@@ -404,7 +404,7 @@ public final class GetPlayers extends KDialog implements WindowListener,
     private void doLoadGame()
     {
         JFileChooser chooser = new JFileChooser(Constants.saveDirname);
-        chooser.setFileFilter(new SaveGameFilter());
+        chooser.setFileFilter(new XMLSnapshotFilter());
         int returnVal = chooser.showOpenDialog(parentFrame);
         if (returnVal == JFileChooser.APPROVE_OPTION)
         {

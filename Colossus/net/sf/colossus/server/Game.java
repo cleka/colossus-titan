@@ -24,6 +24,7 @@ import net.sf.colossus.parser.TerrainRecruitLoader;
 import net.sf.colossus.client.HexMap;
 import net.sf.colossus.client.StartClient;
 
+
 /**
  * Class Game gets and holds high-level data about a Titan game.
  * @version $Id$
@@ -50,7 +51,7 @@ public final class Game
     private int phase;
     private Server server;
     // Negotiation
-    private Set [] proposals = new HashSet[2];
+    private Set[] proposals = new HashSet[2];
 
     private LinkedList colorPickOrder = new LinkedList();
     private java.util.List colorsLeft;
@@ -60,7 +61,6 @@ public final class Game
     /** Server port number. */
     private int port = Constants.defaultPort;
 
-
     /** Public only for JUnit test setup. */
     public Game()
     {
@@ -68,20 +68,17 @@ public final class Game
         CustomRecruitBase.setGame(this);
     }
 
-
     /** For Start */
     Options getOptions()
     {
         return options;
     }
 
-
     // XXX Set from option instead.
     void setPort(int port)
     {
         this.port = port;
     }
-
 
     private void initServer()
     {
@@ -92,7 +89,6 @@ public final class Game
         server = new Server(this, port);
         server.initSocketServer();
     }
-
 
     private void clearFlags()
     {
@@ -105,7 +101,6 @@ public final class Game
         gameOver = false;
         loadingGame = false;
     }
-
 
     private void addPlayersFromOptions()
     {
@@ -123,7 +118,6 @@ public final class Game
         // No longer need the player name and type options. 
         options.clearPlayerInfo();
     }
-
 
     /** Start a new game. */
     void newGame()
@@ -157,12 +151,12 @@ public final class Game
         assignColors();
     }
 
-
     private boolean nameIsTaken(String name)
     {
         for (int i = 0; i < getNumPlayers(); i++)
         {
             Player player = (Player)players.get(i);
+
             if (player.getName().equals(name))
             {
                 return true;
@@ -171,7 +165,7 @@ public final class Game
         return false;
     }
 
-    /** If the name is taken, add random digits to the end. */ 
+    /** If the name is taken, add random digits to the end. */
     String getUniqueName(final String name)
     {
         if (!nameIsTaken(name))
@@ -180,7 +174,6 @@ public final class Game
         }
         return getUniqueName(name + Dice.rollDie());
     }
-
 
     /** Return the index of the correct player for a new remote client.
      *  If loading a game, this is the network player with a matching
@@ -191,34 +184,36 @@ public final class Game
         for (int i = 0; i < getNumPlayers(); i++)
         {
             Player player = (Player)players.get(i);
+
             if (player.getType().endsWith(Constants.network))
             {
                 if (isLoadingGame())
                 {
-                   if (playerName.equals(player.getName()))
-                   {
-                       return i;
-                   }
+                    if (playerName.equals(player.getName()))
+                    {
+                        return i;
+                    }
                 }
                 else
                 {
-                   if (player.getName().startsWith(Constants.byClient))
-                   {
-                       return i;
-                   }
+                    if (player.getName().startsWith(Constants.byClient))
+                    {
+                        return i;
+                    }
                 }
             }
         }
         return -1;
     }
 
-
     private void syncAutoPlay()
     {
         Iterator it = players.iterator();
+
         while (it.hasNext())
         {
             Player player = (Player)it.next();
+
             server.oneSetOption(player.getName(), Options.autoPlay,
                 player.isAI());
             server.oneSetOption(player.getName(), Options.playerType,
@@ -230,10 +225,12 @@ public final class Game
     private void syncOptions()
     {
         Enumeration en = options.propertyNames();
+
         while (en.hasMoreElements())
         {
             String name = (String)en.nextElement();
             String value = options.getStringOption(name);
+
             server.allSetOption(name, value);
         }
     }
@@ -241,6 +238,7 @@ public final class Game
     private void assignColors()
     {
         java.util.List cli = new ArrayList();
+
         colorsLeft = new ArrayList();
         for (int i = 0; i < Constants.colorNames.length; i++)
         {
@@ -251,10 +249,12 @@ public final class Game
         for (int i = 0; i < Constants.DEFAULT_MAX_PLAYERS; i++)
         {
             colorsLeft.add(cli.remove(Dice.rollDie(
-                Constants.DEFAULT_MAX_PLAYERS - i) - 1));
+                        Constants.DEFAULT_MAX_PLAYERS - i) - 1));
         }
+
         /* ... and finish with the newer ones, also in random order */
         int newer = cli.size();
+
         for (int i = 0; i < newer; i++)
         {
             colorsLeft.add(cli.remove(Dice.rollDie(newer - i) - 1));
@@ -267,6 +267,7 @@ public final class Game
         for (int i = getNumPlayers() - 1; i >= 0; i--)
         {
             Player player = (Player)players.get(i);
+
             if (player.isHuman())
             {
                 colorPickOrder.add(player.getName());
@@ -275,6 +276,7 @@ public final class Game
         for (int i = getNumPlayers() - 1; i >= 0; i--)
         {
             Player player = (Player)players.get(i);
+
             if (player.isAI())
             {
                 colorPickOrder.add(player.getName());
@@ -289,6 +291,7 @@ public final class Game
         if (colorPickOrder.size() >= 1)
         {
             String playerName = (String)colorPickOrder.getFirst();
+
             server.askPickColor(playerName, colorsLeft);
         }
         else
@@ -301,6 +304,7 @@ public final class Game
     void assignColor(String playerName, String color)
     {
         Player player = getPlayer(playerName);
+
         colorPickOrder.remove(playerName);
         colorsLeft.remove(color);
         player.setColor(color);
@@ -326,9 +330,11 @@ public final class Game
         server.allUpdatePlayerInfo();
 
         Iterator it = players.iterator();
+
         while (it.hasNext())
         {
             Player player = (Player)it.next();
+
             // XXX Need to let player pick first marker along with color.
             placeInitialLegion(player, player.getFirstAvailableMarker());
             server.allUpdatePlayerInfo();
@@ -339,7 +345,6 @@ public final class Game
         setupPhase();
         caretaker.fullySyncDisplays();
     }
-
 
     /** Randomize towers by rolling dice and rerolling ties. */
     private void assignTowers()
@@ -352,6 +357,7 @@ public final class Game
         ArrayList towerList = new ArrayList();
 
         Iterator it = towerSet.iterator();
+
         while (it.hasNext())
         { // first, fill the list with all Label
             towerList.add(it.next());
@@ -367,6 +373,7 @@ public final class Game
         while ((playersLeft >= 0) && (!towerList.isEmpty()))
         {
             int which = Dice.rollDie(towerList.size());
+
             playerTower[playersLeft] = (String)towerList.remove(which - 1);
             playersLeft--;
         }
@@ -374,17 +381,19 @@ public final class Game
         for (int i = 0; i < numPlayers; i++)
         {
             Player player = getPlayer(i);
+
             Log.event(player.getName() + " gets tower " + playerTower[i]);
             player.setTower(playerTower[i]);
         }
     }
 
     /** Return a list with a balanced order of numPlayer towers chosen
-        from towerList, which must hold numeric strings. */
-    static ArrayList getBalancedTowers(int numPlayers, 
+     from towerList, which must hold numeric strings. */
+    static ArrayList getBalancedTowers(int numPlayers,
         final ArrayList towerList)
     {
         int numTowers = towerList.size();
+
         if (numPlayers > numTowers)
         {
             Log.error("More players than towers!");
@@ -394,10 +403,12 @@ public final class Game
         // Make a sorted copy, converting String to Integer.
         ArrayList numericList = new ArrayList();
         Iterator it = towerList.iterator();
+
         while (it.hasNext())
         {
             String s = (String)it.next();
             Integer i = new Integer(s);
+
             numericList.add(i);
         }
         Collections.sort(numericList);
@@ -410,6 +421,7 @@ public final class Game
         ArrayList sequence = new ArrayList();
         // Prevent floating-point roundoff error.
         double epsilon = 0.0000001;
+
         while (numDone < numPlayers)
         {
             sequence.add(new Integer((int)Math.floor(counter + epsilon)));
@@ -423,6 +435,7 @@ public final class Game
         // Offset the sequence by the starting point, and get only
         // the number of starting towers we need.
         ArrayList returnList = new ArrayList();
+
         it = sequence.iterator();
         numDone = 0;
         while (it.hasNext() && numDone < numPlayers)
@@ -430,6 +443,7 @@ public final class Game
             Integer raw = (Integer)it.next();
             int cooked = (raw.intValue() + startingTower) % numTowers;
             Integer numericLabel = (Integer)numericList.get(cooked);
+
             returnList.add(numericLabel.toString());
             numDone++;
         }
@@ -446,14 +460,13 @@ public final class Game
         return server;
     }
 
-
     void addPlayer(String name, String type)
     {
         Player player = new Player(name, this);
+
         player.setType(type);
         players.add(player);
     }
-
 
     int getNumPlayers()
     {
@@ -464,9 +477,11 @@ public final class Game
     {
         int count = 0;
         Iterator it = players.iterator();
+
         while (it.hasNext())
         {
             Player player = (Player)it.next();
+
             if (!player.isDead())
             {
                 count++;
@@ -513,9 +528,11 @@ public final class Game
         if (name != null)
         {
             Iterator it = players.iterator();
+
             while (it.hasNext())
             {
                 Player player = (Player)it.next();
+
                 if (name.equals(player.getName()))
                 {
                     return player;
@@ -530,9 +547,11 @@ public final class Game
         if (shortColor != null)
         {
             Iterator it = players.iterator();
+
             while (it.hasNext())
             {
                 Player player = (Player)it.next();
+
                 if (shortColor.equals(player.getShortColor()))
                 {
                     return player;
@@ -542,14 +561,15 @@ public final class Game
         return null;
     }
 
-
     int getNumPlayersRemaining()
     {
         int remaining = 0;
         Iterator it = players.iterator();
+
         while (it.hasNext())
         {
             Player player = (Player)it.next();
+
             if (!player.isDead())
             {
                 remaining++;
@@ -562,9 +582,11 @@ public final class Game
     {
         int remaining = 0;
         Iterator it = players.iterator();
+
         while (it.hasNext())
         {
             Player player = (Player)it.next();
+
             if (player.isHuman() && !player.isDead())
             {
                 remaining++;
@@ -573,15 +595,16 @@ public final class Game
         return remaining;
     }
 
-
     Player getWinner()
     {
         int remaining = 0;
         Player winner = null;
         Iterator it = players.iterator();
+
         while (it.hasNext())
         {
             Player player = (Player)it.next();
+
             if (!player.isDead())
             {
                 remaining++;
@@ -598,10 +621,10 @@ public final class Game
         return winner;
     }
 
-
     void checkForVictory()
     {
         int remaining = getNumPlayersRemaining();
+
         switch (remaining)
         {
             case 0:
@@ -612,6 +635,7 @@ public final class Game
 
             case 1:
                 String winnerName = getWinner().getName();
+
                 Log.event("Game over -- " + winnerName + " wins at " +
                     new Date().getTime());
                 server.allTellGameOver(winnerName + " wins");
@@ -622,7 +646,6 @@ public final class Game
                 break;
         }
     }
-
 
     boolean isOver()
     {
@@ -642,12 +665,10 @@ public final class Game
         }
     }
 
-
     boolean isLoadingGame()
     {
         return loadingGame;
     }
-
 
     int getPhase()
     {
@@ -662,15 +683,15 @@ public final class Game
             !playerName.equals(getActivePlayerName()))
         {
             Log.error("Called advancePhase illegally (reason: " +
-                      (oldPhase != phase ? "oldPhase != phase, " +
-                       Constants.getBattlePhaseName(oldPhase) + " != " +
-                       Constants.getBattlePhaseName(phase) :
-                       (pendingAdvancePhase ? "pendingAdvancePhase is true " :
+                (oldPhase != phase ? "oldPhase != phase, " +
+                    Constants.getBattlePhaseName(oldPhase) + " != " +
+                    Constants.getBattlePhaseName(phase) :
+                    (pendingAdvancePhase ? "pendingAdvancePhase is true " :
                         (!playerName.equals(getActivePlayerName()) ?
-                                            "wrong player [" + playerName +
-                                            " vs. " + getActivePlayerName() + 
-                                            "]" :
-                        "UNKNOWN"))) + ")");
+                            "wrong player [" + playerName +
+                            " vs. " + getActivePlayerName() +
+                            "]" :
+                            "UNKNOWN"))) + ")");
             return;
         }
         if (getOption(Options.autoStop) && getNumHumansRemaining() < 1)
@@ -686,6 +707,7 @@ public final class Game
     /** Wrap the complexity of phase advancing. */
     class GamePhaseAdvancer extends PhaseAdvancer
     {
+
         /** Advance to the next phase, only if the passed oldPhase and 
          *  playerName are current. */
         void advancePhase()
@@ -705,7 +727,7 @@ public final class Game
             }
             else
             {
-                Log.event("Phase advances to " + 
+                Log.event("Phase advances to " +
                     Constants.getPhaseName(phase));
             }
             pendingAdvancePhase = false;
@@ -732,13 +754,12 @@ public final class Game
             }
             else
             {
-                Log.event(getActivePlayerName() + "'s turn, number " + 
+                Log.event(getActivePlayerName() + "'s turn, number " +
                     turnNumber);
                 autoSave();
             }
         }
     }
-
 
     private void setupPhase()
     {
@@ -747,24 +768,28 @@ public final class Game
             case Constants.SPLIT:
                 setupSplit();
                 break;
+
             case Constants.MOVE:
                 setupMove();
                 break;
+
             case Constants.FIGHT:
                 setupFight();
                 break;
+
             case Constants.MUSTER:
                 setupMuster();
                 break;
+
             default:
                 Log.error("Bogus phase");
         }
     }
 
-
     private void setupSplit()
     {
         Player player = getActivePlayer();
+
         if (player == null)
         {
             Log.error("No players");
@@ -784,10 +809,10 @@ public final class Game
         }
     }
 
-
     private void setupMove()
     {
         Player player = getActivePlayer();
+
         player.rollMovement();
         server.allSetupMove();
     }
@@ -807,10 +832,10 @@ public final class Game
         }
     }
 
-
     private void setupMuster()
     {
         Player player = getActivePlayer();
+
         player.removeEmptyLegions();
 
         // If this player was eliminated in combat, or can't recruit
@@ -825,263 +850,25 @@ public final class Game
         }
     }
 
-
     int getTurnNumber()
     {
         return turnNumber;
     }
 
-
     void saveGame(final String filename)
     {
-        if (filename == null)
-        {
-            saveGameXML(filename);
-        }
-        else if (filename.endsWith(Constants.saveExtension))
-        {
-            saveGameText(filename);
-        }
-        else
-        {
-            saveGameXML(filename);
-        }
+        saveGameXML(filename);
     }
-
-
-    /** Create a text file describing this game's state, in
-     *  file filename, or <saveDirName>/<time>.sav if null.
-     *  Format:
-     *     Savegame version string
-     *     Variant filename
-     *     Variant name
-     *     Number of players
-     *     Turn number
-     *     Whose turn
-     *     Current phase
-     *     Creature counts
-
-     *     Player 1:
-     *         Name
-     *         Type
-     *         Color
-     *         Starting tower
-     *         Score
-     *         Dead?
-     *         Mulligans left
-     *         Players eliminated
-     *         Number of markers left
-     *         Remaining marker ids
-     *         Movement roll
-     *         Teleported?
-     *         Summoned?
-     *         Number of Legions
-     *
-     *         Legion 1:
-     *             Marker id
-     *             Current hex label
-     *             Starting hex label
-     *             Moved?
-     *             Entry side
-     *             Parent
-     *             Recruit name
-     *             Battle tally
-     *             Height
-     *             Creature 1:
-     *                 Creature type
-     *             ...
-     *         ...
-     *     ...
-
-     *     Engagement hex
-     *     Battle turn number
-     *     Whose battle turn
-     *     Battle phase
-     *     Summon state
-     *     Carry damage
-     *     Drift damage applied?
-
-     *     Attacking Legion:
-     *         Marker id
-     *         Current hex label
-     *         Starting hex label
-     *         Moved?
-     *         Entry side
-     *         Parent
-     *         Recruited?
-     *         Battle tally
-     *         Height
-     *         Creature 1:
-     *             Creature type
-     *             Hits
-     *             Current hex
-     *             Starting hex
-     *             Struck?
-     *         ...
-     *     Defending Legion:
-     *         ...
-     */
-    synchronized void saveGameText(final String filename)
-    {
-        String fn = null; 
-        if (filename == null || filename.equals("null"))
-        {
-            Date date = new Date();
-            File savesDir = new File(Constants.saveDirname);
-            if (!savesDir.exists() || !savesDir.isDirectory())
-            {
-                Log.event("Trying to make directory " + Constants.saveDirname);
-                if (!savesDir.mkdirs())
-                {
-                    Log.error("Could not create saves directory");
-                    return;
-                }
-            }
-
-            fn = Constants.saveDirname + date.getTime() + 
-                Constants.saveExtension;
-        }
-        else
-        {
-            fn = new String(filename);
-        }
-
-        FileWriter fileWriter;
-        try
-        {
-            fileWriter = new FileWriter(fn);
-        }
-        catch (IOException e)
-        {
-            Log.error(e.toString());
-            Log.error("Couldn't open " + fn);
-            return;
-        }
-        PrintWriter out = new PrintWriter(fileWriter);
-
-        out.println(Constants.saveGameVersion);
-        out.println(VariantSupport.getVarName());
-        out.println(VariantSupport.getVarDirectory());
-        out.println(getNumPlayers());
-        out.println(getTurnNumber());
-        out.println(getActivePlayerNum());
-        out.println(getPhase());
-
-        // Caretaker stacks
-        java.util.List creatures = Creature.getCreatures();
-        Iterator it = creatures.iterator();
-        while (it.hasNext())
-        {
-            Creature creature = (Creature)it.next();
-            out.println(caretaker.getCount(creature));
-        }
-
-        // Players
-        it = players.iterator();
-        while (it.hasNext())
-        {
-            Player player = (Player)it.next();
-            out.println(player.getName());
-            out.println(player.getType());
-            out.println(player.getColor());
-            out.println(player.getTower());
-            out.println(player.getScore());
-            out.println(player.isDead());
-            out.println(player.getMulligansLeft());
-            out.println(player.getPlayersElim());
-            out.println(player.getNumMarkersAvailable());
-
-            Set markerIds = player.getMarkersAvailable();
-            Iterator it2 = markerIds.iterator();
-            while (it2.hasNext())
-            {
-                String markerId = (String)it2.next();
-                out.println(markerId);
-            }
-
-            out.println(player.getMovementRoll());
-            out.println(player.hasTeleported());
-            out.println(player.hasSummoned());
-            out.println(player.getNumLegions());
-
-            Collection legions = player.getLegions();
-            it2 = legions.iterator();
-            while (it2.hasNext())
-            {
-                Legion legion = (Legion)it2.next();
-                dumpLegionText(out, legion, false);
-            }
-        }
-
-        // Battle stuff
-        if (engagementInProgress && battle != null)
-        {
-            out.println(battle.getMasterHexLabel());
-            out.println(battle.getTurnNumber());
-            out.println(battle.getActivePlayerName());
-            out.println(battle.getPhase());
-            out.println(battle.getSummonState());
-            out.println(battle.getCarryDamage());
-            out.println(battle.isDriftDamageApplied());
-
-            int numCarryTargets = battle.getCarryTargets().size();
-            out.println(numCarryTargets);
-            it = battle.getCarryTargets().iterator();
-            while (it.hasNext())
-            {
-                String carryTarget = (String)it.next();
-                out.println(carryTarget);
-            }
-
-            dumpLegionText(out, battle.getAttacker(), true);
-            dumpLegionText(out, battle.getDefender(), true);
-        }
-
-        if (out.checkError())
-        {
-            Log.error("Write error " + fn);
-            return;
-        }
-    }
-
-
-    private void dumpLegionText(PrintWriter out, Legion legion, 
-        boolean inBattle)
-    {
-        out.println(legion.getMarkerId());
-        out.println(legion.getCurrentHexLabel());
-        out.println(legion.getStartingHexLabel());
-        out.println(legion.hasMoved());
-        out.println(legion.getEntrySide());
-        out.println(legion.getParentId());
-        out.println(legion.getRecruitName());
-        out.println(legion.getBattleTally());
-        out.println(legion.getHeight());
-        Collection critters = legion.getCritters();
-        Iterator it = critters.iterator();
-        while (it.hasNext())
-        {
-            Critter critter = (Critter)it.next();
-            out.println(critter.getName());
-            if (inBattle)
-            {
-                out.println(critter.getHits());
-                out.println(critter.getCurrentHexLabel());
-                out.println(critter.getStartingHexLabel());
-                out.println(critter.hasStruck());
-            }
-        }
-    }
-
-
 
     synchronized void saveGameXML(final String filename)
     {
-        String fn = null; 
+        String fn = null;
+
         if (filename == null || filename.equals("null"))
         {
             Date date = new Date();
             File savesDir = new File(Constants.saveDirname);
+
             if (!savesDir.exists() || !savesDir.isDirectory())
             {
                 Log.event("Trying to make directory " + Constants.saveDirname);
@@ -1093,7 +880,7 @@ public final class Game
             }
 
             fn = Constants.saveDirname + Constants.xmlSnapshotStart +
-                date.getTime() + Constants.xmlExtension;
+                    date.getTime() + Constants.xmlExtension;
         }
         else
         {
@@ -1101,6 +888,7 @@ public final class Game
         }
 
         FileWriter fileWriter;
+
         try
         {
             fileWriter = new FileWriter(fn);
@@ -1113,14 +901,16 @@ public final class Game
         }
         PrintWriter out = new PrintWriter(fileWriter);
 
-        try 
+        try
         {
             Element root = new Element("ColossusSnapshot");
+
             root.setAttribute("version", Constants.xmlSnapshotVersion);
 
             Document doc = new Document(root);
-            
+
             Element el = new Element("Variant");
+
             el.setAttribute("dir", VariantSupport.getVarDirectory());
             el.setAttribute("file", VariantSupport.getVarName());
             root.addContent(el);
@@ -1138,11 +928,13 @@ public final class Game
             root.addContent(el);
 
             Element car = new Element("Caretaker");
+
             root.addContent(car);
 
             // Caretaker stacks
             java.util.List creatures = Creature.getCreatures();
             Iterator it = creatures.iterator();
+
             while (it.hasNext())
             {
                 Creature creature = (Creature)it.next();
@@ -1154,7 +946,7 @@ public final class Game
                 el.setAttribute("dead", "" + caretaker.getDeadCount(creature));
                 car.addContent(el);
             }
-    
+
             // Players
             it = players.iterator();
             while (it.hasNext())
@@ -1168,37 +960,40 @@ public final class Game
                 el.setAttribute("startingTower", player.getTower());
                 el.setAttribute("score", "" + player.getScore());
                 el.setAttribute("dead", "" + player.isDead());
-                el.setAttribute("mulligansLeft", "" + 
+                el.setAttribute("mulligansLeft", "" +
                     player.getMulligansLeft());
                 el.setAttribute("colorsElim", player.getPlayersElim());
                 el.setAttribute("movementRoll", "" + player.getMovementRoll());
                 el.setAttribute("teleported", "" + player.hasTeleported());
                 el.setAttribute("summoned", "" + player.hasSummoned());
-    
+
                 Collection legions = player.getLegions();
                 Iterator it2 = legions.iterator();
+
                 while (it2.hasNext())
                 {
                     Legion legion = (Legion)it2.next();
-                    el.addContent(dumpLegionXML(doc, legion, battle != null 
-                        && (legion == battle.getAttacker() || 
-                            legion == battle.getDefender())));
+
+                    el.addContent(dumpLegionXML(doc, legion, battle != null
+                            && (legion == battle.getAttacker() ||
+                                legion == battle.getDefender())));
                 }
                 root.addContent(el);
             }
-    
+
             // Battle stuff
             if (engagementInProgress && battle != null)
             {
                 Element bat = new Element("Battle");
+
                 bat.setAttribute("masterHexLabel", battle.getMasterHexLabel());
                 bat.setAttribute("turnNumber", "" + battle.getTurnNumber());
-                bat.setAttribute("activePlayer", "" + 
+                bat.setAttribute("activePlayer", "" +
                     battle.getActivePlayerName());
                 bat.setAttribute("phase", "" + battle.getPhase());
                 bat.setAttribute("summonState", "" + battle.getSummonState());
                 bat.setAttribute("carryDamage", "" + battle.getCarryDamage());
-                bat.setAttribute("driftDamageApplied", "" +  
+                bat.setAttribute("driftDamageApplied", "" +
                     battle.isDriftDamageApplied());
 
                 it = battle.getCarryTargets().iterator();
@@ -1206,13 +1001,15 @@ public final class Game
                 {
                     Element ct = new Element("CarryTarget");
                     String carryTarget = (String)it.next();
+
                     ct.addContent(carryTarget);
                     bat.addContent(ct);
                 }
                 root.addContent(bat);
             }
-            
+
             XMLOutputter putter = new XMLOutputter("    ", true);
+
             putter.output(doc, out);
         }
         catch (IOException ex)
@@ -1230,10 +1027,11 @@ public final class Game
         return in;
     }
 
-    private Element dumpLegionXML(Document doc, Legion legion, 
+    private Element dumpLegionXML(Document doc, Legion legion,
         boolean inBattle)
     {
         Element leg = new Element("Legion");
+
         leg.setAttribute("name", legion.getMarkerId());
         leg.setAttribute("currentHex", legion.getCurrentHexLabel());
         leg.setAttribute("startingHex", legion.getStartingHexLabel());
@@ -1245,6 +1043,7 @@ public final class Game
 
         Collection critters = legion.getCritters();
         Iterator it = critters.iterator();
+
         while (it.hasNext())
         {
             Critter critter = (Critter)it.next();
@@ -1264,348 +1063,42 @@ public final class Game
     }
 
     void autoSave()
-    {            
+    {
         if (getOption(Options.autosave))
         {
             saveGame(null);
         }
     }
 
-
     void loadGame(String filename)
     {
-        if (filename.endsWith(Constants.saveExtension))
-        {
-            loadGameText(filename);
-        }
-        else
-        {
-            loadGameXML(filename);
-        }
+        loadGameXML(filename);
     }
-
-    /** Try to load a game from saveDirName/filename.  If the filename is
-     *  "--latest" then load the latest savegame found in saveDirName. */
-    void loadGameText(String filename)
-    {
-        File file = null;
-        if (filename.equals("--latest"))
-        {
-            File dir = new File(Constants.saveDirname);
-            if (!dir.exists() || !dir.isDirectory())
-            {
-                Log.error("No saves directory");
-                dispose();
-            }
-            String [] filenames = dir.list(new SaveGameFilter());
-            if (filenames.length < 1)
-            {
-                Log.error("No savegames found in saves directory");
-                dispose();
-            }
-            file = new File(Constants.saveDirname + 
-                latestSaveFilename(filenames));
-        }
-        else
-        {
-            file = new File(Constants.saveDirname + filename);
-        }
-
-        try
-        {
-            Log.event("Loading game from " + file);
-            FileReader fileReader = new FileReader(file);
-            BufferedReader in = new BufferedReader(fileReader);
-            String buf;
-
-            buf = in.readLine();
-            if (!buf.equals(Constants.saveGameVersion))
-            {
-                Log.error("Can't load this savegame version.");
-                dispose();
-            }
-
-            // Reset flags that are not in the savegame file.
-            clearFlags();
-            loadingGame = true;
-            
-            VariantSupport.loadVariant(in.readLine(), in.readLine());
-
-            buf = in.readLine();
-            int numPlayers = Integer.parseInt(buf);
-
-            buf = in.readLine();
-            turnNumber = Integer.parseInt(buf);
-
-            buf = in.readLine();
-            activePlayerNum = Integer.parseInt(buf);
-
-            buf = in.readLine();
-            phase = Integer.parseInt(buf);
-
-            java.util.List creatures = Creature.getCreatures();
-            Iterator it = creatures.iterator();
-            while (it.hasNext())
-            {
-                Creature creature = (Creature)it.next();
-                buf = in.readLine();
-                int count = Integer.parseInt(buf);
-                caretaker.setCount(creature, count);
-            }
-
-            players.clear();
-            if (battle != null)
-            {
-                server.allCleanupBattle();
-            }
-
-            // Players
-            for (int i = 0; i < numPlayers; i++)
-            {
-                String name = in.readLine();
-                Player player = new Player(name, this);
-                players.add(player);
-
-                String type = in.readLine();
-                player.setType(type);
-
-                String color = in.readLine();
-                player.setColor(color);
-
-                String tower= in.readLine();
-                player.setTower(tower);
-
-                buf = in.readLine();
-                int score = Integer.parseInt(buf);
-                player.setScore(score);
-
-                buf = in.readLine();
-                player.setDead(Boolean.valueOf(buf).booleanValue());
-
-                buf = in.readLine();
-                int mulligansLeft = Integer.parseInt(buf);
-                player.setMulligansLeft(mulligansLeft);
-
-                String playersElim = in.readLine();
-                if (playersElim.equals("null"))
-                {
-                    playersElim = "";
-                }
-                player.setPlayersElim(playersElim);
-
-                buf = in.readLine();
-                int numMarkersAvailable = Integer.parseInt(buf);
-
-                for (int j = 0; j < numMarkersAvailable; j++)
-                {
-                    String markerId = in.readLine();
-                    player.addLegionMarker(markerId);
-                }
-
-                buf = in.readLine();
-                player.setMovementRoll(Integer.parseInt(buf));
-
-                buf = in.readLine();
-                player.setTeleported(Boolean.valueOf(buf).booleanValue());
-
-                buf = in.readLine();
-                player.setSummoned(Boolean.valueOf(buf).booleanValue());
-
-                buf = in.readLine();
-                int numLegions = Integer.parseInt(buf);
-
-                // Legions
-                for (int j = 0; j < numLegions; j++)
-                {
-                    readLegionText(in, player, false);
-                }
-            }
-
-            // Battle stuff
-            buf = in.readLine();
-            if (buf != null && buf.length() > 0)
-            {
-                String engagementHexLabel = buf.toString();
-
-                buf = in.readLine();
-                int battleTurnNum = Integer.parseInt(buf);
-
-                buf = in.readLine();
-                String battleActivePlayerName = buf;
-
-                buf = in.readLine();
-                int battlePhase = Integer.parseInt(buf);
-
-                buf = in.readLine();
-                int summonState = Integer.parseInt(buf);
-
-                buf = in.readLine();
-                int carryDamage = Integer.parseInt(buf);
-
-                buf = in.readLine();
-                boolean driftDamageApplied =
-                    Boolean.valueOf(buf).booleanValue();
-
-                buf = in.readLine();
-                int numCarryTargets = Integer.parseInt(buf);
-                Set carryTargets = new HashSet();
-                for (int i = 0; i < numCarryTargets; i++)
-                {
-                    buf = in.readLine();
-                    carryTargets.add(buf);
-                }
-
-                Player attackingPlayer = getActivePlayer();
-                Legion attacker = readLegionText(in, attackingPlayer, true);
-
-                Player defendingPlayer = getFirstEnemyLegion(
-                    engagementHexLabel, attackingPlayer).getPlayer();
-                Legion defender = readLegionText(in, defendingPlayer, true);
-
-                int activeLegionNum;
-                if (battleActivePlayerName.equals(attackingPlayer.getName()))
-                {
-                    activeLegionNum = Constants.ATTACKER;
-                }
-                else
-                {
-                    activeLegionNum = Constants.DEFENDER;
-                }
-
-                battle = new Battle(this, attacker.getMarkerId(),
-                    defender.getMarkerId(), activeLegionNum,
-                    engagementHexLabel, battleTurnNum, battlePhase);
-                battle.setSummonState(summonState);
-                battle.setCarryDamage(carryDamage);
-                battle.setDriftDamageApplied(driftDamageApplied);
-                battle.setCarryTargets(carryTargets);
-                battle.init();
-            }
-
-            initServer();
-            // Remaining stuff has been moved to loadGame2()
-        }
-        // FileNotFoundException, IOException, NumberFormatException
-        catch (Exception ex)
-        {
-            Log.error("Tried to load corrupt savegame.");
-            ex.printStackTrace();
-            dispose();
-        }
-    }
-
-    Legion readLegionText(BufferedReader in, Player player,
-        boolean inBattle) throws IOException
-    {
-        String markerId = in.readLine();
-        String currentHexLabel = in.readLine();
-        String startingHexLabel = in.readLine();
-
-        String buf = in.readLine();
-        boolean moved = Boolean.valueOf(buf).booleanValue();
-
-        buf = in.readLine();
-        int entrySide = Integer.valueOf(buf).intValue();
-
-        String parentId = in.readLine();
-
-        String recruitName = in.readLine();
-        if (recruitName.equals("null"))
-        {
-            recruitName = null;
-        }
-
-        buf = in.readLine();
-        int battleTally = Integer.parseInt(buf);
-
-        buf = in.readLine();
-        int height = Integer.parseInt(buf);
-
-        // Critters
-        Critter [] critters = new Critter[8];
-        for (int k = 0; k < height; k++)
-        {
-            buf = in.readLine();
-            Critter critter = new Critter(
-                Creature.getCreatureByName(buf), null, this);
-
-            // Battle stuff
-            if (inBattle)
-            {
-                buf = in.readLine();
-                int hits = Integer.parseInt(buf);
-                critter.setHits(hits);
-
-                buf = in.readLine();
-                critter.setCurrentHexLabel(buf);
-                buf = in.readLine();
-                critter.setStartingHexLabel(buf);
-
-                buf = in.readLine();
-                boolean struck = Boolean.valueOf(buf).booleanValue();
-                critter.setStruck(struck);
-            }
-
-            critters[k] = critter;
-        }
-
-        // If this legion already exists, modify it in place.
-        Legion legion = player.getLegionByMarkerId(markerId);
-        if (legion != null)
-        {
-            for (int k = 0; k < height; k++)
-            {
-                legion.setCritter(k, critters[k]);
-            }
-        }
-        else
-        {
-            legion = new Legion(markerId, parentId, currentHexLabel,
-                                startingHexLabel,
-                                critters[0].getCreature(),
-                                critters[1].getCreature(),
-                                critters[2].getCreature(),
-                                critters[3].getCreature(),
-                                critters[4].getCreature(),
-                                critters[5].getCreature(),
-                                critters[6].getCreature(),
-                                critters[7].getCreature(),
-                                player.getName(),
-                                this);
-            player.addLegion(legion);
-        }
-
-        legion.setMoved(moved);
-        legion.setRecruitName(recruitName);
-        legion.setEntrySide(entrySide);
-        legion.addToBattleTally(battleTally);
-
-        return legion;
-    }
-
-
 
     /** Try to load a game from saveDirName/filename.  If the filename is
      *  "--latest" then load the latest savegame found in saveDirName. */
     void loadGameXML(String filename)
     {
         File file = null;
+
         if (filename.equals("--latest"))
         {
             File dir = new File(Constants.saveDirname);
+
             if (!dir.exists() || !dir.isDirectory())
             {
                 Log.error("No saves directory");
                 dispose();
             }
-            String [] filenames = dir.list(new XMLSnapshotFilter());
+            String[] filenames = dir.list(new XMLSnapshotFilter());
+
             if (filenames.length < 1)
             {
                 Log.error("No XML savegames found in saves directory");
                 dispose();
             }
-            file = new File(Constants.saveDirname + 
-                latestSaveFilename(filenames));
+            file = new File(Constants.saveDirname +
+                        latestSaveFilename(filenames));
         }
         else
         {
@@ -1620,6 +1113,7 @@ public final class Game
 
             Element root = doc.getRootElement();
             Attribute ver = root.getAttribute("version");
+
             if (!ver.getValue().equals(Constants.xmlSnapshotVersion))
             {
                 Log.error("Can't load this savegame version.");
@@ -1629,10 +1123,11 @@ public final class Game
             // Reset flags that are not in the savegame file.
             clearFlags();
             loadingGame = true;
-            
+
             Element el = root.getChild("Variant");
             Attribute dir = el.getAttribute("dir");
             Attribute fil = el.getAttribute("file");
+
             VariantSupport.loadVariant(fil.getValue(), dir.getValue());
 
             el = root.getChild("TurnNumber");
@@ -1647,6 +1142,7 @@ public final class Game
             Element ct = root.getChild("Caretaker");
             java.util.List kids = ct.getChildren();
             Iterator it = kids.iterator();
+
             while (it.hasNext())
             {
                 el = (Element)it.next();
@@ -1654,6 +1150,7 @@ public final class Game
                 int remaining = el.getAttribute("remaining").getIntValue();
                 int dead = el.getAttribute("dead").getIntValue();
                 Creature creature = Creature.getCreatureByName(creatureName);
+
                 caretaker.setCount(creature, remaining);
                 caretaker.setDeadCount(creature, dead);
             }
@@ -1666,6 +1163,7 @@ public final class Game
 
             // Players
             java.util.List playerElements = root.getChildren("Player");
+
             it = playerElements.iterator();
             while (it.hasNext())
             {
@@ -1673,24 +1171,30 @@ public final class Game
 
                 String name = pla.getAttribute("name").getValue();
                 Player player = new Player(name, this);
+
                 players.add(player);
 
                 String type = pla.getAttribute("type").getValue();
+
                 player.setType(type);
 
                 String color = pla.getAttribute("color").getValue();
+
                 player.setColor(color);
 
-                String tower= pla.getAttribute("startingTower").getValue();
+                String tower = pla.getAttribute("startingTower").getValue();
+
                 player.setTower(tower);
 
                 int score = pla.getAttribute("score").getIntValue();
+
                 player.setScore(score);
 
                 player.setDead(pla.getAttribute("dead").getBooleanValue());
 
-                int mulligansLeft = 
-                    pla.getAttribute("mulligansLeft").getIntValue(); 
+                int mulligansLeft =
+                    pla.getAttribute("mulligansLeft").getIntValue();
+
                 player.setMulligansLeft(mulligansLeft);
 
                 player.setMovementRoll(
@@ -1702,8 +1206,9 @@ public final class Game
                 player.setSummoned(
                     pla.getAttribute("summoned").getBooleanValue());
 
-                String playersElim = 
+                String playersElim =
                     pla.getAttribute("colorsElim").getValue();
+
                 if (playersElim == "null")
                 {
                     playersElim = "";
@@ -1712,9 +1217,11 @@ public final class Game
 
                 java.util.List legionElements = pla.getChildren("Legion");
                 Iterator it2 = legionElements.iterator();
+
                 while (it2.hasNext())
                 {
                     Element leg = (Element)it2.next();
+
                     readLegionXML(leg, player);
                 }
             }
@@ -1723,17 +1230,19 @@ public final class Game
             while (it.hasNext())
             {
                 Player player = (Player)it.next();
+
                 player.computeMarkersAvailable();
             }
 
             // Battle stuff
             Element bat = root.getChild("Battle");
+
             if (bat != null)
             {
-                String engagementHexLabel = 
+                String engagementHexLabel =
                     bat.getAttribute("masterHexLabel").getValue();
 
-                int battleTurnNum = 
+                int battleTurnNum =
                     bat.getAttribute("turnNumber").getIntValue();
 
                 String battleActivePlayerName =
@@ -1741,10 +1250,10 @@ public final class Game
 
                 int battlePhase = bat.getAttribute("phase").getIntValue();
 
-                int summonState = 
+                int summonState =
                     bat.getAttribute("summonState").getIntValue();
 
-                int carryDamage = 
+                int carryDamage =
                     bat.getAttribute("carryDamage").getIntValue();
 
                 boolean driftDamageApplied =
@@ -1753,20 +1262,23 @@ public final class Game
                 java.util.List cts = bat.getChildren("CarryTarget");
                 Iterator it2 = cts.iterator();
                 Set carryTargets = new HashSet();
+
                 while (it2.hasNext())
                 {
                     Element cart = (Element)it2.next();
+
                     carryTargets.add(cart.getTextTrim());
                 }
 
                 Player attackingPlayer = getActivePlayer();
                 Legion attacker = getFirstFriendlyLegion(engagementHexLabel,
-                    attackingPlayer);
-                Legion defender = getFirstEnemyLegion(engagementHexLabel, 
-                    attackingPlayer);
+                        attackingPlayer);
+                Legion defender = getFirstEnemyLegion(engagementHexLabel,
+                        attackingPlayer);
                 Player defendingPlayer = defender.getPlayer();
 
                 int activeLegionNum;
+
                 if (battleActivePlayerName.equals(attackingPlayer.getName()))
                 {
                     activeLegionNum = Constants.ATTACKER;
@@ -1777,8 +1289,8 @@ public final class Game
                 }
 
                 battle = new Battle(this, attacker.getMarkerId(),
-                    defender.getMarkerId(), activeLegionNum,
-                    engagementHexLabel, battleTurnNum, battlePhase);
+                            defender.getMarkerId(), activeLegionNum,
+                            engagementHexLabel, battleTurnNum, battlePhase);
                 battle.setSummonState(summonState);
                 battle.setCarryDamage(carryDamage);
                 battle.setDriftDamageApplied(driftDamageApplied);
@@ -1797,7 +1309,7 @@ public final class Game
         }
     }
 
-    private void readLegionXML(Element leg, Player player) 
+    private void readLegionXML(Element leg, Player player)
         throws DataConversionException
     {
         String markerId = leg.getAttribute("name").getValue();
@@ -1807,6 +1319,7 @@ public final class Game
         int entrySide = leg.getAttribute("entrySide").getIntValue();
         String parentId = leg.getAttribute("parent").getValue();
         String recruitName = leg.getAttribute("recruitName").getValue();
+
         if (recruitName.equals("null"))
         {
             recruitName = null;
@@ -1814,31 +1327,36 @@ public final class Game
         int battleTally = leg.getAttribute("battleTally").getIntValue();
 
         // Critters
-        Critter [] critters = new Critter[8];
+        Critter[] critters = new Critter[8];
         java.util.List creatureElements = leg.getChildren("Creature");
         Iterator it = creatureElements.iterator();
         int k = 0;
+
         while (it.hasNext())
         {
             Element cre = (Element)it.next();
             String name = cre.getAttribute("name").getValue();
             Critter critter = new Critter(
-                Creature.getCreatureByName(name), null, this);
+                    Creature.getCreatureByName(name), null, this);
 
             // Battle stuff
             if (cre.getAttribute("hits") != null)
             {
                 int hits = cre.getAttribute("hits").getIntValue();
+
                 critter.setHits(hits);
 
                 String currentBattleHexLabel =
                     cre.getAttribute("currentHex").getValue();
+
                 critter.setCurrentHexLabel(currentBattleHexLabel);
                 String startingBattleHexLabel =
                     cre.getAttribute("startingHex").getValue();
+
                 critter.setStartingHexLabel(startingBattleHexLabel);
 
                 boolean struck = cre.getAttribute("struck").getBooleanValue();
+
                 critter.setStruck(struck);
             }
 
@@ -1848,6 +1366,7 @@ public final class Game
 
         // If this legion already exists, modify it in place.
         Legion legion = player.getLegionByMarkerId(markerId);
+
         if (legion != null)
         {
             for (k = 0; k < legion.getHeight(); k++)
@@ -1858,20 +1377,20 @@ public final class Game
         else
         {
             legion = new Legion(
-                markerId, 
-                parentId, 
-                currentHexLabel, 
-                startingHexLabel,
-                critters[0] == null ? null : critters[0].getCreature(),
-                critters[1] == null ? null : critters[1].getCreature(),
-                critters[2] == null ? null : critters[2].getCreature(),
-                critters[3] == null ? null : critters[3].getCreature(),
-                critters[4] == null ? null : critters[4].getCreature(),
-                critters[5] == null ? null : critters[5].getCreature(),
-                critters[6] == null ? null : critters[6].getCreature(),
-                critters[7] == null ? null : critters[7].getCreature(),
-                player.getName(), 
-                this);
+                        markerId,
+                        parentId,
+                        currentHexLabel,
+                        startingHexLabel,
+                        critters[0] == null ? null : critters[0].getCreature(),
+                        critters[1] == null ? null : critters[1].getCreature(),
+                        critters[2] == null ? null : critters[2].getCreature(),
+                        critters[3] == null ? null : critters[3].getCreature(),
+                        critters[4] == null ? null : critters[4].getCreature(),
+                        critters[5] == null ? null : critters[5].getCreature(),
+                        critters[6] == null ? null : critters[6].getCreature(),
+                        critters[7] == null ? null : critters[7].getCreature(),
+                        player.getName(),
+                        this);
             player.addLegion(legion);
         }
 
@@ -1880,7 +1399,6 @@ public final class Game
         legion.setEntrySide(entrySide);
         legion.addToBattleTally(battleTally);
     }
-
 
     void loadGame2()
     {
@@ -1916,9 +1434,11 @@ public final class Game
     private long numberValue(String filename)
     {
         StringBuffer numberPart = new StringBuffer();
+
         for (int i = 0; i < filename.length(); i++)
         {
             char ch = filename.charAt(i);
+
             if (Character.isDigit(ch))
             {
                 numberPart.append(ch);
@@ -1935,33 +1455,34 @@ public final class Game
     }
 
     /** Find the save filename with the highest numerical value.
-        (1000000000.sav comes after 999999999.sav) */
-    private String latestSaveFilename(String [] filenames)
+     (1000000000.sav comes after 999999999.sav) */
+    private String latestSaveFilename(String[] filenames)
     {
         return (String)Collections.max(Arrays.asList(filenames), new
-            Comparator()
-            {
-                public int compare(Object o1, Object o2)
+                Comparator()
                 {
-                    if (!(o1 instanceof String) || !(o2 instanceof String))
+                    public int compare(Object o1, Object o2)
                     {
-                        throw new ClassCastException();
-                    }
-                    long diff = (numberValue((String)o1) -
-                        numberValue((String)o2));
-                    if (diff > Integer.MAX_VALUE)
-                    {
-                        return Integer.MAX_VALUE;
-                    }
-                    if (diff < Integer.MIN_VALUE)
-                    {
-                        return Integer.MIN_VALUE;
-                    }
-                    return (int)diff;
-                }
-            });
-    }
+                        if (!(o1 instanceof String) || !(o2 instanceof String))
+                        {
+                            throw new ClassCastException();
+                        }
+                        long diff = (numberValue((String)o1) -
+                                numberValue((String)o2));
 
+                        if (diff > Integer.MAX_VALUE)
+                        {
+                            return Integer.MAX_VALUE;
+                        }
+                        if (diff < Integer.MIN_VALUE)
+                        {
+                            return Integer.MIN_VALUE;
+                        }
+                        return (int)diff;
+                    }
+                }
+            );
+    }
 
     /** Return a list of eligible recruits, as Creatures. */
     java.util.List findEligibleRecruits(String markerId, String hexLabel)
@@ -1973,22 +1494,24 @@ public final class Game
         char terrain = hex.getTerrain();
 
         recruits = new ArrayList();
-        java.util.List tempRecruits = 
+        java.util.List tempRecruits =
             TerrainRecruitLoader.getPossibleRecruits(terrain, hexLabel);
-        java.util.List recruiters = 
+        java.util.List recruiters =
             TerrainRecruitLoader.getPossibleRecruiters(terrain, hexLabel);
 
         ListIterator lit = tempRecruits.listIterator();
-            
+
         while (lit.hasNext())
         {
             Creature creature = (Creature)lit.next();
             ListIterator liter = recruiters.listIterator();
+
             while (liter.hasNext())
             {
                 Creature lesser = (Creature)liter.next();
-                if ((TerrainRecruitLoader.numberOfRecruiterNeeded(lesser, 
-                    creature, terrain, hexLabel) <= legion.numCreature(lesser)) &&
+
+                if ((TerrainRecruitLoader.numberOfRecruiterNeeded(lesser,
+                            creature, terrain, hexLabel) <= legion.numCreature(lesser)) &&
                     (recruits.indexOf(creature) == -1))
                 {
                     recruits.add(creature);
@@ -1998,9 +1521,11 @@ public final class Game
 
         // Make sure that the potential recruits are available.
         Iterator it = recruits.iterator();
+
         while (it.hasNext())
         {
             Creature recruit = (Creature)it.next();
+
             if (caretaker.getCount(recruit) < 1)
             {
                 it.remove();
@@ -2015,6 +1540,7 @@ public final class Game
     {
         java.util.List recruiters;
         Creature recruit = Creature.getCreatureByName(recruitName);
+
         if (recruit == null)
         {
             return new ArrayList();
@@ -2027,11 +1553,13 @@ public final class Game
 
         recruiters = TerrainRecruitLoader.getPossibleRecruiters(terrain, hexLabel);
         Iterator it = recruiters.iterator();
+
         while (it.hasNext())
         {
             Creature possibleRecruiter = (Creature)it.next();
             int needed = TerrainRecruitLoader.numberOfRecruiterNeeded(
-                possibleRecruiter, recruit, terrain, hexLabel);
+                    possibleRecruiter, recruit, terrain, hexLabel);
+
             if (needed < 1 || needed > legion.numCreature(possibleRecruiter))
             {
                 // Zap this possible recruiter.
@@ -2049,8 +1577,8 @@ public final class Game
     private boolean anonymousRecruitLegal(Legion legion, Creature recruit)
     {
         return TerrainRecruitLoader.anonymousRecruitLegal(recruit,
-                                     legion.getCurrentHex().getTerrain(),
-                                     legion.getCurrentHex().getLabel());
+                legion.getCurrentHex().getTerrain(),
+                legion.getCurrentHex().getLabel());
     }
 
     /** Add recruit to legion. */
@@ -2058,7 +1586,8 @@ public final class Game
     {
         // Check for recruiter legality.
         java.util.List recruiters = findEligibleRecruiters(
-            legion.getMarkerId(), recruit.getName());
+                legion.getMarkerId(), recruit.getName());
+
         if (recruit == null)
         {
             Log.error("null recruit in Game.doRecruit()");
@@ -2079,7 +1608,7 @@ public final class Game
         }
         else if (!recruiters.contains(recruiter))
         {
-            Log.error("Illegal recruiter " + recruiter.getName() + 
+            Log.error("Illegal recruiter " + recruiter.getName() +
                 " for recruit " + recruit.getName());
             return;
         }
@@ -2087,26 +1616,26 @@ public final class Game
         legion.addCreature(recruit, true);
         MasterHex hex = legion.getCurrentHex();
         int numRecruiters = 0;
+
         if (recruiter != null)
         {
             // Mark the recruiter(s) as visible.
             numRecruiters = TerrainRecruitLoader.numberOfRecruiterNeeded(
-                recruiter, recruit, hex.getTerrain(), hex.getLabel());
+                        recruiter, recruit, hex.getTerrain(), hex.getLabel());
         }
 
         Log.event("Legion " + legion.getLongMarkerName() + " in " +
             hex.getDescription() + " recruits " + recruit.getName() +
             " with " + (numRecruiters == 0 ? "nothing" :
-            numRecruiters + " " + (numRecruiters > 1 ?
-            recruiter.getPluralName() : recruiter.getName())));
+                numRecruiters + " " + (numRecruiters > 1 ?
+                    recruiter.getPluralName() : recruiter.getName())));
 
         // Recruits are one to a customer.
         legion.setRecruitName(recruit.getName());
 
         reinforcing = false;
     }
-    
-    
+
     /** Return a list of names of angel types that can be acquired. */
     java.util.List findEligibleAngels(Legion legion, int score)
     {
@@ -2116,12 +1645,14 @@ public final class Game
         }
         java.util.List recruits = new ArrayList();
         char t = legion.getCurrentHex().getTerrain();
-        java.util.List allRecruits = 
+        java.util.List allRecruits =
             TerrainRecruitLoader.getRecruitableAcquirableList(t, score);
         java.util.Iterator it = allRecruits.iterator();
+
         while (it.hasNext())
         {
             String name = (String)it.next();
+
             if (caretaker.getCount(Creature.getCreatureByName(name)) >= 1 &&
                 !recruits.contains(name))
             {
@@ -2140,18 +1671,19 @@ public final class Game
         System.exit(0);
     }
 
-
     private void placeInitialLegion(Player player, String markerId)
     {
         String name = player.getName();
+
         player.selectMarkerId(markerId);
         Log.event(name + " selects initial marker");
 
         // Lookup coords for chit starting from player[i].getTower()
         String hexLabel = player.getTower();
 
-        Legion legion = Legion.getStartingLegion(markerId, hexLabel, 
-            player.getName(), this);
+        Legion legion = Legion.getStartingLegion(markerId, hexLabel,
+                player.getName(), this);
+
         player.addLegion(legion);
     }
 
@@ -2159,9 +1691,10 @@ public final class Game
     private int findEntrySide(MasterHex hex, int cameFrom)
     {
         int entrySide = -1;
+
         if (cameFrom != -1)
         {
-            if (HexMap.terrainHasStartlist(hex.getTerrain())) 
+            if (HexMap.terrainHasStartlist(hex.getTerrain()))
             {
                 entrySide = 3;
             }
@@ -2173,13 +1706,12 @@ public final class Game
         return entrySide;
     }
 
-
     /** Recursively find conventional moves from this hex.  
      *  If block >= 0, go only that way.  If block == -1, use arches and 
      *  arrows.  If block == -2, use only arrows.  Do not double back in
      *  the direction you just came from.  Return a set of 
      *  hexLabel:entrySide tuples. */
-    private synchronized Set findNormalMoves(MasterHex hex, Legion legion, 
+    private synchronized Set findNormalMoves(MasterHex hex, Legion legion,
         int roll, int block, int cameFrom, boolean ignoreFriends)
     {
         Set set = new HashSet();
@@ -2197,7 +1729,7 @@ public final class Game
                 if (cameFrom != -1)
                 {
                     set.add(hexLabel + ":" + BattleMap.entrySideName(
-                        findEntrySide(hex, cameFrom)));
+                            findEntrySide(hex, cameFrom)));
                 }
             }
             return set;
@@ -2210,10 +1742,12 @@ public final class Game
             // it is unoccupied by friendly legions.
             java.util.List legions = player.getLegions();
             Iterator it = legions.iterator();
+
             while (it.hasNext())
             {
                 // Account for spin cycles.
                 Legion otherLegion = (Legion)it.next();
+
                 if (!ignoreFriends && otherLegion != legion &&
                     hexLabel.equals(otherLegion.getCurrentHexLabel()))
                 {
@@ -2224,7 +1758,7 @@ public final class Game
             if (cameFrom != -1)
             {
                 set.add(hexLabel + ":" + BattleMap.entrySideName(
-                    findEntrySide(hex, cameFrom)));
+                        findEntrySide(hex, cameFrom)));
                 return set;
             }
         }
@@ -2232,8 +1766,8 @@ public final class Game
         if (block >= 0)
         {
             set.addAll(findNormalMoves(hex.getNeighbor(block), legion,
-                roll - 1, Constants.ARROWS_ONLY, (block + 3) % 6, 
-                ignoreFriends));
+                    roll - 1, Constants.ARROWS_ONLY, (block + 3) % 6,
+                    ignoreFriends));
         }
         else if (block == Constants.ARCHES_AND_ARROWS)
         {
@@ -2241,9 +1775,9 @@ public final class Game
             {
                 if (hex.getExitType(i) >= Constants.ARCH && i != cameFrom)
                 {
-                    set.addAll(findNormalMoves(hex.getNeighbor(i), legion, 
-                        roll - 1, Constants.ARROWS_ONLY, (i + 3) % 6,
-                        ignoreFriends));
+                    set.addAll(findNormalMoves(hex.getNeighbor(i), legion,
+                            roll - 1, Constants.ARROWS_ONLY, (i + 3) % 6,
+                            ignoreFriends));
                 }
             }
         }
@@ -2253,9 +1787,9 @@ public final class Game
             {
                 if (hex.getExitType(i) >= Constants.ARROW && i != cameFrom)
                 {
-                    set.addAll(findNormalMoves(hex.getNeighbor(i), legion, 
-                        roll - 1, Constants.ARROWS_ONLY, (i + 3) % 6,
-                        ignoreFriends));
+                    set.addAll(findNormalMoves(hex.getNeighbor(i), legion,
+                            roll - 1, Constants.ARROWS_ONLY, (i + 3) % 6,
+                            ignoreFriends));
                 }
             }
         }
@@ -2263,10 +1797,9 @@ public final class Game
         return set;
     }
 
-
     /** Recursively find all unoccupied hexes within roll hexes, for
      *  tower teleport. */
-    private Set findNearbyUnoccupiedHexes(MasterHex hex, Legion legion, 
+    private Set findNearbyUnoccupiedHexes(MasterHex hex, Legion legion,
         int roll, int cameFrom, boolean ignoreFriends)
     {
         // This hex is the final destination.  Mark it as legal if
@@ -2284,10 +1817,10 @@ public final class Game
             for (int i = 0; i < 6; i++)
             {
                 if (i != cameFrom && (hex.getExitType(i) != Constants.NONE ||
-                   hex.getEntranceType(i) != Constants.NONE))
+                        hex.getEntranceType(i) != Constants.NONE))
                 {
                     set.addAll(findNearbyUnoccupiedHexes(hex.getNeighbor(i),
-                        legion, roll - 1, (i + 3) % 6, ignoreFriends));
+                            legion, roll - 1, (i + 3) % 6, ignoreFriends));
                 }
             }
         }
@@ -2295,23 +1828,23 @@ public final class Game
         return set;
     }
 
-
     /** Return set of hexLabels describing where this legion can move.
      *  Include moves currently blocked by friendly
      *  legions if ignoreFriends is true. */
-    Set listAllMoves(Legion legion, MasterHex hex, int movementRoll, 
+    Set listAllMoves(Legion legion, MasterHex hex, int movementRoll,
         boolean ignoreFriends)
     {
         Set set = listNormalMoves(legion, hex, movementRoll, ignoreFriends);
-        set.addAll(listTeleportMoves(legion, hex, movementRoll, 
-            ignoreFriends));
+
+        set.addAll(listTeleportMoves(legion, hex, movementRoll,
+                ignoreFriends));
         return set;
     }
-
 
     private int findBlock(MasterHex hex)
     {
         int block = Constants.ARCHES_AND_ARROWS;
+
         for (int j = 0; j < 6; j++)
         {
             if (hex.getExitType(j) == Constants.BLOCK)
@@ -2322,7 +1855,6 @@ public final class Game
         }
         return block;
     }
-
 
     /** Return set of hexLabels describing where this legion can move
      *  without teleporting.  Include moves currently blocked by friendly
@@ -2336,16 +1868,18 @@ public final class Game
         }
 
         Set tuples = findNormalMoves(hex, legion, movementRoll, findBlock(hex),
-            Constants.NOWHERE, ignoreFriends);
+                Constants.NOWHERE, ignoreFriends);
 
         // Extract just the hexLabels from the hexLabel:entrySide tuples.
         Set hexLabels = new HashSet();
         Iterator it = tuples.iterator();
+
         while (it.hasNext())
         {
             String tuple = (String)it.next();
             java.util.List parts = Split.split(':', tuple);
             String hexLabel = (String)parts.get(0);
+
             hexLabels.add(hexLabel);
         }
         return hexLabels;
@@ -2390,7 +1924,6 @@ public final class Game
         return true;
     }
 
-    
     private boolean titanTeleportAllowed()
     {
         if (getOption(Options.noTitanTeleport))
@@ -2404,16 +1937,16 @@ public final class Game
         return true;
     }
 
-
     /** Return set of hexLabels describing where this legion can teleport.
      *  Include moves currently blocked by friendly legions if 
      *  ignoreFriends is true. */
-    Set listTeleportMoves(Legion legion, MasterHex hex, int movementRoll, 
+    Set listTeleportMoves(Legion legion, MasterHex hex, int movementRoll,
         boolean ignoreFriends)
     {
         Player player = legion.getPlayer();
 
         Set set = new HashSet();
+
         if (movementRoll != 6 || legion.hasMoved() || player.hasTeleported())
         {
             return set;
@@ -2427,7 +1960,7 @@ public final class Game
             if (towerToNonTowerTeleportAllowed())
             {
                 set.addAll(findNearbyUnoccupiedHexes(hex, legion, 6,
-                    Constants.NOWHERE, ignoreFriends));
+                        Constants.NOWHERE, ignoreFriends));
             }
 
             if (towerToTowerTeleportAllowed())
@@ -2435,13 +1968,15 @@ public final class Game
                 // Mark every unoccupied tower.
                 Set towerSet = MasterBoard.getTowerSet();
                 Iterator it = towerSet.iterator();
+
                 while (it.hasNext())
                 {
                     String hexLabel = (String)it.next();
+
                     if (MasterBoard.getHexByLabel(hexLabel) != null)
                     {
                         if ((!isOccupied(hexLabel) || (ignoreFriends &&
-                            getNumEnemyLegions(hexLabel, player) == 0))
+                                    getNumEnemyLegions(hexLabel, player) == 0))
                             && (!(hexLabel.equals(hex.getLabel()))))
                         {
                             set.add(hexLabel);
@@ -2454,9 +1989,11 @@ public final class Game
                 // Remove nearby towers from set.
                 Set towerSet = MasterBoard.getTowerSet();
                 Iterator it = towerSet.iterator();
+
                 while (it.hasNext())
                 {
                     String hexLabel = (String)it.next();
+
                     set.remove(hexLabel);
                 }
             }
@@ -2469,11 +2006,13 @@ public final class Game
             // Mark every hex containing an enemy stack that does not
             // already contain a friendly stack.
             Iterator it = getAllEnemyLegions(player).iterator();
+
             while (it.hasNext())
             {
                 Legion other = (Legion)it.next();
                 {
                     String hexLabel = other.getCurrentHexLabel();
+
                     if (!isEngagement(hexLabel) || ignoreFriends)
                     {
                         set.add(hexLabel);
@@ -2483,7 +2022,6 @@ public final class Game
         }
         return set;
     }
-
 
     /** Return a Set of Strings "Left" "Right" or "Bottom" describing
      *  possible entry sides.  If the hex is unoccupied, just return 
@@ -2500,23 +2038,23 @@ public final class Game
 
         if (teleport)
         {
-            if (listTeleportMoves(legion, currentHex, movementRoll, 
-                false).contains(targetHexLabel))
+            if (listTeleportMoves(legion, currentHex, movementRoll,
+                    false).contains(targetHexLabel))
             {
                 // Startlisted terrain only have bottom entry side.
                 // Don't bother finding more than one entry side if unoccupied.
                 if (!isOccupied(targetHexLabel) ||
                     HexMap.terrainHasStartlist(targetHex.getTerrain()))
-                    
+
                 {
-                    entrySides.add(Constants.bottom);  
+                    entrySides.add(Constants.bottom);
                     return entrySides;
                 }
                 else
                 {
                     entrySides.add(Constants.bottom);
-                    entrySides.add(Constants.left);  
-                    entrySides.add(Constants.right);  
+                    entrySides.add(Constants.left);
+                    entrySides.add(Constants.right);
                     return entrySides;
                 }
             }
@@ -2527,17 +2065,20 @@ public final class Game
         }
 
         // Normal moves.
-        Set tuples = findNormalMoves(currentHex, legion, movementRoll, 
-            findBlock(currentHex), Constants.NOWHERE, false);
+        Set tuples = findNormalMoves(currentHex, legion, movementRoll,
+                findBlock(currentHex), Constants.NOWHERE, false);
         Iterator it = tuples.iterator();
+
         while (it.hasNext())
         {
             String tuple = (String)it.next();
             java.util.List parts = Split.split(':', tuple);
             String hl = (String)parts.get(0);
+
             if (hl.equals(targetHexLabel))
             {
                 String buf = (String)parts.get(1);
+
                 entrySides.add(buf);
                 // Don't bother finding more than one entry side if unoccupied.
                 if (!isOccupied(targetHexLabel))
@@ -2549,7 +2090,6 @@ public final class Game
         return entrySides;
     }
 
-
     boolean isEngagement(String hexLabel)
     {
         if (getNumLegions(hexLabel) > 1)
@@ -2558,6 +2098,7 @@ public final class Game
             Iterator it = markerIds.iterator();
             String markerId = (String)it.next();
             Player player = getPlayerByMarkerId(markerId);
+
             while (it.hasNext())
             {
                 markerId = (String)it.next();
@@ -2570,7 +2111,6 @@ public final class Game
         return false;
     }
 
-
     /** Return set of hexLabels for engagements found. */
     Set findEngagements()
     {
@@ -2579,10 +2119,12 @@ public final class Game
 
         java.util.List legions = player.getLegions();
         Iterator it = legions.iterator();
+
         while (it.hasNext())
         {
             Legion legion = (Legion)it.next();
             String hexLabel = legion.getCurrentHexLabel();
+
             if (getNumEnemyLegions(hexLabel, player) > 0)
             {
                 set.add(hexLabel);
@@ -2649,25 +2191,22 @@ public final class Game
         }
     }
 
-
     /** For AI. */
     Battle getBattle()
     {
         return battle;
     }
 
-
     private synchronized void kickEngagements()
     {
         server.nextEngagement();
 
-        if (findEngagements().size() == 0 && !summoning && !reinforcing && 
+        if (findEngagements().size() == 0 && !summoning && !reinforcing &&
             !acquiring)
         {
             advancePhase(Constants.FIGHT, getActivePlayerName());
         }
     }
-
 
     void finishBattle(String hexLabel, boolean attackerEntered)
     {
@@ -2678,6 +2217,7 @@ public final class Game
         if (getNumLegions(hexLabel) == 1)
         {
             Legion legion = getFirstLegion(hexLabel);
+
             // Make all creatures in the victorious legion visible.
             legion.revealAllCreatures();
             // Remove battle info from legion and its creatures.
@@ -2696,7 +2236,7 @@ public final class Game
                 // Defender won, so possibly recruit reinforcement.
                 if (attackerEntered && legion.canRecruit())
                 {
-Log.debug("Calling Game.reinforce() from Game.finishBattle()");
+                    Log.debug("Calling Game.reinforce() from Game.finishBattle()");
                     reinforce(legion);
                 }
             }
@@ -2718,9 +2258,11 @@ Log.debug("Calling Game.reinforce() from Game.finishBattle()");
         Set set = new HashSet();
         java.util.List legions = legion.getPlayer().getLegions();
         Iterator it = legions.iterator();
+
         while (it.hasNext())
         {
             Legion candidate = (Legion)it.next();
+
             if (candidate != legion)
             {
                 String hexLabel = candidate.getCurrentHexLabel();
@@ -2728,11 +2270,13 @@ Log.debug("Calling Game.reinforce() from Game.finishBattle()");
                 java.util.List summonableList =
                     Creature.getSummonableCreatures();
                 Iterator sumIt = summonableList.iterator();
+
                 while (sumIt.hasNext() && !hasSummonable)
                 {
                     Creature c = (Creature)sumIt.next();
+
                     hasSummonable = hasSummonable ||
-                        (candidate.numCreature(c) > 0);
+                            (candidate.numCreature(c) > 0);
                 }
                 if (hasSummonable && !isEngagement(hexLabel))
                 {
@@ -2742,7 +2286,6 @@ Log.debug("Calling Game.reinforce() from Game.finishBattle()");
         }
         return set;
     }
-
 
     /** Return true and call Server.didSplit() if the split succeeded. 
      *  Return false if it failed. */
@@ -2770,16 +2313,18 @@ Log.debug("Calling Game.reinforce() from Game.finishBattle()");
         if (results == null)
         {
             Log.debug("Empty split list (" + parentId + ", " +
-                      childId + ")");
+                childId + ")");
             return false;
         }
         java.util.List strings = Split.split(',', results);
         java.util.List creatures = new ArrayList();
         Iterator it = strings.iterator();
+
         while (it.hasNext())
         {
             String name = (String)it.next();
             Creature creature = Creature.getCreatureByName(name);
+
             creatures.add(creature);
         }
 
@@ -2787,7 +2332,7 @@ Log.debug("Calling Game.reinforce() from Game.finishBattle()");
         if (creatures.size() < 2 || legion.getHeight() - creatures.size() < 2)
         {
             Log.debug("Too small/big split list (" + parentId + ", " +
-                      childId + ")");
+                childId + ")");
             return false;
         }
 
@@ -2797,6 +2342,7 @@ Log.debug("Calling Game.reinforce() from Game.finishBattle()");
         // so we must clone "by hand" the List.
         java.util.List tempCritters = legion.getCritters();
         java.util.List tempCreatures = new ArrayList();
+
         it = tempCritters.iterator();
         while (it.hasNext())
         {
@@ -2806,16 +2352,17 @@ Log.debug("Calling Game.reinforce() from Game.finishBattle()");
         while (it.hasNext())
         {
             Creature creature = (Creature)it.next();
+
             if (!tempCreatures.remove(creature))
             {
                 Log.debug("Unavailable creature in split list (" +
-                          parentId + ", " +
-                          childId + ") : " + creature.getName());
+                    parentId + ", " +
+                    childId + ") : " + creature.getName());
                 return false;
             }
         }
 
-        if (getTurnNumber() == 1) 
+        if (getTurnNumber() == 1)
         {
             // Only allow a single split on turn 1.
             if (player.getNumLegions() > 1)
@@ -2831,10 +2378,12 @@ Log.debug("Calling Game.reinforce() from Game.finishBattle()");
             }
             // Each stack must contain exactly 1 lord.
             int numLords = 0;
+
             it = creatures.iterator();
             while (it.hasNext())
             {
                 Creature creature = (Creature)it.next();
+
                 if (creature.isLord())
                 {
                     numLords++;
@@ -2847,12 +2396,14 @@ Log.debug("Calling Game.reinforce() from Game.finishBattle()");
         }
 
         Legion newLegion = legion.split(creatures, childId);
+
         if (newLegion == null)
         {
             return false;
         }
 
         String hexLabel = legion.getCurrentHexLabel();
+
         server.didSplit(hexLabel, parentId, childId, newLegion.getHeight());
 
         if (getOption(Options.allStacksVisible))
@@ -2871,13 +2422,13 @@ Log.debug("Calling Game.reinforce() from Game.finishBattle()");
         return true;
     }
 
-
     /** Move the legion to the hex if legal.  Return true if the
      *  legion was moved or false if the move was illegal. */
     boolean doMove(String markerId, String hexLabel, String entrySide,
         boolean teleport, String teleportingLord)
     {
         Legion legion = getLegionByMarkerId(markerId);
+
         if (legion == null)
         {
             return false;
@@ -2886,18 +2437,18 @@ Log.debug("Calling Game.reinforce() from Game.finishBattle()");
         Player player = legion.getPlayer();
 
         // Verify that the move is legal.
-        if (teleport) 
+        if (teleport)
         {
-            if (!listTeleportMoves(legion, legion.getCurrentHex(), 
-                player.getMovementRoll(), false).contains(hexLabel))
+            if (!listTeleportMoves(legion, legion.getCurrentHex(),
+                    player.getMovementRoll(), false).contains(hexLabel))
             {
                 return false;
             }
         }
         else
         {
-            if (!listNormalMoves(legion, legion.getCurrentHex(), 
-                player.getMovementRoll(), false).contains(hexLabel))
+            if (!listNormalMoves(legion, legion.getCurrentHex(),
+                    player.getMovementRoll(), false).contains(hexLabel))
             {
                 return false;
             }
@@ -2905,12 +2456,14 @@ Log.debug("Calling Game.reinforce() from Game.finishBattle()");
 
         // Verify that the entry side is legal.
         Set legalSides = listPossibleEntrySides(markerId, hexLabel, teleport);
+
         if (!legalSides.contains(entrySide))
         {
             return false;
         }
 
         MasterHex hex = MasterBoard.getHexByLabel(hexLabel);
+
         // If this is a tower hex, the only entry side is the bottom.
         if (HexMap.terrainHasStartlist(hex.getTerrain()) &&
             !entrySide.equals(Constants.bottom))
@@ -2924,7 +2477,7 @@ Log.debug("Calling Game.reinforce() from Game.finishBattle()");
         {
             // Verify teleporting lord.
             if (teleportingLord == null || !legion.listTeleportingLords(
-                hexLabel).contains(teleportingLord))
+                    hexLabel).contains(teleportingLord))
             {
                 return false;
             }
@@ -2935,7 +2488,6 @@ Log.debug("Calling Game.reinforce() from Game.finishBattle()");
         legion.moveToHex(hex, entrySide, teleport, teleportingLord);
         return true;
     }
-
 
     synchronized void engage(String hexLabel)
     {
@@ -2973,9 +2525,9 @@ Log.debug("Calling Game.reinforce() from Game.finishBattle()");
         Player player = getActivePlayer();
         Legion attacker = getFirstFriendlyLegion(hexLabel, player);
         Legion defender = getFirstEnemyLegion(hexLabel, player);
+
         server.askConcede(attacker, defender);
     }
-
 
     // Attacker did not concede early; negotiate. 
     private void engage3(String hexLabel)
@@ -2983,17 +2535,18 @@ Log.debug("Calling Game.reinforce() from Game.finishBattle()");
         Player player = getActivePlayer();
         Legion attacker = getFirstFriendlyLegion(hexLabel, player);
         Legion defender = getFirstEnemyLegion(hexLabel, player);
+
         proposals[0] = new HashSet();
         proposals[1] = new HashSet();
         server.twoNegotiate(attacker, defender);
     }
-
 
     void flee(String markerId)
     {
         Legion defender = getLegionByMarkerId(markerId);
         String hexLabel = defender.getCurrentHexLabel();
         Legion attacker = getFirstEnemyLegion(hexLabel, defender.getPlayer());
+
         handleConcession(defender, attacker, true);
     }
 
@@ -3007,8 +2560,9 @@ Log.debug("Calling Game.reinforce() from Game.finishBattle()");
         {
             Legion attacker = getLegionByMarkerId(markerId);
             String hexLabel = attacker.getCurrentHexLabel();
-            Legion defender = getFirstEnemyLegion(hexLabel, 
-                attacker.getPlayer());
+            Legion defender = getFirstEnemyLegion(hexLabel,
+                    attacker.getPlayer());
+
             handleConcession(attacker, defender, false);
         }
     }
@@ -3017,6 +2571,7 @@ Log.debug("Calling Game.reinforce() from Game.finishBattle()");
     {
         Legion defender = getLegionByMarkerId(markerId);
         String hexLabel = defender.getCurrentHexLabel();
+
         engage2(hexLabel);
     }
 
@@ -3025,6 +2580,7 @@ Log.debug("Calling Game.reinforce() from Game.finishBattle()");
     {
         Legion attacker = getLegionByMarkerId(markerId);
         String hexLabel = attacker.getCurrentHexLabel();
+
         engage3(hexLabel);
     }
 
@@ -3040,6 +2596,7 @@ Log.debug("Calling Game.reinforce() from Game.finishBattle()");
         Proposal proposal = Proposal.makeFromString(proposalString);
 
         int thisPlayerNum;
+
         if (playerName.equals(getActivePlayerName()))
         {
             thisPlayerNum = Constants.ATTACKER;
@@ -3055,6 +2612,7 @@ Log.debug("Calling Game.reinforce() from Game.finishBattle()");
         {
             Legion attacker = getLegionByMarkerId(proposal.getAttackerId());
             String hexLabel = attacker.getCurrentHexLabel();
+
             fight(hexLabel);
         }
 
@@ -3071,10 +2629,12 @@ Log.debug("Calling Game.reinforce() from Game.finishBattle()");
             proposals[thisPlayerNum].add(proposal);
 
             String other = null;
+
             if (playerName.equals(getActivePlayerName()))
             {
                 Legion defender = getLegionByMarkerId(
-                    proposal.getDefenderId());
+                        proposal.getDefenderId());
+
                 other = defender.getPlayerName();
             }
             else
@@ -3086,7 +2646,6 @@ Log.debug("Calling Game.reinforce() from Game.finishBattle()");
             server.tellProposal(other, proposal);
         }
     }
-
 
     /** Synchronized to keep both negotiators from racing to fight. */
     synchronized void fight(String hexLabel)
@@ -3111,17 +2670,17 @@ Log.debug("Calling Game.reinforce() from Game.finishBattle()");
             defender.revealAllCreatures();
 
             battle = new Battle(this, attacker.getMarkerId(),
-                defender.getMarkerId(), Constants.DEFENDER, hexLabel,
-                1, Constants.MOVE);
+                        defender.getMarkerId(), Constants.DEFENDER, hexLabel,
+                        1, Constants.MOVE);
             battle.init();
         }
     }
-
 
     private void handleConcession(Legion loser, Legion winner, boolean fled)
     {
         // Figure how many points the victor receives.
         int points = loser.getPointValue();
+
         if (fled)
         {
             points /= 2;
@@ -3165,7 +2724,6 @@ Log.debug("Calling Game.reinforce() from Game.finishBattle()");
         }
     }
 
-
     private void handleNegotiation(Proposal results)
     {
         Legion attacker = getLegionByMarkerId(results.getAttackerId());
@@ -3173,39 +2731,40 @@ Log.debug("Calling Game.reinforce() from Game.finishBattle()");
 
         if (results.isMutual())
         {
-             // Remove both legions and give no points.
-             attacker.remove();
-             defender.remove();
+            // Remove both legions and give no points.
+            attacker.remove();
+            defender.remove();
 
-             Log.event(attacker.getLongMarkerName() + " and " +
-                 defender.getLongMarkerName() +
-                 " agree to mutual elimination");
+            Log.event(attacker.getLongMarkerName() + " and " +
+                defender.getLongMarkerName() +
+                " agree to mutual elimination");
 
-             // If both Titans died, eliminate both players.
-             if (attacker.hasTitan() && defender.hasTitan())
-             {
-                 // Make defender die first, to simplify turn advancing.
-                 defender.getPlayer().die(null, false);
-                 attacker.getPlayer().die(null, true);
-             }
+            // If both Titans died, eliminate both players.
+            if (attacker.hasTitan() && defender.hasTitan())
+            {
+                // Make defender die first, to simplify turn advancing.
+                defender.getPlayer().die(null, false);
+                attacker.getPlayer().die(null, true);
+            }
 
-             // If either was the titan stack, its owner dies and gives
-             // half points to the victor.
-             else if (attacker.hasTitan())
-             {
-                 attacker.getPlayer().die(defender.getPlayerName(), true);
-             }
+            // If either was the titan stack, its owner dies and gives
+            // half points to the victor.
+            else if (attacker.hasTitan())
+            {
+                attacker.getPlayer().die(defender.getPlayerName(), true);
+            }
 
-             else if (defender.hasTitan())
-             {
-                 defender.getPlayer().die(attacker.getPlayerName(), true);
-             }
+            else if (defender.hasTitan())
+            {
+                defender.getPlayer().die(attacker.getPlayerName(), true);
+            }
         }
         else
         {
             // One legion was eliminated during negotiations.
             Legion winner = getLegionByMarkerId(results.getWinnerId());
             Legion loser;
+
             if (winner == defender)
             {
                 loser = attacker;
@@ -3216,21 +2775,25 @@ Log.debug("Calling Game.reinforce() from Game.finishBattle()");
             }
 
             StringBuffer log = new StringBuffer("Winning legion ");
+
             log.append(winner.getLongMarkerName());
             log.append(" loses creatures ");
 
             // Remove all dead creatures from the winning legion.
             java.util.List winnerLosses = results.getWinnerLosses();
             Iterator it = winnerLosses.iterator();
+
             while (it.hasNext())
             {
                 String creatureName = (String)it.next();
+
                 log.append(creatureName);
                 if (it.hasNext())
                 {
                     log.append(", ");
                 }
                 Creature creature = Creature.getCreatureByName(creatureName);
+
                 winner.removeCreature(creature, true, true);
             }
             Log.event(log.toString());
@@ -3250,8 +2813,8 @@ Log.debug("Calling Game.reinforce() from Game.finishBattle()");
             winner.addPoints(points);
 
             Log.event("Legion " + loser.getLongMarkerName() +
-               " is eliminated by legion " + winner.getLongMarkerName() +
-               " via negotiation");
+                " is eliminated by legion " + winner.getLongMarkerName() +
+                " via negotiation");
 
             // If this was the titan stack, its owner dies and gives half
             // points to the victor.
@@ -3289,7 +2852,6 @@ Log.debug("Calling Game.reinforce() from Game.finishBattle()");
         kickEngagements();
     }
 
-
     void askAcquireAngel(String playerName, String markerId,
         java.util.List recruits)
     {
@@ -3307,15 +2869,16 @@ Log.debug("Calling Game.reinforce() from Game.finishBattle()");
         }
     }
 
-
     /** Return a list of all players' legions. */
     synchronized java.util.List getAllLegions()
     {
         java.util.List list = new ArrayList();
+
         for (Iterator it = players.iterator(); it.hasNext();)
         {
             Player player = (Player)it.next();
             java.util.List legions = player.getLegions();
+
             list.addAll(legions);
         }
         return list;
@@ -3325,9 +2888,11 @@ Log.debug("Calling Game.reinforce() from Game.finishBattle()");
     java.util.List getAllLegionIds()
     {
         java.util.List list = new ArrayList();
+
         for (Iterator it = players.iterator(); it.hasNext();)
         {
             Player player = (Player)it.next();
+
             list.addAll(player.getLegionIds());
         }
         return list;
@@ -3337,12 +2902,15 @@ Log.debug("Calling Game.reinforce() from Game.finishBattle()");
     synchronized java.util.List getAllEnemyLegions(Player player)
     {
         java.util.List list = new ArrayList();
+
         for (Iterator it = players.iterator(); it.hasNext();)
         {
             Player nextPlayer = (Player)it.next();
+
             if (nextPlayer != player)
             {
                 java.util.List legions = nextPlayer.getLegions();
+
                 list.addAll(legions);
             }
         }
@@ -3353,9 +2921,11 @@ Log.debug("Calling Game.reinforce() from Game.finishBattle()");
     java.util.List getAllEnemyLegionIds(Player player)
     {
         java.util.List list = new ArrayList();
+
         for (Iterator it = players.iterator(); it.hasNext();)
         {
             Player nextPlayer = (Player)it.next();
+
             if (nextPlayer != player)
             {
                 list.addAll(nextPlayer.getLegionIds());
@@ -3367,10 +2937,12 @@ Log.debug("Calling Game.reinforce() from Game.finishBattle()");
     Legion getLegionByMarkerId(String markerId)
     {
         Iterator it = players.iterator();
+
         while (it.hasNext())
         {
             Player player = (Player)it.next();
             Legion legion = player.getLegionByMarkerId(markerId);
+
             if (legion != null)
             {
                 return legion;
@@ -3382,10 +2954,12 @@ Log.debug("Calling Game.reinforce() from Game.finishBattle()");
     Player getPlayerByMarkerId(String markerId)
     {
         Iterator it = players.iterator();
+
         while (it.hasNext())
         {
             Player player = (Player)it.next();
             Legion legion = player.getLegionByMarkerId(markerId);
+
             if (legion != null)
             {
                 return player;
@@ -3394,7 +2968,6 @@ Log.debug("Calling Game.reinforce() from Game.finishBattle()");
         return null;
     }
 
-
     /** Get the average point value of all legions in the game. This is
      *  somewhat of a cheat. */
     int getAverageLegionPointValue()
@@ -3402,22 +2975,25 @@ Log.debug("Calling Game.reinforce() from Game.finishBattle()");
         int total = 0;
         java.util.List legions = getAllLegions();
         Iterator it = legions.iterator();
+
         while (it.hasNext())
         {
             Legion legion = (Legion)it.next();
+
             total += legion.getPointValue();
         }
         return total / legions.size();
     }
 
-
     int getNumLegions(String hexLabel)
     {
         int count = 0;
         Iterator it = getAllLegions().iterator();
+
         while (it.hasNext())
         {
             Legion legion = (Legion)it.next();
+
             if (hexLabel.equals(legion.getCurrentHexLabel()))
             {
                 count++;
@@ -3429,9 +3005,11 @@ Log.debug("Calling Game.reinforce() from Game.finishBattle()");
     boolean isOccupied(String hexLabel)
     {
         Iterator it = getAllLegions().iterator();
+
         while (it.hasNext())
         {
             Legion legion = (Legion)it.next();
+
             if (hexLabel.equals(legion.getCurrentHexLabel()))
             {
                 return true;
@@ -3443,9 +3021,11 @@ Log.debug("Calling Game.reinforce() from Game.finishBattle()");
     Legion getFirstLegion(String hexLabel)
     {
         Iterator it = getAllLegions().iterator();
+
         while (it.hasNext())
         {
             Legion legion = (Legion)it.next();
+
             if (hexLabel.equals(legion.getCurrentHexLabel()))
             {
                 return legion;
@@ -3458,9 +3038,11 @@ Log.debug("Calling Game.reinforce() from Game.finishBattle()");
     {
         java.util.List markerIds = new ArrayList();
         Iterator it = getAllLegions().iterator();
+
         while (it.hasNext())
         {
             Legion legion = (Legion)it.next();
+
             if (hexLabel.equals(legion.getCurrentHexLabel()))
             {
                 markerIds.add(legion.getMarkerId());
@@ -3474,9 +3056,11 @@ Log.debug("Calling Game.reinforce() from Game.finishBattle()");
         int count = 0;
         java.util.List legions = player.getLegions();
         Iterator it = legions.iterator();
+
         while (it.hasNext())
         {
             Legion legion = (Legion)it.next();
+
             if (hexLabel.equals(legion.getCurrentHexLabel()))
             {
                 count++;
@@ -3489,9 +3073,11 @@ Log.debug("Calling Game.reinforce() from Game.finishBattle()");
     {
         java.util.List legions = player.getLegions();
         Iterator it = legions.iterator();
+
         while (it.hasNext())
         {
             Legion legion = (Legion)it.next();
+
             if (hexLabel.equals(legion.getCurrentHexLabel()))
             {
                 return legion;
@@ -3500,15 +3086,17 @@ Log.debug("Calling Game.reinforce() from Game.finishBattle()");
         return null;
     }
 
-    synchronized java.util.List getFriendlyLegions(String hexLabel, 
+    synchronized java.util.List getFriendlyLegions(String hexLabel,
         Player player)
     {
         java.util.List newLegions = new ArrayList();
         java.util.List legions = player.getLegions();
         Iterator it = legions.iterator();
+
         while (it.hasNext())
         {
             Legion legion = (Legion)it.next();
+
             if (hexLabel.equals(legion.getCurrentHexLabel()))
             {
                 newLegions.add(legion);
@@ -3522,9 +3110,11 @@ Log.debug("Calling Game.reinforce() from Game.finishBattle()");
         String playerName = player.getName();
         int count = 0;
         Iterator it = getAllEnemyLegions(player).iterator();
+
         while (it.hasNext())
         {
             Legion legion = (Legion)it.next();
+
             if (hexLabel.equals(legion.getCurrentHexLabel()))
             {
                 count++;
@@ -3536,9 +3126,11 @@ Log.debug("Calling Game.reinforce() from Game.finishBattle()");
     Legion getFirstEnemyLegion(String hexLabel, Player player)
     {
         Iterator it = getAllEnemyLegions(player).iterator();
+
         while (it.hasNext())
         {
             Legion legion = (Legion)it.next();
+
             if (hexLabel.equals(legion.getCurrentHexLabel()))
             {
                 return legion;
@@ -3547,7 +3139,6 @@ Log.debug("Calling Game.reinforce() from Game.finishBattle()");
         return null;
     }
 
-
     int mulligan()
     {
         if (getPhase() != Constants.MOVE)
@@ -3555,12 +3146,12 @@ Log.debug("Calling Game.reinforce() from Game.finishBattle()");
             return -1;
         }
         Player player = getActivePlayer();
+
         player.takeMulligan();
         server.allUpdatePlayerInfo();
         setupPhase();
         return player.getMovementRoll();
     }
-
 
     boolean getOption(String optname)
     {
@@ -3575,6 +3166,7 @@ Log.debug("Calling Game.reinforce() from Game.finishBattle()");
     void setOption(String optname, String value)
     {
         String oldValue = options.getStringOption(optname);
+
         if (!value.equals(oldValue))
         {
             options.setOption(optname, value);

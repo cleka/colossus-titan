@@ -411,9 +411,9 @@ public final class MasterBoard extends JPanel
                         chooser.getCurrentDirectory().getAbsolutePath();
                     String basename = chooser.getSelectedFile().getName();
                     // Add default savegame extension.
-                    if (!basename.endsWith(Constants.saveExtension))
+                    if (!basename.endsWith(Constants.xmlExtension))
                     {
-                        basename += Constants.saveExtension;
+                        basename += Constants.xmlExtension;
                     }
                     client.saveGame(dirname + '/' + basename);
                 }

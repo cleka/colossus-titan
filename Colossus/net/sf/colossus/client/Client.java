@@ -1616,6 +1616,11 @@ public final class Client implements IClient
         }
     }
 
+    public void nakStrike(int tag)
+    {
+Log.error("Got nak for strike by " + tag);
+    }
+
     private void pickCarries(int carryDamage, Set carryTargetDescriptions)
     {
         if (!isMyBattlePhase())
@@ -1846,6 +1851,11 @@ Log.debug(playerName + " Client.cleanupBattle()");
             hex.repaint();
             board.highlightPossibleRecruits();
         }
+    }
+
+    public void nakRecruit(String markerId)
+    {
+Log.error("Got nak for recruit with " + markerId);
     }
 
     public void undidRecruit(String markerId, String recruitName)
@@ -2317,6 +2327,11 @@ Log.debug(playerName + " Client.cleanupBattle()");
         }
     }
 
+    public void nakBattleMove(int tag)
+    {
+Log.error("Got nak for move of " + tag);
+    }
+
 
     /** Attempt to have critter tag strike the critter in hexLabel. */
     void strike(int tag, String hexLabel)
@@ -2690,6 +2705,11 @@ Log.debug(playerName + " Client.cleanupBattle()");
         {
             doAutoMoves();
         }
+    }
+
+    public void nakMove(String markerId)
+    {
+Log.error("Got nak for move of " + markerId);
     }
 
     public void undidMove(String markerId, String formerHexLabel,
@@ -3433,6 +3453,11 @@ Log.debug(playerName + " Client.cleanupBattle()");
             board.alignLegions(hexLabel);
             board.highlightTallLegions();
         }
+    }
+
+    public void nakSplit(String parentId)
+    {
+Log.error("Got nak for split of " + parentId);
     }
 
 

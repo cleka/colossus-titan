@@ -43,9 +43,6 @@ public final class Constants
 
     /** Must include trailing slash. */
     public static final String saveDirname = gameDataPath + "/saves/";
-    public static final String saveExtension = ".sav";
-    public static final String saveGameVersion =
-        "Colossus savegame version 11";
     public static final String xmlExtension = ".xml";
     public static final String xmlSnapshotStart = "ColossusSnapshot_";
     public static final String xmlSnapshotVersion = "12";
@@ -329,6 +326,11 @@ public final class Constants
     public static final String askPickColor = "askPickColor";
     public static final String log = "log";
     public static final String showChatMessage = "showChatMessage";
+    public static final String nakSplit = "nakSplit";
+    public static final String nakMove = "nakMove";
+    public static final String nakRecruit = "nakRecruit";
+    public static final String nakBattleMove = "nakBattleMove";
+    public static final String nakStrike = "nakStrike";
 
     static
     {

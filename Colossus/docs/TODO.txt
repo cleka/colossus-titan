@@ -70,20 +70,15 @@ Bug: Saw 8-high enemy legion 3xUni, Chi, 3xGri, Ran.  Height shows up
 
 Bug: LOSTest is failing.
 
-Bug: 1_LATEST_IS_date is broken in remote_inst.
-
-Show user.home, java.version system properties from Help/About
+Bug: 1_LATEST_IS_date is broken in remote_inst.  Can't delete previous
+   1_LATEST_IS file
 
 Have server send marker names.
 Let client pick starting marker along with color.
 
-Somewhat randomize AI marker selection. 
+Somewhat randomize AI marker selection.
 
 Toolbar, or at least Done button.
-
-Make server enforce legal splits.
-
-Add failure packets for illegal splits, moves, strikes, etc.
 
 Change some JDialogs to JFrames to allow separate minimizing?
 

@@ -131,4 +131,14 @@ public interface IClient
     public void log(String message);
 
     public void showChatMessage(String from, String text);
+
+    public void nakSplit(String parentId);
+
+    public void nakMove(String markerId);
+
+    public void nakRecruit(String markerId);
+
+    public void nakBattleMove(int tag);
+
+    public void nakStrike(int tag);
 }

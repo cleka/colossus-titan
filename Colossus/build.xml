@@ -11,7 +11,7 @@
         Environment var JAVACC_HOME pointing to JavaCC install root
      Javamake 1.2.8+ http://www.experimentalstuff.com/Technologies/JavaMake/
         javamake.jar needs to be in your CLASSPATH.
-     JUnit 3.7       http://junit.org
+     JUnit 3.7+      http://junit.org
         junit.jar AND the junit directory need to be in your CLASSPATH.
      To sign jarfiles, you need a file called usernameKeystore,
         (substituting your username for "username")
@@ -178,7 +178,6 @@
 </target>
 
 
-<!-- TODO If the jar is newer than all its contents, don't build. -->
 <target name="jar" depends="init,compile,version"
         description = "Make jar file">
         <jar jarfile = "Colossus.jar" basedir="."

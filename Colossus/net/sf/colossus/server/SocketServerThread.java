@@ -336,7 +336,8 @@ final class SocketServerThread extends Thread implements IClient
         out.println(Constants.setColor + sep + color);
     }
 
-    public void updateCreatureCount(String creatureName, int count, int deadCount)
+    public void updateCreatureCount(String creatureName, int count,
+        int deadCount)
     {
         out.println(Constants.updateCreatureCount + sep + creatureName + sep +
             count + sep + deadCount);
@@ -615,5 +616,30 @@ final class SocketServerThread extends Thread implements IClient
     public void showChatMessage(String from, String text)
     {
         out.println(Constants.showChatMessage + sep + from + sep + text);
+    }
+
+    public void nakSplit(String parentId)
+    {
+        out.println(Constants.nakSplit + sep + parentId);
+    }
+
+    public void nakMove(String markerId)
+    {
+        out.println(Constants.nakMove + sep + markerId);
+    }
+
+    public void nakRecruit(String markerId)
+    {
+        out.println(Constants.nakRecruit + sep + markerId);
+    }
+
+    public void nakBattleMove(int tag)
+    {
+        out.println(Constants.nakBattleMove + sep + tag);
+    }
+
+    public void nakStrike(int tag)
+    {
+        out.println(Constants.nakStrike + sep + tag);
     }
 }
