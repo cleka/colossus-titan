@@ -433,6 +433,15 @@ class Legion
 
     public void revealCreatures(Creature creature, int numberToReveal)
     {
+        // Sanity check, in case numVisibleCreatures is set too high.
+        if (numVisibleCreatures >= height)
+        {
+            System.out.println("numVisibleCreatures was " + 
+                numVisibleCreatures + " but height was only " + height);
+            revealAllCreatures();
+            return;
+        }
+
         int numberAlreadyRevealed = 0;
         for (int i = 0; i < numVisibleCreatures; i++)
         {
