@@ -107,7 +107,6 @@ public class SimpleAI implements AI
                     (legion.hasTitan() || legion.getPointValue() >=
                     minimumSizeToRecruit))
             {
-                //Log.debug("Calling chooseRecruit() in muster().");
                 Creature recruit = chooseRecruit(legion, legion.getHexLabel());
                 if (recruit != null)
                 {
@@ -129,7 +128,6 @@ public class SimpleAI implements AI
 
     public void reinforce(LegionInfo legion)
     {
-        //Log.debug("Calling chooseRecruit() in reinforce().");
         Creature recruit = chooseRecruit(legion, legion.getHexLabel());
         String recruitName = null;
         String recruiterName = null;
@@ -157,33 +155,7 @@ public class SimpleAI implements AI
             return null;
         }
 
-        /*
-         // graph code disabled ATM
-         Creature temprecruit =
-         getBestRecruitmentOneTurnAhead(legion, hex, recruits);
-         Creature temprecruit2 =
-         getBestRecruitmentInfinityAhead(legion, hex, recruits);
-         Creature temprecruit3 =
-         getBestRecruitmentPlacesNextTurn(legion, hex, recruits);
-         */
-
-        Creature recruit =
-                getVariantRecruitHint(legion, hex, recruits);
-
-        /*
-         // graph code disabled ATM
-         if (temprecruit != recruit)
-         {
-         // let's pick-up the creature with the best next turn opportunity
-         // if it has the best 'infinity ahead', and in 4 out of 6 case
-         // if it doesn't.
-         if ((temprecruit == temprecruit2) ||
-         (Dice.rollDie() > 2))
-         {
-         recruit = temprecruit;
-         }
-         }
-         */
+        Creature recruit = getVariantRecruitHint(legion, hex, recruits);
 
         /* use the hinted value as the actual recruit */
         return recruit;
@@ -1063,8 +1035,8 @@ public class SimpleAI implements AI
     //
     // TODO: should be parameterized with weights
     //
-    int evaluateMove(LegionInfo legion, MasterHex hex,
-            boolean canRecruitHere, Map[] enemyAttackMap)
+    int evaluateMove(LegionInfo legion, MasterHex hex, boolean moved,
+            Map[] enemyAttackMap)
     {
         // Avoid using MIN_VALUE and MAX_VALUE because of possible overflow.
         final int WIN_GAME = Integer.MAX_VALUE / 2;
@@ -1229,20 +1201,19 @@ public class SimpleAI implements AI
         // consider what we can recruit
         Creature recruit = null;
 
-        if (canRecruitHere)
+        if (moved)
         {
-            //Log.debug("Calling chooseRecruit() in evaluateMove().");
             recruit = chooseRecruit(legion, hex.getLabel());
 
             if (recruit != null)
             {
                 int oldval = value;
 
-                if (legion.getHeight() < 6)
+                if (legion.getHeight() <= 5)
                 {
                     value += ghrv(recruit, legion, hintSectionUsed);
                 }
-                else
+                else if (legion.getHeight() == 6)
                 {
                     // if we're 6-high, then the value of a recruit is
                     // equal to the improvement in the value of the
@@ -1324,6 +1295,33 @@ public class SimpleAI implements AI
                     value += (newPV - oldPV) +
                             ghrv(recruit, legion, hintSectionUsed);
                 }
+                else if (legion.getHeight() == 7)
+                {
+                    // Cannot recruit, unless we have an angel to summon out,
+                    // and we're not fighting, and someone else is, and that
+                    // other stack summons out our angel.
+                    // Since we don't have enough information about other 
+                    // stacks to be sure that someone will summon from us, 
+                    // just give a small bonus for the possible recruit, if 
+                    // we're not fighting and have a summonable.
+                    if (enemyMarkerId == null &&
+                            legion.numSummonableCreature() >= 1)
+                    {
+                        // This is total fudge.  Removing an angel may hurt 
+                        // this legion, or may help it if the recruit is even
+                        // better.  But it'll help someone else.  And we don't
+                        // know which legion is more important.  So just give
+                        // a small bonus for possibly being able to summon out
+                        // an angel and recruit.
+                        double POSSIBLE_SUMMON_FACTOR = 0.1;
+                        value += POSSIBLE_SUMMON_FACTOR *
+                                ghrv(recruit, legion, hintSectionUsed);
+                    }
+                }
+                else
+                {
+                    Log.error("Bogus legion height " + legion.getHeight());
+                }
 
                 Log.debug("--- if " + legion + " moves to " + hex +
                         " then recruit " + recruit.toString() + " (adding " +
@@ -1398,7 +1396,7 @@ public class SimpleAI implements AI
         // consider risk of being attacked
         if (enemyAttackMap != null)
         {
-            if (canRecruitHere)
+            if (moved)
             {
                 Log.debug("considering risk of moving " + legion + " to " +
                         hex);
@@ -1472,7 +1470,7 @@ public class SimpleAI implements AI
         // recruit on 1,3,5, and we have a behemoth with choice of 3/5
         // to jungle or 4/6 to jungle, prefer the 4/6 location).
         Log.debug("EVAL " + legion +
-                (canRecruitHere ? " move to " : " stay in ") + hex + " = " +
+                (moved ? " move to " : " stay in ") + hex + " = " +
                 value);
 
         return value;
@@ -1774,8 +1772,6 @@ public class SimpleAI implements AI
         public boolean canReach(String terrain)
         {
             int now = getNumberOfWaysToTerrain(legion, hex, terrain);
-            //Log.debug("ORACLE: now is " + now +
-            //    " ( from hex " + hex.getLabel() + " to a " + terrain + ")");
             return (now > 0);
         }
 
@@ -1783,7 +1779,6 @@ public class SimpleAI implements AI
         {
             int count =
                     client.getCreatureCount(Creature.getCreatureByName(name));
-            //Log.debug("ORACLE: count is " + count);
             return count;
         }
 
@@ -1822,7 +1817,6 @@ public class SimpleAI implements AI
         public boolean hasCreature(String name)
         {
             int num = legion.numCreature(name);
-            //Log.debug("ORACLE: num is " + num);
             return (num > 0);
         }
 
@@ -1830,7 +1824,6 @@ public class SimpleAI implements AI
         {
             boolean contains =
                     recruits.contains(Creature.getCreatureByName(name));
-            //Log.debug("ORACLE: contains is " + false);
             return contains;
         }
 
@@ -1885,12 +1878,11 @@ public class SimpleAI implements AI
                 hintSectionUsed);
         if (recruitName == null)
         {
-            //Log.debug("HINT: \"null\" found for " + hex.getLabel() + "...");
             return (Creature)recruits.get(recruits.size() - 1);
         }
-        if ((recruitName.equals("nothing")) ||
-                (recruitName.equals("Nothing")))
-        { // suggest recruiting nothing
+        if ((recruitName.equals("nothing")) || (recruitName.equals("Nothing")))
+        {
+            // suggest recruiting nothing
             return null;
         }
 
