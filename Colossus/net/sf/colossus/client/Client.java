@@ -2281,7 +2281,6 @@ Log.error("Got nak for recruit with " + markerId);
     {
         BattleChit critter = cm.getCritter();
         String hexLabel = cm.getEndingHexLabel();
-        Log.debug("Try " + critter + " to " + hexLabel);
         doBattleMove(critter.getTag(), hexLabel);
         aiPause();
     }

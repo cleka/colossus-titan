@@ -474,7 +474,6 @@ public final class Battle
     private boolean setupMove()
     {
         server.allSetupBattleMove();
-
         return false;
     }
 
@@ -482,7 +481,6 @@ public final class Battle
     {
         server.allSetupBattleFight();
         applyDriftDamage();
-
         return false;
     }
 
@@ -918,7 +916,6 @@ Log.debug("Called Battle.doneReinforcing()");
             else
             {
                 // Reinforcement.
-                game.getCaretaker().putOneBack(critter.getCreature());
                 // This recruit doesn't count.
                 legion.setRecruitName(null);
             }
