@@ -480,6 +480,29 @@ public class TerrainRecruitLoader
     {
         return isAcquirable(c.getName());
     }
+
+    /** Base amount of points needed for Titan improvement. */
+    int titanImprove = 100;
+    /** Amount of points needed for Titan Teleport. */
+    int titanTeleport = 400;
+
+    /**
+     * To obtain the base amount of points needed for Titan improvement.
+     * @return The base amount of points needed for Titan improvement.
+     */
+    public int getTitanImprovementValue()
+    {
+        return titanImprove;
+    }
+
+    /**
+     * To obtain the amount of points needed for Titan Teleport.
+     * @return The amount of points needed for Titan Teleport.
+     */
+    public int getTitanTeleportValue()
+    {
+        return titanTeleport;
+    }
 }
 
 PARSER_END(TerrainRecruitLoader)
@@ -514,6 +537,8 @@ TOKEN :
 TOKEN :
 {
     < ACQUIRABLE : "ACQUIRABLE" >
+|   < TITANIMPROVE : "TITANIMPROVE" >
+|   < TITANTELEPORT : "TITANTELEPORT" >
 }
 
 TOKEN :
@@ -648,6 +673,7 @@ int oneTerrain() :
     String s;
     boolean rb;
     List al;
+    int val;
 }
 {
     (tc = r_char()) (col = r_chaine()) (t = r_chaine())
@@ -694,6 +720,28 @@ int oneTerrain() :
             addAcquirable(ad);
         }
         Log.debug("Using Acquirable List : " + acquirableList);
+        return(0);
+    }
+|   <TITANIMPROVE> (val = r_number())
+    {
+        if (val > 0)
+            titanImprove = val;
+        else
+        {
+            throw new ParseException("Wrong Value for Titan Improvement : "
+                                     + val);
+        }
+        return(0);
+    }
+|   <TITANTELEPORT> (val = r_number())
+    {
+        if (val > 0)
+            titanTeleport = val;
+        else
+        {
+            throw new ParseException("Wrong Value for Titan Teleport : "
+                                     + val);
+        }
         return(0);
     }
 |   <EOF>

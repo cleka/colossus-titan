@@ -45,7 +45,8 @@ WARNING: The way the Hex are displayed (pointy part upside or downside) depend o
 \section{\texttt{TER} file format (default file used: ``Default/Default.ter'')}
 \label{TER}
 
-This file define the Colossus Recruit Trees ; what can recruit and be recruited on what terrain. it's composed of a succession of line of two different kind.
+This file define the Colossus Recruit Trees ; what can recruit and be recruited on what terrain. it's composed of a succession of line of four different kind.
+The first two are mandatory (at least one of each should appear), the other two are optional (default values are supplied).
 
 \subsubsection*{The first kind is:}
 
@@ -95,6 +96,18 @@ The line that starts with 'T' and of name 'Tower' (mandatory) is special. There 
 Note that all $\langle$point\_value$\rangle$ must be even multiple of the first $\langle$point\_value$\rangle$ ; other values are erroneous and will be flagged as such. Also, the first acquirable creature should be a Lord, and is recruited in the starting stack (it's the 'primary' acquirable creature).
 
 Multiple line can be present, in which case, the behavior is the same as if all the Acquirable where on one line. Order of Acquirable is not important, except for the first one, which defines the reference for $\langle$point\_value$\rangle$ and the primary acquirable creature.
+
+\subsubsection*{The third kind is:}
+
+\texttt{TITANIMPROVE $\langle$point\_value$\rangle$}
+
+To give the amount of points required for the Titan to improve by one. Said differently, Titan power is equal to 6 + ($\langle$player\_points$\rangle$ / $\langle$above\_value$\rangle$). The default supplied value is 100.
+
+\subsubsection*{The fourth kind is:}
+
+\texttt{TITANTELEPORT $\langle$point\_value$\rangle$}
+
+To give the amount of points required for the Titan to be able to Titan Teleport. The default supplied value is 400.
 
 \section{\texttt{CRE} file format (default file used: ``Default/Default.cre'')}
 

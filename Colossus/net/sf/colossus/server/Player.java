@@ -260,7 +260,7 @@ public final class Player implements Comparable
 
     boolean canTitanTeleport()
     {
-        return (score >= 400 && !teleported);
+        return (score >= Game.getTitanTeleportValue() && !teleported);
     }
 
 
@@ -321,7 +321,7 @@ public final class Player implements Comparable
 
     int getTitanPower()
     {
-        return (int)(6 + (getScore() / 100));
+        return (int)(6 + (getScore() / Game.getTitanImprovementValue()));
     }
 
 

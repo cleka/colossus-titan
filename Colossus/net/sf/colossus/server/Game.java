@@ -1397,6 +1397,24 @@ public final class Game
         return trl.getPrimaryAcquirable();
     }
 
+    /**
+     * To obtain the base amount of points needed for Titan improvement.
+     * @return The base amount of points needed for Titan improvement.
+     */
+    public static int getTitanImprovementValue()
+    {
+        return trl.getTitanImprovementValue();
+    }
+
+    /**
+     * To obtain the amount of points needed for Titan Teleport.
+     * @return The amount of points needed for Titan Teleport.
+     */
+    public static int getTitanTeleportValue()
+    {
+        return trl.getTitanTeleportValue();
+    }
+
     /** Return a list of eligible recruits, as Creatures. */
     java.util.List findEligibleRecruits(String markerId, String hexLabel)
     {
