@@ -75,6 +75,7 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
     private AbstractAction saveBattlelandAction;
     private AbstractAction saveBattlelandAsAction;
     private AbstractAction quitAction;
+    private AbstractAction eraseAction;
 
     JMenuBar menuBar;
 
@@ -110,10 +111,19 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
                 }
             };
 
+        eraseAction = new AbstractAction("Erase Map") {
+                public void actionPerformed(ActionEvent e) {
+                    eraseMap();
+                    repaint();
+                }
+            };
+
+
         mi = fileMenu.add(saveBattlelandAction);
         mi.setMnemonic(KeyEvent.VK_S);
         mi = fileMenu.add(saveBattlelandAsAction);
         mi.setMnemonic(KeyEvent.VK_A);
+        mi = fileMenu.add(eraseAction);
         mi = fileMenu.add(quitAction);
         mi.setMnemonic(KeyEvent.VK_Q);
 

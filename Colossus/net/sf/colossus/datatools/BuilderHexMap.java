@@ -499,4 +499,17 @@ public class BuilderHexMap extends JPanel implements MouseListener, WindowListen
         }
         return(buf.toString());
     }
+
+    void eraseMap()
+    {
+        Iterator it = hexes.iterator();
+        while (it.hasNext())
+        {
+            BattleHex hex = (BattleHex)it.next();
+            hex.setTerrain('p');
+            hex.setElevation(0);
+            for (int i = 0; i < 6; i++)
+                hex.setHexside(i,' ');
+        }
+    }
 }
