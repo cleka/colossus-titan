@@ -26,7 +26,7 @@ class PickRecruit extends Dialog implements MouseListener, WindowListener
         
         setResizable(false);
 
-        if (legion.getHeight() > 6)
+        if (!legion.canRecruit())
         {
             dispose();
             return;
@@ -420,7 +420,7 @@ class PickRecruit extends Dialog implements MouseListener, WindowListener
                 legion.addCreature(recruits[i]);
 
                 // Recruits are one to a customer.
-                legion.commitMove();
+                legion.markRecruit();
 
                 // Then exit.
                 dispose();
