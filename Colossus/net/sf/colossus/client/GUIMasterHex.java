@@ -263,38 +263,38 @@ public final class GUIMasterHex extends MasterHex
         switch (getLabelSide())
         {
         case 0:
-            g2.drawString(label, rectBound.x +
-                ((rectBound.width - stringWidth(label, g2)) / 2), 
+            g2.drawString(getLabel(), rectBound.x +
+                ((rectBound.width - stringWidth(getLabel(), g2)) / 2), 
                 rectBound.y + halfFontHeight + rectBound.height / 10);
             break;
 
         case 1:
-            g2.drawString(label, rectBound.x + ((rectBound.width -
-                stringWidth(label, g2)) * 5 / 6), rectBound.y + 
+            g2.drawString(getLabel(), rectBound.x + ((rectBound.width -
+                stringWidth(getLabel(), g2)) * 5 / 6), rectBound.y + 
                 halfFontHeight + rectBound.height / 8);
             break;
 
         case 2:
-            g2.drawString(label, rectBound.x + (rectBound.width -
-                stringWidth(label, g2)) * 5 / 6, rectBound.y + halfFontHeight +
+            g2.drawString(getLabel(), rectBound.x + (rectBound.width -
+                stringWidth(getLabel(), g2)) * 5 / 6, rectBound.y + halfFontHeight +
                 rectBound.height * 7 / 8);
             break;
 
         case 3:
-            g2.drawString(label, rectBound.x + ((rectBound.width -
-                stringWidth(label, g2)) / 2), rectBound.y + halfFontHeight +
+            g2.drawString(getLabel(), rectBound.x + ((rectBound.width -
+                stringWidth(getLabel(), g2)) / 2), rectBound.y + halfFontHeight +
                 rectBound.height * 9 / 10);
             break;
 
         case 4:
-            g2.drawString(label, rectBound.x + (rectBound.width -
-                stringWidth(label, g2)) / 6, rectBound.y + halfFontHeight +
+            g2.drawString(getLabel(), rectBound.x + (rectBound.width -
+                stringWidth(getLabel(), g2)) / 6, rectBound.y + halfFontHeight +
                 rectBound.height * 5 / 6);
             break;
 
         case 5:
-            g2.drawString(label, rectBound.x + (rectBound.width -
-                stringWidth(label, g2)) / 6, rectBound.y + halfFontHeight + 
+            g2.drawString(getLabel(), rectBound.x + (rectBound.width -
+                stringWidth(getLabel(), g2)) / 6, rectBound.y + halfFontHeight + 
                 rectBound.height / 8);
             break;
         }

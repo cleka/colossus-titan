@@ -327,7 +327,7 @@ public final class MasterBoard extends JPanel
                 GUIMasterHex hex = getHexContainingPoint(lastPoint);
                 if (hex != null)
                 {
-                    char [] terrains = { hex.getTerrain() };
+                    String[] terrains = { hex.getTerrain() };
                     new ShowAllRecruits(masterFrame, terrains, lastPoint,
                                         hex.getLabel());
                 }

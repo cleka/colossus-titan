@@ -1,37 +1,37 @@
-RECRUIT B Zombie    2 Zombie   ((NOT (HASCREATURE Wraith)) AND
+RECRUIT Brush Zombie    2 Zombie   ((NOT (HASCREATURE Wraith)) AND
                                 (2 Wraith AVAILABLE))
-RECRUIT P Naga      2 Naga     (((CANREACH D) AND
+RECRUIT Plains Naga      2 Naga     (((CANREACH Desert) AND
                                  (NOT (HASCREATURE Griffin))) AND
                                 (2 Griffin AVAILABLE))
-RECRUIT M Orc       2 Orc      (((CANREACH S) AND
+RECRUIT Marsh Orc       2 Orc      (((CANREACH Swamp) AND
                                  (NOT (HASCREATURE Wyvern))) AND
                                 (2 Wyvern AVAILABLE))
-RECRUIT T Skeleton  1 Skeleton ((3 Zombie AVAILABLE) AND
+RECRUIT Tower Skeleton  1 Skeleton ((3 Zombie AVAILABLE) AND
                                 (NOT ((CANRECRUIT Wizard) OR
                                       (CANRECRUIT Golem) OR
                                       (CANRECRUIT Harpy) OR
                                       (CANRECRUIT Beholder))))
-RECRUIT T Troglodyte 1 Troglodyte ((2 Orc AVAILABLE) AND
+RECRUIT Tower Troglodyte 1 Troglodyte ((2 Orc AVAILABLE) AND
                                 (NOT ((CANRECRUIT Wizard) OR
                                       (CANRECRUIT Golem) OR
                                       (CANRECRUIT Harpy) OR
                                       (CANRECRUIT Beholder))))
-RECRUIT T Paladin   1 Paladin  ((2 Naga AVAILABLE) AND
+RECRUIT Tower Paladin   1 Paladin  ((2 Naga AVAILABLE) AND
                                 (NOT ((CANRECRUIT Wizard) OR
                                       (CANRECRUIT Golem) OR
                                       (CANRECRUIT Harpy) OR
                                       (CANRECRUIT Beholder))))
-RECRUIT T Skeleton  0 Skeleton ((6 Zombie AVAILABLE) AND
+RECRUIT Tower Skeleton  0 Skeleton ((6 Zombie AVAILABLE) AND
                                 (NOT ((CANRECRUIT Wizard) OR
                                       (CANRECRUIT Golem) OR
                                       (CANRECRUIT Harpy) OR
                                       (CANRECRUIT Beholder))))
-RECRUIT T Troglodyte 0 Troglodyte ((6 Orc AVAILABLE) AND
+RECRUIT Tower Troglodyte 0 Troglodyte ((6 Orc AVAILABLE) AND
                                 (NOT ((CANRECRUIT Wizard) OR
                                       (CANRECRUIT Golem) OR
                                       (CANRECRUIT Harpy) OR
                                       (CANRECRUIT Beholder))))
-RECRUIT T Paladin   0 Paladin  ((6 Naga AVAILABLE) AND
+RECRUIT Tower Paladin   0 Paladin  ((6 Naga AVAILABLE) AND
                                 (NOT ((CANRECRUIT Wizard) OR
                                       (CANRECRUIT Golem) OR
                                       (CANRECRUIT Harpy) OR

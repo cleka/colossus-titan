@@ -45,20 +45,19 @@ public abstract class Hex
     private boolean selected;
 
     // Game state variables
-    private char terrain;
-    String label = "";  // Avoid null pointer in stringWidth()
+    private String baseName = "";
+    private String label = "";  // Avoid null pointer in stringWidth()
     private int xCoord = -1;
     private int yCoord = -1;
 
-
-    public char getTerrain()
+    public String getTerrain()
     {
-        return terrain;
+        return baseName;
     }
 
-    public void setTerrain(char terrain)
+    public void setTerrain(String bn)
     {
-        this.terrain = terrain;
+        baseName = bn;
     }
 
     public Rectangle getBounds()

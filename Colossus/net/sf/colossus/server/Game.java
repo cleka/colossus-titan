@@ -1496,7 +1496,7 @@ public final class Game
         java.util.List recruits;
 
         MasterHex hex = MasterBoard.getHexByLabel(hexLabel);
-        char terrain = hex.getTerrain();
+        String terrain = hex.getTerrain();
 
         recruits = new ArrayList();
         java.util.List tempRecruits =
@@ -1555,7 +1555,7 @@ public final class Game
         Legion legion = getLegionByMarkerId(markerId);
         String hexLabel = legion.getCurrentHexLabel();
         MasterHex hex = MasterBoard.getHexByLabel(hexLabel);
-        char terrain = hex.getTerrain();
+        String terrain = hex.getTerrain();
 
         recruiters = TerrainRecruitLoader.getPossibleRecruiters(
             terrain, hexLabel);
@@ -1651,9 +1651,9 @@ public final class Game
             return null;
         }
         java.util.List recruits = new ArrayList();
-        char t = legion.getCurrentHex().getTerrain();
+        String terrain = legion.getCurrentHex().getTerrain();
         java.util.List allRecruits =
-            TerrainRecruitLoader.getRecruitableAcquirableList(t, score);
+            TerrainRecruitLoader.getRecruitableAcquirableList(terrain, score);
         java.util.Iterator it = allRecruits.iterator();
 
         while (it.hasNext())

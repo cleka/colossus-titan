@@ -28,6 +28,7 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
     private JCheckBoxMenuItem towerItem;
 
     private AbstractAction towerAction;
+    private AbstractAction clearStartListAction;
 
     class rndFileFilter extends javax.swing.filechooser.FileFilter 
     {
@@ -99,6 +100,9 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
                 try {
                     while (parser.oneBattlelandCase(h) >= 0) {}
                     towerItem.setState(parser.isTower());
+                    isTower = parser.isTower();
+                    java.util.List startList = parser.getStartList();
+                    selectHexesByLabels(new java.util.HashSet(startList));
                 } catch (Exception e) { System.err.println(e); }
             }
         }
@@ -161,8 +165,8 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
 
     class TerrainAction extends AbstractAction
     {
-        char c;
-        TerrainAction(String t, char c)
+        String c;
+        TerrainAction(String t, String c)
         {
             super(t);
             this.c = c;
@@ -293,8 +297,25 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
                     mi.setState(isTower);
                 }
             };
-
         towerItem = (JCheckBoxMenuItem)specialMenu.add(new JCheckBoxMenuItem(towerAction));
+        clearStartListAction = new AbstractAction("Remove StartList") {
+                public void actionPerformed(ActionEvent e) {
+                    GUIBattleHex[][] h = (GUIBattleHex[][])getBattleHexArray();
+                    for (int i = 0; i < h.length; i++)
+                    {
+                        for (int j = 0; j < h[0].length; j++)
+                        {
+                            if ((h[i][j] != null) &&
+                                (h[i][j].isSelected()))
+                            {
+                                h[i][j].unselect();
+                                h[i][j].repaint();
+                            }
+                        }
+                    }
+                }
+            };
+        mi = specialMenu.add(clearStartListAction);
 
         dialog = new JDialog();
 
@@ -311,7 +332,7 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
 
         popupMenuTerrain = new JPopupMenu("Choose Terrain");
         contentPane.add(popupMenuTerrain);
-        char[] terrains = BattleHex.getTerrains();
+        String[] terrains = BattleHex.getTerrains();
         GUIBattleHex tempH = new GUIBattleHex(0,0,1,this,0,0);
 
         for (int i = 0 ; i < terrains.length ; i++)
@@ -327,6 +348,19 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
                                       "Set Elevation to: " + i,
                                       i));
         }
+        popupMenuTerrain.addSeparator();
+        AbstractAction select = new AbstractAction("Select/Unselect (StartList)")
+            {
+                public void actionPerformed(ActionEvent e) {
+                    GUIBattleHex h = getHexContainingPoint(lastPoint);
+                    if (h.isSelected())
+                        h.unselect();
+                    else
+                        h.select();
+                    h.repaint();
+                }
+            };
+        mi = popupMenuTerrain.add(select);
 
         popupMenuBorder = new JPopupMenu("Choose Border");
         contentPane.add(popupMenuBorder);

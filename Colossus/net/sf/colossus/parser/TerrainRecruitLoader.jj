@@ -33,30 +33,30 @@ public class TerrainRecruitLoader
     public static final String Keyword_Special = "Special:";
 
     /**
-     * Map a character (representing a terrain) to a list of recruits.
+     * Map a String (representing a terrain) to a list of recruits.
      */
-    private static Hashtable carToRecruits = new Hashtable();
+    private static HashMap strToRecruits = new HashMap();
     /**
-     * Map a character (representing a terrain) to a terrain name.
+     * Map a String (representing a terrain) to a terrain display name.
      */
-    private static Hashtable carToName = new Hashtable();
+    private static HashMap strToDisplayName = new HashMap();
     /**
-     * Map a character (representing a terrain) to a terrain display name.
+     * Map a String (representing a terrain) to a terrain color.
      */
-    private static Hashtable carToDisplayName = new Hashtable();
+    private static HashMap strToColor = new HashMap();
     /**
-     * Map a character (representing a terrain) to a terrain color.
-     */
-    private static Hashtable carToColor = new Hashtable();
-    /**
-     * Map a character (representing a terrain) to a boolean,
+     * Map a String (representing a terrain) to a boolean,
      * telling if a Creature can recruit in the usual way or not.
      */
-    private static Hashtable carToBelow = new Hashtable();
+    private static HashMap strToBelow = new HashMap();
     /**
-     * All the character that are valid terrains.
+     * Map a String (representing a terrain) to an optional BattlelandsRandomizer filename.
      */
-    private static char[] terrains = null;
+    private static HashMap strToRnd = new HashMap();
+    /**
+     * All the Strings that are valid terrains.
+     */
+    private static String[] terrains = null;
     /**
      * The list of Acquirable Creature, as acquirableData.
      * @see net.sf.colossus.parser.TerrainRecruitLoader.acquirableData
@@ -64,7 +64,7 @@ public class TerrainRecruitLoader
     private static List acquirableList = null;
     /** support for the custom recruiting functions ; map the class name to an
         instance of the class. */
-    private static Hashtable nameToInstance = new Hashtable();
+    private static HashMap nameToInstance = new HashMap();
 
     /**
      * Representation of the Recruiting Graph (for use)
@@ -86,12 +86,12 @@ public class TerrainRecruitLoader
      * Add an entire terrain recruiting list to the Recruiting Graph.
      * @param rl The list of RecruitNumber to add to the graph.
      */
-    private static void addToGraph(ArrayList rl, char t)
+    private static void addToGraph(ArrayList rl, String t)
     {
         Iterator it = rl.iterator();
         String v1 = null;
         boolean regularRecruit =
-            ((Boolean)carToBelow.get(new Character(t))).booleanValue();
+            ((Boolean)strToBelow.get(t)).booleanValue();
         try 
         {
             while (it.hasNext())
@@ -184,22 +184,22 @@ public class TerrainRecruitLoader
                       "a game...");
             terrains = null;
         }
-        carToRecruits.clear();
-        carToName.clear();
-        carToDisplayName.clear();
-        carToColor.clear();
-        carToBelow.clear();
+        strToRecruits.clear();
+        strToDisplayName.clear();
+        strToColor.clear();
+        strToBelow.clear();
+        strToRnd.clear();
         nameToInstance.clear();
         graph.clear();
     }
 
     /**
-     * Return an array of all the char representing a valid terrain.
-     * @return An array of char, each representing a valid terrain.
+     * Return an array of all the String representing a valid terrain.
+     * @return An array of String, each representing a valid terrain.
      */
-    public static char[] getTerrains()
+    public static String[] getTerrains()
     {
-        return (char [])terrains.clone();
+        return (String[])terrains.clone();
     }
 
     /**
@@ -265,6 +265,7 @@ public class TerrainRecruitLoader
         return cri;
     }
     /**
+     * @deprecated
      * Give an array of the starting creatures, those available in the first
      * turn and in the Tower.
      * @return an array of Creature representing the starting creatures.
@@ -272,7 +273,7 @@ public class TerrainRecruitLoader
      */
     public Creature[] getStartingCreatures()
     {
-        return getStartingCreatures('T');
+        return getStartingCreatures("Tower");
     }
     /**
      * Give an array of the starting creatures, those available in the first
@@ -281,7 +282,7 @@ public class TerrainRecruitLoader
      * @return an array of Creature representing the starting creatures.
      * @see net.sf.colossus.server.Creature
      */
-    public static Creature[] getStartingCreatures(char terrain)
+    public static Creature[] getStartingCreatures(String terrain)
     {
         Creature[] bc = new Creature[3];
         java.util.List to = getPossibleRecruits(terrain, null);
@@ -291,41 +292,53 @@ public class TerrainRecruitLoader
         return(bc);
     }
     /**
+     * @deprecated
      * Give the name of the terrain.
-     * @param tc Character representing a terrain.
+     * @param tc String representing a terrain.
      * @return The name of the terrain as a String.
      */
-    public static String getTerrainName(char tc)
+    public static String getTerrainName(String tc)
     {
-        return((String)carToName.get(new Character(tc)));
+        return(tc);
     }
     /**
      * Give the display name of the terrain.
-     * @param tc Character representing a terrain.
+     * @param tc String representing a terrain.
      * @return The display name of the terrain as a String.
      */
-    public static String getTerrainDisplayName(char tc)
+    public static String getTerrainDisplayName(String tc)
     {
-        return((String)carToDisplayName.get(new Character(tc)));
+        return((String)strToDisplayName.get(tc));
     }
     /**
      * Give the color of the terrain.
-     * @param tc Character representing a terrain.
+     * @param tc String representing a terrain.
      * @return The color of the terrain as Color.
      */
-    public static java.awt.Color getTerrainColor(char tc)
+    public static java.awt.Color getTerrainColor(String tc)
     {
-        return((java.awt.Color)carToColor.get(new Character(tc)));
+        return((java.awt.Color)strToColor.get(tc));
+    }
+    /**
+     * Give the name of the random filename to use to generate this terrain,
+     * or null if it's a static Battlelands.
+     * @param tc String representing a terrain.
+     * @return The name of the random source file as a String
+     */
+    public static String getTerrainRandomName(String tc)
+    {
+        return((String)strToRnd.get(tc));
     }
     /**
      * Give a modifiable list of the possible recruits in a terrain.
-     * @param terrain Character representing a terrain.
+     * @param terrain String representing a terrain.
      * @return List of Creatures that can be recruited in the terrain.
      * @see net.sf.colossus.server.Creature
      */
-    public static java.util.List getPossibleRecruits(char terrain, String hexLabel)
+    public static java.util.List getPossibleRecruits(String terrain,
+                                                     String hexLabel)
     {
-        ArrayList al = (ArrayList)carToRecruits.get(new Character(terrain));
+        ArrayList al = (ArrayList)strToRecruits.get(terrain);
         ArrayList re = new ArrayList();
         Iterator it = al.iterator();
         while (it.hasNext())
@@ -346,7 +359,8 @@ public class TerrainRecruitLoader
                     getCustomRecruitBase(tr.getName());
                 if (cri != null)
                 {
-                    List temp = cri.getPossibleSpecialRecruits(terrain, hexLabel);
+                    List temp = cri.getPossibleSpecialRecruits(terrain,
+                                                               hexLabel);
                     re.addAll(temp);
                 }
             }
@@ -355,13 +369,14 @@ public class TerrainRecruitLoader
     }
     /**
      * Give a modifiable list of the possible recruiters in a terrain.
-     * @param terrain Character representing a terrain.
+     * @param terrain String representing a terrain.
      * @return List of Creatures that can recruit in the terrain.
      * @see net.sf.colossus.server.Creature
      */
-    public static java.util.List getPossibleRecruiters(char terrain, String hexLabel)
+    public static java.util.List getPossibleRecruiters(String terrain,
+                                                       String hexLabel)
     {
-        ArrayList al = (ArrayList)carToRecruits.get(new Character(terrain));
+        ArrayList al = (ArrayList)strToRecruits.get(terrain);
         ArrayList re = new ArrayList();
         Iterator it = al.iterator();
         while (it.hasNext())
@@ -405,7 +420,8 @@ public class TerrainRecruitLoader
                         getCustomRecruitBase(tr.getName());
                     if (cri != null)
                     {
-                        List temp = cri.getPossibleSpecialRecruiters(terrain, hexLabel);
+                        List temp = cri.getPossibleSpecialRecruiters(terrain,
+                                                                     hexLabel);
                         re.addAll(temp);
                     }
                 }
@@ -419,14 +435,14 @@ public class TerrainRecruitLoader
      * Creature.
      * @param recruiter The Creature that wish to recruit.
      * @param recruit The Creature that is to be recruited.
-     * @param terrain Character representing a terrain, in which the
+     * @param terrain String representing a terrain, in which the
      * recruiting occurs.
      * @return Number of recruiter needed.
      * @see net.sf.colossus.server.Creature
      */
     public static int numberOfRecruiterNeeded(Creature recruiter, 
                                               Creature recruit,
-                                              char terrain,
+                                              String terrain,
                                               String hexLabel)
     {
         int g_value = graph.numberOfRecruiterNeeded(recruiter.getName(),
@@ -437,7 +453,7 @@ public class TerrainRecruitLoader
     }
 
     public static boolean anonymousRecruitLegal(Creature recruit,
-                                                char terrain,
+                                                String terrain,
                                                 String hexLabel)
     {
         int g_value = graph.numberOfRecruiterNeeded(Keyword_Anything,
@@ -479,9 +495,9 @@ public class TerrainRecruitLoader
         {
             return value;
         }
-        void addTerrain(char t)
+        void addTerrain(String t)
         {
-            where.add(new Character(t));
+            where.add(t);
         }
         /**
          * Tell if the Acquirable can be Acquired in the terrain.
@@ -489,10 +505,10 @@ public class TerrainRecruitLoader
          * @return True if the Acquirable can be acquired here,
          * false otherwise.
          */
-        boolean isAvailable(char t)
+        boolean isAvailable(String t)
         {
             if (where.isEmpty() ||
-                ((where.indexOf(new Character(t))) != -1))
+                ((where.indexOf(t)) != -1))
             {
                 return true;
             }
@@ -572,7 +588,7 @@ public class TerrainRecruitLoader
      * terrain, for this amount of points.
      * @see #getAcquirableRecruitmentsValue()
      */
-    public static List getRecruitableAcquirableList(char t, int value)
+    public static List getRecruitableAcquirableList(String t, int value)
     {
         List al = new ArrayList();
         if ((value % getAcquirableRecruitmentsValue()) != 0)
@@ -716,6 +732,7 @@ TOKEN:
 TOKEN :
 {
     < SPECIALCHAINE : "Special:" (<NUMCAR>)+ >
+|   < RANDOMCHAINE : "Random:" (<NUMCAR>)+ ".rnd" >
 |   < CHAINE : <CAR> (<NUMCAR>)* >
 |   < QUOTEDCHAINE : "\"" (<QUOTEDCAR>)+ "\"" >
 |   < #CAR : ["a"-"z","A"-"Z",".","_"] >
@@ -730,11 +747,13 @@ boolean r_bool() :
     { if (token.image.equals("true")) return true; else return false; }
 }
 
-char r_char() :
+String r_random_chaine() :
 {}
 {
-    <TERRAINLIST>
-    { return (token.image.charAt(0)); }
+    <RANDOMCHAINE>
+    {
+        return((new String(token.image)).substring(7));
+    }
 }
 
 String r_chaine() :
@@ -782,8 +801,7 @@ acquirableData r_acquirableData() :
         while (it.hasNext())
         {
             String ter = (String)it.next();
-            char t = ter.charAt(0);
-            ad.addTerrain(t);
+            ad.addTerrain(ter);
         }
         }
         return ad;
@@ -838,8 +856,8 @@ List r_acquirableDataList() :
 int oneTerrain() :
 {
     String t, dt = null;
+    String rnd = null;
     String col;
-    char tc;
     ArrayList rl;
     String s;
     boolean rb;
@@ -847,32 +865,32 @@ int oneTerrain() :
     int val;
 }
 {
-    (tc = r_char()) (col = r_chaine()) (t = r_chaine())
-        (rb = r_bool()) (rl = r_allRecruit()) (dt = r_chaine())?
+    (col = r_chaine()) (t = r_chaine())
+        (rb = r_bool()) (rl = r_allRecruit()) (dt = r_chaine())? (rnd = r_random_chaine())?
     {
-        carToRecruits.put(new Character(tc), rl);
-        carToName.put(new Character (tc), t);
-        carToDisplayName.put(new Character (tc), dt == null ? t : dt);
-        carToColor.put(new Character (tc), HTMLColor.stringToColor(col));
-        carToBelow.put(new Character (tc), new Boolean (rb));
+        strToRecruits.put(t, rl);
+        strToDisplayName.put(t, dt == null ? t : dt);
+        strToColor.put(t, HTMLColor.stringToColor(col));
+        strToBelow.put(t, new Boolean (rb));
+        strToRnd.put(t, rnd);
         if (terrains == null)
         {
-            terrains = new char[1];
-            terrains[0] = tc;
+            terrains = new String[1];
+            terrains[0] = t;
         } 
         else 
         {
-            char[] t2 = new char[terrains.length + 1];
+            String[] t2 = new String[terrains.length + 1];
             for (int i = 0; i < terrains.length ; i++)
             {
                 t2[i] = terrains[i];
             }
-            t2[terrains.length] = tc;
+            t2[terrains.length] = t;
             terrains = t2;
         }
         Log.debug("Adding recruits for " + t + " " + rl);
 
-        addToGraph(rl, tc);
+        addToGraph(rl, t);
 
         return(1);
     }

@@ -91,6 +91,7 @@ $(JARFILE): net/sf/colossus/parser/StrategicMapLoader.java \
 	net/sf/colossus/parser/TerrainRecruitLoader.java \
 	net/sf/colossus/parser/CreatureLoader.java \
 	net/sf/colossus/parser/BattlelandLoader.java \
+	net/sf/colossus/parser/BattlelandRandomizerLoader.java \
 	net/sf/colossus/parser/VariantLoader.java \
 	net/sf/colossus/parser/AIHintLoader.java \
 	$(CLASS_FILES) $(IMAGES) META-INF/MANIFEST.MF version 
@@ -105,7 +106,7 @@ $(JARFILE): net/sf/colossus/parser/StrategicMapLoader.java \
         Default TitanPlus ExtTitan ExtTitan8 Badlands Outlands Undead \
 	Abyssal6 Abyssal9 \
 	TG-ConceptI TG-ConceptII TG-ConceptIII TG-SetII TG-SetIII TG-Wild \
-	Badlands-JDG SmallTitan Balrog version
+	Badlands-JDG SmallTitan Balrog Random version
 	chmod +x Colossus.jar
 
 # Sign jar file.  You need a keystore file named {your user name}Keystore

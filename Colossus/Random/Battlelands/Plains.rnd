@@ -1,0 +1,20 @@
+# $Id$
+
+# areaone to three are the second lines of attackers
+LABEL areaone=B3 C4 D5
+LABEL areatwo=B2 C2 D2
+LABEL areathree=E2 E3 E4
+
+# Once in a while, something happen in a Plains...
+# sometimes a small lake and some greenery
+AREA (inside) HAZARDS Lake,10.
+LABEL lake=(usedup)
+LABEL nolake=(leftover)
+LABEL nearlake=SURROUNDINGSOF((lake))
+AREA (nearlake) HAZARDS Tree,50. Brambles,50.
+# sometimes a bit of sand
+AREA (nolake) HAZARDS Sand,10.
+LABEL sandy=SURROUNDINGSOF((usedup)) 
+AREA (sandy) HAZARDS Sand,50.
+
+PAIR (Sand,*)(Plains,*) HEXSIDES d,60. c,50.

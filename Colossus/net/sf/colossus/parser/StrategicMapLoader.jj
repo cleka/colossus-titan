@@ -79,20 +79,30 @@ TOKEN :
 
 TOKEN :
 {
-        < TERRAIN : ["a"-"z","A"-"Z"] >
+        < WAY : "ARROW"|"ARROWS"|"ARCH"|"BLOCK" >
 }
 
 TOKEN :
 {
-        < WAY : "ARROW"|"ARROWS"|"ARCH"|"BLOCK" >
+    < CHAINE : <CAR> (<NUMCAR>)* >
+|   < QUOTEDCHAINE : "\"" (<QUOTEDCAR>)+ "\"" >
+|   < #CAR : ["a"-"z","A"-"Z",".","_"] >
+|   < #NUMCAR : <CAR>|["0"-"9"] >
+|   < #QUOTEDCAR : <NUMCAR>|" " >
 }
 
-char c_terrain() :
+String c_chaine() :
 {}
 {
-    <TERRAIN>
+    <CHAINE>
     {
-        return(token.image.charAt(0));
+        return(new String(token.image));
+    }
+|   <QUOTEDCHAINE>
+    {
+        String tok = new String(token.image);
+        String cha = tok.substring(1, tok.length() - 1);
+        return(cha);
     }
 }
 
@@ -122,7 +132,7 @@ int c_way() :
 int oneCase(MasterHex [][] array, java.util.List list, boolean [][] show) :
 {
     String s;
-    char ter;
+    String ter;
     int p;
     int s1;
     int s2;
@@ -136,7 +146,7 @@ int oneCase(MasterHex [][] array, java.util.List list, boolean [][] show) :
     int nPosY;
 }
 {
-    (p = c_number()) (ter = c_terrain()) (s1 = c_number()) (ts1 = c_way()) (s2 = c_number()) (ts2 = c_way()) (s3 = c_number()) (ts3 = c_way()) (posX = c_number()) (posY = c_number())
+    (p = c_number()) (ter = c_chaine()) (s1 = c_number()) (ts1 = c_way()) (s2 = c_number()) (ts2 = c_way()) (s3 = c_number()) (ts3 = c_way()) (posX = c_number()) (posY = c_number())
     {
         array[posX][posY] = new MasterHex();
         show[posX][posY] = true;

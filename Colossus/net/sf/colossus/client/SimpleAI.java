@@ -340,7 +340,7 @@ public class SimpleAI implements AI
     /** Return true if the legion could recruit or acquire something
      *  better than its worst creature in hexLabel. */
     private boolean couldRecruitUp(LegionInfo legion, String hexLabel,
-        LegionInfo enemy, char terrain)
+        LegionInfo enemy, String terrain)
     {
         legion.sortContents();
         Creature weakest = Creature.getCreatureByName(
@@ -1541,7 +1541,7 @@ public class SimpleAI implements AI
         boolean attackerSplitsBeforeBattle, LegionInfo defender,
         MasterHex hex, Creature recruit)
     {
-        char terrain = hex.getTerrain();
+        String terrain = hex.getTerrain();
         double attackerPointValue = getCombatValue(attacker, terrain);
 
         if (attackerSplitsBeforeBattle)
@@ -1572,7 +1572,7 @@ public class SimpleAI implements AI
             // defender in the tower!  ouch!
             defenderPointValue *= 1.2;
         }
-        else if (hex.getTerrain() == 'A')  // The Abyss, in variants
+        else if (hex.getTerrain().equals("Abyss"))  // The Abyss, in variants
         {
             // defender in the abyss!  Kill!
             defenderPointValue *= 0.8;
@@ -1622,13 +1622,13 @@ public class SimpleAI implements AI
             Iterator it = all.iterator();
             while (it.hasNext())
             {
-                char t = ((Character)it.next()).charValue();
+                String terrain = (String)it.next();
                 
                 String dest = TerrainRecruitLoader.getRecruitGraph().
-                    getRecruitFromRecruiterTerrainNumber(base.getName(), t, i);
+                    getRecruitFromRecruiterTerrainNumber(base.getName(), terrain, i);
 
                 if ((dest != null) &&
-                    (getNumberOfWaysToTerrain(legion,hex,t) > 0))
+                    (getNumberOfWaysToTerrain(legion,hex,terrain) > 0))
                 {
                     Creature cdest = Creature.getCreatureByName(dest);
 
@@ -1807,11 +1807,11 @@ public class SimpleAI implements AI
             
         }
 
-        public boolean canReach(char t)
+        public boolean canReach(String terrain)
         {
-            int now = getNumberOfWaysToTerrain(legion,hex,t);
+            int now = getNumberOfWaysToTerrain(legion,hex,terrain);
             //Log.debug("ORACLE: now is " + now + 
-            //    " ( from hex " + hex.getLabel() + " to a " + t + ")");
+            //    " ( from hex " + hex.getLabel() + " to a " + terrain + ")");
             return (now > 0);
         }
         public int creatureAvailable(String name)
@@ -1946,7 +1946,7 @@ public class SimpleAI implements AI
     }
 
     private int getNumberOfWaysToTerrain(LegionInfo legion, 
-        MasterHex hex, char terrainType)
+        MasterHex hex, String terrainType)
     {
         int total = 0;
         for (int roll = 1; roll <= 6; roll++)
@@ -1969,22 +1969,23 @@ public class SimpleAI implements AI
 
         while (it.hasNext())
         {
-            char t = ((Character)it.next()).charValue();
+            String terrain = (String)it.next();
 
-            total += getNumberOfWaysToTerrain(legion,hex,t);
+            total += getNumberOfWaysToTerrain(legion,hex,terrain);
         }
 
         return total;
     }
 
-    private static boolean setContainsHexWithTerrain(Set set, char terrainType)
+    private static boolean setContainsHexWithTerrain(Set set,
+                                                     String terrainType)
     {
         Iterator it = set.iterator();
         while (it.hasNext())
         {
             String hexLabel = (String)it.next();
-            char terrain = MasterBoard.getHexByLabel(hexLabel).getTerrain();
-            if (terrain == terrainType)
+            String terrain = MasterBoard.getHexByLabel(hexLabel).getTerrain();
+            if (terrain.equals(terrainType))
             {
                 return true;
             }
@@ -2190,7 +2191,7 @@ public class SimpleAI implements AI
 
         // Wimpy legions should concede if it costs the enemy an
         // angel or good recruit.
-        char terrain = legion.getCurrentHex().getTerrain();
+        String terrain = legion.getCurrentHex().getTerrain();
         int height = enemy.getHeight();
         if (getCombatValue(legion, terrain) < 0.5 * getCombatValue(enemy,
             terrain) && height >= 6)
@@ -2330,7 +2331,7 @@ public class SimpleAI implements AI
     {
         boolean canKillSomething = false;
         BattleChit bestTarget = null;
-        char terrain = client.getBattleTerrain();
+        String terrain = client.getBattleTerrain();
 
         // Create a map containing each target and the likely number
         // of hits it would take if all possible creatures attacked it.
@@ -2388,7 +2389,7 @@ public class SimpleAI implements AI
      *  hexLabel description strings. */
     public void handleCarries(int carryDamage, Set carryTargets)
     {
-        char terrain = client.getBattleTerrain();
+        String terrain = client.getBattleTerrain();
         BattleChit bestTarget = null;
 
         Iterator it = carryTargets.iterator();
@@ -2475,7 +2476,7 @@ Log.debug("Best target is null, aborting");
     }
 
 
-    static int getCombatValue(BattleChit chit, char terrain)
+    static int getCombatValue(BattleChit chit, String terrain)
     {
         int val = chit.getPointValue();
         Creature creature = chit.getCreature();
@@ -2499,7 +2500,7 @@ Log.debug("Best target is null, aborting");
     }
 
     /** XXX Inaccurate for titans. */
-    static int getCombatValue(Creature creature, char terrain) 
+    static int getCombatValue(Creature creature, String terrain) 
     {
         if (creature.isTitan())
         {
@@ -2538,7 +2539,7 @@ Log.debug("Best target is null, aborting");
     }
 
 
-    static int getCombatValue(LegionInfo legion, char terrain)
+    static int getCombatValue(LegionInfo legion, String terrain)
     {
         int val = 0;
         Iterator it = legion.getContents().iterator();
@@ -2564,16 +2565,16 @@ Log.debug("Best target is null, aborting");
 
     static int getKillValue(Creature creature)
     {
-        return getKillValue(creature, 'P');
+        return getKillValue(creature, "Plains");
     }
 
     // XXX titan power
-    static int getKillValue(BattleChit chit, char terrain)
+    static int getKillValue(BattleChit chit, String terrain)
     {
         return getKillValue(chit.getCreature(), terrain);
     }
 
-    static int getKillValue(Creature creature, char terrain)
+    static int getKillValue(Creature creature, String terrain)
     {
         int val = 10 * creature.getPointValue();
         if (creature.getSkill() >= 4)
@@ -3195,7 +3196,7 @@ Log.debug("Called findBattleMoves()");
 
     private int evaluateCritterMove(BattleChit critter)
     {
-        final char terrain = client.getBattleTerrain();
+        final String terrain = client.getBattleTerrain();
         final String masterHexLabel = client.getBattleSite();
         final LegionInfo legion = client.getLegionInfo(
             client.getMyEngagedMarkerId());
@@ -3223,7 +3224,7 @@ Log.debug("Called findBattleMoves()");
             // We want marsh natives to slightly prefer moving to bog hexes,
             // even though there's no real bonus there, to leave other hexes
             // clear for non-native allies.
-            if (hex.getTerrain() == 'o')
+            if (hex.getTerrain().equals("Bog"))
             {
                 value += bec.NATIVE_BOG;
             }
@@ -3412,7 +3413,7 @@ Log.debug("Called findBattleMoves()");
                     for (int i = 0; i < 6; i++)
                     {
                         BattleHex neighbor = hex.getNeighbor(i);
-                        if (neighbor == null || neighbor.getTerrain() == 't')
+                        if (neighbor == null || neighbor.getTerrain().equals("Tree"))
                         {
                             value += bec.TITAN_BY_EDGE_OR_TREE_BONUS;
                         }

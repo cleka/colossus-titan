@@ -117,11 +117,11 @@ public class RecruitGraph
         private final RecruitVertex src;
         private final RecruitVertex dst;
         private final int number;
-        private final char terrain;
+        private final String terrain;
 
         RecruitEdge(RecruitVertex src,
                     RecruitVertex dst,
-                    int number, char terrain)
+                    int number, String terrain)
         {
             this.src = src;
             this.dst = dst;
@@ -144,7 +144,7 @@ public class RecruitGraph
             return number;
         }
 
-        char getTerrain()
+        String getTerrain()
         {
             return terrain;
         }
@@ -159,7 +159,7 @@ public class RecruitGraph
             if ((o2.getSource() == src) &&
                 (o2.getDestination() == dst) &&
                 (o2.getNumber() == number) &&
-                (o2.getTerrain() == terrain))
+                (o2.getTerrain().equals(terrain)))
             {
                 return true;
             }
@@ -212,7 +212,7 @@ public class RecruitGraph
     
     private RecruitEdge addEdge(RecruitVertex src,
                                 RecruitVertex dst,
-                                int number, char terrain)
+                                int number, String terrain)
     {
         RecruitEdge e = new RecruitEdge(src, dst, number, terrain);
         allEdge.add(e);
@@ -336,7 +336,7 @@ public class RecruitGraph
      */
     public void addEdge(String src,
                         String dst,
-                        int number, char terrain)
+                        int number, String terrain)
     {
         addEdge(addVertex(src),
                 addVertex(dst),
@@ -345,7 +345,7 @@ public class RecruitGraph
 
     public int numberOfRecruiterNeeded(String recruiter, 
                                        String recruit,
-                                       char terrain,
+                                       String terrain,
                                        String hexLabel)
     {
         List allEdge = getIncomingEdges(recruit);
@@ -365,7 +365,7 @@ public class RecruitGraph
         while (it.hasNext())
         {
             RecruitEdge theEdge = (RecruitEdge)it.next();
-            if (theEdge.getTerrain() == terrain)
+            if (theEdge.getTerrain().equals(terrain))
             {
                 RecruitVertex tempSrc = theEdge.getSource();
                 if ((source == tempSrc) ||
@@ -443,11 +443,11 @@ public class RecruitGraph
     }
 
     /**
-     * Return all the terrains (as Character in a List) where the given
+     * Return all the terrains (as String in a List) where the given
      * number of creature of the given name can recruit.
      * @param cre Name of the recruiting creature.
      * @param number Number of creature
-     * @return A List of Character representing all Terrains where recruitment is possible.
+     * @return A List of String representing all Terrains where recruitment is possible.
      */
     public List getAllTerrainsWhereThisNumberOfCreatureRecruit(String cre,
                                                                int number)
@@ -461,7 +461,7 @@ public class RecruitGraph
             RecruitEdge e = (RecruitEdge)it.next();
             
             if (e.getNumber() == number)
-                at.add(new Character(e.getTerrain()));
+                at.add(e.getTerrain());
         }
         return at;   
     }
@@ -474,7 +474,7 @@ public class RecruitGraph
      * @return Name of the recruit.
      */
     public String getRecruitFromRecruiterTerrainNumber(String cre,
-                                                       char t,
+                                                       String t,
                                                        int number)
     {
         java.util.List outgoing = getOutgoingEdges(cre);
@@ -487,7 +487,7 @@ public class RecruitGraph
             RecruitEdge e = (RecruitEdge)it.next();
             
             if ((e.getNumber() == number) &&
-                (e.getTerrain() == t))
+                (e.getTerrain().equals(t)))
             {
                 v2 = e.getDestination().getCreatureName();
             }

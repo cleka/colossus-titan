@@ -99,13 +99,13 @@ final class BattleMovement
      */
     private Set findUnoccupiedStartlistHexes()
     {
-        char t = client.getBattleTerrain();
+        String terrain = client.getBattleTerrain();
         Set set = new HashSet();
-        Iterator it = HexMap.getTowerStartList(t).iterator();
+        Iterator it = HexMap.getTowerStartList(terrain).iterator();
         while (it.hasNext())
         {
             String hexLabel = (String)it.next();
-            BattleHex hex = HexMap.getHexByLabel(t, hexLabel);
+            BattleHex hex = HexMap.getHexByLabel(terrain, hexLabel);
             if (!isOccupied(hexLabel))
             {
                 set.add(hex.getLabel());

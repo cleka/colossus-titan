@@ -8,19 +8,19 @@ LABEL areatwo=A2 B2 C2 D2 E1
 LABEL areathree=E1 E2 E3 E4 E5
 
 # some random hills
-AREA (inside) HAZARDS p,1 p,75.,1 p,50.,1
+AREA (inside) HAZARDS Plains,1 Plains,75.,1 Plains,50.,1
 
-AREA (areaone) HAZARDS t,95.,1
+AREA (areaone) HAZARDS Tree,95.,1
 LABEL treeone=(usedup)
-AREA (areatwo) HAZARDS t,95.,1
+AREA (areatwo) HAZARDS Tree,95.,1
 LABEL treetwo=(usedup)
-AREA (areathree) HAZARDS t,95.,1
+AREA (areathree) HAZARDS Tree,95.,1
 LABEL treethree=(usedup)
 LABEL treall=(treeone)(treetwo)(treethree)
 LABEL treesur=SURROUNDINGSOF((treall))
 
-# some hills surroundings the trees, plus a brush once in a while
-AREA (treesur) HAZARDS p,1 p,1 p,75.,1 p,50.,1 p,25.,1 p,10.,1 r,5.
+# some hills surroundings the trees, plus a bramble once in a while
+AREA (treesur) HAZARDS Plains,1 Plains,1 Plains,75.,1 Plains,50.,1 Plains,25.,1 Plains,10.,1 Brambles,5.
 
 # a cliff once in a while, slope everywhere else
-PAIR (p,1)(p,0) HEXSIDES c,5. s,100.
+PAIR (Plains,1)(Plains,0) HEXSIDES c,5. s,100.

@@ -10,7 +10,7 @@ public interface HintOracleInterface
     public boolean hasCreature(String name); // in the Stack/Legion
     public boolean otherFriendlyStackHasCreature(java.util.List allNames); // in a different Stack/Legion
     public boolean canRecruit(String name); // name could be recruited
-    public boolean canReach(char t); // t can be reached by the Stack/Legion
+    public boolean canReach(String terrain); // terrain can be reached by the Stack/Legion
 
     public int creatureAvailable(String name); // how many in caretaker
     public int stackHeight(); // height of the Stack/Legion

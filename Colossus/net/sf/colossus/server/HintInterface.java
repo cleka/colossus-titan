@@ -19,7 +19,7 @@ public interface HintInterface
      * @param section Array of AI section to be used (usually one or more of "AllAI:", "DefensiveAI:", "OffensiveAI:")
      * @return The name os the suggested recruit
      */
-    public String getRecruitHint(char terrain,
+    public String getRecruitHint(String terrain,
                                  LegionInfo legion,
                                  List recruits,
                                  HintOracleInterface oracle,

@@ -10,6 +10,7 @@ import javax.swing.*;
 import net.sf.colossus.util.Log;
 import net.sf.colossus.util.ResourceLoader;
 import net.sf.colossus.parser.BattlelandLoader;
+import net.sf.colossus.parser.BattlelandRandomizerLoader;
 import net.sf.colossus.parser.TerrainRecruitLoader;
 import net.sf.colossus.server.VariantSupport;
 
@@ -23,7 +24,7 @@ import net.sf.colossus.server.VariantSupport;
 public class HexMap extends JPanel implements MouseListener, WindowListener
 {
     private String masterHexLabel;
-    private char terrain;
+    private String terrain;
 
     // GUI hexes need to be recreated for each object, since scale varies.
     private GUIBattleHex [][] h = new GUIBattleHex[6][6];
@@ -38,6 +39,9 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
     private static Map towerStatusMap = new HashMap();
     private static Map hazardNumberMap = new HashMap();
     private static Map hazardSideNumberMap = new HashMap();
+
+    /* map from the terrain name to the String represneting the terrain after it has been randomized. String is in BattlelandLoader format. */
+    private static Map randomizedTerrainMap = new HashMap();
 
     /** ne, e, se, sw, w, nw */
     private GUIBattleHex [] entrances = new GUIBattleHex[6];
@@ -80,11 +84,12 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
         towerStatusMap.clear();
         hazardNumberMap.clear();
         hazardSideNumberMap.clear();
+        randomizedTerrainMap.clear();
 
-        char [] terrains = TerrainRecruitLoader.getTerrains();
+        String[] terrains = TerrainRecruitLoader.getTerrains();
         for (int t = 0; t < terrains.length; t++)
         {
-            char terrain = terrains[t];
+            String terrain = terrains[t];
 
             BattleHex [][] gameH = new BattleHex[6][6];
             java.util.List gameHexes = new ArrayList();
@@ -103,8 +108,8 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
                     }
                 }
             }
-            setupHexesGameState(terrain, gameH);
             setupNeighbors(gameH);
+            setupHexesGameState(terrain, gameH);
 
             // Initialize non-GUI entrances
             BattleHex[] gameEntrances = new BattleHex[6];
@@ -114,10 +119,10 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
                 gameHexes.add(gameEntrances[k]);
             }
             setupEntrancesGameState(gameEntrances, gameH);
-            entranceHexes.put(new Character(terrain), gameEntrances);
+            entranceHexes.put(terrain, gameEntrances);
             // Add hexes to both the [][] and ArrayList maps.
-            terrainH.put(new Character(terrain), gameH);
-            terrainHexes.put(new Character(terrain), gameHexes);
+            terrainH.put(terrain, gameH);
+            terrainHexes.put(terrain, gameHexes);
         }
     }
 
@@ -131,8 +136,8 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
     void setupHexes()
     {
         setupHexesGUI();
-        setupHexesGameState(terrain, h);
         setupNeighbors(h);
+        setupHexesGameState(terrain, h);
         setupEntrances();
     }
 
@@ -164,30 +169,116 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
      *  Cliffs are bidirectional; other hexside obstacles are noted
      *  only on the high side, since they only interfere with
      *  uphill movement. */
-    private static synchronized void setupHexesGameState(char terrain, 
+    private static synchronized void setupHexesGameState(String terrain, 
         BattleHex [][] h)
     {
         java.util.List directories = 
             VariantSupport.getBattlelandsDirectoriesList();
-        InputStream batIS = ResourceLoader.getInputStream(
-                                           MasterHex.getTerrainName(terrain),
-                                           directories);
+        String rndSourceName =
+            TerrainRecruitLoader.getTerrainRandomName(terrain);
         try
         {
-            BattlelandLoader bl = new BattlelandLoader(batIS);
-            while (bl.oneBattlelandCase(h) >= 0) {}
-            java.util.List tempTowerStartList = bl.getStartList();
-            if (tempTowerStartList != null)
-            {
-                startlistMap.put(new Character(terrain),
-                                      tempTowerStartList);
+            if (rndSourceName == null)
+            { // static Battlelands
+                InputStream batIS =
+                    ResourceLoader.getInputStream(terrain,
+                                                  directories);
+                BattlelandLoader bl = new BattlelandLoader(batIS);
+                while (bl.oneBattlelandCase(h) >= 0) {}
+                java.util.List tempTowerStartList = bl.getStartList();
+                if (tempTowerStartList != null)
+                {
+                    startlistMap.put(terrain,
+                                     tempTowerStartList);
+                }
+                towerStatusMap.put(terrain,
+                                   new Boolean(bl.isTower()));
+                subtitleMap.put(terrain, bl.getSubtitle());
             }
-            towerStatusMap.put(new Character(terrain),
-                               new Boolean(bl.isTower()));
-            subtitleMap.put(new Character(terrain), bl.getSubtitle());
+            else
+            { // random Battlelands
+                String mapData = (String)randomizedTerrainMap.get(terrain);
+                if (mapData == null)
+                {
+                    Log.debug("Randomizing " + terrain +
+                              " with " + rndSourceName);
+                    InputStream brlIS =
+                        ResourceLoader.getInputStream(rndSourceName,
+                                                      directories);
+                    BattlelandRandomizerLoader brl =
+                        new BattlelandRandomizerLoader(brlIS);
+                    while (brl.oneArea(h) >= 0) {}
+                    brl.resolveAllHexsides(h);
+                    towerStatusMap.put(terrain,
+                                       new Boolean(false));
+                    subtitleMap.put(terrain, null);
+                    StringBuffer buf = new StringBuffer();
+                    for (int i = 0; i < 6; i++)
+                    {
+                        for (int j = 0 ; j < 6 ; j++)
+                        {
+                            if (show[i][j])
+                            {
+                                boolean doDumpSides = false;
+                                String haz = h[i][j].getTerrain();
+                                int e = h[i][j].getElevation();
+                                for (int k = 0; k < 6; k++)
+                                {
+                                    char s = h[i][j].getHexside(k);
+                                    if (s != ' ')
+                                        doDumpSides = true;
+                                }
+                                if (doDumpSides ||
+                                    (!haz.equals("Plains")) ||
+                                    (e != 0))
+                                {
+                                    buf.append(i);
+                                    buf.append(" ");
+                                    buf.append(j);
+                                    buf.append(" ");
+                                    buf.append(h[i][j].getTerrain());
+                                    buf.append(" ");
+                                    buf.append(h[i][j].getElevation());
+                                    if (doDumpSides)
+                                    {
+                                        for (int k = 0; k < 6; k++)
+                                        {
+                                            if (h[i][j].getHexside(k) != ' ')
+                                            {
+                                                buf.append(" ");
+                                                buf.append(k);
+                                                buf.append(" ");
+                                                buf.append(h[i][j].getHexside(k));
+                                            }
+                                        }
+                                    }
+                                    buf.append("\n");
+                                }
+                            }
+                        }
+                    }
+                    randomizedTerrainMap.put(terrain, new String(buf));
+                }
+                else
+                {
+                    InputStream batIS = new ByteArrayInputStream(mapData.getBytes());
+                    BattlelandLoader bl = new BattlelandLoader(batIS);
+                    while (bl.oneBattlelandCase(h) >= 0) {}
+                    java.util.List tempTowerStartList = bl.getStartList();
+                    if (tempTowerStartList != null)
+                    {
+                        startlistMap.put(terrain,
+                                         tempTowerStartList);
+                    }
+                    towerStatusMap.put(terrain,
+                                       new Boolean(false));
+                    subtitleMap.put(terrain, null);
+                }
+            }
+            
             /* count all hazards & hazard sides */
             /* slow & inefficient... */
-            char[] hazards = BattleHex.getTerrains();
+            String[] hazards = BattleHex.getTerrains();
             HashMap t2n = new HashMap();
             for (int i = 0; i < hazards.length; i++)
             {
@@ -198,15 +289,15 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
                     {
                         if (show[x][y])
                         {
-                            if (h[x][y].getTerrain() == hazards[i])
+                            if (h[x][y].getTerrain().equals(hazards[i]))
                                 count++;
                         }
                     }
                 }
                 if (count >0)
-                    t2n.put(new Character(hazards[i]), new Integer(count));
+                    t2n.put(hazards[i], new Integer(count));
             }
-            hazardNumberMap.put(new Character(terrain), t2n);
+            hazardNumberMap.put(terrain, t2n);
             char[] hazardSides = BattleHex.getHexsides();
             HashMap s2n = new HashMap();
             for (int i = 0; i < hazardSides.length; i++)
@@ -230,7 +321,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
                 if (count >0)
                     s2n.put(new Character(hazardSides[i]), new Integer(count));
             }
-            hazardSideNumberMap.put(new Character(terrain), s2n);
+            hazardSideNumberMap.put(terrain, s2n);
         }
         catch (Exception e) 
         {
@@ -438,7 +529,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
     }
 
     /** Look for the Hex matching the Label in the terrain static map */
-    public static BattleHex getHexByLabel(char terrain, String label)
+    public static BattleHex getHexByLabel(String terrain, String label)
     {
         int x = 0, y = Integer.parseInt(new String(label.substring(1)));
         switch (label.charAt(0))
@@ -470,15 +561,14 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
         case 'X':
         case 'x':
             /* entrances */
-            BattleHex[] gameEntrances = (BattleHex[])entranceHexes.get(
-                                                new Character(terrain));
+            BattleHex[] gameEntrances =
+                (BattleHex[])entranceHexes.get(terrain);
             return gameEntrances[y];
         default:
             Log.error("Label " + label + " is invalid");
         }
         y = 6 - y - (int)Math.abs(((x - 3) / 2));
-        BattleHex[][] correctHexes = (BattleHex[][])terrainH.get(
-                                          new Character(terrain));
+        BattleHex[][] correctHexes = (BattleHex[][])terrainH.get(terrain);
         return correctHexes[x][y];
     }
 
@@ -512,9 +602,9 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
         return set;
     }
 
-    public static java.util.List getTowerStartList(char terrain)
+    public static java.util.List getTowerStartList(String terrain)
     {
-        return (java.util.List)startlistMap.get(new Character(terrain));
+        return (java.util.List)startlistMap.get(terrain);
     }
 
     public void mousePressed(MouseEvent e)
@@ -600,7 +690,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
             FontMetrics fm;
             String dn = getMasterHex().getTerrainDisplayName();
             String bn = getMasterHex().getTerrainName();
-            String sub = (String)subtitleMap.get(new Character(terrain));
+            String sub = (String)subtitleMap.get(terrain);
     
             if (sub == null)
                 sub = (dn.equals(bn) ? null : bn);
@@ -644,10 +734,10 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
         return terrainIsTower(terrain);
     }
 
-    public static boolean terrainIsTower(char t)
+    public static boolean terrainIsTower(String t)
     {
         boolean temp =
-            ((Boolean)towerStatusMap.get(new Character(t))).booleanValue();
+            ((Boolean)towerStatusMap.get(t)).booleanValue();
         return temp;
     }
 
@@ -656,17 +746,17 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
         return terrainHasStartlist(terrain);
     }
 
-    public static boolean terrainHasStartlist(char t)
+    public static boolean terrainHasStartlist(String t)
     {
         java.util.List temp =
-            (java.util.List)startlistMap.get(new Character(t));
+            (java.util.List)startlistMap.get(t);
         return (!(temp == null));
     }
 
-    public static int getHazardCountInTerrain(char hazard, char terrain)
+    public static int getHazardCountInTerrain(String hazard, String terrain)
     {
-        HashMap t2n = (HashMap)hazardNumberMap.get(new Character(terrain));
-        Object o = t2n.get(new Character(hazard));
+        HashMap t2n = (HashMap)hazardNumberMap.get(terrain);
+        Object o = t2n.get(hazard);
 
         if (o == null)
             return 0;
@@ -676,10 +766,11 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
         return (number.intValue());
     }
 
-    public static int getHazardSideCountInTerrain(char hazard, char terrain)
+    public static int getHazardSideCountInTerrain(char hazard,
+                                                  String terrain)
     {
-        HashMap t2n = (HashMap)hazardSideNumberMap.get(new Character(terrain));
-        Object o = t2n.get(new Character(hazard));
+        HashMap s2n = (HashMap)hazardSideNumberMap.get(terrain);
+        Object o = s2n.get(new Character(hazard));
 
         if (o == null)
             return 0;

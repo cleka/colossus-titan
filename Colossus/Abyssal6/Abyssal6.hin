@@ -1,61 +1,61 @@
 AllAI:
 
-RECRUIT B Cyclops   2 Cyclops  ((CANREACH J) AND
+RECRUIT Brush Cyclops   2 Cyclops  ((CANREACH Jungle) AND
                                 (NOT (HASCREATURE Behemoth)) AND
                                 (2 Behemoth AVAILABLE) AND
                                 (NOT (HEIGHTIS 6)))
-RECRUIT P Lion      2 Lion     ((CANREACH D) AND
+RECRUIT Plains Lion      2 Lion     ((CANREACH Desert) AND
                                 (NOT (HASCREATURE Griffon)) AND
                                 (2 Griffon AVAILABLE) AND
                                 (NOT (HEIGHTIS 6)))
-RECRUIT M Troll     2 Troll    ((CANREACH S) AND
+RECRUIT Marsh Troll     2 Troll    ((CANREACH Swamp) AND
                                 (NOT (HASCREATURE Wyvern)) AND
                                 (2 Wyvern AVAILABLE) AND
                                 (NOT (HEIGHTIS 6)))
-RECRUIT M Ranger    2 Ranger   ((CANREACH P) AND
+RECRUIT Marsh Ranger    2 Ranger   ((CANREACH Plains) AND
                                 (NOT (HASCREATURE AirElemental)) AND
                                 (3 AirElemental AVAILABLE) AND
                                 (NOT (HEIGHTIS 6)))
-RECRUIT W Unicorn   2 Unicorn  ((CANREACH H) AND
+RECRUIT Woods Unicorn   2 Unicorn  ((CANREACH Hills) AND
                                 (NOT (HASCREATURE EarthElemental)) AND
                                 (3 EarthElemental AVAILABLE) AND
                                 (NOT (HEIGHTIS 6)))
-RECRUIT D Hydra     2 Hydra    ((CANREACH S) AND
+RECRUIT Desert Hydra     2 Hydra    ((CANREACH Swamp) AND
                                 (NOT (HASCREATURE WaterElemental)) AND
                                 (3 WaterElemental AVAILABLE) AND
                                 (NOT (HEIGHTIS 6)))
-RECRUIT t Colossus  2 Colossus ((CANREACH m) AND
+RECRUIT Tundra Colossus  2 Colossus ((CANREACH Mountains) AND
                                 (NOT (HASCREATURE FireElemental)) AND
                                 (3 FireElemental AVAILABLE) AND
                                 (NOT (HEIGHTIS 6)))
 
-RECRUIT T Ogre      2 Ogre     (NOT ((CANRECRUIT Warlock) OR
+RECRUIT Tower Ogre      2 Ogre     (NOT ((CANRECRUIT Warlock) OR
                                      (CANRECRUIT Guardian) OR
                                      (CANRECRUIT Knight)))
-RECRUIT T Centaur   2 Centaur  (NOT ((CANRECRUIT Warlock) OR
+RECRUIT Tower Centaur   2 Centaur  (NOT ((CANRECRUIT Warlock) OR
                                      (CANRECRUIT Guardian) OR
                                      (CANRECRUIT Knight)))
-RECRUIT T Gargoyle  1 Gargoyle ((3 Cyclops AVAILABLE) AND
+RECRUIT Tower Gargoyle  1 Gargoyle ((3 Cyclops AVAILABLE) AND
                                 (NOT ((CANRECRUIT Warlock) OR
                                       (CANRECRUIT Guardian) OR
                                       (CANRECRUIT Knight))))
-RECRUIT T Ogre      1 Ogre     ((2 Troll AVAILABLE) AND
+RECRUIT Tower Ogre      1 Ogre     ((2 Troll AVAILABLE) AND
                                 (NOT ((CANRECRUIT Warlock) OR
                                       (CANRECRUIT Guardian) OR
                                       (CANRECRUIT Knight))))
-RECRUIT T Centaur   1 Centaur  ((2 Lion AVAILABLE) AND
+RECRUIT Tower Centaur   1 Centaur  ((2 Lion AVAILABLE) AND
                                 (NOT ((CANRECRUIT Warlock) OR
                                       (CANRECRUIT Guardian) OR
                                       (CANRECRUIT Knight))))
-RECRUIT T Gargoyle  0 Gargoyle ((6 Cyclops AVAILABLE) AND
+RECRUIT Tower Gargoyle  0 Gargoyle ((6 Cyclops AVAILABLE) AND
                                 (NOT ((CANRECRUIT Warlock) OR
                                       (CANRECRUIT Guardian) OR
                                       (CANRECRUIT Knight))))
-RECRUIT T Ogre      0 Ogre     ((6 Troll AVAILABLE) AND
+RECRUIT Tower Ogre      0 Ogre     ((6 Troll AVAILABLE) AND
                                 (NOT ((CANRECRUIT Warlock) OR
                                       (CANRECRUIT Guardian) OR
                                       (CANRECRUIT Knight))))
-RECRUIT T Centaur   0 Centaur  ((6 Lion AVAILABLE) AND
+RECRUIT Tower Centaur   0 Centaur  ((6 Lion AVAILABLE) AND
                                 (NOT ((CANRECRUIT Warlock) OR
                                       (CANRECRUIT Guardian) OR
                                       (CANRECRUIT Knight))))

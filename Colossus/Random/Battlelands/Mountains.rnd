@@ -1,0 +1,52 @@
+# $Id$
+
+LABEL innermost=C3 D3 D4
+
+# First, a volcano
+AREA (innermost) HAZARDS Volcano,2
+LABEL volcano=(usedup)
+LABEL volcsur=SURROUNDINGSOF((volcano))
+AREA (volcsur) HAZARDS Plains,2 Plains,66.66,2 Plains,33.33,2
+LABEL volcsurtwo=(usedup)
+LABEL volcsur=(leftover)
+AREA (volcsur) HAZARDS Plains,1 Plains,66.66,1 Plains,33.33,1
+LABEL volcsurone=(usedup)
+LABEL volcsur=(leftover)
+LABEL usedvolcsur=(volcsurtwo)(volcsurone)
+
+
+# Three high-level plains growing from the defense border lines
+AREA (leftdefenseentry)  HAZARDS Plains,95.,0.,25.,75.
+LABEL leftdefsand=(usedup)
+AREA SURROUNDINGSOF((leftdefsand)) HAZARDS Plains,75.,0.,50.,50. Plains,50.,0.,50.,50. Plains,25.,0.,50.,50.
+LABEL leftdefsand=(usedup)(leftdefsand)
+AREA SURROUNDINGSOF((leftdefsand)) HAZARDS Plains,50.,0.,50.,50. Plains,25.,0.,50.,50.
+
+AREA (upperdefenseentry) HAZARDS Plains,95.,0.,25.,75.
+LABEL upperdefsand=(usedup)
+AREA SURROUNDINGSOF((upperdefsand)) HAZARDS Plains,75.,0.,50.,50. Plains,50 Plains,25.,0.,50.,50.
+LABEL upperdefsand=(usedup)(upperdefsand)
+AREA SURROUNDINGSOF((upperdefsand)) HAZARDS Plains,50.,0.,50.,50. Plains,25.,0.,50.,50. Plains,25.,0.,50.,50.
+
+AREA (lowerdefenseentry) HAZARDS Plains,95.,0.,25.,75.
+LABEL lowerdefsand=(usedup)
+AREA SURROUNDINGSOF((lowerdefsand)) HAZARDS Plains,75.,0.,50.,50. Plains,50.,0.,50.,50. Plains,25.,0.,50.,50.
+LABEL lowerdefsand=(usedup)(lowerdefsand)
+AREA SURROUNDINGSOF((lowerdefsand)) HAZARDS Plains,50.,0.,50.,50. Plains,25.,0.,50.,50.
+
+# the next one is in case something hides the volcano. Put it back !
+AREA (volcano) HAZARDS Volcano,2
+
+# and now, some slope, cliff and other niceties
+# between volcano and 0-level plain : 75% cliff, slope in all other case
+PAIR (Volcano,*)(Plains,0) HEXSIDES c,75. s,100.
+# between volcano and 1-level plain : 10% cliff, slope in all other case
+PAIR (Volcano,*)(Plains,1) HEXSIDES c,10. s,100.
+# between volcano and 2-level plain : 80% slope
+PAIR (Volcano,*)(Plains,2) HEXSIDES s,80.
+# between 2-level plain and 0-level plain : 50% cliff, 50% slope after
+PAIR (Plains,2)(Plains,0) HEXSIDES c,50. s,50.
+# between 2-level plain and 1-level plain : 5% cliff, 50% slope after
+PAIR (Plains,2)(Plains,1) HEXSIDES c,5. s,50.
+# between 1-level plain and 0-level plain : 5% cliff, 50% slope after
+PAIR (Plains,1)(Plains,0) HEXSIDES c,5. s,50.

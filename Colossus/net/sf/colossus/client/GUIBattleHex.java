@@ -167,8 +167,8 @@ public class GUIBattleHex extends BattleHex
             rectBound.y + ((fontMetrics.getHeight() + rectBound.height) / 2));
 
         // Show hex label in upper left corner.
-        g2.drawString(label, rectBound.x + (rectBound.width -
-            fontMetrics.stringWidth(label)) / 3,
+        g2.drawString(getLabel(), rectBound.x + (rectBound.width -
+            fontMetrics.stringWidth(getLabel())) / 3,
             rectBound.y + ((fontMetrics.getHeight() + rectBound.height) / 4));
     }
 
@@ -362,7 +362,7 @@ public class GUIBattleHex extends BattleHex
             Image temp = loadOneOverlay(tempHex.getTerrainName());
             if (temp != null)
             {
-                hexOverlay.put(new Character(getTerrains()[i]), temp);
+                hexOverlay.put(getTerrains()[i], temp);
             }
         }
         for (int i = 0; i < getHexsides().length ; i++)
@@ -380,7 +380,7 @@ public class GUIBattleHex extends BattleHex
     {
         if (hexOverlay == null)
             loadOverlay();
-        Image overlay = (Image)hexOverlay.get(new Character(getTerrain()));
+        Image overlay = (Image)hexOverlay.get(getTerrain());
         if (overlay != null)
         { // first, draw the Hex itself
             g.drawImage(overlay,

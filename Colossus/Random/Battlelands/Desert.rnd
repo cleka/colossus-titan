@@ -7,29 +7,28 @@ LABEL innermost=C3 D3 D4
 # followed by even more surroundings the entire patch.
 # repeat thrice. Note that in each patch, if the first
 # sand isn't  present, then none of the others will be present.
-AREA (leftdefenseentry)  HAZARDS s,95.
+AREA (leftdefenseentry)  HAZARDS Sand,95.
 LABEL leftdefsand=(usedup)
-AREA SURROUNDINGSOF((leftdefsand)) HAZARDS s,75. s,50. s,25.
+AREA SURROUNDINGSOF((leftdefsand)) HAZARDS Sand,75. Sand,50. Sand,25.
 LABEL leftdefsand=(usedup)(leftdefsand)
-AREA SURROUNDINGSOF((leftdefsand)) HAZARDS s,50. s,25.
+AREA SURROUNDINGSOF((leftdefsand)) HAZARDS Sand,50. Sand,25.
 
-AREA (upperdefenseentry) HAZARDS s,95.
+AREA (upperdefenseentry) HAZARDS Sand,95.
 LABEL upperdefsand=(usedup)
-AREA SURROUNDINGSOF((upperdefsand)) HAZARDS s,75. s,50. s,25.
+AREA SURROUNDINGSOF((upperdefsand)) HAZARDS Sand,75. Sand,50. Sand,25.
 LABEL upperdefsand=(usedup)(upperdefsand)
-AREA SURROUNDINGSOF((upperdefsand)) HAZARDS s,50. s,25.
+AREA SURROUNDINGSOF((upperdefsand)) HAZARDS Sand,50. Sand,25.
 
-AREA (lowerdefenseentry) HAZARDS s,95.
+AREA (lowerdefenseentry) HAZARDS Sand,95.
 LABEL lowerdefsand=(usedup)
-AREA SURROUNDINGSOF((lowerdefsand)) HAZARDS s,75. s,50. s,25.
+AREA SURROUNDINGSOF((lowerdefsand)) HAZARDS Sand,75. Sand,50. Sand,25.
 LABEL lowerdefsand=(usedup)(lowerdefsand)
-AREA SURROUNDINGSOF((lowerdefsand)) HAZARDS s,50. s,25.
+AREA SURROUNDINGSOF((lowerdefsand)) HAZARDS Sand,50. Sand,25.
 
 # once in a while, a tree get lost in the Desert
-AREA (innermost) HAZARDS t,5.,1
+AREA (innermost) HAZARDS Tree,5.,1
 
 # hexside probability
 # 60% of the hexside will be dune, and 50% of the remaining will be Cliff
 # This for any elevation
-PAIR (s,*)(p,*) HEXSIDES d,60. c,50.
-
+PAIR (Sand,*)(Plains,*) HEXSIDES d,60. c,50.

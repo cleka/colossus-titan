@@ -293,7 +293,6 @@ public final class VariantSupport
             }
             TerrainRecruitLoader trl = new TerrainRecruitLoader(terIS);
             while (trl.oneTerrain() >= 0) {}
-
             /* now initialize the static bits of the Battlelands */
             HexMap.staticBattlelandsInit();
         }
@@ -302,16 +301,16 @@ public final class VariantSupport
             Log.error("Recruit-per-terrain loading failed : " + e);
             System.exit(1);
         }
-        try
+        //try
         {
             // initialize the static bits of the MasterBoard
             net.sf.colossus.client.MasterBoard.staticMasterboardInit();
         }
-        catch (Exception e) 
-        {
-            Log.error("Masterboard loading failed : " + e);
-            System.exit(1);
-        }
+        //catch (Exception e) 
+        //{
+        //    Log.error("Masterboard loading failed : " + e);
+        //    System.exit(1);
+        //}
     }
 
     private static java.util.Properties loadMarkerNamesProperties()
@@ -430,7 +429,7 @@ public final class VariantSupport
     }
 
     public synchronized static String getRecruitHint(
-        char terrain,
+        String terrain,
         net.sf.colossus.client.LegionInfo legion,
         java.util.List recruits,
         net.sf.colossus.server.HintOracleInterface oracle)
@@ -441,7 +440,7 @@ public final class VariantSupport
     }
 
     public synchronized static String getRecruitHint(
-        char terrain,
+        String terrain,
         net.sf.colossus.client.LegionInfo legion,
         java.util.List recruits,
         net.sf.colossus.server.HintOracleInterface oracle,

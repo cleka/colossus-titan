@@ -1,0 +1,15 @@
+# $Id$
+
+# areaone to three are the second lines of attackers
+LABEL areaone=B3 C4 D5
+LABEL areatwo=B2 C2 D2
+LABEL areathree=E2 E3 E4
+LABEL allarea=(areaone)(areatwo)(areathree)
+AREA (areaone) HAZARDS Tree,1
+AREA (areatwo) HAZARDS Tree,1
+AREA (areathree) HAZARDS Tree,1
+AREA (allarea) HAZARDS Tree,90.,1 Tree,5.,1 Tree,5.,1
+AREA (upperdefenseentry) HAZARDS Tree,25.,1
+AREA (lowerdefenseentry) HAZARDS Tree,25.,1
+AREA (leftdefenseentry) HAZARDS Tree,25.,1
+AREA (anywhere) HAZARDS Tree,25.,1

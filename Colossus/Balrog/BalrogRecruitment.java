@@ -19,13 +19,13 @@ public class BalrogRecruitment extends net.sf.colossus.server.CustomRecruitBase
     private final static int balrogValue = 300;
     private final static String balrogPrefix = "Balrog";
     
-    public List getAllPossibleSpecialRecruiters(char terrain)
+    public List getAllPossibleSpecialRecruiters(String terrain)
     {
         // Balrog recruited in Tower, where everything recruit anyway.
         return new ArrayList();
     }
         
-    public List getAllPossibleSpecialRecruits(char terrain)
+    public List getAllPossibleSpecialRecruits(String terrain)
     {
         List temp = new ArrayList();
         Iterator it = Creature.getCreatures().iterator();
@@ -40,13 +40,13 @@ public class BalrogRecruitment extends net.sf.colossus.server.CustomRecruitBase
         return temp;
     }
 
-    public List getPossibleSpecialRecruiters(char terrain, String hexLabel)
+    public List getPossibleSpecialRecruiters(String terrain, String hexLabel)
     {
         // Balrog recruited in Tower, where everything recruit anyway.
         return new ArrayList();
     }
 
-    public List getPossibleSpecialRecruits(char terrain, String hexLabel)
+    public List getPossibleSpecialRecruits(String terrain, String hexLabel)
     {
         List temp = new ArrayList();
         
@@ -68,7 +68,7 @@ public class BalrogRecruitment extends net.sf.colossus.server.CustomRecruitBase
         return temp;
     }
     
-    public int numberOfRecruiterNeeded(String recruiter, String recruit, char terrain, String hexLabel)
+    public int numberOfRecruiterNeeded(String recruiter, String recruit, String terrain, String hexLabel)
     {
         return 0;
     }

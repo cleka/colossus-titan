@@ -46,6 +46,11 @@ this hex (warning: beware slope or wall who can
 easily be put on the wrong hex, as there's not much
 visual clue of their orientation).
 
+If at least on hex is selected (surrounded by red),
+that means the terrain use a startlist, i.e. custom
+entry hexes for the defender (like the Tower in regular
+Titan). If no hexes are selected, normal rules apply.
+
 The ``File'' Menu:
 
 \begin{itemize}
@@ -59,11 +64,12 @@ below if you want to start from scratch.
 file choosen by the user.
 
 \item The ``Show Battleland'' menu item dump the Battleland
-on standard output.
+on standard output (can be seen only if you have a CLI
+or a way to access standard output...)
 
 \item The ``Erase Map'' menu item return the map to the
 default, i.e. only Plains of elevation 0, and no
-hexside.
+hexside. Warning: startlist is unchanged.
 
 \item The ``Randomize Map'' menu item is used to generate
 a random map from a description file. See the
@@ -77,6 +83,9 @@ The ``Special'' Menu:
 \begin{itemize}
 
 \item The ``Terrain is a Tower'' is used to specify if the terrain is designed to be a Tower or not (i.e. the \texttt{TOWER} flags explained in \htmladdnormallink{FileFormat}{../../FileFormat/index.html}).
+
+\item The ``Remove StartList'' remove unselect all hexes. See the file format
+link above for a startlist description.
 
 \end{itemize}
 

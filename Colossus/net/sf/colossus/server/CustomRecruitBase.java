@@ -199,19 +199,24 @@ abstract public class CustomRecruitBase
     /* subclasses must reimplement the following */
 
     /** List all Creature that can recruit in this terrain in a special way */
-    abstract public List getAllPossibleSpecialRecruiters(char terrain);
+    abstract public List getAllPossibleSpecialRecruiters(String terrain);
       
     /** List all Creature that can be recruited in this terrain in a special way */
-    abstract public List getAllPossibleSpecialRecruits(char terrain);
+    abstract public List getAllPossibleSpecialRecruits(String terrain);
 
     /** List Creature that can recruit in this terrain in a special way now */
-    abstract public List getPossibleSpecialRecruiters(char terrain, String hexLabel);
+    abstract public List getPossibleSpecialRecruiters(String terrain,
+                                                      String hexLabel);
 
     /** List Creature that can be recruited in this terrain in a special way now */
-    abstract public List getPossibleSpecialRecruits(char terrain, String hexLabel);
+    abstract public List getPossibleSpecialRecruits(String terrain,
+                                                    String hexLabel);
 
     /** number of recruiter needed to get a recruit in a special way in this terrain now */
-    abstract public int numberOfRecruiterNeeded(String recruiter, String recruit, char terrain, String hexLabel);
+    abstract public int numberOfRecruiterNeeded(String recruiter,
+                                                String recruit,
+                                                String terrain,
+                                                String hexLabel);
 
     /** bookkeeping function, called once after every player turn.
      private as it should only be called from everyoneAdvanceTurn() */

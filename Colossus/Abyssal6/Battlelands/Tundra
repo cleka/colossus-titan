@@ -1,15 +1,15 @@
-0 3 d 0
-1 1 d 0
-1 4 d 0
-2 1 d 0
-2 3 d 0
-2 4 d 0
-2 5 d 0
-3 1 d 0
-3 2 d 0
-3 5 p 1 0 s 5 s
-4 3 d 0
-4 4 d 0
-4 5 p 1 0 s 5 s
-5 1 d 0
-5 4 p 1 0 s 5 s
+0 3 Drift 0
+1 1 Drift 0
+1 4 Drift 0
+2 1 Drift 0
+2 3 Drift 0
+2 4 Drift 0
+2 5 Drift 0
+3 1 Drift 0
+3 2 Drift 0
+3 5 Plains 1 0 s 5 s
+4 3 Drift 0
+4 4 Drift 0
+4 5 Plains 1 0 s 5 s
+5 1 Drift 0
+5 4 Plains 1 0 s 5 s

@@ -1,0 +1,19 @@
+# $Id$
+
+# areaone to three are the second lines of attackers
+LABEL areaone=B3 C4 D5
+LABEL areatwo=B2 C2 D2
+LABEL areathree=E2 E3 E4
+
+# some bog and tree in the inside
+AREA (inside) HAZARDS Bog Tree Bog,75. Tree,75. Bog,25. Tree,25.
+
+# one bog on each entry side
+AREA (leftdefenseentry) HAZARDS Bog,90.
+AREA (upperdefenseentry) HAZARDS Bog,90.
+AREA (lowerdefenseentry) HAZARDS Bog,90.
+
+# a bit more bog and tree 
+AREA (areaone) HAZARDS Bog,25. Tree,25.
+AREA (areatwo) HAZARDS Bog,25. Tree,25.
+AREA (areathree) HAZARDS Bog,25. Tree,25.

@@ -2441,7 +2441,7 @@ Log.error("Got nak for move of " + tag);
         return battleSite;
     }
 
-    char getBattleTerrain()
+    String getBattleTerrain()
     {
         MasterHex mHex = MasterBoard.getHexByLabel(battleSite);
         return mHex.getTerrain();
@@ -2808,7 +2808,7 @@ Log.error("Got nak for move of " + tag);
         }
 
         MasterHex hex = MasterBoard.getHexByLabel(hexLabel);
-        char terrain = hex.getTerrain();
+        String terrain = hex.getTerrain();
 
         java.util.List tempRecruits =
             TerrainRecruitLoader.getPossibleRecruits(terrain, hexLabel);
@@ -2859,7 +2859,7 @@ Log.error("Got nak for move of " + tag);
         LegionInfo info = getLegionInfo(markerId);
         String hexLabel = info.getHexLabel();
         MasterHex hex = MasterBoard.getHexByLabel(hexLabel);
-        char terrain = hex.getTerrain();
+        String terrain = hex.getTerrain();
 
         recruiters = TerrainRecruitLoader.getPossibleRecruiters(terrain, 
             hexLabel);

@@ -1,12 +1,11 @@
 
 AllAI:
 
-RECRUIT B Cyclops   2 Cyclops  ((NOT (HASCREATURE Behemoth)) AND
+RECRUIT Brush Cyclops   2 Cyclops  ((NOT (HASCREATURE Behemoth)) AND
                                 (2 Behemoth AVAILABLE))
-RECRUIT P Lion      2 Lion     (((CANREACH D) AND
+RECRUIT Plains Lion      2 Lion     (((CANREACH Desert) AND
                                  (NOT (HASCREATURE Griffon))) AND
                                 (2 Griffon AVAILABLE))
-RECRUIT M Troll     2 Troll    (((CANREACH S) AND
+RECRUIT Marsh Troll     2 Troll    (((CANREACH Swamp) AND
                                  (NOT (HASCREATURE Wyvern))) AND
                                 (2 Wyvern AVAILABLE))
-

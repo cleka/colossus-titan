@@ -208,7 +208,8 @@ public final class Constants
         "TG-Wild",
         "TitanPlus",
         "Undead",
-        "Balrog"
+        "Balrog"/*,
+        "Random"*/
     };
 
     public static final int numVariants = variantArray.length;

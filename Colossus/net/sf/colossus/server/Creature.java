@@ -293,31 +293,40 @@ public class Creature implements Comparable
         return flies;
     }
 
-    public boolean isNativeTerrain(char t)
+    public boolean isNativeTerrain(String t)
     {
-        switch(t)
-        {
-        case 'p': /* undefined */
+        if (t.equals("Plains"))
+        { /* undefined */
             return false;
-        case 'w': /* undefined, beneficial for everyone */
+        } else if (t.equals("Tower"))
+        { /* undefined, beneficial for everyone */
             return true;
-        case 'r':
+        } else if (t.equals("Brambles"))
+        {
             return isNativeBramble();
-        case 's':
+        } else if (t.equals("Sand"))
+        {
             return isNativeSandDune();
-        case 't':
+        } else if (t.equals("Tree"))
+        {
             return isNativeTree();
-        case 'o':
+        } else if (t.equals("Bog"))
+        {
             return isNativeBog();
-        case 'v':
+        } else if (t.equals("Volcano"))
+        {
             return isNativeVolcano();
-        case 'd':
+        } else if (t.equals("Drift"))
+        {
             return isNativeDrift();
-        case 'l':
+        } else if (t.equals("Lake"))
+        {
             return isWaterDwelling();
-        case 'n':
+        } else if (t.equals("Stone"))
+        {
             return isNativeStone();
-        default:
+        } else
+        {
             return false;
         }
     }

@@ -1,0 +1,21 @@
+# $Id$
+
+# areaone to three are the second lines of attackers
+LABEL areaone=B3 C4 D5
+LABEL areatwo=B2 C2 D2
+LABEL areathree=E2 E3 E4
+
+# the three central Hex
+LABEL heart=C3 D3 D4
+
+# let's put fair obstacle
+AREA (areaone) HAZARDS Tree,90.,1 Brambles,50.
+AREA (areatwo) HAZARDS Tree,90.,1 Brambles,50.
+AREA (areathree) HAZARDS Tree,90.,1 Brambles,50.
+AREA (heart) HAZARDS Tree,5.,1 Brambles,50.
+AREA (upperdefenseentry) HAZARDS Brambles,50.
+AREA (lowerdefenseentry) HAZARDS Brambles,50.
+AREA (leftdefenseentry) HAZARDS Brambles,50.
+
+# add a bit of randomness
+AREA (areaone)(areatwo)(areathree)(heart) HAZARDS Brambles,50. Tree,5.,1

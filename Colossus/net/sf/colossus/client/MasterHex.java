@@ -63,17 +63,20 @@ public class MasterHex extends Hex
 
     public String getTerrainName()
     {
-        return (TerrainRecruitLoader.getTerrainName(getTerrain()));
+        return getTerrain();
     }
 
     public String getTerrainDisplayName()
     {
         return (TerrainRecruitLoader.getTerrainDisplayName(getTerrain()));
     }
-
-    public static String getTerrainName(char t)
+    
+    /**
+     * @deprecated
+     */
+    public static String getTerrainName(String t)
     {
-        return (TerrainRecruitLoader.getTerrainName(t));
+        return t;
     }
 
     public Color getTerrainColor()
@@ -82,45 +85,12 @@ public class MasterHex extends Hex
     }
 
 
-    public static boolean isNativeCombatBonus(Creature creature, char terrain)
+    public static boolean isNativeCombatBonus(Creature creature, String terrain)
     {
-        /*
-        switch (terrain)
-        {
-            case 'B':
-            case 'J':
-                return creature.isNativeBramble();
-
-            case 'D':
-                return creature.isNativeSandDune();
-
-            case 'H':
-            case 'm':
-                return creature.isNativeSlope();
-
-            case 't':
-                return creature.isNativeDrift();
-
-            case 'M':
-            case 'S':
-                return creature.isNativeBog();
-
-            case 'T':
-                // Everyone benefits from walls.
-                return true;
-
-            // XXX In some variants plains and woods might help natives.
-            case 'P':
-            case 'W':
-            default:
-                return false;
-        }
-        */
-
         int bonusHazardCount = 0;
         int bonusHazardSideCount = 0;
         
-        char[] hazard = BattleHex.getTerrains();
+        String[] hazard = BattleHex.getTerrains();
 
         for (int i = 0; i < hazard.length ; i++)
         {
@@ -189,17 +159,10 @@ public class MasterHex extends Hex
         neighbors[i] = hex;
     }
 
-
-    public String getLabel()
-    {
-        return label;
-    }
-
     public void setLabel(int label)
     {
-        this.label = Integer.toString(label);
+        setLabel(Integer.toString(label));
     }
-
 
     public int getLabelSide()
     {

@@ -55,12 +55,12 @@ class CritterMove
         return endingHexLabel;
     }
 
-    BattleHex getStartingHex(char terrain)
+    BattleHex getStartingHex(String terrain)
     {
         return HexMap.getHexByLabel(terrain, startingHexLabel);
     }
 
-    BattleHex getEndingHex(char terrain)
+    BattleHex getEndingHex(String terrain)
     {
         return HexMap.getHexByLabel(terrain, endingHexLabel);
     }

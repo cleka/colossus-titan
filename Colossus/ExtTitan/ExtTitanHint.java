@@ -7,7 +7,7 @@ import java.util.List;
 
 public class ExtTitanHint implements net.sf.colossus.server.HintInterface
 {
-    public String getRecruitHint(char terrain,
+    public String getRecruitHint(String terrain,
                                  LegionInfo legion,
                                  List recruits,
                                  HintOracleInterface oracle,

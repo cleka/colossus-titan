@@ -32,7 +32,7 @@ public final class Battle
     private String [] legions = new String[2];
     private int activeLegionNum;
     private String masterHexLabel;
-    private char terrain;
+    private String terrain;
     private int turnNumber;
     private int phase;
     private int summonState = Constants.NO_KILLS;
@@ -275,7 +275,7 @@ public final class Battle
     }
 
 
-    char getTerrain()
+    String getTerrain()
     {
         return terrain;
     }
@@ -625,13 +625,13 @@ Log.debug("Called Battle.doneReinforcing()");
      *  are mobile.
      */
     private Set findUnoccupiedStartlistHexes(boolean ignoreMobileAllies, 
-        char t)
+                                             String terrain)
     {
         Set set = new HashSet();
-        Iterator it = HexMap.getTowerStartList(t).iterator();
+        Iterator it = HexMap.getTowerStartList(terrain).iterator();
         while (it.hasNext())
         {
-            BattleHex hex = HexMap.getHexByLabel(t, (String)it.next());
+            BattleHex hex = HexMap.getHexByLabel(terrain, (String)it.next());
             if (ignoreMobileAllies || !isOccupied(hex))
             {
                 set.add(hex.getLabel());
@@ -1828,7 +1828,7 @@ Log.debug("Called Battle.doneReinforcing()");
         }
 
         // Add one if it's bramble.
-        if (nextHex.getTerrain() == 'r')
+        if (nextHex.getTerrain().equals("Brambles"))
         {
             count++;
         }

@@ -31,9 +31,12 @@ public class BattleHex extends Hex
     /**
      * The array of all the valid terrain type for a BattleHex.
      */
-    private static final char[] allTerrains =
-    { 'p', 'w', 'r', 's', 't', 'o', 'v', 'd', 'l', 'n' };
-
+    //private static final char[] allTerrains =
+    //{ 'p', 'w', 'r', 's', 't', 'o', 'v', 'd', 'l', 'n' };
+    private static final String[] allTerrains = 
+    { "Plains", "Tower", "Brambles", "Sand", "Tree", "Bog", "Volcano", "Drift",
+      "Lake", "Stone"};
+    
     // Hexside terrain types are:
     // d, c, s, w, space
     // dune, cliff, slope, wall, no obstacle
@@ -45,6 +48,8 @@ public class BattleHex extends Hex
      */
     private static final char[] allHexsides =
     { ' ', 'd', 'c', 's', 'w', 'r' };
+    //private static final String[] allHexsides =
+    //{ "Nothing", "Dune", "Cliff", "Slope", "Wall", "River"};
 
     /**
      * Hold the type of the six side of the BattleHex.
@@ -83,63 +88,24 @@ public class BattleHex extends Hex
             hexsides[i] = ' ';
         }
 
-        setTerrain('p');
+        setTerrain("Plains");
         assignLabel();
     }
 
 
     public String getTerrainName()
     {
-        String terrainName;
-
-        switch (getTerrain())
-        {
-        case 'p':
-            terrainName = "Plains";
-            break;
-        case 'w':
-            terrainName = "Tower";
-            break;
-        case 'r':
-            terrainName = "Brambles";
-            break;
-        case 's':
-            terrainName = "Sand";
-            break;
-        case 't':
-            /* tree height is irrelevant, so get out now */
-            return "Tree";
-        case 'o':
-            terrainName = "Bog";
-            break;
-        case 'v':
-            terrainName = "Volcano";
-            break;
-        case 'd':
-            terrainName = "Drift";
-            break;
-        case 'l':
-            terrainName = "Lake";
-            break;
-        case 'n':
-            terrainName = "Stone";
-            break;
-        default:
-            terrainName = "?????";
-            break;
-        }
         if (elevation == 0)
-            return(terrainName);
+            return(getTerrain());
         else
-            return(terrainName + " (" + elevation + ")");
+            return(getTerrain() + " (" + elevation + ")");
     }
     
 
     Color getTerrainColor()
     {
-        switch (getTerrain())
+        if (getTerrain().equals("Plains"))
         {
-        case 'p':  // plain
             switch (elevation)
             {
             case 0:
@@ -152,7 +118,8 @@ public class BattleHex extends Hex
             case 3:
                 return HTMLColor.lightYellow;
             }
-        case 'w':  // tower
+        } else if (getTerrain().equals("Tower"))
+        {
             switch (elevation)
             {
             case 0:
@@ -165,7 +132,8 @@ public class BattleHex extends Hex
             case 3:
                 return HTMLColor.lightGray;
             }
-        case 'r':  // bramble
+        } else if (getTerrain().equals("Brambles"))
+        {
             switch (elevation)
             {
             case 0:
@@ -178,13 +146,17 @@ public class BattleHex extends Hex
             case 3:
                 return HTMLColor.darkGreen;
             }
-        case 's':  // sand
+        } else if (getTerrain().equals("Sand"))
+        {
             return Color.orange;
-        case 't':  // tree
+        } else if (getTerrain().equals("Tree"))
+        {
             return HTMLColor.brown;
-        case 'o':  // bog
+        } else if (getTerrain().equals("Bog"))
+        {
             return Color.gray;
-        case 'v':  // volcano
+        } else if (getTerrain().equals("Volcano"))
+        {
             switch (elevation)
             {
             case 3:
@@ -193,20 +165,25 @@ public class BattleHex extends Hex
             case 2:
                 return HTMLColor.darkRed;
             }
-        case 'd':  // drift
+        } else if (getTerrain().equals("Drift"))
+        {
             return Color.blue;
-        case 'l':  // lake
+        } else if (getTerrain().equals("Lake"))
+        {
             return HTMLColor.skyBlue;
-        case 'n':  // stone
+        } else if (getTerrain().equals("Stone"))
+        {
             return HTMLColor.dimGray;
-        default:
+        } else
+        {
             return Color.black;
         }
     }
 
-    public static boolean isNativeBonusHazard(char t)
+    public static boolean isNativeBonusHazard(String name)
     {
-        if (t == 'r' || t == 'v')
+        if (name.equals("Brambles") ||
+            name.equals("Volcano"))
         {
             return true;
         }
@@ -225,8 +202,7 @@ public class BattleHex extends Hex
     public boolean isNativeBonusTerrain()
     {
         boolean result;
-        char t = getTerrain();
-        result = isNativeBonusHazard(t);
+        result = isNativeBonusHazard(getTerrain());
         
         for (int i = 0; i < 6; i++)
         {
@@ -236,9 +212,10 @@ public class BattleHex extends Hex
         return result;
     }
     
-    public static boolean isNonNativePenaltyHazard(char t)
+    public static boolean isNonNativePenaltyHazard(String name)
     {
-        if (t == 'r' || t == 'd')
+        if (name.equals("Brambles") ||
+            name.equals("Drift"))
         {
             return true;
         }
@@ -257,8 +234,7 @@ public class BattleHex extends Hex
     public boolean isNonNativePenaltyTerrain()
     {
         boolean result;
-        char t = getTerrain();
-        result = isNonNativePenaltyHazard(t);
+        result = isNonNativePenaltyHazard(getTerrain());
         for (int i = 0; i < 6; i++)
         {
             char h = getOppositeHexside(i);
@@ -269,15 +245,18 @@ public class BattleHex extends Hex
 
     private void assignLabel()
     {
+        String label;
+
         if (xCoord == -1)
         {
             label = "X" + yCoord;
-            return;
+            
         }
-
-        char xLabel;
-        switch (xCoord)
+        else
         {
+            char xLabel;
+            switch (xCoord)
+            {
             case 0:
                 xLabel = 'A';
                 break;
@@ -298,12 +277,13 @@ public class BattleHex extends Hex
                 break;
             default:
                 xLabel = '?';
+            }
+
+            int yLabel = 6 - yCoord - (int)Math.abs(((xCoord - 3) / 2));
+            label = xLabel + Integer.toString(yLabel);
         }
-
-        int yLabel = 6 - yCoord - (int)Math.abs(((xCoord - 3) / 2));
-        label = xLabel + Integer.toString(yLabel);
+        setLabel(label);
     }
-
 
     public void setHexside(int i, char hexside)
     {
@@ -422,9 +402,7 @@ public class BattleHex extends Hex
 
     public boolean blocksLineOfSight()
     {
-        char terrain = getTerrain();
-
-        return ((terrain == 't') || (terrain == 'n'));
+        return (getTerrain().equals("Tree") || getTerrain().equals("Stone"));
     }
 
     /**
@@ -439,16 +417,16 @@ public class BattleHex extends Hex
      */
     public int getEntryCost(Creature creature, int cameFrom, boolean cumul)
     {
-        char terrain = getTerrain();
+        String terrain = getTerrain();
 
         int cost = NORMAL_COST;
 
         // Check to see if the hex is occupied or totally impassable.
-        if (((terrain == 'l') && (!creature.isWaterDwelling())) ||
-            ((terrain == 't') && (!creature.isNativeTree())) ||
-            ((terrain == 'n') && (!creature.isNativeStone())) ||
-            ((terrain == 'v') && (!creature.isNativeVolcano())) ||
-            ((terrain == 'o') && (!creature.isNativeBog())))
+        if ((getTerrain().equals("Lake") && (!creature.isWaterDwelling())) ||
+            (getTerrain().equals("Tree") && (!creature.isNativeTree())) ||
+            (getTerrain().equals("Stone") && (!creature.isNativeStone())) ||
+            (getTerrain().equals("Volcano") && (!creature.isNativeVolcano()))||
+            (getTerrain().equals("Bog") && (!creature.isNativeBog())))
         {
             cost += IMPASSIBLE_COST;
         }
@@ -481,9 +459,9 @@ public class BattleHex extends Hex
 
         // Bramble, drift, and sand slow non-natives, except that sand
         //     doesn't slow fliers.
-        if ((terrain == 'r' && !creature.isNativeBramble()) ||
-            (terrain == 'd' && !creature.isNativeDrift()) ||
-            (terrain == 's' && !creature.isNativeSandDune() &&
+        if ((getTerrain().equals("Brambles") && !creature.isNativeBramble()) ||
+            (getTerrain().equals("Drift") && !creature.isNativeDrift()) ||
+            (getTerrain().equals("Sand") && !creature.isNativeSandDune() &&
             !creature.isFlier()))
         {
             cost += SLOW_INCREMENT_COST;
@@ -510,16 +488,15 @@ public class BattleHex extends Hex
      */
     public boolean canBeFlownOverBy(Creature creature)
     {
-        char terrain = getTerrain();
         if (!creature.isFlier())
         { // non-flyer can't fly, obviously...
             return false;
         }
-        if (terrain == 'n')
+        if (getTerrain().equals("Stone"))
         { // no one can fly through stone
             return false;
         }
-        if (terrain == 'v')
+        if (getTerrain().equals("Volcano"))
         { // only volcano-native can fly over volcano
             return creature.isNativeVolcano();
         }
@@ -533,12 +510,11 @@ public class BattleHex extends Hex
      */
     public int damageToCreature(Creature creature)
     {
-        char terrain = getTerrain();
-        if ((terrain == 'd') && (!creature.isNativeDrift()))
+        if (getTerrain().equals("Drift") && (!creature.isNativeDrift()))
         { // Non-native take damage in Drift
             return 1;
         }
-        if ((terrain == 's') && (creature.isWaterDwelling()))
+        if (getTerrain().equals("Sand") && (creature.isWaterDwelling()))
         { // Water Dweller (amphibious) take damage in Sand
             return 1;
         }
@@ -552,9 +528,9 @@ public class BattleHex extends Hex
             getOppositeHexside(hexside) == 'c';
     }
 
-    public static char[] getTerrains()
+    public static String[] getTerrains()
     {
-        return (char[])allTerrains.clone();
+        return (String[])allTerrains.clone();
     }
 
     public static char[] getHexsides()

@@ -21,7 +21,7 @@ import net.sf.colossus.parser.TerrainRecruitLoader;
 final class ShowAllRecruits extends KDialog implements MouseListener,
     WindowListener
 {
-    ShowAllRecruits(JFrame parentFrame, char [] terrains,
+    ShowAllRecruits(JFrame parentFrame, String[] terrains,
                     Point point,
                     String singleTerrainHexLabel)
     {
@@ -49,7 +49,7 @@ final class ShowAllRecruits extends KDialog implements MouseListener,
         repaint();
     }
 
-    void doOneTerrain(char terrain, String hexLabel)
+    void doOneTerrain(String terrain, String hexLabel)
     {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));

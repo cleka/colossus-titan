@@ -1,30 +1,30 @@
 AllAI:
 
 # b is the same as B
-RECRUIT B Cyclops   2 Cyclops  ((NOT (HASCREATURE Behemoth)) AND
+RECRUIT Brush Cyclops   2 Cyclops  ((NOT (HASCREATURE Behemoth)) AND
                                 (2 Behemoth AVAILABLE))
 RECRUIT b Cyclops   2 Cyclops  ((NOT (HASCREATURE Behemoth)) AND
                                 (2 Behemoth AVAILABLE))
 # d is the same as D
 # (F)ort, T(O)wn and Waterh(o)le are the same as (P)lains
-RECRUIT P Lion      2 Lion     ((((CANREACH D) OR (CANREACH d)) AND
+RECRUIT Plains Lion      2 Lion     ((((CANREACH Desert) OR (CANREACH d)) AND
                                  (NOT (HASCREATURE Griffon))) AND
                                 (2 Griffon AVAILABLE))
-RECRUIT F Lion      2 Lion     ((((CANREACH D) OR (CANREACH d)) AND
+RECRUIT F Lion      2 Lion     ((((CANREACH Desert) OR (CANREACH d)) AND
                                  (NOT (HASCREATURE Griffon))) AND
                                 (2 Griffon AVAILABLE))
-RECRUIT O Lion      2 Lion     ((((CANREACH D) OR (CANREACH d)) AND
+RECRUIT O Lion      2 Lion     ((((CANREACH Desert) OR (CANREACH d)) AND
                                  (NOT (HASCREATURE Griffon))) AND
                                 (2 Griffon AVAILABLE))
-RECRUIT o Lion      2 Lion     ((((CANREACH D) OR (CANREACH d)) AND
+RECRUIT o Lion      2 Lion     ((((CANREACH Desert) OR (CANREACH d)) AND
                                  (NOT (HASCREATURE Griffon))) AND
                                 (2 Griffon AVAILABLE))
 # s is the same as S
-RECRUIT M Troll     2 Troll    ((((CANREACH S) OR (CANREACH s)) AND
+RECRUIT Marsh Troll     2 Troll    ((((CANREACH Swamp) OR (CANREACH s)) AND
                                  (NOT (HASCREATURE Wyvern))) AND
                                 (2 Wyvern AVAILABLE))
 # N is the same as M
-RECRUIT N Troll     2 Troll    ((((CANREACH S) OR (CANREACH s)) AND
+RECRUIT N Troll     2 Troll    ((((CANREACH Swamp) OR (CANREACH s)) AND
                                  (NOT (HASCREATURE Wyvern))) AND
                                 (2 Wyvern AVAILABLE))
 

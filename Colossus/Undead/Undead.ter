@@ -1,33 +1,32 @@
-B green       Ruins     true  1 Skeleton   2 Zombie   2 Lich      3 GhostDragon
+green       Ruins     true  1 Skeleton   2 Zombie   2 Lich      3 GhostDragon
 
-D orange      Desert    true  1 Naga       3 Griffin  2 Manticore 2 BlackDragon
+orange      Desert    true  1 Naga       3 Griffin  2 Manticore 2 BlackDragon
 
-H saddleBrown Hills     true  1 Troglodyte 2 Magog    2 Unicorn   2 GreenDragon
+saddleBrown Hills     true  1 Troglodyte 2 Magog    2 Unicorn   2 GreenDragon
 
-J darkGreen   Tombs     true  1 Skeleton   2 Zombie   3 Wraith    2 Vampire     2 BoneDragon
+darkGreen   Tombs     true  1 Skeleton   2 Zombie   3 Wraith    2 Vampire     2 BoneDragon
 
-M sienna      Marsh     true  1 Troglodyte 2 Orc      2 Pegasus   3 GoldDragon
+sienna      Marsh     true  1 Troglodyte 2 Orc      2 Pegasus   3 GoldDragon
 
-m red         Mountains true  1 Naga       2 Magog    2 Manticore 2 RedDragon   2 Colossus
+red         Mountains true  1 Naga       2 Magog    2 Manticore 2 RedDragon   2 Colossus
 
-P yellow      Plains    true  1 Paladin    2 Naga     2 Pegasus   3 GoldDragon
+yellow      Plains    true  1 Paladin    2 Naga     2 Pegasus   3 GoldDragon
 
-S blue        Swamp     true  1 Orc        3 Wyvern   2 Hydra     2 BlackDragon
+blue        Swamp     true  1 Orc        3 Wyvern   2 Hydra     2 BlackDragon
 
-t skyBlue     Tundra    true  1 Orc        2 Basilisk 2 Hydra     2 Giant       2 Colossus
+skyBlue     Tundra    true  1 Orc        2 Basilisk 2 Hydra     2 Giant       2 Colossus
 
-W olive       Woods     true  1 Paladin    2 Basilisk 2 Dendroid  2 GreenDragon
+olive       Woods     true  1 Paladin    2 Basilisk 2 Dendroid  2 GreenDragon
 
 # Tower is a special case
-T grey        Tower     false 0 Anything 0 Paladin 0 Anything 0 Skeleton 0 Anything 0 Troglodyte 0 AnyNonLord 3 Golem 0 AnyNonLord 4 Harpy 0 AnyNonLord 5 Beholder -1 Titan 1 Wizard
+grey        Tower     false 0 Anything 0 Paladin 0 Anything 0 Skeleton 0 Anything 0 Troglodyte 0 AnyNonLord 3 Golem 0 AnyNonLord 4 Harpy 0 AnyNonLord 5 Beholder -1 Titan 1 Wizard
 
 
 TITANIMPROVE 75
 TITANTELEPORT 700
 
 ACQUIRABLE 100 Angel
-ACQUIRABLE 100 FireElemental D  100 WaterElemental S  100 AirElemental W  100 EarthElemental H 
-ACQUIRABLE 100 Archdevil J   100 Efreet m    100 Genie t
-ACQUIRABLE 100 Necromancer T 300 TheReaper T
+ACQUIRABLE 100 FireElemental Desert  100 WaterElemental Swamp  100 AirElemental Woods  100 EarthElemental Hills
+ACQUIRABLE 100 Archdevil Jungle   100 Efreet Moutains    100 Genie Tundra
+ACQUIRABLE 100 Necromancer Tower 300 TheReaper Tower
 ACQUIRABLE 300 Archangel
-

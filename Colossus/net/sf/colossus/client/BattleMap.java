@@ -362,8 +362,9 @@ public final class BattleMap extends HexMap implements MouseListener,
     }
 
 
-    public static BattleHex getEntrance(char terrain, String masterHexLabel,
-        int entrySide)
+    public static BattleHex getEntrance(String terrain,
+                                        String masterHexLabel,
+                                        int entrySide)
     {
         return HexMap.getHexByLabel(terrain, "X" + entrySide);
     }
