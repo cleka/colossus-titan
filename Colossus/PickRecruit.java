@@ -64,7 +64,6 @@ class PickRecruit extends Dialog implements MouseListener, WindowListener
         setSize(scale * (Math.max(numEligible, height + 1) + 1),
             (23 * scale / 5));
 
-        // XXX: This doesn't work under Solaris.
         setResizable(false);
 
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
@@ -85,7 +84,7 @@ class PickRecruit extends Dialog implements MouseListener, WindowListener
         for (int i = 0; i < height; i++)
         {
             legionChits[i] = new Chit(scale * (2 * i + 3) / 2,
-                scale * 2 / 3, scale, legion.getCreature(i).getImageName(),
+                scale * 2 / 3, scale, legion.getCritter(i).getImageName(),
                 this);
         }
 
@@ -778,6 +777,40 @@ class PickRecruit extends Dialog implements MouseListener, WindowListener
     }
 
 
+    // Return true if all members of legion who are in recruiters are
+    // already visible.
+    private boolean allRecruitersVisible(Legion legion, Creature [] recruiters)
+    {
+        // Paranoia
+        if (recruiters.length != 4)
+        {
+            System.out.println("Bad arg passed to allRecruitersVisible()");
+            return false;
+        }
+
+        int height = legion.getHeight();
+
+        for (int i = 0; i < height; i++)
+        {
+            Critter critter = legion.getCritter(i);
+            if (!critter.isVisible())
+            {
+                for (int j = 0; j < recruiters.length; j++)
+                {
+                    Creature recruiter = recruiters[j];
+                    if (recruiter != null && recruiter.getName().equals(
+                        critter.getName()))
+                    {
+                        return false;
+                    }
+                }
+            }
+        }
+
+        return true;
+    }
+
+
     public void update(Graphics g)
     {
         if (!imagesLoaded)
@@ -854,6 +887,12 @@ class PickRecruit extends Dialog implements MouseListener, WindowListener
                     // A warm body recruits in a tower.
                     recruiter = null;
                 }
+                else if (allRecruitersVisible(legion, recruiters))
+                {
+                    // If all possible recruiters are already visible, don't
+                    // bother picking which ones to reveal.
+                    recruiter = recruiters[0];
+                }
                 else
                 {
                     new PickRecruiter(parentFrame, legion, 
@@ -861,7 +900,7 @@ class PickRecruit extends Dialog implements MouseListener, WindowListener
                     recruiter = recruiters[0];
                 }
 
-                if (recruit != null && (recruiter != null || 
+                if (recruit != null && (recruiter != null ||
                     numEligibleRecruiters == 0))
                 {
                     // Select that marker.
