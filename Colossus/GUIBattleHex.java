@@ -87,7 +87,7 @@ public final class GUIBattleHex extends BattleHex
 
         if (isSelected())
         {
-            g2.setColor(Color.white);
+            g2.setColor(Color.red);
             g2.fill(hexagon);
 
             g2.setColor(getTerrainColor());
