@@ -22,6 +22,7 @@ from xml.sax.saxutils import DefaultHandler
 
 (True, False) = (1, 0)
 
+options = None
 
 def normalize_whitespace(text):
     return ' '.join(text.split())
@@ -29,6 +30,7 @@ def normalize_whitespace(text):
 
 class snapHandler(DefaultHandler):
     def __init__(self):
+        DefaultHandler.__init__(self)
         self.inReveal = False
         self.inSplit = False
         self.inCreature = False
@@ -216,14 +218,14 @@ class snapHandler(DefaultHandler):
             if self.printTurn():
                 print '        turn = %s' % (self.turn,)
                 print '        print "\\nTurn", turn'
-            print '        aps.getLeaf("%s").merge(aps.getLeaf("%s"), 
-                turn)' % (self.survivorId, self.splitoffId)
+            print '        aps.getLeaf("%s").merge(aps.getLeaf("%s"), turn)' \
+              % (self.survivorId, self.splitoffId)
         else:
             if self.printTurn():
                 print '        turn = %s;' % (self.turn,)
                 print '        Log.debug("Turn " + turn);'
-            print '        aps.getLeaf("%s").merge(aps.getLeaf("%s"), 
-                turn);' % (self.survivorId, self.splitoffId)
+            print '        aps.getLeaf("%s").merge(aps.getLeaf("%s"), turn);' \
+              % (self.survivorId, self.splitoffId)
         self.doneTurn[self.turn] = 1
 
 
