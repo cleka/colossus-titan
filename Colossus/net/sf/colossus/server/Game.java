@@ -803,15 +803,6 @@ public final class Game
         }
         player.resetTurnState();
         server.allSetupSplit();
-
-        // XXX Is this causing double advances?
-        // If there are no markers available, or no legions tall enough
-        // to split, skip forward to movement.
-        if (player.getNumMarkersAvailable() == 0 ||
-                player.getMaxLegionHeight() < 4)
-        {
-            advancePhase(Constants.SPLIT, player.getName());
-        }
     }
 
     private void setupMove()
@@ -2326,7 +2317,6 @@ public final class Game
         {
             String name = (String)it.next();
             Creature creature = Creature.getCreatureByName(name);
-
             creatures.add(creature);
         }
 
@@ -2354,7 +2344,6 @@ public final class Game
         while (it.hasNext())
         {
             Creature creature = (Creature)it.next();
-
             if (!tempCreatures.remove(creature))
             {
                 Log.debug("Unavailable creature in split list (" +
@@ -2385,7 +2374,6 @@ public final class Game
             while (it.hasNext())
             {
                 Creature creature = (Creature)it.next();
-
                 if (creature.isLord())
                 {
                     numLords++;
