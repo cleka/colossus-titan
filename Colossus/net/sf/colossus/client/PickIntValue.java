@@ -25,7 +25,7 @@ public final class PickIntValue extends KDialog implements WindowListener,
 
 
     private PickIntValue(JFrame parentFrame, int oldValue, String title,
-        int min, int max)
+        int min, int max, int step)
     {
         super(parentFrame, title, true);
 
@@ -38,7 +38,7 @@ public final class PickIntValue extends KDialog implements WindowListener,
         Container contentPane = getContentPane();
         contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
 
-        model = new SpinnerNumberModel(oldValue, min, max, 1);
+        model = new SpinnerNumberModel(oldValue, min, max, step);
         spinner = new JSpinner(model);
         contentPane.add(spinner);
         spinner.addChangeListener(this);
@@ -64,9 +64,9 @@ public final class PickIntValue extends KDialog implements WindowListener,
     /** Return the new value if the user accepted it, or oldValue if
      *  user cancelled the dialog. */
     public static int pickIntValue(JFrame parentFrame, int oldValue, 
-        String title, int min, int max)
+        String title, int min, int max, int step)
     {
-        new PickIntValue(parentFrame, oldValue, title, min, max);
+        new PickIntValue(parentFrame, oldValue, title, min, max, step);
         return newValue;
     }
 

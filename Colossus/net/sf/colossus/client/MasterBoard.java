@@ -456,7 +456,7 @@ public final class MasterBoard extends JPanel
             {
                 final int oldScale = Scale.get();
                 final int newScale = PickIntValue.pickIntValue(masterFrame,
-                    oldScale, "Pick scale", 5, 25);
+                    oldScale, "Pick scale", 5, 25, 1);
                 if (newScale != oldScale)
                 {
                     client.setOption(Options.scale, newScale);

@@ -503,7 +503,7 @@ public final class GetPlayers extends KDialog implements WindowListener,
         {
             final int newDelay = PickIntValue.pickIntValue(parentFrame,
                 oldDelay, "Pick AI Delay (in ms)", Constants.MIN_AI_DELAY, 
-                Constants.MAX_AI_DELAY);
+                Constants.MAX_AI_DELAY, 100);
             if (newDelay != oldDelay)
             {
                 options.setOption(Options.aiDelay, newDelay);
@@ -514,7 +514,7 @@ public final class GetPlayers extends KDialog implements WindowListener,
         {
             final int newLimit = PickIntValue.pickIntValue(parentFrame,
                 oldLimit, "Pick AI Time Limit (in s)", 
-                Constants.MIN_AI_TIME_LIMIT, Constants.MAX_AI_TIME_LIMIT);
+                Constants.MIN_AI_TIME_LIMIT, Constants.MAX_AI_TIME_LIMIT, 1);
             if (newLimit != oldLimit)
             {
                 options.setOption(Options.aiTimeLimit, newLimit);
