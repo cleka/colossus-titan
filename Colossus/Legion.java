@@ -474,6 +474,15 @@ class Legion
             critters[i].setVisible(true);
         }
     }
+    
+    
+    public void revealCreature(int index)
+    {
+        if (index < getHeight())
+        {
+            critters[index].setVisible(true);
+        }
+    }
 
 
     public void revealCreatures(Creature creature, int numberToReveal)
