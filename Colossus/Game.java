@@ -457,6 +457,9 @@ class Game extends Frame implements WindowListener, ActionListener
         {
             advanceTurn();
         }
+
+        // Update the status screen to show whose turn it is.
+        updateStatusScreen();
     }
 
 
