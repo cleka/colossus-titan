@@ -94,3 +94,6 @@ java.lang.NullPointerException
         at Battle.advancePhase(Battle.java:177)
         at Battle.doneWithMoves(Battle.java:703)
         at BattleMap$3.actionPerformed(BattleMap.java:112)
+
+Solaris, 1.3: "tower teleports (null)" when all stacks visible.
+   Should fill in a random lord from the stack instead.

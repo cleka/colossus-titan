@@ -21,7 +21,7 @@ separated by spaces.
 <unit>:         A complete creature name like "Behemoth".
 <units>:        One or more of <unit>.
 <land>:         A number of a masterboard hex, like "127".
-<land>:         One or more of <land>.
+<lands>:        One or more of <land>.
 <number>:       A number like "3".
 <numbers>:      One or more of <number>.
 <battlehex>:    A battle hex identifier like "C1"
