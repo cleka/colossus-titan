@@ -53,11 +53,15 @@ public final class Dice
             byte [] bytes = new byte[8];
             try
             {
-                randStream.read(bytes);
+                if (randStream.available() >= 8)
+                {
+                    randStream.read(bytes);
+                }
             }
             catch (IOException ex)
             {
                 Log.error("Problem reading from /dev/random");
+                System.exit(1);
             }
             random.setSeed(eightBytesToLong(bytes));
         }
