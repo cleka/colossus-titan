@@ -22,9 +22,17 @@ public final class PredictSplits
     private CreatureComparator creatureComp = new CreatureComparator();
 
 
-    PredictSplits(String playerName, String rootId, CreatureInfoList creatures)
+    PredictSplits(String playerName, String rootId, 
+        CreatureNameList creatureNames)
     {
-        setRoot(new Node(rootId, creatures, null));
+        CreatureInfoList infoList = new CreatureInfoList();
+        Iterator it = creatureNames.iterator();
+        while (it.hasNext())
+        {
+            String name = (String)it.next();
+            infoList.add(name);
+        }
+        setRoot(new Node(rootId, 0, infoList, null));
     }
 
     void setRoot(Node root)
@@ -32,22 +40,73 @@ public final class PredictSplits
         this.root = root;
     }
 
+    /** Return all non-empty childless nodes in subtree starting from node. */
+    java.util.List getLeaves(Node node)
+    {
+        java.util.List leaves = new ArrayList();
+        if (node.getChild1() == null)
+        {
+            if (!node.getCreatures().isEmpty())
+            {
+                leaves.add(node);
+            }
+        }
+        else
+        {
+            leaves.addAll(getLeaves(node.getChild1()));
+            leaves.addAll(getLeaves(node.getChild2()));
+        }
+        return leaves;
+    }
+
+    /** Print all childless nodes in tree. */
+    void printLeaves()
+    {
+        java.util.List leaves = getLeaves(root);
+        Iterator it = leaves.iterator();
+        while (it.hasNext())
+        {
+            Node leaf = (Node)it.next();
+            Log.debug(leaf.toString());
+        }
+    }
+
+    /** Return the leaf node with matching markerId. */
+    Node getLeaf(String markerId)
+    {
+        java.util.List leaves = getLeaves(root);
+        Iterator it = leaves.iterator();
+        while (it.hasNext())
+        {
+            Node leaf = (Node)it.next();
+            if (markerId.equals(leaf.getMarkerId()))
+            {
+                return leaf;
+            }
+        }
+        return null;
+    }
+
 
     private class Node
     {
         final String markerId;       // Not unique!
+        final int turnCreated;
         CreatureInfoList creatures;  // List of CreatureInfo
-
-        int childSize1;              // At the time this node was split.
-        int childSize2;              // At the time this node was split.
-
+        CreatureInfoList removed;    // List of CreatureInfo, only if atSplit
         final Node parent;
+        int childSize1 = 0;          // At the time this node was split.
+        int childSize2 = 0;          // At the time this node was split.
         Node child1;                 // At the time this node was split.
         Node child2;                 // At the time this node was split.
+        boolean flipped;
+        int turnSplit = -1;
 
-        Node(String markerId, CreatureInfoList creatures, Node parent)
+        Node(String markerId, int turnCreated, CreatureInfoList creatures, 
+            Node parent)
         {
             this.markerId = markerId;
+            this.turnCreated = turnCreated;
             this.creatures = (CreatureInfoList)creatures.clone();
             this.parent = parent;
         }
@@ -57,10 +116,49 @@ public final class PredictSplits
             return markerId;
         }
 
+        String getFullName()
+        {
+            return markerId + '(' + turnCreated + ')';
+        }
+
+        Node getChild1()
+        {
+            return child1;
+        }
+
+        Node getChild2()
+        {
+            return child2;
+        }
+
+        public String toString()
+        {
+            Collections.sort(creatures, creatureComp);
+            StringBuffer sb = new StringBuffer(getFullName() + ":");
+            Iterator it = creatures.iterator();
+            while (it.hasNext())
+            {
+                CreatureInfo ci = (CreatureInfo)it.next();
+                sb.append(" " + ci.toString());
+            }
+            return sb.toString();
+        }
+
         /** Return immutable list of CreatureInfo */
         CreatureInfoList getCreatures()
         {
             return (CreatureInfoList)Collections.unmodifiableList(creatures);
+        }
+
+        void setCreatures(CreatureInfoList creatures)
+        {
+            this.creatures = creatures;
+        }
+
+        /** Return immutable list of CreatureInfo */
+        CreatureInfoList getRemovedCreatures()
+        {
+            return (CreatureInfoList)Collections.unmodifiableList(removed);
         }
 
         /** Return immutable list of CreatureInfo where certain == true. */
@@ -70,13 +168,37 @@ public final class PredictSplits
             Iterator it = getCreatures().iterator();
             while (it.hasNext())
             {
-               CreatureInfo ci = (CreatureInfo)it.next();
-               if (ci.isCertain())
-               {
-                   list.add(ci);
-               }
+                CreatureInfo ci = (CreatureInfo)it.next();
+                if (ci.isCertain())
+                {
+                    list.add(ci);
+                }
             }
             return (CreatureInfoList)Collections.unmodifiableList(list);
+        }
+
+        boolean allCertain()
+        {
+            Iterator it = getCreatures().iterator();
+            while (it.hasNext())
+            {
+                CreatureInfo ci = (CreatureInfo)it.next();
+                if (!ci.isCertain())
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        void setAllCertain()
+        {
+            Iterator it = getCreatures().iterator();
+            while (it.hasNext())
+            {
+                CreatureInfo ci = (CreatureInfo)it.next();
+                ci.setCertain(true);
+            }
         }
 
         /** Return immutable list of CreatureInfo where atSplit == true. */
@@ -86,14 +208,47 @@ public final class PredictSplits
             Iterator it = getCreatures().iterator();
             while (it.hasNext())
             {
-               CreatureInfo ci = (CreatureInfo)it.next();
-               if (ci.isAtSplit())
-               {
-                   list.add(ci);
-               }
+                CreatureInfo ci = (CreatureInfo)it.next();
+                if (ci.isAtSplit())
+                {
+                    list.add(ci);
+                }
             }
             return (CreatureInfoList)Collections.unmodifiableList(list);
         }
+
+        /** Return immutable list of CreatureInfo where atSplit == false. */
+        CreatureInfoList getAfterSplitCreatures()
+        {
+            CreatureInfoList list = new CreatureInfoList();
+            Iterator it = getCreatures().iterator();
+            while (it.hasNext())
+            {
+                CreatureInfo ci = (CreatureInfo)it.next();
+                if (!ci.isAtSplit())
+                {
+                    list.add(ci);
+                }
+            }
+            return (CreatureInfoList)Collections.unmodifiableList(list);
+        }
+
+        /** Return immutable list of CreatureInfo where both certain and atSplit are true. */
+        CreatureInfoList getCertainAtSplitCreatures()
+        {
+            CreatureInfoList list = new CreatureInfoList();
+            Iterator it = getCreatures().iterator();
+            while (it.hasNext())
+            {
+                CreatureInfo ci = (CreatureInfo)it.next();
+                if (ci.isCertain() && ci.isAtSplit())
+                {
+                    list.add(ci);
+                }
+            }
+            return (CreatureInfoList)Collections.unmodifiableList(list);
+        }
+
 
         Node getOtherChild(Node child)
         {
@@ -113,128 +268,112 @@ public final class PredictSplits
             return otherChild;
         }
 
-        List getCreatureNames()
+        String getOtherChildMarkerId()
         {
-            List list = new ArrayList();
-            Iterator it = creatures.iterator();
-            while (it.hasNext())
+            if (!markerId.equals(child1.getMarkerId()))
             {
-                CreatureInfo ci = (CreatureInfo)it.next();
-                list.add(ci.getName());
+                return child1.getMarkerId();
             }
-            return list;
+            else
+            {
+                return child2.getMarkerId();
+            }
         }
+
 
         int getHeight()
         {
             return creatures.size();
         }
 
-        void revealAllCreatures(CreatureInfoList list)
+
+        void revealSomeCreatures(CreatureNameList cnl)
         {
-            if (getHeight() != creatures.size())
+            CreatureInfoList cil = new CreatureInfoList();
+            Iterator it = cnl.iterator();
+            while (it.hasNext())
             {
-                Log.error("Wrong height in Node.revealAllCreatures()");
-                return;
+                String name = (String)it.next();
+                cnl.add(new CreatureInfo(name, true, true));
             }
 
-            // Confirm that all creatures that were certain are there.
+            // Use a copy so we can remove creatures as we check for dupes.
+            CreatureInfoList dupe = (CreatureInfoList)cil.clone();
+
+            // Confirm that all creatures that were certain still fit along
+            // with the revealed creatures.
+            int count = dupe.size();
             CreatureInfoList certain = getCertainCreatures();
-            Iterator it = certain.iterator();
+            it = certain.iterator();
             while (it.hasNext())
             {
                 CreatureInfo ci = (CreatureInfo)it.next();
-                if (list.numCreature(ci) < certain.numCreature(ci))
+                if (dupe.contains(ci))
                 {
-                    Log.error("Certainty error in Node.revealAllCreatures()");
-                    return;
+                    dupe.remove(ci);
                 }
-            }
-
-            // Then mark all creatures as certain and then communicate this
-            // to the parent, to adjust other legions.
-
-            if (certain.size() == getHeight())
-            {
-                // No need to make changes -- we already know everything.
-                return;
-            }
-
-            // Set atSplit false if the creature array already contained
-            // a corresponding entry with atSplit false.
-            CreatureInfoList copy = (CreatureInfoList)list.clone();
-            it = copy.iterator();
-            while (it.hasNext())
-            {
-                CreatureInfo ci = (CreatureInfo)it.next();
-                ci.setCertain(true);
-
-                // If false, then we knew it was here, and can fix below.
-                ci.setAtSplit(true); 
-                if (creatures.contains(ci));
-                {
-                    CreatureInfo original = creatures.getCreatureInfo(ci);
-                    boolean atSplit = original.isAtSplit();
-                    ci.setAtSplit(atSplit);
-                    creatures.remove(original);
-                }
-            }
-            // Then copy the modified clone back to the creatures list.
-            creatures = (CreatureInfoList)copy.clone();
-            parent.tellChildContents(this);
-        }
-
-        void revealSomeCreatures(CreatureInfoList list)
-        {
-            if (getHeight() < creatures.size())
-            {
-                Log.error("Wrong height in Node.revealSomeCreatures()");
-                return;
-            }
-
-            // Use a copy rather than the original so we can remove
-            // creatures as we check, for multiples.
-            CreatureInfoList copy = (CreatureInfoList)list.clone();
-
-            int count = copy.size();
-            // Confirm that all creatures that were certain still fit
-            // along with the revealed creatures.
-            Iterator it = getCertainCreatures().iterator();
-            while (it.hasNext())
-            {
-                CreatureInfo ci = (CreatureInfo)it.next();
-                if (!copy.remove(ci))
+                else
                 {
                     count++;
                 }
             }
+
             if (count > getHeight())
             {
-                Log.error("Certainty error in Node.revealSomeCreatures()");
-                return;
+                throw new RuntimeException(
+                    "Certainty error in revealSomeCreatures");
             }
 
-            // Then mark passed creatures as certain and then 
-            // communicate this to the parent, to adjust other legions.
+            // Mark passed creatures as certain and then communicate this to
+            // parent, to adjust other legions.
 
             if (getCertainCreatures().size() == getHeight())
             {
-                // No need -- we already know everything.
+                // We already know everything.
                 return;
             }
 
-            copy = (CreatureInfoList)list.clone();
+            dupe = (CreatureInfoList)cil.clone();
             count = 0;
-            it = copy.iterator();
+            it = dupe.iterator();
             while (it.hasNext())
             {
                 CreatureInfo ci = (CreatureInfo)it.next();
                 ci.setCertain(true);
-                ci.setAtSplit(true);   // If not atSplit, would be certain.
-                if (creatures.numCreature(ci) < copy.numCreature(ci))
+                ci.setAtSplit(true); // If not atSpilt, then would be certain.
+                if (creatures.numCreature(ci.getName()) < 
+                    dupe.numCreature(ci.getName()))
                 {
                     creatures.add(ci);
                     count++;
+                }
+            }
+
+            // Ensure that the creatures in cnl are now marked certain.
+            dupe = (CreatureInfoList)cil.clone();
+            certain = getCertainCreatures();
+            it = certain.iterator();
+            while (it.hasNext())
+            {
+                CreatureInfo ci = (CreatureInfo)it.next();
+                if (dupe.contains(ci))
+                {
+                    dupe.remove(ci);
+                }
+            }
+            it = dupe.iterator();
+            while (it.hasNext())
+            {
+                CreatureInfo ci = (CreatureInfo)it.next();
+                Iterator it2 = creatures.iterator();
+                while (it2.hasNext())
+                {
+                    CreatureInfo ci2 = (CreatureInfo)it.next();
+                    if (!ci2.isCertain() && ci2.getName().equals(ci.getName()))
+                    {
+                        ci2.setCertain(true);
+                        break;
+                    }
                 }
             }
 
@@ -247,92 +386,57 @@ public final class PredictSplits
             parent.tellChildContents(this);
         }
 
-
-        /*  flippedMarkers is true if the smaller splitoff got the 
-         *  original legion marker. */
-        void split(int childSize, String otherMarkerId,
-            boolean flippedMarkers, CreatureInfoList knownSplitoffs)
+        void revealAllCreatures(CreatureNameList cnl)
         {
-            CreatureInfoList splitoffCreatures = chooseCreaturesToSplitOut(
-                childSize, knownSplitoffs);
-            List splitoffNames = new ArrayList();
-            Iterator it = splitoffCreatures.iterator();
+            CreatureInfoList cil = new CreatureInfoList();
+            Iterator it = cnl.iterator();
             while (it.hasNext())
             {
-                Creature creature = (Creature)it.next();
-                splitoffNames.add(creature.getName());
+                String name = (String)it.next();
+                cnl.add(new CreatureInfo(name, true, true));
             }
 
-            // lists of CreatureInfo
-            CreatureInfoList strongList = new CreatureInfoList();
-            CreatureInfoList weakList = new CreatureInfoList();
-            it = getCreatures().iterator();
+            // Confirm that all creatures that were certain are there.
+            CreatureInfoList certain = getCertainCreatures();
+            it = certain.iterator();
             while (it.hasNext())
             {
                 CreatureInfo ci = (CreatureInfo)it.next();
-                String name = ci.getName();
-                CreatureInfo newInfo = new CreatureInfo(name, false, true);
-                if (splitoffNames.contains(name))
+                if (cil.numCreature(ci.getName()) < 
+                    certain.numCreature(ci.getName()))
                 {
-                    weakList.add(newInfo);
-                    splitoffNames.remove(name);
-                }
-                else
-                {
-                    strongList.add(newInfo);
+                    throw new RuntimeException(
+                        "Certainty error in revealAllCreatures()");
                 }
             }
-
-            // Assume that the bigger stack got the better creatures.
-            // If the two splitoffs have equal sizes, then we don't know
-            // which is the "good" one, so just pick at random.
-            if (childSize + childSize == getHeight())
-            {
-                flippedMarkers = (Dice.rollDie() <= 3);
-            }
-            if (flippedMarkers)
-            {
-                child1 = new Node(otherMarkerId, strongList, this);
-                childSize1 = child1.getHeight();
-                child2 = new Node(markerId, weakList, this);
-                childSize2 = child2.getHeight();
-            }
-            else
-            {
-                child1 = new Node(markerId, strongList, this);
-                childSize1 = child1.getHeight();
-                child2 = new Node(otherMarkerId, weakList, this);
-                childSize2 = child2.getHeight();
-            }
+            revealSomeCreatures(cnl);
         }
 
-        /** Tell this parent legion the known contents of one of its
-         *  children.  Based on this info, it may be able to tell its
-         *  other child and/or its parent something. */
-        void tellChildContents(Node child)
+        /** Return true if creatures in children are consistent with self. */
+        boolean childCreaturesMatch()
         {
-            Node otherChild = getOtherChild(child);
-
-            // All child creatures that were there at the time of the
-            // split should be in this node as well.  If not, then
-            // we need to adjust this legion's contents and tell its parent
-            // and other child.
-            if (!creatures.contains(child.getAtSplitCreatures()))
+            if (child1 == null)
             {
-Log.debug("Adjusting parent node " + markerId);
-                if (parent == null)
+                return true;
+            }
+
+            CreatureInfoList allCreatures = new CreatureInfoList();
+            allCreatures.addAll(child1.getAtSplitCreatures());
+            allCreatures.addAll(child1.getRemovedCreatures());
+            allCreatures.addAll(child2.getAtSplitCreatures());
+            allCreatures.addAll(child2.getRemovedCreatures());
+
+            Iterator it = allCreatures.iterator();
+            while (it.hasNext())
+            {
+                CreatureInfo ci = (CreatureInfo)it.next();
+                if (allCreatures.numCreature(ci.getName()) !=
+                    creatures.numCreature(ci.getName()))
                 {
-                    Log.error("Had root legion contents wrong " + markerId);
-                    return;
+                    return false;
                 }
-                // TODO Re-predict this node's parent's split
-
             }
-            else
-            {
-                // TODO We might still need to adjust this legion's split.
-            }
-            // TODO Mark child's known contents as certain in this node.
+            return true;
         }
 
 
@@ -340,31 +444,40 @@ Log.debug("Adjusting parent node " + markerId);
         /** Decide how to split this legion, and return a list of Creatures to 
          *  remove.  Return null on error. */
         CreatureInfoList chooseCreaturesToSplitOut(int childSize, 
-            CreatureInfoList knownSplitoffs)
+            CreatureInfoList knownSplit, CreatureInfoList knownKeep)
         {
             // Sanity checks
-            if (knownSplitoffs.size() > childSize)
+            if (knownSplit.size() > childSize)
             {
                 Log.error("More known splitoffs than spiltoffs");
                 return null;
             }
-            if (creatures.size() == 8)
+            if (creatures.size() > 8)
+            {
+                throw new RuntimeException("More than 8 creatures in legion");
+            }
+            else if (creatures.size() == 8)
             {
                 if (childSize != 4)
                 {
-                    Log.error("Illegal initial split");
-                    return null;
+                    throw new RuntimeException("Illegal initial split");
                 }
-                if (!getCreatureNames().contains(Constants.angel))
+                if (!creatures.getCreatureNames().contains(Constants.titan))
                 {
-                    Log.error("No angel in 8-high legion");
-                    return null;
+                    throw new RuntimeException("No titan in 8-high legion");
+                }
+                if (!creatures.getCreatureNames().contains(Constants.angel))
+                {
+                    throw new RuntimeException("No angel in 8-high legion");
                 }
             }
-            if (!creatures.contains(knownSplitoffs))
+
+            CreatureInfoList knownCombo = new CreatureInfoList();
+            knownCombo.addAll(knownSplit);
+            knownCombo.addAll(knownKeep);
+            if (!creatures.isSupersetOf(knownCombo))
             {
-                Log.error("Known splitoffs not in parent legion");
-                return null;
+                throw new RuntimeException("Known creatures not in parent");
             }
 
             CreatureInfoList clones = (CreatureInfoList)creatures.clone();
@@ -373,7 +486,7 @@ Log.debug("Adjusting parent node " + markerId);
             Collections.sort(clones, creatureComp);
 
             // Move known splitoffs to the end of the legion.
-            Iterator it = knownSplitoffs.iterator();
+            Iterator it = knownSplit.iterator();
             while (it.hasNext())
             {
                 CreatureInfo ci = (CreatureInfo)it.next();
@@ -381,14 +494,29 @@ Log.debug("Adjusting parent node " + markerId);
                 clones.add(clones.size() - 1, ci);
             }
 
+            // Move known non-splitoffs to the beginning.
+            CreatureInfoList temp = new CreatureInfoList();  // no removeLast()
+            it = knownKeep.iterator();
+            while (it.hasNext())
+            {
+                CreatureInfo ci = (CreatureInfo)it.next();
+                clones.remove(ci);
+                temp.add(ci);
+            }
+            it = temp.iterator();
+            while (it.hasNext())
+            {
+                CreatureInfo ci = (CreatureInfo)it.next();
+                clones.add(0, ci);
+            }
+
             // If initial split, move angel to the end.
             if (getHeight() == 8)
             {
                 // Maintain flags.
-                CreatureInfo angel = creatures.getCreatureInfo(
-                    new CreatureInfo(Constants.angel, false, false));
+                CreatureInfo angel = clones.getCreatureInfo(Constants.angel);
                 clones.remove(angel);
-                clones.add(clones.size() - 1, angel);
+                clones.add(angel);
             }
 
             CreatureInfoList creaturesToRemove = new CreatureInfoList();
@@ -401,6 +529,255 @@ Log.debug("Adjusting parent node " + markerId);
             }
     
             return creaturesToRemove;
+        }
+
+
+        final int REUSE_EXISTING_TURN = -1;
+
+        void split(int childSize, String otherMarkerId, int turn)
+        {
+            if (creatures.size() > 8)
+            {
+                throw new RuntimeException("More than 8 creatures in legion");
+            }
+
+            if (turn == REUSE_EXISTING_TURN)
+            {
+                turn = turnSplit;
+            }
+            else
+            {
+                turnSplit = turn;
+            }
+
+            CreatureInfoList knownKeep = new CreatureInfoList();
+            CreatureInfoList knownSplit = new CreatureInfoList();
+            if (child1 != null)
+            {
+                knownKeep.addAll(child1.getCertainAtSplitCreatures());
+                knownKeep.addAll(child1.getRemovedCreatures());
+                knownSplit.addAll(child2.getCertainAtSplitCreatures());
+                knownSplit.addAll(child2.getRemovedCreatures());
+            }
+
+            CreatureInfoList splitoffCreatures = chooseCreaturesToSplitOut(
+                childSize, knownSplit, knownKeep);
+            CreatureNameList splitoffNames = new CreatureNameList();
+            Iterator it = splitoffCreatures.iterator();
+            while (it.hasNext())
+            {
+                CreatureInfo ci = (CreatureInfo)it.next();
+                splitoffNames.add(ci.getName());
+            }
+
+            CreatureInfoList strongList = new CreatureInfoList();
+            CreatureInfoList weakList = new CreatureInfoList();
+            it = creatures.iterator();
+            while (it.hasNext())
+            {
+                CreatureInfo ci = (CreatureInfo)it.next();
+                String name = ci.getName();
+                CreatureInfo newinfo = new CreatureInfo(name, false, true);
+                if (splitoffNames.contains(name))
+                {
+                    weakList.add(newinfo);
+                    splitoffNames.remove(name);
+                    // If in knownSplit, set certain
+                    if (knownSplit.removeCreatureByName(name))
+                    {
+                        newinfo.setCertain(true);
+                    }
+                }
+                else
+                {
+                    strongList.add(newinfo);
+                    // If in knownKeep, set certain
+                    if (knownKeep.removeCreatureByName(name))
+                    {
+                        newinfo.setCertain(true);
+                    }
+                }
+            }
+
+            CreatureInfoList afterSplit1 = new CreatureInfoList();
+            CreatureInfoList afterSplit2 = new CreatureInfoList();
+            CreatureInfoList removed1 = new CreatureInfoList();
+            CreatureInfoList removed2 = new CreatureInfoList();
+            if (child1 != null)
+            {
+                afterSplit1.addAll(child1.getAfterSplitCreatures());
+                afterSplit2.addAll(child2.getAfterSplitCreatures());
+                removed1.addAll(child1.getRemovedCreatures());
+                removed2.addAll(child2.getRemovedCreatures());
+            }
+
+            // Assume that the bigger stack got the better creatures.
+            flipped = (2 * childSize >= getHeight());
+
+            String marker1 = null;
+            String marker2 = null;
+            if (flipped)
+            {
+                marker1 = otherMarkerId;
+                marker2 = markerId;
+            }
+            else
+            {
+                marker1 = markerId;
+                marker2 = otherMarkerId;
+            }
+
+            CreatureInfoList li1 = new CreatureInfoList();
+            li1.addAll(strongList);
+            li1.addAll(afterSplit1);
+            it = removed1.iterator();
+            while (it.hasNext())
+            {
+                CreatureInfo ci = (CreatureInfo)it.next();
+                li1.remove(ci);
+            }
+            CreatureInfoList li2 = new CreatureInfoList();
+            li2.addAll(weakList);
+            li2.addAll(afterSplit2);
+            it = removed2.iterator();
+            while (it.hasNext())
+            {
+                CreatureInfo ci = (CreatureInfo)it.next();
+                li2.remove(ci);
+            }
+
+            if (child1 == null)
+            {
+                child1 = new Node(marker1, turn, li1, this);
+                child2 = new Node(marker2, turn, li2, this);
+            }
+            else
+            {
+                child1.setCreatures(li1);
+                child2.setCreatures(li2);
+            }
+
+            if (childSize1 == 0)
+            {
+                childSize1 = child1.getHeight();
+                childSize2 = child2.getHeight();
+            }
+        }
+
+        /** Tell this parent legion the known contents of one of its
+         *  children.  Based on this info, it may be able to tell its
+         *  other child and/or its parent something. */
+        void tellChildContents(Node child)
+        {
+            Node otherChild = getOtherChild(child);
+
+            // Add child creatures that were there at the time of the split
+            // should be in this node as well.  If not, then we need to
+            // adjust this legion's contents and tell its parent and other kid.
+            CreatureInfoList childAtSplit = child.getAtSplitCreatures();
+
+            if (!creatures.isSupersetOf(childAtSplit))
+            {
+                if (parent == null)
+                {
+                    throw new RuntimeException(
+                        "Had root legion contents wrong");
+                }
+                else
+                {
+                    // Re-predict this node's parent's split.
+                    revealSomeCreatures(childAtSplit.getCreatureNames());
+                }
+            }
+
+            // Only resplit if necessary.
+            if (!childCreaturesMatch())
+            {
+                split(childSize2, getOtherChildMarkerId(), 
+                    REUSE_EXISTING_TURN);
+            }
+
+            // Mark child's known-at-split contents as certain in this node.
+            CreatureInfoList certain = child.getCertainAtSplitCreatures();
+            Iterator it = certain.iterator();
+            while (it.hasNext())
+            {
+                CreatureInfo ci = (CreatureInfo)it.next();
+                if (creatures.numCreature(ci.getName()) < 
+                    certain.numCreature(ci.getName()))
+                {
+                    throw new RuntimeException("Need to resplit my parent");
+                }
+                Iterator it2 = creatures.iterator();
+                while (it2.hasNext())
+                {
+                    CreatureInfo mine = (CreatureInfo)it.next();
+                    if (mine.getName().equals(ci.getName()) && 
+                        !mine.isCertain())
+                    {
+                        mine.setCertain(true);
+                        break;
+                    }
+                }
+            }
+
+            // If parent and one child are certain, so is the other child.
+            if (allCertain() && child.allCertain())
+            {
+                otherChild.setAllCertain();
+            }
+        }
+
+
+        void addCreature(String creatureName)
+        {
+            if (getHeight() >= 7 && child1 == null)
+            {
+                throw new RuntimeException("Tried adding to 7-high legion");
+            }
+            CreatureInfo ci = new CreatureInfo(creatureName, true, false);
+            creatures.add(ci);
+        }
+
+        void removeCreature(String creatureName)
+        {
+            if (getHeight() <= 0)
+            {
+                throw new RuntimeException(
+                    "Tried removing from 0-high legion");
+            }
+            CreatureInfo ci = creatures.getCreatureInfo(creatureName);
+            CreatureNameList cnl = new CreatureNameList();
+            cnl.add(ci);
+            revealSomeCreatures(cnl);
+
+            // Only need to track the removed creature for future parent split
+            // predictions if it was here at the time of the split.
+            if (ci.isAtSplit())
+            {
+                removed.add(ci);
+            }
+            creatures.removeCreatureByName(creatureName);
+        }
+
+        void removeCreatures(CreatureNameList creatureNames)
+        {
+            Iterator it = creatureNames.iterator();
+            while (it.hasNext())
+            {
+                String name = (String)it.next();
+                removeCreature(name);
+            }
+        }
+
+        void removeAllCreatures()
+        {
+            Iterator it = creatures.iterator();
+            while (it.hasNext())
+            {
+                CreatureInfo ci = (CreatureInfo)it.next();
+                removeCreature(ci.getName());
+            }
         }
     }
 
@@ -471,18 +848,32 @@ Log.debug("Adjusting parent node " + markerId);
         {
             return name.hashCode();
         }
+
+        public String toString()
+        {
+            StringBuffer sb = new StringBuffer(name);
+            if (!certain)
+            {
+                sb.append('?');
+            }
+            if (!atSplit)
+            {
+                sb.append('*');
+            }
+            return sb.toString();
+        }
     }
 
     private class CreatureInfoList extends ArrayList
     {
-        int numCreature(CreatureInfo type)
+        int numCreature(String creatureName)
         {
             int count = 0;
-            Iterator it = this.iterator();
+            Iterator it = iterator();
             while (it.hasNext())
             {
                 CreatureInfo ci = (CreatureInfo)it.next();
-                if (ci.equals(type))
+                if (creatureName.equals(ci.getName()))
                 {
                     count++;
                 }
@@ -490,36 +881,19 @@ Log.debug("Adjusting parent node " + markerId);
             return count;
         }
 
-        /** Return the first CreatureInfo that matches the passed type. */
-        CreatureInfo getCreatureInfo(CreatureInfo type)
+        /** Return the first CreatureInfo that matches the passed name. */
+        CreatureInfo getCreatureInfo(String creatureName)
         {
-            Iterator it = this.iterator();
+            Iterator it = iterator();
             while (it.hasNext())
             {
                 CreatureInfo ci = (CreatureInfo)it.next();
-                if (ci.equals(type))
+                if (ci.getName().equals(creatureName))
                 {
                     return ci;
                 }
             }
             return null;
-        }
-
-        /** Return true if this list contains all elements of the other
-         *  list, including the right number of duplicates. */
-        boolean contains(CreatureInfoList other)
-        {
-            CreatureInfoList dup = (CreatureInfoList)this.clone();
-            Iterator it = other.iterator();
-            while (it.hasNext())
-            {
-                CreatureInfo ci = (CreatureInfo)it.next();
-                if (!dup.remove(ci))
-                {
-                    return false;
-                }
-            }
-            return true;
         }
 
         void removeLastUncertainCreature()
@@ -536,6 +910,53 @@ Log.debug("Adjusting parent node " + markerId);
             }
             Log.error("No uncertain creatures");
         }
+
+        boolean isSupersetOf(CreatureInfoList other)
+        {
+            Iterator it = other.iterator();
+            while (it.hasNext())
+            {
+                CreatureInfo ci = (CreatureInfo)it.next();
+                if (numCreature(ci.getName()) < 
+                    other.numCreature(ci.getName()))
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        /** Remove the first element matching name.  Return true if found. */
+        boolean removeCreatureByName(String name)
+        {
+            Iterator it = iterator();
+            while (it.hasNext())
+            {
+                CreatureInfo ci = (CreatureInfo)it.next();
+                if (name.equals(ci.getName()))
+                {
+                    it.remove();
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        CreatureNameList getCreatureNames()
+        {
+            CreatureNameList list = new CreatureNameList();
+            Iterator it = iterator();
+            while (it.hasNext())
+            {
+                CreatureInfo ci = (CreatureInfo)it.next();
+                list.add(ci.getName());
+            }
+            return list;
+        }
+    }
+
+    private class CreatureNameList extends ArrayList
+    {
     }
 
 
