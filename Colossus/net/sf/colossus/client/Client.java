@@ -54,16 +54,14 @@ public final class Client
 
     // Information on the current moving legion.
     private String moverId;
-    private int entrySide;
-    private boolean teleport;
 
     /** The end of the list is on top in the z-order. */
     private java.util.List markers = new ArrayList();
 
     private java.util.List recruitChits = new ArrayList();
 
-    // Per-client and per-player options. 
-    private Options options; 
+    // Per-client and per-player options.
+    private Options options;
     private boolean optionChanged = false;
 
     /** Player who owns this client. */
@@ -104,8 +102,7 @@ public final class Client
     /** If the game is over, then quitting does not require confirmation. */
     private boolean gameOver;
 
-    /** The primary client controls some game options.  If all players
-     *  are AIs, then the primary client gets a board and map. */
+    /** If all players are AIs, then the primary client gets a GUI. */
     private boolean primary;
 
     /** One per player. */
@@ -117,6 +114,8 @@ public final class Client
     private int numPlayers;
 
     private String currentLookAndFeel = null;
+
+    private Movement movement = new Movement(this);
 
 
     public Client(Server server, String playerName, boolean primary)
@@ -302,6 +301,7 @@ public final class Client
         return options.getIntOption(optname);
     }
 
+    /** Public so that server can set autoPlay for AIs. */
     public void setOption(String optname, String value)
     {
         if (!value.equals(getStringOption(optname)))
@@ -321,6 +321,8 @@ public final class Client
     {
         setOption(optname, String.valueOf(value));
     }
+
+
 
     /** Trigger side effects after changing an option value. */
     private void optionTrigger(String optname, String value)
@@ -375,6 +377,7 @@ public final class Client
         syncOptions();
     }
 
+    // TODO Call this implicitly
     /** Save player options to a file.  The current format is standard
      *  java.util.Properties keyword=value. */
     void saveOptions()
@@ -453,7 +456,7 @@ public final class Client
             playerInfo = new PlayerInfo[numPlayers];
             for (int i = 0; i < numPlayers; i++)
             {
-                playerInfo[i] = new PlayerInfo();
+                playerInfo[i] = new PlayerInfo(this);
             }
         }
 
@@ -813,7 +816,18 @@ public final class Client
             if (chit.isDead())
             {
                 it.remove();
-                // TODO Also remove it from other places e.g. LegionInfo.
+
+                // Also remove it from LegionInfo.
+                // XXX test this for Titans
+                String name = chit.getId();
+                if (chit.isInverted())
+                {
+                    getLegionInfo(defenderMarkerId).removeCreature(name);
+                }
+                else
+                {
+                    getLegionInfo(attackerMarkerId).removeCreature(name);
+                }
             }
         }
         if (map != null)
@@ -1572,6 +1586,7 @@ Log.debug("called Client.acquireAngelCallback()");
         {
             LegionInfo info = (LegionInfo)it.next();
             info.setMoved(false);
+            info.setTeleported(false);
             info.setRecruited(false);
         }
     }
@@ -1903,7 +1918,6 @@ Log.debug("called Client.acquireAngelCallback()");
     }
 
 
-    // TODO cache, after getting list of lords
     private String figureTeleportingLord(String hexLabel)
     {
         java.util.List lords = listTeleportingLords(moverId, hexLabel);
@@ -1991,8 +2005,7 @@ Log.debug("called Client.acquireAngelCallback()");
             return;
         }
 
-        Set entrySides = server.getPossibleEntrySides(moverId, hexLabel, 
-            teleport);
+        Set entrySides = listPossibleEntrySides(moverId, hexLabel, teleport);
 
         String entrySide = PickEntrySide.pickEntrySide(board.getFrame(),
             hexLabel, entrySides);
@@ -2019,7 +2032,7 @@ Log.debug("called Client.acquireAngelCallback()");
     }
 
     public void didMove(String markerId, String startingHexLabel,
-        String currentHexLabel)
+        String currentHexLabel, boolean teleport)
     {
         removeRecruitChit(startingHexLabel);
         if (isMyLegion(markerId))
@@ -2028,6 +2041,10 @@ Log.debug("called Client.acquireAngelCallback()");
         }
         getLegionInfo(markerId).setHexLabel(currentHexLabel);
         getLegionInfo(markerId).setMoved(true);
+        if (teleport)
+        {
+            getLegionInfo(markerId).setTeleported(true);
+        }
         if (board != null)
         {
             board.alignLegions(startingHexLabel);
@@ -2042,6 +2059,7 @@ Log.debug("called Client.acquireAngelCallback()");
         removeRecruitChit(currentHexLabel);
         getLegionInfo(markerId).setHexLabel(currentHexLabel);
         getLegionInfo(markerId).setMoved(false);
+        getLegionInfo(markerId).setTeleported(false);
         if (board != null)
         {
             board.alignLegions(formerHexLabel);
@@ -2190,13 +2208,23 @@ Log.debug("found " + set.size() + " hexes");
     /** Return a set of hexLabels. */
     Set listTeleportMoves(String markerId)
     {
-        return server.listTeleportMoves(markerId);
+        LegionInfo info = getLegionInfo(markerId);
+        MasterHex hex = MasterBoard.getHexByLabel(info.getHexLabel());
+        return movement.listTeleportMoves(info, hex, movementRoll);
     }
 
     /** Return a set of hexLabels. */
     Set listNormalMoves(String markerId)
     {
-        return server.listNormalMoves(markerId);
+        LegionInfo info = getLegionInfo(markerId);
+        MasterHex hex = MasterBoard.getHexByLabel(info.getHexLabel());
+        return movement.listNormalMoves(info, hex, movementRoll);
+    }
+
+    Set listPossibleEntrySides(String moverId, String hexLabel, 
+        boolean teleport)
+    {
+        return movement.listPossibleEntrySides(moverId, hexLabel, teleport);
     }
 
 
@@ -2216,7 +2244,8 @@ Log.debug("found " + set.size() + " hexes");
     }
 
 
-    /** public for client-side AI -- do not call from server side */
+    /** Returns a list of markerIds.
+     *  public for client-side AI -- do not call from server side */
     public java.util.List getLegionsByHex(String hexLabel)
     {
         java.util.List markerIds = new ArrayList();
@@ -2225,7 +2254,7 @@ Log.debug("found " + set.size() + " hexes");
         {
             Map.Entry entry = (Map.Entry)it.next();
             LegionInfo info = (LegionInfo)entry.getValue();
-            if (hexLabel.equals(info.getHexLabel()))
+            if (info != null && hexLabel.equals(info.getHexLabel()))
             {
                 markerIds.add(info.getMarkerId());
             }
@@ -2233,7 +2262,9 @@ Log.debug("found " + set.size() + " hexes");
         return markerIds;
     }
 
-    private java.util.List getLegionsByPlayer(String name)
+    /** Returns a list of markerIds.
+     *  public for client-side AI -- do not call from server side */
+    java.util.List getLegionsByPlayer(String name)
     {
         java.util.List markerIds = new ArrayList();
         Iterator it = legionInfo.entrySet().iterator();
@@ -2312,6 +2343,87 @@ Log.debug("found " + set.size() + " hexes");
             }
         }
         return set;
+    }
+
+    boolean isOccupied(String hexLabel)
+    {
+        return !getLegionsByHex(hexLabel).isEmpty();
+    }
+
+    boolean isEngagement(String hexLabel)
+    {
+        java.util.List markerIds = getLegionsByHex(hexLabel);
+        if (markerIds.size() == 2)
+        {
+            String marker0 = (String)markerIds.get(0);
+            LegionInfo info0 = getLegionInfo(marker0);
+            String playerName0 = info0.getPlayerName();
+
+            String marker1 = (String)markerIds.get(1);
+            LegionInfo info1 = getLegionInfo(marker1);
+            String playerName1 = info1.getPlayerName();
+
+            return !playerName0.equals(playerName1);
+        }
+        return false;
+    }
+
+    java.util.List getEnemyLegions(String playerName)
+    {
+        java.util.List markerIds = new ArrayList();
+        Iterator it = legionInfo.values().iterator();
+        while (it.hasNext())
+        {
+            LegionInfo info = (LegionInfo)it.next();
+            String markerId = info.getMarkerId();
+            if (!playerName.equals(info.getPlayerName()))
+            {
+                markerIds.add(markerId);
+            }
+        }
+        return markerIds;
+    }
+
+    java.util.List getEnemyLegions(String hexLabel, String playerName)
+    {
+        java.util.List markerIds = new ArrayList();
+        java.util.List legions = getLegionsByHex(hexLabel);
+        Iterator it = legions.iterator();
+        while (it.hasNext())
+        {
+            String markerId = (String)it.next();
+            if (!playerName.equals(getPlayerNameByMarkerId(markerId)))
+            {
+                markerIds.add(markerId);
+            }
+        }
+        return markerIds;
+    }
+
+    int getNumEnemyLegions(String hexLabel, String playerName)
+    {
+        return getEnemyLegions(hexLabel, playerName).size();
+    }
+
+    java.util.List getFriendlyLegions(String hexLabel, String playerName)
+    {
+        java.util.List markerIds = new ArrayList();
+        java.util.List legions = getLegionsByHex(hexLabel);
+        Iterator it = legions.iterator();
+        while (it.hasNext())
+        {
+            String markerId = (String)it.next();
+            if (playerName.equals(getPlayerNameByMarkerId(markerId)))
+            {
+                markerIds.add(markerId);
+            }
+        }
+        return markerIds;
+    }
+
+    int getNumFriendlyLegions(String hexLabel, String playerName)
+    {
+        return getFriendlyLegions(hexLabel, playerName).size();
     }
 
 
@@ -2684,4 +2796,5 @@ Log.debug("found " + set.size() + " hexes");
         }
         repaintAllWindows();
     }
+
 }

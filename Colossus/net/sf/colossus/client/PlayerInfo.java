@@ -6,6 +6,7 @@ import java.util.*;
 import net.sf.colossus.util.Split;
 import net.sf.colossus.util.Log;
 import net.sf.colossus.server.Player;
+import net.sf.colossus.parser.TerrainRecruitLoader;
 
 
 /**
@@ -17,6 +18,8 @@ import net.sf.colossus.server.Player;
 
 final class PlayerInfo
 {
+    private Client client;
+
     private boolean dead;
     private String name;
     private int tower;
@@ -31,8 +34,9 @@ final class PlayerInfo
     private int mulligansLeft;
 
     /** Two-stage initialization. */
-    PlayerInfo()
+    PlayerInfo(Client client)
     {
+        this.client = client;
     }
 
 
@@ -142,5 +146,25 @@ final class PlayerInfo
     int getMulligansLeft()
     {
         return mulligansLeft;
+    }
+    
+    boolean canTitanTeleport()
+    {
+        return (score >= TerrainRecruitLoader.getTitanTeleportValue());
+    }
+
+    boolean hasTeleported()
+    {
+        Iterator it = client.getLegionsByPlayer(name).iterator();
+        while (it.hasNext())
+        {
+            String markerId = (String)it.next();
+            LegionInfo info = client.getLegionInfo(markerId);
+            if (info.hasTeleported())
+            {
+                return true;
+            }
+        }
+        return false;
     }
 }

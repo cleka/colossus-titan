@@ -1708,11 +1708,12 @@ public final class Game
      *  arrows.  If block == -2, use only arrows.  Do not double back in
      *  the direction you just came from.  Return a set of 
      *  hexLabel:entrySide tuples. */
-    private Set findNormalMoves(MasterHex hex, Player player, Legion legion,
-        int roll, int block, int cameFrom, boolean ignoreFriends)
+    private Set findNormalMoves(MasterHex hex, Legion legion, int roll, 
+        int block, int cameFrom, boolean ignoreFriends)
     {
         Set set = new HashSet();
         String hexLabel = hex.getLabel();
+        Player player = legion.getPlayer();
 
         // If there are enemy legions in this hex, mark it
         // as a legal move and stop recursing.  If there is
@@ -1733,6 +1734,7 @@ public final class Game
 
         if (roll == 0)
         {
+            // XXX fix
             // This hex is the final destination.  Mark it as legal if
             // it is unoccupied by friendly legions.
             Iterator it = player.getLegions().iterator();
@@ -1757,7 +1759,7 @@ public final class Game
 
         if (block >= 0)
         {
-            set.addAll(findNormalMoves(hex.getNeighbor(block), player, legion,
+            set.addAll(findNormalMoves(hex.getNeighbor(block), legion,
                 roll - 1, Constants.ARROWS_ONLY, (block + 3) % 6, 
                 ignoreFriends));
         }
@@ -1767,8 +1769,8 @@ public final class Game
             {
                 if (hex.getExitType(i) >= Constants.ARCH && i != cameFrom)
                 {
-                    set.addAll(findNormalMoves(hex.getNeighbor(i), player,
-                        legion, roll - 1, Constants.ARROWS_ONLY, (i + 3) % 6,
+                    set.addAll(findNormalMoves(hex.getNeighbor(i), legion, 
+                        roll - 1, Constants.ARROWS_ONLY, (i + 3) % 6,
                         ignoreFriends));
                 }
             }
@@ -1779,8 +1781,8 @@ public final class Game
             {
                 if (hex.getExitType(i) >= Constants.ARROW && i != cameFrom)
                 {
-                    set.addAll(findNormalMoves(hex.getNeighbor(i), player,
-                        legion, roll - 1, Constants.ARROWS_ONLY, (i + 3) % 6,
+                    set.addAll(findNormalMoves(hex.getNeighbor(i), legion, 
+                        roll - 1, Constants.ARROWS_ONLY, (i + 3) % 6,
                         ignoreFriends));
                 }
             }
@@ -1792,8 +1794,8 @@ public final class Game
 
     /** Recursively find all unoccupied hexes within roll hexes, for
      *  tower teleport. */
-    private Set findNearbyUnoccupiedHexes(MasterHex hex, Player player,
-        Legion legion, int roll, int cameFrom, boolean ignoreFriends)
+    private Set findNearbyUnoccupiedHexes(MasterHex hex, Legion legion, 
+        int roll, int cameFrom, boolean ignoreFriends)
     {
         // This hex is the final destination.  Mark it as legal if
         // it is unoccupied.
@@ -1813,7 +1815,7 @@ public final class Game
                    hex.getEntranceType(i) != Constants.NONE))
                 {
                     set.addAll(findNearbyUnoccupiedHexes(hex.getNeighbor(i),
-                        player, legion, roll - 1, (i + 3) % 6, ignoreFriends));
+                        legion, roll - 1, (i + 3) % 6, ignoreFriends));
                 }
             }
         }
@@ -1861,8 +1863,8 @@ public final class Game
             return new HashSet();
         }
 
-        Set tuples = findNormalMoves(hex, legion.getPlayer(), legion,
-            movementRoll, findBlock(hex), Constants.NOWHERE, ignoreFriends);
+        Set tuples = findNormalMoves(hex, legion, movementRoll, findBlock(hex),
+            Constants.NOWHERE, ignoreFriends);
 
         // Extract just the hexLabels from the hexLabel:entrySide tuples.
         Set hexLabels = new HashSet();
@@ -1879,12 +1881,11 @@ public final class Game
 
     private boolean towerTeleportAllowed()
     {
-        if (options.getOption(Options.noTowerTeleport))
+        if (getOption(Options.noTowerTeleport))
         {
             return false;
         }
-        if (getTurnNumber() == 1 &&
-            options.getOption(Options.noFirstTurnTeleport))
+        if (getTurnNumber() == 1 && getOption(Options.noFirstTurnTeleport))
         {
             return false;
         }
@@ -1897,8 +1898,7 @@ public final class Game
         {
             return false;
         }
-        if (getTurnNumber() == 1 &&
-            options.getOption(Options.noFirstTurnT2TTeleport))
+        if (getTurnNumber() == 1 && getOption(Options.noFirstTurnT2TTeleport))
         {
             return false;
         }
@@ -1911,7 +1911,7 @@ public final class Game
         {
             return false;
         }
-        if (options.getOption(Options.towerToTowerTeleportOnly))
+        if (getOption(Options.towerToTowerTeleportOnly))
         {
             return false;
         }
@@ -1921,12 +1921,11 @@ public final class Game
     
     private boolean titanTeleportAllowed()
     {
-        if (options.getOption(Options.noTitanTeleport))
+        if (getOption(Options.noTitanTeleport))
         {
             return false;
         }
-        if (getTurnNumber() == 1 &&
-            options.getOption(Options.noFirstTurnTeleport))
+        if (getTurnNumber() == 1 && getOption(Options.noFirstTurnTeleport))
         {
             return false;
         }
@@ -1935,27 +1934,27 @@ public final class Game
 
 
     /** Return set of hexLabels describing where this legion can teleport.
-     *  Include moves currently blocked by friendly
-     *  legions if ignoreFriends is true. */
+     *  Include moves currently blocked by friendly legions if 
+     *  ignoreFriends is true. */
     Set listTeleportMoves(Legion legion, MasterHex hex, int movementRoll, 
         boolean ignoreFriends)
     {
+        Player player = legion.getPlayer();
+
         Set set = new HashSet();
-        if (movementRoll != 6 || legion.hasMoved())
+        if (movementRoll != 6 || legion.hasMoved() || player.hasTeleported())
         {
             return set;
         }
 
-        Player player = legion.getPlayer();
-
         // Tower teleport
         if (HexMap.terrainIsTower(hex.getTerrain()) && legion.numLords() > 0 &&
-            !player.hasTeleported() && towerTeleportAllowed())
+            towerTeleportAllowed())
         {
             // Mark every unoccupied hex within 6 hexes.
             if (towerToNonTowerTeleportAllowed())
             {
-                set.addAll(findNearbyUnoccupiedHexes(hex, player, legion, 6,
+                set.addAll(findNearbyUnoccupiedHexes(hex, legion, 6,
                     Constants.NOWHERE, ignoreFriends));
             }
 
@@ -2017,7 +2016,7 @@ public final class Game
     /** Return a Set of Strings "Left" "Right" or "Bottom" describing
      *  possible entry sides.  If the hex is unoccupied, just return 
      *  one entry side since it doesn't matter. */
-    Set getPossibleEntrySides(String markerId, String targetHexLabel,
+    Set listPossibleEntrySides(String markerId, String targetHexLabel,
         boolean teleport)
     {
         Set entrySides = new HashSet();
@@ -2056,7 +2055,7 @@ public final class Game
         }
 
         // Normal moves.
-        Set tuples = findNormalMoves(currentHex, player, legion, movementRoll, 
+        Set tuples = findNormalMoves(currentHex, legion, movementRoll, 
             findBlock(currentHex), Constants.NOWHERE, false);
         Iterator it = tuples.iterator();
         while (it.hasNext())
@@ -2361,7 +2360,7 @@ Log.debug("" + findEngagements().size() + " engagements left");
         }
 
         // Verify that the entry side is legal.
-        Set legalSides = getPossibleEntrySides(markerId, hexLabel, teleport);
+        Set legalSides = listPossibleEntrySides(markerId, hexLabel, teleport);
         if (!legalSides.contains(entrySide))
         {
             return false;
@@ -2389,6 +2388,7 @@ Log.debug("" + findEngagements().size() + " engagements left");
     }
 
 
+    // XXX Try to merge with the other version.
     /** Simplified version for AIs and clients that really don't care about
      *  teleport versus ground or entry sides or teleporting lords. */
     boolean doMove(String markerId, String hexLabel)
@@ -2415,7 +2415,7 @@ Log.debug("" + findEngagements().size() + " engagements left");
                 hexLabel).get(0));
         }
 
-        Set sides = getPossibleEntrySides(markerId, hexLabel, teleport);
+        Set sides = listPossibleEntrySides(markerId, hexLabel, teleport);
         String entrySide = "";
         if (!sides.isEmpty())
         {
@@ -2429,7 +2429,8 @@ Log.debug("Game.doMove() teleport=" + teleport + " lord=" + teleportingLord +
             teleportingLord);
         if (moved)
         {
-            server.allTellDidMove(markerId, startingHexLabel, hexLabel);
+            server.allTellDidMove(markerId, startingHexLabel, hexLabel, 
+                teleport);
         }
         return moved;
     }

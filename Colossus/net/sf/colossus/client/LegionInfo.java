@@ -29,6 +29,7 @@ public final class LegionInfo
     private Marker marker;
     private String lastRecruit;
     private boolean moved;
+    private boolean teleported;
     private boolean recruited;
 
     /** Creature name strings for *known* contents.  Never null. */
@@ -265,6 +266,30 @@ public final class LegionInfo
         return getContents().contains("Titan");
     }
 
+    int numLords()
+    {
+        int count = 0;
+
+        Iterator it = getContents().iterator();
+        while (it.hasNext())
+        {
+            String name = (String)it.next();
+            if (name.startsWith("Titan"))
+            {
+                count++;
+            }
+            else
+            {
+                Creature creature = Creature.getCreatureByName(name);
+                if (creature != null && creature.isLord())
+                {
+                    count++;
+                }
+            }
+        }
+        return count;
+    }
+
 
     // XXX Hardcoded to just archangels and angels for now.
     public String bestSummonable()
@@ -353,6 +378,7 @@ Log.debug("LegionInfo.isEngaged() says there are " + numInHex);
         return lastRecruit;
     }
 
+
     void setMoved(boolean moved)
     {
         this.moved = moved;
@@ -362,6 +388,17 @@ Log.debug("LegionInfo.isEngaged() says there are " + numInHex);
     {
         return moved;
     }
+
+    void setTeleported(boolean teleported)
+    {
+        this.teleported = teleported;
+    }
+
+    boolean hasTeleported()
+    {
+        return teleported;
+    }
+
 
     void setRecruited(boolean recruited)
     {

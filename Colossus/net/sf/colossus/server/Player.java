@@ -268,8 +268,7 @@ Log.debug("Called Player.setType() for " + name + " " + type);
 
     boolean canTitanTeleport()
     {
-        return (score >= TerrainRecruitLoader.getTitanTeleportValue() && 
-            !hasTeleported());
+        return (score >= TerrainRecruitLoader.getTitanTeleportValue());
     }
 
 

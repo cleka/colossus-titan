@@ -1053,18 +1053,19 @@ Log.debug("called Server.createSummonAngel for " + legion);
         if (game.doMove(markerId, hexLabel, entrySide, teleport,
             teleportingLord))
         {
-            allTellDidMove(markerId, startingHexLabel, hexLabel);
+            allTellDidMove(markerId, startingHexLabel, hexLabel, teleport);
         }
     }
 
     void allTellDidMove(String markerId, String startingHexLabel,
-        String endingHexLabel)
+        String endingHexLabel, boolean teleport)
     {
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
             Client client = (Client)it.next();
-            client.didMove(markerId, startingHexLabel, endingHexLabel);
+            client.didMove(markerId, startingHexLabel, endingHexLabel, 
+                teleport);
         }
     }
 
@@ -1160,35 +1161,6 @@ Log.debug("called Server.createSummonAngel for " + legion);
             Client client = (Client)it.next();
             client.revealCreatures(legion.getMarkerId(), names);
         }
-    }
-
-
-    // XXX delete add logic to client
-    /** Return a set of hexLabels. */
-    public Set listTeleportMoves(String markerId)
-    {
-        Legion legion = game.getLegionByMarkerId(markerId);
-        return game.listTeleportMoves(legion, legion.getCurrentHex(),
-            legion.getPlayer().getMovementRoll(), false);
-    }
-
-    // XXX delete add logic to client
-    /** Return a set of hexLabels. */
-    public Set listNormalMoves(String markerId)
-    {
-        Legion legion = game.getLegionByMarkerId(markerId);
-        return game.listNormalMoves(legion, legion.getCurrentHex(),
-            legion.getPlayer().getMovementRoll(), false);
-    }
-
-
-    // XXX delete add logic to client
-    /** Return an int which is all possible entry sides (1, 3, 5)
-     *  added together. */
-    public Set getPossibleEntrySides(String markerId, String hexLabel,
-        boolean teleport)
-    {
-        return game.getPossibleEntrySides(markerId, hexLabel, teleport);
     }
 
 
