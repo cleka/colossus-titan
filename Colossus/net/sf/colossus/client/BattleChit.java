@@ -38,6 +38,7 @@ final class BattleChit extends Chit
     // inner scale divided by border thickness
     static final int borderRatio = 20;  
 
+    private static boolean useColouredBorders = false;
 
     BattleChit(int scale, String id, Container container, boolean inverted,
         int tag, String currentHexLabel, String colorName)
@@ -235,14 +236,17 @@ final class BattleChit extends Chit
             g2.setFont(oldFont);
 
         }
-        // Draw border using player color.
-        g2.setColor(color);
-        g2.setStroke(borderStroke);
-        g2.drawRect(midRect.x, midRect.y, midRect.width, midRect.height);
-        g2.setColor(Color.black);
-        g2.setStroke(oneWide);
-        g2.drawRect(outerRect.x, outerRect.y, outerRect.width, 
-            outerRect.height);
+        if (useColouredBorders)
+        {
+            // Draw border using player color.
+            g2.setColor(color);
+            g2.setStroke(borderStroke);
+            g2.drawRect(midRect.x, midRect.y, midRect.width, midRect.height);
+            g2.setColor(Color.black);
+            g2.setStroke(oneWide);
+            g2.drawRect(outerRect.x, outerRect.y, outerRect.width, 
+                        outerRect.height);
+        }
     }
 
     public void setLocation(Point point)
@@ -290,5 +294,10 @@ final class BattleChit extends Chit
     public String toString()
     {
         return getDescription();
+    }
+
+    public static void setUseColouredBorders(boolean bval)
+    {
+        useColouredBorders = bval;
     }
 }

@@ -508,6 +508,11 @@ public final class Client implements IClient
             net.sf.colossus.util.ResourceLoader.purgeImageCache();
             repaintAllWindows();
         }
+        else if (optname.equals(Options.useColouredBorders))
+        {
+            BattleChit.setUseColouredBorders(bval);
+            repaintAllWindows();
+        }
         else if (optname.equals(Options.logDebug))
         {
             Log.setShowDebug(bval);
