@@ -36,6 +36,7 @@ class Turn extends Dialog implements ActionListener
     
     void setupSplitDialog()
     {
+System.out.println("setupSplitDialog");
         Player player = game.getActivePlayer();
         setTitle(player.getName() + " Turn " + game.getTurnNumber());
 
@@ -73,6 +74,7 @@ class Turn extends Dialog implements ActionListener
 
     void setupMoveDialog()
     {
+System.out.println("setupMoveDialog");
         removeAll();
         Player player = game.getActivePlayer();
         if (player.getMulligansLeft() > 0)
@@ -121,6 +123,7 @@ class Turn extends Dialog implements ActionListener
     
     void setupFightDialog()
     {
+System.out.println("setupFightDialog");
         // Highlight hexes with engagements.
         // If there are no engagements, move forward to the muster phase.
         if (board.highlightEngagements() < 1)
@@ -150,6 +153,7 @@ class Turn extends Dialog implements ActionListener
 
     void setupMusterDialog()
     {
+System.out.println("setupMusterDialog");
         removeAll();
         setLayout(new GridLayout(0, 2));
 
