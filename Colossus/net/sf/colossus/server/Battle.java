@@ -20,6 +20,7 @@ import net.sf.colossus.client.BattleMap;
  *
  * @version $Id$
  * @author David Ripton
+ * @author Romain Dolbeau
  */
 
 final class Battle
@@ -886,18 +887,11 @@ final class Battle
             while (it.hasNext())
             {
                 Critter critter = (Critter)it.next();
-                if (critter.getCurrentHex().getTerrain() == 'd' &&
-                    !critter.isNativeDrift())
+                int dam = critter.getCurrentHex().damageToCreature(critter);
+                if (dam >= 0)
                 {
-                    Log.event(critter.getName() + " takes drift damage");
-                    critter.wound(1);
-                }
-                if (critter.getCurrentHex().getTerrain() == 's' &&
-                    critter.isWaterDwelling())
-                {
-                    Log.event(critter.getName() +
-                              ", a Water Dweller, takes sand damage");
-                    critter.wound(1);
+                    critter.wound(dam);
+                    Log.event(critter.getName() + " takes Hex damage");
                 }
             }
         }

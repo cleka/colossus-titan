@@ -428,6 +428,28 @@ public class BattleHex extends Hex
         return(true);
     }
 
+    /**
+     * Return how much damage the Creature should take from this Hex.
+     * @param creature The Creature that may suffer damage.
+     * @return HOw much damage the Creature should take from being there.
+     */
+    public int damageToCreature(Creature creature)
+    {
+        char terrain = getTerrain();
+        if ((terrain == 'd') &&
+            (!creature.isNativeDrift()))
+        { // Non-native take damage in Drift
+            return 1;
+        }
+        if ((terrain == 's') &&
+            (creature.isWaterDwelling()))
+        { // Water Dweller (amphibious) take damage in Sand
+            return 1;
+        }
+        // default : no damage !
+        return 0;
+    }
+
     public boolean isCliff(int hexside)
     {
         return getHexside(hexside) == 'c' || 
