@@ -21,7 +21,7 @@ final class PickStrikePenalty extends KDialog implements ActionListener
     PickStrikePenalty(JFrame parentFrame, Client client, 
         java.util.List choices)
     {
-        super(parentFrame, "Take strike penalty to carry?", false);
+        super(parentFrame, "Take strike penalty to carry?", true);
 
         this.client = client;
 
