@@ -239,16 +239,6 @@ public final class Client
 
     public String getStringOption(String optname)
     {
-        // If autoPlay is set, all options that start with "Auto" return true.
-        if (optname.startsWith("Auto"))
-        {
-            String value = options.getProperty(Options.autoPlay);
-            if (value != null && value.equals("true"))
-            {
-                return "true";
-            }
-        }
-
         String value = options.getProperty(optname);
         return value;
     }
@@ -291,6 +281,27 @@ public final class Client
         // TODO Add some triggers so that if autoPlay or autoSplit is set
         // during this player's split phase, the appropriate action
         // is called.
+    }
+
+    public void setIntOption(String optname, int value)
+    {
+        options.setProperty(optname, String.valueOf(value));
+    }
+
+    /** Return -1 if the option's value has not been set. */
+    public int getIntOption(String optname)
+    {
+        String buf = options.getProperty(optname);
+        int value = -1;
+        try
+        {
+            value = Integer.parseInt(buf);
+        }
+        catch (Exception ex)
+        {
+            value = -1;
+        }
+        return value;
     }
 
 

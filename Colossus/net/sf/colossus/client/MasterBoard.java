@@ -91,6 +91,7 @@ public final class MasterBoard extends JPanel
     public static final String viewRecruitInfo = "View Recruit Info";
     public static final String viewBattleMap = "View Battle Map";
     public static final String changeScale = "Change Scale";
+    public static final String changeAIDelay = "Change AI Delay";
 
     public static final String about = "About";
 
@@ -113,6 +114,7 @@ public final class MasterBoard extends JPanel
     private AbstractAction viewRecruitInfoAction;
     private AbstractAction viewBattleMapAction;
     private AbstractAction changeScaleAction;
+    private AbstractAction changeAIDelayAction;
 
     private AbstractAction aboutAction;
 
@@ -457,6 +459,15 @@ public final class MasterBoard extends JPanel
             }
         };
 
+        changeAIDelayAction = new AbstractAction(changeAIDelay)
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                PickDelay.pickDelay(masterFrame, client, 
+                    client.getIntOption(Options.aiDelay));
+            }
+        };
+
         aboutAction = new AbstractAction(about)
         {
             public void actionPerformed(ActionEvent e)
@@ -501,8 +512,6 @@ public final class MasterBoard extends JPanel
         cbmi.setMnemonic(mnemonic);
         cbmi.setSelected(client.getOption(name));
 
-        // Its a little wasteful to create a separate object
-        // but a little cleaner to have a separate inner class
         cbmi.addItemListener(m_oItemListener);
         menu.add(cbmi);
         checkboxes.put(name, cbmi);
@@ -550,6 +559,8 @@ public final class MasterBoard extends JPanel
         addCheckBox(gameMenu, Options.autosave, KeyEvent.VK_A);
         addCheckBox(gameMenu, Options.allStacksVisible, KeyEvent.VK_S);
         addCheckBox(gameMenu, Options.logDebug, KeyEvent.VK_L);
+        mi = gameMenu.add(changeAIDelayAction);
+        mi.setMnemonic(KeyEvent.VK_D);
 
         // Then per-player options
 
@@ -1830,7 +1841,6 @@ public final class MasterBoard extends JPanel
         {
             masterFrame.setState(JFrame.NORMAL);
         }
-        //XXX Needed?  masterFrame.show();
     }
 
 

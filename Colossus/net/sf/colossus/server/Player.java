@@ -76,6 +76,21 @@ public final class Player implements Comparable
     }
 
 
+    boolean isHuman()
+    {
+        return type.endsWith("Human");
+    }
+
+    boolean isAI()
+    {
+        return type.endsWith("AI");
+    }
+
+    boolean isNone()
+    {
+        return type.endsWith("none");
+    }
+
     String getType()
     {
         return type;

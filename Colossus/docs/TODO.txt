@@ -25,9 +25,6 @@ When a stack flees, make the winning stack visible, to the fleeing
    legion's player's client only.  (Per-player rather than global
    stack visibility.)
 
-Make advance phase delay configurable.
-Add AI time limits.
-
 Improve mapping of terrain types, creature nativity, and creature
    recruiting potential so that the AI can easily take these into
    account.

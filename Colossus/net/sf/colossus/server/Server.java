@@ -214,7 +214,7 @@ public final class Server
         for (int i = 0; i < game.getNumPlayers(); i++)
         {
             Player player = game.getPlayer(i);
-            if (player.getType().endsWith("Human"))
+            if (player.isHuman())
             {
                 return i;
             }
@@ -242,6 +242,38 @@ public final class Server
             return client.getStringOption(optname);
         }
         return "false";
+    }
+
+    int getClientIntOption(String playerName, String optname)
+    {
+        Client client = getClient(playerName);
+        if (client != null)
+        {
+            return client.getIntOption(optname);
+        }
+        return -1;
+    }
+
+    int getClientIntOption(int playerNum, String optname)
+    {
+        Client client = getClient(playerNum);
+        if (client != null)
+        {
+            return client.getIntOption(optname);
+        }
+        return -1;
+    }
+
+    /** Get the option from the first human-controlled client.  If there 
+     *  are none, get the option from the first AI-controlled client. */
+    int getClientIntOption(String optname)
+    {
+        int clientNum = getFirstHumanClientNum();
+        if (clientNum == -1)
+        {
+            clientNum = 0;
+        }
+        return getClientIntOption(clientNum, optname);
     }
 
     /** XXX temp */

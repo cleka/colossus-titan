@@ -213,12 +213,11 @@ public final class Game
         while (it.hasNext())
         {
             Player player = (Player)it.next();
-            String type = player.getType();
-            if (type.endsWith("AI"))
+            if (player.isAI())
             {
                 server.setClientOption(i, Options.autoPlay, true);
             }
-            else if (type.endsWith("Human"))
+            else if (player.isHuman())
             {
                 server.setClientOption(i, Options.autoPlay, false);
             }
@@ -271,18 +270,19 @@ public final class Game
     private void pickPlayerColor(int i, String type, Set colorsLeft)
     {
         Player player = (Player)players.get(i);
-        if (player.getType().endsWith("none"))
+        if (player.isNone())
         {
             return;
         }
-        if (player.getType().endsWith("Human") && (!type.endsWith("Human")))
+        if (player.isHuman() && (!type.endsWith("Human")))
         {
             return;
         }
-        if (!player.getType().endsWith("Human") && (type.endsWith("Human")))
+        if (player.isAI() && (type.endsWith("Human")))
         {
             return;
         }
+
         String playerName = player.getName();
         String color;
         do
@@ -579,8 +579,15 @@ public final class Game
             }
         };
 
-        // This needs to be configurable.
-        int delay = 100;
+        int delay = server.getClientIntOption(Options.aiDelay);
+        if (getActivePlayer().isHuman() || delay < 0) 
+        {
+            delay = 0;
+        }
+        if (delay > 5000)
+        {
+            delay = 5000;
+        }
 
         // java.util.Timer is not present in JDK 1.2, so use the Swing
         // timer for compatibility.
@@ -1108,7 +1115,7 @@ public final class Game
             {
                 Player player = (Player)it.next();
                 String name = player.getName();
-                if (player.getType().endsWith("AI"))
+                if (player.isAI())
                 {
                     server.setClientOption(name, Options.autoPlay, true);
                 }

@@ -6,35 +6,43 @@ import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.event.*;
 
+import net.sf.colossus.server.Options;
+
 
 /** 
- *  Allows picking a new GUI scale for a client.
- *  @version $Id$
+ *  Allows picking a new AI delay.
+ *  @version $Id$ 
  *  @author David Ripton
  */
 
-final class PickScale extends JDialog implements WindowListener,
+final class PickDelay extends JDialog implements WindowListener,
     ChangeListener, ActionListener
 {
-    private static int newScale;
+    private static int newDelay;
     // A JSpinner would be better, but is not supported until JDK 1.4.
     private JSlider slider;
+    private Client client;
 
 
-    private PickScale(JFrame parentFrame, int oldScale)
+    private PickDelay(JFrame parentFrame, Client client, int oldDelay)
     {
-        super(parentFrame, "Set Scale", true);
+        super(parentFrame, "Set AI Delay in ms", false);
+
+        this.client = client;
 
         setBackground(Color.lightGray);
-
         addWindowListener(this);
 
         Container contentPane = getContentPane();
         contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
 
-        slider = new JSlider(JSlider.HORIZONTAL, 5, 25, oldScale);
-        slider.setMajorTickSpacing(5);
-        slider.setMinorTickSpacing(1);
+        if (oldDelay < 0)
+        {
+            oldDelay = 0;
+        }
+        slider = new JSlider(JSlider.HORIZONTAL, 0, 3000, oldDelay);
+        slider.setMajorTickSpacing(1000);
+        slider.setMinorTickSpacing(250);
         slider.setPaintTicks(true);
         slider.setPaintLabels(true);
         contentPane.add(slider);
@@ -62,18 +70,15 @@ final class PickScale extends JDialog implements WindowListener,
         repaint();
     }
 
-    /** Return the new scale if the user accepted it, or -1 if the
-     *  user cancelled the dialog. */
-    static int pickScale(JFrame parentFrame, int oldScale)
+    static void pickDelay(JFrame parentFrame, Client client, int oldDelay)
     {
-        new PickScale(parentFrame, oldScale);
-        return newScale;
+        new PickDelay(parentFrame, client, oldDelay);
     }
 
 
     public void stateChanged(ChangeEvent e)
     {
-        newScale = slider.getValue();
+        newDelay = slider.getValue();
     }
 
     public void actionPerformed(ActionEvent e)
@@ -81,11 +86,19 @@ final class PickScale extends JDialog implements WindowListener,
         if (e.getActionCommand().equals("Accept"))
         {
             dispose();
+            if (client != null)
+            {
+                client.setIntOption(Options.aiDelay, newDelay);
+            }
         }
         else if (e.getActionCommand().equals("Cancel"))
         {
-            newScale = -1;
+            newDelay = -1;
             dispose();
+            if (client != null)
+            {
+                client.setIntOption(Options.aiDelay, newDelay);
+            }
         }
     }
 
@@ -121,8 +134,6 @@ final class PickScale extends JDialog implements WindowListener,
     public static void main(String [] args)
     {
         JFrame frame = new JFrame();
-        int scale = PickScale.pickScale(frame, 15);
-        System.out.println("new scale is " + scale);
-        System.exit(0);
+        PickDelay.pickDelay(frame, null, 100);
     }
 }

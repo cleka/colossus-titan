@@ -363,7 +363,16 @@ final class Battle
                 advancePhaseInternal();
             }
         };
-        int delay = 100;
+        int delay = game.getServer().getClientIntOption(Options.aiDelay);
+        if (getActivePlayer().isHuman() || delay < 0)
+        {
+            delay = 0;
+        }
+        if (delay > 5000)
+        {
+            delay = 5000;
+        }
+
         javax.swing.Timer timer = new javax.swing.Timer(delay, phaseAdvancer);
         timer.setRepeats(false);
         timer.start();
