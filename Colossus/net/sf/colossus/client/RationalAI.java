@@ -675,6 +675,13 @@ public class RationalAI extends SimpleAI implements AI
         Log.debug("This is RationalAI.");
         PlayerInfo player = client.getPlayerInfo();
 
+        if(enemyAttackMap==null)
+        {
+            // special code to allow game to reload prperly if saved
+            // during AI move
+            enemyAttackMap = buildEnemyAttackMap(client.getPlayerInfo());
+        }
+
         // consider mulligans
         if (handleMulligans(player))
         {
