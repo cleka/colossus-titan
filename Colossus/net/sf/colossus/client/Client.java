@@ -623,7 +623,8 @@ Log.debug("Client.makeForcedStrikes()");
         markers.add(marker);
     }
 
-    /** Remove the first marker with this id from the list. */
+    /** Remove the first marker with this id from the list.
+     *  Also remove any recruitChits for this marker's hex. */
     public void removeMarker(String id)
     {
         Iterator it = markers.iterator();
@@ -632,16 +633,16 @@ Log.debug("Client.makeForcedStrikes()");
             Marker marker = (Marker)it.next();
             if (marker.getId().equals(id))
             {
-                // Ordering of deleting stuff is tricky.  Test.
                 String hexLabel = getHexForLegion(id);
                 it.remove();
                 legionToHex.remove(id);
-Log.debug("removed marker from iterator and legionToHex");
                 if (board != null)
                 {
                     board.alignLegions(hexLabel);
-Log.debug("called board.alignLegions() for " + hexLabel);
                 }
+                // XXX Not perfect, but since we don't track recruitChits
+                // by legion this is as good as we can do for now.
+                removeRecruitChit(hexLabel);
                 return;
             }
         }
@@ -1149,8 +1150,7 @@ Log.debug("new PickCarry");
         }
     }
 
-    // TODO Handle this from tellStrikeResults()
-    void setBattleChitDead(int tag)
+    private void setBattleChitDead(int tag)
     {
         Iterator it = battleChits.iterator();
         while (it.hasNext())
@@ -1164,8 +1164,7 @@ Log.debug("new PickCarry");
         }
     }
 
-    // TODO Handle this from tellStrikeResults()
-    void setBattleChitHits(int tag, int hits)
+    private void setBattleChitHits(int tag, int hits)
     {
         Iterator it = battleChits.iterator();
         while (it.hasNext())

@@ -1960,6 +1960,8 @@ public final class Game
             String typeColonDonor = player.aiSummonAngel(attacker);
             if (typeColonDonor == null)
             {
+                // XXX testing Peter's fix
+                player.setDonorId(null);
                 return;
             }
             int split = typeColonDonor.indexOf(':');
