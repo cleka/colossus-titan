@@ -78,7 +78,7 @@ public final class LegionInfo
     }
 
 
-    String getMarkerId()
+    public String getMarkerId()
     {
         return markerId;
     }

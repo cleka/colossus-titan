@@ -1835,7 +1835,7 @@ public class SimpleAI implements AI
 
         String [] summonables = { "Archangel", "Angel" };
 
-        String bestLegion = null;
+        LegionInfo bestLegion = null;
         String bestAngel = null;
 
         Iterator it = hexLabels.iterator();
@@ -1864,11 +1864,11 @@ public class SimpleAI implements AI
                     (Creature.getCreatureByName(myAngel).getPointValue() ==
                         Creature.getCreatureByName(bestAngel).getPointValue()))
             {
-                bestLegion = markerId;
+                bestLegion = info;
                 bestAngel = myAngel;
             }
         }
-        return bestAngel + ":" + bestLegion;
+        return bestAngel + ":" + bestLegion.getMarkerId();
     }
 
 
