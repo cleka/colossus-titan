@@ -59,7 +59,7 @@ This file define the Colossus Recruit Trees ; what
 can recruit and be recruited on what terrain. it's composed
 of a succession of line:
 
-<terrain_letter> <terrain_color> <terrain_name> (<recruiter_needed> <recruit>)+
+<terrain_letter> <terrain_color> <terrain_name> <underecruit_allowed> (<recruiter_needed> <recruit>)+
 
 <terrain_letter> is the letter internaly used to identify the terrain.
  they must all be different.
@@ -68,6 +68,9 @@ of a succession of line:
  see HTMLColor.java for the various available color.
 
 <terrain_name> is the descriptive name of the terrain (Brush, ...)
+
+<underecruit_allowed> is a boolean (i.e. true or false) telling if
+a Creature can recruit below its rank (usually true except for Tower).
 
 <recruiter_needed> is the number of lower-rank creature needed
  to recruit the next creature.

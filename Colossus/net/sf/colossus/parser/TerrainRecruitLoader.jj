@@ -35,8 +35,12 @@ public class TerrainRecruitLoader
      */
     Hashtable carToColor = new Hashtable();
     /**
+     * Map a character (representing a terrain) to a boolean, telling if a Creature can recruit belowe its rank or not.
+     */
+    Hashtable carToBelow = new Hashtable();
+    /**
      * All the character that are valid terrains.
-     */    
+     */
     private char[] terrains = null;
 
     /**
@@ -220,6 +224,7 @@ public class TerrainRecruitLoader
             ArrayList al = (ArrayList)carToRecruits.get(new Character(terrain));
             java.util.List pc = getPossibleRecruits(terrain);
             java.util.List pr = getPossibleFakeRecruiters(terrain);
+            boolean recruitBelow = ((Boolean)carToBelow.get(new Character(terrain))).booleanValue();
 
             int iReer = pc.indexOf(recruiter);
             int iRe = pc.indexOf(recruit);
@@ -229,8 +234,8 @@ public class TerrainRecruitLoader
             { // can't be recruited here
                 return 99;
             }
-            if (iReer >= iRe)
-            { // only one to recruit same or below
+            if ((iReer >= iRe) && recruitBelow)
+            { // only one to recruit same or below if possible
                 return 1;
             }
             if ((iReer != -1) && ((iReer+1) < iRe))
@@ -345,8 +350,20 @@ TOKEN :
 
 TOKEN :
 {
+    < BOOL: "true"|"false" >
+}
+
+TOKEN :
+{
     < CHAINE : (<CAR>)+ >
 |   < #CAR : ["a"-"z","A"-"Z"] >
+}
+
+boolean r_bool() :
+{}
+{
+    <BOOL>
+    { if (token.image.equals("true")) return true; else return false; }
 }
 
 char r_char() :
@@ -399,13 +416,16 @@ int oneTerrain() :
     char tc;
     ArrayList rl;
     String s;
+    boolean rb;
 }
 {
-    (tc = r_char()) (col = r_chaine()) (t = r_chaine()) (rl = r_allRecruit())
+    (tc = r_char()) (col = r_chaine()) (t = r_chaine())
+        (rb = r_bool()) (rl = r_allRecruit())
     {
         carToRecruits.put(new Character(tc), rl);
         carToName.put(new Character (tc), t);
         carToColor.put(new Character (tc), HTMLColor.stringToColor(col));
+        carToBelow.put(new Character (tc), new Boolean (rb));
         if (terrains == null)
         {
             terrains = new char[1];

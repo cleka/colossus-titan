@@ -1,21 +1,21 @@
-B green       Brush     1 Gargoyle 2 Cyclops  2 Gorgon     3 Behemoth
+B green       Brush     true  1 Gargoyle 2 Cyclops  2 Gorgon     3 Behemoth
 
-D orange      Desert    1 Lion     3 Griffon  3 Salamander 2 Hydra
+D orange      Desert    true  1 Lion     3 Griffon  3 Salamander 2 Hydra
 
-H saddleBrown Hills     1 Ogre     2 Minotaur 2 Wyvern     2 Unicorn
+H saddleBrown Hills     true  1 Ogre     2 Minotaur 2 Wyvern     2 Unicorn
 
-J darkGreen   Jungle    1 Gargoyle 2 Cyclops  3 Jabberwok  2 Manticore 2 Serpent
+J darkGreen   Jungle    true  1 Gargoyle 2 Cyclops  3 Jabberwok  2 Manticore 2 Serpent
 
-M sienna      Marsh     1 Ogre     2 Troll    2 Ranger     3 Chimera
+M sienna      Marsh     true  1 Ogre     2 Troll    2 Ranger     3 Chimera
 
-m red         Mountains 1 Lion     2 Minotaur 2 Salamander 2 Dragon    2 Colossus
+m red         Mountains true  1 Lion     2 Minotaur 2 Salamander 2 Dragon    2 Colossus
 
-P yellow      Plains    1 Centaur  2 Lion     2 Ranger     3 Chimera
+P yellow      Plains    true  1 Centaur  2 Lion     2 Ranger     3 Chimera
 
-S blue        Swamp     1 Troll    3 Wyvern   3 Mammoth    2  Hydra
+S blue        Swamp     true  1 Troll    3 Wyvern   3 Mammoth    2  Hydra
 
-T grey        Tower     1 Centaur  1 Gargoyle 1 Ogre       3 Guardian  1 Warlock
+T grey        Tower     false 1 Centaur  1 Gargoyle 1 Ogre       3 Guardian  1 Warlock
 
-t skyBlue     Tundra    1 Troll    2 Warbear  2 Mammoth    2 Giant     2 Colossus
+t skyBlue     Tundra    true  1 Troll    2 Warbear  2 Mammoth    2 Giant     2 Colossus
 
-W olive       Woods     1 Centaur  2 Warbear  2 Griffon    2 Unicorn
+W olive       Woods     true  1 Centaur  2 Warbear  2 Griffon    2 Unicorn
