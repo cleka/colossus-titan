@@ -4,7 +4,7 @@ package net.sf.colossus.client;
 import java.util.*;
 
 import net.sf.colossus.server.Creature;
-
+import net.sf.colossus.util.Options;
 
 /**
  * Class BattleMovement does client-side battle move calculations.
@@ -49,8 +49,11 @@ final class BattleMovement
                         neighbor.getLabel());
                     if (bogey == null)
                     {
-                        entryCost = neighbor.getEntryCost(creature, 
-                            reverseDir);
+                        entryCost =
+                            neighbor.getEntryCost(
+                                creature,
+                                reverseDir,
+                                client.getOption(Options.cumulativeSlow));
                     }
                     else
                     {

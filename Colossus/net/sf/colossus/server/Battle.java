@@ -11,7 +11,7 @@ import net.sf.colossus.client.MasterHex;
 import net.sf.colossus.client.BattleHex;
 import net.sf.colossus.client.HexMap;
 import net.sf.colossus.client.BattleMap;
-
+import net.sf.colossus.util.Options;
 
 /**
  * Class Battle holds data about a Titan battle. It has utility functions
@@ -574,7 +574,11 @@ Log.debug("Called Battle.doneReinforcing()");
                         bogey.getMarkerId().equals(critter.getMarkerId())
                         && !bogey.isInContact(false)))
                     {
-                        entryCost = neighbor.getEntryCost(critter, reverseDir);
+                        entryCost =
+                            neighbor.getEntryCost(
+                                critter,
+                                reverseDir,
+                                game.getOption(Options.cumulativeSlow));
                     }
                     else
                     {

@@ -9,7 +9,6 @@ import net.sf.colossus.server.Creature;
 import net.sf.colossus.util.HTMLColor;
 import net.sf.colossus.util.Log;
 
-
 /**
  * Class BattleHex holds game state for battle hex.
  * @version $Id$
@@ -71,7 +70,7 @@ public class BattleHex extends Hex
     public static final int IMPASSIBLE_COST = 99;
     private static final int SLOW_COST = 2;
     private static final int NORMAL_COST = 1;
-
+    private static final int SLOW_INCREMENT_COST = SLOW_COST - NORMAL_COST;
 
 
     BattleHex(int xCoord, int yCoord)
@@ -438,9 +437,11 @@ public class BattleHex extends Hex
      * @param cameFrom The HexSide through which the Creature try to enter.
      * @return Cost to enter the BattleHex.
      */
-    public int getEntryCost(Creature creature, int cameFrom)
+    public int getEntryCost(Creature creature, int cameFrom, boolean cumul)
     {
         char terrain = getTerrain();
+
+        int cost = NORMAL_COST;
 
         // Check to see if the hex is occupied or totally impassable.
         if (((terrain == 'l') && (!creature.isWaterDwelling())) ||
@@ -449,7 +450,7 @@ public class BattleHex extends Hex
             ((terrain == 'v') && (!creature.isNativeVolcano())) ||
             ((terrain == 'o') && (!creature.isNativeBog())))
         {
-            return IMPASSIBLE_COST;
+            cost += IMPASSIBLE_COST;
         }
 
         char hexside = getHexside(cameFrom);
@@ -458,7 +459,7 @@ public class BattleHex extends Hex
         if ((hexside == 'c' || getOppositeHexside(cameFrom) == 'c') &&
             !creature.isFlier())
         {
-            return IMPASSIBLE_COST;
+            cost += IMPASSIBLE_COST;
         }
 
         // river slows both way, except native & water dwellers
@@ -466,7 +467,7 @@ public class BattleHex extends Hex
             !creature.isFlier() && !creature.isWaterDwelling()
             && !creature.isNativeRiver())
         {
-            return SLOW_COST;
+            cost += SLOW_INCREMENT_COST;
         }
 
         // Check for a slowing hexside.
@@ -475,9 +476,7 @@ public class BattleHex extends Hex
             && !creature.isFlier() &&
             elevation > getNeighbor(cameFrom).getElevation())
         {
-            // All hexes where this applies happen to have no
-            // additional movement costs.
-            return SLOW_COST;
+            cost += SLOW_INCREMENT_COST;
         }
 
         // Bramble, drift, and sand slow non-natives, except that sand
@@ -487,11 +486,20 @@ public class BattleHex extends Hex
             (terrain == 's' && !creature.isNativeSandDune() &&
             !creature.isFlier()))
         {
-            return SLOW_COST;
+            cost += SLOW_INCREMENT_COST;
         }
-
-        // Other hexes only cost 1.
-        return NORMAL_COST;
+        
+        if (cost > IMPASSIBLE_COST)
+        { // max out impassible at IMPASSIBLE_COST
+            cost = IMPASSIBLE_COST;
+        }
+        
+        if ((cost < IMPASSIBLE_COST) && (cost > SLOW_COST) && (!cumul))
+        { // don't cumul Slow
+            cost = SLOW_COST;
+        }
+        
+        return cost;
     }
 
     /**

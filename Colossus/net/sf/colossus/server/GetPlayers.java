@@ -143,6 +143,12 @@ public final class GetPlayers extends KDialog implements WindowListener,
         addCheckbox(Options.towerToTowerTeleportOnly, teleportPane);
         addCheckbox(Options.noTowerTeleport, teleportPane);
 
+        JPanel rulesOptionsPane = new JPanel(new GridLayout(0, 2));
+        rulesOptionsPane.setBorder(new TitledBorder("Rules Options"));
+        mainPane.add(rulesOptionsPane);
+
+        addCheckbox(Options.cumulativeSlow, rulesOptionsPane);
+
         JPanel aiTimePane = new JPanel(new FlowLayout());
         aiTimePane.setBorder(new TitledBorder("AI Timing"));
         mainPane.add(aiTimePane);

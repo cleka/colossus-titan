@@ -38,12 +38,13 @@ public final class Options
         "Tower-to-Tower Teleport only";
     public static final String noTowerTeleport = "No Tower Teleport";
     public static final String noTitanTeleport = "No Titan Teleport";
+    // more rules options
+    public static final String cumulativeSlow = "Slowing is cumulative";
     
 
     // Will add player numbers 0-5 to the end of these.
     public static final String playerName = "Player name ";
     public static final String playerType = "Player type ";
-
 
 
     // Display options (client)
