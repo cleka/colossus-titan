@@ -152,6 +152,9 @@ class SummonAngel extends JDialog implements MouseListener, ActionListener,
                 3 * d.height / 4 - insets.bottom, d.width / 3, d.height / 8);
             laidOut = true;
         }
+
+        button1.repaint();
+        button2.repaint();
     }
 
 
