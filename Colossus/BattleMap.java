@@ -1,5 +1,8 @@
 /** Attempted port of hexmap from MFC to Java dripton  12/10/97 */
 
+// TODO: double-buffer
+// TODO: make the chits show up ASAP when their images load.  MediaTracker?
+
 import java.awt.*;
 
 
@@ -35,16 +38,17 @@ class Hex extends Canvas implements Shape
         p = new Polygon(x_vertex, y_vertex, 6);
         rectBound = new Rectangle(x_vertex[5], y_vertex[0], x_vertex[2] - 
             x_vertex[5], y_vertex[3] - y_vertex[0]);
+        setBounds(rectBound);
     }
 
 
-    public void paint(Graphics g)
+    public void update(Graphics g)
     {
-        update(g);
+        paint(g);
     }
     
 
-    public void update(Graphics g)
+    public void paint(Graphics g)
     {
         System.out.println("painting a Hex");
         if (selected)
@@ -69,13 +73,13 @@ class Hex extends Canvas implements Shape
         if (p.contains(point))
         {
             selected = !selected;
-            repaint();
+            //repaint();
 	    return true;
         }
 	return false;
     }
 
-
+    // Required by interface Shape
     public Rectangle getBounds()
     {
         return rectBound;
@@ -86,13 +90,13 @@ class Hex extends Canvas implements Shape
         return (p.contains(point));
     }
     
-    public Dimension minimumsize()
+    public Dimension getMinimumSize()
     {
         return new Dimension(x_vertex[2] - x_vertex[5], y_vertex[3] 
 	    - y_vertex[0]);
     }
 
-    public Dimension preferredSize()
+    public Dimension getPreferredSize()
     {
         return new Dimension(x_vertex[2] - x_vertex[5], y_vertex[3] 
 	    - y_vertex[0]);
@@ -112,16 +116,17 @@ class Chit extends Canvas implements Shape, java.awt.image.ImageObserver
         selected = false;
         rect = new Rectangle(cx, cy, scale, scale);
         image = Toolkit.getDefaultToolkit().getImage(image_filename);
-    }
-
-
-    public void paint(Graphics g)
-    {
-        update(g);
+	setBounds(rect);
     }
 
     public void update(Graphics g)
     {
+        paint(g);
+    }
+
+    public void paint(Graphics g)
+    {
+        System.out.println("painting a Chit");
         if (g.drawImage(image, rect.x, rect.y, this) == false)
         {
             System.out.println("image started drawing but isn't done");
@@ -134,7 +139,6 @@ class Chit extends Canvas implements Shape, java.awt.image.ImageObserver
         if (rect.contains(point))
         {
             selected = true;
-            repaint();
         }
         else
         {
@@ -171,12 +175,12 @@ class Chit extends Canvas implements Shape, java.awt.image.ImageObserver
         }
     }
     
-    public Dimension minimumsize()
+    public Dimension getMinimumSize()
     {
         return new Dimension(rect.width, rect.height);
     }
 
-    public Dimension preferredSize()
+    public Dimension getPreferredSize()
     {
         return new Dimension(rect.width, rect.height);
     }
@@ -185,7 +189,7 @@ class Chit extends Canvas implements Shape, java.awt.image.ImageObserver
 
 
 
-class HexMap extends Canvas
+public class BattleMap extends Frame
 {
     private Hex[][] h = new Hex[6][6];
     private Chit[] chits = new Chit[22];
@@ -201,24 +205,22 @@ class HexMap extends Canvas
         {false,true,true,true,true,false}
     };
 
-    HexMap(int cx, int cy, int scale)
+    public BattleMap()
     {
-        System.out.println("Creating a HexMap.");
-	tracking = -1;
+        super("BattleMap");
+//        setLayout(null);
 
-        for (int i = 0; i < 6; i++)
-        {
-            for (int j = 0; j < 6; j++)
-            {
-                if (show[i][j])
-                {
-                    h[i][j] = new Hex
-                        ((int)java.lang.Math.round(cx + 3 * i * scale),
-                        (int)java.lang.Math.round(cy + (2 * j + i % 2) *
-                        java.lang.Math.sqrt(3.0) * scale), scale);
-                }
-            }
-        }
+        int cx=80;
+        int cy=80;
+        int scale=25;
+        
+        System.out.println("Creating a BattleMap.");
+        tracking = -1;
+        pack();
+        resize(700, 700);
+        setBackground(java.awt.Color.white);
+	setVisible(true);
+
 
         chits[0] = new Chit(100, 100, 60, "Angel.gif");
         chits[1] = new Chit(120, 120, 60, "Archange.gif");
@@ -242,57 +244,63 @@ class HexMap extends Canvas
         chits[19] = new Chit(500, 500, 60, "Unicorn.gif");
         chits[20] = new Chit(520, 520, 60, "Warbear.gif");
         chits[21] = new Chit(540, 540, 60, "Warlock.gif");
-    }
-
-
-    public void paint(Graphics g)
-    {
-        update(g);
-    }
-
-    public void update(Graphics g)
-    {
-        rectClip = g.getClipBounds();
-        System.out.println("rectClip: " + rectClip.x + " " + rectClip.y 
-	    + " " + rectClip.width + " " + rectClip.height);
-
+        
+        for (int i = 0; i < chits.length; i++)
+        {
+	    //add(chits[i]);
+        }
+        
         for (int i = 0; i < 6; i++)
         {
             for (int j = 0; j < 6; j++)
             {
-                if (show[i][j] && rectClip.intersects(h[i][j].getBounds()))
+                if (show[i][j])
                 {
-                    System.out.println("drawing h[" + i + "][" + j + "]");
-                    h[i][j].update(g);
+                    h[i][j] = new Hex
+                        ((int)java.lang.Math.round(cx + 3 * i * scale),
+                        (int)java.lang.Math.round(cy + (2 * j + i % 2) *
+                        java.lang.Math.sqrt(3.0) * scale), scale);
+                    //add(h[i][j]);
                 }
             }
         }
 
-        // Draw chits from back to front.
-        for (int i = chits.length - 1; i >= 0; i--)
-        {
-	    if (rectClip.intersects(chits[i].getBounds()))
-	    {
-                System.out.println("Drawing chits[" + i + "]");
-                chits[i].update(g);
-            }
+        //validate();
+        repaint();
+    }
+
+    public boolean handleEvent(Event event)
+    {
+        //System.out.println("BattleMap got event " + event.toString());
+        if (event.id == Event.WINDOW_DESTROY)
+	{
+	    System.exit(0);
         }
+        return super.handleEvent(event);
     }
 
-
-
-
-    public Dimension minimumsize()
+    public boolean mouseDrag(Event event, int x, int y)
     {
-        return new Dimension(200, 200);
+        Point point = new Point(x,y);
+        if (tracking != -1)
+        {
+            // TODO: Set clip so that the chit's old 
+            // location gets erased, so we don't need
+            // a global repaint.
+            Rectangle rectClip = new Rectangle(chits[tracking].getBounds());
+            chits[tracking].move(point);
+            rectClip.add(chits[tracking].getBounds());
+            repaint(rectClip.x, rectClip.y, rectClip.width, rectClip.height);
+        }
+        return false;
     }
 
-    public Dimension preferredSize()
+    public boolean mouseUp(Event event, int x, int y)
     {
-        return new Dimension(700,700);
+        tracking = -1;
+        return false;
     }
-
-
+    
     public boolean mouseDown(Event event, int x, int y)
     {
         Point point = new Point(x,y);
@@ -313,9 +321,11 @@ class HexMap extends Canvas
 		        chits[j] = chits[j - 1];
                     }
                     chits[0] = tmpchit;
-                    chits[0].repaint();
+                    //chits[0].repaint();
 		    // TODO: Make this work without a global repaint.
-		    repaint();
+		    //repaint();
+                    Rectangle rectClip = new Rectangle(chits[0].getBounds());
+                    repaint(rectClip.x, rectClip.y, rectClip.width, rectClip.height);
                 }
                 return false;
             }
@@ -332,7 +342,10 @@ class HexMap extends Canvas
                         + j +"]");
                     h[i][j].select(point);
                     // TODO: Make this work without a global repaint.
-                    repaint();
+                    //repaint();
+                    //h[i][j].repaint();
+                    Rectangle rectClip = new Rectangle(h[i][j].getBounds());
+                    repaint(rectClip.x, rectClip.y, rectClip.width, rectClip.height);
 		    return false;
                 }
             }
@@ -341,70 +354,55 @@ class HexMap extends Canvas
         return false;
     }
 
-
-    public boolean mouseUp(Event event, int x, int y)
-    {
-        tracking = -1;
-        return false;
-    }
-
-
-    public boolean mouseDrag(Event event, int x, int y)
-    {
-        Point point = new Point(x,y);
-        if (tracking != -1)
-        {
-            // TODO: Set clip so that the chit's old 
-            // location gets erased, so we don't need
-            // a global repaint.
-            chits[tracking].move(point);
-            repaint();
-        }
-        return false;
-    }
-
-}
-
-
-public class BattleMap extends Frame
-{
-    private HexMap map;
-
-    public BattleMap()
-    {
-        super("BattleMap");
-
-        map = new HexMap(80, 20, 25);
-        add("Center", map);
-        validate();
-    }
-
-    public boolean handleEvent(Event event)
-    {
-        //System.out.println("BattleMap got event " + event.toString());
-        if (event.id == Event.WINDOW_DESTROY)
-	{
-	    System.exit(0);
-        }
-        return super.handleEvent(event);
-    }
-
-    public void update(Graphics g)
-    {
-        System.out.println("Called BattleMap.update()");
-    }
-    
     public void paint(Graphics g)
     {
-        update(g);
+        System.out.println("Called BattleMap.paint()");
+        rectClip = g.getClipBounds();
+        System.out.println("rectClip: " + rectClip.x + " " + rectClip.y 
+	    + " " + rectClip.width + " " + rectClip.height);
+
+        for (int i = 0; i < 6; i++)
+        {
+            for (int j = 0; j < 6; j++)
+            {
+                if (show[i][j] && rectClip.intersects(h[i][j].getBounds()))
+                {
+                    System.out.println("drawing h[" + i + "][" + j + "]");
+                    h[i][j].paint(g);
+                }
+            }
+        }
+
+        // Draw chits from back to front.
+        for (int i = chits.length - 1; i >= 0; i--)
+        {
+	    if (rectClip.intersects(chits[i].getBounds()))
+	    {
+                System.out.println("Drawing chits[" + i + "]");
+                chits[i].paint(g);
+            }
+        }
+    }
+/*    
+    public void update(Graphics g)
+    {
+        paint(g);
+    }
+*/
+    
+    public Dimension getMinimumSize()
+    {
+        return new Dimension(400, 400);
+    }
+
+    public Dimension getPreferredSize()
+    {
+        return new Dimension(700, 700);
     }
 
     public static void main(String args[])
     {
-        BattleMap window = new BattleMap();
-        window.setTitle("BattleMap");
-        window.pack();
-	window.setVisible(true);
+        BattleMap battlemap = new BattleMap();
     }
 
 }
