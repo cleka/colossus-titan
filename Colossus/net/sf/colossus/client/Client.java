@@ -75,6 +75,9 @@ public final class Client implements IClient
     /** Last movement roll for any player. */
     private int movementRoll = -1;
 
+    /** the parent frame for secondaries windows */
+    private JFrame secondaryParent = null;
+
     // XXX Should be per player
     /** Sorted set of available legion markers for this player. */
     private SortedSet markersAvailable = new TreeSet(
@@ -608,7 +611,7 @@ public final class Client implements IClient
             {
                 if (board != null)
                 {
-                    statusScreen = new StatusScreen(board.getFrame(), this);
+                    statusScreen = new StatusScreen((secondaryParent == null ? board.getFrame() : secondaryParent), this);
                 }
             }
         }
@@ -727,7 +730,7 @@ public final class Client implements IClient
                 if (board != null)
                 {
                     caretakerDisplay = new CreatureCollectionView(
-                        board.getFrame(), this);
+                                           (secondaryParent == null ? board.getFrame() : secondaryParent), this);
                     caretakerDisplay.addWindowListener(new WindowAdapter()
                     {
                         public void windowClosing(WindowEvent e)
@@ -3617,6 +3620,20 @@ Log.debug(playerName + " Client.setupBattleFight()");
         else if (delay > Constants.MAX_AI_DELAY)
         {
             delay = Constants.MAX_AI_DELAY;
+        }
+    }
+
+    void setChoosenDevice(GraphicsDevice choosen)
+    {
+        if (choosen != null)
+        {
+            secondaryParent = new JFrame(choosen.getDefaultConfiguration());
+            disposeStatusScreen();
+            updateStatusScreen();
+            if (caretakerDisplay != null)
+                caretakerDisplay.dispose();
+            caretakerDisplay = null;
+            updateCreatureCountDisplay();
         }
     }
 }

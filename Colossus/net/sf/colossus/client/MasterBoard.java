@@ -74,6 +74,8 @@ public final class MasterBoard extends JPanel
     public static final String viewBattleMap = "View Battle Map";
     public static final String changeScale = "Change Scale";
 
+    public static final String chooseScreen = "Choose Screen For Info Windows";
+
     public static final String about = "About";
     
     private AbstractAction newGameAction;
@@ -95,6 +97,8 @@ public final class MasterBoard extends JPanel
     private AbstractAction viewHexRecruitTreeAction;
     private AbstractAction viewBattleMapAction;
     private AbstractAction changeScaleAction;
+
+    private AbstractAction chooseScreenAction;
 
     private AbstractAction aboutAction;
 
@@ -456,6 +460,14 @@ public final class MasterBoard extends JPanel
             }
         };
 
+        chooseScreenAction = new AbstractAction(chooseScreen)
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                ChooseScreen cs = new ChooseScreen(getFrame(), client);
+            }
+        };
+
 
         aboutAction = new AbstractAction(about)
         {
@@ -559,6 +571,7 @@ public final class MasterBoard extends JPanel
         mi = graphicsMenu.add(viewFullRecruitTreeAction);
         mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, 0));
         mi.setMnemonic(KeyEvent.VK_R);
+        mi = graphicsMenu.add(chooseScreenAction);
 
         // Then Look & Feel
         lfMenu = new JMenu("Look & Feel");
