@@ -27,10 +27,10 @@ public class Chit extends JPanel
 
     // Constants describing where to find image files.
 
-    // File.separator does not work right in jar files.  A hardcoded 
+    // File.separator does not work right in jar files.  A hardcoded
     // forward-slash does, and works in *x and Windows.  So I'm ignoring
-    // JavaPureCheck's opinion and using a forward slash.  
-    // XXX Is there a way to detect whether a program is running from a 
+    // JavaPureCheck's opinion and using a forward slash.
+    // XXX Is there a way to detect whether a program is running from a
     // jar file?
     public static final String pathSeparator = "/";
     public static final String imageDirname = "images";
@@ -53,32 +53,32 @@ public class Chit extends JPanel
         String imageFilename = getImagePath(id);
 
         // The image-loading syntax that works correctly for applications
-        // packaged in executable jar files does not work correctly for 
+        // packaged in executable jar files does not work correctly for
         // applets, and vice-versa.
 
         if (isApplet)
         {
             InputStream in;
-            byte[] thanksToNetscape = null; 
-  
+            byte[] thanksToNetscape = null;
+
             try
             {
                 in = getClass().getResourceAsStream(imageFilename);
                 int length = in.available();
                 thanksToNetscape = new byte[length];
                 in.read(thanksToNetscape);
-                // XXX Test this with browsers. 
+                // XXX Test this with browsers.
                 icon = new ImageIcon(thanksToNetscape);
             }
             catch (Exception e)
             {
-                System.out.println("Couldn't load image " + imageFilename + 
+                System.out.println("Couldn't load image " + imageFilename +
                     "\n" + e);
             }
         }
         else
         {
-            // This syntax works with either images in a jar file or images 
+            // This syntax works with either images in a jar file or images
             // in the local filesystem.
             Image image = Toolkit.getDefaultToolkit().getImage(
                 getClass().getResource(imageFilename));
@@ -97,7 +97,7 @@ public class Chit extends JPanel
     {
         return id;
     }
-    
+
 
     public void rescale(int scale)
     {
@@ -111,7 +111,7 @@ public class Chit extends JPanel
     {
 	super.paintComponent(g);
 
-        g.drawImage(icon.getImage(), rect.x, rect.y, rect.width, 
+        g.drawImage(icon.getImage(), rect.x, rect.y, rect.width,
             rect.width, container);
         if (isDead())
         {
@@ -133,7 +133,7 @@ public class Chit extends JPanel
                 rect.y + rect.height);
         }
     }
-    
+
 
     public void setLocation(Point point)
     {
@@ -158,8 +158,8 @@ public class Chit extends JPanel
     {
         return new Dimension(rect.width, rect.height);
     }
-    
-    
+
+
     public Dimension getMinimumSize()
     {
         return getPreferredSize();

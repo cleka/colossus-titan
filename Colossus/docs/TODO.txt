@@ -5,8 +5,6 @@ Add antialiasing option.
 Write a minimal, complete Game.loadGame() that reuses existing 
    objects as much as possible.
 
-Show movement die roll graphically.
-
 Highlight teleport and normal moves differently.
 
 Disable file-related options when running as an applet.

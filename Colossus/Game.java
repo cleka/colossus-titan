@@ -22,6 +22,7 @@ public class Game
     private Battle battle;
     private BattleMap map;
     private static Random random = new Random();
+    private MovementDie movementDie;
 
     public static final int SPLIT = 1;
     public static final int MOVE = 2;
@@ -117,9 +118,14 @@ public class Game
 
     public void newGame()
     {
+        logEvent("\nStarting new game");
+
+        Creature.resetAllCounts();
+        board.clearLegions();
+        players.clear();
+
         JFrame frame = new JFrame();
 
-        players.clear();
         TreeSet playerNames = GetPlayers.getPlayers(frame);
         Iterator it = playerNames.iterator();
         while (it.hasNext())
@@ -147,7 +153,14 @@ public class Game
         if (!disposed)
         {
             statusScreen = new StatusScreen(this);
-            board = new MasterBoard(this);
+            if (board == null)
+            {
+                board = new MasterBoard(this);
+            }
+            else
+            {
+                board.setGame(this);
+            }
             masterFrame = board.getFrame();
             it = players.iterator();
             while (it.hasNext())
@@ -164,6 +177,11 @@ public class Game
         }
 
         loadOptions();
+
+        if (showDice)
+        {
+            initMovementDie();
+        }
     }
 
 
@@ -354,6 +372,7 @@ public class Game
 
             if (showDice)
             {
+                initMovementDie();
                 if (battle != null)
                 {
                     battle.initBattleDice();
@@ -361,6 +380,7 @@ public class Game
             }
             else
             {
+                disposeMovementDie();
                 if (battle != null)
                 {
                     battle.disposeBattleDice();
@@ -370,6 +390,31 @@ public class Game
                     board.twiddleShowDice(false);
                 }
             }
+        }
+    }
+
+
+    public void initMovementDie()
+    {
+        movementDie = new MovementDie(this);
+    }
+
+
+    public void disposeMovementDie()
+    {
+        if (movementDie != null)
+        {
+            movementDie.dispose();
+            movementDie = null;
+        }
+    }
+
+
+    public void showMovementRoll(int roll)
+    {
+        if (movementDie != null)
+        {
+            movementDie.showRoll(roll);
         }
     }
 
@@ -1062,6 +1107,12 @@ public class Game
                     MasterHex hex = legion.getCurrentHex();
                     hex.addLegion(legion, false);
                 }
+            }
+
+            loadOptions();
+            if (showDice)
+            {
+                initMovementDie();
             }
 
             board.setVisible(true);
@@ -1978,9 +2029,17 @@ public class Game
             {
                 map.dispose();
             }
+            if (battle != null)
+            {
+                battle.disposeBattleDice();
+            }
             if (statusScreen != null)
             {
                 statusScreen.dispose();
+            }
+            if (movementDie != null)
+            {
+                movementDie.dispose();
             }
             if (applet != null)
             {
@@ -2515,6 +2574,8 @@ public class Game
 
                 // And move it to the top of the z-order.
                 board.moveMarkerToTop(legion);
+                // Just painting the marker doesn't always do the trick.
+                legion.getCurrentHex().repaint();
 
                 // Highlight all legal destinations
                 // for this legion.

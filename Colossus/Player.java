@@ -373,6 +373,7 @@ public class Player implements Comparable
             Game.logEvent(getName() + " rolled a " + movementRoll +
                 " for movement");
         }
+        game.showMovementRoll(movementRoll);
     }
 
 

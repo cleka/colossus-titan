@@ -1636,8 +1636,8 @@ public class Battle
         if (battleDice != null)
         {
             battleDice.dispose();
+            battleDice = null;
         }
-        battleDice = null;
     }
 
 

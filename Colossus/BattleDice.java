@@ -3,7 +3,7 @@ import java.awt.event.*;
 import javax.swing.*;
 
 /**
- * Class ShowDice displays dice rolls during a battle.
+ * Class BattleDice displays dice rolls during a battle.
  * @version $Id$
  * @author David Ripton
  */
@@ -32,7 +32,7 @@ public class BattleDice extends JFrame implements WindowListener
 
     public BattleDice(Game game)
     {
-        super("Show Dice Rolls");
+        super("Battle Dice Rolls");
 
         this.game = game;
 

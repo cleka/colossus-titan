@@ -644,6 +644,12 @@ public class MasterHex extends Hex
     }
 
 
+    public void clearLegions()
+    {
+        legions.clear();
+    }
+
+
     public void setNeighbor(int i, MasterHex hex)
     {
         neighbors[i] = hex;

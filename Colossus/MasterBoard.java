@@ -134,6 +134,12 @@ public class MasterBoard extends JPanel implements MouseListener,
     }
 
 
+    public void setGame(Game game)
+    {
+        this.game = game;
+    }
+
+
     public void setupActions()
     {
         undoLastSplitAction = new AbstractAction(undoLastSplit)
@@ -340,6 +346,19 @@ public class MasterBoard extends JPanel implements MouseListener,
         {
             public void actionPerformed(ActionEvent e)
             {
+                String [] options = new String[2];
+                options[0] = "Yes";
+                options[1] = "No";
+                int answer = JOptionPane.showOptionDialog(masterFrame,
+                    "Are you sure you with to start a new game?",
+                    "New Game?",
+                    JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
+                    null, options, options[1]);
+
+                if (answer == JOptionPane.YES_OPTION)
+                {
+                    game.newGame();
+                }
             }
         };
 
@@ -1418,6 +1437,22 @@ public class MasterBoard extends JPanel implements MouseListener,
     }
 
 
+    public void clearLegions()
+    {
+        markers.clear();
+
+        Iterator it = hexes.iterator();
+        while (it.hasNext())
+        {
+            MasterHex hex = (MasterHex)it.next();
+            hex.clearLegions();
+            hex.unselect();
+        }
+
+        repaint();
+    }
+
+
     public void loadInitialMarkerImages()
     {
         Collection players = game.getPlayers();
@@ -1614,7 +1649,7 @@ public class MasterBoard extends JPanel implements MouseListener,
     }
 
 
-    /** Clear all entry side and teleport information from all hexes 
+    /** Clear all entry side and teleport information from all hexes
      *  not occupied by a friendly legion. */
     public void clearAllNonFriendlyOccupiedEntrySides(Player player)
     {

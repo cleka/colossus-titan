@@ -147,6 +147,35 @@ public class Creature implements Comparable
     }
 
 
+    public static void resetAllCounts()
+    {
+        angel.setCount(18);
+        archangel.setCount(6);
+        behemoth.setCount(18);
+        centaur.setCount(25);
+        colossus.setCount(10);
+        cyclops.setCount(28);
+        dragon.setCount(18);
+        gargoyle.setCount(21);
+        giant.setCount(18);
+        gorgon.setCount(25);
+        griffon.setCount(18);
+        guardian.setCount(6);
+        hydra.setCount(10);
+        lion.setCount(28);
+        minotaur.setCount(21);
+        ogre.setCount(25);
+        ranger.setCount(28);
+        serpent.setCount(10);
+        titan.setCount(6);
+        troll.setCount(28);
+        unicorn.setCount(12);
+        warbear.setCount(21);
+        warlock.setCount(6);
+        wyvern.setCount(18);
+    }
+
+
     public void takeOne()
     {
         count--;
