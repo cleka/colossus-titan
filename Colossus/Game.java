@@ -37,24 +37,18 @@ public class Game extends Frame implements WindowListener, ActionListener
     private Label [] titanLabel;
     private Label [] scoreLabel;
 
+    private boolean isApplet; 
 
-    public Game()
+
+    public Game(boolean isApplet)
     {
         super("Player Setup");
+        this.isApplet = isApplet;
         setBackground(Color.lightGray);
         pack();
         setSize(300, 250);
-        try
-        {
-            setIconImage(Toolkit.getDefaultToolkit().getImage(
-                getClass().getResource(Creature.colossus.getImageName())));
-        }
-        catch (NullPointerException e)
-        {
-            System.out.println(e.toString() + " Couldn't find " + 
-                Creature.colossus.getImageName());
-            System.exit(1);
-        }
+
+        setupIcon();
 
         // Center dialog on screen.
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
@@ -84,23 +78,14 @@ public class Game extends Frame implements WindowListener, ActionListener
     
     
     // Load a saved game.
-    public Game(String filename)
+    public Game(boolean isApplet, String filename)
     {
         super("Player Setup");
+        this.isApplet = isApplet;
         setBackground(Color.lightGray);
         pack();
-        try
-        {
-            setIconImage(Toolkit.getDefaultToolkit().getImage(
-                getClass().getResource(Creature.colossus.getImageName())));
-        }
-        catch (NullPointerException e)
-        {
-            System.out.println(e.toString() + " Couldn't find " + 
-                Creature.colossus.getImageName());
-            System.exit(1);
-        }
 
+        setupIcon();
 
         addWindowListener(this);
 
@@ -109,6 +94,25 @@ public class Game extends Frame implements WindowListener, ActionListener
         loadGame(filename);
 
         initStatusScreen(false);
+    }
+
+
+    private void setupIcon()
+    {
+        if (!isApplet)
+        {
+            try
+            {
+                setIconImage(Toolkit.getDefaultToolkit().getImage(
+                    getClass().getResource(Creature.colossus.getImageName())));
+            }
+            catch (NullPointerException e)
+            {
+                System.out.println(e.toString() + " Could not find " + 
+                    Creature.colossus.getImageName());
+                dispose();
+            }
+        }
     }
 
 
@@ -514,12 +518,12 @@ public class Game extends Frame implements WindowListener, ActionListener
         {
             case 0:
                 new MessageBox(board, "draw");
-                System.exit(0);
+                dispose();
                 break;
 
             case 1:
                 new MessageBox(board, players[winner].getName() + " wins");
-                System.exit(0);
+                dispose();
                 break;
 
             default:
@@ -565,7 +569,10 @@ public class Game extends Frame implements WindowListener, ActionListener
         updateStatusScreen();
 
         // XXX This should be removed eventually.
-        saveGame();
+        if (!isApplet)
+        {
+            saveGame();
+        }
     }
 
 
@@ -769,7 +776,8 @@ public class Game extends Frame implements WindowListener, ActionListener
                         markerId, null, board, height, 
                         board.getHexFromLabel(hexLabel), creatures[0], 
                         creatures[1], creatures[2], creatures[3], creatures[4],
-                        creatures[5], creatures[6], creatures[7], players[i]);
+                        creatures[5], creatures[6], creatures[7], players[i],
+                        isApplet);
 
                     for (int k = 0; k < height; k++)
                     {
@@ -790,7 +798,7 @@ public class Game extends Frame implements WindowListener, ActionListener
         {
             System.out.println(e.toString());
             // XXX Ask for another file?  Start new game?
-            System.exit(1);
+            dispose();
         }
     }
 
@@ -805,7 +813,7 @@ public class Game extends Frame implements WindowListener, ActionListener
 
     public void windowClosing(WindowEvent e)
     {
-        System.exit(0);
+        dispose();
     }
 
     public void windowDeactivated(WindowEvent e)
@@ -828,7 +836,7 @@ public class Game extends Frame implements WindowListener, ActionListener
     {
         if (e.getActionCommand().equals("Quit"))
         {
-            System.exit(0);
+            dispose();
         }
         else if (e.getActionCommand().equals("OK"))
         {
@@ -861,15 +869,38 @@ public class Game extends Frame implements WindowListener, ActionListener
     }
 
 
+    public void dispose()
+    {
+        if (isApplet)
+        {
+            if (board != null)
+            {
+                board.dispose();
+            }
+            super.dispose();
+        }
+        else
+        {
+            System.exit(0);
+        }
+    }
+
+
+    public boolean isApplet()
+    {
+        return isApplet;
+    }
+
+
     public static void main(String [] args)
     {
         if (args.length == 0)
         {
-            new Game();
+            new Game(false);
         }
         else
         {
-            new Game(args[0]);
+            new Game(false, args[0]);
         }
     }
 }
