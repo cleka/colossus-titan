@@ -147,12 +147,10 @@ public class Chit extends JPanel
         return dead;
     }
 
-
     public void setDead(boolean dead)
     {
         this.dead = dead;
     }
-
 
     public void toggleDead()
     {

@@ -863,11 +863,7 @@ public final class Game
             players.clear();
             if (battle != null)
             {
-                BattleMap map = battle.getBattleMap();
-                if (map != null)
-                {
-                    map.dispose();
-                }
+                server.allDisposeBattleMap();
             }
 
             // Players
@@ -2373,6 +2369,7 @@ public final class Game
     {
         battle = null;
         Client.clearUndoStack();
+        server.allDisposeBattleMap();
         server.allDeiconifyBoard();
 
         // Handle any after-battle angel summoning or recruiting.

@@ -1820,7 +1820,7 @@ Log.debug("Setting for whatever color is left");
                        boolean fakeDice)
     {
         // Repeat until no attackers with valid targets remain.
-        while (!battle.isOver() && battle.highlightCrittersWithTargets() > 0)
+        while (!battle.isOver() && battle.findCrittersWithTargets().size() > 0)
         {
             doOneStrike(legion, battle, fakeDice);
         }

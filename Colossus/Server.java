@@ -208,6 +208,17 @@ public final class Server
     }
 
 
+    public void allHighlightCarries()
+    {
+        Iterator it = clients.iterator();
+        while (it.hasNext())
+        {
+            Client client = (Client)it.next();
+            client.getBattleMap().highlightCarries();
+        }
+    }
+
+
     public void allSetupSplitMenu()
     {
         Iterator it = clients.iterator();
@@ -372,6 +383,78 @@ public final class Server
     }
 
 
+    public void allUnselectBattleHexByLabel(String hexLabel)
+    {
+        Iterator it = clients.iterator();
+        while (it.hasNext())
+        {
+            Client client = (Client)it.next();
+            client.getBattleMap().unselectHexByLabel(hexLabel);
+        }
+    }
+
+    public void allUnselectAllBattleHexes()
+    {
+        Iterator it = clients.iterator();
+        while (it.hasNext())
+        {
+            Client client = (Client)it.next();
+            client.getBattleMap().unselectAllHexes();
+        }
+    }
+
+    public void allRepaintBattleHex(String hexLabel)
+    {
+        Iterator it = clients.iterator();
+        while (it.hasNext())
+        {
+            Client client = (Client)it.next();
+            client.repaintBattleHex(hexLabel);
+        }
+    }
+
+
+    public void allAlignBattleChits(String hexLabel)
+    {
+        Iterator it = clients.iterator();
+        while (it.hasNext())
+        {
+            Client client = (Client)it.next();
+            client.getBattleMap().alignChits(hexLabel);
+        }
+    }
+
+    public void allAlignBattleChits(Set hexLabels)
+    {
+        Iterator it = clients.iterator();
+        while (it.hasNext())
+        {
+            Client client = (Client)it.next();
+            client.getBattleMap().alignChits(hexLabels);
+        }
+    }
+
+    public void allPlaceNewChit(Critter critter, boolean inverted)
+    {
+        Iterator it = clients.iterator();
+        while (it.hasNext())
+        {
+            Client client = (Client)it.next();
+            client.placeNewChit(critter, inverted);
+        }
+    }
+
+    public void allSetBattleChitDead(int tag)
+    {
+        Iterator it = clients.iterator();
+        while (it.hasNext())
+        {
+            Client client = (Client)it.next();
+            client.setBattleChitDead(tag);
+        }
+    }
+
+
     /** Find out if the player wants to acquire and angel or archangel. */
     public String acquireAngel(String playerName, ArrayList recruits)
     {
@@ -446,6 +529,12 @@ public final class Server
     }
 
 
+    public boolean tryToConcede(String markerId)
+    {
+        return game.getBattle().tryToConcede(markerId);
+    }
+
+
     public void twoNegotiate(Legion attacker, Legion defender)
     {
         Client client1 = getClient(attacker.getPlayerName());
@@ -480,16 +569,47 @@ public final class Server
         }
     }
 
+    public boolean chooseStrikePenalty(String playerName, String prompt)
+    {
+        Client client = getClient(playerName);
+        return client.chooseStrikePenalty(prompt);
+    }
 
-    public void allInitBattleMap()
+
+    public void allInitBattleMap(String masterHexLabel, Battle battle)
     {
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
             Client client = (Client)it.next();
-            client.initBattleMap();
+            client.initBattleMap(masterHexLabel, battle);
         }
     }
+
+
+    public void allShowBattleMap()
+    {
+        Iterator it = clients.iterator();
+        while (it.hasNext())
+        {
+            Client client = (Client)it.next();
+            client.showBattleMap();
+        }
+    }
+
+
+    public void allDisposeBattleMap()
+    {
+        Iterator it = clients.iterator();
+        while (it.hasNext())
+        {
+            Client client = (Client)it.next();
+            client.disposeBattleMap();
+        }
+    }
+
+
+
 
     public static void main(String [] args)
     {

@@ -41,7 +41,6 @@ public final class Battle
     private int phase;
     private int summonState = NO_KILLS;
     private int carryDamage;
-    private boolean critterSelected;
     private boolean attackerElim;
     private boolean defenderElim;
     private boolean battleOver;
@@ -63,13 +62,7 @@ public final class Battle
         this.turnNumber = turnNumber;
         this.phase = phase;
 
-// XXX Handle battle map on client side.
-//        map = new BattleMap(masterHexLabel, this);
-//        Client.setMap(map);
-//        map.getFrame().toFront();
-//        map.requestFocus();
-
-        game.getServer().allInitBattleMap();
+        game.getServer().allInitBattleMap(masterHexLabel, this);
 
         terrain = getMasterHex().getTerrain();
         Client.clearUndoStack();
@@ -131,7 +124,6 @@ public final class Battle
         newBattle.phase = phase;
         newBattle.summonState = summonState;
         newBattle.carryDamage = carryDamage;
-        newBattle.critterSelected = critterSelected;
         newBattle.attackerElim = attackerElim;
         newBattle.defenderElim = defenderElim;
         newBattle.attackerEntered = attackerEntered;
@@ -229,17 +221,17 @@ public final class Battle
     }
 
 
-    public Legion getLegionByPlayer(Player player)
+    public Legion getLegionByPlayerName(String playerName)
     {
         Legion attacker = getAttacker();
         if (attacker != null && attacker.getPlayerName().equals(
-            player.getName()))
+            playerName))
         {
             return attacker;
         }
         Legion defender = getDefender();
         if (defender != null && defender.getPlayerName().equals(
-            player.getName()))
+            playerName))
         {
             return defender;
         }
@@ -428,7 +420,7 @@ public final class Battle
     private boolean setupMove()
     {
         // If there are no legal moves, move on.
-        if (highlightMobileCritters() < 1)
+        if (findMobileCritters().size() < 1)
         {
             return true;
         }
@@ -450,7 +442,7 @@ public final class Battle
         applyDriftDamage();
 
         // If there are no possible strikes, move on.
-        if (highlightCrittersWithTargets() < 1)
+        if (findCrittersWithTargets().size() < 1)
         {
             return true;
         }
@@ -472,7 +464,7 @@ public final class Battle
             }
 
             // If there are no possible strikes left, move on.
-            if (highlightCrittersWithTargets() < 1)
+            if (findCrittersWithTargets().size() < 1)
             {
                 commitStrikes();
                 return true;
@@ -497,11 +489,13 @@ public final class Battle
     public void finishSummoningAngel(boolean placeNewChit)
     {
         // Bring the BattleMap back to the front.
-        map.getFrame().show();
+        game.getServer().allShowBattleMap();
 
         if (placeNewChit)
         {
-            map.placeNewChit(getAttacker());
+            Legion attacker = getAttacker();
+            game.getServer().allPlaceNewChit(attacker.getCritter(
+                attacker.getHeight() - 1), false);
         }
         if (phase == SUMMON)
         {
@@ -525,7 +519,8 @@ public final class Battle
             }
             else
             {
-                recruit = PickRecruit.pickRecruit(map.getFrame(), defender);
+                String recruitString = game.getServer().pickRecruit(defender);
+                recruit = Creature.getCreatureByName(recruitString);
             }
             if (recruit != null)
             {
@@ -534,7 +529,9 @@ public final class Battle
 
             if (defender.hasRecruited())
             {
-                map.placeNewChit(defender);
+                Critter newCritter = defender.getCritter(
+                    defender.getHeight() - 1);
+                game.getServer().allPlaceNewChit(newCritter, true);
             }
         }
         return true;
@@ -619,7 +616,7 @@ public final class Battle
     private Set findUnoccupiedTowerHexes(boolean ignoreMobileAllies)
     {
         HashSet set = new HashSet();
-        BattleHex centerHex = map.getCenterHex();
+        BattleHex centerHex = HexMap.getCenterTowerHex();
         if (ignoreMobileAllies || !isOccupied(centerHex))
         {
             set.add(centerHex.getLabel());
@@ -657,12 +654,6 @@ public final class Battle
         return set;
     }
 
-    public void highlightMoves(Critter critter)
-    {
-        Set set = showMoves(critter, false);
-        map.unselectAllHexes();
-        map.selectHexesByLabels(set);
-    }
 
     // XXX Push destination hex label instead of critter
     public void setLastCritterMoved(Critter critter)
@@ -673,19 +664,15 @@ public final class Battle
     // XXX Pop destination hex label instead of critter
     public void undoLastMove()
     {
-        critterSelected = false;
         if (!Client.isUndoStackEmpty())
         {
             Critter critter = (Critter)Client.popUndoStack();
             critter.undoMove();
         }
-        highlightMobileCritters();
     }
 
     public void undoAllMoves()
     {
-        critterSelected = false;
-
         Iterator it = getActiveLegion().getCritters().iterator();
         while (it.hasNext())
         {
@@ -695,17 +682,15 @@ public final class Battle
                 critter.undoMove();
             }
         }
-
-        highlightMobileCritters();
     }
 
 
     /** Mark all of the conceding player's critters as dead. */
-    private void concede(Player player)
+    private void concede(String markerId)
     {
         conceded = true;
 
-        Legion legion = getLegionByPlayer(player);
+        Legion legion = game.getLegionByMarkerId(markerId);
         Iterator it = legion.getCritters().iterator();
         while (it.hasNext())
         {
@@ -714,30 +699,12 @@ public final class Battle
         }
     }
 
-    private boolean tryToConcede(Player player)
+    /** Here for when we eventually do correct concession timing. */
+    public boolean tryToConcede(String markerId)
     {
-        // XXX: Concession timing is tricky.
-        String [] options = new String[2];
-        options[0] = "Yes";
-        options[1] = "No";
-        int answer = JOptionPane.showOptionDialog(map,
-            "Are you sure you wish to concede the battle?",
-            "Confirm Concession?",
-            JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
-            null, options, options[1]);
-
-        if (answer == JOptionPane.YES_OPTION)
-        {
-            Log.event(player.getName() + " concedes the battle");
-            concede(player);
-            return true;
-        }
-        return false;
-    }
-
-    public void tryToConcede()
-    {
-        tryToConcede(getActivePlayer());
+        Log.event(markerId + " concedes the battle");
+        concede(markerId);
+        return true;
     }
 
 
@@ -762,20 +729,9 @@ public final class Battle
         return set;
     }
 
-    /** Select all hexes containing critters eligible to move.
-     *  Return the number of hexes selected (not the number
-     *  of critters). */
-    public int highlightMobileCritters()
-    {
-        Set set = findMobileCritters();
-        map.unselectAllHexes();
-        map.selectHexesByLabels(set);
-        return set.size();
-    }
-
 
     /** Return true if any creatures have been left off-board. */
-    private boolean anyOffboardCreatures()
+    public boolean anyOffboardCreatures()
     {
         Legion legion = getActiveLegion();
         Iterator it = legion.getCritters().iterator();
@@ -790,19 +746,6 @@ public final class Battle
         return false;
     }
 
-    private boolean confirmLeavingCreaturesOffboard()
-    {
-        String [] options = new String[2];
-        options[0] = "Yes";
-        options[1] = "No";
-        int answer = JOptionPane.showOptionDialog(map,
-            "Are you sure you want to leave creatures offboard?",
-            "Confirm Leaving Creatures Offboard?",
-            JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
-            null, options, options[1]);
-
-        return (answer == JOptionPane.YES_OPTION);
-    }
 
     /** If any creatures were left off-board, kill them.  If they were newly
      *  summoned or recruited, unsummon or unrecruit them instead. */
@@ -837,18 +780,7 @@ public final class Battle
     {
         if (anyOffboardCreatures())
         {
-            // Don't prompt AI players.
-            Player player = getActivePlayer();
-            if (game.getServer().getClientOption(player.getName(),
-                Options.autoBattleMove) ||
-                confirmLeavingCreaturesOffboard())
-            {
-                removeOffboardCreatures();
-            }
-            else
-            {
-                return;
-            }
+            removeOffboardCreatures();
         }
         commitMoves();
         advancePhase();
@@ -882,7 +814,6 @@ public final class Battle
     {
         return driftDamageApplied;
     }
-
 
     public void setDriftDamageApplied(boolean driftDamageApplied)
     {
@@ -991,11 +922,11 @@ public final class Battle
                         legion.getPlayer().eliminateTitan();
                     }
 
-                    BattleHex hex = critter.getCurrentHex();
+                    String hexLabel = critter.getCurrentHexLabel();
                     // Remove critter from iterator rather than list to
                     // prevent concurrent modification problems.
                     it.remove();
-                    hex.repaint();
+                    game.getServer().allRepaintBattleHex(hexLabel);
                 }
                 else  // critter is alive
                 {
@@ -1136,18 +1067,8 @@ Log.debug("defender eliminated");
         return set;
     }
 
-    /** Select hexes containing critters that have valid strike targets.
-     *  Return the number of selected hexes. */
-    public int highlightCrittersWithTargets()
-    {
-        Set set = findCrittersWithTargets();
-        map.unselectAllHexes();
-        map.selectHexesByLabels(set);
-        return set.size();
-    }
 
-
-    private boolean isForcedStrikeRemaining()
+    public boolean isForcedStrikeRemaining()
     {
         Legion legion = getActiveLegion();
         if (legion != null)
@@ -1210,9 +1131,8 @@ Log.debug("defender eliminated");
         // Advance only if there are no unresolved strikes.
         if (isForcedStrikeRemaining())
         {
-            highlightCrittersWithTargets();
-            JOptionPane.showMessageDialog(map,
-                "Engaged creatures must strike.");
+            Log.error("client called battle.doneWithStrikes() illegally");
+            // XXX Send some error message to the client.
         }
         else
         {
@@ -1293,15 +1213,6 @@ Log.debug("defender eliminated");
         return findStrikes(critter, rangestrike).size();
     }
 
-    /** Highlight all hexes with targets that the critter can strike.
-     *  Return the number of hexes highlighted. */
-    public int highlightStrikes(Critter critter)
-    {
-        Set set = findStrikes(critter, true);
-        map.unselectAllHexes();
-        map.selectHexesByLabels(set);
-        return set.size();
-    }
 
     /** Return the set of hex labels for hexes with valid carry targets. */
     public Set findCarryTargets()
@@ -1321,13 +1232,6 @@ Log.debug("defender eliminated");
         return set;
     }
 
-    public int highlightCarries()
-    {
-        Set set = findCarryTargets();
-        map.unselectAllHexes();
-        map.selectHexesByLabels(set);
-        return set.size();
-    }
 
     public void applyCarries(Critter target)
     {
@@ -1346,10 +1250,10 @@ Log.debug("defender eliminated");
         else
         {
             String label = target.getCurrentHexLabel();
-            map.unselectHexByLabel(label);
+            game.getServer().allUnselectBattleHexByLabel(label);
+            game.getServer().allSetBattleDiceCarries(carryDamage);
             Log.event(carryDamage + (carryDamage == 1 ?
                 " carry available" : " carries available"));
-            game.getServer().allSetBattleDiceCarries(carryDamage);
         }
     }
 
@@ -1935,83 +1839,6 @@ Log.debug("defender eliminated");
     }
 
 
-    public void actOnCritter(Critter critter)
-    {
-        // Only the active player can move or strike.
-        if (critter != null && critter.getPlayer() == getActivePlayer())
-        {
-            critterSelected = true;
-
-            // Put selected chit at the top of the z-order.
-            if (getActiveLegion().moveToTop(critter))
-            {
-                critter.getCurrentHex().repaint();
-            }
-
-            switch (getPhase())
-            {
-                case MOVE:
-                    // Highlight all legal destinations for this critter.
-                    highlightMoves(critter);
-                    break;
-
-                case FIGHT:
-                case STRIKEBACK:
-                    // Leave carry mode.
-                    clearAllCarries();
-
-                    // Highlight all legal strikes for this critter.
-                    highlightStrikes(critter);
-                    break;
-
-                default:
-                    break;
-            }
-        }
-    }
-
-    public void actOnHex(BattleHex hex)
-    {
-        switch (getPhase())
-        {
-            case MOVE:
-                if (critterSelected)
-                {
-                    doMove(getActiveLegion().getCritter(0), hex);
-                }
-                break;
-
-            case FIGHT:
-            case STRIKEBACK:
-                if (getCarryDamage() > 0)
-                {
-                    applyCarries(getCritter(hex));
-                }
-                else if (critterSelected)
-                {
-                    getActiveLegion().getCritter(0).strike(
-                        getCritter(hex), false);
-                    critterSelected = false;
-                }
-
-                if (getCarryDamage() == 0)
-                {
-                    Player player = getActivePlayer();
-                    if (game.getServer().getClientOption(player.getName(),
-                        Options.autoForcedStrike))
-                    {
-                        makeForcedStrikes(false);
-                    }
-                    highlightCrittersWithTargets();
-                }
-                break;
-
-            default:
-                break;
-        }
-    }
-
-
     /** If legal, move critter to hex and return true. Else return false. */
     public boolean doMove(Critter critter, BattleHex hex)
     {
@@ -2028,8 +1855,6 @@ Log.debug("defender eliminated");
             Log.event(critter.getName() + " moves from " +
                 critter.getCurrentHexLabel() + " to " + hexLabel);
             critter.moveToHex(hex);
-            critterSelected = false;
-            highlightMobileCritters();
             return true;
         }
         else
@@ -2057,30 +1882,8 @@ Log.debug("defender eliminated");
     }
 
 
-    public void actOnMisclick()
-    {
-        switch (getPhase())
-        {
-            case MOVE:
-                critterSelected = false;
-                highlightMobileCritters();
-                break;
-
-            case FIGHT:
-            case STRIKEBACK:
-                critterSelected = false;
-                highlightCrittersWithTargets();
-                break;
-
-            default:
-                break;
-       }
-    }
-
-
     public void cleanup()
     {
-        map.dispose();
         battleOver = true;
         game.finishBattle(masterHexLabel, attackerEntered);
     }
@@ -2155,6 +1958,20 @@ Log.debug("defender eliminated");
             }
         }
         return critters;
+    }
+
+    public Critter getCritter(int tag)
+    {
+        Iterator it = getAllCritters().iterator();
+        while (it.hasNext())
+        {
+            Critter critter = (Critter)it.next();
+            if (critter.getTag() == tag)
+            {
+                return critter;
+            }
+        }
+        return null;
     }
 
 

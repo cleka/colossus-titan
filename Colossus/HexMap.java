@@ -642,9 +642,9 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
 
     /** Return the hex that is defined as the center of the map,
      *  for defender tower entry purposes. */
-    public BattleHex getCenterHex()
+    public static BattleHex getCenterTowerHex()
     {
-        return h[3][2];
+        return getHexByLabel('T', "D4");
     }
 
 

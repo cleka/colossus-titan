@@ -340,7 +340,7 @@ public final class Legion implements Comparable
         {
             Critter critter = (Critter)it.next();
             critter.heal();
-            critter.addBattleInfo(null, null, null, -1);
+            critter.addBattleInfo(null, null, null);
         }
     }
 

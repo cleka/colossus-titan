@@ -17,9 +17,9 @@ public final class BattleMap extends HexMap implements MouseListener,
     private JMenuBar menuBar;
     private JMenu phaseMenu;
     private Client client;
-    // XXX Remove
+    // XXX Remove battle reference
     private Battle battle;
-    private int tag = 0;
+    private boolean critterSelected;
 
     public static final String undoLastMove = "Undo Last Move";
     public static final String undoAllMoves = "Undo All Moves";
@@ -105,7 +105,9 @@ public final class BattleMap extends HexMap implements MouseListener,
         {
             public void actionPerformed(ActionEvent e)
             {
+                critterSelected = false;
                 battle.undoLastMove();
+                highlightMobileCritters();
             }
         };
 
@@ -113,7 +115,9 @@ public final class BattleMap extends HexMap implements MouseListener,
         {
             public void actionPerformed(ActionEvent e)
             {
+                critterSelected = false;
                 battle.undoAllMoves();
+                highlightMobileCritters();
             }
         };
 
@@ -121,6 +125,14 @@ public final class BattleMap extends HexMap implements MouseListener,
         {
             public void actionPerformed(ActionEvent e)
             {
+                if (battle.anyOffboardCreatures())
+                {
+                    if (!client.getOption(Options.autoBattleMove) &&
+                        !confirmLeavingCreaturesOffboard())
+                    {
+                        return;
+                    }
+                }
                 battle.doneWithMoves();
             }
         };
@@ -129,7 +141,16 @@ public final class BattleMap extends HexMap implements MouseListener,
         {
             public void actionPerformed(ActionEvent e)
             {
-                battle.doneWithStrikes();
+                if (battle.isForcedStrikeRemaining())
+                {
+                    highlightCrittersWithTargets();
+                    JOptionPane.showMessageDialog(battleFrame,
+                        "Engaged creatures must strike.");
+                }
+                else
+                {
+                    battle.doneWithStrikes();
+                }
             }
         };
 
@@ -137,10 +158,22 @@ public final class BattleMap extends HexMap implements MouseListener,
         {
             public void actionPerformed(ActionEvent e)
             {
-                // XXX: Since the UI is shared between players for the
-                // hotseat game, we will assume that the active player
-                // is the one conceding.  This will change later.
-                battle.tryToConcede();
+                String [] options = new String[2];
+                options[0] = "Yes";
+                options[1] = "No";
+                int answer = JOptionPane.showOptionDialog(battleFrame,
+                    "Are you sure you wish to concede the battle?",
+                    "Confirm Concession?",
+                    JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
+                    null, options, options[1]);
+
+                if (answer == JOptionPane.YES_OPTION)
+                {
+                    String playerName = client.getPlayerName();
+                    Log.event(playerName + " concedes the battle");
+                    client.concede(battle.getLegionByPlayerName(playerName).
+                        getMarkerId());
+                };
             }
         };
     }
@@ -223,6 +256,7 @@ public final class BattleMap extends HexMap implements MouseListener,
         mi.setMnemonic(KeyEvent.VK_C);
         mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, 0));
 
+        highlightMobileCritters();
         requestFocus();
     }
 
@@ -251,6 +285,7 @@ public final class BattleMap extends HexMap implements MouseListener,
         mi.setMnemonic(KeyEvent.VK_C);
         mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, 0));
 
+        highlightCrittersWithTargets();
         requestFocus();
     }
 
@@ -278,57 +313,44 @@ public final class BattleMap extends HexMap implements MouseListener,
     }
 
 
-    public void placeNewChit(Legion legion)
+    public void placeNewChit(Critter critter, boolean inverted)
     {
-        BattleHex entrance = getEntrance(terrain, masterHexLabel, legion);
-        int height = legion.getHeight();
-        Critter critter = legion.getCritter(height - 1);
+        BattleHex entrance = getEntrance(terrain, masterHexLabel,
+            critter.getLegion());
+        String entranceLabel = entrance.getLabel();
 
-        BattleChit chit = new BattleChit(4 * Scale.get(),
-            critter.getImageName(legion == battle.getDefender()), this,
-            critter);
-        // XXX Add chit to client.
-        critter.addBattleInfo(entrance.getLabel(), entrance.getLabel(),
-            battle, ++tag);
-        alignChits(entrance.getLabel());
+        // Add chit to client.
+        client.addBattleChit(
+            critter.getImageName(inverted), critter);
+        critter.addBattleInfo(entranceLabel, entranceLabel, battle);
+        alignChits(entranceLabel);
     }
 
 
     private void placeLegion(Legion legion, boolean inverted)
     {
         BattleHex entrance = getEntrance(terrain, masterHexLabel, legion);
+        String entranceLabel = entrance.getLabel();
         Iterator it = legion.getCritters().iterator();
         while (it.hasNext())
         {
             Critter critter = (Critter)it.next();
-            BattleChit chit = new BattleChit(4 * Scale.get(),
-                critter.getImageName(inverted), this, critter);
-            // XXX Add chit to client
+            // Add chit to client
+            client.addBattleChit(critter.getImageName(inverted), critter);
 
             String currentHexLabel = critter.getCurrentHexLabel();
             if (currentHexLabel == null)
             {
-                currentHexLabel = entrance.getLabel();
+                currentHexLabel = entranceLabel;
             }
             String startingHexLabel = critter.getStartingHexLabel();
             if (startingHexLabel == null)
             {
-                startingHexLabel = entrance.getLabel();
-            }
-
-            int existingTag = critter.getTag();
-            int thisTag;
-            if (existingTag == -1)
-            {
-                thisTag = ++tag;
-            }
-            else
-            {
-                thisTag = existingTag;
+                startingHexLabel = entranceLabel;
             }
 
             critter.addBattleInfo(currentHexLabel, startingHexLabel,
-                battle, thisTag);
+                battle);
             alignChits(currentHexLabel);
         }
     }
@@ -344,16 +366,15 @@ public final class BattleMap extends HexMap implements MouseListener,
 
     /** Return the Critter whose chit contains the given point,
      *  or null if none does. */
-    private Critter getCritterAtPoint(Point point)
+    private BattleChit getBattleChitAtPoint(Point point)
     {
-        Iterator it = battle.getAllCritters().iterator();
+        Iterator it = client.getBattleChits().iterator();
         while (it.hasNext())
         {
-            Critter critter = (Critter)it.next();
-            Chit chit = critter.getChit();
-            if (chit != null && chit.contains(point))
+            BattleChit chit = (BattleChit)it.next();
+            if (chit.contains(point))
             {
-                return critter;
+                return chit;
             }
         }
         return null;
@@ -383,7 +404,7 @@ public final class BattleMap extends HexMap implements MouseListener,
         for (int i = 0; i < numCritters; i++)
         {
             Critter critter = (Critter)critters.get(i);
-            BattleChit chit = critter.getChit();
+            BattleChit chit = client.getBattleChit(critter.getTag());
             chit.setLocation(point);
             point.x += chitScale4;
             point.y += chitScale4;
@@ -391,29 +412,202 @@ public final class BattleMap extends HexMap implements MouseListener,
         hex.repaint();
     }
 
+    public void alignChits(Set hexLabels)
+    {
+        Iterator it = hexLabels.iterator();
+        while (it.hasNext())
+        {
+            String hexLabel = (String)it.next();
+            alignChits(hexLabel);
+        }
+    }
+
+
+    /** Select all hexes containing critters eligible to move.
+     *  Return the number of hexes selected (not the number
+     *  of critters). */
+    public int highlightMobileCritters()
+    {
+        Set set = battle.findMobileCritters();
+        unselectAllHexes();
+        selectHexesByLabels(set);
+        return set.size();
+    }
+
+    public void highlightMoves(Critter critter)
+    {
+        Set set = battle.showMoves(critter, false);
+        unselectAllHexes();
+        selectHexesByLabels(set);
+    }
+
+    /** Select hexes containing critters that have valid strike targets.
+     *  Return the number of selected hexes. */
+    public int highlightCrittersWithTargets()
+    {
+        Set set = battle.findCrittersWithTargets();
+        unselectAllHexes();
+        selectHexesByLabels(set);
+        return set.size();
+    }
+
+    /** Highlight all hexes with targets that the critter can strike.
+     *  Return the number of hexes highlighted. */
+    public int highlightStrikes(Critter critter)
+    {
+        Set set = battle.findStrikes(critter, true);
+        unselectAllHexes();
+        selectHexesByLabels(set);
+        return set.size();
+    }
+
+
+    public int highlightCarries()
+    {
+        Set set = battle.findCarryTargets();
+        unselectAllHexes();
+        selectHexesByLabels(set);
+        return set.size();
+    }
+
+
+    private boolean confirmLeavingCreaturesOffboard()
+    {
+        String [] options = new String[2];
+        options[0] = "Yes";
+        options[1] = "No";
+        int answer = JOptionPane.showOptionDialog(battleFrame,
+            "Are you sure you want to leave creatures offboard?",
+            "Confirm Leaving Creatures Offboard?",
+            JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
+            null, options, options[1]);
+        return (answer == JOptionPane.YES_OPTION);
+    }
+
+
+    private void actOnCritter(Critter critter)
+    {
+        // Only the active player can move or strike.
+        if (critter != null && critter.getPlayer() == battle.getActivePlayer())
+        {
+            critterSelected = true;
+
+            // Put selected chit at the top of the z-order.
+            if (battle.getActiveLegion().moveToTop(critter))
+            {
+                getGUIHexByLabel(critter.getCurrentHexLabel()).repaint();
+            }
+
+            switch (battle.getPhase())
+            {
+                case Battle.MOVE:
+                    // Highlight all legal destinations for this critter.
+                    highlightMoves(critter);
+                    break;
+
+                case Battle.FIGHT:
+                case Battle.STRIKEBACK:
+                    // Leave carry mode.
+                    battle.clearAllCarries();
+
+                    // Highlight all legal strikes for this critter.
+                    highlightStrikes(critter);
+                    break;
+
+                default:
+                    break;
+            }
+        }
+    }
+
+
+    public void actOnHex(BattleHex hex)
+    {
+        switch (battle.getPhase())
+        {
+            case Battle.MOVE:
+                if (critterSelected)
+                {
+                    battle.doMove(battle.getActiveLegion().getCritter(0), hex);
+                    critterSelected = false;
+                    highlightMobileCritters();
+                }
+                break;
+
+            case Battle.FIGHT:
+            case Battle.STRIKEBACK:
+                if (battle.getCarryDamage() > 0)
+                {
+                    battle.applyCarries(battle.getCritter(hex));
+                }
+                else if (critterSelected)
+                {
+                    battle.getActiveLegion().getCritter(0).strike(
+                        battle.getCritter(hex), false);
+                    critterSelected = false;
+                }
+
+                if (battle.getCarryDamage() == 0)
+                {
+                    Player player = battle.getActivePlayer();
+                    if (client.getOption(Options.autoForcedStrike))
+                    {
+                        battle.makeForcedStrikes(false);
+                    }
+                    highlightCrittersWithTargets();
+                }
+                break;
+
+            default:
+                break;
+        }
+    }
+
+    private void actOnMisclick()
+    {
+        switch (battle.getPhase())
+        {
+            case Battle.MOVE:
+                critterSelected = false;
+                highlightMobileCritters();
+                break;
+
+            case Battle.FIGHT:
+            case Battle.STRIKEBACK:
+                critterSelected = false;
+                highlightCrittersWithTargets();
+                break;
+
+            default:
+                break;
+        }
+    }
+
 
     public void mousePressed(MouseEvent e)
     {
         Point point = e.getPoint();
-        Critter critter = getCritterAtPoint(point);
+        BattleChit chit = getBattleChitAtPoint(point);
         BattleHex hex = getHexContainingPoint(point);
+
+        Critter critter = battle.getCritter(chit.getTag());
 
         // Only the active player can move or strike.
         if (critter != null && critter.getPlayer() == battle.getActivePlayer())
         {
-            battle.actOnCritter(critter);
+            actOnCritter(critter);
         }
 
         // No hits on chits, so check map.
         else if (hex != null && hex.isSelected())
         {
-            battle.actOnHex(hex);
+            actOnHex(hex);
         }
 
         // No hits on selected hexes, so clean up.
         else
         {
-            battle.actOnMisclick();
+            actOnMisclick();
         }
     }
 
@@ -445,7 +639,7 @@ public final class BattleMap extends HexMap implements MouseListener,
         while (lit.hasPrevious())
         {
             Critter critter = (Critter)lit.previous();
-            Chit chit = critter.getChit();
+            BattleChit chit = client.getBattleChit(critter.getTag());
             if (chit != null && rectClip.intersects(chit.getBounds()))
             {
                 chit.paintComponent(g);

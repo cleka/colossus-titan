@@ -176,9 +176,9 @@ public final class Client
     }
 
     /** Legion concedes. */
-    boolean concede(String legion)
+    boolean concede(String markerId)
     {
-        return false;
+        return server.tryToConcede(markerId);
     }
 
     /** Legion does not concede. */
@@ -586,6 +586,81 @@ public final class Client
         return null;
     }
 
+
+    public List getBattleChits()
+    {
+        return battleChits;
+    }
+
+    /** Get the BattleChit with this tag. */
+    public BattleChit getBattleChit(int tag)
+    {
+        Iterator it = markers.iterator();
+        while (it.hasNext())
+        {
+            BattleChit chit = (BattleChit)it.next();
+            if (chit.getTag() == tag)
+            {
+                return chit;
+            }
+        }
+        return null;
+    }
+
+    /** Create a new BattleChit and add it to the end of the list. */
+    public void addBattleChit(String imageName, Critter critter)
+    {
+        BattleChit chit = new BattleChit(4 * Scale.get(), imageName,
+            map, critter);
+        setBattleChit(critter.getTag(), chit);
+    }
+
+    /** Add the BattleChit to the end of the list.  If it's already
+     *  in the list, remove the earlier entry. */
+    public void setBattleChit(int tag, BattleChit chit)
+    {
+        removeBattleChit(tag);
+        battleChits.add(chit);
+    }
+
+    /** Remove the first BattleChit with this tag from the list. Return
+     *  the removed BattleChit. */
+    public BattleChit removeBattleChit(int tag)
+    {
+        Iterator it = battleChits.iterator();
+        while (it.hasNext())
+        {
+            BattleChit chit = (BattleChit)it.next();
+            if (chit.getTag() == tag)
+            {
+                it.remove();
+                return chit;
+            }
+        }
+        return null;
+    }
+
+    public void placeNewChit(Critter critter, boolean inverted)
+    {
+        map.placeNewChit(critter, inverted);
+    }
+
+    public void setBattleChitDead(int tag)
+    {
+        Iterator it = battleChits.iterator();
+        while (it.hasNext())
+        {
+            BattleChit chit = (BattleChit)it.next();
+            if (chit.getTag() == tag)
+            {
+                chit.setDead(true);
+                return;
+            }
+        }
+    }
+
+
+
     public static void clearUndoStack()
     {
         undoStack.clear();
@@ -734,6 +809,21 @@ public final class Client
     }
 
 
+    /** Allow the player to choose whether to take a penalty (fewer dice
+     *  or higher strike number) in order to be allowed to carry.  Return
+     *  true if the penalty is taken. */
+    public boolean chooseStrikePenalty(String prompt)
+    {
+        String [] options = new String[2];
+        options[0] = "Take Penalty";
+        options[1] = "Do Not Take Penalty";
+        int answer = JOptionPane.showOptionDialog(map, prompt,
+            "Take Strike Penalty?", JOptionPane.YES_NO_OPTION,
+            JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
+        return (answer == JOptionPane.YES_OPTION);
+    }
+
+
     public int pickEntrySide(String hexLabel, Legion legion)
     {
         return PickEntrySide.pickEntrySide(board.getFrame(), hexLabel, legion);
@@ -750,6 +840,12 @@ public final class Client
     public void repaintMasterHex(String hexLabel)
     {
         board.getGUIHexByLabel(hexLabel).repaint();
+    }
+
+
+    public void repaintBattleHex(String hexLabel)
+    {
+        map.getGUIHexByLabel(hexLabel).repaint();
     }
 
 
@@ -814,10 +910,24 @@ public final class Client
     }
 
 
-    public void initBattleMap()
+    public void initBattleMap(String masterHexLabel, Battle battle)
     {
-        //map = new BattleMap(this, masterHexLabel);
+        map = new BattleMap(this, masterHexLabel, battle);
+        showBattleMap();
     }
+
+    public void showBattleMap()
+    {
+        map.getFrame().toFront();
+        map.requestFocus();
+    }
+
+    public void disposeBattleMap()
+    {
+        map.dispose();
+        map = null;
+    }
+
 
     public static void main(String [] args)
     {

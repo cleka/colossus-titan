@@ -9,7 +9,9 @@ import java.awt.*;
 
 public final class BattleChit extends Chit
 {
+    // XXX Remove direct critter reference.
     private Critter critter;
+    private int tag;
     private static Font font;
     private static Font oldFont;
     private static int fontHeight;
@@ -20,20 +22,14 @@ public final class BattleChit extends Chit
     {
         super(scale, id, container);
         this.critter = critter;
+        tag = critter.getTag();
         setBackground(Color.white);
     }
 
 
-    public Critter getCritter()
+    public int getTag()
     {
-        return critter;
-    }
-
-
-    // Override the method inherited from Chit.
-    public boolean isDead()
-    {
-        return critter.isDead();
+        return tag;
     }
 
 

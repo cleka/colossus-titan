@@ -21,8 +21,10 @@ public final class Critter extends Creature implements Comparable
     /** Mark whether this critter is a legal carry target. */
     private boolean carryFlag;
     private Game game;
-    /** Used to uniquely compare critters after an AICopy */
-    private int tag = -1;
+    /** Unique identifier for each critter. */
+    private int tag;
+    /** Counter used to assign unique tags. */
+    private static int tagCounter = -1;
 
 
     public Critter(Creature creature, boolean visible, String markerId,
@@ -34,6 +36,7 @@ public final class Critter extends Creature implements Comparable
         this.visible = visible;
         this.markerId = markerId;
         this.game = game;
+        tag = ++tagCounter;
     }
 
 
@@ -55,12 +58,11 @@ public final class Critter extends Creature implements Comparable
 
 
     public void addBattleInfo(String currentHexLabel, String startingHexLabel,
-        Battle battle, int tag)
+        Battle battle)
     {
         this.currentHexLabel = currentHexLabel;
         this.startingHexLabel = startingHexLabel;
         this.battle = battle;
-        this.tag = tag;
     }
 
     public void setGame(Game game)
@@ -195,12 +197,7 @@ public final class Critter extends Creature implements Comparable
                 setDead(true);
             }
 
-            // Update damage displayed on chit.
-            // Chit.repaint() doesn't work right after a creature is killed
-            // by carry damage, so paint the whole hex.
-            // XXX This won't work because we need a GUI hex.  Client
-            // will need to do the repaint.
-            getCurrentHex().repaint();
+            battle.getGame().getServer().allRepaintBattleHex(currentHexLabel);
         }
 
         return excess;
@@ -371,9 +368,10 @@ public final class Critter extends Creature implements Comparable
     {
         currentHexLabel = hex.getLabel();
         battle.setLastCritterMoved(this);
-        BattleMap map = battle.getBattleMap();
-        map.alignChits(startingHexLabel);
-        map.alignChits(currentHexLabel);
+        Set set = new HashSet();
+        set.add(startingHexLabel);
+        set.add(currentHexLabel);
+        battle.getGame().getServer().allAlignBattleChits(set);
     }
 
 
@@ -383,9 +381,10 @@ public final class Critter extends Creature implements Comparable
         currentHexLabel = startingHexLabel;
         Log.event(getName() + " undoes move and returns to " +
             startingHexLabel);
-        BattleMap map = battle.getBattleMap();
-        map.alignChits(formerHexLabel);
-        map.alignChits(currentHexLabel);
+        Set set = new HashSet();
+        set.add(formerHexLabel);
+        set.add(currentHexLabel);
+        battle.getGame().getServer().allAlignBattleChits(set);
     }
 
 
@@ -589,10 +588,6 @@ public final class Critter extends Creature implements Comparable
         }
         prompt.append("?");
 
-        String [] options = new String[2];
-        options[0] = "Take Penalty";
-        options[1] = "Do Not Take Penalty";
-
         if (game.getServer().getClientOption(getPlayer().getName(),
             Options.autoStrike))
         {
@@ -601,11 +596,8 @@ public final class Critter extends Creature implements Comparable
         }
         else
         {
-            int answer = JOptionPane.showOptionDialog(battle.getBattleMap(),
-                prompt.toString(), "Take Strike Penalty?",
-                JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
-                null, options, options[1]);
-            return (answer == JOptionPane.YES_OPTION);
+            return battle.getGame().getServer().chooseStrikePenalty(
+                getPlayer().getName(), prompt.toString());
         }
     }
 
@@ -866,7 +858,7 @@ public final class Critter extends Creature implements Comparable
             Log.event(carryDamage + (carryDamage == 1 ?
                 " carry available" : " carries available"));
             battle.setCarryDamage(carryDamage);
-            battle.highlightCarries();
+            battle.getGame().getServer().allHighlightCarries();
         }
 
         // Record that this attacker has struck.
@@ -905,9 +897,8 @@ public final class Critter extends Creature implements Comparable
         if (dead)
         {
             hits = getPower();
+            battle.getGame().getServer().allSetBattleChitDead(tag);
         }
-        // XXX Need to do this on client side.
-        getChit().setDead(dead);
     }
 
     /** Inconsistent with equals() */
