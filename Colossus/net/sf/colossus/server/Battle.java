@@ -490,15 +490,12 @@ final class Battle
 
     private boolean setupSummon()
     {
-Log.debug("Battle.setupSummon()");
         server.allSetupBattleSummon();
         boolean advance = true;
         if (summonState == Constants.FIRST_BLOOD)
         {
-Log.debug("Battle.setupSummon() FIRST_BLOOD");
             if (getAttacker().canSummonAngel())
             {
-Log.debug("Battle.setupSummon() attacker can summon angel");
                 game.createSummonAngel(getAttacker());
                 advance = false;
             }
@@ -507,7 +504,6 @@ Log.debug("Battle.setupSummon() attacker can summon angel");
             // battle is over.
             summonState = Constants.TOO_LATE;
         }
-Log.debug("Battle.setupSummon() advance will be " + advance);
         return advance;
     }
 
@@ -915,8 +911,8 @@ Log.debug("Battle.setupSummon() advance will be " + advance);
         server.allRemoveDeadBattleChits();
 
         // XXX Remove these and let the client take care of this.
-        server.allRevealLegion(attacker);
-        server.allRevealLegion(defender);
+        // server.allRevealLegion(attacker);
+        // server.allRevealLegion(defender);
     }
 
     private void removeDeadCreaturesFromLegion(Legion legion)
@@ -1138,7 +1134,6 @@ Log.debug("Battle.setupSummon() advance will be " + advance);
      *  technically forced. */
     void makeForcedStrikes(boolean rangestrike)
     {
-Log.debug("called Battle.makeForcedStrikes() " + rangestrike);
         Legion legion = getActiveLegion();
         boolean repeat;
         do
@@ -1308,7 +1303,6 @@ Log.debug("called Battle.makeForcedStrikes() " + rangestrike);
 
     void applyCarries(Critter target)
     {
-Log.debug("called Battle.applyCarries() for " + target.getDescription());
         if (!carryTargets.contains(target.getCurrentHexLabel()))
         {
             Log.warn("Tried illegal carry to " + target.getDescription());

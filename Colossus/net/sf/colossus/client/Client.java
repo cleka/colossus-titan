@@ -306,7 +306,7 @@ public final class Client
         return options.getIntOption(optname);
     }
 
-    /** Public so that server can set autoPlay for AIs. */
+    /** public so that server can set autoPlay for AIs. */
     public void setOption(String optname, String value)
     {
         if (!value.equals(getStringOption(optname)))
@@ -821,7 +821,6 @@ public final class Client
     }
 
 
-
     public void removeDeadBattleChits()
     {
         Iterator it = battleChits.iterator();
@@ -850,6 +849,7 @@ public final class Client
         }
     }
 
+    // XXX A bit too much direct server GUI control.
     public void placeNewChit(String imageName, boolean inverted, int tag, 
         String hexLabel)
     {
@@ -963,6 +963,7 @@ public final class Client
     }
 
     // TODO Should take board data from variant file, or stream, as argument.
+    // XXX Too much direct client GUI control.
     public void initBoard()
     {
         // Do not show boards for AI players, except primary client.
@@ -1017,6 +1018,7 @@ public final class Client
         return summonAngel;
     }
 
+    // XXX Rename
     public void createSummonAngel(String markerId, String longMarkerName)
     {
         if (getOption(Options.autoSummonAngels))
@@ -1054,7 +1056,6 @@ public final class Client
 
     public void askAcquireAngel(String markerId, java.util.List recruits)
     {
-Log.debug("called Client.askAcquireAngel()");
         if (getOption(Options.autoAcquireAngels))
         {
             acquireAngelCallback(markerId, ai.acquireAngel(markerId,
@@ -1120,6 +1121,7 @@ Log.debug("called Client.acquireAngelCallback()");
     }
 
 
+    // XXX rename
     public void showMessageDialog(String message)
     {
         // Don't bother showing messages to AI players.  Perhaps we
@@ -1376,7 +1378,7 @@ Log.debug("called Client.acquireAngelCallback()");
 
 
     public void initBattle(String masterHexLabel, int battleTurnNumber,
-        String battleActivePlayerName, int battlePhase, 
+        String battleActivePlayerName, int battlePhase,
         String attackerMarkerId, String defenderMarkerId)
     {
         cleanupNegotiationDialogs();
@@ -1403,6 +1405,7 @@ Log.debug("called Client.acquireAngelCallback()");
     }
 
 
+    // XXX Too much direct GUI control
     public void cleanupBattle()
     {
         if (map != null)
@@ -1413,6 +1416,8 @@ Log.debug("called Client.acquireAngelCallback()");
         battleChits.clear();
     }
 
+
+    // XXX Too much direct GUI control
     public void highlightEngagements()
     {
         if (board != null)
@@ -1582,7 +1587,7 @@ Log.debug("called Client.acquireAngelCallback()");
         }
     }
 
-    // TODO Update markersAvailable more often.
+    // XXX Update markersAvailable more often.
     public void setupSplit(Set markersAvailable, String activePlayerName,
         int turnNumber)
     {
@@ -1721,6 +1726,7 @@ Log.debug("called Client.acquireAngelCallback()");
     }
 
 
+    // XXX Excessive GUI control
     /** Create a new marker and add it to the end of the list. */
     public void addMarker(String markerId, String hexLabel)
     {
@@ -2204,8 +2210,7 @@ Log.debug("called Client.acquireAngelCallback()");
     }
 
     /** Return a list of creature name strings. */
-    public java.util.List findEligibleRecruiters(String markerId, 
-        String recruitName)
+    java.util.List findEligibleRecruiters(String markerId, String recruitName)
     {
         java.util.List recruiters;
         Creature recruit = Creature.getCreatureByName(recruitName);
@@ -2340,7 +2345,8 @@ Log.debug("found " + set.size() + " hexes");
         {
             Map.Entry entry = (Map.Entry)it.next();
             LegionInfo info = (LegionInfo)entry.getValue();
-            if (info != null && hexLabel.equals(info.getHexLabel()))
+            if (info.getHexLabel() != null &&
+                hexLabel.equals(info.getHexLabel()))
             {
                 markerIds.add(info.getMarkerId());
             }
@@ -2645,11 +2651,14 @@ Log.debug("found " + set.size() + " hexes");
         server.doneWithRecruits(playerName);
     }
 
+
+    // XXX For debug only -- remove
     void forceAdvancePhase()
     {
         server.forceAdvancePhase();
     }
 
+    // XXX For debug only -- remove
     void forceAdvanceBattlePhase()
     {
         server.forceAdvanceBattlePhase();

@@ -388,7 +388,6 @@ public final class Server
     /** Find out if the player wants to acquire an angel or archangel. */
     void askAcquireAngel(String playerName, String markerId, List recruits)
     {
-Log.debug("Called Server.askAcquireAngel()");
         Legion legion = game.getLegionByMarkerId(markerId);
         if (legion.getHeight() < 7)
         {
@@ -402,7 +401,6 @@ Log.debug("Called Server.askAcquireAngel()");
 
     public void acquireAngel(String markerId, String angelType)
     {
-Log.debug("Called Server.acquireAngel() for " + markerId + " " + angelType);
         Legion legion = game.getLegionByMarkerId(markerId);
         if (legion != null)
         {
@@ -413,7 +411,6 @@ Log.debug("Called Server.acquireAngel() for " + markerId + " " + angelType);
 
     void createSummonAngel(Legion legion)
     {
-Log.debug("called Server.createSummonAngel for " + legion);
         Client client = getClient(legion.getPlayerName());
         client.createSummonAngel(legion.getMarkerId(), 
             legion.getLongMarkerName());
@@ -660,7 +657,7 @@ Log.debug("called Server.createSummonAngel for " + legion);
             battle.getCritter(hexLabel));
     }
 
-    // TODO Error checks.
+    // XXX Error checks.
     public void applyCarries(String hexLabel)
     {
         Battle battle = game.getBattle();
@@ -791,7 +788,6 @@ Log.debug("called Server.createSummonAngel for " + legion);
     }
 
 
-    // TODO Undo all moves.  (Currently the client does it.)
     public void mulligan(String playerName)
     {
         if (!playerName.equals(game.getActivePlayerName()))
@@ -799,6 +795,7 @@ Log.debug("called Server.createSummonAngel for " + legion);
             Log.error(playerName + "illegally called mulligan()"); 
             return;
         }
+        game.getActivePlayer().undoAllMoves();
         int roll = game.mulligan();
         Log.event(playerName + " takes a mulligan and rolls " + roll);
         if (roll != -1)
@@ -939,13 +936,13 @@ Log.debug("called Server.createSummonAngel for " + legion);
         game.advancePhase(Constants.MUSTER, playerName);
     }
 
-    /** Advance the phase without error checks, for debug only. */
+    /** XXX Advance the phase without error checks, for debug only. */
     public void forceAdvancePhase()
     {
         game.advancePhase(game.getPhase(), game.getActivePlayerName());
     }
 
-    /** Advance the battle phase without error checks, for debug only. */
+    /** XXX Advance the battle phase without error checks, for debug only. */
     public void forceAdvanceBattlePhase()
     {
         game.getBattle().advancePhase();

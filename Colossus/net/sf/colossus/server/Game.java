@@ -1353,7 +1353,6 @@ public final class Game
                 server.allFullyUpdateOwnLegionContents();
             }
 
-            // Setup MasterBoard
             server.allInitBoard();
             server.allAddMarkers();
 
