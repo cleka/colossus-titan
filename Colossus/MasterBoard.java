@@ -1172,6 +1172,15 @@ public class MasterBoard extends Frame implements MouseListener,
                                             defender);
                                     }
 
+                                    // If the defender won the battle by
+                                    // agreement, he may recruit.
+                                    if (hex.isEngagement() == false &&
+                                        hex.getLegion(0) == defender)
+                                    {
+                                        PickRecruit pickrecruit = new 
+                                            PickRecruit(this, defender);
+                                    }
+
                                     // XXX: Add battle
                                 }
                             }
