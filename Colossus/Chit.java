@@ -33,6 +33,7 @@ class Chit
         dy = 0;
     }
 
+
     void rescale(int scale)
     {
         dx = 0;
@@ -41,10 +42,12 @@ class Chit
         rect.height = scale;
     }
 
+
     public void paint(Graphics g)
     {
         g.drawImage(image, rect.x, rect.y, rect.width, rect.width, container);
     }
+
 
     boolean select(Point point)
     {
@@ -61,6 +64,7 @@ class Chit
         return selected;
     }
 
+
     void setLocation(Point point)
     {
         point.x -= dx;
@@ -68,15 +72,24 @@ class Chit
         rect.setLocation(point);
     }
 
+
+    void setLocationAbs(Point point)
+    {
+        rect.setLocation(point);
+    }
+
+
     public Rectangle getBounds()
     {
         return rect;
     }
 
+
     public Point center()
     {
         return new Point(rect.x + rect.width / 2, rect.y + rect.height / 2);
     }
+
     
     public Point topLeft()
     {
