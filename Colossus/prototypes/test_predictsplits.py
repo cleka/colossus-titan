@@ -394,7 +394,6 @@ class PredictSplitsTestCase(unittest.TestCase):
         assert(not ps.getLeaf("Rd10").allCertain())
         assert(not ps.getLeaf("Rd11").allCertain())
         ps.printLeaves()
-        ps.printNodes()
 
         turn = 10
         print "Turn", turn
@@ -882,8 +881,6 @@ class PredictSplitsTestCase(unittest.TestCase):
         ps.printLeaves()
 
         turn = 7
-
-        turn = 8
         print "\nTurn", turn
         ps.getLeaf("Gd12").split(2, "Gd09", turn)
         ps.getLeaf("Gd03").revealCreatures(['Gargoyle', 'Gargoyle'])
@@ -892,6 +889,16 @@ class PredictSplitsTestCase(unittest.TestCase):
         ps.getLeaf("Gd07").addCreature("Lion")
         ps.getLeaf("Gd08").revealCreatures(['Ogre', 'Ogre'])
         ps.getLeaf("Gd08").addCreature("Troll")
+        assert(ps.getLeaf("Gd03").allCertain())
+        assert(not ps.getLeaf("Gd04").allCertain())
+        assert(ps.getLeaf("Gd07").allCertain())
+        assert(not ps.getLeaf("Gd08").allCertain())
+        assert(not ps.getLeaf("Gd09").allCertain())
+        assert(not ps.getLeaf("Gd12").allCertain())
+        ps.printLeaves()
+
+        turn = 8
+        print "\nTurn", turn
         ps.getLeaf("Gd04").revealCreatures(['Lion', 'Lion'])
         ps.getLeaf("Gd04").addCreature("Ranger")
         ps.getLeaf("Gd07").revealCreatures(['Lion', 'Lion'])
@@ -965,7 +972,6 @@ class PredictSplitsTestCase(unittest.TestCase):
         ps.getLeaf("Gd12").revealCreatures(['Cyclops', 'Cyclops'])
         ps.getLeaf("Gd12").addCreature("Gorgon")
         assert(ps.getLeaf("Gd03").allCertain())
-        # XXX Check this
         assert(not ps.getLeaf("Gd04").allCertain())
         assert(not ps.getLeaf("Gd07").allCertain())
         assert(not ps.getLeaf("Gd07").allCertain())
@@ -1095,6 +1101,8 @@ class PredictSplitsTestCase(unittest.TestCase):
         ps.printLeaves()
 
         turn = 21
+        print "\nTurn", turn
+        ps.printLeaves()
 
         turn = 22
         print "\nTurn", turn
@@ -1390,7 +1398,6 @@ class PredictSplitsTestCase(unittest.TestCase):
         ps.getLeaf("Gr08").revealCreatures(["Centaur"])
         ps.getLeaf("Gr08").addCreature("Centaur")
         ps.printLeaves()
-        ps.dumpAsDot("turn%d.dot" % turn)
         assert(not ps.getLeaf("Gr04").allCertain())
         assert(not ps.getLeaf("Gr08").allCertain())
 
@@ -1399,7 +1406,6 @@ class PredictSplitsTestCase(unittest.TestCase):
         ps.getLeaf("Gr04").revealCreatures(["Gargoyle"])
         ps.getLeaf("Gr04").addCreature("Gargoyle")
         ps.printLeaves()
-        ps.dumpAsDot("turn%d.dot" % turn)
         assert(not ps.getLeaf("Gr04").allCertain())
         assert(not ps.getLeaf("Gr08").allCertain())
 
@@ -1408,7 +1414,6 @@ class PredictSplitsTestCase(unittest.TestCase):
         ps.getLeaf("Gr04").revealCreatures(["Gargoyle", "Gargoyle"])
         ps.getLeaf("Gr04").addCreature("Cyclops")
         ps.printLeaves()
-        ps.dumpAsDot("turn%d.dot" % turn)
         assert(not ps.getLeaf("Gr04").allCertain())
         assert(not ps.getLeaf("Gr08").allCertain())
 
@@ -1420,7 +1425,6 @@ class PredictSplitsTestCase(unittest.TestCase):
         ps.getLeaf("Gr08").revealCreatures(["Centaur", "Centaur"])
         ps.getLeaf("Gr08").addCreature("Lion")
         ps.printLeaves()
-        ps.dumpAsDot("turn%d.dot" % turn)
         assert(not ps.getLeaf("Gr04").allCertain())
         assert(not ps.getLeaf("Gr06").allCertain())
         assert(not ps.getLeaf("Gr08").allCertain())
@@ -1433,7 +1437,6 @@ class PredictSplitsTestCase(unittest.TestCase):
         ps.getLeaf("Gr08").revealCreatures(["Lion"])
         ps.getLeaf("Gr08").addCreature("Lion")
         ps.printLeaves()
-        ps.dumpAsDot("turn%d.dot" % turn)
         assert(not ps.getLeaf("Gr04").allCertain())
         assert(not ps.getLeaf("Gr06").allCertain())
         assert(not ps.getLeaf("Gr08").allCertain())
@@ -1448,7 +1451,6 @@ class PredictSplitsTestCase(unittest.TestCase):
         ps.getLeaf("Gr06").addCreature("Ogre")
         ps.getLeaf("Gr11").removeCreatures(["Centaur", "Centaur"])
         ps.printLeaves()
-        ps.dumpAsDot("turn%d.dot" % turn)
         assert(not ps.getLeaf("Gr04").allCertain())
         assert(not ps.getLeaf("Gr06").allCertain())
         assert(not ps.getLeaf("Gr07").allCertain())
@@ -1463,8 +1465,6 @@ class PredictSplitsTestCase(unittest.TestCase):
         ps.getLeaf("Gr07").revealCreatures(["Ogre"])
         ps.getLeaf("Gr07").addCreature("Ogre")
         ps.printLeaves()
-        ps.printNodes()
-        ps.dumpAsDot("turn%d.dot" % turn)
         assert(not ps.getLeaf("Gr04").allCertain())
         assert(not ps.getLeaf("Gr06").allCertain())
         assert(not ps.getLeaf("Gr07").allCertain())
@@ -1477,15 +1477,10 @@ class PredictSplitsTestCase(unittest.TestCase):
         ps.getLeaf("Gr07").addCreature("Minotaur")
         ps.getLeaf("Gr08").revealCreatures(["Gargoyle"])
         ps.getLeaf("Gr08").addCreature("Gargoyle")
-        ps.printNodes()
-        ps.dumpAsDot("turn%da.dot" % turn)
         ps.getLeaf("Gr06").removeCreatures(["Troll", "Gargoyle", "Gargoyle",
           "Ogre", "Ogre"])
-        ps.dumpAsDot("turn%db.dot" % turn)
-        ps.printNodes()
         ps.getLeaf("Gr12").removeCreatures(["Cyclops", "Ogre"])
-        ps.printNodes()
-        ps.dumpAsDot("turn%dc.dot" % turn)
+        ps.printLeaves()
         assert(ps.getLeaf("Gr04").allCertain())
         assert(ps.getLeaf("Gr07").allCertain())
         assert(ps.getLeaf("Gr08").allCertain())
@@ -1495,7 +1490,6 @@ class PredictSplitsTestCase(unittest.TestCase):
         ps.getLeaf("Gr08").revealCreatures(["Gargoyle", "Gargoyle"])
         ps.getLeaf("Gr08").addCreature("Cyclops")
         ps.printLeaves()
-        ps.dumpAsDot("turn%d.dot" % turn)
         assert(ps.getLeaf("Gr04").allCertain())
         assert(ps.getLeaf("Gr07").allCertain())
         assert(ps.getLeaf("Gr08").allCertain())
@@ -1508,7 +1502,6 @@ class PredictSplitsTestCase(unittest.TestCase):
         ps.getLeaf("Gr08").revealCreatures(["Cyclops"])
         ps.getLeaf("Gr08").addCreature("Cyclops")
         ps.printLeaves()
-        ps.dumpAsDot("turn%d.dot" % turn)
         assert(not ps.getLeaf("Gr01").allCertain())
         assert(ps.getLeaf("Gr04").allCertain())
         assert(ps.getLeaf("Gr07").allCertain())
@@ -1523,7 +1516,6 @@ class PredictSplitsTestCase(unittest.TestCase):
         ps.printLeaves()
         ps.getLeaf("Gr01").removeCreatures(["Gargoyle", "Gargoyle"])
         ps.printLeaves()
-        ps.dumpAsDot("turn%d.dot" % turn)
         assert(ps.getLeaf("Gr04").allCertain())
         assert(ps.getLeaf("Gr07").allCertain())
         assert(ps.getLeaf("Gr08").allCertain())
@@ -1531,13 +1523,13 @@ class PredictSplitsTestCase(unittest.TestCase):
         turn = 13
         print "Turn", turn
         ps.getLeaf("Gr08").split(2, "Gr02", turn)
-        ps.getLeaf("Gr07").revealCreatures(["Troll"])
+        ps.getLeaf("Gr07").revealCreatures(["Ogre", "Ogre"])
         ps.getLeaf("Gr07").addCreature("Troll")
         ps.printLeaves()
-        ps.dumpAsDot("turn%d.dot" % turn)
+        assert(not ps.getLeaf("Gr02").allCertain())
         assert(ps.getLeaf("Gr04").allCertain())
         assert(ps.getLeaf("Gr07").allCertain())
-        assert(ps.getLeaf("Gr08").allCertain())
+        assert(not ps.getLeaf("Gr08").allCertain())
 
         turn = 14
         print "Turn", turn
@@ -1549,18 +1541,22 @@ class PredictSplitsTestCase(unittest.TestCase):
         ps.getLeaf("Gr08").revealCreatures(["Cyclops"])
         ps.getLeaf("Gr08").addCreature("Cyclops")
         ps.printLeaves()
-        ps.dumpAsDot("turn%d.dot" % turn)
+        assert(not ps.getLeaf("Gr02").allCertain())
         assert(not ps.getLeaf("Gr04").allCertain())
         assert(not ps.getLeaf("Gr06").allCertain())
         assert(ps.getLeaf("Gr07").allCertain())
-        assert(ps.getLeaf("Gr08").allCertain())
+        assert(not ps.getLeaf("Gr08").allCertain())
 
         turn = 15
         print "Turn", turn
         ps.getLeaf("Gr06").removeCreatures(["Cyclops", "Cyclops", "Cyclops"])
-        ps.getLeaf("Gr02").revealCreatures(["Centaur"]) # XXX
+        ps.getLeaf("Gr02").revealCreatures(["Centaur"])
         ps.getLeaf("Gr02").addCreature("Centaur")
         ps.printLeaves()
+        assert(not ps.getLeaf("Gr02").allCertain())
+        assert(ps.getLeaf("Gr04").allCertain())
+        assert(ps.getLeaf("Gr07").allCertain())
+        assert(not ps.getLeaf("Gr08").allCertain())
 
         turn = 16
         print "Turn", turn
@@ -1571,33 +1567,58 @@ class PredictSplitsTestCase(unittest.TestCase):
         ps.getLeaf("Gr08").revealCreatures(["Lion"])
         ps.getLeaf("Gr08").addCreature("Lion")
         ps.printLeaves()
+        assert(not ps.getLeaf("Gr02").allCertain())
+        assert(ps.getLeaf("Gr04").allCertain())
+        assert(ps.getLeaf("Gr07").allCertain())
+        assert(not ps.getLeaf("Gr08").allCertain())
 
         turn = 17
         print "Turn", turn
         ps.getLeaf("Gr02").removeCreatures(["Lion", "Centaur", "Centaur"])
         ps.printLeaves()
+        assert(ps.getLeaf("Gr04").allCertain())
+        assert(ps.getLeaf("Gr07").allCertain())
+        assert(ps.getLeaf("Gr08").allCertain())
         ps.getLeaf("Gr08").split(2, "Gr12", turn)
         ps.getLeaf("Gr08").revealCreatures(["Cyclops", "Cyclops"])
         ps.getLeaf("Gr08").addCreature("Gorgon")
         ps.printLeaves()
+        assert(ps.getLeaf("Gr04").allCertain())
+        assert(ps.getLeaf("Gr07").allCertain())
+        assert(not ps.getLeaf("Gr08").allCertain())
+        assert(not ps.getLeaf("Gr12").allCertain())
 
         turn = 18
         print "Turn", turn
         ps.getLeaf("Gr12").removeCreatures(["Lion", "Lion"])
+        assert(ps.getLeaf("Gr04").allCertain())
+        assert(ps.getLeaf("Gr07").allCertain())
+        assert(ps.getLeaf("Gr08").allCertain())
         ps.getLeaf("Gr04").split(2, "Gr12", turn)
         ps.getLeaf("Gr07").split(2, "Gr09", turn)
         ps.getLeaf("Gr08").revealCreatures(["Cyclops", "Cyclops"])
         ps.getLeaf("Gr08").addCreature("Gorgon")
         ps.printLeaves()
+        assert(not ps.getLeaf("Gr04").allCertain())
+        assert(not ps.getLeaf("Gr07").allCertain())
+        assert(ps.getLeaf("Gr08").allCertain())
+        assert(not ps.getLeaf("Gr09").allCertain())
+        assert(not ps.getLeaf("Gr12").allCertain())
 
         turn = 19
         print "Turn", turn
-        ps.getLeaf("Gr09").removeCreature(["Ogre", "Ogre"])
+        ps.getLeaf("Gr09").removeCreatures(["Ogre", "Ogre"])
+        ps.getLeaf("Gr08").split(2, "Gr06", turn)
         ps.getLeaf("Gr07").revealCreatures(["Minotaur", "Minotaur"])
         ps.getLeaf("Gr07").addCreature("Unicorn")
         ps.getLeaf("Gr08").revealCreatures(["Cyclops", "Cyclops"])
         ps.getLeaf("Gr08").addCreature("Gorgon")
         ps.printLeaves()
+        assert(not ps.getLeaf("Gr04").allCertain())
+        assert(not ps.getLeaf("Gr06").allCertain())
+        assert(ps.getLeaf("Gr07").allCertain())
+        assert(not ps.getLeaf("Gr08").allCertain())
+        assert(not ps.getLeaf("Gr12").allCertain())
 
         turn = 20
         print "Turn", turn
@@ -1606,128 +1627,19 @@ class PredictSplitsTestCase(unittest.TestCase):
         ps.getLeaf("Gr08").addCreature("Behemoth")
         ps.getLeaf("Gr12").revealCreatures(["Cyclops"])
         ps.getLeaf("Gr12").addCreature("Cyclops")
+        ps.printLeaves()
+
+        turn = 21
+        print "Turn", turn
         ps.getLeaf("Gr04").revealCreatures(["Cyclops"])
         ps.getLeaf("Gr04").addCreature("Gargoyle")
         ps.getLeaf("Gr12").revealCreatures(["Cyclops", "Cyclops", "Cyclops"])
         ps.getLeaf("Gr12").addCreature("Behemoth")
         ps.printLeaves()
-
-        turn = 22
-        print "Turn", turn
-        ps.printLeaves()
-
-        turn = 23
-        print "Turn", turn
-        ps.getLeaf("Gr06").revealCreatures(["Gorgon"])
-        ps.getLeaf("Gr06").addCreature("Gorgon")
-        ps.getLeaf("Gr07").revealCreatures(["Troll", "Troll"])
-        ps.getLeaf("Gr07").addCreature("Ranger")
-        ps.printLeaves()
-
-        turn = 24
-        print "Turn", turn
-        ps.getLeaf("Gr07").split(2, "Gr11", turn)
-        ps.getLeaf("Gr07").revealCreatures(["Unicorn"])
-        ps.getLeaf("Gr07").addCreature("Unicorn")
-        ps.getLeaf("Gr04").revealCreatures(["Gargoyle"])
-        ps.getLeaf("Gr04").addCreature("Gargoyle")
-        ps.getLeaf("Gr07").revealCreatures(["Ranger"])
-        ps.getLeaf("Gr07").addCreature("Lion")
-        ps.getLeaf("Gr11").revealCreatures(["Minotaur"])
-        ps.getLeaf("Gr11").addCreature("Minotaur")
-        ps.getLeaf("Gr12").revealCreatures(["Cyclops", "Cyclops", "Cyclops"])
-        ps.getLeaf("Gr12").addCreature("Behemoth")
-        ps.printLeaves()
-
-        turn = 26
-        print "Turn", turn
-        ps.getLeaf("Gr07").split(2, "Gr01", turn)
-        ps.getLeaf("Gr01").revealCreatures(["Minotaur"])
-        ps.getLeaf("Gr01").addCreature("Minotaur")
-        ps.getLeaf("Gr07").revealCreatures(["Unicorn"])
-        ps.getLeaf("Gr07").addCreature("Unicorn")
-        ps.getLeaf("Gr12").revealCreatures(["Cyclops", "Cyclops"])
-        ps.getLeaf("Gr12").addCreature("Gorgon")
-        ps.printLeaves()
-
-        turn = 27
-        print "Turn", turn
-        ps.getLeaf("Gr01").revealCreatures(["Lion"])
-        ps.getLeaf("Gr01").addCreature("Lion")
-        ps.getLeaf("Gr06").revealCreatures(["Gorgon"])
-        ps.getLeaf("Gr06").addCreature("Gorgon")
-        ps.getLeaf("Gr07").revealCreatures(["Troll"])
-        ps.getLeaf("Gr07").addCreature("Troll")
-        ps.getLeaf("Gr12").revealCreatures(["Behemoth", "Behemoth"])
-        ps.getLeaf("Gr12").addCreature("Serpent")
-        ps.printLeaves()
-
-        turn = 28
-        print "Turn", turn
-        ps.getLeaf("Gr07").split(2, "Gr10", turn)
-        ps.getLeaf("Gr01").addCreature("Centaur")
-        ps.getLeaf("Gr07").revealCreatures(["Unicorn"])
-        ps.getLeaf("Gr07").addCreature("Unicorn")
-        ps.getLeaf("Gr08").revealCreatures(["Cyclops", "Cyclops"])
-        ps.getLeaf("Gr08").addCreature("Gorgon")
-        ps.getLeaf("Gr10").revealCreatures(["Troll", "Troll"])
-        ps.getLeaf("Gr10").addCreature("Warbear")
-        ps.getLeaf("Gr11").revealCreatures(["Minotaur", "Minotaur"])
-        ps.getLeaf("Gr11").addCreature("Unicorn")
-        ps.printLeaves()
-
-        turn = 29
-        print "Turn", turn
-        ps.getLeaf("Gr06").removeCreatures(["Gorgon", "Gorgon", "Gorgon", 
-          "Gorgon"])
-        ps.getLeaf("Gr10").removeCreatures(["Warbear", "Troll", "Troll"])
-        ps.getLeaf("Gr08").split(2, "Gr05", turn)
-        ps.getLeaf("Gr08").addCreature("Angel")
-        ps.getLeaf("Gr07").revealCreatures(["Ranger"])
-        ps.getLeaf("Gr07").addCreature("Lion")
-        ps.getLeaf("Gr11").revealCreatures(["Unicorn"])
-        ps.getLeaf("Gr11").addCreature("Unicorn")
-        ps.printLeaves()
-
-        turn = 30
-        print "Turn", turn
-        ps.getLeaf("Gr05").removeCreatures(["Cyclops", "Cyclops"])
-        ps.getLeaf("Gr11").revealCreatures("Unicorn", "Unicorn", "Minotaur", 
-          "Minotaur", "Ogre")
-        ps.getLeaf("Gr11").removeCreature("Minotaur")
-        ps.getLeaf("Gr11").revealCreatures("Unicorn", "Unicorn", "Minotaur", 
-          "Ogre")
-        ps.getLeaf("Gr11").revealCreatures(["Unicorn"])
-        ps.getLeaf("Gr11").addCreature("Unicorn")
-        ps.getLeaf("Gr07").split(2, "Gr02", turn)
-        ps.getLeaf("Gr12").split(2, "Gr06", turn)
-        ps.getLeaf("Gr07").addCreature("Angel")
-        ps.getLeaf("Gr08").revealCreatures(["Gorgon"])
-        ps.getLeaf("Gr08").addCreature("Gorgon")
-        ps.getLeaf("Gr12").revealCreatures(["Behemoth", "Behemoth"])
-        ps.getLeaf("Gr12").addCreature("Serpent")
-        ps.getLeaf("Gr06").removeCreatures(["Cyclops", "Cyclops"])
-        ps.printLeaves()
-
-        turn = 31
-        print "Turn", turn
-        ps.getLeaf("Gr04").split(2, "Gr05", turn)
-        ps.getLeaf("Gr01").revealCreatures(["Lion"])
-        ps.getLeaf("Gr01").addCreature("Lion")
-        ps.getLeaf("Gr04").revealCreatures(["Titan"])
-        ps.getLeaf("Gr04").addCreature("Warlock")
-        ps.getLeaf("Gr12").revealCreatures(["Gorgon"])
-        ps.getLeaf("Gr12").addCreature("Gorgon")
-        ps.getLeaf("Gr01").removeCreatures(["Minotaur", "Lion", "Lion", 
-          "Lion", "Centaur"])
-        ps.printLeaves()
-
-        turn = 32
-        print "Turn", turn
-        ps.getLeaf("Gr12").split(2, "Gr10", turn)
-        ps.getLeaf("Gr02").revealCreatures(["Lion"])
-        ps.getLeaf("Gr02").addCreature("Lion")
-        ps.printLeaves()
+        assert(ps.getLeaf("Gr04").allCertain())
+        assert(ps.getLeaf("Gr07").allCertain())
+        assert(ps.getLeaf("Gr08").allCertain())
+        assert(ps.getLeaf("Gr12").allCertain())
 
     """
         Start Gr08: Tit, Ang, Ogr, Ogr, Cen, Cen, Gar, Gar
@@ -1757,7 +1669,6 @@ class PredictSplitsTestCase(unittest.TestCase):
                 Gr12 loses Cyc, Ogr
         Turn 9  Gr08 recruits Cyc with 2xGar
     """
-
 
 
 if __name__ == "__main__":
