@@ -79,8 +79,8 @@ public class BattlelandRandomizerLoader
 
         al = new ArrayList();
 
-        for (i = 1; i < 6 ; i++)
-            for (j = 1; j < 6 ; j++)
+        for (i = 0; i < 6 ; i++)
+            for (j = 0; j < 6 ; j++)
                 if (show[i][j])
                     al.add(new address(i,j));
         labels.put("anywhere", al);
@@ -409,6 +409,7 @@ TOKEN :
 |   < HAZARDS : "HAZARDS" >
 |   < KEYLABEL : "LABEL" >
 |   < SOMEOF : "SOMEOF" >
+|   < SUBSTRACT : "SUBSTRACT" >
 |   < SURROUNDINGSOF : "SURROUNDINGSOF" >
 |   < PAIR : "PAIR" >
 |   < HEXSIDES : "HEXSIDES" >
@@ -538,7 +539,7 @@ range z_range() :
 List z_listAddress() :
 {
     address ad;
-    List al, al2;
+    List al, al2, al3;
     int x,y;
     range r1, r2;
     int i,j;
@@ -547,29 +548,43 @@ List z_listAddress() :
 {
     <SOMEOF> <OPENPAR> (x = z_number()) <COMMA> (al2 = z_listAddress()) <CLOSEPAR> (al = z_listAddress())
     {
-        List al3 = new ArrayList(al);
+        List al4 = new ArrayList(al);
         while (!al2.isEmpty() && (x > 0))
         {
             ad = (address)al2.remove(rand.nextInt(al2.size()));
-            al3.add(ad);
+            al4.add(ad);
             x--;
         }
-        return al3;
+        return al4;
+    }
+|   <SUBSTRACT> <OPENPAR> (al3 = z_listAddress()) <COMMA> (al2 = z_listAddress()) <CLOSEPAR> (al = z_listAddress())
+    {
+        List al4 = new ArrayList(al);
+        Iterator it = al3.iterator();
+        while (it.hasNext())
+        {
+            ad = (address)it.next();
+            if (!(al2.contains(ad)))
+            {
+                al4.add(ad);
+            }
+        }
+        return al4;
     }
 |   <OPENPAR> <LEFTOVER> <CLOSEPAR> (al = z_listAddress())
     {
-        List al3 = new ArrayList(al);
+        List al4 = new ArrayList(al);
         if (leftover != null)
         {
             Iterator it = leftover.iterator();
             while (it.hasNext())
-                al3.add(it.next());
+                al4.add(it.next());
         }
-        return al3;
+        return al4;
     }
 |   <SURROUNDINGSOF> <OPENPAR> (al2 = z_listAddress()) <CLOSEPAR> (al = z_listAddress())
      {
-        List al3 = new ArrayList(al);
+        List al4 = new ArrayList(al);
         if (al2 != null)
         {
             Set  tempSet = new TreeSet();
@@ -597,33 +612,33 @@ List z_listAddress() :
             while (it.hasNext())
             {
                 ad = (address)it.next();
-                al3.add(ad);
+                al4.add(ad);
             }
         }
-        return al3;
+        return al4;
     }
 |   <OPENPAR> <USEDUP> <CLOSEPAR> (al = z_listAddress())
     {
-        List al3 = new ArrayList(al);
+        List al4 = new ArrayList(al);
         if (usedup != null)
         {
             Iterator it = usedup.iterator();
             while (it.hasNext())
-                al3.add(it.next());
+                al4.add(it.next());
         }
-        return al3;
+        return al4;
     }
 |   <OPENPAR> (s = z_label()) <CLOSEPAR> (al = z_listAddress())
     {
-        List al3 = new ArrayList(al);
+        List al4 = new ArrayList(al);
         List ll = (List)labels.get(s);
         if (ll != null)
         {
             Iterator it = ll.iterator();
             while (it.hasNext())
-                al3.add(it.next());
+                al4.add(it.next());
         }
-        return al3;
+        return al4;
     }
 |   (ad = z_address()) (al = z_listAddress())
     {
