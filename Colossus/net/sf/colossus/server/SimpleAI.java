@@ -1824,7 +1824,9 @@ legion.hasMoved() + " canRecruit=" + legion.canRecruit());
     /** Return a string of form angeltype:donorId, or null. */
     public String summonAngel(Legion summoner, Game game)
     {
+Log.debug ("SimpleAI.summonAngel: Finding summonable angels");
         Set set = game.findSummonableAngels(summoner.getMarkerId());
+Log.debug ("SimpleAI.summonAngel: angels found: " + set.toString());
 
         // Always summon the biggest possible angel, from the least
         // important legion that has one.  TODO Make this smarter.
@@ -1837,6 +1839,8 @@ legion.hasMoved() + " canRecruit=" + legion.canRecruit());
         {
             String hexLabel = (String)it.next();
             Legion legion = game.getFirstLegion(hexLabel);
+Log.debug ("SimpleAI.summonAngel: checking summoning from " +
+           legion.getLongMarkerName() + " in " + hexLabel);
             if (bestAngelType(legion).equals("Archangel"))
             {
                 if (bestAngel == null ||
@@ -1852,6 +1856,7 @@ legion.hasMoved() + " canRecruit=" + legion.canRecruit());
                         bestLegion = legion;
                     }
                 }
+Log.debug ("SimpleAI.summonAngel: found archangel");
             }
             else  // Angel
             {
@@ -1867,8 +1872,11 @@ legion.hasMoved() + " canRecruit=" + legion.canRecruit());
                         bestLegion = legion;
                     }
                 }
+Log.debug ("SimpleAI.summonAngel: found angel");
             }
         }
+Log.debug ("SimpleAI.summonAngel: best legion is " + bestLegion);
+Log.debug ("SimpleAI.summonAngel: best angel is " + bestAngel);
         if (bestLegion == null)
         {
             return null;
