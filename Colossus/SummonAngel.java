@@ -39,7 +39,7 @@ class SummonAngel extends Dialog implements MouseListener, ActionListener,
         // Paranoia
         if (!legion.canSummonAngel())
         {
-            cleanup(false);
+            cleanup(null);
             return;
         }
 
@@ -47,7 +47,7 @@ class SummonAngel extends Dialog implements MouseListener, ActionListener,
         // board into a state where those legions can be selected.
         if (board.highlightSummonableAngels(legion) < 1)
         {
-            cleanup(false);
+            cleanup(null);
             return;
         }
 
@@ -119,16 +119,21 @@ class SummonAngel extends Dialog implements MouseListener, ActionListener,
     }
 
 
-    private void cleanup(boolean summoned)
+    private void cleanup(Creature creature)
     {
-        if (summoned)
+        // Sanity check, just in case this got called twice.
+        if (creature != null && legion.canSummonAngel())
         {
             // Only one angel can be summoned per turn.
             player.disallowSummoningAngel();
             legion.markSummoned();
             player.setLastLegionSummonedFrom(donor);
 
-            // Update the number of creatures in both stacks.
+            // Move the angel or archangel.
+            donor.removeCreature(creature);
+            legion.addCreature(creature);
+
+            // Update the number of creatures displayed in both stacks.
             donor.getCurrentHex().repaint();
             legion.getCurrentHex().repaint();
         }
@@ -196,22 +201,12 @@ class SummonAngel extends Dialog implements MouseListener, ActionListener,
 
         if (angelChit == source && !angelChit.isDead())
         {
-            donor.removeCreature(Creature.angel);
-            legion.addCreature(Creature.angel);
-
-            cleanup(true);
+            cleanup(Creature.angel);
         }
 
         else if (archangelChit == source && !archangelChit.isDead())
         {
-            donor.removeCreature(Creature.archangel);
-            legion.addCreature(Creature.archangel);
-            
-            // Update the number of creatures in both stacks.
-            donor.getCurrentHex().repaint();
-            legion.getCurrentHex().repaint();
-
-            cleanup(true);
+            cleanup(Creature.archangel);
         }
     }
 
@@ -248,7 +243,7 @@ class SummonAngel extends Dialog implements MouseListener, ActionListener,
 
     public void windowClosing(WindowEvent e)
     {
-        cleanup(false);
+        cleanup(null);
     }
 
 
@@ -295,28 +290,23 @@ class SummonAngel extends Dialog implements MouseListener, ActionListener,
             if (archangels == 0)
             {
                 // Must take an angel.
-                donor.removeCreature(Creature.angel);
-                legion.addCreature(Creature.angel);
+                cleanup(Creature.angel);
             }
             else if (angels == 0)
             {
                 // Must take an archangel.
-                donor.removeCreature(Creature.archangel);
-                legion.addCreature(Creature.archangel);
+                cleanup(Creature.archangel);
             }
             else
             {
                 // If both are available, make the player click on one.
                 new MessageBox(board, "Select angel or archangel.");
-                return;
             }
-
-            cleanup(true);
         }
 
         else if (e.getActionCommand().equals("Cancel"))
         {
-            cleanup(false);
+            cleanup(null);
         }
     }
 }

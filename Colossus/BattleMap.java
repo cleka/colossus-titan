@@ -1267,7 +1267,8 @@ public class BattleMap extends Frame implements MouseListener,
                         // And bring it to the front.
                         board.show();
     
-                        SummonAngel summonAngel = new SummonAngel(board, attacker);
+                        SummonAngel summonAngel = new SummonAngel(board, 
+                            attacker);
                         board.setSummonAngel(summonAngel);
                     }
                 }
