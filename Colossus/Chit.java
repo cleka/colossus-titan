@@ -30,7 +30,8 @@ class Chit
         rect = new Rectangle(cx, cy, scale, scale);
         this.container = container;
 
-        image = Toolkit.getDefaultToolkit().getImage(imageFilename);
+        image = Toolkit.getDefaultToolkit().getImage(
+            getClass().getResource(imageFilename));
     }
 
 

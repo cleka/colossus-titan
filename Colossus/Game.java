@@ -47,7 +47,7 @@ public class Game extends Frame implements WindowListener, ActionListener
         try
         {
             setIconImage(Toolkit.getDefaultToolkit().getImage(
-                Creature.colossus.getImageName()));
+                getClass().getResource(Creature.colossus.getImageName())));
         }
         catch (NullPointerException e)
         {
@@ -92,7 +92,7 @@ public class Game extends Frame implements WindowListener, ActionListener
         try
         {
             setIconImage(Toolkit.getDefaultToolkit().getImage(
-                Creature.colossus.getImageName()));
+                getClass().getResource(Creature.colossus.getImageName())));
         }
         catch (NullPointerException e)
         {

@@ -109,7 +109,7 @@ public class BattleMap extends Frame implements MouseListener,
         try
         {
             setIconImage(Toolkit.getDefaultToolkit().getImage(
-                Creature.colossus.getImageName()));
+                getClass().getResource(Creature.colossus.getImageName())));
         }
         catch (NullPointerException e)
         {
