@@ -28,7 +28,7 @@ public final class Player implements Comparable
     private String playersEliminated = "";  // RdBkGr
     private int mulligansLeft = 1;
     private int movementRoll;          // 0 if movement has not been rolled.
-    private List legions = Collections.synchronizedList(new ArrayList());
+    private List legions = new ArrayList();
     private boolean dead;
     private boolean titanEliminated;
     private String donorId;
@@ -288,7 +288,7 @@ public final class Player implements Comparable
     }
 
     /** Remove all of this player's zero-height legions. */
-    void removeEmptyLegions()
+    synchronized void removeEmptyLegions()
     {
         Iterator it = legions.iterator(); 
         while (it.hasNext())
@@ -314,17 +314,17 @@ public final class Player implements Comparable
     }
 
 
-    int getNumLegions()
+    synchronized int getNumLegions()
     {
         return legions.size();
     }
 
-    Legion getLegion(int i)
+    synchronized Legion getLegion(int i)
     {
         return (Legion)legions.get(i);
     }
 
-    Legion getLegionByMarkerId(String markerId)
+    synchronized Legion getLegionByMarkerId(String markerId)
     {
         Iterator it = legions.iterator();
         while (it.hasNext())
@@ -338,7 +338,7 @@ public final class Player implements Comparable
         return null;
     }
 
-    Legion getTitanLegion()
+    synchronized Legion getTitanLegion()
     {
         Iterator it = legions.iterator();
         while (it.hasNext())
@@ -352,12 +352,12 @@ public final class Player implements Comparable
         return null;
     }
 
-    List getLegions()
+    synchronized List getLegions()
     {
         return legions;
     }
 
-    List getLegionIds()
+    synchronized List getLegionIds()
     {
         List ids = new ArrayList();
         Iterator it = legions.iterator();
@@ -369,12 +369,12 @@ public final class Player implements Comparable
         return ids;
     }
 
-    void removeLegion(Legion legion)
+    synchronized void removeLegion(Legion legion)
     {
         legions.remove(legion);
     }
 
-    int getMaxLegionHeight()
+    synchronized int getMaxLegionHeight()
     {
         int max = 0;
         Iterator it = legions.iterator();
@@ -392,7 +392,7 @@ public final class Player implements Comparable
 
 
     /** Return the number of this player's legions that have moved. */
-    int legionsMoved()
+    synchronized int legionsMoved()
     {
         int count = 0;
 
@@ -411,7 +411,7 @@ public final class Player implements Comparable
 
     /** Return the number of this player's legions that have legal
         non-teleport moves remaining. */
-    int countMobileLegions()
+    synchronized int countMobileLegions()
     {
         int count = 0;
         Iterator it = legions.iterator();
@@ -540,7 +540,7 @@ public final class Player implements Comparable
 
     /** Return true if two or more of this player's legions share
      *  a hex and they have a legal non-teleport move. */
-    boolean splitLegionHasForcedMove()
+    synchronized boolean splitLegionHasForcedMove()
     {
         Iterator it = legions.iterator();
         while (it.hasNext())

@@ -2120,7 +2120,7 @@ public final class Game
     }
 
     /** Return set of hexLabels for engagements found. */
-    Set findEngagements()
+    synchronized Set findEngagements()
     {
         Set set = new HashSet();
         Player player = getActivePlayer();

@@ -1433,7 +1433,7 @@ Log.debug("Called Server.addClient() for " + playerName);
         }
     }
 
-    void allFullyUpdateOwnLegionContents()
+    synchronized void allFullyUpdateOwnLegionContents()
     {
         Iterator it = game.getPlayers().iterator();
         while (it.hasNext())

@@ -1,3 +1,8 @@
+Bug: 7-high AI stack appeared 8-high to client.  Had correct 7 creatures
+   plus one '?'  Did not get corrected on later turns.  Later appeared
+   to split 6-2.  When I attacked the 6-high stack it was shown to be 5.
+   Linux, 1.4.1.01
+
 Bug: AI player didn't move at start of turn 2.  Just froze.
    Default, 1 human + 3 random AIs, first player froze.  Linux, 1.4.1.01
 
