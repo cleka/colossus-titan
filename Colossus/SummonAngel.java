@@ -29,7 +29,7 @@ class SummonAngel extends Dialog implements MouseListener, ActionListener,
     SummonAngel(MasterBoard board, Legion legion)
     {
         super(board, legion.getPlayer().getName() + 
-            ": Summon Angel", false);
+            ": Summon Angel into Legion " + legion.getMarkerId(), false);
         
         this.legion = legion;
         player = legion.getPlayer();
