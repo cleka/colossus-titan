@@ -212,6 +212,14 @@ class SplitLegion extends JDialog implements MouseListener, ActionListener,
 
         dispose();
         System.gc();
+        try
+        {
+            finalize();
+        }
+        catch (Throwable e)
+        {
+            System.out.println("caught " + e.toString());
+        }
     }
 
 
@@ -390,6 +398,10 @@ class SplitLegion extends JDialog implements MouseListener, ActionListener,
 
             // Set the new chit next to the old chit on the masterboard.
             newLegion.getCurrentHex().addLegion(newLegion);
+
+            // Hide the contents of both legions.
+            oldLegion.hideAllCreatures();
+            newLegion.hideAllCreatures();
 
             // Exit.
             cleanup();
