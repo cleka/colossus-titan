@@ -1995,11 +1995,17 @@ Log.debug("Called Game.assignTowers() with balanced = " + balanced);
 
         // Tower teleport
         if (HexMap.terrainIsTower(hex.getTerrain()) && legion.numLords() > 0 &&
-            !player.hasTeleported())
+            !player.hasTeleported() &&
+            !options.getOption(Options.noTowerTeleport) &&
+            !(options.getOption(Options.noFirstTurnTeleport) &&
+              (turnNumber == 1)))
         {
             // Mark every unoccupied hex within 6 hexes.
-            set.addAll(findNearbyUnoccupiedHexes(hex, player, legion, 6,
-                Constants.NOWHERE, ignoreFriends));
+            if (!options.getOption(Options.towerToTowerTeleportOnly))
+            {
+                set.addAll(findNearbyUnoccupiedHexes(hex, player, legion, 6,
+                    Constants.NOWHERE, ignoreFriends));
+            }
 
             // Mark every unoccupied tower.
             Set towerSet = MasterBoard.getTowerSet();
@@ -2020,7 +2026,10 @@ Log.debug("Called Game.assignTowers() with balanced = " + balanced);
         }
 
         // Titan teleport
-        if (player.canTitanTeleport() && legion.hasTitan())
+        if (player.canTitanTeleport() && legion.hasTitan() &&
+            !options.getOption(Options.noTitanTeleport) &&
+            !(options.getOption(Options.noFirstTurnTeleport) &&
+              (turnNumber == 1)))
         {
             // Mark every hex containing an enemy stack that does not
             // already contain a friendly stack.

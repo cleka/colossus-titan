@@ -38,6 +38,12 @@ public final class Options
     public static final String autoQuit = "Auto quit when game over";
     public static final String aiDelay = "AI delay";  // int
     public static final String variant = "Variant";   // string
+    // t-port option
+    public static final String noFirstTurnTeleport = "No Teleport on first turn";
+    public static final String towerToTowerTeleportOnly = "Tower-to-Tower Teleport only";
+    public static final String noTowerTeleport = "No Tower Teleport";
+    public static final String noTitanTeleport = "No Titan Teleport";
+    
 
     // Will add player numbers 0-5 to the the of these.
     public static final String playerName = "Player name ";

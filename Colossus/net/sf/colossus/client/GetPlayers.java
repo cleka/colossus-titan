@@ -6,6 +6,7 @@ import java.awt.event.*;
 import java.io.*;
 import javax.swing.*;
 import javax.swing.text.*;
+import javax.swing.border.*;
 import java.util.*;
 
 import net.sf.colossus.util.Split;
@@ -50,9 +51,6 @@ public final class GetPlayers extends KDialog implements WindowListener,
     /** This is Game's options, which we will modify directly. */
     private Options options;
 
-    private Container checkboxPane;
-
-
     /** Clear options to abort */
     public GetPlayers(JFrame parentFrame, Options options)
     {
@@ -92,17 +90,25 @@ public final class GetPlayers extends KDialog implements WindowListener,
         gamePane.add(button3);
         button3.addActionListener(this);
 
-        checkboxPane = new JPanel();
-        checkboxPane.setLayout(new GridLayout(0, 3));
+        JPanel checkboxPane = new JPanel(new GridLayout(0, 3));
+        checkboxPane.setBorder(new TitledBorder("General Options"));
         contentPane.add(checkboxPane);
         
-        addCheckbox(Options.autosave);
-        addCheckbox(Options.logDebug);
-        addCheckbox(Options.balancedTowers);
-        addCheckbox(Options.allStacksVisible);
-        addCheckbox(Options.autoStop);
-        addCheckbox(Options.autoQuit);
+        addCheckbox(Options.autosave, checkboxPane);
+        addCheckbox(Options.logDebug, checkboxPane);
+        addCheckbox(Options.balancedTowers, checkboxPane);
+        addCheckbox(Options.allStacksVisible, checkboxPane);
+        addCheckbox(Options.autoStop, checkboxPane);
+        addCheckbox(Options.autoQuit, checkboxPane);
 
+        JPanel teleportPane = new JPanel(new GridLayout(0, 2));
+        teleportPane.setBorder(new TitledBorder("Teleport Options"));
+        contentPane.add(teleportPane);
+
+        addCheckbox(Options.noFirstTurnTeleport, teleportPane);
+        addCheckbox(Options.noTitanTeleport, teleportPane);
+        addCheckbox(Options.towerToTowerTeleportOnly, teleportPane);
+        addCheckbox(Options.noTowerTeleport, teleportPane);
 
         Container delayPane = new JPanel();
         BoxLayout delayLayout = new BoxLayout(delayPane, BoxLayout.X_AXIS);
@@ -228,14 +234,13 @@ public final class GetPlayers extends KDialog implements WindowListener,
     }
 
 
-    private void addCheckbox(String optname)
+    private void addCheckbox(String optname, Container pane)
     {
         JCheckBox cb = new JCheckBox(optname);
         cb.setSelected(options.getOption(optname));
         cb.addItemListener(this);
-        checkboxPane.add(cb);
+        pane.add(cb);
     }
-
 
     /** Start new game if values are legal. */
     private void validateInputs()
@@ -487,7 +492,7 @@ public final class GetPlayers extends KDialog implements WindowListener,
 
     public void itemStateChanged(ItemEvent e)
     {
-        JCheckBox source = (JCheckBox)e.getSource();
+        JToggleButton source = (JToggleButton)e.getSource();
         String text = source.getText();
         boolean selected = (e.getStateChange() == ItemEvent.SELECTED);
         options.setOption(text, selected);
