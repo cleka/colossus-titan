@@ -1,8 +1,5 @@
-import java.applet.*;
 import java.awt.event.*;
 import java.awt.*;
-import java.util.*;
-import java.text.*;
 
 /**
  * Class GameButton launches Colossus as an applet.
@@ -12,6 +9,9 @@ import java.text.*;
 
 class GameButton extends Button implements ActionListener 
 {
+    Game game;
+
+
     GameButton() 
     {
         super("Start");
@@ -20,6 +20,10 @@ class GameButton extends Button implements ActionListener
 
     public void actionPerformed(ActionEvent e) 
     {
-        Game g = new Game(true);
+        // Don't allow multiple clicks to start multiple simultaneous games.
+        if (game == null)
+        {
+            game = new Game(true);
+        }
     }
 }
