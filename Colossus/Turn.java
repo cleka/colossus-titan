@@ -249,6 +249,7 @@ class Turn extends Dialog implements ActionListener, WindowListener
                 // Highlight all unmoved legions, rather than the
                 // locations to which the forced-to-move legion can move. 
                 board.highlightUnmovedLegions();
+                new MessageBox(parentFrame, "At least one legion must move.");
                 return;
             }
 
@@ -277,6 +278,8 @@ class Turn extends Dialog implements ActionListener, WindowListener
                             // locations to which the forced-to-move legion 
                             // can move. 
                             board.highlightUnmovedLegions();
+                            new MessageBox(parentFrame, 
+                                "Split legions must be separated.");
                             return;
                         }
                     }
@@ -296,6 +299,10 @@ class Turn extends Dialog implements ActionListener, WindowListener
                 game.advancePhase();
 
                 setupMusterDialog();
+            }
+            else
+            {
+                new MessageBox(parentFrame, "Must Resolve Engagements.");
             }
         }
         
