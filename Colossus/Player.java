@@ -14,6 +14,7 @@ class Player
     boolean canTitanTeleport;
     int angels;         // number of angels + archangels in legions
     boolean canSummonAngel; 
+    String playersEliminated;    // BkBlRdGd
 
 
     Player(String inName, String inColor, int inStartingTower)
