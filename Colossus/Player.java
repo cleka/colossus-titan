@@ -42,6 +42,12 @@ class Player
     }
 
 
+    public void setAlive(boolean alive)
+    {
+        this.alive = alive;
+    }
+
+
     public String getColor()
     {
         return color;
@@ -132,7 +138,7 @@ class Player
     
     void setPlayersElim(String playersEliminated)
     {
-        this.playersEliminated = playersEliminated;
+        this.playersEliminated = new String(playersEliminated);
     }
 
 
@@ -140,11 +146,12 @@ class Player
     {
         if (playersEliminated == null)
         {
-            playersEliminated = player.getShortColor();
+            playersEliminated = new String(player.getShortColor());
         }
         else
         {
-            playersEliminated += player.getShortColor();
+            playersEliminated = new String(playersEliminated + 
+                player.getShortColor());
         }
     }
 
