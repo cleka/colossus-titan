@@ -36,29 +36,27 @@ class BattleTurn extends Dialog implements ActionListener
         this.defender = defender;
         activeLegion = defender;
 
-        setSize(300, 250);
-
         setupMoveDialog();
+
+        // This is necessary to prevent a visible resize.
+        pack();
 
         setVisible(true);
     }
 
 
-    // XXX: Finish this.
     void setupRecruitDialog()
     {
-        // If it's not time to recruit, move on.
-        if (true)
-        // if (turnNumber != 4 || defender.getHeight() > 6)
+        if (turnNumber != 4 || defender.getHeight() > 6)
         {
             advancePhase();
         }
         else
         {
-            new PickRecruit(map, defender);
-
-            // XXX: When the dialog is dismissed, mark if a recruit 
-            // was taken and advance phase.
+            // Allow recruiting a reinforcement.
+            // new PickRecruit(map, defender);
+            
+            advancePhase();
         }
     }
     
@@ -172,7 +170,7 @@ class BattleTurn extends Dialog implements ActionListener
             setupMoveDialog();
         }
         
-        if (phase == RECRUIT)
+        else if (phase == RECRUIT)
         {
             phase = MOVE;
             setupMoveDialog();
