@@ -156,9 +156,14 @@ public final class Client implements IClient
 
     /** For battle AI. */
     private List bestMoveOrder = null;
+    private List failedBattleMoves = null;
 
     // XXX Make private and wrap consistently.
     boolean showAllRecruitChits = false;
+
+    // Last nakable method called on Server.  Set to null on success.
+    private String nakable = null;
+
 
     public Client(String host, int port, String playerName, boolean remote)
     {
@@ -395,11 +400,13 @@ public final class Client implements IClient
                 board.repaint();
             }
         }
+        kickMoves();
+    }
 
-        // Call here instead of from setupMove() for mulligans.
+    private void kickMoves()
+    {
         if (isMyTurn() && getOption(Options.autoMasterMove) && !isGameOver())
         {
-            clearUndoStack();
             doAutoMoves();
         }
     }
@@ -848,6 +855,7 @@ public final class Client implements IClient
     {
         aiPause();
         clearUndoStack();
+        nakable = Constants.doneWithBattleMoves;
         server.doneWithBattleMoves();
     }
 
@@ -1496,15 +1504,10 @@ public final class Client implements IClient
      *  Used by human players only. */
     public void askChooseStrikePenalty(List choices)
     {
-        if (choices == null || choices.isEmpty())
-        {
-            Log.error("Called Client.askChooseStrikePenalty with no prompts");
-            return;
-        }
-
+        nakable = null;
         if (getOption(Options.autoPlay))
         {
-            // XXX Teach AI to handle strike penalties.  This just takes
+            // TODO Teach AI to handle strike penalties.  This just takes
             // the last one.
             assignStrikePenalty((String)choices.get(choices.size() - 1));
         }
@@ -1516,6 +1519,7 @@ public final class Client implements IClient
 
     void assignStrikePenalty(String prompt)
     {
+        nakable = Constants.assignStrikePenalty;
         server.assignStrikePenalty(prompt);
     }
 
@@ -1736,6 +1740,7 @@ public final class Client implements IClient
             int strikeNumber, List rolls, int damage, boolean killed,
             boolean wasCarry, int carryDamageLeft, Set carryTargetDescriptions)
     {
+        nakable = null;
         BattleChit chit = getBattleChit(strikerTag);
         if (chit != null)
         {
@@ -1786,7 +1791,65 @@ public final class Client implements IClient
 
     public void nak()
     {
-        Log.error(playerName + " got nak");
+        Log.error(playerName + " got nak for " + nakable);
+        recoverFromNak();
+    }
+
+    private void recoverFromNak()
+    {
+        String reason = nakable;
+        nakable = null;
+        if (reason == null)
+        {
+            Log.error("recoverFromNak with null nakable!");
+        }
+        else if (reason == Constants.doSplit)
+        {
+            kickSplit();
+        }
+        else if (reason == Constants.doneWithSplits)
+        {
+            doneWithMoves();
+        }
+        else if (reason == Constants.doMove)
+        {
+            kickMoves();
+        }
+        else if (reason == Constants.doneWithMoves)
+        {
+            doneWithRecruits();
+        }
+        else if (reason == Constants.doBattleMove)
+        {
+            handleFailedBattleMove();
+        }
+        else if (reason == Constants.doneWithBattleMoves)
+        {
+            doneWithStrikes();
+        }
+        else if (reason == Constants.assignStrikePenalty)
+        {
+            doAutoStrikes();
+        }
+        else if (reason == Constants.strike)
+        {
+            doAutoStrikes();
+        }
+        else if (reason == Constants.doneWithStrikes)
+        {
+            doneWithBattleMoves();
+        }
+        else if (reason == Constants.doneWithEngagements)
+        {
+        }
+        else if (reason == Constants.doRecruit)
+        {
+            doneWithRecruits();
+        }
+        else if (reason == Constants.doneWithRecruits)
+        {
+            doneWithSplits();
+        }
     }
 
     private void pickCarries(int carryDamage, Set carryTargetDescriptions)
@@ -1895,6 +1958,7 @@ public final class Client implements IClient
 
     public void nextEngagement()
     {
+        nakable = null;
         if (isMyTurn())
         {
             if (getOption(Options.autoPickEngagements))
@@ -1960,6 +2024,7 @@ public final class Client implements IClient
     {
         // Call server even if some arguments are null, to get past
         // reinforcement.
+        nakable = Constants.doRecruit;
         server.doRecruit(markerId, recruitName, recruiterName);
     }
 
@@ -1995,6 +2060,7 @@ public final class Client implements IClient
     public void didRecruit(String markerId, String recruitName,
             String recruiterName, int numRecruiters)
     {
+        nakable = null;
         String hexLabel = getHexForLegion(markerId);
         if (hexLabel == null)
         {
@@ -2111,6 +2177,7 @@ public final class Client implements IClient
     public synchronized void setupSplit(String activePlayerName,
             int turnNumber)
     {
+        nakable = null;
         clearUndoStack();
         cleanupNegotiationDialogs();
 
@@ -2138,7 +2205,11 @@ public final class Client implements IClient
             }
         }
         updateStatusScreen();
+        kickSplit();
+    }
 
+    private void kickSplit()
+    {
         if (isMyTurn() && getOption(Options.autoSplit) && !isGameOver())
         {
             boolean done = ai.split();
@@ -2151,6 +2222,7 @@ public final class Client implements IClient
 
     public synchronized void setupMove()
     {
+        nakable = null;
         this.phase = Constants.MOVE;
         clearUndoStack();
         if (board != null)
@@ -2187,6 +2259,7 @@ public final class Client implements IClient
 
     public synchronized void setupMuster()
     {
+        nakable = null;
         clearUndoStack();
         cleanupNegotiationDialogs();
 
@@ -2217,6 +2290,7 @@ public final class Client implements IClient
     public synchronized void setupBattleSummon(String battleActivePlayerName,
             int battleTurnNumber)
     {
+        nakable = null;
         this.battlePhase = Constants.SUMMON;
         setBattleActivePlayerName(battleActivePlayerName);
         this.battleTurnNumber = battleTurnNumber;
@@ -2240,6 +2314,7 @@ public final class Client implements IClient
     public synchronized void setupBattleRecruit(String battleActivePlayerName,
             int battleTurnNumber)
     {
+        nakable = null;
         this.battlePhase = Constants.RECRUIT;
         setBattleActivePlayerName(battleActivePlayerName);
         this.battleTurnNumber = battleTurnNumber;
@@ -2269,17 +2344,15 @@ public final class Client implements IClient
     public synchronized void setupBattleMove(String battleActivePlayerName,
             int battleTurnNumber)
     {
+        nakable = null;
         setBattleActivePlayerName(battleActivePlayerName);
         this.battleTurnNumber = battleTurnNumber;
 
         // Just in case the other player started the battle
         // really quickly.
         cleanupNegotiationDialogs();
-
         resetAllBattleMoves();
-
         this.battlePhase = Constants.MOVE;
-
         if (map != null && isMyBattlePhase())
         {
             focusMap();
@@ -2287,24 +2360,32 @@ public final class Client implements IClient
             map.setupMoveMenu();
         }
         updateStatusScreen();
-
         if (isMyBattlePhase() && getOption(Options.autoPlay))
         {
             bestMoveOrder = ai.battleMove();
-            if (bestMoveOrder != null)
-            {
-                Iterator it = bestMoveOrder.iterator();
-                while (it.hasNext())
-                {
-                    CritterMove cm = (CritterMove)it.next();
-                    tryBattleMove(cm);
-                }
-            }
+            failedBattleMoves = new ArrayList();
+            kickBattleMove();
+        }
+    }
 
-            // Wait for information from the server before proceding.
-            java.util.Timer timer = new java.util.Timer();
-            // XXX Use a callback instead of a timer!
-            timer.schedule(new FinishAIBattleMove(), 200);
+    private void kickBattleMove()
+    {
+        if (bestMoveOrder == null || bestMoveOrder.isEmpty())
+        {
+            if (failedBattleMoves == null || failedBattleMoves.isEmpty())
+            {
+                doneWithBattleMoves();
+            }
+            else
+            {
+                retryFailedBattleMoves();
+            }
+        }
+        else
+        {
+            Iterator it = bestMoveOrder.iterator();
+            CritterMove cm = (CritterMove)it.next();
+            tryBattleMove(cm);
         }
     }
 
@@ -2319,13 +2400,17 @@ public final class Client implements IClient
     /** synchronized to prevent concurrent mod on bestMoveOrder */
     private synchronized void retryFailedBattleMoves()
     {
+        bestMoveOrder = failedBattleMoves;
+        failedBattleMoves = null;
         ai.retryFailedBattleMoves(bestMoveOrder);
+        kickBattleMove();
     }
 
     /** Used for both strike and strikeback. */
     public synchronized void setupBattleFight(int battlePhase,
             String battleActivePlayerName)
     {
+        nakable = null;
         this.battlePhase = battlePhase;
         setBattleActivePlayerName(battleActivePlayerName);
         if (battlePhase == Constants.FIGHT)
@@ -2478,6 +2563,7 @@ public final class Client implements IClient
 
     void doBattleMove(int tag, String hexLabel)
     {
+        nakable = Constants.doBattleMove;
         server.doBattleMove(tag, hexLabel);
     }
 
@@ -2500,11 +2586,32 @@ public final class Client implements IClient
                 }
             }
         }
+        kickBattleMove();
+    }
+
+    /** synchronized to prevent concurrent mod on bestMoveOrder */
+    private synchronized void handleFailedBattleMove()
+    {
+        if (bestMoveOrder != null)
+        {
+            Iterator it = bestMoveOrder.iterator();
+            if (it.hasNext())
+            {
+                CritterMove cm = (CritterMove)it.next();
+                it.remove();
+                if (failedBattleMoves != null)
+                {
+                    failedBattleMoves.add(cm);
+                }
+            }
+            kickBattleMove();
+        }
     }
 
     public void tellBattleMove(int tag, String startingHexLabel,
             String endingHexLabel, boolean undo)
     {
+        nakable = null;
         if (isMyCritter(tag) && !undo)
         {
             pushUndoStack(endingHexLabel);
@@ -2531,6 +2638,7 @@ public final class Client implements IClient
     /** Attempt to have critter tag strike the critter in hexLabel. */
     void strike(int tag, String hexLabel)
     {
+        nakable = Constants.strike;
         server.strike(tag, hexLabel);
     }
 
@@ -2868,6 +2976,7 @@ public final class Client implements IClient
             }
         }
 
+        nakable = Constants.doMove;
         server.doMove(moverId, hexLabel, entrySide, teleport, teleportingLord);
         return true;
     }
@@ -2882,6 +2991,7 @@ public final class Client implements IClient
     public void didMove(String markerId, String startingHexLabel,
             String currentHexLabel, String entrySide, boolean teleport)
     {
+        nakable = null;
         removeRecruitChit(startingHexLabel);
         if (isMyLegion(markerId))
         {
@@ -2902,12 +3012,9 @@ public final class Client implements IClient
             board.highlightUnmovedLegions();
             board.repaint();
         }
-
-        if (isMyTurn() && getOption(Options.autoMasterMove) && !isGameOver())
-        {
-            doAutoMoves();
-        }
+        kickMoves();
     }
+
 
     public void undidMove(String markerId, String formerHexLabel,
             String currentHexLabel)
@@ -3457,10 +3564,9 @@ public final class Client implements IClient
         {
             return;
         }
-        // Wait for information from the server before proceding.
-        // XXX Use a callback instead of a timer!
-        java.util.Timer timer = new java.util.Timer();
-        timer.schedule(new FinishSplits(), 200);
+        nakable = Constants.doneWithSplits;
+        server.doneWithSplits();
+        clearRecruitChits();
     }
 
     synchronized void doneWithMoves()
@@ -3471,6 +3577,7 @@ public final class Client implements IClient
         }
         aiPause();
         clearRecruitChits();
+        nakable = Constants.doneWithSplits;
         server.doneWithMoves();
     }
 
@@ -3481,6 +3588,7 @@ public final class Client implements IClient
             return;
         }
         aiPause();
+        nakable = Constants.doneWithEngagements;
         server.doneWithEngagements();
     }
 
@@ -3491,6 +3599,7 @@ public final class Client implements IClient
             return;
         }
         aiPause();
+        nakable = Constants.doneWithSplits;
         server.doneWithRecruits();
     }
 
@@ -3573,10 +3682,20 @@ public final class Client implements IClient
 
     synchronized void doSplit(String parentId)
     {
+        Log.debug("Client.doSplit " + parentId);
         this.parentId = null;
 
         if (!isMyTurn())
         {
+            Log.error("Not my turn!");
+            kickSplit();
+            return;
+        }
+        // Can't split other players' legions.
+        if (!isMyLegion(parentId))
+        {
+            Log.error("Not my legion!");
+            kickSplit();
             return;
         }
         Set markersAvailable = getPlayerInfo().getMarkersAvailable();
@@ -3584,23 +3703,21 @@ public final class Client implements IClient
         if (markersAvailable.size() < 1)
         {
             showMessageDialog("No legion markers");
-            return;
-        }
-        // Can't split other players' legions.
-        if (!isMyLegion(parentId))
-        {
+            kickSplit();
             return;
         }
         // Legion must be tall enough to split.
         if (getLegionHeight(parentId) < 4)
         {
             showMessageDialog("Legion is too short to split");
+            kickSplit();
             return;
         }
         // Enforce only one split on turn 1.
         if (getTurnNumber() == 1 && numSplitsThisTurn > 0)
         {
             showMessageDialog("Can only split once on the first turn");
+            kickSplit();
             return;
         }
 
@@ -3641,6 +3758,9 @@ public final class Client implements IClient
     /** Called by AI, and by pickMarkerCallback() */
     void doSplit(String parentId, String childId, String results)
     {
+        Log.debug("Client.doSplit " + parentId + " " + childId + " " + 
+            results);
+        nakable = Constants.doSplit;
         server.doSplit(parentId, childId, results);
     }
 
@@ -3648,6 +3768,7 @@ public final class Client implements IClient
     public synchronized void didSplit(String hexLabel, String parentId,
             String childId, int childHeight, List splitoffs, int turn)
     {
+        nakable = null;
         LegionInfo childInfo = getLegionInfo(childId);
         childInfo.setHexLabel(hexLabel);
 
@@ -3967,28 +4088,6 @@ public final class Client implements IClient
                 return 1;
             }
             return s1.compareTo(s2);
-        }
-    }
-
-
-    /** Timer-based callback for battle moves. */
-    class FinishAIBattleMove extends TimerTask
-    {
-        public void run()
-        {
-            retryFailedBattleMoves();
-            doneWithBattleMoves();
-        }
-    }
-
-
-    /** Timer-based callback for ending split phase. */
-    class FinishSplits extends TimerTask
-    {
-        public void run()
-        {
-            server.doneWithSplits();
-            clearRecruitChits();
         }
     }
 }
