@@ -101,17 +101,13 @@ class snapHandler(DefaultHandler):
             self.inReveal = False
 
     def doReveal(self):
-        if (self.wholeLegion == 'true'):
-            someall = 'All'
-        else:
-            someall = 'Some'
         if options.python:
             if len(self.creatureNames) == 8:
                 print '        ps = PredictSplits("%s", "%s", %s)' % (
                     self.markerId[:2], self.markerId, self.creatureNames)
                 print '        aps.add_ps(ps)'
-            print '        aps.getLeaf("%s").reveal%sCreatures(%s)' % (
-                self.markerId, someall, self.creatureNames)
+            print '        aps.getLeaf("%s").revealCreatures(%s)' % (
+                self.markerId, self.creatureNames)
         else:
             if len(self.creatureNames) == 8:
                 print '        cnl.clear();'
@@ -123,8 +119,8 @@ class snapHandler(DefaultHandler):
             print '        cnl.clear();'
             for name in self.creatureNames:
                 print '        cnl.add("%s"); ' % (name,)
-            print '        aps.getLeaf("%s").reveal%sCreatures(cnl);' % (
-                self.markerId, someall)
+            print '        aps.getLeaf("%s").revealCreatures(cnl);' % (
+                self.markerId, )
 
     def startCreature(self, attrs):
         if self.inReveal or self.inSplit:
