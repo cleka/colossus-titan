@@ -1263,6 +1263,11 @@ public class BattleMap extends JFrame implements MouseListener,
                     new PickRecruit(this, legion);
                 }
             }
+
+            // Make all creatures in the victorious legion visible, and set
+            // the number of visible creatures correctly to account for 
+            // battle losses.
+            legion.revealAllCreatures();
         }
 
         // Attempt to free resources to work around Java memory leaks.
