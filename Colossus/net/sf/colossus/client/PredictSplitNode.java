@@ -423,10 +423,6 @@ public class PredictSplitNode implements Comparable
         int firstTurnUnknownLord = 0;
         if (this.turnCreated == 0)
         {
-            if (markerId.startsWith("Br"))
-            {
-                int i = 1;
-            }
 
             boolean unknownTitan = certainsToSplit.remove("Titan");
             boolean unknownAngel = certainsToSplit.remove("Angel");
@@ -731,26 +727,89 @@ public class PredictSplitNode implements Comparable
     }
 
     /** Recombine this legion and other, because it was not possible to
-     *  move.  They must share a parent.  If either legion has the parent's
-     *  markerId, then that legion will remain.  Otherwise this legion
-     *  will remain.  Also used to undo splits.*/
+    *  move.  They must share a parent.  If either legion has the parent's
+    *  markerId, then that legion will remain.  Otherwise this legion
+    *  will remain.  Also used to undo splits.
+    */
     void merge(PredictSplitNode other, int turn)
     {
-        if (parent != other.parent)
+        if (this.parent == other.parent)
         {
-            throw new PredictSplitsException("Can't merge non-siblings");
-        }
-        if (getMarkerId().equals(parent.getMarkerId())
-            || other.getMarkerId().equals(parent.getMarkerId()))
-        {
-            // Cancel split.
-            parent.clearChildren();
+            // this is regular merge
+            if (getMarkerId().equals(parent.getMarkerId())
+                || other.getMarkerId().equals(parent.getMarkerId()))
+            { // Cancel split.
+                parent.clearChildren();
+            }
+            else
+            {
+                throw new PredictSplitsException(
+                    "None of the legions carry the parent maker");
+            }
         }
         else
         {
-            // Cancel split, then resplit parent into just this legion.
-            parent.clearChildren();
-            parent.split(getHeight() + other.getHeight(), markerId, turn);
+            // this must be a merge of a 3-way split
+            // origNode -- father -- nodeB
+            //          \ nodeA   \ third
+            // this transforms into
+            // origNode -- (nodeA + nodeB)
+            //          \ third
+
+            PredictSplitNode nodeA;
+            PredictSplitNode nodeB;
+
+            if (this.parent == other.parent.parent)
+            {
+                nodeA = this;
+                nodeB = other;
+            }
+            else if (this.parent.parent == other.parent)
+            {
+                nodeA = other;
+                nodeB = this;
+            }
+            else
+            {
+                throw new PredictSplitsException("Illegal merge");
+            }
+            PredictSplitNode father = nodeB.parent;
+            PredictSplitNode origNode = nodeA.parent;
+            PredictSplitNode thirdLegion;
+            if (nodeB == father.child1)
+            {
+                thirdLegion = father.child2;
+            }
+            else
+            {
+                thirdLegion = father.child1;
+
+            }
+
+            if (origNode.getMarkerId().equals(thirdLegion.getMarkerId()))
+            {
+                // third is carries the original marker and nodeA is then
+                // the splitoff from the origNode, just add creatures from nodeB
+                nodeA.creatures.addAll(nodeB.creatures);
+                origNode.childSize2 = nodeA.getHeight();
+            }
+            else
+            {
+                // attach thirdLegion as the split from the node, and
+                // nodeA+nodeB as the keep
+                origNode.child2 = thirdLegion;
+                origNode.childSize2 = thirdLegion.getHeight();
+                if (origNode.getMarkerId().equals(nodeA.getMarkerId()))
+                {
+                    nodeA.creatures.addAll(nodeB.creatures);
+                    origNode.child1 = nodeA;
+                }
+                else
+                {
+                    nodeB.creatures.addAll(nodeA.creatures);
+                    origNode.child1 = nodeB;
+                }
+            }
         }
     }
 
