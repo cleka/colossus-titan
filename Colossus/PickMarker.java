@@ -22,12 +22,12 @@ class PickMarker extends Dialog implements MouseListener, WindowListener
         setResizable(false);
 
         this.player = player;
-        markers = new Chit[player.numMarkersAvailable];
+        markers = new Chit[player.getNumMarkersAvailable()];
 
         addMouseListener(this);
         addWindowListener(this);
 
-        if (player.numMarkersAvailable == 0)
+        if (player.getNumMarkersAvailable() == 0)
         {
             new MessageBox(parentFrame, "No markers available");
         }
@@ -38,8 +38,8 @@ class PickMarker extends Dialog implements MouseListener, WindowListener
             setLayout(null);
 
             setSize((21 * scale / 20) * (Math.min(12, 
-                player.numMarkersAvailable) + 1), (21 * scale / 20) * 
-                ((player.numMarkersAvailable - 1) / 12 + 2));
+                player.getNumMarkersAvailable()) + 1), (21 * scale / 20) * 
+                ((player.getNumMarkersAvailable() - 1) / 12 + 2));
             
             Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
             setLocation(new Point(d.width / 2 - getSize().width / 2, 
@@ -48,11 +48,11 @@ class PickMarker extends Dialog implements MouseListener, WindowListener
             int cx = scale / 2;
             int cy = scale * 2 / 3;
 
-            for (int i = 0; i < player.numMarkersAvailable; i++)
+            for (int i = 0; i < player.getNumMarkersAvailable(); i++)
             {
                 markers[i] = new Chit(cx + (i % 12) * (scale + 3),
                     cy + (i / 12) * (scale + 3), scale, 
-                    "images/" + player.markersAvailable[i] + ".gif", this);
+                    "images/" + player.getMarker(i) + ".gif", this);
             }
 
             imagesLoaded = false;
@@ -101,9 +101,9 @@ class PickMarker extends Dialog implements MouseListener, WindowListener
 
     public void mouseClicked(MouseEvent e)
     {
-        if (player.numMarkersAvailable == 0)
+        if (player.getNumMarkersAvailable() == 0)
         {
-            player.markerSelected = null;
+            player.clearSelectedMarker();
             dispose();
             return;
         }
@@ -113,19 +113,8 @@ class PickMarker extends Dialog implements MouseListener, WindowListener
         {
             if (markers[i].select(point))
             {
-                // Got a hit.  Send that info back by putting it in 
-                //     player.markerSelected.
-                player.markerSelected = new String(player.markersAvailable[i]);
-
-                // Then adjust player to show that this marker is taken.
-                for (int j = i; j < player.numMarkersAvailable - 1; j++)
-                {
-                    player.markersAvailable[j] = new 
-                        String(player.markersAvailable[j + 1]);
-                }
-                player.markersAvailable[player.numMarkersAvailable - 1] = new 
-                    String("");
-                player.numMarkersAvailable--;
+                // Select that marker.
+                player.selectMarker(i);
 
                 // Then exit.
                 dispose();
@@ -162,7 +151,7 @@ class PickMarker extends Dialog implements MouseListener, WindowListener
 
     public void windowClosing(WindowEvent event)
     {
-        player.markerSelected = null;
+        player.clearSelectedMarker();
         dispose();
         return;
     }
