@@ -34,7 +34,8 @@ Striking continues after concession, until the normal time to check for
 
 Win98, 1.3.1: Focus keeps moving to MovementDie and BattleDice, which
    disrupts keyboard shortcuts.  Doesn't happen with StatusScreen.
-   Doesn't happen in Unix.
+   Doesn't happen in Unix.  Does happen in Linux 1.4.0b2, at least with
+   MovementDie.
 
 Solaris, 1.3.1: Loading in the middle of a battle resets turn
    number to 1 while leaving critters in the middle of the
@@ -99,3 +100,11 @@ A doomed lion with no allies left struck back against an unwounded
 
 Zero-height legion's (caused by angel being summoned out) marker
    doesn't go away.  997978269986.sav
+
+Need to better stop phase advancing on draw, not just win.  Human player
+   ended up AI-controlled after draw.
+
+AI does not recruit post-battle reinforcements.
+
+6-high AI legion next to top circle with colossi did not grab another
+   colossus, for no good reason.

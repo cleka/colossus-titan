@@ -1,3 +1,8 @@
+AI needs to be more careful about protecting Titan. 
+
+Legions full of trolls/ogres/clopses should try harder to
+   avoid the desert.
+
 Consider switching from make to Ant to better handle packages.
 
 Advance phases on space instead of 'D'?
@@ -14,6 +19,9 @@ Split GUI classes from model classes.
 Add UI for players to specify favorite colors.
 
 Get minimax masterboard moves working.
+
+When a stack flees, make the winning stack visible, to the fleeing
+   legion's player's client only.
 
 Make advance phase delay configurable.
 Add AI time limits.

@@ -2757,10 +2757,6 @@ Log.debug("perfect score is : " + perfectScore);
 
             // TODO Change cursor to hourglass after N iterations.
             // Maybe pop up a progress bar or progress monitor.
-if (count % 100 == 0)
-{
-Log.debug(count + " tries");
-}
 
             int score = testMoveOrder(order, battle);
             if (score > bestScore)
@@ -2774,6 +2770,13 @@ Log.debug("got perfect score: " + score);
                 }
             }
             lastOrder = (ArrayList)order.clone();
+
+            // Just bailing out after 100 speeds things up a lot
+            // and seems to work okay.
+            if (count > 99)
+            {
+                break;
+            }
         }
 Log.debug("Got score " + bestScore + " in " + count + " permutations");
         return bestOrder;
