@@ -11,13 +11,15 @@ class Turn extends Dialog implements ActionListener
 {
     static Game game;
     Frame parentFrame;
+    MasterBoard board;
 
-    Turn(Frame parentFrame, Game game)
+    Turn(Frame parentFrame, Game game, MasterBoard board)
     {
         super(parentFrame, game.player[0].name + " Turn 1");
 
-        this.game = game;
         this.parentFrame = parentFrame;
+        this.game = game;
+        this.board = board;
 
         setSize(300, 250);
         
@@ -109,8 +111,11 @@ class Turn extends Dialog implements ActionListener
             for (int j = 0; j < game.player[game.activePlayer].numLegions; j++)
             {
                 // Move this legion back to where it started.
+                game.player[game.activePlayer].legions[j].undoMove();
             }
-            game.player[game.activePlayer].legionsMoved = 0;
+
+            // Remove all moves from MasterBoard.
+            board.unselectAllHexes();
         }
 
         else if (e.getActionCommand() == "Take Mulligan")
@@ -126,14 +131,16 @@ class Turn extends Dialog implements ActionListener
                     // Remove the Take Mulligan button.
                     setupMoveDialog();
                 }
+                // Remove all moves from MasterBoard.
+                board.unselectAllHexes();
             }
         }
 
         else if (e.getActionCommand() == "Done with Moves")
         {
-            if (game.player[game.activePlayer].legionsMoved == 0)
+            if (game.player[game.activePlayer].legionsMoved() == 0)
             {
-                // Check for the wacky case where there are
+                // XXX: Check for the wacky case where there are
                 // no legal moves at all.
             }
 
