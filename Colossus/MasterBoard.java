@@ -264,6 +264,9 @@ class MasterBoard extends JFrame implements MouseListener,
             }
             hex.select();
             hex.repaint();
+
+            // Need to set entry sides even if no possible engagement,
+            // for MasterHex.chooseWhetherToTeleport()
             if (hex.inverted())
             {
                 hex.setEntrySide((cameFrom + 3) % 6);
@@ -272,6 +275,7 @@ class MasterBoard extends JFrame implements MouseListener,
             {
                 hex.setEntrySide(cameFrom);
             }
+
             count++;
             return count;
         }
@@ -351,6 +355,7 @@ class MasterBoard extends JFrame implements MouseListener,
             return 0;
         }
 
+System.out.println("clearAllUnoccupiedEntrySides()");
         clearAllUnoccupiedEntrySides();
         
         int count = 0;
@@ -555,6 +560,7 @@ System.out.println("MasterBoard.finishSummoningAngel");
 
     public void finishBattle()
     {
+System.out.println("MasterBoard.show()");
         show();
 
         if (summoningAngel && summonAngel != null)
