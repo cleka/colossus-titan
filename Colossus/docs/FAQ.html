@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<html>
+  <head>
+    <meta name="generator"
+    content="HTML Tidy for Linux/x86 (vers 1st July 2002), see www.w3.org" />
+<!-- $Id$ -->
+    <title>Frequently Asked Questions for Colossus</title>
+  </head>
+  <body>
+    <ul>
+      <li>Why does the game sometimes prompt me twice for recruits? 
+      <p>Look closer. It&#39;s asking for the recruit and then for the
+      recruiter(s). Do you want to recruit that cyclops with your other
+      cyclops, or with your two gargoyles? If like most people you don&#39;t
+      care, then turn on 
+      <b>Auto pick recruiters</b>
+       and the computer will just pick one for you.</p>
+      </li>
+      <li>Why is the angel X&#39;d out in the summon dialog? I have one. 
+      <p>Because you haven&#39;t selected the donor stack with the angel. When
+      the Summon Angel dialog pops up, all of your unengaged legions with
+      summonable creatures will be highlighted. Pick one, then click on the
+      Summon button.</p>
+      </li>
+      <li>How come I can see enemy units, but some have question marks over
+      them? 
+      <p>This is a demonstration of the AI&#39;s stack prediction algorithm.
+      Using memory of creatures that it&#39;s seen, process of elimination, and
+      some guesses about reasonable splits, it tries to figure out what&#39;s
+      in enemy stacks. We&#39;ll add the ability to turn this off later, for
+      those who want the extra challenge of doing it yourself.</p>
+      </li>
+      <li>How to I make a legion spin around in a circle back to the original
+      hex when I roll a 6? 
+      <p>Just click on the chit twice.</p>
+      </li>
+      <li>What does the Antialias option do? 
+      <p>It makes the graphics a bit smoother (look closely at the hexside
+      edges while you turn it on and off), but this takes some CPU cycles. I
+      recommend turning it on if you have a fast computer and leaving it off if
+      you have a slow computer.</p>
+      </li>
+      <li>Why is the AI so dumb? 
+      <p>Titan has a huge branching complexity. So brute force searching
+      through all possible moves several turns ahead isn&#39;t possible.</p>
+      </li>
+      <li>What&#39;s the difference between 
+      <b>SimpleAI</b>
+       and 
+      <b>CowardSimpleAI</b>
+       and 
+      <b>A Random AI</b>
+       ? 
+      <p>SimpleAI does a straightforward one-ply lookahead for MasterBoard
+      moves. It works fairly well. CowardSimpleAI is the same code with some
+      constants changed to make it less aggressive. A Random AI just chooses
+      one of the available AIs at random -- this will be a more interesting
+      option when there are more viable alternatives.</p>
+      </li>
+      <li>What does the 
+      <b>Load External Variant</b>
+       button do? 
+      <p>It lets you load a variant that&#39;s somewhere else in the
+      filesystem, not included in the game&#39;s jar file.</p>
+      </li>
+      <li>Why, in the Caretaker&#39;s Stack, do some creatures have 
+      <b>--</b>
+       instead of a number ? Why, in the Caretaker&#39;s Stack, are some
+      creatures not red-crossed when there are 0 left? 
+      <p>Same reason: those creatures are &quot;immortal&quot;, i.e. when
+      they&#39;re killed on the batllefields, they&#39;re put back in the
+      Caretaker&#39;s Stack and not in the Graveyard (for instance, in
+      traditional Titan, they&#39;re Angel, Archangel, Warlock, Guardian and
+      Titan).</p>
+      </li>
+      <li>What&#39;s the option ``Slowing is cumulative&#39;&#39; ? 
+      <p>In regular Titan, there&#39;s never two slowing reasons together (you
+      don&#39;t find a bramble up a slope, for instance). In Variants this is
+      possible, so we must decide what to do: do you need 2 (only one slow) or
+      3 (count them both) movement points to go to an up-slope bramble
+      (assuming you&#39;re non-native) ? Without this option, 2. With this
+      option, 3. We don&#39;t decide, you do :-)</p>
+      </li>
+      <li>What&#39;s the option 
+      <b>Always allows one hex</b>
+       ? 
+      <p>This is necessary after introducing the aforementioned option 
+      <b>Slowing is cumulative</b>
+       . What if a 2-skill creature wants to enter an up-slope bramble ?
+      Without this option, it&#39;s impossible. With this option, any creature
+      can enter any non-impassible hex as its first move (it will only move one
+      hex), so our 2-skill creature can enter our up-slope bramble if it
+      hasn&#39;t moved yet.</p>
+      </li>
+      <li>How can I help? 
+      <p>Bug reports are great. Detailed bug reports delivered via the
+      SourceForge bug tracker are even better. If you want to contribute code,
+      make sure that you&#39;re starting from the latest source (so pull from
+      CVS). Please read and follow the coding standards so your code is easier
+      to merge. Join and send mail to the dev mailing list at SF so we know
+      what you&#39;re up to. Beyond that, just code whatever you want and send
+      patches when it works.</p>
+      </li>
+    </ul>
+  </body>
+</html>
+
