@@ -124,7 +124,8 @@ dist: $(JARFILE)
 javadoc:
 	javadoc -d javadoc/ -version -author -private \
         net/sf/colossus/client/*.java net/sf/colossus/server/*.java \
-        net/sf/colossus/util/*.java net/sf/colossus/parser/*.java
+        net/sf/colossus/util/*.java net/sf/colossus/parser/*.java \
+	net/sf/colossus/datatools/*.java
 
 # Make the Colossus-related tools
 BBJAR=BattlelandsBuilder.jar
