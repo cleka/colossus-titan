@@ -3,7 +3,7 @@ package net.sf.colossus.util;
 
 import java.util.*;
 import net.sf.colossus.server.Creature;
-import net.sf.colossus.server.Caretaker;
+import net.sf.colossus.client.CaretakerInfo;
 
 /**
  * The vertex of the Recruit Graph
@@ -16,19 +16,19 @@ import net.sf.colossus.server.Caretaker;
 public class RecruitVertex
 {
     private final Creature cre;
-    private final Caretaker caretaker;
+    private final CaretakerInfo caretakerInfo;
     private List outgoingEdges = new ArrayList();
     
-    RecruitVertex(Creature cre, Caretaker caretaker)
+    RecruitVertex(Creature cre, CaretakerInfo caretakerInfo)
     {
         this.cre = cre;
-        this.caretaker = caretaker;
+        this.caretakerInfo = caretakerInfo;
     }
     
-    RecruitVertex(String name, Caretaker caretaker)
+    RecruitVertex(String name, CaretakerInfo caretakerInfo)
     {
         this.cre = Creature.getCreatureByName(name);
-        this.caretaker = caretaker;
+        this.caretakerInfo = caretakerInfo;
     }
     
     List getOutgoingEdges()
@@ -60,9 +60,9 @@ public class RecruitVertex
 
     public int getRemaining()
     {
-        if (caretaker != null)
+        if (caretakerInfo != null)
         {
-            return caretaker.getCount(cre);
+            return caretakerInfo.getCount(cre);
         }
         else
         {

@@ -87,12 +87,7 @@ public final class Client implements IClient
 
     private AI ai = new SimpleAI(this);
 
-    /** Map of creature name to Integer count.  As in Caretaker, if an entry
-     *  is missing then we assume it is set to the maximum. */
-    private Map creatureCounts = new HashMap();
-    /** Map of creature name to Integer count.  As in Caretaker, if an entry
-     *  is missing then we assume it is set to 0. */
-    private Map creatureDeadCounts = new HashMap();
+    private CaretakerInfo caretakerInfo = new CaretakerInfo();
 
     private int turnNumber = -1;
     private String activePlayerName = "";
@@ -691,13 +686,10 @@ public final class Client implements IClient
     }
 
 
-    public void updateCreatureCount(String creatureName, int count, int deadCount)
+    public void updateCreatureCount(String creatureName, int count, 
+        int deadCount)
     {
-        if (creatureName != null)
-        {
-            creatureCounts.put(creatureName, new Integer(count));
-            creatureDeadCounts.put(creatureName, new Integer(deadCount));
-        }
+        caretakerInfo.updateCount(creatureName, count, deadCount);
         updateCreatureCountDisplay();
     }
 
@@ -2881,42 +2873,32 @@ Log.debug(playerName + " Client.cleanupBattle()");
 
     int getCreatureCount(String creatureName)
     {
-        Integer count = (Integer)creatureCounts.get(creatureName);
-        if (count == null)
-        {
-            return Creature.getCreatureByName(creatureName).getMaxCount();
-        }
-        return count.intValue();
+        return caretakerInfo.getCount(creatureName);
     }
 
     int getCreatureCount(Creature creature)
     {
-        return getCreatureCount(creature.getName());
+        return caretakerInfo.getCount(creature);
     }
 
     int getCreatureDeadCount(String creatureName)
     {
-        Integer count = (Integer)creatureDeadCounts.get(creatureName);
-        if (count == null)
-        {
-            return 0;
-        }
-        return count.intValue();
+        return caretakerInfo.getDeadCount(creatureName);
     }
 
     int getCreatureDeadCount(Creature creature)
     {
-        return getCreatureDeadCount(creature.getName());
+        return caretakerInfo.getDeadCount(creature);
     }
 
     int getCreatureMaxCount(String creatureName)
     {
-        return getCreatureMaxCount(Creature.getCreatureByName(creatureName));
+        return caretakerInfo.getMaxCount(creatureName);
     }
 
     int getCreatureMaxCount(Creature creature)
     {
-        return creature.getMaxCount();
+        return caretakerInfo.getMaxCount(creature);
     }
 
     /** Returns a list of markerIds. */

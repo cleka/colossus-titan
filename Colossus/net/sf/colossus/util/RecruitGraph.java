@@ -4,7 +4,7 @@ package net.sf.colossus.util;
 import java.util.*;
 import net.sf.colossus.client.LegionInfo;
 import net.sf.colossus.server.Creature;
-import net.sf.colossus.server.Caretaker;
+import net.sf.colossus.client.CaretakerInfo;
 
 /**
  * Implementation of a graph dedicated to the Recruit "Tree" (it's a directed
@@ -17,7 +17,7 @@ import net.sf.colossus.server.Caretaker;
 
 public class RecruitGraph
 {
-    private final Caretaker caretaker;
+    private final CaretakerInfo caretakerInfo;
     private List allVertex = new ArrayList();
     private List allEdge = new ArrayList();
     private Map creatureToVertex = new HashMap();
@@ -32,7 +32,7 @@ public class RecruitGraph
         RecruitVertex temp = (RecruitVertex)creatureToVertex.get(cre);
         if (temp == null)
         {
-            temp = new RecruitVertex(cre, caretaker);
+            temp = new RecruitVertex(cre, caretakerInfo);
             allVertex.add(temp);
             creatureToVertex.put(cre, temp);
         }
@@ -87,9 +87,9 @@ public class RecruitGraph
 
     /* PUBLIC */
 
-    public RecruitGraph(Caretaker caretaker)
+    public RecruitGraph(CaretakerInfo caretakerInfo)
     {
-        this.caretaker = caretaker;
+        this.caretakerInfo = caretakerInfo;
     }
 
     public RecruitEdge addEdge(Creature src,
