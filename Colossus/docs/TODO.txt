@@ -1,5 +1,12 @@
-Make auto recruit smarter.  Take the correct small creature in a 
-   tower, and take a third cyclops over a gorgon.
+Make MasterBoard and MasterHex pluggable.  Integrate David Lum's
+   Java2D MasterBoard graphics as an option.
+
+Centralize scale handling.  Add a rescale option.
+
+Add an option to show information about MasterBoard hexes when a
+   mover is selected, such as whether that legion can recruit
+   there, and how many die rolls from that hex would let the
+   legion recruit next turn.
 
 Add allow the ability to replace any creature in a legion with a 
    different creature type or "unknown," for PBEM and debug.

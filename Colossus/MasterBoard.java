@@ -168,11 +168,11 @@ public final class MasterBoard extends JPanel implements MouseListener,
         {
             public void actionPerformed(ActionEvent e)
             {
-                Player player = game.getActivePlayer();
-                if (player.getMaxLegionHeight() > 7)
+                // Initial legions must be split.
+                if (game.getTurnNumber() == 1 &&
+                    game.getActivePlayer().getNumLegions() == 1)
                 {
-                    JOptionPane.showMessageDialog(masterFrame,
-                        "Must split.");
+                    JOptionPane.showMessageDialog(masterFrame, "Must split.");
                 }
                 else
                 {
@@ -1642,6 +1642,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
 
     public static int findScale()
     {
+        // XXX 15 is a bit small, but divides nicely into 30 and 60.
         int scale = 16;
 
         // Make sure that the board fits on the screen.

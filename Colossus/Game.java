@@ -2124,6 +2124,14 @@ public final class Game
                 // The last recruit is the biggest.
                 Creature recruit = (Creature)recruits.get(recruits.size() - 1);
 
+                // Recruit a third cyclops instead of a gorgon.
+                if (recruit == Creature.gorgon && 
+                    recruits.contains(Creature.cyclops) && 
+                    legion.numCreature(Creature.cyclops) == 2)
+                {
+                    recruit = Creature.cyclops;
+                }
+
                 if (recruit != null)
                 {
                     doRecruit(recruit, legion, masterFrame);

@@ -543,24 +543,6 @@ public final class Player implements Comparable
     }
 
 
-    public int getMaxLegionHeight()
-    {
-        int height = 0;
-
-        Iterator it = legions.iterator();
-        while (it.hasNext())
-        {
-            Legion legion = (Legion)it.next();
-            if (legion.getHeight() > height)
-            {
-                height = legion.getHeight();
-            }
-        }
-
-        return height;
-    }
-
-
     public int getNumCreatures()
     {
         int count = 0;
