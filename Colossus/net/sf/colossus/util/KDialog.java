@@ -16,6 +16,14 @@ public class KDialog extends JDialog implements MouseListener, WindowListener
     public KDialog (Frame owner, String title, boolean modal)
     {
         super(owner, title, modal);
+
+        Container cont = getContentPane();
+
+        if (cont instanceof JComponent)
+        {
+            ((JComponent)cont).setBorder(
+                 new javax.swing.border.TitledBorder(title));
+        }
     }
 
     /** Place dialog relative to parentFrame's origin, offset by 
