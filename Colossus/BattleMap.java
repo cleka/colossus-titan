@@ -8,7 +8,7 @@ import java.awt.event.*;
  */
 
 public class BattleMap extends Frame implements MouseListener,
-    MouseMotionListener
+    MouseMotionListener, WindowListener
 {
     public static final double SQRT3 = Math.sqrt(3.0);
     private Hex[][] h = new Hex[6][6];
@@ -44,7 +44,7 @@ public class BattleMap extends Frame implements MouseListener,
         setSize(28 * scale, 28 * scale);
         setBackground(java.awt.Color.white);
         setVisible(true);
-        addWindowListener(new InnerWindowAdapter());
+        addWindowListener(this);
         addMouseListener(this);
         addMouseMotionListener(this);
         
@@ -216,6 +216,36 @@ public class BattleMap extends Frame implements MouseListener,
     }
 
 
+    public void windowActivated(WindowEvent event)
+    {
+    }
+
+    public void windowClosed(WindowEvent event)
+    {
+    }
+
+    public void windowClosing(WindowEvent event)
+    {
+        System.exit(0);
+    }
+
+    public void windowDeactivated(WindowEvent event)
+    {
+    }
+    
+    public void windowDeiconified(WindowEvent event)
+    {
+    }
+
+    public void windowIconified(WindowEvent event)
+    {
+    }
+
+    public void windowOpened(WindowEvent event)
+    {
+    }
+
+
     public void paint(Graphics g)
     {
         if (!imagesLoaded)
@@ -311,13 +341,6 @@ public class BattleMap extends Frame implements MouseListener,
     }
 
 
-    class InnerWindowAdapter extends WindowAdapter 
-    {
-        public void windowClosing(WindowEvent event)
-        {
-            System.exit(0);
-        }
-    }
 }
 
 

@@ -8,7 +8,7 @@ import java.awt.event.*;
  */
 
 public class MasterBoard extends Frame implements MouseListener,
-    MouseMotionListener
+    MouseMotionListener, WindowListener
 {
     // There are a total of 96 hexes
     // Their Titan labels are:
@@ -64,7 +64,7 @@ public class MasterBoard extends Frame implements MouseListener,
         setSize(69 * scale, 69 * scale);
         setBackground(java.awt.Color.black);
         setVisible(true);
-        addWindowListener(new InnerWindowAdapter());
+        addWindowListener(this);
         addMouseListener(this);
         addMouseMotionListener(this);
 
@@ -727,6 +727,36 @@ public class MasterBoard extends Frame implements MouseListener,
     }
 
 
+    public void windowActivated(WindowEvent event)
+    {
+    }
+
+    public void windowClosed(WindowEvent event)
+    {
+    }
+
+    public void windowClosing(WindowEvent event)
+    {
+        System.exit(0);
+    }
+
+    public void windowDeactivated(WindowEvent event)
+    {
+    }
+    
+    public void windowDeiconified(WindowEvent event)
+    {
+    }
+
+    public void windowIconified(WindowEvent event)
+    {
+    }
+
+    public void windowOpened(WindowEvent event)
+    {
+    }
+
+
     public void paint(Graphics g)
     {
         if (!imagesLoaded)
@@ -821,14 +851,6 @@ public class MasterBoard extends Frame implements MouseListener,
         MasterBoard masterboard = new MasterBoard();
     }
 
-
-    class InnerWindowAdapter extends WindowAdapter
-    {
-        public void windowClosing(WindowEvent event)
-        {
-            System.exit(0);
-        }
-    }
 }
 
 
