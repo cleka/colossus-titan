@@ -15,7 +15,7 @@ class Turn extends Dialog implements ActionListener
 
     Turn(Frame parentFrame, Game game, MasterBoard board)
     {
-        super(parentFrame, game.player[0].name + " Turn 1");
+        super(parentFrame, game.getActivePlayer().getName() + " Turn 1");
 
         this.parentFrame = parentFrame;
         this.game = game;
@@ -34,8 +34,7 @@ class Turn extends Dialog implements ActionListener
         removeAll();
         setLayout(new GridLayout(0, 2));
 
-        add(new Label(game.player[game.activePlayer].name + 
-            " : Split stacks"));
+        add(new Label(game.getActivePlayer().getName() + " : Split stacks"));
         Button button1 = new Button("Done with Splits");
         add(button1);
         button1.addActionListener(this);
@@ -51,7 +50,8 @@ class Turn extends Dialog implements ActionListener
     void setupMoveDialog()
     {
         removeAll();
-        if (game.player[game.activePlayer].mulligansLeft > 0) 
+        Player player = game.getActivePlayer();
+        if (player.mulligansLeft > 0)
         {
             setLayout(new GridLayout(0, 4));
         }
@@ -60,17 +60,15 @@ class Turn extends Dialog implements ActionListener
             setLayout(new GridLayout(0, 3));
         }
 
-        game.player[game.activePlayer].movementRoll = 
-            (int) Math.ceil(6 * Math.random());
+        player.movementRoll = (int) Math.ceil(6 * Math.random());
 
-        add(new Label(game.player[game.activePlayer].name + 
-            " : Movement Roll: " + 
-            game.player[game.activePlayer].movementRoll));
+        add(new Label(player.getName() + " : Movement Roll: " + 
+            player.movementRoll));
         Button button1 = new Button("Reset Moves");
         add(button1);
         button1.addActionListener(this);
 
-        if (game.player[game.activePlayer].mulligansLeft > 0)
+        if (player.mulligansLeft > 0)
         {
             Button button2 = new Button("Take Mulligan");
             add(button2);
@@ -91,42 +89,37 @@ class Turn extends Dialog implements ActionListener
     
     public void actionPerformed(ActionEvent e)
     {
+        Player player = game.getActivePlayer();
+
         if (e.getActionCommand() == "Done with Splits")
         {
-            for (int j = 0; j < game.player[game.activePlayer].numLegions; j++)
+            if (player.getMaxLegionHeight() > 7)
             {
-                if (game.player[game.activePlayer].legions[j].height > 7)
-                {
-                    new MessageBox(parentFrame, "Must split.");
-                    return;
-                }
+                new MessageBox(parentFrame, "Must split.");
+                return;
             }
-            game.phase++;
+            game.advancePhase();
 
             setupMoveDialog();
         }
 
         else if (e.getActionCommand() == "Reset Moves")
         {
-            for (int j = 0; j < game.player[game.activePlayer].numLegions; j++)
-            {
-                // Move this legion back to where it started.
-                game.player[game.activePlayer].legions[j].undoMove();
-            }
+            player.undoAllMoves();
 
             // Remove all moves from MasterBoard.
             board.unselectAllHexes();
+            board.repaint();
         }
 
         else if (e.getActionCommand() == "Take Mulligan")
         {
-            if (game.player[game.activePlayer].mulligansLeft > 0)
+            if (player.mulligansLeft > 0)
             {
-                game.player[game.activePlayer].movementRoll = 
-                    (int) Math.ceil(6 * Math.random());
+                player.movementRoll = (int) Math.ceil(6 * Math.random());
 
-                game.player[game.activePlayer].mulligansLeft--;
-                if (game.player[game.activePlayer].mulligansLeft == 0)
+                player.mulligansLeft--;
+                if (player.mulligansLeft == 0)
                 {
                     // Remove the Take Mulligan button.
                     setupMoveDialog();
@@ -138,7 +131,7 @@ class Turn extends Dialog implements ActionListener
 
         else if (e.getActionCommand() == "Done with Moves")
         {
-            if (game.player[game.activePlayer].legionsMoved() == 0)
+            if (player.legionsMoved() == 0)
             {
                 // XXX: Check for the wacky case where there are
                 // no legal moves at all.
@@ -154,9 +147,7 @@ class Turn extends Dialog implements ActionListener
 
         else if (e.getActionCommand() == "End Turn")
         {
-            game.activePlayer++;
-            game.activePlayer %= game.numPlayers;
-            game.phase = 1;
+            game.advanceTurn();
         }
     }
 }
