@@ -35,6 +35,10 @@ jar: classes
 	jar -mcf META-INF/MANIFEST.MF Colossus.jar *.class images/*.gif
 	chmod +x Colossus.jar
 
+# Install jar file
+inst: classes
+	cp Colossus.jar /home/httpd/html
+
 # Clean up
 clean:
 	rm -f *~ *.class core *.bak *.jar
