@@ -406,7 +406,7 @@ class Node implements Comparable
 
     void revealCreatures(List cnl)
     {
-        Log.debug("revealCreatures() for " + this + " ^ " + cnl);
+        Log.debug("PS revealCreatures() for " + this + " ^ " + cnl);
         CreatureInfoList cil = new CreatureInfoList();
         Iterator it = cnl.iterator();
         while (it.hasNext())
@@ -672,7 +672,7 @@ class Node implements Comparable
 
     void split(int childSize, String otherMarkerId, int turn, List splitoffs)
     {
-        Log.debug("split() for " + this + " " + childSize + " " +
+        Log.debug("PS split() for " + this + " " + childSize + " " +
                 otherMarkerId + " " + turn);
         if (childSize == 0)
         {
@@ -840,14 +840,14 @@ class Node implements Comparable
      *  will remain.  Also used to undo splits.*/
     void merge(Node other, int turn)
     {
-        Log.debug("merge() for " + this + " and " + other + " " + turn);
+        Log.debug("PS merge() for " + this + " and " + other + " " + turn);
         if (other == null)
         {
             return;
         }
         if (parent != other.parent)
         {
-            Log.debug("Can't merge non-siblings");
+            Log.warn("Can't merge non-siblings");
             return;
         }
         if (getMarkerId().equals(parent.getMarkerId()) ||
@@ -869,7 +869,8 @@ class Node implements Comparable
      *  other child and/or its parent something. */
     void tellChildContents(Node child)
     {
-        Log.debug("tellChildContents() for node " + this + " from " + child);
+        Log.debug("PS tellChildContents() for node " + this + " from " + 
+                child);
         CreatureInfoList childCertainAtSplit =
                 child.getCertainAtSplitCreatures();
         revealCreatures(childCertainAtSplit.getCreatureNames());
@@ -882,7 +883,7 @@ class Node implements Comparable
         {
             creatureName = "Titan";
         }
-        Log.debug("addCreature() " + this + " : " + creatureName);
+        Log.debug("PS addCreature() " + this + " : " + creatureName);
         if (getHeight() >= 7 && child1 == null)
         {
             throw new PredictSplitsException("Tried adding to 7-high legion");
@@ -897,7 +898,7 @@ class Node implements Comparable
         {
             creatureName = "Titan";
         }
-        Log.debug("removeCreature() " + this + " : " + creatureName);
+        Log.debug("PS removeCreature() " + this + " : " + creatureName);
         if (getHeight() <= 0)
         {
             throw new PredictSplitsException(
