@@ -13,9 +13,10 @@ class Legion
     Chit chit;
     int height;
     String markerId;    // Bk03, Rd12, etc.
+    String splitFrom;   // Bk03, Rd12, etc. or null
     Creature [] creatures = new Creature[8];  // 8 before initial splits
 
-    Legion(int cx, int cy, int scale, String markerId,
+    Legion(int cx, int cy, int scale, String markerId, String splitFrom,
         Container container, int height, Creature creature0,
         Creature creature1, Creature creature2, Creature creature3, 
         Creature creature4, Creature creature5, 
