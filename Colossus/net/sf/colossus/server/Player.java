@@ -591,9 +591,7 @@ public final class Player implements Comparable
         Legion parent = splitoff.getParent();
         splitoff.recombine(parent, true);
         game.getServer().allUpdatePlayerInfo();
-        game.getServer().undidSplit(splitoffId);
-        game.getServer().oneRevealLegion(parent, getName());
-        game.getServer().allFullyUpdateLegionHeights();
+        game.getServer().undidSplit(splitoffId, parent.getMarkerId());
     }
 
 
@@ -609,7 +607,8 @@ public final class Player implements Comparable
                 legion.getCurrentHexLabel(), this);
             if (legion != parent)
             {
-                game.getServer().undidSplit(legion.getMarkerId());
+                game.getServer().undidSplit(legion.getMarkerId(),
+                    parent.getMarkerId());
                 legion.recombine(parent, false);
                 it.remove();
             }
@@ -770,6 +769,7 @@ public final class Player implements Comparable
         game.getServer().allUpdatePlayerInfo();
 
         Log.event(getName() + " dies");
+        game.getServer().allTellPlayerElim(name, slayerName);
             
         // See if the game is over.
         if (checkForVictory)
@@ -795,10 +795,17 @@ public final class Player implements Comparable
     // XXX Prohibit colons in player names.
     /** Return a colon:separated string with a bunch of info for
      *  the status screen. */
-    String getStatusInfo()
+    String getStatusInfo(boolean treatDeadAsAlive)
     {
         StringBuffer buf = new StringBuffer();
-        buf.append(isDead());
+        if (treatDeadAsAlive)
+        {
+            buf.append(false);
+        }
+        else
+        {
+            buf.append(isDead());
+        }
         buf.append(':');
         buf.append(name);
         buf.append(':');

@@ -494,4 +494,12 @@ public class Creature implements Comparable
     {
         noBaseColor = b;
     }
+
+    public String getBaseColor()
+    {
+        if (baseColor != null)
+            return baseColor;
+        else
+            return "";
+    }
 }

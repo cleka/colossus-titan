@@ -7,6 +7,7 @@ import javax.swing.*;
 import java.io.*;
 
 import net.sf.colossus.util.Log;
+import net.sf.colossus.util.Options;
 import net.sf.colossus.client.IClient;
 import net.sf.colossus.client.Client;
 import net.sf.colossus.client.Proposal;
@@ -294,14 +295,19 @@ Log.debug("Called Server.addClient() for " + playerName);
     }
 
 
-    void allUpdatePlayerInfo()
+    void allUpdatePlayerInfo(boolean treatDeadAsAlive)
     {
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
             IClient client = (IClient)it.next();
-            client.updatePlayerInfo(getPlayerInfo());
+            client.updatePlayerInfo(getPlayerInfo(treatDeadAsAlive));
         }
+    }
+
+    void allUpdatePlayerInfo()
+    {
+        allUpdatePlayerInfo(false);
     }
 
     void allUpdateCreatureCount(String creatureName, int count, int deadCount)
@@ -467,6 +473,17 @@ Log.debug("Called Server.addClient() for " + playerName);
             IClient client = (IClient)it.next();
             client.showMessageDialog(message);
         }
+    }
+
+    void allTellPlayerElim(String playerName, String slayerName)
+    {
+        Iterator it = clients.iterator();
+        while (it.hasNext())
+        {
+            IClient client = (IClient)it.next();
+            client.tellPlayerElim(playerName, slayerName);
+        }
+        game.history.playerElimEvent(playerName, slayerName);
     }
 
     void allTellGameOver(String message)
@@ -789,6 +806,15 @@ Log.debug("Called Server.addClient() for " + playerName);
             client.didRecruit(legion.getMarkerId(), recruit.getName(),
                 recruiterName, numRecruiters);
         }
+
+        List recruiterNames = new ArrayList();
+        for (int i = 0; i < numRecruiters; i++)
+        {
+            recruiterNames.add(recruiterName);
+        }
+        game.history.revealEvent(true, null, legion.getMarkerId(), 
+            recruiterNames, false);
+        game.history.addCreatureEvent(legion.getMarkerId(), recruit.getName());
     }
 
     void undidRecruit(Legion legion, String recruitName)
@@ -800,6 +826,7 @@ Log.debug("Called Server.addClient() for " + playerName);
             IClient client = (IClient)it.next();
             client.undidRecruit(legion.getMarkerId(), recruitName);
         }
+        game.history.removeCreatureEvent(legion.getMarkerId(), recruitName);
     }
 
 
@@ -815,6 +842,7 @@ Log.debug("Called Server.addClient() for " + playerName);
 
     void allTellEngagement(String hexLabel, Legion attacker, Legion defender)
     {
+Log.debug("allTellEngagement() " + hexLabel);
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
@@ -1151,14 +1179,26 @@ Log.debug("Called Server.addClient() for " + playerName);
         game.getActivePlayer().undoSplit(splitoffId);
     }
 
-    void undidSplit(String splitoffId)
+
+    void undidSplit(String splitoffId, String survivorId, 
+        boolean updateHistory, int turn)
     {
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
             IClient client = (IClient)it.next();
-            client.undidSplit(splitoffId);
+            client.undidSplit(splitoffId, survivorId, turn);
         }
+        if (updateHistory)
+        {
+            game.history.mergeEvent(splitoffId, survivorId, 
+                game.getTurnNumber());
+        }
+    }
+
+    void undidSplit(String splitoffId, String survivorId)
+    {
+        undidSplit(splitoffId, survivorId, true, game.getTurnNumber());
     }
 
 
@@ -1318,14 +1358,14 @@ Log.debug("Called Server.addClient() for " + playerName);
     }
 
 
-    private List getPlayerInfo()
+    private List getPlayerInfo(boolean treatDeadAsAlive)
     {
         List info = new ArrayList(game.getNumPlayers());
         Iterator it = game.getPlayers().iterator();
         while (it.hasNext())
         {
             Player player = (Player)it.next();
-            info.add(player.getStatusInfo());
+            info.add(player.getStatusInfo(treatDeadAsAlive));
         }
         return info;
     }
@@ -1351,11 +1391,55 @@ Log.debug("Called Server.addClient() for " + playerName);
     {
         allUpdatePlayerInfo();
 
+        IClient activeClient = getClient(game.getActivePlayerName());
+
+        Legion child = game.getLegionByMarkerId(childId);
+        List splitoffs = child.getImageNames();
+        activeClient.didSplit(hexLabel, parentId, childId, height, splitoffs,
+            game.getTurnNumber());
+
+        game.history.splitEvent(parentId, childId, splitoffs, 
+            game.getTurnNumber());
+
+        if (!game.getOption(Options.allStacksVisible))
+        {
+            splitoffs.clear();
+        }
+
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
             IClient client = (IClient)it.next();
-            client.didSplit(hexLabel, parentId, childId, height);
+            if (client != activeClient)
+            {
+                client.didSplit(hexLabel, parentId, childId, height, 
+                    splitoffs, game.getTurnNumber());
+            }
+        }
+    }
+
+    /** Call from History during load game only */
+    void didSplit(String parentId, String childId, List splitoffs, int turn)
+    {
+        IClient activeClient = getClient(game.getActivePlayerName());
+        int childSize = splitoffs.size();
+        activeClient.didSplit(null, parentId, childId, childSize, splitoffs, 
+            turn);
+
+        if (!game.getOption(Options.allStacksVisible))
+        {
+            splitoffs.clear();
+        }
+
+        Iterator it = clients.iterator();
+        while (it.hasNext())
+        {
+            IClient client = (IClient)it.next();
+            if (client != activeClient)
+            {
+                client.didSplit(null, parentId, childId, childSize, splitoffs, 
+                    turn);
+            }
         }
     }
 
@@ -1398,7 +1482,8 @@ Log.debug("Called Server.addClient() for " + playerName);
     }
 
 
-    void allTellAddCreature(String markerId, String creatureName)
+    void allTellAddCreature(String markerId, String creatureName, 
+        boolean updateHistory)
     {
         Iterator it = clients.iterator();
         while (it.hasNext())
@@ -1406,15 +1491,24 @@ Log.debug("Called Server.addClient() for " + playerName);
             IClient client = (IClient)it.next();
             client.addCreature(markerId, creatureName);
         }
+        if (updateHistory)
+        {
+            game.history.addCreatureEvent(markerId, creatureName);
+        }
     }
 
-    void allTellRemoveCreature(String markerId, String creatureName)
+    void allTellRemoveCreature(String markerId, String creatureName, 
+        boolean updateHistory)
     {
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
             IClient client = (IClient)it.next();
             client.removeCreature(markerId, creatureName);
+        }
+        if (updateHistory)
+        {
+            game.history.removeCreatureEvent(markerId, creatureName);
         }
     }
 
@@ -1427,6 +1521,19 @@ Log.debug("Called Server.addClient() for " + playerName);
             client.setLegionContents(legion.getMarkerId(),
                 legion.getImageNames());
         }
+        game.history.revealEvent(true, null, legion.getMarkerId(), 
+            legion.getImageNames(), true);
+    }
+
+    /** Call from History during load game only */
+    void allRevealLegion(String markerId, List creatureNames)
+    {
+        Iterator it = clients.iterator();
+        while (it.hasNext())
+        {
+            IClient client = (IClient)it.next();
+            client.setLegionContents(markerId, creatureNames);
+        }
     }
 
     void oneRevealLegion(Legion legion, String playerName)
@@ -1437,26 +1544,24 @@ Log.debug("Called Server.addClient() for " + playerName);
             client.setLegionContents(legion.getMarkerId(), 
                 legion.getImageNames());
         }
+        List li = new ArrayList();
+        li.add(playerName);
+        game.history.revealEvent(false, li, legion.getMarkerId(), 
+            legion.getImageNames(), true);
     }
 
-    void allFullyUpdateLegionHeights()
+    /** Call from History during load game only */
+    void oneRevealLegion(String playerName, String markerId, List creatureNames)
     {
-        Iterator it = clients.iterator();
-        while (it.hasNext())
+        IClient client = getClient(playerName);
+        if (client != null)
         {
-            IClient client = (IClient)it.next();
-            if (client != null)
-            {
-                Iterator it2 = game.getAllLegions().iterator();
-                while (it2.hasNext())
-                {
-                    Legion legion = (Legion)it2.next();
-                    client.setLegionHeight(legion.getMarkerId(),
-                        legion.getHeight());
-                }
-            }
+            client.setLegionContents(markerId, creatureNames);
         }
+        List li = new ArrayList();
+        li.add(playerName);
     }
+
 
     void allFullyUpdateLegionStatus()
     {
@@ -1478,21 +1583,6 @@ Log.debug("Called Server.addClient() for " + playerName);
         }
     }
 
-    synchronized void allFullyUpdateOwnLegionContents()
-    {
-        Iterator it = game.getPlayers().iterator();
-        while (it.hasNext())
-        {
-            Player player = (Player)it.next();
-            Iterator it2 = player.getLegions().iterator();
-            while (it2.hasNext())
-            {
-                Legion legion = (Legion)it2.next();
-                oneRevealLegion(legion, player.getName());
-            }
-        }
-    }
-
     void allFullyUpdateAllLegionContents()
     {
         Iterator it = game.getAllLegions().iterator();
@@ -1503,40 +1593,30 @@ Log.debug("Called Server.addClient() for " + playerName);
         }
     }
 
-    // XXX temp, until AIs can predict splits.
-    void aiFullyUpdateAllLegionContents()
-    {
-        Iterator it = game.getAllLegions().iterator();
-        while (it.hasNext())
-        {
-            Legion legion = (Legion)it.next();
-            aiRevealLegion(legion);
-        }
-    }
-
-    // XXX temp, until AIs can predict splits.
-    void aiRevealLegion(Legion legion)
-    {
-        Iterator it = game.getPlayers().iterator();
-        while (it.hasNext())
-        {
-            Player player = (Player)it.next();
-            if (player.isAI())
-            {
-                oneRevealLegion(legion, player.getName());
-            }
-        }
-    }
-
     void allRevealCreature(Legion legion, String creatureName)
     {
-        List names = new ArrayList();
-        names.add(creatureName);
+        List creatureNames = new ArrayList();
+        creatureNames.add(creatureName);
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
             IClient client = (IClient)it.next();
-            client.revealCreatures(legion.getMarkerId(), names);
+            client.revealCreatures(legion.getMarkerId(), creatureNames);
+        }
+        game.history.revealEvent(true, null, legion.getMarkerId(),
+            creatureNames, false);
+    }
+
+    /** Call from History during load game only */
+    void allRevealCreature(String markerId, String creatureName)
+    {
+        List creatureNames = new ArrayList();
+        creatureNames.add(creatureName);
+        Iterator it = clients.iterator();
+        while (it.hasNext())
+        {
+            IClient client = (IClient)it.next();
+            client.revealCreatures(markerId, creatureNames);
         }
     }
 

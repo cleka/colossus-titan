@@ -88,6 +88,11 @@ public final class PlayerInfo
         return dead;
     }
 
+    void setDead(boolean dead)
+    {
+        this.dead = dead;
+    }
+
     public String getName()
     {
         return name;

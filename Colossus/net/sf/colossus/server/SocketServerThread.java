@@ -379,11 +379,6 @@ final class SocketServerThread extends Thread implements IClient
         out.println(Constants.removeLegion + sep + id);
     }
 
-    public void setLegionHeight(String markerId, int height)
-    {
-        out.println(Constants.setLegionHeight + sep + markerId + sep + height);
-    }
-
     public void setLegionStatus(String markerId, boolean moved,
         boolean teleported, int entrySide, String lastRecruit)
     {
@@ -463,6 +458,12 @@ final class SocketServerThread extends Thread implements IClient
     public void tellGameOver(String message)
     {
         out.println(Constants.tellGameOver + sep + message);
+    }
+
+    public void tellPlayerElim(String playerName, String slayerName)
+    {
+        out.println(Constants.tellPlayerElim + sep + playerName + sep + 
+            slayerName);
     }
 
     public void askConcede(String allyMarkerId, String enemyMarkerId)
@@ -624,16 +625,18 @@ final class SocketServerThread extends Thread implements IClient
             formerHexLabel + sep + currentHexLabel);
     }
 
-    public void undidSplit(String splitoffId)
+    public void undidSplit(String splitoffId, String survivorId, int turn)
     {
-        out.println(Constants.undidSplit + sep + splitoffId); 
+        out.println(Constants.undidSplit + sep + splitoffId + sep + 
+            survivorId + sep + turn); 
     }
 
     public void didSplit(String hexLabel, String parentId, String childId,
-        int childHeight)
+        int childHeight, List splitoffs, int turn)
     {
         out.println(Constants.didSplit + sep + hexLabel + sep + parentId +
-            sep + childId + sep + childHeight); 
+            sep + childId + sep + childHeight + sep + Glob.glob(splitoffs) +
+            sep + turn); 
     }
 
     public void askPickColor(java.util.List colorsLeft)

@@ -18,8 +18,8 @@ import net.sf.colossus.util.KDialog;
 final class ShowLegion extends KDialog implements MouseListener,
     WindowListener
 {
-    ShowLegion(JFrame parentFrame, String markerId, 
-        java.util.List imageNames, Point point)
+    ShowLegion(JFrame parentFrame, String markerId, java.util.List imageNames, 
+        java.util.List certain, Point point)
     {
         super(parentFrame, "Legion " + markerId, false);
 
@@ -36,23 +36,25 @@ final class ShowLegion extends KDialog implements MouseListener,
         placeRelative(parentFrame, point);
 
         Container contentPane = getContentPane();
-
         contentPane.setLayout(new FlowLayout());
 
         int scale = 4 * Scale.get();
+
         Iterator it = imageNames.iterator();
+        Iterator it2 = certain.iterator();
         while (it.hasNext())
         {
             String imageName = (String)it.next();
-            Chit chit = new Chit(scale, imageName, this);
+
+            boolean sure = ((Boolean)it2.next()).booleanValue();
+            
+            Chit chit = new Chit(scale, imageName, this, false, !sure);
             contentPane.add(chit);
             chit.addMouseListener(this);
         }
 
         pack();
-
         addMouseListener(this);
-
         setVisible(true);
         repaint();
     }

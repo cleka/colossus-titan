@@ -1696,7 +1696,8 @@ public final class MasterBoard extends JPanel
                 if (isPopupButton(e))
                 {
                     new ShowLegion(masterFrame, markerId,
-                        client.getLegionImageNames(markerId), point);
+                        client.getLegionImageNames(markerId), 
+                        client.getLegionCreatureCertainties(markerId), point);
                     return;
                 }
                 else if (client.isMyLegion(markerId))

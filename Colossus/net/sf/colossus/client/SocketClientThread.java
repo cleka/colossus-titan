@@ -144,12 +144,6 @@ Log.debug("End of SocketClientThread while loop");
             String id = (String)args.remove(0);
             client.removeLegion(id);
         }
-        else if (method.equals(Constants.setLegionHeight))
-        {
-            String markerId = (String)args.remove(0);
-            int height = Integer.parseInt((String)args.remove(0));
-            client.setLegionHeight(markerId, height);
-        }
         else if (method.equals(Constants.setLegionStatus))
         {
             String markerId = (String)args.remove(0);
@@ -233,6 +227,12 @@ Log.debug("End of SocketClientThread while loop");
         {
             String message = (String)args.remove(0);
             client.tellGameOver(message);
+        }
+        else if (method.equals(Constants.tellPlayerElim))
+        {
+            String playerName = (String)args.remove(0);
+            String slayerName = (String)args.remove(0);
+            client.tellPlayerElim(playerName, slayerName);
         }
         else if (method.equals(Constants.askConcede))
         {
@@ -419,7 +419,9 @@ Log.debug("End of SocketClientThread while loop");
         else if (method.equals(Constants.undidSplit))
         {
             String splitoffId = (String)args.remove(0);
-            client.undidSplit(splitoffId);
+            String survivorId = (String)args.remove(0);
+            int turn = Integer.parseInt((String)args.remove(0));
+            client.undidSplit(splitoffId, survivorId, turn);
         }
         else if (method.equals(Constants.didSplit))
         {
@@ -427,7 +429,15 @@ Log.debug("End of SocketClientThread while loop");
             String parentId = (String)args.remove(0);
             String childId = (String)args.remove(0);
             int childHeight = Integer.parseInt((String)args.remove(0));
-            client.didSplit(hexLabel, parentId, childId, childHeight);
+            java.util.List splitoffs = new ArrayList();
+            if (!args.isEmpty())
+            {
+                List soList = Split.split(Glob.sep, (String)args.remove(0));
+                splitoffs.addAll(soList);
+            }
+            int turn = Integer.parseInt((String)args.remove(0));
+            client.didSplit(hexLabel, parentId, childId, childHeight, 
+                splitoffs, turn);
         }
         else if (method.equals(Constants.askPickColor))
         {

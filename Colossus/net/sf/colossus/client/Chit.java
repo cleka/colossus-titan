@@ -43,7 +43,21 @@ class Chit extends JPanel
 
     Chit(int scale, String id, Container container)
     {
+        this(scale, id, container, false, false);
+    }
+
+    Chit(int scale, String id, Container container, boolean inverted)
+    {
+        this(scale, id, container, inverted, false);
+    }
+
+    Chit(int scale, String id, Container container, boolean inverted,
+         boolean dubious)
+    {
         super();
+        
+        this.inverted = inverted;
+        
         Point point = getLocation();
 
         // Images are 60x60, so if scale is close to that, avoid
@@ -69,7 +83,7 @@ class Chit extends JPanel
             }
             else
             { // special case : the Titan.
-                String[] filenames = new String[4];
+                String[] filenames = new String[4 + (dubious ? 1 : 0)];
                 int index = 6;
                 int index2 = index;
                 char c = id.charAt(index2);
@@ -85,21 +99,35 @@ class Chit extends JPanel
                 filenames[2] = "Power-" + power + color;
                 int skill = Creature.getCreatureByName("Titan").getSkill();
                 filenames[3] = "Skill-" + skill + "" + color;
-                   
+                
+                if (dubious)
+                {
+                    filenames[4] = "QuestionMarkMask" +
+                        (color.equals("BlackColossus") ? "Red" : "");
+                }
+                
                 icon = getImageIcon(filenames);
             }
         }
         else
         {
             Creature cre = Creature.getCreatureByName(id);
-            icon = getImageIcon(cre.getImageNames());
-        }
-    }
+            String[] names = cre.getImageNames();
 
-    Chit(int scale, String id, Container container, boolean inverted)
-    {
-        this(scale, id, container);
-        this.inverted = inverted;
+            if (dubious)
+            {
+                String[] names2 = new String[names.length + 1];
+                for (int i = 0; i < names.length ; i++)
+                {
+                    names2[i] = names[i];
+                }
+                names2[names.length] = "QuestionMarkMask" + 
+                    (cre.getBaseColor().equals("black") ? "Red" : "");
+                names = names2;
+            }
+
+            icon = getImageIcon(names);
+        }
     }
 
 

@@ -46,6 +46,10 @@ public final class Glob
             while (it.hasNext())
             {
                 Object ob = it.next();
+                if (ob == null)
+                {
+                    ob = "null";
+                }
                 sb.append(ob.toString());
                 if (it.hasNext())
                 {

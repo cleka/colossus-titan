@@ -61,6 +61,10 @@ public final class Game
     /** Server port number. */
     private int port = Constants.defaultPort;
 
+    History history;
+
+
+
     /** Public only for JUnit test setup. */
     public Game()
     {
@@ -137,6 +141,9 @@ public final class Game
                                    true);
         Log.event("Starting new game");
         addPlayersFromOptions();
+
+        history = new History();
+
         initServer();
     }
 
@@ -335,12 +342,11 @@ public final class Game
         server.allUpdatePlayerInfo();
 
         Iterator it = players.iterator();
-
         while (it.hasNext())
         {
             Player player = (Player)it.next();
-
             placeInitialLegion(player, player.getFirstMarker());
+            server.allRevealLegion(player.getLegion(0));
             server.allUpdatePlayerInfo();
         }
 
@@ -712,7 +718,6 @@ public final class Game
     /** Wrap the complexity of phase advancing. */
     class GamePhaseAdvancer extends PhaseAdvancer
     {
-
         /** Advance to the next phase, only if the passed oldPhase and 
          *  playerName are current. */
         void advancePhase()
@@ -802,8 +807,6 @@ public final class Game
             dispose();
         }
         player.resetTurnState();
-        server.allFullyUpdateOwnLegionContents();  // XXX Bug workaround
-        server.allFullyUpdateLegionHeights();      // XXX Bug workaround
         server.allSetupSplit();
 
         // XXX Is this causing double advances?
@@ -977,7 +980,7 @@ public final class Game
                 {
                     Legion legion = (Legion)it2.next();
 
-                    el.addContent(dumpLegion(doc, legion, battle != null
+                    el.addContent(dumpLegion(doc, legion, battleInProgress 
                             && (legion == battle.getAttacker() ||
                                 legion == battle.getDefender())));
                 }
@@ -1017,6 +1020,7 @@ public final class Game
                 }
                 root.addContent(bat);
             }
+            root.addContent(history.getCopy());
 
             XMLOutputter putter = new XMLOutputter("    ", true);
 
@@ -1207,30 +1211,24 @@ Log.debug("DataFileKey: " + mapKey + " DataFileContent :\n" + content);
 
                 String name = pla.getAttribute("name").getValue();
                 Player player = new Player(name, this);
-
                 players.add(player);
 
                 String type = pla.getAttribute("type").getValue();
-
                 player.setType(type);
 
                 String color = pla.getAttribute("color").getValue();
-
                 player.setColor(color);
 
                 String tower = pla.getAttribute("startingTower").getValue();
-
                 player.setTower(tower);
 
                 int score = pla.getAttribute("score").getIntValue();
-
                 player.setScore(score);
 
                 player.setDead(pla.getAttribute("dead").getBooleanValue());
 
                 int mulligansLeft =
                     pla.getAttribute("mulligansLeft").getIntValue();
-
                 player.setMulligansLeft(mulligansLeft);
 
                 player.setMovementRoll(
@@ -1244,7 +1242,6 @@ Log.debug("DataFileKey: " + mapKey + " DataFileContent :\n" + content);
 
                 String playersElim =
                     pla.getAttribute("colorsElim").getValue();
-
                 if (playersElim == "null")
                 {
                     playersElim = "";
@@ -1253,11 +1250,9 @@ Log.debug("DataFileKey: " + mapKey + " DataFileContent :\n" + content);
 
                 java.util.List legionElements = pla.getChildren("Legion");
                 Iterator it2 = legionElements.iterator();
-
                 while (it2.hasNext())
                 {
                     Element leg = (Element)it2.next();
-
                     readLegion(leg, player);
                 }
             }
@@ -1266,43 +1261,33 @@ Log.debug("DataFileKey: " + mapKey + " DataFileContent :\n" + content);
             while (it.hasNext())
             {
                 Player player = (Player)it.next();
-
                 player.computeMarkersAvailable();
             }
             
             // Battle stuff
             Element bat = root.getChild("Battle");
-
             if (bat != null)
             {
                 String engagementHexLabel =
                     bat.getAttribute("masterHexLabel").getValue();
-
                 int battleTurnNum =
                     bat.getAttribute("turnNumber").getIntValue();
-
                 String battleActivePlayerName =
                     bat.getAttribute("activePlayer").getValue();
-
                 int battlePhase = bat.getAttribute("phase").getIntValue();
-
                 int summonState =
                     bat.getAttribute("summonState").getIntValue();
-
                 int carryDamage =
                     bat.getAttribute("carryDamage").getIntValue();
-
                 boolean driftDamageApplied =
                     bat.getAttribute("driftDamageApplied").getBooleanValue();
 
                 java.util.List cts = bat.getChildren("CarryTarget");
-                Iterator it2 = cts.iterator();
                 Set carryTargets = new HashSet();
-
+                Iterator it2 = cts.iterator();
                 while (it2.hasNext())
                 {
                     Element cart = (Element)it2.next();
-
                     carryTargets.add(cart.getTextTrim());
                 }
 
@@ -1314,7 +1299,6 @@ Log.debug("DataFileKey: " + mapKey + " DataFileContent :\n" + content);
                 Player defendingPlayer = defender.getPlayer();
 
                 int activeLegionNum;
-
                 if (battleActivePlayerName.equals(attackingPlayer.getName()))
                 {
                     activeLegionNum = Constants.ATTACKER;
@@ -1333,6 +1317,11 @@ Log.debug("DataFileKey: " + mapKey + " DataFileContent :\n" + content);
                 battle.setCarryTargets(carryTargets);
                 battle.init();
             }
+
+            // History
+            history = new History();
+            Element his = root.getChild("History");
+            history.copyTree(his);
 
             initServer();
             // Remaining stuff has been moved to loadGame2()
@@ -1449,20 +1438,10 @@ Log.debug("DataFileKey: " + mapKey + " DataFileContent :\n" + content);
         syncAutoPlay();
         syncOptions();
 
-        server.allUpdatePlayerInfo();
-
-        if (getOption(Options.allStacksVisible))
-        {
-            server.allFullyUpdateAllLegionContents();
-            server.allFullyUpdateLegionStatus();
-        }
-        else
-        {
-            server.aiFullyUpdateAllLegionContents();
-            server.allFullyUpdateLegionHeights();
-            server.allFullyUpdateOwnLegionContents();
-            server.allFullyUpdateLegionStatus();
-        }
+        server.allUpdatePlayerInfo(true);
+        history.fireEventsFromXML(server);
+        server.allFullyUpdateLegionStatus();
+        server.allUpdatePlayerInfo(false);
 
         server.allInitBoard();
         server.allTellAllLegionLocations();
@@ -1564,17 +1543,14 @@ Log.debug("DataFileKey: " + mapKey + " DataFileContent :\n" + content);
 
         // Make sure that the potential recruits are available.
         Iterator it = recruits.iterator();
-
         while (it.hasNext())
         {
             Creature recruit = (Creature)it.next();
-
             if (caretaker.getCount(recruit) < 1)
             {
                 it.remove();
             }
         }
-
         return recruits;
     }
 
@@ -1583,7 +1559,6 @@ Log.debug("DataFileKey: " + mapKey + " DataFileContent :\n" + content);
     {
         java.util.List recruiters;
         Creature recruit = Creature.getCreatureByName(recruitName);
-
         if (recruit == null)
         {
             return new ArrayList();
@@ -1593,11 +1568,9 @@ Log.debug("DataFileKey: " + mapKey + " DataFileContent :\n" + content);
         String hexLabel = legion.getCurrentHexLabel();
         MasterHex hex = MasterBoard.getHexByLabel(hexLabel);
         String terrain = hex.getTerrain();
-
         recruiters = TerrainRecruitLoader.getPossibleRecruiters(
             terrain, hexLabel);
         Iterator it = recruiters.iterator();
-
         while (it.hasNext())
         {
             Creature possibleRecruiter = (Creature)it.next();
@@ -1610,7 +1583,6 @@ Log.debug("DataFileKey: " + mapKey + " DataFileContent :\n" + content);
                 it.remove();
             }
         }
-
         return recruiters;
     }
 
@@ -1676,7 +1648,6 @@ Log.debug("DataFileKey: " + mapKey + " DataFileContent :\n" + content);
 
         // Recruits are one to a customer.
         legion.setRecruitName(recruit.getName());
-
         reinforcing = false;
     }
 
@@ -1692,7 +1663,6 @@ Log.debug("DataFileKey: " + mapKey + " DataFileContent :\n" + content);
         java.util.List allRecruits =
             TerrainRecruitLoader.getRecruitableAcquirableList(terrain, score);
         java.util.Iterator it = allRecruits.iterator();
-
         while (it.hasNext())
         {
             String name = (String)it.next();
@@ -1718,16 +1688,13 @@ Log.debug("DataFileKey: " + mapKey + " DataFileContent :\n" + content);
     private void placeInitialLegion(Player player, String markerId)
     {
         String name = player.getName();
-
         player.selectMarkerId(markerId);
         Log.event(name + " selects initial marker");
 
         // Lookup coords for chit starting from player[i].getTower()
         String hexLabel = player.getTower();
-
         Legion legion = Legion.getStartingLegion(markerId, hexLabel,
                 player.getName(), this);
-
         player.addLegion(legion);
     }
 
@@ -1735,7 +1702,6 @@ Log.debug("DataFileKey: " + mapKey + " DataFileContent :\n" + content);
     private int findEntrySide(MasterHex hex, int cameFrom)
     {
         int entrySide = -1;
-
         if (cameFrom != -1)
         {
             if (HexMap.terrainHasStartlist(hex.getTerrain()))
@@ -1786,7 +1752,6 @@ Log.debug("DataFileKey: " + mapKey + " DataFileContent :\n" + content);
             // it is unoccupied by friendly legions.
             java.util.List legions = player.getLegions();
             Iterator it = legions.iterator();
-
             while (it.hasNext())
             {
                 // Account for spin cycles.
@@ -1837,7 +1802,6 @@ Log.debug("DataFileKey: " + mapKey + " DataFileContent :\n" + content);
                 }
             }
         }
-
         return set;
     }
 
@@ -1850,12 +1814,10 @@ Log.debug("DataFileKey: " + mapKey + " DataFileContent :\n" + content);
         // it is unoccupied.
         String hexLabel = hex.getLabel();
         Set set = new HashSet();
-
         if (!isOccupied(hexLabel))
         {
             set.add(hexLabel);
         }
-
         if (roll > 0)
         {
             for (int i = 0; i < 6; i++)
@@ -1868,7 +1830,6 @@ Log.debug("DataFileKey: " + mapKey + " DataFileContent :\n" + content);
                 }
             }
         }
-
         return set;
     }
 
@@ -1879,7 +1840,6 @@ Log.debug("DataFileKey: " + mapKey + " DataFileContent :\n" + content);
         boolean ignoreFriends)
     {
         Set set = listNormalMoves(legion, hex, movementRoll, ignoreFriends);
-
         set.addAll(listTeleportMoves(legion, hex, movementRoll,
                 ignoreFriends));
         return set;
@@ -1888,7 +1848,6 @@ Log.debug("DataFileKey: " + mapKey + " DataFileContent :\n" + content);
     private int findBlock(MasterHex hex)
     {
         int block = Constants.ARCHES_AND_ARROWS;
-
         for (int j = 0; j < 6; j++)
         {
             if (hex.getExitType(j) == Constants.BLOCK)
@@ -1910,14 +1869,12 @@ Log.debug("DataFileKey: " + mapKey + " DataFileContent :\n" + content);
         {
             return new HashSet();
         }
-
         Set tuples = findNormalMoves(hex, legion, movementRoll, findBlock(hex),
                 Constants.NOWHERE, ignoreFriends);
 
         // Extract just the hexLabels from the hexLabel:entrySide tuples.
         Set hexLabels = new HashSet();
         Iterator it = tuples.iterator();
-
         while (it.hasNext())
         {
             String tuple = (String)it.next();
@@ -1988,9 +1945,7 @@ Log.debug("DataFileKey: " + mapKey + " DataFileContent :\n" + content);
         boolean ignoreFriends)
     {
         Player player = legion.getPlayer();
-
         Set set = new HashSet();
-
         if (movementRoll != 6 || legion.hasMoved() || player.hasTeleported())
         {
             return set;
@@ -2012,7 +1967,6 @@ Log.debug("DataFileKey: " + mapKey + " DataFileContent :\n" + content);
                 // Mark every unoccupied tower.
                 Set towerSet = MasterBoard.getTowerSet();
                 Iterator it = towerSet.iterator();
-
                 while (it.hasNext())
                 {
                     String hexLabel = (String)it.next();
@@ -2033,7 +1987,6 @@ Log.debug("DataFileKey: " + mapKey + " DataFileContent :\n" + content);
                 // Remove nearby towers from set.
                 Set towerSet = MasterBoard.getTowerSet();
                 Iterator it = towerSet.iterator();
-
                 while (it.hasNext())
                 {
                     String hexLabel = (String)it.next();
@@ -2055,7 +2008,6 @@ Log.debug("DataFileKey: " + mapKey + " DataFileContent :\n" + content);
                 Legion other = (Legion)it.next();
                 {
                     String hexLabel = other.getCurrentHexLabel();
-
                     if (!isEngagement(hexLabel) || ignoreFriends)
                     {
                         set.add(hexLabel);
@@ -2088,7 +2040,6 @@ Log.debug("DataFileKey: " + mapKey + " DataFileContent :\n" + content);
                 // Don't bother finding more than one entry side if unoccupied.
                 if (!isOccupied(targetHexLabel) ||
                     HexMap.terrainHasStartlist(targetHex.getTerrain()))
-
                 {
                     entrySides.add(Constants.bottom);
                     return entrySides;
@@ -2111,7 +2062,6 @@ Log.debug("DataFileKey: " + mapKey + " DataFileContent :\n" + content);
         Set tuples = findNormalMoves(currentHex, legion, movementRoll,
                 findBlock(currentHex), Constants.NOWHERE, false);
         Iterator it = tuples.iterator();
-
         while (it.hasNext())
         {
             String tuple = (String)it.next();
@@ -2215,9 +2165,10 @@ Log.debug("DataFileKey: " + mapKey + " DataFileContent :\n" + content);
             donor.removeCreature(angel, false, false);
             legion.addCreature(angel, false);
 
-            // XXX Maybe replace with a special-purpose summon notification?
-            server.allTellRemoveCreature(donor.getMarkerId(), angel.getName());
-            server.allTellAddCreature(legion.getMarkerId(), angel.getName());
+            server.allTellRemoveCreature(donor.getMarkerId(), angel.getName(),
+                true);
+            server.allTellAddCreature(legion.getMarkerId(), angel.getName(),
+                true);
 
             Log.event("One " + angel.getName() +
                 " is summoned from legion " + donor.getLongMarkerName() +
@@ -2245,7 +2196,6 @@ Log.debug("DataFileKey: " + mapKey + " DataFileContent :\n" + content);
     private synchronized void kickEngagements()
     {
         server.nextEngagement();
-
         if (findEngagements().size() == 0 && !summoning && !reinforcing &&
             !acquiring)
         {
@@ -2258,7 +2208,6 @@ Log.debug("DataFileKey: " + mapKey + " DataFileContent :\n" + content);
     {
         battle = null;
         server.allCleanupBattle();
-
         Legion winner = null;
 
         // Handle any after-battle angel summoning or recruiting.
@@ -2316,11 +2265,9 @@ Log.debug("DataFileKey: " + mapKey + " DataFileContent :\n" + content);
         Set set = new HashSet();
         java.util.List legions = legion.getPlayer().getLegions();
         Iterator it = legions.iterator();
-
         while (it.hasNext())
         {
             Legion candidate = (Legion)it.next();
-
             if (candidate != legion)
             {
                 String hexLabel = candidate.getCurrentHexLabel();
@@ -2328,7 +2275,6 @@ Log.debug("DataFileKey: " + mapKey + " DataFileContent :\n" + content);
                 java.util.List summonableList =
                     Creature.getSummonableCreatures();
                 Iterator sumIt = summonableList.iterator();
-
                 while (sumIt.hasNext() && !hasSummonable)
                 {
                     Creature c = (Creature)sumIt.next();
@@ -2377,7 +2323,6 @@ Log.debug("DataFileKey: " + mapKey + " DataFileContent :\n" + content);
         java.util.List strings = Split.split(',', results);
         java.util.List creatures = new ArrayList();
         Iterator it = strings.iterator();
-
         while (it.hasNext())
         {
             String name = (String)it.next();
@@ -2454,16 +2399,13 @@ Log.debug("DataFileKey: " + mapKey + " DataFileContent :\n" + content);
         }
 
         Legion newLegion = legion.split(creatures, childId);
-
         if (newLegion == null)
         {
             return false;
         }
 
         String hexLabel = legion.getCurrentHexLabel();
-
         server.didSplit(hexLabel, parentId, childId, newLegion.getHeight());
-
         if (getOption(Options.allStacksVisible))
         {
             server.allRevealLegion(legion);
@@ -2471,12 +2413,9 @@ Log.debug("DataFileKey: " + mapKey + " DataFileContent :\n" + content);
         }
         else
         {
-            server.aiRevealLegion(legion);
-            server.aiRevealLegion(newLegion);
             server.oneRevealLegion(legion, player.getName());
             server.oneRevealLegion(newLegion, player.getName());
         }
-
         return true;
     }
 
@@ -2486,14 +2425,12 @@ Log.debug("DataFileKey: " + mapKey + " DataFileContent :\n" + content);
         boolean teleport, String teleportingLord)
     {
         Legion legion = getLegionByMarkerId(markerId);
-
         if (legion == null)
         {
             return false;
         }
 
         Player player = legion.getPlayer();
-
         // Verify that the move is legal.
         if (teleport)
         {
@@ -2514,14 +2451,12 @@ Log.debug("DataFileKey: " + mapKey + " DataFileContent :\n" + content);
 
         // Verify that the entry side is legal.
         Set legalSides = listPossibleEntrySides(markerId, hexLabel, teleport);
-
         if (!legalSides.contains(entrySide))
         {
             return false;
         }
 
         MasterHex hex = MasterBoard.getHexByLabel(hexLabel);
-
         // If this is a tower hex, the only entry side is the bottom.
         if (HexMap.terrainHasStartlist(hex.getTerrain()) &&
             !entrySide.equals(Constants.bottom))
@@ -2539,10 +2474,8 @@ Log.debug("DataFileKey: " + mapKey + " DataFileContent :\n" + content);
             {
                 return false;
             }
-
             server.allRevealCreature(legion, teleportingLord);
         }
-
         legion.moveToHex(hex, entrySide, teleport, teleportingLord);
         return true;
     }
@@ -2576,6 +2509,10 @@ Log.debug("DataFileKey: " + mapKey + " DataFileContent :\n" + content);
             {
                 engage2(hexLabel);
             }
+        }
+        else
+        {
+            Log.debug("illegal call to Game.engage() " + engagementInProgress);
         }
     }
 
@@ -2654,7 +2591,6 @@ Log.debug("DataFileKey: " + mapKey + " DataFileContent :\n" + content);
         }
 
         Proposal proposal = Proposal.makeFromString(proposalString);
-
         int thisPlayerNum;
 
         if (playerName.equals(getActivePlayerName()))
@@ -2672,7 +2608,6 @@ Log.debug("DataFileKey: " + mapKey + " DataFileContent :\n" + content);
         {
             Legion attacker = getLegionByMarkerId(proposal.getAttackerId());
             String hexLabel = attacker.getCurrentHexLabel();
-
             fight(hexLabel);
         }
 
@@ -2687,9 +2622,7 @@ Log.debug("DataFileKey: " + mapKey + " DataFileContent :\n" + content);
         else
         {
             proposals[thisPlayerNum].add(proposal);
-
             String other = null;
-
             if (playerName.equals(getActivePlayerName()))
             {
                 Legion defender = getLegionByMarkerId(
@@ -2791,7 +2724,6 @@ Log.debug("DataFileKey: " + mapKey + " DataFileContent :\n" + content);
     {
         Legion attacker = getLegionByMarkerId(results.getAttackerId());
         Legion defender = getLegionByMarkerId(results.getDefenderId());
-
         Legion winner = null;
         int points = 0;
 
@@ -2830,7 +2762,6 @@ Log.debug("DataFileKey: " + mapKey + " DataFileContent :\n" + content);
             // One legion was eliminated during negotiations.
             winner = getLegionByMarkerId(results.getWinnerId());
             Legion loser;
-
             if (winner == defender)
             {
                 loser = attacker;
@@ -2848,23 +2779,21 @@ Log.debug("DataFileKey: " + mapKey + " DataFileContent :\n" + content);
             // Remove all dead creatures from the winning legion.
             java.util.List winnerLosses = results.getWinnerLosses();
             Iterator it = winnerLosses.iterator();
-
             while (it.hasNext())
             {
                 String creatureName = (String)it.next();
-
                 log.append(creatureName);
                 if (it.hasNext())
                 {
                     log.append(", ");
                 }
                 Creature creature = Creature.getCreatureByName(creatureName);
-
                 winner.removeCreature(creature, true, true);
+                server.allTellRemoveCreature(winner.getMarkerId(), 
+                    creatureName, true);
             }
             Log.event(log.toString());
 
-            server.allFullyUpdateLegionHeights();
             server.oneRevealLegion(winner, attacker.getPlayerName());
             server.oneRevealLegion(winner, defender.getPlayerName());
 
@@ -2941,7 +2870,6 @@ Log.debug("DataFileKey: " + mapKey + " DataFileContent :\n" + content);
     synchronized java.util.List getAllLegions()
     {
         java.util.List list = new ArrayList();
-
         for (Iterator it = players.iterator(); it.hasNext();)
         {
             Player player = (Player)it.next();
@@ -2956,7 +2884,6 @@ Log.debug("DataFileKey: " + mapKey + " DataFileContent :\n" + content);
     java.util.List getAllLegionIds()
     {
         java.util.List list = new ArrayList();
-
         for (Iterator it = players.iterator(); it.hasNext();)
         {
             Player player = (Player)it.next();
@@ -2970,7 +2897,6 @@ Log.debug("DataFileKey: " + mapKey + " DataFileContent :\n" + content);
     synchronized java.util.List getAllEnemyLegions(Player player)
     {
         java.util.List list = new ArrayList();
-
         for (Iterator it = players.iterator(); it.hasNext();)
         {
             Player nextPlayer = (Player)it.next();
@@ -2989,7 +2915,6 @@ Log.debug("DataFileKey: " + mapKey + " DataFileContent :\n" + content);
     java.util.List getAllEnemyLegionIds(Player player)
     {
         java.util.List list = new ArrayList();
-
         for (Iterator it = players.iterator(); it.hasNext();)
         {
             Player nextPlayer = (Player)it.next();
@@ -3005,12 +2930,10 @@ Log.debug("DataFileKey: " + mapKey + " DataFileContent :\n" + content);
     Legion getLegionByMarkerId(String markerId)
     {
         Iterator it = players.iterator();
-
         while (it.hasNext())
         {
             Player player = (Player)it.next();
             Legion legion = player.getLegionByMarkerId(markerId);
-
             if (legion != null)
             {
                 return legion;
@@ -3022,7 +2945,6 @@ Log.debug("DataFileKey: " + mapKey + " DataFileContent :\n" + content);
     Player getPlayerByMarkerId(String markerId)
     {
         Iterator it = players.iterator();
-
         while (it.hasNext())
         {
             Player player = (Player)it.next();
@@ -3043,7 +2965,6 @@ Log.debug("DataFileKey: " + mapKey + " DataFileContent :\n" + content);
         int total = 0;
         java.util.List legions = getAllLegions();
         Iterator it = legions.iterator();
-
         while (it.hasNext())
         {
             Legion legion = (Legion)it.next();
@@ -3057,7 +2978,6 @@ Log.debug("DataFileKey: " + mapKey + " DataFileContent :\n" + content);
     {
         int count = 0;
         Iterator it = getAllLegions().iterator();
-
         while (it.hasNext())
         {
             Legion legion = (Legion)it.next();
@@ -3073,7 +2993,6 @@ Log.debug("DataFileKey: " + mapKey + " DataFileContent :\n" + content);
     boolean isOccupied(String hexLabel)
     {
         Iterator it = getAllLegions().iterator();
-
         while (it.hasNext())
         {
             Legion legion = (Legion)it.next();
@@ -3089,11 +3008,9 @@ Log.debug("DataFileKey: " + mapKey + " DataFileContent :\n" + content);
     Legion getFirstLegion(String hexLabel)
     {
         Iterator it = getAllLegions().iterator();
-
         while (it.hasNext())
         {
             Legion legion = (Legion)it.next();
-
             if (hexLabel.equals(legion.getCurrentHexLabel()))
             {
                 return legion;
@@ -3106,7 +3023,6 @@ Log.debug("DataFileKey: " + mapKey + " DataFileContent :\n" + content);
     {
         java.util.List markerIds = new ArrayList();
         Iterator it = getAllLegions().iterator();
-
         while (it.hasNext())
         {
             Legion legion = (Legion)it.next();
@@ -3124,7 +3040,6 @@ Log.debug("DataFileKey: " + mapKey + " DataFileContent :\n" + content);
         int count = 0;
         java.util.List legions = player.getLegions();
         Iterator it = legions.iterator();
-
         while (it.hasNext())
         {
             Legion legion = (Legion)it.next();
@@ -3141,7 +3056,6 @@ Log.debug("DataFileKey: " + mapKey + " DataFileContent :\n" + content);
     {
         java.util.List legions = player.getLegions();
         Iterator it = legions.iterator();
-
         while (it.hasNext())
         {
             Legion legion = (Legion)it.next();
@@ -3160,7 +3074,6 @@ Log.debug("DataFileKey: " + mapKey + " DataFileContent :\n" + content);
         java.util.List newLegions = new ArrayList();
         java.util.List legions = player.getLegions();
         Iterator it = legions.iterator();
-
         while (it.hasNext())
         {
             Legion legion = (Legion)it.next();
@@ -3178,7 +3091,6 @@ Log.debug("DataFileKey: " + mapKey + " DataFileContent :\n" + content);
         String playerName = player.getName();
         int count = 0;
         Iterator it = getAllEnemyLegions(player).iterator();
-
         while (it.hasNext())
         {
             Legion legion = (Legion)it.next();
@@ -3194,7 +3106,6 @@ Log.debug("DataFileKey: " + mapKey + " DataFileContent :\n" + content);
     Legion getFirstEnemyLegion(String hexLabel, Player player)
     {
         Iterator it = getAllEnemyLegions(player).iterator();
-
         while (it.hasNext())
         {
             Legion legion = (Legion)it.next();
@@ -3214,7 +3125,6 @@ Log.debug("DataFileKey: " + mapKey + " DataFileContent :\n" + content);
             return -1;
         }
         Player player = getActivePlayer();
-
         player.takeMulligan();
         server.allUpdatePlayerInfo();
         setupPhase();
@@ -3234,7 +3144,6 @@ Log.debug("DataFileKey: " + mapKey + " DataFileContent :\n" + content);
     void setOption(String optname, String value)
     {
         String oldValue = options.getStringOption(optname);
-
         if (!value.equals(oldValue))
         {
             options.setOption(optname, value);

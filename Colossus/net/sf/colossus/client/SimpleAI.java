@@ -234,7 +234,6 @@ public class SimpleAI implements AI
         {
             int forcedToAttack = 0;
             boolean goodRecruit = false;
-            legion.sortContents();
 
             for (int roll = 1; roll <= 6; roll++)
             {
@@ -340,7 +339,6 @@ public class SimpleAI implements AI
     private boolean couldRecruitUp(LegionInfo legion, String hexLabel,
         LegionInfo enemy, String terrain)
     {
-        legion.sortContents();
         Creature weakest = Creature.getCreatureByName(
             (String)legion.getContents().get(legion.getHeight() - 1));
 
@@ -808,7 +806,7 @@ public class SimpleAI implements AI
             String markerId = (String)it.next();
             LegionInfo legion = client.getLegionInfo(markerId);
 
-            if (legion.hasMoved())
+            if (legion.hasMoved() || legion.getCurrentHex() == null)
             {
                 continue;
             }
@@ -953,7 +951,10 @@ public class SimpleAI implements AI
             String friendlyMarkerId = (String)friendlyLegionIt.next();
             LegionInfo friendlyLegion = client.getLegionInfo(friendlyMarkerId);
             List moves = (List)moveMap.get(friendlyLegion);
-            allmoves.addAll(moves);
+            if (moves != null)
+            {
+                allmoves.addAll(moves);
+            }
         }
 
         Collections.sort(allmoves, new Comparator()
@@ -1007,7 +1008,6 @@ public class SimpleAI implements AI
     Map[] buildEnemyAttackMap(PlayerInfo player)
     {
         Map[] enemyMap = new HashMap[7];
-
         for (int i = 1; i <= 6; i++)
         {
             enemyMap[i] = new HashMap();
@@ -1072,7 +1072,7 @@ public class SimpleAI implements AI
         return enemyMap;
     }
 
-    //
+
     // cheap, inaccurate evaluation function.  Returns a value for
     // moving this legion to this hex.  The value defines a distance
     // metric over the set of all possible moves.
@@ -1438,9 +1438,6 @@ public class SimpleAI implements AI
                 {
                     continue;
                 }
-
-                Log.debug("got enemies that can attack on a " + roll + " :" + 
-                    enemies);
 
                 Iterator it = enemies.iterator();
                 while (it.hasNext())

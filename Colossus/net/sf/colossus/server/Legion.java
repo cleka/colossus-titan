@@ -85,29 +85,8 @@ public final class Legion implements Comparable
         {
             critters.add(new Critter(creature7, markerId, game));
         }
-
-        initCreatureVisibility();
     }
 
-
-    private void initCreatureVisibility()
-    {
-        // Initial legion contents are public; contents of legions created
-        // by splits are private.
-        // When loading a game, we handle revealing visible creatures
-        // after legion creation.
-        try
-        {
-            if (getHeight() == 8)
-            {
-                game.getServer().allRevealLegion(this);
-            }
-        }
-        catch (NullPointerException ex)
-        {
-            Log.warn("Called Legion.initCreatureVisibility() too early");
-        }
-    }
 
     static Legion getStartingLegion(String markerId, String hexLabel,
         String playerName, Game game)
@@ -222,7 +201,7 @@ public final class Legion implements Comparable
                     Log.event("Legion " + getLongMarkerName() +
                         " acquires one " + angelType);
                     game.getServer().allTellAddCreature(getMarkerId(), 
-                        angelType);
+                        angelType, true);
                 }
             }
         }
@@ -876,7 +855,7 @@ public final class Legion implements Comparable
     /** Recombine this legion into another legion. Only remove this
         legion from the Player if remove is true.  If it's false, the
         caller is responsible for removing this legion, which can avoid
-        concurrent access problems. The caller needs to call
+        concurrent access problems. Someone needs to call
         MasterBoard.alignLegions() on the remaining legion's hexLabel
         after the recombined legion is actually removed. */
     void recombine(Legion legion, boolean remove)
@@ -894,9 +873,8 @@ public final class Legion implements Comparable
             legion.addCreature(critter.getCreature(), false);
         }
 
-        // Let the client know that the legions have recombined.
-        game.getServer().oneRevealLegion(legion, legion.getPlayerName());
-        game.getServer().allFullyUpdateLegionHeights();   
+        // Let the clients know that the legions have recombined.
+        game.getServer().undidSplit(getMarkerId(), legion.getMarkerId());
 
         if (remove)
         {

@@ -850,7 +850,6 @@ Log.debug("Called Battle.doneReinforcing()");
         {
             defenderElim = true;
         }
-
         server.allRemoveDeadBattleChits();
     }
 
@@ -906,7 +905,7 @@ Log.debug("Called Battle.doneReinforcing()");
                 {
                     donor.addCreature(critter.getCreature(), false);
                     server.allTellAddCreature(donor.getMarkerId(), 
-                        critter.getName());
+                        critter.getName(), true);
                     // This summon doesn't count; the player can
                     // summon again later this turn.
                     player.setSummoned(false);
@@ -944,6 +943,9 @@ Log.debug("Called Battle.doneReinforcing()");
         // If an angel or archangel was returned to its donor instead of 
         // the stack, then don't put it back on the stack.
         legion.prepareToRemoveCritter(critter, donor == null); 
+
+        game.history.removeCreatureEvent(legion.getMarkerId(), 
+            critter.getName());
 
         if (critter.isTitan())
         {
@@ -1939,7 +1941,7 @@ Log.debug("Called Battle.doneReinforcing()");
 
 
     /** Return a list of all critters in the battle. */
-    private List getAllCritters()
+    List getAllCritters()
     {
         List critters = new ArrayList();
         Legion defender = getDefender();

@@ -11,7 +11,7 @@
         Environment var JAVACC_HOME pointing to JavaCC install root
      Javamake 1.2.8+ http://www.experimentalstuff.com/Technologies/JavaMake/
         javamake.jar needs to be in your CLASSPATH.
-     JUnit 3.7+      http://junit.org
+     JUnit 3.8.1+      http://junit.org
         junit.jar AND the junit directory need to be in your CLASSPATH.
      To sign jarfiles, you need a file called usernameKeystore,
         (substituting your username for "username")
@@ -157,6 +157,7 @@
         description = "Run all unit tests using JUnit">
         <junit printsummary="yes" fork="no" haltonfailure="no">
                 <formatter type="plain"/>
+                <test name="net.sf.colossus.util.CombosTest"/>
                 <test name="net.sf.colossus.client.PredictSplitsTest"/>
                 <test name="net.sf.colossus.server.BalancedTowersTest"/>
                 <test name="net.sf.colossus.server.CarryTest"/>

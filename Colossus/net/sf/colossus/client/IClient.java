@@ -35,8 +35,6 @@ public interface IClient
 
     public void removeLegion(String id);
 
-    public void setLegionHeight(String markerId, int height);
-
     public void setLegionStatus(String markerId, boolean moved, 
         boolean teleported, int entrySide, String lastRecruit);
 
@@ -66,6 +64,8 @@ public interface IClient
     public void showMessageDialog(String message);
 
     public void tellGameOver(String message);
+
+    public void tellPlayerElim(String playerName, String slayerName);
 
     public void askConcede(String allyMarkerId, String enemyMarkerId);
 
@@ -130,10 +130,10 @@ public interface IClient
     public void undidMove(String markerId, String formerHexLabel,
         String currentHexLabel);
 
-    public void undidSplit(String splitoffId);
+    public void undidSplit(String splitoffId, String survivorId, int turn);
 
     public void didSplit(String hexLabel, String parentId, String childId,
-        int childHeight);
+        int childHeight, List splitoffs, int turn);
 
     public void askPickColor(java.util.List colorsLeft);
 

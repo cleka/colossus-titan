@@ -50,6 +50,7 @@ public final class Client implements IClient
     private BattleMap map;
     private BattleDice battleDice;
 
+    // XXX synch all iteration
     private java.util.List battleChits =
         Collections.synchronizedList(new ArrayList());
 
@@ -110,6 +111,9 @@ public final class Client implements IClient
     /** One per player. */
     private PlayerInfo [] playerInfo;
 
+    /** One per player. */
+    private PredictSplits [] predictSplits;
+
     /** One LegionInfo per legion, keyed by markerId.  Never null. */
     private SortedMap legionInfo = new TreeMap();
 
@@ -136,7 +140,9 @@ public final class Client implements IClient
     /** For battle AI. */
     private java.util.List bestMoveOrder = null;
 
+    // XXX Make private and wrap consistently.
     boolean showAllRecruitChits = false;
+
 
     public Client(String host, int port, String playerName, boolean remote)
     {
@@ -730,6 +736,18 @@ public final class Client implements IClient
         return names;
     }
 
+    int getPlayerNum(String pName)
+    {
+        for (int i = 0; i < playerInfo.length; i++)
+        {
+            if (pName.equals(playerInfo[i].getName()))
+            {
+                return i;
+            }
+        }
+        return -1;
+    }
+
 
     int getAverageLegionPointValue()
     {
@@ -1030,11 +1048,6 @@ Log.debug("Called Client.removeLegion() for " + id);
         return getLegionInfo(markerId).getHeight();
     }
 
-    public void setLegionHeight(String markerId, int height)
-    {
-        getLegionInfo(markerId).setHeight(height);
-    }
-
     /** Needed after loadGame() outside split phase. */
     public void setLegionStatus(String markerId, boolean moved, 
         boolean teleported, int entrySide, String lastRecruit)
@@ -1062,20 +1075,28 @@ Log.debug("Called Client.removeLegion() for " + id);
         return getLegionInfo(markerId).getImageNames();
     }
 
-    /** Replace the existing contents for this legion with these. */
-    public void setLegionContents(String markerId, java.util.List names)
+    /** Return a list of Booleans */
+    java.util.List getLegionCreatureCertainties(String markerId)
     {
+        return getLegionInfo(markerId).getCertainties();
+    }
+
+    /** Replace the existing contents for this legion with these. */
+    public synchronized void setLegionContents(String markerId, 
+        java.util.List names)
+    {
+Log.debug(playerName + " setLegionContents() " + markerId + " " + names);
+        String pName = getPlayerNameByMarkerId(markerId);
+        if (predictSplits == null || getPredictSplits(pName) == null)
+        {
+            initPredictSplits(pName, markerId, names);
+        }
         getLegionInfo(markerId).setContents(names);
     }
 
-    /** Remove all contents for this legion. */
-    private void clearLegionContents(String markerId)
-    {
-        getLegionInfo(markerId).clearContents();
-    }
 
     /** Add a new creature to this legion. */
-    public void addCreature(String markerId, String name)
+    public synchronized void addCreature(String markerId, String name)
     {
         getLegionInfo(markerId).addCreature(name);
         if (board != null)
@@ -1086,19 +1107,26 @@ Log.debug("Called Client.removeLegion() for " + id);
         }
     }
 
-    public void removeCreature(String markerId, String name)
+    public synchronized void removeCreature(String markerId, String name)
     {
-        getLegionInfo(markerId).removeCreature(name);
+        LegionInfo info = getLegionInfo(markerId);
+        String hexLabel = info.getHexLabel();
+        int height = info.getHeight();
+        info.removeCreature(name);
+        if (height <= 1)
+        {
+            removeLegion(markerId);
+        }
         if (board != null)
         {
-            String hexLabel = getHexForLegion(markerId);
             GUIMasterHex hex = board.getGUIHexByLabel(hexLabel);
             hex.repaint();
         }
     }
 
     /** Reveal creatures in this legion, some of which already may be known. */
-    public void revealCreatures(String markerId, final java.util.List names)
+    public synchronized void revealCreatures(String markerId, 
+        final java.util.List names)
     {
         getLegionInfo(markerId).revealCreatures(names);
     }
@@ -1152,7 +1180,6 @@ Log.debug("Called Client.removeLegion() for " + id);
     }
 
 
-    // XXX Does this need to be public?
     public synchronized void removeDeadBattleChits()
     {
         Iterator it = battleChits.iterator();
@@ -1162,7 +1189,7 @@ Log.debug("Called Client.removeLegion() for " + id);
             if (chit.isDead())
             {
                 it.remove();
-                
+
                 // Also remove it from LegionInfo.
                 String name = chit.getId();
                 if (chit.isInverted())
@@ -1524,6 +1551,12 @@ Log.debug("Called Client.removeLegion() for " + id);
         }
     }
 
+    public void tellPlayerElim(String playerName, String slayerName)
+    {
+        Log.debug("called tellPlayerElim() for " + playerName);
+        PlayerInfo info = getPlayerInfo(playerName);
+        info.setDead(true);
+    }
 
     public void tellGameOver(String message)
     {
@@ -2082,7 +2115,7 @@ Log.error("Got nak for recruit with " + markerId);
             disposeMovementDie();
             board.setupSplitMenu();
             board.fullRepaint();  // Ensure that movement die goes away
-            if (playerName.equals(getActivePlayerName()))
+            if (isMyTurn())
             {
                 focusBoard();
                 board.setCursor(Cursor.getPredefinedCursor(
@@ -2730,9 +2763,8 @@ Log.error("Got nak for recruit with " + markerId);
         java.util.List legions = getLegionsByHex(hexLabel);
         if (!legions.isEmpty())
         {
-            LegionInfo other = getLegionInfo((String)legions.get(0));
-            if (other != null && !playerName.equals(other.getPlayerName()) &&
-                info.hasTitan())
+            String markerId = (String)legions.get(0);
+            if (markerId != null && !isMyLegion(markerId) && info.hasTitan())
             {
                 lords.add(info.getTitanBasename());
             }
@@ -2760,7 +2792,6 @@ Log.error("Got nak for recruit with " + markerId);
                 }
             }
         }
-
         return lords;
     }
 
@@ -3008,8 +3039,8 @@ Log.error("Got nak for recruit with " + markerId);
     {
         Set set = new HashSet();
         LegionInfo summonerInfo = getLegionInfo(summonerId);
-        String playerName = summonerInfo.getPlayerName();
-        Iterator it = getLegionsByPlayer(playerName).iterator();
+        String pName = summonerInfo.getPlayerName();
+        Iterator it = getLegionsByPlayer(pName).iterator();
         while (it.hasNext())
         {
             String markerId = (String)it.next();
@@ -3174,13 +3205,13 @@ Log.error("Got nak for recruit with " + markerId);
             {
                 String marker0 = (String)markerIds.get(0);
                 LegionInfo info0 = getLegionInfo(marker0);
-                String playerName0 = info0.getPlayerName();
+                String pName0 = info0.getPlayerName();
 
                 String marker1 = (String)markerIds.get(1);
                 LegionInfo info1 = getLegionInfo(marker1);
-                String playerName1 = info1.getPlayerName();
+                String pName1 = info1.getPlayerName();
 
-                if (!playerName0.equals(playerName1))
+                if (!pName0.equals(pName1))
                 {
                     set.add(hexLabel);
                 }
@@ -3201,18 +3232,18 @@ Log.error("Got nak for recruit with " + markerId);
         {
             String marker0 = (String)markerIds.get(0);
             LegionInfo info0 = getLegionInfo(marker0);
-            String playerName0 = info0.getPlayerName();
+            String pName0 = info0.getPlayerName();
 
             String marker1 = (String)markerIds.get(1);
             LegionInfo info1 = getLegionInfo(marker1);
-            String playerName1 = info1.getPlayerName();
+            String pName1 = info1.getPlayerName();
 
-            return !playerName0.equals(playerName1);
+            return !pName0.equals(pName1);
         }
         return false;
     }
 
-    java.util.List getEnemyLegions(String playerName)
+    java.util.List getEnemyLegions(String pName)
     {
         java.util.List markerIds = new ArrayList();
         Iterator it = legionInfo.values().iterator();
@@ -3220,7 +3251,7 @@ Log.error("Got nak for recruit with " + markerId);
         {
             LegionInfo info = (LegionInfo)it.next();
             String markerId = info.getMarkerId();
-            if (!playerName.equals(info.getPlayerName()))
+            if (!pName.equals(info.getPlayerName()))
             {
                 markerIds.add(markerId);
             }
@@ -3228,7 +3259,7 @@ Log.error("Got nak for recruit with " + markerId);
         return markerIds;
     }
 
-    java.util.List getEnemyLegions(String hexLabel, String playerName)
+    java.util.List getEnemyLegions(String hexLabel, String pName)
     {
         java.util.List markerIds = new ArrayList();
         java.util.List legions = getLegionsByHex(hexLabel);
@@ -3236,7 +3267,7 @@ Log.error("Got nak for recruit with " + markerId);
         while (it.hasNext())
         {
             String markerId = (String)it.next();
-            if (!playerName.equals(getPlayerNameByMarkerId(markerId)))
+            if (!pName.equals(getPlayerNameByMarkerId(markerId)))
             {
                 markerIds.add(markerId);
             }
@@ -3244,9 +3275,9 @@ Log.error("Got nak for recruit with " + markerId);
         return markerIds;
     }
 
-    String getFirstEnemyLegion(String hexLabel, String playerName)
+    String getFirstEnemyLegion(String hexLabel, String pName)
     {
-        java.util.List markerIds = getEnemyLegions(hexLabel, playerName);
+        java.util.List markerIds = getEnemyLegions(hexLabel, pName);
         if (markerIds.isEmpty())
         {
             return null;
@@ -3255,12 +3286,12 @@ Log.error("Got nak for recruit with " + markerId);
     }
 
 
-    int getNumEnemyLegions(String hexLabel, String playerName)
+    int getNumEnemyLegions(String hexLabel, String pName)
     {
-        return getEnemyLegions(hexLabel, playerName).size();
+        return getEnemyLegions(hexLabel, pName).size();
     }
 
-    java.util.List getFriendlyLegions(String playerName)
+    java.util.List getFriendlyLegions(String pName)
     {
         java.util.List markerIds = new ArrayList();
         Iterator it = legionInfo.values().iterator();
@@ -3268,7 +3299,7 @@ Log.error("Got nak for recruit with " + markerId);
         {
             LegionInfo info = (LegionInfo)it.next();
             String markerId = info.getMarkerId();
-            if (playerName.equals(info.getPlayerName()))
+            if (pName.equals(info.getPlayerName()))
             {
                 markerIds.add(markerId);
             }
@@ -3276,8 +3307,7 @@ Log.error("Got nak for recruit with " + markerId);
         return markerIds;
     }
 
-    java.util.List getFriendlyLegions(String hexLabel, 
-        String playerName)
+    java.util.List getFriendlyLegions(String hexLabel, String pName)
     {
         java.util.List markerIds = new ArrayList();
         java.util.List legions = getLegionsByHex(hexLabel);
@@ -3285,7 +3315,7 @@ Log.error("Got nak for recruit with " + markerId);
         while (it.hasNext())
         {
             String markerId = (String)it.next();
-            if (playerName.equals(getPlayerNameByMarkerId(markerId)))
+            if (pName.equals(getPlayerNameByMarkerId(markerId)))
             {
                 markerIds.add(markerId);
             }
@@ -3293,9 +3323,9 @@ Log.error("Got nak for recruit with " + markerId);
         return markerIds;
     }
 
-    String getFirstFriendlyLegion(String hexLabel, String playerName)
+    String getFirstFriendlyLegion(String hexLabel, String pName)
     {
-        java.util.List markerIds = getFriendlyLegions(hexLabel, playerName);
+        java.util.List markerIds = getFriendlyLegions(hexLabel, pName);
         if (markerIds.isEmpty())
         {
             return null;
@@ -3303,9 +3333,9 @@ Log.error("Got nak for recruit with " + markerId);
         return (String)markerIds.get(0);
     }
 
-    int getNumFriendlyLegions(String hexLabel, String playerName)
+    int getNumFriendlyLegions(String hexLabel, String pName)
     {
-        return getFriendlyLegions(hexLabel, playerName).size();
+        return getFriendlyLegions(hexLabel, pName).size();
     }
 
 
@@ -3349,14 +3379,15 @@ Log.error("Got nak for recruit with " + markerId);
         }
     }
 
-    public void undidSplit(String splitoffId)
+    public synchronized void undidSplit(String splitoffId, String survivorId,
+        int turn)
     {
-        LegionInfo info = getLegionInfo(splitoffId);
-        String hexLabel = info.getHexLabel();
+        LegionInfo info = getLegionInfo(survivorId);
+        info.merge(splitoffId, turn);
         removeLegion(splitoffId);
         if (board != null)
         {
-            board.alignLegions(hexLabel);
+            board.alignLegions(info.getHexLabel());
             board.highlightTallLegions();
         }
     }
@@ -3395,18 +3426,18 @@ Log.error("Got nak for recruit with " + markerId);
     }
 
 
-    void doneWithSplits()
+    synchronized void doneWithSplits()
     {
         if (!isMyTurn())
         {
             return;
         }
-        aiPause();
-        server.doneWithSplits();
-        clearRecruitChits();
+        // Wait for information from the server before proceding.
+        java.util.Timer timer = new java.util.Timer();
+        timer.schedule(new FinishSplits(), 200);
     }
 
-    void doneWithMoves()
+    synchronized void doneWithMoves()
     {
         if (!isMyTurn())
         {
@@ -3417,7 +3448,7 @@ Log.error("Got nak for recruit with " + markerId);
         server.doneWithMoves();
     }
 
-    void doneWithEngagements()
+    synchronized void doneWithEngagements()
     {
         if (!isMyTurn())
         {
@@ -3427,7 +3458,7 @@ Log.error("Got nak for recruit with " + markerId);
         server.doneWithEngagements();
     }
 
-    void doneWithRecruits()
+    synchronized void doneWithRecruits()
     {
         if (!isMyTurn())
         {
@@ -3463,7 +3494,6 @@ Log.error("Got nak for recruit with " + markerId);
         }
 
         // Stage 2: He's dead.  Find who killed him and see if he's alive.
-
         for (int i = 0; i < playerInfo.length; i++)
         {
             info = playerInfo[i];
@@ -3511,7 +3541,7 @@ Log.error("Got nak for recruit with " + markerId);
     }
 
 
-    void doSplit(String parentId)
+    synchronized void doSplit(String parentId)
     {
         this.parentId = null;
 
@@ -3587,30 +3617,20 @@ Log.error("Got nak for recruit with " + markerId);
     }
 
     /** Callback from server after any successful split. */
-    public void didSplit(String hexLabel, String parentId, String childId,
-        int childHeight)
+    public synchronized void didSplit(String hexLabel, String parentId, 
+        String childId, int childHeight, java.util.List splitoffs, int turn)
     {
-        // If my legion, or allStacksVisible, separate calls will update
-        // contents of both legions soon.
-
         LegionInfo childInfo = getLegionInfo(childId);
         childInfo.setHexLabel(hexLabel);
-        childInfo.setHeight(childHeight);
 
         LegionInfo parentInfo = getLegionInfo(parentId);
-        parentInfo.setHeight(parentInfo.getHeight() - childHeight);
+        parentInfo.split(childHeight, childId, splitoffs, turn);
 
         if (isMyLegion(childId))
         {
             clearRecruitChits();
             pushUndoStack(childId);
             markersAvailable.remove(childId);
-        }
-        else
-        {
-            // TODO split prediction, saving somewhere in case split is undone
-            clearLegionContents(parentId);
-            clearLegionContents(childId);
         }
 
         numSplitsThisTurn++;
@@ -3889,6 +3909,33 @@ Log.error("Got nak for split of " + parentId);
     }
 
 
+    private void initPredictSplits(String pName, String rootMarkerId,
+        java.util.List creatureNames)
+    {
+Log.debug(playerName + " initPredictSplits() " + pName + " " + 
+rootMarkerId + " " + creatureNames);
+        if (predictSplits == null)
+        {
+            predictSplits = new PredictSplits[numPlayers];
+        }
+        int playerNum = getPlayerNum(pName);
+        predictSplits[playerNum] = new PredictSplits(pName, rootMarkerId,
+            creatureNames);
+    }
+
+    PredictSplits getPredictSplits(String pName)
+    {
+        try
+        {
+            return predictSplits[getPlayerNum(pName)];
+        }
+        catch (NullPointerException ex)
+        {
+            return null;
+        }
+    }
+
+
     class MarkerComparator implements Comparator
     {
         public int compare(Object o1, Object o2)
@@ -3923,6 +3970,16 @@ Log.error("Got nak for split of " + parentId);
         {
             retryFailedBattleMoves();
             doneWithBattleMoves();
+        }
+    }
+
+    /** Timer-based callback for ending split phase. */
+    class FinishSplits extends TimerTask
+    {
+        public void run()
+        {
+            server.doneWithSplits();
+            clearRecruitChits();
         }
     }
 }

@@ -211,7 +211,7 @@ public final class Movement
     public Set listNormalMoves(LegionInfo legion, MasterHex hex, 
         int movementRoll, boolean inAdvance)
     {
-        if (legion.hasMoved() && (!inAdvance))
+        if (hex == null || (legion.hasMoved() && (!inAdvance)))
         {
             return new HashSet();
         }
@@ -301,8 +301,8 @@ public final class Movement
         PlayerInfo player = legion.getPlayerInfo();
 
         Set set = new HashSet();
-        if ((!inAdvance) &&
-            (movementRoll != 6 || legion.hasMoved() || player.hasTeleported()))
+        if (hex == null || ((!inAdvance) && (movementRoll != 6 || 
+            legion.hasMoved() || player.hasTeleported())))
         {
             return set;
         }

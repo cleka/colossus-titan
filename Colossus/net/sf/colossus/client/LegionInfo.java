@@ -18,6 +18,7 @@ import net.sf.colossus.server.Constants;
 public final class LegionInfo
 {
     private Client client;
+    private PredictSplits ps;
 
     /** immutable */
     private String markerId;
@@ -25,7 +26,6 @@ public final class LegionInfo
     private String playerName;
 
     private String hexLabel;
-    private int height;
     private Marker marker;
     private String lastRecruit;
     private boolean moved;
@@ -33,15 +33,24 @@ public final class LegionInfo
     private int entrySide;
     private boolean recruited;
 
-    /** Creature name strings for *known* contents.  Never null. */
-    private List contents = new ArrayList();
-
 
     LegionInfo(String markerId, Client client)
     {
         this.markerId = markerId;
         this.playerName = client.getPlayerNameByMarkerId(markerId);
         this.client = client;
+    }
+
+    private Node getNode(String markerId)
+    {
+        PredictSplits ps = client.getPredictSplits(playerName);
+        Node node = ps.getLeaf(markerId);
+        return node;
+    }
+
+    private Node getNode()
+    {
+        return getNode(this.markerId);
     }
 
 
@@ -55,19 +64,16 @@ public final class LegionInfo
         return marker;
     }
 
-    void setHeight(int height)
-    {
-        this.height = height;
-        if (contents.size() > height)
-        {
-            Log.warn("LegionInfo.contents.size() > height!");
-            contents.clear();
-        }
-    }
-
     public int getHeight()
     {
-        return height;
+        try
+        {
+            return getNode().getHeight();
+        }
+        catch (NullPointerException ex)
+        {
+            return 8;
+        }
     }
 
     public void setHexLabel(String hexLabel)
@@ -98,10 +104,11 @@ public final class LegionInfo
     }
 
 
-    /** Return an immutable copy of the legion's contents. */
+    /** Return an immutable copy of the legion's contents, in sorted order. */
     public List getContents()
     {
-        return Collections.unmodifiableList(contents);
+        return Collections.unmodifiableList(
+            getNode().getCreatures().getCreatureNames());
     }
 
     boolean contains(String creatureName)
@@ -150,28 +157,26 @@ public final class LegionInfo
     {
         java.util.List names = new ArrayList();
         names.addAll(getContents());
-
-        int numUnknowns = getHeight() - names.size();
-        for (int i = 0; i < numUnknowns; i++)
-        {
-            names.add("Unknown");
-        }
-
         int j = names.indexOf(Constants.titan);
         if (j != -1)
         {
             names.set(j, getTitanBasename());
         }
-
-        Collections.sort(names, new CreatureNameComparator());
-
         return names;
     }
 
-
-    public void sortContents()
+    /** Return a list of Booleans. */
+    java.util.List getCertainties()
     {
-        Collections.sort(contents, new CreatureNameComparator());
+        java.util.List booleans = new ArrayList();
+        List cil = getNode().getCreatures();
+        Iterator it = cil.iterator();
+        while (it.hasNext())
+        {
+            CreatureInfo ci = (CreatureInfo)it.next();
+            booleans.add(new Boolean(ci.isCertain()));
+        }
+        return booleans;
     }
 
 
@@ -203,59 +208,35 @@ public final class LegionInfo
     /** Replace the existing contents for this legion with these. */
     void setContents(List names)
     {
-        height = names.size();
-        contents.clear();
-        contents.addAll(names);
-    }
-
-    /** Remove all contents for this legion. */
-    void clearContents()
-    {
-        contents.clear();
+        getNode().revealAllCreatures(names);
     }
 
     /** Add a new creature to this legion. */
     void addCreature(String name)
     {
-        height++;
-        contents.add(name);
+        getNode().addCreature(name);
     }
-
 
     void removeCreature(String name)
     {
-        height--;
-        contents.remove(name);
+        getNode().removeCreature(name);
     }
 
     /** Reveal creatures in this legion, some of which already may be known. */
     void revealCreatures(final List names)
     {
-        if (contents.isEmpty())
-        {
-            contents.addAll(names);
-        }
-        else
-        {
-            List newNames = new ArrayList();
-            newNames.addAll(contents);
+        getNode().revealSomeCreatures(names);
+    }
 
-            List oldScratch = new ArrayList();
-            oldScratch.addAll(contents);
+    void split(int childHeight, String childId, List splitoffs, int turn)
+    {
+        getNode().split(childHeight, childId, turn, splitoffs);
+    }
 
-            Iterator it = names.iterator();
-            while (it.hasNext())
-            {
-                String name = (String)it.next();
-                // If it's already there, don't add it, but remove it from
-                // the list in case we have multiples of this creature.
-                if (!oldScratch.remove(name))
-                {
-                    newNames.add(name);
-                }
-            }
-            contents = newNames;
-        }
+    void merge(String splitoffId, int turn)
+    {
+        Node splitoff = getNode(splitoffId);
+        getNode().merge(splitoff, turn);
     }
 
 
@@ -320,7 +301,7 @@ public final class LegionInfo
         return (bestSummonable() != null);
     }
 
-    /** Return the point value of *known* contents of this legion. */
+    /** Return the point value of suspected contents of this legion. */
     public int getPointValue()
     {
         int sum = 0;
@@ -370,7 +351,7 @@ public final class LegionInfo
         }
     }
 
-    // Not exact -- does not verify that other legion is enemy.
+    // XXX Not exact -- does not verify that other legion is enemy.
     boolean isEngaged()
     {
         int numInHex = client.getLegionsByHex(getHexLabel()).size();
