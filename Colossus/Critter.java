@@ -106,6 +106,12 @@ public final class Critter extends Creature
     }
 
 
+    public String getDescription()
+    {
+        return getName() + " in " + getCurrentHex().getDescription();
+    }
+
+
     public int getPower()
     {
         if (isTitan())
@@ -131,6 +137,12 @@ public final class Critter extends Creature
     public void heal()
     {
         hits = 0;
+    }
+
+
+    public boolean wouldDieFrom(int hits)
+    {
+        return (hits + getHits() > getPower());
     }
 
 
@@ -306,46 +318,6 @@ public final class Critter extends Creature
     }
 
 
-    /** If there is exactly one live enemy critter in contact, return it.
-     *  Otherwise return null. */
-    public Critter getForcedStrikeTarget()
-    {
-        // Offboard creatures are not in contact.
-        if (currentHex.isEntrance())
-        {
-            return null;
-        }
-
-        Critter target = null;
-        int count = 0;
-        for (int i = 0; i < 6; i++)
-        {
-            // Adjacent creatures separated by a cliff are not in contact.
-            if (currentHex.getHexside(i) != 'c' &&
-                currentHex.getOppositeHexside(i) != 'c')
-            {
-                BattleHex hex = currentHex.getNeighbor(i);
-                if (hex != null)
-                {
-                    Critter other = hex.getCritter();
-                    if (other != null && other.getPlayer() != getPlayer() &&
-                        !other.isDead())
-                    {
-                        count++;
-                        if (count >= 2)
-                        {
-                            return null;
-                        }
-                        target = other;
-                    }
-                }
-            }
-        }
-
-        return target;
-    }
-
-
     public void moveToHex(BattleHex hex)
     {
         Game.logEvent(getName() + " moves from " + currentHex.getLabel() +
@@ -367,6 +339,13 @@ public final class Critter extends Creature
         Game.logEvent(getName() + " undoes move and returns to " +
             startingHex.getLabel());
         map.repaint();
+    }
+
+
+    public boolean canStrike(Critter target)
+    {
+        String hexLabel = target.getCurrentHex().getLabel();
+        return battle.findStrikes(this, true).contains(hexLabel);
     }
 
 
@@ -509,7 +488,7 @@ public final class Critter extends Creature
     }
 
 
-    private int getStrikeNumber(Critter target)
+    public int getStrikeNumber(Critter target)
     {
         boolean rangestrike = !isInContact(true);
 
@@ -544,15 +523,17 @@ public final class Critter extends Creature
      *  (fewer dice or higher strike number) in order to be
      *  allowed to carry.  Return true if the penalty is taken,
      *  or false if it is not. */
-    private boolean chooseStrikePenalty(Collection carryTargets)
+    private boolean chooseStrikePenalty(Critter target, Collection 
+        carryTargets)
     {
         StringBuffer prompt = new StringBuffer(
             "Take strike penalty to allow carrying to ");
 
+        Critter carryTarget = null;
         Iterator it = carryTargets.iterator();
         while (it.hasNext())
         {
-            Critter carryTarget = (Critter)it.next();
+            carryTarget = (Critter)it.next();
             BattleHex targetHex = carryTarget.getCurrentHex();
             prompt.append(carryTarget.getName() + " in " +
                 targetHex.getDescription());
@@ -566,10 +547,78 @@ public final class Critter extends Creature
         String [] options = new String[2];
         options[0] = "Take Penalty";
         options[1] = "Do Not Take Penalty";
-        int answer = JOptionPane.showOptionDialog(map, prompt.toString(),
-            "Take Strike Penalty?", JOptionPane.YES_NO_OPTION,
-            JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
-        return (answer == JOptionPane.YES_OPTION);
+
+        if (getPlayer().getOption(Game.autoStrike))
+        {
+            return getPlayer().aiChooseStrikePenalty(this, target,
+                carryTarget, battle);
+        }
+        else
+        {
+            int answer = JOptionPane.showOptionDialog(map, prompt.toString(),
+                "Take Strike Penalty?", JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
+            return (answer == JOptionPane.YES_OPTION);
+        }
+    }
+
+
+    /** Return true if there's any chance that this critter could take
+     *  a strike penalty to carry when striking target. */
+    public boolean possibleStrikePenalty(Critter target)
+    {
+        BattleHex targetHex = target.getCurrentHex();
+        if (numInContact(false) < 2)
+        {
+            return false;
+        }
+
+        int dice = getDice(target);
+
+        // Carries are only possible if the striker is rolling more dice than
+        // the target has hits remaining.
+        if (dice <= target.getPower() - target.getHits())
+        {
+            return false;
+        }
+
+        int strikeNumber = getStrikeNumber(target);
+
+        // Figure whether number of dice or strike number needs to be
+        // penalized in order to carry.
+        for (int i = 0; i < 6; i++)
+        {
+            // Adjacent creatures separated by a cliff are not in contact.
+            if (currentHex.getHexside(i) != 'c' &&
+                currentHex.getOppositeHexside(i) != 'c')
+            {
+                BattleHex hex = currentHex.getNeighbor(i);
+                if (hex != null && hex != targetHex)
+                {
+                    Critter critter = hex.getCritter();
+                    if (critter != null && critter.getPlayer() !=
+                        getPlayer() && !critter.isDead())
+                    {
+                        int tmpDice = getDice(critter);
+                        int tmpStrikeNumber = getStrikeNumber(critter);
+
+                        // Strikes not up across dune hexsides cannot
+                        // carry up across dune hexsides.
+                        if (currentHex.getOppositeHexside(i) == 'd' &&
+                            targetHex.getHexside(Battle.getDirection(
+                            targetHex, currentHex, false)) != 'd')
+                        {
+                        }
+                        else if (tmpStrikeNumber > strikeNumber ||
+                            tmpDice < dice)
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
     }
 
 
@@ -630,16 +679,12 @@ public final class Critter extends Creature
 
                             // Strikes not up across dune hexsides cannot
                             // carry up across dune hexsides.
-                            if (currentHex.getOppositeHexside(i) == 'd')
+                            if (currentHex.getOppositeHexside(i) == 'd' &&
+                                targetHex.getHexside(Battle.getDirection(
+                                targetHex, currentHex, false)) != 'd')
                             {
-                                int direction = Battle.getDirection(targetHex,
-                                    currentHex, false);
-                                if (targetHex.getHexside(direction) != 'd')
-                                {
-                                    critter.setCarryFlag(false);
-                                    Game.logDebug(
-                                        "DENIED CARRY UP DUNE HEXSIDE");
-                                }
+                                critter.setCarryFlag(false);
+                                Game.logDebug("DENIED CARRY UP DUNE HEXSIDE");
                             }
 
                             else if (tmpStrikeNumber > strikeNumber ||
@@ -695,7 +740,7 @@ public final class Critter extends Creature
                 // Make sure the penalty is still relevant.
                 if (tmpStrikeNumber > strikeNumber || tmpDice < dice)
                 {
-                    if (chooseStrikePenalty(critters))
+                    if (chooseStrikePenalty(target, critters))
                     {
                         if (tmpStrikeNumber > strikeNumber)
                         {

@@ -925,6 +925,27 @@ public final class Player implements Comparable
         }
     }
     
+    
+    public void aiStrike(Legion legion, Battle battle)
+    {
+        if (getOption(Game.autoStrike))
+        {
+            ai.strike(legion, battle, game);
+        }
+    }
+    
+    
+    public boolean aiChooseStrikePenalty(Critter critter, Critter target,
+        Critter carryTarget, Battle battle)
+    {
+        if (getOption(Game.autoStrike))
+        {
+            return ai.chooseStrikePenalty(critter, target, carryTarget, 
+                battle, game);
+        }
+        return false;
+    }
+    
 
     /** Comparator that forces this player's legion markers to come
      *  before captured markers in sort order. */

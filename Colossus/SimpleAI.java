@@ -1261,6 +1261,268 @@ class SimpleAI implements AI
     }
 
 
+    public void strike(Legion legion, Battle battle, Game game)
+    {
+        debugln("called SimpleAI.strike");
+        // Repeat until no attackers with valid targets remain.
+        while (battle.strikesRemain(legion))
+        {
+            doOneStrike(legion, battle);
+        }
+    }
+    
+    
+    private void doOneStrike(Legion legion, Battle battle)
+    {
+        debugln("called doOneStrike");
+        // Simple one-ply group strike algorithm.
+
+        // First make forced strikes, including rangestrikes for 
+        // rangestrikers with only one target.
+        battle.makeForcedStrikes(true);
+        debugln("done with forced strikes");
+
+        // Then create a map containing each target
+        // and the likely number of hits it would take if all
+        // possible creatures attacked it.
+        HashMap map = new HashMap();
+        Collection critters = legion.getCritters();
+        Iterator it = critters.iterator();
+        while (it.hasNext())
+        {
+            Critter critter = (Critter)it.next();
+            Set set = battle.findStrikes(critter, true);
+            Iterator it2 = set.iterator();
+            while (it2.hasNext())
+            {
+                String hexLabel = (String)it2.next();
+                Critter target = battle.getCritterFromHexLabel(hexLabel);
+                int dice = critter.getDice(target);
+                int strikeNumber = critter.getStrikeNumber(target);
+                double h = averageNumberOfHits(dice, strikeNumber);
+
+                if (map.containsKey(target))
+                {
+                    double d = ((Double)map.get(target)).doubleValue();
+                    h += d;
+                }
+                debugln("adding " + target.getDescription() + " : " + h);
+                map.put(target, new Double(h));
+            }
+        }
+        debugln("done with target map");
+
+        // Pick the most important target that can likely be
+        // killed this turn.  If none can, pick the most important
+        // target.
+        boolean canKillSomething = false;
+        Critter bestTarget = null;
+        char terrain = battle.getTerrain();
+        it = map.keySet().iterator();
+        while (it.hasNext())
+        {
+            Critter target = (Critter)it.next();
+            debugln("checking target " + target.getDescription());
+            double h = ((Double)map.get(target)).doubleValue();
+            if (h + target.getHits() >= target.getPower())
+            {
+                // We can probably kill this target.
+                if (bestTarget == null || !canKillSomething ||
+                    getKillValue(target, terrain) >
+                    getKillValue(bestTarget, terrain))
+                {
+                    bestTarget = target;
+                    canKillSomething = true;
+                }
+            }
+            else
+            {
+                // We probably can't kill this target.
+                if (bestTarget == null || (!canKillSomething &&
+                    getKillValue(target, terrain) >
+                    getKillValue(bestTarget, terrain)))
+                {
+                    bestTarget = target;
+                }
+            }
+        }
+        if (bestTarget == null)
+        {
+            debugln("no targets");
+            return;
+        }
+        debugln("Best target is " + bestTarget.getDescription());
+
+        // Having found the target, pick an attacker.  The
+        // first priority is finding one that does not need
+        // to worry about carry penalties to hit this target.
+        // The second priority is using the weakest attacker,
+        // so that more information is available when the
+        // stronger attackers strike.
+        Critter bestAttacker = null;
+        it = critters.iterator();
+        while (it.hasNext())
+        {
+            Critter critter = (Critter)it.next();
+            if (critter.canStrike(bestTarget))
+            {
+                if (critter.possibleStrikePenalty(bestTarget))
+                {
+                    if (bestAttacker == null ||
+                        (bestAttacker.possibleStrikePenalty(bestTarget) &&
+                        getCombatValue(critter, terrain) <
+                            getCombatValue(bestAttacker, terrain)))
+                    {
+                        bestAttacker = critter;
+                    }
+                }
+                else
+                {
+                    if (bestAttacker == null || 
+                        bestAttacker.possibleStrikePenalty(bestTarget) ||
+                        getCombatValue(critter, terrain) <
+                            getCombatValue(bestAttacker, terrain))
+                    {
+                        bestAttacker = critter;
+                    }
+                }
+            }
+        }
+        debugln("Best attacker is " + bestAttacker.getDescription());
+
+        // Having found the target and attacker, strike.
+        // Take a carry penalty if there is still a 95%
+        // chance of killing this target. 
+        bestAttacker.strike(bestTarget);
+        debugln("struck");
+
+        // If there are any carries, apply them first to
+        // the biggest creature that could be killed with
+        // them, then to the biggest creature.
+        while (battle.getCarryDamage() > 0)
+        {
+            bestTarget = null;
+            Set set = battle.findCarryTargets();
+            it = set.iterator();
+            while (it.hasNext())
+            {
+                String hexLabel = (String)it.next();
+                Critter target = battle.getCritterFromHexLabel(hexLabel);
+                if (target.wouldDieFrom(battle.getCarryDamage()))
+                {
+                    if (bestTarget == null ||
+                        !bestTarget.wouldDieFrom(battle.getCarryDamage()) ||
+                        getKillValue(target, terrain) >
+                        getKillValue(bestTarget, terrain))
+                    {
+                        bestTarget = target;
+                    }
+                }
+                else
+                {
+                    if (bestTarget == null ||
+                        (!bestTarget.wouldDieFrom(battle.getCarryDamage()) &&
+                        getKillValue(target, terrain) >
+                        getKillValue(bestTarget, terrain)))
+                    {
+                        bestTarget = target;
+                    }
+                }
+                debugln("Best carry target is " + bestTarget.getDescription());
+                battle.applyCarries(bestTarget);
+            }
+        }
+    }
+
+
+    public boolean chooseStrikePenalty(Critter critter, Critter target,
+        Critter carryTarget, Battle battle, Game game)
+    {
+        // If we still have a 95% chance to kill target even after
+        // taking the penalty to carry to carryTarget, return true.
+
+        int dice = Math.min(critter.getDice(target), 
+            critter.getDice(carryTarget));
+        int strikeNumber = Math.max(critter.getStrikeNumber(target), 
+            critter.getStrikeNumber(carryTarget));
+        int hitsNeeded = target.getPower() - target.getHits();
+        if (probabilityOfHitsOrMore(dice, strikeNumber, hitsNeeded) >= 0.95)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+
+    /** Compute n! */
+    private static int factorial(int n)
+    {
+        int answer = 1;
+        for (int i = n; i >= 2; i--)
+        {
+            answer *= i;
+        }
+        return answer;
+    }
+
+
+    /** Compute a choose b. */
+    private static int choose(int a, int b)
+    {
+        return factorial(a) / (factorial(b) * factorial(a - b));
+    }
+
+
+    private static double probabilityOfHits(int dice, int strikeNumber, 
+        int hits)
+    {
+        double p = (7.0 - strikeNumber) / 6.0;
+        return Math.pow(p, hits) * Math.pow(1 - p, dice - hits) * 
+            choose(dice, hits);
+    }
+
+
+    private static double probabilityOfHitsOrMore(int dice, int strikeNumber,
+        int hits)
+    {
+        double total = 0.0;
+        for (int i = hits; i <= dice; i++) 
+        {
+            total += probabilityOfHits(dice, strikeNumber, i);
+        }
+        return total;
+    }
+    
+    
+    private static double probabilityOfHitsOrLess(int dice, int strikeNumber, 
+        int hits)
+    {
+        double total = 0.0;
+        for (int i = 0; i <= hits; i++) 
+        {
+            total += probabilityOfHits(dice, strikeNumber, i);
+        }
+        return total;
+    }
+
+    
+    /** Return the unrounded mean number of hits. */
+    private static double averageNumberOfHits(int dice, int strikeNumber)
+    {
+        return dice * (7 - strikeNumber) / 6.0;
+    }
+
+    /** Return the most likely number of hits.  If there are two
+      * modes, it returns the higher one. */
+    private static int mostLikelyNumberofHits(int dice, int strikeNumber)
+    {
+        return (int)Math.round(dice * (7 - strikeNumber) / 6.0);
+    }
+
+
     public static int getCombatValue(Creature creature, char terrain)
     {
         int val = creature.getPointValue();
@@ -1298,6 +1560,30 @@ class SimpleAI implements AI
         {
             Critter critter = (Critter)it.next();
             val += getCombatValue(critter, terrain);
+        }
+        return val;
+    }
+    
+    
+    public static int getKillValue(Creature creature, char terrain)
+    {
+        int val = creature.getPointValue();
+        if (creature.isFlier())
+        {
+            val++;
+        }
+        if (creature.isRangestriker())
+        {
+            val++;
+        }
+        if (MasterHex.isNativeCombatBonus(creature, terrain))
+        {
+            val++;
+        }
+        // Kill enemy titans.
+        if (creature.isTitan())
+        {
+            val += 100;
         }
         return val;
     }

@@ -20,6 +20,7 @@ public class PerPlayerOptions
         set.add(Game.autoMasterMove);
         set.add(Game.autoFlee);
         set.add(Game.autoPlay);
+        set.add(Game.autoStrike);
     }
 
 

@@ -83,6 +83,7 @@ public final class Game
     public static final String autoSplit = "Auto split";
     public static final String autoMasterMove = "Auto masterboard move";
     public static final String autoFlee = "Auto flee";
+    public static final String autoStrike = "Auto strike";
     public static final String autoPlay = "Auto play";
 
 

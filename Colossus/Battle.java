@@ -135,6 +135,12 @@ public final class Battle
     }
 
 
+    public char getTerrain()
+    {
+        return masterHex.getTerrain();
+    }
+
+
     public int getPhase()
     {
         return phase;
@@ -310,16 +316,21 @@ public final class Battle
             map.setupFightMenu();
 
             // Automatically perform forced strikes if applicable.
-            Player player = game.getActivePlayer();
-            if (player.getOption(Game.autoForcedStrike))
+            Player player = getActivePlayer();
+            if (player.getOption(Game.autoStrike))
             {
-                makeForcedStrikes();
-                // If there are no possible strikes left, move on.
-                if (highlightChitsWithTargets() < 1)
-                {
-                    commitStrikes();
-                    advancePhase();
-                }
+                player.aiStrike(activeLegion, this);
+            }
+            else if (player.getOption(Game.autoForcedStrike))
+            {
+                makeForcedStrikes(false);
+            }
+
+            // If there are no possible strikes left, move on.
+            if (highlightChitsWithTargets() < 1)
+            {
+                commitStrikes();
+                advancePhase();
             }
         }
     }
@@ -531,7 +542,7 @@ public final class Battle
 
         if (!critter.hasMoved() && !critter.isInContact(false))
         {
-            if (masterHex.getTerrain() == 'T' && getTurnNumber() == 1 &&
+            if (getTerrain() == 'T' && getTurnNumber() == 1 &&
                 getActivePlayer() == getDefender().getPlayer())
             {
                 set = findUnoccupiedTowerHexes();
@@ -761,7 +772,7 @@ public final class Battle
         // Drift hexes are only found on the tundra map.
         // Drift damage is applied only once per player turn,
         //    during the strike phase.
-        if (masterHex.getTerrain() == 't' && phase == FIGHT &&
+        if (getTerrain() == 't' && phase == FIGHT &&
             !driftDamageApplied)
         {
             Iterator it = critters.iterator();
@@ -1023,7 +1034,7 @@ Game.logDebug("defender eliminated");
             Critter critter = (Critter)it.next();
             if (critter.getPlayer() == player)
             {
-                if (countStrikes(critter) > 0)
+                if (countStrikes(critter, true) > 0)
                 {
                     set.add(critter.getCurrentHex().getLabel());
                 }
@@ -1064,42 +1075,55 @@ Game.logDebug("defender eliminated");
     }
 
 
+    public Critter getCritterFromHexLabel(String hexLabel)
+    {
+        BattleHex hex = map.getHexFromLabel(hexLabel);
+        return hex.getCritter();
+    }
+
+
     /** Perform strikes for any creature that is forced to strike
      *  and has only one legal target. Forced strikes will never
-     *  generate carries, since there's only one target. */
-    public void makeForcedStrikes()
+     *  generate carries, since there's only one target. If 
+     *  rangestrike is true, also perform rangestrikes for 
+     *  creatures with only one target, even though they're not
+     *  technically forced. */
+    public void makeForcedStrikes(boolean rangestrike)
     {
         Player player = getActivePlayer();
-        boolean repeat = false;
-
-        Iterator it = critters.iterator();
-        while (it.hasNext())
+        boolean repeat;
+        do
         {
-            Critter critter = (Critter)it.next();
-            if (critter.getPlayer() == player)
+            repeat = false;
+            Iterator it = critters.iterator();
+            while (it.hasNext())
             {
-                if (!critter.hasStruck())
+                Critter critter = (Critter)it.next();
+                if (critter.getPlayer() == player)
                 {
-                    Critter target = critter.getForcedStrikeTarget();
-                    if (target != null)
+                    if (!critter.hasStruck())
                     {
-                        critter.strike(target);
-
-                        // If that strike killed the target, it's possible
-                        // that some other creature that had two adjacent
-                        // enemies now has only one.
-                        if (target.isDead())
+                        Set set = findStrikes(critter, rangestrike);
+                        if (set.size() == 1)
                         {
-                            repeat = true;
+                            Iterator it2 = set.iterator();
+                            String hexLabel = (String)it2.next();
+                            Critter target = getCritterFromHexLabel(hexLabel);
+                            critter.strike(target);
+    
+                            // If that strike killed the target, it's possible
+                            // that some other creature that had two adjacent
+                            // enemies now has only one.
+                            if (target.isDead())
+                            {
+                                repeat = true;
+                            }
                         }
                     }
                 }
             }
         }
-        if (repeat)
-        {
-            makeForcedStrikes();
-        }
+        while (repeat);
     }
 
 
@@ -1121,8 +1145,9 @@ Game.logDebug("defender eliminated");
 
 
     /** Return a set of hex labels for hexes containing targets that the
-     *  critter may strike. */
-    private Set findStrikes(Critter critter)
+     *  critter may strike.  Only include rangestrikes if rangestrike
+     *  is true. */
+    public Set findStrikes(Critter critter, boolean rangestrike)
     {
         HashSet set = new HashSet();
 
@@ -1163,7 +1188,7 @@ Game.logDebug("defender eliminated");
         // Then do rangestrikes if applicable.  Rangestrikes are not allowed
         // if the creature can strike normally, so only look for them if
         // no targets have yet been found.
-        if (!adjacentEnemy && critter.isRangestriker() &&
+        if (rangestrike && !adjacentEnemy && critter.isRangestriker() &&
             getPhase() != STRIKEBACK)
         {
             Iterator it = critters.iterator();
@@ -1186,9 +1211,25 @@ Game.logDebug("defender eliminated");
     }
 
 
-    public int countStrikes(Critter critter)
+    public int countStrikes(Critter critter, boolean rangestrike)
     {
-        return findStrikes(critter).size();
+        return findStrikes(critter, rangestrike).size();
+    }
+
+
+    public boolean strikesRemain(Legion legion)
+    {
+        Collection critters = legion.getCritters();
+        Iterator it = critters.iterator();
+        while (it.hasNext())
+        {
+            Critter critter = (Critter)it.next();
+            if (countStrikes(critter, true) > 0)
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
 
@@ -1196,7 +1237,7 @@ Game.logDebug("defender eliminated");
      *  Return the number of hexes highlighted. */
     public int highlightStrikes(Critter critter)
     {
-        Set set = findStrikes(critter);
+        Set set = findStrikes(critter, true);
         map.unselectAllHexes();
         map.selectHexesByLabels(set);
         return set.size();
@@ -1230,7 +1271,7 @@ Game.logDebug("defender eliminated");
     }
 
 
-    private void applyCarries(Critter target)
+    public void applyCarries(Critter target)
     {
         int dealt = carryDamage;
         carryDamage = target.wound(carryDamage);
@@ -1238,8 +1279,7 @@ Game.logDebug("defender eliminated");
         target.setCarryFlag(false);
 
         Game.logEvent(dealt + (dealt == 1 ? " hit carries to " :
-            " hits carry to ") + target.getName() + " in " +
-            target.getCurrentHex().getLabel());
+            " hits carry to ") + target.getDescription());
 
         if (carryDamage <= 0 || findCarryTargets().isEmpty())
         {
@@ -1425,7 +1465,7 @@ Game.logDebug("defender eliminated");
 
             // If there are two walls, striker or target must be at elevation
             //     2 and range must not be 3.
-            if (masterHex.getTerrain() == 'T' && totalObstacles >= 2 &&
+            if (getTerrain() == 'T' && totalObstacles >= 2 &&
                 getRange(initialHex, finalHex) == 3)
             {
                 return true;
@@ -1888,10 +1928,10 @@ Game.logDebug("defender eliminated");
                 {
                     if (game != null)
                     {
-                        Player player = game.getActivePlayer();
+                        Player player = getActivePlayer();
                         if (player.getOption(Game.autoForcedStrike))
                         {
-                            makeForcedStrikes();
+                            makeForcedStrikes(false);
                         }
                     }
                     highlightChitsWithTargets();
