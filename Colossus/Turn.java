@@ -1,22 +1,20 @@
 import java.awt.*;
 import java.awt.event.*;
-import javax.swing.*;
 
 /**
  * Class Turn gets and holds chronological and sequence data for a Titan game.
  * @version $Id$
- * author David Ripton
+ * @author David Ripton
  */
 
-class Turn extends JDialog implements ActionListener
+class Turn extends Dialog implements ActionListener, WindowListener
 {
     private static Game game;
-    private JFrame parentFrame;
+    private Frame parentFrame;
     private MasterBoard board;
-    private Container contentPane;
 
 
-    public Turn(JFrame parentFrame, Game game, MasterBoard board)
+    public Turn(Frame parentFrame, Game game, MasterBoard board)
     {
         super(parentFrame, game.getActivePlayer().getName() + " Turn " +
             game.getTurnNumber());
@@ -26,7 +24,6 @@ class Turn extends JDialog implements ActionListener
         this.board = board;
 
         setBackground(java.awt.Color.lightGray);
-        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
             
         // Place this window in the upper left corner.
         setLocation(new Point(0, 0));
@@ -50,20 +47,19 @@ class Turn extends JDialog implements ActionListener
         }
         else
         {
-            contentPane = getContentPane();
-            contentPane.removeAll();
-            contentPane.setLayout(new GridLayout(0, 4));
+            removeAll();
+            setLayout(new GridLayout(0, 4));
 
-            contentPane.add(new JLabel(game.getActivePlayer().getName() + 
+            add(new Label(game.getActivePlayer().getName() + 
                 " : Split stacks "));
-            JButton button1 = new JButton("Undo All Splits");
-            contentPane.add(button1);
+            Button button1 = new Button("Undo All Splits");
+            add(button1);
             button1.addActionListener(this);
-            JButton button2 = new JButton("Withdraw from Game");
-            contentPane.add(button2);
+            Button button2 = new Button("Withdraw from Game");
+            add(button2);
             button2.addActionListener(this);
-            JButton button3 = new JButton("Done with Splits");
-            contentPane.add(button3);
+            Button button3 = new Button("Done with Splits");
+            add(button3);
             button3.addActionListener(this);
 
             pack();
@@ -77,44 +73,43 @@ class Turn extends JDialog implements ActionListener
 
     private void setupMoveDialog()
     {
-        contentPane = getContentPane();
-        contentPane.removeAll();
+        removeAll();
         Player player = game.getActivePlayer();
         if (player.getMulligansLeft() > 0)
         {
-            contentPane.setLayout(new GridLayout(0, 6));
+            setLayout(new GridLayout(0, 6));
         }
         else
         {
-            contentPane.setLayout(new GridLayout(0, 5));
+            setLayout(new GridLayout(0, 5));
         }
 
         player.rollMovement();
 
-        contentPane.add(new JLabel(player.getName() + " : Movement Roll: " + 
+        add(new Label(player.getName() + " : Movement Roll: " + 
             player.getMovementRoll() + " "));
 
-        JButton button1 = new JButton("Undo Last Move");
-        contentPane.add(button1);
+        Button button1 = new Button("Undo Last Move");
+        add(button1);
         button1.addActionListener(this);
 
-        JButton button2 = new JButton("Undo All Moves");
-        contentPane.add(button2);
+        Button button2 = new Button("Undo All Moves");
+        add(button2);
         button2.addActionListener(this);
 
         if (player.getMulligansLeft() > 0)
         {
-            JButton button3 = new JButton("Take Mulligan");
-            contentPane.add(button3);
+            Button button3 = new Button("Take Mulligan");
+            add(button3);
             button3.addActionListener(this);
         }
 
-        JButton button4 = new JButton("Withdraw from Game");
-        contentPane.add(button4);
+        Button button4 = new Button("Withdraw from Game");
+        add(button4);
         button4.addActionListener(this);
 
-        JButton button5 = new JButton("Done with Moves");
-        contentPane.add(button5);
+        Button button5 = new Button("Done with Moves");
+        add(button5);
         button5.addActionListener(this);
            
         pack();
@@ -135,14 +130,13 @@ class Turn extends JDialog implements ActionListener
         }
         else
         {
-            contentPane = getContentPane();
-            contentPane.removeAll();
-            contentPane.setLayout(new GridLayout(0, 2));
+            removeAll();
+            setLayout(new GridLayout(0, 2));
 
-            contentPane.add(new JLabel(game.getActivePlayer().getName() + 
+            add(new Label(game.getActivePlayer().getName() + 
                 " : Resolve Engagements "));
-            JButton button1 = new JButton("Done with Engagements");
-            contentPane.add(button1);
+            Button button1 = new Button("Done with Engagements");
+            add(button1);
             button1.addActionListener(this);
 
             pack();
@@ -159,23 +153,22 @@ class Turn extends JDialog implements ActionListener
         }
         else
         {
-            contentPane = getContentPane();
-            contentPane.removeAll();
-            contentPane.setLayout(new GridLayout(0, 5));
+            removeAll();
+            setLayout(new GridLayout(0, 5));
 
-            contentPane.add(new JLabel(game.getActivePlayer().getName() + 
+            add(new Label(game.getActivePlayer().getName() + 
                 " : Muster Recruits "));
-            JButton button1 = new JButton("Undo Last Recruit");
-            contentPane.add(button1);
+            Button button1 = new Button("Undo Last Recruit");
+            add(button1);
             button1.addActionListener(this);
-            JButton button2 = new JButton("Undo All Recruits");
-            contentPane.add(button2);
+            Button button2 = new Button("Undo All Recruits");
+            add(button2);
             button2.addActionListener(this);
-            JButton button3 = new JButton("Withdraw from Game");
-            contentPane.add(button3);
+            Button button3 = new Button("Withdraw from Game");
+            add(button3);
             button3.addActionListener(this);
-            JButton button4 = new JButton("End Turn");
-            contentPane.add(button4);
+            Button button4 = new Button("End Turn");
+            add(button4);
             button4.addActionListener(this);
 
             pack();
@@ -190,7 +183,7 @@ class Turn extends JDialog implements ActionListener
     {
         Player player = game.getActivePlayer();
 
-        if (e.getActionCommand() == "Undo All Splits")
+        if (e.getActionCommand().equals("Undo All Splits"))
         {
             player.undoAllSplits();
 
@@ -198,11 +191,11 @@ class Turn extends JDialog implements ActionListener
             board.repaint();
         }
 
-        else if (e.getActionCommand() == "Done with Splits")
+        else if (e.getActionCommand().equals("Done with Splits"))
         {
             if (player.getMaxLegionHeight() > 7)
             {
-                JOptionPane.showMessageDialog(parentFrame, "Must split.");
+                new MessageBox(parentFrame, "Must split.");
                 return;
             }
             game.advancePhase();
@@ -210,7 +203,7 @@ class Turn extends JDialog implements ActionListener
             setupMoveDialog();
         }
 
-        else if (e.getActionCommand() == "Undo Last Move")
+        else if (e.getActionCommand().equals("Undo Last Move"))
         {
             player.undoLastMove();
 
@@ -218,7 +211,7 @@ class Turn extends JDialog implements ActionListener
             board.highlightUnmovedLegions();
         }
 
-        else if (e.getActionCommand() == "Undo All Moves")
+        else if (e.getActionCommand().equals("Undo All Moves"))
         {
             player.undoAllMoves();
 
@@ -226,7 +219,7 @@ class Turn extends JDialog implements ActionListener
             board.highlightUnmovedLegions();
         }
 
-        else if (e.getActionCommand() == "Take Mulligan")
+        else if (e.getActionCommand().equals("Take Mulligan"))
         {
             player.takeMulligan();
 
@@ -239,7 +232,7 @@ class Turn extends JDialog implements ActionListener
             board.unselectAllHexes();
         }
 
-        else if (e.getActionCommand() == "Done with Moves")
+        else if (e.getActionCommand().equals("Done with Moves"))
         {
             // If any legions has a legal non-teleport move, then the 
             // player must move at least one legion.
@@ -281,7 +274,7 @@ class Turn extends JDialog implements ActionListener
             }
         }
 
-        else if (e.getActionCommand() == "Done with Engagements")
+        else if (e.getActionCommand().equals("Done with Engagements"))
         {
             // Advance only if there are no unresolved engagements.
             if (board.highlightEngagements() == 0)
@@ -292,21 +285,21 @@ class Turn extends JDialog implements ActionListener
             }
         }
         
-        else if (e.getActionCommand() == "Undo Last Recruit")
+        else if (e.getActionCommand().equals("Undo Last Recruit"))
         {
             player.undoLastRecruit();
 
             board.highlightPossibleRecruits();
         }
 
-        else if (e.getActionCommand() == "Undo All Recruits")
+        else if (e.getActionCommand().equals("Undo All Recruits"))
         {
             player.undoAllRecruits();
 
             board.highlightPossibleRecruits();
         }
         
-        else if (e.getActionCommand() == "End Turn")
+        else if (e.getActionCommand().equals("End Turn"))
         {
             // Commit all moves.
             player.commitMoves();
@@ -319,11 +312,12 @@ class Turn extends JDialog implements ActionListener
             setupSplitDialog();
         }
 
-        else if (e.getActionCommand() == "Withdraw from Game")
+        else if (e.getActionCommand().equals("Withdraw from Game"))
         {
-            int answer = JOptionPane.showConfirmDialog(parentFrame, 
-                "Are you sure you want to withdraw from the game?");
-            if (answer == JOptionPane.YES_OPTION)
+            new OptionDialog(parentFrame, "Confirm Withdrawal", 
+                "Are you sure you with to withdraw from the game?",
+                "Yes", "No");
+            if (OptionDialog.getLastAnswer() == OptionDialog.YES_OPTION)
             {
                game.getActivePlayer().die(null, true);
 
@@ -332,5 +326,34 @@ class Turn extends JDialog implements ActionListener
                setupSplitDialog();
             }
         }
+    }
+
+
+    public void windowActivated(WindowEvent event)
+    {
+    }
+
+    public void windowClosed(WindowEvent event)
+    {
+    }
+
+    public void windowClosing(WindowEvent event)
+    {
+    }
+
+    public void windowDeactivated(WindowEvent event)
+    {
+    }
+
+    public void windowDeiconified(WindowEvent event)
+    {
+    }
+
+    public void windowIconified(WindowEvent event)
+    {
+    }
+
+    public void windowOpened(WindowEvent event)
+    {
     }
 }
