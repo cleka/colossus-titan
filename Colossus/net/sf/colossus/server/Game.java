@@ -249,7 +249,6 @@ public final class Game
         caretaker.resetAllCounts();
         players.clear();
 
-        // TODO Use list of Map.Entry instead of String?
         java.util.List playerStuff = new ArrayList();
 
         if (cl != null)

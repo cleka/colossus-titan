@@ -4,13 +4,15 @@
 <!-- $Id$ -->
 
 <!-- To use this you need:
-     Sun JDK 1.3+  http://java.sun.com  (currently recommend 1.4.0)
-     Ant 1.4.1+    http://jakarta.apache.org/ant/
+     Sun JDK 1.3+    http://java.sun.com  (currently recommend 1.4.0)
+     Ant 1.4.1+      http://jakarta.apache.org/ant/
         with corresponding optional.jar installed in $ANT_HOME/lib
-     JavaCC 2.1    http://www.webgain.com/trialware/javacc/JavaCC2_1.zip
+     JavaCC 2.1      http://www.webgain.com/trialware/javacc/JavaCC2_1.zip
         Environment var JAVACC_HOME pointing to JavaCC install root
-     Javamake      http://www.experimentalstuff.com/Technologies/JavaMake/
+     Javamake 1.2.8+ http://www.experimentalstuff.com/Technologies/JavaMake/
         javamake.jar needs to be in your CLASSPATH.
+     JUnit 3.7       http://junit.org
+        junit.jar AND the junit directory need to be in your CLASSPATH.
      To sign jarfiles, you need a file called usernameKeystore,
         (substituting your username for "username")
         with an alias matching your username, and you need to put
@@ -105,23 +107,30 @@
         />
 </target>
 
-<!-- XXX Ant's depend task is broken, so just delete all class files. -->
-<target name="dep"
-        description = "Delete dependant class files"> 
-        <delete verbose="yes" quiet = "yes"> 
-                <fileset dir="." 
-                 includes = 
-                         "**/*.class"
-                />
-        </delete>
-</target>
+
 
 <taskdef name="javamake" classname="com.sun.tools.javamake.ant.JavaMake"/>
+
+<!-- TODO Find a way to switch between javamake and javac using a variable -->
 
 <!-- If you don't have Javamake you can change "javamake" to "javac" --> 
 <!-- But get Javamake instead.  Good dependency checking helps a lot. --> 
 <target name="compile" depends="init,parsers"
-        description = "Compile .java files to .class files using javamake">
+        description = "Compile most .java files to .class files using javamake">
+        <delete verbose="yes" quiet = "yes" file = "Colossus.jar"/>
+        <delete verbose="yes" quiet = "yes" file = "test/Colossus.jar"/>
+        <delete verbose="yes" quiet = "yes" file = "BattlelandsBuilder.jar"/>
+        <delete verbose="yes" quiet = "yes" file = "BattlelandsRandomizer.jar"/>
+        <javamake debug="yes" deprecation="yes" target="1.2" srcdir="."
+                includes="**/*.java"
+                excludes="**/*Test.java"
+        />
+</target>
+
+<!-- If you don't have Javamake you can change "javamake" to "javac" --> 
+<!-- But get Javamake instead.  Good dependency checking helps a lot. --> 
+<target name="compileAll" depends="init,parsers"
+        description = "Compile all .java files to .class files using javamake">
         <delete verbose="yes" quiet = "yes" file = "Colossus.jar"/>
         <delete verbose="yes" quiet = "yes" file = "test/Colossus.jar"/>
         <delete verbose="yes" quiet = "yes" file = "BattlelandsBuilder.jar"/>
@@ -131,7 +140,17 @@
         />
 </target>
 
+<!-- XXX Why does this fail if we set fork to yes? -->
+<!-- TODO Add test suite. -->
+<target name="test" depends="compileAll"
+        description = "Run all unit tests using JUnit">
+        <junit printsummary="yes" fork="no" haltonfailure="no">
+                <formatter type="plain"/>
+                <test name="net.sf.colossus.server.BalancedTowersTest"/>
+        </junit>
+</target>
 
+<!-- TODO Add GUI test task. -->
 
 <target name="javadoc" depends="compile"
         description = "Make javadoc files">
@@ -155,7 +174,8 @@
                        Badlands/**,
                        Undead/**,
                        Outlands/**"
-             excludes="net/sf/colossus/datatools/*.class"
+             excludes="net/sf/colossus/datatools/*.class,
+                       **/*Test.class"
              />
         <chmod file="Colossus.jar" perm="755"/>
 </target>
@@ -180,6 +200,7 @@
                          **/Colossus.jar,
                          **/.#Colossus.jar*,
                          **/Colossus.*.zip,
+                         TEST-*Test.txt,
                          javadoc/**,
                          docs/**/*.aux,
                          docs/**/*.log,
@@ -218,7 +239,7 @@
 </target>
 
 
-<target name="run"
+<target name="run" depends="jar"
         description = "Run the game">
         <java jar="Colossus.jar"
               fork="yes"/>
