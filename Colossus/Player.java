@@ -335,9 +335,10 @@ class Player
                 // Return lords and demi-lords to the stacks.
                 for (int j = 0; j < legion.getHeight(); j++)
                 {
-                    if (legion.getCreature(j).isImmortal())
+                    Creature creature = legion.getCreature(j);
+                    if (creature.isImmortal())
                     {
-                        legion.getCreature(j).putOneBack();
+                        creature.putOneBack();
                     }
                 }
 
