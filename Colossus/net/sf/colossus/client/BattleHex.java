@@ -14,6 +14,7 @@ import net.sf.colossus.util.Log;
  * Class BattleHex holds game state for battle hex.
  * @version $Id$
  * @author David Ripton
+ * @author Romain Dolbeau
  */
 
 public class BattleHex extends Hex
@@ -350,11 +351,16 @@ public class BattleHex extends Hex
     }
 
 
-    /** Return the number of movement points it costs to enter this hex.
-     *  For fliers, this is the cost to land in this hex, not fly over it.
-     *  If entry is illegal, just return a cost greater than the maximum
-     *  possible number of movement points. This caller is responsible
-     *  for checking to see if this hex is already occupied. */
+    /**
+     * Return the number of movement points it costs to enter this hex.
+     * For fliers, this is the cost to land in this hex, not fly over it.
+     * If entry is illegal, just return a cost greater than the maximum
+     * possible number of movement points. This caller is responsible
+     * for checking to see if this hex is already occupied.
+     * @param creature The Creature that is trying to move into the BattleHex.
+     * @param cameFrom The HexSide through which the Creature try to enter.
+     * @return Cost to enter the BattleHex.
+     */
     public int getEntryCost(Creature creature, int cameFrom)
     {
         char terrain = getTerrain();
@@ -404,6 +410,26 @@ public class BattleHex extends Hex
 
         // Other hexes only cost 1.
         return NORMAL_COST;
+    }
+
+    /**
+     * Check if the Creature given in parameter can fly over
+     * the BattleHex, or not.
+     * @param creature The Creature that want to fly over this BattleHex
+     * @return If the Creature can fly over here or not.
+     */
+    public boolean canBeFliedOverBy(Creature creature)
+    {
+        char terrain = getTerrain();
+        if (!creature.isFlier())
+        { // non-flyer can't fly, obviously...
+            return false;
+        }
+        if (terrain == 'v')
+        { // only dragon can fly over volcano
+            return ((creature.getName()).equals("Dragon"));
+        }
+        return(true);
     }
 
     public boolean isCliff(int hexside)

@@ -678,10 +678,11 @@ final class Battle
                         }
                     }
 
-                    // Fliers can fly over any non-volcano hex for 1 movement
-                    // point.  Only dragons can fly over volcanos.
-                    if (flies && movesLeft > 1 && (neighbor.getTerrain() != 'v'
-                        || critter.getName().equals("Dragon")))
+                    // Fliers can fly over any hex for 1 movement point,
+                    // but some Hex cannot be flied over by some creatures.
+                    if (flies &&
+                        movesLeft > 1 &&
+                        neighbor.canBeFliedOverBy(critter))
                     {
                         set.addAll(findMoves(neighbor, critter, flies,
                             movesLeft - 1, reverseDir, ignoreMobileAllies));
