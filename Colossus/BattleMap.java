@@ -136,8 +136,8 @@ public class BattleMap extends Frame implements MouseListener,
         for (int i = 0; i < attackerHeight; i++)
         {
             chits[i] = new BattleChit(0, 0, chitScale,
-                attacker.getCreature(i).getImageName(false), this,
-                attacker.getCreature(i), entrance,
+                attacker.getCritter(i).getImageName(false), this,
+                attacker.getCritter(i), entrance,
                 attacker, this);
             tracker.addImage(chits[i].getImage(), 0);
             entrance.addChit(chits[i]);
@@ -148,8 +148,8 @@ public class BattleMap extends Frame implements MouseListener,
         for (int i = attackerHeight; i < numChits; i++)
         {
             chits[i] = new BattleChit(0, 0, chitScale,
-                defender.getCreature(i - attackerHeight).getImageName(true),
-                this, defender.getCreature(i - attackerHeight), entrance,
+                defender.getCritter(i - attackerHeight).getImageName(true),
+                this, defender.getCritter(i - attackerHeight), entrance,
                 defender, this);
             tracker.addImage(chits[i].getImage(), 0);
             entrance.addChit(chits[i]);
@@ -180,10 +180,10 @@ public class BattleMap extends Frame implements MouseListener,
 
         BattleHex entrance = getEntrance(legion);
         int height = legion.getHeight();
-        Creature creature = legion.getCreature(height - 1);
+        Critter critter = legion.getCritter(height - 1);
 
         chits[numChits] = new BattleChit(0, 0, chitScale,
-            creature.getImageName(legion == defender), this, creature,
+            critter.getImageName(legion == defender), this, critter,
             entrance, legion, this);
 
         tracker.addImage(chits[numChits].getImage(), 0);
@@ -293,7 +293,7 @@ public class BattleMap extends Frame implements MouseListener,
                     // Fliers can fly over any non-volcano hex for 1 movement
                     // point.  Only dragons can fly over volcanos.
                     if (flies && movesLeft > 1 && (neighbor.getTerrain() != 'v'
-                        || creature == Creature.dragon))
+                        || creature.getName().equals("Dragon")))
                     {
                         findMoves(neighbor, chit, creature, flies,
                             movesLeft - 1, reverseDir);
@@ -311,7 +311,7 @@ public class BattleMap extends Frame implements MouseListener,
 
         if (!chit.hasMoved() && !chit.inContact(false))
         {
-            Creature creature = chit.getCreature();
+            Critter critter = chit.getCritter();
 
             if (terrain == 'T' && turn.getTurnNumber() == 1 &&
                 turn.getActivePlayer() == defender.getPlayer())
@@ -336,8 +336,8 @@ public class BattleMap extends Frame implements MouseListener,
             }
             else
             {
-                findMoves(chit.getCurrentHex(), chit, creature,
-                    creature.flies(), creature.getSkill(), -1);
+                findMoves(chit.getCurrentHex(), chit, critter,
+                    critter.flies(), critter.getSkill(), -1);
             }
         }
     }
@@ -432,7 +432,7 @@ public class BattleMap extends Frame implements MouseListener,
             {
                 BattleChit chit = chits[i];
                 if (chit.getCurrentHex().getTerrain() == 'd' &&
-                    !chit.getCreature().isNativeDrift())
+                    !chit.getCritter().isNativeDrift())
                 {
                     int totalDamage = chit.getHits();
                     totalDamage++;
@@ -521,11 +521,11 @@ public class BattleMap extends Frame implements MouseListener,
 
         // Then do rangestrikes if applicable.  Rangestrikes are not allowed
         // if the creature can strike normally.
-        Creature creature = chit.getCreature();
-        if (!chit.inContact(true) && creature.rangeStrikes() &&
+        Critter critter = chit.getCritter();
+        if (!chit.inContact(true) && critter.rangeStrikes() &&
             turn.getPhase() != turn.STRIKEBACK)
         {
-            int skill = creature.getSkill();
+            int skill = critter.getSkill();
 
             for (int i = 0; i < numChits; i++)
             {
@@ -944,12 +944,12 @@ public class BattleMap extends Frame implements MouseListener,
     {
         BattleHex currentHex = chit.getCurrentHex();
         BattleHex targetHex = target.getCurrentHex();
-        Creature creature = chit.getCreature();
+        Critter critter = chit.getCritter();
 
         boolean clear = true;
 
         int range = getRange(currentHex, targetHex);
-        int skill = creature.getSkill();
+        int skill = critter.getSkill();
 
         if (range > skill)
         {
@@ -958,8 +958,8 @@ public class BattleMap extends Frame implements MouseListener,
 
         // Only warlocks can rangestrike at range 2, rangestrike Lords,
         // or rangestrike without LOS.
-        else if (creature != Creature.warlock && (range < 3 ||
-            target.getCreature().isLord() ||
+        else if (!critter.getName().equals("Warlock") && (range < 3 ||
+            target.getCritter().isLord() ||
             LOSBlocked(currentHex, targetHex)))
         {
             clear = false;
@@ -1281,9 +1281,7 @@ public class BattleMap extends Frame implements MouseListener,
                 }
             }
 
-            // Make all creatures in the victorious legion visible, and set
-            // the number of visible creatures correctly to account for 
-            // battle losses.
+            // Make all creatures in the victorious legion visible.
             legion.revealAllCreatures();
         }
 
@@ -1315,35 +1313,35 @@ public class BattleMap extends Frame implements MouseListener,
             Legion legion = chits[i].getLegion();
             if (chits[i].isDead())
             {
-                Creature creature = chits[i].getCreature();
+                Critter critter = chits[i].getCritter();
 
                 // After turn 1, offboard chits are returned to the stacks or
                 //   the stack they were summoned from, with no points awarded.
                 if (chits[i].getCurrentHex().isEntrance() &&
                     turn.getTurnNumber() > 1)
                 {
-                    if (creature == Creature.angel || creature ==
-                        Creature.archangel)
+                    if (critter.getName().equals("Angel") || 
+                        critter.getName().equals("Archangel")) 
                     {
                         donor = legion.getPlayer().getLastLegionSummonedFrom();
                         // Because addCreature grabs one from the stack, it
                         //     must be returned there.
-                        creature.putOneBack();
-                        donor.addCreature(creature);
+                        critter.putOneBack();
+                        donor.addCreature(critter);
                     }
                     else
                     {
-                        creature.putOneBack();
+                        critter.putOneBack();
                     }
                 }
 
                 else if (legion == attacker)
                 {
-                    defenderPoints += creature.getPointValue();
+                    defenderPoints += critter.getPointValue();
                 }
                 else
                 {
-                    attackerPoints += creature.getPointValue();
+                    attackerPoints += critter.getPointValue();
 
                     // Chits left offboard do not trigger angel summoning.
                     if (summonState == NO_KILLS &&
@@ -1353,16 +1351,16 @@ public class BattleMap extends Frame implements MouseListener,
                     }
                 }
 
-                legion.removeCreature(creature);
+                legion.removeCreature(critter);
                 // If an angel or archangel was returned to its donor instead
                 // of the stack, then the count must be adjusted.
                 if (donor != null)
                 {
-                    creature.takeOne();
+                    critter.takeOne();
                     donor = null;
                 }
 
-                if (creature == Creature.titan)
+                if (critter.getName().equals("Titan"))
                 {
                     legion.getPlayer().eliminateTitan();
                 }
@@ -1370,10 +1368,6 @@ public class BattleMap extends Frame implements MouseListener,
                 BattleHex hex = chits[i].getCurrentHex();
                 hex.removeChit(chits[i]);
                 hex.repaint();
-
-                // Attempt to free resources to work around leaks.
-                tracker.removeImage(chits[i].getImage());
-                chits[i].getImage().flush();
 
                 for (int j = i; j < numChits - 1; j++)
                 {
