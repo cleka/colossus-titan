@@ -106,6 +106,7 @@ public final class MasterBoard extends JPanel
     private MediaTracker boardTracker = new MediaTracker(this);
     private static StrategicMapLoader sml = null;
 
+    private JMenu lfMenu;
 
     /** Must ensure that variant is loaded before referencing this class,
      *  since readMapData() needs it. */
@@ -560,16 +561,19 @@ public final class MasterBoard extends JPanel
         mi.setMnemonic(KeyEvent.VK_R);
 
         // Then Look & Feel
-        JMenu lfMenu = new JMenu("Look & Feel");
+        lfMenu = new JMenu("Look & Feel");
         menuBar.add(lfMenu);
         UIManager.LookAndFeelInfo[] lfInfo =
             UIManager.getInstalledLookAndFeels();
+        String currentLF = UIManager.getLookAndFeel().getName();
         for (int i = 0; i < lfInfo.length ; i++)
         {
             AbstractAction lfAction =
                 new ChangeLookFeelAction(lfInfo[i].getName(),
                                          lfInfo[i].getClassName());
-            lfMenu.add(lfAction);
+            JCheckBoxMenuItem temp = new JCheckBoxMenuItem(lfAction);
+            lfMenu.add(temp);
+            temp.setState(lfInfo[i].getName().equals(currentLF));
         }
 
         // Then help menu
@@ -590,6 +594,12 @@ public final class MasterBoard extends JPanel
         }
         public void actionPerformed(ActionEvent e) {
             client.setLookAndFeel(className);
+            String currentLF = UIManager.getLookAndFeel().getName();
+            for (int i = 0 ; i < lfMenu.getItemCount() ; i++)
+            {
+                JCheckBoxMenuItem it = (JCheckBoxMenuItem)lfMenu.getItem(i);
+                it.setState(it.getText().equals(currentLF));
+            }
         }
     }
 

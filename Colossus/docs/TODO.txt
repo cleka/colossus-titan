@@ -74,8 +74,7 @@ Change Quit button in GetPlayers dialog to Cancel.  Go back to existing
    game if there is one from Cancel, or quit if just starting.  Eliminate
    confirmation before calling dialog.
 
-L&F menu should indicate current L&F somehow, and not show Windows if not
-   allowed on this platform.
+L&F should not show Windows if not allowed on this platform.
 If player chose L&F from config file, it should be added to menu.
 Kunststoff L&F in swing.properties file fails.  Works in player cfg file.
 Add Kunststoff L&F to jar file?
