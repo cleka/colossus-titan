@@ -130,16 +130,14 @@ public final class Constants
 
     /** all variants are subdirectories of this dir. 
     /*  the default dir name can is not prepended by this. */
-    // towi: direcories not yet restructured: 
-    //public static final String varPath = "variants/"; //towi: variant path
-    public static final String varPath = "./";
+    public static final String varPath = "";
     
     /** Default directory for datafiles, can be outside variants, 
      * but should be there. 
      */
     // towi: direcories not yet restructured: 
     //public static final String defaultDirName = "variants/Default"; 
-    public static final String defaultDirName = "./Default";
+    public static final String defaultDirName = "Default";
 
     /** Images subdirectory name */
     public static final String imagesDirName = "images";
