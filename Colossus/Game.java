@@ -2301,7 +2301,7 @@ public final class Game
             {
                 set.add(hex.getLabel());
                 // Set the entry side relative to the hex label.
-                hex.setEntrySide(cameFrom - hex.getLabelSide() % 6);
+                hex.setEntrySide((6 + cameFrom - hex.getLabelSide()) % 6);
             }
             return set;
         }
@@ -2324,7 +2324,7 @@ public final class Game
 
             // Need to set entry sides even if no possible engagement,
             // for chooseWhetherToTeleport()
-            hex.setEntrySide((cameFrom - hex.getLabelSide()) % 6);
+            hex.setEntrySide((6 + cameFrom - hex.getLabelSide()) % 6);
 
             return set;
         }
