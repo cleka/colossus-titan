@@ -579,7 +579,7 @@ class SimpleAI implements AI
                         {
                             MoveInfo m1 = (MoveInfo) o1;
                             MoveInfo m2 = (MoveInfo) o2;
-                            return m1.difference - m2.difference;
+                            return m2.difference - m1.difference;
                         }
                     });
                 // now, one at a time, try applying moves until we
@@ -632,7 +632,7 @@ class SimpleAI implements AI
                     {
                         MoveInfo m1 = (MoveInfo) o1;
                         MoveInfo m2 = (MoveInfo) o2;
-                        return m1.difference - m2.difference;
+                        return m2.difference - m1.difference;
                     }
                 });
             // now, one at a time, try applying moves until we
@@ -961,7 +961,8 @@ class SimpleAI implements AI
         {
             //debugln("considering risk of moving " + legion + " to "  + hex );
             HashMap[] enemiesThatCanAttackOnA = enemyAttackMap;
-            for (int roll = 1; roll <= 6; roll++)
+	    int roll;
+            for (roll = 1; roll <= 6; roll++)
             {
                 List enemies = (List) enemiesThatCanAttackOnA[roll].get(hex.getLabel());
                 //debugln("got enemies that can attack on a " + roll + " :" + enemies);
@@ -975,17 +976,17 @@ class SimpleAI implements AI
                         break;
                     // break on the lowest roll from which we can be attacked and killed
                 }
-                if (roll < 7)
-                {
-                    final double chanceToAttack = (7.0 - roll) / 6.0;
-                    final double risk;
-                    if (legion.numCreature(Creature.titan)>0)
-                        risk = LOSE_LEGION * chanceToAttack;
-                    else
-                        risk = -legion.getPointValue()/2 * chanceToAttack;
-                    value += risk;
-                } 
-            }
+	    }
+	    if (roll < 7)
+	    {
+		final double chanceToAttack = (7.0 - roll) / 6.0;
+		final double risk;
+		if (legion.numCreature(Creature.titan)>0)
+		    risk = LOSE_LEGION * chanceToAttack;
+		else
+		    risk = -legion.getPointValue()/2 * chanceToAttack;
+		value += risk;
+	    } 
         }
 
         // TODO: consider mobility.  e.g., penalty for suckdown
