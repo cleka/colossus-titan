@@ -39,35 +39,35 @@ class Legion
 
         if (creature0 != null)
         {
-            critters[0] = new Critter(creature0, false);
+            critters[0] = new Critter(creature0, false, this);
         }
         if (creature1 != null)
         {
-            critters[1] = new Critter(creature1, false);
+            critters[1] = new Critter(creature1, false, this);
         }
         if (creature2 != null)
         {
-            critters[2] = new Critter(creature2, false);
+            critters[2] = new Critter(creature2, false, this);
         }
         if (creature3 != null)
         {
-            critters[3] = new Critter(creature3, false);
+            critters[3] = new Critter(creature3, false, this);
         }
         if (creature4 != null)
         {
-            critters[4] = new Critter(creature4, false);
+            critters[4] = new Critter(creature4, false, this);
         }
         if (creature5 != null)
         {
-            critters[5] = new Critter(creature5, false);
+            critters[5] = new Critter(creature5, false, this);
         }
         if (creature6 != null)
         {
-            critters[6] = new Critter(creature6, false);
+            critters[6] = new Critter(creature6, false, this);
         }
         if (creature7 != null)
         {
-            critters[7] = new Critter(creature7, false);
+            critters[7] = new Critter(creature7, false, this);
         }
 
         // Initial legion contents are public; contents of legions created 
@@ -161,7 +161,7 @@ class Legion
         int count = 0;
         for (int i = 0; i < height; i++)
         {
-            if (critters[i].getCreature() == creature)
+            if (critters[i].getName().equals(creature.getName()))
             {
                 count++;
             }
@@ -358,7 +358,7 @@ class Legion
             creature.takeOne();
             height++;
             // Newly added critters are visible.
-            critters[height - 1] = new Critter(creature, true);
+            critters[height - 1] = new Critter(creature, true, this);
         }
     }
 
@@ -395,7 +395,7 @@ class Legion
     {
         for (int i = 0; i < height; i++)
         {
-            if (critters[i].getCreature() == creature)
+            if (critters[i].getName().equals(creature.getName()))
             {
                 removeCreature(i);
                 return;
@@ -439,7 +439,7 @@ class Legion
         }
         else
         {
-            critters[i] = new Critter(creature, false);
+            critters[i] = new Critter(creature, false, this);
         }
     }
 
@@ -506,7 +506,7 @@ class Legion
         for (int i = 0; i < height; i++)
         {
             if (critters[i].getCreature() == creature && 
-                ! critters[i].isVisible())
+                !critters[i].isVisible())
             {
                 critters[i].setVisible(true);
                 numberToReveal--;
