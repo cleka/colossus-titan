@@ -1972,19 +1972,11 @@ Log.debug("called Battle.applyCarries() for " + target.getDescription());
     boolean doMove(int tag, String hexLabel)
     {
         Critter critter = getActiveLegion().getCritterByTag(tag);
-        if (critter != null)
-        {
-            return doMove(critter, hexLabel);
-        }
-        else
+        if (critter == null)
         {
             return false;
         }
-    }
 
-    /** If legal, move critter to hex and return true. Else return false. */
-    private boolean doMove(Critter critter, String hexLabel)
-    {
         // Allow null moves.
         if (hexLabel.equals(critter.getCurrentHexLabel()))
         {

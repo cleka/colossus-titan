@@ -2417,7 +2417,7 @@ public class SimpleAI implements AI
                 moveList = (List)it2.next();
                 CritterMove cm = (CritterMove)moveList.get(0);
                 Critter critter2 = cm.getCritter();
-                critter2.setCurrentHexLabel(cm.getStartingHexLabel());
+                critter2.moveToHex(cm.getStartingHexLabel());
             }
         }
 
