@@ -136,28 +136,21 @@ class Concede extends JDialog implements ActionListener
 
         enemyMarker.paint(offGraphics);
 
-        // ArrayIndexOutOfBoundsException when an angel is acquired?
         for (int i = friend.getHeight() - 1; i >= 0; i--)
         {
-            // If the stack just acquired an angel, make a chit for it.
-            if (friendChits[i] == null)
+            // If the stack just acquired an angel, it won't be painted.
+            if (friendChits[i] != null)
             {
-                friendChits[i] = new Chit((i + 1) * scale + (scale / 5), 
-                    scale / 2, scale, friend.getCreature(i).getImageName(),
-                    this, false);
+                friendChits[i].paint(offGraphics);
             }
-            friendChits[i].paint(offGraphics);
         }
         for (int i = enemy.getHeight() - 1; i >= 0; i--)
         {
-            if (enemyChits[i] == null)
+            // If the stack just acquired an angel, it won't be painted.
+            if (enemyChits[i] != null)
             {
-                enemyChits[i] = new Chit((i + 1) * scale + (scale / 5), 
-                    2 * scale, scale, enemy.getCreature(i).getImageName(),
-                    this, false);
+                enemyChits[i].paint(offGraphics);
             }
-
-            enemyChits[i].paint(offGraphics);
         }
 
         if (!laidOut)
@@ -205,8 +198,13 @@ class Concede extends JDialog implements ActionListener
             }
             for (int i = 0; i < enemy.getHeight(); i++)
             {
-                tracker.removeImage(enemyChits[i].getImage());
-                enemyChits[i].getImage().flush();
+                // Enemy may just have acquired an angel which does not have
+                // a chit here, so check for null.
+                if (enemyChits[i] != null)
+                {
+                    tracker.removeImage(enemyChits[i].getImage());
+                    enemyChits[i].getImage().flush();
+                }
             }
             tracker.removeImage(friendMarker.getImage());
             friendMarker.getImage().flush();
