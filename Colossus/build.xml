@@ -125,11 +125,12 @@
              manifest="META-INF/MANIFEST.MF"
              includes="**/*.class,
              version,
-             Default/*,
-             TitanPlus/*,
-             ExtTitan/*,
-             Badlands/*,
-             Outlands/*"
+             Default/**,
+             TitanPlus/**,
+             ExtTitan/**,
+             Badlands/**,
+             Outlands/**"
+             excludes="net/sf/colossus/datatools/*.class"
              />
         <chmod file="Colossus.jar" perm="755"/>
 </target>

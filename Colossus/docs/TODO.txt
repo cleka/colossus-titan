@@ -1,4 +1,9 @@
-Fix 'Load External Variant' so it works the first time.
+Put web page under CVS.
+
+Set up a local Java Web Start test config.
+
+Document build and test procedures.  Copy all docs to web page from
+   inst target.
 
 Highlight appropriate engagement hex while engagement is being resolved.
    (Except during angel summoning.)
@@ -18,10 +23,6 @@ Change some dialogs to show info in a label instead of the title (so
 
 Move code to center a dialog on screen to one place.  Maybe add a
    parent dialog class?
-
-Put web page under CVS.
-
-Set up a local Java Web Start test config.
 
 Change StatusScreen to use a JTable.
 

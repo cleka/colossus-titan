@@ -68,8 +68,6 @@ JARFILE = Colossus.jar
 
 jar : $(JARFILE)
 
-# TODO Update this whenever anything else changes, and bundle
-# it into the jar.
 version : classes
 	echo `date +%Y%m%d` > version
 
@@ -80,17 +78,17 @@ $(JARFILE): net/sf/colossus/parser/StrategicMapLoader.java \
 	net/sf/colossus/parser/CreatureLoader.java \
 	net/sf/colossus/parser/BattlelandLoader.java \
 	net/sf/colossus/parser/VariantLoader.java \
-	$(CLASS_FILES) $(IMAGES) META-INF/MANIFEST.MF
+	$(CLASS_FILES) $(IMAGES) META-INF/MANIFEST.MF version
 	jar -mcf META-INF/MANIFEST.MF Colossus.jar \
         net/sf/colossus/client/*.class net/sf/colossus/server/*.class \
         net/sf/colossus/util/*.class net/sf/colossus/parser/*.class \
-        Default TitanPlus ExtTitan Badlands Outlands
+        Default TitanPlus ExtTitan Badlands Outlands version
 	chmod +x Colossus.jar
 
-# Sign jar file.  This target uses dripton's key; other developers can
-# make their own and add their own lines to the Makefile.
-signjar : jar
-	jarsigner -keystore driptonKeystore Colossus.jar dripton
+# Sign jar file.  You need a keystore file named {your user name}Keystore
+#    containing a key called {your user name}
+sign : jar
+	jarsigner -keystore $(USER)Keystore Colossus.jar $(USER)
 
 INST_JARFILE = $(HTMLDIR)/$(JARFILE)
 INST_README = $(HTMLDIR)/README.txt
