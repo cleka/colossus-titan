@@ -21,6 +21,7 @@ public final class MovementDie extends JFrame implements WindowListener
         super("Movement Die");
         this.game = game;
         setVisible(false);
+        setupIcon();
         addWindowListener(this);
         pack();
         setBackground(Color.lightGray);
@@ -55,6 +56,26 @@ public final class MovementDie extends JFrame implements WindowListener
         pack();
         setVisible(true);
         repaint();
+    }
+
+
+    private void setupIcon()
+    {
+        if (game != null && !game.isApplet())
+        {
+            try
+            {
+                setIconImage(Toolkit.getDefaultToolkit().getImage(
+                    getClass().getResource(Chit.getImagePath(
+                    Creature.colossus.getImageName()))));
+            }
+            catch (NullPointerException e)
+            {
+                System.out.println(e.toString() + " Couldn't find " +
+                    Creature.colossus.getImageName());
+                dispose();
+            }
+        }
     }
 
 

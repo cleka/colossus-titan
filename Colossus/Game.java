@@ -345,23 +345,6 @@ public final class Game
 
     private void repaintAllWindows()
     {
-        if (board != null)
-        {
-            masterFrame.repaint();
-        }
-        if (battle != null)
-        {
-            BattleMap map = battle.getBattleMap();
-            if (map != null)
-            {
-                map.repaint();
-            }
-            BattleDice dice = battle.getBattleDice();
-            if (dice != null)
-            {
-                dice.repaint();
-            }
-        }
         if (statusScreen != null)
         {
             statusScreen.repaint();
@@ -369,6 +352,23 @@ public final class Game
         if (movementDie != null)
         {
             movementDie.repaint();
+        }
+        if (board != null)
+        {
+            masterFrame.repaint();
+        }
+        if (battle != null)
+        {
+            BattleDice dice = battle.getBattleDice();
+            if (dice != null)
+            {
+                dice.repaint();
+            }
+            BattleMap map = battle.getBattleMap();
+            if (map != null)
+            {
+                map.repaint();
+            }
         }
     }
 
@@ -395,6 +395,8 @@ public final class Game
         {
             movementDie.showRoll(roll);
         }
+        // Give focus back to the masterboard.
+        masterFrame.show();
     }
 
 

@@ -1188,7 +1188,7 @@ public final class Battle
             if (game != null && game.getOption(Game.showDice))
             {
                 battleDice.setCarries(carryDamage);
-                battleDice.setup();
+                battleDice.showRoll();
             }
         }
     }

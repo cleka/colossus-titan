@@ -14,6 +14,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
     private BattleHex [][] h = new BattleHex[6][6];
     private ArrayList hexes = new ArrayList(27);
     protected static int scale;
+    protected int chitScale;
     protected MasterHex masterHex;
 
     // ne, e, se, sw, w, nw
@@ -33,7 +34,8 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
     public HexMap(MasterHex masterHex)
     {
         this.masterHex = masterHex;
-        scale = findScale();
+        findScale();
+        findChitScale();
         setOpaque(true);
         setBackground(Color.white);
         setupHexes();
@@ -41,10 +43,8 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
     }
 
 
-    public static int findScale()
+    private void findScale()
     {
-        int scale;
-
         // Make sure the map fits on the screen.
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
         if (d.height < 1000)
@@ -55,8 +55,23 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
         {
             scale = 30;
         }
+    }
 
-        return scale;
+
+    private void findChitScale()
+    {
+        chitScale = 2 * scale;
+        // Avoid scaling chits at all if possible.
+        if (chitScale >= 50 && chitScale <= 70)
+        {
+            chitScale = 60;
+        }
+    }
+
+
+    public int getChitScale()
+    {
+        return chitScale;
     }
 
 

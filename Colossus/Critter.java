@@ -854,7 +854,7 @@ System.out.println("DENIED CARRY UP DUNE HEXSIDE");
             {
                 battleDice.setValues(this, target, strikeNumber,
                     rolls, damage, carryDamage);
-                battleDice.setup();
+                battleDice.showRoll();
             }
         }
     }

@@ -1420,7 +1420,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
                 Legion legion = (Legion)it2.next();
                 int chitScale = 3 * scale;
                 // Avoid scaling chits at all if possible.
-                if (chitScale > 50 && chitScale < 70)
+                if (chitScale >= 50 && chitScale <= 70)
                 {
                     chitScale = 60;
                 }

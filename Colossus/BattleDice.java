@@ -35,14 +35,11 @@ public final class BattleDice extends JFrame implements WindowListener
         super("Battle Dice Rolls");
 
         this.game = game;
-
         setVisible(false);
-
         addWindowListener(this);
-
+        setupIcon();
         Container contentPane = getContentPane();
         contentPane.setLayout(gridbag);
-
         pack();
 
         setBackground(Color.lightGray);
@@ -97,7 +94,7 @@ public final class BattleDice extends JFrame implements WindowListener
 
     // XXX Cache die images?
     /** Initialize and layout the components, in response to new data. */
-    public void setup()
+    public void showRoll()
     {
         // Top row: label like "Serpent in Plains attacks Archangel in brush"
         // Second row: label like "Rolling 18 dice with target number 6"
@@ -188,6 +185,29 @@ public final class BattleDice extends JFrame implements WindowListener
         setVisible(true);
 
         repaint();
+
+        // Restore focus to the battle map.
+        transferFocus();
+    }
+
+
+    private void setupIcon()
+    {
+        if (game != null && !game.isApplet())
+        {
+            try
+            {
+                setIconImage(Toolkit.getDefaultToolkit().getImage(
+                    getClass().getResource(Chit.getImagePath(
+                    Creature.colossus.getImageName()))));
+            }
+            catch (NullPointerException e)
+            {
+                System.out.println(e.toString() + " Couldn't find " +
+                    Creature.colossus.getImageName());
+                dispose();
+            }
+        }
     }
 
 
@@ -263,6 +283,6 @@ public final class BattleDice extends JFrame implements WindowListener
 
         battleDice.setValues(serpent, angel, targetNumber, rolls, hits,
             carries);
-        battleDice.setup();
+        battleDice.showRoll();
     }
 }

@@ -12,7 +12,6 @@ import javax.swing.*;
 public final class BattleMap extends HexMap implements MouseListener,
     WindowListener
 {
-    private int chitScale;
     private static Point location;
 
     private MasterBoard board;
@@ -56,8 +55,6 @@ public final class BattleMap extends HexMap implements MouseListener,
 
         Container contentPane = battleFrame.getContentPane();
         contentPane.setLayout(new BorderLayout());
-
-        chitScale = 2 * scale;
 
         battleFrame.setSize(getPreferredSize());
 

@@ -31,8 +31,6 @@ public final class BattleHex extends Hex
 
     private BattleHex [] neighbors = new BattleHex[6];
 
-    private int chitScale;
-
     private int xCoord;
     private int yCoord;
 
@@ -55,7 +53,6 @@ public final class BattleHex extends Hex
         this.yCoord = yCoord;
         this.scale = scale;
         len = scale / 3.0;
-        chitScale = 2 * scale;
 
         xVertex[0] = cx;
         yVertex[0] = cy;
@@ -349,6 +346,8 @@ public final class BattleHex extends Hex
         }
 
         Point point = new Point(center);
+
+        int chitScale = map.getChitScale();
 
         // Cascade chits diagonally.
         int chitScale4 = chitScale >> 2;

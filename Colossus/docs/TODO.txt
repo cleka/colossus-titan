@@ -11,6 +11,7 @@ Make MasterBoard and MasterHex pluggable.  Integrate David Lum's
 Add a way to show each player's remaining legion markers outside PickMarker.
 
 Centralize scale handling.  Add a global rescale option.
+Scale should change when windows are resized.
 
 Need to be able to undo an auto recruit of a reinforcement in battle.
    Or else turn off auto recruit for reinforcements.
