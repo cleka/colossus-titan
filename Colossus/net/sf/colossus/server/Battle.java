@@ -576,7 +576,7 @@ Log.debug("Called Battle.doneReinforcing()");
                     {
                         entryCost =
                             neighbor.getEntryCost(
-                                critter,
+                                critter.getCreature(),
                                 reverseDir,
                                 game.getOption(Options.cumulativeSlow));
                     }
@@ -607,7 +607,7 @@ Log.debug("Called Battle.doneReinforcing()");
                     // but some Hex cannot be flown over by some creatures.
                     if (flies &&
                         movesLeft > 1 &&
-                        neighbor.canBeFlownOverBy(critter))
+                        neighbor.canBeFlownOverBy(critter.getCreature()))
                     {
                         set.addAll(findMoves(neighbor, critter, flies,
                                              movesLeft - 1, reverseDir,
@@ -789,7 +789,7 @@ Log.debug("Called Battle.doneReinforcing()");
             while (it.hasNext())
             {
                 Critter critter = (Critter)it.next();
-                int dam = critter.getCurrentHex().damageToCreature(critter);
+                int dam = critter.getCurrentHex().damageToCreature(critter.getCreature());
                 if (dam > 0)
                 {
                     critter.wound(dam);
@@ -903,7 +903,7 @@ Log.debug("Called Battle.doneReinforcing()");
                 if (donor != null)
                 {
                     Log.error("Null donor in Battle.cleanupOneDeadCritter()");
-                    donor.addCreature(critter, false);
+                    donor.addCreature(critter.getCreature(), false);
                     server.allTellAddCreature(donor.getMarkerId(), 
                         critter.getName());
                     // This summon doesn't count; the player can
@@ -914,7 +914,7 @@ Log.debug("Called Battle.doneReinforcing()");
             else
             {
                 // Reinforcement.
-                game.getCaretaker().putOneBack(critter);
+                game.getCaretaker().putOneBack(critter.getCreature());
                 // This recruit doesn't count.
                 legion.setRecruitName(null);
             }

@@ -151,10 +151,6 @@ public class SimpleAI implements AI
             return null;
         }
 
-        // pick the last creature in the list (which is the
-        // best/highest recruit)
-        Creature recruit = (Creature)recruits.get(recruits.size() - 1);
-
         /* 
         // graph code disabled ATM
         Creature temprecruit =
@@ -165,7 +161,7 @@ public class SimpleAI implements AI
             getBestRecruitmentPlacesNextTurn(legion, hex, recruits);
         */
 
-        Creature temprecruit4 =
+        Creature recruit =
             getVariantRecruitHint(legion, hex, recruits);
         /*
         // graph code disabled ATM
@@ -181,134 +177,10 @@ public class SimpleAI implements AI
             }
         }
         */
-
-        // take third cyclops in brush
-        if (recruit == Creature.getCreatureByName("Gorgon")
-            && recruits.contains(Creature.getCreatureByName("Cyclops"))
-            && legion.numCreature(Creature.getCreatureByName("Behemoth")) == 0
-            && legion.numCreature(Creature.getCreatureByName("Cyclops")) == 2)
-        {
-            recruit = Creature.getCreatureByName("Cyclops");
-        }
-        // take a third lion/troll if we've got at least 1 way to desert/swamp
-        // from here and we're not about to be attacked
-        else if (recruits.contains(Creature.getCreatureByName("Lion"))
-            && recruits.contains(Creature.getCreatureByName("Ranger"))
-            && legion.numCreature(Creature.getCreatureByName("Lion")) == 2
-            && getNumberOfWaysToTerrain(legion, hex, 'D') > 0)
-        {
-            recruit = Creature.getCreatureByName("Lion");
-        }
-        else if (recruits.contains(Creature.getCreatureByName("Troll"))
-            && recruits.contains(Creature.getCreatureByName("Ranger"))
-            && legion.numCreature(Creature.getCreatureByName("Troll")) == 2
-            && getNumberOfWaysToTerrain(legion, hex, 'S') > 0)
-        {
-            recruit = Creature.getCreatureByName("Troll");
-        }
-        // tower creature selection:
-        else if (recruits.contains(Creature.getCreatureByName("Ogre")) &&
-                 recruits.contains(Creature.getCreatureByName("Centaur")) &&
-                 recruits.contains(Creature.getCreatureByName("Gargoyle")) &&
-                 recruits.size() == 3)
-        {
-            // if we have 2 centaurs or ogres, take a third
-            if (legion.numCreature(Creature.getCreatureByName("Ogre")) == 2)
-            {
-                recruit = Creature.getCreatureByName("Ogre");
-            }
-            else if (legion.numCreature(
-                Creature.getCreatureByName("Centaur")) == 2)
-            {
-                recruit = Creature.getCreatureByName("Centaur");
-                // else if we have 1 of a tower creature, take a matching one
-                // if more than one tower creature is a possible recruit,
-                // take the one with the more higher-level creatures
-                // still available
-            }
-            else if ((legion.numCreature(
-                          Creature.getCreatureByName("Gargoyle")) == 1) ||
-                     (legion.numCreature(
-                          Creature.getCreatureByName("Ogre")) == 1) ||
-                     (legion.numCreature(
-                          Creature.getCreatureByName("Centaur")) == 1))
-            {
-                int cyclopsLeft = client.getCreatureCount(
-                    Creature.getCreatureByName("Cyclops"));
-                int lionLeft = client.getCreatureCount(
-                    Creature.getCreatureByName("Lion"));
-                int trollLeft = client.getCreatureCount(
-                    Creature.getCreatureByName("Troll"));
-                if (legion.numCreature(
-                        Creature.getCreatureByName("Gargoyle")) != 1)
-                { // don't take a gargoyle -> ignore cyclops
-                    cyclopsLeft = -1;
-                }
-                if (legion.numCreature(
-                        Creature.getCreatureByName("Ogre")) != 1)
-                { // don't take an ogre -> ignore troll
-                    trollLeft = -1;
-                }
-                if (legion.numCreature(
-                        Creature.getCreatureByName("Centaur")) != 1)
-                { // don't take a centaur -> ignore lion
-                    lionLeft = -1;
-                }
-                if ((cyclopsLeft >= trollLeft) && (cyclopsLeft >= lionLeft))
-                {
-                    recruit = Creature.getCreatureByName("Gargoyle");
-                }
-                else if ((trollLeft >= cyclopsLeft) && (trollLeft >= lionLeft))
-                {
-                    recruit = Creature.getCreatureByName("Ogre");
-                }
-                else if ((lionLeft >= trollLeft) && (lionLeft >= cyclopsLeft))
-                {
-                    recruit = Creature.getCreatureByName("Centaur");
-                }
-                // else if there's cyclops left and we don't have 2
-                // gargoyles, take a gargoyle
-            }
-            else if ((client.getCreatureCount(
-                          Creature.getCreatureByName("Cyclops")) > 6) &&
-                     (legion.numCreature(
-                          Creature.getCreatureByName("Gargoyle")) < 2))
-            {
-                recruit = Creature.getCreatureByName("Gargoyle");
-                // else if there's trolls left and we don't have 2 ogres,
-                // take an ogre
-            }
-            else if ((client.getCreatureCount(
-                          Creature.getCreatureByName("Troll")) > 6) &&
-                     (legion.numCreature(
-                          Creature.getCreatureByName("Ogre")) < 2))
-            {
-                recruit = Creature.getCreatureByName("Ogre");
-                // else if there's lions left and we don't have 2 lions,
-                // take a centaur
-            }
-            else if ((client.getCreatureCount(
-                          Creature.getCreatureByName("Lion")) > 6) &&
-                     (legion.numCreature(
-                          Creature.getCreatureByName("Centaur")) < 2))
-            {
-                recruit = Creature.getCreatureByName("Centaur");
-                // else we don't really care; take anything
-            }
-        }
-
-        /*
-        if (recruit != temprecruit4)
-        {
-            Log.debug("HINT: Variant Hint disagree with built-in heuristic: " +
-                      temprecruit4 + " vs. " + recruit);
-        }
-        */
         
         /* use the hinted value as the actual recruit */
-        return temprecruit4;
+        return recruit;
     }
-
 
     public void split()
     {
@@ -2692,7 +2564,8 @@ Log.debug("Best target is null, aborting");
             {
                 CritterMove cm2 = (CritterMove)moveList.get(0);
                 Log.debug("Moving " + critter.getDescription() + " to " +
-                    cm2.getEndingHexLabel());
+                    cm2.getEndingHexLabel() + " (startingHexLabel was " +
+                          startingHexLabel + ")");
                 critter.moveToHex(cm2.getEndingHexLabel());
             }
         }
@@ -2909,9 +2782,9 @@ Log.debug("Called findBattleMoves()");
             // Compute and save the value for each CritterMove.
             cm.setValue(evaluateCritterMove(critter));
             moveList.add(cm);
+            // Move the critter back where it started.
+            critter.moveToHex(critter.getStartingHexLabel());
         }
-        // Move the critter back where it started.
-        critter.moveToHex(critter.getStartingHexLabel());
 
         // Sort critter moves in descending order of score.
         Collections.sort(moveList, new Comparator()

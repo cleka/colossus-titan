@@ -277,6 +277,9 @@ public final class VariantSupport
      *  immediately after loading the variant. */ 
     public synchronized static void loadTerrainsAndRecruits()
     {
+        // remove all old stuff in the custom recruitments system
+        CustomRecruitBase.reset();
+
         try
         {
             java.util.List directories = 
@@ -386,8 +389,10 @@ public final class VariantSupport
             }
         }
         else
-        { // let's assume this is a class name, implementing HintInterface
-            Object o = ResourceLoader.getNewObject(getHintName());
+        {
+            // let's assume this is a class name, implementing HintInterface
+            Object o = ResourceLoader.getNewObject(getHintName(),
+                                                   getVarDirectoriesList());
             if ((o != null) && (o instanceof HintInterface))
             {
                 aihl = (HintInterface)o;

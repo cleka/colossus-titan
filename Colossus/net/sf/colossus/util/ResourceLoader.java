@@ -8,6 +8,7 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.*;
 import java.io.*;
 import java.util.*;
+import java.lang.reflect.*;
 
 /**
  * Class ResourceLoader is an utility class to load a resource from a filename and a list of directory.
@@ -794,18 +795,125 @@ public final class ResourceLoader
     }
 
     /** create an instance of the class whose name is in parameter. */
-    public static Object getNewObject(String className)
+    public static Object getNewObject(String className,
+                                      java.util.List directories)
     {
+        return getNewObject(className, directories, null);
+    } 
+    
+    /** create an instance of the class whose name is in parameter. Parameters
+        to the constructor are in an array. */
+    public static Object getNewObject(String className,
+                                      java.util.List directories,
+                                      Object[] parameter)
+    {
+        Class theClass = null;
         try
         {
-            Class theClass = cl.loadClass(className);
-            Object o = theClass.newInstance();
-            return o;
+            theClass = cl.loadClass(className);
         }
         catch (Exception e)
         {
-            Log.error("Loading of class \"" + className + "\" failed (" + e + ")");
+            // OK, the easy way failed. Try again, without requiring the
+            // class to be in $CLASSPATH or the JAR file.
+            /*
+             * of course all that is useless because ClassLoader::defineClass
+             * is a protected method. why didn't I notice that _before_ 
+             * writing the code ?
+             */
+            /*
+            int index = className.lastIndexOf(".");
+            if (index == -1)
+            {
+                Log.error("Loading of class \"" + className + "\" failed ("
+                          + "no dot in class name" + ")");
+                return null;
+            }
+            String shortClassName = className.substring(index);
+            InputStream classDataIS = getInputStream(shortClassName + ".class",
+                                                     directories);
+            if (classDataIS == null)
+            {
+                Log.error("Loading of class \"" + className + "\" failed ("
+                          + "couldn't create InputStream" + ")");
+                return null;
+            }
+            int l = 4096, read = 0, total = 0;
+            byte b[] = new byte[l];
+            try 
+            {
+                while (read != -1)
+                {
+                    read = classDataIS.read(b,total,l);
+                    if (read != -1)
+                    {
+                        total += read;
+                        l -= read;
+                        if (l == 0)
+                        {
+                            l = 4096;
+                            byte b2[] = new byte[total + l];
+                            for (int i = 0; i < total; i ++)
+                            {
+                                b2[i] = b[i];
+                            }
+                            b = b2;
+                        }
+                    }
+                }
+            }
+            catch (Exception e1)
+            {
+                Log.error("Loading of class \"" + className + "\" failed ("
+                          + e1 + ")");
+                return null;
+            }
+            try
+            {
+                //theClass = cl.defineClass(className, b, 0, total);
+            }
+            catch (Exception e2)
+            {
+                Log.error("Loading of class \"" + className + "\" failed ("
+                          + e2 + ")");
+            }
+            */
+            Log.error("Loading of class \"" + className + "\" failed ("
+                      + e + ")");
         }
-        return null;
+        Constructor c = null;
+        Object o = null;
+        if (parameter != null)
+        {
+            Class paramClasses[] = new Class[parameter.length];
+            for (int i = 0; i < parameter.length; i++)
+            {
+                paramClasses[i] = parameter[i].getClass();
+            }
+            try
+            {
+                c = theClass.getConstructor(paramClasses);
+            }
+            catch (Exception e)
+            {
+                Log.error("Loading of class' constructor for \"" + className +
+                          "\" failed (" + e + ")");
+                return null;
+            }
+        }
+        try
+        {
+            if (parameter != null)
+                o = c.newInstance(parameter);
+            else
+                o = theClass.newInstance();
+        }
+        catch (Exception e)
+        {
+            Log.error("Instanciation of class' constructor for \"" +
+                      className + "\" failed (" + e + ")");
+            return null;
+        }
+        return o;
     }
 }

@@ -547,7 +547,7 @@ Log.debug("Called Server.addClient() for " + playerName);
         while (it.hasNext())
         {
             IClient client = (IClient)it.next();
-            client.placeNewChit(critter.getImageName(),
+            client.placeNewChit(critter.getName(),
                 critter.getMarkerId().equals(game.getBattle().getDefenderId()),
                 critter.getTag(), critter.getCurrentHexLabel());
         }
@@ -642,7 +642,11 @@ Log.debug("Called Server.addClient() for " + playerName);
     }
 
 
-    /** Handle mustering for legion. */
+    /**
+     * Handle mustering for legion.
+     * if recruiting with nothing, recruiterName is a non-null String
+     * that contains "null".
+     */
     public void doRecruit(String markerId, String recruitName,
         String recruiterName)
     {
@@ -693,7 +697,8 @@ Log.debug("Called Server.addClient() for " + playerName);
 
         int numRecruiters = (recruiter == null ? 0 :
              TerrainRecruitLoader.numberOfRecruiterNeeded(
-             recruiter, recruit, legion.getCurrentHex().getTerrain()));
+             recruiter, recruit, legion.getCurrentHex().getTerrain(),
+             legion.getCurrentHex().getLabel()));
         String recruiterName = null;
         if (recruiter != null)
         {

@@ -21,7 +21,9 @@ import net.sf.colossus.parser.TerrainRecruitLoader;
 final class ShowAllRecruits extends KDialog implements MouseListener,
     WindowListener
 {
-    ShowAllRecruits(JFrame parentFrame, char [] terrains, Point point)
+    ShowAllRecruits(JFrame parentFrame, char [] terrains,
+                    Point point,
+                    String singleTerrainHexLabel)
     {
         super(parentFrame, "Recruits", false);
 
@@ -32,7 +34,7 @@ final class ShowAllRecruits extends KDialog implements MouseListener,
 
         for (int i = 0; i < terrains.length; i++)
         {
-            doOneTerrain(terrains[i]);
+            doOneTerrain(terrains[i], singleTerrainHexLabel);
         }
 
         pack();
@@ -47,7 +49,7 @@ final class ShowAllRecruits extends KDialog implements MouseListener,
         repaint();
     }
 
-    void doOneTerrain(char terrain)
+    void doOneTerrain(char terrain, String hexLabel)
     {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
@@ -60,7 +62,7 @@ final class ShowAllRecruits extends KDialog implements MouseListener,
         panel.add(terrainLabel);
 
         java.util.List creatures = 
-            TerrainRecruitLoader.getPossibleRecruits(terrain);
+            TerrainRecruitLoader.getPossibleRecruits(terrain, hexLabel);
         Iterator it = creatures.iterator();
         boolean firstTime = true;
         int scale = 4 * Scale.get();
@@ -78,7 +80,7 @@ final class ShowAllRecruits extends KDialog implements MouseListener,
             else
             {
                 numToRecruit = TerrainRecruitLoader.numberOfRecruiterNeeded(
-                    prevCreature, creature, terrain);
+                    prevCreature, creature, terrain, hexLabel);
             }
     
             JLabel numToRecruitLabel = new JLabel("");
@@ -90,8 +92,8 @@ final class ShowAllRecruits extends KDialog implements MouseListener,
     
             panel.add(numToRecruitLabel);
             numToRecruitLabel.addMouseListener(this);
-
-            Chit chit = new Chit(scale, creature.getImageName(), this);
+            
+            Chit chit = new Chit(scale, creature.getName(), this);
             panel.add(chit);
             chit.addMouseListener(this);
     

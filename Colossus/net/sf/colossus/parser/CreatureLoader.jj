@@ -12,6 +12,7 @@ import java.util.*;
 
 import net.sf.colossus.util.Log;
 import net.sf.colossus.server.Creature;
+import net.sf.colossus.server.VariantSupport;
 
 /**
  * CreatureLoader the creatures descriptions.
@@ -65,10 +66,12 @@ TOKEN :
 
 TOKEN :
 {
-    < CHAINE : (<CAR>)+ >
+    < SPECIALCHAINE : "Special:" (<NUMCAR>)+ >
+|   < CHAINE : <CAR> (<NUMCAR>)* >
 |   < QUOTEDCHAINE : "\"" (<QUOTEDCAR>)+ "\"" >
-|   < #CAR : ["a"-"z","A"-"Z"] >
-|   < #QUOTEDCAR : ["a"-"z","A"-"Z","0"-"9"," ","_"] >
+|   < #CAR : ["a"-"z","A"-"Z",".","_"] >
+|   < #NUMCAR : <CAR>|["0"-"9"] >
+|   < #QUOTEDCAR : <NUMCAR>|" " >
 }
 
 boolean c_bool() :
@@ -76,6 +79,15 @@ boolean c_bool() :
 {
     <BOOL>
     { if (token.image.equals("true")) return true; else return false; }
+}
+
+String c_specialchaine() :
+{}
+{
+    <SPECIALCHAINE>
+    {
+        return(new String(token.image));
+    }
 }
 
 String c_chaine() :
@@ -133,6 +145,7 @@ int oneCreature(List lc) :
     int maxCount;
     String baseColor = null;
     String s;
+    String classtouse = null;
 }
 {
     (name = c_chaine())
@@ -157,15 +170,54 @@ int oneCreature(List lc) :
     (maxCount= c_number())
     (pluralName = c_chaine())
     (baseColor = c_chaine())?
+    (classtouse = c_specialchaine())?
     {
-        lc.add(new Creature(name, power, skill, rangestrikes,
-                            flies, nativeBramble, nativeDrift,
-                            nativeBog, nativeSandDune, nativeSlope,
-                            nativeVolcano, nativeRiver, nativeStone,
-                            nativeTree,
-                            waterDwelling, magicMissile, summonable,
-                            lord, demilord, maxCount, pluralName,
-                            baseColor));
+        if (classtouse == null) // nice and easy way
+        {
+            lc.add(new Creature(name, power, skill, rangestrikes,
+                                flies, nativeBramble, nativeDrift,
+                                nativeBog, nativeSandDune, nativeSlope,
+                                nativeVolcano, nativeRiver, nativeStone,
+                                nativeTree,
+                                waterDwelling, magicMissile, summonable,
+                                lord, demilord, maxCount, pluralName,
+                                baseColor));
+        }
+        else // you want to play hard ? let's play hard.
+        {
+            // first, build an array of from the various parameter.
+            Object o[] = new Object[22];
+            o[0] = name;
+            o[1] = new Integer(power);
+            o[2] = new Integer(skill);
+            o[3] = new Boolean(rangestrikes);
+            o[4] = new Boolean(flies);
+            o[5] = new Boolean(nativeBramble);
+            o[6] = new Boolean(nativeDrift);
+            o[7] = new Boolean(nativeBog);
+            o[8] = new Boolean(nativeSandDune);
+            o[9] = new Boolean(nativeSlope);
+            o[10] = new Boolean(nativeVolcano);
+            o[11] = new Boolean(nativeRiver);
+            o[12] = new Boolean(nativeStone);
+            o[13] = new Boolean(nativeTree);
+            o[14] = new Boolean(waterDwelling);
+            o[15] = new Boolean(magicMissile);
+            o[16] = new Boolean(summonable);
+            o[17] = new Boolean(lord);
+            o[18] = new Boolean(demilord);
+            o[19] = new Integer(maxCount);
+            o[20] = pluralName;
+            o[21] = baseColor;
+            Object cre = net.sf.colossus.util.ResourceLoader.getNewObject(classtouse.substring(8), VariantSupport.getVarDirectoriesList(), o);
+            if (!(cre instanceof Creature))
+            {
+                Log.error("CUSTOM: Class " + classtouse +
+                          " cannot be used to make a Creature !");
+                return 0;
+            }
+            lc.add((Creature)cre);
+        }
         System.out.println(name + " is a " + power + " " +
                            (flies ? "*" : "") +
                            (rangestrikes ? "~" : "") + " " +

@@ -61,6 +61,8 @@ public final class Game
     /** Public only for JUnit test setup. */
     public Game()
     {
+        CustomRecruitBase.setCaretaker(caretaker);
+        CustomRecruitBase.setGame(this);
     }
 
 
@@ -645,7 +647,16 @@ public final class Game
         if (oldPhase != phase || pendingAdvancePhase ||
             !playerName.equals(getActivePlayerName()))
         {
-            Log.error("Called advancePhase illegally");
+            Log.error("Called advancePhase illegally (reason: " +
+                      (oldPhase != phase ? "oldPhase != phase, " +
+                       Constants.getBattlePhaseName(oldPhase) + " != " +
+                       Constants.getBattlePhaseName(phase) :
+                       (pendingAdvancePhase ? "pendingAdvancePhase is true " :
+                        (!playerName.equals(getActivePlayerName()) ?
+                                            "wrong player [" + playerName +
+                                            " vs. " + getActivePlayerName() + 
+                                            "]" :
+                        "UNKNOWN"))) + ")");
             return;
         }
         if (getOption(Options.autoStop) && getNumHumansRemaining() < 1)
@@ -696,6 +707,10 @@ public final class Game
                 activePlayerNum = 0;
                 turnNumber++;
             }
+
+            /* notify all CustomRecruitBase object that we change the active player, for bookkeeping purpose */
+            CustomRecruitBase.everyoneAdvanceTurn(activePlayerNum);
+
             phase = Constants.SPLIT;
             if (getActivePlayer().isDead() && getNumLivingPlayers() > 0)
             {
@@ -1313,9 +1328,17 @@ public final class Game
         else
         {
             legion = new Legion(markerId, parentId, currentHexLabel,
-                startingHexLabel, critters[0], critters[1], critters[2],
-                critters[3], critters[4], critters[5], critters[6],
-                critters[7], player.getName(), this);
+                                startingHexLabel,
+                                critters[0].getCreature(),
+                                critters[1].getCreature(),
+                                critters[2].getCreature(),
+                                critters[3].getCreature(),
+                                critters[4].getCreature(),
+                                critters[5].getCreature(),
+                                critters[6].getCreature(),
+                                critters[7].getCreature(),
+                                player.getName(),
+                                this);
             player.addLegion(legion);
         }
 
@@ -1423,9 +1446,9 @@ public final class Game
 
         recruits = new ArrayList();
         java.util.List tempRecruits = 
-            TerrainRecruitLoader.getPossibleRecruits(terrain);
+            TerrainRecruitLoader.getPossibleRecruits(terrain, hexLabel);
         java.util.List recruiters = 
-            TerrainRecruitLoader.getPossibleRecruiters(terrain);
+            TerrainRecruitLoader.getPossibleRecruiters(terrain, hexLabel);
 
         ListIterator lit = tempRecruits.listIterator();
             
@@ -1437,7 +1460,7 @@ public final class Game
             {
                 Creature lesser = (Creature)liter.next();
                 if ((TerrainRecruitLoader.numberOfRecruiterNeeded(lesser, 
-                    creature, terrain) <= legion.numCreature(lesser)) &&
+                    creature, terrain, hexLabel) <= legion.numCreature(lesser)) &&
                     (recruits.indexOf(creature) == -1))
                 {
                     recruits.add(creature);
@@ -1474,13 +1497,13 @@ public final class Game
         MasterHex hex = MasterBoard.getHexByLabel(hexLabel);
         char terrain = hex.getTerrain();
 
-        recruiters = TerrainRecruitLoader.getPossibleRecruiters(terrain);
+        recruiters = TerrainRecruitLoader.getPossibleRecruiters(terrain, hexLabel);
         Iterator it = recruiters.iterator();
         while (it.hasNext())
         {
             Creature possibleRecruiter = (Creature)it.next();
             int needed = TerrainRecruitLoader.numberOfRecruiterNeeded(
-                possibleRecruiter, recruit, terrain);
+                possibleRecruiter, recruit, terrain, hexLabel);
             if (needed < 1 || needed > legion.numCreature(possibleRecruiter))
             {
                 // Zap this possible recruiter.
@@ -1492,27 +1515,14 @@ public final class Game
     }
 
     /**
-     * Return true if every single creature in legion is eligible
-     *  to recruit this recruit in this terrain.  XXX We really should
-     *  explicitly check for "Anything" instead.
-     * And this will return false for AnyNonLord if there's a Lord
-     * in t he Legion. is that deliberate ?
+     * Return true if this legion can recruit this recruit
+     * without disclosing a recruiter.
      */
-    private boolean allCanRecruit(Legion legion, Creature recruit)
+    private boolean anonymousRecruitLegal(Legion legion, Creature recruit)
     {
-        java.util.List recruiters = findEligibleRecruiters(
-            legion.getMarkerId(), recruit.getName());
-        Iterator it = legion.getCritters().iterator();
-        while (it.hasNext())
-        {
-            Critter critter = (Critter)it.next();
-            Creature creature = critter.getCreature();
-            if (!recruiters.contains(creature))
-            {
-                return false;
-            }
-        }
-        return true;
+        return TerrainRecruitLoader.anonymousRecruitLegal(recruit,
+                                     legion.getCurrentHex().getTerrain(),
+                                     legion.getCurrentHex().getLabel());
     }
 
     /** Add recruit to legion. */
@@ -1528,8 +1538,8 @@ public final class Game
         }
         if (recruiter == null)
         {
-            // If anything can recruit here, then this is okay.
-            if (!allCanRecruit(legion, recruit))
+            // If recruiter can be anonymous, then this is okay.
+            if (!anonymousRecruitLegal(legion, recruit))
             {
                 Log.error("null recruiter in Game.doRecruit()");
                 // XXX Let it go for now  Should return later
@@ -1553,7 +1563,7 @@ public final class Game
         {
             // Mark the recruiter(s) as visible.
             numRecruiters = TerrainRecruitLoader.numberOfRecruiterNeeded(
-                recruiter, recruit, hex.getTerrain());
+                recruiter, recruit, hex.getTerrain(), hex.getLabel());
         }
 
         Log.event("Legion " + legion.getLongMarkerName() + " in " +

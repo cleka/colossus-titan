@@ -152,6 +152,7 @@ public final class Client implements IClient
         sct.start();
 
         TerrainRecruitLoader.setCaretakerInfo(caretakerInfo);
+        net.sf.colossus.server.CustomRecruitBase.addCaretakerInfo(caretakerInfo);
     }
 
     boolean isRemote()
@@ -2722,9 +2723,9 @@ Log.debug(playerName + " Client.cleanupBattle()");
         char terrain = hex.getTerrain();
 
         java.util.List tempRecruits =
-            TerrainRecruitLoader.getPossibleRecruits(terrain);
+            TerrainRecruitLoader.getPossibleRecruits(terrain, hexLabel);
         java.util.List recruiters =
-            TerrainRecruitLoader.getPossibleRecruiters(terrain);
+            TerrainRecruitLoader.getPossibleRecruiters(terrain, hexLabel);
 
         Iterator lit = tempRecruits.iterator();
         while (lit.hasNext())
@@ -2735,7 +2736,7 @@ Log.debug(playerName + " Client.cleanupBattle()");
             {
                 Creature lesser = (Creature)liter.next();
                 if ((TerrainRecruitLoader.numberOfRecruiterNeeded(lesser,
-                    creature, terrain) <= info.numCreature(lesser)) &&
+                    creature, terrain, hexLabel) <= info.numCreature(lesser)) &&
                     (recruits.indexOf(creature) == -1))
                 {
                     recruits.add(creature);
@@ -2772,13 +2773,13 @@ Log.debug(playerName + " Client.cleanupBattle()");
         MasterHex hex = MasterBoard.getHexByLabel(hexLabel);
         char terrain = hex.getTerrain();
 
-        recruiters = TerrainRecruitLoader.getPossibleRecruiters(terrain);
+        recruiters = TerrainRecruitLoader.getPossibleRecruiters(terrain, hexLabel);
         Iterator it = recruiters.iterator();
         while (it.hasNext())
         {
             Creature possibleRecruiter = (Creature)it.next();
             int needed = TerrainRecruitLoader.numberOfRecruiterNeeded(
-                possibleRecruiter, recruit, terrain);
+                possibleRecruiter, recruit, terrain, hexLabel);
             if (needed < 1 || needed > info.numCreature(possibleRecruiter))
             {
                 // Zap this possible recruiter.

@@ -22,7 +22,7 @@ public final class PlayerInfo
 
     private boolean dead;
     private String name;
-    private int tower;
+    private String tower;
     private String color;
     private String playersElim;
     private int numLegions;
@@ -37,6 +37,7 @@ public final class PlayerInfo
     PlayerInfo(Client client)
     {
         this.client = client;
+        net.sf.colossus.server.CustomRecruitBase.addPlayerInfo(this);
     }
 
 
@@ -53,8 +54,7 @@ public final class PlayerInfo
 
         name = ((String)data.get(1));
 
-        buf = ((String)data.get(2));
-        tower = Integer.parseInt(buf);
+        tower = ((String)data.get(2));
 
         color = (String)data.get(3);
 
@@ -93,7 +93,7 @@ public final class PlayerInfo
         return name;
     }
 
-    int getTower()
+    public String getTower()
     {
         return tower;
     }

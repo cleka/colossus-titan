@@ -6,6 +6,7 @@ import net.sf.colossus.client.LegionInfo;
 import net.sf.colossus.server.Creature;
 import net.sf.colossus.client.CaretakerInfo;
 import net.sf.colossus.parser.TerrainRecruitLoader;
+import net.sf.colossus.server.CustomRecruitBase;
 /**
  * Implementation of a graph dedicated to the Recruit "Tree" (it's a directed
  * graph, not a tree, as we can have cycle in theory).
@@ -194,6 +195,20 @@ public class RecruitGraph
         }
         return temp;
     }
+
+    private RecruitVertex getVertex(String cre)
+    {
+        RecruitVertex temp = (RecruitVertex)creatureToVertex.get(cre);
+
+        if (temp == null)
+        {
+            Log.debug("CUSTOM: Adding non-existant creature: " + cre +
+                      " to the graph.");
+            temp = addVertex(cre);
+        }
+        
+        return temp;
+    }
     
     private RecruitEdge addEdge(RecruitVertex src,
                                 RecruitVertex dst,
@@ -270,7 +285,7 @@ public class RecruitGraph
      */
     private List getOutgoingEdges(String cre)
     {
-        RecruitVertex temp = (RecruitVertex)creatureToVertex.get(cre);
+        RecruitVertex temp = getVertex(cre);
         return temp.getOutgoingEdges();
     }
 
@@ -281,7 +296,7 @@ public class RecruitGraph
      */
     private List getIncomingEdges(String cre)
     {
-        RecruitVertex temp = (RecruitVertex)creatureToVertex.get(cre);
+        RecruitVertex temp = getVertex(cre);
         return temp.getIncomingEdges();
     }
     
@@ -292,7 +307,7 @@ public class RecruitGraph
      */
     private List traverse(String cre)
     {
-        return traverse((RecruitVertex)creatureToVertex.get(cre),
+        return traverse(getVertex(cre),
                         new HashSet(),
                         null);
     }
@@ -304,7 +319,7 @@ public class RecruitGraph
      */
     private List traverse(String cre, LegionInfo legion)
     {
-        return traverse((RecruitVertex)creatureToVertex.get(cre),
+        return traverse(getVertex(cre),
                         new HashSet(),
                         legion);
     }
@@ -330,11 +345,17 @@ public class RecruitGraph
 
     public int numberOfRecruiterNeeded(String recruiter, 
                                        String recruit,
-                                       char terrain)
+                                       char terrain,
+                                       String hexLabel)
     {
         List allEdge = getIncomingEdges(recruit);
-        RecruitVertex source = (RecruitVertex)creatureToVertex.get(recruiter);
-        boolean isLord = Creature.getCreatureByName(recruiter).isImmortal();
+        RecruitVertex source = getVertex(recruiter);
+        Creature recruiterCre = Creature.getCreatureByName(recruiter);
+        // if the recruiter is a special such as Anything, avoid
+        // crashing with NullPointerException
+        boolean isLord = (recruiterCre == null ?
+                          false :
+                          recruiterCre.isLord());
         int minValue = 99;
         
         Iterator it = allEdge.iterator();
@@ -356,6 +377,16 @@ public class RecruitGraph
                     {
                         minValue = theEdge.getNumber();
                     }
+                }
+                if (tempSrc.getCreatureName().startsWith(TerrainRecruitLoader.Keyword_Special))
+                {
+                    CustomRecruitBase cri = TerrainRecruitLoader.getCustomRecruitBase(tempSrc.getCreatureName());
+                    int v = cri.numberOfRecruiterNeeded(recruiter,
+                                                        recruit,
+                                                        terrain,
+                                                        hexLabel);
+                    if (v < minValue)
+                        minValue = v;
                 }
             }
         }

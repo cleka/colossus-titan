@@ -23,8 +23,10 @@ class CreatureCollectionView extends KDialog implements WindowListener
     private Point location;
     private Dimension size;
 
-    /** hash by creature name to the label that displays the count */
+    /** hash by creature name to the label that displays the bottom counts */
     Map countMap = new HashMap();
+    /** hash by creature name to the label that displays the top count */
+    Map topCountMap = new HashMap();
     /** hash by creature name to the Chit (so we can cross away the dead) */
     Map chitMap = new HashMap();
     private SaveWindow saveWindow;
@@ -123,6 +125,7 @@ class CreatureCollectionView extends KDialog implements WindowListener
             label.setFont(countFont);
             topLabel.setFont(countFont);
             countMap.put(name, label);
+            topCountMap.put(name, topLabel);
             
             // jikes whines because add is defined in both JPanel and JDialog.
             this.add(topLabel, BorderLayout.NORTH);
@@ -185,13 +188,18 @@ class CreatureCollectionView extends KDialog implements WindowListener
                         chit.setDead(true);
                     }
                 }
-                else if (count == maxcount)
-                {
-                    color = "green";
-                }
                 else
                 {
-                    color = "black";
+                    Chit chit = (Chit)chitMap.get(name);
+                    chit.setDead(false);
+                    if (count == maxcount)
+                    {
+                        color = "green";
+                    }
+                    else
+                    {
+                        color = "black";
+                    }
                 }
                 String htmlCount =
                     htmlColorizeOnly((count < 10 ? "0" : "") + 
@@ -214,6 +222,8 @@ class CreatureCollectionView extends KDialog implements WindowListener
                 label.setText(htmlizeOnly(htmlCount + htmlSlash +
                                           htmlInGameCount + htmlSlash +
                                           htmlDeadCount));
+                JLabel topLabel = (JLabel)topCountMap.get(name);
+                topLabel.setText(htmlizeOnly(htmlColorizeOnly(Integer.toString(maxcount), "blue")));
             }
     
             repaint();

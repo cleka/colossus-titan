@@ -124,7 +124,7 @@ public final class Legion implements Comparable
         while (it.hasNext())
         {
             Critter critter = (Critter)it.next();
-            game.getCaretaker().takeOne(critter);
+            game.getCaretaker().takeOne(critter.getCreature());
         }
         return legion;
     }
@@ -141,7 +141,7 @@ public final class Legion implements Comparable
     }
 
 
-    int getPointValue()
+    public int getPointValue()
     {
         int pointValue = 0;
         Iterator it = critters.iterator();
@@ -154,7 +154,7 @@ public final class Legion implements Comparable
     }
 
 
-    void addPoints(int points)
+   void addPoints(int points)
     {
         if (game == null)
         {
@@ -265,13 +265,13 @@ public final class Legion implements Comparable
     }
 
 
-    String getMarkerId()
+    public String getMarkerId()
     {
         return markerId;
     }
 
 
-    String getMarkerName()
+    public String getMarkerName()
     {
         return getMarkerName(markerId);
     }
@@ -290,13 +290,13 @@ public final class Legion implements Comparable
         return sb.toString();
     }
 
-    String getLongMarkerName()
+    public String getLongMarkerName()
     {
         return getLongMarkerName(markerId);
     }
 
 
-    String getParentId()
+    public String getParentId()
     {
         return parentId;
     }
@@ -323,7 +323,12 @@ public final class Legion implements Comparable
         while (it.hasNext())
         {
             Critter critter = (Critter)it.next();
-            imageNames.add(critter.getImageName());
+            /*
+             * use getName(), not getImageName, as
+             * 1) Chit should be build with actual name to make sure they find the Creature ;
+             * 2) it seems that element in this List somehow find their way to Creature.getCreatureByName(), and if one use the Image Name in there, hell break loose.
+             */
+            imageNames.add(critter.getName());
         }
         return imageNames;
     }
@@ -365,7 +370,7 @@ public final class Legion implements Comparable
         return count;
     }
 
-    int numLords()
+    public int numLords()
     {
         int count = 0;
         Iterator it = critters.iterator();
@@ -380,7 +385,7 @@ public final class Legion implements Comparable
         return count;
     }
 
-    int numRangestrikers()
+    public int numRangestrikers()
     {
         int count = 0;
         Iterator it = critters.iterator();
@@ -395,7 +400,7 @@ public final class Legion implements Comparable
         return count;
     }
 
-    boolean hasTitan()
+    public boolean hasTitan()
     {
         Iterator it = critters.iterator();
         while (it.hasNext())
@@ -409,7 +414,7 @@ public final class Legion implements Comparable
         return false;
     }
 
-    boolean hasSummonable()
+    public boolean hasSummonable()
     {
         Iterator it = critters.iterator();
         while (it.hasNext())
@@ -424,12 +429,12 @@ public final class Legion implements Comparable
     }
 
 
-    int getHeight()
+    public int getHeight()
     {
         return critters.size();
     }
 
-    String getPlayerName()
+    public String getPlayerName()
     {
         return playerName;
     }
@@ -439,7 +444,7 @@ public final class Legion implements Comparable
         return game.getPlayerByMarkerId(markerId);
     }
 
-    boolean hasMoved()
+    public boolean hasMoved()
     {
         return moved;
     }
@@ -469,7 +474,7 @@ public final class Legion implements Comparable
         if (getHeight() > 0)
         {
             log.append("[");
-            // Return lords and demi-lords to the stacks,
+            // Return immortals to the stacks,
             // others to the Graveyard
             Iterator it = critters.iterator();
             while (it.hasNext())
@@ -482,11 +487,11 @@ public final class Legion implements Comparable
                 }
                 if (critter.isImmortal())
                 {
-                    game.getCaretaker().putOneBack(critter);
+                    game.getCaretaker().putOneBack(critter.getCreature());
                 }
                 else
                 {
-                    game.getCaretaker().putDeadOne(critter);
+                    game.getCaretaker().putDeadOne(critter.getCreature());
                 }
             }
             log.append("] ");
@@ -701,16 +706,16 @@ public final class Legion implements Comparable
     {
         Critter critter = (Critter)critters.remove(i);
 
-        // If the creature is a lord or demi-lord, put it back in the stacks.
+        // If the creature is an immortal, put it back in the stacks.
         if (returnImmortalToStack)
         {
             if(critter.isImmortal())
             {
-                game.getCaretaker().putOneBack(critter);
+                game.getCaretaker().putOneBack(critter.getCreature());
             }
             else
             {
-                game.getCaretaker().putDeadOne(critter);
+                game.getCaretaker().putDeadOne(critter.getCreature());
             }
         }
 
@@ -719,8 +724,8 @@ public final class Legion implements Comparable
         {
             remove();
         }
-
-        return critter;
+        // return a Creature, not a Critter
+        return critter.getCreature();
     }
 
 
@@ -755,20 +760,20 @@ public final class Legion implements Comparable
         {
             return null;
         }
-        // If the creature is a lord or demi-lord, put it back in the stacks,
+        // If the creature is an immortal, put it back in the stacks,
         // else put it in the Graveyard
         if (returnImmortalToStack)
         {
             if(critter.isImmortal())
             {
-                game.getCaretaker().putOneBack(critter);
+                game.getCaretaker().putOneBack(critter.getCreature());
             }
             else
             {
-                game.getCaretaker().putDeadOne(critter);
+                game.getCaretaker().putDeadOne(critter.getCreature());
             }
         }
-        return critter;
+        return critter.getCreature();
     }
 
 
@@ -873,12 +878,12 @@ public final class Legion implements Comparable
         {
             Critter critter = (Critter)it.next();
 
-            legion.addCreature(critter, false);
+            legion.addCreature(critter.getCreature(), false);
 
-            // Keep removeLegion() from returning lords to stacks.
-            if (critter.isLord())
+            // Keep removeLegion() from returning immortals to stacks.
+            if (critter.isImmortal())
             {
-                game.getCaretaker().takeOne(critter);
+                game.getCaretaker().takeOne(critter.getCreature());
             }
         }
 

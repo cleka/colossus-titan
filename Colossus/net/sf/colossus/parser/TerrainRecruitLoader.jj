@@ -13,9 +13,11 @@ import java.util.*;
 import net.sf.colossus.util.Log;
 import net.sf.colossus.util.HTMLColor;
 import net.sf.colossus.server.Creature;
+import net.sf.colossus.server.VariantSupport;
 
 import net.sf.colossus.util.RecruitGraph;
 import net.sf.colossus.client.CaretakerInfo;
+import net.sf.colossus.server.CustomRecruitBase;
 
 /**
  * TerrainRecruitLoader load the terrains and recruits descriptions.
@@ -28,6 +30,7 @@ public class TerrainRecruitLoader
     public static final String Keyword_Anything = "Anything";
     public static final String Keyword_AnyNonLord = "AnyNonLord";
     public static final String Keyword_Lord = "Lord";
+    public static final String Keyword_Special = "Special:";
 
     /**
      * Map a character (representing a terrain) to a list of recruits.
@@ -59,6 +62,9 @@ public class TerrainRecruitLoader
      * @see net.sf.colossus.parser.TerrainRecruitLoader.acquirableData
      */
     private static List acquirableList = null;
+    /** support for the custom recruiting functions ; map the class name to an
+        instance of the class. */
+    private static Hashtable nameToInstance = new Hashtable();
 
     /**
      * Representation of the Recruiting Graph (for use)
@@ -97,6 +103,7 @@ public class TerrainRecruitLoader
                     !(v2.equals(Keyword_AnyNonLord)) &&
                     !(v2.equals("Titan")) &&
                     !(v2.equals(Keyword_Lord)) &&
+                    !(v2.startsWith(Keyword_Special)) &&
                     !(tr.getNumber() < 0))
                 { // we musn't add the Edges going to non-recruitable
                     if (v1 != null)
@@ -112,15 +119,23 @@ public class TerrainRecruitLoader
                         if ((tr == tr2) || // same List, same objects
                             regularRecruit)
                         {
-                            // one can always recruit itself at one/zero level,
-                            // and also below if regularRecruit is on.
-                            if ((tr2.getNumber() > 0))
+                            // one can always recruit itself at one/zero
+                            // level, and also below if regularRecruit is on.
+                            String v3 = tr2.getName();
+                            if (!(v3.equals(Keyword_Anything)) &&
+                                !(v3.equals(Keyword_AnyNonLord)) &&
+                                !(v3.equals("Titan")) &&
+                                !(v3.equals(Keyword_Lord)) &&
+                                !(v3.startsWith(Keyword_Special)))
                             {
-                                graph.addEdge(v2, tr2.getName(), 1, t);
-                            }
-                            else if ((tr2.getNumber() == 0))
-                            {
-                                graph.addEdge(v2, tr2.getName(), 0, t);
+                                if ((tr2.getNumber() > 0))
+                                {
+                                    graph.addEdge(v2, v3, 1, t);
+                                }
+                                else if ((tr2.getNumber() == 0))
+                                {
+                                    graph.addEdge(v2, v3, 0, t);
+                                }
                             }
                         }
                         if (tr == tr2)
@@ -128,7 +143,19 @@ public class TerrainRecruitLoader
                             done = true;
                         }
                     }
-                    
+                }
+                if ((v2 != null) && v2.startsWith(Keyword_Special))
+                { // special recruitment, need to add edge between the special aned every possible recruit
+                    CustomRecruitBase cri = getCustomRecruitBase(v2);
+                    java.util.List allRecruits =
+                        cri.getAllPossibleSpecialRecruits(t);
+                    Iterator it3 = allRecruits.iterator();
+                    while (it3.hasNext())
+                    {
+                        Creature cre = (Creature)it3.next();
+                        // use 99 so no-one will rely on this
+                        graph.addEdge(v2, cre.getName(), 99, t);
+                    }
                 }
                 v1 = v2;
             }
@@ -162,6 +189,7 @@ public class TerrainRecruitLoader
         carToDisplayName.clear();
         carToColor.clear();
         carToBelow.clear();
+        nameToInstance.clear();
         graph.clear();
     }
 
@@ -216,6 +244,26 @@ public class TerrainRecruitLoader
             return("(" + number + "," + name +")");
         }
     }
+    public static CustomRecruitBase getCustomRecruitBase(String specialString)
+    {
+        CustomRecruitBase cri =
+            (CustomRecruitBase)nameToInstance.get(specialString);
+        if (cri != null)
+        {
+            return cri;
+        }
+        String className = specialString.substring(8);
+        Object o = net.sf.colossus.util.ResourceLoader.getNewObject(className,
+                                                                    VariantSupport.getVarDirectoriesList());
+        if (o == null)
+        {
+            Log.error("CustomRecruitBase doesn't exist for: " + specialString);
+            return null;
+        }
+        cri = (CustomRecruitBase)o;
+        nameToInstance.put(specialString, cri);
+        return cri;
+    }
     /**
      * Give an array of the starting creatures, those available in the first
      * turn and in the Tower.
@@ -236,7 +284,7 @@ public class TerrainRecruitLoader
     public static Creature[] getStartingCreatures(char terrain)
     {
         Creature[] bc = new Creature[3];
-        java.util.List to = getPossibleRecruits(terrain);
+        java.util.List to = getPossibleRecruits(terrain, null);
         bc[0] = (Creature)to.get(0);
         bc[1] = (Creature)to.get(1);
         bc[2] = (Creature)to.get(2);
@@ -275,7 +323,7 @@ public class TerrainRecruitLoader
      * @return List of Creatures that can be recruited in the terrain.
      * @see net.sf.colossus.server.Creature
      */
-    public static java.util.List getPossibleRecruits(char terrain)
+    public static java.util.List getPossibleRecruits(char terrain, String hexLabel)
     {
         ArrayList al = (ArrayList)carToRecruits.get(new Character(terrain));
         ArrayList re = new ArrayList();
@@ -283,12 +331,24 @@ public class TerrainRecruitLoader
         while (it.hasNext())
         {
             recruitNumber tr = (recruitNumber)it.next();
-            if ((tr.getNumber() >= 0) && !(tr.getName().equals(Keyword_Anything))
-                                      && !(tr.getName().equals(Keyword_AnyNonLord))
-                                      && !(tr.getName().equals("Titan"))
-                                      && !(tr.getName().equals(Keyword_Lord)))
+            if ((tr.getNumber() >= 0) &&
+                !(tr.getName().equals(Keyword_Anything)) &&
+                !(tr.getName().equals(Keyword_AnyNonLord)) &&
+                !(tr.getName().equals("Titan")) &&
+                !(tr.getName().equals(Keyword_Lord)) &&
+                !(tr.getName().startsWith(Keyword_Special)))
             {
                 re.add(Creature.getCreatureByName(tr.getName()));
+            }
+            if (tr.getName().startsWith(Keyword_Special))
+            {
+                CustomRecruitBase cri =
+                    getCustomRecruitBase(tr.getName());
+                if (cri != null)
+                {
+                    List temp = cri.getPossibleSpecialRecruits(terrain, hexLabel);
+                    re.addAll(temp);
+                }
             }
         }
         return(re);
@@ -299,7 +359,7 @@ public class TerrainRecruitLoader
      * @return List of Creatures that can recruit in the terrain.
      * @see net.sf.colossus.server.Creature
      */
-    public static java.util.List getPossibleRecruiters(char terrain)
+    public static java.util.List getPossibleRecruiters(char terrain, String hexLabel)
     {
         ArrayList al = (ArrayList)carToRecruits.get(new Character(terrain));
         ArrayList re = new ArrayList();
@@ -309,7 +369,8 @@ public class TerrainRecruitLoader
             recruitNumber tr = (recruitNumber)it.next();
             if (!(tr.getName().equals(Keyword_Anything)) &&
                 !(tr.getName().equals(Keyword_AnyNonLord)) &&
-                !(tr.getName().equals(Keyword_Lord)))
+                !(tr.getName().equals(Keyword_Lord)) &&
+                !(tr.getName().startsWith(Keyword_Special)))
             {
                 re.add(Creature.getCreatureByName(tr.getName()));
             }
@@ -338,57 +399,19 @@ public class TerrainRecruitLoader
                         }
                     }
                 }
-
+                if (tr.getName().startsWith(Keyword_Special))
+                {
+                    CustomRecruitBase cri =
+                        getCustomRecruitBase(tr.getName());
+                    if (cri != null)
+                    {
+                        List temp = cri.getPossibleSpecialRecruiters(terrain, hexLabel);
+                        re.addAll(temp);
+                    }
+                }
             }
         }
         return(re);
-    }
-    /**
-     * Give a modifiable list of all the possible recruiters in a terrain,
-     * including the 'Fake' ones.
-     * @param terrain Character representing a terrain.
-     * @return List of Creatures that can recruit in the terrain, including
-     * the 'Fake' ones.
-     * @see net.sf.colossus.server.Creature
-     */
-    private static java.util.List getPossibleFakeRecruiters(char terrain)
-    {
-        ArrayList al = (ArrayList)carToRecruits.get(new Character(terrain));
-        ArrayList re = new ArrayList();
-        Iterator it = al.iterator();
-        while (it.hasNext())
-        {
-            recruitNumber tr = (recruitNumber)it.next();
-            if (!(tr.getName().equals(Keyword_Anything)) &&
-                !(tr.getName().equals(Keyword_AnyNonLord)) &&
-                !(tr.getName().equals(Keyword_Lord)))
-            {
-                re.add(Creature.getCreatureByName(tr.getName()));
-            }
-            else
-            {
-                re.add(Creature.unknown);
-            }
-        }
-        return re;
-    }
-
-    public static int numberOfRecruiterNeeded(Creature recruiter, 
-                                                Creature recruit,
-                                                char terrain)
-    {
-        int g_value = graph.numberOfRecruiterNeeded(recruiter.getName(),
-                                                    recruit.getName(),
-                                                    terrain);
-        int old_value = numberOfRecruiterNeeded_OLD(recruiter,
-                                                    recruit,
-                                                    terrain);
-        if (g_value != old_value)
-        {
-            Log.error("GRAPH: Oups, problem in the graph code: it claims that in " + terrain + ", you need " + g_value + " instead of " + old_value + " " + recruiter.getName() + " to recruit " + recruit.getName());
-        }
-        
-        return g_value;
     }
 
     /**
@@ -401,74 +424,34 @@ public class TerrainRecruitLoader
      * @return Number of recruiter needed.
      * @see net.sf.colossus.server.Creature
      */
-    public static int numberOfRecruiterNeeded_OLD(Creature recruiter, 
-        Creature recruit, char terrain)
+    public static int numberOfRecruiterNeeded(Creature recruiter, 
+                                              Creature recruit,
+                                              char terrain,
+                                              String hexLabel)
     {
-        ArrayList al = (ArrayList)carToRecruits.get(new Character(terrain));
-        java.util.List pc = getPossibleRecruits(terrain);
-        java.util.List pr = getPossibleFakeRecruiters(terrain);
-        boolean regularRecruit = ((Boolean)carToBelow.get(
-                       new Character(terrain))).booleanValue();
-        int iReer = pc.indexOf(recruiter);
-        int iRe = pc.indexOf(recruit);
-        int iReerFake = pr.indexOf(recruiter);
-        int iReFake = pr.indexOf(recruit);
+        int g_value = graph.numberOfRecruiterNeeded(recruiter.getName(),
+                                                    recruit.getName(),
+                                                    terrain,
+                                                    hexLabel);
+        return g_value;
+    }
 
-        // find out what's below the recruit in the recruiters stack
-        String below = iReFake > 0 ?    
-            ((recruitNumber)al.get(iReFake - 1)).getName() : "empty";
-        
-        if (iRe == -1)
-        { // can't be recruited here
-            return 99;
+    public static boolean anonymousRecruitLegal(Creature recruit,
+                                                char terrain,
+                                                String hexLabel)
+    {
+        int g_value = graph.numberOfRecruiterNeeded(Keyword_Anything,
+                                                    recruit.getName(),
+                                                    terrain,
+                                                    hexLabel);
+        if (g_value != 0)
+        { // we really shoud ensure the caller *has* AnyNonLord...
+            g_value = graph.numberOfRecruiterNeeded(Keyword_AnyNonLord,
+                                                    recruit.getName(),
+                                                    terrain,
+                                                    hexLabel);
         }
-        if (iReer == iRe)
-        { // only one to recruit same, except if it is a 0-type recruit.
-            int num = (((recruitNumber)al.get(iReFake)).getNumber());
-            if (num > 0)
-                return 1;
-            else
-                return 0;
-        }
-        if ((iReer > iRe) && regularRecruit)
-        { // only one to recruit below if possible,
-          // except if it is a 0-type recruit.
-            int num = (((recruitNumber)al.get(iReFake)).getNumber());
-            if (num > 0)
-                return 1;
-            else
-                return 0;
-        }
-        if ((iReer != -1) && ((iReer+1) == iRe) && regularRecruit)
-        { // regular recruitments if possible
-            return (((recruitNumber)al.get(iReFake)).getNumber());
-        }
-        if ((iReer == -1) && (iRe != -1) &&
-            ((iReerFake+1) == iReFake) && regularRecruit)
-        { // regular recruitments if possible, with a non-recruitable recruiter
-            return (((recruitNumber)al.get(iReFake)).getNumber());
-        }
-        if (iReFake == 0)
-        { // first in stack, itself only (taken care of above)
-            return 99;
-        }
-
-        // First, "Anything" ; the number is needed no matter what
-        // the recruiter is
-        if (below.equals(Keyword_Anything))
-            return (((recruitNumber)al.get(iReFake)).getNumber());
-        // second, "AnyNonLord" ; the number is needed no matter what
-        // the recruiter is
-        if (below.equals(Keyword_AnyNonLord) && !recruiter.isImmortal())
-            return (((recruitNumber)al.get(iReFake)).getNumber());
-        // Third, "Lord" ; only one Lord can recruit
-        if (below.equals(Keyword_Lord) && (recruiter.isLord()))
-            return 1;
-        // Third, "Titan" ; only the Titan can recruit
-        if (below.equals("Titan") && (recruiter.isTitan()))
-            return 1;
-        // not possible to recruit, after all
-        return 99;
+        return (g_value == 0);
     }
 
     /**
@@ -732,10 +715,12 @@ TOKEN:
 
 TOKEN :
 {
-    < CHAINE : (<CAR>)+ >
+    < SPECIALCHAINE : "Special:" (<NUMCAR>)+ >
+|   < CHAINE : <CAR> (<NUMCAR>)* >
 |   < QUOTEDCHAINE : "\"" (<QUOTEDCAR>)+ "\"" >
-|   < #CAR : ["a"-"z","A"-"Z"] >
-|   < #QUOTEDCAR : ["a"-"z","A"-"Z","0"-"9"," ","_"] >
+|   < #CAR : ["a"-"z","A"-"Z",".","_"] >
+|   < #NUMCAR : <CAR>|["0"-"9"] >
+|   < #QUOTEDCAR : <NUMCAR>|" " >
 }
 
 boolean r_bool() :
@@ -756,6 +741,10 @@ String r_chaine() :
 {}
 {
     <CHAINE>
+    {
+        return(new String(token.image));
+    }
+|   <SPECIALCHAINE>
     {
         return(new String(token.image));
     }

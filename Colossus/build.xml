@@ -200,7 +200,8 @@
                        TG-ConceptIII/**,
                        TG-Wild/**,
                        Outlands/**,
-                       SmallTitan/**"
+                       SmallTitan/**,
+                       Balrog/**"
              excludes="net/sf/colossus/datatools/*.class,
                        **/*Test.class"
              />

@@ -206,7 +206,8 @@ public final class Constants
         "TG-SetIII",
         "TG-Wild",
         "TitanPlus",
-        "Undead"
+        "Undead",
+        "Balrog"
     };
 
     public static final int numVariants = variantArray.length;

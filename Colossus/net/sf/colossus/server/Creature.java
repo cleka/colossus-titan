@@ -96,7 +96,6 @@ public class Creature implements Comparable
         }
     }
 
-
     public Creature(Creature creature)
     {
         this.name = creature.name;
@@ -121,8 +120,7 @@ public class Creature implements Comparable
         this.maxCount = creature.maxCount;
         this.pluralName = creature.pluralName;
         this.baseColor = creature.baseColor;
-    }
-
+    }         
 
     /** Call immediately after loading variant, before using creatures. */
     public static void loadCreatures()
@@ -160,7 +158,6 @@ public class Creature implements Comparable
         Collections.sort(creatures);
     }
 
-
     public static java.util.List getCreatures()
     {
         return java.util.Collections.unmodifiableList(creatures);
@@ -181,17 +178,30 @@ public class Creature implements Comparable
         return lord;
     }
 
-    public boolean isImmortal()
+    public boolean isDemiLord()
     {
-        return (lord || demilord);
+        return demilord;
+    }
+
+    public boolean isLordOrDemiLord()
+    {
+        return (isLord() || isDemiLord());
+    }
+
+    public boolean isImmortal()
+    { // might not the same for derived class
+        return isLordOrDemiLord();
     }
 
     public boolean isTitan()
     {
         return name.equals(Constants.titan);
+
     }
 
-    public String getName()
+    /* the name is an unique identifier and must not be changed,
+       so this function is final */
+    public final String getName()
     {
         return name;
     }
@@ -206,6 +216,11 @@ public class Creature implements Comparable
         return name;
     }
 
+    public String getDisplayName()
+    {
+        return name;
+    }
+
     public String[] getImagesNames()
     {
         String[] tempNames;
@@ -215,11 +230,11 @@ public class Creature implements Comparable
             tempNames =
                 new String[4 + specialIncrement];
             String colorSuffix =  "-" + (noBaseColor ? "black" : baseColor);
-            tempNames[0] = name;
+            tempNames[0] = getImageName();
             tempNames[1] = "Power-" + getPower() + colorSuffix;
             
             tempNames[2] = "Skill-" + getSkill() + colorSuffix;
-            tempNames[3] = name + "-Name" + colorSuffix;
+            tempNames[3] = getDisplayName() + "-Name" + colorSuffix;
             if (specialIncrement > 0)
             {
                 tempNames[4] =
@@ -230,7 +245,7 @@ public class Creature implements Comparable
         else
         {
             tempNames = new String[1];
-            tempNames[0] = name;
+            tempNames[0] = getImageName();
         }
         return tempNames;
     }
@@ -384,6 +399,10 @@ public class Creature implements Comparable
 
     public static Creature getCreatureByName(String name)
     {
+        if (name == null)
+        {
+            throw new NullPointerException("Calling Creature.getCreatureByName() on null");
+        }
         Iterator it = creatures.iterator();
         while (it.hasNext())
         {
@@ -393,9 +412,16 @@ public class Creature implements Comparable
                 return creature;
             }
         }
+        if (!(name.equals("null")))
+        {
+            // "null" (not a null pointer...) is used for recruiter
+            // when it is anonoymous, so it is known and legal,
+            // mapped to null (a null pointer, this time).
+            Log.debug("CUSTOM: unknown creature: " + name);
+        }
         return null;
     }
-
+    
     public static boolean isCreature(String name)
     {
         Iterator it = creatures.iterator();
@@ -414,9 +440,11 @@ public class Creature implements Comparable
     {
         return name;
     }
-
-
-    /** Compare by name. */
+    
+    /**
+     * Compare by name.
+     * overloaded in Critte w/ a different semantic
+     */
     public int compareTo(Object object)
     {
         if (object instanceof Creature)

@@ -95,7 +95,7 @@ $(JARFILE): net/sf/colossus/parser/StrategicMapLoader.java \
         Default TitanPlus ExtTitan Badlands Outlands Undead \
 	Abyssal6 Abyssal9 \
 	TG-ConceptI TG-ConceptII TG-ConceptIII TG-SetII TG-SetIII TG-Wild \
-	Badlands-JDG SmallTitan version
+	Badlands-JDG SmallTitan Balrog version
 	chmod +x Colossus.jar
 
 # Sign jar file.  You need a keystore file named {your user name}Keystore

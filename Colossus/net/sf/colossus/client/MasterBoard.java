@@ -316,7 +316,7 @@ public final class MasterBoard extends JPanel
             public void actionPerformed(ActionEvent e)
             {
                 new ShowAllRecruits(masterFrame, 
-                    TerrainRecruitLoader.getTerrains(), null);
+                    TerrainRecruitLoader.getTerrains(), null, null);
             }
         };
 
@@ -328,7 +328,8 @@ public final class MasterBoard extends JPanel
                 if (hex != null)
                 {
                     char [] terrains = { hex.getTerrain() };
-                    new ShowAllRecruits(masterFrame, terrains, lastPoint);
+                    new ShowAllRecruits(masterFrame, terrains, lastPoint,
+                                        hex.getLabel());
                 }
             }
         };
