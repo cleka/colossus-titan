@@ -1,1 +1,1 @@
-java -jar Colossus.jar %1 %2 %3 %4 %5 %6 %7 %8 %9
+java -Xmx64M -jar Colossus.jar %1 %2 %3 %4 %5 %6 %7 %8 %9
