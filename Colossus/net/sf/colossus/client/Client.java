@@ -1313,6 +1313,11 @@ Log.debug("Called Client.removeLegion() for " + id);
     }
 
 
+    String getMoverId()
+    {
+        return moverId;
+    }
+
     void setMoverId(String moverId)
     {
         this.moverId = moverId;

@@ -1757,9 +1757,17 @@ public final class MasterBoard extends JPanel
                 break;
 
             case Constants.MOVE:
-                client.setMoverId(markerId);
-                getGUIHexByLabel(hexLabel).repaint();
-                highlightMoves(markerId);
+                // Allow spin cycle by clicking on chit again.
+                if (markerId.equals(client.getMoverId()))
+                {
+                    actOnHex(hexLabel);
+                }
+                else
+                {
+                    client.setMoverId(markerId);
+                    getGUIHexByLabel(hexLabel).repaint();
+                    highlightMoves(markerId);
+                }
                 break;
 
             case Constants.FIGHT:
