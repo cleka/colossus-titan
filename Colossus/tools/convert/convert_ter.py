@@ -49,7 +49,7 @@ class Acquirable:
     def __str__(self):
         s = '<acquirable name="%s" points="%s"' % (self.name, self.points)
         if self.terrain:
-            s += '" terrain="%s"' % self.terrain
+            s += ' terrain="%s"' % self.terrain
         s += ' />' 
         return s
 
