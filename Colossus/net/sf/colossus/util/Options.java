@@ -124,8 +124,8 @@ public final class Options
     public void saveOptions()
     {
         // Don't save from temporary player names.
-        if (owner.equals(Constants.byColor) || 
-            owner.equals(Constants.byClient))
+        if (owner.startsWith(Constants.byColor) || 
+            owner.startsWith(Constants.byClient))
         {
             return;
         }

@@ -165,7 +165,7 @@ Log.debug("Called Server.addLocalClient() for " + playerName);
     }
 
 
-    void addClient(final IClient client, final String playerName, 
+    synchronized void addClient(final IClient client, final String playerName,
         final boolean remote)
     {
 Log.debug("Called Server.addClient() for " + playerName);

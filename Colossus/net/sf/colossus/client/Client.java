@@ -257,6 +257,8 @@ public final class Client implements IClient
 
     void rescaleAllWindows()
     {
+        clearRecruitChits();
+
         if (statusScreen != null)
         {
             statusScreen.rescale();

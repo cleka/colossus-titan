@@ -68,9 +68,17 @@ public final class LogWindow extends JTextArea
     public void append(String s)
     {
         super.append(s);
+        scrollToEnd();
+    }
+
+
+    void scrollToEnd()
+    {
         JScrollBar vert = scrollPane.getVerticalScrollBar();
         vert.setValue(vert.getMaximum());
+        repaint();
     }
+
 
     public Dimension getMinimumSize()
     {
