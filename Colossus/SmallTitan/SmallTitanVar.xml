@@ -4,5 +4,5 @@
     <creatures filename="DefaultCre.xml" />
     <terrain_recruits filename="DefaultTer.xml" />
     <max_players num="3" />
-    <hint classname="Default.DefaultHint" />
+    <hint classname="SmallTitan.SmallTitanHint" />
 </variant>
