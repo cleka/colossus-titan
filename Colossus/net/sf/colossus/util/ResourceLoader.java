@@ -122,7 +122,7 @@ public final class ResourceLoader
         }
         catch (Exception e)
         {
-            Log.debug("Couldn't load class \"org.apache.batik.transcoder.image.ImageTranscoder\", assuming batik (and SVG files) not avilable.");
+            Log.debug("Couldn't load class \"org.apache.batik.transcoder.image.ImageTranscoder\", assuming batik (and SVG files) not available.");
         }
     }
 
