@@ -12,7 +12,8 @@ import javax.swing.*;
 
 public class KDialog extends JDialog implements MouseListener, WindowListener
 {
-    JComponent newContentPane = null;
+    private JComponent newContentPane = null;
+    protected JLabel label;
 
     /** Only support one of JDialog's many constructor forms. */    
     public KDialog (Frame owner, String title, boolean modal)
@@ -30,7 +31,7 @@ public class KDialog extends JDialog implements MouseListener, WindowListener
 
         if (title != null && title.length() > 0)
         {
-            JLabel label = new JLabel(title);
+            label = new JLabel(title);
             cont.add(label, BorderLayout.NORTH);
         }
         cont.add(newContentPane, BorderLayout.CENTER);

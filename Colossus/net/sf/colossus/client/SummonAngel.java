@@ -27,13 +27,20 @@ final class SummonAngel extends KDialog implements MouseListener,
     private JButton cancelButton;
     private static boolean active;
     private Client client;
-
+    private static final String baseSummonString =
+        ": Summon Angel into Legion ";
+    private static final String sourceSummonString = 
+        "<p>Selected Legion is ";
+    private static final String noSourceSummonString =
+        "<p>No selected Legion";
 
     private SummonAngel(Client client, String markerId)
     {
-        super(client.getBoard().getFrame(), client.getPlayerName() +
-            ": Summon Angel into Legion " + Legion.getLongMarkerName(markerId),
-            false);
+        super(client.getBoard().getFrame(),
+              "<html>" + client.getPlayerName() +
+              baseSummonString + Legion.getLongMarkerName(markerId) +
+              noSourceSummonString + "</html>",
+              false);
 
         this.client = client;
         this.markerId = markerId;
@@ -123,6 +130,7 @@ Log.debug("returning new SummonAngel dialog for " + markerId);
         {
             return;
         }
+
         Object source = e.getSource();
         java.util.Iterator it = sumChitList.iterator();
         boolean done = false;
@@ -141,15 +149,26 @@ Log.debug("returning new SummonAngel dialog for " + markerId);
     {
         cleanup(null, null);
     }
-
-
+    
     /** Upstate state of angel and archangel chits to reflect donor */
     void updateChits()
     {
         String donorId = client.getDonorId();
         if (donorId == null)
         {
+            label.setText("<html>" + client.getPlayerName() +
+                          baseSummonString +
+                          Legion.getLongMarkerName(markerId) +
+                          noSourceSummonString + "</html>");
             return;
+        }
+        else
+        {
+            label.setText("<html>" + client.getPlayerName() +
+                          baseSummonString +
+                          Legion.getLongMarkerName(markerId) +
+                          sourceSummonString +
+                          Legion.getLongMarkerName(donorId) + "</html>");
         }
         java.util.Iterator it = sumChitList.iterator();
         while (it.hasNext())
@@ -158,7 +177,7 @@ Log.debug("returning new SummonAngel dialog for " + markerId);
             c.setDead(!client.donorHas(c.getId()));
         }
     }
-
+    
     public void actionPerformed(ActionEvent e)
     {
         if (e.getActionCommand().equals("Cancel"))
