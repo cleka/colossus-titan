@@ -499,6 +499,8 @@ public final class GUIMasterHex extends MasterHex
             // to look more like the 'regular' Titan Masterboard
             // need to give theta the proper value,
             // depending where on the masterboard we are.
+            // Disabled, as not only the theta is computed wrong,
+            // But it looks ugly (the destination rectangle is wrong too)
 
             int width = overlay.getWidth(board);
             int height = overlay.getHeight(board);
@@ -506,9 +508,13 @@ public final class GUIMasterHex extends MasterHex
                                                  BufferedImage.TYPE_INT_ARGB);
             Graphics2D biContext = bi.createGraphics();
             biContext.drawImage(overlay, 0, 0, null);
+            double theta =
+                theta = ((getLabelSide() + (isInverted() ? 3 : 0)) % 6) *
+                Math.PI / 3.;
             
-            double theta = 0;;
-            AffineTransform at = AffineTransform.getRotateInstance(theta);
+            AffineTransform at = AffineTransform.getRotateInstance(theta,
+                                                                   width / 2,
+                                                                   height / 2);
             AffineTransformOp ato = new AffineTransformOp(at,
                                         AffineTransformOp.TYPE_BILINEAR);
             BufferedImage bi2 = ato.createCompatibleDestImage(bi, null);
