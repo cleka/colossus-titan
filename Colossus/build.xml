@@ -82,7 +82,7 @@
         <javamake debug="yes" deprecation="yes" target="1.4" srcdir="."
                 includes="**/*.java"
                 excludes="**/datatools/*.java">
-			<classpath refid="project.class.path"/>
+            <classpath refid="project.class.path"/>
         </javamake>
 </target>
 
@@ -90,7 +90,7 @@
         description = "Compile all .java files to .class files using javamake">
         <javamake debug="yes" deprecation="yes" target="1.4" srcdir="."
                 includes="**/*.java">
-			<classpath refid="project.class.path"/>
+            <classpath refid="project.class.path"/>
         </javamake>
 </target>
 
@@ -99,7 +99,7 @@
 <target name="test" depends="compile,jar"
         description = "Run all unit tests using JUnit">
         <junit printsummary="yes" fork="no" haltonfailure="no">
-				<classpath refid="project.class.path"/>
+            <classpath refid="project.class.path"/>
                 <formatter type="plain"/>
                 <test name="net.sf.colossus.server.DiceTest"/>
                 <test name="net.sf.colossus.util.CombosTest"/>
@@ -341,7 +341,7 @@
 
 <target name="changelog" depends=""
         description = "Create a ChangeLog file from cvs history">
-        <exec executable="cvs2cl.pl" os="Linux,SunOS">
+        <exec executable="cvs2cl.pl">
             <arg line="-S --no-wrap --utc"/>
         </exec>
         <delete verbose="yes" file = "ChangeLog.bak"/>
@@ -378,51 +378,36 @@
         <move file="${ZIPFILE}" todir="${DOWNLOAD_DIR}"/>
         <copy file="ChangeLog" todir="${HTML_DIR}"/>
         <copy todir="${DOCS_DIR}"> <fileset dir="docs"/></copy>
-        <delete>
-                <fileset dir="${DOWNLOAD_DIR}" includes = "1_LATEST_IS_*"/>
-        </delete>
-        <touch file="${DOWNLOAD_DIR}/1_LATEST_IS_${DSTAMP}"/>
 </target>
 
 <!-- TODO Eliminate double maintenance -->
-<!-- TODO Do not copy unchanged files -->
-<!-- XXX libs/*.jar is not copied -->
-<!-- This requires a good ssh-agent setup. -->
+<!-- This requires rsync and a good ssh-agent setup. -->
 <target name="remote-inst" depends="init,sign,dist,changelog"
-        description = "scp files into htdocs tree on SF">
-        <exec executable="scp" os="Linux,SunOS">
-            <arg line="Colossus.jar ${SERVER}:${HTML_DIR}"/>
+        description = "copy files into htdocs tree on SF">
+        <exec executable="rsync">
+            <arg line="-e ssh Colossus.jar ${SERVER}:${HTML_DIR}"/>
         </exec>
-        <exec executable="scp" os="Linux,SunOS">
-            <arg line="Colossus.jnlp ${SERVER}:${HTML_DIR}"/>
+        <exec executable="rsync">
+            <arg line="-e ssh Colossus.jnlp ${SERVER}:${HTML_DIR}"/>
         </exec>
-        <exec executable="ssh" os="Linux,SunOS">
+        <exec executable="ssh">
             <arg line="${SERVER} mkdir ${LIBS_DIR}"/>
         </exec>
-
-        <exec executable="scp" os="Linux,SunOS">
-            <arg line="ChangeLog ${SERVER}:${HTML_DIR}"/>
+        <exec executable="rsync">
+            <arg line="-e ssh -pt libs/ ${SERVER}:${LIBS_DIR}"/>
         </exec>
-        <exec executable="scp" os="Linux,SunOS">
-            <arg line="${ZIPFILE} ${SERVER}:${DOWNLOAD_DIR}"/>
+        <exec executable="rsync">
+            <arg line="-e ssh ChangeLog ${SERVER}:${HTML_DIR}"/>
         </exec>
-        <exec executable="ssh" os="Linux,SunOS">
+        <exec executable="rsync">
+            <arg line="-e ssh ${ZIPFILE} ${SERVER}:${DOWNLOAD_DIR}"/>
+        </exec>
+        <exec executable="ssh">
             <arg line="${SERVER} mkdir ${DOCS_DIR}"/>
         </exec>
-        <exec executable="scp" os="Linux,SunOS">
-            <arg line="-pr docs/ ${SERVER}:${HTML_DIR}"/>
-        </exec>
-        <delete>
-                <fileset dir="${DOWNLOAD_DIR}" includes = "1_LATEST_IS_*"/>
-        </delete>
-        <exec executable="ssh" os="Linux,SunOS">
-            <arg line="${SERVER} rm ${DOWNLOAD_DIR}/1_LATEST_IS_*"/>
-        </exec>
-        <touch file="${DOWNLOAD_DIR}/1_LATEST_IS_${DSTAMP}"/>
-        <exec executable="scp" os="Linux,SunOS">
-            <arg line="${DOWNLOAD_DIR}/1_LATEST_IS_${DSTAMP} ${SERVER}:${DOWNLOAD_DIR}"/>
+        <exec executable="rsync">
+            <arg line="-e ssh -pt docs/* ${SERVER}:${DOCS_DIR}"/>
         </exec>
 </target>
-
 
 </project>
