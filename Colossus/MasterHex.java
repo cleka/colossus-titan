@@ -1050,7 +1050,7 @@ class MasterHex extends Hex
 
     public boolean canEnterViaSide(int side)
     {
-        if (0 <= side && side < 5)
+        if (0 <= side && side < 6)
         {
             return entrySide[side];
         }
