@@ -787,8 +787,8 @@ Log.debug("Called Battle.doneReinforcing()");
                 if (dam > 0)
                 {
                     critter.wound(dam);
-                    Log.event(critter.getName() + " takes Hex damage");
-                    server.allTellDriftDamageResults(critter, dam);
+                    Log.event(critter.getDescription() + " takes Hex damage");
+                    server.allTellHexDamageResults(critter, dam);
                 }
             }
         }

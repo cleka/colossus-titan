@@ -924,7 +924,7 @@ Log.debug("Called Server.addClient() for " + playerName);
     }
 
     
-    synchronized void allTellDriftDamageResults(Critter target, int damage)
+    synchronized void allTellHexDamageResults(Critter target, int damage)
     {
         this.target = target;
         this.damage = damage;
@@ -933,8 +933,8 @@ Log.debug("Called Server.addClient() for " + playerName);
         while (it.hasNext())
         {
             IClient client = (IClient)it.next();
-            client.tellStrikeResults(-1, target.getTag(), 0, null, damage, 
-                target.isDead(), false, 0, null);
+            client.tellStrikeResults(Constants.hexDamage, target.getTag(), 
+                0, null, damage, target.isDead(), false, 0, null);
         }
     }
 

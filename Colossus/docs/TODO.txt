@@ -7,36 +7,10 @@ Big picture:
 5. Improve AI.  (Group battle moves.)
 
 
-Bug: Failing LOSTest -- problems with slopes and cliffs.
-
-Bug: AI needs to set donor, enter angel when summoning into battle.
-
 Bug: Need to detect failed AI battle moves and fall back to next choice.
 
-Bug?: Attacking, conceded to AI after map up but before entering, and
-   AI did not reinforce.  Check rules.
-
-Bug: Concede dialog has top legion skewed slightly to right of bottom legion.
-
-Bug: Hang after illegal carry attempt.
-Battle phase advances to Fight
-Angel takes Hex damage
-Called ai.strike() for Bu02
-Best target is Warbear in E4
-Best attacker is Troll in E3
-From client Blue: strike ~ 72 ~ A1
-Titan in B1 strikes Angel in Drift hex A1 with strike number 4 : 225351: 2 hits
-Called ai.strike() for Bu02
-Best target is Warbear in E4
-Best attacker is Troll in E3
-From client Blue: strike ~ 99 ~ E4
-added carry target Ogre in Plains hex D4
-Troll in E3 strikes Warbear in Drift hex E4 with strike number 5 : 41266524: 3 hits
-1 carry available
-From client Blue: strike ~ 99 ~ E4
-Removed extra strike2() call for Troll in Plains hex E3
-From client Blue: applyCarries ~ D4
-Warn: Tried illegal carry to Ogre in Plains hex D4
+Bug: If variant loading fails due to a missing variant, need to make sure 
+   that both the server cfg file and the variant pane get reset to "Default"
 
 
 When getting both a PickRecruit and an AcquireAngel after a battle,
@@ -109,12 +83,6 @@ Add SetupBattle dialog, to allow setting up standalone battles.
 
 Add a ShowLegionMarkers window that shows each player's remaining 
    legion markers.
-
-Show StatusScreen and ShowLegion info in the masterboard window, rather 
-   than in separate windows.
-
-Special-case less fear of initial 8-high enemy legions, to make AI move
-   both legions out of tower in turn 1.
 
 Improve mapping of terrain types, creature nativity, and creature
    recruiting potential so that the AI can easily take these into

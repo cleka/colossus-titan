@@ -47,11 +47,8 @@ final class Concede extends KDialog implements ActionListener, WindowListener
 
         setBackground(Color.lightGray);
 
-        int relativeHeight = client.getLegionHeight(allyMarkerId) - 
-            client.getLegionHeight(enemyMarkerId);
-
-        showLegion(allyMarkerId, -relativeHeight);
-        showLegion(enemyMarkerId, relativeHeight);
+        showLegion(allyMarkerId);
+        showLegion(enemyMarkerId);
 
         JPanel buttonPane = new JPanel();
         contentPane.add(buttonPane);
@@ -88,9 +85,10 @@ final class Concede extends KDialog implements ActionListener, WindowListener
     }
 
 
-    private void showLegion(String markerId, int spacers)
+    private void showLegion(String markerId)
     {
         JPanel pane = new JPanel();
+        pane.setLayout(new BoxLayout(pane, BoxLayout.X_AXIS));
         pane.setAlignmentX(0);
         getContentPane().add(pane);
 
@@ -107,12 +105,6 @@ final class Concede extends KDialog implements ActionListener, WindowListener
             String imageName = (String)it.next();
             Chit chit = new Chit(scale, imageName, this);
             pane.add(chit);
-        }
-
-        // XXX Add chit-sized invisible spacers.
-        for (int i = 0; i < spacers; i++)
-        {
-            pane.add(Box.createRigidArea(new Dimension(scale, scale)));
         }
     }
 

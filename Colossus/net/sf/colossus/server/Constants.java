@@ -57,6 +57,9 @@ public final class Constants
     public static final int BIGNUM = 99;
     public static final int OUT_OF_RANGE = 5;
 
+    /** Fake striker id for drift and other hex damage. */
+    public static final int hexDamage = -1;
+
     // Angel-summoning states
     public static final int NO_KILLS = 0;
     public static final int FIRST_BLOOD = 1;
@@ -163,23 +166,24 @@ public final class Constants
     public static final String quit = "Quit";
 
 
-    /** Available internal variants */
+    /** Available internal variants  Try to keep this list mostly
+     *  alphabetized for easier searching, with Default at the top. */
     public static final String [] variantArray =
     {
         "Default",
-        "TitanPlus",
-        "ExtTitan", 
         "Badlands",
         "Badlands-JDG",
+        "ExtTitan", 
         "Outlands",
-        "Undead",
-        "TG-SetII",
-        "TG-SetIII",
+        "SmallTitan",
         "TG-ConceptI",
         "TG-ConceptII",
         "TG-ConceptIII",
+        "TG-SetII",
+        "TG-SetIII",
         "TG-Wild",
-        "SmallTitan"
+        "TitanPlus",
+        "Undead"
     };
 
     public static final int numVariants = variantArray.length;

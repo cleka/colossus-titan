@@ -51,37 +51,8 @@ final class Negotiate extends KDialog implements MouseListener, ActionListener
 
         int scale = 4 * Scale.get();
 
-        JPanel attackerPane = new JPanel();
-        contentPane.add(attackerPane);
-
-        attackerMarker = new Marker(scale, attackerId, this, client);
-        attackerPane.add(attackerMarker);
-
-        Iterator it = client.getLegionImageNames(attackerId).iterator();
-        while (it.hasNext())
-        {
-            String imageName = (String)it.next();
-            Chit chit = new Chit(scale, imageName, this);
-            attackerChits.add(chit);
-            attackerPane.add(chit);
-            chit.addMouseListener(this);
-        }
-
-        JPanel defenderPane = new JPanel();
-        contentPane.add(defenderPane);
-
-        defenderMarker = new Marker(scale, defenderId, this, client);
-        defenderPane.add(defenderMarker);
-
-        it = client.getLegionImageNames(defenderId).iterator();
-        while (it.hasNext())
-        {
-            String imageName = (String)it.next();
-            Chit chit = new Chit(scale, imageName, this);
-            defenderChits.add(chit);
-            defenderPane.add(chit);
-            chit.addMouseListener(this);
-        }
+        showLegion(attackerId, attackerChits);
+        showLegion(defenderId, defenderChits);
 
         JButton button1 = new JButton("Offer");
         button1.setMnemonic(KeyEvent.VK_O);
@@ -111,6 +82,32 @@ final class Negotiate extends KDialog implements MouseListener, ActionListener
         }
         setVisible(true);
         repaint();
+    }
+
+
+    private void showLegion(String markerId, java.util.List chits)
+    {
+        JPanel pane = new JPanel();
+        pane.setLayout(new BoxLayout(pane, BoxLayout.X_AXIS));
+        pane.setAlignmentX(0);
+        getContentPane().add(pane);
+
+        int scale = 4 * Scale.get();
+
+        Marker marker = new Marker(scale, markerId, this, client);
+        pane.add(marker);
+        pane.add(Box.createRigidArea(new Dimension(scale / 4, 0)));
+
+        java.util.List imageNames = client.getLegionImageNames(markerId);
+        Iterator it = imageNames.iterator();
+        while (it.hasNext())
+        {
+            String imageName = (String)it.next();
+            Chit chit = new Chit(scale, imageName, this);
+            chit.addMouseListener(this);
+            chits.add(chit);
+            pane.add(chit);
+        }
     }
 
 

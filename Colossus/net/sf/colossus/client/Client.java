@@ -754,6 +754,7 @@ public final class Client implements IClient
     /** Called from BattleMap to leave carry mode. */
     void leaveCarryMode()
     {
+Log.debug(playerName + " Called Client.leaveCarryMode()");
         server.leaveCarryMode();
         doAutoStrikes(); 
     }
@@ -1566,7 +1567,11 @@ Log.debug("Client.tellStrikeResults() " + strikerTag + " " + targetTag + " " + s
             }
         }
 
-        if (carryDamageLeft >= 1 && !carryTargetDescriptions.isEmpty())
+        if (strikerTag == Constants.hexDamage)
+        {
+            // Do not trigger auto strikes in parallel with setupBattleFight()
+        }
+        else if (carryDamageLeft >= 1 && !carryTargetDescriptions.isEmpty())
         {
             pickCarries(carryDamageLeft, carryTargetDescriptions);
         }

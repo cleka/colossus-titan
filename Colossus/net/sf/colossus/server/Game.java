@@ -690,14 +690,14 @@ Log.debug("Called Game.newGame2()");
         switch (remaining)
         {
             case 0:
-                Log.event("Draw");
+                Log.event("Game over -- Draw");
                 server.allTellGameOver("Draw");
                 setGameOver(true);
                 break;
 
             case 1:
                 String winnerName = getWinner().getName();
-                Log.event(winnerName + " wins");
+                Log.event("Game over -- " + winnerName + " wins");
                 server.allTellGameOver(winnerName + " wins");
                 setGameOver(true);
                 break;
@@ -2741,6 +2741,8 @@ Log.debug("Calling Game.reinforce() from Game.finishBattle()");
 
             int points = loser.getPointValue();
 
+            Player losingPlayer = loser.getPlayer();
+
             // Remove the losing legion.
             loser.remove();
 
@@ -2755,7 +2757,7 @@ Log.debug("Calling Game.reinforce() from Game.finishBattle()");
             // points to the victor.
             if (loser.hasTitan())
             {
-                loser.getPlayer().die(winner.getPlayerName(), true);
+                losingPlayer.die(winner.getPlayerName(), true);
             }
 
             if (winner == defender)

@@ -558,7 +558,10 @@ public final class Legion implements Comparable
     void remove()
     {
         prepareToRemove();
-        getPlayer().getLegions().remove(this);
+        if (getPlayer() != null)
+        {
+            getPlayer().getLegions().remove(this);
+        }
     }
 
 
