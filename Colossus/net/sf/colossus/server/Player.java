@@ -953,25 +953,6 @@ public final class Player implements Comparable
         return null;
     }
 
-/* XXX Move to client side
-    String aiPickColor(Set colors)
-    {
-        // Convert favorite colors from a comma-separated string to a list.
-        String favorites = game.getServer().getClientStringOption(name,
-            Options.favoriteColors);
-        List favoriteColors = null;
-        if (favorites != null)
-        {
-            favoriteColors = Split.split(',', favorites);
-        }
-        else
-        {
-            favoriteColors = new ArrayList();
-        }
-        return ai.pickColor(colors, favoriteColors);
-    }
-*/
-
     // XXX Need to not allow colons in player names.
     /** Return a colon:separated string with a bunch of info for
      *  the status screen. */

@@ -295,39 +295,6 @@ public final class Game
         nextPickColor();
     }
 
-/* XXX  Move to client side
-    private void pickPlayerColor(int i, String type, Set colorsLeft)
-    {
-        Player player = (Player)players.get(i);
-        if (player.isNone())
-        {
-            return;
-        }
-        if (player.isHuman() && (!type.endsWith("Human")))
-        {
-            return;
-        }
-        if (player.isAI() && (type.endsWith("Human")))
-        {
-            return;
-        }
-
-        String playerName = player.getName();
-        String color;
-        do
-        {
-            if (server.getClientOption(i, Options.autoPickColor))
-            {
-                color = player.aiPickColor(colorsLeft);
-            }
-            else
-            {
-                color = server.pickColor(i, colorsLeft);
-            }
-        }
-        while (color == null);
-    }
-*/
 
     private void newGame2()
     {
