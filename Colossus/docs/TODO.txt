@@ -16,7 +16,7 @@ Error: dripton illegally called leaveCarryMode()
 From client dripton: doneWithStrikes
 
 Bug: Complete modal lockup of defender (human network client) battlemap 
-   window (only) at beginning of game.
+   window (only) at beginning of battle, after both legions placed onboard.
 
 Bug: Chat window went modal and started beeping.  Killing it from the
    Graphics menu worked.
@@ -30,6 +30,18 @@ Phase advances to Fight
 in kickEngagements() summoning=false reinforcing=true acquiring=false
 0 engagements left
 From client Blue: engage ~ null
+
+Bug: Hang during AI engagement phase, Win98/1.4.0  
+Timing problem between removeLegion(), acquire, kickEngagements() ?
+Called ai.strike() for Gd02
+Best target is null, aborting
+From client Gold: doneWithStrikes
+Red earns 82.0 points
+From client Red: acquireAngel ~ Rd02 ~ Angel
+Legion Rd02 (Eagle) acquires one Angel
+Red earns 50.2 points
+in kickEngagements() summoning=false reinforcing=false acquiring=false
+Legion Gd01(Caduceus) [Wyvern, Ranger, Troll, Troll, Troll, Ranger] is eliminated
 
 Bug: Hang during AI split phase:
 Black's turn, number 35
@@ -55,6 +67,27 @@ Phase advances to Muster
 Gold's turn, number 17
 From client Brown: doneWithEngagements
 Error: Brown illegally called doneWithEngagements()
+
+Bug: 2-high titan stack did not run away even though it could be caught
+   on 4-6 by a 6-high stack:
+Gold rolls a 4 for movement
+considering risk of leaving Gd01 in Brush hex 109
+got enemies that can attack on a 1 :[Rd04]
+got enemies that can attack on a 2 :[Rd04, Rd11]
+got enemies that can attack on a 3 :[Rd04, Rd11]
+got enemies that can attack on a 4 :[Rd02, Rd04, Rd11]
+got enemies that can attack on a 5 :[Rd01, Rd02, Rd04, Rd11]
+got enemies that can attack on a 6 :[Rd01, Rd02, Rd04, Rd11]
+EVAL Gd01 stay in Brush hex 109 = 0
+considering risk of moving Gd01 to Plains hex 105
+got enemies that can attack on a 5 :[Bu03]
+got enemies that can attack on a 6 :[Bu03]
+EVAL Gd01 move to Plains hex 105 = 0
+
+
+Bug: Sometimes Need to manually resize caretaker to see all creatures.
+Caretaker Titan has excess "Titan" at top, obscured by image.  Use
+   black 6-4 titan instead?
 
 Unify command-line argument processing on client and server sides.
 

@@ -77,9 +77,10 @@ Log.debug("About to create server socket on port " + port);
         }
         catch (IOException ex)
         {
+            Log.error("Could not create socket. Configure networking in OS.");
             Log.error(ex.toString());
             ex.printStackTrace();
-            return;
+            System.exit(1);
         }
         createLocalClients();
 

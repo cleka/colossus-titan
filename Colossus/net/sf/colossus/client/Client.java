@@ -1958,6 +1958,7 @@ Log.debug(playerName + " Client.cleanupBattle()");
     public void setupSplit(Set markersAvailable, String activePlayerName,
         int turnNumber)
     {
+Log.debug(playerName + " called setupSplit");
         cleanupNegotiationDialogs();
 
         this.activePlayerName = activePlayerName;

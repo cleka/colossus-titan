@@ -95,6 +95,24 @@ public final class PredictSplits
             return (CreatureInfoList)Collections.unmodifiableList(list);
         }
 
+        Node getOtherChild(Node child)
+        {
+            Node otherChild = null;
+            if (child == child1)
+            {
+                otherChild = child2;
+            }
+            else if (child == child2)
+            {
+                otherChild = child1;
+            }
+            else
+            {
+                Log.error("Node.tellChildContents() Not my child");
+            }
+            return otherChild;
+        }
+
         List getCreatureNames()
         {
             List list = new ArrayList();
@@ -293,20 +311,7 @@ public final class PredictSplits
          *  other child and/or its parent something. */
         void tellChildContents(Node child)
         {
-            Node otherChild = null;
-            if (child == child1)
-            {
-                otherChild = child2;
-            }
-            else if (child == child2)
-            {
-                otherChild = child1;
-            }
-            else
-            {
-                Log.error("Node.tellChildContents() Not my child");
-                return;
-            }
+            Node otherChild = getOtherChild(child);
 
             // All child creatures that were there at the time of the
             // split should be in this node as well.  If not, then
@@ -315,11 +320,19 @@ public final class PredictSplits
             if (!creatures.contains(child.getAtSplitCreatures()))
             {
 Log.debug("Adjusting parent node " + markerId);
-
-// TODO
+                if (parent == null)
+                {
+                    Log.error("Had root legion contents wrong " + markerId);
+                    return;
+                }
+                // TODO Re-predict this node's parent's split
 
             }
-
+            else
+            {
+                // TODO We might still need to adjust this legion's split.
+            }
+            // TODO Mark child's known contents as certain in this node.
         }
 
 
