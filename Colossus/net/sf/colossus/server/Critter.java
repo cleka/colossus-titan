@@ -961,9 +961,11 @@ final class Critter /* extends Creature */ implements Comparable
 
     public int getPointValue()
     {
-        return creature.getPointValue();
+        // Must use our local, Titan-aware GetPower()
+        // return creature.getPointValue();
+        return getPower() * getSkill();
     }
-
+    
     public int getHintedRecruitmentValue()
     {
         return creature.getHintedRecruitmentValue();

@@ -262,6 +262,10 @@ public class Creature implements Comparable
 
     public int getPointValue()
     {
+        if (isTitan())
+        {
+            Log.warn("Calling getPointValue() on Titan Creature (should only be called on Titan Critter)");
+        }
         return getPower() * getSkill();
     }
 

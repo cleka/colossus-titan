@@ -356,6 +356,9 @@ public class RecruitGraph
         boolean isLord = (recruiterCre == null ?
                           false :
                           recruiterCre.isLord());
+        boolean isDemiLord = (recruiterCre == null ?
+                          false :
+                          recruiterCre.isDemiLord());
         int minValue = 99;
         
         Iterator it = allEdge.iterator();
@@ -368,7 +371,9 @@ public class RecruitGraph
                 if ((source == tempSrc) ||
                     (tempSrc.getCreatureName().equals(
                          TerrainRecruitLoader.Keyword_Anything)) ||
-                    ((!isLord) && (tempSrc.getCreatureName().equals(
+                    ((!isLord) &&
+                     (!isDemiLord) &&
+                     (tempSrc.getCreatureName().equals(
                          TerrainRecruitLoader.Keyword_AnyNonLord))) ||
                     ((isLord) && (tempSrc.getCreatureName().equals(
                          TerrainRecruitLoader.Keyword_Lord))))
