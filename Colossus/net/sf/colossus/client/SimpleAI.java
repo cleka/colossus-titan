@@ -1876,7 +1876,7 @@ public class SimpleAI implements AI
             //Log.debug("ORACLE: count is " + count);
             return count;
         }
-        public boolean otherStackHasCreature(java.util.List allNames)
+        public boolean otherFriendlyStackHasCreature(java.util.List allNames)
         {
             java.util.List all = client.getFriendlyLegions(client.getPlayerName());
 

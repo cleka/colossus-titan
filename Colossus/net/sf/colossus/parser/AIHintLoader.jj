@@ -255,11 +255,11 @@ public class AIHintLoader
         }
     }
 
-    private class ConditionTreeNode_OtherStackHasCreature extends ConditionTreeNode_Leaf
+    private class ConditionTreeNode_OtherFriendlyStackHasCreature extends ConditionTreeNode_Leaf
     {
         java.util.List allNames;
 
-        public ConditionTreeNode_OtherStackHasCreature(java.util.List allNames)
+        public ConditionTreeNode_OtherFriendlyStackHasCreature(java.util.List allNames)
         {
             super();
             this.allNames = allNames;
@@ -269,14 +269,14 @@ public class AIHintLoader
         {
             if (oracle != null)
             {
-                return oracle.otherStackHasCreature(allNames);
+                return oracle.otherFriendlyStackHasCreature(allNames);
             }
             return false;
         }
 
         public String toString()
         {
-            return "( another stack has " + allNames + ")";
+            return "( anotherfriendly stack has " + allNames + ")";
         }
     }
 
@@ -676,7 +676,7 @@ TOKEN :
 |   < LABELIS : "LABELIS" >
 |   < AVAILABLE : "AVAILABLE" >
 |   < ALLATTACKERSMALLERTHAN : "ALLATTACKERSMALLERTHAN" >
-|   < OTHERSTACKHASCREATURE : "OTHERSTACKHASCREATURE" >
+|   < OTHERFRIENDLYSTACKHASCREATURE : "OTHERFRIENDLYSTACKHASCREATURE" >
 |   < RANDOM : "RANDOM" >
 |   < OR : "OR" >
 |   < AND : "AND" >
@@ -878,9 +878,9 @@ void h_recruit_leaf() :
     {
         argStack.push(new ConditionTreeNode_AllAttackerSmallerThan(n));
     }
-|   <OTHERSTACKHASCREATURE> (name = h_chaine() { allNames.add(name); } )+
+|   <OTHERFRIENDLYSTACKHASCREATURE> (name = h_chaine() { allNames.add(name); } )+
     {
-        argStack.push(new ConditionTreeNode_OtherStackHasCreature(allNames));
+        argStack.push(new ConditionTreeNode_OtherFriendlyStackHasCreature(allNames));
     }
 |   "(" h_recruit_ornode() ")"
 }
