@@ -509,7 +509,7 @@ public final class ResourceLoader
         if (data == null)
         {
             Log.warn("getInputStreamFromString:: " +
-                      " Cant't create InputStream from null String");
+                      " Can't create InputStream from null String");
             return null;
         }
         return new ByteArrayInputStream(data.getBytes());
@@ -525,7 +525,7 @@ public final class ResourceLoader
         if (data == null)
         {
             Log.warn("getInputStreamFromBytes:: " +
-                      " Cant't create InputStream from null byte array");
+                      " Can't create InputStream from null byte array");
             return null;
         }
         return new ByteArrayInputStream(data);
