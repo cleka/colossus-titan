@@ -33,6 +33,8 @@ public class RationalAI implements AI
     protected boolean I_HATE_HUMANS = false;
     private List legionsToSplit = new ArrayList();
     private Map[] enemyAttackMap;
+    private Map evaluateMoveMap = new HashMap();
+
 
     public RationalAI(Client client)
     {
@@ -181,8 +183,9 @@ public class RationalAI implements AI
 
     public boolean split()
     {
-        // Refresh this once per turn.
+        // Refresh these once per turn.
         enemyAttackMap = buildEnemyAttackMap(client.getPlayerInfo());
+        evaluateMoveMap.clear();
 
         legionsToSplit.clear();
 
@@ -1762,11 +1765,34 @@ public class RationalAI implements AI
         return value;
     }
 
+    /** Memoizing wrapper for evaluateMoveInner */
+    private int evaluateMove(LegionInfo legion, MasterHex hex,
+        int canRecruitHere, int depth, boolean addHexRisk)
+    {
+        String sep = "~";
+        String key = "" + legion + sep + hex + sep + canRecruitHere + sep + 
+            depth + sep + addHexRisk;
+        int score;
+        Integer val;
+        if (evaluateMoveMap.containsKey(key))
+        {
+            val = (Integer)evaluateMoveMap.get(key);
+            score = val.intValue();
+        }
+        else
+        {
+            score = evaluateMoveInner(legion, hex, canRecruitHere, depth, 
+                addHexRisk);
+            val = new Integer(score);
+            evaluateMoveMap.put(key, val);
+        }
+        return score;
+    }
+
     // cheap, inaccurate evaluation function.  Returns an expected value for
     // moving this legion to this hex.  The value defines a distance
     // metric over the set of all possible moves.
-    // TODO: Can we memoize this?
-    int evaluateMove(LegionInfo legion, MasterHex hex,
+    private int evaluateMoveInner(LegionInfo legion, MasterHex hex,
         int canRecruitHere, int depth, boolean addHexRisk)
     {
         // evaluateHexAttack includes recruit value
@@ -1804,7 +1830,6 @@ public class RationalAI implements AI
             {
                 return (int)value;
             }
-
         }
 
         // squares that are further away are more likely to be blocked
