@@ -454,10 +454,14 @@ public final class Server
     void askAcquireAngel(String playerName, String markerId, List recruits)
     {
 Log.debug("Called Server.askAcquireAngel()");
-        Client client = getClient(playerName);
-        if (client != null)
+        Legion legion = game.getLegionByMarkerId(markerId);
+        if (legion.getHeight() < 7)
         {
-            client.askAcquireAngel(markerId, recruits);
+            Client client = getClient(playerName);
+            if (client != null)
+            {
+                client.askAcquireAngel(markerId, recruits);
+            }
         }
     }
 

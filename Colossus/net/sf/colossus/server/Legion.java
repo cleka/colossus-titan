@@ -315,13 +315,21 @@ final class Legion implements Comparable
         }
         else
         {
-            Creature angel = Creature.getCreatureByName(angelType);
-            if (angel != null)
+            if (getHeight() >= 7)
             {
-                addCreature(angel, true);
-                Log.event("Legion " + getLongMarkerName() + " acquires an " + 
-                          angelType);
-                game.getServer().allTellAddCreature(getMarkerId(), angelType);
+                Log.event("Legion " + getLongMarkerName() +
+                          " if full and cannot acquire: " + angelType);
+            }
+            else
+            {
+                Creature angel = Creature.getCreatureByName(angelType);
+                if (angel != null)
+                {
+                    addCreature(angel, true);
+                    Log.event("Legion " + getLongMarkerName() +
+                              " acquires an " + angelType);
+                    game.getServer().allTellAddCreature(getMarkerId(), angelType);
+                }
             }
         }
         angelsToAcquire--;
