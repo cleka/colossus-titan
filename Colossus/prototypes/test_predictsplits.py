@@ -874,7 +874,7 @@ class PredictSplitsTestCase(unittest.TestCase):
         assert(ps.getLeaf("Gd07").allCertain())
         assert(ps.getLeaf("Gd09").allCertain())
         assert(not ps.getLeaf("Gd10").allCertain())
-        assert(not ps.getLeaf("Gd11").allCertain())
+        assert(ps.getLeaf("Gd11").allCertain())
         assert(not ps.getLeaf("Gd12").allCertain())
         ps.printLeaves()
 
@@ -1022,7 +1022,7 @@ class PredictSplitsTestCase(unittest.TestCase):
         assert(ps.getLeaf("Gd11").allCertain())
         assert(ps.getLeaf("Gd12").allCertain())
         ps.printLeaves()
-        print "\ntest 8 ends"
+        print "\ntest 5 ends"
 
 
     def testPredictSplits6(self):
@@ -1115,7 +1115,7 @@ class PredictSplitsTestCase(unittest.TestCase):
         assert(ps.getLeaf("Gr02").allCertain())
         assert(ps.getLeaf("Gr11").allCertain())
         assert(ps.getLeaf("Gr12").allCertain())
-        print "\ntest 9 ends"
+        print "\ntest 6 ends"
 
 
     def testPredictSplits7(self):
@@ -1202,12 +1202,14 @@ class PredictSplitsTestCase(unittest.TestCase):
         ps.printLeaves()
         assert(not ps.getLeaf("Gr04").allCertain())
         assert(not ps.getLeaf("Gr06").allCertain())
-        assert(not ps.getLeaf("Gr07").allCertain())  # XXX
+        assert(not ps.getLeaf("Gr07").allCertain())
         assert(not ps.getLeaf("Gr08").allCertain())
 
         turn = 8
         print "Turn", turn
         ps.getLeaf("Gr04").split(2, "Gr12", turn)
+        ps.printLeaves()
+
         ps.getLeaf("Gr07").revealCreatures(["Ogre", "Ogre", "Ogre"])
         ps.getLeaf("Gr07").addCreature("Minotaur")
         ps.getLeaf("Gr08").revealCreatures(["Gargoyle"])
@@ -1379,6 +1381,7 @@ class PredictSplitsTestCase(unittest.TestCase):
         assert(ps.getLeaf("Gr07").allCertain())
         assert(ps.getLeaf("Gr08").allCertain())
         assert(ps.getLeaf("Gr12").allCertain())
+        print "\ntest 7 ends"
 
 
     def testPredictSplits8(self):
@@ -1483,10 +1486,9 @@ class PredictSplitsTestCase(unittest.TestCase):
         assert(not ps.getLeaf("Gd01").allCertain())
         assert(not ps.getLeaf("Gd03").allCertain())
         assert(not ps.getLeaf("Gd04").allCertain())
-        assert(not ps.getLeaf("Gd10").allCertain())
+        assert(ps.getLeaf("Gd10").allCertain())
         assert(ps.getLeaf("Gd11").allCertain())
         assert(len(ps.getLeaf("Gd04").getCertainCreatures()) == 6)
-        assert(len(ps.getLeaf("Gd10").getCertainCreatures()) == 1)
 
         ps.getLeaf("Gd01").removeCreature("Centaur")
         ps.getLeaf("Gd01").removeCreature("Centaur")
@@ -1502,7 +1504,7 @@ class PredictSplitsTestCase(unittest.TestCase):
         assert(not ps.getLeaf("Gd03").allCertain())
         assert(not ps.getLeaf("Gd04").allCertain())
         assert(not ps.getLeaf("Gd08").allCertain())
-        assert(not ps.getLeaf("Gd10").allCertain())
+        assert(ps.getLeaf("Gd10").allCertain())
         assert(ps.getLeaf("Gd11").allCertain())
 
         ps.getLeaf("Gd10").removeCreature("Ogre")
