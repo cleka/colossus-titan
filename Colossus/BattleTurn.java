@@ -55,6 +55,7 @@ class BattleTurn extends Dialog implements ActionListener
 
         if (turnNumber == 4 && defender.canRecruit())
         {
+System.out.println("recruiting time");
             // Allow recruiting a reinforcement.
             new PickRecruit(map, defender);
 
@@ -70,12 +71,16 @@ class BattleTurn extends Dialog implements ActionListener
     
     void setupSummonDialog()
     {
+System.out.println("setupSummonDialog");
         removeAll();
         setTitle(getActivePlayer().getName() + " Turn " + turnNumber);
         setLayout(new GridLayout(0, 1));
-        add(new Label(getActivePlayer().getName() + " : Recruit"));
+        add(new Label(getActivePlayer().getName() + " : Summon"));
 
-        if (map.getSummonState() == BattleMap.FIRST_BLOOD)
+        int summonState = map.getSummonState();
+System.out.println("summonState = " + summonState);
+
+        if (summonState == BattleMap.FIRST_BLOOD)
         {
             if (attacker.getHeight() < 7 &&
                 attacker.getPlayer().canSummonAngel())
@@ -90,7 +95,12 @@ System.out.println("SummonAngel");
 
         if (summonAngel == null)
         {
+System.out.println("summonAngel is null");
             advancePhase();
+        }
+        else
+        {
+System.out.println("summonAngel is not null");
         }
     }
 
@@ -98,7 +108,7 @@ System.out.println("SummonAngel");
     // This is called from MasterBoard after the SummonAngel finishes.
     void finishSummoningAngel()
     {
-System.out.println("finishSummoningAngel");
+System.out.println("BattleTurn.finishSummoningAngel");
         if (attacker.summoned())
         {
 System.out.println("placeNewChit");
@@ -209,6 +219,7 @@ System.out.println("placeNewChit");
 
     void advancePhase()
     {
+System.out.println("entering advancePhase() with phase " + phase);
         if (phase == SUMMON)
         {
             phase = MOVE;
@@ -244,48 +255,49 @@ System.out.println("placeNewChit");
 
         else if (phase == STRIKEBACK)
         {
+System.out.println("Calling removeDeadChits");
             map.removeDeadChits();
 
             // Make sure the battle isn't over before continuing.
-            if (attacker.getHeight() < 1 || defender.getHeight() < 1)
+            if (attacker.getHeight() >= 1 && defender.getHeight() >= 1)
             {
-                return;
-            }
-
-            if (activeLegion == attacker)
-            {
-                phase = SUMMON;
-                setupSummonDialog();
-            }
-            else
-            {
-                turnNumber++;
-                if (turnNumber > 7)
+                if (activeLegion == attacker)
                 {
-                    // Time loss.  Attacker is eliminated but defender
-                    //    gets no points.
-                    if (attacker.numCreature(Creature.titan) != 0)
-                    {
-                        // This is the attacker's titan stack, so the defender 
-                        // gets his markers plus half points for his unengaged 
-                        // legions.
-                        Player player = attacker.getPlayer();
-                        attacker.removeLegion();
-                        player.die(defender.getPlayer());
-                    }
-                    else
-                    {
-                        attacker.removeLegion();
-                    }
-                    map.cleanup();
+                    phase = SUMMON;
+                    setupSummonDialog();
                 }
                 else
                 {
-                    phase = RECRUIT;
-                    setupRecruitDialog();
+                    turnNumber++;
+System.out.println("Now turn " + turnNumber);
+                    if (turnNumber > 7)
+                    {
+                        // Time loss.  Attacker is eliminated but defender
+                        //    gets no points.
+                        if (attacker.numCreature(Creature.titan) != 0)
+                        {
+                            // This is the attacker's titan stack, so the 
+                            // defender gets his markers plus half points for 
+                            // his unengaged legions.
+                            Player player = attacker.getPlayer();
+                            attacker.removeLegion();
+                            player.die(defender.getPlayer());
+                        }
+                        else
+                        {
+                            attacker.removeLegion();
+                        }
+                        map.cleanup();
+                    }
+                    else
+                    {
+                        phase = RECRUIT;
+                        setupRecruitDialog();
+                    }
                 }
             }
         }
+System.out.println("leaving advancePhase() with phase " + phase);
     }
 
 
