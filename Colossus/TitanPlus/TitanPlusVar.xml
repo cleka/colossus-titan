@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<variant name="TitanPlus">
+    <strategic_map filename="DefaultMap.xml" />
+    <terrain_recruits filename="TitanPlusTer.xml" />
+    <creatures filename="TitanPlusCre.xml" />
+    <hint classname="TitanPlus.TitanPlusHint" />
+</variant>
