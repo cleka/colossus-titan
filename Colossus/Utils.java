@@ -8,7 +8,7 @@ import java.util.*;
 public final class Utils
 {
     /** Split the string into a list of substrings delimited by sep. */
-    public static List split(final char sep, String s)
+    public static ArrayList split(final char sep, String s)
     {
         ArrayList list = new ArrayList();
 

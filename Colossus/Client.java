@@ -52,6 +52,9 @@ public final class Client
     /** Player who owns this client. */
     String playerName;
 
+    /** Last movement roll for any player. */
+    private int movementRoll = -1;
+
 
     /** Temporary constructor. */
     public Client(Server server, String playerName)
@@ -256,8 +259,14 @@ public final class Client
     /** Legion summoner summons unit from legion donor. */
     boolean summon(String summoner, String donor, String unit)
     {
-        return false;
+        boolean status = server.doSummon(summoner, donor, unit);
+        board.repaint();
+        summonAngel = null;
+        board.highlightEngagements();
+
+        return status;
     }
+
 
     /** Legion acquires an angel or archangel. */
     boolean acquire(String legion, String unit)
@@ -338,6 +347,7 @@ public final class Client
 
     public void showMovementRoll(int roll)
     {
+        movementRoll = roll;
         if (movementDie == null || roll != movementDie.getLastRoll())
         {
             initMovementDie(roll);
@@ -351,6 +361,7 @@ public final class Client
 
     private void initMovementDie(int roll)
     {
+        movementRoll = roll;
         if (board != null)
         {
             movementDie = new MovementDie(4 * Scale.get(), 
@@ -406,7 +417,7 @@ public final class Client
         // Side effects
         if (name.equals(Options.showStatusScreen))
         {
-            updateStatusScreen();
+            updateStatusScreen(server.getPlayerInfo());
         }
         else if (name.equals(Options.antialias))
         {
@@ -490,18 +501,18 @@ public final class Client
     }
 
 
-    public void updateStatusScreen()
+    public void updateStatusScreen(String [] playerInfo)
     {
         if (getOption(Options.showStatusScreen))
         {
             if (statusScreen != null)
             {
-                statusScreen.updateStatusScreen();
+                statusScreen.updateStatusScreen(playerInfo);
             }
             else
             {
-                statusScreen = new StatusScreen(board.getFrame(), this, 
-                    server.getGame());
+                statusScreen = new StatusScreen(board.getFrame(), this,
+                    playerInfo);
             }
         }
         else
@@ -676,12 +687,7 @@ public final class Client
     // TODO Cache legion heights on client side?
     public int getLegionHeight(String markerId)
     {
-        Legion legion = server.getGame().getLegionByMarkerId(markerId);
-        if (legion != null)
-        {
-            return legion.getHeight();
-        }
-        return 0;
+        return server.getLegionHeight(markerId);
     }
 
     /** Add the marker to the end of the list.  If it's already
@@ -891,12 +897,6 @@ public final class Client
         this.map = map;
     }
 
-    /** Don't use this. */
-    public Game getGame()
-    {
-        return server.getGame();
-    }
-
 
     public String getPlayerName()
     {
@@ -914,31 +914,27 @@ public final class Client
         return summonAngel;
     }
 
+    // XXX Remove direct legion reference.
     public void createSummonAngel(Legion legion)
     {
         board.deiconify();
-        summonAngel = SummonAngel.summonAngel(this, legion);
+        summonAngel = SummonAngel.summonAngel(this, legion.getMarkerId(),
+            legion.getLongMarkerName());
     }
 
-    public void doSummon(Legion legion, Legion donor, Creature angel)
+    public String getDonorId()
     {
-        server.getGame().doSummon(legion, donor, angel);
+        return server.getDonorId(playerName);
+    }
 
-        if (legion != null)
-        {
-            String hexLabel = legion.getCurrentHexLabel();
-            GUIMasterHex hex = board.getGUIHexByLabel(hexLabel);
-            hex.repaint();
-        }
-        if (donor != null)
-        {
-            String hexLabel = donor.getCurrentHexLabel();
-            GUIMasterHex hex = board.getGUIHexByLabel(hexLabel);
-            hex.repaint();
-        }
+    public boolean donorHasAngel()
+    {
+        return server.donorHasAngel(playerName);
+    }
 
-        summonAngel = null;
-        board.highlightEngagements();
+    public boolean donorHasArchangel()
+    {
+        return server.donorHasArchangel(playerName);
     }
 
 
@@ -968,9 +964,12 @@ public final class Client
     }
 
 
+    // XXX Remove direct legion reference
     public String splitLegion(Legion legion, String selectedMarkerId)
     {
-        return SplitLegion.splitLegion(this, legion, selectedMarkerId);
+        return SplitLegion.splitLegion(this, legion.getMarkerId(), 
+            legion.getLongMarkerName(), selectedMarkerId, 
+            legion.getImageNames(true));
     }
 
 
@@ -1038,12 +1037,15 @@ public final class Client
     }
 
 
-    public int pickEntrySide(String hexLabel, Legion legion)
+    public int pickEntrySide(String hexLabel, boolean left, boolean bottom,
+        boolean right)
     {
-        return PickEntrySide.pickEntrySide(board.getFrame(), hexLabel, legion);
+        return PickEntrySide.pickEntrySide(board.getFrame(), hexLabel, left,
+            bottom, right);
     }
 
 
+    // XXX Remove direct legion reference
     /** Assumes this is not an AI client and board is not null. */
     public String pickLord(Legion legion)
     {
@@ -1074,16 +1076,10 @@ public final class Client
     {
         if (summonAngel != null)
         {
-            Player player = server.getGame().getPlayer(playerName);
-            Legion donor = server.getGame().getFirstFriendlyLegion(
-                hexLabel, player);
-            if (donor != null)
-            {
-                player.setDonor(donor);
-                summonAngel.updateChits();
-                summonAngel.repaint();
-                getMarker(donor.getMarkerId()).repaint();
-            }
+            server.setDonor(hexLabel);
+            summonAngel.updateChits();
+            summonAngel.repaint();
+            getMarker(server.getDonorId(playerName)).repaint();
         }
         else
         {
@@ -1092,15 +1088,24 @@ public final class Client
     }
 
 
-    public boolean askFlee(Legion defender, Legion attacker)
+    public boolean askConcede(String longMarkerName, String hexDescription,
+        String allyImageName, java.util.List allyImageNames, String
+        enemyImageName, java.util.List enemyImageNames)
     {
-        return Concede.flee(this, board.getFrame(), defender, attacker);
+        return Concede.concede(this, board.getFrame(), longMarkerName,
+            hexDescription, allyImageName, allyImageNames,
+            enemyImageName, enemyImageNames);
     }
 
-    public boolean askConcede(Legion ally, Legion enemy)
+    public boolean askFlee(String longMarkerName, String hexDescription,
+        String allyImageName, java.util.List allyImageNames, String
+        enemyImageName, java.util.List enemyImageNames)
     {
-        return Concede.concede(this, board.getFrame(), ally, enemy);
+        return Concede.flee(this, board.getFrame(), longMarkerName,
+            hexDescription, allyImageName, allyImageNames,
+            enemyImageName, enemyImageNames);
     }
+
 
     public void askNegotiate(Legion attacker, Legion defender)
     {
@@ -1377,10 +1382,16 @@ public final class Client
         }
     }
 
+    // XXX remove direct Player ref.
     public String getColor()
     {
         Player player = server.getGame().getPlayer(playerName);
         return player.getColor();
+    }
+
+    public String getShortColor()
+    {
+        return Player.getShortColor(getColor());
     }
 
 
@@ -1543,10 +1554,9 @@ public final class Client
         return server.getGame().getLegionByMarkerId(markerId);
     }
 
-    /** XXX temp */
-    public Player getActivePlayer()
+    public int getActivePlayerNum()
     {
-        return server.getGame().getActivePlayer();
+        return server.getGame().getActivePlayerNum();
     }
 
     /** XXX temp */
@@ -1696,5 +1706,15 @@ public final class Client
     public Creature[] getStartingCreatures()
     {
         return server.getStartingCreatures();
+    }
+
+    public int getMovementRoll()
+    {
+        return movementRoll;
+    }
+
+    public int getMulligansLeft()
+    {
+        return server.getMulligansLeft(playerName);
     }
 }

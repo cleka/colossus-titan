@@ -98,6 +98,7 @@ Teleport bug not fixed?  Try to reproduce.
 
 Negotiation is broken and disabled.
 
+Red battle hex highlighting clashes with volcano.
 
 
 

@@ -1,6 +1,7 @@
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
+import java.util.*;
 
 
 /**
@@ -23,28 +24,23 @@ public final class StatusScreen extends JDialog implements WindowListener
     private JLabel [] scoreLabel;
 
     private Client client;
-    private Game game;
 
     private static Point location;
     private static Dimension size;
 
 
-    // TODO Should not take a direct Game reference, since that may contain
-    // privileged information.
-    public StatusScreen(JFrame frame, Client client, Game game)
+    public StatusScreen(JFrame frame, Client client, String [] playerInfo)
     {
         super(frame, "Game Status");
 
         setVisible(false);
         this.client = client;
-        this.game = game;
+        int numPlayers = playerInfo.length;
 
         addWindowListener(this);
 
         Container contentPane = getContentPane();
         contentPane.setLayout(new GridLayout(9, 0));
-
-        int numPlayers = game.getNumPlayers();
 
         nameLabel = new JLabel[numPlayers];
         towerLabel = new JLabel[numPlayers];
@@ -128,7 +124,7 @@ public final class StatusScreen extends JDialog implements WindowListener
             contentPane.add(scoreLabel[i]);
         }
 
-        updateStatusScreen();
+        updateStatusScreen(playerInfo);
 
         pack();
 
@@ -166,17 +162,18 @@ public final class StatusScreen extends JDialog implements WindowListener
     }
 
 
-    public void updateStatusScreen()
+    public void updateStatusScreen(String [] playerInfo)
     {
-        for (int i = 0; i < game.getNumPlayers(); i++)
+        for (int i = 0; i < playerInfo.length; i++)
         {
-            Player player = game.getPlayer(i);
+            ArrayList data = Utils.split(':', playerInfo[i]);
+
             Color color;
-            if (player.isDead())
+            if ("true".equals((String)data.get(0)))
             {
                 color = Color.red;
             }
-            else if (game.getActivePlayerNum() == i)
+            else if (client.getActivePlayerNum() == i)
             {
                 color = Color.yellow;
             }
@@ -186,17 +183,15 @@ public final class StatusScreen extends JDialog implements WindowListener
             }
             setPlayerLabelBackground(i, color);
 
-            nameLabel[i].setText(player.getName());
-            towerLabel[i].setText(String.valueOf(100 * player.getTower()));
-            colorLabel[i].setText(player.getColor());
-            elimLabel[i].setText(player.getPlayersElim());
-            legionsLabel[i].setText(String.valueOf(player.getNumLegions()));
-            markersLabel[i].setText(String.valueOf(
-                player.getNumMarkersAvailable()));
-            creaturesLabel[i].setText(String.valueOf(
-                player.getNumCreatures()));
-            titanLabel[i].setText(String.valueOf(player.getTitanPower()));
-            scoreLabel[i].setText(String.valueOf(player.getScore()));
+            nameLabel[i].setText((String)data.get(1));
+            towerLabel[i].setText((String)data.get(2));
+            colorLabel[i].setText((String)data.get(3));
+            elimLabel[i].setText((String)data.get(4));
+            legionsLabel[i].setText((String)data.get(5));
+            markersLabel[i].setText((String)data.get(6));
+            creaturesLabel[i].setText((String)data.get(7));
+            titanLabel[i].setText((String)data.get(8));
+            scoreLabel[i].setText((String)data.get(9));
         }
 
         repaint();

@@ -75,7 +75,7 @@ public final class Server
         while (it.hasNext())
         {
             Client client = (Client)it.next();
-            client.updateStatusScreen();
+            client.updateStatusScreen(getPlayerInfo());
         }
     }
 
@@ -616,6 +616,14 @@ public final class Server
         client.createSummonAngel(legion);
     }
 
+    public boolean doSummon(String markerId, String donorId, String angel)
+    {
+        Legion legion = game.getLegionByMarkerId(markerId);
+        Legion donor = game.getLegionByMarkerId(donorId);
+        Creature creature = Creature.getCreatureByName(angel);
+        return game.doSummon(legion, donor, creature);
+    }
+
 
     /** Called from Game. */
     String pickRecruit(Legion legion)
@@ -678,14 +686,17 @@ public final class Server
     }
 
 
-    public int pickEntrySide(String hexLabel, Legion legion)
+    int pickEntrySide(String hexLabel, Legion legion)
     {
         Client client = getClient(legion.getPlayerName());
-        return client.pickEntrySide(hexLabel, legion);
+        return client.pickEntrySide(hexLabel, 
+            legion.canEnterViaSide(hexLabel, 5),
+            legion.canEnterViaSide(hexLabel, 3),
+            legion.canEnterViaSide(hexLabel, 1));
     }
 
 
-    public String pickLord(Legion legion)
+    String pickLord(Legion legion)
     {
         Client client = getClient(legion.getPlayerName());
         return client.pickLord(legion);
@@ -698,17 +709,22 @@ public final class Server
     }
 
 
-    public boolean askFlee(Legion defender, Legion attacker)
-    {
-        Client client = getClient(defender.getPlayerName());
-        return client.askFlee(defender, attacker);
-    }
-
-
-    public boolean askConcede(Legion ally, Legion enemy)
+    boolean askConcede(Legion ally, Legion enemy)
     {
         Client client = getClient(ally.getPlayerName());
-        return client.askConcede(ally, enemy);
+        return client.askConcede(ally.getLongMarkerName(),
+            ally.getCurrentHex().getDescription(), ally.getMarkerId(),
+            ally.getImageNames(true), enemy.getMarkerId(), 
+            enemy.getImageNames(true));
+    }
+
+    boolean askFlee(Legion ally, Legion enemy)
+    {
+        Client client = getClient(ally.getPlayerName());
+        return client.askFlee(ally.getLongMarkerName(),
+            ally.getCurrentHex().getDescription(), ally.getMarkerId(),
+            ally.getImageNames(true), enemy.getMarkerId(), 
+            enemy.getImageNames(true));
     }
 
 
@@ -1149,5 +1165,90 @@ public final class Server
     public Creature [] getStartingCreatures()
     {
         return game.getStartingCreatures();
+    }
+
+    public int getMulligansLeft(String playerName)
+    {
+        Player player = game.getPlayer(playerName);
+        return player.getMulligansLeft();
+    }
+
+    public void setDonor(String hexLabel)
+    {
+        Player player = game.getActivePlayer();
+        Legion donor = game.getFirstFriendlyLegion(hexLabel, player);
+        if (donor != null)
+        {
+            player.setDonor(donor);
+        }
+    }
+
+    public String getDonorId(String playerName)
+    {
+        Player player = game.getPlayer(playerName);
+        Legion donor = player.getDonor();
+        if (donor != null)
+        {
+            return donor.getMarkerId();
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+    public boolean donorHasAngel(String playerName)
+    {
+        Player player = game.getPlayer(playerName);
+        Legion donor = player.getDonor();
+        if (donor != null)
+        {
+            return (donor.numCreature(Creature.getCreatureByName("Angel")) 
+                >= 1);
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    public boolean donorHasArchangel(String playerName)
+    {
+        Player player = game.getPlayer(playerName);
+        Legion donor = player.getDonor();
+        if (donor != null)
+        {
+            return (donor.numCreature(Creature.getCreatureByName("Archangel"))
+                >= 1);
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+
+    public String [] getPlayerInfo()
+    {
+        String [] info = new String[game.getNumPlayers()];
+        Iterator it = game.getPlayers().iterator();
+        int i = 0;
+        while (it.hasNext())
+        {
+            Player player = (Player)it.next();
+            info[i++] = player.getStatusInfo(); 
+        }
+        return info;
+    }
+
+
+    public int getLegionHeight(String markerId)
+    {
+        Legion legion = game.getLegionByMarkerId(markerId);
+        if (legion != null)
+        {
+            return legion.getHeight();
+        }
+        return 0;
     }
 }

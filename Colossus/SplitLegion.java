@@ -12,7 +12,6 @@ import javax.swing.*;
 public final class SplitLegion extends JDialog implements MouseListener,
     ActionListener, WindowListener
 {
-    private Legion oldLegion;
     private ArrayList oldChits = new ArrayList(8);
     private ArrayList newChits = new ArrayList(8);
 
@@ -29,16 +28,15 @@ public final class SplitLegion extends JDialog implements MouseListener,
     private static String results;
 
 
-    private SplitLegion(Client client, Legion oldLegion, String name,
-        String selectedMarkerId)
+    private SplitLegion(Client client, String oldMarkerId, String 
+        longMarkerName, String selectedMarkerId, java.util.List imageNames)
     {
-        super(client.getBoard().getFrame(), name + ": Split Legion " +
-            oldLegion.getLongMarkerName(), true);
+        super(client.getBoard().getFrame(), client.getPlayerName() + 
+            ": Split Legion " + longMarkerName, true);
 
         Container contentPane = getContentPane();
         contentPane.setLayout(gridbag);
 
-        this.oldLegion = oldLegion;
         this.client = client;
 
         if (selectedMarkerId == null)
@@ -57,19 +55,18 @@ public final class SplitLegion extends JDialog implements MouseListener,
 
         int scale = 4 * Scale.get();
 
-        oldMarker = new Marker(scale, oldLegion.getImageName(), this, null);
+        oldMarker = new Marker(scale, oldMarkerId, this, null);
         constraints.gridx = GridBagConstraints.RELATIVE;
         constraints.gridy = 0;
         constraints.gridwidth = 1;
         gridbag.setConstraints(oldMarker, constraints);
         contentPane.add(oldMarker);
 
-        Collection critters = oldLegion.getCritters();
-        Iterator it = critters.iterator();
+        Iterator it = imageNames.iterator();
         while (it.hasNext())
         {
-            Critter critter = (Critter)it.next();
-            Chit chit = new Chit(scale, critter.getImageName(), this);
+            String imageName = (String)it.next();
+            Chit chit = new Chit(scale, imageName, this);
             oldChits.add(chit);
             gridbag.setConstraints(chit, constraints);
             contentPane.add(chit);
@@ -126,14 +123,15 @@ public final class SplitLegion extends JDialog implements MouseListener,
     }
 
 
-    public static String splitLegion(Client client, Legion oldLegion,
-        String selectedMarkerId)
+    static String splitLegion(Client client, String oldMarkerId,
+        String longMarkerName, String selectedMarkerId, 
+        java.util.List imageNames)
     {
         if (!active)
         {
             active = true;
-            new SplitLegion(client, oldLegion, oldLegion.getPlayerName(),
-                selectedMarkerId);
+            new SplitLegion(client, oldMarkerId, longMarkerName,
+                selectedMarkerId, imageNames);
             active = false;
             return results;
         }

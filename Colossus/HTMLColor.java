@@ -156,19 +156,20 @@ public final class HTMLColor
 
     public static Color stringToColor(String colorName)
     {
-	Color theColor;
-	try
-	{
-	    java.lang.Class htmlColor = Class.forName("HTMLColor");
-	    java.lang.reflect.Field fieldColor = htmlColor.getDeclaredField(colorName);
-	    theColor = (Color)fieldColor.get(null);
-	}
-	catch (Exception e)
-	{
-	    System.out.println("Warning : I know nothing about color \"" +
-			       colorName + "\", : " + e);
-	    theColor = Color.black;
-	}
-	return(theColor);
+        Color theColor;
+        try
+        {
+            java.lang.Class htmlColor = Class.forName("HTMLColor");
+            java.lang.reflect.Field fieldColor = 
+                htmlColor.getDeclaredField(colorName);
+            theColor = (Color)fieldColor.get(null);
+        }
+        catch (Exception e)
+        {
+            System.out.println("Warning : I know nothing about color \"" +
+                               colorName + "\", : " + e);
+            theColor = Color.black;
+        }
+        return(theColor);
     }
 }

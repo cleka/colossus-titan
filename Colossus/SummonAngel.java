@@ -12,9 +12,7 @@ import javax.swing.*;
 public final class SummonAngel extends JDialog implements MouseListener,
     ActionListener, WindowListener
 {
-    private Player player;
-    private Legion legion;
-    private MasterBoard board;
+    private String markerId;
     private Chit angelChit;
     private Chit archangelChit;
     private GridBagLayout gridbag = new GridBagLayout();
@@ -25,27 +23,17 @@ public final class SummonAngel extends JDialog implements MouseListener,
     private Client client;
 
 
-    private SummonAngel(Client client, Legion legion)
+    private SummonAngel(Client client, String markerId, String longMarkerName)
     {
-        super(client.getBoard().getFrame(), legion.getPlayerName() +
-            ": Summon Angel into Legion " + legion.getLongMarkerName(), false);
+        super(client.getBoard().getFrame(), client.getPlayerName() +
+            ": Summon Angel into Legion " + longMarkerName, false);
 
-        this.legion = legion;
-        player = legion.getPlayer();
         this.client = client;
-        this.board = client.getBoard();
-        String markerId = legion.getMarkerId();
-
-        // Paranoia
-        if (!legion.canSummonAngel())
-        {
-            cleanup(null, null);
-            return;
-        }
+        this.markerId = markerId;
 
         // Count and highlight legions with summonable angels, and put
         // board into a state where those legions can be selected.
-        if (board.highlightSummonableAngels(markerId) < 1)
+        if (client.getBoard().highlightSummonableAngels(markerId) < 1)
         {
             cleanup(null, null);
             return;
@@ -106,30 +94,26 @@ public final class SummonAngel extends JDialog implements MouseListener,
         repaint();
     }
 
-    public static SummonAngel summonAngel(Client client, Legion legion)
+    public static SummonAngel summonAngel(Client client, String markerId,
+        String longMarkerName)
     {
         if (!active)
         {
             active = true;
-            return new SummonAngel(client, legion);
+            return new SummonAngel(client, markerId, longMarkerName);
         }
         return null;
     }
 
 
-    public Legion getLegion()
-    {
-        return legion;
-    }
-
     public String getMarkerId()
     {
-        return legion.getMarkerId();
+        return markerId;
     }
 
-    private void cleanup(Legion donor, Creature angel)
+    private void cleanup(String donorId, String angel)
     {
-        client.doSummon(legion, donor, angel);
+        client.summon(markerId, donorId, angel);
         dispose();
         active = false;
     }
@@ -137,19 +121,19 @@ public final class SummonAngel extends JDialog implements MouseListener,
 
     public void mousePressed(MouseEvent e)
     {
-        Legion donor = player.getDonor();
-        if (donor == null)
+        String donorId = client.getDonorId();
+        if (donorId == null)
         {
             return;
         }
         Object source = e.getSource();
         if (angelChit == source && !angelChit.isDead())
         {
-            cleanup(donor, Creature.getCreatureByName("Angel"));
+            cleanup(donorId, "Angel");
         }
         else if (archangelChit == source && !archangelChit.isDead())
         {
-            cleanup(donor, Creature.getCreatureByName("Archangel"));
+            cleanup(donorId, "Archangel");
         }
     }
 
@@ -202,18 +186,14 @@ public final class SummonAngel extends JDialog implements MouseListener,
     /** Upstate state of angel and archangel chits to reflect donor */
     public void updateChits()
     {
-        Legion donor = player.getDonor();
-        if (donor == null)
+        String donorId = client.getDonorId();
+        if (donorId == null)
         {
             return;
         }
 
-        int angels = donor.numCreature(Creature.getCreatureByName("Angel"));
-        int archangels = donor.numCreature(
-            Creature.getCreatureByName("Archangel"));
-
-        angelChit.setDead(angels == 0);
-        archangelChit.setDead(archangels == 0);
+        angelChit.setDead(!client.donorHasAngel());
+        archangelChit.setDead(!client.donorHasArchangel());
     }
 
 
@@ -221,33 +201,31 @@ public final class SummonAngel extends JDialog implements MouseListener,
     {
         if (e.getActionCommand().equals("Summon"))
         {
-            Legion donor = player.getDonor();
-            if (donor == null)
+            String donorId = client.getDonorId();
+            if (donorId == null)
             {
                 client.showMessageDialog("Must select a legion.");
                 return;
             }
 
-            int angels = donor.numCreature(
-                Creature.getCreatureByName("Angel"));
-            int archangels = donor.numCreature(
-                Creature.getCreatureByName("Archangel"));
+            boolean angels = client.donorHasAngel();
+            boolean archangels = client.donorHasArchangel();
 
-            if (angels == 0 && archangels == 0)
+            if (!angels && !archangels)
             {
                 client.showMessageDialog("No angels are available.");
                 return;
             }
 
-            if (archangels == 0)
+            if (!archangels)
             {
                 // Must take an angel.
-                cleanup(donor, Creature.getCreatureByName("Angel"));
+                cleanup(donorId, "Angel");
             }
-            else if (angels == 0)
+            else if (!angels)
             {
                 // Must take an archangel.
-                cleanup(donor, Creature.getCreatureByName("Archangel"));
+                cleanup(donorId, "Archangel");
             }
             else
             {

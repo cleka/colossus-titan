@@ -67,10 +67,6 @@ public class Chit extends JPanel
         icon = getImageIcon(imageFilename);
     }
 
-    /**
-     * TMJF -- made this a utility function for the CreatureCollectionView.
-     * It seems a step backwards from some of the code Dave is using now
-     */
     public ImageIcon getImageIcon(String imageFilename)
     {
         // The image-loading syntax that works correctly for applications
@@ -94,24 +90,25 @@ public class Chit extends JPanel
                 }
             }
             if (icon == null)
-		{ // try with the var-specific directory
-		url = new java.net.URL("file:" + GetPlayers.getVarDirectory() + imageFilename);
-		if (url != null)
-		{
-		    Image image = Toolkit.getDefaultToolkit().getImage(url);
-		    if (image != null)
-		    {
-			icon = new ImageIcon(image);
-		    }
-		}
-	    }
+            { 
+                // try with the var-specific directory
+                url = new java.net.URL("file:" + GetPlayers.getVarDirectory() +
+                    imageFilename);
+                if (url != null)
+                {
+                    Image image = Toolkit.getDefaultToolkit().getImage(url);
+                    if (image != null)
+                    {
+                        icon = new ImageIcon(image);
+                    }
+                }
+            }
             if (icon == null)
             {
                 // try direct file access
                 Image image = Toolkit.getDefaultToolkit().getImage(
                     imageFilename);
-		// Warning: image is never null even if the file
-		// doesn't exist, it seems.
+                // XXX: image is never null even if the file doesn't exist.
                 if (image != null)
                 {
                     icon = new ImageIcon(image);

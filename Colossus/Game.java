@@ -69,7 +69,7 @@ public final class Game extends GameSource
                 terIS = new FileInputStream(recruitName);
             }
             if (terIS == null) 
-	    {
+            {
                 throw new FileNotFoundException(recruitName);
             }
             trl = new TerrainRecruitLoader(terIS);
@@ -184,7 +184,7 @@ public final class Game extends GameSource
         while (it.hasNext())
         {
             String entry = (String)it.next();
-            java.util.List values = Utils.split('~', entry);
+            ArrayList values = Utils.split('~', entry);
             String name = (String)values.get(0);
             String type = (String)values.get(1);
             addPlayer(name, type);
@@ -2032,29 +2032,32 @@ public final class Game extends GameSource
         }
     }
 
-    public void doSummon(Legion legion, Legion donor, Creature angel)
+    public boolean doSummon(Legion legion, Legion donor, Creature angel)
     {
         Player player = getActivePlayer();
 
-        if (angel != null && donor != null && legion.canSummonAngel())
+        if (angel == null || donor == null || !legion.canSummonAngel())
         {
-            // Only one angel can be summoned per turn.
-            player.setSummoned(true);
-
-            // Move the angel or archangel.
-            donor.removeCreature(angel, false, false);
-            legion.addCreature(angel, false);
-
-            Log.event("An " + angel.getName() +
-                " is summoned from legion " + donor.getLongMarkerName() +
-                " into legion " + legion.getLongMarkerName());
+            return false;
         }
+
+        // Only one angel can be summoned per turn.
+        player.setSummoned(true);
+
+        // Move the angel or archangel.
+        donor.removeCreature(angel, false, false);
+        legion.addCreature(angel, false);
+
+        Log.event("An " + angel.getName() +
+            " is summoned from legion " + donor.getLongMarkerName() +
+            " into legion " + legion.getLongMarkerName());
 
         if (battle != null)
         {
             battle.finishSummoningAngel(player.hasSummoned());
         }
         summoningAngel = false;
+        return true;
     }
 
 
@@ -2992,16 +2995,16 @@ public final class Game extends GameSource
 
     static char[] getTerrainsArray()
     {
-	return trl.terrains;
+        return trl.terrains;
     }
 
     static String getTerrainName(char t)
     {
-	return trl.getTerrainName(t);
+        return trl.getTerrainName(t);
     }
 
     static Color getTerrainColor(char t)
     {
-	return trl.getTerrainColor(t);
+        return trl.getTerrainColor(t);
     }
 }

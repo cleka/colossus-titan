@@ -98,7 +98,7 @@ class SimpleAI implements AI
 
         // take third cyclops in brush
         if (recruit == Creature.getCreatureByName("Gorgon")
-	    && recruits.contains(Creature.getCreatureByName("Cyclops"))
+            && recruits.contains(Creature.getCreatureByName("Cyclops"))
             && legion.numCreature(Creature.getCreatureByName("Behemoth")) == 0
             && legion.numCreature(Creature.getCreatureByName("Cyclops")) == 2)
         {
@@ -138,9 +138,9 @@ class SimpleAI implements AI
         }
         // tower creature selection:
         else if (recruits.contains(Creature.getCreatureByName("Ogre")) &&
-		 recruits.contains(Creature.getCreatureByName("Centaur")) &&
-		 recruits.contains(Creature.getCreatureByName("Gargoyle")) &&
-		 recruits.size() == 3)
+                 recruits.contains(Creature.getCreatureByName("Centaur")) &&
+                 recruits.contains(Creature.getCreatureByName("Gargoyle")) &&
+                 recruits.size() == 3)
         {
             // if we have 2 centaurs or ogres, take a third
             if (legion.numCreature(Creature.getCreatureByName("Ogre")) == 2)
@@ -478,7 +478,7 @@ class SimpleAI implements AI
      *  split out. */
     static List doInitialGameSplit(String label, int numPlayers)
     {
-	Creature[] startCre = Game.getStartingCreatures();
+        Creature[] startCre = Game.getStartingCreatures();
         // in CMU style splitting, we split centaurs in even towers,
         // ogres in odd towers.
         final boolean oddTower = "100".equals(label) || "300".equals(label)
@@ -524,7 +524,7 @@ class SimpleAI implements AI
     private static List CMUsplit(boolean favorTitan, Creature splitCreature,
         Creature nonsplitCreature)
     {
-	Creature[] startCre = Game.getStartingCreatures();
+        Creature[] startCre = Game.getStartingCreatures();
         LinkedList splitoffs = new LinkedList();
 
         if (favorTitan)
@@ -577,7 +577,7 @@ class SimpleAI implements AI
     private static List MITsplit(boolean favorTitan, Creature splitCreature,
         Creature nonsplitCreature)
     {
-	Creature[] startCre = Game.getStartingCreatures();
+        Creature[] startCre = Game.getStartingCreatures();
         LinkedList splitoffs = new LinkedList();
 
         if (favorTitan)
@@ -1755,7 +1755,7 @@ class SimpleAI implements AI
             if (bestAngelType(legion).equals("Archangel"))
             {
                 if (bestAngel == null ||
-		    bestAngel != Creature.getCreatureByName("Archangel"))
+                    bestAngel != Creature.getCreatureByName("Archangel"))
                 {
                     bestLegion = legion;
                     bestAngel = Creature.getCreatureByName("Archangel");

@@ -13,8 +13,6 @@ public final class Concede extends JDialog implements ActionListener
 {
     private JFrame parentFrame;
     private boolean flee;
-    private Legion ally;
-    private Legion enemy;
     private Chit allyMarker;
     private Chit enemyMarker;
     private static Point location;
@@ -23,19 +21,18 @@ public final class Concede extends JDialog implements ActionListener
     private static boolean answer;
 
 
-    private Concede(Client client, JFrame parentFrame, Legion ally,
-        Legion enemy, boolean flee)
+    private Concede(Client client, JFrame parentFrame, String longMarkerName,
+        String hexDescription, String allyImageName, java.util.List
+        allyImageNames, String enemyImageName, java.util.List enemyImageNames,
+        boolean flee)
     {
         super(parentFrame, (flee ? "Flee" : "Concede") + " with Legion " +
-            ally.getLongMarkerName() + " in " +
-            ally.getCurrentHex().getDescription() + "?", true);
+            longMarkerName + " in " + hexDescription + "?", true);
 
         Container contentPane = getContentPane();
         contentPane.setLayout(gridbag);
 
         this.parentFrame = parentFrame;
-        this.ally = ally;
-        this.enemy = enemy;
         this.flee = flee;
 
         pack();
@@ -46,36 +43,34 @@ public final class Concede extends JDialog implements ActionListener
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
         int scale = 4 * Scale.get();
 
-        allyMarker = new Marker(scale, ally.getImageName(), this, client);
+        allyMarker = new Marker(scale, allyImageName, this, client);
         constraints.gridy = 0;
         constraints.gridwidth = 1;
         gridbag.setConstraints(allyMarker, constraints);
         contentPane.add(allyMarker);
 
-        Collection critters = ally.getCritters();
-        Iterator it = critters.iterator();
+        Iterator it = allyImageNames.iterator();
         while (it.hasNext())
         {
-            Critter critter = (Critter)it.next();
-            Chit chit = new Chit(scale, critter.getImageName(), this);
+            String imageName = (String)it.next();
+            Chit chit = new Chit(scale, imageName, this);
             constraints.gridy = 0;
             constraints.gridwidth = 1;
             gridbag.setConstraints(chit, constraints);
             contentPane.add(chit);
         }
 
-        enemyMarker = new Marker(scale, enemy.getImageName(), this, client);
+        enemyMarker = new Marker(scale, enemyImageName, this, client);
         constraints.gridy = 1;
         constraints.gridwidth = 1;
         gridbag.setConstraints(enemyMarker, constraints);
         contentPane.add(enemyMarker);
 
-        critters = enemy.getCritters();
-        it = critters.iterator();
+        it = enemyImageNames.iterator();
         while (it.hasNext())
         {
-            Critter critter = (Critter)it.next();
-            Chit chit = new Chit(scale, critter.getImageName(), this);
+            String imageName = (String)it.next();
+            Chit chit = new Chit(scale, imageName, this);
             constraints.gridy = 1;
             constraints.gridwidth = 1;
             gridbag.setConstraints(chit, constraints);
@@ -88,7 +83,8 @@ public final class Concede extends JDialog implements ActionListener
         button2.setMnemonic(KeyEvent.VK_D);
 
         // Attempt to center the buttons.
-        int chitWidth = Math.max(ally.getHeight(), enemy.getHeight()) + 1;
+        int chitWidth = 1 + Math.max(allyImageNames.size(), 
+            enemyImageNames.size());
         if (chitWidth < 4)
         {
             constraints.gridwidth = 1;
@@ -131,20 +127,28 @@ public final class Concede extends JDialog implements ActionListener
 
     /** Return true if the player concedes. */
     public static boolean concede(Client client, JFrame parentFrame,
-        Legion ally, Legion enemy)
+        String longMarkerName, String hexDescription, String allyImageName, 
+        java.util.List allyImageNames, String enemyImageName, 
+        java.util.List enemyImageNames)
     {
         answer = false;
-        new Concede(client, parentFrame, ally, enemy, false);
+        new Concede(client, parentFrame, longMarkerName, hexDescription,
+            allyImageName, allyImageNames, enemyImageName, enemyImageNames,
+            false);
         return answer;
     }
 
 
     /** Return true if the player flees. */
-    public static boolean flee(Client client, JFrame parentFrame, Legion ally,
-        Legion enemy)
+    public static boolean flee(Client client, JFrame parentFrame,
+        String longMarkerName, String hexDescription, String allyImageName, 
+        java.util.List allyImageNames, String enemyImageName, 
+        java.util.List enemyImageNames)
     {
         answer = false;
-        new Concede(client, parentFrame, ally, enemy, true);
+        new Concede(client, parentFrame, longMarkerName, hexDescription,
+            allyImageName, allyImageNames, enemyImageName, enemyImageNames,
+            true);
         return answer;
     }
 

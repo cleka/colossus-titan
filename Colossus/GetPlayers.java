@@ -85,19 +85,19 @@ public final class GetPlayers extends JDialog implements WindowListener,
 
         Container contentPane = getContentPane();
 
-	GridLayout baseLayout = new GridLayout(0, 1);
-	
+        GridLayout baseLayout = new GridLayout(0, 1);
+        
         contentPane.setLayout(baseLayout);
-		
+                
         for (int i = 0; i < 6; i++)
         {
-	    Container playerPane = new Container();
-	    playerPane.setLayout(new GridLayout(0, 3));
-	    contentPane.add(playerPane);
-	    
+            Container playerPane = new Container();
+            playerPane.setLayout(new GridLayout(0, 3));
+            contentPane.add(playerPane);
+            
             String s = "Player " + (i + 1);
             playerPane.add(new JLabel(s));
-	    
+            
             JComboBox playerType = new JComboBox(typeChoices);
             if (i == 0)
             {
@@ -122,17 +122,17 @@ public final class GetPlayers extends JDialog implements WindowListener,
             playerNames[i] = playerName;
         }
 
-	Container gamePane = new Container();
-	gamePane.setLayout(new GridLayout(0, 3));
-	Container variantPane = new Container();
-	variantPane.setLayout(new GridLayout(0, 1));
-	Container optionPane = new Container();
-	optionPane.setLayout(new GridLayout(0, 3));
+        Container gamePane = new Container();
+        gamePane.setLayout(new GridLayout(0, 3));
+        Container variantPane = new Container();
+        variantPane.setLayout(new GridLayout(0, 1));
+        Container optionPane = new Container();
+        optionPane.setLayout(new GridLayout(0, 3));
 
-	contentPane.add(gamePane);
-	contentPane.add(variantPane);
-	contentPane.add(optionPane);
-	
+        contentPane.add(gamePane);
+        contentPane.add(variantPane);
+        contentPane.add(optionPane);
+        
         JButton button1 = new JButton(newGame);
         button1.setMnemonic(KeyEvent.VK_N);
         gamePane.add(button1);
@@ -145,9 +145,9 @@ public final class GetPlayers extends JDialog implements WindowListener,
         button3.setMnemonic(KeyEvent.VK_Q);
         gamePane.add(button3);
         button3.addActionListener(this);
-	JButton buttonVariant = new JButton(loadVariant);
-	variantPane.add(buttonVariant);
-	buttonVariant.addActionListener(this);
+        JButton buttonVariant = new JButton(loadVariant);
+        variantPane.add(buttonVariant);
+        buttonVariant.addActionListener(this);
         JButton button4 = new JButton(loadMap);
         optionPane.add(button4);
         button4.addActionListener(this);
@@ -287,15 +287,19 @@ public final class GetPlayers extends JDialog implements WindowListener,
 
     public static String getVarDirectory()
     {
-	if (varDirectory.equals(""))
-	    return "";
-	else
-	    return (varDirectory + pathSeparator);
+        if (varDirectory.equals(""))
+        {
+            return "";
+        }
+        else
+        {
+            return (varDirectory + pathSeparator);
+        }
     }
 
     public static String getMapName()
     {
-	return (getVarDirectory() + mapName);
+        return (getVarDirectory() + mapName);
     }
     
     static class recFileFilter extends javax.swing.filechooser.FileFilter 
@@ -340,12 +344,12 @@ public final class GetPlayers extends JDialog implements WindowListener,
 
     public static String getRecruitName()
     {
-	return (getVarDirectory() + recruitName);
+        return (getVarDirectory() + recruitName);
     }
 
     public static String getCreaturesName()
     {
-	return (getVarDirectory() + creaturesName);
+        return (getVarDirectory() + creaturesName);
     }
     
     private static String chooseMap() 
@@ -415,22 +419,23 @@ public final class GetPlayers extends JDialog implements WindowListener,
 
     private static void doLoadVariant()
     {
-	javax.swing.JFileChooser varChooser = new JFileChooser();
+        javax.swing.JFileChooser varChooser = new JFileChooser();
         varChooser.setFileFilter(new varFileFilter());
         varChooser.setDialogTitle(
             "Choose your variant (or cancel for default game)");
         int returnVal = varChooser.showOpenDialog(varChooser);
         String varName = "Default.var";
-	varDirectory = "";
+        varDirectory = "";
         if (returnVal == javax.swing.JFileChooser.APPROVE_OPTION)
         {
-	    File varFile = varChooser.getSelectedFile();
+            File varFile = varChooser.getSelectedFile();
             varName = varFile.getAbsolutePath();
-	    varDirectory = varFile.getParentFile().getAbsolutePath();
+            varDirectory = varFile.getParentFile().getAbsolutePath();
         }
-	Log.debug("Loading variant " + varName + ", data files in " + varDirectory);
+        Log.debug("Loading variant " + varName + ", data files in " + 
+            varDirectory);
         try
-	    {
+        {
             ClassLoader cl = Game.class.getClassLoader();
             InputStream varIS = 
                 cl.getResourceAsStream(varName);
@@ -439,33 +444,33 @@ public final class GetPlayers extends JDialog implements WindowListener,
                 varIS = new FileInputStream(varName);
             }
             if (varIS == null) 
-	    {
-		throw new FileNotFoundException(varName);
+            {
+                throw new FileNotFoundException(varName);
             }
-	    else
-	    {
-		VariantLoader vl = new VariantLoader(varIS);
-		String[] data = new String[3];
-		data[0] = data[1] = data[2] = null;
-		while (vl.oneLine(data) >= 0) {}
-		if (data[VariantLoader.MAP_INDEX] != null)
-		{
-		    mapName = data[VariantLoader.MAP_INDEX];
-		    Log.debug("Variant using MAP " + mapName);
-		}
-		if (data[VariantLoader.CRE_INDEX] != null)
-		{
-		    creaturesName = data[VariantLoader.CRE_INDEX];
-		    Log.debug("Variant using CRE " + creaturesName);
+            else
+            {
+                VariantLoader vl = new VariantLoader(varIS);
+                String[] data = new String[3];
+                data[0] = data[1] = data[2] = null;
+                while (vl.oneLine(data) >= 0) {}
+                if (data[VariantLoader.MAP_INDEX] != null)
+                {
+                    mapName = data[VariantLoader.MAP_INDEX];
+                    Log.debug("Variant using MAP " + mapName);
+                }
+                if (data[VariantLoader.CRE_INDEX] != null)
+                {
+                    creaturesName = data[VariantLoader.CRE_INDEX];
+                    Log.debug("Variant using CRE " + creaturesName);
 
-		}
-		if (data[VariantLoader.TER_INDEX] != null)
-		{
-		    recruitName = data[VariantLoader.TER_INDEX];
-		    Log.debug("Variant using TER " + recruitName);
+                }
+                if (data[VariantLoader.TER_INDEX] != null)
+                {
+                    recruitName = data[VariantLoader.TER_INDEX];
+                    Log.debug("Variant using TER " + recruitName);
 
-		}
-	    }
+                }
+            }
         }
         catch (Exception e) 
         {
@@ -487,10 +492,10 @@ public final class GetPlayers extends JDialog implements WindowListener,
         {
             doLoadGame();
         }
-	else if (e.getActionCommand().equals(loadVariant))
+        else if (e.getActionCommand().equals(loadVariant))
         {
-	    doLoadVariant();
-	}
+            doLoadVariant();
+        }
         else if (e.getActionCommand().equals(loadMap))
         {
             mapName = chooseMap();

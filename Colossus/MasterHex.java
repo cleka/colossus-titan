@@ -60,22 +60,22 @@ public class MasterHex extends Hex
 
     public static char[] getTerrainsArray()
     {
-	return Game.getTerrainsArray();
+        return Game.getTerrainsArray();
     }
 
     public String getTerrainName()
     {
-	return (Game.getTerrainName(getTerrain()));
+        return (Game.getTerrainName(getTerrain()));
     }
 
     public static String getTerrainName(char t)
     {
-	return (Game.getTerrainName(t));
+        return (Game.getTerrainName(t));
     }
 
     public Color getTerrainColor()
     {
-	return (Game.getTerrainColor(getTerrain()));
+        return (Game.getTerrainColor(getTerrain()));
     }
 
 

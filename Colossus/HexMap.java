@@ -46,7 +46,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
     /** Set up a static non-GUI hex map for each terrain type. */
     static
     {
-	char terrains[] = MasterHex.getTerrainsArray();
+        char terrains[] = MasterHex.getTerrainsArray();
         for (int t = 0; t < terrains.length; t++)
         {
             char terrain = terrains[t];
@@ -143,46 +143,48 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
      *  Cliffs are bidirectional; other hexside obstacles are noted
      *  only on the high side, since they only interfere with
      *  uphill movement. */
-    protected synchronized static void setupHexesGameState(char terrain, BattleHex [][] h)
+    protected synchronized static void setupHexesGameState(char terrain, 
+        BattleHex [][] h)
     {
-	InputStream terIS = null;
-	String terrainName =
-	    battlelandsDirName +
-	    pathSeparator +
-	    MasterHex.getTerrainName(terrain);
-	try
+        InputStream terIS = null;
+        String terrainName =
+            battlelandsDirName +
+            pathSeparator +
+            MasterHex.getTerrainName(terrain);
+        try
         {
             ClassLoader cl = Game.class.getClassLoader();
             terIS = cl.getResourceAsStream(terrainName);
             if (terIS == null)
-	    {
-		terIS = new FileInputStream(terrainName);
+            {
+                terIS = new FileInputStream(terrainName);
             }
         }
-	catch (FileNotFoundException e)
-	{
-	    // let's try in the var-specific directory
-	    try
-	    {
-		terIS = new FileInputStream(GetPlayers.getVarDirectory() + terrainName);
-	    }
-	    catch (Exception e2) 
-	    {
-		System.out.println("Battlelands loading failed : " + e2);
-	    }
-	}
-        catch (Exception e) 
-	{
-	    System.out.println("Battlelands loading failed : " + e);
+        catch (FileNotFoundException e)
+        {
+            // let's try in the var-specific directory
+            try
+            {
+                terIS = new FileInputStream(GetPlayers.getVarDirectory() + 
+                    terrainName);
+            }
+            catch (Exception e2) 
+            {
+                System.out.println("Battlelands loading failed : " + e2);
+            }
         }
-	try
-	{
-	    BattlelandLoader bl = new BattlelandLoader(terIS);
-	    while (bl.oneBattlelandCase(h) >= 0) {}
-	}
         catch (Exception e) 
-	{
-	    System.out.println("Battlelands loading failed : " + e);
+        {
+            System.out.println("Battlelands loading failed : " + e);
+        }
+        try
+        {
+            BattlelandLoader bl = new BattlelandLoader(terIS);
+            while (bl.oneBattlelandCase(h) >= 0) {}
+        }
+        catch (Exception e) 
+        {
+            System.out.println("Battlelands loading failed : " + e);
         }
     }
 

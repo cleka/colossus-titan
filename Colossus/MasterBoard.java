@@ -686,8 +686,8 @@ final class MasterBoard extends JPanel
                 mapIS = new FileInputStream(mapName);
             }
             if (mapIS == null) 
-	    {
-		throw new FileNotFoundException(mapName);
+            {
+                throw new FileNotFoundException(mapName);
             }
             StrategicMapLoader sml = new StrategicMapLoader(mapIS);
             sml.StrategicMapLoaderInit();
@@ -958,34 +958,34 @@ final class MasterBoard extends JPanel
         unselectAllHexes();
         requestFocus();
 
-        Player player = client.getActivePlayer();
+        String activePlayerName = client.getActivePlayerName();
 
-        masterFrame.setTitle(player.getName() + " Turn " +
+        masterFrame.setTitle(activePlayerName + " Turn " +
             client.getTurnNumber() + " : Split stacks");
 
         phaseMenu.removeAll();
 
-        JMenuItem mi;
-
-        mi = phaseMenu.add(undoLastAction);
-        mi.setMnemonic(KeyEvent.VK_U);
-        mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_U, 0));
-
-        mi = phaseMenu.add(undoAllAction);
-        mi.setMnemonic(KeyEvent.VK_A);
-        mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, 0));
-
-        mi = phaseMenu.add(doneWithPhaseAction);
-        mi.setMnemonic(KeyEvent.VK_D);
-        mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, 0));
-
-        phaseMenu.addSeparator();
-
-        mi = phaseMenu.add(withdrawFromGameAction);
-        mi.setMnemonic(KeyEvent.VK_W);
-
-        if (client.getPlayerName().equals(player.getName()))
+        if (client.getPlayerName().equals(activePlayerName))
         {
+            JMenuItem mi;
+    
+            mi = phaseMenu.add(undoLastAction);
+            mi.setMnemonic(KeyEvent.VK_U);
+            mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_U, 0));
+    
+            mi = phaseMenu.add(undoAllAction);
+            mi.setMnemonic(KeyEvent.VK_A);
+            mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, 0));
+    
+            mi = phaseMenu.add(doneWithPhaseAction);
+            mi.setMnemonic(KeyEvent.VK_D);
+            mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, 0));
+    
+            phaseMenu.addSeparator();
+    
+            mi = phaseMenu.add(withdrawFromGameAction);
+            mi.setMnemonic(KeyEvent.VK_W);
+
             highlightTallLegions();
         }
     }
@@ -996,42 +996,42 @@ final class MasterBoard extends JPanel
         unselectAllHexes();
         requestFocus();
 
-        Player player = client.getActivePlayer();
-        masterFrame.setTitle(player.getName() + " Turn " +
+        String activePlayerName = client.getActivePlayerName();
+        masterFrame.setTitle(activePlayerName + " Turn " +
             client.getTurnNumber() + " : Movement Roll: " +
-            player.getMovementRoll());
+            client.getMovementRoll());
 
         phaseMenu.removeAll();
 
-        JMenuItem mi;
-
-        mi = phaseMenu.add(undoLastAction);
-        mi.setMnemonic(KeyEvent.VK_U);
-        mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_U, 0));
-
-        mi = phaseMenu.add(undoAllAction);
-        mi.setMnemonic(KeyEvent.VK_A);
-        mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, 0));
-
-        mi = phaseMenu.add(doneWithPhaseAction);
-        mi.setMnemonic(KeyEvent.VK_D);
-        mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, 0));
-
-        if (player.getMulligansLeft() > 0)
+        if (client.getPlayerName().equals(activePlayerName))
         {
+            JMenuItem mi;
+    
+            mi = phaseMenu.add(undoLastAction);
+            mi.setMnemonic(KeyEvent.VK_U);
+            mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_U, 0));
+    
+            mi = phaseMenu.add(undoAllAction);
+            mi.setMnemonic(KeyEvent.VK_A);
+            mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, 0));
+    
+            mi = phaseMenu.add(doneWithPhaseAction);
+            mi.setMnemonic(KeyEvent.VK_D);
+            mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, 0));
+    
+            if (client.getMulligansLeft() > 0)
+            {
+                phaseMenu.addSeparator();
+                mi = phaseMenu.add(takeMulliganAction);
+                mi.setMnemonic(KeyEvent.VK_M);
+                mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_M, 0));
+            }
+    
             phaseMenu.addSeparator();
-            mi = phaseMenu.add(takeMulliganAction);
-            mi.setMnemonic(KeyEvent.VK_M);
-            mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_M, 0));
-        }
+    
+            mi = phaseMenu.add(withdrawFromGameAction);
+            mi.setMnemonic(KeyEvent.VK_W);
 
-        phaseMenu.addSeparator();
-
-        mi = phaseMenu.add(withdrawFromGameAction);
-        mi.setMnemonic(KeyEvent.VK_W);
-
-        if (client.getPlayerName().equals(player.getName()))
-        {
             highlightUnmovedLegions();
         }
     }
@@ -1049,19 +1049,19 @@ final class MasterBoard extends JPanel
 
         phaseMenu.removeAll();
 
-        JMenuItem mi;
-
-        mi = phaseMenu.add(doneWithPhaseAction);
-        mi.setMnemonic(KeyEvent.VK_D);
-        mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, 0));
-
-        phaseMenu.addSeparator();
-
-        mi = phaseMenu.add(withdrawFromGameAction);
-        mi.setMnemonic(KeyEvent.VK_W);
-
         if (client.getPlayerName().equals(activePlayerName))
         {
+            JMenuItem mi;
+
+            mi = phaseMenu.add(doneWithPhaseAction);
+            mi.setMnemonic(KeyEvent.VK_D);
+            mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, 0));
+
+            phaseMenu.addSeparator();
+
+            mi = phaseMenu.add(withdrawFromGameAction);
+            mi.setMnemonic(KeyEvent.VK_W);
+
             highlightEngagements();
         }
     }
@@ -1079,27 +1079,27 @@ final class MasterBoard extends JPanel
 
         phaseMenu.removeAll();
 
-        JMenuItem mi;
-
-        mi = phaseMenu.add(undoLastAction);
-        mi.setMnemonic(KeyEvent.VK_U);
-        mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_U, 0));
-
-        mi = phaseMenu.add(undoAllAction);
-        mi.setMnemonic(KeyEvent.VK_A);
-        mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, 0));
-
-        mi = phaseMenu.add(doneWithPhaseAction);
-        mi.setMnemonic(KeyEvent.VK_D);
-        mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, 0));
-
-        phaseMenu.addSeparator();
-
-        mi = phaseMenu.add(withdrawFromGameAction);
-        mi.setMnemonic(KeyEvent.VK_W);
-
         if (client.getPlayerName().equals(activePlayerName))
         {
+            JMenuItem mi;
+    
+            mi = phaseMenu.add(undoLastAction);
+            mi.setMnemonic(KeyEvent.VK_U);
+            mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_U, 0));
+    
+            mi = phaseMenu.add(undoAllAction);
+            mi.setMnemonic(KeyEvent.VK_A);
+            mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, 0));
+    
+            mi = phaseMenu.add(doneWithPhaseAction);
+            mi.setMnemonic(KeyEvent.VK_D);
+            mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, 0));
+    
+            phaseMenu.addSeparator();
+    
+            mi = phaseMenu.add(withdrawFromGameAction);
+            mi.setMnemonic(KeyEvent.VK_W);
+
             highlightPossibleRecruits();
         }
     }
@@ -1134,14 +1134,10 @@ final class MasterBoard extends JPanel
             return;
         }
         ArrayList markerIds = client.getLegionMarkerIds(hexLabel);
-        Player player = client.getActivePlayer();
-        if (player == null)
-        {
-            return;
-        }
 
         // Put the current player's legions first.
-        Collections.sort(markerIds, player.getMarkerComparator());
+        Collections.sort(markerIds, MarkerComparator.getMarkerComparator(
+            client.getShortColor()));
 
         int numLegions = markerIds.size();
         if (numLegions == 0)
@@ -1246,7 +1242,6 @@ final class MasterBoard extends JPanel
     void highlightUnmovedLegions()
     {
         unselectAllHexes();
-        Player player = client.getActivePlayer();
         selectHexesByLabels(client.findAllUnmovedLegionHexes());
         repaint();
     }

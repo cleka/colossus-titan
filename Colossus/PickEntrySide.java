@@ -22,7 +22,7 @@ public final class PickEntrySide extends HexMap implements ActionListener,
 
 
     private PickEntrySide(JFrame parentFrame, String masterHexLabel,
-        Legion legion)
+        boolean left, boolean bottom, boolean right)
     {
         super(masterHexLabel);
         dialog = new JDialog(parentFrame, "Pick entry side", true);
@@ -30,7 +30,7 @@ public final class PickEntrySide extends HexMap implements ActionListener,
         Container contentPane = dialog.getContentPane();
         contentPane.setLayout(null);
 
-        if (legion.canEnterViaSide(masterHexLabel, 5))
+        if (left)
         {
             button5 = new JButton("Left");
             button5.setMnemonic(KeyEvent.VK_L);
@@ -38,7 +38,7 @@ public final class PickEntrySide extends HexMap implements ActionListener,
             button5.addActionListener(this);
         }
 
-        if (legion.canEnterViaSide(masterHexLabel, 3))
+        if (bottom)
         {
             button3 = new JButton("Bottom");
             button3.setMnemonic(KeyEvent.VK_B);
@@ -46,7 +46,7 @@ public final class PickEntrySide extends HexMap implements ActionListener,
             button3.addActionListener(this);
         }
 
-        if (legion.canEnterViaSide(masterHexLabel, 1))
+        if (right)
         {
             button1 = new JButton("Right");
             button1.setMnemonic(KeyEvent.VK_R);
@@ -68,10 +68,10 @@ public final class PickEntrySide extends HexMap implements ActionListener,
 
 
     public static int pickEntrySide(JFrame parentFrame, String masterHexLabel,
-        Legion legion)
+        boolean left, boolean bottom, boolean right)
     {
         entrySide = -1;
-        new PickEntrySide(parentFrame, masterHexLabel, legion);
+        new PickEntrySide(parentFrame, masterHexLabel, left, bottom, right);
         return entrySide;
     }
 

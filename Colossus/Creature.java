@@ -2,14 +2,11 @@ import java.util.*;
 import java.io.*;
 
 /**
- *
  * Class Creature represents the CONSTANT information about a Titan
  * Creature.
  *
  * Game related info is in Critter.  Counts of
  * recruited/available/dead are in Caretaker.
- *
- * TMJF -- test that I can check inn
  *
  * @version $Id$
  * @author David Ripton, Bruce Sherrod 
@@ -32,95 +29,12 @@ public class Creature implements Comparable
     private final boolean demilord;
     private final int maxCount;
 
-    // Add various Creature archetypes as class members
-    /*
-    public static final Creature angel = new Creature("Angel", 6, 4,
-        false, true, false, false, false, false, false, true, false,
-        18, "Angels");
-    public static final Creature archangel = new Creature("Archangel", 9, 4,
-        false, true, false, false, false, false, false, true, false,
-        6, "Archngels");
-    public static final Creature behemoth = new Creature("Behemoth", 8, 3,
-        false, false, true, false, false, false, false, false, false,
-        18, "Behemoths");
-    public static final Creature centaur = new Creature("Centaur", 3, 4,
-        false, false, false, false, false, false, false, false, false,
-        25, "Centaurs");
-    public static final Creature colossus = new Creature("Colossus", 10, 4,
-        false, false, false, true, false, false, true, false, false,
-        10, "Colossi");
-    public static final Creature cyclops = new Creature("Cyclops", 9, 2,
-        false, false, true, false, false, false, false, false, false,
-        28, "Cyclopes");
-    public static final Creature dragon = new Creature("Dragon", 9, 3,
-        true, true, false, false, false, false, true, false, false,
-        18, "Dragons");
-    public static final Creature gargoyle = new Creature("Gargoyle", 4, 3,
-        false, true, true, false, false, false, false, false, false,
-        21, "Gargoyles");
-    public static final Creature giant = new Creature("Giant", 7, 4,
-        true, false, false, true, false, false, false, false, false,
-        18, "Giants");
-    public static final Creature gorgon = new Creature("Gorgon", 6, 3,
-        true, true, true, false, false, false, false, false, false,
-        25, "Gorgons");
-    public static final Creature griffon = new Creature("Griffon", 5, 4,
-        false, true, false, false, false, true, false, false, false,
-        18, "Griffons");
-    public static final Creature guardian = new Creature("Guardian", 12, 2,
-        false, true, false, false, false, false, false, false, true,
-        6, "Guardians");
-    public static final Creature hydra = new Creature("Hydra", 10, 3,
-        true, false, false, false, true, true, false, false, false,
-        10, "Hydras");
-    public static final Creature lion = new Creature("Lion", 5, 3,
-        false, false, false, false, false, true, true, false, false,
-        28, "Lions");
-    public static final Creature minotaur = new Creature("Minotaur", 4, 4,
-        true, false, false, false, false, false, true, false, false,
-        21, "Minotaurs");
-    public static final Creature ogre = new Creature("Ogre", 6, 2,
-        false, false, false, false, true, false, true, false, false,
-        25, "Ogres");
-    public static final Creature ranger = new Creature("Ranger", 4, 4,
-        true, true, false, false, true, false, false, false, false,
-        28, "Rangers");
-    public static final Creature serpent = new Creature("Serpent", 18, 2,
-        false, false, true, false, false, false, false, false, false,
-        10, "Serpents");
-    public static final Creature titan = new Creature("Titan", -1, 4,
-        false, false, false, false, false, false, false, true, false,
-        6, "Titans");
-    public static final Creature troll = new Creature("Troll", 8, 2,
-        false, false, false, true, true, false, false, false, false,
-        28, "Trolls");
-    public static final Creature unicorn = new Creature("Unicorn", 6, 4,
-        false, false, false, false, false, false, true, false, false,
-        12, "Unicorns");
-    public static final Creature warbear = new Creature("Warbear", 6, 3,
-        false, false, false, true, false, false, false, false, false,
-        21, "Warbears");
-    public static final Creature warlock = new Creature("Warlock", 5, 4,
-        true, false, false, false, false, false, false, false, true,
-        6, "Warlocks");
-    public static final Creature wyvern = new Creature("Wyvern", 7, 3,
-        false, true, false, false, true, false, false, false, false,
-        18, "Wyverns");
-    */
     /** For marking unknown enemy creatures when tracking PBEM games. */
     public static final Creature unknown = new Creature("Unknown", 1, 1,
         false, false, false, false, false, false, false, false, false,
         1, "Unknown");
 
     /** Sometimes we need to iterate through all creature types. */
-    /*
-    private static final Creature [] creaturesArray = {angel, archangel,
-        behemoth, centaur, colossus, cyclops, dragon, gargoyle, giant,
-        gorgon, griffon, guardian, hydra, lion, minotaur, ogre, ranger,
-        serpent, titan, troll, unicorn, warbear, warlock, wyvern};
-
-    private static final List creatures = Arrays.asList(creaturesArray);
-    */
     private static List creatures = new ArrayList();
 
 
@@ -166,25 +80,25 @@ public class Creature implements Comparable
 
     public static void loadCreatures()
     {
-	try 
-	{
-	    creatures.clear();
-	    InputStream creIS = 
-		java.lang.ClassLoader.getSystemResourceAsStream(
+        try 
+        {
+            creatures.clear();
+            InputStream creIS = 
+                java.lang.ClassLoader.getSystemResourceAsStream(
                     GetPlayers.getCreaturesName());
-		if (creIS == null)
-		{
-		    creIS = new FileInputStream(GetPlayers.getCreaturesName());
-		}
-		if (creIS == null) 
-		{
-		    throw new FileNotFoundException(GetPlayers.getCreaturesName());
-		}
-		CreatureLoader cl = new CreatureLoader(creIS);
-		while (cl.oneCreature(creatures) >= 0) {}
-	}
+            if (creIS == null)
+            {
+                    creIS = new FileInputStream(GetPlayers.getCreaturesName());
+            }
+            if (creIS == null) 
+            {
+                throw new FileNotFoundException(GetPlayers.getCreaturesName());
+            }
+            CreatureLoader cl = new CreatureLoader(creIS);
+            while (cl.oneCreature(creatures) >= 0) {}
+        }
         catch (Exception e) 
-	{
+        {
             System.out.println("Creatures def. loading failed : " + e);
             System.exit(1);
         }

@@ -7,7 +7,7 @@ import java.io.*;
  * @author David Ripton
  */
 
-public final class Player implements Comparable
+final class Player implements Comparable
 {
     private Game game;
     private String name;
@@ -16,21 +16,20 @@ public final class Player implements Comparable
     private double score;              // track half-points, then round
     private boolean summoned;
     private boolean teleported;
-    private String playersEliminated;  // RdBkGr
+    private String playersEliminated = "";  // RdBkGr
     private int mulligansLeft = 1;
     private int movementRoll;          // 0 if movement has not been rolled.
     private ArrayList legions = new ArrayList();
     private boolean dead;
     private boolean titanEliminated;
     private String donorId;
-    private final MarkerComparator markerComparator = new MarkerComparator();
-    private TreeSet markersAvailable = new TreeSet(markerComparator);
+    private TreeSet markersAvailable;
     private String type;               // "Human" or ".*AI"
 
     private AI ai = new SimpleAI();    // TODO Allow pluggable AIs.
 
 
-    public Player(String name, Game game)
+    Player(String name, Game game)
     {
         this.name = name;
         this.game = game;
@@ -41,7 +40,7 @@ public final class Player implements Comparable
     /**
      *  Deep copy for AI; preserves game state but ignores UI state
      */
-    public Player AICopy(Game game)
+    Player AICopy(Game game)
     {
         Player newPlayer = new Player(name, game);
         newPlayer.color = color;       // Black, Blue, Brown, Gold, Green, Red
@@ -69,12 +68,12 @@ public final class Player implements Comparable
     }
 
 
-    public String getType()
+    String getType()
     {
         return type;
     }
 
-    public void setType(String type)
+    void setType(String type)
     {
         this.type = type;
         if (type.endsWith("AI"))
@@ -98,29 +97,31 @@ public final class Player implements Comparable
     }
 
 
-    public boolean isDead()
+    boolean isDead()
     {
         return dead;
     }
 
-    public void setDead(boolean dead)
+    void setDead(boolean dead)
     {
         this.dead = dead;
     }
 
 
-    public String getColor()
+    String getColor()
     {
         return color;
     }
 
-    public void setColor(String color)
+    void setColor(String color)
     {
         this.color = color;
+        markersAvailable = new TreeSet(
+            MarkerComparator.getMarkerComparator(getShortColor()));
     }
 
 
-    public void initMarkersAvailable()
+    void initMarkersAvailable()
     {
         for (int i = 1; i <= 9; i++)
         {
@@ -133,7 +134,12 @@ public final class Player implements Comparable
     }
 
 
-    public String getShortColor()
+    String getShortColor()
+    {
+        return getShortColor(getColor());
+    }
+
+    static String getShortColor(String color)
     {
         if (color == null)
         {
@@ -170,12 +176,12 @@ public final class Player implements Comparable
     }
 
 
-    public void setTower(int startingTower)
+    void setTower(int startingTower)
     {
         this.startingTower = startingTower;
     }
 
-    public int getTower()
+    int getTower()
     {
         return startingTower;
     }
@@ -197,91 +203,84 @@ public final class Player implements Comparable
     }
 
 
-    public int getScore()
+    int getScore()
     {
         return (int) score;
     }
 
 
-    public void setScore(int score)
+    void setScore(int score)
     {
         this.score = score;
     }
 
 
-    public String getPlayersElim()
+    String getPlayersElim()
     {
         return playersEliminated;
     }
 
 
-    public void setPlayersElim(String playersEliminated)
+    void setPlayersElim(String playersEliminated)
     {
         this.playersEliminated = playersEliminated;
     }
 
 
-    public void addPlayerElim(Player player)
+    void addPlayerElim(Player player)
     {
-        if (playersEliminated == null)
-        {
-            playersEliminated = player.getShortColor();
-        }
-        else
-        {
-            playersEliminated = playersEliminated + player.getShortColor();
-        }
+        playersEliminated = playersEliminated + player.getShortColor();
     }
 
 
-    public boolean canTitanTeleport()
+    boolean canTitanTeleport()
     {
         return (score >= 400 && !teleported);
     }
 
 
-    public boolean hasTeleported()
+    boolean hasTeleported()
     {
         return teleported;
     }
 
-    public void setTeleported(boolean teleported)
+    void setTeleported(boolean teleported)
     {
         this.teleported = teleported;
     }
 
 
-    public boolean hasSummoned()
+    boolean hasSummoned()
     {
         return summoned;
     }
 
-    public void setSummoned(boolean summoned)
+    void setSummoned(boolean summoned)
     {
         this.summoned = summoned;
     }
 
-    public String getDonorId()
+    String getDonorId()
     {
         return donorId;
     }
 
-    public Legion getDonor()
+    Legion getDonor()
     {
         return getLegionByMarkerId(donorId);
     }
 
-    public void setDonorId(String markerId)
+    void setDonorId(String markerId)
     {
         donorId = markerId;
     }
 
-    public void setDonor(Legion donor)
+    void setDonor(Legion donor)
     {
         setDonorId(donor.getMarkerId());
     }
 
-    public void disbandEmptyDonor()
+    void disbandEmptyDonor()
     {
         if (donorId != null)
         {
@@ -295,23 +294,23 @@ public final class Player implements Comparable
     }
 
 
-    public int getTitanPower()
+    int getTitanPower()
     {
         return (int)(6 + (getScore() / 100));
     }
 
 
-    public int getNumLegions()
+    int getNumLegions()
     {
         return legions.size();
     }
 
-    public Legion getLegion(int i)
+    Legion getLegion(int i)
     {
         return (Legion)legions.get(i);
     }
 
-    public Legion getLegionByMarkerId(String markerId)
+    Legion getLegionByMarkerId(String markerId)
     {
         Iterator it = legions.iterator();
         while (it.hasNext())
@@ -325,12 +324,12 @@ public final class Player implements Comparable
         return null;
     }
 
-    public ArrayList getLegions()
+    ArrayList getLegions()
     {
         return legions;
     }
 
-    public List getLegionIds()
+    List getLegionIds()
     {
         List ids = new ArrayList();
         Iterator it = legions.iterator();
@@ -343,7 +342,7 @@ public final class Player implements Comparable
     }
 
 
-    public int getMaxLegionHeight()
+    int getMaxLegionHeight()
     {
         int max = 0;
         Iterator it = legions.iterator();
@@ -362,21 +361,15 @@ public final class Player implements Comparable
 
     /** Sort legions into order of descending importance.  Titan legion
      *  first, then others by point value. */
-    public void sortLegions()
+    void sortLegions()
     {
         Collections.sort(legions);
     }
 
 
-    public MarkerComparator getMarkerComparator()
-    {
-        return markerComparator;
-    }
-
-
     /** Move legion to the first position in the legions list.
      *  Return true if it was moved. */
-    public boolean moveToTop(Legion legion)
+    boolean moveToTop(Legion legion)
     {
         int i = legions.indexOf(legion);
         if (i <= 0)
@@ -394,7 +387,7 @@ public final class Player implements Comparable
 
 
     /** Return the number of this player's legions that have moved. */
-    public int legionsMoved()
+    int legionsMoved()
     {
         int count = 0;
 
@@ -413,7 +406,7 @@ public final class Player implements Comparable
 
     /** Return the number of this player's legions that have legal
         non-teleport moves remaining. */
-    public int countMobileLegions()
+    int countMobileLegions()
     {
         int count = 0;
         Iterator it = legions.iterator();
@@ -430,7 +423,7 @@ public final class Player implements Comparable
     }
 
 
-    public void commitMoves()
+    void commitMoves()
     {
         Iterator it = legions.iterator();
         while (it.hasNext())
@@ -441,12 +434,12 @@ public final class Player implements Comparable
     }
 
 
-    public String getName()
+    String getName()
     {
         return name;
     }
 
-    public void setName(String name)
+    void setName(String name)
     {
         this.name = name;
     }
@@ -457,29 +450,29 @@ public final class Player implements Comparable
     }
 
 
-    public int getMovementRoll()
+    int getMovementRoll()
     {
         return movementRoll;
     }
 
-    public void setMovementRoll(int movementRoll)
+    void setMovementRoll(int movementRoll)
     {
         this.movementRoll = movementRoll;
     }
 
 
-    public int getMulligansLeft()
+    int getMulligansLeft()
     {
         return mulligansLeft;
     }
 
-    public void setMulligansLeft(int number)
+    void setMulligansLeft(int number)
     {
         mulligansLeft = number;
     }
 
 
-    public void resetTurnState()
+    void resetTurnState()
     {
         summoned = false;
         donorId = null;
@@ -497,7 +490,7 @@ public final class Player implements Comparable
 
     /** Clear entry side and teleport information from all of this
      *  player's legions. */
-    public void clearAllHexInfo()
+    void clearAllHexInfo()
     {
         Iterator it = legions.iterator();
         while (it.hasNext())
@@ -508,7 +501,7 @@ public final class Player implements Comparable
     }
 
 
-    public void rollMovement()
+    void rollMovement()
     {
         // Only allow rolling if it hasn't already been done.
         if (movementRoll != 0)
@@ -524,7 +517,7 @@ public final class Player implements Comparable
     }
 
 
-    public void takeMulligan()
+    void takeMulligan()
     {
         if (mulligansLeft > 0)
         {
@@ -542,13 +535,13 @@ public final class Player implements Comparable
     }
 
 
-    public void setLastLegionSplitOff(Legion legion)
+    void setLastLegionSplitOff(Legion legion)
     {
         Client.pushUndoStack(legion.getMarkerId());
     }
 
 
-    public void undoLastMove()
+    void undoLastMove()
     {
         if (!Client.isUndoStackEmpty())
         {
@@ -558,7 +551,7 @@ public final class Player implements Comparable
         }
     }
 
-    public void undoAllMoves()
+    void undoAllMoves()
     {
         Iterator it = legions.iterator();
         while (it.hasNext())
@@ -571,7 +564,7 @@ public final class Player implements Comparable
 
     /** Return true if two or more of this player's legions share
      *  a hex and they have a legal non-teleport move. */
-    public boolean splitLegionHasForcedMove()
+    boolean splitLegionHasForcedMove()
     {
         Iterator it = legions.iterator();
         while (it.hasNext())
@@ -589,7 +582,7 @@ public final class Player implements Comparable
 
 
     /** Return true if any legion can recruit. */
-    public boolean canRecruit()
+    boolean canRecruit()
     {
         Iterator it = legions.iterator();
         while (it.hasNext())
@@ -604,7 +597,7 @@ public final class Player implements Comparable
     }
 
 
-    public void undoLastRecruit()
+    void undoLastRecruit()
     {
         if (!Client.isUndoStackEmpty())
         {
@@ -617,7 +610,7 @@ public final class Player implements Comparable
     }
 
 
-    public void undoAllRecruits()
+    void undoAllRecruits()
     {
         Iterator it = legions.iterator();
         while (it.hasNext())
@@ -631,7 +624,7 @@ public final class Player implements Comparable
     }
 
 
-    public void undoLastSplit()
+    void undoLastSplit()
     {
         if (!Client.isUndoStackEmpty())
         {
@@ -644,7 +637,7 @@ public final class Player implements Comparable
         }
     }
 
-    public void undoAllSplits()
+    void undoAllSplits()
     {
         HashSet hexLabelsToAlign = new HashSet();
         Iterator it = legions.iterator();
@@ -666,7 +659,7 @@ public final class Player implements Comparable
     }
 
 
-    public int getNumCreatures()
+    int getNumCreatures()
     {
         int count = 0;
 
@@ -681,7 +674,7 @@ public final class Player implements Comparable
     }
 
 
-    public void addLegion(Legion legion)
+    void addLegion(Legion legion)
     {
         legions.add(legion);
         Server server = game.getServer();
@@ -692,22 +685,22 @@ public final class Player implements Comparable
     }
 
 
-    public int getNumMarkersAvailable()
+    int getNumMarkersAvailable()
     {
         return markersAvailable.size();
     }
 
-    public Collection getMarkersAvailable()
+    Collection getMarkersAvailable()
     {
         return markersAvailable;
     }
 
-    public boolean isMarkerAvailable(String markerId)
+    boolean isMarkerAvailable(String markerId)
     {
         return (markersAvailable.contains(markerId));
     }
 
-    public String getFirstAvailableMarker()
+    String getFirstAvailableMarker()
     {
         if (markersAvailable.size() == 0)
         {
@@ -718,7 +711,7 @@ public final class Player implements Comparable
 
     /** Removes the selected marker from the list of those available.
      *  Returns the markerId if it was present, or null if it was not. */
-    public String selectMarkerId(String markerId)
+    String selectMarkerId(String markerId)
     {
         if (markersAvailable.remove(markerId))
         {
@@ -730,12 +723,12 @@ public final class Player implements Comparable
         }
     }
 
-    public void addLegionMarker(String markerId)
+    void addLegionMarker(String markerId)
     {
         markersAvailable.add(markerId);
     }
 
-    public void addLegionMarkers(Player player)
+    void addLegionMarkers(Player player)
     {
         Collection newMarkers = player.getMarkersAvailable();
         markersAvailable.addAll(newMarkers);
@@ -744,7 +737,7 @@ public final class Player implements Comparable
 
     /** Add points to this player's score.  Update the status window
      *  to reflect the addition. */
-    public void addPoints(double points)
+    void addPoints(double points)
     {
         if (points > 0)
         {
@@ -760,13 +753,13 @@ public final class Player implements Comparable
 
 
     /** Remove half-points. */
-    public void truncScore()
+    void truncScore()
     {
         score = Math.floor(score);
     }
 
 
-    public void die(String slayerName, boolean checkForVictory)
+    void die(String slayerName, boolean checkForVictory)
     {
         // Engaged legions give half points to the player they're
         // engaged with.  All others give half points to slayer,
@@ -837,19 +830,19 @@ public final class Player implements Comparable
     }
 
 
-    public void eliminateTitan()
+    void eliminateTitan()
     {
         titanEliminated = true;
     }
 
 
-    public boolean isTitanEliminated()
+    boolean isTitanEliminated()
     {
         return titanEliminated;
     }
 
 
-    public String pickMarker()
+    String pickMarker()
     {
         String markerId = null;
         if (game.getServer().getClientOption(name, Options.autoPickMarker))
@@ -865,7 +858,7 @@ public final class Player implements Comparable
         return markerId;
     }
 
-    public String aiPickMarker()
+    String aiPickMarker()
     {
         if (game.getServer().getClientOption(name, Options.autoPickMarker))
         {
@@ -874,7 +867,7 @@ public final class Player implements Comparable
         return null;
     }
 
-    public void aiSplit()
+    void aiSplit()
     {
         if (game.getServer().getClientOption(name, Options.autoSplit))
         {
@@ -887,7 +880,7 @@ public final class Player implements Comparable
         }
     }
 
-    public void aiMasterMove()
+    void aiMasterMove()
     {
         if (game.getServer().getClientOption(name, Options.autoMasterMove))
         {
@@ -900,7 +893,7 @@ public final class Player implements Comparable
         }
     }
 
-    public void aiRecruit()
+    void aiRecruit()
     {
         if (game.getServer().getClientOption(name, Options.autoRecruit))
         {
@@ -913,7 +906,7 @@ public final class Player implements Comparable
         }
     }
 
-    public Creature aiReinforce(Legion legion)
+    Creature aiReinforce(Legion legion)
     {
         if (game.getServer().getClientOption(name, Options.autoRecruit))
         {
@@ -922,7 +915,7 @@ public final class Player implements Comparable
         return null;
     }
 
-    public boolean aiFlee(Legion legion, Legion enemy)
+    boolean aiFlee(Legion legion, Legion enemy)
     {
         if (game.getServer().getClientOption(name, Options.autoFlee))
         {
@@ -931,7 +924,7 @@ public final class Player implements Comparable
         return false;
     }
 
-    public boolean aiConcede(Legion legion, Legion enemy)
+    boolean aiConcede(Legion legion, Legion enemy)
     {
         if (game.getServer().getClientOption(name, Options.autoFlee))
         {
@@ -940,7 +933,7 @@ public final class Player implements Comparable
         return false;
     }
 
-    public void aiStrike(Legion legion, Battle battle, boolean fakeDice,
+    void aiStrike(Legion legion, Battle battle, boolean fakeDice,
         boolean forced)
     {
         if (forced || game.getServer().getClientOption(name,
@@ -950,7 +943,7 @@ public final class Player implements Comparable
         }
     }
 
-    public boolean aiChooseStrikePenalty(Critter critter, Critter target,
+    boolean aiChooseStrikePenalty(Critter critter, Critter target,
         Critter carryTarget, Battle battle)
     {
         if (game.getServer().getClientOption(name, Options.autoStrike))
@@ -961,7 +954,7 @@ public final class Player implements Comparable
         return false;
     }
 
-    public void aiBattleMove()
+    void aiBattleMove()
     {
         if (game.getServer().getClientOption(name, Options.autoBattleMove))
         {
@@ -970,7 +963,7 @@ public final class Player implements Comparable
         }
     }
 
-    public int aiPickEntrySide(String hexLabel, Legion legion)
+    int aiPickEntrySide(String hexLabel, Legion legion)
     {
         if (game.getServer().getClientOption(name, Options.autoPickEntrySide))
         {
@@ -979,7 +972,7 @@ public final class Player implements Comparable
         return -1;
     }
 
-    public String aiPickEngagement()
+    String aiPickEngagement()
     {
         if (game.getServer().getClientOption(name, Options.autoPickEngagement))
         {
@@ -988,7 +981,7 @@ public final class Player implements Comparable
         return null;
     }
 
-    public String aiAcquireAngel(Legion legion, ArrayList recruits, Game game)
+    String aiAcquireAngel(Legion legion, ArrayList recruits, Game game)
     {
         if (game.getServer().getClientOption(name, Options.autoAcquireAngels))
         {
@@ -999,7 +992,7 @@ public final class Player implements Comparable
 
     /** Return a String of form "Angeltype:donorId", or null if no
       * angel is to be summoned. */
-    public String aiSummonAngel(Legion legion)
+    String aiSummonAngel(Legion legion)
     {
         if (game.getServer().getClientOption(name, Options.autoSummonAngels))
         {
@@ -1008,12 +1001,12 @@ public final class Player implements Comparable
         return null;
     }
 
-    public String aiPickColor(Set colors)
+    String aiPickColor(Set colors)
     {
         // Convert favorite colors from a comma-separated string to a list.
         String favorites = game.getServer().getClientStringOption(name,
             Options.favoriteColors);
-        List favoriteColors = null;
+        ArrayList favoriteColors = null;
         if (favorites != null)
         {
             favoriteColors = Utils.split(',', favorites);
@@ -1025,38 +1018,32 @@ public final class Player implements Comparable
         return ai.pickColor(colors, favoriteColors);
     }
 
-
-    /** Comparator that forces this player's legion markers to come
-     *  before captured markers in sort order. */
-    final class MarkerComparator implements Comparator
+    // XXX Need to not allow colons in player names.
+    /** Return a colon:separated string with a bunch of info for
+     *  the status screen. */
+    String getStatusInfo()
     {
-        public int compare(Object o1, Object o2)
-        {
-            if (!(o1 instanceof String) || !(o2 instanceof String))
-            {
-                throw new ClassCastException();
-            }
-            String s1 = (String)o1;
-            String s2 = (String)o2;
-            String myPrefix = getShortColor();
-            if (myPrefix == null)
-            {
-                myPrefix = "";
-            }
-            boolean mine1 = s1.startsWith(myPrefix);
-            boolean mine2 = s2.startsWith(myPrefix);
-            if (mine1 && !mine2)
-            {
-                return -1;
-            }
-            else if (mine2 && !mine1)
-            {
-                return 1;
-            }
-            else
-            {
-                return s1.compareTo(s2);
-            }
-        }
+        StringBuffer buf = new StringBuffer();
+        buf.append(isDead());
+        buf.append(':');
+        buf.append(name);
+        buf.append(':');
+        buf.append(100 * getTower());
+        buf.append(':');
+        buf.append(getColor());
+        buf.append(':');
+        buf.append(getPlayersElim());
+        buf.append(':');
+        buf.append(getNumLegions());
+        buf.append(':');
+        buf.append(getNumMarkersAvailable());
+        buf.append(':');
+        buf.append(getNumCreatures());
+        buf.append(':');
+        buf.append(getTitanPower());
+        buf.append(':');
+        buf.append(getScore());
+
+        return buf.toString();
     }
 }
