@@ -1,6 +1,5 @@
 import java.awt.*;
 import java.awt.event.*;
-import java.io.*;
 
 /**
  * Class PickMarker allows a player to pick a legion marker.
@@ -76,7 +75,8 @@ class PickMarker extends Dialog implements MouseListener, WindowListener
             }
             catch (InterruptedException e)
             {
-                new MessageBox(parentFrame, "waitForAll was interrupted");
+                new MessageBox(parentFrame, e.toString() +
+                    " waitForAll was interrupted");
             }
             imagesLoaded = true;
             setVisible(true);
@@ -168,17 +168,17 @@ class PickMarker extends Dialog implements MouseListener, WindowListener
     }
 
 
-    public void windowActivated(WindowEvent event)
+    public void windowActivated(WindowEvent e)
     {
     }
 
 
-    public void windowClosed(WindowEvent event)
+    public void windowClosed(WindowEvent e)
     {
     }
 
 
-    public void windowClosing(WindowEvent event)
+    public void windowClosing(WindowEvent e)
     {
         player.clearSelectedMarker();
         dispose();
@@ -186,22 +186,22 @@ class PickMarker extends Dialog implements MouseListener, WindowListener
     }
 
 
-    public void windowDeactivated(WindowEvent event)
+    public void windowDeactivated(WindowEvent e)
     {
     }
 
 
-    public void windowDeiconified(WindowEvent event)
+    public void windowDeiconified(WindowEvent e)
     {
     }
 
 
-    public void windowIconified(WindowEvent event)
+    public void windowIconified(WindowEvent e)
     {
     }
 
 
-    public void windowOpened(WindowEvent event)
+    public void windowOpened(WindowEvent e)
     {
     }
 }
