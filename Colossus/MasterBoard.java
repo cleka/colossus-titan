@@ -168,11 +168,150 @@ public class MasterBoard extends Frame implements MouseListener,
     }
 
 
+    void unselectAllHexes()
+    {
+        for (int i = 0; i < h.length; i++)
+        {
+            for (int j = 0; j < h[0].length; j++)
+            {
+                if (show[i][j] && h[i][j].selected == true)
+                {
+                    h[i][j].selected = false;
+                    Rectangle clip = new Rectangle(h[i][j].getBounds());
+                    repaint(clip.x, clip.y, clip.width, clip.height);
+                }
+            }
+        }
+    }
+
+
+    // Recursively find conventional moves from this hex.  Select
+    //    all legal final destinations.  If block >= 0, go only
+    //    that way.  If block == -1, use arches and arrows.  If
+    //    block == -2, use only arrows.
+    void findMoves(MasterHex hex, Player player, Legion legion, 
+        int roll, int block)
+    {
+System.out.println("findMoves for " + hex.label + " roll is " + roll);
+        // If there are enemy legions in this hex, mark it
+        // as a legal move and stop recursing.
+        for (int i = 0; i < game.numPlayers; i++)
+        {
+            if (game.player[i] != player)
+            {
+                for (int j = 0; j < game.player[i].numLegions; j++)
+                {
+                    if (game.player[i].legions[j].currentHex == hex.label)
+                    {
+System.out.println("engagement in hex " + hex.label);
+                        // XXX Mark an engagement.
+
+                        hex.selected = true;
+                        return;
+                    }
+                }
+            }
+        }
+
+        if (roll == 0)
+        {
+            // This hex is the final destination.  Mark it as legal if
+            // it is unoccupied by friendly legions.
+            for (int i = 0; i < player.numLegions; i++)
+            {
+                // Account for spin cycles.
+                if (player.legions[i].currentHex == hex.label &&
+                    player.legions[i] != legion)
+                {
+                    return;
+                }
+            }
+System.out.println("selected hex " + hex.label);
+            hex.selected = true;
+            return;
+        }
+
+
+        if (block >= 0)
+        {
+            findMoves(hex.neighbor[block], player, legion, roll - 1, -2);
+        }
+        else if (block == -1)
+        {
+            for (int i = 0; i < 6; i++)
+            {
+                if (hex.exitType[i] >= MasterHex.ARCH)
+                {
+System.out.println("finding moves for exit " + i);
+                    findMoves(hex.neighbor[i], player, legion, roll - 1, -2);
+                }
+            }
+        }
+        else if (block == -2)
+        {
+            for (int i = 0; i < 6; i++)
+            {
+                if (hex.exitType[i] >= MasterHex.ARROW)
+                {
+System.out.println("finding moves for exit " + i);
+                    findMoves(hex.neighbor[i], player, legion, roll - 1, -2);
+                }
+            }
+        }
+    }
+    
+    
+    // Recursively find tower teleport moves from this hex.  That's
+    // all unoccupied towers except this one, plus all unoccupied
+    // hexes within 6 hexes. 
+    void findTowerTeleportMoves(MasterHex hex, Player player, Legion legion,
+        int roll)
+    {
+System.out.println("findTowerTeleportMoves for " + hex.label + " roll is " + roll);
+        // This hex is the final destination.  Mark it as legal if
+        // it is unoccupied.
+
+        boolean occupied = false;
+        for (int i = 0; i < game.numPlayers; i++)
+        {
+            for (int j = 0; j < game.player[i].numLegions; j++)
+            {
+                if (game.player[i].legions[j].currentHex == hex.label)
+                {
+                    occupied = true;
+                }
+            }
+        }
+        if (occupied == false)
+        {
+            System.out.println("selected hex " + hex.label);
+            hex.selected = true;
+        }
+
+        if (roll > 0)
+        {
+            for (int i = 0; i < 6; i++)
+            {
+                if (hex.exitType[i] != MasterHex.NONE ||
+                    hex.entranceType[i] != MasterHex.NONE)
+                {
+System.out.println("finding moves for direction " + i);
+                    findTowerTeleportMoves(hex.neighbor[i], player, legion, 
+                        roll - 1);
+                }
+            }
+        }
+    }
+
+
     void showMoves(Legion legion, Player player)
     {
+        unselectAllHexes();
+
         MasterHex hex = getHexFromLabel(legion.currentHex); 
 
         // Conventional moves
+System.out.println("hex " + hex.label);
 
         // First, look for a block.
         int block = -1;
@@ -184,27 +323,9 @@ public class MasterBoard extends Frame implements MouseListener,
                 block = j;
             }
         }
+System.out.println("block = " + block);
 
-        // Try both arches and arrow(s).  If there's a block, ignore
-        // non-blocks for the first impulse.  If there's an enemy 
-        // legion, mark this hex and stop.  If there's a friendly legion, 
-        // keep going unless this is the last impulse.
-        // For moves 2-6 (limited by movementRoll) consider only arrow(s).
-
-        for (int i = 1; i <= player.movementRoll; i++)
-        {
-            // For impulse 1 only, consider blocks and arches
-            for (int j = 0; j < 6; j++)
-            {
-                if (hex.exitType[j] >= MasterHex.ARROW)
-                {
-                    
-                }
-            }
-        }
-
-
-
+        findMoves(hex, player, legion, player.movementRoll, block);
 
         if (player.movementRoll == 6)
         {
@@ -213,15 +334,19 @@ public class MasterBoard extends Frame implements MouseListener,
                 legion.numCreature(Creature.angel) > 0 ||
                 legion.numCreature(Creature.archangel) > 0))
             {
+System.out.println("Tower teleport is legal.");
                 // Mark every unoccupied hex within 6 hexes.
-             
+                findTowerTeleportMoves(hex, player, legion, 6);
 
+                // XXX Mark every unoccupied tower except this one.
+                 
             }
 
             // Titan teleport
             if (player.canTitanTeleport() && 
                 legion.numCreature(Creature.titan) > 0)
             {
+System.out.println("Titan teleport is legal.");
                 // Mark every hex containing an enemy unit. 
 
             }
@@ -243,12 +368,14 @@ public class MasterBoard extends Frame implements MouseListener,
                 {
                     h[i][j] = new MasterHex
                         (cx + 4 * i * scale,
-                        (int) Math.round(cy + (3 * j + (i % 2) *
-                        (1 + 2 * (j / 2)) + ((i + 1) % 2) * 2 * ((j + 1) / 2))
-                        * SQRT3 * scale), scale, (i + j) % 2 == 0);
+                        (int) Math.round(cy + (3 * j + (i & 1) *
+                        (1 + 2 * (j / 2)) + ((i + 1) & 1) * 2 * ((j + 1) / 2))
+                        * SQRT3 * scale), scale, ((i + j) & 1) == 0);
                 }
             }
         }
+
+
 
         // Add terrain types, id labels, and exits to hexes.
         h[0][3].terrain='S';
@@ -757,6 +884,48 @@ public class MasterBoard extends Frame implements MouseListener,
                 }
             }
         }
+        
+        // Add references to neighbor hexes.
+        for (int i = 0; i < h.length; i++)
+        {
+            for (int j = 0; j < h[0].length; j++)
+            {
+                if (show[i][j])
+                {
+                    if (h[i][j].exitType[0] != MasterHex.NONE ||
+                        h[i][j].entranceType[0] != MasterHex.NONE)
+                    {
+                        h[i][j].neighbor[0] = h[i][j - 1];
+                    }
+                    if (h[i][j].exitType[1] != MasterHex.NONE ||
+                        h[i][j].entranceType[1] != MasterHex.NONE)
+                    {
+                        h[i][j].neighbor[1] = h[i + 1][j];
+                    }
+                    if (h[i][j].exitType[2] != MasterHex.NONE ||
+                        h[i][j].entranceType[2] != MasterHex.NONE)
+                    {
+                        h[i][j].neighbor[2] = h[i + 1][j];
+                    }
+                    if (h[i][j].exitType[3] != MasterHex.NONE ||
+                        h[i][j].entranceType[3] != MasterHex.NONE)
+                    {
+                        h[i][j].neighbor[3] = h[i][j + 1];
+                    }
+                    if (h[i][j].exitType[4] != MasterHex.NONE ||
+                        h[i][j].entranceType[4] != MasterHex.NONE)
+                    {
+                        h[i][j].neighbor[4] = h[i - 1][j];
+                    }
+                    if (h[i][j].exitType[5] != MasterHex.NONE ||
+                        h[i][j].entranceType[5] != MasterHex.NONE)
+                    {
+                        h[i][j].neighbor[5] = h[i - 1][j];
+                    }
+                }
+            }
+        }
+
     }
 
 
@@ -866,7 +1035,7 @@ public class MasterBoard extends Frame implements MouseListener,
 
                     // If we're moving and have selected a legion and this
                     // hex is a legal destination, move the legion here.
-                    if (game.phase == game.SPLIT)
+                    if (game.phase == game.MOVE)
                     {
                     }
 
