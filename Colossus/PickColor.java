@@ -84,7 +84,7 @@ public class PickColor extends JDialog implements WindowListener, ActionListener
             i++;
         }
         
-        Color [] background = { Color.black, Color.blue, new Color(180, 90, 0),
+        Color [] background = { Color.black, Color.blue, HTMLColor.brown,
             Color.yellow, Color.green, Color.red };
         Color [] foreground = { Color.white, Color.white, Color.white, 
             Color.black, Color.black, Color.black };

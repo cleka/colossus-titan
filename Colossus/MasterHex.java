@@ -424,15 +424,17 @@ public class MasterHex extends Hex
             case 'B':
                 return Color.green;
             case 'D':
-                return Color.orange;
+                return HTMLColor.orange;
             case 'H':
-                return new Color(128, 64, 0);
+                // was 128, 64, 0
+                return HTMLColor.saddleBrown;
             case 'J':
-                return new Color(0, 128, 0);
+                return HTMLColor.darkGreen;
             case 'm':
                 return Color.red;
             case 'M':
-                return new Color(180, 90, 0);
+                // was 180, 90, 0
+                return HTMLColor.sienna;
             case 'P':
                 return Color.yellow;
             case 'S':
@@ -440,9 +442,9 @@ public class MasterHex extends Hex
             case 'T':
                 return Color.gray;
             case 't':
-                return new Color(128, 170, 255);
+                return HTMLColor.skyBlue;
             case 'W':
-                return new Color(128, 128, 0);
+                return HTMLColor.olive;
             default:
                 return Color.black;
         }

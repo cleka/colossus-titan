@@ -401,9 +401,9 @@ public class BattleHex extends Hex
                 switch (elevation)
                 {
                     case 0:
-                        return new Color(150, 150, 0);
+                        return HTMLColor.lightOlive;
                     case 1:
-                        return new Color(200, 200, 0);
+                        return HTMLColor.darkYellow;
                     case 2:
                         return Color.yellow;
                 }
@@ -412,7 +412,7 @@ public class BattleHex extends Hex
             case 's':  // sand
                 return Color.orange;
             case 't':  // tree
-                return new Color(180, 90, 0);
+                return HTMLColor.brown;
             case 'o':  // bog
                 return Color.gray;
             case 'v':  // volcano
