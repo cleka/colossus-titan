@@ -24,7 +24,6 @@ class Concede extends JDialog implements ActionListener
     private Chit [] enemyChits;
     private Chit friendMarker;
     private Chit enemyMarker;
-    private Container contentPane;
     private Graphics gBack;
     private Dimension offDimension;
     private Image offImage;
@@ -37,7 +36,8 @@ class Concede extends JDialog implements ActionListener
             + "?", true);
 
         setResizable(false);
-        contentPane = getContentPane();
+
+        Container contentPane = getContentPane();
         contentPane.setLayout(null);
 
         this.parentFrame = parentFrame;
@@ -173,7 +173,7 @@ class Concede extends JDialog implements ActionListener
 
         g.drawImage(offImage, 0, 0, this);
 
-        // XXX: Handle via super.paint() instead?
+        // These are necessary because JButtons are lightweight.
         button1.repaint();
         button2.repaint();
     }

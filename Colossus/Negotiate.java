@@ -23,7 +23,6 @@ class Negotiate extends JDialog implements MouseListener, ActionListener
     private JButton button1;
     private JButton button2;
     private boolean laidOut = false;
-    private Container contentPane;
     private Graphics gBack;
     private Dimension offDimension;
     private Image offImage;
@@ -35,7 +34,8 @@ class Negotiate extends JDialog implements MouseListener, ActionListener
             defender.getMarkerId(), true);
 
         setResizable(false);
-        contentPane = getContentPane();
+
+        Container contentPane = getContentPane();
         contentPane.setLayout(null);
 
         this.attacker = attacker;
@@ -155,7 +155,7 @@ class Negotiate extends JDialog implements MouseListener, ActionListener
 
         g.drawImage(offImage, 0, 0, this);
 
-        // XXX: Handle via super.paint() instead?
+        // These are necessary because JButtons are lightweight.
         button1.repaint();
         button2.repaint();
     }
