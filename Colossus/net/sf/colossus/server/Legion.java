@@ -561,12 +561,10 @@ public final class Legion implements Comparable
         return moved;
     }
 
-
     void setMoved(boolean moved)
     {
         this.moved = moved;
     }
-
 
     /** Eliminate this legion. */
     void remove()
@@ -574,10 +572,9 @@ public final class Legion implements Comparable
         prepareToRemove();
         if (getPlayer() != null)
         {
-            getPlayer().getLegions().remove(this);
+            getPlayer().removeLegion(this);
         }
     }
-
 
     /** Do the cleanup required before this legion can be removed. */
     void prepareToRemove()

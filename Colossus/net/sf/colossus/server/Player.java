@@ -28,7 +28,7 @@ public final class Player implements Comparable
     private String playersEliminated = "";  // RdBkGr
     private int mulligansLeft = 1;
     private int movementRoll;          // 0 if movement has not been rolled.
-    private List legions = new ArrayList();
+    private List legions = Collections.synchronizedList(new ArrayList());
     private boolean dead;
     private boolean titanEliminated;
     private String donorId;
@@ -72,7 +72,7 @@ public final class Player implements Comparable
     void setType(final String aType)
     {
         String type = new String(aType);
-Log.debug("Called Player.setType() for " + name + " " + type);
+        Log.debug("Called Player.setType() for " + name + " " + type);
         if (type.endsWith(Constants.anyAI))
         {
             int whichAI = Dice.rollDie(Constants.numAITypes) - 1;
@@ -246,18 +246,21 @@ Log.debug("Called Player.setType() for " + name + " " + type);
     /** Remove all of this player's zero-height legions. */
     void removeEmptyLegions()
     {
-        Iterator it = getLegions().iterator(); 
-        while (it.hasNext())
+        synchronized (legions)
         {
-            Legion legion = (Legion)it.next();
-            if (legion.getHeight() == 0)
+            Iterator it = legions.iterator(); 
+            while (it.hasNext())
             {
-                if (donorId != null && donorId.equals(legion.getMarkerId()))
+                Legion legion = (Legion)it.next();
+                if (legion.getHeight() == 0)
                 {
-                    donorId = null;
+                    if (donorId != null && donorId.equals(legion.getMarkerId()))
+                    {
+                        donorId = null;
+                    }
+                    legion.prepareToRemove();
+                    it.remove();
                 }
-                legion.prepareToRemove();
-                it.remove();
             }
         }
     }
@@ -266,29 +269,38 @@ Log.debug("Called Player.setType() for " + name + " " + type);
     int getTitanPower()
     {
         return (int)(6 + (getScore() / 
-            TerrainRecruitLoader.getTitanImprovementValue()));
+                          TerrainRecruitLoader.getTitanImprovementValue()));
     }
 
 
     int getNumLegions()
     {
-        return legions.size();
+        synchronized (legions)
+        {
+            return legions.size();
+        }
     }
 
     Legion getLegion(int i)
     {
-        return (Legion)legions.get(i);
+        synchronized (legions)
+        {
+            return (Legion)legions.get(i);
+        }
     }
 
     Legion getLegionByMarkerId(String markerId)
     {
-        Iterator it = legions.iterator();
-        while (it.hasNext())
+        synchronized (legions)
         {
-            Legion legion = (Legion)it.next();
-            if (legion.getMarkerId().equals(markerId))
+            Iterator it = legions.iterator();
+            while (it.hasNext())
             {
-                return legion;
+                Legion legion = (Legion)it.next();
+                if (legion.getMarkerId().equals(markerId))
+                {
+                    return legion;
+                }
             }
         }
         return null;
@@ -296,13 +308,16 @@ Log.debug("Called Player.setType() for " + name + " " + type);
 
     Legion getTitanLegion()
     {
-        Iterator it = legions.iterator();
-        while (it.hasNext())
+        synchronized (legions)
         {
-            Legion legion = (Legion)it.next();
-            if (legion.hasTitan())
+            Iterator it = legions.iterator();
+            while (it.hasNext())
             {
-                return legion;
+                Legion legion = (Legion)it.next();
+                if (legion.hasTitan())
+                {
+                    return legion;
+                }
             }
         }
         return null;
@@ -316,27 +331,40 @@ Log.debug("Called Player.setType() for " + name + " " + type);
     List getLegionIds()
     {
         List ids = new ArrayList();
-        Iterator it = legions.iterator();
-        while (it.hasNext())
+        synchronized (legions)
         {
-            Legion legion = (Legion)it.next();
-            ids.add(legion.getMarkerId());
+            Iterator it = legions.iterator();
+            while (it.hasNext())
+            {
+                Legion legion = (Legion)it.next();
+                ids.add(legion.getMarkerId());
+            }
         }
         return ids;
     }
 
+    void removeLegion(Legion legion)
+    {
+        synchronized (legions)
+        {
+            legions.remove(legion);
+        }
+    }
 
     int getMaxLegionHeight()
     {
         int max = 0;
-        Iterator it = legions.iterator();
-        while (it.hasNext())
+        synchronized (legions)
         {
-            Legion legion = (Legion)it.next();
-            int height = legion.getHeight();
-            if (height > max)
+            Iterator it = legions.iterator();
+            while (it.hasNext())
             {
-                max = height;
+                Legion legion = (Legion)it.next();
+                int height = legion.getHeight();
+                if (height > max)
+                {
+                    max = height;
+                }
             }
         }
         return max;
@@ -347,7 +375,10 @@ Log.debug("Called Player.setType() for " + name + " " + type);
      *  first, then others by point value. */
     void sortLegions()
     {
-        Collections.sort(legions);
+        synchronized (legions)
+        {
+            Collections.sort(legions);
+        }
     }
 
 
@@ -355,17 +386,20 @@ Log.debug("Called Player.setType() for " + name + " " + type);
      *  Return true if it was moved. */
     boolean moveToTop(Legion legion)
     {
-        int i = legions.indexOf(legion);
-        if (i <= 0)
+        synchronized (legions)
         {
-            // Not found, or already first in the list.
-            return false;
-        }
-        else
-        {
-            legions.remove(i);
-            legions.add(0, legion);
-            return true;
+            int i = legions.indexOf(legion);
+            if (i <= 0)
+            {
+                // Not found, or already first in the list.
+                return false;
+            }
+            else
+            {
+                legions.remove(i);
+                legions.add(0, legion);
+                return true;
+            }
         }
     }
 
@@ -375,13 +409,16 @@ Log.debug("Called Player.setType() for " + name + " " + type);
     {
         int count = 0;
 
-        Iterator it = legions.iterator();
-        while (it.hasNext())
+        synchronized (legions)
         {
-            Legion legion = (Legion)it.next();
-            if (legion.hasMoved())
+            Iterator it = legions.iterator();
+            while (it.hasNext())
             {
-                count++;
+                Legion legion = (Legion)it.next();
+                if (legion.hasMoved())
+                {
+                    count++;
+                }
             }
         }
         return count;
@@ -393,27 +430,32 @@ Log.debug("Called Player.setType() for " + name + " " + type);
     int countMobileLegions()
     {
         int count = 0;
-        Iterator it = legions.iterator();
-        while (it.hasNext())
+        synchronized (legions)
         {
-            Legion legion = (Legion)it.next();
-            if (legion.hasConventionalMove())
+            Iterator it = legions.iterator();
+            while (it.hasNext())
             {
-                count++;
+                Legion legion = (Legion)it.next();
+                if (legion.hasConventionalMove())
+                {
+                    count++;
+                }
             }
         }
-
         return count;
     }
 
 
     void commitMoves()
     {
-        Iterator it = legions.iterator();
-        while (it.hasNext())
+        synchronized (legions)
         {
-            Legion legion = (Legion)it.next();
-            legion.commitMove();
+            Iterator it = legions.iterator();
+            while (it.hasNext())
+            {
+                Legion legion = (Legion)it.next();
+                legion.commitMove();
+            }
         }
     }
 
@@ -507,11 +549,14 @@ Log.debug("Called Player.setType() for " + name + " " + type);
 
     void undoAllMoves()
     {
-        Iterator it = legions.iterator();
-        while (it.hasNext())
+        synchronized (legions)
         {
-            Legion legion = (Legion)it.next();
-            legion.undoMove();
+            Iterator it = legions.iterator();
+            while (it.hasNext())
+            {
+                Legion legion = (Legion)it.next();
+                legion.undoMove();
+            }
         }
     }
 
@@ -520,15 +565,18 @@ Log.debug("Called Player.setType() for " + name + " " + type);
      *  a hex and they have a legal non-teleport move. */
     boolean splitLegionHasForcedMove()
     {
-        Iterator it = legions.iterator();
-        while (it.hasNext())
+        synchronized (legions)
         {
-            Legion legion = (Legion)it.next();
-            String hexLabel = legion.getCurrentHexLabel();
-            if (game.getNumFriendlyLegions(hexLabel, this) > 1 &&
-                legion.hasConventionalMove())
+            Iterator it = legions.iterator();
+            while (it.hasNext())
             {
-                return true;
+                Legion legion = (Legion)it.next();
+                String hexLabel = legion.getCurrentHexLabel();
+                if (game.getNumFriendlyLegions(hexLabel, this) > 1 &&
+                    legion.hasConventionalMove())
+                {
+                    return true;
+                }
             }
         }
         return false;
@@ -538,13 +586,16 @@ Log.debug("Called Player.setType() for " + name + " " + type);
     /** Return true if any legion can recruit. */
     boolean canRecruit()
     {
-        Iterator it = legions.iterator();
-        while (it.hasNext())
+        synchronized (legions)
         {
-            Legion legion = (Legion)it.next();
-            if (legion.hasMoved() && legion.canRecruit())
+            Iterator it = legions.iterator();
+            while (it.hasNext())
             {
-                return true;
+                Legion legion = (Legion)it.next();
+                if (legion.hasMoved() && legion.canRecruit())
+                {
+                    return true;
+                }
             }
         }
         return false;
@@ -577,18 +628,21 @@ Log.debug("Called Player.setType() for " + name + " " + type);
 
     void recombineIllegalSplits()
     {
-        Iterator it = legions.iterator();
-        while (it.hasNext())
+        synchronized (legions)
         {
-            Legion legion = (Legion)it.next();
-            Legion parent = legion.getParent();
-            if (parent != null && parent != legion &&
-                parent.getCurrentHexLabel().equals(
-                legion.getCurrentHexLabel()))
+            Iterator it = legions.iterator();
+            while (it.hasNext())
             {
-                game.getServer().undidSplit(legion.getMarkerId());
-                legion.recombine(parent, false);
-                it.remove();
+                Legion legion = (Legion)it.next();
+                Legion parent = legion.getParent();
+                if (parent != null && parent != legion &&
+                    parent.getCurrentHexLabel().equals(
+                                                       legion.getCurrentHexLabel()))
+                {
+                    game.getServer().undidSplit(legion.getMarkerId());
+                    legion.recombine(parent, false);
+                    it.remove();
+                }
             }
         }
         game.getServer().allUpdatePlayerInfo();
@@ -598,21 +652,25 @@ Log.debug("Called Player.setType() for " + name + " " + type);
     int getNumCreatures()
     {
         int count = 0;
-
-        Iterator it = legions.iterator();
-        while (it.hasNext())
+        synchronized (legions)
         {
-            Legion legion = (Legion)it.next();
-            count += legion.getHeight();
+            Iterator it = legions.iterator();
+            while (it.hasNext())
+            {
+                Legion legion = (Legion)it.next();
+                count += legion.getHeight();
+            }
         }
-
         return count;
     }
 
 
     void addLegion(Legion legion)
     {
-        legions.add(legion);
+        synchronized (legions)
+        {
+            legions.add(legion);
+        }
     }
 
 
@@ -698,58 +756,60 @@ Log.debug("Called Player.setType() for " + name + " " + type);
 
         Player slayer = game.getPlayer(slayerName);
 
-        Iterator it = legions.iterator();
-        while (it.hasNext())
+        synchronized (legions)
         {
-            Legion legion = (Legion)it.next();
-            String hexLabel = legion.getCurrentHexLabel();
-            Legion enemyLegion = game.getFirstEnemyLegion(hexLabel, this);
-            double halfPoints = legion.getPointValue() / 2.0;
-
-            Player scorer;
-
-            if (enemyLegion != null)
+            Iterator it = legions.iterator();
+            while (it.hasNext())
             {
-                scorer = enemyLegion.getPlayer();
-            }
-            else
-            {
-                scorer = slayer;
-            }
-            if (scorer != null)
-            {
-                scorer.addPoints(halfPoints);
-            }
+                Legion legion = (Legion)it.next();
+                String hexLabel = legion.getCurrentHexLabel();
+                Legion enemyLegion = game.getFirstEnemyLegion(hexLabel, this);
+                double halfPoints = legion.getPointValue() / 2.0;
 
-            // Call the iterator's remove() method rather than
-            // removeLegion() to avoid concurrent modification problems.
-            legion.prepareToRemove();
-            it.remove();
+                Player scorer;
+
+                if (enemyLegion != null)
+                {
+                    scorer = enemyLegion.getPlayer();
+                }
+                else
+                {
+                    scorer = slayer;
+                }
+                if (scorer != null)
+                {
+                    scorer.addPoints(halfPoints);
+                }
+
+                // Call the iterator's remove() method rather than
+                // removeLegion() to avoid concurrent modification problems.
+                legion.prepareToRemove();
+                it.remove();
+            }
         }
-
         // Truncate every player's score to an integer value.
         Collection players = game.getPlayers();
-        it = players.iterator();
+        Iterator it = players.iterator();
         while (it.hasNext())
         {
             Player player = (Player)it.next();
             player.truncScore();
         }
-
+            
         // Mark this player as dead.
         setDead(true);
-
+            
         // Record the slayer and give him this player's legion markers.
         if (slayer != null)
         {
             slayer.addPlayerElim(this);
             slayer.takeLegionMarkers(this);
         }
-
+            
         game.getServer().allUpdatePlayerInfo();
 
         Log.event(getName() + " dies");
-
+            
         // See if the game is over.
         if (checkForVictory)
         {
@@ -808,11 +868,14 @@ Log.debug("Called Player.setType() for " + name + " " + type);
     int getTotalPointValue()
     {
         int total = 0;
-        Iterator it = getLegions().iterator();
-        while (it.hasNext())
+        synchronized (legions)
         {
-            Legion legion = (Legion)it.next();
-            total += legion.getPointValue();
+            Iterator it = legions.iterator();
+            while (it.hasNext())
+            {
+                Legion legion = (Legion)it.next();
+                total += legion.getPointValue();
+            }
         }
         return total;
     }
