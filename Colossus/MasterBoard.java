@@ -174,24 +174,35 @@ public class MasterBoard extends Frame implements MouseListener,
 
         // Conventional moves
 
-        // First look for a block.
-        boolean block = false;
-        for (int i = 0; i < 6; i++)
+        // First, look for a block.
+        int block = -1;
+        for (int j = 0; j < 6; j++)
         {
-            if (hex.exitType[i] == MasterHex.BLOCK)
+            if (hex.exitType[j] == MasterHex.BLOCK)
             {
                 // Only this path is allowed. 
-                block = true;
-
+                block = j;
             }
         }
-        if (block == false)
-        {
-            // Try both arches and arrow(s).
 
+        // Try both arches and arrow(s).  If there's a block, ignore
+        // non-blocks for the first impulse.  If there's an enemy 
+        // legion, mark this hex and stop.  If there's a friendly legion, 
+        // keep going unless this is the last impulse.
+        // For moves 2-6 (limited by movementRoll) consider only arrow(s).
+
+        for (int i = 1; i <= player.movementRoll; i++)
+        {
+            // For impulse 1 only, consider blocks and arches
+            for (int j = 0; j < 6; j++)
+            {
+                if (hex.exitType[j] >= MasterHex.ARROW)
+                {
+                    
+                }
+            }
         }
 
-        // For moves 2-6 (limited by movementRoll) consider only arrow(s).
 
 
 
