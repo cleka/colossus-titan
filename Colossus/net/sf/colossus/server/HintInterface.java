@@ -1,7 +1,9 @@
 package net.sf.colossus.server;
 
+
 import net.sf.colossus.client.LegionInfo;
 import java.util.List;
+
 
 /**
  * Interface for the use of AI Hints.
@@ -10,6 +12,7 @@ import java.util.List;
  */
 public interface HintInterface
 {
+
     /**
      * Give the suggested recruit in this terrain for this legion.
      * @param terrain Type of terrain
@@ -20,10 +23,11 @@ public interface HintInterface
      * @return The name os the suggested recruit
      */
     public String getRecruitHint(String terrain,
-                                 LegionInfo legion,
-                                 List recruits,
-                                 HintOracleInterface oracle,
-                                 String[] section);
+            LegionInfo legion,
+            List recruits,
+            HintOracleInterface oracle,
+            String[] section);
+
     /**
      * To obtain the list of creature to split on turn one.
      * @param label Label of the starting Tower.
@@ -31,13 +35,14 @@ public interface HintInterface
      * @return The list of creature to split (listed by name)
      */
     public List getInitialSplitHint(String label,
-                                    String[] section);
+            String[] section);
+
     /**
-     * Give an offset to apply to the creature Point Value before estimating it's recruitment value.
+     * Give an offset to apply to the creature Point Value before estimating its recruitment value.
      * @param name Name of the Creature
      * @param section Array of AI section to be used (usually one or more of "AllAI:", "DefensiveAI:", "OffensiveAI:")
      * @return An offset to the Point Value of the creature.
      */
     public int getHintedRecruitmentValueOffset(String name,
-                                               String[] section);    
+            String[] section);
 }
