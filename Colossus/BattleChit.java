@@ -22,6 +22,9 @@ class BattleChit extends Chit
     // Damage taken
     private int hits = 0;
 
+    // Mark whether this chit is a legal carry target.
+    private boolean carryFlag = false;
+
 
     BattleChit(int cx, int cy, int scale, String imageFilename,
         Container container, Creature creature, Hex hex, Legion legion,
@@ -133,7 +136,7 @@ class BattleChit extends Chit
 
         for (int i = 0; i < 6; i++)
         {
-            // Adjacent creatures separated by a cliff are not engaged.
+            // Adjacent creatures separated by a cliff are not in contact.
             if (currentHex.getHexside(i) != 'c' && 
                 currentHex.getOppositeHexside(i) != 'c')
             {
@@ -185,22 +188,17 @@ class BattleChit extends Chit
     }
 
 
-    void strike(BattleChit target)
+    // Return the number of dice that will be rolled when striking this
+    // target, including modifications for terrain.
+    int getDice(BattleChit target)
     {
         Hex targetHex = target.getCurrentHex();
-
-        boolean carryPossible = true;
-        if (numInContact(false) < 2)
-        {
-            carryPossible = false;
-        }
 
         int dice = getPower();
 
         boolean rangestrike = !inContact(true);
         if (rangestrike)
         {
-            carryPossible = false;
             dice /= 2;
 
             // Dragon rangestriking from volcano: +2
@@ -247,13 +245,17 @@ class BattleChit extends Chit
             }
         }
 
-        if (dice <= target.getPower() - target.getHits())
-        {
-            carryPossible = false;
-        }
+        return dice;
+    }
+
+
+    int getAttackerSkill(BattleChit target)
+    {
+        Hex targetHex = target.getCurrentHex();
 
         int attackerSkill = creature.getSkill();
-        int defenderSkill = target.getCreature().getSkill();
+
+        boolean rangestrike = !inContact(true);
 
         // Skill can be modified by terrain.
         if (!rangestrike)
@@ -328,7 +330,18 @@ class BattleChit extends Chit
                 attackerSkill--;
             }
         }
-        
+
+        return attackerSkill;
+    }
+
+
+    int getStrikeNumber(BattleChit target)
+    {
+        Hex targetHex = target.getCurrentHex();
+        boolean rangestrike = !inContact(true);
+
+        int attackerSkill = getAttackerSkill(target);
+        int defenderSkill = target.getCreature().getSkill();
 
         int strikeNumber = 4 - attackerSkill + defenderSkill;
 
@@ -350,6 +363,74 @@ class BattleChit extends Chit
             strikeNumber = 6;
         }
 
+        return strikeNumber;
+    }
+
+
+    void strike(BattleChit target)
+    {
+        Hex targetHex = target.getCurrentHex();
+
+        boolean carryPossible = true;
+        if (numInContact(false) < 2)
+        {
+            carryPossible = false;
+        }
+
+        int dice = getDice(target);
+
+        if (dice <= target.getPower() - target.getHits())
+        {
+            carryPossible = false;
+        }
+
+        int strikeNumber = getStrikeNumber(target);
+
+        // Figure whether number of dice or strike number needs to be 
+        // penalized in order to carry.
+        if (carryPossible)
+        {
+            // Count legal carry targets.
+            int numCarryTargets = 0;
+
+            for (int i = 0; i < 6; i++)
+            {
+                // Adjacent creatures separated by a cliff are not in contact.
+                if (currentHex.getHexside(i) != 'c' && 
+                    currentHex.getOppositeHexside(i) != 'c')
+                {
+                    Hex hex = currentHex.getNeighbor(i);
+                    if (hex != null && hex != targetHex && hex.isOccupied())
+                    {
+                        BattleChit chit = hex.getChit();
+                        if (chit.getPlayer() != getPlayer() && !chit.isDead())
+                        {
+                            int tmpDice = getDice(chit);
+                            int tmpStrikeNumber = getStrikeNumber(chit);
+
+                            if (tmpStrikeNumber > strikeNumber || 
+                                tmpDice < dice)
+                            {
+                                // XXX: Allow choosing a less effective strike.
+                                chit.setCarryFlag(false);
+                            }
+                            else
+                            {
+                                chit.setCarryFlag(true);
+                                numCarryTargets++;
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (numCarryTargets == 0)
+            {
+                carryPossible = false;
+            }
+        }
+
+
         // Roll the dice.
         int damage = 0;
 
@@ -359,7 +440,7 @@ class BattleChit extends Chit
         {
             int roll = (int) Math.ceil(6 * Math.random());
 
-            // XXX: Display the rolls?
+            // XXX: Display the rolls somehow.
             System.out.print(roll);
 
             if (roll >= strikeNumber)
@@ -371,25 +452,37 @@ class BattleChit extends Chit
 
         int totalDamage = target.getHits();
         totalDamage += damage;
-        int carry = 0;
+        int numCarries = 0;
         int power = target.getPower();
         if (totalDamage > power)
         {
-            carry = totalDamage - power;
+            numCarries = totalDamage - power;
             totalDamage = power;
         }
         target.setHits(totalDamage);
         target.checkForDeath();
         target.repaint();
 
-        // XXX: Let the attacker choose whether to carry, if applicable.
-        if (carryPossible && carry > 0)
+        // Let the attacker choose whether to carry, if applicable.
+        if (carryPossible && numCarries > 0)
         {
-            System.out.println(carry + " possible carries");
+            System.out.println(numCarries + " possible carries");
+            map.highlightCarries(this, numCarries);
         }
 
         // Record that this attacker has struck.
         struck = true;
+    }
+
+
+    boolean getCarryFlag()
+    {
+        return carryFlag;
+    }
+
+    void setCarryFlag(boolean flag)
+    {
+        carryFlag = flag;
     }
 
 
