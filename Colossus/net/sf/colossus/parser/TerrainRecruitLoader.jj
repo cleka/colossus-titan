@@ -458,16 +458,18 @@ public class TerrainRecruitLoader
 
     /**
      * To obtain all the Creature that can be acquired at the given amount of points in the given terrain.
-     * @param t The Terrain in which the recruitement occurs.
-     * @param value The number of points at which the recruitement occurs. Valid values are constrained.
+     * @param t The Terrain in which the recruitment occurs.
+     * @param value The number of points at which the recruitment occurs. Valid values are constrained.
      * @return The list of name (as String) that can be acquired in this terrain, for this amount of points.
      * @see #getAcquirableRecruitmentsValue()
      */
     public static List getRecruitableAcquirableList(char t, int value)
     {
+Log.debug("getRecruitableAcquireableList() t=" + t + " value=" + value);
         List al = new ArrayList();
         if ((value % getAcquirableRecruitmentsValue()) != 0)
         {
+Log.debug("getRecruitableAcquireableList() returning empty list");
             return al;
         }
         Iterator it = acquirableList.iterator();
@@ -476,6 +478,7 @@ public class TerrainRecruitLoader
             acquirableData ad = (acquirableData)it.next();
             if (ad.isAvailable(t) && ((value % ad.getValue()) == 0))
             {
+Log.debug("getRecruitableAcquireableList() adding " + ad.getName());
                 al.add(ad.getName());
             }
         }

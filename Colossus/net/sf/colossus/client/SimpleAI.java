@@ -274,6 +274,7 @@ public class SimpleAI implements AI
         outer: while (it.hasNext())
         {
             String markerId = (String)it.next();
+Log.debug("SimpleAI.split() outer for " + markerId);
             LegionInfo legion = client.getLegionInfo(markerId);
 
             if (legion.getHeight() < 7)
@@ -300,11 +301,12 @@ public class SimpleAI implements AI
                 for (int roll = 1; roll <= 6; roll++)
                 {
                     Set moves = client.getMovement().listAllMoves(legion, 
-                        legion.getCurrentHex(), client.getMovementRoll());
+                        legion.getCurrentHex(), roll);
                     int safeMoves = 0;
                     Iterator moveIt = moves.iterator();
                     while (moveIt.hasNext())
                     {
+Log.debug("SimpleAI.split() moveIt loop top");
                         String hexLabel = (String)moveIt.next();
                         MasterHex hex = MasterBoard.getHexByLabel(hexLabel);
 
@@ -334,16 +336,21 @@ public class SimpleAI implements AI
                                 safeMoves++;
 
                                 // Also consider acquiring angel.
+Log.debug("SimpleAI.split() Thinking about angel");
                                 if (!goodRecruit && couldRecruitUp(legion,
                                     hexLabel, enemy, hex.getTerrain()))
                                 {
+Log.debug("SimpleAI.split() angel goodRecruit");
                                     goodRecruit = true;
                                 }
+Log.debug("SimpleAI.split() 2");
                             }
 
+Log.debug("SimpleAI.split() estimateBattleResults");
                             int result2 = estimateBattleResults(legion, false,
                                 enemy, hex);
 
+Log.debug("SimpleAI.split() 3");
                             if (result2 == WIN_WITH_MINIMAL_LOSSES
                                 && result != WIN_WITH_MINIMAL_LOSSES
                                 && roll <= 4)
@@ -360,6 +367,7 @@ public class SimpleAI implements AI
 
                     if (safeMoves == 0)
                     {
+Log.debug("SimpleAI.split() no safe move");
                         forcedToAttack++;
                     }
                     // If we'll be forced to attack on 2 or more rolls,
@@ -377,11 +385,13 @@ public class SimpleAI implements AI
                     continue outer;
                 }
             }
+Log.debug("SimpleAI.split() pickMarker");
 
             String newMarkerId = pickMarker(client.getMarkersAvailable(),
                 player.getShortColor());
 
             StringBuffer results = new StringBuffer();
+Log.debug("SimpleAI.split() chooseCreaturesToSplitOut");
             List creatures = chooseCreaturesToSplitOut(legion);
             it = creatures.iterator();
             while (it.hasNext())
@@ -390,6 +400,7 @@ public class SimpleAI implements AI
                 results.append(",");
                 results.append(creature.getName());
             }
+Log.debug("SimpleAI.split() doSplit");
             client.doSplit(legion.getMarkerId(), newMarkerId, 
                 results.toString());
         }
@@ -400,6 +411,7 @@ public class SimpleAI implements AI
     private boolean couldRecruitUp(LegionInfo legion, String hexLabel,
         LegionInfo enemy, char terrain)
     {
+Log.debug("couldRecruitUp()");
         legion.sortContents();
         Creature weakest = Creature.getCreatureByName(
             (String)legion.getContents().get(legion.getHeight() - 1));
@@ -413,6 +425,7 @@ public class SimpleAI implements AI
             if (bestRecruit != null && bestRecruit.getPointValue() >
                 weakest.getPointValue())
             {
+Log.debug("couldRecruitUp 7");
                 return true;
             }
         }
@@ -420,41 +433,60 @@ public class SimpleAI implements AI
         // Consider acquiring angels.
         if (enemy != null)
         {
+Log.debug("couldRecruitUp enemy not null");
             int pointValue = enemy.getPointValue();
+Log.debug("couldRecruitUp pointValue=" + pointValue);
             boolean wouldFlee = flee(enemy, legion);
             if (wouldFlee)
             {
                 pointValue /= 2;
+Log.debug("couldRecruitUp wouldFlee pointValue=" + pointValue);
             }
 
             // should work with all variants
             int currentScore = legion.getPlayerInfo().getScore();
+Log.debug("couldRecruitUp currentScore=" + currentScore);
             int arv = TerrainRecruitLoader.getAcquirableRecruitmentsValue();
+Log.debug("couldRecruitUp arv = " + arv);
             int nextScore = (currentScore / arv) * (arv + 1);
+Log.debug("couldRecruitUp nextScore=" + nextScore);
             Creature bestRecruit = null;
             while ((currentScore + pointValue) >= nextScore)
             {
-                java.util.List ral = TerrainRecruitLoader.getRecruitableAcquirableList(terrain, nextScore);
+Log.debug("couldRecruitUp 14");
+                java.util.List ral = 
+                    TerrainRecruitLoader.getRecruitableAcquirableList(terrain, 
+                        nextScore);
+Log.debug("couldRecruitUp 15");
                 java.util.Iterator it = ral.iterator();
                 while (it.hasNext())
                 {
+Log.debug("couldRecruitUp 16");
                     Creature tempRecruit =
                         Creature.getCreatureByName((String)it.next());
+Log.debug("couldRecruitUp 17");
                     if ((bestRecruit == null) ||
                         (tempRecruit.getPointValue() >=
                          bestRecruit.getPointValue()))
+                    {
+Log.debug("couldRecruitUp 18");
                         bestRecruit = tempRecruit;
+Log.debug("couldRecruitUp 19");
+                    }
                     nextScore += arv;
                 }
             }
+Log.debug("couldRecruitUp 20");
 
             if (bestRecruit != null && bestRecruit.getPointValue() >
                 weakest.getPointValue())
             {
+Log.debug("couldRecruitUp 21");
                 return true;
             }
         }
 
+Log.debug("couldRecruitUp 22");
         return false;
     }
 
