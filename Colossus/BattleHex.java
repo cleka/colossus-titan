@@ -382,6 +382,20 @@ class Hex
         }
     }
 
+    // Return the flip side of hexside i.
+    char getOppositeHexside(int i)
+    {
+        char hexside = ' ';
+
+        Hex neighbor = getNeighbor(i);
+        if (neighbor != null)
+        {
+            hexside = neighbor.getHexside((i + 3) % 6);
+        }
+
+        return hexside;
+    }
+
 
     void setElevation (int elevation)
     {
@@ -447,7 +461,8 @@ class Hex
         char hexside = getHexside(cameFrom);
 
         // Non-fliers may not cross cliffs.
-        if (hexside == 'c' && !creature.flies())
+        if ((hexside == 'c' || getOppositeHexside(cameFrom) == 'c') && 
+            !creature.flies())
         {
             return 5;
         }
