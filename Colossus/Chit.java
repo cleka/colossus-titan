@@ -1,6 +1,5 @@
 import java.awt.*;
 import java.util.*;
-import java.awt.image.*;
 
 /**
  * Class Chit implements the GUI for a Titan chit representing
@@ -14,7 +13,7 @@ class Chit
     private Image image;
     private boolean selected = false;
     private Rectangle rect;
-    private Container container;
+    private static Container container;
     public static final double DEG_TO_RAD = Math.PI / 180;
 
     // Offset of the mouse cursor within the chit.
@@ -26,17 +25,12 @@ class Chit
 
 
     Chit(int cx, int cy, int scale, String imageFilename,
-        Container container, boolean inverted)
+        Container container)
     {
         rect = new Rectangle(cx, cy, scale, scale);
         this.container = container;
 
-        Image sourceImage = 
-            Toolkit.getDefaultToolkit().getImage(imageFilename);
-        ImageFilter filter = new RotateFilter(inverted ? 180 * DEG_TO_RAD : 0);
-        ImageProducer producer = new 
-            FilteredImageSource(sourceImage.getSource(), filter);
-        image = Toolkit.getDefaultToolkit().createImage(producer);
+        image = Toolkit.getDefaultToolkit().getImage(imageFilename);
     }
 
 
@@ -55,20 +49,20 @@ class Chit
         if (dead)
         {
             // Draw a triple-wide red X.
-            g.setColor(java.awt.Color.red);    
+            g.setColor(java.awt.Color.red);
 
-            g.drawLine(rect.x, rect.y, rect.x + rect.width, 
+            g.drawLine(rect.x, rect.y, rect.x + rect.width,
                 rect.y + rect.height);
-            g.drawLine(rect.x, rect.y - 1, rect.x + rect.width - 1, 
+            g.drawLine(rect.x, rect.y - 1, rect.x + rect.width - 1,
                 rect.y + rect.height);
-            g.drawLine(rect.x + 1, rect.y, rect.x + rect.width, 
+            g.drawLine(rect.x + 1, rect.y, rect.x + rect.width,
                 rect.y + rect.height - 1);
 
-            g.drawLine(rect.x + rect.width, rect.y, rect.x, 
+            g.drawLine(rect.x + rect.width, rect.y, rect.x,
                 rect.y + rect.height);
-            g.drawLine(rect.x + rect.width - 1, rect.y, rect.x, 
+            g.drawLine(rect.x + rect.width - 1, rect.y, rect.x,
                 rect.y + rect.height - 1);
-            g.drawLine(rect.x + rect.width, rect.y + 1, rect.x + 1, 
+            g.drawLine(rect.x + rect.width, rect.y + 1, rect.x + 1,
                 rect.y + rect.height);
         }
     }
@@ -121,7 +115,7 @@ class Chit
         return new Point(rect.x + rect.width / 2, rect.y + rect.height / 2);
     }
 
-    
+
     public Point topLeft()
     {
         return new Point(rect.x, rect.y);
