@@ -503,32 +503,130 @@ public class BattleMap extends Frame implements MouseListener,
         }
     }
 
+    
+    // XXX: If there are two possible paths, check both.
+    boolean LOSBlocked(Hex hex1, Hex hex2)
+    {
+        if (hex1 == hex2)
+        {
+            return false;
+        }
+        
+        int x1 = hex1.getXCoord();
+        float y1 = hex1.getYCoord();
+        int x2 = hex2.getXCoord();
+        float y2 = hex2.getYCoord();
+
+        // Offboard hexes are not allowed.
+        if (x1 == -1 || x2 == -1)
+        {
+            return true;
+        }
+        
+        int direction = getDirection(hex1, hex2);
+
+        Hex nextHex = hex1.getNeighbor(direction);
+        if (nextHex == null)
+        {
+            System.out.println("oops");
+            return true;
+        }
+
+        if (nextHex == hex2)
+        {
+            // Success!
+            return false;
+        }
+
+        // Trees block LOS.
+        if (nextHex.getTerrain() == 't')
+        {
+            return true;
+        }
+
+        // Characters block LOS.
+        // XXX: Add exceptions for cliffs, elevation differences.
+        if (nextHex.isOccupied())
+        {
+            return true;
+        }
+
+        return LOSBlocked(nextHex, hex2);
+    }
+
 
     // Return a large number if the strike is impossible.  Otherwise
     // return the total skill penalty for range and terrain.
-    int getRangestrikePenalty(BattleChit rangestriker, BattleChit target)
+    int getRangestrikePenalty(BattleChit chit, BattleChit target)
     {
-        Hex currentHex = rangestriker.getCurrentHex();
+        Hex currentHex = chit.getCurrentHex();
         Hex targetHex = target.getCurrentHex();
-        int skill = rangestriker.getCreature().getSkill();
-        int range = getRange(currentHex, targetHex);
+        Creature creature = chit.getCreature();
+        Creature targetCreature = target.getCreature();
+        int skill = creature.getSkill();
+        int elevation = currentHex.getElevation();
+        int targetElevation = targetHex.getElevation();
 
         int penalty = 0;
+
+        int range = getRange(currentHex, targetHex);
 
         if (range > skill)
         {
             penalty += 10;
         }
-        else if (range == 4 && rangestriker.getCreature() != Creature.warlock)
+
+        // Only warlocks can rangestrike at range 2.  (Cliff top/bottom.)
+        else if (range < 3 && creature != Creature.warlock)
         {
-            penalty += 1;
+            penalty += 10;
+        }
+
+        // Only warlocks can rangestrike Lords.
+        else if (target.getCreature().isLord() && creature != Creature.warlock)
+        {
+            penalty += 10;
+        }
+
+        // Don't bother with expensive LOS calculations for warlocks or
+        // out-of-range shots.
+        if (penalty < 10 && creature != Creature.warlock)
+        {
+            if (range == 4)
+            {
+                penalty += 1;
+            }
+
+            if (LOSBlocked(currentHex, targetHex))
+            {
+                penalty += 10;
+            }
+        }
+
+        return penalty;
+    }
+
+
+    // Returns the hexside direction of the path from hex1 to hex2.
+    // XXX: Sometimes two directions are possible.
+    int getDirection(Hex hex1, Hex hex2)
+    {
+        if (hex1 == hex2)
+        {
+            return -1;
         }
         
-        // XXX: LOS code.
-        int x1 = currentHex.getXCoord();
-        float y1 = currentHex.getYCoord();
-        int x2 = targetHex.getXCoord();
-        float y2 = targetHex.getYCoord();
+        int x1 = hex1.getXCoord();
+        float y1 = hex1.getYCoord();
+        int x2 = hex2.getXCoord();
+        float y2 = hex2.getYCoord();
+
+        // Offboard chits are not allowed.
+        if (x1 == -1 || x2 == -1)
+        {
+            return -1;
+        }
+        
 
         // Hexes with odd X coordinates are pushed down half a hex.
         if ((x1 & 1) == 1)
@@ -542,9 +640,58 @@ public class BattleMap extends Frame implements MouseListener,
         
         float xDist = x2 - x1;
         float yDist = y2 - y1;
+        
 
-        // XXX: Terrain penalties.
-        return penalty;
+        if (xDist >= 0)
+        {
+            if (yDist >= 1.5 * xDist)
+            {
+                return 0;
+            }
+            if (yDist <= -1.5 * xDist)
+            {
+                return 3;
+            }
+            if (yDist >= 0)
+            {
+                return 1;
+            }
+            else // (yDist < 0)
+            {
+                return 2;
+            }
+        }
+        else // (xDist < 0)
+        {
+            if (yDist <= 1.5 * xDist)
+            {
+                return 3;
+            }
+            if (yDist >= -1.5 * xDist)
+            {
+                return 0;
+            }
+            if (yDist >= 0)
+            {
+                return 5;
+            }
+            else // (yDist < 0)
+            {
+                return 4;
+            }
+        }
+    }
+
+
+    // If there are two possible unblocked paths, use the one with
+    // the lower number of bramble hexes.
+    int countInterveningBrambleHexes(Hex hex1, Hex hex2)
+    {
+        int count = 0;
+
+        // XXX: Count 'em.
+
+        return count;
     }
 
 
