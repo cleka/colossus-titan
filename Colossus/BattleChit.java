@@ -456,6 +456,7 @@ class BattleChit extends Chit
                                     strikeNumber = tmpStrikeNumber;
                                     dice = tmpDice;
                                     chit.setCarryFlag(true);
+                                    numCarryTargets++;
                                 }
                                 else
                                 {
