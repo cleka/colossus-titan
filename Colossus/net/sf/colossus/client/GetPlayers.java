@@ -316,7 +316,7 @@ public final class GetPlayers extends JDialog implements WindowListener,
         }
     }
 
-    public void actionPerformed(ActionEvent e)
+    public synchronized void actionPerformed(ActionEvent e)
     {
         if (e.getActionCommand().equals(quit))
         {
@@ -340,6 +340,8 @@ public final class GetPlayers extends JDialog implements WindowListener,
                 String buttonName =
                     varName.substring(0,
                                       varName.lastIndexOf(".var"));
+                if (variantBox.getItemCount() > variantArray.length)
+                    variantBox.removeItemAt(variantArray.length);
                 variantBox.addItem(buttonName);
                 variantBox.setSelectedItem(buttonName);
             }
