@@ -15,7 +15,7 @@ P yellow      Plains    true  1 Centaur  2 Lion     2 Ranger     3 Chimera
 S blue        Swamp     true  1 Troll    3 Wyvern   3 Mammoth    2  Hydra
 
 # Tower is a special case
-T grey        Tower     false 0 Anything 0 Centaur 0 Anything 0 Gargoyle 0 Anything 0  Ogre 0 AnyNonLord 3 Guardian 0 AnyNonLord 5 Wraith 0 Titan 1 Warlock
+T grey        Tower     false 0 Anything 0 Centaur 0 Anything 0 Gargoyle 0 Anything 0  Ogre 0 AnyNonLord 3 Guardian 0 AnyNonLord 5 Wraith -1 Titan 1 Warlock
 
 t skyBlue     Tundra    true  1 Troll    2 Warbear  2 Mammoth    2 Giant     2 Colossus
 

@@ -158,6 +158,7 @@ public class TerrainRecruitLoader
             recruitNumber tr = (recruitNumber)it.next();
             if ((tr.getNumber() >= 0) && !(tr.getName().equals("Anything"))
                                       && !(tr.getName().equals("AnyNonLord"))
+                                      && !(tr.getName().equals("Titan"))
                                       && !(tr.getName().equals("Lord")))
             {
                 re.add(Creature.getCreatureByName(tr.getName()));
