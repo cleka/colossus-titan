@@ -1286,18 +1286,15 @@ public final class Battle
         return carryTargets;
     }
 
-
     public void setCarryTargets(HashSet carryTargets)
     {
         this.carryTargets = carryTargets;
     }
 
-
     public void addCarryTarget(String hexLabel)
     {
         carryTargets.add(hexLabel);
     }
-
 
     public void removeCarryTarget(String hexLabel)
     {
@@ -1307,6 +1304,11 @@ public final class Battle
 
     public void applyCarries(Critter target)
     {
+        if (!carryTargets.contains(target.getCurrentHexLabel()))
+        {
+            Log.debug("ILLEGAL CARRY ATTEMPT!");
+            return;
+        }
         int dealt = carryDamage;
         carryDamage = target.wound(carryDamage);
         dealt -= carryDamage;

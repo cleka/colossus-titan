@@ -76,7 +76,14 @@ forget about that other change you made yesterday.
 and doesn't technically need braces.  This makes the code taller,
 but easier to read and change.
 
-11. Otherwise just try to follow the existing format.  A foolish
+11. Keep files in Unix endline format (LF), not Windows format
+(CR/LF) or Mac format (CR).  This is critical for Makefiles, which
+will sometimes stop working if the line breaks are wrong.  Java
+files will work either way, but it's annoying to have a mix of
+line breaks, false diffs caused by files getting converted back
+and forth, etc. so consistent Unix format is best.
+
+12. Otherwise just try to follow the existing format.  A foolish
 consistency may be the hobgoblin of little minds, but it sure
 makes code easier to read.
 

@@ -2924,8 +2924,8 @@ public final class Game extends GameSource
     {
         public void legionChange(LegionEvent evt)
         {
-            System.out.println("Game.GameListener.legionChange: " + evt);
-               fireEvent(evt);
+            //Log.debug("Game.GameListener.legionChange: " + evt);
+            fireEvent(evt);
         }
     };
 

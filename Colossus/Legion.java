@@ -703,7 +703,8 @@ public final class Legion
             game.getServer().allRepaintHex(currentHexLabel);
 
             // Because we are modifying the caretaker
-            fireEvent(new LegionEvent(this, LegionEvent.nLEGION_LOST_CHARACTER));
+            fireEvent(new LegionEvent(this, 
+                LegionEvent.nLEGION_LOST_CHARACTER));
         }
     }
 
@@ -968,7 +969,8 @@ public final class Legion
                 return;
             }
 
-            fireEvent(new LegionEvent(this, LegionEvent.nLEGION_GAINED_CHARACTER));
+            fireEvent(new LegionEvent(this, 
+                LegionEvent.nLEGION_GAINED_CHARACTER));
         }
 
         // Newly added critters are visible.
@@ -990,7 +992,8 @@ public final class Legion
             {
                 game.getCaretaker().putOneBack(critter);
             }
-            fireEvent(new LegionEvent(this, LegionEvent.nLEGION_LOST_CHARACTER));
+            fireEvent(new LegionEvent(this, 
+                LegionEvent.nLEGION_LOST_CHARACTER));
         }
 
         // If there are no critters left, disband the legion.
@@ -1041,7 +1044,8 @@ public final class Legion
             {
                 game.getCaretaker().putOneBack(critter);
             }
-            fireEvent(new LegionEvent(this, LegionEvent.nLEGION_LOST_CHARACTER));
+            fireEvent(new LegionEvent(this, 
+                LegionEvent.nLEGION_LOST_CHARACTER));
         }
         return critter;
     }

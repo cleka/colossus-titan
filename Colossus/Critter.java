@@ -739,7 +739,7 @@ public final class Critter extends Creature implements Comparable
 
                             else
                             {
-                                battle.addCarryTarget(targetHex.getLabel());
+                                battle.addCarryTarget(neighbor.getLabel());
                                 haveCarryTarget = true;
                             }
                         }
@@ -809,7 +809,6 @@ public final class Critter extends Creature implements Comparable
                 carryPossible = false;
             }
         }
-
 
         // Roll the dice.
         int damage = 0;
