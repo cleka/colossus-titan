@@ -39,6 +39,15 @@ public final class ResourceLoader
         return pathSeparator;
     }
 
+    /** empty the cache so that all Chits have to be redrawn */
+    public static void purgeCache()
+    {
+        synchronized (imageCache)
+        {
+            imageCache.clear();
+        }
+    }
+
     /**
      * Return the first Image of name filename in the list of directories.
      * @param filename Name of the Image file to load (without extension).

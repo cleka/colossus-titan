@@ -628,6 +628,7 @@ public final class MasterBoard extends JPanel
         addCheckBox(graphicsMenu, Options.showLogWindow, KeyEvent.VK_L);
         addCheckBox(graphicsMenu, Options.antialias, KeyEvent.VK_N);
         addCheckBox(graphicsMenu, Options.useOverlay, KeyEvent.VK_V);
+        addCheckBox(graphicsMenu, Options.noBaseColor, KeyEvent.VK_W);
         mi = graphicsMenu.add(changeScaleAction);
         mi.setMnemonic(KeyEvent.VK_S);
         mi = graphicsMenu.add(viewFullRecruitTreeAction);

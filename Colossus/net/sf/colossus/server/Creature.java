@@ -43,6 +43,7 @@ public class Creature implements Comparable
     private final boolean demilord;
     private final int maxCount;
     private final String baseColor;
+    private static boolean noBaseColor = false;
 
     public static final Creature unknown = new Creature("Unknown", 1, 1,
         false, false, false, false, false, false, false,
@@ -226,7 +227,7 @@ public class Creature implements Comparable
             int specialIncrement = ((isFlier() || isRangestriker()) ? 1 : 0);
             tempNames =
                 new String[4 + specialIncrement];
-            String colorSuffix =  "-" + baseColor;
+            String colorSuffix =  "-" + (noBaseColor ? "black" : baseColor);
             tempNames[0] = name;
             tempNames[1] = "Power-" + getPower() + colorSuffix;
             
@@ -381,5 +382,10 @@ public class Creature implements Comparable
     public int hashCode()
     {
         return name.hashCode();
+    }
+
+    public static void setNoBaseColor(boolean b)
+    {
+        noBaseColor = b;
     }
 }

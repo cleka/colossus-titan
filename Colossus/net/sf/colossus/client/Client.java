@@ -324,6 +324,12 @@ public final class Client
             Hex.setOverlay(value);
             repaintAllWindows();
         }
+        else if (name.equals(Options.noBaseColor))
+        {
+            Creature.setNoBaseColor(value);
+            net.sf.colossus.util.ResourceLoader.purgeCache();
+            repaintAllWindows();
+        }
         else if (name.equals(Options.logDebug))
         {
             Log.setShowDebug(value);
