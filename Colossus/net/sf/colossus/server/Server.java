@@ -407,7 +407,7 @@ public final class Server implements IServer
         while (it.hasNext())
         {
             Player player = (Player)it.next();
-            if (!player.isDead() && !player.getName().equals(firstHuman))
+            if (!player.isDead())
             {
                 IClient client = getClient(player.getName());
                 if (client != null)
