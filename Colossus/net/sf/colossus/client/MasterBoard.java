@@ -31,6 +31,9 @@ public final class MasterBoard extends JPanel
     private static int horizSize = 0;
     private static int vertSize = 0;
 
+    /** "parity" of the board, so that Hexes are displayed the proper way */
+    private static int boardParity = 0;
+
     /** For easy of mapping to the GUI, hexes will be stored
      *  in a horizSize*vertSize array, with some empty elements. */
     private GUIMasterHex[][] h = null;
@@ -738,9 +741,9 @@ public final class MasterBoard extends JPanel
                     GUIMasterHex hex;
                     hex = h[i][j];
                     hex.init(cx + 4 * i * scale,
-                        (int) Math.round(cy + (3 * j + (i & 1) *
-                            (1 + 2 * (j / 2)) + ((i + 1) & 1) * 2 *
-                            ((j + 1) / 2)) * Hex.SQRT3 * scale),
+                      (int) Math.round(cy + (3 * j + ((i + boardParity) & 1) *
+                      (1 + 2 * (j / 2)) + ((i + 1 + boardParity) & 1) * 2 *
+                      ((j + 1) / 2)) * Hex.SQRT3 * scale),
                         scale,
                         isHexInverted(i, j),
                         this);
@@ -755,7 +758,7 @@ public final class MasterBoard extends JPanel
 
     private static boolean isHexInverted(int i, int j)
     {
-        return (((i + j) & 1) == 0);
+        return (((i + j) & 1) == boardParity);
     }
 
     static MasterHex hexByLabel(MasterHex [][] h, int label)
@@ -848,10 +851,27 @@ public final class MasterBoard extends JPanel
             System.exit(1);
         }
 
+        computeBoardParity();
         setupExits(localH);
         setupEntrances(localH);
         setupHexLabelSides(localH);
         setupNeighbors(localH);
+    }
+
+    private static void computeBoardParity()
+    {
+        boardParity = 0;
+        for (int x = 0; x < horizSize; x++)
+        {
+            for (int y = 0; y < vertSize - 1 ; y++)
+            {
+                if (show[x][y] && show[x][y+1])
+                {
+                    boardParity = 1 - ((x+y) % 2);
+                    return;
+                }
+            }
+        }
     }
 
     private static void setupExits(MasterHex [][] h)
@@ -901,7 +921,7 @@ public final class MasterBoard extends JPanel
         {
             if (dh.getYCoord() == j) 
             {
-                h[i][j].setExitType(2 - ((i + j) & 1),
+                h[i][j].setExitType(2 - ((i + j + boardParity) & 1),
                     h[i][j].getBaseExitType(k));
             } 
             else 
@@ -913,7 +933,7 @@ public final class MasterBoard extends JPanel
         {
             if (dh.getYCoord() == j) 
             {
-                h[i][j].setExitType(4 + ((i + j) & 1), 
+                h[i][j].setExitType(4 + ((i + j + boardParity) & 1), 
                     h[i][j].getBaseExitType(k));
             } 
             else 
