@@ -143,7 +143,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
     }
 
 
-    public void setupActions()
+    private void setupActions()
     {
         undoLastSplitAction = new AbstractAction(undoLastSplit)
         {
@@ -458,6 +458,16 @@ public final class MasterBoard extends JPanel implements MouseListener,
                 }
             }
         };
+
+        // If running as an applet, disable all file-related actions.
+        if (game != null && game.isApplet())
+        {
+            newGameAction.setEnabled(false);
+            loadGameAction.setEnabled(false);
+            saveGameAction.setEnabled(false);
+            saveGameAsAction.setEnabled(false);
+            saveOptionsAction.setEnabled(false);
+        }
     }
 
 
@@ -506,6 +516,12 @@ public final class MasterBoard extends JPanel implements MouseListener,
 
         miAutosave = new JCheckBoxMenuItem(Game.sAutosave);
         miAutosave.setMnemonic(KeyEvent.VK_A);
+        // Do not allow autosave if running as an applet.
+        if (game.isApplet())
+        {
+            game.setAutosave(false);
+            miAutosave.setEnabled(false);
+        }
         miAutosave.setSelected(game.getAutosave());
         miAutosave.addItemListener(this);
         optionsMenu.add(miAutosave);
@@ -561,6 +577,11 @@ public final class MasterBoard extends JPanel implements MouseListener,
 
     public void twiddleAutosave(boolean enable)
     {
+        // Do not allow autosave if running as an applet.
+        if (game.isApplet())
+        {
+            enable = false;
+        }
         miAutosave.setSelected(enable);
     }
 
@@ -1989,6 +2010,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
 
     public static void main(String [] args)
     {
-        new MasterBoard(null);
+        game = new Game();
+        new MasterBoard(game);
     }
 }

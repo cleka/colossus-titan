@@ -776,8 +776,6 @@ public final class Game
     }
 
 
-
-
     /** Create a text file describing this game's state, in
      *  file saves/<time>.sav */
     public void saveGame()

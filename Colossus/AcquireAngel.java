@@ -144,4 +144,31 @@ public final class AcquireAngel extends JDialog implements MouseListener,
     public void windowOpened(WindowEvent e)
     {
     }
+
+
+    public static void main(String [] args)
+    {
+        JFrame frame = new JFrame("testing AcquireAngel");
+        frame.setSize(new Dimension(20 * scale, 20 * scale));
+        frame.pack();
+        frame.setVisible(true);
+
+        MasterHex hex = new MasterHex(0, 0, 0, false, null);
+        hex.setTerrain('B');
+
+        Player player = new Player("Test", null);
+        Legion legion = new Legion("Bk01", null, hex, hex,
+            Creature.titan, Creature.gargoyle, Creature.cyclops,
+            Creature.behemoth, Creature.serpent, Creature.warlock,
+            null, null, player);
+
+        ArrayList recruits = new ArrayList();
+        recruits.add("Archangel");
+        recruits.add("Angel");
+
+        String type = AcquireAngel.acquireAngel(frame, player.getName(),
+            recruits);
+
+        System.out.println("Chose " + type);
+    }
 }

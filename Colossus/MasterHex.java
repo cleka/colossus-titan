@@ -791,4 +791,10 @@ public final class MasterHex extends Hex
     {
         entrySides.clear();
     }
+
+
+    public static void main(String [] args)
+    {
+        MasterBoard.main(args);
+    }
 }

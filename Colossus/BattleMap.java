@@ -91,7 +91,7 @@ public final class BattleMap extends HexMap implements MouseListener,
     }
 
 
-    public void setupActions()
+    private void setupActions()
     {
         undoLastMoveAction = new AbstractAction(undoLastMove)
         {

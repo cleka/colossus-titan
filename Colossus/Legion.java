@@ -111,6 +111,7 @@ public final class Legion
             }
             int score = player.getScore();
             int tmpScore = score;
+
             // It's practically impossible to get more than one archangel
             // from a single battle.
             boolean didArchangel = false;
@@ -119,44 +120,22 @@ public final class Legion
 
             while (getHeight() < 7 && tmpScore / 100 > (score - points) / 100)
             {
-                if (tmpScore / 500 > (score - points) / 500 &&
-                    !didArchangel)
+                recruits = Game.findEligibleAngels(this, tmpScore / 500 >
+                    (score - points) / 500 && !didArchangel);
+                String type = AcquireAngel.acquireAngel(masterFrame,
+                    player.getName(), recruits);
+                tmpScore -= 100;
+                if (type != null && recruits.contains(type))
                 {
-                    // Allow Archangel.
-                    recruits = Game.findEligibleAngels(this, true);
-                    String type = AcquireAngel.acquireAngel(masterFrame,
-                        player.getName(), recruits);
-                    tmpScore -= 100;
-                    if (type != null && recruits.contains(type))
+                    Creature angel = Creature.getCreatureFromName(type);
+                    if (angel != null)
                     {
-                        Creature angel = Creature.getCreatureFromName(type);
-                        if (angel != null)
+                        addCreature(angel, true);
+                        Game.logEvent("Legion " + getMarkerId() +
+                            " acquired an " + type);
+                        if (type.equals("Archangel"))
                         {
-                            addCreature(angel, true);
-                            Game.logEvent("Legion " + getMarkerId() +
-                                " acquired an " + type);
-                            if (type.equals("Archangel"))
-                            {
-                                didArchangel = true;
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    // Disallow Archangel.
-                    recruits = Game.findEligibleAngels(this, false);
-                    String type = AcquireAngel.acquireAngel(masterFrame,
-                        player.getName(), recruits);
-                    tmpScore -= 100;
-                    if (type != null && recruits.contains(type))
-                    {
-                        Creature angel = Creature.getCreatureFromName(type);
-                        if (angel != null)
-                        {
-                            addCreature(angel, true);
-                            Game.logEvent("Legion " + getMarkerId() +
-                                " acquired an " + type);
+                            didArchangel = true;
                         }
                     }
                 }
@@ -322,8 +301,8 @@ public final class Legion
         prepareToRemove();
         player.getLegions().remove(this);
     }
-    
-    
+
+
     /** Do the cleanup required before this legion can be removed. */
     public void prepareToRemove()
     {

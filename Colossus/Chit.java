@@ -1,6 +1,7 @@
 import java.awt.*;
 import java.io.*;
 import javax.swing.*;
+import java.util.*;
 
 /**
  * Class Chit implements the GUI for a Titan chit representing
@@ -33,7 +34,7 @@ public class Chit extends JPanel
     // XXX Is there a way to detect whether a program is running from a
     // jar file?
     public static final String pathSeparator = "/";
-    public static final String imageDirname = "images";
+    public static final String imageDirName = "images";
     public static final String imageExtension = ".gif";
     public static final String invertedPrefix = "i_";
 
@@ -188,11 +189,43 @@ public class Chit extends JPanel
     public static String getImagePath(String basename)
     {
         StringBuffer buf = new StringBuffer();
-        buf.append(imageDirname);
+        buf.append(imageDirName);
         buf.append(pathSeparator);
         buf.append(basename);
         buf.append(imageExtension);
         return buf.toString();
     }
-}
 
+
+    public static void main(String [] args)
+    {
+        JFrame frame = new JFrame("testing Chit");
+        Container contentPane = frame.getContentPane();
+        int scale = 60;
+
+        File dir = new File(imageDirName);
+        if (!dir.exists() || !dir.isDirectory())
+        {
+            System.out.println("No images directory");
+            return;
+        }
+        String [] filenames = dir.list();
+        int sqrt = (int)Math.floor(Math.sqrt(filenames.length));
+        contentPane.setLayout(new GridLayout(sqrt, 0));
+        Arrays.sort(filenames);
+        int extLen = imageExtension.length();
+        for (int i = 0; i < filenames.length; i++)
+        {
+            if (filenames[i].endsWith(imageExtension))
+            {
+                String basename = filenames[i].substring(0,
+                    filenames[i].length() - extLen);
+                Chit chit = new Chit(scale, basename, frame);
+                contentPane.add(chit);
+            }
+        }
+
+        frame.pack();
+        frame.setVisible(true);
+    }
+}

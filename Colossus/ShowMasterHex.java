@@ -167,4 +167,10 @@ public final class ShowMasterHex extends JDialog implements MouseListener,
     public void windowOpened(WindowEvent e)
     {
     }
+
+
+    public static void main(String [] args)
+    {
+        MasterBoard.main(args);
+    }
 }

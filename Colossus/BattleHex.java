@@ -611,4 +611,10 @@ public final class BattleHex extends Hex
         // Other hexes only cost 1.
         return NORMAL_COST;
     }
+
+
+    public static void main(String [] args)
+    {
+        BattleMap.main(args);
+    }
 }

@@ -12,13 +12,14 @@ import java.util.*;
 public final class ShowLegion extends JDialog implements MouseListener,
     WindowListener
 {
+    private static final int scale = 60;
+
+
     public ShowLegion(JFrame parentFrame, Legion legion, Point point, boolean
         allStacksVisible)
     {
         super(parentFrame, "Contents of Legion " +
             legion.getMarkerId(), false);
-
-        int scale = 60;
 
         pack();
         setBackground(Color.lightGray);
@@ -144,5 +145,26 @@ public final class ShowLegion extends JDialog implements MouseListener,
 
     public void windowOpened(WindowEvent e)
     {
+    }
+
+
+    public static void main(String [] args)
+    {
+        JFrame frame = new JFrame("testing ShowLegion");
+        frame.setSize(new Dimension(20 * scale, 20 * scale));
+        frame.pack();
+        frame.setVisible(true);
+
+        MasterHex hex = new MasterHex(0, 0, 0, false, null);
+        hex.setTerrain('B');
+
+        Player player = new Player("Test", null);
+        Legion legion = new Legion("Bk01", null, hex, hex,
+            Creature.titan, Creature.gargoyle, Creature.gargoyle,
+            Creature.cyclops, Creature.cyclops, null,
+            null, null, player);
+        Point point = new Point(10 * scale, 10 * scale);
+
+        new ShowLegion(frame, legion, point, true);
     }
 }

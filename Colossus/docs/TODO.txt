@@ -1,5 +1,3 @@
-Disable file-related options when running as an applet.
-
 Add per-player option menu, with results saved to playername.cfg
 
 Change more modal dialogs to use a factory that returns a value,
