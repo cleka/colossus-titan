@@ -22,7 +22,6 @@ class Legion
     private boolean recruited = false;
     private boolean summoned = false;
     private Player player;
-    private int entrySide;
 
 
     Legion(int cx, int cy, int scale, String markerId, Legion splitFrom,
@@ -187,9 +186,8 @@ class Legion
         currentHex.addLegion(this);
         moved = true;
         player.markLastLegionMoved(this);
-        setEntrySide(hex.getEntrySide());
         // If we teleported, no more teleports are allowed this turn.
-        if (getEntrySide() == -1)
+        if (currentHex.getEntrySide() == -1)
         {
             player.disallowTeleport();
         }
@@ -216,18 +214,6 @@ class Legion
         moved = false;
         recruited = false;
         summoned = false;
-    }
-
-
-    int getEntrySide()
-    {
-        return entrySide;
-    }
-    
-    
-    void setEntrySide(int side)
-    {
-        entrySide = side;
     }
 
 
