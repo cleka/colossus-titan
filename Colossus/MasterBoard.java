@@ -239,13 +239,13 @@ class MasterBoard extends Frame implements MouseListener,
 
     // Clear all entry side and teleport information from all hexes occupied
     // by one or fewer legions.
-    public void clearAllUnoccupiedEntrySides()
+    public void clearAllNonFriendlyOccupiedEntrySides(Player player)
     {
         for (int i = 0; i < h.length; i++)
         {
             for (int j = 0; j < h[0].length; j++)
             {
-                if (show[i][j] && h[i][j].getNumLegions() == 0)
+                if (show[i][j] && h[i][j].getNumFriendlyLegions(player) == 0)
                 {
                     h[i][j].clearAllEntrySides();
                     h[i][j].clearTeleported();
@@ -423,8 +423,10 @@ class MasterBoard extends Frame implements MouseListener,
         {
             return 0;
         }
+        
+        Player player = legion.getPlayer();
 
-        clearAllUnoccupiedEntrySides();
+        clearAllNonFriendlyOccupiedEntrySides(player);
 
         int count = 0;
 
@@ -442,8 +444,6 @@ class MasterBoard extends Frame implements MouseListener,
                 block = j;
             }
         }
-
-        Player player = legion.getPlayer();
 
         count += findMoves(hex, player, legion, player.getMovementRoll(),
             block, -1, show);
