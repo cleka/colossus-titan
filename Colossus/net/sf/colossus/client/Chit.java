@@ -72,7 +72,6 @@ class Chit extends JPanel
         super();
 
         this.inverted = inverted;
-
         Point point = getLocation();
 
         // Images are 60x60, so if scale is close to that, avoid
@@ -90,14 +89,27 @@ class Chit extends JPanel
 
         setBackground(Color.lightGray);
 
-        if (!Creature.isCreature(id))
+        if (Creature.isCreature(id))
         {
-            if (!(id.startsWith("Titan-")))
+            Creature cre = Creature.getCreatureByName(id);
+            String[] names = cre.getImageNames();
+            if (dubious)
             {
-                icon = getImageIcon(id, scale);
+                String[] names2 = new String[names.length + 1];
+                for (int i = 0; i < names.length; i++)
+                {
+                    names2[i] = names[i];
+                }
+                names2[names.length] = "QuestionMarkMask" +
+                        (cre.getBaseColor().equals("black") ? "Red" : "");
+                names = names2;
             }
-            else
-            { // special case : the Titan.
+            icon = getImageIcon(names, scale);
+        }
+        else
+        {
+            if (id.startsWith("Titan-"))
+            {
                 String[] filenames = new String[4 + (dubious ? 1 : 0)];
                 int index = 6;
                 int index2 = index;
@@ -123,25 +135,10 @@ class Chit extends JPanel
 
                 icon = getImageIcon(filenames, scale);
             }
-        }
-        else
-        {
-            Creature cre = Creature.getCreatureByName(id);
-            String[] names = cre.getImageNames();
-
-            if (dubious)
+            else
             {
-                String[] names2 = new String[names.length + 1];
-                for (int i = 0; i < names.length; i++)
-                {
-                    names2[i] = names[i];
-                }
-                names2[names.length] = "QuestionMarkMask" +
-                        (cre.getBaseColor().equals("black") ? "Red" : "");
-                names = names2;
+                icon = getImageIcon(id, scale);
             }
-
-            icon = getImageIcon(names, scale);
         }
     }
 
@@ -183,8 +180,7 @@ class Chit extends JPanel
     {
         java.util.List directories = VariantSupport.getImagesDirectoriesList();
         Image composite = ResourceLoader.getCompositeImage(imageFilenames,
-                directories,
-                scale, scale);
+                directories, scale, scale);
         return new ImageIcon(composite);
     }
 
