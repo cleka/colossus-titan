@@ -1405,7 +1405,7 @@ class MasterBoard extends Frame implements MouseListener,
                     // What to do depends on which mouse button was used
                     // and the current phase of the turn.
 
-                    // Right-click or means to show the contents of the 
+                    // Right-click means to show the contents of the 
                     // legion.
                     if (((e.getModifiers() & InputEvent.BUTTON2_MASK) ==
                         InputEvent.BUTTON2_MASK) || ((e.getModifiers() &
@@ -1500,13 +1500,20 @@ class MasterBoard extends Frame implements MouseListener,
                 {
                     MasterHex hex = h[i][j];
 
-                    // Right-click or alt-click means to show the contents
-                    // of the hex.
+                    // Single-right-click means to show the contents of the hex.
+                    // Double-right-click means to show the hex's battlemap.
                     if (((e.getModifiers() & InputEvent.BUTTON2_MASK) ==
                         InputEvent.BUTTON2_MASK) || ((e.getModifiers() &
                         InputEvent.BUTTON3_MASK) == InputEvent.BUTTON3_MASK))
                     {
-                        new ShowMasterHex(this, hex, point);
+                        if (e.getClickCount() > 1)
+                        {
+                            new ShowBattleMap(this, hex);
+                        }
+                        else
+                        {
+                            new ShowMasterHex(this, hex, point);
+                        }
                         return;
                     }
 
