@@ -40,7 +40,7 @@ class SummonAngel extends JDialog implements MouseListener, ActionListener,
         player = legion.getPlayer();
         this.board = board;
 
-        if (player.canSummonAngel() == false || legion.getHeight() > 6)
+        if (!player.canSummonAngel() || legion.getHeight() > 6)
         {
             cleanup(false);
             return;

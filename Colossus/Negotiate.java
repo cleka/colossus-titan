@@ -221,7 +221,7 @@ class Negotiate extends JDialog implements MouseListener, ActionListener
             int attackersLeft = 0; 
             for (int i = 0; i < attacker.getHeight(); i++)
             {
-                if (attackerChits[i].isDead() == false)
+                if (!attackerChits[i].isDead())
                 {
                     attackersLeft++;
                 }
@@ -229,7 +229,7 @@ class Negotiate extends JDialog implements MouseListener, ActionListener
             int defendersLeft = 0; 
             for (int i = 0; i < defender.getHeight(); i++)
             {
-                if (defenderChits[i].isDead() == false)
+                if (!defenderChits[i].isDead())
                 {
                     defendersLeft++;
                 }
