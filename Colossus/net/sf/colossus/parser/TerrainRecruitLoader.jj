@@ -35,7 +35,7 @@ public class TerrainRecruitLoader
      */
     Hashtable carToColor = new Hashtable();
     /**
-     * Map a character (representing a terrain) to a boolean, telling if a Creature can recruit belowe its rank or not.
+     * Map a character (representing a terrain) to a boolean, telling if a Creature can recruit below its rank or not.
      */
     Hashtable carToBelow = new Hashtable();
     /**
@@ -408,9 +408,9 @@ public class TerrainRecruitLoader
         {
             acquirableData ad = (acquirableData)it.next();
             if (name.equals(ad.getName()))
-             {
+            {
                 return true;
-             }
+            }
         }
         return false;
     }

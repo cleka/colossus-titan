@@ -1,0 +1,251 @@
+$Id$
+
+Building Colossus 
+
+(Sorry this is so longwinded; I'm trying to be thorough in case 
+someone who's not a Java programmer wants to make a small change.)
+
+
+TOOLS NEEDED
+
+All of these tools are free downloads, and we need to avoid making 
+the game depend on tools that aren't.
+
+
+Java development kit:
+
+You need a JDK, which includes a javac compiler, a java runtime environment, 
+and various utilities like jar and javadoc.
+
+The game should work with JDK 1.2 or newer.  1.3.1 seems to be 
+the most stable.  1.4.0 RC is available, so 1.4.0 should be out soon.
+It's a good idea to keep a 1.2.x JDK around for compatibility testing.
+
+Unless you have a fast, reliable, nailed-up net connection, also 
+download the JDK docs, which are packaged separately.
+
+Sun maintains the JDK for Windows, Solaris Sparc and x86, and x86 Linux.  
+See http://java.sun.com/j2se/  I think that the Sun JDK is currently
+the best one on those three platforms.
+
+The Blackdown JDK is the original port of Sun's Solaris JDK to Linux.  
+(Sun's Linux JDK in turn uses Blackdown code.  So the two are very close
+cousins.)  If you have a non-x86 Linux box, you want Blackdown.
+See http://www.blackdown.org/java-linux/ports.html
+
+gcj and kaffe don't have enough GUI support yet to be useful for Colossus.
+
+
+[TODO More platforms.  Please update this document if you use
+platforms that I don't.]
+
+If your platform is not listed above, a starting point for finding
+a JDK is http://java.sun.com/cgi-bin/java-ports.cgi
+
+
+[TODO Do we need to show different environment variable syntax and
+startup script lines on various platforms, shells, etc.?  Ugh.  Find
+a link.]
+
+Once you have installed your JDK, you probably want to set an environment 
+variable called JAVA_HOME that points to its base directory.  Then you want 
+to put $JAVA_HOME/bin in your PATH.  You also want to set CLASSPATH to 
+include "." (the current directory); you'll add stuff to it later as you 
+add Java tools.
+
+Not many tools directly use JAVA_HOME, but it lets you easily switch JDKs 
+by changing one environment variable instead of all the things that point 
+to it.
+
+
+Other compilers:
+
+Jikes is Open Source very fast Java compiler written in C++, originally
+written by IBM.  Its speed is very nice, and it has some other neat 
+features like incremental compilation, more warnings, etc.  However, 
+jikes produces slightly different class files than javac, which 
+sometimes causes problems.  So I recommend using Jikes most of the time,
+but making sure to do a full compile with javac as well before checking
+in code.
+Also, you may need to set the JIKES_PATH environment variable so Jikes 
+can find your standard Java libraries.  And you probably want Jikes in
+your PATH.
+http://www-124.ibm.com/developerworks/projects/jikes/
+Read the Ant docs for how to set the build.compiler property to 
+switch between javac and Jikes.
+
+
+Build tools:
+
+There are two main alternatives for building Colossus, Ant and make.
+
+Ant is a newer cross-platform build tool used by many Java projects.  
+It uses a file called build.xml.   You can download Ant from 
+http://jakarta.apache.org/ant/  You will also need the corresponding
+"optional.jar" which contains extra features that we use, like the 
+JavaCC task.  You need version 1.4.1 or newer.  You'll need to set 
+ANT_HOME to its install directory, and you'll want $ANT_HOME/bin in 
+your PATH.
+
+Make is the old-school Unix build tool.  It uses a build file called
+Makefile.  (Colossus only has one, not nested Makefiles in each
+directory.)  Make is to Ant as C is to Java.  It's fast, it's already
+included on Unix boxes, it's portable only if you handle all the special
+cases yourself, it's somewhat user-hostile, and a lot of people already 
+know it because it's been around forever.  Please try to use Ant instead, 
+so that we can someday get rid of the Makefile and avoid double 
+maintainence.
+
+
+Parser tools:
+
+Colossus uses the JavaCC parser generator written by Sun and Matamata.  
+(JavaCC has nothing to do with javac, despite the similar name.  It
+stands for Java Compiler Compiler.)
+
+This turns .jj files into .java files, which are then compiled normally.  
+You want version 2.1.
+http://www.webgain.com/trialware/javacc/JavaCC2_1.zip
+I set JAVACC_HOME to its install location and then put $JAVACC_HOME/bin
+in my PATH.  (You can probably see the pattern by now.)
+
+You don't actually need to know JavaCC unless you want to change parser
+files or make new ones.  You only need to install it and let build.xml
+drive it for you.
+
+
+Source code control:
+
+We use CVS, with the repository hosted on SourceForge.  SF requires ssh 
+instead of the insecure pserver as a transport mechanism, which complicates
+cvs setup a bit.  There are a lot of CVS + ssh setup directions on
+SF.  If you can't get it to work, ask for help.
+
+[TODO Insert links to cvs, ssh, putty, SF CVS setup instructions, etc.]
+
+
+Java Web Start
+
+If your JDK didn't include Java Web Start, you want that too, so 
+that you can test that you haven't broken JWS compatibility.  (This
+is way too easy to do when you add resources.)
+http://java.sun.com/products/javawebstart/  You want javaws in your
+PATH.
+
+(An alternate JNLP launcher, in case there is no JWS for your platform,
+is OpenJNLP at http://openjnlp.nanode.org   I haven't tried it.  If 
+you do, please update this document.)
+
+
+jar:
+
+Jar is the standard java archive format.  It basically uses the compression 
+algorithm from zip with command line syntax similar to tar.  If you need to 
+uncompress a jar file on a machine with no jar, try your favorite unzip tool.  
+Jar comes with the JDK.
+
+
+jarsigner:
+
+Jars can be signed.  Jars *must* be signed to work over Java Web Start.
+But note that you can use "test" keys -- you don't actually have to
+pay money to a certifying authority and get a "real" key that actually
+"proves" that you are who you say you are.
+
+The jarsigner tool comes with the JDK.  To use it, you need to create
+a personal authentication key, and put it in a keystore file.  The sign
+targets in build.xml and Makefile assume that your key name and keystore
+filename match your username.  If you don't like this, you can add new
+targets.
+
+[TODO Link to basic jarsigner docs.]
+
+
+zip and unzip tools:
+
+You need something that can work with the standard zip format.  WinZip, 
+Info-Zip, PKZip, etc.  Info-Zip is free -- most of the others are shareware.  
+
+
+Text editors:
+
+Your choice.  I recommend choosing something that autoconverts tabs to
+the right number of spaces on the fly.  (Tab characters in code are *evil*)
+and can save files using Unix newline and EOF conventions.  If your editor 
+can't do these, then you'll need to run "ant fix" on your code before 
+checking it into CVS, to avoid creating whole-file false diffs or files
+that look awful if someone has different tab stop settings than yours.
+(Yes, cross-platform development adds a few wrinkles.)
+
+
+
+OPTIONAL TOOLS:
+
+
+Debuggers:
+
+JSwat is free and pretty good.
+http://www.bluemarsh.com/java/jswat/
+
+
+Profilers:
+
+You can use java -Xprof or -Xrunhprof.
+OptimizeIt! rocks, but it's $500.
+[TODO: Add ProfAnal info.]
+
+
+Code reformatters:
+
+If you just can't work with the format in CodingStandards.txt, then you
+need a tool to convert files to and from your personal pet format to the
+one this project uses.
+
+JIndent used to be free, but not that full-featured.  
+[TODO: Find working link to last free version.]
+Now it's really full-featured, but no longer free.
+[TODO: Find free Java code formatter that actually works well.]
+
+
+Image editors:
+
+Currently all images used in Colossus are GIFs.  JPEGs are great for
+photos but not optimal for simple drawings.  PNG is better than GIF 
+in many ways, but Java didn't support it until 1.3 so we don't use it.
+
+Any image editor that can save to standard formats is fine.  If you
+don't have one, Gimp (www.gimp.org) is good and free, but has a steep
+learning curve, much like Photoshop.  
+[TODO: Find a lighter-weight, easier-to-learn free image editor that 
+can save to our file formats.]
+
+
+
+BUILD PROCESS:
+
+Once you have the tools set up, Colossus basically builds itself.
+
+First you need all the source files.  Snag the latest zip file from 
+http://colossus.sf.net/downloads, or (to get the newest possible code)
+pull from CVS.
+
+If you just type "ant" or "make" from the project base directory,
+then you get the default target, which in both cases will compile
+all the .jj files into .java files with JavaCC, then compile all
+the .java files into .class files with javac, then make an unsigned
+executable jar file.
+
+Other interesting targets include clean (delete stuff, useful if
+you want to clean up or make sure that you fully rebuild all your
+class files), fix (ant only -- does a bit of text reformatting on
+java source files), tools (builds standalone tools), sign (signs
+a jarfile), and dist (makes a zip file).  There are also some
+targets that automate installing the package onto a web site --
+these are designed for maintaining the SF site rather than general
+use.  Basically, skim through build.xml
+
+
+GOTCHAS:
+
+[TODO Find out what confuses people and fix or document it.]
+

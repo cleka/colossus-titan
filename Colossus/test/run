@@ -1,0 +1,5 @@
+#!/bin/sh
+# Make sure javaws is in your path
+# Change the codebase in unix.jnlp to match your config.
+# You need a *signed* Colossus.jar in this directory.
+javaws unix.jnlp

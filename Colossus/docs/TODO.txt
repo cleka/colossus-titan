@@ -3,9 +3,7 @@ Document build and test procedures.  Copy all docs to web page from
 
 Put web page under CVS.
 
-Set up a local Java Web Start test config.
-
-java2html (link from rachel.sf.net)
+Set up Java2html for current release source on web site.
 
 Highlight appropriate engagement hex while engagement is being resolved.
    (Except during angel summoning.)
@@ -108,3 +106,5 @@ Client-server networking.
 
 Chat window.
 
+Add movement and recruit animation.  Requires returning full paths for
+   moves, not just destination hex.

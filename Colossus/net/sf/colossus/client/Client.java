@@ -525,7 +525,8 @@ Log.debug("Client.leaveCarryMode()");
 
     private void makeForcedStrikes()
     {
-        if (playerName.equals(getBattleActivePlayerName()))
+        if (playerName.equals(getBattleActivePlayerName()) &&
+            getOption(Options.autoForcedStrike))
         {
 Log.debug("Client.makeForcedStrikes()");
             server.makeForcedStrikes(playerName, getOption(
