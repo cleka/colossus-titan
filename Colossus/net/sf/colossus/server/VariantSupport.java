@@ -358,6 +358,15 @@ public final class VariantSupport
         }
         return null;
     }
+
+    public synchronized static java.util.List getInitialSplitHint(String label)
+    {
+        if (aihl != null)
+        {
+            return aihl.getInitialSplitHint(label);
+        }
+        return null;
+    }
     
     /** get maximum number of players in that variant */
     public static int getMaxPlayers()

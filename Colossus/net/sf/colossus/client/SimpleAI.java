@@ -610,6 +610,10 @@ public class SimpleAI implements AI
         final Creature nonsplitCreature = oddTower ? startCre[0]
                 : startCre[2];
 
+        java.util.List hintSuggestedSplit = getInitialSplitHint(label);
+        Log.debug("Hint: suggest splitting " + hintSuggestedSplit + 
+                  " in " + label);
+
 // XXX Hardcoded to default board.
         // don't split gargoyles in tower 3 or 6 (because of the extra jungles)
         if ("300".equals(label) || "600".equals(label))
@@ -753,6 +757,32 @@ public class SimpleAI implements AI
         return splitoffs;
     }
 
+    private static List getInitialSplitHint(String label)
+    {
+        List byName = VariantSupport.getInitialSplitHint(label);
+
+        if (byName == null)
+        {
+            return null;
+        }
+
+        List byCreature = new ArrayList();
+
+        Iterator it = byName.iterator();
+        while (it.hasNext())
+        {
+            String name = (String)it.next();
+            Creature cre = Creature.getCreatureByName(name);
+            if (cre == null)
+            {
+                Log.error("HINT: Unknown creature in hint (" + name +
+                          "), aborting.");
+                return null;
+            }
+            byCreature.add(cre);
+        }
+        return byCreature;
+    }
 
     /** little helper to store info about possible moves */
     private class MoveInfo

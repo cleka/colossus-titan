@@ -21,7 +21,3 @@ Unicorn    6     4     false false false false false false true  false true  fal
 Warbear    6     3     false false false true  false false false false true  false false false false false false false    21    Warbears   centaurGold
 Warlock    5     4     true  false false false false false false false false false false false true  false false true      6    Warlocks   hydraOrange
 Wyvern     7     3     false true  false false true  false false false false false false false false false false false    18    Wyverns    colossusPink
-# Unused, but leave them defined for the AI.
-Centaur    3     4     false false false false false false false false true  false false false false false false false     0    Centaurs   centaurGold
-Gargoyle   4     3     false true  true  false false false false false false false false false false false false false     0    Gargoyles  black
-Ogre       6     2     false false false false true  false true  false false false false false false false false false     0    Ogres      ogreRed

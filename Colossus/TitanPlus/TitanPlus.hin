@@ -12,3 +12,14 @@ RECRUIT T Troll     2 Troll    (NOT ((CANRECRUIT Warlock) OR
                                      (CANRECRUIT Guardian)))
 RECRUIT T Lion      2 Lion     (NOT ((CANRECRUIT Warlock) OR
                                      (CANRECRUIT Guardian)))
+
+INITIALSPLIT "100" 0.5 ( Titan Cyclops Lion Lion ) ( Angel Cyclops Troll Troll )
+INITIALSPLIT "100" 1.0 ( Titan Cyclops Cyclops Troll ) ( Angel Lion Lion Troll )
+INITIALSPLIT "200" 1.0 ( Titan Cyclops Troll Troll ) ( Angel Cyclops Lion Lion )
+INITIALSPLIT "300" 0.5 ( Titan Cyclops Cyclops Troll ) ( Angel Lion Lion Troll )
+INITIALSPLIT "300" 1.0 ( Titan Lion Lion Troll ) ( Angel Cyclops Cyclops  Troll )
+INITIALSPLIT "400" 0.5 ( Titan Cyclops Troll Troll ) ( Angel Cyclops Lion Lion )
+INITIALSPLIT "400" 1.0 ( Titan Cyclops Cyclops Lion ) ( Angel Troll Troll Lion )
+INITIALSPLIT "500" 1.0 ( Titan Cyclops Troll Troll ) ( Angel Cyclops Lion Lion )
+INITIALSPLIT "600" 0.5 ( Titan Cyclops Cyclops Lion ) ( Angel Troll Troll Lion )
+INITIALSPLIT "600" 1.0 ( Titan Troll Troll Lion ) ( Angel Cyclops Cyclops  Lion )
