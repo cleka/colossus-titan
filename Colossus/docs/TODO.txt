@@ -13,9 +13,7 @@ Highlight appropriate engagement hex while engagement is being resolved.
 
 Make most returned collections unmodifiable.
 
-Initialize autoPickRecruiter, overlays to true by default.
-
-Show just-recruited enemy critters on top of their stacks.
+Initialize autoPickRecruiter and overlays to true by default.
 
 Optional post-engagement status dialog showing which legions/players
    fought, known stack contents, what lived and died, summons, acquires,
@@ -27,22 +25,21 @@ Change some dialogs to show info in a label instead of the title (so
 Move code to center a dialog on screen to one place.  Maybe add a
    parent dialog class?
 
-Change StatusScreen to use a JTable.
+Change StatusScreen to use a JTable.  
+Pass smaller chunks of changed info to StatusScreen, from generalized
+    info update messages. 
 
-Cache hex location of each legion in Client.
-Cache known legion contents in Client.
-Both require sending events to all clients when a legion is formed
-    (game start or load), splits/joins, moves/unmoves, recruits/unrecruits, 
-    reinforces, acquires, summons, dies (flees/concedes/negotiates/battles), 
-    or gets reduced (by negotiation or battle).
-Change client->server information methods to void requests and callbacks.
+Cache legion heights, then known legion contents in Client.
 
-Remove public Client methods that only affect the GUI, e.g. unselectAllHexes()
+Change remaining client->server information methods to void requests 
+   and callbacks.
+
+Remove remaining public Client methods that only directly control the GUI
    in favor of higher-level events.
 
 Always show the current turn, player, and phase in a panel somewhere.
 
-Add confirm dialogs (for conceding with titan, ...)
+Add confirm dialogs (for conceding with titan, skipping recruits, ...)
 
 If there is more than one human player, move the active player's
    map/board to the front.
@@ -68,8 +65,6 @@ Prompt player whether to continue game after last human player dies
 Include an .ico file for Windows.
 
 Remember window positions in .cfg file.
-
-Confirmation prompt to avoid skipping recruits?
 
 Add UI for players to specify favorite colors.
 
@@ -102,10 +97,6 @@ Add optional additional handicap mulligans that can be used after turn 1.
 Show StatusScreen and ShowLegion info in the masterboard window, rather 
    than in separate windows.
 
-Client-server networking.
-
-Chat window.
-
 Add movement and recruit animation.  Requires returning full paths for
    moves, not just destination hex.
 
@@ -113,28 +104,9 @@ Add movement and recruit animation.  Requires returning full paths for
 
 Bug: Can't change player options during battle when attacked by another
      player, only during own turn.
+
 Bug: AI player rolls 6 on turn 1, fails several teleport moves, takes normal
      move.  Not passing teleport=true to Game.doMove() ? 
-Bug: Angel acquiring is broken.  Default variant.
-     dripton's turn, number 7
-     2 creatures are split off from legion Rd01 (Cross) into new legion Br01 (Antlers)
-     2 creatures are split off from legion Rd02 (Eagle) into new legion Br02 (Bell)
-     Phase advances to Move
-     dripton rolls a 1 for movement
-     Legion Rd01 (Cross) in 115 moves to Tower hex 300 entering on Bottom
-     Legion Rd04 (Gong) in 118 moves to Marsh hex 117 entering on Left
-     Legion Rd03 (Fist) in 113 moves to Marsh hex 112 entering on Right
-     Legion Rd02 (Eagle) in 108 moves to Tower hex 200 entering on Bottom
-     Phase advances to Fight
-     in kickEngagements() summoning=false reinforcing=false acquiring=false
-     Legion Bk04 (Feather) flees from legion Rd01 (Cross)
-     Legion Bk04 (Feather) [Gargoyle, Gargoyle] is eliminated
-     dripton earns 12.0 points
-     in kickEngagements() summoning=false reinforcing=false acquiring=false
-     Phase advances to Muster
-     Legion Rd01 (Cross) in Tower hex 300 recruits Warlock with 1 Titan
-     Legion Rd03 (Fist) in Marsh hex 112 recruits Troll with 2 Ogres
-     Legion Rd02 (Eagle) in Tower hex 200 recruits Centaur with 1 Angel
 
 Bug: Entering AI player left troll offboard.  (Had to -- no room.)  It
      was shown in the entrance for the rest of the battle, without an X.
