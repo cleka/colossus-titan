@@ -81,107 +81,21 @@ public final class Client
     // the game?  Maybe change all boolean returns to ints and set up
     // some constants?
 
-    // XXX Need to set up events to model requests from server to client.
 
-
-    /** Pick a player name */
-    boolean name(String playername)
-    {
-        return false;
-    }
-
-    /** Stop waiting for more players to join and start the game. */
-    boolean start()
-    {
-        return false;
-    }
-
-    /** Pick a color */
-    boolean color(String colorname)
-    {
-        return false;
-    }
-
-    /** Undo a split. Used during split phase and just before the end
-     *  of the movement phase. */
-    boolean join(String childLegionId, String parentLegionId)
-    {
-        return false;
-    }
-
-    /** Split some creatures off oldLegion into newLegion. */
-    boolean split(String parentLegionId, String childLegionId,
-        java.util.List splitCreatureNames)
-    {
-        return false;
-    }
-
-    /** Done with splits. Roll movement.  Returns the roll, or -1 on error. */
-    int roll()
-    {
-        return -1;
-    }
 
     /** Take a mulligan. Returns the roll, or -1 on error. */
     int mulligan()
     {
+        clearUndoStack();
         clearRecruitChits();
         return server.mulligan(playerName);
     }
 
-    /** Normally move legion to land entering on entrySide. */
-    boolean move(String legion, String land, int entrySide)
-    {
-        return false;
-    }
-
-    /** Lord teleports legion to land entering on entrySide. */
-    boolean teleport(String legion, String land, int entrySide, String lord)
-    {
-        return false;
-    }
-
-    /** Legion undoes its move. */
-    boolean undoMove(String legion)
-    {
-        return false;
-    }
-
-    /** Attempt to end the movement phase. Fails if nothing moved, or if
-     *  split legions were not separated or rejoined. */
-    boolean doneMoving()
-    {
-        return false;
-    }
-
-    /** Legion recruits recruit using the correct number of recruiter. */
-    boolean recruit(String legion, String recruit, String recruiter)
-    {
-        return false;
-    }
-
-    /** Legion undoes its last recruit. */
-    boolean undoRecruit(String legion)
-    {
-        return false;
-    }
 
     /** Resolve engagement in land. */
     void engage(String land)
     {
         server.engage(land);
-    }
-
-    /** Legion flees. */
-    boolean flee(String legion)
-    {
-        return false;
-    }
-
-    /** Legion does not flee. */
-    boolean dontFlee(String legion)
-    {
-        return false;
     }
 
     /** Legion concedes. */
@@ -190,71 +104,13 @@ public final class Client
         return server.tryToConcede(playerName);
     }
 
-    /** Legion does not concede. */
-    boolean dontConcede(String legion)
-    {
-        return false;
-    }
-
-    /** Offer to negotiate engagement in land.  If legion or unitsLeft
-     *  is null or empty then propose a mutual. If this matches one
-     *  of the opponent's proposals, then accept it. */
-/*
-    boolean negotiate(String land, String legion, java.util.List unitsLeft)
-    {
-        return false;
-    }
-*/
-
     /** Cease negotiations and fight a battle in land. */
     void fight(String land)
     {
+        clearUndoStack();
         server.fight(land);
     }
 
-    /** Move offboard unit to hex. */
-    boolean enter(String unit, String hex)
-    {
-        return false;
-    }
-
-    /** Maneuver unit in hex1 to hex2. */
-    boolean maneuver(String hex1, String hex2)
-    {
-        return false;
-    }
-
-    /** Move unit in hex back to its old location. */
-    boolean undoManeuver(String hex)
-    {
-        return false;
-    }
-
-    /** Done with battle maneuver phase. */
-    boolean doneManeuvering()
-    {
-        return false;
-    }
-
-    /** Unit in hex1 strikes unit in hex2 with the specified number
-     *  of dice and target number.  Returns number of hits or -1
-     *  on error. */
-    int strike(String hex1, String hex2, int dice, int target)
-    {
-        return -1;
-    }
-
-    /** Carry hits to unit in hex. */
-    boolean carry(String hex, int hits)
-    {
-        return false;
-    }
-
-    /** Done with battle strike phase. */
-    boolean doneStriking()
-    {
-        return false;
-    }
 
     /** Legion summoner summons unit from legion donor. */
     void doSummon(String summoner, String donor, String unit)
@@ -266,17 +122,6 @@ public final class Client
     }
 
 
-    /** Legion acquires an angel or archangel. */
-    boolean acquire(String legion, String unit)
-    {
-        return false;
-    }
-
-    /** Finish this player's whole game turn. */
-    boolean nextturn()
-    {
-        return false;
-    }
 
     /** This player quits the whole game. The server needs to always honor
      *  this request, because if it doesn't players will just drop
@@ -293,9 +138,6 @@ public final class Client
         server.withdrawFromGame(playerName);
         return true;
     }
-
-
-    // TODO Add requests for info.
 
 
     private void repaintAllWindows()
@@ -607,6 +449,7 @@ public final class Client
 
     void doneWithBattleMoves()
     {
+        clearUndoStack();
         server.doneWithBattleMoves();
     }
 
@@ -796,36 +639,29 @@ public final class Client
     }
 
 
-    // XXX The following methods should be private.  Server-side classes
-    // should not directly manipulate the undo stack.
-    public void clearUndoStack()
+    private void clearUndoStack()
     {
         undoStack.clear();
     }
 
-    public Object popUndoStack()
+    private Object popUndoStack()
     {
         Object ob = undoStack.removeFirst();
         return ob;
     }
 
-    public void pushUndoStack(Object object)
+    private void pushUndoStack(Object object)
     {
         undoStack.addFirst(object);
     }
 
-    public boolean isUndoStackEmpty()
+    private boolean isUndoStackEmpty()
     {
         return undoStack.isEmpty();
     }
 
 
-    String getMoverId()
-    {
-        return moverId;
-    }
-
-    public void setMoverId(String moverId)
+    void setMoverId(String moverId)
     {
         this.moverId = moverId;
     }
@@ -1189,7 +1025,10 @@ public final class Client
     /** Used for human players only, not the AI. */
     void doMuster(String markerId)
     {
-        server.doMuster(markerId);
+        if (server.doMuster(markerId))
+        {
+            pushUndoStack(markerId);
+        }
     }
 
 
@@ -1382,11 +1221,15 @@ public final class Client
     }
 
 
-    /** Returns true if the move was legal, or false if it
-     *  was not allowed. */
+    /** Returns true if the move was legal, or false if it was not allowed. */
     boolean doBattleMove(int tag, String hexLabel)
     {
-        return server.doBattleMove(tag, hexLabel);
+        boolean moved = server.doBattleMove(tag, hexLabel);
+        if (moved)
+        {
+            pushUndoStack(hexLabel);
+        }
+        return moved;
     }
 
 
@@ -1417,12 +1260,19 @@ public final class Client
 
     void undoLastBattleMove()
     {
-        server.undoLastBattleMove();
+        if (!isUndoStackEmpty())
+        {
+            String hexLabel = (String)popUndoStack();
+            server.undoBattleMove(hexLabel);
+        }
     }
 
     void undoAllBattleMoves()
     {
-        server.undoAllBattleMoves();
+        while (!isUndoStackEmpty())
+        {
+            undoLastBattleMove();
+        }
     }
 
 
@@ -1477,12 +1327,22 @@ public final class Client
 
     void doSplit(String markerId)
     {
-        server.doSplit(markerId);
+        String splitoffId = server.doSplit(markerId);
+        if (splitoffId != null)
+        {
+            pushUndoStack(splitoffId);
+        }
     }
 
-    boolean doMove(String markerId, String hexLabel)
+    boolean doMove(String hexLabel)
     {
-        return server.doMove(markerId, hexLabel);
+        boolean moved = server.doMove(moverId, hexLabel);
+        if (moved)
+        {
+            pushUndoStack(moverId);
+            setMoverId(null);
+        }
+        return moved;
     }
 
     /** Return a list of Creatures. */
@@ -1548,11 +1408,13 @@ public final class Client
 
     void newGame()
     {
+        clearUndoStack();
         server.newGame();
     }
 
     void loadGame(String filename)
     {
+        clearUndoStack();
         server.loadGame(filename);
     }
 
@@ -1579,32 +1441,53 @@ public final class Client
 
     void undoLastSplit()
     {
-        server.undoLastSplit(playerName);
+        if (!isUndoStackEmpty())
+        {
+            String splitoffId = (String)popUndoStack();
+            server.undoSplit(playerName, splitoffId);
+        }
     }
 
     void undoLastMove()
     {
-        server.undoLastMove(playerName);
+        if (!isUndoStackEmpty())
+        {
+            String markerId = (String)popUndoStack();
+            server.undoMove(playerName, markerId);
+        }
     }
 
     void undoLastRecruit()
     {
-        server.undoLastRecruit(playerName);
+        if (!isUndoStackEmpty())
+        {
+            String markerId = (String)popUndoStack();
+            server.undoRecruit(playerName, markerId);
+        }
     }
 
     void undoAllSplits()
     {
-        server.undoAllSplits(playerName);
+        while (!isUndoStackEmpty())
+        {
+            undoLastSplit();
+        }
     }
 
     void undoAllMoves()
     {
-        server.undoAllMoves(playerName);
+        while (!isUndoStackEmpty())
+        {
+            undoLastMove();
+        }
     }
 
     void undoAllRecruits()
     {
-        server.undoAllRecruits(playerName);
+        while (!isUndoStackEmpty())
+        {
+            undoLastRecruit();
+        }
     }
 
 
@@ -1617,7 +1500,9 @@ public final class Client
         if (!server.doneWithSplits(playerName))
         {
             showMessageDialog("Must split");
+            return;
         }
+        clearUndoStack();
     }
 
     void doneWithMoves()
@@ -1628,7 +1513,11 @@ public final class Client
         }
         clearRecruitChits();
         String error = server.doneWithMoves(playerName);
-        if (!error.equals(""))
+        if (error.equals(""))
+        {
+            clearUndoStack();
+        }
+        else
         {
             showMessageDialog(error);
             board.highlightUnmovedLegions();
@@ -1645,6 +1534,7 @@ public final class Client
         {
             showMessageDialog("Must resolve engagements");
         }
+        clearUndoStack();
     }
 
     void doneWithRecruits()
@@ -1653,6 +1543,7 @@ public final class Client
         {
             return;
         }
+        clearUndoStack();
         server.doneWithRecruits(playerName);
     }
 

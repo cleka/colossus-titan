@@ -642,8 +642,9 @@ public final class Server
             legion.getMarkerId());
     }
 
-    /** Handle mustering for legion. */
-    public void doMuster(String markerId)
+    /** Handle mustering for legion.  Return true if the legion 
+     *  mustered something. */
+    public boolean doMuster(String markerId)
     {
         Legion legion = game.getLegionByMarkerId(markerId);
         if (legion != null && legion.hasMoved() && legion.canRecruit())
@@ -663,8 +664,10 @@ public final class Server
             {
                 allUpdateStatusScreen();
                 allUnselectHexByLabel(legion.getCurrentHexLabel());
+                return true;
             }
         }
+        return false;
     }
 
 
@@ -798,16 +801,10 @@ public final class Server
     }
 
 
-    public void undoLastBattleMove()
+    public boolean undoBattleMove(String hexLabel)
     {
         Battle battle = game.getBattle();
-        battle.undoLastMove();
-    }
-
-    public void undoAllBattleMoves()
-    {
-        Battle battle = game.getBattle();
-        battle.undoAllMoves();
+        return battle.undoMove(hexLabel);
     }
 
 
@@ -1008,59 +1005,34 @@ public final class Server
         return legion.getImageNames(showAll);
     }
 
-    public void undoLastSplit(String playerName)
+    public void undoSplit(String playerName, String splitoffId)
     {
         if (playerName != getActivePlayerName())
         {
             return;
         }
-        game.getPlayer(playerName).undoLastSplit();
+        game.getPlayer(playerName).undoSplit(splitoffId);
     }
 
-    public void undoLastMove(String playerName)
+    public void undoMove(String playerName, String markerId)
     {
         if (playerName != getActivePlayerName())
         {
             return;
         }
-        game.getPlayer(playerName).undoLastMove();
+        game.getPlayer(playerName).undoMove(markerId);
     }
 
-    public void undoLastRecruit(String playerName)
+    public void undoRecruit(String playerName, String markerId)
     {
         if (playerName != getActivePlayerName())
         {
             return;
         }
-        game.getPlayer(playerName).undoLastRecruit();
+        game.getPlayer(playerName).undoRecruit(markerId);
     }
 
-    public void undoAllSplits(String playerName)
-    {
-        if (playerName != getActivePlayerName())
-        {
-            return;
-        }
-        game.getPlayer(playerName).undoAllSplits();
-    }
 
-    public void undoAllMoves(String playerName)
-    {
-        if (playerName != getActivePlayerName())
-        {
-            return;
-        }
-        game.getPlayer(playerName).undoAllMoves();
-    }
-
-    public void undoAllRecruits(String playerName)
-    {
-        if (playerName != getActivePlayerName())
-        {
-            return;
-        }
-        game.getPlayer(playerName).undoAllRecruits();
-    }
 
     /** Return true if it's okay to advance to the next phase. */
     public boolean doneWithSplits(String playerName)
@@ -1105,7 +1077,7 @@ public final class Server
         // the same hex, and move on to the next phase.
         else
         {
-            player.undoAllSplits();
+            player.recombineIllegalSplits();
             game.advancePhase(Constants.MOVE);
             return "";
         }
@@ -1263,7 +1235,12 @@ public final class Server
 
     public String getPlayerColor(String playerName)
     {
-        return game.getPlayer(playerName).getColor();
+        Player player = game.getPlayer(playerName);
+        if (player != null)
+        {
+            return player.getColor();
+        }
+        return "unknown";
     }
 
     public String getBattleActivePlayerName()
@@ -1291,9 +1268,10 @@ public final class Server
         return game.getTurnNumber();
     }
 
-    public void doSplit(String markerId)
+    /** Return the splitoffId. */
+    public String doSplit(String markerId)
     {
-        game.doSplit(markerId);
+        return game.doSplit(markerId);
     }
 
     public boolean doMove(String markerId, String hexLabel)
@@ -1383,37 +1361,6 @@ public final class Server
         return client.pickMarker(markersAvailable);
     }
 
-    // XXX These are temporary
-    public void clearUndoStack(String playerName)
-    {
-        Client client = getClient(playerName);
-        client.clearUndoStack();
-    }
-
-    public Object popUndoStack(String playerName)
-    {
-        Client client = getClient(playerName);
-        Object ob = client.popUndoStack();
-        return ob;
-    }
-
-    public void pushUndoStack(String playerName, Object object)
-    {
-        Client client = getClient(playerName);
-        client.pushUndoStack(object);
-    }
-
-    public boolean isUndoStackEmpty(String playerName)
-    {
-        Client client = getClient(playerName);
-        return client.isUndoStackEmpty();
-    }
-
-    void setMoverId(String playerName, String id)
-    {
-        Client client = getClient(playerName);
-        client.setMoverId(id);
-    }
 
     boolean chooseWhetherToTeleport(String playerName)
     {

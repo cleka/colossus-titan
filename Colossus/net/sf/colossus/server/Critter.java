@@ -373,7 +373,6 @@ final class Critter extends Creature implements Comparable
     void moveToHex(String hexLabel)
     {
         currentHexLabel = hexLabel;
-        game.getServer().pushUndoStack(getPlayerName(), currentHexLabel);
         Set set = new HashSet();
         set.add(startingHexLabel);
         set.add(currentHexLabel);

@@ -94,7 +94,7 @@
 
 <target name="compile" depends="init,parsers"
         description = "Compile .java files to .class files">
-        <javac deprecation="yes" target="1.2" srcdir="."
+        <javac debug="yes" deprecation="yes" target="1.2" srcdir="."
                 includes="**/*.java"
         />
 </target>
@@ -164,7 +164,7 @@
 <!-- Be very careful modifying this.  It whacks whole directories easily. -->
 <!-- XXX Files like .#Colossus.jar.1.203 are not being deleted.  Ant bug? -->
 <target name="clean"
-        description = "Delete derived files"> 
+        description = "Delete most derived files"> 
         <delete verbose="yes" includeemptydirs="yes"> 
                 <fileset dir="." 
                  includes = 
@@ -179,6 +179,18 @@
                          **/Colossus.*.zip,
                          javadoc/**,
                          net/sf/colossus/parser/*.java"
+                />
+        </delete>
+</target>
+
+
+<target name="fullyclean" depends="clean"
+        description = "Delete all derived files and savegames"> 
+        <delete verbose="yes" includeemptydirs="yes">
+                <fileset dir="." 
+                 includes = 
+                         "net/sf/colossus/parser/*.java,
+                          saves/*.sav"
                 />
         </delete>
 </target>

@@ -11,7 +11,6 @@ import net.sf.colossus.client.MasterHex;
 import net.sf.colossus.client.BattleHex;
 import net.sf.colossus.client.HexMap;
 import net.sf.colossus.client.BattleMap;
-//import net.sf.colossus.client.Client;
 
 
 /**
@@ -86,9 +85,6 @@ final class Battle
 
         placeLegion(attacker);
         placeLegion(defender);
-
-        game.getServer().clearUndoStack(attacker.getPlayerName());
-        game.getServer().clearUndoStack(defender.getPlayerName());
     }
 
 
@@ -765,21 +761,18 @@ final class Battle
     }
 
 
-    void undoLastMove()
+    boolean undoMove(String hexLabel)
     {
-        if (!game.getServer().isUndoStackEmpty(getActivePlayerName()))
+        Critter critter = getCritter(hexLabel);
+        if (critter != null)
         {
-            String hexLabel = (String)game.getServer().popUndoStack(
-                getActivePlayerName());
-            Critter critter = getCritter(hexLabel);
-            if (critter != null)
-            {
-                critter.undoMove();
-            }
-            else
-            {
-                Log.error("Undo move error: no critter in " + hexLabel);
-            }
+            critter.undoMove();
+            return true;
+        }
+        else
+        {
+            Log.error("Undo move error: no critter in " + hexLabel);
+            return false;
         }
     }
 
@@ -881,8 +874,6 @@ final class Battle
 
     private void commitMoves()
     {
-        game.getServer().clearUndoStack(getActivePlayerName());
-
         Iterator it = getActiveLegion().getCritters().iterator();
         while (it.hasNext())
         {

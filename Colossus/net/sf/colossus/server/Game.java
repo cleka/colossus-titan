@@ -657,7 +657,6 @@ public final class Game
     private void setupMove()
     {
         Player player = getActivePlayer();
-        server.clearUndoStack(player.getName());
         player.rollMovement();
         server.allSetupMoveMenu();
 
@@ -667,7 +666,6 @@ public final class Game
     private void setupFight()
     {
         // If there are no engagements, move forward to the muster phase.
-        server.clearUndoStack(getActivePlayerName());
         if (!summoningAngel && findEngagements().size() == 0)
         {
             advancePhase(Constants.FIGHT);
@@ -693,7 +691,6 @@ public final class Game
         else
         {
             player.disbandEmptyDonor();
-            server.clearUndoStack(getActivePlayerName());
             server.allSetupMusterMenu();
 
             player.aiRecruit();
@@ -1196,7 +1193,7 @@ public final class Game
         // FileNotFoundException, IOException, NumberFormatException
         catch (Exception e)
         {
-            Log.error(e + "Tried to load corrupt savegame.");
+            Log.error(e + " Tried to load corrupt savegame.");
             e.printStackTrace();
             dispose();
         }
@@ -1637,9 +1634,6 @@ public final class Game
 
         // Recruits are one to a customer.
         legion.setRecruitName(recruit.getName());
-
-        server.pushUndoStack(legion.getPlayerName(), legion.getMarkerId());
-
         server.allRepaintHex(legion.getCurrentHexLabel());
     }
 
@@ -2060,7 +2054,6 @@ public final class Game
     void finishBattle(String hexLabel, boolean attackerEntered)
     {
         battle = null;
-        server.clearUndoStack(getActivePlayerName());
         server.allDisposeBattleMap();
         server.allDeiconifyBoard();
 
@@ -2144,8 +2137,9 @@ public final class Game
 
 
 
-    /** Only used for human players, not for auto splits */
-    boolean doSplit(String markerId)
+    /** Return the splitoffId, or null if the split failed. 
+        Only used for human players, not for auto splits. */
+    String doSplit(String markerId)
     {
         Legion legion = getLegionByMarkerId(markerId);
         Player player = legion.getPlayer();
@@ -2155,14 +2149,14 @@ public final class Game
         {
             server.showMessageDialog(player.getName(),
                 "No markers are available.");
-            return false;
+            return null;
         }
         // Don't allow extra splits in turn 1.
         if (getTurnNumber() == 1 && player.getNumLegions() > 1)
         {
             server.showMessageDialog(player.getName(),
                 "Cannot split twice on Turn 1.");
-            return false;
+            return null;
         }
 
         int oldHeight = legion.getHeight();
@@ -2170,6 +2164,7 @@ public final class Game
         legion.sortCritters();
 
         String selectedMarkerId = player.pickMarker();
+        Legion newLegion = null;
 
         String results = server.splitLegion(legion, selectedMarkerId);
         if (results != null)
@@ -2186,26 +2181,26 @@ public final class Game
                 Creature creature = Creature.getCreatureByName(name);
                 creatures.add(creature);
             }
-            Legion newLegion = legion.split(creatures, newMarkerId);
+            newLegion = legion.split(creatures, newMarkerId);
 
             // Hide all creatures in both legions.
             legion.hideAllCreatures();
             newLegion.hideAllCreatures();
         }
 
-
-        int newHeight = legion.getHeight();
-
         // If we split, unselect this hex.
-        MasterHex hex = legion.getCurrentHex();
-        if (newHeight < 7)
+        if (newLegion != null)
         {
+            MasterHex hex = legion.getCurrentHex();
             server.allUpdateStatusScreen();
             server.allUnselectHexByLabel(hex.getLabel());
             server.allAlignLegions(hex.getLabel());
+            return newLegion.getMarkerId();
         }
-
-        return (newHeight < oldHeight);
+        else
+        {
+            return null;
+        }
     }
 
 

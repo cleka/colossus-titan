@@ -1668,8 +1668,7 @@ public final class MasterBoard extends JPanel
             // destination, move the legion here.
             case Constants.MOVE:
                 client.clearRecruitChits();
-                String moverId = client.getMoverId();
-                if (client.doMove(moverId, hexLabel))
+                if (client.doMove(hexLabel))
                 {
                     highlightUnmovedLegions();
                 }

@@ -492,8 +492,6 @@ public final class Player implements Comparable
         teleported = false;
         movementRoll = 0;
 
-        game.getServer().clearUndoStack(name);
-
         // Make sure that all legions are allowed to move and recruit.
         commitMoves();
 
@@ -547,18 +545,11 @@ public final class Player implements Comparable
     }
 
 
-    void setLastLegionSplitOff(Legion legion)
+    void undoMove(String markerId)
     {
-        game.getServer().pushUndoStack(name, legion.getMarkerId());
-    }
-
-
-    void undoLastMove()
-    {
-        if (!game.getServer().isUndoStackEmpty(name))
+        Legion legion = getLegionByMarkerId(markerId);
+        if (legion != null)
         {
-            String markerId = (String)game.getServer().popUndoStack(name);
-            Legion legion = getLegionByMarkerId(markerId);
             legion.undoMove();
         }
     }
@@ -609,47 +600,26 @@ public final class Player implements Comparable
     }
 
 
-    void undoLastRecruit()
+    void undoRecruit(String markerId)
     {
-        if (!game.getServer().isUndoStackEmpty(name))
-        {
-            String markerId = (String)game.getServer().popUndoStack(name);
-            Legion legion = getLegionByMarkerId(markerId);
-            legion.undoRecruit();
-            // Update number of creatures in status window.
-            game.getServer().allUpdateStatusScreen();
-        }
-    }
-
-
-    void undoAllRecruits()
-    {
-        Iterator it = legions.iterator();
-        while (it.hasNext())
-        {
-            Legion legion = (Legion)it.next();
-            legion.undoRecruit();
-        }
-
+        Legion legion = getLegionByMarkerId(markerId);
+        legion.undoRecruit();
         // Update number of creatures in status window.
         game.getServer().allUpdateStatusScreen();
     }
 
 
-    void undoLastSplit()
+    void undoSplit(String splitoffId)
     {
-        if (!game.getServer().isUndoStackEmpty(name))
-        {
-            String splitoffId = (String)game.getServer().popUndoStack(name);
-            Legion splitoff = getLegionByMarkerId(splitoffId);
-            String hexLabelToAlign = splitoff.getCurrentHexLabel();
-            splitoff.recombine(splitoff.getParent(), true);
-            game.getServer().allAlignLegions(hexLabelToAlign);
-            game.getServer().allUpdateStatusScreen();
-        }
+        Legion splitoff = getLegionByMarkerId(splitoffId);
+        String hexLabelToAlign = splitoff.getCurrentHexLabel();
+        splitoff.recombine(splitoff.getParent(), true);
+        game.getServer().allAlignLegions(hexLabelToAlign);
+        game.getServer().allUpdateStatusScreen();
     }
 
-    void undoAllSplits()
+
+    void recombineIllegalSplits()
     {
         HashSet hexLabelsToAlign = new HashSet();
         Iterator it = legions.iterator();
@@ -896,10 +866,7 @@ public final class Player implements Comparable
         if (game.getServer().getClientOption(name, Options.autoMasterMove))
         {
             ai.masterMove(game);
-            // XXX This should fix illegal legions, but it would be better
-            // to merge this logic and the logic in MasterBoard to create
-            // a server-side check.
-            undoAllSplits();
+            recombineIllegalSplits();
             game.advancePhase(Constants.MOVE);
         }
     }

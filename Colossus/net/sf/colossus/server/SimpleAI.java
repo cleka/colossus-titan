@@ -2286,7 +2286,6 @@ class SimpleAI implements AI
 
                 CritterMove cm = new CritterMove(critter,
                    currentHexLabel, hexLabel);
-                // XXX BattleHex hex = HexMap.getHexByLabel(terrain, hexLabel);
 
                 // Need to move the critter to evaluate.
                 critter.moveToHex(hexLabel);

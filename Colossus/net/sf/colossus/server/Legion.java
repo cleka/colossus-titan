@@ -659,8 +659,6 @@ final class Legion implements Comparable
 
         currentHexLabel = hexLabel;
         moved = true;
-        game.getServer().setMoverId(playerName, null);
-        game.getServer().pushUndoStack(playerName, markerId);
 
         boolean teleported = getTeleported(hexLabel);
 
@@ -753,7 +751,6 @@ final class Legion implements Comparable
     {
         if (recruitName != null)
         {
-
             Creature creature = Creature.getCreatureByName(recruitName);
             game.getCaretaker().putOneBack(creature);
             removeCreature(creature, false, true);
@@ -1263,7 +1260,6 @@ final class Legion implements Comparable
         game.getServer().allAddMarker(newMarkerId);
 
         player.addLegion(newLegion);
-        player.setLastLegionSplitOff(newLegion);
 
         game.getServer().allUpdateStatusScreen();
         Log.event(newLegion.getHeight() +
