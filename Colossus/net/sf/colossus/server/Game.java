@@ -1720,7 +1720,7 @@ Log.debug("Called Game.newGame2()");
         int entrySide = -1;
         if (cameFrom != -1)
         {
-            if (HexMap.terrainIsTower(hex.getTerrain())) 
+            if (HexMap.terrainHasStartlist(hex.getTerrain())) 
             {
                 entrySide = 3;
             }
@@ -2061,10 +2061,10 @@ Log.debug("Called Game.newGame2()");
             if (listTeleportMoves(legion, currentHex, movementRoll, 
                 false).contains(targetHexLabel))
             {
-                // Towers only have bottom entry side.
+                // Startlisted terrain only have bottom entry side.
                 // Don't bother finding more than one entry side if unoccupied.
                 if (!isOccupied(targetHexLabel) ||
-                    HexMap.terrainIsTower(targetHex.getTerrain()))
+                    HexMap.terrainHasStartlist(targetHex.getTerrain()))
                     
                 {
                     entrySides.add(Constants.bottom);  
@@ -2397,7 +2397,7 @@ Log.debug("" + findEngagements().size() + " engagements left");
 
         MasterHex hex = MasterBoard.getHexByLabel(hexLabel);
         // If this is a tower hex, the only entry side is the bottom.
-        if (HexMap.terrainIsTower(hex.getTerrain()) &&
+        if (HexMap.terrainHasStartlist(hex.getTerrain()) &&
             !entrySide.equals(Constants.bottom))
         {
             Log.warn("Tried to enter invalid side of tower");

@@ -186,13 +186,15 @@ Also, non-Tree Native attacking a Tree Native in a Tree lose one skill (but not 
 
 NOTE: Theres' a graphical tools,
 ``\htmladdnormallink{BattlelandsBuilder}{../datatools/BattlelandsBuilder/index.html}'',
-designed to allow easy creations of Battlelands.
+designed to allow easy creations of Battlelands. It doesn't handle Startlist or Tower flag yet (see below).
 
-One more line \emph{must} exist for the Tower(s) ; the startlist. It's a single line containing first the word \texttt{STARTLIST}, then a space-separated list of hex label (one letter followed by one digit, displayed in each hexagon of the Battleland). This is where the Defender will enter the Tower. For instance, in th usual Titan Tower, the line used is:
+One more line exist ; the startlist. It's a single line containing first the word \texttt{STARTLIST}, then a space-separated list of hex label (one letter followed by one digit, displayed in each hexagon of the Battleland). This is where the Defender will enter the terrain. For instance, in the usual Titan Tower, the line used is:
 
 \texttt{STARTLIST D4 C4 E4 D3 C3 E3 D5}
 
-This line is used to detect that a terrain is a Tower, so it should not appears in other terrain.
+Also, the line imply the Attacker will enter by the bottom side. This is usually used for Tower, but can be used for other terrain as well.
+
+Towers are denoted by the keyword \texttt{TOWER} by itself on a line. The terrain is then considered a Tower, i.e. you can Tower Teleport from it, and players are allowed to start in it.
 
 \section{\texttt{VAR} file format (default file used: ``Default/Default.var'')}
 \label{VAR}

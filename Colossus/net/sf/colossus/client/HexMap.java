@@ -31,8 +31,9 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
     private static Map terrainH = new HashMap();
     private static Map terrainHexes = new HashMap();
     private static Map entrancesHex = new HashMap();
-    private static Map towerStartListMap = new HashMap();
+    private static Map startlistMap = new HashMap();
     private static Map subtitleMap = new HashMap();
+    private static Map towerStatusMap = new HashMap();
 
     /** ne, e, se, sw, w, nw */
     private GUIBattleHex [] entrances = new GUIBattleHex[6];
@@ -54,8 +55,15 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
 
 
     /** Set up a static non-GUI hex map for each terrain type. */
-    static
+    static void staticBattlelandsInit()
     {
+        terrainH.clear();
+        terrainHexes.clear();
+        entrancesHex.clear();
+        startlistMap.clear();
+        subtitleMap.clear();
+        towerStatusMap.clear();
+
         char [] terrains = TerrainRecruitLoader.getTerrains();
         for (int t = 0; t < terrains.length; t++)
         {
@@ -166,9 +174,11 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
             java.util.List tempTowerStartList = bl.getStartList();
             if (tempTowerStartList != null)
             {
-                towerStartListMap.put(new Character(terrain),
+                startlistMap.put(new Character(terrain),
                                       tempTowerStartList);
             }
+            towerStatusMap.put(new Character(terrain),
+                               new Boolean(bl.isTower()));
             subtitleMap.put(new Character(terrain), bl.getSubtitle());
         }
         catch (Exception e) 
@@ -453,7 +463,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
 
     public static java.util.List getTowerStartList(char terrain)
     {
-        return (java.util.List)towerStartListMap.get(new Character(terrain));
+        return (java.util.List)startlistMap.get(new Character(terrain));
     }
 
     public void mousePressed(MouseEvent e)
@@ -578,8 +588,20 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
 
     public static boolean terrainIsTower(char t)
     {
+        boolean temp =
+            ((Boolean)towerStatusMap.get(new Character(t))).booleanValue();
+        return temp;
+    }
+
+    public boolean terrainHasStartlist()
+    {
+        return terrainIsTower(terrain);
+    }
+
+    public static boolean terrainHasStartlist(char t)
+    {
         java.util.List temp =
-            (java.util.List)towerStartListMap.get(new Character(t));
+            (java.util.List)startlistMap.get(new Character(t));
         return (!(temp == null));
     }
 }

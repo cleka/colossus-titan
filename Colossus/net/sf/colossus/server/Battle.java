@@ -681,10 +681,12 @@ final class Battle
         return set;
     }
 
-    /** This method is called by the defender on turn 1 in the tower.
-     *  So we know that there are no enemies on board, and all allies
-     *  are mobile. */
-    private Set findUnoccupiedTowerHexes(boolean ignoreMobileAllies, char t)
+    /** This method is called by the defender on turn 1 in a
+     *  Startlisted Terrain,
+     *  so we know that there are no enemies on board, and all allies
+     *  are mobile.
+     */
+    private Set findUnoccupiedStartlistHexes(boolean ignoreMobileAllies, char t)
     {
         Set set = new HashSet();
         Iterator it = HexMap.getTowerStartList(t).iterator();
@@ -713,10 +715,11 @@ final class Battle
         Set set = new HashSet();
         if (!critter.hasMoved() && !critter.isInContact(false))
         {
-            if (HexMap.terrainIsTower(terrain) && (turnNumber == 1) &&
+            if (HexMap.terrainHasStartlist(terrain) && (turnNumber == 1) &&
                 activeLegionNum == Constants.DEFENDER)
             {
-                set = findUnoccupiedTowerHexes(ignoreMobileAllies, terrain);
+                set =
+                    findUnoccupiedStartlistHexes(ignoreMobileAllies, terrain);
             }
             else
             {

@@ -40,8 +40,11 @@ public class BattlelandLoader
         hexSide(int p, char t) { pos = p; type = t; }
     }
 
-    /** hold the list of label for the Tower startlist */
+    /** hold the list of label for the startlist */
     private java.util.List startlist = null;
+
+    /** is the terrain a Tower ? */
+    private boolean isTower = false;
 
     /** optional subtitle for the Battlelands */
     private String subtitle = null;
@@ -54,6 +57,11 @@ public class BattlelandLoader
     public String getSubtitle()
     {
         return subtitle;
+    }
+
+    public boolean isTower()
+    {
+        return isTower;
     }
 }
 
@@ -101,6 +109,7 @@ TOKEN :
 {
     < STARTLIST: "STARTLIST" >
 |   < CASELABEL : ["A"-"F","a"-"f"]["1"-"6"] >
+|   < TOWER: "TOWER" >
 }
 
 TOKEN :
@@ -143,6 +152,15 @@ void b_startlist() :
         if (temp.size() < 7)
             return;
         startlist = temp;
+    }
+}
+
+void b_isTower() :
+{ }
+{
+    <TOWER>
+    {
+        isTower = true;
     }
 }
 
@@ -263,6 +281,10 @@ int oneBattlelandCase(BattleHex [][] h) :
         return(0);
     }
 |   b_subtitle()
+    {
+        return(0);
+    }
+|   b_isTower()
     {
         return(0);
     }

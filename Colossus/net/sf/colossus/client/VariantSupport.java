@@ -254,6 +254,9 @@ public final class VariantSupport
             }
             TerrainRecruitLoader trl = new TerrainRecruitLoader(terIS);
             while (trl.oneTerrain() >= 0) {}
+
+            /* now initialize the static bits of the Battlelands */
+            HexMap.staticBattlelandsInit();
         }
         catch (Exception e) 
         {

@@ -87,10 +87,12 @@ final class BattleMovement
         return set;
     }
 
-    /** This method is called by the defender on turn 1 in the tower.
-     *  So we know that there are no enemies on board, and all allies
-     *  are mobile. */
-    private Set findUnoccupiedTowerHexes()
+    /** This method is called by the defender on turn 1 in a
+     *  Startlisted Terrain,
+     *  so we know that there are no enemies on board, and all allies
+     *  are mobile.
+     */
+    private Set findUnoccupiedStartlistHexes()
     {
         char t = client.getBattleTerrain();
         Set set = new HashSet();
@@ -126,12 +128,12 @@ final class BattleMovement
         Set set = new HashSet();
         if (!chit.hasMoved() && !client.isInContact(chit, false))
         {
-            if (HexMap.terrainIsTower(client.getBattleTerrain()) && (
+            if (HexMap.terrainHasStartlist(client.getBattleTerrain()) && (
                 client.getBattleTurnNumber() == 1) &&
                 client.getBattleActiveMarkerId().equals(
                     client.getDefenderMarkerId()))
             {
-                set = findUnoccupiedTowerHexes();
+                set = findUnoccupiedStartlistHexes();
             }
             else
             {
