@@ -86,6 +86,8 @@ Exemple: if you use \texttt{0 Anything 3 ogre 0 Titan 2 Gargoyle}, you will be a
 
 The line that starts with 'T' and of name 'Tower' (mandatory) is special. There should always be at least 3 regular creatures, recruitable with zero of Anything, and should be marked as 'non-regular' recruitments. The 3 creatures will be used as starting creatures.
 
+Both $\langle$terrain\_name$\rangle$ and $\langle$terrain\_display\_name$\rangle$ can be either purely alphabetical, or alphanumerical plus spaces between doublequotes ``"''. If a filename is involved, all spaces will be replaced by underscores ``\_''.
+
 \subsubsection*{The second kind is:}
 
 \texttt{\texttt{ACQUIRABLE} $\langle$point\_value$\rangle$ $\langle$acquirable\_name$\rangle$ (($\langle$terrain\_letter$\rangle$,)*$\langle$terrain\_letter$\rangle$)?}
@@ -142,6 +144,8 @@ all on one line.
 \item $\langle$pluralName$\rangle$ is the same as name, just plural.
 \item $\langle$baseColorName$\rangle$ (optional) is the name of the color to use for the name, power and skill value of the creature (when displayed on screen). This name (is used to determine which overlay to use for name/power/skill, or which color to use for drawing them (black is the default in this case). If this field is not present, then \emph{no} overlay are used: Colossus will assume a simgle image is enough to supply all informations.
 \end{itemize}
+
+Both $\langle$name$\rangle$ and $\langle$pluralName$\rangle$ can be either purely alphabetical, or alphanumerical plus spaces between doublequotes ``"''. If a filename is involved, all spaces will be replaced by underscores ``\_''.
 
 \section{Battleland file format (files used: by terrain name under ``Battlelands'')}
 

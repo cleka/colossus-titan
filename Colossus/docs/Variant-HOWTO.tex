@@ -70,13 +70,16 @@ is working on it (yet).
 
 Creature's name (the first column of a \texttt{CRE} file) should not
 contain space or other non-alphabetical character (you
-can't use digits yet). So, don't create ``Killer Rabbit 2''
-but create ``KillerRabbitTwo'' instead.
+can't use digits yet), unless put between doublequotes ``"''.
+i.e., proper name are ``KillerRabbitTwo'' or ``"Killer Rabbit 2"''.
+The same name must be used in the \texttt{CRE} and \texttt{TER} file.
 
 The creature's name is also used as the base name
 of the pictures. So a ``KillerRabbitTwo'' will use
 the file ``KillerRabbitTwo.gif'' in the subdirectory
-``images''.
+``images''. Spaces will be replaced by underscores ``\_'',
+and doublequotes will be ignored. So ``"Killer Rabbit 2"''
+will use ``Killer\_Rabbit\_2.gif''.
 
 You should be able to re-use an existing name, as
 the ``images'' subdirectory is accessed before the default

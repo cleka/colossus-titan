@@ -66,7 +66,9 @@ TOKEN :
 TOKEN :
 {
     < CHAINE : (<CAR>)+ >
+|   < QUOTEDCHAINE : "\"" (<QUOTEDCAR>)+ "\"" >
 |   < #CAR : ["a"-"z","A"-"Z"] >
+|   < #QUOTEDCAR : ["a"-"z","A"-"Z","0"-"9"," ","_"] >
 }
 
 boolean c_bool() :
@@ -82,6 +84,12 @@ String c_chaine() :
     <CHAINE>
     {
         return(new String(token.image));
+    }
+|   <QUOTEDCHAINE>
+    {
+        String tok = new String(token.image);
+        String cha = tok.substring(1, tok.length() - 1);
+        return(cha);
     }
 }
 

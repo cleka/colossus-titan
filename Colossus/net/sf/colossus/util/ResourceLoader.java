@@ -48,9 +48,9 @@ public final class ResourceLoader
     public static Image getImage(String filename, java.util.List directories)
     {
         Image image = null;
+        String mapKey = getMapKey(filename, directories);
         synchronized (imageCache)
         {
-            String mapKey = getMapKey(filename, directories);
             Object cached = imageCache.get(mapKey);
             if ((cached != null) && (cached instanceof Image))
             {
@@ -111,9 +111,9 @@ public final class ResourceLoader
     public static ImageIcon getImageIcon(String filename, java.util.List directories)
     {
         ImageIcon icon = null;
+        String mapKey = getMapKey(filename, directories);
         synchronized (imageCache)
-        {
-            String mapKey = getMapKey(filename, directories);
+        {        
             Object cached = imageCache.get(mapKey);
             if ((cached != null) && (cached instanceof Image))
             {
@@ -176,7 +176,7 @@ public final class ResourceLoader
             url = new java.net.URL("file:" +
                           path +
                           pathSeparator +
-                          filename);
+                          fixFilename(filename));
             // url will not be null even is the file doesn't exist,
             // so we need to check if connection can be opened
             if ((url != null) && (url.openStream() != null))
@@ -199,7 +199,7 @@ public final class ResourceLoader
             java.net.URL url;
             url = cl.getResource(path +
                                  pathSeparator +
-                                 filename);
+                                 fixFilename(filename));
             // url will not be null even is the file doesn't exist,
             // so we need to check if connection can be opened
             if ((url != null) && (url.openStream() != null))
@@ -232,7 +232,7 @@ public final class ResourceLoader
             if (o instanceof String)
             {
                 String path = (String)o;
-                String fullPath = path + pathSeparator + filename;
+                String fullPath = path + pathSeparator + fixFilename(filename);
                 try
                 {
                     stream = new FileInputStream(fullPath);
@@ -263,7 +263,7 @@ public final class ResourceLoader
             if (o instanceof String)
             {
                 String path = (String)o;
-                String fullPath = path + pathSeparator + filename;
+                String fullPath = path + pathSeparator + fixFilename(filename);
                 try
                 {
                     stream = new FileOutputStream(fullPath);
@@ -686,5 +686,10 @@ public final class ResourceLoader
     {
 
         return HTMLColor.stringToColor(colorNameFromFilename(filename, prefix));
+    }
+
+    private static String fixFilename(String filename)
+    {
+        return filename.replace(' ', '_');
     }
 }
