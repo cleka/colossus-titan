@@ -161,6 +161,7 @@ public class ShowBattleMap extends JPanel implements WindowListener,
         frame.setVisible(true);
 
         MasterHex hex = new MasterHex(0, 0, 0, false, null);
+        hex.setTerrain('D');
         new ShowBattleMap(frame, hex);
     }
 }

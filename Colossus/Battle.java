@@ -1795,8 +1795,8 @@ public class Battle
         Player player1 = new Player("Attacker", null);
         Player player2 = new Player("Defender", null);
         MasterHex hex = new MasterHex(0, 0, 0, false, null);
-        hex.setTerrain('J');
-        hex.setEntrySide(3);
+        hex.setTerrain('D');
+        hex.setEntrySide(5);
         Legion attacker = new Legion("Bk01", null, hex,
             Creature.archangel, Creature.troll, Creature.ranger,
             Creature.hydra, Creature.griffon, Creature.angel,

@@ -1,5 +1,6 @@
 import java.awt.*;
 import java.util.*;
+import java.awt.geom.*;
 
 /**
  * Class MasterHex describes one Masterboard hex
@@ -15,6 +16,7 @@ public class MasterHex extends Hex
     private FontMetrics fontMetrics;
     private int halfFontHeight;
     private String name;
+    private Point offCenter;
 
     private MasterHex [] neighbors = new MasterHex[6];
 
@@ -61,13 +63,13 @@ public class MasterHex extends Hex
             xVertex[1] = cx + 3 * scale;
             yVertex[1] = cy;
             xVertex[2] = cx + 4 * scale;
-            yVertex[2] = cy + (int) Math.round(SQRT3 * scale);
+            yVertex[2] = cy + SQRT3 * scale;
             xVertex[3] = cx + 2 * scale;
-            yVertex[3] = cy + (int) Math.round(3 * SQRT3 * scale);
+            yVertex[3] = cy + 3 * SQRT3 * scale;
             xVertex[4] = cx;
-            yVertex[4] = cy + (int) Math.round(3 * SQRT3 * scale);
+            yVertex[4] = cy + 3 * SQRT3 * scale;
             xVertex[5] = cx - 2 * scale;
-            yVertex[5] = cy + (int) Math.round(SQRT3 * scale);
+            yVertex[5] = cy + SQRT3 * scale;
         }
         else
         {
@@ -76,42 +78,47 @@ public class MasterHex extends Hex
             xVertex[1] = cx + 2 * scale;
             yVertex[1] = cy;
             xVertex[2] = cx + 4 * scale;
-            yVertex[2] = cy + (int) Math.round(2 * SQRT3 * scale);
+            yVertex[2] = cy + 2 * SQRT3 * scale;
             xVertex[3] = cx + 3 * scale;
-            yVertex[3] = cy + (int) Math.round(3 * SQRT3 * scale);
+            yVertex[3] = cy + 3 * SQRT3 * scale;
             xVertex[4] = cx - scale;
-            yVertex[4] = cy + (int) Math.round(3 * SQRT3 * scale);
+            yVertex[4] = cy + 3 * SQRT3 * scale;
             xVertex[5] = cx - 2 * scale;
-            yVertex[5] = cy + (int) Math.round(2 * SQRT3 * scale);
+            yVertex[5] = cy + 2 * SQRT3 * scale;
         }
 
-        hexagon = new Polygon(xVertex, yVertex, 6);
-        // Add 1 to width and height because Java rectangles come up
-        // one pixel short of the area actually painted.
-        rectBound = new Rectangle(xVertex[5], yVertex[0], xVertex[2] -
-                        xVertex[5] + 1, yVertex[3] - yVertex[0] + 1);
+        hexagon = makePolygon(6, xVertex, yVertex, true);
+        rectBound = hexagon.getBounds();
+        center = findCenter();
+        offCenter = new Point((int)Math.round((xVertex[0] + xVertex[1]) / 2),
+            (int)Math.round(((yVertex[0] + yVertex[3]) / 2) + 
+            (inverted ? -(scale / 6.0) : (scale / 6.0))));
     }
 
 
     public void paint(Graphics g)
     {
+        Graphics2D g2 = (Graphics2D)g;
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+            RenderingHints.VALUE_ANTIALIAS_OFF);
+
         if (isSelected())
         {
-            g.setColor(Color.white);
+            g2.setColor(Color.white);
         }
         else
         {
-            g.setColor(getTerrainColor());
+            g2.setColor(getTerrainColor());
         }
 
-        g.fillPolygon(hexagon);
-        g.setColor(Color.black);
-        g.drawPolygon(hexagon);
+        g2.fill(hexagon);
+        g2.setColor(Color.black);
+        g2.draw(hexagon);
 
         // Draw label and terrain name
         if (fontMetrics == null)
         {
-            fontMetrics = g.getFontMetrics();
+            fontMetrics = g2.getFontMetrics();
             halfFontHeight = (fontMetrics.getMaxAscent() +
                 fontMetrics.getLeading()) >> 1;
             name = getTerrainName().toUpperCase();
@@ -120,40 +127,40 @@ public class MasterHex extends Hex
         switch (getLabelSide())
         {
             case 0:
-                g.drawString(label, rectBound.x +
+                g2.drawString(label, rectBound.x +
                     ((rectBound.width - fontMetrics.stringWidth(label)) >> 1),
                     rectBound.y + halfFontHeight + rectBound.height / 10);
                 break;
 
             case 1:
-                g.drawString(label, rectBound.x + (rectBound.width -
+                g2.drawString(label, rectBound.x + (rectBound.width -
                     fontMetrics.stringWidth(label)) * 4 / 5,
                     rectBound.y + halfFontHeight + rectBound.height / 5);
                 break;
 
             case 2:
-                g.drawString(label, rectBound.x + (rectBound.width -
+                g2.drawString(label, rectBound.x + (rectBound.width -
                     fontMetrics.stringWidth(label)) * 4 / 5,
                     rectBound.y + halfFontHeight +
                     rectBound.height * 4 / 5);
                 break;
 
             case 3:
-                g.drawString(label, rectBound.x + ((rectBound.width -
+                g2.drawString(label, rectBound.x + ((rectBound.width -
                     fontMetrics.stringWidth(label)) >> 1),
                     rectBound.y + halfFontHeight +
                     rectBound.height * 9 / 10);
                 break;
 
             case 4:
-                g.drawString(label, rectBound.x + (rectBound.width -
+                g2.drawString(label, rectBound.x + (rectBound.width -
                     fontMetrics.stringWidth(label)) / 5,
                     rectBound.y + halfFontHeight +
                     rectBound.height * 4 / 5);
                 break;
 
             case 5:
-                g.drawString(label, rectBound.x + (rectBound.width -
+                g2.drawString(label, rectBound.x + (rectBound.width -
                     fontMetrics.stringWidth(label)) / 5,
                     rectBound.y + halfFontHeight + rectBound.height / 5);
                 break;
@@ -163,26 +170,26 @@ public class MasterHex extends Hex
         // with a smaller font.
         if (name.equals("MOUNTAINS"))
         {
-            Font oldFont = g.getFont();
+            Font oldFont = g2.getFont();
             String fontName = oldFont.getName();
             int size = oldFont.getSize();
             int style = oldFont.getStyle();
 
             Font font = new Font(fontName, style,  9 * size / 10);
-            g.setFont(font);
-            FontMetrics fontMetrics = g.getFontMetrics();
+            g2.setFont(font);
+            FontMetrics fontMetrics = g2.getFontMetrics();
             halfFontHeight = (fontMetrics.getMaxAscent() +
                 fontMetrics.getLeading()) >> 1;
 
-            g.drawString(name, rectBound.x + ((rectBound.width -
+            g2.drawString(name, rectBound.x + ((rectBound.width -
                 fontMetrics.stringWidth(name)) >> 1),
                 rectBound.y + halfFontHeight + rectBound.height * 2 / 3);
 
-            g.setFont(oldFont);
+            g2.setFont(oldFont);
         }
         else
         {
-            g.drawString(name, rectBound.x + ((rectBound.width -
+            g2.drawString(name, rectBound.x + ((rectBound.width -
                 fontMetrics.stringWidth(name)) >> 1),
                 rectBound.y + halfFontHeight + (rectBound.height >> 1));
         }
@@ -203,7 +210,7 @@ public class MasterHex extends Hex
 
             if (exitType[i] != NONE)
             {
-                drawGate(g, xVertex[i], yVertex[i], xVertex[n], yVertex[n],
+                drawGate(g2, xVertex[i], yVertex[i], xVertex[n], yVertex[n],
                                 exitType[i]);
             }
 
@@ -214,7 +221,7 @@ public class MasterHex extends Hex
 
             if (entranceType[i] != NONE)
             {
-                drawGate(g, xVertex[n], yVertex[n], xVertex[i], yVertex[i],
+                drawGate(g2, xVertex[n], yVertex[n], xVertex[i], yVertex[i],
                                 entranceType[i]);
             }
         }
@@ -236,18 +243,18 @@ public class MasterHex extends Hex
     }
 
 
-    private void drawGate(Graphics g, int vx1, int vy1, int vx2, int vy2,
-        int gateType)
+    private void drawGate(Graphics2D g2, double vx1, double vy1, double vx2,
+        double vy2, int gateType)
     {
-        int x0;                 // first focus point
-        int y0;
-        int x1;                 // second focus point
-        int y1;
-        int x2;                 // center point
-        int y2;
-        double theta;           // gate angle
-        int [] x = new int[4];  // gate points
-        int [] y = new int[4];
+        double x0;                    // first focus point
+        double y0;
+        double x1;                    // second focus point
+        double y1;
+        double x2;                    // center point
+        double y2;
+        double theta;                 // gate angle
+        double [] x = new double[4];  // gate points
+        double [] y = new double[4];
 
         x0 = vx1 + (vx2 - vx1) / 6;
         y0 = vy1 + (vy2 - vy1) / 6;
@@ -259,48 +266,51 @@ public class MasterHex extends Hex
         switch (gateType)
         {
             case BLOCK:
-                x[0] = (int) Math.round(x0 - len * Math.sin(theta));
-                y[0] = (int) Math.round(y0 + len * Math.cos(theta));
-                x[1] = (int) Math.round(x0 + len * Math.sin(theta));
-                y[1] = (int) Math.round(y0 - len * Math.cos(theta));
-                x[2] = (int) Math.round(x1 + len * Math.sin(theta));
-                y[2] = (int) Math.round(y1 - len * Math.cos(theta));
-                x[3] = (int) Math.round(x1 - len * Math.sin(theta));
-                y[3] = (int) Math.round(y1 + len * Math.cos(theta));
+                x[0] = x0 - len * Math.sin(theta);
+                y[0] = y0 + len * Math.cos(theta);
+                x[1] = x0 + len * Math.sin(theta);
+                y[1] = y0 - len * Math.cos(theta);
+                x[2] = x1 + len * Math.sin(theta);
+                y[2] = y1 - len * Math.cos(theta);
+                x[3] = x1 - len * Math.sin(theta);
+                y[3] = y1 + len * Math.cos(theta);
 
-                g.setColor(Color.white);
-                g.fillPolygon(x, y, 4);
-                g.setColor(Color.black);
-                g.drawPolyline(x, y, 4);
+                GeneralPath polygon = makePolygon(4, x, y, false);
+
+                g2.setColor(Color.white);
+                g2.fill(polygon);
+                g2.setColor(Color.black);
+                g2.draw(polygon);
                 break;
 
             case ARCH:
-                x[0] = (int) Math.round(x0 - len * Math.sin(theta));
-                y[0] = (int) Math.round(y0 + len * Math.cos(theta));
-                x[1] = (int) Math.round(x0 + len * Math.sin(theta));
-                y[1] = (int) Math.round(y0 - len * Math.cos(theta));
-                x[2] = (int) Math.round(x1 + len * Math.sin(theta));
-                y[2] = (int) Math.round(y1 - len * Math.cos(theta));
-                x[3] = (int) Math.round(x1 - len * Math.sin(theta));
-                y[3] = (int) Math.round(y1 + len * Math.cos(theta));
+                x[0] = x0 - len * Math.sin(theta);
+                y[0] = y0 + len * Math.cos(theta);
+                x[1] = x0 + len * Math.sin(theta);
+                y[1] = y0 - len * Math.cos(theta);
+                x[2] = x1 + len * Math.sin(theta);
+                y[2] = y1 - len * Math.cos(theta);
+                x[3] = x1 - len * Math.sin(theta);
+                y[3] = y1 + len * Math.cos(theta);
 
-                x2 = (int) Math.round((x0 + x1) >> 1);
-                y2 = (int) Math.round((y0 + y1) >> 1);
-                Rectangle rect = new Rectangle();
-                rect.x = x2 - (int) Math.round(len);
-                rect.y = y2 - (int) Math.round(len);
-                rect.width = (int) (2 * Math.round(len));
-                rect.height = (int) (2 * Math.round(len));
+                x2 = (x0 + x1) / 2;
+                y2 = (y0 + y1) / 2;
 
-                g.setColor(Color.white);
-                // Draw a bit more than a semicircle, to clean edge.
-                g.fillArc(rect.x, rect.y, rect.width, rect.height,
-                    (int) Math.round((2 * Math.PI - theta) *
-                    RAD_TO_DEG - 10), 200);
-                g.setColor(Color.black);
-                g.drawArc(rect.x, rect.y, rect.width, rect.height,
-                    (int) Math.round((2 * Math.PI - theta) * RAD_TO_DEG),
-                    180);
+                Rectangle2D.Double rect = new Rectangle2D.Double();
+                rect.x = x2 - len;
+                rect.y = y2 - len;
+                rect.width = 2 * len;
+                rect.height = 2 * len;
+
+                Arc2D.Double arc = new Arc2D.Double(rect.x, rect.y,
+                    rect.width, rect.height,
+                    ((2 * Math.PI - theta) * RAD_TO_DEG), 180,
+                    Arc2D.OPEN);
+
+                g2.setColor(Color.white);
+                g2.fill(arc);
+                g2.setColor(Color.black);
+                g2.draw(arc);
 
                 x[2] = x[0];
                 y[2] = y[0];
@@ -310,27 +320,33 @@ public class MasterHex extends Hex
                 y[1] = y[3];
                 x[3] = x0;
                 y[3] = y0;
-                g.setColor(Color.white);
-                g.fillPolygon(x, y, 4);
-                g.setColor(Color.black);
-                g.drawLine(x1, y1, x[1], y[1]);
-                g.drawLine(x[2], y[2], x0, y0);
+
+                polygon = makePolygon(4, x, y, false);
+
+                g2.setColor(Color.white);
+                g2.fill(polygon);
+                // Erase the existing hexside line.
+                g2.draw(new Line2D.Double(x0, y0 , x1, y1));
+
+                g2.setColor(Color.black);
+                g2.draw(new Line2D.Double(x1, y1, x[1], y[1]));
+                g2.draw(new Line2D.Double(x[2], y[2], x0, y0));
                 break;
 
             case ARROW:
-                x[0] = (int) Math.round(x0 - len * Math.sin(theta));
-                y[0] = (int) Math.round(y0 + len * Math.cos(theta));
-                x[1] = (int) Math.round(((x0 + x1) >> 1) + len *
-                    Math.sin(theta));
-                y[1] = (int) Math.round(((y0 + y1) >> 1) - len *
-                    Math.cos(theta));
-                x[2] = (int) Math.round(x1 - len * Math.sin(theta));
-                y[2] = (int) Math.round(y1 + len * Math.cos(theta));
+                x[0] = x0 - len * Math.sin(theta);
+                y[0] = y0 + len * Math.cos(theta);
+                x[1] = (x0 + x1) / 2 + len * Math.sin(theta);
+                y[1] = (y0 + y1) / 2 - len * Math.cos(theta);
+                x[2] = x1 - len * Math.sin(theta);
+                y[2] = y1 + len * Math.cos(theta);
 
-                g.setColor(Color.white);
-                g.fillPolygon(x, y, 3);
-                g.setColor(Color.black);
-                g.drawPolyline(x, y, 3);
+                polygon = makePolygon(3, x, y, false);
+
+                g2.setColor(Color.white);
+                g2.fill(polygon);
+                g2.setColor(Color.black);
+                g2.draw(polygon);
                 break;
 
             case ARROWS:
@@ -342,19 +358,19 @@ public class MasterHex extends Hex
                     x1 = vx1 + (vx2 - vx1) * (4 + 3 * j) / 12;
                     y1 = vy1 + (vy2 - vy1) * (4 + 3 * j) / 12;
 
-                    x[0] = (int) Math.round(x0 - len * Math.sin(theta));
-                    y[0] = (int) Math.round(y0 + len * Math.cos(theta));
-                    x[1] = (int) Math.round(((x0 + x1) >> 1) + len *
-                           Math.sin(theta));
-                    y[1] = (int) Math.round(((y0 + y1) >> 1) - len *
-                           Math.cos(theta));
-                    x[2] = (int) Math.round(x1 - len * Math.sin(theta));
-                    y[2] = (int) Math.round(y1 + len * Math.cos(theta));
+                    x[0] = x0 - len * Math.sin(theta);
+                    y[0] = y0 + len * Math.cos(theta);
+                    x[1] = (x0 + x1) / 2 + len * Math.sin(theta);
+                    y[1] = (y0 + y1) / 2 - len * Math.cos(theta);
+                    x[2] = x1 - len * Math.sin(theta);
+                    y[2] = y1 + len * Math.cos(theta);
 
-                    g.setColor(Color.white);
-                    g.fillPolygon(x, y, 3);
-                    g.setColor(Color.black);
-                    g.drawPolyline(x, y, 3);
+                    polygon = makePolygon(3, x, y, false);
+
+                    g2.setColor(Color.white);
+                    g2.fill(polygon);
+                    g2.setColor(Color.black);
+                    g2.draw(polygon);
                 }
                 break;
         }
@@ -425,12 +441,11 @@ public class MasterHex extends Hex
     }
 
 
-    // Return a point near the center of the hex, vertically offset
-    // a bit toward the fat side.
+    /** Return a point near the center of the hex, vertically offset
+     *  a bit toward the fat side. */
     private Point getOffCenter()
     {
-        return new Point((xVertex[0] + xVertex[1]) >> 1, ((yVertex[0] +
-            yVertex[3]) >> 1) + (inverted ? -(scale / 6) : (scale / 6)));
+        return offCenter;
     }
 
 

@@ -1,5 +1,6 @@
 import java.awt.*;
 import java.util.*;
+import java.awt.geom.*;
 
 /**
  * Class BattleHex describes one Battlemap hex.
@@ -59,19 +60,17 @@ public class BattleHex extends Hex
         xVertex[1] = cx + 2 * scale;
         yVertex[1] = cy;
         xVertex[2] = cx + 3 * scale;
-        yVertex[2] = cy + (int) Math.round(SQRT3 * scale);
+        yVertex[2] = cy + SQRT3 * scale;
         xVertex[3] = cx + 2 * scale;
-        yVertex[3] = cy + (int) Math.round(2 * SQRT3 * scale);
+        yVertex[3] = cy + 2 * SQRT3 * scale;
         xVertex[4] = cx;
-        yVertex[4] = cy + (int) Math.round(2 * SQRT3 * scale);
+        yVertex[4] = cy + 2 * SQRT3 * scale;
         xVertex[5] = cx - 1 * scale;
-        yVertex[5] = cy + (int) Math.round(SQRT3 * scale);
+        yVertex[5] = cy + SQRT3 * scale;
 
-        hexagon = new Polygon(xVertex, yVertex, 6);
-        // Add 1 to width and height because Java rectangles come up
-        // one pixel short.
-        rectBound = new Rectangle(xVertex[5], yVertex[0], xVertex[2] -
-                        xVertex[5] + 1, yVertex[3] - yVertex[0] + 1);
+        hexagon = makePolygon(6, xVertex, yVertex, true);
+        rectBound = hexagon.getBounds();
+        center = findCenter();
 
         for (int i = 0; i < 6; i++)
         {
@@ -85,32 +84,36 @@ public class BattleHex extends Hex
 
     public void paint(Graphics g)
     {
+        Graphics2D g2 = (Graphics2D)g;
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+            RenderingHints.VALUE_ANTIALIAS_OFF);
+
         if (isSelected())
         {
-            g.setColor(Color.white);
+            g2.setColor(Color.white);
         }
         else
         {
-            g.setColor(getTerrainColor());
+            g2.setColor(getTerrainColor());
         }
 
-        g.fillPolygon(hexagon);
-        g.setColor(Color.black);
-        g.drawPolygon(hexagon);
+        g2.fill(hexagon);
+        g2.setColor(Color.black);
+        g2.draw(hexagon);
 
         if (name == null)
         {
             name = getTerrainName().toUpperCase();
         }
 
-        FontMetrics fontMetrics = g.getFontMetrics();
+        FontMetrics fontMetrics = g2.getFontMetrics();
 
-        g.drawString(name, rectBound.x + ((rectBound.width -
+        g2.drawString(name, rectBound.x + ((rectBound.width -
             fontMetrics.stringWidth(name)) >> 1),
             rectBound.y + ((fontMetrics.getHeight() + rectBound.height) >> 1));
 
         // Show hex label in upper left corner.
-        g.drawString(label, rectBound.x + (rectBound.width -
+        g2.drawString(label, rectBound.x + (rectBound.width -
             fontMetrics.stringWidth(label)) / 3,
             rectBound.y + ((fontMetrics.getHeight() + rectBound.height) >> 2));
 
@@ -122,16 +125,16 @@ public class BattleHex extends Hex
             if (hexside != ' ')
             {
                 n = (i + 1) % 6;
-                drawHexside(g, xVertex[i], yVertex[i], xVertex[n], yVertex[n],
+                drawHexside(g2, xVertex[i], yVertex[i], xVertex[n], yVertex[n],
                     hexside);
             }
-            
+
             // Draw them again from the other side.
             hexside = getOppositeHexside(i);
             if (hexside != ' ')
             {
                 n = (i + 1) % 6;
-                drawHexside(g, xVertex[n], yVertex[n], xVertex[i], yVertex[i],
+                drawHexside(g2, xVertex[n], yVertex[n], xVertex[i], yVertex[i],
                     hexside);
             }
         }
@@ -153,18 +156,18 @@ public class BattleHex extends Hex
     }
 
 
-    public void drawHexside(Graphics g, int vx1, int vy1, int vx2, int vy2, char
-        hexsideType)
+    public void drawHexside(Graphics2D g2, double vx1, double vy1, double vx2, 
+        double vy2, char hexsideType)
     {
-        int x0;                  // first focus point
-        int y0;
-        int x1;                  // second focus point
-        int y1;
-        int x2;                  // center point
-        int y2;
+        double x0;                  // first focus point
+        double y0;
+        double x1;                  // second focus point
+        double y1;
+        double x2;                  // center point
+        double y2;
         double theta;            // gate angle
-        int [] x = new int[4];   // hexside points
-        int [] y = new int[4];   // hexside points
+        double [] x = new double[4];   // hexside points
+        double [] y = new double[4];   // hexside points
 
 
         x0 = vx1 + (vx2 - vx1) / 6;
@@ -184,19 +187,19 @@ public class BattleHex extends Hex
                     x1 = vx1 + (vx2 - vx1) * (4 + 3 * j) / 12;
                     y1 = vy1 + (vy2 - vy1) * (4 + 3 * j) / 12;
 
-                    x[0] = (int) Math.round(x0 - len * Math.sin(theta));
-                    y[0] = (int) Math.round(y0 + len * Math.cos(theta));
-                    x[1] = (int) Math.round(((x0 + x1) >> 1) + len * 
-                        Math.sin(theta));
-                    y[1] = (int) Math.round(((y0 + y1) >> 1) - len * 
-                        Math.cos(theta));
-                    x[2] = (int) Math.round(x1 - len * Math.sin(theta));
-                    y[2] = (int) Math.round(y1 + len * Math.cos(theta));
+                    x[0] = x0 - len * Math.sin(theta);
+                    y[0] = y0 + len * Math.cos(theta);
+                    x[1] = (x0 + x1) / 2 + len * Math.sin(theta);
+                    y[1] = (y0 + y1) / 2 - len * Math.cos(theta);
+                    x[2] = x1 - len * Math.sin(theta);
+                    y[2] = y1 + len * Math.cos(theta);
 
-                    g.setColor(Color.white);
-                    g.fillPolygon(x, y, 3);
-                    g.setColor(Color.black);
-                    g.drawPolyline(x, y, 3);
+                    GeneralPath polygon = makePolygon(3, x, y, false);
+
+                    g2.setColor(Color.white);
+                    g2.fill(polygon);
+                    g2.setColor(Color.black);
+                    g2.draw(polygon);
                 }
                 break;
 
@@ -208,33 +211,31 @@ public class BattleHex extends Hex
                     x1 = vx1 + (vx2 - vx1) * (4 + 3 * j) / 12;
                     y1 = vy1 + (vy2 - vy1) * (4 + 3 * j) / 12;
 
-                    x[0] = (int) Math.round(x0 - len * Math.sin(theta));
-                    y[0] = (int) Math.round(y0 + len * Math.cos(theta));
-                    x[1] = (int) Math.round(x0 + len * Math.sin(theta));
-                    y[1] = (int) Math.round(y0 - len * Math.cos(theta));
-                    x[2] = (int) Math.round(x1 + len * Math.sin(theta));
-                    y[2] = (int) Math.round(y1 - len * Math.cos(theta));
-                    x[3] = (int) Math.round(x1 - len * Math.sin(theta));
-                    y[3] = (int) Math.round(y1 + len * Math.cos(theta));
+                    x[0] = x0 - len * Math.sin(theta);
+                    y[0] = y0 + len * Math.cos(theta);
+                    x[1] = x0 + len * Math.sin(theta);
+                    y[1] = y0 - len * Math.cos(theta);
+                    x[2] = x1 + len * Math.sin(theta);
+                    y[2] = y1 - len * Math.cos(theta);
+                    x[3] = x1 - len * Math.sin(theta);
+                    y[3] = y1 + len * Math.cos(theta);
 
-                    x2 = (int) Math.round((x0 + x1) >> 1);
-                    y2 = (int) Math.round((y0 + y1) >> 1);
-                    Rectangle rect = new Rectangle();
-                    rect.x = x2 - (int) Math.round(len);
-                    rect.y = y2 - (int) Math.round(len);
-                    rect.width = (int) (2 * Math.round(len));
-                    rect.height = (int) (2 * Math.round(len));
+                    x2 = (x0 + x1) / 2;
+                    y2 = (y0 + y1) / 2;
+                    Rectangle2D.Double rect = new Rectangle2D.Double();
+                    rect.x = x2 - len;
+                    rect.y = y2 - len;
+                    rect.width = 2 * len;
+                    rect.height = 2 * len;
 
-                    g.setColor(Color.white);
-                    // Draw a bit more than a semicircle, to clean edge.
-                    g.fillArc(rect.x, rect.y, rect.width, rect.height,
-                        (int) Math.round((2 * Math.PI - theta) *
-                        RAD_TO_DEG - 10), 200);
-                    g.setColor(Color.black);
-                    g.drawArc(rect.x, rect.y, rect.width, rect.height,
-                        (int) Math.round((2 * Math.PI - theta) * RAD_TO_DEG),
-                        180);
-
+                    g2.setColor(Color.white);
+                    Arc2D.Double arc = new Arc2D.Double(rect.x, rect.y,
+                        rect.width, rect.height,
+                        ((2 * Math.PI - theta) * RAD_TO_DEG), 180,
+                        Arc2D.OPEN);
+                    g2.fill(arc);
+                    g2.setColor(Color.black);
+                    g2.draw(arc);
                 }
                 break;
 
@@ -246,18 +247,18 @@ public class BattleHex extends Hex
                     x1 = vx1 + (vx2 - vx1) * (4 + 3 * j) / 12;
                     y1 = vy1 + (vy2 - vy1) * (4 + 3 * j) / 12;
 
-                    x[0] = (int) Math.round(x0 - len / 3 * Math.sin(theta));
-                    y[0] = (int) Math.round(y0 + len / 3 * Math.cos(theta));
-                    x[1] = (int) Math.round(x0 + len / 3 * Math.sin(theta));
-                    y[1] = (int) Math.round(y0 - len / 3 * Math.cos(theta));
-                    x[2] = (int) Math.round(x1 + len / 3 * Math.sin(theta));
-                    y[2] = (int) Math.round(y1 - len / 3 * Math.cos(theta));
-                    x[3] = (int) Math.round(x1 - len / 3 * Math.sin(theta));
-                    y[3] = (int) Math.round(y1 + len / 3 * Math.cos(theta));
+                    x[0] = x0 - len / 3 * Math.sin(theta);
+                    y[0] = y0 + len / 3 * Math.cos(theta);
+                    x[1] = x0 + len / 3 * Math.sin(theta);
+                    y[1] = y0 - len / 3 * Math.cos(theta);
+                    x[2] = x1 + len / 3 * Math.sin(theta);
+                    y[2] = y1 - len / 3 * Math.cos(theta);
+                    x[3] = x1 - len / 3 * Math.sin(theta);
+                    y[3] = y1 + len / 3 * Math.cos(theta);
 
-                    g.setColor(Color.black);
-                    g.drawLine(x[0], y[0], x[1], y[1]);
-                    g.drawLine(x[2], y[2], x[3], y[3]);
+                    g2.setColor(Color.black);
+                    g2.draw(new Line2D.Double(x[0], y[0], x[1], y[1]));
+                    g2.draw(new Line2D.Double(x[2], y[2], x[3], y[3]));
                 }
                 break;
 
@@ -269,19 +270,21 @@ public class BattleHex extends Hex
                     x1 = vx1 + (vx2 - vx1) * (4 + 3 * j) / 12;
                     y1 = vy1 + (vy2 - vy1) * (4 + 3 * j) / 12;
 
-                    x[0] = (int) Math.round(x0 - len * Math.sin(theta));
-                    y[0] = (int) Math.round(y0 + len * Math.cos(theta));
-                    x[1] = (int) Math.round(x0 + len * Math.sin(theta));
-                    y[1] = (int) Math.round(y0 - len * Math.cos(theta));
-                    x[2] = (int) Math.round(x1 + len * Math.sin(theta));
-                    y[2] = (int) Math.round(y1 - len * Math.cos(theta));
-                    x[3] = (int) Math.round(x1 - len * Math.sin(theta));
-                    y[3] = (int) Math.round(y1 + len * Math.cos(theta));
+                    x[0] = x0 - len * Math.sin(theta);
+                    y[0] = y0 + len * Math.cos(theta);
+                    x[1] = x0 + len * Math.sin(theta);
+                    y[1] = y0 - len * Math.cos(theta);
+                    x[2] = x1 + len * Math.sin(theta);
+                    y[2] = y1 - len * Math.cos(theta);
+                    x[3] = x1 - len * Math.sin(theta);
+                    y[3] = y1 + len * Math.cos(theta);
 
-                    g.setColor(Color.white);
-                    g.fillPolygon(x, y, 4);
-                    g.setColor(Color.black);
-                    g.drawPolyline(x, y, 4);
+                    GeneralPath polygon = makePolygon(4, x, y, false);
+
+                    g2.setColor(Color.white);
+                    g2.fill(polygon);
+                    g2.setColor(Color.black);
+                    g2.draw(polygon);
                 }
                 break;
         }
@@ -447,7 +450,7 @@ public class BattleHex extends Hex
                 xLabel = '?';
         }
 
-        int yLabel = 6 - yCoord - (int) Math.abs(Math.floor((xCoord - 3) >> 1));
+        int yLabel = 6 - yCoord - (int)Math.abs(((xCoord - 3) / 2));
         label = new String(xLabel + Integer.toString(yLabel));
     }
 

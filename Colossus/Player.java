@@ -742,4 +742,19 @@ public class Player implements Comparable
     {
         return titanEliminated;
     }
+
+
+    /** This will eventually be a per-player option.  Right now it's
+     *  global for the whole game. */
+    public boolean getAutoPickRecruiter()
+    {
+        if (game != null)
+        {
+            return game.getAutoPickRecruiter();
+        }
+        else
+        {
+            return false;
+        }
+    }
 }

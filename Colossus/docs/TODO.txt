@@ -1,5 +1,9 @@
 Hook up remaining actions in MasterBoard menu.
 
+Pick better colors.
+
+Add antialiasing option.
+
 Write a minimal, complete Game.loadGame() that reuses existing 
    objects as much as possible.
 
@@ -8,14 +12,20 @@ Show movement die roll graphically.
 Disable file-related options when running as an applet.
 
 Add per-player option menu, with results saved to playername.cfg
+
+Add chits and hexes to containers and use layout managers to place
+   chits?  Difficulties with overlapping hexes, stacked chits.
+
+Change Hex.xVertex and yVertex to doubles?
+
 Add "no 2s or 5s" mulligan option.  (Per player, or global, or both?)
 Add auto-recruit option.
-Add auto-move option.
 Add auto-forced-strike option.
+Add auto-pick-entry-side option.
+Add auto-move option.
 Add auto-strike option.
 Add auto-split option.
 Add auto-flee option.
-Add auto-pick-entry-side option.
 Add auto-play option.  (aka Really Dumb Computer Opponent.)
 
 Add ability to specify computer opponents in GetPlayers.
@@ -24,7 +34,6 @@ Skip strikes that can't matter.
 
 Add keyboard legion selection?
 Add toolbars?
-Add status bar to bottom of MasterBoard?
 Add tooltips?
 
 Copy entrySide and teleported from MasterHex to Legion.

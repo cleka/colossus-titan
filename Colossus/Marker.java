@@ -19,6 +19,7 @@ public class Marker extends Chit
     {
         super(scale, id, container);
         this.legion = legion;
+        setBackground(Color.black);
     }
 
 

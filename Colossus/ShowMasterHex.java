@@ -9,7 +9,8 @@ import java.util.*;
  * @author David Ripton
  */
 
-class ShowMasterHex extends JDialog implements MouseListener, WindowListener
+public class ShowMasterHex extends JDialog implements MouseListener,
+    WindowListener
 {
     private static final int scale = 60;
 

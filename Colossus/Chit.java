@@ -48,6 +48,8 @@ public class Chit extends JPanel
         this.container = container;
         this.id = id;
 
+        setBackground(Color.lightGray);
+
         String imageFilename = getImagePath(id);
 
         // The image-loading syntax that works correctly for applications

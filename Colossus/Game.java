@@ -1879,12 +1879,14 @@ public class Game
     }
 
 
-    public void doRecruit(Creature recruit, Legion legion,
+    public static void doRecruit(Creature recruit, Legion legion,
         JFrame parentFrame)
     {
         // Pick the recruiter(s) if necessary.
         ArrayList recruiters = findEligibleRecruiters(legion, recruit);
         Creature recruiter;
+        
+        Player player = legion.getPlayer();
 
         int numEligibleRecruiters = recruiters.size();
         if (numEligibleRecruiters == 0)
@@ -1892,7 +1894,7 @@ public class Game
             // A warm body recruits in a tower.
             recruiter = null;
         }
-        else if (getAutoPickRecruiter() || numEligibleRecruiters == 1 ||
+        else if (player.getAutoPickRecruiter() || numEligibleRecruiters == 1 ||
             allRecruitersVisible(legion, recruiters))
         {
             // If there's only one possible recruiter, or if all

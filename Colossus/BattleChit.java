@@ -20,6 +20,7 @@ public class BattleChit extends Chit
     {
         super(scale, id, container);
         this.critter = critter;
+        setBackground(Color.white);
     }
 
 

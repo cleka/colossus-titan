@@ -110,20 +110,17 @@ public class PickEntrySide extends JPanel implements ActionListener,
 
             if (button5 != null)
             {
-                button5.setBounds(cx + 1 * scale,
-                    (int) Math.round(cy + 1 * scale),
+                button5.setBounds(cx + 1 * scale, cy + 1 * scale,
                     d.width / 7, d.height / 16);
             }
             if (button3 != null)
             {
-                button3.setBounds(cx + 1 * scale,
-                    (int) Math.round(cy + 21 * scale),
+                button3.setBounds(cx + 1 * scale, cy + 21 * scale,
                     d.width / 7, d.height / 16);
             }
             if (button1 != null)
             {
-                button1.setBounds(cx + 19 * scale,
-                    (int) Math.round(cy + 11 * scale),
+                button1.setBounds(cx + 19 * scale, cy + 11 * scale,
                     d.width / 7, d.height / 16);
             }
 
@@ -248,6 +245,7 @@ public class PickEntrySide extends JPanel implements ActionListener,
         frame.setVisible(true);
 
         MasterHex hex = new MasterHex(0, 0, 0, false, null);
+        hex.setTerrain('D');
         hex.setEntrySide(1);
         hex.setEntrySide(3);
         hex.setEntrySide(5);
