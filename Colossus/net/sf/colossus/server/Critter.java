@@ -13,11 +13,12 @@ import net.sf.colossus.client.HexMap;
  * Class Critter represents an individual Titan Character.
  * @version $Id$
  * @author David Ripton
+ * @author Romain Dolbeau
  */
 
-final class Critter /* extends Creature */ implements Comparable
+final class Critter implements Comparable
 {
-    private Creature creature;  // XXX
+    private Creature creature;
     private String markerId;
     private Battle battle;
     private boolean struck;
@@ -36,14 +37,6 @@ final class Critter /* extends Creature */ implements Comparable
 
     Critter(Creature creature, String markerId, Game game)
     {
-        /* super(creature);
-        
-        if (creature instanceof Critter)
-        {
-            throw new IllegalArgumentException("Critter should not be built out of another Critter, only from regular Creature");
-        }
-        */
-
         this.creature = creature;
         this.markerId = markerId;
         this.game = game;
@@ -60,7 +53,6 @@ final class Critter /* extends Creature */ implements Comparable
     }
 
 
-    // XXX
     Creature getCreature()
     {
         return creature;
@@ -86,22 +78,15 @@ final class Critter /* extends Creature */ implements Comparable
         return game.getPlayerByMarkerId(markerId);
     }
 
-    String getPlayerName()
-    {
-        return game.getPlayerByMarkerId(markerId).getName();
-    }
-
     int getTag()
     {
         return tag;
     }
 
-
     Battle getBattle()
     {
         return battle;
     }
-
 
     String getDescription()
     {
@@ -109,7 +94,7 @@ final class Critter /* extends Creature */ implements Comparable
     }
 
 
-    public int getPower()
+    private int getPower()
     {
         if (isTitan())
         {
@@ -143,12 +128,6 @@ final class Critter /* extends Creature */ implements Comparable
     void heal()
     {
         hits = 0;
-    }
-
-
-    boolean wouldDieFrom(int hits)
-    {
-        return (hits + getHits() >= getPower());
     }
 
 
@@ -195,7 +174,6 @@ final class Critter /* extends Creature */ implements Comparable
         return struck;
     }
 
-
     void setStruck(boolean struck)
     {
         this.struck = struck;
@@ -235,7 +213,7 @@ final class Critter /* extends Creature */ implements Comparable
 
     /** Return the number of enemy creatures in contact with this critter.
      *  Dead critters count as being in contact only if countDead is true. */
-    int numInContact(boolean countDead)
+    private int numInContact(boolean countDead)
     {
         BattleHex hex = getCurrentHex();
 
@@ -268,34 +246,6 @@ final class Critter /* extends Creature */ implements Comparable
     }
 
 
-    /** Return the number of friendly creatures adjacent to this critter.
-     *  Dead critters do not count. */
-    int numAdjacentAllies()
-    {
-        BattleHex hex = getCurrentHex();
-        // Offboard creatures are not in contact.
-        if (hex.isEntrance())
-        {
-            return 0;
-        }
-        int count = 0;
-        for (int i = 0; i < 6; i++)
-        {
-            BattleHex neighbor = hex.getNeighbor(i);
-            if (neighbor != null)
-            {
-                Critter other = battle.getCritter(neighbor);
-                if (other != null && other.getPlayer() == getPlayer() &&
-                    !other.isDead())
-                {
-                    count++;
-                }
-            }
-        }
-        return count;
-    }
-
-
     /** Return true if there are any enemies adjacent to this critter.
      *  Dead critters count as being in contact only if countDead is true. */
     boolean isInContact(boolean countDead)
@@ -317,8 +267,7 @@ final class Critter /* extends Creature */ implements Comparable
                 if (neighbor != null)
                 {
                     Critter other = battle.getCritter(neighbor);
-                    if (other != null && !other.getPlayerName().equals(
-                        getPlayerName()) &&
+                    if (other != null && other.getPlayer() != getPlayer() &&
                         (countDead || !other.isDead()))
                     {
                         return true;
@@ -640,15 +589,6 @@ final class Critter /* extends Creature */ implements Comparable
         return null;
     }
 
-
-    /** Return true if there's any chance that this critter could take
-     *  a strike penalty to carry when striking target.  Side effects
-     *  on penaltyOptions, battle.carryTargets. */
-    boolean possibleStrikePenalty(Critter target)
-    {
-        findCarries(target);
-        return (!penaltyOptions.isEmpty());
-    }
 
     // XXX Should be able to return penaltyOptions and carry targets
     // rather than use side effects.
@@ -982,7 +922,8 @@ final class Critter /* extends Creature */ implements Comparable
         // Must use our local, Titan-aware getPointValue()
         // return creature.getHintedRecruitmentValue(section);
         return getPointValue() +
-            VariantSupport.getHintedRecruitmentValueOffset(creature.getName(), section);
+            VariantSupport.getHintedRecruitmentValueOffset(creature.getName(),
+                section);
     }
     
     public boolean isRangestriker()
