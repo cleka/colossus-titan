@@ -1,8 +1,11 @@
-# Makefile for Titan
+# Makefile for Colossus
 # dripton  June 26, 1998
+# Make sure to save this file in Unix rather than DOS endline format, so that
+#    it will continue to work portably.
 
 
-JC = javac -depend -J-Djavac.pipe.output=true -g -deprecation
+JC = jikes -depend -g -deprecation
+#JC = javac -depend -J-Djavac.pipe.output=true -g -deprecation
 #JC = javac -depend -J-Djavac.pipe.output=true -O:interclass
 
 
@@ -18,6 +21,7 @@ all: BattleMap.class \
      MasterBoard.class \
      MasterHex.class \
      Negotiate.class \
+     PickEntrySide.class \
      PickMarker.class \
      PickRecruit.class \
      Player.class \
@@ -61,6 +65,9 @@ MasterHex.class: MasterHex.java
 
 Negotiate.class: Negotiate.java
 	$(JC) Negotiate.java
+
+PickEntrySide.class: PickEntrySide.java
+	$(JC) PickEntrySide.java
 
 PickMarker.class: PickMarker.java
 	$(JC) PickMarker.java
