@@ -42,6 +42,7 @@
         <property name="HTMLDIR" value="/home/groups/c/co/colossus/htdocs"/>
         <property name="DOWNLOAD_DIR" value="${HTMLDIR}/download"/>
         <property name="DOCS_DIR" value="${HTMLDIR}/docs"/>
+        <property name="LIBS_DIR" value="${HTMLDIR}/libs"/>
         <property name="ZIPFILE" value="Colossus.${DSTAMP}.zip"/>
         <property name="SERVER" value="shell1.sf.net"/>
 
@@ -56,7 +57,7 @@
 
 
 <!-- The javacc target does not support multiple .jj files in one target. -->
-<target name="parsers" 
+<target name="parsers"
         depends="BattlelandLoader,
                  CreatureLoader,
                  StrategicMapLoader,
@@ -124,8 +125,8 @@
 
 <!-- TODO Find a way to switch between javamake and javac using a variable -->
 
-<!-- If you don't have Javamake you can change "javamake" to "javac" --> 
-<!-- But get Javamake instead.  Good dependency checking helps a lot. --> 
+<!-- If you don't have Javamake you can change "javamake" to "javac" -->
+<!-- But get Javamake instead.  Good dependency checking helps a lot. -->
 <target name="compile" depends="init,parsers"
         description = "Compile most .java files to .class files using javamake">
         <javamake debug="yes" deprecation="yes" target="1.4" srcdir="."
@@ -139,8 +140,8 @@
 
 <!-- TODO Add an option to always compileAll based on an environment var. -->
 
-<!-- If you don't have Javamake you can change "javamake" to "javac" --> 
-<!-- But get Javamake instead.  Good dependency checking helps a lot. --> 
+<!-- If you don't have Javamake you can change "javamake" to "javac" -->
+<!-- But get Javamake instead.  Good dependency checking helps a lot. -->
 <target name="compileAll" depends="init,parsers"
         description = "Compile all .java files to .class files using javamake">
         <javamake debug="yes" deprecation="yes" target="1.4" srcdir="."
@@ -210,11 +211,11 @@
 
 <!-- Be very careful modifying this.  It whacks whole directories easily. -->
 <target name="clean" depends="cleanjars"
-        description = "Delete most derived files"> 
-        <delete verbose="yes" quiet = "yes" includeemptydirs="yes" 
-                defaultexcludes="no"> 
-                <fileset dir="." 
-                 includes = 
+        description = "Delete most derived files">
+        <delete verbose="yes" quiet = "yes" includeemptydirs="yes"
+                defaultexcludes="no">
+                <fileset dir="."
+                 includes =
                         "version,
                          log,
                          fixcrlf*,
@@ -233,10 +234,10 @@
 
 
 <target name="fullyclean" depends="clean"
-        description = "Delete all derived files and savegames"> 
+        description = "Delete all derived files and savegames">
         <delete verbose="yes" quiet = "yes" includeemptydirs="yes">
-                <fileset dir="." 
-                 includes = 
+                <fileset dir="."
+                 includes =
                          "net/sf/colossus/parser/*.java,
                           javamake.pdb"
                 />
@@ -245,8 +246,8 @@
 
 
 <target name="fix"
-        description = "Fix end of line characters and eliminate tabs"> 
-        <fixcrlf srcDir="." eol="lf" tab="remove" javafiles="yes" 
+        description = "Fix end of line characters and eliminate tabs">
+        <fixcrlf srcDir="." eol="lf" tab="remove" javafiles="yes"
                 eof="remove" tablength="8"
                 includes="**/*.java,**/*.jj"
         />
@@ -319,7 +320,6 @@
 
 <!-- Tasks from here down are only needed for installation on the web site. -->
 
-<!-- TODO Make a Windows version of this task. -->
 <target name="changelog" depends=""
         description = "Create a ChangeLog file from cvs history">
         <exec executable="cvs2cl.pl" os="Linux,SunOS">
@@ -332,9 +332,9 @@
         description = "Make zip file for user download">
         <zip zipfile="${ZIPFILE}" basedir="."
              excludes="**/*.sav,
-                 **/*.zip, 
-                 **/*.bak, 
-                 **/*javadoc*/*, 
+                 **/*.zip,
+                 **/*.bak,
+                 **/*javadoc*/*,
                  *Keystore*,
                  *cfg,
                  *properties*,
@@ -353,49 +353,56 @@
 
 
 <target name="inst" depends="init,sign,dist,changelog"
-        description = "Locally copy files into htdocs tree on SF"> 
+        description = "Locally copy files into htdocs tree on SF">
         <copy file="Colossus.jar" todir="${HTMLDIR}"/>
         <copy file="Colossus.jnlp" todir="${HTMLDIR}"/>
         <move file="${ZIPFILE}" todir="${DOWNLOAD_DIR}"/>
         <copy file="ChangeLog" todir="${HTMLDIR}"/>
         <copy todir="${DOCS_DIR}"> <fileset dir="docs"/></copy>
-        <delete> 
-                <fileset dir="${DOWNLOAD_DIR}" includes = "1_LATEST_IS_*"/> 
+        <delete>
+                <fileset dir="${DOWNLOAD_DIR}" includes = "1_LATEST_IS_*"/>
         </delete>
         <touch file="${DOWNLOAD_DIR}/1_LATEST_IS_${DSTAMP}"/>
 </target>
 
 <!-- TODO Eliminate double maintenance -->
+<!-- TODO Do not copy unchanged files -->
 <!-- This requires a good ssh-agent setup. -->
 <target name="remote-inst" depends="init,sign,dist,changelog"
-        description = "scp files into htdocs tree on SF"> 
-        <exec executable="scp">
+        description = "scp files into htdocs tree on SF">
+        <exec executable="scp" os="Linux,SunOS">
             <arg line="Colossus.jar ${SERVER}:${HTMLDIR}"/>
         </exec>
-        <exec executable="scp">
+        <exec executable="scp" os="Linux,SunOS">
             <arg line="Colossus.jnlp ${SERVER}:${HTMLDIR}"/>
         </exec>
+        <exec executable="ssh" os="Linux,SunOS">
+            <arg line="${SERVER} mkdir ${LIBS_DIR}"/>
+        </exec>
+        <exec executable="scp" os="Linux,SunOS">
+            <arg line="libs/*.jar ${SERVER}:${LIBSDIR}"/>
+        </exec>
 
-        <exec executable="scp">
+        <exec executable="scp" os="Linux,SunOS">
             <arg line="ChangeLog ${SERVER}:${HTMLDIR}"/>
         </exec>
-        <exec executable="scp">
+        <exec executable="scp" os="Linux,SunOS">
             <arg line="${ZIPFILE} ${SERVER}:${DOWNLOAD_DIR}"/>
         </exec>
-        <exec executable="ssh">
-            <arg line="${SERVER} rm -r ${DOCS_DIR}"/>
+        <exec executable="ssh" os="Linux,SunOS">
+            <arg line="${SERVER} mkdir ${DOCS_DIR}"/>
         </exec>
-        <exec executable="scp">
+        <exec executable="scp" os="Linux,SunOS">
             <arg line="-pr docs/ ${SERVER}:${HTMLDIR}"/>
         </exec>
-        <delete> 
-                <fileset dir="${DOWNLOAD_DIR}" includes = "1_LATEST_IS_*"/> 
+        <delete>
+                <fileset dir="${DOWNLOAD_DIR}" includes = "1_LATEST_IS_*"/>
         </delete>
-        <exec executable="ssh">
+        <exec executable="ssh" os="Linux,SunOS">
             <arg line="${SERVER} rm ${DOWNLOAD_DIR}/1_LATEST_IS_*"/>
         </exec>
         <touch file="${DOWNLOAD_DIR}/1_LATEST_IS_${DSTAMP}"/>
-        <exec executable="scp"> 
+        <exec executable="scp" os="Linux,SunOS">
             <arg line="${DOWNLOAD_DIR}/1_LATEST_IS_${DSTAMP} ${SERVER}:${DOWNLOAD_DIR}"/>
         </exec>
 </target>

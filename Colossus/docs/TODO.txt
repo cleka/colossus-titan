@@ -140,3 +140,5 @@ SVG chits.  Maybe SVG board and map, after we have SVG chits.  (No point
 
 Place SummonAngel so that it doesn't overlap any of the player's markers
    with summonable angels.
+
+Move jdom, werken.opt out of source tree into separate jar files?
