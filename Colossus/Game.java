@@ -295,7 +295,17 @@ public class Game
     {
         // XXX Need dialog to pick filename.
         Date date = new Date();
-        String filename = date.getTime() + ".sav";
+        File savesDir = new File("saves");
+        if (!savesDir.exists() || !savesDir.isDirectory())
+        {
+             if (!savesDir.mkdir())
+             {
+                 System.out.println("Could not create saves directory");
+                 return;
+             }
+        }
+
+        String filename = "saves/" + date.getTime() + ".sav";
         FileWriter fileWriter;
         try
         {
@@ -360,14 +370,44 @@ public class Game
     }
 
 
+    // Try to load a game from ./filename first, then from saves/filename.
+    // If the filename is "--latest" then load the latest savegame found in
+    // saves/ 
     private void loadGame(String filename)
     {
         // XXX Need a dialog to pick the savegame's filename, and 
         //     confirmation if there's already a game in progress.
+        File file;
+
+        if (filename.equals("--latest"))
+        {
+            File dir = new File("saves");
+            if (!dir.exists() || !dir.isDirectory())
+            {
+                System.out.println("No saves directory");
+                dispose();
+            }
+            String [] filenames = dir.list(new SaveGameFilter());
+            if (filenames.length < 1)
+            {
+                System.out.println("No savegames found in saves directory");
+                dispose();
+            }
+            sortSaveFilenames(filenames);
+            file = new File("saves/" + filenames[0]); 
+        }
+        else
+        {
+            file = new File(filename);
+            if (!file.exists())
+            {
+                file = new File("saves/" + filename);
+            }
+        }
          
         try
         {
-            FileReader fileReader = new FileReader(filename);
+            FileReader fileReader = new FileReader(file);
             BufferedReader in = new BufferedReader(fileReader);
             String buf = new String();
 
@@ -482,6 +522,48 @@ public class Game
             System.out.println(e.toString());
             // XXX Ask for another file?  Start new game?
             dispose();
+        }
+    }
+
+
+    // Extract and return the numeric part of a filename.
+    long numberValue(String filename)
+    {
+        StringBuffer numberPart = new StringBuffer();
+        for (int i = 0; i < filename.length(); i++)
+        {
+            char ch = filename.charAt(i);
+            if (Character.isDigit(ch))
+            {
+                numberPart.append(ch);
+            }
+        }
+        try
+        {
+            return Long.valueOf(new String(numberPart)).longValue();
+        }
+        catch (NumberFormatException e)
+        {
+            return -1L;
+        }
+    }
+
+
+    // Sort filenames in descending numeric order.  (1000000000.sav
+    // comes before 999999999.sav)
+    void sortSaveFilenames(String [] filenames)
+    {
+        for (int i = 0; i < filenames.length - 1; i++)
+        {
+            for (int j = i + 1; j < filenames.length; j++)
+            {
+                if (numberValue(filenames[i]) < numberValue(filenames[j]))
+                {
+                    String temp = filenames[i];
+                    filenames[i] = filenames[j];
+                    filenames[j] = temp;
+                }
+            }
         }
     }
 
