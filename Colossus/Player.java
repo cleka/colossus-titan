@@ -133,6 +133,12 @@ class Player
     }
 
 
+    Game getGame()
+    {
+        return game;
+    }
+
+
     int legionsMoved()
     {
         int total = 0;
@@ -180,6 +186,9 @@ class Player
 
     void rollMovementDie()
     {
+        // It's a new turn, so it is again legal to summon an angel.
+        canSummonAngel = true;
+
         movementRoll = (int) Math.ceil(6 * Math.random());
     }
 
@@ -393,10 +402,9 @@ class Player
 
         // Removing all legions is icky because the array shrinks as
         // each is removed.
-        int num = numLegions;
-        for (int i = 0; i < num; i++)
+        for (int i = numLegions - 1; i >= 0; i--)
         {
-            removeLegion(legions[0]);
+            removeLegion(legions[i]);
         }
 
         // Mark this player as dead.
