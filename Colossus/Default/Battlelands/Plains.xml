@@ -1,4 +1,3 @@
 <?xml version="1.0"?>
-<!DOCTYPE battlemap SYSTEM "file:./Default/Battlelands/battlemap.dtd">
 <battlemap terrain="Plains" tower="False">
 </battlemap>

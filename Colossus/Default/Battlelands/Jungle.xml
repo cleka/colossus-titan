@@ -1,5 +1,4 @@
 <?xml version="1.0"?>
-<!DOCTYPE battlemap SYSTEM "file:./Default/Battlelands/battlemap.dtd">
 <battlemap terrain="Jungle" tower="False">
     <battlehex x="0" y="3" terrain="Brambles" elevation="0">
     </battlehex>

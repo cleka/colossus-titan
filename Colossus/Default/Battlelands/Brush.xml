@@ -1,5 +1,4 @@
 <?xml version="1.0"?>
-<!DOCTYPE battlemap SYSTEM "file:./Default/Battlelands/battlemap.dtd">
 <!-- towi: giving the file-path to the dtd would not be neccessary if the 
     RecourceLoader would not return a InputStream, but a url to the 
     xml file to load. that could then passed to the SAXBuilder and it could 

@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE battlemap SYSTEM "file:./Default/Battlelands/battlemap.dtd">
 <battlemap terrain="Mountains" tower="False">
     <battlehex x="0" y="4" terrain="Plains" elevation="1">
         <border number="0" type="s" />

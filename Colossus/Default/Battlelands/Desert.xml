@@ -1,5 +1,4 @@
 <?xml version="1.0"?>
-<!DOCTYPE battlemap SYSTEM "file:./Default/Battlelands/battlemap.dtd">
 <battlemap terrain="Desert" tower="False">
     <battlehex x="0" y="3" terrain="Sand" elevation="0">
         <border number="0" type="d" />
