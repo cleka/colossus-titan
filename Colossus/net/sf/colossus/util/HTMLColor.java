@@ -171,7 +171,7 @@ public final class HTMLColor
     // The Player Colors (based on Chit)
     public static final Color BlackColossus = HTMLColor.black;
     public static final Color BlueColossus = new Color(16,24,123);
-    public static final Color BrownColossus = new Color(90,33,33);
+    public static final Color BrownColossus = new Color(120,40,40);
     public static final Color GoldColossus = new Color(165,148,49);
     public static final Color GreenColossus = new Color(24,173,66);
     public static final Color RedColossus = new Color(189,0,24);

@@ -41,13 +41,9 @@ Compute numLegions, numMarkers, numCreatures, titan power, total point value
 
 Turn off wait cursor more often.
 
-Remove look and feel menu.
-
 Indicate which players have titan teleport in StatusScreen.
 
-Synchronize repaints in StatusScreen so yellow moves all at once.
-
-Save random seed in savegame?
+Synchronize repaints in StatusScreen so yellow moves all at once
 
 Do not scale chits in CreatureCollectionView
 
@@ -66,26 +62,25 @@ Have server send marker names.
 Toolbar, or at least Done button.
 
 Change some JDialogs to JFrames to allow separate minimizing?
+Should be able to move recruit chart behind board, map.
 
 When saving game explicitly (not with autosave), log the event
    and the full savegame path.
 
 Disable "AIs stop when humans dead" if no human players at start of game.
 
-Should be able to move recruit chart behind board, map.
-
 Add link from client to LogWindow; advance scroll thumb at end of various
-   phases. 
+   phases.
 
 Should be able to clear recruitChits in any phase.  Move to Graphics menu?
 
 Real whole-legion battle eval function, including gang hits.
 
-Ability to dismiss and recall recruit markers.
+Ability to dismiss and recall recruitChits
 
-Finish split prediction.
-
-Refactor to eliminate duplicate code.
+Refactor to eliminate duplicate code.  (Especially Movement, BattleMovement, 
+   Strike, Creature/Critter/CreatureInfo)
+Fix the Titan Creature/Critter problem.
 
 Machine learning to tweak AI constants.
 
@@ -104,8 +99,10 @@ Sometimes refuse remote newGame/loadGame/saveGame calls?
 Cleanup network shutdown -- when game over or player eliminated, don't
    whine if its client drops.
 
-Set Client movementRoll when loading during movement phase after roll.
-Set which legions have recruited when loading during recruit phase.
+Fully event-driven savegames.
+Use identical events for network protocol.
+Use events to support infinite undo/redo, VCR controls to step through
+   games, stepping AI, etc.
 
 Change Quit button in GetPlayers dialog to Cancel.  Go back to existing 
    game if there is one from Cancel, or quit if just starting.  Eliminate
@@ -114,6 +111,7 @@ Change Quit button in GetPlayers dialog to Cancel.  Go back to existing
 L&F should not show Windows if not allowed on this platform.
 Kunststoff L&F in swing.properties file fails.  Works in player cfg file.
 Add Kunststoff L&F to jar file?
+Eliminate L&F menu entirely?
 
 Add "no 2s or 5s" mulligan option.
 Add optional additional handicap mulligans that can be used after turn 1.
@@ -129,11 +127,12 @@ Show zoomed area around mouse cursor in a small window, for Abyssal9.
 
 Add confirm dialogs (for conceding with titan, skipping recruits, ...)
 
-Make BattleMap less tall.
 Highlight entrances somehow.  Maybe use fixed boxes with an arrow to
    show entry side, instead of cascading.
-
-XML game history log
+Turn map to move player's entrance (or attacker's if observing) to 
+   bottom.  Line up entering creatures rather than overlapping.
+   Color-code entrances.
+Make BattleMap less tall.  Move dice, etc. to one side.
 
 Write more design docs.
 
@@ -142,8 +141,33 @@ Add SetupBattle dialog, to allow setting up standalone battles.
    angel/archangel available to summon, recruits available for terrain
    type, player scores for titan power.)
 
+Track all players' markers on client side.
 Add a ShowLegionMarkers window that shows each player's remaining 
-   legion markers.
+   markers.
+
+Add a window that shows all players' units
 
 Add movement and recruit animation.  Requires returning full paths for
    moves, not just destination hex.
+
+After JDK 1.4.1 for MacOS is released:
+   Update JNLP file to force 1.4+
+   JSpinner
+   Boxes, not JPanels with BoxLayouts
+   SO_REUSEADDR on server socket
+   Remove duplicated XML library code.
+
+Make split prediction optional.
+
+Make inverting defending units optional.
+
+SVG chits.  Maybe SVG board and map, after we have SVG chits.  (No point
+   before then -- just drags in Batik without giving infinite rescaling.)
+
+More unit tests.
+
+Place SummonAngel so that it doesn't overlap any of the player's markers
+   with summonable angels.
+
+Convert TeX docs to simple HTML to simplify build.
+

@@ -141,4 +141,13 @@ final class PickColor extends KDialog implements WindowListener, ActionListener
         color = e.getActionCommand();
         dispose();
     }
+
+
+    public static void main(String [] args)
+    {
+        java.util.List colorsLeft = Arrays.asList(Constants.colorNames);
+        String color = pickColor(new JFrame(), "Player", colorsLeft);
+        System.out.println("Picked " + color);
+        System.exit(0);
+    }
 }

@@ -1236,7 +1236,7 @@ public final class Client implements IClient
         {
             colorName = getColorByMarkerId(attackerMarkerId);
         }
-        BattleChit chit = new BattleChit(5 * Scale.get(), imageName,
+        BattleChit chit = new BattleChit((int)(5 * Scale.get()), imageName,
             map, inverted, tag, hexLabel, colorName);
         battleChits.add(chit);
     }

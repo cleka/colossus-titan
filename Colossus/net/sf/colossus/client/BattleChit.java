@@ -30,10 +30,13 @@ final class BattleChit extends Chit
     private String colorName;
     private Color color;
     private static BasicStroke oneWide = new BasicStroke(1);
-    private BasicStroke borderStroke;
+    private static BasicStroke borderStroke;
     private Rectangle midRect;
     private Rectangle outerRect;
     private int scale;
+
+    // inner scale divided by border thickness
+    static final int borderRatio = 20;  
 
 
     BattleChit(int scale, String id, Container container, boolean inverted,
@@ -46,7 +49,6 @@ final class BattleChit extends Chit
         this.colorName = colorName;
         color = HTMLColor.stringToColor(colorName + "Colossus");
         setBackground(Color.white);
-        borderStroke = new BasicStroke(scale / 7);
     }
 
 
@@ -262,10 +264,21 @@ final class BattleChit extends Chit
     public void setBounds(Rectangle outerRect)
     {
         this.outerRect = outerRect;
-        rect = new Rectangle(outerRect.x + scale / 8, outerRect.y + scale / 8, 
-            outerRect.width - scale / 4, outerRect.height - scale / 4);
-        midRect = new Rectangle(rect.x - scale / 16, rect.y - scale / 16, 
-            rect.width + scale / 8, rect.height + scale / 8);
+        int innerScale = (int)(outerRect.width / (1.0 + 2.0 / borderRatio));
+        // avoid rescaling if possible
+        if (innerScale > 50 && innerScale < 70)
+        {
+            innerScale = 60;
+        }
+        borderStroke = new BasicStroke((int)Math.ceil(
+            (outerRect.width - innerScale) / 2.0));
+        Point center = new Point(outerRect.x + outerRect.width / 2, 
+            outerRect.y + outerRect.height / 2);
+        rect = new Rectangle(center.x - innerScale / 2, 
+            center.y - innerScale / 2, innerScale, innerScale);
+        int midScale = (int)(Math.round((scale + innerScale) / 2.0));
+        midRect = new Rectangle(center.x - midScale / 2, 
+            center.y - midScale / 2, midScale, midScale);
     }
 
 

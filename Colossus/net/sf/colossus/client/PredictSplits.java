@@ -848,8 +848,8 @@ class Node implements Comparable
         }
         if (parent != other.parent)
         {
-            throw new PredictSplitsException("Tried to merge non-siblings " + 
-                parent + " " + other.parent);
+            Log.debug("Can't merge non-siblings");
+            return;
         }
         if (getMarkerId().equals(parent.getMarkerId()) ||
             other.getMarkerId().equals(parent.getMarkerId()))
