@@ -116,7 +116,7 @@ public class Chit extends Canvas
     }
 
 
-    public boolean select(Point point)
+    public boolean contains(Point point)
     {
         if (rect.contains(point))
         {

@@ -97,3 +97,6 @@ Linux, ibmjdk118: Angel summoned into battle can move on top of
 
 Linux, ibmjdk118; Win98, jdk1.3rc1: Tried to strike own creature!
 
+Linux, ibmjdk118: '6' in upper left corner of MasterBoard window
+   after loading a game.  Stray legion height?  Disappears in a
+   repaint after a few turns.

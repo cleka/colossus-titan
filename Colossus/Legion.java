@@ -238,9 +238,9 @@ public class Legion
     {
         boolean teleported = hex.teleported();
         Game.logEvent("Legion " + getMarkerId() + " in " +
-            currentHex.getTerrainName() + " hex " + currentHex.getLabel() + 
-            (teleported ?  " teleports " : " moves ") + "to " + 
-            hex.getTerrainName() + " hex " + hex.getLabel());
+            currentHex.getDescription() + 
+            (teleported ?  " teleports " : " moves ") + 
+            "to " + hex.getDescription());
 
         currentHex.removeLegion(this);
         currentHex = hex;

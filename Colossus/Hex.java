@@ -19,7 +19,7 @@ public class Hex
     private char terrain;
     protected int scale;
     protected double len;
-
+    protected String label;
 
 
     public boolean select(Point point)
@@ -86,4 +86,23 @@ public class Hex
     {
         this.terrain = terrain;
     }        
+
+
+    public String getLabel()
+    {
+        return label;
+    }
+
+
+    // This needs to be overridden in subclasses.
+    public String getTerrainName()
+    {
+        return "?????";
+    }
+
+
+    public String getDescription()
+    {
+        return getTerrainName() + " hex " + getLabel();
+    }
 }

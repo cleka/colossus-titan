@@ -96,8 +96,8 @@ public class MasterBoard extends Frame implements MouseListener,
         imagesLoaded = false;
 
         // Initialize the popup menu.
-        popupMenu = new PopupMenu("View Hex Info or BattleMap?");
-        menuItemHex = new MenuItem("View Hex Info");
+        popupMenu = new PopupMenu();
+        menuItemHex = new MenuItem("View Recruit Info");
         menuItemMap = new MenuItem("View BattleMap");
         popupMenu.add(menuItemHex);
         popupMenu.add(menuItemMap);
@@ -266,7 +266,8 @@ public class MasterBoard extends Frame implements MouseListener,
         {
             for (int j = 0; j < h[0].length; j++)
             {
-                if (show[i][j] && h[i][j].getLabel() == label)
+                if (show[i][j] && h[i][j].getLabel().equals(
+                    Integer.toString(label)))
                 {
                     return h[i][j];
                 }
@@ -308,7 +309,7 @@ public class MasterBoard extends Frame implements MouseListener,
             for (int j = 0; j < player.getNumLegions(); j++)
             {
                 Legion legion = player.getLegion(j);
-                if (legion.getMarker().select(point))
+                if (legion.getMarker().contains(point))
                 {
                     return legion;
                 }
@@ -1568,6 +1569,7 @@ public class MasterBoard extends Frame implements MouseListener,
                 InputEvent.BUTTON3_MASK) == InputEvent.BUTTON3_MASK))
             {
                 lastPoint = point;
+                popupMenu.setLabel(hex.getDescription());
                 popupMenu.show(e.getComponent(), point.x, point.y);
 
                 return;
@@ -1662,13 +1664,11 @@ public class MasterBoard extends Frame implements MouseListener,
                 case Game.FIGHT:
                     if (summoningAngel)
                     {
-                        Legion donor =
-                            hex.getFriendlyLegion(player);
+                        Legion donor = hex.getFriendlyLegion(player);
                         player.selectLegion(donor);
                         if (summonAngel == null)
                         {
-                            summonAngel =
-                                map.getTurn().getSummonAngel();
+                            summonAngel = map.getTurn().getSummonAngel();
                         }
                         summonAngel.repaint();
                         donor.getMarker().repaint();
@@ -1679,17 +1679,14 @@ public class MasterBoard extends Frame implements MouseListener,
                     else if (hex.isEngagement() && !dialogLock)
                     {
                         dialogLock = true;
-                        Legion attacker =
-                            hex.getFriendlyLegion(player);
-                        Legion defender =
-                            hex.getEnemyLegion(player);
+                        Legion attacker = hex.getFriendlyLegion(player);
+                        Legion defender = hex.getEnemyLegion(player);
 
                         if (defender.canFlee())
                         {
                             // Fleeing gives half points and denies the
                             // attacker the chance to summon an angel.
-                            new Concede(this, defender, attacker,
-                                true);
+                            new Concede(this, defender, attacker, true);
                         }
 
                         if (hex.isEngagement())
@@ -1720,9 +1717,9 @@ public class MasterBoard extends Frame implements MouseListener,
                                         dialogLock = false;
                                     }
                                 }
-                                else if (hex.getLegion(0) == attacker
-                                    && attacker.getHeight() < 7
-                                    && player.canSummonAngel())
+                                else if (hex.getLegion(0) == attacker && 
+                                    attacker.getHeight() < 7 && 
+                                    player.canSummonAngel())
                                 {
                                     // If the attacker won the battle
                                     // by agreement, he may summon an
@@ -1846,7 +1843,7 @@ public class MasterBoard extends Frame implements MouseListener,
         MasterHex hex = getHexContainingPoint(lastPoint);
         if (hex != null)
         {
-            if (e.getActionCommand().equals("View Hex Info"))
+            if (e.getActionCommand().equals("View Recruit Info"))
             {
                 new ShowMasterHex(this, hex, lastPoint);
             }

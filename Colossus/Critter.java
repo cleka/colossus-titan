@@ -511,7 +511,7 @@ public class Critter extends Creature
         {
             BattleHex targetHex = carryTargets[i].getCurrentHex();
             prompt.append(carryTargets[i].getName() + " in " +
-                targetHex.getTerrainName() + " hex " + targetHex.getLabel());
+                targetHex.getDescription());
             if (i < carryTargets.length - 1)
             {
                 prompt.append(", ");

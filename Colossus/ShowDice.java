@@ -130,11 +130,9 @@ public class ShowDice extends Dialog implements WindowListener
         removeAll();
 
         label1.setText(attacker.getName() + " in " + 
-            attacker.getCurrentHex().getTerrainName() + " hex " +
-            attacker.getCurrentHex().getLabel() + " attacks " + 
+            attacker.getCurrentHex().getDescription() + " attacks " + 
             defender.getName() + " in " + 
-            defender.getCurrentHex().getTerrainName() + " hex " +
-            defender.getCurrentHex().getLabel());
+            defender.getCurrentHex().getDescription()); 
         label1.setAlignment(Label.LEFT);
         constraints.gridy = 0;
         constraints.gridwidth = 6;

@@ -31,7 +31,10 @@ public class BattleHex extends Hex
     private int xCoord;
     private int yCoord;
 
-    private String label;
+    // Hex labels are:
+    // A1-A3, B1-B4, C1-C5, D1-D6, E1-E5, F1-F4.  
+    // Letters increase left to right; numbers increase bottom to top.
+
 
 
     public BattleHex(int cx, int cy, int scale, BattleMap map, int xCoord, 
@@ -469,15 +472,6 @@ public class BattleHex extends Hex
             default:
                 return Color.black;
         }
-    }
-
-
-    // A1-A3, B1-B4, C1-C5, D1-D6, E1-E5, F1-F4.  
-    // Letters increase left to right; numbers increase
-    // bottom to top.
-    public String getLabel()
-    {
-        return label;
     }
 
 

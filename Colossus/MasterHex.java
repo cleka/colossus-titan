@@ -20,11 +20,11 @@ public class MasterHex extends Hex
     // Brush, Desert, Hills, Jungle, mountains, Marsh, Plains,
     // Swamp, Tower, tundra, Woods
 
+    // Hex labels are:
     // Middle ring: 1-42
     // Outer ring: 101-142
     // Towers: 100, 200, 300, 400, 500, 600
     // Inner ring: 1000, 2000, 3000, 4000, 5000, 6000
-    private int label;
 
     // n, ne, se, s, sw, nw
     private int labelSide;
@@ -152,45 +152,44 @@ public class MasterHex extends Hex
 
         // Draw label and terrain name
         FontMetrics fontMetrics = g.getFontMetrics();
-        String sLabel = Integer.toString(label);
         String name = getTerrainName().toUpperCase();
         int fontHeight = fontMetrics.getMaxAscent() + fontMetrics.getLeading();
 
         switch (getLabelSide())
         {
             case 0:
-                g.drawString(sLabel, rectBound.x + 
-                    (rectBound.width - fontMetrics.stringWidth(sLabel)) / 2,
+                g.drawString(label, rectBound.x + 
+                    (rectBound.width - fontMetrics.stringWidth(label)) / 2,
                     rectBound.y + fontHeight / 2 + rectBound.height / 10);
                 break;
 
             case 1:
-                g.drawString(sLabel, rectBound.x + (rectBound.width - 
-                    fontMetrics.stringWidth(sLabel)) * 4 / 5,
+                g.drawString(label, rectBound.x + (rectBound.width - 
+                    fontMetrics.stringWidth(label)) * 4 / 5,
                     rectBound.y + fontHeight / 2 + rectBound.height / 5);
                 break;
 
             case 2:
-                g.drawString(sLabel, rectBound.x + (rectBound.width - 
-                    fontMetrics.stringWidth(sLabel)) * 4 / 5,
+                g.drawString(label, rectBound.x + (rectBound.width - 
+                    fontMetrics.stringWidth(label)) * 4 / 5,
                     rectBound.y + fontHeight / 2 + rectBound.height * 4 / 5);
                 break;
 
             case 3:
-                g.drawString(sLabel, rectBound.x + (rectBound.width - 
-                    fontMetrics.stringWidth(sLabel)) / 2,
+                g.drawString(label, rectBound.x + (rectBound.width - 
+                    fontMetrics.stringWidth(label)) / 2,
                     rectBound.y + fontHeight / 2 + rectBound.height * 9 / 10);
                 break;
 
             case 4:
-                g.drawString(sLabel, rectBound.x + (rectBound.width - 
-                    fontMetrics.stringWidth(sLabel)) / 5,
+                g.drawString(label, rectBound.x + (rectBound.width - 
+                    fontMetrics.stringWidth(label)) / 5,
                     rectBound.y + fontHeight / 2 + rectBound.height * 4 / 5);
                 break;
 
             case 5:
-                g.drawString(sLabel, rectBound.x + (rectBound.width - 
-                    fontMetrics.stringWidth(sLabel)) / 5,
+                g.drawString(label, rectBound.x + (rectBound.width - 
+                    fontMetrics.stringWidth(label)) / 5,
                     rectBound.y + fontHeight / 2 + rectBound.height / 5);
                 break;
         }
@@ -1009,7 +1008,7 @@ public class MasterHex extends Hex
     }
 
 
-    public int getLabel()
+    public String getLabel()
     {
         return label;
     }
@@ -1023,7 +1022,7 @@ public class MasterHex extends Hex
 
     public void setLabel(int label)
     {
-        this.label = label;
+        this.label = Integer.toString(label);
     }
 
 

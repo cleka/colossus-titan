@@ -72,13 +72,12 @@ public class BattleMap extends Frame implements MouseListener,
         super(attacker.getMarkerId() + " (" + attacker.getPlayer().getName() +
             ") attacks " + defender.getMarkerId() + " (" +
             defender.getPlayer().getName() + ")" + " in " + 
-            masterHex.getTerrainName() + " hex " + masterHex.getLabel());
+            masterHex.getDescription());
         
         Game.logEvent("\n" + attacker.getMarkerId() + " (" + 
             attacker.getPlayer().getName() + ") attacks " + 
             defender.getMarkerId() + " (" + defender.getPlayer().getName() + 
-            ")" + " in " + masterHex.getTerrainName() + " hex " + 
-            masterHex.getLabel());
+            ")" + " in " + masterHex.getDescription());
 
         this.attacker = attacker;
         this.defender = defender;
@@ -1375,7 +1374,7 @@ public class BattleMap extends Frame implements MouseListener,
                 {
                     critters[j] = critters[j + 1];
                 }
-                critters[numCritters--] = null;
+                critters[--numCritters] = null;
             }
             else
             {
@@ -1873,7 +1872,7 @@ public class BattleMap extends Frame implements MouseListener,
     {
         for (int i = 0; i < numCritters; i++)
         {
-            if (critters[i].getChit().select(point)) 
+            if (critters[i].getChit().contains(point)) 
             {
                 return critters[i];
             }

@@ -52,7 +52,8 @@ Running the game requires the following:
    Linux: IBM's 1.1.8 is the most stable, but not perfect.  
       The Sun and Blackdown 1.1.8 versions are pretty good.  
       The Sun and Blackdown 1.2.2 versions are okay.  Sun's 
-      1.3 beta refresh is buggy.  kaffe is buggy.
+      1.3 beta refresh is buggy.  kaffe is buggy.  IBM's 1.3
+      is buggy.
 
    If you have something else, you might find bugs that I haven't.  
    If you manage to get Colossus running on a system I haven't tried, 

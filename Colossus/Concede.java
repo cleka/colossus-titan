@@ -32,8 +32,7 @@ public class Concede extends Dialog implements ActionListener
     {
         super(parentFrame, ally.getPlayer().getName() + ": " + (flee ?
             "Flee" : "Concede") + " with Legion "  + ally.getMarkerId() +
-            " in " + ally.getCurrentHex().getTerrainName() + " hex " +
-            ally.getCurrentHex().getLabel() + "?", true);
+            " in " + ally.getCurrentHex().getDescription() + "?", true);
 
         setLayout(gridbag);
 

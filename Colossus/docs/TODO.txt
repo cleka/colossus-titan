@@ -1,7 +1,5 @@
 Split GUI classes from model classes.
 
-Add context menu for MasterHex.
-
 Add server menu for save game, load game, new game, autosave, visible 
    stacks option, ability to create or dismiss status screen, 
    PickRecruits vs.  always reveal the biggest/smallest possible 
