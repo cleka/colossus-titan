@@ -402,6 +402,28 @@ class Game extends Frame implements WindowListener, ActionListener
     }
 
 
+    void checkForVictory()
+    {
+        int remaining = 0;
+        int winner = -1;
+
+        for (int i = 0; i < numPlayers; i++)
+        {
+            if (player[i].isAlive())
+            {
+                remaining++;
+                if (remaining >= 2)
+                {
+                    return;
+                }
+                winner = i;
+            }
+        }
+
+        new MessageBox(board, player[winner].getName() + " wins");
+    }
+
+
     int getPhase()
     {
         return phase;
