@@ -204,6 +204,7 @@
         <zip zipfile="${ZIPFILE}" basedir="."
              excludes="**/*.sav,
                  **/*.zip, 
+                 **/*.bak, 
                  **/*javadoc*/*, 
                  *Keystore*,
                  *cfg,
