@@ -1,12 +1,14 @@
 /** Attempted port of hexmap from MFC to Java dripton  12/10/97 */
 
-// TODO: double-buffer
-// TODO: make the chits show up ASAP when their images load.  MediaTracker?
+// TODO: Make the chits show up ASAP when their images load.
+// TODO: Make the drawing of stacked chits less painful.
+// TODO: Double-buffer.
+// TODO: Add the dragon and hydra.
 
 import java.awt.*;
 
 
-class Hex extends Canvas implements Shape
+class Hex implements Shape
 {
     protected boolean selected;
     private int[] x_vertex = new int[6];
@@ -38,7 +40,6 @@ class Hex extends Canvas implements Shape
         p = new Polygon(x_vertex, y_vertex, 6);
         rectBound = new Rectangle(x_vertex[5], y_vertex[0], x_vertex[2] - 
             x_vertex[5], y_vertex[3] - y_vertex[0]);
-        setBounds(rectBound);
     }
 
 
@@ -73,7 +74,6 @@ class Hex extends Canvas implements Shape
         if (p.contains(point))
         {
             selected = !selected;
-            //repaint();
 	    return true;
         }
 	return false;
@@ -90,33 +90,24 @@ class Hex extends Canvas implements Shape
         return (p.contains(point));
     }
     
-    public Dimension getMinimumSize()
-    {
-        return new Dimension(x_vertex[2] - x_vertex[5], y_vertex[3] 
-	    - y_vertex[0]);
-    }
-
-    public Dimension getPreferredSize()
-    {
-        return new Dimension(x_vertex[2] - x_vertex[5], y_vertex[3] 
-	    - y_vertex[0]);
-    }
 }
 
 
 
-class Chit extends Canvas implements Shape, java.awt.image.ImageObserver
+class Chit implements Shape
 {
     protected boolean selected;
     private Rectangle rect;
     private Image image;
+    private Container container;
 
-    Chit(int cx, int cy, int scale, String image_filename)
+    Chit(int cx, int cy, int scale, String image_filename, 
+        Container my_container)
     {
         selected = false;
         rect = new Rectangle(cx, cy, scale, scale);
         image = Toolkit.getDefaultToolkit().getImage(image_filename);
-	setBounds(rect);
+        container = my_container;
     }
 
     public void update(Graphics g)
@@ -127,7 +118,7 @@ class Chit extends Canvas implements Shape, java.awt.image.ImageObserver
     public void paint(Graphics g)
     {
         System.out.println("painting a Chit");
-        if (g.drawImage(image, rect.x, rect.y, this) == false)
+        if (g.drawImage(image, rect.x, rect.y, container) == false)
         {
             System.out.println("image started drawing but isn't done");
         }
@@ -150,39 +141,13 @@ class Chit extends Canvas implements Shape, java.awt.image.ImageObserver
 
     void move(Point point)
     {
-        // Repainting needs to happen at a higher level.
         rect.setLocation(point);
     }
 
     // Required by interface Shape
     public Rectangle getBounds()
     {
-        return (Rectangle) rect;
-    }
-
-    // Required by interface ImageObserver
-    public boolean imageUpdate(Image img, int infoflags, int x,
-        int y, int width, int height)
-    {
-        // If image is done loading, forget about it.
-        if (infoflags >= 32)
-        {
-            return false;
-        }
-        else 
-        {
-            return true;
-        }
-    }
-    
-    public Dimension getMinimumSize()
-    {
-        return new Dimension(rect.width, rect.height);
-    }
-
-    public Dimension getPreferredSize()
-    {
-        return new Dimension(rect.width, rect.height);
+        return rect;
     }
 
 }
@@ -194,7 +159,6 @@ public class BattleMap extends Frame
     private Hex[][] h = new Hex[6][6];
     private Chit[] chits = new Chit[22];
     private int tracking;
-    Rectangle rectClip = new Rectangle();
     final private boolean[][] show =
     {
         {false,false,true,true,true,false},
@@ -204,52 +168,55 @@ public class BattleMap extends Frame
         {false,true,true,true,true,true},
         {false,true,true,true,true,false}
     };
+    private Rectangle rectClip = new Rectangle();
+
+    // Hack: Do we need to clear the background of the current
+    //       clip on the next redraw?
+    private boolean needToClear;
+    private boolean imagesLoading;
 
     public BattleMap()
     {
         super("BattleMap");
-//        setLayout(null);
 
         int cx=80;
         int cy=80;
         int scale=25;
         
         System.out.println("Creating a BattleMap.");
-        tracking = -1;
+
         pack();
         resize(700, 700);
         setBackground(java.awt.Color.white);
 	setVisible(true);
-
-
-        chits[0] = new Chit(100, 100, 60, "Angel.gif");
-        chits[1] = new Chit(120, 120, 60, "Archange.gif");
-        chits[2] = new Chit(140, 140, 60, "Behemoth.gif");
-        chits[3] = new Chit(160, 160, 60, "Centaur.gif");
-        chits[4] = new Chit(180, 180, 60, "Colossus.gif");
-        chits[5] = new Chit(200, 200, 60, "Cyclops.gif");
-        chits[6] = new Chit(220, 220, 60, "Gargoyle.gif");
-        chits[7] = new Chit(240, 240, 60, "Giant.gif");
-        chits[8] = new Chit(260, 260, 60, "Gorgon.gif");
-        chits[9] = new Chit(280, 280, 60, "Griffon.gif");
-        chits[10] = new Chit(300, 300, 60, "Guardian.gif");
-        chits[11] = new Chit(320, 320, 60, "Hydra.gif");
-        chits[12] = new Chit(340, 340, 60, "Lion.gif");
-        chits[13] = new Chit(360, 360, 60, "Minotaur.gif");
-        chits[14] = new Chit(380, 380, 60, "Ogre.gif");
-        chits[15] = new Chit(400, 400, 60, "Ranger.gif");
-        chits[16] = new Chit(420, 420, 60, "Serpent.gif");
-        chits[17] = new Chit(460, 460, 60, "Titan.gif");
-        chits[18] = new Chit(480, 480, 60, "Troll.gif");
-        chits[19] = new Chit(500, 500, 60, "Unicorn.gif");
-        chits[20] = new Chit(520, 520, 60, "Warbear.gif");
-        chits[21] = new Chit(540, 540, 60, "Warlock.gif");
         
-        for (int i = 0; i < chits.length; i++)
-        {
-	    //add(chits[i]);
-        }
-        
+        tracking = -1;
+	needToClear = false;
+	imagesLoading = true;
+
+        chits[0] = new Chit(100, 100, 60, "Angel.gif", this);
+        chits[1] = new Chit(120, 120, 60, "Archange.gif", this);
+        chits[2] = new Chit(140, 140, 60, "Behemoth.gif", this);
+        chits[3] = new Chit(160, 160, 60, "Centaur.gif", this);
+        chits[4] = new Chit(180, 180, 60, "Colossus.gif", this);
+        chits[5] = new Chit(200, 200, 60, "Cyclops.gif", this);
+        chits[6] = new Chit(220, 220, 60, "Gargoyle.gif", this);
+        chits[7] = new Chit(240, 240, 60, "Giant.gif", this);
+        chits[8] = new Chit(260, 260, 60, "Gorgon.gif", this);
+        chits[9] = new Chit(280, 280, 60, "Griffon.gif", this);
+        chits[10] = new Chit(300, 300, 60, "Guardian.gif", this);
+        chits[11] = new Chit(320, 320, 60, "Hydra.gif", this);
+        chits[12] = new Chit(340, 340, 60, "Lion.gif", this);
+        chits[13] = new Chit(360, 360, 60, "Minotaur.gif", this);
+        chits[14] = new Chit(380, 380, 60, "Ogre.gif", this);
+        chits[15] = new Chit(400, 400, 60, "Ranger.gif", this);
+        chits[16] = new Chit(420, 420, 60, "Serpent.gif", this);
+        chits[17] = new Chit(460, 460, 60, "Titan.gif", this);
+        chits[18] = new Chit(480, 480, 60, "Troll.gif", this);
+        chits[19] = new Chit(500, 500, 60, "Unicorn.gif", this);
+        chits[20] = new Chit(520, 520, 60, "Warbear.gif", this);
+        chits[21] = new Chit(540, 540, 60, "Warlock.gif", this);
+
         for (int i = 0; i < 6; i++)
         {
             for (int j = 0; j < 6; j++)
@@ -260,18 +227,15 @@ public class BattleMap extends Frame
                         ((int)java.lang.Math.round(cx + 3 * i * scale),
                         (int)java.lang.Math.round(cy + (2 * j + i % 2) *
                         java.lang.Math.sqrt(3.0) * scale), scale);
-                    //add(h[i][j]);
                 }
             }
         }
 
-        //validate();
         repaint();
     }
 
     public boolean handleEvent(Event event)
     {
-        //System.out.println("BattleMap got event " + event.toString());
         if (event.id == Event.WINDOW_DESTROY)
 	{
 	    System.exit(0);
@@ -284,13 +248,11 @@ public class BattleMap extends Frame
         Point point = new Point(x,y);
         if (tracking != -1)
         {
-            // TODO: Set clip so that the chit's old 
-            // location gets erased, so we don't need
-            // a global repaint.
             Rectangle rectClip = new Rectangle(chits[tracking].getBounds());
             chits[tracking].move(point);
             rectClip.add(chits[tracking].getBounds());
             repaint(rectClip.x, rectClip.y, rectClip.width, rectClip.height);
+	    needToClear = true;
         }
         return false;
     }
@@ -321,9 +283,6 @@ public class BattleMap extends Frame
 		        chits[j] = chits[j - 1];
                     }
                     chits[0] = tmpchit;
-                    //chits[0].repaint();
-		    // TODO: Make this work without a global repaint.
-		    //repaint();
                     Rectangle rectClip = new Rectangle(chits[0].getBounds());
                     repaint(rectClip.x, rectClip.y, rectClip.width, rectClip.height);
                 }
@@ -341,9 +300,6 @@ public class BattleMap extends Frame
                     System.out.println("Calling select for h[" + i + "]["
                         + j +"]");
                     h[i][j].select(point);
-                    // TODO: Make this work without a global repaint.
-                    //repaint();
-                    //h[i][j].repaint();
                     Rectangle rectClip = new Rectangle(h[i][j].getBounds());
                     repaint(rectClip.x, rectClip.y, rectClip.width, rectClip.height);
 		    return false;
@@ -383,12 +339,22 @@ public class BattleMap extends Frame
             }
         }
     }
-/*    
+
     public void update(Graphics g)
     {
+        // Hack: Manually clear the background when chits are dragged.
+        if (needToClear)
+	{
+	    Rectangle rectClip = new Rectangle(g.getClipBounds());
+	    g.setColor(getBackground());
+	    g.fillRect(rectClip.x, rectClip.y, rectClip.width, rectClip.height);
+	    g.setColor(getForeground());
+	    needToClear = false;
+        }
+
+	// TODO: Wait if imagesLoading
         paint(g);
     }
-*/
     
     public Dimension getMinimumSize()
     {
