@@ -224,14 +224,10 @@ class SummonAngel extends JDialog implements MouseListener, ActionListener,
             donor.removeCreature(Creature.angel);
             // Update the number of creatures in the donor stack.
             donor.getCurrentHex().repaint();
-            // Remove visible angel from donor stack.
-            donor.hideCreature(Creature.angel);
 
             legion.addCreature(Creature.angel);
             // Update the number of creatures in the legion.
             legion.getCurrentHex().repaint();
-            // Mark the new angel as visible.
-            legion.revealCreatures(Creature.angel, 1);
 
             cleanup(true);
         }
@@ -241,14 +237,10 @@ class SummonAngel extends JDialog implements MouseListener, ActionListener,
             donor.removeCreature(Creature.archangel);
             // Update the number of creatures in the donor stack.
             donor.getCurrentHex().repaint();
-            // Remove visible angel from donor stack.
-            donor.hideCreature(Creature.archangel);
 
             legion.addCreature(Creature.archangel);
             // Update the number of creatures in the legion.
             legion.getCurrentHex().repaint();
-            // Mark the new archangel as visible.
-            legion.revealCreatures(Creature.archangel, 1);
 
             cleanup(true);
         }
