@@ -1351,6 +1351,7 @@ public class PredictSplitsTest extends TestCase
         assertFalse(ps.getLeaf("Gr04").allCertain());
         assertFalse(ps.getLeaf("Gr06").allCertain());
         assertFalse(ps.getLeaf("Gr08").allCertain());
+        assertEquals(ps.getLeaf("Gr06").getCertainCreatures().size(), 1);
 
         turn = 6;
         Log.debug("Turn " + turn);
