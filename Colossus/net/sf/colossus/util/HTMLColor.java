@@ -158,14 +158,20 @@ public final class HTMLColor
     public static final Color darkYellow = new Color(200, 200, 0);
     public static final Color lightOlive = new Color(150, 150, 0);
 
-    // The Player Colors
-    public static final Color BlackColossus = HTMLColor.black;
-    public static final Color BlueColossus = HTMLColor.blue;
-    public static final Color BrownColossus = new Color(90,33,33);
-    public static final Color GoldColossus = HTMLColor.lightOlive;
-    public static final Color GreenColossus = HTMLColor.darkGreen;
-    public static final Color RedColossus = HTMLColor.red;
+    // More additions, for Creatures (based on Chit)
+    public static final Color ogreRed = new Color(128,0,0);
+    public static final Color hydraOrange = new Color(255,132,21);
+    public static final Color behemothGreen = new Color(2,129,2);
+    public static final Color centaurGold = new Color(129,129,1);
+    public static final Color colossusPink = new Color(207,6,207);
 
+    // The Player Colors (based on Chit)
+    public static final Color BlackColossus = HTMLColor.black;
+    public static final Color BlueColossus = new Color(16,24,123);
+    public static final Color BrownColossus = new Color(90,33,33);
+    public static final Color GoldColossus = new Color(165,148,49);
+    public static final Color GreenColossus = new Color(24,173,66);
+    public static final Color RedColossus = new Color(189,0,24);
 
     public static Color stringToColor(String colorName)
     {
