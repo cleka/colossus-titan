@@ -168,8 +168,6 @@ class Hex
     }
 
 
-
-
     Point getCenter()
     {
         return new Point((xVertex[0] + xVertex[3]) / 2,
@@ -343,11 +341,11 @@ class Hex
                 switch (elevation)
                 {
                     case 0:
-                        return java.awt.Color.yellow;
+                        return new Color(150, 150, 0);
                     case 1:
                         return new Color(200, 200, 0);
                     case 2:
-                        return new Color(150, 150, 0);
+                        return java.awt.Color.yellow;
                 }
             case 'r':  // bramble
                 return java.awt.Color.green;
