@@ -1632,26 +1632,28 @@ Log.debug("Done copying history tree from savegame");
             return;
         }
 
-        legion.addCreature(recruit, true);
-        MasterHex hex = legion.getCurrentHex();
-        int numRecruiters = 0;
+        if(legion.addCreature(recruit, true))
+	{
+          MasterHex hex = legion.getCurrentHex();
+          int numRecruiters = 0;
 
-        if (recruiter != null)
-        {
+          if (recruiter != null)
+          {
             // Mark the recruiter(s) as visible.
             numRecruiters = TerrainRecruitLoader.numberOfRecruiterNeeded(
                         recruiter, recruit, hex.getTerrain(), hex.getLabel());
-        }
+          }
 
-        Log.event("Legion " + legion.getLongMarkerName() + " in " +
+          Log.event("Legion " + legion.getLongMarkerName() + " in " +
             hex.getDescription() + " recruits " + recruit.getName() +
             " with " + (numRecruiters == 0 ? "nothing" :
                 numRecruiters + " " + (numRecruiters > 1 ?
                     recruiter.getPluralName() : recruiter.getName())));
 
-        // Recruits are one to a customer.
-        legion.setRecruitName(recruit.getName());
-        reinforcing = false;
+          // Recruits are one to a customer.
+          legion.setRecruitName(recruit.getName());
+          reinforcing = false;
+	}
     }
 
     /** Return a list of names of angel types that can be acquired. */

@@ -657,12 +657,12 @@ public final class Legion implements Comparable
     /** Add a creature to this legion.  If takeFromStack is true,
         then do this only if such a creature remains in the stacks,
         and decrement the number of this creature type remaining. */
-    void addCreature(Creature creature, boolean takeFromStack)
+    boolean addCreature(Creature creature, boolean takeFromStack)
     {
         if (getHeight() > 7 || (getHeight() == 7 && game.getTurnNumber() > 1))
         {
             Log.error("Tried to add to 7-high legion!");
-            return;
+            return false;
         }
         if (takeFromStack)
         {
@@ -673,11 +673,15 @@ public final class Legion implements Comparable
             }
             else
             {
-                return;
+		// TODO: looking at stresstest logs shows this event
+                // occuring for some unreported situations, track-em down
+                Log.error("Tried to addCreature when they were all gone!");
+                return false;
             }
         }
 
         critters.add(new Critter(creature, markerId, game));
+	return true;
     }
 
     /** Remove the creature in position i in the legion.  Return the
