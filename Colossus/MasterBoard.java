@@ -980,7 +980,7 @@ System.out.println("MasterBoard.finishSummoningAngel");
                         int gateType = h[i][j].getExitType(k);
                         if (gateType != 0)
                         {
-                            switch(k)
+                            switch (k)
                             {
                                 case 0:
                                     h[i][j - 1].setEntranceType(3, gateType);
@@ -1094,8 +1094,7 @@ System.out.println("MasterBoard.finishSummoningAngel");
                         InputEvent.BUTTON2_MASK) || ((e.getModifiers() & 
                         InputEvent.BUTTON3_MASK) == InputEvent.BUTTON3_MASK))
                     {
-                        ShowLegion showlegion = new ShowLegion(this, legion, 
-                            point);
+                        new ShowLegion(this, legion, point);
                         return;
                     }
                     else
@@ -1103,7 +1102,7 @@ System.out.println("MasterBoard.finishSummoningAngel");
                         // Only the current player can manipulate his legions.
                         if (i == game.getActivePlayerNum())
                         {
-                            switch(game.getPhase())
+                            switch (game.getPhase())
                             {
                                 case Game.SPLIT:
                                     // Need a legion marker to split.
@@ -1171,6 +1170,7 @@ System.out.println("MasterBoard.finishSummoningAngel");
 
         // No hits on chits, so check map.
 
+
         Player player = game.getActivePlayer();
         for (int i = 0; i < h.length; i++)
         {
@@ -1179,7 +1179,19 @@ System.out.println("MasterBoard.finishSummoningAngel");
                 if (show[i][j] && h[i][j].contains(point))
                 {
                     MasterHex hex = h[i][j];
-                    switch(game.getPhase())
+                    
+                    // Right-click or alt-click means to show the contents
+                    // of the hex.
+                    if (((e.getModifiers() & InputEvent.BUTTON2_MASK) ==
+                        InputEvent.BUTTON2_MASK) || ((e.getModifiers() & 
+                        InputEvent.BUTTON3_MASK) == InputEvent.BUTTON3_MASK))
+                    {
+                        new ShowMasterHex(this, hex, point);
+                        return;
+                    }
+
+                    // Otherwise, the action to take depends on the phase.
+                    switch (game.getPhase())
                     {
                         // If we're moving, and have selected a legion which 
                         // has not yet moved, and this hex is a legal 
@@ -1294,7 +1306,7 @@ System.out.println("summonAngel is null");
         }
 
         // No hits on chits or map, so re-highlight.
-        switch(game.getPhase())
+        switch (game.getPhase())
         {
             case Game.MOVE:
                 highlightUnmovedLegions();
