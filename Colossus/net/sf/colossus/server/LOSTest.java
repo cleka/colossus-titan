@@ -40,7 +40,6 @@ public class LOSTest extends TestCase
     {
         game = new Game();
         VariantSupport.loadVariant("Default");
-        game.initAndLoadData();  // Will load creatures
 
         game.addPlayer("Black", "SimpleAI");
         game.addPlayer("Green", "SimpleAI");

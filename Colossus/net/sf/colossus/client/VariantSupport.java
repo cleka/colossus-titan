@@ -2,9 +2,11 @@ package net.sf.colossus.client;
 
 import net.sf.colossus.util.ResourceLoader;
 import net.sf.colossus.server.Constants;
+import net.sf.colossus.server.Creature;
 import net.sf.colossus.util.Log;
 import net.sf.colossus.util.Split;
 import net.sf.colossus.parser.VariantLoader;
+import net.sf.colossus.parser.TerrainRecruitLoader;
 import java.io.*;
 import javax.swing.text.*;
 
@@ -23,6 +25,7 @@ public final class VariantSupport
     private static String creaturesName = "";
     private static Document varREADME = null;
     private static java.util.List dependUpon = null;
+    private static boolean loadedVariant = false;
 
 
     /**
@@ -55,13 +58,16 @@ public final class VariantSupport
     public static Document loadVariant(String tempVarName, 
         String tempVarDirectory)
     {
-        if (variantName.equals(tempVarName) &&
+        if (loadedVariant && variantName.equals(tempVarName) &&
             varDirectory.equals(tempVarDirectory))
         {
             Log.debug("*not* loading already loaded variant " + tempVarName +
                       ", data files in " + tempVarDirectory);
             return varREADME;
         }
+
+        loadedVariant = false;
+
         Log.debug("Loading variant " + tempVarName +
                   ", data files in " + tempVarDirectory);
         try
@@ -137,6 +143,14 @@ public final class VariantSupport
             creaturesName = Constants.defaultCREFile;
             varREADME = null;
         }
+
+        if (varREADME != null)
+        {
+            loadedVariant = true;
+            Creature.loadCreatures();
+            loadTerrainsAndRecruits();
+        }
+
         return varREADME;
     }
 
@@ -207,5 +221,30 @@ public final class VariantSupport
     public static java.util.List getBattlelandsDirectoriesList()
     {
         return getVarDirectoriesList(Constants.battlelandsDirName);
+    }
+
+    /** TerrainRecruitLoader is needed by many classes, so load it
+     *  immediately after loading the variant. */ 
+    public static void loadTerrainsAndRecruits()
+    {
+        try
+        {
+            java.util.List directories = 
+                VariantSupport.getVarDirectoriesList();
+            InputStream terIS = ResourceLoader.getInputStream(
+                VariantSupport.getRecruitName(), directories);
+            if (terIS == null) 
+            {
+                throw new FileNotFoundException(
+                    VariantSupport.getRecruitName());
+            }
+            TerrainRecruitLoader trl = new TerrainRecruitLoader(terIS);
+            while (trl.oneTerrain() >= 0) {}
+        }
+        catch (Exception e) 
+        {
+            Log.error("Recruit-per-terrain loading failed : " + e);
+            System.exit(1);
+        }
     }
 }

@@ -50,8 +50,6 @@ public final class Game
     // Negotiation
     private Set [] proposals = new HashSet[2];
 
-    // XXX Can we completely eliminate this reference and go all static?
-    private TerrainRecruitLoader trl;
     private LinkedList colorPickOrder = new LinkedList();
     private Set colorsLeft;
     private PhaseAdvancer phaseAdvancer = new GamePhaseAdvancer();
@@ -68,30 +66,6 @@ public final class Game
     Game(CommandLine cl)
     {
         this.cl = cl;
-    }
-
-    void initAndLoadData()
-    {
-        Creature.loadCreatures(); /* try to load creatures */
-        try /* try to load the Recruits database */
-        {
-            java.util.List directories = 
-                VariantSupport.getVarDirectoriesList();
-            InputStream terIS = ResourceLoader.getInputStream(
-                VariantSupport.getRecruitName(), directories);
-            if (terIS == null) 
-            {
-                throw new FileNotFoundException(
-                    VariantSupport.getRecruitName());
-            }
-            trl = new TerrainRecruitLoader(terIS);
-            while (trl.oneTerrain() >= 0) {}
-        }
-        catch (Exception e) 
-        {
-            Log.error("Recruit-per-terrain loading failed : " + e);
-            System.exit(1);
-        }
     }
 
 
@@ -304,7 +278,6 @@ public final class Game
 
         addPlayersFromOptions();
 
-        initAndLoadData();
         initServerAndClients();
 
         // We need to set the autoPlay option before loading the board,
@@ -321,6 +294,7 @@ public final class Game
         activePlayerNum = 0;
         assignColors();
     }
+
 
     private void syncAutoPlay()
     {
@@ -1180,13 +1154,10 @@ public final class Game
                 dispose();
             }
 
-
             // Reset flags that are not in the savegame file.
             clearFlags();
             
             VariantSupport.loadVariant(in.readLine(), in.readLine());
-
-            initAndLoadData(); // _before_ Creatures get read
 
             buf = in.readLine();
             int numPlayers = Integer.parseInt(buf);
@@ -1207,7 +1178,7 @@ public final class Game
                 Creature creature = (Creature)it.next();
                 buf = in.readLine();
                 int count = Integer.parseInt(buf);
-                caretaker.setCount(creature,count);
+                caretaker.setCount(creature, count);
             }
 
             players.clear();
@@ -1635,7 +1606,8 @@ public final class Game
         while (it.hasNext())
         {
             String name = (String)it.next();
-            if (caretaker.getCount(Creature.getCreatureByName(name)) >= 1)
+            if (caretaker.getCount(Creature.getCreatureByName(name)) >= 1 &&
+                !recruits.contains(name))
             {
                 recruits.add(name);
             }
@@ -1670,18 +1642,6 @@ public final class Game
 
         // Lookup coords for chit starting from player[i].getTower()
         String hexLabel = player.getTower();
-
-        caretaker.takeOne(Creature.getCreatureByName("Titan"));
-        caretaker.takeOne(Creature.getCreatureByName(
-            TerrainRecruitLoader.getPrimaryAcquirable()));
-        Creature[] startCre = TerrainRecruitLoader.getStartingCreatures(
-            MasterBoard.getHexByLabel(hexLabel).getTerrain());
-        caretaker.takeOne(startCre[2]);
-        caretaker.takeOne(startCre[2]);
-        caretaker.takeOne(startCre[0]);
-        caretaker.takeOne(startCre[0]);
-        caretaker.takeOne(startCre[1]);
-        caretaker.takeOne(startCre[1]);
 
         Legion legion = Legion.getStartingLegion(markerId, hexLabel, 
             player.getName(), this);

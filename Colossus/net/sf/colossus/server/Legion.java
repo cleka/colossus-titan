@@ -221,6 +221,13 @@ final class Legion implements Comparable
                        startCre[1],
                        startCre[1],
                        playerName, game);
+
+        Iterator it = legion.getCritters().iterator();
+        while (it.hasNext())
+        {
+            Critter critter = (Critter)it.next();
+            game.getCaretaker().takeOne(critter);
+        }
         return legion;
     }
 

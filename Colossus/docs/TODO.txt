@@ -10,8 +10,6 @@ Add raw socket interface.
 Make TerrainRecruitLoader initialization fully static.
 Should not need to load MasterBoard map data twice.
 
-Bug: AcquireAngel showed 3 angels.  (Both times, on a double-acquire.)
-
 Set Client movementRoll when loading during movement phase after roll.
 
 Add JUnit section to build docs.

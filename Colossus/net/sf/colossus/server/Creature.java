@@ -7,6 +7,7 @@ import java.io.*;
 import net.sf.colossus.util.ResourceLoader;
 import net.sf.colossus.util.Log;
 import net.sf.colossus.parser.CreatureLoader;
+import net.sf.colossus.parser.TerrainRecruitLoader;
 import net.sf.colossus.client.VariantSupport;
 
 /**
@@ -117,7 +118,8 @@ public class Creature implements Comparable
     }
 
 
-    static void loadCreatures()
+    /** Call immediately after loading variant, before using creatures. */
+    public static void loadCreatures()
     {
         try 
         {
@@ -150,6 +152,7 @@ public class Creature implements Comparable
             }
         }
     }
+
 
     public static java.util.List getCreatures()
     {

@@ -41,7 +41,6 @@ public class CarryTest extends TestCase
     {
         game = new Game();
         VariantSupport.loadVariant("Default");
-        game.initAndLoadData();  // Will load creatures
 
         game.addPlayer("Red", "SimpleAI");
         game.addPlayer("Blue", "SimpleAI");
