@@ -32,6 +32,7 @@ public final class Dice
 
 
     private static int[] basicSequence = {4,3,1,6,5,2};
+    //private static int[] basicSequence = {1,2,3,4,5,6};
     private static int seqNum = -1;
     
     /* this one return from a fixed sequence, instead of a random value */

@@ -113,7 +113,7 @@ public class DiceTest extends TestCase
         int n = trials;
         double meanM = (2.0 * r * (n - r) / n) + 1.;
         double varianceM = ((2.0 * r) * (n - r) / n / n * 
-                ((2 * r) * (n - r) - n)) / (n - 1.);
+                ((2. * r) * (n - r) - n)) / (n - 1.);
         System.out.println("r=" + r + " M=" + M + " mean=" + meanM + " var=" +
             varianceM);
         failIfAbnormal(M, meanM, varianceM, random); 
@@ -156,8 +156,8 @@ public class DiceTest extends TestCase
                 S += val;
             }
         }
-        double meanS = 0;
-        double varianceS = n / 18 * (n - 1) * (2 * n + 5);
+        double meanS = 0.;
+        double varianceS = (n / 18.) * (n - 1.) * (2. * n + 5.);
         System.out.println("S=" + S + " mean=" + meanS + " var=" + varianceS);
         failIfAbnormal(S, meanS, varianceS, random); 
     }
@@ -288,12 +288,13 @@ public class DiceTest extends TestCase
         double sd = Math.sqrt(variance);
         double z = (val - mean) / sd;
         System.out.print("sd=" + sd + " z=" + z);
-        if (random && Math.abs(z) > 3)
+        // fail if variance negative, as sd & z are NaN
+        if (random && ((Math.abs(z) > 3) || (variance < 0.)))
         {
             System.out.println(" (FAIL)");
             fail();
         }
-        else if (!random && Math.abs(z) > 3)
+        else if (!random && ((Math.abs(z) > 3) || (variance < 0.)))
         {
             System.out.println(" (EXPECTED FAIL)");
         }
