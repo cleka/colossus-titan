@@ -269,7 +269,13 @@ class Legion
         {
             return;
         }
-        
+
+        // If the creature is a lord or demi-lord, put it back in the stacks.
+        if (creatures[i].isImmortal())
+        {
+            creatures[i].putOneBack();
+        }
+
         for (int j = i; j < height - 1; j++)
         {
             creatures[j] = creatures[j + 1];
