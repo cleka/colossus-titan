@@ -62,18 +62,18 @@ final class ChooseScreen extends KDialog implements ActionListener
 
         GraphicsDevice[] all = GraphicsEnvironment
             .getLocalGraphicsEnvironment().getScreenDevices();
-        GraphicsDevice choosen = null;
+        GraphicsDevice chosen = null;
 
         for (int i = 0; i < all.length; i++)
         {
             if (fullName.equals("Screen: " + all[i].getClass().getName() +
                     " " + all[i].getIDstring()))
             {
-                choosen = all[i];
+                chosen = all[i];
             }
         }
         setVisible(false);
-        client.setChoosenDevice(choosen);
+        client.setChosenDevice(chosen);
         dispose();
     }
 }

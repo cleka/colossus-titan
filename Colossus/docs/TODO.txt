@@ -205,3 +205,8 @@ PickRecruiter should allow clicking on the top row (if applicable),
    not just the bottom.
 
 Try some Law of Demeter refactorings.
+
+EngagementResults:
+Legion won the battle in -1 turns
+Legion earned 0 points
+Losing legion's creatures need to be shown without ?

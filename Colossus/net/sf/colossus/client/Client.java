@@ -38,7 +38,7 @@ import net.sf.colossus.util.Split;
  */
 
 
-public final class Client implements IClient
+public final class Client implements IClient, IOracle, IOptions
 {
 
     /** This will eventually be a network interface rather than a
@@ -296,7 +296,7 @@ public final class Client implements IClient
         {
             if (engagementResults == null)
             {
-                engagementResults = new EngagementResults(frame, this);
+                engagementResults = new EngagementResults(frame, this, this);
             }
             engagementResults.addData(winnerId, method, points,
                 _tellEngagementResults_attackerStartingContents,
@@ -435,7 +435,8 @@ public final class Client implements IClient
         return movementDie;
     }
 
-    boolean getOption(String optname)
+    // public for IOptions
+    public boolean getOption(String optname)
     {
         // If autoplay is set, then return true for all other auto* options.
         if (optname.startsWith("Auto") && !optname.equals(Options.autoPlay))
@@ -448,7 +449,8 @@ public final class Client implements IClient
         return options.getOption(optname);
     }
 
-    String getStringOption(String optname)
+    // Public for IOptions
+    public String getStringOption(String optname)
     {
         return options.getStringOption(optname);
     }
@@ -595,10 +597,7 @@ public final class Client implements IClient
     {
         options.loadOptions();
         syncOptions();
-        // if (!getOption(Options.autoPlay))
-        {
-            runAllOptionTriggers();
-        }
+        runAllOptionTriggers();
     }
 
     /** Synchronize menu checkboxes and cfg file after an option change. */
@@ -624,7 +623,8 @@ public final class Client implements IClient
         }
     }
 
-    int getNumPlayers()
+    // public for IOracle
+    public int getNumPlayers()
     {
         return numPlayers;
     }
@@ -679,7 +679,8 @@ public final class Client implements IClient
                 if (board != null)
                 {
                     statusScreen = new StatusScreen((secondaryParent == null ?
-                            board.getFrame() : secondaryParent), this);
+                            board.getFrame() : secondaryParent), this, this, 
+                            this);
                 }
             }
         }
@@ -1050,22 +1051,24 @@ public final class Client implements IClient
 
     /** Return a list of Strings.  Use the proper string for titans and
      *  unknown creatures. */
-    List getLegionImageNames(String markerId)
+    // public for IOracle
+    public List getLegionImageNames(String markerId)
     {
         return getLegionInfo(markerId).getImageNames();
     }
 
     /** Return a list of Booleans */
-    List getLegionCreatureCertainties(String markerId)
+    // public for IOracle
+    public List getLegionCreatureCertainties(String markerId)
     {
         try
         {
             return getLegionInfo(markerId).getCertainties();
         }
-        catch(NullPointerException exc)
+        catch (NullPointerException exc)
         {  // TODO: is this the right thing?
             List l = new ArrayList(42/4);  // just longer then max
-            for(int idx=0; idx<(42/4); idx++)
+            for(int idx = 0; idx < (42/4); idx++)
             {
                 l.add(new Boolean(true));  // all true
             }
@@ -2502,7 +2505,8 @@ public final class Client implements IClient
         return Player.getShortColor(getColor());
     }
 
-    String getBattleActivePlayerName()
+    // public for IOracle
+    public String getBattleActivePlayerName()
     {
         return battleActivePlayerName;
     }
@@ -2538,12 +2542,14 @@ public final class Client implements IClient
         }
     }
 
-    String getDefenderMarkerId()
+    // public for IOracle
+    public String getDefenderMarkerId()
     {
         return defenderMarkerId;
     }
 
-    String getAttackerMarkerId()
+    // public for IOracle
+    public String getAttackerMarkerId()
     {
         return attackerMarkerId;
     }
@@ -2553,7 +2559,8 @@ public final class Client implements IClient
         return battlePhase;
     }
 
-    String getBattlePhaseName()
+    // public for IOracle
+    public String getBattlePhaseName()
     {
         if (phase == Constants.FIGHT && battlePhase >= Constants.SUMMON &&
                 battlePhase <= Constants.STRIKEBACK)
@@ -2563,14 +2570,10 @@ public final class Client implements IClient
         return "";
     }
 
-    int getBattleTurnNumber()
+    // public for IOracle
+    public int getBattleTurnNumber()
     {
         return battleTurnNumber;
-    }
-
-    String getBattleTurnNumberString()
-    {
-        return battleTurnNumber<1 ? "" : ""+battleTurnNumber;
     }
 
     void doBattleMove(int tag, String hexLabel)
@@ -2677,7 +2680,8 @@ public final class Client implements IClient
         }
     }
 
-    String getBattleSite()
+    // public for IOracle
+    public String getBattleSite()
     {
         return battleSite;
     }
@@ -2800,7 +2804,8 @@ public final class Client implements IClient
         return (playerName.equals(getPlayerNameByTag(tag)));
     }
 
-    String getActivePlayerName()
+    // public for IOracle
+    public String getActivePlayerName()
     {
         return activePlayerName;
     }
@@ -2810,26 +2815,16 @@ public final class Client implements IClient
         return phase;
     }
 
-    String getPhaseName()
+    // public for IOracle
+    public String getPhaseName()
     {
         return Constants.getPhaseName(getPhase());
     }
 
-    int getTurnNumber()
+    // public for IOracle
+    public int getTurnNumber()
     {
         return turnNumber;
-    }
-
-    String getTurnNumberString()
-    {
-        if (turnNumber < 1)
-        {
-            return "";
-        }
-        else
-        {
-            return "" + turnNumber;
-        }
     }
 
     private String figureTeleportingLord(String moverId, String hexLabel)
@@ -4014,11 +4009,11 @@ public final class Client implements IClient
         }
     }
 
-    void setChoosenDevice(GraphicsDevice choosen)
+    void setChosenDevice(GraphicsDevice chosen)
     {
-        if (choosen != null)
+        if (chosen != null)
         {
-            secondaryParent = new JFrame(choosen.getDefaultConfiguration());
+            secondaryParent = new JFrame(chosen.getDefaultConfiguration());
             disposeStatusScreen();
             updateStatusScreen();
             if (caretakerDisplay != null)

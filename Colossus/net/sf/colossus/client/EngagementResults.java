@@ -33,30 +33,30 @@ import net.sf.colossus.util.Options;
  * after that it pops open the dialog, presenting the just added entry.
  * In the dialog one can go forward and back, and drop boring results.
  *
- * TODO: hide and show this dialog from master board.
- *
  * @version $Id$
- * @author David Ripton
  * @author Towi
+ * @author David Ripton
  */
 
 final class EngagementResults
     extends KDialog
     implements ActionListener, WindowListener
 {
-    private Client client;
+    private IOracle oracle;
+    private IOptions options;
 
     /** 
      * inits the diaolog, not opens it.
      * @param frame is the parent window
-     * @param client is the colossus.client to talk to
+     * @param oracle gives us information
      */
-    EngagementResults(final JFrame frame, final Client aClient)
+    EngagementResults(final JFrame frame, final IOracle oracle, 
+            IOptions options)
     {
         super(frame, "Engagement Status", false);
         setFocusable(false);
-        this.client = aClient;
-        // pack(); // TODO: needed here? dunno.
+        this.oracle = oracle;
+        this.options = options;
         setBackground(Color.lightGray);
         addWindowListener(this);
     }
@@ -70,9 +70,9 @@ final class EngagementResults
      *   of better quality.
      *
      * @param attackerStartingContents - imagew names,
-     *   result from client.getLegionImageNames
+     *   result from oracle.getLegionImageNames
      * @param defenderStartingContents - imagew names,
-     *   result from client.getLegionImageNames
+     *   result from oracle.getLegionImageNames
      * @param attackerStartingCertainities - list of Booleans,
      *   for overlay ?-marks
      * @param defenderStartingCertainities - list of Booleans,
@@ -90,11 +90,11 @@ final class EngagementResults
     {
         EngagementLogEntry elog = new EngagementLogEntry();
 
-        elog.hexLabel = client.getBattleSite();
-        elog.attackerId = client.getAttackerMarkerId();
-        elog.defenderId = client.getDefenderMarkerId();
-        elog.battleTurn = client.getBattleTurnNumber();
-        elog.gameTurn = client.getTurnNumber();
+        elog.hexLabel = oracle.getBattleSite();
+        elog.attackerId = oracle.getAttackerMarkerId();
+        elog.defenderId = oracle.getDefenderMarkerId();
+        elog.battleTurn = oracle.getBattleTurnNumber();
+        elog.gameTurn = oracle.getTurnNumber();
 
         elog.attackerStartingContents = attackerStartingContents;
         elog.defenderStartingContents = defenderStartingContents;
@@ -102,13 +102,13 @@ final class EngagementResults
         elog.defenderStartingCertainities = defenderStartingCertainities;
 
         elog.attackerEndingContents =
-            client.getLegionImageNames(elog.attackerId);
+            oracle.getLegionImageNames(elog.attackerId);
         elog.defenderEndingContents =
-            client.getLegionImageNames(elog.defenderId);
+            oracle.getLegionImageNames(elog.defenderId);
         elog.attackerEndingCertainities =
-            client.getLegionCreatureCertainties(elog.attackerId);
+            oracle.getLegionCreatureCertainties(elog.attackerId);
         elog.defenderEndingCertainities =
-            client.getLegionCreatureCertainties(elog.defenderId);
+            oracle.getLegionCreatureCertainties(elog.defenderId);
 
         elog.setWinnerId(winnerId);
         elog.setMethod(method);
@@ -424,7 +424,7 @@ final class EngagementResults
 
     void maybeShow()
     {
-        if (client.getOption(Options.showStatusScreen) &&
+        if (options.getOption(Options.showEngagementResults) &&
                 engagementLog.size() != 0)
         {
             pack();
@@ -483,6 +483,6 @@ final class EngagementResults
     /** just close it */
     public void windowClosing(WindowEvent e)
     {
-        client.setOption(Options.showEngagementResults, false);
+        options.setOption(Options.showEngagementResults, false);
     }
 }

@@ -15,21 +15,21 @@ import net.sf.colossus.util.Options;
  */
 public final class SaveWindow
 {
-    private Client client;
+    private IOptions options;
     private String name;
     private final Dimension screen =
             Toolkit.getDefaultToolkit().getScreenSize();
 
-    public SaveWindow(Client client, String name)
+    public SaveWindow(IOptions options, String name)
     {
-        this.client = client;
+        this.options = options;
         this.name = name;
     }
 
     public Dimension loadSize()
     {
-        int x = client.getIntOption(name + Options.sizeX);
-        int y = client.getIntOption(name + Options.sizeY);
+        int x = options.getIntOption(name + Options.sizeX);
+        int y = options.getIntOption(name + Options.sizeY);
         Dimension size = null;
         if (x > 0 && y > 0)
         {
@@ -40,14 +40,14 @@ public final class SaveWindow
 
     public void saveSize(final Dimension size)
     {
-        client.setOption(name + Options.sizeX, (int)size.getWidth());
-        client.setOption(name + Options.sizeY, (int)size.getHeight());
+        options.setOption(name + Options.sizeX, (int)size.getWidth());
+        options.setOption(name + Options.sizeY, (int)size.getHeight());
     }
 
     public Point loadLocation()
     {
-        int x = client.getIntOption(name + Options.locX);
-        int y = client.getIntOption(name + Options.locY);
+        int x = options.getIntOption(name + Options.locX);
+        int y = options.getIntOption(name + Options.locY);
         Point location = null;
         if (x >= 0 && y >= 0 && x < screen.width && y < screen.height)
         {
@@ -58,8 +58,8 @@ public final class SaveWindow
 
     public void saveLocation(final Point location)
     {
-        client.setOption(name + Options.locX, location.x);
-        client.setOption(name + Options.locY, location.y);
+        options.setOption(name + Options.locX, location.x);
+        options.setOption(name + Options.locY, location.y);
     }
 }
 

@@ -47,23 +47,27 @@ final class StatusScreen extends KDialog implements WindowListener
     private JLabel battleTurnLabel;
     private JLabel battlePhaseLabel;
 
+    private IOracle oracle;
+    private IOptions options;
     private Client client;
 
     private Point location;
     private Dimension size;
     private SaveWindow saveWindow;
 
-    StatusScreen(JFrame frame, Client client)
+    StatusScreen(JFrame frame, IOracle oracle, IOptions options, Client client)
     {
         super(frame, "Game Status", false);
 
         setVisible(false);
         setFocusable(false);
 
+        this.oracle = oracle;
+        this.options = options;
         this.client = client;
 
         // Needs to be set up before calling this.
-        numPlayers = client.getNumPlayers();
+        numPlayers = oracle.getNumPlayers();
 
         addWindowListener(this);
 
@@ -188,7 +192,7 @@ final class StatusScreen extends KDialog implements WindowListener
 
         pack();
 
-        saveWindow = new SaveWindow(client, "StatusScreen");
+        saveWindow = new SaveWindow(options, "StatusScreen");
 
         if (size == null)
         {
@@ -234,12 +238,24 @@ final class StatusScreen extends KDialog implements WindowListener
 
     void updateStatusScreen()
     {
-        activePlayerLabel.setText(client.getActivePlayerName());
-        turnLabel.setText("" + client.getTurnNumberString());
-        phaseLabel.setText(client.getPhaseName());
-        battleActivePlayerLabel.setText(client.getBattleActivePlayerName());
-        battleTurnLabel.setText("" + client.getBattleTurnNumberString());
-        battlePhaseLabel.setText(client.getBattlePhaseName());
+        activePlayerLabel.setText(oracle.getActivePlayerName());
+        int turnNumber = oracle.getTurnNumber();
+        String turn = "";
+        if (turnNumber >= 1)
+        {
+            turn = "" + turnNumber;
+        }
+        turnLabel.setText(turn);
+        phaseLabel.setText(oracle.getPhaseName());
+        battleActivePlayerLabel.setText(oracle.getBattleActivePlayerName());
+        int battleTurnNumber = oracle.getBattleTurnNumber();
+        String battleTurn = "";
+        if (battleTurnNumber >= 1)
+        {
+            battleTurn = "" + battleTurnNumber;
+        }
+        battleTurnLabel.setText(battleTurn);
+        battlePhaseLabel.setText(oracle.getBattlePhaseName());
 
         for (int i = 0; i < numPlayers; i++)
         {
@@ -249,7 +265,7 @@ final class StatusScreen extends KDialog implements WindowListener
             {
                 color = Color.red;
             }
-            else if (client.getActivePlayerName().equals(info.getName()))
+            else if (oracle.getActivePlayerName().equals(info.getName()))
             {
                 color = Color.yellow;
             }
@@ -292,7 +308,7 @@ final class StatusScreen extends KDialog implements WindowListener
 
     public void windowClosing(WindowEvent e)
     {
-        client.setOption(Options.showStatusScreen, false);
+        options.setOption(Options.showStatusScreen, false);
     }
 
     public Dimension getMinimumSize()
