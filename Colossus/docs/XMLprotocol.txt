@@ -331,9 +331,9 @@ Messages (server to one or more clients)
 <points player="[player]" points="[number]" />
     [player] receives [number] full points for a battle.
 
-<eliminatePlayer loser="[player]" slayer="[player]" halfPoints="[number]" />
+# TODO Half points  Not all go to slayer, if some legions engaged.
+<eliminatePlayer loser="[player]" slayer="[player]" />
     loser has been eliminated from the game by slayer (may be null).
-    If slayer is not null then he receives number points from half points.
 
 <gameOver winner="[player]" />
     The game is over.  If no winner is given, the game is a draw.
