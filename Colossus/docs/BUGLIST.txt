@@ -42,9 +42,10 @@ Solaris, jdk1.2.2, jdk1.3: Popup menu text is invisible
    foreground colors.
 
 Win98, jdk1.3; Solaris, jdk1.3: OutOfMemoryException starting a battle, 
-   usually around turn 15 of a 4-player game.  Image memory leak again?  
-   Or somewhere else?  System.gc() calls don't help.  Happens even with 
-   -Xint option passed to java.
+   usually around turn 15 of a 4-player game or turn 11 of a 6-player
+   game.  Where's the memory leak?
+   Things that don't help: System.gc() calls after every battle, -Xint,
+   -client, -server, -Xincgc options to Java.
 
 
 Current programming bugs:
@@ -75,11 +76,6 @@ Linux, ibmjdk118: Angel summoned into battle can move on top of
    are highlighted.
 
 Linux, ibmjdk118; Win98, jdk1.3rc1: Tried to strike own creature!
-
-Linux, ibmjdk118: Numbers (sometimes overlapping) appear in the 
-   upper left corner of the MasterBoard window after loading a game.  
-   Stray legion heights?  They disappear in a repaint after a few 
-   turns.
 
 Linux, ibmjdk118; Solaris, jdk1.3: Battle did not end once when a 
    player (always the attacker?) died.  BattleTurn was not dismissed, 
