@@ -16,8 +16,7 @@ import net.sf.colossus.util.Log;
 public final class Dice
 {
     private static Random random = new Random();
-    /** If you're *really* paranoid, change to urandom. */
-    private static String randomFilename = "/dev/random";
+    private static String randomFilename = "/dev/urandom";
     private static File randomSource = new File(randomFilename);
     private static FileInputStream randStream = null;
     
