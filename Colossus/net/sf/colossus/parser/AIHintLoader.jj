@@ -441,6 +441,7 @@ public class AIHintLoader
     public synchronized String getRecruitHint(
         char terrain,
         LegionInfo legion,
+        List recruits,
         HintOracleInterface oracle)
     {
         Character index = new Character(terrain);
@@ -462,6 +463,7 @@ public class AIHintLoader
             {
                 th.setOracle(oracle);
                     
+                // first, try with all the creatures in the Legion
                 Iterator legionIt = legion.getContents().iterator();
                 while (legionIt.hasNext() && (hint == null))
                 { // this will try creatures as many times as they exist. yuck !
@@ -472,6 +474,19 @@ public class AIHintLoader
                         hint = th.getRecruitee();
                     }
                 }
+                // second, try with all recruitable creature (so that
+                // hint with (number == ) are tried)
+                Iterator recruitsIt = recruits.iterator();
+                while (recruitsIt.hasNext() && (hint == null))
+                { // this will try creatures as many times as they exist. yuck !
+                    String creature = ((Creature)recruitsIt.next()).getName();
+                    
+                    if (th.match(terrain, creature, legion.numCreature(creature)))
+                    {
+                        hint = th.getRecruitee();
+                    }
+                }
+
                 // remove the Oracle, just in case
                 th.setOracle(null);
             }

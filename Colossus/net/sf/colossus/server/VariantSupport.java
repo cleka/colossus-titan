@@ -350,11 +350,12 @@ public final class VariantSupport
     public synchronized static String getRecruitHint(
         char terrain,
         net.sf.colossus.client.LegionInfo legion,
+        java.util.List recruits,
         net.sf.colossus.server.HintOracleInterface oracle)
     {
         if (aihl != null)
         {
-            return aihl.getRecruitHint(terrain,legion,oracle);
+            return aihl.getRecruitHint(terrain,legion,recruits,oracle);
         }
         return null;
     }

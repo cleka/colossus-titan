@@ -1867,12 +1867,13 @@ public class SimpleAI implements AI
     }
 
     Creature getVariantRecruitHint(LegionInfo legion,
-                                           MasterHex hex,
-                                           List recruits)
+                                   MasterHex hex,
+                                   List recruits)
     {
         String recruitName =
             VariantSupport.getRecruitHint(hex.getTerrain(),
                                           legion,
+                                          recruits,
                                           new SimpleAIOracle(legion,hex,recruits));
         if (recruitName == null)
         {
