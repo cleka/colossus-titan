@@ -241,6 +241,7 @@ Credits:
 
 Programming:  David Ripton  dripton@wizard.net
               Bruce Sherrod (AI)  bruce@thematrix.com
+	      Tom Fruchterman
               David Barr (applet conversion)
 
 Counter art:  Jerry Reiger, David Lum, Tchula Ripton
