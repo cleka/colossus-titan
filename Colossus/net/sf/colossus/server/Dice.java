@@ -12,6 +12,11 @@ import net.sf.colossus.util.DevRandom;
 public final class Dice
 {
     private static Random random = new DevRandom();
+
+    static void init(String source)
+    {
+        random = new DevRandom(source);
+    }
     
     /** Put all die rolling in one place, in case we decide to change random
      *  number algorithms, use an external dice server, etc. */

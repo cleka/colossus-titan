@@ -151,6 +151,7 @@
         description = "Run all unit tests using JUnit">
         <junit printsummary="yes" fork="no" haltonfailure="no">
                 <formatter type="plain"/>
+                <test name="net.sf.colossus.server.DiceTest"/>
                 <test name="net.sf.colossus.util.CombosTest"/>
                 <test name="net.sf.colossus.client.PredictSplitsTest"/>
                 <test name="net.sf.colossus.server.BalancedTowersTest"/>
