@@ -539,8 +539,12 @@ public final class MasterBoard extends JPanel implements MouseListener,
         addCheckBox(playerMenu, Game.autoPickMarker, KeyEvent.VK_M);
         addCheckBox(playerMenu, Game.autoPickEntrySide, KeyEvent.VK_E);
         addCheckBox(playerMenu, Game.autoForcedStrike, KeyEvent.VK_F);
-        addCheckBox(playerMenu, Game.autoMove, KeyEvent.VK_A);
+        addCheckBox(playerMenu, Game.autoMasterMove, KeyEvent.VK_A);
         addCheckBox(playerMenu, Game.autoSplit, KeyEvent.VK_S);
+        // XXX Add autoPlay after Player.syncCheckBoxes() / twiddleOption()
+        //   are working right.
+        // playerMenu.addSeparator();
+        // addCheckBox(playerMenu, Game.autoPlay, KeyEvent.VK_U);
 
         // Then per-client GUI options
         JMenu graphicsMenu = new JMenu("Graphics");

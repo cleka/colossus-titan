@@ -237,9 +237,11 @@ You'll want to manually delete all those save files from time to time.
 Credits:
 
 Programming:  David Ripton  dripton@wizard.net
+              Bruce Sherrod (AI)  bruce@thematrix.com
               David Barr (applet conversion)
-              Bruce Sherrod (AI)
+
 Counter art:  Tchula Ripton, David Lum
-Bug reports:  Anthony Kam, Bruce Sherrod, Augustin Ku, David Barr,
-              Sean McCulloch, Luca Ferraro, Jonathan Woodward
+
+Bug reports:  Anthony Kam, Augustin Ku, Sean McCulloch, Luca Ferraro, 
+              Jonathan Woodward
 

@@ -23,7 +23,7 @@ public final class Game
     public static Random random = new Random();
     private MovementDie movementDie;
     private SummonAngel summonAngel;
-    private AI ai = new SimpleAI();
+    private AI ai = new SimpleAI();  // TODO move to player
     private Caretaker caretaker = new Caretaker();
 
     public static final int SPLIT = 1;
@@ -47,28 +47,54 @@ public final class Game
     public static final String configVersion =
         "Colossus config file version 2";
 
+    /** Preference file */
+    public static final String optionsPath = "Colossus";
+    public static final String optionsSep = "-";
+    public static final String optionsExtension = ".cfg";
+    private Properties options = new Properties();
+
+
     // Option names
+
+    // Server options
     public static final String autosave = "Autosave";
     public static final String allStacksVisible = "All stacks visible";
-    public static final String autoRecruit = "Auto recruit";
-    public static final String autoPickRecruiter = "Autopick recruiter";
-    public static final String autoPickMarker = "Autopick marker";
-    public static final String autoPickEntrySide = "Autopick entry side";
-    public static final String autoForcedStrike = "Auto forced strike";
-    public static final String showStatusScreen = "Show game status";
-    public static final String showDice = "Show dice";
-    public static final String antialias = "Antialias";
+    
+    // Debug options (server)
     public static final String chooseMovement = "Choose movement roll";
     public static final String chooseHits= "Choose number of hits";
     public static final String chooseTowers = "Choose towers";
     public static final String chooseCreatures = "Choose creatures";
-    public static final String autoSplit = "Auto split";
-    public static final String autoMove = "Auto move"; // masterboard movement
 
-    /** Preference file */
-    private static final String optionsPath = "Colossus";
-    private static final String optionsExtension = ".cfg";
-    private Properties options = new Properties();
+    // Graphics options (client)
+    public static final String showStatusScreen = "Show game status";
+    public static final String showDice = "Show dice";
+    public static final String antialias = "Antialias";
+
+    // AI options (player)
+    public static final String autoRecruit = "Auto recruit";
+    public static final String autoPickRecruiter = "Auto pick recruiter";
+    public static final String autoPickMarker = "Auto pick marker";
+    public static final String autoPickEntrySide = "Auto pick entry side";
+    public static final String autoForcedStrike = "Auto forced strike";
+    public static final String autoSplit = "Auto split";
+    public static final String autoMasterMove = "Auto masterboard move";
+    public static final String autoPlay = "Auto play";
+
+    private static HashSet perPlayerOptions = new HashSet();
+
+
+    static
+    {
+        perPlayerOptions.add(autoRecruit);
+        perPlayerOptions.add(autoPickRecruiter);
+        perPlayerOptions.add(autoPickMarker);
+        perPlayerOptions.add(autoPickEntrySide);
+        perPlayerOptions.add(autoForcedStrike);
+        perPlayerOptions.add(autoSplit);
+        perPlayerOptions.add(autoMasterMove);
+        perPlayerOptions.add(autoPlay);
+    }
 
 
     /** Start a new game. */
@@ -408,10 +434,27 @@ public final class Game
     }
 
 
+    public static HashSet getPerPlayerOptions()
+    {
+        return perPlayerOptions;
+    }
+
+
     /** Return the value of the boolean option given by name. Default
      *  to false if there is no such option. */
     public boolean getOption(String name)
     {
+        if (perPlayerOptions.contains(name))
+        {
+            try
+            {
+                return getActivePlayer().getOption(name);
+            }
+            catch (Exception ex)
+            {
+            }
+        }
+
         String value = options.getProperty(name);
         if (value != null && value.equals("true"))
         {
@@ -427,6 +470,12 @@ public final class Game
     /** Set option name to (a string version of) the given boolean value. */
     public void setOption(String name, boolean value)
     {
+        if (perPlayerOptions.contains(name))
+        {
+            getActivePlayer().setOption(name, value);
+            return;
+        }
+
         options.setProperty(name, String.valueOf(value));
 
         // Side effects
@@ -503,8 +552,6 @@ public final class Game
 
     public void advancePhase()
     {
-	saveOptions(); // save this players options
-
         phase++;
 
         if (phase > MUSTER ||
@@ -517,8 +564,6 @@ public final class Game
             board.unselectAllHexes();
             logEvent("Phase advances to " + getPhaseName(phase));
         }
-
-	loadOptions(); // load next players options
 
         setupPhase();
     }
@@ -565,7 +610,7 @@ public final class Game
             player.highlightTallLegions();
         }
 
-	if (getOption(autoSplit))
+	if (player.getOption(autoSplit))
 	{
 	    ai.split(this);
 	}
@@ -582,7 +627,7 @@ public final class Game
         // Highlight hexes with legions that can move.
         highlightUnmovedLegions();
 
-        if (getOption(autoMove))
+        if (player.getOption(autoMasterMove))
         {
             ai.move(this);
         }
@@ -617,7 +662,7 @@ public final class Game
             // Highlight hexes with legions eligible to muster.
             highlightPossibleRecruits();
 
-            if (getOption(autoRecruit))
+            if (player.getOption(autoRecruit))
             {
                 ai.muster(this);
             }
@@ -641,11 +686,12 @@ public final class Game
         }
         else
         {
-            logEvent("\n" + getActivePlayer().getName() +
-                "'s turn, number " + turnNumber);
+            Player player = getActivePlayer();
+            logEvent("\n" + player.getName() + "'s turn, number " + 
+                turnNumber);
 
+            player.syncCheckboxes();
             updateStatusScreen();
-
             if (!isApplet && getOption(autosave))
             {
                 saveGame();
@@ -1092,7 +1138,6 @@ public final class Game
                 battle.setDriftDamageApplied(driftDamageApplied);
             }
 
-
             loadOptions();
 
             if (getOption(showDice))
@@ -1262,16 +1307,24 @@ public final class Game
      *  java.util.Properties keyword=value. */
     public void saveOptions()
     {
-	final String optionsFile = optionsPath  + getActivePlayer().getName()
-	    + optionsExtension;
+	final String optionsFile = optionsPath + optionsExtension;
         try
         {
             FileOutputStream out = new FileOutputStream(optionsFile);
             options.store(out, configVersion);
+            out.close();
         }
         catch (IOException e)
         {
             System.out.println("Couldn't write options to " + optionsFile);
+        }
+
+        // Save options for each player
+        Iterator it = players.iterator();
+        while (it.hasNext())
+        {
+            Player player = (Player)it.next();
+            player.saveOptions();
         }
     }
 
@@ -1280,37 +1333,34 @@ public final class Game
      *  java.util.Properties keyword=value */
     public void loadOptions()
     {
-	final String optionsFile = optionsPath  + getActivePlayer().getName()
-	    + optionsExtension;
-	final String defaultOptionsFile = optionsPath + optionsExtension;
+	final String optionsFile = optionsPath + optionsExtension;
         try
         {
-	    File of = new File(optionsFile);
-	    if (of.exists())
-	    {
-		FileInputStream in = new FileInputStream(optionsFile);
-		options.load(in);
-	    }
-	    else
-	    {
-		System.out.println("Loading default options for " 
-				   + getActivePlayer().getColor());
-		FileInputStream in = new FileInputStream(defaultOptionsFile);
-		options.load(in);
-	    }
+            FileInputStream in = new FileInputStream(optionsFile);
+            options.load(in);
         }
         catch (IOException e)
         {
-            System.out.println("Couldn't read options from " + optionsFile);
+            System.out.println("Couldn't read game options from " + 
+                optionsFile);
             return;
         }
-
-        Enumeration it = options.propertyNames();
-        while (it.hasMoreElements())
+        
+        // Ensure that menu checkboxes reflect the correct state.
+        Enumeration en = options.propertyNames();
+        while (en.hasMoreElements())
         {
-            String name = (String)it.nextElement();
+            String name = (String)en.nextElement();
             boolean value = getOption(name);
             board.twiddleOption(name, value);
+        }
+        
+        // Load options for each player
+        Iterator it = players.iterator();
+        while (it.hasNext())
+        {
+            Player player = (Player)it.next();
+            player.loadOptions();
         }
     }
 
@@ -2089,7 +2139,8 @@ public final class Game
             // A warm body recruits in a tower.
             recruiter = null;
         }
-        else if (getOption(autoPickRecruiter) || numEligibleRecruiters == 1 ||
+        else if (player.getOption(autoPickRecruiter) || 
+            numEligibleRecruiters == 1 ||
             allRecruitersVisible(legion, recruiters))
         {
             // If there's only one possible recruiter, or if all
@@ -2215,7 +2266,7 @@ public final class Game
     {
         String name = player.getName();
         String selectedMarkerId;
-        if (getOption(autoPickMarker))
+        if (player.getOption(autoPickMarker))
         {
             selectedMarkerId = player.getFirstAvailableMarker();
         }
@@ -2713,7 +2764,7 @@ public final class Game
                 }
 
                 SplitLegion.splitLegion(masterFrame, legion,
-                    getOption(autoPickMarker));
+                    player.getOption(autoPickMarker));
 
                 updateStatusScreen();
                 // If we split, unselect this hex.
@@ -2783,7 +2834,7 @@ public final class Game
                     if (hex.getTeleported() && hex.canEnterViaLand())
                     {
                         boolean answer;
-                        if (getOption(autoPickEntrySide))
+                        if (player.getOption(autoPickEntrySide))
                         {
                             // Always choose to move normally rather
                             // than teleport if auto-picking entry sides.
@@ -2817,7 +2868,7 @@ public final class Game
                     if (hex.isOccupied() && hex.getNumEntrySides() > 1)
                     {
                         int side;
-                        if (getOption(autoPickEntrySide))
+                        if (player.getOption(autoPickEntrySide))
                         {
                             side = hex.getEntrySide();
                         }

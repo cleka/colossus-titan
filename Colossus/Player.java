@@ -1,4 +1,5 @@
 import java.util.*;
+import java.io.*;
 
 /**
  * Class Player holds the data for one player in a Titan game.
@@ -29,7 +30,7 @@ public final class Player implements Comparable
     /** Stack of legions, to allow multiple levels of undo for splits,
      *  moves, and recruits. */
     private LinkedList undoStack = new LinkedList();
-
+    private Properties options = new Properties();
 
 
     public Player(String name, Game game)
@@ -745,6 +746,99 @@ public final class Player implements Comparable
     public boolean isTitanEliminated()
     {
         return titanEliminated;
+    }
+
+
+    /** Return the value of the boolean option given by name. Default
+     *  to false if there is no such option. */
+    public boolean getOption(String name)
+    {
+        String value = options.getProperty(name);
+        if (value != null && value.equals("true"))
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+
+    /** Set option name to (a string version of) the given boolean value. */
+    public void setOption(String name, boolean value)
+    {
+        options.setProperty(name, String.valueOf(value));
+        
+        // Side effects.
+        if (name.equals(Game.autoPlay))
+        {
+            // Set all other player options to the same value.
+            HashSet perPlayerOptions = Game.getPerPlayerOptions();
+            Iterator it = perPlayerOptions.iterator();
+            while (it.hasNext())
+            {
+                String optname = (String)it.next();
+                if (!optname.equals(Game.autoPlay))
+                {
+                    setOption(optname, value);
+                }
+            }
+            syncCheckboxes();
+        }
+    }
+
+
+    /** Save player options to a file.  The current format is standard
+     *  java.util.Properties keyword=value. */
+    public void saveOptions()
+    {
+        final String optionsFile = Game.optionsPath + Game.optionsSep + 
+            name + Game.optionsExtension;
+        try
+        {
+            FileOutputStream out = new FileOutputStream(optionsFile);
+            options.store(out, Game.configVersion);
+            out.close();
+        }
+        catch (IOException e)
+        {
+            System.out.println("Couldn't write options to " + optionsFile);
+        }
+    }
+
+
+    /** Load game options from a file. The current format is standard
+     *  java.util.Properties keyword=value */
+    public void loadOptions()
+    {
+        final String optionsFile = Game.optionsPath + Game.optionsSep +
+            name + Game.optionsExtension;
+        try
+        {
+            FileInputStream in = new FileInputStream(optionsFile);
+            options.load(in);
+        }
+        catch (IOException e)
+        {
+            System.out.println("Couldn't read player options from " +
+                optionsFile);
+            return;
+        }
+    }
+
+
+    // XXX This method doesn't work right.
+    /** Ensure that Player menu checkboxes reflect the correct state. */
+    public void syncCheckboxes()
+    {
+        Enumeration en = options.propertyNames();
+        while (en.hasMoreElements())
+        {
+            String name = (String)en.nextElement();
+            boolean value = getOption(name);
+            game.getBoard().twiddleOption(name, value);
+        }
     }
 
 

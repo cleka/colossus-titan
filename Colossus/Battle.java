@@ -310,7 +310,7 @@ public final class Battle
             map.setupFightMenu();
 
             // Automatically perform forced strikes if applicable.
-            if (game != null && game.getOption(Game.autoForcedStrike))
+            if (getActivePlayer().getOption(Game.autoForcedStrike))
             {
                 makeForcedStrikes();
                 // If there are no possible strikes left, move on.
