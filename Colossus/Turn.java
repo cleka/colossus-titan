@@ -82,7 +82,7 @@ class Turn extends Dialog implements ActionListener
             setLayout(new GridLayout(0, 4));
         }
 
-        player.rollMovementDie();
+        player.rollMovement();
 
         add(new Label(player.getName() + " : Movement Roll: " + 
             player.getMovementRoll()));
