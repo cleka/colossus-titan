@@ -241,7 +241,7 @@ class MasterHex
 
         theta = Math.atan2(vy2 - vy1, vx2 - vx1);
 
-        switch(gateType)
+        switch (gateType)
         {
             case BLOCK:
                 x[0] = (int) Math.round(x0 - l * Math.sin(theta));
@@ -399,7 +399,7 @@ class MasterHex
 
     String getTerrainName()
     {
-        switch(terrain)
+        switch (terrain)
         {
             case 'B':
                 return "BRUSH";
@@ -430,7 +430,7 @@ class MasterHex
 
     Color getTerrainColor()
     {
-        switch(terrain)
+        switch (terrain)
         {
             case 'B':
                 return java.awt.Color.green;
@@ -456,6 +456,198 @@ class MasterHex
                 return new Color(128, 128, 0);
             default:
                 return java.awt.Color.black;
+        }
+    }
+
+
+    // Return the number of types of recruits for this terrain type.
+    int getNumRecruitTypes()
+    {
+        switch (terrain)
+        {
+            case 'B':
+            case 'D':
+            case 'H':
+            case 'M':
+            case 'P':
+            case 'S':
+            case 'W':
+                return 3;
+
+            case 'J':
+            case 'm':
+            case 't':
+                return 4;
+
+            case 'T':
+                return 5;
+
+            default:
+                return -1;
+        }
+    }
+
+
+    // Return the ith recruit possible in this terrain type.
+    Creature getRecruit(int i)
+    {
+        switch (terrain)
+        {
+            case 'B':
+                switch (i)
+                {
+                    case 0:
+                        return Creature.gargoyle;
+                    case 1:
+                        return Creature.cyclops;
+                    case 2:
+                        return Creature.gorgon;
+                    default:
+                        return null;
+                }
+
+            case 'D':
+                switch (i)
+                {
+                    case 0:
+                        return Creature.lion;
+                    case 1:
+                        return Creature.griffon;
+                    case 2:
+                        return Creature.hydra;
+                    default:
+                        return null;
+                }
+
+            case 'H':
+                switch (i)
+                {
+                    case 0:
+                        return Creature.ogre;
+                    case 1:
+                        return Creature.minotaur;
+                    case 2:
+                        return Creature.unicorn;
+                    default:
+                        return null;
+                }
+
+            case 'J':
+                switch (i)
+                {
+                    case 0:
+                        return Creature.gargoyle;
+                    case 1:
+                        return Creature.cyclops;
+                    case 2:
+                        return Creature.behemoth;
+                    case 3:
+                        return Creature.serpent;
+                    default:
+                        return null;
+                }
+
+            case 'm':
+                switch (i)
+                {
+                    case 0:
+                        return Creature.lion;
+                    case 1:
+                        return Creature.minotaur;
+                    case 2:
+                        return Creature.dragon;
+                    case 3:
+                        return Creature.colossus;
+                    default:
+                        return null;
+                }
+
+            case 'M':
+                switch (i)
+                {
+                    case 0:
+                        return Creature.ogre;
+                    case 1:
+                        return Creature.troll;
+                    case 2:
+                        return Creature.ranger;
+                    default:
+                        return null;
+                }
+
+            case 'P':
+                switch (i)
+                {
+                    case 0:
+                        return Creature.centaur;
+                    case 1:
+                        return Creature.lion;
+                    case 2:
+                        return Creature.ranger;
+                    default:
+                        return null;
+                }
+
+            case 'S':
+                switch (i)
+                {
+                    case 0:
+                        return Creature.troll;
+                    case 1:
+                        return Creature.wyvern;
+                    case 2:
+                        return Creature.hydra;
+                    default:
+                        return null;
+                }
+
+            case 'T':
+                switch (i)
+                {
+                    case 0:
+                        return Creature.centaur;
+                    case 1:
+                        return Creature.gargoyle;
+                    case 2:
+                        return Creature.ogre;
+                    case 3:
+                        return Creature.guardian;
+                    case 4:
+                        return Creature.warlock;
+                    default:
+                        return null;
+                }
+
+            case 't':
+                switch (i)
+                {
+                    case 0:
+                        return Creature.troll;
+                    case 1:
+                        return Creature.warbear;
+                    case 2:
+                        return Creature.giant;
+                    case 3:
+                        return Creature.colossus;
+                    default:
+                        return null;
+                }
+
+            case 'W':
+                switch (i)
+                {
+                    case 0:
+                        return Creature.centaur;
+                    case 1:
+                        return Creature.warbear;
+                    case 2:
+                        return Creature.unicorn;
+                    default:
+                        return null;
+                }
+
+            default:
+                return null;
         }
     }
 
