@@ -2071,8 +2071,11 @@ public final class Client implements IClient
 
         if (isMyTurn() && getOption(Options.autoSplit) && !isGameOver())
         {
-            ai.split();
-            doneWithSplits();
+            boolean done = ai.split();
+            if (done)
+            {
+                doneWithSplits();
+            }
         }
     }
 
@@ -2230,6 +2233,7 @@ public final class Client implements IClient
 
             // Wait for information from the server before proceding.
             java.util.Timer timer = new java.util.Timer();
+            // XXX Use a callback instead of a timer!
             timer.schedule(new FinishAIBattleMove(), 200);
         }
     }
@@ -3324,6 +3328,14 @@ public final class Client implements IClient
             board.alignLegions(info.getHexLabel());
             board.highlightTallLegions();
         }
+        if (isMyTurn() && getOption(Options.autoSplit) && !isGameOver())
+        {
+            boolean done = ai.splitCallback(null, null);
+            if (done)
+            {
+                doneWithSplits();
+            }
+        }
     }
 
     void undoLastRecruit()
@@ -3371,6 +3383,7 @@ public final class Client implements IClient
             return;
         }
         // Wait for information from the server before proceding.
+        // XXX Use a callback instead of a timer!
         java.util.Timer timer = new java.util.Timer();
         timer.schedule(new FinishSplits(), 200);
     }
@@ -3579,6 +3592,14 @@ public final class Client implements IClient
         {
             board.alignLegions(hexLabel);
             board.highlightTallLegions();
+        }
+        if (isMyTurn() && getOption(Options.autoSplit) && !isGameOver())
+        {
+            boolean done = ai.splitCallback(parentId, childId);
+            if (done)
+            {
+                doneWithSplits();
+            }
         }
     }
 

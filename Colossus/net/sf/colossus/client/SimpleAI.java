@@ -162,7 +162,7 @@ public class SimpleAI implements AI
         return recruit;
     }
 
-    public void split()
+    public boolean split()
     {
         PlayerInfo player = client.getPlayerInfo();
 
@@ -172,6 +172,18 @@ public class SimpleAI implements AI
             String markerId = (String)it.next();
             splitOneLegion(player, markerId);
         }
+        return true;
+    }
+
+    public boolean splitCallback(String parentId, String childId)
+    {
+        return true;
+    }
+
+    /** Unused in this AI; just return true to indicate done. */
+    public boolean splitCallback()
+    {
+        return true;
     }
 
     private void splitOneLegion(PlayerInfo player, String markerId)

@@ -74,6 +74,7 @@ public final class LegionInfo
         }
         catch (NullPointerException ex)
         {
+            Log.error("null pointer in LegionInfo.getHeight()");
             return 8;
         }
     }
@@ -113,7 +114,7 @@ public final class LegionInfo
         }
         catch (NullPointerException e)
         {
-            // Log.debug("NullPointerException in getContents(). Return empty set of creatures.");
+            Log.debug("NullPointerException in getContents()");
             return new ArrayList();
         }
     }

@@ -18,8 +18,11 @@ public interface AI
     /** make masterboard moves for current player in the Game */
     boolean masterMove();
 
-    /** make splits for current player */
-    void split();
+    /** make splits for current player.  Return true if done */
+    boolean split();
+
+    /** continue making splits.  Return true if done. */
+    boolean splitCallback(String parentId, String childId);
 
     /** make recruits for current player */
     void muster();

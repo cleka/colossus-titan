@@ -30,6 +30,7 @@ public class RationalAI implements AI
     private boolean timeIsUp;
     private Random random = new DevRandom();
     protected boolean I_HATE_HUMANS = false;
+    private List legionsToSplit = new ArrayList();
 
     public RationalAI(Client client)
     {
@@ -197,23 +198,58 @@ public class RationalAI implements AI
         return recruit;
     }
 
-    public void split()
+    public boolean split()
     {
+        legionsToSplit.clear();
+
         PlayerInfo player = client.getPlayerInfo();
-
         Iterator it = player.getLegionIds().iterator();
-
         while (it.hasNext())
         {
             String markerId = (String)it.next();
-
-            splitOneLegion(player, markerId);
+            legionsToSplit.add(markerId);
         }
+        return fireSplits();
+    }
+
+    /** Return true if done with all splits, false if splits or callbacks remain. */
+    private boolean fireSplits()
+    {
+        if (legionsToSplit.isEmpty())
+        {
+            return true;
+        }
+        String markerId = (String)legionsToSplit.remove(0);
+        boolean done = splitOneLegion(client.getPlayerInfo(), markerId);
+        if (done)
+        {
+            return fireSplits();
+        }
+        return false;
+    }
+
+    // XXX Undoing a split could release the marker needed to do another
+    // split, so we need to synchronize access.
+    /** If parentId and childId are null, this is a callback to an undo split */
+    public boolean splitCallback(String parentId, String childId)
+    {
+        if (parentId == null && childId == null)
+        {
+            // Undo split is done; fire off the next split
+            return fireSplits();
+        }
+        boolean done = splitOneLegionCallback(parentId, childId);
+        if (done)
+        {
+            return fireSplits();
+        }
+        return false;
     }
 
     // Compute the expected value of a split legion
     // If we want to compute just a single legion, pass null for the child_legion
-    private double expectedValueSplitLegion(Map[] enemyAttackMap, LegionInfo legion, LegionInfo child_legion)
+    private double expectedValueSplitLegion(Map[] enemyAttackMap, LegionInfo
+            legion, LegionInfo child_legion)
     {
         double split_value = 0.0;
 
@@ -322,21 +358,13 @@ public class RationalAI implements AI
         return split_value;
     }
 
-    private void splitOneLegion(PlayerInfo player, String markerId)
+    /** Return true if done, false if waiting for callback. */
+    private boolean splitOneLegion(PlayerInfo player, String markerId)
     {
         Log.setShowDebug(true);
         Log.debug("splitOneLegion()");
 
         LegionInfo legion = client.getLegionInfo(markerId);
-
-        /*
-         // Don't split until we reach height 7 after round 7
-         if (legion.getHeight() < 7 && client.getTurnNumber() > 7)
-         {
-         Log.debug("No split: height < 7 and turn is 4 or higher");
-         return;
-         }
-         **/
 
         // Allow aggressive splits - especially early in the game it is better
         // to split more often -- this should get toned down later in the
@@ -344,7 +372,7 @@ public class RationalAI implements AI
         if (legion.getHeight() < 6)
         {
             Log.debug("No split: height < 6");
-            return;
+            return true;
         }
 
         Map[] enemyAttackMap = buildEnemyAttackMap(client.getPlayerInfo());
@@ -384,17 +412,7 @@ public class RationalAI implements AI
         if (legion.getHeight() < 7 && !hasMustered)
         {
             Log.debug("No split: height < 7 and not mustered");
-            return;
-        }
-
-        // find expected value of no split
-        Log.debug("splitOneLegion(): Expected value with no split");
-        double no_split_value = 0.0;
-
-        if (client.getTurnNumber() > 1)
-        {
-            no_split_value = expectedValueSplitLegion(enemyAttackMap, legion,
-                    null);
+            return true;
         }
 
         // Do the split.  If we don't like the result we will undo it at the end
@@ -406,35 +424,42 @@ public class RationalAI implements AI
         if (newMarkerId == null)
         {
             Log.debug("No split.  No markers available.");
-            return;
+            return true;
         }
 
-        Log.debug("Wait for split");
+        Log.debug("Wait for split callback");
         client.doSplit(legion.getMarkerId(), newMarkerId, results.toString());
+        return false;
+    }
 
-        // do nothing, wait for split to complete on game/server thread  
-        try
-        {
-            Thread.sleep(300);
-        }
-        catch (InterruptedException e)
-        {
-        }
-
+    /** Return true if done, false if waiting for undo split */
+    private boolean splitOneLegionCallback(String markerId, String newMarkerId)
+    {
+        LegionInfo legion = client.getLegionInfo(markerId);
         Log.debug("Split complete");
 
         if (client.getTurnNumber() == 1)
         { // first turn
             Log.debug("First turn split");
-            return;
+            return true;
         }
 
         LegionInfo child_legion = client.getLegionInfo(newMarkerId);
 
         // Compute split value
         Log.debug("splitOneLegion(): Expected value with split");
+        Map[] enemyAttackMap = buildEnemyAttackMap(client.getPlayerInfo());
         double split_value = expectedValueSplitLegion(enemyAttackMap, legion,
                 child_legion); // expected value of split    
+
+        // find expected value of no split
+        Log.debug("splitOneLegionCallback(): Expected value with no split");
+        double no_split_value = 0.0;
+        if (client.getTurnNumber() > 1)
+        {
+            no_split_value = expectedValueSplitLegion(enemyAttackMap, legion,
+                    null);
+        }
 
         // For Titan group, try to only split when at 7
         // The only exception should be if we are under
@@ -457,10 +482,12 @@ public class RationalAI implements AI
             // Undo the split  
             client.undoSplit(newMarkerId);
             Log.debug("undo split - better to keep stack together");
+            return false;
         }
         else
         {
-            Log.debug("do split");
+            Log.debug("keep the split");
+            return true;
         }
     }
 
