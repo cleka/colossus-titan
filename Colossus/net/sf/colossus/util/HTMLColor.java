@@ -179,6 +179,9 @@ public final class HTMLColor
     public static final Color OrangeColossus = hydraOrange;
     public static final Color PurpleColossus = colossusPink;
     public static final Color SilverColossus = new Color(153,153,153);
+    public static final Color SkyColossus = skyBlue;
+    public static final Color PineColossus = forestGreen;
+    public static final Color IndigoColossus = indigo;
 
     public static Color stringToColor(String colorName)
     {
