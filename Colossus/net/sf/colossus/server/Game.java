@@ -80,7 +80,7 @@ public final class Game
         }
     }
 
-    void initServerAndClients()
+    private void initServerAndClients()
     {
         if (server == null)
         {
@@ -93,8 +93,30 @@ public final class Game
         for (int i = 0; i < getNumPlayers(); i++)
         {
             Player player = (Player)players.get(i);
-            server.addClient(player.getName());
+            server.addClient(player.getName(), (i == getPrimaryPlayerNum()));
         }
+    }
+
+    /** Return the first human player number, or the first AI if none. */
+    private int getPrimaryPlayerNum()
+    {
+        for (int i = 0; i < getNumPlayers(); i++)
+        {
+            Player player = (Player)players.get(i);
+            if (player.isHuman())
+            {
+                return i;
+            }
+        }
+        for (int i = 0; i < getNumPlayers(); i++)
+        {
+            Player player = (Player)players.get(i);
+            if (player.isAI())
+            {
+                return i;
+            }
+        }
+        return -1;
     }
 
 
@@ -187,11 +209,11 @@ public final class Game
             Log.event("Add " + type + " player " + name);
         }
 
-        // We need to set the autoPlay option before loading the board,
-        // so that we can avoid showing boards for AI players.
-
         initAndLoadData();
         initServerAndClients();
+
+        // We need to set the autoPlay option before loading the board,
+        // so that we can avoid showing boards for non-primary AI players.
 
         syncAutoPlay();
 
@@ -212,16 +234,8 @@ public final class Game
         while (it.hasNext())
         {
             Player player = (Player)it.next();
-            if (player.isAI())
-            {
-                server.setClientOption(player.getName(), Options.autoPlay,
-                    true);
-            }
-            else if (player.isHuman())
-            {
-                server.setClientOption(player.getName(), Options.autoPlay,
-                    false);
-            }
+            server.setClientOption(player.getName(), Options.autoPlay,
+                player.isAI());
         }
     }
 
@@ -1949,7 +1963,6 @@ public final class Game
         return set;
     }
 
-
     void createSummonAngel(Legion attacker)
     {
         Player player = getActivePlayer();
@@ -2104,8 +2117,7 @@ Log.debug("" + findEngagements().size() + " engagements left");
                     hasSummonable = hasSummonable ||
                         (candidate.numCreature(c) > 0);
                 }
-                if (hasSummonable &&
-                    !isEngagement(hexLabel))
+                if (hasSummonable && !isEngagement(hexLabel))
                 {
                     set.add(hexLabel);
                 }

@@ -7,7 +7,6 @@ import javax.swing.*;
 
 import net.sf.colossus.util.Log;
 import net.sf.colossus.client.Client;
-// XXX temp
 import net.sf.colossus.client.Proposal;
 
 
@@ -18,7 +17,6 @@ import net.sf.colossus.client.Proposal;
  *  @version $Id$
  *  @author David Ripton
  */
-
 public final class Server
 {
     private Game game;
@@ -48,9 +46,9 @@ public final class Server
 
 
     /** Temporary.  We will not use direct client refs later. */
-    void addClient(String playerName)
+    void addClient(String playerName, boolean primary)
     {
-        clients.add(new Client(this, playerName));
+        clients.add(new Client(this, playerName, primary));
     }
 
 
@@ -1099,6 +1097,12 @@ Log.debug("Called Server.acquireAngel() for " + markerId + " " + angelType);
         player.setMulligansLeft(0);
 
         game.advancePhase(Constants.MUSTER, playerName);
+    }
+
+    /** Advance the phase without error checks, for debug only. */
+    public void forceAdvancePhase()
+    {
+        game.advancePhase(game.getPhase(), game.getActivePlayerName());
     }
 
 

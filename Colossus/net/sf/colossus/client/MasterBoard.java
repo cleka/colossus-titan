@@ -77,6 +77,8 @@ public final class MasterBoard extends JPanel
     public static final String undoAll = "Undo All";
     public static final String doneWithPhase = "Done";
 
+    public static final String forceAdvancePhase = "Force Advance Phase";
+
     public static final String takeMulligan = "Take Mulligan";
     public static final String concedeBattle = "Concede battle";
     public static final String withdrawFromGame = "Withdraw from Game";
@@ -102,6 +104,7 @@ public final class MasterBoard extends JPanel
     private AbstractAction undoLastAction;
     private AbstractAction undoAllAction;
     private AbstractAction doneWithPhaseAction;
+    private AbstractAction forceAdvancePhaseAction;
 
     private AbstractAction takeMulliganAction;
     private AbstractAction withdrawFromGameAction;
@@ -261,6 +264,15 @@ public final class MasterBoard extends JPanel
                         client.doneWithRecruits();
                         break;
                 }
+            }
+        };
+
+
+        forceAdvancePhaseAction = new AbstractAction(forceAdvancePhase)
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                client.forceAdvancePhase();
             }
         };
 
@@ -1145,6 +1157,13 @@ public final class MasterBoard extends JPanel
 
             highlightTallLegions();
         }
+        else if (client.isPrimary())
+        {
+            JMenuItem mi;
+            mi = phaseMenu.add(forceAdvancePhaseAction);
+            mi.setMnemonic(KeyEvent.VK_F);
+            mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, 0));
+        }
     }
 
 
@@ -1197,6 +1216,13 @@ public final class MasterBoard extends JPanel
 
             highlightUnmovedLegions();
         }
+        else if (client.isPrimary())
+        {
+            JMenuItem mi;
+            mi = phaseMenu.add(forceAdvancePhaseAction);
+            mi.setMnemonic(KeyEvent.VK_F);
+            mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, 0));
+        }
     }
 
 
@@ -1232,6 +1258,13 @@ public final class MasterBoard extends JPanel
             mi.setMnemonic(KeyEvent.VK_W);
 
             highlightEngagements();
+        }
+        else if (client.isPrimary())
+        {
+            JMenuItem mi;
+            mi = phaseMenu.add(forceAdvancePhaseAction);
+            mi.setMnemonic(KeyEvent.VK_F);
+            mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, 0));
         }
     }
 
@@ -1276,6 +1309,13 @@ public final class MasterBoard extends JPanel
             mi.setMnemonic(KeyEvent.VK_W);
 
             highlightPossibleRecruits();
+        }
+        else if (client.isPrimary())
+        {
+            JMenuItem mi;
+            mi = phaseMenu.add(forceAdvancePhaseAction);
+            mi.setMnemonic(KeyEvent.VK_F);
+            mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, 0));
         }
     }
 

@@ -97,13 +97,23 @@ public final class Client
     String battleActivePlayerName = "none";
     int battlePhase = -1;
 
+    /** The primary client controls some game options.  If all players
+     *  are AIs, then the primary client gets a board and map. */
+    private boolean primary;
 
-    public Client(Server server, String playerName)
+
+    public Client(Server server, String playerName, boolean primary)
     {
         this.server = server;
         this.playerName = playerName;
+        this.primary = primary;
     }
 
+
+    boolean isPrimary()
+    {
+        return primary;
+    }
 
     /** Take a mulligan. */
     void mulligan()
@@ -780,8 +790,8 @@ public final class Client
     // TODO Should take board data from variant file, or stream, as argument.
     public void initBoard()
     {
-        // Do not show boards for AI players.
-        if (!getOption(Options.autoPlay))
+        // Do not show boards for AI players, except primary client.
+        if (!getOption(Options.autoPlay) || primary)
         {
             disposeMasterBoard();
 
@@ -1194,8 +1204,8 @@ Log.debug("called Client.acquireAngelCallback()");
         setBattleActivePlayerName(battleActivePlayerName);
         this.battlePhase = battlePhase;
 
-        // Do not show map for AI players.
-        if (!getOption(Options.autoPlay))
+        // Do not show map for AI players, except primary client.
+        if (!getOption(Options.autoPlay) || primary)
         {
             map = new BattleMap(this, masterHexLabel);
             JFrame frame = map.getFrame();
@@ -1997,6 +2007,12 @@ Log.debug("called Client.acquireAngelCallback()");
         clearUndoStack();
         server.doneWithRecruits(playerName);
     }
+
+    void forceAdvancePhase()
+    {
+        server.forceAdvancePhase();
+    }
+
 
     // TODO cache this
     private String getPlayerNameByMarkerId(String markerId)

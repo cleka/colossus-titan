@@ -760,34 +760,9 @@ final class Legion implements Comparable
         {
             return false;
         }
-
-        return summonableAvailable();
+        return !game.findSummonableAngels(markerId).isEmpty();
     }
 
-    /** Return true if this legion can summon. */
-    boolean summonableAvailable()
-    {
-        Player player = getPlayer();
-        Collection legions = player.getLegions();
-        Iterator it = legions.iterator();
-        List summonableList = Creature.getSummonableCreatures();
-        while (it.hasNext())
-        {
-            Legion candidate = (Legion)it.next();
-            if (candidate != this)
-            {    
-                Iterator sumoIt = summonableList.iterator();
-                while (sumoIt.hasNext())
-                {
-                    Creature c = (Creature)sumoIt.next();
-                    if (candidate.numCreature(c) > 0)
-                        return true;
-                }
-            }
-        }
-
-        return false;
-    }
 
     String getCurrentHexLabel()
     {
