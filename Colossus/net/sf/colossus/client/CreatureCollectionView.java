@@ -33,8 +33,19 @@ class CreatureCollectionView extends KDialog implements WindowListener
 
         this.client = client;
 
+        getContentPane().setLayout(new BorderLayout());
+
         JPanel panel = makeCreaturePanel();
         getContentPane().add(panel, BorderLayout.CENTER);
+
+        JLabel label = new JLabel(
+            htmlizeOnly(
+                htmlColorizeOnly("Values are: ", "black") +
+                htmlColorizeOnly("In Stack / ", "black") +
+                htmlColorizeOnly("Dead", "red") +
+                htmlColorizeOnly(" / ", "black") +
+                htmlColorizeOnly("Total", "blue")));
+        getContentPane().add(label, BorderLayout.SOUTH);
 
         addWindowListener(this);
 
@@ -110,7 +121,7 @@ class CreatureCollectionView extends KDialog implements WindowListener
             String color;
             if (count == 0)
             {
-                color = "red";
+                color = "yellow";
             }
             else if (count == maxcount)
             {
@@ -130,7 +141,7 @@ class CreatureCollectionView extends KDialog implements WindowListener
                              Creature.getCreatureByName(name).isImmortal() ?
                              "X" :
                              Integer.toString(deadCount),
-                             "yellow");
+                             "red");
             String htmlSlash = htmlColorizeOnly(" / ", "black");
             label.setText(htmlizeOnly(htmlCount + htmlSlash +
                                       htmlDeadCount + htmlSlash +
