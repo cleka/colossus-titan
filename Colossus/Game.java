@@ -31,6 +31,8 @@ class Game extends Frame implements WindowListener, ActionListener
         super("Player Setup");
         pack();
         setSize(300, 250);
+        // XXX This should be centered on the screen.
+        setLocation(300, 300);
         
         setLayout(new GridLayout(0, 2));
 
@@ -138,6 +140,7 @@ class Game extends Frame implements WindowListener, ActionListener
 
 
     // XXX This should be one dialog per player.
+    // XXX It would be nice to have a working setSize here.
     void chooseColors()
     {
         removeAll();
@@ -254,6 +257,8 @@ class Game extends Frame implements WindowListener, ActionListener
         removeAll();
         setTitle("Game Status");
         setLayout(new GridLayout(0, 9));
+        // XXX It would be nice if this were horizontally centered.
+        setLocation(300, 0);
 
         // Need to sort player in descending tower order
         sortPlayers();
