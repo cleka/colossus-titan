@@ -110,7 +110,7 @@ Log.debug("About to create server socket on port " + port);
         try
         {
             clientSocket = serverSocket.accept();
-            Log.event("Got client connection from " + 
+            Log.event("Got client connection from " +
                 clientSocket.getInetAddress().toString());
             clientSockets[numClients] = clientSocket;
             numClients++;

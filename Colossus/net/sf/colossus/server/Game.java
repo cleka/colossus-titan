@@ -744,7 +744,8 @@ public final class Game
                 turnNumber++;
             }
 
-            /* notify all CustomRecruitBase object that we change the active player, for bookkeeping purpose */
+            /* notify all CustomRecruitBase object that we change the 
+               active player, for bookkeeping purpose */
             CustomRecruitBase.everyoneAdvanceTurn(activePlayerNum);
 
             phase = Constants.SPLIT;
@@ -1513,7 +1514,8 @@ public final class Game
                 Creature lesser = (Creature)liter.next();
 
                 if ((TerrainRecruitLoader.numberOfRecruiterNeeded(lesser,
-                            creature, terrain, hexLabel) <= legion.numCreature(lesser)) &&
+                    creature, terrain, hexLabel) <= 
+                    legion.numCreature(lesser)) &&
                     (recruits.indexOf(creature) == -1))
                 {
                     recruits.add(creature);
@@ -1553,7 +1555,8 @@ public final class Game
         MasterHex hex = MasterBoard.getHexByLabel(hexLabel);
         char terrain = hex.getTerrain();
 
-        recruiters = TerrainRecruitLoader.getPossibleRecruiters(terrain, hexLabel);
+        recruiters = TerrainRecruitLoader.getPossibleRecruiters(
+            terrain, hexLabel);
         Iterator it = recruiters.iterator();
 
         while (it.hasNext())
@@ -2196,7 +2199,6 @@ public final class Game
         }
     }
 
-    /** For AI. */
     Battle getBattle()
     {
         return battle;
