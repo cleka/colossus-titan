@@ -16,6 +16,7 @@ public final class Legion
     private ArrayList critters = new ArrayList();
     private MasterHex currentHex;
     private MasterHex startingHex;
+    private boolean moved;
     private boolean recruited;
     private Player player;
     private int battleTally;
@@ -170,6 +171,12 @@ public final class Legion
     }
 
 
+    public int getBattleTally()
+    {
+        return battleTally;
+    }
+
+
     public void clearBattleTally()
     {
         battleTally = 0;
@@ -299,7 +306,13 @@ public final class Legion
 
     public boolean hasMoved()
     {
-        return (currentHex != startingHex);
+        return moved;
+    }
+
+
+    public void setMoved(boolean moved)
+    {
+        this.moved = moved;
     }
 
 
@@ -364,6 +377,7 @@ public final class Legion
         currentHex.removeLegion(this);
         currentHex = hex;
         currentHex.addLegion(this, true);
+        moved = true;
         player.setLastLegionMoved();
         // If we teleported, no more teleports are allowed this turn.
         if (teleported)
@@ -375,11 +389,12 @@ public final class Legion
 
     public void undoMove()
     {
-        if (currentHex != startingHex)
+        if (moved)
         {
             currentHex.removeLegion(this);
             currentHex = startingHex;
             currentHex.addLegion(this, true);
+            moved = false;
             Game.logEvent("Legion " + getMarkerId() + " undoes its move");
 
             // If this legion teleported, allow teleporting again.
@@ -395,6 +410,7 @@ public final class Legion
     public void commitMove()
     {
         startingHex = currentHex;
+        moved = false;
         recruited = false;
     }
 

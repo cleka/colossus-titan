@@ -334,7 +334,11 @@ public final class BattleHex extends Hex
 
     public Critter getCritter()
     {
-        return (Critter)critters.get(0);
+        if (critters.size() > 0)
+        {
+            return (Critter)critters.get(0);
+        }
+        return null;
     }
 
 

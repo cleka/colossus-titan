@@ -41,3 +41,10 @@ Post-battle angel summoning is broken.  Donor hexes are selected, but
 
 Split.  Left click on small stack.  Right click on large stack.  Click
    on destination hex.  Small stack moves, though large stack is on top.
+
+--latest finds savegames with non-numeric filenames, and always uses
+   them in preference to those with normal numeric filenames.
+
+Ranger in level 2 tower hex can't rangestrike gargoyle in hex b2, just
+   outside tower.  Check rules.
+

@@ -149,7 +149,12 @@ public final class Game
         while (lit.hasPrevious())
         {
             Player player = (Player)lit.previous();
-            String color = PickColor.pickColor(frame, this, player);
+            String color;
+            do
+            {
+                color = PickColor.pickColor(frame, this, player);
+            }
+            while (color == null);
             logEvent(player.getName() + " chooses color " + color);
             player.setColor(color);
             player.initMarkersAvailable();
@@ -612,7 +617,6 @@ public final class Game
      *         Number of markers left
      *         Remaining marker ids
      *         Movement roll
-     *         XXX Add last legion moved/split/recruited?
      *         Number of Legions
      *         Legion 1:
      *             Marker id
@@ -650,6 +654,7 @@ public final class Game
         }
         PrintWriter out = new PrintWriter(fileWriter);
 
+        out.println(saveGameVersion);
         out.println(getNumPlayers());
         out.println(getTurnNumber());
         out.println(getActivePlayerNum());
@@ -662,7 +667,8 @@ public final class Game
             Creature creature = (Creature)it.next();
             out.println(creature.getCount());
         }
-     
+
+/*
         if (engagementInProgress)
         {
             out.println(battle.getMasterHex().getLabel());
@@ -681,6 +687,7 @@ public final class Game
             out.println();
             out.println();
         }
+*/
 
         it = players.iterator();
         while (it.hasNext())
@@ -729,11 +736,29 @@ public final class Game
                     Critter critter = (Critter)it3.next();
                     out.println(critter.getName());
                     out.println(critter.isVisible());
+
+                    // Battle stuff
+/*
                     out.println(critter.getHits());
-                    out.println(critter.getCurrentHex().getLabel());
-                    out.println(critter.getStartingHex().getLabel());
+                    if (critter.getCurrentHex() != null)
+                    {
+                        out.println(critter.getCurrentHex().getLabel());
+                    }
+                    else
+                    {
+                        out.println("null");
+                    }
+                    if (critter.getStartingHex() != null)
+                    {
+                        out.println(critter.getStartingHex().getLabel());
+                    }
+                    else
+                    {
+                        out.println("null");
+                    }
                     out.println(critter.hasStruck());
                     out.println(critter.getCarryFlag());
+*/
                 }
             }
         }
@@ -845,25 +870,40 @@ public final class Game
 
             players.clear();
             board.clearLegions();
-            
-            // Battle            
-            buf = in.readLine();
-            MasterHex engagementHex = board.getHexFromLabel(buf);
-            
-            buf = in.readLine();
-            int battleTurnNum = Integer.parseInt(buf);
-            
-            buf = in.readLine();
-            String battleActivePlayerName = new String(buf);
-            
-            buf = in.readLine();
-            int battlePhase = Integer.parseInt(buf);
 
+/*
+            // Battle
             buf = in.readLine();
-            int summonState = Integer.parseInt(buf);
+            MasterHex engagementHex = null;
+            if (buf.length() > 0)
+            {
+                engagementHex = board.getHexFromLabel(buf);
 
-            buf = in.readLine();
-            int carryDamage = Integer.parseInt(buf);
+                buf = in.readLine();
+                int battleTurnNum = Integer.parseInt(buf);
+
+                buf = in.readLine();
+                String battleActivePlayerName = new String(buf);
+
+                buf = in.readLine();
+                int battlePhase = Integer.parseInt(buf);
+
+                buf = in.readLine();
+                int summonState = Integer.parseInt(buf);
+
+                buf = in.readLine();
+                int carryDamage = Integer.parseInt(buf);
+            }
+            else
+            {
+                // No battle, so waste next five lines.
+                buf = in.readLine();
+                buf = in.readLine();
+                buf = in.readLine();
+                buf = in.readLine();
+                buf = in.readLine();
+            }
+*/
 
             // Players
             for (int i = 0; i < numPlayers; i++)
@@ -935,7 +975,7 @@ public final class Game
 
                     buf = in.readLine();
                     boolean recruited = Boolean.valueOf(buf).booleanValue();
-                    
+
                     buf = in.readLine();
                     int battleTally = Integer.parseInt(buf);
 
@@ -954,6 +994,8 @@ public final class Game
                         boolean visible = Boolean.valueOf(buf).booleanValue();
                         critter.setVisible(visible);
 
+/*
+                        // Battle stuff
                         buf = in.readLine();
                         int hits = Integer.parseInt(buf);
                         critter.setHits(hits);
@@ -975,6 +1017,7 @@ public final class Game
                         buf = in.readLine();
                         boolean carry = Boolean.valueOf(buf).booleanValue();
                         critter.setCarryFlag(carry);
+*/
 
                         critters[k] = critter;
                     }
@@ -1013,6 +1056,8 @@ public final class Game
             board.setVisible(true);
             board.repaint();
 
+/*
+            // Battle stuff
             if (engagementHex != null)
             {
                 Legion attacker = engagementHex.getFriendlyLegion(
@@ -1022,11 +1067,13 @@ public final class Game
                 battle = new Battle(board, attacker, defender, engagementHex);
                 map = battle.getBattleMap();
             }
+*/
+
         }
         // FileNotFoundException, IOException, NumberFormatException
         catch (Exception e)
         {
-            System.out.println(e.toString());
+            e.printStackTrace();
             // XXX Ask for another file?  Start new game?
             dispose();
         }

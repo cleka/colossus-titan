@@ -48,7 +48,7 @@ public final class Critter extends Creature
 
         this.visible = visible;
         this.legion = legion;
-        if (name.equals("Titan"))
+        if (name.equals("Titan") && legion != null)
         {
             setPower(getPlayer().getTitanPower());
         }

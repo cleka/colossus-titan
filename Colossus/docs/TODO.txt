@@ -1,3 +1,5 @@
+Reorder guardian and warlock, since guardian is bigger.
+
 Write a minimal, complete Game.loadGame() that reuses existing 
    objects as much as possible.
 

@@ -603,7 +603,12 @@ public final class MasterHex extends Hex
             point.y -= chitScale >> 2;
             Legion legion1 = (Legion)legions.get(1);
             marker = legion1.getMarker();
-            marker.setLocation(point);
+            if (marker != null)
+            {
+                // XXX Second marker can be null when loading during
+                // the engagement phase.
+                marker.setLocation(point);
+            }
         }
         else if (numLegions == 3)
         {

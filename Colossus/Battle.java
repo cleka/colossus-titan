@@ -1729,11 +1729,13 @@ public final class Battle
         switch (getPhase())
         {
             case MOVE:
+                chitSelected = false;
                 highlightMovableChits();
                 break;
 
             case FIGHT:
             case STRIKEBACK:
+                chitSelected = false;
                 highlightChitsWithTargets();
                 break;
 
