@@ -128,6 +128,8 @@ public interface IClient
 
     public void askPickColor(java.util.List colorsLeft);
 
+    public void askPickFirstMarker(Set markersAvailable);
+
     public void log(String message);
 
     public void showChatMessage(String from, String text);

@@ -286,7 +286,7 @@ public final class Game
         nextPickColor();
     }
 
-    private void nextPickColor()
+    void nextPickColor()
     {
         if (colorPickOrder.size() >= 1)
         {
@@ -312,11 +312,12 @@ public final class Game
         {
             server.setPlayerName(player.getName(), color);
             player.setName(color);
+            playerName = color;
         }
         Log.event(player.getName() + " chooses color " + color);
         player.initMarkersAvailable();
 
-        nextPickColor();
+        server.askPickFirstMarker(playerName);
     }
 
     String getNextColorPicker()
@@ -335,8 +336,7 @@ public final class Game
         {
             Player player = (Player)it.next();
 
-            // XXX Need to let player pick first marker along with color.
-            placeInitialLegion(player, player.getFirstAvailableMarker());
+            placeInitialLegion(player, player.getFirstMarker());
             server.allUpdatePlayerInfo();
         }
 

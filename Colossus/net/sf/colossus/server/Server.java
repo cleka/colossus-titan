@@ -1494,6 +1494,29 @@ Log.debug("Server.setPlayerName() from " + playerName + " to " + newName);
         }
     }
 
+    void askPickFirstMarker(String playerName)
+    {
+        Player player = game.getPlayer(playerName);
+        IClient client = getClient(playerName);
+        if (client != null)
+        {
+            client.askPickFirstMarker(player.getMarkersAvailable());
+        }
+    }
+
+    public void assignFirstMarker(String markerId)
+    {
+        Player player = game.getPlayer(getPlayerName());
+        if (!player.getMarkersAvailable().contains(markerId))
+        {
+            Log.error(getPlayerName() + 
+                " illegally called assignFirstMarker()");
+            return;
+        }
+        player.setFirstMarker(markerId);
+        game.nextPickColor();
+    }
+
     /** Hack to set color on load game. */
     synchronized void allSetColor()
     {

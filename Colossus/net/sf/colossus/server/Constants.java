@@ -268,6 +268,8 @@ public final class Constants
     public static final String doSplit = "doSplit";
     public static final String doMove = "doMove";
     public static final String assignColor = "assignColor";
+    public static final String assignFirstMarker = "assignFirstMarker";
+    public static final String askPickFirstMarker = "askPickFirstMarker";
     public static final String relayChatMessage = "relayChatMessage";
     //public static final String newGame = "newGame";
     //public static final String loadGame = "loadGame";

@@ -424,6 +424,13 @@ Log.debug("End of SocketClientThread while loop");
             colorsLeft.addAll(clList);
             client.askPickColor(colorsLeft);
         }
+        else if (method.equals(Constants.askPickFirstMarker))
+        {
+            List maList = Split.split(Glob.sep, (String)args.remove(0));
+            Set markersAvailable = new HashSet();
+            markersAvailable.addAll(maList);
+            client.askPickFirstMarker(markersAvailable);
+        }
         else if (method.equals(Constants.log))
         {
             if (!args.isEmpty())
@@ -648,6 +655,11 @@ Log.debug("End of SocketClientThread while loop");
     public void assignColor(String color)
     {
         out.println(Constants.assignColor + sep + color);
+    }
+
+    public void assignFirstMarker(String markerId)
+    {
+        out.println(Constants.assignFirstMarker + sep + markerId);
     }
 
     public void relayChatMessage(String target, String text)

@@ -3396,12 +3396,18 @@ Log.error("Got nak for move of " + markerId);
         }
     }
 
-    /** Second part of doSplit, after the child marker is picked.
-     * Used for human players only. */
+    /** Called after a marker is picked, either first marker or split. */
     void pickMarkerCallback(String childId)
     {
-        if (parentId == null || childId == null)
+        if (childId == null)
         {
+            return;
+        }
+
+        if (parentId == null)
+        {
+            // Picking first marker.
+            server.assignFirstMarker(childId);
             return;
         }
 
@@ -3492,6 +3498,26 @@ Log.error("Got nak for split of " + parentId);
         setColor(color);
 
         server.assignColor(color);
+    }
+
+    public void askPickFirstMarker(Set markersAvailable)
+    {
+        this.markersAvailable.clear();
+        if (markersAvailable != null)
+        {
+            this.markersAvailable.addAll(markersAvailable);
+        }
+
+        if (getOption(Options.autoPickMarker))
+        {
+            String markerId = ai.pickMarker(markersAvailable, getShortColor());
+            pickMarkerCallback(markerId);
+        }
+        else
+        {
+            new PickMarker(board.getFrame(), playerName, markersAvailable,
+                this);
+        }
     }
 
     String getHexForLegion(String markerId)

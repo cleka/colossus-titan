@@ -382,6 +382,7 @@ Log.debug("revealSomeCreatures() for " + this + " " + cnl);
         // Confirm that all creatures that were certain still fit along
         // with the revealed creatures.
         int count = dupe.size();
+Log.debug("revealSomeCreatures() count is " + count);
         CreatureInfoList certain = getCertainCreatures();
         it = certain.iterator();
         while (it.hasNext())
@@ -394,13 +395,15 @@ Log.debug("revealSomeCreatures() for " + this + " " + cnl);
             else
             {
                 count++;
+Log.debug("revealSomeCreatures() adding " + ci + " count is " + count);
             }
         }
 
         if (count > getHeight())
         {
             throw new PredictSplitsException(
-                "Certainty error in revealSomeCreatures -- count is " + count);
+                "Certainty error in revealSomeCreatures -- count is " + 
+                count + " height is " + getHeight());
         }
 
         // Mark passed creatures as certain and then communicate this to

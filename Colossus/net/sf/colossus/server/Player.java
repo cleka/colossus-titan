@@ -34,6 +34,7 @@ public final class Player implements Comparable
     private String donorId;
     private SortedSet markersAvailable = new TreeSet();
     private String type;               // "Human" or ".*AI"
+    private String firstMarker;
 
 
     Player(String name, Game game)
@@ -152,6 +153,16 @@ public final class Player implements Comparable
         }
     }
 
+
+    void setFirstMarker(String firstMarker)
+    {
+        this.firstMarker = firstMarker;
+    }
+
+    String getFirstMarker()
+    {
+        return firstMarker;
+    }
 
 
     String getShortColor()

@@ -282,6 +282,11 @@ final class SocketServerThread extends Thread implements IClient
             String color = (String)args.remove(0);
             server.assignColor(color);
         }
+        else if (method.equals(Constants.assignFirstMarker))
+        {
+            String markerId = (String)args.remove(0);
+            server.assignFirstMarker(markerId);
+        }
         else if (method.equals(Constants.relayChatMessage))
         {
             String target = (String)args.remove(0);
@@ -606,6 +611,12 @@ final class SocketServerThread extends Thread implements IClient
     public void askPickColor(java.util.List colorsLeft)
     {
         out.println(Constants.askPickColor + sep + Glob.glob(colorsLeft));
+    }
+
+    public void askPickFirstMarker(Set markersAvailable)
+    {
+        out.println(Constants.askPickFirstMarker + sep + 
+            Glob.glob(markersAvailable));
     }
 
     public void log(String message)

@@ -71,10 +71,12 @@ Bug: Saw 8-high enemy legion 3xUni, Chi, 3xGri, Ran.  Height shows up
 Bug: LOSTest is failing.
 
 Bug: 1_LATEST_IS_date is broken in remote_inst.  Can't delete previous
-   1_LATEST_IS file
+   1_LATEST_IS file  Works from RH 7.3 box.
+
+Bug: Titan teleport onto chaff stack in tower, 1 warlock left, recruitChit
+   shows ogre instead of warlock.
 
 Have server send marker names.
-Let client pick starting marker along with color.
 
 Toolbar, or at least Done button.
 
