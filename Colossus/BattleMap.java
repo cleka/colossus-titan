@@ -533,7 +533,7 @@ public class BattleMap extends Frame implements MouseListener,
     private boolean LOSBlockedDir(Hex initialHex, Hex currentHex, Hex finalHex, 
         boolean left, int strikeElevation, boolean strikerAtop, boolean
         strikerAtopCliff, boolean midObstacle, boolean midCliff, boolean 
-        midChit)
+        midChit, int totalObstacles)
     {
         boolean targetAtop = false;
         boolean targetAtopCliff = false;
@@ -571,6 +571,7 @@ public class BattleMap extends Frame implements MouseListener,
             if (hexside != ' ')
             {
                 strikerAtop = true; 
+                totalObstacles++;
                 if (hexside == 'c')
                 {
                     strikerAtopCliff = true;
@@ -580,6 +581,7 @@ public class BattleMap extends Frame implements MouseListener,
             if (hexside2 != ' ')
             {
                 midObstacle = true;
+                totalObstacles++;
                 if (hexside2 == 'c')
                 {
                     midCliff = true;
@@ -591,6 +593,7 @@ public class BattleMap extends Frame implements MouseListener,
             if (hexside != ' ')
             {
                 midObstacle = true;
+                totalObstacles++;
                 if (hexside == 'c')
                 {
                     midCliff = true;
@@ -600,6 +603,7 @@ public class BattleMap extends Frame implements MouseListener,
             if (hexside2 != ' ')
             {
                 targetAtop = true;
+                totalObstacles++;
                 if (hexside2 == 'c')
                 {
                     targetAtopCliff = true;
@@ -621,6 +625,14 @@ public class BattleMap extends Frame implements MouseListener,
                 return true;
             }
 
+            // If there are three slopes, striker and target must each
+            //     be atop one.
+            if (totalObstacles >= 3 && (!strikerAtop || !targetAtop) &&
+                (!strikerAtopCliff && !targetAtopCliff))
+            {
+                return true;
+            }
+
             // Success!
             return false;
         }
@@ -637,6 +649,7 @@ public class BattleMap extends Frame implements MouseListener,
             if (hexside != ' ' || hexside2 != ' ')
             {
                 midObstacle = true;
+                totalObstacles++;
                 if (hexside == 'c' || hexside2 == 'c')
                 {
                     midCliff = true;
@@ -661,7 +674,7 @@ public class BattleMap extends Frame implements MouseListener,
 
         return LOSBlockedDir(initialHex, nextHex, finalHex, left, 
             strikeElevation, strikerAtop, strikerAtopCliff, 
-            midObstacle, midCliff, midChit);
+            midObstacle, midCliff, midChit, totalObstacles);
     }
 
 
@@ -703,26 +716,25 @@ public class BattleMap extends Frame implements MouseListener,
         int strikeElevation = Math.min(hex1.getElevation(), 
             hex2.getElevation());
 
-        if (yDist == 0 || yDist == 1.5 * xDist || yDist == -1.5 * xDist)
+        if (yDist == 0 || Math.abs(yDist) == 1.5 * Math.abs(xDist))
         {
             // Hexspine; try both sides.
             return (LOSBlockedDir(hex1, hex1, hex2, true, strikeElevation,
-                false, false, false, false, false) &&
+                false, false, false, false, false, 0) &&
                 LOSBlockedDir(hex1, hex1, hex2, false, strikeElevation, 
-                false, false, false, false, false));
+                false, false, false, false, false, 0));
         }
-        else if ((xDist / yDist > 0 && yDist < 1.5 * xDist) ||
-            yDist < -1.5 * xDist)
+        else if (xDist / yDist > 0)
         {
             // LOS to left
             return LOSBlockedDir(hex1, hex1, hex2, true, strikeElevation,
-                false, false, false, false, false);
+                false, false, false, false, false, 0);
         }
         else
         {
             // LOS to right
             return LOSBlockedDir(hex1, hex1, hex2, false, strikeElevation,
-                false, false, false, false, false);
+                false, false, false, false, false, 0);
         }
     }
 
@@ -992,19 +1004,22 @@ public class BattleMap extends Frame implements MouseListener,
         float xDist = x2 - x1;
         float yDist = y2 - y1;
 
-        // Hexspine; try both sides.
-        if (yDist == 0 || yDist == 1.5 * xDist || yDist == -1.5 * xDist) 
+        if (yDist == 0 || Math.abs(yDist) == 1.5 * Math.abs(xDist))
         {
+            // Hexspine; try both sides.
             return Math.min(countBrambleHexesDir(hex1, hex2, true, 0), 
                 countBrambleHexesDir(hex1, hex2, false, 0));
         }
-        else if ((xDist / yDist > 0 && yDist < 1.5 * xDist) || 
-            yDist < -1.5 * xDist)
+        
+        else if (xDist / yDist > 0)
         {
+            // LOS to left
             return countBrambleHexesDir(hex1, hex2, true, 0);
         }
+        
         else
         {
+            // LOS to right
             return countBrambleHexesDir(hex1, hex2, false, 0);
         }
     }
