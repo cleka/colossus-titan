@@ -69,11 +69,11 @@ class Concede extends JDialog implements ActionListener
                 2 * scale, scale, enemy.getCreature(i).getImageName(), this);
         }
 
-        friendMarker = new Chit(scale / 5, scale / 2, scale,
-            friend.getImageName(), this);
+        friendMarker = new Marker(scale / 5, scale / 2, scale,
+            friend.getImageName(), this, friend);
 
-        enemyMarker = new Chit(scale / 5, 2 * scale, scale,
-            enemy.getImageName(), this);
+        enemyMarker = new Marker(scale / 5, 2 * scale, scale,
+            enemy.getImageName(), this, enemy);
 
         tracker = new MediaTracker(this);
 
