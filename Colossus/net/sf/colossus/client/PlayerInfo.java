@@ -54,33 +54,33 @@ public final class PlayerInfo
         String buf;
 
         buf = (String)data.remove(0);
-        dead = Boolean.valueOf(buf).booleanValue();
+        setDead(Boolean.valueOf(buf).booleanValue());
 
-        name = ((String)data.remove(0));
+        setName((String)data.remove(0));
 
-        tower = ((String)data.remove(0));
+        setTower((String)data.remove(0));
 
-        color = (String)data.remove(0);
+        setColor((String)data.remove(0));
 
-        playersElim = (String)data.remove(0);
-
-        buf = (String)data.remove(0);
-        numLegions = Integer.parseInt(buf);
+        setPlayersElim((String)data.remove(0));
 
         buf = (String)data.remove(0);
-        numCreatures = Integer.parseInt(buf);
+        setNumLegions(Integer.parseInt(buf));
 
         buf = (String)data.remove(0);
-        titanPower = Integer.parseInt(buf);
+        setNumCreatures(Integer.parseInt(buf));
 
         buf = (String)data.remove(0);
-        score = Integer.parseInt(buf);
+        setCreatureValue(Integer.parseInt(buf));
 
         buf = (String)data.remove(0);
-        creatureValue = Integer.parseInt(buf);
+        setTitanPower(Integer.parseInt(buf));
 
         buf = (String)data.remove(0);
-        mulligansLeft = Integer.parseInt(buf);
+        setScore(Integer.parseInt(buf));
+
+        buf = (String)data.remove(0);
+        setMulligansLeft(Integer.parseInt(buf));
 
         if (!data.isEmpty())
         {
@@ -89,23 +89,24 @@ public final class PlayerInfo
                 markersAvailable = new TreeSet(new MarkerComparator(
                     getShortColor()));
             }
-            else
-            {
-                markersAvailable.clear();
-            }
-            markersAvailable.addAll(data);
+            setMarkersAvailable(data);
         }
     }
 
+
+    void setDead(boolean dead)
+    {
+        this.dead = dead;
+    }
 
     boolean isDead()
     {
         return dead;
     }
 
-    void setDead(boolean dead)
+    void setName(String name)
     {
-        this.dead = dead;
+        this.name = name;
     }
 
     public String getName()
@@ -113,9 +114,19 @@ public final class PlayerInfo
         return name;
     }
 
+    void setTower(String tower)
+    {
+        this.tower = tower;
+    }
+
     public String getTower()
     {
         return tower;
+    }
+
+    void setColor(String color)
+    {
+        this.color = color;
     }
 
     String getColor()
@@ -123,9 +134,14 @@ public final class PlayerInfo
         return color;
     }
 
-    public String getShortColor()
+    String getShortColor()
     {
         return Player.getShortColor(getColor());
+    }
+
+    void setPlayersElim(String playersElim)
+    {
+        this.playersElim = playersElim;
     }
 
     String getPlayersElim()
@@ -133,9 +149,35 @@ public final class PlayerInfo
         return playersElim;
     }
 
+    void setNumLegions(int numLegions)
+    {
+        this.numLegions = numLegions;
+    }
+
     int getNumLegions()
     {
         return numLegions;
+    }
+
+    void setMarkersAvailable(Collection markersAvailable)
+    {
+        this.markersAvailable.clear();
+        this.markersAvailable.addAll(markersAvailable);
+    }
+
+    void addMarkerAvailable(String markerId)
+    {
+        markersAvailable.add(markerId);
+    }
+
+    void removeMarkerAvailable(String markerId)
+    {
+        markersAvailable.remove(markerId);
+    }
+
+    Set getMarkersAvailable()
+    {
+        return Collections.unmodifiableSortedSet(markersAvailable);
     }
 
     int getNumMarkers()
@@ -150,9 +192,19 @@ public final class PlayerInfo
         }
     }
 
+    void setNumCreatures(int numCreatures)
+    {
+        this.numCreatures = numCreatures;
+    }
+
     int getNumCreatures()
     {
         return numCreatures;
+    }
+
+    void setCreatureValue(int creatureValue)
+    {
+        this.creatureValue = creatureValue;
     }
 
     int getCreatureValue()
@@ -160,9 +212,19 @@ public final class PlayerInfo
         return creatureValue;
     }
 
+    void setTitanPower(int titanPower)
+    {
+        this.titanPower = titanPower;
+    }
+
     int getTitanPower()
     {
         return titanPower;
+    }
+
+    void setScore(int score)
+    {
+        this.score = score;
     }
 
     public int getScore()
@@ -170,16 +232,21 @@ public final class PlayerInfo
         return score;
     }
 
-    public int getMulligansLeft()
-    {
-        return mulligansLeft;
-    }
-    
     boolean canTitanTeleport()
     {
         return (score >= TerrainRecruitLoader.getTitanTeleportValue());
     }
 
+    void setMulligansLeft(int mulligansLeft)
+    {
+        this.mulligansLeft = mulligansLeft;
+    }
+
+    int getMulligansLeft()
+    {
+        return mulligansLeft;
+    }
+    
     boolean hasTeleported()
     {
         Iterator it = getLegionIds().iterator();
@@ -196,7 +263,7 @@ public final class PlayerInfo
     }
 
     /** Return the number of this player's legions that have moved. */
-    public int numLegionsMoved()
+    int numLegionsMoved()
     {
         int count = 0;
 
@@ -213,30 +280,15 @@ public final class PlayerInfo
         return count;
     }
 
-    public int numMobileLegions()
+    int numMobileLegions()
     {
         return getNumLegions() - numLegionsMoved();
     }
 
     /** Return a List of markerIds. */
-    public List getLegionIds()
+    List getLegionIds()
     {
         return client.getLegionsByPlayer(name);
-    }
-
-    Set getMarkersAvailable()
-    {
-        return Collections.unmodifiableSortedSet(markersAvailable);
-    }
-
-    void addMarkerAvailable(String markerId)
-    {
-        markersAvailable.add(markerId);
-    }
-
-    void removeMarkerAvailable(String markerId)
-    {
-        markersAvailable.remove(markerId);
     }
 
     void removeAllLegions()

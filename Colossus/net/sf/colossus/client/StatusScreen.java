@@ -30,7 +30,6 @@ final class StatusScreen extends KDialog implements WindowListener
     private JLabel [] legionsLabel;
     private JLabel [] markersLabel;
     private JLabel [] creaturesLabel;
-    private JLabel [] valueLabel;
     private JLabel [] titanLabel;
     private JLabel [] scoreLabel;
 
@@ -104,7 +103,6 @@ final class StatusScreen extends KDialog implements WindowListener
         creaturesLabel = new JLabel[numPlayers];
         titanLabel = new JLabel[numPlayers];
         scoreLabel = new JLabel[numPlayers];
-        valueLabel = new JLabel[numPlayers];
 
         gridPane.add(new JLabel("Player"));
         for (int i = 0; i < numPlayers; i++)
@@ -160,14 +158,6 @@ final class StatusScreen extends KDialog implements WindowListener
             creaturesLabel[i] = new JLabel();
             creaturesLabel[i].setOpaque(true);
             gridPane.add(creaturesLabel[i]);
-        }
-
-        gridPane.add(new JLabel("Value"));
-        for (int i = 0; i < numPlayers; i++)
-        {
-            valueLabel[i] = new JLabel();
-            valueLabel[i].setOpaque(true);
-            gridPane.add(valueLabel[i]);
         }
 
         gridPane.add(new JLabel("Titan Size"));
@@ -230,7 +220,6 @@ final class StatusScreen extends KDialog implements WindowListener
             legionsLabel[i].setBackground(color);
             markersLabel[i].setBackground(color);
             creaturesLabel[i].setBackground(color);
-            valueLabel[i].setBackground(color);
             titanLabel[i].setBackground(color);
             scoreLabel[i].setBackground(color);
         }
@@ -271,7 +260,6 @@ final class StatusScreen extends KDialog implements WindowListener
             legionsLabel[i].setText("" + info.getNumLegions());
             markersLabel[i].setText("" + info.getNumMarkers());
             creaturesLabel[i].setText("" + info.getNumCreatures());
-            valueLabel[i].setText("" + info.getCreatureValue());
             titanLabel[i].setText("" + info.getTitanPower());
             scoreLabel[i].setText("" + info.getScore());
         }
