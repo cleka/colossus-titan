@@ -37,6 +37,8 @@ Bug: Got two "All humans eliminated" dialogs -- one for human and one
 
 Bug: LOSTest is failing.
 
+Un-hardcode the marker names from Legion.java and put them in a data file.
+
 When saving game explicitly (not with autosave), log the event
    and the full savegame path.
 
