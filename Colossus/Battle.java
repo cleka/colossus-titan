@@ -2,8 +2,12 @@ import java.util.*;
 import javax.swing.*;
 import java.awt.event.*;
 
+import net.sf.colossus.battle.*;
+
 /**
- * Class Battle holds data about a Titan battle.
+ * Class Battle holds data about a Titan battle. It has utility functions
+ * related to incrementing the phase, managing moves, and managing
+ * strikes
  *
  * @version $Id$
  * @author David Ripton
@@ -2042,6 +2046,58 @@ public final class Battle
             }
         }
         return null;
+    }
+
+    BattleMemo saveToMemo()
+        {
+            BattleMemo oMemo = null;
+            Legion oDefenderLegion = getActiveLegion();
+            Legion oAttackerLegion = getInactiveLegion();
+            LegionMemo oAttackerMemo = oAttackerLegion.saveToMemo();
+            LegionMemo oDefenderMemo = oDefenderLegion.saveToMemo();
+
+            int nEntrySide = -1;
+            nEntrySide = oAttackerLegion.getEntrySide(masterHexLabel);
+            boolean bHasSummoned = oAttackerLegion.getPlayer().hasSummoned(); 
+            boolean bAngelAvailable = oAttackerLegion.angelAvailable();
+            boolean bArchangelAvailable = oAttackerLegion.archangelAvailable();
+
+            oMemo = new BattleMemo(
+                oAttackerMemo,
+                oDefenderMemo,
+                bAngelAvailable,
+                bArchangelAvailable,
+                terrain,
+                masterHexLabel,
+                nEntrySide);
+
+            return oMemo;
+        }
+
+    private static Game makeLegionsAndReturnGame(BattleMemo oMemo)
+    {
+        Game game = new Game();
+        game.addPlayer("Attacker");
+        Player player1 = game.getPlayer(0);
+        game.addPlayer("Defender");
+        Player player2 = game.getPlayer(1);
+        game.initBoard();
+        Legion attacker = new Legion(game, oMemo.getAttacker());
+        Legion defender = new Legion(game, oMemo.getDefender());
+        attacker.setEntrySide(oMemo.getMasterHex(), oMemo.getEntrySide());
+
+        return game;
+    }
+
+    public Battle(BattleMemo oMemo)
+    {
+        this(makeLegionsAndReturnGame(oMemo), 
+             oMemo.getAttacker().getMarkerId(),
+             oMemo.getDefender().getMarkerId(),
+             Battle.DEFENDER,
+             oMemo.getAttacker().getCurrentHexLabel(),
+             1,
+             Battle.MOVE);
     }
 
 
