@@ -85,7 +85,7 @@ class SplitLegion extends Dialog implements MouseListener, ActionListener
                 tracker.addImage(oldChits[i].getImage(), 0);
             }
             tracker.addImage(oldMarker.getImage(), 0);
-            tracker.addImage(newLegion.getChit().getImage(), 0);
+            tracker.addImage(newLegion.getMarker().getImage(), 0);
 
             try
             {
@@ -121,7 +121,7 @@ class SplitLegion extends Dialog implements MouseListener, ActionListener
 
         oldMarker.paint(g);
 
-        newLegion.getChit().paint(g);
+        newLegion.getMarker().paint(g);
 
         for (int i = oldLegion.getHeight() - 1; i >= 0; i--)
         {
@@ -262,7 +262,7 @@ class SplitLegion extends Dialog implements MouseListener, ActionListener
             // The split is legal.
 
             // Resize the new legion to MasterBoard scale.
-            newLegion.getChit().rescale(oldLegion.getChit().getBounds().width);
+            newLegion.getMarker().rescale(oldLegion.getMarker().getBounds().width);
 
             // Add the new legion to the player.
             player.addLegion(newLegion);

@@ -119,7 +119,7 @@ class MasterBoard extends Frame implements MouseListener,
 
         for (int i = 0; i < game.getNumPlayers(); i++)
         {
-            tracker.addImage(game.getPlayer(i).getLegion(0).getChit().
+            tracker.addImage(game.getPlayer(i).getLegion(0).getMarker().
                 getImage(), 0);
         }
 
@@ -1063,7 +1063,7 @@ class MasterBoard extends Frame implements MouseListener,
             for (int j = 0; j < player.getNumLegions(); j++)
             {
                 Legion legion = player.getLegion(j);
-                if (legion.getChit().select(point))
+                if (legion.getMarker().select(point))
                 {
                     // What to do depends on which mouse button was used
                     // and the current phase of the turn.
@@ -1366,9 +1366,9 @@ class MasterBoard extends Frame implements MouseListener,
             for (int j = player.getNumLegions() - 1; j >= 0; j--)
             {
                 if (rectClip.intersects(
-                    player.getLegion(j).getChit().getBounds()))
+                    player.getLegion(j).getMarker().getBounds()))
                 {
-                    player.getLegion(j).getChit().paint(gBack);
+                    player.getLegion(j).getMarker().paint(gBack);
                 }
             }
         }

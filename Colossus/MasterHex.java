@@ -581,7 +581,7 @@ class MasterHex
             return;
         }
 
-        int chitScale = legions[0].getChit().getBounds().width;
+        int chitScale = legions[0].getMarker().getBounds().width;
         Point point = getOffCenter();
 
         if (numLegions == 1)
@@ -589,36 +589,36 @@ class MasterHex
             // Place legion in the center of the hex.
             point.x -= chitScale / 2;
             point.y -= chitScale / 2;
-            legions[0].getChit().setLocationAbs(point);     
+            legions[0].getMarker().setLocationAbs(point);     
         }
         else if (numLegions == 2)
         {
             // Place legions in NW and SE corners.
             point.x -= 3 * chitScale / 4;
             point.y -= 3 * chitScale / 4;
-            legions[0].getChit().setLocationAbs(point);
+            legions[0].getMarker().setLocationAbs(point);
 
             point = getOffCenter();
             point.x -= chitScale / 4;
             point.y -= chitScale / 4;
-            legions[1].getChit().setLocationAbs(point);
+            legions[1].getMarker().setLocationAbs(point);
         }
         else if (numLegions == 3)
         {
             // Place legions in NW, SE, NE corners.
             point.x -= 3 * chitScale / 4;
             point.y -= 3 * chitScale / 4;
-            legions[0].getChit().setLocationAbs(point);
+            legions[0].getMarker().setLocationAbs(point);
 
             point = getOffCenter();
             point.x -= chitScale / 4;
             point.y -= chitScale / 4;
-            legions[1].getChit().setLocationAbs(point);
+            legions[1].getMarker().setLocationAbs(point);
 
             point = getOffCenter();
             point.x -= chitScale / 4;
             point.y -= chitScale;
-            legions[2].getChit().setLocationAbs(point);
+            legions[2].getMarker().setLocationAbs(point);
         }
     }
     
