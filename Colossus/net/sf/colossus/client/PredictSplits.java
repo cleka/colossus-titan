@@ -52,7 +52,58 @@ public final class PredictSplits
             leaves.addAll(getLeaves(node.getChild1()));
             leaves.addAll(getLeaves(node.getChild2()));
         }
+
+        TreeSet prunes = new TreeSet(new ReverseIntegerComparator());
+
+        // If duplicate markerIds, prune the older node.
+        for (int i = 0; i < leaves.size(); i++)
+        {
+            for (int j = 0; j < leaves.size(); j++)
+            {
+                if (i != j) 
+                {
+                    Node leaf1 = (Node)leaves.get(i);
+                    Node leaf2 = (Node)leaves.get(j);
+                    if (leaf1.getMarkerId().equals(leaf2.getMarkerId()))
+                    {
+                        if (leaf1.getTurnCreated() == leaf2.getTurnCreated())
+                        {
+                            throw new PredictSplitsException(
+                                "Two leaf nodes with same markerId and turn");
+                        }
+                    }
+                    else if (leaf1.getTurnCreated() < leaf2.getTurnCreated())
+                    {
+                        prunes.add(new Integer(i));
+                    }
+                    else
+                    {
+                        prunes.add(new Integer(j));
+                    }
+                }
+            }
+        }
+        // Remove in reverse order to keep indexes consistent.
+        Iterator it = prunes.iterator();
+        while (it.hasNext())
+        {
+            Integer in = (Integer)it.next();
+            leaves.remove(in.intValue());
+        }
+
         return leaves;
+    }
+
+    class ReverseIntegerComparator implements Comparator
+    {
+        // Sort in reverse, so we don't disturb array 
+        // indexes when removing.
+        public int compare(Object o1, Object o2)
+        {
+            Integer in1 = (Integer)o1;
+            Integer in2 = (Integer)o2;
+            return in2.compareTo(in1);
+        }
     }
 
     /** Print all childless nodes in tree. */
@@ -152,9 +203,14 @@ class Node
         return child2;
     }
 
+    int getTurnCreated()
+    {
+        return turnCreated;
+    }
+
     public String toString()
     {
-        // XXX Collections.sort(creatures, cic);
+        Collections.sort(creatures, cic);
         StringBuffer sb = new StringBuffer(getFullName() + ":");
         Iterator it = creatures.iterator();
         while (it.hasNext())
@@ -310,6 +366,7 @@ class Node
 
     void revealSomeCreatures(CreatureNameList cnl)
     {
+Log.debug("revealSomeCreatures() for " + this + " " + cnl);
         CreatureInfoList cil = new CreatureInfoList();
         Iterator it = cnl.iterator();
         while (it.hasNext())
@@ -342,7 +399,7 @@ class Node
         if (count > getHeight())
         {
             throw new PredictSplitsException(
-                "Certainty error in revealSomeCreatures");
+                "Certainty error in revealSomeCreatures -- count is " + count);
         }
 
         // Mark passed creatures as certain and then communicate this to
@@ -404,6 +461,7 @@ class Node
             creatures.removeLastUncertainCreature();
         }
 
+Log.debug("revealSomeCreatures() " + this);
         parent.tellChildContents(this);
     }
 
@@ -414,7 +472,7 @@ class Node
         while (it.hasNext())
         {
             String name = (String)it.next();
-            cnl.add(new CreatureInfo(name, true, true));
+            cil.add(new CreatureInfo(name, true, true));
         }
 
         // Confirm that all creatures that were certain are there.
@@ -590,6 +648,7 @@ class Node
             CreatureInfo ci = (CreatureInfo)it.next();
             splitoffNames.add(ci.getName());
         }
+Log.debug("splitoffNames is " + splitoffNames);
 
         CreatureInfoList strongList = new CreatureInfoList();
         CreatureInfoList weakList = new CreatureInfoList();
@@ -633,7 +692,14 @@ class Node
         }
 
         // Assume that the bigger stack got the better creatures.
-        flipped = (2 * childSize >= getHeight());
+        if (childSize + childSize <= getHeight())
+        {
+            flipped = false;
+        }
+        else
+        {
+            flipped = true;
+        }
 
         String marker1 = null;
         String marker2 = null;
@@ -683,6 +749,8 @@ class Node
             childSize1 = child1.getHeight();
             childSize2 = child2.getHeight();
         }
+Log.debug("child1: " + child1);
+Log.debug("child2: " + child2);
     }
 
     /** Tell this parent legion the known contents of one of its
@@ -697,6 +765,10 @@ class Node
         // adjust this legion's contents and tell its parent and other kid.
         CreatureInfoList childAtSplit = child.getAtSplitCreatures();
 
+Log.debug("tellChildContents for node " + this + " from node " + child);
+Log.debug("child atSplit is " + childAtSplit);
+
+
         if (!creatures.isSupersetOf(childAtSplit))
         {
             if (parent == null)
@@ -706,6 +778,7 @@ class Node
             else
             {
                 // Re-predict this node's parent's split.
+Log.debug("Re-predicting parent split");
                 revealSomeCreatures(childAtSplit.getCreatureNames());
             }
         }
@@ -768,7 +841,7 @@ class Node
         }
         CreatureInfo ci = creatures.getCreatureInfo(creatureName);
         CreatureNameList cnl = new CreatureNameList();
-        cnl.add(ci);
+        cnl.add(ci.getName());
         revealSomeCreatures(cnl);
 
         // Only need to track the removed creature for future parent split
@@ -792,12 +865,14 @@ class Node
 
     void removeAllCreatures()
     {
+        CreatureNameList cnl = new CreatureNameList();
         Iterator it = creatures.iterator();
         while (it.hasNext())
         {
             CreatureInfo ci = (CreatureInfo)it.next();
-            removeCreature(ci.getName());
+            cnl.add(ci.getName());
         }
+        removeCreatures(cnl);
     }
 }
 

@@ -9,6 +9,8 @@ import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.util.Log;
 
 
+// XXX Handle the case where initial split puts Titan in Rd02
+
 /**
  *  JUnit test for split prediction.
  *  @version $Id$
