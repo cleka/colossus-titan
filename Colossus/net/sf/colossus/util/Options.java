@@ -120,6 +120,16 @@ public final class Options
     
     public void saveOptions()
     {
+        File optionsDir = new File(optionsPath);
+        if (!optionsDir.exists() || !optionsDir.isDirectory())
+        {
+             if (!optionsDir.mkdirs())
+             {
+                 Log.error("Could not create options directory");
+                 return;
+             }
+        }
+
         String optionsFile = getOptionsFilename();
         try
         {

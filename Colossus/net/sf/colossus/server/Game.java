@@ -1116,7 +1116,7 @@ Log.debug("Called Game.assignTowers() with balanced = " + balanced);
         File savesDir = new File(Constants.saveDirname);
         if (!savesDir.exists() || !savesDir.isDirectory())
         {
-             if (!savesDir.mkdir())
+             if (!savesDir.mkdirs())
              {
                  Log.error("Could not create saves directory");
                  return;
