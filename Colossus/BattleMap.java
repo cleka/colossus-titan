@@ -8,7 +8,7 @@ import java.awt.event.*;
  */
 
 public class BattleMap extends Frame implements MouseListener,
-    MouseMotionListener, WindowListener
+    WindowListener
 {
     private BattleHex[][] h = new BattleHex[6][6];
 
@@ -97,18 +97,11 @@ public class BattleMap extends Frame implements MouseListener,
         pack();
         setSize(getPreferredSize());
 
-        if (location == null)
-        {
-            location = new Point(scale, scale);
-        }
-        setLocation(location);
-
         setupIcon();
 
         setBackground(Color.white);
         addWindowListener(this);
         addMouseListener(this);
-        addMouseMotionListener(this);
 
         validate();
 
@@ -123,7 +116,7 @@ public class BattleMap extends Frame implements MouseListener,
         BattleHex entrance = getEntrance(attacker);
         for (int i = 0; i < attackerHeight; i++)
         {
-            chits[i] = new BattleChit(0, 0, chitScale,
+            chits[i] = new BattleChit(-1, -1, chitScale,
                 attacker.getCritter(i).getImageName(false), this,
                 attacker.getCritter(i), entrance,
                 attacker, this);
@@ -135,7 +128,7 @@ public class BattleMap extends Frame implements MouseListener,
         entrance = getEntrance(defender);
         for (int i = attackerHeight; i < numChits; i++)
         {
-            chits[i] = new BattleChit(0, 0, chitScale,
+            chits[i] = new BattleChit(-1, -1, chitScale,
                 defender.getCritter(i - attackerHeight).getImageName(true),
                 this, defender.getCritter(i - attackerHeight), entrance,
                 defender, this);
@@ -150,8 +143,7 @@ public class BattleMap extends Frame implements MouseListener,
         }
         catch (InterruptedException e)
         {
-            new MessageBox(this, e.toString() +
-                " waitForAll was interrupted");
+            new MessageBox(this, e.toString() + " waitForAll was interrupted");
         }
         imagesLoaded = true;
 
@@ -160,6 +152,14 @@ public class BattleMap extends Frame implements MouseListener,
         attacker.clearBattleTally();
         defender.clearBattleTally();
 
+        pack();
+        
+        if (location == null)
+        {
+            location = new Point(scale, scale);
+        }
+        setLocation(location);
+
         setVisible(true);
         repaint();
     }
@@ -167,7 +167,7 @@ public class BattleMap extends Frame implements MouseListener,
 
     private void setupIcon()
     {
-        if (board.getGame().isApplet())
+        if (board != null && board.getGame().isApplet())
         {
             try
             {
@@ -193,7 +193,7 @@ public class BattleMap extends Frame implements MouseListener,
         int height = legion.getHeight();
         Critter critter = legion.getCritter(height - 1);
 
-        chits[numChits] = new BattleChit(0, 0, chitScale,
+        chits[numChits] = new BattleChit(-1, -1, chitScale,
             critter.getImageName(legion == defender), this, critter,
             entrance, legion, this);
 
@@ -511,20 +511,17 @@ public class BattleMap extends Frame implements MouseListener,
                 currentHex.getOppositeHexside(i) != 'c')
             {
                 BattleHex hex = currentHex.getNeighbor(i);
-                if (hex != null)
+                if (hex != null && hex.isOccupied())
                 {
-                    if (hex.isOccupied())
+                    BattleChit bogie = hex.getChit();
+                    if (bogie.getPlayer() != player && !bogie.isDead())
                     {
-                        BattleChit bogie = hex.getChit();
-                        if (bogie.getPlayer() != player && !bogie.isDead())
+                        if (highlight)
                         {
-                            if (highlight)
-                            {
-                                hex.select();
-                                hex.repaint();
-                            }
-                            count++;
+                            hex.select();
+                            hex.repaint();
                         }
+                        count++;
                     }
                 }
             }
@@ -559,7 +556,6 @@ public class BattleMap extends Frame implements MouseListener,
                 }
             }
         }
-        repaint();
 
         return count;
     }
@@ -1856,6 +1852,7 @@ public class BattleMap extends Frame implements MouseListener,
                 chitSelected = true;
 
                 // Put selected chit at the top of the Z-order.
+
                 if (i != 0)
                 {
                     BattleChit tmpchit = chits[i];
@@ -1952,17 +1949,7 @@ public class BattleMap extends Frame implements MouseListener,
     }
 
 
-    public void mouseDragged(MouseEvent e)
-    {
-    }
-
-
     public void mouseReleased(MouseEvent e)
-    {
-    }
-
-
-    public void mouseMoved(MouseEvent e)
     {
     }
 
@@ -2036,8 +2023,14 @@ public class BattleMap extends Frame implements MouseListener,
             return;
         }
 
-        Dimension d = getSize();
+        // Abort if called too early.
         rectClip = g.getClipBounds();
+        if (rectClip == null)
+        {
+            return;
+        }
+        
+        Dimension d = getSize();
 
         // Create the back buffer only if we don't have a good one.
         if (offGraphics == null || d.width != offDimension.width ||
@@ -2088,13 +2081,13 @@ public class BattleMap extends Frame implements MouseListener,
 
     public Dimension getMinimumSize()
     {
-        return getPreferredSize();
+        return new Dimension(30 * scale, 28 * scale);
     }
 
 
     public Dimension getPreferredSize()
     {
-        return new Dimension(30 * scale, 28 * scale);
+        return new Dimension(30 * scale, 30 * scale);
     }
 
 
@@ -2110,11 +2103,11 @@ public class BattleMap extends Frame implements MouseListener,
     {
         Player player1 = new Player("Attacker", null);
         Player player2 = new Player("Defender", null);
-        Legion attacker = new Legion(0, 0, chitScale, null, null, null, 7,
+        Legion attacker = new Legion(chitScale, "Bk01", null, null, 7,
             null, Creature.ogre, Creature.troll, Creature.ranger,
             Creature.hydra, Creature.griffon, Creature.angel,
             Creature.warlock, null, player1);
-        Legion defender = new Legion(0, 0, chitScale, null, null, null, 7,
+        Legion defender = new Legion(chitScale, "Rd01", null, null, 7,
             null, Creature.centaur, Creature.lion, Creature.gargoyle,
             Creature.cyclops, Creature.gorgon, Creature.guardian,
             Creature.minotaur, null, player2);
