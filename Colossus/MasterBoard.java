@@ -48,7 +48,7 @@ public class MasterBoard extends Frame implements MouseListener,
     private Image offImage;
     private Graphics gBack;
     private Dimension offDimension;
-    private boolean needToClear;
+//    private boolean needToClear;
     private MediaTracker tracker;
     private boolean imagesLoaded;
     private int scale;
@@ -71,7 +71,7 @@ public class MasterBoard extends Frame implements MouseListener,
         addMouseMotionListener(this);
 
         // tracking = -1;
-        needToClear = false;
+        // needToClear = false;
         imagesLoaded = false;
 
         // Initialize the hexmap
@@ -83,24 +83,26 @@ public class MasterBoard extends Frame implements MouseListener,
             PickMarker pickmarker = new PickMarker(this, game.player[i]);
         }
 
-        // Update status window
+        // Update status window to reflect markers taken.
         game.updateStatusScreen();
 
         // Place initial legions.
         for (int i = 0; i < game.numPlayers; i++)
         {
             // Lookup coords for chit starting from player[i].startingTower
-            Point point = get_vertex_from_label(100 * 
-                game.player[i].startingTower);
+            Point point = getOffCenterFromLabel(100 * game.player[i].startingTower);
 
-            game.player[i].legions[0] = new Legion(point.x + scale, 
-                point.y + scale, 60, game.player[i].markerSelected, this, 8, 
-                Creature.titan, Creature.angel, Creature.ogre, Creature.ogre, 
-                Creature.centaur, Creature.centaur, Creature.gargoyle, 
-                Creature.gargoyle);
+            game.player[i].legions[0] = new Legion(point.x - (3 * scale / 2), 
+                point.y - (3 * scale / 2), 3 * scale, game.player[i].markerSelected, 
+                this, 8, Creature.titan, Creature.angel, Creature.ogre, 
+                Creature.ogre, Creature.centaur, Creature.centaur, 
+                Creature.gargoyle, Creature.gargoyle);
 
             game.player[i].numLegions = 1;
         }
+
+        // Update status window to reflect new legions.
+        game.updateStatusScreen();
 
         tracker = new MediaTracker(this);
 
@@ -135,8 +137,9 @@ public class MasterBoard extends Frame implements MouseListener,
 
 
     // Do a brute-force search through the hex array, looking for
-    //    a match.  Return the northwest vertex of that hex.
-    Point get_vertex_from_label(int label)
+    //    a match.  Return a point near the center of that hex,
+    //    vertically offset a bit toward the fat side.
+    Point getOffCenterFromLabel(int label)
     {
         for (int i = 0; i < h.length; i++)
         {
@@ -144,7 +147,9 @@ public class MasterBoard extends Frame implements MouseListener,
             {
                 if (show[i][j] && h[i][j].label == label)
                 {
-                    return new Point(h[i][j].xVertex[0], h[i][j].yVertex[0]);
+                    return new Point((h[i][j].xVertex[0] + h[i][j].xVertex[1]) / 2, 
+                        (h[i][j].yVertex[0] + h[i][j].yVertex[3]) / 2 +
+                        (h[i][j].inverted ? -(scale / 2) : (scale / 2)));
                 }
             }
         }
@@ -759,6 +764,21 @@ public class MasterBoard extends Frame implements MouseListener,
         }
 */
 
+        for (int i = 0; i < game.numPlayers; i++)
+        {
+            for (int j = 0; j < game.player[i].numLegions; j++)
+            {
+                if (game.player[i].legions[j].chit.select(point))
+                {
+                    // XXX Show info about this legion
+                    Rectangle clip = new Rectangle(
+                        game.player[i].legions[j].chit.getBounds());
+                    repaint(clip.x, clip.y, clip.width, clip.height);
+                    return;
+                }
+            }
+        }
+
         // No hits on chits, so check map.
         for (int i = 0; i < h.length; i++)
         {
@@ -842,8 +862,8 @@ public class MasterBoard extends Frame implements MouseListener,
             }
         }
 
-        // Draw chits from back to front.
 /*
+        // Draw chits from back to front.
         for (int i = chits.length - 1; i >= 0; i--)
         {
             if (rectClip.intersects(chits[i].getBounds()))
@@ -852,6 +872,18 @@ public class MasterBoard extends Frame implements MouseListener,
             }
         }
 */
+
+        for (int i = 0; i < game.numPlayers; i++)
+        {
+            for (int j = 0; j < game.player[i].numLegions; j++)
+            {
+                if (rectClip.intersects(game.player[i].legions[j].chit.getBounds()))
+                {
+                    game.player[i].legions[j].chit.paint(g);
+                }
+            }
+        }
+                
     }
 
     public void update(Graphics g)
@@ -868,6 +900,7 @@ public class MasterBoard extends Frame implements MouseListener,
             gBack = offImage.getGraphics();
         }
 
+/*
         // Clear the background only when chits are dragged.
         if (needToClear)
         {
@@ -877,6 +910,7 @@ public class MasterBoard extends Frame implements MouseListener,
             gBack.setColor(getForeground());
             needToClear = false;
         }
+*/
 
         for (int i = 0; i < h.length; i++)
         {
@@ -899,6 +933,17 @@ public class MasterBoard extends Frame implements MouseListener,
             }
         }
 */
+
+        for (int i = 0; i < game.numPlayers; i++)
+        {
+            for (int j = 0; j < game.player[i].numLegions; j++)
+            {
+                if (rectClip.intersects(game.player[i].legions[j].chit.getBounds()))
+                {
+                    game.player[i].legions[j].chit.paint(gBack);
+                }
+            }
+        }
 
         g.drawImage(offImage, 0, 0, this);
     }
@@ -939,7 +984,7 @@ class MasterHex
     int[] yVertex = new int[6];
     private Polygon p;
     private Rectangle rectBound;
-    private boolean inverted;
+    boolean inverted;
     private int scale;
     private double l;              // hexside length
 
