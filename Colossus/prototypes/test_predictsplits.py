@@ -788,8 +788,8 @@ class PredictSplitsTestCase(unittest.TestCase):
         Turn 3  Gr11 recruits Wbe with 2xCen
         """
 
-    def testPredictSplits7(self):
-        print "\ntest 7 begins"
+    def testPredictSplits4(self):
+        print "\ntest 4 begins"
         creatures = []
         creatures.append(CreatureInfo('Angel', True, True))
         creatures.append(CreatureInfo('Gargoyle', True, True))
@@ -803,8 +803,8 @@ class PredictSplitsTestCase(unittest.TestCase):
         print "test 7 ends"
 
 
-    def testPredictSplits8(self):
-        print "\ntest 8 begins"
+    def testPredictSplits5(self):
+        print "\ntest 5 begins"
         ps = PredictSplits("Gd", "Gd04", ['Titan', 'Angel', 'Gargoyle',
           'Gargoyle', 'Centaur', 'Centaur', 'Ogre', 'Ogre'])
         ps.getLeaf("Gd04").revealCreatures(['Titan', 'Angel', 'Gargoyle',
@@ -964,7 +964,8 @@ class PredictSplitsTestCase(unittest.TestCase):
         ps.getLeaf("Gd12").revealCreatures(['Cyclops', 'Cyclops'])
         ps.getLeaf("Gd12").addCreature("Gorgon")
         assert(ps.getLeaf("Gd03").allCertain())
-        assert(ps.getLeaf("Gd04").allCertain())
+        # XXX Check this
+        assert(not ps.getLeaf("Gd04").allCertain())
         assert(not ps.getLeaf("Gd07").allCertain())
         assert(not ps.getLeaf("Gd07").allCertain())
         assert(not ps.getLeaf("Gd09").allCertain())
@@ -1259,11 +1260,11 @@ class PredictSplitsTestCase(unittest.TestCase):
         """
 
 
-    def testPredictSplits9(self):
-        print "\ntest 9 begins"
-        ps = PredictSplits("Gr", "Gr11", ['Titan', 'Angel', 'Gargoyle', 
+    def testPredictSplits6(self):
+        print "\ntest 6 begins"
+        ps = PredictSplits("Gr", "Gr11", ['Titan', 'Angel', 'Gargoyle',
           'Gargoyle', 'Centaur', 'Centaur', 'Ogre', 'Ogre'])
-        ps.getLeaf("Gr11").revealCreatures(['Titan', 'Angel', 'Gargoyle', 
+        ps.getLeaf("Gr11").revealCreatures(['Titan', 'Angel', 'Gargoyle',
           'Gargoyle', 'Centaur', 'Centaur', 'Ogre', 'Ogre'])
         ps.printLeaves()
 
@@ -1371,6 +1372,337 @@ class PredictSplitsTestCase(unittest.TestCase):
                 Gr10 is attacked, revealed as Gar, Gar, Cyc, eliminated
         Turn 6  Gr02 recruits Cen with Cen
         """
+
+
+    def testPredictSplits7(self):
+        print "\ntest 7 begins"
+        ps = PredictSplits("Gr", "Gr08", ['Titan', 'Angel', 'Gargoyle',
+          'Gargoyle', 'Centaur', 'Centaur', 'Ogre', 'Ogre'])
+        ps.printLeaves()
+
+        turn = 1
+        print "Turn", turn
+        ps.getLeaf("Gr08").split(4, "Gr04", turn)
+        ps.getLeaf("Gr04").revealCreatures(["Titan"])
+        ps.getLeaf("Gr04").revealCreatures(["Titan"])
+        ps.getLeaf("Gr04").addCreature("Warlock")
+        ps.getLeaf("Gr08").revealCreatures(["Centaur"])
+        ps.getLeaf("Gr08").addCreature("Centaur")
+        ps.printLeaves()
+
+        turn = 2
+        print "Turn", turn
+        ps.getLeaf("Gr04").revealCreatures(["Gargoyle"])
+        ps.getLeaf("Gr04").addCreature("Gargoyle")
+        ps.printLeaves()
+
+        turn = 3
+        print "Turn", turn
+        ps.getLeaf("Gr04").revealCreatures(["Gargoyle", "Gargoyle"])
+        ps.getLeaf("Gr04").addCreature("Cyclops")
+        ps.printLeaves()
+
+        turn = 4
+        print "Turn", turn
+        ps.getLeaf("Gr04").split(2, "Gr06", turn)
+        ps.getLeaf("Gr04").revealCreatures(["Ogre"])
+        ps.getLeaf("Gr04").addCreature("Ogre")
+        ps.getLeaf("Gr08").revealCreatures(["Centaur", "Centaur"])
+        ps.getLeaf("Gr08").addCreature("Lion")
+        ps.printLeaves()
+
+        turn = 5
+        print "Turn", turn
+        ps.getLeaf("Gr04").revealCreatures(["Cyclops"])
+        ps.getLeaf("Gr04").addCreature("Cyclops")
+        ps.getLeaf("Gr06").addCreature("Ogre")
+        ps.getLeaf("Gr08").revealCreatures(["Lion"])
+        ps.getLeaf("Gr08").addCreature("Lion")
+        ps.printLeaves()
+
+        turn = 6
+        print "Turn", turn
+        ps.getLeaf("Gr04").split(2, "Gr07", turn)
+        ps.getLeaf("Gr08").split(2, "Gr11", turn)
+        ps.getLeaf("Gr04").revealCreatures(["Titan"])
+        ps.getLeaf("Gr04").addCreature("Warlock")
+        ps.getLeaf("Gr06").revealCreatures(["Ogre"])
+        ps.getLeaf("Gr06").addCreature("Ogre")
+        ps.getLeaf("Gr11").removeCreatures(["Centaur", "Centaur"])
+        ps.printLeaves()
+
+        turn = 7
+        print "Turn", turn
+        ps.getLeaf("Gr04").revealCreatures(["Cyclops"])
+        ps.getLeaf("Gr04").addCreature("Cyclops")
+        ps.getLeaf("Gr06").revealCreatures(["Ogre", "Ogre"])
+        ps.getLeaf("Gr06").addCreature("Troll")
+        ps.getLeaf("Gr07").revealCreatures(["Ogre"])
+        ps.getLeaf("Gr07").addCreature("Ogre")
+        ps.printLeaves()
+
+        turn = 8
+        print "Turn", turn
+        ps.getLeaf("Gr04").split(2, "Gr12", turn)
+        ps.getLeaf("Gr07").revealCreatures(["Ogre", "Ogre", "Ogre"])
+        ps.getLeaf("Gr07").addCreature("Minotaur")
+        ps.getLeaf("Gr08").revealCreatures(["Gargoyle"])
+        ps.getLeaf("Gr08").addCreature("Gargoyle")
+        ps.printNodes()
+        ps.getLeaf("Gr06").removeCreatures(["Troll", "Gargoyle", "Gargoyle",
+          "Ogre", "Ogre"])
+        ps.printNodes()
+        ps.getLeaf("Gr12").removeCreatures(["Cyclops", "Ogre"])
+        ps.printNodes()
+
+        turn = 9
+        print "Turn", turn
+        ps.getLeaf("Gr08").revealCreatures(["Gargoyle", "Gargoyle"])
+        ps.getLeaf("Gr08").addCreature("Cyclops")
+        ps.printLeaves()
+
+        turn = 11
+        print "Turn", turn
+        ps.getLeaf("Gr08").split(2, "Gr01", turn)
+        ps.getLeaf("Gr04").revealCreatures(["Titan"])
+        ps.getLeaf("Gr04").addCreature("Warlock")
+        ps.getLeaf("Gr08").revealCreatures(["Cyclops"])
+        ps.getLeaf("Gr08").addCreature("Cyclops")
+        ps.printLeaves()
+
+        turn = 12
+        print "Turn", turn
+        ps.getLeaf("Gr04").revealCreatures(["Cyclops"])
+        ps.getLeaf("Gr04").addCreature("Cyclops")
+        ps.getLeaf("Gr08").revealCreatures(["Lion"])
+        ps.getLeaf("Gr08").addCreature("Lion")
+        ps.printLeaves()
+        ps.getLeaf("Gr01").removeCreatures(["Gargoyle", "Gargoyle"])
+        ps.printLeaves()
+
+        turn = 13
+        print "Turn", turn
+        ps.getLeaf("Gr07").revealCreatures(["Troll"])
+        ps.getLeaf("Gr07").addCreature("Troll")
+        ps.printLeaves()
+
+        turn = 14
+        print "Turn", turn
+        ps.getLeaf("Gr04").split(2, "Gr06", turn)
+        ps.getLeaf("Gr04").revealCreatures(["Cyclops"])
+        ps.getLeaf("Gr04").addCreature("Cyclops")
+        ps.getLeaf("Gr06").revealCreatures(["Cyclops"])
+        ps.getLeaf("Gr06").addCreature("Cyclops")
+        ps.getLeaf("Gr08").revealCreatures(["Cyclops"])
+        ps.getLeaf("Gr08").addCreature("Cyclops")
+        ps.printLeaves()
+
+        turn = 15
+        print "Turn", turn
+        ps.getLeaf("Gr06").removeCreatures(["Cyclops", "Cyclops", "Cyclops"])
+        ps.getLeaf("Gr02").revealCreatures(["Centaur"])
+        ps.getLeaf("Gr02").addCreature("Centaur")
+        ps.printLeaves()
+
+        turn = 16
+        print "Turn", turn
+        ps.getLeaf("Gr04").revealCreatures(["Cyclops"])
+        ps.getLeaf("Gr04").addCreature("Cyclops")
+        ps.getLeaf("Gr07").revealCreatures(["Ogre", "Ogre", "Ogre"])
+        ps.getLeaf("Gr07").addCreature("Minotaur")
+        ps.getLeaf("Gr08").revealCreatures(["Lion"])
+        ps.getLeaf("Gr08").addCreature("Lion")
+        ps.printLeaves()
+
+        turn = 17
+        print "Turn", turn
+        ps.getLeaf("Gr02").revealCreatures(["Lion", "Centaur", "Centaur"])
+        ps.getLeaf("Gr02").removeCreatures(["Lion", "Centaur", "Centaur"])
+        ps.printLeaves()
+        
+        ps.getLeaf("Gr08").split(2, "Gr12", turn)
+        ps.getLeaf("Gr08").revealCreatures(["Cyclops", "Cyclops"])
+        ps.getLeaf("Gr08").addCreature("Gorgon")
+        ps.printLeaves()
+
+        turn = 18
+        print "Turn", turn
+        ps.getLeaf("Gr12").removeCreatures(["Lion", "Lion"])
+        ps.getLeaf("Gr04").split(2, "Gr12", turn)
+        ps.getLeaf("Gr07").split(2, "Gr09", turn)
+        ps.getLeaf("Gr08").revealCreatures(["Cyclops", "Cyclops"])
+        ps.getLeaf("Gr08").addCreature("Gorgon")
+        ps.printLeaves()
+
+        turn = 19
+        print "Turn", turn
+        ps.getLeaf("Gr09").removeCreature(["Ogre", "Ogre"])
+        ps.getLeaf("Gr07").revealCreatures(["Minotaur", "Minotaur"])
+        ps.getLeaf("Gr07").addCreature("Unicorn")
+        ps.getLeaf("Gr08").revealCreatures(["Cyclops", "Cyclops"])
+        ps.getLeaf("Gr08").addCreature("Gorgon")
+        ps.printLeaves()
+
+        turn = 20
+        print "Turn", turn
+        ps.getLeaf("Gr06").removeCreatures(["Gorgon", "Lion"])
+        ps.getLeaf("Gr08").revealCreatures(["Cyclops", "Cyclops", "Cyclops"])
+        ps.getLeaf("Gr08").addCreature("Behemoth")
+        ps.getLeaf("Gr12").revealCreatures(["Cyclops"])
+        ps.getLeaf("Gr12").addCreature("Cyclops")
+        ps.getLeaf("Gr04").revealCreatures(["Cyclops"])
+        ps.getLeaf("Gr04").addCreature("Gargoyle")
+        ps.getLeaf("Gr12").revealCreatures(["Cyclops", "Cyclops", "Cyclops"])
+        ps.getLeaf("Gr12").addCreature("Behemoth")
+        ps.printLeaves()
+
+        turn = 22
+        print "Turn", turn
+        ps.printLeaves()
+
+        turn = 23
+        print "Turn", turn
+        ps.getLeaf("Gr06").revealCreatures(["Gorgon"])
+        ps.getLeaf("Gr06").addCreature("Gorgon")
+        ps.getLeaf("Gr07").revealCreatures(["Troll", "Troll"])
+        ps.getLeaf("Gr07").addCreature("Ranger")
+        ps.printLeaves()
+
+        turn = 24
+        print "Turn", turn
+        ps.getLeaf("Gr07").split(2, "Gr11", turn)
+        ps.getLeaf("Gr07").revealCreatures(["Unicorn"])
+        ps.getLeaf("Gr07").addCreature("Unicorn")
+        ps.getLeaf("Gr04").revealCreatures(["Gargoyle"])
+        ps.getLeaf("Gr04").addCreature("Gargoyle")
+        ps.getLeaf("Gr07").revealCreatures(["Ranger"])
+        ps.getLeaf("Gr07").addCreature("Lion")
+        ps.getLeaf("Gr11").revealCreatures(["Minotaur"])
+        ps.getLeaf("Gr11").addCreature("Minotaur")
+        ps.getLeaf("Gr12").revealCreatures(["Cyclops", "Cyclops", "Cyclops"])
+        ps.getLeaf("Gr12").addCreature("Behemoth")
+        ps.printLeaves()
+
+        turn = 26
+        print "Turn", turn
+        ps.getLeaf("Gr07").split(2, "Gr01", turn)
+        ps.getLeaf("Gr01").revealCreatures(["Minotaur"])
+        ps.getLeaf("Gr01").addCreature("Minotaur")
+        ps.getLeaf("Gr07").revealCreatures(["Unicorn"])
+        ps.getLeaf("Gr07").addCreature("Unicorn")
+        ps.getLeaf("Gr12").revealCreatures(["Cyclops", "Cyclops"])
+        ps.getLeaf("Gr12").addCreature("Gorgon")
+        ps.printLeaves()
+
+        turn = 27
+        print "Turn", turn
+        ps.getLeaf("Gr01").revealCreatures(["Lion"])
+        ps.getLeaf("Gr01").addCreature("Lion")
+        ps.getLeaf("Gr06").revealCreatures(["Gorgon"])
+        ps.getLeaf("Gr06").addCreature("Gorgon")
+        ps.getLeaf("Gr07").revealCreatures(["Troll"])
+        ps.getLeaf("Gr07").addCreature("Troll")
+        ps.getLeaf("Gr12").revealCreatures(["Behemoth", "Behemoth"])
+        ps.getLeaf("Gr12").addCreature("Serpent")
+        ps.printLeaves()
+
+        turn = 28
+        print "Turn", turn
+        ps.getLeaf("Gr07").split(2, "Gr10", turn)
+        ps.getLeaf("Gr01").addCreature("Centaur")
+        ps.getLeaf("Gr07").revealCreatures(["Unicorn"])
+        ps.getLeaf("Gr07").addCreature("Unicorn")
+        ps.getLeaf("Gr08").revealCreatures(["Cyclops", "Cyclops"])
+        ps.getLeaf("Gr08").addCreature("Gorgon")
+        ps.getLeaf("Gr10").revealCreatures(["Troll", "Troll"])
+        ps.getLeaf("Gr10").addCreature("Warbear")
+        ps.getLeaf("Gr11").revealCreatures(["Minotaur", "Minotaur"])
+        ps.getLeaf("Gr11").addCreature("Unicorn")
+        ps.printLeaves()
+
+        turn = 29
+        print "Turn", turn
+        ps.getLeaf("Gr06").removeCreatures(["Gorgon", "Gorgon", "Gorgon", 
+          "Gorgon"])
+        ps.getLeaf("Gr10").removeCreatures(["Warbear", "Troll", "Troll"])
+        ps.getLeaf("Gr08").split(2, "Gr05", turn)
+        ps.getLeaf("Gr08").addCreature("Angel")
+        ps.getLeaf("Gr07").revealCreatures(["Ranger"])
+        ps.getLeaf("Gr07").addCreature("Lion")
+        ps.getLeaf("Gr11").revealCreatures(["Unicorn"])
+        ps.getLeaf("Gr11").addCreature("Unicorn")
+        ps.printLeaves()
+
+        turn = 30
+        print "Turn", turn
+        ps.getLeaf("Gr05").removeCreatures(["Cyclops", "Cyclops"])
+        ps.getLeaf("Gr11").revealCreatures("Unicorn", "Unicorn", "Minotaur", 
+          "Minotaur", "Ogre")
+        ps.getLeaf("Gr11").removeCreature("Minotaur")
+        ps.getLeaf("Gr11").revealCreatures("Unicorn", "Unicorn", "Minotaur", 
+          "Ogre")
+        ps.getLeaf("Gr11").revealCreatures(["Unicorn"])
+        ps.getLeaf("Gr11").addCreature("Unicorn")
+        ps.getLeaf("Gr07").split(2, "Gr02", turn)
+        ps.getLeaf("Gr12").split(2, "Gr06", turn)
+        ps.getLeaf("Gr07").addCreature("Angel")
+        ps.getLeaf("Gr08").revealCreatures(["Gorgon"])
+        ps.getLeaf("Gr08").addCreature("Gorgon")
+        ps.getLeaf("Gr12").revealCreatures(["Behemoth", "Behemoth"])
+        ps.getLeaf("Gr12").addCreature("Serpent")
+        ps.getLeaf("Gr06").removeCreatures(["Cyclops", "Cyclops"])
+        ps.printLeaves()
+
+        turn = 31
+        print "Turn", turn
+        ps.getLeaf("Gr04").split(2, "Gr05", turn)
+        ps.getLeaf("Gr01").revealCreatures(["Lion"])
+        ps.getLeaf("Gr01").addCreature("Lion")
+        ps.getLeaf("Gr04").revealCreatures(["Titan"])
+        ps.getLeaf("Gr04").addCreature("Warlock")
+        ps.getLeaf("Gr12").revealCreatures(["Gorgon"])
+        ps.getLeaf("Gr12").addCreature("Gorgon")
+        ps.getLeaf("Gr01").removeCreatures(["Minotaur", "Lion", "Lion", 
+          "Lion", "Centaur"])
+        ps.printLeaves()
+
+        turn = 32
+        print "Turn", turn
+        ps.getLeaf("Gr12").split(2, "Gr10", turn)
+        ps.getLeaf("Gr02").revealCreatures(["Lion"])
+        ps.getLeaf("Gr02").addCreature("Lion")
+        ps.printLeaves()
+
+    """
+        Start Gr08: Tit, Ang, Ogr, Ogr, Cen, Cen, Gar, Gar
+        Turn 1  Gr08 splits off Tit, Gar, Ogr, Ogr into Gr04
+                Gr04 recruits Wlk with Tit
+                Gr08 recruits Cen with Cen
+        Turn 2  Gr04 recruits Gar with Gar
+        Turn 3  Gr04 recruits Cyc with 2xGar
+        Turn 4  Gr04 splits off Gar, Gar into Gr06
+                Gr04 recruits Ogr with Ogr
+                Gr08 recruits Lio with 2xCen
+        Turn 5  Gr04 recruits Cyc with Cyc
+                Gr06 recruits Ogr
+                Gr08 recruits Lio with Lio
+        Turn 6  Gr04 splits off Ogr, Ogr into Gr07
+                Gr08 splits off Cen, Cen into Gr11
+                Gr04 recruits Wlk with Tit
+                Gr06 recruits Ogr with Ogr
+                Gr11 loses Cen, Cen
+        Turn 7  Gr04 recruits Cyc with Cyc
+                Gr06 recruits Tro with 2xOgr
+                Gr07 recruits Ogr with Ogr
+        Turn 8  Gr04 splits off Cyc, Ogr into Gr12
+                Gr07 recruits Min with 3xOgr
+                Gr08 recruits Gar with Gar
+                Gr06 loses Tro, Gar, Gar, Ogr, Ogr
+                Gr12 loses Cyc, Ogr
+        Turn 9  Gr08 recruits Cyc with 2xGar
+    """
+
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -189,7 +189,7 @@ class Node:
     def __repr__(self):
         return self.__str__()
 
-    def getCertain(self):
+    def getCertainCreatures(self):
         """Return list of CreatureInfo where certain is true."""
         return [ci for ci in self.creatures if ci.certain]
 
@@ -237,6 +237,10 @@ class Node:
     def revealCreatures(self, cnl):
         """cnl is a list of creature names"""
         print "revealCreatures for", self, cnl
+        if (not cnl or 
+          superset(getCreatureNames(self.getCertainCreatures()), cnl)):
+            print "no new information, exiting"
+            return
 
         cil = [CreatureInfo(name, True, True) for name in cnl]
 
@@ -247,7 +251,7 @@ class Node:
         # Confirm that all creatures that were certain still fit
         # along with the revealed creatures.
         count = len(dupe)
-        certain = self.getCertain()
+        certain = self.getCertainCreatures()
         for ci in certain:
             if ci in dupe:
                 dupe.remove(ci)
@@ -278,7 +282,7 @@ class Node:
 
         # Ensure that the creatures in cnl are now marked as certain
         dupe = copy.deepcopy(cil)
-        certain = self.getCertain()
+        certain = self.getCertainCreatures()
         for ci in certain:
             if ci in dupe:
                 dupe.remove(ci)
@@ -433,7 +437,7 @@ class Node:
         else:
             print " not all certain" 
             if len(knownSplit) == childSize:
-                certain = self.getCertain()[:]
+                certain = self.getCertainCreatures()[:]
                 for ci in knownSplit:
                     certain.remove(ci)
                 assert superset(certain, knownKeep)
@@ -442,7 +446,7 @@ class Node:
                 print " knownKeep is now", knownKeep
 
             elif len(knownKeep) == len(self.creatures) - childSize:
-                certain = self.getCertain()[:]
+                certain = self.getCertainCreatures()[:]
                 for ci in knownKeep:
                     certain.remove(ci)
                 assert superset(certain, knownSplit)
@@ -562,7 +566,8 @@ class Node:
         print "_updateParentContents for node", self
         if (self.parent.allCertain() and self.getSibling().allCertain() and
           not self.allCertain()):
-            self.revealCreatures(subtractLists(getCreatureNames(self.parent.creatures), 
+            self.revealCreatures(subtractLists(getCreatureNames(
+              self.parent.creatures), 
               getCreatureNames(self.getSibling().getAtSplitCreatures())))
         if self.child1 is not None:
             self.child1._updateParentContents()
@@ -591,6 +596,7 @@ class Node:
         self.creatures.remove(ci)
 
     def removeCreatures(self, creatureNames):
+        print "removeCreatures", self, ':', creatureNames
         self.revealCreatures(creatureNames)
         for name in creatureNames:
             self.removeCreature(name)
