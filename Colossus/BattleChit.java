@@ -181,23 +181,24 @@ class BattleChit extends Chit
     }
 
 
-    // XXX: Need to deal with carries.
     void strike(BattleChit target)
     {
-        int dice = getPower();
-
-        // XXX: This can be modified by terrain.
-        // Native striking down a dune hexside: +2
-        // Native striking down a slope hexside: +1
-        // Non-native striking up a dune hexside: -1
-        // Dragon striking or rangestriking from volcano: +2
-
         Hex targetHex = target.getCurrentHex();
+
+        boolean carryPossible = true;
+        if (numEngaged() < 2)
+        {
+            carryPossible = false;
+        }
+
+        int dice = getPower();
 
         boolean rangestrike = !isEngaged();
         if (rangestrike)
         {
+            carryPossible = false;
             dice /= 2;
+
             // Dragon rangestriking from volcano: +2
             if (creature == Creature.dragon && currentHex.getTerrain() == 'v')
             {
@@ -206,32 +207,129 @@ class BattleChit extends Chit
         }
         else
         {
-            // XXX: Add these.
-            // Native striking down a dune hexside: +2
-            // Native striking down a slope hexside: +1
-            // Non-native striking up a dune hexside: -1
+            // Dice can be modified by terrain.
             // Dragon striking from volcano: +2
+            if (creature == Creature.dragon && currentHex.getTerrain() == 'v')
+            {
+                dice += 2;
+            }
 
+            if (currentHex.getElevation() > targetHex.getElevation())
+            {
+                int direction = map.getDirection(currentHex, targetHex);
+                char hexside = currentHex.getHexside(direction);
+                // Native striking down a dune hexside: +2
+                if (hexside == 'd' && creature.isNativeSandDune())
+                {
+                    dice += 2;
+                }
+                // Native striking down a slope hexside: +1
+                else if (hexside == 's' && creature.isNativeSlope())
+                {
+                    dice++;
+                }
+            }
+            else if (targetHex.getElevation() > currentHex.getElevation())
+            {
+                int direction = map.getDirection(targetHex, currentHex);
+                char hexside = targetHex.getHexside(direction);
+                // Non-native striking up a dune hexside: -1
+                if (hexside == 'd' && !creature.isNativeSandDune())
+                {
+                    dice--;
+                }
+            }
+        }
+
+        if (dice <= target.getPower() - target.getHits())
+        {
+            carryPossible = false;
         }
 
         int attackerSkill = creature.getSkill();
         int defenderSkill = target.getCreature().getSkill();
 
-        // XXX: Skill can be modified by terrain.
-        // Non-native striking out of bramble: -1
-        // Non-native striking up slope: -1
-        // Down across wall: +1
-        // Up across wall: -1
-        // Non-native non-warlock rangestrikes: -1 per intervening bramble hex
-        // Non-warlock rangestrike into volcano: -1
-        // Non-warlock rangestrike up across wall: -1 per wall
+        // Skill can be modified by terrain.
+        if (!rangestrike)
+        {
+            // Non-native striking out of bramble: -1
+            if (currentHex.getTerrain() == 'r' && !creature.isNativeBramble())
+            {
+                attackerSkill--;
+            }
+        
+            if (currentHex.getElevation() > targetHex.getElevation())
+            {
+                int direction = map.getDirection(currentHex, targetHex);
+                char hexside = currentHex.getHexside(direction);
+                // Striking down across wall: +1
+                if (hexside == 'w') 
+                {
+                    attackerSkill++;
+                }
+            }
+            else if (currentHex.getElevation() < targetHex.getElevation())
+            {
+                int direction = map.getDirection(targetHex, currentHex);
+                char hexside = targetHex.getHexside(direction);
+                // Non-native striking up slope: -1
+                // Striking up across wall: -1
+                if ((hexside == 's' && !creature.isNativeSlope()) ||
+                    hexside == 'w')
+                {
+                    attackerSkill--;
+                }
+            }
+
+        }
+        else if (creature != Creature.warlock)
+        {
+            // Non-native rangestrikes: -1 per intervening bramble hex
+            if (!creature.isNativeBramble())
+            {
+                attackerSkill -= map.countInterveningBrambleHexes(currentHex,
+                    targetHex);
+            }
+
+            // Rangestrike up across wall: -1 per wall
+            boolean wall = false;
+            for (int i = 0; i < 6; i++) 
+            {
+                if (targetHex.getHexside(i) == 'w')
+                {
+                    wall = true;
+                }
+            }
+            if (wall)
+            {
+                if (targetHex.getElevation() > currentHex.getElevation())
+                {
+                    attackerSkill -= (targetHex.getElevation() -
+                        currentHex.getElevation());
+                }
+            }
+
+            // Rangestrike into volcano: -1
+            if (targetHex.getTerrain() == 'v')
+            {
+                attackerSkill--;
+            }
+        }
+        
 
         int strikeNumber = 4 - attackerSkill + defenderSkill;
 
-        // XXX: strikeNumber can be modified directly by terrain.
+        // Strike number can be modified directly by terrain.
         // Native defending in bramble, from strike by a non-native: +1
         // Native defending in bramble, from rangestrike by a non-native
         //     non-warlock: +1
+        if (targetHex.getTerrain() == 'r' && 
+            target.getCreature().isNativeBramble() && 
+            !creature.isNativeBramble() &&
+            !(rangestrike && creature == Creature.warlock))
+        {
+            strikeNumber++;
+        }
 
         // Sixes always hit.
         if (strikeNumber > 6)
@@ -271,6 +369,10 @@ class BattleChit extends Chit
         target.checkForDeath();
 
         // XXX: Let the attacker choose whether to carry, if applicable.
+        if (carryPossible && carry > 0)
+        {
+            System.out.println(carry + " possible carries");
+        }
 
         // Record that this attacker has struck.
         struck = true;
