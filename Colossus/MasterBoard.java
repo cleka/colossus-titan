@@ -73,7 +73,7 @@ public class MasterBoard extends Frame implements MouseListener,
         setupHexes();
 
         // Each player needs to pick his first legion marker.
-        for (int i = 0; i < game.numPlayers; i++)
+        for (int i = 0; i < game.getNumPlayers(); i++)
         {
             do
             {
@@ -86,16 +86,15 @@ public class MasterBoard extends Frame implements MouseListener,
 
 
         // Place initial legions.
-        for (int i = 0; i < game.numPlayers; i++)
+        for (int i = 0; i < game.getNumPlayers(); i++)
         {
             // Lookup coords for chit starting from player[i].startingTower
             Point point = getHexFromLabel(100 * game.player[i].startingTower).
                 getOffCenter();
 
-            game.player[i].legions[0] = new Legion(point.x - (3 * scale / 2), 
-                point.y - (3 * scale / 2), 3 * scale, 
-                game.player[i].markerSelected, null,
-                this, 8, 100 * game.player[i].startingTower, Creature.titan, 
+            game.player[i].legions[0] = new Legion(point.x - 2 * scale, 
+                point.y - 2 * scale, 3 * scale, game.player[i].markerSelected, 
+                null, this, 8, 100 * game.player[i].startingTower, Creature.titan, 
                 Creature.angel, Creature.ogre, Creature.ogre, Creature.centaur, 
                 Creature.centaur, Creature.gargoyle, Creature.gargoyle);
 
@@ -107,7 +106,7 @@ public class MasterBoard extends Frame implements MouseListener,
 
         tracker = new MediaTracker(this);
 
-        for (int i = 0; i < game.numPlayers; i++)
+        for (int i = 0; i < game.getNumPlayers(); i++)
         {
             tracker.addImage(game.player[i].legions[0].chit.image, 0);
         }
@@ -175,15 +174,14 @@ public class MasterBoard extends Frame implements MouseListener,
     {
         // If there are enemy legions in this hex, mark it
         // as a legal move and stop recursing.
-        for (int i = 0; i < game.numPlayers; i++)
+        for (int i = 0; i < game.getNumPlayers(); i++)
         {
             if (game.player[i] != player)
             {
-                for (int j = 0; j < game.player[i].numLegions; j++)
+                for (int j = 0; j < game.player[i].getNumLegions(); j++)
                 {
-                    if (game.player[i].legions[j].currentHex == hex.label)
+                    if (game.player[i].legions[j].getCurrentHex() == hex.label)
                     {
-System.out.println("engagement in hex " + hex.label);
                         // XXX Mark an engagement.
 
                         hex.selected = true;
@@ -197,10 +195,10 @@ System.out.println("engagement in hex " + hex.label);
         {
             // This hex is the final destination.  Mark it as legal if
             // it is unoccupied by friendly legions.
-            for (int i = 0; i < player.numLegions; i++)
+            for (int i = 0; i < player.getNumLegions(); i++)
             {
                 // Account for spin cycles.
-                if (player.legions[i].currentHex == hex.label &&
+                if (player.legions[i].getCurrentHex() == hex.label &&
                     player.legions[i] != legion)
                 {
                     return;
@@ -248,11 +246,11 @@ System.out.println("engagement in hex " + hex.label);
         // it is unoccupied.
 
         boolean occupied = false;
-        for (int i = 0; i < game.numPlayers; i++)
+        for (int i = 0; i < game.getNumPlayers(); i++)
         {
-            for (int j = 0; j < game.player[i].numLegions; j++)
+            for (int j = 0; j < game.player[i].getNumLegions(); j++)
             {
-                if (game.player[i].legions[j].currentHex == hex.label)
+                if (game.player[i].legions[j].getCurrentHex() == hex.label)
                 {
                     occupied = true;
                 }
@@ -282,7 +280,12 @@ System.out.println("engagement in hex " + hex.label);
     {
         unselectAllHexes();
 
-        MasterHex hex = getHexFromLabel(legion.currentHex); 
+        if (legion.moved)
+        {
+            return;
+        }
+
+        MasterHex hex = getHexFromLabel(legion.getCurrentHex());
 
         // Conventional moves
 
@@ -314,11 +317,12 @@ System.out.println("engagement in hex " + hex.label);
                 {
                     hex = getHexFromLabel(tower); 
                     boolean occupied = false;
-                    for (int i = 0; i < game.numPlayers; i++)
+                    for (int i = 0; i < game.getNumPlayers(); i++)
                     {
-                        for (int j = 0; j < game.player[i].numLegions; j++)
+                        for (int j = 0; j < game.player[i].getNumLegions(); 
+                            j++)
                         {
-                            if (game.player[i].legions[j].currentHex == 
+                            if (game.player[i].legions[j].getCurrentHex() == 
                                 hex.label)
                             {
                                 occupied = true;
@@ -953,9 +957,9 @@ System.out.println("engagement in hex " + hex.label);
     {
         Point point = e.getPoint();
 
-        for (int i = 0; i < game.numPlayers; i++)
+        for (int i = 0; i < game.getNumPlayers(); i++)
         {
-            for (int j = 0; j < game.player[i].numLegions; j++)
+            for (int j = 0; j < game.player[i].getNumLegions(); j++)
             {
                 if (game.player[i].legions[j].chit.select(point))
                 {
@@ -975,7 +979,7 @@ System.out.println("engagement in hex " + hex.label);
                     else
                     {
                         // Only the current player can manipulate his legions.
-                        if (i == game.activePlayer)
+                        if (i == game.getActivePlayerNum())
                         {
                             if (game.phase == game.SPLIT)
                             {
@@ -1015,22 +1019,25 @@ System.out.println("engagement in hex " + hex.label);
         }
 
         // No hits on chits, so check map.
+        Player player = game.getActivePlayer();
+
         for (int i = 0; i < h.length; i++)
         {
             for (int j = 0; j < h[0].length; j++)
             {
                 if (show[i][j] && h[i][j].contains(point))
                 {
-                    // If we're moving and have selected a legion and this
-                    // hex is a legal destination, move the legion here.
+                    // If we're moving, and have selected a legion which has
+                    // not yet moved, and this hex is a legal destination, 
+                    // move the legion here.
                     if (game.phase == game.MOVE)
                     {
-                        if (game.player[game.activePlayer].selectedLegion != -1 
-                            && h[i][j].selected == true)
+                        if (player.selectedLegion != -1 && h[i][j].selected 
+                            == true) 
                         {
-                            game.player[game.activePlayer].legions
-                                [game.player[game.activePlayer].selectedLegion]
-                                .moveToHex(h[i][j]);
+                            Legion legion = player.legions[
+                                player.selectedLegion];
+                            legion.moveToHex(h[i][j]);
                             unselectAllHexes();
                             // XXX Repaint only affected hexes and chits?
                             repaint();
@@ -1142,9 +1149,9 @@ System.out.println("engagement in hex " + hex.label);
         }
 
         // Paint in reverse order to make visible z-order match clicks.
-        for (int i = game.numPlayers - 1; i >= 0; i--)
+        for (int i = game.getNumPlayers() - 1; i >= 0; i--)
         {
-            for (int j = game.player[i].numLegions - 1; j >= 0; j--)
+            for (int j = game.player[i].getNumLegions() - 1; j >= 0; j--)
             {
                 if (rectClip.intersects(
                     game.player[i].legions[j].chit.getBounds()))
