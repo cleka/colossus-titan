@@ -1,3 +1,6 @@
+Minimize caretaker and status screens when we minimize the masterboard.
+Ditto for restoring.
+
 Eliminate persistent legion.hexInfo and instead return a temporary
    object containing all the entry sides and teleport possibilities
    along with the possible hexes that the legion can move to.

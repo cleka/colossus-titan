@@ -11,8 +11,6 @@ import javax.swing.*;
 
 public final class BattleDice extends JPanel
 {
-    private Insets insets = new Insets(5, 5, 5, 5);
-    private static Point location;
     private String attackerName;
     private String defenderName;
     private String attackerHexId;
@@ -25,25 +23,15 @@ public final class BattleDice extends JPanel
     private char terrain;
     private JLabel label1 = new JLabel();
     private JLabel label2 = new JLabel();
-    private JLabel label3 = new JLabel();
     private Chit [] dice;
 
 
     public BattleDice()
     {
         setVisible(false);
-        setLayout(new FlowLayout());
+        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
         setBackground(Color.lightGray);
-
-        // Move dialog to saved location, or middle right of screen.
-        if (location == null)
-        {
-            Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-            location = new Point(d.width - getSize().width,
-                (d.height - getSize().height) / 2);
-        }
-        setLocation(location);
     }
 
 
@@ -89,11 +77,6 @@ public final class BattleDice extends JPanel
     /** Initialize and layout the components, in response to new data. */
     public void showRoll()
     {
-        // Top row: label like "Serpent in Plains attacks Archangel in brush"
-        // Second row: label like "Rolling 18 dice with target number 6"
-        // Rows 3-N: Dice, maximum 12 per row
-        // Last row: label like "4 hits, 0 possible carries"
-
         setVisible(false);
         removeAll();
 
@@ -101,54 +84,34 @@ public final class BattleDice extends JPanel
             HexMap.getHexByLabel(terrain, attackerHexId).getDescription() +
             " attacks " + defenderName + " in " +
             HexMap.getHexByLabel(terrain, defenderHexId).getDescription());
-        label1.setAlignmentX(Label.LEFT_ALIGNMENT);
+        label1.setAlignmentX(Label.CENTER_ALIGNMENT);
         add(label1);
 
-        label2.setText("Rolling " + numDice + " dice with target number " +
-            targetNumber);
-        label3.setAlignmentX(Label.LEFT_ALIGNMENT);
-        add(label2);
-
+        JPanel diceBox = new JPanel();
+        diceBox.setLayout(new FlowLayout());
+        add(diceBox);
         dice = new Chit[numDice];
+        Dimension d = new Dimension(3, 0);
         for (int i = 0; i < numDice; i++)
         {
             dice[i] = new Chit(2 * Scale.get(), getDieImageName(rolls[i]),
                 this);
-            add(dice[i]);
+            diceBox.add(dice[i]);
         }
 
-        String hitString;
-        if (hits == 1)
-        {
-            hitString = " hit, ";
-        }
-        else
-        {
-            hitString = " hits, ";
-        }
         String carryString;
         if (carries == 1)
         {
-            carryString = " possible carry";
+            carryString = " carry";
         }
         else
         {
-            carryString = " possible carries";
+            carryString = " carries";
         }
-        label3.setText(hits + hitString + carries + carryString);
-        label3.setAlignmentX(Label.LEFT_ALIGNMENT);
-        add(label3);
+        label2.setText(carries + carryString);
+        label2.setAlignmentX(Label.CENTER_ALIGNMENT);
+        add(label2);
 
-        // If the dialog is moving off the right edge of the screen,
-        // move it left until it fits.
-        Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-        location = getLocation();
-        int adj = location.x + getSize().width - d.width;
-        if (adj > 0)
-        {
-            location.x -= adj;
-            setLocation(location);
-        }
         setVisible(true);
 
         repaint();

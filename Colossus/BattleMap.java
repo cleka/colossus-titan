@@ -79,7 +79,7 @@ public final class BattleMap extends HexMap implements MouseListener,
         contentPane.add(new JScrollPane(this), BorderLayout.CENTER);
 
         setupPlayerLabel();
-        contentPane.add(playerLabel, BorderLayout.SOUTH);
+        contentPane.add(playerLabel, BorderLayout.NORTH);
 
         battleFrame.pack();
         battleFrame.setVisible(true);
