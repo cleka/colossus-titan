@@ -45,7 +45,9 @@ class PickRecruit extends Dialog implements MouseListener, WindowListener
         setLayout(null);
         setBackground(java.awt.Color.lightGray);
 
+System.out.println("Calling findEligibleRecruits");
         numEligible = findEligibleRecruits(legion, recruits);
+System.out.println("numEligible is " + numEligible);
         if (numEligible == 0)
         {
             dispose();
@@ -369,10 +371,12 @@ class PickRecruit extends Dialog implements MouseListener, WindowListener
         // Pack the recruits array for display.
         for (int i = 0; i < recruits.length - 1; i++)
         {
+System.out.println("i is " + i);
             if (recruits[i] == null)
             {
                 for (int j = i; j < recruits.length - 1; j++)
                 {
+System.out.println("j is " + i);
                     recruits[j] = recruits[j + 1];
                 }
                 recruits[recruits.length - 1] = null;
@@ -422,6 +426,8 @@ class PickRecruit extends Dialog implements MouseListener, WindowListener
 
                 // Recruits are one to a customer.
                 legion.markRecruited();
+
+                player.markLastLegionRecruited(legion);
 
                 // Then exit.
                 dispose();
