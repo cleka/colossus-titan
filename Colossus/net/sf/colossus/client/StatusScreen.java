@@ -258,6 +258,14 @@ final class StatusScreen extends KDialog implements WindowListener
             setPlayerLabelBackground(i, color);
 
             nameLabel[i].setText(info.getName());
+            if (info.canTitanTeleport())
+            {
+                nameLabel[i].setText(info.getName() + "*");
+            }
+            else
+            {
+                nameLabel[i].setText(info.getName());
+            }
             towerLabel[i].setText("" + info.getTower());
             colorLabel[i].setText(info.getColor());
             elimLabel[i].setText(info.getPlayersElim());
