@@ -48,7 +48,10 @@ class BattleTurn extends Dialog implements ActionListener
 
     void setupRecruitDialog()
     {
+        removeAll();
         setTitle(getActivePlayer().getName() + " Turn " + turnNumber);
+        setLayout(new GridLayout(0, 1));
+        add(new Label(getActivePlayer().getName() + " : Recruit"));
 
         if (turnNumber == 4 && defender.canRecruit())
         {
@@ -67,24 +70,44 @@ class BattleTurn extends Dialog implements ActionListener
     
     void setupSummonDialog()
     {
+        removeAll();
         setTitle(getActivePlayer().getName() + " Turn " + turnNumber);
+        setLayout(new GridLayout(0, 1));
+        add(new Label(getActivePlayer().getName() + " : Recruit"));
 
         if (map.getSummonState() == BattleMap.FIRST_BLOOD)
         {
             if (attacker.getHeight() < 7 &&
                 attacker.getPlayer().canSummonAngel())
             {
+System.out.println("SummonAngel");
                 summonAngel = new SummonAngel(map.getBoard(), attacker);
             }
-            else
-            {
-System.out.println("Couldn't summon angel  height is " + attacker.getHeight());
-            }
         }
-        // XXX: Need a way to placeNewChit() that triggers when the summon
-        // finishes.
 
-        advancePhase();
+        if (summonAngel == null)
+        {
+            advancePhase();
+        }
+    }
+
+
+    // This is called from MasterBoard after the SummonAngel finishes.
+    void finishSummoningAngel()
+    {
+System.out.println("finishSummoningAngel");
+        if (attacker.summoned())
+        {
+System.out.println("placeNewChit");
+            map.placeNewChit(attacker);
+        }
+
+        summonAngel = null;
+
+        if (phase == SUMMON)
+        {
+            advancePhase();
+        }
     }
 
 
@@ -98,10 +121,10 @@ System.out.println("Couldn't summon angel  height is " + attacker.getHeight());
         else
         {
             removeAll();
-            setLayout(new GridLayout(0, 4));
             setTitle(getActivePlayer().getName() + " Turn " + turnNumber);
+            setLayout(new GridLayout(0, 4));
 
-            add(new Label(activeLegion.getPlayer().getName() + " : Move"));
+            add(new Label(getActivePlayer().getName() + " : Move"));
 
             Button button1 = new Button("Undo Last Move");
             add(button1);
@@ -140,10 +163,10 @@ System.out.println("Couldn't summon angel  height is " + attacker.getHeight());
         else
         {
             removeAll();
-            setLayout(new GridLayout(0, 2));
             setTitle(getActivePlayer().getName() + " Turn " + turnNumber);
+            setLayout(new GridLayout(0, 2));
 
-            add(new Label(activeLegion.getPlayer().getName() +
+            add(new Label(getActivePlayer().getName() +
                 ((phase == FIGHT) ? " : Strike" : " : Strikeback")));
             Button button1 = new Button("Done with Strikes");
             add(button1);
