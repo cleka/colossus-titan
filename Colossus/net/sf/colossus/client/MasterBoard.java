@@ -1389,6 +1389,7 @@ public final class MasterBoard extends JPanel
         Set combo = new HashSet();
         combo.addAll(teleport);
         combo.addAll(normal);
+
         showBestRecruit(markerId, combo);
     }
 
@@ -1400,9 +1401,8 @@ public final class MasterBoard extends JPanel
         while (it.hasNext())
         {
             String hexLabel = (String)it.next();
-            java.util.List recruits =
-                client.findEligibleRecruits(markerId,
-                                            hexLabel);
+            java.util.List recruits = client.findEligibleRecruits(markerId,
+                hexLabel);
             if (recruits != null && recruits.size() > 0)
             {
                 if ((!client.showAllRecruitChits) ||

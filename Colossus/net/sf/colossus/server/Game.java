@@ -2014,7 +2014,6 @@ public final class Game
             // Mark every hex containing an enemy stack that does not
             // already contain a friendly stack.
             Iterator it = getAllEnemyLegions(player).iterator();
-
             while (it.hasNext())
             {
                 Legion other = (Legion)it.next();
@@ -2218,37 +2217,39 @@ public final class Game
         }
     }
 
-    void finishBattle(String hexLabel, boolean attackerEntered)
+    void finishBattle(String hexLabel, boolean attackerEntered, int points)
     {
         battle = null;
         server.allCleanupBattle();
 
+        Legion winner = null;
+
         // Handle any after-battle angel summoning or recruiting.
         if (getNumLegions(hexLabel) == 1)
         {
-            Legion legion = getFirstLegion(hexLabel);
+            winner = getFirstLegion(hexLabel);
 
             // Make all creatures in the victorious legion visible.
-            server.allRevealLegion(legion);
-            // Remove battle info from legion and its creatures.
-            legion.clearBattleInfo();
+            server.allRevealLegion(winner);
+            // Remove battle info from winning legion and its creatures.
+            winner.clearBattleInfo();
 
-            if (legion.getPlayer() == getActivePlayer())
+            if (winner.getPlayer() == getActivePlayer())
             {
                 // Attacker won, so possibly summon angel.
-                if (legion.canSummonAngel())
+                if (winner.canSummonAngel())
                 {
-                    createSummonAngel(legion);
+                    createSummonAngel(winner);
                 }
             }
             else
             {
                 // Defender won, so possibly recruit reinforcement.
-                if (attackerEntered && legion.canRecruit())
+                if (attackerEntered && winner.canRecruit())
                 {
                     Log.debug(
                         "Calling Game.reinforce() from Game.finishBattle()");
-                    reinforce(legion);
+                    reinforce(winner);
                 }
             }
         }
@@ -2258,6 +2259,12 @@ public final class Game
         caretaker.resurrectImmortals();
 
         server.allUpdatePlayerInfo();
+        String winnerId = null;
+        if (winner != null)
+        {
+            winnerId = winner.getMarkerId();
+        }
+        server.allTellEngagementResults(winnerId, "fight", points);
         if (!summoning && !reinforcing && !acquiring)
         {
             server.allHighlightEngagements();
@@ -2733,6 +2740,8 @@ public final class Game
         // the battle.
         engagementInProgress = false;
         server.allUpdatePlayerInfo();
+        server.allTellEngagementResults(winner.getMarkerId(), 
+            fled ? "flee" : "concede", points);
         server.allHighlightEngagements();
         if (!acquiring)
         {
@@ -2744,6 +2753,9 @@ public final class Game
     {
         Legion attacker = getLegionByMarkerId(results.getAttackerId());
         Legion defender = getLegionByMarkerId(results.getDefenderId());
+
+        Legion winner = null;
+        int points = 0;
 
         if (results.isMutual())
         {
@@ -2778,7 +2790,7 @@ public final class Game
         else
         {
             // One legion was eliminated during negotiations.
-            Legion winner = getLegionByMarkerId(results.getWinnerId());
+            winner = getLegionByMarkerId(results.getWinnerId());
             Legion loser;
 
             if (winner == defender)
@@ -2818,7 +2830,7 @@ public final class Game
             server.oneRevealLegion(winner, attacker.getPlayerName());
             server.oneRevealLegion(winner, defender.getPlayerName());
 
-            int points = loser.getPointValue();
+            points = loser.getPointValue();
 
             Player losingPlayer = loser.getPlayer();
 
@@ -2861,6 +2873,8 @@ public final class Game
         }
         engagementInProgress = false;
         server.allUpdatePlayerInfo();
+        server.allTellEngagementResults(winner == null ? null : 
+            winner.getMarkerId(), "negotiate", points);
         if (!summoning && !reinforcing && !acquiring)
         {
             server.allHighlightEngagements();

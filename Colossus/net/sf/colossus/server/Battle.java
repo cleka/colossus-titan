@@ -46,6 +46,7 @@ public final class Battle
     /** Set of hexLabels for valid carry targets */
     private Set carryTargets = new HashSet();
     private PhaseAdvancer phaseAdvancer = new BattlePhaseAdvancer();
+    private int pointsScored = 0;
 
 
     Battle(Game game, String attackerId, String defenderId,
@@ -984,6 +985,7 @@ Log.debug("Called Battle.doneReinforcing()");
             }
             else
             {
+                pointsScored = defender.getBattleTally();
                 defender.addBattleTallyToPoints();
             }
             attacker.getPlayer().die(slayerName, true);
@@ -998,6 +1000,7 @@ Log.debug("Called Battle.doneReinforcing()");
             }
             else
             {
+                pointsScored = attacker.getBattleTally();
                 attacker.addBattleTallyToPoints();
             }
             defender.getPlayer().die(slayerName, true);
@@ -1015,12 +1018,14 @@ Log.debug("Called Battle.doneReinforcing()");
         // Check for single legion elimination.
         else if (attackerElim)
         {
+            pointsScored = defender.getBattleTally();
             defender.addBattleTallyToPoints();
             attacker.remove();
             cleanup();
         }
         else if (defenderElim)
         {
+            pointsScored = attacker.getBattleTally();
             attacker.addBattleTallyToPoints();
             defender.remove();
             cleanup();
@@ -1932,7 +1937,7 @@ Log.debug("Called Battle.doneReinforcing()");
     void cleanup()
     {
         battleOver = true;
-        game.finishBattle(masterHexLabel, attackerEntered);
+        game.finishBattle(masterHexLabel, attackerEntered, pointsScored);
     }
 
 

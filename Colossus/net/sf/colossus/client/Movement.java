@@ -362,7 +362,7 @@ public final class Movement
                 LegionInfo other = client.getLegionInfo(markerId);
                 {
                     String hexLabel = other.getHexLabel();
-                    if (!client.isEngagement(hexLabel))
+                    if (hexLabel != null && !client.isEngagement(hexLabel))
                     {
                         set.add(hexLabel);
                     }

@@ -42,6 +42,7 @@ public final class Client implements IClient
     private SummonAngel summonAngel;
     private MovementDie movementDie;
     private Chat chat;
+    private EngagementResults engagementResults;
 
     /** hexLabel of MasterHex for current or last engagement. */
     private String battleSite;
@@ -241,8 +242,16 @@ public final class Client implements IClient
             return;
         }
 
-        EngagementResults er = new EngagementResults(frame, this, winnerId,
-            method, points);
+        if (engagementResults == null)
+        {
+            // XXX commented out for now, until it's done
+            //engagementResults = new EngagementResults(frame, this, winnerId,
+            //    method, points);
+        }
+        else
+        {
+            engagementResults.updateData(winnerId, method, points);
+        }
     }
 
 
@@ -967,7 +976,7 @@ public final class Client implements IClient
 
 
     /** Remove this eliminated legion, and clean up related stuff. */
-    public void removeLegion(String id)
+    public synchronized void removeLegion(String id)
     {
         Marker marker = getMarker(id);
         markers.remove(marker);
@@ -988,6 +997,7 @@ public final class Client implements IClient
         if (board != null)
         {
             board.alignLegions(hexLabel);
+Log.debug("Called Client.removeLegion() for " + id);
         }
     }
 
@@ -1709,7 +1719,7 @@ public final class Client implements IClient
 
     public void nakStrike(int tag)
     {
-Log.error("Got nak for strike by " + tag);
+        Log.error("Got nak for strike by " + tag);
     }
 
     private void pickCarries(int carryDamage, Set carryTargetDescriptions)
@@ -1801,7 +1811,6 @@ Log.debug(playerName + " Client.cleanupBattle()");
             map = null;
         }
         battleChits.clear();
-        battleTurnNumber = -1;
         battlePhase = -1;
         battleActivePlayerName = null;
     }
@@ -1835,7 +1844,6 @@ Log.debug(playerName + " Client.cleanupBattle()");
             }
         }
     }
-
 
 
     /** Used for human players only.  */
@@ -2014,8 +2022,8 @@ Log.error("Got nak for recruit with " + markerId);
     }
 
     // XXX Update markersAvailable more often.
-    public void setupSplit(Set markersAvailable, String activePlayerName,
-        int turnNumber)
+    public synchronized void setupSplit(Set markersAvailable, 
+        String activePlayerName, int turnNumber)
     {
         clearUndoStack();
         cleanupNegotiationDialogs();
@@ -2060,7 +2068,7 @@ Log.error("Got nak for recruit with " + markerId);
         }
     }
 
-    public void setupMove()
+    public synchronized void setupMove()
     {
         this.phase = Constants.MOVE;
         clearUndoStack();
@@ -2071,7 +2079,7 @@ Log.error("Got nak for recruit with " + markerId);
         updateStatusScreen();
     }
 
-    public void setupFight()
+    public synchronized void setupFight()
     {
         clearUndoStack();
         this.phase = Constants.FIGHT;
@@ -2088,7 +2096,7 @@ Log.error("Got nak for recruit with " + markerId);
         }
     }
 
-    public void setupMuster()
+    public synchronized void setupMuster()
     {
         clearUndoStack();
         cleanupNegotiationDialogs();
@@ -2350,7 +2358,7 @@ Log.error("Got nak for recruit with " + markerId);
 
     String getAttackerMarkerId()
     {
-        return defenderMarkerId;
+        return attackerMarkerId;
     }
 
     int getBattlePhase()
@@ -2854,6 +2862,12 @@ Log.error("Got nak for recruit with " + markerId);
         }
 
         MasterHex hex = MasterBoard.getHexByLabel(hexLabel);
+        if (hex == null)
+        {
+            Log.warn("null hex in Client.findEligibleRecruits()");
+            Log.warn("hexLabel is " + hexLabel);
+            return recruits;
+        }
         String terrain = hex.getTerrain();
 
         java.util.List tempRecruits =

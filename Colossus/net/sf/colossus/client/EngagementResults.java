@@ -17,42 +17,62 @@ import net.sf.colossus.util.Log;
 final class EngagementResults extends KDialog implements ActionListener,
     WindowListener
 {
+    private Client client;
+
+
     EngagementResults(
         JFrame frame,
         Client client, 
-        String winnerId,         // Null if mutual elimination
+        String winnerId,         // null if mutual elimination
         String method,           // flee, concede, negotiate, fight
         int points)
     {
         super(frame, "Engagement Status", false);
 
-        String hexLabel = client.getBattleSite();
-        String attackerId = client.getAttackerMarkerId();
-        String defenderId = client.getDefenderMarkerId();
-        int turns = client.getBattleTurnNumber();
-        java.util.List attackerStartingContents = null;
-//            client.getAttackerStartingContents();
-        java.util.List defenderStartingContents = null;
-//            client.getDefenderStartingContents();
-
-        String loserId = null;
-        if (winnerId.equals(attackerId))
-        {
-            loserId = defenderId;
-        }
-        else if (winnerId.equals(defenderId))
-        {
-            loserId = attackerId;
-        }
+        this.client = client;
 
         pack();
         setBackground(Color.lightGray);
         addWindowListener(this);
 
-        centerOnScreen();
+        Container contentPane = getContentPane();
+        contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
+
+        updateData(winnerId, method, points);
+    }
+
+
+    void updateData(String winnerId, String method, int points)
+    {
+        String hexLabel = client.getBattleSite();
+        String attackerId = client.getAttackerMarkerId();
+        String defenderId = client.getDefenderMarkerId();
+        int battleTurn = client.getBattleTurnNumber();
+        int gameTurn = client.getTurnNumber();
+
+        // TODO
+        java.util.List attackerStartingContents = new ArrayList();
+        java.util.List defenderStartingContents = new ArrayList();
+
+        java.util.List attackerEndingContents = client.getLegionImageNames(
+            attackerId);
+        java.util.List defenderEndingContents = client.getLegionImageNames(
+            defenderId);
+
+        String loserId = null;
+        if (winnerId != null && winnerId.equals(attackerId))
+        {
+            loserId = defenderId;
+        }
+        else if (winnerId != null && winnerId.equals(defenderId))
+        {
+            loserId = attackerId;
+        }
 
         Container contentPane = getContentPane();
-        int scale = 4 * Scale.get();
+
+        JLabel label0 = new JLabel("Turn " + gameTurn);
+        contentPane.add(label0);
         
         JLabel label1 = new JLabel(attackerId + " attacked " + defenderId + 
             " in " + MasterBoard.getHexByLabel(hexLabel).getDescription());
@@ -61,20 +81,35 @@ final class EngagementResults extends KDialog implements ActionListener,
         JLabel label2 = new JLabel();
         if (method.equals("flee"))
         {
-            label2.setText(winnerId + " won when " + loserId + "fled");
+            label2.setText(winnerId + " won when " + loserId + " fled");
         }
         else if (method.equals("concede"))
         {
-            label2.setText(winnerId + " won when " + loserId + "conceded");
+            label2.setText(winnerId + " won when " + loserId + " conceded");
         }
         else if (method.equals("negotiate"))
         {
-            label2.setText(winnerId + " won a negotiated settlement");
+            if (winnerId != null)
+            {
+                label2.setText(winnerId + " won a negotiated settlement");
+            }
+            else
+            {
+                label2.setText("Negotiated mutual elimination");
+            }
         }
         else if (method.equals("fight"))
         {
-            label2.setText(winnerId + " won the battle in " + turns + 
-                " turns");
+            if (winnerId != null)
+            {
+                label2.setText(winnerId + " won the battle in " + battleTurn + 
+                    " turns");
+            }
+            else
+            {
+                label2.setText("Mutual elimination in " + battleTurn + 
+                    " turns");
+            }
         }
         else
         {
@@ -86,37 +121,26 @@ final class EngagementResults extends KDialog implements ActionListener,
             " points");
         contentPane.add(label3);
 
-        JLabel label4 = new JLabel("Starting contents of " + attackerId);
-        contentPane.add(label4);
+        showLegionContents(attackerId, attackerStartingContents,
+            contentPane, true);
 
-        JPanel panel1 = new JPanel();
-        panel1.setLayout(new BoxLayout(panel1, BoxLayout.X_AXIS));
-        contentPane.add(panel1);
+        showLegionContents(defenderId, defenderStartingContents,
+            contentPane, true);
 
-        Iterator it = attackerStartingContents.iterator();
-        while (it.hasNext())
-        {
-            String imageName = (String)it.next();
-            Chit chit = new Chit(scale, imageName, this);
-            panel1.add(chit);
-            chit.addMouseListener(this);
-        }
+        showLegionContents(attackerId, attackerEndingContents,
+            contentPane, false);
 
-        JLabel label5 = new JLabel("Starting contents of " + defenderId);
-        contentPane.add(label5);
+        showLegionContents(defenderId, defenderEndingContents,
+            contentPane, false);
 
-        JPanel panel2 = new JPanel();
-        panel2.setLayout(new BoxLayout(panel2, BoxLayout.X_AXIS));
-        contentPane.add(panel1);
 
-        it = defenderStartingContents.iterator();
-        while (it.hasNext())
-        {
-            String imageName = (String)it.next();
-            Chit chit = new Chit(scale, imageName, this);
-            panel2.add(chit);
-            chit.addMouseListener(this);
-        }
+        JButton prevButton = new JButton("Previous");
+        prevButton.addActionListener(this);
+        contentPane.add(prevButton);
+
+        JButton nextButton = new JButton("Next");
+        nextButton.addActionListener(this);
+        contentPane.add(nextButton);
 
         JButton dismissButton = new JButton("Dismiss");
         dismissButton.addActionListener(this);
@@ -124,6 +148,29 @@ final class EngagementResults extends KDialog implements ActionListener,
 
         pack();
         setVisible(true);
+    }
+
+
+    void showLegionContents(String markerId, java.util.List imageNames, 
+        Container contentPane, boolean starting)
+    {
+        JLabel label = new JLabel(starting ? "Starting" : "Final" + 
+            " contents of " + markerId);
+        contentPane.add(label);
+
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+        contentPane.add(panel);
+
+        int scale = 4 * Scale.get();
+
+        Iterator it = imageNames.iterator();
+        while (it.hasNext())
+        {
+            String imageName = (String)it.next();
+            Chit chit = new Chit(scale, imageName, this);
+            panel.add(chit);
+        }
     }
 
 

@@ -488,6 +488,13 @@ Log.debug("End of SocketClientThread while loop");
                                   (String)args.remove(0),
                                   (String)args.remove(0));
         }
+        else if (method.equals(Constants.tellEngagementResults))
+        {
+            String winnerId = (String)args.remove(0);
+            String resMethod = (String)args.remove(0);
+            int points = Integer.parseInt((String)args.remove(0));
+            client.tellEngagementResults(winnerId, resMethod, points);
+        }
         else
         {
             Log.error("Bogus packet (Client, method: " +

@@ -96,9 +96,16 @@ public final class Legion implements Comparable
         // by splits are private.
         // When loading a game, we handle revealing visible creatures
         // after legion creation.
-        if (getHeight() == 8)
+        try
         {
-            game.getServer().allRevealLegion(this);
+            if (getHeight() == 8)
+            {
+                game.getServer().allRevealLegion(this);
+            }
+        }
+        catch (NullPointerException ex)
+        {
+            Log.warn("Called Legion.initCreatureVisibility() too early");
         }
     }
 

@@ -1249,7 +1249,10 @@ Log.debug("Called Server.addClient() for " + playerName);
                 legion.getCurrentHexLabel(), player).getPlayerName();
         }
         player.die(slayerName, true);
-        game.advancePhase(game.getPhase(), getPlayerName());
+        if (player == game.getActivePlayer())
+        {
+            game.advancePhase(game.getPhase(), getPlayerName());
+        }
     }
 
 
