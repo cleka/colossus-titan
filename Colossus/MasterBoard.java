@@ -20,7 +20,7 @@ public class MasterBoard extends Frame implements MouseListener,
     // For easy of mapping to the GUI, they'll be stored
     // in a 15x8 array, with some empty elements.
 
-    public final double SQRT3 = 1.73205080757;
+    public static final double SQRT3 = Math.sqrt(3.0);
 
     private MasterHex[][] h = new MasterHex[15][8];
     private Chit[] chits = new Chit[4];
@@ -785,12 +785,12 @@ public class MasterBoard extends Frame implements MouseListener,
 
     public Dimension getMinimumSize()
     {
-        return new Dimension(65 * scale, 65 * scale);
+        return new Dimension(69 * scale, 69 * scale);
     }
 
     public Dimension getPreferredSize()
     {
-        return new Dimension(65 * scale, 65 * scale);
+        return new Dimension(69 * scale, 69 * scale);
     }
 
 
@@ -818,7 +818,8 @@ public class MasterBoard extends Frame implements MouseListener,
 
 class MasterHex
 {
-    public static final double SQRT3 = 1.73205080757;
+    public static final double SQRT3 = Math.sqrt(3.0);
+    public static final double RAD_TO_DEG = 180 / Math.PI;
     private boolean selected;
     private int[] xVertex = new int[6];
     private int[] yVertex = new int[6];
@@ -848,33 +849,20 @@ class MasterHex
     private int y0;
     private int x1;                // second focus point
     private int y1;
+    private int x2;                // center point
+    private int y2;
     private double theta;          // gate angle
     private int x[] = new int[4];  // gate points
     private int y[] = new int[4];
 
 
-    MasterHex(int cx, int cy, int inScale, boolean inInverted)
+    MasterHex(int cx, int cy, int scale, boolean inverted)
     {
         selected = false;
-        inverted = inInverted;
-        scale = inScale;
+        this.inverted = inverted;
+        this.scale = scale;
         l = scale / 3.0;
-        if (!inverted)
-        {
-            xVertex[0] = cx;
-            yVertex[0] = cy;
-            xVertex[1] = cx + 2 * scale;
-            yVertex[1] = cy;
-            xVertex[2] = cx + 4 * scale;
-            yVertex[2] = cy + (int) Math.round(2 * SQRT3 * scale);
-            xVertex[3] = cx + 3 * scale;
-            yVertex[3] = cy + (int) Math.round(3 * SQRT3 * scale);
-            xVertex[4] = cx - scale;
-            yVertex[4] = cy + (int) Math.round(3 * SQRT3 * scale);
-            xVertex[5] = cx - 2 * scale;
-            yVertex[5] = cy + (int) Math.round(2 * SQRT3 * scale);
-        }
-        else
+        if (inverted)
         {
             xVertex[0] = cx - scale;
             yVertex[0] = cy;
@@ -888,6 +876,21 @@ class MasterHex
             yVertex[4] = cy + (int) Math.round(3 * SQRT3 * scale);
             xVertex[5] = cx - 2 * scale;
             yVertex[5] = cy + (int) Math.round(SQRT3 * scale);
+        }
+        else
+        {
+            xVertex[0] = cx;
+            yVertex[0] = cy;
+            xVertex[1] = cx + 2 * scale;
+            yVertex[1] = cy;
+            xVertex[2] = cx + 4 * scale;
+            yVertex[2] = cy + (int) Math.round(2 * SQRT3 * scale);
+            xVertex[3] = cx + 3 * scale;
+            yVertex[3] = cy + (int) Math.round(3 * SQRT3 * scale);
+            xVertex[4] = cx - scale;
+            yVertex[4] = cy + (int) Math.round(3 * SQRT3 * scale);
+            xVertex[5] = cx - 2 * scale;
+            yVertex[5] = cy + (int) Math.round(2 * SQRT3 * scale);
         }
 
         p = new Polygon(xVertex, yVertex, 6);
@@ -914,26 +917,28 @@ class MasterHex
         g.drawPolygon(p);
 
         FontMetrics fontMetrics = g.getFontMetrics();
+        String sLabel = Integer.toString(label);
+        String sName = getTerrainName();
+        int fontHeight = fontMetrics.getMaxAscent() + 
+            fontMetrics.getLeading();
 
         if (inverted)
         {
-            g.drawString(Integer.toString(label), 
-                rectBound.x + rectBound.width / 2 - 
-                fontMetrics.stringWidth(Integer.toString(label)) / 2,
-                rectBound.y + rectBound.height / 3);
-            g.drawString(getTerrainName(), rectBound.x + rectBound.width / 2 -
-                fontMetrics.stringWidth(getTerrainName()) / 2,
-                rectBound.y + rectBound.height * 2 / 3);
+            g.drawString(sLabel, rectBound.x + (rectBound.width - 
+                fontMetrics.stringWidth(sLabel)) / 2,
+                rectBound.y + rectBound.height * 19 / 20);
+            g.drawString(sName, rectBound.x + (rectBound.width -
+                fontMetrics.stringWidth(sName)) / 2,
+                rectBound.y + fontHeight + rectBound.height / 4);
         }
         else
         {
-            g.drawString(getTerrainName(), rectBound.x + rectBound.width / 2 -
-                fontMetrics.stringWidth(getTerrainName()) / 2,
-                rectBound.y + rectBound.height * 2 / 3);
-            g.drawString(Integer.toString(label), 
-                rectBound.x + rectBound.width / 2 -
-                fontMetrics.stringWidth(Integer.toString(label)) / 2,
-                rectBound.y + rectBound.height / 3);
+            g.drawString(sLabel, rectBound.x + (rectBound.width -
+                fontMetrics.stringWidth(sLabel)) / 2,
+                rectBound.y + fontHeight + rectBound.height / 20 );
+            g.drawString(sName, rectBound.x + (rectBound.width -
+                fontMetrics.stringWidth(sName)) / 2,
+                rectBound.y + rectBound.height * 3 / 4);
         }
 
 
@@ -987,17 +992,33 @@ class MasterHex
                         y[2] = (int) Math.round(y1 - l * Math.cos(theta));
                         x[3] = (int) Math.round(x1 - l * Math.sin(theta));
                         y[3] = (int) Math.round(y1 + l * Math.cos(theta));
-                        Polygon p = new Polygon(x, y, 4);
-                        Rectangle rect = p.getBounds();
-    
+
+                        x2 = (int) Math.round((x0 + x1) / 2);
+                        y2 = (int) Math.round((y0 + y1) / 2);
+                        Rectangle rect = new Rectangle();
+                        rect.x = x2 - (int) Math.round(l);
+                        rect.y = y2 - (int) Math.round(l);
+                        rect.width = (int) (2 * Math.round(l));
+                        rect.height = (int) (2 * Math.round(l));
+                        
                         g.setColor(java.awt.Color.white);
-                        g.fillArc(rect.x, rect.y, rect.width, rect.height,
-                             (int) Math.round((2 * Math.PI - theta) * 180 / Math.PI), 
-                             180);
+                        g.fillOval(rect.x, rect.y, rect.width, rect.height);
                         g.setColor(java.awt.Color.black);
-                        g.drawArc(rect.x, rect.y, rect.width, rect.height,
-                             (int) Math.round((2 * Math.PI - theta) * 180 / Math.PI), 
-                             180);
+                        g.drawOval(rect.x, rect.y, rect.width, rect.height);
+                        
+                        x[2] = x[0];
+                        y[2] = y[0];
+                        x[0] = x1;
+                        y[0] = y1;
+                        x[1] = x[3];
+                        y[1] = y[3];
+                        x[3] = x0;
+                        y[3] = y0;
+                        g.setColor(java.awt.Color.white);
+                        g.fillPolygon(x, y, 4);
+                        g.setColor(java.awt.Color.black);
+                        g.drawLine(x1, y1, x[1], y[1]);
+                        g.drawLine(x[2], y[2], x0, y0);
                         break;
 
                     case 3:   // 1 arrow
@@ -1102,15 +1123,32 @@ class MasterHex
                         x[3] = (int) Math.round(x1 - l * Math.sin(theta));
                         y[3] = (int) Math.round(y1 + l * Math.cos(theta));
 
-                        Polygon p = new Polygon(x, y, 4);
-                        Rectangle rect = p.getBounds();
+                        x2 = (int) Math.round((x0 + x1) / 2);
+                        y2 = (int) Math.round((y0 + y1) / 2);
+                        Rectangle rect = new Rectangle();
+                        rect.x = x2 - (int) Math.round(l);
+                        rect.y = y2 - (int) Math.round(l);
+                        rect.width = (int) (2 * Math.round(l));
+                        rect.height = (int) (2 * Math.round(l));
 
                         g.setColor(java.awt.Color.white);
-                        g.fillArc(rect.x, rect.y, rect.width, rect.height,
-                             (int) ((2 * Math.PI - theta) * 180 / Math.PI), 180);
+                        g.fillOval(rect.x, rect.y, rect.width, rect.height);
                         g.setColor(java.awt.Color.black);
-                        g.drawArc(rect.x, rect.y, rect.width, rect.height,
-                             (int) ((2 * Math.PI - theta) * 180 / Math.PI), 180);
+                        g.drawOval(rect.x, rect.y, rect.width, rect.height);
+
+                        x[2] = x[0];
+                        y[2] = y[0];
+                        x[0] = x1;
+                        y[0] = y1;
+                        x[1] = x[3];
+                        y[1] = y[3];
+                        x[3] = x0;
+                        y[3] = y0;
+                        g.setColor(java.awt.Color.white);
+                        g.fillPolygon(x, y, 4);
+                        g.setColor(java.awt.Color.black);
+                        g.drawLine(x1, y1, x[1], y[1]);
+                        g.drawLine(x[2], y[2], x0, y0);
                         break;
 
                     case 3:   // 1 arrow
