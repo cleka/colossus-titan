@@ -375,7 +375,7 @@ public final class GetPlayers extends JDialog implements WindowListener,
 
     public static String getCreaturesName()
     {
-        return (getVarDirectory() + creaturesName);
+        return (creaturesName);
     }
     
     private static String chooseMap() 

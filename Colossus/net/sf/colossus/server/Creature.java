@@ -5,6 +5,7 @@ import java.util.*;
 import java.io.*;
 
 import net.sf.colossus.util.Log;
+import net.sf.colossus.util.ResourceLoader;
 import net.sf.colossus.client.GetPlayers;
 import net.sf.colossus.parser.CreatureLoader;
 
@@ -103,13 +104,12 @@ public class Creature implements Comparable
         try 
         {
             creatures.clear();
-            ClassLoader cl = Game.class.getClassLoader();
-            InputStream creIS = 
-                cl.getResourceAsStream(GetPlayers.getCreaturesName());
-            if (creIS == null)
-            {
-                creIS = new FileInputStream(GetPlayers.getCreaturesName());
-            }
+            java.util.List directories = new java.util.ArrayList();
+            directories.add(GetPlayers.getVarDirectory());
+            directories.add(Constants.defaultDirName);
+            InputStream creIS = ResourceLoader.getInputStream(
+                                               GetPlayers.getCreaturesName(),
+                                               directories);
             if (creIS == null) 
             {
                 throw new FileNotFoundException(GetPlayers.getCreaturesName());
