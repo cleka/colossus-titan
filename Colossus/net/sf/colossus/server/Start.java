@@ -51,6 +51,7 @@ public final class Start
             opts.addOption('n', "nnetwork", true, "Number of network slots");
             opts.addOption('q', "quit", false, "Quit JVM when game ends");
             opts.addOption('p', "port", true, "Server port number");
+            opts.addOption('d', "delay", true, "AI delay in ms");
 
             cl = opts.parse(args);
         }

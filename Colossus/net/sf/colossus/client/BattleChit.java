@@ -63,7 +63,6 @@ final class BattleChit extends Chit
     void setDead(boolean dead)
     {
         super.setDead(dead);
-Log.debug("Called BattleChit.setDead() " + dead + " " + getDescription());
         if (dead)
         {
             setHits(0);

@@ -9,11 +9,6 @@ Big picture:
 
 Bug: Failing LOSTest -- problems with slopes and cliffs.
 
-Bug: run -i 6 -g sometimes spins forever on fixName.  Sometimes okay.  Race.
-Called SocketServerThread.setPlayerName() old:Gold new:<By color>5 thread: Gold
-From client <By color>5: fixName ~ Gold
-Got fixName new:Gold old:<By color>5
-
 Bug: Some strike updates do not reach client GUI.
 
 Bug: Double advance from split phase when autosplit has no legal splits?
@@ -23,9 +18,19 @@ Bug: AI needs to set donor, enter angel when summoning into battle.
 Bug: Need to detect failed AI battle moves and fall back to next choice.
 
 Bug?: Attacking, conceded to AI after map up but before entering, and
-      AI did not reinforce.  Check rules.
+   AI did not reinforce.  Check rules.
+
+Bug: Concede dialog has top legion skewed slightly to right of bottom legion.
+
+Bug: Overlay sometimes not loading at start, even though checked on menu.  
+   Need to turn off then on.
+
+Bug: AIs still kamikaze into superior stacks with All stacks visible off.
 
 Auto-advance from battle move, strike phases is disabled for humans.
+
+Attacking titans are now way too aggressive early in battles.
+
 
 When getting both a PickRecruit and an AcquireAngel after a battle,
    make sure the PickRecruit is on top, because it's modal.

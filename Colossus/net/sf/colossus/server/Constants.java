@@ -135,6 +135,7 @@ public final class Constants
     public static final String human = "Human";
     public static final String network = "Network";
     public static final String none = "None";
+    public static final String observer = "Observer";
     public static final String ai = "AI";
     public static final String anyAI = "A Random AI";
     public static final String defaultAI = anyAI;

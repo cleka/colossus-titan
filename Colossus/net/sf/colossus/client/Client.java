@@ -755,6 +755,7 @@ public final class Client implements IClient
     void leaveCarryMode()
     {
         server.leaveCarryMode();
+        doAutoStrikes(); 
     }
 
 
@@ -830,23 +831,31 @@ public final class Client implements IClient
         server.doneWithStrikes();
     }
 
-    synchronized void makeForcedStrikes()
+    /** Return true if any strikes were taken. */
+    synchronized boolean makeForcedStrikes()
     {
         if (isMyBattlePhase() && getOption(Options.autoForcedStrike))
         {
-            strike.makeForcedStrikes(getOption(Options.autoRangeSingle));
+            return strike.makeForcedStrikes(getOption(
+                Options.autoRangeSingle));
         }
+        return false;
     }
 
+    /** Handle both forced strikes and AI strikes. */
     synchronized void doAutoStrikes()
     {
         if (isMyBattlePhase()) 
         {
             if (getOption(Options.autoPlay))
             {
-                boolean more = ai.strike(getLegionInfo(
-                    getBattleActiveMarkerId()));
-                if (!more)
+                boolean struck = makeForcedStrikes();
+                if (!struck)
+                {
+                    struck = ai.strike(getLegionInfo(
+                        getBattleActiveMarkerId()));
+                }
+                if (!struck)
                 {
                     doneWithStrikes();
                 }
@@ -1553,8 +1562,10 @@ public final class Client implements IClient
         {
             pickCarries(carryDamageLeft, carryTargetDescriptions);
         }
-
-        doAutoStrikes();
+        else
+        {
+            doAutoStrikes();
+        }
     }
 
     private void pickCarries(int carryDamage, Set carryTargetDescriptions)
@@ -1622,8 +1633,7 @@ public final class Client implements IClient
         getLegionInfo(defenderMarkerId).setEntrySide((getLegionInfo(
             attackerMarkerId).getEntrySide() + 3) % 6);
 
-        // Do not show map for AI players.
-        if (!getOption(Options.autoPlay))
+        if (board != null)
         {
             map = new BattleMap(this, masterHexLabel);
             JFrame frame = map.getFrame();

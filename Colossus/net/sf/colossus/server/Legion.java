@@ -595,7 +595,10 @@ public final class Legion implements Comparable
         // Let the clients clean up the legion marker, etc.
         game.getServer().allRemoveLegion(markerId);
 
-        getPlayer().addLegionMarker(getMarkerId());
+        if (getPlayer() != null)
+        {
+            getPlayer().addLegionMarker(getMarkerId());
+        }
     }
 
 

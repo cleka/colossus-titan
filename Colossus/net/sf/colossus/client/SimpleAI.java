@@ -1860,10 +1860,15 @@ public class SimpleAI implements AI
         return map;
     }
 
-    private BattleChit findBestTarget(Map map, char terrain)
+    private BattleChit findBestTarget()
     {
         boolean canKillSomething = false;
         BattleChit bestTarget = null;
+        char terrain = client.getBattleTerrain();
+
+        // Create a map containing each target and the likely number
+        // of hits it would take if all possible creatures attacked it.
+        Map map = generateDamageMap();
 
         Iterator it = map.keySet().iterator();
         while (it.hasNext())
@@ -1952,10 +1957,13 @@ public class SimpleAI implements AI
         {
             Log.warn("No carry target but " + carryDamage +
                 " points of available carry damage");
-            return;
+            client.leaveCarryMode();
         }
-        Log.debug("Best carry target is " + bestTarget.getDescription());
-        client.applyCarries(bestTarget.getHexLabel());
+        else
+        {
+            Log.debug("Best carry target is " + bestTarget.getDescription());
+            client.applyCarries(bestTarget.getHexLabel());
+        }
     }
 
     /** Simple one-ply group strike algorithm.  Return false if there were
@@ -1963,20 +1971,14 @@ public class SimpleAI implements AI
     public synchronized boolean strike(LegionInfo legion)
     {
 Log.debug("Called ai.strike() for " + legion.getMarkerId());
-        // First make forced strikes, including rangestrikes for
-        // rangestrikers with only one target.
-        client.makeForcedStrikes();
-
-        // Then create a map containing each target and the likely number
-        // of hits it would take if all possible creatures attacked it.
-        Map map = generateDamageMap();
+        // PRE: Caller handles forced strikes before calling this.
 
         // Pick the most important target that can likely be killed this
         // turn.  If none can, pick the most important target.
         // TODO If none can, and we're going to lose the battle this turn, 
         // pick the easiest target to kill.
 
-        BattleChit bestTarget = findBestTarget(map, client.getBattleTerrain());
+        BattleChit bestTarget = findBestTarget();
         if (bestTarget == null)
         {
 Log.debug("Best target is null, aborting");
@@ -2372,7 +2374,6 @@ Log.debug("Called findBattleMoves()");
         // before finding permutations of move orders.
         int perfectScore = 0;
         ArrayList trimmedCritterMoves = (ArrayList)allCritterMoves.clone();
-Log.debug("trimmedCritterMoves has " + trimmedCritterMoves.size() + " entries");
         Collections.sort(trimmedCritterMoves, new MoveOrderComparator());
 
         it = trimmedCritterMoves.iterator();
@@ -2546,7 +2547,7 @@ Log.debug("trimmedCritterMoves has " + trimmedCritterMoves.size() + " entries");
         final int ATTACKER_GET_HIT_SCALE_FACTOR = -1;
         final int DEFENDER_GET_HIT_SCALE_FACTOR = -2;
         final int TITAN_TOWER_HEIGHT_BONUS = 1000;
-        final int TITAN_FORWARD_EARLY_PENALTY = -300;
+        final int TITAN_FORWARD_EARLY_PENALTY = -1000;
         final int TITAN_BY_EDGE_OR_TREE_BONUS = 400;
         final int DEFENDER_TOWER_HEIGHT_BONUS = 80;
         final int DEFENDER_FORWARD_EARLY_PENALTY = -60;
@@ -2699,7 +2700,8 @@ Log.debug("trimmedCritterMoves has " + trimmedCritterMoves.size() + " entries");
 
                 // XXX Attacking legions late in battle ignore damage.
                 if (legion.getMarkerId().equals(
-                    client.getDefenderMarkerId()) || turn <= 4)
+                    client.getDefenderMarkerId()) || critter.isTitan() || 
+                    turn <= 4)
                 {
                     if (hitsExpected + hits >= power)
                     {

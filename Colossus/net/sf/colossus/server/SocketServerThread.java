@@ -114,7 +114,9 @@ final class SocketServerThread extends Thread implements IClient
         else if (method.equals(Constants.fixName))
         {
             String newName = (String)args.remove(0);
-            if (!newName.equals(playerName))
+            // Prevent an infinite loop oscillating between two names.
+            if (!newName.equals(playerName) && 
+                !newName.startsWith(Constants.byColor))
             {
                 setPlayerName(newName);
             }

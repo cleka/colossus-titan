@@ -70,18 +70,23 @@ final class Strike
      *  generate carries, since there's only one target. If
      *  rangestrike is true, also perform rangestrikes for
      *  creatures with only one target, even though they're not
-     *  technically forced.
+     *  technically forced.  Return after one strike, so the
+     *  client can wait for status from the server.
      *  XXX This method does stuff, rather than just returning 
-     *  information, unlike the rest of the Strike class. */
-    synchronized void makeForcedStrikes(boolean rangestrike)
+     *  information, unlike the rest of the Strike class.
+     *  Returns true if a strike was made. */
+    synchronized boolean makeForcedStrikes(boolean rangestrike)
     {
+        boolean struck = false;
+
         if (client.getBattlePhase() != Constants.FIGHT && 
             client.getBattlePhase() != Constants.STRIKEBACK &&
             !client.isMyBattlePhase())
         {
             Log.error("Called Strike.makeForcedStrikes() in wrong phase");
-            return;
+            return false;
         }
+
         Iterator it = client.getActiveBattleChits().iterator();
         while (it.hasNext())
         {
@@ -93,9 +98,11 @@ final class Strike
                 {
                     String hexLabel = (String)(set.iterator().next());
                     client.strike(chit.getTag(), hexLabel);
+                    return true;
                 }
             }
         }
+        return false;
     }
 
 

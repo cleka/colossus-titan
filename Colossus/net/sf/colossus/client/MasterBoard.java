@@ -401,7 +401,7 @@ public final class MasterBoard extends JPanel
         {
             public void actionPerformed(ActionEvent e)
             {
-                if (client.isGameOver() && client.isRemote())
+                if (client.isGameOver())
                 {
                     System.exit(0);
                 }
@@ -522,6 +522,7 @@ public final class MasterBoard extends JPanel
         addCheckBox(playerMenu, Options.autoRecruit, KeyEvent.VK_R);
         addCheckBox(playerMenu, Options.autoPickRecruiter, KeyEvent.VK_U);
         addCheckBox(playerMenu, Options.autoReinforce, KeyEvent.VK_N);
+        addCheckBox(playerMenu, Options.autoPlay, KeyEvent.VK_P);
 
         // Then per-client GUI options
         JMenu graphicsMenu = new JMenu("Graphics");
@@ -1760,6 +1761,12 @@ public final class MasterBoard extends JPanel
         {
             // XXX This code is a duplicate of quitGameAction.  Find out
             // how to invoke that action correctly from here.
+            if (client.isGameOver())
+            {
+                client.withdrawFromGame();
+                System.exit(0);
+            }
+
             String [] options = new String[2];
             options[0] = "Yes";
             options[1] = "No";

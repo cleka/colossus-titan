@@ -90,7 +90,7 @@ public final class Log
     }
 
 
-    private static void out(String s)
+    private static synchronized void out(String s)
     {
         if (toStdout)
         {
