@@ -8,10 +8,10 @@ Win95, 1.1.7: BattleTurn: "Done with Mov..."; default button size is
 
 Red Hat 6.1, kaffe 1.05
    Background colors are different.  (e.g. white instead of black.)  They're 
-      being set rather than defaulted, so this looks like a kaffe bug.
+      being set rather than defaulted.
    Some clicks are rejected as though not inside chits or hexes even though
       they are.  Sometimes a second click works; sometimes it takes several
-      tries.  Hit testing problems in kaffe?
+      tries.
    Problems with PickMarker at the start of the game.  The first player's
       markers are not displayed, but clicking in the place where they
       should be works.  Some clicks are repeatedly missed, which prevents
@@ -38,12 +38,18 @@ Red Hat 6.1, Sun 1.2.2/1.3/1.3refresh, Blackdown 1.2.2RC4:
    corner instead of over mouse position.  These problems don't happen 
    with ibmjdk118.
 
-Win98, JDK1.3rc1: setLocation() to keep ShowLegion, ShowMasterHex
+Win98, JDK1.3: setLocation() to keep ShowLegion, ShowMasterHex
    dialogs from displaying past the bottom or right edge of the
-   screen isn't working.  Works fine on other JDKs, so this looks
-   like a bug with rc1.
+   screen isn't working.  Works fine on other JDKs.
 
-Win98, JDK1.3rc1: Tried to strike own creature.
+Win98, jdk1.3: Multiple fast right-clicks on a MasterHex do not succeed
+   in displaying ShowBattleMap.  They do result in a ShowMasterHex that
+   cannot be dismissed, except by left-clicking on a chit within it.
+
+Win98, jdk1.3: Bad repaint onto potential carry target with no carries.
+
+Win98, jdk1.3: OutOfMemoryError starting a battle in turn 15 of a 
+   4-player game.  Image memory leak again?
 
 
 Current programming bugs:
@@ -89,5 +95,5 @@ Linux, ibmjdk118: Angel summoned into battle can move on top of
    any of its allies which has not moved yet, because their hexes 
    are highlighted.
 
-Linux, ibmjdk118: Tried to strike own creature!
+Linux, ibmjdk118; Win98, jdk1.3rc1: Tried to strike own creature!
 

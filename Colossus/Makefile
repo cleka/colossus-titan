@@ -24,7 +24,7 @@ HTMLDIR = /home/httpd/html
 
 all: jar
 
-.PHONY : all classes jar clean dist
+.PHONY : all classes jar clean dist javadoc
 
 
 # New implicit rule for Java

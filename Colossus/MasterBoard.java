@@ -1525,6 +1525,7 @@ public class MasterBoard extends Frame implements MouseListener,
                         InputEvent.BUTTON2_MASK) || ((e.getModifiers() &
                         InputEvent.BUTTON3_MASK) == InputEvent.BUTTON3_MASK))
                     {
+                        // XXX On fast machines, this doesn't work.
                         if (e.getClickCount() > 1)
                         {
                             new ShowBattleMap(this, hex);
