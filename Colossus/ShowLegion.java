@@ -20,7 +20,7 @@ class ShowLegion extends Dialog implements MouseListener
 
         int scale = 60;
         setLocation(new Point(point.x - scale, point.y - scale));
-        setSize((22 * scale / 20) * (legion.getHeight()), 8 * scale / 5);
+        setSize(scale * legion.getHeight(), 8 * scale / 5);
         
         setLayout(null);
 
