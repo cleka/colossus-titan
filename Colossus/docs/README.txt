@@ -1,10 +1,10 @@
-Colossus alpha     October 24, 2001    Copyright 2001 David Ripton
+Colossus alpha     December 6, 2001    Copyright 2001 David Ripton
 
 Colossus is an attempt at a Java clone of Avalon Hill's Titan(tm) boardgame.
 
 It's not done yet.  Right now it allows hotseat play, and play against a
 mostly working but not-quite-ready-for-prime-time AI.  Client/server 
-networking is in development.
+networking is in development.  (Really, we're getting closer.)
 
 This program is freeware, distributed under the GNU public license, which
 is included in the file COPYING.GPL.  This means that you have the right to
@@ -15,40 +15,64 @@ please send me a copy so that I can fold them into the master code.
 
 Running the game requires the following:
 
-1. A 1.2 or later version of a JRE (Java runtime environment) or JDK
-   (Java development kit).
+1. A 1.2 (aka "Java 2") or later version of a JRE (Java runtime environment) 
+   or JDK (Java development kit).
 
    (Colossus will not run under JRE 1.0.x or 1.1.x  Colossus does not
    currently run as an applet in a web browser.  The obsolete 
    Microsoft JVM that's bundled with IE won't work.  Sorry.)
 
    Win32, Solaris, and x86 Linux versions of the JRE and JDK are
-   freely downloadable from java.sun.com.  Another Linux port is
-   available from www.blackdown.org.  Info on other ports is
-   available at http://java.sun.com/cgi-bin/java-ports.cgi
+   freely downloadable from http://java.sun.com.  
+
+   Another Linux port is available from http://www.blackdown.org.  
+
+   The Mac version is at http://devworld.apple.com/java/
+
+   Info on other ports (AIX, OS/2, etc.) is at 
+   http://java.sun.com/cgi-bin/java-ports.cgi
 
    The current recommended version is Sun JRE 1.3.1.
+
    If in doubt, you probably want:
    http://java.sun.com/j2se/1.3/jre/download-windows.html
 
 2. The minimum computer spec is about a 133 MHz CPU, 64 MB RAM, 
-   2-button mouse, 800x600 256-color display.  You'll get better 
-   results with about a 300 MHz CPU and 1024x768 display.
+   mouse, 800x600 256-color display.  You'll get better results 
+   with about a 300 MHz CPU and 1024x768 display.
 
-Directions:
 
-I assume you already know how to play Titan.  The rules are copyrighted by
-Avalon Hill, so I can't provide them.  Titan is an excellent boardgame, and I
-recommend that everyone buy a copy while you still can.  (Avalon Hill was
-bought by Hasbro, which may or may not decide to reprint Titan in something 
-like its original form.)
 
-Probably the best way to run Colossus is to use the executable jar file.
-If you downloaded Colossus.jar by itself, you're set.  If you downloaded
-a zip file, you'll need to unzip it and find the jar file inside.  Try
-double-clicking on Colossus.jar in your GUI file manager.  If that
-doesn't work, pop up a command prompt, cd to the directory where
+
+GETTING THE PROGRAM TO RUN
+
+The easiest way to run the game, if you already have Java Web Start (or
+an equivalent JNLP launcher) installed on your computer, is to click on 
+the Java Web Start link on the web page.  This will download the game, 
+upgrade your JRE if necessary, make a shortcut icon if you want, etc.
+Really slick, when it works.  If it doesn't work, you have other options.
+
+Another option is to run the executable jar file. If you downloaded 
+Colossus.jar by itself, you're set.  If you downloaded a zip file, you'll 
+need to unzip it using your favorite unzip tool and find the jar file 
+inside.  Try double-clicking on Colossus.jar in your GUI file manager.  
+If that doesn't work, pop up a command prompt, cd to the directory where 
 you unzipped the zip file, and try typing "java -jar Colossus.jar"
+
+Yet another option, in case the jar file is temporarily broken for some 
+reason, is to expand the whole game tree and run the Start class manually.  
+Unzip the zip file, make sure there is a file called "Start.class" in 
+the current directory, and try "java Start"
+
+
+
+GAME PLAY INSTRUCTIONS
+
+I assume you already know how to play Titan.  The full rules are copyrighted 
+by Avalon Hill, so I can't provide them.  Titan is an excellent boardgame, 
+and I recommend that everyone buy a copy while you still can.  (Avalon Hill 
+was bought by Hasbro, which may or may not decide to reprint Titan in 
+something like its original form.)
 
 Once you get things running, a dialog should pop up, allowing you to
 choose up to six player types (human, AI, or not present) and their names.
@@ -65,14 +89,16 @@ After each player has picked his initial legion marker, the MasterBoard window
 will pop up.  You'll see each player's initial legion marker sitting in a
 tower hex.  You'll also see a small window in the lower right corner of the
 screen.  This is the Game Status window, which tracks each player's score,
-number of legion markers remaining, etc.
+number of legion markers remaining, etc.  And there's a Caretaker window which 
+tracks how many of each creature remain in the stacks.  (These are optional: 
+turn them on or off from the Graphics menu.)
 
-You can right-click on a legion to see its contents. (Unless you've selected
-"All stacks visible" on the Game menu, the contents of other players' legions
-are hidden, except for those creatures which have recently been revealed via
-fighting, recruiting, or teleporting).  You can right-click on a hex to call
-up a menu, which lets you either see what you can recruit in that hex, or
-its battle map.
+You can right-click (or control-click if you have a one-button mouse) on a 
+legion to see its contents. (Unless you've selected "All stacks visible" on 
+the Game menu, the contents of other players' legions are hidden, except for 
+those creatures which have recently been revealed via fighting, recruiting, 
+or teleporting).  You can right-click on a hex to call up a menu, which lets 
+you either see what you can recruit in that hex, or its battle map.
 
 The active player first needs to split his initial 8-high legion.  You'll
 notice that the hex containing the active player's legion is lit up as a
@@ -86,9 +112,11 @@ legions contains three Creatures and one Lord.  When you're ready, select
 Done from the Phase menu.
 
 Next comes the movement phase.  The game will tell you your movement roll.
-Click on a legion, and the places it can move will light up.  Click on one of
-those places, and the legion will move there.  (In some cases, you will need
-to choose whether to teleport or move normally.)  The "Undo Last Move" and
+Click on a legion, and the places it can move will light up.  Little pictures
+of the creatures the legion can recruit in hex will also appear.  Click on 
+one of those places, and the legion will move there.  (In some cases, you 
+will need to choose whether to teleport or move normally, or which lord 
+teleports if there is more than once choice.)  The "Undo Last Move" and
 "Undo All Moves" actions are there in case you change your mind.  During the
 first turn only, and once only, there will be a "Take Mulligan" action which
 you can use to re-roll your movement.  When you're done moving everything you
@@ -102,7 +130,10 @@ the attacker is given a chance to concede.  If both legions stick around, then
 a negotiation window pops up, where creatures can be clicked on to "X" them
 away.  If the combatants can come to an agreement where all the creatures on
 at least one side die, then there's no need to fight.  Otherwise, it's time
-for battle.  (Negotiation is currently disabled but will be put back in.)
+for battle.  
+
+(NOTE: Negotiation is currently broken and disabled but will be put back in 
+when we get around to fixing it.)
 
 During a battle, the appropriate BattleMap pops up, with each legion on the
 appropriate entry side.  (You have to choose an entry side during movement
@@ -123,11 +154,12 @@ Pick one, and he tries to strike it.  (If it's legal to take a strike penalty
 in order to carry, then a dialog will pop up to ask if you want to do so.)  
 The number of hits are displayed on the target.  If the target is dead, it 
 will have a big "X" displayed over it.  If there is excess damage that can 
-legally carry over, then the legal carry target(s) will light up, and the 
-striking player needs to pick which one to carry to, or click somewhere else 
-to decline the carry.  This carry process can repeat if the strike blows 
-through more than one creature.  There's no way to undo strikes.  (That
-would be cheating.)  When done striking, choose Done. 
+legally carry over, then the legal carry target(s) will light up, and the
+cursor should change to a number, and the striking player needs to pick 
+which one to carry to, or click somewhere else to decline the carry.  This 
+carry process can repeat if the strike blows through more than one creature.  
+There's no way to undo strikes.  (That would be cheating.)  When done 
+striking, choose Done. 
 
 After the strike phase, the other player gets a strikeback phase.  It's
 identical to the strike phase, except that rangestrikes are not allowed.
@@ -156,51 +188,103 @@ After all engagements are resolved, choose Done to proceed to the mustering
 phase.  Legions that moved and can recruit will light up.  Click on each one 
 and choose a recruit.  If more than one type of creature is capable of 
 summoning that recruit, you'll have to choose the recruiter(s) to be 
-revealed, unless the "Autopick recruiter" option has been selected.  When 
-done, click Done and pass the mouse to the next player.
+revealed, unless the "Autopick recruiter" option has been selected.
+When done, click Done and pass the mouse to the next player.
 
 The game ends when zero or one Titans remain.  The last player standing is
 the winner; if the game ends with a mutual elimination, it's a draw.
 
 
-Miscellaneous stuff:
 
-Unless you turn off the Autosave option, the game produces a numbered .sav 
-file in the saves/ subdirectory every turn.  If you start a new game with
-"java -jar Colossus.jar filename.sav" instead of just "java -jar Colossus"
-then the save file will be loaded.  "java -jar Colossus.jar --latest" will
-load the most recent save game in the saves/ subdirectory -- this is useful
-if the game crashes.  Or you can just use the Load option on the File menu.
-You'll want to manually delete all those save files from time to time.
+IMPROVEMENTS:
 
-The antialias option makes the board look a little bit nicer, but slows
-down the game a bit.
+If you find any bugs that you think we can fix, please let us know, in
+as much detail as possible.  (In particular, include the OS and JVM 
+version.)  The best way to report bugs is via the bug tracker at 
+SourceForge -- go to http://colossus.sf.net, click on the SourceForge 
+icon, click on Tracker, and click on Bugs.  (If that's too hard you can 
+just send email.)
 
-If you select Save Options from the File menu, then all the current players' 
-options will be saved in files called <player name>.cfg 
-
-Support for variable maps and recruit trees has recently been added.  It's
-still very new and things might not work correctly with other than the
-defaults.
-
-
-Improvements:
-
-If you find any bugs that you think I can fix, please let me know, in
-as much detail as possible.  (In particular, include the OS and JVM version.)
-The best way to report bugs is via the bug tracker at SourceForge --
-go to http://colossus.sourceforge.net, click on the SourceForge icon, click on
-tracker, and click on bugs.
-
-Java is still evolving, and the JDK itself still has plenty of bugs,
-especially in the AWT.  You can vote for the ones that you find most
-annoying at http://developer.java.sun.com
-
-I've tried to get the rules right, though a few areas (concession timing,
+We've tried to get the rules right, though a few areas (concession timing,
 in particular) are still off.  Bruno Wolff's Titan Errata and Clarifications
-at http://www.uwm.edu/~bruno/titan/errata.shtml is a good place to check for
+at http://wolff.to/titan/errata.shtml is a good place to check for
 rules issues.
 
+
+
+FREQUENTLY ASKED QUESTIONS:
+
+Q.  Why does the game sometimes prompt me twice for recruits?
+
+A.  Look closer.  It's asking for the recruit and then for the recruiter(s).
+    Do you want to recruit that cyclops with your other cyclops, or with
+    your two gargoyles?  If like most people you don't care, then turn on 
+    "auto pick recruiter" and the computer will just pick one for you.
+
+Q.  How to I make a legion spin around in a circle back to the original
+    hex when I roll a 6? 
+
+A.  The second click needs to be inside the hex, but outside the legion 
+    marker.  If you click inside the legion marker then you cancel the
+    pending move and try to move the legion again.  I know this requires
+    a lot of coordination for a turn-based boardgame, but I can't think
+    of a better way to do this interface.
+
+Q.  What does the Antialias option do?
+
+A.  It makes the graphics a bit smoother (look closely at the hexside edges
+    while you turn it on and off), but this takes some CPU cycles.  I
+    recommend turning it on if you have a fast computer and leaving it off
+    if you have a slow computer. 
+
+Q.  When is network play going to be done?
+
+A.  Probably about April 2002.  No guarantees -- real life sometimes
+    gets in the way of fun programming projects.
+
+    It's a lot of work, because I want to do it the right away (a 
+    language-neutral, simple socket protocol with a server that enforces
+    the rules rather than trusting the clients) rather than just slapping
+    an quick RMI layer on the existing game.  I know you want network
+    play now, but games that break if two players have clients just a
+    little bit different, and where any fourth-grader can change the
+    die-rolling function to get 6s in combat whenever he wants, are no fun.
+
+Q.  What's the difference between SimpleAI and MinimaxAI and RandomAI?
+
+A1. SimpleAI is faster and smarter.  MinimaxAI is slower and dumber.
+    RandomAI is not really a separate AI: it picks one of the other AIs 
+    at random.  Use SimpleAI for now since MinimaxAI isn't really done.
+
+A2. (More than you probably want to know)  SimpleAI is a handcoded 
+    one-ply expert system.  MinimaxAI uses the standard Minimax with 
+    Alpha-Beta Pruning algorithm for masterboard moves.  (It uses the 
+    same algorithm as SimpleAI for battle moves, because minimax would 
+    take forever due to the huge number of possible moves for large legions.)
+    In theory, MinimaxAI should be stronger, once we get it working.  But
+    it's not working very well yet.  If you understood this answer, how
+    about helping us fix it?
+
+Q.  What are all those load map, load terrain, load recruit, etc. buttons?
+
+A.  The maps and recruit trees and stuff used to be hardcoded.  Romain
+    has recently pulled them out into data files, which means that you
+    can customize parts of the game by making new data files instead of
+    changing code.  If that interests you, see docs/FileFormat.txt   We'll
+    include some variant data files in the package at some point.  Note that
+    the AI has not been fully tested with variant maps.
+
+Q.  Why not use XML for all of those data files?
+
+A.  Because an XML parser is about as big as the rest of Colossus put
+    together, and I don't want to double the download size for all the 
+    people still using slow modems, and I don't want to require people 
+    to download and install an XML parser separately because that's one 
+    more technical hurdle that most people don't want to deal with 
+    just to play a silly game.
+    
+    JDK 1.4 includes an XML parser, so maybe eventually.  (Not anytime
+    soon -- 1.4 is still beta and there is no Mac version yet.)
 
 
 
@@ -208,7 +292,7 @@ Credits:
 
 Programming:  David Ripton  dripton@wizard.net
               Bruce Sherrod (AI)  bruce@thematrix.com
-              Tom Fruchterman
+              Tom Fruchterman (caretaker display)
               David Barr (applet conversion)
 	      Romain Dolbeau (variant support)
 

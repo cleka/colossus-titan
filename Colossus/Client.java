@@ -957,12 +957,11 @@ public final class Client
     }
 
 
-    // XXX Remove direct legion reference
-    public String splitLegion(Legion legion, String selectedMarkerId)
+    public String splitLegion(String markerId, String longMarkerName,
+        String selectedMarkerId, java.util.List imageNames)
     {
-        return SplitLegion.splitLegion(this, legion.getMarkerId(), 
-            legion.getLongMarkerName(), selectedMarkerId, 
-            legion.getImageNames(true));
+        return SplitLegion.splitLegion(this, markerId, longMarkerName,
+            selectedMarkerId, imageNames);
     }
 
 
@@ -1038,12 +1037,11 @@ public final class Client
     }
 
 
-    // XXX Remove direct legion reference
     /** Assumes this is not an AI client and board is not null. */
-    public String pickLord(Legion legion)
+    public String pickLord(java.util.List imageNames)
     {
-        Creature lord = PickLord.pickLord(board.getFrame(), legion);
-        return lord.toString();
+        String lord = PickLord.pickLord(board.getFrame(), imageNames);
+        return lord;
     }
 
 
@@ -1100,7 +1098,6 @@ public final class Client
     }
 
 
-    // XXX Remove direct legion refs.
     public void askNegotiate(String attackerLongMarkerName, 
         String defenderLongMarkerName, String attackerMarkerId, 
         String defenderMarkerId, java.util.List attackerImageNames, 
@@ -1381,11 +1378,9 @@ public final class Client
         }
     }
 
-    // XXX remove direct Player ref.
     public String getColor()
     {
-        Player player = server.getGame().getPlayer(playerName);
-        return player.getColor();
+        return server.getPlayerColor(playerName);
     }
 
     public String getShortColor()
@@ -1396,19 +1391,19 @@ public final class Client
 
     public String getBattleActivePlayerName()
     {
-        return server.getGame().getBattle().getActivePlayerName();
+        return server.getBattleActivePlayerName();
     }
 
 
     public int getBattlePhase()
     {
-        return server.getGame().getBattle().getPhase();
+        return server.getBattlePhase();
     }
 
 
     public int getBattleTurnNumber()
     {
-        return server.getGame().getBattle().getTurnNumber();
+        return server.getBattleTurnNumber();
     }
 
 
@@ -1485,13 +1480,10 @@ public final class Client
         return server.findCrittersWithTargets();
     }
 
-
     public String getPlayerNameByTag(int tag)
     {
         return server.getPlayerNameByTag(tag);
     }
-
-
 
     public String getActivePlayerName()
     {
@@ -1500,62 +1492,56 @@ public final class Client
 
     public int getPhase()
     {
-        return server.getGame().getPhase();
+        return server.getPhase();
     }
 
     public int getTurnNumber()
     {
-        return server.getGame().getTurnNumber();
+        return server.getTurnNumber();
     }
 
     public void doSplit(String markerId)
     {
-        server.getGame().doSplit(markerId);
+        server.doSplit(markerId);
     }
 
     public boolean doMove(String markerId, String hexLabel)
     {
-        return server.getGame().doMove(markerId, hexLabel);
+        return server.doMove(markerId, hexLabel);
     }
 
     /** Return a list of Creatures. */
     public ArrayList findEligibleRecruits(String markerId, String hexLabel)
     {
-        return server.getGame().findEligibleRecruits(markerId, hexLabel);
+        return server.findEligibleRecruits(markerId, hexLabel);
     }
 
     /** Return a set of hexLabels. */
     public Set findAllEligibleRecruitHexes()
     {
-        return server.getGame().findAllEligibleRecruitHexes();
+        return server.findAllEligibleRecruitHexes();
     }
 
     /** Return a set of hexLabels. */
     public Set findSummonableAngels(String markerId)
     {
-        return server.getGame().findSummonableAngels(markerId);
+        return server.findSummonableAngels(markerId);
     }
 
     /** Return a set of hexLabels. */
     public Set listMoves(String markerId)
     {
-        return server.getGame().listMoves(markerId);
+        return server.listMoves(markerId);
     }
 
     public java.util.List getAllLegionIds()
     {
-        return server.getGame().getAllLegionIds();
-    }
-
-    /** XXX temp */
-    public Legion getLegionByMarkerId(String markerId)
-    {
-        return server.getGame().getLegionByMarkerId(markerId);
+        return server.getAllLegionIds();
     }
 
     public int getActivePlayerNum()
     {
-        return server.getGame().getActivePlayerNum();
+        return server.getActivePlayerNum();
     }
 
     public int getCreatureCount(String creatureName)
@@ -1566,42 +1552,42 @@ public final class Client
 
     public ArrayList getLegionMarkerIds(String hexLabel)
     {
-        return server.getGame().getLegionMarkerIds(hexLabel);
+        return server.getLegionMarkerIds(hexLabel);
     }
 
     public Set findAllUnmovedLegionHexes()
     {
-        return server.getGame().findAllUnmovedLegionHexes();
+        return server.findAllUnmovedLegionHexes();
     }
 
     public Set findTallLegionHexes()
     {
-        return server.getGame().findTallLegionHexes();
+        return server.findTallLegionHexes();
     }
 
     public Set findEngagements()
     {
-        return server.getGame().findEngagements();
+        return server.findEngagements();
     }
 
     public void newGame()
     {
-        server.getGame().newGame();
+        server.newGame();
     }
 
     public void loadGame(String filename)
     {
-        server.getGame().loadGame(filename);
+        server.loadGame(filename);
     }
 
     public void saveGame()
     {
-        server.getGame().saveGame();
+        server.saveGame();
     }
 
     public void saveGame(String filename)
     {
-        server.getGame().saveGame(filename);
+        server.saveGame(filename);
     }
 
     public String getLongMarkerName(String markerId)
@@ -1698,12 +1684,6 @@ public final class Client
     public boolean isMyLegion(String markerId)
     {
         return (playerName.equals(server.getPlayerNameByMarkerId(markerId)));
-    }
-
-
-    public Creature[] getStartingCreatures()
-    {
-        return server.getStartingCreatures();
     }
 
     public int getMovementRoll()

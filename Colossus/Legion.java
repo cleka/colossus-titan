@@ -446,6 +446,29 @@ public final class Legion implements Comparable
     }
 
 
+    /** Return a list of unique imageNames for all lords in this legion. */
+    public java.util.List getUniqueLordImageNames()
+    {
+        sortCritters();
+        java.util.List imageNames = new ArrayList();
+        Iterator it = getCritters().iterator();
+        int unknowns = 0;
+        while (it.hasNext())
+        {
+            Critter critter = (Critter)it.next();
+            if (critter.isLord()) 
+            {
+                String imageName = critter.getImageName(true);
+                if (!imageNames.contains(imageName))
+                {
+                    imageNames.add(critter.getImageName(false));
+                }
+            }
+        }
+        return imageNames;
+    }
+
+
     public String getImageName()
     {
         return markerId;

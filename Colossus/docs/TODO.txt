@@ -1,3 +1,9 @@
+Move .cfg files (etc.) to subdirectories.
+
+Include an .ico file for Windows.
+
+Remember window positions in .cfg file.
+
 Show just-recruited enemy critters on top of their stacks.
 
 Add a window that shows the recruiting tree.
@@ -11,6 +17,7 @@ Eliminate persistent legion.hexInfo and instead return a temporary
    along with the possible hexes that the legion can move to.
 
 Consider switching from make to Ant to better handle packages.
+Consider SableCC.
 
 Confirmation prompt to avoid skipping recruits?
 

@@ -61,12 +61,6 @@ public final class Server
     // TODO Event handling scheme to catch messages from clients.  Parsing
     // scheme to turn them into method calls.
 
-    /** Temporary convenience method until all client-side classes no longer
-     *  need game refs. */
-    public Game getGame()
-    {
-        return game;
-    }
 
 
     void allUpdateStatusScreen()
@@ -687,7 +681,9 @@ public final class Server
     String splitLegion(Legion legion, String selectedMarkerId)
     {
         Client client = getClient(legion.getPlayerName());
-        return client.splitLegion(legion, selectedMarkerId);
+        return client.splitLegion(legion.getMarkerId(), 
+            legion.getLongMarkerName(), selectedMarkerId, 
+            legion.getImageNames(true));
     }
 
 
@@ -704,7 +700,7 @@ public final class Server
     String pickLord(Legion legion)
     {
         Client client = getClient(legion.getPlayerName());
-        return client.pickLord(legion);
+        return client.pickLord(legion.getUniqueLordImageNames());
     }
 
 
@@ -1269,4 +1265,122 @@ public final class Server
     {
         return game.getCaretaker().getCount(creatureName);
     }
+
+
+    public String getPlayerColor(String playerName)
+    {
+        return game.getPlayer(playerName).getColor();
+    }
+
+    public String getBattleActivePlayerName()
+    {
+        return game.getBattle().getActivePlayerName();
+    }
+
+    public int getBattlePhase()
+    {
+        return game.getBattle().getPhase();
+    }
+
+    public int getBattleTurnNumber()
+    {
+        return game.getBattle().getTurnNumber();
+    }
+
+    public int getPhase()
+    {
+        return game.getPhase();
+    }
+
+    public int getTurnNumber()
+    {
+        return game.getTurnNumber();
+    }
+
+    public void doSplit(String markerId)
+    {
+        game.doSplit(markerId);
+    }
+
+    public boolean doMove(String markerId, String hexLabel)
+    {
+        return game.doMove(markerId, hexLabel);
+    }
+
+    /** Return a list of Creatures. */
+    public ArrayList findEligibleRecruits(String markerId, String hexLabel)
+    {
+        return game.findEligibleRecruits(markerId, hexLabel);
+    }
+
+    /** Return a set of hexLabels. */
+    public Set findAllEligibleRecruitHexes()
+    {
+        return game.findAllEligibleRecruitHexes();
+    }
+
+    /** Return a set of hexLabels. */
+    public Set findSummonableAngels(String markerId)
+    {
+        return game.findSummonableAngels(markerId);
+    }
+
+    /** Return a set of hexLabels. */
+    public Set listMoves(String markerId)
+    {
+        return game.listMoves(markerId);
+    }
+
+    public java.util.List getAllLegionIds()
+    {
+        return game.getAllLegionIds();
+    }
+
+    public int getActivePlayerNum()
+    {
+        return game.getActivePlayerNum();
+    }
+
+    public ArrayList getLegionMarkerIds(String hexLabel)
+    {
+        return game.getLegionMarkerIds(hexLabel);
+    }
+
+    public Set findAllUnmovedLegionHexes()
+    {
+        return game.findAllUnmovedLegionHexes();
+    }
+
+    public Set findTallLegionHexes()
+    {
+        return game.findTallLegionHexes();
+    }
+
+    public Set findEngagements()
+    {
+        return game.findEngagements();
+    }
+
+    public void newGame()
+    {
+        game.newGame();
+    }
+
+    public void loadGame(String filename)
+    {
+        game.loadGame(filename);
+    }
+
+    public void saveGame()
+    {
+        game.saveGame();
+    }
+
+    public void saveGame(String filename)
+    {
+        game.saveGame(filename);
+    }
+
+
+
 }

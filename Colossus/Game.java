@@ -2406,7 +2406,7 @@ public final class Game
     }
 
 
-    public void negotiate(String playerName, NegotiationResults offer)
+    void negotiate(String playerName, NegotiationResults offer)
     {
         // If it's too late to negotiate, just throw this away.
         if (battleInProgress)
@@ -2444,6 +2444,7 @@ public final class Game
         else
         {
             offers[thisPlayerSet].add(offer);
+            // XXX Need to tell the other player about the offer.
         }
     }
 

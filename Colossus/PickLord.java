@@ -13,56 +13,32 @@ import java.util.*;
 public final class PickLord extends JDialog implements MouseListener,
     WindowListener
 {
-    private Player player;
-    private Legion legion;
     private ArrayList chits = new ArrayList();
-    private ArrayList lords = new ArrayList();
-    private static Creature lord;
+    private static String lordType;
+    private java.util.List imageNames;
 
 
-    private PickLord(JFrame parentFrame, Legion legion)
+    private PickLord(JFrame parentFrame, java.util.List imageNames)
     {
         super(parentFrame, "Reveal Which Lord?", true);
 
-        lord = null;
-
-        this.legion = legion;
-        player = legion.getPlayer();
+        this.imageNames = imageNames;
+        lordType = null;
 
         addMouseListener(this);
         addWindowListener(this);
 
         Container contentPane = getContentPane();
-
         contentPane.setLayout(new FlowLayout());
-
         pack();
-
         setBackground(Color.lightGray);
-
-        // Need to use Critters instead of Creatures to display
-        // titan power correctly.
-        if (legion.numCreature(Creature.getCreatureByName("Titan")) > 0)
-        {
-            lords.add(legion.getCritter(Creature.getCreatureByName("Titan")));
-        }
-        if (legion.numCreature(Creature.getCreatureByName("Archangel")) > 0)
-        {
-            lords.add(legion.getCritter(Creature.getCreatureByName("Archangel")));
-        }
-        if (legion.numCreature(Creature.getCreatureByName("Angel")) > 0)
-        {
-            lords.add(legion.getCritter(Creature.getCreatureByName("Angel")));
-        }
-
         setResizable(false);
 
-        Iterator it = lords.iterator();
+        Iterator it = imageNames.iterator();
         while (it.hasNext())
         {
-            Critter critter = (Critter)it.next();
-            Chit chit = new Chit(4 * Scale.get(), critter.getImageName(),
-                this);
+            String imageName = (String)it.next();
+            Chit chit = new Chit(4 * Scale.get(), imageName, this);
             chits.add(chit);
             contentPane.add(chit);
             chit.addMouseListener(this);
@@ -79,10 +55,10 @@ public final class PickLord extends JDialog implements MouseListener,
     }
 
 
-    public static Creature pickLord(JFrame parentFrame, Legion legion)
+    static String pickLord(JFrame parentFrame, java.util.List imageNames)
     {
-        new PickLord(parentFrame, legion);
-        return lord;
+        new PickLord(parentFrame, imageNames);
+        return lordType;
     }
 
 
@@ -92,7 +68,11 @@ public final class PickLord extends JDialog implements MouseListener,
         int i = chits.indexOf(source);
         if (i != -1)
         {
-            lord = (Creature)lords.get(i);
+            lordType = (String)imageNames.get(i);
+            if (lordType.startsWith("Titan"))
+            {
+                lordType = "Titan";
+            }
             dispose();
         }
     }
