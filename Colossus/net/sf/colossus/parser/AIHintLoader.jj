@@ -2,8 +2,6 @@ options
 {
   IGNORE_CASE = false;
   STATIC = false;
-  LOOKAHEAD = 20;
-  FORCE_LA_CHECK = true;
 }
 
 PARSER_BEGIN(AIHintLoader)
@@ -25,6 +23,7 @@ import net.sf.colossus.server.HintOracleInterface;
 public class AIHintLoader
 {
     Map terrainToRecruitHintList = new HashMap();
+    java.util.Stack argStack = new java.util.Stack();
 
     private class recruitHintData
     {
@@ -571,56 +570,76 @@ double h_random() :
     }
 }
 
-ConditionTreeNode h_condnode() :
+void h_ornode() :
+{}
 {
-    ConditionTreeNode ctn1;
-    ConditionTreeNode ctn2;
+    h_andnode() ( <OR> h_andnode()
+    {
+        ConditionTreeNode ctn1 = (ConditionTreeNode)argStack.pop();
+        ConditionTreeNode ctn2 = (ConditionTreeNode)argStack.pop();
+        argStack.push(new ConditionTreeNode_BinaryOr(ctn1,ctn2));
+    } ) *
+}
+
+void h_andnode() :
+{}
+{
+    h_unarynode() ( <AND> h_unarynode()
+    {
+        ConditionTreeNode ctn1 = (ConditionTreeNode)argStack.pop();
+        ConditionTreeNode ctn2 = (ConditionTreeNode)argStack.pop();
+        argStack.push(new ConditionTreeNode_BinaryAnd(ctn1,ctn2));
+    } ) *
+}
+
+void h_unarynode() :
+{}
+{
+    <NOT> h_leaf()
+    {
+        ConditionTreeNode ctn1 = (ConditionTreeNode)argStack.pop();
+        argStack.push(new ConditionTreeNode_UnaryNot(ctn1));
+    }
+|   h_leaf()
+}
+
+void h_leaf() :
+{
     char tc;
     int n;
     String name;
     double p;
 }
 {
-    <OPENPAR> (ctn1 = h_condnode()) <OR> (ctn2 = h_condnode()) <CLOSEPAR>
+    (tc = h_reachterrain())
     {
-        return new ConditionTreeNode_BinaryOr(ctn1,ctn2);
+        argStack.push(new ConditionTreeNode_CanReach(tc));
     }
-|   <OPENPAR> (ctn1 = h_condnode()) <AND> (ctn2 = h_condnode()) <CLOSEPAR>
+|   <HASCREATURE> (name = h_chaine())
     {
-        return new ConditionTreeNode_BinaryAnd(ctn1,ctn2);
+        argStack.push(new ConditionTreeNode_HasCreature(name));
     }
-|   <OPENPAR> <NOT> (ctn1 = h_condnode()) <CLOSEPAR>
+|   (p = h_random())
     {
-        return new ConditionTreeNode_UnaryNot(ctn1);
+        argStack.push(new ConditionTreeNode_Random(p));
     }
-|   <OPENPAR> (tc = h_reachterrain()) <CLOSEPAR>
+|   (n = h_number()) (name = h_chaine()) <AVAILABLE>
     {
-        return new ConditionTreeNode_CanReach(tc);
+        argStack.push(new ConditionTreeNode_CreatureAvailable(n,name));
     }
-|   <OPENPAR> <HASCREATURE> (name = h_chaine()) <CLOSEPAR>
+|   <CANRECRUIT> (name = h_chaine())
     {
-        return new ConditionTreeNode_HasCreature(name);
+        argStack.push(new ConditionTreeNode_CanRecruit(name));
     }
-|   <OPENPAR> (p = h_random()) <CLOSEPAR>
+|   <HEIGHTIS> (n = h_number())
     {
-        return new ConditionTreeNode_Random(p);
+        argStack.push(new ConditionTreeNode_HeightIs(n));
     }
-|   <OPENPAR> (n = h_number()) (name = h_chaine()) <AVAILABLE> <CLOSEPAR>
+|   <LABELIS> (name = h_chaine())
     {
-        return new ConditionTreeNode_CreatureAvailable(n,name);
+        argStack.push(new ConditionTreeNode_LabelIs(name));
     }
-|   <OPENPAR> <CANRECRUIT> (name = h_chaine()) <CLOSEPAR>
-    {
-        return new ConditionTreeNode_CanRecruit(name);
-    }
-|   <OPENPAR> <HEIGHTIS> (n = h_number()) <CLOSEPAR>
-    {
-        return new ConditionTreeNode_HeightIs(n);
-    }
-|   <OPENPAR> <LABELIS> (name = h_chaine()) <CLOSEPAR>
-    {
-        return new ConditionTreeNode_LabelIs(name);
-    }
+|   "(" h_ornode() ")"
 }
 
 recruitHintData h_recruit_hint() :
@@ -641,12 +660,18 @@ int oneHint() :
 {
     recruitHintData recruitHint;
     String s;
-    ConditionTreeNode ctn = null;
 }
 {
-    (recruitHint = h_recruit_hint()) (ctn = h_condnode())?
+    (recruitHint = h_recruit_hint()) (h_ornode())?
     {
         Character index = new Character(recruitHint.getTerrain());
+
+        ConditionTreeNode ctn = null;
+
+        if (!argStack.empty())
+        {
+            ctn = (ConditionTreeNode)argStack.pop();
+        }
 
         List temp = (List)terrainToRecruitHintList.get(index);
 
