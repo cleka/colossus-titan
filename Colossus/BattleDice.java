@@ -185,9 +185,6 @@ public final class BattleDice extends JFrame implements WindowListener
         setVisible(true);
 
         repaint();
-
-        // Restore focus to the battle map.
-        transferFocus();
     }
 
 
@@ -247,6 +244,13 @@ public final class BattleDice extends JFrame implements WindowListener
 
     public void windowOpened(WindowEvent e)
     {
+    }
+
+
+    /** Never grab the keyboard focus. */
+    public boolean isFocusTraversable()
+    {
+        return false;
     }
 
 

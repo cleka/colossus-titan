@@ -395,8 +395,6 @@ public final class Game
         {
             movementDie.showRoll(roll);
         }
-        // Give focus back to the masterboard.
-        masterFrame.show();
     }
 
 

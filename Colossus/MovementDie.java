@@ -118,6 +118,13 @@ public final class MovementDie extends JFrame implements WindowListener
     }
 
 
+    /** Never grab the keyboard focus. */
+    public boolean isFocusTraversable()
+    {
+        return false;
+    }
+
+
     public static void main(String [] args)
     {
         MovementDie movementDie = new MovementDie(null);

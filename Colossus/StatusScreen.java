@@ -54,7 +54,6 @@ public final class StatusScreen extends JFrame implements WindowListener
         titanLabel = new JLabel[numPlayers];
         scoreLabel = new JLabel[numPlayers];
 
-
         contentPane.add(new JLabel("Player"));
         for (int i = 0; i < numPlayers; i++)
         {
@@ -207,8 +206,7 @@ public final class StatusScreen extends JFrame implements WindowListener
             setPlayerLabelBackground(i, color);
 
             nameLabel[i].setText(player.getName());
-            towerLabel[i].setText(String.valueOf(100 *
-                player.getTower()));
+            towerLabel[i].setText(String.valueOf(100 * player.getTower()));
             colorLabel[i].setText(player.getColor());
             elimLabel[i].setText(player.getPlayersElim());
             legionsLabel[i].setText(String.valueOf(player.getNumLegions()));

@@ -23,7 +23,7 @@ public class Chit extends JPanel
     /** We need to track whether we're running as an applet to load
         images correctly.  setApplet() should be called before any
         objects of this class (or its children) are created. */
-    protected static boolean isApplet = false;
+    protected static boolean isApplet;
 
     private String id;
 
