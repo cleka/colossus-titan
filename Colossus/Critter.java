@@ -8,9 +8,10 @@ class Critter extends Creature
 {
     private boolean visible;
     private Creature creature;
+    private Legion legion;
 
     
-    Critter(Creature creature, boolean visible)
+    Critter(Creature creature, boolean visible, Legion legion)
     {
         super(creature.name, creature.power, creature.skill, 
             creature.rangeStrikes, creature.flies, creature.nativeBramble, 
@@ -28,6 +29,11 @@ class Critter extends Creature
         }
 
         this.visible = visible; 
+        this.legion = legion;
+        if (getName().equals("Titan"))
+        {
+            setPower(legion.getPlayer().getTitanPower());
+        }
     }
 
 
@@ -73,5 +79,60 @@ class Critter extends Creature
     public void putOneBack()
     {
         creature.putOneBack();
+    }
+
+
+    // File.separator does not work right in jar files.  A hardcoded 
+    // forward-slash does, and works in *x and Windows.  I have
+    // no idea if it works on the Mac, etc.
+    public String getImageName(boolean inverted)
+    {
+        String myName;
+        if (getName().equals("Titan") && getPower() >= 6 && getPower() <= 20)
+        {
+            // Use Titan14.gif for a 14-power titan, etc.  Use the generic
+            // Titan.gif (with X-4) for ridiculously big titans, to avoid 
+            // the need for an infinite number of images.
+            
+            myName = getName() + getPower();
+        }
+        else
+        {
+            myName = name;
+        }
+
+        if (inverted)
+        {
+            return "images/i_" + myName + ".gif";
+        }
+        else
+        {
+            return "images/" + myName + ".gif";
+        }
+    }
+
+
+    public String getImageName()
+    {
+        return getImageName(false);
+    }
+
+
+
+    public int getPower()
+    {
+        // Update Titan power if necessary.
+        if (getName().equals("Titan"))
+        {
+            setPower(legion.getPlayer().getTitanPower());
+        }
+
+        return power;
+    }
+
+
+    public int getPointValue()
+    {
+        return getPower() * skill;
     }
 }
