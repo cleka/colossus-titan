@@ -114,7 +114,7 @@ class Chit extends JPanel
             int width = icon.getIconWidth();
             int height = icon.getIconHeight();
             BufferedImage bi = new BufferedImage(width, height,
-                                                 BufferedImage.TYPE_INT_RGB);
+                                                 BufferedImage.TYPE_INT_ARGB);
             Graphics2D biContext = bi.createGraphics();
             biContext.drawImage(image, 0, 0, null);
             
@@ -126,7 +126,7 @@ class Chit extends JPanel
             bi2 = ato.filter(bi, bi2);
             image = bi2;
         }
-        g2.drawImage(icon.getImage(), rect.x, rect.y, rect.width,
+        g2.drawImage(image, rect.x, rect.y, rect.width,
                      rect.height, container);
         if (isDead())
         {

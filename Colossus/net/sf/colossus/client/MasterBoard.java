@@ -1397,7 +1397,9 @@ public final class MasterBoard extends JPanel
     private void setupIcon()
     {
         java.util.List directories = new java.util.ArrayList();
-        directories.add(Constants.imagesDirName);
+        directories.add(Constants.defaultDirName +
+                        ResourceLoader.getPathSeparator() +
+                        Constants.imagesDirName);
         
         Image image = ResourceLoader.getImage("Colossus", directories);
         
