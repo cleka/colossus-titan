@@ -14,6 +14,7 @@ class BattleTurn extends Dialog implements ActionListener
     public static final int RECRUIT = 1;
     public static final int MOVE = 2;
     public static final int FIGHT = 3;
+    public static final int STRIKEBACK = 4;
 
     private Frame parentFrame;
     private BattleMap map;
@@ -36,43 +37,49 @@ class BattleTurn extends Dialog implements ActionListener
         activeLegion = defender;
 
         setSize(300, 250);
-        
+
         setupMoveDialog();
 
         setVisible(true);
     }
 
-    
+
     void setupMoveDialog()
     {
-        // XXX: If there are no legal moves, move on.
+        // If there are no legal moves, move on.
+        if (map.highlightMovableChits() < 1)
+        {
+            advancePhase();
+        }
+        else
+        {
+            removeAll();
+            setLayout(new GridLayout(0, 4));
+            setTitle(getActivePlayer().getName() + " Turn " + turnNumber);
 
-        removeAll();
-        setLayout(new GridLayout(0, 4));
-        setTitle(getActivePlayer().getName() + " Turn " + turnNumber);
+            add(new Label(activeLegion.getPlayer().getName() + " : Move"));
 
-        add(new Label(activeLegion.getPlayer().getName() + " : Move"));
+            Button button1 = new Button("Undo Last Move");
+            add(button1);
+            button1.addActionListener(this);
 
-        Button button1 = new Button("Undo Last Move");
-        add(button1);
-        button1.addActionListener(this);
+            Button button2 = new Button("Undo All Moves");
+            add(button2);
+            button2.addActionListener(this);
 
-        Button button2 = new Button("Undo All Moves");
-        add(button2);
-        button2.addActionListener(this);
+            Button button3 = new Button("Done with Moves");
+            add(button3);
+            button3.addActionListener(this);
 
-        Button button3 = new Button("Done with Moves");
-        add(button3);
-        button3.addActionListener(this);
-           
-        pack();
+            pack();
 
-        // Place this window in the upper right corner.
-        Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-        setLocation(new Point(d.width - getSize().width, 0));
+            // Place this window in the upper right corner.
+            Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
+            setLocation(new Point(d.width - getSize().width, 0));
+        }
     }
 
-    
+
     void setupFightDialog()
     {
         // If there are no possible strikes, move on.
@@ -86,8 +93,8 @@ class BattleTurn extends Dialog implements ActionListener
             setLayout(new GridLayout(0, 2));
             setTitle(getActivePlayer().getName() + " Turn " + turnNumber);
 
-            add(new Label(activeLegion.getPlayer().getName() + 
-                " : Strike"));
+            add(new Label(activeLegion.getPlayer().getName() +
+                ((phase == FIGHT) ? " : Strike" : " : Strikeback")));
             Button button1 = new Button("Done with Strikes");
             add(button1);
             button1.addActionListener(this);
@@ -100,7 +107,7 @@ class BattleTurn extends Dialog implements ActionListener
         }
     }
 
-    
+
     Legion getActiveLegion()
     {
         return activeLegion;
@@ -133,32 +140,48 @@ class BattleTurn extends Dialog implements ActionListener
             setupFightDialog();
         }
 
-        // phase == FIGHT
-        else if (activeLegion == defender)
+        else if (phase == FIGHT)
         {
-            activeLegion = attacker;
-            phase = MOVE;
-            setupMoveDialog();
-        }
-
-        // phase == FIGHT, activeLegion == attacker
-        else
-        {
-            activeLegion = defender;
-            turnNumber++;
-            if (turnNumber > 7)
+            if (activeLegion == defender)
             {
-                // XXX: Time loss.
+                activeLegion = attacker;
             }
             else
+            {
+                activeLegion = defender;
+            }
+
+            phase = STRIKEBACK;
+            setupFightDialog();
+        }
+
+        else if (phase == STRIKEBACK)
+        {
+            // Remove dead chits.
+            map.removeDeadChits();
+
+            if (activeLegion == attacker)
             {
                 phase = MOVE;
                 setupMoveDialog();
             }
+            else
+            {
+                turnNumber++;
+                if (turnNumber > 7)
+                {
+                    // XXX: Time loss.
+                }
+                else
+                {
+                    phase = MOVE;
+                    setupMoveDialog();
+                }
+            }
         }
     }
 
-    
+
     public void actionPerformed(ActionEvent e)
     {
         if (e.getActionCommand() == "Undo Last Move")
@@ -185,6 +208,7 @@ class BattleTurn extends Dialog implements ActionListener
             // Advance only if there are no unresolved strikes.
             if (map.forcedStrikesRemain() == false)
             {
+                map.commitStrikes();
                 advancePhase();
             }
         }
