@@ -14,7 +14,7 @@ class MessageBox extends Dialog implements ActionListener
 
     MessageBox(Frame parentFrame, String message)
     {
-        super(parentFrame, "Message");
+        super(parentFrame, "Message", true);
 
         setLayout(new GridLayout(0, 1));
         setBackground(Color.lightGray);
