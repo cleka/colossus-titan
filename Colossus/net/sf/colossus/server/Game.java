@@ -2405,7 +2405,7 @@ public final class Game
         Legion attacker = getLegionByMarkerId(markerId);
         String hexLabel = attacker.getCurrentHexLabel();
         Legion defender = getFirstEnemyLegion(hexLabel, attacker.getPlayer());
-        handleConcession(defender, attacker, true);
+        handleConcession(attacker, defender, false);
     }
 
     void doNotFlee(String markerId)
