@@ -223,6 +223,10 @@ public class Creature implements Comparable
 
     public String[] getImagesNames()
     {
+        if (isTitan())
+        {
+            Log.warn("Calling getImagesNames() for Titan, this is broken.");
+        }
         String[] tempNames;
         if (baseColor != null)
         {
