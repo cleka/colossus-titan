@@ -25,13 +25,21 @@ final class SplitLegion extends KDialog implements MouseListener,
     private Marker newMarker;
 
     private Client client;
-    private GridBagLayout gridbag = new GridBagLayout();
-    private GridBagConstraints constraints = new GridBagConstraints();
     private static boolean active;
     private String selectedMarkerId;
 
     /** new marker id,creature1,creature2... */
     private static String results;
+
+    private Box oldBox;
+    private Box newBox;
+    private Box buttonBox;
+
+    private Component oldGlue;
+    private Component newGlue;
+
+    private int totalChits;
+    private int scale;
 
 
     private SplitLegion(Client client, String parentId,
@@ -41,7 +49,7 @@ final class SplitLegion extends KDialog implements MouseListener,
             ": Split Legion " + parentId, true);
 
         Container contentPane = getContentPane();
-        contentPane.setLayout(gridbag);
+        contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
 
         this.client = client;
 
@@ -56,16 +64,22 @@ final class SplitLegion extends KDialog implements MouseListener,
         addMouseListener(this);
         addWindowListener(this);
 
-        int scale = 4 * Scale.get();
+        scale = 4 * Scale.get();
+
+        oldBox = Box.createHorizontalBox();
+        newBox = Box.createHorizontalBox();
+        buttonBox = Box.createHorizontalBox();
+
+        contentPane.add(oldBox);
+        contentPane.add(newBox);
+        contentPane.add(buttonBox);
 
         oldMarker = new Marker(scale, parentId, this, null);
-        constraints.gridx = GridBagConstraints.RELATIVE;
-        constraints.gridy = 0;
-        constraints.gridwidth = 1;
-        gridbag.setConstraints(oldMarker, constraints);
-        contentPane.add(oldMarker);
+        oldBox.add(oldMarker);
+        oldBox.add(Box.createHorizontalStrut(scale / 4));
 
         java.util.List imageNames = client.getLegionImageNames(parentId);
+        totalChits = imageNames.size();
 
         Iterator it = imageNames.iterator();
         while (it.hasNext())
@@ -73,49 +87,29 @@ final class SplitLegion extends KDialog implements MouseListener,
             String imageName = (String)it.next();
             Chit chit = new Chit(scale, imageName, this);
             oldChits.add(chit);
-            gridbag.setConstraints(chit, constraints);
-            contentPane.add(chit);
+            oldBox.add(chit);
             chit.addMouseListener(this);
         }
 
-        newMarker = new Marker(scale, selectedMarkerId, this, null);
 
-        constraints.gridx = GridBagConstraints.RELATIVE;
-        constraints.gridy = 1;
-        constraints.gridwidth = 1;
-        gridbag.setConstraints(newMarker, constraints);
-        contentPane.add(newMarker);
+        newMarker = new Marker(scale, selectedMarkerId, this, null);
+        newBox.add(newMarker);
+        newBox.add(Box.createHorizontalStrut(scale / 4));
+
+        oldGlue = Box.createHorizontalGlue();
+        newGlue = Box.createHorizontalGlue();
+        oldBox.add(oldGlue);
+        newBox.add(newGlue);
 
         JButton button1 = new JButton("Done");
         button1.setMnemonic(KeyEvent.VK_D);
         JButton button2 = new JButton("Cancel");
         button2.setMnemonic(KeyEvent.VK_C);
 
-         // Attempt to center the buttons.
-        int chitWidth = Math.max(oldChits.size(), newChits.size()) + 1;
-        if (chitWidth < 4)
-        {
-            constraints.gridwidth = 1;
-        }
-        else
-        {
-            constraints.gridwidth = 2;
-        }
-        int leadSpace = (chitWidth - 2 * constraints.gridwidth) / 2;
-        if (leadSpace < 0)
-        {
-            leadSpace = 0;
-        }
-
-        constraints.gridx = leadSpace;
-        constraints.gridy = 2;
-        gridbag.setConstraints(button1, constraints);
-        contentPane.add(button1);
+        buttonBox.add(button1);
         button1.addActionListener(this);
 
-        constraints.gridx = leadSpace + constraints.gridwidth;
-        gridbag.setConstraints(button2, constraints);
-        contentPane.add(button2);
+        buttonBox.add(button2);
         button2.addActionListener(this);
 
         pack();
@@ -141,22 +135,20 @@ final class SplitLegion extends KDialog implements MouseListener,
 
     /** Move a chit to the end of the other line. */
     private void moveChitToOtherLine(java.util.List fromChits, java.util.List
-        toChits, int oldPosition, int gridy)
+        toChits, Box fromBox, Box toBox, int oldPosition)
     {
-        Container contentPane = getContentPane();
+        oldBox.remove(oldGlue);
+        newBox.remove(newGlue);
 
         Chit chit = (Chit)fromChits.remove(oldPosition);
-        contentPane.remove(chit);
-
+        fromBox.remove(chit);
         toChits.add(chit);
+        toBox.add(chit);
 
-        constraints.gridx = GridBagConstraints.RELATIVE;
-        constraints.gridy = gridy;
-        constraints.gridwidth = 1;
-        gridbag.setConstraints(chit, constraints);
-        contentPane.add(chit);
+        oldBox.add(oldGlue);
+        newBox.add(newGlue);
 
-        pack();
+        //pack();
         repaint();
     }
 
@@ -234,7 +226,7 @@ final class SplitLegion extends KDialog implements MouseListener,
         int i = oldChits.indexOf(source);
         if (i != -1)
         {
-            moveChitToOtherLine(oldChits, newChits, i, 1);
+            moveChitToOtherLine(oldChits, newChits, oldBox, newBox, i);
             return;
         }
         else
@@ -242,7 +234,7 @@ final class SplitLegion extends KDialog implements MouseListener,
             i = newChits.indexOf(source);
             if (i != -1)
             {
-                moveChitToOtherLine(newChits, oldChits, i, 0);
+                moveChitToOtherLine(newChits, oldChits, newBox, oldBox, i);
                 return;
             }
         }
