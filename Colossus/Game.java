@@ -464,20 +464,22 @@ System.out.println("advancePhase to phase " + phase);
 System.out.println("advanceTurn");
         board.unselectAllHexes();
         activePlayerNum++;
-        activePlayerNum %= numPlayers;
-        if (activePlayerNum == 0)
+        if (activePlayerNum == numPlayers)
         {
+            activePlayerNum = 0;
             turnNumber++;
         }
         phase = SPLIT;
 System.out.println("phase = SPLIT  activePlayerNum = " + activePlayerNum);
-        if (getActivePlayer().isAlive() == false)
+        if (!getActivePlayer().isAlive())
         {
             advanceTurn();
         }
-
-        // Update the status screen to show whose turn it is.
-        updateStatusScreen();
+        else
+        {
+            // Update the status screen to show whose turn it is.
+            updateStatusScreen();
+        }
     }
 
 
