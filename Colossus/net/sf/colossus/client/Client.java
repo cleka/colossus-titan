@@ -303,9 +303,13 @@ public final class Client implements IClient
         }
 
         // Call here instead of from setupMove() for mulligans.
-        if (isMyTurn() && getOption(Options.autoMasterMove))
+        if (isMyTurn() && getOption(Options.autoMasterMove) && !isGameOver())
         {
-            ai.masterMove();
+            boolean again = ai.masterMove();
+            if (!again)
+            {
+                doneWithMoves();
+            }
         }
     }
 
@@ -1780,6 +1784,7 @@ public final class Client implements IClient
     {
         String hexLabel = getHexForLegion(markerId);
         removeCreature(markerId, recruitName);
+        getLegionInfo(markerId).setRecruited(false);
         if (board != null)
         {
             GUIMasterHex hex = board.getGUIHexByLabel(hexLabel);
@@ -1787,7 +1792,6 @@ public final class Client implements IClient
             hex.repaint();
             board.highlightPossibleRecruits();
         }
-        getLegionInfo(markerId).setRecruited(false);
     }
 
     /** null means cancel.  "none" means no recruiter (tower creature). */
@@ -1870,7 +1874,7 @@ public final class Client implements IClient
         }
         updateStatusScreen();
 
-        if (isMyTurn() && getOption(Options.autoSplit))
+        if (isMyTurn() && getOption(Options.autoSplit) && !isGameOver())
         {
             ai.split();
             doneWithSplits();
@@ -1915,7 +1919,7 @@ public final class Client implements IClient
         }
         updateStatusScreen();
 
-        if (getOption(Options.autoRecruit))
+        if (getOption(Options.autoRecruit) && !isGameOver())
         {
             ai.muster();
             doneWithRecruits();
@@ -2181,6 +2185,7 @@ public final class Client implements IClient
             map.alignChits(startingHexLabel);
             map.alignChits(endingHexLabel);
             map.repaint();
+            map.highlightMobileCritters();
         }
     }
 
@@ -2537,6 +2542,15 @@ public final class Client implements IClient
             board.highlightUnmovedLegions();
             board.repaint();
         }
+
+        if (isMyTurn() && getOption(Options.autoMasterMove) && !isGameOver())
+        {
+            boolean again = ai.masterMove();
+            if (!again)
+            {
+                doneWithMoves();
+            }
+        }
     }
 
     public void undidMove(String markerId, String formerHexLabel,
@@ -2551,6 +2565,7 @@ public final class Client implements IClient
         {
             board.alignLegions(formerHexLabel);
             board.alignLegions(currentHexLabel);
+            board.highlightUnmovedLegions();
         }
     }
 
@@ -2748,7 +2763,7 @@ public final class Client implements IClient
         {
             Map.Entry entry = (Map.Entry)it.next();
             LegionInfo info = (LegionInfo)entry.getValue();
-            if (info.getHexLabel() != null &&
+            if (info != null && info.getHexLabel() != null &&
                 hexLabel.equals(info.getHexLabel()))
             {
                 markerIds.add(info.getMarkerId());
@@ -2991,6 +3006,7 @@ public final class Client implements IClient
         if (board != null)
         {
             board.alignLegions(hexLabel);
+            board.highlightTallLegions();
         }
     }
 
@@ -3000,9 +3016,6 @@ public final class Client implements IClient
         {
             String markerId = (String)popUndoStack();
             server.undoRecruit(markerId);
-            String hexLabel = getHexForLegion(markerId);
-            GUIMasterHex hex = board.getGUIHexByLabel(hexLabel);
-            hex.repaint();
         }
     }
 

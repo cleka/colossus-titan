@@ -14,7 +14,7 @@ import java.util.*;
 public interface AI
 {
     /** make masterboard moves for current player in the Game */
-    void masterMove();
+    boolean masterMove();
 
     /** make splits for current player */
     void split();

@@ -719,14 +719,18 @@ public class SimpleAI implements AI
         }
     }
 
-    public void masterMove()
+    /** Return true if we need to run this method again after the server
+     *  updates the client with the results of a move or mulligan. */
+    public boolean masterMove()
     {
+        boolean moved = false;
+
         PlayerInfo player = client.getPlayerInfo(client.getPlayerName());
 
         // consider mulligans
         if (handleMulligans(player))
         {
-            return;
+            return true;
         }
 
         /** cache all places enemies can move to, for use in risk analysis. */
@@ -737,23 +741,27 @@ public class SimpleAI implements AI
         // we're forced to move.
         Map moveMap = new HashMap();
 
-        handleVoluntaryMoves(player, moveMap, enemyAttackMap);
+        moved = handleVoluntaryMoves(player, moveMap, enemyAttackMap);
+        if (moved)
+        {
+            return true;
+        }
 
         // make sure we move splits (when forced)
-        handleForcedSplitMoves(player, moveMap);
+        moved = handleForcedSplitMoves(player, moveMap);
+        if (moved)
+        {
+            return true;
+        }
 
         // make sure we move at least one legion
         if (player.numLegionsMoved() == 0)
         {
-            handleForcedSingleMove(player, moveMap);
-
-            // Perhaps that forced move opened up a good move for another
-            // legion, or forced a split move.  So iterate again.
-            handleVoluntaryMoves(player, moveMap, enemyAttackMap);
-            handleForcedSplitMoves(player, moveMap);
+            moved = handleForcedSingleMove(player, moveMap);
+            // Always need to retry.
+            return true;
         }
-
-        client.doneWithMoves();
+        return false;
     }
 
     /** Return true if AI took a mulligan. */
@@ -771,10 +779,11 @@ public class SimpleAI implements AI
         return false;
     }
 
-    private void handleVoluntaryMoves(PlayerInfo player, Map moveMap, 
+    /** Return true if we moved something. */
+    private boolean handleVoluntaryMoves(PlayerInfo player, Map moveMap,
         Map [] enemyAttackMap)
     {
-        boolean moved;
+        boolean moved = false;
         List markerIds = player.getLegionIds();
 
         // Sort markerIds in descending order of legion importance.
@@ -792,72 +801,65 @@ public class SimpleAI implements AI
             }
         );
 
-
-        // Each time we move a legion, that may open up a previously blocked 
-        // move for a higher-priority legion.  So when we move something, 
-        // we should break out of the move loop and start over.
-        do
+        Iterator it = markerIds.iterator();
+        while (it.hasNext())
         {
-            moved = false;
-            Iterator it = markerIds.iterator();
-            while (it.hasNext())
+            String markerId = (String)it.next();
+            LegionInfo legion = client.getLegionInfo(markerId);
+
+            if (legion.hasMoved())
             {
-                String markerId = (String)it.next();
-                LegionInfo legion = client.getLegionInfo(markerId);
+                continue;
+            }
 
-                if (legion.hasMoved())
+            // compute the value of sitting still
+            List moveList = new ArrayList();
+            moveMap.put(legion, moveList);
+
+            MoveInfo sitStillMove = new MoveInfo(legion, null,
+                evaluateMove(legion, legion.getCurrentHex(), false,
+                enemyAttackMap), 0);
+            moveList.add(sitStillMove);
+
+            // find the best move (1-ply search)
+            MasterHex bestHex = null;
+            int bestValue = Integer.MIN_VALUE;
+            Set set = client.getMovement().listAllMoves(legion, 
+                legion.getCurrentHex(), client.getMovementRoll());
+
+            Iterator moveIterator = set.iterator();
+            while (moveIterator.hasNext())
+            {
+                final String hexLabel = (String)moveIterator.next();
+                final MasterHex hex = MasterBoard.getHexByLabel(hexLabel);
+                final int value = evaluateMove(legion, hex, true,
+                    enemyAttackMap);
+
+                if (value > bestValue || bestHex == null)
                 {
-                    continue;
+                    bestValue = value;
+                    bestHex = hex;
                 }
+                MoveInfo move = new MoveInfo(legion, hex, value,
+                    value - sitStillMove.value);
+                moveList.add(move);
+            }
 
-                // compute the value of sitting still
-                List moveList = new ArrayList();
-                moveMap.put(legion, moveList);
-
-                MoveInfo sitStillMove = new MoveInfo(legion, null,
-                    evaluateMove(legion, legion.getCurrentHex(), false,
-                    enemyAttackMap), 0);
-                moveList.add(sitStillMove);
-
-                // find the best move (1-ply search)
-                MasterHex bestHex = null;
-                int bestValue = Integer.MIN_VALUE;
-                Set set = client.getMovement().listAllMoves(legion, 
-                    legion.getCurrentHex(), client.getMovementRoll());
-
-                Iterator moveIterator = set.iterator();
-                while (moveIterator.hasNext())
+            // if we found a move that's better than sitting still, move
+            if (bestValue > sitStillMove.value)
+            {
+                moved = doMove(legion.getMarkerId(), bestHex.getLabel());
+                if (moved)
                 {
-                    final String hexLabel = (String)moveIterator.next();
-                    final MasterHex hex = MasterBoard.getHexByLabel(hexLabel);
-                    final int value = evaluateMove(legion, hex, true,
-                        enemyAttackMap);
-
-                    if (value > bestValue || bestHex == null)
-                    {
-                        bestValue = value;
-                        bestHex = hex;
-                    }
-                    MoveInfo move = new MoveInfo(legion, hex, value,
-                        value - sitStillMove.value);
-                    moveList.add(move);
-                }
-
-                // if we found a move that's better than sitting still, move
-                if (bestValue > sitStillMove.value)
-                {
-                    moved = doMove(legion.getMarkerId(), bestHex.getLabel());
-
-                    // Break out of the move loop and start over with
-                    // the highest-priority unmoved legion.
-                    break;
+                    return true;
                 }
             }
         }
-        while (moved);
+        return false;
     }
 
-    private void handleForcedSplitMoves(PlayerInfo player, Map moveMap)
+    /** Return true if we moved something. */
+    private boolean handleForcedSplitMoves(PlayerInfo player, Map moveMap)
     {
         List markerIds = player.getLegionIds();
         Iterator it = markerIds.iterator();
@@ -869,7 +871,7 @@ public class SimpleAI implements AI
             List friendlyLegions = client.getFriendlyLegions(hexLabel, 
                 player.getName());
 
-            outer: while (friendlyLegions.size() > 1 &&
+            while (friendlyLegions.size() > 1 &&
                 !client.getMovement().listNormalMoves(legion, 
                     legion.getCurrentHex(), 
                     client.getMovementRoll()).isEmpty())
@@ -919,28 +921,19 @@ public class SimpleAI implements AI
                         move.difference + 
                         " in order to handle illegal legion " + legion);
 
-                    doMove(move.legion.getMarkerId(), move.hex.getLabel());
-
-                    // check again if this legion is ok; if so, break
-                    friendlyLegions = client.getFriendlyLegions(hexLabel,
-                        player.getName());
-                    if (friendlyLegions.size() > 1 && 
-                        !client.getMovement().listNormalMoves(legion, 
-                            legion.getCurrentHex(), 
-                            client.getMovementRoll()).isEmpty())
+                    boolean moved = doMove(move.legion.getMarkerId(), 
+                        move.hex.getLabel());
+                    if (moved)
                     {
-                        continue;
-                    }
-                    else
-                    {
-                        break outer;    // legion is all set
+                        return true;
                     }
                 }
             }
         }
+        return false;
     }
 
-    private void handleForcedSingleMove(PlayerInfo player, Map moveMap)
+    private boolean handleForcedSingleMove(PlayerInfo player, Map moveMap)
     {
         Log.debug("Ack! forced to move someone");
 
@@ -990,21 +983,23 @@ public class SimpleAI implements AI
                     + " taking penalty " + move.difference
                     + " in order to handle illegal legion " + move.legion);
 
-            doMove(move.legion.getMarkerId(), move.hex.getLabel());
+            boolean moved = doMove(move.legion.getMarkerId(), 
+                move.hex.getLabel());
+            if (moved)
+            {
+                return true;
+            }
         }
+
+        Log.error("handleForcedSingleMove() didn't move anyone");
+        // Try again, even though it'll probably loop forever.
+        return true;
     }
 
     private boolean doMove(String markerId, String hexLabel)
     {
-        // XXX Don't *know* move succeeded without asking server.
+        // Don't *know* move succeeded without asking server.
         boolean moved = client.doMove(markerId, hexLabel);
-        if (moved)
-        {
-            // XXX Don't want to wait for server.
-            LegionInfo legion = client.getLegionInfo(markerId);
-            legion.setHexLabel(hexLabel);
-            legion.setMoved(true);
-        }
         return moved;
     }
 
@@ -2218,7 +2213,8 @@ Log.debug("Best target is null, aborting");
                     Log.debug("applymove: try " + fakeCritter + " to " + 
                         hexLabel);
                     client.doBattleMove(fakeCritter.getTag(), hexLabel);
-                    // XXX Need to test that the move was okay.
+                    // XXX Need to test that the move was okay, and
+                    // try another one if it failed.
                     break;
                 }
             }
@@ -2531,30 +2527,30 @@ Log.debug("trimmedCritterMoves has " + trimmedCritterMoves.size() + " entries");
         final int turn = client.getBattleTurnNumber();
 
         // Weight constants.
-        final int OFFBOARD_DEATH_SCALE_FACTOR = -15;
-        final int NATIVE_BONUS_TERRAIN = 5;
-        final int NATIVE_BOG = 2;
-        final int NON_NATIVE_PENALTY_TERRAIN = -10;
-        final int FIRST_RANGESTRIKE_TARGET = 30;
-        final int EXTRA_RANGESTRIKE_TARGET = 10;
-        final int RANGESTRIKE_TITAN = 50;
-        final int RANGESTRIKE_WITHOUT_PENALTY = 10;
-        final int ATTACKER_ADJACENT_TO_ENEMY = 40;
-        final int DEFENDER_ADJACENT_TO_ENEMY = -2;
-        final int ADJACENT_TO_TITAN = 130;
-        final int ADJACENT_TO_RANGESTRIKER = 50;
-        final int KILL_SCALE_FACTOR = 10;
-        final int KILLABLE_TARGETS_SCALE_FACTOR = 1;
-        final int ATTACKER_GET_KILLED_SCALE_FACTOR = -2;
-        final int DEFENDER_GET_KILLED_SCALE_FACTOR = -4;
+        final int OFFBOARD_DEATH_SCALE_FACTOR = -150;
+        final int NATIVE_BONUS_TERRAIN = 50;
+        final int NATIVE_BOG = 20;
+        final int NON_NATIVE_PENALTY_TERRAIN = -100;
+        final int FIRST_RANGESTRIKE_TARGET = 300;
+        final int EXTRA_RANGESTRIKE_TARGET = 100;
+        final int RANGESTRIKE_TITAN = 500;
+        final int RANGESTRIKE_WITHOUT_PENALTY = 100;
+        final int ATTACKER_ADJACENT_TO_ENEMY = 400;
+        final int DEFENDER_ADJACENT_TO_ENEMY = -20;
+        final int ADJACENT_TO_TITAN = 1300;
+        final int ADJACENT_TO_RANGESTRIKER = 500;
+        final int KILL_SCALE_FACTOR = 100;
+        final int KILLABLE_TARGETS_SCALE_FACTOR = 10;
+        final int ATTACKER_GET_KILLED_SCALE_FACTOR = -20;
+        final int DEFENDER_GET_KILLED_SCALE_FACTOR = -40;
         final int ATTACKER_GET_HIT_SCALE_FACTOR = -1;
         final int DEFENDER_GET_HIT_SCALE_FACTOR = -2;
-        final int TITAN_TOWER_HEIGHT_BONUS = 100;
-        final int TITAN_FORWARD_EARLY_PENALTY = -30;
-        final int TITAN_BY_EDGE_OR_TREE_BONUS = 40;
-        final int DEFENDER_TOWER_HEIGHT_BONUS = 8;
-        final int DEFENDER_FORWARD_EARLY_PENALTY = -6;
-        final int ATTACKER_DISTANCE_FROM_ENEMY_PENALTY = -10;
+        final int TITAN_TOWER_HEIGHT_BONUS = 1000;
+        final int TITAN_FORWARD_EARLY_PENALTY = -300;
+        final int TITAN_BY_EDGE_OR_TREE_BONUS = 400;
+        final int DEFENDER_TOWER_HEIGHT_BONUS = 80;
+        final int DEFENDER_FORWARD_EARLY_PENALTY = -60;
+        final int ATTACKER_DISTANCE_FROM_ENEMY_PENALTY = -100;
 
         int value = 0;
 

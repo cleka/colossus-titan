@@ -20,21 +20,17 @@ Bug: Double advance from split phase when autosplit has no legal splits?
 
 Bug: AI needs to set donor, enter angel when summoning into battle.
 
-Bug: Takes 2 undo battle moves to undo a move.
+Bug: Need to detect failed AI battle moves and fall back to next choice.
 
-Bug: Need to detect failed AI battle moves and fall back.
-
-Bug: Hang on AI player "done with moves"  Looks like no legion was moved.
-
-Bug: Need to re-highlight after undo split, undo battle move, undo muster.
-
-Bug: Game advanced past human's battle move phase, leaving all offboard.
+Bug?: Attacking, conceded to AI after map up but before entering, and
+      AI did not reinforce.  Check rules.
 
 Auto-advance from battle move, strike phases is disabled for humans.
 
 When getting both a PickRecruit and an AcquireAngel after a battle,
    make sure the PickRecruit is on top, because it's modal.
    Or make PickRecruit non-modal.
+
 
 Colorize chat window.
 Colorize StatusScreen.

@@ -439,7 +439,7 @@ public final class BattleMap extends HexMap implements MouseListener,
 
 
     /** Select all hexes containing critters eligible to move. */
-    private void highlightMobileCritters()
+    void highlightMobileCritters()
     {
         Set set = client.findMobileCritters();
         unselectAllHexes();
@@ -625,6 +625,7 @@ public final class BattleMap extends HexMap implements MouseListener,
         if (answer == JOptionPane.YES_OPTION)
         {
             client.withdrawFromGame();
+            System.exit(0);
         }
     }
 

@@ -322,7 +322,6 @@ Log.debug("Called Server.addClient() for " + playerName);
         }
         else
         {
-            Log.error("No client in clientMap for " + playerName);
             return null;
         }
     }
