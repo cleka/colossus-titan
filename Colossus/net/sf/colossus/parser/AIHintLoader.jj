@@ -33,6 +33,7 @@ public class AIHintLoader
         int number;
         String recruitee;
         ConditionTreeNode ctn = null;
+        HintOracleInterface oracle = null;
 
         recruitHintData(char terrain,
                         String recruiter,
@@ -48,6 +49,16 @@ public class AIHintLoader
         char getTerrain()
         {
             return terrain;
+        }
+
+        String getRecruiter()
+        {
+            return recruiter;
+        }
+
+        int getNumber()
+        {
+            return number;
         }
 
         String getRecruitee()
@@ -82,9 +93,12 @@ public class AIHintLoader
                       String recruiter,
                       int number)
         {
-            return (this.terrain == terrain &&
-                    this.recruiter.equals(recruiter) &&
-                    this.number == number &&
+            return ((oracle == null ?
+                         true :
+                         oracle.creatureAvailable(recruitee) > 0) &&
+                    (this.terrain == terrain) &&
+                    (this.recruiter.equals(recruiter)) &&
+                    (this.number == number) &&
                     (ctn == null ? true : ctn.isTrue()));
         }
         
@@ -94,6 +108,7 @@ public class AIHintLoader
             {
                 ctn.setOracle(oracle);
             }
+            this.oracle = oracle;
         }
     }
 
@@ -146,6 +161,11 @@ public class AIHintLoader
             }
             return false;
         }
+
+        public String toString()
+        {
+            return "( stack can reach a " + terrain + ")";
+        }
     }
     
     private class ConditionTreeNode_HasCreature extends ConditionTreeNode_Leaf
@@ -165,6 +185,11 @@ public class AIHintLoader
                 return oracle.hasCreature(name);
             }
             return false;
+        }
+
+        public String toString()
+        {
+            return "( stack has " + name + ")";
         }
     }
 
@@ -188,6 +213,11 @@ public class AIHintLoader
             }
             return false;
         }
+
+        public String toString()
+        {
+            return "( at least " + n + " " + name + " are available )";
+        }
     }
 
     private class ConditionTreeNode_CanRecruit extends ConditionTreeNode_Leaf
@@ -207,6 +237,11 @@ public class AIHintLoader
                 return oracle.canRecruit(name);
             }
             return false;
+        }
+
+        public String toString()
+        {
+            return "( stack can recruit " + name + " )";
         }
     }
 
@@ -230,6 +265,11 @@ public class AIHintLoader
         {
             return (rnd.nextDouble() < p);
         }
+
+        public String toString()
+        {
+            return "( " + (100 * p) + " % )";
+        }
     }
     
     private abstract class ConditionTreeNode_BinaryOp extends ConditionTreeNode
@@ -250,9 +290,15 @@ public class AIHintLoader
         {
             super(ctn1,ctn2);
         }
+
         public boolean isTrue()
         {
             return (ctn1.isTrue() && ctn2.isTrue());
+        }
+
+        public String toString()
+        {
+            return "( " + ctn1 + " and " + ctn2 + " )";
         }
     }
 
@@ -266,6 +312,11 @@ public class AIHintLoader
         public boolean isTrue()
         {
             return (ctn1.isTrue() || ctn2.isTrue());
+        }
+
+        public String toString()
+        {
+            return "( " + ctn1 + " or " + ctn2 + " )";
         }
     }
 
@@ -289,6 +340,11 @@ public class AIHintLoader
         public boolean isTrue()
         {
             return (!(ctn1.isTrue()));
+        }
+
+        public String toString()
+        {
+            return "( not " + ctn1 + " )";
         }
     }
     
@@ -559,6 +615,12 @@ int oneHint() :
         }
 
         temp.add(recruitHint);
+
+        Log.debug("Recruit hint : in " + recruitHint.getTerrain() +
+                  " with " + recruitHint.getNumber() + " " + 
+                  recruitHint.getRecruiter() + " get a " + 
+                  recruitHint.getRecruitee() +
+                  (ctn == null ? "" : " if " + ctn));
         return(1);
     }
 |   (s = h_comment())
