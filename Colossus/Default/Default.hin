@@ -28,3 +28,14 @@ RECRUIT T Ogre      0 Ogre     ((6 Troll AVAILABLE) AND
 RECRUIT T Centaur   0 Centaur  ((6 Lion AVAILABLE) AND
                                 (NOT ((CANRECRUIT Warlock) OR
                                       (CANRECRUIT Guardian))))
+
+INITIALSPLIT "100" 0.5 ( Titan Gargoyle Centaur Centaur ) ( Angel Gargoyle Ogre Ogre )
+INITIALSPLIT "100" 1.0 ( Titan Gargoyle Gargoyle Ogre ) ( Angel Centaur Centaur Ogre )
+INITIALSPLIT "200" 1.0 ( Titan Gargoyle Ogre Ogre ) ( Angel Gargoyle Centaur Centaur )
+INITIALSPLIT "300" 0.5 ( Titan Gargoyle Gargoyle Ogre ) ( Angel Centaur Centaur Ogre )
+INITIALSPLIT "300" 1.0 ( Titan Centaur Centaur Ogre ) ( Angel Gargoyle Gargoyle  Ogre )
+INITIALSPLIT "400" 0.5 ( Titan Gargoyle Ogre Ogre ) ( Angel Gargoyle Centaur Centaur )
+INITIALSPLIT "400" 1.0 ( Titan Gargoyle Gargoyle Centaur ) ( Angel Ogre Ogre Centaur )
+INITIALSPLIT "500" 1.0 ( Titan Gargoyle Ogre Ogre ) ( Angel Gargoyle Centaur Centaur )
+INITIALSPLIT "600" 0.5 ( Titan Gargoyle Gargoyle Centaur ) ( Angel Ogre Ogre Centaur )
+INITIALSPLIT "600" 1.0 ( Titan Ogre Ogre Centaur ) ( Angel Gargoyle Gargoyle  Centaur )

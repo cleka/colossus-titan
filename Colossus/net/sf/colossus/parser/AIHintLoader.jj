@@ -23,7 +23,44 @@ import net.sf.colossus.server.HintOracleInterface;
 public class AIHintLoader
 {
     Map terrainToRecruitHintList = new HashMap();
+    Map labelToInitialSplitList = new HashMap();
     java.util.Stack argStack = new java.util.Stack();
+    Random rnd = new Random();
+
+    private class initialSplitHintData
+    {
+        List legions = new ArrayList();
+        double p = 0.0;
+
+        public initialSplitHintData()
+        {
+        }
+
+        void addLegion(List legion)
+        {
+            legions.add(legion);
+        }
+
+        void setProbability(double p)
+        {
+            this.p = p;
+        }
+
+        double getProbability()
+        {
+            return p;
+        }
+
+        List getLegions()
+        {
+            return Collections.unmodifiableList(legions);
+        }
+
+        public String toString()
+        {
+            return "Suggested Split (" + (100 * p) + " %) : " + legions;
+        }
+    }
 
     private class recruitHintData
     {
@@ -302,7 +339,6 @@ public class AIHintLoader
     private class ConditionTreeNode_Random extends ConditionTreeNode_Leaf
     {
         double p;
-        Random rnd = new Random();
 
         public ConditionTreeNode_Random(double p)
         {
@@ -442,6 +478,36 @@ public class AIHintLoader
         }
         return hint;
     }
+
+    public synchronized List getInitialSplitHint(String label)
+    {
+        List allHints = (List)labelToInitialSplitList.get(label);
+        List legion = null;
+
+        if (allHints == null)
+        {
+            return null;
+        }
+
+        Iterator it = allHints.iterator();
+        boolean done = false;
+
+        while (it.hasNext() && !done)
+        {
+            initialSplitHintData ishd = (initialSplitHintData)it.next();
+
+            if (rnd.nextDouble() < ishd.getProbability())
+            {
+                List legions = ishd.getLegions();
+
+                legion = (List)legions.get(rnd.nextInt(legions.size()));
+
+                done = true;
+            }
+        }
+
+        return legion;
+    }
 }
 
 PARSER_END(AIHintLoader)
@@ -484,6 +550,7 @@ TOKEN :
 |   < NOT: "NOT" >
 |   < OPENPAR : "(" >
 |   < CLOSEPAR : ")" >
+|   < INITIALSPLIT: "INITIALSPLIT" >
 }
 
 TOKEN :
@@ -505,7 +572,7 @@ TOKEN :
 {
     < CHAINE : (<CAR>)+ >
 |   < QUOTEDCHAINE : "\"" (<QUOTEDCAR>)+ "\"" >
-|   < #CAR : ["a"-"z","A"-"Z"] >
+|   < #CAR : ["a"-"z","A"-"Z"] > 
 |   < #QUOTEDCAR : ["a"-"z","A"-"Z","0"-"9"," ","_"] >
 }
 
@@ -540,7 +607,35 @@ int h_number() :
     }
 }
 
-char h_reachterrain() :
+double h_fpnumber() :
+{}
+{
+    <FPNUMBER>
+    { return(Double.parseDouble(token.image)); }
+}
+
+/* initial split */
+
+initialSplitHintData h_initialsplit_hint() :
+{
+    String name;
+    double p;
+    List inter = new ArrayList();
+    initialSplitHintData ishd = new initialSplitHintData();
+}
+{
+    (p = h_fpnumber()) ( <OPENPAR> ( (name = h_chaine())
+{ inter.add(name); } )+ <CLOSEPAR> { ishd.addLegion(inter); inter = new ArrayList(); } )+
+        {
+            ishd.setProbability(p);
+            return ishd;
+        }
+}
+
+
+/* recruiting */
+
+char h_recruit_reachterrain() :
 {
     char tc;
 }
@@ -551,15 +646,7 @@ char h_reachterrain() :
         }
 }
 
-double h_fpnumber() :
-{}
-{
-    <FPNUMBER>
-    { return(Double.parseDouble(token.image)); }
-}
-
-
-double h_random() :
+double h_recruit_random() :
 {
     double p;
 }
@@ -570,10 +657,10 @@ double h_random() :
     }
 }
 
-void h_ornode() :
+void h_recruit_ornode() :
 {}
 {
-    h_andnode() ( <OR> h_andnode()
+    h_recruit_andnode() ( <OR> h_recruit_andnode()
     {
         ConditionTreeNode ctn1 = (ConditionTreeNode)argStack.pop();
         ConditionTreeNode ctn2 = (ConditionTreeNode)argStack.pop();
@@ -581,10 +668,10 @@ void h_ornode() :
     } ) *
 }
 
-void h_andnode() :
+void h_recruit_andnode() :
 {}
 {
-    h_unarynode() ( <AND> h_unarynode()
+    h_recruit_unarynode() ( <AND> h_recruit_unarynode()
     {
         ConditionTreeNode ctn1 = (ConditionTreeNode)argStack.pop();
         ConditionTreeNode ctn2 = (ConditionTreeNode)argStack.pop();
@@ -592,18 +679,18 @@ void h_andnode() :
     } ) *
 }
 
-void h_unarynode() :
+void h_recruit_unarynode() :
 {}
 {
-    <NOT> h_leaf()
+    <NOT> h_recruit_leaf()
     {
         ConditionTreeNode ctn1 = (ConditionTreeNode)argStack.pop();
         argStack.push(new ConditionTreeNode_UnaryNot(ctn1));
     }
-|   h_leaf()
+|   h_recruit_leaf()
 }
 
-void h_leaf() :
+void h_recruit_leaf() :
 {
     char tc;
     int n;
@@ -611,7 +698,7 @@ void h_leaf() :
     double p;
 }
 {
-    (tc = h_reachterrain())
+    (tc = h_recruit_reachterrain())
     {
         argStack.push(new ConditionTreeNode_CanReach(tc));
     }
@@ -619,7 +706,7 @@ void h_leaf() :
     {
         argStack.push(new ConditionTreeNode_HasCreature(name));
     }
-|   (p = h_random())
+|   (p = h_recruit_random())
     {
         argStack.push(new ConditionTreeNode_Random(p));
     }
@@ -639,7 +726,7 @@ void h_leaf() :
     {
         argStack.push(new ConditionTreeNode_LabelIs(name));
     }
-|   "(" h_ornode() ")"
+|   "(" h_recruit_ornode() ")"
 }
 
 recruitHintData h_recruit_hint() :
@@ -660,9 +747,11 @@ int oneHint() :
 {
     recruitHintData recruitHint;
     String s;
+    String label;
+    initialSplitHintData ishd;
 }
 {
-    (recruitHint = h_recruit_hint()) (h_ornode())?
+    (recruitHint = h_recruit_hint()) (h_recruit_ornode())?
     {
         Character index = new Character(recruitHint.getTerrain());
 
@@ -693,6 +782,21 @@ int oneHint() :
                   recruitHint.getRecruiter() + " get a " + 
                   recruitHint.getRecruitee() +
                   (ctn == null ? "" : " if " + ctn));
+        return(1);
+    }
+|   <INITIALSPLIT> (label = h_chaine()) (ishd = h_initialsplit_hint())
+    {
+        List isl = (List)labelToInitialSplitList.get(label);
+
+        if (isl == null)
+        {
+            isl = new ArrayList();
+            labelToInitialSplitList.put(label, isl);
+        }
+        Log.debug("HINT: Initial Split hint for hex " + label + " is " + ishd);
+        
+        isl.add(ishd);
+        
         return(1);
     }
 |   (s = h_comment())
