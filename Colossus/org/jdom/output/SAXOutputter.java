@@ -10,26 +10,26 @@
  are met:
  
  1. Redistributions of source code must retain the above copyright
-    notice, this list of conditions, and the following disclaimer.
+ notice, this list of conditions, and the following disclaimer.
  
  2. Redistributions in binary form must reproduce the above copyright
-    notice, this list of conditions, and the disclaimer that follows 
-    these conditions in the documentation and/or other materials 
-    provided with the distribution.
+ notice, this list of conditions, and the disclaimer that follows 
+ these conditions in the documentation and/or other materials 
+ provided with the distribution.
 
  3. The name "JDOM" must not be used to endorse or promote products
-    derived from this software without prior written permission.  For
-    written permission, please contact <pm AT jdom DOT org>.
+ derived from this software without prior written permission.  For
+ written permission, please contact <pm AT jdom DOT org>.
  
  4. Products derived from this software may not be called "JDOM", nor
-    may "JDOM" appear in their name, without prior written permission
-    from the JDOM Project Management <pm AT jdom DOT org>.
+ may "JDOM" appear in their name, without prior written permission
+ from the JDOM Project Management <pm AT jdom DOT org>.
  
  In addition, we request (but do not require) that you include in the 
  end-user documentation provided with the redistribution and/or in the 
  software itself an acknowledgement equivalent to the following:
-     "This product includes software developed by the
-      JDOM Project (http://www.jdom.org/)."
+ "This product includes software developed by the
+ JDOM Project (http://www.jdom.org/)."
  Alternatively, the acknowledgment may be graphical using the logos 
  available at http://www.jdom.org/images/logos.
 
@@ -56,20 +56,16 @@
 
 package org.jdom.output;
 
+
 import java.io.*;
-import java.lang.reflect.Method;
-import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.*;
 import java.util.*;
 
-import org.xml.sax.*;
-import org.xml.sax.Locator;
-import org.xml.sax.ext.DeclHandler;
-import org.xml.sax.ext.LexicalHandler;
-import org.xml.sax.helpers.LocatorImpl;
-import org.xml.sax.helpers.AttributesImpl;
-import org.xml.sax.helpers.XMLReaderFactory;
-
 import org.jdom.*;
+import org.xml.sax.*;
+import org.xml.sax.ext.*;
+import org.xml.sax.helpers.*;
+
 
 /**
  * <code>SAXOutputter</code> takes a JDOM tree and fires SAX2 events.
@@ -105,30 +101,31 @@ import org.jdom.*;
  * @author Bradley S. Huffman
  * @version $Revision$, $Date$
  */
-public class SAXOutputter {
-   
-    private static final String CVS_ID = 
-      "@(#) $RCSfile$ $Revision$ $Date$ $Name$";
+public class SAXOutputter
+{
+
+    private static final String CVS_ID =
+            "@(#) $RCSfile$ $Revision$ $Date$ $Name$";
 
     /** Shortcut for SAX namespaces core feature */
     private static final String NAMESPACES_SAX_FEATURE =
-                        "http://xml.org/sax/features/namespaces";
+            "http://xml.org/sax/features/namespaces";
 
     /** Shortcut for SAX namespace-prefixes core feature */
     private static final String NS_PREFIXES_SAX_FEATURE =
-                        "http://xml.org/sax/features/namespace-prefixes";
+            "http://xml.org/sax/features/namespace-prefixes";
 
     /** Shortcut for SAX validation core feature */
     private static final String VALIDATION_SAX_FEATURE =
-                        "http://xml.org/sax/features/validation";
+            "http://xml.org/sax/features/validation";
 
     /** Shortcut for SAX-ext. lexical handler property */
     private static final String LEXICAL_HANDLER_SAX_PROPERTY =
-                        "http://xml.org/sax/properties/lexical-handler";
+            "http://xml.org/sax/properties/lexical-handler";
 
     /** Shortcut for SAX-ext. declaration handler property */
     private static final String DECL_HANDLER_SAX_PROPERTY =
-                        "http://xml.org/sax/properties/declaration-handler";
+            "http://xml.org/sax/properties/declaration-handler";
 
     /**
      * Shortcut for SAX-ext. lexical handler alternate property.
@@ -136,18 +133,17 @@ public class SAXOutputter {
      * "standard", some parsers use it instead of the official one.
      */
     private static final String LEXICAL_HANDLER_ALT_PROPERTY =
-                        "http://xml.org/sax/handlers/LexicalHandler";
+            "http://xml.org/sax/handlers/LexicalHandler";
 
     /** Shortcut for SAX-ext. declaration handler alternate property */
     private static final String DECL_HANDLER_ALT_PROPERTY =
-                        "http://xml.org/sax/handlers/DeclHandler";
+            "http://xml.org/sax/handlers/DeclHandler";
 
     /**
      * Array to map JDOM attribute type (as entry index) to SAX
      * attribute type names.
      */
-    private static final String[] attrTypeToNameMap = new String[] {
-        "CDATA",        // Attribute.UNDEFINED_ATTRIBUTE, as per SAX 2.0 spec.
+    private static final String[] attrTypeToNameMap = new String[] { "CDATA",        // Attribute.UNDEFINED_ATTRIBUTE, as per SAX 2.0 spec.
         "CDATA",        // Attribute.CDATA_ATTRIBUTE
         "ID",           // Attribute.ID_ATTRIBUTE
         "IDREF",        // Attribute.IDREF_ATTRIBUTE
@@ -162,13 +158,13 @@ public class SAXOutputter {
 
     /** registered <code>ContentHandler</code> */
     private ContentHandler contentHandler;
-   
+
     /** registered <code>ErrorHandler</code> */
     private ErrorHandler errorHandler;
-   
+
     /** registered <code>DTDHandler</code> */
     private DTDHandler dtdHandler;
-   
+
     /** registered <code>EntityResolver</code> */
     private EntityResolver entityResolver;
 
@@ -177,7 +173,7 @@ public class SAXOutputter {
 
     /** registered <code>DeclHandler</code> */
     private DeclHandler declHandler;
-   
+
     /**
      * Whether to report attribute namespace declarations as xmlns attributes.
      * Defaults to <code>false</code> as per SAX specifications.
@@ -194,11 +190,18 @@ public class SAXOutputter {
     private boolean reportDtdEvents = true;
 
     /**
+     * A SAX Locator that points at the JDOM node currently being
+     * outputted.
+     */
+    private JDOMLocator locator = null;
+
+    /**
      * This will create a <code>SAXOutputter</code> without any
      * registered handler.  The application is then responsible for
      * registering them using the <code>setXxxHandler()</code> methods.
      */
-    public SAXOutputter() {
+    public SAXOutputter()
+    {
     }
 
     /**
@@ -208,7 +211,8 @@ public class SAXOutputter {
      * @param contentHandler contains <code>ContentHandler</code> 
      * callback methods
      */
-    public SAXOutputter(ContentHandler contentHandler) {
+    public SAXOutputter(ContentHandler contentHandler)
+    {
         this(contentHandler, null, null, null, null);
     }
 
@@ -225,12 +229,13 @@ public class SAXOutputter {
      * callback methods
      */
     public SAXOutputter(ContentHandler contentHandler,
-                        ErrorHandler   errorHandler,
-                        DTDHandler     dtdHandler,
-                        EntityResolver entityResolver) {
+            ErrorHandler errorHandler,
+            DTDHandler dtdHandler,
+            EntityResolver entityResolver)
+    {
         this(contentHandler, errorHandler, dtdHandler, entityResolver, null);
     }
-   
+
     /**
      * This will create a <code>SAXOutputter</code> with the
      * specified SAX2 handlers. At this time, only <code>ContentHandler</code>
@@ -245,34 +250,37 @@ public class SAXOutputter {
      * @param lexicalHandler contains <code>LexicalHandler</code> callbacks.
      */
     public SAXOutputter(ContentHandler contentHandler,
-                        ErrorHandler   errorHandler,
-                        DTDHandler     dtdHandler,
-                        EntityResolver entityResolver,
-                        LexicalHandler lexicalHandler) {
+            ErrorHandler errorHandler,
+            DTDHandler dtdHandler,
+            EntityResolver entityResolver,
+            LexicalHandler lexicalHandler)
+    {
         this.contentHandler = contentHandler;
         this.errorHandler = errorHandler;
         this.dtdHandler = dtdHandler;
         this.entityResolver = entityResolver;
         this.lexicalHandler = lexicalHandler;
     }
-   
+
     /**
      * This will set the <code>ContentHandler</code>.
      *
      * @param contentHandler contains <code>ContentHandler</code> 
      * callback methods.
      */
-    public void setContentHandler(ContentHandler contentHandler) {
+    public void setContentHandler(ContentHandler contentHandler)
+    {
         this.contentHandler = contentHandler;
     }
-   
+
     /**
      * Returns the registered <code>ContentHandler</code>.
      *
      * @return the current <code>ContentHandler</code> or
      * <code>null</code> if none was registered.
      */
-    public ContentHandler getContentHandler() {
+    public ContentHandler getContentHandler()
+    {
         return this.contentHandler;
     }
 
@@ -281,7 +289,8 @@ public class SAXOutputter {
      *
      * @param errorHandler contains <code>ErrorHandler</code> callback methods.
      */
-    public void setErrorHandler(ErrorHandler errorHandler) {
+    public void setErrorHandler(ErrorHandler errorHandler)
+    {
         this.errorHandler = errorHandler;
     }
 
@@ -291,7 +300,8 @@ public class SAXOutputter {
      * @return the current <code>ErrorHandler</code> or
      * <code>null</code> if none was registered.
      */
-    public ErrorHandler getErrorHandler() {
+    public ErrorHandler getErrorHandler()
+    {
         return this.errorHandler;
     }
 
@@ -300,7 +310,8 @@ public class SAXOutputter {
      *
      * @param dtdHandler contains <code>DTDHandler</code> callback methods.
      */
-    public void setDTDHandler(DTDHandler dtdHandler) {
+    public void setDTDHandler(DTDHandler dtdHandler)
+    {
         this.dtdHandler = dtdHandler;
     }
 
@@ -310,7 +321,8 @@ public class SAXOutputter {
      * @return the current <code>DTDHandler</code> or
      * <code>null</code> if none was registered.
      */
-    public DTDHandler getDTDHandler() {
+    public DTDHandler getDTDHandler()
+    {
         return this.dtdHandler;
     }
 
@@ -319,7 +331,8 @@ public class SAXOutputter {
      *
      * @param entityResolver contains EntityResolver callback methods.
      */
-    public void setEntityResolver(EntityResolver entityResolver) {
+    public void setEntityResolver(EntityResolver entityResolver)
+    {
         this.entityResolver = entityResolver;
     }
 
@@ -329,7 +342,8 @@ public class SAXOutputter {
      * @return the current <code>EntityResolver</code> or
      * <code>null</code> if none was registered.
      */
-    public EntityResolver getEntityResolver() {
+    public EntityResolver getEntityResolver()
+    {
         return this.entityResolver;
     }
 
@@ -338,7 +352,8 @@ public class SAXOutputter {
      *
      * @param lexicalHandler contains lexical callback methods.
      */
-    public void setLexicalHandler(LexicalHandler lexicalHandler) {
+    public void setLexicalHandler(LexicalHandler lexicalHandler)
+    {
         this.lexicalHandler = lexicalHandler;
     }
 
@@ -348,7 +363,8 @@ public class SAXOutputter {
      * @return the current <code>LexicalHandler</code> or
      * <code>null</code> if none was registered.
      */
-    public LexicalHandler getLexicalHandler() {
+    public LexicalHandler getLexicalHandler()
+    {
         return this.lexicalHandler;
     }
 
@@ -357,7 +373,8 @@ public class SAXOutputter {
      *
      * @param declHandler contains declaration callback methods.
      */
-    public void setDeclHandler(DeclHandler declHandler) {
+    public void setDeclHandler(DeclHandler declHandler)
+    {
         this.declHandler = declHandler;
     }
 
@@ -367,7 +384,8 @@ public class SAXOutputter {
      * @return the current <code>DeclHandler</code> or
      * <code>null</code> if none was registered.
      */
-    public DeclHandler getDeclHandler() {
+    public DeclHandler getDeclHandler()
+    {
         return this.declHandler;
     }
 
@@ -376,10 +394,11 @@ public class SAXOutputter {
      * reported as "xmlns" attributes.  This flag defaults to <code>false</code>
      * and behaves as the "namespace-prefixes" SAX core feature.
      *
-     * @param reportDecl whether attribute namespace declarations shall be
+     * @param declareNamespaces whether attribute namespace declarations shall be
      * reported as "xmlns" attributes.
      */
-    public void setReportNamespaceDeclarations(boolean declareNamespaces) {
+    public void setReportNamespaceDeclarations(boolean declareNamespaces)
+    {
         this.declareNamespaces = declareNamespaces;
     }
 
@@ -390,7 +409,8 @@ public class SAXOutputter {
      *
      * @param reportDtdEvents whether to notify DTD events.
      */
-    public void setReportDTDEvents(boolean reportDtdEvents) {
+    public void setReportDTDEvents(boolean reportDtdEvents)
+    {
         this.reportDtdEvents = reportDtdEvents;
     }
 
@@ -433,25 +453,33 @@ public class SAXOutputter {
      *         the feature name but cannot set the requested value.
      */
     public void setFeature(String name, boolean value)
-                throws SAXNotRecognizedException, SAXNotSupportedException {
-        if (NS_PREFIXES_SAX_FEATURE.equals(name)) {
+        throws SAXNotRecognizedException, SAXNotSupportedException
+    {
+        if (NS_PREFIXES_SAX_FEATURE.equals(name))
+        {
             // Namespace prefix declarations.
             this.setReportNamespaceDeclarations(value);
         }
-        else {
-            if (NAMESPACES_SAX_FEATURE.equals(name)) {
-                if (value != true) {
+        else
+        {
+            if (NAMESPACES_SAX_FEATURE.equals(name))
+            {
+                if (value != true)
+                {
                     // Namespaces feature always supported by SAXOutputter.
                     throw new SAXNotSupportedException(name);
                 }
                 // Else: true is OK!
             }
-            else {
-                if (VALIDATION_SAX_FEATURE.equals(name)) {
+            else
+            {
+                if (VALIDATION_SAX_FEATURE.equals(name))
+                {
                     // Report DTD events.
                     this.setReportDTDEvents(value);
                 }
-                else {
+                else
+                {
                     // Not a supported feature.
                     throw new SAXNotRecognizedException(name);
                 }
@@ -473,22 +501,29 @@ public class SAXOutputter {
      *         the feature name but determine its value at this time.
      */
     public boolean getFeature(String name)
-                throws SAXNotRecognizedException, SAXNotSupportedException {
-        if (NS_PREFIXES_SAX_FEATURE.equals(name)) {
+        throws SAXNotRecognizedException, SAXNotSupportedException
+    {
+        if (NS_PREFIXES_SAX_FEATURE.equals(name))
+        {
             // Namespace prefix declarations.
             return (this.declareNamespaces);
         }
-        else {
-            if (NAMESPACES_SAX_FEATURE.equals(name)) {
+        else
+        {
+            if (NAMESPACES_SAX_FEATURE.equals(name))
+            {
                 // Namespaces feature always supported by SAXOutputter.
                 return (true);
             }
-            else {
-                if (VALIDATION_SAX_FEATURE.equals(name)) {
+            else
+            {
+                if (VALIDATION_SAX_FEATURE.equals(name))
+                {
                     // Report DTD events.
                     return (this.reportDtdEvents);
                 }
-                else {
+                else
+                {
                     // Not a supported feature.
                     throw new SAXNotRecognizedException(name);
                 }
@@ -528,17 +563,22 @@ public class SAXOutputter {
      *         property name but cannot set the requested value.
      */
     public void setProperty(String name, Object value)
-                throws SAXNotRecognizedException, SAXNotSupportedException {
+        throws SAXNotRecognizedException, SAXNotSupportedException
+    {
         if ((LEXICAL_HANDLER_SAX_PROPERTY.equals(name)) ||
-            (LEXICAL_HANDLER_ALT_PROPERTY.equals(name))) {
+                (LEXICAL_HANDLER_ALT_PROPERTY.equals(name)))
+        {
             this.setLexicalHandler((LexicalHandler)value);
         }
-        else {
+        else
+        {
             if ((DECL_HANDLER_SAX_PROPERTY.equals(name)) ||
-                (DECL_HANDLER_ALT_PROPERTY.equals(name))) {
+                    (DECL_HANDLER_ALT_PROPERTY.equals(name)))
+            {
                 this.setDeclHandler((DeclHandler)value);
             }
-            else {
+            else
+            {
                 throw new SAXNotRecognizedException(name);
             }
         }
@@ -557,22 +597,26 @@ public class SAXOutputter {
      *         property name but cannot determine its value at this time.
      */
     public Object getProperty(String name)
-                throws SAXNotRecognizedException, SAXNotSupportedException {
+        throws SAXNotRecognizedException, SAXNotSupportedException
+    {
         if ((LEXICAL_HANDLER_SAX_PROPERTY.equals(name)) ||
-            (LEXICAL_HANDLER_ALT_PROPERTY.equals(name))) {
+                (LEXICAL_HANDLER_ALT_PROPERTY.equals(name)))
+        {
             return this.getLexicalHandler();
         }
-        else {
+        else
+        {
             if ((DECL_HANDLER_SAX_PROPERTY.equals(name)) ||
-                (DECL_HANDLER_ALT_PROPERTY.equals(name))) {
+                    (DECL_HANDLER_ALT_PROPERTY.equals(name)))
+            {
                 return this.getDeclHandler();
             }
-            else {
+            else
+            {
                 throw new SAXNotRecognizedException(name);
             }
         }
     }
-
 
     /**
      * This will output the <code>JDOM Document</code>, firing off the
@@ -582,8 +626,11 @@ public class SAXOutputter {
      *
      * @throws JDOMException if any error occurred.
      */
-    public void output(Document document) throws JDOMException {
-        if (document == null) {
+    public void output(Document document)
+        throws JDOMException
+    {
+        if (document == null)
+        {
             return;
         }
 
@@ -594,26 +641,35 @@ public class SAXOutputter {
         startDocument();
 
         // Fire DTD events
-        if (this.reportDtdEvents) {
-           dtdEvents(document);
+        if (this.reportDtdEvents)
+        {
+            dtdEvents(document);
         }
 
         // Handle root element, as well as any root level
         // processing instructions and comments
         Iterator i = document.getContent().iterator();
-        while (i.hasNext()) {
+        while (i.hasNext())
+        {
             Object obj = i.next();
-            if (obj instanceof Element) {
+
+            // update locator
+            locator.setNode(obj);
+
+            if (obj instanceof Element)
+            {
                 // process root element and its content
                 element(document.getRootElement(), new NamespaceStack());
             }
-            else if (obj instanceof ProcessingInstruction) {
+            else if (obj instanceof ProcessingInstruction)
+            {
                 // contentHandler.processingInstruction()
-                processingInstruction((ProcessingInstruction) obj);
+                processingInstruction((ProcessingInstruction)obj);
             }
-            else if (obj instanceof Comment) {
+            else if (obj instanceof Comment)
+            {
                 // lexicalHandler.comment()
-                comment(((Comment) obj).getText()); 
+                comment(((Comment)obj).getText());
             }
         }
 
@@ -634,8 +690,11 @@ public class SAXOutputter {
      *
      * @throws JDOMException if any error occurred.
      */
-    public void output(List nodes) throws JDOMException {
-        if ((nodes == null) || (nodes.size() == 0)) {
+    public void output(List nodes)
+        throws JDOMException
+    {
+        if ((nodes == null) || (nodes.size() == 0))
+        {
             return;
         }
 
@@ -651,7 +710,7 @@ public class SAXOutputter {
         // contentHandler.endDocument()
         endDocument();
     }
-   
+
     /**
      * This parses a DTD declaration to fire the related events towards
      * the registered handlers.
@@ -659,17 +718,21 @@ public class SAXOutputter {
      * @param document <code>JDOM Document</code> the DocType is to
      *                 process.
      */
-    private void dtdEvents(Document document) throws JDOMException {
+    private void dtdEvents(Document document)
+        throws JDOMException
+    {
         DocType docType = document.getDocType();
 
         if ((docType != null) &&
-            ((dtdHandler != null) || (declHandler != null))) {
+                ((dtdHandler != null) || (declHandler != null)))
+        {
             // Fire DTD-related events only if handlers have been registered
-            String publicID  = docType.getPublicID();
-            String systemID  = docType.getSystemID();
+            String publicID = docType.getPublicID();
+            String systemID = docType.getSystemID();
             String intSubset = docType.getInternalSubset();
 
-            if (intSubset != null) {
+            if (intSubset != null)
+            {
                 intSubset = intSubset.trim();
             }
 
@@ -677,45 +740,56 @@ public class SAXOutputter {
             StringBuffer buf = new StringBuffer(64);
             buf.append("<!DOCTYPE ").append(docType.getElementName());
 
-            if ((intSubset != null) && (intSubset.length() !=0)) {
-               // Internal subset present => Parse it
-               buf.append(" [\n").append(intSubset).append(']');
+            if ((intSubset != null) && (intSubset.length() != 0))
+            {
+                // Internal subset present => Parse it
+                buf.append(" [\n").append(intSubset).append(']');
             }
-            else {
-               // No internal subset defined => Try to parse original DTD
-               if ((publicID != null) || (systemID != null)) {
-                    if (publicID != null) {
+            else
+            {
+                // No internal subset defined => Try to parse original DTD
+                if ((publicID != null) || (systemID != null))
+                {
+                    if (publicID != null)
+                    {
                         buf.append(" PUBLIC ");
                         buf.append('\"').append(publicID).append('\"');
                     }
-                    else {
+                    else
+                    {
                         buf.append(" SYSTEM ");
                     }
                     buf.append('\"').append(systemID).append('\"');
                 }
-                else {
+                else
+                {
                     // Doctype is totally empty! => Skip parsing
                     buf.setLength(0);
                 }
             }
 
-            if (buf.length() != 0) {
-                try {
+            if (buf.length() != 0)
+            {
+                try
+                {
                     String dtdDoc = buf.append('>').toString();
 
                     // Parse dummy XML document to fire DTD events.
                     createDTDParser().parse(new InputSource(
-                                                new StringReader(dtdDoc)));
+                            new StringReader(dtdDoc)));
                 }
-                catch (SAXParseException ex1) {
+                catch (SAXParseException ex1)
+                {
                     // Expected exception: There's no root element in DTD
                     // so the parser complains!
                     // ex1.printStackTrace();
                 }
-                catch (SAXException ex2) {
+                catch (SAXException ex2)
+                {
                     throw new JDOMException("DTD parsing error", ex2);
                 }
-                catch (IOException ex3) {
+                catch (IOException ex3)
+                {
                     throw new JDOMException("DTD parsing error", ex3);
                 }
             }
@@ -733,14 +807,17 @@ public class SAXOutputter {
      *
      * @param document JDOM <code>Document</code>.
      */
-    private void documentLocator(Document document) {
-        LocatorImpl locator = new LocatorImpl();
+    private void documentLocator(Document document)
+    {
+        locator = new JDOMLocator();
         String publicID = null;
         String systemID = null;
 
-        if (document != null) {
+        if (document != null)
+        {
             DocType docType = document.getDocType();
-            if (docType != null) {
+            if (docType != null)
+            {
                 publicID = docType.getPublicID();
                 systemID = docType.getSystemID();
             }
@@ -750,7 +827,7 @@ public class SAXOutputter {
         locator.setLineNumber(-1);
         locator.setColumnNumber(-1);
 
-        contentHandler.setDocumentLocator((Locator) locator);
+        contentHandler.setDocumentLocator(locator);
     }
 
     /**
@@ -759,30 +836,41 @@ public class SAXOutputter {
      * all handlers to be invoked (setDocumentLocator is always first).
      * </p>
      */
-    private void startDocument() throws JDOMException {
-        try {
+    private void startDocument()
+        throws JDOMException
+    {
+        try
+        {
             contentHandler.startDocument();
         }
-        catch (SAXException se) {
+        catch (SAXException se)
+        {
             throw new JDOMException("Exception in startDocument", se);
         }
     }
-   
+
     /**
      * <p>
      * Always the last method of all callbacks in all handlers
      * to be invoked.
      * </p>
      */
-    private void endDocument() throws JDOMException {
-        try {
+    private void endDocument()
+        throws JDOMException
+    {
+        try
+        {
             contentHandler.endDocument();
+
+            // reset locator
+            locator = null;
         }
-        catch (SAXException se) {
+        catch (SAXException se)
+        {
             throw new JDOMException("Exception in endDocument", se);
         }
     }
-   
+
     /**
      * <p>
      * This will invoke the <code>ContentHandler.processingInstruction</code>
@@ -791,21 +879,25 @@ public class SAXOutputter {
      *
      * @param pi <code>ProcessingInstruction</code> containing target and data.
      */
-    private void processingInstruction(ProcessingInstruction pi) 
-                           throws JDOMException {
-        if (pi != null) {
+    private void processingInstruction(ProcessingInstruction pi)
+        throws JDOMException
+    {
+        if (pi != null)
+        {
             String target = pi.getTarget();
             String data = pi.getData();
-            try {
+            try
+            {
                 contentHandler.processingInstruction(target, data);
             }
-            catch (SAXException se) {
+            catch (SAXException se)
+            {
                 throw new JDOMException(
-                    "Exception in processingInstruction", se);
+                        "Exception in processingInstruction", se);
             }
         }
     }
-   
+
     /**
      * <p>
      * This will recursively invoke all of the callbacks for a particular 
@@ -815,8 +907,9 @@ public class SAXOutputter {
      * @param element <code>Element</code> used in callbacks.
      * @param namespaces <code>List</code> stack of Namespaces in scope.
      */
-    private void element(Element element, NamespaceStack namespaces) 
-                           throws JDOMException {
+    private void element(Element element, NamespaceStack namespaces)
+        throws JDOMException
+    {
         // used to check endPrefixMapping
         int previouslyDeclaredNamespaces = namespaces.size();
 
@@ -829,13 +922,16 @@ public class SAXOutputter {
         // handle content in the element
         elementContent(element.getContent(), namespaces);
 
+        // update locator
+        locator.setNode(element);
+
         // contentHandler.endElement()
         endElement(element);
 
         // contentHandler.endPrefixMapping()
         endPrefixMapping(namespaces, previouslyDeclaredNamespaces);
     }
-   
+
     /**
      * <p>
      * This will invoke the <code>ContentHandler.startPrefixMapping</code> 
@@ -849,45 +945,55 @@ public class SAXOutputter {
      * @return <code>Attributes</code> declaring the namespaces local to
      * <code>element</code> or <code>null</code>.
      */
-    private Attributes startPrefixMapping(Element element, 
-                                          NamespaceStack namespaces) 
-                                                   throws JDOMException {
+    private Attributes startPrefixMapping(Element element,
+            NamespaceStack namespaces)
+        throws JDOMException
+    {
         AttributesImpl nsAtts = null;   // The namespaces as xmlns attributes
 
         Namespace ns = element.getNamespace();
-        if (ns != Namespace.NO_NAMESPACE && ns != Namespace.XML_NAMESPACE) {
+        if (ns != Namespace.NO_NAMESPACE && ns != Namespace.XML_NAMESPACE)
+        {
             String prefix = ns.getPrefix();
             String uri = namespaces.getURI(prefix);
-            if (!ns.getURI().equals(uri)) {
+            if (!ns.getURI().equals(uri))
+            {
                 namespaces.push(ns);
                 nsAtts = this.addNsAttribute(nsAtts, ns);
-                try {
+                try
+                {
                     contentHandler.startPrefixMapping(prefix, ns.getURI());
                 }
-                catch (SAXException se) {
-                   throw new JDOMException(
-                       "Exception in startPrefixMapping", se);
+                catch (SAXException se)
+                {
+                    throw new JDOMException(
+                            "Exception in startPrefixMapping", se);
                 }
             }
         }
 
         // Fire additional namespace declarations
         List additionalNamespaces = element.getAdditionalNamespaces();
-        if (additionalNamespaces != null) {
+        if (additionalNamespaces != null)
+        {
             Iterator itr = additionalNamespaces.iterator();
-            while (itr.hasNext()) {
+            while (itr.hasNext())
+            {
                 ns = (Namespace)itr.next();
                 String prefix = ns.getPrefix();
                 String uri = namespaces.getURI(prefix);
-                if (!ns.getURI().equals(uri)) {
+                if (!ns.getURI().equals(uri))
+                {
                     namespaces.push(ns);
                     nsAtts = this.addNsAttribute(nsAtts, ns);
-                    try {
+                    try
+                    {
                         contentHandler.startPrefixMapping(prefix, ns.getURI());
                     }
-                    catch (SAXException se) {
+                    catch (SAXException se)
+                    {
                         throw new JDOMException(
-                            "Exception in startPrefixMapping", se);
+                                "Exception in startPrefixMapping", se);
                     }
                 }
             }
@@ -906,20 +1012,24 @@ public class SAXOutputter {
      * @param previouslyDeclaredNamespaces number of previously declared 
      * namespaces
      */
-    private void endPrefixMapping(NamespaceStack namespaces, 
-                                  int previouslyDeclaredNamespaces) 
-                                                throws JDOMException {
-        while (namespaces.size() > previouslyDeclaredNamespaces) {
+    private void endPrefixMapping(NamespaceStack namespaces,
+            int previouslyDeclaredNamespaces)
+        throws JDOMException
+    {
+        while (namespaces.size() > previouslyDeclaredNamespaces)
+        {
             String prefix = namespaces.pop();
-            try {
+            try
+            {
                 contentHandler.endPrefixMapping(prefix);
             }
-            catch (SAXException se) {
+            catch (SAXException se)
+            {
                 throw new JDOMException("Exception in endPrefixMapping", se);
             }
         }
     }
-   
+
     /**
      * <p>
      * This will invoke the <code>startElement</code> callback
@@ -927,38 +1037,42 @@ public class SAXOutputter {
      * </p>
      *
      * @param element <code>Element</code> used in callbacks.
-     * @param eltNamespaces <code>List</code> of namespaces to declare with
+     * @param nsAtts <code>List</code> of namespaces to declare with
      * the element or <code>null</code>.
      */
-    private void startElement(Element element, Attributes nsAtts) 
-                      throws JDOMException {
+    private void startElement(Element element, Attributes nsAtts)
+        throws JDOMException
+    {
         String namespaceURI = element.getNamespaceURI();
         String localName = element.getName();
         String rawName = element.getQualifiedName();
 
         // Allocate attribute list.
-        AttributesImpl atts = (nsAtts != null)?
-                              new AttributesImpl(nsAtts): new AttributesImpl();
+        AttributesImpl atts = (nsAtts != null) ?
+                new AttributesImpl(nsAtts) : new AttributesImpl();
 
         List attributes = element.getAttributes();
         Iterator i = attributes.iterator();
-        while (i.hasNext()) {
-            Attribute a = (Attribute) i.next();
+        while (i.hasNext())
+        {
+            Attribute a = (Attribute)i.next();
             atts.addAttribute(a.getNamespaceURI(),
-                              a.getName(),
-                              a.getQualifiedName(),
-                              getAttributeTypeName(a.getAttributeType()),
-                              a.getValue());
+                    a.getName(),
+                    a.getQualifiedName(),
+                    getAttributeTypeName(a.getAttributeType()),
+                    a.getValue());
         }
-         
-        try {
+
+        try
+        {
             contentHandler.startElement(namespaceURI, localName, rawName, atts);
         }
-        catch (SAXException se) {
+        catch (SAXException se)
+        {
             throw new JDOMException("Exception in startElement", se);
         }
     }
-   
+
     /**
      * <p>
      * This will invoke the <code>endElement</code> callback
@@ -967,19 +1081,23 @@ public class SAXOutputter {
      *
      * @param element <code>Element</code> used in callbacks.
      */
-    private void endElement(Element element) throws JDOMException {
+    private void endElement(Element element)
+        throws JDOMException
+    {
         String namespaceURI = element.getNamespaceURI();
         String localName = element.getName();
         String rawName = element.getQualifiedName();
-        
-        try {
+
+        try
+        {
             contentHandler.endElement(namespaceURI, localName, rawName);
         }
-        catch (SAXException se) {
+        catch (SAXException se)
+        {
             throw new JDOMException("Exception in endElement", se);
         }
     }
-   
+
     /**
      * <p>
      * This will invoke the callbacks for the content of an element.
@@ -988,40 +1106,52 @@ public class SAXOutputter {
      * @param content element content as a <code>List</code> of nodes.
      * @param namespaces <code>List</code> stack of Namespaces in scope.
      */
-    private void elementContent(List content, NamespaceStack namespaces) 
-                      throws JDOMException {
+    private void elementContent(List content, NamespaceStack namespaces)
+        throws JDOMException
+    {
         Iterator i = content.iterator();
-        while (i.hasNext()) {
+        while (i.hasNext())
+        {
             Object obj = i.next();
 
-            if (obj instanceof Element) {
-                element((Element) obj, namespaces);
+            // update locator
+            locator.setNode(obj);
+
+            if (obj instanceof Element)
+            {
+                element((Element)obj, namespaces);
             }
-            else if (obj instanceof CDATA) {
-                cdata(((CDATA) obj).getText());
+            else if (obj instanceof CDATA)
+            {
+                cdata(((CDATA)obj).getText());
             }
-            else if (obj instanceof Text) {
+            else if (obj instanceof Text)
+            {
                 // contentHandler.characters()
-                characters(((Text) obj).getText());
+                characters(((Text)obj).getText());
             }
-            else if (obj instanceof ProcessingInstruction) {
+            else if (obj instanceof ProcessingInstruction)
+            {
                 // contentHandler.processingInstruction()
-                processingInstruction((ProcessingInstruction) obj);
+                processingInstruction((ProcessingInstruction)obj);
             }
-            else if (obj instanceof Comment) {
+            else if (obj instanceof Comment)
+            {
                 // lexicalHandler.comment()
-                comment(((Comment) obj).getText()); 
+                comment(((Comment)obj).getText());
             }
-            else if (obj instanceof EntityRef) {
+            else if (obj instanceof EntityRef)
+            {
                 // contentHandler.skippedEntity()
-                entityRef((EntityRef) obj);
+                entityRef((EntityRef)obj);
             }
-            else {
+            else
+            {
                 // Not a valid element child. This could happen with
                 // application-provided lists which may contain non
                 // JDOM objects.
                 handleError(new JDOMException(
-                                        "Invalid element content: " + obj));
+                        "Invalid element content: " + obj));
             }
         }
     }
@@ -1033,18 +1163,24 @@ public class SAXOutputter {
      *
      * @param cdataText all text in the CDATA section, including whitespace.
      */
-    private void cdata(String cdataText) throws JDOMException {
-        try {
-            if (lexicalHandler != null) {
+    private void cdata(String cdataText)
+        throws JDOMException
+    {
+        try
+        {
+            if (lexicalHandler != null)
+            {
                 lexicalHandler.startCDATA();
                 characters(cdataText);
                 lexicalHandler.endCDATA();
             }
-            else {
+            else
+            {
                 characters(cdataText);
             }
         }
-        catch (SAXException se) {
+        catch (SAXException se)
+        {
             throw new JDOMException("Exception in CDATA", se);
         }
     }
@@ -1056,12 +1192,16 @@ public class SAXOutputter {
      *
      * @param elementText all text in an element, including whitespace.
      */
-    private void characters(String elementText) throws JDOMException {
+    private void characters(String elementText)
+        throws JDOMException
+    {
         char[] c = elementText.toCharArray();
-        try {
+        try
+        {
             contentHandler.characters(c, 0, c.length);
         }
-        catch (SAXException se) {
+        catch (SAXException se)
+        {
             throw new JDOMException("Exception in characters", se);
         }
     }
@@ -1073,12 +1213,18 @@ public class SAXOutputter {
      *
      * @param commentText all text in a comment, including whitespace.
      */
-    private void comment(String commentText) throws JDOMException {
-        if (lexicalHandler != null) {
+    private void comment(String commentText)
+        throws JDOMException
+    {
+        if (lexicalHandler != null)
+        {
             char[] c = commentText.toCharArray();
-            try {
+            try
+            {
                 lexicalHandler.comment(c, 0, c.length);
-            } catch (SAXException se) {
+            }
+            catch (SAXException se)
+            {
                 throw new JDOMException("Exception in comment", se);
             }
         }
@@ -1092,19 +1238,23 @@ public class SAXOutputter {
      *
      * @param entity <code>EntityRef</code>.
      */
-    private void entityRef(EntityRef entity) throws JDOMException {
-        if (entity != null) {
-            try {
+    private void entityRef(EntityRef entity)
+        throws JDOMException
+    {
+        if (entity != null)
+        {
+            try
+            {
                 // No need to worry about appending a '%' character as
                 // we do not support parameter entities
                 contentHandler.skippedEntity(entity.getName());
             }
-            catch (SAXException se) {
+            catch (SAXException se)
+            {
                 throw new JDOMException("Exception in entityRef", se);
             }
         }
     }
-   
 
     /**
      * <p>
@@ -1117,16 +1267,19 @@ public class SAXOutputter {
      *
      * @return <code>AttributeImpl</code> the updated attribute list.
      */
-    private AttributesImpl addNsAttribute(AttributesImpl atts, Namespace ns) {
-        if (this.declareNamespaces) {
-            if (atts == null) {
+    private AttributesImpl addNsAttribute(AttributesImpl atts, Namespace ns)
+    {
+        if (this.declareNamespaces)
+        {
+            if (atts == null)
+            {
                 atts = new AttributesImpl();
             }
             atts.addAttribute("",                          // namespace
-                              "",                          // local name
-                              "xmlns:" + ns.getPrefix(),   // qualified name
-                              "CDATA",                     // type
-                              ns.getURI());                // value
+                    "",                          // local name
+                    "xmlns:" + ns.getPrefix(),   // qualified name
+                    "CDATA",                     // type
+                    ns.getURI());                // value
         }
         return atts;
     }
@@ -1144,8 +1297,10 @@ public class SAXOutputter {
      * @see org.jdom.Attribute#getAttributeType
      * @see org.xml.sax.Attributes#getType
      */
-    private String getAttributeTypeName(int type) {
-        if ((type < 0) || (type >= attrTypeToNameMap.length)) {
+    private String getAttributeTypeName(int type)
+    {
+        if ((type < 0) || (type >= attrTypeToNameMap.length))
+        {
             type = Attribute.UNDECLARED_ATTRIBUTE;
         }
         return attrTypeToNameMap[type];
@@ -1167,22 +1322,30 @@ public class SAXOutputter {
      *                       or if the error handler fired a
      *                       {@link SAXException}.
      */
-    protected void handleError(JDOMException exception) throws JDOMException {
-        if (errorHandler != null) {
-            try {
+    protected void handleError(JDOMException exception)
+        throws JDOMException
+    {
+        if (errorHandler != null)
+        {
+            try
+            {
                 errorHandler.error(new SAXParseException(
-                                exception.getMessage(), null, exception));
+                        exception.getMessage(), null, exception));
             }
-            catch (SAXException se) {
-               if (se.getException() instanceof JDOMException) {
-                   throw (JDOMException)(se.getException());
-               }
-               else {
-                   throw new JDOMException(se.getMessage(), se);
-               }
+            catch (SAXException se)
+            {
+                if (se.getException() instanceof JDOMException)
+                {
+                    throw (JDOMException)(se.getException());
+                }
+                else
+                {
+                    throw new JDOMException(se.getMessage(), se);
+                }
             }
         }
-        else {
+        else
+        {
             throw exception;
         }
     }
@@ -1196,46 +1359,58 @@ public class SAXOutputter {
      *
      * @throws Exception if no parser can be created.
      */
-    protected XMLReader createParser() throws Exception {
+    protected XMLReader createParser()
+        throws Exception
+    {
         XMLReader parser = null;
 
         // Try using JAXP...
         // Note we need JAXP 1.1, and if JAXP 1.0 is all that's
         // available then the getXMLReader call fails and we skip
         // to the hard coded default parser
-        try {
-            Class factoryClass = 
+        try
+        {
+            Class factoryClass =
                     Class.forName("javax.xml.parsers.SAXParserFactory");
 
             // factory = SAXParserFactory.newInstance();
-            Method newParserInstance = 
+            Method newParserInstance =
                     factoryClass.getMethod("newInstance", null);
             Object factory = newParserInstance.invoke(null, null);
 
             // jaxpParser = factory.newSAXParser();
             Method newSAXParser = factoryClass.getMethod("newSAXParser", null);
-            Object jaxpParser   = newSAXParser.invoke(factory, null);
+            Object jaxpParser = newSAXParser.invoke(factory, null);
 
             // parser = jaxpParser.getXMLReader();
             Class parserClass = jaxpParser.getClass();
-            Method getXMLReader = 
+            Method getXMLReader =
                     parserClass.getMethod("getXMLReader", null);
             parser = (XMLReader)getXMLReader.invoke(jaxpParser, null);
-        } catch (ClassNotFoundException e) {
+        }
+        catch (ClassNotFoundException e)
+        {
             //e.printStackTrace();
-        } catch (InvocationTargetException e) {
+        }
+        catch (InvocationTargetException e)
+        {
             //e.printStackTrace();
-        } catch (NoSuchMethodException e) {
+        }
+        catch (NoSuchMethodException e)
+        {
             //e.printStackTrace();
-        } catch (IllegalAccessException e) {
+        }
+        catch (IllegalAccessException e)
+        {
             //e.printStackTrace();
         }
 
         // Check to see if we got a parser yet, if not, try to use a
         // hard coded default
-        if (parser == null) {
+        if (parser == null)
+        {
             parser = XMLReaderFactory.createXMLReader(
-                                "org.apache.xerces.parsers.SAXParser");
+                    "org.apache.xerces.parsers.SAXParser");
         }
         return parser;
     }
@@ -1251,7 +1426,9 @@ public class SAXOutputter {
      *
      * @throws JDOMException if no parser can be created.
      */
-    private XMLReader createDTDParser() throws JDOMException {
+    private XMLReader createDTDParser()
+        throws JDOMException
+    {
         XMLReader parser = null;
 
         // Get a parser instance
@@ -1259,46 +1436,86 @@ public class SAXOutputter {
         {
             parser = createParser();
         }
-        catch (Exception ex1) {
-           throw new JDOMException("Error in SAX parser allocation", ex1);
+        catch (Exception ex1)
+        {
+            throw new JDOMException("Error in SAX parser allocation", ex1);
         }
 
         // Register handlers
-        if (this.getDTDHandler() != null) {
+        if (this.getDTDHandler() != null)
+        {
             parser.setDTDHandler(this.getDTDHandler());
         }
-        if (this.getEntityResolver() != null) {
+        if (this.getEntityResolver() != null)
+        {
             parser.setEntityResolver(this.getEntityResolver());
         }
-        if (this.getLexicalHandler() != null) {
-            try {
+        if (this.getLexicalHandler() != null)
+        {
+            try
+            {
                 parser.setProperty(LEXICAL_HANDLER_SAX_PROPERTY,
-                                   this.getLexicalHandler());
+                        this.getLexicalHandler());
             }
-            catch (SAXException ex1) {
-                try {
+            catch (SAXException ex1)
+            {
+                try
+                {
                     parser.setProperty(LEXICAL_HANDLER_ALT_PROPERTY,
-                                       this.getLexicalHandler());
-                } catch (SAXException ex2) {
+                            this.getLexicalHandler());
+                }
+                catch (SAXException ex2)
+                {
                     // Forget it!
                 }
             }
         }
-        if (this.getDeclHandler() != null) {
-            try {
+        if (this.getDeclHandler() != null)
+        {
+            try
+            {
                 parser.setProperty(DECL_HANDLER_SAX_PROPERTY,
-                                   this.getDeclHandler());
+                        this.getDeclHandler());
             }
-            catch (SAXException ex1) {
-                try {
+            catch (SAXException ex1)
+            {
+                try
+                {
                     parser.setProperty(DECL_HANDLER_ALT_PROPERTY,
-                                       this.getDeclHandler());
-                } catch (SAXException ex2) {
+                            this.getDeclHandler());
+                }
+                catch (SAXException ex2)
+                {
                     // Forget it!
                 }
             }
         }
 
         return (parser);
+    }
+
+    /**
+     * Returns a JDOMLocator object referencing the node currently
+     * being processed by this outputter.  The returned object is a
+     * snapshot of the  location information and can thus safely be
+     * memorized for later use.
+     * <p>
+     * This method allows direct access to the location information
+     * maintained by SAXOutputter without requiring to implement
+     * <code>XMLFilter</code>. (In SAX, locators are only available
+     * though the <code>ContentHandler</code> interface).</p>
+     * <p>
+     * Note that location information is only available while
+     * SAXOutputter is outputting nodes. Hence this method should
+     * only be used by objects taking part in the output processing
+     * such as <code>ErrorHandler</code>s.
+     *
+     * @return a JDOMLocator object referencing the node currently
+     *         being processed or <code>null</code> if no output
+     *         operation is being performed.
+     */
+    public JDOMLocator getLocator()
+    {
+        return (locator != null) ? new JDOMLocator(locator) : null;
     }
 }

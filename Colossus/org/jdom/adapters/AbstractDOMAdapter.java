@@ -10,26 +10,26 @@
  are met:
  
  1. Redistributions of source code must retain the above copyright
-    notice, this list of conditions, and the following disclaimer.
+ notice, this list of conditions, and the following disclaimer.
  
  2. Redistributions in binary form must reproduce the above copyright
-    notice, this list of conditions, and the disclaimer that follows 
-    these conditions in the documentation and/or other materials 
-    provided with the distribution.
+ notice, this list of conditions, and the disclaimer that follows 
+ these conditions in the documentation and/or other materials 
+ provided with the distribution.
 
  3. The name "JDOM" must not be used to endorse or promote products
-    derived from this software without prior written permission.  For
-    written permission, please contact <request_AT_jdom_DOT_org>.
+ derived from this software without prior written permission.  For
+ written permission, please contact <request_AT_jdom_DOT_org>.
  
  4. Products derived from this software may not be called "JDOM", nor
-    may "JDOM" appear in their name, without prior written permission
-    from the JDOM Project Management <request_AT_jdom_DOT_org>.
+ may "JDOM" appear in their name, without prior written permission
+ from the JDOM Project Management <request_AT_jdom_DOT_org>.
  
  In addition, we request (but do not require) that you include in the 
  end-user documentation provided with the redistribution and/or in the 
  software itself an acknowledgement equivalent to the following:
-     "This product includes software developed by the
-      JDOM Project (http://www.jdom.org/)."
+ "This product includes software developed by the
+ JDOM Project (http://www.jdom.org/)."
  Alternatively, the acknowledgment may be graphical using the logos 
  available at http://www.jdom.org/images/logos.
 
@@ -56,18 +56,14 @@
 
 package org.jdom.adapters;
 
-import java.io.IOException;
-import java.io.FileInputStream;
-import java.io.File;
-import java.io.InputStream;
+
+import java.io.*;
 import java.lang.reflect.*;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.DocumentType;
-import org.w3c.dom.DOMImplementation;
-
 import org.jdom.*;
-import org.jdom.JDOMException;
+import org.w3c.dom.*;
+import org.w3c.dom.Document;
+
 
 /**
  * <b><code>AbstractDOMAdapter</code></b>.
@@ -80,10 +76,11 @@ import org.jdom.JDOMException;
  * @author Jason Hunter
  * @version $Revision$, $Date$
  */
-public abstract class AbstractDOMAdapter implements DOMAdapter {
+public abstract class AbstractDOMAdapter implements DOMAdapter
+{
 
-    private static final String CVS_ID = 
-      "@(#) $RCSfile$ $Revision$ $Date$ $Name$";
+    private static final String CVS_ID =
+            "@(#) $RCSfile$ $Revision$ $Date$ $Name$";
 
     /**
      * This creates a new <code>{@link Document}</code> from an
@@ -97,7 +94,8 @@ public abstract class AbstractDOMAdapter implements DOMAdapter {
      * @throws JDOMException when errors occur in parsing.
      */
     public Document getDocument(File filename, boolean validate)
-        throws IOException, JDOMException {
+        throws IOException, JDOMException
+    {
 
         return getDocument(new FileInputStream(filename), validate);
     }
@@ -123,7 +121,8 @@ public abstract class AbstractDOMAdapter implements DOMAdapter {
      * @return <code>Document</code> - created DOM Document.
      * @throws JDOMException when errors occur.
      */
-    public abstract Document createDocument() throws JDOMException;
+    public abstract Document createDocument()
+        throws JDOMException;
 
     /**
      * This creates an empty <code>Document</code> object based
@@ -135,23 +134,26 @@ public abstract class AbstractDOMAdapter implements DOMAdapter {
      * @return <code>Document</code> - created DOM Document.
      * @throws JDOMException when errors occur.
      */
-    public Document createDocument(DocType doctype) throws JDOMException {
-        if (doctype == null) {
+    public Document createDocument(DocType doctype)
+        throws JDOMException
+    {
+        if (doctype == null)
+        {
             return createDocument();
         }
-  
+
         DOMImplementation domImpl = createDocument().getImplementation();
         DocumentType domDocType = domImpl.createDocumentType(
-                                      doctype.getElementName(),
-                                      doctype.getPublicID(),
-                                      doctype.getSystemID());
+                doctype.getElementName(),
+                doctype.getPublicID(),
+                doctype.getSystemID());
 
         // Set the internal subset if possible
         setInternalSubset(domDocType, doctype.getInternalSubset());
 
         return domImpl.createDocument("http://temporary",
-                                      doctype.getElementName(),
-                                      domDocType);
+                doctype.getElementName(),
+                domDocType);
     }
 
     /**
@@ -163,19 +165,25 @@ public abstract class AbstractDOMAdapter implements DOMAdapter {
      * @param dt DocumentType to be altered
      * @param s String to use as the internal DTD subset
      */
-    protected void setInternalSubset(DocumentType dt, String s) {
-        if (dt == null || s == null) return;
+    protected void setInternalSubset(DocumentType dt, String s)
+    {
+        if (dt == null || s == null)
+        {
+            return;
+        }
 
         // Default behavior is to attempt a setInternalSubset() call using
         // reflection.  This method is not part of the DOM spec, but it's
         // available on Xerces 1.4.4+.  It's not currently in Crimson.
-        try {
+        try
+        {
             Class dtclass = dt.getClass();
             Method setInternalSubset = dtclass.getMethod(
-                "setInternalSubset", new Class[] {java.lang.String.class});
+                    "setInternalSubset", new Class[] {java.lang.String.class});
             setInternalSubset.invoke(dt, new Object[] {s});
         }
-        catch (Exception e) {
+        catch (Exception e)
+        {
             // ignore
         }
     }

@@ -10,26 +10,26 @@
  are met:
 
  1. Redistributions of source code must retain the above copyright
-    notice, this list of conditions, and the following disclaimer.
+ notice, this list of conditions, and the following disclaimer.
 
  2. Redistributions in binary form must reproduce the above copyright
-    notice, this list of conditions, and the disclaimer that follows
-    these conditions in the documentation and/or other materials
-    provided with the distribution.
+ notice, this list of conditions, and the disclaimer that follows
+ these conditions in the documentation and/or other materials
+ provided with the distribution.
 
  3. The name "JDOM" must not be used to endorse or promote products
-    derived from this software without prior written permission.  For
-    written permission, please contact <request_AT_jdom_DOT_org>.
+ derived from this software without prior written permission.  For
+ written permission, please contact <request_AT_jdom_DOT_org>.
 
  4. Products derived from this software may not be called "JDOM", nor
-    may "JDOM" appear in their name, without prior written permission
-    from the JDOM Project Management <request_AT_jdom_DOT_org>.
+ may "JDOM" appear in their name, without prior written permission
+ from the JDOM Project Management <request_AT_jdom_DOT_org>.
 
  In addition, we request (but do not require) that you include in the
  end-user documentation provided with the redistribution and/or in the
  software itself an acknowledgement equivalent to the following:
-     "This product includes software developed by the
-      JDOM Project (http://www.jdom.org/)."
+ "This product includes software developed by the
+ JDOM Project (http://www.jdom.org/)."
  Alternatively, the acknowledgment may be graphical using the logos
  available at http://www.jdom.org/images/logos.
 
@@ -56,8 +56,11 @@
 
 package org.jdom.input;
 
-import org.jdom.*;
+
 import java.util.*;
+
+import org.jdom.*;
+
 
 /**
  * <code>JDOMFactory</code> is an interface to be used by builders
@@ -71,7 +74,8 @@ import java.util.*;
  * @author Bradley S. Huffman
  * @version $Revision$, $Date$
  */
-public interface JDOMFactory {
+public interface JDOMFactory
+{
 
     // **** constructing Attributes ****
 
@@ -98,7 +102,7 @@ public interface JDOMFactory {
      * @param namespace <code>Namespace</code> namespace for new attribute.
      */
     public Attribute attribute(String name, String value,
-                                            int type, Namespace namespace);
+            int type, Namespace namespace);
 
     /**
      * This will create a new <code>Attribute</code> with the
@@ -145,7 +149,7 @@ public interface JDOMFactory {
     /**
      * This creates the Text with the supplied text.
      *
-     * @param data <code>String</code> content of Text.
+     * @param str <code>String</code> content of Text.
      */
     public Text text(String str);
 
@@ -172,8 +176,8 @@ public interface JDOMFactory {
      * @param systemID <code>String</code> system ID of
      *        referenced DTD
      */
-    public DocType docType(String elementName, 
-                           String publicID, String systemID);
+    public DocType docType(String elementName,
+            String publicID, String systemID);
 
     /**
      * This will create the <code>DocType</code> with
@@ -228,7 +232,7 @@ public interface JDOMFactory {
      *
      * @param name <code>String</code> name of element.
      * @param namespace <code>Namespace</code> to put element in.
-         */
+     */
     public Element element(String name, Namespace namespace);
 
     /**
@@ -274,18 +278,18 @@ public interface JDOMFactory {
      * @param data <code>Map</code> data for PI, in
      *             name/value pairs
      */
-    public ProcessingInstruction processingInstruction(String target, 
-                                                       Map data);
+    public ProcessingInstruction processingInstruction(String target,
+            Map data);
 
     /**
      * This will create a new <code>ProcessingInstruction</code>
      * with the specified target and data.
      *
      * @param target <code>String</code> target of PI.
-     * @param rawData <code>String</code> data for PI.
+     * @param data <code>String</code> data for PI.
      */
-    public ProcessingInstruction processingInstruction(String target, 
-                                                       String data);
+    public ProcessingInstruction processingInstruction(String target,
+            String data);
 
     // **** constructing EntityRef ****
 

@@ -10,26 +10,26 @@
  are met:
  
  1. Redistributions of source code must retain the above copyright
-    notice, this list of conditions, and the following disclaimer.
+ notice, this list of conditions, and the following disclaimer.
  
  2. Redistributions in binary form must reproduce the above copyright
-    notice, this list of conditions, and the disclaimer that follows 
-    these conditions in the documentation and/or other materials 
-    provided with the distribution.
+ notice, this list of conditions, and the disclaimer that follows 
+ these conditions in the documentation and/or other materials 
+ provided with the distribution.
 
  3. The name "JDOM" must not be used to endorse or promote products
-    derived from this software without prior written permission.  For
-    written permission, please contact <request_AT_jdom_DOT_org>.
+ derived from this software without prior written permission.  For
+ written permission, please contact <request_AT_jdom_DOT_org>.
  
  4. Products derived from this software may not be called "JDOM", nor
-    may "JDOM" appear in their name, without prior written permission
-    from the JDOM Project Management <request_AT_jdom_DOT_org>.
+ may "JDOM" appear in their name, without prior written permission
+ from the JDOM Project Management <request_AT_jdom_DOT_org>.
  
  In addition, we request (but do not require) that you include in the 
  end-user documentation provided with the redistribution and/or in the 
  software itself an acknowledgement equivalent to the following:
-     "This product includes software developed by the
-      JDOM Project (http://www.jdom.org/)."
+ "This product includes software developed by the
+ JDOM Project (http://www.jdom.org/)."
  Alternatively, the acknowledgment may be graphical using the logos 
  available at http://www.jdom.org/images/logos.
 
@@ -56,15 +56,12 @@
 
 package org.jdom.adapters;
 
-import java.io.IOException;
-import java.io.FileInputStream;
-import java.io.File;
-import java.io.InputStream;
 
+import java.io.*;
+
+import org.jdom.*;
 import org.w3c.dom.Document;
 
-import org.jdom.DocType;
-import org.jdom.JDOMException;
 
 /**
  * <b><code>DOMAdapter</code></b>.
@@ -77,7 +74,8 @@ import org.jdom.JDOMException;
  * @author Jason Hunter
  * @version $Revison$, $Date$
  */
-public interface DOMAdapter {
+public interface DOMAdapter
+{
 
     /**
      * This creates a new <code>Document</code> from a
@@ -115,7 +113,8 @@ public interface DOMAdapter {
      * @return <code>Document</code> - created DOM Document.
      * @throws JDOMException when errors occur.
      */
-    public Document createDocument() throws JDOMException;
+    public Document createDocument()
+        throws JDOMException;
 
     /**
      * This creates an empty <code>Document</code> object based
@@ -125,5 +124,6 @@ public interface DOMAdapter {
      * @return <code>Document</code> - created DOM Document.
      * @throws JDOMException when errors occur.
      */
-    public Document createDocument(DocType doctype) throws JDOMException;
+    public Document createDocument(DocType doctype)
+        throws JDOMException;
 }

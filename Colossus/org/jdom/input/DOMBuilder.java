@@ -10,26 +10,26 @@
  are met:
  
  1. Redistributions of source code must retain the above copyright
-    notice, this list of conditions, and the following disclaimer.
+ notice, this list of conditions, and the following disclaimer.
  
  2. Redistributions in binary form must reproduce the above copyright
-    notice, this list of conditions, and the disclaimer that follows 
-    these conditions in the documentation and/or other materials 
-    provided with the distribution.
+ notice, this list of conditions, and the disclaimer that follows 
+ these conditions in the documentation and/or other materials 
+ provided with the distribution.
 
  3. The name "JDOM" must not be used to endorse or promote products
-    derived from this software without prior written permission.  For
-    written permission, please contact <request_AT_jdom_DOT_org>.
+ derived from this software without prior written permission.  For
+ written permission, please contact <request_AT_jdom_DOT_org>.
  
  4. Products derived from this software may not be called "JDOM", nor
-    may "JDOM" appear in their name, without prior written permission
-    from the JDOM Project Management <request_AT_jdom_DOT_org>.
+ may "JDOM" appear in their name, without prior written permission
+ from the JDOM Project Management <request_AT_jdom_DOT_org>.
  
  In addition, we request (but do not require) that you include in the 
  end-user documentation provided with the redistribution and/or in the 
  software itself an acknowledgement equivalent to the following:
-     "This product includes software developed by the
-      JDOM Project (http://www.jdom.org/)."
+ "This product includes software developed by the
+ JDOM Project (http://www.jdom.org/)."
  Alternatively, the acknowledgment may be graphical using the logos 
  available at http://www.jdom.org/images/logos.
 
@@ -56,21 +56,17 @@
 
 package org.jdom.input;
 
+
 import java.io.*;
 import java.net.*;
-import java.util.*;
-import java.lang.reflect.*;
 
 import org.jdom.*;
-import org.jdom.Comment;
 import org.jdom.Document;
 import org.jdom.Element;
-import org.jdom.EntityRef;
-import org.jdom.ProcessingInstruction;
 import org.jdom.adapters.*;
-
 import org.w3c.dom.*;
 import org.xml.sax.*;
+
 
 /**
  * <code>DOMBuilder</code> builds a JDOM tree using DOM.
@@ -88,16 +84,17 @@ import org.xml.sax.*;
  * @author Bradley S. Huffman
  * @version $Revision$, $Date$
  */
-public class DOMBuilder {
+public class DOMBuilder
+{
 
-    private static final String CVS_ID = 
-      "@(#) $RCSfile$ $Revision$ $Date$ $Name$";
+    private static final String CVS_ID =
+            "@(#) $RCSfile$ $Revision$ $Date$ $Name$";
 
     /** Default adapter class to use. This is used when no other parser
-      * is given and JAXP isn't available. 
-      */
+     * is given and JAXP isn't available. 
+     */
     private static final String DEFAULT_ADAPTER_CLASS =
-        "org.jdom.adapters.XercesDOMAdapter";
+            "org.jdom.adapters.XercesDOMAdapter";
 
     /** Whether validation should occur */
     private boolean validate;
@@ -113,7 +110,8 @@ public class DOMBuilder {
      * a parser via JAXP, then will try to use a set of default parsers.
      * The underlying parser will not validate.
      */
-    public DOMBuilder() {
+    public DOMBuilder()
+    {
         this(false);
     }
 
@@ -129,7 +127,8 @@ public class DOMBuilder {
      *             building from files and that's the only time validation
      *             matters
      */
-    public DOMBuilder(boolean validate) {
+    public DOMBuilder(boolean validate)
+    {
         setValidation(validate);
     }
 
@@ -141,7 +140,8 @@ public class DOMBuilder {
      * @param adapterClass <code>String</code> name of class
      *                     to use for DOM building.
      */
-    public DOMBuilder(String adapterClass) {
+    public DOMBuilder(String adapterClass)
+    {
         this(adapterClass, false);
     }
 
@@ -159,7 +159,8 @@ public class DOMBuilder {
      *             building from files and that's the only time validation
      *             matters
      */
-    public DOMBuilder(String adapterClass, boolean validate) {
+    public DOMBuilder(String adapterClass, boolean validate)
+    {
         this.adapterClass = adapterClass;
         setValidation(validate);
     }
@@ -170,7 +171,8 @@ public class DOMBuilder {
      *
      * @param factory <code>JDOMFactory</code> to use
      */
-    public void setFactory(JDOMFactory factory) {
+    public void setFactory(JDOMFactory factory)
+    {
         this.factory = factory;
     }
 
@@ -179,8 +181,12 @@ public class DOMBuilder {
      *
      * @param validate <code>boolean</code> indicating whether validation
      * should occur.
+     * @deprecated Deprecated in Beta 9, DOMBuilder shouldn't be used for
+     *             building from files and that's the only time validation
+     *             matters
      */
-    public void setValidation(boolean validate) {
+    public void setValidation(boolean validate)
+    {
         this.validate = validate;
     }
 
@@ -197,52 +203,65 @@ public class DOMBuilder {
      *             should be used for building from any input other than a
      *             DOM tree
      */
-    public Document build(InputStream in) throws JDOMException {
+    public Document build(InputStream in)
+        throws JDOMException
+    {
         Document doc = factory.document((Element)null);
         org.w3c.dom.Document domDoc = null;
 
-        try {
-            if (adapterClass != null) {
+        try
+        {
+            if (adapterClass != null)
+            {
                 // The user knows that they want to use a particular impl
-                try {
+                try
+                {
                     DOMAdapter adapter =
-                        (DOMAdapter)Class.forName(adapterClass).newInstance();
+                            (DOMAdapter)Class.forName(adapterClass).newInstance();
                     domDoc = adapter.getDocument(in, validate);
                     // System.out.println("using specific " + adapterClass);
                 }
-                catch (ClassNotFoundException e) {
+                catch (ClassNotFoundException e)
+                {
                     // e.printStackTrace();
                 }
             }
-            else {
+            else
+            {
                 // Try using JAXP...
                 // Ignore any exceptions that result from JAXP not existing
-                try {
+                try
+                {
                     DOMAdapter adapter =
-                        (DOMAdapter)Class.forName(
-                        "org.jdom.adapters.JAXPDOMAdapter").newInstance();
+                            (DOMAdapter)Class.forName(
+                            "org.jdom.adapters.JAXPDOMAdapter").newInstance();
                     // System.out.println("using JAXP");
                     domDoc = adapter.getDocument(in, validate);
                 }
-                catch (ClassNotFoundException e) {
+                catch (ClassNotFoundException e)
+                {
                     // e.printStackTrace();
                 }
-                catch (IllegalAccessException e) {
+                catch (IllegalAccessException e)
+                {
                     // e.printStackTrace();
                 }
             }
 
             // If we don't have a domDoc yet and there's no adapter, try
             // the hard coded default parser
-            if (domDoc == null && adapterClass == null) {
-                try {
+            if (domDoc == null && adapterClass == null)
+            {
+                try
+                {
                     DOMAdapter adapter = (DOMAdapter)
-                        Class.forName(DEFAULT_ADAPTER_CLASS).newInstance();
+                            Class.forName(DEFAULT_ADAPTER_CLASS).newInstance();
                     domDoc = adapter.getDocument(in, validate);
                     // System.out.println("Using default " +
                     //   DEFAULT_ADAPTER_CLASS);
                 }
-                catch (ClassNotFoundException e) {
+                catch (ClassNotFoundException e)
+                {
                     // e.printStackTrace();
                 }
             }
@@ -250,21 +269,26 @@ public class DOMBuilder {
             // Start out at root level
             buildTree(domDoc, doc, null, true);
         }
-        catch (Throwable e) {
-           if (e instanceof SAXParseException) {
+        catch (Throwable e)
+        {
+            if (e instanceof SAXParseException)
+            {
                 SAXParseException p = (SAXParseException)e;
                 String systemId = p.getSystemId();
-                if (systemId != null) {
+                if (systemId != null)
+                {
                     throw new JDOMException("Error on line " +
-                              p.getLineNumber() + " of document "
-                              + systemId, e);
+                            p.getLineNumber() + " of document "
+                            + systemId, e);
                 }
-                else {
+                else
+                {
                     throw new JDOMException("Error on line " +
-                              p.getLineNumber(), e);
+                            p.getLineNumber(), e);
                 }
             }
-            else {
+            else
+            {
                 throw new JDOMException("Error in building from stream", e);
             }
         }
@@ -284,12 +308,16 @@ public class DOMBuilder {
      *             should be used for building from any input other than a
      *             DOM tree
      */
-    public Document build(File file) throws JDOMException {
-        try {
+    public Document build(File file)
+        throws JDOMException
+    {
+        try
+        {
             FileInputStream in = new FileInputStream(file);
             return build(in);
         }
-        catch (FileNotFoundException e) {
+        catch (FileNotFoundException e)
+        {
             throw new JDOMException("Error in building from " + file, e);
         }
     }
@@ -307,11 +335,15 @@ public class DOMBuilder {
      *             should be used for building from any input other than a
      *             DOM tree
      */
-    public Document build(URL url) throws JDOMException {
-        try {
+    public Document build(URL url)
+        throws JDOMException
+    {
+        try
+        {
             return build(url.openStream());
         }
-        catch (IOException e) {
+        catch (IOException e)
+        {
             throw new JDOMException("Error in building from " + url, e);
         }
     }
@@ -322,7 +354,8 @@ public class DOMBuilder {
      * @param domDocument <code>org.w3c.dom.Document</code> object
      * @return <code>Document</code> - JDOM document object.
      */
-    public Document build(org.w3c.dom.Document domDocument) {
+    public Document build(org.w3c.dom.Document domDocument)
+    {
         Document doc = factory.document((Element)null);
         buildTree(domDocument, doc, null, true);
         return doc;
@@ -334,10 +367,11 @@ public class DOMBuilder {
      * @param domElement <code> org.w3c.dom.Element</code> object
      * @return <code>Element</code> - JDOM Element object
      */
-    public org.jdom.Element build(org.w3c.dom.Element domElement) {
+    public org.jdom.Element build(org.w3c.dom.Element domElement)
+    {
         Document doc = factory.document((Element)null);
         buildTree(domElement, doc, null, true);
-        return doc.getRootElement();               
+        return doc.getRootElement();
     }
 
     /**
@@ -351,14 +385,17 @@ public class DOMBuilder {
      * @param atRoot <code>boolean</code> indicating whether at root level.
      */
     private void buildTree(Node node,
-                           Document doc,
-                           Element current,
-                           boolean atRoot) {
+            Document doc,
+            Element current,
+            boolean atRoot)
+    {
         // Recurse through the tree
-        switch (node.getNodeType()) {
+        switch (node.getNodeType())
+        {
             case Node.DOCUMENT_NODE:
                 NodeList nodes = node.getChildNodes();
-                for (int i=0, size=nodes.getLength(); i<size; i++) {
+                for (int i = 0, size = nodes.getLength(); i < size; i++)
+                {
                     buildTree(nodes.item(i), doc, current, true);
                 }
                 break;
@@ -368,7 +405,8 @@ public class DOMBuilder {
                 String prefix = "";
                 String localName = nodeName;
                 int colon = nodeName.indexOf(':');
-                if (colon >= 0) {
+                if (colon >= 0)
+                {
                     prefix = nodeName.substring(0, colon);
                     localName = nodeName.substring(colon + 1);
                 }
@@ -376,20 +414,25 @@ public class DOMBuilder {
                 // Get element's namespace
                 Namespace ns = null;
                 String uri = node.getNamespaceURI();
-                if (uri == null) {
+                if (uri == null)
+                {
                     ns = (current == null) ? Namespace.NO_NAMESPACE
-                                           : current.getNamespace(prefix);
+                            : current.getNamespace(prefix);
                 }
-                else {
+                else
+                {
                     ns = Namespace.getNamespace(prefix, uri);
                 }
 
                 Element element = factory.element(localName, ns);
 
-                if (atRoot) {
+                if (atRoot)
+                {
                     // If at root, set as document root
                     doc.setRootElement(element);
-                } else {
+                }
+                else
+                {
                     // else add to parent element
                     current.addContent(element);
                 }
@@ -398,47 +441,55 @@ public class DOMBuilder {
                 NamedNodeMap attributeList = node.getAttributes();
                 int attsize = attributeList.getLength();
 
-                for (int i = 0; i < attsize; i++) {
-                    Attr att = (Attr) attributeList.item(i);
+                for (int i = 0; i < attsize; i++)
+                {
+                    Attr att = (Attr)attributeList.item(i);
 
                     String attname = att.getName();
-                    if (attname.startsWith("xmlns")) {
+                    if (attname.startsWith("xmlns"))
+                    {
                         String attPrefix = "";
                         colon = attname.indexOf(':');
-                        if (colon >= 0) {
+                        if (colon >= 0)
+                        {
                             attPrefix = attname.substring(colon + 1);
                         }
 
                         String attvalue = att.getValue();
 
                         Namespace declaredNS =
-                            Namespace.getNamespace(attPrefix, attvalue);
+                                Namespace.getNamespace(attPrefix, attvalue);
 
                         // Add as additional namespaces if it's different
                         // than this element's namespace (perhaps we should
                         // also have logic not to mark them as additional if
                         // it's been done already, but it probably doesn't
                         // matter)
-                        if (prefix.equals(attPrefix)) {
+                        if (prefix.equals(attPrefix))
+                        {
                             element.setNamespace(declaredNS);
                         }
-                        else {
+                        else
+                        {
                             element.addNamespaceDeclaration(declaredNS);
                         }
                     }
                 }
 
                 // Add attributes
-                for (int i = 0; i < attsize; i++) {
-                    Attr att = (Attr) attributeList.item(i);
+                for (int i = 0; i < attsize; i++)
+                {
+                    Attr att = (Attr)attributeList.item(i);
 
                     String attname = att.getName();
 
-                    if ( !attname.startsWith("xmlns")) {
+                    if (!attname.startsWith("xmlns"))
+                    {
                         String attPrefix = "";
                         String attLocalName = attname;
                         colon = attname.indexOf(':');
-                        if (colon >= 0) {
+                        if (colon >= 0)
+                        {
                             attPrefix = attname.substring(0, colon);
                             attLocalName = attname.substring(colon + 1);
                         }
@@ -447,15 +498,17 @@ public class DOMBuilder {
 
                         // Get attribute's namespace
                         Namespace attns = null;
-                        if ("".equals(attPrefix)) {
+                        if ("".equals(attPrefix))
+                        {
                             attns = Namespace.NO_NAMESPACE;
-                        } 
-                        else {
+                        }
+                        else
+                        {
                             attns = element.getNamespace(attPrefix);
-                        } 
+                        }
 
                         Attribute attribute =
-                            factory.attribute(attLocalName, attvalue, attns);
+                                factory.attribute(attLocalName, attvalue, attns);
                         element.setAttribute(attribute);
                     }
                 }
@@ -464,11 +517,14 @@ public class DOMBuilder {
                 // The list should never be null nor should it ever contain
                 // null nodes, but some DOM impls are broken
                 NodeList children = node.getChildNodes();
-                if (children != null) {
+                if (children != null)
+                {
                     int size = children.getLength();
-                    for (int i = 0; i < size; i++) {
+                    for (int i = 0; i < size; i++)
+                    {
                         Node item = children.item(i);
-                        if (item != null) {
+                        if (item != null)
+                        {
                             buildTree(item, doc, element, false);
                         }
                     }
@@ -485,23 +541,28 @@ public class DOMBuilder {
                 current.addContent(factory.cdata(cdata));
                 break;
 
-
             case Node.PROCESSING_INSTRUCTION_NODE:
-                if (atRoot) {
+                if (atRoot)
+                {
                     doc.addContent(
-                        factory.processingInstruction(node.getNodeName(),
-                                                      node.getNodeValue()));
-                } else {
+                            factory.processingInstruction(node.getNodeName(),
+                            node.getNodeValue()));
+                }
+                else
+                {
                     current.addContent(
-                        factory.processingInstruction(node.getNodeName(),
-                                                      node.getNodeValue()));
+                            factory.processingInstruction(node.getNodeName(),
+                            node.getNodeValue()));
                 }
                 break;
 
             case Node.COMMENT_NODE:
-                if (atRoot) {
+                if (atRoot)
+                {
                     doc.addContent(factory.comment(node.getNodeValue()));
-                } else {
+                }
+                else
+                {
                     current.addContent(factory.comment(node.getNodeValue()));
                 }
                 break;

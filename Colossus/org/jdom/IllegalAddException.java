@@ -10,26 +10,26 @@
  are met:
  
  1. Redistributions of source code must retain the above copyright
-    notice, this list of conditions, and the following disclaimer.
+ notice, this list of conditions, and the following disclaimer.
  
  2. Redistributions in binary form must reproduce the above copyright
-    notice, this list of conditions, and the disclaimer that follows 
-    these conditions in the documentation and/or other materials 
-    provided with the distribution.
+ notice, this list of conditions, and the disclaimer that follows 
+ these conditions in the documentation and/or other materials 
+ provided with the distribution.
 
  3. The name "JDOM" must not be used to endorse or promote products
-    derived from this software without prior written permission.  For
-    written permission, please contact <request_AT_jdom_DOT_org>.
+ derived from this software without prior written permission.  For
+ written permission, please contact <request_AT_jdom_DOT_org>.
  
  4. Products derived from this software may not be called "JDOM", nor
-    may "JDOM" appear in their name, without prior written permission
-    from the JDOM Project Management <request_AT_jdom_DOT_org>.
+ may "JDOM" appear in their name, without prior written permission
+ from the JDOM Project Management <request_AT_jdom_DOT_org>.
  
  In addition, we request (but do not require) that you include in the 
  end-user documentation provided with the redistribution and/or in the 
  software itself an acknowledgement equivalent to the following:
-     "This product includes software developed by the
-      JDOM Project (http://www.jdom.org/)."
+ "This product includes software developed by the
+ JDOM Project (http://www.jdom.org/)."
  Alternatively, the acknowledgment may be graphical using the logos 
  available at http://www.jdom.org/images/logos.
 
@@ -56,6 +56,7 @@
 
 package org.jdom;
 
+
 /**
  * <code>IllegalAddException</code> is thrown when trying to add a
  * illegal object to a JDOM construct.
@@ -63,10 +64,11 @@ package org.jdom;
  * @author Brett McLaughlin
  * @version $Revision$, $Date$
  */
-public class IllegalAddException extends IllegalArgumentException {
+public class IllegalAddException extends IllegalArgumentException
+{
 
-    private static final String CVS_ID = 
-      "@(#) $RCSfile$ $Revision$ $Date$ $Name$";
+    private static final String CVS_ID =
+            "@(#) $RCSfile$ $Revision$ $Date$ $Name$";
 
     /**
      * This will create an <code>Exception</code> indicating
@@ -78,15 +80,9 @@ public class IllegalAddException extends IllegalArgumentException {
      * @param added <code>Attribute</code> that could not be added
      * @param reason cause of the problem
      */
-    public IllegalAddException(Element base, Attribute added, String reason) {
-        super(new StringBuffer()
-              .append("The attribute \"")
-              .append(added.getQualifiedName())
-              .append("\" could not be added to the element \"")
-              .append(base.getQualifiedName())
-              .append("\": ")
-              .append(reason)
-              .toString());
+    public IllegalAddException(Element base, Attribute added, String reason)
+    {
+        super(new StringBuffer().append("The attribute \"").append(added.getQualifiedName()).append("\" could not be added to the element \"").append(base.getQualifiedName()).append("\": ").append(reason).toString());
     }
 
     /**
@@ -99,15 +95,9 @@ public class IllegalAddException extends IllegalArgumentException {
      * @param added <code>Element</code> that could not be added
      * @param reason cause of the problem
      */
-    public IllegalAddException(Element base, Element added, String reason) {
-        super(new StringBuffer()
-              .append("The element \"")
-              .append(added.getQualifiedName())
-              .append("\" could not be added as a child of \"")
-              .append(base.getQualifiedName())
-              .append("\": ")
-              .append(reason)
-              .toString());
+    public IllegalAddException(Element base, Element added, String reason)
+    {
+        super(new StringBuffer().append("The element \"").append(added.getQualifiedName()).append("\" could not be added as a child of \"").append(base.getQualifiedName()).append("\": ").append(reason).toString());
     }
 
     /**
@@ -120,13 +110,9 @@ public class IllegalAddException extends IllegalArgumentException {
      * @param added <code>Element</code> that could not be added
      * @param reason cause of the problem
      */
-    public IllegalAddException(Document base, Element added, String reason) {
-        super(new StringBuffer()
-              .append("The element \"")
-              .append(added.getQualifiedName())
-              .append("\" could not be added as the root of the document: ")
-              .append(reason)
-              .toString());
+    public IllegalAddException(Document base, Element added, String reason)
+    {
+        super(new StringBuffer().append("The element \"").append(added.getQualifiedName()).append("\" could not be added as the root of the document: ").append(reason).toString());
     }
 
     /**
@@ -140,15 +126,9 @@ public class IllegalAddException extends IllegalArgumentException {
      * @param reason cause of the problem
      */
     public IllegalAddException(Element base, ProcessingInstruction added,
-                               String reason) {
-        super(new StringBuffer()
-              .append("The PI \"")
-              .append(added.getTarget())
-              .append("\" could not be added as content to \"")
-              .append(base.getQualifiedName())
-              .append("\": ")
-              .append(reason)
-              .toString());
+            String reason)
+    {
+        super(new StringBuffer().append("The PI \"").append(added.getTarget()).append("\" could not be added as content to \"").append(base.getQualifiedName()).append("\": ").append(reason).toString());
     }
 
     /**
@@ -162,13 +142,9 @@ public class IllegalAddException extends IllegalArgumentException {
      * @param reason cause of the problem
      */
     public IllegalAddException(Document base, ProcessingInstruction added,
-                               String reason) {
-        super(new StringBuffer()
-              .append("The PI \"")
-              .append(added.getTarget())
-              .append("\" could not be added to the top level of the document: ")
-              .append(reason)
-              .toString());
+            String reason)
+    {
+        super(new StringBuffer().append("The PI \"").append(added.getTarget()).append("\" could not be added to the top level of the document: ").append(reason).toString());
     }
 
     /**
@@ -181,17 +157,10 @@ public class IllegalAddException extends IllegalArgumentException {
      * @param added <code>Comment</code> that could not be added
      * @param reason cause of the problem
      */
-    public IllegalAddException(Element base, Comment added, String reason) {
-        super(new StringBuffer()
-              .append("The comment \"")
-              .append(added.getText())
-              .append("\" could not be added as content to \"")
-              .append(base.getQualifiedName())
-              .append("\": ")
-              .append(reason)
-              .toString());
+    public IllegalAddException(Element base, Comment added, String reason)
+    {
+        super(new StringBuffer().append("The comment \"").append(added.getText()).append("\" could not be added as content to \"").append(base.getQualifiedName()).append("\": ").append(reason).toString());
     }
-
 
     /**
      * This will create an <code>Exception</code> indicating
@@ -202,17 +171,10 @@ public class IllegalAddException extends IllegalArgumentException {
      * @param added <code>CDATA</code> that could not be added
      * @param reason cause of the problem
      */
-    public IllegalAddException(Element base, CDATA added, String reason) {
-        super(new StringBuffer()
-              .append("The CDATA \"")
-              .append(added.getText())
-              .append("\" could not be added as content to \"")
-              .append(base.getQualifiedName())
-              .append("\": ")
-              .append(reason)
-              .toString());
+    public IllegalAddException(Element base, CDATA added, String reason)
+    {
+        super(new StringBuffer().append("The CDATA \"").append(added.getText()).append("\" could not be added as content to \"").append(base.getQualifiedName()).append("\": ").append(reason).toString());
     }
-
 
     /**
      * This will create an <code>Exception</code> indicating
@@ -224,15 +186,9 @@ public class IllegalAddException extends IllegalArgumentException {
      * @param added <code>Text</code> that could not be added
      * @param reason cause of the problem
      */
-    public IllegalAddException(Element base, Text added, String reason) {
-        super(new StringBuffer()
-              .append("The Text \"")
-              .append(added.getText())
-              .append("\" could not be added as content to \"")
-              .append(base.getQualifiedName())
-              .append("\": ")
-              .append(reason)
-              .toString());
+    public IllegalAddException(Element base, Text added, String reason)
+    {
+        super(new StringBuffer().append("The Text \"").append(added.getText()).append("\" could not be added as content to \"").append(base.getQualifiedName()).append("\": ").append(reason).toString());
     }
 
     /**
@@ -245,13 +201,9 @@ public class IllegalAddException extends IllegalArgumentException {
      * @param added <code>Comment</code> that could not be added
      * @param reason cause of the problem
      */
-    public IllegalAddException(Document base, Comment added, String reason) {
-        super(new StringBuffer()
-              .append("The comment \"")
-              .append(added.getText())
-              .append("\" could not be added to the top level of the document: ")
-              .append(reason)
-              .toString());
+    public IllegalAddException(Document base, Comment added, String reason)
+    {
+        super(new StringBuffer().append("The comment \"").append(added.getText()).append("\" could not be added to the top level of the document: ").append(reason).toString());
     }
 
     /**
@@ -264,15 +216,9 @@ public class IllegalAddException extends IllegalArgumentException {
      * @param added <code>EntityRef</code> reference that could not be added
      * @param reason cause of the problem
      */
-    public IllegalAddException(Element base, EntityRef added, String reason) {
-        super(new StringBuffer()
-              .append("The entity reference\"")
-              .append(added.getName())
-              .append("\" could not be added as content to \"")
-              .append(base.getQualifiedName())
-              .append("\": ")
-              .append(reason)
-              .toString());
+    public IllegalAddException(Element base, EntityRef added, String reason)
+    {
+        super(new StringBuffer().append("The entity reference\"").append(added.getName()).append("\" could not be added as content to \"").append(base.getQualifiedName()).append("\": ").append(reason).toString());
     }
 
     /**
@@ -285,19 +231,11 @@ public class IllegalAddException extends IllegalArgumentException {
      * @param added <code>Namespace</code> that could not be added
      * @param reason cause of the problem
      */
-    public IllegalAddException(Element base, Namespace added, String reason) {
-        super(new StringBuffer()
-              .append("The namespace xmlns")
-              .append((added.getPrefix() == null ||
-                       added.getPrefix().equals("")) ? "=" 
-                                   : ":" + added.getPrefix() + "=")
-              .append("\"")
-              .append(added.getURI())
-              .append("\" could not be added as a namespace to \"")
-              .append(base.getQualifiedName())
-              .append("\": ")
-              .append(reason)
-              .toString());
+    public IllegalAddException(Element base, Namespace added, String reason)
+    {
+        super(new StringBuffer().append("The namespace xmlns").append((added.getPrefix() == null ||
+                added.getPrefix().equals("")) ? "="
+                : ":" + added.getPrefix() + "=").append("\"").append(added.getURI()).append("\" could not be added as a namespace to \"").append(base.getQualifiedName()).append("\": ").append(reason).toString());
     }
 
     /**
@@ -310,13 +248,9 @@ public class IllegalAddException extends IllegalArgumentException {
      * @param added <code>DocType</code> that could not be added
      * @param reason cause of the problem
      */
-    public IllegalAddException(Document base, DocType added, String reason) {
-        super(new StringBuffer()
-              .append("The DOCTYPE ")
-              .append(added.toString())
-              .append(" could not be added to the document: ")
-              .append(reason)
-              .toString());
+    public IllegalAddException(Document base, DocType added, String reason)
+    {
+        super(new StringBuffer().append("The DOCTYPE ").append(added.toString()).append(" could not be added to the document: ").append(reason).toString());
     }
 
     /**
@@ -325,7 +259,8 @@ public class IllegalAddException extends IllegalArgumentException {
      *
      * @param reason cause of the problem
      */
-    public IllegalAddException(String reason) {
+    public IllegalAddException(String reason)
+    {
         super(reason);
     }
 }

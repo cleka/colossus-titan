@@ -10,26 +10,26 @@
  are met:
  
  1. Redistributions of source code must retain the above copyright
-    notice, this list of conditions, and the following disclaimer.
+ notice, this list of conditions, and the following disclaimer.
  
  2. Redistributions in binary form must reproduce the above copyright
-    notice, this list of conditions, and the disclaimer that follows 
-    these conditions in the documentation and/or other materials 
-    provided with the distribution.
+ notice, this list of conditions, and the disclaimer that follows 
+ these conditions in the documentation and/or other materials 
+ provided with the distribution.
 
  3. The name "JDOM" must not be used to endorse or promote products
-    derived from this software without prior written permission.  For
-    written permission, please contact <request_AT_jdom_DOT_org>.
+ derived from this software without prior written permission.  For
+ written permission, please contact <request_AT_jdom_DOT_org>.
  
  4. Products derived from this software may not be called "JDOM", nor
-    may "JDOM" appear in their name, without prior written permission
-    from the JDOM Project Management <request_AT_jdom_DOT_org>.
+ may "JDOM" appear in their name, without prior written permission
+ from the JDOM Project Management <request_AT_jdom_DOT_org>.
  
  In addition, we request (but do not require) that you include in the 
  end-user documentation provided with the redistribution and/or in the 
  software itself an acknowledgement equivalent to the following:
-     "This product includes software developed by the
-      JDOM Project (http://www.jdom.org/)."
+ "This product includes software developed by the
+ JDOM Project (http://www.jdom.org/)."
  Alternatively, the acknowledgment may be graphical using the logos 
  available at http://www.jdom.org/images/logos.
 
@@ -56,10 +56,10 @@
 
 package org.jdom.input;
 
-import org.xml.sax.SAXParseException;
 
-import org.jdom.Document;
-import org.jdom.JDOMException;
+import org.jdom.*;
+import org.xml.sax.*;
+
 
 /**
  * <b><code>JDOMParseException</code></b>.
@@ -67,10 +67,11 @@ import org.jdom.JDOMException;
  * @author Laurent Bihanic
  * @version $Revision$, $Date$
  */
-public class JDOMParseException extends JDOMException {
+public class JDOMParseException extends JDOMException
+{
 
-    private static final String CVS_ID = 
-      "@(#) $RCSfile$ $Revision$ $Date$ $Name$";
+    private static final String CVS_ID =
+            "@(#) $RCSfile$ $Revision$ $Date$ $Name$";
 
     /**
      * The portion of the document that was successfully built before
@@ -88,7 +89,8 @@ public class JDOMParseException extends JDOMException {
      * @param cause <code>Throwable</code> that caused this
      *              to be thrown.
      */
-    public JDOMParseException(String message, Throwable cause)  {
+    public JDOMParseException(String message, Throwable cause)
+    {
         this(message, null, cause);
     }
 
@@ -106,18 +108,20 @@ public class JDOMParseException extends JDOMException {
      *              to be thrown.
      */
     public JDOMParseException(String message, Document partialDocument,
-                                              Throwable cause)  {
+            Throwable cause)
+    {
         super(message, cause);
         this.partialDocument = partialDocument;
     }
 
     /**
-     * Returns the partial document, i.e. the portion of document
-     * that was successfully built before the error occurred.
+     * Returns the partial document that was successfully built before 
+     * the error occurred.
      *
      * @return the partial document.
      */
-    public Document getPartialDocument() {
+    public Document getPartialDocument()
+    {
         return partialDocument;
     }
 
@@ -128,9 +132,10 @@ public class JDOMParseException extends JDOMException {
      * @return a string containing the public identifier, or
      *         <code>null</code> if the information is not available.
      */
-    public String getPublicId() {
-        return (getCause() instanceof SAXParseException)?
-                        ((SAXParseException)getCause()).getPublicId(): null;
+    public String getPublicId()
+    {
+        return (getCause() instanceof SAXParseException) ?
+                ((SAXParseException)getCause()).getPublicId() : null;
     }
 
     /**
@@ -140,9 +145,10 @@ public class JDOMParseException extends JDOMException {
      * @return a string containing the system identifier, or
      *         <code>null</code> if the information is not available.
      */
-    public String getSystemId() {
-        return (getCause() instanceof SAXParseException)?
-                        ((SAXParseException)getCause()).getSystemId(): null;
+    public String getSystemId()
+    {
+        return (getCause() instanceof SAXParseException) ?
+                ((SAXParseException)getCause()).getSystemId() : null;
     }
 
     /**
@@ -154,9 +160,10 @@ public class JDOMParseException extends JDOMException {
      * @return an integer representing the line number, or -1
      *         if the information is not available.
      */
-    public int getLineNumber() {
-        return (getCause() instanceof SAXParseException)?
-                        ((SAXParseException)getCause()).getLineNumber(): -1;
+    public int getLineNumber()
+    {
+        return (getCause() instanceof SAXParseException) ?
+                ((SAXParseException)getCause()).getLineNumber() : -1;
     }
 
     /**
@@ -168,9 +175,10 @@ public class JDOMParseException extends JDOMException {
      * @return an integer representing the column number, or -1
      *         if the information is not available.
      */
-    public int getColumnNumber() {
-        return (getCause() instanceof SAXParseException)?
-                        ((SAXParseException)getCause()).getColumnNumber(): -1;
+    public int getColumnNumber()
+    {
+        return (getCause() instanceof SAXParseException) ?
+                ((SAXParseException)getCause()).getColumnNumber() : -1;
     }
 }
 

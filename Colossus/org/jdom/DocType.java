@@ -10,26 +10,26 @@
  are met:
  
  1. Redistributions of source code must retain the above copyright
-    notice, this list of conditions, and the following disclaimer.
+ notice, this list of conditions, and the following disclaimer.
  
  2. Redistributions in binary form must reproduce the above copyright
-    notice, this list of conditions, and the disclaimer that follows 
-    these conditions in the documentation and/or other materials 
-    provided with the distribution.
+ notice, this list of conditions, and the disclaimer that follows 
+ these conditions in the documentation and/or other materials 
+ provided with the distribution.
 
  3. The name "JDOM" must not be used to endorse or promote products
-    derived from this software without prior written permission.  For
-    written permission, please contact <request_AT_jdom_DOT_org>.
+ derived from this software without prior written permission.  For
+ written permission, please contact <request_AT_jdom_DOT_org>.
  
  4. Products derived from this software may not be called "JDOM", nor
-    may "JDOM" appear in their name, without prior written permission
-    from the JDOM Project Management <request_AT_jdom_DOT_org>.
+ may "JDOM" appear in their name, without prior written permission
+ from the JDOM Project Management <request_AT_jdom_DOT_org>.
  
  In addition, we request (but do not require) that you include in the 
  end-user documentation provided with the redistribution and/or in the 
  software itself an acknowledgement equivalent to the following:
-     "This product includes software developed by the
-      JDOM Project (http://www.jdom.org/)."
+ "This product includes software developed by the
+ JDOM Project (http://www.jdom.org/)."
  Alternatively, the acknowledgment may be graphical using the logos 
  available at http://www.jdom.org/images/logos.
 
@@ -56,7 +56,9 @@
 
 package org.jdom;
 
-import java.io.Serializable;
+
+import java.io.*;
+
 
 /**
  * <code>DocType</code> represents an XML DOCTYPE declaration.
@@ -65,10 +67,11 @@ import java.io.Serializable;
  * @author Jason Hunter
  * @version $Revision$, $Date$
  */
-public class DocType implements Serializable, Cloneable {
+public class DocType implements Serializable, Cloneable
+{
 
-    private static final String CVS_ID = 
-      "@(#) $RCSfile$ $Revision$ $Date$ $Name$";
+    private static final String CVS_ID =
+            "@(#) $RCSfile$ $Revision$ $Date$ $Name$";
 
     /** The element being constrained */
     protected String elementName;
@@ -88,7 +91,9 @@ public class DocType implements Serializable, Cloneable {
     /**
      * Default, no-args constructor for implementations to use if needed.
      */
-    protected DocType() {}
+    protected DocType()
+    {
+    }
 
     /*
      * XXX:
@@ -111,7 +116,8 @@ public class DocType implements Serializable, Cloneable {
      * @throws IllegalNameException if the given root element name is not a
      *         legal XML element name.
      */
-    public DocType(String elementName, String publicID, String systemID) {
+    public DocType(String elementName, String publicID, String systemID)
+    {
         setElementName(elementName);
         setPublicID(publicID);
         setSystemID(systemID);
@@ -131,7 +137,8 @@ public class DocType implements Serializable, Cloneable {
      * @throws IllegalNameException if the given root element name is not a
      *         legal XML element name.
      */
-    public DocType(String elementName, String systemID) {
+    public DocType(String elementName, String systemID)
+    {
         this(elementName, null, systemID);
     }
 
@@ -144,7 +151,8 @@ public class DocType implements Serializable, Cloneable {
      * @throws IllegalNameException if the given root element name is not a
      *         legal XML element name.
      */
-    public DocType(String elementName) {
+    public DocType(String elementName)
+    {
         this(elementName, null, null);
     }
 
@@ -153,7 +161,8 @@ public class DocType implements Serializable, Cloneable {
      *
      * @return <code>String</code> - element name for DOCTYPE
      */
-    public String getElementName() {
+    public String getElementName()
+    {
         return elementName;
     }
 
@@ -167,11 +176,13 @@ public class DocType implements Serializable, Cloneable {
      * @throws IllegalNameException if the given root element name is not a
      *         legal XML element name.
      */
-    public DocType setElementName(String elementName) {
+    public DocType setElementName(String elementName)
+    {
         // This can contain a colon so we use checkXMLName()
         // instead of checkElementName()
         String reason = Verifier.checkXMLName(elementName);
-        if (reason != null) {
+        if (reason != null)
+        {
             throw new IllegalNameException(elementName, "DocType", reason);
         }
         this.elementName = elementName;
@@ -185,7 +196,8 @@ public class DocType implements Serializable, Cloneable {
      *
      * @return <code>String</code> - public ID of referenced DTD.
      */
-    public String getPublicID() {
+    public String getPublicID()
+    {
         return publicID;
     }
 
@@ -197,9 +209,11 @@ public class DocType implements Serializable, Cloneable {
      * @throws IllegalDataException if the given public ID is not a legal
      *         public ID.
      */
-    public DocType setPublicID(String publicID) {
+    public DocType setPublicID(String publicID)
+    {
         String reason = Verifier.checkPublicID(publicID);
-        if (reason != null) {
+        if (reason != null)
+        {
             throw new IllegalDataException(publicID, "DocType", reason);
         }
         this.publicID = publicID;
@@ -214,7 +228,8 @@ public class DocType implements Serializable, Cloneable {
      *
      * @return <code>String</code> - system ID of referenced DTD.
      */
-    public String getSystemID() {
+    public String getSystemID()
+    {
         return systemID;
     }
 
@@ -227,9 +242,11 @@ public class DocType implements Serializable, Cloneable {
      * @throws IllegalDataException if the given system ID is not a legal
      *         system literal.
      */
-    public DocType setSystemID(String systemID) {
+    public DocType setSystemID(String systemID)
+    {
         String reason = Verifier.checkSystemLiteral(systemID);
-        if (reason != null) {
+        if (reason != null)
+        {
             throw new IllegalDataException(systemID, "DocType", reason);
         }
         this.systemID = systemID;
@@ -244,17 +261,19 @@ public class DocType implements Serializable, Cloneable {
      *
      * @return <code>Document</code> owning this DocType, or null.
      */
-    public Document getDocument() {
+    public Document getDocument()
+    {
         return this.document;
     }
 
     /**
      * This sets the <code>{@link Document}</code> holding this doctype.
      *
-     * @param DocType <code>Document</code> holding this doctype
+     * @param Document <code>Document</code> holding this doctype
      * @return <code>Document</code> this <code>DocType</code> modified
      */
-    protected DocType setDocument(Document document) {
+    protected DocType setDocument(Document document)
+    {
         this.document = document;
         return this;
     }
@@ -265,7 +284,8 @@ public class DocType implements Serializable, Cloneable {
      * @param newData data for the internal subset, as a 
      *        <code>String</code>.
      */
-    public void setInternalSubset(String newData) {
+    public void setInternalSubset(String newData)
+    {
         internalSubset = newData;
     }
 
@@ -274,7 +294,8 @@ public class DocType implements Serializable, Cloneable {
      * 
      * @return <code>String</code> - the internal subset
      */
-    public String getInternalSubset() {
+    public String getInternalSubset()
+    {
         return internalSubset;
     }
 
@@ -285,12 +306,9 @@ public class DocType implements Serializable, Cloneable {
      * @return <code>String</code> - information about the
      *         <code>DocType</code>
      */
-    public String toString() {
-        return new StringBuffer()
-            .append("[DocType: ")
-            .append(new org.jdom.output.XMLOutputter().outputString(this))
-            .append("]")
-            .toString();
+    public String toString()
+    {
+        return new StringBuffer().append("[DocType: ").append(new org.jdom.output.XMLOutputter().outputString(this)).append("]").toString();
     }
 
     /**
@@ -303,19 +321,24 @@ public class DocType implements Serializable, Cloneable {
      * @param ob <code>Object</code> to compare to.
      * @return whether the elements are equal
      */
-    public final boolean equals(Object ob) {
+    public final boolean equals(Object ob)
+    {
         return (this == ob);
     }
 
     // Utility function to help with equals()
-    private boolean stringEquals(String s1, String s2) {
-        if (s1 == null && s2 == null) {
+    private boolean stringEquals(String s1, String s2)
+    {
+        if (s1 == null && s2 == null)
+        {
             return true;
         }
-        else if (s1 == null && s2 != null) {
+        else if (s1 == null && s2 != null)
+        {
             return false;
         }
-        else {
+        else
+        {
             // If we get here we know s1 can't be null 
             return s1.equals(s2);
         }
@@ -326,7 +349,8 @@ public class DocType implements Serializable, Cloneable {
      *
      * @return <code>int</code> - hash code.
      */
-    public final int hashCode() {
+    public final int hashCode()
+    {
         return super.hashCode();
     }
 
@@ -335,12 +359,16 @@ public class DocType implements Serializable, Cloneable {
      *
      * @return <code>Object</code> - clone of this <code>DocType</code>.
      */
-    public Object clone() {
+    public Object clone()
+    {
         DocType docType = null;
 
-        try {
-            docType = (DocType) super.clone();
-        } catch (CloneNotSupportedException ce) {
+        try
+        {
+            docType = (DocType)super.clone();
+        }
+        catch (CloneNotSupportedException ce)
+        {
             // Can't happen
         }
 

@@ -10,26 +10,26 @@
  are met:
  
  1. Redistributions of source code must retain the above copyright
-    notice, this list of conditions, and the following disclaimer.
+ notice, this list of conditions, and the following disclaimer.
  
  2. Redistributions in binary form must reproduce the above copyright
-    notice, this list of conditions, and the disclaimer that follows 
-    these conditions in the documentation and/or other materials 
-    provided with the distribution.
+ notice, this list of conditions, and the disclaimer that follows 
+ these conditions in the documentation and/or other materials 
+ provided with the distribution.
 
  3. The name "JDOM" must not be used to endorse or promote products
-    derived from this software without prior written permission.  For
-    written permission, please contact <request_AT_jdom_DOT_org>.
+ derived from this software without prior written permission.  For
+ written permission, please contact <request_AT_jdom_DOT_org>.
  
  4. Products derived from this software may not be called "JDOM", nor
-    may "JDOM" appear in their name, without prior written permission
-    from the JDOM Project Management <request_AT_jdom_DOT_org>.
+ may "JDOM" appear in their name, without prior written permission
+ from the JDOM Project Management <request_AT_jdom_DOT_org>.
  
  In addition, we request (but do not require) that you include in the 
  end-user documentation provided with the redistribution and/or in the 
  software itself an acknowledgement equivalent to the following:
-     "This product includes software developed by the
-      JDOM Project (http://www.jdom.org/)."
+ "This product includes software developed by the
+ JDOM Project (http://www.jdom.org/)."
  Alternatively, the acknowledgment may be graphical using the logos 
  available at http://www.jdom.org/images/logos.
 
@@ -56,8 +56,10 @@
 
 package org.jdom;
 
-import java.io.Serializable;
+
+import java.io.*;
 import java.util.*;
+
 
 /**
  * <code>ProcessingInstruction</code> defines behavior for an
@@ -73,10 +75,11 @@ import java.util.*;
  * @version $Revision$, $Date$
  */
 
-public class ProcessingInstruction implements Serializable, Cloneable {
+public class ProcessingInstruction implements Serializable, Cloneable
+{
 
-    private static final String CVS_ID = 
-      "@(#) $RCSfile$ $Revision$ $Date$ $Name$";
+    private static final String CVS_ID =
+            "@(#) $RCSfile$ $Revision$ $Date$ $Name$";
 
     /** The target of the PI */
     protected String target;
@@ -94,7 +97,9 @@ public class ProcessingInstruction implements Serializable, Cloneable {
      * Default, no-args constructor for implementations
      * to use if needed.
      */
-    protected ProcessingInstruction() { }
+    protected ProcessingInstruction()
+    {
+    }
 
     /**
      * This will create a new <code>ProcessingInstruction</code>
@@ -106,7 +111,8 @@ public class ProcessingInstruction implements Serializable, Cloneable {
      * @throws IllegalTargetException if the given target is illegal
      *         as a processing instruction name.
      */
-    public ProcessingInstruction(String target, Map data) {
+    public ProcessingInstruction(String target, Map data)
+    {
         setTarget(target);
         setData(data);
     }
@@ -116,11 +122,12 @@ public class ProcessingInstruction implements Serializable, Cloneable {
      * with the specified target and data.
      *
      * @param target <code>String</code> target of PI.
-     * @param rawData <code>String</code> data for PI.
+     * @param data <code>String</code> data for PI.
      * @throws IllegalTargetException if the given target is illegal
      *         as a processing instruction name.
      */
-    public ProcessingInstruction(String target, String data) {
+    public ProcessingInstruction(String target, String data)
+    {
         setTarget(target);
         setData(data);
     }
@@ -128,13 +135,15 @@ public class ProcessingInstruction implements Serializable, Cloneable {
     /**
      * This will set the target for the PI.
      *
-     * @param target <code>String</code> new target of PI.
+     * @param newTarget <code>String</code> new target of PI.
      * @return <code>ProcessingInstruction</code> - this PI modified.
      */
-    public ProcessingInstruction setTarget(String newTarget) {
+    public ProcessingInstruction setTarget(String newTarget)
+    {
         String reason;
         if ((reason = Verifier.checkProcessingInstructionTarget(newTarget))
-                                    != null) {
+                != null)
+        {
             throw new IllegalTargetException(newTarget, reason);
         }
 
@@ -148,9 +157,11 @@ public class ProcessingInstruction implements Serializable, Cloneable {
      *
      * @return parent of this <code>ProcessingInstruction</code>
      */
-    public Element getParent() {
-        if (parent instanceof Element) {
-            return (Element) parent;
+    public Element getParent()
+    {
+        if (parent instanceof Element)
+        {
+            return (Element)parent;
         }
         return null;
     }
@@ -163,7 +174,8 @@ public class ProcessingInstruction implements Serializable, Cloneable {
      * @param parent <code>Element</code> to be new parent.
      * @return this <code>ProcessingInstruction</code> modified.
      */
-    protected ProcessingInstruction setParent(Element parent) {
+    protected ProcessingInstruction setParent(Element parent)
+    {
         this.parent = parent;
         return this;
     }
@@ -175,12 +187,15 @@ public class ProcessingInstruction implements Serializable, Cloneable {
      * @return <code>ProcessingInstruction</code> - this 
      * <code>ProcessingInstruction</code> modified.
      */
-    public ProcessingInstruction detach() {
-        if (parent instanceof Element) {
-            ((Element) parent).removeContent(this);
+    public ProcessingInstruction detach()
+    {
+        if (parent instanceof Element)
+        {
+            ((Element)parent).removeContent(this);
         }
-        else if (parent instanceof Document) {
-            ((Document) parent).removeContent(this);
+        else if (parent instanceof Document)
+        {
+            ((Document)parent).removeContent(this);
         }
         return this;
     }
@@ -192,12 +207,15 @@ public class ProcessingInstruction implements Serializable, Cloneable {
      *
      * @return <code>Document</code> owning this PI, or null.
      */
-    public Document getDocument() {
-        if (parent instanceof Document) {
-            return (Document) parent;
+    public Document getDocument()
+    {
+        if (parent instanceof Document)
+        {
+            return (Document)parent;
         }
-        if (parent instanceof Element) {
-            return (Document) ((Element)parent).getDocument();
+        if (parent instanceof Element)
+        {
+            return ((Element)parent).getDocument();
         }
         return null;
     }
@@ -208,7 +226,8 @@ public class ProcessingInstruction implements Serializable, Cloneable {
      * @param document <code>Document</code> parent
      * @return this <code>PI</code> modified
      */
-    protected ProcessingInstruction setDocument(Document document) {
+    protected ProcessingInstruction setDocument(Document document)
+    {
         this.parent = document;
         return this;
     }
@@ -218,7 +237,8 @@ public class ProcessingInstruction implements Serializable, Cloneable {
      *
      * @return <code>String</code> - target of PI.
      */
-    public String getTarget() {
+    public String getTarget()
+    {
         return target;
     }
 
@@ -227,7 +247,8 @@ public class ProcessingInstruction implements Serializable, Cloneable {
      *
      * @return <code>String</code> - data of PI.
      */
-    public String getData() {
+    public String getData()
+    {
         return rawData;
     }
 
@@ -238,26 +259,33 @@ public class ProcessingInstruction implements Serializable, Cloneable {
      * @return <code>List</code> - the <code>List</code> containing the
      *         "attribute" names.
      */
-    public List getNames() {
-      Set mapDataSet = mapData.entrySet();
-      List nameList = new ArrayList();
-      for (Iterator i = mapDataSet.iterator(); i.hasNext();) {
-         String wholeSet = (i.next()).toString();
-         String attrName = wholeSet.substring(0,(wholeSet.indexOf("=")));
-         nameList.add(attrName);
-      }
-      return nameList;
+    public List getNames()
+    {
+        Set mapDataSet = mapData.entrySet();
+        List nameList = new ArrayList();
+        for (Iterator i = mapDataSet.iterator(); i.hasNext();)
+        {
+            String wholeSet = (i.next()).toString();
+            String attrName = wholeSet.substring(0, (wholeSet.indexOf("=")));
+            nameList.add(attrName);
+        }
+        return nameList;
     }
 
     /**
      * This will set the raw data for the PI.
      *
-     * @param rawData <code>String</code> data of PI.
+     * @param data <code>String</code> data of PI.
      * @return <code>ProcessingInstruction</code> - this PI modified.
      */
-    public ProcessingInstruction setData(String data) {
-        // XXX Need to validate the data
-        // XXX Make sure the PI doesn't contain ?> internally, a la CDATA
+    public ProcessingInstruction setData(String data)
+    {
+        String reason = Verifier.checkProcessingInstructionData(data);
+        if (reason != null)
+        {
+            throw new IllegalDataException(data, reason);
+        }
+
         this.rawData = data;
         this.mapData = parseData(data);
         return this;
@@ -271,9 +299,17 @@ public class ProcessingInstruction implements Serializable, Cloneable {
      *
      * @return <code>ProcessingInstruction</code> - modified PI.
      */
-    public ProcessingInstruction setData(Map data) {
-        // XXX Need to validate the data
-        this.rawData = toString(data);
+    public ProcessingInstruction setData(Map data)
+    {
+        String temp = toString(data);
+
+        String reason = Verifier.checkProcessingInstructionData(temp);
+        if (reason != null)
+        {
+            throw new IllegalDataException(temp, reason);
+        }
+
+        this.rawData = temp;
         this.mapData = data;
         return this;
     }
@@ -287,7 +323,8 @@ public class ProcessingInstruction implements Serializable, Cloneable {
      *             to lookup value for.
      * @return <code>String</code> - value of name/value pair.
      */
-    public String getValue(String name) {
+    public String getValue(String name)
+    {
         return (String)mapData.get(name);
     }
 
@@ -301,10 +338,22 @@ public class ProcessingInstruction implements Serializable, Cloneable {
      * @return <code>ProcessingInstruction</code> this PI modified.
      */
     public ProcessingInstruction setValue(String name,
-                                          String value) {
-        // XXX Need to validate the data
-        mapData.put(name, value);
-        rawData = toString(mapData);
+            String value)
+    {
+        String reason = Verifier.checkProcessingInstructionData(name);
+        if (reason != null)
+        {
+            throw new IllegalDataException(name, reason);
+        }
+
+        reason = Verifier.checkProcessingInstructionData(value);
+        if (reason != null)
+        {
+            throw new IllegalDataException(value, reason);
+        }
+
+        this.mapData.put(name, value);
+        this.rawData = toString(mapData);
         return this;
     }
 
@@ -314,8 +363,10 @@ public class ProcessingInstruction implements Serializable, Cloneable {
      * @return <code>boolean</code> - whether the requested
      *         instruction was removed.
      */
-    public boolean removeValue(String name) {
-        if ((mapData.remove(name)) != null) {
+    public boolean removeValue(String name)
+    {
+        if ((mapData.remove(name)) != null)
+        {
             rawData = toString(mapData);
             return true;
         }
@@ -328,20 +379,20 @@ public class ProcessingInstruction implements Serializable, Cloneable {
      *
      * @param mapData <code>Map</code> PI data to convert
      */
-    private String toString(Map mapData) {
+    private String toString(Map mapData)
+    {
         StringBuffer rawData = new StringBuffer();
 
         Iterator i = mapData.keySet().iterator();
-        while (i.hasNext()) {
+        while (i.hasNext())
+        {
             String name = (String)i.next();
             String value = (String)mapData.get(name);
-            rawData.append(name)
-                   .append("=\"")
-                   .append(value)
-                   .append("\" ");
+            rawData.append(name).append("=\"").append(value).append("\" ");
         }
         // Remove last space, if we did any appending
-        if (rawData.length() > 0) {
+        if (rawData.length() > 0)
+        {
             rawData.setLength(rawData.length() - 1);
         }
 
@@ -354,7 +405,8 @@ public class ProcessingInstruction implements Serializable, Cloneable {
      *
      * @param rawData <code>String</code> PI data to parse
      */
-    private Map parseData(String rawData) {
+    private Map parseData(String rawData)
+    {
         // The parsing here is done largely "by hand" which means the code
         // gets a little tricky/messy.  The following conditions should 
         // now be handled correctly:
@@ -374,7 +426,8 @@ public class ProcessingInstruction implements Serializable, Cloneable {
         String inputData = rawData.trim();
 
         // Iterate through the remaining inputData string
-        while (!inputData.trim().equals("")) {
+        while (!inputData.trim().equals(""))
+        {
             //System.out.println("parseData() looking at: " + inputData);
 
             // Search for "name =", "name=" or "name1 name2..."
@@ -383,25 +436,29 @@ public class ProcessingInstruction implements Serializable, Cloneable {
             int startName = 0;
             char previousChar = inputData.charAt(startName);
             int pos = 1;
-            for (; pos<inputData.length(); pos++) {
+            for (; pos < inputData.length(); pos++)
+            {
                 char currentChar = inputData.charAt(pos);
-                if (currentChar == '=') {
+                if (currentChar == '=')
+                {
                     name = inputData.substring(startName, pos).trim();
                     // Get the boundaries on the quoted string
                     // We use boundaries so we know where to start next
                     int[] bounds = extractQuotedString(
-                                     inputData.substring(pos+1));
+                            inputData.substring(pos + 1));
                     // A null value means a parse error and we return empty!
-                    if (bounds == null) {
+                    if (bounds == null)
+                    {
                         return new HashMap();
                     }
-                    value = inputData.substring(bounds[0]+pos+1,
-                                                bounds[1]+pos+1);
+                    value = inputData.substring(bounds[0] + pos + 1,
+                            bounds[1] + pos + 1);
                     pos += bounds[1] + 1;  // skip past value
                     break;
                 }
                 else if (Character.isWhitespace(previousChar)
-                          && !Character.isWhitespace(currentChar)) {
+                        && !Character.isWhitespace(currentChar))
+                {
                     startName = pos;
                 }
 
@@ -416,13 +473,14 @@ public class ProcessingInstruction implements Serializable, Cloneable {
 
             // If both a name and a value have been found, then add
             // them to the data Map
-            if (name.length() > 0 && value != null) {
+            if (name.length() > 0 && value != null)
+            {
                 //if (data.containsKey(name)) {
-                    // A repeat, that's a parse error, so return a null map
-                    //return new HashMap();
+                // A repeat, that's a parse error, so return a null map
+                //return new HashMap();
                 //}
                 //else {
-                    data.put(name, value);
+                data.put(name, value);
                 //}
             }
         }
@@ -443,9 +501,10 @@ public class ProcessingInstruction implements Serializable, Cloneable {
      * @return the first quoted string encountered in the input data. If
      *         no quoted string is found, then the empty string, "", is
      *         returned.
-     * @see parseData
+     * @see #parseData
      */
-    private int[] extractQuotedString(String rawData) {
+    private int[] extractQuotedString(String rawData)
+    {
         // Remembers whether we're actually in a quoted string yet
         boolean inQuotes = false;
 
@@ -458,16 +517,20 @@ public class ProcessingInstruction implements Serializable, Cloneable {
 
         // Iterate through the input string looking for the start
         // and end of the quoted string
-        for (int pos=0; pos < rawData.length(); pos++) {
+        for (int pos = 0; pos < rawData.length(); pos++)
+        {
             char currentChar = rawData.charAt(pos);
-            if (currentChar=='"' || currentChar=='\'') {
-                if (!inQuotes) {
+            if (currentChar == '"' || currentChar == '\'')
+            {
+                if (!inQuotes)
+                {
                     // We're entering a quoted string
                     quoteChar = currentChar;
                     inQuotes = true;
-                    start = pos+1;
+                    start = pos + 1;
                 }
-                else if (quoteChar == currentChar) {
+                else if (quoteChar == currentChar)
+                {
                     // We're leaving a quoted string
                     inQuotes = false;
                     return new int[] { start, pos };
@@ -479,7 +542,7 @@ public class ProcessingInstruction implements Serializable, Cloneable {
 
         return null;
     }
-    
+
     /**
      * This returns a <code>String</code> representation of the
      * <code>ProcessingInstruction</code>, suitable for debugging. If the XML
@@ -490,12 +553,9 @@ public class ProcessingInstruction implements Serializable, Cloneable {
      * @return <code>String</code> - information about the
      *         <code>ProcessingInstruction</code>
      */
-    public String toString() {
-        return new StringBuffer()
-            .append("[ProcessingInstruction: ")
-            .append(new org.jdom.output.XMLOutputter().outputString(this))
-            .append("]")
-            .toString();
+    public String toString()
+    {
+        return new StringBuffer().append("[ProcessingInstruction: ").append(new org.jdom.output.XMLOutputter().outputString(this)).append("]").toString();
     }
 
     /**
@@ -507,7 +567,8 @@ public class ProcessingInstruction implements Serializable, Cloneable {
      *         <code>ProcessingInstruction</code> is equal to the supplied
      *         <code>Object</code>.
      */
-    public final boolean equals(Object ob) {
+    public final boolean equals(Object ob)
+    {
         return (ob == this);
     }
 
@@ -516,7 +577,8 @@ public class ProcessingInstruction implements Serializable, Cloneable {
      *
      * @return <code>int</code> - hash code.
      */
-    public final int hashCode() {
+    public final int hashCode()
+    {
         return super.hashCode();
     }
 
@@ -526,13 +588,17 @@ public class ProcessingInstruction implements Serializable, Cloneable {
      * @return <code>Object</code> - clone of this 
      * <code>ProcessingInstruction</code>.
      */
-    public Object clone() {
+    public Object clone()
+    {
         ProcessingInstruction pi = null;
 
-        try {
-             pi = (ProcessingInstruction) super.clone();
-        } catch (CloneNotSupportedException ce) {
-             // Can't happen
+        try
+        {
+            pi = (ProcessingInstruction)super.clone();
+        }
+        catch (CloneNotSupportedException ce)
+        {
+            // Can't happen
         }
 
         // target and rawdata are immutable and references copied by
@@ -543,7 +609,8 @@ public class ProcessingInstruction implements Serializable, Cloneable {
         pi.parent = null;
 
         // Create a new Map object for the clone (since Map isn't Cloneable)
-        if (mapData != null) {
+        if (mapData != null)
+        {
             pi.mapData = parseData(rawData);
         }
 

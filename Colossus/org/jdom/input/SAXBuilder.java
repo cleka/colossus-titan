@@ -10,26 +10,26 @@
  are met:
  
  1. Redistributions of source code must retain the above copyright
-    notice, this list of conditions, and the following disclaimer.
+ notice, this list of conditions, and the following disclaimer.
  
  2. Redistributions in binary form must reproduce the above copyright
-    notice, this list of conditions, and the disclaimer that follows 
-    these conditions in the documentation and/or other materials 
-    provided with the distribution.
+ notice, this list of conditions, and the disclaimer that follows 
+ these conditions in the documentation and/or other materials 
+ provided with the distribution.
 
  3. The name "JDOM" must not be used to endorse or promote products
-    derived from this software without prior written permission.  For
-    written permission, please contact <request_AT_jdom_DOT_org>.
+ derived from this software without prior written permission.  For
+ written permission, please contact <request_AT_jdom_DOT_org>.
  
  4. Products derived from this software may not be called "JDOM", nor
-    may "JDOM" appear in their name, without prior written permission
-    from the JDOM Project Management <request_AT_jdom_DOT_org>.
+ may "JDOM" appear in their name, without prior written permission
+ from the JDOM Project Management <request_AT_jdom_DOT_org>.
  
  In addition, we request (but do not require) that you include in the 
  end-user documentation provided with the redistribution and/or in the 
  software itself an acknowledgement equivalent to the following:
-     "This product includes software developed by the
-      JDOM Project (http://www.jdom.org/)."
+ "This product includes software developed by the
+ JDOM Project (http://www.jdom.org/)."
  Alternatively, the acknowledgment may be graphical using the logos 
  available at http://www.jdom.org/images/logos.
 
@@ -56,6 +56,7 @@
 
 package org.jdom.input;
 
+
 import java.io.*;
 import java.lang.reflect.*;
 import java.net.*;
@@ -67,6 +68,7 @@ import org.xml.sax.*;
 import org.xml.sax.ext.LexicalHandler;
 import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.helpers.XMLReaderFactory;
+
 
 /**
  * <code>SAXBuilder</code> builds a JDOM tree using SAX.
@@ -85,17 +87,18 @@ import org.xml.sax.helpers.XMLReaderFactory;
  * @author Alex Rosen
  * @version $Revision$, $Date$
  */
-public class SAXBuilder {
+public class SAXBuilder
+{
 
-    private static final String CVS_ID = 
-      "@(#) $RCSfile$ $Revision$ $Date$ $Name$";
+    private static final String CVS_ID =
+            "@(#) $RCSfile$ $Revision$ $Date$ $Name$";
 
     /** 
      * Default parser class to use. This is used when no other parser
      * is given and JAXP isn't available.
      */
     private static final String DEFAULT_SAX_DRIVER =
-        "org.apache.xerces.parsers.SAXParser";
+            "org.apache.xerces.parsers.SAXParser";
 
     /** Whether validation should occur */
     private boolean validate;
@@ -108,7 +111,7 @@ public class SAXBuilder {
 
     /** ErrorHandler class to use */
     private ErrorHandler saxErrorHandler = null;
- 
+
     /** EntityResolver class to use */
     private EntityResolver saxEntityResolver = null;
 
@@ -117,7 +120,7 @@ public class SAXBuilder {
 
     /** XMLFilter instance to use */
     private XMLFilter saxXMLFilter = null;
- 
+
     /** The factory for creating new JDOM objects */
     protected JDOMFactory factory = null;
 
@@ -144,7 +147,8 @@ public class SAXBuilder {
      * a parser via JAXP, then will try to use a set of default 
      * SAX Drivers. The underlying parser will not validate.
      */
-    public SAXBuilder() {
+    public SAXBuilder()
+    {
         this(false);
     }
 
@@ -157,7 +161,8 @@ public class SAXBuilder {
      * @param validate <code>boolean</code> indicating if
      *                 validation should occur.
      */
-    public SAXBuilder(boolean validate) {
+    public SAXBuilder(boolean validate)
+    {
         this.validate = validate;
     }
 
@@ -168,7 +173,8 @@ public class SAXBuilder {
      * @param saxDriverClass <code>String</code> name of SAX Driver
      *                       to use for parsing.
      */
-    public SAXBuilder(String saxDriverClass) {
+    public SAXBuilder(String saxDriverClass)
+    {
         this(saxDriverClass, false);
     }
 
@@ -182,7 +188,8 @@ public class SAXBuilder {
      * @param validate <code>boolean</code> indicating if
      *                 validation should occur.
      */
-    public SAXBuilder(String saxDriverClass, boolean validate) {
+    public SAXBuilder(String saxDriverClass, boolean validate)
+    {
         this.saxDriverClass = saxDriverClass;
         this.validate = validate;
     }
@@ -193,7 +200,8 @@ public class SAXBuilder {
      *
      * @param factory <code>JDOMFactory</code> to use
      */
-    public void setFactory(JDOMFactory factory) {
+    public void setFactory(JDOMFactory factory)
+    {
         this.factory = factory;
     }
 
@@ -203,7 +211,8 @@ public class SAXBuilder {
      * @param validate <code>boolean</code> indicating whether validation 
      * should occur.
      */
-    public void setValidation(boolean validate) {
+    public void setValidation(boolean validate)
+    {
         this.validate = validate;
     }
 
@@ -212,7 +221,8 @@ public class SAXBuilder {
      *
      * @param errorHandler <code>ErrorHandler</code>
      */
-    public void setErrorHandler(ErrorHandler errorHandler) {
+    public void setErrorHandler(ErrorHandler errorHandler)
+    {
         saxErrorHandler = errorHandler;
     }
 
@@ -221,7 +231,8 @@ public class SAXBuilder {
      *
      * @param entityResolver <code>EntityResolver</code>
      */
-    public void setEntityResolver(EntityResolver entityResolver) {
+    public void setEntityResolver(EntityResolver entityResolver)
+    {
         saxEntityResolver = entityResolver;
     }
 
@@ -230,7 +241,8 @@ public class SAXBuilder {
      *
      * @param dtdHandler <code>DTDHandler</code>
      */
-    public void setDTDHandler(DTDHandler dtdHandler) {
+    public void setDTDHandler(DTDHandler dtdHandler)
+    {
         saxDTDHandler = dtdHandler;
     }
 
@@ -239,10 +251,11 @@ public class SAXBuilder {
      *
      * @param xmlFilter <code>XMLFilter</code>
      */
-    public void setXMLFilter(XMLFilter xmlFilter) {
+    public void setXMLFilter(XMLFilter xmlFilter)
+    {
         saxXMLFilter = xmlFilter;
     }
- 
+
     /**
      * Specifies whether or not the parser should elminate whitespace in 
      * element content (sometimes known as "ignorable whitespace") when
@@ -254,7 +267,8 @@ public class SAXBuilder {
      *
      * @param ignoringWhite Whether to ignore ignorable whitespace
      */
-    public void setIgnoringElementContentWhitespace(boolean ignoringWhite) {
+    public void setIgnoringElementContentWhitespace(boolean ignoringWhite)
+    {
         this.ignoringWhite = ignoringWhite;
     }
 
@@ -271,9 +285,10 @@ public class SAXBuilder {
      *
      * @param reuseParser Whether to reuse the SAX parser.
      */
-    public void setReuseParser(boolean reuseParser) {
+    public void setReuseParser(boolean reuseParser)
+    {
         this.reuseParser = reuseParser;
-        this.saxParser   = null;
+        this.saxParser = null;
     }
 
     /**
@@ -291,7 +306,8 @@ public class SAXBuilder {
      * @param name The feature name, which is a fully-qualified URI.
      * @param value The requested state of the feature (true or false).
      */
-    public void setFeature(String name, boolean value) {
+    public void setFeature(String name, boolean value)
+    {
         // Save the specified feature for later.
         features.put(name, new Boolean(value));
     }
@@ -311,7 +327,8 @@ public class SAXBuilder {
      * @param name The property name, which is a fully-qualified URI.
      * @param value The requested value for the property.
      */
-    public void setProperty(String name, Object value) {
+    public void setProperty(String name, Object value)
+    {
         // Save the specified property for later.
         properties.put(name, value);
     }
@@ -326,25 +343,30 @@ public class SAXBuilder {
      * @throws IOException when an I/O error prevents a document
      *         from being fully parsed.
      */
-    public Document build(InputSource in) 
-     throws JDOMException, IOException {
+    public Document build(InputSource in)
+        throws JDOMException, IOException
+    {
         SAXHandler contentHandler = null;
 
-        try {
+        try
+        {
             // Create and configure the content handler.
             contentHandler = createContentHandler();
             configureContentHandler(contentHandler);
 
             XMLReader parser = this.saxParser;
-            if (parser == null) {
+            if (parser == null)
+            {
                 // Create and configure the parser.
                 parser = createParser();
 
                 // Install optional filter
-                if (saxXMLFilter != null) {
+                if (saxXMLFilter != null)
+                {
                     // Connect filter chain to parser
                     XMLFilter root = saxXMLFilter;
-                    while (root.getParent() instanceof XMLFilter) {
+                    while (root.getParent() instanceof XMLFilter)
+                    {
                         root = (XMLFilter)root.getParent();
                     }
                     root.setParent(parser);
@@ -356,11 +378,13 @@ public class SAXBuilder {
                 // Configure parser
                 configureParser(parser, contentHandler);
 
-                if (reuseParser == true) {
+                if (reuseParser == true)
+                {
                     this.saxParser = parser;
                 }
             }
-            else {
+            else
+            {
                 // Reset content handler as SAXHandler instances can not
                 // be reused
                 parser.setContentHandler(contentHandler);
@@ -371,23 +395,29 @@ public class SAXBuilder {
 
             return contentHandler.getDocument();
         }
-        catch (SAXParseException e) {
+        catch (SAXParseException e)
+        {
             String systemId = e.getSystemId();
-            if (systemId != null) {
-                throw new JDOMParseException("Error on line " + 
-                    e.getLineNumber() + " of document " + systemId,
-                    contentHandler.getDocument(), e);
-            } else {
+            if (systemId != null)
+            {
                 throw new JDOMParseException("Error on line " +
-                    e.getLineNumber(),
-                    contentHandler.getDocument(), e);
+                        e.getLineNumber() + " of document " + systemId,
+                        contentHandler.getDocument(), e);
+            }
+            else
+            {
+                throw new JDOMParseException("Error on line " +
+                        e.getLineNumber(),
+                        contentHandler.getDocument(), e);
             }
         }
-        catch (SAXException e) {
-            throw new JDOMParseException("Error in building: " + 
-                e.getMessage(), contentHandler.getDocument(), e);
+        catch (SAXException e)
+        {
+            throw new JDOMParseException("Error in building: " +
+                    e.getMessage(), contentHandler.getDocument(), e);
         }
-        finally {
+        finally
+        {
             // Explicitly nullify the handler to encourage GC
             // It's a stack var so this shouldn't be necessary, but it
             // seems to help on some JVMs
@@ -400,7 +430,8 @@ public class SAXBuilder {
      *
      * @return <code>SAXHandler</code> - resultant SAXHandler object.
      */
-    protected SAXHandler createContentHandler() {
+    protected SAXHandler createContentHandler()
+    {
         SAXHandler contentHandler = new SAXHandler(factory);
         return contentHandler;
     }
@@ -413,7 +444,8 @@ public class SAXBuilder {
      * setIgnoringElementContentWhitespace().
      * </p>
      */
-    protected void configureContentHandler(SAXHandler contentHandler) {
+    protected void configureContentHandler(SAXHandler contentHandler)
+    {
         // Setup pass through behavior
         contentHandler.setExpandEntities(expand);
         contentHandler.setIgnoringElementContentWhitespace(ignoringWhite);
@@ -431,73 +463,83 @@ public class SAXBuilder {
      *
      * @return <code>XMLReader</code> - resultant XMLReader object.
      */
-    protected XMLReader createParser() throws JDOMException {
+    protected XMLReader createParser()
+        throws JDOMException
+    {
         XMLReader parser = null;
-        if (saxDriverClass != null) {
+        if (saxDriverClass != null)
+        {
             // The user knows that they want to use a particular class
-            try {
-              parser = XMLReaderFactory.createXMLReader(saxDriverClass);
-              // System.out.println("using specific " + saxDriverClass);
+            try
+            {
+                parser = XMLReaderFactory.createXMLReader(saxDriverClass);
+
+                // Configure parser
+                setFeaturesAndProperties(parser, true);
             }
-            catch (SAXException e) {
-              throw new JDOMException("Could not load " + saxDriverClass, e); 
+            catch (SAXException e)
+            {
+                throw new JDOMException("Could not load " + saxDriverClass, e);
             }
-        } else {
+        }
+        else
+        {
             // Try using JAXP...
             // Note we need JAXP 1.1, and if JAXP 1.0 is all that's
             // available then the getXMLReader call fails and we skip
             // to the hard coded default parser
-            try {
-                Class factoryClass = 
-                    Class.forName("javax.xml.parsers.SAXParserFactory");
+            try
+            {
+                // Get factory class and method.
+                Class factoryClass =
+                        Class.forName("org.jdom.input.JAXPParserFactory");
 
-                // factory = SAXParserFactory.newInstance();
-                Method newParserInstance = 
-                    factoryClass.getMethod("newInstance", null);
-                Object factory = newParserInstance.invoke(null, null);
+                Method createParser =
+                        factoryClass.getMethod("createParser",
+                        new Class[] { boolean.class, Map.class, Map.class });
 
-                // factory.setValidating(validate);
-                Method setValidating = 
-                    factoryClass.getMethod("setValidating", 
-                                           new Class[]{boolean.class});
-                setValidating.invoke(factory, 
-                                     new Object[]{new Boolean(validate)});
+                // Create SAX parser.
+                parser = (XMLReader)createParser.invoke(null,
+                        new Object[] { new Boolean(validate),
+                    features, properties });
 
-                // jaxpParser = factory.newSAXParser();
-                Method newSAXParser = 
-                    factoryClass.getMethod("newSAXParser", null);
-                Object jaxpParser  = newSAXParser.invoke(factory, null);
-
-                // parser = jaxpParser.getXMLReader();
-                Class parserClass = jaxpParser.getClass();
-                Method getXMLReader = 
-                    parserClass.getMethod("getXMLReader", null);
-                parser = (XMLReader)getXMLReader.invoke(jaxpParser, null);
-
-                // System.out.println("Using jaxp " +
-                //   parser.getClass().getName());
-            } catch (ClassNotFoundException e) {
-                //e.printStackTrace();
-            } catch (InvocationTargetException e) {
-                //e.printStackTrace();
-            } catch (NoSuchMethodException e) {
-                //e.printStackTrace();
-            } catch (IllegalAccessException e) {
-                //e.printStackTrace();
+                // Configure parser
+                setFeaturesAndProperties(parser, false);
+            }
+            catch (JDOMException e)
+            {
+                throw e;
+            }
+            catch (NoClassDefFoundError e)
+            {
+                // The class loader failed to resolve the dependencies
+                // of org.jdom.input.JAXPParserFactory. This probably means
+                // that no JAXP parser is present in its class path.
+                // => Ignore and try allocating default SAX parser instance.
+            }
+            catch (Exception e)
+            {
+                // Ignore and try allocating default SAX parser instance.
             }
         }
 
         // Check to see if we got a parser yet, if not, try to use a
         // hard coded default
-        if (parser == null) {
-            try {
+        if (parser == null)
+        {
+            try
+            {
                 parser = XMLReaderFactory.createXMLReader(DEFAULT_SAX_DRIVER);
                 // System.out.println("using default " + DEFAULT_SAX_DRIVER);
                 saxDriverClass = parser.getClass().getName();
+
+                // Configure parser
+                setFeaturesAndProperties(parser, true);
             }
-            catch (SAXException e) {
+            catch (SAXException e)
+            {
                 throw new JDOMException("Could not load default SAX parser: "
-                  + DEFAULT_SAX_DRIVER, e); 
+                        + DEFAULT_SAX_DRIVER, e);
             }
         }
 
@@ -516,99 +558,142 @@ public class SAXBuilder {
      * </p>
      */
     protected void configureParser(XMLReader parser, SAXHandler contentHandler)
-        throws JDOMException {
+        throws JDOMException
+    {
 
         // Setup SAX handlers.
 
         parser.setContentHandler(contentHandler);
 
-        if (saxEntityResolver != null) {
+        if (saxEntityResolver != null)
+        {
             parser.setEntityResolver(saxEntityResolver);
         }
 
-        if (saxDTDHandler != null) {
+        if (saxDTDHandler != null)
+        {
             parser.setDTDHandler(saxDTDHandler);
-        } else {
+        }
+        else
+        {
             parser.setDTDHandler(contentHandler);
         }
 
-        if (saxErrorHandler != null) {
-             parser.setErrorHandler(saxErrorHandler);
-        } else {
-             parser.setErrorHandler(new BuilderErrorHandler());
+        if (saxErrorHandler != null)
+        {
+            parser.setErrorHandler(saxErrorHandler);
+        }
+        else
+        {
+            parser.setErrorHandler(new BuilderErrorHandler());
         }
 
+        // Setup lexical reporting.
+        boolean lexicalReporting = false;
+        try
+        {
+            parser.setProperty("http://xml.org/sax/handlers/LexicalHandler",
+                    contentHandler);
+            lexicalReporting = true;
+        }
+        catch (SAXNotSupportedException e)
+        {
+            // No lexical reporting available
+        }
+        catch (SAXNotRecognizedException e)
+        {
+            // No lexical reporting available
+        }
+
+        // Some parsers use alternate property for lexical handling (grr...)
+        if (!lexicalReporting)
+        {
+            try
+            {
+                parser.setProperty(
+                        "http://xml.org/sax/properties/lexical-handler",
+                        contentHandler);
+                lexicalReporting = true;
+            }
+            catch (SAXNotSupportedException e)
+            {
+                // No lexical reporting available
+            }
+            catch (SAXNotRecognizedException e)
+            {
+                // No lexical reporting available
+            }
+        }
+
+        // Try setting the DeclHandler if entity expansion is off
+        if (!expand)
+        {
+            try
+            {
+                parser.setProperty(
+                        "http://xml.org/sax/properties/declaration-handler",
+                        contentHandler);
+            }
+            catch (SAXNotSupportedException e)
+            {
+                // No lexical reporting available
+            }
+            catch (SAXNotRecognizedException e)
+            {
+                // No lexical reporting available
+            }
+        }
+    }
+
+    private void setFeaturesAndProperties(XMLReader parser,
+            boolean coreFeatures)
+        throws JDOMException
+    {
         // Set any user-specified features on the parser.
         Iterator iter = features.keySet().iterator();
-        while(iter.hasNext()) {
+        while (iter.hasNext())
+        {
             String name = (String)iter.next();
             Boolean value = (Boolean)features.get(name);
             internalSetFeature(parser, name, value.booleanValue(), name);
         }
 
         // Set any user-specified properties on the parser.
-        Iterator iter2 = properties.keySet().iterator();
-        while(iter2.hasNext()) {
-            String name = (String)iter2.next();
-            Object value = properties.get(name);
-            internalSetProperty(parser, name, value, name);
+        iter = properties.keySet().iterator();
+        while (iter.hasNext())
+        {
+            String name = (String)iter.next();
+            internalSetProperty(parser, name, properties.get(name), name);
         }
 
-        // Setup lexical reporting.
-        boolean lexicalReporting = false;
-        try {
-            parser.setProperty("http://xml.org/sax/handlers/LexicalHandler",
-                               contentHandler);
-            lexicalReporting = true;
-        } catch (SAXNotSupportedException e) {
-            // No lexical reporting available
-        } catch (SAXNotRecognizedException e) {
-            // No lexical reporting available
-        }
-
-        // Some parsers use alternate property for lexical handling (grr...)
-        if (!lexicalReporting) {
-            try {
-                parser.setProperty(
-                    "http://xml.org/sax/properties/lexical-handler",
-                    contentHandler);
-                lexicalReporting = true;
-            } catch (SAXNotSupportedException e) {
-                // No lexical reporting available
-            } catch (SAXNotRecognizedException e) {
-                // No lexical reporting available
+        if (coreFeatures)
+        {
+            // Set validation.
+            try
+            {
+                internalSetFeature(parser,
+                        "http://xml.org/sax/features/validation",
+                        validate, "Validation");
             }
-        }
-
-        // Try setting the DeclHandler if entity expansion is off
-        if (!expand) {
-            try {
-                parser.setProperty(
-                    "http://xml.org/sax/properties/declaration-handler",
-                    contentHandler);
-            } catch (SAXNotSupportedException e) {
-                // No lexical reporting available
-            } catch (SAXNotRecognizedException e) {
-                // No lexical reporting available
+            catch (JDOMException e)
+            {
+                // If validation is not supported, and the user is requesting
+                // that we don't validate, that's fine - don't throw an
+                // exception.
+                if (validate)
+                {
+                    throw e;
+                }
             }
-        }
 
-        // Set validation.
-        try {
-            internalSetFeature(parser, "http://xml.org/sax/features/validation", 
-                    validate, "Validation");
-        } catch (JDOMException e) {
-            // If validation is not supported, and the user is requesting
-            // that we don't validate, that's fine - don't throw an exception.
-            if (validate)
-                throw e;
+            // Setup some namespace features.
+            internalSetFeature(parser,
+                    "http://xml.org/sax/features/namespaces",
+                    true, "Namespaces");
+            internalSetFeature(parser,
+                    "http://xml.org/sax/features/namespace-prefixes",
+                    true, "Namespace prefixes");
         }
-
-        // Setup some namespace features.
-        internalSetFeature(parser, "http://xml.org/sax/features/namespaces", 
-                true, "Namespaces");
-        internalSetFeature(parser, "http://xml.org/sax/features/namespace-prefixes", 
-                false, "Namespace prefixes");
 
         // Set entity expansion
         // Note SAXHandler can work regardless of how this is set, but when
@@ -617,27 +702,20 @@ public class SAXBuilder {
         // Apparently no parsers yet support this feature.
         // XXX It might make sense to setEntityResolver() with a resolver
         // that simply ignores external general entities
-        try {
-            if (parser.getFeature("http://xml.org/sax/features/external-general-entities") != expand) { 
-                parser.setFeature("http://xml.org/sax/features/external-general-entities", expand);
+        try
+        {
+            if (parser.getFeature("http://xml.org/sax/features/external-general-entities") !=
+                    expand)
+            {
+                parser.setFeature("http://xml.org/sax/features/external-general-entities",
+                        expand);
             }
-
         }
-        catch (SAXNotRecognizedException e) {
-        /*
-            // No entity expansion available
-            throw new JDOMException(
-              "Entity expansion feature not recognized by " + 
-              parser.getClass().getName());
-        */
+        catch (SAXNotRecognizedException e)
+        { /* Ignore... */
         }
-        catch (SAXNotSupportedException e) {
-        /*
-            // No entity expansion available
-            throw new JDOMException(
-              "Entity expansion feature not supported by " +
-              parser.getClass().getName());
-        */
+        catch (SAXNotSupportedException e)
+        { /* Ignore... */
         }
     }
 
@@ -645,16 +723,25 @@ public class SAXBuilder {
      * Tries to set a feature on the parser. If the feature cannot be set,
      * throws a JDOMException describing the problem.
      */
-    private void internalSetFeature(XMLReader parser, String feature, 
-                    boolean value, String displayName) throws JDOMException {
-        try {
+    private void internalSetFeature(XMLReader parser, String feature,
+            boolean value, String displayName)
+        throws JDOMException
+    {
+        try
+        {
             parser.setFeature(feature, value);
-        } catch (SAXNotSupportedException e) {
+        }
+        catch (SAXNotSupportedException e)
+        {
             throw new JDOMException(
-                displayName + " feature not supported for SAX driver " + parser.getClass().getName());
-        } catch (SAXNotRecognizedException e) {
+                    displayName + " feature not supported for SAX driver " +
+                    parser.getClass().getName());
+        }
+        catch (SAXNotRecognizedException e)
+        {
             throw new JDOMException(
-                displayName + " feature not recognized for SAX driver " + parser.getClass().getName());
+                    displayName + " feature not recognized for SAX driver " +
+                    parser.getClass().getName());
         }
     }
 
@@ -664,16 +751,25 @@ public class SAXBuilder {
      * throws a JDOMException describing the problem.
      * </p>
      */
-    private void internalSetProperty(XMLReader parser, String property, 
-                    Object value, String displayName) throws JDOMException {
-        try {
+    private void internalSetProperty(XMLReader parser, String property,
+            Object value, String displayName)
+        throws JDOMException
+    {
+        try
+        {
             parser.setProperty(property, value);
-        } catch (SAXNotSupportedException e) {
+        }
+        catch (SAXNotSupportedException e)
+        {
             throw new JDOMException(
-                displayName + " property not supported for SAX driver " + parser.getClass().getName());
-        } catch (SAXNotRecognizedException e) {
+                    displayName + " property not supported for SAX driver " +
+                    parser.getClass().getName());
+        }
+        catch (SAXNotRecognizedException e)
+        {
             throw new JDOMException(
-                displayName + " property not recognized for SAX driver " + parser.getClass().getName());
+                    displayName + " property not recognized for SAX driver " +
+                    parser.getClass().getName());
         }
     }
 
@@ -689,8 +785,9 @@ public class SAXBuilder {
      * @throws IOException when an I/O error prevents a document
      *         from being fully parsed.
      */
-    public Document build(InputStream in) 
-     throws JDOMException, IOException {
+    public Document build(InputStream in)
+        throws JDOMException, IOException
+    {
         return build(new InputSource(in));
     }
 
@@ -706,12 +803,16 @@ public class SAXBuilder {
      * @throws IOException when an I/O error prevents a document
      *         from being fully parsed.
      */
-    public Document build(File file) 
-        throws JDOMException, IOException {
-        try {
+    public Document build(File file)
+        throws JDOMException, IOException
+    {
+        try
+        {
             URL url = fileToURL(file);
             return build(url);
-        } catch (MalformedURLException e) {
+        }
+        catch (MalformedURLException e)
+        {
             throw new JDOMException("Error in building", e);
         }
     }
@@ -728,8 +829,9 @@ public class SAXBuilder {
      * @throws IOException when an I/O error prevents a document
      *         from being fully parsed.
      */
-    public Document build(URL url) 
-        throws JDOMException, IOException {
+    public Document build(URL url)
+        throws JDOMException, IOException
+    {
         String systemID = url.toExternalForm();
         return build(new InputSource(systemID));
     }
@@ -748,7 +850,8 @@ public class SAXBuilder {
      *         from being fully parsed.
      */
     public Document build(InputStream in, String systemId)
-        throws JDOMException, IOException {
+        throws JDOMException, IOException
+    {
 
         InputSource src = new InputSource(in);
         src.setSystemId(systemId);
@@ -763,14 +866,15 @@ public class SAXBuilder {
      *   to use an InputStream rather than a Reader, if it's available.
      * </p>
      *
-     * @param in <code>Reader</code> to read from.
+     * @param characterStream <code>Reader</code> to read from.
      * @return <code>Document</code> - resultant Document object.
      * @throws JDOMException when errors occur in parsing.
      * @throws IOException when an I/O error prevents a document
      *         from being fully parsed.
      */
-    public Document build(Reader characterStream) 
-        throws JDOMException, IOException {
+    public Document build(Reader characterStream)
+        throws JDOMException, IOException
+    {
         return build(new InputSource(characterStream));
     }
 
@@ -782,18 +886,19 @@ public class SAXBuilder {
      *   to use an InputStream rather than a Reader, if it's available.
      * </p>
      *
-     * @param in <code>Reader</code> to read from.
+     * @param characterStream <code>Reader</code> to read from.
      * @param systemId base for resolving relative URIs
      * @return <code>Document</code> - resultant Document object.
      * @throws JDOMException when errors occur in parsing.
      * @throws IOException when an I/O error prevents a document
      *         from being fully parsed.
      */
-    public Document build(Reader characterStream, String SystemId)
-        throws JDOMException, IOException {
+    public Document build(Reader characterStream, String systemId)
+        throws JDOMException, IOException
+    {
 
         InputSource src = new InputSource(characterStream);
-        src.setSystemId(SystemId);
+        src.setSystemId(systemId);
         return build(src);
     }
 
@@ -808,8 +913,9 @@ public class SAXBuilder {
      * @throws IOException when an I/O error prevents a document
      *         from being fully parsed.
      */
-    public Document build(String systemId) 
-        throws JDOMException, IOException {
+    public Document build(String systemId)
+        throws JDOMException, IOException
+    {
         return build(new InputSource(systemId));
     }
 
@@ -822,15 +928,20 @@ public class SAXBuilder {
      * @param f the file to convert
      * @return the file path converted to a file: URL
      */
-    protected URL fileToURL(File f) throws MalformedURLException {
+    protected URL fileToURL(File f)
+        throws MalformedURLException
+    {
         String path = f.getAbsolutePath();
-        if (File.separatorChar != '/') {
+        if (File.separatorChar != '/')
+        {
             path = path.replace(File.separatorChar, '/');
         }
-        if (!path.startsWith("/")) {
+        if (!path.startsWith("/"))
+        {
             path = "/" + path;
         }
-        if (!path.endsWith("/") && f.isDirectory()) {
+        if (!path.endsWith("/") && f.isDirectory())
+        {
             path = path + "/";
         }
         return new URL("file", "", path);
@@ -859,7 +970,8 @@ public class SAXBuilder {
      * @param expand <code>boolean</code> indicating whether entity expansion 
      * should occur.
      */
-    public void setExpandEntities(boolean expand) {
+    public void setExpandEntities(boolean expand)
+    {
         this.expand = expand;
     }
 }

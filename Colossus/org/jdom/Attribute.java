@@ -10,26 +10,26 @@
  are met:
  
  1. Redistributions of source code must retain the above copyright
-    notice, this list of conditions, and the following disclaimer.
+ notice, this list of conditions, and the following disclaimer.
  
  2. Redistributions in binary form must reproduce the above copyright
-    notice, this list of conditions, and the disclaimer that follows 
-    these conditions in the documentation and/or other materials 
-    provided with the distribution.
+ notice, this list of conditions, and the disclaimer that follows 
+ these conditions in the documentation and/or other materials 
+ provided with the distribution.
 
  3. The name "JDOM" must not be used to endorse or promote products
-    derived from this software without prior written permission.  For
-    written permission, please contact <request_AT_jdom_DOT_org>.
+ derived from this software without prior written permission.  For
+ written permission, please contact <request_AT_jdom_DOT_org>.
  
  4. Products derived from this software may not be called "JDOM", nor
-    may "JDOM" appear in their name, without prior written permission
-    from the JDOM Project Management <request_AT_jdom_DOT_org>.
+ may "JDOM" appear in their name, without prior written permission
+ from the JDOM Project Management <request_AT_jdom_DOT_org>.
  
  In addition, we request (but do not require) that you include in the 
  end-user documentation provided with the redistribution and/or in the 
  software itself an acknowledgement equivalent to the following:
-     "This product includes software developed by the
-      JDOM Project (http://www.jdom.org/)."
+ "This product includes software developed by the
+ JDOM Project (http://www.jdom.org/)."
  Alternatively, the acknowledgment may be graphical using the logos 
  available at http://www.jdom.org/images/logos.
 
@@ -56,10 +56,9 @@
 
 package org.jdom;
 
-import java.io.Serializable;
-import java.io.ObjectOutputStream;
-import java.io.ObjectInputStream;
-import java.io.IOException;
+
+import java.io.*;
+
 
 /**
  * <code>Attribute</code> defines behavior for an XML
@@ -73,10 +72,11 @@ import java.io.IOException;
  * @author Wesley Biggs
  * @version $Revision$, $Date$
  */
-public class Attribute implements Serializable, Cloneable {
+public class Attribute implements Serializable, Cloneable
+{
 
-    private static final String CVS_ID = 
-      "@(#) $RCSfile$ $Revision$ $Date$ $Name$";
+    private static final String CVS_ID =
+            "@(#) $RCSfile$ $Revision$ $Date$ $Name$";
 
     /**
      * Attribute type: the attribute has not been declared or type
@@ -166,8 +166,6 @@ public class Attribute implements Serializable, Cloneable {
      */
     public final static int ENUMERATED_ATTRIBUTE = 10;
 
-
-
     /** The local name of the <code>Attribute</code> */
     protected String name;
 
@@ -186,7 +184,9 @@ public class Attribute implements Serializable, Cloneable {
     /**
      * Default, no-args constructor for implementations to use if needed.
      */
-    protected Attribute() {}
+    protected Attribute()
+    {
+    }
 
     /**
      * This will create a new <code>Attribute</code> with the
@@ -203,7 +203,8 @@ public class Attribute implements Serializable, Cloneable {
      *         illegal character data (as determined by
      *         {@link org.jdom.Verifier#checkCharacterData}).
      */
-    public Attribute(String name, String value, Namespace namespace) {
+    public Attribute(String name, String value, Namespace namespace)
+    {
         setName(name);
         setValue(value);
         setNamespace(namespace);
@@ -227,7 +228,8 @@ public class Attribute implements Serializable, Cloneable {
      *         if the given attribute type is not one of the 
      *         supported types.
      */
-    public Attribute(String name, String value, int type, Namespace namespace) {
+    public Attribute(String name, String value, int type, Namespace namespace)
+    {
         setName(name);
         setValue(value);
         setAttributeType(type);
@@ -251,7 +253,8 @@ public class Attribute implements Serializable, Cloneable {
      *         illegal character data (as determined by
      *         {@link org.jdom.Verifier#checkCharacterData}).
      */
-    public Attribute(String name, String value) {
+    public Attribute(String name, String value)
+    {
         this(name, value, UNDECLARED_ATTRIBUTE, Namespace.NO_NAMESPACE);
     }
 
@@ -275,7 +278,8 @@ public class Attribute implements Serializable, Cloneable {
      *         if the given attribute type is not one of the 
      *         supported types.
      */
-    public Attribute(String name, String value, int type) {
+    public Attribute(String name, String value, int type)
+    {
         this(name, value, type, Namespace.NO_NAMESPACE);
     }
 
@@ -285,8 +289,9 @@ public class Attribute implements Serializable, Cloneable {
      *
      * @return parent of this <code>Attribute</code>
      */
-    public Element getParent() {
-        return (Element) parent;
+    public Element getParent()
+    {
+        return (Element)parent;
     }
 
     /**
@@ -296,8 +301,10 @@ public class Attribute implements Serializable, Cloneable {
      *
      * @return <code>Document</code> owning this Attribute, or null.
      */
-    public Document getDocument() {
-        if (parent != null) {
+    public Document getDocument()
+    {
+        if (parent != null)
+        {
             return ((Element)parent).getDocument();
         }
         return null;
@@ -309,7 +316,8 @@ public class Attribute implements Serializable, Cloneable {
      * @param parent <code>Element</code> to be new parent.
      * @return this <code>Attribute</code> modified.
      */
-    protected Attribute setParent(Element parent) {
+    protected Attribute setParent(Element parent)
+    {
         this.parent = parent;
         return this;
     }
@@ -320,9 +328,11 @@ public class Attribute implements Serializable, Cloneable {
      *
      * @return <code>Attribute</code> - this <code>Attribute</code> modified.
      */
-    public Attribute detach() {
+    public Attribute detach()
+    {
         Element p = getParent();
-        if (p != null) {
+        if (p != null)
+        {
             p.removeAttribute(this.getName(), this.getNamespace());
         }
         return this;
@@ -346,7 +356,8 @@ public class Attribute implements Serializable, Cloneable {
      * @return <code>String</code> - name of this attribute,
      *                               without any namespace prefix.
      */
-    public String getName() {
+    public String getName()
+    {
         return name;
     }
 
@@ -357,9 +368,11 @@ public class Attribute implements Serializable, Cloneable {
      * @throws IllegalNameException if the given name is illegal as an
      *         attribute name.
      */
-    public Attribute setName(String name) {
+    public Attribute setName(String name)
+    {
         String reason;
-        if ((reason = Verifier.checkAttributeName(name)) != null) {
+        if ((reason = Verifier.checkAttributeName(name)) != null)
+        {
             throw new IllegalNameException(name, "attribute", reason);
         }
         this.name = name;
@@ -385,15 +398,16 @@ public class Attribute implements Serializable, Cloneable {
      *
      * @return <code>String</code> - full name for this element.
      */
-    public String getQualifiedName() {
+    public String getQualifiedName()
+    {
         // Add prefix, if needed
         String prefix = namespace.getPrefix();
-        if ((prefix != null) && (!prefix.equals(""))) {
-            return new StringBuffer(prefix)
-                .append(':')
-                .append(getName())
-                .toString();
-        } else {
+        if ((prefix != null) && (!prefix.equals("")))
+        {
+            return new StringBuffer(prefix).append(':').append(getName()).toString();
+        }
+        else
+        {
             return getName();
         }
     }
@@ -410,7 +424,8 @@ public class Attribute implements Serializable, Cloneable {
      * @return <code>String</code> - namespace prefix of this
      *                               attribute.
      */
-    public String getNamespacePrefix() {
+    public String getNamespacePrefix()
+    {
         return namespace.getPrefix();
     }
 
@@ -421,7 +436,8 @@ public class Attribute implements Serializable, Cloneable {
      *
      * @return <code>String</code> - namespace URI for this <code>Attribute</code>.
      */
-    public String getNamespaceURI() {
+    public String getNamespaceURI()
+    {
         return namespace.getURI();
     }
 
@@ -431,7 +447,8 @@ public class Attribute implements Serializable, Cloneable {
      *
      * @return <code>Namespace</code> - Namespace object for this <code>Attribute</code>
      */
-    public Namespace getNamespace() {
+    public Namespace getNamespace()
+    {
         return namespace;
     }
 
@@ -444,22 +461,26 @@ public class Attribute implements Serializable, Cloneable {
      * @throws IllegalNameException if the new namespace is the default
      *         namespace. Attributes cannot be in a default namespace.
      */
-    public Attribute setNamespace(Namespace namespace) {
-        if (namespace == null) {
+    public Attribute setNamespace(Namespace namespace)
+    {
+        if (namespace == null)
+        {
             namespace = Namespace.NO_NAMESPACE;
         }
 
         // Verify the attribute isn't trying to be in a default namespace
         // Attributes can't be in a default namespace
-        if (namespace != Namespace.NO_NAMESPACE && 
-            namespace.getPrefix().equals("")) {
+        if (namespace != Namespace.NO_NAMESPACE &&
+                namespace.getPrefix().equals(""))
+        {
             throw new IllegalNameException("", "attribute namespace",
-                "An attribute namespace without a prefix can only be the " +
-                "NO_NAMESPACE namespace");
+                    "An attribute namespace without a prefix can only be the " +
+                    "NO_NAMESPACE namespace");
         }
         this.namespace = namespace;
         return this;
     }
+
     /**
      * This will return the actual textual value of this
      * <code>Attribute</code>.  This will include all text
@@ -467,7 +488,8 @@ public class Attribute implements Serializable, Cloneable {
      *
      * @return <code>String</code> - value for this attribute.
      */
-    public String getValue() {
+    public String getValue()
+    {
         return value;
     }
 
@@ -480,9 +502,11 @@ public class Attribute implements Serializable, Cloneable {
      *         illegal character data (as determined by
      *         {@link org.jdom.Verifier#checkCharacterData}).
      */
-    public Attribute setValue(String value) {
+    public Attribute setValue(String value)
+    {
         String reason = null;
-        if ((reason = Verifier.checkCharacterData(value)) != null) {
+        if ((reason = Verifier.checkCharacterData(value)) != null)
+        {
             throw new IllegalDataException(value, "attribute", reason);
         }
         this.value = value;
@@ -495,7 +519,8 @@ public class Attribute implements Serializable, Cloneable {
      *
      * @return <code>int</code> - type for this attribute.
      */
-    public int getAttributeType() {
+    public int getAttributeType()
+    {
         return type;
     }
 
@@ -507,10 +532,12 @@ public class Attribute implements Serializable, Cloneable {
      * @throws IllegalDataException if the given attribute type is
      *         not one of the supported types.
      */
-    public Attribute setAttributeType(int type) {
-        if ((type < UNDECLARED_ATTRIBUTE) || (type > ENUMERATED_ATTRIBUTE)) {
+    public Attribute setAttributeType(int type)
+    {
+        if ((type < UNDECLARED_ATTRIBUTE) || (type > ENUMERATED_ATTRIBUTE))
+        {
             throw new IllegalDataException(String.valueOf(type),
-                                        "attribute", "Illegal attribute type");
+                    "attribute", "Illegal attribute type");
         }
         this.type = type;
         return this;
@@ -523,15 +550,9 @@ public class Attribute implements Serializable, Cloneable {
      * @return <code>String</code> - information about the
      *         <code>Attribute</code>
      */
-    public String toString() {
-        return new StringBuffer()
-            .append("[Attribute: ")
-            .append(getQualifiedName())
-            .append("=\"")
-            .append(value)
-            .append("\"")
-            .append("]")
-            .toString();
+    public String toString()
+    {
+        return new StringBuffer().append("[Attribute: ").append(getQualifiedName()).append("=\"").append(value).append("\"").append("]").toString();
     }
 
     /**
@@ -542,7 +563,8 @@ public class Attribute implements Serializable, Cloneable {
      * @return <code>boolean</code> - whether the <code>Attribute</code> is
      *         equal to the supplied <code>Object</code>.
      */
-    public final boolean equals(Object ob) {
+    public final boolean equals(Object ob)
+    {
         return (ob == this);
     }
 
@@ -551,7 +573,8 @@ public class Attribute implements Serializable, Cloneable {
      *
      * @return <code>int</code> - hash code.
      */
-    public final int hashCode() {
+    public final int hashCode()
+    {
         return super.hashCode();
     }
 
@@ -560,12 +583,16 @@ public class Attribute implements Serializable, Cloneable {
      *
      * @return <code>Object</code> - clone of this <code>Attribute</code>.
      */
-    public Object clone() {
+    public Object clone()
+    {
         Attribute attribute = null;
 
-        try {
-            attribute = (Attribute) super.clone();
-        } catch(CloneNotSupportedException ce) {
+        try
+        {
+            attribute = (Attribute)super.clone();
+        }
+        catch (CloneNotSupportedException ce)
+        {
             // Won't happen
         }
 
@@ -590,10 +617,15 @@ public class Attribute implements Serializable, Cloneable {
      * @return <code>int</code> value of attribute.
      * @throws DataConversionException when conversion fails.
      */
-    public int getIntValue() throws DataConversionException {
-        try {
+    public int getIntValue()
+        throws DataConversionException
+    {
+        try
+        {
             return Integer.parseInt(value);
-        } catch (NumberFormatException e) {
+        }
+        catch (NumberFormatException e)
+        {
             throw new DataConversionException(name, "int");
         }
     }
@@ -607,10 +639,15 @@ public class Attribute implements Serializable, Cloneable {
      * @return <code>long</code> value of attribute.
      * @throws DataConversionException when conversion fails.
      */
-    public long getLongValue() throws DataConversionException {
-        try {
+    public long getLongValue()
+        throws DataConversionException
+    {
+        try
+        {
             return Long.parseLong(value);
-        } catch (NumberFormatException e) {
+        }
+        catch (NumberFormatException e)
+        {
             throw new DataConversionException(name, "long");
         }
     }
@@ -624,11 +661,16 @@ public class Attribute implements Serializable, Cloneable {
      * @return <code>float</code> value of attribute.
      * @throws DataConversionException when conversion fails.
      */
-    public float getFloatValue() throws DataConversionException {
-        try {
+    public float getFloatValue()
+        throws DataConversionException
+    {
+        try
+        {
             // Avoid Float.parseFloat() to support JDK 1.1
             return Float.valueOf(value).floatValue();
-        } catch (NumberFormatException e) {
+        }
+        catch (NumberFormatException e)
+        {
             throw new DataConversionException(name, "float");
         }
     }
@@ -642,11 +684,16 @@ public class Attribute implements Serializable, Cloneable {
      * @return <code>double</code> value of attribute.
      * @throws DataConversionException when conversion fails.
      */
-    public double getDoubleValue() throws DataConversionException {
-        try {
+    public double getDoubleValue()
+        throws DataConversionException
+    {
+        try
+        {
             // Avoid Double.parseDouble() to support JDK 1.1
             return Double.valueOf(value).doubleValue();
-        } catch (NumberFormatException e) {
+        }
+        catch (NumberFormatException e)
+        {
             throw new DataConversionException(name, "double");
         }
     }
@@ -659,23 +706,32 @@ public class Attribute implements Serializable, Cloneable {
      * @return <code>boolean</code> value of attribute.
      * @throws DataConversionException when conversion fails.
      */
-    public boolean getBooleanValue() throws DataConversionException {
+    public boolean getBooleanValue()
+        throws DataConversionException
+    {
         if ((value.equalsIgnoreCase("true")) ||
-            (value.equalsIgnoreCase("on")) ||
-            (value.equalsIgnoreCase("yes"))) {
+                (value.equalsIgnoreCase("on")) ||
+                (value.equalsIgnoreCase("yes")))
+        {
             return true;
-        } else if ((value.equalsIgnoreCase("false")) ||
-                   (value.equalsIgnoreCase("off")) ||
-                   (value.equalsIgnoreCase("no"))) {
+        }
+        else if ((value.equalsIgnoreCase("false")) ||
+                (value.equalsIgnoreCase("off")) ||
+                (value.equalsIgnoreCase("no")))
+        {
             return false;
-        } else {
+        }
+        else
+        {
             throw new DataConversionException(name, "boolean");
         }
     }
 
     // Support a custom Namespace serialization so no two namespace
     // object instances may exist for the same prefix/uri pair
-    private void writeObject(ObjectOutputStream out) throws IOException {
+    private void writeObject(ObjectOutputStream out)
+        throws IOException
+    {
 
         out.defaultWriteObject();
 
@@ -686,11 +742,12 @@ public class Attribute implements Serializable, Cloneable {
     }
 
     private void readObject(ObjectInputStream in)
-        throws IOException, ClassNotFoundException {
-        
+        throws IOException, ClassNotFoundException
+    {
+
         in.defaultReadObject();
 
         namespace = Namespace.getNamespace(
-            (String)in.readObject(), (String)in.readObject());
+                (String)in.readObject(), (String)in.readObject());
     }
 }

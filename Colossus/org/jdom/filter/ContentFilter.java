@@ -10,26 +10,26 @@
  are met:
 
  1. Redistributions of source code must retain the above copyright
-    notice, this list of conditions, and the following disclaimer.
+ notice, this list of conditions, and the following disclaimer.
 
  2. Redistributions in binary form must reproduce the above copyright
-    notice, this list of conditions, and the disclaimer that follows
-    these conditions in the documentation and/or other materials
-    provided with the distribution.
+ notice, this list of conditions, and the disclaimer that follows
+ these conditions in the documentation and/or other materials
+ provided with the distribution.
 
  3. The name "JDOM" must not be used to endorse or promote products
-    derived from this software without prior written permission.  For
-    written permission, please contact <request_AT_jdom_DOT_org>.
+ derived from this software without prior written permission.  For
+ written permission, please contact <request_AT_jdom_DOT_org>.
 
  4. Products derived from this software may not be called "JDOM", nor
-    may "JDOM" appear in their name, without prior written permission
-    from the JDOM Project Management <request_AT_jdom_DOT_org>.
+ may "JDOM" appear in their name, without prior written permission
+ from the JDOM Project Management <request_AT_jdom_DOT_org>.
 
  In addition, we request (but do not require) that you include in the
  end-user documentation provided with the redistribution and/or in the
  software itself an acknowledgement equivalent to the following:
-     "This product includes software developed by the
-      JDOM Project (http://www.jdom.org/)."
+ "This product includes software developed by the
+ JDOM Project (http://www.jdom.org/)."
  Alternatively, the acknowledgment may be graphical using the logos
  available at http://www.jdom.org/images/logos.
 
@@ -56,7 +56,9 @@
 
 package org.jdom.filter;
 
+
 import org.jdom.*;
+
 
 /**
  * <code>ContentFilter</code> is a general purpose <code>Filter</code>
@@ -91,31 +93,32 @@ import org.jdom.*;
  * @author Bradley S. Huffman
  * @version $Revision$, $Date$
  */
-public class ContentFilter implements Filter {
+public class ContentFilter implements Filter
+{
 
-    private static final String CVS_ID = 
-      "@(#) $RCSfile$ $Revision$ $Date$ $Name$";
+    private static final String CVS_ID =
+            "@(#) $RCSfile$ $Revision$ $Date$ $Name$";
 
     /** Mask for JDOM <code>Element</code> objects */
-    public static final int ELEMENT   = 1;
+    public static final int ELEMENT = 1;
 
     /** Mask for JDOM <code>CDATA</code> objects */
-    public static final int CDATA     = 2;
+    public static final int CDATA = 2;
 
     /** Mask for JDOM <code>Text</code> objects */
-    public static final int TEXT      = 4;
+    public static final int TEXT = 4;
 
     /** Mask for JDOM <code>Comment</code> objects */
-    public static final int COMMENT   = 8;
+    public static final int COMMENT = 8;
 
     /** Mask for JDOM <code>ProcessingInstruction</code> objects */
-    public static final int PI        = 16;
+    public static final int PI = 16;
 
     /** Mask for JDOM <code>EntityRef</code> objects */
     public static final int ENTITYREF = 32;
 
     /** Mask for JDOM <code>Document</code> object */
-    public static final int DOCUMENT  = 64;
+    public static final int DOCUMENT = 64;
 
     /** The JDOM object mask */
     protected int filterMask;
@@ -123,7 +126,8 @@ public class ContentFilter implements Filter {
     /**
      * Default constructor that allows any legal JDOM objects.
      */
-    public ContentFilter() {
+    public ContentFilter()
+    {
         setDefaultMask();
     }
 
@@ -133,11 +137,14 @@ public class ContentFilter implements Filter {
      * @param allVisible <code>true</code> all JDOM objects are visible,
      *                   <code>false</code> all JDOM objects are hidden.
      */
-    public ContentFilter(boolean allVisible) {
-        if (allVisible) {
+    public ContentFilter(boolean allVisible)
+    {
+        if (allVisible)
+        {
             setDefaultMask();
         }
-        else {
+        else
+        {
             filterMask &= ~filterMask;
         }
     }
@@ -147,21 +154,24 @@ public class ContentFilter implements Filter {
      *
      * @param mask Mask of JDOM objects to allow.
      */
-    public ContentFilter(int mask) {
+    public ContentFilter(int mask)
+    {
         setFilterMask(mask);
     }
 
     /**
      * Return current filtering mask.
      */
-    public int getFilterMask() {
+    public int getFilterMask()
+    {
         return filterMask;
     }
 
     /**
      * Set filtering mask.
      */
-    public void setFilterMask(int mask) {
+    public void setFilterMask(int mask)
+    {
         setDefaultMask();
         filterMask &= mask;
     }
@@ -169,16 +179,18 @@ public class ContentFilter implements Filter {
     /**
      * Set this filter to allow all legal JDOM objects.
      */
-    public void setDefaultMask() {
+    public void setDefaultMask()
+    {
         filterMask = ELEMENT | CDATA | TEXT | COMMENT |
-                     PI | ENTITYREF | DOCUMENT;
+                PI | ENTITYREF | DOCUMENT;
     }
 
     /**
      * Set filter to match only JDOM objects that are legal
      * document content.
      */
-    public void setDocumentContent() {
+    public void setDocumentContent()
+    {
         filterMask = ELEMENT | COMMENT | PI;
     }
 
@@ -186,9 +198,10 @@ public class ContentFilter implements Filter {
      * Set filter to match only JDOM objects that are legal
      * element content.
      */
-    public void setElementContent() {
+    public void setElementContent()
+    {
         filterMask = ELEMENT | CDATA | TEXT |
-                     COMMENT | PI | ENTITYREF;
+                COMMENT | PI | ENTITYREF;
     }
 
     /**
@@ -197,11 +210,14 @@ public class ContentFilter implements Filter {
      * @param visible whether Elements are visible, <code>true</code>
      *        if yes, <code>false</code> if not
      */
-    public void setElementVisible(boolean visible) {
-        if (visible) {
+    public void setElementVisible(boolean visible)
+    {
+        if (visible)
+        {
             filterMask |= ELEMENT;
         }
-        else {
+        else
+        {
             filterMask &= ~ELEMENT;
         }
     }
@@ -212,11 +228,14 @@ public class ContentFilter implements Filter {
      * @param visible whether CDATA nodes are visible, <code>true</code>
      *        if yes, <code>false</code> if not
      */
-    public void setCDATAVisible(boolean visible) {
-        if (visible) {
+    public void setCDATAVisible(boolean visible)
+    {
+        if (visible)
+        {
             filterMask |= CDATA;
         }
-        else {
+        else
+        {
             filterMask &= ~CDATA;
         }
     }
@@ -227,11 +246,14 @@ public class ContentFilter implements Filter {
      * @param visible whether Text nodes are visible, <code>true</code>
      *        if yes, <code>false</code> if not
      */
-    public void setTextVisible(boolean visible) {
-        if (visible) {
+    public void setTextVisible(boolean visible)
+    {
+        if (visible)
+        {
             filterMask |= TEXT;
         }
-        else {
+        else
+        {
             filterMask &= ~TEXT;
         }
     }
@@ -242,11 +264,14 @@ public class ContentFilter implements Filter {
      * @param visible whether Comments are visible, <code>true</code>
      *        if yes, <code>false</code> if not
      */
-    public void setCommentVisible(boolean visible) {
-        if (visible) {
+    public void setCommentVisible(boolean visible)
+    {
+        if (visible)
+        {
             filterMask |= COMMENT;
         }
-        else {
+        else
+        {
             filterMask &= ~COMMENT;
         }
     }
@@ -257,11 +282,14 @@ public class ContentFilter implements Filter {
      * @param visible whether ProcessingInstructions are visible,
      *        <code>true</code> if yes, <code>false</code> if not
      */
-    public void setPIVisible(boolean visible) {
-        if (visible) {
+    public void setPIVisible(boolean visible)
+    {
+        if (visible)
+        {
             filterMask |= PI;
         }
-        else {
+        else
+        {
             filterMask &= ~PI;
         }
     }
@@ -272,33 +300,16 @@ public class ContentFilter implements Filter {
      * @param visible whether EntityRefs are visible, <code>true</code>
      *        if yes, <code>false</code> if not
      */
-    public void setEntityRefVisible(boolean visible) {
-        if (visible) {
+    public void setEntityRefVisible(boolean visible)
+    {
+        if (visible)
+        {
             filterMask |= ENTITYREF;
         }
-        else {
+        else
+        {
             filterMask &= ~ENTITYREF;
         }
-    }
-
-    /**
-     * Check to see if the object can be added to the list.
-     *
-     * @param obj The object to verify.
-     * @return <code>true</code> if the object can be added.
-     */
-    public boolean canAdd(Object obj) {
-        return matches(obj);
-    }
-
-    /**
-     * Check to see if the object can be removed from the list.
-     *
-     * @param obj The object to verify.
-     * @return <code>true</code> if the object can be removed.
-     */
-    public boolean canRemove(Object obj) {
-        return matches(obj);
     }
 
     /**
@@ -308,26 +319,34 @@ public class ContentFilter implements Filter {
      * @return <code>true</code> if the objected matched a predfined 
      *           set of rules.
      */
-    public boolean matches(Object obj) {
-        if (obj instanceof Element) {
+    public boolean matches(Object obj)
+    {
+        if (obj instanceof Element)
+        {
             return (filterMask & ELEMENT) != 0;
         }
-        else if (obj instanceof CDATA) {
+        else if (obj instanceof CDATA)
+        {
             return (filterMask & CDATA) != 0;
         }
-        else if (obj instanceof Text) {
+        else if (obj instanceof Text)
+        {
             return (filterMask & TEXT) != 0;
         }
-        else if (obj instanceof Comment) {
+        else if (obj instanceof Comment)
+        {
             return (filterMask & COMMENT) != 0;
         }
-        else if (obj instanceof ProcessingInstruction) {
+        else if (obj instanceof ProcessingInstruction)
+        {
             return (filterMask & PI) != 0;
         }
-        else if (obj instanceof EntityRef) {
+        else if (obj instanceof EntityRef)
+        {
             return (filterMask & ENTITYREF) != 0;
         }
-        else if (obj instanceof Document) {
+        else if (obj instanceof Document)
+        {
             return (filterMask & DOCUMENT) != 0;
         }
 
@@ -341,11 +360,13 @@ public class ContentFilter implements Filter {
      *
      * @return <code>true</code> if the Filters are equal
      */
-    public boolean equals(Object obj) {
-        if (obj instanceof ContentFilter) {
-            ContentFilter filter = (ContentFilter) obj;
+    public boolean equals(Object obj)
+    {
+        if (obj instanceof ContentFilter)
+        {
+            ContentFilter filter = (ContentFilter)obj;
             return (filterMask == filter.filterMask);
         }
         return false;
     }
-} 
+}

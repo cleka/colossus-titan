@@ -10,26 +10,26 @@
  are met:
  
  1. Redistributions of source code must retain the above copyright
-    notice, this list of conditions, and the following disclaimer.
+ notice, this list of conditions, and the following disclaimer.
  
  2. Redistributions in binary form must reproduce the above copyright
-    notice, this list of conditions, and the disclaimer that follows 
-    these conditions in the documentation and/or other materials 
-    provided with the distribution.
+ notice, this list of conditions, and the disclaimer that follows 
+ these conditions in the documentation and/or other materials 
+ provided with the distribution.
 
  3. The name "JDOM" must not be used to endorse or promote products
-    derived from this software without prior written permission.  For
-    written permission, please contact <request_AT_jdom_DOT_org>.
+ derived from this software without prior written permission.  For
+ written permission, please contact <request_AT_jdom_DOT_org>.
  
  4. Products derived from this software may not be called "JDOM", nor
-    may "JDOM" appear in their name, without prior written permission
-    from the JDOM Project Management <request_AT_jdom_DOT_org>.
+ may "JDOM" appear in their name, without prior written permission
+ from the JDOM Project Management <request_AT_jdom_DOT_org>.
  
  In addition, we request (but do not require) that you include in the 
  end-user documentation provided with the redistribution and/or in the 
  software itself an acknowledgement equivalent to the following:
-     "This product includes software developed by the
-      JDOM Project (http://www.jdom.org/)."
+ "This product includes software developed by the
+ JDOM Project (http://www.jdom.org/)."
  Alternatively, the acknowledgment may be graphical using the logos 
  available at http://www.jdom.org/images/logos.
 
@@ -56,6 +56,7 @@
 
 package org.jdom;
 
+
 /**
  * <p><code>IllegalNameException</code>
  *   is thrown when a name is supplied in construction, etc.,
@@ -67,10 +68,11 @@ package org.jdom;
  * @author Elliotte Rusty Harold
  * @version $Revision$, $Date$
  */
-public class IllegalNameException extends IllegalArgumentException {
+public class IllegalNameException extends IllegalArgumentException
+{
 
-    private static final String CVS_ID = 
-      "@(#) $RCSfile$ $Revision$ $Date$ $Name$";
+    private static final String CVS_ID =
+            "@(#) $RCSfile$ $Revision$ $Date$ $Name$";
 
     /**
      * This will create an <code>Exception</code> indicating
@@ -82,16 +84,9 @@ public class IllegalNameException extends IllegalArgumentException {
      *        that <code>name</code> was supplied to.
      * @param reason <code>String</code> message or reason name is illegal.
      */
-    public IllegalNameException(String name, String construct, String reason) {
-        super(new StringBuffer()
-              .append("The name \"")
-              .append(name)
-              .append("\" is not legal for JDOM/XML ")
-              .append(construct)
-              .append("s: ")
-              .append(reason)
-              .append(".")
-              .toString());
+    public IllegalNameException(String name, String construct, String reason)
+    {
+        super(new StringBuffer().append("The name \"").append(name).append("\" is not legal for JDOM/XML ").append(construct).append("s: ").append(reason).append(".").toString());
     }
 
     /**
@@ -103,13 +98,8 @@ public class IllegalNameException extends IllegalArgumentException {
      * @param construct <code>String</code> name of JDOM construct
      *        that <code>name</code> was supplied to.
      */
-    public IllegalNameException(String name, String construct) {
-        super(new StringBuffer()
-              .append("The name \"")
-              .append(name)
-              .append("\" is not legal for JDOM/XML ")
-              .append(construct)
-              .append("s.")
-              .toString());
+    public IllegalNameException(String name, String construct)
+    {
+        super(new StringBuffer().append("The name \"").append(name).append("\" is not legal for JDOM/XML ").append(construct).append("s.").toString());
     }
 }

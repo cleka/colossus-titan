@@ -10,26 +10,26 @@
  are met:
  
  1. Redistributions of source code must retain the above copyright
-    notice, this list of conditions, and the following disclaimer.
+ notice, this list of conditions, and the following disclaimer.
  
  2. Redistributions in binary form must reproduce the above copyright
-    notice, this list of conditions, and the disclaimer that follows 
-    these conditions in the documentation and/or other materials 
-    provided with the distribution.
+ notice, this list of conditions, and the disclaimer that follows 
+ these conditions in the documentation and/or other materials 
+ provided with the distribution.
 
  3. The name "JDOM" must not be used to endorse or promote products
-    derived from this software without prior written permission.  For
-    written permission, please contact <request_AT_jdom_DOT_org>.
+ derived from this software without prior written permission.  For
+ written permission, please contact <request_AT_jdom_DOT_org>.
  
  4. Products derived from this software may not be called "JDOM", nor
-    may "JDOM" appear in their name, without prior written permission
-    from the JDOM Project Management <request_AT_jdom_DOT_org>.
+ may "JDOM" appear in their name, without prior written permission
+ from the JDOM Project Management <request_AT_jdom_DOT_org>.
  
  In addition, we request (but do not require) that you include in the 
  end-user documentation provided with the redistribution and/or in the 
  software itself an acknowledgement equivalent to the following:
-     "This product includes software developed by the
-      JDOM Project (http://www.jdom.org/)."
+ "This product includes software developed by the
+ JDOM Project (http://www.jdom.org/)."
  Alternatively, the acknowledgment may be graphical using the logos 
  available at http://www.jdom.org/images/logos.
 
@@ -56,7 +56,9 @@
 
 package org.jdom.filter;
 
+
 import org.jdom.*;
+
 
 /**
  * The <code>ElementFilter</code> when applied to a <code>FilterList</code>
@@ -66,29 +68,33 @@ import org.jdom.*;
  * @author Bradley S. Huffman
  * @version $Revision$, $Date$
  */
-public class ElementFilter implements Filter {
+public class ElementFilter implements Filter
+{
 
-    private static final String CVS_ID = 
-      "@(#) $RCSfile$ $Revision$ $Date$ $Name$";
+    private static final String CVS_ID =
+            "@(#) $RCSfile$ $Revision$ $Date$ $Name$";
 
     /** The element name */
     protected String name;
 
     /** The element namespace */
     protected Namespace namespace;
-    
+
     /**
      * Select only the Elements.
      */
-    public ElementFilter() {}
+    public ElementFilter()
+    {
+    }
 
     /**
      * Select only the Elements with the supplied name in any Namespace.
      *
      * @param name   The name of the Element.
      */
-    public ElementFilter(String name) {
-        this.name   = name;
+    public ElementFilter(String name)
+    {
+        this.name = name;
     }
 
     /**
@@ -96,7 +102,8 @@ public class ElementFilter implements Filter {
      *
      * @param namespace The namespace the Element lives in.
      */
-    public ElementFilter(Namespace namespace) {
+    public ElementFilter(Namespace namespace)
+    {
         this.namespace = namespace;
     }
 
@@ -106,33 +113,10 @@ public class ElementFilter implements Filter {
      * @param name   The name of the Element.
      * @param namespace The namespace the Element lives in.
      */
-    public ElementFilter(String name, Namespace namespace) {
-        this.name   = name;
+    public ElementFilter(String name, Namespace namespace)
+    {
+        this.name = name;
         this.namespace = namespace;
-    }
-
-    /**
-     * Only allow the adding of Element objects.
-     *
-     * @param obj The object to verify.
-     * @return <code>true</code> if the object can be added.
-     * @throws IllegalAddException if the object can be added.
-     */
-    public boolean canAdd(Object obj) {
-        return matches(obj);
-    }
-
-    /**
-     * Check to see if the object can be removed from the list.
-     *
-     * @param obj The object to verify.
-     * @return <code>true</code> if the object can be removed.
-     */
-    public boolean canRemove(Object obj) {
-        if (obj instanceof Element) {
-            return true;
-        }
-        return false;
     }
 
     /**
@@ -142,23 +126,32 @@ public class ElementFilter implements Filter {
      * @return <code>true</code> if the objected matched a predfined 
      *           set of rules.
      */
-    public boolean matches(Object obj) {
-        if (obj instanceof Element) {
-            Element element = (Element) obj;
-            if (name == null) {
-                if (namespace == null) {
+    public boolean matches(Object obj)
+    {
+        if (obj instanceof Element)
+        {
+            Element element = (Element)obj;
+            if (name == null)
+            {
+                if (namespace == null)
+                {
                     return true;
                 }
-                else {
+                else
+                {
                     return namespace.equals(element.getNamespace());
                 }
             }
-            else {
-                if (name.equals(element.getName())) {
-                    if (namespace == null) {
+            else
+            {
+                if (name.equals(element.getName()))
+                {
+                    if (namespace == null)
+                    {
                         return true;
                     }
-                    else {
+                    else
+                    {
                         return namespace.equals(element.getNamespace());
                     }
                 }
@@ -173,17 +166,24 @@ public class ElementFilter implements Filter {
      *
      * @return <code>true</code> if the Filters are equal
      */
-    public boolean equals(Object obj) {
+    public boolean equals(Object obj)
+    {
         if (this == obj)
+        {
             return true;
+        }
 
-        if (obj instanceof ElementFilter) {
-            ElementFilter filter = (ElementFilter) obj;
-            if (namespace == filter.namespace) {
-                if (name == filter.name) {
+        if (obj instanceof ElementFilter)
+        {
+            ElementFilter filter = (ElementFilter)obj;
+            if (namespace == filter.namespace)
+            {
+                if (name == filter.name)
+                {
                     return true;
                 }
-                else {
+                else
+                {
                     return (name == null) ? false : name.equals(filter.name);
                 }
             }

@@ -10,26 +10,26 @@
  are met:
  
  1. Redistributions of source code must retain the above copyright
-    notice, this list of conditions, and the following disclaimer.
+ notice, this list of conditions, and the following disclaimer.
  
  2. Redistributions in binary form must reproduce the above copyright
-    notice, this list of conditions, and the disclaimer that follows 
-    these conditions in the documentation and/or other materials 
-    provided with the distribution.
+ notice, this list of conditions, and the disclaimer that follows 
+ these conditions in the documentation and/or other materials 
+ provided with the distribution.
 
  3. The name "JDOM" must not be used to endorse or promote products
-    derived from this software without prior written permission.  For
-    written permission, please contact <request_AT_jdom_DOT_org>.
+ derived from this software without prior written permission.  For
+ written permission, please contact <request_AT_jdom_DOT_org>.
  
  4. Products derived from this software may not be called "JDOM", nor
-    may "JDOM" appear in their name, without prior written permission
-    from the JDOM Project Management <request_AT_jdom_DOT_org>.
+ may "JDOM" appear in their name, without prior written permission
+ from the JDOM Project Management <request_AT_jdom_DOT_org>.
  
  In addition, we request (but do not require) that you include in the 
  end-user documentation provided with the redistribution and/or in the 
  software itself an acknowledgement equivalent to the following:
-     "This product includes software developed by the
-      JDOM Project (http://www.jdom.org/)."
+ "This product includes software developed by the
+ JDOM Project (http://www.jdom.org/)."
  Alternatively, the acknowledgment may be graphical using the logos 
  available at http://www.jdom.org/images/logos.
 
@@ -56,7 +56,9 @@
 
 package org.jdom;
 
+
 import java.util.*;
+
 
 /**
  * <code>Namespace</code> defines both a factory for
@@ -77,13 +79,14 @@ import java.util.*;
  * @author Wesley Biggs
  * @version $Revision$, $Date$
  */
-public final class Namespace {
+public final class Namespace
+{
 
     // XXX May want to use weak references to keep the maps from growing 
     // large with extended use
 
-    private static final String CVS_ID = 
-      "@(#) $RCSfile$ $Revision$ $Date$ $Name$";
+    private static final String CVS_ID =
+            "@(#) $RCSfile$ $Revision$ $Date$ $Name$";
 
     /** 
      * Factory list of namespaces. 
@@ -95,8 +98,8 @@ public final class Namespace {
     /** Define a <code>Namespace</code> for when <i>not</i> in a namespace */
     public static final Namespace NO_NAMESPACE = new Namespace("", "");
 
-    public static final Namespace XML_NAMESPACE = 
-        new Namespace("xml", "http://www.w3.org/XML/1998/namespace");
+    public static final Namespace XML_NAMESPACE =
+            new Namespace("xml", "http://www.w3.org/XML/1998/namespace");
 
     /** The prefix mapped to this namespace */
     private String prefix;
@@ -108,13 +111,14 @@ public final class Namespace {
      * This static initializer acts as a factory contructor.
      * It sets up storage and required initial values.
      */
-    static {
+    static
+    {
         namespaces = new HashMap();
 
         // Add the "empty" namespace
         namespaces.put("&", NO_NAMESPACE);
         namespaces.put("xml&http://www.w3.org/XML/1998/namespace",
-                       XML_NAMESPACE);
+                XML_NAMESPACE);
     }
 
     /**
@@ -128,12 +132,15 @@ public final class Namespace {
      * @throws IllegalNameException if the given prefix and uri make up
      *         an illegal namespace name.
      */
-    public static Namespace getNamespace(String prefix, String uri) {
+    public static Namespace getNamespace(String prefix, String uri)
+    {
         // Sanity checking
-        if ((prefix == null) || (prefix.trim().equals(""))) {
+        if ((prefix == null) || (prefix.trim().equals("")))
+        {
             prefix = "";
         }
-        if ((uri == null) || (uri.trim().equals(""))) {
+        if ((uri == null) || (uri.trim().equals("")))
+        {
             uri = "";
         }
 
@@ -141,26 +148,29 @@ public final class Namespace {
         // should all be legal. In other words, an illegal namespace won't
         // have been placed in this.  Thus we can do this test before
         // verifying the URI and prefix.
-        String lookup = new StringBuffer(64)
-            .append(prefix).append('&').append(uri).toString();
-        Namespace preexisting = (Namespace) namespaces.get(lookup);
-        if (preexisting != null) {
+        String lookup = new StringBuffer(64).append(prefix).append('&').append(uri).toString();
+        Namespace preexisting = (Namespace)namespaces.get(lookup);
+        if (preexisting != null)
+        {
             return preexisting;
         }
 
         // Ensure proper naming
         String reason;
-        if ((reason = Verifier.checkNamespacePrefix(prefix)) != null) {
+        if ((reason = Verifier.checkNamespacePrefix(prefix)) != null)
+        {
             throw new IllegalNameException(prefix, "Namespace prefix", reason);
         }
-        if ((reason = Verifier.checkNamespaceURI(uri)) != null) {
+        if ((reason = Verifier.checkNamespaceURI(uri)) != null)
+        {
             throw new IllegalNameException(uri, "Namespace URI", reason);
         }
 
         // Unless the "empty" Namespace (no prefix and no URI), require a URI
-        if ((!prefix.equals("")) && (uri.equals(""))) {
+        if ((!prefix.equals("")) && (uri.equals("")))
+        {
             throw new IllegalNameException("", "namespace",
-                "Namespace URIs must be non-null and non-empty Strings");
+                    "Namespace URIs must be non-null and non-empty Strings");
         }
 
         // Handle XML namespace mislabels. If the user requested the correct
@@ -169,17 +179,19 @@ public final class Namespace {
         // Thus any use of the xml prefix or the
         // http://www.w3.org/XML/1998/namespace URI at this point must be
         // incorrect. 
-        if (prefix.equals("xml")) {
+        if (prefix.equals("xml"))
+        {
             throw new IllegalNameException(prefix, "Namespace prefix",
-             "The xml prefix can only be bound to " +
-             "http://www.w3.org/XML/1998/namespace");        
+                    "The xml prefix can only be bound to " +
+                    "http://www.w3.org/XML/1998/namespace");
         }
         // The erratum to Namespaces in XML 1.0 that suggests this 
         // next check is controversial. Not everyone accepts it. 
-        if (uri.equals("http://www.w3.org/XML/1998/namespace")) {
+        if (uri.equals("http://www.w3.org/XML/1998/namespace"))
+        {
             throw new IllegalNameException(uri, "Namespace URI",
-             "The http://www.w3.org/XML/1998/namespace must be bound to " +
-             "the xml prefix.");        
+                    "The http://www.w3.org/XML/1998/namespace must be bound to " +
+                    "the xml prefix.");
         }
 
         // Finally, store and return
@@ -196,7 +208,8 @@ public final class Namespace {
      * @param uri <code>String</code> URI of new <code>Namespace</code>.
      * @return <code>Namespace</code> - ready to use namespace.
      */
-    public static Namespace getNamespace(String uri) {
+    public static Namespace getNamespace(String uri)
+    {
         return getNamespace("", uri);
     }
 
@@ -208,7 +221,8 @@ public final class Namespace {
      * @param prefix <code>String</code> prefix to map to this namespace.
      * @param uri <code>String</code> URI for namespace.
      */
-    private Namespace(String prefix, String uri) {
+    private Namespace(String prefix, String uri)
+    {
         this.prefix = prefix;
         this.uri = uri;
     }
@@ -218,7 +232,8 @@ public final class Namespace {
      *
      * @return <code>String</code> - prefix for this <code>Namespace</code>.
      */
-    public String getPrefix() {
+    public String getPrefix()
+    {
         return prefix;
     }
 
@@ -227,7 +242,8 @@ public final class Namespace {
      *
      * @return <code>String</code> - URI for this <code>Namespace</code>.
      */
-    public String getURI() {
+    public String getURI()
+    {
         return uri;
     }
 
@@ -239,11 +255,14 @@ public final class Namespace {
      * @return <code>boolean</code> - whether the supplied object is equal to
      *         this <code>Namespace</code>.
      */
-    public boolean equals(Object ob) {
-        if (this == ob) {
+    public boolean equals(Object ob)
+    {
+        if (this == ob)
+        {
             return true;
         }
-        if (ob instanceof Namespace) {  // instanceof returns false if null
+        if (ob instanceof Namespace)
+        {  // instanceof returns false if null
             return uri.equals(((Namespace)ob).uri);
         }
         return false;
@@ -255,9 +274,10 @@ public final class Namespace {
      *
      * @return <code>String</code> - information about this instance.
      */
-    public String toString() {
-        return "[Namespace: prefix \"" + prefix + "\" is mapped to URI \"" + 
-               uri + "\"]";
+    public String toString()
+    {
+        return "[Namespace: prefix \"" + prefix + "\" is mapped to URI \"" +
+                uri + "\"]";
     }
 
     /**
@@ -267,7 +287,8 @@ public final class Namespace {
      *
      * @return <code>int</code> - hash code for this <code>Namespace</code>.
      */
-    public int hashCode() {
+    public int hashCode()
+    {
         return uri.hashCode();
     }
 }

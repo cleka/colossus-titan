@@ -10,26 +10,26 @@
  are met:
 
  1. Redistributions of source code must retain the above copyright
-    notice, this list of conditions, and the following disclaimer.
+ notice, this list of conditions, and the following disclaimer.
 
  2. Redistributions in binary form must reproduce the above copyright
-    notice, this list of conditions, and the disclaimer that follows
-    these conditions in the documentation and/or other materials
-    provided with the distribution.
+ notice, this list of conditions, and the disclaimer that follows
+ these conditions in the documentation and/or other materials
+ provided with the distribution.
 
  3. The name "JDOM" must not be used to endorse or promote products
-    derived from this software without prior written permission.  For
-    written permission, please contact <request_AT_jdom_DOT_org>.
+ derived from this software without prior written permission.  For
+ written permission, please contact <request_AT_jdom_DOT_org>.
 
  4. Products derived from this software may not be called "JDOM", nor
-    may "JDOM" appear in their name, without prior written permission
-    from the JDOM Project Management <request_AT_jdom_DOT_org>.
+ may "JDOM" appear in their name, without prior written permission
+ from the JDOM Project Management <request_AT_jdom_DOT_org>.
 
  In addition, we request (but do not require) that you include in the
  end-user documentation provided with the redistribution and/or in the
  software itself an acknowledgement equivalent to the following:
-     "This product includes software developed by the
-      JDOM Project (http://www.jdom.org/)."
+ "This product includes software developed by the
+ JDOM Project (http://www.jdom.org/)."
  Alternatively, the acknowledgment may be graphical using the logos
  available at http://www.jdom.org/images/logos.
 
@@ -56,6 +56,7 @@
 
 package org.jdom;
 
+
 /**
  * <code><b>CDATA</b></code> represents character-based content within an
  * XML document represented by JDOM. It is intended to provide a modular,
@@ -70,10 +71,11 @@ package org.jdom;
  * @author Bradley S. Huffman
  * @version $Revision$, $Date$
  */
-public class CDATA extends Text {
+public class CDATA extends Text
+{
 
-    private static final String CVS_ID = 
-      "@(#) $RCSfile$ $Revision$ $Date$ $Name$";
+    private static final String CVS_ID =
+            "@(#) $RCSfile$ $Revision$ $Date$ $Name$";
 
     private static final String EMPTY_STRING = "";
 
@@ -82,7 +84,9 @@ public class CDATA extends Text {
      * classes. It allows subclassers to get a raw instance with no
      * initialization.
      */
-    protected CDATA() { }
+    protected CDATA()
+    {
+    }
 
     /**
      * This constructor creates a new <code>CDATA</code> node, with the
@@ -94,7 +98,8 @@ public class CDATA extends Text {
      *          by {@link org.jdom.Verifier#checkCharacterData})
      *         or the CDATA end delimiter <code>]]&gt;</code>.
      */
-    public CDATA(String str) {
+    public CDATA(String str)
+    {
         setText(str);
     }
 
@@ -107,19 +112,22 @@ public class CDATA extends Text {
      *          by {@link org.jdom.Verifier#checkCharacterData})
      *         or the CDATA end delimiter <code>]]&gt;</code>.
      */
-    public Text setText(String str) {
+    public Text setText(String str)
+    {
         // Overrides Text.setText() because this needs to check CDATA
         // rules are enforced.  We could have a separate Verifier check
         // for CDATA beyond Text and call that alone before super.setText().
 
         String reason;
 
-        if (str == null) {
+        if (str == null)
+        {
             value = EMPTY_STRING;
             return this;
         }
 
-        if ((reason = Verifier.checkCDATASection(str)) != null) {
+        if ((reason = Verifier.checkCDATASection(str)) != null)
+        {
             throw new IllegalDataException(str, "CDATA section", reason);
         }
         value = str;
@@ -136,23 +144,31 @@ public class CDATA extends Text {
      *          by {@link org.jdom.Verifier#checkCharacterData})
      *         or the CDATA end delimiter <code>]]&gt;</code>.
      */
-    public void append(String str) {
+    public void append(String str)
+    {
         // Overrides Text.setText() because this needs to check CDATA
         // rules are enforced.  We could have a separate Verifier check
         // for CDATA beyond Text and call that alone before super.setText().
 
         String reason;
 
-        if (str == null) {
+        if (str == null)
+        {
             return;
         }
-        if ((reason = Verifier.checkCDATASection(str)) != null) {
+        if ((reason = Verifier.checkCDATASection(str)) != null)
+        {
             throw new IllegalDataException(str, "CDATA section", reason);
         }
 
         if (value == EMPTY_STRING)
-             value = str;
-        else value += str;
+        {
+            value = str;
+        }
+        else
+        {
+            value += str;
+        }
     }
 
     /**
@@ -160,16 +176,13 @@ public class CDATA extends Text {
      * <code>CDATA</code> node, suitable for debugging. If the XML
      * representation of the <code>CDATA</code> node is desired,
      * either <code>{@link #getText}</code> or
-     * {@link org.jdom.output.XMLOutputter#output(CDATA, Writer)}</code>
+     * {@link org.jdom.output.XMLOutputter#output(CDATA, java.io.Writer)}</code>
      * should be used.
      *
      * @return <code>String</code> - information about this node.
      */
-    public String toString() {
-        return new StringBuffer(64)
-            .append("[CDATA: ")
-            .append(getText())
-            .append("]")
-            .toString();
+    public String toString()
+    {
+        return new StringBuffer(64).append("[CDATA: ").append(getText()).append("]").toString();
     }
 }

@@ -10,26 +10,26 @@
  are met:
  
  1. Redistributions of source code must retain the above copyright
-    notice, this list of conditions, and the following disclaimer.
+ notice, this list of conditions, and the following disclaimer.
  
  2. Redistributions in binary form must reproduce the above copyright
-    notice, this list of conditions, and the disclaimer that follows 
-    these conditions in the documentation and/or other materials 
-    provided with the distribution.
+ notice, this list of conditions, and the disclaimer that follows 
+ these conditions in the documentation and/or other materials 
+ provided with the distribution.
 
  3. The name "JDOM" must not be used to endorse or promote products
-    derived from this software without prior written permission.  For
-    written permission, please contact <request_AT_jdom_DOT_org>.
+ derived from this software without prior written permission.  For
+ written permission, please contact <request_AT_jdom_DOT_org>.
  
  4. Products derived from this software may not be called "JDOM", nor
-    may "JDOM" appear in their name, without prior written permission
-    from the JDOM Project Management <request_AT_jdom_DOT_org>.
+ may "JDOM" appear in their name, without prior written permission
+ from the JDOM Project Management <request_AT_jdom_DOT_org>.
  
  In addition, we request (but do not require) that you include in the 
  end-user documentation provided with the redistribution and/or in the 
  software itself an acknowledgement equivalent to the following:
-     "This product includes software developed by the
-      JDOM Project (http://www.jdom.org/)."
+ "This product includes software developed by the
+ JDOM Project (http://www.jdom.org/)."
  Alternatively, the acknowledgment may be graphical using the logos 
  available at http://www.jdom.org/images/logos.
 
@@ -56,18 +56,14 @@
 
 package org.jdom.adapters;
 
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 
+import java.io.*;
+import java.lang.reflect.*;
+
+import org.jdom.*;
+import org.jdom.input.*;
 import org.w3c.dom.Document;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXParseException;
 
-import org.jdom.JDOMException;
-import org.jdom.input.BuilderErrorHandler;
 
 /**
  * <b><code>JAXPDOMAdapater</code></b>.
@@ -79,10 +75,11 @@ import org.jdom.input.BuilderErrorHandler;
  * @author Jason Hunter
  * @version $Revision$, $Date$
  */
-public class JAXPDOMAdapter extends AbstractDOMAdapter {
+public class JAXPDOMAdapter extends AbstractDOMAdapter
+{
 
-    private static final String CVS_ID = 
-      "@(#) $RCSfile$ $Revision$ $Date$ $Name$";
+    private static final String CVS_ID =
+            "@(#) $RCSfile$ $Revision$ $Date$ $Name$";
 
     /**
      * This creates a new <code>{@link Document}</code> from an
@@ -95,67 +92,78 @@ public class JAXPDOMAdapter extends AbstractDOMAdapter {
      * @return <code>Document</code> - instance ready for use.
      * @throws IOException when I/O error occurs.
      * @throws JDOMException when errors occur in parsing.
-      */
+     */
     public Document getDocument(InputStream in, boolean validate)
-        throws IOException, JDOMException {
+        throws IOException, JDOMException
+    {
 
-        try {
+        try
+        {
             // Try using JAXP...
             // Note we need DOM Level 2 and thus JAXP 1.1.
             Class.forName("javax.xml.transform.Transformer");
 
             // Try JAXP 1.1 calls to build the document
             Class factoryClass =
-                Class.forName("javax.xml.parsers.DocumentBuilderFactory");
+                    Class.forName("javax.xml.parsers.DocumentBuilderFactory");
 
             // factory = DocumentBuilderFactory.newInstance();
             Method newParserInstance =
-                factoryClass.getMethod("newInstance", null);
+                    factoryClass.getMethod("newInstance", null);
             Object factory = newParserInstance.invoke(null, null);
 
             // factory.setValidating(validate);
             Method setValidating =
-                factoryClass.getMethod("setValidating",
-                                   new Class[]{boolean.class});
+                    factoryClass.getMethod("setValidating",
+                    new Class[] {boolean.class});
             setValidating.invoke(factory,
-                                 new Object[]{new Boolean(validate)});
+                    new Object[] {new Boolean(validate)});
 
             // factory.setNamespaceAware(true);
             Method setNamespaceAware =
-                factoryClass.getMethod("setNamespaceAware",
-                                       new Class[]{boolean.class});
+                    factoryClass.getMethod("setNamespaceAware",
+                    new Class[] {boolean.class});
             setNamespaceAware.invoke(factory,
-                                 new Object[]{Boolean.TRUE});
-    
+                    new Object[] {Boolean.TRUE});
+
             // jaxpParser = factory.newDocumentBuilder();
             Method newDocBuilder =
-                factoryClass.getMethod("newDocumentBuilder", null);
-            Object jaxpParser  = newDocBuilder.invoke(factory, null);
+                    factoryClass.getMethod("newDocumentBuilder", null);
+            Object jaxpParser = newDocBuilder.invoke(factory, null);
 
             // jaxpParser.setErrorHandler(null);
             Class parserClass = jaxpParser.getClass();
             Method setErrorHandler =
-                parserClass.getMethod("setErrorHandler",
-                                 new Class[]{org.xml.sax.ErrorHandler.class});
+                    parserClass.getMethod("setErrorHandler",
+                    new Class[] {org.xml.sax.ErrorHandler.class});
             setErrorHandler.invoke(jaxpParser,
-                                 new Object[]{new BuilderErrorHandler()});
+                    new Object[] {new BuilderErrorHandler()});
 
             // domDoc = jaxpParser.parse(in);
             Method parse = parserClass.getMethod(
-                "parse", new Class[]{InputStream.class});
+                    "parse", new Class[] {InputStream.class});
             org.w3c.dom.Document domDoc = (org.w3c.dom.Document)
-                parse.invoke(jaxpParser, new Object[]{in});
+                    parse.invoke(jaxpParser, new Object[] {in});
 
             return domDoc;
-        } catch (InvocationTargetException e) {
+        }
+        catch (InvocationTargetException e)
+        {
             Throwable targetException = e.getTargetException();
-            if (targetException instanceof IOException) {
-                throw (IOException) targetException;
-            } else {
-                throw new JDOMException(targetException.getMessage(), targetException);
+            if (targetException instanceof IOException)
+            {
+                throw (IOException)targetException;
             }
-        } catch (Exception e) {
-            throw new JDOMException("Reflection failed while parsing a document with JAXP", e); 
+            else
+            {
+                throw new JDOMException(targetException.getMessage(),
+                        targetException);
+            }
+        }
+        catch (Exception e)
+        {
+            throw new JDOMException("Reflection failed while parsing a document with JAXP",
+                    e);
         }
 
         // Allow all exceptions to pass through
@@ -167,38 +175,43 @@ public class JAXPDOMAdapter extends AbstractDOMAdapter {
      *
      * @return <code>Document</code> - created DOM Document.
      * @throws JDOMException when errors occur in parsing.
-      */
-    public Document createDocument() 
-        throws JDOMException {
+     */
+    public Document createDocument()
+        throws JDOMException
+    {
 
-        try {
+        try
+        {
             // We need DOM Level 2 and thus JAXP 1.1.
             // If JAXP 1.0 is all that's available then we error out.
             Class.forName("javax.xml.transform.Transformer");
 
             // Try JAXP 1.1 calls to build the document
             Class factoryClass =
-                Class.forName("javax.xml.parsers.DocumentBuilderFactory");
+                    Class.forName("javax.xml.parsers.DocumentBuilderFactory");
 
             // factory = DocumentBuilderFactory.newInstance();
             Method newParserInstance =
-                factoryClass.getMethod("newInstance", null);
+                    factoryClass.getMethod("newInstance", null);
             Object factory = newParserInstance.invoke(null, null);
 
             // jaxpParser = factory.newDocumentBuilder();
             Method newDocBuilder =
-                factoryClass.getMethod("newDocumentBuilder", null);
-            Object jaxpParser  = newDocBuilder.invoke(factory, null);
+                    factoryClass.getMethod("newDocumentBuilder", null);
+            Object jaxpParser = newDocBuilder.invoke(factory, null);
 
             // domDoc = jaxpParser.newDocument();
             Class parserClass = jaxpParser.getClass();
             Method newDoc = parserClass.getMethod("newDocument", null);
             org.w3c.dom.Document domDoc =
-                (org.w3c.dom.Document) newDoc.invoke(jaxpParser, null);
+                    (org.w3c.dom.Document)newDoc.invoke(jaxpParser, null);
 
             return domDoc;
-        } catch (Exception e) {
-            throw new JDOMException("Reflection failed while creating new JAXP document", e); 
+        }
+        catch (Exception e)
+        {
+            throw new JDOMException("Reflection failed while creating new JAXP document",
+                    e);
         }
 
     }

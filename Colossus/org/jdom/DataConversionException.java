@@ -10,26 +10,26 @@
  are met:
  
  1. Redistributions of source code must retain the above copyright
-    notice, this list of conditions, and the following disclaimer.
+ notice, this list of conditions, and the following disclaimer.
  
  2. Redistributions in binary form must reproduce the above copyright
-    notice, this list of conditions, and the disclaimer that follows 
-    these conditions in the documentation and/or other materials 
-    provided with the distribution.
+ notice, this list of conditions, and the disclaimer that follows 
+ these conditions in the documentation and/or other materials 
+ provided with the distribution.
 
  3. The name "JDOM" must not be used to endorse or promote products
-    derived from this software without prior written permission.  For
-    written permission, please contact <request_AT_jdom_DOT_org>.
+ derived from this software without prior written permission.  For
+ written permission, please contact <request_AT_jdom_DOT_org>.
  
  4. Products derived from this software may not be called "JDOM", nor
-    may "JDOM" appear in their name, without prior written permission
-    from the JDOM Project Management <request_AT_jdom_DOT_org>.
+ may "JDOM" appear in their name, without prior written permission
+ from the JDOM Project Management <request_AT_jdom_DOT_org>.
  
  In addition, we request (but do not require) that you include in the 
  end-user documentation provided with the redistribution and/or in the 
  software itself an acknowledgement equivalent to the following:
-     "This product includes software developed by the
-      JDOM Project (http://www.jdom.org/)."
+ "This product includes software developed by the
+ JDOM Project (http://www.jdom.org/)."
  Alternatively, the acknowledgment may be graphical using the logos 
  available at http://www.jdom.org/images/logos.
 
@@ -56,6 +56,7 @@
 
 package org.jdom;
 
+
 /**
  * <code>DataConversionException</code>
  * is thrown when a requested XML value
@@ -66,10 +67,11 @@ package org.jdom;
  * @author Jason Hunter
  * @version $Revision$, $Date$
  */
-public class DataConversionException extends JDOMException {
+public class DataConversionException extends JDOMException
+{
 
-    private static final String CVS_ID = 
-      "@(#) $RCSfile$ $Revision$ $Date$ $Name$";
+    private static final String CVS_ID =
+            "@(#) $RCSfile$ $Revision$ $Date$ $Name$";
 
     /**
      * This will create an <code>Exception</code> indicating
@@ -81,12 +83,8 @@ public class DataConversionException extends JDOMException {
      * @param dataType <code>String</code> name of data type
      *                 being converted to.
      */
-    public DataConversionException(String name, String dataType) {
-        super(new StringBuffer()
-              .append("The XML construct ")
-              .append(name)
-              .append(" could not be converted to a ")
-              .append(dataType)
-              .toString());
+    public DataConversionException(String name, String dataType)
+    {
+        super(new StringBuffer().append("The XML construct ").append(name).append(" could not be converted to a ").append(dataType).toString());
     }
 }

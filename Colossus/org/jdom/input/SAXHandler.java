@@ -10,26 +10,26 @@
  are met:
 
  1. Redistributions of source code must retain the above copyright
-    notice, this list of conditions, and the following disclaimer.
+ notice, this list of conditions, and the following disclaimer.
 
  2. Redistributions in binary form must reproduce the above copyright
-    notice, this list of conditions, and the disclaimer that follows
-    these conditions in the documentation and/or other materials
-    provided with the distribution.
+ notice, this list of conditions, and the disclaimer that follows
+ these conditions in the documentation and/or other materials
+ provided with the distribution.
 
  3. The name "JDOM" must not be used to endorse or promote products
-    derived from this software without prior written permission.  For
-    written permission, please contact <request_AT_jdom_DOT_org>.
+ derived from this software without prior written permission.  For
+ written permission, please contact <request_AT_jdom_DOT_org>.
 
  4. Products derived from this software may not be called "JDOM", nor
-    may "JDOM" appear in their name, without prior written permission
-    from the JDOM Project Management <request_AT_jdom_DOT_org>.
+ may "JDOM" appear in their name, without prior written permission
+ from the JDOM Project Management <request_AT_jdom_DOT_org>.
 
  In addition, we request (but do not require) that you include in the
  end-user documentation provided with the redistribution and/or in the
  software itself an acknowledgement equivalent to the following:
-     "This product includes software developed by the
-      JDOM Project (http://www.jdom.org/)."
+ "This product includes software developed by the
+ JDOM Project (http://www.jdom.org/)."
  Alternatively, the acknowledgment may be graphical using the logos
  available at http://www.jdom.org/images/logos.
 
@@ -56,18 +56,14 @@
 
 package org.jdom.input;
 
-import java.io.*;
-import java.lang.reflect.*;
-import java.net.*;
+
 import java.util.*;
 
 import org.jdom.*;
-
 import org.xml.sax.*;
-import org.xml.sax.ext.LexicalHandler;
-import org.xml.sax.ext.DeclHandler;
-import org.xml.sax.helpers.DefaultHandler;
-import org.xml.sax.helpers.XMLReaderFactory;
+import org.xml.sax.ext.*;
+import org.xml.sax.helpers.*;
+
 
 /**
  * <code>SAXHandler</code> supports SAXBuilder.
@@ -80,11 +76,12 @@ import org.xml.sax.helpers.XMLReaderFactory;
  * @version $Revision$, $Date$
  */
 public class SAXHandler extends DefaultHandler implements LexicalHandler,
-                                                          DeclHandler,
-                                                          DTDHandler {
+            DeclHandler,
+            DTDHandler
+{
 
     private static final String CVS_ID =
-      "@(#) $RCSfile$ $Revision$ $Date$ $Name$";
+            "@(#) $RCSfile$ $Revision$ $Date$ $Name$";
 
     /** Hash table to map SAX attribute type names to JDOM attribute types. */
     private static final Map attrNameToTypeMap = new HashMap(13);
@@ -92,19 +89,15 @@ public class SAXHandler extends DefaultHandler implements LexicalHandler,
     /** <code>Document</code> object being built */
     private Document document;
 
-    // Note: keeping a "current element" variable to avoid the constant
-    // peek() calls to the top of the stack has shown to cause no noticeable
-    // performance improvement.
-
-    /** Element stack */
-    protected Stack stack;
+    /** <code>Element</code> object being built */
+    protected Element currentElement;
 
     /** Indicator of where in the document we are */
     protected boolean atRoot;
 
     /** Indicator of whether we are in the DocType. Note that the DTD consists
      * of both the internal subset (inside the <!DOCTYPE> tag) and the 
-      * external subset (in a separate .dtd file). */
+     * external subset (in a separate .dtd file). */
     protected boolean inDTD = false;
 
     /** Indicator of whether we are in the internal subset */
@@ -120,18 +113,15 @@ public class SAXHandler extends DefaultHandler implements LexicalHandler,
     private boolean expand = true;
 
     /** Indicator of whether we are actively suppressing (non-expanding) a
-        current entity */
+     current entity */
     protected boolean suppress = false;
 
     /** How many nested entities we're currently within */
     private int entityDepth = 0;  // XXX may not be necessary anymore?
 
     /** Temporary holder for namespaces that have been declared with
-      * startPrefixMapping, but are not yet available on the element */
-    protected LinkedList declaredNamespaces;
-
-    /** The namespaces in scope and actually attached to an element */
-    protected LinkedList availableNamespaces;
+     * startPrefixMapping, but are not yet available on the element */
+    protected List declaredNamespaces;
 
     /** Temporary holder for the internal subset */
     private StringBuffer internalSubset = new StringBuffer();
@@ -167,27 +157,28 @@ public class SAXHandler extends DefaultHandler implements LexicalHandler,
      * {@link #getAttributeType specific code}.
      * </p>
      */
-    static {
+    static
+    {
         attrNameToTypeMap.put("CDATA",
-                              new Integer(Attribute.CDATA_ATTRIBUTE));
+                new Integer(Attribute.CDATA_ATTRIBUTE));
         attrNameToTypeMap.put("ID",
-                              new Integer(Attribute.ID_ATTRIBUTE));
+                new Integer(Attribute.ID_ATTRIBUTE));
         attrNameToTypeMap.put("IDREF",
-                              new Integer(Attribute.IDREF_ATTRIBUTE));
+                new Integer(Attribute.IDREF_ATTRIBUTE));
         attrNameToTypeMap.put("IDREFS",
-                              new Integer(Attribute.IDREFS_ATTRIBUTE));
+                new Integer(Attribute.IDREFS_ATTRIBUTE));
         attrNameToTypeMap.put("ENTITY",
-                              new Integer(Attribute.ENTITY_ATTRIBUTE));
+                new Integer(Attribute.ENTITY_ATTRIBUTE));
         attrNameToTypeMap.put("ENTITIES",
-                              new Integer(Attribute.ENTITIES_ATTRIBUTE));
+                new Integer(Attribute.ENTITIES_ATTRIBUTE));
         attrNameToTypeMap.put("NMTOKEN",
-                              new Integer(Attribute.NMTOKEN_ATTRIBUTE));
+                new Integer(Attribute.NMTOKEN_ATTRIBUTE));
         attrNameToTypeMap.put("NMTOKENS",
-                              new Integer(Attribute.NMTOKENS_ATTRIBUTE));
+                new Integer(Attribute.NMTOKENS_ATTRIBUTE));
         attrNameToTypeMap.put("NOTATION",
-                              new Integer(Attribute.NOTATION_ATTRIBUTE));
+                new Integer(Attribute.NOTATION_ATTRIBUTE));
         attrNameToTypeMap.put("ENUMERATION",
-                              new Integer(Attribute.ENUMERATED_ATTRIBUTE));
+                new Integer(Attribute.ENUMERATED_ATTRIBUTE));
     }
 
     /**
@@ -195,7 +186,8 @@ public class SAXHandler extends DefaultHandler implements LexicalHandler,
      * events and creates a JDOM Document.  The objects will be constructed
      * using the default factory.
      */
-    public SAXHandler() {
+    public SAXHandler()
+    {
         this((JDOMFactory)null);
     }
 
@@ -207,18 +199,19 @@ public class SAXHandler extends DefaultHandler implements LexicalHandler,
      * @param factory <code>JDOMFactory</code> to be used for constructing
      * objects
      */
-    public SAXHandler(JDOMFactory factory) {
-        if (factory != null) {
+    public SAXHandler(JDOMFactory factory)
+    {
+        if (factory != null)
+        {
             this.factory = factory;
-        } else {
+        }
+        else
+        {
             this.factory = new DefaultJDOMFactory();
         }
 
         atRoot = true;
-        stack = new Stack();
-        declaredNamespaces = new LinkedList();
-        availableNamespaces = new LinkedList();
-        availableNamespaces.add(Namespace.XML_NAMESPACE);
+        declaredNamespaces = new ArrayList();
         externalEntities = new HashMap();
 
         document = this.factory.document((Element)null);
@@ -229,7 +222,8 @@ public class SAXHandler extends DefaultHandler implements LexicalHandler,
      *
      * @return <code>Document</code> - Document that was built
      */
-    public Document getDocument() {
+    public Document getDocument()
+    {
         return document;
     }
 
@@ -241,7 +235,8 @@ public class SAXHandler extends DefaultHandler implements LexicalHandler,
      *
      * @see #SAXHandler(org.jdom.input.JDOMFactory)
      */
-    public JDOMFactory getFactory() {
+    public JDOMFactory getFactory()
+    {
         return factory;
     }
 
@@ -254,7 +249,8 @@ public class SAXHandler extends DefaultHandler implements LexicalHandler,
      * @param expand <code>boolean</code> indicating whether entity expansion
      * should occur.
      */
-    public void setExpandEntities(boolean expand) {
+    public void setExpandEntities(boolean expand)
+    {
         this.expand = expand;
     }
 
@@ -267,7 +263,8 @@ public class SAXHandler extends DefaultHandler implements LexicalHandler,
      *
      * @see #setExpandEntities
      */
-    public boolean getExpandEntities() {
+    public boolean getExpandEntities()
+    {
         return expand;
     }
 
@@ -282,7 +279,8 @@ public class SAXHandler extends DefaultHandler implements LexicalHandler,
      *
      * @param ignoringWhite Whether to ignore ignorable whitespace
      */
-    public void setIgnoringElementContentWhitespace(boolean ignoringWhite) {
+    public void setIgnoringElementContentWhitespace(boolean ignoringWhite)
+    {
         this.ignoringWhite = ignoringWhite;
     }
 
@@ -296,7 +294,8 @@ public class SAXHandler extends DefaultHandler implements LexicalHandler,
      *
      * @see #setIgnoringElementContentWhitespace
      */
-    public boolean getIgnoringElementContentWhitespace() {
+    public boolean getIgnoringElementContentWhitespace()
+    {
         return ignoringWhite;
     }
 
@@ -310,15 +309,18 @@ public class SAXHandler extends DefaultHandler implements LexicalHandler,
      * @throws SAXException when things go wrong
      */
     public void externalEntityDecl(String name,
-                                   String publicID, String systemID)
-                                   throws SAXException {
+            String publicID, String systemID)
+        throws SAXException
+    {
         // Store the public and system ids for the name
-        externalEntities.put(name, new String[]{publicID, systemID});
+        externalEntities.put(name, new String[] {publicID, systemID});
 
-        if (!inInternalSubset) return;
+        if (!inInternalSubset)
+        {
+            return;
+        }
 
-        internalSubset.append("  <!ENTITY ")
-              .append(name);
+        internalSubset.append("  <!ENTITY ").append(name);
         appendExternalId(publicID, systemID);
         internalSubset.append(">\n");
     }
@@ -333,29 +335,27 @@ public class SAXHandler extends DefaultHandler implements LexicalHandler,
      * @param value <code>String</code> value of attribute
      */
     public void attributeDecl(String eName, String aName, String type,
-                              String valueDefault, String value)
-        throws SAXException {
+            String valueDefault, String value)
+        throws SAXException
+    {
 
-        if (!inInternalSubset) return;
-
-        internalSubset.append("  <!ATTLIST ")
-              .append(eName)
-              .append(" ")
-              .append(aName)
-              .append(" ")
-              .append(type)
-              .append(" ");
-        if (valueDefault != null) {
-              internalSubset.append(valueDefault);
-        } else {
-            internalSubset.append("\"")
-                  .append(value)
-                  .append("\"");
+        if (!inInternalSubset)
+        {
+            return;
         }
-        if ((valueDefault != null) && (valueDefault.equals("#FIXED"))) {
-            internalSubset.append(" \"")
-                  .append(value)
-                  .append("\"");
+
+        internalSubset.append("  <!ATTLIST ").append(eName).append(" ").append(aName).append(" ").append(type).append(" ");
+        if (valueDefault != null)
+        {
+            internalSubset.append(valueDefault);
+        }
+        else
+        {
+            internalSubset.append("\"").append(value).append("\"");
+        }
+        if ((valueDefault != null) && (valueDefault.equals("#FIXED")))
+        {
+            internalSubset.append(" \"").append(value).append("\"");
         }
         internalSubset.append(">\n");
     }
@@ -366,15 +366,16 @@ public class SAXHandler extends DefaultHandler implements LexicalHandler,
      * @param name <code>String</code> name of element
      * @param model <code>String</code> model of the element in DTD syntax
      */
-    public void elementDecl(String name, String model) throws SAXException {
+    public void elementDecl(String name, String model)
+        throws SAXException
+    {
         // Skip elements that come from the external subset
-        if (!inInternalSubset) return;
+        if (!inInternalSubset)
+        {
+            return;
+        }
 
-        internalSubset.append("  <!ELEMENT ")
-              .append(name)
-              .append(" ")
-              .append(model)
-              .append(">\n");
+        internalSubset.append("  <!ELEMENT ").append(name).append(" ").append(model).append(">\n");
     }
 
     /**
@@ -384,20 +385,25 @@ public class SAXHandler extends DefaultHandler implements LexicalHandler,
      * @param value <code>String</code> value of the entity
      */
     public void internalEntityDecl(String name, String value)
-        throws SAXException { 
+        throws SAXException
+    {
 
         // Skip entities that come from the external subset
-        if (!inInternalSubset) return;
+        if (!inInternalSubset)
+        {
+            return;
+        }
 
         internalSubset.append("  <!ENTITY ");
-        if (name.startsWith("%")) {
-           internalSubset.append("% ").append(name.substring(1));
-        } else {
-           internalSubset.append(name);
+        if (name.startsWith("%"))
+        {
+            internalSubset.append("% ").append(name.substring(1));
         }
-        internalSubset.append(" \"")
-              .append(value)
-              .append("\">\n");
+        else
+        {
+            internalSubset.append(name);
+        }
+        internalSubset.append(" \"").append(value).append("\">\n");
     }
 
     /**
@@ -412,17 +418,24 @@ public class SAXHandler extends DefaultHandler implements LexicalHandler,
      * @throws SAXException when things go wrong
      */
     public void processingInstruction(String target, String data)
-        throws SAXException {
+        throws SAXException
+    {
 
-        if (suppress) return;
+        if (suppress)
+        {
+            return;
+        }
 
         flushCharacters();
 
-        if (atRoot) {
+        if (atRoot)
+        {
             document.addContent(factory.processingInstruction(target, data));
-        } else {
+        }
+        else
+        {
             getCurrentElement().addContent(
-                factory.processingInstruction(target, data));
+                    factory.processingInstruction(target, data));
         }
     }
 
@@ -435,11 +448,15 @@ public class SAXHandler extends DefaultHandler implements LexicalHandler,
      * @throws SAXException when things go wrong
      */
     public void skippedEntity(String name)
-        throws SAXException {
+        throws SAXException
+    {
 
         // We don't handle parameter entity references.
-        if (name.startsWith("%")) return; 
-       
+        if (name.startsWith("%"))
+        {
+            return;
+        }
+
         flushCharacters();
 
         getCurrentElement().addContent(factory.entityRef(name));
@@ -453,39 +470,16 @@ public class SAXHandler extends DefaultHandler implements LexicalHandler,
      * @param uri <code>String</code> namespace URI.
      */
     public void startPrefixMapping(String prefix, String uri)
-        throws SAXException {
+        throws SAXException
+    {
 
-        if (suppress) return;
+        if (suppress)
+        {
+            return;
+        }
 
         Namespace ns = Namespace.getNamespace(prefix, uri);
         declaredNamespaces.add(ns);
-    }
-
-    /**
-     * This will add the prefix mapping to the JDOM
-     * <code>Document</code> object.
-     *
-     * @param prefix <code>String</code> namespace prefix.
-     * @param uri <code>String</code> namespace URI.
-     */
-    public void endPrefixMapping(String prefix)
-        throws SAXException {
-
-        if (suppress) return;
-
-        // Remove the namespace from the available list
-        // (Should find the namespace fast because recent adds
-        // are at the front of the list.  It may not be the head
-        // tho because endPrefixMapping calls on the same element
-        // can come in any order.)
-        Iterator itr = availableNamespaces.iterator();
-        while (itr.hasNext()) {
-            Namespace ns = (Namespace) itr.next();
-            if (prefix.equals(ns.getPrefix())) {
-                itr.remove();
-                return;
-            }
-        }
     }
 
     /**
@@ -506,48 +500,45 @@ public class SAXHandler extends DefaultHandler implements LexicalHandler,
      * @throws SAXException when things go wrong
      */
     public void startElement(String namespaceURI, String localName,
-                             String qName, Attributes atts)
-                             throws SAXException {
-        if (suppress) return;
+            String qName, Attributes atts)
+        throws SAXException
+    {
+        if (suppress)
+        {
+            return;
+        }
 
         Element element = null;
 
-        if ((namespaceURI != null) && (!namespaceURI.equals(""))) {
+        if ((namespaceURI != null) && (!namespaceURI.equals("")))
+        {
             String prefix = "";
 
             // Determine any prefix on the Element
-            if (!qName.equals(localName)) {
+            if (!qName.equals(localName))
+            {
                 int split = qName.indexOf(":");
                 prefix = qName.substring(0, split);
             }
             Namespace elementNamespace =
-                Namespace.getNamespace(prefix, namespaceURI);
+                    Namespace.getNamespace(prefix, namespaceURI);
             element = factory.element(localName, elementNamespace);
-
-            // Remove this namespace from those in the temp declared list
-/**
- * I've commented out these lines to ensure that element's that have a namespace
- *   make those namespaces available to their attributes, which this seems to
- *   break. However, I'm not 100% sure that this doesn't cause some other
- *   problems. My gut feeling is "no", but I'm not sure, so I'm just commenting
- *   it out. We'll remove for good in the next drop I think.
- * - Brett, 07/30/2001
-            if (declaredNamespaces.size() > 0) {
-                declaredNamespaces.remove(elementNamespace);
-            }
- */
-        } else {
+        }
+        else
+        {
             element = factory.element(localName);
         }
 
         // Take leftover declared namespaces and add them to this element's
         // map of namespaces
-        if (declaredNamespaces.size() > 0) {
+        if (declaredNamespaces.size() > 0)
+        {
             transferNamespaces(element);
         }
 
         // Handle attributes
-        for (int i=0, len=atts.getLength(); i<len; i++) {
+        for (int i = 0, len = atts.getLength(); i < len; i++)
+        {
             Attribute attribute = null;
 
             String attLocalName = atts.getLocalName(i);
@@ -558,31 +549,40 @@ public class SAXHandler extends DefaultHandler implements LexicalHandler,
             // them already in startPrefixMapping().
             // This is sometimes necessary when SAXHandler is used with
             // another source than SAXBuilder, as with JDOMResult.
-            if (attQName.startsWith("xmlns:") || attQName.equals("xmlns")) {
+            if (attQName.startsWith("xmlns:") || attQName.equals("xmlns"))
+            {
                 continue;
             }
 
-            if (!attQName.equals(attLocalName)) {
+            if (!attQName.equals(attLocalName))
+            {
                 String attPrefix = attQName.substring(0, attQName.indexOf(":"));
+                Namespace attNs = Namespace.getNamespace(attPrefix,
+                        atts.getURI(i));
+
                 attribute = factory.attribute(attLocalName, atts.getValue(i),
-                                              attType, getNamespace(attPrefix));
-            } else {
+                        attType, attNs);
+            }
+            else
+            {
                 attribute = factory.attribute(attLocalName, atts.getValue(i),
-                                              attType);
+                        attType);
             }
             element.setAttribute(attribute);
         }
 
         flushCharacters();
 
-        if (atRoot) {
+        if (atRoot)
+        {
             document.setRootElement(element);
-            stack.push(element);
             atRoot = false;
-        } else {
-            getCurrentElement().addContent(element);
-            stack.push(element);
         }
+        else
+        {
+            getCurrentElement().addContent(element);
+        }
+        currentElement = element;
     }
 
     /**
@@ -591,33 +591,18 @@ public class SAXHandler extends DefaultHandler implements LexicalHandler,
      *
      * @param element <code>Element</code> to read namespaces from.
      */
-    private void transferNamespaces(Element element) {
+    private void transferNamespaces(Element element)
+    {
         Iterator i = declaredNamespaces.iterator();
-        while (i.hasNext()) {
+        while (i.hasNext())
+        {
             Namespace ns = (Namespace)i.next();
-            availableNamespaces.addFirst(ns);
-            element.addNamespaceDeclaration(ns);
-        }
-        declaredNamespaces.clear();
-    }
-
-    /**
-     * For a given namespace prefix, this will return the
-     * <code>{@link Namespace}</code> object for that prefix,
-     * within the current scope.
-     *
-     * @param prefix namespace prefix.
-     * @return <code>Namespace</code> - namespace for supplied prefix.
-     */
-    private Namespace getNamespace(String prefix) {
-        Iterator i = availableNamespaces.iterator();
-        while (i.hasNext()) {
-            Namespace ns = (Namespace)i.next();
-            if (prefix.equals(ns.getPrefix())) {
-                return ns;
+            if (ns != element.getNamespace())
+            {
+                element.addNamespaceDeclaration(ns);
             }
         }
-        return Namespace.NO_NAMESPACE;
+        declaredNamespaces.clear();
     }
 
     /**
@@ -628,12 +613,16 @@ public class SAXHandler extends DefaultHandler implements LexicalHandler,
      * @param length <code>int</code> length of data.
      */
     public void characters(char[] ch, int start, int length)
-                    throws SAXException {
+        throws SAXException
+    {
 
         if (suppress || (length == 0))
+        {
             return;
+        }
 
-        if (previousCDATA != inCDATA) {
+        if (previousCDATA != inCDATA)
+        {
             flushCharacters();
         }
 
@@ -651,8 +640,10 @@ public class SAXHandler extends DefaultHandler implements LexicalHandler,
      * @throws SAXException when things go wrong
      */
     public void ignorableWhitespace(char[] ch, int start, int length)
-                                                     throws SAXException {
-        if (!ignoringWhite) {
+        throws SAXException
+    {
+        if (!ignoringWhite)
+        {
             characters(ch, start, length);
         }
     }
@@ -663,9 +654,12 @@ public class SAXHandler extends DefaultHandler implements LexicalHandler,
      *
      * @throws SAXException when things go wrong
      */
-    protected void flushCharacters() throws SAXException {
+    protected void flushCharacters()
+        throws SAXException
+    {
 
-        if (textBuffer.size() == 0) {
+        if (textBuffer.size() == 0)
+        {
             previousCDATA = inCDATA;
             return;
         }
@@ -673,21 +667,23 @@ public class SAXHandler extends DefaultHandler implements LexicalHandler,
         String data = textBuffer.toString();
         textBuffer.clear();
 
-/**
- * This is commented out because of some problems with
- * the inline DTDs that Xerces seems to have.
-if (!inDTD) {
-  if (inEntity) {
-    getCurrentElement().setContent(factory.text(data));
-  } else {
-    getCurrentElement().addContent(factory.text(data));
-}
-*/
+        /**
+         * This is commented out because of some problems with
+         * the inline DTDs that Xerces seems to have.
+         if (!inDTD) {
+         if (inEntity) {
+         getCurrentElement().setContent(factory.text(data));
+         } else {
+         getCurrentElement().addContent(factory.text(data));
+         }
+         */
 
-        if (previousCDATA) {
+        if (previousCDATA)
+        {
             getCurrentElement().addContent(factory.cdata(data));
         }
-        else {
+        else
+        {
             getCurrentElement().addContent(factory.text(data));
         }
 
@@ -707,28 +703,30 @@ if (!inDTD) {
      * @throws SAXException when things go wrong
      */
     public void endElement(String namespaceURI, String localName,
-                           String qName) throws SAXException {
+            String qName)
+        throws SAXException
+    {
 
-        if (suppress) return;
+        if (suppress)
+        {
+            return;
+        }
 
         flushCharacters();
 
-        try {
-            Element element = (Element)stack.pop();
-
-            // Remove the namespaces that this element makes available
-            List addl = element.getAdditionalNamespaces();
-            if (addl.size() > 0) {
-                availableNamespaces.removeAll(addl);
+        if (!atRoot)
+        {
+            currentElement = currentElement.getParent();
+            if (currentElement == null)
+            {
+                atRoot = true;
             }
         }
-        catch (EmptyStackException ex1) {
+        else
+        {
             throw new SAXException(
-                "Ill-formed XML document (missing opening tag for " +
-                localName + ")");
-        }
-        if (stack.empty()) {
-            atRoot = true;
+                    "Ill-formed XML document (missing opening tag for " +
+                    localName + ")");
         }
     }
 
@@ -743,12 +741,13 @@ if (!inDTD) {
      * @param systemID <code>String</code> system ID of DTD
      */
     public void startDTD(String name, String publicID, String systemID)
-        throws SAXException {
+        throws SAXException
+    {
 
         flushCharacters(); //XXX Is this needed here?
 
         document.setDocType(
-            factory.docType(name, publicID, systemID));
+                factory.docType(name, publicID, systemID));
         inDTD = true;
         inInternalSubset = true;
     }
@@ -756,51 +755,62 @@ if (!inDTD) {
     /**
      * This signifies that the reading of the DTD is complete.
      */
-    public void endDTD() throws SAXException {
+    public void endDTD()
+        throws SAXException
+    {
 
         document.getDocType().setInternalSubset(internalSubset.toString());
         inDTD = false;
         inInternalSubset = false;
     }
 
-    public void startEntity(String name) throws SAXException {
+    public void startEntity(String name)
+        throws SAXException
+    {
         entityDepth++;
 
-        if (expand || entityDepth > 1) {
+        if (expand || entityDepth > 1)
+        {
             // Short cut out if we're expanding or if we're nested
             return;
         }
 
         // A "[dtd]" entity indicates the beginning of the external subset
-        if (name.equals("[dtd]")) {
+        if (name.equals("[dtd]"))
+        {
             inInternalSubset = false;
             return;
         }
 
         // Ignore DTD references, and translate the standard 5
         if ((!inDTD) &&
-            (!name.equals("amp")) &&
-            (!name.equals("lt")) &&
-            (!name.equals("gt")) &&
-            (!name.equals("apos")) &&
-            (!name.equals("quot"))) {
+                (!name.equals("amp")) &&
+                (!name.equals("lt")) &&
+                (!name.equals("gt")) &&
+                (!name.equals("apos")) &&
+                (!name.equals("quot")))
+        {
 
-            if (!expand) {
+            if (!expand)
+            {
                 String pub = null;
                 String sys = null;
-                String[] ids = (String[]) externalEntities.get(name);
-                if (ids != null) {
-                  pub = ids[0];  // may be null, that's OK
-                  sys = ids[1];  // may be null, that's OK
+                String[] ids = (String[])externalEntities.get(name);
+                if (ids != null)
+                {
+                    pub = ids[0];  // may be null, that's OK
+                    sys = ids[1];  // may be null, that's OK
                 }
+
                 /**
-                 * if stack is empty, this entity belongs to an attribute
+                 * if no current element, this entity belongs to an attribute
                  * in these cases, it is an error on the part of the parser
                  * to call startEntity but this will help in some cases.
                  * See org/xml/sax/ext/LexicalHandler.html#startEntity(java.lang.String)
                  * for more information
                  */
-                if (!(atRoot || stack.isEmpty())) {
+                if (!atRoot)
+                {
                     flushCharacters();
                     EntityRef entity = factory.entityRef(name, pub, sys);
 
@@ -812,14 +822,18 @@ if (!inDTD) {
         }
     }
 
-    public void endEntity(String name) throws SAXException {
+    public void endEntity(String name)
+        throws SAXException
+    {
         entityDepth--;
-        if (entityDepth == 0) {
+        if (entityDepth == 0)
+        {
             // No way are we suppressing if not in an entity,
             // regardless of the "expand" value
             suppress = false;
         }
-        if (name.equals("[dtd]")) {
+        if (name.equals("[dtd]"))
+        {
             inInternalSubset = true;
         }
     }
@@ -827,8 +841,13 @@ if (!inDTD) {
     /**
      * Report a CDATA section - ignored in SAXBuilder.
      */
-    public void startCDATA() throws SAXException {
-        if (suppress) return;
+    public void startCDATA()
+        throws SAXException
+    {
+        if (suppress)
+        {
+            return;
+        }
 
         inCDATA = true;
     }
@@ -836,8 +855,13 @@ if (!inDTD) {
     /**
      * Report a CDATA section - ignored in SAXBuilder.
      */
-    public void endCDATA() throws SAXException {
-        if (suppress) return;
+    public void endCDATA()
+        throws SAXException
+    {
+        if (suppress)
+        {
+            return;
+        }
 
         previousCDATA = true;
         inCDATA = false;
@@ -854,26 +878,31 @@ if (!inDTD) {
      * @param length <code>int</code> length of data.
      */
     public void comment(char[] ch, int start, int length)
-        throws SAXException {
+        throws SAXException
+    {
 
-        if (suppress) return;
+        if (suppress)
+        {
+            return;
+        }
 
         flushCharacters();
 
         String commentText = new String(ch, start, length);
-        if (inDTD && inInternalSubset && (expand == false)) {
-            internalSubset.append("  <!--")
-                  .append(commentText)
-                  .append("-->\n");
+        if (inDTD && inInternalSubset && (expand == false))
+        {
+            internalSubset.append("  <!--").append(commentText).append("-->\n");
             return;
         }
-        if ((!inDTD) && (!commentText.equals(""))) {
-            if (stack.empty()) {
-                document.addContent(
-                   factory.comment(commentText));
-            } else {
-                getCurrentElement().addContent(
-                    factory.comment(commentText));
+        if ((!inDTD) && (!commentText.equals("")))
+        {
+            if (atRoot)
+            {
+                document.addContent(factory.comment(commentText));
+            }
+            else
+            {
+                getCurrentElement().addContent(factory.comment(commentText));
             }
         }
     }
@@ -886,13 +915,16 @@ if (!inDTD) {
      * @param systemID the system ID of the notation
      */
     public void notationDecl(String name, String publicID, String systemID)
-        throws SAXException {
+        throws SAXException
+    {
 
-        if (!inInternalSubset) return;
+        if (!inInternalSubset)
+        {
+            return;
+        }
 
-        internalSubset.append("  <!NOTATION ")
-              .append(name);
-        appendExternalId(publicID, systemID);    
+        internalSubset.append("  <!NOTATION ").append(name);
+        appendExternalId(publicID, systemID);
         internalSubset.append(">\n");
     }
 
@@ -905,16 +937,18 @@ if (!inDTD) {
      * @param notationName <code>String</code> of the unparsed entity decl
      */
     public void unparsedEntityDecl(String name, String publicID,
-                                   String systemID, String notationName)
-        throws SAXException {
+            String systemID, String notationName)
+        throws SAXException
+    {
 
-        if (!inInternalSubset) return;
+        if (!inInternalSubset)
+        {
+            return;
+        }
 
-        internalSubset.append("  <!ENTITY ")
-              .append(name);
+        internalSubset.append("  <!ENTITY ").append(name);
         appendExternalId(publicID, systemID);
-        internalSubset.append(" NDATA ")
-              .append(notationName);
+        internalSubset.append(" NDATA ").append(notationName);
         internalSubset.append(">\n");
     }
 
@@ -925,38 +959,40 @@ if (!inDTD) {
      * @param publicID the public ID
      * @param systemID the system ID
      */
-    protected void appendExternalId(String publicID, String systemID) {
-        if (publicID != null) {
-            internalSubset.append(" PUBLIC \"")
-                  .append(publicID)
-                  .append("\"");
+    protected void appendExternalId(String publicID, String systemID)
+    {
+        if (publicID != null)
+        {
+            internalSubset.append(" PUBLIC \"").append(publicID).append("\"");
         }
-        if (systemID != null) {
-            if (publicID == null) {
+        if (systemID != null)
+        {
+            if (publicID == null)
+            {
                 internalSubset.append(" SYSTEM ");
             }
-            else {
+            else
+            {
                 internalSubset.append(" ");
             }
-            internalSubset.append("\"")
-                  .append(systemID)
-                  .append("\"");
+            internalSubset.append("\"").append(systemID).append("\"");
         }
     }
 
     /**
      * Returns the being-parsed element.
      *
-     * @return <code>Element</code> - element at the top of the stack.
+     * @return <code>Element</code> - element being built.
      */
-    protected Element getCurrentElement() throws SAXException {
-        try {
-            return (Element)(stack.peek());
-        }
-        catch (EmptyStackException ex1) {
+    protected Element getCurrentElement()
+        throws SAXException
+    {
+        if (currentElement == null)
+        {
             throw new SAXException(
-                "Ill-formed XML document (multiple root elements detected)");
+                    "Ill-formed XML document (multiple root elements detected)");
         }
+        return currentElement;
     }
 
     /**
@@ -971,20 +1007,26 @@ if (!inDTD) {
      * @see Attribute#setAttributeType
      * @see Attributes#getType
      */
-    private int getAttributeType(String typeName) {
+    private int getAttributeType(String typeName)
+    {
         Integer type = (Integer)(attrNameToTypeMap.get(typeName));
-        if (type == null) {
+        if (type == null)
+        {
             if (typeName != null && typeName.length() > 0 &&
-                typeName.charAt(0) == '(') {
+                    typeName.charAt(0) == '(')
+            {
                 // Xerces 1.4.X reports attributes of enumerated type with
                 // a type string equals to the enumeration definition, i.e.
                 // starting with a parenthesis.
                 return Attribute.ENUMERATED_ATTRIBUTE;
             }
-            else {
+            else
+            {
                 return Attribute.UNDECLARED_ATTRIBUTE;
             }
-        } else {
+        }
+        else
+        {
             return type.intValue();
         }
     }
@@ -1001,7 +1043,8 @@ if (!inDTD) {
      * @param locator <code>Locator</code> an object that can return
      * the location of any SAX document event.
      */
-    public void setDocumentLocator(Locator locator) {
+    public void setDocumentLocator(Locator locator)
+    {
         this.locator = locator;
     }
 
@@ -1012,7 +1055,8 @@ if (!inDTD) {
      * @return <code>Locator</code> an object that can return
      * the location of any SAX document event.
      */
-    public Locator getDocumentLocator() {
+    public Locator getDocumentLocator()
+    {
         return locator;
     }
 }

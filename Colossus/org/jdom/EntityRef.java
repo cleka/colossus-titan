@@ -10,26 +10,26 @@
  are met:
  
  1. Redistributions of source code must retain the above copyright
-    notice, this list of conditions, and the following disclaimer.
+ notice, this list of conditions, and the following disclaimer.
  
  2. Redistributions in binary form must reproduce the above copyright
-    notice, this list of conditions, and the disclaimer that follows 
-    these conditions in the documentation and/or other materials 
-    provided with the distribution.
+ notice, this list of conditions, and the disclaimer that follows 
+ these conditions in the documentation and/or other materials 
+ provided with the distribution.
 
  3. The name "JDOM" must not be used to endorse or promote products
-    derived from this software without prior written permission.  For
-    written permission, please contact <request_AT_jdom_DOT_org>.
+ derived from this software without prior written permission.  For
+ written permission, please contact <request_AT_jdom_DOT_org>.
  
  4. Products derived from this software may not be called "JDOM", nor
-    may "JDOM" appear in their name, without prior written permission
-    from the JDOM Project Management <request_AT_jdom_DOT_org>.
+ may "JDOM" appear in their name, without prior written permission
+ from the JDOM Project Management <request_AT_jdom_DOT_org>.
  
  In addition, we request (but do not require) that you include in the 
  end-user documentation provided with the redistribution and/or in the 
  software itself an acknowledgement equivalent to the following:
-     "This product includes software developed by the
-      JDOM Project (http://www.jdom.org/)."
+ "This product includes software developed by the
+ JDOM Project (http://www.jdom.org/)."
  Alternatively, the acknowledgment may be graphical using the logos 
  available at http://www.jdom.org/images/logos.
 
@@ -56,7 +56,9 @@
 
 package org.jdom;
 
+
 import java.io.Serializable;
+
 
 /**
  * <code>EntityRef</code> Defines an XML entity reference in Java.
@@ -66,10 +68,11 @@ import java.io.Serializable;
  * @author Philip Nelson
  * @version $Revision$, $Date$
  */
-public class EntityRef implements Serializable, Cloneable {
+public class EntityRef implements Serializable, Cloneable
+{
 
-    private static final String CVS_ID = 
-      "@(#) $RCSfile$ $Revision$ $Date$ $Name$";
+    private static final String CVS_ID =
+            "@(#) $RCSfile$ $Revision$ $Date$ $Name$";
 
     /** The name of the <code>EntityRef</code> */
     protected String name;
@@ -86,7 +89,9 @@ public class EntityRef implements Serializable, Cloneable {
     /**
      * Default, no-args constructor for implementations to use if needed.
      */
-    protected EntityRef() {}
+    protected EntityRef()
+    {
+    }
 
     /**
      * This will create a new <code>EntityRef</code> with the supplied name.
@@ -95,7 +100,8 @@ public class EntityRef implements Serializable, Cloneable {
      * @throws IllegalNameException if the given name is not a legal
      *         XML name.
      */
-    public EntityRef(String name) {
+    public EntityRef(String name)
+    {
         this(name, null, null);
     }
 
@@ -109,7 +115,8 @@ public class EntityRef implements Serializable, Cloneable {
      * @throws IllegalDataException if the given system ID is not a legal
      *         system literal.
      */
-    public EntityRef(String name, String systemID) {
+    public EntityRef(String name, String systemID)
+    {
         this(name, null, systemID);
     }
 
@@ -124,7 +131,8 @@ public class EntityRef implements Serializable, Cloneable {
      * @throws IllegalNameException if the given name is not a legal
      *         XML name.
      */
-    public EntityRef(String name, String publicID, String systemID) {
+    public EntityRef(String name, String publicID, String systemID)
+    {
         setName(name);
         setPublicID(publicID);
         setSystemID(systemID);
@@ -135,12 +143,16 @@ public class EntityRef implements Serializable, Cloneable {
      *
      * @return <code>Object</code> - clone of this <code>EntityRef</code>.
      */
-    public Object clone() {
+    public Object clone()
+    {
         EntityRef entity = null;
 
-        try {
-            entity = (EntityRef) super.clone();
-        } catch (CloneNotSupportedException ce) {
+        try
+        {
+            entity = (EntityRef)super.clone();
+        }
+        catch (CloneNotSupportedException ce)
+        {
             // Can't happen
         }
 
@@ -160,9 +172,11 @@ public class EntityRef implements Serializable, Cloneable {
      *
      * @return <code>Entity</code> - this <code>Entity</code> modified.
      */
-    public EntityRef detach() {
+    public EntityRef detach()
+    {
         Element p = getParent();
-        if (p != null) {
+        if (p != null)
+        {
             p.removeContent(this);
         }
         return this;
@@ -176,7 +190,8 @@ public class EntityRef implements Serializable, Cloneable {
      * @return <code>boolean</code> - whether the <code>Entity</code> is
      *         equal to the supplied <code>Object</code>.
      */
-    public final boolean equals(Object ob) {
+    public final boolean equals(Object ob)
+    {
         return (ob == this);
     }
 
@@ -187,8 +202,10 @@ public class EntityRef implements Serializable, Cloneable {
      *
      * @return <code>Document</code> owning this Entity, or null.
      */
-    public Document getDocument() {
-        if (parent != null) {
+    public Document getDocument()
+    {
+        if (parent != null)
+        {
             return ((Element)parent).getDocument();
         }
 
@@ -200,7 +217,8 @@ public class EntityRef implements Serializable, Cloneable {
      *
      * @return <code>String</code> - entity name.
      */
-    public String getName() {
+    public String getName()
+    {
         return name;
     }
 
@@ -210,8 +228,9 @@ public class EntityRef implements Serializable, Cloneable {
      *
      * @return parent of this <code>EntityRef</code>
      */
-    public Element getParent() {
-        return (Element) parent;
+    public Element getParent()
+    {
+        return (Element)parent;
     }
 
     /**
@@ -220,7 +239,8 @@ public class EntityRef implements Serializable, Cloneable {
      *
      * @return public ID of this <code>EntityRef</code>
      */
-    public String getPublicID() {
+    public String getPublicID()
+    {
         return publicID;
     }
 
@@ -230,7 +250,8 @@ public class EntityRef implements Serializable, Cloneable {
      *
      * @return system ID of this <code>EntityRef</code>
      */
-    public String getSystemID() {
+    public String getSystemID()
+    {
         return systemID;
     }
 
@@ -239,7 +260,8 @@ public class EntityRef implements Serializable, Cloneable {
      *
      * @return <code>int</code> - hash code.
      */
-    public final int hashCode() {
+    public final int hashCode()
+    {
         return super.hashCode();
     }
 
@@ -249,7 +271,8 @@ public class EntityRef implements Serializable, Cloneable {
      * @param parent <code>Element</code> to be new parent.
      * @return this <code>Entity</code> modified.
      */
-    protected EntityRef setParent(Element parent) {
+    protected EntityRef setParent(Element parent)
+    {
         this.parent = parent;
         return this;
     }
@@ -262,11 +285,13 @@ public class EntityRef implements Serializable, Cloneable {
      * @throws IllegalNameException if the given name is not a legal
      *         XML name.
      */
-    public EntityRef setName(String name) {
+    public EntityRef setName(String name)
+    {
         // This can contain a colon so we use checkXMLName()
         // instead of checkElementName()
         String reason = Verifier.checkXMLName(name);
-        if (reason != null) {
+        if (reason != null)
+        {
             throw new IllegalNameException(name, "EntityRef", reason);
         }
         this.name = name;
@@ -276,14 +301,16 @@ public class EntityRef implements Serializable, Cloneable {
     /**
      * This will set the public ID of this <code>EntityRef</code>.
      *
-     * @param newPublicID new public id
+     * @param publicID new public id
      * @return this <code>EntityRef</code> modified.
      * @throws IllegalDataException if the given public ID is not a legal
      *         public ID.
      */
-    public EntityRef setPublicID(String publicID) {
+    public EntityRef setPublicID(String publicID)
+    {
         String reason = Verifier.checkPublicID(publicID);
-        if (reason != null) {
+        if (reason != null)
+        {
             throw new IllegalDataException(publicID, "EntityRef", reason);
         }
         this.publicID = publicID;
@@ -293,14 +320,16 @@ public class EntityRef implements Serializable, Cloneable {
     /**
      * This will set the system ID of this <code>EntityRef</code>.
      *
-     * @param newSystemID new system id
+     * @param systemID new system id
      * @throws IllegalDataException if the given system ID is not a legal
      *         system literal.
      * @return this <code>EntityRef</code> modified.
      */
-    public EntityRef setSystemID(String systemID) {
+    public EntityRef setSystemID(String systemID)
+    {
         String reason = Verifier.checkSystemLiteral(systemID);
-        if (reason != null) {
+        if (reason != null)
+        {
             throw new IllegalDataException(systemID, "EntityRef", reason);
         }
         this.systemID = systemID;
@@ -314,13 +343,8 @@ public class EntityRef implements Serializable, Cloneable {
      * @return <code>String</code> - information about the
      *         <code>EntityRef</code>
      */
-    public String toString() {
-        return new StringBuffer()
-            .append("[EntityRef: ")
-            .append("&")
-            .append(name)
-            .append(";")
-            .append("]")
-            .toString();
+    public String toString()
+    {
+        return new StringBuffer().append("[EntityRef: ").append("&").append(name).append(";").append("]").toString();
     }
 }

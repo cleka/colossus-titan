@@ -10,26 +10,26 @@
  are met:
  
  1. Redistributions of source code must retain the above copyright
-    notice, this list of conditions, and the following disclaimer.
+ notice, this list of conditions, and the following disclaimer.
  
  2. Redistributions in binary form must reproduce the above copyright
-    notice, this list of conditions, and the disclaimer that follows 
-    these conditions in the documentation and/or other materials 
-    provided with the distribution.
+ notice, this list of conditions, and the disclaimer that follows 
+ these conditions in the documentation and/or other materials 
+ provided with the distribution.
 
  3. The name "JDOM" must not be used to endorse or promote products
-    derived from this software without prior written permission.  For
-    written permission, please contact <pm AT jdom DOT org>.
+ derived from this software without prior written permission.  For
+ written permission, please contact <pm AT jdom DOT org>.
  
  4. Products derived from this software may not be called "JDOM", nor
-    may "JDOM" appear in their name, without prior written permission
-    from the JDOM Project Management <pm AT jdom DOT org>.
+ may "JDOM" appear in their name, without prior written permission
+ from the JDOM Project Management <pm AT jdom DOT org>.
  
  In addition, we request (but do not require) that you include in the 
  end-user documentation provided with the redistribution and/or in the 
  software itself an acknowledgement equivalent to the following:
-     "This product includes software developed by the
-      JDOM Project (http://www.jdom.org/)."
+ "This product includes software developed by the
+ JDOM Project (http://www.jdom.org/)."
  Alternatively, the acknowledgment may be graphical using the logos 
  available at http://www.jdom.org/images/logos.
 
@@ -55,9 +55,11 @@
  */
 package org.jdom.output;
 
+
 import java.util.*;
 
 import org.jdom.Namespace;
+
 
 /**
  * <code>NamespaceStack</code> is a helper class used by both
@@ -70,58 +72,63 @@ import org.jdom.Namespace;
  * @author Brett McLaughlin
  * @version $Revision$, $Date$
  */
-class NamespaceStack {
- 
-    private static final String CVS_ID = 
-      "@(#) $RCSfile$ $Revision$ $Date$ $Name$";
+class NamespaceStack
+{
+
+    private static final String CVS_ID =
+            "@(#) $RCSfile$ $Revision$ $Date$ $Name$";
 
     /** The prefixes available */
     private Stack prefixes;
 
     /** The URIs available */
-    private Stack uris;        
+    private Stack uris;
 
     /**
      * This creates the needed storage.
      */
-    public NamespaceStack() {
+    public NamespaceStack()
+    {
         prefixes = new Stack();
         uris = new Stack();
     }
-  
+
     /**
      * This will add a new <code>{@link Namespace}</code>
      * to those currently available.
      * 
      * @param ns <code>Namespace</code> to add.
      */
-    public void push(Namespace ns) {
+    public void push(Namespace ns)
+    {
         prefixes.push(ns.getPrefix());
         uris.push(ns.getURI());
-    }      
-    
+    }
+
     /**
      * This will remove the topmost (most recently added)
      * <code>{@link Namespace}</code>, and return its prefix.
      *
      * @return <code>String</code> - the popped namespace prefix.
      */
-    public String pop() {      
+    public String pop()
+    {
         String prefix = (String)prefixes.pop();
         uris.pop();
 
         return prefix;
     }
-    
+
     /**
      * This returns the number of available namespaces.
      *
      * @return <code>int</code> - size of the namespace stack.
      */
-    public int size() {
-        return prefixes.size();     
-    }    
-  
+    public int size()
+    {
+        return prefixes.size();
+    }
+
     /**
      * Given a prefix, this will return the namespace URI most 
      * rencently (topmost) associated with that prefix.
@@ -129,27 +136,31 @@ class NamespaceStack {
      * @param prefix <code>String</code> namespace prefix.
      * @return <code>String</code> - the namespace URI for that prefix.
      */
-    public String getURI(String prefix) {
+    public String getURI(String prefix)
+    {
         int index = prefixes.lastIndexOf(prefix);
-        if (index == -1) {
+        if (index == -1)
+        {
             return null;
         }
         String uri = (String)uris.elementAt(index);
-        return uri;       
+        return uri;
     }
-    
+
     /**
      * This will print out the size and current stack, from the
      * most recently added <code>{@link Namespace}</code> to
      * the "oldest," all to <code>System.out</code>.
      */
-    public String toString() {
+    public String toString()
+    {
         StringBuffer buf = new StringBuffer();
         String sep = System.getProperty("line.separator");
         buf.append("Stack: " + prefixes.size() + sep);
-        for (int i = 0; i < prefixes.size(); i++) {
+        for (int i = 0; i < prefixes.size(); i++)
+        {
             buf.append(prefixes.elementAt(i) + "&" + uris.elementAt(i) + sep);
-        }        
+        }
         return buf.toString();
     }
 }

@@ -10,26 +10,26 @@
  are met:
 
  1. Redistributions of source code must retain the above copyright
-    notice, this list of conditions, and the following disclaimer.
+ notice, this list of conditions, and the following disclaimer.
 
  2. Redistributions in binary form must reproduce the above copyright
-    notice, this list of conditions, and the disclaimer that follows
-    these conditions in the documentation and/or other materials
-    provided with the distribution.
+ notice, this list of conditions, and the disclaimer that follows
+ these conditions in the documentation and/or other materials
+ provided with the distribution.
 
  3. The name "JDOM" must not be used to endorse or promote products
-    derived from this software without prior written permission.  For
-    written permission, please contact <request_AT_jdom_DOT_org>.
+ derived from this software without prior written permission.  For
+ written permission, please contact <request_AT_jdom_DOT_org>.
 
  4. Products derived from this software may not be called "JDOM", nor
-    may "JDOM" appear in their name, without prior written permission
-    from the JDOM Project Management <request_AT_jdom_DOT_org>.
+ may "JDOM" appear in their name, without prior written permission
+ from the JDOM Project Management <request_AT_jdom_DOT_org>.
 
  In addition, we request (but do not require) that you include in the
  end-user documentation provided with the redistribution and/or in the
  software itself an acknowledgement equivalent to the following:
-     "This product includes software developed by the
-      JDOM Project (http://www.jdom.org/)."
+ "This product includes software developed by the
+ JDOM Project (http://www.jdom.org/)."
  Alternatively, the acknowledgment may be graphical using the logos
  available at http://www.jdom.org/images/logos.
 
@@ -56,10 +56,12 @@
 
 package org.jdom;
 
-import java.io.Serializable;
+
+import java.io.*;
 import java.util.*;
 
-import org.jdom.filter.Filter;
+import org.jdom.filter.*;
+
 
 /**
  * <code>Document</code> defines behavior for an XML Document, modeled
@@ -72,10 +74,11 @@ import org.jdom.filter.Filter;
  * @author Bradley S. Huffman
  * @version $Revision$, $Date$
  */
-public class Document implements Serializable, Cloneable {
+public class Document implements Serializable, Cloneable
+{
 
     private static final String CVS_ID =
-      "@(#) $RCSfile$ $Revision$ $Date$ $Name$";
+            "@(#) $RCSfile$ $Revision$ $Date$ $Name$";
 
     /**
      * This <code>Document</code>'s
@@ -94,7 +97,9 @@ public class Document implements Serializable, Cloneable {
      * throw an IllegalStateException if this document is accessed before a
      * root element is added.  This method is most useful for build tools.
      */
-    public Document() {}
+    public Document()
+    {
+    }
 
     /**
      * This will create a new <code>Document</code>,
@@ -108,9 +113,12 @@ public class Document implements Serializable, Cloneable {
      *         is already attached to a document or the given 
      *         rootElement already has a parent
      */
-    public Document(Element rootElement, DocType docType) {
+    public Document(Element rootElement, DocType docType)
+    {
         if (rootElement != null)
+        {
             setRootElement(rootElement);
+        }
         setDocType(docType);
     }
 
@@ -124,7 +132,8 @@ public class Document implements Serializable, Cloneable {
      * @throws IllegalAddException if the given rootElement already has
      *         a parent.
      */
-    public Document(Element rootElement) {
+    public Document(Element rootElement)
+    {
         this(rootElement, null);
     }
 
@@ -133,13 +142,14 @@ public class Document implements Serializable, Cloneable {
      * with the supplied list of content, and the supplied
      * <code>{@link DocType}</code> declaration.
      *
-     * @param content <code>List</code> of starter content
+     * @param newContent <code>List</code> of starter content
      * @param docType <code>DocType</code> declaration.
      * @throws IllegalAddException if (1) the List contains more than
      *         one Element or objects of illegal types, or (2) if the
      *         given docType object is already attached to a document.
      */
-    public Document(List newContent, DocType docType) {
+    public Document(List newContent, DocType docType)
+    {
         setContent(newContent);
         setDocType(docType);
     }
@@ -153,7 +163,8 @@ public class Document implements Serializable, Cloneable {
      * @throws IllegalAddException if the List contains more than
      *         one Element or objects of illegal types.
      */
-    public Document(List content) {
+    public Document(List content)
+    {
         this(content, null);
     }
 
@@ -164,7 +175,8 @@ public class Document implements Serializable, Cloneable {
      * @return <code>true</code> if this document has a root element,
      *         <code>false</code> otherwise.
      */
-    public boolean hasRootElement() {
+    public boolean hasRootElement()
+    {
         return (content.indexOfFirstElement() < 0) ? false : true;
     }
 
@@ -175,12 +187,14 @@ public class Document implements Serializable, Cloneable {
      * @return <code>Element</code> - the document's root element
      * @throws IllegalStateException if the root element hasn't been set
      */
-    public Element getRootElement() {
+    public Element getRootElement()
+    {
         int index = content.indexOfFirstElement();
-        if (index < 0) {
-            throw new IllegalStateException("Root element not set"); 
+        if (index < 0)
+        {
+            throw new IllegalStateException("Root element not set");
         }
-        return (Element) content.get(index);
+        return (Element)content.get(index);
     }
 
     /**
@@ -193,12 +207,15 @@ public class Document implements Serializable, Cloneable {
      * @throws IllegalAddException if the given rootElement already has
      *         a parent.
      */
-    public Document setRootElement(Element rootElement) {
+    public Document setRootElement(Element rootElement)
+    {
         int index = content.indexOfFirstElement();
-        if (index < 0) {
+        if (index < 0)
+        {
             content.add(rootElement);
         }
-        else {
+        else
+        {
             content.set(index, rootElement);
         }
         return this;
@@ -209,16 +226,20 @@ public class Document implements Serializable, Cloneable {
      *
      * @return removed root <code>Element</code>
      */
-    public Element detachRootElement() {
+    public Element detachRootElement()
+    {
         int index = content.indexOfFirstElement();
         if (index < 0)
+        {
             return null;
-        return (Element) removeContent(index);
+        }
+        return (Element)removeContent(index);
     }
 
     // Remove Object at given index, or null if index is out of
     // range or content cannot be removed.
-    private Object removeContent(int index) {
+    private Object removeContent(int index)
+    {
         return content.remove(index);
     }
 
@@ -229,7 +250,8 @@ public class Document implements Serializable, Cloneable {
      *
      * @return <code>DocType</code> - the DOCTYPE declaration.
      */
-    public DocType getDocType() {
+    public DocType getDocType()
+    {
         return docType;
     }
 
@@ -245,16 +267,20 @@ public class Document implements Serializable, Cloneable {
      * @throws IllegalAddException if the given docType is
      *   already attached to a Document.
      */
-    public Document setDocType(DocType docType) {
-        if (docType != null) {
-            if (docType.getDocument() != null) {
+    public Document setDocType(DocType docType)
+    {
+        if (docType != null)
+        {
+            if (docType.getDocument() != null)
+            {
                 throw new IllegalAddException(this, docType,
-                          "The docType already is attached to a document");
+                        "The docType already is attached to a document");
             }
             docType.setDocument(this);
         }
 
-        if (this.docType != null) {
+        if (this.docType != null)
+        {
             this.docType.setDocument(null);
         }
 
@@ -270,7 +296,8 @@ public class Document implements Serializable, Cloneable {
      * @throws IllegalAddException if the given processing instruction
      *         already has a parent element.
      */
-    public Document addContent(ProcessingInstruction pi) {
+    public Document addContent(ProcessingInstruction pi)
+    {
         content.add(pi);
         return this;
     }
@@ -283,7 +310,8 @@ public class Document implements Serializable, Cloneable {
      * @throws IllegalAddException if the given comment already has a
      *         parent element.
      */
-    public Document addContent(Comment comment) {
+    public Document addContent(Comment comment)
+    {
         content.add(comment);
         return this;
     }
@@ -302,9 +330,12 @@ public class Document implements Serializable, Cloneable {
      * @return <code>List</code> - all Document content
      * @throws IllegalStateException if the root element hasn't been set
      */
-    public List getContent() {
+    public List getContent()
+    {
         if (!hasRootElement())
-            throw new IllegalStateException("Root element not set"); 
+        {
+            throw new IllegalStateException("Root element not set");
+        }
         return content;
     }
 
@@ -321,12 +352,15 @@ public class Document implements Serializable, Cloneable {
      * @return <code>List</code> - filtered Document content
      * @throws IllegalStateException if the root element hasn't been set
      */
-    public List getContent(Filter filter) {
+    public List getContent(Filter filter)
+    {
         if (!hasRootElement())
-            throw new IllegalStateException("Root element not set"); 
+        {
+            throw new IllegalStateException("Root element not set");
+        }
         return content.getView(filter);
     }
-  
+
     /**
      * This sets the content of the <code>Document</code>.  The supplied
      * List should contain only objects of type <code>Element</code>,
@@ -361,7 +395,8 @@ public class Document implements Serializable, Cloneable {
      * @throws IllegalAddException if the List contains objects of
      *         illegal types.
      */
-    public Document setContent(List newContent) {
+    public Document setContent(List newContent)
+    {
         content.clearAndSet(newContent);
         return this;
     }
@@ -371,10 +406,11 @@ public class Document implements Serializable, Cloneable {
      * If the specified <code>ProcessingInstruction</code> is not a child of
      * this <code>Document</code>, this method does nothing.
      *
-     * @param child <code>ProcessingInstruction</code> to delete
+     * @param pi <code>ProcessingInstruction</code> to delete
      * @return whether deletion occurred
      */
-    public boolean removeContent(ProcessingInstruction pi) {
+    public boolean removeContent(ProcessingInstruction pi)
+    {
         return content.remove(pi);
     }
 
@@ -386,7 +422,8 @@ public class Document implements Serializable, Cloneable {
      * @param comment <code>Comment</code> to delete
      * @return whether deletion occurred
      */
-    public boolean removeContent(Comment comment) {
+    public boolean removeContent(Comment comment)
+    {
         return content.remove(comment);
     }
 
@@ -400,22 +437,26 @@ public class Document implements Serializable, Cloneable {
      * @return <code>String</code> - information about the
      *         <code>Document</code>
      */
-    public String toString() {
-        StringBuffer stringForm = new StringBuffer()
-            .append("[Document: ");
+    public String toString()
+    {
+        StringBuffer stringForm = new StringBuffer().append("[Document: ");
 
-        if (docType != null) {
-            stringForm.append(docType.toString())
-                      .append(", ");
-        } else {
+        if (docType != null)
+        {
+            stringForm.append(docType.toString()).append(", ");
+        }
+        else
+        {
             stringForm.append(" No DOCTYPE declaration, ");
         }
 
         Element rootElement = getRootElement();
-        if (rootElement != null) {
-            stringForm.append("Root is ")
-                      .append(rootElement.toString());
-        } else {
+        if (rootElement != null)
+        {
+            stringForm.append("Root is ").append(rootElement.toString());
+        }
+        else
+        {
             stringForm.append(" No root element"); // shouldn't happen
         }
 
@@ -432,7 +473,8 @@ public class Document implements Serializable, Cloneable {
      * @return <code>boolean</code> - whether the <code>Document</code> is
      *         equal to the supplied <code>Object</code>.
      */
-    public final boolean equals(Object ob) {
+    public final boolean equals(Object ob)
+    {
         return (ob == this);
     }
 
@@ -441,7 +483,8 @@ public class Document implements Serializable, Cloneable {
      *
      * @return <code>int</code> - hash code.
      */
-    public final int hashCode() {
+    public final int hashCode()
+    {
         return super.hashCode();
     }
 
@@ -450,16 +493,21 @@ public class Document implements Serializable, Cloneable {
      *
      * @return <code>Object</code> - clone of this <code>Document</code>.
      */
-    public Object clone() {
+    public Object clone()
+    {
         Document doc = null;
 
-        try {
-            doc = (Document) super.clone();
-        } catch (CloneNotSupportedException ce) {
+        try
+        {
+            doc = (Document)super.clone();
+        }
+        catch (CloneNotSupportedException ce)
+        {
             // Can't happen
         }
 
-        if (docType != null) {
+        if (docType != null)
+        {
             doc.docType = (DocType)docType.clone();
             doc.docType.setDocument(doc);
         }
@@ -470,19 +518,23 @@ public class Document implements Serializable, Cloneable {
 
         // Add the cloned content to clone
 
-        for (int i = 0; i < content.size(); i++) {
+        for (int i = 0; i < content.size(); i++)
+        {
             Object obj = content.get(i);
-            if (obj instanceof Element) {
+            if (obj instanceof Element)
+            {
                 Element element = (Element)((Element)obj).clone();
                 doc.content.add(element);
             }
-            else if (obj instanceof Comment) {
+            else if (obj instanceof Comment)
+            {
                 Comment comment = (Comment)((Comment)obj).clone();
                 doc.content.add(comment);
             }
-            else if (obj instanceof ProcessingInstruction) {
+            else if (obj instanceof ProcessingInstruction)
+            {
                 ProcessingInstruction pi = (ProcessingInstruction)
-                           ((ProcessingInstruction)obj).clone();
+                        ((ProcessingInstruction)obj).clone();
                 doc.content.add(pi);
             }
         }
