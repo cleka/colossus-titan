@@ -99,7 +99,7 @@ public final class VariantSupport
                 {
                     Log.error("Can't use more than " +
                               Constants.MAX_MAX_PLAYERS +
-                              " players, while variant require " +
+                              " players, while variant requires " +
                               maxPlayers);
                     maxPlayers = Constants.MAX_MAX_PLAYERS;
                 }

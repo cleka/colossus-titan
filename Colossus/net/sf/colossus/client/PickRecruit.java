@@ -18,7 +18,7 @@ import net.sf.colossus.util.KDialog;
 
 
 final class PickRecruit extends KDialog implements MouseListener,
-    WindowListener
+    WindowListener, ActionListener
 {
     private java.util.List recruits;   // of Creatures
     private java.util.List recruitChits = new ArrayList();
@@ -89,6 +89,10 @@ final class PickRecruit extends KDialog implements MouseListener,
             i++;
         }
 
+        JButton cancelButton = new JButton("Cancel");
+        cancelButton.addActionListener(this);
+        recruitPane.add(cancelButton);
+
         pack();
         centerOnScreen();
         setVisible(true);
@@ -122,6 +126,12 @@ final class PickRecruit extends KDialog implements MouseListener,
             recruit = ((Creature)recruits.get(i)).getName();
             dispose();
         }
+    }
+
+    public void actionPerformed(ActionEvent e)
+    {
+        // Only action is cancel.
+        dispose();
     }
 
 

@@ -1126,6 +1126,7 @@ public class SimpleAI implements AI
                               enemyPointValue) /
                         TerrainRecruitLoader.getAcquirableRecruitmentsValue();
                     // plus a fraction of a titan strength
+// XXX Should be by variant
                     value += (6 * enemyPointValue) /
                         TerrainRecruitLoader.getTitanImprovementValue();
                     // plus some more for killing a group (this is arbitrary)
@@ -1274,12 +1275,15 @@ public class SimpleAI implements AI
                     // pieces that we'll have after splitting.
                     // TODO this should call our splitting code to see
                     // what split decision we would make
+                    // If the legion would never split, then ignore
+                    // this special case.
 
                     // This special case was overkill.  A 6-high stack
                     // with 3 lions, or a 6-high stack with 3 clopses,
-                    // sometimes refused to go to a safe desert/jungle
+                    // sometimes refused to go to a safe desert/jungle,
+                    // and 6-high stacks refused to recruit colossi,
                     // because the value of the recruit was toned down
-                    // too much. So the effect has been reduced by half.
+                    // too much. So the effect has been reduced.
                     Log.debug("--- 6-HIGH SPECIAL CASE");
 
                     Creature weakest1 = null;
@@ -1340,7 +1344,7 @@ public class SimpleAI implements AI
                         - weakest2.getPointValue()
                         + Math.max(maxCreaturePV, recruit.getPointValue());
 
-                    value += (((newPV - oldPV) + recruit.getPointValue()) / 2);
+                    value += (newPV - oldPV) + recruit.getPointValue();
                 }
 
                 Log.debug("--- if " + legion + " moves to " + hex

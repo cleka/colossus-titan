@@ -856,6 +856,7 @@ Log.debug("Called Game.newGame2()");
             dispose();
         }
         player.resetTurnState();
+        server.allFullyUpdateLegionHeights();  // XXX Bug workaround
         server.allSetupSplit();
 
         // XXX Is this causing double advances?

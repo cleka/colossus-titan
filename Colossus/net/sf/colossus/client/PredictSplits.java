@@ -308,14 +308,13 @@ public final class PredictSplits
                 return;
             }
 
-
             // All child creatures that were there at the time of the
-            // split should be in this legion as well.  If not, then
+            // split should be in this node as well.  If not, then
             // we need to adjust this legion's contents and tell its parent
             // and other child.
             if (!creatures.contains(child.getAtSplitCreatures()))
             {
-Log.debug("Adjusting parent legion " + markerId);
+Log.debug("Adjusting parent node " + markerId);
 
 // TODO
 

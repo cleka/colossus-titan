@@ -1711,6 +1711,7 @@ public final class Client implements IClient
 
     public synchronized void cleanupBattle()
     {
+Log.debug(playerName + " Client.cleanupBattle()");
         if (map != null)
         {
             map.dispose();
