@@ -374,9 +374,7 @@ public final class MasterBoard extends JPanel
         {
             public void actionPerformed(ActionEvent e)
             {
-                // XXX Offer the ability to re-use a save filename,
-                // rather than always making a new one?
-                client.saveGame();
+                client.saveGame(null);
             }
         };
 

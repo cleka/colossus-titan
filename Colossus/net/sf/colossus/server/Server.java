@@ -4,13 +4,10 @@ package net.sf.colossus.server;
 import java.util.*;
 import java.net.*;
 import javax.swing.*;
-import java.rmi.*;
-import java.rmi.server.*;
 
 import net.sf.colossus.util.Log;
-import net.sf.colossus.client.IRMIClient;
-import net.sf.colossus.client.IRMIClient;
-import net.sf.colossus.client.ClientFactory;
+import net.sf.colossus.client.IClient;
+import net.sf.colossus.client.Client;
 import net.sf.colossus.client.Proposal;
 import net.sf.colossus.parser.TerrainRecruitLoader;
 
@@ -22,57 +19,125 @@ import net.sf.colossus.parser.TerrainRecruitLoader;
  *  @version $Id$
  *  @author David Ripton
  */
-public final class Server extends UnicastRemoteObject implements IRMIServer
+public final class Server implements IServer
 {
     private Game game;
 
     // XXX Need to verify that various requests came from the correct
     // client for that player.
 
-    /** For now we'll keep a list of client refs locally rather than using
-     *  the network protocol.  We will eventually instead keep a list of the
-     *  existing socket connections to use. Maybe also save things like
-     *  the originating IP, in case a connection breaks and we need to
-     *  authenticate reconnects.  Do not share these references. */
+    /** 
+     *  Maybe also save things like the originating IP, in case a 
+     *  connection breaks and we need to authenticate reconnects.  
+     *  Do not share these references. */
     private List clients = new ArrayList();
     private List remoteClients = new ArrayList();
 
     /** Map of player name to client. */
     private Map clientMap = new HashMap();
 
+    /** Number of remote clients we're waiting for. */
+    private int waitingForClients;
+
     // Cached strike information.
     Critter striker;
     Critter target;
     int strikeNumber;
     int damage;
-    int [] rolls;
+    List rolls;
 
 
 
-    Server(Game game) throws RemoteException
+    Server(Game game)
     {
-        super();
         this.game = game;
+        waitingForClients = game.getNumPlayers();
+    }
+
+    void initSocketServer() 
+    {
+        new SocketServer(this, Constants.defaultPort, game.getNumPlayers());
+    }
+
+    /** Each server thread's name is set to its player's name. */
+    private String getPlayerName()
+    {
+        return Thread.currentThread().getName();
+    }
+
+    private boolean isActivePlayer()
+    {
+        return getPlayerName().equals(game.getActivePlayerName());
+    }
+
+    private boolean isBattleActivePlayer()
+    {
+        return getPlayerName().equals(game.getBattle().getActivePlayerName());
+    }
+
+
+    void addLocalClients()
+    {
+Log.debug("Called Server.addLocalClients()");
+        for (int i = 0; i < game.getNumPlayers(); i++)
+        {
+            Player player = game.getPlayer(i);
+            if (!player.getType().endsWith(Constants.network))
+            {
+                addLocalClient(player.getName());
+            }
+        }
     }
 
 
     void addLocalClient(String playerName)
     {
-        IRMIClient client = ClientFactory.createClient(this, playerName);
+Log.debug("Called Server.addLocalClient() for " + playerName);
+
+        IClient client = new Client("localhost", Constants.defaultPort, 
+            playerName, false);
         clients.add(client);
         clientMap.put(playerName, client);
+        waitingForClients--;
+Log.debug("Decremented waitingForClients to " + waitingForClients);
+        if (waitingForClients <= 0)
+        {
+            game.newGame2();
+        }
     }
 
-    public void addRemoteClient(IRMIClient client, String playerName)
+
+    /** The IClient will actually be a SocketServerThread. */
+    void addRemoteClient(final IClient client, final String playerName)
     {
+Log.debug("Called Server.addRemoteClient() for " + playerName);
+
+        int slot = game.findOpenNetworkSlot();
+Log.debug("Network slot " + slot);
+        if (slot == -1)
+        {
+            return;
+        }
+
         Log.setServer(this);
         Log.setToRemote(true);
         clients.add(client);
         remoteClients.add(client);
+
         String name = game.getUniqueName(playerName);
-Log.debug("Adding client with unique name " + name); 
+Log.debug("Adding client with unique name " + name);
         clientMap.put(name, client);
-        game.addRemoteClient(name);
+
+        Player player = game.getPlayer(slot);
+        player.setName(name);
+        // In case we had to change a duplicate name.
+        setPlayerName(name, name);
+        waitingForClients--;
+Log.debug("Decremented waitingForClients to " + waitingForClients);
+        if (waitingForClients <= 0)
+        {
+            game.newGame2();
+        }
     }
 
 
@@ -81,18 +146,11 @@ Log.debug("Adding client with unique name " + name);
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            IRMIClient client = (IRMIClient)it.next();
-            try
-            {
-                client.dispose();
-            }
-            catch (RemoteException e)
-            {
-                Log.error(e.toString());
-                e.printStackTrace();
-            }
+            IClient client = (IClient)it.next();
+            client.dispose();
         }
         clients.clear();
+        // XXX drop sockets
     }
 
 
@@ -101,16 +159,8 @@ Log.debug("Adding client with unique name " + name);
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            IRMIClient client = (IRMIClient)it.next();
-            try
-            {
-                client.updatePlayerInfo(getPlayerInfo());
-            }
-            catch (RemoteException e)
-            {
-                Log.error(e.toString());
-                e.printStackTrace();
-            }
+            IClient client = (IClient)it.next();
+            client.updatePlayerInfo(getPlayerInfo());
         }
     }
 
@@ -119,16 +169,8 @@ Log.debug("Adding client with unique name " + name);
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            IRMIClient client = (IRMIClient)it.next();
-            try
-            {
-                client.updateCreatureCount(creatureName, count);
-            }
-            catch (RemoteException e)
-            {
-                Log.error(e.toString());
-                e.printStackTrace();
-            }
+            IClient client = (IClient)it.next();
+            client.updateCreatureCount(creatureName, count);
         }
     }
 
@@ -138,16 +180,8 @@ Log.debug("Adding client with unique name " + name);
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            IRMIClient client = (IRMIClient)it.next();
-            try
-            {
-                client.tellMovementRoll(roll);
-            }
-            catch (RemoteException e)
-            {
-                Log.error(e.toString());
-                e.printStackTrace();
-            }
+            IClient client = (IClient)it.next();
+            client.tellMovementRoll(roll);
         }
     }
 
@@ -166,35 +200,35 @@ Log.debug("Adding client with unique name " + name);
     }
 
 
-    public void doneWithStrikes(String playerName)
+    public void doneWithStrikes()
     {
         Battle battle = game.getBattle();
-        if (!playerName.equals(battle.getActivePlayerName()))
+        if (!isBattleActivePlayer())
         {
-            Log.error(playerName + " illegally called doneWithStrikes()");
+            Log.error(getPlayerName() + " illegally called doneWithStrikes()");
             return;
         }
         if (!battle.doneWithStrikes())
         {
-            showMessageDialog(playerName, "Must take forced strikes");
+            showMessageDialog("Must take forced strikes");
         }
     }
 
 
-    public void makeForcedStrikes(String playerName, boolean rangestrike)
+    public void makeForcedStrikes(boolean rangestrike)
     {
-        if (playerName.equals(game.getBattle().getActivePlayerName()))
+        if (isBattleActivePlayer())
         {
             game.getBattle().makeForcedStrikes(rangestrike);
         }
     }
 
 
-    private IRMIClient getClient(String playerName)
+    private IClient getClient(String playerName)
     {
         if (clientMap.containsKey(playerName))
         {
-            return (IRMIClient)clientMap.get(playerName);
+            return (IClient)clientMap.get(playerName);
         }
         else
         {
@@ -225,16 +259,8 @@ Log.debug("Adding client with unique name " + name);
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            IRMIClient client = (IRMIClient)it.next();
-            try
-            {
-                client.initBoard();
-            }
-            catch (RemoteException e)
-            {
-                Log.error(e.toString());
-                e.printStackTrace();
-            }
+            IClient client = (IClient)it.next();
+            client.initBoard();
         }
     }
 
@@ -258,16 +284,8 @@ Log.debug("Adding client with unique name " + name);
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            IRMIClient client = (IRMIClient)it.next();
-            try
-            {
-                client.tellLegionLocation(markerId, hexLabel);
-            }
-            catch (RemoteException e)
-            {
-                Log.error(e.toString());
-                e.printStackTrace();
-            }
+            IClient client = (IClient)it.next();
+            client.tellLegionLocation(markerId, hexLabel);
         }
     }
 
@@ -276,32 +294,21 @@ Log.debug("Adding client with unique name " + name);
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            IRMIClient client = (IRMIClient)it.next();
-            try
-            {
-                client.removeLegion(markerId);
-            }
-            catch (RemoteException e)
-            {
-                Log.error(e.toString());
-                e.printStackTrace();
-            }
+            IClient client = (IClient)it.next();
+            client.removeLegion(markerId);
         }
     }
 
 
+    private void showMessageDialog(final String message)
+    {
+        showMessageDialog(getPlayerName(), message);
+    }
+
     void showMessageDialog(String playerName, String message)
     {
-        IRMIClient client = getClient(playerName);
-        try
-        {
-            client.showMessageDialog(message);
-        }
-        catch (RemoteException e)
-        {
-            Log.error(e.toString());
-            e.printStackTrace();
-        }
+        IClient client = getClient(playerName);
+        client.showMessageDialog(message);
     }
 
     void allShowMessageDialog(String message)
@@ -309,16 +316,8 @@ Log.debug("Adding client with unique name " + name);
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            IRMIClient client = (IRMIClient)it.next();
-            try
-            {
-                client.showMessageDialog(message);
-            }
-            catch (RemoteException e)
-            {
-                Log.error(e.toString());
-                e.printStackTrace();
-            }
+            IClient client = (IClient)it.next();
+            client.showMessageDialog(message);
         }
     }
 
@@ -327,16 +326,8 @@ Log.debug("Adding client with unique name " + name);
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            IRMIClient client = (IRMIClient)it.next();
-            try
-            {
-                client.tellGameOver(message);
-            }
-            catch (RemoteException e)
-            {
-                Log.error(e.toString());
-                e.printStackTrace();
-            }
+            IClient client = (IClient)it.next();
+            client.tellGameOver(message);
         }
     }
 
@@ -347,17 +338,9 @@ Log.debug("Adding client with unique name " + name);
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            IRMIClient client = (IRMIClient)it.next();
-            try
-            {
-                client.setupTurnState(game.getActivePlayerName(),
-                    game.getTurnNumber());
-            }
-            catch (RemoteException e)
-            {
-                Log.error(e.toString());
-                e.printStackTrace();
-            }
+            IClient client = (IClient)it.next();
+            client.setupTurnState(game.getActivePlayerName(),
+                game.getTurnNumber());
         }
     }
 
@@ -367,17 +350,9 @@ Log.debug("Adding client with unique name " + name);
         while (it.hasNext())
         {
             Player player = (Player)it.next();
-            IRMIClient client = getClient(player.getName());
-            try
-            {
-                client.setupSplit(player.getMarkersAvailable(),
+            IClient client = getClient(player.getName());
+            client.setupSplit(player.getMarkersAvailable(),
                 game.getActivePlayerName(), game.getTurnNumber());
-            }
-            catch (RemoteException e)
-            {
-                Log.error(e.toString());
-                e.printStackTrace();
-            }
         }
         allUpdatePlayerInfo();
     }
@@ -388,16 +363,8 @@ Log.debug("Adding client with unique name " + name);
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            IRMIClient client = (IRMIClient)it.next();
-            try
-            {
-                client.setupMove();
-            }
-            catch (RemoteException e)
-            {
-                Log.error(e.toString());
-                e.printStackTrace();
-            }
+            IClient client = (IClient)it.next();
+            client.setupMove();
         }
     }
 
@@ -406,16 +373,8 @@ Log.debug("Adding client with unique name " + name);
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            IRMIClient client = (IRMIClient)it.next();
-            try
-            {
-                client.setupFight();
-            }
-            catch (RemoteException e)
-            {
-                Log.error(e.toString());
-                e.printStackTrace();
-            }
+            IClient client = (IClient)it.next();
+            client.setupFight();
         }
     }
 
@@ -424,16 +383,8 @@ Log.debug("Adding client with unique name " + name);
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            IRMIClient client = (IRMIClient)it.next();
-            try
-            {
-                client.setupMuster();
-            }
-            catch (RemoteException e)
-            {
-                Log.error(e.toString());
-                e.printStackTrace();
-            }
+            IClient client = (IClient)it.next();
+            client.setupMuster();
         }
     }
 
@@ -443,17 +394,9 @@ Log.debug("Adding client with unique name " + name);
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            IRMIClient client = (IRMIClient)it.next();
-            try
-            {
-                client.setupBattleSummon(game.getBattle().getActivePlayerName(),
+            IClient client = (IClient)it.next();
+            client.setupBattleSummon(game.getBattle().getActivePlayerName(),
                 game.getBattle().getTurnNumber());
-            }
-            catch (RemoteException e)
-            {
-                Log.error(e.toString());
-                e.printStackTrace();
-            }
         }
     }
 
@@ -462,18 +405,10 @@ Log.debug("Adding client with unique name " + name);
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            IRMIClient client = (IRMIClient)it.next();
-            try
-            {
-                client.setupBattleRecruit(
-                    game.getBattle().getActivePlayerName(),
-                    game.getBattle().getTurnNumber());
-            }
-            catch (RemoteException e)
-            {
-                Log.error(e.toString());
-                e.printStackTrace();
-            }
+            IClient client = (IClient)it.next();
+            client.setupBattleRecruit(
+                game.getBattle().getActivePlayerName(),
+                game.getBattle().getTurnNumber());
         }
     }
 
@@ -482,16 +417,8 @@ Log.debug("Adding client with unique name " + name);
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            IRMIClient client = (IRMIClient)it.next();
-            try
-            {
-                client.setupBattleMove();
-            }
-            catch (RemoteException e)
-            {
-                Log.error(e.toString());
-                e.printStackTrace();
-            }
+            IClient client = (IClient)it.next();
+            client.setupBattleMove();
         }
     }
 
@@ -500,17 +427,9 @@ Log.debug("Adding client with unique name " + name);
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            IRMIClient client = (IRMIClient)it.next();
-            try
-            {
-                client.setupBattleFight(game.getBattle().getPhase(),
+            IClient client = (IClient)it.next();
+            client.setupBattleFight(game.getBattle().getPhase(),
                 game.getBattle().getActivePlayerName());
-            }
-            catch (RemoteException e)
-            {
-                Log.error(e.toString());
-                e.printStackTrace();
-            }
         }
     }
 
@@ -520,18 +439,10 @@ Log.debug("Adding client with unique name " + name);
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            IRMIClient client = (IRMIClient)it.next();
-            try
-            {
-                client.placeNewChit(critter.getImageName(),
+            IClient client = (IClient)it.next();
+            client.placeNewChit(critter.getImageName(),
                 critter.getMarkerId().equals(game.getBattle().getDefenderId()),
                 critter.getTag(), critter.getCurrentHexLabel());
-            }
-            catch (RemoteException e)
-            {
-                Log.error(e.toString());
-                e.printStackTrace();
-            }
         }
     }
 
@@ -541,16 +452,8 @@ Log.debug("Adding client with unique name " + name);
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            IRMIClient client = (IRMIClient)it.next();
-            try
-            {
-                client.removeDeadBattleChits();
-            }
-            catch (RemoteException e)
-            {
-                Log.error(e.toString());
-                e.printStackTrace();
-            }
+            IClient client = (IClient)it.next();
+            client.removeDeadBattleChits();
         }
     }
 
@@ -560,16 +463,8 @@ Log.debug("Adding client with unique name " + name);
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            IRMIClient client = (IRMIClient)it.next();
-            try
-            {
-                client.highlightEngagements();
-            }
-            catch (RemoteException e)
-            {
-                Log.error(e.toString());
-                e.printStackTrace();
-            }
+            IClient client = (IClient)it.next();
+            client.highlightEngagements();
         }
     }
 
@@ -580,18 +475,10 @@ Log.debug("Adding client with unique name " + name);
         Legion legion = game.getLegionByMarkerId(markerId);
         if (legion.getHeight() < 7)
         {
-            IRMIClient client = getClient(playerName);
+            IClient client = getClient(playerName);
             if (client != null)
             {
-                try
-                {
-                    client.askAcquireAngel(markerId, recruits);
-                }
-                catch (RemoteException e)
-                {
-                    Log.error(e.toString());
-                    e.printStackTrace();
-                }
+                client.askAcquireAngel(markerId, recruits);
             }
         }
     }
@@ -608,17 +495,8 @@ Log.debug("Adding client with unique name " + name);
 
     void createSummonAngel(Legion legion)
     {
-        IRMIClient client = getClient(legion.getPlayerName());
-        try
-        {
-            client.createSummonAngel(legion.getMarkerId(),
-            legion.getLongMarkerName());
-        }
-        catch (RemoteException e)
-        {
-            Log.error(e.toString());
-            e.printStackTrace();
-        }
+        IClient client = getClient(legion.getPlayerName());
+        client.createSummonAngel(legion.getMarkerId());
     }
 
     void reinforce(Legion legion)
@@ -629,16 +507,8 @@ Log.debug("Adding client with unique name " + name);
         }
         else
         {
-            IRMIClient client = getClient(legion.getPlayerName());
-            try
-            {
-                client.doReinforce(legion.getMarkerId());
-            }
-            catch (RemoteException e)
-            {
-                Log.error(e.toString());
-                e.printStackTrace();
-            }
+            IClient client = getClient(legion.getPlayerName());
+            client.doReinforce(legion.getMarkerId());
         }
     }
 
@@ -706,17 +576,9 @@ Log.debug("Adding client with unique name " + name);
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            IRMIClient client = (IRMIClient)it.next();
-            try
-            {
-                client.didRecruit(legion.getMarkerId(), recruit.getName(),
+            IClient client = (IClient)it.next();
+            client.didRecruit(legion.getMarkerId(), recruit.getName(),
                 recruiterName, numRecruiters);
-            }
-            catch (RemoteException e)
-            {
-                Log.error(e.toString());
-                e.printStackTrace();
-            }
         }
     }
 
@@ -726,16 +588,8 @@ Log.debug("Adding client with unique name " + name);
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            IRMIClient client = (IRMIClient)it.next();
-            try
-            {
-                client.undidRecruit(legion.getMarkerId(), recruitName);
-            }
-            catch (RemoteException e)
-            {
-                Log.error(e.toString());
-                e.printStackTrace();
-            }
+            IClient client = (IClient)it.next();
+            client.undidRecruit(legion.getMarkerId(), recruitName);
         }
     }
 
@@ -762,18 +616,8 @@ Log.debug("Adding client with unique name " + name);
         }
         else
         {
-            IRMIClient client = getClient(ally.getPlayerName());
-            try
-            {
-                client.askConcede(ally.getLongMarkerName(),
-                ally.getCurrentHex().getDescription(), ally.getMarkerId(),
-                enemy.getMarkerId());
-            }
-            catch (RemoteException e)
-            {
-                Log.error(e.toString());
-                e.printStackTrace();
-            }
+            IClient client = getClient(ally.getPlayerName());
+            client.askConcede(ally.getMarkerId(), enemy.getMarkerId());
         }
     }
 
@@ -803,18 +647,8 @@ Log.debug("Adding client with unique name " + name);
         }
         else
         {
-            IRMIClient client = getClient(ally.getPlayerName());
-            try
-            {
-                client.askFlee(ally.getLongMarkerName(),
-                ally.getCurrentHex().getDescription(), ally.getMarkerId(),
-                enemy.getMarkerId());
-            }
-            catch (RemoteException e)
-            {
-                Log.error(e.toString());
-                e.printStackTrace();
-            }
+            IClient client = getClient(ally.getPlayerName());
+            client.askFlee(ally.getMarkerId(), enemy.getMarkerId());
         }
     }
 
@@ -832,12 +666,12 @@ Log.debug("Adding client with unique name " + name);
     void twoNegotiate(Legion attacker, Legion defender)
     {
     /* TODO Put negotiation back in.
-        IRMIClient client1 = getClient(defender.getPlayerName());
+        IClient client1 = getClient(defender.getPlayerName());
         client1.askNegotiate(attacker.getLongMarkerName(),
             defender.getLongMarkerName(), attacker.getMarkerId(),
             defender.getMarkerId(), attacker.getCurrentHexLabel());
 
-        IRMIClient client2 = getClient(attacker.getPlayerName());
+        IClient client2 = getClient(attacker.getPlayerName());
         client2.askNegotiate(attacker.getLongMarkerName(),
             defender.getLongMarkerName(), attacker.getMarkerId(),
             defender.getMarkerId(), attacker.getCurrentHexLabel());
@@ -846,26 +680,17 @@ Log.debug("Adding client with unique name " + name);
         fight(attacker.getCurrentHexLabel());
     }
 
-    // XXX Stringify the proposal.
     /** playerName makes a proposal. */
-    public void makeProposal(String playerName, Proposal proposal)
+    public void makeProposal(String proposalString)
     {
-        game.makeProposal(playerName, proposal);
+        game.makeProposal(getPlayerName(), proposalString);
     }
 
     /** Tell playerName about proposal. */
     void tellProposal(String playerName, Proposal proposal)
     {
-        IRMIClient client = getClient(playerName);
-        try
-        {
-            client.tellProposal(proposal);
-            }
-            catch (RemoteException e)
-            {
-                Log.error(e.toString());
-                e.printStackTrace();
-            }
+        IClient client = getClient(playerName);
+        client.tellProposal(proposal.toString());
     }
 
     public void fight(String hexLabel)
@@ -891,16 +716,8 @@ Log.debug("Adding client with unique name " + name);
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            IRMIClient client = (IRMIClient)it.next();
-            try
-            {
-                client.tellBattleMove(tag, startingHex, endingHex, undo);
-            }
-            catch (RemoteException e)
-            {
-                Log.error(e.toString());
-                e.printStackTrace();
-            }
+            IClient client = (IClient)it.next();
+            client.tellBattleMove(tag, startingHex, endingHex, undo);
         }
     }
 
@@ -928,7 +745,7 @@ Log.debug("Adding client with unique name " + name);
 
 
     void allTellStrikeResults(Critter striker, Critter target,
-        int strikeNumber, int [] rolls, int damage, int carryDamageLeft,
+        int strikeNumber, List rolls, int damage, int carryDamageLeft,
         Set carryTargetDescriptions)
     {
         // Save strike info so that it can be reused for carries.
@@ -941,19 +758,10 @@ Log.debug("Adding client with unique name " + name);
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            IRMIClient client = (IRMIClient)it.next();
-            try
-            {
-                client.tellStrikeResults(striker.getDescription(),
-                striker.getTag(), target.getDescription(), target.getTag(),
+            IClient client = (IClient)it.next();
+            client.tellStrikeResults(striker.getTag(), target.getTag(),
                 strikeNumber, rolls, damage, target.isDead(), false,
                 carryDamageLeft, carryTargetDescriptions);
-            }
-            catch (RemoteException e)
-            {
-                Log.error(e.toString());
-                e.printStackTrace();
-            }
         }
     }
 
@@ -980,20 +788,10 @@ Log.debug("Adding client with unique name " + name);
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            IRMIClient client = (IRMIClient)it.next();
-            try
-            {
-                client.tellStrikeResults(striker.getDescription(),
-                striker.getTag(), carryTarget.getDescription(),
-                carryTarget.getTag(), strikeNumber, rolls, carryDamageDone,
-                carryTarget.isDead(), true, carryDamageLeft,
-                carryTargetDescriptions);
-            }
-            catch (RemoteException e)
-            {
-                Log.error(e.toString());
-                e.printStackTrace();
-            }
+            IClient client = (IClient)it.next();
+            client.tellStrikeResults(striker.getTag(), carryTarget.getTag(), 
+                strikeNumber, rolls, carryDamageDone, carryTarget.isDead(), 
+                true, carryDamageLeft, carryTargetDescriptions);
         }
     }
 
@@ -1005,18 +803,9 @@ Log.debug("Adding client with unique name " + name);
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            IRMIClient client = (IRMIClient)it.next();
-            try
-            {
-                client.tellStrikeResults("hex damage", -1, 
-                    target.getDescription(), target.getTag(), 0, null, 
-                    damage, target.isDead(), false, 0, null);
-            }
-            catch (RemoteException e)
-            {
-                Log.error(e.toString());
-                e.printStackTrace();
-            }
+            IClient client = (IClient)it.next();
+            client.tellStrikeResults(-1, target.getTag(), 0, null, damage, 
+                target.isDead(), false, 0, null);
         }
     }
 
@@ -1025,7 +814,7 @@ Log.debug("Adding client with unique name " + name);
     void askChooseStrikePenalty(SortedSet penaltyOptions)
     {
         String playerName = game.getBattle().getActivePlayerName();
-        IRMIClient client = getClient(playerName);
+        IClient client = getClient(playerName);
         ArrayList choices = new ArrayList();
         Iterator it = penaltyOptions.iterator();
         while (it.hasNext())
@@ -1034,20 +823,15 @@ Log.debug("Adding client with unique name " + name);
             striker = po.getStriker();
             choices.add(po.toString());
         }
-        try
-        {
-            client.askChooseStrikePenalty(choices);
-        }
-        catch (RemoteException e)
-        {
-            Log.error(e.toString());
-            e.printStackTrace();
-        }
+        client.askChooseStrikePenalty(choices);
     }
 
-    public void assignStrikePenalty(String playerName, String prompt)
+    public void assignStrikePenalty(String prompt)
     {
-        striker.assignStrikePenalty(prompt);
+        if (isBattleActivePlayer())
+        {
+            striker.assignStrikePenalty(prompt);
+        }
     }
 
     void allInitBattle(String masterHexLabel)
@@ -1056,18 +840,10 @@ Log.debug("Adding client with unique name " + name);
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            IRMIClient client = (IRMIClient)it.next();
-            try
-            {
-                client.initBattle(masterHexLabel, battle.getTurnNumber(),
+            IClient client = (IClient)it.next();
+            client.initBattle(masterHexLabel, battle.getTurnNumber(),
                 battle.getActivePlayerName(), battle.getPhase(),
                 battle.getAttackerId(), battle.getDefenderId());
-            }
-            catch (RemoteException e)
-            {
-                Log.error(e.toString());
-                e.printStackTrace();
-            }
         }
     }
 
@@ -1077,29 +853,21 @@ Log.debug("Adding client with unique name " + name);
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            IRMIClient client = (IRMIClient)it.next();
-            try
-            {
-                client.cleanupBattle();
-            }
-            catch (RemoteException e)
-            {
-                Log.error(e.toString());
-                e.printStackTrace();
-            }
+            IClient client = (IClient)it.next();
+            client.cleanupBattle();
         }
     }
 
 
-    public void mulligan(String playerName)
+    public void mulligan()
     {
-        if (!playerName.equals(game.getActivePlayerName()))
+        if (!isActivePlayer())
         {
-            Log.error(playerName + " illegally called mulligan()");
+            Log.error(getPlayerName() + " illegally called mulligan()");
             return;
         }
         int roll = game.mulligan();
-        Log.event(playerName + " takes a mulligan and rolls " + roll);
+        Log.event(getPlayerName() + " takes a mulligan and rolls " + roll);
         if (roll != -1)
         {
             allTellMovementRoll(roll);
@@ -1107,13 +875,13 @@ Log.debug("Adding client with unique name " + name);
     }
 
 
-    public void undoSplit(String playerName, String splitoffId)
+    public void undoSplit(String splitoffId)
     {
-        if (!playerName.equals(game.getActivePlayerName()))
+        if (!isActivePlayer())
         {
             return;
         }
-        game.getPlayer(playerName).undoSplit(splitoffId);
+        game.getActivePlayer().undoSplit(splitoffId);
     }
 
     void undidSplit(String splitoffId)
@@ -1121,96 +889,80 @@ Log.debug("Adding client with unique name " + name);
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            IRMIClient client = (IRMIClient)it.next();
-            try
-            {
-                client.undidSplit(splitoffId);
-            }
-            catch (RemoteException e)
-            {
-                Log.error(e.toString());
-                e.printStackTrace();
-            }
+            IClient client = (IClient)it.next();
+            client.undidSplit(splitoffId);
         }
     }
 
 
-    public void undoMove(String playerName, String markerId)
+    public void undoMove(String markerId)
     {
-        if (!playerName.equals(game.getActivePlayerName()))
+        if (!isActivePlayer())
         {
             return;
         }
         Legion legion = game.getLegionByMarkerId(markerId);
         String formerHexLabel = legion.getCurrentHexLabel();
-        game.getPlayer(playerName).undoMove(markerId);
+        game.getActivePlayer().undoMove(markerId);
         String currentHexLabel = legion.getCurrentHexLabel();
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            IRMIClient client = (IRMIClient)it.next();
-            try
-            {
-                client.undidMove(markerId, formerHexLabel, currentHexLabel);
-            }
-            catch (RemoteException e)
-            {
-                Log.error(e.toString());
-                e.printStackTrace();
-            }
+            IClient client = (IClient)it.next();
+            client.undidMove(markerId, formerHexLabel, currentHexLabel);
         }
     }
 
 
-    public void undoRecruit(String playerName, String markerId)
+    public void undoRecruit(String markerId)
     {
-        if (!playerName.equals(game.getActivePlayerName()))
+        if (!isActivePlayer())
         {
             return;
         }
-        game.getPlayer(playerName).undoRecruit(markerId);
+        game.getActivePlayer().undoRecruit(markerId);
     }
 
 
-    public void doneWithSplits(String playerName)
+    public void doneWithSplits()
     {
-        if (!playerName.equals(game.getActivePlayerName()))
+        if (!isActivePlayer())
         {
-            Log.error(playerName + " illegally called doneWithSplits()");
+            Log.error(getPlayerName() + " illegally called doneWithSplits()");
             return;
         }
         if (game.getTurnNumber() == 1 &&
-            game.getPlayer(playerName).getNumLegions() == 1)
+            game.getActivePlayer().getNumLegions() == 1)
         {
-            showMessageDialog(playerName, "Must split initial legion");
+            showMessageDialog("Must split initial legion");
             return;
         }
-        game.advancePhase(Constants.SPLIT, playerName);
+        game.advancePhase(Constants.SPLIT, getPlayerName());
     }
 
-    public void doneWithMoves(String playerName)
+    public void doneWithMoves()
     {
-        if (!playerName.equals(game.getActivePlayerName()))
+        if (!isActivePlayer())
         {
-            Log.error(playerName + " illegally called doneWithMoves()");
+            Log.error(getPlayerName() + " illegally called doneWithMoves()");
             return;
         }
 
-        Player player = game.getPlayer(playerName);
+        Player player = game.getActivePlayer();
 
         // If any legion has a legal non-teleport move, then
         // the player must move at least one legion.
         if (player.legionsMoved() == 0 &&
             player.countMobileLegions() > 0)
         {
-            showMessageDialog(playerName, "At least one legion must move.");
+            showMessageDialog("At least one legion must move.");
             return;
         }
         // If legions share a hex and have a legal
         // non-teleport move, force one of them to take it.
         else if (player.splitLegionHasForcedMove())
         {
-            showMessageDialog(playerName, "Split legions must be separated.");
+            showMessageDialog("Split legions must be separated.");
             return;
         }
         // Otherwise, recombine all split legions still in
@@ -1218,50 +970,52 @@ Log.debug("Adding client with unique name " + name);
         else
         {
             player.recombineIllegalSplits();
-            game.advancePhase(Constants.MOVE, playerName);
+            game.advancePhase(Constants.MOVE, getPlayerName());
         }
     }
 
-    public void doneWithEngagements(String playerName)
+    public void doneWithEngagements()
     {
-        if (!playerName.equals(game.getActivePlayerName()))
+        if (!isActivePlayer())
         {
-            Log.error(playerName + " illegally called doneWithEngagements()");
+            Log.error(getPlayerName() + 
+                " illegally called doneWithEngagements()");
             return;
         }
         // Advance only if there are no unresolved engagements.
         if (game.findEngagements().size() > 0)
         {
-            showMessageDialog(playerName, "Must resolve engagements");
+            showMessageDialog("Must resolve engagements");
             return;
         }
-        game.advancePhase(Constants.FIGHT, playerName);
+        game.advancePhase(Constants.FIGHT, getPlayerName());
     }
 
-    public void doneWithRecruits(String playerName)
+    public void doneWithRecruits()
     {
-        if (!playerName.equals(game.getActivePlayerName()))
+        if (!isActivePlayer())
         {
-            Log.error(playerName + " illegally called doneWithRecruits()");
+            Log.error(getPlayerName() + 
+                " illegally called doneWithRecruits()");
             return;
         }
-        Player player = game.getPlayer(playerName);
+        Player player = game.getActivePlayer();
         player.commitMoves();
 
         // Mulligans are only allowed on turn 1.
         player.setMulligansLeft(0);
 
-        game.advancePhase(Constants.MUSTER, playerName);
+        game.advancePhase(Constants.MUSTER, getPlayerName());
     }
 
 
     // XXX Need to support inactive players quitting.
     // XXX If player quits while engaged, might need to set slayer.
     // TODO Notify all players.
-    public void withdrawFromGame(String playerName)
+    public void withdrawFromGame()
     {
-        game.getPlayer(playerName).die(null, true);
-        game.advancePhase(game.getPhase(), playerName);
+        game.getPlayer(getPlayerName()).die(null, true);
+        game.advancePhase(game.getPhase(), getPlayerName());
     }
 
 
@@ -1280,15 +1034,14 @@ Log.debug("Adding client with unique name " + name);
     }
 
 
-    private String [] getPlayerInfo()
+    private List getPlayerInfo()
     {
-        String [] info = new String[game.getNumPlayers()];
+        List info = new ArrayList(game.getNumPlayers());
         Iterator it = game.getPlayers().iterator();
-        int i = 0;
         while (it.hasNext())
         {
             Player player = (Player)it.next();
-            info[i++] = player.getStatusInfo();
+            info.add(player.getStatusInfo());
         }
         return info;
     }
@@ -1307,16 +1060,8 @@ Log.debug("Adding client with unique name " + name);
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            IRMIClient client = (IRMIClient)it.next();
-            try
-            {
-                client.didSplit(hexLabel, parentId, childId, height);
-            }
-            catch (RemoteException e)
-            {
-                Log.error(e.toString());
-                e.printStackTrace();
-            }
+            IClient client = (IClient)it.next();
+            client.didSplit(hexLabel, parentId, childId, height);
         }
     }
 
@@ -1340,17 +1085,9 @@ Log.debug("Adding client with unique name " + name);
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            IRMIClient client = (IRMIClient)it.next();
-            try
-            {
-                client.didMove(markerId, startingHexLabel, endingHexLabel,
+            IClient client = (IClient)it.next();
+            client.didMove(markerId, startingHexLabel, endingHexLabel,
                 teleport);
-            }
-            catch (RemoteException e)
-            {
-                Log.error(e.toString());
-                e.printStackTrace();
-            }
         }
     }
 
@@ -1360,16 +1097,8 @@ Log.debug("Adding client with unique name " + name);
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            IRMIClient client = (IRMIClient)it.next();
-            try
-            {
-                client.addCreature(markerId, creatureName);
-            }
-            catch (RemoteException e)
-            {
-                Log.error(e.toString());
-                e.printStackTrace();
-            }
+            IClient client = (IClient)it.next();
+            client.addCreature(markerId, creatureName);
         }
     }
 
@@ -1378,16 +1107,8 @@ Log.debug("Adding client with unique name " + name);
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            IRMIClient client = (IRMIClient)it.next();
-            try
-            {
-                client.removeCreature(markerId, creatureName);
-            }
-            catch (RemoteException e)
-            {
-                Log.error(e.toString());
-                e.printStackTrace();
-            }
+            IClient client = (IClient)it.next();
+            client.removeCreature(markerId, creatureName);
         }
     }
 
@@ -1396,33 +1117,16 @@ Log.debug("Adding client with unique name " + name);
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            IRMIClient client = (IRMIClient)it.next();
-            try
-            {
-                client.setLegionContents(legion.getMarkerId(),
+            IClient client = (IClient)it.next();
+            client.setLegionContents(legion.getMarkerId(),
                 legion.getImageNames());
-            }
-            catch (RemoteException e)
-            {
-                Log.error(e.toString());
-                e.printStackTrace();
-            }
         }
     }
 
     void oneRevealLegion(Legion legion, String playerName)
     {
-        IRMIClient client = getClient(playerName);
-        try
-        {
-            client.setLegionContents(legion.getMarkerId(),
-            legion.getImageNames());
-        }
-        catch (RemoteException e)
-        {
-            Log.error(e.toString());
-            e.printStackTrace();
-        }
+        IClient client = getClient(playerName);
+        client.setLegionContents(legion.getMarkerId(), legion.getImageNames());
     }
 
     void allFullyUpdateLegionHeights()
@@ -1430,21 +1134,13 @@ Log.debug("Adding client with unique name " + name);
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            IRMIClient client = (IRMIClient)it.next();
+            IClient client = (IClient)it.next();
             Iterator it2 = game.getAllLegions().iterator();
             while (it2.hasNext())
             {
                 Legion legion = (Legion)it2.next();
-                try
-                {
-                    client.setLegionHeight(legion.getMarkerId(),
+                client.setLegionHeight(legion.getMarkerId(),
                     legion.getHeight());
-                }
-                catch (RemoteException e)
-                {
-                    Log.error(e.toString());
-                    e.printStackTrace();
-                }
             }
         }
     }
@@ -1455,7 +1151,7 @@ Log.debug("Adding client with unique name " + name);
         while (it.hasNext())
         {
             Player player = (Player)it.next();
-            IRMIClient client = getClient(player.getName());
+            IClient client = getClient(player.getName());
 
             Iterator it2 = player.getLegions().iterator();
             while (it2.hasNext())
@@ -1483,16 +1179,8 @@ Log.debug("Adding client with unique name " + name);
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            IRMIClient client = (IRMIClient)it.next();
-            try
-            {
-                client.revealCreatures(legion.getMarkerId(), names);
-            }
-            catch (RemoteException e)
-            {
-                Log.error(e.toString());
-                e.printStackTrace();
-            }
+            IClient client = (IClient)it.next();
+            client.revealCreatures(legion.getMarkerId(), names);
         }
     }
 
@@ -1510,12 +1198,6 @@ Log.debug("Adding client with unique name " + name);
     }
 
     // XXX Disallow in network games
-    public void saveGame()
-    {
-        game.saveGame();
-    }
-
-    // XXX Disallow in network games
     public void saveGame(String filename)
     {
         game.saveGame(filename);
@@ -1524,37 +1206,21 @@ Log.debug("Adding client with unique name " + name);
     /** Used to change a player name after color is assigned. */
     void setPlayerName(String playerName, String newName)
     {
-        IRMIClient client = getClient(playerName);
-        try
-        {
-            client.setPlayerName(newName);
-        }
-        catch (RemoteException e)
-        {
-            Log.error(e.toString());
-            e.printStackTrace();
-        }
+        IClient client = getClient(playerName);
+        client.setPlayerName(newName);
         clientMap.remove(playerName);
         clientMap.put(newName, client);
     }
 
     void askPickColor(String playerName, Set colorsLeft)
     {
-        IRMIClient client = getClient(playerName);
-        try
-        {
-            client.askPickColor(colorsLeft);
-        }
-        catch (RemoteException e)
-        {
-            Log.error(e.toString());
-            e.printStackTrace();
-        }
+        IClient client = getClient(playerName);
+        client.askPickColor(colorsLeft);
     }
 
-    public void assignColor(String playerName, String color)
+    public void assignColor(String color)
     {
-        game.assignColor(playerName, color);
+        game.assignColor(getPlayerName(), color);
     }
 
     // XXX Hack to set color on load game.
@@ -1566,16 +1232,8 @@ Log.debug("Adding client with unique name " + name);
             Player player = (Player)it.next();
             String name = player.getName();
             String color = player.getColor();
-            IRMIClient client = getClient(name);
-            try
-            {
-                client.setColor(color);
-            }
-            catch (RemoteException e)
-            {
-                Log.error(e.toString());
-                e.printStackTrace();
-            }
+            IClient client = getClient(name);
+            client.setColor(color);
         }
     }
 
@@ -1590,16 +1248,8 @@ Log.debug("Adding client with unique name " + name);
 
     void oneSetOption(String playerName, String optname, String value)
     {
-        IRMIClient client = getClient(playerName);
-        try
-        {
-            client.setOption(optname, value);
-        }
-        catch (RemoteException e)
-        {
-            Log.error(e.toString());
-            e.printStackTrace();
-        }
+        IClient client = getClient(playerName);
+        client.setOption(optname, value);
     }
 
     void oneSetOption(String playerName, String optname, boolean value)
@@ -1612,16 +1262,8 @@ Log.debug("Adding client with unique name " + name);
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            IRMIClient client = (IRMIClient)it.next();
-            try
-            {
-                client.setOption(optname, value);
-            }
-            catch (RemoteException e)
-            {
-                Log.error(e.toString());
-                e.printStackTrace();
-            }
+            IClient client = (IClient)it.next();
+            client.setOption(optname, value);
         }
     }
 
@@ -1641,16 +1283,8 @@ Log.debug("Adding client with unique name " + name);
         Iterator it = remoteClients.iterator();
         while (it.hasNext())
         {
-            IRMIClient client = (IRMIClient)it.next();
-            try
-            {
-                client.log(message);
-            }
-            catch (RemoteException e)
-            {
-                Log.error(e.toString());
-                e.printStackTrace();
-            }
+            IClient client = (IClient)it.next();
+            client.log(message);
         }
     }
 }

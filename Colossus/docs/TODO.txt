@@ -1,17 +1,19 @@
-Bug: Repaints missed on some remote players' masterboard moves.
-Bug: Remote player sometimes sees all of AI's trial battle moves.
+Bug: Non-warlock rangestrikers fail to attack legions of all lords.
+     They move into rangestriking position even though they can't.
+Bug: Log window text sometimes appears over board, map.
+Bug: Load game is completely broken.
 
-Change from RMI to string socket protocol.
 Authenticate all remote calls to ensure that they come from the correct
-   client or server.  (By socket.)
+   client or server.  (By socket, using the thread name, set to player name.)
+Remove RMI stuff from Makefile.
+Fix remote logging.
 
 Add StartClient gui for setting playerName and hostname. 
 Add Client.jnlp file.
-Add Server.jnlp file, if possible.  (Need to spawn rmiregistry.)
+Add Server.jnlp file.
 
 Refuse remote newGame/loadGame/saveGame calls?
 Disconnect all clients on a newGame.
-Refuse client connections after game has started.
 
 Chat window.
 

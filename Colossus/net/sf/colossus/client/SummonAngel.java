@@ -7,6 +7,7 @@ import javax.swing.*;
 import java.util.*;
 
 import net.sf.colossus.server.Creature;
+import net.sf.colossus.server.Legion;
 import net.sf.colossus.util.KDialog;
 import net.sf.colossus.util.Log;
 
@@ -28,10 +29,11 @@ final class SummonAngel extends KDialog implements MouseListener,
     private Client client;
 
 
-    private SummonAngel(Client client, String markerId, String longMarkerName)
+    private SummonAngel(Client client, String markerId)
     {
         super(client.getBoard().getFrame(), client.getPlayerName() +
-            ": Summon Angel into Legion " + longMarkerName, false);
+            ": Summon Angel into Legion " + Legion.getLongMarkerName(markerId),
+            false);
 
         this.client = client;
         this.markerId = markerId;
@@ -88,15 +90,14 @@ final class SummonAngel extends KDialog implements MouseListener,
         repaint();
     }
 
-    static SummonAngel summonAngel(Client client, String markerId,
-        String longMarkerName)
+    static SummonAngel summonAngel(Client client, String markerId)
     {
 Log.debug("called summonAngel for " + markerId);
         if (!active)
         {
             active = true;
 Log.debug("returning new SummonAngel dialog for " + markerId);
-            return new SummonAngel(client, markerId, longMarkerName);
+            return new SummonAngel(client, markerId);
         }
         return null;
     }

@@ -19,7 +19,7 @@ import net.sf.colossus.parser.TerrainRecruitLoader;
  * @author Romain Dolbeau
  */
 
-final class Legion implements Comparable
+public final class Legion implements Comparable
 {
     private String markerId;    // Bk03, Rd12, etc.
     private String parentId;
@@ -398,17 +398,26 @@ final class Legion implements Comparable
 
     String getMarkerName()
     {
+        return getMarkerName(markerId);
+    }
+
+    public static String getMarkerName(String markerId)
+    {
         return (String)markerNames.get(markerId);
     }
 
-
-    String getLongMarkerName()
+    public static String getLongMarkerName(String markerId)
     {
         StringBuffer sb = new StringBuffer(markerId);
         sb.append(" (");
-        sb.append(getMarkerName());
+        sb.append(getMarkerName(markerId));
         sb.append(")");
         return sb.toString();
+    }
+
+    String getLongMarkerName()
+    {
+        return getLongMarkerName(markerId);
     }
 
 

@@ -2,18 +2,16 @@ package net.sf.colossus.client;
 
 
 import java.util.*;
-import java.rmi.*;
 import com.werken.opt.Options;
 import com.werken.opt.Option;
 import com.werken.opt.CommandLine;
 
-import net.sf.colossus.server.IRMIServer;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.util.Log;
 
 
 /**
- *  Startup code for RMI Client
+ *  Startup code for network Client
  *  @version $Id$
  *  @author David Ripton
  */
@@ -23,6 +21,7 @@ public class StartClient
 {
     private static String playerName = Constants.username;
     private static String hostname = "localhost";
+    private static int port = Constants.defaultPort;
 
 
     private static void usage(Options opts)
@@ -72,22 +71,6 @@ public class StartClient
             hostname = cl.getOptValue('s');
         }
 
-
-        if (System.getSecurityManager() == null) 
-        {
-            System.setSecurityManager(new RMISecurityManager());
-        }
-        try 
-        {
-            String name = "//" + hostname + "/Colossus";
-            IRMIServer server = (IRMIServer)Naming.lookup(name);
-            Client client = new Client(server, playerName);
-            client.attachToServer();
-        } 
-        catch (Exception e) 
-        {
-            Log.error("StartClient exception: " + e.getMessage());
-            e.printStackTrace();
-        }
+        Client client = new Client(hostname, port, playerName, true);
     }
 }

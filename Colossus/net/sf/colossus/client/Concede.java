@@ -8,6 +8,7 @@ import java.util.*;
 
 import net.sf.colossus.util.KDialog;
 import net.sf.colossus.util.Options;
+import net.sf.colossus.server.Legion;
 
 /**
  * Class Concede allows a player to flee or concede before starting a Battle.
@@ -29,12 +30,14 @@ final class Concede extends KDialog implements ActionListener, WindowListener
     private SaveWindow saveWindow;
 
 
-    private Concede(Client client, JFrame parentFrame, String longMarkerName,
-        String hexDescription, String allyMarkerId, String enemyMarkerId, 
-        boolean flee)
+    private Concede(Client client, JFrame parentFrame, String allyMarkerId, 
+        String enemyMarkerId, boolean flee)
     {
         super(parentFrame, (flee ? "Flee" : "Concede") + " with Legion " +
-            longMarkerName + " in " + hexDescription + "?", false);
+            Legion.getLongMarkerName(allyMarkerId) + " in " + 
+            MasterBoard.getHexByLabel(
+                client.getHexForLegion(allyMarkerId)).getDescription() + "?", 
+            false);
 
         Container contentPane = getContentPane();
         contentPane.setLayout(gridbag);
@@ -144,20 +147,16 @@ final class Concede extends KDialog implements ActionListener, WindowListener
 
 
     static void concede(Client client, JFrame parentFrame,
-        String longMarkerName, String hexDescription, String allyMarkerId, 
-        String enemyMarkerId)
+        String allyMarkerId, String enemyMarkerId)
     {
-        new Concede(client, parentFrame, longMarkerName, hexDescription,
-            allyMarkerId, enemyMarkerId, false);
+        new Concede(client, parentFrame, allyMarkerId, enemyMarkerId, false);
     }
 
 
-    static void flee(Client client, JFrame parentFrame,
-        String longMarkerName, String hexDescription, String allyMarkerId, 
+    static void flee(Client client, JFrame parentFrame, String allyMarkerId, 
         String enemyMarkerId)
     {
-        new Concede(client, parentFrame, longMarkerName, hexDescription,
-            allyMarkerId, enemyMarkerId, true);
+        new Concede(client, parentFrame, allyMarkerId, enemyMarkerId, true);
     }
 
 

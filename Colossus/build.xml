@@ -143,13 +143,6 @@
         />
 </target>
 
-<target name="rmi" depends="compile"
-        description = "Compile RMI stubs">
-        <rmic base="" debug="yes" stubversion="1.2"
-              includes = "net/sf/colossus/client/Client.class,
-                          net/sf/colossus/server/Server.class"
-        />
-</target>
 
 <!-- XXX Why does this fail if we set fork to yes? -->
 <!-- TODO Add test suite. -->
@@ -175,7 +168,7 @@
 
 
 <!-- TODO If the jar is newer than all its contents, don't build. -->
-<target name="jar" depends="init,compile,version,rmi"
+<target name="jar" depends="init,compile,version"
         description = "Make jar file">
         <jar jarfile = "Colossus.jar" basedir="."
              manifest="META-INF/MANIFEST.MF"

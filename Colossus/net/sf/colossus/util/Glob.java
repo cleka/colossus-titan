@@ -1,0 +1,55 @@
+package net.sf.colossus.util;
+
+
+import java.util.*;
+
+
+/** Stringify contents of various container classes.
+ *  @version $Id$
+ *  @author David Ripton
+ */
+
+public final class Glob
+{
+    public static final String sep = " %@% ";
+
+    public static String glob(String [] a)
+    {
+        StringBuffer sb = new StringBuffer();
+        for (int i = 0; i < a.length - 1; i++)
+        {
+            sb.append(a[i]);
+            sb.append(sep);
+        }
+        sb.append(a[a.length - 1]);
+        return sb.toString();
+    }
+
+    public static String glob(int [] a)
+    {
+        StringBuffer sb = new StringBuffer();
+        for (int i = 0; i < a.length - 1; i++)
+        {
+            sb.append(a[i]);
+            sb.append(sep);
+        }
+        sb.append(a[a.length - 1]);
+        return sb.toString();
+    }
+
+    public static String glob(Collection col)
+    {
+        StringBuffer sb = new StringBuffer();
+        Iterator it = col.iterator();
+        while (it.hasNext())
+        {
+            Object ob = it.next();
+            sb.append(ob.toString());
+            if (it.hasNext())
+            {
+                sb.append(sep);
+            }
+        }
+        return sb.toString();
+    }
+}

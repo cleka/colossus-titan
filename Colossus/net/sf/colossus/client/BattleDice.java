@@ -1,6 +1,7 @@
 package net.sf.colossus.client;
 
 
+import java.util.*;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
@@ -19,7 +20,7 @@ final class BattleDice extends JPanel
     private String targetDesc = "";
     private int numDice = 0;
     private int targetNumber = 0;
-    private int [] rolls = new int[0];
+    private java.util.List rolls = new ArrayList();
     private int hits = 0;
     private JLabel label1 = new JLabel();
     private Chit [] dice;
@@ -35,22 +36,20 @@ final class BattleDice extends JPanel
 
 
     void setValues(String strikerDesc, String targetDesc, int targetNumber, 
-        int hits, int [] rolls)
+        int hits, java.util.List rolls)
     {
         this.strikerDesc = strikerDesc;
         this.targetDesc = targetDesc;
         this.targetNumber = targetNumber;
         this.hits = hits;
         this.rolls = rolls;
-        if (rolls != null)
-            numDice = rolls.length;
-        else
-            numDice = 0;
+        numDice = rolls.size();
     }
 
 
-    private String getDieImageName(int roll)
+    private String getDieImageName(Integer rollInteger)
     {
+        int roll = rollInteger.intValue();
         StringBuffer basename = new StringBuffer();
         if (roll >= targetNumber)
         {
@@ -89,8 +88,8 @@ final class BattleDice extends JPanel
         dice = new Chit[numDice];
         for (int i = 0; i < numDice; i++)
         {
-            dice[i] = new Chit(2 * Scale.get(), getDieImageName(rolls[i]),
-                this);
+            dice[i] = new Chit(2 * Scale.get(), 
+                getDieImageName((Integer)rolls.get(i)), this);
             diceBox.add(dice[i]);
         }
 

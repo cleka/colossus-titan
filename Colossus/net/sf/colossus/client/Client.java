@@ -7,12 +7,10 @@ import javax.swing.*;
 import java.io.*;
 import java.awt.event.*;
 import java.awt.*;
-import java.rmi.*;
-import java.rmi.server.*;
 
 import net.sf.colossus.util.Log;
 import net.sf.colossus.util.Split;
-import net.sf.colossus.server.IRMIServer;
+import net.sf.colossus.server.IServer;
 import net.sf.colossus.util.Options;
 import net.sf.colossus.server.Player;
 import net.sf.colossus.server.Creature;
@@ -31,11 +29,11 @@ import net.sf.colossus.parser.TerrainRecruitLoader;
  */
 
 
-public final class Client extends UnicastRemoteObject implements IRMIClient
+public final class Client implements IClient
 {
     /** This will eventually be a network interface rather than a
      *  direct reference.  So don't share this reference. */
-    private IRMIServer server;
+    private IServer server;
 
     private MasterBoard board;
     private StatusScreen statusScreen;
@@ -121,29 +119,27 @@ public final class Client extends UnicastRemoteObject implements IRMIClient
     private BattleMovement battleMovement = new BattleMovement(this);
     private Strike strike = new Strike(this);
 
+    private boolean remote;
 
-    Client(IRMIServer server, String playerName) throws RemoteException
+
+    public Client(String host, int port, String playerName, boolean remote)
     {
         super();
 
-        this.server = server;
         this.playerName = playerName;
+        this.remote = remote;
+
         options = new Options(playerName);
         // Need to load options early so they don't overwrite server options.
         loadOptions();
+
+        SocketClient socketClient = new SocketClient(this, host, port);
+        this.server = (IServer)socketClient;
     }
 
-    void attachToServer()
+    public boolean isRemote()
     {
-        try
-        {
-            server.addRemoteClient(this, playerName);
-        }
-        catch (RemoteException e)
-        {
-            Log.error(e.toString());
-            e.printStackTrace();
-        }
+        return remote;
     }
 
 
@@ -154,30 +150,14 @@ public final class Client extends UnicastRemoteObject implements IRMIClient
         clearUndoStack();
         clearRecruitChits();
 
-        try
-        {
-            server.mulligan(playerName);
-        }
-        catch (RemoteException e)
-        {
-            Log.error(e.toString());
-            e.printStackTrace();
-        }
+        server.mulligan();
     }
 
 
     /** Resolve engagement in land. */
     void engage(String land)
     {
-        try
-        {
-            server.engage(land);
-        }
-        catch (RemoteException e)
-        {
-            Log.error(e.toString());
-            e.printStackTrace();
-        }
+        server.engage(land);
     }
 
     String getMyEngagedMarkerId()
@@ -201,58 +181,27 @@ public final class Client extends UnicastRemoteObject implements IRMIClient
 
     private void concede(String markerId)
     {
-        try
-        {
-            server.concede(markerId);
-        }
-        catch (RemoteException e)
-        {
-            Log.error(e.toString());
-            e.printStackTrace();
-        }
+        server.concede(markerId);
     }
 
     private void doNotConcede(String markerId)
     {
-        try
-        {
-            server.doNotConcede(markerId);
-        }
-        catch (RemoteException e)
-        {
-            Log.error(e.toString());
-            e.printStackTrace();
-        }
+        server.doNotConcede(markerId);
     }
 
 
     /** Cease negotiations and fight a battle in land. */
     void fight(String land)
     {
-        try
-        {
-            server.fight(land);
-        }
-        catch (RemoteException e)
-        {
-            Log.error(e.toString());
-            e.printStackTrace();
-        }
+        server.fight(land);
     }
 
 
     /** Legion summoner summons unit from legion donor. */
     void doSummon(String summoner, String donor, String unit)
     {
-        try
-        {
-            server.doSummon(summoner, donor, unit);
-        }
-        catch (RemoteException e)
-        {
-            Log.error(e.toString());
-            e.printStackTrace();
-        }
+        server.doSummon(summoner, donor, unit);
+
         if (board != null)
         {
             board.repaint();
@@ -272,15 +221,7 @@ public final class Client extends UnicastRemoteObject implements IRMIClient
         // XXX Right now the game breaks if a player quits outside his
         // own turn.  But we need to support this, or players will
         // just drop connections.
-        try
-        {
-            server.withdrawFromGame(playerName);
-        }
-        catch (RemoteException e)
-        {
-            Log.error(e.toString());
-            e.printStackTrace();
-        }
+        server.withdrawFromGame();
     }
 
 
@@ -544,9 +485,9 @@ public final class Client extends UnicastRemoteObject implements IRMIClient
     }
 
 
-    public void updatePlayerInfo(String [] infoStrings)
+    public void updatePlayerInfo(java.util.List infoStrings)
     {
-        numPlayers = infoStrings.length;
+        numPlayers = infoStrings.size();
 
         if (playerInfo == null)
         {
@@ -559,7 +500,7 @@ public final class Client extends UnicastRemoteObject implements IRMIClient
 
         for (int i = 0; i < numPlayers; i++)
         {
-            playerInfo[i].update(infoStrings[i]);
+            playerInfo[i].update((String)infoStrings.get(i));
         }
 
         updateStatusScreen();
@@ -706,30 +647,15 @@ public final class Client extends UnicastRemoteObject implements IRMIClient
     /** Called from BattleMap to leave carry mode. */
     void leaveCarryMode()
     {
-        try
-        {
-            server.leaveCarryMode();
-        }
-        catch (RemoteException e)
-        {
-            Log.error(e.toString());
-            e.printStackTrace();
-        }
+        server.leaveCarryMode();
     }
 
 
     void doneWithBattleMoves()
     {
         clearUndoStack();
-        try
-        {
-            server.doneWithBattleMoves();
-        }
-        catch (RemoteException e)
-        {
-            Log.error(e.toString());
-            e.printStackTrace();
-        }
+        
+        server.doneWithBattleMoves();
     }
 
     boolean anyOffboardCreatures()
@@ -750,15 +676,7 @@ public final class Client extends UnicastRemoteObject implements IRMIClient
 
     void doneWithStrikes()
     {
-        try
-        {
-            server.doneWithStrikes(playerName);
-        }
-        catch (RemoteException e)
-        {
-            Log.error(e.toString());
-            e.printStackTrace();
-        }
+        server.doneWithStrikes();
     }
 
     private void makeForcedStrikes()
@@ -766,16 +684,7 @@ public final class Client extends UnicastRemoteObject implements IRMIClient
         if (playerName.equals(getBattleActivePlayerName()) &&
             getOption(Options.autoForcedStrike))
         {
-            try
-            {
-                server.makeForcedStrikes(playerName, getOption(
-                    Options.autoRangeSingle));
-            }
-            catch (RemoteException e)
-            {
-                Log.error(e.toString());
-                e.printStackTrace();
-            }
+            server.makeForcedStrikes(getOption(Options.autoRangeSingle));
         }
     }
 
@@ -1126,8 +1035,7 @@ public final class Client extends UnicastRemoteObject implements IRMIClient
         return summonAngel;
     }
 
-    // XXX Rename
-    public void createSummonAngel(String markerId, String longMarkerName)
+    public void createSummonAngel(String markerId)
     {
         if (getOption(Options.autoSummonAngels))
         {
@@ -1141,8 +1049,7 @@ public final class Client extends UnicastRemoteObject implements IRMIClient
         {
             board.deiconify();
             board.getFrame().toFront();
-            summonAngel = SummonAngel.summonAngel(this, markerId,
-                longMarkerName);
+            summonAngel = SummonAngel.summonAngel(this, markerId);
         }
     }
 
@@ -1178,15 +1085,8 @@ public final class Client extends UnicastRemoteObject implements IRMIClient
 
     void acquireAngelCallback(String markerId, String angelType)
     {
-        try
-        {
-            server.acquireAngel(markerId, angelType);
-        }
-        catch (RemoteException e)
-        {
-            Log.error(e.toString());
-            e.printStackTrace();
-        }
+        server.acquireAngel(markerId, angelType);
+
         if (board != null)
         {
             String hexLabel = getHexForLegion(markerId);
@@ -1232,19 +1132,10 @@ public final class Client extends UnicastRemoteObject implements IRMIClient
 
     void assignStrikePenalty(String prompt)
     {
-        try
-        {
-            server.assignStrikePenalty(playerName, prompt);
-        }
-        catch (RemoteException e)
-        {
-            Log.error(e.toString());
-            e.printStackTrace();
-        }
+        server.assignStrikePenalty(prompt);
     }
 
 
-    // XXX rename
     public void showMessageDialog(String message)
     {
         // Don't bother showing messages to AI players.  Perhaps we
@@ -1294,18 +1185,11 @@ public final class Client extends UnicastRemoteObject implements IRMIClient
             }
             String markerId = (String)legions.get(0);
             donorId = markerId;
-            try
-            {
-                server.setDonor(markerId);
-                summonAngel.updateChits();
-                summonAngel.repaint();
-                getLegionInfo(markerId).getMarker().repaint();
-            }
-            catch (RemoteException e)
-            {
-                Log.error(e.toString());
-                e.printStackTrace();
-            }
+
+            server.setDonor(markerId);
+            summonAngel.updateChits();
+            summonAngel.repaint();
+            getLegionInfo(markerId).getMarker().repaint();
         }
         else
         {
@@ -1313,39 +1197,25 @@ public final class Client extends UnicastRemoteObject implements IRMIClient
         }
     }
 
-    // XXX too many arguments
-    public void askConcede(String longMarkerName, String hexDescription,
-        String allyMarkerId, String enemyMarkerId)
+    public void askConcede(String allyMarkerId, String enemyMarkerId)
     {
-        Concede.concede(this, board.getFrame(), longMarkerName,
-            hexDescription, allyMarkerId, enemyMarkerId);
+        Concede.concede(this, board.getFrame(), allyMarkerId, enemyMarkerId);
     }
 
-    // XXX too many arguments
-    public void askFlee(String longMarkerName, String hexDescription,
-        String allyMarkerId, String enemyMarkerId)
+    public void askFlee(String allyMarkerId, String enemyMarkerId)
     {
-        Concede.flee(this, board.getFrame(), longMarkerName,
-            hexDescription, allyMarkerId, enemyMarkerId);
+        Concede.flee(this, board.getFrame(), allyMarkerId, enemyMarkerId);
     }
 
     void answerFlee(String markerId, boolean answer)
     {
-        try
+        if (answer)
         {
-            if (answer)
-            {
-                server.flee(markerId);
-            }
-            else
-            {
-                server.doNotFlee(markerId);
-            }
+            server.flee(markerId);
         }
-        catch (RemoteException e)
+        else
         {
-            Log.error(e.toString());
-            e.printStackTrace();
+            server.doNotFlee(markerId);
         }
     }
 
@@ -1362,25 +1232,20 @@ public final class Client extends UnicastRemoteObject implements IRMIClient
     }
 
 
-    // XXX too many arguments
-    public void askNegotiate(String attackerLongMarkerName,
-        String defenderLongMarkerName, String attackerId, String defenderId,
-        String hexLabel)
+    public void askNegotiate(String attackerId, String defenderId)
     {
         Proposal proposal = null;
         if (getOption(Options.autoNegotiate))
         {
             // TODO AI players just fight for now.
             proposal = new Proposal(attackerId, defenderId, true, false,
-                null, null, hexLabel);
+                null, null, getHexForLegion(attackerId));
             makeProposal(proposal);
         }
         else
         {
         /* TODO Finish
-            negotiate = new Negotiate(this, attackerLongMarkerName,
-                defenderLongMarkerName, attackerId, defenderId,
-                hexLabel);
+            negotiate = new Negotiate(this, attackerId, defenderId);
         */
         }
     }
@@ -1404,30 +1269,31 @@ public final class Client extends UnicastRemoteObject implements IRMIClient
 
     private void makeProposal(Proposal proposal)
     {
-        // XXX Stringify the proposal.
-        try
-        {
-            server.makeProposal(playerName, proposal);
-        }
-        catch (RemoteException e)
-        {
-            Log.error(e.toString());
-            e.printStackTrace();
-        }
+        server.makeProposal(proposal.toString());
     }
 
 
     /** Inform this player about the other player's proposal. */
-    public void tellProposal(Proposal proposal)
+    public void tellProposal(String proposalString)
     {
+        Proposal proposal = Proposal.makeProposal(proposalString);
         new ReplyToProposal(this, proposal);
     }
 
-    // XXX too many arguments
-    public void tellStrikeResults(String strikerDesc, int strikerTag,
-        String targetDesc, int targetTag, int strikeNumber, int [] rolls,
-        int damage, boolean killed, boolean wasCarry, int carryDamageLeft,
-        Set carryTargetDescriptions)
+    private String getBattleChitDescription(BattleChit chit)
+    {
+        if (chit == null)
+        {
+            return "";
+        }
+        BattleHex hex = HexMap.getHexByLabel(getBattleTerrain(), 
+            chit.getHexLabel());
+        return chit.getCreatureName() + " in " + hex.getDescription();
+    }
+
+    public void tellStrikeResults(int strikerTag, int targetTag, 
+        int strikeNumber, java.util.List rolls, int damage, boolean killed, 
+        boolean wasCarry, int carryDamageLeft, Set carryTargetDescriptions)
     {
         BattleChit chit = getBattleChit(strikerTag);
         if (chit != null)
@@ -1435,9 +1301,11 @@ public final class Client extends UnicastRemoteObject implements IRMIClient
             chit.setStruck(true);
         }
 
+        BattleChit targetChit = getBattleChit(targetTag);
         if (battleDice != null)
         {
-            battleDice.setValues(strikerDesc, targetDesc, strikeNumber,
+            battleDice.setValues(getBattleChitDescription(chit), 
+                getBattleChitDescription(targetChit), strikeNumber,
                 damage, rolls);
             battleDice.showRoll();
         }
@@ -1446,7 +1314,6 @@ public final class Client extends UnicastRemoteObject implements IRMIClient
             map.unselectAllHexes();
         }
 
-        BattleChit targetChit = getBattleChit(targetTag);
         if (targetChit != null)
         {
             if (killed)
@@ -1475,7 +1342,6 @@ public final class Client extends UnicastRemoteObject implements IRMIClient
                 map.highlightCrittersWithTargets();
             }
         }
-
     }
 
     private void pickCarries(int carryDamage, Set carryTargetDescriptions)
@@ -1608,15 +1474,7 @@ public final class Client extends UnicastRemoteObject implements IRMIClient
             return;
         }
 
-        try
-        {
-            server.doRecruit(markerId, recruitName, recruiterName);
-        }
-        catch (RemoteException e)
-        {
-            Log.error(e.toString());
-            e.printStackTrace();
-        }
+        server.doRecruit(markerId, recruitName, recruiterName);
     }
 
     /** Currently used for human players only.  Always needs to call
@@ -1640,15 +1498,7 @@ public final class Client extends UnicastRemoteObject implements IRMIClient
                 hexDescription);
         }
 
-        try
-        {
-            server.doRecruit(markerId, recruitName, recruiterName);
-        }
-        catch (RemoteException e)
-        {
-            Log.error(e.toString());
-            e.printStackTrace();
-        }
+        server.doRecruit(markerId, recruitName, recruiterName);
     }
 
     public void didRecruit(String markerId, String recruitName,
@@ -1992,15 +1842,7 @@ public final class Client extends UnicastRemoteObject implements IRMIClient
 
     void doBattleMove(int tag, String hexLabel)
     {
-        try
-        {
-            server.doBattleMove(tag, hexLabel);
-        }
-        catch (RemoteException e)
-        {
-            Log.error(e.toString());
-            e.printStackTrace();
-        }
+        server.doBattleMove(tag, hexLabel);
     }
 
     public void tellBattleMove(int tag, String startingHexLabel,
@@ -2027,29 +1869,13 @@ public final class Client extends UnicastRemoteObject implements IRMIClient
     /** Attempt to have critter tag strike the critter in hexLabel. */
     void strike(int tag, String hexLabel)
     {
-        try
-        {
-            server.strike(tag, hexLabel);
-        }
-        catch (RemoteException e)
-        {
-            Log.error(e.toString());
-            e.printStackTrace();
-        }
+        server.strike(tag, hexLabel);
     }
 
     /** Attempt to apply carries to the critter in hexLabel. */
     void applyCarries(String hexLabel)
     {
-        try
-        {
-            server.applyCarries(hexLabel);
-        }
-        catch (RemoteException e)
-        {
-            Log.error(e.toString());
-            e.printStackTrace();
-        }
+        server.applyCarries(hexLabel);
         if (map != null)
         {
             map.unselectHexByLabel(hexLabel);
@@ -2063,15 +1889,7 @@ public final class Client extends UnicastRemoteObject implements IRMIClient
         if (!isUndoStackEmpty())
         {
             String hexLabel = (String)popUndoStack();
-            try
-            {
-                server.undoBattleMove(hexLabel);
-            }
-            catch (RemoteException e)
-            {
-                Log.error(e.toString());
-                e.printStackTrace();
-            }
+            server.undoBattleMove(hexLabel);
         }
     }
 
@@ -2308,16 +2126,7 @@ public final class Client extends UnicastRemoteObject implements IRMIClient
             teleportingLord = figureTeleportingLord(hexLabel);
         }
 
-        try
-        {
-            server.doMove(moverId, hexLabel, entrySide, teleport,
-                teleportingLord);
-        }
-        catch (RemoteException e)
-        {
-            Log.error(e.toString());
-            e.printStackTrace();
-        }
+        server.doMove(moverId, hexLabel, entrySide, teleport, teleportingLord);
     }
 
     private boolean goodEntrySide(String entrySide)
@@ -2725,55 +2534,19 @@ Log.debug("found " + set.size() + " hexes");
     void newGame()
     {
         clearUndoStack();
-        try
-        {
-            server.newGame();
-        }
-        catch (RemoteException e)
-        {
-            Log.error(e.toString());
-            e.printStackTrace();
-        }
+        server.newGame();
     }
 
     void loadGame(String filename)
     {
         clearUndoStack();
-        try
-        {
-            server.loadGame(filename);
-        }
-        catch (RemoteException e)
-        {
-            Log.error(e.toString());
-            e.printStackTrace();
-        }
+        server.loadGame(filename);
     }
 
-    void saveGame()
-    {
-        try
-        {
-            server.saveGame();
-        }
-        catch (RemoteException e)
-        {
-            Log.error(e.toString());
-            e.printStackTrace();
-        }
-    }
 
     void saveGame(String filename)
     {
-        try
-        {
-            server.saveGame(filename);
-        }
-        catch (RemoteException e)
-        {
-            Log.error(e.toString());
-            e.printStackTrace();
-        }
+        server.saveGame(filename);
     }
 
 
@@ -2782,17 +2555,9 @@ Log.debug("found " + set.size() + " hexes");
         if (!isUndoStackEmpty())
         {
             String splitoffId = (String)popUndoStack();
-            try
-            {
-                server.undoSplit(playerName, splitoffId);
-                markersAvailable.add(splitoffId);
-                numSplitsThisTurn--;
-            }
-            catch (RemoteException e)
-            {
-                Log.error(e.toString());
-                e.printStackTrace();
-            }
+            server.undoSplit(splitoffId);
+            markersAvailable.add(splitoffId);
+            numSplitsThisTurn--;
         }
     }
 
@@ -2801,15 +2566,7 @@ Log.debug("found " + set.size() + " hexes");
         if (!isUndoStackEmpty())
         {
             String markerId = (String)popUndoStack();
-            try
-            {
-                server.undoMove(playerName, markerId);
-            }
-            catch (RemoteException e)
-            {
-                Log.error(e.toString());
-                e.printStackTrace();
-            }
+            server.undoMove(markerId);
         }
     }
 
@@ -2829,15 +2586,7 @@ Log.debug("found " + set.size() + " hexes");
         if (!isUndoStackEmpty())
         {
             String markerId = (String)popUndoStack();
-            try
-            {
-                server.undoRecruit(playerName, markerId);
-            }
-            catch (RemoteException e)
-            {
-                Log.error(e.toString());
-                e.printStackTrace();
-            }
+            server.undoRecruit(markerId);
             String hexLabel = getHexForLegion(markerId);
             GUIMasterHex hex = board.getGUIHexByLabel(hexLabel);
             hex.repaint();
@@ -2875,15 +2624,7 @@ Log.debug("found " + set.size() + " hexes");
         {
             return;
         }
-        try
-        {
-            server.doneWithSplits(playerName);
-        }
-        catch (RemoteException e)
-        {
-            Log.error(e.toString());
-            e.printStackTrace();
-        }
+        server.doneWithSplits();
         clearUndoStack();
         clearRecruitChits();
     }
@@ -2895,15 +2636,7 @@ Log.debug("found " + set.size() + " hexes");
             return;
         }
         clearRecruitChits();
-        try
-        {
-            server.doneWithMoves(playerName);
-        }
-        catch (RemoteException e)
-        {
-            Log.error(e.toString());
-            e.printStackTrace();
-        }
+        server.doneWithMoves();
         clearUndoStack();
     }
 
@@ -2913,15 +2646,7 @@ Log.debug("found " + set.size() + " hexes");
         {
             return;
         }
-        try
-        {
-            server.doneWithEngagements(playerName);
-        }
-        catch (RemoteException e)
-        {
-            Log.error(e.toString());
-            e.printStackTrace();
-        }
+        server.doneWithEngagements();
         clearUndoStack();
     }
 
@@ -2932,15 +2657,7 @@ Log.debug("found " + set.size() + " hexes");
             return;
         }
         clearUndoStack();
-        try
-        {
-            server.doneWithRecruits(playerName);
-        }
-        catch (RemoteException e)
-        {
-            Log.error(e.toString());
-            e.printStackTrace();
-        }
+        server.doneWithRecruits();
     }
 
 
@@ -3058,15 +2775,7 @@ Log.debug("found " + set.size() + " hexes");
 
         if (results != null)
         {
-            try
-            {
-                server.doSplit(parentId, childId, results);
-            }
-            catch (RemoteException e)
-            {
-                Log.error(e.toString());
-                e.printStackTrace();
-            }
+            server.doSplit(parentId, childId, results);
         }
     }
 
@@ -3137,18 +2846,10 @@ Log.debug("found " + set.size() + " hexes");
 
         setColor(color);
 
-        try
-        {
-            server.assignColor(playerName, color);
-        }
-        catch (RemoteException e)
-        {
-            Log.error(e.toString());
-            e.printStackTrace();
-        }
+        server.assignColor(color);
     }
 
-    private String getHexForLegion(String markerId)
+    String getHexForLegion(String markerId)
     {
         return getLegionInfo(markerId).getHexLabel();
     }

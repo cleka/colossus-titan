@@ -6,7 +6,6 @@ import java.util.*;
 import javax.swing.*;
 import java.awt.event.*;
 import java.awt.*;
-import java.rmi.*;
 
 import com.werken.opt.CommandLine;
 
@@ -59,9 +58,6 @@ public final class Game
     // XXX Need to clear cl after initialization is done? 
     private CommandLine cl = null;
 
-    /** Number of remote clients we're waiting for. */
-    private int waitingForClients;
-
 
     Game()
     {
@@ -73,38 +69,11 @@ public final class Game
     }
 
 
-    private void initServerAndClients()
+    private void initServer()
     {
-        if (server == null)
-        {
-            try
-            {
-                server = new Server(this);
-            }
-            catch (RemoteException e)
-            {
-                Log.error(e.toString());
-                e.printStackTrace();
-                dispose();
-            }
-        }
-        else
-        {
-            server.disposeAllClients();
-        }
-        for (int i = 0; i < getNumPlayers(); i++)
-        {
-            Player player = (Player)players.get(i);
-            if (player.getType().endsWith(Constants.network))
-            {
-                waitingForClients++;
-Log.debug("Incremented waitingForClients to " + waitingForClients);
-            }
-            else
-            {
-                server.addLocalClient(player.getName());
-            }
-        }
+Log.debug("Called Game.initServer()");
+        server = new Server(this);
+        server.initSocketServer();
     }
 
 
@@ -148,7 +117,6 @@ Log.debug("Incremented waitingForClients to " + waitingForClients);
         acquiring = false;
         pendingAdvancePhase = false;
         gameOver = false;
-        waitingForClients = 0;
     }
 
 
@@ -285,26 +253,13 @@ Log.debug("Incremented waitingForClients to " + waitingForClients);
         }
 
         options.saveOptions();
-
         VariantSupport.loadVariant(options.getStringOption(Options.variant));
-
         Log.event("Starting new game");
-
         addPlayersFromOptions();
-
-        initServerAndClients();
-
-        if (waitingForClients == 0)
-        {
-            newGame2();
-        }
-        else
-        {
-            initRMI();
-        }
+        initServer();
     }
 
-    private void newGame2()
+    void newGame2()
     {
 Log.debug("Called Game.newGame2()");
         // We need to set the autoPlay option before loading the board,
@@ -320,27 +275,6 @@ Log.debug("Called Game.newGame2()");
         assignColors();
     }
 
-    private void initRMI()
-    {
-Log.debug("Called Game.initRMI()");
-        if (System.getSecurityManager() == null)
-        {
-            System.setSecurityManager(new RMISecurityManager());
-        }
-        String name = "//" + "localhost" + "/Colossus";
-        try
-        {
-            Naming.rebind(name, server);
-            System.out.println("RMIServer bound");
-        }
-        catch (Exception e)
-        {
-            System.err.println("RMIServer main() exception: " +
-                e.getMessage());
-            e.printStackTrace();
-            dispose();
-        }
-    }
 
     private boolean nameIsTaken(String name)
     {
@@ -365,29 +299,19 @@ Log.debug("Called Game.initRMI()");
         return getUniqueName(name + rollDie());
     }
 
-    void addRemoteClient(final String playerName)
+
+    int findOpenNetworkSlot()
     {
-Log.debug("Called Game.addedRemoteClient for " + playerName);
         for (int i = 0; i < getNumPlayers(); i++)
         {
             Player player = (Player)players.get(i);
             if (player.getType().endsWith(Constants.network) &&
                 player.getName().startsWith(Constants.byClient))
             {
-                player.setName(playerName);
-
-                // XXX broken
-                // In case we had to change a duplicate name.
-                server.setPlayerName(playerName, playerName);
-                waitingForClients--;
-                if (waitingForClients <= 0)
-                {
-                    newGame2();
-                }
-                break;
+                return i;
             }
         }
-
+        return -1;
     }
 
 
@@ -909,6 +833,11 @@ Log.debug("Called Game.addedRemoteClient for " + playerName);
     private void setupSplit()
     {
         Player player = getActivePlayer();
+        if (player == null)
+        {
+            Log.error("No players");
+            dispose();
+        }
         player.resetTurnState();
         server.allSetupSplit();
 
@@ -977,8 +906,9 @@ Log.debug("Called Game.addedRemoteClient for " + playerName);
 
 
     /** Create a text file describing this game's state, in
-     *  file filename.  We don't use XML yet because we don't 
-     *  want to require everyone to install a parser.
+     *  file filename, or <saveDirName>/<time>.sav if null.
+     *  We don't use XML yet because we don't want to require 
+     *  JDK 1.3.x users to install a parser.
      *  Format:
      *     Savegame version string
      *     Number of players
@@ -1047,17 +977,40 @@ Log.debug("Called Game.addedRemoteClient for " + playerName);
      *     Defending Legion:
      *         ...
      */
-    void saveGame(String filename)
+    void saveGame(final String filename)
     {
+        String fn = null; 
+        if (filename == null)
+        {
+            Date date = new Date();
+            File savesDir = new File(Constants.saveDirname);
+            if (!savesDir.exists() || !savesDir.isDirectory())
+            {
+                Log.event("Trying to make directory " + Constants.saveDirname);
+                if (!savesDir.mkdirs())
+                {
+                    Log.error("Could not create saves directory");
+                    return;
+                }
+            }
+
+            fn = Constants.saveDirname + date.getTime() + 
+                Constants.saveExtension;
+        }
+        else
+        {
+            fn = new String(filename);
+        }
+
         FileWriter fileWriter;
         try
         {
-            fileWriter = new FileWriter(filename);
+            fileWriter = new FileWriter(fn);
         }
         catch (IOException e)
         {
             Log.error(e.toString());
-            Log.error("Couldn't open " + filename);
+            Log.error("Couldn't open " + fn);
             return;
         }
         PrintWriter out = new PrintWriter(fileWriter);
@@ -1142,7 +1095,7 @@ Log.debug("Called Game.addedRemoteClient for " + playerName);
 
         if (out.checkError())
         {
-            Log.error("Write error " + filename);
+            Log.error("Write error " + fn);
             return;
         }
     }
@@ -1174,33 +1127,11 @@ Log.debug("Called Game.addedRemoteClient for " + playerName);
         }
     }
 
-    /** Create a text file describing this game's state, in
-     *  file <saveDirName>/<time>.sav */
-    void saveGame()
-    {
-        Date date = new Date();
-        File savesDir = new File(Constants.saveDirname);
-        if (!savesDir.exists() || !savesDir.isDirectory())
-        {
-             Log.event("Trying to make directory " + Constants.saveDirname);
-             if (!savesDir.mkdirs())
-             {
-                 Log.error("Could not create saves directory");
-                 return;
-             }
-        }
-
-        String filename = Constants.saveDirname + date.getTime() + 
-            Constants.saveExtension;
-
-        saveGame(filename);
-    }
-
     void autoSave()
     {            
         if (getOption(Options.autosave))
         {
-            saveGame();
+            saveGame(null);
         }
     }
 
@@ -1344,7 +1275,7 @@ Log.debug("Called Game.addedRemoteClient for " + playerName);
                 }
             }
 
-            initServerAndClients();
+            initServer();
             server.allSetColor();
 
             // We need to set the autoPlay option before loading the board,
@@ -1710,6 +1641,10 @@ Log.debug("Called Game.addedRemoteClient for " + playerName);
 
     void dispose()
     {
+        if (server != null)
+        {
+            server.disposeAllClients();
+        }
         System.exit(0);
     }
 
@@ -2584,13 +2519,15 @@ Log.debug("" + findEngagements().size() + " engagements left");
     }
 
     /** playerName offers proposal. */
-    void makeProposal(String playerName, Proposal proposal)
+    void makeProposal(String playerName, String proposalString)
     {
         // If it's too late to negotiate, just throw this away.
         if (battleInProgress)
         {
             return;
         }
+
+        Proposal proposal = Proposal.makeProposal(proposalString);
 
         int thisPlayerNum;
         if (playerName.equals(getActivePlayerName()))

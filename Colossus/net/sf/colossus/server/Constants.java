@@ -138,6 +138,8 @@ public final class Constants
     public static final String username = System.getProperty("user.name",
         byColor);
 
+    public static final int defaultPort = 1969;
+
 
     /** Available internal variants */
     public static final String [] variantArray =
@@ -170,4 +172,101 @@ public final class Constants
     {
         return Collections.unmodifiableList(variantList);
     }
+
+
+    // Protocol packet type constants
+    /** XXX If any of the args in the protocol contain this string, then
+     *  the protocol will break.  Escape it for chat. */
+    public static final String protocolTermSeparator=" ~ ";
+
+    // From client to server
+    public static final String signOn = "signOn";
+
+    public static final String leaveCarryMode = "leaveCarryMode";
+    public static final String doneWithBattleMoves = "doneWithBattleMoves";
+    public static final String doneWithStrikes = "doneWithStrikes";
+    public static final String makeForcedStrikes = "makeForcedStrikes";
+    public static final String acquireAngel = "acquireAngel";
+    public static final String doSummon = "doSummon";
+    public static final String doRecruit = "doRecruit";
+    public static final String engage = "engage";
+    public static final String concede = "concede";
+    public static final String doNotConcede = "doNotConcede";
+    public static final String flee = "flee";
+    public static final String doNotFlee = "doNotFlee";
+    public static final String makeProposal = "makeProposal";
+    public static final String fight = "fight";
+    public static final String doBattleMove = "doBattleMove";
+    public static final String strike = "strike";
+    public static final String applyCarries = "applyCarries";
+    public static final String undoBattleMove = "undoBattleMove";
+    public static final String assignStrikePenalty = "assignStrikePenalty";
+    public static final String mulligan = "mulligan";
+    public static final String undoSplit = "undoSplit";
+    public static final String undoMove = "undoMove";
+    public static final String undoRecruit = "undoRecruit";
+    public static final String doneWithSplits = "doneWithSplits";
+    public static final String doneWithMoves = "doneWithMoves";
+    public static final String doneWithEngagements = "doneWithEngagements";
+    public static final String doneWithRecruits = "doneWithRecruits";
+    public static final String withdrawFromGame = "withdrawFromGame";
+    public static final String setDonor = "setDonor";
+    public static final String doSplit = "doSplit";
+    public static final String doMove = "doMove";
+    public static final String assignColor = "assignColor";
+    public static final String newGame = "newGame";
+    public static final String loadGame = "loadGame";
+    public static final String saveGame = "saveGame";
+
+    // From server to client
+    public static final String tellMovementRoll = "tellMovementRoll";
+    public static final String setOption = "setOption";
+    public static final String updatePlayerInfo = "updatePlayerInfo";
+    public static final String setColor = "setColor";
+    public static final String updateCreatureCount = "updateCreatureCount";
+    public static final String dispose = "dispose";
+    public static final String removeLegion = "removeLegion";
+    public static final String setLegionHeight = "setLegionHeight";
+    public static final String setLegionContents = "setLegionContents";
+    public static final String addCreature = "addCreature";
+    public static final String removeCreature = "removeCreature";
+    public static final String revealCreatures = "revealCreatures";
+    public static final String removeDeadBattleChits = "removeDeadBattleChits";
+    public static final String placeNewChit = "placeNewChit";
+    public static final String initBoard = "initBoard";
+    public static final String setPlayerName = "setPlayerName";
+    public static final String createSummonAngel = "createSummonAngel";
+    public static final String askAcquireAngel = "askAcquireAngel";
+    public static final String askChooseStrikePenalty = 
+        "askChooseStrikePenalty";
+    public static final String showMessageDialog = "showMessageDialog";
+    public static final String tellGameOver = "tellGameOver";
+    public static final String askConcede = "askConcede";
+    public static final String askFlee = "askFlee";
+    public static final String askNegotiate = "askNegotiate";
+    public static final String tellProposal = "tellProposal";
+    public static final String tellStrikeResults = "tellStrikeResults";
+    public static final String initBattle = "initBattle";
+    public static final String cleanupBattle = "cleanupBattle";
+    public static final String highlightEngagements = "highlightEngagements";
+    public static final String doReinforce = "doReinforce";
+    public static final String didRecruit = "didRecruit";
+    public static final String undidRecruit = "undidRecruit";
+    public static final String setupTurnState = "setupTurnState";
+    public static final String setupSplit = "setupSplit";
+    public static final String setupMove = "setupMove";
+    public static final String setupFight = "setupFight";
+    public static final String setupMuster = "setupMuster";
+    public static final String setupBattleSummon = "setupBattleSummon";
+    public static final String setupBattleRecruit = "setupBattleRecruit";
+    public static final String setupBattleMove = "setupBattleMove";
+    public static final String setupBattleFight = "setupBattleFight";
+    public static final String tellLegionLocation = "tellLegionLocation";
+    public static final String tellBattleMove = "tellBattleMove";
+    public static final String didMove = "didMove";
+    public static final String undidMove = "undidMove";
+    public static final String undidSplit = "undidSplit";
+    public static final String didSplit = "didSplit";
+    public static final String askPickColor = "askPickColor";
+    public static final String log = "log";
 }

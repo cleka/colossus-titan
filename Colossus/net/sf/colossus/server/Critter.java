@@ -820,15 +820,16 @@ Log.debug("new penalty option: " + po.toString());
         // Roll the dice.
         int damage = 0;
 
-        int [] rolls = new int[dice];
+        java.util.List rolls = new ArrayList();
         StringBuffer rollString = new StringBuffer(36);
 
         for (int i = 0; i < dice; i++)
         {
-            rolls[i] = Game.rollDie();
-            rollString.append(rolls[i]);
+            int roll = Game.rollDie();
+            rolls.add(new Integer(roll));
+            rollString.append(roll);
 
-            if (rolls[i] >= strikeNumber)
+            if (roll >= strikeNumber)
             {
                 damage++;
             }

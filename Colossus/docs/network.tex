@@ -29,25 +29,14 @@ in the PATH.  And the server computer needs to have a well-known
 hostname or IP address accessible to the other players' computers, 
 without draconian firewalling.
 
-The server operator needs to run the runserver script, which starts
-the rmiregistry program (if it's already running, this will fail and 
-throw an exception, which won't hurt anything) and then sets RMI 
-codebase and security policy locations and runs the server.  Because
-the codebase is set relative to the current directory, you need to run
-this script from its own directory, the base of the Colossus source tree.
-
-(Note: if you use the run script instead of the runserver script,
-remote clients won't be able to connect.)
-
-rmiregistry is a program included with the JDK/JRE that sets up named 
-RMI connections.  It binds to port 1099 by default.
-
-The startup dialog should appear, allowing you to set the variant,
-optional rules, and how many players of which types you want.  Human
-players are local to the server machine.  Network players are remote.
-The game will wait for *exactly* the number of network players you 
-specify, then start the game.  If you prefer, you can use command-line 
-options instead.  ``\texttt{run -h}'' to see them.
+The server operator simply runs the normal "run" script used to run 
+hotseat games.  The startup dialog should appear as normal, allowing 
+you to set the variant, optional rules, and how many players of which 
+types you want.  Human players are local to the server machine.  
+Network players are remote.  The game will wait for *exactly* the 
+number of network players you specify, then start the game.  If you 
+prefer, you can use command-line options instead.  ``\texttt{run -h}'' 
+to see them.
 
 Each client needs to wait for the server to be started, then run
 the runclient script.  It takes two arguments.  -p playername and
@@ -70,30 +59,14 @@ your favorite IRC or instant messenger client in the background.
 
 \begin{itemize}
 
-\item[Q] I can't make it work because of my firewall.
+\item[Q] What about firewalls?
 
-\item[A] That means your firewall is working as designed.
-
-   If you control the firewall, configure it to allow inbound and 
-   outbound traffic on all ports > 1024 while playing.  If you don't 
-   control the firewall, you're probably hosed -- the game currently
-   uses Java RMI, which is not at all firewall-friendly.
-   
-   I plan to ditch RMI in favor of simple sockets with server-to-client 
-   traffic piggybacking on the original client-to-server connection.
-
-\item[Q] There are permission denied errors.
-
-\item[A] It's probably a bad java.policy file.  
-
-   Make sure there's a file called java.policy in the Colossus 
-   base directory on the machine where you run the server.
-
-\item[Q] The server worked the first time, but now it doesn't.
-   
-\item[A] The old server is probably still bound to the socket.
-
-   Kill the server process.  If you can't, reboot the machine. 
+\item[A] We changed from RMI to simple sockets, so the game should be
+much more firewall-friendly.  The server accepts connections from 
+clients on port 1969, and piggybacks return traffic on the same sockets
+rather than opening more.  So as long as the client machines have the
+ability to connect out to high ports, and the server machine has inbound
+port 1969 open, it should work.
 
 \end{itemize}
 

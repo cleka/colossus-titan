@@ -4,7 +4,7 @@ package net.sf.colossus.util;
 import java.util.*;
 
 
-/** Miscellaneous utility functions.
+/** Perl-style split function.
  *  @version $Id$
  *  @author David Ripton
  */
@@ -12,7 +12,12 @@ import java.util.*;
 public final class Split
 {
     /** Split the string into a list of substrings delimited by sep. */
-    public static List split(final char sep, String s)
+    public static List split(final char sep, final String s)
+    {
+        return split("" + sep, s);
+    }
+
+    public static List split(final String sep, final String s)
     {
         List list = new ArrayList();
 
@@ -27,7 +32,7 @@ public final class Split
                 return list;
             }
             list.add(s.substring(pos, splitAt));
-            pos = splitAt + 1;
+            pos = splitAt + sep.length();
         }
         while (pos < len);
         return list;
