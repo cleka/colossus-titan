@@ -19,6 +19,7 @@ class Legion
     private MasterHex currentHex;
     private MasterHex startingHex;
     private boolean moved = false;
+    private boolean recruited = false;
     private Player player;
 
 
@@ -198,6 +199,30 @@ class Legion
     {
         startingHex = currentHex;
         moved = false;
+        recruited = false;
+    }
+
+
+    boolean canRecruit()
+    {
+        if (recruited || height > 6)
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+
+    void markRecruit()
+    {
+        recruited = true;
+    }
+
+
+    void clearRecruit()
+    {
+        recruited = false;
     }
 
 
