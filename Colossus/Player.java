@@ -29,26 +29,26 @@ class Player
     private Legion lastLegionRecruited;
 
 
-    Player(String name, Game game)
+    public Player(String name, Game game)
     {
         this.name = name;
         this.game = game;
     }
 
 
-    boolean isAlive()
+    public boolean isAlive()
     {
         return alive;
     }
 
 
-    String getColor()
+    public String getColor()
     {
         return color;
     }
 
 
-    void setColor(String color)
+    public void setColor(String color)
     {
         this.color = color;
         for (int i = 0; i <= 8; i++)
@@ -63,7 +63,7 @@ class Player
     }
 
 
-    String getShortColor()
+    public String getShortColor()
     {
         if (color == "Black")
         {
@@ -96,31 +96,31 @@ class Player
     }
 
 
-    void setTower(int startingTower)
+    public void setTower(int startingTower)
     {
         this.startingTower = startingTower;
     }
 
 
-    int getTower()
+    public int getTower()
     {
         return startingTower;
     }
 
 
-    int getScore()
+    public int getScore()
     {
         return (int) score;
     }
 
 
-    String getPlayersElim()
+    public String getPlayersElim()
     {
         return playersEliminated;
     }
 
 
-    void addPlayerElim(Player player)
+    public void addPlayerElim(Player player)
     {
         if (playersEliminated == null)
         {
@@ -133,85 +133,85 @@ class Player
     }
 
 
-    boolean canTitanTeleport()
+    public boolean canTitanTeleport()
     {
         return (score >= 400 && canTeleport());
     }
 
 
-    boolean canSummonAngel()
+    public boolean canSummonAngel()
     {
         return canSummonAngel;
     }
 
 
-    void allowSummoningAngel()
+    public void allowSummoningAngel()
     {
         canSummonAngel = true;
     }
 
 
-    void disallowSummoningAngel()
+    public void disallowSummoningAngel()
     {
         canSummonAngel = false;
     }
 
 
-    boolean canTeleport()
+    public boolean canTeleport()
     {
         return canTeleport;
     }
 
 
-    void allowTeleport()
+    public void allowTeleport()
     {
         canTeleport = true;
     }
 
 
-    void disallowTeleport()
+    public void disallowTeleport()
     {
         canTeleport = false;
     }
 
 
-    Legion getLastLegionSummonedFrom()
+    public Legion getLastLegionSummonedFrom()
     {
         return lastLegionSummonedFrom;
     }
 
 
-    void setLastLegionSummonedFrom(Legion legion)
+    public void setLastLegionSummonedFrom(Legion legion)
     {
         lastLegionSummonedFrom = legion;
     }
 
 
-    int getTitanPower()
+    public int getTitanPower()
     {
         return (int) (6 + (score / 100));
     }
 
 
-    int getNumLegions()
+    public int getNumLegions()
     {
         return numLegions;
     }
 
 
-    Legion getLegion(int i)
+    public Legion getLegion(int i)
     {
         return legions[i];
     }
 
 
-    Game getGame()
+    public Game getGame()
     {
         return game;
     }
 
 
-    int legionsMoved()
+    public int legionsMoved()
     {
         int total = 0;
         for (int i = 0; i < numLegions; i++)
@@ -226,7 +226,25 @@ class Player
     }
 
 
-    void commitMoves()
+    // Return the number of this player's legions that have legal 
+    // non-teleport moves remaining.
+    public int countMobileLegions()
+    {
+        int count = 0;
+
+        for (int i = 0; i < getNumLegions(); i++)
+        {
+            if (game.getBoard().showMoves(getLegion(i)) > 0)
+            {
+                count++;
+            }
+        }
+
+        return count;
+    }
+
+
+    public void commitMoves()
     {
         for (int i = 0; i < numLegions; i++)
         {
@@ -235,31 +253,31 @@ class Player
     }
 
 
-    String getName()
+    public String getName()
     {
         return name;
     }
 
 
-    int getMovementRoll()
+    public int getMovementRoll()
     {
         return movementRoll;
     }
 
 
-    int getMulligansLeft()
+    public int getMulligansLeft()
     {
         return mulligansLeft;
     }
 
 
-    void setMulligansLeft(int number)
+    public void setMulligansLeft(int number)
     {
         mulligansLeft = number;
     }
 
 
-    void rollMovement()
+    public void rollMovement()
     {
         // It's a new turn, so once-per-turn things are allowed again.
         allowSummoningAngel();
@@ -276,7 +294,7 @@ System.out.println("game.getBoard().clearAllEntrySides()");
     }
 
 
-    void takeMulligan()
+    public void takeMulligan()
     {
         if (mulligansLeft > 0)
         {
@@ -287,13 +305,13 @@ System.out.println("game.getBoard().clearAllEntrySides()");
     }
 
 
-    void markLastLegionMoved(Legion legion)
+    public void markLastLegionMoved(Legion legion)
     {
         lastLegionMoved = legion;
     }
 
 
-    void undoLastMove()
+    public void undoLastMove()
     {
         if (lastLegionMoved != null)
         {
@@ -303,7 +321,7 @@ System.out.println("game.getBoard().clearAllEntrySides()");
     }
 
 
-    void undoAllMoves()
+    public void undoAllMoves()
     {
         for (int i = 0; i < numLegions; i++)
         {
@@ -314,7 +332,7 @@ System.out.println("game.getBoard().clearAllEntrySides()");
     }
 
     
-    void undoLastRecruit()
+    public void undoLastRecruit()
     {
         if (lastLegionRecruited != null)
         {
@@ -324,19 +342,19 @@ System.out.println("game.getBoard().clearAllEntrySides()");
     }
 
 
-    void markLastLegionRecruited(Legion legion)
+    public void markLastLegionRecruited(Legion legion)
     {
         lastLegionRecruited = legion;
     }
 
 
-    void clearLastLegionRecruited()
+    public void clearLastLegionRecruited()
     {
         lastLegionRecruited = null;
     }
 
     
-    void undoAllRecruits()
+    public void undoAllRecruits()
     {
         for (int i = 0; i < numLegions; i++)
         {
@@ -345,7 +363,7 @@ System.out.println("game.getBoard().clearAllEntrySides()");
     }
 
 
-    void highlightTallLegions()
+    public void highlightTallLegions()
     {
         for (int i = 0; i < numLegions; i++)
         {
@@ -360,7 +378,7 @@ System.out.println("game.getBoard().clearAllEntrySides()");
     }
 
 
-    void undoAllSplits()
+    public void undoAllSplits()
     {
         for (int i = numLegions - 1; i >= 0; i--)
         {
@@ -380,7 +398,7 @@ System.out.println("game.getBoard().clearAllEntrySides()");
     }
 
 
-    int getMaxLegionHeight()
+    public int getMaxLegionHeight()
     {
         int height = 0;
         for (int i = 0; i < numLegions; i++)
@@ -394,14 +412,14 @@ System.out.println("game.getBoard().clearAllEntrySides()");
     }
 
 
-    void addLegion(Legion legion)
+    public void addLegion(Legion legion)
     {
         numLegions++;
         legions[numLegions - 1] = legion;
     }
 
 
-    void removeLegion(Legion legion)
+    public void removeLegion(Legion legion)
     {
         for (int i = 0; i < numLegions; i++)
         {
@@ -436,49 +454,49 @@ System.out.println("game.getBoard().clearAllEntrySides()");
     }
 
 
-    void selectLegion(Legion legion)
+    public void selectLegion(Legion legion)
     {
         selectedLegion = legion;
     }
 
 
-    void unselectLegion()
+    public void unselectLegion()
     {
         selectedLegion = null;
     }
 
 
-    Legion getSelectedLegion()
+    public Legion getSelectedLegion()
     {
         return selectedLegion;
     }
 
 
-    int getNumMarkersAvailable()
+    public int getNumMarkersAvailable()
     {
         return numMarkersAvailable;
     }
 
 
-    String [] getMarkersAvailable()
+    public String [] getMarkersAvailable()
     {
         return markersAvailable;
     }
 
 
-    String getMarker(int i)
+    public String getMarker(int i)
     {
         return markersAvailable[i];
     }
 
 
-    String getSelectedMarker()
+    public String getSelectedMarker()
     {
         return markerSelected;
     }
 
 
-    void addSelectedMarker()
+    public void addSelectedMarker()
     {
         markersAvailable[numMarkersAvailable] = new String(markerSelected);
         numMarkersAvailable++;
@@ -486,13 +504,13 @@ System.out.println("game.getBoard().clearAllEntrySides()");
     }
 
 
-    void clearSelectedMarker()
+    public void clearSelectedMarker()
     {
         markerSelected = null;
     }
 
 
-    void selectMarker(int i)
+    public void selectMarker(int i)
     {
         if (i < 0 || i >= numMarkersAvailable)
         {
@@ -514,7 +532,7 @@ System.out.println("game.getBoard().clearAllEntrySides()");
     }
 
 
-    void addLegionMarkers(Player player)
+    public void addLegionMarkers(Player player)
     {
         String [] newMarkers = player.getMarkersAvailable();
         int len;
@@ -527,7 +545,7 @@ System.out.println("game.getBoard().clearAllEntrySides()");
     }
 
 
-    void addPoints(double points)
+    public void addPoints(double points)
     {
         score += points;
         if (game != null)
@@ -538,13 +556,13 @@ System.out.println("game.getBoard().clearAllEntrySides()");
 
 
     // Remove half-points.
-    void truncScore()
+    public void truncScore()
     {
         score = Math.floor(score);
     }
 
 
-    void die(Player player)
+    public void die(Player player)
     {
         // Engaged legions give half points to the player they're
         // engaged with.  All others give half points to player,
@@ -603,12 +621,12 @@ System.out.println("game.getBoard().clearAllEntrySides()");
     }
 
 
-    void eliminateTitan()
+    public void eliminateTitan()
     {
         titanEliminated = true;
     }
 
-    boolean isTitanEliminated()
+    public boolean isTitanEliminated()
     {
         return titanEliminated;
     }
