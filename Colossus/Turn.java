@@ -35,12 +35,15 @@ class Turn extends Dialog implements ActionListener
         Player player = game.getActivePlayer();
         setTitle(player.getName() + " Turn " + game.getTurnNumber());
         removeAll();
-        setLayout(new GridLayout(0, 2));
+        setLayout(new GridLayout(0, 3));
 
         add(new Label(game.getActivePlayer().getName() + " : Split stacks"));
-        Button button1 = new Button("Done with Splits");
+        Button button1 = new Button("Undo All Splits");
         add(button1);
         button1.addActionListener(this);
+        Button button2 = new Button("Done with Splits");
+        add(button2);
+        button2.addActionListener(this);
 
         pack();
 
@@ -68,31 +71,36 @@ class Turn extends Dialog implements ActionListener
         Player player = game.getActivePlayer();
         if (player.getMulligansLeft() > 0)
         {
-            setLayout(new GridLayout(0, 4));
+            setLayout(new GridLayout(0, 5));
         }
         else
         {
-            setLayout(new GridLayout(0, 3));
+            setLayout(new GridLayout(0, 4));
         }
 
         player.rollMovementDie();
 
         add(new Label(player.getName() + " : Movement Roll: " + 
             player.getMovementRoll()));
-        Button button1 = new Button("Reset Moves");
+
+        Button button1 = new Button("Undo Last Move");
         add(button1);
         button1.addActionListener(this);
 
+        Button button2 = new Button("Undo All Moves");
+        add(button2);
+        button2.addActionListener(this);
+
         if (player.getMulligansLeft() > 0)
         {
-            Button button2 = new Button("Take Mulligan");
-            add(button2);
-            button2.addActionListener(this);
+            Button button3 = new Button("Take Mulligan");
+            add(button3);
+            button3.addActionListener(this);
         }
 
-        Button button3 = new Button("Done with Moves");
-        add(button3);
-        button3.addActionListener(this);
+        Button button4 = new Button("Done with Moves");
+        add(button4);
+        button4.addActionListener(this);
            
         pack();
 
@@ -174,7 +182,15 @@ class Turn extends Dialog implements ActionListener
     {
         Player player = game.getActivePlayer();
 
-        if (e.getActionCommand() == "Done with Splits")
+        if (e.getActionCommand() == "Undo All Splits")
+        {
+            player.undoAllSplits();
+
+            // Remove all moves from MasterBoard.
+            board.repaint();
+        }
+
+        else if (e.getActionCommand() == "Done with Splits")
         {
             if (player.getMaxLegionHeight() > 7)
             {
@@ -186,7 +202,16 @@ class Turn extends Dialog implements ActionListener
             setupMoveDialog();
         }
 
-        else if (e.getActionCommand() == "Reset Moves")
+        else if (e.getActionCommand() == "Undo Last Move")
+        {
+            player.undoLastMove();
+
+            // Remove all moves from MasterBoard.
+            board.unselectAllHexes();
+            board.repaint();
+        }
+
+        else if (e.getActionCommand() == "Undo All Moves")
         {
             player.undoAllMoves();
 
