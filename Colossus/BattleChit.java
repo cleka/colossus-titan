@@ -16,8 +16,8 @@ class BattleChit extends Chit
     private boolean moved = false;
     private boolean struck = false;
 
-    private Hex currentHex;
-    private Hex startingHex;
+    private BattleHex currentHex;
+    private BattleHex startingHex;
 
     // Damage taken
     private int hits = 0;
@@ -27,8 +27,8 @@ class BattleChit extends Chit
 
 
     BattleChit(int cx, int cy, int scale, String imageFilename,
-        Container container, Creature creature, Hex hex, Legion legion,
-        boolean inverted, BattleMap map)
+        Container container, Creature creature, BattleHex hex, 
+        Legion legion, boolean inverted, BattleMap map)
     {
         super(cx, cy, scale, imageFilename, container, inverted);
         this.creature = creature;
@@ -117,13 +117,13 @@ class BattleChit extends Chit
     }
 
 
-    Hex getCurrentHex()
+    BattleHex getCurrentHex()
     {
         return currentHex;
     }
 
 
-    Hex getStartingHex()
+    BattleHex getStartingHex()
     {
         return startingHex;
     }
@@ -145,7 +145,7 @@ class BattleChit extends Chit
             if (currentHex.getHexside(i) != 'c' && 
                 currentHex.getOppositeHexside(i) != 'c')
             {
-                Hex hex = currentHex.getNeighbor(i);
+                BattleHex hex = currentHex.getNeighbor(i);
                 if (hex != null)
                 {
                     if (hex.isOccupied())
@@ -171,7 +171,7 @@ class BattleChit extends Chit
     }
 
 
-    void moveToHex(Hex hex)
+    void moveToHex(BattleHex hex)
     {
         currentHex.removeChit(this);
         currentHex = hex;
@@ -197,7 +197,7 @@ class BattleChit extends Chit
     // target, including modifications for terrain.
     int getDice(BattleChit target)
     {
-        Hex targetHex = target.getCurrentHex();
+        BattleHex targetHex = target.getCurrentHex();
 
         int dice = getPower();
 
@@ -249,7 +249,7 @@ class BattleChit extends Chit
 
     int getAttackerSkill(BattleChit target)
     {
-        Hex targetHex = target.getCurrentHex();
+        BattleHex targetHex = target.getCurrentHex();
 
         int attackerSkill = creature.getSkill();
 
@@ -335,7 +335,7 @@ class BattleChit extends Chit
 
     int getStrikeNumber(BattleChit target)
     {
-        Hex targetHex = target.getCurrentHex();
+        BattleHex targetHex = target.getCurrentHex();
         boolean rangestrike = !inContact(true);
 
         int attackerSkill = getAttackerSkill(target);
@@ -367,7 +367,7 @@ class BattleChit extends Chit
 
     void strike(BattleChit target)
     {
-        Hex targetHex = target.getCurrentHex();
+        BattleHex targetHex = target.getCurrentHex();
 
         boolean carryPossible = true;
         if (numInContact(false) < 2)
@@ -397,7 +397,7 @@ class BattleChit extends Chit
                 if (currentHex.getHexside(i) != 'c' && 
                     currentHex.getOppositeHexside(i) != 'c')
                 {
-                    Hex hex = currentHex.getNeighbor(i);
+                    BattleHex hex = currentHex.getNeighbor(i);
                     if (hex != null && hex != targetHex && hex.isOccupied())
                     {
                         BattleChit chit = hex.getChit();

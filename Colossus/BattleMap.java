@@ -11,10 +11,10 @@ import com.sun.java.swing.*;
 public class BattleMap extends JFrame implements MouseListener,
     MouseMotionListener, WindowListener
 {
-    private Hex[][] h = new Hex[6][6];
+    private BattleHex[][] h = new BattleHex[6][6];
 
     // ne, e, se, sw, w, nw
-    private Hex [] entrances = new Hex[6];
+    private BattleHex [] entrances = new BattleHex[6];
 
     private int numChits;
     private BattleChit[] chits = new BattleChit[14];
@@ -112,7 +112,7 @@ public class BattleMap extends JFrame implements MouseListener,
         int attackerHeight = attacker.getHeight();
         numChits = attackerHeight + defender.getHeight();
 
-        Hex entrance = getEntrance(attacker);
+        BattleHex entrance = getEntrance(attacker);
         for (int i = 0; i < attackerHeight; i++)
         {
             chits[i] = new BattleChit(0, 0, chitScale,
@@ -159,7 +159,7 @@ public class BattleMap extends JFrame implements MouseListener,
         imagesLoaded = false;
         tracker = new MediaTracker(this);
 
-        Hex entrance = getEntrance(legion);
+        BattleHex entrance = getEntrance(legion);
         int height = legion.getHeight();
         Creature creature = legion.getCreature(height - 1);
 
@@ -228,7 +228,7 @@ public class BattleMap extends JFrame implements MouseListener,
                 if (!chit.hasMoved() && !chit.inContact(false))
                 {
                     count++;
-                    Hex hex = chit.getCurrentHex();
+                    BattleHex hex = chit.getCurrentHex();
                     hex.select();
                     hex.repaint();
                 }
@@ -241,14 +241,14 @@ public class BattleMap extends JFrame implements MouseListener,
 
     // Recursively find moves from this hex.  Select all legal destinations.
     //    Do not double back.  Return the number of moves found.
-    private void findMoves(Hex hex, BattleChit chit, Creature creature,
+    private void findMoves(BattleHex hex, BattleChit chit, Creature creature,
         boolean flies, int movesLeft, int cameFrom)
     {
         for (int i = 0; i < 6; i++)
         {
             if (i != cameFrom)
             {
-                Hex neighbor = hex.getNeighbor(i);
+                BattleHex neighbor = hex.getNeighbor(i);
                 if (neighbor != null)
                 {
                     int reverseDir = (i + 3) % 6;
@@ -441,7 +441,7 @@ public class BattleMap extends JFrame implements MouseListener,
                 if (countStrikes(chit) > 0)
                 {
                     count++;
-                    Hex hex = chit.getCurrentHex();
+                    BattleHex hex = chit.getCurrentHex();
                     hex.select();
                     hex.repaint();
                 }
@@ -471,7 +471,7 @@ public class BattleMap extends JFrame implements MouseListener,
         }
 
         Player player = chit.getPlayer();
-        Hex currentHex = chit.getCurrentHex();
+        BattleHex currentHex = chit.getCurrentHex();
 
         // First mark and count normal strikes.
         for (int i = 0; i < 6; i++)
@@ -480,7 +480,7 @@ public class BattleMap extends JFrame implements MouseListener,
             if (currentHex.getHexside(i) != 'c' && 
                 currentHex.getOppositeHexside(i) != 'c')
             {
-                Hex hex = currentHex.getNeighbor(i);
+                BattleHex hex = currentHex.getNeighbor(i);
                 if (hex != null)
                 {
                     if (hex.isOccupied())
@@ -513,7 +513,7 @@ public class BattleMap extends JFrame implements MouseListener,
                 BattleChit bogie = chits[i];
                 if (bogie.getPlayer() != player && !bogie.isDead())
                 {
-                    Hex hex = bogie.getCurrentHex();
+                    BattleHex hex = bogie.getCurrentHex();
 
                     // Can't rangestrike if it can be struck normally.
                     if (!hex.isSelected())
@@ -559,7 +559,7 @@ public class BattleMap extends JFrame implements MouseListener,
             BattleChit target = chits[i];
             if (target.getCarryFlag())
             {
-                Hex targetHex = target.getCurrentHex();
+                BattleHex targetHex = target.getCurrentHex();
                 targetHex.select();
                 targetHex.repaint();
                 count++;
@@ -628,7 +628,7 @@ public class BattleMap extends JFrame implements MouseListener,
 
     // Returns the range in hexes from hex1 to hex2.  Titan ranges are
     // inclusive at both ends.
-    int getRange(Hex hex1, Hex hex2)
+    int getRange(BattleHex hex1, BattleHex hex2)
     {
         int x1 = hex1.getXCoord();
         float y1 = hex1.getYCoord();
@@ -691,10 +691,10 @@ public class BattleMap extends JFrame implements MouseListener,
 
     // Check LOS, going to the left of hexspines if argument left is true, or
     // to the right if it is false.
-    private boolean LOSBlockedDir(Hex initialHex, Hex currentHex, Hex finalHex, 
-        boolean left, int strikeElevation, boolean strikerAtop, boolean
-        strikerAtopCliff, boolean midObstacle, boolean midCliff, boolean 
-        midChit, int totalObstacles)
+    private boolean LOSBlockedDir(BattleHex initialHex, BattleHex currentHex, 
+        BattleHex finalHex, boolean left, int strikeElevation, 
+        boolean strikerAtop, boolean strikerAtopCliff, boolean midObstacle, 
+        boolean midCliff, boolean midChit, int totalObstacles)
     {
         boolean targetAtop = false;
         boolean targetAtopCliff = false;
@@ -717,7 +717,7 @@ public class BattleMap extends JFrame implements MouseListener,
         
         int direction = getDirection(currentHex, finalHex, left);
 
-        Hex nextHex = currentHex.getNeighbor(direction);
+        BattleHex nextHex = currentHex.getNeighbor(direction);
 
         if (nextHex == null)
         {
@@ -850,7 +850,7 @@ public class BattleMap extends JFrame implements MouseListener,
     // Check to see if the LOS from hex1 to hex2 is blocked.  If the LOS
     // lies along a hexspine, check both and return true only if both are
     // blocked.
-    boolean LOSBlocked(Hex hex1, Hex hex2)
+    boolean LOSBlocked(BattleHex hex1, BattleHex hex2)
     {
         if (hex1 == hex2)
         {
@@ -904,8 +904,8 @@ public class BattleMap extends JFrame implements MouseListener,
     // Return true if the rangestrike is possible.
     boolean rangestrikePossible(BattleChit chit, BattleChit target)
     {
-        Hex currentHex = chit.getCurrentHex();
-        Hex targetHex = target.getCurrentHex();
+        BattleHex currentHex = chit.getCurrentHex();
+        BattleHex targetHex = target.getCurrentHex();
         Creature creature = chit.getCreature(); 
 
         boolean clear = true;
@@ -935,7 +935,7 @@ public class BattleMap extends JFrame implements MouseListener,
     // Sometimes two directions are possible.  If the left parameter
     // is set, the direction further left will be given.  Otherwise,
     // the direction further right will be given.
-    int getDirection(Hex hex1, Hex hex2, boolean left)
+    int getDirection(BattleHex hex1, BattleHex hex2, boolean left)
     {
         if (hex1 == hex2)
         {
@@ -1081,7 +1081,7 @@ public class BattleMap extends JFrame implements MouseListener,
     // Return the number of intervening bramble hexes.  If LOS is along a
     // hexspine, go left if argument left is true, right otherwise.  If
     // LOS is blocked, return a large number.
-    private int countBrambleHexesDir(Hex hex1, Hex hex2,
+    private int countBrambleHexesDir(BattleHex hex1, BattleHex hex2,
         boolean left, int previousCount)
     {
         int count = previousCount;
@@ -1099,7 +1099,7 @@ public class BattleMap extends JFrame implements MouseListener,
         
         int direction = getDirection(hex1, hex2, left);
 
-        Hex nextHex = hex1.getNeighbor(direction);
+        BattleHex nextHex = hex1.getNeighbor(direction);
         if (nextHex == null)
         {
             return 10;
@@ -1135,7 +1135,7 @@ public class BattleMap extends JFrame implements MouseListener,
 
     // Return the number of intervening bramble hexes.  If LOS is along a
     // hexspine and there are two choices, pick the lower one.
-    int countBrambleHexes(Hex hex1, Hex hex2)
+    int countBrambleHexes(BattleHex hex1, BattleHex hex2)
     {
         if (hex1 == hex2)
         {
@@ -1311,7 +1311,7 @@ public class BattleMap extends JFrame implements MouseListener,
                     legion.getPlayer().eliminateTitan();
                 }
 
-                Hex hex = chits[i].getCurrentHex();
+                BattleHex hex = chits[i].getCurrentHex();
                 hex.removeChit(chits[i]);
                 hex.repaint();
 
@@ -1419,27 +1419,27 @@ System.out.println("defender's titan eliminated");
             {
                 if (show[i][j])
                 {
-                    h[i][j] = new Hex
+                    h[i][j] = new BattleHex
                         ((int) Math.round(cx + 3 * i * scale),
                         (int) Math.round(cy + (2 * j + (i & 1)) *
-                        Hex.SQRT3 * scale), scale, this, i, j);
+                        BattleHex.SQRT3 * scale), scale, this, i, j);
                 }
             }
         }
 
 
         // Initialize entrances.
-        entrances[0] = new Hex(cx + 15 * scale,
+        entrances[0] = new BattleHex(cx + 15 * scale,
             (int) Math.round(cy + 1 * scale), scale, this, -1, 0);
-        entrances[1] = new Hex(cx + 21 * scale,
+        entrances[1] = new BattleHex(cx + 21 * scale,
             (int) Math.round(cy + 10 * scale), scale, this, -1, 1);
-        entrances[2] = new Hex(cx + 17 * scale,
+        entrances[2] = new BattleHex(cx + 17 * scale,
             (int) Math.round(cy + 22 * scale), scale, this, -1, 2);
-        entrances[3] = new Hex(cx + 2 * scale,
+        entrances[3] = new BattleHex(cx + 2 * scale,
             (int) Math.round(cy + 21 * scale), scale, this, -1, 3);
-        entrances[4] = new Hex(cx - 3 * scale,
+        entrances[4] = new BattleHex(cx - 3 * scale,
             (int) Math.round(cy + 10 * scale), scale, this, -1, 4);
-        entrances[5] = new Hex(cx + 1 * scale,
+        entrances[5] = new BattleHex(cx + 1 * scale,
             (int) Math.round(cy + 1 * scale), scale, this, -1, 5);
 
 
@@ -1777,7 +1777,7 @@ System.out.println("defender's titan eliminated");
     }
 
 
-    Hex getEntrance(Legion legion)
+    BattleHex getEntrance(Legion legion)
     {
         if (legion == attacker)
         {
