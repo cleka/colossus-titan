@@ -1,16 +1,12 @@
-Add load options, so that JWS users can get at their cfg files.
+Copy various new docs to web page from inst.  tex -> html first when possible.
+Put web page under CVS.
+Split up README into separate files.
 
 Document test procedures.  
 
-ShowLegion on mouseover
-
 Add some JUnit tests.
 
-Copy all docs to web page from inst target.
-Put web page under CVS.
-Split up README into separate files.  Probably HTML not text.
-
-Set up Java2html for current release source on web site.
+ShowLegion on mouseover, not click, with permanent dialog.
 
 Highlight appropriate engagement hex while engagement is being resolved.
    (Except during angel summoning.)
@@ -19,44 +15,31 @@ Make most returned collections unmodifiable.
 
 Initialize autoPickRecruiter and overlays to true by default.
 
-Optional post-engagement status dialog showing which legions/players
-   fought, known stack contents, what lived and died, summons, acquires,
-   reinforcements, and points.
+Optional post-engagement status dialog. 
 
 Change some dialogs to show info in a label instead of the title (so
    the dialog is wide enough) and add explicit cancel buttons.
 
 Move code to center a dialog on screen to one place.  Maybe add a
    parent dialog class?
-<<<<<<< TODO.txt
-=======
 
 Change StatusScreen to use a JTable.  
 Pass smaller chunks of changed info to StatusScreen, from generalized
     info update messages. 
 
 Cache legion heights, then known legion contents in Client.
->>>>>>> 1.137
 
-<<<<<<< TODO.txt
-Change StatusScreen to use a JTable.
-=======
 Change remaining client->server information methods to void requests 
    and callbacks.
->>>>>>> 1.137
 
-<<<<<<< TODO.txt
-Cache hex location of each legion in Client.
 Cache known legion contents in Client.
 Both require sending events to all clients when a legion is formed
     (game start or load), splits/joins, moves/unmoves, recruits/unrecruits, 
     reinforces, acquires, summons, dies (flees/concedes/negotiates/battles), 
     or gets reduced (by negotiation or battle).
-Change client->server information methods to void requests and callbacks.
-=======
+
 Remove remaining public Client methods that only directly control the GUI
    in favor of higher-level events.
->>>>>>> 1.137
 
 Always show the current turn, player, and phase in a panel somewhere.
 
@@ -71,7 +54,6 @@ Highlight entrances somehow.  Maybe use fixed boxes with an arrow to
 
 Add display of dead creatures / total creatures / creatures in play to
    CreatureCollectionView, and some way to toggle between these values.
-Add total value of all a player's creatures to StatusScreen.
 
 Reveal all stacks at game end.
 
@@ -120,30 +102,3 @@ Add movement and recruit animation.  Requires returning full paths for
    moves, not just destination hex.
 
 
-
-Bug: Can't change player options during battle when attacked by another
-     player, only during own turn.
-
-Bug: AI player rolls 6 on turn 1, fails several teleport moves, takes normal
-     move.  Not passing teleport=true to Game.doMove() ? 
-
-Bug: Entering AI player left troll offboard.  (Had to -- no room.)  It
-     was shown in the entrance for the rest of the battle, without an X.
-     Points were given for it, correctly.  But no log message showing
-     it being swept.
-
-Bug: deadlocks in AI's summon battle phase
-
-Bug: Need to repaint after auto strikes, before manual strike.
-
-Bug: AI stack recruits cyclops, flees to another AI stack, recruitChit
-     not cleared.
-
-Bug: Game ends during advance phase, auto-advance to muster phase,
-     acquire angel dialogs not cleared.
-
-Bug 513346: Mark as fixed
-
-Bug: PickEntrySide buttons flicker.
-
-Copy various new docs to web page from inst.  tex -> html first when possible.
