@@ -10,6 +10,8 @@ import java.awt.event.*;
 class Hex
 {
     public static final double SQRT3 = Math.sqrt(3.0);
+    public static final double RAD_TO_DEG = 180 / Math.PI;
+
     private boolean selected;
     private int[] xVertex = new int[6];
     private int[] yVertex = new int[6];
@@ -195,19 +197,7 @@ class Hex
         switch(hexsideType)
         {
             case 'c':     // cliff -- triangles
-                x[0] = (int) Math.round(x0 - l * Math.sin(theta));
-                y[0] = (int) Math.round(y0 + l * Math.cos(theta));
-                x[1] = (int) Math.round((x0 + x1) / 2 + l * Math.sin(theta));
-                y[1] = (int) Math.round((y0 + y1) / 2 - l * Math.cos(theta));
-                x[2] = (int) Math.round(x1 - l * Math.sin(theta));
-                y[2] = (int) Math.round(y1 + l * Math.cos(theta));
-
-                g.setColor(java.awt.Color.white);
-                g.fillPolygon(x, y, 3);
-                g.setColor(java.awt.Color.black);
-                g.drawPolyline(x, y, 3);
-
-                for (int j = 1; j < 3; j++)
+                for (int j = 0; j < 3; j++)
                 {
                     x0 = vx1 + (vx2 - vx1) * (2 + 3 * j) / 12;
                     y0 = vy1 + (vy2 - vy1) * (2 + 3 * j) / 12;
@@ -230,20 +220,8 @@ class Hex
                 }
                 break;
 
-            case 'd':     // XXX: dune --  arcs
-                x[0] = (int) Math.round(x0 - l * Math.sin(theta));
-                y[0] = (int) Math.round(y0 + l * Math.cos(theta));
-                x[1] = (int) Math.round((x0 + x1) / 2 + l * Math.sin(theta));
-                y[1] = (int) Math.round((y0 + y1) / 2 - l * Math.cos(theta));
-                x[2] = (int) Math.round(x1 - l * Math.sin(theta));
-                y[2] = (int) Math.round(y1 + l * Math.cos(theta));
-
-                g.setColor(java.awt.Color.white);
-                g.fillPolygon(x, y, 3);
-                g.setColor(java.awt.Color.black);
-                g.drawPolyline(x, y, 3);
-
-                for (int j = 1; j < 3; j++)
+            case 'd':     // dune --  arcs
+                for (int j = 0; j < 3; j++)
                 {
                     x0 = vx1 + (vx2 - vx1) * (2 + 3 * j) / 12;
                     y0 = vy1 + (vy2 - vy1) * (2 + 3 * j) / 12;
@@ -252,37 +230,59 @@ class Hex
 
                     x[0] = (int) Math.round(x0 - l * Math.sin(theta));
                     y[0] = (int) Math.round(y0 + l * Math.cos(theta));
-                    x[1] = (int) Math.round((x0 + x1) / 2 + l * 
-                        Math.sin(theta));
-                    y[1] = (int) Math.round((y0 + y1) / 2 - l * 
-                        Math.cos(theta));
-                    x[2] = (int) Math.round(x1 - l * Math.sin(theta));
-                    y[2] = (int) Math.round(y1 + l * Math.cos(theta));
-                    
+                    x[1] = (int) Math.round(x0 + l * Math.sin(theta));
+                    y[1] = (int) Math.round(y0 - l * Math.cos(theta));
+                    x[2] = (int) Math.round(x1 + l * Math.sin(theta));
+                    y[2] = (int) Math.round(y1 - l * Math.cos(theta));
+                    x[3] = (int) Math.round(x1 - l * Math.sin(theta));
+                    y[3] = (int) Math.round(y1 + l * Math.cos(theta));
+
+                    x2 = (int) Math.round((x0 + x1) / 2);
+                    y2 = (int) Math.round((y0 + y1) / 2);
+                    Rectangle rect = new Rectangle();
+                    rect.x = x2 - (int) Math.round(l);
+                    rect.y = y2 - (int) Math.round(l);
+                    rect.width = (int) (2 * Math.round(l));
+                    rect.height = (int) (2 * Math.round(l));
+
                     g.setColor(java.awt.Color.white);
-                    g.fillPolygon(x, y, 3);
+                    // Draw a bit more than a semicircle, to clean edge.
+                    g.fillArc(rect.x, rect.y, rect.width, rect.height,
+                        (int) Math.round((2 * Math.PI - theta) *
+                        RAD_TO_DEG - 10), 200);
                     g.setColor(java.awt.Color.black);
-                    g.drawPolyline(x, y, 3);
+                    g.drawArc(rect.x, rect.y, rect.width, rect.height,
+                        (int) Math.round((2 * Math.PI - theta) * RAD_TO_DEG),
+                        180);
+                    
                 }
                 break;
 
-            case 's':     // XXX: slope -- lines
+            case 's':     // slope -- lines
+                for (int j = 0; j < 3; j++)
+                {
+                    x0 = vx1 + (vx2 - vx1) * (2 + 3 * j) / 12;
+                    y0 = vy1 + (vy2 - vy1) * (2 + 3 * j) / 12;
+                    x1 = vx1 + (vx2 - vx1) * (4 + 3 * j) / 12;
+                    y1 = vy1 + (vy2 - vy1) * (4 + 3 * j) / 12;
+
+                    x[0] = (int) Math.round(x0 - l / 3 * Math.sin(theta));
+                    y[0] = (int) Math.round(y0 + l / 3 * Math.cos(theta));
+                    x[1] = (int) Math.round(x0 + l / 3 * Math.sin(theta));
+                    y[1] = (int) Math.round(y0 - l / 3 * Math.cos(theta));
+                    x[2] = (int) Math.round(x1 + l / 3 * Math.sin(theta));
+                    y[2] = (int) Math.round(y1 - l / 3 * Math.cos(theta));
+                    x[3] = (int) Math.round(x1 - l / 3 * Math.sin(theta));
+                    y[3] = (int) Math.round(y1 + l / 3 * Math.cos(theta));
+                    
+                    g.setColor(java.awt.Color.black);
+                    g.drawLine(x[0], y[0], x[1], y[1]);
+                    g.drawLine(x[2], y[2], x[3], y[3]);
+                }
                 break;
 
-            case 'w':     // XXX: wall --  blocks
-                x[0] = (int) Math.round(x0 - l * Math.sin(theta));
-                y[0] = (int) Math.round(y0 + l * Math.cos(theta));
-                x[1] = (int) Math.round((x0 + x1) / 2 + l * Math.sin(theta));
-                y[1] = (int) Math.round((y0 + y1) / 2 - l * Math.cos(theta));
-                x[2] = (int) Math.round(x1 - l * Math.sin(theta));
-                y[2] = (int) Math.round(y1 + l * Math.cos(theta));
-
-                g.setColor(java.awt.Color.white);
-                g.fillPolygon(x, y, 3);
-                g.setColor(java.awt.Color.black);
-                g.drawPolyline(x, y, 3);
-
-                for (int j = 1; j < 3; j++)
+            case 'w':     // wall --  blocks
+                for (int j = 0; j < 3; j++)
                 {
                     x0 = vx1 + (vx2 - vx1) * (2 + 3 * j) / 12;
                     y0 = vy1 + (vy2 - vy1) * (2 + 3 * j) / 12;
@@ -291,17 +291,17 @@ class Hex
 
                     x[0] = (int) Math.round(x0 - l * Math.sin(theta));
                     y[0] = (int) Math.round(y0 + l * Math.cos(theta));
-                    x[1] = (int) Math.round((x0 + x1) / 2 + l * 
-                        Math.sin(theta));
-                    y[1] = (int) Math.round((y0 + y1) / 2 - l * 
-                        Math.cos(theta));
-                    x[2] = (int) Math.round(x1 - l * Math.sin(theta));
-                    y[2] = (int) Math.round(y1 + l * Math.cos(theta));
+                    x[1] = (int) Math.round(x0 + l * Math.sin(theta));
+                    y[1] = (int) Math.round(y0 - l * Math.cos(theta));
+                    x[2] = (int) Math.round(x1 + l * Math.sin(theta));
+                    y[2] = (int) Math.round(y1 - l * Math.cos(theta));
+                    x[3] = (int) Math.round(x1 - l * Math.sin(theta));
+                    y[3] = (int) Math.round(y1 + l * Math.cos(theta));
                     
                     g.setColor(java.awt.Color.white);
-                    g.fillPolygon(x, y, 3);
+                    g.fillPolygon(x, y, 4);
                     g.setColor(java.awt.Color.black);
-                    g.drawPolyline(x, y, 3);
+                    g.drawPolyline(x, y, 4);
                 }
                 break;
         }
@@ -495,7 +495,7 @@ class Hex
             case 'o':
                 return "BOG";
             case 'v':
-                return "VOLCANO";
+                return "VOLCANO (2)";
             case 'd':
                 return "DRIFT";
             default:
