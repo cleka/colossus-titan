@@ -172,15 +172,38 @@ public class MasterBoard extends Frame implements MouseListener,
     {
         MasterHex hex = getHexFromLabel(legion.currentHex); 
 
-
         // Conventional moves
+
+        // First look for a block.
+        boolean block = false;
+        for (int i = 0; i < 6; i++)
+        {
+            if (hex.exitType[i] == MasterHex.BLOCK)
+            {
+                // Only this path is allowed. 
+                block = true;
+
+            }
+        }
+        if (block == false)
+        {
+            // Try both arches and arrow(s).
+
+        }
+
+        // For moves 2-6 (limited by movementRoll) consider only arrow(s).
+
 
 
         if (player.movementRoll == 6)
         {
             // Tower teleport
-            if (hex.terrain == 'T')
+            if (hex.terrain == 'T' && (legion.numCreature(Creature.titan) > 0 ||
+                legion.numCreature(Creature.angel) > 0 ||
+                legion.numCreature(Creature.archangel) > 0))
             {
+                // Mark every unoccupied hex within 6 hexes.
+             
 
             }
 
@@ -188,8 +211,8 @@ public class MasterBoard extends Frame implements MouseListener,
             if (player.canTitanTeleport() && 
                 legion.numCreature(Creature.titan) > 0)
             {
-                
                 // Mark every hex containing an enemy unit. 
+
             }
         }
     }
