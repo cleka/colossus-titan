@@ -31,24 +31,25 @@ public class BattleMap extends Frame implements MouseListener,
     private MediaTracker tracker;
     private boolean imagesLoaded;
 
-    static private int scale = 30;
-    static private int chitScale = 12 * scale / 5;
+    private static int scale = 30;
+    private static int chitScale = 12 * scale / 5;
     private Dimension preferredSize;
 
     private Legion attacker;
     private Legion defender;
-    private char terrain;
+
+    // l = left, r = right, b = bottom
     private char side;
 
     // B,D,H,J,m,M,P,S,T,t,W
     // Brush, Desert, Hills, Jungle, mountains, Marsh, Plains,
     // Swamp, Tower, tundra, Woods
+    private char terrain;
 
-    // l, r, b for left, right, bottom
 
     public BattleMap(Legion attacker, Legion defender, char terrain, char side)
     {
-        super("BattleMap");
+        super(attacker.getMarkerId() + " attacks " + defender.getMarkerId());
 
         this.attacker = attacker;
         this.defender = defender;
@@ -57,9 +58,9 @@ public class BattleMap extends Frame implements MouseListener,
 
         preferredSize = new Dimension(28 * scale, 28 * scale);
         setSize(preferredSize);
+        setResizable(false);
 
         setBackground(java.awt.Color.white);
-        setVisible(true);
         addWindowListener(this);
         addMouseListener(this);
         addMouseMotionListener(this);
@@ -71,7 +72,7 @@ public class BattleMap extends Frame implements MouseListener,
         pack();
         validate();
 
-        int cx = 3 * scale;
+        int cx = 5 * scale;
         int cy = 3 * scale;
 
         for (int i = 0; i < h.length; i++)
@@ -116,6 +117,7 @@ public class BattleMap extends Frame implements MouseListener,
         }
         imagesLoaded = true;
 
+        setVisible(true);
         repaint();
     }
 
@@ -313,7 +315,7 @@ public class BattleMap extends Frame implements MouseListener,
     
     public Dimension getMinimumSize()
     {
-        return new Dimension(480, 480);
+        return preferredSize;
     }
 
     public Dimension getPreferredSize()
