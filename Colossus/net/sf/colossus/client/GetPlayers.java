@@ -332,6 +332,7 @@ public final class GetPlayers extends KDialog implements WindowListener,
             }
             return(false);
         }
+
         public String getDescription() 
         {
             return("Colossus VARiant file");
@@ -340,7 +341,8 @@ public final class GetPlayers extends KDialog implements WindowListener,
 
     private void doLoadVariant()
     {
-        javax.swing.JFileChooser varChooser = new JFileChooser(".");
+        javax.swing.JFileChooser varChooser = 
+            new JFileChooser(Constants.gameDataPath);
         varChooser.setFileFilter(new varFileFilter());
         varChooser.setDialogTitle(
             "Choose your variant (or cancel for default game)");
@@ -348,14 +350,13 @@ public final class GetPlayers extends KDialog implements WindowListener,
         String varName = Constants.defaultVARFile;
         if (returnVal == javax.swing.JFileChooser.APPROVE_OPTION)
         {
-            File varFile = varChooser.getSelectedFile();
+            File varFile = varChooser.getSelectedFile().getAbsoluteFile();
             Document doc = VariantSupport.loadVariant(varFile);
             if (doc != null)
             {
                 String name = varFile.getName();
-                name = name.substring(0,name.lastIndexOf(".var"));
-                options.setOption(Options.variant,
-                                  name);
+                name = name.substring(0, name.lastIndexOf(".var"));
+                options.setOption(Options.variant, name);
                 readme.setContentType((String)doc.getProperty(
                            ResourceLoader.keyContentType));
                 readme.setDocument(doc);

@@ -403,18 +403,15 @@ public final class MasterBoard extends JPanel
                 int returnVal = chooser.showSaveDialog(masterFrame);
                 if (returnVal == JFileChooser.APPROVE_OPTION)
                 {
-                    String dirname = chooser.getCurrentDirectory().getName();
+                    String dirname = 
+                        chooser.getCurrentDirectory().getAbsolutePath();
                     String basename = chooser.getSelectedFile().getName();
-                    StringBuffer path = new StringBuffer();
-                    path.append(dirname);
-                    path.append(File.separator);
-                    path.append(basename);
                     // Add default savegame extension.
-                    if (!path.toString().endsWith(Constants.saveExtension))
+                    if (!basename.endsWith(Constants.saveExtension))
                     {
-                        path.append(Constants.saveExtension);
+                        basename += Constants.saveExtension;
                     }
-                    client.saveGame(path.toString());
+                    client.saveGame(dirname + '/' + basename);
                 }
             }
         };
@@ -431,12 +428,13 @@ public final class MasterBoard extends JPanel
         {
             public void actionPerformed(ActionEvent e)
             {
-                JFileChooser chooser = new JFileChooser(Options.optionsPath);
+                JFileChooser chooser = new JFileChooser(Constants.optionsPath);
                 chooser.setFileFilter(new ConfigFileFilter());
                 int returnVal = chooser.showOpenDialog(masterFrame);
                 if (returnVal == JFileChooser.APPROVE_OPTION)
                 {
-                    client.loadOptions(chooser.getSelectedFile().getName());
+                    client.loadOptions(
+                        chooser.getSelectedFile().getAbsolutePath());
                 }
             }
         };

@@ -19,7 +19,7 @@ public final class ConfigFileFilter extends javax.swing.filechooser.FileFilter
 
     public boolean accept(File dir, String name)
     {
-        if (name.endsWith(Options.optionsExtension))
+        if (name.endsWith(Constants.optionsExtension))
         {
             return true;
         }
@@ -32,17 +32,13 @@ public final class ConfigFileFilter extends javax.swing.filechooser.FileFilter
 
     public boolean accept(File f)
     {
-        String name = f.getName();
-        if (name.endsWith(Options.optionsExtension))
+        if (f.isDirectory())
         {
             return true;
         }
-        else
-        {
-            return false;
-        }
+        String name = f.getName();
+        return accept(null, name);
     }
-
 
     public String getDescription()
     {

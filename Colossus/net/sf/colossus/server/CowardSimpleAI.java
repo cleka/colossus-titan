@@ -8,9 +8,10 @@ package net.sf.colossus.server;
 
 public class CowardSimpleAI extends SimpleAI
 {
-
     CowardSimpleAI()
     {
+        super();
+
         /* up the ratios a little */
         RATIO_WIN_MINIMAL_LOSS = 1.45; // 1.30;
         RATIO_WIN_HEAVY_LOSS = 1.25; // 1.15;

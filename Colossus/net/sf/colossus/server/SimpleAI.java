@@ -27,6 +27,11 @@ import net.sf.colossus.client.LegionInfo;
 
 public class SimpleAI implements AI
 {
+    public SimpleAI()
+    {
+    }
+
+
     public String pickColor(Set colors, List favoriteColors)
     {
         Iterator it = favoriteColors.iterator();

@@ -54,7 +54,7 @@ public final class Game
     private LinkedList colorPickOrder = new LinkedList();
     private Set colorsLeft;
     private PhaseAdvancer phaseAdvancer = new GamePhaseAdvancer();
-    private Options options = new Options(Options.optionsServerName);
+    private Options options = new Options(Constants.optionsServerName);
 
     // XXX Need to clear cl after initialization is done? 
     private CommandLine cl = null;
@@ -243,12 +243,6 @@ public final class Game
         {
             String name = options.getStringOption(Options.playerName + i);
             String type = options.getStringOption(Options.playerType + i);
-
-            if (type == Constants.anyAI)
-            {
-                int whichAI = rollDie(Constants.numAITypes) - 1;
-                type = Constants.aiArray[whichAI];
-            }
 
             if (name != null && type != null && !type.equals(GetPlayers.none))
             {
@@ -562,15 +556,10 @@ Log.debug("Called Game.assignTowers() with balanced = " + balanced);
     }
 
 
-    void addPlayer(String name, String type)
+    private void addPlayer(String name, String type)
     {
         Player player = new Player(name, this);
         player.setType(type);
-        addPlayer(player);
-    }
-
-    void addPlayer(Player player)
-    {
         players.add(player);
     }
 
@@ -737,7 +726,7 @@ Log.debug("Called Game.assignTowers() with balanced = " + balanced);
         return gameOver;
     }
 
-    void setGameOver(boolean gameOver)
+    private void setGameOver(boolean gameOver)
     {
         this.gameOver = gameOver;
         if (gameOver && getOption(Options.autoQuit))

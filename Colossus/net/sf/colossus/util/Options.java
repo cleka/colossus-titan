@@ -5,6 +5,7 @@ import java.util.*;
 import java.io.*;
 
 import net.sf.colossus.util.Log;
+import net.sf.colossus.server.Constants;
 
 
 /** Class Options lists game options for Colossus.
@@ -16,16 +17,6 @@ public final class Options
 {
     // Everything is public because we use this class in both the client
     // and server packages.  (With separate data.)
-
-    // Constants related to the options config files
-    public static final String optionsPath = 
-        System.getProperty("user.home") + "/Colossus/";
-    public static final String optionsBase = "Colossus-";
-    public static final String optionsServerName = "server";
-    public static final String optionsExtension = ".cfg";
-
-    public static final String configVersion =
-        "Colossus config file version 2";
 
 
     // Option names
@@ -84,7 +75,7 @@ public final class Options
 
 
     private Properties props = new Properties();
-    private String owner;      // playerName, or optionsServerName
+    private String owner;      // playerName, or Constants.optionsServerName
 
 
     public Options(String owner)
@@ -95,7 +86,8 @@ public final class Options
 
     public String getOptionsFilename()
     {
-        return optionsPath + optionsBase + owner + optionsExtension;
+        return Constants.gameDataPath + Constants.optionsBase + owner + 
+            Constants.optionsExtension;
     }
 
     public void loadOptions()
@@ -120,7 +112,7 @@ public final class Options
     
     public void saveOptions()
     {
-        File optionsDir = new File(optionsPath);
+        File optionsDir = new File(Constants.gameDataPath);
         if (!optionsDir.exists() || !optionsDir.isDirectory())
         {
              if (!optionsDir.mkdirs())
@@ -134,7 +126,7 @@ public final class Options
         try
         {
             FileOutputStream out = new FileOutputStream(optionsFile);
-            props.store(out, configVersion);
+            props.store(out, Constants.configVersion);
             out.close();
         }
         catch (IOException e)

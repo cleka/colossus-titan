@@ -23,11 +23,25 @@ public final class Constants
     public static final int MUSTER = 4;
 
 
+    /** Base path for all external game data files. */
+    public static final String gameDataPath = 
+        System.getProperty("user.home") + "/Colossus/";
+
+    // Constants related to the options config files
+    public static final String optionsPath = gameDataPath;
+    public static final String optionsBase = "Colossus-";
+    public static final String optionsServerName = "server";
+    public static final String optionsExtension = ".cfg";
+
+    public static final String configVersion =
+        "Colossus config file version 2";
+
+
+
     // Constants for savegames
 
     /** Must include trailing slash. */
-    public static final String saveDirname = 
-        System.getProperty("user.home") + "/Colossus/saves/";
+    public static final String saveDirname = gameDataPath + "/saves/";
     public static final String saveExtension = ".sav";
     public static final String saveGameVersion =
         "Colossus savegame version 11";

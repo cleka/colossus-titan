@@ -28,20 +28,15 @@ public final class SaveGameFilter extends javax.swing.filechooser.FileFilter
         }
     }
 
-
     public boolean accept(File f)
     {
-        String name = f.getName();
-        if (name.endsWith(Constants.saveExtension))
+        if (f.isDirectory())
         {
             return true;
         }
-        else
-        {
-            return false;
-        }
+        String name = f.getName();
+        return accept(null, name);
     }
-
 
     public String getDescription()
     {

@@ -96,16 +96,22 @@ public final class Player implements Comparable
         return type;
     }
 
-    void setType(String type)
+    void setType(final String aType)
     {
+        String type = new String(aType);
+Log.debug("Called Player.setType() for " + name + " " + type);
+        if (type.endsWith(Constants.anyAI))
+        {
+            int whichAI = Game.rollDie(Constants.numAITypes) - 1;
+            type = Constants.aiArray[whichAI];
+        }
         if (!type.startsWith("net.sf.colossus.server."))
         {
             type = "net.sf.colossus.server." + type;
         }
-        this.type = type;
         if (type.endsWith("AI"))
         {
-            if (!(ai.getClass().getName().equals(type))) 
+            if (!(ai.getClass().getName().equals(type)))
             {
                 System.out.println("Changing player " + name + " from " +
                     ai.getClass().getName() + " to " + type);
@@ -121,6 +127,7 @@ public final class Player implements Comparable
                 }
             }
         }
+        this.type = type;
     }
 
 
