@@ -97,6 +97,7 @@ public class DiceTest extends TestCase
     // Runs test http://www2.sunysuffolk.edu/wrightj/MA24/Misc/RunsTest.pdf
 
 
+    // XXX Need to use chi-square distribution not normal distribution.
     void chiSquareTest(int [] rolls, boolean random)
     {
         // We know our non-random dice will ace this test, so use them
