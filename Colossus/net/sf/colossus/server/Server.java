@@ -1380,7 +1380,7 @@ Log.debug("Split legions must be separated.");
     // XXX Disallow in network games
     public void newGame()
     {
-        game.newGame();
+        Start.startupDialog(game, null);
     }
 
     // XXX Disallow in network games
@@ -1429,7 +1429,7 @@ Log.debug("Server.setPlayerName() from " + playerName + " to " + newName);
     }
 
     /** Hack to set color on load game. */
-    void allSetColor()
+    synchronized void allSetColor()
     {
         Iterator it = game.getPlayers().iterator();
         while (it.hasNext())

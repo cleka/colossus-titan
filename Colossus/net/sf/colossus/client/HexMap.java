@@ -517,57 +517,64 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
 
     public void paintComponent(Graphics g)
     {
-        super.paintComponent(g);
-        Graphics2D g2 = (Graphics2D)g;
-
-        // Abort if called too early.
-        Rectangle rectClip = g.getClipBounds();
-        if (rectClip == null)
+        try
         {
-            return;
-        }
-
-        Iterator it = hexes.iterator();
-        while (it.hasNext())
-        {
-            GUIBattleHex hex = (GUIBattleHex)it.next();
-            if (!hex.isEntrance() && rectClip.intersects(hex.getBounds()))
+            super.paintComponent(g);
+            Graphics2D g2 = (Graphics2D)g;
+    
+            // Abort if called too early.
+            Rectangle rectClip = g.getClipBounds();
+            if (rectClip == null)
             {
-                hex.paint(g);
+                return;
             }
-        }
-
-        /* always antialias this, the font is huge */
-        Object oldantialias = g2.getRenderingHint(
-            RenderingHints.KEY_ANTIALIASING);
-        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-                            RenderingHints.VALUE_ANTIALIAS_ON);
-
-        Font oldFont = g.getFont();
-        FontMetrics fm;
-        String dn = getMasterHex().getTerrainDisplayName();
-        String bn = getMasterHex().getTerrainName();
-        String sub = (String)subtitleMap.get(new Character(terrain));
-
-        if (sub == null)
-            sub = (dn.equals(bn) ? null : bn);
-        
-        g.setFont(ResourceLoader.defaultFont.deriveFont((float)48));
-        fm = g.getFontMetrics();
-        int tma = fm.getMaxAscent();
-        g.drawString(dn, 80, 4 + tma);
-        
-        if (sub != null)
-        {
-            g.setFont(ResourceLoader.defaultFont.deriveFont((float)24));
+    
+            Iterator it = hexes.iterator();
+            while (it.hasNext())
+            {
+                GUIBattleHex hex = (GUIBattleHex)it.next();
+                if (!hex.isEntrance() && rectClip.intersects(hex.getBounds()))
+                {
+                    hex.paint(g);
+                }
+            }
+    
+            /* always antialias this, the font is huge */
+            Object oldantialias = g2.getRenderingHint(
+                RenderingHints.KEY_ANTIALIASING);
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                                RenderingHints.VALUE_ANTIALIAS_ON);
+    
+            Font oldFont = g.getFont();
+            FontMetrics fm;
+            String dn = getMasterHex().getTerrainDisplayName();
+            String bn = getMasterHex().getTerrainName();
+            String sub = (String)subtitleMap.get(new Character(terrain));
+    
+            if (sub == null)
+                sub = (dn.equals(bn) ? null : bn);
+            
+            g.setFont(ResourceLoader.defaultFont.deriveFont((float)48));
             fm = g.getFontMetrics();
-            int tma2 = fm.getMaxAscent();
-            g.drawString(sub, 80, 4 + tma + 8 + tma2);
+            int tma = fm.getMaxAscent();
+            g.drawString(dn, 80, 4 + tma);
+            
+            if (sub != null)
+            {
+                g.setFont(ResourceLoader.defaultFont.deriveFont((float)24));
+                fm = g.getFontMetrics();
+                int tma2 = fm.getMaxAscent();
+                g.drawString(sub, 80, 4 + tma + 8 + tma2);
+            }
+            /* reset antialiasing */
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                                oldantialias);
+            g.setFont(oldFont);
         }
-        /* reset antialiasing */
-        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-                            oldantialias);
-        g.setFont(oldFont);
+        catch (NullPointerException ex)
+        {
+            // If we try to paint before something is loaded, just retry later.
+        }
     }
 
 

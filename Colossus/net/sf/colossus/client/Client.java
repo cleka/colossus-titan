@@ -80,31 +80,7 @@ public final class Client implements IClient
 
     // XXX Should be per player
     /** Sorted set of available legion markers for this player. */
-    private SortedSet markersAvailable = new TreeSet(
-        new Comparator()
-        {
-            public int compare(Object o1, Object o2)
-            {
-                if (!(o1 instanceof String) || !(o2 instanceof String))
-                {
-                    throw new ClassCastException();
-                }
-                String s1 = (String)o1;
-                String s2 = (String)o2;
-                if (s1.startsWith(getShortColor()) && 
-                    !s2.startsWith(getShortColor()))
-                {
-                    return -1;
-                }
-                if (!s1.startsWith(getShortColor()) && 
-                    s2.startsWith(getShortColor()))
-                {
-                    return 1;
-                }
-                return s1.compareTo(s2);
-            }
-        }
-    );
+    private SortedSet markersAvailable = new TreeSet(new MarkerComparator());
 
     private String parentId;
     private int numSplitsThisTurn;
@@ -611,7 +587,8 @@ public final class Client implements IClient
             {
                 if (board != null)
                 {
-                    statusScreen = new StatusScreen((secondaryParent == null ? board.getFrame() : secondaryParent), this);
+                    statusScreen = new StatusScreen((secondaryParent == null ? 
+                        board.getFrame() : secondaryParent), this);
                 }
             }
         }
@@ -730,7 +707,8 @@ public final class Client implements IClient
                 if (board != null)
                 {
                     caretakerDisplay = new CreatureCollectionView(
-                                           (secondaryParent == null ? board.getFrame() : secondaryParent), this);
+                        (secondaryParent == null ? board.getFrame() : 
+                            secondaryParent), this);
                     caretakerDisplay.addWindowListener(new WindowAdapter()
                     {
                         public void windowClosing(WindowEvent e)
@@ -781,6 +759,7 @@ public final class Client implements IClient
 
     public void dispose()
     {
+Log.debug(playerName + " Client.dispose()");
         cleanupBattle();
         disposeMovementDie();
         disposeStatusScreen();
@@ -1262,7 +1241,11 @@ public final class Client implements IClient
 
     public synchronized void initBoard()
     {
-        VariantSupport.loadVariant(options.getStringOption(Options.variant));
+        if (isRemote())
+        {
+            VariantSupport.loadVariant(options.getStringOption(
+                Options.variant));
+        }
 
         if (!getOption(Options.autoPlay))
         {
@@ -3252,6 +3235,10 @@ Log.debug(playerName + " Client.setupBattleFight()");
 
     String getPlayerNameForShortColor(String shortColor)
     {
+        if (playerInfo == null)
+        {
+            return null;
+        }
         PlayerInfo info = null;
 
         // Stage 1: See if the player who started with this color is alive.
@@ -3637,4 +3624,34 @@ Log.debug(playerName + " Client.setupBattleFight()");
             updateCreatureCountDisplay();
         }
     }
+
+
+
+    class MarkerComparator implements Comparator
+    {
+        public int compare(Object o1, Object o2)
+        {
+            String shortColor = "None";  // In case not initialized yet.
+            if (color != null)
+            {
+                shortColor = getShortColor();
+            }
+            if (!(o1 instanceof String) || !(o2 instanceof String))
+            {
+                throw new ClassCastException();
+            }
+            String s1 = (String)o1;
+            String s2 = (String)o2;
+            if (s1.startsWith(shortColor) && !s2.startsWith(shortColor))
+            {
+                return -1;
+            }
+            if (!s1.startsWith(shortColor) && s2.startsWith(shortColor))
+            {
+                return 1;
+            }
+            return s1.compareTo(s2);
+        }
+    }
+
 }

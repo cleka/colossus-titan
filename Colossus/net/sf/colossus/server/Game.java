@@ -54,9 +54,6 @@ public final class Game
     private PhaseAdvancer phaseAdvancer = new GamePhaseAdvancer();
     private Options options = new Options(Constants.optionsServerName);
 
-    // XXX Need to clear cl after initialization is done? 
-    private CommandLine cl = null;
-
     /** Server port number. */
     private int port = Constants.defaultPort;
 
@@ -65,9 +62,18 @@ public final class Game
     {
     }
 
-    Game(CommandLine cl)
+
+    /** For Start */
+    Options getOptions()
     {
-        this.cl = cl;
+        return options;
+    }
+
+
+    // XXX Set from option instead.
+    void setPort(int port)
+    {
+        this.port = port;
     }
 
 
@@ -96,97 +102,6 @@ Log.debug("Called Game.initServer()");
     }
 
 
-    /** Modify options from command-line args if possible.  Clear
-     *  options to abort if something is wrong. */
-    private void setupOptionsFromCommandLine(CommandLine cl)
-    {
-        int numHumans = 0;
-        int numAIs = 0;
-        int numNetworks = 0;
-
-        if (cl.optIsSet('v'))
-        {
-            String variantName = cl.getOptValue('v');
-            // XXX Check that this variant is in the list.
-            options.setOption(Options.variant, variantName);
-        }
-        if (cl.optIsSet('q'))
-        {
-            options.setOption(Options.autoQuit, true);
-        }
-        if (cl.optIsSet('u'))
-        {
-            options.clearPlayerInfo();
-            String buf = cl.getOptValue('u');
-            numHumans = Integer.parseInt(buf);
-        }
-        if (cl.optIsSet('i'))
-        {
-            options.clearPlayerInfo();
-            String buf = cl.getOptValue('i');
-            numAIs = Integer.parseInt(buf);
-        }
-        if (cl.optIsSet('n'))
-        {
-            options.clearPlayerInfo();
-            String buf = cl.getOptValue('n');
-            numNetworks = Integer.parseInt(buf);
-        }
-        if (cl.optIsSet('p'))
-        {
-            String buf = cl.getOptValue('p');
-            port = Integer.parseInt(buf);
-        }
-        if (cl.optIsSet('d'))
-        {
-            String buf = cl.getOptValue('d');
-            int delay = Integer.parseInt(buf);
-            options.setOption(Options.aiDelay, delay);
-        }
-        if (cl.optIsSet('t'))
-        {
-            String buf = cl.getOptValue('t');
-            int limit = Integer.parseInt(buf);
-            options.setOption(Options.aiTimeLimit, limit);
-        }
-        // Quit if values are bogus.
-        if (numHumans < 0 || numAIs < 0 || numNetworks < 0 ||
-            numHumans + numAIs + numNetworks > Constants.MAX_MAX_PLAYERS)
-        {
-            Log.error("Illegal number of players");
-            options.clear();
-            return;
-        }
-
-        for (int i = 0; i < numHumans; i++)
-        {
-            String name = null;
-            if (i == 0)
-            {
-                name = Constants.username;
-            }
-            else
-            {
-                name = Constants.byColor + i;
-            }
-            options.setOption(Options.playerName + i, name);
-            options.setOption(Options.playerType + i, Constants.human);
-        }
-        for (int j = numHumans; j < numNetworks + numHumans; j++)
-        {
-            String name = Constants.byClient + j;
-            options.setOption(Options.playerName + j, name);
-            options.setOption(Options.playerType + j, Constants.network);
-        }
-        for (int k = numHumans + numNetworks; 
-            k < numAIs + numHumans + numNetworks; k++)
-        {
-            String name = Constants.byColor + k;
-            options.setOption(Options.playerName + k, name);
-            options.setOption(Options.playerType + k, Constants.defaultAI);
-        }
-    }
-
     private void addPlayersFromOptions()
     {
         for (int i = 0; i < VariantSupport.getMaxPlayers(); i++)
@@ -214,46 +129,8 @@ Log.debug("Called Game.initServer()");
         caretaker.resetAllCounts();
         players.clear();
 
-        // Need to load options early, so we can use them to initialize
-        // GetPlayers, and easily override them from command line.
-        options.loadOptions();
-
-        if (cl != null)
-        {
-            setupOptionsFromCommandLine(cl);
-        }
-
-        // Load game options 'l' and 'z' are handled separately.
-        if (!cl.optIsSet('g')) 
-        {
-            new GetPlayers(new JFrame(), options);
-        }
-
-        if (options.isEmpty())
-        {
-            // Bad input, or user selected Quit.
-            dispose();
-        }
-
-        // See if user hit the Load game button, and we should
-        // load a game instead of starting a new one.
-        String filename = options.getStringOption(Constants.loadGame);
-        if (filename != null && filename.length() > 0)
-        {
-            options.clearPlayerInfo();
-            loadGame(filename);
-            return;
-        }
-
-        // See if user hit the Run client button, and we should abort
-        // the server and run the client.
-        if (options.getOption(Constants.runClient))
-        {
-            StartClient.main();
-            return;
-        }
-
         options.saveOptions();
+
         VariantSupport.loadVariant(options.getStringOption(Options.variant));
         Log.event("Starting new game");
         addPlayersFromOptions();
@@ -1168,8 +1045,6 @@ Log.debug("Called Game.newGame2()");
      *  "--latest" then load the latest savegame found in saveDirName. */
     void loadGame(String filename)
     {
-        options.loadOptions();
-
         File file = null;
         if (filename.equals("--latest"))
         {

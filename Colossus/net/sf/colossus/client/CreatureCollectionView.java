@@ -21,6 +21,7 @@ class CreatureCollectionView extends KDialog implements WindowListener
 {
     private Client client;
     private Point location;
+    private Dimension size;
 
     /** hash by creature name to the label that displays the count */
     Map countMap = new HashMap();
@@ -78,6 +79,17 @@ class CreatureCollectionView extends KDialog implements WindowListener
         {
             setLocation(location);
         }
+
+        if (size == null)
+        {
+            size = saveWindow.loadSize();
+        }
+        if (size == null)
+        {
+            size = getPreferredSize();
+        }
+        setSize(size);
+
         update();
         setVisible(true);
     }
@@ -122,7 +134,9 @@ class CreatureCollectionView extends KDialog implements WindowListener
             int minX = chitDim.width + 1;
             int minY = chitDim.height + (2 * (int)labelDim.getHeight()) + 1;
             if (minX < (int)labelDim.getWidth() + 2)
+            {
                 minX = (int)labelDim.getWidth() + 2;
+            }
             return new Dimension(minX, minY);
         }
     }
@@ -144,54 +158,61 @@ class CreatureCollectionView extends KDialog implements WindowListener
 
     public void update()
     {
-        Iterator it = countMap.entrySet().iterator();
-        while (it.hasNext())
+        try
         {
-            Map.Entry entry = (Map.Entry)it.next();
-            String name = (String)entry.getKey();
-            JLabel label = (JLabel)entry.getValue();
-            int count = client.getCreatureCount(name);
-            int maxcount = client.getCreatureMaxCount(name);
-            int deadCount = client.getCreatureDeadCount(name);
-            int inGameCount = maxcount - (deadCount + count);
-            String color;
-            if (count == 0)
+            Iterator it = countMap.entrySet().iterator();
+            while (it.hasNext())
             {
-                color = "yellow";
+                Map.Entry entry = (Map.Entry)it.next();
+                String name = (String)entry.getKey();
+                JLabel label = (JLabel)entry.getValue();
+                int count = client.getCreatureCount(name);
+                int maxcount = client.getCreatureMaxCount(name);
+                int deadCount = client.getCreatureDeadCount(name);
+                int inGameCount = maxcount - (deadCount + count);
+                String color;
+                if (count == 0)
+                {
+                    color = "yellow";
+                }
+                else if (count == maxcount)
+                {
+                    color = "green";
+                }
+                else
+                {
+                    color = "black";
+                }
+                String htmlCount =
+                    htmlColorizeOnly((count < 10 ? "0" : "") + 
+                                     Integer.toString(count), color);
+                String htmlTotalCount =
+                    htmlColorizeOnly((maxcount < 10 ? "0" : "") + 
+                                     Integer.toString(maxcount),
+                                     "blue");
+                String htmlDeadCount =
+                    htmlColorizeOnly(
+                        Creature.getCreatureByName(name).isImmortal() ?
+                            "--" :
+                            (deadCount < 10 ? "0" : "") + 
+                                 Integer.toString(deadCount), "red");
+                String htmlInGameCount =
+                    htmlColorizeOnly((inGameCount < 10 ? "0" : "") + 
+                                     Integer.toString(inGameCount),
+                                     "green");
+                String htmlSlash = htmlColorizeOnly("/", "black");
+                label.setText(htmlizeOnly(htmlCount + htmlSlash +
+                                          htmlInGameCount + htmlSlash +
+                                          htmlDeadCount));
             }
-            else if (count == maxcount)
-            {
-                color = "green";
-            }
-            else
-            {
-                color = "black";
-            }
-            String htmlCount =
-                htmlColorizeOnly((count < 10 ? "0" : "") + 
-                                 Integer.toString(count), color);
-            String htmlTotalCount =
-                htmlColorizeOnly((maxcount < 10 ? "0" : "") + 
-                                 Integer.toString(maxcount),
-                                 "blue");
-            String htmlDeadCount =
-                htmlColorizeOnly(
-                             Creature.getCreatureByName(name).isImmortal() ?
-                             "--" :
-                             (deadCount < 10 ? "0" : "") + 
-                             Integer.toString(deadCount),
-                             "red");
-            String htmlInGameCount =
-                htmlColorizeOnly((inGameCount < 10 ? "0" : "") + 
-                                 Integer.toString(inGameCount),
-                                 "green");
-            String htmlSlash = htmlColorizeOnly("/", "black");
-            label.setText(htmlizeOnly(htmlCount + htmlSlash +
-                                      htmlInGameCount + htmlSlash +
-                                      htmlDeadCount));
+    
+            repaint();
         }
-
-        repaint();
+        catch (NullPointerException ex)
+        {
+            // If we try updating this dialog before creatures are loaded,
+            // just ignore the exception and let it retry later.
+        }
     }
 
     private static String htmlColorizeOnly(String input, String color)
@@ -222,7 +243,9 @@ class CreatureCollectionView extends KDialog implements WindowListener
     {
         super.dispose();
         location = getLocation();
+        size = getSize();
         saveWindow.saveLocation(location);
+        saveWindow.saveSize(size);
     }
 
     void rescale()
@@ -242,14 +265,16 @@ class CreatureCollectionView extends KDialog implements WindowListener
         dispose();
     }
 
-    public Dimension getPreferredSize()
+    public Dimension getMinimumSize()
     {
         java.util.List creatures = Creature.getCreatures();
-        /* default : 5 creatures wide */
+        // default : 5 creatures wide 
         
         int minSingleX = (4 * Scale.get()) + 8;
         if (minSingleX < (int)baseLabel.getPreferredSize().getWidth() + 8)
+        {
             minSingleX = (int)baseLabel.getPreferredSize().getWidth() + 8;
+        }
 
         int minX = minSingleX * 5;
         int minY = (((4 * Scale.get()) + 8 +
@@ -257,5 +282,10 @@ class CreatureCollectionView extends KDialog implements WindowListener
                     ((creatures.size() + 4 ) / 5)) + 60;
         
         return new Dimension(minX, minY);
+    }
+
+    public Dimension getPreferredSize()
+    {
+        return getMinimumSize();
     }
 }

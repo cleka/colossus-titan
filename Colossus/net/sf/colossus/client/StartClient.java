@@ -34,7 +34,7 @@ public class StartClient extends KDialog implements WindowListener,
     JComboBox portBox; 
 
 
-    private StartClient(String playerName, String hostname, int port)
+    public StartClient(String playerName, String hostname, int port)
     {
         super(new JFrame(), "Client startup options", false);
         getContentPane().setLayout(new GridLayout(0, 2));
@@ -132,7 +132,7 @@ public class StartClient extends KDialog implements WindowListener,
     }
 
 
-    private static void connect(String playerName, String hostname, int port)
+    public static void connect(String playerName, String hostname, int port)
     {
         new Client(hostname, port, playerName, true);
     }
@@ -147,70 +147,5 @@ public class StartClient extends KDialog implements WindowListener,
             Option opt = (Option)it.next();
             Log.event(opt.toString());
         }
-    }
-
-
-    public static void main(String [] args)
-    {
-        Log.event("StartClient for Colossus version " + Client.getVersion());
-
-        // This is a werken Options, not a util Options.
-        Options opts = new Options();
-        CommandLine cl = null;
-
-        String playerName = Constants.username;
-        String hostname = Constants.localhost;
-        int port = Constants.defaultPort;
-
-        try
-        {
-            opts.addOption('h', "help", false, "Show options help");
-            opts.addOption('n', "name", true, "Player name");
-            opts.addOption('s', "server", true, "Server name or IP");
-            opts.addOption('p', "port", true, "Server port");
-            opts.addOption('g', "go", false, "Start immediately without GUI");
-
-            cl = opts.parse(args);
-        }
-        catch (Exception ex)
-        {
-            // TODO Clean up the output.
-            ex.printStackTrace();
-            return;
-        }
-
-        if (cl.optIsSet('h'))
-        {
-            usage(opts);
-            return;
-        }
-        if (cl.optIsSet('n'))
-        {
-            playerName = cl.getOptValue('n');
-        }
-        if (cl.optIsSet('s'))
-        {
-            hostname = cl.getOptValue('s');
-        }
-        if (cl.optIsSet('p'))
-        {
-            port = Integer.parseInt(cl.getOptValue('p'));
-        }
-
-        if (!cl.optIsSet('g'))
-        {
-            new StartClient(playerName, hostname, port);
-        }
-        else
-        {
-            connect(playerName, hostname, port);
-        }
-    }
-
-    /** Convenience method for calls from server side. */
-    public static void main()
-    {
-        String [] args = new String[0];
-        main(args);
     }
 }

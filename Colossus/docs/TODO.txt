@@ -84,12 +84,8 @@ got enemies that can attack on a 5 :[Bu03]
 got enemies that can attack on a 6 :[Bu03]
 EVAL Gd01 move to Plains hex 105 = 0
 
-
-Bug: Sometimes Need to manually resize caretaker to see all creatures.
 Caretaker Titan has excess "Titan" at top, obscured by image.  Use
    black 6-4 titan instead?
-
-Unify command-line argument processing on client and server sides.
 
 Add link from client to LogWindow; advance scroll thumb at end of various
    phases. 

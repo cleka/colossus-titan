@@ -120,6 +120,7 @@ public class Creature implements Comparable
     /** Call immediately after loading variant, before using creatures. */
     public static void loadCreatures()
     {
+Log.debug("Creature.loadCreatures()");
         try 
         {
             creatures.clear();
