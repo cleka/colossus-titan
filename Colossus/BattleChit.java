@@ -126,14 +126,16 @@ class BattleChit extends Chit
     }
 
 
-    int numEngaged()
+    // Dead chits count as chits in contact only if countDead is true.
+    int numInContact(boolean countDead)
     {
         int count = 0;
 
         for (int i = 0; i < 6; i++)
         {
             // Adjacent creatures separated by a cliff are not engaged.
-            if (currentHex.getHexside(i) != 'c')
+            if (currentHex.getHexside(i) != 'c' && 
+                currentHex.getOppositeHexside(i) != 'c')
             {
                 Hex hex = currentHex.getNeighbor(i);
                 if (hex != null)
@@ -141,7 +143,8 @@ class BattleChit extends Chit
                     if (hex.isOccupied())
                     {
                         BattleChit chit = hex.getChit();
-                        if (chit.getPlayer() != getPlayer() && !chit.isDead())
+                        if (chit.getPlayer() != getPlayer() && 
+                            (countDead || !chit.isDead()))
                         {
                             count++;
                         }
@@ -153,9 +156,10 @@ class BattleChit extends Chit
         return count;
     }
 
-    boolean isEngaged()
+    // Dead chits count as chits in contact only if countDead is true.
+    boolean inContact(boolean countDead)
     {
-        return (numEngaged() > 0);
+        return (numInContact(countDead) > 0);
     }
 
 
@@ -186,14 +190,14 @@ class BattleChit extends Chit
         Hex targetHex = target.getCurrentHex();
 
         boolean carryPossible = true;
-        if (numEngaged() < 2)
+        if (numInContact(false) < 2)
         {
             carryPossible = false;
         }
 
         int dice = getPower();
 
-        boolean rangestrike = !isEngaged();
+        boolean rangestrike = !inContact(true);
         if (rangestrike)
         {
             carryPossible = false;
