@@ -48,6 +48,7 @@ public abstract class PhaseAdvancer
         {
             delay = Constants.MAX_DELAY;
         }
+
         return delay;
     }
 
