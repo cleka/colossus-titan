@@ -22,7 +22,7 @@ public class MasterBoard extends Frame implements MouseListener,
 
     private static MasterHex[][] h = new MasterHex[15][8];
 
-    final static private boolean[][] show =
+    private static final boolean[][] show =
     {
         {false, false, false, true, true, false, false, false},
         {false, false, true, true, true, true, false, false},
@@ -78,9 +78,9 @@ public class MasterBoard extends Frame implements MouseListener,
         {
             do
             {
-                new PickMarker(this, game.player[i]);
+                new PickMarker(this, game.getPlayer(i));
             }
-            while (game.player[i].getSelectedMarker() == null);
+            while (game.getPlayer(i).getSelectedMarker() == null);
             // Update status window to reflect marker taken.
             game.updateStatusScreen();
         }
@@ -90,7 +90,8 @@ public class MasterBoard extends Frame implements MouseListener,
         for (int i = 0; i < game.getNumPlayers(); i++)
         {
             // Lookup coords for chit starting from player[i].getTower()
-            MasterHex hex = getHexFromLabel(100 * game.player[i].getTower());
+            MasterHex hex = getHexFromLabel(100 * 
+                game.getPlayer(i).getTower());
 
             Creature.titan.takeOne();
             Creature.angel.takeOne();
@@ -102,12 +103,12 @@ public class MasterBoard extends Frame implements MouseListener,
             Creature.gargoyle.takeOne();
 
             Legion legion = new Legion(0, 0, 3 * scale, 
-                game.player[i].getSelectedMarker(), null, this, 8, 
+                game.getPlayer(i).getSelectedMarker(), null, this, 8, 
                 hex, Creature.titan, Creature.angel, Creature.ogre, 
                 Creature.ogre, Creature.centaur, Creature.centaur, 
-                Creature.gargoyle, Creature.gargoyle, game.player[i]);
+                Creature.gargoyle, Creature.gargoyle, game.getPlayer(i));
 
-            game.player[i].addLegion(legion);
+            game.getPlayer(i).addLegion(legion);
             hex.addLegion(legion);
         }
 
@@ -118,7 +119,8 @@ public class MasterBoard extends Frame implements MouseListener,
 
         for (int i = 0; i < game.getNumPlayers(); i++)
         {
-            tracker.addImage(game.player[i].legions[0].chit.getImage(), 0);
+            tracker.addImage(game.getPlayer(i).getLegion(0).getChit().
+                getImage(), 0);
         }
 
         try
@@ -205,8 +207,8 @@ public class MasterBoard extends Frame implements MouseListener,
             for (int i = 0; i < player.getNumLegions(); i++)
             {
                 // Account for spin cycles.
-                if (player.legions[i].getCurrentHex() == hex &&
-                    player.legions[i] != legion)
+                if (player.getLegion(i).getCurrentHex() == hex &&
+                    player.getLegion(i) != legion)
                 {
                     return count;
                 }
@@ -337,12 +339,13 @@ public class MasterBoard extends Frame implements MouseListener,
                 // Mark every hex containing an enemy unit. 
                 for (int i = 0; i < game.getNumPlayers(); i++)
                 {
-                    if (game.player[i] != player)
+                    if (game.getPlayer(i) != player)
                     {
-                        for (int j = 0; j < game.player[i].getNumLegions(); 
+                        for (int j = 0; j < game.getPlayer(i).getNumLegions(); 
                             j++)
                         {
-                            hex = game.player[i].legions[j].getCurrentHex();
+                            hex = game.getPlayer(i).getLegion(j).
+                                getCurrentHex();
                             hex.select();
                             hex.repaint();
                         }
@@ -364,7 +367,7 @@ public class MasterBoard extends Frame implements MouseListener,
 
         for (int i = 0; i < player.getNumLegions(); i++) 
         {
-            Legion legion = player.legions[i];
+            Legion legion = player.getLegion(i);
             if (legion.hasMoved() == false)
             {
                 MasterHex hex = legion.getCurrentHex();
@@ -386,7 +389,7 @@ public class MasterBoard extends Frame implements MouseListener,
 
         for (int i = 0; i < player.getNumLegions(); i++)
         {
-            Legion legion = player.legions[i];
+            Legion legion = player.getLegion(i);
             MasterHex hex = legion.getCurrentHex();
             if (hex.getNumEnemyLegions(player) > 0)
             {
@@ -409,7 +412,7 @@ public class MasterBoard extends Frame implements MouseListener,
 
         for (int i = 0; i < player.getNumLegions(); i++)
         {
-            Legion candidate = player.legions[i];
+            Legion candidate = player.getLegion(i);
             if (candidate != legion)
             {
                 MasterHex hex = candidate.getCurrentHex();
@@ -1054,11 +1057,11 @@ public class MasterBoard extends Frame implements MouseListener,
 
         for (int i = 0; i < game.getNumPlayers(); i++)
         {
-            Player player = game.player[i];
+            Player player = game.getPlayer(i);
             for (int j = 0; j < player.getNumLegions(); j++)
             {
-                Legion legion = player.legions[j];
-                if (legion.chit.select(point))
+                Legion legion = player.getLegion(j);
+                if (legion.getChit().select(point))
                 {
                     // What to do depends on which mouse button was used
                     // and the current phase of the turn.
@@ -1357,12 +1360,13 @@ public class MasterBoard extends Frame implements MouseListener,
         // Paint in reverse order to make visible z-order match clicks.
         for (int i = game.getNumPlayers() - 1; i >= 0; i--)
         {
-            for (int j = game.player[i].getNumLegions() - 1; j >= 0; j--)
+            Player player = game.getPlayer(i);
+            for (int j = player.getNumLegions() - 1; j >= 0; j--)
             {
                 if (rectClip.intersects(
-                    game.player[i].legions[j].chit.getBounds()))
+                    player.getLegion(j).getChit().getBounds()))
                 {
-                    game.player[i].legions[j].chit.paint(gBack);
+                    player.getLegion(j).getChit().paint(gBack);
                 }
             }
         }
