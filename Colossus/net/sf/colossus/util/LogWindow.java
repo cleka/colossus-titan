@@ -39,7 +39,8 @@ public final class LogWindow extends JTextArea
 
     public Dimension getMinimumSize()
     {
-        return new Dimension(640, 100);
+        Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
+        return new Dimension(Math.min(d.width, 800), 100);
     }
 
 

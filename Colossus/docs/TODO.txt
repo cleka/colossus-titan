@@ -1,4 +1,19 @@
-Make most returned collections unmodifiable. 
+Make most returned collections unmodifiable.
+
+Initialize autoPickRecruiter to true by default.
+
+Show just-recruited enemy critters on top of their stacks.
+
+Optional post-engagement status dialog showing which legions/players
+   fought, known stack contents, what lived and died, summons, acquires,
+   reinforcements, and points.
+
+Change some dialogs to show info in a label instead of the title 
+   and add explicit cancel buttons.  AcquireAngel...
+
+Move code to center a dialog on screen to one place.
+
+Change StatusScreen to use a JTable.
 
 Cache known legion contents in Client.
 Cache hex location of each legion in Client.
@@ -6,6 +21,10 @@ Both require sending events to all clients when a legion is formed
     (game start or load), splits/joins, moves/unmoves, recruits/unrecruits, 
     reinforces, acquires, summons, dies (flees/concedes/negotiates/battles), 
     or gets reduced (by negotiation or battle).
+Change client->server information methods to void requests and callbacks.
+
+Remove public Client methods that only affect the GUI, e.g. unselectAllHexes()
+   in favor of higher-level events.
 
 Always show the current turn, player, and phase in a panel somewhere.
 
@@ -39,8 +58,6 @@ Reduce imports between client and server packages.  Document remaining
 Include an .ico file for Windows.
 
 Remember window positions in .cfg file.
-
-Show just-recruited enemy critters on top of their stacks.
 
 Confirmation prompt to avoid skipping recruits?
 

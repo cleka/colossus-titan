@@ -32,6 +32,8 @@ final class Critter extends Creature implements Comparable
     private int tag;
     /** Counter used to assign unique tags. */
     private static int tagCounter = -1;
+    private SortedSet penaltyOptions = new TreeSet();
+    private boolean carryPossible;
 
 
     Critter(Creature creature, boolean visible, String markerId, Game game)
@@ -118,6 +120,12 @@ final class Critter extends Creature implements Comparable
     int getTag()
     {
         return tag;
+    }
+
+
+    Battle getBattle()
+    {
+        return battle;
     }
 
     /** Return only the base part of the image name for this critter. */
@@ -286,7 +294,7 @@ final class Critter extends Creature implements Comparable
         for (int i = 0; i < 6; i++)
         {
             // Adjacent creatures separated by a cliff are not in contact.
-            if (hex.getHexside(i) != 'c' && hex.getOppositeHexside(i) != 'c')
+            if (!hex.isCliff(i))
             {
                 BattleHex neighbor = hex.getNeighbor(i);
                 if (neighbor != null)
@@ -348,14 +356,14 @@ final class Critter extends Creature implements Comparable
         for (int i = 0; i < 6; i++)
         {
             // Adjacent creatures separated by a cliff are not in contact.
-            if (hex.getHexside(i) != 'c' && hex.getOppositeHexside(i) != 'c')
+            if (!hex.isCliff(i))
             {
                 BattleHex neighbor = hex.getNeighbor(i);
                 if (neighbor != null)
                 {
                     Critter other = battle.getCritter(neighbor);
-                    if (other != null && !other.getPlayer().getName().equals(
-                        getPlayer().getName()) &&
+                    if (other != null && !other.getPlayerName().equals(
+                        getPlayerName()) &&
                         (countDead || !other.isDead()))
                     {
                         return true;
@@ -568,134 +576,30 @@ final class Critter extends Creature implements Comparable
     }
 
 
-    /** Allow the player to choose whether to take a penalty
-     *  (fewer dice or higher strike number) in order to be
-     *  allowed to carry.  Return true if the penalty is taken,
-     *  or false if it is not. */
-    private boolean chooseStrikePenalty(Critter target, Collection
-        carryTargets)
-    {
-        StringBuffer prompt = new StringBuffer(
-            "Take strike penalty to allow carrying to ");
-
-        Critter carryTarget = null;
-        Iterator it = carryTargets.iterator();
-        while (it.hasNext())
-        {
-            carryTarget = (Critter)it.next();
-            BattleHex targetHex = carryTarget.getCurrentHex();
-            prompt.append(carryTarget.getName() + " in " +
-                targetHex.getDescription());
-            if (it.hasNext())
-            {
-                prompt.append(", ");
-            }
-        }
-        prompt.append("?");
-
-        if (game.getServer().getClientOption(getPlayer().getName(),
-            Options.autoStrike))
-        {
-            return getPlayer().aiChooseStrikePenalty(this, target,
-                carryTarget, battle);
-        }
-        else
-        {
-            return battle.getGame().getServer().chooseStrikePenalty(
-                getPlayer().getName(), prompt.toString());
-        }
-    }
-
-
-    /** Return true if there's any chance that this critter could take
-     *  a strike penalty to carry when striking target. */
-    boolean possibleStrikePenalty(Critter target)
-    {
-        BattleHex hex = getCurrentHex();
-        BattleHex targetHex = target.getCurrentHex();
-        if (numInContact(false) < 2)
-        {
-            return false;
-        }
-
-        int dice = getDice(target);
-
-        // Carries are only possible if the striker is rolling more dice than
-        // the target has hits remaining.
-        if (dice <= target.getPower() - target.getHits())
-        {
-            return false;
-        }
-
-        int strikeNumber = getStrikeNumber(target);
-
-        // Figure whether number of dice or strike number needs to be
-        // penalized in order to carry.
-        for (int i = 0; i < 6; i++)
-        {
-            // Adjacent creatures separated by a cliff are not in contact.
-            if (hex.getHexside(i) != 'c' && hex.getOppositeHexside(i) != 'c')
-            {
-                BattleHex neighbor = hex.getNeighbor(i);
-                if (neighbor != null && neighbor != targetHex)
-                {
-                    Critter critter = battle.getCritter(neighbor);
-                    if (critter != null && critter.getPlayer() !=
-                        getPlayer() && !critter.isDead())
-                    {
-                        int tmpDice = getDice(critter);
-                        int tmpStrikeNumber = getStrikeNumber(critter);
-
-                        // Strikes not up across dune hexsides cannot
-                        // carry up across dune hexsides.
-                        if (hex.getOppositeHexside(i) == 'd' &&
-                            targetHex.getHexside(Battle.getDirection(
-                            targetHex, hex, false)) != 'd')
-                        {
-                        }
-                        else if (tmpStrikeNumber > strikeNumber ||
-                            tmpDice < dice)
-                        {
-                            return true;
-                        }
-                    }
-                }
-            }
-        }
-        return false;
-    }
-
-
     /** Calculate number of dice and strike number needed to hit target,
-     *  and whether any carries are possible.  Roll the dice and apply
-     *  damage.  Highlight legal carry targets. */
-    void strike(Critter target, boolean rollFakeDice)
+     *  and whether any carries and strike penalties are possible.  The
+     *  actual striking is now deferred to strike2(). */
+    void strike(Critter target)
     {
         // Sanity check
         if (target.getPlayer() == getPlayer())
         {
-            Log.error(getName() + " tried to strike allied " +
-                target.getName());
+            Log.error(getDescription() + " tried to strike allied " +
+                target.getDescription());
             return;
         }
 
         BattleHex hex = getCurrentHex();
         BattleHex targetHex = target.getCurrentHex();
-        // Bug 488753 says AI creatures occasionally struck from
-        // offboard.  So let's add an extra check.
-        if (hex.isEntrance() || targetHex.isEntrance())
-        {
-            Log.error("Attempted offboard strike disallowed!");
-            return;
-        }
 
         battle.leaveCarryMode();
-        boolean carryPossible = true;
+        carryPossible = true;
         if (numInContact(false) < 2)
         {
             carryPossible = false;
         }
 
+        int strikeNumber = getStrikeNumber(target);
         int dice = getDice(target);
 
         // Carries are only possible if the striker is rolling more dice than
@@ -705,157 +609,212 @@ final class Critter extends Creature implements Comparable
             carryPossible = false;
         }
 
-        int strikeNumber = getStrikeNumber(target);
-
-        // Figure whether number of dice or strike number needs to be
-        // penalized in order to carry.
         if (carryPossible)
         {
-            boolean haveCarryTarget = false;
-            List penaltyOptions = new ArrayList();
+            findCarries(target, dice, strikeNumber);
 
-            for (int i = 0; i < 6; i++)
+            if (!penaltyOptions.isEmpty())
             {
-                // Adjacent creatures separated by a cliff are not in contact.
-                if (hex.getHexside(i) != 'c' &&
-                    hex.getOppositeHexside(i) != 'c')
+                // Add the non-penalty option as a choice.
+                penaltyOptions.add(new PenaltyOption(this, target, dice, 
+                    strikeNumber));
+
+                if (game.getServer().getClientOption(getPlayerName(),
+                    Options.autoStrike))
                 {
-                    BattleHex neighbor = hex.getNeighbor(i);
-                    if (neighbor != null && neighbor != targetHex)
+                    PenaltyOption po = getPlayer().aiChooseStrikePenalty(
+                        Collections.unmodifiableSortedSet(penaltyOptions));
+                    if (po == null)
                     {
-                        Critter critter = battle.getCritter(neighbor);
-                        if (critter != null && critter.getPlayer() !=
-                            getPlayer() && !critter.isDead())
-                        {
-                            int tmpDice = getDice(critter);
-                            int tmpStrikeNumber = getStrikeNumber(critter);
-
-                            // Strikes not up across dune hexsides cannot
-                            // carry up across dune hexsides.
-                            if (hex.getOppositeHexside(i) == 'd' &&
-                                targetHex.getHexside(Battle.getDirection(
-                                targetHex, hex, false)) != 'd')
-                            {
-                                battle.removeCarryTarget(targetHex.getLabel());
-                            }
-
-                            else if (tmpStrikeNumber > strikeNumber ||
-                                tmpDice < dice)
-                            {
-                                // Add this scenario to the list.
-                                penaltyOptions.add(new PenaltyOption(critter,
-                                    tmpDice, tmpStrikeNumber));
-                            }
-
-                            else
-                            {
-                                battle.addCarryTarget(neighbor.getLabel());
-                                haveCarryTarget = true;
-                            }
-                        }
-                    }
-                }
-            }
-
-            // Sort penalty options by number of dice (ascending), then by
-            //    strike number (descending).
-            Collections.sort(penaltyOptions);
-
-            // Find the group of PenaltyOptions with identical dice and
-            //    strike numbers.
-            PenaltyOption option;
-            List critters = new ArrayList();
-            ListIterator lit = penaltyOptions.listIterator();
-            while (lit.hasNext())
-            {
-                option = (PenaltyOption)lit.next();
-                int tmpDice = option.getDice();
-                int tmpStrikeNumber = option.getStrikeNumber();
-                critters.clear();
-                critters.add(option.getCritter());
-
-                while (lit.hasNext())
-                {
-                    option = (PenaltyOption)lit.next();
-                    if (option.getDice() == tmpDice &&
-                        option.getStrikeNumber() == tmpStrikeNumber)
-                    {
-                        critters.add(option.getCritter());
+                        Log.error("aiChooseStrikePenalty returned null!");
                     }
                     else
                     {
-                        lit.previous();
-                        break;
+Log.debug("aiChooseStrikePenalty returned: " + po.toString()); 
+                        assignStrikePenalty(po.toString());
+                        return;
                     }
                 }
-
-                // Make sure the penalty is still relevant.
-                if (tmpStrikeNumber > strikeNumber || tmpDice < dice)
+                else
                 {
-                    if (chooseStrikePenalty(target, critters))
-                    {
-                        if (tmpStrikeNumber > strikeNumber)
-                        {
-                            strikeNumber = tmpStrikeNumber;
-                        }
-                        if (tmpDice < dice)
-                        {
-                            dice = tmpDice;
-                        }
-                        Iterator it2 = critters.iterator();
-                        while (it2.hasNext())
-                        {
-                            Critter critter = (Critter)it2.next();
-                            battle.addCarryTarget(
-                                critter.getCurrentHexLabel());
-                            haveCarryTarget = true;
-                        }
-                    }
+                    game.getServer().askChooseStrikePenalty(penaltyOptions);
+                    return;
                 }
-            }
-
-            if (!haveCarryTarget)
-            {
-                carryPossible = false;
             }
         }
 
+        strike2(target, dice, strikeNumber);
+    }
+
+    void assignStrikePenalty(String prompt)
+    {
+Log.debug("calling Critter.assignStrikePenalty() with " + prompt);
+        PenaltyOption po = matchingPenaltyOption(prompt); 
+        if (po != null)
+        {
+Log.debug("Valid penalty option");
+            Critter target = po.getTarget();
+            int dice = po.getDice();
+            int strikeNumber = po.getStrikeNumber();
+            carryPossible = (po.numCarryTargets() >= 1);
+            battle.setCarryTargets(po.getCarryTargets());
+            strike2(target, dice, strikeNumber);
+        }
+        else
+        {
+            Log.warn("Illegal penalty option " + prompt);
+        }
+    }
+
+    /** Return true if the passed prompt matches one of the stored
+     *  penalty options. */
+    private PenaltyOption matchingPenaltyOption(String prompt)
+    {
+        if (penaltyOptions == null)
+        {
+            return null;
+        }
+        Iterator it = penaltyOptions.iterator();
+        while (it.hasNext())
+        {
+            PenaltyOption po = (PenaltyOption)it.next();
+            if (prompt.equals(po.toString()))
+            {
+                return po;
+            }
+        }
+        return null;
+    }
+
+
+    /** Return true if there's any chance that this critter could take
+     *  a strike penalty to carry when striking target.  Side effects
+     *  on penaltyOptions, battle.carryTargets. */
+    boolean possibleStrikePenalty(Critter target)
+    {
+        int dice = getDice(target);
+        int strikeNumber = getStrikeNumber(target);
+        findCarries(target, dice, strikeNumber);
+        return (!penaltyOptions.isEmpty());
+    }
+
+    // Side effects on penaltyOptions, Battle.carryTargets
+    private void findCarries(Critter target, int dice, int strikeNumber)
+    {
+Log.debug("findCarries " + this.getDescription() + " striking " + target.getDescription() + " dice:" + dice + " strikeNumber:" + strikeNumber);
+
+        battle.clearCarryTargets();
+        penaltyOptions.clear();
+
+        // Look for possible carries in each direction.
+        for (int i = 0; i < 6; i++)
+        {
+            if (possibleCarryToDir(target.getCurrentHex(), i))
+            {
+                findCarry(target, dice, strikeNumber, 
+                    getCurrentHex().getNeighbor(i));
+            }
+        }
+    }
+
+    /** Return true if carries are possible to the hex in direction
+     *  dir, considering only terrain. */
+    private boolean possibleCarryToDir(BattleHex targetHex, int dir)
+    {
+        BattleHex hex = getCurrentHex();
+        BattleHex neighbor = hex.getNeighbor(dir); 
+
+        if (neighbor == null || neighbor == targetHex)
+        {
+            return false;
+        }
+        if (hex.isCliff(dir))
+        {
+            return false;
+        }
+        // Strikes not up across dune hexsides cannot carry up across 
+        // dune hexsides.
+        if (hex.getOppositeHexside(dir) == 'd' && targetHex.getHexside(
+            Battle.getDirection(targetHex, hex, false)) != 'd')
+        {
+            return false;
+        }
+        return true;
+    }
+
+    /** For a strike on target, find any carries (including those
+     *  only allowed via strike penalty) to the creature in neighbor */
+    private void findCarry(Critter target, int dice, int strikeNumber, 
+        BattleHex neighbor)
+    {
+        BattleHex hex = getCurrentHex();
+        BattleHex targetHex = target.getCurrentHex();
+
+        Critter victim = battle.getCritter(neighbor);
+        if (victim == null || victim.getPlayer() == getPlayer() || 
+            victim.isDead())
+        {
+            return;
+        }
+        int tmpDice = getDice(victim);
+        int tmpStrikeNumber = getStrikeNumber(victim);
+
+        if (tmpStrikeNumber <= strikeNumber && tmpDice >= dice)
+        {
+            // Can carry with no need for a penalty.
+            battle.addCarryTarget(neighbor.getLabel());
+Log.debug("added carry target " + victim.getDescription());
+        }
+
+        else
+        {
+            // Add this scenario to the list, reusing an
+            // existing PenaltyOption if possible.
+            Iterator it = penaltyOptions.iterator();
+            while (it.hasNext())
+            {
+                PenaltyOption po = (PenaltyOption)it.next();
+                if (po.getDice() == tmpDice &&
+                    po.getStrikeNumber() == tmpStrikeNumber)
+                {
+Log.debug("existing penalty option: " + po.toString());
+                    po.addCarryTarget(neighbor.getLabel());
+                    return;
+                }
+            }
+            // No match, so create a new one.
+            PenaltyOption po =  new PenaltyOption(this, target,
+                tmpDice, tmpStrikeNumber);
+            po.addCarryTarget(neighbor.getLabel());
+            penaltyOptions.add(po);
+Log.debug("new penalty option: " + po.toString());
+        }
+    }
+
+
+    /** Called after strike penalties are chosen.
+     *  Roll the dice and apply damage.  Highlight legal carry targets. */
+    private void strike2(Critter target, int dice, int strikeNumber)
+    {
         // Roll the dice.
         int damage = 0;
 
         int [] rolls = new int[dice];
         StringBuffer rollString = new StringBuffer(36);
 
-        if (rollFakeDice)
+        for (int i = 0; i < dice; i++)
         {
-            for (int i = 0; i < dice; i++)
-            {
-                rolls[i] = Probs.rollFakeDie();
-                rollString.append(rolls[i]);
+            rolls[i] = Game.rollDie();
+            rollString.append(rolls[i]);
 
-                if (rolls[i] >= strikeNumber)
-                {
-                    damage++;
-                }
-            }
-        }
-        else
-        {
-            for (int i = 0; i < dice; i++)
+            if (rolls[i] >= strikeNumber)
             {
-                rolls[i] = Game.rollDie();
-                rollString.append(rolls[i]);
-
-                if (rolls[i] >= strikeNumber)
-                {
-                    damage++;
-                }
+                damage++;
             }
         }
 
         Log.event(getName() + " in " + currentHexLabel +
-            " strikes " + target.getName() + " in " +
-            targetHex.getLabel() + " with strike number " +
+            " strikes " + target.getDescription() + " with strike number " +
             strikeNumber + " : " + rollString + ": " + damage +
             (damage == 1 ? " hit" : " hits"));
 
@@ -864,14 +823,13 @@ final class Critter extends Creature implements Comparable
         {
             carryDamage = 0;
         }
+        battle.setCarryDamage(carryDamage);
 
         // Let the attacker choose whether to carry, if applicable.
         if (carryDamage > 0)
         {
             Log.event(carryDamage + (carryDamage == 1 ?
                 " carry available" : " carries available"));
-            battle.setCarryDamage(carryDamage);
-            battle.getGame().getServer().highlightCarries(getPlayerName());
         }
 
         // Record that this attacker has struck.
@@ -880,9 +838,10 @@ final class Critter extends Creature implements Comparable
         // Display the rolls in the BattleDice dialog.
         if (game != null)
         {
-            game.getServer().allSetBattleDiceValues(getName(),
-                target.getName(), currentHexLabel, target.getCurrentHexLabel(),
-                battle.getTerrain(), strikeNumber, damage, carryDamage, rolls);
+            game.getServer().allSetBattleValues(getName(), target.getName(), 
+                currentHexLabel, target.getCurrentHexLabel(), 
+                battle.getTerrain(), strikeNumber, damage, carryDamage, rolls,
+                battle.getCarryTargets());
         }
     }
 

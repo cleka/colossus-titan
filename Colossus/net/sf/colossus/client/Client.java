@@ -235,7 +235,8 @@ public final class Client
         return movementDie;
     }
 
-
+    // XXX All the public option methods need to be non-public.
+    // XXX Server-side options need to be tracked on the server.
     public boolean getOption(String name)
     {
         // If autoplay is set, then return true for all other auto* options.
@@ -281,7 +282,12 @@ public final class Client
         else if (name.equals(Options.showLogWindow))
         {
             Log.setToWindow(value);
-            if (!value)
+            if (value)
+            {
+                // Force log window to appear.
+                Log.event("");
+            }
+            else
             {
                 Log.disposeLogWindow();
             }
@@ -353,6 +359,7 @@ public final class Client
             return;
         }
         syncCheckboxes();
+        setBooleanOptions();
     }
 
 
@@ -372,6 +379,22 @@ public final class Client
         }
     }
 
+    /** Trigger all option-setting side effects by setting all
+     *  options to their just-loaded values. */
+    private void setBooleanOptions()
+    {
+        Enumeration en = options.propertyNames();
+        while (en.hasMoreElements())
+        {
+            String name = (String)en.nextElement();
+            String value = options.getProperty(name);
+            if (value.equals("true") || value.equals("false"))
+            {
+                setOption(name, Boolean.valueOf(value).booleanValue());
+            }
+        }
+    }
+
 
     public void updateStatusScreen(String [] playerInfo)
     {
@@ -383,8 +406,11 @@ public final class Client
             }
             else
             {
-                statusScreen = new StatusScreen(board.getFrame(), this,
-                    playerInfo);
+                if (board != null)
+                {
+                    statusScreen = new StatusScreen(board.getFrame(), this,
+                        playerInfo);
+                }
             }
         }
         else
@@ -408,15 +434,18 @@ public final class Client
         {
             if (caretakerDisplay == null)
             {
-                caretakerDisplay = new CreatureCollectionView(
-                    board.getFrame(), this);
-                caretakerDisplay.addWindowListener(new WindowAdapter()
+                if (board != null)
                 {
-                    public void windowClosing(WindowEvent e)
+                    caretakerDisplay = new CreatureCollectionView(
+                        board.getFrame(), this);
+                    caretakerDisplay.addWindowListener(new WindowAdapter()
                     {
-                        setOption(Options.showCaretaker, false);
-                    }
-                });
+                        public void windowClosing(WindowEvent e)
+                        {
+                            setOption(Options.showCaretaker, false);
+                        }
+                    });
+                }
             }
             else
             {
@@ -742,11 +771,13 @@ public final class Client
     }
 
 
+    // TODO Make this non-public.  Have Server track client IDs itself.
     public String getPlayerName()
     {
         return playerName;
     }
 
+    // TODO Make this non-public.  Have Server track client IDs itself.
     public int getPlayerNum()
     {
         return playerNum;
@@ -825,18 +856,22 @@ public final class Client
     }
 
 
+
     /** Allow the player to choose whether to take a penalty (fewer dice
-     *  or higher strike number) in order to be allowed to carry.  Return
-     *  true if the penalty is taken. */
-    public boolean chooseStrikePenalty(String prompt)
+     *  or higher strike number) in order to be allowed to carry.
+     *  Used by human players only. */
+    public void askChooseStrikePenalty(java.util.List choices)
     {
-        String [] options = new String[2];
-        options[0] = "Take Penalty";
-        options[1] = "Do Not Take Penalty";
-        int answer = JOptionPane.showOptionDialog(map, prompt,
-            "Take Strike Penalty?", JOptionPane.YES_NO_OPTION,
-            JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
-        return (answer == JOptionPane.YES_OPTION);
+        if (choices == null || choices.isEmpty())
+        {
+            Log.error("called Client.askChooseStrikePenalty with no prompts");
+        }
+        new PickStrikePenalty(map.getFrame(), this, choices);
+    }
+
+    void assignStrikePenalty(String prompt)
+    {
+        server.assignStrikePenalty(playerName, prompt);
     }
 
 
@@ -992,9 +1027,11 @@ public final class Client
     }
 
 
-    public void setBattleDiceValues(String attackerName, String defenderName,
+    // TODO Use this method to mark chits as wounded / dead.
+    public void setBattleValues(String attackerName, String defenderName,
         String attackerHexId, String defenderHexId, char terrain,
-        int strikeNumber, int damage, int carryDamage, int [] rolls)
+        int strikeNumber, int damage, int carryDamage, int [] rolls,
+        Set carryTargets)
     {
         if (battleDice != null)
         {
@@ -1002,15 +1039,21 @@ public final class Client
                 defenderHexId, terrain, strikeNumber, damage, carryDamage,
                 rolls);
             battleDice.showRoll();
+            if (carryDamage > 0)
+            {
+Log.debug("Calling BattleMap.highlightCarries with " + carryTargets.size() + 
+" carry targets");
+                map.highlightCarries(carryDamage, carryTargets);
+            }
         }
     }
 
-    public void setBattleDiceCarries(int carries)
+    public void setCarries(int carryDamage, Set carryTargets)
     {
-        if (battleDice != null)
+        battleDice.setCarries(carryDamage);
+        if (carryDamage > 0)
         {
-            battleDice.setCarries(carries);
-            battleDice.showRoll();
+            map.highlightCarries(carryDamage, carryTargets);
         }
     }
 
@@ -1256,14 +1299,6 @@ public final class Client
         }
     }
 
-
-    public void highlightCarries()
-    {
-        if (map != null)
-        {
-            map.highlightCarries();
-        }
-    }
 
     public void setupBattleSummonMenu()
     {

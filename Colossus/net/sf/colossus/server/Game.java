@@ -311,6 +311,7 @@ public final class Game
 
         server.allUpdateStatusScreen();
         server.allUpdateCaretakerDisplay();
+
         // Reset the color of the player label now that it's known.
         server.allSetupPlayerLabel();
     }
@@ -1000,6 +1001,7 @@ public final class Game
 
         try
         {
+            Log.event("Loading game from " + file);
             FileReader fileReader = new FileReader(file);
             BufferedReader in = new BufferedReader(fileReader);
             String buf;
@@ -1194,7 +1196,6 @@ public final class Game
             server.allLoadInitialMarkerImages();
             setupPhase();
 
-            // Setup status screen
             server.allUpdateStatusScreen();
             server.allUpdateCaretakerDisplay();
         }

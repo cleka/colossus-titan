@@ -21,6 +21,7 @@ import net.sf.colossus.client.Proposal;
 public final class Server
 {
     private Game game;
+    private Critter striker;
 
     // XXX How do we keep track of which client goes with which player?
     // Sort by tower number when the game starts?
@@ -99,6 +100,16 @@ public final class Server
         {
             Client client = (Client)it.next();
             client.clearCarries();
+        }
+    }
+
+    void allSetCarries(int carryDamage, Set carryTargets)
+    {
+        Iterator it = clients.iterator();
+        while (it.hasNext())
+        {
+            Client client = (Client)it.next();
+            client.setCarries(carryDamage, carryTargets);
         }
     }
 
@@ -322,13 +333,6 @@ public final class Server
             Client client = (Client)it.next();
             client.showMessageDialog(message);
         }
-    }
-
-
-    void highlightCarries(String playerName)
-    {
-        Client client = getClient(playerName);
-        client.highlightCarries();
     }
 
 
@@ -667,7 +671,6 @@ public final class Server
             if (recruitName != null)
             {
                 Creature recruit = Creature.getCreatureByName(recruitName);
-                // XXX Make sure this works correctly with null, "none"
                 Creature recruiter = Creature.getCreatureByName(recruiterName);
                 if (recruit != null)
                 {
@@ -680,7 +683,7 @@ public final class Server
                 didMuster(legion);
             }
         }
-        // XXX Need to always call this to keep game from hanging.
+        // Need to always call this to keep game from hanging.
         if (game.getPhase() == Constants.FIGHT)
         {
             if (game.getBattle() != null)
@@ -830,7 +833,7 @@ public final class Server
     {
         Battle battle = game.getBattle();
         battle.getActiveLegion().getCritterByTag(tag).strike(
-            battle.getCritter(hexLabel), false);
+            battle.getCritter(hexLabel));
     }
 
 
@@ -924,30 +927,21 @@ public final class Server
     }
 
 
-    void allSetBattleDiceValues(String attackerName,
-        String defenderName, String attackerHexId, String defenderHexId,
-        char terrain, int strikeNumber, int damage, int carryDamage,
-        int [] rolls)
+    void allSetBattleValues(String attackerName, String defenderName, 
+        String attackerHexId, String defenderHexId, char terrain, 
+        int strikeNumber, int damage, int carryDamage, int [] rolls, 
+        Set carryTargets)
     {
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
             Client client = (Client)it.next();
-            client.setBattleDiceValues(attackerName, defenderName,
+            client.setBattleValues(attackerName, defenderName,
                 attackerHexId, defenderHexId, terrain, strikeNumber,
-                damage, carryDamage, rolls);
+                damage, carryDamage, rolls, carryTargets);
         }
     }
 
-    void allSetBattleDiceCarries(int carries)
-    {
-        Iterator it = clients.iterator();
-        while (it.hasNext())
-        {
-            Client client = (Client)it.next();
-            client.setBattleDiceCarries(carries);
-        }
-    }
 
     void allSetBattleWaitCursor()
     {
@@ -969,12 +963,27 @@ public final class Server
         }
     }
 
-    boolean chooseStrikePenalty(String playerName, String prompt)
+    /** Takes a Set of PenaltyOptions. */
+    void askChooseStrikePenalty(SortedSet penaltyOptions)
     {
+        String playerName = game.getActivePlayerName();
         Client client = getClient(playerName);
-        return client.chooseStrikePenalty(prompt);
+        ArrayList choices = new ArrayList();
+        Iterator it = penaltyOptions.iterator();
+        while (it.hasNext())
+        {
+            PenaltyOption po = (PenaltyOption)it.next();
+            striker = po.getStriker();
+            choices.add(po.toString());
+        }
+        client.askChooseStrikePenalty(choices);
     }
 
+    public void assignStrikePenalty(String playerName, String prompt)
+    {
+        striker.assignStrikePenalty(prompt);
+        striker = null;
+    }
 
     void allInitBattleMap(String masterHexLabel)
     {

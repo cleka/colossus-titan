@@ -30,11 +30,10 @@ public interface AI
     boolean concede(Legion legion, Legion enemy, Game game);
 
     /** make battle strikes for legion */
-    void strike(Legion legion, Battle battle, Game game, boolean fakeDice);
+    void strike(Legion legion, Battle battle, Game game);
 
     /** choose whether to take a penalty in order to possibly carry */
-    boolean chooseStrikePenalty(Critter critter, Critter target,
-        Critter carryTarget, Battle battle, Game game);
+    PenaltyOption chooseStrikePenalty(SortedSet penaltyOptions);
 
     /** make battle moves for the active legion */
     void battleMove(Game game);

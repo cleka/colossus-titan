@@ -58,7 +58,9 @@ public final class GetPlayers extends JDialog implements WindowListener,
     private static String anyAI = "A Random AI";
     private static String defaultAI = "SimpleAI";
     /* aiList should match the class name of available AI */
-    private static String[] aiList = { "SimpleAI", "MinimaxAI" };
+    // XXX MinimaxAI is currently very broken.
+    //private static String[] aiList = { "SimpleAI", "MinimaxAI" };
+    private static String[] aiList = { "SimpleAI" };
 
     private GetPlayers(JFrame parentFrame)
     {

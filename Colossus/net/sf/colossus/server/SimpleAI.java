@@ -1095,7 +1095,8 @@ public class SimpleAI implements AI
                             continue;
                         }
 
-                        if (l.numCreature(Creature.getCreatureByName("Angel")) == 0)
+                        if (l.numCreature(Creature.getCreatureByName(
+                            "Angel")) == 0)
                         {
                             continue;
                         }
@@ -1122,8 +1123,9 @@ public class SimpleAI implements AI
                     }
                     // don't do this if we'll lose our only angel group
                     // and won't score enough points to make up for it
-                    else if (legion.numCreature(Creature.getCreatureByName("Angel")) > 0
-                             &&!haveOtherAngels && enemyPointValue < 88)
+                    else if (legion.numCreature(Creature.getCreatureByName(
+                        "Angel")) > 0 &&!haveOtherAngels && 
+                        enemyPointValue < 88)
                     {
                         value += LOSE_LEGION + 5;
                     }
@@ -1140,8 +1142,8 @@ public class SimpleAI implements AI
                     break;
 
                 case DRAW:
-                    Log.debug("legion " + legion + " can attack " + enemyLegion
-                            + " in " + hex + " and DRAW");
+                    Log.debug("legion " + legion + " can attack " + 
+                        enemyLegion + " in " + hex + " and DRAW");
 
                     // If this is an unimportant group for us, but
                     // is enemy titan, do it.  This might be an
@@ -1342,7 +1344,8 @@ public class SimpleAI implements AI
         {
             if (canRecruitHere)
             {
-                Log.debug("considering risk of moving " + legion + " to " + hex);
+                Log.debug("considering risk of moving " + legion + " to " + 
+                    hex);
             }
             else
             {
@@ -1872,18 +1875,17 @@ public class SimpleAI implements AI
         return null;
     }
 
-    public void strike(Legion legion, Battle battle, Game game,
-        boolean fakeDice)
+    public void strike(Legion legion, Battle battle, Game game)
     {
         // Repeat until no attackers with valid targets remain.
         while (!battle.isOver() && battle.findCrittersWithTargets().size() > 0)
         {
-            doOneStrike(legion, battle, fakeDice);
+            doOneStrike(legion, battle); 
         }
     }
 
 
-    private void doOneStrike(Legion legion, Battle battle, boolean fakeDice)
+    private void doOneStrike(Legion legion, Battle battle)
     {
         // Simple one-ply group strike algorithm.
         // First make forced strikes, including rangestrikes for
@@ -2001,7 +2003,7 @@ public class SimpleAI implements AI
         // Having found the target and attacker, strike.
         // Take a carry penalty if there is still a 95%
         // chance of killing this target.
-        bestAttacker.strike(bestTarget, fakeDice);
+        bestAttacker.strike(bestTarget);
 
         // If there are any carries, apply them first to
         // the biggest creature that could be killed with
@@ -2037,27 +2039,47 @@ public class SimpleAI implements AI
                     }
                 }
             }
+            if (bestTarget == null)
+            {
+                Log.warn("No carry target but " + battle.getCarryDamage() +
+                    " points of available carry damage");
+                battle.setCarryDamage(0);
+                return;
+            }
             Log.debug("Best carry target is " + bestTarget.getDescription());
             battle.applyCarries(bestTarget);
         }
     }
 
 
-    public boolean chooseStrikePenalty(Critter critter, Critter target,
-        Critter carryTarget, Battle battle, Game game)
+    public PenaltyOption chooseStrikePenalty(SortedSet penaltyOptions)
     {
         // If we still have a 95% chance to kill target even after
-        // taking the penalty to carry to carryTarget, return true.
+        // taking the penalty to carry to carryTargets, return true.
         final double carryThreshold = 0.95;
+        PenaltyOption choice = null;
 
-        int dice = Math.min(critter.getDice(target),
-                critter.getDice(carryTarget));
-        int strikeNumber = Math.max(critter.getStrikeNumber(target),
-                critter.getStrikeNumber(carryTarget));
-        int hitsNeeded = target.getPower() - target.getHits();
+        // Someone inefficient since we always iterate through all
+        // options and take the last match, rather than iterating
+        // backwards and exiting early.
+        Iterator it = penaltyOptions.iterator();
+        while (it.hasNext())
+        {
+            PenaltyOption po = (PenaltyOption)it.next();
+            Critter striker = po.getStriker();
+            Critter target = po.getTarget();
+            int dice = Math.min(striker.getDice(target), po.getDice());
+            int strikeNumber = Math.max(striker.getStrikeNumber(target),
+                po.getStrikeNumber());
+            int hitsNeeded = target.getPower() - target.getHits();
 
-        return (Probs.probHitsOrMore(dice, strikeNumber, hitsNeeded) >=
-            carryThreshold);
+            if (Probs.probHitsOrMore(dice, strikeNumber, hitsNeeded) >=
+                carryThreshold)
+            {
+                choice = po;
+            }
+        }
+        return choice;
     }
 
 
@@ -2174,8 +2196,6 @@ public class SimpleAI implements AI
 
     public void battleMove(Game game)
     {
-        Log.debug("Called battleMove()");
-
         // Consider one critter at a time, in order of importance.
         // Examine all possible moves for that critter not already
         // taken by a more important one.
@@ -2388,7 +2408,6 @@ public class SimpleAI implements AI
                 perfectScore += cm.getCritter().getPointValue();
             }
         }
-        Log.debug("perfect score is : " + perfectScore);
 
         if (perfectScore == 0)
         {
@@ -2442,7 +2461,6 @@ public class SimpleAI implements AI
                 bestScore = score;
                 if (score >= perfectScore)
                 {
-                    Log.debug("got perfect score: " + score);
                     break;
                 }
             }

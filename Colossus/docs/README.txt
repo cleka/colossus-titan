@@ -133,8 +133,7 @@ away.  If the combatants can come to an agreement where all the creatures on
 at least one side die, then there's no need to fight.  Otherwise, it's time
 for battle.  
 
-(NOTE: Negotiation is currently broken and disabled but will be put back in 
-when we get around to fixing it.)
+(NOTE: Negotiation is currently broken.  It'll be back in soon.)
 
 During a battle, the appropriate BattleMap pops up, with each legion on the
 appropriate entry side.  (You have to choose an entry side during movement
@@ -245,10 +244,7 @@ A.  Probably about April 2002.  No guarantees -- real life sometimes
     It's a lot of work, because I want to do it the right away (a 
     language-neutral, simple socket protocol with a server that enforces
     the rules rather than trusting the clients) rather than just slapping
-    an quick RMI layer on the existing game.  I know you want network
-    play now, but games that break if two players have clients just a
-    little bit different, and where any fourth-grader can change the
-    die-rolling function to get 6s in combat whenever he wants, are no fun.
+    an quick RMI layer on the existing game.
 
 Q.  Why is the AI so dumb?
 
@@ -267,13 +263,11 @@ A1. SimpleAI is faster and smarter.  MinimaxAI is slower and dumber.
 A2. (More than you probably want to know)  SimpleAI is a handcoded 
     one-ply expert system.  MinimaxAI uses the standard Minimax with 
     Alpha-Beta Pruning algorithm for masterboard moves.  (It uses the 
-    same algorithm as SimpleAI for battle moves, because minimax would 
-    take forever due to the huge number of possible moves for large legions.)
-    In theory, MinimaxAI should be stronger, once we get it working.  But
-    it's not working very well yet.  If you understood this answer, how
-    about helping us fix it?
+    same algorithm as SimpleAI for battle moves for now.)
+    In theory, MinimaxAI should be stronger, once we get it fully 
+    working.  But it's not working very well yet.
 
-Q.  What are all those load map, load terrain, load recruit, etc. buttons?
+Q.  What's the load variant button do? 
 
 A.  The maps and recruit trees and stuff used to be hardcoded.  Romain
     has recently pulled them out into data files, which means that you
@@ -289,7 +283,7 @@ A.  Bug reports are great.  Detailed bug reports delivered via the
     SourceForge bug tracker are even better.  
     
     If you want to contribute code, make sure that you're starting 
-    from the latest source (pull from CVS)  Please read and follow 
+    from the latest source (so pull from CVS).  Please read and follow
     CodingStandards.txt so your code is easier to merge.  Join and
     send mail to the dev mailing list at SF so we know what you're
     up to.  Beyond that, just code whatever you want and send 

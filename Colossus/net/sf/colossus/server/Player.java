@@ -31,7 +31,7 @@ public final class Player implements Comparable
     private boolean dead;
     private boolean titanEliminated;
     private String donorId;
-    private TreeSet markersAvailable;
+    private SortedSet markersAvailable = new TreeSet();
     private String type;               // "Human" or ".*AI"
 
     private AI ai = new SimpleAI();    // TODO Allow pluggable AIs.
@@ -70,7 +70,8 @@ public final class Player implements Comparable
         }
 
         // Strings are immutable, so a shallow copy == a deep copy
-        newPlayer.markersAvailable = (TreeSet)markersAvailable.clone();
+        newPlayer.markersAvailable = new TreeSet();
+        newPlayer.markersAvailable.addAll(markersAvailable);
 
         return newPlayer;
     }
@@ -669,12 +670,12 @@ public final class Player implements Comparable
 
     Set getMarkersAvailable()
     {
-        return Collections.unmodifiableSet(markersAvailable);
+        return Collections.unmodifiableSortedSet(markersAvailable);
     }
 
     String getFirstAvailableMarker()
     {
-        if (markersAvailable.size() == 0)
+        if (markersAvailable.isEmpty())
         {
             return null;
         }
@@ -888,25 +889,22 @@ public final class Player implements Comparable
         return false;
     }
 
-    void aiStrike(Legion legion, Battle battle, boolean fakeDice,
-        boolean forced)
+    void aiStrike(Legion legion, Battle battle, boolean forced)
     {
         if (forced || game.getServer().getClientOption(name,
             Options.autoStrike))
         {
-            ai.strike(legion, battle, game, fakeDice);
+            ai.strike(legion, battle, game);
         }
     }
 
-    boolean aiChooseStrikePenalty(Critter critter, Critter target,
-        Critter carryTarget, Battle battle)
+    PenaltyOption aiChooseStrikePenalty(SortedSet penaltyOptions)
     {
         if (game.getServer().getClientOption(name, Options.autoStrike))
         {
-            return ai.chooseStrikePenalty(critter, target, carryTarget,
-                battle, game);
+            return ai.chooseStrikePenalty(penaltyOptions);
         }
-        return false;
+        return null;
     }
 
     void aiBattleMove()

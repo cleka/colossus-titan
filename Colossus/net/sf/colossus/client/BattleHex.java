@@ -7,6 +7,7 @@ import java.awt.geom.*;
 
 import net.sf.colossus.server.Creature;
 import net.sf.colossus.util.HTMLColor;
+import net.sf.colossus.util.Log;
 
 
 /**
@@ -237,7 +238,15 @@ public class BattleHex extends Hex
 
     public char getHexside(int i)
     {
-        return hexsides[i];
+        if (i >= 0 && i <= 5)
+        {
+            return hexsides[i];
+        }
+        else
+        {
+            Log.warn("Called BattleHex.getHexside() with " + i);
+            return '?';
+        }
     }
 
 
@@ -372,5 +381,11 @@ public class BattleHex extends Hex
 
         // Other hexes only cost 1.
         return NORMAL_COST;
+    }
+
+    public boolean isCliff(int hexside)
+    {
+        return getHexside(hexside) == 'c' || 
+            getOppositeHexside(hexside) == 'c';
     }
 }

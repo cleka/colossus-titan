@@ -313,26 +313,36 @@ final class Legion implements Comparable
 
     void addAngel(String angelType)
     {
-        if (angelsToAcquire <= 0 || angelType == null)
+        if (angelsToAcquire <= 0) 
         {
             return;
         }
-        if (angelType.equals("Archangel") && !canAcquireArchangel)
+
+        if (angelType == null)
         {
-            return;
-        }
-        Creature angel = Creature.getCreatureByName(angelType);
-        if (angel != null)
-        {
-            addCreature(angel, true);
-            Log.event("Legion " + getLongMarkerName() + " acquires an " + 
-                angelType);
+            // Declined to acquire.
             angelsToAcquire--;
-            if (angelType.equals("Archangel"))
+        }
+        else if (angelType.equals("Archangel") && !canAcquireArchangel)
+        {
+            return;
+        }
+        else
+        {
+            Creature angel = Creature.getCreatureByName(angelType);
+            if (angel != null)
             {
-                canAcquireArchangel = false;
+                addCreature(angel, true);
+                Log.event("Legion " + getLongMarkerName() + " acquires an " + 
+                    angelType);
+                angelsToAcquire--;
+                if (angelType.equals("Archangel"))
+                {
+                    canAcquireArchangel = false;
+                }
             }
         }
+
         if (angelsToAcquire == 0)
         {
             game.doneAcquiringAngels();

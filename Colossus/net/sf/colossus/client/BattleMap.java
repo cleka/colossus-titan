@@ -472,25 +472,23 @@ public final class BattleMap extends HexMap implements MouseListener,
         selectHexesByLabels(set);
     }
 
-
-    void highlightCarries()
+    /** carryTargets is a Set of hexLabels */
+    void highlightCarries(int carryDamage, Set carryTargets)
     {
-        Set set = client.getCarryTargets();
         unselectAllHexes();
-        selectHexesByLabels(set);
-        setupCarryCursor();
+        selectHexesByLabels(carryTargets);
+        setupCarryCursor(carryDamage);
     }
 
     void clearCarries()
     {
         unselectAllHexes();
-        setupCarryCursor();
+        setupCarryCursor(0);
     }
 
 
-    private void setupCarryCursor()
+    private void setupCarryCursor(int numCarries)
     {
-        int numCarries = client.getCarryDamage();
         Cursor cursor = null;
 
         if (numCarries == 0)

@@ -32,9 +32,10 @@ Linux, 1.3.1, fvwm2: Problems with dialog resizing.  Doesn't seem to
 
 AI BUGS:
 
-AI Legions sometimes miss the risk of staying in their current hex.  
+AI Legions completely miss the risk of staying in their current hex.  
    For example, 2-high titan legion in H4 saw no risk from enemy 
    6-high legion in D7, when it could have easily moved to safety.
+   I think this logic is backwards.
 
 AI attacking ranger is way too aggressive on the first turn, moving 
    adjacent to two enemy trolls rather than sitting back and rangestriking.
@@ -206,3 +207,24 @@ Did file/new game while game was being set up.  Got comodification exception.
 MinimaxAI advances phases and turns illegally while a human player is trying
    to enter the battle map.
 
+Stuff (markers, LogWindow) that is painted before the MasterBoard is ready
+   end up dumping pixels onto the upper-left corner of the MasterFrame.
+   Need to setVisible(false) on master frame until later.
+
+On every SimpleAI move:
+   Error: Could not find hex 700
+   Error: Could not find hex 800
+   Error: Could not find hex 900
+
+From SimpleAI:  (Works, but...)
+   Warn: Tried to enter invalid side of tower
+   Legion Gd02 (Claw) in 400 tower teleports (null) to Tower hex 500 entering 
+      on Bottom
+   Legion Gd01 (Caduceus) in 400 moves to Woods hex 25 entering on Left
+
+We routinely get "Warn: Tried to enter invalid side of tower"
+   I think this is harmless (we're trying to enter it as if it were 
+   another terrain type), but we should eliminate the warning by changing 
+   all entry side routines to always return the bottom for towers.
+
+Need to repaint after choosing a strike penalty.

@@ -547,7 +547,7 @@ final class Battle
             if (server.getClientOption(player.getName(),
                 Options.autoStrike))
             {
-                player.aiStrike(getActiveLegion(), this, false, false);
+                player.aiStrike(getActiveLegion(), this, false);
             }
             else if (server.getClientOption(player.getName(),
                 Options.autoForcedStrike))
@@ -1175,7 +1175,7 @@ final class Battle
                     {
                         String hexLabel = (String)(set.iterator().next());
                         Critter target = getCritter(hexLabel);
-                        critter.strike(target, false);
+                        critter.strike(target);
 
                         // If that strike killed the target, it's possible
                         // that some other creature that had two targets
@@ -1237,8 +1237,7 @@ final class Battle
         for (int i = 0; i < 6; i++)
         {
             // Adjacent creatures separated by a cliff are not engaged.
-            if (currentHex.getHexside(i) != 'c' &&
-                currentHex.getOppositeHexside(i) != 'c')
+            if (!currentHex.isCliff(i))
             {
                 BattleHex targetHex = currentHex.getNeighbor(i);
                 if (targetHex != null && isOccupied(targetHex))
@@ -1290,12 +1289,18 @@ final class Battle
     /** Return the set of hex labels for hexes with valid carry targets. */
     Set getCarryTargets()
     {
-        return carryTargets;
+        return Collections.unmodifiableSet(carryTargets);
+    }
+
+    void clearCarryTargets()
+    {
+        carryTargets.clear();
     }
 
     void setCarryTargets(Set carryTargets)
     {
-        this.carryTargets = carryTargets;
+        this.carryTargets.clear();
+        this.carryTargets.addAll(carryTargets);
     }
 
     void addCarryTarget(String hexLabel)
@@ -1317,6 +1322,7 @@ final class Battle
 
     void applyCarries(Critter target)
     {
+Log.debug("called Battle.applyCarries() for " + target.getDescription());
         if (!carryTargets.contains(target.getCurrentHexLabel()))
         {
             Log.warn("ILLEGAL CARRY ATTEMPT!");
@@ -1336,8 +1342,7 @@ final class Battle
         }
         else
         {
-            server.highlightCarries(getActivePlayerName());
-            server.allSetBattleDiceCarries(carryDamage);
+            server.allSetCarries(carryDamage, getCarryTargets());
             Log.event(carryDamage + (carryDamage == 1 ?
                 " carry available" : " carries available"));
         }
@@ -1983,7 +1988,7 @@ final class Battle
         }
         else
         {
-            Log.event(critter.getName() + " in " +
+            Log.warn(critter.getName() + " in " +
                 critter.getCurrentHexLabel() +
                 " tried to illegally move to " + hexLabel);
             return false;
