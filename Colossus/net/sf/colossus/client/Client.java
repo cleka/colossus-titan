@@ -243,7 +243,10 @@ public final class Client implements IClient
      *  connections when they want to quit in a hurry. */
     void withdrawFromGame()
     {
-        server.withdrawFromGame();
+        if (!isGameOver())
+        {
+            server.withdrawFromGame();
+        }
     }
 
 

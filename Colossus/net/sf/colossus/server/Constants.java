@@ -174,7 +174,7 @@ public final class Constants
     public static final String angel = "Angel";
 
     // Network stuff
-    public static final int defaultPort = 1969;
+    public static final int defaultPort = 26567;
     public static final String localhost = "localhost";
     public static final int numSavedServerNames = 10;
 

@@ -2137,8 +2137,11 @@ public final class Game
 
     void createSummonAngel(Legion attacker)
     {
-        summoning = true;
-        server.createSummonAngel(attacker);
+        if (!isOver())
+        {
+            summoning = true;
+            server.createSummonAngel(attacker);
+        }
     }
 
     /** Called locally and from Battle. */
@@ -2238,7 +2241,8 @@ public final class Game
                 // Defender won, so possibly recruit reinforcement.
                 if (attackerEntered && legion.canRecruit())
                 {
-                    Log.debug("Calling Game.reinforce() from Game.finishBattle()");
+                    Log.debug(
+                        "Calling Game.reinforce() from Game.finishBattle()");
                     reinforce(legion);
                 }
             }
