@@ -156,12 +156,6 @@ Log.debug("End of SocketClientThread while loop");
             client.setLegionStatus(markerId, moved, teleported, entrySide,
                 lastRecruit);
         }
-        else if (method.equals(Constants.setLegionContents))
-        {
-            String markerId = (String)args.remove(0);
-            List names = Split.split(Glob.sep, (String)args.remove(0));
-            client.setLegionContents(markerId, names);
-        }
         else if (method.equals(Constants.addCreature))
         {
             String markerId = (String)args.remove(0);

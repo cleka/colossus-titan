@@ -386,12 +386,6 @@ final class SocketServerThread extends Thread implements IClient
             sep + teleported + sep + entrySide + sep + lastRecruit);
     }
 
-    public void setLegionContents(String markerId, List names)
-    {
-        out.println(Constants.setLegionContents + sep + markerId + sep + 
-            Glob.glob(names));
-    }
-
     public void addCreature(String markerId, String name)
     {
         out.println(Constants.addCreature + sep + markerId + sep + name);

@@ -38,8 +38,6 @@ public interface IClient
     public void setLegionStatus(String markerId, boolean moved, 
         boolean teleported, int entrySide, String lastRecruit);
 
-    public void setLegionContents(String markerId, List names);
-
     public void addCreature(String markerId, String name);
 
     public void removeCreature(String markerId, String name);

@@ -1518,7 +1518,7 @@ public final class Server implements IServer
         while (it.hasNext())
         {
             IClient client = (IClient)it.next();
-            client.setLegionContents(legion.getMarkerId(),
+            client.revealCreatures(legion.getMarkerId(),
                 legion.getImageNames());
         }
         game.history.revealEvent(true, null, legion.getMarkerId(), 
@@ -1532,7 +1532,7 @@ public final class Server implements IServer
         while (it.hasNext())
         {
             IClient client = (IClient)it.next();
-            client.setLegionContents(markerId, creatureNames);
+            client.revealCreatures(markerId, creatureNames);
         }
     }
 
@@ -1541,7 +1541,7 @@ public final class Server implements IServer
         IClient client = getClient(playerName);
         if (client != null)
         {
-            client.setLegionContents(legion.getMarkerId(), 
+            client.revealCreatures(legion.getMarkerId(), 
                 legion.getImageNames());
         }
         List li = new ArrayList();
@@ -1556,7 +1556,7 @@ public final class Server implements IServer
         IClient client = getClient(playerName);
         if (client != null)
         {
-            client.setLegionContents(markerId, creatureNames);
+            client.revealCreatures(markerId, creatureNames);
         }
         List li = new ArrayList();
         li.add(playerName);

@@ -390,9 +390,9 @@ class Node implements Comparable
     }
 
 
-    void revealSomeCreatures(List cnl)
+    void revealCreatures(List cnl)
     {
-        Log.debug("revealSomeCreatures() for " + this + " " + cnl);
+        Log.debug("revealCreatures() for " + this + " " + cnl);
         CreatureInfoList cil = new CreatureInfoList();
         Iterator it = cnl.iterator();
         while (it.hasNext())
@@ -425,7 +425,7 @@ class Node implements Comparable
         if (count > getHeight())
         {
             throw new PredictSplitsException(
-                "Certainty error in revealSomeCreatures -- count is " + 
+                "Certainty error in revealCreatures -- count is " + 
                 count + " height is " + getHeight());
         }
 
@@ -494,33 +494,6 @@ class Node implements Comparable
         }
     }
 
-    void revealAllCreatures(List cnl)
-    {
-        CreatureInfoList cil = new CreatureInfoList();
-        Iterator it = cnl.iterator();
-        while (it.hasNext())
-        {
-            String name = (String)it.next();
-            cil.add(new CreatureInfo(name, true, true));
-        }
-
-        // Confirm that all creatures that were certain are there.
-        CreatureInfoList certain = getCertainCreatures();
-        it = certain.iterator();
-        while (it.hasNext())
-        {
-            CreatureInfo ci = (CreatureInfo)it.next();
-            String name = ci.getName();
-            if (cil.numCreature(name) < certain.numCreature(name))
-            {
-                throw new PredictSplitsException(
-                    "Certainty error in revealAllCreatures() " + 
-                    name + " " + cil.numCreature(name) + " " +
-                    certain.numCreature(name));
-            }
-        }
-        revealSomeCreatures(cnl);
-    }
 
     /** Return true if creatures in children are consistent with self. */
     boolean childCreaturesMatch()
@@ -608,7 +581,7 @@ class Node implements Comparable
         knownCombo.addAll(knownKeep);
         if (!creatures.isSupersetOf(knownCombo))
         {
-            revealSomeCreatures(knownCombo.getCreatureNames());
+            revealCreatures(knownCombo.getCreatureNames());
             split(childSize, getOtherChildMarkerId(), REUSE_EXISTING_TURN);
         }
 
@@ -900,7 +873,7 @@ class Node implements Comparable
         Log.debug("tellChildContents() for node " + this + " from " + child);
         CreatureInfoList childCertainAtSplit = 
             child.getCertainAtSplitCreatures();
-        revealSomeCreatures(childCertainAtSplit.getCreatureNames());
+        revealCreatures(childCertainAtSplit.getCreatureNames());
         split(childSize2, getOtherChildMarkerId(), REUSE_EXISTING_TURN);
     }
 
@@ -934,7 +907,7 @@ class Node implements Comparable
         }
         List cnl = new ArrayList();
         cnl.add(creatureName);
-        revealSomeCreatures(cnl);
+        revealCreatures(cnl);
 
         CreatureInfo ci = creatures.getCreatureInfo(creatureName);
         if (ci == null)

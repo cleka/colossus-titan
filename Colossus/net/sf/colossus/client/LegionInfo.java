@@ -205,12 +205,6 @@ public final class LegionInfo
     }
 
 
-    /** Replace the existing contents for this legion with these. */
-    void setContents(List names)
-    {
-        getNode().revealAllCreatures(names);
-    }
-
     /** Add a new creature to this legion. */
     void addCreature(String name)
     {
@@ -225,7 +219,7 @@ public final class LegionInfo
     /** Reveal creatures in this legion, some of which already may be known. */
     void revealCreatures(final List names)
     {
-        getNode().revealSomeCreatures(names);
+        getNode().revealCreatures(names);
     }
 
     void split(int childHeight, String childId, List splitoffs, int turn)

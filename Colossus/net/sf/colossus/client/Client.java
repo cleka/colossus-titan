@@ -1080,18 +1080,6 @@ public final class Client implements IClient
         return getLegionInfo(markerId).getCertainties();
     }
 
-    /** Replace the existing contents for this legion with these. */
-    public synchronized void setLegionContents(String markerId, 
-        java.util.List names)
-    {
-        String pName = getPlayerNameByMarkerId(markerId);
-        if (predictSplits == null || getPredictSplits(pName) == null)
-        {
-            initPredictSplits(pName, markerId, names);
-        }
-        getLegionInfo(markerId).setContents(names);
-    }
-
 
     /** Add a new creature to this legion. */
     public synchronized void addCreature(String markerId, String name)
@@ -1126,6 +1114,11 @@ public final class Client implements IClient
     public synchronized void revealCreatures(String markerId, 
         final java.util.List names)
     {
+        String pName = getPlayerNameByMarkerId(markerId);
+        if (predictSplits == null || getPredictSplits(pName) == null)
+        {
+            initPredictSplits(pName, markerId, names);
+        }
         getLegionInfo(markerId).revealCreatures(names);
     }
 
