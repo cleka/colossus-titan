@@ -2740,6 +2740,49 @@ public final class Game
     }
 
 
+    // TODO: Use a more general log function rather than
+    // showMessageDialog.
+    // TODO: return success or failure.
+    private void doSplit(Legion legion, Player player)
+    {
+        // Need a legion marker to split.
+        if (player.getNumMarkersAvailable() == 0)
+        {
+            JOptionPane.showMessageDialog(board,
+                "No markers are available.");
+            return;
+        }
+        // A legion must be at least 4 high to split.
+        if (legion.getHeight() < 4)
+        {
+            JOptionPane.showMessageDialog(board,
+                "Legion is too short to split.");
+            return;
+        }
+        // Don't allow extra splits in turn 1.
+        if (getTurnNumber() == 1 && player.getNumLegions() > 1)
+        {
+            JOptionPane.showMessageDialog(board,
+                "Cannot split twice on Turn 1.");
+            return;
+        }
+
+        // TODO Generalize this so that it works with either
+        // GUI or AI.
+        SplitLegion.splitLegion(masterFrame, legion,
+            player.getOption(autoPlay) ||
+            player.getOption(autoPickMarker));
+
+        updateStatusScreen();
+        // If we split, unselect this hex.
+        if (legion.getHeight() < 7)
+        {
+            MasterHex hex = legion.getCurrentHex();
+            board.unselectHexByLabel(hex.getLabel());
+        }
+    }
+
+
     public void actOnLegion(Legion legion)
     {
         Player player = legion.getPlayer();
@@ -2747,40 +2790,8 @@ public final class Game
         switch (getPhase())
         {
             case Game.SPLIT:
-                // Need a legion marker to split.
-                if (player.getNumMarkersAvailable() == 0)
-                {
-                    JOptionPane.showMessageDialog(board,
-                        "No markers are available.");
-                    return;
-                }
-                // A legion must be at least 4 high to split.
-                if (legion.getHeight() < 4)
-                {
-                    JOptionPane.showMessageDialog(board,
-                        "Legion is too short to split.");
-                    return;
-                }
-                // Don't allow extra splits in turn 1.
-                if (getTurnNumber() == 1 && player.getNumLegions() > 1)
-                {
-                    JOptionPane.showMessageDialog(board,
-                        "Cannot split twice on Turn 1.");
-                    return;
-                }
-
-                SplitLegion.splitLegion(masterFrame, legion,
-                    player.getOption(autoPlay) ||
-                    player.getOption(autoPickMarker));
-
-                updateStatusScreen();
-                // If we split, unselect this hex.
-                if (legion.getHeight() < 7)
-                {
-                    MasterHex hex = legion.getCurrentHex();
-                    board.unselectHexByLabel(hex.getLabel());
-                }
-                return;
+                doSplit(legion, player);
+                break;
 
             case Game.MOVE:
                 // Select this legion.
@@ -2791,7 +2802,7 @@ public final class Game
                 // Highlight all legal destinations
                 // for this legion.
                 highlightMoves(legion);
-                return;
+                break;
 
             case Game.FIGHT:
                 doFight(legion.getCurrentHex(), player);
@@ -2815,8 +2826,7 @@ public final class Game
                         updateStatusScreen();
                     }
                 }
-
-                return;
+                break;
         }
     }
 
@@ -2841,7 +2851,8 @@ public final class Game
                     if (hex.getTeleported() && hex.canEnterViaLand())
                     {
                         boolean answer;
-                        if (player.getOption(autoPickEntrySide))
+                        if (player.getOption(autoPlay) ||
+                            player.getOption(autoPickEntrySide))
                         {
                             // Always choose to move normally rather
                             // than teleport if auto-picking entry sides.
@@ -2875,7 +2886,8 @@ public final class Game
                     if (hex.isOccupied() && hex.getNumEntrySides() > 1)
                     {
                         int side;
-                        if (player.getOption(autoPickEntrySide))
+                        if (player.getOption(autoPlay) ||
+                            player.getOption(autoPickEntrySide))
                         {
                             side = hex.getEntrySide();
                         }
