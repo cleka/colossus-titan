@@ -120,32 +120,7 @@ class SummonAngel extends JDialog implements MouseListener, ActionListener,
             player.setLastLegionSummonedFrom(donor);
         }
 
-        // Attempt to free resources to work around Java memory leaks.
-        setVisible(false);
-        if (offImage != null)
-        {
-            offImage.flush();
-            offGraphics.dispose();
-        }
-
-        if (imagesLoaded)
-        {
-            tracker.removeImage(angelChit.getImage());
-            angelChit.getImage().flush();
-            tracker.removeImage(archangelChit.getImage());
-            archangelChit.getImage().flush();
-        }
-
         dispose();
-        System.gc();
-        try
-        {
-            finalize();
-        }
-        catch (Throwable e)
-        {
-            System.out.println("caught " + e.toString());
-        }
 
         // Let the MasterBoard know to leave the angel-summoning state.
         board.finishSummoningAngel();

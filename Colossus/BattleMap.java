@@ -1274,39 +1274,11 @@ public class BattleMap extends JFrame implements MouseListener,
             legion.revealAllCreatures();
         }
 
-        // Attempt to free resources to work around Java memory leaks.
-        setVisible(false);
-
-        if (offImage != null)
-        {
-            offImage.flush();
-            offGraphics.dispose();
-        }
-
-        if (imagesLoaded)
-        {
-            for (int i = 0; i < numChits; i++)
-            {
-                tracker.removeImage(chits[i].getImage());
-                chits[i].getImage().flush();
-            }
-        }
-
         if (turn != null)
         {
             turn.dispose();
-            // XXX: Need turn.cleanup() ?
         }
         dispose();
-        System.gc();
-        try
-        {
-            finalize();
-        }
-        catch (Throwable e)
-        {
-            System.out.println("caught " + e.toString());
-        }
 
         masterHex.unselect();
         masterHex.repaint();
