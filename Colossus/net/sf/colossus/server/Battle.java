@@ -1661,7 +1661,7 @@ Log.debug("called Battle.applyCarries() for " + target.getDescription());
     /** Check to see if the LOS from hex1 to hex2 is blocked.  If the LOS
      *  lies along a hexspine, check both and return true only if both are
      *  blocked. */
-    private boolean isLOSBlocked(BattleHex hex1, BattleHex hex2)
+    boolean isLOSBlocked(BattleHex hex1, BattleHex hex2)
     {
         if (hex1 == hex2)
         {

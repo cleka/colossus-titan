@@ -138,8 +138,6 @@ public final class Game
      */
     Game AICopy()
     {
-        // XXX Make sure to clear player options so that we don't get into
-        // an AI infinite loop.
         Game game2 = new Game();
 
         for (int i = 0; i < players.size(); i++)
@@ -297,7 +295,6 @@ public final class Game
 
         options.saveOptions();
 
-        // XXX Load variant only if not already loaded.
         VariantSupport.loadVariant(options.getStringOption(Options.variant));
 
         Log.event("Starting new game");
@@ -554,7 +551,7 @@ public final class Game
     }
 
 
-    private void addPlayer(String name, String type)
+    void addPlayer(String name, String type)
     {
         Player player = new Player(name, this);
         player.setType(type);
@@ -1769,7 +1766,8 @@ public final class Game
 
         caretaker.takeOne(Creature.getCreatureByName("Titan"));
         caretaker.takeOne(Creature.getCreatureByName(getPrimaryAcquirable()));
-        Creature[] startCre = trl.getStartingCreatures(MasterBoard.getHexByLabel(hexLabel).getTerrain());
+        Creature[] startCre = trl.getStartingCreatures(
+            MasterBoard.getHexByLabel(hexLabel).getTerrain());
         caretaker.takeOne(startCre[2]);
         caretaker.takeOne(startCre[2]);
         caretaker.takeOne(startCre[0]);

@@ -155,7 +155,9 @@ public final class MasterBoard extends JPanel
 
 
     // No-arg constructor for testing and AICopy(), without GUI stuff.
-    MasterBoard()
+    // public for unit tests -- may want to keep a copy of the non-GUI
+    // board on the server side later.
+    public MasterBoard()
     {
         setupHexes();
     }
@@ -796,7 +798,10 @@ public final class MasterBoard extends JPanel
                 }
             }
             if (show == null)
+            {
                 show = new boolean[horizSize][vertSize];
+            }
+
             if (!isGUI) /* we're filling the plain hexes */
             {
                 plain = new MasterHex[horizSize][vertSize];
@@ -827,7 +832,8 @@ public final class MasterBoard extends JPanel
                 while (sml.oneCase(h, hexes, show, true) >= 0) {} 
                 localH = h;
             }
-        }        catch (Exception e) 
+        }
+        catch (Exception e) 
         {
             Log.error("Strategic map loading failed : " + e);
             System.exit(1);

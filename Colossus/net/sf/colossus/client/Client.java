@@ -909,6 +909,9 @@ Log.debug("Client.makeForcedStrikes() for " + playerName);
     // TODO Should take board data from variant file, or stream, as argument.
     public void initBoard()
     {
+        // Need to load the scale option before creating the board.
+        loadOptions();
+
         // Do not show boards for AI players, except primary client.
         if (!getOption(Options.autoPlay) || primary)
         {
@@ -928,7 +931,7 @@ Log.debug("Client.makeForcedStrikes() for " + playerName);
             board.requestFocus();
         }
 
-        // Now that the board is ready we can load options and
+        // Now that the board is ready we can reload options and
         // sync the option checkboxes.
         loadOptions();
     }
