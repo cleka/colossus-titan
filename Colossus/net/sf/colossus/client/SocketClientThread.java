@@ -482,6 +482,12 @@ Log.debug("End of SocketClientThread while loop");
             int tag = Integer.parseInt((String)args.remove(0));
             client.nakBattleMove(tag);
         }
+        else if (method.equals(Constants.tellEngagement))
+        {
+            client.tellEngagement((String)args.remove(0),
+                                  (String)args.remove(0),
+                                  (String)args.remove(0));
+        }
         else
         {
             Log.error("Bogus packet (Client, method: " +
