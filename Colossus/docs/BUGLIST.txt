@@ -147,8 +147,8 @@ EVAL Guardian move to Plains hex D6 = -25
 Considered 18 moves for Guardian in D4: D4 B2 E3 C3 F2 D5 B3 E4 C4 F3 B4 E5 C5 F4 D6 D3 E2 C2
 
 Need to make recruitChits optional.
-Gray square appears in upper left corner of masterboard frame when a
-   recruitChit is generated.
 recruitChits show up even for 7-high legions.  This might make sense
    in hexes where a battle could thin the stack, or where an angel
    could be summoned out, but some 7-high legions can never recruit.
+
+Add confirm dialog when quitting by exiting frame.

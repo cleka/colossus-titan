@@ -5,12 +5,7 @@ Legions full of trolls/ogres/clopses should try harder to
 
 Consider switching from make to Ant to better handle packages.
 
-Advance phases on space instead of 'D'?
-
 Confirmation prompt to avoid skipping recruits?
-
-Attacking AI creatures need to chargest closest enemy in the last few
-   turns, rather than accepting a time loss.
 
 Allow first human player to control game options, load game, etc.
 
@@ -21,7 +16,8 @@ Add UI for players to specify favorite colors.
 Get minimax masterboard moves working.
 
 When a stack flees, make the winning stack visible, to the fleeing
-   legion's player's client only.
+   legion's player's client only.  (Per-player rather than global
+   stack visibility.)
 
 Make advance phase delay configurable.
 Add AI time limits.

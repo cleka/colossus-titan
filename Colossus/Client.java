@@ -769,21 +769,17 @@ public final class Client
         int scale = 2 * Scale.get();
         GUIMasterHex hex = board.getGUIHexByLabel(hexLabel);
         Chit chit = new Chit(scale, imageName, board);
-        chit.setVisible(false);
         Point startingPoint = hex.getOffCenter();
         Point point = new Point(startingPoint);
         point.x -= scale / 2;
         point.y -= scale / 2;
         chit.setLocation(point);
-        chit.setVisible(true);
         recruitChits.add(chit);
     }
 
     public void clearRecruitChits()
     {
         recruitChits.clear();
-        // XXX optimize
-        board.repaint();
     }
 
 
