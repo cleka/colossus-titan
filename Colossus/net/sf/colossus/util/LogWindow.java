@@ -52,7 +52,7 @@ public final class LogWindow extends JTextArea
         if (location == null)
         {
             Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-            int y = d.height - getMinimumSize().height;
+            int y = d.height - size.height;
             location = new Point(0, y);
         }
         logFrame.setLocation(location);

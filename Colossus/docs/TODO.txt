@@ -1,6 +1,4 @@
-Remember window positions in player .cfg file.
-   Ensure that windows are placed on screen and at usable size.
-   Do LogWindow.
+Ensure that windows are placed on screen and at usable size.
 
 Bug: Repaints missed on some remote players' masterboard moves.
 Bug: Remote player sometimes sees all of AI's trial battle moves.
