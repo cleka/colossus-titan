@@ -14,9 +14,6 @@ Win98 1.3 - 1.3.1: setLocation() to keep ShowLegion, ShowMasterHex
 Solaris 1.3; Linux 1.3: JPopupMenu mnemonics don't work.  They work okay
    in Win98 1.3.
 
-Win98 1.3: Popup menus are not erased properly.  They erase fine
-   in Linux and Solaris 1.3.
-
 Linux 1.4b: Problems running to a remote X display.  Some of the
    startup dialogs never show up.  Behind the MasterBoard?
 
@@ -35,7 +32,7 @@ Concession timing.  If both players want to concede, the non-phasing
 Striking continues after concession, until the normal time to check for
    creature (and then player) death.
 
-Win98, 1.3: Focus keeps moving to MovementDie and BattleDice, which
+Win98, 1.3.1: Focus keeps moving to MovementDie and BattleDice, which
    disrupts keyboard shortcuts.  Doesn't happen with StatusScreen.
    Doesn't happen in Unix.
 
@@ -66,16 +63,8 @@ Win98, 1.3.1-1.4b: Turn 1, player started in tower 300.  Rolled a 6.  Titan
    fact that it could only get there by teleporting.  Angel to marsh
    22, got same prompt even though titan already teleported.  Still there.
 
-Solaris, 1.3.1: MovementDie is appearing mostly off right edge of the
-   screen.  StatusScreen is appearing with its bottom edge off the
-   bottom of the screen.
-
 Win98, 1.4b: Currently have to pick recruiter even with "all stacks visible"
    set.
-
-Win98, 1.4b: Need to re-highlight hexes with eligible recruits after each
-   recruit, in case the last one was taken?  Also after each undo recruit,
-   in case the last one came back?
 
 Solaris, 1.3.1: All enemy creatures are invisible after loading a game.
 

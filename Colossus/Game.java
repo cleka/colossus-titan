@@ -194,9 +194,11 @@ public final class Game
             colorsLeft.add(PickColor.colorNames[i]);
         }
 
-        ListIterator lit = players.listIterator(players.size());
+        int playerNum = players.size();
+        ListIterator lit = players.listIterator(playerNum);
         while (lit.hasPrevious())
         {
+            playerNum--;
             Player player = (Player)lit.previous();
             String color;
             do
@@ -215,6 +217,11 @@ public final class Game
             colorsLeft.remove(color);
             Log.event(player.getName() + " chooses color " + color);
             player.setColor(color);
+            if (GetPlayers.byColor.equals(player.getName()))
+            {
+                player.setName(color);
+                server.getClient(playerNum).setPlayerName(color);
+            }
             player.initMarkersAvailable();
         }
 

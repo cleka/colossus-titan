@@ -795,6 +795,12 @@ public final class Client
         return playerName;
     }
 
+    public void setPlayerName(String playerName)
+    {
+        this.playerName = playerName;
+    }
+
+
     public SummonAngel getSummonAngel()
     {
         return summonAngel;

@@ -2099,7 +2099,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
                 legion.sortCritters();
                 new ShowLegion(masterFrame, legion, point,
                     client.getOption(Options.allStacksVisible) ||
-                    playerName == game.getActivePlayerName());
+                    playerName == client.getPlayerName());
                 return;
             }
             else

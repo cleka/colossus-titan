@@ -20,6 +20,8 @@ public final class GetPlayers extends JDialog implements WindowListener,
     public static String human = "Human";
     public static String ai = "AI";
     public static String def = "Default";
+    public static String byColor = "<By color>";
+    public static String none = "None";
 
     private JFrame parentFrame;
     private ArrayList textFields = new ArrayList();
