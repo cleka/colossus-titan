@@ -11,8 +11,6 @@ import java.awt.event.*;
 class SummonAngel extends Dialog implements MouseListener, ActionListener,
     WindowListener
 {
-    private int numEligible = 0;
-    private Creature [] recruits;
     private MediaTracker tracker;
     private Player player;
     private Legion legion;
@@ -86,7 +84,8 @@ class SummonAngel extends Dialog implements MouseListener, ActionListener,
         }
         catch (InterruptedException e)
         {
-            new MessageBox(board, "waitForAll was interrupted");
+            new MessageBox(board, e.toString() +
+                "waitForAll was interrupted");
         }
         imagesLoaded = true;
 
@@ -133,7 +132,6 @@ class SummonAngel extends Dialog implements MouseListener, ActionListener,
         }
 
         Dimension d = getSize();
-        Rectangle rectClip = g.getClipBounds();
 
         // Create the back buffer only if we don't have a good one.
         if (offGraphics == null || d.width != offDimension.width ||
@@ -236,38 +234,38 @@ class SummonAngel extends Dialog implements MouseListener, ActionListener,
     }
 
 
-    public void windowActivated(WindowEvent event)
+    public void windowActivated(WindowEvent e)
     {
     }
 
 
-    public void windowClosed(WindowEvent event)
+    public void windowClosed(WindowEvent e)
     {
     }
 
 
-    public void windowClosing(WindowEvent event)
+    public void windowClosing(WindowEvent e)
     {
         cleanup(false);
     }
 
 
-    public void windowDeactivated(WindowEvent event)
+    public void windowDeactivated(WindowEvent e)
     {
     }
 
 
-    public void windowDeiconified(WindowEvent event)
+    public void windowDeiconified(WindowEvent e)
     {
     }
 
 
-    public void windowIconified(WindowEvent event)
+    public void windowIconified(WindowEvent e)
     {
     }
 
 
-    public void windowOpened(WindowEvent event)
+    public void windowOpened(WindowEvent e)
     {
     }
 

@@ -40,7 +40,7 @@ class SplitLegion extends Dialog implements MouseListener, ActionListener,
         this.player = player;
         this.parentFrame = parentFrame;
 
-        PickMarker pickmarker = new PickMarker(parentFrame, player);
+        new PickMarker(parentFrame, player);
 
         if (player.getSelectedMarker() == null)
         {
@@ -100,7 +100,7 @@ class SplitLegion extends Dialog implements MouseListener, ActionListener,
             }
             catch (InterruptedException e)
             {
-                new MessageBox(parentFrame,
+                new MessageBox(parentFrame, e.toString() +
                     "waitForAll was interrupted");
             }
             imagesLoaded = true;
@@ -280,32 +280,32 @@ class SplitLegion extends Dialog implements MouseListener, ActionListener,
 
 
 
-    public void windowActivated(WindowEvent event)
+    public void windowActivated(WindowEvent e)
     {
     }
 
-    public void windowClosed(WindowEvent event)
+    public void windowClosed(WindowEvent e)
     {
     }
 
-    public void windowClosing(WindowEvent event)
+    public void windowClosing(WindowEvent e)
     {
         cancel();
     }
 
-    public void windowDeactivated(WindowEvent event)
+    public void windowDeactivated(WindowEvent e)
     {
     }
 
-    public void windowDeiconified(WindowEvent event)
+    public void windowDeiconified(WindowEvent e)
     {
     }
 
-    public void windowIconified(WindowEvent event)
+    public void windowIconified(WindowEvent e)
     {
     }
 
-    public void windowOpened(WindowEvent event)
+    public void windowOpened(WindowEvent e)
     {
     }
 
