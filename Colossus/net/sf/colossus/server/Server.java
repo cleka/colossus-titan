@@ -935,6 +935,7 @@ Log.debug("Called Server.acquireAngel() for " + markerId + " " + angelType);
     }
 
 
+    // TODO Undo all moves.  (Currently the client does it.)
     public void mulligan(String playerName)
     {
         if (!playerName.equals(game.getActivePlayerName()))
@@ -1103,6 +1104,12 @@ Log.debug("Called Server.acquireAngel() for " + markerId + " " + angelType);
     public void forceAdvancePhase()
     {
         game.advancePhase(game.getPhase(), game.getActivePlayerName());
+    }
+
+    /** Advance the battle phase without error checks, for debug only. */
+    public void forceAdvanceBattlePhase()
+    {
+        game.getBattle().advancePhase();
     }
 
 

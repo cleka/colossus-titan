@@ -37,11 +37,13 @@ public final class BattleMap extends HexMap implements MouseListener,
     private static final String undoAll = "Undo All";
     private static final String doneWithPhase = "Done";
     private static final String concedeBattle = "Concede Battle";
+    private static final String forceAdvancePhase = "Force Advance Phase";
 
     private AbstractAction undoLastAction;
     private AbstractAction undoAllAction;
     private AbstractAction doneWithPhaseAction;
     private AbstractAction concedeBattleAction;
+    private AbstractAction forceAdvancePhaseAction;
 
     BattleMap(Client client, String masterHexLabel)
     {
@@ -169,6 +171,15 @@ public final class BattleMap extends HexMap implements MouseListener,
         };
 
 
+        forceAdvancePhaseAction = new AbstractAction(forceAdvancePhase)
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                client.forceAdvanceBattlePhase();
+            }
+        };
+
+
         concedeBattleAction = new AbstractAction(concedeBattle)
         {
             public void actionPerformed(ActionEvent e)
@@ -216,6 +227,11 @@ public final class BattleMap extends HexMap implements MouseListener,
             " Turn " + client.getBattleTurnNumber() + " : Summon");
         phaseMenu.removeAll();
 
+        JMenuItem mi;
+        mi = phaseMenu.add(forceAdvancePhaseAction);
+        mi.setMnemonic(KeyEvent.VK_F);
+        mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, 0));
+
         requestFocus();
     }
 
@@ -233,6 +249,11 @@ public final class BattleMap extends HexMap implements MouseListener,
         {
             phaseMenu.removeAll();
         }
+
+        JMenuItem mi;
+        mi = phaseMenu.add(forceAdvancePhaseAction);
+        mi.setMnemonic(KeyEvent.VK_F);
+        mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, 0));
 
         requestFocus();
     }
@@ -270,6 +291,12 @@ public final class BattleMap extends HexMap implements MouseListener,
         mi.setMnemonic(KeyEvent.VK_C);
         mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, 0));
 
+        phaseMenu.addSeparator();
+
+        mi = phaseMenu.add(forceAdvancePhaseAction);
+        mi.setMnemonic(KeyEvent.VK_F);
+        mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, 0));
+
         if (client.getPlayerName().equals(client.getBattleActivePlayerName()))
         {
             highlightMobileCritters();
@@ -302,6 +329,12 @@ public final class BattleMap extends HexMap implements MouseListener,
         mi = phaseMenu.add(concedeBattleAction);
         mi.setMnemonic(KeyEvent.VK_C);
         mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, 0));
+
+        phaseMenu.addSeparator();
+
+        mi = phaseMenu.add(forceAdvancePhaseAction);
+        mi.setMnemonic(KeyEvent.VK_F);
+        mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, 0));
 
         if (client.getPlayerName().equals(client.getBattleActivePlayerName()))
         {

@@ -118,8 +118,14 @@ public final class Client
     /** Take a mulligan. */
     void mulligan()
     {
+        // TODO This should be enforced on the server side.
+        undoAllMoves();
+
+        // XXX These are redundant, but will be needed again when we 
+        // move the undo.
         clearUndoStack();
         clearRecruitChits();
+
         server.mulligan(playerName);
     }
 
@@ -2011,6 +2017,11 @@ Log.debug("called Client.acquireAngelCallback()");
     void forceAdvancePhase()
     {
         server.forceAdvancePhase();
+    }
+
+    void forceAdvanceBattlePhase()
+    {
+        server.forceAdvanceBattlePhase();
     }
 
 

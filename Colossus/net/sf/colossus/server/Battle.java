@@ -357,7 +357,7 @@ final class Battle
     }
 
 
-    private void advancePhase()
+    void advancePhase()
     {
         phaseAdvancer.advancePhase();
     }

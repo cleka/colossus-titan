@@ -7,6 +7,9 @@ Document test procedures.
 
 Add some JUnit tests.
 
+Add command-line options to start a game with N AIs, have the game exit
+   java when done, etc. to support automated testing.
+
 Find a better Java dependency checker, and add a real depend target.  There 
 are a couple mentioned on the Ant page.
 
@@ -89,3 +92,5 @@ Show StatusScreen and ShowLegion info in the masterboard window, rather
 
 Add movement and recruit animation.  Requires returning full paths for
    moves, not just destination hex.
+
+   

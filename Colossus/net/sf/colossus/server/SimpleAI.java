@@ -1820,9 +1820,9 @@ public class SimpleAI implements AI
     /** Return a string of form angeltype:donorId, or null. */
     public String summonAngel(Legion summoner, Game game)
     {
-Log.debug ("SimpleAI.summonAngel: Finding summonable angels");
+Log.debug("SimpleAI.summonAngel: Finding summonable angels");
         Set set = game.findSummonableAngels(summoner.getMarkerId());
-Log.debug ("SimpleAI.summonAngel: angels found: " + set.toString());
+Log.debug("SimpleAI.summonAngel: angels found: " + set.toString());
 
         // Always summon the biggest possible angel, from the least
         // important legion that has one.  TODO Make this smarter.
@@ -1835,7 +1835,7 @@ Log.debug ("SimpleAI.summonAngel: angels found: " + set.toString());
         {
             String hexLabel = (String)it.next();
             Legion legion = game.getFirstLegion(hexLabel);
-Log.debug ("SimpleAI.summonAngel: checking summoning from " +
+Log.debug("SimpleAI.summonAngel: checking summoning from " +
            legion.getLongMarkerName() + " in " + hexLabel);
             if (bestAngelType(legion).equals("Archangel"))
             {
@@ -1852,7 +1852,7 @@ Log.debug ("SimpleAI.summonAngel: checking summoning from " +
                         bestLegion = legion;
                     }
                 }
-Log.debug ("SimpleAI.summonAngel: found archangel");
+Log.debug("SimpleAI.summonAngel: found archangel");
             }
             else  // Angel
             {
@@ -1868,14 +1868,14 @@ Log.debug ("SimpleAI.summonAngel: found archangel");
                         bestLegion = legion;
                     }
                 }
-Log.debug ("SimpleAI.summonAngel: found angel");
+Log.debug("SimpleAI.summonAngel: found angel");
             }
         }
-Log.debug ("SimpleAI.summonAngel: best legion is " + bestLegion);
-Log.debug ("SimpleAI.summonAngel: best angel is " + bestAngel);
-        if (bestLegion == null)
+Log.debug("SimpleAI.summonAngel: best legion is " + bestLegion);
+Log.debug("SimpleAI.summonAngel: best angel is " + bestAngel);
+        if (bestLegion == null || bestAngel == null)
         {
-            return null;
+            Log.error("null in SimpleAI.summonAngel() -- hang coming");
         }
         return bestAngel.getName() + ":" + bestLegion.getMarkerId();
     }
