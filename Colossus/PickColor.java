@@ -14,8 +14,9 @@ public class PickColor extends Dialog implements WindowListener, ActionListener
     private Label [] colorLabel = new Label[6];
     private Game game;
     private int playerNum;
-    private String [] colorNames = new String[6];
-
+    private static final String [] colorNames = 
+        {"Black", "Blue", "Brown", "Gold", "Green", "Red"};
+        
 
     public PickColor(Frame parentFrame, Game game, int playerNum)
     {
@@ -24,13 +25,6 @@ public class PickColor extends Dialog implements WindowListener, ActionListener
         this.game = game;
         this.playerNum = playerNum;
     
-        colorNames[0] = "Black";
-        colorNames[1] = "Blue";
-        colorNames[2] = "Brown";
-        colorNames[3] = "Gold";
-        colorNames[4] = "Green";
-        colorNames[5] = "Red";
-
         setBackground(Color.lightGray);
         pack();
 
@@ -75,22 +69,11 @@ public class PickColor extends Dialog implements WindowListener, ActionListener
 
             add(colorLabel[i]);
         }
-
-        Color [] background = new Color[6];
-        background[0] = Color.black;
-        background[1] = Color.blue;
-        background[2] = new Color(180, 90, 0);
-        background[3] = Color.yellow;
-        background[4] = Color.green;
-        background[5] = Color.red;
         
-        Color [] foreground = new Color[6];
-        foreground[0] = Color.white;
-        foreground[1] = Color.white;
-        foreground[2] = Color.white;
-        foreground[3] = Color.black;
-        foreground[4] = Color.black;
-        foreground[5] = Color.black;
+        Color [] background = { Color.black, Color.blue, new Color(180, 90, 0),
+            Color.yellow, Color.green, Color.red };
+        Color [] foreground = { Color.white, Color.white, Color.white, 
+            Color.black, Color.black, Color.black };
 
         for (int i = 0; i < 6; i++)
         {
