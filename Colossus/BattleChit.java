@@ -1,5 +1,6 @@
 import java.awt.*;
 import java.util.*;
+import javax.swing.*;
 
 /**
  * Class BattleChit implements the GUI for a Titan chit representing
@@ -51,7 +52,7 @@ class BattleChit extends Chit
     }
 
 
-    void setHits(int damage)
+    public void setHits(int damage)
     {
         hits = damage;
     }
@@ -70,7 +71,7 @@ class BattleChit extends Chit
     }
 
 
-    void checkForDeath()
+    public void checkForDeath()
     {
         if (hits >= getPower())
         {
@@ -80,57 +81,57 @@ class BattleChit extends Chit
     }
 
 
-    Legion getLegion()
+    public Legion getLegion()
     {
         return legion;
     }
 
 
-    Player getPlayer()
+    public Player getPlayer()
     {
         return legion.getPlayer();
     }
 
 
-    boolean hasMoved()
+    public boolean hasMoved()
     {
         return moved;
     }
 
 
-    void commitMove()
+    public void commitMove()
     {
         startingHex = currentHex;
         moved = false;
     }
 
 
-    boolean hasStruck()
+    public boolean hasStruck()
     {
         return struck;
     }
 
 
-    void commitStrike()
+    public void commitStrike()
     {
         struck = false;
     }
 
 
-    BattleHex getCurrentHex()
+    public BattleHex getCurrentHex()
     {
         return currentHex;
     }
 
 
-    BattleHex getStartingHex()
+    public BattleHex getStartingHex()
     {
         return startingHex;
     }
 
 
     // Dead chits count as chits in contact only if countDead is true.
-    int numInContact(boolean countDead)
+    public int numInContact(boolean countDead)
     {
         // Offboard chits are not in contact.
         if (currentHex.isEntrance())
@@ -165,13 +166,13 @@ class BattleChit extends Chit
     }
 
     // Dead chits count as chits in contact only if countDead is true.
-    boolean inContact(boolean countDead)
+    public boolean inContact(boolean countDead)
     {
         return (numInContact(countDead) > 0);
     }
 
 
-    void moveToHex(BattleHex hex)
+    public void moveToHex(BattleHex hex)
     {
         currentHex.removeChit(this);
         currentHex = hex;
@@ -182,7 +183,7 @@ class BattleChit extends Chit
     }
 
 
-    void undoMove()
+    public void undoMove()
     {
         currentHex.removeChit(this);
         currentHex = startingHex;
@@ -195,7 +196,7 @@ class BattleChit extends Chit
 
     // Return the number of dice that will be rolled when striking this
     // target, including modifications for terrain.
-    int getDice(BattleChit target)
+    public int getDice(BattleChit target)
     {
         BattleHex targetHex = target.getCurrentHex();
 
@@ -247,7 +248,7 @@ class BattleChit extends Chit
     }
 
 
-    int getAttackerSkill(BattleChit target)
+    public int getAttackerSkill(BattleChit target)
     {
         BattleHex targetHex = target.getCurrentHex();
 
@@ -333,7 +334,7 @@ class BattleChit extends Chit
     }
 
 
-    int getStrikeNumber(BattleChit target)
+    public int getStrikeNumber(BattleChit target)
     {
         BattleHex targetHex = target.getCurrentHex();
         boolean rangestrike = !inContact(true);
@@ -363,9 +364,33 @@ class BattleChit extends Chit
 
         return strikeNumber;
     }
+    
+    
+    // Allow the player to choose whether to take a penalty
+    // (fewer dice or higher strike number) in order to be
+    // allowed to carry.  Return true if the penalty is taken,
+    // or false if it is not.
+    private boolean chooseStrikePenalty(int tmpStrikeNumber, int strikeNumber,
+        int tmpDice, int dice, BattleChit carryTarget)
+    {
+        String yesString = "Take Penalty";
+        String noString = "Do Not Take Penalty";
+        String promptString = "Take strike penalty to allow carrying to " +
+            carryTarget.getCreature().getName() + "?";
+
+        Object[] options = {yesString, noString};
+        int optval = JOptionPane.showOptionDialog(map, promptString, 
+            "Take Strike Penalty?", JOptionPane.YES_NO_OPTION,
+            JOptionPane.QUESTION_MESSAGE, null, options, noString);
+
+        return (optval == JOptionPane.YES_OPTION);
+    }
 
 
-    void strike(BattleChit target)
+    // Calculate number of dice and strike number needed to hit target,
+    // and whether any carries are possible.  Roll the dice and apply
+    // damage.  Highlight legal carry targets.
+    public void strike(BattleChit target)
     {
         BattleHex targetHex = target.getCurrentHex();
 
@@ -377,6 +402,8 @@ class BattleChit extends Chit
 
         int dice = getDice(target);
 
+        // Carries are only possible if the striker is rolling more dice than
+        // the target has hits remaining.
         if (dice <= target.getPower() - target.getHits())
         {
             carryPossible = false;
@@ -406,12 +433,36 @@ class BattleChit extends Chit
                             int tmpDice = getDice(chit);
                             int tmpStrikeNumber = getStrikeNumber(chit);
 
-                            if (tmpStrikeNumber > strikeNumber || 
+                            // Strikes not up across dune hexsides cannot 
+                            // carry up across dune hexsides.
+                            if (currentHex.getOppositeHexside(i) == 'd')
+                            {
+                                int direction = map.getDirection(targetHex, 
+                                    currentHex, false);
+                                if (targetHex.getHexside(direction) != 'd')
+                                {
+                                    chit.setCarryFlag(false);
+                                }
+                            }
+
+                            else if (tmpStrikeNumber > strikeNumber || 
                                 tmpDice < dice)
                             {
-                                // XXX: Allow choosing a less effective strike.
-                                chit.setCarryFlag(false);
+                                // Allow choosing a less effective strike in
+                                // order to possibly carry.
+                                if (chooseStrikePenalty(tmpStrikeNumber,
+                                    strikeNumber, tmpDice, dice, chit))
+                                {
+                                    strikeNumber = tmpStrikeNumber;
+                                    dice = tmpDice;
+                                    chit.setCarryFlag(true);
+                                }
+                                else
+                                {
+                                    chit.setCarryFlag(false);
+                                }
                             }
+
                             else
                             {
                                 chit.setCarryFlag(true);
@@ -450,11 +501,11 @@ class BattleChit extends Chit
 
         int totalDamage = target.getHits();
         totalDamage += damage;
-        int numCarries = 0;
+        int carryDamage = 0;
         int power = target.getPower();
         if (totalDamage > power)
         {
-            numCarries = totalDamage - power;
+            carryDamage = totalDamage - power;
             totalDamage = power;
         }
         target.setHits(totalDamage);
@@ -462,10 +513,10 @@ class BattleChit extends Chit
         target.repaint();
 
         // Let the attacker choose whether to carry, if applicable.
-        if (carryPossible && numCarries > 0)
+        if (carryPossible && carryDamage > 0)
         {
-            System.out.println(numCarries + " possible carries");
-            map.highlightCarries(this, numCarries);
+            System.out.println(carryDamage + " possible carries");
+            map.highlightCarries(this, carryDamage);
         }
 
         // Record that this attacker has struck.
@@ -473,12 +524,13 @@ class BattleChit extends Chit
     }
 
 
-    boolean getCarryFlag()
+    public boolean getCarryFlag()
     {
         return carryFlag;
     }
 
-    void setCarryFlag(boolean flag)
+
+    public void setCarryFlag(boolean flag)
     {
         carryFlag = flag;
     }
