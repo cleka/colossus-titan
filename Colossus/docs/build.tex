@@ -177,9 +177,9 @@ pay money to a certifying authority and get a ``real'' key that actually
 
 The jarsigner tool comes with the \texttt{JDK}. To use it, you need to create
 a personal authentication key, and put it in a keystore file. The sign
-targets in build.xml and Makefile assume that your key name and keystore
-filename match your username. If you don't like this, you can add new
-targets.
+targets in ``build.xml'' and ``Makefile'' assume that your key name and
+keystore filename match your username. If you don't like this, you can
+add new targets.
 
 \begin{itemize}
 \item[TODO:] Link to basic jarsigner docs.
@@ -188,7 +188,7 @@ targets.
 \subsection{zip and unzip tools}
 
 You need something that can work with the standard zip format. WinZip, 
-Info-Zip, \texttt{PKZ}ip, etc. Info-Zip is free -- most of the others are
+Info-Zip, PKZip, etc. Info-Zip is free -- most of the others are
 shareware. 
 
 \subsection{Text editors}
@@ -202,7 +202,8 @@ creating whole-file false diffs or files that look awful if someone has
 different tab stop settings than yours. (Yes, cross-platform development
 adds a few wrinkles.)
 
-Among the nice editors for Unix, there's \hypercite{XEmacs}{XEmacs}{}{XEMACS}. XEmacs can use the \hypercite{Java Development Environment for Emacs}{Java Development Environment for Emacs}{}{JDE}.
+Among the nice editors for Unix, there's \hypercite{XEmacs}{XEmacs}{}{XEMACS}. XEmacs can use the
+\hypercite{Java Development Environment for Emacs}{Java Development Environment for Emacs}{}{JDE}.
 
 \section{Optional tools}
 
@@ -213,7 +214,7 @@ Among the nice editors for Unix, there's \hypercite{XEmacs}{XEmacs}{}{XEMACS}. X
 
 \subsection{Profilers}
 
-You can use java -Xprof or -Xrunhprof.
+You can use \texttt{java -Xprof} or \texttt{-Xrunhprof}.
 OptimizeIt! rocks, but it's \$500.
 \begin{itemize}
 \item[TODO:] Add ProfAnal info.
@@ -221,9 +222,10 @@ OptimizeIt! rocks, but it's \$500.
 
 \subsection{Code reformatters}
 
-If you just can't work with the format in CodingStandards.txt, then you
-need a tool to convert files to and from your personal pet format to the
-one this project uses.
+If you just can't work with the format in
+\htmladdnormallink{CodingStandards}{../CodingStandards/index.html},
+then you need a tool to convert files to and from your personal pet
+format to the one this project uses.
 
 JIndent used to be free, but not that full-featured. 
 \begin{itemize}
@@ -236,13 +238,14 @@ Now it's really full-featured, but no longer free.
 
 \subsection{Image editors}
 
-Currently all images used in Colossus are \texttt{GIF}s. \texttt{JPEG}s are great for
-photos but not optimal for simple drawings. \texttt{PNG} is better than \texttt{GIF} 
+Currently all images used in Colossus are \texttt{GIF}s.
+\texttt{JPEG}s are great for photos but not optimal for simple drawings.
+\texttt{PNG} is better than \texttt{GIF} 
 in many ways, but Java didn't support it until 1.3 so we don't use it.
 
 Any image editor that can save to standard formats is fine. If you
-don't have one, Gimp (www.gimp.org) is good and free, but has a steep
-learning curve, much like Photoshop. 
+don't have one, \hypercite{The Gimp}{The Gimp}{}{GIMP} is good and free,
+but has a steep learning curve, much like Photoshop. 
 \begin{itemize}
 \item[TODO:] Find a lighter-weight, easier-to-learn free image editor that 
 can save to our file formats.
@@ -253,23 +256,23 @@ can save to our file formats.
 Once you have the tools set up, Colossus basically builds itself.
 
 First you need all the source files. Snag the latest zip file from 
-\htmladdnormallink{http://colossus.sf.net/download/}{http://colossus.sf.net/download/}, or (to get
-the newest possible code) pull from \texttt{CVS}.
+\htmladdnormallink{http://colossus.sf.net/download/}{http://colossus.sf.net/download/},
+or (to get the newest possible code) pull from \texttt{CVS}.
 
 If you just type ``ant'' or ``make'' from the project base directory,
 then you get the default target, which in both cases will compile
-all the .jj files into .java files with Java\texttt{CC}, then compile all
+all the .jj files into .java files with JavaCC, then compile all
 the .java files into .class files with javac, then make an unsigned
 executable jar file.
 
-Other interesting targets include clean (delete stuff, useful if
+Other interesting targets include ``clean'' (delete stuff, useful if
 you want to clean up or make sure that you fully rebuild all your
-class files), fix (ant only -- does a bit of text reformatting on
-java source files), tools (builds standalone tools), sign (signs
-a jarfile), and dist (makes a zip file). There are also some
+class files), ``fix'' (ant only -- does a bit of text reformatting on
+java source files), ``tools'' (builds standalone tools), ``sign'' (signs
+a jarfile), and ``dist'' (makes a zip file). There are also some
 targets that automate installing the package onto a web site --
 these are designed for maintaining the \texttt{SF} site rather than general
-use. Basically, skim through build.xml
+use. Basically, skim through ``build.xml''.
 
 \section{Gotchas}
 
