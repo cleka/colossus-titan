@@ -114,7 +114,7 @@ public final class MasterBoard extends JPanel
 
     /** Must ensure that variant is loaded before referencing this class,
      *  since readMapData() needs it. */
-    public static void staticMasterboardInit()
+    public synchronized static void staticMasterboardInit()
     {
         // variant can changes those
         horizSize = 0;

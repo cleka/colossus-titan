@@ -255,7 +255,7 @@ public final class VariantSupport
 
     /** TerrainRecruitLoader is needed by many classes, so load it
      *  immediately after loading the variant. */ 
-    public static void loadTerrainsAndRecruits()
+    public synchronized static void loadTerrainsAndRecruits()
     {
         try
         {
