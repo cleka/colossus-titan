@@ -456,6 +456,32 @@ class MasterBoard extends Frame implements MouseListener,
     }
 
 
+    // Returns number of legions that can recruit.
+    int highlightPossibleRecruits()
+    {
+        int count = 0;
+        Player player = game.getActivePlayer();
+
+        for (int i = 0; i < player.getNumLegions(); i++)
+        {
+            Legion legion = player.getLegion(i);
+            if (legion.canRecruit() && legion.hasMoved())
+            {
+                Creature [] recruits = new Creature[5];
+                if (PickRecruit.findEligibleRecruits(legion, recruits) >= 1)
+                {
+                    MasterHex hex = legion.getCurrentHex();
+                    hex.select();
+                    hex.repaint();
+                    count++;
+                }
+            }
+        }
+
+        return count;
+    }
+
+
     void finishSummoningAngel()
     {
 System.out.println("MasterBoard.finishSummoningAngel");
@@ -477,6 +503,8 @@ System.out.println("MasterBoard.finishSummoningAngel");
 
     void finishBattle()
     {
+        show();
+
         if (summoningAngel && summonAngel != null)
         {
             highlightSummonableAngels(summonAngel.getLegion());
@@ -1305,6 +1333,7 @@ System.out.println("summonAngel is null");
                                         if (hex.getEntrySide() == -1)
                                         {
                                             // XXX: Need PickEntrySide dialog.
+System.out.println("entry side was -1; setting it to 3");
                                             hex.setEntrySide(3);
                                         }
                                         map = new BattleMap(attacker, defender, 
