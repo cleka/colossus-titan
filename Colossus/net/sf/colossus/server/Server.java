@@ -209,12 +209,12 @@ public final class Server
 
     /** Return the number of the first human-controlled client, or -1 if
      *  all clients are AI-controlled. */
-    int getFirstHumanClientNum()
+    private int getFirstHumanClientNum()
     {
         for (int i = 0; i < game.getNumPlayers(); i++)
         {
             Player player = game.getPlayer(i);
-            if (player.getType().equals("Human"))
+            if (player.getType().endsWith("Human"))
             {
                 return i;
             }
@@ -432,16 +432,6 @@ public final class Server
         }
     }
 
-
-    void allDeiconifyBoard()
-    {
-        Iterator it = clients.iterator();
-        while (it.hasNext())
-        {
-            Client client = (Client)it.next();
-            client.deiconifyBoard();
-        }
-    }
 
     void allAddMarker(String markerId)
     {
@@ -923,17 +913,6 @@ public final class Server
         {
             Client client = (Client)it.next();
             client.initBattleMap(masterHexLabel);
-        }
-    }
-
-
-    void allShowBattleMap()
-    {
-        Iterator it = clients.iterator();
-        while (it.hasNext())
-        {
-            Client client = (Client)it.next();
-            client.showBattleMap();
         }
     }
 

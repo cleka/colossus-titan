@@ -16,6 +16,10 @@ public final class Log
 
 
     private static boolean showDebug = true;
+    private static boolean toStdout = true;
+    private static boolean toWindow = false;
+    private static LogWindow logWindow;
+
 
     public static boolean getShowDebug()
     {
@@ -28,22 +32,70 @@ public final class Log
     }
 
 
+    public static boolean isToStdout()
+    {
+        return toStdout;
+    }
+
+    public static void setToStdout(boolean toStdout)
+    {
+        Log.toStdout = toStdout;
+    }
+
+
+    public static boolean isToWindow()
+    {
+        return toWindow;
+    }
+
+    public static void setToWindow(boolean toWindow)
+    {
+        Log.toWindow = toWindow;
+    }
+
+
+    public static void disposeLogWindow()
+    {
+        if (logWindow != null)
+        {
+            logWindow.dispose();
+            logWindow = null;
+        }
+    }
+
+
+    private static void out(String s)
+    {
+        if (toStdout)
+        {
+            System.out.println(s);
+        }
+        if (toWindow)
+        {
+            if (logWindow == null)
+            {
+                logWindow = new LogWindow();
+            }
+            logWindow.append(s + "\n");
+        }
+    }
+
     /** Log an event. */
     public static void event(String s)
     {
-        System.out.println(s);
+        out(s);
     }
 
     /** Log an error. */
     public static void error(String s)
     {
-        System.out.println("Error: " + s);
+        out("Error: " + s);
     }
 
     /** Log a warning. */
     public static void warn(String s)
     {
-        System.out.println("Warn:" + s);
+        out("Warn: " + s);
     }
 
     /** Log a debug message. */
@@ -51,7 +103,7 @@ public final class Log
     {
         if (showDebug)
         {
-            System.out.println(s);
+            out(s);
         }
     }
 }

@@ -275,6 +275,14 @@ public final class Client
         {
             updateCaretakerDisplay();
         }
+        else if (name.equals(Options.showLogWindow))
+        {
+            Log.setToWindow(value);
+            if (value == false)
+            {
+                Log.disposeLogWindow();
+            }
+        }
     }
 
     public void setStringOption(String optname, String value)
@@ -961,24 +969,16 @@ public final class Client
         if (!getOption(Options.autoPlay))
         {
             map = new BattleMap(this, masterHexLabel);
-            battleDice = new BattleDice();
             JFrame frame = map.getFrame();
+            battleDice = new BattleDice();
             frame.getContentPane().add(battleDice, BorderLayout.SOUTH);
             frame.pack();
-            showBattleMap();
-        }
-    }
-
-    public void showBattleMap()
-    {
-        if (map != null)
-        {
-            JFrame frame = map.getFrame();
             frame.toFront();
             map.requestFocus();
             frame.setVisible(true);
         }
     }
+
 
     public void disposeBattleMap()
     {
@@ -1074,13 +1074,6 @@ public final class Client
         }
     }
 
-    public void deiconifyBoard()
-    {
-        if (board != null)
-        {
-            board.deiconify();
-        }
-    }
 
     public void unselectHexByLabel(String hexLabel)
     {

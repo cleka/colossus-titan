@@ -65,10 +65,10 @@ final class Battle
         // Set defender's entry side opposite attacker's.
         Legion attacker = getAttacker();
         int side = attacker.getEntrySide();
-        // XXX If invalid, default to 3, which is always valid.
-        if (side == -1)
+        if (side != 1 && side != 3 && side != 5)
         {
-            Log.warn("Fixing bogus entry side!");
+            Log.warn("Fixing bogus entry side: " + side);
+            // XXX If invalid, default to 3, which is always valid.
             side = 3;
             attacker.setEntrySide(side);
         }
@@ -575,9 +575,6 @@ final class Battle
     /** Called from Game after the SummonAngel finishes. */
     void finishSummoningAngel(boolean placeNewChit)
     {
-        // Bring the BattleMap back to the front.
-        game.getServer().allShowBattleMap();
-
         if (placeNewChit)
         {
             Legion attacker = getAttacker();
@@ -626,8 +623,6 @@ final class Battle
                 game.getServer().allPlaceNewChit(newCritter, true);
             }
         }
-        // Bring the BattleMap back to the front.
-        game.getServer().allShowBattleMap();
 
         // Always returns true, because we always want to advance to
         // the next phase.  (Unless we decide to support undo?)

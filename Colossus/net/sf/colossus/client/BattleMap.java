@@ -360,6 +360,8 @@ public final class BattleMap extends HexMap implements MouseListener,
     {
         client.addBattleChit(imageName, tag);
         alignChits(hexLabel);
+        // Need to move map back in front of board after summon or muster.
+        battleFrame.toFront();
     }
 
 

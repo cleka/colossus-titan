@@ -245,7 +245,7 @@ public class Creature implements Comparable
     }
 
 
-    /** Compare by name.  Inconsistent with equals. */
+    /** Compare by name. */
     public int compareTo(Object object)
     {
         if (object instanceof Creature)
@@ -257,5 +257,17 @@ public class Creature implements Comparable
         {
             throw new ClassCastException();
         }
+    }
+
+
+    /** Compare by name. */
+    public boolean equals(Object object)
+    {
+        if (!(object instanceof Creature))
+        {
+            return false;
+        }
+        Creature other = (Creature)object;
+        return name.equals(other.getName());
     }
 }

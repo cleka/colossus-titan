@@ -47,8 +47,7 @@ class CreatureCollectionView extends JDialog
             location = new Point(d.width - getSize().width, 0);
         }
         setLocation(location);
-
-        show();
+        setVisible(true);
     }
 
     /** hash by creature name to the label that displays the count */

@@ -5,6 +5,8 @@ Reduce imports between client and server packages.  Document remaining
 Make all modal dialogs non-modal.  (Can't enforce GUI modality across a
    network.)
 
+Add factories for remaining dialogs.
+
 Include an .ico file for Windows.
 
 Remember window positions in .cfg file.

@@ -581,6 +581,7 @@ public final class MasterBoard extends JPanel
 
         addCheckBox(graphicsMenu, Options.showCaretaker, KeyEvent.VK_C);
         addCheckBox(graphicsMenu, Options.showStatusScreen, KeyEvent.VK_G);
+        addCheckBox(graphicsMenu, Options.showLogWindow, KeyEvent.VK_L);
         addCheckBox(graphicsMenu, Options.antialias, KeyEvent.VK_N);
         mi = graphicsMenu.add(changeScaleAction);
         mi.setMnemonic(KeyEvent.VK_S);
@@ -1616,7 +1617,7 @@ public final class MasterBoard extends JPanel
                 // Right-click means to show the contents of the legion.
                 if (isPopupButton(e))
                 {
-                    new ShowLegion(masterFrame, 
+                    new ShowLegion(masterFrame,
                         client.getLongMarkerName(markerId),
                         client.getLegionImageNames(markerId), point);
                     return;
@@ -1829,7 +1830,7 @@ public final class MasterBoard extends JPanel
         {
             masterFrame.setState(JFrame.NORMAL);
         }
-        masterFrame.show();
+        //XXX Needed?  masterFrame.show();
     }
 
 

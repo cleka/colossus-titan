@@ -218,7 +218,7 @@ public final class Game
             {
                 server.setClientOption(i, Options.autoPlay, true);
             }
-            else if (type.equals("Human"))
+            else if (type.endsWith("Human"))
             {
                 server.setClientOption(i, Options.autoPlay, false);
             }
@@ -1932,7 +1932,8 @@ public final class Game
     }
 
     /** Return the sum of all possible entry sides for this legion and hex,
-     *  or -1 if there are none. */
+     *  or -1 if there are none.  If the hex is unoccupied, just return 
+     *  one entry side since it doesn't matter. */
     int getPossibleEntrySides(String markerId, String targetHexLabel, 
         boolean teleport)
     {
@@ -1947,9 +1948,13 @@ public final class Game
             if (listTeleportMoves(legion, currentHex, movementRoll, 
                 false).contains(targetHexLabel))
             {
-                if (targetHex.getTerrain() == 'T')
+                // Towers only have bottom entry side.
+                // Don't bother finding more than one entry side if unoccupied.
+                if (!isOccupied(targetHexLabel) ||
+                    targetHex.getTerrain() == 'T')
+                    
                 {
-                    return 3;  // Towers only have bottom entry side.
+                    return 3;  
                 }
                 else
                 {
@@ -1976,6 +1981,11 @@ public final class Game
             {
                 String buf = (String)parts.get(1);
                 entrySides += Integer.parseInt(buf);
+                // Don't bother finding more than one entry side if unoccupied.
+                if (!isOccupied(targetHexLabel))
+                {
+                    return entrySides;
+                }
             }
         }
         return entrySides;
@@ -2101,7 +2111,6 @@ public final class Game
     {
         battle = null;
         server.allDisposeBattleMap();
-        server.allDeiconifyBoard();
 
         // Handle any after-battle angel summoning or recruiting.
         if (getNumLegions(hexLabel) == 1)
@@ -2264,9 +2273,46 @@ public final class Game
         Player player = legion.getPlayer();
 
         // Verify that the move is legal.
-        if (!listAllMoves(legion, legion.getCurrentHex(), 
-            player.getMovementRoll(), false).contains(hexLabel))
-        // XXX Also verify teleport and entry side
+        if (teleport) 
+        {
+            if (!listTeleportMoves(legion, legion.getCurrentHex(), 
+                player.getMovementRoll(), false).contains(hexLabel))
+            {
+                return false;
+            }
+        }
+        else
+        {
+            if (!listNormalMoves(legion, legion.getCurrentHex(), 
+                player.getMovementRoll(), false).contains(hexLabel))
+            {
+                return false;
+            }
+        }
+
+        // Verify that the entry side is legal.
+        // XXX This logic needs to be moved somewhere else.
+        int sides = getPossibleEntrySides(markerId, hexLabel, teleport);
+        boolean left = false;
+        boolean bottom = false;
+        boolean right = false;
+        if (sides >= 5)
+        {
+            left = true;
+            sides -= 5;
+        }
+        if (sides >= 3)
+        {
+            bottom = true;
+            sides -= 3;
+        }
+        if (sides >= 1)
+        {
+            right = true;
+            sides -= 1;
+        }
+        if (entrySide == 1 && !right || entrySide == 3 && !bottom ||
+            entrySide == 5 && !left)
         {
             return false;
         }
@@ -2306,6 +2352,8 @@ public final class Game
     }
 
 
+    // XXX Needs to be rewritten to allow non-modal flee / concede / negotiate
+    // dialogs.
     void engage(String hexLabel)
     {
         // Do not allow clicking on engagements if one is
