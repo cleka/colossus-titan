@@ -17,7 +17,7 @@ class PickMarker extends Dialog implements MouseListener, WindowListener
 
     PickMarker(Frame parentFrame, Player player)
     {
-        super(parentFrame, player.name + ": Pick Legion Marker", true);
+        super(parentFrame, player.getName() + ": Pick Legion Marker", true);
         
         setResizable(false);
 
