@@ -9,6 +9,7 @@ import java.util.*;
 
 import net.sf.colossus.util.Split;
 import net.sf.colossus.util.Log;
+import net.sf.colossus.util.ResourceLoader;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.SaveGameFilter;
 import net.sf.colossus.server.Game;
@@ -459,18 +460,17 @@ public final class GetPlayers extends JDialog implements WindowListener,
             shortVarName = varFile.getName();
             varDirectory = varFile.getParentFile().getAbsolutePath();
         }
-        Log.debug("Loading variant " + varName + ", data files in " + 
+        Log.debug("Loading variant " + shortVarName + ", data files in " + 
             varDirectory);
         try
         {
-            ClassLoader cl = Client.class.getClassLoader();
-            InputStream varIS = 
-                cl.getResourceAsStream(varName);
+            java.util.List directories = new java.util.ArrayList();
+            directories.add(varDirectory);
+            directories.add(Constants.defaultDirName);
+            InputStream varIS = ResourceLoader.getInputStream(
+                                               shortVarName,
+                                               directories);
             if (varIS == null)
-            {
-                varIS = new FileInputStream(varName);
-            }
-            if (varIS == null) 
             {
                 throw new FileNotFoundException(varName);
             }

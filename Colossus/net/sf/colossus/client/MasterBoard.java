@@ -710,14 +710,14 @@ public final class MasterBoard extends JPanel
     {
         // Add terrain types, id labels, label sides, and exits to hexes.
         MasterHex[][] localH = null;
-        java.util.List directories = new java.util.ArrayList();
-        directories.add(GetPlayers.getVarDirectory());
-        directories.add(Constants.defaultDirName);
-        InputStream mapIS = ResourceLoader.getInputStream(
-                                           GetPlayers.getMapName(),
-                                           directories);
         try
         {
+            java.util.List directories = new java.util.ArrayList();
+            directories.add(GetPlayers.getVarDirectory());
+            directories.add(Constants.defaultDirName);
+            InputStream mapIS = ResourceLoader.getInputStream(
+                                               GetPlayers.getMapName(),
+                                               directories);
             if (mapIS == null) 
             {
                 throw new FileNotFoundException(GetPlayers.getMapName());
