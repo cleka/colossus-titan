@@ -39,10 +39,10 @@
 
 
 
-        <property name="HTMLDIR" value="/home/groups/c/co/colossus/htdocs"/>
-        <property name="DOWNLOAD_DIR" value="${HTMLDIR}/download"/>
-        <property name="DOCS_DIR" value="${HTMLDIR}/docs"/>
-        <property name="LIBS_DIR" value="${HTMLDIR}/libs"/>
+        <property name="HTML_DIR" value="/home/groups/c/co/colossus/htdocs"/>
+        <property name="DOWNLOAD_DIR" value="${HTML_DIR}/download"/>
+        <property name="DOCS_DIR" value="${HTML_DIR}/docs"/>
+        <property name="LIBS_DIR" value="${HTML_DIR}/libs"/>
         <property name="ZIPFILE" value="Colossus.${DSTAMP}.zip"/>
         <property name="SERVER" value="shell1.sf.net"/>
 
@@ -355,10 +355,10 @@
 
 <target name="inst" depends="init,sign,dist,changelog"
         description = "Locally copy files into htdocs tree on SF">
-        <copy file="Colossus.jar" todir="${HTMLDIR}"/>
-        <copy file="Colossus.jnlp" todir="${HTMLDIR}"/>
+        <copy file="Colossus.jar" todir="${HTML_DIR}"/>
+        <copy file="Colossus.jnlp" todir="${HTML_DIR}"/>
         <move file="${ZIPFILE}" todir="${DOWNLOAD_DIR}"/>
-        <copy file="ChangeLog" todir="${HTMLDIR}"/>
+        <copy file="ChangeLog" todir="${HTML_DIR}"/>
         <copy todir="${DOCS_DIR}"> <fileset dir="docs"/></copy>
         <delete>
                 <fileset dir="${DOWNLOAD_DIR}" includes = "1_LATEST_IS_*"/>
@@ -372,20 +372,20 @@
 <target name="remote-inst" depends="init,sign,dist,changelog"
         description = "scp files into htdocs tree on SF">
         <exec executable="scp" os="Linux,SunOS">
-            <arg line="Colossus.jar ${SERVER}:${HTMLDIR}"/>
+            <arg line="Colossus.jar ${SERVER}:${HTML_DIR}"/>
         </exec>
         <exec executable="scp" os="Linux,SunOS">
-            <arg line="Colossus.jnlp ${SERVER}:${HTMLDIR}"/>
+            <arg line="Colossus.jnlp ${SERVER}:${HTML_DIR}"/>
         </exec>
         <exec executable="ssh" os="Linux,SunOS">
             <arg line="${SERVER} mkdir ${LIBS_DIR}"/>
         </exec>
         <exec executable="scp" os="Linux,SunOS">
-            <arg line="libs/*.jar ${SERVER}:${LIBSDIR}"/>
+            <arg line="libs/*.jar ${SERVER}:${LIBS_DIR}"/>
         </exec>
 
         <exec executable="scp" os="Linux,SunOS">
-            <arg line="ChangeLog ${SERVER}:${HTMLDIR}"/>
+            <arg line="ChangeLog ${SERVER}:${HTML_DIR}"/>
         </exec>
         <exec executable="scp" os="Linux,SunOS">
             <arg line="${ZIPFILE} ${SERVER}:${DOWNLOAD_DIR}"/>
@@ -394,7 +394,7 @@
             <arg line="${SERVER} mkdir ${DOCS_DIR}"/>
         </exec>
         <exec executable="scp" os="Linux,SunOS">
-            <arg line="-pr docs/ ${SERVER}:${HTMLDIR}"/>
+            <arg line="-pr docs/ ${SERVER}:${HTML_DIR}"/>
         </exec>
         <delete>
                 <fileset dir="${DOWNLOAD_DIR}" includes = "1_LATEST_IS_*"/>
