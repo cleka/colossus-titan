@@ -133,7 +133,7 @@ class Legion
 
     public String getImageName()
     {
-        return "images" + File.separator + markerId + ".gif";
+        return "images/" + markerId + ".gif";
     }
 
 

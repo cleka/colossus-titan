@@ -77,7 +77,7 @@ class ShowLegion extends Dialog implements MouseListener, WindowListener
                 String imageName;
                 if (!critter.isVisible())
                 {
-                    imageName = "images" + File.separator + "Question.gif"; 
+                    imageName = "images/" + "Question.gif"; 
                 }
                 else
                 {

@@ -159,7 +159,7 @@ class Creature
 
     public String getImageName()
     {
-        return "images" + File.separator + name + ".gif";
+        return "images/" + name + ".gif";
     }
 
 
