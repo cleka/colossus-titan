@@ -17,7 +17,7 @@ class Player
     String [] markersAvailable = new String[60];
     String markerSelected;
     int numLegions;
-    Legion [] legions;
+    Legion [] legions = new Legion[60];
     boolean alive;
     boolean myTurn;
 
