@@ -14,6 +14,7 @@ class BattleChit extends Chit
     private Creature creature;
     private BattleMap map;
     private boolean moved = false;
+    private boolean struck = false;
 
     private Hex currentHex;
     private Hex startingHex;
@@ -87,22 +88,60 @@ class BattleChit extends Chit
     }
 
 
+    boolean hasStruck()
+    {
+        return struck;
+    }
+
+
+    void commitStrikes()
+    {
+        struck = false;
+    }
+
+
     Hex getCurrentHex()
     {
         return currentHex;
     }
-    
-    
+
+
     Hex getStartingHex()
     {
         return startingHex;
     }
 
 
+    int numEngaged()
+    {
+        int count = 0;
+
+        for (int i = 0; i < 6; i++)
+        {
+            // Adjacent creatures separated by a cliff are not engaged.
+            if (currentHex.getHexside(i) != 'c')
+            {
+                Hex hex = currentHex.getNeighbor(i);
+                if (hex != null)
+                {
+                    if (hex.isOccupied())
+                    {
+                        BattleChit chit = hex.getChit();
+                        if (chit.getPlayer() != player)
+                        {
+                            count++;
+                        }
+                    }
+                }
+            }
+        }
+
+        return count;
+    }
+
     boolean isEngaged()
     {
-        // XXX Need to use map to figure this out.
-        return false;
+        return (numEngaged() > 0);
     }
 
 
