@@ -1,6 +1,5 @@
 import java.awt.*;
 import java.awt.event.*;
-import javax.swing.*;
 
 /**
  * Class MasterHex describes one Masterboard hex
@@ -1105,15 +1104,11 @@ class MasterHex extends Hex
     // Present a dialog allowing the player to enter via land or teleport.
     public void chooseWhetherToTeleport()
     {
-        String string1 = "Teleport";
-        String string2 = "Move Normally";
-        Object[] options = {string1, string2};
-        int optval = JOptionPane.showOptionDialog(board, "Teleport?", 
-            "Teleport?", JOptionPane.YES_NO_OPTION, 
-            JOptionPane.QUESTION_MESSAGE, null, options, string2);
+        new OptionDialog(board, "Teleport?", "Teleport?", "Teleport", 
+            "Move Normally");
 
         // If Teleport, then leave teleported set.
-        if (optval == JOptionPane.NO_OPTION)
+        if (OptionDialog.getLastAnswer() == OptionDialog.NO_OPTION)
         {
             clearTeleported();
         }
