@@ -53,7 +53,6 @@ class BattleTurn extends JDialog implements ActionListener
         setVisible(true);
 
         // Make sure that this window is in front of the Turn window.
-System.out.println("BattleTurn.toFront()");
         toFront();
     }
 
@@ -100,7 +99,6 @@ System.out.println("BattleTurn.toFront()");
 
                 // Make sure the MasterBoard is visible.
                 map.getBoard().deiconify();
-System.out.println("map.getBoard().show()");
                 map.getBoard().show();
 
                 summonAngel = new SummonAngel(map.getBoard(), attacker);
@@ -138,7 +136,6 @@ System.out.println("map.getBoard().show()");
         }
 
         // Bring the BattleMap back to the front.
-System.out.println("map.show()");
         map.show();
     }
 
