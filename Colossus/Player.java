@@ -271,7 +271,7 @@ public class Player
 
         for (int i = 0; i < getNumLegions(); i++)
         {
-            if (game.getBoard().countMoves(getLegion(i)) > 0)
+            if (game.countConventionalMoves(getLegion(i)) > 0)
             {
                 count++;
             }

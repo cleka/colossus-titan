@@ -1,5 +1,6 @@
 import java.awt.*;
 import java.awt.event.*;
+import java.util.*;
 
 /**
  * Class BattleMap implements the GUI for a Titan battlemap.
@@ -184,20 +185,7 @@ public class BattleMap extends Frame implements MouseListener,
     }
 
 
-    public static boolean listContains(String [] list, String item)
-    {
-        for (int i = list.length - 1; i >= 0; i--)
-        {
-            if (item.equals(list[i]))
-            {
-                return true;
-            }
-        }
-        return false;
-    }
-
-
-    public static void unselectHexesByLabels(String [] labels)
+    public static void unselectHexesByLabels(Set labels)
     {
         for (int i = 0; i < h.length; i++)
         {
@@ -207,8 +195,7 @@ public class BattleMap extends Frame implements MouseListener,
                 {
                     BattleHex hex = h[i][j];
 
-                    if (hex.isSelected() && listContains(labels, 
-                        hex.getLabel()))
+                    if (hex.isSelected() && labels.contains(hex.getLabel()))
                     {
                         hex.unselect();
                         hex.repaint();
@@ -219,7 +206,7 @@ public class BattleMap extends Frame implements MouseListener,
     }
     
     
-    public static void selectHexesByLabels(String [] labels)
+    public static void selectHexesByLabels(Set labels)
     {
         for (int i = 0; i < h.length; i++)
         {
@@ -229,33 +216,11 @@ public class BattleMap extends Frame implements MouseListener,
                 {
                     BattleHex hex = h[i][j];
 
-                    if (!hex.isSelected() && listContains(labels,
-                        hex.getLabel()))
+                    if (!hex.isSelected() && labels.contains(hex.getLabel()))
                     {
                         hex.select();
                         hex.repaint();
                     }
-                }
-            }
-        }
-    }
-
-
-    public static void highlightUnoccupiedTowerHexes()
-    {
-        if (!h[3][1].isOccupied())
-        {
-            h[3][1].select();
-            h[3][1].repaint();
-        }
-        for (int i = 2; i <= 4; i++)
-        {
-            for (int j = 2; j <= 3; j++)
-            {
-                if (!h[i][j].isOccupied())
-                {
-                    h[i][j].select();
-                    h[i][j].repaint();
                 }
             }
         }
@@ -399,6 +364,12 @@ public class BattleMap extends Frame implements MouseListener,
         }
 
         return null;
+    }
+
+
+    public static BattleHex getCenterTowerHex()
+    {
+        return h[3][2];
     }
 
 

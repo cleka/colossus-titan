@@ -1,5 +1,6 @@
 import java.awt.*;
 import java.awt.event.*;
+import java.util.*;
 
 /**
  * Class MasterBoard implements the GUI for a Titan masterboard.
@@ -223,6 +224,48 @@ public class MasterBoard extends Frame implements MouseListener,
     }
 
 
+    public static void unselectHexesByLabels(Set labels)
+    {
+        for (int i = 0; i < h.length; i++)
+        {
+            for (int j = 0; j < h[0].length; j++)
+            {
+                if (SetupMasterHexes.show[i][j])
+                {
+                    MasterHex hex = h[i][j];
+
+                    if (hex.isSelected() && labels.contains(hex.getLabel()))
+                    {
+                        hex.unselect();
+                        hex.repaint();
+                    }
+                }
+            }
+        }
+    }
+    
+    
+    public static void selectHexesByLabels(Set labels)
+    {
+        for (int i = 0; i < h.length; i++)
+        {
+            for (int j = 0; j < h[0].length; j++)
+            {
+                if (SetupMasterHexes.show[i][j])
+                {
+                    MasterHex hex = h[i][j];
+
+                    if (!hex.isSelected() && labels.contains(hex.getLabel()))
+                    {
+                        hex.select();
+                        hex.repaint();
+                    }
+                }
+            }
+        }
+    }
+
+
     // Clear all entry side and teleport information from all hexes occupied
     // by one or fewer legions.
     public void clearAllNonFriendlyOccupiedEntrySides(Player player)
@@ -259,243 +302,6 @@ public class MasterBoard extends Frame implements MouseListener,
     }
 
 
-    // Recursively find conventional moves from this hex.  Select
-    //    all legal final destinations.  If block >= 0, go only
-    //    that way.  If block == -1, use arches and arrows.  If
-    //    block == -2, use only arrows.  Do not double back in
-    //    the direction you just came from.  Return the number of
-    //    moves found.
-    private int findMoves(MasterHex hex, Player player, Legion legion,
-        int roll, int block, int cameFrom, boolean show)
-    {
-        int count = 0;
-
-        // If there are enemy legions in this hex, mark it
-        // as a legal move and stop recursing.  If there is
-        // also a friendly legion there, just stop recursing.
-        if (hex.getNumEnemyLegions(player) > 0)
-        {
-            if (hex.getNumFriendlyLegions(player) == 0)
-            {
-                if (show)
-                {
-                    hex.select();
-                    hex.repaint();
-
-                    // Set the entry side relative to the hex label.
-                    hex.setEntrySide((6 + cameFrom - hex.getLabelSide()) % 6);
-                }
-                
-            }
-            return count;
-        }
-
-        if (roll == 0)
-        {
-            // This hex is the final destination.  Mark it as legal if
-            // it is unoccupied by friendly legions.
-            for (int i = 0; i < player.getNumLegions(); i++)
-            {
-                // Account for spin cycles.
-                if (player.getLegion(i).getCurrentHex() == hex &&
-                    player.getLegion(i) != legion)
-                {
-                    return count;
-                }
-            }
-            if (show)
-            {
-                hex.select();
-                hex.repaint();
-                // Need to set entry sides even if no possible engagement,
-                // for MasterHex.chooseWhetherToTeleport()
-                hex.setEntrySide((6 + cameFrom - hex.getLabelSide()) % 6);
-            }
-
-            count++;
-            return count;
-        }
-
-
-        if (block >= 0)
-        {
-            count += findMoves(hex.getNeighbor(block), player, legion,
-                roll - 1, -2, (block + 3) % 6, show);
-        }
-        else if (block == -1)
-        {
-            for (int i = 0; i < 6; i++)
-            {
-                if (hex.getExitType(i) >= MasterHex.ARCH && i != cameFrom)
-                {
-                    count += findMoves(hex.getNeighbor(i), player, legion,
-                        roll - 1, -2, (i + 3) % 6, show);
-                }
-            }
-        }
-        else if (block == -2)
-        {
-            for (int i = 0; i < 6; i++)
-            {
-                if (hex.getExitType(i) >= MasterHex.ARROW && i != cameFrom)
-                {
-                    count += findMoves(hex.getNeighbor(i), player, legion,
-                        roll - 1, -2, (i + 3) % 6, show);
-                }
-            }
-        }
-
-        return count;
-    }
-
-
-    // Recursively find tower teleport moves from this hex.  That's
-    // all unoccupied hexes within 6 hexes.  Teleports to towers
-    // are handled separately.  Do not double back.
-    private void findTowerTeleportMoves(MasterHex hex, Player player,
-        Legion legion, int roll, int cameFrom, boolean show)
-    {
-        // This hex is the final destination.  Mark it as legal if
-        // it is unoccupied.
-
-        if (!hex.isOccupied())
-        {
-            if (show)
-            {
-                hex.select();
-                hex.repaint();
-            }
-            // Mover can choose side of entry.
-            hex.setTeleported(true);
-        }
-
-        if (roll > 0)
-        {
-            for (int i = 0; i < 6; i++)
-            {
-                if (i != cameFrom && (hex.getExitType(i) != MasterHex.NONE ||
-                   hex.getEntranceType(i) != MasterHex.NONE))
-                {
-                    findTowerTeleportMoves(hex.getNeighbor(i), player, legion,
-                        roll - 1, (i + 3) % 6, show);
-                }
-            }
-        }
-    }
-
-    
-    // Return number of legal non-teleport moves.
-    public int countMoves(Legion legion)
-    {
-        return countAndMaybeShowMoves(legion, false);
-    }
-    
-    
-    // Return number of legal non-teleport moves.
-    public int showMoves(Legion legion)
-    {
-        return countAndMaybeShowMoves(legion, true);
-    }
-
-
-    // Return number of legal non-teleport moves.
-    private int countAndMaybeShowMoves(Legion legion, boolean show)
-    {
-        if (show)
-        {
-            unselectAllHexes();
-        }
-
-        if (legion.hasMoved())
-        {
-            return 0;
-        }
-        
-        Player player = legion.getPlayer();
-
-        clearAllNonFriendlyOccupiedEntrySides(player);
-
-        int count = 0;
-
-        MasterHex hex = legion.getCurrentHex();
-
-        // Conventional moves
-
-        // First, look for a block.
-        int block = -1;
-        for (int j = 0; j < 6; j++)
-        {
-            if (hex.getExitType(j) == MasterHex.BLOCK)
-            {
-                // Only this path is allowed.
-                block = j;
-            }
-        }
-
-        count += findMoves(hex, player, legion, player.getMovementRoll(),
-            block, -1, show);
-
-        if (player.getMovementRoll() == 6)
-        {
-            // Tower teleport
-            if (hex.getTerrain() == 'T' && legion.numLords() > 0 &&
-                player.canTeleport())
-            {
-                // Mark every unoccupied hex within 6 hexes.
-                findTowerTeleportMoves(hex, player, legion, 6, -1, show);
-
-                // Mark every unoccupied tower.
-                for (int tower = 100; tower <= 600; tower += 100)
-                {
-                    hex = getHexFromLabel(tower);
-                    if (hex != null && !hex.isOccupied())
-                    {
-                        if (show)
-                        {
-                            hex.select();
-                            hex.repaint();
-                            // Mover can choose side of entry.
-                            hex.setTeleported(true);
-                        }
-                    }
-                }
-            }
-
-            // Titan teleport
-            if (player.canTitanTeleport() &&
-                legion.numCreature(Creature.titan) > 0)
-            {
-                // Mark every hex containing an enemy stack that does not
-                // already contain a friendly stack.
-                for (int i = 0; i < game.getNumPlayers(); i++)
-                {
-                    if (game.getPlayer(i) != player)
-                    {
-                        for (int j = 0; j < game.getPlayer(i).getNumLegions();
-                            j++)
-                        {
-                            hex = game.getPlayer(i).getLegion(j).
-                                getCurrentHex();
-                            if (!hex.isEngagement())
-                            {
-                                if (show)
-                                {
-                                    hex.select();
-                                    hex.repaint();
-                                    // Mover can choose side of entry.
-                                    hex.setTeleported(true);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        return count;
-    }
-
-
     // Present a dialog allowing the player to enter via land or teleport.
     private void chooseWhetherToTeleport(MasterHex hex)
     {
@@ -515,8 +321,6 @@ public class MasterBoard extends Frame implements MouseListener,
         // setState(Frame.NORMAL) does not work under 1.1
         // removeNotify() then addNotify() causes problems with the Turn dialog
     }
-                    
-                    
 
 
     public void mousePressed(MouseEvent e)

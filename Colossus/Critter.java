@@ -698,7 +698,8 @@ public class Critter extends Creature
         // Let the attacker choose whether to carry, if applicable.
         if (carryDamage > 0)
         {
-            battle.highlightCarries(carryDamage);
+            battle.setCarryDamage(carryDamage);
+            battle.highlightCarries();
         }
 
         // Record that this attacker has struck.

@@ -1,5 +1,8 @@
+import java.util.*;
+
 /**
  * Class Battle holds data about a Titan battle.
+ *
  * @version $Id$
  * @author David Ripton
  */
@@ -299,6 +302,12 @@ public class Battle
     {
         return carryDamage;
     }
+    
+
+    public void setCarryDamage(int carryDamage)
+    {
+        this.carryDamage = carryDamage;;
+    }
 
 
     public boolean isChitSelected()
@@ -353,13 +362,16 @@ public class Battle
     }
 
 
-    // Recursively find moves from this hex.  Select all legal destinations.
-    //    Do not double back.  Return the number of moves found.
-    private void findMoves(BattleHex hex, Creature creature, boolean flies, 
-        int movesLeft, int cameFrom)
+    /** Recursively find moves from this hex.  Return an array of hex IDs for
+     *  all legal destinations.  Do not double back. */
+    private Set findMoves(BattleHex hex, Creature creature,
+        boolean flies, int movesLeft, int cameFrom)
     {
+        TreeSet set = new TreeSet();
+
         for (int i = 0; i < 6; i++)
         {
+            // Do not double back.
             if (i != cameFrom)
             {
                 BattleHex neighbor = hex.getNeighbor(i);
@@ -372,16 +384,15 @@ public class Battle
                     if (entryCost <= movesLeft)
                     {
                         // Mark that hex as a legal move.
-                        neighbor.select();
-                        neighbor.repaint();
+                        set.add(neighbor.getLabel());
 
                         // If there are movement points remaining, continue
                         // checking moves from there.  Fliers skip this
                         // because flying is more efficient.
                         if (!flies && movesLeft > entryCost)
                         {
-                            findMoves(neighbor, creature, flies,
-                                movesLeft - entryCost, reverseDir);
+                            set.addAll(findMoves(neighbor, creature, flies,
+                                movesLeft - entryCost, reverseDir));
                         }
                     }
 
@@ -390,33 +401,68 @@ public class Battle
                     if (flies && movesLeft > 1 && (neighbor.getTerrain() != 'v'
                         || creature.getName().equals("Dragon")))
                     {
-                        findMoves(neighbor, creature, flies, movesLeft - 1,
-                            reverseDir);
+                        set.addAll(findMoves(neighbor, creature, flies, 
+                            movesLeft - 1, reverseDir));
                     }
                 }
             }
         }
+
+        return set;
     }
 
 
-    // Find all legal moves for this critter.
-    public void showMoves(Critter critter)
+    private static Set findUnoccupiedTowerHexes()
     {
-        map.unselectAllHexes();
+        TreeSet set = new TreeSet();
+
+        BattleHex centerHex = BattleMap.getCenterTowerHex();
+
+        if (!centerHex.isOccupied())
+        {
+            set.add(centerHex.getLabel());
+        }
+        for (int i = 0; i < 6; i++)
+        {
+            BattleHex hex = centerHex.getNeighbor(i);
+            if (!hex.isOccupied())
+            {
+                set.add(hex.getLabel());
+            }
+        }
+
+        return set;
+    }
+
+
+    /** Find all legal moves for this critter. */
+    private Set showMoves(Critter critter)
+    {
+        Set set = new TreeSet();
 
         if (!critter.hasMoved() && !critter.isInContact(false))
         {
             if (masterHex.getTerrain() == 'T' && getTurnNumber() == 1 &&
                 getActivePlayer() == getDefender().getPlayer())
             {
-                map.highlightUnoccupiedTowerHexes();
+                set = findUnoccupiedTowerHexes();
             }
             else
             {
-                findMoves(critter.getCurrentHex(), critter,
+                set = findMoves(critter.getCurrentHex(), critter,
                     critter.isFlier(), critter.getSkill(), -1);
             }
         }
+
+        return set;
+    }
+
+
+    public void highlightMoves(Critter critter)
+    {
+        Set set = showMoves(critter);
+        map.unselectAllHexes();
+        map.selectHexesByLabels(set);
     }
 
 
@@ -493,12 +539,11 @@ public class Battle
     }
 
 
-    public int highlightMovableChits()
+    /** Return a set of hex labels for hex labels with critters eligible 
+     *  to move. */
+    public Set findMovableChits()
     {
-        map.unselectAllHexes();
-
-        int count = 0;
-
+        TreeSet set = new TreeSet();
         Player player = getActivePlayer();
 
         for (int i = 0; i < getNumCritters(); i++)
@@ -508,15 +553,24 @@ public class Battle
             {
                 if (!critter.hasMoved() && !critter.isInContact(false))
                 {
-                    count++;
                     BattleHex hex = critter.getCurrentHex();
-                    hex.select();
-                    hex.repaint();
+                    set.add(hex.getLabel());
                 }
             }
         }
 
-        return count;
+        return set;
+    }
+    
+    /** Selects all hexes containing critters eligible to move. 
+     *  Returns the number of hexes selected (not the number
+     *  of critters). */
+    public int highlightMovableChits()
+    {
+        Set set = findMovableChits();
+        map.unselectAllHexes();
+        map.selectHexesByLabels(set);
+        return set.size();
     }
 
 
@@ -600,8 +654,8 @@ public class Battle
     }
 
 
-    // Move the passed Critter to the top of the critters array.
-    // Shift the other critters up. 
+    /** Move the passed Critter to the top of the critters array.
+     *  Shift the other critters up. */
     public void moveToTop(Critter critter)
     {
         int i = 0;
@@ -776,13 +830,12 @@ public class Battle
         }
     }
 
-
-    public int highlightChitsWithTargets()
+    /** Return the set of hex labels for hexes with critters that have
+     *  valid strike targets. */
+    public Set findChitsWithTargets()
     {
-        map.unselectAllHexes();
-
-        int count = 0;
         Player player = getActivePlayer();
+        TreeSet set = new TreeSet();
 
         for (int i = 0; i < getNumCritters(); i++)
         {
@@ -791,15 +844,22 @@ public class Battle
             {
                 if (countStrikes(critter) > 0)
                 {
-                    count++;
-                    BattleHex hex = critter.getCurrentHex();
-                    hex.select();
-                    hex.repaint();
+                    set.add(critter.getCurrentHex().getLabel());
                 }
             }
         }
 
-        return count;
+        return set;
+    }
+    
+    /** Select hexes containing critters that have valid strike targets. 
+     *  Return the number of selected hexes. */
+    public int highlightChitsWithTargets()
+    {
+        Set set = findChitsWithTargets();    
+        map.unselectAllHexes();
+        map.selectHexesByLabels(set);
+        return set.size();
     }
 
 
@@ -839,22 +899,17 @@ public class Battle
     }
 
 
-    // Count the number of targets that a creature may strike.  If highlight
-    //     is true, also select their hexes.
-    private int countAndMaybeHighlightStrikes(Critter critter, boolean
-        highlight)
+    /** Return a set of hex labels for hexes containing targets that the 
+     *  critter may strike.
+     */
+    private Set findStrikes(Critter critter)
     {
-        int count = 0;
-
-        if (highlight)
-        {
-            map.unselectAllHexes();
-        }
+        TreeSet set = new TreeSet(); 
 
         // Each creature may strike only once per turn.
         if (critter.hasStruck())
         {
-            return 0;
+            return set;
         }
 
         Player player = critter.getPlayer();
@@ -873,21 +928,16 @@ public class Battle
                     Critter target = targetHex.getCritter();
                     if (target.getPlayer() != player && !target.isDead())
                     {
-                        if (highlight)
-                        {
-                            targetHex.select();
-                            // XXX not working right
-                            targetHex.repaint();
-                        }
-                        count++;
+                        set.add(targetHex.getLabel());
                     }
                 }
             }
         }
 
         // Then do rangestrikes if applicable.  Rangestrikes are not allowed
-        // if the creature can strike normally.
-        if (count == 0 && critter.isRangestriker() &&
+        // if the creature can strike normally, so only look for them if
+        // no targets have yet been found.
+        if (set.size() == 0 && critter.isRangestriker() &&
             getPhase() != STRIKEBACK)
         {
             for (int i = 0; i < getNumCritters(); i++)
@@ -899,57 +949,55 @@ public class Battle
 
                     if (isRangestrikePossible(critter, target))
                     {
-                        if (highlight)
-                        {
-                            targetHex.select();
-                            targetHex.repaint();
-                        }
-                        count++;
+                        set.add(targetHex.getLabel());
                     }
                 }
             }
         }
 
-        return count;
+        return set;
     }
 
 
-    private int countStrikes(Critter critter)
+    public int countStrikes(Critter critter)
     {
-        return countAndMaybeHighlightStrikes(critter, false);
+        return findStrikes(critter).size();
     }
 
-
+    /** Highlight all hexes with targets that the critter can strike.
+     *  Return the number of hexes highlighted. */
     public int highlightStrikes(Critter critter)
     {
-        return countAndMaybeHighlightStrikes(critter, true);
+        Set set = findStrikes(critter);
+        map.unselectAllHexes();
+        map.selectHexesByLabels(set);
+        return set.size();
     }
 
-
-    public int highlightCarries(int damage)
+    /** Return the set of hex labels for hexes with valid carry targets. */
+    public Set findCarries()
     {
-        map.unselectAllHexes();
-
-        int count = 0;
-
+        TreeSet set = new TreeSet();
+        
         for (int i = 0; i < getNumCritters(); i++)
         {
             Critter target = getCritter(i);
             if (target.getCarryFlag())
             {
-                BattleHex targetHex = target.getCurrentHex();
-                targetHex.select();
-                targetHex.repaint();
-                count++;
+                set.add(target.getCurrentHex().getLabel());
             }
         }
 
-        if (count > 0)
-        {
-            carryDamage = damage;
-        }
+        return set;
+    }
 
-        return count;
+
+    public int highlightCarries()
+    {
+        Set set = findCarries();
+        map.unselectAllHexes();
+        map.selectHexesByLabels(set);
+        return set.size();
     }
 
 
@@ -1546,7 +1594,7 @@ public class Battle
             {
                 case MOVE:
                     // Highlight all legal destinations for this chit.
-                    showMoves(critter);
+                    highlightMoves(critter);
                     break;
 
                 case FIGHT:
@@ -1671,9 +1719,6 @@ public class Battle
     
             map.dispose();
     
-            // XXX needed?
-            //masterHex.unselect();
-            //masterHex.repaint();
             board.getGame().finishBattle();
         }
         catch (NullPointerException e)

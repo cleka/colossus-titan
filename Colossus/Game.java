@@ -1669,17 +1669,23 @@ public class Game
         forcedMovementRoll = 0;
     }
 
+        
+    private static final int ARCHES_AND_ARROWS = -1;
+    private static final int ARROWS_ONLY = -2;
 
-    // Recursively find conventional moves from this hex.  Select
-    //    all legal final destinations.  If block >= 0, go only
-    //    that way.  If block == -1, use arches and arrows.  If
-    //    block == -2, use only arrows.  Do not double back in
-    //    the direction you just came from.  Return the number of
-    //    moves found.
-    private int findMoves(MasterHex hex, Player player, Legion legion,
-        int roll, int block, int cameFrom, boolean show)
+    private static final int NOWHERE = -1;
+
+
+    /** Recursively find conventional moves from this hex.  Select
+     *  all legal final destinations.  If block >= 0, go only
+     *  that way.  If block == -1, use arches and arrows.  If
+     *  block == -2, use only arrows.  Do not double back in
+     *  the direction you just came from.
+     */
+    private Set findMoves(MasterHex hex, Player player, Legion legion,
+        int roll, int block, int cameFrom)
     {
-        int count = 0;
+        TreeSet set = new TreeSet();
 
         // If there are enemy legions in this hex, mark it
         // as a legal move and stop recursing.  If there is
@@ -1688,17 +1694,12 @@ public class Game
         {
             if (hex.getNumFriendlyLegions(player) == 0)
             {
-                if (show)
-                {
-                    hex.select();
-                    hex.repaint();
-
-                    // Set the entry side relative to the hex label.
-                    hex.setEntrySide((6 + cameFrom - hex.getLabelSide()) % 6);
-                }
-                
+                set.add(hex.getLabel());
+                // XXX
+                // Set the entry side relative to the hex label.
+                hex.setEntrySide((6 + cameFrom - hex.getLabelSide()) % 6);
             }
-            return count;
+            return set;
         }
 
         if (roll == 0)
@@ -1711,71 +1712,69 @@ public class Game
                 if (player.getLegion(i).getCurrentHex() == hex &&
                     player.getLegion(i) != legion)
                 {
-                    return count;
+                    return set;
                 }
             }
-            if (show)
-            {
-                hex.select();
-                hex.repaint();
-                // Need to set entry sides even if no possible engagement,
-                // for MasterHex.chooseWhetherToTeleport()
-                hex.setEntrySide((6 + cameFrom - hex.getLabelSide()) % 6);
-            }
 
-            count++;
-            return count;
+            set.add(hex.getLabel());
+
+            // XXX
+            // Need to set entry sides even if no possible engagement,
+            // for MasterHex.chooseWhetherToTeleport()
+            hex.setEntrySide((6 + cameFrom - hex.getLabelSide()) % 6);
+
+            return set;
         }
 
 
         if (block >= 0)
         {
-            count += findMoves(hex.getNeighbor(block), player, legion,
-                roll - 1, -2, (block + 3) % 6, show);
+            set.addAll(findMoves(hex.getNeighbor(block), player, legion,
+                roll - 1, ARROWS_ONLY, (block + 3) % 6));
         }
-        else if (block == -1)
+        else if (block == ARCHES_AND_ARROWS)
         {
             for (int i = 0; i < 6; i++)
             {
                 if (hex.getExitType(i) >= MasterHex.ARCH && i != cameFrom)
                 {
-                    count += findMoves(hex.getNeighbor(i), player, legion,
-                        roll - 1, -2, (i + 3) % 6, show);
+                    set.addAll(findMoves(hex.getNeighbor(i), player, legion,
+                        roll - 1, ARROWS_ONLY, (i + 3) % 6));
                 }
             }
         }
-        else if (block == -2)
+        else if (block == ARROWS_ONLY)
         {
             for (int i = 0; i < 6; i++)
             {
                 if (hex.getExitType(i) >= MasterHex.ARROW && i != cameFrom)
                 {
-                    count += findMoves(hex.getNeighbor(i), player, legion,
-                        roll - 1, -2, (i + 3) % 6, show);
+                    set.addAll(findMoves(hex.getNeighbor(i), player, legion,
+                        roll - 1, ARROWS_ONLY, (i + 3) % 6));
                 }
             }
         }
 
-        return count;
+        return set;
     }
 
 
     // Recursively find tower teleport moves from this hex.  That's
     // all unoccupied hexes within 6 hexes.  Teleports to towers
     // are handled separately.  Do not double back.
-    private void findTowerTeleportMoves(MasterHex hex, Player player,
-        Legion legion, int roll, int cameFrom, boolean show)
+    private Set findTowerTeleportMoves(MasterHex hex, Player player,
+        Legion legion, int roll, int cameFrom)
     {
         // This hex is the final destination.  Mark it as legal if
         // it is unoccupied.
 
+        TreeSet set = new TreeSet();
+
         if (!hex.isOccupied())
         {
-            if (show)
-            {
-                hex.select();
-                hex.repaint();
-            }
+            set.add(hex.getLabel());
+
+            // XXX
             // Mover can choose side of entry.
             hex.setTeleported(true);
         }
@@ -1787,53 +1786,56 @@ public class Game
                 if (i != cameFrom && (hex.getExitType(i) != MasterHex.NONE ||
                    hex.getEntranceType(i) != MasterHex.NONE))
                 {
-                    findTowerTeleportMoves(hex.getNeighbor(i), player, legion,
-                        roll - 1, (i + 3) % 6, show);
+                    set.addAll(findTowerTeleportMoves(hex.getNeighbor(i), 
+                        player, legion, roll - 1, (i + 3) % 6));
                 }
             }
         }
+
+        return set;
     }
 
     
-    // Return number of legal non-teleport moves.
-    public int countMoves(Legion legion)
+    /** Return number of legal non-teleport moves. */
+    public int countConventionalMoves(Legion legion)
     {
-        return countAndMaybeShowMoves(legion, false);
+        return showMoves(legion, false).size();
     }
     
     
-    // Return number of legal non-teleport moves.
-    public int showMoves(Legion legion)
+    /** Select hexes where this legion can move. Return total number of
+     *  legal moves. */
+    public int highlightMoves(Legion legion)
     {
-        return countAndMaybeShowMoves(legion, true);
+        Set set = showMoves(legion, true);
+        board.unselectAllHexes();
+        board.selectHexesByLabels(set);
+        return set.size();
     }
 
 
-    // Return number of legal non-teleport moves.
-    private int countAndMaybeShowMoves(Legion legion, boolean show)
+    /** Return set of hex labels where this legion can move. 
+     *  Include teleport moves only if teleport is true. */
+    private Set showMoves(Legion legion, boolean teleport)
     {
-        if (show)
-        {
-            board.unselectAllHexes();
-        }
+        Set set = new TreeSet();
 
         if (legion.hasMoved())
         {
-            return 0;
+            return set;
         }
         
         Player player = legion.getPlayer();
 
+        // XXX entry sides
         board.clearAllNonFriendlyOccupiedEntrySides(player);
-
-        int count = 0;
 
         MasterHex hex = legion.getCurrentHex();
 
         // Conventional moves
 
         // First, look for a block.
-        int block = -1;
+        int block = ARCHES_AND_ARROWS;
         for (int j = 0; j < 6; j++)
         {
             if (hex.getExitType(j) == MasterHex.BLOCK)
@@ -1843,17 +1845,18 @@ public class Game
             }
         }
 
-        count += findMoves(hex, player, legion, player.getMovementRoll(),
-            block, -1, show);
+        set.addAll(findMoves(hex, player, legion, player.getMovementRoll(),
+            block, NOWHERE));
 
-        if (player.getMovementRoll() == 6)
+        if (teleport && player.getMovementRoll() == 6)
         {
             // Tower teleport
             if (hex.getTerrain() == 'T' && legion.numLords() > 0 &&
                 player.canTeleport())
             {
                 // Mark every unoccupied hex within 6 hexes.
-                findTowerTeleportMoves(hex, player, legion, 6, -1, show);
+                set.addAll(findTowerTeleportMoves(hex, player, legion, 6, 
+                    NOWHERE));
 
                 // Mark every unoccupied tower.
                 for (int tower = 100; tower <= 600; tower += 100)
@@ -1861,13 +1864,11 @@ public class Game
                     hex = MasterBoard.getHexFromLabel(tower);
                     if (!hex.isOccupied())
                     {
-                        if (show)
-                        {
-                            hex.select();
-                            hex.repaint();
-                            // Mover can choose side of entry.
-                            hex.setTeleported(true);
-                        }
+                        set.add(hex.getLabel());
+
+                        // XXX
+                        // Mover can choose side of entry.
+                        hex.setTeleported(true);
                     }
                 }
             }
@@ -1888,13 +1889,10 @@ public class Game
                             hex = getPlayer(i).getLegion(j).getCurrentHex();
                             if (!hex.isEngagement())
                             {
-                                if (show)
-                                {
-                                    hex.select();
-                                    hex.repaint();
-                                    // Mover can choose side of entry.
-                                    hex.setTeleported(true);
-                                }
+                                set.add(hex.getLabel());
+                                // XXX
+                                // Mover can choose side of entry.
+                                hex.setTeleported(true);
                             }
                         }
                     }
@@ -1902,7 +1900,7 @@ public class Game
             }
         }
 
-        return count;
+        return set;
     }
 
 
@@ -2102,7 +2100,7 @@ public class Game
 
                 // Highlight all legal destinations
                 // for this legion.
-                showMoves(legion);
+                highlightMoves(legion);
                 return;
 
             case Game.FIGHT:

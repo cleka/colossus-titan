@@ -1,4 +1,4 @@
-Colossus alpha     August 11, 2000    Copyright 2000 David Ripton
+Colossus alpha     October 9, 2000    Copyright 2000 David Ripton
 
 This is Colossus.  It's an attempt at a Java clone of Avalon Hill's
 Titan(tm) boardgame.
@@ -19,15 +19,19 @@ don't add anything that would be a copyright violation.)
 
 Running the game requires the following:
 
-1. A 1.1 or later (1.0 will not work) version of a JRE (Java runtime 
-   environment) or JDK (Java development kit).  A JRE is a smaller
-   download; a JDK also lets you compile Java programs, not just run
-   them.
+1. A 1.2 or later version of a JRE (Java runtime environment) or JDK 
+   (Java development kit).  A JRE is a smaller download; a JDK also 
+   lets you compile Java programs, not just run them.
+
+   (Colossus used to run under JDK 1.1, but I recently made some
+   changes that break backwards compatibility.  If this affects you,
+   let me know.)
 
    Colossus will now also run as an applet in a web browser, as long
-   as your browser is new enough to support JDK 1.1 applets.  But the 
-   Java virtual machines in current web browsers are buggy and out of 
-   date, so I don't really recommend this.
+   as your browser is new enough to support JDK 1.2 applets.  That
+   probably means downloading a recent version of Sun's Java plug-in 
+   (included with the JRE), since most browsers come with out-of-date 
+   Java virtual machines.
 
    Win32, Solaris, and Linux versions of the JDK and JRE are freely 
    downloadable from java.sun.com.  Another Linux port is available 
@@ -40,19 +44,20 @@ Running the game requires the following:
    general.  All the Java environments have strong and weak points,
    but the AWT is usually a weak point.
 
-   Windows: IBM's 1.1.8 is excellent.  Sun's 1.3 is very good,
-      but somewhat buggy.  Pre-1.1.8 versions have horrible 
-      image memory leaks that cause Colossus to crash on a 
-      regular basis, so upgrade to 1.1.8 if possible.
+   Windows: Sun's 1.3 is good, but there are memory leaks
+      in the HotSpot garbage collector.  Turning off client 
+      HotSpot will make it slower but fix the memory
+      leaks.  1.2.2 is okay.  1.2.0 and 1.2.1 have very serious 
+      memory leaks in the image handling code, so I don't 
+      recommend them.
 
    Solaris Sparc: Recent Sun boxes come with a pre-installed 
-      1.2.x JDK.  If you want to update it, 1.2.2 is less buggy 
-      than 1.3 beta refresh.
+      1.2.x JDK, which is okay.  1.3 is faster, but has 
+      memory leaks unless you turn off HotSpot.
 
-   Linux: IBM's 1.1.8 is the most stable, but not perfect.  
-      The Sun and Blackdown 1.1.8 versions are pretty good.  
-      The Sun and Blackdown 1.2.2 versions are okay.  Sun's 
-      1.3 beta refresh is buggy.  kaffe is buggy.  IBM's 1.3
+   Linux: The Sun and Blackdown 1.2.2 versions are okay.  Sun's
+      1.3 beta refresh is buggier.  (I haven't tried 1.3 final 
+      yet; it might be better.)  kaffe is buggy.  IBM's JDK 1.3 
       is buggy.
 
    If you have something else, you might find bugs that I haven't.  
@@ -65,15 +70,17 @@ Running the game requires the following:
    
    What is reasonably fast?  It depends.  I think Colossus runs acceptably
    on a Pentium 133 with 64 MB and a JVM with a JIT.  Your opinion may vary.
-   The client-side HotSpot JVM in JDK 1.3 for Windows seems to help, so
-   if you have a slower machine, you might want to upgrade your JRE.
+   The client-side HotSpot JVM in JDK 1.3 seems to help, so if you have a 
+   slower machine, you might want to upgrade your JRE.
 
    The game looks best in 1280x960 or higher, but I've added some scaling
    so you should be able to get by in 1024x768.  Less should work but will
    be really ugly.  The Java AWT requires at least a 256-color display; it 
    might work with less, but colors will be off.
 
-   Colossus used to require Swing, but it doesn't anymore.
+   Colossus used to require Swing, but it doesn't anymore.  But it might
+   again someday.  (Swing is included in JDK 1.2+, so there's no longer
+   quite as much reason to avoid it.)
 
    Java handles mouse buttons beyond the first badly.  In a perfect world,
    option-click on a Macintosh and the second mouse button on a PC would
@@ -90,34 +97,23 @@ recommend that everyone buy a copy while you still can.  (Avalon Hill was
 recently bought by Hasbro, which may or may not decide to reprint Titan in
 something like its current form.)
 
-First you need to unzip the zip file into a new directory.  Using InfoZip
-unzip, that would be something like "unzip Colossus.zip -d c:\Colossus"
-You need to make sure that your unzip program preserves subdirectories,
-which might involve a command-line or checkbox option.  In particular, 
-all the gif files need to be in the images subdirectory, or they won't be 
-found.
+Probably the best way to run Colossus is to use the executable jar file.  
+If you downloaded Colossus.jar by itself, you're set.  If you downloaded
+a zip file, you'll need to unzip it and find the jar file inside.  Try
+double-clicking on Colossus.jar in your GUI file manager.  If that
+doesn't work, pop up a command prompt, cd to the directory where 
+you unzipped the zip file, and try typing "java -jar Colossus.jar"
 
-You need to run the Game class.  In a command-line based JDK, you change
-to the directory with Game.class in it (c:\Colossus in the above example)
-and type "java Game"  (Case matters.)  If you want to load a game, type 
-"java Game <filename of savegame>" instead.  If this doesn't work, it's 
-probably a classpath problem.  Try "java -cp . Game" instead if you have 
-a 1.2 JVM, or try adding "." to the CLASSPATH environment variable with 
-a 1.1 JVM.
+Another alternative is to run Colossus as an applet.  Point your
+web browser to the included index.html file, and hope it works.  If
+it doesn't, you probably need to install Sun's Java plug-in.
 
-Another alternative is running from a jar archive.  If you have Colossus.jar
-and a 1.2+ JVM, you should be able to say "java -cp Colossus.jar Game"
-Under Windows, you should even be able to double-click on the Colossus.jar 
-file.
-
-Still another alternative is to run Colossus as an applet.  Point your
-web browser to the included index.html file, and hope it works.
-
-A dialog should pop up, allowing you to type in up to six player names.  Put 
-names in some of the boxes, then click "OK"  Another dialog will pop up, 
-telling you which tower each player gets and letting players pick colors in 
-increasing order of tower number.  Pick colors for each player.  If you 
-misclick, click "Restart"  When every player has a color, click "Done"
+Once you get things running, a dialog should pop up, allowing you to 
+type in up to six player names.  Put names in some of the boxes, then 
+click "OK"  Another dialog will pop up, telling you which tower each 
+player gets and letting players pick colors in increasing order of 
+tower number.  Pick colors for each player.  If you misclick, click 
+"Restart"  When every player has a color, click "Done"
 
 Now a window will pop up for each player, letting him pick his initial legion 
 marker.  (You'll notice that right now the legion markers are just colored 
@@ -235,11 +231,11 @@ rules issues.
 
 There is currently some very rough save / load game code in place.  The
 game produces a numbered .sav file in the saves/ subdirectory every turn.  
-If you start a new game with "java Game filename.sav" instead of just 
-"java Game" then the save file will be loaded.  "java Game --latest"
-will load the most recent save game in the saves/ subdirectory.  You'll 
-want to delete all those save files from time to time.  I'll add a better 
-user interface for this eventually.
+If you start a new game with "java -jar Colossus.jar filename.sav" 
+instead of just "java -jar Colossus" then the save file will be loaded.  
+"java -jar Colossus.jar --latest" will load the most recent save game in 
+the saves/ subdirectory.  You'll want to delete all those save files 
+from time to time.  I'll add a better user interface for this eventually.
 
 
 Credits:

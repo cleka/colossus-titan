@@ -296,7 +296,7 @@ public class Turn extends Dialog implements ActionListener, WindowListener
                     if (hex.getNumFriendlyLegions(player) > 1)
                     {
                         // If there are no legal moves, recombine.
-                        if (board.showMoves(legion) == 0)
+                        if (game.countConventionalMoves(legion) == 0)
                         {
                             for (int j = hex.getNumLegions() - 1; j >= 1; j--)
                             {
