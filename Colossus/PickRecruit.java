@@ -30,6 +30,7 @@ class PickRecruit extends JDialog implements MouseListener, WindowListener
         super(parentFrame, legion.getPlayer().getName() +
             ": Pick Recruit", true);
 
+        // This sanity check is a bit expensive.
         if (!legion.canRecruit())
         {
             dispose();
@@ -97,7 +98,7 @@ class PickRecruit extends JDialog implements MouseListener, WindowListener
 
 
     // Returns the number of eligible recruits.
-    static int findEligibleRecruits(Legion legion, Creature [] recruits)
+    public static int findEligibleRecruits(Legion legion, Creature [] recruits)
     {
         MasterHex hex = legion.getCurrentHex();
 
