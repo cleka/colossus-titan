@@ -28,10 +28,10 @@ class BattleChit extends Chit
 
 
     BattleChit(int cx, int cy, int scale, String imageFilename,
-        Container container, Creature creature, BattleHex hex, 
-        Legion legion, boolean inverted, BattleMap map)
+        Container container, Creature creature, BattleHex hex,
+        Legion legion, BattleMap map)
     {
-        super(cx, cy, scale, imageFilename, container, inverted);
+        super(cx, cy, scale, imageFilename, container);
         this.creature = creature;
         this.currentHex = hex;
         this.startingHex = hex;
@@ -143,7 +143,7 @@ class BattleChit extends Chit
         for (int i = 0; i < 6; i++)
         {
             // Adjacent creatures separated by a cliff are not in contact.
-            if (currentHex.getHexside(i) != 'c' && 
+            if (currentHex.getHexside(i) != 'c' &&
                 currentHex.getOppositeHexside(i) != 'c')
             {
                 BattleHex hex = currentHex.getNeighbor(i);
@@ -152,7 +152,7 @@ class BattleChit extends Chit
                     if (hex.isOccupied())
                     {
                         BattleChit chit = hex.getChit();
-                        if (chit.getPlayer() != getPlayer() && 
+                        if (chit.getPlayer() != getPlayer() &&
                             (countDead || !chit.isDead()))
                         {
                             count++;
@@ -264,14 +264,14 @@ class BattleChit extends Chit
             {
                 attackerSkill--;
             }
-        
+
             if (currentHex.getElevation() > targetHex.getElevation())
             {
                 // Adjacent hex, so only one possible direction.
                 int direction = map.getDirection(currentHex, targetHex, false);
                 char hexside = currentHex.getHexside(direction);
                 // Striking down across wall: +1
-                if (hexside == 'w') 
+                if (hexside == 'w')
                 {
                     attackerSkill++;
                 }
@@ -307,7 +307,7 @@ class BattleChit extends Chit
 
             // Rangestrike up across wall: -1 per wall
             boolean wall = false;
-            for (int i = 0; i < 6; i++) 
+            for (int i = 0; i < 6; i++)
             {
                 if (targetHex.getHexside(i) == 'w')
                 {
@@ -348,8 +348,8 @@ class BattleChit extends Chit
         // Native defending in bramble, from strike by a non-native: +1
         // Native defending in bramble, from rangestrike by a non-native
         //     non-warlock: +1
-        if (targetHex.getTerrain() == 'r' && 
-            target.getCreature().isNativeBramble() && 
+        if (targetHex.getTerrain() == 'r' &&
+            target.getCreature().isNativeBramble() &&
             !creature.isNativeBramble() &&
             !(rangestrike && creature == Creature.warlock))
         {
@@ -364,8 +364,8 @@ class BattleChit extends Chit
 
         return strikeNumber;
     }
-    
-    
+
+
     // Allow the player to choose whether to take a penalty
     // (fewer dice or higher strike number) in order to be
     // allowed to carry.  Return true if the penalty is taken,
@@ -379,7 +379,7 @@ class BattleChit extends Chit
             carryTarget.getCreature().getName() + "?";
 
         Object[] options = {yesString, noString};
-        int optval = JOptionPane.showOptionDialog(map, promptString, 
+        int optval = JOptionPane.showOptionDialog(map, promptString,
             "Take Strike Penalty?", JOptionPane.YES_NO_OPTION,
             JOptionPane.QUESTION_MESSAGE, null, options, noString);
 
@@ -411,7 +411,7 @@ class BattleChit extends Chit
 
         int strikeNumber = getStrikeNumber(target);
 
-        // Figure whether number of dice or strike number needs to be 
+        // Figure whether number of dice or strike number needs to be
         // penalized in order to carry.
         if (carryPossible)
         {
@@ -421,7 +421,7 @@ class BattleChit extends Chit
             for (int i = 0; i < 6; i++)
             {
                 // Adjacent creatures separated by a cliff are not in contact.
-                if (currentHex.getHexside(i) != 'c' && 
+                if (currentHex.getHexside(i) != 'c' &&
                     currentHex.getOppositeHexside(i) != 'c')
                 {
                     BattleHex hex = currentHex.getNeighbor(i);
@@ -433,11 +433,11 @@ class BattleChit extends Chit
                             int tmpDice = getDice(chit);
                             int tmpStrikeNumber = getStrikeNumber(chit);
 
-                            // Strikes not up across dune hexsides cannot 
+                            // Strikes not up across dune hexsides cannot
                             // carry up across dune hexsides.
                             if (currentHex.getOppositeHexside(i) == 'd')
                             {
-                                int direction = map.getDirection(targetHex, 
+                                int direction = map.getDirection(targetHex,
                                     currentHex, false);
                                 if (targetHex.getHexside(direction) != 'd')
                                 {
@@ -445,7 +445,7 @@ class BattleChit extends Chit
                                 }
                             }
 
-                            else if (tmpStrikeNumber > strikeNumber || 
+                            else if (tmpStrikeNumber > strikeNumber ||
                                 tmpDice < dice)
                             {
                                 // Allow choosing a less effective strike in
@@ -560,7 +560,7 @@ class BattleChit extends Chit
 
             // Provide a high-contrast background for the number.
             g.setColor(java.awt.Color.white);
-            g.fillRect(rect.x + (rect.width - fontWidth) / 2, 
+            g.fillRect(rect.x + (rect.width - fontWidth) / 2,
                 rect.y + (rect.height - fontHeight) / 2,
                 fontWidth, fontHeight);
 
