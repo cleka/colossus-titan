@@ -278,6 +278,10 @@ class Negotiate extends Dialog implements MouseListener, ActionListener
             {
                 attacker.removeLegion();
                 defender.removeLegion();
+                
+                Game.logEvent(attacker.getMarkerId() + " and " +
+                    defender.getMarkerId() + 
+                    " agree to mutual elimination"); 
 
                 // If either was the titan stack, its owner dies and gives
                 // half points to the victor.
@@ -342,6 +346,10 @@ class Negotiate extends Dialog implements MouseListener, ActionListener
 
                 // Add points, and angels if necessary.
                 winner.addPoints(points);
+                
+                Game.logEvent("Legion " + loser.getMarkerId() + 
+                   " is eliminated by legion " + winner.getMarkerId() +
+                   " via negotiation");
 
                 // If this was the titan stack, its owner dies and gives half
                 // points to the victor.

@@ -32,7 +32,7 @@ class Critter extends Creature
             creature.rangeStrikes, creature.flies, creature.nativeBramble, 
             creature.nativeDrift, creature.nativeBog, 
             creature.nativeSandDune, creature.nativeSlope, creature.lord, 
-            creature.demilord, creature.count);
+            creature.demilord, creature.count, creature.pluralName);
 
         if (name != null) 
         {
@@ -179,25 +179,41 @@ class Critter extends Creature
     }
 
 
-    public void setHits(int damage)
-    {
-        hits = damage;
-    }
-    
-    
     public void heal()
     {
-        setHits(0);
+        hits = 0;
     }
 
 
-    public void checkForDeath()
+    // Apply damage to this critter.
+    // Returns the amount of excess damage done, which may 
+    // sometimes carry to another target. 
+    public int wound(int damage)
     {
-        if (hits >= getPower())
+        int excess = 0;
+
+        if (damage > 0)
         {
-            setDead(true);
-            currentHex.repaint();
+            hits += damage;
+            if (hits > power)
+            {
+                excess = hits - power;
+                hits = power;
+            }
+
+            // Check for death.
+            if (hits >= getPower())
+            {
+                setDead(true);
+            }
+
+            // Update damage displayed on chit.
+            // XXX Chit.repaint() doesn't work right after a
+            // creature is killed by carry damage.
+            getCurrentHex().repaint();
         }
+
+        return excess;
     }
 
 
@@ -283,6 +299,9 @@ class Critter extends Creature
 
     public void moveToHex(BattleHex hex)
     {
+        Game.logEvent(getName() + " moves from " + currentHex.getLabel() + 
+            " to " + hex.getLabel());
+
         currentHex.removeCritter(this);
         currentHex = hex;
         currentHex.addCritter(this);
@@ -300,6 +319,8 @@ class Critter extends Creature
         moved = false;
         map.clearLastCritterMoved();
         map.repaint();
+        Game.logEvent(getName() + " undoes move and returns to " + 
+            startingHex.getLabel()); 
     }
 
 
@@ -488,8 +509,9 @@ class Critter extends Creature
 
         for (int i = 0; i < carryTargets.length; i++)
         {
+            BattleHex targetHex = carryTargets[i].getCurrentHex();
             prompt.append(carryTargets[i].getName() + " in " +
-                carryTargets[i].getCurrentHex().getTerrainName().toLowerCase());
+                targetHex.getTerrainName() + " hex " + targetHex.getLabel());
             if (i < carryTargets.length - 1)
             {
                 prompt.append(", ");
@@ -532,7 +554,8 @@ class Critter extends Creature
         // Sanity check
         if (target.getPlayer() == getPlayer())
         {
-            System.out.println("Tried to strike own creature!");
+            System.out.println(getName() + " tried to strike allied " + 
+                target.getName());
             return;
         }
 
@@ -577,7 +600,8 @@ class Critter extends Creature
                     if (hex != null && hex != targetHex && hex.isOccupied())
                     {
                         Critter critter = hex.getCritter();
-                        if (critter.getPlayer() != getPlayer() && !critter.isDead())
+                        if (critter.getPlayer() != getPlayer() && 
+                            !critter.isDead())
                         {
                             int tmpDice = getDice(critter);
                             int tmpStrikeNumber = getStrikeNumber(critter);
@@ -680,9 +704,11 @@ class Critter extends Creature
         int damage = 0;
 
         int [] rolls = new int[dice];
+        StringBuffer rollString = new StringBuffer(36);
         for (int i = 0; i < dice; i++)
         {
-            rolls[i] = (int) Math.ceil(6 * Math.random());
+            rolls[i] = Game.rollDie();
+            rollString.append(rolls[i]);
 
             if (rolls[i] >= strikeNumber)
             {
@@ -690,22 +716,11 @@ class Critter extends Creature
             }
         }
 
-        int totalDamage = target.getHits();
-        totalDamage += damage;
-        int carryDamage = 0;
-        int power = target.getPower();
-        if (totalDamage > power)
+        int carryDamage = target.wound(damage);
+        if (!carryPossible)
         {
-            if (carryPossible)
-            {
-                carryDamage = totalDamage - power;
-            }
-            totalDamage = power;
+            carryDamage = 0;
         }
-        target.setHits(totalDamage);
-        target.checkForDeath();
-
-        target.getChit().repaint();
 
         // Let the attacker choose whether to carry, if applicable.
         if (carryDamage > 0)
@@ -725,6 +740,11 @@ class Critter extends Creature
         showDice.setHits(damage);
         showDice.setCarries(carryDamage);
         showDice.setup();
+
+        Game.logEvent(getName() + " in " + currentHex.getLabel() + 
+            " strikes " + target.getName() + " in " + 
+            targetHex.getLabel() + " with strike number " +
+            strikeNumber + " : " + rollString + ": " + damage + " hits");
     }
 
 
@@ -750,7 +770,7 @@ class Critter extends Creature
     {
         if (dead) 
         {
-            setHits(getPower());
+            hits = getPower();
         }
         chit.setDead(dead);
     }

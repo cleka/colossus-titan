@@ -33,7 +33,7 @@ class PickRecruit extends Dialog implements MouseListener, WindowListener
     {
         super(parentFrame, legion.getPlayer().getName() +
             ": Pick Recruit in " + 
-            legion.getCurrentHex().getTerrainName().toLowerCase(), true);
+            legion.getCurrentHex().getTerrainName(), true);
 
         if (!legion.canRecruit())
         {
@@ -227,6 +227,15 @@ class PickRecruit extends Dialog implements MouseListener, WindowListener
                     {
                         legion.revealCreatures(recruiter, numRecruiters);
                     }
+
+                    Game.logEvent("Legion " + legion.getMarkerId() +
+                        " in " +  
+                        legion.getCurrentHex().getTerrainName() +
+                        " hex " + legion.getCurrentHex().getLabel() +
+                        " recruits " + recruit.getName() + " with " +
+                        (numRecruiters == 0 ? "nothing" :
+                        numRecruiters + " " + (numRecruiters > 1 ? 
+                        recruiter.getPluralName() : recruiter.getName())));
 
                     // Recruits are one to a customer.
                     legion.markRecruited();

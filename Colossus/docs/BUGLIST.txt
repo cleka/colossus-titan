@@ -32,10 +32,11 @@ Red Hat 6.1, ibmjdk118: Occasional SIGSEGV javacore in SplitLegion, with
    javacore in PickRecruit, even with green threads.  One SIGSEGV
    javacore during battle, with green threads.  AWT thread race condition?
 
-Red Hat 6.1, Sun 1.2.2, Blackdown 1.2.2RC4: ShowDice dialog sometimes 
-   moves from upper right corner to upper left corner.  ShowLegion
-   dialog sometimes pops up in upper left corner instead of over
-   mouse position.  These problems don't happen with ibmjdk118.
+Red Hat 6.1, Sun 1.2.2/1.3/1.3refresh, Blackdown 1.2.2RC4: 
+   ShowDice dialog sometimes moves from upper right corner to upper 
+   left corner.  ShowLegion dialog sometimes pops up in upper left 
+   corner instead of over mouse position.  These problems don't happen 
+   with ibmjdk118.
 
 Win98, JDK1.3rc1: setLocation() to keep ShowLegion, ShowMasterHex
    dialogs from displaying past the bottom or right edge of the

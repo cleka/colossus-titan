@@ -31,6 +31,8 @@ class BattleHex extends Hex
     private int xCoord;
     private int yCoord;
 
+    private String label;
+
 
     BattleHex(int cx, int cy, int scale, BattleMap map, int xCoord, int yCoord)
     {
@@ -65,6 +67,7 @@ class BattleHex extends Hex
         }
 
         setTerrain('p');
+        assignLabel();
     }
 
 
@@ -115,11 +118,16 @@ class BattleHex extends Hex
         g.drawPolygon(hexagon);
 
         FontMetrics fontMetrics = g.getFontMetrics();
-        String name = getTerrainName().toUpperCase();
 
+        String name = getTerrainName().toUpperCase();
         g.drawString(name, rectBound.x + (rectBound.width -
             fontMetrics.stringWidth(name)) / 2,
             rectBound.y + (fontMetrics.getHeight() + rectBound.height) / 2);
+        
+        // Show hex label in upper left corner.
+        g.drawString(label, rectBound.x + (rectBound.width -
+            fontMetrics.stringWidth(label)) / 3,
+            rectBound.y + (fontMetrics.getHeight() + rectBound.height) / 4);
 
         // Draw hexside features.
         for (int i = 0; i < 6; i++)
@@ -461,6 +469,53 @@ class BattleHex extends Hex
             default:
                 return Color.black;
         }
+    }
+
+
+    // A1-A3, B1-B4, C1-C5, D1-D6, E1-E5, F1-F4.  
+    // Letters increase left to right; numbers increase
+    // bottom to top.
+    String getLabel()
+    {
+        return label;
+    }
+
+
+    private void assignLabel()
+    {
+        if (xCoord == -1)
+        {
+            label = "entrance";
+            return;
+        }
+
+        char xLabel;
+        switch (xCoord)
+        {
+            case 0:
+                xLabel = 'A';
+                break;
+            case 1:
+                xLabel = 'B';
+                break;
+            case 2:
+                xLabel = 'C';
+                break;
+            case 3:
+                xLabel = 'D';
+                break;
+            case 4:
+                xLabel = 'E';
+                break;
+            case 5:
+                xLabel = 'F';
+                break;
+            default:
+                xLabel = '?';
+        }
+
+        int yLabel = 6 - yCoord - (int) Math.abs(Math.floor((xCoord - 3) / 2));
+        label = new String(xLabel + Integer.toString(yLabel));
     }
 
 

@@ -123,7 +123,11 @@ class AcquireAngel extends Dialog implements MouseListener, WindowListener
             if (chits[i] == source)
             {
                 // Select that marker.
-                legion.addCreature(recruits[i]);
+                Creature creature = recruits[i];
+                legion.addCreature(creature);
+
+                Game.logEvent("Legion " + legion.getMarkerId() +
+                    " acquired an " + creature.getName());
 
                 // Then exit.
                 dispose();

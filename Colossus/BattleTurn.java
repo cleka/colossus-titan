@@ -9,7 +9,7 @@ import java.awt.event.*;
 
 class BattleTurn extends Dialog implements ActionListener, WindowListener
 {
-    // phases of a turn
+    // Phases of a battle turn
     public static final int SUMMON = 0;
     public static final int RECRUIT = 1;
     public static final int MOVE = 2;
@@ -54,6 +54,26 @@ class BattleTurn extends Dialog implements ActionListener, WindowListener
         setLocation(location);
 
         setVisible(true);
+    }
+
+
+    public static String getPhaseName(int phase)
+    {
+        switch (phase)
+        {
+            case SUMMON:
+                return "Summon";
+            case RECRUIT:
+                return "Recruit";
+            case MOVE:
+                return "Move";
+            case FIGHT:
+                return "Fight";
+            case STRIKEBACK:
+                return "Strikeback";
+            default:
+                return "?????";
+        }
     }
 
 
@@ -236,18 +256,24 @@ class BattleTurn extends Dialog implements ActionListener, WindowListener
         if (phase == SUMMON)
         {
             phase = MOVE;
+            Game.logEvent("Battle phase advances to " + 
+                getPhaseName(phase));
             setupMoveDialog();
         }
         
         else if (phase == RECRUIT)
         {
             phase = MOVE;
+            Game.logEvent("Battle phase advances to " + 
+                getPhaseName(phase));
             setupMoveDialog();
         }
 
         else if (phase == MOVE)
         {
             phase = FIGHT;
+            Game.logEvent("Battle phase advances to " + 
+                getPhaseName(phase));
             setupFightDialog();
         }
 
@@ -263,6 +289,8 @@ class BattleTurn extends Dialog implements ActionListener, WindowListener
             }
 
             phase = STRIKEBACK;
+            Game.logEvent("Battle phase advances to " + 
+                getPhaseName(phase));
             setupFightDialog();
         }
 
@@ -276,6 +304,8 @@ class BattleTurn extends Dialog implements ActionListener, WindowListener
                 if (activeLegion == attacker)
                 {
                     phase = SUMMON;
+                    Game.logEvent(getActivePlayer().getName() + 
+                        "'s battle turn, number " + turnNumber);
                     setupSummonDialog();
                 }
                 else
@@ -283,6 +313,7 @@ class BattleTurn extends Dialog implements ActionListener, WindowListener
                     turnNumber++;
                     if (turnNumber > 7)
                     {
+                        Game.logEvent("Time loss");
                         // Time loss.  Attacker is eliminated but defender
                         //    gets no points.
                         if (attacker.numCreature(Creature.titan) != 0)
@@ -304,10 +335,13 @@ class BattleTurn extends Dialog implements ActionListener, WindowListener
                     {
                         phase = RECRUIT;
                         setupRecruitDialog();
+                        Game.logEvent(getActivePlayer().getName() + 
+                            "'s battle turn, number " + turnNumber);
                     }
                 }
             }
         }
+
     }
 
 

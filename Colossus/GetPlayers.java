@@ -100,6 +100,8 @@ public class GetPlayers extends Dialog implements WindowListener, ActionListener
             game.setNumPlayers(numPlayers);
             for (int i = 0; i < numPlayers; i++)
             {
+                // Display player numbers as if they started at 1 not 0.
+                Game.logEvent("Player " + (i + 1) + " is " + playerNames[i]);
                 game.setPlayerName(i, playerNames[i]);
             }
         }

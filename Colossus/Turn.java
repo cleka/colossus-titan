@@ -232,7 +232,7 @@ class Turn extends Dialog implements ActionListener, WindowListener
 
             if (player.getMulligansLeft() == 0)
             {
-                // Remove the Take Mulligan button.
+                // Remove the Take Mulligan button, and reroll movement die.
                 setupMoveDialog();
             }
             // Remove all moves from MasterBoard.

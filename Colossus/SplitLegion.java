@@ -368,6 +368,11 @@ class SplitLegion extends Dialog implements MouseListener, ActionListener,
 
             // Exit.
             dispose();
+
+            Game.logEvent(newLegion.getHeight() + 
+                " creatures were split off from legion " + 
+                oldLegion.getMarkerId() +
+                " into new legion " + newLegion.getMarkerId());
         }
 
         else if (e.getActionCommand().equals("Cancel"))

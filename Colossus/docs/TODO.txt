@@ -1,11 +1,13 @@
+Improve logging.
+
+Split GUI classes from model classes.
+
 Add server menu for save game, load game, new game, autosave, visible 
    stacks option, ability to create or dismiss status screen, 
    PickRecruits vs.  always reveal the biggest/smallest possible 
    recruiter.  Read option defaults from a config file.
 
 Fix concession timing.
-
-Split GUI classes from model classes.
 
 Client-server networking.
 

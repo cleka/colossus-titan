@@ -72,7 +72,13 @@ public class BattleMap extends Frame implements MouseListener,
         super(attacker.getMarkerId() + " (" + attacker.getPlayer().getName() +
             ") attacks " + defender.getMarkerId() + " (" +
             defender.getPlayer().getName() + ")" + " in " + 
-            masterHex.getTerrainName().toLowerCase());
+            masterHex.getTerrainName() + " hex " + masterHex.getLabel());
+        
+        Game.logEvent("\n" + attacker.getMarkerId() + " (" + 
+            attacker.getPlayer().getName() + ") attacks " + 
+            defender.getMarkerId() + " (" + defender.getPlayer().getName() + 
+            ")" + " in " + masterHex.getTerrainName() + " hex " + 
+            masterHex.getLabel());
 
         this.attacker = attacker;
         this.defender = defender;
@@ -369,13 +375,9 @@ public class BattleMap extends Frame implements MouseListener,
     {
         chitSelected = false;
 
-        for (int i = 0; i < numCritters; i++)
+        if (lastCritterMoved != null)
         {
-            Critter critter = chits[i].getCritter();
-            if (critter == lastCritterMoved)
-            {
-                critter.undoMove();
-            }
+            lastCritterMoved.undoMove();
         }
     }
 
@@ -449,11 +451,8 @@ public class BattleMap extends Frame implements MouseListener,
                 if (critter.getCurrentHex().getTerrain() == 'd' &&
                     !critter.isNativeDrift())
                 {
-                    int totalDamage = critter.getHits();
-                    totalDamage++;
-                    critter.setHits(totalDamage);
-                    critter.checkForDeath();
-                    critter.getChit().repaint();
+                    Game.logEvent(critter.getName() + " takes drift damage");
+                    critter.wound(1);
                 }
             }
         }
@@ -617,23 +616,16 @@ public class BattleMap extends Frame implements MouseListener,
 
     public void applyCarries(Critter target)
     {
-        int totalDamage = target.getHits();
-        totalDamage += getCarryDamage();
-        int power = target.getPower();
-        if (totalDamage > power)
-        {
-            setCarryDamage(totalDamage - power);
-            totalDamage = power;
-            target.setCarryFlag(false);
-        }
-        else
+        carryDamage = target.wound(carryDamage);
+        if (carryDamage < 0)
         {
             clearAllCarries();
         }
-        target.setHits(totalDamage);
-        target.checkForDeath();
-        target.getCurrentHex().unselect();
-        target.getChit().repaint();
+        else
+        {
+            target.setCarryFlag(false);
+            target.getCurrentHex().unselect();
+        }
     }
 
 

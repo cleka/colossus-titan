@@ -28,6 +28,9 @@ public class Game
 
     private boolean isApplet; 
 
+    // XXX This should be added to the options menu.
+    private boolean autosaveEveryTurn = true;
+    
 
     public Game(boolean isApplet)
     {
@@ -74,29 +77,73 @@ public class Game
     }
 
 
-    // Use a Fisher-Yates shuffle to randomize towers.
+    public static String getPhaseName(int phase)
+    {
+        switch (phase)
+        {
+            case SPLIT:
+                return "Split";
+            case MOVE:
+                return "Move";
+            case FIGHT:
+                return "Fight";
+            case MUSTER:
+                return "Muster";
+            default:
+                return "?????";
+        }
+    }
+
+
+    // Randomize towers by rolling dice and rerolling ties.
     private void assignTowers()
     {
-        int [] playerTower = new int[6];
+        int [] playerTower = new int[numPlayers];
+        int [] rolls = new int[numPlayers];
 
-        for (int i = 0; i < 6; i++)
+        final int UNASSIGNED = 0;
+        for (int i = 0; i < numPlayers; i++)
         {
-            playerTower[i] = i + 1;
+            playerTower[i] = UNASSIGNED;
         }
 
-        for (int i = playerTower.length - 1; i >= 0; i--)
+        int playersLeft = numPlayers;
+        while (playersLeft > 0)
         {
-            int j = (int) Math.floor((i + 1) * Math.random());
-            if (i != j)
+            for (int i = 0; i < numPlayers; i++)
             {
-                int t = playerTower[i];
-                playerTower[i] = playerTower[j];
-                playerTower[j] = t;
+                if (playerTower[i] == UNASSIGNED)
+                {
+                    rolls[i] = rollDie();
+                }
+            }
+
+            for (int i = 0; i < numPlayers; i++)
+            {
+                if (playerTower[i] == 0)
+                {
+                    boolean unique = true;
+                    for (int j = 0; j < numPlayers; j++)
+                    {
+                        if (i != j && rolls[i] == rolls[j])
+                        {
+                            unique = false;
+                            break;
+                        }
+                    }
+                    if (unique)
+                    {
+                        playerTower[i] = rolls[i];
+                        playersLeft--;
+                    }
+                }
             }
         }
 
         for (int i = 0; i < numPlayers; i++)
         {
+            Game.logEvent(players[i].getName() + " gets tower " + 
+                playerTower[i]);
             players[i].setTower(playerTower[i]);
         }
     }
@@ -192,11 +239,13 @@ public class Game
         switch (remaining)
         {
             case 0:
+                Game.logEvent("Draw");
                 new MessageBox(board, "Draw");
                 dispose();
                 break;
 
             case 1:
+                Game.logEvent(players[winner].getName() + " wins");
                 new MessageBox(board, players[winner].getName() + " wins");
                 dispose();
                 break;
@@ -223,6 +272,7 @@ public class Game
     {
         board.unselectAllHexes();
         phase++;
+        Game.logEvent("Phase advances to " + Game.getPhaseName(phase));
     }
 
 
@@ -240,11 +290,15 @@ public class Game
         {
             advanceTurn();
         }
+        else
+        {
+            Game.logEvent("\n" + getActivePlayer().getName() + 
+                "'s turn, number " + turnNumber);
+        }
 
         updateStatusScreen();
 
-        // XXX This should be removed eventually.
-        if (!isApplet)
+        if (!isApplet && autosaveEveryTurn)
         {
             saveGame();
         }
@@ -1333,6 +1387,21 @@ public class Game
     public boolean isApplet()
     {
         return isApplet;
+    }
+
+
+    public static void logEvent(String s)
+    {
+        System.out.println(s);
+    }
+
+
+    // Put all die rolling in one place, in case we decide to
+    // change random number algorithms, use an external dice
+    // server, etc.
+    public static int rollDie()
+    {
+        return (int) Math.floor(6 * Math.random()) + 1;
     }
 
 

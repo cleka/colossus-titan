@@ -136,6 +136,10 @@ class SummonAngel extends Dialog implements MouseListener, ActionListener,
             // Update the number of creatures displayed in both stacks.
             donor.getCurrentHex().repaint();
             legion.getCurrentHex().repaint();
+        
+            Game.logEvent("An " + creature.getName() + 
+                " was summoned from legion " + donor.getMarkerId() +
+                " into legion " + legion.getMarkerId());
         }
 
         dispose();

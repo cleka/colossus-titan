@@ -220,7 +220,7 @@ class Player
 
     public int getTitanPower()
     {
-        return (int) (6 + (score / 100));
+        return (int) (6 + (getScore() / 100));
     }
 
 
@@ -332,7 +332,9 @@ class Player
             legions[i].hideAllCreatures();
         }
 
-        movementRoll = (int) Math.ceil(6 * Math.random());
+        movementRoll = Game.rollDie();
+        Game.logEvent(getName() + " rolled a " + movementRoll + 
+            " for movement");
     }
 
 
@@ -341,7 +343,7 @@ class Player
         if (mulligansLeft > 0)
         {
             undoAllMoves();
-            rollMovement();
+            Game.logEvent(getName() + " took a mulligan");
             mulligansLeft--;
         }
     }
@@ -665,6 +667,8 @@ class Player
         {
             game.updateStatusScreen();
         }
+
+        Game.logEvent(getName() + " earns " + points + " points");
     }
 
 
@@ -733,6 +737,8 @@ class Player
         game.updateStatusScreen();
 
         game.getBoard().repaint();
+
+        Game.logEvent(getName() + " dies");
 
         // See if the game is over.
         if (checkForVictory)

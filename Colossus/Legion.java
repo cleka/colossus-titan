@@ -236,16 +236,23 @@ class Legion
 
     public void moveToHex(MasterHex hex)
     {
+        boolean teleported = hex.teleported();
+        Game.logEvent("Legion " + getMarkerId() + " in " +
+            currentHex.getTerrainName() + " hex " + currentHex.getLabel() + 
+            (teleported ?  " teleports " : " moves ") + "to " + 
+            hex.getTerrainName() + " hex " + hex.getLabel());
+
         currentHex.removeLegion(this);
         currentHex = hex;
         currentHex.addLegion(this);
         moved = true;
         player.markLastLegionMoved(this);
         // If we teleported, no more teleports are allowed this turn.
-        if (currentHex.teleported())
+        if (teleported)
         {
             player.disallowTeleport();
         }
+
     }
 
 
@@ -260,6 +267,7 @@ class Legion
         currentHex = startingHex;
         currentHex.addLegion(this);
         moved = false;
+        Game.logEvent("Legion " + getMarkerId() + " undoes its move");
     }
 
 
@@ -319,6 +327,8 @@ class Legion
             removeCreature(height - 1);
 
             clearRecruited();
+
+            Game.logEvent("Legion " + getMarkerId() + " undoes its recruit");
         }
     }
 
@@ -488,6 +498,9 @@ class Legion
         // Prevent double-returning lords to stacks.
         height = 0;
         removeLegion();
+
+        Game.logEvent("Legion " + getMarkerId() + 
+            " recombined into legion " + legion.getMarkerId());
     }
 
 

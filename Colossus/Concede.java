@@ -32,8 +32,7 @@ class Concede extends Dialog implements ActionListener
     {
         super(parentFrame, ally.getPlayer().getName() + ": " + (flee ?
             "Flee" : "Concede") + " with Legion "  + ally.getMarkerId() +
-            " in " + ally.getCurrentHex().getTerrainName().toLowerCase() +
-            "?", true);
+            " in " + ally.getCurrentHex().getTerrainName() + "?", true);
 
         setLayout(gridbag);
 
@@ -212,6 +211,13 @@ class Concede extends Dialog implements ActionListener
             if (flee)
             {
                 points /= 2;
+                Game.logEvent("Legion " + ally.getMarkerId() + 
+                    " flees from legion " + enemy.getMarkerId());
+            }
+            else
+            {
+                Game.logEvent("Legion " + ally.getMarkerId() + 
+                    " concedes to legion " + enemy.getMarkerId());
             }
 
             // Remove the dead legion.

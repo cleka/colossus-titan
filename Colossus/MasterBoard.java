@@ -103,6 +103,8 @@ class MasterBoard extends Frame implements MouseListener,
                     new PickMarker(this, game.getPlayer(i));
                 }
                 while (game.getPlayer(i).getSelectedMarker() == null);
+                Game.logEvent(game.getPlayer(i).getName() + 
+                    " selected initial marker");
                 // Update status window to reflect marker taken.
                 game.updateStatusScreen();
             }
@@ -691,6 +693,8 @@ class MasterBoard extends Frame implements MouseListener,
 
         turn.setVisible(true);
         turn.setEnabled(true);
+
+        Game.logEvent("\n");
     }
 
 
@@ -1394,6 +1398,7 @@ class MasterBoard extends Frame implements MouseListener,
     }
 
 
+    // XXX This really needs to be split up.
     public void mousePressed(MouseEvent e)
     {
         Point point = e.getPoint();

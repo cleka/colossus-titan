@@ -149,8 +149,11 @@ public class PickColor extends Dialog implements WindowListener, ActionListener
 
     public void actionPerformed(ActionEvent e)
     {
+        String color = e.getActionCommand();
         // Send data back to game, and exit.
-        game.getPlayer(playerNum).setColor(e.getActionCommand());
+        Game.logEvent(game.getPlayer(playerNum).getName() + 
+            " chooses color " + color);
+        game.getPlayer(playerNum).setColor(color);
         dispose();
     }
 }
