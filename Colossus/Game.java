@@ -29,7 +29,6 @@ class Game extends Frame implements WindowListener, ActionListener
     Game()
     {
         super("Player Setup");
-        pack();
         setSize(300, 250);
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
         setLocation(new Point(d.width / 2 - getSize().width / 2, d.height / 2
@@ -52,6 +51,7 @@ class Game extends Frame implements WindowListener, ActionListener
         add(b2);
         b2.addActionListener(this);
 
+        pack();
         setVisible(true);
         addWindowListener(this);
     }
@@ -140,7 +140,6 @@ class Game extends Frame implements WindowListener, ActionListener
     }
 
 
-    // XXX This should eventually be one dialog per player.
     void chooseColors()
     {
         removeAll();
@@ -197,11 +196,12 @@ class Game extends Frame implements WindowListener, ActionListener
         add(b3);
         b3.addActionListener(this);
 
-        pack();
         setSize(230, 50 * numPlayers + 100);
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
         setLocation(new Point(d.width / 2 - getSize().width / 2, d.height / 2
                      - getSize().height / 2));
+
+        pack();
 
         for (int i = 1; i <= 6; i++)
         {
