@@ -40,6 +40,29 @@ public final class Player implements Comparable
         this.game = game;
     }
 
+    /**
+     *  Deep copy for AI; preserves game state but ignores UI state
+     */
+    public Player AICopy()
+    {
+	Player newPlayer = new Player(name, game);
+	newPlayer.color = color;              // Black, Blue, Brown, Gold, Green, Red
+	newPlayer.startingTower = startingTower;         // 1-6
+	newPlayer.score = score;              // track half-points, then round
+	newPlayer.summoned = summoned;
+	newPlayer.teleported = teleported;
+	newPlayer.playersEliminated = playersEliminated;  // RdBkGr
+	newPlayer.mulligansLeft = mulligansLeft;
+	newPlayer.movementRoll = movementRoll;
+	newPlayer.dead = dead;
+	newPlayer.ai = ai;
+	newPlayer.titanEliminated = titanEliminated;
+	for (int i = 0; i < legions.size(); i++)
+	    newPlayer.legions.add(i, ((Legion) legions.get(i)).AICopy());
+	// Strings are immutable, so a shallow copy == a deep copy
+	newPlayer.markersAvailable = (TreeSet) markersAvailable.clone();
+	return newPlayer;
+    }
 
     public boolean isDead()
     {

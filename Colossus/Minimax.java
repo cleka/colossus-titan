@@ -165,7 +165,13 @@ class Minimax
 			break;
 		}
 	    }
-	    if (maximize == AVERAGE)
+	    if (numMovesExamined  == 0)
+	    {
+		// no legal moves from here, so terminate
+		best_score = position.evaluation();
+		best_move = new FinalMove();
+	    }
+	    else if (maximize == AVERAGE)
 	    {
 		best_score /= numMovesExamined;
 		best_move = new FinalMove();

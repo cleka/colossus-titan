@@ -166,6 +166,29 @@ public final class Legion
         }
     }
 
+    /** deep copy for AI */
+    public Legion AICopy()
+    {
+	Legion newLegion = new Legion(markerId, parentId, currentHex, startingHex, 
+				      critters.size()>=1?(Creature)critters.get(0):null,
+				      critters.size()>=2?(Creature)critters.get(1):null,
+				      critters.size()>=3?(Creature)critters.get(2):null,
+				      critters.size()>=4?(Creature)critters.get(3):null,
+				      critters.size()>=5?(Creature)critters.get(4):null,
+				      critters.size()>=6?(Creature)critters.get(5):null,
+				      critters.size()>=7?(Creature)critters.get(6):null,
+				      critters.size()>=8?(Creature)critters.get(7):null, 
+				      player);
+	newLegion.moved = moved;
+	newLegion.recruited = recruited;
+	newLegion.battleTally = battleTally;
+	newLegion.entrySide = entrySide;
+	newLegion.teleported = teleported;
+	newLegion.teleportingLord = teleportingLord;
+	newLegion.marker = marker;
+	return newLegion;
+    }
+
 
     public int getPointValue()
     {
@@ -585,6 +608,12 @@ public final class Legion
         this.entrySide = entrySide;
     }
 
+
+    /** convenience method for AI */
+    public void addCreature(Creature creature)
+    {
+	addCreature(creature,false);
+    }
 
     /** Add a creature to this legion.  If takeFromStack is true,
         then do this only if such a creature remains in the stacks,

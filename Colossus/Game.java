@@ -80,8 +80,6 @@ public final class Game
     public static final String autoMasterMove = "Auto masterboard move";
     public static final String autoPlay = "Auto play";
 
-
-
     /** Start a new game. */
     public Game(GameApplet applet)
     {
@@ -110,6 +108,33 @@ public final class Game
     /** Default constructor, for testing only. */
     public Game()
     {
+    }
+
+
+    /**
+     * MaKe a deep copy for the AI to use.
+     * This preserves all game state but throws away a lot of the UI stuff
+     */
+    public Game AICopy()
+    {
+	//make sure to clear player options so that we don't get into an AI infinite loop
+	Game newGame = new Game();
+	for (int i =0; i < players.size(); i++)
+	    newGame.players.add(i, ((Player)players.get(i)).AICopy());
+	newGame.board = board; // don't need to deep copy this
+	newGame.activePlayerNum = activePlayerNum;
+	newGame.turnNumber = turnNumber;
+	newGame.statusScreen = null;
+	newGame.applet = null;
+	newGame.battle = null;
+	newGame.movementDie = null;
+	newGame.summonAngel = null;
+	newGame.caretaker = caretaker.AICopy();
+	newGame.phase = phase;
+	newGame.isApplet = false;
+	newGame.masterFrame = null;
+	newGame.engagementInProgress = false;
+	return newGame;
     }
 
 
@@ -330,6 +355,11 @@ public final class Game
         return activePlayerNum;
     }
 
+    /** for AI only */
+    public void setActivePlayerNum(int i)
+    {
+	activePlayerNum = i;
+    }
 
     public Player getPlayer(int i)
     {
@@ -3166,7 +3196,6 @@ public final class Game
                 break;
         }
     }
-
 
     public static void main(String [] args)
     {

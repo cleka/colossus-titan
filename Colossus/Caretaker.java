@@ -16,7 +16,6 @@ public class Caretaker
      */
     private HashMap map = new HashMap();
 
-
     public int getCount(Creature creature)
     {
 	Integer count = (Integer) map.get(creature.getName());
@@ -52,5 +51,17 @@ public class Caretaker
     {
 	Integer count = (Integer) map.get(creature.getName());
 	map.put(creature.getName(), new Integer(count.intValue()+1));
+    }
+
+    /**
+     * deep copy for AI
+     */
+    public Caretaker AICopy()
+    {
+	Caretaker newCaretaker = new Caretaker();
+	// because String and Integer are both immutable, a shallow copy is
+	// the same as a deep copy
+	newCaretaker.map = (HashMap) map.clone();
+	return newCaretaker;
     }
 }
