@@ -1,0 +1,22 @@
+B green       Brush     1 Gargoyle 2 Cyclops  2 Gorgon
+
+D orange      Desert    1 Lion     3 Griffon  2 Hydra
+
+H saddleBrown Hills     1 Ogre     3 Minotaur 2 Unicorn
+
+J darkGreen   Jungle    1 Gargoyle 2 Cyclops  3 Behemoth 2 Serpent
+
+M sienna      Marsh     1 Ogre     2 Troll    2 Ranger
+
+m red         Mountains 1 Lion     2 Minotaur 2 Dragon   2 Colossus
+
+P yellow      Plains    1 Centaur  2 Lion     2 Ranger
+
+S blue        Swamp     1 Troll    3 Wyvern   2 Hydra
+
+# Tower is a special case
+T grey        Tower     1 Centaur  1 Gargoyle 1 Ogre     3 Guardian 1 Warlock
+
+t skyBlue     Tundra    1 Troll    2 Warbear  2 Giant    2 Colossus
+
+W olive       Woods     1 Centaur  3 Warbear  2 Unicorn

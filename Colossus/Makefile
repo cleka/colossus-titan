@@ -81,12 +81,11 @@ $(JARFILE): net/sf/colossus/parser/StrategicMapLoader.java \
 	net/sf/colossus/parser/CreatureLoader.java \
 	net/sf/colossus/parser/BattlelandLoader.java \
 	net/sf/colossus/parser/VariantLoader.java \
-	$(CLASS_FILES) $(IMAGES) META-INF/MANIFEST.MF StrategicMap.map
+	$(CLASS_FILES) $(IMAGES) META-INF/MANIFEST.MF
 	jar -mcf META-INF/MANIFEST.MF Colossus.jar \
         net/sf/colossus/client/*.class net/sf/colossus/server/*.class \
         net/sf/colossus/util/*.class net/sf/colossus/parser/*.class \
-        images/*.gif StrategicMap.map Recruit.ter Creature.cre Default.var \
-        Battlelands images/ResourceAnchor.class
+        images/*.gif Default Battlelands
 	chmod +x Colossus.jar
 
 # Sign jar file.  This target uses dripton's key; other developers can

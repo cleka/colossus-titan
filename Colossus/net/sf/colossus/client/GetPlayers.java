@@ -50,11 +50,11 @@ public final class GetPlayers extends JDialog implements WindowListener,
     private static java.util.List playerInfo = new ArrayList();
 
     private static final String pathSeparator = "/";
-    private static String varDirectory = "";
+    private static String varDirectory = "Default";
     private static String variantName = "Default.var";
-    private static String mapName = "StrategicMap.map";
-    private static String recruitName = "Recruit.ter";
-    private static String creaturesName = "Creature.cre";
+    private static String mapName = "Default.map";
+    private static String recruitName = "Default.ter";
+    private static String creaturesName = "Default.cre";
     private static String anyAI = "A Random AI";
     private static String defaultAI = "SimpleAI";
     /* aiList should match the class name of available AI */
@@ -380,7 +380,7 @@ public final class GetPlayers extends JDialog implements WindowListener,
         mapChooser.setDialogTitle(
             "Choose your map (or cancel for default map)");
         int returnVal = mapChooser.showOpenDialog(mapChooser);
-        String mapName = "StrategicMap.map";
+        String mapName = "Default.map";
         if (returnVal == javax.swing.JFileChooser.APPROVE_OPTION) 
         {
             mapName = mapChooser.getSelectedFile().getAbsolutePath();
@@ -395,7 +395,7 @@ public final class GetPlayers extends JDialog implements WindowListener,
         recChooser.setDialogTitle(
             "Choose your recruiters base (or cancel for default base)");
         int returnVal = recChooser.showOpenDialog(recChooser);
-        String recName = "Recruit.ter";
+        String recName = "Default.ter";
         if (returnVal == javax.swing.JFileChooser.APPROVE_OPTION) 
         {
             recName = recChooser.getSelectedFile().getAbsolutePath();
@@ -410,7 +410,7 @@ public final class GetPlayers extends JDialog implements WindowListener,
         creChooser.setDialogTitle(
             "Choose your creatures base (or cancel for default base)");
         int returnVal = creChooser.showOpenDialog(creChooser);
-        String creName = "Creature.cre";
+        String creName = "Default.cre";
         if (returnVal == javax.swing.JFileChooser.APPROVE_OPTION) 
         {
             creName = creChooser.getSelectedFile().getAbsolutePath();
@@ -445,9 +445,9 @@ public final class GetPlayers extends JDialog implements WindowListener,
         varChooser.setDialogTitle(
             "Choose your variant (or cancel for default game)");
         int returnVal = varChooser.showOpenDialog(varChooser);
-        String varName = "Default.var";
-        String shortVarName = varName;
-        varDirectory = "";
+        String varName = "Default" + pathSeparator + "Default.var";
+        String shortVarName = "Default.var";
+        varDirectory = "Default";
         if (returnVal == javax.swing.JFileChooser.APPROVE_OPTION)
         {
             File varFile = varChooser.getSelectedFile();

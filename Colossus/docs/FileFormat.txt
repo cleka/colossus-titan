@@ -4,7 +4,10 @@ This file document file formats for the various datafile used
 by Colossus. In all these files, comments start with
 a "#" and extend to the end-of-line.
 
-1) MAP file format (default file used: StrategicMap.map)
+All files, and the two subdirectory 'Battlelands' and 'images'
+should be in the same directory.
+
+1) MAP file format (default file used: Default/Default.map)
 
 This file define the Colossus Masterboard ; what terrain type to use
 for an hex and what sort of exit to which hex. It's composed
@@ -34,7 +37,7 @@ and on columns 4 and 3).
 
 At the moment, max size is the same as the default master board.
 
-2) TER file format (default file used: Recruit.ter)
+2) TER file format (default file used: Default/Default.ter)
 
 This file define the Colossus Recruit Trees ; what
 can recruit and be recruited on what terrain. it's composed
@@ -72,7 +75,7 @@ creatures (starting legion will get 2 of each).
 Note: for the guardian or the guardian replacement, any value
 other than '3' will _not_ work.
 
-3) CRE file format (default file used: Creature.cre)
+3) CRE file format (default file used: Default/Default.cre)
 
 This file define the Colossus Creatures ; it's composed
 of a succession of lines:
@@ -122,7 +125,7 @@ where <border_number> is between 0 and 5 and <bordet_type> is currently
 one of: d, c, s, w (Dune, Cliff, Slope, Wall) ; space (' ') is allowed,
 but it is the default 'no obstacle' and so it is not needed.
 
-5) VAR file format (default file used: Default.var)
+5) VAR file format (default file used: Default/Default.var)
 
 This file contains a variant definition, i.e. which
 MAP, CRE and TER file should be used.
