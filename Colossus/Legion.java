@@ -520,7 +520,7 @@ class Legion
 
 
     // Reveal the lord who teleported the legion.  Pick one if necessary.
-    public void revealTeleportingLord()
+    public void revealTeleportingLord(Frame parentFrame)
     {
         // Count how many types of lords are in the stack.  If only one,
         // reveal it.
@@ -552,25 +552,12 @@ class Legion
             }
             else if (archangels == 1)
             {
-                revealCreatures( Creature.archangel, 1);
+                revealCreatures(Creature.archangel, 1);
             }
         }
         else
         {
-            // XXX Need a dialog for this.  For now, reveal angels then
-            // archangels than titan.
-            if (angels == 1)
-            {
-                revealCreatures(Creature.angel, 1);
-            }
-            else if (archangels == 1)
-            {
-                revealCreatures(Creature.archangel, 1);
-            }
-            else
-            {
-                revealCreatures(Creature.titan, 1);
-            }
+            new PickLord(parentFrame, this);
         }
     }
 }
