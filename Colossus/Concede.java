@@ -125,11 +125,10 @@ class Concede extends Dialog implements ActionListener
         {
             Insets insets = getInsets(); 
             Dimension d = getSize();
-            // XXX: Need to ensure minimum width of buttons.
-            button1.setBounds(insets.left + d.width / 8, 7 * d.height / 8 - 
-                insets.bottom, d.width / 4, d.height / 8);
-            button2.setBounds(5 * d.width / 8 - insets.right, 
-                7 * d.height / 8 - insets.bottom, d.width / 4, d.height / 8);
+            button1.setBounds(insets.left + d.width / 9, 7 * d.height / 8 - 
+                insets.bottom, d.width / 3, d.height / 8);
+            button2.setBounds(5 * d.width / 9 - insets.right, 
+                7 * d.height / 8 - insets.bottom, d.width / 3, d.height / 8);
         }
 
     }
@@ -183,7 +182,7 @@ class Concede extends Dialog implements ActionListener
 
     public Dimension getPreferredSize()
     {
-        return new Dimension((21 * scale / 20) * (Math.max(friend.getHeight(),
-            enemy.getHeight()) + 1), 7 * scale / 2);
+        return new Dimension(scale * (Math.max(friend.getHeight(),
+            enemy.getHeight()) + 2), 4 * scale);
     }
 }
