@@ -13,8 +13,9 @@ import net.sf.colossus.util.Log;
  */
 public class DevRandom extends Random
 {
-    private final static String urandomFilename = "/dev/urandom";
-    private final static String randomFilename = "/dev/random";
+    final static String urandomFilename = "/dev/urandom";
+    final static String randomFilename = "/dev/random";
+    final static String PRNG = "PRNG";
     private String source = urandomFilename;
     private File randomSource = null;
     private FileInputStream randStream = null;
@@ -34,6 +35,11 @@ public class DevRandom extends Random
     
     private void init()
     {
+        if (source.equals(PRNG))
+        {
+            // Don't try other sources.
+            return;
+        }
         randomSource = new File(source);
         if ((randomSource == null) || (!randomSource.exists()))
         {
@@ -72,9 +78,13 @@ public class DevRandom extends Random
             return super.next(bits);
         }
         if (bits > 32)
+        {
             bits = 32;
+        }
         if (bits < 1)
+        {
             bits = 1;
+        }
         int size = (bits + 7) / 8;
         int mask = (1 << bits) - 1;
         byte [] bytes = new byte[size];

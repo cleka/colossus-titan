@@ -7,6 +7,7 @@ import net.sf.colossus.util.Log;
 import net.sf.colossus.util.Probs;
 import net.sf.colossus.util.Perms;
 import net.sf.colossus.util.Options;
+import net.sf.colossus.util.DevRandom;
 import net.sf.colossus.parser.TerrainRecruitLoader;
 import net.sf.colossus.server.Creature;
 import net.sf.colossus.server.Constants;
@@ -29,7 +30,7 @@ public class SimpleAI implements AI
     };
     private int timeLimit = Constants.DEFAULT_AI_TIME_LIMIT;  // in s
     private boolean timeIsUp;
-    private Random random = new net.sf.colossus.util.DevRandom();
+    private Random random = new DevRandom();
 
     public SimpleAI(Client client)
     {

@@ -359,21 +359,18 @@ public final class Game
     /** Randomize towers by rolling dice and rerolling ties. */
     private void assignTowers()
     {
-        boolean balanced = getOption(Options.balancedTowers);
-
         int numPlayers = getNumPlayers();
         String[] playerTower = new String[numPlayers];
         Set towerSet = MasterBoard.getTowerSet();
         ArrayList towerList = new ArrayList();
 
         Iterator it = towerSet.iterator();
-
         while (it.hasNext())
         { // first, fill the list with all Label
             towerList.add(it.next());
         }
 
-        if (balanced)
+        if (getOption(Options.balancedTowers))
         {
             towerList = getBalancedTowers(numPlayers, towerList);
         }
@@ -383,7 +380,6 @@ public final class Game
         while ((playersLeft >= 0) && (!towerList.isEmpty()))
         {
             int which = Dice.rollDie(towerList.size());
-
             playerTower[playersLeft] = (String)towerList.remove(which - 1);
             playersLeft--;
         }
@@ -391,7 +387,6 @@ public final class Game
         for (int i = 0; i < numPlayers; i++)
         {
             Player player = getPlayer(i);
-
             Log.event(player.getName() + " gets tower " + playerTower[i]);
             player.setTower(playerTower[i]);
         }
