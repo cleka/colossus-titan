@@ -300,7 +300,8 @@ public final class Client implements IClient, IOracle, IOptions
                 _tellEngagementResults_attackerStartingContents,
                 _tellEngagementResults_defenderStartingContents,
                 _tellEngagementResults_attackerLegionCertainities,
-                _tellEngagementResults_defenderLegionCertainities);
+                _tellEngagementResults_defenderLegionCertainities,
+                isMyTurn());
         }
         else
         {

@@ -2,6 +2,7 @@ package net.sf.colossus.client;
 
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.FlowLayout;
@@ -10,6 +11,8 @@ import java.awt.Container;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -29,8 +32,8 @@ import net.sf.colossus.util.Options;
  * Post-engagement status dialog.
  *
  * It collects the results of all battles that are send by 'addData()`.
- * after that it pops open the dialog, presenting the just added entry.
- * In the dialog one can go forward and back, and drop boring results.
+ *
+ * @todo fix layout so the empty dialog can be shown 
  *
  * @version $Id$
  * @author Towi
@@ -42,10 +45,25 @@ final class EngagementResults
 {
     private IOracle oracle;
     private IOptions options;
+    
     private int current = -1;
     private int lastSeen = -1;
+    
     private ArrayList engagementLog = new ArrayList();
 	private SaveWindow saveWindow;
+
+    private JButton firstButton;
+    private JButton prevButton;
+    private JButton nextButton;
+    private JButton lastButton;
+	private JLabel turnLabel;
+	private JLabel summaryLabel;
+	private JLabel resultLabel;
+	private JLabel pointsLabel;
+	private JLabel attackerIdLabel;
+	private JLabel defenderIdLabel;
+	private JPanel panelCenter;
+	private boolean moveNext;
 
     /** 
      * inits the diaolog, not opens it.
@@ -53,20 +71,37 @@ final class EngagementResults
      * @param oracle gives us information
      */
     EngagementResults(final JFrame frame, final IOracle oracle, 
-            IOptions options)
+            final IOptions options)
     {
         super(frame, "Engagement Status", false);
         setFocusable(false);
         this.oracle = oracle;
         this.options = options;
         setBackground(Color.lightGray);
+        setupGUI();
+        
         setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
+        this.addWindowListener(new WindowAdapter() {
+        	public void windowClosing(WindowEvent e) {
+				super.windowClosing(e);
+                options.setOption(Options.showEngagementResults, false);
+			}
+        });
         
         this.saveWindow = new SaveWindow(options, "EngagementResultView");
         saveWindow.restore(this, new Point(0,0));
     }
 
-    /** adds a log record to the list of logged engagements.
+    /**
+     * Adds a log record to the list of logged engagements.
+     * 
+     * Now the dialog moves to the new engagement if either
+     * - the engagement happens in the attacker's turn
+     * - it is the first one after the attacker's turn
+     * The idea behind this design is that the dialog content moves along with 
+     * the player when the player is in charge of the game tempo, but if the player
+     * is only passive the engagements stop moving until the player takes control 
+     * by either continuing to play or by clicking the next button.
      *
      * TODO: see if xxxStartingCertainities can somehow get values
      *   of better quality.
@@ -79,6 +114,9 @@ final class EngagementResults
      *   for overlay ?-marks
      * @param defenderStartingCertainities - list of Booleans,
      *   for overlay ?-marks
+     * @param attackersTurn should be set to true if the engagement happened
+     *   in the attackers master board turn. The engagement dialog will be moved
+     *   to this engagement, the same will happen with the next
      */
     void addData(
         String winnerId, // null on mutual elim, flee, concede, negotiate
@@ -88,7 +126,8 @@ final class EngagementResults
         List attackerStartingContents,
         List defenderStartingContents,
         List attackerStartingCertainities,
-        List defenderStartingCertainities
+        List defenderStartingCertainities,
+        boolean attackersTurn
         )
     {
         Engagement result = new Engagement(winnerId,
@@ -101,250 +140,188 @@ final class EngagementResults
                 defenderStartingCertainities,
                 oracle
         );       
-        EngagementLogEntry elog = new EngagementLogEntry(result);
-        engagementLog.add(elog);
+        this.engagementLog.add(result);
         
         if(this.current == -1)
         {
         	this.current = 0;
         }
+        
+        if(attackersTurn || this.moveNext) {
+        	this.current = this.engagementLog.size() - 1;
+        }
+        // iff we are in the attackers turn, the next engagement
+        // should be placed automatically, too
+        this.moveNext = attackersTurn; 
 
         showCurrent();
+        maybeShow();
     }
 
-
-    /** one log entry. can show itself into a swing container.
-     * @todo the model part has been extracted into ths Engagement class,
-     * this class should disappear now in favour of doing the GUI layout only once
-     * in the outer class.
+    /** like toString into a swing component.
+     * the current rough layout is:
+     * <pre>
+     *  ### Content:BorderLayout ########################
+     *  # +--North:GridLayout(n,1)--------------------+ #
+     *  # | Label_1                                   | #
+     *  # | Label_2                                   | #
+     *  # | ...                                       | #
+     *  # | Label_n                                   | #
+     *  # +-------------------------------------------+ #
+     *  #===============================================#
+     *  # +West:Grid(4,1)-+  %  +-Center:Grid(4,1)----+ #
+     *  # | Label_bef_att |  %  | ImageList_bef_att   | #
+     *  # | Label_bef_def |  %  | ImageList_bef_def   | #
+     *  # | Label_aft_att |  %  | ImageList_aft_att   | #
+     *  # | Label_aft_def |  %  | ImageList_aft_def   | #
+     *  # +---------------+  %  +---------------------+ #
+     *  #===============================================#
+     *  # +-South:FlowLayout(left)--------------------+ #
+     *  # |  -buttons-                                | #
+     *  # +-------------------------------------------+ #
+     *  #################################################
+     * </pre>
      */
-    private class EngagementLogEntry
+    private void setupGUI()
     {
-        private Engagement result;
+        Container contentPane = this.getContentPane();        
+        contentPane.setLayout(new BorderLayout());
 
-		public EngagementLogEntry(Engagement result) {
-			this.result = result;
-		}
+        //    space for Labels
+        JPanel panelNorth  = new JPanel();
+        panelNorth.setLayout(new GridLayout(4,1, 0,2));
+        panelNorth.setBackground(Color.GRAY);
+        contentPane.add(panelNorth,  BorderLayout.NORTH);
 
-        /** make some of the background colors more distiguishable */
-        private final static boolean COLORFUL = true;
-		private JButton firstButton;
-		private JButton prevButton;
-		private JButton nextButton;
-		private JButton lastButton;
-        /** like toString into a swing component.
-         * the current rough layout is:
-         * <pre>
-         *  ### Content:BorderLayout ########################
-         *  # +--North:GridLayout(n,1)--------------------+ #
-         *  # | Label_1                                   | #
-         *  # | Label_2                                   | #
-         *  # | ...                                       | #
-         *  # | Label_n                                   | #
-         *  # +-------------------------------------------+ #
-         *  #===============================================#
-         *  # +West:Grid(4,1)-+  %  +-Center:Grid(4,1)----+ #
-         *  # | Label_bef_att |  %  | ImageList_bef_att   | #
-         *  # | Label_bef_def |  %  | ImageList_bef_def   | #
-         *  # | Label_aft_att |  %  | ImageList_aft_att   | #
-         *  # | Label_aft_def |  %  | ImageList_aft_def   | #
-         *  # +---------------+  %  +---------------------+ #
-         *  #===============================================#
-         *  # +-South:FlowLayout(left)--------------------+ #
-         *  # |  -buttons-                                | #
-         *  # +-------------------------------------------+ #
-         *  #################################################
-         * </pre>
-         */
-        void show(Container cnt)
+        //    space for imagelists
+        this.panelCenter = new JPanel();
+        panelCenter.setLayout(new GridLayout(3,1, 0,2));
+        contentPane.add(panelCenter, BorderLayout.CENTER);
+
+        //    space for list labels
+        JPanel panelWest = new JPanel();
+        panelWest.setLayout(new GridLayout(6,1, 0,2));
+        contentPane.add(panelWest, BorderLayout.WEST);
+
+        //    space for navigate buttons
+        JPanel panelSouth  = new JPanel();
+        panelSouth.setLayout(new FlowLayout(FlowLayout.LEFT));
+        contentPane.add(panelSouth, BorderLayout.SOUTH);
+        panelSouth.setBackground(Color.GRAY);
+
+        //
+        // add elements
+        //
+        //  north
+        this.turnLabel = new JLabel();
+        this.summaryLabel = new JLabel();
+        this.resultLabel = new JLabel();
+        this.pointsLabel = new JLabel();
+
+        panelNorth.add(this.turnLabel);
+        panelNorth.add(this.summaryLabel);
+        panelNorth.add(this.resultLabel);
+        panelNorth.add(this.pointsLabel);
+
+        // west
+        this.attackerIdLabel = new JLabel();
+        this.attackerIdLabel.setForeground(Color.BLUE);
+        this.defenderIdLabel = new JLabel();
+        this.defenderIdLabel.setForeground(Color.BLUE);
+
+        panelWest.add(new JLabel("Attacker"));
+        panelWest.add(this.attackerIdLabel);
+        panelWest.add(new JLabel("Defender"));
+        panelWest.add(this.defenderIdLabel);
+        panelWest.add(new JLabel("Winner"));
+
+        //  center gets only prepared for the chits
+        
+        //  south
+        this.firstButton = new JButton("First");
+        firstButton.addActionListener(new ActionListener(){
+        	public void actionPerformed(ActionEvent e){
+                current = 0;
+                showCurrent();
+        	}    
+        });
+        panelSouth.add(firstButton);
+
+        this.prevButton = new JButton("Previous");
+        prevButton.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent e) {
+                current--;
+                showCurrent();
+        	}   
+        });
+        panelSouth.add(prevButton);
+
+        this.nextButton = new JButton("Next");
+        nextButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                current++;
+                showCurrent();
+			}   
+        });
+        panelSouth.add(nextButton);
+
+        this.lastButton = new JButton("Last");
+        lastButton.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent e) {
+                current = engagementLog.size() - 1;
+                showCurrent();
+			}
+        });
+        panelSouth.add(lastButton);
+
+        JButton hideButton = new JButton("Hide");
+        hideButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                hide();
+            }
+        });
+        panelSouth.add(hideButton);
+    }
+    
+    private Component createLegionComponent(String markerId,
+            List imageNames,
+            List certainList,
+            boolean isStarting,
+            boolean isDefender)
+    {
+        // prepare my box
+        Box panel = Box.createHorizontalBox();
+        if (isDefender)
         {
-            // setup the containers
-            cnt.removeAll();
-            cnt.setLayout(new BorderLayout());
-
-            //    space for Labels
-            JPanel panelNorth  = new JPanel();
-            panelNorth.setLayout(new GridLayout(4,1, 0,2));
-            cnt.add(panelNorth,  BorderLayout.NORTH);
-            if(COLORFUL)
-            {
-                panelNorth.setBackground(Color.GRAY);
-            }
-
-            //    space for imagelists
-            JPanel panelCenter = new JPanel();
-            panelCenter.setLayout(new GridLayout(3,1, 0,2));
-            cnt.add(panelCenter, BorderLayout.CENTER);
-
-            //    space for list labels
-            JPanel panelWest = new JPanel();
-            panelWest.setLayout(new GridLayout(6,1, 0,2));
-            cnt.add(panelWest, BorderLayout.WEST);
-
-            //    space for navigate buttons
-            JPanel panelSouth  = new JPanel();
-            panelSouth.setLayout(new FlowLayout(FlowLayout.LEFT));
-            cnt.add(panelSouth, BorderLayout.SOUTH);
-            if(COLORFUL)
-            {
-                panelSouth.setBackground(Color.GRAY);
-            }
-
-            //
-            // add elements
-            //
-            //  north
-            panelNorth.add(new JLabel("Turn " + result.gameTurn));
-            panelNorth.add(new JLabel(result.attackerId + " attacked " + result.defenderId
-                + " in "
-                + MasterBoard.getHexByLabel(result.hexLabel).getDescription()));
-            panelNorth.add(new JLabel(result.getResultText()));
-            if(result.winnerId!=null)
-            {
-                panelNorth.add(new JLabel(result.winnerId + " earned "
-                    + result.points + " points"));
-            }
-
-            // west
-            panelWest.add(new JLabel("Atacker"));
-            JLabel l = new JLabel(result.attackerId);
-            l.setForeground(Color.BLUE);
-            panelWest.add(l);
-            panelWest.add(new JLabel("Defender"));
-            l = new JLabel(result.defenderId);
-            l.setForeground(Color.BLUE);
-            panelWest.add(l);
-            panelWest.add(new JLabel("Winner"));
-
-
-            //  center
-            _legion(result.attackerId,
-                result.attackerStartingContents, result.attackerStartingCertainities,
-                panelCenter, true, false, false);
-
-            _legion(result.defenderId,
-                result.defenderStartingContents, result.defenderStartingCertainities,
-                panelCenter, true, true, false);
-            if (result.attackerId.equals(result.winnerId))
-            {
-                _legion(result.attackerId,
-                    result.attackerEndingContents, result.attackerEndingCertainties,
-                    panelCenter, false, false, false);
-            }
-            else if (result.defenderId.equals(result.winnerId))
-            {
-                _legion(result.defenderId,
-                result.defenderEndingContents, result.defenderEndingCertainties,
-                panelCenter, false, true, false);
-            }
- 
-            //  south
-            this.firstButton = new JButton("First");
-            firstButton.addActionListener(new ActionListener(){
-            	public void actionPerformed(ActionEvent e){
-                    current = 0;
-                    showCurrent();
-            	}    
-            });
-            panelSouth.add(firstButton);
-            this.firstButton.setEnabled(current != 0);
-
-            this.prevButton = new JButton("Previous");
-            prevButton.addActionListener(new ActionListener() {
-            	public void actionPerformed(ActionEvent e) {
-                    current--;
-                    showCurrent();
-            	}   
-            });
-            panelSouth.add(prevButton);
-            this.prevButton.setEnabled(current != 0);
-
-            if(current != engagementLog.size()-1)
-            {
-                this.nextButton = new JButton("Next");
-                nextButton.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent e) {
-                        current++;
-                        showCurrent();
-        			}   
-                });
-            }
-            else
-            {
-                this.nextButton = new JButton("Hide");
-                nextButton.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent e) {
-                        current++;
-                        hide();
-                    }   
-                });
-            }   
-            panelSouth.add(nextButton);
-
-            this.lastButton = new JButton("Last");
-            lastButton.addActionListener(new ActionListener() {
-            	public void actionPerformed(ActionEvent e) {
-                    current = engagementLog.size() - 1;
-                    showCurrent();
-				}
-            });
-            panelSouth.add(lastButton);
-            this.lastButton.setEnabled(current != engagementLog.size()-1);
-
-            // finish
+            panel.setBackground(Color.WHITE);
         }
-
-        /** helper for show */
-        void _legion(String markerId,
-                List imageNames,
-                List certainList,
-                Container cnt,
-                boolean isStarting,
-                boolean isDefender,
-                boolean isDead)
+        int scale = 3 * Scale.get(); // or 3 or 4?
+        // add marker
+        Marker marker = new Marker(scale, markerId, panel, null);
+        panel.add(marker);
+        panel.add(Box.createHorizontalStrut(5));
+        // towi: you want it upside down or not? then remove "false"
+        final boolean inverse = false && isDefender;
+        // add chits
+        int idx = 0;
+        for (Iterator it = imageNames.iterator(); it.hasNext(); )
         {
-            // prepare my box
-            Box panel = Box.createHorizontalBox();
-            if (COLORFUL && isDefender)
-            {
-                panel.setBackground(Color.WHITE);
-            }
-            cnt.add(panel);
-            int scale = 3 * Scale.get(); // or 3 or 4?
-            // add marker
-            Marker marker = new Marker(scale, markerId, cnt, null);
-            if (isDead)
-            {
-                marker.setDead(true);
-            }
-            panel.add(marker);
-            panel.add(Box.createHorizontalStrut(5));
-            // towi: you want it upside down or not? then remove "false"
-            final boolean inverse = false && isDefender;
-            // add chits
-            int idx = 0;
-            for (Iterator it = imageNames.iterator(); it.hasNext(); )
-            {
-                final String imageName = (String) it.next();
-                final Boolean chitCertain = (Boolean) certainList.get(idx);
-                final boolean showDubious = !chitCertain.booleanValue();
-                Chit chit = new Chit(scale, imageName, cnt,
-                    inverse, showDubious);
-                if (isDead)
-                {
-                    chit.setDead(true);
-                }
-                panel.add(chit);
-                idx += 1;
-            }
-            // make list always 7 wide with invisible chits. not perfect.
-            for (int i = idx; i < 7; i++)
-            {
-                panel.add(Box.createRigidArea(new Dimension(scale, scale)));
-            }
-            // expand space
-            panel.add(Box.createHorizontalGlue());
+            final String imageName = (String) it.next();
+            final Boolean chitCertain = (Boolean) certainList.get(idx);
+            final boolean showDubious = !chitCertain.booleanValue();
+            Chit chit = new Chit(scale, imageName, panel,
+                inverse, showDubious);
+            panel.add(chit);
+            idx += 1;
         }
+        // make list always 7 wide with invisible chits. not perfect.
+        for (int i = idx; i < 7; i++)
+        {
+            panel.add(Box.createRigidArea(new Dimension(scale, scale)));
+        }
+        // expand space
+        panel.add(Box.createHorizontalGlue());
+        return panel;
     }
 
     private void showCurrent() 
@@ -360,15 +337,53 @@ final class EngagementResults
         }
         else
         {
-            EngagementLogEntry elog =
-                (EngagementLogEntry) engagementLog.get(current);
-            Container contentPane = getContentPane();
-            elog.show(contentPane);
+            Engagement result = (Engagement) engagementLog.get(current);
             this.setTitle("Engagement " + (current + 1)
                 + " of " + engagementLog.size());
+            this.turnLabel.setText("Turn " + result.gameTurn);
+            this.summaryLabel.setText(result.attackerId + " attacked " + result.defenderId
+            		                  + " in "
+									  + MasterBoard.getHexByLabel(result.hexLabel).getDescription());
+            this.resultLabel.setText(result.getResultText());                          
+            if(result.winnerId!=null)
+            {
+                this.pointsLabel.setText(result.winnerId + " earned "
+                    + result.points + " points");
+            }
+            else
+            {
+            	this.pointsLabel.setText("");
+            }
+            this.attackerIdLabel.setText(result.attackerId);
+            this.defenderIdLabel.setText(result.defenderId);
+            
+            this.firstButton.setEnabled(current != 0);
+            this.prevButton.setEnabled(current != 0);
+            this.nextButton.setEnabled(current != engagementLog.size()-1);
+            this.lastButton.setEnabled(current != engagementLog.size()-1);
+
+            this.panelCenter.removeAll();            
+            this.panelCenter.add(createLegionComponent(result.attackerId,
+                    result.attackerStartingContents, result.attackerStartingCertainities,
+                    true, false));
+            this.panelCenter.add(createLegionComponent(result.defenderId,
+                    result.defenderStartingContents, result.defenderStartingCertainities,
+                    true, true));
+            if (result.attackerId.equals(result.winnerId))
+            {
+                this.panelCenter.add(createLegionComponent(result.attackerId,
+                    result.attackerEndingContents, result.attackerEndingCertainties,
+                    false, false));
+            }
+            else if (result.defenderId.equals(result.winnerId))
+            {
+                this.panelCenter.add(createLegionComponent(result.defenderId,
+                    result.defenderEndingContents, result.defenderEndingCertainties,
+                    false, true));
+            }
+
             this.lastSeen = Math.max(this.lastSeen, this.current);
         }
-        maybeShow();
     }
 
     void maybeShow()
