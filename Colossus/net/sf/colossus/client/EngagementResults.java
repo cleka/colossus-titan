@@ -363,6 +363,10 @@ final class EngagementResults
                     result.defenderEndingContents, result.defenderEndingCertainties,
                     false, true));
             }
+            else
+            {
+                this.panelCenter.add(new JPanel());
+            }
 
             this.lastSeen = Math.max(this.lastSeen, this.current);
         }
