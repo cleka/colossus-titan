@@ -820,6 +820,21 @@ Log.debug("Called Server.acquireAngel() for " + markerId + " " + angelType);
         }
     }
 
+    void allTellDriftDamageResults(Critter target, int damage)
+    {
+        this.target = target;
+        this.damage = damage;
+
+        Iterator it = clients.iterator();
+        while (it.hasNext())
+        {
+            Client client = (Client)it.next();
+            client.tellStrikeResults("hex damage", -1, target.getDescription(),
+                target.getTag(), 0, null, damage, target.isDead(), false, 
+                0, null);
+        }
+    }
+
 
     void allSetBattleWaitCursor()
     {

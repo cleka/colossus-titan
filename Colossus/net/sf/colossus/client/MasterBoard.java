@@ -1145,8 +1145,8 @@ public final class MasterBoard extends JPanel
             JMenuItem mi;
 
             mi = phaseMenu.add(clearRecruitChitsAction);
-            mi.setMnemonic(KeyEvent.VK_SPACE);
-            mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0));
+            mi.setMnemonic(KeyEvent.VK_C);
+            mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, 0));
 
             phaseMenu.addSeparator();
     
@@ -1197,8 +1197,8 @@ public final class MasterBoard extends JPanel
             JMenuItem mi;
 
             mi = phaseMenu.add(clearRecruitChitsAction);
-            mi.setMnemonic(KeyEvent.VK_SPACE);
-            mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0));
+            mi.setMnemonic(KeyEvent.VK_C);
+            mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, 0));
 
             phaseMenu.addSeparator();
 
@@ -1233,8 +1233,8 @@ public final class MasterBoard extends JPanel
             JMenuItem mi;
     
             mi = phaseMenu.add(clearRecruitChitsAction);
-            mi.setMnemonic(KeyEvent.VK_SPACE);
-            mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0));
+            mi.setMnemonic(KeyEvent.VK_C);
+            mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, 0));
 
             phaseMenu.addSeparator();
 

@@ -70,6 +70,7 @@ final class AcquireAngel extends JDialog implements MouseListener,
     void cleanup(String angelType)
     {
         client.acquireAngelCallback(markerId, angelType);
+        dispose();
     }
 
 
@@ -80,9 +81,6 @@ final class AcquireAngel extends JDialog implements MouseListener,
         if (i != -1)
         {
             cleanup((String)recruits.get(i));
-
-            // Then exit.
-            dispose();
         }
     }
 

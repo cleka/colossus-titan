@@ -894,6 +894,7 @@ final class Battle
                 {
                     critter.wound(dam);
                     Log.event(critter.getName() + " takes Hex damage");
+                    server.allTellDriftDamageResults(critter, dam);
                 }
             }
         }

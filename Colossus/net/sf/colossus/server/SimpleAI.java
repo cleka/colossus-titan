@@ -48,6 +48,8 @@ public class SimpleAI implements AI
 
     public String pickMarker(Set markerIds, String preferredShortColor)
     {
+// XXX AI players are still picking the wrong markers.
+Log.debug("called SimpleAI.pickMarker with " + markerIds.size() + " markers and preferred color " + preferredShortColor);
         Iterator it = markerIds.iterator();
         String markerId = null;
         while (it.hasNext())
@@ -98,6 +100,12 @@ public class SimpleAI implements AI
                         game.getServer().didRecruit(legion);
                     }
                 }
+            }
+// XXX Why doesn't the AI recruit base tower creatures?
+            else if (legion.getCurrentHex().getTerrain() == 'T')
+            {
+Log.debug(legion.getLongMarkerName() + " not recruiting in tower  moved=" +
+legion.hasMoved() + " canRecruit=" + legion.canRecruit());
             }
         }
     }

@@ -100,3 +100,5 @@ Show StatusScreen and ShowLegion info in the masterboard window, rather
 
 Add movement and recruit animation.  Requires returning full paths for
    moves, not just destination hex.
+
+Bug: Drift damage not passed to client.

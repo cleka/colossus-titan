@@ -837,9 +837,16 @@ Log.debug("called board.alignLegions() for " + hexLabel);
         return summonAngel;
     }
 
+    // Only called for human players.
     public void createSummonAngel(String markerId, String longMarkerName)
     {
+        if (board == null)
+        {
+            Log.error("Called createSummonAngel() with null board");
+            return;
+        }
         board.deiconify();
+        board.getFrame().toFront();
         summonAngel = SummonAngel.summonAngel(this, markerId, longMarkerName);
     }
 
@@ -1377,6 +1384,10 @@ Log.debug("Called Client.reinforce for " + markerId);
         if (board != null)
         {
             board.setupSplitMenu();
+            if (playerName.equals(getActivePlayerName()))
+            {
+                board.getFrame().toFront();
+            }
         }
     }
 
@@ -1421,6 +1432,10 @@ Log.debug("Called Client.reinforce for " + markerId);
     {
         if (map != null)
         {
+            if (playerName.equals(getBattleActivePlayerName()))
+            {
+                map.getFrame().toFront();
+            }
             map.setupSummonMenu();
         }
     }
@@ -1429,6 +1444,10 @@ Log.debug("Called Client.reinforce for " + markerId);
     {
         if (map != null)
         {
+            if (playerName.equals(getBattleActivePlayerName()))
+            {
+                map.getFrame().toFront();
+            }
             map.setupRecruitMenu();
         }
     }
@@ -1449,6 +1468,10 @@ Log.debug("Called Client.reinforce for " + markerId);
     {
         if (map != null)
         {
+            if (playerName.equals(getBattleActivePlayerName()))
+            {
+                map.getFrame().toFront();
+            }
             map.setupFightMenu();
         }
     }
@@ -1513,6 +1536,7 @@ Log.debug("Called Client.reinforce for " + markerId);
     }
 
 
+    // TODO Cache this
     String getBattleActivePlayerName()
     {
         return server.getBattleActivePlayerName();
