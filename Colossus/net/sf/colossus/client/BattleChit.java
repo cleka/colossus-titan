@@ -34,6 +34,11 @@ final class BattleChit extends Chit
     }
 
 
+    int getHits()
+    {
+        return hits;
+    }
+
     void setHits(int hits)
     {
         this.hits = hits;
@@ -61,7 +66,6 @@ final class BattleChit extends Chit
                 font = new Font(name, style, 2 * size);
                 g.setFont(font);
                 fontMetrics = g.getFontMetrics();
-                // XXX Test this 80% fudge factor on multiple platforms.
                 fontHeight = 4 * fontMetrics.getAscent() / 5;
             }
             else

@@ -24,9 +24,9 @@ public final class Options
 
     // Server options
     public static final String autosave = "Autosave";
-    public static final String allStacksVisible = "All stacks visible";
     public static final String logDebug = "Log debug messages";
-
+    public static final String allStacksVisible = "All stacks visible";
+    public static final String debugMulligans = "Debug mulligans";
 
     // Display options (client)
     public static final String showCaretaker = "Show Caretaker's stacks";

@@ -17,6 +17,7 @@ public final class LogWindow extends JTextArea
 
     public LogWindow()
     {
+        setEditable(false);
         setBackground(Color.white);
         logFrame = new JFrame("Log Window");
         scrollPane = new JScrollPane(this);

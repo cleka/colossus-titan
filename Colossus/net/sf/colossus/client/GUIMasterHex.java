@@ -289,14 +289,15 @@ public final class GUIMasterHex extends MasterHex
             name = getTerrainName().toUpperCase();
         }
 
-        // The word "MOUNTAINS" needs to be printed in the wide part of
+        // Long names like "MOUNTAINS" need to be printed in the wide part of
         // the hex, with a smaller font.
-        if (name.equals("MOUNTAINS"))
+        if (name.length() >= 8)
         {
             shrinkFont(g2); 
             g2.drawString(name, rectBound.x + ((rectBound.width -
                 fontMetrics.stringWidth(name)) / 2),
-                rectBound.y + halfFontHeight + rectBound.height * 2 / 3);
+                rectBound.y + halfFontHeight + rectBound.height * 
+                (isInverted() ? 1 : 2) / 3);
             restoreFont(g2);
         }
         else

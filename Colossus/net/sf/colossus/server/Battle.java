@@ -930,7 +930,6 @@ final class Battle
         }
     }
 
-
     private void removeDeadCreatures()
     {
         // Initialize these to true, and then set them to false when a
@@ -940,102 +939,102 @@ final class Battle
 
         Legion attacker = getAttacker();
         Legion defender = getDefender();
-        Legion donor = null;
 
-        for (int i = Constants.DEFENDER; i <= Constants.ATTACKER; i++)
-        {
-            Legion legion = getLegion(i);
-            Iterator it = legion.getCritters().iterator();
-            while (it.hasNext())
-            {
-                Critter critter = (Critter)it.next();
-                if (critter.isDead())
-                {
-                    // After turn 1, offboard creatures are returned to the
-                    // stacks or the legion they were summoned from, with
-                    // no points awarded.
-                    if (critter.getCurrentHex().isEntrance() &&
-                        getTurnNumber() > 1)
-                    {
-                        if (critter.isAngel())
-                        {
-                            Player player = legion.getPlayer();
-                            donor = player.getDonor();
-                            donor.addCreature(critter, false);
-                            // This summon doesn't count; the player can
-                            // summon again later this turn.
-                            player.setSummoned(false);
-                        }
-                        else
-                        {
-                            // Reinforcement.
-                            game.getCaretaker().putOneBack(critter);
-                            // This recruit doesn't count.
-                            legion.setRecruitName(null);
-                        }
-                    }
-                    else if (legion == attacker)
-                    {
-                        defender.addToBattleTally(critter.getPointValue());
-                    }
-                    else  // legion == defender
-                    {
-                        attacker.addToBattleTally(critter.getPointValue());
+        removeDeadCreaturesFromLegion(defender);
+        removeDeadCreaturesFromLegion(attacker);
 
-                        // Creatures left offboard do not trigger angel
-                        // summoning.
-                        if (summonState == Constants.NO_KILLS &&
-                            !critter.getCurrentHex().isEntrance())
-                        {
-                            summonState = Constants.FIRST_BLOOD;
-                        }
-                    }
-
-                    boolean putBack = true;
-                    // If an angel or archangel was returned to its donor
-                    // instead of the stack, then don't put it back on
-                    // the stack.
-                    if (critter.isAngel() && donor != null)
-                    {
-                        putBack = false;
-                        donor = null;
-                    }
-                    legion.prepareToRemoveCritter(critter, putBack);
-
-                    if (critter.isTitan())
-                    {
-                        legion.getPlayer().eliminateTitan();
-                    }
-
-                    String hexLabel = critter.getCurrentHexLabel();
-                    // Remove critter from iterator rather than list to
-                    // prevent concurrent modification problems.
-                    it.remove();
-                    server.allRemoveBattleChit(critter.getTag());
-                }
-                else  // critter is alive
-                {
-                    if (legion == attacker)
-                    {
-                        attackerElim = false;
-                    }
-                    else
-                    {
-                        defenderElim = false;
-                    }
-                }
-            }
-        }
-
-        Player player = attacker.getPlayer();
-        if (player == null || player.isTitanEliminated())
+        if (attacker.getPlayer() == null || 
+            attacker.getPlayer().isTitanEliminated())
         {
             attackerElim = true;
         }
-        player = defender.getPlayer();
-        if (player == null || player.isTitanEliminated())
+        if (defender.getPlayer() == null || 
+            defender.getPlayer().isTitanEliminated())
         {
             defenderElim = true;
+        }
+
+        server.allRemoveDeadBattleChits();
+    }
+
+    private void removeDeadCreaturesFromLegion(Legion legion)
+    {
+        Iterator it = legion.getCritters().iterator();
+        while (it.hasNext())
+        {
+            Critter critter = (Critter)it.next();
+            if (critter.isDead())
+            {
+                cleanupOneDeadCritter(critter);
+                it.remove();
+            }
+            else  // critter is alive
+            {
+                if (legion == getAttacker())
+                {
+                    attackerElim = false;
+                }
+                else
+                {
+                    defenderElim = false;
+                }
+            }
+        }
+    }
+
+    private void cleanupOneDeadCritter(Critter critter)
+    {
+        Legion legion = critter.getLegion();
+        Legion donor = null;
+
+        // After turn 1, offboard creatures are returned to the
+        // stacks or the legion they were summoned from, with
+        // no points awarded.
+        if (critter.getCurrentHex().isEntrance() &&
+            getTurnNumber() > 1)
+        {
+            if (critter.isAngel())
+            {
+                Player player = legion.getPlayer();
+                donor = player.getDonor();
+                donor.addCreature(critter, false);
+                // This summon doesn't count; the player can
+                // summon again later this turn.
+                player.setSummoned(false);
+            }
+            else
+            {
+                // Reinforcement.
+                game.getCaretaker().putOneBack(critter);
+                // This recruit doesn't count.
+                legion.setRecruitName(null);
+            }
+        }
+        else if (legion == getAttacker())
+        {
+            getDefender().addToBattleTally(critter.getPointValue());
+        }
+        else  // defender
+        {
+            getAttacker().addToBattleTally(critter.getPointValue());
+
+            // Creatures left offboard do not trigger angel
+            // summoning.
+            if (summonState == Constants.NO_KILLS &&
+                !critter.getCurrentHex().isEntrance())
+            {
+                summonState = Constants.FIRST_BLOOD;
+            }
+        }
+
+        // If an angel or archangel was returned to its donor instead of 
+        // the stack, then don't put it back on the stack.
+        legion.prepareToRemoveCritter(critter, 
+            (donor == null || !critter.isAngel()));
+
+        if (critter.isTitan())
+        {
+            legion.getPlayer().eliminateTitan();
         }
     }
 
@@ -1988,7 +1987,6 @@ Log.debug("called Battle.applyCarries() for " + target.getDescription());
             return false;
         }
     }
-
 
     /** If legal, move critter to hex and return true. Else return false. */
     private boolean doMove(Critter critter, String hexLabel)

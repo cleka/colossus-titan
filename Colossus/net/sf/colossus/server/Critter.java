@@ -179,6 +179,7 @@ final class Critter extends Creature implements Comparable
     void setHits(int hits)
     {
         this.hits = hits;
+        // TODO remove
         battle.getGame().getServer().allSetBattleChitHits(tag, hits);
     }
 
@@ -379,10 +380,8 @@ final class Critter extends Creature implements Comparable
     void moveToHex(String hexLabel)
     {
         currentHexLabel = hexLabel;
-        Set set = new HashSet();
-        set.add(startingHexLabel);
-        set.add(currentHexLabel);
-        battle.getGame().getServer().allAlignBattleChits(set);
+        battle.getGame().getServer().allTellBattleMove(tag, startingHexLabel,
+            currentHexLabel, false);
     }
 
 
@@ -392,10 +391,8 @@ final class Critter extends Creature implements Comparable
         currentHexLabel = startingHexLabel;
         Log.event(getName() + " undoes move and returns to " +
             startingHexLabel);
-        Set set = new HashSet();
-        set.add(formerHexLabel);
-        set.add(currentHexLabel);
-        battle.getGame().getServer().allAlignBattleChits(set);
+        battle.getGame().getServer().allTellBattleMove(tag, formerHexLabel,
+            currentHexLabel, true);
     }
 
 
@@ -794,6 +791,12 @@ Log.debug("new penalty option: " + po.toString());
      *  Roll the dice and apply damage.  Highlight legal carry targets. */
     private void strike2(Critter target, int dice, int strikeNumber)
     {
+        if (hasStruck())
+        {
+            Log.debug("Removed extra strike2() call for " + getDescription());
+            return;
+        }
+
         // Roll the dice.
         int damage = 0;
 
@@ -853,6 +856,7 @@ Log.debug("new penalty option: " + po.toString());
         if (dead)
         {
             hits = getPower();
+            // XXX Remove
             battle.getGame().getServer().allSetBattleChitDead(tag);
         }
     }

@@ -303,12 +303,12 @@ Move failed
 forced to move split legion Bk01 to Tower hex 600 taking penalty 16 in order to handle illegal legion Bk01
 
 
-Human forced strikes not taken after carry.
+Human forced strikes not always(?) taken after carry.
 Game does not advance past the strike phase automatically after a carry if no
    strikes/carries left.
-Strike / carry hexes are not unselected after carrying.
-
+No setDead() / repaint after autoSingleCarry when a creature was killed.
+Need to force a repaint of wounded creatures after auto forced strikes.
 Engagement hex not unselected after human player loses sole battle.
    Phase does not automatically advance.
-
 Half repaints of some chits during battle.
+

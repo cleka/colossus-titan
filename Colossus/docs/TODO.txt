@@ -1,4 +1,5 @@
-Re-add infinite mulligans cheat option for debug.
+Put the variant in the savegame file, and automatically load it when
+   the game is loaded.
 
 Highlight appropriate engagement hex while engagement is being resolved.
    (Except during angel summoning.)
@@ -13,8 +14,8 @@ Optional post-engagement status dialog showing which legions/players
    fought, known stack contents, what lived and died, summons, acquires,
    reinforcements, and points.
 
-Change some dialogs to show info in a label instead of the title, 
-   and add explicit cancel buttons.
+Change some dialogs to show info in a label instead of the title (so
+   the dialog is wide enough) and add explicit cancel buttons.
 
 Move code to center a dialog on screen to one place.  Maybe add a
    parent dialog class?

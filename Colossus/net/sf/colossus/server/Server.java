@@ -415,13 +415,14 @@ public final class Server
     }
 
 
-    void allAlignBattleChits(Set hexLabels)
+    void allTellBattleMove(int tag, String startingHex, String endingHex,
+        boolean undo)
     {
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
             Client client = (Client)it.next();
-            client.alignBattleChits(hexLabels);
+            client.tellBattleMove(tag, startingHex, endingHex, undo);
         }
     }
 
@@ -456,13 +457,13 @@ public final class Server
         }
     }
 
-    void allRemoveBattleChit(int tag)
+    void allRemoveDeadBattleChits()
     {
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
             Client client = (Client)it.next();
-            client.removeBattleChit(tag);
+            client.removeDeadBattleChits();
         }
     }
 
@@ -1048,8 +1049,13 @@ public final class Server
         }
         Player player = game.getPlayer(playerName);
         player.commitMoves();
-        // Mulligans are only allowed on turn 1.
-        player.setMulligansLeft(0);
+
+        // Mulligans are only allowed on turn 1, unless we're in
+        // debug mode. 
+        if (!getClientOption(Options.debugMulligans))
+        {
+            player.setMulligansLeft(0);
+        }
         game.advancePhase(Constants.MUSTER, playerName);
         return true;
     }

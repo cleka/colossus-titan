@@ -510,9 +510,9 @@ Log.debug("Client.doneWithCarries()");
         {
             map.unselectAllHexes();
         }
+        // XXX Remove excessive round trips by handing this on the server.
         makeForcedStrikes();
     }
-
 
     /** Called from BattleMap to leave carry mode. */
     void leaveCarryMode()
@@ -543,6 +543,7 @@ Log.debug("Client.leaveCarryMode()");
     {
         if (playerName.equals(getBattleActivePlayerName()))
         {
+Log.debug("Client.makeForcedStrikes()");
             server.makeForcedStrikes(playerName, getOption(
                 Options.autoRangeSingle));
         }
@@ -630,20 +631,18 @@ Log.debug("Client.leaveCarryMode()");
     }
 
 
-    // TODO Rename.
-    /** Remove the first BattleChit with this tag from the list. */
-    public void removeBattleChit(int tag)
+    public void removeDeadBattleChits()
     {
         Iterator it = battleChits.iterator();
         while (it.hasNext())
         {
             BattleChit chit = (BattleChit)it.next();
-            if (chit.getTag() == tag)
+            if (chit.isDead())
             {
                 it.remove();
+                // TODO Also remove it from other places.
             }
         }
-        // XXX Repaint just the chit's hex.
         if (map != null)
         {
             map.repaint();
@@ -1015,6 +1014,7 @@ Log.debug("Client.leaveCarryMode()");
         }
         else
         {
+            // TODO Reduce round trips by doing this on the server.
             makeForcedStrikes();
             if (map != null)
             {
@@ -1366,13 +1366,14 @@ Log.debug("Called Client.reinforce for " + markerId);
     }
 
 
-    // TODO Need to cache hex for each battle chit on client,
-    // and notify moves instead of aligns.
-    public void alignBattleChits(Set hexLabels)
+    // TODO Remember hex for each marker.
+    public void tellBattleMove(int tag, String startingHex, String currentHex,
+        boolean undo)
     {
         if (map != null)
         {
-            map.alignChits(hexLabels);
+            map.alignChits(startingHex);
+            map.alignChits(currentHex);
         }
     }
 
@@ -1481,12 +1482,6 @@ Log.debug("Client.applyCarries() for " + hexLabel);
             map.unselectHexByLabel(hexLabel);
             map.repaint();
         }
-    }
-
-    int getCarryDamage()
-    {
-Log.debug("Client.getCarryDamage()");
-        return server.getCarryDamage();
     }
 
     Set getCarryTargets()

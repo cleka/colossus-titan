@@ -514,10 +514,7 @@ public final class BattleMap extends HexMap implements MouseListener,
 
             case Constants.FIGHT:
             case Constants.STRIKEBACK:
-                // Leave carry mode.
                 client.leaveCarryMode();
-
-                // Highlight all legal strikes for this critter.
                 highlightStrikes(tag);
                 break;
 
@@ -541,12 +538,7 @@ public final class BattleMap extends HexMap implements MouseListener,
 
             case Constants.FIGHT:
             case Constants.STRIKEBACK:
-                // XXX Change
-                if (client.getCarryDamage() > 0)
-                {
-                    client.applyCarries(hexLabel);
-                }
-                else if (selectedCritterTag != -1)
+                if (selectedCritterTag != -1)
                 {
                     client.strike(selectedCritterTag, hexLabel);
                     selectedCritterTag = -1;
@@ -598,7 +590,6 @@ public final class BattleMap extends HexMap implements MouseListener,
             hexLabel = hex.getLabel();
         }
 
-        // XXX Only the active player can move or strike.
         if (chit != null && client.getPlayerNameByTag(chit.getTag()).equals(
             client.getBattleActivePlayerName()))
         {
