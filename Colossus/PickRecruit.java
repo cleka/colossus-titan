@@ -96,7 +96,7 @@ class PickRecruit extends Dialog implements MouseListener, WindowListener
     {
         MasterHex hex = legion.getCurrentHex();
 
-        switch(hex.getTerrain())
+        switch (hex.getTerrain())
         {
             case 'B':
                 if (legion.numCreature(Creature.gargoyle) >= 1 ||
