@@ -1,0 +1,2 @@
+cd ..
+java -cp Colossus.jar Game $1
