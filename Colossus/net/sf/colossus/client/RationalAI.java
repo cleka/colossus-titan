@@ -25,8 +25,7 @@ import net.sf.colossus.server.VariantSupport;
 public class RationalAI implements AI
 {
     Client client;
-    String[] hintSectionUsed = { net.sf.colossus.parser.AIHintLoader.sectionOffensiveAI,
-        net.sf.colossus.parser.AIHintLoader.sectionAllAI };
+    String[] hintSectionUsed = { Constants.sectionOffensiveAI };
     private int timeLimit = Constants.DEFAULT_AI_TIME_LIMIT;  // in s
     private boolean timeIsUp;
     private Random random = new DevRandom();

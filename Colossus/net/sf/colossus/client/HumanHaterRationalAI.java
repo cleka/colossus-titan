@@ -1,6 +1,9 @@
 package net.sf.colossus.client;
 
 
+import net.sf.colossus.server.Constants;
+
+
 /**
  * Simple implementation of a Titan AI - a bit more coward the regular SimpleAI
  * @version $Id$
@@ -17,7 +20,6 @@ public class HumanHaterRationalAI extends RationalAI
 
         /* this is a defensive AI, not an offensive one, so use
          the proper hints section */
-        hintSectionUsed[0] =
-                net.sf.colossus.parser.AIHintLoader.sectionDefensiveAI;
+        hintSectionUsed[0] = Constants.sectionDefensiveAI;
     }
 }

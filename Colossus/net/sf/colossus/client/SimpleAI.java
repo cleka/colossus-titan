@@ -24,11 +24,12 @@ import net.sf.colossus.util.Probs;
 public class SimpleAI implements AI
 {
     Client client;
-    String[] hintSectionUsed = { net.sf.colossus.parser.AIHintLoader.sectionOffensiveAI,
-        net.sf.colossus.parser.AIHintLoader.sectionAllAI };
+
     private int timeLimit = Constants.DEFAULT_AI_TIME_LIMIT;  // in s
     private boolean timeIsUp;
     private Random random = new DevRandom();
+
+    String[] hintSectionUsed = { Constants.sectionOffensiveAI };
 
     public SimpleAI(Client client)
     {
