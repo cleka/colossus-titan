@@ -8,7 +8,7 @@
 
 \title{Building Colossus}
 
-\author{David Ripton}
+\author{David Ripton, Romain Dolbeau}
 
 \maketitle
 
@@ -22,63 +22,67 @@ the game depend on tools that aren't.
 
 \subsection{Java development kit}
 
-You need a \texttt{JDK}, which includes a javac compiler, a java runtime environment, 
-and various utilities like jar and javadoc.
+You need a \texttt{JDK}, which includes a javac compiler, a java runtime
+environment,  and various utilities like jar and javadoc.
 
-The game should work with \texttt{JDK} 1.2 or newer.  1.3.1 seems to be 
-the most stable.  1.4.0 \texttt{RC} is available, so 1.4.0 should be out soon.
+The game should work with \texttt{JDK} 1.2 or newer. 1.3.1 seems to be 
+the most stable. 1.4.0 \texttt{RC} is available, so 1.4.0 should be out soon.
 It's a good idea to keep a 1.2.x \texttt{JDK} around for compatibility testing.
 
 Unless you have a fast, reliable, nailed-up net connection, also 
 download the \texttt{JDK} docs, which are packaged separately.
 
-Sun maintains the \texttt{JDK} for Windows, Solaris Sparc and x86, and x86 Linux.  
-See \hypercite{Sun JDK}{}{}{SUNJDK}. I think that the Sun \texttt{JDK} is currently
+\htmladdnormallink{Sun}{http://www.sun.com/} maintains the \texttt{JDK}
+for MS Windows, Solaris Sparc and x86, and x86 Linux. See
+\hypercite{Sun JDK}{}{}{SUNJDK}. I think that the
+\htmladdnormallink{Sun}{http://www.sun.com/} \texttt{JDK} is currently
 the best one on those three platforms.
 
-The Blackdown \texttt{JDK} is the original port of Sun's Solaris \texttt{JDK} to Linux.  
-(Sun's Linux \texttt{JDK} in turn uses Blackdown code.  So the two are very close
-cousins.)  If you have a non-x86 Linux box, you want Blackdown.
-See \hypercite{Blackdown JDK}{}{}{BLACKDOWNJDK}.
+The Blackdown \texttt{JDK} is the original port of
+\htmladdnormallink{Sun}{http://www.sun.com/}'s Solaris \texttt{JDK}
+to Linux. (\htmladdnormallink{Sun}{http://www.sun.com/}'s Linux
+\texttt{JDK} in turn uses Blackdown code. So the two are very close cousins.)
+If you have a non-x86 Linux box, you want Blackdown. See
+\hypercite{Blackdown JDK}{}{}{BLACKDOWNJDK}.
 
-gcj and kaffe don't have enough \texttt{GUI} support yet to be useful for Colossus.
+\texttt{gcj} and \texttt{kaffe} don't have enough \texttt{GUI} support yet to
+be useful for Colossus.
 
 \begin{itemize}
-\item[TODO:]  More platforms.  Please update this document if you use
+\item[TODO:] More platforms. Please update this document if you use
 platforms that I don't.
 \end{itemize}
 
-If your platform is not listed above, a starting point for finding
-a \texttt{JDK} is \htmladdnormallink{http://java.sun.com/cgi-bin/java-ports.cgi}{http://java.sun.com/cgi-bin/java-ports.cgi}
+If your platform is not listed above, a starting point for finding a
+\texttt{JDK} is \htmladdnormallink{http://java.sun.com/cgi-bin/java-ports.cgi}{http://java.sun.com/cgi-bin/java-ports.cgi}
 
 \begin{itemize}
-\item[TODO:]  Do we need to show different environment variable syntax and
-startup script lines on various platforms, shells, etc.?  Ugh.  Find
-a link.
+\item[TODO:] Do we need to show different environment variable syntax and
+startup script lines on various platforms, shells, etc.? Ugh. Find a link.
 \end{itemize}
 
-Once you have installed your \texttt{JDK}, you probably want to set an environment 
-variable called \texttt{JAVA\_HOME} that points to its base directory.  Then you want 
-to put \texttt{\$JAVA\_HOME}/bin in your \texttt{PATH}.  You also want to set \texttt{CLASSPATH} to 
-include ``.'' (the current directory); you'll add stuff to it later as you 
-add Java tools.
+Once you have installed your \texttt{JDK}, you probably want to set an
+environment variable called \texttt{JAVA\_HOME} that points to its base
+directory. Then you want to put \texttt{\$JAVA\_HOME}/bin in your
+\texttt{PATH}. You also want to set \texttt{CLASSPATH} to include ``.''
+(the current directory); you'll add stuff to it later as you add Java tools.
 
-Not many tools directly use \texttt{JAVA\_HOME}, but it lets you easily switch \texttt{JDK}s 
-by changing one environment variable instead of all the things that point 
-to it.
+Not many tools directly use \texttt{JAVA\_HOME}, but it lets you easily
+switch \texttt{JDK}s by changing one environment variable instead of all
+the things that point to it.
 
 \subsection{Other compilers}
 
-\hypercite{Jikes}{Jikes}{}{JIKES} is Open Source very fast Java compiler written
-in C++, originally
-written by \texttt{IBM}.  Its speed is very nice, and it has some other neat 
-features like incremental compilation, more warnings, etc.  However, 
+\hypercite{Jikes}{Jikes}{}{JIKES} is Open Source very fast Java compiler
+written in C++, originally
+written by \texttt{IBM}. Its speed is very nice, and it has some other neat 
+features like incremental compilation, more warnings, etc. However, 
 jikes produces slightly different class files than javac, which 
-sometimes causes problems.  So I recommend using Jikes most of the time,
+sometimes causes problems. So I recommend using Jikes most of the time,
 but making sure to do a full compile with javac as well before checking
 in code.
-Also, you may need to set the \texttt{JIKES\_PATH} environment variable so Jikes 
-can find your standard Java libraries.  And you probably want Jikes in
+Also, you may need to set the \texttt{JIKES\_PATH} environment variable so
+Jikes can find your standard Java libraries. And you probably want Jikes in
 your \texttt{PATH}.
 
 Read the Ant docs for how to set the build.compiler property to 
@@ -86,106 +90,119 @@ switch between javac and Jikes.
 
 \subsection{Build tools}
 
-There are two main alternatives for building Colossus, \hypercite{ant}{ant}{}{ANT} and make.
+There are two main alternatives for building Colossus,
+\hypercite{ant}{ant}{}{ANT} and make.
 
-Ant is a newer cross-platform build tool used by many Java projects.  
+Ant is a newer cross-platform build tool used by many Java projects. 
 It uses a file called build.xml. You will also need the corresponding
 ``optional.jar'' which contains extra features that we use, like the 
-Java\texttt{CC} task.  You need version 1.4.1 or newer.  You'll need to set 
-\texttt{ANT\_HOME} to its install directory, and you'll want \texttt{\$ANT\_HOME}/bin in 
-your \texttt{PATH}.
+Java\texttt{CC} task. You need version 1.4.1 or newer. You'll need to set 
+\texttt{ANT\_HOME} to its install directory, and you'll want
+\texttt{\$ANT\_HOME}/bin in your \texttt{PATH}.
 
-Make is the old-school Unix build tool.  It uses a build file called
-Makefile.  (Colossus only has one, not nested Makefiles in each
-directory.)  Make is to Ant as C is to Java.  It's fast, it's already
+Make is the old-school Unix build tool. It uses a build file called
+Makefile. (Colossus only has one, not nested Makefiles in each
+directory.) Make is to Ant as C is to Java. It's fast, it's already
 included on Unix boxes, it's portable only if you handle all the special
 cases yourself, it's somewhat user-hostile, and a lot of people already 
-know it because it's been around forever.  Please try to use Ant instead, 
+know it because it's been around forever. Please try to use Ant instead, 
 so that we can someday get rid of the Makefile and avoid double 
 maintainence.
 
 \subsection{Parser tools}
 
-Colossus uses the \hypercite{JavaCC}{JavaCC}{}{JAVACC} parser generator written by Sun and Matamata.  
-(Java\texttt{CC} has nothing to do with javac, despite the similar name.  It
-stands for Java Compiler Compiler.)
+Colossus uses the \hypercite{JavaCC}{JavaCC}{}{JAVACC} parser generator
+written by \htmladdnormallink{Sun}{http://www.sun.com/} and Matamata.
+(Java\texttt{CC} has nothing to do with javac, despite the similar name.
+It stands for Java Compiler Compiler.)
 
-This turns .jj files into .java files, which are then compiled normally.  
+This turns .jj files into .java files, which are then compiled normally. 
 You want version 2.1.
 
-Direct access to the archive file: \htmladdnormallink{http://www.webgain.com/trialware/javacc/JavaCC2\_1.zip}{http://www.webgain.com/trialware/javacc/JavaCC2\_1.zip}
+Direct access to the archive file:
+\htmladdnormallink{http://www.webgain.com/trialware/javacc/JavaCC2\_1.zip}{http://www.webgain.com/trialware/javacc/JavaCC2\_1.zip}.
 
-I set \texttt{JAVACC\_HOME} to its install location and then put \texttt{\$JAVACC\_HOME}/bin
-in my \texttt{PATH}.  (You can probably see the pattern by now.)
+I set \texttt{JAVACC\_HOME} to its install location and then put
+\texttt{\$JAVACC\_HOME}/bin in my \texttt{PATH}. (You can probably
+see the pattern by now.)
 
-You don't actually need to know Java\texttt{CC} unless you want to change parser
-files or make new ones.  You only need to install it and let build.xml
+You don't actually need to know Java\texttt{CC} unless you want to change
+parser files or make new ones. You only need to install it and let build.xml
 drive it for you.
 
 \subsection{Source code control}
 
-We use \hypercite{\texttt{CVS}}{\texttt{CVS}}{}{CVS}, with the repository hosted on \hypercite{SourceForge}{SourceForge}{}{SOURCEFORGE}.
+We use \hypercite{\texttt{CVS}}{\texttt{CVS}}{}{CVS}, with the repository 
+hosted on \hypercite{SourceForge}{SourceForge}{}{SOURCEFORGE}.
 \texttt{SF} requires \hypercite{ssh}{ssh}{}{SSH} or
-\hypercite{OpenSSH}{OpenSSH}{}{OPENSSH}  instead of the insecure pserver as a transport mechanism,
-which complicates cvs setup a bit.  There are a lot of \texttt{CVS} +
-ssh setup directions on \texttt{SF}.  If you can't get it to work,
-ask for help.
+\hypercite{OpenSSH}{OpenSSH}{}{OPENSSH} instead of the insecure pserve
+as a transport mechanism, which complicates cvs setup a bit. There are a
+lot of \texttt{CVS} + ssh setup directions on \texttt{SF}. If you can't
+get it to work, ask for help.
+
+If you're under Win32 (that's MS Windows 95+ or NT and later), see
+\hypercite{PuTTY}{}{}{PUTTY} for a SSH/Telnet client. General SourceForge
+documentation is at \htmladdnormallink{http://sourceforge.net/docman/?group\_id=1}{http://sourceforge.net/docman/?group\_id=1}.
 
 \begin{itemize}
-\item[TODO:]  Insert links to cvs, ssh, putty, \texttt{SF} \texttt{CVS} setup instructions, etc.
+\item[TODO:] Insert \texttt{SF} \texttt{CVS} setup instructions, etc.
 \end{itemize}
 
 \subsection{Java Web Start}
 
 If your \texttt{JDK} didn't include Java Web Start, you want that too, so 
-that you can test that you haven't broken \texttt{JWS} compatibility.  (This
+that you can test that you haven't broken \texttt{JWS} compatibility. (This
 is way too easy to do when you add resources.)
-\htmladdnormallink{http://java.sun.com/products/javawebstart/}{http://java.sun.com/products/javawebstart/}. You want javaws in your
+\htmladdnormallink{http://java.sun.com/products/javawebstart/}{http://java.sun.com/products/javawebstart/}. You want \texttt{javaws} in your
 \texttt{PATH}.
 
-(An alternate \texttt{JNLP} launcher, in case there is no \texttt{JWS} for your platform,
-is Open\texttt{JNLP} at \htmladdnormallink{http://openjnlp.nanode.org}{http://openjnlp.nanode.org}. I haven't
-tried it. If you do, please update this document.)
+(An alternate \texttt{JNLP} launcher, in case there is no \texttt{JWS} for
+your platform, is Open\texttt{JNLP} at
+\htmladdnormallink{http://openjnlp.nanode.org}{http://openjnlp.nanode.org}.
+I haven't tried it. If you do, please update this document.)
 
 \subsection{jar}
 
-Jar is the standard java archive format.  It basically uses the compression 
-algorithm from zip with command line syntax similar to tar.  If you need to 
-uncompress a jar file on a machine with no jar, try your favorite unzip tool.  
+Jar is the standard java archive format. It basically uses the compression 
+algorithm from zip with command line syntax similar to tar. If you need to 
+uncompress a jar file on a machine with no jar, try your favorite unzip tool. 
 Jar comes with the \texttt{JDK}.
 
 \subsection{jarsigner}
 
-Jars can be signed.  Jars *must* be signed to work over Java Web Start.
+Jars can be signed. Jars \textbf{must} be signed to work over Java Web Start.
 But note that you can use ``test'' keys -- you don't actually have to
 pay money to a certifying authority and get a ``real'' key that actually
 ``proves'' that you are who you say you are.
 
-The jarsigner tool comes with the \texttt{JDK}.  To use it, you need to create
-a personal authentication key, and put it in a keystore file.  The sign
+The jarsigner tool comes with the \texttt{JDK}. To use it, you need to create
+a personal authentication key, and put it in a keystore file. The sign
 targets in build.xml and Makefile assume that your key name and keystore
-filename match your username.  If you don't like this, you can add new
+filename match your username. If you don't like this, you can add new
 targets.
 
 \begin{itemize}
-\item[TODO:]  Link to basic jarsigner docs.
+\item[TODO:] Link to basic jarsigner docs.
 \end{itemize}
 
 \subsection{zip and unzip tools}
 
-You need something that can work with the standard zip format.  WinZip, 
-Info-Zip, \texttt{PKZ}ip, etc.  Info-Zip is free -- most of the others are shareware.  
+You need something that can work with the standard zip format. WinZip, 
+Info-Zip, \texttt{PKZ}ip, etc. Info-Zip is free -- most of the others are
+shareware. 
 
 \subsection{Text editors}
 
-Your choice.  I recommend choosing something that autoconverts tabs to
-the right number of spaces on the fly.  (Tab characters in code are *evil*)
-and can save files using Unix newline and \texttt{EOF} conventions.  If your editor 
-can't do these, then you'll need to run ``ant fix'' on your code before 
-checking it into \texttt{CVS}, to avoid creating whole-file false diffs or files
-that look awful if someone has different tab stop settings than yours.
-(Yes, cross-platform development adds a few wrinkles.)
+Your choice. I recommend choosing something that autoconverts tabs to
+the right number of spaces on the fly. (Tab characters in code are
+\textbf{evil}) and can save files using Unix newline and \texttt{EOF}
+conventions. If your editor can't do these, then you'll need to run
+``ant fix'' on your code before checking it into \texttt{CVS}, to avoid
+creating whole-file false diffs or files that look awful if someone has
+different tab stop settings than yours. (Yes, cross-platform development
+adds a few wrinkles.)
 
+Among the nice editors for Unix, there's \hypercite{XEmacs}{XEmacs}{}{XEMACS}. XEmacs can use the \hypercite{Java Development Environment for Emacs}{Java Development Environment for Emacs}{}{JDE}.
 
 \section{Optional tools}
 
@@ -199,7 +216,7 @@ that look awful if someone has different tab stop settings than yours.
 You can use java -Xprof or -Xrunhprof.
 OptimizeIt! rocks, but it's \$500.
 \begin{itemize}
-\item[TODO:]  Add ProfAnal info.
+\item[TODO:] Add ProfAnal info.
 \end{itemize}
 
 \subsection{Code reformatters}
@@ -208,26 +225,26 @@ If you just can't work with the format in CodingStandards.txt, then you
 need a tool to convert files to and from your personal pet format to the
 one this project uses.
 
-\texttt{JI}ndent used to be free, but not that full-featured.  
+JIndent used to be free, but not that full-featured. 
 \begin{itemize}
-\item[TODO:]  Find working link to last free version.
+\item[TODO:] Find working link to last free version.
 \end{itemize}
 Now it's really full-featured, but no longer free.
 \begin{itemize}
-\item[TODO:]  Find free Java code formatter that actually works well.
+\item[TODO:] Find free Java code formatter that actually works well.
 \end{itemize}
 
 \subsection{Image editors}
 
-Currently all images used in Colossus are \texttt{GIF}s.  \texttt{JPEG}s are great for
-photos but not optimal for simple drawings.  \texttt{PNG} is better than \texttt{GIF} 
+Currently all images used in Colossus are \texttt{GIF}s. \texttt{JPEG}s are great for
+photos but not optimal for simple drawings. \texttt{PNG} is better than \texttt{GIF} 
 in many ways, but Java didn't support it until 1.3 so we don't use it.
 
-Any image editor that can save to standard formats is fine.  If you
+Any image editor that can save to standard formats is fine. If you
 don't have one, Gimp (www.gimp.org) is good and free, but has a steep
-learning curve, much like Photoshop.  
+learning curve, much like Photoshop. 
 \begin{itemize}
-\item[TODO:]  Find a lighter-weight, easier-to-learn free image editor that 
+\item[TODO:] Find a lighter-weight, easier-to-learn free image editor that 
 can save to our file formats.
 \end{itemize}
 
@@ -235,7 +252,7 @@ can save to our file formats.
 
 Once you have the tools set up, Colossus basically builds itself.
 
-First you need all the source files.  Snag the latest zip file from 
+First you need all the source files. Snag the latest zip file from 
 \htmladdnormallink{http://colossus.sf.net/downloads}{http://colossus.sf.net/downloads}, or (to get
 the newest possible code) pull from \texttt{CVS}.
 
@@ -249,10 +266,10 @@ Other interesting targets include clean (delete stuff, useful if
 you want to clean up or make sure that you fully rebuild all your
 class files), fix (ant only -- does a bit of text reformatting on
 java source files), tools (builds standalone tools), sign (signs
-a jarfile), and dist (makes a zip file).  There are also some
+a jarfile), and dist (makes a zip file). There are also some
 targets that automate installing the package onto a web site --
 these are designed for maintaining the \texttt{SF} site rather than general
-use.  Basically, skim through build.xml
+use. Basically, skim through build.xml
 
 \section{Gotchas}
 
