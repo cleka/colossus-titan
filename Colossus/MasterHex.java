@@ -11,7 +11,7 @@ class MasterHex
 {
     public static final double SQRT3 = Math.sqrt(3.0);
     public static final double RAD_TO_DEG = 180 / Math.PI;
-    private boolean selected;
+    boolean selected;
     int[] xVertex = new int[6];
     int[] yVertex = new int[6];
     private Polygon p;
@@ -19,6 +19,7 @@ class MasterHex
     boolean inverted;
     private int scale;
     private double l;              // hexside length
+    MasterHex [] neighbor = new MasterHex[6];
 
     // B,D,H,J,m,M,P,S,T,t,W
     // Brush, Desert, Hills, Jungle, mountains, Marsh, Plains,
@@ -344,7 +345,6 @@ class MasterHex
                 break;
         }
     }
-
 
 
     boolean select(Point point)
