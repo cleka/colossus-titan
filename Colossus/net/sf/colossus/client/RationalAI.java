@@ -1168,14 +1168,20 @@ public class RationalAI implements AI
 
     }
 
-    private void findMoveList(List markerIds, List all_legionMoves,
+    private boolean findMoveList(List markerIds, List all_legionMoves,
         MultiSet occupiedHexes, boolean teleportsOnly)
     {
+        boolean moved = false;
         Iterator it = markerIds.iterator();
         while (it.hasNext())
         {
             String markerId = (String)it.next();
             LegionInfo legion = client.getLegionInfo(markerId);
+            if (legion.hasMoved())
+            {
+                moved = true;
+                continue;
+            }
 
             Log.debug("consider marker " + markerId);
 
@@ -1241,6 +1247,7 @@ public class RationalAI implements AI
 
             all_legionMoves.add(legionMoves);
         }
+        return moved;
     }
 
     /** Return true if we moved something and need to be called again. */
@@ -1254,7 +1261,7 @@ public class RationalAI implements AI
 
         MultiSet occupiedHexes = new MultiSet();
 
-        findMoveList(markerIds, all_legionMoves, occupiedHexes, false);
+        moved = findMoveList(markerIds, all_legionMoves, occupiedHexes, false);
 
         Log.debug("done computing move values for legions");
 
@@ -1326,6 +1333,10 @@ public class RationalAI implements AI
         if (mustMove)
         {
             Log.debug("Combined optimum has constraint that we must move.");
+        }
+        else
+        {
+            Log.debug("Combined optimum DOES NOT have constraint that we must move.");
         }
 
         if (all_legionMoves.size() < 1)
@@ -1418,7 +1429,7 @@ public class RationalAI implements AI
             // apply constraint. at least one legion must move to
             // a place that is not currently occupied by our legions.
             // this prevents illegal exchanges of A moves to B and B moves to A
-            if (!hasEmptyHexMove)
+            if (!hasEmptyHexMove && mustMove)
             {
                 continue;
             }
