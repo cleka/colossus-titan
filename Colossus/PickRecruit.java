@@ -59,7 +59,7 @@ class PickRecruit extends Dialog implements MouseListener, WindowListener
         for (int i = 0; i < numEligible; i++)
         {
             markers[i] = new Chit(cx + i * (21 * scale / 20), cy, scale,
-                "images/" + recruits[i].name + ".gif", this);
+                recruits[i].getImageName(), this);
         }
 
         imagesLoaded = false;
@@ -355,13 +355,9 @@ class PickRecruit extends Dialog implements MouseListener, WindowListener
         // Check for availability of chits.
         for (int i = 0; i < 5; i++)
         {
-            if (recruits[i] != null)
+            if (recruits[i] != null && recruits[i].getCount() < 1)
             {
-                // XXX: If no chits are left
-                if (false)
-                {
-                    recruits[i] = null;
-                }
+                recruits[i] = null;
             }
         }
 
