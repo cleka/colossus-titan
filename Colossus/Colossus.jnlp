@@ -14,18 +14,18 @@
        </information>
        <resources>
          <jar href="Colossus.jar"/>
-         <jar href="batik-awt-util.jar"/>
-         <jar href="batik-bridge.jar"/>
-         <jar href="batik-css.jar"/>
-         <jar href="batik-dom.jar"/>
-         <jar href="batik-ext.jar"/>
-         <jar href="batik-gvt.jar"/>
-         <jar href="batik-parser.jar"/>
-         <jar href="batik-script.jar"/>
-         <jar href="batik-svg-dom.jar"/>
-         <jar href="batik-transcoder.jar"/>
-         <jar href="batik-util.jar"/>
-         <jar href="batik-xml.jar"/>
+         <jar href="libs/batik-awt-util.jar"/>
+         <jar href="libs/batik-bridge.jar"/>
+         <jar href="libs/batik-css.jar"/>
+         <jar href="libs/batik-dom.jar"/>
+         <jar href="libs/batik-ext.jar"/>
+         <jar href="libs/batik-gvt.jar"/>
+         <jar href="libs/batik-parser.jar"/>
+         <jar href="libs/batik-script.jar"/>
+         <jar href="libs/batik-svg-dom.jar"/>
+         <jar href="libs/batik-transcoder.jar"/>
+         <jar href="libs/batik-util.jar"/>
+         <jar href="libs/batik-xml.jar"/>
          <j2se version="1.4+" max-heap-size="128M"/>
        </resources>
        <security>

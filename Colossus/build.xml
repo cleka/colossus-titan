@@ -368,6 +368,7 @@
 
 <!-- TODO Eliminate double maintenance -->
 <!-- TODO Do not copy unchanged files -->
+<!-- XXX * does not work as a wildcard.  Fix -->
 <!-- This requires a good ssh-agent setup. -->
 <target name="remote-inst" depends="init,sign,dist,changelog"
         description = "scp files into htdocs tree on SF">
