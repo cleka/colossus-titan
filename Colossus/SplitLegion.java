@@ -68,9 +68,9 @@ class SplitLegion extends Dialog implements MouseListener, ActionListener
             oldChits = new Chit[oldLegion.getHeight()];
             for (int i = 0; i < oldLegion.getHeight(); i++)
             {
-                oldChits[i] = new Chit((i + 1) * scale + (scale / 5), scale / 2,
-                    scale, "images/" + oldLegion.creatures[i].name + ".gif",
-                    this);
+                oldChits[i] = new Chit((i + 1) * scale + (scale / 5), 
+                    scale / 2, scale, "images/" + oldLegion.creatures[i].name 
+                    + ".gif", this);
             }
             newChits = new Chit[oldLegion.getHeight()];
             
@@ -144,7 +144,7 @@ class SplitLegion extends Dialog implements MouseListener, ActionListener
     }
 
 
-    public void mouseClicked(MouseEvent e)
+    public void mousePressed(MouseEvent e)
     {
         Point point = e.getPoint();
         for (int i = 0; i < oldLegion.getHeight(); i++)
@@ -218,7 +218,7 @@ class SplitLegion extends Dialog implements MouseListener, ActionListener
     {
     }
 
-    public void mousePressed(MouseEvent e)
+    public void mouseClicked(MouseEvent e)
     {
     }
 
