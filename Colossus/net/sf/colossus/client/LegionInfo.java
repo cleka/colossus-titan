@@ -59,12 +59,12 @@ public final class LegionInfo
         this.height = height;
     }
 
-    int getHeight()
+    public int getHeight()
     {
         return height;
     }
 
-    void setHexLabel(String hexLabel)
+    public void setHexLabel(String hexLabel)
     {
         this.hexLabel = hexLabel;
     }
@@ -74,8 +74,13 @@ public final class LegionInfo
         return hexLabel; 
     }
 
+    public MasterHex getCurrentHex()
+    {
+        return MasterBoard.getHexByLabel(getHexLabel()); 
+    }
 
-    String getPlayerName()
+
+    public String getPlayerName()
     {
         return playerName;
     }
@@ -88,7 +93,7 @@ public final class LegionInfo
 
 
     /** Return an immutable copy of the legion's contents. */
-    List getContents()
+    public List getContents()
     {
         return Collections.unmodifiableList(contents);
     }
@@ -177,7 +182,7 @@ public final class LegionInfo
     }
 
 
-    PlayerInfo getPlayerInfo()
+    public PlayerInfo getPlayerInfo()
     {
         return client.getPlayerInfo(playerName);
     }
@@ -266,7 +271,7 @@ public final class LegionInfo
         return getContents().contains("Titan");
     }
 
-    int numLords()
+    public int numLords()
     {
         int count = 0;
 
@@ -378,7 +383,7 @@ public final class LegionInfo
     }
 
 
-    void setMoved(boolean moved)
+    public void setMoved(boolean moved)
     {
         this.moved = moved;
     }
@@ -416,5 +421,10 @@ public final class LegionInfo
             !hasRecruited() && !getPlayerInfo().isDead() &&
             !client.findEligibleRecruits(getMarkerId(), 
                 getHexLabel()).isEmpty();
+    }
+
+    public String toString()
+    {
+        return markerId;
     }
 }

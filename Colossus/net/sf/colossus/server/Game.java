@@ -888,8 +888,6 @@ Log.debug("Called Game.newGame2()");
         Player player = getActivePlayer();
         player.rollMovement();
         server.allSetupMove();
-
-        player.aiMasterMove();
     }
 
     private void setupFight()

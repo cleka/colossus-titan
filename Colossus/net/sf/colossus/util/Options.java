@@ -75,6 +75,8 @@ public final class Options
     public static final String autoRecruit = "Auto recruit";
     public static final String autoPickRecruiter = "Auto pick recruiters";
     public static final String autoReinforce = "Auto reinforce";
+    public static final String autoMasterMove = "Auto masterboard move";
+    public static final String autoPickLord = "Auto pick teleporting lord";
     public static final String autoPlay = "Auto play";
 
     // General per-player options

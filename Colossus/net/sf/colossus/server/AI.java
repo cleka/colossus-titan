@@ -17,7 +17,7 @@ import net.sf.colossus.client.LegionInfo;
 public interface AI
 {
     /** make masterboard moves for current player in the Game */
-    void masterMove(Game game);
+    void masterMove(Client client);
 
     /** make splits for current player */
     void split(Game game);

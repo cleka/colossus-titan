@@ -858,6 +858,7 @@ Log.debug("Called Player.setType() for " + name + " " + type);
         }
     }
 
+/* XXX
     void aiMasterMove()
     {
         if (isAI())
@@ -871,6 +872,7 @@ Log.debug("Called Player.setType() for " + name + " " + type);
             }
         }
     }
+    */
 
 
     boolean aiFlee(Legion legion, Legion enemy)

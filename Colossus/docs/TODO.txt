@@ -9,8 +9,20 @@ Big picture:
 6. Improve AI.
 
 Bug: Failing LOSTest -- problems with slopes and cliffs.
+
 Bug: Auto forced strike is taking strikes when there's > 1 target.
+
 Bug: run -i 6 -g sometimes spins forever on fixName.  Sometimes okay.  Race.
+Called SocketServerThread.setPlayerName() old:Gold new:<By color>5 thread: Gold
+From client <By color>5: fixName ~ Gold
+Got fixName new:Gold old:<By color>5
+
+Bug: Need to sort legions before AI moves.
+
+Bug: Some strike updates to not reach client GUI.
+
+
+Client-side AIs need All Stacks Visible until split prediction is done.
 
 Need to re-highlight after undo split, undo battle move.
 

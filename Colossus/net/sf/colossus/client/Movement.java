@@ -189,7 +189,8 @@ public final class Movement
 
     /** Return set of hexLabels describing where this legion can move
      *  without teleporting. */
-    Set listNormalMoves(LegionInfo legion, MasterHex hex, int movementRoll)
+    public Set listNormalMoves(LegionInfo legion, MasterHex hex, 
+        int movementRoll)
     {
         if (legion.hasMoved())
         {

@@ -151,7 +151,7 @@ public final class Client implements IClient
 
 
     /** Take a mulligan. */
-    void mulligan()
+    public void mulligan()
     {
         undoAllMoves();   // XXX Maybe move entirely to server
         clearUndoStack();
@@ -293,6 +293,12 @@ public final class Client implements IClient
             {
                 board.repaint();
             }
+        }
+
+        // Call here instead of from setupMove() for mulligans.
+        if (isMyTurn() && getOption(Options.autoMasterMove))
+        {
+            ai.masterMove(this);
         }
     }
 
@@ -497,6 +503,20 @@ public final class Client implements IClient
         return numPlayers;
     }
 
+    public int getNumLivingPlayers()
+    {
+        int total = 0;
+        for (int i = 0; i < playerInfo.length; i++)
+        {
+            PlayerInfo info = playerInfo[i];
+            if (!info.isDead())
+            {
+                total++;
+            }
+        }
+        return total;
+    }
+
 
     public void updatePlayerInfo(java.util.List infoStrings)
     {
@@ -587,12 +607,12 @@ public final class Client implements IClient
     }
 
 
-    PlayerInfo getPlayerInfo(int playerNum)
+    public PlayerInfo getPlayerInfo(int playerNum)
     {
         return playerInfo[playerNum];
     }
 
-    PlayerInfo getPlayerInfo(String name)
+    public PlayerInfo getPlayerInfo(String name)
     {
         for (int i = 0; i < playerInfo.length; i++)
         {
@@ -604,7 +624,7 @@ public final class Client implements IClient
         return null;
     }
 
-    java.util.List getPlayerNames()
+    public java.util.List getPlayerNames()
     {
         java.util.List names = new ArrayList();
         for (int i = 0; i < playerInfo.length; i++)
@@ -792,6 +812,13 @@ public final class Client implements IClient
      *  public for client-side AI -- do not call from server side. */
     public LegionInfo getLegionInfo(String markerId)
     {
+    /*
+        if (markerId == null)
+        {
+            Log.error("Called Client.getLegionInfo() with null markerId");
+            return null;
+        }
+        */
         LegionInfo info = (LegionInfo)legionInfo.get(markerId);
         if (info == null)
         {
@@ -1200,6 +1227,11 @@ public final class Client implements IClient
      *  Return true if the player chooses to teleport. */
     private boolean chooseWhetherToTeleport()
     {
+        if (getOption(Options.autoMasterMove))
+        {
+            return false;
+        }
+
         String [] options = new String[2];
         options[0] = "Teleport";
         options[1] = "Move Normally";
@@ -2185,7 +2217,7 @@ public final class Client implements IClient
         return Constants.getPhaseName(getPhase());
     }
 
-    int getTurnNumber()
+    public int getTurnNumber()
     {
         return turnNumber;
     }
@@ -2203,22 +2235,35 @@ public final class Client implements IClient
     }
 
 
-    private String figureTeleportingLord(String hexLabel)
+    private String figureTeleportingLord(String moverId, String hexLabel)
     {
         java.util.List lords = listTeleportingLords(moverId, hexLabel);
+        String lordName = null;
         switch (lords.size())
         {
             case 0:
                 return null;
             case 1:
-                String lordName = (String)lords.get(0);
+                lordName = (String)lords.get(0);
                 if (lordName.startsWith(Constants.titan))
                 {
                     lordName = Constants.titan;
                 }
                 return lordName;
             default:
-                return PickLord.pickLord(board.getFrame(), lords);
+                if (getOption(options.autoPickLord))
+                {
+                    lordName = (String)lords.get(0);
+                    if (lordName.startsWith(Constants.titan))
+                    {
+                        lordName = Constants.titan;
+                    }
+                    return lordName;
+                }
+                else
+                {
+                    return PickLord.pickLord(board.getFrame(), lords);
+                }
         }
     }
 
@@ -2271,12 +2316,18 @@ public final class Client implements IClient
         return lords;
     }
 
+   
+    boolean doMove(String hexLabel)
+    {
+        return doMove(moverId, hexLabel);
+    }
 
-    void doMove(String hexLabel)
+    /** Return true if the move looks legal. */
+    public boolean doMove(String moverId, String hexLabel)
     {
         if (moverId == null)
         {
-            return;
+            return false;
         }
 
         boolean teleport = false;
@@ -2297,26 +2348,35 @@ public final class Client implements IClient
         }
         else
         {
-            return;
+            return false;
         }
 
         Set entrySides = listPossibleEntrySides(moverId, hexLabel, teleport);
 
-        String entrySide = PickEntrySide.pickEntrySide(board.getFrame(),
-            hexLabel, entrySides);
+        String entrySide = null;
+        if (getOption(Options.autoPickEntrySide))
+        {
+            entrySide = (String)entrySides.iterator().next();
+        }
+        else
+        {
+            entrySide = PickEntrySide.pickEntrySide(board.getFrame(),
+                hexLabel, entrySides);
+        }
 
         if (!goodEntrySide(entrySide))
         {
-            return;
+            return false;
         }
 
         String teleportingLord = null;
         if (teleport)
         {
-            teleportingLord = figureTeleportingLord(hexLabel);
+            teleportingLord = figureTeleportingLord(moverId, hexLabel);
         }
 
         server.doMove(moverId, hexLabel, entrySide, teleport, teleportingLord);
+        return true;
     }
 
     private boolean goodEntrySide(String entrySide)
@@ -2563,7 +2623,7 @@ public final class Client implements IClient
     }
 
     /** Returns a list of markerIds. */
-    public java.util.List getLegionsByPlayer(String name)
+    public synchronized java.util.List getLegionsByPlayer(String name)
     {
         java.util.List markerIds = new ArrayList();
         Iterator it = legionInfo.entrySet().iterator();
@@ -2668,7 +2728,7 @@ public final class Client implements IClient
         return false;
     }
 
-    java.util.List getEnemyLegions(String playerName)
+    public java.util.List getEnemyLegions(String playerName)
     {
         java.util.List markerIds = new ArrayList();
         Iterator it = legionInfo.values().iterator();
@@ -2684,7 +2744,7 @@ public final class Client implements IClient
         return markerIds;
     }
 
-    java.util.List getEnemyLegions(String hexLabel, String playerName)
+    public java.util.List getEnemyLegions(String hexLabel, String playerName)
     {
         java.util.List markerIds = new ArrayList();
         java.util.List legions = getLegionsByHex(hexLabel);
@@ -2700,12 +2760,24 @@ public final class Client implements IClient
         return markerIds;
     }
 
+    public String getFirstEnemyLegion(String hexLabel, String playerName)
+    {
+        java.util.List markerIds = getEnemyLegions(hexLabel, playerName);
+        if (markerIds.isEmpty())
+        {
+            return null;
+        }
+        return (String)markerIds.get(0);
+    }
+
+
     int getNumEnemyLegions(String hexLabel, String playerName)
     {
         return getEnemyLegions(hexLabel, playerName).size();
     }
 
-    java.util.List getFriendlyLegions(String hexLabel, String playerName)
+    public java.util.List getFriendlyLegions(String hexLabel, 
+        String playerName)
     {
         java.util.List markerIds = new ArrayList();
         java.util.List legions = getLegionsByHex(hexLabel);
@@ -2825,7 +2897,7 @@ public final class Client implements IClient
         clearRecruitChits();
     }
 
-    void doneWithMoves()
+    public void doneWithMoves()
     {
         if (!playerName.equals(getActivePlayerName()))
         {
@@ -2914,12 +2986,12 @@ public final class Client implements IClient
         return playerName.equals(getBattleActivePlayerName());
     }
 
-    int getMovementRoll()
+    public int getMovementRoll()
     {
         return movementRoll;
     }
 
-    int getMulligansLeft()
+    public int getMulligansLeft()
     {
         PlayerInfo info = getPlayerInfo(playerName);
         return info.getMulligansLeft();

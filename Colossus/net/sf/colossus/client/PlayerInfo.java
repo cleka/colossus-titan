@@ -4,6 +4,7 @@ package net.sf.colossus.client;
 import java.util.*;
 
 import net.sf.colossus.util.Split;
+import net.sf.colossus.util.Log;
 import net.sf.colossus.server.Player;
 import net.sf.colossus.parser.TerrainRecruitLoader;
 
@@ -15,7 +16,7 @@ import net.sf.colossus.parser.TerrainRecruitLoader;
  */
 
 
-final class PlayerInfo
+public final class PlayerInfo
 {
     private Client client;
 
@@ -87,7 +88,7 @@ final class PlayerInfo
         return dead;
     }
 
-    String getName()
+    public String getName()
     {
         return name;
     }
@@ -142,7 +143,7 @@ final class PlayerInfo
         return score;
     }
 
-    int getMulligansLeft()
+    public int getMulligansLeft()
     {
         return mulligansLeft;
     }
@@ -154,7 +155,7 @@ final class PlayerInfo
 
     boolean hasTeleported()
     {
-        Iterator it = client.getLegionsByPlayer(name).iterator();
+        Iterator it = getLegionIds().iterator();
         while (it.hasNext())
         {
             String markerId = (String)it.next();
@@ -165,5 +166,34 @@ final class PlayerInfo
             }
         }
         return false;
+    }
+
+    /** Return the number of this player's legions that have moved. */
+    public int numLegionsMoved()
+    {
+        int count = 0;
+
+        Iterator it = getLegionIds().iterator();
+        while (it.hasNext())
+        {
+            String markerId = (String)it.next();
+            LegionInfo legion = client.getLegionInfo(markerId);
+            if (legion.hasMoved())
+            {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    public int numMobileLegions()
+    {
+        return getNumLegions() - numLegionsMoved();
+    }
+
+    /** Return a List of markerIds. */
+    public List getLegionIds()
+    {
+        return client.getLegionsByPlayer(name);
     }
 }
