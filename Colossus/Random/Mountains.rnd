@@ -49,4 +49,4 @@ PAIR (p,2)(p,0) HEXSIDES c,50. s,50.
 # between 2-level plain and 1-level plain : 5% cliff, 50% slope after
 PAIR (p,2)(p,1) HEXSIDES c,5. s,50.
 # between 1-level plain and 0-level plain : 5% cliff, 50% slope after
-PAIR (p,2)(p,1) HEXSIDES c,5. s,50.
+PAIR (p,1)(p,0) HEXSIDES c,5. s,50.
