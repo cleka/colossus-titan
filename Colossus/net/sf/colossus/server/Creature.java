@@ -250,11 +250,17 @@ public class Creature implements Comparable
         return getPower() * getSkill();
     }
 
+    public int getHintedRecruitmentValue()
+    {
+        return getPointValue() +
+            VariantSupport.getHintedRecruitmentValueOffset(name);
+    }
+    
     public boolean isRangestriker()
     {
         return rangestrikes;
     }
-
+    
     public boolean isFlier()
     {
         return flies;

@@ -47,3 +47,6 @@ INITIALSPLIT "400" 1.0 ( Titan Gargoyle Gargoyle Centaur ) ( Angel Ogre Ogre Cen
 INITIALSPLIT "500" 1.0 ( Titan Gargoyle Ogre Ogre ) ( Angel Gargoyle Centaur Centaur )
 INITIALSPLIT "600" 0.5 ( Titan Gargoyle Gargoyle Centaur ) ( Angel Ogre Ogre Centaur )
 INITIALSPLIT "600" 1.0 ( Titan Ogre Ogre Centaur ) ( Angel Gargoyle Gargoyle  Centaur )
+
+# Let's claim the Druid has almost no recruitment value so that the Titan will pick-up anything over a Druid.
+RECRUITVALUE Druid -10

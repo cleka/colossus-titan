@@ -206,6 +206,8 @@ Each hint is a line of one of the forms:
 
 \texttt{INITIALSPLIT $\langle$hex\_label$\rangle$ $\langle$decimal\_value$\rangle$ "(" $\langle$split\_creature\_name$\rangle$ * ")" *}
 
+\texttt{RECRUITVALUE} $\langle$creature\_name$\rangle$ $\langle$value\_offset$\rangle$
+
 where for \texttt{RECRUIT}:
 
 \begin{itemize}
@@ -243,6 +245,10 @@ where for \texttt{INITIALSPLIT}:
 At the moment, there should be exactly two lists of exactly four creatures in the hint. The 8 creatures should be exactly one Titan, one Angel (those two in different stacks), and 2 of each of the three starting creatures of the Tower.
 
 Each split for a given Tower is checked in order, and the first to pass the test is used, so the last one for each Tower should always use ``1.0'' as the probability.
+
+where for \texttt{RECRUITVALUE}
+
+The $\langle$creature\_name$\rangle$ is the name of the affected creature, and the $\langle$value\_offset$\rangle$ is how many points to add/retire to the normal value. This only affect the AI estimation of the recruitment value of the crature: a creature with a big positive value will be recruited before anything else, a creature with a big negative value will be recruited after anything else.
 
 \section{\texttt{VAR} file format (default file used: ``Default/Default.var'')}
 \label{VAR}

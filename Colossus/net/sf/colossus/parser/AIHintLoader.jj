@@ -24,6 +24,7 @@ public class AIHintLoader
 {
     Map terrainToRecruitHintList = new HashMap();
     Map labelToInitialSplitList = new HashMap();
+    Map nameToRecruitmentValueOffset = new HashMap();
     java.util.Stack argStack = new java.util.Stack();
     Random rnd = new Random();
 
@@ -523,6 +524,20 @@ public class AIHintLoader
 
         return legion;
     }
+
+    public int getHintedRecruitmentValueOffset(String name)
+    {
+        Integer i = (Integer)nameToRecruitmentValueOffset.get(name);
+        
+        if (i == null)
+        {
+            return 0;
+        }
+        else
+        {
+            return i.intValue();
+        }
+    }
 }
 
 PARSER_END(AIHintLoader)
@@ -565,7 +580,16 @@ TOKEN :
 |   < NOT: "NOT" >
 |   < OPENPAR : "(" >
 |   < CLOSEPAR : ")" >
-|   < INITIALSPLIT: "INITIALSPLIT" >
+}
+
+TOKEN :
+{
+    < INITIALSPLIT: "INITIALSPLIT" >
+}
+
+TOKEN :
+{
+    < RECRUITVALUE: "RECRUITVALUE" >
 }
 
 TOKEN :
@@ -763,6 +787,8 @@ int oneHint() :
     recruitHintData recruitHint;
     String s;
     String label;
+    String name;
+    int offset;
     initialSplitHintData ishd;
 }
 {
@@ -813,6 +839,12 @@ int oneHint() :
         isl.add(ishd);
         
         return(1);
+    }
+|   <RECRUITVALUE> (name = h_chaine()) (offset = h_number())
+    {
+        nameToRecruitmentValueOffset.put(name, new Integer(offset));
+
+        return 1;
     }
 |   (s = h_comment())
     {

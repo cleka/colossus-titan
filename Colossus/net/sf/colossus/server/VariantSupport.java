@@ -368,6 +368,11 @@ public final class VariantSupport
         }
         return null;
     }
+
+    public synchronized static int getHintedRecruitmentValueOffset(String name)
+    {
+        return aihl.getHintedRecruitmentValueOffset(name);
+    }
     
     /** get maximum number of players in that variant */
     public static int getMaxPlayers()
