@@ -50,16 +50,19 @@ System.out.println("setupSplitDialog");
         {
             contentPane = getContentPane();
             contentPane.removeAll();
-            contentPane.setLayout(new GridLayout(0, 3));
+            contentPane.setLayout(new GridLayout(0, 4));
 
             contentPane.add(new JLabel(game.getActivePlayer().getName() + 
-                " : Split stacks"));
+                " : Split stacks "));
             JButton button1 = new JButton("Undo All Splits");
             contentPane.add(button1);
             button1.addActionListener(this);
-            JButton button2 = new JButton("Done with Splits");
+            JButton button2 = new JButton("Withdraw from Game");
             contentPane.add(button2);
             button2.addActionListener(this);
+            JButton button3 = new JButton("Done with Splits");
+            contentPane.add(button3);
+            button3.addActionListener(this);
 
             pack();
 
@@ -81,17 +84,17 @@ System.out.println("setupMoveDialog");
         Player player = game.getActivePlayer();
         if (player.getMulligansLeft() > 0)
         {
-            contentPane.setLayout(new GridLayout(0, 5));
+            contentPane.setLayout(new GridLayout(0, 6));
         }
         else
         {
-            contentPane.setLayout(new GridLayout(0, 4));
+            contentPane.setLayout(new GridLayout(0, 5));
         }
 
         player.rollMovement();
 
         contentPane.add(new JLabel(player.getName() + " : Movement Roll: " + 
-            player.getMovementRoll() + "  "));
+            player.getMovementRoll() + " "));
 
         JButton button1 = new JButton("Undo Last Move");
         contentPane.add(button1);
@@ -108,9 +111,13 @@ System.out.println("setupMoveDialog");
             button3.addActionListener(this);
         }
 
-        JButton button4 = new JButton("Done with Moves");
+        JButton button4 = new JButton("Withdraw from Game");
         contentPane.add(button4);
         button4.addActionListener(this);
+
+        JButton button5 = new JButton("Done with Moves");
+        contentPane.add(button5);
+        button5.addActionListener(this);
            
         pack();
 
@@ -140,7 +147,7 @@ System.out.println("setupFightDialog");
             contentPane.setLayout(new GridLayout(0, 2));
 
             contentPane.add(new JLabel(game.getActivePlayer().getName() + 
-                " : Resolve Engagements"));
+                " : Resolve Engagements "));
             JButton button1 = new JButton("Done with Engagements");
             contentPane.add(button1);
             button1.addActionListener(this);
@@ -166,19 +173,22 @@ System.out.println("setupMusterDialog");
         {
             contentPane = getContentPane();
             contentPane.removeAll();
-            contentPane.setLayout(new GridLayout(0, 4));
+            contentPane.setLayout(new GridLayout(0, 5));
 
             contentPane.add(new JLabel(game.getActivePlayer().getName() + 
-                " : Muster Recruits"));
+                " : Muster Recruits "));
             JButton button1 = new JButton("Undo Last Recruit");
             contentPane.add(button1);
             button1.addActionListener(this);
             JButton button2 = new JButton("Undo All Recruits");
             contentPane.add(button2);
             button2.addActionListener(this);
-            JButton button3 = new JButton("End Turn");
+            JButton button3 = new JButton("Withdraw from Game");
             contentPane.add(button3);
             button3.addActionListener(this);
+            JButton button4 = new JButton("End Turn");
+            contentPane.add(button4);
+            button4.addActionListener(this);
 
             pack();
 
@@ -322,6 +332,20 @@ System.out.println("setupMusterDialog");
             game.advanceTurn();
 
             setupSplitDialog();
+        }
+
+        else if (e.getActionCommand() == "Withdraw from Game")
+        {
+            int answer = JOptionPane.showConfirmDialog(parentFrame, 
+                "Are you sure you want to withdraw from the game?");
+            if (answer == JOptionPane.YES_OPTION)
+            {
+               game.getActivePlayer().die(null);
+
+               game.advanceTurn();
+
+               setupSplitDialog();
+            }
         }
     }
 }
