@@ -9,7 +9,7 @@ import java.net.*;
 import javax.swing.*;
 import java.io.*;
 import net.sf.colossus.util.Log;
-import net.sf.colossus.util.ImageLoader;
+import net.sf.colossus.util.ResourceLoader;
 import net.sf.colossus.server.Constants;
 
 
@@ -491,10 +491,10 @@ public final class GUIMasterHex extends MasterHex
         {
             java.util.List directories = new java.util.ArrayList();
             directories.add(GetPlayers.getVarDirectory() +
-                            ImageLoader.getPathSeparator() +
+                            ResourceLoader.getPathSeparator() +
                             Constants.imageDirName);
             directories.add(Constants.imageDirName);
-            overlay = ImageLoader.getImage(getTerrainName() +
+            overlay = ResourceLoader.getImage(getTerrainName() +
                                            (!inverted ? invertedPostfix : ""),
                                            directories);
             

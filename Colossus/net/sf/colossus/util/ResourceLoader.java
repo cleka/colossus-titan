@@ -4,13 +4,13 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * Class ImageLoader is an utlity class to load an Image from a filename and a list of directory.
+ * Class ResourceLoader is an utility class to load a resource from a filename and a list of directory.
  * @version $Id$
  * @author Romain Dolbeau
  * @author David Ripton
  */
 
-public final class ImageLoader
+public final class ResourceLoader
 {
     // File.separator does not work right in jar files.  A hardcoded
     // forward-slash does, and works in *x and Windows.  So I'm ignoring

@@ -9,7 +9,7 @@ import java.io.*;
 
 import net.sf.colossus.util.Log;
 import net.sf.colossus.util.HTMLColor;
-import net.sf.colossus.util.ImageLoader;
+import net.sf.colossus.util.ResourceLoader;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.Options;
 import net.sf.colossus.server.Creature;
@@ -1404,7 +1404,7 @@ public final class MasterBoard extends JPanel
         java.util.List directories = new java.util.ArrayList();
         directories.add(Constants.imageDirName);
         
-        Image image = ImageLoader.getImage("Colossus", directories);
+        Image image = ResourceLoader.getImage("Colossus", directories);
         
         if (image == null)
         {

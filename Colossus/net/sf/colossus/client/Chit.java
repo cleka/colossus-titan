@@ -7,7 +7,7 @@ import javax.swing.*;
 import java.util.*;
 import java.awt.geom.*;
 import java.net.*;
-import net.sf.colossus.util.ImageLoader;
+import net.sf.colossus.util.ResourceLoader;
 import net.sf.colossus.server.Constants;
 
 
@@ -65,10 +65,10 @@ class Chit extends JPanel
         // first, build list of candidate directories
         java.util.List directories = new java.util.ArrayList();
         directories.add(GetPlayers.getVarDirectory() +
-                        ImageLoader.getPathSeparator() +
+                        ResourceLoader.getPathSeparator() +
                         Constants.imageDirName);
         directories.add(Constants.imageDirName);
-        icon = ImageLoader.getImageIcon(imageFilename,
+        icon = ResourceLoader.getImageIcon(imageFilename,
                                         directories);
 
         if (icon == null)

@@ -8,7 +8,7 @@ import java.net.*;
 import javax.swing.*;
 import java.io.*;
 import net.sf.colossus.util.Log;
-import net.sf.colossus.util.ImageLoader;
+import net.sf.colossus.util.ResourceLoader;
 import net.sf.colossus.server.Constants;
 
 /**
@@ -330,10 +330,10 @@ public class GUIBattleHex extends BattleHex
         Image overlay = null;
         java.util.List directories = new java.util.ArrayList();
         directories.add(GetPlayers.getVarDirectory() +
-                        ImageLoader.getPathSeparator() +
+                        ResourceLoader.getPathSeparator() +
                         Constants.imageDirName);
         directories.add(Constants.imageDirName);
-        overlay = ImageLoader.getImage(name + imagePostfix, directories);
+        overlay = ResourceLoader.getImage(name + imagePostfix, directories);
         return overlay;
     }
 
