@@ -34,6 +34,7 @@ public class Game extends JFrame implements WindowListener, ActionListener
     private JLabel [] titanLabel;
     private JLabel [] scoreLabel;
     private Container contentPane;
+    private boolean gameOver = false;
 
 
     Game()
@@ -429,32 +430,50 @@ public class Game extends JFrame implements WindowListener, ActionListener
     }
 
 
+    boolean isGameOver()
+    {
+        return gameOver;
+    }
+
+
+    void declareGameOver()
+    {
+        gameOver = true;
+    }
+
+
     void checkForVictory()
     {
-        int remaining = 0;
-        int winner = -1;
-
-        for (int i = 0; i < numPlayers; i++)
+        if (!isGameOver())
         {
-            if (players[i].isAlive())
+            int remaining = 0;
+            int winner = -1;
+
+            for (int i = 0; i < numPlayers; i++)
             {
-                remaining++;
-                if (remaining >= 2)
+                if (players[i].isAlive())
                 {
-                    return;
+                    remaining++;
+                    winner = i;
                 }
-                winner = i;
             }
-        }
 
-        if (remaining == 1)
-        {
-            JOptionPane.showMessageDialog(board, players[winner].getName() 
-                + " wins");
-        }
-        else
-        {
-            JOptionPane.showMessageDialog(board, "draw");
+            switch (remaining)
+            {
+	        case 0:
+                    JOptionPane.showMessageDialog(board, "draw");
+                    declareGameOver();
+		    break;
+
+                case 1:
+                    JOptionPane.showMessageDialog(board, 
+		        players[winner].getName() + " wins");
+                    declareGameOver();
+		    break;
+
+                default:
+                    break;
+            }
         }
     }
 
