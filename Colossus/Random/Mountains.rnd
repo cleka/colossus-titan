@@ -34,6 +34,9 @@ AREA SURROUNDINGSOF((lowerdefsand)) HAZARDS p,75.,0.,50.,50. p,50.,0.,50.,50. p,
 LABEL lowerdefsand=(usedup)(lowerdefsand)
 AREA SURROUNDINGSOF((lowerdefsand)) HAZARDS p,50.,0.,50.,50. p,25.,0.,50.,50.
 
+# the next one is in case something hides the volcano. Put it back !
+AREA (volcano) HAZARDS v,2
+
 # and now, some slope, cliff and other niceties
 # between volcano and 0-level plain : 75% cliff, slope in all other case
 PAIR (v,*)(p,0) HEXSIDES c,75. s,100.
