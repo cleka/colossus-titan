@@ -19,8 +19,7 @@ class CreatureInfoList extends ArrayList
     int numCreature(String creatureName)
     {
         int count = 0;
-        Iterator it = iterator();
-        while (it.hasNext())
+        for (Iterator it = iterator(); it.hasNext(); )
         {
             CreatureInfo ci = (CreatureInfo)it.next();
             if (creatureName.equals(ci.getName()))
@@ -34,8 +33,7 @@ class CreatureInfoList extends ArrayList
     /** Return the first CreatureInfo that matches the passed name. */
     CreatureInfo getCreatureInfo(String creatureName)
     {
-        Iterator it = iterator();
-        while (it.hasNext())
+        for (Iterator it = iterator(); it.hasNext(); )
         {
             CreatureInfo ci = (CreatureInfo)it.next();
             if (ci.getName().equals(creatureName))
@@ -63,8 +61,7 @@ class CreatureInfoList extends ArrayList
 
     boolean isSupersetOf(CreatureInfoList other)
     {
-        Iterator it = other.iterator();
-        while (it.hasNext())
+        for (Iterator it = other.iterator(); it.hasNext(); )
         {
             CreatureInfo ci = (CreatureInfo)it.next();
             if (numCreature(ci.getName()) <
@@ -83,8 +80,7 @@ class CreatureInfoList extends ArrayList
         {
             name = "Titan";
         }
-        Iterator it = iterator();
-        while (it.hasNext())
+        for (Iterator it = iterator(); it.hasNext(); )
         {
             CreatureInfo ci = (CreatureInfo)it.next();
             if (name.equals(ci.getName()))
@@ -99,8 +95,7 @@ class CreatureInfoList extends ArrayList
     List getCreatureNames()
     {
         List list = new ArrayList();
-        Iterator it = iterator();
-        while (it.hasNext())
+        for (Iterator it = iterator(); it.hasNext(); )
         {
             CreatureInfo ci = (CreatureInfo)it.next();
             list.add(ci.getName());
@@ -112,8 +107,7 @@ class CreatureInfoList extends ArrayList
     public Object clone()
     {
         CreatureInfoList dupe = new CreatureInfoList();
-        Iterator it = iterator();
-        while (it.hasNext())
+        for (Iterator it = iterator(); it.hasNext(); )
         {
             CreatureInfo ci = (CreatureInfo)it.next();
             dupe.add(ci.clone());
