@@ -1528,7 +1528,10 @@ Log.debug("Called Client.removeLegion() for " + id);
     public void tellGameOver(String message)
     {
         gameOver = true;
-        showMessageDialog(message);
+        if (board != null)
+        {
+            showMessageDialog(message);
+        }
     }
 
     boolean isGameOver()
