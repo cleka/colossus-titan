@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<variant name="Abyssal9">
+    <strategic_map filename="Abyssal9Map.xml" />
+    <creatures filename="Abyssal9Cre.xml" />
+    <terrain_recruits filename="Abyssal9Ter.xml" />
+    <depends>
+        <depend variant="Abyssal6" />
+        <depend variant="ExtTitan" />
+    </depends>
+    <max_players num="9" />
+    <hint classname="Abyssal6.Abyssal6Hint" />
+</variant>
