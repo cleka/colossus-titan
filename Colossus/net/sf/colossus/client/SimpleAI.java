@@ -1571,6 +1571,11 @@ public class SimpleAI implements AI
             // defender in the tower!  ouch!
             defenderPointValue *= 1.2;
         }
+        else if (hex.getTerrain() == 'A')  // The Abyss, in variants
+        {
+            // defender in the abyss!  Kill!
+            defenderPointValue *= 0.8;
+        }
 
         // really dumb estimator
         double ratio = (double)attackerPointValue / (double)defenderPointValue;

@@ -1116,7 +1116,7 @@ Log.debug("Called Battle.doneReinforcing()");
     boolean doneWithStrikes()
     {
         // Advance only if there are no unresolved strikes.
-        if (isForcedStrikeRemaining())
+        if (getPhase() < Constants.FIGHT || isForcedStrikeRemaining())
         {
             Log.error(server.getPlayerName() + 
                 " called battle.doneWithStrikes() illegally");

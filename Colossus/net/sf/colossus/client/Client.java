@@ -834,7 +834,7 @@ public final class Client implements IClient
         return chits;
     }
 
-    void markOffboardCreaturesDead()
+    private void markOffboardCreaturesDead()
     {
         Iterator it = getActiveBattleChits().iterator();
         while (it.hasNext())

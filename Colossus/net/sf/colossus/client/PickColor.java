@@ -22,8 +22,8 @@ final class PickColor extends KDialog implements WindowListener, ActionListener
 {
     private JLabel [] colorLabel = new JLabel[Constants.MAX_MAX_PLAYERS];
 
-    private static final Color [] background;// = { Color.black, Color.blue, HTMLColor.brown, Color.yellow, Color.green, Color.red };
-    private static final Color [] foreground;// = { Color.white, Color.white, Color.white, Color.black, Color.black, Color.black };
+    private static final Color [] background;
+    private static final Color [] foreground;
 
     private static String color;
 
@@ -44,7 +44,8 @@ final class PickColor extends KDialog implements WindowListener, ActionListener
         }
     }
 
-    private PickColor(JFrame parentFrame, String playerName, java.util.List colorsLeft)
+    private PickColor(JFrame parentFrame, String playerName, 
+        java.util.List colorsLeft)
     {
         super(parentFrame, playerName + ", Pick a Color", true);
 

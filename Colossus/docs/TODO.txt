@@ -1,49 +1,10 @@
 Are dragons supposed to be native to tree hexes in Abyssal?
 
-Bug: Complete modal lockup of defender (human network client) battlemap 
-   window (only) at beginning of battle, after both legions placed onboard.
-
 Bug: Chat window went modal and started beeping.  Killing it from the
    Graphics menu worked.
 
 Bug: Logic to keep ShowLegion fully onscreen also failing on RH 7.3, 1.4.0,
    Sawfish at 1600x1200
-
-Bug: handleForcedSingleMove() didn't move anyone.  Because player has no
-   legions.  So why isn't he dead?  Titan was killed several turns earlier,
-   but death was not triggered, so game continued until all legions elim.
-
-Bug: Hang during AI engagement phase:
-From client Blue: doneWithMoves
-Phase advances to Fight
-in kickEngagements() summoning=false reinforcing=true acquiring=false
-0 engagements left
-From client Blue: engage ~ null
-
-Bug: Hang during AI split phase:
-Black's turn, number 35
-We can safely split AND attack with Bk01
-We can safely split AND attack with Bk01
-We can safely split AND attack with Bk01
-We can safely split AND attack with Bk01
-We can safely split AND attack with Bk01
-We can safely split AND attack with Bk01
-We can safely split AND attack with Bk01
-We can safely split AND attack with Bk01
-Not splitting Bk01 because it can't improve from here
-
-Bug: Hang during AI split phase
-From client Brown: engage ~ 134
-From client Red: flee ~ Rd06
-Legion Rd06 (Jester) flees from legion Br01 (Antlers)
-Legion Rd06 (Jester) [Ranger, Ranger] is eliminated
-Brown earns 16.0 points
-in kickEngagements() summoning=false reinforcing=false acquiring=false
-0 engagements left
-Phase advances to Muster
-Gold's turn, number 17
-From client Brown: doneWithEngagements
-Error: Brown illegally called doneWithEngagements()
 
 Bug: 2-high titan stack did not run away even though it could be caught
    on 4-6 by a 6-high stack:
@@ -71,7 +32,7 @@ Bug: Saw 8-high enemy legion 3xUni, Chi, 3xGri, Ran.  Height shows up
 
 Bug: Got two "All humans eliminated" dialogs -- one for human and one
    for last AI.  (With stop when all humans eliminated option set.)
-   Eliminated the dialog.
+   Eliminated the dialog.  Put back?
 
 Remember IP addresses from past games.
 

@@ -302,12 +302,12 @@ Log.debug("Called Server.addClient() for " + playerName);
 
     public void doneWithStrikes()
     {
-        if (!isBattleActivePlayer())
+        Battle battle = game.getBattle();
+        if (!isBattleActivePlayer() || battle.getPhase() < Constants.FIGHT)
         {
             Log.error(getPlayerName() + " illegally called doneWithStrikes()");
             return;
         }
-        Battle battle = game.getBattle();
         if (!battle.doneWithStrikes())
         {
             showMessageDialog("Must take forced strikes");
