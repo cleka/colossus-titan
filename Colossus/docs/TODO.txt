@@ -56,9 +56,6 @@ Gold's turn, number 17
 From client Brown: doneWithEngagements
 Error: Brown illegally called doneWithEngagements()
 
-Caretaker Titan has excess "Titan" at top, obscured by image.  Use
-   black 6-4 titan instead?
-
 Unify command-line argument processing on client and server sides.
 
 Add link from client to LogWindow; advance scroll thumb at end of various
