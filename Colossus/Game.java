@@ -428,7 +428,14 @@ public class Game extends Frame implements WindowListener, ActionListener
             }
         }
 
-        new MessageBox(board, players[winner].getName() + " wins");
+        if (remaining == 1)
+        {
+            new MessageBox(board, players[winner].getName() + " wins");
+        }
+        else
+        {
+            new MessageBox(board, "draw");
+        }
     }
 
 
