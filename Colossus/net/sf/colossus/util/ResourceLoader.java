@@ -418,64 +418,17 @@ public final class ResourceLoader
                 }
                 if (tempImage[i] == null)
                 {
-                    if (filenames[i].startsWith("Plain-"))
-                    {
-                        tempImage[i] =
-                            createPlainImage(basew,baseh,
-                                              colorFromFilename(filenames[i],
-                                                                "Plain-"));
-                    }
-                    if (filenames[i].startsWith("Power-"))
-                    {
-                        int val = numberFromFilename(filenames[i], "Power-");
-                        String mapKey2 = getMapKey(filenames[i], directories);
-                        tempImage[i] =
-                            createNumberImage(basew,baseh,val,false,mapKey2,
-                                              colorFromFilename(filenames[i],
-                                                                "Power-"));
-                    }
-                    if (filenames[i].startsWith("Skill-"))
-                    {
-                        int val = numberFromFilename(filenames[i], "Skill-");
-                        String mapKey2 = getMapKey(filenames[i], directories);
-                        tempImage[i] =
-                            createNumberImage(basew,baseh,val,true,mapKey2,
-                                              colorFromFilename(filenames[i],
-                                                                "Skill-"));
-                    }
-                    if (filenames[i].startsWith("Flying") ||
-                        filenames[i].startsWith("Rangestrike"))
-                    {
-                        int fly_ix = filenames[i].indexOf("Flying");
-                        int rgs_ix = filenames[i].indexOf("Rangestrike");
-                        String prefix = 
-                            (fly_ix != -1 ? "Flying" : "") +
-                            (rgs_ix != -1 ? "Rangestrike" : "");
-                        String mapKey2 = getMapKey(filenames[i], directories);
-                        tempImage[i] =
-                            createColorizedImage(prefix + "Base",
-                                                 colorFromFilename(filenames[i], prefix), mapKey2, directories);
-                    }
-                    if (filenames[i].indexOf("-Name") != -1)
-                    {
-                        String name =
-                            filenames[i].substring(0,
-                                                   filenames[i].indexOf("-Name"));
-                        String mapKey2 = getMapKey(filenames[i], directories);
-                        tempImage[i] =
-                            createNameImage(basew,baseh,name,mapKey2,
-                                            colorFromFilename(filenames[i],
-                                                              name + "-Name"));
-                    }
-                    if (tempImage[i] == null)
-                    {
-                        System.err.println("Error: during creation of \"" +
-                                           mapKey + "\", loading failed for " +
-                                           filenames[i]);
-                        return null;
-                    }
-                    waitOnImage(tempImage[i]);
-                }
+		    tempImage[i] = tryBuildingInexistantImage(filenames[i],
+							      basew, baseh,
+							      directories);
+		}
+		if (tempImage[i] == null)
+		{
+		    System.err.println("Error: during creation of \"" +
+				       mapKey + "\", loading failed for " +
+				       filenames[i]);
+		    return null;
+		}
             }
             bi = new BufferedImage(basew, baseh,
                                    BufferedImage.TYPE_INT_ARGB);
@@ -490,14 +443,82 @@ public final class ResourceLoader
             }
             if (bi != null)
             {
-                waitOnImage(bi);
-                imageCache.put(mapKey, bi);
+		synchronized (imageCache)
+		{
+		    imageCache.put(mapKey, bi);
+		}
             }
         }
         return bi;
     }
 
-    private static Image createNumberImage(int width, int height, int value, boolean right, String mapKey, Color color)
+    private static Image tryBuildingInexistantImage(String filename, int basew, int baseh, java.util.List directories)
+    {
+	Image tempImage = null;
+	
+	if (filename.startsWith("Plain-"))
+	{
+	    tempImage =
+		createPlainImage(basew,baseh,
+				 colorFromFilename(filename,
+						   "Plain-"));
+	}
+	if (filename.startsWith("Power-"))
+	{
+	    int val = numberFromFilename(filename, "Power-");
+	    tempImage =
+		createNumberImage(basew,baseh,val,false,
+				  colorFromFilename(filename,
+						    "Power-"));
+	}
+	if (filename.startsWith("Skill-"))
+	{
+	    int val = numberFromFilename(filename, "Skill-");
+	    tempImage =
+		createNumberImage(basew,baseh,val,true,
+				  colorFromFilename(filename,
+						    "Skill-"));
+	}
+	if (filename.startsWith("Flying") ||
+	    filename.startsWith("Rangestrike"))
+	{
+	    int fly_ix = filename.indexOf("Flying");
+	    int rgs_ix = filename.indexOf("Rangestrike");
+	    String prefix = 
+		(fly_ix != -1 ? "Flying" : "") +
+		(rgs_ix != -1 ? "Rangestrike" : "");
+	    tempImage =
+		createColorizedImage(prefix + "Base",
+				     colorFromFilename(filename,
+						       prefix),
+				     directories);
+	}
+	if (filename.indexOf("-Name") != -1)
+	{
+	    String name =
+		filename.substring(0,
+				   filename.indexOf("-Name"));
+	    tempImage =
+		createNameImage(basew,baseh,name,
+				colorFromFilename(filename,
+						  name + "-Name"));
+	}
+	if (tempImage == null)
+	{
+	    System.err.println("Error: creation failed for " +
+			       filename);
+	    return null;
+	}
+	waitOnImage(tempImage);
+	String mapKey = getMapKey(filename, directories);
+	synchronized (imageCache)
+	{
+	    imageCache.put(mapKey, tempImage);
+	}
+	return(tempImage);
+    }
+
+    private static Image createNumberImage(int width, int height, int value, boolean right, Color color)
     {
         BufferedImage bi = new BufferedImage(width, height,
                                              BufferedImage.TYPE_INT_ARGB);
@@ -525,14 +546,13 @@ public final class ResourceLoader
                                  2,
                                  height - 2);
         }
-        synchronized (imageCache)
-        {
-            imageCache.put(mapKey, bi);
-        }
+	waitOnImage(bi);
+	
         return bi;
     }
 
-    private static Image createNameImage(int width, int height, String name, String mapKey, Color color)
+
+    private static Image createNameImage(int width, int height, String name, Color color)
     {
         BufferedImage bi = new BufferedImage(width, height,
                                              BufferedImage.TYPE_INT_ARGB);
@@ -559,11 +579,8 @@ public final class ResourceLoader
         }
         int offset = (width - sw) / 2;
         biContext.drawString(name, offset, 1 + fm.getMaxAscent());
+	waitOnImage(bi);
 
-        synchronized (imageCache)
-        {
-            imageCache.put(mapKey, bi);
-        }
         return bi;
     }
 
@@ -585,7 +602,7 @@ public final class ResourceLoader
         return bi;
     }
 
-    private static Image createColorizedImage(String filename, Color color, String mapKey, java.util.List directories)
+    private static Image createColorizedImage(String filename, Color color, java.util.List directories)
     {
         Image temp = getImage(filename, directories);
         ImageIcon tempIcon = new ImageIcon(temp);
@@ -641,13 +658,6 @@ public final class ResourceLoader
             }
         }
         
-        synchronized (imageCache)
-        {
-            if (bi != null)
-            {
-                imageCache.put(mapKey, bi);
-            }
-        }
         return bi;
     }
 
