@@ -631,6 +631,12 @@ public final class Player implements Comparable
     }
 
 
+    public boolean isMarkerAvailable(String markerId)
+    {
+        return (markersAvailable.contains(markerId));
+    }
+
+
     public String getFirstAvailableMarker()
     {
         if (markersAvailable.size() == 0)
@@ -777,7 +783,14 @@ public final class Player implements Comparable
      *  to false if there is no such option. */
     public boolean getOption(String optname)
     {
-        String value = options.getProperty(optname);
+        // If autoPlay is set, all per-player options return true.
+        String value = options.getProperty(Game.autoPlay);
+        if (value != null && value.equals("true"))
+        {
+            return true;
+        }
+
+        value = options.getProperty(optname);
         if (value != null && value.equals("true"))
         {
             return true;
@@ -852,7 +865,7 @@ public final class Player implements Comparable
 
     public void aiSplit()
     {
-        if (getOption(Game.autoPlay) || getOption(Game.autoSplit))
+        if (getOption(Game.autoSplit))
         {
             ai.split(game);
         }
@@ -861,7 +874,7 @@ public final class Player implements Comparable
 
     public void aiMasterMove()
     {
-        if (getOption(Game.autoPlay) || getOption(Game.autoMasterMove))
+        if (getOption(Game.autoMasterMove))
         {
             ai.move(game);
         }
@@ -870,7 +883,7 @@ public final class Player implements Comparable
 
     public void aiRecruit()
     {
-        if (getOption(Game.autoPlay) || getOption(Game.autoRecruit))
+        if (getOption(Game.autoRecruit))
         {
             ai.muster(game);
         }

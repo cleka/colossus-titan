@@ -1,7 +1,6 @@
 import java.io.*;
 import java.util.*;
 import javax.swing.*;
-
 import org.apache.log4j.*;
 
 
@@ -22,7 +21,7 @@ public final class Game
     private StatusScreen statusScreen;
     private GameApplet applet;
     private Battle battle;
-    public static Random random = new Random();
+    private static Random random = new Random();
     private MovementDie movementDie;
     private SummonAngel summonAngel;
     private Caretaker caretaker = new Caretaker();
@@ -484,17 +483,20 @@ public final class Game
             }
             catch (Exception ex)
             {
+                return false;
             }
-        }
-
-        String value = options.getProperty(name);
-        if (value != null && value.equals("true"))
-        {
-            return true;
         }
         else
         {
-            return false;
+            String value = options.getProperty(name);
+            if (value != null && value.equals("true"))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
     }
 
@@ -2161,8 +2163,7 @@ public final class Game
             // A warm body recruits in a tower.
             recruiter = null;
         }
-        else if (player.getOption(autoPlay) ||
-            player.getOption(autoPickRecruiter) ||
+        else if (player.getOption(autoPickRecruiter) ||
             numEligibleRecruiters == 1 ||
             allRecruitersVisible(legion, recruiters))
         {
@@ -2283,15 +2284,15 @@ public final class Game
     {
         cat.info(s);
     }
-    
-    
+
+
     /** Log an error using log4j. */
     public static void logError(String s)
     {
         cat.error(s);
     }
-    
-    
+
+
     /** Log a debug message using log4j. */
     public static void logDebug(String s)
     {
@@ -2311,7 +2312,7 @@ public final class Game
     {
         String name = player.getName();
         String selectedMarkerId;
-        if (player.getOption(autoPlay) || player.getOption(autoPickMarker))
+        if (player.getOption(autoPickMarker))
         {
             selectedMarkerId = player.getFirstAvailableMarker();
         }
@@ -2341,11 +2342,8 @@ public final class Game
         caretaker.takeOne(Creature.gargoyle);
         caretaker.takeOne(Creature.gargoyle);
 
-        Legion legion = new Legion(selectedMarkerId, null, hex, hex,
-            Creature.titan, Creature.angel, Creature.ogre, Creature.ogre,
-            Creature.centaur, Creature.centaur, Creature.gargoyle,
-            Creature.gargoyle, player);
-
+        Legion legion = Legion.getStartingLegion(selectedMarkerId, hex,
+            player);
         player.addLegion(legion);
         hex.addLegion(legion, false);
     }
@@ -2776,46 +2774,45 @@ public final class Game
     }
 
 
-    // TODO: Use a more general log function rather than
-    // showMessageDialog.
-    // TODO: return success or failure.
-    private void doSplit(Legion legion, Player player)
+    private boolean doSplit(Legion legion, Player player)
     {
         // Need a legion marker to split.
         if (player.getNumMarkersAvailable() == 0)
         {
             JOptionPane.showMessageDialog(board,
                 "No markers are available.");
-            return;
+            return false;
         }
         // A legion must be at least 4 high to split.
         if (legion.getHeight() < 4)
         {
             JOptionPane.showMessageDialog(board,
                 "Legion is too short to split.");
-            return;
+            return false;
         }
         // Don't allow extra splits in turn 1.
         if (getTurnNumber() == 1 && player.getNumLegions() > 1)
         {
             JOptionPane.showMessageDialog(board,
                 "Cannot split twice on Turn 1.");
-            return;
+            return false;
         }
 
-        // TODO: Generalize this so that it works with either
-        // GUI or AI.
         SplitLegion.splitLegion(masterFrame, legion,
-            player.getOption(autoPlay) ||
             player.getOption(autoPickMarker));
 
         updateStatusScreen();
+
         // If we split, unselect this hex.
+        MasterHex hex = legion.getCurrentHex();
         if (legion.getHeight() < 7)
         {
-            MasterHex hex = legion.getCurrentHex();
             board.unselectHexByLabel(hex.getLabel());
         }
+        hex.repaint();
+
+        // XXX only return true if we actually split.
+        return true;
     }
 
 
@@ -2887,8 +2884,7 @@ public final class Game
                     if (hex.getTeleported() && hex.canEnterViaLand())
                     {
                         boolean answer;
-                        if (player.getOption(autoPlay) ||
-                            player.getOption(autoPickEntrySide))
+                        if (player.getOption(autoPickEntrySide))
                         {
                             // Always choose to move normally rather
                             // than teleport if auto-picking entry sides.
@@ -2922,8 +2918,7 @@ public final class Game
                     if (hex.isOccupied() && hex.getNumEntrySides() > 1)
                     {
                         int side;
-                        if (player.getOption(autoPlay) ||
-                            player.getOption(autoPickEntrySide))
+                        if (player.getOption(autoPickEntrySide))
                         {
                             side = hex.getEntrySide();
                         }
@@ -3259,7 +3254,7 @@ public final class Game
     }
 
 
-    /** Get the average point value of all legions in the game. This is 
+    /** Get the average point value of all legions in the game. This is
      *  somewhat of a cheat. */
     public int getAverageLegionPointValue()
     {

@@ -311,8 +311,7 @@ public final class Battle
 
             // Automatically perform forced strikes if applicable.
             Player player = game.getActivePlayer();
-            if (player.getOption(Game.autoPlay) ||
-                player.getOption(Game.autoForcedStrike))
+            if (player.getOption(Game.autoForcedStrike))
             {
                 makeForcedStrikes();
                 // If there are no possible strikes left, move on.
@@ -611,7 +610,7 @@ public final class Battle
         options[0] = "Yes";
         options[1] = "No";
         int answer = JOptionPane.showOptionDialog(map,
-            "Are you sure you with to concede the battle?",
+            "Are you sure you wish to concede the battle?",
             "Confirm Concession?",
             JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
             null, options, options[1]);
@@ -665,11 +664,44 @@ public final class Battle
         map.selectHexesByLabels(set);
         return set.size();
     }
+    
+    
+    /** Return true if any creatures have been left off-board. */
+    private boolean anyOffboardCreatures()
+    {
+        Player player = getActivePlayer();
+        Iterator it = critters.iterator();
+        while (it.hasNext())
+        {
+            Critter critter = (Critter)it.next();
+            if (critter.getCurrentHex().isEntrance() &&
+                critter.getPlayer() == player)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    
+    private boolean confirmLeavingCreaturesOffboard()
+    {
+        String [] options = new String[2];
+        options[0] = "Yes";
+        options[1] = "No";
+        int answer = JOptionPane.showOptionDialog(map,
+            "Are you sure you want to leave creatures offboard?",
+            "Confirm Leaving Creatures Offboard?",
+            JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
+            null, options, options[1]);
+
+        return (answer == JOptionPane.YES_OPTION);
+    }
 
 
     /** If any chits were left off-board, kill them.  If they were newly
      *  summoned or recruited, unsummon or unrecruit them instead. */
-    private void removeOffboardChits()
+    private void removeOffboardCreatures()
     {
         Player player = getActivePlayer();
         Iterator it = critters.iterator();
@@ -700,7 +732,17 @@ public final class Battle
 
     public void doneWithMoves()
     {
-        removeOffboardChits();
+        if (anyOffboardCreatures())
+        {
+            if (confirmLeavingCreaturesOffboard())
+            {
+                removeOffboardCreatures();
+            }
+            else
+            {
+                return;
+            }
+        }
         commitMoves();
         advancePhase();
     }
@@ -1825,8 +1867,7 @@ public final class Battle
                     if (game != null)
                     {
                         Player player = game.getActivePlayer();
-                        if (player.getOption(Game.autoPlay) ||
-                            player.getOption(Game.autoForcedStrike))
+                        if (player.getOption(Game.autoForcedStrike))
                         {
                             makeForcedStrikes();
                         }

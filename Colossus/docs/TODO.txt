@@ -1,27 +1,18 @@
+Log splits, but not exact creatures split unless showAllLegions option 
+   is set.
+
 Log first recruit of each creature type, and when each is exhausted.
 
-Add different debug logging levels.  Maybe use JLog or some other
-   free logging package instead of reinventing the wheel, if the 
-   footprint is small enough.
-
-Auto move should take mulligans if available.  Titans should teleport
-   to towers and grab warlocks more often.  Consider recruit scarcity
-   (last gargoyle more valuable than troll).  Don't leave non-moved
-   legion highlighted.  Force moving something, starting with least
-   valuable stack if none want to move.  Consider terrain when
+AI: Consider recruit scarcity (last gargoyle more valuable than troll).  
+   Don't leave non-moved legion highlighted. Consider terrain when
    deciding whether to fight.  Don't cheat and peek at the opposing 
    stack unless all stacks are visible or some cheat option is set.
-   Have stacks figure moves in some priority order, not just legion order.
-   Randomize order in which moves are actually made to avoid giving away 
-   titan location.  Consider safety of moved-to hex.  Add some value to 
-   flying and rangestrike to creature recruiting scores, or just make up 
-   a good value for each creature type.  Don't give as much value for 
-   recruiting creatures less powerful than the ones already there, 
-   especially if already 6 high.  Give some value to sitting in native 
-   terrain.  Get scrub snacks out of nearby opponent's good recruiting 
-   terrain, and into blocking positions.
-
-Auto split should not split when it's dangerous to do so.
+   Add some value to flying and rangestrike to creature recruiting scores, 
+   or just make up a good value for each creature type.  
+   Don't give as much value for recruiting creatures less powerful than 
+   the ones already there, especially if already 6 high.  Give some value 
+   to sitting in native terrain.  Get scrub snacks out of nearby 
+   opponents' good recruiting terrain, and into blocking positions.
 
 Add redo.
 
@@ -57,7 +48,6 @@ Add an option to show information about MasterBoard hexes when a
 
 Add allow the ability to replace any creature in a legion with a
    different creature type or "unknown," for PBEM and debug.
-
 
 Change more modal dialogs to use a factory that returns a value,
    rather than a public constructor and a call to a mutator.

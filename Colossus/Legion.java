@@ -166,6 +166,25 @@ public final class Legion
         }
     }
 
+
+    public static Legion getStartingLegion(String markerId, MasterHex hex,
+        Player player)
+    {
+        return new Legion(markerId, null, hex, hex, Creature.titan,
+            Creature.angel, Creature.ogre, Creature.ogre, 
+            Creature.centaur, Creature.centaur, Creature.gargoyle,
+            Creature.gargoyle, player);
+    }
+
+
+    public static Legion getEmptyLegion(String markerId, String parentId, 
+        MasterHex hex, Player player)
+    {
+        return new Legion(markerId, parentId, hex, hex, null, null, null,
+            null, null, null, null, null, player);
+    }
+
+
     /** deep copy for AI */
     public Legion AICopy()
     {
@@ -255,7 +274,7 @@ public final class Legion
         {
             // If we're testing battles with player or game or board
             // null, don't crash.
-            e.printStackTrace();
+            Game.logError(e.toString());
         }
     }
 
@@ -754,6 +773,60 @@ public final class Legion
 
         Game.logEvent("Legion " + getLongMarkerName() +
             " recombined into legion " + legion.getLongMarkerName());
+    }
+
+
+    /**
+     * Split off creatures into a new legion using legion marker markerId.
+     * (Or the first available marker, if markerId is null.)
+     * Return the new legion, or null if there's an error. 
+     */
+    public Legion split(List creatures, String newMarkerId)
+    {
+        if (newMarkerId == null)
+        {
+            newMarkerId = player.getFirstAvailableMarker();
+            if (newMarkerId == null)
+            {
+                return null;
+            }
+        }
+        if (!player.isMarkerAvailable(newMarkerId))
+        {
+            return null;
+        }
+
+        Legion newLegion = Legion.getEmptyLegion(newMarkerId, markerId,
+            currentHex, player);
+
+        Iterator it = creatures.iterator();
+        while (it.hasNext())
+        {
+            Creature creature = (Creature)it.next();
+            creature = removeCreature(creature, false, false);
+            if (creature == null)
+            {
+                // Abort the split.
+                newLegion.recombine(this, true);
+                return null;
+            }
+            newLegion.addCreature(creature);
+        }
+
+        Marker newMarker = new Marker(marker.getBounds().width,
+            newMarkerId, player.getGame().getMasterFrame(), newLegion);
+        newLegion.setMarker(newMarker);
+
+        player.addLegion(newLegion);
+        player.setLastLegionSplitOff(newLegion);
+        currentHex.addLegion(newLegion, false);
+
+        return newLegion;
+    }
+    
+    public Legion split(List creatures)
+    {
+        return split(creatures, null);
     }
 
 

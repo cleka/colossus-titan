@@ -8,7 +8,6 @@
 
 import java.io.*;
 import java.util.*;
-
 import org.apache.log4j.*;
 
 
@@ -31,7 +30,7 @@ class SimpleAI implements AI
     {
         // Do not recruit if this legion is a scooby snack.
         double scoobySnackFactor = 0.15;
-        int minimumSizeToRecruit = (int)(scoobySnackFactor * 
+        int minimumSizeToRecruit = (int)(scoobySnackFactor *
             game.getAverageLegionPointValue());
 
         Player player = game.getActivePlayer();
@@ -40,8 +39,8 @@ class SimpleAI implements AI
         while (it.hasNext())
         {
             Legion legion = (Legion)it.next();
-            if (legion.hasMoved() && legion.canRecruit() && 
-                (legion.numCreature(Creature.titan) >= 1 || 
+            if (legion.hasMoved() && legion.canRecruit() &&
+                (legion.numCreature(Creature.titan) >= 1 ||
                 legion.getPointValue() >= minimumSizeToRecruit))
             {
                 Creature recruit = chooseRecruit(game,legion, legion.getCurrentHex());
@@ -49,64 +48,63 @@ class SimpleAI implements AI
                 {
                     game.doRecruit(recruit, legion, game.masterFrame);
                 }
-                
             }
         }
         game.board.unselectAllHexes();
         game.updateStatusScreen();
     }
-                
+
 
     /**
      * pick what we would want to recruit with this legion in this hex.
-     * @return the Creature to recruit or null 
+     * @return the Creature to recruit or null
      */
     private static Creature chooseRecruit (Game game, Legion legion, MasterHex hex)
     {
         List recruits = game.findEligibleRecruits(legion, hex);
         if (recruits.size() == 0) return null;
         // pick the last creature in the list (which is the best/highest recruit)
-        Creature recruit = (Creature)recruits.get(recruits.size() - 1); 
-        // take third cyclops in brush 
-        if (recruit == Creature.gorgon 
-            && recruits.contains(Creature.cyclops) 
-            && legion.numCreature(Creature.behemoth) == 0 
+        Creature recruit = (Creature)recruits.get(recruits.size() - 1);
+        // take third cyclops in brush
+        if (recruit == Creature.gorgon
+            && recruits.contains(Creature.cyclops)
+            && legion.numCreature(Creature.behemoth) == 0
             && legion.numCreature(Creature.cyclops) == 2)
         {
             recruit = Creature.cyclops;
-        } 
-        // take a fourth cyclops in brush 
+        }
+        // take a fourth cyclops in brush
         // (so that we can split out a cyclops and still keep 3)
-        else if (recruit == Creature.gorgon 
-                 && recruits.contains(Creature.cyclops) 
+        else if (recruit == Creature.gorgon
+                 && recruits.contains(Creature.cyclops)
                  && legion.getHeight() == 6
                  && legion.numCreature(Creature.behemoth) == 0
-                 && legion.numCreature(Creature.gargoyle) == 0) 
+                 && legion.numCreature(Creature.gargoyle) == 0)
         {
             recruit = Creature.cyclops;
-        } 
+        }
         // prefer warlock over guardian (should be built in now)
-        else if ( recruits.contains(Creature.guardian) 
+        else if ( recruits.contains(Creature.guardian)
                   && recruits.contains(Creature.warlock) )
         {
             recruit = Creature.warlock;
         }
         // take a third lion/troll if we've got at least 1 way to desert/swamp
-        // from here and we're not about to be attacked 
-        else if ( recruits.contains(Creature.lion) 
-                  && recruits.contains(Creature.ranger) 
+        // from here and we're not about to be attacked
+        else if ( recruits.contains(Creature.lion)
+                  && recruits.contains(Creature.ranger)
                   && legion.numCreature(Creature.lion) == 2
                   && getNumberOfWaysToTerrain(legion,hex,'D') > 0)
         {
             recruit = Creature.lion;
         }
-        else if ( recruits.contains(Creature.troll) 
-                  && recruits.contains(Creature.ranger) 
+        else if ( recruits.contains(Creature.troll)
+                  && recruits.contains(Creature.ranger)
                   && legion.numCreature(Creature.troll) == 2
                   && getNumberOfWaysToTerrain(legion,hex,'S') > 0)
         {
             recruit = Creature.troll;
-        } 
+        }
         // tower creature selection:
         else if ( recruits.contains(Creature.ogre)
                   && recruits.contains(Creature.centaur)
@@ -124,20 +122,20 @@ class SimpleAI implements AI
             else if (legion.numCreature(Creature.ogre) == 1)
                 recruit = Creature.ogre;
             else if (legion.numCreature(Creature.centaur) == 1)
-                recruit = Creature.centaur; 
-            // else if there's cyclops left and we don't have 2 gargoyles, take a gargoyle 
+                recruit = Creature.centaur;
+            // else if there's cyclops left and we don't have 2 gargoyles, take a gargoyle
             else if (game.getCaretaker().getCount(Creature.cyclops) > 6
                      && legion.numCreature(Creature.gargoyle) < 2 )
                 recruit = Creature.gargoyle;
-            // else if there's trolls left and we don't have 2 ogres, take an ogre 
+            // else if there's trolls left and we don't have 2 ogres, take an ogre
             else if (game.getCaretaker().getCount(Creature.troll) > 6
                      && legion.numCreature(Creature.ogre) < 2 )
                 recruit = Creature.ogre;
-            // else if there's lions left and we don't have 2 lions, take a centaur 
+            // else if there's lions left and we don't have 2 lions, take a centaur
             else if (game.getCaretaker().getCount(Creature.lion) > 6
                      && legion.numCreature(Creature.centaur) < 2 )
                 recruit = Creature.centaur;
-            // else we dont really care; take anything 
+            // else we dont really care; take anything
         }
         return recruit;
     }
@@ -146,13 +144,10 @@ class SimpleAI implements AI
     public void split (Game game)
     {
         Player player = game.getActivePlayer();
-        List legions = player.getLegions();
-        Iterator it = legions.iterator();
-        LinkedList legionsToAdd = new LinkedList();
-        while (it.hasNext())
+        for (int i = player.getNumLegions() - 1; i >= 0; i--)
         {
-            Legion legion = (Legion) it.next();
-            if (legion.getHeight() < 7) 
+            Legion legion = player.getLegion(i);
+            if (legion.getHeight() < 7)
                 continue;
 
             // don't split if we're likely to be forced to attack and lose
@@ -169,7 +164,7 @@ class SimpleAI implements AI
                     while (moveIt.hasNext())
                     {
                         String hexLabel = (String) moveIt.next();
-                        MasterHex hex = game.board.getHexFromLabel(hexLabel); 
+                        MasterHex hex = game.board.getHexFromLabel(hexLabel);
                         if (hex.getNumEnemyLegions(player) == 0)
                             safeMoves++;
                         else
@@ -178,17 +173,17 @@ class SimpleAI implements AI
                             int result = estimateBattleResults(legion,true,enemy,hex);
                             if (result == WIN_WITH_MINIMAL_LOSSES)
                             {
-                                //debugln("We can safely split AND attack with " + legion );
+                                debugln("We can safely split AND attack with " + legion );
                                 safeMoves++;
                             }
                             int result2 = estimateBattleResults(legion,false,enemy,hex);
-                            if (result2 == WIN_WITH_MINIMAL_LOSSES 
+                            if (result2 == WIN_WITH_MINIMAL_LOSSES
                                 && result != WIN_WITH_MINIMAL_LOSSES
                                 && roll <= 4)
                             {
                                 // don't split so that we can attack!
-                                //debugln("Not splitting " + legion 
-                                //+ "because we want the muscle to attack");
+                                debugln("Not splitting " + legion
+                                + " because we want the muscle to attack");
                                 forcedToAttack = 999;
                             }
                         }
@@ -203,73 +198,32 @@ class SimpleAI implements AI
             }
 
             // TODO: don't split if we're about to be attacked and we
-            // need the muscle 
+            // need the muscle
             // TODO: don't split if there's no upwards recruiting
             // potential from our current location
 
             // create the new legion
-            String selectedMarkerId = player.getFirstAvailableMarker();
-            selectedMarkerId = player.selectMarkerId(selectedMarkerId);
-            if (selectedMarkerId == null)
-            {
-                // ack! we're out of legion markers!
-                return;
-            }
-            Legion newLegion = new Legion(selectedMarkerId, 
-                                          legion.getMarkerId(), 
-                                          legion.getCurrentHex(), // current hex
-                                          legion.getCurrentHex(), // starting hex
-                                          null, null, null, null, // creatures
-                                          null, null, null, null, // creatures
-                                          player);
-            Marker oldMarker = legion.getMarker();
-            String imageName = selectedMarkerId;
-            Marker newMarker = new Marker(oldMarker.getBounds().width,
-                                          imageName, game.board, newLegion);
-            newLegion.setMarker(newMarker); 
-            MasterHex hex = newLegion.getCurrentHex();
-            newLegion.getCurrentHex().addLegion(newLegion, false);
-            legionsToAdd.addLast(newLegion);
-
-            if (legion.getHeight() == 8)
-            {
-                doInitialGameSplit(game,hex,legion,newLegion);
-            }
-            else
-            {
-                List creaturesToRemove = chooseCreaturesToSplitOut(legion);
-                Iterator creatureIt = creaturesToRemove.iterator();
-                while (creatureIt.hasNext())
-                {
-                    Creature creature = (Creature) creatureIt.next();
-                    newLegion.addCreature(legion.removeCreature(creature,false,false),false);
-                }
-            }
-        } 
-
-        // must do this after so that we don't get a CoModificationException from
-        // the legion iterator above.
-        while (legionsToAdd.size() > 0)
-        {
-            Legion newLegion = (Legion) legionsToAdd.removeFirst();
-            player.addLegion(newLegion);
-            player.setLastLegionSplitOff(newLegion);
+            Legion newLegion = legion.split(chooseCreaturesToSplitOut(legion,
+                game.getNumPlayers()));
         }
-    } 
+    }
 
     /**
      * decide how to split this legion, and return a List of Creature's to remove.
      */
-    private static List chooseCreaturesToSplitOut(Legion legion)
+    private static List chooseCreaturesToSplitOut(Legion legion, int numPlayers)
     {
         //
-        // split a 7 high legion somehow
+        // split a 7 or 8 high legion somehow
         //
         // idea: pick the 2 weakest creatures and kick them
         // out. if there are more than 2 weakest creatures,
         // prefer a pair of matching ones.  if none match,
         // kick out the left-most ones (the oldest ones)
-        // 
+        //
+        // For an 8-high starting legion, call helper
+        // method doInitialGameSplit()
+        //
         // TODO: keep 3 cyclops if we don't have a behemoth
         // (split out a gorgon instead)
         //
@@ -278,9 +232,16 @@ class SimpleAI implements AI
         // centaurs, 2 gargoyles, and 2 cyclops, split out the
         // gargoyles)
         //
+
+        if (legion.getHeight() == 8)
+        {
+            return doInitialGameSplit(legion.getCurrentHex().getLabel(),
+                numPlayers);
+        }
+
         Critter weakest1 = null;
         Critter weakest2 = null;
-        for (Iterator critterIt = legion.getCritters().iterator(); 
+        for (Iterator critterIt = legion.getCritters().iterator();
              critterIt.hasNext(); )
         {
             Critter critter = (Critter) critterIt.next();
@@ -307,6 +268,13 @@ class SimpleAI implements AI
         return creaturesToRemove;
     }
 
+
+    private static List chooseCreaturesToSplitOut(Legion legion)
+    {
+        return chooseCreaturesToSplitOut(legion, 2);
+    }
+
+
     // From Hugh Moore:
     //
     //  It really depends on how many players there are and how good I
@@ -322,73 +290,26 @@ class SimpleAI implements AI
     //  but two player games are fucked up.
     //
 
-    /** helper for split */
-    private void doInitialGameSplit(Game game, MasterHex hex, 
-                                    Legion legion, Legion newLegion)
+    /** Return a list of exactly four creatures (including one lord) to
+     *  split out.*/
+    private static List doInitialGameSplit(String label, int numPlayers)
     {
-        final Creature titan = legion.removeCreature( Creature.titan, false, false);
-        final Creature angel = legion.removeCreature( Creature.angel, false, false);
-        final Creature gargoyle1 = legion.removeCreature( Creature.gargoyle, false, false);
-        final Creature gargoyle2 = legion.removeCreature( Creature.gargoyle, false, false);
-        final Creature ogre1 = legion.removeCreature( Creature.ogre, false, false);
-        final Creature ogre2 = legion.removeCreature( Creature.ogre, false, false);
-        final Creature centaur1 = legion.removeCreature( Creature.centaur, false, false);
-        final Creature centaur2 = legion.removeCreature( Creature.centaur, false, false);
-        final String label = hex.getLabel();
         // in CMU style splitting, we split centaurs in even towers,
-        // ogres in odd towers.  
-        final boolean oddTower = 
+        // ogres in odd towers.
+        final boolean oddTower =
             "100".equals(label) || "300".equals(label) || "500".equals(label);
-        final Creature splitCreature1 = oddTower?ogre1:centaur1;
-        final Creature splitCreature2 = oddTower?ogre2:centaur2;
-        final Creature nonsplitCreature1 = oddTower?centaur1:ogre1;
-        final Creature nonsplitCreature2 = oddTower?centaur2:ogre2;
+        final Creature splitCreature = oddTower?Creature.ogre:Creature.centaur;
+        final Creature nonsplitCreature = oddTower?Creature.centaur:Creature.ogre;
 
-        // randomize the two legion markers
-        final Legion legion1; 
-        final Legion legion2;
-        if (game.random.nextInt(10) % 2 == 0)
-        {
-            legion1 = legion; 
-            legion2 = newLegion;
-        }
-        else
-        {
-            legion1 = legion; 
-            legion2 = newLegion;
-        }
- 
         // if lots of players, keep gargoyles with titan (we need the muscle)
-        if (game.getNumPlayers() > 4)
+        if (numPlayers > 4)
         {
-            legion1.addCreature(titan);
-            legion1.addCreature(gargoyle1);
-            legion1.addCreature(gargoyle2);
-            legion1.addCreature(splitCreature1);
-            legion2.addCreature(angel);
-            legion2.addCreature(splitCreature2);
-            legion2.addCreature(nonsplitCreature1);
-            legion2.addCreature(nonsplitCreature2);
+            return CMUsplit(true, splitCreature, nonsplitCreature);
         }
         // don't split gargoyles in tower 3 or 6 (because of the extra jungles)
         else if ("300".equals(label) || "600".equals(label))
         {
-            if (game.random.nextInt(10) % 2 ==0)
-            {
-                legion1.addCreature(titan);
-                legion2.addCreature(angel);
-            }
-            else
-            {
-                legion1.addCreature(angel);
-                legion2.addCreature(titan);
-            } 
-            legion1.addCreature(gargoyle1);
-            legion1.addCreature(gargoyle2);
-            legion1.addCreature(splitCreature1);
-            legion2.addCreature(splitCreature2);
-            legion2.addCreature(nonsplitCreature1);
-            legion2.addCreature(nonsplitCreature2);
+            return CMUsplit(false, splitCreature, nonsplitCreature);
         }
         //
         // new idea due to David Ripton: split gargoyles in tower 2 or
@@ -399,45 +320,119 @@ class SimpleAI implements AI
         //
         else if ("200".equals(label) || "500".equals(label))
         {
-            // MIT split
-            legion1.addCreature(titan);
-            legion1.addCreature(nonsplitCreature1);
-            legion1.addCreature(nonsplitCreature2);
-            legion1.addCreature(gargoyle1); 
-            legion2.addCreature(angel);
-            legion2.addCreature(splitCreature1);
-            legion2.addCreature(splitCreature2);
-            legion2.addCreature(gargoyle2);
+            return MITsplit(true, splitCreature, nonsplitCreature);
         }
         //
         // otherwise, mix it up for fun
         else
         {
-            if (game.random.nextInt(100) <= 33)
+            if (Game.rollDie() <= 2)
             {
-                // MIT split
-                legion1.addCreature(titan);
-                legion1.addCreature(nonsplitCreature1);
-                legion1.addCreature(nonsplitCreature2);
-                legion1.addCreature(gargoyle1); 
-                legion2.addCreature(angel);
-                legion2.addCreature(splitCreature1);
-                legion2.addCreature(splitCreature2);
-                legion2.addCreature(gargoyle2);
+                return MITsplit(true, splitCreature, nonsplitCreature);
             }
             else
             {
-                // CMU split
-                legion1.addCreature(titan);
-                legion1.addCreature(gargoyle1);
-                legion1.addCreature(gargoyle2);
-                legion1.addCreature(splitCreature1);
-                legion2.addCreature(angel);
-                legion2.addCreature(splitCreature2);
-                legion2.addCreature(nonsplitCreature1);
-                legion2.addCreature(nonsplitCreature2);
+                return CMUsplit(true, splitCreature, nonsplitCreature);
             }
         }
+    }
+
+
+    // Keep the gargoyles together.
+    private static List CMUsplit(boolean favorTitan, Creature splitCreature,
+        Creature nonsplitCreature)
+    {
+        LinkedList splitoffs = new LinkedList();
+        if (favorTitan)
+        {
+            if (Game.rollDie() <= 3)
+            {
+                splitoffs.add(Creature.titan);
+                splitoffs.add(Creature.gargoyle);
+                splitoffs.add(Creature.gargoyle);
+                splitoffs.add(splitCreature);
+            }
+            else
+            {
+                splitoffs.add(Creature.angel);
+                splitoffs.add(nonsplitCreature);
+                splitoffs.add(nonsplitCreature);
+                splitoffs.add(splitCreature);
+            }
+        }
+        else
+        {
+            if (Game.rollDie() <= 3)
+            {
+                splitoffs.add(Creature.titan);
+            }
+            else
+            {
+                splitoffs.add(Creature.angel);
+            }
+            if (Game.rollDie() <= 3)
+            {
+                splitoffs.add(Creature.gargoyle);
+                splitoffs.add(Creature.gargoyle);
+                splitoffs.add(splitCreature);
+            }
+            else
+            {
+                splitoffs.add(nonsplitCreature);
+                splitoffs.add(nonsplitCreature);
+                splitoffs.add(splitCreature);
+            }
+        }
+        return splitoffs;
+    }
+
+
+    // Split the gargoyles.
+    private static List MITsplit(boolean favorTitan, Creature splitCreature,
+        Creature nonsplitCreature)
+    {
+        LinkedList splitoffs = new LinkedList();
+        if (favorTitan)
+        {
+            if (Game.rollDie() <= 3)
+            {
+                splitoffs.add(Creature.titan);
+                splitoffs.add(nonsplitCreature);
+                splitoffs.add(nonsplitCreature);
+                splitoffs.add(Creature.gargoyle);
+            }
+            else
+            {
+                splitoffs.add(Creature.angel);
+                splitoffs.add(splitCreature);
+                splitoffs.add(splitCreature);
+                splitoffs.add(Creature.gargoyle);
+            }
+        }
+        else
+        {
+            if (Game.rollDie() <= 3)
+            {
+                splitoffs.add(Creature.titan);
+            }
+            else
+            {
+                splitoffs.add(Creature.angel);
+            }
+            if (Game.rollDie() <= 3)
+            {
+                splitoffs.add(nonsplitCreature);
+                splitoffs.add(nonsplitCreature);
+                splitoffs.add(Creature.gargoyle);
+            }
+            else
+            {
+                splitoffs.add(splitCreature);
+                splitoffs.add(splitCreature);
+                splitoffs.add(Creature.gargoyle);
+            }
+        }
+        return splitoffs;
     }
 
 
@@ -451,7 +446,7 @@ class SimpleAI implements AI
         {
             PlayerMove playermove = (PlayerMove) minimax.search
                 ( new MasterBoardPosition(game,game.getActivePlayerNum()),1);
-            // apply the PlayerMove 
+            // apply the PlayerMove
             for (Iterator it = playermove.moves.entrySet().iterator(); it.hasNext();)
             {
                 Map.Entry entry = (Map.Entry) it.next();
@@ -493,8 +488,9 @@ class SimpleAI implements AI
         // TODO: this is really stupid.  do something smart here.
         // idea: hard code an "opening book" of turn 1 moves based
         // on our splits and die rolls.
-        if (player.getMulligansLeft() > 0 && player.getMovementRoll() == 2)
-        { 
+        if (player.getMulligansLeft() > 0 && (player.getMovementRoll() == 2 ||
+            player.getMovementRoll() == 5))
+        {
             player.takeMulligan();
             player.rollMovement();
 
@@ -517,19 +513,19 @@ class SimpleAI implements AI
             ArrayList moveList = new ArrayList();
             moveMap.put(legion,moveList);
             MoveInfo sitStillMove = new MoveInfo
-                ( legion, null, 
-                  evaluateMove(game, legion,legion.getCurrentHex(), false, enemyAttackMap), 
+                ( legion, null,
+                  evaluateMove(game, legion,legion.getCurrentHex(), false, enemyAttackMap),
                   0);
             moveList.add(sitStillMove);
-            // find the best move (1-ply search) 
+            // find the best move (1-ply search)
             MasterHex bestHex = null;
             int bestValue = Integer.MIN_VALUE;
             Set set = game.listMoves(legion, true);
             for (Iterator moveIterator = set.iterator(); moveIterator.hasNext();)
             {
                 final String hexLabel = (String) moveIterator.next();
-                final MasterHex hex = game.board.getHexFromLabel(hexLabel); 
-                final int value = evaluateMove(game, legion,hex,true,enemyAttackMap); 
+                final MasterHex hex = game.board.getHexFromLabel(hexLabel);
+                final int value = evaluateMove(game, legion,hex,true,enemyAttackMap);
                 if (value > bestValue || bestHex == null)
                 {
                     bestValue = value;
@@ -537,8 +533,8 @@ class SimpleAI implements AI
                 }
                 MoveInfo move = new MoveInfo(legion, hex, value, value - sitStillMove.value);
                 moveList.add(move);
-            } 
-            // if we found a move that's better than sitting still, move 
+            }
+            // if we found a move that's better than sitting still, move
             if (bestValue > sitStillMove.value)
             {
                 movedALegion = true;
@@ -560,7 +556,9 @@ class SimpleAI implements AI
                 // pick the legion in this hex whose best move has the
                 // least difference with its sitStillValue, and force
                 // it to move.
-                debugln("Ack! forced to move a split group"); 
+
+                // TODO: Consider relative importance of legions.
+                debugln("Ack! forced to move a split group");
 
                 // first, concatenate all the moves for all the
                 // legions that are here, and sort them by their
@@ -589,10 +587,10 @@ class SimpleAI implements AI
                 {
                     MoveInfo move = (MoveInfo) moveIt.next();
                     if (move.hex == null) continue; //skip the sitStill moves
-                    debugln("forced to move split legion " 
-                            + move.legion + " to " + move.hex 
+                    debugln("forced to move split legion "
+                            + move.legion + " to " + move.hex
                             + " taking penalty " + move.difference
-                            + " in order to handle illegal legion " + legion); 
+                            + " in order to handle illegal legion " + legion);
                     game.actOnLegion(move.legion);
                     game.actOnHex(move.hex);
                     movedALegion = true;
@@ -639,20 +637,20 @@ class SimpleAI implements AI
             // have moved a legion
             Iterator moveIt = allmoves.iterator();
             while (moveIt.hasNext()
-                   && player.legionsMoved() == 0 
+                   && player.legionsMoved() == 0
                    && player.countMobileLegions() > 0)
             {
                 MoveInfo move = (MoveInfo) moveIt.next();
                 if (move.hex == null) continue; //skip the sitStill moves
-                debugln("forced to move " 
-                        + move.legion + " to " + move.hex 
+                debugln("forced to move "
+                        + move.legion + " to " + move.hex
                         + " taking penalty " + move.difference
-                        + " in order to handle illegal legion " + move.legion); 
+                        + " in order to handle illegal legion " + move.legion);
                 game.actOnLegion(move.legion);
                 game.actOnHex(move.hex);
                 movedALegion = true;
             }
-        } 
+        }
     }
 
 
@@ -682,7 +680,9 @@ class SimpleAI implements AI
             while (legionIt.hasNext())
             {
                 Legion legion = (Legion) legionIt.next();
+
                 //debugln("checking where " + legion + " can attack next turn..");
+
                 // for each movement roll he might make
                 for (int roll = 1; roll <= 6; roll++)
                 {
@@ -695,35 +695,35 @@ class SimpleAI implements AI
                         for (int effectiveRoll = roll; effectiveRoll<=6; effectiveRoll++)
                         {
                             // legion can attack to hexlabel on a effectiveRoll.
-                            ArrayList list = 
+                            ArrayList list =
                                 (ArrayList) enemyMap[effectiveRoll].get(hexlabel);
                             if (list == null)
                                 list = new ArrayList();
                             if (list.contains(legion))
                                 continue;
                             list.add(legion);
-                            //debugln("" + legion + " can attack " 
-                            //+ hexlabel + " on a " + effectiveRoll);
+                            //debugln("" + legion + " can attack "
+                            // + hexlabel + " on a " + effectiveRoll);
                             enemyMap[effectiveRoll].put(hexlabel,list);
                         }
                     }
                 }
             }
-        } 
-        //debugln("built map!");
+        }
+        //debugln("built map");
         return enemyMap;
-    } 
+    }
 
     //
     // cheap, inaccurate evaluation function.  Returns a value for
     // moving this legion to this hex.  The value defines a distance
     // metric over the set of all possible moves.
     //
-    // TODO: should be parameterized with weights 
+    // TODO: should be parameterized with weights
     //
-    private static int evaluateMove (Game game, 
-                                     Legion legion, 
-                                     MasterHex hex, 
+    private static int evaluateMove (Game game,
+                                     Legion legion,
+                                     MasterHex hex,
                                      boolean canRecruitHere,
                                      HashMap[] enemyAttackMap )
     {
@@ -743,16 +743,16 @@ class SimpleAI implements AI
                     debugln("legion " + legion + " can attack " + enemyLegion +
                             " in " + hex + " and WIN_WITH_MINIMAL_LOSSES");
                     // we score a fraction of an angel
-                    value += (24 * enemyPointValue) / 100; 
+                    value += (24 * enemyPointValue) / 100;
                     // plus a fraction of a titan strength
-                    value += (6 * enemyPointValue) / 100; 
+                    value += (6 * enemyPointValue) / 100;
                     // plus some more for killing a group (this is arbitrary)
-                    value += (10 * enemyPointValue) / 100; 
+                    value += (10 * enemyPointValue) / 100;
                     // TODO: if enemy titan, we also score half points
                     // (this may make the AI unfairly gun for your titan)
                     break;
                 case WIN_WITH_HEAVY_LOSSES:
-                    debugln("legion " + legion + " can attack " + enemyLegion + 
+                    debugln("legion " + legion + " can attack " + enemyLegion +
                             " in " + hex + " and WIN_WITH_HEAVY_LOSSES");
                     // don't do this with our titan unless we can win the game
                     {
@@ -780,7 +780,7 @@ class SimpleAI implements AI
                                 value += enemyPointValue;
                             }
                             else
-                            {   
+                            {
                                 // ack! we'll fuck up our titan group
                                 value += LOSE_LEGION + 10;
                             }
@@ -789,25 +789,25 @@ class SimpleAI implements AI
                         // and won't score enough points to make up for it
                         else if (legion.numCreature(Creature.angel) > 0
                                  && !haveOtherAngels
-                                 && enemyPointValue < 88) 
+                                 && enemyPointValue < 88)
                         {
                                 value += LOSE_LEGION+5;
                         }
                         else
                         {
                             // we score a fraction of an angel & titan strength
-                            value += (30 * enemyPointValue) / 100; 
+                            value += (30 * enemyPointValue) / 100;
                             // but we lose this group
-                            value -= (20 * legion.getPointValue()) / 100; 
+                            value -= (20 * legion.getPointValue()) / 100;
                             // TODO: if we have no other angels, more penalty here
                             // TODO: if enemy titan, we also score half points
                             // (this may make the AI unfairly gun for your titan)
-                        } 
+                        }
                     }
                     break;
                 case DRAW:
                     {
-                        debugln("legion " + legion + " can attack " + enemyLegion + 
+                        debugln("legion " + legion + " can attack " + enemyLegion +
                                 " in " + hex + " and DRAW");
                         // If this is an unimportant group for us, but
                         // is enemy titan, do it.  This might be an
@@ -818,41 +818,42 @@ class SimpleAI implements AI
                         {
                             // arbitrary value for killing a player
                             // but scoring no points: it's worth a
-                            // little 
+                            // little
                             // TODO: if there's only 2 players, we
                             // should do this
                             value += enemyPointValue / 6;
                         }
                         else
                         {
-                            // otherwise no thanks 
-                            value += LOSE_LEGION + 2; 
+                            // otherwise no thanks
+                            value += LOSE_LEGION + 2;
                         }
                     }
                     break;
                 case LOSE_BUT_INFLICT_HEAVY_LOSSES:
                     {
-                        debugln("legion " + legion + " can attack " + enemyLegion + 
+                        debugln("legion " + legion + " can attack " + enemyLegion +
                                 " in " + hex + " and LOSE_BUT_INFLICT_HEAVY_LOSSES");
                         // TODO: how important is it that we damage
                         // his group?
-                        value += LOSE_LEGION + 1; 
+                        value += LOSE_LEGION + 1;
                     }
                     break;
                 case LOSE:
                     {
-                        debugln("legion " + legion + " can attack " + enemyLegion + 
+                        debugln("legion " + legion + " can attack " + enemyLegion +
                                 " in " + hex + " and LOSE");
-                        value += LOSE_LEGION; 
+                        value += LOSE_LEGION;
                     }
                     break;
             }
         }
 
         // consider what we can recruit
+        Creature recruit = null;
         if (canRecruitHere)
         {
-            Creature recruit = chooseRecruit(game,legion,hex);
+            recruit = chooseRecruit(game,legion,hex);
             if (recruit != null)
             {
                 int oldval = value;
@@ -868,11 +869,15 @@ class SimpleAI implements AI
                     // TODO this should call our splitting code to see
                     // what split decision we would make
 
-                    //debugln("--- 6-HIGH SPECIAL CASE");
-                    
+                    debugln("--- 6-HIGH SPECIAL CASE");
+                    // TODO This special case is overkill.  A 6-high stack
+                    // with 3 lions sometimes refuses to go to a safe desert
+                    // and grab a griffon, because its value is toned down
+                    // too much.  Reduce the effect.
+
                     Critter weakest1 = null;
                     Critter weakest2 = null;
-                    for (Iterator critterIt = legion.getCritters().iterator(); 
+                    for (Iterator critterIt = legion.getCritters().iterator();
                          critterIt.hasNext(); )
                     {
                         Critter critter = (Critter) critterIt.next();
@@ -893,25 +898,25 @@ class SimpleAI implements AI
                                 weakest1 = critter;
                         }
                     }
-                    int minCreaturePV 
+                    int minCreaturePV
                         = Math.min(weakest1.getPointValue(),weakest2.getPointValue());
-                    int maxCreaturePV 
+                    int maxCreaturePV
                         = Math.max(weakest1.getPointValue(),weakest2.getPointValue());
                     // point value of my best 5 pieces right now
                     int oldPV = legion.getPointValue() - minCreaturePV;
                     // point value of my best 5 pieces after adding this recruit
                     // and then splitting off my 2 weakest
-                    int newPV = legion.getPointValue() 
+                    int newPV = legion.getPointValue()
                         - weakest1.getPointValue()
-                        - weakest2.getPointValue() 
+                        - weakest2.getPointValue()
                         + Math.max(maxCreaturePV,recruit.getPointValue());
                     value += newPV - oldPV;
-                } 
-                //debugln("--- if " + legion
-                //+ " moves to " + hex
-                //+ " then it could recruit " 
-                //+  recruit.toString()
-                //+ " (adding " + (value-oldval) + " to score)" );
+                }
+                debugln("--- if " + legion
+                + " moves to " + hex
+                + " then recruit "
+                + recruit.toString()
+                + " (adding " + (value-oldval) + ")" );
             }
         }
 
@@ -936,13 +941,13 @@ class SimpleAI implements AI
                 // others players ability to move.
                 Legion enemy = nextHex.getEnemyLegion(legion.getPlayer());
                 if (enemy != null
-                    && estimateBattleResults(legion,enemy,nextHex) 
+                    && estimateBattleResults(legion,enemy,nextHex)
                     != WIN_WITH_MINIMAL_LOSSES)
-                    continue; 
+                    continue;
                 List nextRecruits = game.findEligibleRecruits(legion,nextHex);
                 if (nextRecruits.size() == 0)
                     continue;
-                Creature nextRecruit = 
+                Creature nextRecruit =
                     (Creature)nextRecruits.get(nextRecruits.size() - 1);
                 int val = nextRecruit.getSkill() * nextRecruit.getPower();
                 if (val > bestRecruitVal)
@@ -951,7 +956,7 @@ class SimpleAI implements AI
                     bestRecruit = nextRecruit;
                 }
             }
-            nextTurnValue += bestRecruitVal; 
+            nextTurnValue += bestRecruitVal;
         }
         nextTurnValue /= 6; // 1/6 chance of each happening
         value += nextTurnValue;
@@ -959,19 +964,27 @@ class SimpleAI implements AI
         // consider risk of being attacked
         if (enemyAttackMap != null)
         {
-            //debugln("considering risk of moving " + legion + " to "  + hex );
+            if (canRecruitHere)
+            {
+                debugln("considering risk of moving " + legion + " to "  + hex );
+            }
+            else
+            {
+                debugln("considering risk of leaving " + legion + " in "  + hex );
+            }
             HashMap[] enemiesThatCanAttackOnA = enemyAttackMap;
 	    int roll;
             for (roll = 1; roll <= 6; roll++)
             {
                 List enemies = (List) enemiesThatCanAttackOnA[roll].get(hex.getLabel());
-                //debugln("got enemies that can attack on a " + roll + " :" + enemies);
                 if (enemies == null) continue;
+                debugln("got enemies that can attack on a " + roll + " :" + enemies);
                 Iterator it = enemies.iterator();
                 while (it.hasNext())
                 {
                     Legion enemy = (Legion) it.next();
-                    final int result = estimateBattleResults(enemy, legion, hex);
+                    final int result = estimateBattleResults(enemy, false,
+                        legion, hex, recruit);
                     if (result == WIN_WITH_MINIMAL_LOSSES)
                         break;
                     // break on the lowest roll from which we can be attacked and killed
@@ -986,7 +999,7 @@ class SimpleAI implements AI
 		else
 		    risk = -legion.getPointValue()/2 * chanceToAttack;
 		value += risk;
-	    } 
+	    }
         }
 
         // TODO: consider mobility.  e.g., penalty for suckdown
@@ -1007,8 +1020,8 @@ class SimpleAI implements AI
         // recruit on 1,3,5, and we have a behemoth with choice of 3/5
         // to jungle or 4/6 to jungle, prefer the 4/6 location).
 
-        debugln("EVAL " + legion 
-                + (canRecruitHere?" move to ":" stay in ") 
+        debugln("EVAL " + legion
+                + (canRecruitHere?" move to ":" stay in ")
                 + hex
                 + " = " + value);
         return value;
@@ -1020,7 +1033,7 @@ class SimpleAI implements AI
     private static final int DRAW = 2;
     private static final int LOSE_BUT_INFLICT_HEAVY_LOSSES = 3;
     private static final int LOSE = 4;
-    
+
     /**
      * estimate the outcome of a battle
      * @param attacker the attacking legion
@@ -1029,16 +1042,27 @@ class SimpleAI implements AI
      * contain info about which side the attacker enters from )
      * @return a constant int indicating the attack result.
      */
-    private static int estimateBattleResults (Legion attacker, 
-                                             Legion defender, 
+    private static int estimateBattleResults (Legion attacker,
+                                             Legion defender,
                                              MasterHex hex)
     {
-        return estimateBattleResults(attacker,false,defender,hex);
+        return estimateBattleResults(attacker,false,defender,hex,null);
     }
-    private static int estimateBattleResults (Legion attacker, 
+
+    private static int estimateBattleResults (Legion attacker,
                                              boolean attackerSplitsBeforeBattle,
-                                             Legion defender, 
+                                             Legion defender,
                                              MasterHex hex)
+    {
+        return estimateBattleResults(attacker, attackerSplitsBeforeBattle,
+            defender, hex, null);
+    }
+
+    private static int estimateBattleResults (Legion attacker,
+                                             boolean attackerSplitsBeforeBattle,
+                                             Legion defender,
+                                             MasterHex hex,
+                                             Creature recruit)
     {
         double attackerPointValue = attacker.getPointValue();
         if (attackerSplitsBeforeBattle)
@@ -1052,14 +1076,19 @@ class SimpleAI implements AI
                 attackerPointValue -= creature.getPointValue();
             }
         }
+        if (recruit != null)
+        {
+            // debugln("adding in recruited " + recruit + " when evaluating battle");
+            attackerPointValue += recruit.getPointValue();
+        }
         // reduce PV slightly if titan is present and weak (and thus can't fight)
         Critter attackerTitan  = attacker.getCritter(Creature.titan);
-        if (attackerTitan != null) 
+        if (attackerTitan != null)
         {
             switch (attackerTitan.getPower())
             {
-                case 6:   
-                    attackerPointValue -= 12;  
+                case 6:
+                    attackerPointValue -= 12;
                     break;
                 case 7:
                     attackerPointValue -= 10;
@@ -1070,16 +1099,16 @@ class SimpleAI implements AI
                     // 9 or above is worth full strength
             }
         }
-        // TODO: add angel call 
+        // TODO: add angel call
         double defenderPointValue = defender.getPointValue();
         // reduce PV slightly if titan is present and weak (and thus cant' fight)
         Critter defenderTitan  = defender.getCritter(Creature.titan);
-        if (defenderTitan != null) 
+        if (defenderTitan != null)
         {
             switch (defenderTitan.getPower())
             {
-                case 6:   
-                    defenderPointValue -= 12;  
+                case 6:
+                    defenderPointValue -= 12;
                     break;
                 case 7:
                     defenderPointValue -= 10;
@@ -1089,7 +1118,7 @@ class SimpleAI implements AI
                     break;
                     // 9 or above is worth full strength
             }
-        } 
+        }
         // TODO: add in enemy's most likely turn 4 recruit
 
         // TODO: adjust for natives / terrain type
@@ -1098,27 +1127,27 @@ class SimpleAI implements AI
             case 'T':  // defender in the tower!  ouch!
                 defenderPointValue *= 1.2;
                 break;
-            case 'B':  
+            case 'B':
                 // in brush, having a native advantage is worth points
                 // TODO: implement this
                 break;
-            case 'M': 
+            case 'M':
                 // in marsh, lack of any natives is a penalty.
                 // if >=2 natives, then not much effect
                 // TODO: implement this
                 break;
-            case 'S': 
+            case 'S':
                 // in swamp, same as marsh plus a minor benefit to the defender
                 // from the trees (unless attacker has more rangestrikers)
                 // TODO: implement this
                 break;
                 // TODO: implement other terrain
         }
-        // TODO: adjust for entry side 
-        
+        // TODO: adjust for entry side
+
 
         // really dumb estimator
-        double ratio = (double) attackerPointValue / (double) defenderPointValue; 
+        double ratio = (double) attackerPointValue / (double) defenderPointValue;
         if (ratio >= 1.30)
             return WIN_WITH_MINIMAL_LOSSES;
         else if (ratio >= 1.15)
@@ -1138,10 +1167,10 @@ class SimpleAI implements AI
      *  teleport if possible, and account for blocking enemy groups.
      *
      *  This method is very similar to Game.listMoves().
-     * 
+     *
      */
-    private static int getNumberOfWaysToTerrain(Legion legion, 
-                                                MasterHex hex, 
+    private static int getNumberOfWaysToTerrain(Legion legion,
+                                                MasterHex hex,
                                                 char terrainType)
     {
         // if moves[i] is true, then a roll of i can get us to terrainType.
@@ -1156,18 +1185,18 @@ class SimpleAI implements AI
                 // Only this path is allowed.
                 block = j;
             }
-        } 
-        findNormalMovesToTerrain(legion, legion.getPlayer(), hex, 
-                                 6, block, Game.NOWHERE, 
+        }
+        findNormalMovesToTerrain(legion, legion.getPlayer(), hex,
+                                 6, block, Game.NOWHERE,
                                  terrainType, moves);
 
         // consider tower teleport
-        if (hex.getTerrain() == 'T' 
-            && legion.numLords() > 0 
+        if (hex.getTerrain() == 'T'
+            && legion.numLords() > 0
             && moves[6] == false)
         {
             // hack: assume that we can always tower teleport to the terrain we
-            // want to go to. 
+            // want to go to.
             // TODO: check to make sure there's an open terrain to teleport to.
             // (probably want a lookup table for this)
             moves[6] = true;
@@ -1178,9 +1207,9 @@ class SimpleAI implements AI
         return count;
     }
 
-    private static void findNormalMovesToTerrain(Legion legion, Player player, 
-                                                 MasterHex hex, 
-                                                 int roll, int block, int cameFrom, 
+    private static void findNormalMovesToTerrain(Legion legion, Player player,
+                                                 MasterHex hex,
+                                                 int roll, int block, int cameFrom,
                                                  char terrainType, boolean[] moves)
     {
         // If there are enemy legions in this hex, mark it
@@ -1197,7 +1226,7 @@ class SimpleAI implements AI
                 }
             }
             return;
-        } 
+        }
         if (roll == 0)
         {
             // This hex is the final destination.  Mark it as legal if
@@ -1210,17 +1239,17 @@ class SimpleAI implements AI
                 {
                     return;
                 }
-            } 
+            }
             if (hex.getTerrain() == terrainType)
             {
                 moves[roll] = true;
-            } 
+            }
             return;
-        } 
+        }
         if (block >= 0)
         {
-            findNormalMovesToTerrain( legion, player, hex.getNeighbor(block), 
-                                      roll-1, Game.ARROWS_ONLY, (block+3)%6, 
+            findNormalMovesToTerrain( legion, player, hex.getNeighbor(block),
+                                      roll-1, Game.ARROWS_ONLY, (block+3)%6,
                                       terrainType, moves);
         }
         else if (block == Game.ARCHES_AND_ARROWS)
@@ -1229,8 +1258,8 @@ class SimpleAI implements AI
             {
                 if (hex.getExitType(i) >= MasterHex.ARCH && i != cameFrom)
                 {
-                    findNormalMovesToTerrain( legion, player, hex.getNeighbor(i), 
-                                              roll - 1, Game.ARROWS_ONLY, (i + 3) % 6, 
+                    findNormalMovesToTerrain( legion, player, hex.getNeighbor(i),
+                                              roll - 1, Game.ARROWS_ONLY, (i + 3) % 6,
                                               terrainType, moves);
                 }
             }
@@ -1241,12 +1270,12 @@ class SimpleAI implements AI
             {
                 if (hex.getExitType(i) >= MasterHex.ARROW && i != cameFrom)
                 {
-                    findNormalMovesToTerrain( legion, player, hex.getNeighbor(i), 
-                                              roll - 1, Game.ARROWS_ONLY, (i + 3) % 6, 
+                    findNormalMovesToTerrain( legion, player, hex.getNeighbor(i),
+                                              roll - 1, Game.ARROWS_ONLY, (i + 3) % 6,
                                               terrainType, moves);
                 }
             }
-        } 
+        }
         return;
     }
 
@@ -1256,7 +1285,7 @@ class SimpleAI implements AI
     ////////////////////////////////////////////////////////////////
     // minimax stuff
     ////////////////////////////////////////////////////////////////
-    
+
     class MasterBoardPosition implements Minimax.GamePosition
     {
         // AICopy() of the game
@@ -1280,29 +1309,29 @@ class SimpleAI implements AI
             enemyAttackMap = buildEnemyAttackMap(game,game.getPlayer(activePlayerNum));
         }
 
-        public int maximize() 
-        { 
+        public int maximize()
+        {
             if (activePlayerNum < 0)
                 return Minimax.AVERAGE;
             else if (game.getActivePlayerNum() == activePlayerNum)
                 return Minimax.MAXIMIZE;
             else
-                return Minimax.MINIMIZE; 
+                return Minimax.MINIMIZE;
         }
 
-        public int evaluation() 
-        { 
+        public int evaluation()
+        {
             debugln("evaluating game position");
 
             // TODO: need to correct for the fact that more material
             // is not always better.
             // idea: score for legion markers available?
-            final Player activePlayer = game.getPlayer(Math.abs(activePlayerNum)); 
+            final Player activePlayer = game.getPlayer(Math.abs(activePlayerNum));
 
-            // check for loss 
+            // check for loss
             if (activePlayer.isDead())
             {
-                debugln("evaluation: loss! " + Integer.MIN_VALUE); 
+                debugln("evaluation: loss! " + Integer.MIN_VALUE);
                 return Integer.MIN_VALUE;
             }
 
@@ -1320,14 +1349,14 @@ class SimpleAI implements AI
                 }
                 switch (playersRemaining)
                 {
-                    case 0: 
+                    case 0:
                         {
                             debugln("evaluation: draw! " + 0);
-                            return 0; 
+                            return 0;
                         }
-                    case 1: 
+                    case 1:
                         {
-                            debugln("evaluation: win! " 
+                            debugln("evaluation: win! "
                                     + Integer.MAX_VALUE);
                             return Integer.MAX_VALUE;
                         }
@@ -1344,8 +1373,8 @@ class SimpleAI implements AI
                     {
                         Legion legion = (Legion) it.next();
                         value += evaluateMove(game,
-                                              legion, 
-                                              legion.getCurrentHex(), 
+                                              legion,
+                                              legion.getCurrentHex(),
                                               legion.hasMoved(),
                                               enemyAttackMap);
                     }
@@ -1358,8 +1387,8 @@ class SimpleAI implements AI
                     {
                         Legion legion = (Legion) it.next();
                         value += evaluateMove(game,
-                                              legion, 
-                                              legion.getCurrentHex(), 
+                                              legion,
+                                              legion.getCurrentHex(),
                                               legion.hasMoved(),
                                               null);
                     }
@@ -1368,21 +1397,21 @@ class SimpleAI implements AI
                 }
             }
             debugln("evaluation: " + value);
-            return value; 
+            return value;
         }
 
         /** plausible move generator
          * may be lazy; also, may implement forward pruning.
          * @return an iterator which returns Move's, in the order
-         * that they should be evaluated by Minimax.  The moves should 
+         * that they should be evaluated by Minimax.  The moves should
          * extend Move, and be handled by applyMove().
          */
         public Iterator generateMoves()
         {
             debugln("generating moves..");
 
-            // check for loss 
-            final Player activePlayer = game.getPlayer(Math.abs(activePlayerNum)); 
+            // check for loss
+            final Player activePlayer = game.getPlayer(Math.abs(activePlayerNum));
             if (activePlayer.isDead()) // oops! we lost
                 return new ArrayList().iterator();  // no moves
 
@@ -1401,7 +1430,7 @@ class SimpleAI implements AI
                 if (playersRemaining < 2) // draw or win
                     return new ArrayList().iterator();  // no moves
             }
-                
+
             // dice moves
             if (activePlayerNum < 0)
             {
@@ -1411,7 +1440,7 @@ class SimpleAI implements AI
                 for (int i = 1; i <= 6; i++)
                 {
                     moves.add(new DiceMove(i, this));
-                } 
+                }
                 return moves.iterator();
             }
 
@@ -1438,8 +1467,8 @@ class SimpleAI implements AI
             return allmoves.iterator();
         }
 
-        /** 
-         * advance game state ( this should adjust maximize() as necessary ) 
+        /**
+         * advance game state ( this should adjust maximize() as necessary )
          */
         public Minimax.GamePosition applyMove(Minimax.Move move)
         {
@@ -1461,7 +1490,7 @@ class SimpleAI implements AI
                 debugln("applying player move");
 
                 PlayerMove playermove = (PlayerMove) move;
-                MasterBoardPosition position = new MasterBoardPosition(playermove.position); 
+                MasterBoardPosition position = new MasterBoardPosition(playermove.position);
                 // apply the PlayerMove moves
                 for (Iterator it = playermove.moves.entrySet().iterator(); it.hasNext();)
                 {
@@ -1514,14 +1543,14 @@ class SimpleAI implements AI
                                     {
                                         // both groups destroyed
                                         legion.remove();
-                                        enemy.remove(); 
-                                    } 
+                                        enemy.remove();
+                                    }
                                 }
                             }
                             break;
                         case Game.SPLIT:
                             {
-                                split(game); 
+                                split(game);
                             }
                             break;
                         case Game.MUSTER:
@@ -1537,21 +1566,21 @@ class SimpleAI implements AI
                 position.activePlayerNum = -1 * Math.abs(activePlayerNum);
                 return position;
             }
-            else 
+            else
                 throw new RuntimeException("ack! bad move type");
         }
     }
-    
+
     class MasterBoardPositionMove implements Minimax.Move
     {
         protected MasterBoardPosition position;
         private int value;
         public void setValue(int value) { this.value = value; }
         public int getValue() { return value; }
-    } 
+    }
 
-    class DiceMove extends MasterBoardPositionMove 
-    { 
+    class DiceMove extends MasterBoardPositionMove
+    {
         int roll;
         public DiceMove(int roll, MasterBoardPosition position)
         {
@@ -1560,7 +1589,7 @@ class SimpleAI implements AI
         }
     }
 
-    class PlayerMove extends MasterBoardPositionMove 
+    class PlayerMove extends MasterBoardPositionMove
     {
         /** map of Legion to Hex where the legion moves to  */
         HashMap moves;

@@ -64,8 +64,8 @@ public final class SplitLegion extends JDialog implements MouseListener,
 
         MasterHex hex = oldLegion.getCurrentHex();
 
-        newLegion = new Legion(selectedMarkerId, oldLegion.getMarkerId(), hex,
-            hex, null, null, null, null, null, null, null, null, player);
+        newLegion = Legion.getEmptyLegion(selectedMarkerId, 
+            oldLegion.getMarkerId(), hex, player);
         String imageName = selectedMarkerId;
         newMarker = new Marker(scale, imageName, this, null);
         newLegion.setMarker(newMarker);
@@ -264,81 +264,78 @@ public final class SplitLegion extends JDialog implements MouseListener,
     }
 
 
+    /** 
+     *  Return true if the split is legal. Each legion must have 
+     *  height >= 2.  If this was an initial split, each legion
+     *  must have height == 4 and one lord.
+     */
+    private boolean isSplitLegal()
+    {
+        if (oldLegion.getHeight() < 2 || newLegion.getHeight() < 2)
+        {
+            JOptionPane.showMessageDialog(parentFrame, "Legion too short.");
+            return false;
+        }
+        if (oldLegion.getHeight() + newLegion.getHeight() == 8)
+        {
+            if (oldLegion.getHeight() != newLegion.getHeight())
+            {
+                JOptionPane.showMessageDialog(parentFrame,
+                    "Initial split must be 4-4.");
+                return false;
+            }
+            if (oldLegion.numLords() != 1)
+            {
+                JOptionPane.showMessageDialog(parentFrame,
+                    "Each stack must have one lord.");
+                return false;
+            }
+        }
+        return true;
+    }
+
+
+    private void performSplit()
+    {
+        // Resize the new legion's marker to MasterBoard scale.
+        newMarker.rescale(oldLegion.getMarker().getBounds().width);
+
+        // Add the new legion to the player.
+        if (player != null)
+        {
+            player.addLegion(newLegion);
+            player.setLastLegionSplitOff(newLegion);
+        }
+
+        // Set the new chit next to the old chit on the masterboard.
+        MasterHex hex = newLegion.getCurrentHex();
+        if (hex != null)
+        {
+            hex.addLegion(newLegion, false);
+        }
+
+        // Hide the contents of both legions.
+        oldLegion.hideAllCreatures();
+        newLegion.hideAllCreatures();
+
+        Game.logEvent(newLegion.getHeight() +
+            " creatures are split off from legion " +
+            oldLegion.getLongMarkerName() +
+            " into new legion " + newLegion.getLongMarkerName());
+    }
+
+
     public void actionPerformed(ActionEvent e)
     {
         if (e.getActionCommand().equals("Done"))
         {
-            // Check to make sure that each Legion is legal.
-            // Each legion must have 2 <= height <= 7.
-            // Also, if this was an initial split, each Legion
-            // must have height 4 and one lord.
-            if (oldLegion.getHeight() < 2 || newLegion.getHeight() < 2)
+            if (!isSplitLegal())
             {
-                JOptionPane.showMessageDialog(parentFrame,
-                    "Legion too short.");
                 return;
             }
-            if (oldLegion.getHeight() + newLegion.getHeight() == 8)
-            {
-                if (oldLegion.getHeight() != newLegion.getHeight())
-                {
-                    JOptionPane.showMessageDialog(parentFrame,
-                        "Initial split must be 4-4.");
-                    return;
-                }
-                else
-                {
-                    if (oldLegion.numLords() != 1)
-                    {
-                        JOptionPane.showMessageDialog(parentFrame,
-                            "Each stack must have one lord.");
-                        return;
-                    }
-                }
-            }
-
-            // The split is legal.
-
-            // Resize the new legion to MasterBoard scale.
-            newMarker.rescale(oldLegion.getMarker().getBounds().width);
-
-            // Add the new legion to the player.
-            if (player != null)
-            {
-                player.addLegion(newLegion);
-            }
-
-            // Set the new chit next to the old chit on the masterboard.
-            MasterHex hex = newLegion.getCurrentHex();
-            if (hex != null)
-            {
-                newLegion.getCurrentHex().addLegion(newLegion, false);
-            }
-
-            // Hide the contents of both legions.
-            oldLegion.hideAllCreatures();
-            newLegion.hideAllCreatures();
-
-            // Mark the last legion split off.
-            if (player != null)
-            {
-                player.setLastLegionSplitOff(newLegion);
-            }
-
-            // Exit.
+            performSplit();
             dispose();
 
-            Game.logEvent(newLegion.getHeight() +
-                " creatures are split off from legion " +
-                oldLegion.getLongMarkerName() +
-                " into new legion " + newLegion.getLongMarkerName());
-
-            // This is needed for splits where the hex was not
-            // highlighted because the legion was not 7+ high.
-            if (hex != null)
-            {
-                hex.repaint();
-            }
         }
 
         else if (e.getActionCommand().equals("Cancel"))
@@ -360,10 +357,8 @@ public final class SplitLegion extends JDialog implements MouseListener,
         player.setColor("Red");
         player.initMarkersAvailable();
         String selectedMarkerId = player.selectMarkerId("Rd01");
-        Legion legion = new Legion(selectedMarkerId, null, null, null,
-            Creature.titan, Creature.angel, Creature.ogre, Creature.ogre,
-            Creature.centaur, Creature.centaur, Creature.gargoyle,
-            Creature.gargoyle, player);
+        Legion legion = Legion.getStartingLegion(selectedMarkerId, null,
+            player);
         Marker marker = new Marker(scale, selectedMarkerId, frame, null);
         legion.setMarker(marker);
 
