@@ -8,8 +8,6 @@ import java.util.*;
 import java.awt.geom.*;
 import java.net.*;
 
-import images.ResourceAnchor;
-
 
 /**
  * Class Chit implements the GUI for a Titan chit representing
@@ -77,7 +75,7 @@ class Chit extends JPanel
 
         try 
         {
-            ClassLoader cl = ResourceAnchor.class.getClassLoader();
+            ClassLoader cl = Client.class.getClassLoader();
             URL url = cl.getResource(imageFilename);
             if (url != null)
             {

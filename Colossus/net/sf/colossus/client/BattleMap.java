@@ -56,8 +56,6 @@ public final class BattleMap extends HexMap implements MouseListener,
         Container contentPane = battleFrame.getContentPane();
         contentPane.setLayout(new BorderLayout());
 
-        battleFrame.setSize(getPreferredSize());
-
         setupIcon();
 
         battleFrame.addWindowListener(this);
@@ -81,8 +79,8 @@ public final class BattleMap extends HexMap implements MouseListener,
 
         defaultCursor = battleFrame.getCursor();
 
-        battleFrame.pack();
-        battleFrame.setVisible(true);
+        // Do not call pack() or setVisible(true) until after
+        // BattleDice is added to frame.
     }
 
 
@@ -212,7 +210,7 @@ public final class BattleMap extends HexMap implements MouseListener,
     }
 
 
-    public void setupSummonMenu()
+    void setupSummonMenu()
     {
         if (battleFrame == null)
         {
@@ -227,7 +225,7 @@ public final class BattleMap extends HexMap implements MouseListener,
     }
 
 
-    public void setupRecruitMenu()
+    void setupRecruitMenu()
     {
         if (battleFrame == null)
         {
@@ -245,7 +243,7 @@ public final class BattleMap extends HexMap implements MouseListener,
     }
 
 
-    public void setupMoveMenu()
+    void setupMoveMenu()
     {
         if (battleFrame == null)
         {
@@ -285,7 +283,7 @@ public final class BattleMap extends HexMap implements MouseListener,
     }
 
 
-    public void setupFightMenu()
+    void setupFightMenu()
     {
         if (battleFrame == null)
         {
@@ -318,7 +316,7 @@ public final class BattleMap extends HexMap implements MouseListener,
     }
 
 
-    public JFrame getFrame()
+    JFrame getFrame()
     {
         return battleFrame;
     }
@@ -341,7 +339,7 @@ public final class BattleMap extends HexMap implements MouseListener,
 
 
     /** Show which player owns this board. */
-    public void setupPlayerLabel()
+    void setupPlayerLabel()
     {
         String playerName = client.getPlayerName();
         playerLabel = new JLabel(playerName);
@@ -358,7 +356,7 @@ public final class BattleMap extends HexMap implements MouseListener,
     }
 
 
-    public void placeNewChit(String imageName, int tag, String hexLabel)
+    void placeNewChit(String imageName, int tag, String hexLabel)
     {
         client.addBattleChit(imageName, tag);
         alignChits(hexLabel);
@@ -389,7 +387,7 @@ public final class BattleMap extends HexMap implements MouseListener,
     }
 
 
-    public void alignChits(String hexLabel)
+    void alignChits(String hexLabel)
     {
         GUIBattleHex hex = getGUIHexByLabel(hexLabel);
         int [] tags = client.getCritterTags(hexLabel);
@@ -430,7 +428,7 @@ public final class BattleMap extends HexMap implements MouseListener,
         hex.repaint();
     }
 
-    public void alignChits(Set hexLabels)
+    void alignChits(Set hexLabels)
     {
         Iterator it = hexLabels.iterator();
         while (it.hasNext())
@@ -473,7 +471,7 @@ public final class BattleMap extends HexMap implements MouseListener,
     }
 
 
-    public void highlightCarries()
+    void highlightCarries()
     {
         Set set = client.getCarryTargets();
         unselectAllHexes();
@@ -481,7 +479,7 @@ public final class BattleMap extends HexMap implements MouseListener,
         setupCarryCursor();
     }
 
-    public void clearCarries()
+    void clearCarries()
     {
         unselectAllHexes();
         setupCarryCursor();
@@ -538,12 +536,12 @@ public final class BattleMap extends HexMap implements MouseListener,
         }
     }
 
-    public void setDefaultCursor()
+    void setDefaultCursor()
     {
         battleFrame.setCursor(defaultCursor);
     }
 
-    public void setWaitCursor()
+    void setWaitCursor()
     {
         battleFrame.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
     }
@@ -734,7 +732,7 @@ public final class BattleMap extends HexMap implements MouseListener,
     }
 
 
-    public void dispose()
+    void dispose()
     {
         // Save location for next object.
         location = getLocation();
@@ -746,7 +744,7 @@ public final class BattleMap extends HexMap implements MouseListener,
     }
 
 
-    public void rescale()
+    void rescale()
     {
         setupHexes();
         setupEntrances();

@@ -42,11 +42,6 @@ Improve mapping of terrain types, creature nativity, and creature
 
 Write some design docs.
 
-Movement die should be displayed immediately when enabled, rather than
-   waiting until the next turn, unless no movement die has been rolled
-   yet.  Same for battle dice, which means always keeping the information
-   up to date even if it's not being used.
-
 Make MasterBoard and MasterHex pluggable.  Integrate David Lum's
    Java2D MasterBoard graphics as an option.
 

@@ -42,7 +42,6 @@ final class Concede extends JDialog implements ActionListener
         pack();
 
         setBackground(Color.lightGray);
-        //setResizable(false);
 
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
         int scale = 4 * Scale.get();

@@ -53,7 +53,6 @@ final class SummonAngel extends JDialog implements MouseListener,
         pack();
 
         setBackground(Color.lightGray);
-        //setResizable(false);
 
         int scale = 4 * Scale.get();
 

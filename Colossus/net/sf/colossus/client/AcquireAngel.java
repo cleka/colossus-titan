@@ -37,7 +37,6 @@ final class AcquireAngel extends JDialog implements MouseListener,
 
         pack();
         setBackground(Color.lightGray);
-        //setResizable(false);
 
         Iterator it = recruits.iterator();
         while (it.hasNext())

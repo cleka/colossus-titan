@@ -47,7 +47,6 @@ final class PickRecruit extends JDialog implements MouseListener,
         contentPane.setLayout(gridbag);
         pack();
         setBackground(Color.lightGray);
-        //setResizable(false);
         int scale = 4 * Scale.get();
 
         legionMarker = new Marker(scale, markerId, this, null);

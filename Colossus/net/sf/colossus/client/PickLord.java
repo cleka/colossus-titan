@@ -35,7 +35,6 @@ final class PickLord extends JDialog implements MouseListener, WindowListener
         contentPane.setLayout(new FlowLayout());
         pack();
         setBackground(Color.lightGray);
-        //setResizable(false);
 
         Iterator it = imageNames.iterator();
         while (it.hasNext())

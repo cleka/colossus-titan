@@ -50,6 +50,10 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
     };
 
 
+    int scale = 2 * Scale.get();
+    int cx = 6 * scale;
+    int cy = 2 * scale;
+
 
     /** Set up a static non-GUI hex map for each terrain type. */
     static
@@ -122,10 +126,6 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
     private void setupHexesGUI()
     {
         hexes.clear();
-
-        int scale = 2 * Scale.get();
-        int cx = 6 * scale;
-        int cy = 3 * scale;
 
         // Initialize hex array.
         for (int i = 0; i < h.length; i++)
@@ -249,11 +249,6 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
 
     private void setupEntrancesGUI()
     {
-        int scale = 2 * Scale.get();
-
-        int cx = 6 * scale;
-        int cy = 3 * scale;
-
         // Initialize entrances.
         entrances[0] = new GUIBattleHex(cx + 15 * scale,
             (int) Math.round(cy + 1 * scale), scale, this, -1, 0);
@@ -538,7 +533,6 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
 
     public Dimension getPreferredSize()
     {
-        int scale = Scale.get();
-        return new Dimension(60 * scale, 60 * scale);
+        return new Dimension(60 * Scale.get(), 55 * Scale.get());
     }
 }

@@ -25,7 +25,7 @@ Win98, 1.3.1: Windows don't always pop to the front when show() is
 
 Linux, 1.3.1, fvwm2: Problems with dialog resizing.  Doesn't seem to
    happen with other window managers.  Commented out 
-   setResizable(false) in all dialogs as an attempted workaround.
+   setResizable(false) in all dialogs as a workaround.
 
 
 Current programming bugs:
@@ -100,7 +100,6 @@ Carry cursor sometimes fails without an error message.  Race condition?
 Negotiation is broken and disabled.
 
 Red battle hex highlighting clashes with volcano.
-
 
 
 AI bugs:

@@ -35,7 +35,6 @@ final class PickMarker extends JDialog implements MouseListener, WindowListener
         pack();
 
         setBackground(Color.lightGray);
-        //setResizable(false);
 
         Iterator it = markerIds.iterator();
         while (it.hasNext())

@@ -35,8 +35,6 @@ final class ShowBattleMap extends HexMap implements WindowListener,
 
         contentPane.add(this, BorderLayout.CENTER);
         dialog.pack();
-
-        //dialog.setResizable(false);
         dialog.setVisible(true);
     }
 

@@ -40,7 +40,6 @@ public final class Client
 
     private ArrayList battleChits = new ArrayList();
 
-    // Moved here from Player.
     /** Stack of legion marker ids, to allow multiple levels of undo for
      *  splits, moves, and recruits. */
     private LinkedList undoStack = new LinkedList();
@@ -560,21 +559,6 @@ public final class Client
         }
     }
 
-
-    private void initBattleDice()
-    {
-        battleDice = new BattleDice();
-        map.getFrame().getContentPane().add(battleDice, BorderLayout.SOUTH);
-    }
-
-    private void disposeBattleDice()
-    {
-        if (map != null && battleDice != null)
-        {
-            map.getFrame().remove(battleDice);
-        }
-        battleDice = null;
-    }
 
     private void disposeMasterBoard()
     {
@@ -1147,8 +1131,11 @@ public final class Client
         if (!getOption(Options.autoPlay))
         {
             map = new BattleMap(this, masterHexLabel);
+            battleDice = new BattleDice();
+            JFrame frame = map.getFrame();
+            frame.getContentPane().add(battleDice, BorderLayout.SOUTH);
+            frame.pack();
             showBattleMap();
-            initBattleDice();
         }
     }
 
@@ -1156,8 +1143,10 @@ public final class Client
     {
         if (map != null)
         {
-            map.getFrame().toFront();
+            JFrame frame = map.getFrame();
+            frame.toFront();
             map.requestFocus();
+            frame.setVisible(true);
         }
     }
 
@@ -1169,7 +1158,6 @@ public final class Client
             map = null;
         }
         battleChits.clear();
-        disposeBattleDice();
     }
 
 

@@ -15,16 +15,16 @@ import javax.swing.*;
 
 final class BattleDice extends JPanel
 {
-    private String attackerName;
-    private String defenderName;
-    private String attackerHexId;
-    private String defenderHexId;
-    private int numDice;
-    private int targetNumber;
-    private int [] rolls;
-    private int hits;
-    private int carries;
-    private char terrain;
+    private String attackerName = "";
+    private String defenderName = "";
+    private String attackerHexId = "";
+    private String defenderHexId = "";
+    private int numDice = 0;
+    private int targetNumber = 0;
+    private int [] rolls = new int[0];
+    private int hits = 0;
+    private int carries = 0;
+    private char terrain = '?';
     private JLabel label1 = new JLabel();
     private JLabel label2 = new JLabel();
     private Chit [] dice;
@@ -34,8 +34,8 @@ final class BattleDice extends JPanel
     {
         setVisible(false);
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-
         setBackground(Color.lightGray);
+        showRoll();
     }
 
 
@@ -81,19 +81,20 @@ final class BattleDice extends JPanel
     /** Initialize and layout the components, in response to new data. */
     void showRoll()
     {
-        // Abort if called too early.
-        if (attackerName == null)
-        {
-            return;
-        }
-
         setVisible(false);
         removeAll();
 
-        label1.setText(attackerName + " in " +
-            HexMap.getHexByLabel(terrain, attackerHexId).getDescription() +
-            " attacks " + defenderName + " in " +
-            HexMap.getHexByLabel(terrain, defenderHexId).getDescription());
+        if (attackerName.equals(""))
+        {
+            label1.setText("");
+        }
+        else
+        {
+            label1.setText(attackerName + " in " +
+                HexMap.getHexByLabel(terrain, attackerHexId).getDescription() +
+                " attacks " + defenderName + " in " +
+                HexMap.getHexByLabel(terrain, defenderHexId).getDescription());
+        }
         label1.setAlignmentX(Label.CENTER_ALIGNMENT);
         add(label1);
 
@@ -118,17 +119,35 @@ final class BattleDice extends JPanel
         {
             carryString = " carries";
         }
-        label2.setText(carries + carryString);
+        if (attackerName.equals(""))
+        {
+            label2.setText("");
+        }
+        else
+        {
+            label2.setText(carries + carryString);
+        }
         label2.setAlignmentX(Label.CENTER_ALIGNMENT);
         add(label2);
 
         setVisible(true);
-
         repaint();
     }
 
     void rescale()
     {
         showRoll();
+    }
+
+
+    public Dimension getMinimumSize()
+    {
+        return getPreferredSize();
+    }
+
+    public Dimension getPreferredSize()
+    {
+        int scale = Scale.get();
+        return new Dimension(60 * scale, 6 * scale);
     }
 }

@@ -45,7 +45,6 @@ final class Negotiate extends JDialog implements MouseListener, ActionListener
         contentPane.setLayout(gridbag);
         pack();
         setBackground(Color.lightGray);
-        //setResizable(false);
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
         addMouseListener(this);
 

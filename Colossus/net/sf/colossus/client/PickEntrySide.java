@@ -65,7 +65,6 @@ final class PickEntrySide extends HexMap implements ActionListener,
         dialog.pack();
 
         dialog.setSize(getPreferredSize());
-        //dialog.setResizable(false);
         dialog.setBackground(Color.white);
         dialog.setVisible(true);
     }
@@ -96,9 +95,6 @@ final class PickEntrySide extends HexMap implements ActionListener,
 
         if (!laidOut)
         {
-            int cx = 6 * scale;
-            int cy = 3 * scale;
-
             if (button5 != null)
             {
                 button5.setBounds(cx + 1 * scale, cy + 1 * scale,

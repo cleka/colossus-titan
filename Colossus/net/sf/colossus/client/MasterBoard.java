@@ -13,7 +13,6 @@ import net.sf.colossus.server.Options;
 import net.sf.colossus.server.Creature;
 import net.sf.colossus.server.SaveGameFilter;
 import net.sf.colossus.parser.StrategicMapLoader;
-import images.ResourceAnchor;
 
 
 /**
@@ -471,7 +470,7 @@ public final class MasterBoard extends JPanel
                 String version = "unknown";
                 try
                 {
-                    ClassLoader cl = ResourceAnchor.class.getClassLoader();
+                    ClassLoader cl = Client.class.getClassLoader();
                     InputStream is = cl.getResourceAsStream("version");
                     is.read(bytes);
                     version = new String(bytes, 0, bytes.length); 

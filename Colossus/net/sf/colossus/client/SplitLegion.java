@@ -51,9 +51,6 @@ final class SplitLegion extends JDialog implements MouseListener,
 
         setBackground(Color.lightGray);
 
-        // We get graphical glitches in Solaris if we don't allow resizing.
-        //setResizable(true);
-
         addMouseListener(this);
         addWindowListener(this);
 
