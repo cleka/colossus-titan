@@ -346,7 +346,7 @@ public final class Server implements IServer
     }
 
 
-    public void doneWithStrikes()
+    public synchronized void doneWithStrikes()
     {
         Battle battle = game.getBattle();
         if (!isBattleActivePlayer() || battle.getPhase() < Constants.FIGHT)
@@ -669,7 +669,7 @@ public final class Server implements IServer
         }
     }
 
-    public void acquireAngel(String markerId, String angelType)
+    public synchronized void acquireAngel(String markerId, String angelType)
     {
         Legion legion = game.getLegionByMarkerId(markerId);
         if (!getPlayerName().equals(legion.getPlayerName()))
