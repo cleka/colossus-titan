@@ -134,13 +134,19 @@ class Player
 
     boolean canTitanTeleport()
     {
-        return (canTeleport && score >= 400);
+        return (score >= 400 && canTeleport());
     }
 
 
     boolean canSummonAngel()
     {
         return canSummonAngel;
+    }
+
+
+    void allowSummoningAngel()
+    {
+        canSummonAngel = true;
     }
 
 
@@ -155,10 +161,12 @@ class Player
         return canTeleport;
     }
 
+
     void allowTeleport()
     {
         canTeleport = true;
     }
+
 
     void disallowTeleport()
     {
@@ -253,8 +261,8 @@ class Player
     void rollMovement()
     {
         // It's a new turn, so once-per-turn things are allowed again.
-        canSummonAngel = true;
-        canTeleport = true;
+        allowSummoningAngel();
+        allowTeleport();
 
         // Make sure that all legions are allowed to move and recruit.
         commitMoves();
@@ -296,7 +304,7 @@ class Player
             legions[i].undoMove();
         }
 
-        canTeleport = true;
+        allowTeleport();
     }
 
 
@@ -479,7 +487,6 @@ class Player
             markersAvailable[numMarkersAvailable + i] = newMarkers[i];
         }
         numMarkersAvailable += len;
-System.out.println("numMarkersAvailable is now " + numMarkersAvailable);
     }
 
 
