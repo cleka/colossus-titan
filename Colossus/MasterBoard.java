@@ -57,6 +57,10 @@ class MasterBoard extends Frame implements MouseListener,
     // Setting this to true will make all stacks public.
     private boolean allVisible = false;
 
+    // Keep multiple quick clicks from popping up multiples
+    // of the same dialog.
+    private boolean dialogLock = false;
+
 
     public MasterBoard(Game game, boolean newgame)
     {
@@ -1439,7 +1443,12 @@ class MasterBoard extends Frame implements MouseListener,
                                         return;
                                     }
 
-                                    new SplitLegion(this, legion, player);
+                                    if (!dialogLock)
+                                    {
+                                        dialogLock = true;
+                                        new SplitLegion(this, legion, player);
+                                        dialogLock = false;
+                                    }
                                         
                                     // Update status window.
                                     game.updateStatusScreen();
@@ -1470,16 +1479,21 @@ class MasterBoard extends Frame implements MouseListener,
                                     if (legion.hasMoved() && 
                                         legion.canRecruit())
                                     {
-                                        new PickRecruit(this, legion);
-                                    }
-                                    // If we recruited, unselect this hex.
-                                    if (!legion.canRecruit())
-                                    {
-                                        legion.getCurrentHex().unselect();
-                                        legion.getCurrentHex().repaint();
+                                        if (!dialogLock)
+                                        {
+                                            dialogLock = true;
+                                            new PickRecruit(this, legion);
+                                            if (!legion.canRecruit())
+                                            {
+                                                legion.getCurrentHex().
+                                                    unselect();
+                                                legion.getCurrentHex().
+                                                    repaint();
 
-                                        // Update status window.
-                                        game.updateStatusScreen();
+                                                game.updateStatusScreen();
+                                            }
+                                            dialogLock = false;
+                                        }
                                     }
                                     return;
                             }
@@ -1612,8 +1626,9 @@ class MasterBoard extends Frame implements MouseListener,
 
                             // Do not allow clicking on engagements if one is
                             // already being resolved.
-                            else if (hex.isEngagement() && map == null)
+                            else if (hex.isEngagement() && !dialogLock)
                             {
+                                dialogLock = true;
                                 Legion attacker =
                                     hex.getFriendlyLegion(player);
                                 Legion defender =
@@ -1631,7 +1646,6 @@ class MasterBoard extends Frame implements MouseListener,
                                 {
                                     // The attacker may concede now without
                                     // allowing the defender a reinforcement.
-
                                     new Concede(this, attacker, defender,
                                         false);
 
@@ -1651,7 +1665,13 @@ class MasterBoard extends Frame implements MouseListener,
                                         {
                                             // If the defender won the battle
                                             // by agreement, he may recruit.
-                                            new PickRecruit(this, defender);
+                                            if (!dialogLock)
+                                            {
+                                                dialogLock = true;
+                                                new PickRecruit(this, 
+                                                    defender);
+                                                dialogLock = false;
+                                            }
                                         }
                                         else if (hex.getLegion(0) == attacker
                                             && attacker.getHeight() < 7
@@ -1681,6 +1701,7 @@ class MasterBoard extends Frame implements MouseListener,
                                 }
 
                                 highlightEngagements();
+                                dialogLock = false;
                             }
                             break;
 
