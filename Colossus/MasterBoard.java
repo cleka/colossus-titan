@@ -445,6 +445,17 @@ class MasterBoard extends Frame implements MouseListener,
         summoningAngel = false;
         highlightEngagements();
         summonAngel = null;
+        if (map != null)
+        {
+            map.getTurn().finishSummoningAngel();
+        }
+    }
+
+
+    void finishBattle()
+    {
+        highlightEngagements();
+        map = null;
     }
 
 
@@ -1191,12 +1202,16 @@ class MasterBoard extends Frame implements MouseListener,
                                 player.selectLegion(attacker);
                                 if (summonAngel == null)
                                 {
+System.out.println("summonAngel is null");
                                     summonAngel = 
                                         map.getTurn().getSummonAngel();
                                 }
                                 summonAngel.repaint();
                             }
-                            else if (hex.isEngagement())
+
+                            // Do not allow clicking on engagements if one is
+                            // already being resolved.
+                            else if (hex.isEngagement() && map == null)
                             {
                                 Legion attacker = 
                                     hex.getFriendlyLegion(player);
