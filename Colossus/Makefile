@@ -1,8 +1,10 @@
 # Makefile for Titan
 # dripton  June 26, 1998
 
+
 JC = javac -depend -J-Djavac.pipe.output=true -g -deprecation
 #JC = javac -depend -J-Djavac.pipe.output=true -O:interclass
+
 
 all: BattleMap.class \
      BattleChit.class \
