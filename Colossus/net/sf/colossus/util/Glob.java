@@ -40,14 +40,17 @@ public final class Glob
     public static String glob(Collection col)
     {
         StringBuffer sb = new StringBuffer();
-        Iterator it = col.iterator();
-        while (it.hasNext())
+        if (col != null)
         {
-            Object ob = it.next();
-            sb.append(ob.toString());
-            if (it.hasNext())
+            Iterator it = col.iterator();
+            while (it.hasNext())
             {
-                sb.append(sep);
+                Object ob = it.next();
+                sb.append(ob.toString());
+                if (it.hasNext())
+                {
+                    sb.append(sep);
+                }
             }
         }
         return sb.toString();

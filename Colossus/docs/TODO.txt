@@ -148,6 +148,59 @@ From server to Green: addCreature ~ Gd04 ~ Angel
 From server to Gold: addCreature ~ Gd04 ~ Angel
 
 
+Bug: Load game from menu sometimes fails, even with all local players.  
+   Usually works from command line.  Bogus askPickColor()
+From server to dripton: setOption ~ Autosave ~ true
+From server to dripton: setOption ~ Log debug messages ~ true
+From server to dripton: setOption ~ AI delay ~ 0
+From server to dripton: initBoard
+*not* loading already loaded variant TG-SetII.var, data files in TG-SetII
+From server to dripton: askPickColor ~ Black %@% Blue %@% Brown %@% Green %@% Red %@% Gold
+From client dripton: assignColor ~ Red
+Loaded Default/images/Unknown.gif
+
+
+Bug: Not allowed to advance past engagement phase, after winning a battle,
+   eliminating a titan legion, and acquiring an angel.
+dripton earns 90.0 points
+From server to Brown: updatePlayerInfo ~ false:Brown:600:Brown::2:10:11:6:36:198:0 %@% false:Blue:500:Blue::2:10:6:6:37:87:0 %@% false:Black:300:Black::4:8:19:6:0:323:1 %@% false:dripton:200:Red::5:7:21:9:363:338:0
+From server to Blue: updatePlayerInfo ~ false:Brown:600:Brown::2:10:11:6:36:198:0 %@% false:Blue:500:Blue::2:10:6:6:37:87:0 %@% false:Black:300:Black::4:8:19:6:0:323:1 %@% false:dripton:200:Red::5:7:21:9:363:338:0
+From server to Black: updatePlayerInfo ~ false:Brown:600:Brown::2:10:11:6:36:198:0 %@% false:Blue:500:Blue::2:10:6:6:37:87:0 %@% false:Black:300:Black::4:8:19:6:0:323:1 %@% false:dripton:200:Red::5:7:21:9:363:338:0
+dripton earns 18.0 points
+Legion Bu02 (Bat) [Cyclops, Cyclops] is eliminated
+From server to Brown: removeLegion ~ Bu02
+From server to Blue: removeLegion ~ Bu02
+From server to Black: removeLegion ~ Bu02
+From server to Brown: updatePlayerInfo ~ false:Brown:600:Brown::2:10:11:6:36:198:0 %@% false:Blue:500:Blue::1:11:4:6:37:51:0 %@% false:Black:300:Black::4:8:19:6:0:323:1 %@% false:dripton:200:Red::5:7:21:9:388:338:0
+From server to Blue: updatePlayerInfo ~ false:Brown:600:Brown::2:10:11:6:36:198:0 %@% false:Blue:500:Blue::1:11:4:6:37:51:0 %@% false:Black:300:Black::4:8:19:6:0:323:1 %@% false:dripton:200:Red::5:7:21:9:388:338:0
+From server to Black: updatePlayerInfo ~ false:Brown:600:Brown::2:10:11:6:36:198:0 %@% false:Blue:500:Blue::1:11:4:6:37:51:0 %@% false:Black:300:Black::4:8:19:6:0:323:1 %@% false:dripton:200:Red::5:7:21:9:388:338:0
+dripton earns 25.5 points
+Legion Bu04 (Cloud) [Centaur, Centaur, Centaur, Lion] is eliminated
+From server to Brown: removeLegion ~ Bu04
+From client dripton: makeForcedStrikes ~ true
+java.lang.NullPointerException
+	at net.sf.colossus.server.Battle.getActivePlayerName(Battle.java:237)
+	at net.sf.colossus.server.Server.isBattleActivePlayer(Server.java:139)
+	at net.sf.colossus.server.Server.makeForcedStrikes(Server.java:314)
+	at net.sf.colossus.server.SocketServerThread.callMethod(SocketServerThread.java:137)
+	at net.sf.colossus.server.SocketServerThread.parseLine(SocketServerThread.java:97)
+	at net.sf.colossus.server.SocketServerThread.run(SocketServerThread.java:63)
+From server to Blue: removeLegion ~ Bu04
+From server to Black: removeLegion ~ Bu04
+From server to Brown: updatePlayerInfo ~ false:Brown:600:Brown::2:10:11:6:36:198:0 %@% true:Blue:500:Blue::0:0:0:6:37:0:0 %@% false:Black:300:Black::4:8:19:6:0:323:1 %@% false:dripton:200:Red:Bu:5:19:21:9:388:338:0
+From server to Blue: updatePlayerInfo ~ false:Brown:600:Brown::2:10:11:6:36:198:0 %@% true:Blue:500:Blue::0:0:0:6:37:0:0 %@% false:Black:300:Black::4:8:19:6:0:323:1 %@% false:dripton:200:Red:Bu:5:19:21:9:388:338:0
+From server to Black: updatePlayerInfo ~ false:Brown:600:Brown::2:10:11:6:36:198:0 %@% true:Blue:500:Blue::0:0:0:6:37:0:0 %@% false:Black:300:Black::4:8:19:6:0:323:1 %@% false:dripton:200:Red:Bu:5:19:21:9:388:338:0
+Blue dies
+From server to Brown: cleanupBattle
+From server to Blue: cleanupBattle
+From server to Black: cleanupBattle
+From server to Brown: setLegionContents ~ Rd01 ~ Titan %@% Angel %@% Angel %@% Troll
+From server to Blue: setLegionContents ~ Rd01 ~ Titan %@% Angel %@% Angel %@% Troll
+From server to Black: setLegionContents ~ Rd01 ~ Titan %@% Angel %@% Angel %@% Troll
+From server to Brown: updatePlayerInfo ~ false:Brown:600:Brown::2:10:11:6:36:198:0 %@% true:Blue:500:Blue::0:0:0:6:37:0:0 %@% false:Black:300:Black::4:8:19:6:0:323:1 %@% false:dripton:200:Red:Bu:5:19:21:9:388:338:0
+From server to Blue: updatePlayerInfo ~ false:Brown:600:Brown::2:10:11:6:36:198:0 %@% true:Blue:500:Blue::0:0:0:6:37:0:0 %@% false:Black:300:Black::4:8:19:6:0:323:1 %@% false:dripton:200:Red:Bu:5:19:21:9:388:338:0
+From server to Black: updatePlayerInfo ~ false:Brown:600:Brown::2:10:11:6:36:198:0 %@% true:Blue:500:Blue::0:0:0:6:37:0:0 %@% false:Black:300:Black::4:8:19:6:0:323:1 %@% false:dripton:200:Red:Bu:5:19:21:9:388:338:0
+
 
 Show battle hex id, legion ids in BattleMap frame title.  (Trying to set it, but
    it's not showing up.)
@@ -159,6 +212,8 @@ Do not ask player to pick a color if only one remains.
 
 Colorize chat window.
 Colorize StatusScreen.
+
+Sort creatures so that clopses and warbears aren't mixed.
 
 Observer clients.
 

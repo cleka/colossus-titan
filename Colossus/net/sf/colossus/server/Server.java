@@ -137,6 +137,7 @@ Log.debug("About to create server socket on port " + port);
     private boolean isBattleActivePlayer()
     {
         return game.getBattle() != null &&
+            game.getBattle().getActivePlayerName() != null &&
             getPlayerName().equals(game.getBattle().getActivePlayerName());
     }
 
@@ -181,9 +182,16 @@ Log.debug("Called Server.addClient() for " + playerName);
 
         waitingForClients--;
 Log.debug("Decremented waitingForClients to " + waitingForClients);
-        if (waitingForClients <= 0 && !game.isLoadingGame())
+        if (waitingForClients <= 0)
         {
-            game.newGame2();
+            if (game.isLoadingGame())
+            {
+                game.loadGame2();
+            }
+            else
+            {
+                game.newGame2();
+            }
         }
     }
 

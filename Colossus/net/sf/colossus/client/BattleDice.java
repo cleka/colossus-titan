@@ -54,7 +54,15 @@ final class BattleDice extends JPanel
 
     private String getDieImageName(String rollString)
     {
-        int roll = Integer.parseInt(rollString);
+        int roll;
+        try
+        {
+            roll = Integer.parseInt(rollString);
+        }
+        catch (NumberFormatException ex)
+        {
+            return null;
+        }
         StringBuffer basename = new StringBuffer();
         if (roll >= targetNumber)
         {
@@ -93,9 +101,12 @@ final class BattleDice extends JPanel
         dice = new Chit[numDice];
         for (int i = 0; i < numDice; i++)
         {
-            dice[i] = new Chit(2 * Scale.get(), 
-                getDieImageName((String)rolls.get(i)), this);
-            diceBox.add(dice[i]);
+            String imageName = getDieImageName((String)rolls.get(i));
+            if (imageName != null)
+            {
+                dice[i] = new Chit(2 * Scale.get(), imageName, this);
+                diceBox.add(dice[i]);
+            }
         }
 
         setVisible(true);

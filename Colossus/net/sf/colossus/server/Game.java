@@ -1373,31 +1373,7 @@ Log.debug("Called Game.newGame2()");
             }
 
             initServer();
-            server.allSetColor();
-
-            // We need to set the autoPlay option before loading the board,
-            // so that we can avoid showing boards for AI players.
-            syncAutoPlay();
-            syncOptions();
-
-            server.allUpdatePlayerInfo();
-
-            if (getOption(Options.allStacksVisible))
-            {
-                server.allFullyUpdateAllLegionContents();
-            }
-            else
-            {
-                server.allFullyUpdateLegionHeights();
-                server.allFullyUpdateOwnLegionContents();
-            }
-
-            server.allInitBoard();
-            server.allTellAllLegionLocations();
-
-            server.allSetupTurnState();
-            setupPhase();
-            caretaker.fullySyncDisplays();
+            // Remaining stuff has been moved to loadGame2()
         }
         // FileNotFoundException, IOException, NumberFormatException
         catch (Exception e)
@@ -1406,7 +1382,6 @@ Log.debug("Called Game.newGame2()");
             e.printStackTrace();
             dispose();
         }
-        loadingGame = false;
     }
 
     Legion readLegion(BufferedReader in, Player player,
@@ -1488,6 +1463,35 @@ Log.debug("Called Game.newGame2()");
         legion.addToBattleTally(battleTally);
 
         return legion;
+    }
+
+    void loadGame2()
+    {
+        server.allSetColor();
+
+        // We need to set the autoPlay option before loading the board,
+        // so that we can avoid showing boards for AI players.
+        syncAutoPlay();
+        syncOptions();
+
+        server.allUpdatePlayerInfo();
+
+        if (getOption(Options.allStacksVisible))
+        {
+            server.allFullyUpdateAllLegionContents();
+        }
+        else
+        {
+            server.allFullyUpdateLegionHeights();
+            server.allFullyUpdateOwnLegionContents();
+        }
+
+        server.allInitBoard();
+        server.allTellAllLegionLocations();
+
+        server.allSetupTurnState();
+        setupPhase();
+        caretaker.fullySyncDisplays();
     }
 
     /** Extract and return the numeric part of a filename. */
