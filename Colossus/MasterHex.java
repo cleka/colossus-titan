@@ -90,53 +90,6 @@ public class MasterHex extends Hex
     }
 
 
-    public void rescale(int cx, int cy, int scale)
-    {
-        this.scale = scale;
-        len = scale / 3.0;
-        if (inverted)
-        {
-            xVertex[0] = cx - scale;
-            yVertex[0] = cy;
-            xVertex[1] = cx + 3 * scale;
-            yVertex[1] = cy;
-            xVertex[2] = cx + 4 * scale;
-            yVertex[2] = cy + (int) Math.round(SQRT3 * scale);
-            xVertex[3] = cx + 2 * scale;
-            yVertex[3] = cy + (int) Math.round(3 * SQRT3 * scale);
-            xVertex[4] = cx;
-            yVertex[4] = cy + (int) Math.round(3 * SQRT3 * scale);
-            xVertex[5] = cx - 2 * scale;
-            yVertex[5] = cy + (int) Math.round(SQRT3 * scale);
-        }
-        else
-        {
-            xVertex[0] = cx;
-            yVertex[0] = cy;
-            xVertex[1] = cx + 2 * scale;
-            yVertex[1] = cy;
-            xVertex[2] = cx + 4 * scale;
-            yVertex[2] = cy + (int) Math.round(2 * SQRT3 * scale);
-            xVertex[3] = cx + 3 * scale;
-            yVertex[3] = cy + (int) Math.round(3 * SQRT3 * scale);
-            xVertex[4] = cx - scale;
-            yVertex[4] = cy + (int) Math.round(3 * SQRT3 * scale);
-            xVertex[5] = cx - 2 * scale;
-            yVertex[5] = cy + (int) Math.round(2 * SQRT3 * scale);
-        }
-
-        hexagon.xpoints = xVertex;
-        hexagon.ypoints = yVertex;
-
-        // Add 1 to width and height because Java rectangles come up
-        // one pixel short of the area actually painted.
-        rectBound.x =  xVertex[5];
-        rectBound.y =  yVertex[0];
-        rectBound.width = xVertex[2] - xVertex[5] + 1;
-        rectBound.height = yVertex[3] - yVertex[0] + 1;
-    }
-
-
     public void paint(Graphics g)
     {
         if (isSelected())
@@ -807,7 +760,7 @@ public class MasterHex extends Hex
 
     // Return a point near the center of the hex, vertically offset
     // a bit toward the fat side.
-    public Point getOffCenter()
+    private Point getOffCenter()
     {
         return new Point((xVertex[0] + xVertex[1]) / 2, (yVertex[0] + 
             yVertex[3]) / 2 + (inverted ? -(scale / 6) : (scale / 6))); 
@@ -911,7 +864,7 @@ public class MasterHex extends Hex
     }
 
 
-    public void alignLegions()
+    private void alignLegions()
     {
         if (numLegions == 0)
         {
@@ -1072,22 +1025,6 @@ public class MasterHex extends Hex
     }
 
 
-    // Return a possible entry side.  If there are more than one, only one
-    // will be returned.
-    public int getEntrySide()
-    {
-        for (int i = 0; i < 6; i++)
-        {
-            if (entrySide[i])
-            {
-                return i;
-            }
-        }
-
-        return -1;
-    }
-
-
     // Return the number of possible entry sides.
     public int getNumEntrySides()
     {
@@ -1131,21 +1068,31 @@ public class MasterHex extends Hex
     }
 
 
+    // Return a possible entry side.  If there is more than one, only one
+    // will be returned.  If there is none, -1 will be returned.
+    public int getEntrySide()
+    {
+        for (int i = 0; i < 6; i++)
+        {
+            if (entrySide[i])
+            {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+
     public boolean getTeleported()
     {
         return teleported;
     }
 
-
-    public void setTeleported()
+   
+    public void setTeleported(boolean teleported)
     {
-        teleported = true;
-    }
-
-
-    public void clearTeleported()
-    {
-        teleported = false;
+        this.teleported = teleported;
     }
 
 
@@ -1154,20 +1101,6 @@ public class MasterHex extends Hex
         for (int i = 0; i < 6; i++)
         {
             entrySide[i] = false;
-        }
-    }
-
-
-    // Present a dialog allowing the player to enter via land or teleport.
-    public void chooseWhetherToTeleport()
-    {
-        new OptionDialog(board, "Teleport?", "Teleport?", "Teleport", 
-            "Move Normally");
-
-        // If Teleport, then leave teleported set.
-        if (OptionDialog.getLastAnswer() == OptionDialog.NO_OPTION)
-        {
-            clearTeleported();
         }
     }
 }

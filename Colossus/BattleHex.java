@@ -76,37 +76,6 @@ public class BattleHex extends Hex
     }
 
 
-    public void rescale(int cx, int cy, int scale)
-    {
-        this.scale = scale;
-        len = scale / 3.0;
-
-        xVertex[0] = cx;
-        yVertex[0] = cy;
-        xVertex[1] = cx + 2 * scale;
-        yVertex[1] = cy;
-        xVertex[2] = cx + 3 * scale;
-        yVertex[2] = cy + (int) Math.round(SQRT3 * scale);
-        xVertex[3] = cx + 2 * scale;
-        yVertex[3] = cy + (int) Math.round(2 * SQRT3 * scale);
-        xVertex[4] = cx;
-        yVertex[4] = cy + (int) Math.round(2 * SQRT3 * scale);
-        xVertex[5] = cx - scale;
-        yVertex[5] = cy + (int) Math.round(SQRT3 * scale);
-
-        // The hit testing breaks if we just reassign the vertices
-        // of the old hexagon.
-        hexagon = new Polygon(xVertex, yVertex, 6);
-
-        // Add 1 to width and height because Java rectangles come up
-        // one pixel short.
-        rectBound.x =  xVertex[5];
-        rectBound.y =  yVertex[0];
-        rectBound.width = xVertex[2] - xVertex[5] + 1;
-        rectBound.height = yVertex[3] - yVertex[0] + 1;
-    }
-
-
     public void paint(Graphics g)
     {
         if (isSelected())

@@ -717,7 +717,7 @@ public class BattleMap extends Frame implements MouseListener,
         Point point = e.getPoint();
         Player player = battle.getActivePlayer();
 
-        Critter critter = battle.getCritterContainingPoint(point);
+        Critter critter = battle.getCritterWithChitContainingPoint(point);
 
         // Only the active player can move or strike.
         if (critter != null && critter.getPlayer() == player)
@@ -840,7 +840,7 @@ public class BattleMap extends Frame implements MouseListener,
     {
         if (board != null)
         {
-            board.disposeGame();
+            board.getGame().dispose();
         }
         dispose();
     }
@@ -946,14 +946,6 @@ public class BattleMap extends Frame implements MouseListener,
     public Dimension getPreferredSize()
     {
         return new Dimension(30 * scale, 30 * scale);
-    }
-    
-    
-    public Dimension getMapSize()
-    {
-        Rectangle xRect = h[5][3].getBounds();
-        Rectangle yRect = h[3][5].getBounds();
-        return new Dimension(xRect.x + xRect.width, yRect.y + yRect.height);
     }
     
     

@@ -1,3 +1,5 @@
+Merge the hex setup code in BattleMap, ShowBattleMap, PickEntrySide.
+
 Split GUI classes from model classes.
 
 Add server menu for save game, load game, new game, autosave, visible 

@@ -100,3 +100,8 @@ Linux, ibmjdk118; Win98, jdk1.3rc1: Tried to strike own creature!
 Linux, ibmjdk118: '6' in upper left corner of MasterBoard window
    after loading a game.  Stray legion height?  Disappears in a
    repaint after a few turns.
+
+Linux, ibmjdk118: A gargoyle was given a penalty option to strike 
+   a gargoyle in bramble vs. one in plains, even though brush 
+   natives are unaffected by bramble.  Broken PenaltyOption.sort?
+

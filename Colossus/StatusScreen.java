@@ -11,7 +11,9 @@ import java.awt.event.*;
 
 public class StatusScreen extends Frame implements WindowListener
 {
-    private Label [] activeLabel;
+    private Label [] nameLabel;
+    private Label [] towerLabel;
+    private Label [] colorLabel;
     private Label [] elimLabel;
     private Label [] legionsLabel;
     private Label [] markersLabel;
@@ -31,12 +33,11 @@ public class StatusScreen extends Frame implements WindowListener
 
         setupIcon();
 
-        setLayout(new GridLayout(0, 10));
+        setLayout(new GridLayout(0, 9));
 
         // active, player name, tower, color, colors eliminated, legions,
         //     markers, creatures, titan power, score
 
-        add(new Label(""));
         add(new Label("Player "));
         add(new Label("Tower "));
         add(new Label("Color "));
@@ -48,7 +49,9 @@ public class StatusScreen extends Frame implements WindowListener
         add(new Label("Score"));
 
         int numPlayers = game.getNumPlayers();
-        activeLabel = new Label[numPlayers];
+        nameLabel = new Label[numPlayers];
+        towerLabel = new Label[numPlayers];
+        colorLabel = new Label[numPlayers];
         elimLabel = new Label[numPlayers];
         legionsLabel = new Label[numPlayers];
         markersLabel = new Label[numPlayers];
@@ -58,38 +61,35 @@ public class StatusScreen extends Frame implements WindowListener
 
         for (int i = 0; i < numPlayers; i++)
         {
-            activeLabel[i] = new Label(" ");
-            if (game.getActivePlayerNum() == i)
-            {
-                activeLabel[i] = new Label("*");
-            }
-            else
-            {
-                activeLabel[i] = new Label(" ");
-            }
-            add(activeLabel[i]);
-            add(new Label(game.getPlayer(i).getName()));
-            add(new Label(
-                String.valueOf(100 * game.getPlayer(i).getTower())));
-            add(new Label(game.getPlayer(i).getColor()));
-            elimLabel[i] = new Label(game.getPlayer(i).getPlayersElim());
+            nameLabel[i] = new Label();
+            add(nameLabel[i]);
+
+            towerLabel[i] = new Label();
+            add(towerLabel[i]);
+
+            colorLabel[i] = new Label();
+            add(colorLabel[i]);
+
+            elimLabel[i] = new Label();
             add(elimLabel[i]);
-            legionsLabel[i] = new Label(String.valueOf(
-                game.getPlayer(i).getNumLegions()));
+
+            legionsLabel[i] = new Label();
             add(legionsLabel[i]);
-            markersLabel[i] = new Label(String.valueOf(
-                game.getPlayer(i).getNumMarkersAvailable()));
+
+            markersLabel[i] = new Label();
             add(markersLabel[i]);
-            creaturesLabel[i] = new Label(String.valueOf(
-                game.getPlayer(i).getNumCreatures()));
+
+            creaturesLabel[i] = new Label();
             add(creaturesLabel[i]);
-            titanLabel[i] = new Label(String.valueOf(
-                game.getPlayer(i).getTitanPower()));
+
+            titanLabel[i] = new Label();
             add(titanLabel[i]);
-            scoreLabel[i] = new Label(String.valueOf(
-                game.getPlayer(i).getScore()));
+
+            scoreLabel[i] = new Label();
             add(scoreLabel[i]);
         }
+
+        updateStatusScreen();
 
         pack();
 
@@ -121,18 +121,46 @@ public class StatusScreen extends Frame implements WindowListener
     }
 
 
+    private void setPlayerLabelBackground(int i, Color color)
+    {
+        if (nameLabel[i].getBackground() != color)
+        {
+            nameLabel[i].setBackground(color);
+            towerLabel[i].setBackground(color);
+            colorLabel[i].setBackground(color);
+            elimLabel[i].setBackground(color);
+            legionsLabel[i].setBackground(color);
+            markersLabel[i].setBackground(color);
+            creaturesLabel[i].setBackground(color);
+            titanLabel[i].setBackground(color);
+            scoreLabel[i].setBackground(color);
+        }
+    }
+
+
     public void updateStatusScreen()
     {
         for (int i = 0; i < game.getNumPlayers(); i++)
         {
+            Color color;
             if (game.getActivePlayerNum() == i)
             {
-                activeLabel[i].setText("*");
+                color = Color.yellow;
+            }
+            else if (!game.getPlayer(i).isAlive())
+            {
+                color = Color.red;
             }
             else
             {
-                activeLabel[i].setText(" ");
+                color = Color.lightGray;
             }
+            setPlayerLabelBackground(i, color);
+
+            nameLabel[i].setText(game.getPlayer(i).getName());
+            towerLabel[i].setText(String.valueOf(100 * 
+                game.getPlayer(i).getTower()));
+            colorLabel[i].setText(game.getPlayer(i).getColor());
             elimLabel[i].setText(game.getPlayer(i).getPlayersElim());
             legionsLabel[i].setText(String.valueOf(
                 game.getPlayer(i).getNumLegions()));

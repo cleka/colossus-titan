@@ -63,7 +63,7 @@ public class Battle
     }
 
 
-    public static String getPhaseName(int phase)
+    private static String getPhaseName(int phase)
     {
         switch (phase)
         {
@@ -80,12 +80,6 @@ public class Battle
             default:
                 return "?????";
         }
-    }
-
-
-    public Legion getActiveLegion()
-    {
-        return activeLegion;
     }
 
 
@@ -232,7 +226,7 @@ public class Battle
     }
 
 
-    public void startSummoningAngel()
+    private void startSummoningAngel()
     {
         if (summonState == Battle.FIRST_BLOOD)
         {
@@ -284,12 +278,6 @@ public class Battle
     }
 
 
-    public void setCarryDamage(int damage)
-    {
-        carryDamage = damage;
-    }
-
-
     public int getCarryDamage()
     {
         return carryDamage;
@@ -332,7 +320,7 @@ public class Battle
     }
 
 
-    public void removeCritter(Critter critter)
+    private void removeCritter(Critter critter)
     {
         for (int i = 0; i < numCritters; i++)
         {
@@ -554,7 +542,7 @@ public class Battle
                 critter.getCurrentHex().repaint();
             }
         }
-        setCarryDamage(0);
+        carryDamage = 0;
     }
 
 
@@ -602,7 +590,7 @@ public class Battle
 
     // Return the Critter whose chit contains the given point,
     //   or null if none does.
-    public Critter getCritterContainingPoint(Point point)
+    public Critter getCritterWithChitContainingPoint(Point point)
     {
         for (int i = 0; i < numCritters; i++)
         {
@@ -616,7 +604,7 @@ public class Battle
     }
     
     
-    public void removeDeadCreatures()
+    private void removeDeadCreatures()
     {
         // Initialize these to true, and then set them to false when a
         // non-dead chit is found.
@@ -875,7 +863,7 @@ public class Battle
     }
 
 
-    public int countStrikes(Critter critter)
+    private int countStrikes(Critter critter)
     {
         return countAndMaybeHighlightStrikes(critter, false);
     }
@@ -907,7 +895,7 @@ public class Battle
 
         if (count > 0)
         {
-            setCarryDamage(damage);
+            carryDamage = damage;
         }
 
         return count;
@@ -916,8 +904,8 @@ public class Battle
 
     public void applyCarries(Critter target)
     {
-        setCarryDamage(target.wound(getCarryDamage()));
-        if (getCarryDamage() < 0)
+        carryDamage = target.wound(carryDamage);
+        if (carryDamage < 0)
         {
             clearAllCarries();
         }
@@ -1200,7 +1188,7 @@ public class Battle
 
 
     // Return true if the rangestrike is possible.
-    public boolean isRangestrikePossible(Critter critter, Critter target)
+    private boolean isRangestrikePossible(Critter critter, Critter target)
     {
         BattleHex currentHex = critter.getCurrentHex();
         BattleHex targetHex = target.getCurrentHex();
@@ -1475,12 +1463,6 @@ public class Battle
             // LOS to right
             return countBrambleHexesDir(hex1, hex2, false, 0);
         }
-    }
-
-
-    public MasterBoard getBoard()
-    {
-        return board;
     }
 
 

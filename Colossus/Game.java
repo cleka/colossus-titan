@@ -77,7 +77,7 @@ public class Game
     }
 
 
-    public static String getPhaseName(int phase)
+    private static String getPhaseName(int phase)
     {
         switch (phase)
         {
@@ -190,7 +190,7 @@ public class Game
     }
 
 
-    public int getNumLivingPlayers()
+    private int getNumLivingPlayers()
     {
         int count = 0;
         for (int i = 0; i < numPlayers; i++)

@@ -251,12 +251,6 @@ public class Critter extends Creature
     }
 
 
-    public BattleHex getStartingHex()
-    {
-        return startingHex;
-    }
-
-    
     // Dead critters count as being in contact only if countDead is true.
     public int numInContact(boolean countDead)
     {
@@ -383,7 +377,7 @@ public class Critter extends Creature
     }
 
 
-    public int getAttackerSkill(Critter target)
+    private int getAttackerSkill(Critter target)
     {
         BattleHex targetHex = target.getCurrentHex();
 
@@ -472,7 +466,7 @@ public class Critter extends Creature
     }
 
 
-    public int getStrikeNumber(Critter target)
+    private int getStrikeNumber(Critter target)
     {
         BattleHex targetHex = target.getCurrentHex();
         boolean rangestrike = !isInContact(true);

@@ -242,12 +242,6 @@ public class MasterBoard extends Frame implements MouseListener,
     }
 
 
-    public void disposeGame()
-    {
-        game.dispose();
-    }
-
-
     public void dispose()
     {
         if (map != null)
@@ -302,7 +296,7 @@ public class MasterBoard extends Frame implements MouseListener,
     
     // Return the Legion whose marker contains the given
     //    point, or null if none does.
-    private Legion getLegionContainingPoint(Point point)
+    private Legion getLegionWithMarkerContainingPoint(Point point)
     {
         for (int i = 0; i < game.getNumPlayers(); i++)
         {
@@ -339,7 +333,7 @@ public class MasterBoard extends Frame implements MouseListener,
 
     // Clear all entry side and teleport information from all hexes occupied
     // by one or fewer legions.
-    public void clearAllNonFriendlyOccupiedEntrySides(Player player)
+    private void clearAllNonFriendlyOccupiedEntrySides(Player player)
     {
         for (int i = 0; i < h.length; i++)
         {
@@ -348,7 +342,7 @@ public class MasterBoard extends Frame implements MouseListener,
                 if (show[i][j] && h[i][j].getNumFriendlyLegions(player) == 0)
                 {
                     h[i][j].clearAllEntrySides();
-                    h[i][j].clearTeleported();
+                    h[i][j].setTeleported(false);
                 }
             }
         }
@@ -365,7 +359,7 @@ public class MasterBoard extends Frame implements MouseListener,
                 if (show[i][j])
                 {
                     h[i][j].clearAllEntrySides();
-                    h[i][j].clearTeleported();
+                    h[i][j].setTeleported(false);
                 }
             }
         }
@@ -479,7 +473,7 @@ public class MasterBoard extends Frame implements MouseListener,
                 hex.repaint();
             }
             // Mover can choose side of entry.
-            hex.setTeleported();
+            hex.setTeleported(true);
         }
 
         if (roll > 0)
@@ -568,7 +562,7 @@ public class MasterBoard extends Frame implements MouseListener,
                             hex.select();
                             hex.repaint();
                             // Mover can choose side of entry.
-                            hex.setTeleported();
+                            hex.setTeleported(true);
                         }
                     }
                 }
@@ -596,7 +590,7 @@ public class MasterBoard extends Frame implements MouseListener,
                                     hex.select();
                                     hex.repaint();
                                     // Mover can choose side of entry.
-                                    hex.setTeleported();
+                                    hex.setTeleported(true);
                                 }
                             }
                         }
@@ -756,6 +750,20 @@ public class MasterBoard extends Frame implements MouseListener,
 
         // Insert a blank line in the log file after each battle.
         Game.logEvent("\n");
+    }
+
+
+    // Present a dialog allowing the player to enter via land or teleport.
+    private void chooseWhetherToTeleport(MasterHex hex)
+    {
+        new OptionDialog(this, "Teleport?", "Teleport?", "Teleport", 
+            "Move Normally");
+
+        // If Teleport, then leave teleported set.
+        if (OptionDialog.getLastAnswer() == OptionDialog.NO_OPTION)
+        {
+            hex.setTeleported(false);
+        }
     }
 
 
@@ -1430,28 +1438,6 @@ public class MasterBoard extends Frame implements MouseListener,
     }
 
 
-    private void rescale(int scale)
-    {
-        this.scale = scale;
-        int cx = 3 * scale;
-        int cy = 2 * scale;
-
-        setSize(69 * scale, 69 * scale);
-
-        // Initialize hexes.
-        for (int i = 0; i < h.length; i++)
-        {
-            for (int j = 0; j < h[0].length; j++)
-            {
-                if (show[i][j])
-                {
-                    h[i][j].rescale(cx, cy, scale);
-                }
-            }
-        }
-    }
-
-
     public void deiconify()
     {
         // setState(Frame.NORMAL) does not work under 1.1
@@ -1463,7 +1449,7 @@ public class MasterBoard extends Frame implements MouseListener,
     {
         Point point = e.getPoint();
 
-        Legion legion = getLegionContainingPoint(point);
+        Legion legion = getLegionWithMarkerContainingPoint(point);
 
         if (legion != null)
         {
@@ -1593,7 +1579,7 @@ public class MasterBoard extends Frame implements MouseListener,
                         // Pick teleport or normal move if necessary.
                         if (hex.getTeleported() && hex.canEnterViaLand())
                         {
-                            hex.chooseWhetherToTeleport();
+                            chooseWhetherToTeleport(hex);
                         }
 
                         // If this is a tower hex, set the entry side
