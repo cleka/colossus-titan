@@ -1,5 +1,3 @@
-Bug: Need to detect failed AI battle moves and fall back to next choice.
-
 Bug: Defender won battle in turn 7 strikeback.  BattleMap never cleared.
    Never got cleanupBattle() call.  So never called Game.finishBattle()?
 From client Blue: doneWithStrikes
@@ -95,7 +93,12 @@ Bug: Saw 8-high enemy legion 3xUni, Chi, 3xGri, Ran.  Height shows up
 Bug: Got two "All humans eliminated" dialogs -- one for human and one
    for last AI.  (With stop when all humans eliminated option set.)
 
+Remember IP addresses from past games.
+
+Disable "AIs stop when humans dead" if no human players at start of game.
+
 Auto-redirect output to file lastlog in Colossus directory
+Save a clean game move record, sans debug spooge, to another file.
 
 Add link from client to LogWindow; advance scroll thumb at end of various
    phases. 

@@ -2253,21 +2253,52 @@ Log.debug("Best target is null, aborting");
 
         if (bestMoveOrder != null)
         {
-            Iterator it = bestMoveOrder.iterator();
-            while (it.hasNext())
-            {
-                CritterMove cm = (CritterMove)it.next();
-                BattleChit fakeCritter = cm.getCritter();
-
-                String hexLabel = cm.getEndingHexLabel();
-                Log.debug("try " + fakeCritter + " to " + hexLabel);
-                client.doBattleMove(fakeCritter.getTag(), hexLabel);
-                // XXX Need to test that the move was okay, and
-                // try another one if it failed.
-            }
+            makeBattleMoves(bestMoveOrder);
+            retryFailedBattleMoves(bestMoveOrder);
         }
 
         Log.debug("Done with battleMove()");
+    }
+
+
+    private void makeBattleMoves(List bestMoveOrder)
+    {
+        Iterator it = bestMoveOrder.iterator();
+        while (it.hasNext())
+        {
+            CritterMove cm = (CritterMove)it.next();
+            BattleChit critter = cm.getCritter();
+
+            String hexLabel = cm.getEndingHexLabel();
+            Log.debug("try " + critter + " to " + hexLabel);
+            client.doBattleMove(critter.getTag(), hexLabel);
+        }
+    }
+
+    private void retryFailedBattleMoves(List bestMoveOrder)
+    {
+        List retries = new ArrayList();
+
+        // Try another move for creatures whose moves failed.
+        Iterator it = bestMoveOrder.iterator();
+        while (it.hasNext())
+        {
+            CritterMove cm = (CritterMove)it.next();
+            BattleChit critter = cm.getCritter();
+            String startingHexLabel = cm.getEndingHexLabel();
+            String endingHexLabel = cm.getStartingHexLabel();
+
+            BattleChit squatter = client.getBattleChit(endingHexLabel);
+            if (squatter == null || squatter.getTag() != critter.getTag())
+            {
+                Log.debug(critter.getDescription() + " failed to move");
+                List moveList = findBattleMovesOneCritter(critter);
+                CritterMove cm2 = (CritterMove)moveList.get(0);
+                Log.debug("Moving " + critter.getDescription() + " to " +
+                    cm2.getEndingHexLabel());
+                critter.moveToHex(cm2.getEndingHexLabel());
+            }
+        }
     }
 
 
@@ -2441,70 +2472,13 @@ Log.debug("Called findBattleMoves()");
         while (it.hasNext())
         {
             BattleChit critter = (BattleChit)it.next();
-            String currentHexLabel = critter.getCurrentHexLabel();
-
-            // moves is a list of hex labels where one critter can move.
-
-            // Sometimes friendly critters need to get out of the way to 
-            // clear a path for a more important critter.  We consider 
-            // moves that the critter could make, disregarding mobile allies.
-
-            // XXX Should show moves including moving through mobile allies.
-            Set moves = client.showBattleMoves(critter.getTag());
-
-            // TODO Make less important creatures get out of the way.
-
-            // Not moving is also an option.
-            moves.add(currentHexLabel);
-
-            List moveList = new MoveList();
-
-            Iterator it2 = moves.iterator();
-            while (it2.hasNext())
-            {
-                String hexLabel = (String)it2.next();
-
-                CritterMove cm = new CritterMove(critter, currentHexLabel, 
-                    hexLabel);
-
-                // Need to move the critter to evaluate.
-                critter.moveToHex(hexLabel);
-
-                // Compute and save the value for each CritterMove.
-                cm.setValue(evaluateCritterMove(critter));
-                moveList.add(cm);
-            }
-            // Move the critter back where it started.
-            critter.moveToHex(critter.getStartingHexLabel());
-
-            // Sort critter moves in descending order of score.
-            Collections.sort(moveList, new Comparator()
-            {
-                public int compare(Object o1, Object o2)
-                {
-                    CritterMove cm1 = (CritterMove)o1;
-                    CritterMove cm2 = (CritterMove)o2;
-                    return cm2.getValue() - cm1.getValue();
-                }
-            });
-
-            // Show the moves considered.
-            StringBuffer buf = new StringBuffer("Considered " +
-                moveList.size() + " moves for " + critter.getTag() + " " +
-                critter.getCreatureName() + " in " + currentHexLabel+ ":");
-            it2 = moveList.iterator();
-            while (it2.hasNext())
-            {
-                CritterMove cm = (CritterMove)it2.next();
-                buf.append(" " + cm.getEndingHexLabel());
-            }
-            Log.debug(buf.toString());
+            List moveList = findBattleMovesOneCritter(critter);
 
             // Add this critter's moves to the list.
             allCritterMoves.add(moveList);
 
             // Put all critters back where they started.
-            it2 = allCritterMoves.iterator();
+            Iterator it2 = allCritterMoves.iterator();
             while (it2.hasNext())
             {
                 moveList = (MoveList)it2.next();
@@ -2516,6 +2490,70 @@ Log.debug("Called findBattleMoves()");
 
         List legionMoves = findLegionMoves(allCritterMoves);
         return legionMoves;
+    }
+
+    private List findBattleMovesOneCritter(BattleChit critter)
+    {
+        String currentHexLabel = critter.getCurrentHexLabel();
+
+        // moves is a list of hex labels where one critter can move.
+
+        // Sometimes friendly critters need to get out of the way to 
+        // clear a path for a more important critter.  We consider 
+        // moves that the critter could make, disregarding mobile allies.
+
+        // XXX Should show moves including moving through mobile allies.
+        Set moves = client.showBattleMoves(critter.getTag());
+
+        // TODO Make less important creatures get out of the way.
+
+        // Not moving is also an option.
+        moves.add(currentHexLabel);
+
+        List moveList = new MoveList();
+
+        Iterator it2 = moves.iterator();
+        while (it2.hasNext())
+        {
+            String hexLabel = (String)it2.next();
+
+            CritterMove cm = new CritterMove(critter, currentHexLabel, 
+                hexLabel);
+
+            // Need to move the critter to evaluate.
+            critter.moveToHex(hexLabel);
+
+            // Compute and save the value for each CritterMove.
+            cm.setValue(evaluateCritterMove(critter));
+            moveList.add(cm);
+        }
+        // Move the critter back where it started.
+        critter.moveToHex(critter.getStartingHexLabel());
+
+        // Sort critter moves in descending order of score.
+        Collections.sort(moveList, new Comparator()
+        {
+            public int compare(Object o1, Object o2)
+            {
+                CritterMove cm1 = (CritterMove)o1;
+                CritterMove cm2 = (CritterMove)o2;
+                return cm2.getValue() - cm1.getValue();
+            }
+        });
+
+        // Show the moves considered.
+        StringBuffer buf = new StringBuffer("Considered " +
+            moveList.size() + " moves for " + critter.getTag() + " " +
+            critter.getCreatureName() + " in " + currentHexLabel+ ":");
+        it2 = moveList.iterator();
+        while (it2.hasNext())
+        {
+            CritterMove cm = (CritterMove)it2.next();
+            buf.append(" " + cm.getEndingHexLabel());
+        }
+        Log.debug(buf.toString());
+
+        return moveList;
     }
 
 
@@ -3088,80 +3126,6 @@ Log.debug("Called findBattleMoves()");
         }
 
         return sum;
-    }
-
-
-    /** Fliers should move last, since they can fly over allies.
-     *  Those moving far should move before those staying close to home.
-     *  Non-natives should move before natives, since natives can often
-     *     move through hexes that non-natives can't.
-     *  More important creatures should move before less important
-     *     creatures. */
-    public final class MoveOrderComparator implements Comparator
-    {
-        MoveOrderComparator()
-        {
-        }
-
-        public int compare(Object o1, Object o2)
-        {
-            final char terrain = client.getBattleTerrain();
-
-            ArrayList moveList1 = (MoveList)o1;
-            ArrayList moveList2 = (MoveList)o2;
-            CritterMove cm1 = (CritterMove)moveList1.get(0);
-            CritterMove cm2 = (CritterMove)moveList2.get(0);
-            BattleChit critter1 = cm1.getCritter();
-            BattleChit critter2 = cm2.getCritter();
-            BattleHex desiredHex1 = cm1.getEndingHex(terrain);
-            BattleHex desiredHex2 = cm2.getEndingHex(terrain);
-
-            if (critter1.getCreature().isFlier() && 
-                !critter2.getCreature().isFlier())
-            {
-                return 1;
-            }
-            else if (critter2.getCreature().isFlier() && 
-                !critter1.getCreature().isFlier())
-            {
-                return -1;
-            }
-
-            int range1 = client.getStrike().getRange(
-                client.getStartingBattleHex(critter1), desiredHex1, true);
-            int range2 = client.getStrike().getRange(
-                client.getStartingBattleHex(critter2), desiredHex2, true);
-            int diff = range2 - range1;
-            if (diff != 0)
-            {
-                return diff;
-            }
-
-            if (MasterHex.isNativeCombatBonus(critter1.getCreature(), 
-                terrain) && !MasterHex.isNativeCombatBonus(
-                critter2.getCreature(), terrain))
-            {
-                return 1;
-            }
-            else if (MasterHex.isNativeCombatBonus(critter2.getCreature(), 
-                terrain) && !MasterHex.isNativeCombatBonus(
-                critter1.getCreature(), terrain))
-            {
-                return -1;
-            }
-
-            diff = getKillValue(critter2, terrain) -
-                getKillValue(critter1, terrain);
-            if (diff != 0)
-            {
-                return diff;
-            }
-            else
-            {
-                return critter1.getCreatureName().compareTo(
-                    critter2.getCreatureName());
-            }
-        }
     }
 
 

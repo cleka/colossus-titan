@@ -849,8 +849,11 @@ Log.debug("Called Server.addClient() for " + playerName);
             return;
         }
         Battle battle = game.getBattle();
-        battle.getActiveLegion().getCritterByTag(tag).strike(
-            battle.getCritter(hexLabel));
+        if (battle != null)
+        {
+            battle.getActiveLegion().getCritterByTag(tag).strike(
+                battle.getCritter(hexLabel));
+        }
     }
 
     public synchronized void applyCarries(String hexLabel)
