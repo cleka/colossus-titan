@@ -415,8 +415,6 @@ Log.debug("Called Game.newGame2()");
 
     void assignColor(String playerName, String color)
     {
-        // XXX Only let the player whose turn it is pick.
-
         Player player = getPlayer(playerName);
         colorsLeft.remove(color);
         player.setColor(color);
@@ -1181,7 +1179,6 @@ Log.debug("Called Game.newGame2()");
         options.loadOptions();
 
         File file = null;
-
         if (filename.equals("--latest"))
         {
             File dir = new File(Constants.saveDirname);
@@ -1314,14 +1311,6 @@ Log.debug("Called Game.newGame2()");
                 }
             }
 
-            initServer();
-            server.allSetColor();
-
-            // We need to set the autoPlay option before loading the board,
-            // so that we can avoid showing boards for AI players.
-            syncAutoPlay();
-            syncOptions();
-
             // Battle stuff
             buf = in.readLine();
             if (buf != null && buf.length() > 0)
@@ -1383,6 +1372,14 @@ Log.debug("Called Game.newGame2()");
                 battle.init();
             }
 
+            initServer();
+            server.allSetColor();
+
+            // We need to set the autoPlay option before loading the board,
+            // so that we can avoid showing boards for AI players.
+            syncAutoPlay();
+            syncOptions();
+
             server.allUpdatePlayerInfo();
 
             if (getOption(Options.allStacksVisible))
@@ -1397,6 +1394,7 @@ Log.debug("Called Game.newGame2()");
 
             server.allInitBoard();
             server.allTellAllLegionLocations();
+
             server.allSetupTurnState();
             setupPhase();
             caretaker.fullySyncDisplays();

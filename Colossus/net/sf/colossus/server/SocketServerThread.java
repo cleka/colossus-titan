@@ -50,6 +50,7 @@ final class SocketServerThread extends Thread implements IClient
         catch (IOException ex)
         {
             Log.error(ex.toString());
+            ex.printStackTrace();
             return;
         }
 
@@ -66,6 +67,7 @@ final class SocketServerThread extends Thread implements IClient
         catch (IOException ex)
         {
             Log.error(ex.toString());
+            ex.printStackTrace();
         }
 
         // Shut down the client.
@@ -77,6 +79,7 @@ final class SocketServerThread extends Thread implements IClient
         catch (IOException ex)
         {
             Log.error(ex.toString());
+            ex.printStackTrace();
         }
     }
 

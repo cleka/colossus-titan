@@ -41,6 +41,7 @@ final class SocketClientThread extends Thread implements IServer
         catch (Exception ex)
         {
             Log.error(ex.toString());
+            ex.printStackTrace();
             return;
         }
 
@@ -59,6 +60,7 @@ final class SocketClientThread extends Thread implements IServer
         catch (IOException ex)
         {
             Log.error(ex.toString());
+            ex.printStackTrace();
             return;
         }
 
@@ -81,12 +83,13 @@ Log.debug("End of SocketClientThread while loop");
         catch (IOException ex)
         {
             Log.error(ex.toString());
+            ex.printStackTrace();
         }
         System.exit(0);
     }
 
 
-    private void parseLine(String s)
+    private synchronized void parseLine(String s)
     {
         List li = Split.split(sep, s);
         String method = (String)li.remove(0);

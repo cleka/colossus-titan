@@ -50,10 +50,6 @@ public final class Server implements IServer
     private int damage;
     private List rolls;
 
-    // Enforce color picking
-    private String colorPickingPlayerName;
-    private Set colorsLeft;
-
     // Network stuff
     private ServerSocket serverSocket;
     private Socket [] clientSockets = new Socket[Constants.MAX_PLAYERS];
@@ -72,15 +68,21 @@ public final class Server implements IServer
     {
         numClients = 0;
         maxClients = game.getNumLivingPlayers();
-Log.debug("new SocketServer maxClients = " + maxClients);
+Log.debug("initSocketServer maxClients = " + maxClients);
 
         try
         {
+            if (serverSocket != null)
+            {
+                serverSocket.close();
+                serverSocket = null;
+            }
             serverSocket = new ServerSocket(port);
         }
         catch (IOException ex)
         {
             Log.error(ex.toString());
+            ex.printStackTrace();
             return;
         }
 
@@ -106,6 +108,7 @@ Log.debug("Got client connection");
         catch (IOException ex)
         {
             Log.error(ex.toString());
+            ex.printStackTrace();
             return;
         }
 
@@ -215,7 +218,17 @@ Log.debug("Decremented waitingForClients to " + waitingForClients);
             client.dispose();
         }
         clients.clear();
-        // XXX drop sockets
+        if (serverSocket != null)
+        {
+            try
+            {
+                serverSocket.close();
+            }
+            catch (IOException ex)
+            {
+                Log.error(ex.toString());
+            }
+        }
     }
 
 
@@ -319,18 +332,25 @@ Log.debug("Decremented waitingForClients to " + waitingForClients);
     }
 
 
-    void allInitBoard()
+    synchronized void allInitBoard()
     {
-        Iterator it = clients.iterator();
+        Iterator it = game.getPlayers().iterator();
         while (it.hasNext())
         {
-            IClient client = (IClient)it.next();
-            client.initBoard();
+            Player player = (Player)it.next();
+            if (!player.isDead())
+            {
+                IClient client = getClient(player.getName());
+                if (client != null)
+                {
+                    client.initBoard();
+                }
+            }
         }
     }
 
 
-    void allTellAllLegionLocations()
+    synchronized void allTellAllLegionLocations()
     {
         List markerIds = game.getAllLegionIds();
         Iterator it = markerIds.iterator();
@@ -778,7 +798,7 @@ Log.debug("Decremented waitingForClients to " + waitingForClients);
         }
     }
 
-    void allTellBattleMove(int tag, String startingHex, String endingHex,
+    void allTellBattleMove(int tag, String startingHex, String endingHex, 
         boolean undo)
     {
         Iterator it = clients.iterator();
@@ -833,7 +853,7 @@ Log.debug("Decremented waitingForClients to " + waitingForClients);
         }
     }
 
-    void allTellCarryResults(Critter carryTarget, int carryDamageDone,
+    void allTellCarryResults(Critter carryTarget, int carryDamageDone, 
         int carryDamageLeft, Set carryTargetDescriptions)
     {
         if (striker == null || target == null || rolls == null)
@@ -863,6 +883,7 @@ Log.debug("Decremented waitingForClients to " + waitingForClients);
         }
     }
 
+    
     void allTellDriftDamageResults(Critter target, int damage)
     {
         this.target = target;
@@ -1194,7 +1215,11 @@ Log.debug("Decremented waitingForClients to " + waitingForClients);
     void oneRevealLegion(Legion legion, String playerName)
     {
         IClient client = getClient(playerName);
-        client.setLegionContents(legion.getMarkerId(), legion.getImageNames());
+        if (client != null)
+        {
+            client.setLegionContents(legion.getMarkerId(), 
+                legion.getImageNames());
+        }
     }
 
     void allFullyUpdateLegionHeights()
@@ -1203,12 +1228,15 @@ Log.debug("Decremented waitingForClients to " + waitingForClients);
         while (it.hasNext())
         {
             IClient client = (IClient)it.next();
-            Iterator it2 = game.getAllLegions().iterator();
-            while (it2.hasNext())
+            if (client != null)
             {
-                Legion legion = (Legion)it2.next();
-                client.setLegionHeight(legion.getMarkerId(),
-                    legion.getHeight());
+                Iterator it2 = game.getAllLegions().iterator();
+                while (it2.hasNext())
+                {
+                    Legion legion = (Legion)it2.next();
+                    client.setLegionHeight(legion.getMarkerId(),
+                        legion.getHeight());
+                }
             }
         }
     }
@@ -1278,10 +1306,8 @@ Log.debug("Decremented waitingForClients to " + waitingForClients);
         clientMap.put(newName, client);
     }
 
-    void askPickColor(String playerName, final Set colorsLeft)
+    synchronized void askPickColor(String playerName, final Set colorsLeft)
     {
-        this.colorsLeft = colorsLeft;
-        this.colorPickingPlayerName = playerName;
         IClient client = getClient(playerName);
         if (client != null)
         {
@@ -1289,14 +1315,12 @@ Log.debug("Decremented waitingForClients to " + waitingForClients);
         }
     }
 
-    public void assignColor(String color)
+    // XXX Verify that it's this player's turn.
+    public synchronized void assignColor(String color)
     {
-        if (getPlayerName().equals(colorPickingPlayerName) &&
-            colorsLeft.contains(color) && getPlayer().getColor() == null)
+        if (getPlayer().getColor() == null)
         {
             game.assignColor(getPlayerName(), color);
-            colorPickingPlayerName = null;
-            colorsLeft = null;
         }
     }
 
