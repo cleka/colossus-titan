@@ -29,7 +29,8 @@ class Legion
     {
         this.markerId = markerId;
         this.splitFrom = splitFrom;
-        this.marker = new Chit(cx, cy, scale, getImageName(), container);
+        this.marker = new Chit(cx, cy, scale, getImageName(), container, 
+            false);
         this.height = height;
         this.currentHex = hex;
         this.startingHex = hex;
@@ -58,24 +59,27 @@ class Legion
 
     void addPoints(int points)
     {
-        player.addPoints(points);        
-
-        int score = player.getScore();
-        int tmpScore = score;
-
-        while (height < 7 && tmpScore / 100 > (score - points) / 100)
+        if (player != null)
         {
-            if (tmpScore / 500 > (score - points) / 500)
+            player.addPoints(points);        
+
+            int score = player.getScore();
+            int tmpScore = score;
+
+            while (height < 7 && tmpScore / 100 > (score - points) / 100)
             {
-                // Allow Archangel.
-                new AcquireAngel(player.getGame().getBoard(), this, true);
-                tmpScore -= 100;
-            }
-            else
-            {
-                // Disallow Archangel.
-                new AcquireAngel(player.getGame().getBoard(), this, false);
-                tmpScore -= 100;
+                if (tmpScore / 500 > (score - points) / 500)
+                {
+                    // Allow Archangel.
+                    new AcquireAngel(player.getGame().getBoard(), this, true);
+                    tmpScore -= 100;
+                }
+                else
+                {
+                    // Disallow Archangel.
+                    new AcquireAngel(player.getGame().getBoard(), this, false);
+                    tmpScore -= 100;
+                }
             }
         }
     }
