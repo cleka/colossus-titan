@@ -1385,8 +1385,13 @@ public final class Server implements IServer
             return;
         }
         Legion legion = game.getLegionByMarkerId(markerId);
-        String startingHexLabel = legion.getCurrentHexLabel();
+        if (legion == null)
+        {
+            client.nak();
+            return;
+        }
 
+        String startingHexLabel = legion.getCurrentHexLabel();
         if (game.doMove(markerId, hexLabel, entrySide, teleport,
                 teleportingLord))
         {
