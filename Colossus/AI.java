@@ -25,7 +25,8 @@ public interface AI
     public boolean concede(Legion legion, Legion enemy, Game game);
 
     /** make battle strikes for legion */
-    public void strike(Legion legion, Battle battle, Game game);
+    public void strike(Legion legion, Battle battle, Game game, 
+        boolean fakeDice);
 
     /** choose whether to take a penalty in order to possibly carry */
     public boolean chooseStrikePenalty(Critter critter, Critter target,

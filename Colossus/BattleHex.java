@@ -433,6 +433,44 @@ public final class BattleHex extends Hex
     }
 
 
+    public boolean isNativeBonusTerrain()
+    {
+        char t = getTerrain();
+        if (t == 'r' || t == 'v')
+        {
+            return true;
+        }
+        for (int i = 0; i < 6; i++)
+        {
+            char h = getHexside(i);
+            if (h == 'w' || h == 's' || h == 'd')
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    
+    public boolean isNonNativePenaltyTerrain()
+    {
+        char t = getTerrain();
+        if (t == 'r' || t == 'd')
+        {
+            return true;
+        }
+        for (int i = 0; i < 6; i++)
+        {
+            char h = getOppositeHexside(i);
+            if (h == 'w' || h == 's' || h == 'd')
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
     private void assignLabel()
     {
         if (xCoord == -1)

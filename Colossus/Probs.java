@@ -7,6 +7,9 @@
 
 public class Probs
 {
+    static int lastFakeDie = 5;
+
+
     /** Compute n! */
     public static int factorial(int n)
     {
@@ -72,5 +75,29 @@ public class Probs
     public static int modeHits(int dice, int strikeNumber)
     {
         return (int)Math.round(dice * (7 - strikeNumber) / 6.0);
+    }
+
+
+    /** Return the next die roll in a predictable regular sequence,
+     *  useful for estimating combat results.  The current sequence
+     *  is 436125. */
+    public static int rollFakeDie()
+    {
+        switch (lastFakeDie)
+        {
+            case 1: lastFakeDie = 2;
+                    break;
+            case 2: lastFakeDie = 5;
+                    break;
+            case 3: lastFakeDie = 6;
+                    break;
+            case 4: lastFakeDie = 3;
+                    break;
+            case 5: lastFakeDie = 4;
+                    break;
+            case 6: lastFakeDie = 1;
+                    break;
+        }
+        return lastFakeDie;
     }
 }

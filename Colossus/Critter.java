@@ -281,6 +281,34 @@ public final class Critter extends Creature
 
         return count;
     }
+    
+    
+    /** Return the number of friendly creatures adjacent to this critter.
+     *  Dead critters do not count. */
+    public int numAdjacentAllies()
+    {
+        BattleHex hex = getCurrentHex();
+        // Offboard creatures are not in contact.
+        if (hex.isEntrance())
+        {
+            return 0;
+        }
+        int count = 0;
+        for (int i = 0; i < 6; i++)
+        {
+            BattleHex neighbor = hex.getNeighbor(i);
+            if (neighbor != null)
+            {
+                Critter other = neighbor.getCritter();
+                if (other != null && other.getPlayer() == getPlayer() &&
+                    !other.isDead())
+                {
+                    count++;
+                }
+            }
+        }
+        return count;
+    }
 
 
     /** Return true if there are any enemies adjacent to this critter.
@@ -622,7 +650,7 @@ public final class Critter extends Creature
     /** Calculate number of dice and strike number needed to hit target,
      *  and whether any carries are possible.  Roll the dice and apply
      *  damage.  Highlight legal carry targets. */
-    public void strike(Critter target)
+    public void strike(Critter target, boolean rollFakeDice)
     {
         // Sanity check
         if (target.getPlayer() == getPlayer())
@@ -773,7 +801,21 @@ public final class Critter extends Creature
         StringBuffer rollString = new StringBuffer(36);
 
         Game game = battle.getGame();
-        if (game != null && game.getOption(Options.chooseHits))
+
+        if (rollFakeDice)
+        {
+            for (int i = 0; i < dice; i++)
+            {
+                rolls[i] = Probs.rollFakeDie();
+                rollString.append(rolls[i]);
+
+                if (rolls[i] >= strikeNumber)
+                {
+                    damage++;
+                }
+            }
+        }
+        else if (game != null && game.getOption(Options.chooseHits))
         {
             do
             {

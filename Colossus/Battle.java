@@ -25,11 +25,17 @@ public final class Battle
     // A big number
     public static final int BIGNUM = 99;
 
+    // Legion tags
+    public static final int DEFENDER = 0;
+    public static final int ATTACKER = 1;
+
+
     private Game game;
     private BattleMap map;
     private Legion attacker;
     private Legion defender;
-    private Legion activeLegion;
+    private int activeLegionNum;
+    private Legion [] legions = new Legion[2];
     private MasterBoard board;
     private MasterHex masterHex;
     private BattleDice battleDice;
@@ -49,13 +55,15 @@ public final class Battle
 
 
     public Battle(MasterBoard board, Legion attacker, Legion defender,
-        Legion activeLegion, MasterHex masterHex, int turnNumber, int phase)
+        int activeLegionNum, MasterHex masterHex, int turnNumber, int phase)
     {
         this.board = board;
         this.masterHex = masterHex;
         this.defender = defender;
         this.attacker = attacker;
-        this.activeLegion = activeLegion;
+        legions[0] = defender;
+        legions[1] = attacker;
+        this.activeLegionNum = activeLegionNum;
         this.turnNumber = turnNumber;
         this.phase = phase;
         if (board != null)
@@ -88,7 +96,9 @@ public final class Battle
         newBattle.masterHex = masterHex; // don't need to deep copy
         newBattle.defender = defender.AICopy();
         newBattle.attacker = attacker.AICopy();
-        newBattle.activeLegion = activeLegion.AICopy(); // wasteful?
+        newBattle.legions[0] = newBattle.defender;
+        newBattle.legions[1] = newBattle.attacker;
+        newBattle.activeLegionNum = activeLegionNum;
         newBattle.turnNumber = turnNumber;
         newBattle.phase = phase;
         newBattle.game = board.getGame().AICopy();
@@ -146,7 +156,7 @@ public final class Battle
 
     public Player getActivePlayer()
     {
-        return activeLegion.getPlayer();
+        return legions[activeLegionNum].getPlayer();
     }
 
 
@@ -159,6 +169,24 @@ public final class Battle
     public Legion getDefender()
     {
         return defender;
+    }
+
+
+    public int getActiveLegionNum()
+    {
+        return activeLegionNum;
+    }
+    
+    
+    public Legion getActiveLegion()
+    {
+        return legions[activeLegionNum];
+    }
+
+
+    public Legion getLegion(int legionNum)
+    {
+        return legions[legionNum];
     }
 
 
@@ -186,6 +214,18 @@ public final class Battle
     }
 
 
+    public boolean getAttackerElim()
+    {
+        return attackerElim;
+    }
+    
+    
+    public boolean getDefenderElim()
+    {
+        return defenderElim;
+    }
+
+
     public void advancePhase()
     {
         if (phase == SUMMON)
@@ -207,7 +247,7 @@ public final class Battle
             // IF the attacker makes it to the end of his first movement
             // phase without conceding, even if he left all legions
             // off-board, the defender can recruit.
-            if (activeLegion == attacker && !conceded)
+            if (activeLegionNum == ATTACKER && !conceded)
             {
                 attackerEntered = true;
             }
@@ -218,14 +258,7 @@ public final class Battle
 
         else if (phase == FIGHT)
         {
-            if (activeLegion == defender)
-            {
-                activeLegion = attacker;
-            }
-            else
-            {
-                activeLegion = defender;
-            }
+            activeLegionNum = ~activeLegionNum;
             driftDamageApplied = false;
             phase = STRIKEBACK;
             Game.logEvent("Battle phase advances to " + getPhaseName(phase));
@@ -241,7 +274,7 @@ public final class Battle
             if (!attackerElim && !defenderElim)
             {
                 // Active legion is the one that was striking back.
-                if (activeLegion == attacker)
+                if (activeLegionNum == ATTACKER)
                 {
                     phase = SUMMON;
                     Game.logEvent(getActivePlayer().getName() +
@@ -352,7 +385,7 @@ public final class Battle
             Player player = getActivePlayer();
             if (player.getOption(Options.autoStrike))
             {
-                player.aiStrike(activeLegion, this);
+                player.aiStrike(legions[activeLegionNum], this, false);
             }
             else if (player.getOption(Options.autoForcedStrike))
             {
@@ -569,7 +602,7 @@ public final class Battle
 
 
     /** Find all legal moves for this critter. */
-    private Set showMoves(Critter critter)
+    public Set showMoves(Critter critter)
     {
         Set set = new HashSet();
 
@@ -1138,7 +1171,7 @@ Game.logDebug("defender eliminated");
                     {
                         String hexLabel = (String)(set.iterator().next());
                         Critter target = getCritterFromHexLabel(hexLabel);
-                        critter.strike(target);
+                        critter.strike(target, false);
 
                         // If that strike killed the target, it's possible
                         // that some other creature that had two adjacent
@@ -1217,7 +1250,8 @@ Game.logDebug("defender eliminated");
         // if the creature can strike normally, so only look for them if
         // no targets have yet been found.
         if (rangestrike && !adjacentEnemy && critter.isRangestriker() &&
-            getPhase() != STRIKEBACK && critter.getLegion() == activeLegion)
+            getPhase() != STRIKEBACK && 
+            critter.getLegion() == legions[activeLegionNum])
         {
             Iterator it = critters.iterator();
             while (it.hasNext())
@@ -1910,6 +1944,7 @@ Game.logDebug("defender eliminated");
     }
 
 
+    // XXX Change to use hex label, not hex reference.
     public void actOnHex(BattleHex hex)
     {
         switch (getPhase())
@@ -1931,7 +1966,7 @@ Game.logDebug("defender eliminated");
                 }
                 else if (critterSelected)
                 {
-                    getCritter(0).strike(hex.getCritter());
+                    getCritter(0).strike(hex.getCritter(), false);
                     critterSelected = false;
                 }
 
@@ -2050,7 +2085,7 @@ Game.logDebug("defender eliminated");
             Creature.minotaur, null, player2);
         attacker.setEntrySide(5);
 
-        new Battle(null, attacker, defender, defender, hex, 1, MOVE);
+        new Battle(null, attacker, defender, DEFENDER, hex, 1, MOVE);
     }
 }
 

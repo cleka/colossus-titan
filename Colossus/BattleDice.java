@@ -273,12 +273,10 @@ public final class BattleDice extends JFrame implements WindowListener
             Creature.dragon, null, player2);
 
         Critter serpent = attacker.getCritter(Creature.serpent);
-        BattleHex hex1 = new BattleHex(1, 1, 60, null, 1, 1);
-        serpent.addBattleInfo(hex1, hex1, null, null, null);
+        serpent.addBattleInfo("C3", "C3", null, null, null);
 
         Critter angel = defender.getCritter(Creature.angel);
-        BattleHex hex2 = new BattleHex(2, 2, 60, null, 2, 2);
-        angel.addBattleInfo(hex2, hex2, null, null, null);
+        angel.addBattleInfo("C2", "C2", null, null, null);
 
         int targetNumber = 6;
         int [] rolls = {1,2,3,4,5,6,1,2,3,4,5,6,1,2,3,4,5,6};

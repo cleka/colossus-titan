@@ -575,11 +575,9 @@ public final class Game
     }
 
 
-    public void checkForVictory()
+    public int getNumPlayersRemaining()
     {
         int remaining = 0;
-        Player winner = null;
-
         Iterator it = players.iterator();
         while (it.hasNext())
         {
@@ -587,10 +585,40 @@ public final class Game
             if (!player.isDead())
             {
                 remaining++;
-                winner = player;
             }
         }
+        return remaining;
+    }
 
+
+    public Player getWinner()
+    {
+        int remaining = 0;
+        Player winner = null;
+        Iterator it = players.iterator();
+        while (it.hasNext())
+        {
+            Player player = (Player)it.next();
+            if (!player.isDead())
+            {
+                remaining++;
+                if (remaining > 1)
+                {
+                    return null;
+                }
+                else
+                {
+                    winner = player;
+                }
+            }
+        }
+        return winner;
+    }
+
+
+    public void checkForVictory()
+    {
+        int remaining = getNumPlayersRemaining();
         switch (remaining)
         {
             case 0:
@@ -600,9 +628,9 @@ public final class Game
                 break;
 
             case 1:
-                logEvent(winner.getName() + " wins");
-                JOptionPane.showMessageDialog(board,
-                    winner.getName() + " wins");
+                String winnerName = getWinner().getName();
+                logEvent(winnerName + " wins");
+                JOptionPane.showMessageDialog(board, winnerName + " wins");
                 dispose();
                 break;
 
@@ -1186,14 +1214,19 @@ public final class Game
                     attackingPlayer).getPlayer();
                 Legion defender = readLegion(in, defendingPlayer, true);
 
-                Legion activeLegion = defender;
+                int activeLegionNum;
                 if (battleActivePlayerName.equals(attackingPlayer.getName()))
                 {
-                    activeLegion = attacker;
+                    activeLegionNum = Battle.ATTACKER;
+                }
+                else
+                {
+                    activeLegionNum = Battle.DEFENDER;
                 }
 
-                battle = new Battle(board, attacker, defender, activeLegion,
-                    engagementHex, battleTurnNum, battlePhase);
+                battle = new Battle(board, attacker, defender, 
+                    activeLegionNum, engagementHex, battleTurnNum, 
+                    battlePhase);
 
                 battle.setSummonState(summonState);
                 battle.setCarryDamage(carryDamage);
@@ -3046,7 +3079,7 @@ public final class Game
                 // Reveal both legions to all players.
                 attacker.revealAllCreatures();
                 defender.revealAllCreatures();
-                battle = new Battle(board, attacker, defender, defender,
+                battle = new Battle(board, attacker, defender, Battle.DEFENDER,
                     hex, 1, Battle.MOVE);
             }
         }
