@@ -11,6 +11,8 @@ import java.io.*;
  *  @author David Ripton
  */
 
+import net.sf.colossus.*;
+
 public final class Client
 {
     /** This will eventually be a network interface rather than a
@@ -422,6 +424,10 @@ public final class Client
         {
             Log.setShowDebug(value);
         }
+		else if (name.equals(Options.showCaretaker))
+		{
+			updateCaretakerDisplay();
+		}
     }
 
     public void setStringOption(String optname, String value)
@@ -515,6 +521,29 @@ public final class Client
                 statusScreen.dispose();
             }
             this.statusScreen = null;
+        }
+    }
+
+	/**
+	 * This is a bad name because out first cur is modal
+	 * somehow the repainting of the MB also breaks when we bring this
+	 * up. To make this non-modal and dynamically update, we need events
+	 */
+    public void updateCaretakerDisplay()
+    {
+		// First cut, we make this modal and don't have a setting
+        if (getOption(Options.showCaretaker))
+        {
+			IImageUtility oImageUtility = new ChitImageUtility();
+			ICreatureCollection oCaretakerCollection = 
+				server.getGame().getCaretaker().getCollectionInterface();
+			JFrame oFrame = board.getFrame();
+			JDialog oDialog = 
+				new CreatureCollectionView(oFrame, 
+										   oCaretakerCollection,
+										   oImageUtility);
+			oDialog.pack();
+			oDialog.show();
         }
     }
 
