@@ -1959,17 +1959,15 @@ class SimpleAI implements AI
                         bestTarget = target;
                     }
                 }
-
-                Log.debug("Best carry target is " +
-                    bestTarget.getDescription());
-                battle.applyCarries(bestTarget);
             }
+            Log.debug("Best carry target is " + bestTarget.getDescription());
+            battle.applyCarries(bestTarget);
         }
     }
 
 
     public boolean chooseStrikePenalty(Critter critter, Critter target,
-            Critter carryTarget, Battle battle, Game game)
+        Critter carryTarget, Battle battle, Game game)
     {
         // If we still have a 95% chance to kill target even after
         // taking the penalty to carry to carryTarget, return true.
