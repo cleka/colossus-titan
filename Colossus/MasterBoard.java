@@ -634,7 +634,7 @@ public final class MasterBoard extends JPanel
                             (1 + 2 * (j / 2)) + ((i + 1) & 1) * 2 *
                             ((j + 1) / 2)) * Hex.SQRT3 * scale),
                         scale,
-                        ((i + j) & 1) == 0,
+                        isHexInverted(i, j),
                         this);
 
                     hex.setXCoord(i);
@@ -645,6 +645,12 @@ public final class MasterBoard extends JPanel
                 }
             }
         }
+    }
+
+
+    private static boolean isHexInverted(int i, int j)
+    {
+        return (((i + j) & 1) == 0);
     }
 
     static MasterHex hexByLabel(MasterHex [][] h, int label)
@@ -666,6 +672,8 @@ public final class MasterBoard extends JPanel
         return null;
     }
 
+
+    // TODO Break this method up. 
     /** This method only needs to be run once, since the attributes it
      *  sets up are constant for the game. */
     private static void setupHexesGameState(MasterHex [][] h)
@@ -767,103 +775,9 @@ public final class MasterBoard extends JPanel
                 }
             }
         }
-        // XXX Couldn't find better way (yet)
-        h[0][3].setLabelSide(2);
-        h[0][4].setLabelSide(1);
-        h[1][2].setLabelSide(2);
-        h[1][3].setLabelSide(5);
-        h[1][4].setLabelSide(4);
-        h[1][5].setLabelSide(1);
-        h[2][1].setLabelSide(2);
-        h[2][2].setLabelSide(5);
-        h[2][3].setLabelSide(2);
-        h[2][4].setLabelSide(1);
-        h[2][5].setLabelSide(4);
-        h[2][6].setLabelSide(1);
-        h[3][0].setLabelSide(2);
-        h[3][1].setLabelSide(5);
-        h[3][2].setLabelSide(2);
-        h[3][3].setLabelSide(5);
-        h[3][4].setLabelSide(4);
-        h[3][5].setLabelSide(1);
-        h[3][6].setLabelSide(4);
-        h[3][7].setLabelSide(1);
-        h[4][0].setLabelSide(3);
-        h[4][1].setLabelSide(2);
-        h[4][2].setLabelSide(5);
-        h[4][3].setLabelSide(2);
-        h[4][4].setLabelSide(1);
-        h[4][5].setLabelSide(4);
-        h[4][6].setLabelSide(1);
-        h[4][7].setLabelSide(0);
-        h[5][0].setLabelSide(0);
-        h[5][1].setLabelSide(3);
-        h[5][2].setLabelSide(2);
-        h[5][3].setLabelSide(5);
-        h[5][4].setLabelSide(4);
-        h[5][5].setLabelSide(1);
-        h[5][6].setLabelSide(0);
-        h[5][7].setLabelSide(3);
-        h[6][0].setLabelSide(3);
-        h[6][1].setLabelSide(0);
-        h[6][2].setLabelSide(3);
-        h[6][3].setLabelSide(2);
-        h[6][4].setLabelSide(1);
-        h[6][5].setLabelSide(0);
-        h[6][6].setLabelSide(3);
-        h[6][7].setLabelSide(0);
-        h[7][0].setLabelSide(0);
-        h[7][1].setLabelSide(3);
-        h[7][2].setLabelSide(0);
-        h[7][3].setLabelSide(3);
-        h[7][4].setLabelSide(0);
-        h[7][5].setLabelSide(3);
-        h[7][6].setLabelSide(0);
-        h[7][7].setLabelSide(3);
-        h[8][0].setLabelSide(3);
-        h[8][1].setLabelSide(0);
-        h[8][2].setLabelSide(3);
-        h[8][3].setLabelSide(4);
-        h[8][4].setLabelSide(5);
-        h[8][5].setLabelSide(0);
-        h[8][6].setLabelSide(3);
-        h[8][7].setLabelSide(0);
-        h[9][0].setLabelSide(0);
-        h[9][1].setLabelSide(3);
-        h[9][2].setLabelSide(4);
-        h[9][3].setLabelSide(1);
-        h[9][4].setLabelSide(2);
-        h[9][5].setLabelSide(5);
-        h[9][6].setLabelSide(0);
-        h[9][7].setLabelSide(3);
-        h[10][0].setLabelSide(3);
-        h[10][1].setLabelSide(4);
-        h[10][2].setLabelSide(1);
-        h[10][3].setLabelSide(4);
-        h[10][4].setLabelSide(5);
-        h[10][5].setLabelSide(2);
-        h[10][6].setLabelSide(5);
-        h[10][7].setLabelSide(0);
-        h[11][0].setLabelSide(4);
-        h[11][1].setLabelSide(1);
-        h[11][2].setLabelSide(4);
-        h[11][3].setLabelSide(1);
-        h[11][4].setLabelSide(2);
-        h[11][5].setLabelSide(5);
-        h[11][6].setLabelSide(2);
-        h[11][7].setLabelSide(5);
-        h[12][1].setLabelSide(4);
-        h[12][2].setLabelSide(1);
-        h[12][3].setLabelSide(4);
-        h[12][4].setLabelSide(5);
-        h[12][5].setLabelSide(2);
-        h[12][6].setLabelSide(5);
-        h[13][2].setLabelSide(4);
-        h[13][3].setLabelSide(1);
-        h[13][4].setLabelSide(2);
-        h[13][5].setLabelSide(5);
-        h[14][3].setLabelSide(4);
-        h[14][4].setLabelSide(5);
+
+        setupHexLabelSides(h);
+
 
         // Derive entrances from exits.
         for (int i = 0; i < h.length; i++)
@@ -942,6 +856,119 @@ public final class MasterBoard extends JPanel
                         hex.getEntranceType(5) != MasterHex.NONE)
                     {
                         hex.setNeighbor(5, h[i - 1][j]);
+                    }
+                }
+            }
+        }
+    }
+
+
+    /** If the shortest hexside closest to the center of the board
+     *  is a short hexside, set the label side to it.
+     *  Else set the label side to the opposite hexside. */
+    private static void setupHexLabelSides(MasterHex [][] h)
+    {
+        // First find the center of the board.
+        int width = h.length;
+        int height = h[0].length;
+
+        // Subtract 1 to account for 1-based length of 0-based array.
+        double midX = (width - 1) / 2.0;
+        double midY = (height - 1) / 2.0;
+
+        for (int i = 0; i < h.length; i++)
+        {
+            for (int j = 0; j < plain[0].length; j++)
+            if (show[i][j])
+            {
+                double deltaX = i - midX;
+                // Adjust for aspect ratio of h array, which has roughly
+                // twice as many horizontal as vertical elements even
+                // though the board is roughly square.
+                double deltaY = (j - midY) * (double)width / height;
+
+                double ratio;
+
+                // Watch for division by zero.
+                if (deltaY == 0)
+                {
+                    ratio = deltaX * 99999999;
+                }
+                else
+                {
+                    ratio = deltaX / deltaY;
+                }
+
+                // Derive the exact number if needed.
+                if (Math.abs(ratio) < 0.6)
+                {
+                    // Vertically dominated, so top or bottom hexside.
+                    // top, unless inverted
+                    if (isHexInverted(i, j))
+                    {
+                        h[i][j].setLabelSide(3);
+                    }
+                    else
+                    {
+                        h[i][j].setLabelSide(0);
+                    }
+                }
+                else
+                {
+                    // One of the left or right side hexsides.
+                    if (deltaX >= 0)
+                    {
+                        if (deltaY >= 0)
+                        {
+                            // 2 unless inverted
+                            if (isHexInverted(i, j))
+                            {
+                                h[i][j].setLabelSide(5);
+                            }
+                            else
+                            {
+                                h[i][j].setLabelSide(2);
+                            }
+                        }
+                        else
+                        {
+                            // 4 unless inverted
+                            if (isHexInverted(i, j))
+                            {
+                                h[i][j].setLabelSide(1);
+                            }
+                            else
+                            {
+                                h[i][j].setLabelSide(4);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (deltaY >= 0)
+                        {
+                            // 4 unless inverted
+                            if (isHexInverted(i, j))
+                            {
+                                h[i][j].setLabelSide(1);
+                            }
+                            else
+                            {
+                                h[i][j].setLabelSide(4);
+                            }
+                        }
+                        else
+                        {
+                            // 2 unless inverted
+                            if (isHexInverted(i, j))
+                            {
+                                h[i][j].setLabelSide(5);
+                            }
+                            else
+                            {
+                                h[i][j].setLabelSide(2);
+                            }
+                        }
                     }
                 }
             }

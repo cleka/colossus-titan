@@ -411,4 +411,10 @@ public final class GUIMasterHex extends MasterHex
     {
         return offCenter;
     }
+
+
+    public boolean isInverted()
+    {
+        return inverted;
+    }
 }
