@@ -447,9 +447,8 @@ Log.debug("couldRecruitUp wouldFlee pointValue=" + pointValue);
             int currentScore = legion.getPlayerInfo().getScore();
 Log.debug("couldRecruitUp currentScore=" + currentScore);
             int arv = TerrainRecruitLoader.getAcquirableRecruitmentsValue();
-Log.debug("couldRecruitUp arv = " + arv);
-            int nextScore = (currentScore / arv) * (arv + 1);
-Log.debug("couldRecruitUp nextScore=" + nextScore);
+            int nextScore = ((currentScore / arv) + 1) * arv;
+
             Creature bestRecruit = null;
             while ((currentScore + pointValue) >= nextScore)
             {
@@ -471,10 +470,9 @@ Log.debug("couldRecruitUp 17");
                     {
 Log.debug("couldRecruitUp 18");
                         bestRecruit = tempRecruit;
-Log.debug("couldRecruitUp 19");
                     }
-                    nextScore += arv;
                 }
+                nextScore += arv;
             }
 Log.debug("couldRecruitUp 20");
 
