@@ -121,10 +121,12 @@ final class Critter extends Creature implements Comparable
     {
         String basename = super.getImageName();
 
+/* XXX Temporarily disabled while moving logic to client side
         if (isTitan() && getPlayer() != null)
         {
             basename = "Titan-" + getPower() + "-" + getPlayer().getColor();
         }
+*/
 
         return basename;
     }

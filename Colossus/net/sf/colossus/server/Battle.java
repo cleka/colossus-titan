@@ -990,6 +990,8 @@ final class Battle
                 Player player = legion.getPlayer();
                 donor = player.getDonor();
                 donor.addCreature(critter, false);
+                server.allTellAddCreature(donor.getMarkerId(), 
+                    critter.getName());
                 // This summon doesn't count; the player can
                 // summon again later this turn.
                 player.setSummoned(false);

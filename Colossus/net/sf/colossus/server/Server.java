@@ -562,12 +562,18 @@ Log.debug("Called Server.acquireAngel() for " + markerId + " " + angelType);
 
         int numRecruiters = Game.numberOfRecruiterNeeded(recruiter, recruit, 
             legion.getCurrentHex().getTerrain());
+        String recruiterName = null;
+        if (recruiter != null)
+        {
+            recruiterName = recruiter.getName();
+        }
+
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
             Client client = (Client)it.next();
             client.didRecruit(legion.getMarkerId(), recruit.getName(),
-                recruiter.getName(), numRecruiters);
+                recruiterName, numRecruiters);
         }
     }
 
@@ -1262,6 +1268,16 @@ Log.debug("Called Server.acquireAngel() for " + markerId + " " + angelType);
         }
     }
 
+    void allTellRemoveCreature(String markerId, String creatureName)
+    {
+        Iterator it = clients.iterator();
+        while (it.hasNext())
+        {
+            Client client = (Client)it.next();
+            client.removeCreature(markerId, creatureName);
+        }
+    }
+
     void allRevealLegion(Legion legion)
     {
         Iterator it = clients.iterator();
@@ -1314,6 +1330,16 @@ Log.debug("Called Server.acquireAngel() for " + markerId + " " + angelType);
                 Legion legion = (Legion)it2.next();
                 oneRevealLegion(legion, player.getName()); 
             }
+        }
+    }
+
+    void allFullyUpdateAllLegionContents()
+    {
+        Iterator it = game.getAllLegions().iterator();
+        while (it.hasNext())
+        {
+            Legion legion = (Legion)it.next();
+            allRevealLegion(legion);
         }
     }
 

@@ -1831,6 +1831,8 @@ Log.debug("SimpleAI.summonAngel: angels found: " + set.toString());
         // Always summon the biggest possible angel, from the least
         // important legion that has one.  TODO Make this smarter.
 
+        // XXX This will not summon non-angel summonables!
+
         Legion bestLegion = null;
         Creature bestAngel = null;
 

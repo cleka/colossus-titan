@@ -1,5 +1,12 @@
-Test summons, acquires, reinforces, joins, unrecruits for possible bugs
-   in client side legion contents/height logic.
+Bug: Need another full repaint after loading game to show updated heights.
+Bug: Make colorized / powered titans work again.
+
+Bug: Non-displayed carry hits.  Only when strike penalty?
+2 carries available
+2 hits carry to Ranger in Plains hex E4
+Error: Called allTellCarryResults() without setup.
+Error: null striker
+
 
 Copy various new docs to web page from inst.  tex -> html first when possible.
 Put old, new web pages under CVS.

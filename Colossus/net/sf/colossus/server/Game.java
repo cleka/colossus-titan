@@ -1179,14 +1179,21 @@ public final class Game
             // Setup MasterBoard
             server.allInitBoard();
             server.allAddMarkers();
+
+            if (server.getClientOption(Options.allStacksVisible))
+            {
+                server.allFullyUpdateAllLegionContents();
+            }
+            else
+            {
+                server.allFullyUpdateLegionHeights();
+                server.allFullyUpdateOwnLegionContents();
+            }
+
             setupPhase();
 
             server.allUpdateStatusScreen();
             caretaker.fullySyncDisplays();
-
-            server.allFullyUpdateLegionHeights();
-            server.allFullyUpdateOwnLegionContents();
-            // TODO allStacksVisible
         }
         // FileNotFoundException, IOException, NumberFormatException
         catch (Exception e)
@@ -2002,6 +2009,7 @@ public final class Game
         server.reinforce(legion);
     }
 
+    // Called by both human and AI.
     void doSummon(Legion legion, Legion donor, Creature angel)
     {
         Player player = getActivePlayer();
@@ -2014,6 +2022,10 @@ public final class Game
             // Move the angel or archangel.
             donor.removeCreature(angel, false, false);
             legion.addCreature(angel, false);
+
+            // TODO Maybe replace with a special-purpose summon notification?
+            server.allTellRemoveCreature(donor.getMarkerId(), angel.getName());
+            server.allTellAddCreature(legion.getMarkerId(), angel.getName());
 
             Log.event("An " + angel.getName() +
                 " is summoned from legion " + donor.getLongMarkerName() +
@@ -2311,6 +2323,9 @@ Log.debug("Game.doMove() teleport=" + teleport + " lord=" + teleportingLord +
 
             attacker.sortCritters();
             defender.sortCritters();
+
+            server.oneRevealLegion(attacker, defender.getPlayerName());
+            server.oneRevealLegion(defender, attacker.getPlayerName());
 
             if (defender.canFlee())
             {

@@ -683,6 +683,11 @@ public final class Client
     public void setLegionHeight(String markerId, int height)
     {
         legionToHeight.put(markerId, new Integer(height));
+        Marker marker = getMarker(markerId);
+        if (marker != null)
+        {
+            marker.repaint();
+        }
     }
 
     void incLegionHeight(String markerId)
@@ -749,7 +754,6 @@ public final class Client
 
     public void removeCreature(String markerId, String name)
     {
-Log.debug("called Client.removeCreature for " + markerId + " " + name);
         decLegionHeight(markerId);
         java.util.List names = getLegionContents(markerId);
         if (names == null)
