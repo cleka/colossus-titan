@@ -28,6 +28,7 @@ class MasterHex extends Hex
     private int label;
 
     // n, ne, se, s, sw, nw
+    private int labelSide;
     private int[] exitType = new int[6];
     private int[] entranceType = new int[6];
 
@@ -149,30 +150,65 @@ class MasterHex extends Hex
         g.setColor(Color.black);
         g.drawPolygon(hexagon);
 
+        // Draw label and terrain name
         FontMetrics fontMetrics = g.getFontMetrics();
         String sLabel = Integer.toString(label);
         String sName = getTerrainName();
         int fontHeight = fontMetrics.getMaxAscent() + fontMetrics.getLeading();
 
-        if (inverted)
+        switch (getLabelSide())
         {
-            g.drawString(sLabel, rectBound.x + (rectBound.width - 
-                fontMetrics.stringWidth(sLabel)) / 2,
-                rectBound.y + rectBound.height * 19 / 20);
+            case 0:
+                g.drawString(sLabel, rectBound.x + 
+                    (rectBound.width - fontMetrics.stringWidth(sLabel)) / 2,
+                    rectBound.y + fontHeight / 2 + rectBound.height / 10);
+                break;
+
+            case 1:
+                g.drawString(sLabel, rectBound.x + (rectBound.width - 
+                    fontMetrics.stringWidth(sLabel)) * 4 / 5,
+                    rectBound.y + fontHeight / 2 + rectBound.height / 5);
+                break;
+
+            case 2:
+                g.drawString(sLabel, rectBound.x + (rectBound.width - 
+                    fontMetrics.stringWidth(sLabel)) * 4 / 5,
+                    rectBound.y + fontHeight / 2 + rectBound.height * 4 / 5);
+                break;
+
+            case 3:
+                g.drawString(sLabel, rectBound.x + (rectBound.width - 
+                    fontMetrics.stringWidth(sLabel)) / 2,
+                    rectBound.y + fontHeight / 2 + rectBound.height * 9 / 10);
+                break;
+
+            case 4:
+                g.drawString(sLabel, rectBound.x + (rectBound.width - 
+                    fontMetrics.stringWidth(sLabel)) / 5,
+                    rectBound.y + fontHeight / 2 + rectBound.height * 4 / 5);
+                break;
+
+            case 5:
+                g.drawString(sLabel, rectBound.x + (rectBound.width - 
+                    fontMetrics.stringWidth(sLabel)) / 5,
+                    rectBound.y + fontHeight / 2 + rectBound.height / 5);
+                break;
+        }
+
+        // The word "MOUNTAINS" needs to be printed in the wide part of the hex.
+        if (sName.equals("MOUNTAINS"))
+        {
             g.drawString(sName, rectBound.x + (rectBound.width -
                 fontMetrics.stringWidth(sName)) / 2,
-                rectBound.y + fontHeight + rectBound.height / 4);
+                rectBound.y + fontHeight / 2 + rectBound.height * 2 / 3);
         }
         else
         {
-            g.drawString(sLabel, rectBound.x + (rectBound.width -
-                fontMetrics.stringWidth(sLabel)) / 2,
-                rectBound.y + fontHeight + rectBound.height / 20 );
             g.drawString(sName, rectBound.x + (rectBound.width -
                 fontMetrics.stringWidth(sName)) / 2,
-                rectBound.y + rectBound.height * 3 / 4);
+                rectBound.y + fontHeight / 2 + rectBound.height / 2);
         }
-
+        
 
         // Draw exits and entrances
         for (int i = inverted ? 0 : 1; i < 6; i += 2)
@@ -979,9 +1015,21 @@ class MasterHex extends Hex
     }
 
 
+    public int getLabelSide()
+    {
+        return labelSide;
+    }
+
+
     public void setLabel(int label)
     {
         this.label = label;
+    }
+
+
+    public void setLabelSide(int labelSide)
+    {
+        this.labelSide = labelSide;
     }
 
 
