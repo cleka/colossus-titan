@@ -51,7 +51,7 @@ public class Creature implements Comparable
     public static final Creature unknown = new Creature("Unknown", 1, 1,
         false, false, false, false, false, false, false, false,
         false, false, false, false, false, false, false, false,
-        1, "Unknown");
+        1, "Unknown", null);
 
     /** Sometimes we need to iterate through all creature types. */
     private static java.util.List creatures = new ArrayList();
@@ -62,42 +62,9 @@ public class Creature implements Comparable
         boolean flies, boolean nativeBramble, boolean nativeDrift,
         boolean nativeBog, boolean nativeSandDune, boolean nativeSlope,
         boolean nativeVolcano, boolean nativeRiver, boolean nativeStone,
-        boolean nativeTree,
-        boolean waterDwelling, boolean magicMissile, boolean summonable,
-        boolean lord, boolean demilord, int maxCount, String pluralName)
-    {
-        this.name = name;
-        this.power = power;
-        this.skill = skill;
-        this.rangestrikes = rangestrikes;
-        this.flies = flies;
-        this.nativeBramble = nativeBramble;
-        this.nativeDrift = nativeDrift;
-        this.nativeBog = nativeBog;
-        this.nativeSandDune = nativeSandDune;
-        this.nativeSlope = nativeSlope;
-        this.nativeVolcano = nativeVolcano;
-        this.nativeRiver = nativeRiver;
-        this.nativeStone = nativeStone;
-        this.nativeTree = nativeTree;
-        this.waterDwelling = waterDwelling;
-        this.magicMissile = magicMissile;
-        this.summonable = summonable;
-        this.lord = lord;
-        this.demilord = demilord;
-        this.maxCount = maxCount;
-        this.pluralName = pluralName;
-        this.baseColor = null;
-    }
-
-    public Creature(String name, int power, int skill, boolean rangestrikes,
-        boolean flies, boolean nativeBramble, boolean nativeDrift,
-        boolean nativeBog, boolean nativeSandDune, boolean nativeSlope,
-        boolean nativeVolcano, boolean nativeRiver, boolean nativeStone,
-        boolean nativeTree,
-        boolean waterDwelling, boolean magicMissile, boolean summonable,
-        boolean lord, boolean demilord, int maxCount, String pluralName,
-        String baseColor)
+        boolean nativeTree, boolean waterDwelling, boolean magicMissile, 
+        boolean summonable, boolean lord, boolean demilord, int maxCount, 
+        String pluralName, String baseColor)
     {
         this.name = name;
         this.power = power;
@@ -122,6 +89,7 @@ public class Creature implements Comparable
         this.pluralName = pluralName;
         this.baseColor = baseColor;
     }
+
 
     public Creature(Creature creature)
     {
@@ -155,13 +123,14 @@ public class Creature implements Comparable
         try 
         {
             creatures.clear();
-            java.util.List directories = VariantSupport.getVarDirectoriesList();
+            java.util.List directories = 
+                VariantSupport.getVarDirectoriesList();
             InputStream creIS = ResourceLoader.getInputStream(
-                                               VariantSupport.getCreaturesName(),
-                                               directories);
+                VariantSupport.getCreaturesName(), directories);
             if (creIS == null) 
             {
-                throw new FileNotFoundException(VariantSupport.getCreaturesName());
+                throw new FileNotFoundException(
+                    VariantSupport.getCreaturesName());
             }
             CreatureLoader creatureLoader = new CreatureLoader(creIS);
             while (creatureLoader.oneCreature(creatures) >= 0) {}
@@ -354,7 +323,7 @@ public class Creature implements Comparable
         while (it.hasNext())
         {
             Creature creature = (Creature)it.next();
-            if (name.equals(creature.getName()))
+            if (name.equalsIgnoreCase(creature.getName()))
             {
                 return creature;
             }
