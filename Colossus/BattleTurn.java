@@ -298,7 +298,7 @@ class BattleTurn extends JDialog implements ActionListener
                             // his unengaged legions.
                             Player player = attacker.getPlayer();
                             attacker.removeLegion();
-                            player.die(defender.getPlayer());
+                            player.die(defender.getPlayer(), true);
                         }
                         else
                         {
