@@ -1,7 +1,9 @@
-Ensure that windows are placed on screen and at usable size.
-
 Bug: Repaints missed on some remote players' masterboard moves.
 Bug: Remote player sometimes sees all of AI's trial battle moves.
+
+Change from RMI to string socket protocol.
+Authenticate all remote calls to ensure that they come from the correct
+   client or server.  (By socket.)
 
 Add StartClient gui for setting playerName and hostname. 
 Add Client.jnlp file.
@@ -16,9 +18,6 @@ Chat window.
 Colorize StatusScreen.
 
 Eliminate excess arguments to Flee, Concede, Negotiate.
-
-Authenticate all remote calls to ensure that they come from the correct
-   client or server.
 
 Eliminate LegionInfo, PlayerInfo, Strike, Movement and instead use
    slightly different versions of Game, Legion, Player, Battle, etc. 

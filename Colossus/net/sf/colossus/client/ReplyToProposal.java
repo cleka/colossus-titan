@@ -28,6 +28,8 @@ final class ReplyToProposal extends KDialog implements ActionListener
     private GridBagConstraints constraints = new GridBagConstraints();
     private Client client;
     private Proposal proposal;
+    private Point location;
+    private SaveWindow saveWindow;
 
 
     ReplyToProposal(Client client, Proposal proposal)
@@ -145,8 +147,9 @@ final class ReplyToProposal extends KDialog implements ActionListener
 
         pack();
 
-        // Use the same location as the preceding Concede dialog.
-        Point location = Concede.returnLocation();
+        saveWindow = new SaveWindow(client, "ReplyToProposal");
+
+        location = saveWindow.loadLocation();
         if (location == null)
         {
             centerOnScreen();
@@ -213,7 +216,8 @@ final class ReplyToProposal extends KDialog implements ActionListener
 
     private void cleanup()
     {
-        Concede.saveLocation(getLocation());
+        location = getLocation();
+        saveWindow.saveLocation(location);
         dispose();
         client.negotiateCallback(proposal);
     }

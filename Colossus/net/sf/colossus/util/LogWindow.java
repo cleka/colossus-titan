@@ -6,6 +6,7 @@ import java.awt.*;
 import java.awt.event.*;
 
 import net.sf.colossus.client.Client;
+import net.sf.colossus.client.SaveWindow;
 
 
 /** 
@@ -18,8 +19,9 @@ public final class LogWindow extends JTextArea
     private JFrame logFrame;
     private JScrollPane scrollPane;
     private Client client;
-    private static Point location;
-    private static Dimension size;
+    private Point location;
+    private Dimension size;
+    private SaveWindow saveWindow;
 
 
     public LogWindow(Client client)
@@ -41,14 +43,16 @@ public final class LogWindow extends JTextArea
         logFrame.getContentPane().add(scrollPane);
         logFrame.pack();
 
-        loadSize();
+        saveWindow = new SaveWindow(client, "LogWindow");
+
+        size = saveWindow.loadSize();
         if (size == null)
         {
             size = getMinimumSize();
         }
         logFrame.setSize(size);
 
-        loadLocation();
+        location = saveWindow.loadLocation();
         if (location == null)
         {
             Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
@@ -77,41 +81,11 @@ public final class LogWindow extends JTextArea
 
     public void dispose()
     {
-        saveSize();
-        saveLocation();
+        size = logFrame.getSize();
+        saveWindow.saveSize(size);
+        location = logFrame.getLocation();
+        saveWindow.saveLocation(location);
         logFrame.dispose();
         client.setOption(Options.showLogWindow, false);
-    }
-
-
-    private void loadSize()
-    {
-        int x = client.getIntOption(Options.logWindowSizeX);
-        int y = client.getIntOption(Options.logWindowSizeY);
-        size = new Dimension(x, y);
-    }
-
-    private void saveSize()
-    {
-        size = logFrame.getSize();
-        client.setOption(Options.logWindowSizeX, (int)size.getWidth());
-        client.setOption(Options.logWindowSizeY, (int)size.getHeight());
-    }
-
-    private void loadLocation()
-    {
-        int x = client.getIntOption(Options.logWindowLocX);
-        int y = client.getIntOption(Options.logWindowLocY);
-        if (x >= 0 && y >= 0)
-        {
-            location = new Point(x, y);
-        }
-    }
-
-    private void saveLocation()
-    {
-        location = logFrame.getLocation();
-        client.setOption(Options.logWindowLocX, location.x);
-        client.setOption(Options.logWindowLocY, location.y);
     }
 }

@@ -21,11 +21,12 @@ final class Concede extends KDialog implements ActionListener, WindowListener
     private boolean flee;
     private Chit allyMarker;
     private Chit enemyMarker;
-    private static Point location;
+    private Point location;
     private GridBagLayout gridbag = new GridBagLayout();
     private GridBagConstraints constraints = new GridBagConstraints();
     private Client client;
     private String allyMarkerId;
+    private SaveWindow saveWindow;
 
 
     private Concede(Client client, JFrame parentFrame, String longMarkerName,
@@ -122,9 +123,11 @@ final class Concede extends KDialog implements ActionListener, WindowListener
 
         pack();
 
+        saveWindow = new SaveWindow(client, "Concede");
+
         if (location == null)
         {
-            loadLocation();
+            location = saveWindow.loadLocation();
         }
         if (location == null)
         {
@@ -158,38 +161,10 @@ final class Concede extends KDialog implements ActionListener, WindowListener
     }
 
 
-    static void saveLocation(Point point)
-    {
-        location = point;
-    }
-
-    static Point returnLocation()
-    {
-        return location;
-    }
-
-
-    private void loadLocation()
-    {
-        int x = client.getIntOption(Options.concedeLocX);
-        int y = client.getIntOption(Options.concedeLocY);
-        if (x >= 0 && y >= 0)
-        {
-            location = new Point(x, y);
-        }
-    }
-
-    private void saveLocation()
-    {
-        location = getLocation();
-        client.setOption(Options.concedeLocX, location.x);
-        client.setOption(Options.concedeLocY, location.y);
-    }
-
-
     private void cleanup(boolean answer)
     {
-        saveLocation();
+        location = getLocation();
+        saveWindow.saveLocation(location);
         dispose();
         if (flee)
         {

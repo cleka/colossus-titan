@@ -82,6 +82,19 @@ your favorite IRC or instant messenger client in the background.
    I plan to ditch RMI in favor of simple sockets with server-to-client 
    traffic piggybacking on the original client-to-server connection.
 
+\item[Q] There are permission denied errors.
+
+\item[A] It's probably a bad java.policy file.  
+
+   Make sure there's a file called java.policy in the Colossus 
+   base directory on the machine where you run the server.
+
+\item[Q] The server worked the first time, but now it doesn't.
+   
+\item[A] The old server is probably still bound to the socket.
+
+   Kill the server process.  If you can't, reboot the machine. 
+
 \end{itemize}
 
 \end{document}

@@ -21,7 +21,7 @@ import net.sf.colossus.server.Constants;
 public final class BattleMap extends HexMap implements MouseListener,
     WindowListener
 {
-    private static Point location;
+    private Point location;
     private JFrame battleFrame;
     private JMenuBar menuBar;
     private JMenu phaseMenu;
@@ -41,6 +41,9 @@ public final class BattleMap extends HexMap implements MouseListener,
     private AbstractAction undoAllAction;
     private AbstractAction doneWithPhaseAction;
     private AbstractAction concedeBattleAction;
+
+    private SaveWindow saveWindow;
+
 
     BattleMap(Client client, String masterHexLabel)
     {
@@ -64,9 +67,11 @@ public final class BattleMap extends HexMap implements MouseListener,
 
         setupEntrances();
 
+        saveWindow = new SaveWindow(client, "BattleMap");
+
         if (location == null)
         {
-            loadLocation();
+            location = saveWindow.loadLocation();
         }
         if (location == null)
         {
@@ -659,26 +664,10 @@ public final class BattleMap extends HexMap implements MouseListener,
     }
 
 
-    private void loadLocation()
-    {
-        int x = client.getIntOption(Options.battleMapLocX);
-        int y = client.getIntOption(Options.battleMapLocY);
-        if (x >= 0 && y >= 0)
-        {
-            location = new Point(x, y);
-        }
-    }
-
-    private void saveLocation()
-    {
-        location = battleFrame.getLocation();
-        client.setOption(Options.battleMapLocX, location.x);
-        client.setOption(Options.battleMapLocY, location.y);
-    }
-
     void dispose()
     {
-        saveLocation();
+        location = battleFrame.getLocation();
+        saveWindow.saveLocation(location);
 
         if (battleFrame != null)
         {

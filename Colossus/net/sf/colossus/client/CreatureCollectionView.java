@@ -20,10 +20,11 @@ import net.sf.colossus.util.Options;
 class CreatureCollectionView extends KDialog implements WindowListener
 {
     private Client client;
-    private static Point location;
+    private Point location;
 
     /** hash by creature name to the label that displays the count */
     Map countMap = new HashMap();
+    private SaveWindow saveWindow;
 
 
     CreatureCollectionView(JFrame frame, Client client)
@@ -39,9 +40,11 @@ class CreatureCollectionView extends KDialog implements WindowListener
 
         pack();
 
+        saveWindow = new SaveWindow(client, "CreatureCollectionView");
+
         if (location == null)
         {
-            loadLocation();
+            location = saveWindow.loadLocation();
         }
         if (location == null)
         {
@@ -133,27 +136,12 @@ class CreatureCollectionView extends KDialog implements WindowListener
         return sb.toString();
     }
 
-    private void loadLocation()
-    {
-        int x = client.getIntOption(Options.creatureCollectionViewLocX);
-        int y = client.getIntOption(Options.creatureCollectionViewLocY);
-        if (x >= 0 && y >= 0)
-        {
-            location = new Point(x, y);
-        }
-    }
-
-    private void saveLocation()
-    {
-        location = getLocation();
-        client.setOption(Options.creatureCollectionViewLocX, location.x);
-        client.setOption(Options.creatureCollectionViewLocY, location.y);
-    }
 
     public void dispose()
     {
         super.dispose();
-        saveLocation();
+        location = getLocation();
+        saveWindow.saveLocation(location);
     }
 
     void rescale()

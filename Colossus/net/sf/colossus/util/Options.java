@@ -56,34 +56,10 @@ public final class Options
     public static final String scale = "Scale";
 
     // Window locations and sizes
-    public static final String statusScreenLocX = "Status screen location X";
-    public static final String statusScreenLocY = "Status screen location Y";
-    public static final String statusScreenSizeX = "Status screen size X";
-    public static final String statusScreenSizeY = "Status screen size Y";
-
-    public static final String concedeLocX = "Concede location X";
-    public static final String concedeLocY = "Concede location Y";
-    public static final String concedeSizeX = "Concede size X";
-    public static final String concedeSizeY = "Concede size Y";
-
-    public static final String creatureCollectionViewLocX = 
-        "Creature collection view location X";
-    public static final String creatureCollectionViewLocY = 
-        "Creature collection view location Y";
-    public static final String creatureCollectionViewSizeX = 
-        "Creature collection view size X";
-    public static final String creatureCollectionViewSizeY = 
-        "Creature collection view size Y";
-
-    public static final String battleMapLocX = "Battle map location X";
-    public static final String battleMapLocY = "Battle map location Y";
-    public static final String battleMapSizeX = "Battle map size X";
-    public static final String battleMapSizeY = "Battle map size Y";
-
-    public static final String logWindowLocX = "Log window location X";
-    public static final String logWindowLocY = "Log window location Y";
-    public static final String logWindowSizeX = "Log window size X";
-    public static final String logWindowSizeY = "Log window size Y";
+    public static final String locX = "Location X";
+    public static final String locY = "Location Y";
+    public static final String sizeX = "Size X";
+    public static final String sizeY = "Size Y";
 
     // AI options (player - on client)
     public static final String autoPickColor = "Auto pick color";

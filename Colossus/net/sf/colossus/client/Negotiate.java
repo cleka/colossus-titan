@@ -29,6 +29,8 @@ final class Negotiate extends KDialog implements MouseListener, ActionListener
     private Client client;
     private Proposal proposal;
     private String hexLabel;
+    private Point location;
+    private SaveWindow saveWindow;
 
 
     Negotiate(Client client, String attackerLongMarkerName,
@@ -130,8 +132,9 @@ final class Negotiate extends KDialog implements MouseListener, ActionListener
 
         pack();
 
-        // Use the same location as the preceding Concede dialog.
-        Point location = Concede.returnLocation();
+        saveWindow = new SaveWindow(client, "Negotiate");
+
+        location = saveWindow.loadLocation();
         if (location == null)
         {
             centerOnScreen();
@@ -148,7 +151,8 @@ final class Negotiate extends KDialog implements MouseListener, ActionListener
 
     void cleanup()
     {
-        Concede.saveLocation(getLocation());
+        location = getLocation();
+        saveWindow.saveLocation(location);
         dispose();
         client.negotiateCallback(proposal);
     }

@@ -36,8 +36,9 @@ final class StatusScreen extends KDialog implements WindowListener
 
     private Client client;
 
-    private static Point location;
-    private static Dimension size;
+    private Point location;
+    private Dimension size;
+    private SaveWindow saveWindow;
 
 
     StatusScreen(JFrame frame, Client client)
@@ -150,9 +151,11 @@ final class StatusScreen extends KDialog implements WindowListener
 
         pack();
 
+        saveWindow = new SaveWindow(client, "StatusScreen");
+
         if (size == null)
         {
-            loadSize();
+            size = saveWindow.loadSize();
         }
         if (size != null)
         {
@@ -161,7 +164,7 @@ final class StatusScreen extends KDialog implements WindowListener
 
         if (location == null)
         {
-            loadLocation();
+            location = saveWindow.loadLocation();
         }
         if (location == null)
         {
@@ -230,43 +233,13 @@ final class StatusScreen extends KDialog implements WindowListener
         repaint();
     }
 
-    private void loadSize()
-    {
-        int x = client.getIntOption(Options.statusScreenSizeX);
-        int y = client.getIntOption(Options.statusScreenSizeY);
-        size = new Dimension(x, y);
-    }
-
-    private void saveSize()
-    {
-        size = getSize();
-        client.setOption(Options.statusScreenSizeX, (int)size.getWidth());
-        client.setOption(Options.statusScreenSizeY, (int)size.getHeight());
-    }
-
-    private void loadLocation()
-    {
-        int x = client.getIntOption(Options.statusScreenLocX);
-        int y = client.getIntOption(Options.statusScreenLocY);
-        if (x >= 0 && y >= 0)
-        {
-            location = new Point(x, y);
-        }
-    }
-
-    private void saveLocation()
-    {
-        location = getLocation();
-        client.setOption(Options.statusScreenLocX, location.x);
-        client.setOption(Options.statusScreenLocY, location.y);
-    }
-
-
     public void dispose()
     {
         super.dispose();
-        saveSize();
-        saveLocation();
+        size = getSize();
+        saveWindow.saveSize(size);
+        location = getLocation();
+        saveWindow.saveLocation(location);
     }
 
 
