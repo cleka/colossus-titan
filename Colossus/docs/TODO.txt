@@ -13,9 +13,6 @@ Bug: ShowLegion appears in wrong place when MasterBoard is scrolled.
 
 Bug: AI player sometimes leaves reinforcements offboard unnecessarily.
 
-Bug: AI player didn't move at start of turn 2.  Just froze.
-   Default, 1 human + 3 random AIs, first player froze.  Linux, 1.4.1.01
-
 Bug: The duplicate name detection code for network players is now
    failing with the new initialization timing -- oscillating fixNames
    between dripton and dripton4
@@ -47,20 +44,29 @@ Bug: Loaded a game with 2 human players and 4 AIs.  Only got one board.
 Bug: Enemy had two stacks, one fully known and one fully unknown.  Should
    have been fully known by process of elimination.
 
-Out of memory error after many consecutive Load Game actions.  Find leak.
+Bug: Out of memory error after many consecutive Load Game actions.  Find leak.
 
-Compute numLegions, numMarkers, numCreatures, titan power, total point value
+EASY Clean out battle turn number in StatusScreen when there's no battle.
+
+EASY Compute numLegions, numMarkers, numCreatures, titan power, total point value
    on client side rather than passing them in player info.
 
-Turn off wait cursor more often.
+EASY Turn off wait cursor more often.
 
-Indicate which players have titan teleport in StatusScreen.
+EASY Indicate which players have titan teleport in StatusScreen.
+
+EASY Do not scale chits in CreatureCollectionView
+
+EASY When saving game explicitly (not with autosave), log the event
+   and the full savegame path.
+
+EASY Disable "AIs stop when humans dead" if no human players at start of game.
+
+EASY Colorize chat window.
+
+EASY Make inverting defending units optional.
 
 Synchronize repaints in StatusScreen so yellow moves all at once
-
-Do not scale chits in CreatureCollectionView
-
-Allow clearing recruit chits, displaying stuff during other players' turns.
 
 Finish EngagementResults:
    Non-overlapping dialogs?  Make it a tabbled dialog?
@@ -76,20 +82,17 @@ Toolbar, or at least Done button.
 
 Change some JDialogs to JFrames to allow separate minimizing?
 Should be able to move recruit chart behind board, map.
-
-When saving game explicitly (not with autosave), log the event
-   and the full savegame path.
-
-Disable "AIs stop when humans dead" if no human players at start of game.
+OR
+Make BattleMap a JDialog rather than a JFrame (moving menu), to fix focus.
 
 Add link from client to LogWindow; advance scroll thumb at end of various
    phases.
 
 Should be able to clear recruitChits in any phase.  Move to Graphics menu?
+Allow displaying stuff during other players' turns.
+Ability to dismiss and recall recruitChits
 
 Real whole-legion battle eval function, including gang hits.
-
-Ability to dismiss and recall recruitChits
 
 Refactor to eliminate duplicate code.  (Especially Movement, BattleMovement, 
    Strike, Creature/Critter/CreatureInfo)
@@ -97,13 +100,13 @@ Fix the Titan Creature/Critter problem.
 
 Machine learning to tweak AI constants.
 
-Improve networking.  (Persistent servers, reporting game openings to web page.)
+Improve networking.  
+   Persistent servers, 
+   Reporting game openings to web page.
 
 When getting both a PickRecruit and an AcquireAngel after a battle,
    make sure the PickRecruit is on top, because it's modal.
    Or make PickRecruit non-modal.
-
-Colorize chat window.
 
 Observer clients.
 
@@ -122,8 +125,6 @@ Change Quit button in GetPlayers dialog to Cancel.  Go back to existing
    confirmation before calling dialog.
 
 L&F should not show Windows if not allowed on this platform.
-Kunststoff L&F in swing.properties file fails.  Works in player cfg file.
-Add Kunststoff L&F to jar file?
 Eliminate L&F menu entirely?
 
 Add "no 2s or 5s" mulligan option.
@@ -147,15 +148,13 @@ Turn map to move player's entrance (or attacker's if observing) to
    Color-code entrances.
 Make BattleMap less tall.  Move dice, etc. to one side.
 
-Write more design docs.
-
 Add SetupBattle dialog, to allow setting up standalone battles.
    (terrain, entry side, creatures in attacking and defending legions,
    angel/archangel available to summon, recruits available for terrain
    type, player scores for titan power.)
 
 Track all players' markers on client side.
-Add a ShowLegionMarkers window that shows each player's remaining 
+Add a ShowLegionMarkers window that shows each player's remaining
    markers.
 
 Add a window that shows all players' units
@@ -172,16 +171,9 @@ After JDK 1.4.1 for MacOS is released:
 
 Make split prediction optional.
 
-Make inverting defending units optional.
-
 SVG chits.  Maybe SVG board and map, after we have SVG chits.  (No point
    before then -- just drags in Batik without giving infinite rescaling.)
-
-More unit tests.
 
 Place SummonAngel so that it doesn't overlap any of the player's markers
    with summonable angels.
 
-Convert TeX docs to simple HTML to simplify build.
-
-Clean out battle turn number in StatusScreen when there's no battle.
