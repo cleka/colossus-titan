@@ -28,7 +28,7 @@ clean:
 distclean: clean
 	rm -f $(DESTS) $(DESTSTXT)
 
-html: $(DESTSHTML)
+html: all $(DESTSHTML)
 
 %.html: %.tex
 	$(LATEX2HTML) $<
