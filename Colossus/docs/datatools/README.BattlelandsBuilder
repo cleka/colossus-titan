@@ -26,10 +26,18 @@ this hex (warning: beware slope or wall who can
 easily be put on the wrong hex, as there's not much
 visual clue of their orientation).
 
-ATM, the 'Save' and 'Save As' menu aren't working,
-they both dump the Battleland on the standard output.
-Copy/Paste them (or use a redirection) to the proper
-file.
+The 'Load Map' menu item is used to load a Battlelands 
+file in the map.
+
+The 'Save As' menu item save the Battleland to a
+file choosen by the user.
+
+The 'Show Battleland' menu item dump the Battleland
+on standard output.
+
+The 'Erase Map' menu item return the map to the
+default, i.e. only Plains of elevation 0, and no
+hexside.
 
 The 'Randomize Map' menu item is used to generate
 a random map from a description file. See the

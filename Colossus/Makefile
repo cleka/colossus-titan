@@ -138,14 +138,14 @@ BBSRC=net/sf/colossus/datatools/BattlelandsBuilder.java \
       net/sf/colossus/util/HTMLColor.java \
       net/sf/colossus/parser/BattlelandLoader.java
 
-BRSRC=net/sf/colossus/datatools/BattlelandsRandomizer.java \
+BRSRC=net/sf/colossus/parser/BattlelandRandomizerLoader.java \
+      net/sf/colossus/datatools/BattlelandsRandomizer.java \
       net/sf/colossus/datatools/BuilderHexMap.java \
       net/sf/colossus/client/Hex.java \
       net/sf/colossus/client/BattleHex.java \
       net/sf/colossus/client/GUIBattleHex.java \
       net/sf/colossus/util/HTMLColor.java \
-      net/sf/colossus/parser/BattlelandLoader.java \
-      net/sf/colossus/parser/BattlelandRandomizerLoader.java
+      net/sf/colossus/parser/BattlelandLoader.java
 
 BBCLASS=$(addsuffix .class,$(basename $(BBSRC)))
 
@@ -158,7 +158,9 @@ BRMANIFEST=META-INF/datatools/BattlelandsRandomizer/MANIFEST.MF
 datatools: $(BBJAR) $(BRJAR)
 
 
-$(BBJAR): net/sf/colossus/parser/BattlelandLoader.java $(BBCLASS)
+$(BBJAR): net/sf/colossus/parser/BattlelandLoader.java \
+          net/sf/colossus/parser/BattlelandRandomizerLoader.java \
+          $(BBCLASS)
 	jar -cmf $(BBMANIFEST) $@ net/sf/colossus/datatools/*.class \
                                   net/sf/colossus/client/*.class \
                                   net/sf/colossus/parser/*.class \

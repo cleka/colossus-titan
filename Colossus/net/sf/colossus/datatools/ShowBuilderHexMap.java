@@ -51,7 +51,7 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
         javax.swing.JFileChooser rndChooser = new JFileChooser(".");
         rndChooser.setFileFilter(new rndFileFilter());
         rndChooser.setDialogTitle(
-                   "Choose the RaNDom file (or cancel for nothing)");
+                   "Choose the RaNDom file to open (or cancel for nothing)");
         int returnVal = rndChooser.showOpenDialog(rndChooser);
         if (returnVal == javax.swing.JFileChooser.APPROVE_OPTION)
         {
@@ -68,6 +68,60 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
                     new net.sf.colossus.parser.BattlelandRandomizerLoader(inputFile);
                 try {
                     while (parser.oneArea(h) >= 0) {}
+                } catch (Exception e) { System.err.println(e); }
+            }
+        }
+    }
+
+    private void doLoadFile(BattleHex[][] h)
+    {
+        javax.swing.JFileChooser rndChooser = new JFileChooser(".");
+        rndChooser.setDialogTitle(
+                   "Choose the battleland file to open (or cancel for nothing)");
+        int returnVal = rndChooser.showOpenDialog(rndChooser);
+        if (returnVal == javax.swing.JFileChooser.APPROVE_OPTION)
+        {
+            java.io.File rndFile = rndChooser.getSelectedFile();
+            String tempRndName = rndFile.getName();
+            String tempRndDirectory = rndFile.getParentFile().getAbsolutePath();
+            java.util.List directories = new java.util.ArrayList();
+            directories.add(tempRndDirectory);
+            java.io.InputStream inputFile =
+                net.sf.colossus.util.ResourceLoader.getInputStream(tempRndName, directories);
+            if (inputFile != null)
+            {
+                net.sf.colossus.parser.BattlelandLoader parser = 
+                    new net.sf.colossus.parser.BattlelandLoader(inputFile);
+                try {
+                    while (parser.oneBattlelandCase(h) >= 0) {}
+                } catch (Exception e) { System.err.println(e); }
+            }
+        }
+    }
+
+    private void doSaveFile()
+    {
+        javax.swing.JFileChooser rndChooser = new JFileChooser(".");
+        rndChooser.setDialogTitle(
+                   "Choose the battleland file to save (or cancel for nothing)");
+        int returnVal = rndChooser.showOpenDialog(rndChooser);
+        if (returnVal == javax.swing.JFileChooser.APPROVE_OPTION)
+        {
+            java.io.File rndFile = rndChooser.getSelectedFile();
+            String tempRndName = rndFile.getName();
+            String tempRndDirectory = rndFile.getParentFile().getAbsolutePath();
+            java.util.List directories = new java.util.ArrayList();
+            directories.add(tempRndDirectory);
+            java.io.OutputStream outputFile =
+                net.sf.colossus.util.ResourceLoader.getOutputStream(tempRndName, directories);
+            if (outputFile != null)
+            {
+                String outStr = dumpAsString();
+                try
+                {
+                    outputFile.write(outStr.getBytes());
+                    outputFile.flush();
+                    outputFile.close();
                 } catch (Exception e) { System.err.println(e); }
             }
         }
@@ -119,11 +173,12 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
         }
     }
 
-    private AbstractAction saveBattlelandAction;
+    private AbstractAction showBattlelandAction;
     private AbstractAction saveBattlelandAsAction;
     private AbstractAction quitAction;
     private AbstractAction eraseAction;
     private AbstractAction randomizeAction;
+    private AbstractAction loadFileAction;
 
     JMenuBar menuBar;
 
@@ -137,19 +192,15 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
         menuBar.add(fileMenu);
         JMenuItem mi;
 
-        saveBattlelandAction = new AbstractAction("Save Battleland") {
+        showBattlelandAction = new AbstractAction("Show Battleland") {
                 public void actionPerformed(ActionEvent e) {
                     System.out.print(dumpAsString());
-                    if (filename != null)
-                    {
-                        
-                    }
                 }
             };
-
+        
         saveBattlelandAsAction = new AbstractAction("Save Battleland As...") {
                 public void actionPerformed(ActionEvent e) {
-                    System.out.print(dumpAsString());
+                    doSaveFile();
                 }
             };
 
@@ -173,10 +224,18 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
                 }
             };
 
-        mi = fileMenu.add(saveBattlelandAction);
-        mi.setMnemonic(KeyEvent.VK_S);
+        loadFileAction = new AbstractAction("Load Map (from file)") {
+                public void actionPerformed(ActionEvent e) {
+                    doLoadFile(getBattleHexArray());
+                    repaint();
+                }
+            };
+
+        mi = fileMenu.add(loadFileAction);
+        mi.setMnemonic(KeyEvent.VK_O);
         mi = fileMenu.add(saveBattlelandAsAction);
-        mi.setMnemonic(KeyEvent.VK_A);
+        mi.setMnemonic(KeyEvent.VK_S);
+        mi = fileMenu.add(showBattlelandAction);
         mi = fileMenu.add(eraseAction);
         mi = fileMenu.add(randomizeAction);
         mi = fileMenu.add(quitAction);

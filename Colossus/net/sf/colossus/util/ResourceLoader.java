@@ -172,4 +172,31 @@ public final class ResourceLoader
         }
         return(stream);
     }
+
+    /**
+     * Return the first OutputStream from file of name filename in the list of directories.
+     * @param filename Name of the file to load.
+     * @param directories List of directories to search (in order).
+     * @return The OutputStream, or null if it was not found.
+     */
+    public static OutputStream getOutputStream(String filename, java.util.List directories)
+    {
+        OutputStream stream = null;
+        java.util.Iterator it = directories.iterator();
+        while (it.hasNext() && (stream == null))
+        {
+            Object o = it.next();
+            if (o instanceof String)
+            {
+                String path = (String)o;
+                String fullPath = path + pathSeparator + filename;
+                try
+                {
+                    stream = new FileOutputStream(fullPath);
+                } 
+                catch (Exception e) { stream = null; }
+            }
+        }
+        return(stream);
+    }
 }
