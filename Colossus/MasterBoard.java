@@ -75,7 +75,11 @@ public class MasterBoard extends Frame implements MouseListener,
         // Each player needs to pick his first legion marker.
         for (int i = 0; i < game.numPlayers; i++)
         {
-            PickMarker pickmarker = new PickMarker(this, game.player[i]);
+            do
+            {
+                PickMarker pickmarker = new PickMarker(this, game.player[i]);
+            }
+            while (game.player[i].markerSelected == null);
             // Update status window to reflect marker taken.
             game.updateStatusScreen();
         }
@@ -192,7 +196,6 @@ public class MasterBoard extends Frame implements MouseListener,
     void findMoves(MasterHex hex, Player player, Legion legion, 
         int roll, int block)
     {
-System.out.println("findMoves for " + hex.label + " roll is " + roll);
         // If there are enemy legions in this hex, mark it
         // as a legal move and stop recursing.
         for (int i = 0; i < game.numPlayers; i++)
@@ -226,7 +229,6 @@ System.out.println("engagement in hex " + hex.label);
                     return;
                 }
             }
-System.out.println("selected hex " + hex.label);
             hex.selected = true;
             return;
         }
@@ -242,7 +244,6 @@ System.out.println("selected hex " + hex.label);
             {
                 if (hex.exitType[i] >= MasterHex.ARCH)
                 {
-System.out.println("finding moves for exit " + i);
                     findMoves(hex.neighbor[i], player, legion, roll - 1, -2);
                 }
             }
@@ -253,7 +254,6 @@ System.out.println("finding moves for exit " + i);
             {
                 if (hex.exitType[i] >= MasterHex.ARROW)
                 {
-System.out.println("finding moves for exit " + i);
                     findMoves(hex.neighbor[i], player, legion, roll - 1, -2);
                 }
             }
@@ -267,7 +267,6 @@ System.out.println("finding moves for exit " + i);
     void findTowerTeleportMoves(MasterHex hex, Player player, Legion legion,
         int roll)
     {
-System.out.println("findTowerTeleportMoves for " + hex.label + " roll is " + roll);
         // This hex is the final destination.  Mark it as legal if
         // it is unoccupied.
 
@@ -284,7 +283,6 @@ System.out.println("findTowerTeleportMoves for " + hex.label + " roll is " + rol
         }
         if (occupied == false)
         {
-            System.out.println("selected hex " + hex.label);
             hex.selected = true;
         }
 
@@ -295,7 +293,6 @@ System.out.println("findTowerTeleportMoves for " + hex.label + " roll is " + rol
                 if (hex.exitType[i] != MasterHex.NONE ||
                     hex.entranceType[i] != MasterHex.NONE)
                 {
-System.out.println("finding moves for direction " + i);
                     findTowerTeleportMoves(hex.neighbor[i], player, legion, 
                         roll - 1);
                 }
@@ -311,7 +308,6 @@ System.out.println("finding moves for direction " + i);
         MasterHex hex = getHexFromLabel(legion.currentHex); 
 
         // Conventional moves
-System.out.println("hex " + hex.label);
 
         // First, look for a block.
         int block = -1;
@@ -323,7 +319,6 @@ System.out.println("hex " + hex.label);
                 block = j;
             }
         }
-System.out.println("block = " + block);
 
         findMoves(hex, player, legion, player.movementRoll, block);
 
@@ -338,8 +333,28 @@ System.out.println("Tower teleport is legal.");
                 // Mark every unoccupied hex within 6 hexes.
                 findTowerTeleportMoves(hex, player, legion, 6);
 
-                // XXX Mark every unoccupied tower except this one.
-                 
+                // Mark every unoccupied tower.
+                for (int tower = 100; tower <= 600; tower += 100)
+                {
+                    hex = getHexFromLabel(tower); 
+                    boolean occupied = false;
+                    for (int i = 0; i < game.numPlayers; i++)
+                    {
+                        for (int j = 0; j < game.player[i].numLegions; j++)
+                        {
+                            if (game.player[i].legions[j].currentHex == 
+                                hex.label)
+                            {
+                                occupied = true;
+                            }
+                        }
+                    }
+                    if (occupied == false)
+                    {
+                        hex.selected = true;
+                    }
+                }
+                repaint();
             }
 
             // Titan teleport
