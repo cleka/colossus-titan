@@ -469,6 +469,21 @@ public final class Legion implements Comparable
         return count;
     }
 
+    public int numRangestrikers()
+    {
+        int count = 0;
+        Iterator it = critters.iterator();
+        while (it.hasNext())
+        {
+            Critter critter = (Critter)it.next();
+            if (critter.isRangestriker())
+            {
+                count++;
+            }
+        }
+        return count;
+    }
+
     public boolean hasTitan()
     {
         Iterator it = critters.iterator();
@@ -814,7 +829,7 @@ public final class Legion implements Comparable
     }
 
 
-    public List getCritters()
+    public ArrayList getCritters()
     {
         return critters;
     }

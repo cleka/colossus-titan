@@ -1,7 +1,6 @@
 import java.io.*;
 import java.util.*;
 import javax.swing.*;
-import org.apache.log4j.*;
 
 
 /**
@@ -37,9 +36,7 @@ public final class Game
     private JFrame masterFrame;
     private boolean engagementInProgress;
 
-
-    /** log4j config file */
-    public static final String logConfigFilename = "log.cfg";
+    private static boolean DEBUG = true;
 
 
     // Constants for savegames
@@ -55,19 +52,6 @@ public final class Game
     public static final String optionsPath = "Colossus";
     public static final String optionsSep = "-";
     public static final String optionsExtension = ".cfg";
-
-
-    // log4j
-    // Make this public to start, so we don't have to set up a logger in
-    // each class.  Maybe change that later.
-    public static Category cat = Category.getInstance(Game.class.getName());
-
-
-    static
-    {
-        // log4j
-        PropertyConfigurator.configure(logConfigFilename);
-    }
 
 
     /** Start a new game. */
@@ -1272,7 +1256,7 @@ public final class Game
         catch (Exception e)
         {
             logError(e + "Tried to load corrupt savegame.");
-            e.printStackTrace();  // XXX Should log it.
+            e.printStackTrace();
             dispose();
         }
     }
@@ -2297,31 +2281,33 @@ public final class Game
     }
 
 
-    // log4j strategy
     //    debug -- intended for developer only -- console or logfile
     //    info  -- routine info -- console or logfile or GUI scroll window
     //    warn  -- user mistake or important info -- message dialog
     //    error -- serious program error -- message dialog or stderr
     //    fatal -- fatal program error -- message dialog or stderr
 
-    /** Log an event using log4j at info priority. */
+    /** Log an event. */
     public static void logEvent(String s)
     {
-        cat.info(s);
+        System.out.println(s);
     }
 
 
-    /** Log an error using log4j. */
+    /** Log an error. */
     public static void logError(String s)
     {
-        cat.error(s);
+        System.out.println(s);
     }
 
 
-    /** Log a debug message using log4j. */
+    /** Log a debug message. */
     public static void logDebug(String s)
     {
-        cat.debug(s);
+        if (DEBUG)
+        {
+            System.out.println(s);
+        }
     }
 
 

@@ -9,11 +9,12 @@
 # jikes is really fast, good, and free.  It supports -depend so all
 #    dependent objects will be recompiled when you change one.
 # javac is the standard; use it if you don't have jikes.  Sun has removed
-#    the -depend/-Xdepend option from javac in JDK 1.3, so be careful.
+#    the -depend/-Xdepend option from javac in JDK 1.3, so be careful to
+#    manually recompile classes when necessary.
 # kjc comes with kaffe.  I like its --warning option.
 
-#JCC = jikes -g -depend -deprecation +P
-JCC = javac -J-Djavac.pipe.output=true -g -deprecation -target 1.2
+JCC = jikes -g -depend -deprecation +P
+#JCC = javac -J-Djavac.pipe.output=true -g -deprecation -target 1.2
 #JCC = kjc -g --deprecation --warning
 
 
@@ -51,11 +52,9 @@ JARFILE = Colossus.jar
 
 jar : $(JARFILE)
 
-LOG4J = org/apache/log4j/
-
 # Create jar file
 $(JARFILE): $(CLASS_FILES) $(IMAGES) META-INF/MANIFEST.MF
-	jar -mcf META-INF/MANIFEST.MF Colossus.jar *.class images/*.gif $(LOG4J)*.class $(LOG4J)config/*.class $(LOG4J)helpers/*.class $(LOG4J)or/*.class $(LOG4J)spi/*.class
+	jar -mcf META-INF/MANIFEST.MF Colossus.jar *.class images/*.gif
 	chmod +x Colossus.jar
 
 # Install jar and html files for applet

@@ -135,7 +135,8 @@ public final class Critter extends Creature
 
     /** A creature class is the creature name and the label of its
      *  current BattleHex.  This is useful when doing AI battle moves,
-     *  since one offboard lion is identical to another. */
+     *  since one offboard lion is identical to another. It also
+     *  prevents AICopy() problems since Strings are immutable. */
     public String getCreatureClass()
     {
         if (currentHexLabel == null)

@@ -1365,11 +1365,35 @@ Game.logDebug("defender eliminated");
     }
 
 
+    private static final int OUT_OF_RANGE = 5;
+
     /** Return the range in hexes from hex1 to hex2.  Titan ranges are
      *  inclusive at both ends. */
     public static int getRange(BattleHex hex1, BattleHex hex2,
         boolean allowEntrance)
     {
+        if (hex1.isEntrance() || hex2.isEntrance())
+        {
+            if (allowEntrance)
+            {
+                // The range to an entrance is the range to the
+                // closest of its neighbors, plus one.
+                if (hex1.isEntrance())
+                {
+                    return 1 + minRangeToNeighbor(hex1, hex2);
+                }
+                else  // hex2.isEntrance()
+                {
+                    return 1 + minRangeToNeighbor(hex2, hex1);
+                }
+            }
+            else
+            {
+                // It's out of range.  Don't sweat the details.
+                return OUT_OF_RANGE;
+            }
+        }
+
         int x1 = hex1.getXCoord();
         double y1 = hex1.getYCoord();
         int x2 = hex2.getXCoord();
@@ -1388,16 +1412,6 @@ Game.logDebug("defender eliminated");
         double xDist = Math.abs(x2 - x1);
         double yDist = Math.abs(y2 - y1);
 
-        // Offboard creatures are out of striking range.
-        if (!allowEntrance && (x1 == -1 || x2 == -1))
-        {
-            xDist = BIGNUM;
-        }
-        else
-        {
-            // TODO Handle ranges to entrances.
-        }
-
         if (xDist >= 2 * yDist)
         {
             return (int) Math.ceil(xDist + 1);
@@ -1414,6 +1428,26 @@ Game.logDebug("defender eliminated");
         {
             return (int) Math.floor(yDist + 2);
         }
+    }
+
+
+    /** Return the minimum range from any neighbor of hex1 to hex2. */
+    private static int minRangeToNeighbor(BattleHex hex1, BattleHex hex2)
+    {
+        int min = OUT_OF_RANGE;
+        for (int i = 0; i < 6; i++)
+        {
+            BattleHex hex = hex1.getNeighbor(i);
+            if (hex != null)
+            {
+                int range = getRange(hex, hex2, false);
+                if (range < min)
+                {
+                    min = range;
+                }
+            }
+        }
+        return min;
     }
 
 
@@ -1971,7 +2005,6 @@ Game.logDebug("defender eliminated");
     }
 
 
-    // XXX Change to use hex label, not hex reference.
     public void actOnHex(BattleHex hex)
     {
         switch (getPhase())
@@ -2016,8 +2049,8 @@ Game.logDebug("defender eliminated");
     }
 
 
-    /** If legal, move critter to hex. */
-    public void doMove(Critter critter, BattleHex hex)
+    /** If legal, move critter to hex *  and return true. Else return false. */
+    public boolean doMove(Critter critter, BattleHex hex)
     {
         String hexLabel = hex.getLabel();
 
@@ -2025,6 +2058,7 @@ Game.logDebug("defender eliminated");
         if (hexLabel.equals(critter.getCurrentHexLabel()))
         {
             Game.logEvent(critter.getDescription() + " does not move");
+            return true;
         }
         else if (showMoves(critter).contains(hexLabel))
         {
@@ -2033,12 +2067,14 @@ Game.logDebug("defender eliminated");
             critter.moveToHex(hex);
             critterSelected = false;
             highlightMovableCritters();
+            return true;
         }
         else
         {
             Game.logEvent(critter.getName() + " in " +
                 critter.getCurrentHexLabel() +
                 " tried to illegally move to " + hexLabel);
+            return false;
         }
     }
 
