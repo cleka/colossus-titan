@@ -42,6 +42,10 @@ public class Game extends JFrame implements WindowListener, ActionListener
         setBackground(java.awt.Color.white);
         pack();
         setSize(300, 250);
+        setIconImage(Toolkit.getDefaultToolkit().getImage(
+            Creature.colossus.getImageName()));
+
+        // Center dialog on screen.
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
         setLocation(new Point(d.width / 2 - getSize().width / 2, d.height / 2
                      - getSize().height / 2));
@@ -209,6 +213,7 @@ public class Game extends JFrame implements WindowListener, ActionListener
         contentPane.add(button3);
         button3.addActionListener(this);
 
+        // Center dialog on screen.
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
         setLocation(new Point(d.width / 2 - getSize().width / 2, d.height / 2
                      - getSize().height / 2));
@@ -321,8 +326,10 @@ public class Game extends JFrame implements WindowListener, ActionListener
 
         pack();
 
+        // Move dialog to bottom right of screen.
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-        setLocation(new Point(d.width / 2 - getSize().width / 2, 0));
+        setLocation(new Point(d.width - getSize().width, 
+            d.height - getSize().height));
 
         setVisible(true);
 
