@@ -121,12 +121,7 @@ public class MasterBoard extends Frame implements MouseListener,
         setVisible(true);
         repaint();
 
-        // XXX temporary test call
-        SplitLegion splitlegion = new SplitLegion(this, 
-            game.player[0].legions[0], game.player[0]);
-        // Update status window to reflect marker taken.
-        game.updateStatusScreen();
-        repaint();
+        Turn turn = new Turn(this, game);
     }
 
 
@@ -724,10 +719,50 @@ public class MasterBoard extends Frame implements MouseListener,
             {
                 if (game.player[i].legions[j].chit.select(point))
                 {
-                    // Show info about this legion.
-                    ShowLegion showlegion = new ShowLegion(this, 
-                        game.player[i].legions[j], point);
-                    return;
+                    // What to do depends on which mouse button was used
+                    // and the current phase of the turn.
+
+                    // Right-click or alt-click means to show the contents
+                    // of the legion.
+                    if (((e.getModifiers() & InputEvent.BUTTON2_MASK) ==
+                        InputEvent.BUTTON2_MASK) || ((e.getModifiers() & 
+                        InputEvent.BUTTON3_MASK) == InputEvent.BUTTON3_MASK))
+                    {
+                        ShowLegion showlegion = new ShowLegion(this, 
+                            game.player[i].legions[j], point);
+                        return;
+                    }
+                    else
+                    {
+                        // Only the current player can mess with his legions.
+                        if (i == game.activePlayer)
+                        {
+                            if (game.phase == 1)  // split
+                            {
+                                SplitLegion splitlegion = new SplitLegion(this, 
+                                    game.player[i].legions[j], game.player[i]);
+                                // Update status window to reflect marker taken.
+                                game.updateStatusScreen();
+                                repaint();
+                                return;
+                            }
+
+                            else if (game.phase == 2)  // move
+                            {
+                                return;
+                            }
+
+                            else if (game.phase == 3)  // fight
+                            {
+                                return;
+                            }
+
+                            else if (game.phase == 4)  // muster
+                            {
+                                return;
+                            }
+                        }
+                    }
                 }
             }
         }
