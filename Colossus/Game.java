@@ -10,10 +10,7 @@ import java.awt.event.*;
 class Game extends Frame implements WindowListener, ActionListener
 {
     int numPlayers;
-    String [] playerName; 
-    int [] playerTower;
-    String [] playerColor = new String[6];
-    Player [] player;
+    Player [] player = new Player[6];
     TextField [] tf = new TextField[7];
     int currentColor;
     Label [] colorLabel = new Label[6];
@@ -86,7 +83,7 @@ class Game extends Frame implements WindowListener, ActionListener
         }
 
         // Make sure each player has a unique, non-empty name
-        playerName = new String[numPlayers];
+        String [] playerName = new String[numPlayers];
         for (int i = 0; i < numPlayers; i++)
         {
             playerName[i] = tf[i + 1].getText();
@@ -109,6 +106,12 @@ class Game extends Frame implements WindowListener, ActionListener
             return;
         }
 
+        // Fill the player objects
+        for (int i = 0; i < numPlayers; i++)
+        {
+            player[i] = new Player(playerName[i]);
+        }
+
         // Since the inputs are validated, it's time to roll for towers.
         assignTowers();
     }
@@ -116,7 +119,7 @@ class Game extends Frame implements WindowListener, ActionListener
 
     void assignTowers()
     {
-        playerTower = new int[6];
+        int [] playerTower = new int[6];
 
         // A random card-shuffling algorithm is cleaner than repeated 
         //    die-rolling and checking for duplicates
@@ -135,6 +138,10 @@ class Game extends Frame implements WindowListener, ActionListener
             playerTower[m] = playerTower[n];
             playerTower[n] = t;
         }
+        for (int i = 0; i < numPlayers; i++)
+        {
+            player[i].setTower(playerTower[i]);
+        }
 
         chooseColors();
     }
@@ -145,7 +152,7 @@ class Game extends Frame implements WindowListener, ActionListener
         removeAll();
         setTitle("Choose Colors");
         setLayout(new GridLayout(0, 3));
-        // XXX Why doesn't this work?
+        // XXX Why doesn't this stick?
         setSize(300, 250);
 
         add(new Label("Tower"));
@@ -158,10 +165,10 @@ class Game extends Frame implements WindowListener, ActionListener
         {
             for (int j = 0; j < numPlayers; j++)
             {
-                if (playerTower[j] == i)
+                if (player[j].startingTower == i)
                 {
                     add(new Label(String.valueOf(100 * i)));
-                    add(new Label(playerName[j]));
+                    add(new Label(player[j].name));
                     colorLabel[j] = new Label("");
                     add(colorLabel[j]);
                 }
@@ -196,7 +203,7 @@ class Game extends Frame implements WindowListener, ActionListener
         {
             for (int j = 0; j < numPlayers; j++)
             {
-                if (playerTower[j] == i)
+                if (player[j].startingTower == i)
                 {
                     currentColor = i;
                     colorLabel[j].setText("?");
@@ -221,9 +228,9 @@ class Game extends Frame implements WindowListener, ActionListener
 
         for (int j = 0; j < numPlayers; j++)
         {
-            if (playerTower[j] == currentColor)
+            if (player[j].startingTower == currentColor)
             {
-                playerColor[j] = new String(color);
+                player[j].setColor(color);
                 colorLabel[j].setText(color);
             }
         }
@@ -232,7 +239,7 @@ class Game extends Frame implements WindowListener, ActionListener
         {
             for (int j = 0; j < numPlayers; j++)
             {
-                if (playerTower[j] == i)
+                if (player[j].startingTower == i)
                 {
                     currentColor = i;
                     colorLabel[j].setText("?");
@@ -289,7 +296,8 @@ class Game extends Frame implements WindowListener, ActionListener
         }
         else if (e.getActionCommand() == "Done")
         {
-            // Set up Player classes
+            // Go on to do initial splits
+            System.out.println("To Do: initial splits");
             System.exit(0);
         }
         else  // Color button
