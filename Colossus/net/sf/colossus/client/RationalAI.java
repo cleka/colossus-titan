@@ -1459,7 +1459,6 @@ public class RationalAI implements AI
         // find initial optimum, assuming optimum will move a legion
         boolean conflicted = handleConflictedMoves(all_legionMoves, !moved,
                 occupiedHexes);
-
     }
 
     // find optimimum move for a set of legion moves given by all_legionMoves.
@@ -1467,8 +1466,8 @@ public class RationalAI implements AI
     // across the set of legions.  If the flag mustMove is set to true
     // then we add the constraint that at least one of these legions must
     // move.
-    private boolean handleConflictedMoves(List all_legionMoves, boolean mustMove,
-            TreeSet occupiedHexes)
+    private boolean handleConflictedMoves(List all_legionMoves,
+            boolean mustMove, TreeSet occupiedHexes)
     {
         if (mustMove)
         {
@@ -1479,6 +1478,7 @@ public class RationalAI implements AI
 
         if (all_legionMoves.size() < 1)
         {
+            Log.error("No moves available!  Probable hang!");
             return false;
         }
 
@@ -1499,15 +1499,14 @@ public class RationalAI implements AI
             iter++;
             Set hexes = new HashSet();
             double value = 0;
-            boolean hasMove;
-            boolean hasEmptyHexMove;
-            hasEmptyHexMove = false;
-            hasMove = false;
+            boolean hasMove = false;
+            boolean hasEmptyHexMove = false;
             Log.debug("Considering combined move number: " + iter);
             for (int i = 0; i < all_legionMoves.size(); i++)
             {
                 List legionMoves = (List)all_legionMoves.get(i);
-                LegionBoardMove lm = (LegionBoardMove)legionMoves.get(li.index(i));
+                LegionBoardMove lm = (LegionBoardMove)legionMoves.get(
+                        li.index(i));
                 String hex = lm.toHex;
                 Log.debug(lm.markerId + " moves to " + lm.toHex);
                 if (hexes.contains(hex))
@@ -1565,7 +1564,8 @@ public class RationalAI implements AI
         for (int i = 0; i < all_legionMoves.size(); i++)
         {
             List legionMoves = (List)all_legionMoves.get(i);
-            LegionBoardMove lm = (LegionBoardMove)legionMoves.get(best_move.index(i));
+            LegionBoardMove lm = (LegionBoardMove)legionMoves.get(
+                    best_move.index(i));
             LegionInfo legion = client.getLegionInfo(lm.markerId);
             Log.debug("Had conflict. Optimum move for " + lm.markerId +
                     " is " + lm.toHex);
@@ -1573,7 +1573,6 @@ public class RationalAI implements AI
             {
                 bestMoves.add(lm);
             }
-
         }
 
         // apply moves.  go to empty hexes first.
@@ -1589,19 +1588,13 @@ public class RationalAI implements AI
             while (bm.hasNext())
             {
                 LegionBoardMove lm = (LegionBoardMove)bm.next();
-                // first make moves which are not going to hexes
-                // currently occupied by our legions
-                if (!occupiedHexes.contains(lm.toHex) ||
-                        lm.fromHex.equals(lm.toHex))
+                boolean moved_legion = doMove(lm.markerId, lm.toHex);
+                if (moved_legion)
                 {
-                    boolean moved_legion = doMove(lm.markerId, lm.toHex);
-                    if (moved_legion)
-                    {
-                        occupiedHexes.remove(lm.fromHex); // hex is now free
-                        occupiedHexes.add(lm.toHex);
-                        bm.remove(); // move has been made
-                        moved = true;
-                    }
+                    occupiedHexes.remove(lm.fromHex); // hex is now free
+                    occupiedHexes.add(lm.toHex);
+                    bm.remove(); // move has been made
+                    moved = true;
                 }
             }
             tries++;
@@ -1614,7 +1607,6 @@ public class RationalAI implements AI
     {
         // Don't *know* move succeeded without asking server.
         boolean moved = client.doMove(markerId, hexLabel);
-
         return moved;
     }
 
