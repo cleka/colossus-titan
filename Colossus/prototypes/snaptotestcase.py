@@ -83,7 +83,9 @@ class snapHandler(DefaultHandler):
 
     def endHistory(self):
         self.printLeaves()
-        if not options.python:
+        if options.python:
+            print '        print "\\ntest %s ends"' % (options.testcase,)
+        else:
             print '    }'
 
     def startReveal(self, attrs):
@@ -214,14 +216,14 @@ class snapHandler(DefaultHandler):
             if self.printTurn():
                 print '        turn = %s' % (self.turn,)
                 print '        print "\\nTurn", turn'
-            print '        aps.getLeaf("%s").merge(aps.getLeaf("%s"), turn)' % (
-                self.survivorId, self.splitoffId)
+            print '        aps.getLeaf("%s").merge(aps.getLeaf("%s"), 
+                turn)' % (self.survivorId, self.splitoffId)
         else:
             if self.printTurn():
                 print '        turn = %s;' % (self.turn,)
                 print '        Log.debug("Turn " + turn);'
-            print '        aps.getLeaf("%s").merge(aps.getLeaf("%s"), turn);' % (
-                self.survivorId, self.splitoffId)
+            print '        aps.getLeaf("%s").merge(aps.getLeaf("%s"), 
+                turn);' % (self.survivorId, self.splitoffId)
         self.doneTurn[self.turn] = 1
 
 

@@ -913,7 +913,7 @@ class PredictSplitsTestCase(unittest.TestCase):
                 Rd03 recruits Tro with 2xOgr
                 Rd04 recruits Lio with 2xCen
         Turn 6  Rd02 splits off Gar, Gar into Rd05
-                Rd01 attacks and is revealed as Tit, Wlk, Wlk, Cyc, Tro, Gar, Gar
+                Rd01 attacks and is revealed: Tit, Wlk, Wlk, Cyc, Tro, Gar, Gar
                 Angel summoned from Rd02 into Rd01
                 2xGar killed, Rd01 revealed as Tit, Ang, Wlk, Wlk, Cyc, Tro
                 Rd02 recruits Min with 2xLio
@@ -989,8 +989,8 @@ class PredictSplitsTestCase(unittest.TestCase):
 
         turn = 4
         print "Turn", turn
-        ps.getLeaf("Rd10").revealCreatures(["Titan", "Ranger", "Troll", "Troll",
-            "Gargoyle", "Ogre", "Ogre"])
+        ps.getLeaf("Rd10").revealCreatures(["Titan", "Ranger", "Troll", 
+            "Troll", "Gargoyle", "Ogre", "Ogre"])
         ps.printLeaves()
         ps.getLeaf("Rd10").removeCreature("Gargoyle")
         ps.getLeaf("Rd11").removeCreature("Angel")
@@ -1137,7 +1137,8 @@ class PredictSplitsTestCase(unittest.TestCase):
         ps.getLeaf("Rd11").addCreature("Ranger")
         ps.getLeaf("Rd08").revealCreatures(["Lion", "Lion", "Centaur",
                 "Centaur"])
-        ps.getLeaf("Rd08").removeCreatures(["Lion", "Lion", "Centaur", "Centaur"])
+        ps.getLeaf("Rd08").removeCreatures(["Lion", "Lion", "Centaur", 
+                "Centaur"])
         assert(not ps.getLeaf("Rd04").allCertain())
         assert(not ps.getLeaf("Rd05").allCertain())
         assert(ps.getLeaf("Rd06").allCertain())
@@ -1471,7 +1472,7 @@ class PredictSplitsTestCase(unittest.TestCase):
         n.revealCreatures(['Gargoyle', 'Gargoyle'])
         print n
         assert(n.allCertain())
-        print "\ntest 7 ends"
+        print "test 7 ends"
 
 
 if __name__ == "__main__":
