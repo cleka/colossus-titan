@@ -791,6 +791,7 @@ public class PredictSplitNode implements Comparable
                 // the splitoff from the origNode, just add creatures from nodeB
                 nodeA.creatures.addAll(nodeB.creatures);
                 origNode.childSize2 = nodeA.getHeight();
+                origNode.child1=thirdLegion;
             }
             else
             {
