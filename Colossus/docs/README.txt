@@ -1,12 +1,10 @@
-Colossus alpha     April 25, 2001    Copyright 2001 David Ripton
+Colossus alpha     May 7, 2001    Copyright 2001 David Ripton
 
 Colossus is an attempt at a Java clone of Avalon Hill's Titan(tm) boardgame.
 
-It's not done yet.  Right now it only allows hotseat play.  I'll do client /
-server network play next, after getting bored fixing bugs in the hotseat game.
-I do not intend to add internal computer players, but I'll publish the
-server socket interface so that anyone who wants to can write a client-side
-bot.
+It's not done yet.  Right now it only allows hotseat play.  A computer player
+is under active development, and can play some phases of the game pretty well,
+but it's not done yet.  We'll do client / server network play next.
 
 This program is freeware, distributed under the GNU public license, which
 is included in the file COPYING.GPL.  This means that you have the right to
@@ -22,16 +20,15 @@ Running the game requires the following:
    lets you compile Java programs, not just run them.
 
    (Colossus used to run under JDK 1.1, but I recently made some
-   changes that break backwards compatibility.  Sorry, but those
-   changes were necessary to plug some major memory leaks, make
-   popup menus show up properly under Linux and Solaris, etc.)
+   necessary changes that broke backwards compatibility.  Sorry.)
 
    Colossus should also run as an applet in a web browser, as long
    as your browser is new enough to support JDK 1.2 applets.  That
    probably means downloading a recent version of Sun's Java plug-in
    (included with the JRE), since most browsers come with out-of-date
    Java virtual machines.  If you're downloading the JRE, you might
-   as well use the JRE itself rather than the plug-in.
+   as well use the JRE itself rather than the plug-in.  So running
+   as an applet is not really recommended.
 
    Win32, Solaris, and x86 Linux versions of the JDK and JRE are
    freely downloadable from java.sun.com.  Another Linux port is
@@ -211,10 +208,10 @@ the winner; if the game ends with a mutual elimination, it's a draw.
 Improvements:
 
 If you find any bugs that you think I can fix, please let me know, in
-as much detail as possible.  The ones I know about should be in BUGLIST.txt
-
-The features that I'm planning to add are in TODO.txt  Other people can
-also make improvements.
+as much detail as possible.  (In particular, include the OS and JVM version.)
+The best way to report bugs is via the bug tracker at SourceForge --
+go to http://colossus.sourceforge.net, click on the SourceForge icon,
+click on tracker, and click on bugs.
 
 Java is still evolving, and the JDK itself still has plenty of bugs,
 especially in the AWT.  You can vote for the ones that you find most

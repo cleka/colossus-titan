@@ -4,6 +4,7 @@ import java.util.*;
  *  Generic Minimax with alpha-beta pruning
  *  also supports averaging for games with randomness
  *
+ *  @version $Id$
  *  @author Bruce Sherrod
  */
 class Minimax

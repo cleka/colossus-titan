@@ -2,6 +2,8 @@ import java.io.*;
 
 /**
  * Class SaveGameFilter implements a FilenameFilter for savegames.
+ * @author David Ripton
+ * @version $Id$
  */
 
 public final class SaveGameFilter extends javax.swing.filechooser.FileFilter

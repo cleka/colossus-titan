@@ -1,7 +1,7 @@
 /**
  *
  * Simple implementation of a Titan AI
- *
+ * @version $Id$
  * @author Bruce Sherrod
  *
  *
@@ -19,13 +19,20 @@ class SimpleAI implements AI
 
     public void muster (Game game)
     {
+        // Do not recruit if this legion is a scooby snack.
+        double scoobySnackFactor = 0.15;
+        int minimumSizeToRecruit = (int)(scoobySnackFactor * 
+            game.getAverageLegionPointValue());
+
         Player player = game.getActivePlayer();
         List legions = player.getLegions();
         Iterator it = legions.iterator();
         while (it.hasNext())
         {
             Legion legion = (Legion)it.next();
-            if (legion.hasMoved() && legion.canRecruit())
+            if (legion.hasMoved() && legion.canRecruit() && 
+                (legion.numCreature(Creature.titan) >= 1 || 
+                legion.getPointValue() >= minimumSizeToRecruit))
             {
 		Creature recruit = chooseRecruit(game,legion, legion.getCurrentHex());
                 if (recruit != null)

@@ -1411,29 +1411,22 @@ public final class MasterBoard extends JPanel implements MouseListener,
 
     public void loadInitialMarkerImages()
     {
-        Collection players = game.getPlayers();
-        Iterator it = players.iterator();
-        while (it.hasNext())
+        Collection legions = game.getAllLegions();
+        for (Iterator it = legions.iterator(); it.hasNext();)
         {
-            Player player = (Player)it.next();
-            Collection legions = player.getLegions();
-            Iterator it2 = legions.iterator();
-            while (it2.hasNext())
+            Legion legion = (Legion)it.next();
+            int chitScale = 3 * scale;
+            // Avoid scaling chits at all if possible.
+            if (chitScale >= 50 && chitScale <= 70)
             {
-                Legion legion = (Legion)it2.next();
-                int chitScale = 3 * scale;
-                // Avoid scaling chits at all if possible.
-                if (chitScale >= 50 && chitScale <= 70)
-                {
-                    chitScale = 60;
-                }
-                Marker marker = new Marker(chitScale, legion.getImageName(),
-                    this, null);
-                legion.setMarker(marker);
-                MasterHex hex = legion.getCurrentHex();
-                hex.alignLegions();
-                moveMarkerToBottom(legion);
+                chitScale = 60;
             }
+            Marker marker = new Marker(chitScale, legion.getImageName(),
+                this, null);
+            legion.setMarker(marker);
+            MasterHex hex = legion.getCurrentHex();
+            hex.alignLegions();
+            moveMarkerToBottom(legion);
         }
     }
 

@@ -4,6 +4,7 @@ import java.util.*;
  *
  * Class Careture represents the caretaker's stacks
  *
+ * @version $Id$
  * @author Bruce Sherrod
  */
 

@@ -2768,7 +2768,7 @@ public final class Game
             return;
         }
 
-        // TODO Generalize this so that it works with either
+        // TODO: Generalize this so that it works with either
         // GUI or AI.
         SplitLegion.splitLegion(masterFrame, legion,
             player.getOption(autoPlay) ||
@@ -3209,6 +3209,35 @@ public final class Game
                 break;
         }
     }
+
+
+    /** Return a list of all players' legions. */
+    public List getAllLegions()
+    {
+        ArrayList list = new ArrayList();
+        for (Iterator it = players.iterator(); it.hasNext();)
+        {
+            Player player = (Player)it.next();
+            list.addAll((ArrayList)player.getLegions());
+        }
+        return list;
+    }
+
+
+    /** Get the average point value of all legions in the game. This is 
+     *  somewhat of a cheat. */
+    public int getAverageLegionPointValue()
+    {
+        int total = 0;
+        List legions = getAllLegions();
+        for (Iterator it = legions.iterator(); it.hasNext();)
+        {
+            Legion legion = (Legion)it.next();
+            total += legion.getPointValue();
+        }
+        return total / legions.size();
+    }
+
 
     public static void main(String [] args)
     {

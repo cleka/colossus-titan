@@ -1,6 +1,8 @@
 
 /**
  * interface to allow for multiple AI implementations
+ * 
+ * @version $Id$
  */
 public interface AI
 {
