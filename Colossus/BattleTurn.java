@@ -138,6 +138,9 @@ System.out.println("placeNewChit");
         {
             advancePhase();
         }
+
+        // Bring the BattleMap back to the front.
+        map.show();
     }
 
 
