@@ -10,9 +10,7 @@ Add remaining command-line options.
 
 Save/load/test scale.
 
-Add code to recognize alt towers as towers, show overlays for alt
-   hills/mountains/towers for Badlands-JDG
-TundraAlt not used in standard Badlands?
+Validate LOS for level 3 hexes in Badlands-JDG.
 
 Bug: All stacks visible is broken.
 
@@ -29,6 +27,10 @@ Bug: No T2T teleport on first turn only works for first player?
 
 Bug: Need to redo caretaker stack display when "Use black overlay on Chits"
    is flipped.
+
+Bug: Chit-sized white space over map's terrain label in top left corner of
+   map.  Minimize/restore doesn't fix.  Presumably a null chit is being 
+   painted.
 
 Change Quit button in GetPlayers dialog to Cancel.  Go back to existing 
    game if there is one from Cancel, or quit if just starting.  Eliminate
