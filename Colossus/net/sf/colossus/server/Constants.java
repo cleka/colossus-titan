@@ -121,7 +121,7 @@ public final class Constants
     public static final String battlemapIconSubscript = "Battle";
 
     // XXX Not used everywhere yet, so don't change it.
-    public static final int MAX_PLAYERS = 6;
+    public static final int DEFAULT_MAX_PLAYERS = 6;
 
     // Player types
     public static final String human = "Human";

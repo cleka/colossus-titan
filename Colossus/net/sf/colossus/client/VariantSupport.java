@@ -26,7 +26,7 @@ public final class VariantSupport
     private static Document varREADME = null;
     private static java.util.List dependUpon = null;
     private static boolean loadedVariant = false;
-
+    private static int maxPlayers = Constants.DEFAULT_MAX_PLAYERS;
 
     /**
      * Load a Colossus Variant by name.
@@ -89,6 +89,14 @@ public final class VariantSupport
                 String[] data = new String[4];
                 data[0] = data[1] = data[2] = data[3] = null;
                 while (vl.oneLine(data) >= 0) {}
+                if (vl.maxPlayers > 0)
+                {
+                    maxPlayers = vl.maxPlayers;
+                }
+                else
+                {
+                    maxPlayers = Constants.DEFAULT_MAX_PLAYERS;
+                }
                 varDirectory = tempVarDirectory;
                 variantName = tempVarName;
                 if (data[VariantLoader.MAP_INDEX] != null)
@@ -141,6 +149,7 @@ public final class VariantSupport
             mapName = Constants.defaultMAPFile;
             recruitName = Constants.defaultTERFile;
             creaturesName = Constants.defaultCREFile;
+            maxPlayers = Constants.DEFAULT_MAX_PLAYERS;
             varREADME = null;
         }
 
@@ -263,5 +272,11 @@ public final class VariantSupport
             Log.error("Recruit-per-terrain loading failed : " + e);
             System.exit(1);
         }
+    }
+
+    /** get maximum number of players in that variant */
+    public static int getMaxPlayers()
+    {
+        return maxPlayers;
     }
 }

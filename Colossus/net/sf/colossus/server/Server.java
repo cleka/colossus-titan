@@ -11,7 +11,7 @@ import net.sf.colossus.client.IClient;
 import net.sf.colossus.client.Client;
 import net.sf.colossus.client.Proposal;
 import net.sf.colossus.parser.TerrainRecruitLoader;
-
+import net.sf.colossus.client.VariantSupport;
 
 /**
  *  Class Server lives on the server side and handles all communcation with
@@ -49,7 +49,7 @@ public final class Server implements IServer
 
     // Network stuff
     private ServerSocket serverSocket;
-    private Socket [] clientSockets = new Socket[Constants.MAX_PLAYERS];
+    private Socket [] clientSockets = new Socket[VariantSupport.getMaxPlayers()];
     private int numClients;
     private int maxClients;
 
@@ -74,7 +74,7 @@ Log.debug("About to create server socket on port " + port);
                 serverSocket.close();
                 serverSocket = null;
             }
-            serverSocket = new ServerSocket(port, Constants.MAX_PLAYERS);
+            serverSocket = new ServerSocket(port, VariantSupport.getMaxPlayers());
         }
         catch (IOException ex)
         {

@@ -171,7 +171,7 @@ Log.debug("Called Game.initServer()");
         }
         // Quit if values are bogus.
         if (numHumans < 0 || numAIs < 0 || numNetworks < 0 ||
-            numHumans + numAIs + numNetworks > Constants.MAX_PLAYERS)
+            numHumans + numAIs + numNetworks > VariantSupport.getMaxPlayers())
         {
             Log.error("Illegal number of players");
             options.clear();
@@ -209,7 +209,7 @@ Log.debug("Called Game.initServer()");
 
     private void addPlayersFromOptions()
     {
-        for (int i = 0; i < Constants.MAX_PLAYERS; i++)
+        for (int i = 0; i < VariantSupport.getMaxPlayers(); i++)
         {
             String name = options.getStringOption(Options.playerName + i);
             String type = options.getStringOption(Options.playerType + i);

@@ -21,6 +21,7 @@ public class VariantLoader
     public static final int CRE_INDEX = 1;
     public static final int TER_INDEX = 2;
     public static final int DEPEND_INDEX = 3;
+    public int maxPlayers = -1;
 }
 
 PARSER_END(VariantLoader)
@@ -103,9 +104,42 @@ void v_depend(String[] ls) :
     { ls[DEPEND_INDEX] = fn; }
 }
 
+TOKEN :
+{
+    < NUMBER : (<DIGIT>)+ >
+|   < #DIGIT: ["0" - "9"] >
+}
+
+TOKEN :
+{
+    < MAXPLAYERS: "MAXPLAYERS" >
+}
+
+
+int v_number() :
+{}
+{
+    <NUMBER>
+    {
+        return(Integer.parseInt(token.image));
+    }
+}
+
+int v_maxplayers() :
+{
+    int temp;
+}
+{
+    <MAXPLAYERS> (temp = v_number())
+    {
+        return temp;
+    }
+}
+
 int oneLine(String[] ls) :
 {
     String s;
+    int mp;
 }
 {
     v_map(ls)      
@@ -123,6 +157,10 @@ int oneLine(String[] ls) :
 |   v_depend(ls)      
     {
         return(1);
+    }
+|   (mp = v_maxplayers()) 
+    {
+        maxPlayers = mp;
     }
 |   <EOL>
     {
