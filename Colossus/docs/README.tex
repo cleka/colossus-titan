@@ -28,12 +28,12 @@ please send me a copy so that I can fold them into the master code.
 
 \section{Game requirements}
 
-A 1.2 (aka ``Java 2'') or later version of a JRE (Java runtime environment) 
-or JDK (Java development kit). 
+A 1.3 or later version of a JRE (Java runtime environment) or JDK (Java development kit). 
 
-(Colossus will not run under JRE 1.0.x or 1.1.x It won't currently run 
-as an applet in a web browser. The obsolete Microsoft JVM that's bundled
-with IE and Windows won't work. Sorry.)
+(Colossus will not run under JRE 1.0.x or 1.1.x or 1.2.x  [We just broke 1.2
+support when we started using PNG files.]  It won't currently run as an applet 
+in a web browser. The obsolete Microsoft JVM that's bundled with IE and Windows 
+won't work. Sorry.)
 
 Windows, Solaris, and x86 Linux versions of the JRE and JDK are freely 
 downloadable from \htmladdnormallink{http://java.sun.com}{http://java.sun.com}.
@@ -47,16 +47,17 @@ The Mac version is at
 Info on other ports (AIX, OS/2, etc.) is at 
 \htmladdnormallink{http://java.sun.com/cgi-bin/java-ports.cgi}{http://java.sun.com/cgi-bin/java-ports.cgi}
 
-The current recommended version is Sun JRE 1.3.1.
+The current recommended version is Sun JRE 1.4.0 on platforms that have it, 
+(Windows, x86 Linux, Solaris) and 1.3.1 on platforms that don't.  (We know 
+of some GUI bugs in 1.3.1 for Linux that are fixed in 1.4.0.)
 
-If in doubt, you probably want:
-\htmladdnormallink{http://java.sun.com/j2se/1.3/jre/download-windows.html}{http://java.sun.com/j2se/1.3/jre/download-windows.html}
+If in doubt, you probably want to visit:
+\htmladdnormallink{http://java.sun.com/j2se/1.4/download.html}{http://java.sun.com/j2se/1.4/download.html}
 
-You also need a computer with a mouse and a color display. I'm not 
-sure exactly what the minimum system spec is anymore. A Pentium
-133 with 64MB is slow but works. If you try the game on something 
-slower or with less memory, please let me know your system specs
-and how well it worked.
+You also need a computer with a mouse and a color display.  The minimum
+system spec is about a Pentium 133 with 64MB.  The recommended system
+is about a 300 MHz CPU and 128MB.  It's free, so if you don't know if
+your system is fast enough, just try it.
 
 \section{Getting the program to run}
 
@@ -73,7 +74,7 @@ inside. Try double-clicking on Colossus.jar in your GUI file manager.
 If that doesn't work, pop up a command prompt, cd to the directory where 
 you unzipped the zip file, and try typing ``java -jar Colossus.jar''
 
-Yet another option, in case the jar file is temporarily broken for some 
+Yet another option, in case the jar file is temporarily broken for some
 reason, is to expand the whole game tree and run the Start class manually. 
 Unzip the zip file and try ``java net.sf.colossus.server.Start''
 
@@ -87,21 +88,25 @@ something like its original form.)
 
 Once you get things running, a dialog should pop up, allowing you to
 choose up to six player types (human, AI, or not present) and their names.
-When you're done, click ``OK'' Another dialog will pop up, telling you which 
-tower each player gets and letting players pick colors in increasing order 
-of tower number. Pick colors for each player. If you misclick, click
-``Restart'' When every player has a color, click ``Done''
+You can also choose a variant.  When you're done, click ``OK'' 
+
+Another dialog will pop up, telling you which tower each player gets and 
+letting players pick colors in increasing order of tower number. Pick colors 
+for each human player. If you misclick, click ``Restart'' When every player 
+has a color, click ``Done''
 
 Now a window will pop up for each player, letting him pick his initial legion
 marker. Pick one. (If you really don't care, use the ``Auto pick markers''
-option on the Player menu.)
+option on the Player menu.)  (NOTE: This is currently broken -- each player
+is automatically assigned a first legion marker even if ``Auto pick markers''
+is off.)
 
 After each player has picked his initial legion marker, the MasterBoard window
 will pop up. You'll see each player's initial legion marker sitting in a
 tower hex. You'll also see a small window in the lower right corner of the
 screen. This is the Game Status window, which tracks each player's score,
 number of legion markers remaining, etc. And there's a Caretaker window which 
-tracks how many of each creature remain in the stacks. (These are optional: 
+tracks how many of each creature remain in the stacks. (These are both optional: 
 turn them on or off from the Graphics menu.)
 
 You can right-click (or control-click if you have a one-button mouse) on a 
