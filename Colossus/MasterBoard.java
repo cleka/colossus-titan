@@ -1416,7 +1416,7 @@ class MasterBoard extends Frame implements MouseListener,
                                         }
                                         else
                                         {
-                                            legion.revealTeleportingLord();
+                                            legion.revealTeleportingLord(this);
                                         }
                                     }
 
