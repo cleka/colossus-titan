@@ -12,14 +12,14 @@ public final class Marker extends Chit
     private Font oldFont;
     private int fontHeight;
     private int fontWidth;
-    private Legion legion;
+    private Client client;
 
 
-    public Marker(int scale, String id, Container container, Legion legion)
+    public Marker(int scale, String id, Container container, Client client)
     {
         super(scale, id, container);
         setBackground(Color.black);
-        this.legion = legion;
+        this.client = client;
     }
 
 
@@ -42,12 +42,12 @@ public final class Marker extends Chit
         Rectangle rect = getBounds();
         g.drawRect(rect.x, rect.y, rect.width, rect.height);
 
-        if (legion == null)
+        if (client == null)
         {
             return;
         }
 
-        String height = Integer.toString(legion.getHeight());
+        String height = Integer.toString(client.getLegionHeight(getId()));
 
         // Construct a font 1.5 times the size of the current font.
         if (font == null)

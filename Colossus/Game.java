@@ -1964,8 +1964,12 @@ public final class Game
 
         // Recruits are one to a customer.
         legion.setRecruitName(recruit.getName());
-        legion.getPlayer().setLastLegionRecruited(legion);
+
+        Client.pushUndoStack(legion.getMarkerId());
+
+        server.allRepaintHex(legion.getCurrentHexLabel());
     }
+
 
     /** Return a list of names of angel types that can be acquired. */
     public ArrayList findEligibleAngels(Legion legion, boolean archangel)
@@ -2418,7 +2422,7 @@ public final class Game
             }
         }
         engagementInProgress = false;
-        server.allHighlightEngagements();
+        server.highlightEngagements(getActivePlayerName());
         server.allUpdateStatusScreen();
     }
 
@@ -2677,9 +2681,17 @@ public final class Game
         }
         int otherSet = (thisPlayerSet + 1) & 1;
 
+        // If this player wants to fight, cancel negotiations.
+        if (offer.isFight())
+        {
+            Legion attacker = getLegionByMarkerId(offer.getAttackerId());
+            String hexLabel = attacker.getCurrentHexLabel();
+            fight(hexLabel);
+        }
+
         // If this offer matches an earlier one from the other player,
         // settle the engagement.
-        if (offers[otherSet].contains(offer))
+        else if (offers[otherSet].contains(offer))
         {
             handleNegotiation(offer);
         }
@@ -2752,7 +2764,7 @@ public final class Game
         // defender flees or the attacker concedes before entering
         // the battle.
         engagementInProgress = false;
-        server.allHighlightEngagements();
+        server.highlightEngagements(getActivePlayerName());
     }
 
 
@@ -2879,7 +2891,7 @@ public final class Game
             }
         }
         engagementInProgress = false;
-        server.allHighlightEngagements();
+        server.highlightEngagements(getActivePlayerName());
     }
 
 

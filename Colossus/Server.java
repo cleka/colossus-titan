@@ -197,25 +197,17 @@ public final class Server
         }
     }
 
-    public void allHighlightEngagements()
+    public void highlightEngagements(String playerName)
     {
-        Iterator it = clients.iterator();
-        while (it.hasNext())
-        {
-            Client client = (Client)it.next();
-            client.highlightEngagements();
-        }
+        Client client = getClient(playerName);
+        client.highlightEngagements();
     }
 
 
-    public void allHighlightCarries()
+    public void highlightCarries(String playerName)
     {
-        Iterator it = clients.iterator();
-        while (it.hasNext())
-        {
-            Client client = (Client)it.next();
-            client.highlightCarries();
-        }
+        Client client = getClient(playerName);
+        client.highlightCarries();
     }
 
 
@@ -541,6 +533,19 @@ public final class Server
         client1.askNegotiate(attacker, defender);
         Client client2 = getClient(defender.getPlayerName());
         client2.askNegotiate(attacker, defender);
+    }
+
+
+    // XXX temp
+    public void negotiate(String playerName, NegotiationResults results)
+    {
+        game.negotiate(playerName, results);
+    }
+
+
+    public void fight(String hexLabel)
+    {
+        game.fight(hexLabel);
     }
 
 

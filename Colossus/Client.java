@@ -195,10 +195,16 @@ public final class Client
         return false;
     }
 
-    /** Cease negotiations and fight a battle in land. */
-    boolean fight(String land)
+    // XXX temp
+    void negotiate(NegotiationResults results)
     {
-        return false;
+        server.negotiate(playerName, results);
+    }
+
+    /** Cease negotiations and fight a battle in land. */
+    void fight(String land)
+    {
+        server.fight(land);
     }
 
     /** Move offboard unit to hex. */
@@ -566,8 +572,20 @@ public final class Client
     public void addMarker(String markerId)
     {
         Marker marker = new Marker(3 * Scale.get(), markerId,
-            board.getFrame(), server.getGame().getLegionByMarkerId(markerId));
+            board.getFrame(), this);
         setMarker(markerId, marker);
+    }
+
+
+    // TODO Cache legion heights on client side?
+    public int getLegionHeight(String markerId)
+    {
+        Legion legion = server.getGame().getLegionByMarkerId(markerId);
+        if (legion != null)
+        {
+            return legion.getHeight();
+        }
+        return 0;
     }
 
     /** Add the marker to the end of the list.  If it's already
@@ -604,7 +622,7 @@ public final class Client
     /** Get the BattleChit with this tag. */
     public BattleChit getBattleChit(int tag)
     {
-        Iterator it = markers.iterator();
+        Iterator it = battleChits.iterator();
         while (it.hasNext())
         {
             BattleChit chit = (BattleChit)it.next();
@@ -881,18 +899,26 @@ public final class Client
 
     public boolean askFlee(Legion defender, Legion attacker)
     {
-        return Concede.flee(board.getFrame(), defender, attacker);
+        return Concede.flee(this, board.getFrame(), defender, attacker);
     }
 
     public boolean askConcede(Legion ally, Legion enemy)
     {
-        return Concede.concede(board.getFrame(), ally, enemy);
+        return Concede.concede(this, board.getFrame(), ally, enemy);
     }
 
     public void askNegotiate(Legion attacker, Legion defender)
     {
-        NegotiationResults results =
-            Negotiate.negotiate(board.getFrame(), attacker, defender);
+        NegotiationResults results = Negotiate.negotiate(this,
+            board.getFrame(), attacker, defender);
+        if (results.isFight())
+        {
+            fight(attacker.getCurrentHexLabel());
+        }
+        else
+        {
+            negotiate(results);
+        }
     }
 
     public void setBattleDiceValues(String attackerName, String defenderName,

@@ -80,8 +80,6 @@ Win98, 1.4b: Chits are placed slightly off-center in battle hexes.
 
 
 
-New legions' heights are not shown on markers.  Initial / loaded legions ok.
-
 Players can skip movement phase.  Error check is missing.
 
 Need to allow first human player to control game options, load game, etc.
@@ -92,7 +90,6 @@ Undo split: "Could not find hex Gd08."  Pushing wrong thing on to undostack,
 Undo move: legion teleported to a new hex and grew to 10 critters.  (Bogus
    recombine with its parent when playing with undosplit?)
 
-Need to check for empty undostack on undo.
+Need to repaint hex with stack that recruits, to update height on marker.
 
-Don't select/unselect hexes on other players' boards, just the active player's.
-
+Critters entering battle can only move one hex.  Neighbors broken?

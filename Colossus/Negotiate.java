@@ -24,7 +24,8 @@ public final class Negotiate extends JDialog implements MouseListener,
     private static NegotiationResults results;
 
 
-    private Negotiate(JFrame parentFrame, Legion attacker, Legion defender)
+    private Negotiate(Client client, JFrame parentFrame, Legion attacker,
+        Legion defender)
     {
         super(parentFrame, attacker.getLongMarkerName() + " Negotiates with " +
             defender.getLongMarkerName(), true);
@@ -49,7 +50,7 @@ public final class Negotiate extends JDialog implements MouseListener,
         int scale = 4 * Scale.get();
 
         attackerMarker = new Marker(scale, attacker.getImageName(),
-            this, attacker);
+            this, client);
         constraints.gridx = GridBagConstraints.RELATIVE;
         constraints.gridy = 0;
         constraints.gridwidth = 1;
@@ -72,7 +73,7 @@ public final class Negotiate extends JDialog implements MouseListener,
         }
 
         defenderMarker = new Marker(scale, defender.getImageName(),
-            this, defender);
+            this, client);
         constraints.gridx = GridBagConstraints.RELATIVE;
         constraints.gridy = 1;
         constraints.gridwidth = 1;
@@ -145,10 +146,10 @@ public final class Negotiate extends JDialog implements MouseListener,
     /** Display a dialog allowing one player to offer a settlement to
      *  an engagement.  Return a NegotiationResults.
      */
-    public static NegotiationResults negotiate(JFrame parentFrame,
-        Legion attacker, Legion defender)
+    public static NegotiationResults negotiate(Client client,
+        JFrame parentFrame, Legion attacker, Legion defender)
     {
-        new Negotiate(parentFrame, attacker, defender);
+        new Negotiate(client, parentFrame, attacker, defender);
         return results;
     }
 
@@ -343,7 +344,7 @@ public final class Negotiate extends JDialog implements MouseListener,
         player.addLegion(defender);
         client.addMarker(selectedMarkerId);
 
-        Negotiate.negotiate(frame, attacker, defender);
+        Negotiate.negotiate(client, frame, attacker, defender);
         System.exit(0);
     }
 }

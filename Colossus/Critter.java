@@ -372,7 +372,7 @@ public final class Critter extends Creature implements Comparable
     public void moveToHex(BattleHex hex)
     {
         currentHexLabel = hex.getLabel();
-        battle.setLastCritterMoved(this);
+        Client.pushUndoStack(currentHexLabel);
         Set set = new HashSet();
         set.add(startingHexLabel);
         set.add(currentHexLabel);
@@ -863,7 +863,7 @@ public final class Critter extends Creature implements Comparable
             Log.event(carryDamage + (carryDamage == 1 ?
                 " carry available" : " carries available"));
             battle.setCarryDamage(carryDamage);
-            battle.getGame().getServer().allHighlightCarries();
+            battle.getGame().getServer().highlightCarries(getPlayerName());
         }
 
         // Record that this attacker has struck.

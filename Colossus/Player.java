@@ -557,16 +557,9 @@ public final class Player implements Comparable
             String markerId = (String)Client.popUndoStack();
             Legion legion = getLegionByMarkerId(markerId);
             legion.undoRecruit();
+            // Update number of creatures in status window.
+            game.getServer().allUpdateStatusScreen();
         }
-
-        // Update number of creatures in status window.
-        game.getServer().allUpdateStatusScreen();
-    }
-
-
-    public void setLastLegionRecruited(Legion legion)
-    {
-        Client.pushUndoStack(legion.getMarkerId());
     }
 
 

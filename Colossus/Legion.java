@@ -674,6 +674,7 @@ public final class Legion implements Comparable
             recruitName = null;
             Log.event("Legion " + getLongMarkerName() +
                 " undoes its recruit");
+            game.getServer().allRepaintHex(currentHexLabel);
         }
     }
 
@@ -745,10 +746,7 @@ public final class Legion implements Comparable
 
         void setEntrySide(int side)
         {
-            if (side == 1 || side == 3 || side ==5)
-            {
-                entrySides.add(new Integer(side));
-            }
+            entrySides.add(new Integer(side));
         }
 
         int getNumEntrySides()

@@ -405,7 +405,10 @@ public final class BattleMap extends HexMap implements MouseListener,
         {
             Critter critter = (Critter)critters.get(i);
             BattleChit chit = client.getBattleChit(critter.getTag());
-            chit.setLocation(point);
+            if (chit != null)
+            {
+                chit.setLocation(point);
+            }
             point.x += chitScale4;
             point.y += chitScale4;
         }
@@ -587,10 +590,14 @@ public final class BattleMap extends HexMap implements MouseListener,
     public void mousePressed(MouseEvent e)
     {
         Point point = e.getPoint();
-        BattleChit chit = getBattleChitAtPoint(point);
-        BattleHex hex = getHexContainingPoint(point);
 
-        Critter critter = battle.getCritter(chit.getTag());
+        BattleChit chit = getBattleChitAtPoint(point);
+        Critter critter = null;
+        if (chit != null)
+        {
+            critter = battle.getCritter(chit.getTag());
+        }
+        BattleHex hex = getHexContainingPoint(point);
 
         // Only the active player can move or strike.
         if (critter != null && critter.getPlayerName() ==

@@ -23,8 +23,8 @@ public final class Concede extends JDialog implements ActionListener
     private static boolean answer;
 
 
-    private Concede(JFrame parentFrame, Legion ally, Legion enemy,
-        boolean flee)
+    private Concede(Client client, JFrame parentFrame, Legion ally,
+        Legion enemy, boolean flee)
     {
         super(parentFrame, ally.getPlayerName() + ": " + (flee ?
             "Flee" : "Concede") + " with Legion "  + ally.getLongMarkerName() +
@@ -46,7 +46,7 @@ public final class Concede extends JDialog implements ActionListener
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
         int scale = 4 * Scale.get();
 
-        allyMarker = new Marker(scale, ally.getImageName(), this, ally);
+        allyMarker = new Marker(scale, ally.getImageName(), this, client);
         constraints.gridy = 0;
         constraints.gridwidth = 1;
         gridbag.setConstraints(allyMarker, constraints);
@@ -64,7 +64,7 @@ public final class Concede extends JDialog implements ActionListener
             contentPane.add(chit);
         }
 
-        enemyMarker = new Marker(scale, enemy.getImageName(), this, enemy);
+        enemyMarker = new Marker(scale, enemy.getImageName(), this, client);
         constraints.gridy = 1;
         constraints.gridwidth = 1;
         gridbag.setConstraints(enemyMarker, constraints);
@@ -130,21 +130,21 @@ public final class Concede extends JDialog implements ActionListener
 
 
     /** Return true if the player concedes. */
-    public static boolean concede(JFrame parentFrame, Legion ally,
-        Legion enemy)
+    public static boolean concede(Client client, JFrame parentFrame,
+        Legion ally, Legion enemy)
     {
         answer = false;
-        new Concede(parentFrame, ally, enemy, false);
+        new Concede(client, parentFrame, ally, enemy, false);
         return answer;
     }
 
 
     /** Return true if the player flees. */
-    public static boolean flee(JFrame parentFrame, Legion ally,
+    public static boolean flee(Client client, JFrame parentFrame, Legion ally,
         Legion enemy)
     {
         answer = false;
-        new Concede(parentFrame, ally, enemy, true);
+        new Concede(client, parentFrame, ally, enemy, true);
         return answer;
     }
 
@@ -224,9 +224,9 @@ public final class Concede extends JDialog implements ActionListener
         player.addLegion(defender);
         client.addMarker(selectedMarkerId);
 
-        boolean answer = Concede.flee(frame, defender, attacker);
+        boolean answer = Concede.flee(client, frame, defender, attacker);
         System.out.println("Flee? " + answer);
-        answer = Concede.concede(frame, attacker, defender);
+        answer = Concede.concede(client, frame, attacker, defender);
         System.out.println("Concede? " + answer);
         System.exit(0);
     }

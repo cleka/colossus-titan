@@ -198,16 +198,19 @@ public final class MasterBoard extends JPanel implements MouseListener,
             public void actionPerformed(ActionEvent e)
             {
                 Player player = game.getActivePlayer();
-                if (player.getName() != client.getPlayerName())
+                if (!player.getName().equals(client.getPlayerName()))
                 {
                     return;
                 }
                 // peek at the undo stack so we know where to align
                 String hexLabel = (String)Client.topUndoStack();
-                player.undoLastSplit();
-                alignLegions(hexLabel);
-                highlightTallLegions(player);
-                repaint();
+                if (hexLabel != null)
+                {
+                    player.undoLastSplit();
+                    alignLegions(hexLabel);
+                    highlightTallLegions(player);
+                    repaint();
+                }
             }
         };
 
@@ -216,7 +219,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
             public void actionPerformed(ActionEvent e)
             {
                 Player player = game.getActivePlayer();
-                if (player.getName() != client.getPlayerName())
+                if (!player.getName().equals(client.getPlayerName()))
                 {
                     return;
                 }
@@ -233,7 +236,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
             public void actionPerformed(ActionEvent e)
             {
                 Player player = game.getActivePlayer();
-                if (player.getName() != client.getPlayerName())
+                if (!player.getName().equals(client.getPlayerName()))
                 {
                     return;
                 }
@@ -254,7 +257,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
             public void actionPerformed(ActionEvent e)
             {
                 Player player = game.getActivePlayer();
-                if (player.getName() != client.getPlayerName())
+                if (!player.getName().equals(client.getPlayerName()))
                 {
                     return;
                 }
@@ -268,7 +271,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
             public void actionPerformed(ActionEvent e)
             {
                 Player player = game.getActivePlayer();
-                if (player.getName() != client.getPlayerName())
+                if (!player.getName().equals(client.getPlayerName()))
                 {
                     return;
                 }
@@ -282,7 +285,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
             public void actionPerformed(ActionEvent e)
             {
                 Player player = game.getActivePlayer();
-                if (player.getName() != client.getPlayerName())
+                if (!player.getName().equals(client.getPlayerName()))
                 {
                     return;
                 }
@@ -299,7 +302,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
             public void actionPerformed(ActionEvent e)
             {
                 Player player = game.getActivePlayer();
-                if (player.getName() != client.getPlayerName())
+                if (!player.getName().equals(client.getPlayerName()))
                 {
                     return;
                 }
@@ -337,8 +340,8 @@ public final class MasterBoard extends JPanel implements MouseListener,
         {
             public void actionPerformed(ActionEvent e)
             {
-                Player player = game.getActivePlayer();
-                if (player.getName() != client.getPlayerName())
+                String activePlayerName = game.getActivePlayerName();
+                if (!activePlayerName.equals(client.getPlayerName()))
                 {
                     return;
                 }
@@ -360,7 +363,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
             public void actionPerformed(ActionEvent e)
             {
                 Player player = game.getActivePlayer();
-                if (player.getName() != client.getPlayerName())
+                if (!player.getName().equals(client.getPlayerName()))
                 {
                     return;
                 }
@@ -374,7 +377,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
             public void actionPerformed(ActionEvent e)
             {
                 Player player = game.getActivePlayer();
-                if (player.getName() != client.getPlayerName())
+                if (!player.getName().equals(client.getPlayerName()))
                 {
                     return;
                 }
@@ -388,7 +391,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
             public void actionPerformed(ActionEvent e)
             {
                 Player player = game.getActivePlayer();
-                if (player.getName() != client.getPlayerName())
+                if (!player.getName().equals(client.getPlayerName()))
                 {
                     return;
                 }
@@ -406,7 +409,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
             public void actionPerformed(ActionEvent e)
             {
                 Player player = game.getActivePlayer();
-                if (player.getName() != client.getPlayerName())
+                if (!player.getName().equals(client.getPlayerName()))
                 {
                     return;
                 }
@@ -1460,7 +1463,10 @@ public final class MasterBoard extends JPanel implements MouseListener,
         mi = phaseMenu.add(withdrawFromGameAction);
         mi.setMnemonic(KeyEvent.VK_W);
 
-        highlightTallLegions(player);
+        if (client.getPlayerName().equals(player.getName()))
+        {
+            highlightTallLegions(player);
+        }
     }
 
 
@@ -1503,7 +1509,10 @@ public final class MasterBoard extends JPanel implements MouseListener,
         mi = phaseMenu.add(withdrawFromGameAction);
         mi.setMnemonic(KeyEvent.VK_W);
 
-        highlightUnmovedLegions();
+        if (client.getPlayerName().equals(player.getName()))
+        {
+            highlightUnmovedLegions();
+        }
     }
 
 
@@ -1512,7 +1521,9 @@ public final class MasterBoard extends JPanel implements MouseListener,
         unselectAllHexes();
         requestFocus();
 
-        masterFrame.setTitle(game.getActivePlayerName() + " Turn " +
+        String activePlayerName = game.getActivePlayerName();
+
+        masterFrame.setTitle(activePlayerName + " Turn " +
             game.getTurnNumber() + " : Resolve Engagements ");
 
         phaseMenu.removeAll();
@@ -1528,7 +1539,10 @@ public final class MasterBoard extends JPanel implements MouseListener,
         mi = phaseMenu.add(withdrawFromGameAction);
         mi.setMnemonic(KeyEvent.VK_W);
 
-        highlightEngagements();
+        if (client.getPlayerName().equals(activePlayerName))
+        {
+            highlightEngagements();
+        }
     }
 
 
@@ -1537,7 +1551,9 @@ public final class MasterBoard extends JPanel implements MouseListener,
         unselectAllHexes();
         requestFocus();
 
-        masterFrame.setTitle(game.getActivePlayerName() + " Turn " +
+        String activePlayerName = game.getActivePlayerName();
+
+        masterFrame.setTitle(activePlayerName + " Turn " +
             game.getTurnNumber() + " : Muster Recruits ");
 
         phaseMenu.removeAll();
@@ -1561,7 +1577,10 @@ public final class MasterBoard extends JPanel implements MouseListener,
         mi = phaseMenu.add(withdrawFromGameAction);
         mi.setMnemonic(KeyEvent.VK_W);
 
-        highlightPossibleRecruits();
+        if (client.getPlayerName().equals(activePlayerName))
+        {
+            highlightPossibleRecruits();
+        }
     }
 
 

@@ -62,14 +62,16 @@ public final class Battle
         this.turnNumber = turnNumber;
         this.phase = phase;
 
+        // Set defender's entry side opposite attacker's.
+        int side = getAttacker().getEntrySide(masterHexLabel);
+        Legion defender = getDefender();
+        defender.clearAllEntrySides(masterHexLabel);
+        defender.setEntrySide(masterHexLabel, (side + 3) % 6);
+
         game.getServer().allInitBattleMap(masterHexLabel, this);
 
         terrain = getMasterHex().getTerrain();
         Client.clearUndoStack();
-
-        // Set defender's entry side opposite attacker's.
-        int side = getAttacker().getEntrySide(masterHexLabel);
-        getDefender().setEntrySide(masterHexLabel, (side + 3) % 6);
     }
 
 
@@ -660,19 +662,20 @@ public final class Battle
     }
 
 
-    // XXX Push destination hex label instead of critter
-    public void setLastCritterMoved(Critter critter)
-    {
-        Client.pushUndoStack(critter);
-    }
-
-    // XXX Pop destination hex label instead of critter
     public void undoLastMove()
     {
         if (!Client.isUndoStackEmpty())
         {
-            Critter critter = (Critter)Client.popUndoStack();
-            critter.undoMove();
+            String hexLabel = (String)Client.popUndoStack();
+            Critter critter = getCritter(hexLabel);
+            if (critter != null)
+            {
+                critter.undoMove();
+            }
+            else
+            {
+                Log.error("Undo move error: no critter in " + hexLabel);
+            }
         }
     }
 
