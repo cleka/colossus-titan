@@ -3,12 +3,13 @@ import java.awt.event.*;
 import javax.swing.*;
 
 /**
- * Class Turn holds control buttons. 
+ * Class Turn holds control buttons.
  * @version $Id$
  * @author David Ripton
  */
 
-public class Turn extends JDialog implements ActionListener, WindowListener
+public class Turn extends JDialog implements ActionListener, WindowListener,
+    KeyListener
 {
     private static Game game;
     private static MasterBoard board;
@@ -26,6 +27,7 @@ public class Turn extends JDialog implements ActionListener, WindowListener
         setBackground(Color.lightGray);
 
         addWindowListener(this);
+        addKeyListener(this);
             
         // Move dialog to saved location, or just to the right of board.
         if (location == null)
@@ -234,6 +236,9 @@ public class Turn extends JDialog implements ActionListener, WindowListener
 
     public void actionPerformed(ActionEvent e)
     {
+        // Focus is needed for keyboard input.
+        requestFocus();
+
         Player player = game.getActivePlayer();
 
         if (e.getActionCommand().equals("Undo Last Split"))
@@ -399,10 +404,29 @@ public class Turn extends JDialog implements ActionListener, WindowListener
             }
         }
     }
+    
+
+    /** Allow keyboard shortcuts for most button actions. */ 
+    public void keyTyped(KeyEvent e)
+    {
+        char ch = e.getKeyChar();
+        Game.logEvent("Turn got key input:" + ch);
+    }
+
+    public void keyPressed(KeyEvent e)
+    {
+    }
+    
+    public void keyReleased(KeyEvent e)
+    {
+    }
+
+
 
 
     public void windowActivated(WindowEvent e)
     {
+        requestFocus();
     }
 
     public void windowClosed(WindowEvent e)
@@ -419,6 +443,7 @@ public class Turn extends JDialog implements ActionListener, WindowListener
 
     public void windowDeiconified(WindowEvent e)
     {
+        requestFocus();
     }
 
     public void windowIconified(WindowEvent e)
@@ -427,6 +452,7 @@ public class Turn extends JDialog implements ActionListener, WindowListener
 
     public void windowOpened(WindowEvent e)
     {
+        requestFocus();
     }
 
 
@@ -440,5 +466,12 @@ public class Turn extends JDialog implements ActionListener, WindowListener
     public Dimension getPreferredSize()
     {
         return getMinimumSize();
+    }
+
+
+    /** Required for keyboard input. */
+    public boolean isFocusTraversable()
+    {
+        return true;
     }
 }
