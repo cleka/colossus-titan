@@ -124,10 +124,6 @@
                 manifest="META-INF/MANIFEST.MF"
                 includes="**/*.class,
                     **/*.gif,
-                    StrategicMap.map,
-                    Recruit.ter,
-                    Creature.cre,
-                    Default.var,
                     version,
                     Battlelands/*,
                     Default/*"
