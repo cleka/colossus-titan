@@ -1,20 +1,22 @@
-<?xml version="1.0" encoding="utf-8"?>
-     <!-- JNLP File for Colossus -->
-     <jnlp
-       codebase="http://colossus.sf.net/"
-       href="Colossus.jnlp">
-       <application-desc main-class="Start"/>
-       <information>
-         <title>Colossus</title>
+<?xml version="1.0" encoding="utf-8"?> 
+     <!-- JNLP File for Colossus --> 
+     <jnlp 
+       codebase="http://colossus.sf.net/" 
+       href="Colossus.jnlp"> 
+       <application-desc main-class="Start"/> 
+       <information> 
+         <title>Colossus</title> 
          <vendor>David Ripton</vendor>
-         <icon href="Colossus.gif"/>
-         <homepage href="index.html"/>
-       </information>
-       <resources>
-         <jar href="Colossus.jar"/>
-         <j2se version="1.2+"/>
-       </resources>
-       <security>
-           <all-permissions>
-       </security>
-     </jnlp>
+         <icon href="Colossus.gif"/> 
+         <offline-allowed/> 
+         <homepage href="index.html"/> 
+       </information> 
+       <resources> 
+         <jar href="Colossus.jar"/> 
+         <j2se version="1.2+"/> 
+       </resources> 
+       <security> 
+           <all-permissions> 
+       </security> 
+     </jnlp> 
+

@@ -1,3 +1,5 @@
+# $Id$
+
 # Make sure to save this file in Unix rather than DOS endline format, so that
 #    it will continue to work portably.  GNU make has hard-to-diagnose 
 #    problems with spurious ^M characters.
@@ -70,6 +72,11 @@ $(JARFILE): StrategicMapLoader.java TerrainRecruitLoader.java \
 	jar -mcf META-INF/MANIFEST.MF Colossus.jar *.class net/sf/colossus/*.class net/sf/colossus/protocol/*.class images/*.gif StrategicMap.map Recruit.ter
 	chmod +x Colossus.jar
 
+# Sign jar file.  This target uses dripton's key; other developers can
+# make their own and add their own lines to the Makefile.
+signjar : jar
+	jarsigner -keystore driptonKeystore Colossus.jar dripton
+
 INST_JARFILE = $(HTMLDIR)/$(JARFILE)
 INST_README = $(HTMLDIR)/README.txt
 INST_DIST = $(DOWNLOAD_DIR)/$(ZIPFILE)
@@ -80,7 +87,7 @@ $(INST_README): docs/README.txt
 $(INST_DIST): dist
 	cp $(ZIPFILE) $(DOWNLOAD_DIR)
 
-inst: $(INST_JARFILE) $(INST_HTML) $(INST_README) $(INST_DIST)
+inst: signjar $(INST_JARFILE) $(INST_HTML) $(INST_README) $(INST_DIST)
 
 # Clean up
 clean:
