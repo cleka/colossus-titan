@@ -1,13 +1,3 @@
-/* 
- * MasterBoard, for Titan
- * version $Id$
- * dripton
- */
-
-// TODO: Restrict chit dragging to within window
-// TODO: Add stack markers
-// TODO: Fix colors
-
 import java.awt.*;
 import java.awt.event.*;
 
@@ -17,11 +7,10 @@ import java.awt.event.*;
  * @author David Ripton
  */
 
-
 public class MasterBoard extends Frame implements MouseListener,
     MouseMotionListener
 {
-    // There are a total of 96 hexes 
+    // There are a total of 96 hexes
     // Their Titan labels are:
     // Middle ring: 1-42
     // Outer ring: 101-142
@@ -31,8 +20,10 @@ public class MasterBoard extends Frame implements MouseListener,
     // For easy of mapping to the GUI, they'll be stored
     // in a 15x8 array, with some empty elements.
 
+    public final double SQRT3 = 1.73205080757;
+
     private MasterHex[][] h = new MasterHex[15][8];
-    private Chit[] chits = new Chit[22];
+    private Chit[] chits = new Chit[4];
     private int tracking;
     final private boolean[][] show =
     {
@@ -59,23 +50,24 @@ public class MasterBoard extends Frame implements MouseListener,
     private boolean needToClear;
     private MediaTracker tracker;
     private boolean imagesLoaded;
+    private int scale;
 
     public MasterBoard()
     {
         super("MasterBoard");
 
-        int cx=80;
-        int cy=80;
-        int scale=15;
-        
+        scale = 15;
+        int cx = 6 * scale;
+        int cy = 6 * scale;
+
         pack();
-        setSize(1000, 1000);
-        setBackground(java.awt.Color.white);
+        setSize(69 * scale, 69 * scale);
+        setBackground(java.awt.Color.black);
         setVisible(true);
         addWindowListener(new InnerWindowAdapter());
         addMouseListener(this);
         addMouseMotionListener(this);
-        
+
         tracking = -1;
         needToClear = false;
         imagesLoaded = false;
@@ -88,10 +80,10 @@ public class MasterBoard extends Frame implements MouseListener,
                 if (show[i][j])
                 {
                     h[i][j] = new MasterHex
-                        ((int) Math.round(cx + 4 * i * scale),
-                        (int) Math.round(cy + (3 * j + (i % 2) * 
+                        (cx + 4 * i * scale,
+                        (int) Math.round(cy + (3 * j + (i % 2) *
                         (1 + 2 * (j / 2)) + ((i + 1) % 2) * 2 * ((j + 1) / 2))
-                        * Math.sqrt(3.0) * scale), scale, (i + j) % 2 == 0);
+                        * SQRT3 * scale), scale, (i + j) % 2 == 0);
                 }
             }
         }
@@ -100,7 +92,7 @@ public class MasterBoard extends Frame implements MouseListener,
         h[0][3].terrain='S';
         h[0][3].label=132;
         h[0][3].exitType[1]=4;
-         
+
         h[0][4].terrain='P';
         h[0][4].label=133;
         h[0][4].exitType[0]=4;
@@ -401,7 +393,7 @@ public class MasterBoard extends Frame implements MouseListener,
         h[9][1].terrain='J';
         h[9][1].label=19;
         h[9][1].exitType[0]=1;
-        h[9][1].exitType[4]=2;
+        h[9][1].exitType[4]=4;
 
         h[9][2].terrain='W';
         h[9][2].label=16;
@@ -565,32 +557,52 @@ public class MasterBoard extends Frame implements MouseListener,
         h[14][4].label=111;
         h[14][4].exitType[4]=4;
 
+        // Derive entrances from exits
+        for (int i = 0; i < h.length; i++)
+        {
+            for (int j = 0; j < h[0].length; j++)
+            {
+                if (show[i][j])
+                {
+                    for (int k = 0; k < 6; k++)
+                    {
+                        int gateType = h[i][j].exitType[k];
+                        if (gateType != 0)
+                        {
+                            switch(k)
+                            {
+                                case 0:
+                                    h[i][j - 1].entranceType[3] = gateType;
+                                    break;
+                                case 1:
+                                    h[i + 1][j].entranceType[4] = gateType;
+                                    break;
+                                case 2:
+                                    h[i + 1][j].entranceType[5] = gateType;
+                                    break;
+                                case 3:
+                                    h[i][j + 1].entranceType[0] = gateType;
+                                    break;
+                                case 4:
+                                    h[i - 1][j].entranceType[1] = gateType;
+                                    break;
+                                case 5:
+                                    h[i - 1][j].entranceType[2] = gateType;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
 
 
         tracker = new MediaTracker(this);
 
-        chits[0] = new Chit(100, 100, 60, "images/Angel.gif", this);
-        chits[1] = new Chit(120, 120, 60, "images/Archangel.gif", this);
-        chits[2] = new Chit(140, 140, 60, "images/Behemoth.gif", this);
-        chits[3] = new Chit(160, 160, 60, "images/Centaur.gif", this);
-        chits[4] = new Chit(180, 180, 60, "images/Colossus.gif", this);
-        chits[5] = new Chit(200, 200, 60, "images/Cyclops.gif", this);
-        chits[6] = new Chit(220, 220, 60, "images/Gargoyle.gif", this);
-        chits[7] = new Chit(240, 240, 60, "images/Giant.gif", this);
-        chits[8] = new Chit(260, 260, 60, "images/Gorgon.gif", this);
-        chits[9] = new Chit(280, 280, 60, "images/Griffon.gif", this);
-        chits[10] = new Chit(300, 300, 60, "images/Guardian.gif", this);
-        chits[11] = new Chit(320, 320, 60, "images/Hydra.gif", this);
-        chits[12] = new Chit(340, 340, 60, "images/Lion.gif", this);
-        chits[13] = new Chit(360, 360, 60, "images/Minotaur.gif", this);
-        chits[14] = new Chit(380, 380, 60, "images/Ogre.gif", this);
-        chits[15] = new Chit(400, 400, 60, "images/Ranger.gif", this);
-        chits[16] = new Chit(420, 420, 60, "images/Serpent.gif", this);
-        chits[17] = new Chit(460, 460, 60, "images/Titan.gif", this);
-        chits[18] = new Chit(480, 480, 60, "images/Troll.gif", this);
-        chits[19] = new Chit(500, 500, 60, "images/Unicorn.gif", this);
-        chits[20] = new Chit(520, 520, 60, "images/Warbear.gif", this);
-        chits[21] = new Chit(540, 540, 60, "images/Warlock.gif", this);
+        chits[0] = new Chit(100, 100, 60, "images/Bk01.gif", this);
+        chits[1] = new Chit(120, 120, 60, "images/Bk04.gif", this);
+        chits[2] = new Chit(140, 140, 60, "images/Rd08.gif", this);
+        chits[3] = new Chit(160, 160, 60, "images/Rd12.gif", this);
 
         for (int i = 0; i < chits.length; i++)
         {
@@ -613,9 +625,14 @@ public class MasterBoard extends Frame implements MouseListener,
 
     public void mouseDragged(MouseEvent e)
     {
-        Point point = e.getPoint();
         if (tracking != -1)
         {
+            Point point = e.getPoint();
+            point.x = Math.max(point.x, 30);
+            point.y = Math.max(point.y, 60);
+            point.x = Math.min(point.x, getSize().width - 30);
+            point.y = Math.min(point.y, getSize().height - 30);
+        
             Rectangle clip = new Rectangle(chits[tracking].getBounds());
             chits[tracking].setLocation(point);
             clip.add(chits[tracking].getBounds());
@@ -628,7 +645,7 @@ public class MasterBoard extends Frame implements MouseListener,
     {
         tracking = -1;
     }
-    
+
     public void mousePressed(MouseEvent e)
     {
         Point point = e.getPoint();
@@ -722,9 +739,9 @@ public class MasterBoard extends Frame implements MouseListener,
     {
         Dimension d = getSize();
         rectClip = g.getClipBounds();
-        
+
         // Create the back buffer only if we don't have a good one.
-        if (gBack == null || d.width != offDimension.width || 
+        if (gBack == null || d.width != offDimension.width ||
             d.height != offDimension.height)
         {
             offDimension = d;
@@ -736,7 +753,7 @@ public class MasterBoard extends Frame implements MouseListener,
         if (needToClear)
         {
             gBack.setColor(getBackground());
-            gBack.fillRect(rectClip.x, rectClip.y, rectClip.width, 
+            gBack.fillRect(rectClip.x, rectClip.y, rectClip.width,
                 rectClip.height);
             gBack.setColor(getForeground());
             needToClear = false;
@@ -765,15 +782,15 @@ public class MasterBoard extends Frame implements MouseListener,
         g.drawImage(offImage, 0, 0, this);
     }
 
-    
+
     public Dimension getMinimumSize()
     {
-        return new Dimension(400, 400);
+        return new Dimension(65 * scale, 65 * scale);
     }
 
     public Dimension getPreferredSize()
     {
-        return new Dimension(1000, 1000);
+        return new Dimension(65 * scale, 65 * scale);
     }
 
 
@@ -783,7 +800,7 @@ public class MasterBoard extends Frame implements MouseListener,
     }
 
 
-    class InnerWindowAdapter extends WindowAdapter 
+    class InnerWindowAdapter extends WindowAdapter
     {
         public void windowClosing(WindowEvent event)
         {
@@ -793,19 +810,29 @@ public class MasterBoard extends Frame implements MouseListener,
 }
 
 
+/**
+ * Class MasterHex describes one Masterboard hex
+ * @version $Id$
+ * @author David Ripton
+ */
+
 class MasterHex
 {
+    public static final double SQRT3 = 1.73205080757;
     private boolean selected;
     private int[] xVertex = new int[6];
     private int[] yVertex = new int[6];
     private Polygon p;
     private Rectangle rectBound;
+    private boolean inverted;
+    private int scale;
+    private double l;              // hexside length
 
     // B,D,H,J,m,M,P,S,T,t,W
     // Brush, Desert, Hills, Jungle, mountains, Marsh, Plains,
     // Swamp, Tower, tundra, Woods
     char terrain;
- 
+
     // Middle ring: 1-42
     // Outer ring: 101-142
     // Towers: 100, 200, 300, 400, 500, 600
@@ -815,10 +842,23 @@ class MasterHex
     // n, ne, se, s, sw, nw
     // 0=none, 1=block, 2=arch, 3=arrow 4=arrows
     int[] exitType = new int[6];
+    int[] entranceType = new int[6];
 
-    MasterHex(int cx, int cy, int scale, boolean inverted)
+    private int x0;                // first focus point
+    private int y0;
+    private int x1;                // second focus point
+    private int y1;
+    private double theta;          // gate angle
+    private int x[] = new int[4];  // gate points
+    private int y[] = new int[4];
+
+
+    MasterHex(int cx, int cy, int inScale, boolean inInverted)
     {
         selected = false;
+        inverted = inInverted;
+        scale = inScale;
+        l = scale / 3.0;
         if (!inverted)
         {
             xVertex[0] = cx;
@@ -826,13 +866,13 @@ class MasterHex
             xVertex[1] = cx + 2 * scale;
             yVertex[1] = cy;
             xVertex[2] = cx + 4 * scale;
-            yVertex[2] = cy + (int)Math.round(2 * Math.sqrt(3.0) * scale);
+            yVertex[2] = cy + (int) Math.round(2 * SQRT3 * scale);
             xVertex[3] = cx + 3 * scale;
-            yVertex[3] = cy + (int)Math.round(3 * Math.sqrt(3.0) * scale);
+            yVertex[3] = cy + (int) Math.round(3 * SQRT3 * scale);
             xVertex[4] = cx - scale;
-            yVertex[4] = cy + (int)Math.round(3 * Math.sqrt(3.0) * scale);
+            yVertex[4] = cy + (int) Math.round(3 * SQRT3 * scale);
             xVertex[5] = cx - 2 * scale;
-            yVertex[5] = cy + (int)Math.round(2 * Math.sqrt(3.0) * scale);
+            yVertex[5] = cy + (int) Math.round(2 * SQRT3 * scale);
         }
         else
         {
@@ -841,231 +881,295 @@ class MasterHex
             xVertex[1] = cx + 3 * scale;
             yVertex[1] = cy;
             xVertex[2] = cx + 4 * scale;
-            yVertex[2] = cy + (int)Math.round(Math.sqrt(3.0) * scale);
+            yVertex[2] = cy + (int) Math.round(SQRT3 * scale);
             xVertex[3] = cx + 2 * scale;
-            yVertex[3] = cy + (int)Math.round(3 * Math.sqrt(3.0) * scale);
+            yVertex[3] = cy + (int) Math.round(3 * SQRT3 * scale);
             xVertex[4] = cx;
-            yVertex[4] = cy + (int)Math.round(3 * Math.sqrt(3.0) * scale);
+            yVertex[4] = cy + (int) Math.round(3 * SQRT3 * scale);
             xVertex[5] = cx - 2 * scale;
-            yVertex[5] = cy + (int)Math.round(Math.sqrt(3.0) * scale);
+            yVertex[5] = cy + (int) Math.round(SQRT3 * scale);
         }
 
         p = new Polygon(xVertex, yVertex, 6);
         // Add 1 to width and height because Java rectangles come up
-        // one pixel short.
-        rectBound = new Rectangle(xVertex[5], yVertex[0], xVertex[2] - 
+        // one pixel short of the area actually painted.
+        rectBound = new Rectangle(xVertex[5], yVertex[0], xVertex[2] -
                         xVertex[5] + 1, yVertex[3] - yVertex[0] + 1);
     }
 
 
-    // XXX: Pick better colors.
     public void paint(Graphics g)
     {
-        switch(terrain)
+        if (selected)
         {
-            case 'B':
-                g.setColor(java.awt.Color.green);
-                break; 
-            case 'D':
-                g.setColor(java.awt.Color.orange);
-                break;
-            case 'H':
-                g.setColor(java.awt.Color.cyan);
-                break;
-            case 'J':
-                g.setColor(java.awt.Color.darkGray);
-                break;
-            case 'm':
-                g.setColor(java.awt.Color.red);
-                break;
-            case 'M':
-                g.setColor(java.awt.Color.pink);
-                break;
-            case 'P':
-                g.setColor(java.awt.Color.yellow);
-                break;
-            case 'S':
-                g.setColor(java.awt.Color.blue);
-                break;
-            case 'T':
-                g.setColor(java.awt.Color.gray);
-                break;
-            case 't':
-                g.setColor(java.awt.Color.lightGray);
-                break;
-            case 'W':
-                g.setColor(java.awt.Color.magenta);
-                break;
-            default:
-                g.setColor(java.awt.Color.white);
-                break;
+            g.setColor(java.awt.Color.white);
         }
-//        g.fillPolygon(p);
+        else
+        {
+            g.setColor(getTerrainColor());
+        }
+
+        g.fillPolygon(p);
         g.setColor(java.awt.Color.black);
         g.drawPolygon(p);
 
-        // XXX scale this
         FontMetrics fontMetrics = g.getFontMetrics();
-        g.drawString(Integer.toString(label), rectBound.x + rectBound.width / 2 -
-            fontMetrics.stringWidth(Integer.toString(label)) / 2,
-            rectBound.y + rectBound.height / 3);
-        g.drawString(getTerrainName(), rectBound.x + rectBound.width / 2 -
-            fontMetrics.stringWidth(getTerrainName()) / 2,
-            rectBound.y + rectBound.height * 2 / 3);
 
-        // draw exits
-        // There are up to 3 gates to draw.  Each is 1/6 of a hexside
-        // square.  The first is positioned from 1/6 to 1/3 of the way
-        // along the hexside, the second from 5/12 to 7/12, and the 
-        // third from 2/3 to 5/6.  The inner edge of each is 1/12 of a
-        // hexside inside the hexside, and the outer edge is 1/12 of a
-        // hexside outside the hexside.
-
-        for (int i = 0; i < 6; i++)
+        if (inverted)
         {
-            int x0;
-            int y0;
-            int x1;
-            int y1;
-            double l;
-            double theta;
-            int x[] = new int[4];
-            int y[] = new int[4];
+            g.drawString(Integer.toString(label), 
+                rectBound.x + rectBound.width / 2 - 
+                fontMetrics.stringWidth(Integer.toString(label)) / 2,
+                rectBound.y + rectBound.height / 3);
+            g.drawString(getTerrainName(), rectBound.x + rectBound.width / 2 -
+                fontMetrics.stringWidth(getTerrainName()) / 2,
+                rectBound.y + rectBound.height * 2 / 3);
+        }
+        else
+        {
+            g.drawString(getTerrainName(), rectBound.x + rectBound.width / 2 -
+                fontMetrics.stringWidth(getTerrainName()) / 2,
+                rectBound.y + rectBound.height * 2 / 3);
+            g.drawString(Integer.toString(label), 
+                rectBound.x + rectBound.width / 2 -
+                fontMetrics.stringWidth(Integer.toString(label)) / 2,
+                rectBound.y + rectBound.height / 3);
+        }
 
-            switch(exitType[i])
+
+        // Draw exits and entrances
+        for (int i = inverted ? 0 : 1; i < 6; i += 2)
+        {
+            int n = (i + 1) % 6;
+
+            // Draw exits
+            // There are up to 3 gates to draw.  Each is 1/6 of a hexside
+            // square.  The first is positioned from 1/6 to 1/3 of the way
+            // along the hexside, the second from 5/12 to 7/12, and the
+            // third from 2/3 to 5/6.  The inner edge of each is 1/12 of a
+            // hexside inside the hexside, and the outer edge is 1/12 of a
+            // hexside outside the hexside.
+
+            if (exitType[i] != 0)
             {
-                case 1:   // block
-                    x0 = xVertex[i] + ((xVertex[(i + 1) % 6] - xVertex[i]) / 6);
-                    y0 = yVertex[i] + ((yVertex[(i + 1) % 6] - yVertex[i]) / 6);
+                x0 = xVertex[i] + ((xVertex[n] - xVertex[i]) / 6);
+                y0 = yVertex[i] + ((yVertex[n] - yVertex[i]) / 6);
+                x1 = xVertex[i] + ((xVertex[n] - xVertex[i]) / 3);
+                y1 = yVertex[i] + ((yVertex[n] - yVertex[i]) / 3);
 
-                    x1 = xVertex[i] + ((xVertex[(i + 1) % 6] - xVertex[i]) / 3);
-                    y1 = yVertex[i] + ((yVertex[(i + 1) % 6] - yVertex[i]) / 3);
+                theta = Math.atan2(yVertex[n] - yVertex[i],
+                              xVertex[n] - xVertex[i]);
 
-                    l = Math.sqrt((yVertex[(i + 1) % 6] - yVertex[i]) * 
-                                  (yVertex[(i + 1) % 6] - yVertex[i]) +
-                                  (xVertex[(i + 1) % 6] - xVertex[i]) *
-                                  (xVertex[(i + 1) % 6] - xVertex[i])) / 12;
+                switch(exitType[i])
+                {
+                    case 1:   // block
+                        x[0] = (int) Math.round(x0 - l * Math.sin(theta));
+                        y[0] = (int) Math.round(y0 + l * Math.cos(theta));
+                        x[1] = (int) Math.round(x0 + l * Math.sin(theta));
+                        y[1] = (int) Math.round(y0 - l * Math.cos(theta));
+                        x[2] = (int) Math.round(x1 + l * Math.sin(theta));
+                        y[2] = (int) Math.round(y1 - l * Math.cos(theta));
+                        x[3] = (int) Math.round(x1 - l * Math.sin(theta));
+                        y[3] = (int) Math.round(y1 + l * Math.cos(theta));
 
-                    theta = Math.atan2(yVertex[(i + 1) % 6] - yVertex[i],
-                                  xVertex[(i + 1) % 6] - xVertex[i]);
+                        g.setColor(java.awt.Color.white);
+                        g.fillPolygon(x, y, 4);
+                        g.setColor(java.awt.Color.black);
+                        g.drawPolyline(x, y, 4);
+                        break;
 
-                    x[0] = (int) Math.round(x0 - l * Math.sin(theta));
-                    y[0] = (int) Math.round(y0 + l * Math.cos(theta));
-                    x[1] = (int) Math.round(x0 + l * Math.sin(theta));
-                    y[1] = (int) Math.round(y0 - l * Math.cos(theta));
-                    x[2] = (int) Math.round(x1 + l * Math.sin(theta));
-                    y[2] = (int) Math.round(y1 - l * Math.cos(theta));
-                    x[3] = (int) Math.round(x1 - l * Math.sin(theta));
-                    y[3] = (int) Math.round(y1 + l * Math.cos(theta));
+                    case 2:   // arch
+                        x[0] = (int) Math.round(x0 - l * Math.sin(theta));
+                        y[0] = (int) Math.round(y0 + l * Math.cos(theta));
+                        x[1] = (int) Math.round(x0 + l * Math.sin(theta));
+                        y[1] = (int) Math.round(y0 - l * Math.cos(theta));
+                        x[2] = (int) Math.round(x1 + l * Math.sin(theta));
+                        y[2] = (int) Math.round(y1 - l * Math.cos(theta));
+                        x[3] = (int) Math.round(x1 - l * Math.sin(theta));
+                        y[3] = (int) Math.round(y1 + l * Math.cos(theta));
+                        Polygon p = new Polygon(x, y, 4);
+                        Rectangle rect = p.getBounds();
+    
+                        g.setColor(java.awt.Color.white);
+                        g.fillArc(rect.x, rect.y, rect.width, rect.height,
+                             (int) Math.round((2 * Math.PI - theta) * 180 / Math.PI), 
+                             180);
+                        g.setColor(java.awt.Color.black);
+                        g.drawArc(rect.x, rect.y, rect.width, rect.height,
+                             (int) Math.round((2 * Math.PI - theta) * 180 / Math.PI), 
+                             180);
+                        break;
 
-                    g.setColor(java.awt.Color.white);
-                    g.fillPolygon(x, y, 4);
-                    g.setColor(java.awt.Color.black);
-                    g.drawPolyline(x, y, 4);
-                break;
-
-                case 2:   // arch
-                    x0 = xVertex[i] + ((xVertex[(i + 1) % 6] - xVertex[i]) / 6);
-                    y0 = yVertex[i] + ((yVertex[(i + 1) % 6] - yVertex[i]) / 6);
-
-                    x1 = xVertex[i] + ((xVertex[(i + 1) % 6] - xVertex[i]) / 3);
-                    y1 = yVertex[i] + ((yVertex[(i + 1) % 6] - yVertex[i]) / 3);
-
-                        l = Math.sqrt((yVertex[(i + 1) % 6] - yVertex[i]) * 
-                                  (yVertex[(i + 1) % 6] - yVertex[i]) +
-                                  (xVertex[(i + 1) % 6] - xVertex[i]) *
-                                  (xVertex[(i + 1) % 6] - xVertex[i])) / 12;
-
-                    theta = Math.atan2(yVertex[(i + 1) % 6] - yVertex[i],
-                                  xVertex[(i + 1) % 6] - xVertex[i]);
-
-                    x[0] = (int) Math.round(x0 - l * Math.sin(theta));
-                    y[0] = (int) Math.round(y0 + l * Math.cos(theta));
-                    x[1] = (int) Math.round(x0 + l * Math.sin(theta));
-                    y[1] = (int) Math.round(y0 - l * Math.cos(theta));
-                    x[2] = (int) Math.round(x1 + l * Math.sin(theta));
-                    y[2] = (int) Math.round(y1 - l * Math.cos(theta));
-                    x[3] = (int) Math.round(x1 - l * Math.sin(theta));
-                    y[3] = (int) Math.round(y1 + l * Math.cos(theta));
-
-                    Polygon p = new Polygon(x, y, 4); 
-                    Rectangle rect = p.getBounds();
-
-                    g.setColor(java.awt.Color.white);
-                    g.fillArc(rect.x, rect.y, rect.width, rect.height, 
-                             (int) ((2 * Math.PI - theta) * 180 / Math.PI), 180);
-                    g.setColor(java.awt.Color.black);
-                    g.drawArc(rect.x, rect.y, rect.width, rect.height, 
-                             (int) ((2 * Math.PI - theta) * 180 / Math.PI), 180);
-                    break;
-
-                case 3:   // 1 arrow
-                    x0 = xVertex[i] + ((xVertex[(i + 1) % 6] - xVertex[i]) / 6);
-                    y0 = yVertex[i] + ((yVertex[(i + 1) % 6] - yVertex[i]) / 6);
-
-                    x1 = xVertex[i] + ((xVertex[(i + 1) % 6] - xVertex[i]) / 3);
-                    y1 = yVertex[i] + ((yVertex[(i + 1) % 6] - yVertex[i]) / 3);
-
-                    l = Math.sqrt((yVertex[(i + 1) % 6] - yVertex[i]) * 
-                                  (yVertex[(i + 1) % 6] - yVertex[i]) +
-                                  (xVertex[(i + 1) % 6] - xVertex[i]) *
-                                  (xVertex[(i + 1) % 6] - xVertex[i])) / 12;
-
-                    theta = Math.atan2(yVertex[(i + 1) % 6] - yVertex[i],
-                                  xVertex[(i + 1) % 6] - xVertex[i]);
-
-                    x[0] = (int) Math.round(x0 - l * Math.sin(theta));
-                    y[0] = (int) Math.round(y0 + l * Math.cos(theta));
-                    x[1] = (int) Math.round((x0 + x1) / 2 + l * Math.sin(theta));
-                    y[1] = (int) Math.round((y0 + y1) / 2 - l * Math.cos(theta));
-                    x[2] = (int) Math.round(x1 - l * Math.sin(theta));
-                    y[2] = (int) Math.round(y1 + l * Math.cos(theta));
-
-                    g.setColor(java.awt.Color.white);
-                    g.fillPolygon(x, y, 3);
-                    g.setColor(java.awt.Color.black);
-                    g.drawPolyline(x, y, 3);
-                    break;
-
-                case 4:   // 3 arrows
-                    l = Math.sqrt((yVertex[(i + 1) % 6] - yVertex[i]) * 
-                                  (yVertex[(i + 1) % 6] - yVertex[i]) +
-                                  (xVertex[(i + 1) % 6] - xVertex[i]) *
-                                  (xVertex[(i + 1) % 6] - xVertex[i])) / 12;
-
-                    theta = Math.atan2(yVertex[(i + 1) % 6] - yVertex[i],
-                                  xVertex[(i + 1) % 6] - xVertex[i]);
-
-                    for (int j = 0; j < 3; j++)
-                    {
-                        x0 = xVertex[i] + ((xVertex[(i + 1) % 6] - xVertex[i]) * 
-                             (2 + 3 * j) / 12);
-                        y0 = yVertex[i] + ((yVertex[(i + 1) % 6] - yVertex[i]) * 
-                             (2 + 3 * j) / 12);
-
-                        x1 = xVertex[i] + ((xVertex[(i + 1) % 6] - xVertex[i]) * 
-                             (4 + 3 * j) / 12);
-                        y1 = yVertex[i] + ((yVertex[(i + 1) % 6] - yVertex[i]) * 
-                             (4 + 3 * j) / 12);
-
-
+                    case 3:   // 1 arrow
                         x[0] = (int) Math.round(x0 - l * Math.sin(theta));
                         y[0] = (int) Math.round(y0 + l * Math.cos(theta));
                         x[1] = (int) Math.round((x0 + x1) / 2 + l * Math.sin(theta));
                         y[1] = (int) Math.round((y0 + y1) / 2 - l * Math.cos(theta));
                         x[2] = (int) Math.round(x1 - l * Math.sin(theta));
                         y[2] = (int) Math.round(y1 + l * Math.cos(theta));
-    
+
                         g.setColor(java.awt.Color.white);
                         g.fillPolygon(x, y, 3);
                         g.setColor(java.awt.Color.black);
                         g.drawPolyline(x, y, 3);
-                    }
-                    break;
+                        break;
 
-                case 0:   // none
-                default:
-                    break;
+                    case 4:   // 3 arrows
+                        x[0] = (int) Math.round(x0 - l * Math.sin(theta));
+                        y[0] = (int) Math.round(y0 + l * Math.cos(theta));
+                        x[1] = (int) Math.round((x0 + x1) / 2 + l * 
+                               Math.sin(theta));
+                        y[1] = (int) Math.round((y0 + y1) / 2 - l * 
+                               Math.cos(theta));
+                        x[2] = (int) Math.round(x1 - l * Math.sin(theta));
+                        y[2] = (int) Math.round(y1 + l * Math.cos(theta));
+
+                        g.setColor(java.awt.Color.white);
+                        g.fillPolygon(x, y, 3);
+                        g.setColor(java.awt.Color.black);
+                        g.drawPolyline(x, y, 3);
+
+                        for (int j = 1; j < 3; j++)
+                        {
+                            x0 = xVertex[i] + ((xVertex[n] - xVertex[i]) *
+                                 (2 + 3 * j) / 12);
+                            y0 = yVertex[i] + ((yVertex[n] - yVertex[i]) *
+                                 (2 + 3 * j) / 12);
+
+                            x1 = xVertex[i] + ((xVertex[n] - xVertex[i]) *
+                                 (4 + 3 * j) / 12);
+                            y1 = yVertex[i] + ((yVertex[n] - yVertex[i]) *
+                                 (4 + 3 * j) / 12);
+
+                            x[0] = (int) Math.round(x0 - l * Math.sin(theta));
+                            y[0] = (int) Math.round(y0 + l * Math.cos(theta));
+                            x[1] = (int) Math.round((x0 + x1) / 2 + l * 
+                                   Math.sin(theta));
+                            y[1] = (int) Math.round((y0 + y1) / 2 - l * 
+                                   Math.cos(theta));
+                            x[2] = (int) Math.round(x1 - l * Math.sin(theta));
+                            y[2] = (int) Math.round(y1 + l * Math.cos(theta));
+    
+                            g.setColor(java.awt.Color.white);
+                            g.fillPolygon(x, y, 3);
+                            g.setColor(java.awt.Color.black);
+                            g.drawPolyline(x, y, 3);
+                        }
+                        break;
+                }
+            }
+
+            // Draw entrances
+            // Unfortunately, since exits extend out into adjacent hexes,
+            // they sometimes get overdrawn.  So we need to draw them
+            // again from the other hex, as entrances.
+
+            if (entranceType[i] != 0)
+            {
+                x0 = xVertex[n] + ((xVertex[i] - xVertex[n]) / 6);
+                y0 = yVertex[n] + ((yVertex[i] - yVertex[n]) / 6);
+                x1 = xVertex[n] + ((xVertex[i] - xVertex[n]) / 3);
+                y1 = yVertex[n] + ((yVertex[i] - yVertex[n]) / 3);
+
+                theta = Math.atan2(yVertex[i] - yVertex[n], xVertex[i] - 
+                        xVertex[n]);
+
+                switch(entranceType[i])
+                {
+                    case 1:   // block
+                        x[0] = (int) Math.round(x0 - l * Math.sin(theta));
+                        y[0] = (int) Math.round(y0 + l * Math.cos(theta));
+                        x[1] = (int) Math.round(x0 + l * Math.sin(theta));
+                        y[1] = (int) Math.round(y0 - l * Math.cos(theta));
+                        x[2] = (int) Math.round(x1 + l * Math.sin(theta));
+                        y[2] = (int) Math.round(y1 - l * Math.cos(theta));
+                        x[3] = (int) Math.round(x1 - l * Math.sin(theta));
+                        y[3] = (int) Math.round(y1 + l * Math.cos(theta));
+
+                        g.setColor(java.awt.Color.white);
+                        g.fillPolygon(x, y, 4);
+                        g.setColor(java.awt.Color.black);
+                        g.drawPolyline(x, y, 4);
+                        break;
+
+                    case 2:   // arch
+                        x[0] = (int) Math.round(x0 - l * Math.sin(theta));
+                        y[0] = (int) Math.round(y0 + l * Math.cos(theta));
+                        x[1] = (int) Math.round(x0 + l * Math.sin(theta));
+                        y[1] = (int) Math.round(y0 - l * Math.cos(theta));
+                        x[2] = (int) Math.round(x1 + l * Math.sin(theta));
+                        y[2] = (int) Math.round(y1 - l * Math.cos(theta));
+                        x[3] = (int) Math.round(x1 - l * Math.sin(theta));
+                        y[3] = (int) Math.round(y1 + l * Math.cos(theta));
+
+                        Polygon p = new Polygon(x, y, 4);
+                        Rectangle rect = p.getBounds();
+
+                        g.setColor(java.awt.Color.white);
+                        g.fillArc(rect.x, rect.y, rect.width, rect.height,
+                             (int) ((2 * Math.PI - theta) * 180 / Math.PI), 180);
+                        g.setColor(java.awt.Color.black);
+                        g.drawArc(rect.x, rect.y, rect.width, rect.height,
+                             (int) ((2 * Math.PI - theta) * 180 / Math.PI), 180);
+                        break;
+
+                    case 3:   // 1 arrow
+                        x[0] = (int) Math.round(x0 - l * Math.sin(theta));
+                        y[0] = (int) Math.round(y0 + l * Math.cos(theta));
+                        x[1] = (int) Math.round((x0 + x1) / 2 + l * Math.sin(theta));
+                        y[1] = (int) Math.round((y0 + y1) / 2 - l * Math.cos(theta));
+                        x[2] = (int) Math.round(x1 - l * Math.sin(theta));
+                        y[2] = (int) Math.round(y1 + l * Math.cos(theta));
+
+                        g.setColor(java.awt.Color.white);
+                        g.fillPolygon(x, y, 3);
+                        g.setColor(java.awt.Color.black);
+                        g.drawPolyline(x, y, 3);
+                        break;
+
+                    case 4:   // 3 arrows
+                        x[0] = (int) Math.round(x0 - l * Math.sin(theta));
+                        y[0] = (int) Math.round(y0 + l * Math.cos(theta));
+                        x[1] = (int) Math.round((x0 + x1) / 2 + l * 
+                               Math.sin(theta));
+                        y[1] = (int) Math.round((y0 + y1) / 2 - l *
+                               Math.cos(theta));
+                        x[2] = (int) Math.round(x1 - l * Math.sin(theta));
+                        y[2] = (int) Math.round(y1 + l * Math.cos(theta));
+
+                        g.setColor(java.awt.Color.white);
+                        g.fillPolygon(x, y, 3);
+                        g.setColor(java.awt.Color.black);
+                        g.drawPolyline(x, y, 3);
+                    
+                        for (int j = 1; j < 3; j++)
+                        {
+                            x0 = xVertex[n] + ((xVertex[i] -
+                                 xVertex[n]) * (2 + 3 * j) / 12);
+                            y0 = yVertex[n] + ((yVertex[i] -
+                                 yVertex[n]) * (2 + 3 * j) / 12);
+
+                            x1 = xVertex[n] + ((xVertex[i] -
+                                 xVertex[n]) * (4 + 3 * j) / 12);
+                            y1 = yVertex[n] + ((yVertex[i] -
+                                 yVertex[n]) * (4 + 3 * j) / 12);
+
+                            x[0] = (int) Math.round(x0 - l * Math.sin(theta));
+                            y[0] = (int) Math.round(y0 + l * Math.cos(theta));
+                            x[1] = (int) Math.round((x0 + x1) / 2 + l * 
+                                   Math.sin(theta));
+                            y[1] = (int) Math.round((y0 + y1) / 2 - l *
+                                   Math.cos(theta));
+                            x[2] = (int) Math.round(x1 - l * Math.sin(theta));
+                            y[2] = (int) Math.round(y1 + l * Math.cos(theta));
+
+                            g.setColor(java.awt.Color.white);
+                            g.fillPolygon(x, y, 3);
+                            g.setColor(java.awt.Color.black);
+                            g.drawPolyline(x, y, 3);
+                        }
+                        break;
+                }
             }
         }
     }
@@ -1097,91 +1201,60 @@ class MasterHex
         switch(terrain)
         {
             case 'B':
-                return "brush";
+                return "BRUSH";
             case 'D':
-                return "desert";
+                return "DESERT";
             case 'H':
-                return "hills";
+                return "HILLS";
             case 'J':
-                return "jungle";
+                return "JUNGLE";
             case 'm':
-                return "mountains";
+                return "MOUNTAINS";
             case 'M':
-                return "marsh";
+                return "MARSH";
             case 'P':
-                return "plains";
+                return "PLAINS";
             case 'S':
-                return "swamp";
+                return "SWAMP";
             case 'T':
-                return "tower";
+                return "TOWER";
             case 't':
-                return "tundra";
+                return "TUNDRA";
             case 'W':
-                return "woods";
+                return "WOODS";
             default:
                 return "?????";
         }
     }
 
-}
-
-
-class Chit
-{
-    // The container's MediaTracker needs to access the image.
-    Image image;
-
-    private boolean selected;
-    private Rectangle rect;
-    private Container container;
-
-    // offset of the mouse cursor within the chit.
-    private int dx;
-    private int dy;
-
-
-    Chit(int cx, int cy, int scale, String imageFilename, 
-        Container myContainer)
+    Color getTerrainColor()
     {
-        selected = false;
-        rect = new Rectangle(cx, cy, scale, scale);
-        image = Toolkit.getDefaultToolkit().getImage(imageFilename);
-        container = myContainer;
-        dx = 0;
-        dy = 0;
-    }
-    
-    public void paint(Graphics g)
-    {
-        g.drawImage(image, rect.x, rect.y, container);
-    }
-
-    boolean select(Point point)
-    {
-        if (rect.contains(point))
+        switch(terrain)
         {
-            selected = true;
-            dx = point.x - rect.x;
-            dy = point.y - rect.y;
+            case 'B':
+                return java.awt.Color.green;
+            case 'D':
+                return java.awt.Color.orange;
+            case 'H':
+                return new Color(128, 64, 0);
+            case 'J':
+                return new Color(0, 128, 0);
+            case 'm':
+                return java.awt.Color.red;
+            case 'M':
+                return new Color(180, 90, 0);
+            case 'P':
+                return java.awt.Color.yellow;
+            case 'S':
+                return java.awt.Color.blue;
+            case 'T':
+                return java.awt.Color.gray;
+            case 't':
+                return new Color(128, 170, 255);
+            case 'W':
+                return new Color(128, 128, 0);
+            default:
+                return java.awt.Color.black;
         }
-        else
-        {
-            selected = false;
-        }
-        return selected;
     }
-
-    void setLocation(Point point)
-    {
-        point.x -= dx;
-        point.y -= dy;
-        rect.setLocation(point);
-    }
-
-    public Rectangle getBounds()
-    {
-        return rect;
-    }
-
 }
-
