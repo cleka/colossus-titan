@@ -1703,7 +1703,7 @@ public final class MasterBoard extends JPanel
         int modifiers = e.getModifiers();
         return (((modifiers & InputEvent.BUTTON2_MASK) != 0) ||
             ((modifiers & InputEvent.BUTTON3_MASK) != 0) ||
-            e.isAltDown());
+            e.isAltDown() || e.isControlDown());
     }
 
     class MasterBoardMouseHandler extends MouseAdapter
