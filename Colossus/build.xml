@@ -5,8 +5,7 @@
 
 <!-- To use this you need:
      Sun JDK 1.3+    http://java.sun.com  (currently recommend 1.4.0)
-     Ant 1.4.1+      http://jakarta.apache.org/ant/
-        with corresponding optional.jar installed in $ANT_HOME/lib
+     Ant 1.5+        http://jakarta.apache.org/ant/
      JavaCC 2.1      http://www.webgain.com/trialware/javacc/JavaCC2_1.zip
         Environment var JAVACC_HOME pointing to JavaCC install root
      Javamake 1.2.8+ http://www.experimentalstuff.com/Technologies/JavaMake/
@@ -22,11 +21,6 @@
         http://www.red-bean.com/cvs2cl/  You also need perl in the path.
         And you need to have ssh-agent set up so that you can do cvs
         commands over ssh without password prompts.
-     To build the docs you need:
-        make
-        LaTeX
-        latex2html
-        dvi2tty    http://www.mesa.nl/pub/dvi2tty/
 -->
 
 <project name="Colossus" default="jar" basedir=".">
@@ -225,17 +219,7 @@
                          **/.#Colossus.jar*,
                          **/Colossus.*.zip,
                          TEST-*Test.txt,
-                         javadoc/**,
-                         docs/**/*.aux,
-                         docs/**/*.log,
-                         docs/**/*.toc,
-                         docs/**/*.blg,
-                         docs/**/*.bbl,
-                         docs/**/*.dvi,
-                         docs/**/*.ps,
-                         docs/**/*.html,
-                         docs/**/*.css,
-                         docs/**/*.pl"
+                         javadoc/**"
                 />
         </delete>
 </target>
@@ -338,13 +322,6 @@
         <delete verbose="yes" file = "ChangeLog.bak"/>
 </target>
 
-<target name="docs" depends=""
-        description = "Generate docs from TeX source">
-        <exec executable="make" dir="docs" os="Linux,SunOS">
-            <arg line=""/>
-        </exec>
-</target>
-
 <target name="dist" depends="init,sign,changelog,tools"
         description = "Make zip file for user download">
         <zip zipfile="${ZIPFILE}" basedir="."
@@ -369,7 +346,7 @@
 </target>
 
 
-<target name="inst" depends="init,sign,dist,changelog,docs"
+<target name="inst" depends="init,sign,dist,changelog"
         description = "Locally copy files into htdocs tree on SF"> 
         <copy file="Colossus.jar" todir="${HTMLDIR}"/>
         <copy file="Colossus.jnlp" todir="${HTMLDIR}"/>
@@ -384,7 +361,7 @@
 
 <!-- TODO Eliminate double maintenance -->
 <!-- This requires a good ssh-agent setup. -->
-<target name="remote-inst" depends="init,sign,dist,changelog,docs"
+<target name="remote-inst" depends="init,sign,dist,changelog"
         description = "scp files into htdocs tree on SF"> 
         <exec executable="scp">
             <arg line="Colossus.jar ${SERVER}:${HTMLDIR}"/>
