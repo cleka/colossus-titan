@@ -14,6 +14,10 @@ import net.sf.colossus.util.Log;
 import net.sf.colossus.util.HTMLColor;
 import net.sf.colossus.server.Creature;
 
+import net.sf.colossus.util.RecruitGraph;
+import net.sf.colossus.util.RecruitEdge;
+import net.sf.colossus.util.RecruitVertex;
+
 /**
  * TerrainRecruitLoader load the terrains and recruits descriptions.
  * @author Romain Dolbeau
@@ -48,15 +52,44 @@ public class TerrainRecruitLoader
      */
     private static char[] terrains = null;
     /**
-     * The list of Acquirable Creature, as acquirableData
+     * The list of Acquirable Creature, as acquirableData.
      * @see net.sf.colossus.parser.TerrainRecruitLoader.acquirableData
      */
     private static List acquirableList = null;
+
     /**
-     * Mapping between a creature's name and the maximum useful number
-     * of said creature (except "Any")
+     * Representation of the Recruiting Graph (for use)
+     * (sometimes called Recruiting Tree).
      */
-    private static Hashtable nameToMUN = new Hashtable();
+    private static RecruitGraph graph = new RecruitGraph(null);
+
+    /**
+     * Add an entire terrain recruiting list to the Recruiting Graph.
+     * @param rl The list of RecruitNumber to add to the graph.
+     */
+    private static void addToGraph(ArrayList rl, char t)
+    {
+        Iterator it = rl.iterator();
+        String v1 = null;
+
+        try 
+        {
+            while (it.hasNext())
+            {
+                recruitNumber tr = (recruitNumber)it.next();
+                String v2 = tr.getName();
+                if ((tr.getNumber() > 0) && (v2 != null) && (v1 != null))
+                {
+                    graph.addEdge(v1, v2, tr.getNumber(), t);
+                }
+                v1 = v2;
+            }
+        }
+        catch (Exception e)
+        {
+            Log.error("Couldn't fill graph : " + e);
+        }
+    }
     
     /* make sure that all static elements are null or empty when creating a
      * new TerrainRecruitLoader object...
@@ -81,7 +114,7 @@ public class TerrainRecruitLoader
         carToDisplayName.clear();
         carToColor.clear();
         carToBelow.clear();
-        nameToMUN.clear();
+        graph = new RecruitGraph(null);
     }
 
     /**
@@ -577,39 +610,16 @@ public class TerrainRecruitLoader
      */
     public static int getMaximumUsefulNumber(String name)
     {
-        char terrains[] = getTerrains();
         int mun = -1;
-
-        Object munO = nameToMUN.get(name);
-
-        if (munO == null)
+            
+        java.util.List outgoing = graph.getOutgoingEdges(name);
+        Iterator it = outgoing.iterator();
+        while (it.hasNext())
         {
-            for (int i = 0; i < terrains.length ; i++)
-            {
-                ArrayList al =
-                    (ArrayList)carToRecruits.get(new Character(terrains[i]));
-                Iterator it = al.iterator();
-                boolean remember = false;
-                while (it.hasNext())
-                {
-                    recruitNumber tr = (recruitNumber)it.next();
-                    if (remember)
-                    {
-                        if (tr.getNumber() > mun)
-                            mun = tr.getNumber();
-                        remember = false;
-                    }
-                    if (name.equals(tr.getName()))
-                    {
-                        remember = true;
-                    }
-                }
-            }
-            nameToMUN.put(name, new Integer(mun));
-        }
-        else
-        {
-            mun = ((Integer)munO).intValue();
+            RecruitEdge e = (RecruitEdge)it.next();
+            
+            if (e.getNumber() > mun)
+                mun = (int)e.getNumber();
         }
         return mun;
     }
@@ -618,12 +628,81 @@ public class TerrainRecruitLoader
      * What is the maximum "useful" number of a given creature for
      * recruitment purpose (excluding "Any" or "AnyNonLord").
      * return value of -1 or 0 means the Creature cannot recruit except itself.
-     * @param namecreature Creature considered.
+     * @param creature Creature considered.
      * @return The higher number of creatures needed to recruit something.
      */
     public static int getMaximumUsefulNumber(Creature creature)
     {
         return getMaximumUsefulNumber(creature.getName());
+    }
+
+    /**
+     * Return all the terrains (as Character in a List) where the given
+     * number of creature of the given name can recruit.
+     * @param name Name of the recruiting creature.
+     * @param number Number of creature
+     * @return A List of Character representing all Terrains where recruitment is possible.
+     */
+    public static java.util.List getAllTerrainsWhereThisNumberOfCreatureRecruit(String name, int number)
+    {
+        java.util.List at = new ArrayList();
+            
+        java.util.List outgoing = graph.getOutgoingEdges(name);
+        Iterator it = outgoing.iterator();
+        while (it.hasNext())
+        {
+            RecruitEdge e = (RecruitEdge)it.next();
+            
+            if (e.getNumber() == number)
+                at.add(new Character(e.getTerrain()));
+        }
+        return at;
+    }
+
+    /**
+     * Return the name of the recruit for the given number of the given recruiter in the given terrain, or null if there's none.
+     * @param name Name of the recruiting creature.
+     * @param number Number of creature
+     * @param t Terrain in which the recruiting may occur.
+     * @return Name of the recruit.
+     */
+    public static String getRecruitFromRecruiterTerrainNumber(String name, char t, int number)
+    {
+        java.util.List outgoing = graph.getOutgoingEdges(name);
+        String v2 = null;
+
+        Iterator it = outgoing.iterator();
+
+        while (it.hasNext())
+        {
+            RecruitEdge e = (RecruitEdge)it.next();
+            
+            if ((e.getNumber() == number) &&
+                (e.getTerrain() == t))
+            {
+                v2 = e.getDestination().getCreatureName();
+            }
+        }
+        return v2;
+    }
+    
+    public static String getBestPossibleRecruitEver(String name)
+    {
+        String best = name;
+        int maxVP = -1;
+        List all = graph.traverseDepthFirst(name);
+        Iterator it = all.iterator();
+        while (it.hasNext())
+        {
+            RecruitVertex v2 = (RecruitVertex)it.next();
+            int vp = v2.getCreature().getPointValue();
+            if (vp > maxVP)
+            {
+                maxVP = vp;
+                best = v2.getCreatureName();
+            }
+        }
+        return best;
     }
 }
 
@@ -769,7 +848,10 @@ ArrayList r_allRecruit() :
 }
 {
     (i = r_number()) (n = r_chaine()) (temp = r_allRecruit())
-    { temp.add(0, new recruitNumber(n, i)); return temp; }
+    {
+        temp.add(0, new recruitNumber(n, i));
+        return temp;
+    }
 |   /* empty */
     { return new ArrayList(); }
 
@@ -830,6 +912,9 @@ int oneTerrain() :
             terrains = t2;
         }
         Log.debug("Adding recruits for " + t + " " + rl);
+
+        addToGraph(rl, tc);
+
         return(1);
     }
 |   <EOL>

@@ -17,6 +17,7 @@ import net.sf.colossus.server.VariantSupport;
  * Simple implementation of a Titan AI
  * @version $Id$
  * @author Bruce Sherrod, David Ripton
+ * @author Romain Dolbeau
  */
 
 
@@ -147,6 +148,26 @@ public class SimpleAI implements AI
         // pick the last creature in the list (which is the
         // best/highest recruit)
         Creature recruit = (Creature)recruits.get(recruits.size() - 1);
+
+        Creature temprecruit =
+            getBestRecruitmentOneTurnAhead(legion,hex,recruits);
+        Creature temprecruit2 =
+            getBestRecruitmentInfinityAhead(recruits);
+
+        /*
+        // graph code disabled ATM
+        if (temprecruit != recruit)
+        {
+            // let's pick-up the creature with the best next turn opportunity
+            // if it has the best 'infinity ahead', and in 4 out of 6 case
+            // if it doesn't.
+            if ((temprecruit == temprecruit2) ||
+                (Dice.rollDie() > 2))
+            {
+                recruit = temprecruit;
+            }
+        }
+        */
 
         // take third cyclops in brush
         if (recruit == Creature.getCreatureByName("Gorgon")
@@ -1602,6 +1623,128 @@ public class SimpleAI implements AI
         }
     }
 
+    private int[] getNumberAndPVForBestNextTurnRecruitment(LegionInfo legion, 
+                                                    MasterHex hex,
+                                                    Creature base)
+    {
+        int mun = TerrainRecruitLoader.getMaximumUsefulNumber(base);
+        int already = legion.numCreature(base);
+        int maxPV = -1;
+        int num = 0;
+        
+        for (int i = 1; i <= mun ; i++)
+        {
+            List all = TerrainRecruitLoader.getAllTerrainsWhereThisNumberOfCreatureRecruit(base.getName(), i);
+            
+            Iterator it = all.iterator();
+            while (it.hasNext())
+            {
+                char t = ((Character)it.next()).charValue();
+                
+                String dest = TerrainRecruitLoader.getRecruitFromRecruiterTerrainNumber(base.getName(), t, i);
+
+                if ((dest != null) &&
+                    (getNumberOfWaysToTerrain(legion,hex,t) > 0))
+                {
+                    Creature cdest = Creature.getCreatureByName(dest);
+
+                    if (legion.numCreature(cdest) == 0)
+                    {
+                        // don't bother if we already have next stage
+                        // this will not catch if we already have
+                        // the after-next stage (i.e. it will try to take
+                        // a third Cyclops over a Gorgon even if we have a
+                        // Serpent, as long as we don't have a Behemoth)
+                        int pv = cdest.getPointValue();
+                        
+                        if (pv > maxPV)
+                        {
+                            maxPV = pv;
+                            num = i;
+                        }
+                    }
+                }
+            }
+        }
+
+        int r[] = new int[2];
+
+        r[0] = num; r[1] = maxPV;
+
+        return r;
+    }
+
+    private Creature getBestRecruitmentOneTurnAhead(LegionInfo legion, 
+                                                    MasterHex hex,
+                                                    List recruits)
+    {
+        Creature recruit = (Creature)recruits.get(recruits.size() - 1);
+        String basic = recruit.getName();
+        int r[] = getNumberAndPVForBestNextTurnRecruitment(legion,hex,recruit);
+
+        // say the best we can do ATM is either what we can recruit next turn, or the value of the recruit itself;
+        int maxPV = ((r[0] == (1 + legion.numCreature(recruit))) ? r[1] : recruit.getPointValue());
+
+        Iterator it = recruits.iterator();
+        
+        while (it.hasNext())
+        {
+            Creature base = (Creature)it.next();
+
+            r = getNumberAndPVForBestNextTurnRecruitment(legion,hex,base);
+
+            if ((r[0] == (1 + legion.numCreature(base))) &&
+                (r[1] > maxPV) && 
+                (base != recruit))
+            { // by recruiting one more "base", we could have a better recruit next turn than what our best this turn could do. So we recruit. Example: instead of recruiting a 18pts Gorgon we'll get a third Cyclops if the 24pts Behemoth is in range. Ditto for the third Lion/Troll if we can reach a Griffon/Wywern (20/21pts) instead of a 16pts ranger. OTOH, in a variant were the ranger can recruit, we might take the ranger anyway (it its recruit is better than a Griffon or Wywern).
+                recruit = base;
+                maxPV = r[1];
+            }
+        }
+
+        if (!(basic.equals(recruit.getName())))
+        {
+            Log.debug("GRAPH: OneTurnAhead suggest recruiting " +
+                      recruit.getName() +" instead of " + basic +
+                      " because we can get better next turn");
+        }
+
+        return recruit;
+    }
+
+    /* this one is dumb, it doesn't take into account how may creatures
+       we already have, and if intermediate are still available */
+    private Creature getBestRecruitmentInfinityAhead(List recruits)
+    {
+        ListIterator it = recruits.listIterator(recruits.size());
+        Creature best = null;
+        String basic = ((Creature)recruits.get(recruits.size() - 1)).getName();
+        int maxVP = -1;
+        
+        while (it.hasPrevious())
+        {
+            Creature recruit = (Creature)it.previous();
+
+            String temp = TerrainRecruitLoader.getBestPossibleRecruitEver(recruit.getName());
+
+            int vp = (Creature.getCreatureByName(temp)).getPointValue();
+
+            if (vp > maxVP)
+            {
+                maxVP = vp; /* vp of recruit */
+                best = recruit; /* best is recruit_er_ */
+            }
+        }
+
+        if (!(basic.equals(best.getName())))
+        {
+            Log.debug("GRAPH: InfinityAhead suggest recruiting " +
+                      best.getName() + " instead of " + basic +
+                      " because it has the best creature in its tree");
+        }
+
+        return best;
+    }
 
     private int getNumberOfWaysToTerrain(LegionInfo legion, 
         MasterHex hex, char terrainType)
@@ -1615,6 +1758,22 @@ public class SimpleAI implements AI
                 total++;
             }
         }
+        return total;
+    }
+
+    private int getNumberOfWaysToTerrains(LegionInfo legion, 
+        MasterHex hex, java.util.List tl)
+    {
+        Iterator it = tl.iterator();
+        int total = 0;
+
+        while (it.hasNext())
+        {
+            char t = ((Character)it.next()).charValue();
+
+            total += getNumberOfWaysToTerrain(legion,hex,t);
+        }
+
         return total;
     }
 

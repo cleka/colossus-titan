@@ -19,7 +19,7 @@ import net.sf.colossus.util.Log;
  */
 
 
-final class Caretaker implements Cloneable
+public final class Caretaker implements Cloneable
 {
     /** Mapping from String creature name to Integer count. If the
      *  creature is not found, assume that we have a full count (equal
@@ -37,7 +37,7 @@ final class Caretaker implements Cloneable
     }
 
 
-    int getCount(String creatureName)
+    public int getCount(String creatureName)
     {
         Integer count = (Integer)map.get(creatureName);
         if (count == null)
@@ -47,7 +47,7 @@ final class Caretaker implements Cloneable
         return count.intValue();
     }
 
-    int getCount(Creature creature)
+    public int getCount(Creature creature)
     {
         return getCount(creature.getName());
     }
