@@ -265,22 +265,30 @@ public class Creature implements Comparable
     }
 
     public int getPointValue()
-    {
+    { // this function is replicated in Critter
         if (isTitan())
         {
             Log.warn("Calling getPointValue() on Titan Creature (should only be called on Titan Critter)");
         }
         return getPower() * getSkill();
     }
-
+    
     public int getHintedRecruitmentValue()
-    {
+    { // this function is replicated in Critter
+        if (isTitan())
+        {
+            Log.warn("Calling getHintedRecruitmentValue() on Titan Creature (should only be called on Titan Critter)");
+        }
         return getPointValue() +
             VariantSupport.getHintedRecruitmentValueOffset(name);
     }
-
+    
     public int getHintedRecruitmentValue(String[] section)
-    {
+    { // this function is replicated in Critter
+        if (isTitan())
+        {
+            Log.warn("Calling getHintedRecruitmentValue() on Titan Creature (should only be called on Titan Critter)");
+        }
         return getPointValue() +
             VariantSupport.getHintedRecruitmentValueOffset(name, section);
     }

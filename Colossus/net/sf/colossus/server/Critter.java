@@ -961,21 +961,27 @@ final class Critter /* extends Creature */ implements Comparable
 
     public int getPointValue()
     {
-        // Must use our local, Titan-aware GetPower()
+        // Must use our local, Titan-aware getPower()
         // return creature.getPointValue();
         return getPower() * getSkill();
     }
     
     public int getHintedRecruitmentValue()
     {
-        return creature.getHintedRecruitmentValue();
+        // Must use our local, Titan-aware getPointValue()
+        // return creature.getHintedRecruitmentValue();
+        return getPointValue() +
+            VariantSupport.getHintedRecruitmentValueOffset(creature.getName());
     }
 
     public int getHintedRecruitmentValue(String[] section)
     {
-        return creature.getHintedRecruitmentValue(section);
+        // Must use our local, Titan-aware getPointValue()
+        // return creature.getHintedRecruitmentValue(section);
+        return getPointValue() +
+            VariantSupport.getHintedRecruitmentValueOffset(creature.getName(), section);
     }
-
+    
     public boolean isRangestriker()
     {
         return creature.isRangestriker();
