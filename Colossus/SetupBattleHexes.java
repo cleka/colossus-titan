@@ -20,7 +20,7 @@ public class SetupBattleHexes
     public static void setupHexes(BattleHex [][] h, char terrain,
         BattleMap map)
     {
-        int scale = 30;
+        int scale = BattleMap.getScale();
 
         int cx = 6 * scale;
         int cy = 3 * scale;
