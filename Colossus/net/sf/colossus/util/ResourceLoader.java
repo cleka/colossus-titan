@@ -98,9 +98,8 @@ public final class ResourceLoader
                         if (image != null)
                         {
                             imageCache.put(mapKey, image);
-                            System.err.println("Loaded " + path +
-                                               pathSeparator + filename +
-                                               imageExtension[i]);
+                            Log.debug("Loaded " + path + pathSeparator + 
+                                filename + imageExtension[i]);
                         }
                     }
                 }
@@ -163,9 +162,8 @@ public final class ResourceLoader
                         if (icon != null)
                         {
                             imageCache.put(mapKey, icon);
-                            System.err.println("Loaded " + path +
-                                               pathSeparator + filename +
-                                               imageExtension[i]);
+                            Log.debug("Loaded " + path + pathSeparator + 
+                                filename + imageExtension[i]);
                         }
                     }
                 }
@@ -307,7 +305,8 @@ public final class ResourceLoader
             }
             catch (Exception e)
             {
-                System.err.println("ERROR: html document exist, but cannot be loaded (" + filename + "): " + e);
+                Log.error("html document exists, but cannot be loaded (" + 
+                    filename + "): " + e);
             }
             return null;
         }
@@ -338,7 +337,8 @@ public final class ResourceLoader
             }
             catch (Exception e)
             {
-                System.err.println("ERROR: text document exist, but cannot be loaded (" + filename + "): " + e);
+                Log.error("text document exists, but cannot be loaded (" + 
+                    filename + "): " + e);
             }
             return null;
         }
@@ -424,9 +424,8 @@ public final class ResourceLoader
 		}
 		if (tempImage[i] == null)
 		{
-		    System.err.println("Error: during creation of \"" +
-				       mapKey + "\", loading failed for " +
-				       filenames[i]);
+		    Log.error("during creation of [" + mapKey + 
+                        "], loading failed for " + filenames[i]);
 		    return null;
 		}
             }
@@ -513,8 +512,7 @@ public final class ResourceLoader
 
 	if (tempImage == null)
 	{
-	    System.err.println("Error: creation failed for " +
-			       filename);
+	    Log.error("creation failed for " + filename);
 	    return null;
 	}
 	waitOnImage(tempImage);
@@ -621,9 +619,8 @@ public final class ResourceLoader
         }
         if (tempIcon.getImageLoadStatus() != MediaTracker.COMPLETE)
         {
-            System.err.println("Image loading of " + filename +
-                               " failed (" +
-                               tempIcon.getImageLoadStatus() + ")");
+            Log.error("Image loading of " + filename + " failed (" +
+                tempIcon.getImageLoadStatus() + ")");
             return null;
         }
         int width = tempIcon.getIconWidth();
@@ -679,8 +676,8 @@ public final class ResourceLoader
         }
         if (icon.getImageLoadStatus() != MediaTracker.COMPLETE)
         {
-            System.err.println("Image loading failed (" +
-                               icon.getImageLoadStatus() + ")");
+            Log.error("Image loading failed (" + icon.getImageLoadStatus() + 
+                ")");
         }
     }
 
@@ -688,8 +685,7 @@ public final class ResourceLoader
     {
         if (!(filename.startsWith(prefix)))
         {
-            System.err.println("Warning: " + prefix +
-                               " is not prefix of " + filename);
+            Log.warn("Warning: " + prefix + " is not prefix of " + filename);
             return 0;
         }
         int index = prefix.length();
@@ -723,7 +719,7 @@ public final class ResourceLoader
         }
         catch (Exception e)
         {
-            System.err.println("Error during number extraction: " + e);
+            Log.error("during number extraction: " + e);
         }
         return val;
     }
@@ -732,8 +728,7 @@ public final class ResourceLoader
     {
         if (!(filename.startsWith(prefix)))
         {
-            System.err.println("Warning: " + prefix +
-                               " is not prefix of " + filename);
+            Log.warn(prefix + " is not prefix of " + filename);
             return "black";
         }
         int index = prefix.length();
