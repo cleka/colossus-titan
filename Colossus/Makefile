@@ -5,7 +5,6 @@
 #    it will continue to work portably.  GNU make has hard-to-diagnose 
 #    problems with spurious ^M characters.
 
-
 # Java compiler
 # jikes is really fast, good, and free.  It supports -depend so all
 #    dependent objects will be recompiled when you change one.
@@ -19,13 +18,18 @@ JCC = jikes -g -depend -deprecation +P
 
 
 # Install directory for html and applet jar files.
-HTMLDIR = /home/httpd/html
+HTMLDIR = /home/groups/Colossus/htdocs
+DOWNLOAD_DIR = $(HTMLDIR)/download
+FTPDIR = /home/groups/ftp/pub/Colossus
+
+ZIPFILE = Colossus.`date +%Y%m%d`.zip
+
 
 # Targets
 
 all: jar
 
-.PHONY : all classes jar clean dist javadoc
+.PHONY : all classes jar clean dist javadoc inst $(ZIPFILE)
 
 
 # New implicit rule for Java
@@ -54,20 +58,28 @@ $(JARFILE): $(CLASS_FILES) $(IMAGES) META-INF/MANIFEST.MF
 
 # Install jar and html files for applet
 INST_JARFILE = $(HTMLDIR)/$(JARFILE)
-INST_HTML = $(HTMLDIR)/Colossus_applet.html
+INST_HTML = $(HTMLDIR)/Colossus_applet_plug.html
+INST_README = $(HTMLDIR)/README.txt
+INST_DIST = $(FTPDIR)/$(ZIPFILE)
 $(INST_JARFILE): $(JARFILE)
 	cp Colossus.jar $(HTMLDIR)
-$(INST_HTML): Colossus_applet.html
-	cp Colossus_applet.html $(HTMLDIR)
-inst: $(INST_JARFILE) $(INST_HTML)
+$(INST_HTML): Colossus_applet_plug.html
+	cp Colossus_applet_plug.html $(HTMLDIR)
+$(INST_README): docs/README.txt
+	cp docs/README.txt $(HTMLDIR)
+$(INST_DIST): dist
+	cp $(ZIPFILE) $(FTPDIR)
+	cp $(ZIPFILE) $(DOWNLOAD_DIR)
+
+inst: $(INST_JARFILE) $(INST_HTML) $(INST_README) $(INST_DIST)
 
 # Clean up
 clean:
 	rm -f *~ *.class core javacore.txt *.bak *.jar
 
-# Make zip file.  Don't include saved games or other zip files.
-dist:
-	zip -pr Colossus.`date +%Y%m%d`.zip * -x *.sav *.zip
+# Make zip file.  Don't include saved games, CVS dirs, or other zip files.
+dist: $(JARFILE)
+	zip -pr $(ZIPFILE) * -x *.sav *.zip \*CVS\*
 
 
 # Make javadoc docs
