@@ -46,8 +46,14 @@ class Negotiate extends JDialog implements MouseListener, ActionListener
         setResizable(false);
 
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-        setLocation(new Point(d.width / 2 - getSize().width / 2, d.height / 2
-            - getSize().height / 2));
+
+        Point location = Concede.returnLocation();
+        if (location == null)
+        {
+            location = new Point(d.width / 2 - getSize().width / 2, d.height / 2
+                - getSize().height / 2);
+        }
+        setLocation(location);
 
         addMouseListener(this);
 
@@ -106,6 +112,13 @@ class Negotiate extends JDialog implements MouseListener, ActionListener
 
         setVisible(true);
         repaint();
+    }
+    
+    
+    public void cleanup()
+    {
+        Concede.saveLocation(getLocation());
+        dispose();
     }
 
 
@@ -325,7 +338,7 @@ class Negotiate extends JDialog implements MouseListener, ActionListener
             }
 
             // Exit this dialog.
-            dispose();
+            cleanup();
 
             // Unselect and repaint the hex.
             hex.unselect();
@@ -335,7 +348,7 @@ class Negotiate extends JDialog implements MouseListener, ActionListener
         else if (e.getActionCommand() == "Fight")
         {
             // Exit this dialog.
-            dispose();
+            cleanup();
         }
     }
 

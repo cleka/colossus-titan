@@ -66,6 +66,7 @@ public class BattleMap extends JFrame implements MouseListener,
     public static final int TOO_LATE = 2;
     private int summonState = NO_KILLS;
     Legion donor = null;
+    private static Point location;
 
 
     public BattleMap(MasterBoard board, Legion attacker, Legion defender,
@@ -99,6 +100,12 @@ public class BattleMap extends JFrame implements MouseListener,
 
         pack();
         setSize(getPreferredSize());
+
+        if (location == null)
+        {
+            location = new Point(scale, scale);
+        }
+        setLocation(location);
 
         try
         {
@@ -1285,8 +1292,12 @@ public class BattleMap extends JFrame implements MouseListener,
 
         if (turn != null)
         {
-            turn.dispose();
+            turn.cleanup();
         }
+
+        // Save location for next object.
+        location = getLocation();
+
         dispose();
 
         masterHex.unselect();

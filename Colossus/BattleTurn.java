@@ -27,6 +27,7 @@ class BattleTurn extends JDialog implements ActionListener
     private SummonAngel summonAngel;
     private boolean summoningAngel = false;
     private Container contentPane;
+    private static Point location;
 
 
     BattleTurn(JFrame parentFrame, BattleMap map, Legion attacker, Legion
@@ -47,8 +48,13 @@ class BattleTurn extends JDialog implements ActionListener
 
         pack();
 
-        // Place this window in the upper left corner.
-        setLocation(new Point(0, 0));
+        // Place this window in the upper left corner, or at the saved
+        // location of the last BattleTurn. 
+        if (location == null)
+        {
+            location = new Point(0, 0);
+        }
+        setLocation(location);
 
         setVisible(true);
 
@@ -320,6 +326,13 @@ class BattleTurn extends JDialog implements ActionListener
     SummonAngel getSummonAngel()
     {
         return summonAngel;
+    }
+
+
+    public void cleanup()
+    {
+        location = getLocation();
+        dispose();
     }
 
 

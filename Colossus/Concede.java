@@ -27,6 +27,7 @@ class Concede extends JDialog implements ActionListener
     private Graphics offGraphics;
     private Dimension offDimension;
     private Image offImage;
+    private static Point location;
 
 
     Concede(JFrame parentFrame, Legion friend, Legion enemy, boolean flee)
@@ -51,8 +52,13 @@ class Concede extends JDialog implements ActionListener
         setResizable(false);
 
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-        setLocation(new Point(d.width / 2 - getSize().width / 2, d.height / 2
-            - getSize().height / 2));
+
+        if (location == null)
+        {
+            location = new Point(d.width / 2 - getSize().width / 2, d.height / 2
+                - getSize().height / 2);
+        }
+        setLocation(location);
 
         // Leave space for angels.
         friendChits = new Chit[7];
@@ -109,6 +115,25 @@ class Concede extends JDialog implements ActionListener
 
         setVisible(true);
         repaint();
+    }
+
+
+    public static void saveLocation(Point point)
+    {
+        location = point;
+    }
+
+
+    public static Point returnLocation()
+    {
+        return location;
+    }
+
+
+    public void cleanup()
+    {
+        location = getLocation();
+        dispose();
     }
 
 
@@ -203,7 +228,7 @@ class Concede extends JDialog implements ActionListener
             }
 
             // Exit this dialog.
-            dispose();
+            cleanup();
 
             // Unselect and repaint the hex.
             MasterHex hex = enemy.getCurrentHex();
@@ -213,7 +238,7 @@ class Concede extends JDialog implements ActionListener
 
         else
         {
-            dispose();
+            cleanup();
         }
     }
 
