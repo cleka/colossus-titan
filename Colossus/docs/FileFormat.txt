@@ -39,6 +39,14 @@ All of those should be on one line.
  master board, case 126 and 125 are on the same line number 0
 and on columns 4 and 3).
 
+WARNING: The way the Hex are displayed (pointy part upside or
+downside) depend on the parity of the X+Y sum. It is possible
+to create a perfectly legit MAP where all the Hex are upside-down !
+Should this happen, the only way fo tix this 'feature' currently,
+is to move everything one column right _or_ one row down, i.e.,
+force the reversal of the parity. Sorry about that, the problem
+hasn't yet been solved.
+
 2) TER file format (default file used: Default/Default.ter)
 
 This file define the Colossus Recruit Trees ; what
