@@ -27,19 +27,14 @@ public class RecruitGraph
      */
     private class RecruitVertex
     {
-        private final Creature cre;
+        private final String cre;
         private final RecruitGraph graph;
         private List outgoingEdges = new ArrayList();
-    
-        RecruitVertex(Creature cre, RecruitGraph graph)
-        {
-            this.cre = cre;
-            this.graph = graph;
-        }
+        private List incomingEdges = new ArrayList();
     
         RecruitVertex(String name, RecruitGraph graph)
         {
-            this.cre = Creature.getCreatureByName(name);
+            this.cre = name;
             this.graph = graph;
         }
     
@@ -49,7 +44,14 @@ public class RecruitGraph
             oe.addAll(outgoingEdges);
             return oe;
         }
-    
+
+        List getIncomingEdges()
+        {
+            List ie = new ArrayList();
+            ie.addAll(incomingEdges);
+            return ie;
+        }
+        
         void addOutgoingEdge(RecruitEdge e)
         {
             if (!(outgoingEdges.contains(e)))
@@ -57,15 +59,18 @@ public class RecruitGraph
                 outgoingEdges.add(e);
             }
         }
-    
-        Creature getCreature()
+
+        void addIncomingEdge(RecruitEdge e)
         {
-            return cre;
+            if (!(incomingEdges.contains(e)))
+            {
+                incomingEdges.add(e);
+            }
         }
     
         String getCreatureName()
         {
-            return cre.getName();
+            return cre;
         }
 
         int getRemaining()
@@ -87,7 +92,7 @@ public class RecruitGraph
                 return false;
             }
             RecruitVertex o2 = (RecruitVertex)obj;
-            if (o2.getCreature() == cre)
+            if (o2.getCreatureName().equals(cre))
             {
                 return true;
             }
@@ -96,7 +101,7 @@ public class RecruitGraph
 
         public String toString()
         {
-            return "RecruitVertex " + cre.getName() + " with " +
+            return "RecruitVertex " + cre + " with " +
                 outgoingEdges.size() + "exits";
         }
     }
@@ -122,8 +127,6 @@ public class RecruitGraph
             this.number = number;
             this.terrain = terrain;
         }
-
-        /* PUBLIC */
 
         RecruitVertex getSource()
         {
@@ -180,12 +183,7 @@ public class RecruitGraph
         this.caretakerInfo = null;
     }
 
-    private RecruitVertex addVertex(String name)
-    {
-        return addVertex(Creature.getCreatureByName(name));
-    }
-
-    private RecruitVertex addVertex(Creature cre)
+    private RecruitVertex addVertex(String cre)
     {
         RecruitVertex temp = (RecruitVertex)creatureToVertex.get(cre);
         if (temp == null)
@@ -204,11 +202,12 @@ public class RecruitGraph
         RecruitEdge e = new RecruitEdge(src, dst, number, terrain);
         allEdge.add(e);
         src.addOutgoingEdge(e);
+        dst.addIncomingEdge(e);
         return e;
     }
 
     /**
-     * Traverse the graph (depth first), assuming that all vertex in visited have been already visited, and using the given legion for availability of creatures (along with the caretakerInfo).
+     * Traverse the graph (depth first), assuming that all vertex in visited have been already visited, and using the given legion for availability of creatures (along with the caretakerInfo). This will ignore any strange stuff such as Anything, AnyNonLord, and so on. OTOH It will not ignore the Titan.
      * @param s The base vertex
      * @param visited Already visited vertexes
      * @param legion The legion to use for availability
@@ -266,32 +265,32 @@ public class RecruitGraph
 
     /**
      * Give the List of RecruitEdge where the given creature is the source.
-     * @param cre Recruiting creature
+     * @param  cre Name of the recruiting creature
      * @return A List of all the outgoing RecruitEdge.
      */
-    private List getOutgoingEdges(Creature cre)
+    private List getOutgoingEdges(String cre)
     {
         RecruitVertex temp = (RecruitVertex)creatureToVertex.get(cre);
         return temp.getOutgoingEdges();
     }
 
     /**
-     * Give the List of RecruitEdge where the given creature is the source.
-     * @param  name Name of the recruiting creature
-     * @return A List of all the outgoing RecruitEdge.
+     * Give the List of RecruitEdge where the given creature is the destination.
+     * @param  cre Name of the recruited creature
+     * @return A List of all the incoming RecruitEdge.
      */
-    private List getOutgoingEdges(String name)
+    private List getIncomingEdges(String cre)
     {
-        return getOutgoingEdges(Creature.getCreatureByName(name));
+        RecruitVertex temp = (RecruitVertex)creatureToVertex.get(cre);
+        return temp.getIncomingEdges();
     }
-
-
+    
     /**
      * Give the List of RecruitVertex still reachable through the given creature.
-     * @param cre Base creature
+     * @param cre Name of the base creature
      * @return A List of all the reachable RecruitVertex.
      */
-    private List traverse(Creature cre)
+    private List traverse(String cre)
     {
         return traverse((RecruitVertex)creatureToVertex.get(cre),
                         new HashSet(),
@@ -299,54 +298,18 @@ public class RecruitGraph
     }
     
     /**
-     * Give the List of RecruitVertex still reachable through the given creature.
-     * @param name Name of the base creature
-     * @return A List of all the reachable RecruitVertex.
-     */
-    private List traverse(String name)
-    {
-        return traverse(Creature.getCreatureByName(name));
-    }
-    
-    /**
      * Give the List of RecruitVertex still reachable through the given creature from the given Legion.
-     * @param cre Base creature
+     * @param cre Name of the base creature
      * @return A List of all the reachable RecruitVertex.
      */
-    private List traverse(Creature cre, LegionInfo legion)
+    private List traverse(String cre, LegionInfo legion)
     {
         return traverse((RecruitVertex)creatureToVertex.get(cre),
                         new HashSet(),
                         legion);
     }
-    
-    /**
-     * Give the List of RecruitVertex still reachable through the given creature from the given Legion.
-     * @param name Name of the base creature
-     * @return A List of all the reachable RecruitVertex.
-     */
-    private List traverse(String name, LegionInfo legion)
-    {
-        return traverse(Creature.getCreatureByName(name), legion);
-    }
 
     /* PUBLIC */
-
-    /**
-     * Add an edge is the graph from a Creature to another, in a given number, in a given terrain.
-     * @param src Recruiting creature
-     * @param dst Recruited creature
-     * @param number Number of recruiters
-     * @param terrain Terrain where the recruiting occurs
-     */
-    public void addEdge(Creature src,
-                               Creature dst,
-                               int number, char terrain)
-    {
-        addEdge(addVertex(src),
-                addVertex(dst),
-                number, terrain);
-    }
 
     /**
      * Add an edge is the graph from a Creature to another, in a given number, in a given terrain.
@@ -357,8 +320,8 @@ public class RecruitGraph
      * @return The new RecruitEdge.
      */
     public void addEdge(String src,
-                               String dst,
-                               int number, char terrain)
+                        String dst,
+                        int number, char terrain)
     {
         addEdge(addVertex(src),
                 addVertex(dst),
@@ -384,19 +347,19 @@ public class RecruitGraph
         allEdge.clear();
         creatureToVertex.clear();
     }
-    
+
     /**
      * What is the maximum "useful" number of a given creature for
      * recruitment purpose (excluding "Any" or "AnyNonLord").
      * return value of -1 or 0 means the Creature cannot recruit except itself.
-     * @param creature Creature considered.
+     * @param cre Name of the creature considered.
      * @return The higher number of creatures needed to recruit something.
      */
-    public int getMaximumUsefulNumber(Creature creature)
+    public int getMaximumUsefulNumber(String cre)
     {
         int mun = -1;
         
-        java.util.List outgoing = getOutgoingEdges(creature);
+        java.util.List outgoing = getOutgoingEdges(cre);
         Iterator it = outgoing.iterator();
         while (it.hasNext())
         {
@@ -406,28 +369,17 @@ public class RecruitGraph
                 mun = (int)e.getNumber();
         }
         return mun;
-    }
 
-    /**
-     * What is the maximum "useful" number of a given creature for
-     * recruitment purpose (excluding "Any" or "AnyNonLord").
-     * return value of -1 or 0 means the Creature cannot recruit except itself.
-     * @param name Name of the creature considered.
-     * @return The higher number of creatures needed to recruit something.
-     */
-    public int getMaximumUsefulNumber(String name)
-    {
-        return getMaximumUsefulNumber(Creature.getCreatureByName(name));
     }
 
     /**
      * Return all the terrains (as Character in a List) where the given
      * number of creature of the given name can recruit.
-     * @param cre Recruiting creature.
+     * @param cre Name of the recruiting creature.
      * @param number Number of creature
      * @return A List of Character representing all Terrains where recruitment is possible.
      */
-    public List getAllTerrainsWhereThisNumberOfCreatureRecruit(Creature cre,
+    public List getAllTerrainsWhereThisNumberOfCreatureRecruit(String cre,
                                                                int number)
     {
         java.util.List at = new ArrayList();
@@ -441,30 +393,17 @@ public class RecruitGraph
             if (e.getNumber() == number)
                 at.add(new Character(e.getTerrain()));
         }
-        return at;
-    }
-
-    /**
-     * Return all the terrains (as Character in a List) where the given
-     * number of creature of the given name can recruit.
-     * @param name Name of the recruiting creature.
-     * @param number Number of creature
-     * @return A List of Character representing all Terrains where recruitment is possible.
-     */
-    public List getAllTerrainsWhereThisNumberOfCreatureRecruit(String name,
-                                                               int number)
-    {
-        return getAllTerrainsWhereThisNumberOfCreatureRecruit(Creature.getCreatureByName(name), number);
+        return at;   
     }
 
     /**
      * Return the name of the recruit for the given number of the given recruiter in the given terrain, or null if there's none.
-     * @param cre Recruiting creature.
+     * @param cre Name of the recruiting creature.
      * @param number Number of creature
      * @param t Terrain in which the recruiting may occur.
      * @return Name of the recruit.
      */
-    public String getRecruitFromRecruiterTerrainNumber(Creature cre,
+    public String getRecruitFromRecruiterTerrainNumber(String cre,
                                                        char t,
                                                        int number)
     {
@@ -487,36 +426,23 @@ public class RecruitGraph
     }
 
     /**
-     * Return the name of the recruit for the given number of the given recruiter in the given terrain, or null if there's none.
-     * @param name Name of the recruiting creature.
-     * @param number Number of creature
-     * @param t Terrain in which the recruiting may occur.
-     * @return Name of the recruit.
-     */
-    public String getRecruitFromRecruiterTerrainNumber(String name,
-                                                       char t,
-                                                       int number)
-    {
-        return getRecruitFromRecruiterTerrainNumber(Creature.getCreatureByName(name), t, number);
-    }
-
-    /**
      * Return the name of the best possible creature that is reachable trough the given creature from the given LegionInfo (can be null).
-     * @param cre Recruiting creature.
+     * @param cre Name of the recruiting creature.
      * @param legion The recruiting legion or null.
      * @return Name of the best possible recruit.
      */
-    public String getBestPossibleRecruitEver(Creature cre,
+    public String getBestPossibleRecruitEver(String cre,
                                              LegionInfo legion)
     {
-        String best = cre.getName();
+        String best = cre;
         int maxVP = -1;
         List all = traverse(cre, legion);
         Iterator it = all.iterator();
         while (it.hasNext())
         {
             RecruitVertex v2 = (RecruitVertex)it.next();
-            int vp = v2.getCreature().getPointValue();
+            Creature creature = Creature.getCreatureByName(v2.getCreatureName());
+            int vp = (creature == null ? -1 : creature.getPointValue());
             if (vp > maxVP)
             {
                 maxVP = vp;
@@ -524,17 +450,5 @@ public class RecruitGraph
             }
         }
         return best;
-    }
-
-    /**
-     * Return the name of the best possible creature that is reachable trough the given creature from the given LegionInfo (can be null).
-     * @param name Name of the recruiting creature.
-     * @param legion The recruiting legion or null.
-     * @return Name of the best possible recruit.
-     */
-    public String getBestPossibleRecruitEver(String name,
-                                             LegionInfo legion)
-    {
-        return getBestPossibleRecruitEver(Creature.getCreatureByName(name), legion);
     }
 }

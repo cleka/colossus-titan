@@ -87,7 +87,7 @@ public class TerrainRecruitLoader
             {
                 recruitNumber tr = (recruitNumber)it.next();
                 String v2 = tr.getName();
-                if ((tr.getNumber() > 0) && (v2 != null) && (v1 != null))
+                if ((v2 != null) && (v1 != null))
                 {
                     graph.addEdge(v1, v2, tr.getNumber(), t);
                 }
@@ -332,6 +332,13 @@ public class TerrainRecruitLoader
             }
         }
         return re;
+    }
+
+    public static int numberOfRecruiterNeeded_G(Creature recruiter, 
+                                                Creature recruit,
+                                                char terrain)
+    {
+        return 0;
     }
 
     /**

@@ -1686,7 +1686,7 @@ public class SimpleAI implements AI
                                                     MasterHex hex,
                                                     Creature base)
     {
-        int mun = TerrainRecruitLoader.getRecruitGraph().getMaximumUsefulNumber(base);
+        int mun = TerrainRecruitLoader.getRecruitGraph().getMaximumUsefulNumber(base.getName());
         int already = legion.numCreature(base);
         int maxPV = -1;
         int num = 0;
