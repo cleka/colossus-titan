@@ -573,273 +573,88 @@ class PickRecruit extends JDialog implements MouseListener, WindowListener
     }
 
 
-    // Returns the number of eligible recruits.  The passed in Creature array
-    // should be of length 5.
-    // XXX: This really should be table-driven.
+    // Returns the number of eligible recruits.  The passed-in recruits array
+    // should be of length 5, and will be filled with the eligible recruits.
     public static int findEligibleRecruits(Legion legion, Creature [] recruits)
     {
+        // Paranoia
+        if (recruits.length != 5)
+        {
+            System.out.println("Bad arg passed to findEligibleRecruits()");
+            return 0;
+        }
+        for (int i = 0; i < recruits.length; i++)
+        {
+            recruits[i] = null;
+        }
+        
         MasterHex hex = legion.getCurrentHex();
 
-        switch (hex.getTerrain())
+        // Towers are a special case.
+        if (hex.getTerrain() == 'T')
         {
-            case 'B':
-                if (legion.numCreature(Creature.gargoyle) >= 1 ||
-                    legion.numCreature(Creature.cyclops) >= 1 ||
-                    legion.numCreature(Creature.gorgon) >= 1)
-                {
-                    recruits[0] = Creature.gargoyle;
-                }
-                if (legion.numCreature(Creature.gargoyle) >= 2 ||
-                    legion.numCreature(Creature.cyclops) >= 1 ||
-                    legion.numCreature(Creature.gorgon) >= 1)
-                {
-                    recruits[1] = Creature.cyclops;
-                }
-                if (legion.numCreature(Creature.cyclops) >= 2 ||
-                    legion.numCreature(Creature.gorgon) >= 1)
-                {
-                    recruits[2] = Creature.gorgon;
-                }
-                break;
-
-            case 'D':
-                if (legion.numCreature(Creature.lion) >= 1 ||
-                    legion.numCreature(Creature.griffon) >= 1 ||
-                    legion.numCreature(Creature.hydra) >= 1)
-                {
-                    recruits[0] = Creature.lion;
-                }
-                if (legion.numCreature(Creature.lion) >= 3 ||
-                    legion.numCreature(Creature.griffon) >= 1 ||
-                    legion.numCreature(Creature.hydra) >= 1)
-                {
-                    recruits[1] = Creature.griffon;
-                }
-                if (legion.numCreature(Creature.griffon) >= 2 ||
-                    legion.numCreature(Creature.hydra) >= 1)
-                {
-                    recruits[2] = Creature.hydra;
-                }
-                break;
-
-            case 'H':
-                if (legion.numCreature(Creature.ogre) >= 1 ||
-                    legion.numCreature(Creature.minotaur) >= 1 ||
-                    legion.numCreature(Creature.unicorn) >= 1)
-                {
-                    recruits[0] = Creature.ogre;
-                }
-                if (legion.numCreature(Creature.ogre) >= 3 ||
-                    legion.numCreature(Creature.minotaur) >= 1 ||
-                    legion.numCreature(Creature.unicorn) >= 1)
-                {
-                    recruits[1] = Creature.minotaur;
-                }
-                if (legion.numCreature(Creature.minotaur) >= 2 ||
-                    legion.numCreature(Creature.unicorn) >= 1)
-                {
-                    recruits[2] = Creature.unicorn;
-                }
-                break;
-
-            case 'J':
-                if (legion.numCreature(Creature.gargoyle) >= 1 ||
-                    legion.numCreature(Creature.cyclops) >= 1 ||
-                    legion.numCreature(Creature.behemoth) >= 1 ||
-                    legion.numCreature(Creature.serpent) >= 1)
-                {
-                    recruits[0] = Creature.gargoyle;
-                }
-                if (legion.numCreature(Creature.gargoyle) >= 2 ||
-                    legion.numCreature(Creature.cyclops) >= 1 ||
-                    legion.numCreature(Creature.behemoth) >= 1 ||
-                    legion.numCreature(Creature.serpent) >= 1)
-                {
-                    recruits[1] = Creature.cyclops;
-                }
-                if (legion.numCreature(Creature.cyclops) >= 3 ||
-                    legion.numCreature(Creature.behemoth) >= 1 ||
-                    legion.numCreature(Creature.serpent) >= 1)
-                {
-                    recruits[2] = Creature.behemoth;
-                }
-                if (legion.numCreature(Creature.behemoth) >= 2 ||
-                    legion.numCreature(Creature.serpent) >= 1)
-                {
-                    recruits[3] = Creature.serpent;
-                }
-                break;
-
-            case 'm':
-                if (legion.numCreature(Creature.lion) >= 1 ||
-                    legion.numCreature(Creature.minotaur) >= 1 ||
-                    legion.numCreature(Creature.dragon) >= 1 ||
-                    legion.numCreature(Creature.colossus) >= 1)
-                {
-                    recruits[0] = Creature.lion;
-                }
-                if (legion.numCreature(Creature.lion) >= 2 ||
-                    legion.numCreature(Creature.minotaur) >= 1 ||
-                    legion.numCreature(Creature.dragon) >= 1 ||
-                    legion.numCreature(Creature.colossus) >= 1)
-                {
-                    recruits[1] = Creature.minotaur;
-                }
-                if (legion.numCreature(Creature.minotaur) >= 2 ||
-                    legion.numCreature(Creature.dragon) >= 1 ||
-                    legion.numCreature(Creature.colossus) >= 1)
-                {
-                    recruits[2] = Creature.dragon;
-                }
-                if (legion.numCreature(Creature.dragon) >= 2 ||
-                    legion.numCreature(Creature.colossus) >= 1)
-                {
-                    recruits[3] = Creature.colossus;
-                }
-                break;
-
-            case 'M':
-                if (legion.numCreature(Creature.ogre) >= 1 ||
-                    legion.numCreature(Creature.troll) >= 1 ||
-                    legion.numCreature(Creature.ranger) >= 1)
-                {
-                    recruits[0] = Creature.ogre;
-                }
-                if (legion.numCreature(Creature.ogre) >= 2 ||
-                    legion.numCreature(Creature.troll) >= 1 ||
-                    legion.numCreature(Creature.ranger) >= 1)
-                {
-                    recruits[1] = Creature.troll;
-                }
-                if (legion.numCreature(Creature.troll) >= 2 ||
-                    legion.numCreature(Creature.ranger) >= 1)
-                {
-                    recruits[2] = Creature.ranger;
-                }
-                break;
-
-            case 'P':
-                if (legion.numCreature(Creature.centaur) >= 1 ||
-                    legion.numCreature(Creature.lion) >= 1 ||
-                    legion.numCreature(Creature.ranger) >= 1)
-                {
-                    recruits[0] = Creature.centaur;
-                }
-                if (legion.numCreature(Creature.centaur) >= 2 ||
-                    legion.numCreature(Creature.lion) >= 1 ||
-                    legion.numCreature(Creature.ranger) >= 1)
-                {
-                    recruits[1] = Creature.lion;
-                }
-                if (legion.numCreature(Creature.lion) >= 2 ||
-                    legion.numCreature(Creature.ranger) >= 1)
-                {
-                    recruits[2] = Creature.ranger;
-                }
-                break;
-
-            case 'S':
-                if (legion.numCreature(Creature.troll) >= 1 ||
-                    legion.numCreature(Creature.wyvern) >= 1 ||
-                    legion.numCreature(Creature.hydra) >= 1)
-                {
-                    recruits[0] = Creature.troll;
-                }
-                if (legion.numCreature(Creature.troll) >= 3 ||
-                    legion.numCreature(Creature.wyvern) >= 1 ||
-                    legion.numCreature(Creature.hydra) >= 1)
-                {
-                    recruits[1] = Creature.wyvern;
-                }
-                if (legion.numCreature(Creature.wyvern) >= 2 ||
-                    legion.numCreature(Creature.hydra) >= 1)
-                {
-                    recruits[2] = Creature.hydra;
-                }
-                break;
-
-            case 't':
-                if (legion.numCreature(Creature.troll) >= 1 ||
-                    legion.numCreature(Creature.warbear) >= 1 ||
-                    legion.numCreature(Creature.giant) >= 1 ||
-                    legion.numCreature(Creature.colossus) >= 1)
-                {
-                    recruits[0] = Creature.troll;
-                }
-                if (legion.numCreature(Creature.troll) >= 2 ||
-                    legion.numCreature(Creature.warbear) >= 1 ||
-                    legion.numCreature(Creature.giant) >= 1 ||
-                    legion.numCreature(Creature.colossus) >= 1)
-                {
-                    recruits[1] = Creature.warbear;
-                }
-                if (legion.numCreature(Creature.warbear) >= 2 ||
-                    legion.numCreature(Creature.giant) >= 1 ||
-                    legion.numCreature(Creature.colossus) >= 1)
-                {
-                    recruits[2] = Creature.giant;
-                }
-                if (legion.numCreature(Creature.giant) >= 2 ||
-                    legion.numCreature(Creature.colossus) >= 1)
-                {
-                    recruits[3] = Creature.colossus;
-                }
-                break;
-
-            case 'T':
-                recruits[0] = Creature.centaur;
-                recruits[1] = Creature.gargoyle;
-                recruits[2] = Creature.ogre;
-                if (legion.numCreature(Creature.behemoth) >= 3 ||
-                    legion.numCreature(Creature.centaur) >= 3 ||
-                    legion.numCreature(Creature.colossus) >= 3 ||
-                    legion.numCreature(Creature.cyclops) >= 3 ||
-                    legion.numCreature(Creature.dragon) >= 3 ||
-                    legion.numCreature(Creature.gargoyle) >= 3 ||
-                    legion.numCreature(Creature.giant) >= 3 ||
-                    legion.numCreature(Creature.gorgon) >= 3 ||
-                    legion.numCreature(Creature.griffon) >= 3 ||
-                    legion.numCreature(Creature.guardian) >= 1 ||
-                    legion.numCreature(Creature.hydra) >= 3 ||
-                    legion.numCreature(Creature.lion) >= 3 ||
-                    legion.numCreature(Creature.minotaur) >= 3 ||
-                    legion.numCreature(Creature.ogre) >= 3 ||
-                    legion.numCreature(Creature.ranger) >= 3 ||
-                    legion.numCreature(Creature.serpent) >= 3 ||
-                    legion.numCreature(Creature.troll) >= 3 ||
-                    legion.numCreature(Creature.unicorn) >= 3 ||
-                    legion.numCreature(Creature.warbear) >= 3 ||
-                    legion.numCreature(Creature.wyvern) >= 3)
-                {
-                    recruits[3] = Creature.guardian;
-                }
-                if (legion.numCreature(Creature.titan) >= 1 ||
-                    legion.numCreature(Creature.warlock) >= 1)
-                {
-                    recruits[4] = Creature.warlock;
-                }
-                break;
-
-            case 'W':
-                if (legion.numCreature(Creature.centaur) >= 1 ||
-                    legion.numCreature(Creature.warbear) >= 1 ||
-                    legion.numCreature(Creature.unicorn) >= 1)
-                {
-                    recruits[0] = Creature.centaur;
-                }
-                if (legion.numCreature(Creature.centaur) >= 3 ||
-                    legion.numCreature(Creature.warbear) >= 1 ||
-                    legion.numCreature(Creature.unicorn) >= 1)
-                {
-                    recruits[1] = Creature.warbear;
-                }
-                if (legion.numCreature(Creature.warbear) >= 2 ||
-                    legion.numCreature(Creature.unicorn) >= 1)
-                {
-                    recruits[2] = Creature.unicorn;
-                }
-                break;
+            recruits[0] = Creature.centaur;
+            recruits[1] = Creature.gargoyle;
+            recruits[2] = Creature.ogre;
+            if (legion.numCreature(Creature.behemoth) >= 3 ||
+                legion.numCreature(Creature.centaur) >= 3 ||
+                legion.numCreature(Creature.colossus) >= 3 ||
+                legion.numCreature(Creature.cyclops) >= 3 ||
+                legion.numCreature(Creature.dragon) >= 3 ||
+                legion.numCreature(Creature.gargoyle) >= 3 ||
+                legion.numCreature(Creature.giant) >= 3 ||
+                legion.numCreature(Creature.gorgon) >= 3 ||
+                legion.numCreature(Creature.griffon) >= 3 ||
+                legion.numCreature(Creature.guardian) >= 1 ||
+                legion.numCreature(Creature.hydra) >= 3 ||
+                legion.numCreature(Creature.lion) >= 3 ||
+                legion.numCreature(Creature.minotaur) >= 3 ||
+                legion.numCreature(Creature.ogre) >= 3 ||
+                legion.numCreature(Creature.ranger) >= 3 ||
+                legion.numCreature(Creature.serpent) >= 3 ||
+                legion.numCreature(Creature.troll) >= 3 ||
+                legion.numCreature(Creature.unicorn) >= 3 ||
+                legion.numCreature(Creature.warbear) >= 3 ||
+                legion.numCreature(Creature.wyvern) >= 3)
+            {
+                recruits[3] = Creature.guardian;
+            }
+            if (legion.numCreature(Creature.titan) >= 1 ||
+                legion.numCreature(Creature.warlock) >= 1)
+            {
+                recruits[4] = Creature.warlock;
+            }
         }
+        else
+        {
+            int numRecruitTypes = hex.getNumRecruitTypes();
+            Creature [] recruitTypes = new Creature[numRecruitTypes];
+            for (int i = 0; i < numRecruitTypes; i++)
+            {
+                recruitTypes[i] = hex.getRecruit(i);
+            }
+          
+            for (int i = numRecruitTypes - 1; i >= 0; i--)
+            {
+                int numCreature = legion.numCreature(recruitTypes[i]);
+                if (numCreature >= 1)
+                {
+                    int numToRecruit = hex.getNumToRecruit(i + 1);
+                    if (numToRecruit > 0 && numCreature >= numToRecruit)
+                    {
+                        // We can recruit the next highest creature.
+                        recruits[i + 1] = recruitTypes[i + 1];
+                    }
+                    for (int j = i; j >= 0; j--)
+                    {
+                        // We can recruit this creature and all below it.
+                        recruits[j] = recruitTypes[j];
+                    }
+                    break;
+                }
+            }
+        }
+
 
         // Check for availability of chits.
         int count = 0;
@@ -875,625 +690,90 @@ class PickRecruit extends JDialog implements MouseListener, WindowListener
 
 
     // Returns the number of eligible recruiters.  The passed-in recruiters
-    // array should be of length 4.
-    // XXX: This really should be table-driven.
+    // array should be of length 4 and will be filled in with recruiters.
     public static int findEligibleRecruiters(Legion legion, Creature recruit, 
         Creature [] recruiters)
     {
+        // Paranoia
+        if (recruiters.length != 4)
+        {
+            System.out.println("Bad arg passed to findEligibleRecruiters()");
+            return 0;
+        }
+        for (int i = 0; i < recruiters.length; i++)
+        {
+            recruiters[i] = null;
+        }
+
         MasterHex hex = legion.getCurrentHex();
 
         int count = 0;
 
-        switch (hex.getTerrain())
+        if (hex.getTerrain() == 'T')
         {
-            case 'B':
-                if (recruit == Creature.gargoyle)
+            // Towers are a special case.  The recruiter of tower creatures 
+            // remains anonymous, so we only deal with guardians and warlocks.
+            if (recruit == Creature.guardian)
+            {
+                for (int i = 0; i < Creature.creatures.length; i++)
                 {
-                    if (legion.numCreature(Creature.gargoyle) >= 1)
+                    Creature creature = Creature.creatures[i];
+                    if (creature == Creature.guardian && 
+                        legion.numCreature(creature) >= 1)
                     {
-                        recruiters[count++] = Creature.gargoyle;
+                        recruiters[count++] = creature;
                     }
-                    if (legion.numCreature(Creature.cyclops) >= 1)
+                    else if (!creature.isImmortal() &&
+                        legion.numCreature(creature) >= 3)
                     {
-                        recruiters[count++] = Creature.cyclops;
-                    }
-                    if (legion.numCreature(Creature.gorgon) >= 1)
-                    {
-                        recruiters[count++] = Creature.gorgon;
+                        recruiters[count++] = creature;
                     }
                 }
-                else if (recruit == Creature.cyclops)
+            }
+            else if (recruit == Creature.warlock)
+            {
+                if (legion.numCreature(Creature.titan) >= 1)
                 {
-                    if (legion.numCreature(Creature.gargoyle) >= 2)
-                    {
-                        recruiters[count++] = Creature.gargoyle;
-                    }
-                    if (legion.numCreature(Creature.cyclops) >= 1)
-                    {
-                        recruiters[count++] = Creature.cyclops;
-                    }
-                    if (legion.numCreature(Creature.gorgon) >= 1)
-                    {
-                        recruiters[count++] = Creature.gorgon;
-                    }
+                    recruiters[count++] = Creature.titan;
                 }
-                else if (recruit == Creature.gorgon)
+                if (legion.numCreature(Creature.warlock) >= 1)
                 {
-                    if (legion.numCreature(Creature.cyclops) >= 2)
-                    {
-                        recruiters[count++] = Creature.cyclops;
-                    }
-                    if (legion.numCreature(Creature.gorgon) >= 1)
-                    {
-                        recruiters[count++] = Creature.gorgon;
-                    }
+                    recruiters[count++] = Creature.warlock;
                 }
-                break;
+            }
+        }
+        else
+        {
+            int numRecruitTypes = hex.getNumRecruitTypes();
+            Creature [] recruitTypes = new Creature[numRecruitTypes];
+            for (int i = 0; i < numRecruitTypes; i++)
+            {
+                recruitTypes[i] = hex.getRecruit(i);
+            }
 
-
-            case 'D':
-                if (recruit == Creature.lion)
+            for (int i = 0; i < numRecruitTypes; i++)
+            {
+                if (recruit == hex.getRecruit(i))
                 {
-                    if (legion.numCreature(Creature.lion) >= 1)
+                    int numToRecruit = hex.getNumToRecruit(i);
+                    if (numToRecruit > 0 && 
+                        legion.numCreature(hex.getRecruit(i - 1)) >= 
+                        numToRecruit) 
                     {
-                        recruiters[count++] = Creature.lion;
+                        // Can recruit up.
+                        recruiters[count++] = hex.getRecruit(i - 1);
                     }
-                    if (legion.numCreature(Creature.griffon) >= 1)
+                    for (int j = i; j < numRecruitTypes; j++)
                     {
-                        recruiters[count++] = Creature.griffon;
+                        if (legion.numCreature(hex.getRecruit(j)) >= 1)
+                        {
+                            // Can recruit down or level.
+                            recruiters[count++] = hex.getRecruit(j);
+                        }
                     }
-                    if (legion.numCreature(Creature.hydra) >= 1)
-                    {
-                        recruiters[count++] = Creature.hydra;
-                    }
+                    break;
                 }
-                else if (recruit == Creature.griffon)
-                {
-                    if (legion.numCreature(Creature.lion) >= 3)
-                    {
-                        recruiters[count++] = Creature.lion;
-                    }
-                    if (legion.numCreature(Creature.griffon) >= 1)
-                    {
-                        recruiters[count++] = Creature.griffon;
-                    }
-                    if (legion.numCreature(Creature.hydra) >= 1)
-                    {
-                        recruiters[count++] = Creature.hydra;
-                    }
-                }
-                else if (recruit == Creature.hydra)
-                {
-                    if (legion.numCreature(Creature.griffon) >= 2)
-                    {
-                        recruiters[count++] = Creature.griffon;
-                    }
-                    if (legion.numCreature(Creature.hydra) >= 1)
-                    {
-                        recruiters[count++] = Creature.hydra;
-                    }
-                }
-                break;
-
-            case 'H':
-                if (recruit == Creature.ogre)
-                {
-                    if (legion.numCreature(Creature.ogre) >= 1)
-                    {
-                        recruiters[count++] = Creature.ogre;
-                    }
-                    if (legion.numCreature(Creature.minotaur) >= 1)
-                    {
-                        recruiters[count++] = Creature.minotaur;
-                    }
-                    if (legion.numCreature(Creature.unicorn) >= 1)
-                    {
-                        recruiters[count++] = Creature.unicorn;
-                    }
-                }
-                else if (recruit == Creature.minotaur)
-                {
-                    if (legion.numCreature(Creature.ogre) >= 3)
-                    {
-                        recruiters[count++] = Creature.ogre;
-                    }
-                    if (legion.numCreature(Creature.minotaur) >= 1)
-                    {
-                        recruiters[count++] = Creature.minotaur;
-                    }
-                    if (legion.numCreature(Creature.unicorn) >= 1)
-                    {
-                        recruiters[count++] = Creature.unicorn;
-                    }
-                }
-                else if (recruit == Creature.unicorn)
-                {
-                    if (legion.numCreature(Creature.minotaur) >= 2)
-                    {
-                        recruiters[count++] = Creature.minotaur;
-                    }
-                    if (legion.numCreature(Creature.unicorn) >= 1)
-                    {
-                        recruiters[count++] = Creature.unicorn;
-                    }
-                }
-                break;
-
-            case 'J':
-                if (recruit == Creature.gargoyle)
-                {
-                    if (legion.numCreature(Creature.gargoyle) >= 1)
-                    {
-                        recruiters[count++] = Creature.gargoyle;
-                    }
-                    if (legion.numCreature(Creature.cyclops) >= 1)
-                    {
-                        recruiters[count++] = Creature.cyclops;
-                    }
-                    if (legion.numCreature(Creature.behemoth) >= 1)
-                    {
-                        recruiters[count++] = Creature.behemoth;
-                    }
-                    if (legion.numCreature(Creature.serpent) >= 1)
-                    {
-                        recruiters[count++] = Creature.serpent;
-                    }
-                }
-                else if (recruit == Creature.cyclops)
-                {
-                    if (legion.numCreature(Creature.gargoyle) >= 2)
-                    {
-                        recruiters[count++] = Creature.gargoyle;
-                    }
-                    if (legion.numCreature(Creature.cyclops) >= 1)
-                    {
-                        recruiters[count++] = Creature.cyclops;
-                    }
-                    if (legion.numCreature(Creature.behemoth) >= 1)
-                    {
-                        recruiters[count++] = Creature.behemoth;
-                    }
-                    if (legion.numCreature(Creature.serpent) >= 1)
-                    {
-                        recruiters[count++] = Creature.serpent;
-                    }
-                }
-                else if (recruit == Creature.behemoth)
-                {
-                    if (legion.numCreature(Creature.cyclops) >= 3)
-                    {
-                        recruiters[count++] = Creature.cyclops;
-                    }
-                    if (legion.numCreature(Creature.behemoth) >= 1)
-                    {
-                        recruiters[count++] = Creature.behemoth;
-                    }
-                    if (legion.numCreature(Creature.serpent) >= 1)
-                    {
-                        recruiters[count++] = Creature.serpent;
-                    }
-                }
-                else if (recruit == Creature.serpent)
-                {
-                    if (legion.numCreature(Creature.behemoth) >= 2)
-                    {
-                        recruiters[count++] = Creature.behemoth;
-                    }
-                    if (legion.numCreature(Creature.serpent) >= 1)
-                    {
-                        recruiters[count++] = Creature.serpent;
-                    }
-                }
-                break;
-
-            case 'm':
-                if (recruit == Creature.lion)
-                {
-                    if (legion.numCreature(Creature.lion) >= 1)
-                    {
-                        recruiters[count++] = Creature.lion;
-                    }
-                    if (legion.numCreature(Creature.minotaur) >= 1)
-                    {
-                        recruiters[count++] = Creature.minotaur;
-                    }
-                    if (legion.numCreature(Creature.dragon) >= 1)
-                    {
-                        recruiters[count++] = Creature.dragon;
-                    }
-                    if (legion.numCreature(Creature.colossus) >= 1)
-                    {
-                        recruiters[count++] = Creature.colossus;
-                    }
-                }
-                else if (recruit == Creature.minotaur)
-                {
-                    if (legion.numCreature(Creature.lion) >= 2)
-                    {
-                        recruiters[count++] = Creature.lion;
-                    }
-                    if (legion.numCreature(Creature.minotaur) >= 1)
-                    {
-                        recruiters[count++] = Creature.minotaur;
-                    }
-                    if (legion.numCreature(Creature.dragon) >= 1)
-                    {
-                        recruiters[count++] = Creature.dragon;
-                    }
-                    if (legion.numCreature(Creature.colossus) >= 1)
-                    {
-                        recruiters[count++] = Creature.colossus;
-                    }
-                }
-                else if (recruit == Creature.dragon)
-                {
-                    if (legion.numCreature(Creature.minotaur) >= 2)
-                    {
-                        recruiters[count++] = Creature.minotaur;
-                    }
-                    if (legion.numCreature(Creature.dragon) >= 1)
-                    {
-                        recruiters[count++] = Creature.dragon;
-                    }
-                    if (legion.numCreature(Creature.colossus) >= 1)
-                    {
-                        recruiters[count++] = Creature.colossus;
-                    }
-                }
-                else if (recruit == Creature.colossus)
-                {
-                    if (legion.numCreature(Creature.dragon) >= 2)
-                    {
-                        recruiters[count++] = Creature.dragon;
-                    }
-                    if (legion.numCreature(Creature.colossus) >= 1)
-                    {
-                        recruiters[count++] = Creature.colossus;
-                    }
-                }
-                break;
-
-            case 'M':
-                if (recruit == Creature.ogre)
-                {
-                    if (legion.numCreature(Creature.ogre) >= 1)
-                    {
-                        recruiters[count++] = Creature.ogre;
-                    }
-                    if (legion.numCreature(Creature.troll) >= 1)
-                    {
-                        recruiters[count++] = Creature.troll;
-                    }
-                    if (legion.numCreature(Creature.ranger) >= 1)
-                    {
-                        recruiters[count++] = Creature.ranger;
-                    }
-                }
-                else if (recruit == Creature.troll)
-                {
-                    if (legion.numCreature(Creature.ogre) >= 2)
-                    {
-                        recruiters[count++] = Creature.ogre;
-                    }
-                    if (legion.numCreature(Creature.troll) >= 1)
-                    {
-                        recruiters[count++] = Creature.troll;
-                    }
-                    if (legion.numCreature(Creature.ranger) >= 1)
-                    {
-                        recruiters[count++] = Creature.ranger;
-                    }
-                }
-                else if (recruit == Creature.ranger)
-                {
-                    if (legion.numCreature(Creature.troll) >= 2)
-                    {
-                        recruiters[count++] = Creature.troll;
-                    }
-                    if (legion.numCreature(Creature.ranger) >= 1)
-                    {
-                        recruiters[count++] = Creature.ranger;
-                    }
-                }
-                break;
-
-            case 'P':
-                if (recruit == Creature.centaur)
-                {
-                    if (legion.numCreature(Creature.centaur) >= 1)
-                    {
-                        recruiters[count++] = Creature.centaur;
-                    }
-                    if (legion.numCreature(Creature.lion) >= 1)
-                    {
-                        recruiters[count++] = Creature.lion;
-                    }
-                    if (legion.numCreature(Creature.ranger) >= 1)
-                    {
-                        recruiters[count++] = Creature.ranger;
-                    }
-                }
-                else if (recruit == Creature.lion)
-                {
-                    if (legion.numCreature(Creature.centaur) >= 2)
-                    {
-                        recruiters[count++] = Creature.centaur;
-                    }
-                    if (legion.numCreature(Creature.lion) >= 1)
-                    {
-                        recruiters[count++] = Creature.lion;
-                    }
-                    if (legion.numCreature(Creature.ranger) >= 1)
-                    {
-                        recruiters[count++] = Creature.ranger;
-                    }
-                }
-                else if (recruit == Creature.ranger)
-                {
-                    if (legion.numCreature(Creature.lion) >= 2)
-                    {
-                        recruiters[count++] = Creature.lion;
-                    }
-                    if (legion.numCreature(Creature.ranger) >= 1)
-                    {
-                        recruiters[count++] = Creature.ranger;
-                    }
-                }
-                break;
-
-            case 'S':
-                if (recruit == Creature.troll)
-                {
-                    if (legion.numCreature(Creature.troll) >= 1)
-                    {
-                        recruiters[count++] = Creature.troll;
-                    }
-                    if (legion.numCreature(Creature.wyvern) >= 1)
-                    {
-                        recruiters[count++] = Creature.wyvern;
-                    }
-                    if (legion.numCreature(Creature.hydra) >= 1)
-                    {
-                        recruiters[count++] = Creature.hydra;
-                    }
-                }
-                else if (recruit == Creature.wyvern)
-                {
-                    if (legion.numCreature(Creature.troll) >= 3)
-                    {
-                        recruiters[count++] = Creature.troll;
-                    }
-                    if (legion.numCreature(Creature.wyvern) >= 1)
-                    {
-                        recruiters[count++] = Creature.wyvern;
-                    }
-                    if (legion.numCreature(Creature.hydra) >= 1)
-                    {
-                        recruiters[count++] = Creature.hydra;
-                    }
-                }
-                else if (recruit == Creature.hydra)
-                {
-                    if (legion.numCreature(Creature.wyvern) >= 2)
-                    {
-                        recruiters[count++] = Creature.wyvern;
-                    }
-                    if (legion.numCreature(Creature.hydra) >= 1)
-                    {
-                        recruiters[count++] = Creature.hydra;
-                    }
-                }
-                break;
-
-            case 't':
-                if (recruit == Creature.troll)
-                {
-                    if (legion.numCreature(Creature.troll) >= 1)
-                    {
-                        recruiters[count++] = Creature.troll;
-                    }
-                    if (legion.numCreature(Creature.warbear) >= 1)
-                    {
-                        recruiters[count++] = Creature.warbear;
-                    }
-                    if (legion.numCreature(Creature.giant) >= 1)
-                    {
-                        recruiters[count++] = Creature.giant;
-                    }
-                    if (legion.numCreature(Creature.colossus) >= 1)
-                    {
-                        recruiters[count++] = Creature.colossus;
-                    }
-                }
-                else if (recruit == Creature.warbear)
-                {
-                    if (legion.numCreature(Creature.troll) >= 2)
-                    {
-                        recruiters[count++] = Creature.troll;
-                    }
-                    if (legion.numCreature(Creature.warbear) >= 1)
-                    {
-                        recruiters[count++] = Creature.warbear;
-                    }
-                    if (legion.numCreature(Creature.giant) >= 1)
-                    {
-                        recruiters[count++] = Creature.giant;
-                    }
-                    if (legion.numCreature(Creature.colossus) >= 1)
-                    {
-                        recruiters[count++] = Creature.colossus;
-                    }
-                }
-                else if (recruit == Creature.giant)
-                {
-                    if (legion.numCreature(Creature.warbear) >= 2)
-                    {
-                        recruiters[count++] = Creature.warbear;
-                    }
-                    if (legion.numCreature(Creature.giant) >= 1)
-                    {
-                        recruiters[count++] = Creature.giant;
-                    }
-                    if (legion.numCreature(Creature.colossus) >= 1)
-                    {
-                        recruiters[count++] = Creature.colossus;
-                    }
-                }
-                else if (recruit == Creature.colossus)
-                {
-                    if (legion.numCreature(Creature.giant) >= 2)
-                    {
-                        recruiters[count++] = Creature.giant;
-                    }
-                    if (legion.numCreature(Creature.colossus) >= 1)
-                    {
-                        recruiters[count++] = Creature.colossus;
-                    }
-                }
-                break;
-
-            case 'T':
-                // The recruiter of tower creatures remains anonymous.
-                if (recruit == Creature.guardian)
-                {
-                    int recruiterIndex = 0;
-                    if (legion.numCreature(Creature.behemoth) >= 3)
-                    {
-                        recruiters[count++] = Creature.behemoth;
-                    }
-                    if (legion.numCreature(Creature.centaur) >= 3)
-                    {
-                        recruiters[count++] = Creature.centaur;
-                    }
-                    if (legion.numCreature(Creature.colossus) >= 3)
-                    {
-                        recruiters[count++] = Creature.colossus;
-                    }
-                    if (legion.numCreature(Creature.cyclops) >= 3)
-                    {
-                        recruiters[count++] = Creature.cyclops;
-                    }
-                    if (legion.numCreature(Creature.dragon) >= 3)
-                    {
-                        recruiters[count++] = Creature.dragon;
-                    }
-                    if (legion.numCreature(Creature.gargoyle) >= 3)
-                    {
-                        recruiters[count++] = Creature.gargoyle;
-                    }
-                    if (legion.numCreature(Creature.giant) >= 3)
-                    {
-                        recruiters[count++] = Creature.giant;
-                    }
-                    if (legion.numCreature(Creature.gorgon) >= 3)
-                    {
-                        recruiters[count++] = Creature.gorgon;
-                    }
-                    if (legion.numCreature(Creature.griffon) >= 3)
-                    {
-                        recruiters[count++] = Creature.griffon;
-                    }
-                    if (legion.numCreature(Creature.guardian) >= 1)
-                    {
-                        recruiters[count++] = Creature.guardian;
-                    }
-                    if (legion.numCreature(Creature.hydra) >= 3)
-                    {
-                        recruiters[count++] = Creature.hydra;
-                    }
-                    if (legion.numCreature(Creature.lion) >= 3)
-                    {
-                        recruiters[count++] = Creature.lion;
-                    }
-                    if (legion.numCreature(Creature.minotaur) >= 3)
-                    {
-                        recruiters[count++] = Creature.minotaur;
-                    }
-                    if (legion.numCreature(Creature.ogre) >= 3)
-                    {
-                        recruiters[count++] = Creature.ogre;
-                    }
-                    if (legion.numCreature(Creature.ranger) >= 3)
-                    {
-                        recruiters[count++] = Creature.ranger;
-                    }
-                    if (legion.numCreature(Creature.serpent) >= 3)
-                    {
-                        recruiters[count++] = Creature.serpent;
-                    }
-                    if (legion.numCreature(Creature.troll) >= 3)
-                    {
-                        recruiters[count++] = Creature.troll;
-                    }
-                    if (legion.numCreature(Creature.unicorn) >= 3)
-                    {
-                        recruiters[count++] = Creature.unicorn;
-                    }
-                    if (legion.numCreature(Creature.warbear) >= 3)
-                    {
-                        recruiters[count++] = Creature.warbear;
-                    }
-                    if (legion.numCreature(Creature.wyvern) >= 3)
-                    {
-                        recruiters[count++] = Creature.wyvern;
-                    }
-                }
-                else if (recruit == Creature.warlock)
-                {
-                    if (legion.numCreature(Creature.titan) >= 1)
-                    {
-                        recruiters[count++] = Creature.titan;
-                    }
-                    if (legion.numCreature(Creature.warlock) >= 1)
-                    {
-                        recruiters[count++] = Creature.warlock;
-                    }
-                }
-                break;
-
-            case 'W':
-                if (recruit == Creature.centaur)
-                {
-                    if (legion.numCreature(Creature.centaur) >= 1)
-                    {
-                        recruiters[count++] = Creature.centaur;
-                    }
-                    if (legion.numCreature(Creature.warbear) >= 1)
-                    {
-                        recruiters[count++] = Creature.warbear;
-                    }
-                    if (legion.numCreature(Creature.unicorn) >= 1)
-                    {
-                        recruiters[count++] = Creature.unicorn;
-                    }
-                }
-                else if (recruit == Creature.warbear)
-                {
-                    if (legion.numCreature(Creature.centaur) >= 3)
-                    {
-                        recruiters[count++] = Creature.centaur;
-                    }
-                    if (legion.numCreature(Creature.warbear) >= 1)
-                    {
-                        recruiters[count++] = Creature.warbear;
-                    }
-                    if (legion.numCreature(Creature.unicorn) >= 1)
-                    {
-                        recruiters[count++] = Creature.unicorn;
-                    }
-                }
-                else if (recruit == Creature.unicorn)
-                {
-                    if (legion.numCreature(Creature.warbear) >= 2)
-                    {
-                        recruiters[count++] = Creature.warbear;
-                    }
-                    if (legion.numCreature(Creature.unicorn) >= 1)
-                    {
-                        recruiters[count++] = Creature.unicorn;
-                    }
-                }
-                break;
+            }
         }
 
         return count;
@@ -1616,12 +896,13 @@ class PickRecruit extends JDialog implements MouseListener, WindowListener
                     recruiter = recruiters[0];
                 }
 
-                if (recruit != null && (recruiter != null || numEligibleRecruiters == 0))
+                if (recruit != null && (recruiter != null || 
+                    numEligibleRecruiters == 0))
                 {
                     // Select that marker.
                     legion.addCreature(recruit);
 
-                    // XXX: Mark the recruit and recruiter(s) as visible.
+                    // Mark the recruit and recruiter(s) as visible.
                     legion.revealCreatures(recruit, 1);
                     int numRecruiters = numberOfRecruiterNeeded(recruiter, recruit,
                         legion.getCurrentHex().getTerrain());
