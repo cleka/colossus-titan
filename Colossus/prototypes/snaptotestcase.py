@@ -68,6 +68,7 @@ class snapHandler(DefaultHandler):
     def startHistory(self, attrs):
         if options.python:
             print '    def testPredictSplits%s(self):' % (options.testcase,)
+            print '        print "\\ntest %s begins"' % (options.testcase,)
         else:
             print '    public void testPredictSplits%s()' % (options.testcase,)
             print '    {'
