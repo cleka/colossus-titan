@@ -39,7 +39,6 @@ class AcquireAngel extends Dialog implements MouseListener, WindowListener
         setLayout(null);
 
         numEligible = findEligibleRecruits(legion, recruits, archangel);
-System.out.println("AcquireAngel: numEligible = " + numEligible);
         if (numEligible == 0)
         {
             dispose();
