@@ -18,6 +18,7 @@ all: AcquireAngel.class \
      Game.class \
      Hex.class \
      Legion.class \
+     Marker.class \
      MasterBoard.class \
      MasterHex.class \
      Negotiate.class \
@@ -60,6 +61,9 @@ Hex.class: Hex.java
 
 Legion.class: Legion.java
 	$(JC) Legion.java
+
+Marker.class: Marker.java
+	$(JC) Marker.java
 
 MasterBoard.class: MasterBoard.java
 	$(JC) MasterBoard.java
