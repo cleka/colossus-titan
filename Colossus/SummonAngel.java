@@ -101,7 +101,7 @@ class SummonAngel extends Dialog implements MouseListener, ActionListener,
         {
             // Only one angel can be summoned per turn.
             player.disallowSummoningAngel();
-            legion.markSummon();
+            legion.markSummoned();
         }
 
         board.finishSummoningAngel();
