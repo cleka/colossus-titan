@@ -97,6 +97,7 @@ public final class Options
 
     public void loadOptions(String optionsFile)
     {
+        Log.event("Trying to read options from " + optionsFile);
         try
         {
             FileInputStream in = new FileInputStream(optionsFile);
@@ -104,7 +105,7 @@ public final class Options
         }
         catch (IOException e)
         {
-            Log.debug("Couldn't read options from " + optionsFile);
+            Log.event("Couldn't read options from " + optionsFile);
             return;
         }
     }
@@ -112,6 +113,9 @@ public final class Options
     
     public void saveOptions()
     {
+        String optionsFile = getOptionsFilename();
+        Log.event("Trying to save options to " + optionsFile);
+
         File optionsDir = new File(Constants.gameDataPath);
         if (!optionsDir.exists() || !optionsDir.isDirectory())
         {
@@ -123,7 +127,6 @@ public final class Options
              }
         }
 
-        String optionsFile = getOptionsFilename();
         try
         {
             FileOutputStream out = new FileOutputStream(optionsFile);
