@@ -5,6 +5,9 @@ import java.util.*;
 import javax.swing.*;
 
 import net.sf.colossus.util.Log;
+import com.werken.opt.Options;
+import com.werken.opt.Option;
+import com.werken.opt.CommandLine;
 
 
 /**
@@ -15,65 +18,62 @@ import net.sf.colossus.util.Log;
 
 public final class Start
 {
-    // TODO Let the user pick a different L&F.
-    private static void setLookAndFeel()
-    {
-        // Set look and feel to native, since Metal does not show titles
-        // for popup menus.
-        try
-        {
-            UIManager.setLookAndFeel(
-                UIManager.getSystemLookAndFeelClassName());
-        }
-        catch (Exception e)
-        {
-            Log.error(e + "Could not set look and feel.");
-        }
-    }
-
     public static void main(String [] args)
     {
-
-        /* Options we want:
-              Start new game, skipping GetPlayers dialog
-                  names and types for each player
-                  --variant <variant name>
-              Load savegame 
-                  --loadgame <savegame name)
-                  --latest
-              --help
-              If no args, we need to just start a game.
-        */
-
-        // Trying werken.opts
-        /*
-        com.werken.opt.Options opts = new com.werken.opt.Options();
-
-        // TODO Add each allowed option here.
+        // This is a werken Options, not a util Options.
+        Options opts = new Options();
+        CommandLine cl = null;
 
         try
         {
-            opts.parse(args);
+            opts.addOption('h', "help", false, "Show options help");
+            opts.addOption('l', "load", true, "Load savegame");
+            opts.addOption('z', "latest", false, "Load latest savegame");
+            opts.addOption('s', "start", false, "Start new game immediately");
+            opts.addOption('v', "variant", true, "Set variant");
+            opts.addOption('u', "nhuman", true, "Number of humans");
+            opts.addOption('i', "nai", true, "Number of SimpleAIs");
+            opts.addOption('q', "quit", false, "Quit JVM when game ends");
+
+            cl = opts.parse(args);
         }
         catch (Exception ex)
         {
+            // TODO Clean up the output.
             ex.printStackTrace();
+            System.exit(1);
         }
-        */
 
-        setLookAndFeel();
-
-        if (args.length == 0)
+        if (cl.optIsSet('h'))
         {
-            // Start a new game.
-            Game game = new Game();
-            game.newGame();
+            usage(opts);
+            System.exit(0);
+        }
+
+        Game game = new Game(cl);
+        if (cl.optIsSet('l') || cl.optIsSet('z'))
+        {
+            String filename = "--latest";
+            if (cl.optIsSet('l'))
+            {
+                filename = cl.getOptValue('l');
+            }
+            game.loadGame(filename);
         }
         else
         {
-            // Load a game.
-            Game game = new Game();
-            game.loadGame(args[0]);
+            game.newGame(); 
+        }
+    }
+
+    private static void usage(Options opts)
+    {
+        System.out.println("Usage: java -jar Colossus.jar [options]");
+        Iterator it = opts.getOptions().iterator();
+        while (it.hasNext())
+        {
+            Option opt = (Option)it.next();
+            System.out.println(opt.toString());
         }
     }
 }

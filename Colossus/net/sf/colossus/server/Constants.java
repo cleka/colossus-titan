@@ -102,4 +102,7 @@ public final class Constants
     public static final String battlemapIconText = "Colossus";
     public static final String battlemapIconTextColor = "black";
     public static final String battlemapIconSubscript = "Battle";
+
+    // XXX Not used everywhere yet, so don't change it.
+    public static final int MAX_PLAYERS = 6;
 }

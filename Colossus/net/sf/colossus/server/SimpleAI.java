@@ -752,7 +752,8 @@ public class SimpleAI implements AI
     static void handleMulligans(Game game, Player player)
     {
         // TODO: This is really stupid.  Do something smart here.
-        if (player.getMulligansLeft() > 0 && (player.getMovementRoll() == 2 ||
+        if (game.getTurnNumber() == 1 && player.getMulligansLeft() > 0 && 
+            (player.getMovementRoll() == 2 ||
             player.getMovementRoll() == 5))
         {
             player.takeMulligan();

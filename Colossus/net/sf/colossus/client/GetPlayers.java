@@ -46,10 +46,10 @@ public final class GetPlayers extends KDialog implements WindowListener,
     private JScrollPane scrollPane = null;
 
     /** List of Map.Entry objects that map player names to player types */
-    private static java.util.List playerInfo = new ArrayList();
+    private static java.util.List playerStuff = new ArrayList();
 
     private static String anyAI = "A Random AI";
-    private static String defaultAI = "SimpleAI";
+    public static String defaultAI = "SimpleAI";
     /* aiList should match the class name of available AI */
     private static String[] aiList = { "SimpleAI" };
 
@@ -199,14 +199,14 @@ public final class GetPlayers extends KDialog implements WindowListener,
     public static java.util.List getPlayers(JFrame parentFrame)
     {
         new GetPlayers(parentFrame);
-        return playerInfo;
+        return playerStuff;
     }
 
 
     /** Start new game if values are legal. */
     private void validateInputs()
     {
-        playerInfo.clear();
+        playerStuff.clear();
         Set namesTaken = new HashSet();
         int numPlayers = 0;
         Random aiRand = new Random();
@@ -233,13 +233,13 @@ public final class GetPlayers extends KDialog implements WindowListener,
                 }
                 numPlayers++;
                 String entry = name + "~" + type;
-                playerInfo.add(entry);
+                playerStuff.add(entry);
                 namesTaken.add(name);
             }
         }
 
         // Exit if there aren't enough unique player names.
-        if (numPlayers < 1 || playerInfo.size() != numPlayers)
+        if (numPlayers < 1 || playerStuff.size() != numPlayers)
         {
             return;
         }
@@ -256,9 +256,9 @@ public final class GetPlayers extends KDialog implements WindowListener,
         int returnVal = chooser.showOpenDialog(parentFrame);
         if (returnVal == JFileChooser.APPROVE_OPTION)
         {
-            playerInfo.clear();
+            playerStuff.clear();
             // Set key to "load game" and value to savegame filename.
-            playerInfo.add(loadGame + "~" +
+            playerStuff.add(loadGame + "~" +
                 chooser.getSelectedFile().getName());
             dispose();
         }
@@ -313,7 +313,7 @@ public final class GetPlayers extends KDialog implements WindowListener,
     {
         if (e.getActionCommand().equals(quit))
         {
-            playerInfo.clear();
+            playerStuff.clear();
             dispose();
         }
         else if (e.getActionCommand().equals(newGame))

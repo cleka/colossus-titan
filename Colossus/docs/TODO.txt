@@ -1,8 +1,19 @@
 Add JUnit section to build docs.
 Add test target to build.xml.  (Need a test suite first.)
 
+Mention werken.opts in docs.
+Add remaining command-line options.
+
+Change some dialogs to show info in a label instead of the title (so
+   the dialog is wide enough) and add explicit cancel buttons.
+
 Bug: 6-AI game, one AI (dripton) showed a SummonAngel dialog rather than
    picking itself.  Loaded autoplay=false from cfg file and overrode isAI()?
+
+Bug: Undo move with a recruitChit showing, not cleared.
+
+Bug: Still getting excess Acquire dialog, for 6-high legion that earns two
+   angels, but angel is not added.
 
 Add "no 2s or 5s" mulligan option.
 Add optional additional handicap mulligans that can be used after turn 1.
@@ -19,9 +30,7 @@ Send creature list, summonable list, recruit tree, etc. to clients at startup.
 Put old, new web pages under CVS.
 Switch to new web page.
 
-Include an .ico file for Windows.  (ImageMagick can autogenerate one.)
-Maybe have a separate icons directory rather than reusing the ones
-   in Default/images?
+Include a Colossus.ico file for Windows.
 
 Add command-line options to start a game with N AIs, have the game exit
    java when done, etc. to support automated testing.  GetOpt package?
@@ -38,9 +47,6 @@ Highlight appropriate engagement hex while engagement is being resolved.
 Initialize autoPickRecruiter and Show Graphical Overlays to true by default.
 
 Optional post-engagement status dialog.
-
-Change some dialogs to show info in a label instead of the title (so
-   the dialog is wide enough) and add explicit cancel buttons.
 
 Remove remaining public Client methods that only directly control the GUI
    in favor of higher-level events.

@@ -7,6 +7,8 @@ import javax.swing.*;
 import java.awt.event.*;
 import java.awt.*;
 
+import com.werken.opt.CommandLine;
+
 import net.sf.colossus.util.Log;
 import net.sf.colossus.util.Split;
 import net.sf.colossus.util.Options;
@@ -53,9 +55,16 @@ public final class Game
     private PhaseAdvancer phaseAdvancer = new GamePhaseAdvancer();
     private Options options = new Options(Options.optionsServerName);
 
+    private CommandLine cl = null;
+
 
     Game()
     {
+    }
+
+    Game(CommandLine cl)
+    {
+        this.cl = cl;
     }
 
     void initAndLoadData()
@@ -129,29 +138,29 @@ public final class Game
     {
         // XXX Make sure to clear player options so that we don't get into
         // an AI infinite loop.
-        Game newGame = new Game();
+        Game game2 = new Game();
 
         for (int i = 0; i < players.size(); i++)
         {
-            Player player = ((Player)players.get(i)).AICopy(newGame);
-            newGame.players.add(i, player);
+            Player player = ((Player)players.get(i)).AICopy(game2);
+            game2.players.add(i, player);
         }
-        newGame.activePlayerNum = activePlayerNum;
-        newGame.turnNumber = turnNumber;
+        game2.activePlayerNum = activePlayerNum;
+        game2.turnNumber = turnNumber;
         if (battle != null)
         {
-            newGame.battle = battle.AICopy(newGame);
+            game2.battle = battle.AICopy(game2);
         }
-        newGame.caretaker = caretaker.AICopy();
-        newGame.phase = phase;
-        newGame.engagementInProgress = engagementInProgress;
-        newGame.battleInProgress = battleInProgress;
-        newGame.summoning = summoning;
-        newGame.reinforcing = reinforcing;
-        newGame.acquiring = acquiring;
-        newGame.server = server;
+        game2.caretaker = caretaker.AICopy();
+        game2.phase = phase;
+        game2.engagementInProgress = engagementInProgress;
+        game2.battleInProgress = battleInProgress;
+        game2.summoning = summoning;
+        game2.reinforcing = reinforcing;
+        game2.acquiring = acquiring;
+        game2.server = server;
 
-        return newGame;
+        return game2;
     }
 
     private void clearFlags()
@@ -165,6 +174,72 @@ public final class Game
         gameOver = false;
     }
 
+
+    /** Fill in values from command-line args if possible. */
+    private java.util.List getPlayerStuffFromCommandLine(CommandLine cl)
+    {
+        int numHumans = 1;
+        int numAIs = 5;
+        java.util.List playerStuff = new ArrayList();
+
+        if (cl.optIsSet('v'))
+        {
+            String variant = cl.getOptValue('v');
+            // TODO Load variant
+        }
+        if (cl.optIsSet('q'))
+        {
+            // TODO Set the option and don't let cfg file overwrite.
+        }
+        if (cl.optIsSet('u'))
+        {
+            String buf = cl.getOptValue('v');
+            numHumans = Integer.parseInt(buf);
+        }
+        if (cl.optIsSet('i'))
+        {
+            String buf = cl.getOptValue('v');
+            numAIs = Integer.parseInt(buf);
+        }
+        // Try to coerce bogus values into legality. 
+        // Perhaps we should just punt instead?
+        if (numHumans < 0)
+        {
+            numHumans = 0;
+        }
+        if (numHumans > Constants.MAX_PLAYERS)
+        {
+            numHumans = Constants.MAX_PLAYERS;
+        }
+        if (numAIs > Constants.MAX_PLAYERS)
+        {
+            numAIs = Constants.MAX_PLAYERS; 
+        }
+        if (numAIs < 0)
+        {
+            numAIs = 0;
+        }
+        if (numHumans + numAIs > Constants.MAX_PLAYERS)
+        {
+            numAIs = Constants.MAX_PLAYERS - numHumans;
+        }
+        for (int i = 0; i < numHumans; i++)
+        {
+            String name = GetPlayers.byColor + i;
+            if (i == 0)
+            {
+                name = GetPlayers.username;
+            }
+            playerStuff.add(name + '~' + "Human"); 
+        }
+        for (int i = 0; i < numAIs; i++)
+        {
+            String name = GetPlayers.byColor + (i + Constants.MAX_PLAYERS);
+            playerStuff.add(name + '~' + GetPlayers.defaultAI); 
+        }
+        return playerStuff;
+    }
+
     /** Start a new game. */
     void newGame()
     {
@@ -174,10 +249,21 @@ public final class Game
         caretaker.resetAllCounts();
         players.clear();
 
-        // Temporary hotseat startup code
-        JFrame frame = new JFrame();
-        java.util.List playerInfo = GetPlayers.getPlayers(frame);
-        if (playerInfo.isEmpty())
+        // TODO Use list of Map.Entry instead of String?
+        java.util.List playerStuff = new ArrayList();
+
+        if (cl != null)
+        {
+            playerStuff = getPlayerStuffFromCommandLine(cl);
+        }
+
+        if (!cl.optIsSet('s'))
+        {
+            JFrame frame = new JFrame();
+            playerStuff = GetPlayers.getPlayers(frame);
+        }
+
+        if (playerStuff.isEmpty())
         {
             // User selected Quit.
             dispose();
@@ -185,9 +271,9 @@ public final class Game
 
         // See if user hit the Load game button, and we should
         // load a game instead of starting a new one.
-        if (playerInfo.size() == 1)
+        if (playerStuff.size() == 1)
         {
-            String entry = (String)playerInfo.get(0);
+            String entry = (String)playerStuff.get(0);
             java.util.List values = Split.split('~', entry);
             String key = (String)values.get(0);
             if (key.equals(GetPlayers.loadGame))
@@ -200,7 +286,7 @@ public final class Game
 
         Log.event("Starting new game");
 
-        Iterator it = playerInfo.iterator();
+        Iterator it = playerStuff.iterator();
         while (it.hasNext())
         {
             String entry = (String)it.next();
