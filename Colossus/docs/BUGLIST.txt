@@ -49,8 +49,9 @@ Win98, jdk1.3: Multiple fast right-clicks on a MasterHex do not succeed
 
 Win98, jdk1.3: Bad repaint onto potential carry target with no carries.
 
-Win98, jdk1.3: OutOfMemoryError starting a battle in turn 15 of a 
-   4-player game.  Image memory leak again?
+Win98, jdk1.3; Solaris, jdk1.3: OutOfMemoryException starting a battle in 
+   turn 15 of a 4-player game.  Also during turn 45 of a 5-player game.  
+   Image memory leak again?
 
 Solaris, jdk1.2.2, jdk1.3: Popup menu text is invisible 
    black-on-black.  There is no way to set the background and 

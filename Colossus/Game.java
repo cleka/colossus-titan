@@ -130,6 +130,13 @@ public class Game
             this.forcedMovementRoll = forcedMovementRoll;
         }
     }
+    
+
+    // For testing only. 
+    public Game()
+    {
+        players = new Player[6];
+    }
 
 
     private static String getPhaseName(int phase)
@@ -278,6 +285,15 @@ public class Game
     public Player getPlayer(int i)
     {
         return players[i];
+    }
+
+
+    public void setPlayer(int i, Player player)
+    {
+        if (i >= 0 && i < numPlayers)
+        {
+            players[i] = player;
+        }
     }
 
 

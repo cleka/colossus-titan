@@ -25,6 +25,8 @@ class ShowMasterHex extends Dialog implements MouseListener, WindowListener
         super(parentFrame, hex.getTerrainName() + " Hex " + hex.getLabel(),
             false);
 
+        this.hex = hex;
+
         numChits = hex.getNumRecruitTypes();
 
         pack();
@@ -59,8 +61,8 @@ class ShowMasterHex extends Dialog implements MouseListener, WindowListener
         setLocation(origin);
 
         setLayout(new GridLayout(0, 3));
-
-        this.hex = hex;
+        
+        addMouseListener(this);
 
         chits = new Chit[numChits];
         for (int i = 0; i < numChits; i++)
@@ -103,7 +105,6 @@ class ShowMasterHex extends Dialog implements MouseListener, WindowListener
         }
         imagesLoaded = true;
 
-        addMouseListener(this);
         pack();
 
         setVisible(true);

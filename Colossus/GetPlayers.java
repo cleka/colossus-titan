@@ -189,6 +189,17 @@ public class GetPlayers extends Dialog implements WindowListener, ActionListener
     }
 
 
+    public Dimension getMinimumSize()
+    {
+        return new Dimension(300, 300);
+    }
+    
+    public Dimension getPreferredSize()
+    {
+        return getMinimumSize();
+    }
+
+
     public static void main(String [] args)
     {
         new GetPlayers(new Frame(), null);

@@ -156,4 +156,34 @@ public class PickColor extends Dialog implements WindowListener, ActionListener
         game.getPlayer(playerNum).setColor(color);
         dispose();
     }
+
+
+    public Dimension getMinimumSize()
+    {
+        return new Dimension(250, 250);
+    }
+    
+    public Dimension getPreferredSize()
+    {
+        return getMinimumSize();
+    }
+
+
+    public static void main(String [] args)
+    {
+        Game game = new Game();
+        Frame frame = new Frame();
+
+        int numPlayers = 2;
+        game.setNumPlayers(numPlayers);
+        Player p0 = new Player("Bo", game);
+        Player p1 = new Player("Luke", game);
+        game.setPlayer(0, p0);
+        game.setPlayer(1, p1);
+
+        new PickColor(frame, game, 0);
+        new PickColor(frame, game, 1);
+
+        System.exit(0);
+    }
 }
