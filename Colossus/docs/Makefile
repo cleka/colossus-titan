@@ -5,7 +5,7 @@ DVIPS=dvips
 DVI2TTY=dvi2tty
 LATEX2HTML=latex2html
 
-SOURCES=FileFormat CodingStandards FAQ build
+SOURCES=FileFormat CodingStandards FAQ build Credits
 DESTS=$(addsuffix .ps,$(SOURCES))
 DESTSTXT=$(addsuffix .txt,$(SOURCES))
 DESTSHTML=$(addsuffix .html,$(SOURCES))
