@@ -7,9 +7,6 @@ Change all arguments to public Client/Server methods to String.  (Use a
    proxy layer for this.)
 Add raw socket interface.
 
-Make TerrainRecruitLoader initialization fully static.
-Should not need to load MasterBoard map data twice.
-
 Set Client movementRoll when loading during movement phase after roll.
 
 Add JUnit section to build docs.

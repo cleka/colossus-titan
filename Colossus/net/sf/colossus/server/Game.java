@@ -2459,13 +2459,20 @@ Log.debug("Game.doMove() teleport=" + teleport + " lord=" + teleportingLord +
         handleConcession(defender, attacker, true);
     }
 
-    /** Used only for pre-battle attacker concession. */
     void concede(String markerId)
     {
-        Legion attacker = getLegionByMarkerId(markerId);
-        String hexLabel = attacker.getCurrentHexLabel();
-        Legion defender = getFirstEnemyLegion(hexLabel, attacker.getPlayer());
-        handleConcession(attacker, defender, false);
+        if (battleInProgress)
+        {
+            battle.concede(getLegionByMarkerId(markerId).getPlayerName());
+        }
+        else
+        {
+            Legion attacker = getLegionByMarkerId(markerId);
+            String hexLabel = attacker.getCurrentHexLabel();
+            Legion defender = getFirstEnemyLegion(hexLabel, 
+                attacker.getPlayer());
+            handleConcession(attacker, defender, false);
+        }
     }
 
     void doNotFlee(String markerId)
