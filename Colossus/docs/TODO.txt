@@ -5,9 +5,11 @@ Bug: Attacked a 5-high enemy legion and it became 3-high.
 
 Need to initialize number of titans in caretaker based on variant max_players.
 
-AI delays within phases (between moves, strikes, etc.). 
+More AI delays within phases (between moves, strikes, etc.). 
 
 Real whole-legion battle eval function, including gang hits.
+
+Ability to dismiss and recall recruit markers.
 
 Split prediction.
 
@@ -30,10 +32,6 @@ Sometimes refuse remote newGame/loadGame/saveGame calls?
 
 Cleanup network shutdown -- when game over or player eliminated, don't
    whine if its client drops.
-
-Eliminate LegionInfo, PlayerInfo, Strike, Movement and instead use
-   slightly different versions of Game, Legion, Player, Battle, etc. 
-   on client side.
 
 Set Client movementRoll when loading during movement phase after roll.
 Set which legions have recruited when loading during recruit phase.

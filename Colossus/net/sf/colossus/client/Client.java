@@ -75,7 +75,31 @@ public final class Client implements IClient
 
     // XXX Should be per player
     /** Sorted set of available legion markers for this player. */
-    private TreeSet markersAvailable = new TreeSet();  
+    private SortedSet markersAvailable = new TreeSet(
+        new Comparator()
+        {
+            public int compare(Object o1, Object o2)
+            {
+                if (!(o1 instanceof String) || !(o2 instanceof String))
+                {
+                    throw new ClassCastException();
+                }
+                String s1 = (String)o1;
+                String s2 = (String)o2;
+                if (s1.startsWith(getShortColor()) && 
+                    !s2.startsWith(getShortColor()))
+                {
+                    return -1;
+                }
+                if (!s1.startsWith(getShortColor()) && 
+                    s2.startsWith(getShortColor()))
+                {
+                    return 1;
+                }
+                return s1.compareTo(s2);
+            }
+        }
+    );
 
     private String parentId;
     private int numSplitsThisTurn;
@@ -3279,7 +3303,6 @@ public final class Client implements IClient
     {
         if (parentId == null || childId == null)
         {
-            Log.warn("Called Client.pickMarkerCallback with null markerId");
             return;
         }
 
