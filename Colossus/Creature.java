@@ -75,6 +75,12 @@ class Creature
     static Creature wyvern = new Creature("Wyvern", 7, 3, false, true, false,
         false, true, false, false, false, false, 18);
 
+    // Sometimes we need to iterate through all creature types.
+    static Creature [] creatures = {angel, archangel, behemoth,
+        centaur, colossus, cyclops, dragon, gargoyle, giant, gorgon,
+        griffon, guardian, hydra, lion, minotaur, ogre, ranger, 
+        serpent, titan, troll, unicorn, warbear, warlock, wyvern};
+
 
     Creature(String name, int power, int skill, boolean rangeStrikes,
         boolean flies, boolean nativeBramble, boolean nativeDrift,
@@ -97,55 +103,61 @@ class Creature
     }
 
 
-    int getPointValue()
+    public int getPointValue()
     {
         return power * skill;
     }
 
 
-    int getCount()
+    public int getCount()
     {
         return count;
     }
 
 
-    void takeOne()
+    public void setCount(int newcount)
+    {
+        count = newcount;
+    }
+
+
+    public void takeOne()
     {
         count--;
     }
 
 
-    void putOneBack()
+    public void putOneBack()
     {
         count++;
     }
 
 
-    boolean isLord()
+    public boolean isLord()
     {
         return lord;
     }
 
 
-    boolean isImmortal()
+    public boolean isImmortal()
     {
         return (lord || demilord);
     }
 
 
-    String getName()
+    public String getName()
     {
         return name;
     }
 
 
-    String getImageName()
+    public String getImageName()
     {
         return "images" + File.separator + name + ".gif";
     }
 
 
-    String getImageName(boolean inverted)
+    public String getImageName(boolean inverted)
     {
         if (inverted)
         {
@@ -158,56 +170,71 @@ class Creature
     }
 
 
-    int getPower()
+    public int getPower()
     {
         return power;
     }
 
 
-    int getSkill()
+    public int getSkill()
     {
         return skill;
     }
 
 
-    boolean rangeStrikes()
+    public boolean rangeStrikes()
     {
         return rangeStrikes;
     }
 
 
-    boolean flies()
+    public boolean flies()
     {
         return flies;
     }
 
 
-    boolean isNativeBramble()
+    public boolean isNativeBramble()
     {
         return nativeBramble;
     }
 
 
-    boolean isNativeDrift()
+    public boolean isNativeDrift()
     {
         return nativeDrift;
     }
 
 
-    boolean isNativeBog()
+    public boolean isNativeBog()
     {
         return nativeBog;
     }
 
 
-    boolean isNativeSandDune()
+    public boolean isNativeSandDune()
     {
         return nativeSandDune;
     }
 
 
-    boolean isNativeSlope()
+    public boolean isNativeSlope()
     {
         return nativeSlope;
+    }
+
+
+    public static Creature getCreatureFromName(String name)
+    {
+        for (int i = 0; i < creatures.length; i++)
+        {
+            if (name.compareTo(creatures[i].getName()) == 0)
+            {
+                return creatures[i];
+            }
+        }
+
+        System.out.println("There is no creature called " + name);
+        return null;
     }
 }
