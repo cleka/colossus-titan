@@ -43,8 +43,8 @@ public class BattleMap extends Frame implements MouseListener,
     private Legion attacker;
     private Legion defender;
 
-    // l = left (5), r = right (1), b = bottom (3)
-    private char side;
+    // 5 is left, 1 is right, 3 is bottom
+    private int side;
 
     private BattleTurn turn;
     private MasterBoard board;
@@ -65,10 +65,11 @@ public class BattleMap extends Frame implements MouseListener,
     public static final int FIRST_BLOOD = 1;
     public static final int TOO_LATE = 2;
     private int summonState = NO_KILLS;
+    Legion donor = null;
 
 
     public BattleMap(Legion attacker, Legion defender, MasterHex masterHex, 
-        char side, MasterBoard board)
+        int side, MasterBoard board)
     {
         super(attacker.getMarkerId() + " attacks " + defender.getMarkerId());
 
@@ -78,10 +79,10 @@ public class BattleMap extends Frame implements MouseListener,
         this.terrain = masterHex.getTerrain();
         this.board = board;
 
-        // All tower attacks come from the bottom side.
+        // All tower attacks come from the bottom side (3)
         if (terrain == 'T')
         {
-            this.side = 'b';
+            this.side = 3;
         }
         else
         {
@@ -93,9 +94,7 @@ public class BattleMap extends Frame implements MouseListener,
         preferredSize = new Dimension(30 * scale, 30 * scale);
         setSize(preferredSize);
 
-        // XXX: Removed due to a bug in Linux jdk1.1.6v2.  Put back when fixed.
-        // setResizable(false);
-
+        setResizable(false);
         setBackground(java.awt.Color.white);
         addWindowListener(this);
         addMouseListener(this);
@@ -365,7 +364,8 @@ public class BattleMap extends Frame implements MouseListener,
 
 
     // If any chits were left off-board, kill them.
-    // XXX: If they were newly summoned, unsummon them instead.
+    // XXX: If they were newly summoned or recruited, unsummon or unrecruit
+    //   them instead.
     void removeOffboardChits()
     {
         Player player = turn.getActivePlayer();
@@ -1250,7 +1250,28 @@ public class BattleMap extends Frame implements MouseListener,
             if (chits[i].isDead())
             {
                 Creature creature = chits[i].getCreature();
-                if (legion == attacker)
+                
+                // After turn 1, offboard chits are returned to the stacks or
+                //   the stack they were summoned from, with no points awarded.
+                if (chits[i].getCurrentHex().getXCoord() == -1 && 
+                    turn.getTurnNumber() > 1)
+                {
+                    if (creature == Creature.angel || creature == 
+                        Creature.archangel)
+                    {
+                        donor = legion.getPlayer().getLastLegionSummonedFrom();
+                        // Because addCreature grabs one from the stack, it
+                        //     must be returned there.
+                        creature.putOneBack();                         
+                        donor.addCreature(creature);
+                    }
+                    else
+                    {
+                        creature.putOneBack();
+                    }
+                }
+
+                else if (legion == attacker)
                 {
                     defenderPoints += creature.getPointValue();
                 }
@@ -1264,6 +1285,13 @@ public class BattleMap extends Frame implements MouseListener,
                 }
 
                 legion.removeCreature(creature);
+                // If an angel or archangel was returned to its donor instead
+                // of the stack, then the count must be adjusted. 
+                if (donor != null)
+                {
+                    creature.takeOne();
+                    donor = null;
+                }
 
                 if (creature == Creature.titan)
                 {
@@ -1740,37 +1768,11 @@ System.out.println("defender's titan eliminated");
     {
         if (legion == attacker)
         {
-            switch (side)
-            {
-                case 'l':
-                    return entrances[5];
-
-                case 'r':
-                    return entrances[1];
-
-                case 'b':
-                    return entrances[3];
-
-                default:
-                    return null;
-            }
+            return entrances[side];
         }
         else
         {
-            switch (side)
-            {
-                case 'l':
-                    return entrances[2];
-
-                case 'r':
-                    return entrances[4];
-
-                case 'b':
-                    return entrances[0];
-                
-                default:
-                    return null;
-            }
+            return entrances[(side + 3) % 6];
         }
     }
 
