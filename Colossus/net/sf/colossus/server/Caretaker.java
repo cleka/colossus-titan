@@ -175,8 +175,7 @@ public final class Caretaker implements Cloneable
         }
     }
 
-    /** Update ALL creatures' counts on all clients.  This should only
-     *  be called when a game is loaded or restarted. */
+    /** Update ALL creatures' counts on all clients. */
     void fullySyncDisplays()
     {
         // Do *all* creatures, not just the ones in the map.
@@ -214,12 +213,13 @@ public final class Caretaker implements Cloneable
                 if (dead > 0)
                 {
                     int live = getCount(name);
-                    // Don't use setCount, because we want to update displays
-                    // only after both updates are done.
+                    // Don't use setCount() / setDeadCount(), because we 
+                    // want to update displays only at the end. 
                     map.put(name, new Integer(live + dead)); 
-                    setDeadCount(name, 0);
+                    deadMap.put(name, new Integer(0));
                 }
             }
         }
+        fullySyncDisplays();
     }
 }

@@ -9,6 +9,7 @@ import java.util.*;
 import net.sf.colossus.server.Creature;
 import net.sf.colossus.util.KDialog;
 import net.sf.colossus.util.Options;
+import net.sf.colossus.util.Log;
 
 
 /** 
@@ -180,12 +181,12 @@ class CreatureCollectionView extends KDialog implements WindowListener
                 // safety check
                 if ((inGameCount < 0) || (inGameCount > maxcount))
                 {
-                    throw new RuntimeException("Something went wrong:" +
-                                               " discrepancy between total (" +
-                                               maxcount + "), remaining (" +
-                                               count + ") and dead (" +
-                                               deadCount +
-                                               ") count for creature " + name);
+                    Log.error("Something went wrong:" +
+                              " discrepancy between total (" + maxcount + 
+                              "), remaining (" + count + 
+                              ") and dead (" + deadCount +
+                              ") count for creature " + name);
+                    return;
                 }
                 
                 boolean immortal = 
@@ -235,7 +236,8 @@ class CreatureCollectionView extends KDialog implements WindowListener
                                           htmlInGameCount + htmlSlash +
                                           htmlDeadCount));
                 JLabel topLabel = (JLabel)topCountMap.get(name);
-                topLabel.setText(htmlizeOnly(htmlColorizeOnly(Integer.toString(maxcount), "blue")));
+                topLabel.setText(htmlizeOnly(htmlColorizeOnly(
+                    Integer.toString(maxcount), "blue")));
             }
     
             repaint();
