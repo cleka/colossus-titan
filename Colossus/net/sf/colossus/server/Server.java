@@ -723,6 +723,7 @@ public final class Server implements IServer
         }
         else
         {
+            Log.error("Illegal recruit");
             client.nak();
             return;
         }
@@ -906,6 +907,7 @@ public final class Server implements IServer
         boolean moved = game.getBattle().doMove(tag, hexLabel);
         if (!moved)
         {
+            Log.error("Battle move failed");
             client.nak();
         }
     }
@@ -1411,6 +1413,7 @@ public final class Server implements IServer
         Legion legion = game.getLegionByMarkerId(markerId);
         if (legion == null)
         {
+            Log.error("Legion not found");
             client.nak();
             return;
         }
@@ -1424,6 +1427,7 @@ public final class Server implements IServer
         }
         else
         {
+            Log.error("Move failed");
             client.nak();
         }
     }

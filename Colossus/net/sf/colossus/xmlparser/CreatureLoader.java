@@ -99,7 +99,14 @@ public class CreatureLoader
     public List getCreatures()
     {
         List copy = new ArrayList();
-        copy.addAll(this.creatures);
+        try
+        {
+            copy.addAll(this.creatures);
+        }
+        catch (NullPointerException ex)
+        {
+            Log.warn("Caught in CreatureLoader " + ex);
+        }
         return copy;
     }
 }
