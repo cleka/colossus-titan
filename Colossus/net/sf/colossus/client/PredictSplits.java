@@ -421,7 +421,6 @@ class Node implements Comparable
                 count++;
             }
         }
-        Log.debug("count is " + count + " height is " + getHeight());
 
         if (count > getHeight())
         {
@@ -489,7 +488,6 @@ class Node implements Comparable
             creatures.removeLastUncertainCreature();
         }
 
-        Log.debug("end revealSomeCreatures() " + this);
         if (parent != null)
         {
             parent.tellChildContents(this);
@@ -498,7 +496,6 @@ class Node implements Comparable
 
     void revealAllCreatures(List cnl)
     {
-        Log.debug("revealAllCreatures() for " + this + " " + cnl);
         CreatureInfoList cil = new CreatureInfoList();
         Iterator it = cnl.iterator();
         while (it.hasNext())
@@ -863,8 +860,6 @@ class Node implements Comparable
             childSize1 = child1.getHeight();
             childSize2 = child2.getHeight();
         }
-        Log.debug("child1: " + child1);
-        Log.debug("child2: " + child2);
     }
 
     /** Recombine this legion and other, because it was not possible to
@@ -902,7 +897,7 @@ class Node implements Comparable
      *  other child and/or its parent something. */
     void tellChildContents(Node child)
     {
-        Log.debug("tellChildContents for node " + this + " from " + child);
+        Log.debug("tellChildContents() for node " + this + " from " + child);
         CreatureInfoList childCertainAtSplit = 
             child.getCertainAtSplitCreatures();
         revealSomeCreatures(childCertainAtSplit.getCreatureNames());
