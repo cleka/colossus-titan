@@ -4,17 +4,35 @@
 JC = javac -depend -J-Djavac.pipe.output=true -g -deprecation
 #JC = javac -depend -J-Djavac.pipe.output=true -O:interclass
 
-all: BattleMap.class BattleChit.class Chit.class Concede.class Creature.class \
-    Game.class Hex.class Legion.class MasterBoard.class MasterHex.class \
-    MessageBox.class Negotiate.class PickMarker.class PickRecruit.class \
-    Player.class ShowLegion.class SplitLegion.class SummonAngel.class \
-    Turn.class
+all: BattleMap.class \
+     BattleChit.class \
+     BattleTurn.class \
+     Chit.class \
+     Concede.class \
+     Creature.class \
+     Game.class \
+     Hex.class \
+     Legion.class \
+     MasterBoard.class \
+     MasterHex.class \
+     MessageBox.class \
+     Negotiate.class \
+     PickMarker.class \
+     PickRecruit.class \
+     Player.class \
+     ShowLegion.class \
+     SplitLegion.class \
+     SummonAngel.class \
+     Turn.class
 
 BattleMap.class: BattleMap.java
 	$(JC) BattleMap.java
 
 BattleChit.class: BattleChit.java
 	$(JC) BattleChit.java
+
+BattleTurn.class: BattleTurn.java
+	$(JC) BattleTurn.java
 
 Chit.class: Chit.java
 	$(JC) Chit.java
