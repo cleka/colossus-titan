@@ -238,10 +238,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
                                     (!haz.equals("Plains")) ||
                                     (e != 0))
                                 {
-                                    buf.append(i);
-                                    buf.append(" ");
-                                    buf.append(j);
-                                    buf.append(" ");
+                                    buf.append(i + " " + j + " ");
                                     buf.append(h[i][j].getTerrain());
                                     buf.append(" ");
                                     buf.append(h[i][j].getElevation());
@@ -251,9 +248,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
                                         {
                                             if (h[i][j].getHexside(k) != ' ')
                                             {
-                                                buf.append(" ");
-                                                buf.append(k);
-                                                buf.append(" ");
+                                                buf.append(" " + k + " ");
                                                 buf.append(h[i][j].getHexside(k));
                                             }
                                         }
@@ -263,11 +258,27 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
                             }
                         }
                     }
+                    if (brl.isTower())
+                    {
+                        buf.append("TOWER\n");
+                    }
+                    if (tempTowerStartList != null)
+                    {
+                        buf.append("STARTLIST");
+                        Iterator it = tempTowerStartList.iterator();
+                        while (it.hasNext())
+                        {
+                            String label = (String)it.next();
+                            buf.append(" " + label);
+                        }
+                        buf.append("\n");
+                    }
                     randomizedTerrainMap.put(terrain, new String(buf));
                 }
                 else
                 {
-                    InputStream batIS = new ByteArrayInputStream(mapData.getBytes());
+                    InputStream batIS =
+                        new ByteArrayInputStream(mapData.getBytes());
                     BattlelandLoader bl = new BattlelandLoader(batIS);
                     while (bl.oneBattlelandCase(h) >= 0) {}
                     java.util.List tempTowerStartList = bl.getStartList();
