@@ -286,16 +286,23 @@ class Player
 
     void selectMarker(int i)
     {
-        markerSelected = new String(markersAvailable[i]); 
-
-        // Adjust other markers because this one is taken.
-        for (int j = i; j < numMarkersAvailable - 1; j++)
+        if (i < 0 && i >= numMarkersAvailable)
         {
-            markersAvailable[j] = new String(markersAvailable[j + 1]);
+            markerSelected = null;
         }
+        else
+        {
+            markerSelected = new String(markersAvailable[i]); 
+
+            // Adjust other markers because this one is taken.
+            for (int j = i; j < numMarkersAvailable - 1; j++)
+            {
+                markersAvailable[j] = new String(markersAvailable[j + 1]);
+            }
         
-        markersAvailable[numMarkersAvailable - 1] = new String("");
-        numMarkersAvailable--;
+            markersAvailable[numMarkersAvailable - 1] = new String("");
+            numMarkersAvailable--;
+        }
     }
 
 
@@ -303,5 +310,44 @@ class Player
     {
         score += points;
         game.updateStatusScreen();
+    }
+
+
+    void die(Player player)
+    {
+        // Engaged legions give half points to the player they're
+        // engaged with.  All others give half points to player,
+        // if non-null.
+
+        // XXX Roundoff errors?
+        for (int i = 0; i < numLegions; i++)
+        {
+            MasterHex hex = legions[i].getCurrentHex();
+            Legion legion = hex.getEnemyLegion(this);
+            if (legion != null)
+            {
+                Player enemy = legion.getPlayer();
+                enemy.addPoints(legions[i].getPointValue() / 2);
+            }
+            else
+            {
+                player.addPoints(legions[i].getPointValue() / 2);
+            }
+        }
+
+        // Removing all legions is icky because the array shrinks as
+        // each is removed.
+        int num = numLegions;
+        for (int i = 0; i < num; i++)
+        {
+            removeLegion(legions[0]);
+        }
+
+        // Mark this player as dead.
+        alive = false;
+
+        game.updateStatusScreen();
+
+        game.getBoard().repaint();
     }
 }
