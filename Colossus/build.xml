@@ -104,6 +104,7 @@
         <delete verbose="yes" quiet = "yes" file = "Colossus.jar"/>
         <delete verbose="yes" quiet = "yes" file = "test/Colossus.jar"/>
         <delete verbose="yes" quiet = "yes" file = "BattlelandsBuilder.jar"/>
+        <delete verbose="yes" quiet = "yes" file = "BattlelandsRandomizer.jar"/>
         <javac debug="yes" deprecation="yes" target="1.2" srcdir="."
                 includes="**/*.java"
         />
@@ -192,7 +193,7 @@
 <!-- Tools -->
 
 
-<target name="tools" depends="bbjar"/>
+<target name="tools" depends="bbjar,brjar"/>
 
 <target name="bbjar" depends="init,compile,version"
         description = "Make Battlelands Builder jar file">
@@ -212,6 +213,23 @@
         <chmod file="BattlelandsBuilder.jar" perm="755"/>
 </target>
 
+<target name="brjar" depends="init,compile,version"
+        description = "Make Battlelands Randomizer jar file">
+        <jar jarfile = "BattlelandsRandomizer.jar" basedir="."
+             manifest="META-INF/datatools/BattlelandsRandomizer/MANIFEST.MF"
+             includes="net/sf/colossus/datatools/*.class,
+             net/sf/colossus/client/*.class,
+             net/sf/colossus/parser/*.class,
+             net/sf/colossus/server/*.class,
+             net/sf/colossus/util/*.class,
+             Default,
+             TitanPlus,
+             ExtTitan,
+             Badlands,
+             Outlands"
+        />
+        <chmod file="BattlelandsRandomizer.jar" perm="755"/>
+</target>
 
 <!-- TODO If jar is already signed, don't sign it again. -->
 <target name="sign" depends="jar"
@@ -251,6 +269,7 @@
                  *cfg,
                  *properties*,
                  BattlelandsBuilder.jar,
+                 BattlelandsRandomizer.jar,
                  .*,
                  test/*.jar"
         />
