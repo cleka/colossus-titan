@@ -393,7 +393,7 @@ class PickEntrySide extends Dialog implements ActionListener,
 
                     if (i < 5 && show[i + 1][j - ((i + 1) & 1)])
                     {
-                        h[i][j].setNeighbor(1, h[i + 1][j - ((i + 1) & 1)]);;
+                        h[i][j].setNeighbor(1, h[i + 1][j - ((i + 1) & 1)]);
                     }
 
                     if (i < 5 && j + (i & 1) < 6 && show[i + 1][j + (i & 1)])
