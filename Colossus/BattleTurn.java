@@ -1,6 +1,5 @@
 import java.awt.*;
 import java.awt.event.*;
-import javax.swing.*;
 
 /**
  * Class BattleTurn gets and holds chronological and sequence data for a battle.
@@ -8,7 +7,7 @@ import javax.swing.*;
  * author David Ripton
  */
 
-class BattleTurn extends JDialog implements ActionListener
+class BattleTurn extends Dialog implements ActionListener, WindowListener
 {
     // phases of a turn
     public static final int SUMMON = 0;
@@ -17,7 +16,7 @@ class BattleTurn extends JDialog implements ActionListener
     public static final int FIGHT = 3;
     public static final int STRIKEBACK = 4;
 
-    private JFrame parentFrame;
+    private Frame parentFrame;
     private BattleMap map;
     private Legion attacker;
     private Legion defender;
@@ -26,11 +25,10 @@ class BattleTurn extends JDialog implements ActionListener
     private int phase = MOVE;
     private SummonAngel summonAngel;
     private boolean summoningAngel = false;
-    private Container contentPane;
     private static Point location;
 
 
-    BattleTurn(JFrame parentFrame, BattleMap map, Legion attacker, Legion
+    BattleTurn(Frame parentFrame, BattleMap map, Legion attacker, Legion
         defender)
     {
         super(parentFrame, defender.getPlayer().getName() + " Turn 1");
@@ -42,7 +40,6 @@ class BattleTurn extends JDialog implements ActionListener
         activeLegion = defender;
         
         setBackground(java.awt.Color.lightGray);
-        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 
         setupMoveDialog();
 
@@ -65,11 +62,10 @@ class BattleTurn extends JDialog implements ActionListener
 
     void setupRecruitDialog()
     {
-        contentPane = getContentPane();
-        contentPane.removeAll();
+        removeAll();
         setTitle(getActivePlayer().getName() + " Turn " + turnNumber);
-        contentPane.setLayout(new GridLayout(0, 1));
-        contentPane.add(new JLabel(getActivePlayer().getName() + " : Recruit"));
+        setLayout(new GridLayout(0, 1));
+        add(new Label(getActivePlayer().getName() + " : Recruit"));
 
         if (turnNumber == 4 && defender.canRecruit())
         {
@@ -88,11 +84,10 @@ class BattleTurn extends JDialog implements ActionListener
     
     void setupSummonDialog()
     {
-        contentPane = getContentPane();
-        contentPane.removeAll();
+        removeAll();
         setTitle(getActivePlayer().getName() + " Turn " + turnNumber);
-        contentPane.setLayout(new GridLayout(0, 1));
-        contentPane.add(new JLabel(getActivePlayer().getName() + " : Summon"));
+        setLayout(new GridLayout(0, 1));
+        add(new Label(getActivePlayer().getName() + " : Summon"));
 
         int summonState = map.getSummonState();
 
@@ -154,28 +149,26 @@ class BattleTurn extends JDialog implements ActionListener
         }
         else
         {
-            contentPane = getContentPane();
-            contentPane.removeAll();
+            removeAll();
             setTitle(getActivePlayer().getName() + " Turn " + turnNumber);
-            contentPane.setLayout(new GridLayout(0, 5));
+            setLayout(new GridLayout(0, 5));
 
-            contentPane.add(new JLabel(getActivePlayer().getName() + 
-                " : Move"));
+            add(new Label(getActivePlayer().getName() + " : Move"));
 
-            JButton button1 = new JButton("Undo Last Move");
-            contentPane.add(button1);
+            Button button1 = new Button("Undo Last Move");
+            add(button1);
             button1.addActionListener(this);
 
-            JButton button2 = new JButton("Undo All Moves");
-            contentPane.add(button2);
+            Button button2 = new Button("Undo All Moves");
+            add(button2);
             button2.addActionListener(this);
 
-            JButton button3 = new JButton("Concede Battle");
-            contentPane.add(button3);
+            Button button3 = new Button("Concede Battle");
+            add(button3);
             button3.addActionListener(this);
 
-            JButton button4 = new JButton("Done with Moves");
-            contentPane.add(button4);
+            Button button4 = new Button("Done with Moves");
+            add(button4);
             button4.addActionListener(this);
 
             pack();
@@ -199,19 +192,18 @@ class BattleTurn extends JDialog implements ActionListener
         }
         else
         {
-            contentPane = getContentPane();
-            contentPane.removeAll();
-            contentPane.setLayout(new GridLayout(0, 3));
+            removeAll();
+            setLayout(new GridLayout(0, 3));
 
-            contentPane.add(new JLabel(getActivePlayer().getName() +
+            add(new Label(getActivePlayer().getName() + 
                 ((phase == FIGHT) ? " : Strike" : " : Strikeback")));
 
-            JButton button1 = new JButton("Concede Battle");
-            contentPane.add(button1);
+            Button button1 = new Button("Concede Battle");
+            add(button1);
             button1.addActionListener(this);
             
-            JButton button2 = new JButton("Done with Strikes");
-            contentPane.add(button2);
+            Button button2 = new Button("Done with Strikes");
+            add(button2);
             button2.addActionListener(this);
 
             pack();
@@ -338,24 +330,24 @@ class BattleTurn extends JDialog implements ActionListener
 
     public void actionPerformed(ActionEvent e)
     {
-        if (e.getActionCommand() == "Undo Last Move")
+        if (e.getActionCommand().equals("Undo Last Move"))
         {
             map.undoLastMove();
         }
 
-        else if (e.getActionCommand() == "Undo All Moves")
+        else if (e.getActionCommand().equals("Undo All Moves"))
         {
             map.undoAllMoves();
         }
 
-        else if (e.getActionCommand() == "Done with Moves")
+        else if (e.getActionCommand().equals("Done with Moves"))
         {
             map.removeOffboardChits();
             map.commitMoves();
             advancePhase();
         }
 
-        else if (e.getActionCommand() == "Done with Strikes")
+        else if (e.getActionCommand().equals("Done with Strikes"))
         {
             // Advance only if there are no unresolved strikes.
             if (!map.forcedStrikesRemain())
@@ -365,16 +357,46 @@ class BattleTurn extends JDialog implements ActionListener
             }
         }
 
-        else if (e.getActionCommand() == "Concede Battle")
+        else if (e.getActionCommand().equals("Concede Battle"))
         {
             // XXX: Concession timing is tricky.
-            int answer = JOptionPane.showConfirmDialog(parentFrame, 
-                "Are you sure you want to concede the battle?");
-            if (answer == JOptionPane.YES_OPTION)
+            new OptionDialog(parentFrame, "Confirm Concession",
+                "Are you sure you want to concede the battle?",
+                "Yes", "No");
+            if (OptionDialog.getLastAnswer() == OptionDialog.YES_OPTION)
             {
                 map.concede(getActivePlayer());
             }
             advancePhase();
         }
+    }
+
+
+    public void windowActivated(WindowEvent event)
+    {
+    }
+
+    public void windowClosed(WindowEvent event)
+    {
+    }
+
+    public void windowClosing(WindowEvent event)
+    {
+    }
+
+    public void windowDeactivated(WindowEvent event)
+    {
+    }
+
+    public void windowDeiconified(WindowEvent event)
+    {
+    }
+
+    public void windowIconified(WindowEvent event)
+    {
+    }
+
+    public void windowOpened(WindowEvent event)
+    {
     }
 }
