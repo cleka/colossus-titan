@@ -23,6 +23,9 @@ Linux 1.4b: Problems running to a remote X display.  Some of the
 Linux, Solaris, 1.3: Dialogs sometimes beep for no good reason.
    Doesn't happen in Win98.
 
+Win98, 1.3.1: Windows don't always pop to the front when show() is
+   called.  Works fine in Linux and Solaris.
+
 
 Current programming bugs:
 
@@ -31,9 +34,6 @@ Concession timing.  If both players want to concede, the non-phasing
    aren't allowed in the middle of strikes.  Etc.
 Striking continues after concession, until the normal time to check for
    creature (and then player) death.
-
---latest finds savegames with non-numeric filenames, and always uses
-   them in preference to those with normal numeric filenames.
 
 Win98, 1.3: Focus keeps moving to MovementDie and BattleDice, which
    disrupts keyboard shortcuts.  Doesn't happen with StatusScreen.
@@ -73,19 +73,9 @@ Solaris, 1.3.1: MovementDie is appearing mostly off right edge of the
 Win98, 1.4b: Currently have to pick recruiter even with "all stacks visible"
    set.
 
-Win98, 1.4b: One player's info dialogs block all other players.  No real
-   solution until we add threaded events.
-
 Win98, 1.4b: Need to re-highlight hexes with eligible recruits after each
    recruit, in case the last one was taken?  Also after each undo recruit,
    in case the last one came back?
-
-Solaris, 1.3.1: Need to bring map back to front after recruiting a
-   reinforcement in battle.  Fixed?
-
-Solaris, 1.3.1: Post-battle angel summoning is broken because the game
-   automatically advances to the next phase.  Summon dialog shows up
-   in the muster phase, when it no longer works.
 
 Solaris, 1.3.1: All enemy creatures are invisible after loading a game.
 
@@ -95,5 +85,3 @@ Need prettier question.gif
 
 Attacking AI is way too happy to take a time loss.  Need to crank up
    aggression in the last few turns of battle.
-
-Need to sort legion before recruiting a reinforcement in battle.

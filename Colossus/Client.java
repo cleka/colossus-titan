@@ -830,6 +830,7 @@ public final class Client
 
     public String pickRecruit(Legion legion)
     {
+        legion.sortCritters();
         Creature recruit = PickRecruit.pickRecruit(board.getFrame(), legion);
         if (recruit != null)
         {
@@ -1084,6 +1085,7 @@ public final class Client
     {
         if (legion.hasMoved() && legion.canRecruit())
         {
+            legion.sortCritters();
             Creature recruit = PickRecruit.pickRecruit(board.getFrame(),
                 legion);
             if (recruit != null)

@@ -586,7 +586,6 @@ public final class Game
         Client.clearUndoStack();
         if (!summoningAngel && findEngagements().size() == 0)
         {
-Log.debug("calling advancePhase() from setupFight()");
             advancePhase(FIGHT);
         }
         else
@@ -1200,8 +1199,17 @@ Log.debug("calling advancePhase() from setupFight()");
                     {
                         throw new ClassCastException();
                     }
-                    return (int)(numberValue((String)o1) -
+                    long diff = (numberValue((String)o1) -
                         numberValue((String)o2));
+                    if (diff > Integer.MAX_VALUE)
+                    {
+                        return Integer.MAX_VALUE;
+                    }
+                    if (diff < Integer.MIN_VALUE)
+                    {
+                        return Integer.MIN_VALUE;
+                    }
+                    return (int)diff;
                 }
             });
     }
@@ -2386,7 +2394,6 @@ Log.debug("calling advancePhase() from setupFight()");
         }
         else
         {
-Log.debug("calling server.createSummonAngel()");
             summoningAngel = true;
             server.createSummonAngel(attacker);
         }
@@ -2394,7 +2401,6 @@ Log.debug("calling server.createSummonAngel()");
 
     public void doSummon(Legion legion, Legion donor, Creature angel)
     {
-Log.debug("called Game.doSummon()");
         Player player = getActivePlayer();
 
         if (angel != null && donor != null && legion.canSummonAngel())
@@ -2493,9 +2499,11 @@ Log.debug("called Game.doSummon()");
         }
         engagementInProgress = false;
         battleInProgress = false;
-        summoningAngel = false;
         server.allUpdateStatusScreen();
-        server.allHighlightEngagements();
+        if (!summoningAngel)
+        {
+            server.allHighlightEngagements();
+        }
         aiSetupEngagements();
     }
 
@@ -2993,7 +3001,10 @@ Log.debug("called Game.doSummon()");
         }
         engagementInProgress = false;
         server.allUpdateStatusScreen();
-        server.allHighlightEngagements();
+        if (!summoningAngel)
+        {
+            server.allHighlightEngagements();
+        }
         aiSetupEngagements();
     }
 
