@@ -212,7 +212,7 @@ class Legion
     {
         startingHex = currentHex;
         moved = false;
-        recruited = false;
+        clearRecruited();
         summoned = false;
     }
 
@@ -237,6 +237,31 @@ class Legion
     void markRecruited()
     {
         recruited = true;
+    }
+
+
+    void clearRecruited()
+    {
+        recruited = false;
+    }
+
+
+    void undoRecruit()
+    {
+        if (recruited())
+        {
+            Creature creature = creatures[height - 1];
+
+            // removeCreature() will automatically put immortal creatures back
+            // on the stack, but mortal ones must be handled manually.
+            if (!creature.isImmortal()) 
+            {
+                creature.putOneBack();
+            }
+            removeCreature(height - 1);
+
+            clearRecruited();
+        }
     }
 
 
