@@ -22,6 +22,7 @@ public class Creature implements Comparable
     protected boolean lord;
     protected boolean demilord;
     protected int count;
+    protected final int maxCount;
 
 
     // Add various Creature archetypes as class members
@@ -112,7 +113,7 @@ public class Creature implements Comparable
     private static final List creatures = Arrays.asList(creaturesArray);
 
 
-    public Creature(String name, int power, int skill, boolean rangestrikes,
+    private Creature(String name, int power, int skill, boolean rangestrikes,
         boolean flies, boolean nativeBramble, boolean nativeDrift,
         boolean nativeBog, boolean nativeSandDune, boolean nativeSlope,
         boolean lord, boolean demilord, int count, String pluralName)
@@ -129,8 +130,29 @@ public class Creature implements Comparable
         this.nativeSlope = nativeSlope;
         this.lord = lord;
         this.demilord = demilord;
+        this.maxCount = count;
         this.count = count;
         this.pluralName = pluralName;
+    }
+
+    
+    protected Creature(Creature creature)
+    {
+        this.name = creature.name;
+        this.power = creature.power;
+        this.skill = creature.skill;
+        this.rangestrikes = creature.rangestrikes;
+        this.flies = creature.flies;
+        this.nativeBramble = creature.nativeBramble;
+        this.nativeDrift = creature.nativeDrift;
+        this.nativeBog = creature.nativeBog;
+        this.nativeSandDune = creature.nativeSandDune;
+        this.nativeSlope = creature.nativeSlope;
+        this.lord = creature.lord;
+        this.demilord = creature.demilord;
+        this.maxCount = creature.count;
+        this.count = creature.count;
+        this.pluralName = creature.pluralName;
     }
 
 
@@ -154,30 +176,12 @@ public class Creature implements Comparable
 
     public static void resetAllCounts()
     {
-        angel.setCount(18);
-        archangel.setCount(6);
-        behemoth.setCount(18);
-        centaur.setCount(25);
-        colossus.setCount(10);
-        cyclops.setCount(28);
-        dragon.setCount(18);
-        gargoyle.setCount(21);
-        giant.setCount(18);
-        gorgon.setCount(25);
-        griffon.setCount(18);
-        guardian.setCount(6);
-        hydra.setCount(10);
-        lion.setCount(28);
-        minotaur.setCount(21);
-        ogre.setCount(25);
-        ranger.setCount(28);
-        serpent.setCount(10);
-        titan.setCount(6);
-        troll.setCount(28);
-        unicorn.setCount(12);
-        warbear.setCount(21);
-        warlock.setCount(6);
-        wyvern.setCount(18);
+        Iterator it = creatures.iterator();
+        while (it.hasNext())
+        {
+            Creature creature = (Creature)it.next();
+            creature.count = creature.maxCount;
+        }
     }
 
 

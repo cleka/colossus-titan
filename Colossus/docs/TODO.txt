@@ -1,9 +1,13 @@
+Note first recruit of each creature type, and when each is exhausted.
+
 Scale Theodore S. Hetke's chits down to 60x60.  Fix text.  Add stars and
    bolts.
 
 Movement die should be displayed immediately when enabled, rather than
    waiting until the next turn, unless no movement die has been rolled
    yet.  Same for battledice.
+
+StatusScreen should be updated immediately upon a player death.
 
 Make MasterBoard and MasterHex pluggable.  Integrate David Lum's
    Java2D MasterBoard graphics as an option.

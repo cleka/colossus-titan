@@ -34,21 +34,9 @@ public final class Critter extends Creature
 
     public Critter(Creature creature, boolean visible, Legion legion)
     {
-        super(creature.name, creature.power, creature.skill,
-            creature.rangestrikes, creature.flies, creature.nativeBramble,
-            creature.nativeDrift, creature.nativeBog,
-            creature.nativeSandDune, creature.nativeSlope, creature.lord,
-            creature.demilord, creature.count, creature.pluralName);
+        super(creature);
 
-        if (name != null)
-        {
-            this.creature = Creature.getCreatureFromName(name);
-        }
-        else
-        {
-            this.creature = null;
-        }
-
+        this.creature = creature;
         this.visible = visible;
         this.legion = legion;
         if (name.equals("Titan") && legion != null)
