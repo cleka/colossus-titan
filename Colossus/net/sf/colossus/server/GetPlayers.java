@@ -32,9 +32,9 @@ public final class GetPlayers extends KDialog implements WindowListener,
     private JFrame parentFrame;
 
     private Vector typeChoices = new Vector();
-    private JComboBox [] playerTypes = new JComboBox[Constants.MAX_MAX_PLAYERS];
-    private JComboBox [] playerNames = new JComboBox[Constants.MAX_MAX_PLAYERS];
-    private JTextPane readme = new JTextPane();
+    private JComboBox[] playerTypes = new JComboBox[Constants.MAX_MAX_PLAYERS];
+    private JComboBox[] playerNames = new JComboBox[Constants.MAX_MAX_PLAYERS];
+    private JEditorPane readme = new JEditorPane();
 
     private JComboBox variantBox;
 
