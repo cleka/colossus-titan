@@ -31,9 +31,13 @@ class BattleHex:
         s += '    </battlehex>' 
         return s
 
-def print_header(terrain, istower):
+def print_header(terrain, istower, subtitle):
     print '<?xml version="1.0"?>'
-    print '<battlemap terrain="%s" tower="%s">' % (terrain, istower)
+    if subtitle:
+        print '<battlemap terrain="%s" tower="%s" subtitle="%s">' % (
+          terrain, istower, subtitle)
+    else:
+        print '<battlemap terrain="%s" tower="%s">' % (terrain, istower)
 
 def print_footer():
     print '</battlemap>'
@@ -44,7 +48,7 @@ def handle_line(line):
         pass
     elif line.startswith('#'):
         print '<!-- ' + line[1:] + ' -->'
-    elif line.startswith('TOWER'):
+    elif line.startswith('TOWER') or line.startswith('SUBTITLE'):
         pass  # Dealt with this at the start
     elif line.startswith('STARTLIST'):
         atoms = line.split()[1:]
@@ -58,15 +62,23 @@ def handle_line(line):
 
 
 def main(filename):
+    if os.path.isdir(filename):
+        return
     fil = file(filename)
     lines = fil.readlines()
     istower = False
+    subtitle = None
     for line in lines:
         if line.startswith('TOWER'):
             istower = True
-            break
+        elif line.startswith('SUBTITLE'):
+            atoms = line.split(' ', 1)
+            subtitle = atoms[1]
+            subtitle = subtitle.strip()
+            subtitle = subtitle.strip('"')
+            subtitle = subtitle.strip()
     terrain = os.path.basename(filename)
-    print_header(terrain, istower)
+    print_header(terrain, istower, subtitle)
     for line in lines:
         handle_line(line)
     print_footer()

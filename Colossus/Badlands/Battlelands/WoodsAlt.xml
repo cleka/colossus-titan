@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<battlemap terrain="WoodsAlt" tower="False">
+    <battlehex x="1" y="1" terrain="Tree" elevation="1">
+    </battlehex>
+    <battlehex x="1" y="3" terrain="Tree" elevation="1">
+    </battlehex>
+    <battlehex x="2" y="2" terrain="Tree" elevation="1">
+    </battlehex>
+    <battlehex x="2" y="4" terrain="Tree" elevation="1">
+    </battlehex>
+    <battlehex x="3" y="1" terrain="Tree" elevation="1">
+    </battlehex>
+    <battlehex x="3" y="3" terrain="Tree" elevation="1">
+    </battlehex>
+    <battlehex x="4" y="3" terrain="Tree" elevation="1">
+    </battlehex>
+    <battlehex x="4" y="5" terrain="Tree" elevation="1">
+    </battlehex>
+</battlemap>

@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<battlemap terrain="Graveyard" tower="False">
+    <battlehex x="0" y="2" terrain="Drift" elevation="0">
+    </battlehex>
+    <battlehex x="1" y="3" terrain="Drift" elevation="0">
+    </battlehex>
+    <battlehex x="2" y="2" terrain="Drift" elevation="0">
+    </battlehex>
+    <battlehex x="3" y="1" terrain="Drift" elevation="0">
+    </battlehex>
+    <battlehex x="3" y="4" terrain="Drift" elevation="0">
+    </battlehex>
+    <battlehex x="3" y="5" terrain="Drift" elevation="0">
+    </battlehex>
+    <battlehex x="4" y="3" terrain="Drift" elevation="0">
+    </battlehex>
+    <battlehex x="5" y="1" terrain="Drift" elevation="0">
+    </battlehex>
+</battlemap>

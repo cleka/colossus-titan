@@ -25,7 +25,7 @@ import java.util.Set;
 
 import javax.swing.JPanel;
 
-import net.sf.colossus.parser.BattlelandLoader;
+import net.sf.colossus.xmlparser.BattlelandLoader;
 import net.sf.colossus.parser.BattlelandRandomizerLoader;
 import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 import net.sf.colossus.server.VariantSupport;
@@ -177,26 +177,20 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
     private static synchronized void setupHexesGameState(String terrain,
             BattleHex[][] h, boolean serverSideFirstLoad)
     {
-        List directories =
-                VariantSupport.getBattlelandsDirectoriesList();
+        List directories = VariantSupport.getBattlelandsDirectoriesList();
         String rndSourceName =
                 TerrainRecruitLoader.getTerrainRandomName(terrain);
         try
         {
             if ((rndSourceName == null) || (!serverSideFirstLoad))
             { // static Battlelands
-                InputStream batIS =
-                        ResourceLoader.getInputStream(terrain,
-                        directories);
-                BattlelandLoader bl = new BattlelandLoader(batIS);
-                while (bl.oneBattlelandCase(h) >= 0)
-                {
-                }
+                InputStream batIS = ResourceLoader.getInputStream(
+                        terrain + ".xml", directories);
+                BattlelandLoader bl = new BattlelandLoader(batIS, h);
                 List tempTowerStartList = bl.getStartList();
                 if (tempTowerStartList != null)
                 {
-                    startlistMap.put(terrain,
-                            tempTowerStartList);
+                    startlistMap.put(terrain, tempTowerStartList);
                 }
                 towerStatusMap.put(terrain, new Boolean(bl.isTower()));
                 subtitleMap.put(terrain, bl.getSubtitle());

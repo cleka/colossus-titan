@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<battlemap terrain="Waterhole" tower="False">
+    <battlehex x="2" y="3" terrain="Lake" elevation="0">
+    </battlehex>
+    <battlehex x="3" y="2" terrain="Lake" elevation="0">
+    </battlehex>
+    <battlehex x="3" y="3" terrain="Lake" elevation="0">
+    </battlehex>
+</battlemap>

@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<battlemap terrain="Town" tower="False">
+    <battlehex x="2" y="3" terrain="Tower" elevation="1">
+        <border number="0" type="w" />
+        <border number="1" type="w" />
+        <border number="2" type="w" />
+        <border number="3" type="w" />
+        <border number="4" type="w" />
+        <border number="5" type="w" />
+    </battlehex>
+    <battlehex x="3" y="2" terrain="Bog" elevation="0">
+    </battlehex>
+    <battlehex x="3" y="3" terrain="Lake" elevation="0">
+    </battlehex>
+</battlemap>
