@@ -103,22 +103,26 @@ is needed, and the number before the recruits indicate
 how many of the creatures _before_ Lord or Titan are
 needed.
 
-When <recruiter_needed> is 0 (zero), then the creature can
+When <recruiter_needed> is 0 (zero), then the creature
+can be recruited, but the recruiter will remain anonymous.
+This is useful only if the recruiter is 'Anything', of course.
+
+When <recruiter_needed> is -1 (minus one), then the creature can
 recruit, but cannot be recruited. Such creature, and the
 pseudo-creature above, are ignored for the purpose of
 normal recruitements. If you put 'Titan' as a recruiter,
-it should _always_ be zero, as beeing able to recruit
+it should _always_ be -1, as beeing able to recruit
 Titan is going to cause lots of trouble.
 
 exemple: if you use "0 Anything 3 ogre 0 Titan 2 Gargoyle",
 you will be able to recruit an Ogre with any 3 creatures
 or with a Gargoyle, and you will be able to recruits
 a gargoyle with two Ogres or the Titan. You won't be
-able to recruit "Anything" or "Titan", of course;
+able to recruit "Anything" or "Titan", of course.
 
 The line that starts with 'T' and of name 'Tower' (mandatory) is
 special. There should always be at least 3 regular creatures,
-recruitable with one of Anything, and should be marked
+recruitable with zero of Anything, and should be marked
 as 'non-regular' recruitments. The 3 creatures will be used
 as starting creatures.
 

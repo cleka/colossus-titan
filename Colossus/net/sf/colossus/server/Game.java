@@ -1469,11 +1469,11 @@ public final class Game
     /** Return a list of eligible recruiter creatures. */
     java.util.List findEligibleRecruiters(String markerId, String recruitName)
     {
-        java.util.List recruiters = new ArrayList(4);
+        java.util.List recruiters;
         Creature recruit = Creature.getCreatureByName(recruitName);
         if (recruit == null)
         {
-            return recruiters;
+            return new ArrayList();
         }
 
         Legion legion = getLegionByMarkerId(markerId);
@@ -1488,8 +1488,7 @@ public final class Game
             Creature possibleRecruiter = (Creature)it.next();
             int needed = numberOfRecruiterNeeded(possibleRecruiter,
                                                  recruit, terrain);
-            if (needed < 1 || needed > legion.numCreature(
-                                                          possibleRecruiter))
+            if (needed < 1 || needed > legion.numCreature(possibleRecruiter))
             {
                 // Zap this possible recruiter.
                 it.remove();
@@ -1513,7 +1512,7 @@ public final class Game
             // Mark the recruiter(s) as visible.
             numRecruiters = numberOfRecruiterNeeded(recruiter,
                 recruit, hex.getTerrain());
-            if (numRecruiters >= 1 && numRecruiters <= 3)
+            if (numRecruiters >= 1 && numRecruiters < 99)
             {
                 legion.revealCreatures(recruiter, numRecruiters);
             }

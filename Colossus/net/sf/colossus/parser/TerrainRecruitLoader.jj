@@ -39,7 +39,7 @@ public class TerrainRecruitLoader
      */
     Hashtable carToColor = new Hashtable();
     /**
-     * Map a character (representing a terrain) to a boolean, telling if a Creature can recruit below its rank or not.
+     * Map a character (representing a terrain) to a boolean, telling if a Creature can recruit in the usual way or not.
      */
     Hashtable carToBelow = new Hashtable();
     /**
@@ -156,9 +156,9 @@ public class TerrainRecruitLoader
         while (it.hasNext())
         {
             recruitNumber tr = (recruitNumber)it.next();
-            if ((tr.getNumber() > 0) && !(tr.getName().equals("Anything"))
-                                     && !(tr.getName().equals("AnyNonLord"))
-                                     && !(tr.getName().equals("Lord")))
+            if ((tr.getNumber() >= 0) && !(tr.getName().equals("Anything"))
+                                      && !(tr.getName().equals("AnyNonLord"))
+                                      && !(tr.getName().equals("Lord")))
             {
                 re.add(Creature.getCreatureByName(tr.getName()));
             }
@@ -262,14 +262,22 @@ public class TerrainRecruitLoader
         int iRe = pc.indexOf(recruit);
         int iReerFake = pr.indexOf(recruiter);
         int iReFake = pr.indexOf(recruit);
+
+        // find out what's below the recruit in the recruiters stack
+        String below = iReFake > 0 ?    
+            ((recruitNumber)al.get(iReFake - 1)).getName() : "empty";
         
         if (iRe == -1)
         { // can't be recruited here
             return 99;
         }
         if (iReer == iRe)
-        { // only one to recruit same
-            return 1;
+        { // only one to recruit same, except if it is a 0-type recruit.
+            int num = (((recruitNumber)al.get(iReFake)).getNumber());
+            if (num > 0)
+                return 1;
+            else
+                return 0;
         }
         if ((iReer > iRe) && regularRecruit)
         { // only one to recruit below if possible
@@ -279,13 +287,15 @@ public class TerrainRecruitLoader
         { // regular recruitments if possible
             return (((recruitNumber)al.get(iReFake)).getNumber());
         }
+        if ((iReer == -1) && (iRe != -1) &&
+            ((iReerFake+1) == iReFake) && regularRecruit)
+        { // regular recruitments if possible, with a non-recruitable recruiter
+            return (((recruitNumber)al.get(iReFake)).getNumber());
+        }
         if (iReFake == 0)
         { // first in stack, itself only (taken care of above)
             return 99;
         }
-
-        // find out what's below the recruit in the recruiters stack
-        String below = ((recruitNumber)al.get(iReFake - 1)).getName();
 
         // First, "Anything" ; the number is needed no matter what
         // the recruiter is
@@ -498,7 +508,7 @@ TOKEN :
 
 TOKEN :
 {
-    < NUMBER : (<DIGIT>)+ >
+    < NUMBER : ("-")?(<DIGIT>)+ >
 |   < #DIGIT : ["0" - "9"] >
 }
 

@@ -66,7 +66,7 @@ final class ShowAllRecruits extends JDialog implements MouseListener,
                 }
     
                 JLabel numToRecruitLabel = new JLabel("", JLabel.CENTER);
-                if (numToRecruit > 0 && numToRecruit <= 3)
+                if (numToRecruit > 0 && numToRecruit < 99)
                 {
                     numToRecruitLabel.setText(Integer.toString(numToRecruit));
                     numToRecruitLabel.setAlignmentX(Label.CENTER_ALIGNMENT);
