@@ -26,9 +26,9 @@ class AcquireAngel extends JDialog implements MouseListener, WindowListener
 
     AcquireAngel(JFrame parentFrame, Legion legion, boolean archangel)
     {
-        super(parentFrame, legion.getPlayer().getName() + 
+        super(parentFrame, legion.getPlayer().getName() +
             ": Acquire Angel", true);
-        
+
         this.legion = legion;
         player = legion.getPlayer();
 
@@ -53,9 +53,9 @@ class AcquireAngel extends JDialog implements MouseListener, WindowListener
         setBackground(java.awt.Color.lightGray);
         setSize(scale * (numEligible + 1), (21 * scale / 10));
         setResizable(false);
-            
+
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-        setLocation(new Point(d.width / 2 - getSize().width / 2, 
+        setLocation(new Point(d.width / 2 - getSize().width / 2,
             d.height / 2 - getSize().height / 2));
 
         int cx = scale / 2;
@@ -64,7 +64,7 @@ class AcquireAngel extends JDialog implements MouseListener, WindowListener
         for (int i = 0; i < numEligible; i++)
         {
             markers[i] = new Chit(cx + i * (21 * scale / 20), cy, scale,
-                recruits[i].getImageName(), this, false);
+                recruits[i].getImageName(), this);
         }
 
         tracker = new MediaTracker(this);
@@ -80,7 +80,7 @@ class AcquireAngel extends JDialog implements MouseListener, WindowListener
         }
         catch (InterruptedException e)
         {
-            JOptionPane.showMessageDialog(parentFrame, 
+            JOptionPane.showMessageDialog(parentFrame,
                 "waitForAll was interrupted");
         }
 
@@ -215,8 +215,8 @@ class AcquireAngel extends JDialog implements MouseListener, WindowListener
             }
         }
     }
-    
-    
+
+
     public void mouseEntered(MouseEvent e)
     {
     }
@@ -226,12 +226,12 @@ class AcquireAngel extends JDialog implements MouseListener, WindowListener
     {
     }
 
-    
+
     public void mouseClicked(MouseEvent e)
     {
     }
 
-    
+
     public void mouseReleased(MouseEvent e)
     {
     }
@@ -257,7 +257,7 @@ class AcquireAngel extends JDialog implements MouseListener, WindowListener
     {
     }
 
-                                                         
+
     public void windowDeiconified(WindowEvent event)
     {
     }
