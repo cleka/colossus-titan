@@ -53,6 +53,10 @@ class MasterBoard extends Frame implements MouseListener,
     private SummonAngel summonAngel;
     private BattleMap map;
     private Turn turn;
+    private boolean isApplet;
+
+    // Setting this to true will make all stacks public.
+    private boolean allVisible = false;
 
 
     public MasterBoard(Game game, boolean newgame)
@@ -60,6 +64,8 @@ class MasterBoard extends Frame implements MouseListener,
         super("MasterBoard");
 
         this.game = game;
+
+        isApplet = game.isApplet();
 
         setLayout(null);
 
@@ -71,17 +77,8 @@ class MasterBoard extends Frame implements MouseListener,
         }
 
         setSize(getPreferredSize());
-        try
-        {
-            setIconImage(Toolkit.getDefaultToolkit().getImage(
-                getClass().getResource(Creature.colossus.getImageName())));
-        }
-        catch (NullPointerException e)
-        {
-            System.out.println(e.toString() + " Couldn't find " +
-                Creature.colossus.getImageName());
-            System.exit(1);
-        }
+
+        setupIcon();
 
         setBackground(Color.black);
 
@@ -103,7 +100,7 @@ class MasterBoard extends Frame implements MouseListener,
             {
                 do
                 {
-                    new PickMarker(this, game.getPlayer(i));
+                    new PickMarker(this, game.getPlayer(i), isApplet);
                 }
                 while (game.getPlayer(i).getSelectedMarker() == null);
                 // Update status window to reflect marker taken.
@@ -130,7 +127,8 @@ class MasterBoard extends Frame implements MouseListener,
                     game.getPlayer(i).getSelectedMarker(), null, this, 8,
                     hex, Creature.titan, Creature.angel, Creature.ogre,
                     Creature.ogre, Creature.centaur, Creature.centaur,
-                    Creature.gargoyle, Creature.gargoyle, game.getPlayer(i));
+                    Creature.gargoyle, Creature.gargoyle, game.getPlayer(i),
+                    isApplet);
     
                 game.getPlayer(i).addLegion(legion);
                 hex.addLegion(legion);
@@ -167,6 +165,25 @@ class MasterBoard extends Frame implements MouseListener,
             finishInit(true);
         }
     }
+        
+    
+    void setupIcon()
+    {
+        if (!isApplet)
+        {
+            try
+            {
+                setIconImage(Toolkit.getDefaultToolkit().getImage(
+                    getClass().getResource(Creature.colossus.getImageName())));
+            }
+            catch (NullPointerException e)
+            {
+                System.out.println(e.toString() + " Couldn't find " +
+                    Creature.colossus.getImageName());
+                game.dispose();
+            }
+        }
+    }
 
 
     // These steps need to be delayed if we're loading a game. 
@@ -197,6 +214,29 @@ class MasterBoard extends Frame implements MouseListener,
     public int getScale()
     {
         return scale;
+    }
+
+
+    public Game getGame()
+    {
+        return game;
+    }
+
+
+    public void disposeGame()
+    {
+        game.dispose();
+    }
+
+
+    public void dispose()
+    {
+        if (map != null)
+        {
+            map.dispose();
+        }
+
+        super.dispose();
     }
 
 
@@ -1377,7 +1417,8 @@ class MasterBoard extends Frame implements MouseListener,
                         InputEvent.BUTTON3_MASK) == InputEvent.BUTTON3_MASK))
                     {
                         new ShowLegion(this, legion, point, 
-                            i == game.getActivePlayerNum());
+                            allVisible || i == game.getActivePlayerNum(),
+                            isApplet);
                         return;
                     }
                     else
@@ -1404,7 +1445,8 @@ class MasterBoard extends Frame implements MouseListener,
                                         return;
                                     }
 
-                                    new SplitLegion(this, legion, player);
+                                    new SplitLegion(this, legion, player, 
+                                        isApplet);
                                     // Update status window.
                                     game.updateStatusScreen();
                                     // If we split, unselect this hex.
@@ -1434,7 +1476,8 @@ class MasterBoard extends Frame implements MouseListener,
                                     if (legion.hasMoved() && 
                                         legion.canRecruit())
                                     {
-                                        new PickRecruit(this, legion);
+                                        new PickRecruit(this, legion, 
+                                            isApplet);
                                     }
                                     // If we recruited, unselect this hex.
                                     if (!legion.canRecruit())
@@ -1470,7 +1513,7 @@ class MasterBoard extends Frame implements MouseListener,
                         InputEvent.BUTTON2_MASK) || ((e.getModifiers() &
                         InputEvent.BUTTON3_MASK) == InputEvent.BUTTON3_MASK))
                     {
-                        new ShowMasterHex(this, hex, point);
+                        new ShowMasterHex(this, hex, point, isApplet);
                         return;
                     }
 
@@ -1580,7 +1623,7 @@ class MasterBoard extends Frame implements MouseListener,
                                     // Fleeing gives half points and denies the
                                     // attacker the chance to summon an angel.
                                     new Concede(this, defender, attacker,
-                                        true);
+                                        true, isApplet);
                                 }
 
                                 if (hex.isEngagement())
@@ -1589,14 +1632,14 @@ class MasterBoard extends Frame implements MouseListener,
                                     // allowing the defender a reinforcement.
 
                                     new Concede(this, attacker, defender,
-                                        false);
+                                        false, isApplet);
 
                                     // The players may agree to a negotiated
                                     // settlement.
                                     if (hex.isEngagement())
                                     {
                                         new Negotiate(this, attacker,
-                                            defender);
+                                            defender, isApplet);
                                     }
 
 
@@ -1607,7 +1650,8 @@ class MasterBoard extends Frame implements MouseListener,
                                         {
                                             // If the defender won the battle
                                             // by agreement, he may recruit.
-                                            new PickRecruit(this, defender);
+                                            new PickRecruit(this, defender,
+                                                isApplet);
                                         }
                                         else if (hex.getLegion(0) == attacker
                                             && attacker.getHeight() < 7
@@ -1717,7 +1761,7 @@ class MasterBoard extends Frame implements MouseListener,
 
     public void windowClosing(WindowEvent e)
     {
-        System.exit(0);
+        game.dispose();
     }
 
 
