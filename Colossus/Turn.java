@@ -56,8 +56,7 @@ class Turn extends Dialog implements ActionListener
             {
                 MasterHex hex = legion.getCurrentHex();
                 hex.select();
-                Rectangle clip = new Rectangle(hex.getBounds());
-                board.repaint(clip.x, clip.y, clip.width, clip.height);
+                hex.repaint();
             }
         }
     }
@@ -129,8 +128,7 @@ class Turn extends Dialog implements ActionListener
             if (hex.getNumEnemyLegions(player) > 0)
             {
                 hex.select();
-                Rectangle clip = new Rectangle(hex.getBounds());
-                board.repaint(clip.x, clip.y, clip.width, clip.height);
+                hex.repaint();
             }
         }
     }
@@ -165,8 +163,7 @@ class Turn extends Dialog implements ActionListener
                 {
                     MasterHex hex = legion.getCurrentHex();
                     hex.select();
-                    Rectangle clip = new Rectangle(hex.getBounds());
-                    board.repaint(clip.x, clip.y, clip.width, clip.height);
+                    hex.repaint();
                 }
             }
         }
@@ -225,6 +222,27 @@ class Turn extends Dialog implements ActionListener
                 // XXX: If two or more legions share the same hex, force a
                 // move if one is legal.  Otherwise, recombine them.
 
+                for (int i = 0; i < player.getNumLegions(); i++)
+                {
+                    Legion legion = player.legions[i];
+                    MasterHex hex = legion.getCurrentHex();
+                    if (hex.getNumFriendlyLegions(player) > 1)
+                    {
+                        // If there are no legal moves, recombine.
+                        if (board.showMoves(legion, player) == 0)
+                        {
+                            for (int j = hex.getNumLegions() - 1; j >= 1; j--)
+                            {
+                                hex.getLegion(j).recombine(hex.getLegion(0));
+                            }
+                            hex.repaint();
+                        }
+                        else
+                        {
+                            return;
+                        }
+                    }
+                }
 
                 game.advancePhase();
 
