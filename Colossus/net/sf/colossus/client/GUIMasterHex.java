@@ -13,6 +13,7 @@ import net.sf.colossus.util.Log;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.VariantSupport;
 
+
 /**
  * Class GUIMasterHex holds GUI information for a MasterHex.
  * @version $Id$
@@ -276,26 +277,26 @@ public final class GUIMasterHex extends MasterHex
 
         case 2:
             g2.drawString(getLabel(), rectBound.x + (rectBound.width -
-                stringWidth(getLabel(), g2)) * 5 / 6, rectBound.y + halfFontHeight +
-                rectBound.height * 7 / 8);
+                stringWidth(getLabel(), g2)) * 5 / 6, rectBound.y + 
+                halfFontHeight + rectBound.height * 7 / 8);
             break;
 
         case 3:
             g2.drawString(getLabel(), rectBound.x + ((rectBound.width -
-                stringWidth(getLabel(), g2)) / 2), rectBound.y + halfFontHeight +
-                rectBound.height * 9 / 10);
+                stringWidth(getLabel(), g2)) / 2), rectBound.y + 
+                halfFontHeight + rectBound.height * 9 / 10);
             break;
 
         case 4:
             g2.drawString(getLabel(), rectBound.x + (rectBound.width -
-                stringWidth(getLabel(), g2)) / 6, rectBound.y + halfFontHeight +
-                rectBound.height * 5 / 6);
+                stringWidth(getLabel(), g2)) / 6, rectBound.y + 
+                halfFontHeight + rectBound.height * 5 / 6);
             break;
 
         case 5:
             g2.drawString(getLabel(), rectBound.x + (rectBound.width -
-                stringWidth(getLabel(), g2)) / 6, rectBound.y + halfFontHeight + 
-                rectBound.height / 8);
+                stringWidth(getLabel(), g2)) / 6, rectBound.y + 
+                halfFontHeight + rectBound.height / 8);
             break;
         }
 
