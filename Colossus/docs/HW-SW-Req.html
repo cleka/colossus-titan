@@ -9,19 +9,31 @@
   <body>
     <h2>Requirements</h2>
     <p>This document covers the basic hardware and software requirements to
-    play Colossus. If you want to rebuild the game, please check the document
-    Building Colossus TODO.</p>
-    <p>Colossus should work with any Java Runtime Environment (JRE) or Java
-    Development Kit (JDK) release 1.3 or newer. Using 1.4 is recommended, in
-    particular on the Linux operating system, as it fixes some bugs. Building
-    Colossus TODO contains the links to the various JDK and JRE available.</p>
+    play Colossus. If you want to rebuild the game, please check the document 
+    <a href="build.html">Building Colossus</a>
+     .</p>
+    <p>Colossus should work with any 
+    <a href="http://java.sun.com/j2se">Java Runtime Environment (JRE)</a>
+     or 
+    <a href="http://java.sun.com/j2se">Java Development Kit (JDK / J2SDK)</a>
+     release 1.3 or newer. Using 1.4.1 is recommended, in particular on the
+    Linux operating system, as it fixes some bugs. 
+    <a href="build.html">Building Colossus</a>
+     contains the links to the various JDK and JRE available.</p>
     <p>On the hardware side, you&#39;ll need a color display (the higher the
     resolution the better, below 1024x768 is likely to look ugly) and enough
-    RAM (64 MibiBytes should work, 128 MiB or more is better). A fast processor
-    makes the game more comfortable, but as Colossus is turn-based, not
-    real-time, it should work on about anything. For x86-family (i.e. Intel
-    Pentium, AMD Athlon, etc.) processor, a speed of at least 200 megahertz
-    should allow the game to run decently.</p>
+    RAM (64 
+    <a href="http://physics.nist.gov/cuu/Units/binary.html">MibiBytes</a>
+     should work, 128 MiB or more is better). A fast processor makes the game
+    more comfortable, but as Colossus is turn-based, not real-time, it should
+    work on about anything. For x86-family (i.e. Intel Pentium, AMD Athlon,
+    etc.) processor, a speed of at least 200 megahertz should allow the game to
+    run decently.</p>
+    <p>Finally, Colossus uses TCP sockets to communicate between client and
+    server, 
+    <b>even for local games</b>
+    . So if you have an old operating system that doesn&#39;t install
+    networking by default, you may need to install it.</p>
     <p>Colossus is free, so if in doubt, just try it.</p>
     <p>The table below lists some tested configurations.</p>
     <table border="1">
