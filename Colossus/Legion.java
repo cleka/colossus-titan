@@ -15,13 +15,13 @@ class Legion
     String markerId;    // Bk03, Rd12, etc.
     private String splitFrom;   // Bk03, Rd12, etc. or null
     Creature [] creatures = new Creature[8];  // 8 before initial splits
-    private int currentHex;
-    private int startingHex;
+    private MasterHex currentHex;
+    private MasterHex startingHex;
     private boolean moved = false;
     private Player player;
 
     Legion(int cx, int cy, int scale, String markerId, String splitFrom,
-        Container container, int height, int currentHex, 
+        Container container, int height, MasterHex currentHex, 
         Creature creature0, Creature creature1, Creature creature2, 
         Creature creature3, Creature creature4, Creature creature5, 
         Creature creature6, Creature creature7, Player player)
@@ -116,18 +116,18 @@ class Legion
 
     void moveToHex(MasterHex hex)
     {
-        MasterBoard.getHexFromLabel(currentHex).removeLegion(this);
-        currentHex = hex.label;
-        MasterBoard.getHexFromLabel(currentHex).addLegion(this);
+        currentHex.removeLegion(this);
+        currentHex = hex;
+        currentHex.addLegion(this);
         moved = true;
     }
 
 
     void undoMove()
     {
-        MasterBoard.getHexFromLabel(currentHex).removeLegion(this);
+        currentHex.removeLegion(this);
         currentHex = startingHex;
-        MasterBoard.getHexFromLabel(currentHex).addLegion(this);
+        currentHex.addLegion(this);
         moved = false;
     }
 
@@ -139,7 +139,7 @@ class Legion
     }
 
 
-    int getCurrentHex()
+    MasterHex getCurrentHex()
     {
         return currentHex;
     }
