@@ -28,6 +28,7 @@ final class PlayerInfo
     private int creatureValue;
     private int titanPower;
     private int score;
+    private int mulligansLeft;
 
     /** Two-stage initialization. */
     PlayerInfo()
@@ -72,6 +73,9 @@ final class PlayerInfo
 
         buf = (String)data.get(10);
         creatureValue = Integer.parseInt(buf);
+
+        buf = (String)data.get(11);
+        mulligansLeft = Integer.parseInt(buf);
     }
 
 
@@ -133,5 +137,10 @@ final class PlayerInfo
     int getScore()
     {
         return score;
+    }
+
+    int getMulligansLeft()
+    {
+        return mulligansLeft;
     }
 }

@@ -2487,8 +2487,6 @@ public class SimpleAI implements AI
 
             count++;
 
-            game.getServer().allSetBattleWaitCursor();
-
             int score = testMoveOrder(order, battle);
             if (score > bestScore)
             {
@@ -2508,8 +2506,6 @@ public class SimpleAI implements AI
                 break;
             }
         }
-        // Change cursor back to default.
-        game.getServer().allSetBattleDefaultCursor();
 
         Log.debug("Got score " + bestScore + " in " + count + " permutations");
         return bestOrder;

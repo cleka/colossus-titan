@@ -18,13 +18,15 @@ final class BattleChit extends Chit
     private static Font oldFont;
     private static int fontHeight;
     private int hits = 0;
+    private String hexLabel;
 
 
     BattleChit(int scale, String id, Container container, boolean inverted,
-        int tag)
+        int tag, String hexLabel)
     {
         super(scale, id, container, inverted);
         this.tag = tag;
+        this.hexLabel = hexLabel;
         setBackground(Color.white);
     }
 
@@ -54,6 +56,17 @@ final class BattleChit extends Chit
             setHits(0);
         }
     }
+
+    String getHexLabel()
+    {
+        return hexLabel;
+    }
+
+    void setHexLabel(String hexLabel)
+    {
+        this.hexLabel = hexLabel;
+    }
+    
 
 
     public void paintComponent(Graphics g)

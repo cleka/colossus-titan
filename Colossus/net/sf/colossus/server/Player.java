@@ -968,6 +968,8 @@ Log.debug("Called Player.setType() for " + name + " " + type);
         buf.append(getScore());
         buf.append(':');
         buf.append(getTotalPointValue());
+        buf.append(':');
+        buf.append(getMulligansLeft());
 
         return buf.toString();
     }

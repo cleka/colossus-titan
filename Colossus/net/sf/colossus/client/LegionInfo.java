@@ -28,6 +28,7 @@ public final class LegionInfo
     private int height;
     private Marker marker;
     private String lastRecruit;
+    private boolean moved;
 
     /** Creature name strings for *known* contents.  Never null. */
     private List contents = new ArrayList();
@@ -312,6 +313,27 @@ public final class LegionInfo
         int numInHex = client.getLegionsByHex(getHexLabel()).size();
 Log.debug("LegionInfo.isEngaged() says there are " + numInHex);
         return (numInHex == 2);
+    }
+
+
+    void setLastRecruit(String lastRecruit)
+    {
+        this.lastRecruit = lastRecruit;
+    }
+
+    String getLastRecruit()
+    {
+        return lastRecruit;
+    }
+
+    void setMoved(boolean moved)
+    {
+        this.moved = moved;
+    }
+
+    boolean moved()
+    {
+        return moved;
     }
 }
 

@@ -171,8 +171,6 @@ public final class Client
     /** Legion summoner summons unit from legion donor. */
     void doSummon(String summoner, String donor, String unit)
     {
-Log.debug("called Client.doSummon: " + unit + " from " + donor + " to " + summoner);
-
         server.doSummon(summoner, donor, unit);
         if (board != null)
         {
@@ -618,10 +616,19 @@ Log.debug("called Client.doSummon: " + unit + " from " + donor + " to " + summon
         server.doneWithBattleMoves();
     }
 
-    // TODO cache
     boolean anyOffboardCreatures()
     {
-        return server.anyOffboardCreatures();
+        Iterator it = getBattleChits().iterator();
+        while (it.hasNext())
+        {
+            BattleChit chit = (BattleChit)it.next();
+            if (chit.getHexLabel().startsWith("X") &&
+                playerName.equals(getPlayerNameByTag(chit.getTag())))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
 
@@ -635,7 +642,6 @@ Log.debug("called Client.doSummon: " + unit + " from " + donor + " to " + summon
         if (playerName.equals(getBattleActivePlayerName()) &&
             getOption(Options.autoForcedStrike))
         {
-Log.debug("Client.makeForcedStrikes() for " + playerName);
             server.makeForcedStrikes(playerName, getOption(
                 Options.autoRangeSingle));
         }
@@ -648,8 +654,8 @@ Log.debug("Client.makeForcedStrikes() for " + playerName);
     }
 
 
-    // Public for client-side AI -- do not call from server side.
-    /** Get this legion's info.  Create it first if necessary. */
+    /** Get this legion's info.  Create it first if necessary.
+     *  Public for client-side AI -- do not call from server side. */
     public LegionInfo getLegionInfo(String markerId)
     {
         LegionInfo info = (LegionInfo)legionInfo.get(markerId);
@@ -779,25 +785,6 @@ Log.debug("Client.makeForcedStrikes() for " + playerName);
         return null;
     }
 
-    /** Create a new BattleChit and add it to the end of the list. */
-    void addBattleChit(final String bareImageName, boolean inverted, int tag)
-    {
-        String imageName = bareImageName;
-        if (imageName.equals("Titan"))
-        {
-            if (inverted)
-            {
-                imageName = getTitanBasename(defenderMarkerId);
-            }
-            else
-            {
-                imageName = getTitanBasename(attackerMarkerId);
-            }
-        }
-        BattleChit chit = new BattleChit(4 * Scale.get(), imageName,
-            map, inverted, tag);
-        battleChits.add(chit);
-    }
 
 
     public void removeDeadBattleChits()
@@ -823,8 +810,32 @@ Log.debug("Client.makeForcedStrikes() for " + playerName);
     {
         if (map != null)
         {
-            map.placeNewChit(imageName, inverted, tag, hexLabel);
+            addBattleChit(imageName, inverted, tag, hexLabel);
+            map.alignChits(hexLabel);
+            // Make sure map is visible after summon or muster.
+            map.toFront();
         }
+    }
+
+    /** Create a new BattleChit and add it to the end of the list. */
+    private void addBattleChit(final String bareImageName, boolean inverted, 
+        int tag, String hexLabel)
+    {
+        String imageName = bareImageName;
+        if (imageName.equals("Titan"))
+        {
+            if (inverted)
+            {
+                imageName = getTitanBasename(defenderMarkerId);
+            }
+            else
+            {
+                imageName = getTitanBasename(attackerMarkerId);
+            }
+        }
+        BattleChit chit = new BattleChit(4 * Scale.get(), imageName,
+            map, inverted, tag, hexLabel);
+        battleChits.add(chit);
     }
 
 
@@ -1419,8 +1430,7 @@ Log.debug("called Client.acquireAngelCallback()");
         }
         String hexLabel = getHexForLegion(markerId);
 
-        java.util.List recruits = server.findEligibleRecruits(markerId, 
-            hexLabel);
+        java.util.List recruits = findEligibleRecruits(markerId, hexLabel);
         String hexDescription =
             MasterBoard.getHexByLabel(hexLabel).getDescription();
 
@@ -1449,8 +1459,7 @@ Log.debug("called Client.acquireAngelCallback()");
     {
         String hexLabel = getHexForLegion(markerId);
 
-        java.util.List recruits = server.findEligibleRecruits(markerId, 
-            hexLabel);
+        java.util.List recruits = findEligibleRecruits(markerId, hexLabel);
         String hexDescription =
             MasterBoard.getHexByLabel(hexLabel).getDescription();
 
@@ -1681,18 +1690,6 @@ Log.debug("called Client.acquireAngelCallback()");
     }
 
 
-    // TODO Remember hex for each marker.
-    public void tellBattleMove(int tag, String startingHex, String currentHex,
-        boolean undo)
-    {
-        if (map != null)
-        {
-            map.alignChits(startingHex);
-            map.alignChits(currentHex);
-        }
-    }
-
-
     /** Create a new marker and add it to the end of the list. */
     public void addMarker(String markerId, String hexLabel)
     {
@@ -1775,12 +1772,22 @@ Log.debug("called Client.acquireAngelCallback()");
         server.doBattleMove(tag, hexLabel);
     }
 
-    public void didBattleMove(int tag, String startingHexLabel, 
-        String endingHexLabel)
+    public void tellBattleMove(int tag, String startingHexLabel, 
+        String endingHexLabel, boolean undo)
     {
-        if (isMyCritter(tag))
+        if (isMyCritter(tag) && !undo)
         {
             pushUndoStack(endingHexLabel);
+        }
+        BattleChit chit = getBattleChit(tag);
+        if (chit != null)
+        {
+            chit.setHexLabel(endingHexLabel);
+        }
+        if (map != null)
+        {
+            map.alignChits(startingHexLabel);
+            map.alignChits(endingHexLabel);
         }
     }
 
@@ -1902,8 +1909,8 @@ Log.debug("called Client.acquireAngelCallback()");
 
         boolean teleport = false;
 
-        Set teleports = server.listTeleportMoves(moverId);
-        Set normals = server.listNormalMoves(moverId);
+        Set teleports = listTeleportMoves(moverId);
+        Set normals = listNormalMoves(moverId);
         if (teleports.contains(hexLabel) && normals.contains(hexLabel))
         {
             teleport = chooseWhetherToTeleport();
@@ -1957,6 +1964,7 @@ Log.debug("called Client.acquireAngelCallback()");
             pushUndoStack(markerId);
         }
         getLegionInfo(markerId).setHexLabel(currentHexLabel);
+        getLegionInfo(markerId).setMoved(true);
         if (board != null)
         {
             board.alignLegions(startingHexLabel);
@@ -1970,6 +1978,7 @@ Log.debug("called Client.acquireAngelCallback()");
         removeRecruitChit(formerHexLabel);
         removeRecruitChit(currentHexLabel);
         getLegionInfo(markerId).setHexLabel(currentHexLabel);
+        getLegionInfo(markerId).setMoved(false);
         if (board != null)
         {
             board.alignLegions(formerHexLabel);
@@ -1990,9 +1999,9 @@ Log.debug("called Client.acquireAngelCallback()");
     }
 
 
-    // public for client-side AI -- do not call from server side.
     /** Return a set of hexLabels for all other unengaged legions of 
-     *  markerId's player that have summonables. */
+     *  markerId's player that have summonables.
+     * public for client-side AI -- do not call from server side. */
     public Set findSummonableAngelHexes(String summonerId)
     {
 Log.debug("Called Client.findSummonableAngelHexes for " + summonerId);
@@ -2042,7 +2051,7 @@ Log.debug("found " + set.size() + " hexes");
     }
 
 
-    // public for client-side AI -- do not call from server side
+    /** public for client-side AI -- do not call from server side */
     public java.util.List getLegionsByHex(String hexLabel)
     {
         java.util.List markerIds = new ArrayList();
@@ -2327,10 +2336,10 @@ Log.debug("found " + set.size() + " hexes");
         return movementRoll;
     }
 
-    // TODO cache
     int getMulligansLeft()
     {
-        return server.getMulligansLeft(playerName);
+        PlayerInfo info = getPlayerInfo(playerName);
+        return info.getMulligansLeft();
     }
 
 

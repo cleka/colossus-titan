@@ -807,23 +807,6 @@ Log.debug("Battle.setupSummon() advance will be " + advance);
     }
 
 
-    /** Return true if any creatures have been left off-board. */
-    boolean anyOffboardCreatures()
-    {
-        Legion legion = getActiveLegion();
-        Iterator it = legion.getCritters().iterator();
-        while (it.hasNext())
-        {
-            Critter critter = (Critter)it.next();
-            if (critter.getCurrentHex().isEntrance())
-            {
-                return true;
-            }
-        }
-        return false;
-    }
-
-
     /** If any creatures were left off-board, kill them.  If they were newly
      *  summoned or recruited, unsummon or unrecruit them instead. */
     private void removeOffboardCreatures()

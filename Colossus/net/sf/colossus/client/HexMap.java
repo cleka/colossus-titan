@@ -30,7 +30,6 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
     private java.util.List hexes = new ArrayList(33);
 
     // The game state hexes can be set up once for each terrain type.
-    // XXX Also Need entrances in non-GUI maps.
     private static Map terrainH = new HashMap();
     private static Map terrainHexes = new HashMap();
     private static Map entrancesHex = new HashMap();
@@ -528,7 +527,8 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
         }
 
         /* always antialias this, the font is huge */
-        Object oldantialias = g2.getRenderingHint(RenderingHints.KEY_ANTIALIASING);
+        Object oldantialias = g2.getRenderingHint(
+            RenderingHints.KEY_ANTIALIASING);
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                             RenderingHints.VALUE_ANTIALIAS_ON);
 

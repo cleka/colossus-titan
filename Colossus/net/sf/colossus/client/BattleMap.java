@@ -398,12 +398,8 @@ public final class BattleMap extends HexMap implements MouseListener,
     }
 
 
-    void placeNewChit(String imageName, boolean inverted, int tag, 
-        String hexLabel)
+    void toFront()
     {
-        client.addBattleChit(imageName, inverted, tag);
-        alignChits(hexLabel);
-        // Need to move map back in front of board after summon or muster.
         battleFrame.toFront();
     }
 

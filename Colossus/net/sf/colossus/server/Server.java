@@ -123,13 +123,6 @@ public final class Server
     }
 
     
-    // XXX delete client side should be able to figure out
-    public boolean anyOffboardCreatures()
-    {
-        Battle battle = game.getBattle();
-        return battle.anyOffboardCreatures();
-    }
-
     public void doneWithStrikes(String playerName)
     {
         Battle battle = game.getBattle();
@@ -360,17 +353,6 @@ Log.debug("called Server.makeForcedStrikes() " + playerName + " " + rangestrike)
         }
     }
 
-
-    void allTellBattleMove(int tag, String startingHex, String endingHex,
-        boolean undo)
-    {
-        Iterator it = clients.iterator();
-        while (it.hasNext())
-        {
-            Client client = (Client)it.next();
-            client.tellBattleMove(tag, startingHex, endingHex, undo);
-        }
-    }
 
     void allPlaceNewChit(Critter critter, boolean inverted)
     {
@@ -683,18 +665,18 @@ Log.debug("called Server.createSummonAngel for " + legion);
         {
             Critter critter = game.getBattle().getCritter(tag);
             String startingHexLabel = critter.getStartingHexLabel();
-            allTellDidBattleMove(tag, startingHexLabel, hexLabel);
+            allTellBattleMove(tag, startingHexLabel, hexLabel, false);
         }
     }
 
-    void allTellDidBattleMove(int tag, String startingHexLabel,
-        String endingHexLabel)
+    void allTellBattleMove(int tag, String startingHex, String endingHex,
+        boolean undo)
     {
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
             Client client = (Client)it.next();
-            client.didBattleMove(tag, startingHexLabel, endingHexLabel);
+            client.tellBattleMove(tag, startingHex, endingHex, undo);
         }
     }
 
@@ -712,14 +694,6 @@ Log.debug("called Server.createSummonAngel for " + legion);
         Battle battle = game.getBattle();
         Critter target = battle.getCritter(hexLabel);
         battle.applyCarries(target);
-    }
-
-
-    // XXX delete add logic to client
-    public Set getCarryTargets()
-    {
-        Battle battle = game.getBattle();
-        return battle.getCarryTargets();
     }
 
 
@@ -862,26 +836,6 @@ Log.debug("called Server.createSummonAngel for " + legion);
         }
     }
 
-
-    void allSetBattleWaitCursor()
-    {
-        Iterator it = clients.iterator();
-        while (it.hasNext())
-        {
-            Client client = (Client)it.next();
-            client.setBattleWaitCursor();
-        }
-    }
-
-    void allSetBattleDefaultCursor()
-    {
-        Iterator it = clients.iterator();
-        while (it.hasNext())
-        {
-            Client client = (Client)it.next();
-            client.setBattleDefaultCursor();
-        }
-    }
 
     /** Takes a Set of PenaltyOptions. */
     void askChooseStrikePenalty(SortedSet penaltyOptions)
@@ -1100,18 +1054,6 @@ Log.debug("called Server.createSummonAngel for " + legion);
     }
 
 
-    public String getPlayerNameByMarkerId(String markerId)
-    {
-        return game.getPlayerByMarkerId(markerId).getName();
-    }
-
-
-    public int getMulligansLeft(String playerName)
-    {
-        Player player = game.getPlayer(playerName);
-        return player.getMulligansLeft();
-    }
-
     public void setDonor(String markerId)
     {
         Player player = game.getActivePlayer();
@@ -1127,7 +1069,6 @@ Log.debug("called Server.createSummonAngel for " + legion);
     }
 
 
-    // XXX Stringify the return value.
     private String [] getPlayerInfo()
     {
         String [] info = new String[game.getNumPlayers()];
@@ -1141,25 +1082,6 @@ Log.debug("called Server.createSummonAngel for " + legion);
         return info;
     }
 
-
-    public int getLegionHeight(String markerId)
-    {
-        Legion legion = game.getLegionByMarkerId(markerId);
-        if (legion != null)
-        {
-            return legion.getHeight();
-        }
-        return 0;
-    }
-
-
-    // XXX Delete
-    /** Return the available legion markers for playerName. */
-    public Set getMarkersAvailable(String playerName)
-    {
-        Player player = game.getPlayer(playerName);
-        return player.getMarkersAvailable();
-    }
 
     public void doSplit(String parentId, String childId, String results)
     {
