@@ -122,8 +122,11 @@ public class MasterBoard extends Frame implements MouseListener,
         repaint();
 
         // XXX temporary test call
-        //SplitLegion splitlegion = new SplitLegion(this, 
-        //    game.player[0].legions[0], game.player[0]);
+        SplitLegion splitlegion = new SplitLegion(this, 
+            game.player[0].legions[0], game.player[0]);
+        // Update status window to reflect marker taken.
+        game.updateStatusScreen();
+        repaint();
     }
 
 
@@ -724,7 +727,6 @@ public class MasterBoard extends Frame implements MouseListener,
                     // Show info about this legion.
                     ShowLegion showlegion = new ShowLegion(this, 
                         game.player[i].legions[j], point);
-                    // XXX Excessive repaint here.
                     return;
                 }
             }
@@ -830,9 +832,10 @@ public class MasterBoard extends Frame implements MouseListener,
             }
         }
 
-        for (int i = 0; i < game.numPlayers; i++)
+        // Paint in reverse order to make visible z-order match clicks.
+        for (int i = game.numPlayers - 1; i >= 0; i--)
         {
-            for (int j = 0; j < game.player[i].numLegions; j++)
+            for (int j = game.player[i].numLegions - 1; j >= 0; j--)
             {
                 if (rectClip.intersects(
                     game.player[i].legions[j].chit.getBounds()))
