@@ -8,8 +8,6 @@ Eliminate Legion.hexInfoMap and just recompute and store the info for
 
 Get minimax masterboard moves working.
 
-Teach the AI how to summon angels.
-
 Rewrite SplitLegion to use Legion.split()
 
 Add a configurable AI move delay to make it easier to follow what the

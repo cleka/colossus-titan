@@ -34,6 +34,7 @@ public final class Options
     public static final String autoBattleMove = "Auto battle move";
     public static final String autoForcedStrike = "Auto forced strike";
     public static final String autoStrike = "Auto strike";
+    public static final String autoSummonAngels = "Auto summon angels";
     public static final String autoAcquireAngels = "Auto acquire angels";
     public static final String autoRecruit = "Auto recruit";
     public static final String autoPickRecruiter = "Auto pick recruiter";
@@ -53,6 +54,7 @@ public final class Options
         perPlayerSet.add(autoBattleMove);
         perPlayerSet.add(autoForcedStrike);
         perPlayerSet.add(autoStrike);
+        perPlayerSet.add(autoSummonAngels);
         perPlayerSet.add(autoAcquireAngels);
         perPlayerSet.add(autoRecruit);
         perPlayerSet.add(autoPickRecruiter);

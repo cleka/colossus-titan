@@ -75,11 +75,33 @@ public final class Battle
      *  is non-null earlier. */
     public void init()
     {
-        setupPhase();
-
         if (game != null && game.getOption(Options.showDice))
         {
             initBattleDice();
+        }
+
+        boolean advance = false;
+        switch (getPhase())
+        {
+            case Battle.SUMMON:
+                advance = setupSummon();
+                break;
+            case Battle.RECRUIT:
+                advance = setupRecruit();
+                break;
+            case Battle.MOVE:
+                advance = setupMove();
+                break;
+            case Battle.FIGHT:
+            case Battle.STRIKEBACK:
+                advance = setupFight();
+                break;
+            default:
+                Game.logError("Bogus phase");
+        }
+        if (advance)
+        {
+            advancePhase();
         }
     }
 
@@ -268,20 +290,22 @@ public final class Battle
     }
 
 
-    public void advancePhase()
+    private void advancePhase()
     {
+        boolean again = false;
+
         if (phase == SUMMON)
         {
             phase = MOVE;
             Game.logEvent("Battle phase advances to " + getPhaseName(phase));
-            setupMove();
+            again = setupMove();
         }
 
         else if (phase == RECRUIT)
         {
             phase = MOVE;
             Game.logEvent("Battle phase advances to " + getPhaseName(phase));
-            setupMove();
+            again = setupMove();
         }
 
         else if (phase == MOVE)
@@ -295,7 +319,7 @@ public final class Battle
             }
             phase = FIGHT;
             Game.logEvent("Battle phase advances to " + getPhaseName(phase));
-            setupFight();
+            again = setupFight();
         }
 
         else if (phase == FIGHT)
@@ -306,7 +330,7 @@ public final class Battle
             driftDamageApplied = false;
             phase = STRIKEBACK;
             Game.logEvent("Battle phase advances to " + getPhaseName(phase));
-            setupFight();
+            again = setupFight();
         }
 
         else if (phase == STRIKEBACK)
@@ -315,7 +339,7 @@ public final class Battle
             checkForElimination();
 
             // Make sure the battle isn't over before continuing.
-            if (!attackerElim && !defenderElim)
+            if (!battleOver)
             {
                 // Active legion is the one that was striking back.
                 if (activeLegionNum == ATTACKER)
@@ -323,8 +347,7 @@ public final class Battle
                     phase = SUMMON;
                     Game.logEvent(getActivePlayer().getName() +
                         "'s battle turn, number " + turnNumber);
-                    setupSummon();
-                    startSummoningAngel();
+                    again = setupSummon();
                 }
                 else
                 {
@@ -349,11 +372,12 @@ public final class Battle
                             attacker.remove();
                         }
                         cleanup();
+                        again = false;
                     }
                     else
                     {
                         phase = RECRUIT;
-                        setupRecruit();
+                        again = setupRecruit();
                         Player player = getActivePlayer();
                         if (player != null)
                         {
@@ -364,73 +388,72 @@ public final class Battle
                 }
             }
         }
-    }
 
-
-    private void setupPhase()
-    {
-        switch (getPhase())
+        if (again && !battleOver)
         {
-            case Battle.SUMMON:
-                setupSummon();
-                break;
-            case Battle.RECRUIT:
-                setupRecruit();
-                break;
-            case Battle.MOVE:
-                setupMove();
-                break;
-            case Battle.FIGHT:
-            case Battle.STRIKEBACK:
-                setupFight();
-                break;
-            default:
-                Game.logError("Bogus phase");
+            advancePhase();
         }
     }
 
 
-    private void setupSummon()
+    private boolean setupSummon()
     {
         map.setupSummonMenu();
+        if (summonState == Battle.FIRST_BLOOD)
+        {
+            if (getAttacker().canSummonAngel() && game != null)
+            {
+Game.logDebug("called game.createSummonAngel from Battle");
+                game.createSummonAngel(getAttacker());
+            }
+            // This is the last chance to summon an angel until the
+            // battle is over.
+            summonState = Battle.TOO_LATE;
+        }
+        if (game == null || game.getSummonAngel() == null)
+        {
+            if (phase == SUMMON)
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
 
-    private void setupRecruit()
+    private boolean setupRecruit()
     {
         map.setupRecruitMenu();
-        recruitReinforcement();
+        return recruitReinforcement();
     }
 
-
-    private void setupMove()
+    private boolean setupMove()
     {
         // If there are no legal moves, move on.
         if (highlightMobileCritters() < 1)
         {
-            advancePhase();
+            return true;
         }
         else
         {
             map.setupMoveMenu();
-
             Player player = getActivePlayer();
             if (player.getOption(Options.autoBattleMove))
             {
                 player.aiBattleMove();
             }
         }
+        return false;
     }
 
-
-    private void setupFight()
+    private boolean setupFight()
     {
         applyDriftDamage();
 
         // If there are no possible strikes, move on.
         if (highlightCrittersWithTargets() < 1)
         {
-            advancePhase();
+            return true;
         }
         else
         {
@@ -451,9 +474,10 @@ public final class Battle
             if (highlightCrittersWithTargets() < 1)
             {
                 commitStrikes();
-                advancePhase();
+                return true;
             }
         }
+        return false;
     }
 
 
@@ -468,56 +492,30 @@ public final class Battle
         return summonState;
     }
 
-
     public void setSummonState(int summonState)
     {
         this.summonState = summonState;
     }
 
 
-    private void startSummoningAngel()
-    {
-        if (summonState == Battle.FIRST_BLOOD)
-        {
-            if (getAttacker().canSummonAngel() && game != null)
-            {
-                game.createSummonAngel(getAttacker());
-            }
-
-            // This is the last chance to summon an angel until the
-            // battle is over.
-            summonState = Battle.TOO_LATE;
-        }
-
-        if (game == null || game.getSummonAngel() == null)
-        {
-            if (phase == SUMMON)
-            {
-                advancePhase();
-            }
-        }
-    }
-
-
     /** Called from Game after the SummonAngel finishes. */
     public void finishSummoningAngel(boolean placeNewChit)
     {
+        // Bring the BattleMap back to the front.
+        map.getFrame().show();
+
         if (placeNewChit)
         {
             map.placeNewChit(getAttacker());
         }
-
         if (phase == SUMMON)
         {
             advancePhase();
         }
-
-        // Bring the BattleMap back to the front.
-        map.getFrame().show();
     }
 
 
-    public void recruitReinforcement()
+    private boolean recruitReinforcement()
     {
         Legion defender = getDefender();
         if (turnNumber == 4 && defender.canRecruit())
@@ -543,8 +541,7 @@ public final class Battle
                 map.placeNewChit(defender);
             }
         }
-
-        advancePhase();
+        return true;
     }
 
 
@@ -552,7 +549,6 @@ public final class Battle
     {
         return carryDamage;
     }
-
 
     public void setCarryDamage(int carryDamage)
     {
@@ -621,7 +617,6 @@ public final class Battle
         return set;
     }
 
-
     /** This method is called by the defender on turn 1 in the tower.
      *  So we know that there are no enemies on board, and all allies
      *  are mobile. */
@@ -643,7 +638,6 @@ public final class Battle
         }
         return set;
     }
-
 
     /** Find all legal moves for this critter. The returned list
      *  contains hex IDs, not hexes. */
@@ -667,7 +661,6 @@ public final class Battle
         return set;
     }
 
-
     public void highlightMoves(Critter critter)
     {
         Set set = showMoves(critter, false);
@@ -675,26 +668,21 @@ public final class Battle
         map.selectHexesByLabels(set);
     }
 
-
     public void setLastCritterMoved(Critter critter)
     {
         lastCrittersMoved.addFirst(critter);
     }
 
-
     public void undoLastMove()
     {
         critterSelected = false;
-
         if (!lastCrittersMoved.isEmpty())
         {
             Critter critter = (Critter)lastCrittersMoved.removeFirst();
             critter.undoMove();
         }
-
         highlightMobileCritters();
     }
-
 
     public void undoAllMoves()
     {
@@ -728,11 +716,9 @@ public final class Battle
         }
     }
 
-
-    private void tryToConcede(Player player)
+    private boolean tryToConcede(Player player)
     {
         // XXX: Concession timing is tricky.
-
         String [] options = new String[2];
         options[0] = "Yes";
         options[1] = "No";
@@ -746,10 +732,10 @@ public final class Battle
         {
             Game.logEvent(player.getName() + " concedes the battle");
             concede(player);
-            advancePhase();
+            return true;
         }
+        return false;
     }
-
 
     public void tryToConcede()
     {
@@ -806,7 +792,6 @@ public final class Battle
         return false;
     }
 
-
     private boolean confirmLeavingCreaturesOffboard()
     {
         String [] options = new String[2];
@@ -820,7 +805,6 @@ public final class Battle
 
         return (answer == JOptionPane.YES_OPTION);
     }
-
 
     /** If any creatures were left off-board, kill them.  If they were newly
      *  summoned or recruited, unsummon or unrecruit them instead. */
@@ -850,7 +834,6 @@ public final class Battle
             critter.commitMove();
         }
     }
-
 
     public void doneWithMoves()
     {
@@ -904,6 +887,7 @@ public final class Battle
         this.driftDamageApplied = driftDamageApplied;
     }
 
+
     public void clearAllCarries()
     {
         boolean needToRepaint = false;
@@ -936,7 +920,6 @@ public final class Battle
 
         Legion attacker = getAttacker();
         Legion defender = getDefender();
-
         Legion donor = null;
 
         for (int i = DEFENDER; i <= ATTACKER; i++)
@@ -957,7 +940,7 @@ public final class Battle
                         if (critter.isAngel())
                         {
                             Player player = legion.getPlayer();
-                            donor = player.getLastLegionSummonedFrom();
+                            donor = player.getDonor();
                             donor.addCreature(critter, false);
                             donor.getCurrentHex().repaint();
                             // This summon doesn't count; the player can
@@ -1118,11 +1101,15 @@ Game.logDebug("defender eliminated");
 
     private void commitStrikes()
     {
-        Iterator it = getActiveLegion().getCritters().iterator();
-        while (it.hasNext())
+        Legion legion = getActiveLegion();
+        if (legion != null)
         {
-            Critter critter = (Critter)it.next();
-            critter.setStruck(false);
+            Iterator it = legion.getCritters().iterator();
+            while (it.hasNext())
+            {
+                Critter critter = (Critter)it.next();
+                critter.setStruck(false);
+            }
         }
     }
 
@@ -1157,18 +1144,21 @@ Game.logDebug("defender eliminated");
 
     private boolean isForcedStrikeRemaining()
     {
-        Iterator it = getActiveLegion().getCritters().iterator();
-        while (it.hasNext())
+        Legion legion = getActiveLegion();
+        if (legion != null)
         {
-            Critter critter = (Critter)it.next();
-            if (!critter.hasStruck() && critter.isInContact(false))
+            Iterator it = legion.getCritters().iterator();
+            while (it.hasNext())
             {
-                return true;
+                Critter critter = (Critter)it.next();
+                if (!critter.hasStruck() && critter.isInContact(false))
+                {
+                    return true;
+                }
             }
         }
         return false;
     }
-
 
     /** Perform strikes for any creature that is forced to strike
      *  and has only one legal target. Forced strikes will never
@@ -1209,7 +1199,6 @@ Game.logDebug("defender eliminated");
         }
         while (repeat);
     }
-
 
     public void doneWithStrikes()
     {
@@ -1299,7 +1288,6 @@ Game.logDebug("defender eliminated");
         return findStrikes(critter, rangestrike).size();
     }
 
-
     /** Highlight all hexes with targets that the critter can strike.
      *  Return the number of hexes highlighted. */
     public int highlightStrikes(Critter critter)
@@ -1328,7 +1316,6 @@ Game.logDebug("defender eliminated");
         return set;
     }
 
-
     public int highlightCarries()
     {
         Set set = findCarryTargets();
@@ -1336,7 +1323,6 @@ Game.logDebug("defender eliminated");
         map.selectHexesByLabels(set);
         return set.size();
     }
-
 
     public void applyCarries(Critter target)
     {
@@ -1437,7 +1423,6 @@ Game.logDebug("defender eliminated");
         }
     }
 
-
     /** Return the minimum range from any neighbor of hex1 to hex2. */
     private static int minRangeToNeighbor(BattleHex hex1, BattleHex hex2)
     {
@@ -1457,7 +1442,6 @@ Game.logDebug("defender eliminated");
         return min;
     }
 
-
     /** Caller must ensure that yDist != 0 */
     private static boolean toLeft(double xDist, double yDist)
     {
@@ -1472,7 +1456,6 @@ Game.logDebug("defender eliminated");
             return false;
         }
     }
-
 
     /** Check LOS, going to the left of hexspines if argument left is true, or
      *  to the right if it is false. */
@@ -1626,7 +1609,6 @@ Game.logDebug("defender eliminated");
             midObstacle, midCliff, midChit, totalObstacles);
     }
 
-
     /** Check to see if the LOS from hex1 to hex2 is blocked.  If the LOS
      *  lies along a hexspine, check both and return true only if both are
      *  blocked. */
@@ -1680,7 +1662,6 @@ Game.logDebug("defender eliminated");
         }
     }
 
-
     /** Return true if the rangestrike is possible. */
     private boolean isRangestrikePossible(Critter critter, Critter target)
     {
@@ -1705,7 +1686,6 @@ Game.logDebug("defender eliminated");
 
         return true;
     }
-
 
     /** Return the hexside direction of the path from hex1 to hex2.
      *  Sometimes two directions are possible.  If the left parameter
@@ -1959,12 +1939,10 @@ Game.logDebug("defender eliminated");
         return battleDice;
     }
 
-
     public void initBattleDice()
     {
         battleDice = new BattleDice(game);
     }
-
 
     public void disposeBattleDice()
     {
@@ -2010,7 +1988,6 @@ Game.logDebug("defender eliminated");
             }
         }
     }
-
 
     public void actOnHex(BattleHex hex)
     {

@@ -44,4 +44,7 @@ public interface AI
 
     /** choose whether to acquire an angel or archangel */
     String acquireAngel(Legion legion, ArrayList recruits, Game game);
+
+    /** choose whether to summon an angel or archangel */
+    String summonAngel(Legion legion, Game game);
 }

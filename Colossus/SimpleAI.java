@@ -1649,6 +1649,72 @@ class SimpleAI implements AI
         return null;
     }
 
+    /** Return a string of form angeltype:donorId, or null. */
+    public String summonAngel(Legion summoner, Game game)
+    {
+        Set set = game.findSummonableAngels(summoner);
+
+        // Always summon the biggest possible angel, from the least
+        // important legion that has one.  TODO Make this smarter.
+
+        Legion bestLegion = null;
+        Creature bestAngel = null;
+
+        Iterator it = set.iterator();
+        while (it.hasNext())
+        {
+            String hexLabel = (String)it.next();
+            Legion legion = game.getFirstLegion(hexLabel);
+            if (bestAngelType(legion).equals("Archangel"))
+            {
+                if (bestAngel == null || bestAngel != Creature.archangel)
+                {
+                    bestLegion = legion;
+                    bestAngel = Creature.archangel;
+                }
+                else
+                {
+                    if (legion.compareTo(bestLegion) > 0)
+                    {
+                        bestLegion = legion;
+                    }
+                }
+            }
+            else  // Angel
+            {
+                if (bestAngel == null)
+                {
+                    bestLegion = legion;
+                    bestAngel = Creature.angel;
+                }
+                else if (bestAngel == Creature.angel)
+                {
+                    if (legion.compareTo(bestLegion) > 0)
+                    {
+                        bestLegion = legion;
+                    }
+                }
+            }
+        }
+        if (bestLegion == null)
+        {
+            return null;
+        }
+        return bestAngel.getName() + ":" + bestLegion.getMarkerId();
+    }
+
+    public static String bestAngelType(Legion legion)
+    {
+        if (legion.numCreature(Creature.archangel) >= 1)
+        {
+            return "Archangel";
+        }
+        if (legion.numCreature(Creature.angel) >= 1)
+        {
+            return "Angel";
+        }
+        return null;
+    }
 
     public void strike(Legion legion, Battle battle, Game game,
                        boolean fakeDice)
@@ -1733,8 +1799,6 @@ class SimpleAI implements AI
 
         if (bestTarget == null)
         {
-            debugln("no targets");
-
             return;
         }
 

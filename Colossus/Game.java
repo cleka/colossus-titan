@@ -336,7 +336,6 @@ public final class Game
         }
     }
 
-
     public int getActivePlayerNum()
     {
         return activePlayerNum;
@@ -347,7 +346,6 @@ public final class Game
     {
 	activePlayerNum = i;
     }
-
 
     public Player getPlayer(int i)
     {
@@ -1475,8 +1473,6 @@ public final class Game
         return recruits;
     }
 
-
-
     /** Return the number of the given recruiter needed to muster the given
       * recruit in the given terrain.  Return an impossibly big number
       * if the recruiter can't muster that recruit in that terrain. */
@@ -1927,13 +1923,11 @@ public final class Game
         return 99;
     }
 
-
     /** Return a list of eligible recruits, as Creatures. */
     public ArrayList findEligibleRecruits(Legion legion)
     {
         return findEligibleRecruits(legion, legion.getCurrentHex());
     }
-
 
     /** Return a list of eligible recruits, as Creatures. */
     public ArrayList findEligibleRecruits(Legion legion, MasterHex hex)
@@ -2052,7 +2046,6 @@ public final class Game
         return recruits;
     }
 
-
     /** Return a list of eligible recruiters. Use Critters instead
      *  of Creatures so that Titan power is shown properly. */
     public ArrayList findEligibleRecruiters(Legion legion, Creature recruit)
@@ -2118,7 +2111,6 @@ public final class Game
         return recruiters;
     }
 
-
     /** Return true if all members of legion who are in recruiters are
      *  already visible. */
     private boolean allRecruitersVisible(Legion legion, ArrayList recruiters)
@@ -2150,7 +2142,6 @@ public final class Game
         return true;
     }
 
-
     private void doMuster(Legion legion)
     {
         if (legion.hasMoved() && legion.canRecruit())
@@ -2163,13 +2154,8 @@ public final class Game
 
             if (!legion.canRecruit())
             {
-                // XXX This is redundant, since doRecruit() also tries
-                // to unselect it.  Neither seems to be working, though.
                 updateStatusScreen();
                 board.unselectHexByLabel(legion.getCurrentHexLabel());
-
-                // XXX Even more redundancy.
-                board.getHexByLabel(legion.getCurrentHexLabel()).repaint();
             }
         }
     }
@@ -2204,9 +2190,7 @@ public final class Game
         }
 
         legion.addCreature(recruit, true);
-
         MasterHex hex = legion.getCurrentHex();
-
         int numRecruiters = 0;
         if (recruiter != null)
         {
@@ -2228,9 +2212,6 @@ public final class Game
         // Recruits are one to a customer.
         legion.setRecruitName(recruit.getName());
         legion.getPlayer().setLastLegionRecruited(legion);
-
-        hex.unselect();
-        hex.repaint();
     }
 
     /** Return a list of names of angel types that can be acquired. */
@@ -2380,12 +2361,9 @@ public final class Game
     public void highlightUnmovedLegions()
     {
         board.unselectAllHexes();
-
         Player player = getActivePlayer();
-        player.setDonor(null);
-        List legions = player.getLegions();
         HashSet set = new HashSet();
-        Iterator it = legions.iterator();
+        Iterator it = player.getLegions().iterator();
         while (it.hasNext())
         {
             Legion legion = (Legion)it.next();
@@ -2394,7 +2372,6 @@ public final class Game
                 set.add(legion.getCurrentHexLabel());
             }
         }
-
         board.selectHexesByLabels(set);
         board.repaint();
     }
@@ -2729,18 +2706,66 @@ public final class Game
         return summonAngel;
     }
 
-
     public void createSummonAngel(Legion attacker)
     {
-        // Make sure the MasterBoard is visible.
-        if (masterFrame.getState() == JFrame.ICONIFIED)
+        Player player = getActivePlayer();
+        if (player.getOption(Options.autoSummonAngels))
         {
-            masterFrame.setState(JFrame.NORMAL);
-        }
-        // And bring it to the front.
-        masterFrame.show();
+            String typeColonDonor = player.aiSummonAngel(attacker);
+            int split = typeColonDonor.indexOf(':');
+            String angelType = typeColonDonor.substring(0, split);
+            String donorId = typeColonDonor.substring(split + 1);
 
-        summonAngel = SummonAngel.summonAngel(this, attacker);
+            // Set up the donor in case the summon gets cancelled.
+            Legion donor = player.getLegionByMarkerId(donorId);
+            // XXX Fix this when donor becomes a string
+            player.setDonor(donor);
+            Creature angel = Creature.getCreatureByName(angelType);
+            doSummon(attacker, donor, angel);
+        }
+        else
+        {
+            // Make sure the MasterBoard is visible.
+            if (masterFrame.getState() == JFrame.ICONIFIED)
+            {
+                masterFrame.setState(JFrame.NORMAL);
+            }
+            // And bring it to the front.
+            masterFrame.show();
+
+            summonAngel = SummonAngel.summonAngel(this, attacker);
+        }
+    }
+
+    public void doSummon(Legion legion, Legion donor, Creature angel)
+    {
+        // Sanity check, just in case this got called twice.
+        if (angel != null && legion.canSummonAngel())
+        {
+            Player player = getActivePlayer();
+
+            // Only one angel can be summoned per turn.
+            player.setSummoned(true);
+
+            // Move the angel or archangel.
+            donor.removeCreature(angel, false, false);
+            legion.addCreature(angel, false);
+
+            // Update the number of creatures displayed in both stacks.
+            donor.getCurrentHex().repaint();
+            legion.getCurrentHex().repaint();
+
+            Game.logEvent("An " + angel.getName() +
+                " is summoned from legion " + donor.getLongMarkerName() +
+                " into legion " + legion.getLongMarkerName());
+
+            if (battle != null)
+            {
+                battle.finishSummoningAngel(player.hasSummoned());
+            }
+            summonAngel = null;
+            highlightEngagements();
+        }
     }
 
 
@@ -2754,6 +2779,8 @@ public final class Game
     public void finishBattle(String hexLabel, boolean attackerEntered)
     {
         masterFrame.show();
+
+        battle = null;
 
         // Handle any after-battle angel summoning or recruiting.
         if (getNumLegions(hexLabel) == 1)
@@ -2769,6 +2796,7 @@ public final class Game
                 // Attacker won, so possibly summon angel.
                 if (legion.canSummonAngel())
                 {
+logDebug("calling createSummonAngel from game.finishBattle()");
                     createSummonAngel(legion);
                 }
             }
@@ -2795,9 +2823,7 @@ public final class Game
                 }
             }
         }
-        battle = null;
         engagementInProgress = false;
-
         updateStatusScreen();
 
         // Performance is a bit slow after battles, so try to
@@ -2811,21 +2837,13 @@ public final class Game
     }
 
 
-    /** Return number of legions with summonable angels. */
-    public int highlightSummonableAngels(Legion legion)
+    public Set findSummonableAngels(Legion legion)
     {
-        board.unselectAllHexes();
-
-        Player player = legion.getPlayer();
-        player.setDonor(null);
-
-        int count = 0;
-
         HashSet set = new HashSet();
-
-        for (int i = 0; i < player.getNumLegions(); i++)
+        Iterator it = legion.getPlayer().getLegions().iterator();
+        while (it.hasNext())
         {
-            Legion candidate = player.getLegion(i);
+            Legion candidate = (Legion)it.next();
             if (candidate != legion)
             {
                 String hexLabel = candidate.getCurrentHexLabel();
@@ -2833,31 +2851,20 @@ public final class Game
                     candidate.numCreature(Creature.archangel) > 0) &&
                     !isEngagement(hexLabel))
                 {
-
-                    count++;
                     set.add(hexLabel);
                 }
             }
         }
-
-        if (count > 0)
-        {
-            board.selectHexesByLabels(set);
-        }
-
-        return count;
+        return set;
     }
 
-
-    public void finishSummoningAngel()
+    /** Return number of legions with summonable angels. */
+    public int highlightSummonableAngels(Legion legion)
     {
-        if (battle != null)
-        {
-            battle.finishSummoningAngel(summonAngel.getSummoned());
-        }
-        summonAngel = null;
-
-        highlightEngagements();
+        Set set = findSummonableAngels(legion);
+        board.unselectAllHexes();
+        board.selectHexesByLabels(set);
+        return set.size();
     }
 
 
@@ -3341,6 +3348,7 @@ public final class Game
                 {
                     // If the attacker won the battle by agreement,
                     // he may summon an angel.
+Game.logDebug("Calling createSummonAngel() from handleNegotiation");
                     createSummonAngel(attacker);
                 }
             }

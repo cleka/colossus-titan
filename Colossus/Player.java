@@ -22,9 +22,8 @@ public final class Player implements Comparable
     private ArrayList legions = new ArrayList();
     private boolean dead;
     private boolean titanEliminated;
-    private Legion donor;
-    private Legion mover;
-    private Legion lastLegionSummonedFrom;
+    private Legion donor;              // XXX Change to string.
+    private Legion mover;              // XXX Change to string.
     private MarkerComparator markerComparator = new MarkerComparator();
     private TreeSet markersAvailable = new TreeSet(markerComparator);
 
@@ -62,8 +61,11 @@ public final class Player implements Comparable
         {
             newPlayer.legions.add(i, ((Legion)legions.get(i)).AICopy(game));
         }
+        // XXX Need to add donor, mover once they are changed to strings.
+
         // Strings are immutable, so a shallow copy == a deep copy
         newPlayer.markersAvailable = (TreeSet) markersAvailable.clone();
+
         return newPlayer;
     }
 
@@ -210,23 +212,10 @@ public final class Player implements Comparable
     }
 
 
-    public boolean hasSummoned()
-    {
-        return summoned;
-    }
-
-
-    public void setSummoned(boolean summoned)
-    {
-        this.summoned = summoned;
-    }
-
-
     public boolean hasTeleported()
     {
         return teleported;
     }
-
 
     public void setTeleported(boolean teleported)
     {
@@ -234,32 +223,39 @@ public final class Player implements Comparable
     }
 
 
-    public Legion getLastLegionSummonedFrom()
+    public boolean hasSummoned()
     {
-        return lastLegionSummonedFrom;
+        return summoned;
     }
 
+    public void setSummoned(boolean summoned)
+    {
+        this.summoned = summoned;
+    }
+
+    public Legion getDonor()
+    {
+        return donor;
+    }
+
+    public void setDonor(Legion legion)
+    {
+        donor = legion;
+    }
 
     public void disbandEmptyDonor()
     {
-        if (lastLegionSummonedFrom != null &&
-            lastLegionSummonedFrom.getHeight() == 0)
+        if (donor != null && donor.getHeight() == 0)
         {
-            lastLegionSummonedFrom.remove();
-            lastLegionSummonedFrom = null;
+            donor.remove();
+            donor = null;
         }
-    }
-
-
-    public void setLastLegionSummonedFrom(Legion legion)
-    {
-        lastLegionSummonedFrom = legion;
     }
 
 
     public int getTitanPower()
     {
-        return (int) (6 + (getScore() / 100));
+        return (int)(6 + (getScore() / 100));
     }
 
 
@@ -268,12 +264,10 @@ public final class Player implements Comparable
         return legions.size();
     }
 
-
     public Legion getLegion(int i)
     {
         return (Legion)legions.get(i);
     }
-
 
     public Legion getLegionByMarkerId(String markerId)
     {
@@ -288,7 +282,6 @@ public final class Player implements Comparable
         }
         return null;
     }
-
 
     public ArrayList getLegions()
     {
@@ -418,6 +411,8 @@ public final class Player implements Comparable
     public void resetTurnState()
     {
         summoned = false;
+        donor = null;
+
         teleported = false;
         movementRoll = 0;
 
@@ -661,18 +656,6 @@ public final class Player implements Comparable
     {
         legions.add(legion);
         game.getBoard().alignLegions(legion.getCurrentHexLabel());
-    }
-
-
-    public void setDonor(Legion donor)
-    {
-        this.donor = donor;
-    }
-
-
-    public Legion getDonor()
-    {
-        return donor;
     }
 
 
@@ -1047,6 +1030,17 @@ public final class Player implements Comparable
         if (getOption(Options.autoAcquireAngels))
         {
             return ai.acquireAngel(legion, recruits, game);
+        }
+        return null;
+    }
+
+    /** Return a String of form "Angeltype:donorId", or null if no
+      * angel is to be summoned. */
+    public String aiSummonAngel(Legion legion)
+    {
+        if (getOption(Options.autoSummonAngels))
+        {
+            return ai.summonAngel(legion, game);
         }
         return null;
     }

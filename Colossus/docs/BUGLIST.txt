@@ -86,3 +86,13 @@ Solaris, 1.3.1: Loading in the middle of a battle resets turn
    number to 1 while leaving critters in the middle of the
    map, keeps the map around after the battle is over, etc.  It's
    a mess.
+
+Win98, 1.3.1: Human-controlled legions are staying highlighted
+   after summoning or splitting, again.  They un-highlight after
+   moving.  unselect() and repaint() are being called.  Problem
+   does not always happen right after loading a game.
+
+Win98, 1.3.1: Legions sometimes miss the risk of staying in their
+   current hex.  For example, 2-high titan legion in H4 saw no
+   risk from enemy 6-high legion in D7, when it could have easily
+   moved to safety.

@@ -24,7 +24,6 @@ public final class SummonAngel extends JDialog implements MouseListener,
     private GridBagConstraints constraints = new GridBagConstraints();
     private JButton button1;
     private JButton button2;
-    private boolean summoned;
     private static boolean active;
 
 
@@ -104,7 +103,6 @@ public final class SummonAngel extends JDialog implements MouseListener,
         repaint();
     }
 
-
     public static SummonAngel summonAngel(Game game, Legion legion)
     {
         if (!active)
@@ -121,41 +119,10 @@ public final class SummonAngel extends JDialog implements MouseListener,
         return legion;
     }
 
-
-    public boolean getSummoned()
+    private void cleanup(Creature angel)
     {
-        return summoned;
-    }
-
-
-    private void cleanup(Creature creature)
-    {
-        // Sanity check, just in case this got called twice.
-        if (creature != null && legion.canSummonAngel())
-        {
-            summoned = true;
-
-            // Only one angel can be summoned per turn.
-            player.setSummoned(true);
-            player.setLastLegionSummonedFrom(donor);
-
-            // Move the angel or archangel.
-            donor.removeCreature(creature, false, false);
-            legion.addCreature(creature, false);
-
-            // Update the number of creatures displayed in both stacks.
-            donor.getCurrentHex().repaint();
-            legion.getCurrentHex().repaint();
-
-            Game.logEvent("An " + creature.getName() +
-                " is summoned from legion " + donor.getLongMarkerName() +
-                " into legion " + legion.getLongMarkerName());
-        }
-
+        game.doSummon(legion, donor, angel);
         dispose();
-
-        // Let the game know to leave the angel-summoning state.
-        game.finishSummoningAngel();
         active = false;
     }
 
@@ -167,14 +134,11 @@ public final class SummonAngel extends JDialog implements MouseListener,
         {
             return;
         }
-
         Object source = e.getSource();
-
         if (angelChit == source && !angelChit.isDead())
         {
             cleanup(Creature.angel);
         }
-
         else if (archangelChit == source && !archangelChit.isDead())
         {
             cleanup(Creature.archangel);
