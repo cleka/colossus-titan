@@ -97,7 +97,7 @@ clean:
 
 # Make zip file.  Don't include saved games, CVS dirs, or other zip files.
 dist: $(JARFILE)
-	zip -pr $(ZIPFILE) * -x *.sav -x *.zip -x \*CVS\* -x \*javadoc\*
+	zip -pr $(ZIPFILE) * -x *.sav -x *.zip -x \*CVS\* -x \*javadoc\* -x *Keystore*
 
 
 # Make javadoc docs
