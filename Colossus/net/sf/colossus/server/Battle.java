@@ -1486,6 +1486,11 @@ Log.debug("called Battle.applyCarries() for " + target.getDescription());
         }
     }
 
+    static boolean isObstacle(char hexside)
+    {
+        return (hexside != ' ') && (hexside != 'r');
+    }
+
     /** Check LOS, going to the left of hexspines if argument left is true, or
      *  to the right if it is false. */
     private boolean isLOSBlockedDir(BattleHex initialHex, BattleHex currentHex,
@@ -1521,7 +1526,7 @@ Log.debug("called Battle.applyCarries() for " + target.getDescription());
 
         if (currentHex == initialHex)
         {
-            if (hexside != ' ')
+            if (isObstacle(hexside)) 
             {
                 strikerAtop = true;
                 totalObstacles++;
@@ -1535,7 +1540,7 @@ Log.debug("called Battle.applyCarries() for " + target.getDescription());
                 }
             }
 
-            if (hexside2 != ' ')
+            if (isObstacle(hexside2))
             {
                 midObstacle = true;
                 totalObstacles++;
@@ -1551,7 +1556,7 @@ Log.debug("called Battle.applyCarries() for " + target.getDescription());
         }
         else if (nextHex == finalHex)
         {
-            if (hexside != ' ')
+            if (isObstacle(hexside))
             {
                 midObstacle = true;
                 totalObstacles++;
@@ -1565,7 +1570,7 @@ Log.debug("called Battle.applyCarries() for " + target.getDescription());
                 }
             }
 
-            if (hexside2 != ' ')
+            if (isObstacle(hexside2))
             {
                 targetAtop = true;
                 totalObstacles++;
@@ -1623,7 +1628,7 @@ Log.debug("called Battle.applyCarries() for " + target.getDescription());
                 return true;
             }
 
-            if (hexside != ' ' || hexside2 != ' ')
+            if (isObstacle(hexside) || isObstacle(hexside2))
             {
                 midObstacle = true;
                 totalObstacles++;

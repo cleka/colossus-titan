@@ -1,8 +1,9 @@
-Add unit tests for server options.
 Add JUnit section to build docs.
 Document test procedures.
 
-Add remaining command-line options.
+Add server-side static map/board initialization?
+
+Add remaining command-line options.  (User prefs dir?)
 
 Use SF project releases.
 
@@ -82,7 +83,3 @@ Special-case less fear of initial 8-high enemy legions, to make AI move
 Improve mapping of terrain types, creature nativity, and creature
    recruiting potential so that the AI can easily take these into
    account.
-
-Make MasterBoard and MasterHex pluggable.  Integrate David Lum's
-   Java2D MasterBoard graphics as an option.
-
