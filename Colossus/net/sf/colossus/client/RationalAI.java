@@ -464,7 +464,8 @@ public class RationalAI implements AI
         // For Titan group, try to only split when at 7
         // The only exception should be if we are under
         // severe attack and splitting can save us
-        if (legion.hasTitan() && legion.getHeight() < 7)
+        if (legion.hasTitan() &&
+                (legion.getHeight() + child_legion.getHeight()) < 7)
         {
             split_value -= 10000;
             no_split_value += 10000;
@@ -1163,7 +1164,7 @@ public class RationalAI implements AI
         private void next()
         {
             next_index(nIndex - 1);
-            print_index();
+            // print_index();
         }
 
         int index(int i)
@@ -1493,22 +1494,52 @@ public class RationalAI implements AI
         Log.debug("handleConflictedMoves");
         int iter = 0;
 
+        setupTimer();
+
         legion_move_combination:
         while (li.hasNext())
         {
             iter++;
-            Set hexes = new HashSet();
+            if (timeIsUp)
+            {
+                if (iter >= 1000)
+                {
+                    Log.debug("handleVoluntaryMoves() time up after " + iter +
+                            " iterations");
+                    break;
+                }
+            }
+
             double value = 0;
+            // Log.debug("Considering combined move number: " + iter);
+
+            // Compute intial value of move
+            for (int i = 0; i < all_legionMoves.size(); i++)
+            {
+                List legionMoves = (List)all_legionMoves.get(i);
+                LegionBoardMove lm = (LegionBoardMove)legionMoves.get(
+                        li.index(i));
+                value += lm.val;
+            }
+
+            if (value <= best_value)
+            {
+                // We already have a better move than this
+                continue;
+            }
+
+            // Check to see if move is valid
+            Set hexes = new HashSet();
             boolean hasMove = false;
             boolean hasEmptyHexMove = false;
-            Log.debug("Considering combined move number: " + iter);
+
             for (int i = 0; i < all_legionMoves.size(); i++)
             {
                 List legionMoves = (List)all_legionMoves.get(i);
                 LegionBoardMove lm = (LegionBoardMove)legionMoves.get(
                         li.index(i));
                 String hex = lm.toHex;
-                Log.debug(lm.markerId + " moves to " + lm.toHex);
+                // Log.debug(lm.markerId + " moves to " + lm.toHex);
                 if (hexes.contains(hex))
                 {
                     // if this combination has two legions moving
@@ -1527,13 +1558,13 @@ public class RationalAI implements AI
                 }
 
                 hexes.add(hex);
-                value += lm.val;
+
                 if (!lm.noMove)
                 {
                     hasMove = true;
                 }
             }
-            Log.debug("Combined move value: " + value);
+            // Log.debug("Combined move value: " + value);
 
             // apply constraint. at least one legion must move to
             // a place that is not currently occupied by our legions.
@@ -1550,12 +1581,10 @@ public class RationalAI implements AI
                 continue;
             }
 
-            if (value > best_value)
-            {
-                Log.debug("New best move!");
-                best_value = value;
-                best_move = new LegionIndex(li);
-            }
+            // Log.debug("New best move!");
+            best_value = value;
+            best_move = new LegionIndex(li);
+
         }
         Log.debug("Done computing best move.");
 
@@ -1582,19 +1611,33 @@ public class RationalAI implements AI
         // flag.  In this case, there should be at least one
         // move to an empty hex which makes this a legal move set.
         int tries = 0;
-        while (bestMoves.size() > 0 && tries < 100)
+        int MAX_TRIES = 20;
+        while (bestMoves.size() > 0 && tries < MAX_TRIES)
         {
             ListIterator bm = bestMoves.listIterator();
             while (bm.hasNext())
             {
                 LegionBoardMove lm = (LegionBoardMove)bm.next();
-                boolean moved_legion = doMove(lm.markerId, lm.toHex);
-                if (moved_legion)
+
+                // first make moves which are not going to hexes
+                // currently occupied by our legions
+
+                if (!occupiedHexes.contains(lm.toHex) ||
+                        lm.fromHex.equals(lm.toHex) || tries > MAX_TRIES - 3)
                 {
-                    occupiedHexes.remove(lm.fromHex); // hex is now free
-                    occupiedHexes.add(lm.toHex);
-                    bm.remove(); // move has been made
-                    moved = true;
+                    boolean moved_legion = doMove(lm.markerId, lm.toHex);
+                    if (moved_legion)
+                    {
+                        Log.debug("Successfully moved? " + lm.markerId);
+                        occupiedHexes.remove(lm.fromHex); // hex is now free
+                        occupiedHexes.add(lm.toHex);
+                        bm.remove(); // move has been made
+                        moved = true;
+                    }
+                    else
+                    {
+                        Log.debug("Did not move? " + lm.markerId);
+                    }
                 }
             }
             tries++;

@@ -2793,7 +2793,15 @@ public final class Client implements IClient
             teleportingLord = figureTeleportingLord(moverId, hexLabel);
         }
 
+        // if this hex is already occupied, return false
+        int friendlyLegions = getNumFriendlyLegions(hexLabel, activePlayerName);
+        if (friendlyLegions > 0)
+        {
+            return false;
+        }
+
         server.doMove(moverId, hexLabel, entrySide, teleport, teleportingLord);
+
         return true;
     }
 
