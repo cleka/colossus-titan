@@ -3143,36 +3143,6 @@ Log.debug("Called findBattleMoves()");
         }
     }
 
-    /** Sort critters in decreasing order of importance.  Keep
-     *  identical creatures together with a secondary sort by
-     *  creature name. */
-    final class CritterComparator implements Comparator
-    {
-        private char terrain;
-
-        CritterComparator(char terrain)
-        {
-            this.terrain = terrain;
-        }
-
-        public int compare(Object o1, Object o2)
-        {
-            BattleChit critter1 = (BattleChit)o1;
-            BattleChit critter2 = (BattleChit)o2;
-            int diff = getKillValue(critter2, terrain) -
-                getKillValue(critter1, terrain);
-            if (diff != 0)
-            {
-                return diff;
-            }
-            else
-            {
-                return critter1.getCreatureName().compareTo(
-                    critter2.getCreatureName());
-            }
-        }
-    }
-
 
     class CritterMove
     {

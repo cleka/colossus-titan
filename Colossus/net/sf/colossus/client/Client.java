@@ -1928,7 +1928,10 @@ public final class Client implements IClient
         this.phase = Constants.SPLIT;
 
         this.markersAvailable.clear();
-        this.markersAvailable.addAll(markersAvailable);
+        if (markersAvailable != null)
+        {
+            this.markersAvailable.addAll(markersAvailable);
+        }
 
         numSplitsThisTurn = 0;
 

@@ -73,7 +73,8 @@ Log.debug("About to create server socket on port " + port);
                 serverSocket.close();
                 serverSocket = null;
             }
-            serverSocket = new ServerSocket(port, VariantSupport.getMaxPlayers());
+            serverSocket = new ServerSocket(port, 
+                VariantSupport.getMaxPlayers());
         }
         catch (IOException ex)
         {

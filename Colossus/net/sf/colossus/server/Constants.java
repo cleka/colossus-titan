@@ -166,6 +166,7 @@ public final class Constants
         byColor);
 
     public static final String titan = "Titan";
+    public static final String angel = "Angel";
 
     // Network stuff
     public static final int defaultPort = 1969;

@@ -360,7 +360,8 @@ Log.debug("Called Game.newGame2()");
         /* Add the first 6 colors in random order, ... */
         for (int i = 0; i < Constants.DEFAULT_MAX_PLAYERS; i++)
         {
-            colorsLeft.add(cli.remove(Dice.rollDie(Constants.DEFAULT_MAX_PLAYERS - i) - 1));
+            colorsLeft.add(cli.remove(Dice.rollDie(
+                Constants.DEFAULT_MAX_PLAYERS - i) - 1));
         }
         /* ... and finish with the newer ones, also in random order */
         int newer = cli.size();
@@ -371,7 +372,7 @@ Log.debug("Called Game.newGame2()");
 
         // Let human players pick colors first, followed by AI players.
         // Within each group, players pick colors in ascending tower order.
-        colorPickOrder.clear(); 
+        colorPickOrder.clear();
 
         for (int i = getNumPlayers() - 1; i >= 0; i--)
         {
@@ -395,15 +396,10 @@ Log.debug("Called Game.newGame2()");
 
     private void nextPickColor()
     {
-        if (colorPickOrder.size() > 1)
+        if (colorPickOrder.size() >= 1)
         {
             String playerName = (String)colorPickOrder.getFirst();
             server.askPickColor(playerName, colorsLeft);
-        }
-        else if (colorPickOrder.size() == 1)
-        {
-            String playerName = (String)colorPickOrder.getFirst();
-            assignColor(playerName, (String)(colorsLeft.iterator().next()));
         }
         else
         {
