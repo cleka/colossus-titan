@@ -1,3 +1,4 @@
 TER:Balrog.ter
 CRE:Balrog.cre
 DEPEND:ExtTitan
+HINT:Default.hin,DefaultTowerRecruit.hin,DefaultThirdRecruit.hin,DefaultSplit.hin

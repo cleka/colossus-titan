@@ -3,3 +3,4 @@ CRE:Abyssal9.cre
 TER:Abyssal6.ter
 DEPEND:Abyssal6,ExtTitan
 MAXPLAYERS:9
+HINT:Abyssal6.hin,Abyssal6TowerRecruit.hin,DefaultThirdRecruit.hin,DefaultSplit.hin

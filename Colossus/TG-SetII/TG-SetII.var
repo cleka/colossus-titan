@@ -1,3 +1,4 @@
 MAP:Default.map
 TER:Default.ter
 CRE:Default.cre
+HINT:Default.hin,DefaultTowerRecruit.hin,DefaultThirdRecruit.hin,DefaultSplit.hin
