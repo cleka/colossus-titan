@@ -1,4 +1,4 @@
 Manifest-Version: 1.0
-Main-Class: Start
+Main-Class: net.sf.colossus.server.Start
 Created-By: 1.2 (Sun Microsystems Inc.)
 

@@ -45,16 +45,15 @@ all: jar
 	$(JCC) $<
 
 %.java: %.jj
-	$(JAVACC) -STATIC=false $<
+	$(JAVACC) -STATIC=false -OUTPUT_DIRECTORY=net/sf/colossus/parser $<
 
 # Find target files
 
 sources = $(wildcard *.java) \
-	StrategicMapLoader.java \
-	TerrainRecruitLoader.java \
-	CreatureLoader.java \
-	BattlelandLoader.java \
-	VariantLoader.java
+	$(wildcard net/sf/colossus/client/*.java) \
+	$(wildcard net/sf/colossus/server/*.java) \
+	$(wildcard net/sf/colossus/util/*.java) \
+	$(wildcard net/sf/colossus/parser/*.java)
 
 CLASS_FILES = $(sources:%.java=%.class)
 
@@ -73,10 +72,17 @@ version :
 
 
 # Create jar file
-$(JARFILE): StrategicMapLoader.java TerrainRecruitLoader.java \
-	CreatureLoader.java BattlelandLoader.java \
+$(JARFILE): net/sf/colossus/parser/StrategicMapLoader.java \
+	net/sf/colossus/parser/TerrainRecruitLoader.java \
+	net/sf/colossus/parser/CreatureLoader.java \
+	net/sf/colossus/parser/BattlelandLoader.java \
+	net/sf/colossus/parser/VariantLoader.java \
 	$(CLASS_FILES) $(IMAGES) META-INF/MANIFEST.MF StrategicMap.map
-	jar -mcf META-INF/MANIFEST.MF Colossus.jar *.class images/*.gif StrategicMap.map Recruit.ter Creature.cre Default.var Battlelands
+	jar -mcf META-INF/MANIFEST.MF Colossus.jar \
+        net/sf/colossus/client/*.class net/sf/colossus/server/*.class \
+        net/sf/colossus/util/*.class net/sf/colossus/parser/*.class \
+        images/*.gif StrategicMap.map Recruit.ter Creature.cre Default.var \
+        Battlelands images/ResourceAnchor.class
 	chmod +x Colossus.jar
 
 # Sign jar file.  This target uses dripton's key; other developers can
@@ -109,5 +115,8 @@ dist: $(JARFILE)
 
 # Make javadoc docs
 javadoc:
-	javadoc -d javadoc/ -version -author -private *.java
+	javadoc -d javadoc/ -version -author -private \
+        net/sf/colossus/client/*.java net/sf/colossus/server/*.java \
+        net/sf/colossus/util/*.java net/sf/colossus/parser/*.java
 
+# TODO Make tags

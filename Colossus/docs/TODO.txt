@@ -1,3 +1,7 @@
+Add test .jnlp files that points to a jar in the local filesystem,
+   and to a jar on a test webserver or another directory on the
+   SF webserver.
+
 Move .cfg files (etc.) to subdirectories.
 
 Include an .ico file for Windows.

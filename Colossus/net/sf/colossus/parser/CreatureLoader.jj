@@ -1,0 +1,124 @@
+options
+{
+  IGNORE_CASE = false;
+  STATIC = false;
+}
+
+PARSER_BEGIN(CreatureLoader)
+package net.sf.colossus.parser;
+
+
+import java.util.*;
+
+import net.sf.colossus.server.Creature;
+
+
+public class CreatureLoader
+{
+}
+
+PARSER_END(CreatureLoader)
+
+SKIP :
+{
+    " "
+  | "\r"
+  | "\t"
+}
+
+TOKEN :
+{
+    < EOL: "\n" >
+}
+
+TOKEN :
+{
+    < NUMBER : "-"(<DIGIT>)+|(<DIGIT>)+ >
+|   < #DIGIT : ["0" - "9"] >
+}
+
+TOKEN :
+{
+    < BOOL: "true"|"false" >
+}
+
+TOKEN :
+{
+    < CHAINE : (<CAR>)+ >
+|   < #CAR : ["a"-"z","A"-"Z"] >
+}
+
+boolean c_bool() :
+{}
+{
+    <BOOL>
+    { if (token.image.equals("true")) return true; else return false; }
+}
+
+String c_chaine() :
+{}
+{
+    <CHAINE>
+    {
+        return(new String(token.image));
+    }
+}
+
+int c_number() :
+{}
+{
+    <NUMBER>
+    {
+        return(Integer.parseInt(token.image));
+    }
+}
+
+int oneCreature(List lc) :
+{
+    String name;
+    String pluralName;
+    int power;
+    int skill;
+    boolean rangestrikes;
+    boolean flies;
+    boolean nativeBramble;
+    boolean nativeDrift;
+    boolean nativeBog;
+    boolean nativeSandDune;
+    boolean nativeSlope;
+    boolean lord;
+    boolean demilord;
+    int maxCount;
+}
+{
+    (name = c_chaine())
+    (power= c_number())
+    (skill= c_number())
+    (rangestrikes= c_bool())
+    (flies= c_bool())
+    (nativeBramble= c_bool())
+    (nativeDrift= c_bool())
+    (nativeBog= c_bool())
+    (nativeSandDune= c_bool())
+    (nativeSlope= c_bool())
+    (lord= c_bool())
+    (demilord= c_bool())
+    (maxCount= c_number())
+    (pluralName = c_chaine()) <EOL>
+    {
+        lc.add(new Creature(name, power, skill, rangestrikes,
+                              flies, nativeBramble, nativeDrift,
+                              nativeBog, nativeSandDune, nativeSlope,
+                              lord, demilord, maxCount, pluralName));
+        System.out.println(name + " is a " + power + " " + skill);
+        return 1;
+    }
+|   <EOL>
+    {
+        return(0);
+    }
+|   <EOF>
+    {
+        return(-1);
+    }
+}

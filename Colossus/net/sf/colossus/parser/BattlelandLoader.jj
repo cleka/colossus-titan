@@ -1,0 +1,119 @@
+options
+{
+  IGNORE_CASE = false;
+  STATIC = false;
+}
+
+PARSER_BEGIN(BattlelandLoader)
+package net.sf.colossus.parser;
+
+
+import java.util.*;
+
+import net.sf.colossus.client.BattleHex;
+
+
+public class BattlelandLoader
+{
+    class hexSide 
+    {
+        int pos;
+        char type;
+        hexSide(int p, char t) { pos = p; type = t; }
+    }
+}
+
+PARSER_END(BattlelandLoader)
+
+SKIP :
+{
+        " "
+  |     "\r"
+  |     "\t"
+}
+
+TOKEN :
+{
+        < EOL: "\n" >
+}
+
+TOKEN :
+{
+        < NUMBER : (<DIGIT>)+ >
+|       < #DIGIT: ["0" - "9"] >
+}
+
+TOKEN :
+{
+        < TERRAIN : ["a"-"z","A"-"Z"] >
+}
+
+int b_number() :
+{}
+{
+    <NUMBER>
+    {
+        return(Integer.parseInt(token.image));
+    }
+}
+
+char b_terrain() :
+{}
+{
+    <TERRAIN>
+    {
+        return(token.image.charAt(0));
+    }
+}
+
+hexSide b_hexSide() :
+{
+    int p;
+    char t;
+}
+{
+    (p = b_number()) (t = b_terrain())
+    {
+        return new hexSide(p, t );
+    }
+}
+
+ArrayList b_allHexSide() :
+{
+    ArrayList temp;
+    hexSide hs;
+}
+{
+    (hs = b_hexSide()) (temp = b_allHexSide())
+    { temp.add(0, hs); return temp; }
+|   /* empty */
+    { return new ArrayList(); }
+}
+
+int oneBattlelandCase(BattleHex [][] h) :
+{
+    int x,y,e;
+    char t;
+    ArrayList hsl;
+}
+{
+    (x = b_number()) (y = b_number()) (t = b_terrain()) (e = b_number()) (hsl = b_allHexSide()) <EOL>
+    {
+        h[x][y].setTerrain(t);
+        h[x][y].setElevation(e);
+        for (int i = 0; i < hsl.size() ; i++)
+        {
+            hexSide hs = (hexSide)hsl.get(i);
+            h[x][y].setHexside(hs.pos, hs.type);
+        }
+        return(1);
+    }
+|   <EOL>
+    {
+        return(0);
+    }
+|   <EOF>
+    {
+        return(-1);
+    }
+}
