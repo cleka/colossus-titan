@@ -22,12 +22,15 @@ class CreatureInfo implements Cloneable
         {
             name = "Titan";
         }
+        else if (name.length() == 0)
+        {
+            throw new RuntimeException("CreatureInfo with empty name!");
+        }
         this.name = name;
         this.certain = certain;
         this.atSplit = atSplit;
     }
 
-    // towi: final for performance. hope it helps.
     final String getName()
     {
         return name;
