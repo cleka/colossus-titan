@@ -49,6 +49,8 @@ public class BattlelandsRandomizer
         } catch (Exception e) { System.err.println(e); }
 
         System.out.println(bhm.dumpAsString());
+
+        System.exit(0);
     }
 
 }

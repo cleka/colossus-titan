@@ -247,7 +247,9 @@ TOKEN :
 
 TOKEN :
 {
-    < TERRAIN : ["a"-"z","A"-"Z"] >
+    < LABEL : ["A"-"F","a"-"f"]["1"-"6"] >
+|   < TERRAIN : ["a"-"z","A"-"Z"] >
+
 }
 
 char z_terrain() :
@@ -279,6 +281,46 @@ address z_address() :
 {
     <OPENPAR> (x = z_number()) <COMMA> (y = z_number()) <CLOSEPAR>
     {
+        return new address(x,y);
+    }
+|   <LABEL>
+    {
+        switch (token.image.charAt(0))
+        {
+        case 'A':
+        case 'a':
+            x = 0;
+            break;
+        case 'B':
+        case 'b':
+            x = 1;
+            break;
+        case 'C':
+        case 'c':
+            x = 2;
+            break;
+        case 'D':
+        case 'd':
+            x = 3;
+            break;
+        case 'E':
+        case 'e':
+            x = 4;
+            break;
+        case 'F':
+        case 'f':
+            x = 5;
+            break;
+        default:
+            throw new ParseException("Hex " + token.image + "doesn't exist");
+        }
+        y = 6 - Integer.parseInt(new String(token.image.substring(1)));
+        int i = 5;
+        while (!show[x][i])
+        {
+            y--;
+            i--;
+        }
         return new address(x,y);
     }
 }

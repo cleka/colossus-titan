@@ -27,13 +27,16 @@ where
     (<range>,<range>)
     (<number>,<range>)
     (<range>,<number>)
+    <hex_label>
     (inside)
     (leftdefense)
     (upperdefense)
     (lowerdefense)
     where <number> is a number between 0 and 5, and <range> is of the form
         <number>-<number>
-    i.e. a range of number between 0 and 5. The other four forms are literal
+    i.e. a range of number between 0 and 5.
+    <hex_label> is simply the label displayed on the Battlemap (F4, C3,...)
+    The other four forms are literal
     string, and represent everything but the most outside Hex, and the 3
     lines of 3 hexagons representing the defense entry lines (left,
     upper-right, and lower-right respectively).
