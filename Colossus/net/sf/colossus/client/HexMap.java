@@ -653,7 +653,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
 
     public boolean terrainHasStartlist()
     {
-        return terrainIsTower(terrain);
+        return terrainHasStartlist(terrain);
     }
 
     public static boolean terrainHasStartlist(char t)
