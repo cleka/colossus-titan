@@ -112,3 +112,6 @@ java.lang.NullPointerException
 Solaris, 1.3: Dead titan, but player keeps going.  Need to check
    for player death more often to work around this bug?  (Seen
    multiple times, but can't reproduce at will.)
+
+Solaris, 1.3: Player options are sometimes incorrect for both
+   loaded and new games.

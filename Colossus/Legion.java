@@ -296,6 +296,20 @@ public final class Legion
     }
 
 
+    public void clearBattleInfo()
+    {
+        clearBattleTally();
+
+        Iterator it = critters.iterator();
+        while (it.hasNext())
+        {
+            Critter critter = (Critter)it.next();
+            critter.heal();
+            critter.addBattleInfo(null, null, null, null, null);
+        }
+    }
+
+
     public void addToBattleTally(int points)
     {
         battleTally += points;
@@ -865,17 +879,6 @@ public final class Legion
         {
             Critter critter = (Critter)it.next();
             critter.setVisible(true);
-        }
-    }
-
-
-    public void healAllCreatures()
-    {
-        Iterator it = critters.iterator();
-        while (it.hasNext())
-        {
-            Critter critter = (Critter)it.next();
-            critter.heal();
         }
     }
 

@@ -33,28 +33,23 @@ public final class Battle
     private MasterBoard board;
     private MasterHex masterHex;
     private BattleDice battleDice;
-
     private int turnNumber;
     private int phase;
     private int summonState = NO_KILLS;
     private int carryDamage;
     private boolean critterSelected;
     private ArrayList critters = new ArrayList();
-
-    /** Stack of critters moved, to allow multiple levels of undo. */
-    private LinkedList lastCrittersMoved = new LinkedList();
-
     private boolean attackerElim;
     private boolean defenderElim;
-
     private boolean attackerEntered;
     private boolean conceded;
     private boolean driftDamageApplied;
+    /** Stack of critters moved, to allow multiple levels of undo. */
+    private LinkedList lastCrittersMoved = new LinkedList();
 
 
     public Battle(MasterBoard board, Legion attacker, Legion defender,
-        Legion activeLegion, MasterHex masterHex, boolean inProgress,
-        int turnNumber, int phase)
+        Legion activeLegion, MasterHex masterHex, int turnNumber, int phase)
     {
         this.board = board;
         this.masterHex = masterHex;
@@ -67,14 +62,7 @@ public final class Battle
         {
             this.game = board.getGame();
         }
-
-        if (!inProgress)
-        {
-            attacker.clearBattleTally();
-            defender.clearBattleTally();
-        }
-
-        map = new BattleMap(board, masterHex, this, inProgress);
+        map = new BattleMap(board, masterHex, this);
 
         setupPhase();
 
@@ -82,6 +70,51 @@ public final class Battle
         {
             initBattleDice();
         }
+    }
+
+
+    /** No-arg constructor for AICopy() */
+    public Battle()
+    {
+    }
+
+
+    /** Make a deep copy for the AI. */
+    public Battle AICopy()
+    {
+        Battle newBattle = new Battle();
+
+        newBattle.board = board; // don't need to deep copy
+        newBattle.masterHex = masterHex; // don't need to deep copy
+        newBattle.defender = defender.AICopy();
+        newBattle.attacker = attacker.AICopy();
+        newBattle.activeLegion = activeLegion.AICopy(); // wasteful?
+        newBattle.turnNumber = turnNumber;
+        newBattle.phase = phase;
+        newBattle.game = board.getGame().AICopy();
+        newBattle.game.setOption(Options.showDice, false);
+        newBattle.map = map; // don't need to deep copy
+        newBattle.summonState = summonState;
+        newBattle.carryDamage = carryDamage;
+        newBattle.critterSelected = critterSelected;
+        newBattle.attackerElim = attackerElim;
+        newBattle.defenderElim = defenderElim;
+        newBattle.attackerEntered = attackerEntered;
+        newBattle.conceded = conceded;
+        newBattle.driftDamageApplied = driftDamageApplied;
+
+        newBattle.critters = new ArrayList();
+        Iterator it = critters.iterator();
+        while (it.hasNext())
+        {
+            Critter critter = (Critter)it.next();
+            newBattle.critters.add(critter.AICopy());
+        }
+
+        // Need to break out GUI stuff from battle state?
+        newBattle.setupPhase();
+
+        return newBattle;
     }
 
 
@@ -683,8 +716,8 @@ public final class Battle
         map.selectHexesByLabels(set);
         return set.size();
     }
-    
-    
+
+
     /** Return true if any creatures have been left off-board. */
     private boolean anyOffboardCreatures()
     {
@@ -701,8 +734,8 @@ public final class Battle
         }
         return false;
     }
-    
-    
+
+
     private boolean confirmLeavingCreaturesOffboard()
     {
         String [] options = new String[2];
@@ -866,6 +899,7 @@ public final class Battle
                         Player player = legion.getPlayer();
                         donor = player.getLastLegionSummonedFrom();
                         donor.addCreature(critter, false);
+                        donor.getCurrentHex().repaint();
                         // This summon doesn't count; the player can
                         // summon again later this turn.
                         player.setSummoned(false);
@@ -1032,7 +1066,7 @@ Game.logDebug("defender eliminated");
         while (it.hasNext())
         {
             Critter critter = (Critter)it.next();
-            if (critter.getPlayer() == player && 
+            if (critter.getPlayer() == player &&
                 countStrikes(critter, true) > 0)
             {
                 set.add(critter.getCurrentHex().getLabel());
@@ -1082,8 +1116,8 @@ Game.logDebug("defender eliminated");
 
     /** Perform strikes for any creature that is forced to strike
      *  and has only one legal target. Forced strikes will never
-     *  generate carries, since there's only one target. If 
-     *  rangestrike is true, also perform rangestrikes for 
+     *  generate carries, since there's only one target. If
+     *  rangestrike is true, also perform rangestrikes for
      *  creatures with only one target, even though they're not
      *  technically forced. */
     public void makeForcedStrikes(boolean rangestrike)
@@ -1479,7 +1513,7 @@ Game.logDebug("defender eliminated");
         }
 
         // Creatures block LOS, unless both striker and target are at higher
-        //     elevation than the creature, or unless the creature is at 
+        //     elevation than the creature, or unless the creature is at
         //     the base of a cliff and the striker or target is atop it.
         if (nextHex.isOccupied() && nextHex.getElevation() >= strikeElevation
             && (!strikerAtopCliff || currentHex != initialHex))
@@ -1750,7 +1784,7 @@ Game.logDebug("defender eliminated");
             return BIGNUM;
         }
 
-        // All creatures block LOS.  (There are no height differences on 
+        // All creatures block LOS.  (There are no height differences on
         // maps with bramble.)
         if (nextHex.isOccupied())
         {
@@ -1948,6 +1982,7 @@ Game.logDebug("defender eliminated");
         map.dispose();
 
         // Handle any after-battle angel summoning or recruiting.
+        // XXX Do this from Game instead?
         if (masterHex.getNumLegions() == 1)
         {
             Legion legion = masterHex.getLegion(0);
@@ -1988,8 +2023,8 @@ Game.logDebug("defender eliminated");
             // Make all creatures in the victorious legion visible.
             legion.revealAllCreatures();
 
-            // Heal all creatures in the winning legion.
-            legion.healAllCreatures();
+            // Remove battle info from legion and its creatures.
+            legion.clearBattleInfo();
         }
 
         if (game != null)
@@ -2015,7 +2050,7 @@ Game.logDebug("defender eliminated");
             Creature.minotaur, null, player2);
         attacker.setEntrySide(5);
 
-        new Battle(null, attacker, defender, defender, hex, false, 1, MOVE);
+        new Battle(null, attacker, defender, defender, hex, 1, MOVE);
     }
 }
 

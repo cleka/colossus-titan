@@ -442,7 +442,7 @@ class SimpleAI implements AI
     }
 
 
-    public void move (Game game)
+    public void masterMove (Game game)
     {
         if (true)
         {
@@ -1263,6 +1263,26 @@ class SimpleAI implements AI
 
     public void battleMove(Legion legion, Battle battle, Game game)
     {
+    /*
+        PlayerBattleMove pMove = (PlayerBattleMove) minimax.search
+            ( new BattleMapPosition(game, game.getActivePlayerNum()), 1);
+        // apply the PlayerMove
+        for (Iterator it = pMove.moves.entrySet().iterator(); it.hasNext();)
+        {
+            Map.Entry entry = (Map.Entry) it.next();
+            Critter critter = (Critter)entry.getKey();
+            BattleHex hex = (BattleHex)entry.getValue();
+            battle.actOnCritter(critter);
+            battle.actOnHex(hex);
+        }
+    */
+    }
+
+
+    private static int evaluateBattleMove (Game game, Battle battle,
+        Critter critter, BattleHex hex)
+    {
+        return 0;
     }
 
 
@@ -1302,7 +1322,7 @@ class SimpleAI implements AI
                     Critter target = battle.getCritterFromHexLabel(hexLabel);
                     int dice = critter.getDice(target);
                     int strikeNumber = critter.getStrikeNumber(target);
-                    double h = averageNumberOfHits(dice, strikeNumber);
+                    double h = Probs.meanHits(dice, strikeNumber);
 
                     if (map.containsKey(target))
                     {
@@ -1450,7 +1470,7 @@ class SimpleAI implements AI
         int strikeNumber = Math.max(critter.getStrikeNumber(target),
             critter.getStrikeNumber(carryTarget));
         int hitsNeeded = target.getPower() - target.getHits();
-        if (probabilityOfHitsOrMore(dice, strikeNumber, hitsNeeded) >= 0.95)
+        if (Probs.probHitsOrMore(dice, strikeNumber, hitsNeeded) >= 0.95)
         {
             return true;
         }
@@ -1458,72 +1478,6 @@ class SimpleAI implements AI
         {
             return false;
         }
-    }
-
-
-    /** Compute n! */
-    private static int factorial(int n)
-    {
-        int answer = 1;
-        for (int i = n; i >= 2; i--)
-        {
-            answer *= i;
-        }
-        return answer;
-    }
-
-
-    /** Compute a choose b. */
-    private static int choose(int a, int b)
-    {
-        return factorial(a) / (factorial(b) * factorial(a - b));
-    }
-
-
-    private static double probabilityOfHits(int dice, int strikeNumber,
-        int hits)
-    {
-        double p = (7.0 - strikeNumber) / 6.0;
-        return Math.pow(p, hits) * Math.pow(1 - p, dice - hits) *
-            choose(dice, hits);
-    }
-
-
-    private static double probabilityOfHitsOrMore(int dice, int strikeNumber,
-        int hits)
-    {
-        double total = 0.0;
-        for (int i = hits; i <= dice; i++)
-        {
-            total += probabilityOfHits(dice, strikeNumber, i);
-        }
-        return total;
-    }
-
-
-    private static double probabilityOfHitsOrLess(int dice, int strikeNumber,
-        int hits)
-    {
-        double total = 0.0;
-        for (int i = 0; i <= hits; i++)
-        {
-            total += probabilityOfHits(dice, strikeNumber, i);
-        }
-        return total;
-    }
-
-
-    /** Return the unrounded mean number of hits. */
-    private static double averageNumberOfHits(int dice, int strikeNumber)
-    {
-        return dice * (7 - strikeNumber) / 6.0;
-    }
-
-    /** Return the most likely number of hits.  If there are two
-      * modes, it returns the higher one. */
-    private static int mostLikelyNumberofHits(int dice, int strikeNumber)
-    {
-        return (int)Math.round(dice * (7 - strikeNumber) / 6.0);
     }
 
 
@@ -1905,6 +1859,306 @@ class SimpleAI implements AI
         /** map of Legion to Hex where the legion moves to  */
         HashMap moves;
         public PlayerMove(HashMap moves, MasterBoardPosition position)
+        {
+            this.position = position;
+            this.moves = moves;
+        }
+    }
+
+
+    ////////////////////////////////////////////////////////////////
+    // battle minimax stuff
+    ////////////////////////////////////////////////////////////////
+
+    /* Battles are 2-player games within the multiplayer titan game.
+       They must be evaluated within that context.  So not all
+       winning positions are equally good, and not all losing
+       positions are equally bad, since the surviving contents of
+       the winning stack matter. All results that kill the last
+       enemy titan are equally good, though, and all results that
+       get our titan killed are equally bad.
+
+       We can greatly simplify analysis by assuming that every strike
+       will score the average number of hits.  This may or may not
+       be good enough.  In particular, exposing a titan in a situation
+       where a slightly above average number of hits will kill it is
+       probably unwise.
+
+       When finding all possible moves, we need to take into account
+       that friendly creatures can block one another's moves.  Not
+       every creature gets to move first.
+
+       There are 27 hexes on each battle map.  A fast creature starting
+       near the middle of the map can move to all of them, terrain and
+       other creatures permitting.  So the possible number of different
+       positions after one move is huge.
+    */
+
+
+    class BattleMapPosition implements Minimax.GamePosition
+    {
+        // AICopy() of the game
+        Game game;
+        // AICopy() of the battle
+        Battle battle;
+        // the player for whom we're doing the evaluation.
+        // note, this is NOT the same as Game.getActivePlayerNum()
+        int activePlayerNum;
+
+        public BattleMapPosition(Game game, int activePlayerNum)
+        {
+            this.game = game.AICopy();
+            this.battle = battle.AICopy();
+            this.activePlayerNum = activePlayerNum;
+        }
+
+        public BattleMapPosition(BattleMapPosition position)
+        {
+            this.game = position.game.AICopy();
+            this.battle = position.battle.AICopy();
+            this.activePlayerNum = position.activePlayerNum;
+        }
+
+        public int maximize()
+        {
+            if (game.getActivePlayerNum() == activePlayerNum)
+            {
+                return Minimax.MAXIMIZE;
+            }
+            else
+            {
+                return Minimax.MINIMIZE;
+            }
+        }
+
+        public int evaluation()
+        {
+            debugln("evaluating battle position");
+
+            final Player activePlayer = game.getPlayer(activePlayerNum);
+
+            // check for loss
+            if (activePlayer.isDead())
+            {
+                debugln("evaluation: loss! " + Integer.MIN_VALUE);
+                return Integer.MIN_VALUE;
+            }
+
+            // check for victory
+            {
+                int playersRemaining = 0;
+                Iterator it = game.getPlayers().iterator();
+                while (it.hasNext())
+                {
+                    Player player = (Player)it.next();
+                    if (!player.isDead())
+                    {
+                        playersRemaining++;
+                    }
+                }
+                switch (playersRemaining)
+                {
+                    case 0:
+                        {
+                            debugln("evaluation: draw! " + 0);
+                            return 0;
+                        }
+                    case 1:
+                        {
+                            debugln("evaluation: win! "
+                                    + Integer.MAX_VALUE);
+                            return Integer.MAX_VALUE;
+                        }
+                }
+            }
+
+            // Iterate over both players in battle?
+            int value = 0;
+            for (Iterator it = battle.getCritters().iterator(); it.hasNext();)
+            {
+                Critter critter = (Critter)it.next();
+                if (critter.getPlayer() == activePlayer)
+                {
+                    value += evaluateBattleMove(game, battle, critter,
+                        critter.getCurrentHex());
+                }
+            }
+            debugln("evaluation: " + value);
+            return value;
+        }
+
+        /** plausible move generator
+         * may be lazy; also, may implement forward pruning.
+         * @return an iterator which returns Move's, in the order
+         * that they should be evaluated by Minimax.  The moves should
+         * extend Move, and be handled by applyMove().
+         */
+        public Iterator generateMoves()
+        {
+            debugln("generating battle moves..");
+
+            // check for loss
+            final Player activePlayer = game.getPlayer(activePlayerNum);
+            if (activePlayer.isDead()) // oops! we lost
+                return new ArrayList().iterator();  // no moves
+
+            // check for victory
+            {
+                int playersRemaining = 0;
+                Iterator it = game.getPlayers().iterator();
+                while (it.hasNext())
+                {
+                    Player player = (Player)it.next();
+                    if (!player.isDead())
+                    {
+                        playersRemaining++;
+                    }
+                }
+                if (playersRemaining < 2) // draw or win
+                    return new ArrayList().iterator();  // no moves
+            }
+
+            // enumerate moves for player i
+            debugln("hack! not considering all moves..");
+
+            // HACK: consider all moves for first legion only.
+            // (this is just for testing)
+            ArrayList allmoves = new ArrayList();
+            Legion legion = (Legion) game.getActivePlayer().getLegions().get(0);
+            for (Iterator it = game.listMoves(legion,true).iterator(); it.hasNext();)
+            {
+                String hexLabel = (String) it.next();
+                MasterHex hex = game.board.getHexFromLabel(hexLabel);
+                HashMap moves = new HashMap();
+                moves.put(legion, hex);
+                PlayerBattleMove move = new PlayerBattleMove(moves, this);
+                allmoves.add(move);
+            }
+
+            debugln("considering " + allmoves.size() + " possible moves " );
+
+            return allmoves.iterator();
+        }
+
+        /**
+         * advance game state ( this should adjust maximize() as necessary )
+         */
+        public Minimax.GamePosition applyMove(Minimax.Move move)
+        {
+            debugln("applying moves..");
+
+            if (move instanceof DiceMove)
+            {
+                debugln("applying dice move");
+                // apply dice rolling
+                DiceMove dicemove = (DiceMove) move;
+                MasterBoardPosition position = new MasterBoardPosition(dicemove.position);
+                position.activePlayerNum = activePlayerNum;
+                int roll = dicemove.roll;
+                position.game.getActivePlayer().setMovementRoll(roll);
+                return position;
+            }
+            else if (move instanceof PlayerMove)
+            {
+                debugln("applying player move");
+
+                PlayerMove playermove = (PlayerMove) move;
+                MasterBoardPosition position = new MasterBoardPosition(playermove.position);
+                // apply the PlayerMove moves
+                for (Iterator it = playermove.moves.entrySet().iterator(); it.hasNext();)
+                {
+                    Map.Entry entry = (Map.Entry) it.next();
+                    Legion legion = (Legion) entry.getKey();
+                    MasterHex hex = (MasterHex) entry.getValue();
+                    debugln("applymove: try " + legion + " to " +hex);
+                    game.actOnLegion(legion);
+                    game.actOnHex(hex);
+                }
+                // advance phases until we reach the next move phase
+                game.advancePhase();
+                while (game.getPhase() != Game.MOVE)
+                {
+                    switch (game.getPhase())
+                    {
+                        case Game.FIGHT:
+                            {
+                                // fake resolution for all fights
+                                // TODO: need more accurate fight estimator
+                                Player player = game.getActivePlayer();
+                                for (int i = 0; i < player.getNumLegions(); i++)
+                                {
+                                    Legion legion = player.getLegion(i);
+                                    MasterHex hex = legion.getCurrentHex();
+                                    Legion enemy = hex.getEnemyLegion(player);
+                                    if (enemy == null) continue;
+                                    Player enemyPlayer = enemy.getPlayer();
+                                    int myPV = legion.getPointValue();
+                                    int enemyPV = enemy.getPointValue();
+                                    boolean myTitan = legion.numCreature(Creature.titan)>0;
+                                    boolean enemyTitan = enemy.numCreature(Creature.titan)>0;
+                                    if (myPV * 0.8 > enemyPV)
+                                    {
+                                        // i win
+                                        enemy.remove();
+                                        player.addPoints(enemyPV);
+                                        if (enemyTitan)
+                                            enemyPlayer.die(player,false);
+                                    }
+                                    else if (enemyPV * 0.8 > myPV)
+                                    {
+                                        // enemy wins
+                                        legion.remove();
+                                        enemyPlayer.addPoints(myPV);
+                                        if (myTitan)
+                                            player.die(enemyPlayer,false);
+                                    }
+                                    else
+                                    {
+                                        // both groups destroyed
+                                        legion.remove();
+                                        enemy.remove();
+                                    }
+                                }
+                            }
+                            break;
+                        case Game.SPLIT:
+                            {
+                                split(game);
+                            }
+                            break;
+                        case Game.MUSTER:
+                            {
+                                muster(game);
+                            }
+                            break;
+                    }
+                    // now advance again until we get to MOVE phase
+                    game.advancePhase();
+                }
+                position.activePlayerNum = activePlayerNum;
+                return position;
+            }
+            else
+            {
+                throw new RuntimeException("ack! bad move type");
+            }
+        }
+    }
+
+
+    class BattleMapPositionMove implements Minimax.Move
+    {
+        protected BattleMapPosition position;
+        private int value;
+        public void setValue(int value) { this.value = value; }
+        public int getValue() { return value; }
+    }
+
+    class PlayerBattleMove extends BattleMapPositionMove
+    {
+        /** map of Critter to Hex where the legion moves */
+        HashMap moves;
+        public PlayerBattleMove(HashMap moves, BattleMapPosition position)
         {
             this.position = position;
             this.moves = moves;

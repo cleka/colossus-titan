@@ -34,8 +34,7 @@ public final class BattleMap extends HexMap implements MouseListener,
     private AbstractAction concedeBattleAction;
 
 
-    public BattleMap(MasterBoard board, MasterHex masterHex, Battle battle,
-        boolean inProgress)
+    public BattleMap(MasterBoard board, MasterHex masterHex, Battle battle)
     {
         super(masterHex);
 
@@ -68,8 +67,8 @@ public final class BattleMap extends HexMap implements MouseListener,
 
         setupEntrances();
 
-        placeLegion(attacker, false, inProgress);
-        placeLegion(defender, true, inProgress);
+        placeLegion(attacker, false);
+        placeLegion(defender, true);
 
         if (location == null)
         {
@@ -247,15 +246,15 @@ public final class BattleMap extends HexMap implements MouseListener,
         BattleChit chit = new BattleChit(chitScale,
             critter.getImageName(legion == battle.getDefender()), this,
             critter);
-        critter.addBattleInfo(entrance, entrance, this, chit, battle);
+        critter.addBattleInfo(entrance.getLabel(), entrance.getLabel(),
+            this, chit, battle);
         entrance.addCritter(critter);
 
         chit.repaint();
     }
 
 
-    private void placeLegion(Legion legion, boolean inverted,
-        boolean inProgress)
+    private void placeLegion(Legion legion, boolean inverted)
     {
         BattleHex entrance = getEntrance(legion);
         Collection critters = legion.getCritters();
@@ -267,37 +266,20 @@ public final class BattleMap extends HexMap implements MouseListener,
             BattleChit chit = new BattleChit(chitScale,
                 critter.getImageName(inverted), this, critter);
 
-            BattleHex currentHex;
-            BattleHex startingHex;
-            if (inProgress)
-            {
-                String currentHexLabel = critter.getCurrentHexLabel();
-                String startingHexLabel = critter.getStartingHexLabel();
+            String currentHexLabel = critter.getCurrentHexLabel();
+            String startingHexLabel = critter.getStartingHexLabel();
 
-                if (currentHexLabel.equals("entrance"))
-                {
-                    currentHex = entrance;
-                }
-                else
-                {
-                    currentHex = getHexFromLabel(critter.getCurrentHexLabel());
-                }
-                if (startingHexLabel.equals("entrance"))
-                {
-                    startingHex = entrance;
-                }
-                else
-                {
-                    startingHex = getHexFromLabel(
-                        critter.getStartingHexLabel());
-                }
-            }
-            else
+            if (currentHexLabel == null)
             {
-                currentHex = startingHex = entrance;
+                currentHexLabel = entrance.getLabel();
             }
-            critter.addBattleInfo(currentHex, startingHex, this, chit, battle);
-            currentHex.addCritter(critter);
+            if (startingHexLabel == null)
+            {
+                startingHexLabel = entrance.getLabel();
+            }
+            critter.addBattleInfo(currentHexLabel, startingHexLabel,
+                this, chit, battle);
+            getHexFromLabel(currentHexLabel).addCritter(critter);
         }
     }
 

@@ -138,7 +138,7 @@ public final class SummonAngel extends JDialog implements MouseListener,
             player.setLastLegionSummonedFrom(donor);
 
             // Move the angel or archangel.
-            donor.removeCreature(creature, false, true);
+            donor.removeCreature(creature, false, false);
             legion.addCreature(creature, false);
 
             // Update the number of creatures displayed in both stacks.

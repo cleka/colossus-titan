@@ -12,7 +12,7 @@ import javax.swing.*;
 public class HexMap extends JPanel implements MouseListener, WindowListener
 {
     private BattleHex [][] h = new BattleHex[6][6];
-    private ArrayList hexes = new ArrayList(27);
+    private ArrayList hexes = new ArrayList(33);
     protected static int scale;
     protected int chitScale;
     protected MasterHex masterHex;
@@ -430,6 +430,13 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
         entrances[5] = new BattleHex(cx + 1 * scale,
             (int) Math.round(cy + 1 * scale), scale, this, -1, 5);
 
+        hexes.add(entrances[0]);
+        hexes.add(entrances[1]);
+        hexes.add(entrances[2]);
+        hexes.add(entrances[3]);
+        hexes.add(entrances[4]);
+        hexes.add(entrances[5]);
+
         // Add neighbors to entrances.
         entrances[0].setNeighbor(3, h[3][0]);
         entrances[0].setNeighbor(4, h[4][1]);
@@ -657,7 +664,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
         while (it.hasNext())
         {
             BattleHex hex = (BattleHex)it.next();
-            if (rectClip.intersects(hex.getBounds()))
+            if (!hex.isEntrance() && rectClip.intersects(hex.getBounds()))
             {
                 hex.paint(g);
             }

@@ -12,23 +12,15 @@ public final class Critter extends Creature
     private boolean visible;
     private Creature creature;
     private Legion legion;
-
     private BattleMap map;
     private Battle battle;
     private boolean struck;
-
-    private BattleHex currentHex;
-    private BattleHex startingHex;
-
     private String currentHexLabel;
     private String startingHexLabel;
-
     /** Damage taken */
     private int hits;
-
     /** Mark whether this critter is a legal carry target. */
     private boolean carryFlag;
-
     private BattleChit chit;
 
 
@@ -42,11 +34,30 @@ public final class Critter extends Creature
     }
 
 
-    public void addBattleInfo(BattleHex currentHex, BattleHex startingHex,
+    /** Deep copy for AI. */
+    public Critter AICopy()
+    {
+        Critter newCritter = new Critter(creature, visible, 
+            legion.AICopy());
+
+        newCritter.map = map;
+        newCritter.battle = battle;
+        newCritter.struck = struck;
+        newCritter.currentHexLabel = currentHexLabel;
+        newCritter.startingHexLabel = startingHexLabel;
+        newCritter.hits = hits;
+        newCritter.carryFlag = carryFlag;
+        newCritter.chit = chit;
+
+        return newCritter;
+    }
+
+
+    public void addBattleInfo(String currentHexLabel, String startingHexLabel,
         BattleMap map, BattleChit chit, Battle battle)
     {
-        this.currentHex = currentHex;
-        this.startingHex = startingHex;
+        this.currentHexLabel = currentHexLabel;
+        this.startingHexLabel = startingHexLabel;
         this.map = map;
         this.chit = chit;
         this.battle = battle;
@@ -179,13 +190,13 @@ public final class Critter extends Creature
 
     public boolean hasMoved()
     {
-        return (startingHex != currentHex);
+        return (!startingHexLabel.equals(currentHexLabel));
     }
 
 
     public void commitMove()
     {
-        startingHex = currentHex;
+        startingHexLabel = currentHexLabel;
     }
 
 
@@ -203,26 +214,19 @@ public final class Critter extends Creature
 
     public BattleHex getCurrentHex()
     {
-        return currentHex;
+        return map.getHexFromLabel(currentHexLabel);
     }
 
 
     public BattleHex getStartingHex()
     {
-        return startingHex;
+        return map.getHexFromLabel(startingHexLabel);
     }
 
 
     public String getCurrentHexLabel()
     {
-        if (currentHex != null)
-        {
-            return currentHex.getLabel();
-        }
-        else
-        {
-            return currentHexLabel;
-        }
+        return currentHexLabel;
     }
 
 
@@ -234,14 +238,7 @@ public final class Critter extends Creature
 
     public String getStartingHexLabel()
     {
-        if (startingHex != null)
-        {
-            return startingHex.getLabel();
-        }
-        else
-        {
-            return startingHexLabel;
-        }
+        return startingHexLabel;
     }
 
 
@@ -255,8 +252,10 @@ public final class Critter extends Creature
      *  Dead critters count as being in contact only if countDead is true. */
     public int numInContact(boolean countDead)
     {
+        BattleHex hex = getCurrentHex();
+
         // Offboard creatures are not in contact.
-        if (currentHex.isEntrance())
+        if (hex.isEntrance())
         {
             return 0;
         }
@@ -265,13 +264,12 @@ public final class Critter extends Creature
         for (int i = 0; i < 6; i++)
         {
             // Adjacent creatures separated by a cliff are not in contact.
-            if (currentHex.getHexside(i) != 'c' &&
-                currentHex.getOppositeHexside(i) != 'c')
+            if (hex.getHexside(i) != 'c' && hex.getOppositeHexside(i) != 'c')
             {
-                BattleHex hex = currentHex.getNeighbor(i);
-                if (hex != null)
+                BattleHex neighbor = hex.getNeighbor(i);
+                if (neighbor != null)
                 {
-                    Critter other = hex.getCritter();
+                    Critter other = neighbor.getCritter();
                     if (other != null && other.getPlayer() != getPlayer() &&
                         (countDead || !other.isDead()))
                     {
@@ -289,8 +287,10 @@ public final class Critter extends Creature
      *  Dead critters count as being in contact only if countDead is true. */
     public boolean isInContact(boolean countDead)
     {
+        BattleHex hex = getCurrentHex();
+
         // Offboard creatures are not in contact.
-        if (currentHex.isEntrance())
+        if (hex.isEntrance())
         {
             return false;
         }
@@ -298,13 +298,12 @@ public final class Critter extends Creature
         for (int i = 0; i < 6; i++)
         {
             // Adjacent creatures separated by a cliff are not in contact.
-            if (currentHex.getHexside(i) != 'c' &&
-                currentHex.getOppositeHexside(i) != 'c')
+            if (hex.getHexside(i) != 'c' && hex.getOppositeHexside(i) != 'c')
             {
-                BattleHex hex = currentHex.getNeighbor(i);
-                if (hex != null)
+                BattleHex neighbor = hex.getNeighbor(i);
+                if (neighbor != null)
                 {
-                    Critter other = hex.getCritter();
+                    Critter other = neighbor.getCritter();
                     if (other != null && other.getPlayer() != getPlayer() &&
                         (countDead || !other.isDead()))
                     {
@@ -320,12 +319,12 @@ public final class Critter extends Creature
 
     public void moveToHex(BattleHex hex)
     {
-        Game.logEvent(getName() + " moves from " + currentHex.getLabel() +
+        Game.logEvent(getName() + " moves from " + currentHexLabel +
             " to " + hex.getLabel());
 
-        currentHex.removeCritter(this);
-        currentHex = hex;
-        currentHex.addCritter(this);
+        getCurrentHex().removeCritter(this);
+        currentHexLabel = hex.getLabel();
+        getCurrentHex().addCritter(this);
         battle.setLastCritterMoved(this);
         map.repaint();
     }
@@ -333,18 +332,18 @@ public final class Critter extends Creature
 
     public void undoMove()
     {
-        currentHex.removeCritter(this);
-        currentHex = startingHex;
-        currentHex.addCritter(this);
+        getCurrentHex().removeCritter(this);
+        currentHexLabel = startingHexLabel;
+        getCurrentHex().addCritter(this);
         Game.logEvent(getName() + " undoes move and returns to " +
-            startingHex.getLabel());
+            startingHexLabel);
         map.repaint();
     }
 
 
     public boolean canStrike(Critter target)
     {
-        String hexLabel = target.getCurrentHex().getLabel();
+        String hexLabel = target.getCurrentHexLabel();
         return battle.findStrikes(this, true).contains(hexLabel);
     }
 
@@ -353,6 +352,7 @@ public final class Critter extends Creature
      *  target, including modifications for terrain. */
     public int getDice(Critter target)
     {
+        BattleHex hex = getCurrentHex();
         BattleHex targetHex = target.getCurrentHex();
 
         int dice = getPower();
@@ -364,7 +364,7 @@ public final class Critter extends Creature
             dice /= 2;
 
             // Dragon rangestriking from volcano: +2
-            if (getName().equals("Dragon") && currentHex.getTerrain() == 'v')
+            if (getName().equals("Dragon") && hex.getTerrain() == 'v')
             {
                 dice += 2;
             }
@@ -373,14 +373,14 @@ public final class Critter extends Creature
         {
             // Dice can be modified by terrain.
             // Dragon striking from volcano: +2
-            if (getName().equals("Dragon") && currentHex.getTerrain() == 'v')
+            if (getName().equals("Dragon") && hex.getTerrain() == 'v')
             {
                 dice += 2;
             }
 
             // Adjacent hex, so only one possible direction.
-            int direction = Battle.getDirection(currentHex, targetHex, false);
-            char hexside = currentHex.getHexside(direction);
+            int direction = Battle.getDirection(hex, targetHex, false);
+            char hexside = hex.getHexside(direction);
 
             // Native striking down a dune hexside: +2
             if (hexside == 'd' && isNativeSandDune())
@@ -394,7 +394,7 @@ public final class Critter extends Creature
             }
             // Non-native striking up a dune hexside: -1
             else if (!isNativeSandDune() &&
-                currentHex.getOppositeHexside(direction) == 'd')
+                hex.getOppositeHexside(direction) == 'd')
             {
                 dice--;
             }
@@ -406,6 +406,7 @@ public final class Critter extends Creature
 
     private int getAttackerSkill(Critter target)
     {
+        BattleHex hex = getCurrentHex();
         BattleHex targetHex = target.getCurrentHex();
 
         int attackerSkill = getSkill();
@@ -416,33 +417,30 @@ public final class Critter extends Creature
         if (!rangestrike)
         {
             // Non-native striking out of bramble: -1
-            if (currentHex.getTerrain() == 'r' && !isNativeBramble())
+            if (hex.getTerrain() == 'r' && !isNativeBramble())
             {
                 attackerSkill--;
             }
 
-            if (currentHex.getElevation() > targetHex.getElevation())
+            if (hex.getElevation() > targetHex.getElevation())
             {
                 // Adjacent hex, so only one possible direction.
-                int direction = Battle.getDirection(currentHex, targetHex,
-                    false);
-                char hexside = currentHex.getHexside(direction);
+                int direction = Battle.getDirection(hex, targetHex, false);
+                char hexside = hex.getHexside(direction);
                 // Striking down across wall: +1
                 if (hexside == 'w')
                 {
                     attackerSkill++;
                 }
             }
-            else if (currentHex.getElevation() < targetHex.getElevation())
+            else if (hex.getElevation() < targetHex.getElevation())
             {
                 // Adjacent hex, so only one possible direction.
-                int direction = Battle.getDirection(targetHex, currentHex,
-                    false);
+                int direction = Battle.getDirection(targetHex, hex, false);
                 char hexside = targetHex.getHexside(direction);
                 // Non-native striking up slope: -1
                 // Striking up across wall: -1
-                if ((hexside == 's' && !isNativeSlope()) ||
-                    hexside == 'w')
+                if ((hexside == 's' && !isNativeSlope()) || hexside == 'w')
                 {
                     attackerSkill--;
                 }
@@ -451,7 +449,7 @@ public final class Critter extends Creature
         else if (!getName().equals("Warlock"))
         {
             // Range penalty
-            if (battle.getRange(currentHex, targetHex) == 4)
+            if (battle.getRange(hex, targetHex) == 4)
             {
                 attackerSkill--;
             }
@@ -459,15 +457,14 @@ public final class Critter extends Creature
             // Non-native rangestrikes: -1 per intervening bramble hex
             if (!isNativeBramble())
             {
-                attackerSkill -= battle.countBrambleHexes(currentHex,
-                    targetHex);
+                attackerSkill -= battle.countBrambleHexes(hex, targetHex);
             }
 
             // Rangestrike up across wall: -1 per wall
             if (targetHex.hasWall())
             {
                 int heightDeficit = targetHex.getElevation() -
-                    currentHex.getElevation();
+                    hex.getElevation();
                 if (heightDeficit > 0)
                 {
                     // Because of the design of the tower map, a strike to
@@ -567,6 +564,7 @@ public final class Critter extends Creature
      *  a strike penalty to carry when striking target. */
     public boolean possibleStrikePenalty(Critter target)
     {
+        BattleHex hex = getCurrentHex();
         BattleHex targetHex = target.getCurrentHex();
         if (numInContact(false) < 2)
         {
@@ -589,13 +587,12 @@ public final class Critter extends Creature
         for (int i = 0; i < 6; i++)
         {
             // Adjacent creatures separated by a cliff are not in contact.
-            if (currentHex.getHexside(i) != 'c' &&
-                currentHex.getOppositeHexside(i) != 'c')
+            if (hex.getHexside(i) != 'c' && hex.getOppositeHexside(i) != 'c')
             {
-                BattleHex hex = currentHex.getNeighbor(i);
-                if (hex != null && hex != targetHex)
+                BattleHex neighbor = hex.getNeighbor(i);
+                if (neighbor != null && neighbor != targetHex)
                 {
-                    Critter critter = hex.getCritter();
+                    Critter critter = neighbor.getCritter();
                     if (critter != null && critter.getPlayer() !=
                         getPlayer() && !critter.isDead())
                     {
@@ -604,9 +601,9 @@ public final class Critter extends Creature
 
                         // Strikes not up across dune hexsides cannot
                         // carry up across dune hexsides.
-                        if (currentHex.getOppositeHexside(i) == 'd' &&
+                        if (hex.getOppositeHexside(i) == 'd' &&
                             targetHex.getHexside(Battle.getDirection(
-                            targetHex, currentHex, false)) != 'd')
+                            targetHex, hex, false)) != 'd')
                         {
                         }
                         else if (tmpStrikeNumber > strikeNumber ||
@@ -635,6 +632,7 @@ public final class Critter extends Creature
             return;
         }
 
+        BattleHex hex = getCurrentHex();
         BattleHex targetHex = target.getCurrentHex();
 
         boolean carryPossible = true;
@@ -664,13 +662,13 @@ public final class Critter extends Creature
             for (int i = 0; i < 6; i++)
             {
                 // Adjacent creatures separated by a cliff are not in contact.
-                if (currentHex.getHexside(i) != 'c' &&
-                    currentHex.getOppositeHexside(i) != 'c')
+                if (hex.getHexside(i) != 'c' &&
+                    hex.getOppositeHexside(i) != 'c')
                 {
-                    BattleHex hex = currentHex.getNeighbor(i);
-                    if (hex != null && hex != targetHex)
+                    BattleHex neighbor = hex.getNeighbor(i);
+                    if (neighbor != null && neighbor != targetHex)
                     {
-                        Critter critter = hex.getCritter();
+                        Critter critter = neighbor.getCritter();
                         if (critter != null && critter.getPlayer() !=
                             getPlayer() && !critter.isDead())
                         {
@@ -679,9 +677,9 @@ public final class Critter extends Creature
 
                             // Strikes not up across dune hexsides cannot
                             // carry up across dune hexsides.
-                            if (currentHex.getOppositeHexside(i) == 'd' &&
+                            if (hex.getOppositeHexside(i) == 'd' &&
                                 targetHex.getHexside(Battle.getDirection(
-                                targetHex, currentHex, false)) != 'd')
+                                targetHex, hex, false)) != 'd')
                             {
                                 critter.setCarryFlag(false);
                                 Game.logDebug("DENIED CARRY UP DUNE HEXSIDE");
@@ -816,7 +814,7 @@ public final class Critter extends Creature
             }
         }
 
-        Game.logEvent(getName() + " in " + currentHex.getLabel() +
+        Game.logEvent(getName() + " in " + currentHexLabel +
             " strikes " + target.getName() + " in " +
             targetHex.getLabel() + " with strike number " +
             strikeNumber + " : " + rollString + ": " + damage +

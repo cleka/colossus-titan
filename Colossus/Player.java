@@ -239,6 +239,17 @@ public final class Player implements Comparable
     }
 
 
+    public void disbandEmptyDonor()
+    {
+        if (lastLegionSummonedFrom != null && 
+            lastLegionSummonedFrom.getHeight() == 0)
+        {
+            lastLegionSummonedFrom.remove();
+            lastLegionSummonedFrom = null;
+        }
+    }
+
+
     public void setLastLegionSummonedFrom(Legion legion)
     {
         lastLegionSummonedFrom = legion;
@@ -846,7 +857,6 @@ public final class Player implements Comparable
         {
             Game.logError("Couldn't read player options from " + optionsFile);
         }
-        syncCheckboxes();
     }
 
 
@@ -876,7 +886,7 @@ public final class Player implements Comparable
     {
         if (getOption(Options.autoMasterMove))
         {
-            ai.move(game);
+            ai.masterMove(game);
         }
     }
 

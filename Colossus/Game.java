@@ -48,7 +48,7 @@ public final class Game
     public static final String saveExtension = ".sav";
     public static final String saveGameVersion =
         "Colossus savegame version 5";
-    
+
     public static final String configVersion =
         "Colossus config file version 2";
 
@@ -543,8 +543,6 @@ public final class Game
             return;
         }
 
-        syncCheckboxes();
-
         // Load options for each player
         Collection players = getPlayers();
         Iterator it = players.iterator();
@@ -553,6 +551,8 @@ public final class Game
             Player player = (Player)it.next();
             player.loadOptions();
         }
+
+        syncCheckboxes();
         getActivePlayer().syncCheckboxes();
     }
 
@@ -722,6 +722,7 @@ public final class Game
         }
         else
         {
+            player.disbandEmptyDonor();
             player.clearUndoStack();
             board.setupMusterMenu();
 
@@ -1192,7 +1193,7 @@ public final class Game
                 }
 
                 battle = new Battle(board, attacker, defender, activeLegion,
-                    engagementHex, true, battleTurnNum, battlePhase);
+                    engagementHex, battleTurnNum, battlePhase);
 
                 battle.setSummonState(summonState);
                 battle.setCarryDamage(carryDamage);
@@ -3046,7 +3047,7 @@ public final class Game
                 attacker.revealAllCreatures();
                 defender.revealAllCreatures();
                 battle = new Battle(board, attacker, defender, defender,
-                    hex, false, 1, Battle.MOVE);
+                    hex, 1, Battle.MOVE);
             }
         }
     }
