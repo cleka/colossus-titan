@@ -1,3 +1,4 @@
+<? header ("Content-Type: application/x-java-jnlp-file"); ?>
 <?xml version="1.0" encoding="utf-8"?>
      <!-- JNLP File for Colossus -->
      <jnlp

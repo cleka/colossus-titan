@@ -50,6 +50,8 @@
         <property name="DOCS_DIR" value="${HTMLDIR}/docs"/>
         <property name="ZIPFILE" value="Colossus.${DSTAMP}.zip"/>
         <property name="SERVER" value="shell1.sf.net"/>
+        <property name="SERVER2" value="vidar.dreamhost.com"/>
+        <property name="HTMLDIR2" value="ripton.net/colossus/"/>
 
 </target>
 
@@ -387,6 +389,15 @@
         <exec executable="scp">
             <arg line="Colossus.jnlp ${SERVER}:${HTMLDIR}"/>
         </exec>
+
+        <!-- SF is unreliable, so copy jar and jnlp to alternate host. -->
+        <exec executable="scp">
+            <arg line="Colossus.jar ${SERVER2}:${HTMLDIR2}"/>
+        </exec>
+        <exec executable="scp">
+            <arg line="Colossus.jnlp ${SERVER2}:${HTMLDIR2}"/>
+        </exec>
+
         <exec executable="scp">
             <arg line="${ZIPFILE} ${SERVER}:${DOWNLOAD_DIR}"/>
         </exec>
