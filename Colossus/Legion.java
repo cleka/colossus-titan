@@ -15,8 +15,8 @@ class Legion
     String markerId;    // Bk03, Rd12, etc.
     String splitFrom;   // Bk03, Rd12, etc. or null
     Creature [] creatures = new Creature[8];  // 8 before initial splits
-    int currentHex;
-    int startingHex;
+    private int currentHex;
+    private int startingHex;
     boolean moved = false;
 
     Legion(int cx, int cy, int scale, String markerId, String splitFrom,
@@ -80,6 +80,26 @@ class Legion
     }
 
 
+    int numLords()
+    {
+        int count = 0;
+        for (int i = 0; i < height; i++)
+        {
+            if (creatures[i].lord)
+            {
+                count++;
+            }
+        }
+        return count;
+    }
+
+
+    int getHeight()
+    {
+        return height;
+    }
+
+
     void moveToHex(MasterHex hex)
     {
         currentHex = hex.label;
@@ -94,5 +114,11 @@ class Legion
         MasterHex hex = MasterBoard.getHexFromLabel(startingHex);
         chit.setLocationAbs(hex.getOffCenter());
         moved = false;
+    }
+
+
+    int getCurrentHex()
+    {
+        return currentHex;
     }
 }
