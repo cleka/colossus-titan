@@ -118,42 +118,42 @@ class PickRecruit extends Dialog implements MouseListener, WindowListener
     }
 
 
-    // Returns the number of the given recruiter needed to muster the given recruit
-    // in the given terrain.  Returns -1 on error.
-    public static int numberOfRecruiterNeeded(Creature recruiter, Creature recruit, 
-        char terrain)
+    // Returns the number of the given recruiter needed to muster the given
+    // recruit in the given terrain.  Returns -1 on error.
+    public static int numberOfRecruiterNeeded(Critter recruiter, Creature
+        recruit, char terrain)
     {
         switch (terrain)
         {
             case 'B':
-                if (recruit == Creature.gargoyle)
+                if (recruit.getName().equals("Gargoyle"))
                 {
-                    if (recruiter == Creature.gargoyle || 
-                        recruiter == Creature.cyclops ||
-                        recruiter == Creature.gorgon)
+                    if (recruiter.getName().equals("Gargoyle") || 
+                        recruiter.getName().equals("Cyclops") ||
+                        recruiter.getName().equals("Gorgon"))
                     {
                         return 1;
                     }
                 }
-                else if (recruit == Creature.cyclops)
+                else if (recruit.getName().equals("Cyclops"))
                 {
-                    if (recruiter == Creature.gargoyle)
+                    if (recruiter.getName().equals("Gargoyle"))
                     {
                         return 2;
                     }
-                    else if (recruiter == Creature.cyclops ||
-                             recruiter == Creature.gorgon)
+                    else if (recruiter.getName().equals("Cyclops") ||
+                             recruiter.getName().equals("Gorgon"))
                     {
                         return 1;
                     }
                 }
-                else if (recruit == Creature.gorgon)
+                else if (recruit.getName().equals("Gorgon"))
                 {
-                    if (recruiter == Creature.cyclops)
+                    if (recruiter.getName().equals("Cyclops"))
                     {
                         return 2;
                     }
-                    else if (recruiter == Creature.gorgon)
+                    else if (recruiter.getName().equals("Gorgon"))
                     {
                         return 1;
                     }
@@ -161,34 +161,34 @@ class PickRecruit extends Dialog implements MouseListener, WindowListener
                 break;
             
             case 'D':
-                if (recruit == Creature.lion)
+                if (recruit.getName().equals("Lion"))
                 {
-                    if (recruiter == Creature.lion || 
-                        recruiter == Creature.griffon ||
-                        recruiter == Creature.hydra)
+                    if (recruiter.getName().equals("Lion") || 
+                        recruiter.getName().equals("Griffon") ||
+                        recruiter.getName().equals("Hydra"))
                     {
                         return 1;
                     }
                 }
-                else if (recruit == Creature.griffon)
+                else if (recruit.getName().equals("Griffon"))
                 {
-                    if (recruiter == Creature.lion)
+                    if (recruiter.getName().equals("Lion"))
                     {
                         return 3;
                     }
-                    else if (recruiter == Creature.griffon ||
-                             recruiter == Creature.hydra)
+                    else if (recruiter.getName().equals("Griffon") ||
+                             recruiter.getName().equals("Hydra"))
                     {
                         return 1;
                     }
                 }
-                else if (recruit == Creature.hydra)
+                else if (recruit.getName().equals("Hydra"))
                 {
-                    if (recruiter == Creature.griffon)
+                    if (recruiter.getName().equals("Griffon"))
                     {
                         return 2;
                     }
-                    else if (recruiter == Creature.hydra)
+                    else if (recruiter.getName().equals("Hydra"))
                     {
                         return 1;
                     }
@@ -196,34 +196,34 @@ class PickRecruit extends Dialog implements MouseListener, WindowListener
                 break;
 
             case 'H':
-                if (recruit == Creature.ogre)
+                if (recruit.getName().equals("Ogre"))
                 {
-                    if (recruiter == Creature.ogre || 
-                        recruiter == Creature.minotaur ||
-                        recruiter == Creature.unicorn)
+                    if (recruiter.getName().equals("Ogre") || 
+                        recruiter.getName().equals("Minotaur") ||
+                        recruiter.getName().equals("Unicorn"))
                     {
                         return 1;
                     }
                 }
-                else if (recruit == Creature.minotaur)
+                else if (recruit.getName().equals("Minotaur"))
                 {
-                    if (recruiter == Creature.ogre)
+                    if (recruiter.getName().equals("Ogre"))
                     {
                         return 3;
                     }
-                    else if (recruiter == Creature.minotaur ||
-                             recruiter == Creature.unicorn)
+                    else if (recruiter.getName().equals("Minotaur") ||
+                             recruiter.getName().equals("Unicorn"))
                     {
                         return 1;
                     }
                 }
-                else if (recruit == Creature.unicorn)
+                else if (recruit.getName().equals("Unicorn"))
                 {
-                    if (recruiter == Creature.minotaur)
+                    if (recruiter.getName().equals("Minotaur"))
                     {
                         return 2;
                     }
-                    else if (recruiter == Creature.unicorn)
+                    else if (recruiter.getName().equals("Unicorn"))
                     {
                         return 1;
                     }
@@ -231,48 +231,48 @@ class PickRecruit extends Dialog implements MouseListener, WindowListener
                 break;
 
             case 'J':
-                if (recruit == Creature.gargoyle)
+                if (recruit.getName().equals("Gargoyle"))
                 {
-                    if (recruiter == Creature.gargoyle || 
-                        recruiter == Creature.cyclops ||
-                        recruiter == Creature.behemoth ||
-                        recruiter == Creature.serpent)
+                    if (recruiter.getName().equals("Gargoyle") || 
+                        recruiter.getName().equals("Cyclops") ||
+                        recruiter.getName().equals("Behemoth") ||
+                        recruiter.getName().equals("Serpent"))
                     {
                         return 1;
                     }
                 }
-                else if (recruit == Creature.cyclops)
+                else if (recruit.getName().equals("Cyclops"))
                 {
-                    if (recruiter == Creature.gargoyle)
+                    if (recruiter.getName().equals("Gargoyle"))
                     {
                         return 2;
                     }
-                    else if (recruiter == Creature.cyclops ||
-                             recruiter == Creature.behemoth ||
-                             recruiter == Creature.serpent)
+                    else if (recruiter.getName().equals("Cyclops") ||
+                             recruiter.getName().equals("Behemoth") ||
+                             recruiter.getName().equals("Serpent"))
                     {
                         return 1;
                     }
                 }
-                else if (recruit == Creature.behemoth)
+                else if (recruit.getName().equals("Behemoth"))
                 {
-                    if (recruiter == Creature.cyclops)
+                    if (recruiter.getName().equals("Cyclops"))
                     {
                         return 3;
                     }
-                    else if (recruiter == Creature.behemoth ||
-                             recruiter == Creature.serpent)
+                    else if (recruiter.getName().equals("Behemoth") ||
+                             recruiter.getName().equals("Serpent"))
                     {
                         return 1;
                     }
                 }
-                else if (recruit == Creature.serpent)
+                else if (recruit.getName().equals("Serpent"))
                 {
-                    if (recruiter == Creature.behemoth)
+                    if (recruiter.getName().equals("Behemoth"))
                     {
                         return 2;
                     }
-                    else if (recruiter == Creature.serpent)
+                    else if (recruiter.getName().equals("Serpent"))
                     {
                         return 1;
                     }
@@ -280,48 +280,48 @@ class PickRecruit extends Dialog implements MouseListener, WindowListener
                 break;
 
             case 'm':
-                if (recruit == Creature.lion)
+                if (recruit.getName().equals("Lion"))
                 {
-                    if (recruiter == Creature.lion || 
-                        recruiter == Creature.minotaur ||
-                        recruiter == Creature.dragon ||
-                        recruiter == Creature.colossus)
+                    if (recruiter.getName().equals("Lion") || 
+                        recruiter.getName().equals("Minotaur") ||
+                        recruiter.getName().equals("Dragon") ||
+                        recruiter.getName().equals("Colossus"))
                     {
                         return 1;
                     }
                 }
-                else if (recruit == Creature.minotaur)
+                else if (recruit.getName().equals("Minotaur"))
                 {
-                    if (recruiter == Creature.lion)
+                    if (recruiter.getName().equals("Lion"))
                     {
                         return 2;
                     }
-                    else if (recruiter == Creature.minotaur ||
-                             recruiter == Creature.dragon ||
-                             recruiter == Creature.colossus)
+                    else if (recruiter.getName().equals("Minotaur") ||
+                             recruiter.getName().equals("Dragon") ||
+                             recruiter.getName().equals("Colossus"))
                     {
                         return 1;
                     }
                 }
-                else if (recruit == Creature.dragon)
+                else if (recruit.getName().equals("Dragon"))
                 {
-                    if (recruiter == Creature.minotaur)
+                    if (recruiter.getName().equals("Minotaur"))
                     {
                         return 2;
                     }
-                    else if (recruiter == Creature.dragon ||
-                             recruiter == Creature.colossus)
+                    else if (recruiter.getName().equals("Dragon") ||
+                             recruiter.getName().equals("Colossus"))
                     {
                         return 1;
                     }
                 }
-                else if (recruit == Creature.colossus)
+                else if (recruit.getName().equals("Colossus"))
                 {
-                    if (recruiter == Creature.dragon)
+                    if (recruiter.getName().equals("Dragon"))
                     {
                         return 2;
                     }
-                    else if (recruiter == Creature.colossus)
+                    else if (recruiter.getName().equals("Colossus"))
                     {
                         return 1;
                     }
@@ -329,34 +329,34 @@ class PickRecruit extends Dialog implements MouseListener, WindowListener
                 break;
 
             case 'M':
-                if (recruit == Creature.ogre)
+                if (recruit.getName().equals("Ogre"))
                 {
-                    if (recruiter == Creature.ogre || 
-                        recruiter == Creature.troll ||
-                        recruiter == Creature.ranger)
+                    if (recruiter.getName().equals("Ogre") || 
+                        recruiter.getName().equals("Troll") ||
+                        recruiter.getName().equals("Ranger"))
                     {
                         return 1;
                     }
                 }
-                else if (recruit == Creature.troll)
+                else if (recruit.getName().equals("Troll"))
                 {
-                    if (recruiter == Creature.ogre)
+                    if (recruiter.getName().equals("Ogre"))
                     {
                         return 2;
                     }
-                    else if (recruiter == Creature.troll ||
-                             recruiter == Creature.ranger)
+                    else if (recruiter.getName().equals("Troll") ||
+                             recruiter.getName().equals("Ranger"))
                     {
                         return 1;
                     }
                 }
-                else if (recruit == Creature.ranger)
+                else if (recruit.getName().equals("Ranger"))
                 {
-                    if (recruiter == Creature.troll)
+                    if (recruiter.getName().equals("Troll"))
                     {
                         return 2;
                     }
-                    else if (recruiter == Creature.ranger)
+                    else if (recruiter.getName().equals("Ranger"))
                     {
                         return 1;
                     }
@@ -364,34 +364,34 @@ class PickRecruit extends Dialog implements MouseListener, WindowListener
                 break;
 
             case 'P':
-                if (recruit == Creature.centaur)
+                if (recruit.getName().equals("Centaur"))
                 {
-                    if (recruiter == Creature.centaur || 
-                        recruiter == Creature.lion ||
-                        recruiter == Creature.ranger)
+                    if (recruiter.getName().equals("Centaur") || 
+                        recruiter.getName().equals("Lion") ||
+                        recruiter.getName().equals("Ranger"))
                     {
                         return 1;
                     }
                 }
-                else if (recruit == Creature.lion)
+                else if (recruit.getName().equals("Lion"))
                 {
-                    if (recruiter == Creature.centaur)
+                    if (recruiter.getName().equals("Centaur"))
                     {
                         return 2;
                     }
-                    else if (recruiter == Creature.lion ||
-                             recruiter == Creature.ranger)
+                    else if (recruiter.getName().equals("Lion") ||
+                             recruiter.getName().equals("Ranger"))
                     {
                         return 1;
                     }
                 }
-                else if (recruit == Creature.ranger)
+                else if (recruit.getName().equals("Ranger"))
                 {
-                    if (recruiter == Creature.lion)
+                    if (recruiter.getName().equals("Lion"))
                     {
                         return 2;
                     }
-                    else if (recruiter == Creature.ranger)
+                    else if (recruiter.getName().equals("Ranger"))
                     {
                         return 1;
                     }
@@ -399,34 +399,34 @@ class PickRecruit extends Dialog implements MouseListener, WindowListener
                 break;
 
             case 'S':
-                if (recruit == Creature.troll)
+                if (recruit.getName().equals("Troll"))
                 {
-                    if (recruiter == Creature.troll || 
-                        recruiter == Creature.wyvern ||
-                        recruiter == Creature.hydra)
+                    if (recruiter.getName().equals("Troll") || 
+                        recruiter.getName().equals("Wyvern") ||
+                        recruiter.getName().equals("Hydra"))
                     {
                         return 1;
                     }
                 }
-                else if (recruit == Creature.wyvern)
+                else if (recruit.getName().equals("Wyvern"))
                 {
-                    if (recruiter == Creature.troll)
+                    if (recruiter.getName().equals("Troll"))
                     {
                         return 3;
                     }
-                    else if (recruiter == Creature.wyvern ||
-                             recruiter == Creature.hydra)
+                    else if (recruiter.getName().equals("Wyvern") ||
+                             recruiter.getName().equals("Hydra"))
                     {
                         return 1;
                     }
                 }
-                else if (recruit == Creature.hydra)
+                else if (recruit.getName().equals("Hydra"))
                 {
-                    if (recruiter == Creature.wyvern)
+                    if (recruiter.getName().equals("Wyvern"))
                     {
                         return 2;
                     }
-                    else if (recruiter == Creature.hydra)
+                    else if (recruiter.getName().equals("Hydra"))
                     {
                         return 1;
                     }
@@ -434,48 +434,48 @@ class PickRecruit extends Dialog implements MouseListener, WindowListener
                 break;
 
             case 't':
-                if (recruit == Creature.troll)
+                if (recruit.getName().equals("Troll"))
                 {
-                    if (recruiter == Creature.troll || 
-                        recruiter == Creature.warbear ||
-                        recruiter == Creature.giant ||
-                        recruiter == Creature.colossus)
+                    if (recruiter.getName().equals("Troll") || 
+                        recruiter.getName().equals("Warbear") ||
+                        recruiter.getName().equals("Giant") ||
+                        recruiter.getName().equals("Colossus"))
                     {
                         return 1;
                     }
                 }
-                else if (recruit == Creature.warbear)
+                else if (recruit.getName().equals("Warbear"))
                 {
-                    if (recruiter == Creature.troll)
+                    if (recruiter.getName().equals("Troll"))
                     {
                         return 2;
                     }
-                    else if (recruiter == Creature.warbear ||
-                             recruiter == Creature.giant ||
-                             recruiter == Creature.colossus)
+                    else if (recruiter.getName().equals("Warbear") ||
+                             recruiter.getName().equals("Giant") ||
+                             recruiter.getName().equals("Colossus"))
                     {
                         return 1;
                     }
                 }
-                else if (recruit == Creature.giant)
+                else if (recruit.getName().equals("Giant"))
                 {
-                    if (recruiter == Creature.warbear)
+                    if (recruiter.getName().equals("Warbear"))
                     {
                         return 2;
                     }
-                    else if (recruiter == Creature.giant ||
-                             recruiter == Creature.colossus)
+                    else if (recruiter.getName().equals("Giant") ||
+                             recruiter.getName().equals("Colossus"))
                     {
                         return 1;
                     }
                 }
-                else if (recruit == Creature.colossus)
+                else if (recruit.getName().equals("Colossus"))
                 {
-                    if (recruiter == Creature.giant)
+                    if (recruiter.getName().equals("Giant"))
                     {
                         return 2;
                     }
-                    else if (recruiter == Creature.colossus)
+                    else if (recruiter.getName().equals("Colossus"))
                     {
                         return 1;
                     }
@@ -483,45 +483,45 @@ class PickRecruit extends Dialog implements MouseListener, WindowListener
                 break;
 
             case 'T':
-                if (recruit == Creature.centaur ||
-                    recruit == Creature.gargoyle ||
-                    recruit == Creature.ogre)
+                if (recruit.getName().equals("Centaur") ||
+                    recruit.getName().equals("Gargoyle") ||
+                    recruit.getName().equals("Ogre"))
                 {
                     return 0;
                 }
-                else if (recruit == Creature.warlock)
+                else if (recruit.getName().equals("Warlock"))
                 {
-                    if (recruiter == Creature.titan ||
-                        recruiter == Creature.warlock)
+                    if (recruiter.getName().equals("Titan") ||
+                        recruiter.getName().equals("Warlock"))
                     {
                         return 1;
                     }
                 }
-                else if (recruit == Creature.guardian)
+                else if (recruit.getName().equals("Guardian"))
                 {
-                    if (recruiter == Creature.behemoth ||
-                        recruiter == Creature.centaur ||
-                        recruiter == Creature.colossus ||
-                        recruiter == Creature.cyclops ||
-                        recruiter == Creature.dragon ||
-                        recruiter == Creature.gargoyle ||
-                        recruiter == Creature.giant ||
-                        recruiter == Creature.gorgon ||
-                        recruiter == Creature.griffon ||
-                        recruiter == Creature.hydra ||
-                        recruiter == Creature.lion ||
-                        recruiter == Creature.minotaur ||
-                        recruiter == Creature.ogre ||
-                        recruiter == Creature.ranger ||
-                        recruiter == Creature.serpent ||
-                        recruiter == Creature.troll ||
-                        recruiter == Creature.unicorn ||
-                        recruiter == Creature.warbear ||
-                        recruiter == Creature.wyvern)
+                    if (recruiter.getName().equals("Behemoth") ||
+                        recruiter.getName().equals("Centaur") ||
+                        recruiter.getName().equals("Colossus") ||
+                        recruiter.getName().equals("Cyclops") ||
+                        recruiter.getName().equals("Dragon") ||
+                        recruiter.getName().equals("Gargoyle") ||
+                        recruiter.getName().equals("Giant") ||
+                        recruiter.getName().equals("Gorgon") ||
+                        recruiter.getName().equals("Griffon") ||
+                        recruiter.getName().equals("Hydra") ||
+                        recruiter.getName().equals("Lion") ||
+                        recruiter.getName().equals("Minotaur") ||
+                        recruiter.getName().equals("Ogre") ||
+                        recruiter.getName().equals("Ranger") ||
+                        recruiter.getName().equals("Serpent") ||
+                        recruiter.getName().equals("Troll") ||
+                        recruiter.getName().equals("Unicorn") ||
+                        recruiter.getName().equals("Warbear") ||
+                        recruiter.getName().equals("Wyvern"))
                     {
                         return 3;
                     }
-                    else if (recruiter == Creature.guardian)
+                    else if (recruiter.getName().equals("Guardian"))
                     {
                         return 1;
                     }
@@ -529,34 +529,34 @@ class PickRecruit extends Dialog implements MouseListener, WindowListener
                 break;
 
             case 'W':
-                if (recruit == Creature.centaur)
+                if (recruit.getName().equals("Centaur"))
                 {
-                    if (recruiter == Creature.centaur || 
-                        recruiter == Creature.warbear ||
-                        recruiter == Creature.unicorn)
+                    if (recruiter.getName().equals("Centaur") || 
+                        recruiter.getName().equals("Warbear") ||
+                        recruiter.getName().equals("Unicorn"))
                     {
                         return 1;
                     }
                 }
-                else if (recruit == Creature.warbear)
+                else if (recruit.getName().equals("Warbear"))
                 {
-                    if (recruiter == Creature.centaur)
+                    if (recruiter.getName().equals("Centaur"))
                     {
                         return 3;
                     }
-                    else if (recruiter == Creature.warbear ||
-                             recruiter == Creature.unicorn)
+                    else if (recruiter.getName().equals("Warbear") ||
+                             recruiter.getName().equals("Unicorn"))
                     {
                         return 1;
                     }
                 }
-                else if (recruit == Creature.unicorn)
+                else if (recruit.getName().equals("Unicorn"))
                 {
-                    if (recruiter == Creature.warbear)
+                    if (recruiter.getName().equals("Warbear"))
                     {
                         return 2;
                     }
-                    else if (recruiter == Creature.unicorn)
+                    else if (recruiter.getName().equals("Unicorn"))
                     {
                         return 1;
                     }
@@ -688,8 +688,10 @@ class PickRecruit extends Dialog implements MouseListener, WindowListener
 
     // Returns the number of eligible recruiters.  The passed-in recruiters
     // array should be of length 4 and will be filled in with recruiters.
+    // We use a Critter array instead of a Creature array so that Titan
+    // power is shown properly.
     public static int findEligibleRecruiters(Legion legion, Creature recruit, 
-        Creature [] recruiters)
+        Critter [] recruiters)
     {
         // Paranoia
         if (recruiters.length != 4)
@@ -710,32 +712,32 @@ class PickRecruit extends Dialog implements MouseListener, WindowListener
         {
             // Towers are a special case.  The recruiter of tower creatures 
             // remains anonymous, so we only deal with guardians and warlocks.
-            if (recruit == Creature.guardian)
+            if (recruit.getName().equals("Guardian"))
             {
                 for (int i = 0; i < Creature.creatures.length; i++)
                 {
                     Creature creature = Creature.creatures[i];
-                    if (creature == Creature.guardian && 
+                    if (creature.getName().equals("Guardian") && 
                         legion.numCreature(creature) >= 1)
                     {
-                        recruiters[count++] = creature;
+                        recruiters[count++] = legion.getCritter(creature);
                     }
                     else if (!creature.isImmortal() &&
                         legion.numCreature(creature) >= 3)
                     {
-                        recruiters[count++] = creature;
+                        recruiters[count++] = legion.getCritter(creature);
                     }
                 }
             }
-            else if (recruit == Creature.warlock)
+            else if (recruit.getName().equals("Warlock"))
             {
                 if (legion.numCreature(Creature.titan) >= 1)
                 {
-                    recruiters[count++] = Creature.titan;
+                    recruiters[count++] = legion.getCritter(Creature.titan);
                 }
                 if (legion.numCreature(Creature.warlock) >= 1)
                 {
-                    recruiters[count++] = Creature.warlock;
+                    recruiters[count++] = legion.getCritter(Creature.warlock);
                 }
             }
         }
@@ -750,7 +752,7 @@ class PickRecruit extends Dialog implements MouseListener, WindowListener
 
             for (int i = 0; i < numRecruitTypes; i++)
             {
-                if (recruit == hex.getRecruit(i))
+                if (recruit.getName().equals(hex.getRecruit(i).getName()))
                 {
                     int numToRecruit = hex.getNumToRecruit(i);
                     if (numToRecruit > 0 && 
@@ -758,14 +760,16 @@ class PickRecruit extends Dialog implements MouseListener, WindowListener
                         numToRecruit) 
                     {
                         // Can recruit up.
-                        recruiters[count++] = hex.getRecruit(i - 1);
+                        recruiters[count++] = legion.getCritter(
+                            hex.getRecruit(i - 1));
                     }
                     for (int j = i; j < numRecruitTypes; j++)
                     {
                         if (legion.numCreature(hex.getRecruit(j)) >= 1)
                         {
                             // Can recruit down or level.
-                            recruiters[count++] = hex.getRecruit(j);
+                            recruiters[count++] = legion.getCritter(
+                                hex.getRecruit(j));
                         }
                     }
                     break;
@@ -872,8 +876,8 @@ class PickRecruit extends Dialog implements MouseListener, WindowListener
                 Creature recruit = recruits[i];
 
                 // Pick the recruiter(s) if necessary.
-                Creature recruiters [] = new Creature[4];
-                Creature recruiter;
+                Critter recruiters [] = new Critter[4];
+                Critter recruiter;
 
                 int numEligibleRecruiters = findEligibleRecruiters(legion, 
                     recruit, recruiters);
