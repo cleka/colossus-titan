@@ -652,7 +652,7 @@ Log.debug("Called Game.newGame2()");
         if (getOption(Options.autoStop) && getNumHumansRemaining() < 1)
         {
             Log.event("Not advancing because no humans remain");
-            server.allTellGameOver("All humans eliminated");
+            // XXX buggy?  server.allTellGameOver("All humans eliminated");
             setGameOver(true);
             return;
         }
