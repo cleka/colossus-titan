@@ -6,8 +6,8 @@ import java.util.Comparator;
 import net.sf.colossus.server.Creature;
 
 
-/** Sort creatures in decreasing order of importance.  Keep identical 
- *  creatures together with a secondary sort by creature name. */
+/** Sort creatures in decreasing order of importance, then by creature
+ *  name, then by certainty. */
 final class CreatureInfoComparator implements Comparator
 {
     public int compare(Object o1, Object o2)
@@ -21,9 +21,19 @@ final class CreatureInfoComparator implements Comparator
         {
             return diff;
         }
-        else
+        diff = creature1.getName().compareTo(creature2.getName());
+        if (diff != 0)
         {
-            return creature1.getName().compareTo(creature2.getName());
+            return diff;
         }
+        if (info1.isCertain() && !info2.isCertain())
+        {
+            return -1;
+        }
+        if (info2.isCertain() && !info1.isCertain())
+        {
+            return 1;
+        }
+        return 0;
     }
 }
