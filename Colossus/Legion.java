@@ -1,6 +1,9 @@
 import javax.swing.*;
 import java.util.*;
 
+import net.sf.colossus.protocol.*;
+import net.sf.colossus.battle.*;
+
 /**
  * Class Legion represents a Titan stack of Creatures and its
  * stack marker.
@@ -8,7 +11,9 @@ import java.util.*;
  * @author David Ripton
  */
 
-public final class Legion implements Comparable
+public final class Legion 
+    extends GameSource
+	implements Comparable
 {
     private String markerId;    // Bk03, Rd12, etc.
     private String parentId;
@@ -106,6 +111,10 @@ public final class Legion implements Comparable
         markerNames.put("Rd12", "Torch");
     }
 
+	/**
+	 * TMJF sez: these are public but I think they are only for testing purposes
+	 */
+
     public Legion(String markerId, String parentId, String currentHexLabel,
         String startingHexLabel, Creature creature0, Creature creature1,
         Creature creature2, Creature creature3, Creature creature4,
@@ -197,22 +206,29 @@ public final class Legion implements Comparable
         }
     }
 
-
     public static Legion getStartingLegion(String markerId, String hexLabel,
         String playerName, Game game)
     {
-        return new Legion(markerId, null, hexLabel, hexLabel, Creature.titan,
-            Creature.angel, Creature.ogre, Creature.ogre,
-            Creature.centaur, Creature.centaur, Creature.gargoyle,
-            Creature.gargoyle, playerName, game);
+		Legion oLegion = 
+			new Legion(markerId, null, hexLabel, hexLabel, Creature.titan,
+					   Creature.angel, Creature.ogre, Creature.ogre,
+					   Creature.centaur, Creature.centaur, Creature.gargoyle,
+					   Creature.gargoyle, playerName, game);
+		// Probably not the right place to be adding this
+		oLegion.addGameListener(game.getListener());
+        return oLegion;
     }
 
 
     public static Legion getEmptyLegion(String markerId, String parentId,
         String hexLabel, String playerName, Game game)
     {
-        return new Legion(markerId, parentId, hexLabel, hexLabel, null,
-            null, null, null, null, null, null, null, playerName, game);
+		Legion oLegion = 
+			new Legion(markerId, parentId, hexLabel, hexLabel, null,
+					   null, null, null, null, null, null, null, playerName, game);
+		// Probably not the right place to be adding this
+		oLegion.addGameListener(game.getListener());
+		return oLegion;
     }
 
 
@@ -544,6 +560,9 @@ public final class Legion implements Comparable
         log.append(" ");
         if (getHeight() > 0)
         {
+            // I think this belongs here
+            // if we are putting creatures back in the Caretakers stack
+
             log.append("[");
             // Return lords and demi-lords to the stacks.
             Iterator it = critters.iterator();
@@ -561,6 +580,8 @@ public final class Legion implements Comparable
                 }
             }
             log.append("] ");
+
+            fireEvent(new LegionEvent(this, LegionEvent.nLEGION_DIED));
         }
         log.append("is eliminated");
         Log.event(log.toString());
@@ -671,6 +692,7 @@ public final class Legion implements Comparable
     {
         if (recruitName != null)
         {
+
             Creature creature = Creature.getCreatureByName(recruitName);
             game.getCaretaker().putOneBack(creature);
             removeCreature(creature, false, true);
@@ -678,6 +700,9 @@ public final class Legion implements Comparable
             Log.event("Legion " + getLongMarkerName() +
                 " undoes its recruit");
             game.getServer().allRepaintHex(currentHexLabel);
+
+			// Because we are modifying the caretaker
+			fireEvent(new LegionEvent(this, LegionEvent.nLEGION_LOST_CHARACTER));
         }
     }
 
@@ -691,14 +716,46 @@ public final class Legion implements Comparable
             return false;
         }
 
+        if(angelAvailable())
+            return true;
+
+        if(archangelAvailable())
+            return true;
+
+        return false;
+    }
+
+    /** Return true if this legion can summon an angel or archangel. */
+    public boolean angelAvailable()
+    {
+        Player player = getPlayer();
         Collection legions = player.getLegions();
         Iterator it = legions.iterator();
         while (it.hasNext())
         {
             Legion candidate = (Legion)it.next();
             if (candidate != this &&
-                (candidate.numCreature(Creature.angel) > 0 ||
-                candidate.numCreature(Creature.archangel) > 0) &&
+                (candidate.numCreature(Creature.angel) > 0) &&
+                !game.isEngagement(candidate.getCurrentHexLabel()))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /** Return true if this legion can summon an angel or archangel. */
+    public boolean archangelAvailable()
+    {
+        Player player = getPlayer();
+        Collection legions = player.getLegions();
+        Iterator it = legions.iterator();
+        while (it.hasNext())
+        {
+            Legion candidate = (Legion)it.next();
+            if (candidate != this &&
+                (candidate.numCreature(Creature.archangel) > 0) &&
                 !game.isEngagement(candidate.getCurrentHexLabel()))
             {
                 return true;
@@ -899,6 +956,7 @@ public final class Legion implements Comparable
     {
         if (takeFromStack)
         {
+
             Caretaker caretaker = game.getCaretaker();
             if (caretaker.getCount(creature) > 0)
             {
@@ -908,6 +966,8 @@ public final class Legion implements Comparable
             {
                 return;
             }
+
+			fireEvent(new LegionEvent(this, LegionEvent.nLEGION_GAINED_CHARACTER));
         }
 
         // Newly added critters are visible.
@@ -923,9 +983,13 @@ public final class Legion implements Comparable
         Critter critter = (Critter)critters.remove(i);
 
         // If the creature is a lord or demi-lord, put it back in the stacks.
-        if (returnImmortalToStack && critter.isImmortal())
+        if (returnImmortalToStack)
         {
-            game.getCaretaker().putOneBack(critter);
+            if(critter.isImmortal())
+            {
+                game.getCaretaker().putOneBack(critter);
+            }
+            fireEvent(new LegionEvent(this, LegionEvent.nLEGION_LOST_CHARACTER));
         }
 
         // If there are no critters left, disband the legion.
@@ -970,9 +1034,13 @@ public final class Legion implements Comparable
             return null;
         }
         // If the creature is a lord or demi-lord, put it back in the stacks.
-        if (returnImmortalToStack && critter.isImmortal())
+        if (returnImmortalToStack)
         {
-            game.getCaretaker().putOneBack(critter);
+            if(critter.isImmortal())
+            {
+                game.getCaretaker().putOneBack(critter);
+            }
+            fireEvent(new LegionEvent(this, LegionEvent.nLEGION_LOST_CHARACTER));
         }
         return critter;
     }
@@ -1267,6 +1335,60 @@ public final class Legion implements Comparable
         }
     }
 
+
+    private String[] convertCritterListToStringArray(ArrayList oCritterList)
+        {
+            int nSize = oCritterList.size();
+            String[] strArray = new String[nSize];
+            int i = 0;
+            Iterator it = oCritterList.iterator();
+            while(it.hasNext())
+            {
+                Critter oCritter = (Critter) it.next();
+                String strName = oCritter.getName();
+                strArray[i++] = strName;
+            }
+
+            return strArray;
+        }
+
+    public LegionMemo saveToMemo()
+    {
+        ArrayList oList = this.getCritters();
+        String[] strCritters = convertCritterListToStringArray(oList);
+        return new LegionMemo(getMarkerId(),
+                              parentId,
+                              currentHexLabel,
+                              startingHexLabel,
+                              strCritters,
+                              getPlayer().getName()
+                              );
+    }
+    
+    private static Creature getCreatureByName(String strName)
+    {
+        return strName != null ? Creature.getCreatureByName(strName) : null;
+    }
+    public Legion(Game oGame, LegionMemo oMemo)
+        {
+            this(oMemo.getMarkerId(), 
+                 oMemo.getParentMarkerId(), 
+                 oMemo.getCurrentHexLabel(),
+                 oMemo.getStartingHexLabel(),
+                 getCreatureByName(oMemo.getCritter(0)),
+                 getCreatureByName(oMemo.getCritter(1)),
+                 getCreatureByName(oMemo.getCritter(2)),
+                 getCreatureByName(oMemo.getCritter(3)),
+                 getCreatureByName(oMemo.getCritter(4)),
+                 getCreatureByName(oMemo.getCritter(5)),
+                 getCreatureByName(oMemo.getCritter(6)),
+                 getCreatureByName(oMemo.getCritter(7)),
+                 oMemo.getPlayerName(),
+                 oGame);
+        }
+
+// --------------------------------------------
+// Implement Comparable
 
     /** Legions are sorted in descending order of total point value,
         with the titan legion always coming first.  This is inconsistent
