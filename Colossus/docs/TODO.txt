@@ -1,17 +1,16 @@
-Big picture:
-1. Fix bugs with client-side AI.
-2. Add split prediction.
-3. Refactor to eliminate duplicate code.
-4. Improve networking.  (Persistent servers, reporting game openings to web
-   page.)
-5. Improve AI.  (Group battle moves.)
-
-
 Bug: Need to detect failed AI battle moves and fall back to next choice.
 
 Bug: If variant loading fails due to a missing variant, need to make sure 
    that both the server cfg file and the variant pane get reset to "Default"
 
+Split prediction.
+
+Refactor to eliminate duplicate code.
+
+Machine learning to tweak AI constants.
+
+Improve networking.  (Persistent servers, reporting game openings to web
+   page.)
 
 When getting both a PickRecruit and an AcquireAngel after a battle,
    make sure the PickRecruit is on top, because it's modal.

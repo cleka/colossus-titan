@@ -498,20 +498,6 @@ public final class Legion implements Comparable
         return false;
     }
 
-    boolean hasAngel()
-    {
-        Iterator it = critters.iterator();
-        while (it.hasNext())
-        {
-            Critter critter = (Critter)it.next();
-            if (critter.isAngel())
-            {
-                return true;
-            }
-        }
-        return false;
-    }
-
     boolean hasSummonable()
     {
         Iterator it = critters.iterator();

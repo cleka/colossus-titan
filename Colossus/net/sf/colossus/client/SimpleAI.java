@@ -422,6 +422,8 @@ public class SimpleAI implements AI
             {
                 pointValue /= 2;
             }
+
+// XXX Not correct for some variants.
             int currentScore = legion.getPlayerInfo().getScore();
             Creature bestRecruit = null;
             if ((currentScore + pointValue) / 500 > currentScore / 500 &&
@@ -1764,6 +1766,7 @@ public class SimpleAI implements AI
     }
 
 
+// XXX Not correct for some variants.
     public String acquireAngel(String markerId, List recruits)
     {
         // TODO If the legion is 6 high and can recruit something better,
@@ -1788,8 +1791,6 @@ public class SimpleAI implements AI
         // important legion that has one.
 
         Set hexLabels = client.findSummonableAngelHexes(summonerId);
-
-        String [] summonables = { "Archangel", "Angel" };
 
         LegionInfo bestLegion = null;
         String bestAngel = null;

@@ -183,11 +183,6 @@ public class Creature implements Comparable
         return name.equals(Constants.titan);
     }
 
-    public boolean isAngel()
-    {
-        return name.equals("Angel") || name.equals("Archangel");
-    }
-
     public String getName()
     {
         return name;
