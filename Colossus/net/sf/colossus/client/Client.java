@@ -1992,10 +1992,10 @@ Log.error("Got nak for recruit with " + markerId);
         {
             disposeMovementDie();
             board.setupSplitMenu();
+            board.fullRepaint();  // Ensure that movement die goes away
             if (playerName.equals(getActivePlayerName()))
             {
                 focusBoard();
-                board.fullRepaint();
                 board.setCursor(Cursor.getPredefinedCursor(
                     Cursor.DEFAULT_CURSOR));
             }
