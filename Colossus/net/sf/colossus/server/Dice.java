@@ -24,6 +24,11 @@ public final class Dice
 
     public static int rollDie(int size)
     {
+        if (size > 10000)
+        {
+            Log.error("Looks like someone is trying to cheat");
+            return 0;
+        }
         return random.nextInt(size) + 1;
     }
 }
