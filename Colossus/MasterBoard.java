@@ -75,7 +75,7 @@ public class MasterBoard extends Frame implements MouseListener,
         {
             do
             {
-                PickMarker pickmarker = new PickMarker(this, game.player[i]);
+                new PickMarker(this, game.player[i]);
             }
             while (game.player[i].getSelectedMarker() == null);
             // Update status window to reflect marker taken.
@@ -106,7 +106,7 @@ public class MasterBoard extends Frame implements MouseListener,
 
         for (int i = 0; i < game.getNumPlayers(); i++)
         {
-            tracker.addImage(game.player[i].legions[0].chit.image, 0);
+            tracker.addImage(game.player[i].legions[0].chit.getImage(), 0);
         }
 
         try
@@ -122,7 +122,7 @@ public class MasterBoard extends Frame implements MouseListener,
         setVisible(true);
         repaint();
 
-        Turn turn = new Turn(this, game, this);
+        new Turn(this, game, this);
     }
 
 
@@ -983,8 +983,7 @@ public class MasterBoard extends Frame implements MouseListener,
                                     {
                                         return;
                                     }
-                                    SplitLegion splitlegion = new 
-                                        SplitLegion(this, legion, player);
+                                    new SplitLegion(this, legion, player);
                                     // Update status window.
                                     game.updateStatusScreen();
                                     // If we split, unselect this hex.
@@ -1043,6 +1042,7 @@ public class MasterBoard extends Frame implements MouseListener,
             {
                 if (show[i][j] && h[i][j].contains(point))
                 {
+                    MasterHex hex = h[i][j];
                     switch(game.getPhase())
                     {
                         // If we're moving, and have selected a legion which 
@@ -1050,9 +1050,9 @@ public class MasterBoard extends Frame implements MouseListener,
                         // destination, move the legion here.
                         case Game.MOVE:
                             Legion legion = player.getSelectedLegion();
-                            if (legion != null && h[i][j].isSelected())
+                            if (legion != null && hex.isSelected())
                             {
-                                legion.moveToHex(h[i][j]);
+                                legion.moveToHex(hex);
                                 unselectAllHexes();
                                 // XXX Repaint only affected hexes and chits?
                                 repaint();
@@ -1062,22 +1062,39 @@ public class MasterBoard extends Frame implements MouseListener,
                         // If we're fighting and there is an engagement here,
                         // resolve it.
                         case Game.FIGHT:
-                            if (h[i][j].getNumFriendlyLegions(player) > 0 &&
-                                h[i][j].getNumEnemyLegions(player) > 0)
+                            if (hex.getNumFriendlyLegions(player) > 0 &&
+                                hex.getNumEnemyLegions(player) > 0)
                             {
                                 Legion attacker = 
-                                    h[i][j].getFriendlyLegion(player);
+                                    hex.getFriendlyLegion(player);
                                 Legion defender = 
-                                    h[i][j].getEnemyLegion(player);
+                                    hex.getEnemyLegion(player);
 
                                 if (defender.canFlee()) 
                                 {
-                                
+                                    new Concede(this, defender, attacker, 
+                                        true);
                                 }
 
-                                // Either player may concede.
-                                
-                                // XXX: Add negotiation and battle
+                                if (hex.getNumEnemyLegions(player) > 0)
+                                {
+                                    // Either player may concede.  Prompt the
+                                    // attacker.  Only bother to prompt the
+                                    // defender if he couldn't flee.
+
+                                    new Concede(this, attacker, defender, 
+                                        false);
+                                    if (hex.getNumFriendlyLegions(player) > 0) 
+                                    {
+                                        if (defender.canFlee() == false)
+                                        {
+                                            new Concede(this, defender, 
+                                                attacker, false);
+                                        }
+                                    }
+
+                                        // XXX: Add negotiation and battle
+                                }
                             }
                             break;
 
@@ -1088,7 +1105,7 @@ public class MasterBoard extends Frame implements MouseListener,
                             break;
                     }
 
-                    Rectangle clip = new Rectangle(h[i][j].getBounds());
+                    Rectangle clip = new Rectangle(hex.getBounds());
                     repaint(clip.x, clip.y, clip.width, clip.height);
                     return;
                 }
