@@ -526,6 +526,20 @@ class MasterHex
     }
 
 
+    boolean isEngagement()
+    {
+        Player player = legions[0].getPlayer();
+        for (int i = 1; i < numLegions; i++)
+        {
+            if (legions[i].getPlayer() != player)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
     Legion getFriendlyLegion(Player player)
     {
         for (int i = 0; i < numLegions; i++)
