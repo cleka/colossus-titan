@@ -47,6 +47,7 @@ final class BattleDice extends JPanel
         if (rolls != null)
         {
             this.rolls.addAll(rolls);
+            Collections.sort(this.rolls);
         }
         numDice = this.rolls.size();
     }
