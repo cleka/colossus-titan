@@ -1038,7 +1038,6 @@ public final class Client implements IClient
         if (board != null)
         {
             board.alignLegions(hexLabel);
-Log.debug("Called Client.removeLegion() for " + id);
         }
     }
 
@@ -1085,7 +1084,6 @@ Log.debug("Called Client.removeLegion() for " + id);
     public synchronized void setLegionContents(String markerId, 
         java.util.List names)
     {
-Log.debug(playerName + " setLegionContents() " + markerId + " " + names);
         String pName = getPlayerNameByMarkerId(markerId);
         if (predictSplits == null || getPredictSplits(pName) == null)
         {
@@ -1872,7 +1870,7 @@ Log.debug(playerName + " setLegionContents() " + markerId + " " + names);
 
     public synchronized void cleanupBattle()
     {
-Log.debug(playerName + " Client.cleanupBattle()");
+        Log.debug(playerName + " Client.cleanupBattle()");
         if (map != null)
         {
             map.dispose();
@@ -2483,8 +2481,6 @@ Log.error("Got nak for recruit with " + markerId);
                 {
                     // Remove this CritterMove from the list to show
                     // that it doesn't need to be retried.
-                    Log.debug("markBattleMoveSuccessful() " + tag + " " + 
-                        endingHexLabel);
                     it.remove();
                 }
             }
@@ -3912,8 +3908,6 @@ Log.error("Got nak for split of " + parentId);
     private void initPredictSplits(String pName, String rootMarkerId,
         java.util.List creatureNames)
     {
-Log.debug(playerName + " initPredictSplits() " + pName + " " + 
-rootMarkerId + " " + creatureNames);
         if (predictSplits == null)
         {
             predictSplits = new PredictSplits[numPlayers];

@@ -392,7 +392,7 @@ class Node implements Comparable
 
     void revealSomeCreatures(List cnl)
     {
-Log.debug("revealSomeCreatures() for " + this + " " + cnl);
+        //Log.debug("revealSomeCreatures() for " + this + " " + cnl);
         CreatureInfoList cil = new CreatureInfoList();
         Iterator it = cnl.iterator();
         while (it.hasNext())
@@ -488,13 +488,13 @@ Log.debug("revealSomeCreatures() for " + this + " " + cnl);
             creatures.removeLastUncertainCreature();
         }
 
-Log.debug("revealSomeCreatures() " + this);
+        //Log.debug("revealSomeCreatures() " + this);
         parent.tellChildContents(this);
     }
 
     void revealAllCreatures(List cnl)
     {
-Log.debug("revealAllCreatures() for " + this + " " + cnl);
+        //Log.debug("revealAllCreatures() for " + this + " " + cnl);
         CreatureInfoList cil = new CreatureInfoList();
         Iterator it = cnl.iterator();
         while (it.hasNext())
@@ -571,8 +571,8 @@ Log.debug("revealAllCreatures() for " + this + " " + cnl);
     CreatureInfoList findAllPossibleSplits(int childSize, 
         CreatureInfoList knownKeep, CreatureInfoList knownSplit)
     {
-        Log.debug("findAllPossibleSplits() for " + this + " " + childSize +
-            " " + knownKeep + " " + knownSplit);
+        //Log.debug("findAllPossibleSplits() for " + this + " " + childSize +
+        //    " " + knownKeep + " " + knownSplit);
 
         // Sanity checks
         if (knownSplit.size() > childSize)
@@ -605,7 +605,6 @@ Log.debug("revealAllCreatures() for " + this + " " + cnl);
         knownCombo.addAll(knownKeep);
         if (!creatures.isSupersetOf(knownCombo))
         {
-            Log.debug("not superset");
             revealSomeCreatures(knownCombo.getCreatureNames());
             split(childSize, getOtherChildMarkerId(), REUSE_EXISTING_TURN);
         }
@@ -653,8 +652,8 @@ Log.debug("revealAllCreatures() for " + this + " " + cnl);
     CreatureInfoList chooseCreaturesToSplitOut(int childSize, 
         CreatureInfoList knownKeep, CreatureInfoList knownSplit)
     {
-Log.debug("chooseCreaturesToSplitOut() " + this + " " + childSize + " " +
-knownKeep + " " + knownSplit);
+        //Log.debug("chooseCreaturesToSplitOut() " + this + " " + childSize 
+        // + " " + knownKeep + " " + knownSplit);
         // Sanity checks
         if (knownSplit.size() > childSize)
         {
@@ -686,7 +685,6 @@ knownKeep + " " + knownSplit);
         knownCombo.addAll(knownKeep);
         if (!creatures.isSupersetOf(knownCombo))
         {
-            Log.debug("not superset");
             revealSomeCreatures(knownCombo.getCreatureNames());
             split(childSize, getOtherChildMarkerId(), REUSE_EXISTING_TURN);
         }
@@ -759,8 +757,8 @@ knownKeep + " " + knownSplit);
 
     void split(int childSize, String otherMarkerId, int turn, List splitoffs)
     {
-Log.debug("split() for " + this + " " + childSize + " " + 
-otherMarkerId + " " + turn);
+        //Log.debug("split() for " + this + " " + childSize + " " + 
+        //otherMarkerId + " " + turn);
         if (childSize == 0)
         {
             Log.warn("childSize is 0; aborting");
@@ -932,24 +930,25 @@ otherMarkerId + " " + turn);
             childSize1 = child1.getHeight();
             childSize2 = child2.getHeight();
         }
-Log.debug("child1: " + child1);
-Log.debug("child2: " + child2);
+        //Log.debug("child1: " + child1);
+        //Log.debug("child2: " + child2);
     }
 
     /** Recombine this legion and other, because it was not possible to
      *  move.  They must share a parent.  If either legion has the parent's
      *  markerId, then that legion will remain.  Otherwise this legion
-     *  will remain. */
+     *  will remain.  Also used to undo splits.*/
     void merge(Node other, int turn)
     {
-Log.debug("merge() for " + this + " and " + other);
+        //Log.debug("merge() for " + this + " and " + other + " " + turn);
         if (other == null)
         {
             return;
         }
         if (parent != other.parent)
         {
-            throw new PredictSplitsException("Tried to merge non-siblings");
+            Log.warn("Tried to merge non-siblings");
+            return;
         }
         if (getMarkerId().equals(parent.getMarkerId()) ||
             other.getMarkerId().equals(parent.getMarkerId()))
@@ -970,7 +969,7 @@ Log.debug("merge() for " + this + " and " + other);
      *  other child and/or its parent something. */
     void tellChildContents(Node child)
     {
-Log.debug("tellChildContents for node " + this + " from node " + child);
+        //Log.debug("tellChildContents for node " + this + " from " + child);
         CreatureInfoList childCertainAtSplit = 
             child.getCertainAtSplitCreatures();
         revealSomeCreatures(childCertainAtSplit.getCreatureNames());
@@ -984,7 +983,7 @@ Log.debug("tellChildContents for node " + this + " from node " + child);
         {
             creatureName = "Titan";
         }
-        Log.debug("addCreature() " + this + " : " + creatureName);
+        //Log.debug("addCreature() " + this + " : " + creatureName);
         if (getHeight() >= 7 && child1 == null)
         {
             throw new PredictSplitsException("Tried adding to 7-high legion");
@@ -999,7 +998,7 @@ Log.debug("tellChildContents for node " + this + " from node " + child);
         {
             creatureName = "Titan";
         }
-Log.debug("PredictSplits.removeCreature() " + this + " : " + creatureName);
+        Log.debug("removeCreature() " + this + " : " + creatureName);
         if (getHeight() <= 0)
         {
             throw new PredictSplitsException(
@@ -1020,7 +1019,6 @@ Log.debug("PredictSplits.removeCreature() " + this + " : " + creatureName);
         // predictions if it was here at the time of the split.
         if (ci.isAtSplit())
         {
-Log.debug("appending " + ci + " to removed");
             removed.add(ci);
         }
         creatures.removeCreatureByName(creatureName);

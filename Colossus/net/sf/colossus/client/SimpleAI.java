@@ -1361,6 +1361,10 @@ public class SimpleAI implements AI
             {
                 String nextLabel = (String)nextMoveIt.next();
                 MasterHex nextHex = MasterBoard.getHexByLabel(nextLabel);
+                if (nextHex == null)  // XXX How does this happen?
+                {
+                    continue;
+                }
                 // if we have to fight in that hex and we can't
                 // WIN_WITH_MINIMAL_LOSSES, then assume we can't
                 // recruit there.  IDEA: instead of doing any of this
@@ -1396,9 +1400,7 @@ public class SimpleAI implements AI
                     (Creature)nextRecruits.get(nextRecruits.size() - 1);
                 // Reduced val by 5 to make current turn recruits more
                 // valuable than next turn's recruits
-                int val = nextRecruit.getSkill() * nextRecruit.getPower()
-                          - 5;
-
+                int val = nextRecruit.getSkill() * nextRecruit.getPower() - 5;
                 if (val > bestRecruitVal)
                 {
                     bestRecruitVal = val;
