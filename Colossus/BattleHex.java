@@ -567,8 +567,9 @@ class BattleHex extends Hex
         char terrain = getTerrain();
 
         // Check to see if the hex is occupied or totally impassable.
-        if (isOccupied() || terrain == 't' || (terrain == 'v' && creature !=
-            Creature.dragon) || (terrain == 'o' && !creature.isNativeBog()))
+        if (isOccupied() || terrain == 't' || (terrain == 'v' && 
+            !creature.getName().equals("Dragon")) || (terrain == 'o' && 
+            !creature.isNativeBog()))
         {
             return 5;
         }
