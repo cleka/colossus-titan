@@ -36,14 +36,14 @@ public class Abyssal9Hint implements net.sf.colossus.server.HintInterface
         recruits = creaturesToStrings(recruits);
         List sect = Arrays.asList(section);
 
-        if (terrain.equals("Brush") || terrain.equals("Jungle"))
+        if (terrain.equals("Brush"))
         {
-            int numCyclops = legion.numCreature("Cyclops");
-            if (numCyclops > 0 &&
-                    numCyclops < 3 &&
+            if (recruits.contains("Cyclops") &&
                     !legion.contains("Behemoth") &&
-                    oracle.creatureAvailable("Behemoth") >= 2 &&
-                    oracle.creatureAvailable("Cyclops") >= 1)
+                    legion.getHeight() != 6 &&
+                    legion.numCreature("Cyclops") == 2 &&
+                    oracle.creatureAvailable("Behemoth") >= 2
+				)
             {
                 return "Cyclops";
             }
@@ -52,9 +52,10 @@ public class Abyssal9Hint implements net.sf.colossus.server.HintInterface
         {
             if (recruits.contains("Lion") &&
                     !legion.contains("Griffon") &&
+                    legion.getHeight() != 6 &&
                     legion.numCreature("Lion") == 2 &&
-                    oracle.canReach("Desert") &&
-                    oracle.creatureAvailable("Griffon") >= 2)
+                    oracle.creatureAvailable("Griffon") >= 2
+               )
             {
                 return "Lion";
             }
@@ -90,11 +91,21 @@ public class Abyssal9Hint implements net.sf.colossus.server.HintInterface
         {
             if (recruits.contains("Troll") &&
                     !legion.contains("Wyvern") &&
+                    legion.getHeight() != 6 &&
                     legion.numCreature("Troll") == 2 &&
-                    oracle.canReach("Swamp") &&
-                    oracle.creatureAvailable("Wyvern") >= 2)
+                    oracle.creatureAvailable("Wyvern") >= 2 &&
+                    oracle.canReach("Desert"))
             {
                 return "Troll";
+            }
+            if (recruits.contains("Ranger") &&
+                    !legion.contains("AirElemental") &&
+                    legion.getHeight() != 6 &&
+                    legion.numCreature("Ranger") == 2 &&
+                    oracle.creatureAvailable("AirElemental") >= 3 &&
+                    oracle.canReach("Plains"))
+            {
+                return "Ranger";
             }
             if (sect.contains(Constants.sectionDefensiveAI))
             {
@@ -122,6 +133,42 @@ public class Abyssal9Hint implements net.sf.colossus.server.HintInterface
                 {
                     return "Ogre";
                 }
+            }
+        }
+        else if (terrain.equals("Woods"))
+        {
+            if (recruits.contains("Unicorn") &&
+                    !legion.contains("EarthElemental") &&
+                    legion.getHeight() != 6 &&
+                    legion.numCreature("Unicorn") == 2 &&
+                    oracle.creatureAvailable("EarthElemental") >= 3 &&
+                    oracle.canReach("Hills"))
+            {
+                return "Unicorn";
+            }
+        }
+        else if (terrain.equals("Desert"))
+        {
+            if (recruits.contains("Hydra") &&
+                    !legion.contains("WaterElemental") &&
+                    legion.getHeight() != 6 &&
+                    legion.numCreature("Hydra") == 2 &&
+                    oracle.creatureAvailable("WaterElemental") >= 3 &&
+                    oracle.canReach("Swamp"))
+            {
+                return "Hydra";
+            }
+        }
+        else if (terrain.equals("Tundra"))
+        {
+            if (recruits.contains("Colossus") &&
+                    !legion.contains("FireElemental") &&
+                    legion.getHeight() != 6 &&
+                    legion.numCreature("Colossus") == 2 &&
+                    oracle.creatureAvailable("FireElemental") >= 3 &&
+                    oracle.canReach("Mountains"))
+            {
+                return "Colossus";
             }
         }
         else if (terrain.equals("Tower"))
