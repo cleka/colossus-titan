@@ -49,8 +49,6 @@ Bug: Out of memory error after many consecutive Load Game actions.  Find leak.
 EASY Compute numLegions, numMarkers, numCreatures, titan power, total point value
    on client side rather than passing them in player info.
 
-EASY Turn off wait cursor more often.
-
 EASY Indicate which players have titan teleport in StatusScreen.
 
 EASY Do not scale chits in CreatureCollectionView

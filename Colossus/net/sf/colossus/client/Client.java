@@ -2161,6 +2161,10 @@ Log.error("Got nak for recruit with " + markerId);
         {
             board.setupMoveMenu();
         }
+        if (isMyTurn() && board != null)
+        {
+            defaultCursor();
+        }
         updateStatusScreen();
     }
 
@@ -2174,6 +2178,10 @@ Log.error("Got nak for recruit with " + markerId);
         }
         updateStatusScreen();
 
+        if (isMyTurn() && board != null)
+        {
+            defaultCursor();
+        }
         if (isMyTurn() && getOption(Options.autoPickEngagements))
         {
             aiPause();
@@ -2193,6 +2201,10 @@ Log.error("Got nak for recruit with " + markerId);
             board.setupMusterMenu();
         }
         updateStatusScreen();
+        if (isMyTurn() && board != null)
+        {
+            defaultCursor();
+        }
 
         if (getOption(Options.autoRecruit) && !isGameOver())
         {
@@ -2271,6 +2283,7 @@ Log.error("Got nak for recruit with " + markerId);
         if (map != null && isMyBattlePhase())
         {
             focusMap();
+            defaultCursor();
             map.setupMoveMenu();
         }
         updateStatusScreen();

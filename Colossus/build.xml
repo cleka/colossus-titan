@@ -201,10 +201,10 @@
 
 
 <!-- Be very careful modifying this.  It whacks whole directories easily. -->
-<!-- XXX Files like .#Colossus.jar.1.203 are not being deleted.  Ant bug? -->
 <target name="clean" depends="cleanjars"
         description = "Delete most derived files"> 
-        <delete verbose="yes" quiet = "yes" includeemptydirs="yes"> 
+        <delete verbose="yes" quiet = "yes" includeemptydirs="yes" 
+                defaultexcludes="no"> 
                 <fileset dir="." 
                  includes = 
                         "version,
@@ -216,7 +216,6 @@
                          **/*.bak,
                          **/*.old,
                          **/*.class,
-                         **/.#Colossus.jar*,
                          **/Colossus.*.zip,
                          TEST-*Test.txt,
                          javadoc/**"
