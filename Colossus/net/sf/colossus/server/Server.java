@@ -298,16 +298,13 @@ Log.debug("called Server.makeForcedStrikes() " + playerName + " " + rangestrike)
         }
     }
 
-    // XXX Do not pass hexLabels -- let clients calculate them.
     void allSetupMuster()
     {
-        Set hexLabels = game.findAllEligibleRecruitHexes();
-
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
             Client client = (Client)it.next();
-            client.setupMuster(hexLabels);
+            client.setupMuster();
         }
     }
 
@@ -449,36 +446,6 @@ Log.debug("called Server.createSummonAngel for " + legion);
         game.doSummon(legion, donor, creature);
     }
 
-
-    // XXX delete add logic to client
-    /** Return true if the legion has moved and can recruit. */
-    public boolean canRecruit(String markerId)
-    {
-        Legion legion = game.getLegionByMarkerId(markerId);
-        return legion != null && legion.hasMoved() && legion.canRecruit();
-    }
-
-    // XXX delete add logic to client
-    /** Return a list of Creatures. */
-    public List findEligibleRecruits(String markerId, String hexLabel)
-    {
-        return game.findEligibleRecruits(markerId, hexLabel);
-    }
-
-    // XXX delete add logic to client
-    /** Return a list of creature name strings. */
-    public List findEligibleRecruiters(String markerId, String recruitName)
-    {
-        List creatures = game.findEligibleRecruiters(markerId, recruitName);
-        List strings = new ArrayList();
-        Iterator it = creatures.iterator();
-        while (it.hasNext())
-        {
-            Creature creature = (Creature)it.next();
-            strings.add(creature.getName());
-        }
-        return strings;
-    }
 
     /** Handle mustering for legion. */ 
     public void doRecruit(String markerId, String recruitName,

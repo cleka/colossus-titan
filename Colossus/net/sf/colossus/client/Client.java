@@ -17,6 +17,7 @@ import net.sf.colossus.server.Creature;
 import net.sf.colossus.server.AI;
 import net.sf.colossus.server.SimpleAI;
 import net.sf.colossus.server.Constants;
+import net.sf.colossus.parser.TerrainRecruitLoader;
 
 
 /**
@@ -81,8 +82,6 @@ public final class Client
 
     /** Gradually moving AI to client side. */
     private AI ai = new SimpleAI();
-
-    private Set possibleRecruitHexes;
 
     /** Map of creature name to Integer count.  As in Caretaker, if an entry
      *  is missing then we assume it is set to the maximum. */
@@ -1425,13 +1424,13 @@ Log.debug("called Client.acquireAngelCallback()");
     /** Currently used for human players only. */
     void doRecruit(String markerId)
     {
-        // TODO Cache this on client
-        if (!server.canRecruit(markerId))
+        LegionInfo info = getLegionInfo(markerId);
+        if (info == null || !info.canRecruit())
         {
             return;
         }
-        String hexLabel = getHexForLegion(markerId);
 
+        String hexLabel = getHexForLegion(markerId);
         java.util.List recruits = findEligibleRecruits(markerId, hexLabel);
         String hexDescription =
             MasterBoard.getHexByLabel(hexLabel).getDescription();
@@ -1486,7 +1485,6 @@ Log.debug("called Client.acquireAngelCallback()");
         {
             Log.error("Client.didRecruit() null hexLabel for " + markerId);
         }
-        possibleRecruitHexes.remove(hexLabel);
         if (isMyLegion(markerId))
         {
             pushUndoStack(markerId);
@@ -1502,6 +1500,8 @@ Log.debug("called Client.acquireAngelCallback()");
             revealCreatures(markerId, recruiters);
         }
         addCreature(markerId, recruitName);
+        getLegionInfo(markerId).setRecruited(true);
+        getLegionInfo(markerId).setLastRecruit(recruitName);
 
         if (board != null)
         {
@@ -1515,7 +1515,6 @@ Log.debug("called Client.acquireAngelCallback()");
     public void undidRecruit(String markerId, String recruitName)
     {
         String hexLabel = getHexForLegion(markerId);
-        possibleRecruitHexes.add(hexLabel);
         removeCreature(markerId, recruitName);
         if (board != null)
         {
@@ -1524,6 +1523,7 @@ Log.debug("called Client.acquireAngelCallback()");
             hex.repaint();
             board.highlightPossibleRecruits();
         }
+        getLegionInfo(markerId).setRecruited(false);
     }
 
     /** null means cancel.  "none" means no recruiter (tower creature). */
@@ -1532,8 +1532,8 @@ Log.debug("called Client.acquireAngelCallback()");
     {
         String recruiterName = null;
 
-        java.util.List recruiters = server.findEligibleRecruiters(
-            markerId, recruitName);
+        java.util.List recruiters = findEligibleRecruiters(markerId, 
+            recruitName);
 
         int numEligibleRecruiters = recruiters.size();
         if (numEligibleRecruiters == 0)
@@ -1572,6 +1572,7 @@ Log.debug("called Client.acquireAngelCallback()");
         {
             LegionInfo info = (LegionInfo)it.next();
             info.setMoved(false);
+            info.setRecruited(false);
         }
     }
 
@@ -1622,10 +1623,9 @@ Log.debug("called Client.acquireAngelCallback()");
         }
     }
 
-    public void setupMuster(Set possibleRecruitHexes)
+    public void setupMuster()
     {
         this.phase = Constants.MUSTER;
-        this.possibleRecruitHexes = new HashSet(possibleRecruitHexes);
 
         if (board != null)
         {
@@ -2052,13 +2052,110 @@ Log.debug("called Client.acquireAngelCallback()");
     /** Return a list of Creatures. */
     java.util.List findEligibleRecruits(String markerId, String hexLabel)
     {
-        return server.findEligibleRecruits(markerId, hexLabel);
+        java.util.List recruits = new ArrayList();
+
+        LegionInfo info = getLegionInfo(markerId);
+        if (info == null)
+        {
+            return recruits;
+        }
+
+        MasterHex hex = MasterBoard.getHexByLabel(hexLabel);
+        char terrain = hex.getTerrain();
+
+        java.util.List tempRecruits = 
+            TerrainRecruitLoader.getPossibleRecruits(terrain);
+        java.util.List recruiters = 
+            TerrainRecruitLoader.getPossibleRecruiters(terrain);
+
+        Iterator lit = tempRecruits.iterator();
+        while (lit.hasNext())
+        {
+            Creature creature = (Creature)lit.next();
+            Iterator liter = recruiters.iterator();
+            while (liter.hasNext())
+            {
+                Creature lesser = (Creature)liter.next();
+                if ((TerrainRecruitLoader.numberOfRecruiterNeeded(lesser, 
+                    creature, terrain) <= info.numCreature(lesser)) &&
+                    (recruits.indexOf(creature) == -1))
+                {
+                    recruits.add(creature);
+                }
+            }
+        }
+
+        // Make sure that the potential recruits are available.
+        Iterator it = recruits.iterator();
+        while (it.hasNext())
+        {
+            Creature recruit = (Creature)it.next();
+            if (getCreatureCount(recruit) < 1)
+            {
+                it.remove();
+            }
+        }
+
+        return recruits;
     }
+
+    /** Return a list of creature name strings. */
+    public java.util.List findEligibleRecruiters(String markerId, 
+        String recruitName)
+    {
+        java.util.List recruiters;
+        Creature recruit = Creature.getCreatureByName(recruitName);
+        if (recruit == null)
+        {
+            return new ArrayList();
+        }
+
+        LegionInfo info = getLegionInfo(markerId);
+        String hexLabel = info.getHexLabel();
+        MasterHex hex = MasterBoard.getHexByLabel(hexLabel);
+        char terrain = hex.getTerrain();
+
+        recruiters = TerrainRecruitLoader.getPossibleRecruiters(terrain);
+        Iterator it = recruiters.iterator();
+        while (it.hasNext())
+        {
+            Creature possibleRecruiter = (Creature)it.next();
+            int needed = TerrainRecruitLoader.numberOfRecruiterNeeded(
+                possibleRecruiter, recruit, terrain);
+            if (needed < 1 || needed > info.numCreature(possibleRecruiter))
+            {
+                // Zap this possible recruiter.
+                it.remove();
+            }
+        }
+
+        java.util.List strings = new ArrayList();
+        it = recruiters.iterator();
+        while (it.hasNext())
+        {
+            Creature creature = (Creature)it.next();
+            strings.add(creature.getName());
+        }
+        return strings;
+    }
+
 
     /** Return a set of hexLabels. */
     Set getPossibleRecruitHexes()
     {
-        return Collections.unmodifiableSet(possibleRecruitHexes);
+        Set set = new HashSet();
+
+        Iterator it = legionInfo.values().iterator();
+        while (it.hasNext())
+        {
+            LegionInfo info = (LegionInfo)it.next();
+            if (activePlayerName.equals(info.getPlayerName()) &&
+                info.canRecruit())
+            {
+                set.add(info.getHexLabel());
+            }
+        }
+        return set;
     }
 
 
@@ -2111,6 +2208,11 @@ Log.debug("found " + set.size() + " hexes");
             return Creature.getCreatureByName(creatureName).getMaxCount();
         }
         return count.intValue();
+    }
+
+    int getCreatureCount(Creature creature)
+    {
+        return getCreatureCount(creature.getName());
     }
 
 
@@ -2276,7 +2378,6 @@ Log.debug("found " + set.size() + " hexes");
             String hexLabel = getHexForLegion(markerId);
             GUIMasterHex hex = board.getGUIHexByLabel(hexLabel);
             hex.repaint();
-            possibleRecruitHexes.add(hexLabel);
         }
     }
 

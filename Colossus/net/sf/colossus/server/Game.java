@@ -3040,29 +3040,6 @@ Log.debug("Game.doMove() teleport=" + teleport + " lord=" + teleportingLord +
     }
 
 
-    // XXX delete after adding logic to client
-    Set findAllEligibleRecruitHexes()
-    {
-        Player player = getActivePlayer();
-        Set set = new HashSet();
-
-        for (int i = 0; i < player.getNumLegions(); i++)
-        {
-            Legion legion = player.getLegion(i);
-            if (legion.hasMoved() && legion.canRecruit())
-            {
-                String markerId = legion.getMarkerId();
-                String hexLabel = legion.getCurrentHexLabel();
-                if (findEligibleRecruits(markerId, hexLabel).size() > 0)
-                {
-                    set.add(hexLabel);
-                }
-            }
-        }
-        return set;
-    }
-
-
     boolean getOption(String optname)
     {
         return options.getOption(optname);

@@ -29,6 +29,7 @@ public final class LegionInfo
     private Marker marker;
     private String lastRecruit;
     private boolean moved;
+    private boolean recruited;
 
     /** Creature name strings for *known* contents.  Never null. */
     private List contents = new ArrayList();
@@ -96,6 +97,26 @@ public final class LegionInfo
        return getContents().contains(creatureName);
     }
 
+    int numCreature(String creatureName)
+    {
+        int count = 0;
+        Iterator it = getContents().iterator();
+        while (it.hasNext())
+        {
+            String name = (String)it.next();
+            if (name.equals(creatureName))
+            {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    int numCreature(Creature creature)
+    {
+        return numCreature(creature.getName());
+    }
+
     /** Return a list of Strings.  Use the proper string for titans and
      *  unknown creatures. */
     java.util.List getImageNames()
@@ -152,6 +173,12 @@ public final class LegionInfo
         );
 
         return names;
+    }
+
+
+    PlayerInfo getPlayerInfo()
+    {
+        return client.getPlayerInfo(playerName);
     }
 
 
@@ -335,5 +362,23 @@ Log.debug("LegionInfo.isEngaged() says there are " + numInHex);
     {
         return moved;
     }
-}
 
+    void setRecruited(boolean recruited)
+    {
+        this.recruited = recruited;
+    }
+
+    boolean hasRecruited()
+    {
+        return recruited;
+    }
+
+    /** Return true if the legion has moved and can recruit. */
+    boolean canRecruit()
+    {
+        return hasMoved() && getHeight() < 7 &&
+            !hasRecruited() && !getPlayerInfo().isDead() &&
+            !client.findEligibleRecruits(getMarkerId(), 
+                getHexLabel()).isEmpty();
+    }
+}

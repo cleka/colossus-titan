@@ -1,6 +1,8 @@
 Add JUnit section to build docs.
 Document test procedures.
 
+Make TerrainRecruitLoader initialization fully static.
+
 Add server-side static map/board initialization?
 
 Add remaining command-line options.  (User prefs dir?)
