@@ -441,7 +441,7 @@ System.out.println("clearAllUnoccupiedEntrySides()");
         for (int i = 0; i < player.getNumLegions(); i++) 
         {
             Legion legion = player.getLegion(i);
-            if (legion.hasMoved() == false)
+            if (!legion.hasMoved())
             {
                 MasterHex hex = legion.getCurrentHex();
                 hex.select();
@@ -541,7 +541,6 @@ System.out.println("clearAllUnoccupiedEntrySides()");
 
     public void finishSummoningAngel()
     {
-System.out.println("MasterBoard.finishSummoningAngel");
         summoningAngel = false;
         highlightEngagements();
         summonAngel = null;
@@ -1260,7 +1259,7 @@ System.out.println("MasterBoard.show()");
                                         new PickRecruit(this, legion);
                                     }
                                     // If we recruited, unselect this hex.
-                                    if (legion.canRecruit() == false)
+                                    if (!legion.canRecruit())
                                     {
                                         legion.getCurrentHex().unselect();
                                     }
@@ -1363,7 +1362,6 @@ System.out.println("MasterBoard.show()");
                                 player.selectLegion(attacker);
                                 if (summonAngel == null)
                                 {
-System.out.println("summonAngel is null");
                                     summonAngel = 
                                         map.getTurn().getSummonAngel();
                                 }
