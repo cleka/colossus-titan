@@ -1,12 +1,3 @@
-/* 
- * BattleMap, for Titan
- * version $Id$
- * dripton
- */
-
-// TODO: Add the dragon and hydra.
-// TODO: Restrict chit dragging to within window
-
 import java.awt.*;
 import java.awt.event.*;
 
@@ -16,12 +7,12 @@ import java.awt.event.*;
  * @author David Ripton
  */
 
-
 public class BattleMap extends Frame implements MouseListener,
     MouseMotionListener
 {
+    public static final double SQRT3 = 1.73205080757;
     private Hex[][] h = new Hex[6][6];
-    private Chit[] chits = new Chit[22];
+    private Chit[] chits = new Chit[24];
     private int tracking;
     final private boolean[][] show =
     {
@@ -67,9 +58,9 @@ public class BattleMap extends Frame implements MouseListener,
                 if (show[i][j])
                 {
                     h[i][j] = new Hex
-                        ((int)Math.round(cx + 3 * i * scale),
-                        (int)Math.round(cy + (2 * j + i % 2) *
-                        Math.sqrt(3.0) * scale), scale);
+                        ((int) Math.round(cx + 3 * i * scale),
+                        (int) Math.round(cy + (2 * j + i % 2) *
+                        SQRT3 * scale), scale);
                 }
             }
         }
@@ -93,11 +84,13 @@ public class BattleMap extends Frame implements MouseListener,
         chits[14] = new Chit(380, 380, 60, "images/Ogre.gif", this);
         chits[15] = new Chit(400, 400, 60, "images/Ranger.gif", this);
         chits[16] = new Chit(420, 420, 60, "images/Serpent.gif", this);
-        chits[17] = new Chit(460, 460, 60, "images/Titan.gif", this);
-        chits[18] = new Chit(480, 480, 60, "images/Troll.gif", this);
-        chits[19] = new Chit(500, 500, 60, "images/Unicorn.gif", this);
-        chits[20] = new Chit(520, 520, 60, "images/Warbear.gif", this);
-        chits[21] = new Chit(540, 540, 60, "images/Warlock.gif", this);
+        chits[17] = new Chit(440, 440, 60, "images/Titan.gif", this);
+        chits[18] = new Chit(460, 460, 60, "images/Troll.gif", this);
+        chits[19] = new Chit(480, 480, 60, "images/Unicorn.gif", this);
+        chits[20] = new Chit(500, 500, 60, "images/Warbear.gif", this);
+        chits[21] = new Chit(520, 520, 60, "images/Warlock.gif", this);
+        chits[22] = new Chit(540, 540, 60, "images/Dragon.gif", this);
+        chits[23] = new Chit(560, 560, 60, "images/Wyvern.gif", this);
 
         for (int i = 0; i < chits.length; i++)
         {
@@ -120,9 +113,14 @@ public class BattleMap extends Frame implements MouseListener,
 
     public void mouseDragged(MouseEvent e)
     {
-        Point point = e.getPoint();
         if (tracking != -1)
         {
+            Point point = e.getPoint();
+            point.x = Math.max(point.x, 30);
+            point.y = Math.max(point.y, 60);
+            point.x = Math.min(point.x, getSize().width - 30);
+            point.y = Math.min(point.y, getSize().height - 30);
+
             Rectangle clip = new Rectangle(chits[tracking].getBounds());
             chits[tracking].setLocation(point);
             clip.add(chits[tracking].getBounds());
@@ -238,9 +236,6 @@ public class BattleMap extends Frame implements MouseListener,
             gBack = offImage.getGraphics();
         }
 
-        // XXX: Find out which is faster, this needToClear business
-        //      or just clearing the whole back buffer every time.
-
         // Clear the background only when chits are dragged.
         if (needToClear)
         {
@@ -302,8 +297,15 @@ public class BattleMap extends Frame implements MouseListener,
 }
 
 
+/**
+ * Class Hex describes one Battlemap hex.
+ * @version $Id$
+ * @author David Ripton
+ */
+
 class Hex
 {
+    public static final double SQRT3 = 1.73205080757;
     private boolean selected;
     private int[] xVertex = new int[6];
     private int[] yVertex = new int[6];
@@ -320,13 +322,13 @@ class Hex
         xVertex[1] = cx + 2 * scale;
         yVertex[1] = cy;
         xVertex[2] = cx + 3 * scale;
-        yVertex[2] = cy + (int)Math.round(Math.sqrt(3.0) * scale);
+        yVertex[2] = cy + (int) Math.round(SQRT3 * scale);
         xVertex[3] = cx + 2 * scale;
-        yVertex[3] = cy + (int)Math.round(2 * Math.sqrt(3.0) * scale);
+        yVertex[3] = cy + (int) Math.round(2 * SQRT3 * scale);
         xVertex[4] = cx;
-        yVertex[4] = cy + (int)Math.round(2 * Math.sqrt(3.0) * scale);
+        yVertex[4] = cy + (int) Math.round(2 * SQRT3 * scale);
         xVertex[5] = cx - 1 * scale;
-        yVertex[5] = cy + (int)Math.round(Math.sqrt(3.0) * scale);
+        yVertex[5] = cy + (int) Math.round(SQRT3 * scale);
 
         p = new Polygon(xVertex, yVertex, 6);
         // Add 1 to width and height because Java rectangles come up
@@ -377,64 +379,3 @@ class Hex
     }
     
 }
-
-
-class Chit
-{
-    // The container's MediaTracker needs to access the image.
-    Image image;
-
-    private boolean selected;
-    private Rectangle rect;
-    private Container container;
-
-    // offset of the mouse cursor within the chit.
-    private int dx;
-    private int dy;
-
-
-    Chit(int cx, int cy, int scale, String imageFilename, 
-        Container myContainer)
-    {
-        selected = false;
-        rect = new Rectangle(cx, cy, scale, scale);
-        image = Toolkit.getDefaultToolkit().getImage(imageFilename);
-        container = myContainer;
-        dx = 0;
-        dy = 0;
-    }
-    
-    public void paint(Graphics g)
-    {
-        g.drawImage(image, rect.x, rect.y, container);
-    }
-
-    boolean select(Point point)
-    {
-        if (rect.contains(point))
-        {
-            selected = true;
-            dx = point.x - rect.x;
-            dy = point.y - rect.y;
-        }
-        else
-        {
-            selected = false;
-        }
-        return selected;
-    }
-
-    void setLocation(Point point)
-    {
-        point.x -= dx;
-        point.y -= dy;
-        rect.setLocation(point);
-    }
-
-    public Rectangle getBounds()
-    {
-        return rect;
-    }
-
-}
-
