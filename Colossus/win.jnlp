@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+     <!-- JNLP File for Colossus local testing -->
+     <!-- TODO Find a way to make the codebase path relative -->
+     <jnlp
+       codebase="file:///c:/src/Colossus/test"
+       href="win.jnlp">
+       <application-desc main-class="net.sf.colossus.server.Start"/>
+       <information>
+         <title>Colossus</title>
+         <vendor>David Ripton</vendor>
+         <icon href="Colossus.gif"/>
+         <offline-allowed/>
+         <homepage href="index.html"/>
+       </information>
+       <resources>
+         <jar href="Colossus.jar"/>
+         <jar href="libs/batik-awt-util.jar"/>
+         <jar href="libs/batik-bridge.jar"/>
+         <jar href="libs/batik-css.jar"/>
+         <jar href="libs/batik-dom.jar"/>
+         <jar href="libs/batik-ext.jar"/>
+         <jar href="libs/batik-gvt.jar"/>
+         <jar href="libs/batik-parser.jar"/>
+         <jar href="libs/batik-script.jar"/>
+         <jar href="libs/batik-svg-dom.jar"/>
+         <jar href="libs/batik-transcoder.jar"/>
+         <jar href="libs/batik-util.jar"/>
+         <jar href="libs/batik-xml.jar"/>
+         <j2se version="1.4+" max-heap-size="128M"/>
+       </resources>
+       <security>
+           <all-permissions/>
+       </security>
+     </jnlp>

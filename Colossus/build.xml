@@ -69,7 +69,6 @@
 <target name="cleanjars" depends=""
         description = "Delete stale jar files">
         <delete verbose="yes" quiet = "yes" file = "Colossus.jar"/>
-        <delete verbose="yes" quiet = "yes" file = "test/Colossus.jar"/>
         <delete verbose="yes" quiet = "yes" file = "BattlelandsBuilder.jar"/>
         <delete verbose="yes" quiet = "yes" file = "BattlelandsRandomizer.jar"/>
 </target>
@@ -344,7 +343,6 @@
                  storepass="${env.JARPASSWORD}"
         />
         <chmod file="Colossus.jar" perm="755"/>
-        <copy file="Colossus.jar" todir="test"/>
 </target>
 
 
@@ -371,7 +369,6 @@
                  *properties*,
                  BattlelandsRandomizer.jar,
                  .*,
-                 test/*.jar,
                  **/*.ps,
                  **/*.aux,
                  **/*.bbl,
