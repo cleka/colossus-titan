@@ -36,6 +36,41 @@ public class BattlelandRandomizerLoader
 
     Hashtable labels = new Hashtable();
 
+    {
+        int i,j;
+        List al;
+
+        al = new ArrayList();
+        
+        for (i = 1; i <= 4 ; i++)
+            for (j = 2; j <= 3 ; j++)
+                al.add(new address(i,j));
+        al.add(new address(3,1));
+        for (i = 2; i <= 4 ; i++)
+            al.add(new address(i,4));
+        labels.put("inside", al);
+
+        al = new ArrayList();
+
+        for (i = 2; i <= 4 ; i++)
+            al.add(new address(0,i));
+        labels.put("leftdefenseentry", al);
+
+        al = new ArrayList();
+
+        al.add(new address(3,0));
+        for (i = 4; i <= 5 ; i++)
+            al.add(new address(i,1));
+        labels.put("upperdefenseentry", al);
+        
+        al = new ArrayList();
+
+        al.add(new address(5,4));
+        for (i = 3; i <= 4 ; i++)
+            al.add(new address(i,5));
+        labels.put("lowerdefenseentry", al);   
+    }
+
     private class randomTerrain implements Comparable
     {
         private final char terrain;
@@ -231,10 +266,6 @@ TOKEN :
 |   < TERRAINS : "TERRAINS" >
 |   < KEYLABEL : "LABEL" >
 |   < SOMEOF : "SOMEOF" >
-|   < INSIDE : "inside" >
-|   < LEFTDEFENSE : "leftdefense" >
-|   < UPPERDEFENSE : "upperdefense" >
-|   < LOWERDEFENSE : "lowerdefense" >
 }
 
 TOKEN :
@@ -374,40 +405,13 @@ List z_listAddress() :
 |   <OPENPAR> (s = z_label()) <CLOSEPAR> (al = z_listAddress())
     {
         List ll = (List)labels.get(s);
-        Iterator it = ll.iterator();
-        while (it.hasNext())
-            al.add(it.next());
+        if (ll != null)
+        {
+            Iterator it = ll.iterator();
+            while (it.hasNext())
+                al.add(it.next());
+        }
         return al;
-    }
-|   <OPENPAR> <INSIDE> <CLOSEPAR> (al = z_listAddress())
-    { // hard-coded value
-        for (i = 1; i <= 4 ; i++)
-            for (j = 2; j <= 3 ; j++)
-                al.add(new address(i,j));
-        al.add(new address(3,1));
-        for (i = 2; i <= 4 ; i++)
-            al.add(new address(i,4));
-        return(al);
-    }
-|   <OPENPAR> <LEFTDEFENSE> <CLOSEPAR> (al = z_listAddress())
-    { // hard-coded value
-        for (i = 2; i <= 4 ; i++)
-            al.add(new address(0,i));
-        return(al);
-    }
-|   <OPENPAR> <UPPERDEFENSE> <CLOSEPAR> (al = z_listAddress())
-    { // hard-coded value
-        al.add(new address(3,0));
-        for (i = 4; i <= 5 ; i++)
-            al.add(new address(i,1));
-        return(al);
-    }
-|   <OPENPAR> <LOWERDEFENSE> <CLOSEPAR> (al = z_listAddress())
-    { // hard-coded value
-        al.add(new address(5,4));
-        for (i = 3; i <= 4 ; i++)
-            al.add(new address(i,5));
-        return(al);
     }
 |   (ad = z_address()) (al = z_listAddress())
     {

@@ -31,10 +31,6 @@ where
     (<range>,<number>)
     <hex_label>
     (<label>)
-    (inside)
-    (leftdefense)
-    (upperdefense)
-    (lowerdefense)
     SOMEOF(<number>,<list_of_hex>)
 
     where <number> is a number between 0 and 5, and <range> is of the form
@@ -42,10 +38,13 @@ where
     i.e. a range of number between 0 and 5.
     <hex_label> is simply the label displayed on the Battlemap (F4, C3,...)
     <label> is a label defined previously with a LABEL statement (see below)
-    The other four forms are literal (similar to labels)
-    string, and represent everything but the most outside Hex, and the 3
-    lines of 3 hexagons representing the defense entry lines (left,
-    upper-right, and lower-right respectively).
+
+    There are some predefined labels available, including :
+    "inside" representing everything but the most outside Hex
+    "leftdefenseentry", "upperdefenseentry" and "lowerdefenseentry",
+    the 3 lines of 3 hexagons representing the defense entry lines
+    (left, upper-right, and lower-right respectively).
+    
     SOMEOF is a literal string ; result is a list of <number> hexes taken
     randomly from the <list_of_hex> in parameter.
 
