@@ -198,7 +198,7 @@
                           net/sf/colossus/parser/*.class,
                           net/sf/colossus/util/HTMLColor.class"
         />
-        <chmod file="Colossus.jar" perm="755"/>
+        <chmod file="BattlelandsBuilder.jar" perm="755"/>
 </target>
 
 
@@ -236,6 +236,7 @@
                  *Keystore*,
                  *cfg,
                  *properties*,
+                 BattlelandsBuilder.jar,
                  .*"
         />
 </target>
