@@ -1628,6 +1628,10 @@ public final class MasterBoard extends JPanel
     {
         switch (client.getPhase())
         {
+            case Constants.SPLIT:
+                highlightTallLegions();
+                break;
+
             case Constants.MOVE:
                 client.clearRecruitChits();
                 client.setMoverId(null);
