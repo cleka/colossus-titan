@@ -37,9 +37,6 @@ final class SplitLegion extends KDialog implements MouseListener,
     private JPanel newBox;
     private Box buttonBox;
 
-    private Component oldGlue;
-    private Component newGlue;
-
     private int totalChits;
     private int scale;
 
@@ -101,10 +98,11 @@ final class SplitLegion extends KDialog implements MouseListener,
         newBox.add(newMarker);
         newBox.add(Box.createRigidArea(new Dimension(scale / 4, 0)));
 
-        oldGlue = Box.createHorizontalGlue();
-        newGlue = Box.createHorizontalGlue();
-        oldBox.add(oldGlue);
-        newBox.add(newGlue);
+        // Add chit-sized invisible spacers.
+        for (int i = 0; i < totalChits; i++)
+        {
+            newBox.add(Box.createRigidArea(new Dimension(scale, 0)));
+        }
 
         JButton button1 = new JButton("Done");
         button1.setMnemonic(KeyEvent.VK_D);
@@ -137,22 +135,20 @@ final class SplitLegion extends KDialog implements MouseListener,
     }
 
 
-    /** Move a chit to the end of the other line. */
+    /** Move a chit to the end of the other line. */ 
     private void moveChitToOtherLine(java.util.List fromChits, java.util.List
         toChits, Container fromBox, Container toBox, int oldPosition)
     {
-        oldBox.remove(oldGlue);
-        newBox.remove(newGlue);
-
         Chit chit = (Chit)fromChits.remove(oldPosition);
         fromBox.remove(chit);
+        fromBox.add(Box.createRigidArea(new Dimension(scale, 0)));
+
+        toBox.remove(toBox.getComponentCount() - 1);
         toChits.add(chit);
-        toBox.add(chit);
+        // Account for the marker and the spacer.
+        toBox.add(chit, toChits.size() + 1);
 
-        oldBox.add(oldGlue);
-        newBox.add(newGlue);
-
-        //pack();
+        pack();
         repaint();
     }
 
