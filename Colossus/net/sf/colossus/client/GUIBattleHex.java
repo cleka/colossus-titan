@@ -112,9 +112,6 @@ public class GUIBattleHex extends BattleHex
             g2.fill(hexagon);
         }
 
-        if (useOverlay)
-            paintOverlay(g2);
-
         g2.setColor(Color.black);
         g2.draw(hexagon);
 
@@ -139,6 +136,9 @@ public class GUIBattleHex extends BattleHex
                     hexside);
             }
         }
+
+        if (useOverlay)
+            paintOverlay(g2);
 
         // Do not anti-alias text.
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
@@ -405,8 +405,9 @@ public class GUIBattleHex extends BattleHex
                         rectBound.height,
                     map);
         }
+        /* DISABLED ; work but doesn't look nice...
+        Shape oldClip = g.getClip();
         // second, draw the opposite Hex HexSide
-        /* DISABLED
         for (int i = 0; i < 6; i++)
         {
             char op = getOppositeHexside(i);
@@ -417,86 +418,56 @@ public class GUIBattleHex extends BattleHex
                                             new Character(op));
                 if (sideOverlay != null)
                 {
-                    int firstVertex = (i + 3) % 6;
-                    int secondVertex = (firstVertex + 1) % 6;
+                    int firstVertex = i;
+                    int secondVertex = (i + 1) % 6;
                     int sx1 = 0, sx2 = 0, sy1 = 0, sy2 = 0;
                     Rectangle neighborBound = neighbor.getBounds();
                     int dx1 = 0, dx2 = 0, dy1 = 0, dy2 = 0;
                     int sourceWidth, sourceHeight;
                     sourceWidth = sideOverlay.getWidth(map);
                     sourceHeight = sideOverlay.getHeight(map);
-                    switch (firstVertex)
-                    {
-                    case 0:
-                        sx1 = sourceWidth / 4;
-                        sx2 = (3 * sourceWidth) / 4;
-                        sy1 = 0;
-                        sy2 = sourceHeight / 2;
-                        dx1 = (neighborBound.width / 4);
-                        dx2 = ((3 * neighborBound.width) / 4);
-                        dy1 = 0;
-                        dy2 = (neighborBound.height / 2);
-                        break;
-                    case 1:
-                        sx1 = (3 * sourceWidth) / 4;
-                        sx2 = sourceWidth;
-                        sy1 = 0;
-                        sy2 = sourceHeight / 2;
-                        dx1 = ((3 * neighborBound.width) / 4);
-                        dx2 = neighborBound.width;
-                        dy1 = 0;
-                        dy2 = (neighborBound.height / 2);
-                        break;
-                    case 2:
-                        sx1 = (3 * sourceWidth) / 4;
-                        sx2 = sourceWidth;
-                        sy1 = sourceHeight / 2;
-                        sy2 = sourceHeight;
-                        dx1 = ((3 * neighborBound.width) / 4);
-                        dx2 = neighborBound.width;
-                        dy1 = (neighborBound.height / 2);
-                        dy2 = neighborBound.height;
-                        break;
-                    case 3:
-                        sx1 = sourceWidth / 4;
-                        sx2 = (3 * sourceWidth) / 4;
-                        sy1 = sourceHeight / 2;
-                        sy2 = sourceHeight;
-                        dx1 = (neighborBound.width / 4);
-                        dx2 = ((3 * neighborBound.width) / 4);
-                        dy1 = (neighborBound.height / 2);
-                        dy2 = neighborBound.height;
-                        break;
-                    case 4:
-                        sx1 = 0;
-                        sx2 = sourceWidth / 4;
-                        sy1 = sourceHeight / 2;
-                        sy2 = sourceHeight;
-                        dx1 = 0;
-                        dx2 = (neighborBound.width / 4);
-                        dy1 = (neighborBound.height / 2);
-                        dy2 = neighborBound.height;
-                        break;
-                    case 5:
-                        sx1 = 0;
-                        sx2 = sourceWidth / 4;
-                        sy1 = 0;
-                        sy2 = sourceHeight / 2;
-                        dx1 = 0;
-                        dx2 = (neighborBound.width / 4);
-                        dy1 = 0;
-                        dy2 = (neighborBound.height / 2);
-                        break;
-                    }
-                    // make it bigger
-                    // dx1 = (int)((double)dx1 * 1.14814814814814814814);
-                    // dx2 = (int)((double)dx2 * 1.14814814814814814814);
-                    // dy1 = (int)((double)dy1 * 1.17021276595744680851);
-                    // dy2 = (int)((double)dy2 * 1.17021276595744680851);
-                    // dx1 += neighborBound.x;
-                    dx2 += neighborBound.x;
-                    dy1 += neighborBound.y;
-                    dy2 += neighborBound.y;
+
+                    GeneralPath myClip = new GeneralPath();
+                    float xm;
+                    float ym;
+                    xm = (float)findCenter2D().x;
+                    ym = (float)findCenter2D().y;
+                    myClip.moveTo(xm, ym);
+                    float xi,yi;
+                    xi = (float)xVertex[firstVertex];
+                    yi = (float)yVertex[firstVertex];
+                    myClip.lineTo(xi,yi);
+                    xi = (float)xVertex[secondVertex];
+                    yi = (float)yVertex[secondVertex];
+                    myClip.lineTo(xi,yi);
+                    myClip.lineTo(xm,ym);
+                    g.setClip(null);
+                    g.clip(myClip);
+
+                    sx1 = 0;
+                    sy1 = 0;
+                    sx2 = sideOverlay.getWidth(map);
+                    sy2 = sideOverlay.getHeight(map);
+
+                    xm = (float)neighbor.findCenter2D().x;
+                    ym = (float)neighbor.findCenter2D().y;
+                    xi = (float)neighbor.xVertex[5] - xm;
+                    yi = (float)neighbor.yVertex[0] - ym;
+                    xi *= 1.2; //1.14814814814814814814;
+                    yi *= 1.2; //1.17021276595744680851;
+                    xi += xm;
+                    yi += ym;
+                    dx1 = (int)xi;
+                    dy1 = (int)yi;
+                    xi = (float)neighbor.xVertex[2] - xm;
+                    yi = (float)neighbor.yVertex[3] - ym;
+                    xi *= 1.2; //1.14814814814814814814;
+                    yi *= 1.2; //1.17021276595744680851;
+                    xi += xm;
+                    yi += ym;
+                    dx2 = (int)xi;
+                    dy2 = (int)yi;
+                    
                     g.drawImage(sideOverlay,
                                 dx1, dy1, dx2, dy2,
                                 sx1, sy1, sx2, sy2,
@@ -504,6 +475,7 @@ public class GUIBattleHex extends BattleHex
                 }
             }
         }
+        g.setClip(oldClip);
         */
     }
 }
