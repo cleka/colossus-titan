@@ -598,7 +598,7 @@ public class SimpleAI implements AI
             }
             else
             {
-                splitoffs.add(Creature.getCreatureByName("Angel"));
+                splitoffs.add(Creature.getCreatureByName(Game.getPrimaryAcquirable()));
                 splitoffs.add(nonsplitCreature);
                 splitoffs.add(nonsplitCreature);
                 splitoffs.add(splitCreature);
@@ -612,7 +612,7 @@ public class SimpleAI implements AI
             }
             else
             {
-                splitoffs.add(Creature.getCreatureByName("Angel"));
+                splitoffs.add(Creature.getCreatureByName(Game.getPrimaryAcquirable()));
             }
 
             if (Game.rollDie() <= 3)
@@ -651,7 +651,7 @@ public class SimpleAI implements AI
             }
             else
             {
-                splitoffs.add(Creature.getCreatureByName("Angel"));
+                splitoffs.add(Creature.getCreatureByName(Game.getPrimaryAcquirable()));
                 splitoffs.add(splitCreature);
                 splitoffs.add(splitCreature);
                 splitoffs.add(startCre[1]);
@@ -665,7 +665,7 @@ public class SimpleAI implements AI
             }
             else
             {
-                splitoffs.add(Creature.getCreatureByName("Angel"));
+                splitoffs.add(Creature.getCreatureByName(Game.getPrimaryAcquirable()));
             }
 
             if (Game.rollDie() <= 3)
