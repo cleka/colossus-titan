@@ -38,11 +38,11 @@ class Turn extends Dialog implements ActionListener
         add(button1);
         button1.addActionListener(this);
 
+        pack();
+
         // Place this window in the upper right corner.
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
         setLocation(new Point(d.width - getSize().width, 0));
-
-        pack();
     }
 
 
@@ -79,11 +79,11 @@ class Turn extends Dialog implements ActionListener
         add(button3);
         button3.addActionListener(this);
            
+        pack();
+
         // Place this window in the upper right corner.
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
         setLocation(new Point(d.width - getSize().width, 0));
-
-        pack();
     }
 
     
