@@ -1,24 +1,3 @@
-Bug: 20020405 Hang in AI split phase, playing Abyssal6 5 AIs on one machine,
-   one network player on another, both Win98.
-From client Gold: strike ~ 70 ~ C4
-Lion in D5 strikes Cyclops in Drift (1) hex C4 with strike number 3 : 23443: 4 hits
-Called ai.strike() for Gd01
-Best target is null, aborting
-From client Gold: doneWithStrikes
-Green earns 99.0 points
-Legion Gd01 (Caduceus) is eliminated
-From client Green: acquireAngel ~ Gr01 ~ Angel
-Legion Gr01 (Cauldron) acquires one Angel
-in kickEngagements() summoning=false reinforcing=false acquiring=false
-Called Game.findEngagements()
-0 engagements left
-Called Game.findEngagements()
-Phase advances to Muster
-Blue's turn, number 5
-Green earns 48.0 points
-Legion Gd02 (Claw) [Angel, Cyclops, Gargoyle, Gargoyle, Ogre, Cyclops] is eliminated
-From client Blue: doSplit ~ Bu02 ~ Bu01 ~ ,Gargoyle,Gargoyle
-
 Bug: Chat window went modal and started beeping.  Killing it from the
    Graphics menu worked.
 
@@ -55,7 +34,14 @@ Bug: Got two "All humans eliminated" dialogs -- one for human and one
 
 Bug: LOSTest is failing.
 
+When saving game explicitly (not with autosave), log the event
+   and the full savegame path.
+
 Disable "AIs stop when humans dead" if no human players at start of game.
+
+Should be able to move recruit chart behind board, map.
+
+AI needs to better avoid drift hexes.
 
 Add link from client to LogWindow; advance scroll thumb at end of various
    phases. 
@@ -90,8 +76,6 @@ Cleanup network shutdown -- when game over or player eliminated, don't
 Set Client movementRoll when loading during movement phase after roll.
 Set which legions have recruited when loading during recruit phase.
 
-Use SF project releases.
-
 Change Quit button in GetPlayers dialog to Cancel.  Go back to existing 
    game if there is one from Cancel, or quit if just starting.  Eliminate
    confirmation before calling dialog.
@@ -107,6 +91,7 @@ Add UI for players to specify favorite colors.
 
 Put old, new web pages under CVS.
 Switch to new XWeb web page.
+Use SF project releases.
 
 Include a Colossus.ico file for Windows.
 
