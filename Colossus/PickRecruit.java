@@ -360,18 +360,24 @@ System.out.println("numEligible is " + numEligible);
         }
 
         // Check for availability of chits.
+        int count = 0;
+
         for (int i = 0; i < recruits.length; i++)
         {
             if (recruits[i] != null && recruits[i].getCount() < 1)
             {
                 recruits[i] = null;
             }
+            if (recruits[i] != null)
+            {
+                count++;
+            }
         }
 
         // Pack the recruits array for display.
-        for (int i = 0, k = 0; i < recruits.length - 1; i++)
+        for (int i = 0; i < count; i++)
         {
-            while (recruits[i] == null && k < recruits.length)
+            while (recruits[i] == null)
             {
                 for (int j = i; j < recruits.length - 1; j++)
                 {
@@ -381,14 +387,6 @@ System.out.println("numEligible is " + numEligible);
             }
         }
 
-        int count = 0;
-        for (int i = 0; i < recruits.length; i++)
-        {
-            if (recruits[i] != null)
-            {
-                count++;
-            }
-        }
         return count;
     }
 
