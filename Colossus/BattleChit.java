@@ -380,6 +380,7 @@ class BattleChit extends Chit
         }
         target.setHits(totalDamage);
         target.checkForDeath();
+        target.repaint();
 
         // XXX: Let the attacker choose whether to carry, if applicable.
         if (carryPossible && carry > 0)
@@ -389,5 +390,44 @@ class BattleChit extends Chit
 
         // Record that this attacker has struck.
         struck = true;
+    }
+
+
+    public void paint(Graphics g)
+    {
+        super.paint(g);
+
+        if (hits > 0 && !isDead())
+        {
+            String sHits = Integer.toString(hits);
+            Rectangle rect = getBounds();
+
+            // Construct a font 3 times the size of the current font.
+            Font oldFont = g.getFont();
+            String name = oldFont.getName();
+            int size = oldFont.getSize();
+            int style = oldFont.getStyle();
+            Font font = new Font(name, style, 3 * size);
+            g.setFont(font);
+
+            FontMetrics fontMetrics = g.getFontMetrics();
+            int fontHeight = fontMetrics.getAscent();
+            int fontWidth = fontMetrics.stringWidth(sHits);
+
+            // Provide a high-contrast background for the number.
+            g.setColor(java.awt.Color.white);
+            g.fillRect(rect.x + (rect.width - fontWidth) / 2, 
+                rect.y + (rect.height - fontHeight) / 2,
+                fontWidth, fontHeight);
+
+            // Show number of hits taken in red.
+            g.setColor(java.awt.Color.red);
+
+            g.drawString(sHits, rect.x + (rect.width - fontWidth) / 2,
+                rect.y + (rect.height + fontHeight) / 2);
+
+            // Restore the font.
+            g.setFont(oldFont);
+        }
     }
 }
