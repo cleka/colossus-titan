@@ -57,16 +57,6 @@ class BattleChit extends Chit
     }
 
 
-    void checkForDeath()
-    {
-        if (hits >= creature.getPower())
-        {
-            setDead(true);
-            currentHex.repaint();
-        }
-    }
-
-
     public int getPower()
     {
         if (creature == Creature.titan)
@@ -76,6 +66,16 @@ class BattleChit extends Chit
         else
         {
             return creature.getPower();
+        }
+    }
+
+
+    void checkForDeath()
+    {
+        if (hits >= getPower())
+        {
+            setDead(true);
+            currentHex.repaint();
         }
     }
 
