@@ -66,6 +66,7 @@ class MasterBoard extends JFrame implements MouseListener,
         contentPane.setLayout(null);
         setSize(getPreferredSize());
         setBackground(java.awt.Color.black);
+
         addWindowListener(this);
         addMouseListener(this);
         addMouseMotionListener(this);
@@ -1124,6 +1125,13 @@ System.out.println("MasterBoard.finishSummoningAngel");
                 }
             }
         }
+    }
+
+
+    // This is a place-holder function, until the JDK adds the required
+    // functionality.  (It's supposed to be in JDK 1.2beta4.1) 
+    void deiconify()
+    {
     }
 
 
