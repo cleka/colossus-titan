@@ -14,7 +14,7 @@ import java.util.*;
  */
 
 
-public final class AcquireAngel extends JDialog implements MouseListener,
+final class AcquireAngel extends JDialog implements MouseListener,
     WindowListener
 {
     private ArrayList chits = new ArrayList();
@@ -37,7 +37,7 @@ public final class AcquireAngel extends JDialog implements MouseListener,
 
         pack();
         setBackground(Color.lightGray);
-        setResizable(false);
+        //setResizable(false);
 
         Iterator it = recruits.iterator();
         while (it.hasNext())
@@ -60,7 +60,7 @@ public final class AcquireAngel extends JDialog implements MouseListener,
     }
 
 
-    public static String acquireAngel(JFrame parentFrame, String name,
+    static String acquireAngel(JFrame parentFrame, String name,
         ArrayList recruits)
     {
         recruit = null;

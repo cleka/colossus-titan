@@ -12,7 +12,7 @@ import javax.swing.event.*;
  *  @author David Ripton
  */
 
-public final class PickScale extends JDialog implements WindowListener,
+final class PickScale extends JDialog implements WindowListener,
     ChangeListener, ActionListener
 {
     private static int newScale;
@@ -63,7 +63,7 @@ public final class PickScale extends JDialog implements WindowListener,
 
     /** Return the new scale if the user accepted it, or -1 if the
      *  user cancelled the dialog. */
-    public static int pickScale(JFrame parentFrame, int oldScale)
+    static int pickScale(JFrame parentFrame, int oldScale)
     {
         new PickScale(parentFrame, oldScale);
         return newScale;

@@ -16,7 +16,7 @@ import net.sf.colossus.client.HexMap;
  * @author David Ripton
  */
 
-public final class Critter extends Creature implements Comparable
+final class Critter extends Creature implements Comparable
 {
     private boolean visible;
     private Creature creature;
@@ -34,8 +34,7 @@ public final class Critter extends Creature implements Comparable
     private static int tagCounter = -1;
 
 
-    public Critter(Creature creature, boolean visible, String markerId,
-        Game game)
+    Critter(Creature creature, boolean visible, String markerId, Game game)
     {
         super(creature);
 
@@ -48,7 +47,7 @@ public final class Critter extends Creature implements Comparable
 
 
     /** Deep copy for AI. */
-    public Critter AICopy(Game game)
+    Critter AICopy(Game game)
     {
         Critter newCritter = new Critter(creature, visible, markerId, game);
 
@@ -63,7 +62,7 @@ public final class Critter extends Creature implements Comparable
     }
 
 
-    public void addBattleInfo(String currentHexLabel, String startingHexLabel,
+    void addBattleInfo(String currentHexLabel, String startingHexLabel,
         Battle battle)
     {
         this.currentHexLabel = currentHexLabel;
@@ -71,47 +70,47 @@ public final class Critter extends Creature implements Comparable
         this.battle = battle;
     }
 
-    public void setGame(Game game)
+    void setGame(Game game)
     {
         this.game = game;
     }
 
-    public boolean isVisible()
+    boolean isVisible()
     {
         return visible;
     }
 
-    public void setVisible(boolean visible)
+    void setVisible(boolean visible)
     {
         this.visible = visible;
     }
 
-    public Creature getCreature()
+    Creature getCreature()
     {
         return creature;
     }
 
-    public String getMarkerId()
+    String getMarkerId()
     {
         return markerId;
     }
 
-    public void setMarkerId(String markerId)
+    void setMarkerId(String markerId)
     {
         this.markerId = markerId;
     }
 
-    public Legion getLegion()
+    Legion getLegion()
     {
         return game.getLegionByMarkerId(markerId);
     }
 
-    public Player getPlayer()
+    Player getPlayer()
     {
         return game.getPlayerByMarkerId(markerId);
     }
 
-    public String getPlayerName()
+    String getPlayerName()
     {
         return game.getPlayerByMarkerId(markerId).getName();
     }
@@ -138,7 +137,7 @@ public final class Critter extends Creature implements Comparable
     }
 
 
-    public String getDescription()
+    String getDescription()
     {
         return getName() + " in " + getCurrentHex().getDescription();
     }
@@ -163,26 +162,26 @@ public final class Critter extends Creature implements Comparable
     }
 
 
-    public int getHits()
+    int getHits()
     {
         return hits;
     }
 
 
-    public void setHits(int hits)
+    void setHits(int hits)
     {
         this.hits = hits;
         battle.getGame().getServer().allSetBattleChitHits(tag, hits);
     }
 
 
-    public void heal()
+    void heal()
     {
         hits = 0;
     }
 
 
-    public boolean wouldDieFrom(int hits)
+    boolean wouldDieFrom(int hits)
     {
         return (hits + getHits() > getPower());
     }
@@ -190,7 +189,7 @@ public final class Critter extends Creature implements Comparable
 
     /** Apply damage to this critter.  Return the amount of excess damage
      *  done, which may sometimes carry to another target. */
-    public int wound(int damage)
+    int wound(int damage)
     {
         int excess = 0;
 
@@ -216,61 +215,56 @@ public final class Critter extends Creature implements Comparable
     }
 
 
-    public boolean hasMoved()
+    boolean hasMoved()
     {
         return (!currentHexLabel.equals(startingHexLabel));
     }
 
 
-    public void commitMove()
+    void commitMove()
     {
         startingHexLabel = currentHexLabel;
     }
 
 
-    public boolean hasStruck()
+    boolean hasStruck()
     {
         return struck;
     }
 
 
-    public void setStruck(boolean struck)
+    void setStruck(boolean struck)
     {
         this.struck = struck;
     }
 
 
-    public BattleHex getCurrentHex()
+    BattleHex getCurrentHex()
     {
         return HexMap.getHexByLabel(battle.getTerrain(), currentHexLabel);
     }
 
-
-    public BattleHex getStartingHex()
+    BattleHex getStartingHex()
     {
         return HexMap.getHexByLabel(battle.getTerrain(), startingHexLabel);
     }
 
-
-    public String getCurrentHexLabel()
+    String getCurrentHexLabel()
     {
         return currentHexLabel;
     }
 
-
-    public void setCurrentHexLabel(String label)
+    void setCurrentHexLabel(String label)
     {
         this.currentHexLabel = label;
     }
 
-
-    public String getStartingHexLabel()
+    String getStartingHexLabel()
     {
         return startingHexLabel;
     }
 
-
-    public void setStartingHexLabel(String label)
+    void setStartingHexLabel(String label)
     {
         this.startingHexLabel = label;
     }
@@ -278,7 +272,7 @@ public final class Critter extends Creature implements Comparable
 
     /** Return the number of enemy creatures in contact with this critter.
      *  Dead critters count as being in contact only if countDead is true. */
-    public int numInContact(boolean countDead)
+    int numInContact(boolean countDead)
     {
         BattleHex hex = getCurrentHex();
 
@@ -313,7 +307,7 @@ public final class Critter extends Creature implements Comparable
 
     /** Return the number of friendly creatures adjacent to this critter.
      *  Dead critters do not count. */
-    public int numAdjacentAllies()
+    int numAdjacentAllies()
     {
         BattleHex hex = getCurrentHex();
         // Offboard creatures are not in contact.
@@ -341,7 +335,7 @@ public final class Critter extends Creature implements Comparable
 
     /** Return true if there are any enemies adjacent to this critter.
      *  Dead critters count as being in contact only if countDead is true. */
-    public boolean isInContact(boolean countDead)
+    boolean isInContact(boolean countDead)
     {
         BattleHex hex = getCurrentHex();
 
@@ -376,7 +370,7 @@ public final class Critter extends Creature implements Comparable
 
     /** Most code should use Battle.doMove() instead, since it checks
      *  for legality and logs the move. */
-    public void moveToHex(String hexLabel)
+    void moveToHex(String hexLabel)
     {
         currentHexLabel = hexLabel;
         game.getServer().pushUndoStack(getPlayerName(), currentHexLabel);
@@ -387,7 +381,7 @@ public final class Critter extends Creature implements Comparable
     }
 
 
-    public void undoMove()
+    void undoMove()
     {
         String formerHexLabel = currentHexLabel;
         currentHexLabel = startingHexLabel;
@@ -400,7 +394,7 @@ public final class Critter extends Creature implements Comparable
     }
 
 
-    public boolean canStrike(Critter target)
+    boolean canStrike(Critter target)
     {
         String hexLabel = target.getCurrentHexLabel();
         return battle.findStrikes(this, true).contains(hexLabel);
@@ -409,7 +403,7 @@ public final class Critter extends Creature implements Comparable
 
     /** Return the number of dice that will be rolled when striking this
      *  target, including modifications for terrain. */
-    public int getDice(Critter target)
+    int getDice(Critter target)
     {
         BattleHex hex = getCurrentHex();
         BattleHex targetHex = target.getCurrentHex();
@@ -544,7 +538,7 @@ public final class Critter extends Creature implements Comparable
     }
 
 
-    public int getStrikeNumber(Critter target)
+    int getStrikeNumber(Critter target)
     {
         boolean rangestrike = !isInContact(true);
 
@@ -616,7 +610,7 @@ public final class Critter extends Creature implements Comparable
 
     /** Return true if there's any chance that this critter could take
      *  a strike penalty to carry when striking target. */
-    public boolean possibleStrikePenalty(Critter target)
+    boolean possibleStrikePenalty(Critter target)
     {
         BattleHex hex = getCurrentHex();
         BattleHex targetHex = target.getCurrentHex();
@@ -676,7 +670,7 @@ public final class Critter extends Creature implements Comparable
     /** Calculate number of dice and strike number needed to hit target,
      *  and whether any carries are possible.  Roll the dice and apply
      *  damage.  Highlight legal carry targets. */
-    public void strike(Critter target, boolean rollFakeDice)
+    void strike(Critter target, boolean rollFakeDice)
     {
         // Sanity check
         if (target.getPlayer() == getPlayer())
@@ -894,13 +888,12 @@ public final class Critter extends Creature implements Comparable
     }
 
 
-    public boolean isDead()
+    boolean isDead()
     {
         return (getHits() >= getPower());
     }
 
-
-    public void setDead(boolean dead)
+    void setDead(boolean dead)
     {
         if (dead)
         {

@@ -18,7 +18,7 @@ import images.ResourceAnchor;
  * @author David Ripton
  */
 
-public class Chit extends JPanel
+class Chit extends JPanel
 {
     private ImageIcon icon;
     private Rectangle rect;
@@ -46,7 +46,7 @@ public class Chit extends JPanel
     private static BasicStroke threeWide = new BasicStroke(3);
 
 
-    public Chit(int scale, String id, Container container)
+    Chit(int scale, String id, Container container)
     {
         super();
         Point point = getLocation();

@@ -14,7 +14,7 @@ import net.sf.colossus.server.Constants;
  * @author David Ripton
  */
 
-public final class GUIMasterHex extends MasterHex
+final class GUIMasterHex extends MasterHex
 {
     private boolean inverted;
     private FontMetrics fontMetrics;
@@ -47,13 +47,12 @@ public final class GUIMasterHex extends MasterHex
     // Use two-stage initialization so that we can clone the GUIMasterHex
     // from an existing MasterHex, then add the GUI info.
 
-    public GUIMasterHex()
+    GUIMasterHex()
     {
         super();
     }
 
-    public void init(int cx, int cy, int scale, boolean inverted,
-        MasterBoard board)
+    void init(int cx, int cy, int scale, boolean inverted, MasterBoard board)
     {
         this.inverted = inverted;
         this.board = board;
@@ -167,10 +166,10 @@ public final class GUIMasterHex extends MasterHex
             // hexside inside the hexside, and the outer edge is 1/12 of a
             // hexside outside the hexside.
 
-            if (exitType[i] != Constants.NONE)
+            if (getExitType(i) != Constants.NONE)
             {
                 drawGate(g2, xVertex[i], yVertex[i], xVertex[n], yVertex[n],
-                                exitType[i]);
+                    getExitType(i));
             }
 
             // Draw entrances
@@ -178,10 +177,10 @@ public final class GUIMasterHex extends MasterHex
             // they sometimes get overdrawn.  So we need to draw them
             // again from the other hex, as entrances.
 
-            if (entranceType[i] != Constants.NONE)
+            if (getEntranceType(i) != Constants.NONE)
             {
                 drawGate(g2, xVertex[n], yVertex[n], xVertex[i], yVertex[i],
-                                entranceType[i]);
+                    getEntranceType(i));
             }
         }
 
@@ -413,13 +412,13 @@ public final class GUIMasterHex extends MasterHex
 
     /** Return a point near the center of the hex, vertically offset
      *  a bit toward the fat side. */
-    public Point getOffCenter()
+    Point getOffCenter()
     {
         return offCenter;
     }
 
 
-    public boolean isInverted()
+    boolean isInverted()
     {
         return inverted;
     }

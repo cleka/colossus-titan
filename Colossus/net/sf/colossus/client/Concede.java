@@ -13,7 +13,7 @@ import java.util.*;
  * @author David Ripton
  */
 
-public final class Concede extends JDialog implements ActionListener
+final class Concede extends JDialog implements ActionListener
 {
     private JFrame parentFrame;
     private boolean flee;
@@ -42,7 +42,7 @@ public final class Concede extends JDialog implements ActionListener
         pack();
 
         setBackground(Color.lightGray);
-        setResizable(false);
+        //setResizable(false);
 
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
         int scale = 4 * Scale.get();
@@ -130,7 +130,7 @@ public final class Concede extends JDialog implements ActionListener
 
 
     /** Return true if the player concedes. */
-    public static boolean concede(Client client, JFrame parentFrame,
+    static boolean concede(Client client, JFrame parentFrame,
         String longMarkerName, String hexDescription, String allyImageName, 
         java.util.List allyImageNames, String enemyImageName, 
         java.util.List enemyImageNames)
@@ -144,7 +144,7 @@ public final class Concede extends JDialog implements ActionListener
 
 
     /** Return true if the player flees. */
-    public static boolean flee(Client client, JFrame parentFrame,
+    static boolean flee(Client client, JFrame parentFrame,
         String longMarkerName, String hexDescription, String allyImageName, 
         java.util.List allyImageNames, String enemyImageName, 
         java.util.List enemyImageNames)
@@ -157,13 +157,13 @@ public final class Concede extends JDialog implements ActionListener
     }
 
 
-    public static void saveLocation(Point point)
+    static void saveLocation(Point point)
     {
         location = point;
     }
 
 
-    public static Point returnLocation()
+    static Point returnLocation()
     {
         return location;
     }

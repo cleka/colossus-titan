@@ -32,10 +32,10 @@ public final class BattleMap extends HexMap implements MouseListener,
     /** tag of the selected critter, or -1 if no critter is selected. */
     private int selectedCritterTag = -1;
 
-    public static final String undoLast = "Undo Last";
-    public static final String undoAll = "Undo All";
-    public static final String doneWithPhase = "Done";
-    public static final String concedeBattle = "Concede Battle";
+    private static final String undoLast = "Undo Last";
+    private static final String undoAll = "Undo All";
+    private static final String doneWithPhase = "Done";
+    private static final String concedeBattle = "Concede Battle";
 
     private AbstractAction undoLastAction;
     private AbstractAction undoAllAction;
@@ -44,7 +44,7 @@ public final class BattleMap extends HexMap implements MouseListener,
 
 
 
-    public BattleMap(Client client, String masterHexLabel)
+    BattleMap(Client client, String masterHexLabel)
     {
         super(masterHexLabel);
 
@@ -87,14 +87,14 @@ public final class BattleMap extends HexMap implements MouseListener,
 
 
     // Simple constructor for testing and AICopy()
-    public BattleMap(String masterHexLabel)
+    BattleMap(String masterHexLabel)
     {
         super(masterHexLabel);
         setupEntrances();
     }
 
 
-    public BattleMap AICopy(String masterHexLabel)
+    BattleMap AICopy(String masterHexLabel)
     {
         BattleMap newMap = new BattleMap(masterHexLabel);
         return newMap;

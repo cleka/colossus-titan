@@ -13,7 +13,7 @@ import javax.swing.*;
  * @author David Ripton
  */
 
-public final class SplitLegion extends JDialog implements MouseListener,
+final class SplitLegion extends JDialog implements MouseListener,
     ActionListener, WindowListener
 {
     private ArrayList oldChits = new ArrayList(8);
@@ -52,7 +52,7 @@ public final class SplitLegion extends JDialog implements MouseListener,
         setBackground(Color.lightGray);
 
         // We get graphical glitches in Solaris if we don't allow resizing.
-        setResizable(true);
+        //setResizable(true);
 
         addMouseListener(this);
         addWindowListener(this);

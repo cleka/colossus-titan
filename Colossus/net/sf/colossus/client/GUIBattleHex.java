@@ -12,7 +12,7 @@ import java.awt.geom.*;
  * @author David Ripton
  */
 
-public final class GUIBattleHex extends BattleHex
+final class GUIBattleHex extends BattleHex
 {
     private HexMap map;
     private String name;
@@ -32,8 +32,7 @@ public final class GUIBattleHex extends BattleHex
     // Letters increase left to right; numbers increase bottom to top.
 
 
-    public GUIBattleHex(int cx, int cy, int scale, HexMap map, int xCoord,
-        int yCoord)
+    GUIBattleHex(int cx, int cy, int scale, HexMap map, int xCoord, int yCoord)
     {
         super(xCoord, yCoord);
 
@@ -167,7 +166,7 @@ public final class GUIBattleHex extends BattleHex
     }
 
 
-    public void drawHexside(Graphics2D g2, double vx1, double vy1, double vx2,
+    void drawHexside(Graphics2D g2, double vx1, double vy1, double vx2,
         double vy2, char hexsideType)
     {
         double x0;                     // first focus point

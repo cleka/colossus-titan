@@ -19,7 +19,7 @@ import net.sf.colossus.util.Log;
  */
 
 
-public final class Caretaker implements Cloneable
+final class Caretaker implements Cloneable
 {
     /**
      * mapping from String creature name to Integer count.  If the
@@ -31,13 +31,13 @@ public final class Caretaker implements Cloneable
     // XXX Temporary?  We need a Game reference for callback events.
     private Game game;
 
-    public Caretaker(Game game)
+    Caretaker(Game game)
     {
         this.game = game;
     }
 
 
-    public int getCount(String strCreatureName)
+    int getCount(String strCreatureName)
     {
         Integer count = (Integer) map.get(strCreatureName);
         if (count == null)
@@ -47,29 +47,29 @@ public final class Caretaker implements Cloneable
         return count.intValue();
     }
 
-    public int getCount(Creature creature)
+    int getCount(Creature creature)
     {
         return getCount(creature.getName());
     }
 
-    protected void setCount(String strCreatureName, int count)
+    void setCount(String strCreatureName, int count)
     {
         map.put(strCreatureName, new Integer(count)); 
         updateDisplays();
     }
 
-    public void setCount(Creature creature, int count)
+    void setCount(Creature creature, int count)
     {
         setCount(creature.getName(), count);
     }
 
-    public void resetAllCounts()
+    void resetAllCounts()
     {
         map = new HashMap();
         updateDisplays();
     }
 
-    public void takeOne(Creature creature)
+    void takeOne(Creature creature)
     {
         Integer count = (Integer) map.get(creature.getName());
         if (count == null)
@@ -94,7 +94,7 @@ public final class Caretaker implements Cloneable
         updateDisplays();
     }
 
-    public void putOneBack(Creature creature)
+    void putOneBack(Creature creature)
     {
         Integer count = (Integer)map.get(creature.getName());
         // count can be null if we're testing a battle.
@@ -106,7 +106,7 @@ public final class Caretaker implements Cloneable
         updateDisplays();
     }
 
-    public void updateDisplays()
+    void updateDisplays()
     {
         if (game != null)
         {
@@ -121,9 +121,9 @@ public final class Caretaker implements Cloneable
     /**
      * deep copy for AI
      */
-    public Caretaker AICopy()
+    Caretaker AICopy()
     {
-        return (Caretaker) clone();
+        return (Caretaker)clone();
     }
 
     // ---------------------------------

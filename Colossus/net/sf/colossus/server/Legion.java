@@ -16,7 +16,7 @@ import net.sf.colossus.client.MasterHex;
  * @author David Ripton
  */
 
-public final class Legion implements Comparable
+final class Legion implements Comparable
 {
     private String markerId;    // Bk03, Rd12, etc.
     private String parentId;
@@ -115,11 +115,11 @@ public final class Legion implements Comparable
     }
 
     /**
-     * TMJF sez: these are public but I think they are only for
+     * TMJF sez: these are but I think they are only for
      * testing purposes
      */
 
-    public Legion(String markerId, String parentId, String currentHexLabel,
+    Legion(String markerId, String parentId, String currentHexLabel,
         String startingHexLabel, Creature creature0, Creature creature1,
         Creature creature2, Creature creature3, Creature creature4,
         Creature creature5, Creature creature6, Creature creature7,
@@ -175,7 +175,7 @@ public final class Legion implements Comparable
 
 
     //* For AICopy() */
-    public Legion(String markerId, String parentId, String currentHexLabel,
+    Legion(String markerId, String parentId, String currentHexLabel,
         String startingHexLabel, ArrayList critters, String playerName,
         Game game)
     {
@@ -210,7 +210,7 @@ public final class Legion implements Comparable
         }
     }
 
-    public static Legion getStartingLegion(String markerId, String hexLabel,
+    static Legion getStartingLegion(String markerId, String hexLabel,
         String playerName, Game game)
     {
         Creature[] startCre = game.getStartingCreatures();
@@ -229,7 +229,7 @@ public final class Legion implements Comparable
     }
 
 
-    public static Legion getEmptyLegion(String markerId, String parentId,
+    static Legion getEmptyLegion(String markerId, String parentId,
         String hexLabel, String playerName, Game game)
     {
         Legion oLegion =
@@ -241,7 +241,7 @@ public final class Legion implements Comparable
 
 
     /** deep copy for AI */
-    public Legion AICopy(Game game)
+    Legion AICopy(Game game)
     {
         Legion newLegion = new Legion(markerId, parentId, currentHexLabel,
             startingHexLabel, critters, playerName, game);
@@ -266,13 +266,13 @@ public final class Legion implements Comparable
 
     // We could remove this method, and have the various dialogs
     // that use it take game as an argument.
-    public Game getGame()
+    Game getGame()
     {
         return game;
     }
 
 
-    public int getPointValue()
+    int getPointValue()
     {
         int pointValue = 0;
         Iterator it = critters.iterator();
@@ -285,7 +285,7 @@ public final class Legion implements Comparable
     }
 
 
-    public void addPoints(int points)
+    void addPoints(int points)
     {
         if (game == null)
         {
@@ -345,19 +345,19 @@ public final class Legion implements Comparable
     }
 
 
-    public int getBattleTally()
+    int getBattleTally()
     {
         return battleTally;
     }
 
 
-    public void clearBattleTally()
+    void clearBattleTally()
     {
         battleTally = 0;
     }
 
 
-    public void clearBattleInfo()
+    void clearBattleInfo()
     {
         clearBattleTally();
 
@@ -371,32 +371,32 @@ public final class Legion implements Comparable
     }
 
 
-    public void addToBattleTally(int points)
+    void addToBattleTally(int points)
     {
         battleTally += points;
     }
 
 
-    public void addBattleTallyToPoints()
+    void addBattleTallyToPoints()
     {
         addPoints(battleTally);
         clearBattleTally();
     }
 
 
-    public String getMarkerId()
+    String getMarkerId()
     {
         return markerId;
     }
 
 
-    public String getMarkerName()
+    String getMarkerName()
     {
         return (String)markerNames.get(markerId);
     }
 
 
-    public String getLongMarkerName()
+    String getLongMarkerName()
     {
         StringBuffer sb = new StringBuffer(markerId);
         sb.append(" (");
@@ -406,13 +406,13 @@ public final class Legion implements Comparable
     }
 
 
-    public String getParentId()
+    String getParentId()
     {
         return parentId;
     }
 
 
-    public Legion getParent()
+    Legion getParent()
     {
         return getPlayer().getLegionByMarkerId(parentId);
     }
@@ -428,7 +428,7 @@ public final class Legion implements Comparable
      *  Unless showAll is true, return "Unknown" for critters that
      *  are not visible.  Put all the Unknowns at the end of the
      *  list to avoid giving out too much information. */
-    public java.util.List getImageNames(boolean showAll)
+    java.util.List getImageNames(boolean showAll)
     {
         sortCritters();
         java.util.List imageNames = new ArrayList();
@@ -455,7 +455,7 @@ public final class Legion implements Comparable
 
 
     /** Return a list of unique imageNames for all lords in this legion. */
-    public java.util.List getUniqueLordImageNames()
+    java.util.List getUniqueLordImageNames()
     {
         sortCritters();
         java.util.List imageNames = new ArrayList();
@@ -477,13 +477,13 @@ public final class Legion implements Comparable
     }
 
 
-    public String getImageName()
+    String getImageName()
     {
         return markerId;
     }
 
 
-    public boolean canFlee()
+    boolean canFlee()
     {
         Iterator it = critters.iterator();
         while (it.hasNext())
@@ -498,7 +498,7 @@ public final class Legion implements Comparable
     }
 
 
-    public int numCreature(Creature creature)
+    int numCreature(Creature creature)
     {
         int count = 0;
         Iterator it = critters.iterator();
@@ -513,7 +513,7 @@ public final class Legion implements Comparable
         return count;
     }
 
-    public int numLords()
+    int numLords()
     {
         int count = 0;
         Iterator it = critters.iterator();
@@ -528,7 +528,7 @@ public final class Legion implements Comparable
         return count;
     }
 
-    public int numRangestrikers()
+    int numRangestrikers()
     {
         int count = 0;
         Iterator it = critters.iterator();
@@ -543,7 +543,7 @@ public final class Legion implements Comparable
         return count;
     }
 
-    public boolean hasTitan()
+    boolean hasTitan()
     {
         Iterator it = critters.iterator();
         while (it.hasNext())
@@ -557,7 +557,7 @@ public final class Legion implements Comparable
         return false;
     }
 
-    public boolean hasAngel()
+    boolean hasAngel()
     {
         Iterator it = critters.iterator();
         while (it.hasNext())
@@ -572,35 +572,35 @@ public final class Legion implements Comparable
     }
 
 
-    public int getHeight()
+    int getHeight()
     {
         return critters.size();
     }
 
-    public String getPlayerName()
+    String getPlayerName()
     {
         return playerName;
     }
 
-    public Player getPlayer()
+    Player getPlayer()
     {
         return game.getPlayerByMarkerId(markerId);
     }
 
-    public boolean hasMoved()
+    boolean hasMoved()
     {
         return moved;
     }
 
 
-    public void setMoved(boolean moved)
+    void setMoved(boolean moved)
     {
         this.moved = moved;
     }
 
 
     /** Eliminate this legion. */
-    public void remove()
+    void remove()
     {
         String hexLabel = currentHexLabel;
         prepareToRemove();
@@ -614,7 +614,7 @@ public final class Legion implements Comparable
 
 
     /** Do the cleanup required before this legion can be removed. */
-    public void prepareToRemove()
+    void prepareToRemove()
     {
         StringBuffer log = new StringBuffer("Legion ");
         log.append(getLongMarkerName());
@@ -652,7 +652,7 @@ public final class Legion implements Comparable
     }
 
 
-    public void moveToHex(MasterHex hex)
+    void moveToHex(MasterHex hex)
     {
         Player player = getPlayer();
         String hexLabel = hex.getLabel();
@@ -684,7 +684,7 @@ public final class Legion implements Comparable
     }
 
 
-    public void undoMove()
+    void undoMove()
     {
         if (moved)
         {
@@ -711,7 +711,7 @@ public final class Legion implements Comparable
 
 
     /** Called at end of player turn. */
-    public void commitMove()
+    void commitMove()
     {
         startingHexLabel = currentHexLabel;
         moved = false;
@@ -719,17 +719,17 @@ public final class Legion implements Comparable
     }
 
 
-    public boolean hasRecruited()
+    boolean hasRecruited()
     {
         return (recruitName != null);
     }
 
-    public String getRecruitName()
+    String getRecruitName()
     {
         return recruitName;
     }
 
-    public void setRecruitName(String recruitName)
+    void setRecruitName(String recruitName)
     {
         this.recruitName = recruitName;
     }
@@ -737,7 +737,7 @@ public final class Legion implements Comparable
 
     /** hasMoved() is a separate check, so that this function can be used in
      *  battle as well as during the muster phase. */
-    public boolean canRecruit()
+    boolean canRecruit()
     {
         if (recruitName != null || getHeight() > 6 || getPlayer().isDead() ||
             game.findEligibleRecruits(getMarkerId(), 
@@ -749,7 +749,7 @@ public final class Legion implements Comparable
     }
 
 
-    public void undoRecruit()
+    void undoRecruit()
     {
         if (recruitName != null)
         {
@@ -766,7 +766,7 @@ public final class Legion implements Comparable
 
 
     /** Return true if this legion can summon an angel or archangel. */
-    public boolean canSummonAngel()
+    boolean canSummonAngel()
     {
         Player player = getPlayer();
         if (getHeight() >= 7 || player.hasSummoned())
@@ -778,7 +778,7 @@ public final class Legion implements Comparable
     }
 
     /** Return true if this legion can summon an angel (only). */
-    public boolean angelAvailable()
+    boolean angelAvailable()
     {
         Player player = getPlayer();
         Collection legions = player.getLegions();
@@ -798,7 +798,7 @@ public final class Legion implements Comparable
     }
 
     /** Return true if this legion can summon an archangel. */
-    public boolean archangelAvailable()
+    boolean archangelAvailable()
     {
         Player player = getPlayer();
         Collection legions = player.getLegions();
@@ -819,22 +819,22 @@ public final class Legion implements Comparable
     }
 
 
-    public String getCurrentHexLabel()
+    String getCurrentHexLabel()
     {
         return currentHexLabel;
     }
 
-    public MasterHex getCurrentHex()
+    MasterHex getCurrentHex()
     {
         return MasterBoard.getHexByLabel(currentHexLabel);
     }
 
-    public String getStartingHexLabel()
+    String getStartingHexLabel()
     {
         return startingHexLabel;
     }
 
-    public MasterHex getStartingHex()
+    MasterHex getStartingHex()
     {
         return MasterBoard.getHexByLabel(startingHexLabel);
     }
@@ -909,7 +909,7 @@ public final class Legion implements Comparable
 
     /** If the indicated hex has exactly one entry side, return it.
      *  Otherwise return -1. */
-    public int getEntrySide(String hexLabel)
+    int getEntrySide(String hexLabel)
     {
         HexInfo hexInfo = (HexInfo)hexInfoMap.get(hexLabel);
         if (hexInfo == null)
@@ -919,7 +919,7 @@ public final class Legion implements Comparable
         return hexInfo.getEntrySide();
     }
 
-    public void setEntrySide(String hexLabel, int entrySide)
+    void setEntrySide(String hexLabel, int entrySide)
     {
         HexInfo hexInfo = (HexInfo)hexInfoMap.get(hexLabel);
         if (hexInfo == null)
@@ -930,7 +930,7 @@ public final class Legion implements Comparable
         hexInfoMap.put(hexLabel, hexInfo);
     }
 
-    public int getNumEntrySides(String hexLabel)
+    int getNumEntrySides(String hexLabel)
     {
         HexInfo hexInfo = (HexInfo)hexInfoMap.get(hexLabel);
         if (hexInfo == null)
@@ -940,7 +940,7 @@ public final class Legion implements Comparable
         return hexInfo.getNumEntrySides();
     }
 
-    public boolean canEnterViaSide(String hexLabel, int side)
+    boolean canEnterViaSide(String hexLabel, int side)
     {
         HexInfo hexInfo = (HexInfo)hexInfoMap.get(hexLabel);
         if (hexInfo == null)
@@ -950,7 +950,7 @@ public final class Legion implements Comparable
         return hexInfo.canEnterViaSide(side);
     }
 
-    public boolean canEnterViaLand(String hexLabel)
+    boolean canEnterViaLand(String hexLabel)
     {
         HexInfo hexInfo = (HexInfo)hexInfoMap.get(hexLabel);
         if (hexInfo == null)
@@ -960,7 +960,7 @@ public final class Legion implements Comparable
         return hexInfo.canEnterViaLand();
     }
 
-    public void clearAllEntrySides(String hexLabel)
+    void clearAllEntrySides(String hexLabel)
     {
         HexInfo hexInfo = (HexInfo)hexInfoMap.get(hexLabel);
         if (hexInfo != null)
@@ -969,13 +969,13 @@ public final class Legion implements Comparable
         }
     }
 
-    public void clearAllHexInfo()
+    void clearAllHexInfo()
     {
         hexInfoMap.clear();
     }
 
 
-    public boolean getTeleported(String hexLabel)
+    boolean getTeleported(String hexLabel)
     {
         HexInfo hexInfo = (HexInfo)hexInfoMap.get(hexLabel);
         if (hexInfo == null)
@@ -985,7 +985,7 @@ public final class Legion implements Comparable
         return hexInfo.getTeleported();
     }
 
-    public void setTeleported(String hexLabel, boolean teleported)
+    void setTeleported(String hexLabel, boolean teleported)
     {
         HexInfo hexInfo = (HexInfo)hexInfoMap.get(hexLabel);
         if (hexInfo == null)
@@ -997,7 +997,7 @@ public final class Legion implements Comparable
     }
 
     /** convenience method for AI */
-    public void addCreature(Creature creature)
+    void addCreature(Creature creature)
     {
         addCreature(creature,false);
     }
@@ -1005,7 +1005,7 @@ public final class Legion implements Comparable
     /** Add a creature to this legion.  If takeFromStack is true,
         then do this only if such a creature remains in the stacks,
         and decrement the number of this creature type remaining. */
-    public void addCreature(Creature creature, boolean takeFromStack)
+    void addCreature(Creature creature, boolean takeFromStack)
     {
         if (takeFromStack)
         {
@@ -1028,7 +1028,7 @@ public final class Legion implements Comparable
     /** Remove the creature in position i in the legion.  Return the
         removed creature. Put immortal creatures back on the stack
         if returnImmortalToStack is true. */
-    public Creature removeCreature(int i, boolean returnImmortalToStack,
+    Creature removeCreature(int i, boolean returnImmortalToStack,
         boolean disbandIfEmpty)
     {
         Critter critter = (Critter)critters.remove(i);
@@ -1054,7 +1054,7 @@ public final class Legion implements Comparable
 
     /** Remove the first creature matching the passed creature's type
         from the legion.  Return the removed creature. */
-    public Creature removeCreature(Creature creature, boolean
+    Creature removeCreature(Creature creature, boolean
         returnImmortalToStack, boolean disbandIfEmpty)
     {
         // indexOf wants the same object, not just the same type.
@@ -1076,7 +1076,7 @@ public final class Legion implements Comparable
      *  legion.  Do not actually remove it, to prevent comodification
      *  errors.  Do not disband the legion if empty, since the critter
      *  has not actually been removed. Return the critter if present. */
-    public Creature prepareToRemoveCritter(Critter critter, boolean
+    Creature prepareToRemoveCritter(Critter critter, boolean
         returnImmortalToStack)
     {
         if (critter == null || !critters.contains(critter))
@@ -1095,33 +1095,33 @@ public final class Legion implements Comparable
     }
 
 
-    public ArrayList getCritters()
+    ArrayList getCritters()
     {
         return critters;
     }
 
 
-    public Creature getCreature(int i)
+    Creature getCreature(int i)
     {
         Critter critter = getCritter(i);
         return critter.getCreature();
     }
 
 
-    public Critter getCritter(int i)
+    Critter getCritter(int i)
     {
         return (Critter)critters.get(i);
     }
 
 
-    public void setCritter(int i, Critter critter)
+    void setCritter(int i, Critter critter)
     {
         critters.set(i, critter);
         critter.setMarkerId(markerId);
     }
 
     /** Return the first critter with a matching tag. */
-    public Critter getCritterByTag(int tag)
+    Critter getCritterByTag(int tag)
     {
         Iterator it = critters.iterator();
         while (it.hasNext())
@@ -1137,7 +1137,7 @@ public final class Legion implements Comparable
 
     /** Move critter to the first position in the critters list.
      *  Return true if it was moved. */
-    public boolean moveToTop(Critter critter)
+    boolean moveToTop(Critter critter)
     {
         int i = critters.indexOf(critter);
         if (i <= 0)
@@ -1156,7 +1156,7 @@ public final class Legion implements Comparable
 
     /** Gets the first critter in this legion with the same creature
         type as the passed creature. */
-    public Critter getCritter(Creature creature)
+    Critter getCritter(Creature creature)
     {
         Iterator it = critters.iterator();
         while (it.hasNext())
@@ -1172,7 +1172,7 @@ public final class Legion implements Comparable
 
 
     /** Sort critters into descending order of importance. */
-    public void sortCritters()
+    void sortCritters()
     {
         Collections.sort(critters);
     }
@@ -1184,7 +1184,7 @@ public final class Legion implements Comparable
         concurrent access problems. The caller needs to call
         MasterBoard.alignLegions() on the remaining legion's hexLabel
         after the recombined legion is actually removed. */
-    public void recombine(Legion legion, boolean remove)
+    void recombine(Legion legion, boolean remove)
     {
         // Sanity check
         if (legion == this)
@@ -1226,7 +1226,7 @@ public final class Legion implements Comparable
      * (Or the first available marker, if markerId is null.)
      * Return the new legion, or null if there's an error.
      */
-    public Legion split(List creatures, String newMarkerId)
+    Legion split(List creatures, String newMarkerId)
     {
         Player player = getPlayer();
         if (newMarkerId == null)
@@ -1276,13 +1276,13 @@ public final class Legion implements Comparable
         return newLegion;
     }
 
-    public Legion split(List creatures)
+    Legion split(List creatures)
     {
         return split(creatures, null);
     }
 
 
-    public void hideAllCreatures()
+    void hideAllCreatures()
     {
         Iterator it = critters.iterator();
         while (it.hasNext())
@@ -1293,7 +1293,7 @@ public final class Legion implements Comparable
     }
 
 
-    public void revealAllCreatures()
+    void revealAllCreatures()
     {
         Iterator it = critters.iterator();
         while (it.hasNext())
@@ -1303,7 +1303,7 @@ public final class Legion implements Comparable
         }
     }
 
-    public void revealCreatures(Creature creature, int numberToReveal)
+    void revealCreatures(Creature creature, int numberToReveal)
     {
         int numberAlreadyRevealed = 0;
 
@@ -1344,7 +1344,7 @@ public final class Legion implements Comparable
 
     /** Reveal the lord who tower teleported the legion.  Pick one if
      *  necessary. */
-    public void revealTeleportingLord(boolean autoPick)
+    void revealTeleportingLord(boolean autoPick)
     {
         teleportingLord = null;
         TreeSet lords = new TreeSet();
@@ -1406,8 +1406,6 @@ public final class Legion implements Comparable
         return strName != null ? Creature.getCreatureByName(strName) : null;
     }
 
-// --------------------------------------------
-// Implement Comparable
 
     /** Legions are sorted in descending order of total point value,
         with the titan legion always coming first.  This is inconsistent

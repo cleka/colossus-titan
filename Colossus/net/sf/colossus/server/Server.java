@@ -144,7 +144,7 @@ public final class Server
 
 
     // XXX temp
-    public void loadOptions()
+    void loadOptions()
     {
         Iterator it = clients.iterator();
         while (it.hasNext())
@@ -154,7 +154,7 @@ public final class Server
         }
     }
 
-    public void saveOptions()
+    void saveOptions()
     {
         Iterator it = clients.iterator();
         while (it.hasNext())
@@ -178,8 +178,7 @@ public final class Server
         return null;
     }
 
-    /** Don't use this. */
-    public Client getClient(int playerNum)
+    private Client getClient(int playerNum)
     {
         return (Client)clients.get(playerNum);
     }
@@ -207,7 +206,7 @@ public final class Server
 
     /** Return the number of the first human-controlled client, or -1 if
      *  all clients are AI-controlled. */
-    public int getFirstHumanClientNum()
+    int getFirstHumanClientNum()
     {
         for (int i = 0; i < game.getNumPlayers(); i++)
         {
@@ -304,7 +303,7 @@ public final class Server
         }
     }
 
-    public void showMessageDialog(String playerName, String message)
+    void showMessageDialog(String playerName, String message)
     {
         Client client = getClient(playerName);
         client.showMessageDialog(message);
@@ -321,7 +320,7 @@ public final class Server
     }
 
 
-    public void highlightCarries(String playerName)
+    void highlightCarries(String playerName)
     {
         Client client = getClient(playerName);
         client.highlightCarries();
@@ -597,7 +596,7 @@ public final class Server
 
 
     /** Find out if the player wants to acquire and angel or archangel. */
-    public String acquireAngel(String playerName, ArrayList recruits)
+    String acquireAngel(String playerName, ArrayList recruits)
     {
         String angelType = null;
         Client client = getClient(playerName);
@@ -609,7 +608,7 @@ public final class Server
     }
 
 
-    public void createSummonAngel(Legion legion)
+    void createSummonAngel(Legion legion)
     {
         Client client = getClient(legion.getPlayerName());
         client.createSummonAngel(legion.getMarkerId(), 
@@ -920,7 +919,7 @@ public final class Server
         }
     }
 
-    public boolean chooseStrikePenalty(String playerName, String prompt)
+    boolean chooseStrikePenalty(String playerName, String prompt)
     {
         Client client = getClient(playerName);
         return client.chooseStrikePenalty(prompt);
@@ -960,7 +959,7 @@ public final class Server
     }
 
 
-    public void setupPlayerLabel(String playerName)
+    void setupPlayerLabel(String playerName)
     {
         Client client = getClient(playerName);
         client.setupPlayerLabel();
@@ -1170,11 +1169,6 @@ public final class Server
         return game.getPlayerByMarkerId(markerId).getName();
     }
 
-
-    public Creature [] getStartingCreatures()
-    {
-        return game.getStartingCreatures();
-    }
 
     public int getMulligansLeft(String playerName)
     {
@@ -1425,5 +1419,17 @@ public final class Server
     {
         Client client = getClient(playerName);
         return client.chooseWhetherToTeleport();
+    }
+
+    void setPlayerName(int i, String name)
+    {
+        Client client = getClient(i);
+        client.setPlayerName(name);
+    }
+
+    String pickColor(int i, Set colorsLeft)
+    {
+        Client client = getClient(i);
+        return client.pickColor(colorsLeft);
     }
 }

@@ -7,6 +7,7 @@ import javax.swing.*;
 import java.util.*;
 
 import net.sf.colossus.util.HTMLColor;
+import net.sf.colossus.server.Constants;
 
 
 /**
@@ -16,13 +17,10 @@ import net.sf.colossus.util.HTMLColor;
  */
 
 
-public final class PickColor extends JDialog implements WindowListener,
-    ActionListener
+final class PickColor extends JDialog implements WindowListener, ActionListener
 {
     private JLabel [] colorLabel = new JLabel[6];
 
-    public static final String [] colorNames =
-        {"Black", "Blue", "Brown", "Gold", "Green", "Red"};
     private static final Color [] background = { Color.black, Color.blue,
         HTMLColor.brown, Color.yellow, Color.green, Color.red };
     private static final Color [] foreground = { Color.white, Color.white,
@@ -35,8 +33,7 @@ public final class PickColor extends JDialog implements WindowListener,
     private static String color;
 
 
-    private PickColor(JFrame parentFrame, String playerName, 
-        Set colorsLeft)
+    private PickColor(JFrame parentFrame, String playerName, Set colorsLeft)
     {
         super(parentFrame, playerName + ", Pick a Color", true);
 
@@ -50,12 +47,12 @@ public final class PickColor extends JDialog implements WindowListener,
 
         for (int i = 0; i < 6; i++)
         {
-            if (colorsLeft.contains(colorNames[i]))
+            if (colorsLeft.contains(Constants.colorNames[i]))
             {
                 JButton button = new JButton();
                 int scale = Scale.get();
                 button.setPreferredSize(new Dimension(7 * scale, 4 * scale));
-                button.setText(colorNames[i]);
+                button.setText(Constants.colorNames[i]);
                 button.setMnemonic(colorMnemonics[i]);
                 button.setBackground(background[i]);
                 button.setForeground(foreground[i]);
@@ -76,7 +73,7 @@ public final class PickColor extends JDialog implements WindowListener,
     }
 
 
-    public static String pickColor(JFrame parentFrame, String playerName,
+    static String pickColor(JFrame parentFrame, String playerName,
         Set colorsLeft)
     {
         new PickColor(parentFrame, playerName, colorsLeft);
@@ -84,20 +81,20 @@ public final class PickColor extends JDialog implements WindowListener,
     }
 
 
-    public static String getColorName(int i)
+    static String getColorName(int i)
     {
-        if (i >= 0 && i < colorNames.length)
+        if (i >= 0 && i < Constants.colorNames.length)
         {
-            return colorNames[i];
+            return Constants.colorNames[i];
         }
         return null;
     }
 
-    public static Color getForegroundColor(String colorName)
+    static Color getForegroundColor(String colorName)
     {
-        for (int i = 0; i < colorNames.length; i++)
+        for (int i = 0; i < Constants.colorNames.length; i++)
         {
-            if (colorName.equals(colorNames[i]))
+            if (colorName.equals(Constants.colorNames[i]))
             {
                 return foreground[i];
             }
@@ -105,11 +102,11 @@ public final class PickColor extends JDialog implements WindowListener,
         return null;
     }
 
-    public static Color getBackgroundColor(String colorName)
+    static Color getBackgroundColor(String colorName)
     {
-        for (int i = 0; i < colorNames.length; i++)
+        for (int i = 0; i < Constants.colorNames.length; i++)
         {
-            if (colorName.equals(colorNames[i]))
+            if (colorName.equals(Constants.colorNames[i]))
             {
                 return background[i];
             }
@@ -122,7 +119,7 @@ public final class PickColor extends JDialog implements WindowListener,
     {
         for (int i = 0; i < 6; i++)
         {
-            if (colorName.equals(colorNames[i]))
+            if (colorName.equals(Constants.colorNames[i]))
             {
                 return i;
             }

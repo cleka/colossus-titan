@@ -1,0 +1,204 @@
+<?xml version="1.0"?>
+
+<!-- Ant buildfile for Colossus -->
+<!-- $Id$ -->
+
+<!-- To use this you need:
+     Sun JDK 1.2+  http://java.sun.com  (currently recommend 1.3.1)
+     Ant 1.4.1+    http://jakarta.apache.org/ant/
+        with corresponding optional.jar installed in $ANT_HOME/lib
+     JavaCC 2.1    http://www.webgain.com/trialware/javacc/JavaCC2_1.zip
+        Environment var $JAVACC_HOME pointing to JavaCC install root
+     To sign jarfiles, you need a file called usernameKeystore,
+	(substituting your username for "username")
+        with an alias matching your username, and you need to put
+        the password for this key in environment var JARPASSWORD.
+	(Ant won't do keyboard input.)
+-->
+
+<project name="Colossus" default="jar" basedir=".">
+
+<property environment="env"/>
+
+
+
+<target name="init"
+        description="Initialization">
+
+        <tstamp/>
+
+        <!-- Set this to jikes or kjc to use those instead of javac -->
+        <property name="build.compiler" value="modern"/>
+
+        <property name="HTMLDIR" value="/home/groups/c/co/colossus/htdocs"/>
+        <property name="DOWNLOAD_DIR" value="${HTMLDIR}/download"/>
+        <property name="ZIPFILE" value="Colossus.${DSTAMP}.zip"/>
+
+</target>
+
+
+<target name="version" depends="init"
+        description="Create a timestamp file">
+        <echo file="./version" message="${DSTAMP}&#10;"
+        />
+</target>
+
+
+<!-- The javacc target does not support multiple .jj files in one target. -->
+<target name="parsers" 
+        depends="BattlelandLoader,
+                 CreatureLoader,
+                 StrategicMapLoader,
+                 TerrainRecruitLoader,
+                 VariantLoader,
+                 fix"
+        description = "Create .java files from .jj files with javacc">
+</target>
+
+<target name="BattlelandLoader">
+        <javacc target="net/sf/colossus/parser/BattlelandLoader.jj"
+                javacchome="${env.JAVACC_HOME}"
+        />
+</target>
+
+<target name="CreatureLoader">
+        <javacc target="net/sf/colossus/parser/CreatureLoader.jj"
+                javacchome="${env.JAVACC_HOME}"
+        />
+</target>
+
+<target name="StrategicMapLoader">
+        <javacc target="net/sf/colossus/parser/StrategicMapLoader.jj"
+                javacchome="${env.JAVACC_HOME}"
+        />
+</target>
+
+<target name="TerrainRecruitLoader">
+        <javacc target="net/sf/colossus/parser/TerrainRecruitLoader.jj"
+                javacchome="${env.JAVACC_HOME}"
+        />
+</target>
+
+<target name="VariantLoader">
+        <javacc target="net/sf/colossus/parser/VariantLoader.jj"
+                javacchome="${env.JAVACC_HOME}"
+        />
+</target>
+
+
+<!-- XXX Is this working? -->
+<target name="dep" 
+        description = "Remove out-of-date class files">
+        <depend srcdir="**"/>
+</target> 
+
+
+<target name="compile" depends="init,parsers,fix"
+        description = "Compile .java files to .class files">
+        <javac deprecation="yes" target="1.2" srcdir="."
+                includes="**/*.java"
+        />
+</target>
+
+
+<target name="javadoc" depends="fix,compile"
+        description = "Make javadoc files">
+        <javadoc sourcepath="." destdir="./javadoc"
+                 packagenames="net.sf.colossus.*"
+        />
+</target>
+
+
+<target name="jar" depends="compile,version"
+        description = "Make jar file">
+        <jar jarfile = "Colossus.jar" basedir="."
+                manifest="META-INF/MANIFEST.MF"
+                includes="**/*.class,
+                    **/*.gif,
+                    StrategicMap.map,
+                    Recruit.ter,
+                    Creature.cre,
+                    Default.var,
+                    version,
+                    Battlelands/*"
+        />
+
+        <chmod file="Colossus.jar" perm="755"/>
+</target>
+
+
+<!-- XXX Grab jarsigner password from ant.properties file instead? -->
+<target name="sign" depends="jar"
+        description = "Sign jar file">
+        <signjar jar="Colossus.jar"
+                 alias="${user.name}"
+                 keystore="${user.name}Keystore"
+                 storepass="${env.JARPASSWORD}"
+        />
+</target>
+
+
+<target name="dist" depends="sign"
+        description = "Make zip file for user download">
+        <zip zipfile="${ZIPFILE}" basedir="."
+             excludes="**/*.sav,
+                 **/*.zip, 
+                 **/*javadoc*/*, 
+                 *Keystore*,
+                 *cfg,
+                 *properties*,
+                 .*"
+        />
+</target>
+
+
+<!-- XXX Is this working? -->
+<target name="inst" depends="init,sign,dist"
+        description = "Copy files into htdocs tree on SF"> 
+        <copy file="Colossus.jar" todir="${HTMLDIR}"/>
+        <copy file="docs/README.txt" todir="${HTMLDIR}"/>
+        <copy file="Colossus.jnlp" todir="${HTMLDIR}"/>
+        <copy file="${ZIPFILE}" todir="${DOWNLOAD_DIR}"/>
+</target>
+
+
+<!-- Be very careful modifying this.  It whacks whole directories easily. -->
+<!-- XXX Files like .#Colossus.jar.1.203 are not being deleted. -->
+<target name="clean"
+        description = "Delete derived files"> 
+        <delete verbose="yes" includeemptydirs="yes"> 
+                <fileset dir="." 
+                 includes = 
+                        "version,
+                         **/core,
+                         **/javacore.txt,
+                         **/*~,
+                         **/*.bak,
+                         **/*.class,
+                         **/Colossus.jar,
+                         **/.#Colossus.jar*,
+                         **/Colossus.*.zip,
+                         javadoc/**,
+                         net/sf/colossus/parser/*.java"
+                />
+        </delete>
+</target>
+
+
+<target name="fix"
+        description = "Fix end of line characters and eliminate tabs"> 
+        <fixcrlf srcDir="." eol="lf" tab="remove" javafiles="yes" 
+                eof="remove" tablength="8"
+                includes="**/*.java,**/*.jj"
+        />
+</target>
+
+
+<target name="run"
+        description = "Run the game">
+        <java jar="Colossus.jar"
+              fork="yes"/>
+</target>
+
+
+</project>

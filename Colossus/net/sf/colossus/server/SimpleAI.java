@@ -23,7 +23,7 @@ import net.sf.colossus.client.BattleMap;
  */
 
 
-public class SimpleAI implements AI
+class SimpleAI implements AI
 {
     public String pickColor(Set colors, List favoriteColors)
     {
@@ -1839,7 +1839,7 @@ public class SimpleAI implements AI
         return bestAngel.getName() + ":" + bestLegion.getMarkerId();
     }
 
-    public static String bestAngelType(Legion legion)
+    static String bestAngelType(Legion legion)
     {
         if (legion.numCreature(Creature.getCreatureByName("Archangel")) >= 1)
         {
@@ -2041,7 +2041,7 @@ public class SimpleAI implements AI
     }
 
 
-    public static int getCombatValue(Creature creature, char terrain)
+    static int getCombatValue(Creature creature, char terrain)
     {
         int val = creature.getPointValue();
 
@@ -2075,7 +2075,7 @@ public class SimpleAI implements AI
     }
 
 
-    public static int getCombatValue(Legion legion, char terrain)
+    static int getCombatValue(Legion legion, char terrain)
     {
         int val = 0;
         Collection critters = legion.getCritters();
@@ -2203,7 +2203,7 @@ public class SimpleAI implements AI
     /** Compute a set of CritterMoves for the game's active legion.
      *  Return an ArrayList containing one ArrayList of CritterMoves
      *  for each Critter. */
-    public ArrayList findBattleMoves(Game realGame)
+    ArrayList findBattleMoves(Game realGame)
     {
         // Consider one critter at a time, in order of importance.
         // Examine all possible moves for that critter not already
@@ -2766,11 +2766,11 @@ public class SimpleAI implements AI
      *     move through hexes that non-natives can't.
      *  More important creatures should move before less important
      *     creatures. */
-    final class MoveOrderComparator implements Comparator
+    public final class MoveOrderComparator implements Comparator
     {
         private Battle battle;
 
-        public MoveOrderComparator(Battle battle)
+        MoveOrderComparator(Battle battle)
         {
             this.battle = battle;
         }
@@ -2839,7 +2839,7 @@ public class SimpleAI implements AI
     {
         private char terrain;
 
-        public CritterComparator(char terrain)
+        CritterComparator(char terrain)
         {
             this.terrain = terrain;
         }
@@ -2869,7 +2869,7 @@ public class SimpleAI implements AI
         private String startingHexLabel;
         private String endingHexLabel;
 
-        public CritterMove(Critter critter, String startingHexLabel,
+        CritterMove(Critter critter, String startingHexLabel,
             String endingHexLabel)
         {
             super();
@@ -2888,27 +2888,27 @@ public class SimpleAI implements AI
             return value;
         }
 
-        public Critter getCritter()
+        Critter getCritter()
         {
             return critter;
         }
 
-        public String getStartingHexLabel()
+        String getStartingHexLabel()
         {
             return startingHexLabel;
         }
 
-        public String getEndingHexLabel()
+        String getEndingHexLabel()
         {
             return endingHexLabel;
         }
 
-        public BattleHex getStartingHex(char terrain)
+        BattleHex getStartingHex(char terrain)
         {
             return HexMap.getHexByLabel(terrain, startingHexLabel);
         }
 
-        public BattleHex getEndingHex(char terrain)
+        BattleHex getEndingHex(char terrain)
         {
             return HexMap.getHexByLabel(terrain, endingHexLabel);
         }

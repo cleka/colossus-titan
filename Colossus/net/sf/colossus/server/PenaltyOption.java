@@ -8,14 +8,14 @@ package net.sf.colossus.server;
  * @author David Ripton
  */
 
-public final class PenaltyOption implements Comparable
+final class PenaltyOption implements Comparable
 {
     private Critter critter;
     private int dice;
     private int strikeNumber;
 
 
-    public PenaltyOption(Critter critter, int dice, int strikeNumber)
+    PenaltyOption(Critter critter, int dice, int strikeNumber)
     {
         this.critter = critter;
         this.dice = dice;
@@ -23,19 +23,19 @@ public final class PenaltyOption implements Comparable
     }
 
 
-    public Critter getCritter()
+    Critter getCritter()
     {
         return critter;
     }
 
 
-    public int getDice()
+    int getDice()
     {
         return dice;
     }
 
 
-    public int getStrikeNumber()
+    int getStrikeNumber()
     {
         return strikeNumber;
     }

@@ -5,9 +5,10 @@ There is no standard tab stop in Java, so tabs will look bad for
 anyone whose editor is set up differently than that of the person
 who put tabs in the code.  Configure your editor to emit the
 appropriate number of spaces rather than a hard tab when you hit
-the tab key.  (Of course, Makefiles are an exception, because you
-have to use tabs there.  Which is almost enough of a reason to
-switch to Ant.)
+the tab key.  (Of course, Makefiles are an exception, because
+you have to use tabs in them.  Ick.)  "ant fix" converts tabs
+to spaces for you, but it assumes a tab stop of 8 unless you
+change it.
 
 2. Wrap code at 79 characters.  This is a pain sometimes, but it
 allows easly working with the code using 80-column editor and
@@ -28,31 +29,23 @@ keep it that way.  At some point we might decide to bump the JDK
 version requirement for a truly great feature (e.g. templated
 container classes), but don't do it trivially. 
 
-5. Try not to use public member variables, except for constants.
-Use a private variable and public get/set methods.  (But don't
-automatically add an accessor and mutator for every variable,
-just for the ones that actually need them.)  This adds some
-overhead up front but makes it easier to refactor code later.
+5. Keep all member variables private, except for constants.
+Use get/set methods to share.  (But don't automatically add 
+an accessor and mutator for every variable, just for the ones 
+that actually need them.)  This adds some overhead up front 
+but makes it easier to refactor code later.
 
-6. Try to comment stuff, at least at the public method level for
-non-trivial methods.  But there's no need to go overboard
-commenting obvious stuff.  Javadoc comments are preferable to
-regular comments for whole methods and important member variables.
+6. Try to comment stuff, at least at the method level for
+non-trivial and non-private methods.  But there's no need to go 
+overboard commenting obvious stuff.  Use javadoc comments
+instead of regular comments where applicable.
 
-7. The game started out in the default package for simplicity.
-It's being gradually moved to sub-packages within net.sf.colossus,
-for the client/server split.  Where to put new code, and when to
-move code into a package, is a judgment call.  Err on the side of
-caution when moving existing code around, because moving files
-wreaks havoc on CVS history.  Stick to public and private in the
-default package.  Use package private only within explicit packages
-when it really makes logical sense because the packages are actually
-coherent units rather than just piles of code that happen to share
-a directory.  (In the long run many public methods should become
-package private, but there's no hurry.)  When you create new
-packages, make sure to fix the appropriate spots in the Makefile
-and test that the program still works from the executable jar file,
-not just from the full code tree.
+7. Every method in the .client and .server packages should be
+either private (if possible) or package private (if needed
+by other classes in the package), unless it needs to be public.
+And just because a method is public doesn't mean it should be
+called from outside the package.  Remember, there will only
+be a network interface between Client and Server.
 
 8. Some methods are private because they're not used outside of
 their class, not necessarily because they shouldn't be used
@@ -63,7 +56,8 @@ don't need to check to see if other classes call / override
 something before changing it if it's tagged private / final) and
 for the JVM, not necessarily design statements.  So feel free
 to change such things as necessary, until the interfaces are
-finalized and polished and other people depend upon them.
+finalized and polished and other people depend upon them.  But
+see #7.
 
 9. Always do a cvs diff before you check code in.  That way
 if your editor accidentally changed a bunch of spaces to tabs,
@@ -81,7 +75,8 @@ but easier to read and change.
 will sometimes stop working if the line breaks are wrong.  Java
 files will work either way, but it's annoying to have a mix of
 line breaks, false diffs caused by files getting converted back
-and forth, etc. so consistent Unix format is best.
+and forth, etc. so consistent Unix format is best.  "ant fix"
+is your friend.
 
 12. Otherwise just try to follow the existing format.  A foolish
 consistency may be the hobgoblin of little minds, but it sure

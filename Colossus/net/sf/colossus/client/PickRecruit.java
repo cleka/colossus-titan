@@ -16,7 +16,7 @@ import net.sf.colossus.server.Creature;
  */
 
 
-public final class PickRecruit extends JDialog implements MouseListener,
+final class PickRecruit extends JDialog implements MouseListener,
     WindowListener
 {
     private java.util.List recruits;   // of Creatures
@@ -47,7 +47,7 @@ public final class PickRecruit extends JDialog implements MouseListener,
         contentPane.setLayout(gridbag);
         pack();
         setBackground(Color.lightGray);
-        setResizable(false);
+        //setResizable(false);
         int scale = 4 * Scale.get();
 
         legionMarker = new Marker(scale, markerId, this, null);

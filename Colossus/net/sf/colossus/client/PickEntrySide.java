@@ -14,7 +14,7 @@ import java.util.*;
  * @author David Ripton
  */
 
-public final class PickEntrySide extends HexMap implements ActionListener,
+final class PickEntrySide extends HexMap implements ActionListener,
     WindowListener
 {
     private static JButton button5;  // left
@@ -65,13 +65,13 @@ public final class PickEntrySide extends HexMap implements ActionListener,
         dialog.pack();
 
         dialog.setSize(getPreferredSize());
-        dialog.setResizable(false);
+        //dialog.setResizable(false);
         dialog.setBackground(Color.white);
         dialog.setVisible(true);
     }
 
 
-    public static int pickEntrySide(JFrame parentFrame, String masterHexLabel,
+    static int pickEntrySide(JFrame parentFrame, String masterHexLabel,
         boolean left, boolean bottom, boolean right)
     {
         entrySide = -1;

@@ -14,8 +14,7 @@ import javax.swing.*;
  */
 
 
-public final class PickMarker extends JDialog implements MouseListener,
-    WindowListener
+final class PickMarker extends JDialog implements MouseListener, WindowListener
 {
     private ArrayList markers = new ArrayList();
     private static String markerId;
@@ -36,7 +35,7 @@ public final class PickMarker extends JDialog implements MouseListener,
         pack();
 
         setBackground(Color.lightGray);
-        setResizable(false);
+        //setResizable(false);
 
         Iterator it = markerIds.iterator();
         while (it.hasNext())

@@ -16,18 +16,18 @@ import net.sf.colossus.server.Game;
  * @author David Ripton
  */
 
-public final class ShowMasterHex extends JDialog implements MouseListener,
+final class ShowMasterHex extends JDialog implements MouseListener,
     WindowListener
 {
-    public ShowMasterHex(JFrame parentFrame, Client client, 
-        MasterHex hex, Point point)
+    ShowMasterHex(JFrame parentFrame, Client client, MasterHex hex,
+        Point point)
     {
         super(parentFrame, hex.getTerrainName() + " Hex " + hex.getLabel(),
             false);
 
         pack();
         setBackground(Color.lightGray);
-        setResizable(false);
+        //setResizable(false);
         addWindowListener(this);
 
         // Place dialog relative to parentFrame's origin, and fully on-screen.

@@ -20,8 +20,8 @@ public final class NegotiationResults
     private Set winnerLosses;
 
 
-    public NegotiationResults(String attackerId, String defenderId,
-        boolean fight, boolean mutual, String winnerId, Set winnerLosses)
+    NegotiationResults(String attackerId, String defenderId, boolean fight,
+        boolean mutual, String winnerId, Set winnerLosses)
     {
         this.attackerId = attackerId;
         this.defenderId = defenderId;

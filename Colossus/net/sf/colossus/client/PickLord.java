@@ -14,8 +14,7 @@ import java.util.*;
  */
 
 
-public final class PickLord extends JDialog implements MouseListener,
-    WindowListener
+final class PickLord extends JDialog implements MouseListener, WindowListener
 {
     private ArrayList chits = new ArrayList();
     private static String lordType;
@@ -36,7 +35,7 @@ public final class PickLord extends JDialog implements MouseListener,
         contentPane.setLayout(new FlowLayout());
         pack();
         setBackground(Color.lightGray);
-        setResizable(false);
+        //setResizable(false);
 
         Iterator it = imageNames.iterator();
         while (it.hasNext())

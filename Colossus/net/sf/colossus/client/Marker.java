@@ -10,7 +10,7 @@ import java.awt.*;
  * @author David Ripton
  */
 
-public final class Marker extends Chit
+final class Marker extends Chit
 {
     private Font font;
     private Font oldFont;
@@ -19,7 +19,7 @@ public final class Marker extends Chit
     private Client client;
 
 
-    public Marker(int scale, String id, Container container, Client client)
+    Marker(int scale, String id, Container container, Client client)
     {
         super(scale, id, container);
         setBackground(Color.black);

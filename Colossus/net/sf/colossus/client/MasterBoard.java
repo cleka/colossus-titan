@@ -170,7 +170,7 @@ public final class MasterBoard extends JPanel
     }
 
 
-    public MasterBoard AICopy()
+    MasterBoard AICopy()
     {
         MasterBoard newBoard = new MasterBoard();
         newBoard.setupActions();
@@ -1383,44 +1383,6 @@ public final class MasterBoard extends JPanel
             }
         }
         Log.error("Could not find hex " + label);
-        return null;
-    }
-
-    /** Do a brute-force search through the hex array, looking for
-     *  a hex with the proper terrain type.  Return the hex, or null
-     *  if none is found. */
-    public static MasterHex getAnyHexWithTerrain(char terrain)
-    {
-        Iterator it = plainHexes.iterator();
-        while (it.hasNext())
-        {
-            MasterHex hex = (MasterHex)it.next();
-            if (hex.getTerrain() == terrain)
-            {
-                return hex;
-            }
-        }
-
-        Log.error("Could not find hex with terrain " + terrain);
-        return null;
-    }
-
-    /** Do a brute-force search through the hex array, looking for
-     *  a hex with the proper terrain type.  Return the hex, or null
-     *  if none is found. */
-    GUIMasterHex getAnyGUIHexWithTerrain(char terrain)
-    {
-        Iterator it = hexes.iterator();
-        while (it.hasNext())
-        {
-            GUIMasterHex hex = (GUIMasterHex)it.next();
-            if (hex.getTerrain() == terrain)
-            {
-                return hex;
-            }
-        }
-
-        Log.error("Could not find hex with terrain " + terrain);
         return null;
     }
 

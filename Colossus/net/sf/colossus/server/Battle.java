@@ -23,7 +23,7 @@ import net.sf.colossus.client.BattleMap;
  * @author David Ripton
  */
 
-public final class Battle
+final class Battle
 {
     private Game game;
     private String attackerId;
@@ -48,7 +48,7 @@ public final class Battle
     private final int BIGNUM = 99;
 
 
-    public Battle(Game game, String attackerId, String defenderId,
+    Battle(Game game, String attackerId, String defenderId,
         int activeLegionNum, String masterHexLabel, int turnNumber, int phase)
     {
         this.game = game;
@@ -140,7 +140,7 @@ public final class Battle
 
     /** We need to do two-stage construction so that game.battle
      *  is non-null earlier. */
-    public void init()
+    void init()
     {
         game.getServer().allInitBattleMap(masterHexLabel);
         initBattleChits(getAttacker(), false);
@@ -172,12 +172,12 @@ public final class Battle
     }
 
     /** No-arg constructor for AICopy() */
-    public Battle()
+    Battle()
     {
     }
 
     /** Make a deep copy for the AI. */
-    public Battle AICopy(Game game)
+    Battle AICopy(Game game)
     {
         Battle newBattle = new Battle();
         newBattle.game = game;
@@ -223,62 +223,62 @@ public final class Battle
     }
 
 
-    public Game getGame()
+    Game getGame()
     {
         return game;
     }
 
 
-    public Player getActivePlayer()
+    Player getActivePlayer()
     {
         return game.getPlayerByMarkerId(legions[activeLegionNum]);
     }
 
-    public String getActivePlayerName()
+    String getActivePlayerName()
     {
         return getActivePlayer().getName();
     }
 
-    public String getAttackerId()
+    String getAttackerId()
     {
         return attackerId;
     }
 
-    public Legion getAttacker()
+    Legion getAttacker()
     {
         return game.getLegionByMarkerId(attackerId);
     }
 
-    public String getDefenderId()
+    String getDefenderId()
     {
         return defenderId;
     }
 
-    public Legion getDefender()
+    Legion getDefender()
     {
         return game.getLegionByMarkerId(defenderId);
     }
 
 
-    public int getActiveLegionNum()
+    int getActiveLegionNum()
     {
         return activeLegionNum;
     }
 
 
-    public Legion getActiveLegion()
+    Legion getActiveLegion()
     {
         return getLegion(activeLegionNum);
     }
 
 
-    public Legion getInactiveLegion()
+    Legion getInactiveLegion()
     {
         return getLegion((activeLegionNum + 1) & 1);
     }
 
 
-    public Legion getLegion(int legionNum)
+    Legion getLegion(int legionNum)
     {
         if (legionNum == Constants.DEFENDER)
         {
@@ -295,7 +295,7 @@ public final class Battle
     }
 
 
-    public Legion getLegionByPlayerName(String playerName)
+    Legion getLegionByPlayerName(String playerName)
     {
         Legion attacker = getAttacker();
         if (attacker != null && attacker.getPlayerName().equals(
@@ -313,47 +313,47 @@ public final class Battle
     }
 
 
-    public String getMasterHexLabel()
+    String getMasterHexLabel()
     {
         return masterHexLabel;
     }
 
-    public MasterHex getMasterHex()
+    MasterHex getMasterHex()
     {
         return MasterBoard.getHexByLabel(masterHexLabel);
     }
 
 
-    public char getTerrain()
+    char getTerrain()
     {
         return terrain;
     }
 
 
-    public int getPhase()
+    int getPhase()
     {
         return phase;
     }
 
-    public int getTurnNumber()
+    int getTurnNumber()
     {
         return turnNumber;
     }
 
 
-    public boolean isAttackerElim()
+    boolean isAttackerElim()
     {
         return attackerElim;
     }
 
 
-    public boolean isDefenderElim()
+    boolean isDefenderElim()
     {
         return defenderElim;
     }
 
 
-    public boolean isOver()
+    boolean isOver()
     {
         return battleOver;
     }
@@ -567,19 +567,19 @@ public final class Battle
     }
 
 
-    public int getSummonState()
+    int getSummonState()
     {
         return summonState;
     }
 
-    public void setSummonState(int summonState)
+    void setSummonState(int summonState)
     {
         this.summonState = summonState;
     }
 
 
     /** Called from Game after the SummonAngel finishes. */
-    public void finishSummoningAngel(boolean placeNewChit)
+    void finishSummoningAngel(boolean placeNewChit)
     {
         // Bring the BattleMap back to the front.
         game.getServer().allShowBattleMap();
@@ -641,12 +641,12 @@ public final class Battle
     }
 
 
-    public int getCarryDamage()
+    int getCarryDamage()
     {
         return carryDamage;
     }
 
-    public void setCarryDamage(int carryDamage)
+    void setCarryDamage(int carryDamage)
     {
         this.carryDamage = carryDamage;
     }
@@ -736,7 +736,7 @@ public final class Battle
     }
 
 
-    public Set showMoves(int tag)
+    Set showMoves(int tag)
     {
         Critter critter = getActiveLegion().getCritterByTag(tag);
         return showMoves(critter, false);
@@ -744,7 +744,7 @@ public final class Battle
 
     /** Find all legal moves for this critter. The returned list
      *  contains hex IDs, not hexes. */
-    public Set showMoves(Critter critter, boolean ignoreMobileAllies)
+    Set showMoves(Critter critter, boolean ignoreMobileAllies)
     {
         Set set = new HashSet();
         if (!critter.hasMoved() && !critter.isInContact(false))
@@ -765,7 +765,7 @@ public final class Battle
     }
 
 
-    public void undoLastMove()
+    void undoLastMove()
     {
         if (!game.getServer().isUndoStackEmpty(getActivePlayerName()))
         {
@@ -783,7 +783,7 @@ public final class Battle
         }
     }
 
-    public void undoAllMoves()
+    void undoAllMoves()
     {
         Iterator it = getActiveLegion().getCritters().iterator();
         while (it.hasNext())
@@ -812,7 +812,7 @@ public final class Battle
     }
 
     /** Here for when we eventually do correct concession timing. */
-    public boolean tryToConcede(String playerName)
+    boolean tryToConcede(String playerName)
     {
         Legion legion = getLegionByPlayerName(playerName);
         String markerId = legion.getMarkerId();
@@ -824,7 +824,7 @@ public final class Battle
 
     /** Return a set of hex labels for hex labels with critters eligible
      *  to move. */
-    public Set findMobileCritters()
+    Set findMobileCritters()
     {
         HashSet set = new HashSet();
         Legion legion = getActiveLegion();
@@ -845,7 +845,7 @@ public final class Battle
 
 
     /** Return true if any creatures have been left off-board. */
-    public boolean anyOffboardCreatures()
+    boolean anyOffboardCreatures()
     {
         Legion legion = getActiveLegion();
         Iterator it = legion.getCritters().iterator();
@@ -890,7 +890,7 @@ public final class Battle
         }
     }
 
-    public void doneWithMoves()
+    void doneWithMoves()
     {
         if (anyOffboardCreatures())
         {
@@ -901,7 +901,7 @@ public final class Battle
     }
 
 
-    public void applyDriftDamage()
+    void applyDriftDamage()
     {
         // Drift hexes are only found on the tundra map.
         // Drift damage is applied only once per player turn,
@@ -924,18 +924,18 @@ public final class Battle
     }
 
 
-    public boolean isDriftDamageApplied()
+    boolean isDriftDamageApplied()
     {
         return driftDamageApplied;
     }
 
-    public void setDriftDamageApplied(boolean driftDamageApplied)
+    void setDriftDamageApplied(boolean driftDamageApplied)
     {
         this.driftDamageApplied = driftDamageApplied;
     }
 
 
-    public void leaveCarryMode()
+    void leaveCarryMode()
     {
         carryDamage = 0;
         carryTargets.clear();
@@ -1145,7 +1145,7 @@ public final class Battle
 
     /** Return the set of hex labels for hexes with critters that have
      *  valid strike targets. */
-    public Set findCrittersWithTargets()
+    Set findCrittersWithTargets()
     {
         HashSet set = new HashSet();
         Iterator it = getActiveLegion().getCritters().iterator();
@@ -1162,7 +1162,7 @@ public final class Battle
     }
 
 
-    public boolean isForcedStrikeRemaining()
+    boolean isForcedStrikeRemaining()
     {
         Legion legion = getActiveLegion();
         if (legion != null)
@@ -1186,7 +1186,7 @@ public final class Battle
      *  rangestrike is true, also perform rangestrikes for
      *  creatures with only one target, even though they're not
      *  technically forced. */
-    public void makeForcedStrikes(boolean rangestrike)
+    void makeForcedStrikes(boolean rangestrike)
     {
         Legion legion = getActiveLegion();
         boolean repeat;
@@ -1221,7 +1221,7 @@ public final class Battle
     }
 
     /** Return true if okay, or false if forced strikes remain. */
-    public boolean doneWithStrikes()
+    boolean doneWithStrikes()
     {
         // Advance only if there are no unresolved strikes.
         if (isForcedStrikeRemaining())
@@ -1238,7 +1238,7 @@ public final class Battle
     }
 
 
-    public Set findStrikes(int tag)
+    Set findStrikes(int tag)
     {
         Critter critter = getActiveLegion().getCritterByTag(tag);
         return findStrikes(critter, true);
@@ -1247,7 +1247,7 @@ public final class Battle
     /** Return a set of hex labels for hexes containing targets that the
      *  critter may strike.  Only include rangestrikes if rangestrike
      *  is true. */
-    public Set findStrikes(Critter critter, boolean rangestrike)
+    Set findStrikes(Critter critter, boolean rangestrike)
     {
         HashSet set = new HashSet();
 
@@ -1310,41 +1310,41 @@ public final class Battle
     }
 
 
-    public int countStrikes(Critter critter, boolean rangestrike)
+    int countStrikes(Critter critter, boolean rangestrike)
     {
         return findStrikes(critter, rangestrike).size();
     }
 
 
     /** Return the set of hex labels for hexes with valid carry targets. */
-    public Set getCarryTargets()
+    Set getCarryTargets()
     {
         return carryTargets;
     }
 
-    public void setCarryTargets(HashSet carryTargets)
+    void setCarryTargets(HashSet carryTargets)
     {
         this.carryTargets = carryTargets;
     }
 
-    public void addCarryTarget(String hexLabel)
+    void addCarryTarget(String hexLabel)
     {
         carryTargets.add(hexLabel);
     }
 
-    public void removeCarryTarget(String hexLabel)
+    void removeCarryTarget(String hexLabel)
     {
         carryTargets.remove(hexLabel);
     }
 
 
-    public void applyCarries(String hexLabel)
+    void applyCarries(String hexLabel)
     {
         Critter target = getCritter(hexLabel);
         applyCarries(target);
     }
 
-    public void applyCarries(Critter target)
+    void applyCarries(Critter target)
     {
         if (!carryTargets.contains(target.getCurrentHexLabel()))
         {
@@ -1377,7 +1377,7 @@ public final class Battle
 
     /** Return the range in hexes from hex1 to hex2.  Titan ranges are
      *  inclusive at both ends. */
-    public static int getRange(BattleHex hex1, BattleHex hex2,
+    static int getRange(BattleHex hex1, BattleHex hex2,
         boolean allowEntrance)
     {
         if (hex1 == null || hex2 == null)
@@ -1465,7 +1465,7 @@ public final class Battle
 
     /** Return the titan range (inclusive at both ends) from the critter to the
      *  closest enemy critter.  Return OUT_OF_RANGE if there are none. */
-    public int minRangeToEnemy(Critter critter)
+    int minRangeToEnemy(Critter critter)
     {
         BattleHex hex = critter.getCurrentHex();
         int min = OUT_OF_RANGE;
@@ -1739,7 +1739,7 @@ public final class Battle
      *  Sometimes two directions are possible.  If the left parameter
      *  is set, the direction further left will be given.  Otherwise,
      *  the direction further right will be given. */
-    public static int getDirection(BattleHex hex1, BattleHex hex2,
+    static int getDirection(BattleHex hex1, BattleHex hex2,
         boolean left)
     {
         if (hex1 == hex2)
@@ -1930,7 +1930,7 @@ public final class Battle
 
     // Return the number of intervening bramble hexes.  If LOS is along a
     // hexspine and there are two choices, pick the lower one.
-    public int countBrambleHexes(BattleHex hex1, BattleHex hex2)
+    int countBrambleHexes(BattleHex hex1, BattleHex hex2)
     {
         // Bramble is found only in brush and jungle.
         if (terrain != 'B' && terrain != 'J')
@@ -1980,7 +1980,7 @@ public final class Battle
 
 
     /** If legal, move critter to hex and return true. Else return false. */
-    public boolean doMove(int tag, String hexLabel)
+    boolean doMove(int tag, String hexLabel)
     {
         Critter critter = getActiveLegion().getCritterByTag(tag);
         if (critter != null)
@@ -2022,7 +2022,7 @@ public final class Battle
     /** A streamlined version of doMove for the AI. If legal, move critter
      *  to hex and return true. Else return false.  Do not allow null moves.
      */
-    public boolean testMove(Critter critter, String hexLabel)
+    boolean testMove(Critter critter, String hexLabel)
     {
         if (showMoves(critter, false).contains(hexLabel))
         {
@@ -2033,7 +2033,7 @@ public final class Battle
     }
 
 
-    public void cleanup()
+    void cleanup()
     {
         battleOver = true;
         game.finishBattle(masterHexLabel, attackerEntered);
@@ -2058,7 +2058,7 @@ public final class Battle
     }
 
 
-    public boolean isOccupied(String hexLabel)
+    boolean isOccupied(String hexLabel)
     {
         Iterator it = getAllCritters().iterator();
         while (it.hasNext())
@@ -2072,17 +2072,17 @@ public final class Battle
         return false;
     }
 
-    public boolean isOccupied(BattleHex hex)
+    boolean isOccupied(BattleHex hex)
     {
         return isOccupied(hex.getLabel());
     }
 
-    public Critter getCritter(BattleHex hex)
+    Critter getCritter(BattleHex hex)
     {
         return getCritter(hex.getLabel());
     }
 
-    public Critter getCritter(String hexLabel)
+    Critter getCritter(String hexLabel)
     {
         Iterator it = getAllCritters().iterator();
         while (it.hasNext())
@@ -2096,7 +2096,7 @@ public final class Battle
         return null;
     }
 
-    public ArrayList getCritters(String hexLabel)
+    ArrayList getCritters(String hexLabel)
     {
         ArrayList critters = new ArrayList();
         Iterator it = getAllCritters().iterator();
@@ -2111,7 +2111,7 @@ public final class Battle
         return critters;
     }
 
-    public Critter getCritter(int tag)
+    Critter getCritter(int tag)
     {
         Iterator it = getAllCritters().iterator();
         while (it.hasNext())

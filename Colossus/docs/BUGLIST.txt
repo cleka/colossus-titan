@@ -23,6 +23,10 @@ Linux, Solaris, 1.3 - 1.3.1: Dialogs sometimes beep for no good reason.
 Win98, 1.3.1: Windows don't always pop to the front when show() is
    called.  Works fine in Linux and Solaris.
 
+Linux, 1.3.1, fvwm2: Problems with dialog resizing.  Doesn't seem to
+   happen with other window managers.  Commented out 
+   setResizable(false) in all dialogs as an attempted workaround.
+
 
 Current programming bugs:
 
@@ -93,14 +97,10 @@ CreatureCollectionView does not respect scale.
 
 Carry cursor sometimes fails without an error message.  Race condition?
 
-
-Teleport bug not fixed?  Try to reproduce.
-
 Negotiation is broken and disabled.
 
 Red battle hex highlighting clashes with volcano.
 
-Report that JNLP is broken but zip works.  Need to confirm.
 
 
 AI bugs:

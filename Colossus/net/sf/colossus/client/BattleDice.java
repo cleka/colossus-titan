@@ -13,7 +13,7 @@ import javax.swing.*;
  */
 
 
-public final class BattleDice extends JPanel
+final class BattleDice extends JPanel
 {
     private String attackerName;
     private String defenderName;
@@ -30,7 +30,7 @@ public final class BattleDice extends JPanel
     private Chit [] dice;
 
 
-    public BattleDice()
+    BattleDice()
     {
         setVisible(false);
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -39,7 +39,7 @@ public final class BattleDice extends JPanel
     }
 
 
-    public void setValues(String attackerName, String defenderName,
+    void setValues(String attackerName, String defenderName,
         String attackerHexId, String defenderHexId, char terrain,
         int targetNumber, int hits, int carries, int [] rolls)
     {
@@ -55,7 +55,7 @@ public final class BattleDice extends JPanel
         numDice = rolls.length;
     }
 
-    public void setCarries(int carries)
+    void setCarries(int carries)
     {
         this.carries = carries;
     }
@@ -79,7 +79,7 @@ public final class BattleDice extends JPanel
 
 
     /** Initialize and layout the components, in response to new data. */
-    public void showRoll()
+    void showRoll()
     {
         // Abort if called too early.
         if (attackerName == null)
@@ -127,7 +127,7 @@ public final class BattleDice extends JPanel
         repaint();
     }
 
-    public void rescale()
+    void rescale()
     {
         showRoll();
     }

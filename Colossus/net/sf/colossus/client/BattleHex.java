@@ -41,12 +41,12 @@ public class BattleHex extends Hex
 
     /** Movement costs */
     public static final int IMPASSIBLE_COST = 99;
-    public static final int SLOW_COST = 2;
-    public static final int NORMAL_COST = 1;
+    private static final int SLOW_COST = 2;
+    private static final int NORMAL_COST = 1;
 
 
 
-    public BattleHex(int xCoord, int yCoord)
+    BattleHex(int xCoord, int yCoord)
     {
         this.xCoord = xCoord;
         this.yCoord = yCoord;
@@ -103,7 +103,7 @@ public class BattleHex extends Hex
     }
 
 
-    public Color getTerrainColor()
+    Color getTerrainColor()
     {
         switch (getTerrain())
         {
@@ -271,7 +271,7 @@ public class BattleHex extends Hex
         }
     }
 
-    public void setNeighbor(int i, BattleHex hex)
+    void setNeighbor(int i, BattleHex hex)
     {
         if (i >= 0 && i < 6)
         {

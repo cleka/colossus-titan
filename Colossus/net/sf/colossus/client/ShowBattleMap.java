@@ -13,13 +13,13 @@ import javax.swing.*;
  * @author David Ripton
  */
 
-public final class ShowBattleMap extends HexMap implements WindowListener,
+final class ShowBattleMap extends HexMap implements WindowListener,
     MouseListener
 {
     private JDialog dialog;
 
 
-    public ShowBattleMap(JFrame parentFrame, String masterHexLabel)
+    ShowBattleMap(JFrame parentFrame, String masterHexLabel)
     {
         super(masterHexLabel);
 
@@ -36,7 +36,7 @@ public final class ShowBattleMap extends HexMap implements WindowListener,
         contentPane.add(this, BorderLayout.CENTER);
         dialog.pack();
 
-        dialog.setResizable(false);
+        //dialog.setResizable(false);
         dialog.setVisible(true);
     }
 

@@ -13,7 +13,6 @@ import net.sf.colossus.client.MasterBoard;
 import net.sf.colossus.client.MasterHex;
 import net.sf.colossus.client.GetPlayers;
 import net.sf.colossus.client.Client;
-import net.sf.colossus.client.PickColor;
 import net.sf.colossus.client.NegotiationResults;
 import net.sf.colossus.parser.TerrainRecruitLoader;
 
@@ -44,7 +43,7 @@ public final class Game
     private Set [] offers = new HashSet[2];
     private static TerrainRecruitLoader trl;
 
-    public Game()
+    Game()
     {
     }
 
@@ -229,19 +228,19 @@ public final class Game
         server.allInitBoard();
 
         Set colorsLeft = new HashSet();
-        for (i = 0; i < PickColor.colorNames.length; i++)
+        for (i = 0; i < Constants.colorNames.length; i++)
         {
-            colorsLeft.add(PickColor.colorNames[i]);
+            colorsLeft.add(Constants.colorNames[i]);
         }
 
         // Let human players pick colors first, followed by AI players.
         for (i = getNumPlayers() - 1; i >= 0; i--)
         {
-            pickPlayerColor(i, "Human", colorsLeft, frame);
+            pickPlayerColor(i, "Human", colorsLeft);
         }
         for (i = getNumPlayers() - 1; i >= 0; i--)
         {
-            pickPlayerColor(i, "AllAI", colorsLeft, frame);
+            pickPlayerColor(i, "AllAI", colorsLeft);
         }
 
         it = players.iterator();
@@ -269,19 +268,18 @@ public final class Game
 
 
     /** Let player i pick a color, only if type matches the player's type. */
-    private void pickPlayerColor(int i, String type, Set colorsLeft,
-        JFrame frame)
+    private void pickPlayerColor(int i, String type, Set colorsLeft)
     {
         Player player = (Player)players.get(i);
-        if (player.getType().equals("none"))
+        if (player.getType().endsWith("none"))
         {
             return;
         }
-        if (player.getType().equals("Human") && (!type.equals("Human")))
+        if (player.getType().endsWith("Human") && (!type.endsWith("Human")))
         {
             return;
         }
-        if (!player.getType().equals("Human") && (type.equals("Human")))
+        if (!player.getType().endsWith("Human") && (type.endsWith("Human")))
         {
             return;
         }
@@ -295,7 +293,7 @@ public final class Game
             }
             else
             {
-                color = PickColor.pickColor(frame, playerName, colorsLeft);
+                color = server.pickColor(i, colorsLeft);
             }
         }
         while (color == null);
@@ -304,7 +302,7 @@ public final class Game
         if (GetPlayers.byColor.equals(playerName))
         {
             player.setName(color);
-            server.getClient(i).setPlayerName(color);
+            server.setPlayerName(i, color);
         }
         Log.event(playerName + " chooses color " + color);
         player.initMarkersAvailable();

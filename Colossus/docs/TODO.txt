@@ -1,3 +1,7 @@
+Make all possible public classes and methods package private.  Reduce 
+   cross-platform imports.  Document remaining public classes, which 
+   are those that need to be included in the network protocol.
+
 Add test .jnlp files that points to a jar in the local filesystem,
    and to a jar on a test webserver or another directory on the
    SF webserver.
@@ -20,12 +24,9 @@ Eliminate persistent legion.hexInfo and instead return a temporary
    object containing all the entry sides and teleport possibilities
    along with the possible hexes that the legion can move to.
 
-Consider switching from make to Ant to better handle packages.
-Consider SableCC.
+Try SableCC.
 
 Confirmation prompt to avoid skipping recruits?
-
-Split GUI classes from model classes.
 
 Add UI for players to specify favorite colors.
 
@@ -82,10 +83,6 @@ Color code StatusScreen better.
 Show StatusScreen and ShowLegion info in the masterboard window, rather 
    than in separate windows.
 
-Move GUI/client classes and model/server classes into separate
-   packages.  Make all possible public classes package private.
-   Document remaining public classes, which are those that
-   need to be included in the network protocol.
 
 Client-server networking.
 

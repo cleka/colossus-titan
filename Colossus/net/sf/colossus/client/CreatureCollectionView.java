@@ -14,13 +14,13 @@ import net.sf.colossus.server.Creature;
  *  @version $Id$
  *  @author Tom Fruchterman
  */
-public class CreatureCollectionView extends JDialog
+class CreatureCollectionView extends JDialog
 {
     private Client client;
     private static Point location;
 
 
-    public CreatureCollectionView(JFrame frame, Client client)
+    CreatureCollectionView(JFrame frame, Client client)
     {
         super(frame);
         setTitle("Caretaker's Stacks");

@@ -13,7 +13,7 @@ import javax.swing.*;
  */
 
 
-public final class SummonAngel extends JDialog implements MouseListener,
+final class SummonAngel extends JDialog implements MouseListener,
     ActionListener, WindowListener
 {
     private String markerId;
@@ -53,7 +53,7 @@ public final class SummonAngel extends JDialog implements MouseListener,
         pack();
 
         setBackground(Color.lightGray);
-        setResizable(false);
+        //setResizable(false);
 
         int scale = 4 * Scale.get();
 
@@ -95,7 +95,7 @@ public final class SummonAngel extends JDialog implements MouseListener,
         repaint();
     }
 
-    public static SummonAngel summonAngel(Client client, String markerId,
+    static SummonAngel summonAngel(Client client, String markerId,
         String longMarkerName)
     {
         if (!active)
@@ -107,7 +107,7 @@ public final class SummonAngel extends JDialog implements MouseListener,
     }
 
 
-    public String getMarkerId()
+    String getMarkerId()
     {
         return markerId;
     }
@@ -185,7 +185,7 @@ public final class SummonAngel extends JDialog implements MouseListener,
 
 
     /** Upstate state of angel and archangel chits to reflect donor */
-    public void updateChits()
+    void updateChits()
     {
         String donorId = client.getDonorId();
         if (donorId == null)

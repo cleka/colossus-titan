@@ -72,10 +72,6 @@ public final class Client
         this.playerName = playerName;
     }
 
-    /** Null constructor for testing only. */
-    public Client()
-    {
-    }
 
 
     // Add all methods that GUI classes need to call against server classes.
@@ -303,7 +299,7 @@ public final class Client
     // TODO Add requests for info.
 
 
-    public void repaintAllWindows()
+    private void repaintAllWindows()
     {
         if (statusScreen != null)
         {
@@ -327,7 +323,7 @@ public final class Client
         }
     }
 
-    public void rescaleAllWindows()
+    void rescaleAllWindows()
     {
         if (statusScreen != null)
         {
@@ -377,7 +373,7 @@ public final class Client
         movementDie = null;
     }
 
-    public MovementDie getMovementDie()
+    MovementDie getMovementDie()
     {
         return movementDie;
     }
@@ -483,13 +479,9 @@ public final class Client
         syncCheckboxes();
     }
 
-    public void clearAllOptions()
-    {
-        options.clear();
-    }
 
     /** Ensure that Player menu checkboxes reflect the correct state. */
-    public void syncCheckboxes()
+    private void syncCheckboxes()
     {
         Enumeration en = options.propertyNames();
         while (en.hasMoreElements())
@@ -569,13 +561,13 @@ public final class Client
     }
 
 
-    public void initBattleDice()
+    private void initBattleDice()
     {
         battleDice = new BattleDice();
         map.getFrame().getContentPane().add(battleDice, BorderLayout.SOUTH);
     }
 
-    public void disposeBattleDice()
+    private void disposeBattleDice()
     {
         if (map != null && battleDice != null)
         {
@@ -584,7 +576,7 @@ public final class Client
         battleDice = null;
     }
 
-    public void disposeMasterBoard()
+    private void disposeMasterBoard()
     {
         if (board != null)
         {
@@ -593,7 +585,7 @@ public final class Client
         }
     }
 
-    public void disposeStatusScreen()
+    void disposeStatusScreen()
     {
         if (statusScreen != null)
         {
@@ -623,42 +615,42 @@ public final class Client
 
 
     /** Called from BattleMap to leave carry mode. */
-    public void leaveCarryMode()
+    void leaveCarryMode()
     {
         server.leaveCarryMode();
     }
 
 
-    public void doneWithBattleMoves()
+    void doneWithBattleMoves()
     {
         server.doneWithBattleMoves();
     }
 
-    public boolean anyOffboardCreatures()
+    boolean anyOffboardCreatures()
     {
         return server.anyOffboardCreatures();
     }
 
     /** Returns true if okay, or false if forced strikes remain. */
-    public boolean doneWithStrikes()
+    boolean doneWithStrikes()
     {
         return server.doneWithStrikes();
     }
 
 
-    public void makeForcedStrikes(boolean rangestrike)
+    void makeForcedStrikes(boolean rangestrike)
     {
         server.makeForcedStrikes(rangestrike);
     }
 
 
-    public java.util.List getMarkers()
+    java.util.List getMarkers()
     {
         return markers;
     }
 
     /** Get the first marker with this id. */
-    public Marker getMarker(String id)
+    Marker getMarker(String id)
     {
         Iterator it = markers.iterator();
         while (it.hasNext())
@@ -685,14 +677,14 @@ public final class Client
 
 
     // TODO Cache legion heights on client side?
-    public int getLegionHeight(String markerId)
+    int getLegionHeight(String markerId)
     {
         return server.getLegionHeight(markerId);
     }
 
     /** Add the marker to the end of the list.  If it's already
      *  in the list, remove the earlier entry. */
-    public void setMarker(String id, Marker marker)
+    void setMarker(String id, Marker marker)
     {
         removeMarker(id);
         markers.add(marker);
@@ -700,7 +692,7 @@ public final class Client
 
     /** Remove the first marker with this id from the list. Return
      *  the removed marker. */
-    public Marker removeMarker(String id)
+    public void removeMarker(String id)
     {
         Iterator it = markers.iterator();
         while (it.hasNext())
@@ -709,20 +701,19 @@ public final class Client
             if (marker.getId() == id)
             {
                 it.remove();
-                return marker;
+                return;
             }
         }
-        return null;
     }
 
 
-    public ArrayList getBattleChits()
+    ArrayList getBattleChits()
     {
         return battleChits;
     }
 
     /** Get the BattleChit with this tag. */
-    public BattleChit getBattleChit(int tag)
+    BattleChit getBattleChit(int tag)
     {
         Iterator it = battleChits.iterator();
         while (it.hasNext())
@@ -737,7 +728,7 @@ public final class Client
     }
 
     /** Create a new BattleChit and add it to the end of the list. */
-    public void addBattleChit(String imageName, int tag)
+    void addBattleChit(String imageName, int tag)
     {
         BattleChit chit = new BattleChit(4 * Scale.get(), imageName,
             map, tag);
@@ -796,12 +787,12 @@ public final class Client
     }
 
 
-    public ArrayList getRecruitChits()
+    ArrayList getRecruitChits()
     {
         return recruitChits;
     }
 
-    public void addRecruitChit(String imageName, String hexLabel)
+    void addRecruitChit(String imageName, String hexLabel)
     {
         int scale = 2 * Scale.get();
         GUIMasterHex hex = board.getGUIHexByLabel(hexLabel);
@@ -815,7 +806,7 @@ public final class Client
         recruitChits.add(chit);
     }
 
-    public void clearRecruitChits()
+    void clearRecruitChits()
     {
         recruitChits.clear();
     }
@@ -845,7 +836,7 @@ public final class Client
     }
 
 
-    public String getMoverId()
+    String getMoverId()
     {
         return moverId;
     }
@@ -856,7 +847,7 @@ public final class Client
     }
 
 
-    public MasterBoard getBoard()
+    MasterBoard getBoard()
     {
         return board;
     }
@@ -884,12 +875,12 @@ public final class Client
     }
 
 
-    public BattleMap getBattleMap()
+    BattleMap getBattleMap()
     {
         return map;
     }
 
-    public void setBattleMap(BattleMap map)
+    void setBattleMap(BattleMap map)
     {
         this.map = map;
     }
@@ -906,7 +897,7 @@ public final class Client
     }
 
 
-    public SummonAngel getSummonAngel()
+    SummonAngel getSummonAngel()
     {
         return summonAngel;
     }
@@ -918,17 +909,17 @@ public final class Client
             longMarkerName);
     }
 
-    public String getDonorId()
+    String getDonorId()
     {
         return server.getDonorId(playerName);
     }
 
-    public boolean donorHasAngel()
+    boolean donorHasAngel()
     {
         return server.donorHasAngel(playerName);
     }
 
-    public boolean donorHasArchangel()
+    boolean donorHasArchangel()
     {
         return server.donorHasArchangel(playerName);
     }
@@ -1051,7 +1042,6 @@ public final class Client
         }
     }
 
-
     public void repaintBattleHex(String hexLabel)
     {
         if (map != null)
@@ -1061,7 +1051,7 @@ public final class Client
     }
 
 
-    public void doFight(String hexLabel)
+    void doFight(String hexLabel)
     {
         if (summonAngel != null)
         {
@@ -1178,7 +1168,6 @@ public final class Client
             map.dispose();
             map = null;
         }
-        // XXX Should these be in a separate method?
         battleChits.clear();
         disposeBattleDice();
     }
@@ -1378,30 +1367,28 @@ public final class Client
         }
     }
 
-    public String getColor()
+    String getColor()
     {
         return server.getPlayerColor(playerName);
     }
 
-    public String getShortColor()
+    String getShortColor()
     {
         return Player.getShortColor(getColor());
     }
 
 
-    public String getBattleActivePlayerName()
+    String getBattleActivePlayerName()
     {
         return server.getBattleActivePlayerName();
     }
 
-
-    public int getBattlePhase()
+    int getBattlePhase()
     {
         return server.getBattlePhase();
     }
 
-
-    public int getBattleTurnNumber()
+    int getBattleTurnNumber()
     {
         return server.getBattleTurnNumber();
     }
@@ -1409,231 +1396,231 @@ public final class Client
 
     /** Returns true if the move was legal, or false if it
      *  was not allowed. */
-    public boolean doBattleMove(int tag, String hexLabel)
+    boolean doBattleMove(int tag, String hexLabel)
     {
         return server.doBattleMove(tag, hexLabel);
     }
 
 
     /** Attempt to have critter tag strike the critter in hexLabel. */
-    public void strike(int tag, String hexLabel)
+    void strike(int tag, String hexLabel)
     {
         server.strike(tag, hexLabel);
     }
 
 
     /** Attempt to apply carries to the critter in hexLabel. */
-    public void applyCarries(String hexLabel)
+    void applyCarries(String hexLabel)
     {
         server.applyCarries(hexLabel);
     }
 
 
-    public int getCarryDamage()
+    int getCarryDamage()
     {
         return server.getCarryDamage();
     }
 
-    public Set getCarryTargets()
+    Set getCarryTargets()
     {
         return server.getCarryTargets();
     }
 
 
-    public void undoLastBattleMove()
+    void undoLastBattleMove()
     {
         server.undoLastBattleMove();
     }
 
-    public void undoAllBattleMoves()
+    void undoAllBattleMoves()
     {
         server.undoAllBattleMoves();
     }
 
 
-    public int [] getCritterTags(String hexLabel)
+    int [] getCritterTags(String hexLabel)
     {
         return server.getCritterTags(hexLabel);
     }
 
     /** Return a set of hexLabels. */
-    public Set findMobileCritters()
+    Set findMobileCritters()
     {
         return server.findMobileCritters();
     }
 
     /** Return a set of hexLabels. */
-    public Set showBattleMoves(int tag)
+    Set showBattleMoves(int tag)
     {
         return server.showBattleMoves(tag);
     }
 
     /** Return a set of hexLabels. */
-    public Set findStrikes(int tag)
+    Set findStrikes(int tag)
     {
         return server.findStrikes(tag);
     }
 
     /** Return a set of hexLabels. */
-    public Set findCrittersWithTargets()
+    Set findCrittersWithTargets()
     {
         return server.findCrittersWithTargets();
     }
 
-    public String getPlayerNameByTag(int tag)
+    String getPlayerNameByTag(int tag)
     {
         return server.getPlayerNameByTag(tag);
     }
 
-    public String getActivePlayerName()
+    String getActivePlayerName()
     {
         return server.getActivePlayerName();
     }
 
-    public int getPhase()
+    int getPhase()
     {
         return server.getPhase();
     }
 
-    public int getTurnNumber()
+    int getTurnNumber()
     {
         return server.getTurnNumber();
     }
 
-    public void doSplit(String markerId)
+    void doSplit(String markerId)
     {
         server.doSplit(markerId);
     }
 
-    public boolean doMove(String markerId, String hexLabel)
+    boolean doMove(String markerId, String hexLabel)
     {
         return server.doMove(markerId, hexLabel);
     }
 
     /** Return a list of Creatures. */
-    public java.util.List findEligibleRecruits(String markerId,
+    java.util.List findEligibleRecruits(String markerId,
         String hexLabel)
     {
         return server.findEligibleRecruits(markerId, hexLabel);
     }
 
     /** Return a set of hexLabels. */
-    public Set findAllEligibleRecruitHexes()
+    Set findAllEligibleRecruitHexes()
     {
         return server.findAllEligibleRecruitHexes();
     }
 
     /** Return a set of hexLabels. */
-    public Set findSummonableAngels(String markerId)
+    Set findSummonableAngels(String markerId)
     {
         return server.findSummonableAngels(markerId);
     }
 
     /** Return a set of hexLabels. */
-    public Set listMoves(String markerId)
+    Set listMoves(String markerId)
     {
         return server.listMoves(markerId);
     }
 
-    public java.util.List getAllLegionIds()
+    java.util.List getAllLegionIds()
     {
         return server.getAllLegionIds();
     }
 
-    public int getActivePlayerNum()
+    int getActivePlayerNum()
     {
         return server.getActivePlayerNum();
     }
 
-    public int getCreatureCount(String creatureName)
+    int getCreatureCount(String creatureName)
     {
         return server.getCreatureCount(creatureName);
     }
 
 
-    public ArrayList getLegionMarkerIds(String hexLabel)
+    ArrayList getLegionMarkerIds(String hexLabel)
     {
         return server.getLegionMarkerIds(hexLabel);
     }
 
-    public Set findAllUnmovedLegionHexes()
+    Set findAllUnmovedLegionHexes()
     {
         return server.findAllUnmovedLegionHexes();
     }
 
-    public Set findTallLegionHexes()
+    Set findTallLegionHexes()
     {
         return server.findTallLegionHexes();
     }
 
-    public Set findEngagements()
+    Set findEngagements()
     {
         return server.findEngagements();
     }
 
-    public void newGame()
+    void newGame()
     {
         server.newGame();
     }
 
-    public void loadGame(String filename)
+    void loadGame(String filename)
     {
         server.loadGame(filename);
     }
 
-    public void saveGame()
+    void saveGame()
     {
         server.saveGame();
     }
 
-    public void saveGame(String filename)
+    void saveGame(String filename)
     {
         server.saveGame(filename);
     }
 
-    public String getLongMarkerName(String markerId)
+    String getLongMarkerName(String markerId)
     {
         return server.getLongMarkerName(markerId);
     }
 
     /** Return a list of Strings. */
-    public java.util.List getLegionImageNames(String markerId)
+    java.util.List getLegionImageNames(String markerId)
     {
         return server.getLegionImageNames(markerId, playerName);
     }
 
-    public void undoLastSplit()
+    void undoLastSplit()
     {
         server.undoLastSplit(playerName);
     }
 
-    public void undoLastMove()
+    void undoLastMove()
     {
         server.undoLastMove(playerName);
     }
 
-    public void undoLastRecruit()
+    void undoLastRecruit()
     {
         server.undoLastRecruit(playerName);
     }
 
-    public void undoAllSplits()
+    void undoAllSplits()
     {
         server.undoAllSplits(playerName);
     }
 
-    public void undoAllMoves()
+    void undoAllMoves()
     {
         server.undoAllMoves(playerName);
     }
 
-    public void undoAllRecruits()
+    void undoAllRecruits()
     {
         server.undoAllRecruits(playerName);
     }
 
 
-    public void doneWithSplits()
+    void doneWithSplits()
     {
         if (!playerName.equals(server.getActivePlayerName()))
         {
@@ -1645,7 +1632,7 @@ public final class Client
         }
     }
 
-    public void doneWithMoves()
+    void doneWithMoves()
     {
         if (!playerName.equals(server.getActivePlayerName()))
         {
@@ -1660,7 +1647,7 @@ public final class Client
         }
     }
 
-    public void doneWithEngagements()
+    void doneWithEngagements()
     {
         if (!playerName.equals(server.getActivePlayerName()))
         {
@@ -1672,7 +1659,7 @@ public final class Client
         }
     }
 
-    public void doneWithRecruits()
+    void doneWithRecruits()
     {
         if (!playerName.equals(server.getActivePlayerName()))
         {
@@ -1682,17 +1669,17 @@ public final class Client
     }
 
 
-    public boolean isMyLegion(String markerId)
+    boolean isMyLegion(String markerId)
     {
         return (playerName.equals(server.getPlayerNameByMarkerId(markerId)));
     }
 
-    public int getMovementRoll()
+    int getMovementRoll()
     {
         return movementRoll;
     }
 
-    public int getMulligansLeft()
+    int getMulligansLeft()
     {
         return server.getMulligansLeft(playerName);
     }
@@ -1701,5 +1688,10 @@ public final class Client
     {
         return PickMarker.pickMarker(board.getFrame(), playerName,
             markersAvailable);
+    }
+
+    public String pickColor(Set colorsLeft)
+    {
+        return PickColor.pickColor(board.getFrame(), playerName, colorsLeft);
     }
 }

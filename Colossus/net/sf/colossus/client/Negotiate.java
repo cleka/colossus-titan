@@ -15,8 +15,7 @@ import net.sf.colossus.server.Creature;
  * @author David Ripton
  */
 
-public final class Negotiate extends JDialog implements MouseListener,
-    ActionListener
+final class Negotiate extends JDialog implements MouseListener, ActionListener
 {
     private String attackerMarkerId;
     private String defenderMarkerId;
@@ -46,7 +45,7 @@ public final class Negotiate extends JDialog implements MouseListener,
         contentPane.setLayout(gridbag);
         pack();
         setBackground(Color.lightGray);
-        setResizable(false);
+        //setResizable(false);
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
         addMouseListener(this);
 
@@ -147,7 +146,7 @@ public final class Negotiate extends JDialog implements MouseListener,
     /** Display a dialog allowing one player to offer a settlement to
      *  an engagement.  Return a NegotiationResults.
      */
-    public static NegotiationResults negotiate(Client client, 
+    static NegotiationResults negotiate(Client client, 
         String attackerLongMarkerName, String defenderLongMarkerName, 
         String attackerMarkerId, String defenderMarkerId,
         java.util.List attackerImageNames, java.util.List defenderImageNames)
@@ -159,7 +158,7 @@ public final class Negotiate extends JDialog implements MouseListener,
     }
 
 
-    public void cleanup()
+    void cleanup()
     {
         Concede.saveLocation(getLocation());
         dispose();

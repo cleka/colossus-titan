@@ -61,7 +61,7 @@ class MinimaxAI extends SimpleAI implements AI
         int AIPlayerNum;
         HashMap[] enemyAttackMap;
 
-        public MasterBoardPosition(Game game, int AIPlayerNum)
+        MasterBoardPosition(Game game, int AIPlayerNum)
         {
             this.game = game.AICopy();
             this.AIPlayerNum = AIPlayerNum;
@@ -69,7 +69,7 @@ class MinimaxAI extends SimpleAI implements AI
                 game.getPlayer(AIPlayerNum));
         }
 
-        public MasterBoardPosition(MasterBoardPosition position)
+        MasterBoardPosition(MasterBoardPosition position)
         {
             this.game = position.game.AICopy();
             this.AIPlayerNum = position.AIPlayerNum;
@@ -372,7 +372,7 @@ class MinimaxAI extends SimpleAI implements AI
         }
     }
 
-    class MasterBoardPositionMove implements Minimax.Move
+    public class MasterBoardPositionMove implements Minimax.Move
     {
         MasterBoardPosition position;
         private int value;
@@ -392,7 +392,7 @@ class MinimaxAI extends SimpleAI implements AI
     {
         int roll;
 
-        public DiceMove(int roll, MasterBoardPosition position)
+        DiceMove(int roll, MasterBoardPosition position)
         {
             this.position = position;
             this.roll = roll;
@@ -403,7 +403,7 @@ class MinimaxAI extends SimpleAI implements AI
     {
         HashMap moves;
 
-        public PlayerMove(HashMap moves, MasterBoardPosition position)
+        PlayerMove(HashMap moves, MasterBoardPosition position)
         {
             this.position = position;
             this.moves = moves;

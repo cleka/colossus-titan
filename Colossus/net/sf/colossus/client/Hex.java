@@ -31,20 +31,20 @@ public abstract class Hex
     //              4---------3
 
     // GUI variables
-    protected double[] xVertex = new double[6];
-    protected double[] yVertex = new double[6];
-    protected double len;
-    protected GeneralPath hexagon;
-    protected Rectangle rectBound;
+    double[] xVertex = new double[6];
+    double[] yVertex = new double[6];
+    double len;
+    GeneralPath hexagon;
+    Rectangle rectBound;
     /** Globally turns antialiasing on or off for all hexes. */
-    protected static boolean antialias;
+    static boolean antialias;
 
     // Selection is in-between GUI and game state.
     private boolean selected;
 
     // Game state variables
     private char terrain;
-    protected String label = "";  // Avoid null pointer in stringWidth()
+    String label = "";  // Avoid null pointer in stringWidth()
     private int xCoord = -1;
     private int yCoord = -1;
 
@@ -60,7 +60,7 @@ public abstract class Hex
     }
 
 
-    public Rectangle getBounds()
+    Rectangle getBounds()
     {
         return rectBound;
     }
@@ -113,28 +113,28 @@ public abstract class Hex
     }
 
 
-    public void select()
+    void select()
     {
         selected = true;
     }
 
-    public void unselect()
+    void unselect()
     {
         selected = false;
     }
 
-    public boolean isSelected()
+    boolean isSelected()
     {
         return selected;
     }
 
 
-    public static boolean getAntialias()
+    static boolean getAntialias()
     {
         return antialias;
     }
 
-    public static void setAntialias(boolean enabled)
+    static void setAntialias(boolean enabled)
     {
         antialias = enabled;
     }
@@ -143,7 +143,7 @@ public abstract class Hex
     /** Return a GeneralPath polygon, with the passed number of sides,
      *  and the passed x and y coordinates.  Close the polygon if the
      *  argument closed is true. */
-    public static GeneralPath makePolygon(int sides, double [] x, double [] y,
+    static GeneralPath makePolygon(int sides, double [] x, double [] y,
         boolean closed)
     {
         GeneralPath polygon = new GeneralPath(GeneralPath.WIND_EVEN_ODD,
@@ -162,14 +162,14 @@ public abstract class Hex
 
 
     /** Return the Point closest to the center of the polygon. */
-    public Point findCenter()
+    Point findCenter()
     {
         return new Point((int)Math.round((xVertex[2] + xVertex[5]) / 2),
             (int)Math.round((yVertex[0] + yVertex[3]) / 2));
     }
 
     /** Return the Point2D.Double at the center of the polygon. */
-    public Point2D.Double findCenter2D()
+    Point2D.Double findCenter2D()
     {
         return new Point2D.Double((xVertex[2] + xVertex[5]) / 2.0,
             (yVertex[0] + yVertex[3]) / 2.0);

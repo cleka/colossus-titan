@@ -17,7 +17,7 @@ import net.sf.colossus.server.Options;
  */
 
 
-public final class StatusScreen extends JDialog implements WindowListener
+final class StatusScreen extends JDialog implements WindowListener
 {
     private JLabel [] nameLabel;
     private JLabel [] towerLabel;
@@ -35,7 +35,7 @@ public final class StatusScreen extends JDialog implements WindowListener
     private static Dimension size;
 
 
-    public StatusScreen(JFrame frame, Client client, String [] playerInfo)
+    StatusScreen(JFrame frame, Client client, String [] playerInfo)
     {
         super(frame, "Game Status");
 
@@ -168,7 +168,7 @@ public final class StatusScreen extends JDialog implements WindowListener
     }
 
 
-    public void updateStatusScreen(String [] playerInfo)
+    void updateStatusScreen(String [] playerInfo)
     {
         for (int i = 0; i < playerInfo.length; i++)
         {
@@ -253,7 +253,7 @@ public final class StatusScreen extends JDialog implements WindowListener
         return getMinimumSize();
     }
 
-    public void rescale()
+    void rescale()
     {
         int scale = Scale.get();
         setSize(25 * scale, 15 * scale);

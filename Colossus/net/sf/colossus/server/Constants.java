@@ -60,4 +60,8 @@ public final class Constants
     public static final int NOWHERE = -1;
 
     public static final String invertedPrefix = "i_";
+
+
+    public static final String [] colorNames =
+        {"Black", "Blue", "Brown", "Gold", "Green", "Red"};
 }

@@ -11,7 +11,7 @@ import java.awt.*;
  * @author David Ripton
  */
 
-public final class BattleChit extends Chit
+final class BattleChit extends Chit
 {
     private int tag;
     private static Font font;
@@ -20,7 +20,7 @@ public final class BattleChit extends Chit
     private int hits = 0;
 
 
-    public BattleChit(int scale, String id, Container container, int tag)
+    BattleChit(int scale, String id, Container container, int tag)
     {
         super(scale, id, container);
         this.tag = tag;
@@ -28,13 +28,13 @@ public final class BattleChit extends Chit
     }
 
 
-    public int getTag()
+    int getTag()
     {
         return tag;
     }
 
 
-    public void setHits(int hits)
+    void setHits(int hits)
     {
         this.hits = hits;
         repaint();

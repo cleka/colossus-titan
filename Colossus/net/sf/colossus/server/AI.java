@@ -9,7 +9,7 @@ import java.util.*;
  *
  * @version $Id$
  */
-public interface AI
+interface AI
 {
     /** make masterboard moves for current player in the Game */
     void masterMove(Game game);

@@ -23,7 +23,7 @@ final class ShowLegion extends JDialog implements MouseListener,
 
         pack();
         setBackground(Color.lightGray);
-        setResizable(false);
+        //setResizable(false);
         addWindowListener(this);
 
         // Place dialog relative to parentFrame's origin, and fully on-screen.

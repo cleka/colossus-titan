@@ -13,18 +13,18 @@ import javax.swing.*;
  */
 
 
-public final class MovementDie extends Chit
+final class MovementDie extends Chit
 {
     private int lastRoll = 0;
 
 
-    public MovementDie(int scale, String id, Container container)
+    MovementDie(int scale, String id, Container container)
     {
         super(scale, id, container);
     }
 
 
-    public static String getDieImageName(int roll)
+    static String getDieImageName(int roll)
     {
         StringBuffer basename = new StringBuffer("Hit");
         basename.append(roll);
@@ -33,7 +33,7 @@ public final class MovementDie extends Chit
     }
 
 
-    public int getLastRoll()
+    int getLastRoll()
     {
         return lastRoll;
     }

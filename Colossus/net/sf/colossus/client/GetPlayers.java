@@ -95,9 +95,7 @@ public final class GetPlayers extends JDialog implements WindowListener,
         pack();
 
         Container contentPane = getContentPane();
-
         GridLayout baseLayout = new GridLayout(0, 1);
-        
         contentPane.setLayout(baseLayout);
                 
         for (int i = 0; i < 6; i++)
@@ -493,6 +491,7 @@ public final class GetPlayers extends JDialog implements WindowListener,
     {
         if (e.getActionCommand().equals(quit))
         {
+            playerInfo.clear();
             dispose();
         }
         else if (e.getActionCommand().equals(newGame))

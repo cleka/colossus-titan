@@ -30,10 +30,10 @@ public class MasterHex extends Hex
 
     // n, ne, se, s, sw, nw
     private int labelSide;
-    protected int[] exitType = new int[6];
-    protected int[] baseExitType = new int[3];
-    protected int[] baseExitLabel = new int[3];
-    protected int[] entranceType = new int[6];
+    private int[] exitType = new int[6];
+    private int[] baseExitType = new int[3];
+    private int[] baseExitLabel = new int[3];
+    private int[] entranceType = new int[6];
 
 
     // The hex vertexes are numbered like this:
@@ -54,14 +54,9 @@ public class MasterHex extends Hex
     //           4------------3                  4------3
 
 
-    public MasterHex()
+    MasterHex()
     {
         super();
-    }
-
-    public static char[] getTerrainsArray()
-    {
-        return Game.getTerrainsArray();
     }
 
     public String getTerrainName()
@@ -126,7 +121,7 @@ public class MasterHex extends Hex
         }
     }
 
-    public void setNeighbor(int i, MasterHex hex)
+    void setNeighbor(int i, MasterHex hex)
     {
         neighbors[i] = hex;
     }
@@ -148,7 +143,7 @@ public class MasterHex extends Hex
         return labelSide;
     }
 
-    public void setLabelSide(int labelSide)
+    void setLabelSide(int labelSide)
     {
         this.labelSide = labelSide;
     }
@@ -159,7 +154,7 @@ public class MasterHex extends Hex
         return exitType[i];
     }
 
-    public void setExitType(int i, int exitType)
+    void setExitType(int i, int exitType)
     {
         this.exitType[i] = exitType;
     }
@@ -189,7 +184,7 @@ public class MasterHex extends Hex
         return entranceType[i];
     }
 
-    public void setEntranceType(int i, int entranceType)
+    void setEntranceType(int i, int entranceType)
     {
         this.entranceType[i] = entranceType;
     }

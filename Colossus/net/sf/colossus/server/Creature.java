@@ -68,7 +68,7 @@ public class Creature implements Comparable
     }
 
 
-    protected Creature(Creature creature)
+    public Creature(Creature creature)
     {
         this.name = creature.name;
         this.power = creature.power;
@@ -86,7 +86,8 @@ public class Creature implements Comparable
         this.pluralName = creature.pluralName;
     }
 
-    public static void loadCreatures()
+
+    static void loadCreatures()
     {
         try 
         {
@@ -127,12 +128,10 @@ public class Creature implements Comparable
         return lord;
     }
 
-
     public boolean isImmortal()
     {
         return (lord || demilord);
     }
-
 
     public boolean isTitan()
     {
@@ -144,18 +143,15 @@ public class Creature implements Comparable
         return name.equals("Angel") || name.equals("Archangel");
     }
 
-
     public String getName()
     {
         return name;
     }
 
-
     public String getPluralName()
     {
         return pluralName;
     }
-
 
     public String getImageName(boolean inverted)
     {
@@ -167,7 +163,6 @@ public class Creature implements Comparable
         basename.append(name);
         return basename.toString();
     }
-
 
     public String getImageName()
     {
@@ -195,7 +190,6 @@ public class Creature implements Comparable
         return rangestrikes;
     }
 
-
     public boolean isFlier()
     {
         return flies;
@@ -207,24 +201,20 @@ public class Creature implements Comparable
         return nativeBramble;
     }
 
-
     public boolean isNativeDrift()
     {
         return nativeDrift;
     }
-
 
     public boolean isNativeBog()
     {
         return nativeBog;
     }
 
-
     public boolean isNativeSandDune()
     {
         return nativeSandDune;
     }
-
 
     public boolean isNativeSlope()
     {

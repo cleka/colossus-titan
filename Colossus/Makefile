@@ -1,8 +1,11 @@
 # $Id$
 
+# If you have problems with make, use Ant instead.  See build.xml.
+
 # Make sure to save this file in Unix rather than DOS endline format, so that
 #    it will continue to work portably.  GNU make has hard-to-diagnose 
-#    problems with spurious ^M characters.
+#    problems with spurious ^M characters.  And be certain that tabs do not 
+#    get converted to spaces.
 
 # Java compiler
 # jikes is really fast.  It supports -depend so all
@@ -24,12 +27,12 @@ JCC = javac -J-Djavac.pipe.output=true -g -deprecation -target 1.2
 # JavaCC 2.1 is available from 
 # http://www.webgain.com/trialware/javacc/JavaCC2_1.zip
 
+# Needs to be in the path.
 JAVACC= javacc
 
 
 HTMLDIR = /home/groups/c/co/colossus/htdocs
 DOWNLOAD_DIR = $(HTMLDIR)/download
-
 ZIPFILE = Colossus.`date +%Y%m%d`.zip
 
 
@@ -53,7 +56,8 @@ sources = $(wildcard *.java) \
 	$(wildcard net/sf/colossus/client/*.java) \
 	$(wildcard net/sf/colossus/server/*.java) \
 	$(wildcard net/sf/colossus/util/*.java) \
-	$(wildcard net/sf/colossus/parser/*.java)
+	$(wildcard net/sf/colossus/parser/*.java) \
+	$(wildcard images/*.java)
 
 CLASS_FILES = $(sources:%.java=%.class)
 
@@ -67,7 +71,7 @@ jar : $(JARFILE)
 
 # TODO Update this whenever anything else changes, and bundle
 # it into the jar.
-version :
+version : classes
 	echo `date +%Y%m%d` > version
 
 
@@ -102,15 +106,18 @@ $(INST_DIST): dist
 $(INST_JNLP): dist
 	cp Colossus.jnlp $(HTMLDIR)
 
-inst: signjar $(INST_JARFILE) $(INST_HTML) $(INST_README) $(INST_DIST) $(INST_JNLP)
+inst: signjar $(INST_JARFILE) $(INST_README) $(INST_DIST) $(INST_JNLP)
 
 # Clean up
 clean:
-	rm -f *~ core javacore.txt *.bak *.jar *.class .#*.jar 
+	rm -f version core javacore.txt *~ *.bak *.class *.jar .#*.jar javadoc/ \
+            net.sf.colossus/parser/*.java
 
 # Make zip file.  Don't include saved games, CVS dirs, or other zip files.
 dist: $(JARFILE)
-	zip -pr $(ZIPFILE) * -x *.sav -x *.zip -x \*CVS\* -x \*javadoc\* -x *Keystore*
+	zip -pr $(ZIPFILE) * -x *.sav -x *.zip -x \*CVS\* -x \*javadoc\* \
+            -x *Keystore* -x *cfg -x *properties* -x .*
+
 
 
 # Make javadoc docs
@@ -119,4 +126,3 @@ javadoc:
         net/sf/colossus/client/*.java net/sf/colossus/server/*.java \
         net/sf/colossus/util/*.java net/sf/colossus/parser/*.java
 
-# TODO Make tags
