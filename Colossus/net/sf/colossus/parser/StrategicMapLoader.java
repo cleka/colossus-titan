@@ -9,10 +9,22 @@ import net.sf.colossus.server.Constants;
 import net.sf.colossus.client.MasterHex;
 import net.sf.colossus.server.Game;
 
-
+/**
+ * StrategicMapLoader load the description of the MasterBoard.
+ * @author Romain Dolbeau
+ * @version $Id$
+ * @see net.sf.colossus.client.MasterHex
+ */
 public class StrategicMapLoader implements StrategicMapLoaderConstants {
+    /**
+     * Map the textual description of a transition to the constant representing the same transition.
+     */
     static Hashtable stringToWay;
 
+    /**
+     * Initialize the loader, in particular the text-to-constant mapping.
+     * @see #stringToWay
+     */
     public void StrategicMapLoaderInit()
     {
         stringToWay = new Hashtable(4);
@@ -40,6 +52,11 @@ public class StrategicMapLoader implements StrategicMapLoaderConstants {
     throw new Error("Missing return statement in function");
   }
 
+/**
+ * @param h The MasterHex array in which the case will be added.
+ * @return Status of the parser ; negative at the end of file, positive on success, null on blank line.
+ * @see net.sf.colossus.client.MasterHex
+ */
   final public int oneCase(MasterHex [][] h) throws ParseException {
     char ter;
     int p;

@@ -4,7 +4,11 @@ package net.sf.colossus.parser;
 
 import java.util.*;
 
-
+/**
+ * VariantLoader load the name of variant files fro a variant description.
+ * @author Romain Dolbeau
+ * @version $Id$
+ */
 public class VariantLoader implements VariantLoaderConstants {
     public static final int MAP_INDEX = 0;
     public static final int CRE_INDEX = 1;

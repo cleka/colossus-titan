@@ -12,7 +12,12 @@ import java.util.*;
 
 import net.sf.colossus.server.Creature;
 
-
+/**
+ * CreatureLoader the creatures descriptions.
+ * @author Romain Dolbeau
+ * @version $Id$
+ * @see net.sf.colossus.server.Creature
+ */
 public class CreatureLoader
 {
 }
@@ -73,6 +78,12 @@ int c_number() :
     }
 }
 
+/**
+ * Add one creature to the list of creature.
+ * @param lc List of creatures.
+ * @return Status of the parser ; negative at the end of file, positive on success, null on blank line.
+ * @see net.sf.colossus.server.Creature
+ */
 int oneCreature(List lc) :
 {
     String name;

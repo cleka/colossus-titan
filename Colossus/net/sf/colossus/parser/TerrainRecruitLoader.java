@@ -8,26 +8,67 @@ import net.sf.colossus.util.Log;
 import net.sf.colossus.util.HTMLColor;
 import net.sf.colossus.server.Creature;
 
-
+/**
+ * TerrainRecruitLoader load the terrains and recruits descriptions.
+ * @author Romain Dolbeau
+ * @version $Id$
+ * @see net.sf.colossus.server.Creature
+ */
 public class TerrainRecruitLoader implements TerrainRecruitLoaderConstants {
+    /**
+     * Map a character (representing a terrain) to a list of recruits.
+     */
     Hashtable carToRecruits = new Hashtable();
+    /**
+     * Map a character (representing a terrain) to a terrain name.
+     */
     Hashtable carToName = new Hashtable();
+    /**
+     * Map a character (representing a terrain) to a terrain color.
+     */
     Hashtable carToColor = new Hashtable();
+    /**
+     * All the character that are valid terrains.
+     */
     public char[] terrains = null;
 
+    /**
+     * Used internally to associate a creature name and the number of creatures needed to recruit it.
+     * @author Romain Dolbeau
+     * @version $Id$
+     */
     class recruitNumber
     {
+        /**
+         * Name of the creature
+         */
         public String name;
+        /**
+         * Number of creatures needed to recruit it, depend on the terrain.
+         */
         public int number;
+        /**
+         * @param n Name of the creature
+         * @param i Number of creatures needed to recruit it in the terrain considered.
+         */
         public recruitNumber(String n, int i)
         {
             name = n; number = i;
         }
+        /**
+         * Textual representation of the data.
+         * @return Textual representation of the data as a String.
+         */
         public String toString()
         {
             return("(" + number + "," + name +")");
         }
     }
+    /**
+     * Give an array of the starting creatures, those available in the first turn and in the tower.
+     * @return an array of Creature representing the starting creatures.
+     * @see net.sf.colossus.server.Creature
+     */
     public Creature[] getStartingCreatures()
     {
         Creature[] bc = new Creature[3];
@@ -37,14 +78,30 @@ public class TerrainRecruitLoader implements TerrainRecruitLoaderConstants {
         bc[2] = (Creature)to.get(2);
         return(bc);
     }
+    /**
+     * Give the name of the terrain.
+     * @param tc Character representing a terrain.
+     * @return The name of the terrain as a String.
+     */
     public String getTerrainName(char tc)
     {
         return((String)carToName.get(new Character(tc)));
     }
+    /**
+     * Give the color of the terrain.
+     * @param tc Character representing a terrain.
+     * @return The color of the terrain as Color.
+     */
     public java.awt.Color getTerrainColor(char tc)
     {
         return((java.awt.Color)carToColor.get(new Character(tc)));
     }
+    /**
+     * Give a list of the possible recruits in a terrain.
+     * @param terrain Character representing a terrain.
+     * @return List of Creature that can be recruited in the terrain.
+     * @see net.sf.colossus.server.Creature
+     */
     public ArrayList getPossibleRecruits(char terrain)
     {
         ArrayList al = (ArrayList)carToRecruits.get(new Character(terrain));
@@ -59,6 +116,14 @@ public class TerrainRecruitLoader implements TerrainRecruitLoaderConstants {
         }
         return(re);
     }
+    /**
+     * Give the number of a given recruiters needed to recruit a given Creature.
+     * @param recruiter The Creature that wish to recruit.
+     * @param recruit The Creature that is to be recruited.
+     * @param terrain Character representing a terrain, in which the recruiting occurs.
+     * @return Number of recruiter needed.
+     * @see net.sf.colossus.server.Creature
+     */
     public int numberOfRecruiterNeeded(Creature recruiter, Creature recruit, char terrain)
     {
         if (terrain != 'T') /* handle Tower with care */
@@ -158,6 +223,10 @@ public class TerrainRecruitLoader implements TerrainRecruitLoaderConstants {
     throw new Error("Missing return statement in function");
   }
 
+/**
+ * Load a terrain and the recruit possibility in this terrain.
+ * @return Status of the parser ; negative at the end of file, positive on success, null on blank line.
+ */
   final public int oneTerrain() throws ParseException {
     String t;
     String col;

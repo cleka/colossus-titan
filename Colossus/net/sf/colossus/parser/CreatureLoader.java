@@ -6,7 +6,12 @@ import java.util.*;
 
 import net.sf.colossus.server.Creature;
 
-
+/**
+ * CreatureLoader the creatures descriptions.
+ * @author Romain Dolbeau
+ * @version $Id$
+ * @see net.sf.colossus.server.Creature
+ */
 public class CreatureLoader implements CreatureLoaderConstants {
 
   final public boolean c_bool() throws ParseException {
@@ -27,6 +32,12 @@ public class CreatureLoader implements CreatureLoaderConstants {
     throw new Error("Missing return statement in function");
   }
 
+/**
+ * Add one creature to the list of creature.
+ * @param lc List of creatures.
+ * @return Status of the parser ; negative at the end of file, positive on success, null on blank line.
+ * @see net.sf.colossus.server.Creature
+ */
   final public int oneCreature(List lc) throws ParseException {
     String name;
     String pluralName;

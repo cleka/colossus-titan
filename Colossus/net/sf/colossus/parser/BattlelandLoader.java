@@ -6,11 +6,28 @@ import java.util.*;
 
 import net.sf.colossus.client.BattleHex;
 
-
+/**
+ * BattlelandLoader load the Battlelands descriptions into a BattleHex array.
+ * @author Romain Dolbeau
+ * @version $Id$
+ * @see net.sf.colossus.client.BattleHex
+ */
 public class BattlelandLoader implements BattlelandLoaderConstants {
+    /**
+     * hexSide is used internally to represent data about the side of an Hex.
+     * @author Romain Dolbeau
+     * @version $Id$
+     */
     class hexSide
     {
+        /**
+         * Position of the hexSide, between 0 and 5.
+         */
         int pos;
+        /**
+         * Type of the hexSide
+         * @see net.sf.colossus.client.BattleHex
+         */
         char type;
         hexSide(int p, char t) { pos = p; type = t; }
     }
@@ -52,6 +69,11 @@ public class BattlelandLoader implements BattlelandLoaderConstants {
     throw new Error("Missing return statement in function");
   }
 
+/**
+ * @param h The BattleHex in which the case will be added.
+ * @return Status of the parser ; negative at the end of file, positive on success, null on blank line.
+ * @see net.sf.colossus.client.BattleHex
+ */
   final public int oneBattlelandCase(BattleHex [][] h) throws ParseException {
     int x,y,e;
     char t;
