@@ -49,12 +49,7 @@ public final class SaveWindow
     {
         int x = options.getIntOption(name + Options.locX);
         int y = options.getIntOption(name + Options.locY);
-        Point location = null;
-        if (x >= 0 && y >= 0 && x < screen.width && y < screen.height)
-        {
-            location = new Point(x, y);
-        }
-        return location;
+        return new Point(x, y);
     }
 
     public void saveLocation(final Point location)
