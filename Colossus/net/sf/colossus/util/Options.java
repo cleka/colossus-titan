@@ -17,22 +17,24 @@ public final class Options
     // Everything is public because we use this class in both the client
     // and server packages.  (With separate data.)
 
+
+    // Non-options that use the options framework
     // Will add player numbers 0 through n-1 to the end of these.
     public static final String playerName = "Player name ";
     public static final String playerType = "Player type ";
 
     // Option names
 
-    // Server options
+    // Server administrative options
     public static final String autosave = "Autosave";
     public static final String logDebug = "Log debug messages";
-
     public static final String autoStop = "AIs stop when humans dead";
     public static final String autoQuit = "Auto quit when game over";
 
+
+    // Rules options
     public static final String variant = "Variant";
 
-    // rules options
     public static final String balancedTowers = "Balanced starting towers";
     public static final String allStacksVisible = "All stacks visible";
     public static final String cumulativeSlow = "Slowing is cumulative";
@@ -40,7 +42,6 @@ public final class Options
     public static final String nonRandomBattleDice = 
         "Use non-random battle dice";
 
-    // teleport rules options
     public static final String noFirstTurnT2TTeleport = 
         "No tower-to-tower Teleport on first turn";
     public static final String noFirstTurnTeleport = 
@@ -93,10 +94,11 @@ public final class Options
     public static final String autoReinforce = "Auto reinforce";
     public static final String autoPlay = "Auto play";
 
+    // AI timing options (client only)
     public static final String aiTimeLimit = "AI time limit";
     public static final String aiDelay = "AI delay";
 
-    // General per-player options
+    // General per-player options (client only)
     public static final String favoriteColors = "Favorite colors";
     public static final String favoriteLookFeel = "Favorite Look And Feel";
 

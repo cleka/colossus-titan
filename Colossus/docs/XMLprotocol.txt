@@ -1,5 +1,7 @@
 Colossus XML network / savegame event format
 
+$Id$
+
 Conventions
 -----------
 
@@ -9,13 +11,13 @@ Everything is case sensitive, unless stated otherwise.
 [player]:       The name of a player currently in the game
 [colorname]:    One of "Black", "Brown", ...
 [legion]:       A marker id like "Bk01".
-[unit]:         A complete creature name like "Behemoth".
-[units]:        One or more of [unit].
+[creature]:     A complete creature name like "Behemoth".
+[creatures]:    One or more of [creature].
 [land]:         A number of a masterboard hex, like "127".
 [number]:       A number like "3".
 [battlehex]:    A battle hex identifier like "C1"
-[entryside]:    One of "right", "left", "bottom"
-[bool]:         One of "true" or "false"
+[entryside]:    "right", "left", or "bottom"
+[bool]:         "true" or "false"
 
 
 Requests (client to server)
@@ -36,18 +38,18 @@ Requests (client to server)
     Starts the game. No more players can connect.
 
 <split parent=[legion] child=[legion]>
-    <units>
-        <creature1>
-        <creaturen>
-    </units>
+    <creatures>
+        <creature name="[creature1]">
+        <creature name="[creatureN]">
+    </creatures>
 </split>
-    Split off [units] from [legion1] to a new legion with marker
+    Split off [creatures] from [legion1] to a new legion with marker
     [legion2].
 
 <merge parent=[legion] child=[legion]>
-    Move all units from child legion back into parent legion.
+    Merge all creatures from child legion back into parent legion.
     Used to cancel a split before movement is rolled, or just before
-    DONEWITHMOVES if neither legion can move.
+    donewithmoves if neither legion can move.
 
 <roll />
     Finish splitting and wait for the movement roll.
@@ -64,7 +66,7 @@ Requests (client to server)
 <undomove legion="[legion]" />
     Move [legion] back to its previous location.
 
-<recruit legion="[legion]" recruit="[unit]" {recruiter="[unit]"}
+<recruit legion="[legion]" recruit="[creature]" {recruiter="[creature]"}
     Muster a recruit using the right number of recruiter.  If recruiter is not
     set then the server picks.
 
@@ -87,23 +89,23 @@ Requests (client to server)
     [legion] does not concede the battle.
 
 <negotiate hex="[land]" survivor="[legion]">
-    <units>
-        <creature1>
-        <creatureN>
-    </units>
+    <creatures>
+        <creature name="[creature1]">
+        <creature name="[creatureN]">
+    </creatures>
 </negotiate>
     Offer a negotiated settlement to the engagement in [land] where 
-    survivor wins, and is left with units.  If survivor or units is
+    survivor wins, and is left with creatures.  If survivor or creatures is
     missing or empty, offer mutual destruction.
 
 <accept hex="[land]" survivor="[legion]">
     <losses legion="[legion]">
-        <creature1>
-        <creatureN>
+        <creature name="[creature1]">
+        <creature name="[creatureN]">
     </losses>
     <losses legion="[legion]">
-        <creature1>
-        <creatureN>
+        <creature name="[creature1]">
+        <creature name="[creatureN]">
     </losses>
 </accept>
     Accept a settlement proposed by the other player.
@@ -111,14 +113,14 @@ Requests (client to server)
 <fight hex="[land]" />
     Cease negotiations in [land] and fight a battle.
 
-<enter creature="[unit]" hex="[battlehex]" />
+<enter creature="[creature]" hex="[battlehex]" />
     Move creature from offboard to hex.
 
 <maneuver starthex="[battlehex]" endhex="[battlehex2]" />
-    Move unit in starthex to endhex.
+    Move creature in starthex to endhex.
 
 <undomaneuver hex="[battlehex]" />
-    Move unit in hex back to its previous location.
+    Move creature in hex back to its previous location.
 
 <donemaneuvering />
     All battle moves are finished.  Move on to strike phase, or the
@@ -126,20 +128,21 @@ Requests (client to server)
 
 <strike strikerhex="[battlehex]" targethex="[battlehex]" 
         dice="[number]" strike="[number]" />
-    Unit in strikerhex strikes unit in targethex, rolling dice against the 
-    given strike number.  The server will assign dice and strike if missing.
+    Creature in strikerhex strikes creature in targethex, rolling dice 
+    against the given strike number.  The server will assign dice and 
+    strike if missing.
 
 <carry targethex="[battlehex]" hits="[number]" />
-    Carry hits to the unit in targethex.
+    Carry hits to the creature in targethex.
 
 <donestriking />
     All battle strikes are finished.  Move on to the opponent's phase.
 
-<summon summoner="[legion1]" donor="[legion2]" creature="[unit]" />
-    Summoner summons a unit from donor.
+<summon summoner="[legion1]" donor="[legion2]" creature="[creature]" />
+    Summoner summons a creature from donor.
 
-<acquire legion="[legion]" creature="[unit]" />
-    Legion acquires a unit.
+<acquire legion="[legion]" creature="[creature]" />
+    Legion acquires a creature.
 
 <nextturn />
     Finish this player's entire game turn.
@@ -156,8 +159,20 @@ Requests (client to server)
 Messages (server to one or more clients)
 --------
 
-# TODO All options
-<formgame variant="[variantname]" minplayers="[number]" maxplayers="[number]" />
+<formgame minplayers="[number]" maxplayers="[number]" >
+    <option name="variant" value="Default" />
+    <option name="balancedTowers" value="true" />
+    <option name="allStacksVisible" value="false" />
+    <option name="cumulativeSlow" value="true" />
+    <option name="oneHexAllowed" value="true" />
+    <option name="nonRandomBattleDice" value="false" />
+    <option name="noFirstTurnT2TTeleport" value="false" />
+    <option name="noFirstTurnTeleport" value="false" />
+    <option name="towerToTowerTeleportOnly" value="false" />
+    <option name="noTowerTeleport" value="false" />
+    <option name="noTitanTeleport" value="false" />
+</formgame>
+    Form a new game with the listed options.
 
 <nak packet="[number]" />
     Request [number] (starting from 0) from this client was denied.
@@ -172,13 +187,13 @@ Messages (server to one or more clients)
     Player has been assigned tower.
 
 <split parent="[legion]" child="[legion]" numsplit="[number]">
-    <units>
-        <creature1>
-        <creaturen>
-    </units>
+    <creatures>
+        <creature name="[creature1]">
+        <creature name="[creatureN]">
+    </creatures>
 </split>
-    A player splits off [number] units from [legion1] to a new
-    legion with marker [legion2].  (The splitoff units will only 
+    A player splits off [number] creatures from [legion1] to a new
+    legion with marker [legion2].  (The splitoff creatures will only 
     be identified if this client is allowed to see the contents
     of this stack.)
 
@@ -199,52 +214,52 @@ Messages (server to one or more clients)
     [legion] moved back to its previous location.
 
 <engage hex="[land]" />
-    <units>
-        <creature1>
-        <creaturen>
-    </units>
+    <creatures>
+        <creature name="[creature1]">
+        <creature name="[creatureN]">
+    </creatures>
     Active player chose to resolve the engagement in [land].  The opposing legion's
-    units are revealed.
+    creatures are revealed.
 
 <flee legion="[legion]">
-    <units>
-        <creature1>
-        <creaturen>
-    </units>
+    <creatures>
+        <creature name="[creature1]">
+        <creature name="[creatureN]">
+    </creatures>
 </flee>
-    [legion] fled, losing units.
+    [legion] fled, losing creatures.
 
 <donotflee legion="[legion]" />
     [legion] did not flee.
 
 <concede legion="[legion]">
-    <units>
-        <creature1>
-        <creaturen>
-    </units>
+    <creatures>
+        <creature name="[creature1]">
+        <creature name="[creatureN]">
+    </creatures>
 </concede>
-    [legion] conceded the battle, losing units.
+    [legion] conceded the battle, losing creatures.
 
 <donotconcede legion="[legion]" />
     [legion] did not concede the battle.
 
 <negotiate hex="[land]" survivor="[legion]">
-    <units>
-        <creature1>
-        <creatureN>
-    </units>
+    <creatures>
+        <creature name="[creature1]">
+        <creature name="[creatureN]">
+    </creatures>
 </negotiate>
     An offer was made, with survivor (if any) winning and
-    keeping units.
+    keeping creatures.
 
 <accept hex="[land]" survivor="[legion]">
     <losses legion="[legion]">
-        <creature1>
-        <creatureN>
+        <creature name="[creature1]">
+        <creature name="[creatureN]">
     </losses>
     <losses legion="[legion]">
-        <creature1>
-        <creatureN>
+        <creature name="[creature1]">
+        <creature name="[creatureN]">
     </losses>
 </accept>
     An offer was accepted.  Each legion's losses are shown.
@@ -252,21 +267,21 @@ Messages (server to one or more clients)
 <fight hex="[land]" />
     A battle will be fought.
 
-<enter creature="[unit]" hex="[battlehex]" />
-    Unit moved from offboard to hex.
+<enter creature="[creature]" hex="[battlehex]" />
+    creature moved from offboard to hex.
 
 <maneuver starthex="[battlehex]" endhex="[battlehex2]" />
-    Unit moved from starthex to endhex.
+    creature moved from starthex to endhex.
 
 <undomaneuver hex="[battlehex]" />
-    Unit in hex moved back to its previous location.
+    creature in hex moved back to its previous location.
 
 <donemaneuvering />
     All battle moves are finished.  Move on to strike phase, or the
     opponent's battle turn, as appropriate.
 
 <drift  [battlehex] />
-    Unit in [battlehex] took one point of drift damage.
+    creature in [battlehex] took one point of drift damage.
 
 <strike strikerhex="[battlehex]" targethex="[battlehex]" 
         dice="[number]" strike="[number]" hits="[number]" carries="[number]">
@@ -279,7 +294,7 @@ Messages (server to one or more clients)
         [battlehexN]
     </carryhexes>
 </strike>
-    Unit in strikerhex struck unit in targethex, rolling dice against the 
+    creature in strikerhex struck creature in targethex, rolling dice against the 
     given strike number.  Exact rolls, hits, carries, and carry targets 
     are given.
 
@@ -289,17 +304,17 @@ Messages (server to one or more clients)
         [battlehexN]
     </carryhexes>
 </carry>
-    Hits were carried to the unit in targethex.  If there are still carries
+    Hits were carried to the creature in targethex.  If there are still carries
     and carry targets remaining, they are shown.
 
 <donestriking />
     All battle strikes are finished for this phase.
 
-<summon summoner="[legion1]" donor="[legion2]" creature="[unit]" />
-    Summoner summoned a unit from donor.
+<summon summoner="[legion1]" donor="[legion2]" creature="[creature]" />
+    Summoner summoned a creature from donor.
 
-<acquire legion="[legion]" creature="[unit]" />
-    Legion acquired a unit.
+<acquire legion="[legion]" creature="[creature]" />
+    Legion acquired a creature.
 
 <points player="[player]" points="[number]" />
     [player] receives [number] points
@@ -310,7 +325,7 @@ Messages (server to one or more clients)
 <gameover winner="[player]" />
     The game is over.  If no winner is given, the game is a draw.
 
-<recruit legion="[legion]" recruit="[unit]" recruiter="[unit]" />
+<recruit legion="[legion]" recruit="[creature]" recruiter="[creature]" />
     Muster a recruit using the right number of recruiter.
 
 <undorecruit legion="[legion]" />
