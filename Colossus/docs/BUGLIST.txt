@@ -83,10 +83,6 @@ Concession timing.  If both players want to concede, the non-phasing
 Striking continues after concession, until the normal time to check for
    creature (and then player) death.
 
-Solaris: Makefile no longer works.  Target "classes" isn't working
-   properly.  Why not?  It works fine under Linux.  Both use GNU make 
-   3.77.
-
 Linux, ibmjdk118: Drift damage was not applied to a cyclops.
 
 Linux, ibmjdk118: Legion with angel in tower did not immediately
@@ -136,3 +132,7 @@ java.lang.ArrayIndexOutOfBoundsException
         at java.awt.EventDispatchThread.run(EventDispatchThread.java:84)
 
 All: Losses per-side in a pre-battle agreement should be made public.
+
+Solaris, jdk1.3: Sometimes moving a chit onto its own hex in battle
+   eliminates that chit's movement options.  "Undo last move" works.
+

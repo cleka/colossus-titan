@@ -92,7 +92,7 @@ public class BattleMap extends Frame implements MouseListener,
         
         if (location == null)
         {
-            location = new Point(scale, scale);
+            location = new Point(0, 2 * scale);
         }
         setLocation(location);
 
@@ -475,13 +475,13 @@ public class BattleMap extends Frame implements MouseListener,
     
     public Dimension getMinimumSize()
     {
-        return new Dimension(30 * scale, 28 * scale);
+        return getPreferredSize();
     }
     
     
     public Dimension getPreferredSize()
     {
-        return new Dimension(30 * scale, 30 * scale);
+        return new Dimension(30 * scale, 28 * scale);
     }
     
     

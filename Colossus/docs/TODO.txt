@@ -1,4 +1,5 @@
-Make BattleMap frame a bit smaller, to waste less screen space.
+Update number of carries shown in ShowDice after each carry,
+   in cases where there are enough to carry to multiple enemies.
 
 Make ShowDice a bit smaller?
 

@@ -740,6 +740,6 @@ public class MasterBoard extends Frame implements MouseListener,
 
     public Dimension getPreferredSize()
     {
-        return new Dimension(64 * scale, 60 * scale);
+        return getMinimumSize();
     }
 }
