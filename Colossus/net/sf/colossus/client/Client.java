@@ -107,9 +107,6 @@ public final class Client extends UnicastRemoteObject implements IRMIClient
     /** If the game is over, then quitting does not require confirmation. */
     private boolean gameOver;
 
-    /** If all players are AIs, then the primary client gets a GUI. */
-    private boolean primary;
-
     /** One per player. */
     private PlayerInfo [] playerInfo;
 
@@ -125,14 +122,12 @@ public final class Client extends UnicastRemoteObject implements IRMIClient
     private Strike strike = new Strike(this);
 
 
-    Client(IRMIServer server, String playerName, boolean primary)
-        throws RemoteException
+    Client(IRMIServer server, String playerName) throws RemoteException
     {
         super();
 
         this.server = server;
         this.playerName = playerName;
-        this.primary = primary;
         options = new Options(playerName);
         // Need to load options early so they don't overwrite server options.
         loadOptions();
@@ -149,12 +144,6 @@ public final class Client extends UnicastRemoteObject implements IRMIClient
             Log.error(e.toString());
             e.printStackTrace();
         }
-    }
-
-
-    boolean isPrimary()
-    {
-        return primary;
     }
 
 
@@ -516,7 +505,7 @@ public final class Client extends UnicastRemoteObject implements IRMIClient
     {
         options.loadOptions();
         syncOptions();
-        if (!getOption(Options.autoPlay) || primary)
+        if (!getOption(Options.autoPlay))
         {
             runAllOptionTriggers();
         }
@@ -1097,8 +1086,7 @@ public final class Client extends UnicastRemoteObject implements IRMIClient
     {
         VariantSupport.loadVariant(options.getStringOption(Options.variant));
 
-        // Do not show boards for AI players, except primary client.
-        if (!getOption(Options.autoPlay) || primary)
+        if (!getOption(Options.autoPlay))
         {
             disposeMasterBoard();
             board = new MasterBoard(this);
@@ -1546,8 +1534,8 @@ public final class Client extends UnicastRemoteObject implements IRMIClient
         this.defenderMarkerId = defenderMarkerId;
         this.battleSite = masterHexLabel;
 
-        // Do not show map for AI players, except primary client.
-        if (!getOption(Options.autoPlay) || primary)
+        // Do not show map for AI players.
+        if (!getOption(Options.autoPlay))
         {
             map = new BattleMap(this, masterHexLabel);
             JFrame frame = map.getFrame();

@@ -1,11 +1,9 @@
 Bug: Repaints missed on some remote players' masterboard moves.
-
 Bug: Remote player sometimes sees all of AI's trial battle moves.
 
 Add StartClient gui for setting playerName and hostname. 
 Add Client.jnlp file.
 Add Server.jnlp file, if possible.  (Need to spawn rmiregistry.)
-Document RMI.
 
 Refuse remote newGame/loadGame/saveGame calls?
 Disconnect all clients on a newGame.

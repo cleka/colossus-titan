@@ -40,8 +40,6 @@ public final class Server extends UnicastRemoteObject implements IRMIServer
     /** Map of player name to client. */
     private Map clientMap = new HashMap();
 
-    private String primaryPlayerName = null;
-
     // Cached strike information.
     Critter striker;
     Critter target;
@@ -58,16 +56,11 @@ public final class Server extends UnicastRemoteObject implements IRMIServer
     }
 
 
-    void addLocalClient(String playerName, boolean primary)
+    void addLocalClient(String playerName)
     {
-        IRMIClient client = ClientFactory.createClient(this, playerName,
-            primary);
+        IRMIClient client = ClientFactory.createClient(this, playerName);
         clients.add(client);
         clientMap.put(playerName, client);
-        if (primary)
-        {
-            primaryPlayerName = playerName;
-        }
     }
 
     public void addRemoteClient(IRMIClient client, String playerName)

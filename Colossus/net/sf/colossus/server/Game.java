@@ -102,32 +102,9 @@ Log.debug("Incremented waitingForClients to " + waitingForClients);
             }
             else
             {
-                server.addLocalClient(player.getName(), 
-                    (i == getPrimaryPlayerNum()));
+                server.addLocalClient(player.getName());
             }
         }
-    }
-
-    /** Return the first human player number, or the first AI if none. */
-    private int getPrimaryPlayerNum()
-    {
-        for (int i = 0; i < getNumPlayers(); i++)
-        {
-            Player player = (Player)players.get(i);
-            if (player.isHuman())
-            {
-                return i;
-            }
-        }
-        for (int i = 0; i < getNumPlayers(); i++)
-        {
-            Player player = (Player)players.get(i);
-            if (player.isAI())
-            {
-                return i;
-            }
-        }
-        return -1;
     }
 
 
@@ -331,7 +308,7 @@ Log.debug("Incremented waitingForClients to " + waitingForClients);
     {
 Log.debug("Called Game.newGame2()");
         // We need to set the autoPlay option before loading the board,
-        // so that we can avoid showing boards for non-primary AI players.
+        // so that we can avoid showing boards for AI players.
         syncAutoPlay();
         syncOptions();
         server.allInitBoard();
@@ -1371,7 +1348,7 @@ Log.debug("Called Game.addedRemoteClient for " + playerName);
             server.allSetColor();
 
             // We need to set the autoPlay option before loading the board,
-            // so that we can avoid showing boards for non-primary AI players.
+            // so that we can avoid showing boards for AI players.
             syncAutoPlay();
             syncOptions();
 

@@ -81,7 +81,7 @@ public class StartClient
         {
             String name = "//" + hostname + "/Colossus";
             IRMIServer server = (IRMIServer)Naming.lookup(name);
-            Client client = new Client(server, playerName, false);
+            Client client = new Client(server, playerName);
             client.attachToServer();
         } 
         catch (Exception e) 

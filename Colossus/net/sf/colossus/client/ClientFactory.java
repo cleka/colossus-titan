@@ -15,12 +15,11 @@ import net.sf.colossus.util.Log;
 
 public class ClientFactory
 {
-    public static IRMIClient createClient(IRMIServer server, String playerName,
-        boolean primary)
+    public static IRMIClient createClient(IRMIServer server, String playerName)
     {
         try
         {
-            Client client = new Client(server, playerName, primary);
+            Client client = new Client(server, playerName);
             return (IRMIClient)client;
         }
         catch (RemoteException e)
