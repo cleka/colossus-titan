@@ -151,6 +151,7 @@ public class StartClient extends KDialog implements WindowListener,
 
     private void loadClientOptions()
     {
+Log.debug("StartClient.loadClientOptions() for " + playerName);
         clientOptions = new net.sf.colossus.util.Options(playerName);
         clientOptions.loadOptions();
     }
@@ -158,6 +159,7 @@ public class StartClient extends KDialog implements WindowListener,
     /** Save the chosen hostname as an option.  LRU sort saved hostnames. */
     private static void saveHostname()
     {
+Log.debug("StartClient.saveHostname()");
         int highestNum = -1;
         java.util.List names = new ArrayList();
         names.add(hostname);
@@ -177,6 +179,7 @@ public class StartClient extends KDialog implements WindowListener,
         }
         for (int i = 0; i <= highestNum; i++)
         {
+Log.debug("StartClient.saveHostname()   setting option " + i);
             clientOptions.setOption(net.sf.colossus.util.Options.serverName + 
                 i, (String)names.get(i));
         }

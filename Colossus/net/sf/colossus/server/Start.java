@@ -9,6 +9,7 @@ import com.werken.opt.CommandLine;
 import net.sf.colossus.util.Log;
 import net.sf.colossus.client.Client;
 import net.sf.colossus.client.StartClient;
+
 // This class uses both com.werken.opt.Options and 
 // net.sf.colossus.util.Options, but only the latter is imported.
 import net.sf.colossus.util.Options;
@@ -76,13 +77,17 @@ public final class Start
     {
         net.sf.colossus.util.Options options = game.getOptions();
         options.loadOptions();
+Log.debug("load:" + options.toString());
         clearNonPersistentOptions(options);
 
+Log.debug("clear: " + options.toString());
         new GetPlayers(new JFrame(), options);
         String loadFilename = options.getStringOption(Constants.loadGame);
+Log.debug("after dialog: " + options.toString());
 
         if (options.isEmpty())
         {
+Log.debug("Start.startupDialog() options.isEmpty()");
              // Bad input, or user selected Quit.
              game.dispose();
         }
@@ -91,6 +96,7 @@ public final class Start
         // load a game instead of starting a new one.
         else if (loadFilename != null && loadFilename.length() > 0)
         {
+Log.debug("Start.startupDialog() loadFilename is " + loadFilename);
             options.clearPlayerInfo();
             game.loadGame(loadFilename);
         }
@@ -99,11 +105,13 @@ public final class Start
         // the server and run the client.
         else if (options.getOption(Constants.runClient))
         {
+Log.debug("Start.startupDialog() runClient");
             startClient(cl);
         }
 
         else
         {
+Log.debug("Start.startupDialog() newGame");
             game.newGame();
         }
     }

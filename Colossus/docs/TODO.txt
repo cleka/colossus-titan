@@ -1,3 +1,42 @@
+Bug: Uglyness in logs after end of game.
+Legion Bu02 (Bat) [Colossus, Giant, Unicorn, Unicorn] is eliminated
+dripton earns 36.0 points
+Legion Bu01 (Anchor) [Unicorn, Unicorn, Unicorn] is eliminated
+Blue dies
+Game over -- dripton wins at 1029387441871
+Blue Client.cleanupBattle()
+Black Client.cleanupBattle()
+Brown Client.cleanupBattle()
+Gold Client.cleanupBattle()
+Green Client.cleanupBattle()
+dripton Client.cleanupBattle()
+Options.setOption() BattleMapLocation X, 0
+Options.setOption() BattleMapLocation Y, 60
+called summonAngel for Rd03
+returning new SummonAngel dialog for Rd03
+From client dripton: doSummon ~ Rd03 ~ null ~ null
+in kickEngagements() summoning=false reinforcing=false acquiring=true
+Called Game.findEngagements()
+0 engagements left
+Called Game.findEngagements()
+From client dripton: acquireAngel ~ Rd03 ~ null
+in kickEngagements() summoning=false reinforcing=false acquiring=false
+Called Game.findEngagements()
+0 engagements left
+Called Game.findEngagements()
+Phase advances to Muster
+From client dripton: withdrawFromGame
+Legion Rd01 (Cross) [Titan, Archangel, Warlock, Warlock, Warlock, Warlock, Warlock] is eliminated
+Legion Rd03 (Fist) [Colossus, Giant, Giant, Warbear, Ranger] is eliminated
+Legion Rd09 (Spiral) [Troll, Troll] is eliminated
+dripton dies
+Game over -- Draw at 1029387448938
+Green's turn, number 58
+Phase advances to Move
+Green rolls a 4 for movement
+
+
+
 Bug: stresstest is broken by new options processing.  cfg file ends up
    overriding command-line options and inserting a human player.
 

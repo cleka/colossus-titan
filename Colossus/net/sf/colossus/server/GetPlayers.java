@@ -163,7 +163,7 @@ public final class GetPlayers extends KDialog implements WindowListener,
         delayLabel = new JLabel();
         setDelayLabel(oldDelay);
         aiTimePane.add(delayLabel);
-        JButton delayButton = new JButton(options.aiDelay);
+        JButton delayButton = new JButton(Options.aiDelay);
         delayButton.addActionListener(this);
         aiTimePane.add(delayButton);
 
@@ -176,7 +176,7 @@ public final class GetPlayers extends KDialog implements WindowListener,
         timeLimitLabel = new JLabel();
         setTimeLimitLabel(oldLimit);
         aiTimePane.add(timeLimitLabel);
-        JButton timeLimitButton = new JButton(options.aiTimeLimit);
+        JButton timeLimitButton = new JButton(Options.aiTimeLimit);
         timeLimitButton.addActionListener(this);
         aiTimePane.add(timeLimitButton);
 
@@ -419,8 +419,10 @@ public final class GetPlayers extends KDialog implements WindowListener,
 
     private void doRunClient()
     {
+Log.debug("GetPlayers.doRunClient()");
         setVisible(false);
         options.setOption(Constants.runClient, true);
+Log.debug("after setting runClient true: " + options.toString());
         dispose();
     }
 
@@ -559,7 +561,7 @@ public final class GetPlayers extends KDialog implements WindowListener,
                         variantBox.removeItemAt(Constants.numVariants);
                     }
                     Document doc = VariantSupport.loadVariant(value);
-                    options.setOption(Options.variant,value);
+                    options.setOption(Options.variant, value);
                     String prop = (String)doc.getProperty(
                            ResourceLoader.keyContentType);
                     readme.setContentType(prop);

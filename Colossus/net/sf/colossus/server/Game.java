@@ -105,6 +105,7 @@ Log.debug("Called Game.initServer()");
 
     private void addPlayersFromOptions()
     {
+Log.debug("Game.addPlayersFromOptions()");
         for (int i = 0; i < VariantSupport.getMaxPlayers(); i++)
         {
             String name = options.getStringOption(Options.playerName + i);
@@ -117,6 +118,7 @@ Log.debug("Called Game.initServer()");
             }
         }
         // No longer need the player name and type options. 
+Log.debug("About to call options.clearPlayerInfo()");
         options.clearPlayerInfo();
     }
 
