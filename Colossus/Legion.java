@@ -186,7 +186,7 @@ class Legion
         moved = true;
         player.markLastLegionMoved(this);
         // If we teleported, no more teleports are allowed this turn.
-        if (currentHex.getEntrySide() == -1)
+        if (currentHex.teleported())
         {
             player.disallowTeleport();
         }
@@ -196,7 +196,7 @@ class Legion
     public void undoMove()
     {
         // If this legion teleported, allow teleporting again.
-        if (currentHex.getEntrySide() == -1)
+        if (currentHex.teleported())
         {
             player.allowTeleport();
         }
