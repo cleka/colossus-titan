@@ -184,7 +184,7 @@ public final class Server
     public void showMessageDialog(String playerName, String message)
     {
         Client client = getClient(playerName);
-        JOptionPane.showMessageDialog(client.getBoard(), message);
+        client.showMessageDialog(message);
     }
 
     public void allShowMessageDialog(String message)
@@ -193,7 +193,7 @@ public final class Server
         while (it.hasNext())
         {
             Client client = (Client)it.next();
-            JOptionPane.showMessageDialog(client.getBoard(), message);
+            client.showMessageDialog(message);
         }
     }
 
@@ -466,6 +466,14 @@ public final class Server
         Client client = getClient(legion.getPlayerName());
         return client.pickRecruit(legion);
     }
+
+
+    /** Need to do error checking. */
+    public void doRecruit(Creature recruit, Legion legion)
+    {
+        game.doRecruit(recruit, legion);
+    }
+
 
     public String pickRecruiter(Legion legion, ArrayList recruiters)
     {

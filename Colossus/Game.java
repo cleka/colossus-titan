@@ -147,12 +147,16 @@ public final class Game
         Collections.sort(players);
         activePlayerNum = 0;
 
+        // We need to set the autoPlay option before loading the board,
+        // so that we can avoid showing boards for AI players.
+
         // XXX temp
-        initBoard();
+        initServerAndClients();
+
 
         server.loadOptions();
 
-        // Override autoPlay option with checkbox selection.
+        // Override autoPlay option with checkbox selection, if not default.
         it = players.iterator();
         while (it.hasNext())
         {
@@ -169,6 +173,8 @@ public final class Game
                     false);
             }
         }
+
+        server.allInitBoard();
 
         HashSet colorsLeft = new HashSet();
         for (int i = 0; i < PickColor.colorNames.length; i++)
@@ -455,8 +461,14 @@ public final class Game
     }
 
 
-    public void advancePhase()
+    /** Advance to the next phase, only if the passed oldPhase is current. */
+    public void advancePhase(int oldPhase)
     {
+        if (oldPhase != phase)
+        {
+            Log.error("Called advancePhase illegally");
+            return;
+        }
         phase++;
 
         if (phase > MUSTER ||
@@ -505,7 +517,7 @@ public final class Game
         if (player.getNumMarkersAvailable() == 0 ||
             player.getMaxLegionHeight() < 4)
         {
-            advancePhase();
+            advancePhase(SPLIT);
         }
         else
         {
@@ -531,7 +543,7 @@ public final class Game
         Client.clearUndoStack();
         if (findEngagements().size() == 0)
         {
-            advancePhase();
+            advancePhase(FIGHT);
         }
         else
         {
@@ -544,9 +556,12 @@ public final class Game
     private void setupMuster()
     {
         Player player = getActivePlayer();
-        if (player.isDead())
+
+        // If this player was eliminated in combat, or can't recruit
+        // anything, advance to the next turn.
+        if (player.isDead() || !player.canRecruit())
         {
-            advancePhase();
+            advancePhase(MUSTER);
         }
         else
         {
@@ -937,7 +952,7 @@ public final class Game
                 }
             }
 
-            initBoard();
+            initServerAndClients();
 
             // Battle stuff
             buf = in.readLine();
@@ -993,6 +1008,7 @@ public final class Game
             server.loadOptions();
 
             // Setup MasterBoard
+            server.allInitBoard();
             server.allLoadInitialMarkerImages();
             setupPhase();
 
@@ -1900,25 +1916,6 @@ public final class Game
         return true;
     }
 
-    public void doMuster(Legion legion)
-    {
-        if (legion.hasMoved() && legion.canRecruit())
-        {
-            Client client = server.getClient(legion.getPlayerName());
-            JFrame frame = client.getBoard().getFrame();
-            Creature recruit = PickRecruit.pickRecruit(frame, legion);
-            if (recruit != null)
-            {
-                doRecruit(recruit, legion);
-            }
-
-            if (!legion.canRecruit())
-            {
-                server.allUpdateStatusScreen();
-                server.allUnselectHexByLabel(legion.getCurrentHexLabel());
-            }
-        }
-    }
 
     public void doRecruit(Creature recruit, Legion legion)
     {
@@ -2391,7 +2388,7 @@ public final class Game
 
         if (findEngagements().size() == 0)
         {
-            advancePhase();
+            advancePhase(FIGHT);
         }
     }
 
@@ -2669,7 +2666,7 @@ public final class Game
             // The attacker may concede now without
             // allowing the defender a reinforcement.
             boolean concedes = false;
-            if (server.getClientOption(defender.getPlayer().getName(),
+            if (server.getClientOption(attacker.getPlayer().getName(),
                 Options.autoFlee))
             {
                 concedes = attacker.getPlayer().aiConcede(attacker, defender);
@@ -2738,10 +2735,18 @@ public final class Game
     {
         if (!battleInProgress)
         {
-            battleInProgress = true;
             Player player = getActivePlayer();
             Legion attacker = getFirstFriendlyLegion(hexLabel, player);
             Legion defender = getFirstEnemyLegion(hexLabel, player);
+
+            // If the second player clicks Fight from the negotiate
+            // dialog late, just exit.
+            if (attacker == null || defender == null)
+            {
+                return;
+            }
+
+            battleInProgress = true;
 
             // Reveal both legions to all players.
             attacker.revealAllCreatures();

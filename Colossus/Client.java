@@ -501,7 +501,10 @@ public final class Client
         }
         else
         {
-            board.twiddleOption(Options.showStatusScreen, false);
+            if (board != null)
+            {
+                board.twiddleOption(Options.showStatusScreen, false);
+            }
             if (statusScreen != null)
             {
                 statusScreen.dispose();
@@ -539,7 +542,10 @@ public final class Client
 
     public void clearAllCarries()
     {
-        map.unselectAllHexes();
+        if (map != null)
+        {
+            map.unselectAllHexes();
+        }
     }
 
 
@@ -566,9 +572,12 @@ public final class Client
     /** Create a new marker and add it to the end of the list. */
     public void addMarker(String markerId)
     {
-        Marker marker = new Marker(3 * Scale.get(), markerId,
-            board.getFrame(), this);
-        setMarker(markerId, marker);
+        if (board != null)
+        {
+            Marker marker = new Marker(3 * Scale.get(), markerId,
+                board.getFrame(), this);
+            setMarker(markerId, marker);
+        }
     }
 
 
@@ -664,7 +673,10 @@ public final class Client
 
     public void placeNewChit(Critter critter, boolean inverted)
     {
-        map.placeNewChit(critter, inverted);
+        if (map != null)
+        {
+            map.placeNewChit(critter, inverted);
+        }
     }
 
     public void setBattleChitDead(int tag)
@@ -736,8 +748,12 @@ public final class Client
 
     public void initBoard()
     {
-        board = new MasterBoard(this);
-        board.requestFocus();
+        // Do not show boards for AI players.
+        if (!getOption(Options.autoPlay))
+        {
+            board = new MasterBoard(this);
+            board.requestFocus();
+        }
     }
 
 
@@ -808,8 +824,7 @@ public final class Client
 
     public String splitLegion(Legion legion, String selectedMarkerId)
     {
-        return SplitLegion.splitLegion(board.getFrame(), legion,
-            selectedMarkerId);
+        return SplitLegion.splitLegion(this, legion, selectedMarkerId);
     }
 
 
@@ -853,6 +868,30 @@ public final class Client
     }
 
 
+    public void showMessageDialog(String message)
+    {
+        // Don't bother showing messages to AI players.  Perhaps we
+        // should log them.
+        if (getOption(Options.autoPlay))
+        {
+            return;
+        }
+        JFrame frame = null;
+        if (map != null)
+        {
+            frame = map.getFrame();
+        }
+        else if (board != null)
+        {
+            frame = board.getFrame();
+        }
+        if (frame != null)
+        {
+            JOptionPane.showMessageDialog(frame, message);
+        }
+    }
+
+
     public int pickEntrySide(String hexLabel, Legion legion)
     {
         return PickEntrySide.pickEntrySide(board.getFrame(), hexLabel, legion);
@@ -868,13 +907,19 @@ public final class Client
 
     public void repaintMasterHex(String hexLabel)
     {
-        board.getGUIHexByLabel(hexLabel).repaint();
+        if (board != null)
+        {
+            board.getGUIHexByLabel(hexLabel).repaint();
+        }
     }
 
 
     public void repaintBattleHex(String hexLabel)
     {
-        map.getGUIHexByLabel(hexLabel).repaint();
+        if (map != null)
+        {
+            map.getGUIHexByLabel(hexLabel).repaint();
+        }
     }
 
 
@@ -912,8 +957,19 @@ public final class Client
 
     public void askNegotiate(Legion attacker, Legion defender)
     {
-        NegotiationResults results = Negotiate.negotiate(this,
-            board.getFrame(), attacker, defender);
+        NegotiationResults results = null;
+        // AI players just fight for now anyway, and the AI reference is
+        // on the server side, so make this static rather than jumping
+        // through hoops.
+        if (getOption(Options.autoNegotiate))
+        {
+            results = SimpleAI.negotiate();
+        }
+        else
+        {
+            results = Negotiate.negotiate(this, attacker, defender);
+        }
+
         if (results.isFight())
         {
             fight(attacker.getCurrentHexLabel());
@@ -949,14 +1005,21 @@ public final class Client
 
     public void initBattleMap(String masterHexLabel, Battle battle)
     {
-        map = new BattleMap(this, masterHexLabel, battle);
-        showBattleMap();
+        // Do not show map for AI players.
+        if (!getOption(Options.autoPlay))
+        {
+            map = new BattleMap(this, masterHexLabel, battle);
+            showBattleMap();
+        }
     }
 
     public void showBattleMap()
     {
-        map.getFrame().toFront();
-        map.requestFocus();
+        if (map != null)
+        {
+            map.getFrame().toFront();
+            map.requestFocus();
+        }
     }
 
     public void disposeBattleMap()
@@ -971,34 +1034,74 @@ public final class Client
         board.highlightEngagements();
     }
 
+
+    /** Used for human players only, not the AI. */
+    public void doMuster(Legion legion)
+    {
+        if (legion.hasMoved() && legion.canRecruit())
+        {
+            Creature recruit = PickRecruit.pickRecruit(board.getFrame(),
+                legion);
+            if (recruit != null)
+            {
+                server.doRecruit(recruit, legion);
+            }
+
+            if (!legion.canRecruit())
+            {
+                server.allUpdateStatusScreen();
+                server.allUnselectHexByLabel(legion.getCurrentHexLabel());
+            }
+        }
+    }
+
+
     public void setupSplitMenu()
     {
-        board.setupSplitMenu();
+        if (board != null)
+        {
+            board.setupSplitMenu();
+        }
     }
 
     public void setupMoveMenu()
     {
-        board.setupMoveMenu();
+        if (board != null)
+        {
+            board.setupMoveMenu();
+        }
     }
 
     public void setupFightMenu()
     {
-        board.setupFightMenu();
+        if (board != null)
+        {
+            board.setupFightMenu();
+        }
     }
 
     public void setupMusterMenu()
     {
-        board.setupMusterMenu();
+        if (board != null)
+        {
+            board.setupMusterMenu();
+        }
     }
 
     public void alignLegions(String hexLabel)
     {
-        board.alignLegions(hexLabel);
+        if (board != null)
+        {
+            board.alignLegions(hexLabel);
+        }
     }
 
     public void alignLegions(Set hexLabels)
     {
-        board.alignLegions(hexLabels);
+        if (board != null)
+        {
+            board.alignLegions(hexLabels);
+        }
     }
 
     public void deiconifyBoard()
@@ -1008,69 +1111,108 @@ public final class Client
 
     public void unselectHexByLabel(String hexLabel)
     {
-        board.unselectHexByLabel(hexLabel);
+        if (board != null)
+        {
+            board.unselectHexByLabel(hexLabel);
+        }
     }
 
     public void unselectAllHexes()
     {
-        board.unselectAllHexes();
+        if (board != null)
+        {
+            board.unselectAllHexes();
+        }
     }
 
 
     public void highlightCarries()
     {
-        map.highlightCarries();
+        if (map != null)
+        {
+            map.highlightCarries();
+        }
     }
 
     public void setupBattleSummonMenu()
     {
-        map.setupSummonMenu();
+        if (map != null)
+        {
+            map.setupSummonMenu();
+        }
     }
 
     public void setupBattleRecruitMenu()
     {
-        map.setupRecruitMenu();
+        if (map != null)
+        {
+            map.setupRecruitMenu();
+        }
     }
 
     public void setupBattleMoveMenu()
     {
-        map.setupMoveMenu();
+        if (map != null)
+        {
+            map.setupMoveMenu();
+        }
     }
 
     public void setupBattleFightMenu()
     {
-        map.setupFightMenu();
+        if (map != null)
+        {
+            map.setupFightMenu();
+        }
     }
 
     public void unselectBattleHexByLabel(String hexLabel)
     {
-        map.unselectHexByLabel(hexLabel);
+        if (map != null)
+        {
+            map.unselectHexByLabel(hexLabel);
+        }
     }
 
     public void unselectAllBattleHexes()
     {
-        map.unselectAllHexes();
+        if (map != null)
+        {
+            map.unselectAllHexes();
+        }
     }
 
     public void alignBattleChits(String hexLabel)
     {
-        map.alignChits(hexLabel);
+        if (map != null)
+        {
+            map.alignChits(hexLabel);
+        }
     }
 
     public void alignBattleChits(Set hexLabels)
     {
-        map.alignChits(hexLabels);
+        if (map != null)
+        {
+            map.alignChits(hexLabels);
+        }
     }
 
 
     public void loadInitialMarkerImages()
     {
-        board.loadInitialMarkerImages();
+        if (board != null)
+        {
+            board.loadInitialMarkerImages();
+        }
     }
 
     public void setupPlayerLabel()
     {
-        board.setupPlayerLabel();
+        if (board != null)
+        {
+            board.setupPlayerLabel();
+        }
     }
 
 

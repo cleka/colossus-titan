@@ -18,25 +18,24 @@ public final class Negotiate extends JDialog implements MouseListener,
     private ArrayList defenderChits = new ArrayList();
     private Marker attackerMarker;
     private Marker defenderMarker;
-    private JFrame parentFrame;
     private GridBagLayout gridbag = new GridBagLayout();
     private GridBagConstraints constraints = new GridBagConstraints();
+    private Client client;
     private static NegotiationResults results;
 
 
-    private Negotiate(Client client, JFrame parentFrame, Legion attacker,
-        Legion defender)
+    private Negotiate(Client client, Legion attacker, Legion defender)
     {
-        super(parentFrame, attacker.getLongMarkerName() + " Negotiates with " +
-            defender.getLongMarkerName(), true);
+        super(client.getBoard().getFrame(), attacker.getLongMarkerName() +
+            " Negotiates with " + defender.getLongMarkerName(), true);
 
         Container contentPane = getContentPane();
 
         contentPane.setLayout(gridbag);
 
+        this.client = client;
         this.attacker = attacker;
         this.defender = defender;
-        this.parentFrame = parentFrame;
 
         pack();
         setBackground(Color.lightGray);
@@ -146,10 +145,10 @@ public final class Negotiate extends JDialog implements MouseListener,
     /** Display a dialog allowing one player to offer a settlement to
      *  an engagement.  Return a NegotiationResults.
      */
-    public static NegotiationResults negotiate(Client client,
-        JFrame parentFrame, Legion attacker, Legion defender)
+    public static NegotiationResults negotiate(Client client, Legion attacker,
+        Legion defender)
     {
-        new Negotiate(client, parentFrame, attacker, defender);
+        new Negotiate(client, attacker, defender);
         return results;
     }
 
@@ -220,7 +219,7 @@ public final class Negotiate extends JDialog implements MouseListener,
             // Ensure that at least one legion is completely eliminated.
             if (attackersLeft && defendersLeft)
             {
-                JOptionPane.showMessageDialog(parentFrame,
+                client.showMessageDialog(
                     "At least one legion must be eliminated.");
                 return;
             }
@@ -261,7 +260,7 @@ public final class Negotiate extends JDialog implements MouseListener,
                     Chit chit = (Chit)it.next();
                     if (chit.isDead() && chit.getId().startsWith("Titan"))
                     {
-                        JOptionPane.showMessageDialog(parentFrame,
+                        client.showMessageDialog(
                             "Titan cannot die unless his whole stack dies.");
                         return;
                     }
@@ -344,7 +343,7 @@ public final class Negotiate extends JDialog implements MouseListener,
         player.addLegion(defender);
         client.addMarker(selectedMarkerId);
 
-        Negotiate.negotiate(client, frame, attacker, defender);
+        Negotiate.negotiate(client, attacker, defender);
         System.exit(0);
     }
 }

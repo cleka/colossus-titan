@@ -215,7 +215,7 @@ public final class SummonAngel extends JDialog implements MouseListener,
             Legion donor = player.getDonor();
             if (donor == null)
             {
-                JOptionPane.showMessageDialog(board, "Must select a legion.");
+                client.showMessageDialog("Must select a legion.");
                 return;
             }
 
@@ -224,8 +224,7 @@ public final class SummonAngel extends JDialog implements MouseListener,
 
             if (angels == 0 && archangels == 0)
             {
-                JOptionPane.showMessageDialog(board,
-                    "No angels are available.");
+                client.showMessageDialog("No angels are available.");
                 return;
             }
 
@@ -242,8 +241,7 @@ public final class SummonAngel extends JDialog implements MouseListener,
             else
             {
                 // If both are available, make the player click on one.
-                JOptionPane.showMessageDialog(board,
-                    "Select angel or archangel.");
+                client.showMessageDialog("Select angel or archangel.");
             }
         }
 

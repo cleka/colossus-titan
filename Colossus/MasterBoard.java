@@ -323,13 +323,11 @@ public final class MasterBoard extends JPanel implements MouseListener,
                         if (game.getTurnNumber() == 1 &&
                             player.getNumLegions() == 1)
                         {
-                            // XXX Only do this for humans.
-                            JOptionPane.showMessageDialog(masterFrame,
-                                "Must split.");
+                            client.showMessageDialog("Must split.");
                         }
                         else
                         {
-                            game.advancePhase();
+                            game.advancePhase(Game.SPLIT);
                         }
                         break;
 
@@ -340,7 +338,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
                             player.countMobileLegions() > 0)
                         {
                             highlightUnmovedLegions();
-                            JOptionPane.showMessageDialog(masterFrame,
+                            client.showMessageDialog(
                                 "At least one legion must move.");
                         }
                         else
@@ -350,7 +348,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
                             if (player.splitLegionHasForcedMove())
                             {
                                 highlightUnmovedLegions();
-                                JOptionPane.showMessageDialog(masterFrame,
+                                client.showMessageDialog(
                                     "Split legions must be separated.");
                             }
                             // Otherwise, recombine all split legions still in
@@ -358,7 +356,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
                             else
                             {
                                 player.undoAllSplits();
-                                game.advancePhase();
+                                game.advancePhase(Game.MOVE);
                             }
                         }
                         break;
@@ -367,11 +365,11 @@ public final class MasterBoard extends JPanel implements MouseListener,
                         // Advance only if there are no unresolved engagements.
                         if (game.findEngagements().size() == 0)
                         {
-                            game.advancePhase();
+                            game.advancePhase(Game.FIGHT);
                         }
                         else
                         {
-                            JOptionPane.showMessageDialog(masterFrame,
+                            client.showMessageDialog(
                                 "Must Resolve Engagements.");
                         }
                         break;
@@ -380,7 +378,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
                         player.commitMoves();
                         // Mulligans are only allowed on turn 1.
                         player.setMulligansLeft(0);
-                        game.advancePhase();
+                        game.advancePhase(Game.MUSTER);
                         break;
                 }
             }
@@ -432,7 +430,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
                 if (answer == JOptionPane.YES_OPTION)
                 {
                    player.die(null, true);
-                   game.advancePhase();
+                   game.advancePhase(game.getPhase());
                 }
             }
         };
@@ -2167,7 +2165,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
                 break;
 
             case Game.MUSTER:
-                game.doMuster(legion);
+                client.doMuster(legion);
                 break;
         }
     }

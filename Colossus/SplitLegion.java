@@ -19,7 +19,7 @@ public final class SplitLegion extends JDialog implements MouseListener,
     private Marker oldMarker;
     private Marker newMarker;
 
-    private JFrame parentFrame;
+    private Client client;
     private GridBagLayout gridbag = new GridBagLayout();
     private GridBagConstraints constraints = new GridBagConstraints();
     private static boolean active;
@@ -29,17 +29,17 @@ public final class SplitLegion extends JDialog implements MouseListener,
     private static String results;
 
 
-    private SplitLegion(JFrame parentFrame, Legion oldLegion, String name,
+    private SplitLegion(Client client, Legion oldLegion, String name,
         String selectedMarkerId)
     {
-        super(parentFrame, name + ": Split Legion " +
+        super(client.getBoard().getFrame(), name + ": Split Legion " +
             oldLegion.getLongMarkerName(), true);
 
         Container contentPane = getContentPane();
         contentPane.setLayout(gridbag);
 
         this.oldLegion = oldLegion;
-        this.parentFrame = parentFrame;
+        this.client = client;
         Game game = oldLegion.getGame();
 
         if (selectedMarkerId == null)
@@ -127,13 +127,13 @@ public final class SplitLegion extends JDialog implements MouseListener,
     }
 
 
-    public static String splitLegion(JFrame parentFrame, Legion oldLegion,
+    public static String splitLegion(Client client, Legion oldLegion,
         String selectedMarkerId)
     {
         if (!active)
         {
             active = true;
-            new SplitLegion(parentFrame, oldLegion, oldLegion.getPlayerName(),
+            new SplitLegion(client, oldLegion, oldLegion.getPlayerName(),
                 selectedMarkerId);
             active = false;
             return results;
@@ -171,15 +171,14 @@ public final class SplitLegion extends JDialog implements MouseListener,
     {
         if (oldChits.size() < 2 || newChits.size() < 2)
         {
-            JOptionPane.showMessageDialog(parentFrame, "Legion too short.");
+            client.showMessageDialog("Legion too short.");
             return false;
         }
         if (oldChits.size() + newChits.size() == 8)
         {
             if (oldChits.size() != newChits.size())
             {
-                JOptionPane.showMessageDialog(parentFrame,
-                    "Initial split must be 4-4.");
+                client.showMessageDialog("Initial split must be 4-4.");
                 return false;
             }
 
@@ -196,8 +195,7 @@ public final class SplitLegion extends JDialog implements MouseListener,
             }
             if (numLords != 1)
             {
-                JOptionPane.showMessageDialog(parentFrame,
-                    "Each stack must have one lord.");
+                client.showMessageDialog("Each stack must have one lord.");
                 return false;
             }
         }
@@ -331,7 +329,7 @@ public final class SplitLegion extends JDialog implements MouseListener,
 
         selectedMarkerId = player.selectMarkerId("Rd02");
 
-        String retval = SplitLegion.splitLegion(frame, legion,
+        String retval = SplitLegion.splitLegion(client, legion,
             selectedMarkerId);
 
         System.out.println(retval);

@@ -566,6 +566,22 @@ public final class Player implements Comparable
     }
 
 
+    /** Return true if any legion can recruit. */
+    public boolean canRecruit()
+    {
+        Iterator it = legions.iterator();
+        while (it.hasNext())
+        {
+            Legion legion = (Legion)it.next();
+            if (legion.hasMoved() && legion.canRecruit())
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
     public void undoLastRecruit()
     {
         if (!Client.isUndoStackEmpty())
@@ -833,7 +849,7 @@ public final class Player implements Comparable
         if (game.getServer().getClientOption(name, Options.autoSplit))
         {
             ai.split(game);
-            game.advancePhase();
+            game.advancePhase(Game.SPLIT);
         }
     }
 
@@ -842,7 +858,7 @@ public final class Player implements Comparable
         if (game.getServer().getClientOption(name, Options.autoMasterMove))
         {
             ai.masterMove(game);
-            game.advancePhase();
+            game.advancePhase(Game.MOVE);
         }
     }
 
@@ -851,7 +867,7 @@ public final class Player implements Comparable
         if (game.getServer().getClientOption(name, Options.autoRecruit))
         {
             ai.muster(game);
-            game.advancePhase();
+            game.advancePhase(Game.MUSTER);
         }
     }
 

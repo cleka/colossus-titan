@@ -23,7 +23,7 @@ public final class BattleMap extends HexMap implements MouseListener,
     private Battle battle;
     private boolean critterSelected;
 
-    public static final String undoLast = "Undo Last"; 
+    public static final String undoLast = "Undo Last";
     public static final String redoLast = "Redo Last";
     public static final String undoAll = "Undo All";
     public static final String doneWithPhase = "Done";
@@ -172,7 +172,7 @@ public final class BattleMap extends HexMap implements MouseListener,
                         if (battle.isForcedStrikeRemaining())
                         {
                             highlightCrittersWithTargets();
-                            JOptionPane.showMessageDialog(battleFrame,
+                            client.showMessageDialog(
                                 "Engaged creatures must strike.");
                         }
                         else

@@ -20,7 +20,6 @@ class SimpleAI implements AI
         while (it.hasNext())
         {
             String preferredColor = (String)it.next();
-Log.debug("Looking for " + preferredColor);
             if (colors.contains(preferredColor))
             {
                 return preferredColor;
@@ -30,7 +29,6 @@ Log.debug("Looking for " + preferredColor);
         it = colors.iterator();
         if (it.hasNext())
         {
-Log.debug("Setting for whatever color is left");
             return (String)it.next();
         }
         return null;
@@ -254,7 +252,8 @@ Log.debug("Setting for whatever color is left");
 
                             if (result == WIN_WITH_MINIMAL_LOSSES)
                             {
-                                Log.debug("We can safely split AND attack with "
+                                Log.debug(
+                                    "We can safely split AND attack with "
                                     + legion);
                                 safeMoves++;
 
@@ -570,7 +569,7 @@ Log.debug("Setting for whatever color is left");
 
     // Split the gargoyles.
     private static List MITsplit(boolean favorTitan, Creature splitCreature,
-            Creature nonsplitCreature)
+        Creature nonsplitCreature)
     {
         LinkedList splitoffs = new LinkedList();
 
@@ -1394,7 +1393,7 @@ Log.debug("Setting for whatever color is left");
         boolean attackerSplitsBeforeBattle, Legion defender, MasterHex hex)
     {
         return estimateBattleResults(attacker, attackerSplitsBeforeBattle,
-                defender, hex, null);
+            defender, hex, null);
     }
 
     private static int estimateBattleResults(Legion attacker,
@@ -1731,6 +1730,14 @@ Log.debug("Setting for whatever color is left");
         }
         return false;
     }
+
+
+    /** Just a placeholder that always fights. */
+    public static NegotiationResults negotiate()
+    {
+        return new NegotiationResults(null, null, true, false, null, null);
+    }
+
 
     public String acquireAngel(Legion legion, ArrayList recruits, Game game)
     {
@@ -2317,7 +2324,7 @@ Log.debug("Setting for whatever color is left");
                 }
 
                 // advance phases until we reach the next move phase
-                game.advancePhase();
+                game.advancePhase(game.getPhase());
 
                 while (game.getPhase() != Game.MOVE)
                 {
@@ -2389,7 +2396,7 @@ Log.debug("Setting for whatever color is left");
                     }
 
                     // now advance again until we get to MOVE phase
-                    game.advancePhase();
+                    game.advancePhase(game.getPhase());
                 }
 
                 // set activePlayer negative so that we average over dice rolls

@@ -22,11 +22,13 @@ public final class Options
     public static final String autosave = "Autosave";
     public static final String allStacksVisible = "All stacks visible";
 
-    // Graphics options (client)
+
+    // Display options (client)
     public static final String showStatusScreen = "Show game status";
     public static final String showDice = "Show dice";
     public static final String antialias = "Antialias";
     public static final String scale = "Scale";
+    public static final String aiDelay = "AI delay";
 
     // AI options (player - put on client)
     public static final String autoPickColor = "Auto pick color";
@@ -35,6 +37,7 @@ public final class Options
     public static final String autoMasterMove = "Auto masterboard move";
     public static final String autoPickEntrySide = "Auto pick entry sides";
     public static final String autoFlee = "Auto flee";
+    public static final String autoNegotiate = "Auto negotiate";
     public static final String autoPickEngagement = "Auto pick engagements";
     public static final String autoBattleMove = "Auto battle move";
     public static final String autoForcedStrike = "Auto forced strike";
@@ -47,32 +50,4 @@ public final class Options
 
     // General per-player options
     public static final String favoriteColors = "Favorite colors";
-
-    private static HashSet perPlayerSet = new HashSet();
-
-    static
-    {
-        perPlayerSet.add(autoPickColor);
-        perPlayerSet.add(autoPickMarker);
-        perPlayerSet.add(autoSplit);
-        perPlayerSet.add(autoMasterMove);
-        perPlayerSet.add(autoPickEntrySide);
-        perPlayerSet.add(autoPickEngagement);
-        perPlayerSet.add(autoFlee);
-        perPlayerSet.add(autoBattleMove);
-        perPlayerSet.add(autoForcedStrike);
-        perPlayerSet.add(autoStrike);
-        perPlayerSet.add(autoSummonAngels);
-        perPlayerSet.add(autoAcquireAngels);
-        perPlayerSet.add(autoRecruit);
-        perPlayerSet.add(autoPickRecruiter);
-        perPlayerSet.add(Options.autoPlay);
-        perPlayerSet.add(Options.favoriteColors);
-    }
-
-
-    public static Set getPerPlayerOptions()
-    {
-        return perPlayerSet;
-    }
 }

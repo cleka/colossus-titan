@@ -455,8 +455,6 @@ public final class Battle
         }
         else
         {
-            game.getServer().allSetupBattleFightMenu();
-
             // Automatically perform forced strikes if applicable.
             Player player = getActivePlayer();
             if (game.getServer().getClientOption(player.getName(),
@@ -476,6 +474,8 @@ public final class Battle
                 commitStrikes();
                 return true;
             }
+
+            game.getServer().allSetupBattleFightMenu();
         }
         return false;
     }
