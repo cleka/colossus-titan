@@ -24,7 +24,7 @@ final class PickCarry extends KDialog implements ActionListener
         Set choices)
     {
         super(parentFrame, "Apply " + carryDamage + 
-            (carryDamage == 1 ? "carry to:" : " carries to:"), true);
+            (carryDamage == 1 ? "carry to:" : " carries to:"), false);
 
         this.client = client;
 
