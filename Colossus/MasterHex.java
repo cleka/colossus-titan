@@ -11,15 +11,19 @@ class MasterHex
 {
     public static final double SQRT3 = Math.sqrt(3.0);
     public static final double RAD_TO_DEG = 180 / Math.PI;
-    boolean selected;
-    int[] xVertex = new int[6];
-    int[] yVertex = new int[6];
+    private int[] xVertex = new int[6];
+    private int[] yVertex = new int[6];
     private Polygon p;
     private Rectangle rectBound;
-    boolean inverted;
+    private boolean inverted;
     private int scale;
     private double l;              // hexside length
+    private int numLegions = 0;
+    private Legion [] legions = new Legion[3];
+
     MasterHex [] neighbor = new MasterHex[6];
+    boolean selected;
+    
 
     // B,D,H,J,m,M,P,S,T,t,W
     // Brush, Desert, Hills, Jungle, mountains, Marsh, Plains,
@@ -42,6 +46,7 @@ class MasterHex
     static final int ARCH = 2;
     static final int ARROW = 3;
     static final int ARROWS = 4;
+
 
     MasterHex(int cx, int cy, int scale, boolean inverted)
     {
@@ -363,9 +368,16 @@ class MasterHex
         return rectBound;
     }
 
+
     public boolean contains(Point point)
     {
         return (p.contains(point));
+    }
+
+
+    char getTerrain()
+    {
+        return terrain;
     }
 
     String getTerrainName()
@@ -430,11 +442,126 @@ class MasterHex
         }
     }
 
+
     // Return a point near the center of the hex, vertically offset
     // a bit toward the fat side.
     Point getOffCenter()
     {
         return new Point((xVertex[0] + xVertex[1]) / 2, (yVertex[0] + 
             yVertex[3]) / 2 + (inverted ? -(scale / 6) : (scale / 6))); 
+    }
+
+
+    int getNumLegions()
+    {
+        return numLegions;
+    }
+
+
+    int getNumFriendlyLegions(Player player)
+    {
+        int count = 0;
+        for (int i = 0; i < numLegions; i++)
+        {
+            if (legions[i].getPlayer() == player)
+            {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    
+    int getNumEnemyLegions(Player player)
+    {
+        int count = 0;
+        for (int i = 0; i < numLegions; i++)
+        {
+            if (legions[i].getPlayer() != player)
+            {
+                count++;
+            }
+        }
+        return count;
+    }
+
+
+    void alignLegions()
+    {
+        if (numLegions == 0)
+        {
+            return;
+        }
+
+        int chitScale = legions[0].chit.getBounds().width;
+        Point point = getOffCenter();
+
+        if (numLegions == 1)
+        {
+            // Place legion in the center of the hex.
+            point.x -= chitScale / 2;
+            point.y -= chitScale / 2;
+            legions[0].chit.setLocationAbs(point);     
+        }
+        else if (numLegions == 2)
+        {
+            // Place legions in NW and SE corners.
+            point.x -= 3 * chitScale / 4;
+            point.y -= 3 * chitScale / 4;
+            legions[0].chit.setLocationAbs(point);
+
+            point = getOffCenter();
+            point.x -= chitScale / 4;
+            point.y -= chitScale / 4;
+            legions[1].chit.setLocationAbs(point);
+        }
+        else if (numLegions == 3)
+        {
+            // Place legions in NW, SE, NE corners.
+            point.x -= 3 * chitScale / 4;
+            point.y -= 3 * chitScale / 4;
+            legions[0].chit.setLocationAbs(point);
+
+            point = getOffCenter();
+            point.x -= chitScale / 4;
+            point.y -= chitScale / 4;
+            legions[1].chit.setLocationAbs(point);
+
+            point = getOffCenter();
+            point.x -= chitScale / 4;
+            point.y -= chitScale;
+            legions[2].chit.setLocationAbs(point);
+        }
+    }
+    
+    
+    void addLegion(Legion legion)
+    {
+        numLegions++;
+        legions[numLegions - 1] = legion;
+
+        // Reposition all legions within the hex.
+        alignLegions();
+    }
+
+
+    void removeLegion(Legion legion)
+    {
+        for (int i = 0; i < numLegions; i++)
+        {
+            if (legions[i] == legion)
+            {
+                for (int j = i; j < numLegions - 1; j++)
+                {
+                    legions[j] = legions[j + 1];
+                }
+                legions[numLegions - 1] = null;
+                numLegions--;
+
+                // Reposition all legions within the hex.
+                alignLegions();
+                return;
+            }
+        }
     }
 }
