@@ -1,7 +1,8 @@
 Suspected Java bugs:
 
 Win95, jdk 1.1.7, 1.2, 1.2.1: OutOfMemory error -- Image memory leak.
-   Fixed in 1.1.8 and 1.2.2
+   This inevitably causes the game to crash, unless you have a huge
+   amount of memory and allocate it to java.  Fixed in 1.1.8 and 1.2.2.
 
 Win95, 1.1.7: BattleTurn: "Done with Mov..."; default button size is
    too small for its label.
@@ -77,9 +78,6 @@ Solaris: Makefile no longer works.  Target "classes" isn't working
    properly.  Why not?  It works fine under Linux.  Both use GNU make 
    3.77.
 
-Netscape 4.7: Applet does not stop when game is over.  AppletButton 
-   does not allow starting another game when game is over.
-
 Linux, ibmjdk118: Drift damage was not applied to a cyclops.
 
 Linux, ibmjdk118: Legion with angel in tower did not immediately
@@ -97,10 +95,12 @@ Linux, ibmjdk118: Angel summoned into battle can move on top of
 
 Linux, ibmjdk118; Win98, jdk1.3rc1: Tried to strike own creature!
 
-Linux, ibmjdk118: '6' in upper left corner of MasterBoard window
-   after loading a game.  Stray legion height?  Disappears in a
-   repaint after a few turns.
+Linux, ibmjdk118: Numbers (sometimes overlapping) appear in the 
+   upper left corner of the MasterBoard window after loading a game.  
+   Stray legion heights?  They disappear in a repaint after a few 
+   turns.
 
-Linux, ibmjdk118: Battle does not end when a player dies.
-   BattleTurn is not dismissed.
+Linux, ibmjdk118: Battle did not end once when a player died.
+   BattleTurn was not dismissed, and the game could not continue.
+   Unable to duplicate so far.
 

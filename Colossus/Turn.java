@@ -10,16 +10,14 @@ import java.awt.event.*;
 public class Turn extends Dialog implements ActionListener, WindowListener
 {
     private static Game game;
-    private Frame parentFrame;
     private MasterBoard board;
 
 
-    public Turn(Frame parentFrame, Game game, MasterBoard board)
+    public Turn(Game game, MasterBoard board)
     {
-        super(parentFrame, game.getActivePlayer().getName() + " Turn " +
+        super(board, game.getActivePlayer().getName() + " Turn " +
             game.getTurnNumber());
 
-        this.parentFrame = parentFrame;
         this.game = game;
         this.board = board;
 
@@ -227,7 +225,7 @@ public class Turn extends Dialog implements ActionListener, WindowListener
         {
             if (player.getMaxLegionHeight() > 7)
             {
-                new MessageBox(parentFrame, "Must split.");
+                new MessageBox(board, "Must split.");
                 return;
             }
             advancePhase();
@@ -272,7 +270,7 @@ public class Turn extends Dialog implements ActionListener, WindowListener
                 // Highlight all unmoved legions, rather than the
                 // locations to which the forced-to-move legion can move. 
                 board.highlightUnmovedLegions();
-                new MessageBox(parentFrame, "At least one legion must move.");
+                new MessageBox(board, "At least one legion must move.");
                 return;
             }
 
@@ -301,7 +299,7 @@ public class Turn extends Dialog implements ActionListener, WindowListener
                             // locations to which the forced-to-move legion 
                             // can move. 
                             board.highlightUnmovedLegions();
-                            new MessageBox(parentFrame, 
+                            new MessageBox(board, 
                                 "Split legions must be separated.");
                             return;
                         }
@@ -321,7 +319,7 @@ public class Turn extends Dialog implements ActionListener, WindowListener
             }
             else
             {
-                new MessageBox(parentFrame, "Must Resolve Engagements.");
+                new MessageBox(board, "Must Resolve Engagements."); 
             }
         }
         
@@ -352,7 +350,7 @@ public class Turn extends Dialog implements ActionListener, WindowListener
 
         else if (e.getActionCommand().equals("Withdraw from Game"))
         {
-            new OptionDialog(parentFrame, "Confirm Withdrawal", 
+            new OptionDialog(board, "Confirm Withdrawal", 
                 "Are you sure you with to withdraw from the game?",
                 "Yes", "No");
             if (OptionDialog.getLastAnswer() == OptionDialog.YES_OPTION)

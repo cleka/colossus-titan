@@ -181,9 +181,6 @@ public class MasterBoard extends Frame implements MouseListener,
     // These steps need to be delayed if we're loading a game. 
     public void finishInit(boolean newgame)
     {
-        setVisible(true);
-        repaint();
-            
         if (!newgame)
         {
             // Move all legions into their hexes.
@@ -199,7 +196,10 @@ public class MasterBoard extends Frame implements MouseListener,
             }
         }
 
-        turn = new Turn(this, game, this);
+        turn = new Turn(game, this);
+        
+        setVisible(true);
+        repaint();
     }
 
 
