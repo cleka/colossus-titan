@@ -8,6 +8,7 @@ import javax.swing.event.*;
 
 import net.sf.colossus.util.KDialog;
 
+
 /** 
  *  Allows picking any integer value
  *  @version $Id$
@@ -15,7 +16,7 @@ import net.sf.colossus.util.KDialog;
  */
 
 public final class PickIntValue extends KDialog implements WindowListener,
-    ChangeListener, ActionListener
+            ChangeListener, ActionListener
 {
     private static int newValue;
     private static int oldValue;
@@ -23,13 +24,13 @@ public final class PickIntValue extends KDialog implements WindowListener,
     private JSpinner spinner;
     private SpinnerNumberModel model;
 
-
     private PickIntValue(JFrame parentFrame, int oldValue, String title,
-        int min, int max, int step)
+            int min, int max, int step)
     {
         super(parentFrame, title, true);
 
         this.oldValue = oldValue;
+        this.newValue = oldValue;
 
         setBackground(Color.lightGray);
 
@@ -63,13 +64,12 @@ public final class PickIntValue extends KDialog implements WindowListener,
 
     /** Return the new value if the user accepted it, or oldValue if
      *  user cancelled the dialog. */
-    public static int pickIntValue(JFrame parentFrame, int oldValue, 
-        String title, int min, int max, int step)
+    public static int pickIntValue(JFrame parentFrame, int oldValue,
+            String title, int min, int max, int step)
     {
         new PickIntValue(parentFrame, oldValue, title, min, max, step);
         return newValue;
     }
-
 
     public void stateChanged(ChangeEvent e)
     {
