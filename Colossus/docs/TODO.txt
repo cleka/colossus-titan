@@ -1,25 +1,18 @@
-Bug: Non-displayed carry hits.  Only when strike penalty?
-2 carries available
-2 hits carry to Ranger in Plains hex E4
-Error: Called allTellCarryResults() without setup.
-Error: null striker
-
-
-Copy various new docs to web page from inst.  tex -> html first when possible.
 Put old, new web pages under CVS.
-ant inst all html stuff to web site.
-Install dvi2tty on SF first.
+Switch to new web page.
 
-Document test procedures.
-
-Add some JUnit tests.
+Fix pic used for minimized icon.
+Include an .ico file for Windows.  (ImageMagick can autogenerate one.)
 
 Add command-line options to start a game with N AIs, have the game exit
    java when done, etc. to support automated testing.  GetOpt package?
 Options to auto quit JVM when game over, auto stop when last human dies.
 
-Find a better Java dependency checker, and add a real depend target.  There 
-are a couple mentioned on the Ant page.
+Document test procedures.
+Add some JUnit tests.
+
+Find a better Java dependency checker (javadepend?), and add a real 
+   depend target.  
 
 ShowLegion on mouseover, not click, with permanent dialog.
 
@@ -32,9 +25,6 @@ Optional post-engagement status dialog.
 
 Change some dialogs to show info in a label instead of the title (so
    the dialog is wide enough) and add explicit cancel buttons.
-
-Pass smaller chunks of changed info to StatusScreen, from generalized
-   info update messages. 
 
 Remove remaining public Client methods that only directly control the GUI
    in favor of higher-level events.
@@ -58,10 +48,7 @@ Allow players to specify that they automatically refuse to negotiate.
 Prompt player whether to continue game after last human player dies
    if AIs remain.
 
-Include an .ico file for Windows.
-
 Remember window positions in .cfg file.
-
 Remember GetPlayers settings in .cfg file.
 
 Add UI for players to specify favorite colors.
@@ -89,6 +76,7 @@ Add SetupBattle dialog, to allow setting up standalone battles.
 
 Add "no 2s or 5s" mulligan option.  (Per player, or global, or both?)
 Add optional additional handicap mulligans that can be used after turn 1.
+Add balanced tower setup option.
 
 Show StatusScreen and ShowLegion info in the masterboard window, rather 
    than in separate windows.
