@@ -42,6 +42,7 @@ public class DefaultHint implements net.sf.colossus.server.HintInterface
             if (numCyclops > 0 &&
                     numCyclops < 3 &&
                     !legion.contains("Behemoth") &&
+                    !legion.contains("Serpent") &&
                     oracle.creatureAvailable("Behemoth") >= 2 &&
                     oracle.creatureAvailable("Cyclops") >= 1)
             {
