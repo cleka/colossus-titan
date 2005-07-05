@@ -64,7 +64,9 @@
         />
 </target>
 
-<taskdef name="javamake" classname="com.sun.tools.javamake.ant.JavaMake" /> 
+<taskdef name="javamake" classname="com.sun.tools.javamake.ant.JavaMake" 
+         classpathref="project.class.path"
+/> 
 
 
 <target name="compile" depends="init"
