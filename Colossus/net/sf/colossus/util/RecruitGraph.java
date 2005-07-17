@@ -162,14 +162,10 @@ public class RecruitGraph
                 return false;
             }
             RecruitEdge o2 = (RecruitEdge)obj;
-            if ((o2.getSource() == src) &&
+            return ((o2.getSource() == src) &&
                     (o2.getDestination() == dst) &&
                     (o2.getNumber() == number) &&
-                    (o2.getTerrain().equals(terrain)))
-            {
-                return true;
-            }
-            return false;
+                    (o2.getTerrain().equals(terrain)));
         }
 
         public String toString()
