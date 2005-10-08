@@ -3,5 +3,5 @@
     <strategic_map filename="InfiniteMap.xml" />
     <creatures filename="InfiniteCre.xml" />
     <terrain_recruits filename="DefaultTer.xml" />
-    <hint filename="Default.DefaultHint" />
+    <hint classname="Default.DefaultHint" />
 </variant>
