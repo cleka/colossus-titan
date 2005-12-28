@@ -952,8 +952,7 @@ public final class MasterBoard extends JPanel
         if (_hexByLabel_last_h != h)
         {
             // alas, we have to rebuild the cache          
-            Log.warn("TOWI: new 'MasterHex[][] h' " +
-                "in MasterBoard.hexByLabel()");
+            Log.debug("new 'MasterHex[][] h' in MasterBoard.hexByLabel()");
             _hexByLabel_last_h = h;
             // write all 'h' elements by their int-value into an Array.
             // we can do that here, because the 'label' arg is an int. if it

@@ -199,7 +199,7 @@ public final class VariantSupport
         catch (Exception e)
         {
             Log.error("Variant loading failed : " + e);
-            e.printStackTrace(); //towi: added to get more info
+            e.printStackTrace();
             varDirectory = Constants.defaultDirName;
             variantName = Constants.defaultVARFile;
             mapName = Constants.defaultMAPFile;

@@ -33,7 +33,6 @@ public class BattleHex
      * The array of all the valid terrain type for a BattleHex Side.
      */
     private static final char[] allHexsides = { ' ', 'd', 'c', 's', 'w', 'r' };
-    //private static final String[] allHexsides =
     //{ "Nothing", "Dune", "Cliff", "Slope", "Wall", "River"};
 
     /**
@@ -252,7 +251,7 @@ public class BattleHex
     private void assignLabel()
     {
         String label;
-        if (xCoord < 0)   // towi: changed from ?== -1? to ?< 0?.
+        if (xCoord < 0)
         {
             label = "X" + yCoord;
         }
@@ -265,7 +264,6 @@ public class BattleHex
     }
 
     /** a char for an int: 0:'A'=0, 1:'B', ... int(w):'W', else:'?', <0:undef.
-     * towi: support from 'A'..'W'; old "switch" was 'A'..'F'. 
      * */ 
     private final static char _intXCoordToXLabel(final int x) 
     {
@@ -521,13 +519,11 @@ public class BattleHex
 
     public static String[] getTerrains()
     {
-        // towi: uncloned. cant see why this was needed -- was slow.
-        return ALL_HAZARD_TERRAINS;  
+        return ALL_HAZARD_TERRAINS;
     }
 
     public static char[] getHexsides()
     {
-        // towi: uncloned. cant see why this was needed -- was slow.
         return allHexsides;
     }
 }

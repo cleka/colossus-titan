@@ -135,7 +135,6 @@ public final class Constants
     /** Default directory for datafiles, can be outside variants, 
      * but should be there. 
      */
-    // towi: direcories not yet restructured: 
     //public static final String defaultDirName = "variants/Default"; 
     public static final String defaultDirName = "Default";
 
