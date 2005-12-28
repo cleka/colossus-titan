@@ -280,7 +280,7 @@ final class EngagementResults extends KDialog
         JButton hideButton = new JButton("Hide");
         hideButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                setVisible(false);
+                hide();
             }
         }
         );
@@ -412,15 +412,12 @@ final class EngagementResults extends KDialog
         super.dispose();
     }
 
-    public void setVisible(boolean isVisible) 
+    public void hide()
     {
-        if (isVisible = false) 
-        {
-            saveWindow.save(this);
-        }
-        super.setVisible(isVisible);
+        saveWindow.save(this);
+        super.hide();
     }
-    
+
     /**
      * Stores information about an engagement.
      * 
