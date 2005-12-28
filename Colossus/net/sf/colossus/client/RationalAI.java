@@ -669,7 +669,7 @@ public class RationalAI extends SimpleAI implements AI
         
         public String toString()
         {
-        	return markerId + " to " + toHex;
+            return markerId + " to " + toHex;
         }
     }
 
@@ -1483,7 +1483,7 @@ public class RationalAI extends SimpleAI implements AI
         int canRecruitHere, int depth, boolean normalHexRisk)
     {
 
-    	// evaluateHexAttack includes recruit value
+        // evaluateHexAttack includes recruit value
         double value = evaluateHexAttack(legion, hex, canRecruitHere);
 
         // if we get killed at this hex there can be no further musters
@@ -1601,28 +1601,30 @@ public class RationalAI extends SimpleAI implements AI
             def_dead = d;
         }
         
-		/**
-		 * @param ev
-		 * @param att_dead
-		 * @param def_dead
-		 * @param log
-		 */
-		public BattleResults(double ev, int att_dead, int def_dead, List log) {
-			super();
-			this.ev = ev;
-			this.att_dead = att_dead;
-			this.def_dead = def_dead;
-			this.log = log;
-		}
+        /**
+         * @param ev
+         * @param att_dead
+         * @param def_dead
+         * @param log
+         */
+         public BattleResults(double ev, int att_dead, int def_dead, List log) 
+         {
+             super();
+             this.ev = ev;
+             this.att_dead = att_dead;
+             this.def_dead = def_dead;
+             this.log = log;
+         }
 
-		/**
-		 * @return Returns the log.
-		 */
-		public List getLog() {
-			return log;
-		}
+        /**
+         * @return Returns the log.
+         */
+        public List getLog() 
+        {
+            return log;
+        }
 
-		public double getExpectedValue()
+        public double getExpectedValue()
         {
             return ev;
         }
@@ -1637,13 +1639,14 @@ public class RationalAI extends SimpleAI implements AI
             return def_dead;
         }
 
-        void log() {
-			Log.debug("Expected battle log");
-			for (Iterator it = log.iterator(); it.hasNext();) {
-				Log.debug((String) it.next());
-			}
-		}
-        
+        void log() 
+        {
+            Log.debug("Expected battle log");
+            for (Iterator it = log.iterator(); it.hasNext();) 
+            {
+                Log.debug((String) it.next());
+            }
+        }
     }
 
     BattleResults estimateBattleResults(LegionInfo attacker,
@@ -1679,16 +1682,15 @@ public class RationalAI extends SimpleAI implements AI
         int defenderKilled = 0;
         int defenderMuster = 0;
         int round;
-        boolean summonedAngel = false;
         List log = new ArrayList(14);
         
         round_loop:
         for (round = 2; round <= 7; round++)
         {
-        	// note start on turn 2, because often there wil be no contact in turn 1
-        	log.add("Round "+round+" attacker" + attackerCreatures);
-        	log.add("Round "+round+" defender" + defenderCreatures);
-        	/*
+            // note start on turn 2, because often there wil be no contact in turn 1
+            log.add("Round "+round+" attacker" + attackerCreatures);
+            log.add("Round "+round+" defender" + defenderCreatures);
+            /*
             // DO NOT ADD ANGEL!
             // If attacker cannot win without angel then this
             // will often leave a weak group with an angel in it
@@ -1703,7 +1705,6 @@ public class RationalAI extends SimpleAI implements AI
                 {
                     PowerSkill angel = getNativeValue(callable, terrain, false);
                     attackerCreatures.add(angel);
-                    summonedAngel = true;
                 }
             //}
 

@@ -3,7 +3,6 @@ package net.sf.colossus.client;
 
 import java.awt.Dimension;
 import java.awt.Point;
-import java.awt.Toolkit;
 import java.awt.Window;
 
 import net.sf.colossus.util.Options;
@@ -18,8 +17,6 @@ public final class SaveWindow
 {
     private IOptions options;
     private String name;
-    private final Dimension screen =
-            Toolkit.getDefaultToolkit().getScreenSize();
 
     public SaveWindow(IOptions options, String name)
     {

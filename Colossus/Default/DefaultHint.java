@@ -1,13 +1,15 @@
 package Default;
 
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+
 import net.sf.colossus.client.LegionInfo;
-import net.sf.colossus.server.HintOracleInterface;
-import net.sf.colossus.server.Creature;
 import net.sf.colossus.server.Constants;
+import net.sf.colossus.server.HintOracleInterface;
 import net.sf.colossus.util.DevRandom;
-import net.sf.colossus.util.Log;
-import java.util.*;
 
 
 public class DefaultHint implements net.sf.colossus.server.HintInterface

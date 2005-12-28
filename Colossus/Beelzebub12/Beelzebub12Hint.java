@@ -1,13 +1,13 @@
 package Beelzebub12;
 
 
+import java.util.ArrayList;
+import java.util.List;
+
 import net.sf.colossus.client.LegionInfo;
 import net.sf.colossus.server.HintOracleInterface;
-import net.sf.colossus.server.Creature;
-import net.sf.colossus.server.Constants;
 import net.sf.colossus.util.DevRandom;
 import Default.DefaultHint;
-import java.util.*;
 
 
 public class Beelzebub12Hint implements net.sf.colossus.server.HintInterface
@@ -21,7 +21,6 @@ public class Beelzebub12Hint implements net.sf.colossus.server.HintInterface
         String[] section)
     {
         recruits = DefaultHint.creaturesToStrings(recruits);
-        List sect = Arrays.asList(section);
 
         if (terrain.equals("Plains"))
         {
