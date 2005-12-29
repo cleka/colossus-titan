@@ -27,16 +27,18 @@ public abstract class GUIHex {
     // Selection is in-between GUI and game state.
     private boolean selected;
 
-
-	public GUIHex(Hex model) {
-    	this.model = model;
+    public GUIHex(Hex model) 
+    {
+        this.model = model;
     }
     
-	public Hex getHexModel() {
-		return this.model;
-	}
+    public Hex getHexModel() 
+    {
+        return this.model;
+    }
     
-    public void setHexModel(Hex model) {
+    public void setHexModel(Hex model) 
+    {
         this.model = model;
     }
     

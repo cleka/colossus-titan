@@ -2536,7 +2536,7 @@ public class SimpleAI implements AI
         
         public String toString()
         {
-        	return name + "(" + hp + ")";
+            return name + "(" + hp + ")";
         }
     }
 

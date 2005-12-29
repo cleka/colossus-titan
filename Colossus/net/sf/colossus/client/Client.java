@@ -973,7 +973,7 @@ public final class Client implements IClient, IOracle, IOptions
 
     LegionInfo createLegionInfo(String markerId)
     {
-    	LegionInfo info = new LegionInfo(markerId, this);
+        LegionInfo info = new LegionInfo(markerId, this);
         legionInfo.put(markerId, info);
         return info;
     }
@@ -1054,12 +1054,12 @@ public final class Client implements IClient, IOracle, IOptions
     // public for IOracle
     public List getLegionImageNames(String markerId)
     {
-    	LegionInfo info = getLegionInfo(markerId);
-    	if(info != null)
-    	{
-    		return info.getImageNames();
-    	}
-    	return new ArrayList();
+        LegionInfo info = getLegionInfo(markerId);
+        if(info != null)
+        {
+            return info.getImageNames();
+        }
+        return new ArrayList();
     }
 
     /** Return a list of Booleans */
@@ -1101,13 +1101,13 @@ public final class Client implements IClient, IOracle, IOptions
         info.removeCreature(name);
         if (height <= 1)
         {
-        	// dont remove this, sever will give explicit order to remove it
-        	// removeLegion(markerId);
+            // dont remove this, sever will give explicit order to remove it
+            // removeLegion(markerId);
         }
         if (height <= 1 && getTurnNumber() == -1)
         {
-        	// hack to remove legions correctly durin load
-        	removeLegion(markerId);
+            // hack to remove legions correctly during load
+            removeLegion(markerId);
         }
         if (board != null)
         {
