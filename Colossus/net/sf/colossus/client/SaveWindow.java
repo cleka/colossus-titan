@@ -18,6 +18,8 @@ public final class SaveWindow
     private IOptions options;
     private String name;
 
+    public static final Point nullPoint = new Point(-1, -1);
+    
     public SaveWindow(IOptions options, String name)
     {
         this.options = options;
@@ -42,6 +44,13 @@ public final class SaveWindow
         options.setOption(name + Options.sizeY, (int)size.getHeight());
     }
 
+    /**
+     * BUG: A Lot of code checks for loadLocation() == null, when in fact this 
+     * can never occur.
+     * As <code>getIntOptions</code> returns -1 for unknown property values.
+     * 
+     * @return
+     */
     public Point loadLocation()
     {
         int x = options.getIntOption(name + Options.locX);

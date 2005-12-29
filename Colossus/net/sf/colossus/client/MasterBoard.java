@@ -10,16 +10,8 @@ import java.awt.Graphics2D;
 import java.awt.GraphicsEnvironment;
 import java.awt.Image;
 import java.awt.Point;
+import java.awt.Toolkit;
 import java.awt.event.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.InputEvent;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.*;
@@ -95,8 +87,8 @@ public final class MasterBoard extends JPanel
     public static final String viewFullRecruitTree = "View Full Recruit Tree";
     public static final String viewHexRecruitTree = "View Hex Recruit Tree";
     public static final String viewBattleMap = "View Battle Map";
-    public static final String
-        viewCreatureDetails = "View Creature:Ranger Details";
+    public static final String viewCreatureDetails =
+        "View Creature:Ranger Details";
     public static final String changeScale = "Change Scale";
 
     public static final String chooseScreen = "Choose Screen For Info Windows";
@@ -134,6 +126,7 @@ public final class MasterBoard extends JPanel
     private boolean playerLabelDone;
 
     private JMenu lfMenu;
+    private SaveWindow saveWindow;
 
     private final class InfoPopupHandler extends KeyAdapter {
         private static final int POPUP_KEY = KeyEvent.VK_SHIFT;
@@ -160,14 +153,16 @@ public final class MasterBoard extends JPanel
                     for (Iterator iter = markers.iterator(); iter.hasNext();)
                     {
                         Marker marker = (Marker)iter.next();
-                        LegionInfo legion = client.getLegionInfo(marker.getId());
+                        LegionInfo legion = client.getLegionInfo(
+                            marker.getId());
                         List imageNames = legion.getImageNames();
                         List certainties = legion.getCertainties();
 
                         final JPanel panel = new JPanel(null);
                         Color playerColor =
-                            HTMLColor.stringToColor(legion.getPlayerInfo().getColor() +
-                            "Colossus");
+                            HTMLColor.stringToColor(
+                                legion.getPlayerInfo().getColor() + 
+                                "Colossus");
                         panel.setBackground(playerColor);
                         int scale = 2 * Scale.get();
 
@@ -177,9 +172,10 @@ public final class MasterBoard extends JPanel
                         while (it.hasNext())
                         {
                             String imageName = (String)it.next();
-                            boolean sure = ((Boolean)it2.next()).booleanValue();
-                            Chit chit = new Chit(scale, imageName, panel, false,
-                                !sure);
+                            boolean sure = 
+                                ((Boolean)it2.next()).booleanValue();
+                            Chit chit = new Chit(scale, imageName, panel, 
+                                false, !sure);
                             panel.add(chit);
                             chit.setLocation(scale * j + PANEL_MARGIN,
                                 PANEL_MARGIN);
@@ -201,14 +197,16 @@ public final class MasterBoard extends JPanel
                                 if (lastMousePos != null)
                                 {
                                     Point loc = panel.getLocation();
-                                    int diffX = e.getPoint().x - lastMousePos.x;
-                                    int diffY = e.getPoint().y - lastMousePos.y;
+                                    int diffX = e.getPoint().x - 
+                                        lastMousePos.x;
+                                    int diffY = e.getPoint().y - 
+                                        lastMousePos.y;
                                     loc.x += diffX;
                                     loc.y += diffY;
                                     panel.setLocation(loc);
                                     lastMousePos = e.getPoint();
-                                    // lastMousePos is read relative to panel, so adjust
-                                    // for movement
+                                    // lastMousePos is read relative to panel, 
+                                    // so adjust for movement
                                     lastMousePos.x -= diffX;
                                     lastMousePos.x -= diffY;
                                 }
@@ -363,6 +361,19 @@ public final class MasterBoard extends JPanel
 
         setupPlayerLabel();
 
+        saveWindow = new SaveWindow(client, "MasterBoardScreen");
+        Point loadLocation = saveWindow.loadLocation();
+
+        if (SaveWindow.nullPoint.equals(loadLocation)) {
+            // Copy of code from KDialog.centerOnScreen();
+            Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
+            masterFrame.setLocation(new Point(d.width / 2 - 
+                getSize().width / 2, d.height / 2 - getSize().height / 2));
+        }
+        else {
+            masterFrame.setLocation(loadLocation);
+        }
+
         masterFrame.pack();
         masterFrame.setVisible(true);
     }
@@ -511,7 +522,8 @@ public final class MasterBoard extends JPanel
             public void actionPerformed(ActionEvent e)
             {
                 new ShowAllRecruits(masterFrame,
-                    TerrainRecruitLoader.getTerrains(), null, null,
+                    client,
+                    TerrainRecruitLoader.getTerrains(),
                     scrollPane);
             }
         };
@@ -536,9 +548,8 @@ public final class MasterBoard extends JPanel
                 if (hex != null)
                 {
                     MasterHex hexModel = hex.getMasterHexModel();
-                    String[] terrains = { hexModel.getTerrain() };
-                    new ShowAllRecruits(masterFrame, terrains, lastPoint,
-                        hexModel.getLabel(), scrollPane);
+                    new ShowRecruits(masterFrame, hexModel.getTerrain(), 
+                        lastPoint, hexModel.getLabel(), scrollPane);
 
                 }
             }
@@ -637,6 +648,7 @@ public final class MasterBoard extends JPanel
             {
                 if (client.isGameOver())
                 {
+                    client.dispose();
                     System.exit(0);
                 }
 
@@ -651,6 +663,7 @@ public final class MasterBoard extends JPanel
                 if (answer == JOptionPane.YES_OPTION)
                 {
                     client.withdrawFromGame();
+                    client.dispose();
                     System.exit(0);
                 }
             }
@@ -871,7 +884,7 @@ public final class MasterBoard extends JPanel
         String playerName = client.getPlayerName();
         if (bottomBar == null)
         {
-            // add a bottom bar 
+            // add a bottom bar
             bottomBar = new BottomBar();
             contentPane.add(bottomBar, BorderLayout.SOUTH);
 
@@ -932,7 +945,7 @@ public final class MasterBoard extends JPanel
     }
 
     /** reference to the 'h' the cache was built for.
-     * we have to rebuild the cache for a new 'h' 
+     * we have to rebuild the cache for a new 'h'
      */
     private static MasterHex[][] _hexByLabel_last_h = null;
 
@@ -940,10 +953,10 @@ public final class MasterBoard extends JPanel
     private static java.util.Vector _hexByLabel_cache = null;
 
     /**
-     * towi changes: here is now a cache implemented so that the nested 
+     * towi changes: here is now a cache implemented so that the nested
      *   loop is not executed at every call. the cache is implemented with
-     *   an array. it will work as long as the hex-labels-strings can be 
-     *   converted to int. this must be the case anyway since the 
+     *   an array. it will work as long as the hex-labels-strings can be
+     *   converted to int. this must be the case anyway since the
      *   param 'label' is an int here.
      */
     static MasterHex hexByLabel(MasterHex[][] h, int label)
@@ -951,7 +964,7 @@ public final class MasterBoard extends JPanel
         // if the 'h' was the same last time we can use the cache
         if (_hexByLabel_last_h != h)
         {
-            // alas, we have to rebuild the cache          
+            // alas, we have to rebuild the cache
             Log.debug("new 'MasterHex[][] h' in MasterBoard.hexByLabel()");
             _hexByLabel_last_h = h;
             // write all 'h' elements by their int-value into an Array.
@@ -977,7 +990,7 @@ public final class MasterBoard extends JPanel
             }
         }
         // the cache is built and looks like this:
-        //   _hexByLabel_cache[0...] = 
+        //   _hexByLabel_cache[0...] =
         //      [ h00,h01,h02, ..., null, null, ..., h30,h31,... ]
         final MasterHex found = (MasterHex)_hexByLabel_cache.get(label);
         if (found == null)
@@ -2042,7 +2055,8 @@ public final class MasterBoard extends JPanel
                 if (isPopupButton(e))
                 {
                     lastPoint = point;
-                    popupMenu.setLabel(hex.getMasterHexModel().getDescription());
+                    popupMenu.setLabel(
+                        hex.getMasterHexModel().getDescription());
                     popupMenu.show(e.getComponent(), point.x, point.y);
                     return;
                 }
@@ -2147,28 +2161,7 @@ public final class MasterBoard extends JPanel
     {
         public void windowClosing(WindowEvent e)
         {
-            // XXX This code is a duplicate of quitGameAction.  Find out
-            // how to invoke that action correctly from here.
-            if (client.isGameOver())
-            {
-                client.withdrawFromGame();
-                System.exit(0);
-            }
-
-            String[] options = new String[2];
-            options[0] = "Yes";
-            options[1] = "No";
-            int answer = JOptionPane.showOptionDialog(masterFrame,
-                "Are you sure you wish to quit?",
-                "Quit Game?",
-                JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
-                null, options, options[1]);
-
-            if (answer == JOptionPane.YES_OPTION)
-            {
-                client.withdrawFromGame();
-                System.exit(0);
-            }
+            quitGameAction.actionPerformed(null);
         }
     }
 
@@ -2321,6 +2314,7 @@ public final class MasterBoard extends JPanel
     {
         setVisible(false);
         setEnabled(false);
+        saveWindow.saveLocation(masterFrame.getLocation());
         masterFrame.setVisible(false);
         masterFrame.setEnabled(false);
         masterFrame.dispose();
@@ -2395,12 +2389,8 @@ public final class MasterBoard extends JPanel
         }
     }
 
-    //
-    // class Bottom Bar 
-    // {{{
     class BottomBar extends JPanel
     {
-
         private JLabel playerLabel;
 
         /** quick access button to the doneWithPhase action.
@@ -2408,7 +2398,7 @@ public final class MasterBoard extends JPanel
          */
         private JButton doneButton;
 
-        /** display the current phase in the bottom bar, near the done button */
+        /** display the current phase in the bottom bar */
         private JLabel phaseLabel;
 
         void setPlayerName(String s)
@@ -2457,7 +2447,4 @@ public final class MasterBoard extends JPanel
 
         }
     }
-    // end of class Bottom Bar
-    // }}}
-
 }
