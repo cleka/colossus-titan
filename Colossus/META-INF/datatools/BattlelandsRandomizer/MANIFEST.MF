@@ -1,3 +1,0 @@
-Manifest-Version: 1.0
-Main-Class: net/sf/colossus/datatools/BattlelandsRandomizer
-Created-By: 1.2 (Sun Microsystems Inc.)

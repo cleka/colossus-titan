@@ -1,4 +1,0 @@
-Manifest-Version: 1.0
-Main-Class: net.sf.colossus.server.Start
-Created-By: 1.2 (Sun Microsystems Inc.)
-Class-Path: libs/werken.opt.jar libs/jdom.jar
