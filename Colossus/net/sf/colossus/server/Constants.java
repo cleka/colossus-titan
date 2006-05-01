@@ -32,8 +32,6 @@ public final class Constants
     public static final String configVersion =
             "Colossus config file version 2";
 
-    public static final String logFileName = "lastgame.log";
-
     // Constants for savegames
 
     /** Must include trailing slash. */
@@ -96,12 +94,12 @@ public final class Constants
      shortened name directly */
 
     /* all should be MAX_MAX_PLAYERS long */
-    public static final String[] colorNames = 
+    public static final String[] colorNames =
     {
         "Black", "Blue", "Brown", "Gold", "Green", "Red",
         "Orange", "Purple", "Silver", "Sky", "Pine", "Indigo"
     };
-    public static final String[] shortColorNames = 
+    public static final String[] shortColorNames =
     {
         "Bk", "Bu", "Br", "Gd", "Gr", "Rd",
         "Or", "Pu", "Si", "Sk", "Pi", "In"
@@ -128,14 +126,14 @@ public final class Constants
     public static final String right = "Right";
     public static final String left = "Left";
 
-    /** all variants are subdirectories of this dir. 
+    /** all variants are subdirectories of this dir.
     /*  the default dir name can is not prepended by this. */
     public static final String varPath = "";
-    
-    /** Default directory for datafiles, can be outside variants, 
-     * but should be there. 
+
+    /** Default directory for datafiles, can be outside variants,
+     * but should be there.
      */
-    //public static final String defaultDirName = "variants/Default"; 
+    //public static final String defaultDirName = "variants/Default";
     public static final String defaultDirName = "Default";
 
     /** Images subdirectory name */
@@ -324,7 +322,7 @@ public final class Constants
     public static final String addCreature = "addCreature";
     public static final String removeCreature = "removeCreature";
     public static final String revealCreatures = "revealCreatures";
-    public static final String revealEngagedCreatures = 
+    public static final String revealEngagedCreatures =
         "revealEngagedCreatures"; //towi
     public static final String removeDeadBattleChits = "removeDeadBattleChits";
     public static final String placeNewChit = "placeNewChit";
@@ -369,8 +367,7 @@ public final class Constants
     {
         if (colorNames.length != shortColorNames.length)
         {
-            System.err.println("ERROR: List of constants is wrong !");
-            System.exit(1);
+            throw new RuntimeException("ERROR: colorNames length does not match size of shortColorNames length.");
         }
         for (int i = 0; i < colorNames.length; i++)
         {

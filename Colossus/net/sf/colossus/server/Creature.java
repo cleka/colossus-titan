@@ -22,9 +22,9 @@ import net.sf.colossus.xmlparser.CreatureLoader;
  * @author Romain Dolbeau
  */
 
-public class Creature 
-implements 
-    Comparable, 
+public class Creature
+implements
+    Comparable,
     net.sf.colossus.util.Terrains // H_xxx constants
 {
     private final String name;
@@ -144,8 +144,7 @@ implements
         }
         catch (Exception e)
         {
-            Log.error("Creatures def. loading failed : " + e);
-            System.exit(1);
+            throw new RuntimeException("Failed to load Creatures definition", e);
         }
         summonableCreatures.clear();
         Iterator it = creatures.iterator();
@@ -205,13 +204,13 @@ implements
     { // Titan use class CreatureTitan
         return false;
     }
-    
+
     /** true if any if the values can change during the game returned by:
      * - getPower, getSkill, (and therefore getPointValue)
      * - isRangestriker, isFlier, useMagicMissile
      * - isNativeTerraion(t), for all t
      * - isNativeHexSide(h) for all h
-     * In Standard game only the titans change their attributes 
+     * In Standard game only the titans change their attributes
      */
     public boolean canChangeValue()
     {
@@ -466,7 +465,7 @@ implements
     }
 
     /** case insensitive creature type lookup. its cached, its fast.
-     * 
+     *
      * implementation description:
      * - if creaturen name is found in cache (hash map String->Creature)
      *   return it
@@ -494,7 +493,7 @@ implements
             //   as "not found" marker.
             return (Creature) _getCreatureByName_cache.get(name);
         }
-        else 
+        else
         {
             // find it the slow way and add to cache.
             Iterator it = creatures.iterator();
@@ -592,17 +591,17 @@ implements
     }
 
     /** get the non-terrainified part of the kill-value.
-     *  
+     *
      * towi: Note that you have to take special care for creatures that
      * might change their attributes -- like the Power of titans.
      * since this modifies the return value.
-     * on the other hand... since titans have a killValue>1000 anyway, 
-     * this might not matter at all. 
+     * on the other hand... since titans have a killValue>1000 anyway,
+     * this might not matter at all.
      */
     public int getKillValue()
     {
         int val = 10 * getPointValue();
-        final int skill = getSkill(); 
+        final int skill = getSkill();
         if (skill >= 4)
         {
             val += 2;

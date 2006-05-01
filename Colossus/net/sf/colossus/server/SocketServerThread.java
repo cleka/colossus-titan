@@ -49,8 +49,7 @@ final class SocketServerThread extends Thread implements IClient
         }
         catch (IOException ex)
         {
-            Log.error(ex.toString());
-            ex.printStackTrace();
+            Log.error(ex);
             return;
         }
 
@@ -67,8 +66,7 @@ final class SocketServerThread extends Thread implements IClient
         }
         catch (IOException ex)
         {
-            Log.error(ex.toString());
-            ex.printStackTrace();
+            Log.error(ex);
             server.withdrawFromGame();
         }
 
@@ -84,8 +82,7 @@ final class SocketServerThread extends Thread implements IClient
         }
         catch (IOException ex)
         {
-            Log.error(ex.toString());
-            ex.printStackTrace();
+            Log.error(ex);
         }
     }
 
@@ -621,7 +618,7 @@ final class SocketServerThread extends Thread implements IClient
             int childHeight, List splitoffs, int turn)
     {
         out.println(Constants.didSplit + sep + hexLabel + sep + parentId +
-                sep + childId + sep + childHeight + sep + 
+                sep + childId + sep + childHeight + sep +
                 Glob.glob(splitoffs) + sep + turn);
     }
 

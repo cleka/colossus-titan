@@ -1,186 +1,49 @@
 package net.sf.colossus.util;
 
-import java.io.*;
-
-import net.sf.colossus.server.Server;
-import net.sf.colossus.server.Constants;
-import net.sf.colossus.client.Client;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
-/** Logging functions.
+/** 
+ *  Logging functions. Wraps java.util.logging.
+ * 
+ *  This class should get deprecated and proper java.util.logging Loggers created where
+ *  needed.
+ *
  *  @version $Id$
  *  @author David Ripton
+ *  @author Barrie Treloar
  */
 
 public final class Log
 {
-    // debug -- intended for developers only -- console or logfile
-    // info  -- routine info -- console or logfile or GUI scroll window
-    // warn  -- user mistake or important info -- message dialog
-    // error -- serious program error -- message dialog or stderr
-    // fatal -- fatal program error -- message dialog or stderr
+    public static final Logger LOGGER = Logger.getLogger(Log.class.getName());
 
-
-    private static boolean showDebug = true;
-    private static boolean toStdout = true;
-    private static boolean toFile = true;
-    private static boolean toWindow = false;
-    private static boolean toRemote = false;
-    private static LogWindow logWindow;
-    /** Server, for remote logging. */
-    private static Server server;
-    /** First local client, for log window. */
-    private static Client client;
-    private static PrintWriter fileout;
-
-
-    /** Needed for printing exception stack traces to the log. */
-    public static PrintWriter getFileout()
-    {
-        return fileout;
-    }
-
-    public static boolean getShowDebug()
-    {
-        return showDebug;
-    }
-
-    public static void setShowDebug(boolean showDebug)
-    {
-        Log.showDebug = showDebug;
-    }
-
-    public static boolean isToStdout()
-    {
-        return toStdout;
-    }
-
-    public static void setToStdout(boolean toStdout)
-    {
-        Log.toStdout = toStdout;
-    }
-
-    public static boolean isToFile()
-    {
-        return toFile;
-    }
-
-    public static void setToFile(boolean toFile)
-    {
-        Log.toFile = toFile;
-    }
-
-    public static boolean isToWindow()
-    {
-        return toWindow;
-    }
-
-    public static void setToWindow(boolean toWindow)
-    {
-        Log.toWindow = toWindow;
-    }
-
-    public static void setServer(Server server)
-    {
-        Log.server = server;
-    }
-
-    public static void setClient(Client client)
-    {
-        Log.client = client;
-    }
-
-    public static boolean isToRemote()
-    {
-        return toRemote;
-    }
-
-    public static void setToRemote(boolean toRemote)
-    {
-        Log.toRemote = toRemote;
-    }
-
-
-    public static void disposeLogWindow()
-    {
-        if (logWindow != null)
-        {
-            logWindow.dispose();
-            logWindow = null;
-        }
-    }
-
-
-    private static synchronized void out(String s)
-    {
-        if (toStdout)
-        {
-            System.out.println(s);
-        }
-        if (toFile)
-        {
-            String logPath = Constants.gameDataPath + Constants.logFileName;
-            try
-            {
-                if (fileout == null)
-                {
-                    fileout = new PrintWriter(new FileOutputStream(logPath), 
-                        true);
-                }
-                fileout.println(s);
-            }
-            catch (FileNotFoundException ex)
-            {
-                toFile = false;
-                Log.error("Could not open logfile " + logPath);
-                Log.error(ex.toString());
-            }
-        }
-        if (toWindow && client != null)
-        {
-            if (logWindow == null)
-            {
-                logWindow = new LogWindow(client);
-            }
-            logWindow.append(s + "\n");
-        }
-        if (toRemote && server != null)
-        {
-            server.allLog(s + "\n");
-        }
-    }
-
-    /** Log an event. */
     public static void event(String s)
     {
-        out(s.trim());
+        LOGGER.log(Level.INFO, s);
     }
 
-    /** Log an error. */
     public static void error(String s)
     {
-        out("Error: " + s.trim());
+        error(s, null);
     }
 
-    /** Log a warning. */
     public static void warn(String s)
     {
-        out("Warn: " + s.trim());
+        LOGGER.log(Level.WARNING, s);
     }
 
-    // XXX This looks thread-unsafe.
-    /** Log a debug message, to stdout only. */
     public static void debug(String s)
     {
-        boolean wasToWindow = isToWindow();
-        setToWindow(false);
-        boolean wasToRemote = isToRemote();
-        setToRemote(false);
-        if (showDebug)
-        {
-            out("- " + s.trim());
-        }
-        setToWindow(wasToWindow);
-        setToRemote(wasToRemote);
+        LOGGER.log(Level.FINEST, s);
+    }
+
+    public static void error(String message, Throwable ex) {
+        LOGGER.log(Level.SEVERE, message, ex);
+    }
+
+    public static void error(Throwable ex) {
+        LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
     }
 }

@@ -1,13 +1,24 @@
 package net.sf.colossus.client;
 
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Map;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import net.sf.colossus.util.Log;
+import net.sf.colossus.server.Constants;
+import net.sf.colossus.server.Creature;
 import net.sf.colossus.util.MultiSet;
 import net.sf.colossus.xmlparser.TerrainRecruitLoader;
-import net.sf.colossus.server.Creature;
-import net.sf.colossus.server.Constants;
 
 
 /**
@@ -19,6 +30,8 @@ import net.sf.colossus.server.Constants;
  */
 public class RationalAI extends SimpleAI implements AI
 {
+    private static final Logger logger = Logger.getLogger(RationalAI.class.getName());
+
     boolean I_HATE_HUMANS = false;
     private List legionsToSplit = new ArrayList();
     private Map[] enemyAttackMap;
@@ -57,7 +70,7 @@ public class RationalAI extends SimpleAI implements AI
     /** Return true if done with all splits and callbacks */
     private boolean fireSplits()
     {
-        Log.debug("RationalAI.fireSplits " + legionsToSplit);
+        logger.log(Level.FINEST, "RationalAI.fireSplits " + legionsToSplit);
         if (legionsToSplit.isEmpty())
         {
             return true;
@@ -73,11 +86,11 @@ public class RationalAI extends SimpleAI implements AI
 
     // XXX Undoing a split could release the marker needed to do another
     // split, so we need to synchronize access.
-    /** If parentId and childId are null, this is a callback to 
+    /** If parentId and childId are null, this is a callback to
      * an undo split */
     public boolean splitCallback(String parentId, String childId)
     {
-        Log.debug("RationalAI.splitCallback " + parentId + " " + childId);
+        logger.log(Level.FINEST, "RationalAI.splitCallback " + parentId + " " + childId);
         if (parentId == null && childId == null)
         {
             // Undo split is done; fire off the next split
@@ -92,7 +105,7 @@ public class RationalAI extends SimpleAI implements AI
     }
 
     // Compute the expected value of a split legion
-    // If we want to compute just a single legion, pass null for 
+    // If we want to compute just a single legion, pass null for
     // the child_legion
     private double expectedValueSplitLegion(LegionInfo legion,
         LegionInfo child_legion)
@@ -108,21 +121,21 @@ public class RationalAI extends SimpleAI implements AI
         {
             stay_here_value2 = hexRisk(child_legion, legion.getCurrentHex(),
                 null, false);
-            Log.debug("expectedValueSplitLegion(), value of " +
+            logger.log(Level.FINEST, "expectedValueSplitLegion(), value of " +
                 "staying here for split legion1 " + stay_here_value1);
-            Log.debug("expectedValueSplitLegion(), value of " +
+            logger.log(Level.FINEST, "expectedValueSplitLegion(), value of " +
                 "staying here for split legion1 " + stay_here_value2);
         }
         else
         {
-            Log.debug("expectedValueSplitLegion(), value of " +
+            logger.log(Level.FINEST, "expectedValueSplitLegion(), value of " +
                 "staying here for unsplit legion " + stay_here_value1);
             stay_here_value2 = 0.0;
         }
 
         for (int roll = 1; roll <= 6; roll++)
         {
-            Log.debug("expectedValueSplitLegion: Roll " + roll);
+            logger.log(Level.FINEST, "expectedValueSplitLegion: Roll " + roll);
             Set moves = client.getMovement().listAllMoves(legion,
                 legion.getCurrentHex(), roll);
 
@@ -174,7 +187,7 @@ public class RationalAI extends SimpleAI implements AI
             }
 
             // find optimal move for this roll
-            // iterate through move combinations of stack1 and stack2 to 
+            // iterate through move combinations of stack1 and stack2 to
             // find max
             double max_split;
 
@@ -208,8 +221,7 @@ public class RationalAI extends SimpleAI implements AI
     /** Return true if done, false if waiting for callback. */
     boolean splitOneLegion(PlayerInfo player, String markerId)
     {
-        Log.setShowDebug(true);
-        Log.debug("splitOneLegion()");
+        logger.log(Level.FINEST, "splitOneLegion()");
 
         LegionInfo legion = client.getLegionInfo(markerId);
 
@@ -218,7 +230,7 @@ public class RationalAI extends SimpleAI implements AI
         // game by the scooby snack factor
         if (legion.getHeight() < 6)
         {
-            Log.debug("No split: height < 6");
+            logger.log(Level.FINEST, "No split: height < 6");
             return true;
         }
 
@@ -229,13 +241,13 @@ public class RationalAI extends SimpleAI implements AI
         {
             at_risk = true;
         }
-        
+
         if (at_risk && legion.getHeight() < 7)
         {
-            Log.debug("No split: height < 7 and legion at risk");
+            logger.log(Level.FINEST, "No split: height < 7 and legion at risk");
             return true;
         }
-        
+
         StringBuffer results = new StringBuffer();
         boolean hasMustered = false;
 
@@ -261,22 +273,22 @@ public class RationalAI extends SimpleAI implements AI
         // don't split a stack if it has not mustered
         if (legion.getHeight() < 7 && !hasMustered)
         {
-            Log.debug("No split: height < 7 and not mustered");
+            logger.log(Level.FINEST, "No split: height < 7 and not mustered");
             return true;
         }
 
-        // Do the split.  If we don't like the result we will undo it. 
+        // Do the split.  If we don't like the result we will undo it.
         //
         String newMarkerId = pickMarker(player.getMarkersAvailable(),
             player.getShortColor());
 
         if (newMarkerId == null)
         {
-            Log.debug("No split.  No markers available.");
+            logger.log(Level.FINEST, "No split.  No markers available.");
             return true;
         }
 
-        Log.debug("Wait for split callback");
+        logger.log(Level.FINEST, "Wait for split callback");
         client.doSplit(legion.getMarkerId(), newMarkerId, results.toString());
         return false;
     }
@@ -285,23 +297,23 @@ public class RationalAI extends SimpleAI implements AI
     private boolean splitOneLegionCallback(String markerId, String newMarkerId)
     {
         LegionInfo legion = client.getLegionInfo(markerId);
-        Log.debug("Split complete");
+        logger.log(Level.FINEST, "Split complete");
 
         if (client.getTurnNumber() == 1)
         { // first turn
-            Log.debug("First turn split");
+            logger.log(Level.FINEST, "First turn split");
             return true;
         }
 
         LegionInfo child_legion = client.getLegionInfo(newMarkerId);
 
         // Compute split value
-        Log.debug("splitOneLegion(): Expected value with split");
+        logger.log(Level.FINEST, "splitOneLegion(): Expected value with split");
         double split_value = expectedValueSplitLegion(legion, child_legion);
-        // expected value of split    
+        // expected value of split
 
         // find expected value of no split
-        Log.debug("splitOneLegionCallback(): Expected value with no split");
+        logger.log(Level.FINEST, "splitOneLegionCallback(): Expected value with no split");
         double no_split_value = 0.0;
         if (client.getTurnNumber() > 1)
         {
@@ -311,8 +323,8 @@ public class RationalAI extends SimpleAI implements AI
         // For Titan group, try to only split when at 7
         // The only exception should be if we are under
         // severe attack and splitting can save us
-        
-        // For now, just don't split titans under 7 tall no matter what 
+
+        // For now, just don't split titans under 7 tall no matter what
         /*
         if (legion.hasTitan() &&
              (legion.getHeight() + child_legion.getHeight()) < 7)
@@ -326,21 +338,21 @@ public class RationalAI extends SimpleAI implements AI
         // This gives tendency to split if not under attack.
         // If no_split_value is < -20 , we are under attack and trapped.
         // Do not split.
-        Log.debug("no split value: " + no_split_value);
-        Log.debug("split value: " + split_value);
+        logger.log(Level.FINEST, "no split value: " + no_split_value);
+        logger.log(Level.FINEST, "split value: " + split_value);
         // Inequality needs to be < here.  I_HATE_HUMANS will causes
         // split_value = 0 on both sides.
         if (split_value * 1.02 < no_split_value ||
             split_value < -20)
         {
-            // Undo the split  
+            // Undo the split
             client.undoSplit(newMarkerId);
-            Log.debug("undo split - better to keep stack together");
+            logger.log(Level.FINEST, "undo split - better to keep stack together");
             return false;
         }
         else
         {
-            Log.debug("keep the split");
+            logger.log(Level.FINEST, "keep the split");
             return true;
         }
     }
@@ -416,8 +428,8 @@ public class RationalAI extends SimpleAI implements AI
         return value;
     }
 
-    // Given a list of creatures sorted by value, figure out which ones are 
-    // redundant / have mustered. 
+    // Given a list of creatures sorted by value, figure out which ones are
+    // redundant / have mustered.
     // Removes any creatures that have mustered from the original sorted list
     List removeMustered(List sortedCreatures)
     {
@@ -537,7 +549,7 @@ public class RationalAI extends SimpleAI implements AI
         boolean at_risk)
     {
         //
-        // split a 5 to 8 high legion 
+        // split a 5 to 8 high legion
         //
         // idea: pick the 2 weakest creatures and kick them
         // out. if there are more than 2 weakest creatures,
@@ -556,18 +568,18 @@ public class RationalAI extends SimpleAI implements AI
             return new MusteredCreatures(true, creatures);
         }
 
-        Log.debug("sortCreaturesByValueName() in chooseCreaturesToSplitOut");
+        logger.log(Level.FINEST, "sortCreaturesByValueName() in chooseCreaturesToSplitOut");
 
         List sortedCreatures = sortCreaturesByValueName(legion.getContents(),
             legion);
 
-        Log.debug("Sorted stack - minus titan: " + sortedCreatures);
+        logger.log(Level.FINEST, "Sorted stack - minus titan: " + sortedCreatures);
         // Look at lowest valued creatures
         // Try to pull out pair that has already mustered.
-        Log.debug("removeMustered() in chooseCreaturesToSplitOut");
+        logger.log(Level.FINEST, "removeMustered() in chooseCreaturesToSplitOut");
         List creaturesThatHaveMustered = removeMustered(sortedCreatures);
 
-        Log.debug("List of mustered creatures: " + creaturesThatHaveMustered);
+        logger.log(Level.FINEST, "List of mustered creatures: " + creaturesThatHaveMustered);
         boolean hasMustered = false;
 
         if (creaturesThatHaveMustered.size() < 1)
@@ -582,7 +594,7 @@ public class RationalAI extends SimpleAI implements AI
         List creaturesToRemove = new ArrayList();
 
         // Try to pull out pair that has already mustered.
-        Log.debug("build final split list in chooseCreaturesToSplitOut");
+        logger.log(Level.FINEST, "build final split list in chooseCreaturesToSplitOut");
         Iterator sortIt = creaturesThatHaveMustered.iterator();
         boolean split_all_mustered = false;
 
@@ -603,7 +615,7 @@ public class RationalAI extends SimpleAI implements AI
 
         // If we have 3 mustered creatures, check if we have 3
         // Centaur, Ogre, Cyclops, Troll, Lion.  If so, try to keep the
-        // 3 together for maximum mustering potential 
+        // 3 together for maximum mustering potential
         // it is a bit aggressive to keep trying to do 3/4 splits
         // but it seems to give a better result
         if (sortIt.hasNext() && !at_risk)
@@ -622,10 +634,10 @@ public class RationalAI extends SimpleAI implements AI
                     s_first.compareTo("Lion") == 0
                     )
                 {
-                    // remove the 3rd creature 
+                    // remove the 3rd creature
                     creaturesToRemove.add(critter);
-                    Log.debug("Triple found!");
-                    Log.debug("Creatures to remove: " + creaturesToRemove);
+                    logger.log(Level.FINEST, "Triple found!");
+                    logger.log(Level.FINEST, "Creatures to remove: " + creaturesToRemove);
                     return new MusteredCreatures(hasMustered,
                         creaturesToRemove);
                 }
@@ -642,7 +654,7 @@ public class RationalAI extends SimpleAI implements AI
 
             creaturesToRemove.add(critter);
         }
-        Log.debug("Creatures to remove: " + creaturesToRemove);
+        logger.log(Level.FINEST, "Creatures to remove: " + creaturesToRemove);
 
         return  new MusteredCreatures(hasMustered, creaturesToRemove);
     }
@@ -666,7 +678,7 @@ public class RationalAI extends SimpleAI implements AI
             this.val = val;
             this.noMove = noMove;
         }
-        
+
         public String toString()
         {
             return markerId + " to " + toHex;
@@ -677,7 +689,7 @@ public class RationalAI extends SimpleAI implements AI
      *  updates the client with the results of a move or mulligan. */
     public boolean masterMove()
     {
-        Log.debug("This is RationalAI.");
+        logger.log(Level.FINEST, "This is RationalAI.");
         PlayerInfo player = client.getPlayerInfo();
 
         if(enemyAttackMap==null)
@@ -733,7 +745,7 @@ public class RationalAI extends SimpleAI implements AI
                 continue;
             }
 
-            Log.debug("consider marker " + markerId);
+            logger.log(Level.FINEST, "consider marker " + markerId);
 
             // compute the value of sitting still
             List legionMoves = new ArrayList();
@@ -749,7 +761,7 @@ public class RationalAI extends SimpleAI implements AI
                 legionMoves.add(lmove);
                 occupiedHexes.add(legion.getCurrentHex().getLabel());
 
-                Log.debug("value of sitting still at hex " + hex.getLabel() +
+                logger.log(Level.FINEST, "value of sitting still at hex " + hex.getLabel() +
                     " : " + value);
             }
 
@@ -775,7 +787,7 @@ public class RationalAI extends SimpleAI implements AI
                 hex = MasterBoard.getHexByLabel(hexLabel);
                 value = evaluateMove(legion, hex, RECRUIT_TRUE, 2, true);
 
-                Log.debug("value hex " + hexLabel + " value: " + r3(value));
+                logger.log(Level.FINEST, "value hex " + hexLabel + " value: " + r3(value));
 
                 lmove = new LegionBoardMove(markerId,
                     legion.getCurrentHex().getLabel(),
@@ -803,7 +815,7 @@ public class RationalAI extends SimpleAI implements AI
     /** Return true if we moved something and need to be called again. */
     private boolean handleVoluntaryMoves(PlayerInfo player)
     {
-        Log.debug("handleVoluntaryMoves()");
+        logger.log(Level.FINEST, "handleVoluntaryMoves()");
 
         boolean moved = false;
         List markerIds = player.getLegionIds();
@@ -813,16 +825,16 @@ public class RationalAI extends SimpleAI implements AI
 
         moved = findMoveList(markerIds, all_legionMoves, occupiedHexes, false);
 
-        Log.debug("done computing move values for legions");
-        
-        Log.debug("raw best moves:");
+        logger.log(Level.FINEST, "done computing move values for legions");
+
+        logger.log(Level.FINEST, "raw best moves:");
         for (Iterator it = all_legionMoves.iterator(); it.hasNext();)
         {
                 List moves = ((List)it.next());
                 LegionBoardMove lbm = (LegionBoardMove) moves.get(0);
-                Log.debug(lbm.markerId + " to " + lbm.toHex + " value " + lbm.val);
+                logger.log(Level.FINEST, lbm.markerId + " to " + lbm.toHex + " value " + lbm.val);
         }
-        
+
 
         // handle teleports
         // XXX
@@ -850,7 +862,7 @@ public class RationalAI extends SimpleAI implements AI
                 LegionBoardMove lm = (LegionBoardMove)legionMoves.get(0);
                 if (lm.val > best_value)
                 {
-                    Log.debug("found new teleport best move " + lm.markerId +
+                    logger.log(Level.FINEST, "found new teleport best move " + lm.markerId +
                         " to " + lm.toHex + " value " + lm.val);
                     best_value = lm.val;
                     best_move = lm;
@@ -861,7 +873,7 @@ public class RationalAI extends SimpleAI implements AI
             {
                 if (!best_move.noMove)
                 {
-                    Log.debug("found teleport:  " + best_move.markerId +
+                    logger.log(Level.FINEST, "found teleport:  " + best_move.markerId +
                         " to " + best_move.toHex + " value " + best_move.val);
                     bestMoveList.add(best_move);
                     return true;
@@ -875,14 +887,14 @@ public class RationalAI extends SimpleAI implements AI
         return false;
     }
 
-    private class MoveFinder    
+    private class MoveFinder
     {
         private List bestMove = null;
         private double bestScore;
         private boolean mustMove;
         private long nodesExplored = 0;
 
-        // initial score is some value that should be smaller that the 
+        // initial score is some value that should be smaller that the
         // worst move
         private final static double INITIAL_SCORE = -1000000;
         private final static double NO_MOVE_EXISTS = 2 * INITIAL_SCORE;
@@ -894,15 +906,15 @@ public class RationalAI extends SimpleAI implements AI
             this.mustMove = mustMove;
             nodesExplored = 0;
 
-            Log.debug("Starting computing the best move");
+            logger.log(Level.FINEST, "Starting computing the best move");
 
             setupTimer();
-            
+
             Collections.shuffle(all_legionMoves,random);
 
             branchAndBound(new ArrayList(), all_legionMoves, 0);
 
-            Log.debug("Total nodes explored = " + nodesExplored);
+            logger.log(Level.FINEST, "Total nodes explored = " + nodesExplored);
 
             for (Iterator it = bestMove.iterator(); it.hasNext();)
             {
@@ -1007,11 +1019,11 @@ public class RationalAI extends SimpleAI implements AI
                 if (!lm.noMove)
                 {
                     // A marker that cant move at this point
-                    // means a cycle exists 
+                    // means a cycle exists
                     return null;
                 }
                 // now we know we have a split legion not moving since
-                // that is the only way to have a noMove conflict 
+                // that is the only way to have a noMove conflict
                 LegionInfo legion = client.getLegionInfo(lm.markerId);
                 Set moves =
                     client.getMovement().listNormalMoves(
@@ -1025,7 +1037,7 @@ public class RationalAI extends SimpleAI implements AI
                     if (!(newOccupiedHexes.contains(dest)
                         || occupiedHexes.containsKey(dest)))
                     {
-                        // this legion has an open move it should have taken                  
+                        // this legion has an open move it should have taken
                         return null;
                     }
                 }
@@ -1045,11 +1057,11 @@ public class RationalAI extends SimpleAI implements AI
             {
                 if (bestMove == null)
                 {
-                    // Log.debug("no legal move found yet, not able to time out");
+                    // logger.log(Level.FINEST, "no legal move found yet, not able to time out");
                 }
                 else
                 {
-                    Log.debug(
+                    logger.log(Level.FINEST, 
                         "handleVoluntaryMoves() time up after "
                             + nodesExplored
                             + " Nodes Explored");
@@ -1071,7 +1083,7 @@ public class RationalAI extends SimpleAI implements AI
                 {
                     bestMove = newBestMove;
                     bestScore = currentValue;
-                    Log.debug(
+                    logger.log(Level.FINEST, 
                         "New best move found: ("
                             + currentValue
                             + ") "
@@ -1079,7 +1091,7 @@ public class RationalAI extends SimpleAI implements AI
                 }
                 else
                 {
-                    /*                Log.debug(
+                    /*                logger.log(Level.FINEST, 
                                         "Illigal move: ("
                                             + currentValue
                                             + " : "
@@ -1172,7 +1184,7 @@ public class RationalAI extends SimpleAI implements AI
                     if (stayMove != null)
                     { // there should be one, but just checking
                         newMoves.add(stayMove);
-                        // make shure staymove is explored last  
+                        // make shure staymove is explored last
                     }
                 }
                 else
@@ -1216,7 +1228,7 @@ public class RationalAI extends SimpleAI implements AI
             return 0.0;
         }
 
-        // Log.debug("considering risk of " + legion + " in " + hex);
+        // logger.log(Level.FINEST, "considering risk of " + legion + " in " + hex);
         int roll;
         int result = 0;
 
@@ -1237,7 +1249,7 @@ public class RationalAI extends SimpleAI implements AI
             {
                 LegionInfo enemy = (LegionInfo)it.next();
                 result = evaluateCombat(enemy, legion, hex);
-                
+
                 if (invert)
                 {
                     result = - result;
@@ -1251,13 +1263,13 @@ public class RationalAI extends SimpleAI implements AI
             risk -= worst_result_this_roll;
         }
         risk /= 6.0;
-        
+
         if (invert)
         {
             risk = - risk;
         }
-        
-        // Log.debug("compute final attack risk as " + r3(risk));
+
+        // logger.log(Level.FINEST, "compute final attack risk as " + r3(risk));
         return risk;
     }
 
@@ -1274,7 +1286,7 @@ public class RationalAI extends SimpleAI implements AI
             hex);
 
         int value = (int)result.getExpectedValue();
-        
+
         if (!I_HATE_HUMANS)
         {
             // In rational AI mode do not reward early titan attacks
@@ -1283,9 +1295,9 @@ public class RationalAI extends SimpleAI implements AI
                 return value - 100;
             }
         }
-        
+
         boolean defenderTitan = defender.hasTitan();
-        
+
         if (result.getExpectedValue() > 0)
         {
             if (attacker.hasTitan())
@@ -1310,7 +1322,7 @@ public class RationalAI extends SimpleAI implements AI
                         (attackerPointValue - result.getAttackerDead()) >
                         TITAN_SURVIVAL)
                     {
-                        // our titan stack will be badly damaged 
+                        // our titan stack will be badly damaged
                         // but it is worth it
                         value = 100 +
                             (int)result.getExpectedValue() * 100;
@@ -1318,7 +1330,7 @@ public class RationalAI extends SimpleAI implements AI
                     else
                     {
                         // ack! we'll fuck up our titan group
-                        // use metric below so that if we have no choice 
+                        // use metric below so that if we have no choice
                         // but to attack we pick the least losing battle
                         value = (int)result.getAttackerDead() *
                             -100;
@@ -1329,7 +1341,7 @@ public class RationalAI extends SimpleAI implements AI
                 // will be large part of value
                 {
                     // ack! we'll fuck up our titan group
-                    // use metric below so that if we have no choice but to 
+                    // use metric below so that if we have no choice but to
                     // attack we pick the least losing battle
                     value = -100 + (int)result.getAttackerDead() * -100;
                 }
@@ -1366,22 +1378,22 @@ public class RationalAI extends SimpleAI implements AI
                 // ack! we'll kill our titan group
                 // use metric below so that if we have no choice but to attack
                 // we pick the least losing battle
-                       
+
                 value = (-1000 + (int)result.getExpectedValue() * 1000) /
                     client.getNumLivingPlayers();
             }
         }
 
-        
+
         // apply penalty to attacks if we have few legions
         // Don't reward titan attacks with few stacks
         int attackerLegions = attacker.getPlayerInfo().getNumLegions();
         if (attackerLegions < 5 && !I_HATE_HUMANS)
         {
-            return value - (result.getAttackerDead() / 
+            return value - (result.getAttackerDead() /
                     attackerPointValue) * 1000;
         }
-        
+
         return value;
     }
 
@@ -1409,10 +1421,10 @@ public class RationalAI extends SimpleAI implements AI
                 value = evaluateCombat(attacker, defender, hex);
             }
 
-            if (I_HATE_HUMANS && !isHumanLegion(defender) && 
+            if (I_HATE_HUMANS && !isHumanLegion(defender) &&
                     !isHumanLegion(attacker))
             {
-                // try not to attack other AIs                
+                // try not to attack other AIs
                 if (value > -50)
                 {
                     value = -50;
@@ -1457,7 +1469,7 @@ public class RationalAI extends SimpleAI implements AI
         int canRecruitHere, int depth, boolean addHexRisk)
     {
         String sep = "~";
-        String key = "" + legion + sep + hex + sep + canRecruitHere + sep + 
+        String key = "" + legion + sep + hex + sep + canRecruitHere + sep +
             depth + sep + addHexRisk;
         int score;
         Integer val;
@@ -1468,7 +1480,7 @@ public class RationalAI extends SimpleAI implements AI
         }
         else
         {
-            score = evaluateMoveInner(legion, hex, canRecruitHere, depth, 
+            score = evaluateMoveInner(legion, hex, canRecruitHere, depth,
                 addHexRisk);
             val = new Integer(score);
             evaluateMoveMap.put(key, val);
@@ -1497,12 +1509,12 @@ public class RationalAI extends SimpleAI implements AI
         double stay_at_hex = 0.0;
 
         boolean invert = false;
-        
+
         if (!normalHexRisk)
         {
             // invert = true;
         }
-        
+
         // value of staying at hex we move to
         // i.e. what is risk we will be attacked if we stay at this hex
         // (if invert = true, this becomes value of potentially
@@ -1513,7 +1525,7 @@ public class RationalAI extends SimpleAI implements AI
         // a next turn
         value += stay_at_hex;
 
-        // if we are very likely to be attacked and die here 
+        // if we are very likely to be attacked and die here
         // then just return value
         if (value < -10)
         {
@@ -1524,7 +1536,7 @@ public class RationalAI extends SimpleAI implements AI
         {
             return (int)value;
         }
-  
+
 
         // squares that are further away are more likely to be blocked
         double DISC_FACTOR = 1.0;
@@ -1537,7 +1549,7 @@ public class RationalAI extends SimpleAI implements AI
             Set tele_moves = client.getMovement().listTeleportMoves(legion, hex, roll);
             double bestMoveVal = stay_at_hex; // can always stay here
             boolean no_attack = false;
-            
+
             for (int i = 0; i < 2; i++)
             {
                 Iterator nextMoveIt;
@@ -1575,7 +1587,7 @@ public class RationalAI extends SimpleAI implements AI
         nextTurnValue /= 6.0;     // 1/6 chance of each happening
         value += 0.9 * nextTurnValue; // discount future moves some
 
-        //Log.debug("depth " + depth + " EVAL " + legion +
+        //logger.log(Level.FINEST, "depth " + depth + " EVAL " + legion +
         //    (canRecruitHere != RECRUIT_FALSE ? " move to " : " stay in ") +
         //    hex + " = " + r3(value));
 
@@ -1593,21 +1605,21 @@ public class RationalAI extends SimpleAI implements AI
         private int att_dead;
         private int def_dead;
         private List log = new ArrayList();
-        
+
         public BattleResults(double e, int a, int d)
         {
             ev = e;
             att_dead = a;
             def_dead = d;
         }
-        
+
         /**
          * @param ev
          * @param att_dead
          * @param def_dead
          * @param log
          */
-         public BattleResults(double ev, int att_dead, int def_dead, List log) 
+         public BattleResults(double ev, int att_dead, int def_dead, List log)
          {
              super();
              this.ev = ev;
@@ -1619,7 +1631,7 @@ public class RationalAI extends SimpleAI implements AI
         /**
          * @return Returns the log.
          */
-        public List getLog() 
+        public List getLog()
         {
             return log;
         }
@@ -1639,12 +1651,12 @@ public class RationalAI extends SimpleAI implements AI
             return def_dead;
         }
 
-        void log() 
+        void log()
         {
-            Log.debug("Expected battle log");
-            for (Iterator it = log.iterator(); it.hasNext();) 
+            logger.log(Level.FINEST, "Expected battle log");
+            for (Iterator it = log.iterator(); it.hasNext();)
             {
-                Log.debug((String) it.next());
+                logger.log(Level.FINEST, (String) it.next());
             }
         }
     }
@@ -1656,7 +1668,7 @@ public class RationalAI extends SimpleAI implements AI
     }
 
     // add in value of points received for killing group / 100
-    // * (fraction of angel value = angel + arch = 24 + 12/5 
+    // * (fraction of angel value = angel + arch = 24 + 12/5
     //    + titan value = 10 -- arbitrary, it's worth more than 4)
     final double KILLPOINTS = (24.0 + 12.0 / 5.0 + 10.0) / 100.0;
 
@@ -1683,7 +1695,7 @@ public class RationalAI extends SimpleAI implements AI
         int defenderMuster = 0;
         int round;
         List log = new ArrayList(14);
-        
+
         round_loop:
         for (round = 2; round <= 7; round++)
         {
@@ -1750,7 +1762,7 @@ public class RationalAI extends SimpleAI implements AI
                         Math.max(attackerCreatures.size(),
                         defenderCreatures.size()); attacks++)
                     {
-                        // if we have reached the end of the attackers, 
+                        // if we have reached the end of the attackers,
                         // roll-over
                         if (!a.hasNext())
                         {
@@ -1802,7 +1814,7 @@ public class RationalAI extends SimpleAI implements AI
                         }
                         attack_skill = psa.getSkillAttack();
 
-                        // when computing attacking power, subtract any 
+                        // when computing attacking power, subtract any
                         // dice lost due to native defence
                         attack_power = psa.getPowerAttack() -
                             psd.getPowerDefend();
@@ -1867,7 +1879,7 @@ public class RationalAI extends SimpleAI implements AI
             }
         }
 
-        // add in attackers final recruit  
+        // add in attackers final recruit
         double attackerMuster = 0;
         if (attackerCreatures.size() > 2)
         {
@@ -1931,10 +1943,10 @@ public class RationalAI extends SimpleAI implements AI
 
     public boolean flee(LegionInfo legion, LegionInfo enemy)
     {
-        Log.debug("flee called.");
+        logger.log(Level.FINEST, "flee called.");
         if (legion.hasTitan())
         {
-            Log.debug("Do not flee.  Defender titan.");
+            logger.log(Level.FINEST, "Do not flee.  Defender titan.");
             return false;
         } // Titan never flee !
 
@@ -1944,12 +1956,12 @@ public class RationalAI extends SimpleAI implements AI
             legion.getCurrentHex());
         I_HATE_HUMANS = save_hate;
         int result = (int)br.getExpectedValue();
-        
-        Log.debug("flee: attacking legion = " + enemy + ":" + enemy.getContents());
-        Log.debug("flee: defending legion = " + legion + ":" + legion.getContents());
-        Log.debug("flee called. battle results value: " + result);
-        Log.debug("expected value of attacker dead = " + br.getAttackerDead());
-        Log.debug("expected value of defender dead = " + br.getDefenderDead());
+
+        logger.log(Level.FINEST, "flee: attacking legion = " + enemy + ":" + enemy.getContents());
+        logger.log(Level.FINEST, "flee: defending legion = " + legion + ":" + legion.getContents());
+        logger.log(Level.FINEST, "flee called. battle results value: " + result);
+        logger.log(Level.FINEST, "expected value of attacker dead = " + br.getAttackerDead());
+        logger.log(Level.FINEST, "expected value of defender dead = " + br.getDefenderDead());
         br.log();
 
         // For the first four turns never flee
@@ -1959,13 +1971,13 @@ public class RationalAI extends SimpleAI implements AI
         {
             return false;
         }
-        
+
         // Don't flee if we win
         if (br.getAttackerDead()  > br.getDefenderDead())
         {
             return false;
         }
-        
+
         // find attacker's most likely recruit
         double deniedMuster = 0;
         List recruits = client.findEligibleRecruits(enemy.getMarkerId(),
@@ -1977,7 +1989,7 @@ public class RationalAI extends SimpleAI implements AI
             deniedMuster = bestRecruit.getPointValue();
         }
 
-        
+
         int currentScore = enemy.getPlayerInfo().getScore();
         int pointValue = legion.getPointValue();
         boolean canAcquireAngel = ((currentScore + pointValue) /
@@ -2009,34 +2021,34 @@ public class RationalAI extends SimpleAI implements AI
                 deniedMuster = 0;
             }
         }
-        
-        Log.debug("expected value of denied muster = " + deniedMuster);
-        
-        double do_not_flee_value = br.getAttackerDead() - 
+
+        logger.log(Level.FINEST, "expected value of denied muster = " + deniedMuster);
+
+        double do_not_flee_value = br.getAttackerDead() -
             br.getDefenderDead() * KILLPOINTS;
-        double flee_value = deniedMuster - (br.getDefenderDead() * 
+        double flee_value = deniedMuster - (br.getDefenderDead() *
                 KILLPOINTS) / 2.0;
-        
-        Log.debug("do_not_flee_value = " + do_not_flee_value);
-        Log.debug("flee_value = " + flee_value);
-        
+
+        logger.log(Level.FINEST, "do_not_flee_value = " + do_not_flee_value);
+        logger.log(Level.FINEST, "flee_value = " + flee_value);
+
         if (do_not_flee_value >= flee_value)
         {
             // defender wins
-            Log.debug("don't flee: defending is worth more");
+            logger.log(Level.FINEST, "don't flee: defending is worth more");
             return false;
         }
 
-        
+
         // defender loses but might not flee if
 
         if (enemy.hasTitan())
         {
             if (br.getAttackerDead() > enemy.getPointValue() * 2 / 7)
             {
-                // attacker loses at least 2 significant pieces 
+                // attacker loses at least 2 significant pieces
                 // from Titan stack
-                Log.debug("don't flee: hurt titan");
+                logger.log(Level.FINEST, "don't flee: hurt titan");
                 return false;
             }
         }
@@ -2063,13 +2075,13 @@ public class RationalAI extends SimpleAI implements AI
         BattleResults br = estimateBattleResults(legion, enemy,
             legion.getCurrentHex());
         I_HATE_HUMANS = save_hate;
-        
-        Log.debug("concede: attacking legion = " + legion + ":" + legion.getContents());
-        Log.debug("concede: defending legion = " + enemy + ":" + enemy.getContents());
-        Log.debug("concede called. battle results value: " + 
+
+        logger.log(Level.FINEST, "concede: attacking legion = " + legion + ":" + legion.getContents());
+        logger.log(Level.FINEST, "concede: defending legion = " + enemy + ":" + enemy.getContents());
+        logger.log(Level.FINEST, "concede called. battle results value: " +
                 br.getExpectedValue());
-        Log.debug("expected value of attacker dead = " + br.getAttackerDead());
-        Log.debug("expected value of defender dead = " + br.getDefenderDead());
+        logger.log(Level.FINEST, "expected value of attacker dead = " + br.getAttackerDead());
+        logger.log(Level.FINEST, "expected value of defender dead = " + br.getDefenderDead());
         br.log();
 
         if (br.getDefenderDead() < enemy.getPointValue() * 2 / 7 &&
@@ -2113,7 +2125,7 @@ public class RationalAI extends SimpleAI implements AI
                 PowerSkill ps;
                 int titanPower = legion.getPlayerInfo().getTitanPower();
 
-                // Assume that Titans 
+                // Assume that Titans
                 // take only a minimal part in the combat.
                 // Here we have to include them in the list
                 // of creatures so that the AI knows to jump

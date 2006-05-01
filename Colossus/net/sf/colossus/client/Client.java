@@ -9,6 +9,8 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.InputStream;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -23,6 +25,7 @@ import net.sf.colossus.server.IServer;
 import net.sf.colossus.server.Player;
 import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.util.Log;
+import net.sf.colossus.util.LogWindow;
 import net.sf.colossus.util.Options;
 import net.sf.colossus.util.ResourceLoader;
 import net.sf.colossus.util.Split;
@@ -142,6 +145,8 @@ public final class Client implements IClient, IOracle, IOptions
 
     // XXX Make private and wrap consistently.
     boolean showAllRecruitChits = false;
+
+    private LogWindow logWindow;
 
     public Client(String host, int port, String playerName, boolean remote)
     {
@@ -534,7 +539,14 @@ public final class Client implements IClient, IOracle, IOptions
         }
         else if (optname.equals(Options.logDebug))
         {
-            Log.setShowDebug(bval);   // XXX move this to server
+            // XXX move this to server
+            // XXX Now this uses Log4J should this be moved to the server still?
+            if (bval) {
+                Logger.global.setLevel(Level.ALL);
+            }
+            else {
+                Logger.global.setLevel(Level.INFO);
+            }
         }
         else if (optname.equals(Options.showCaretaker))
         {
@@ -542,15 +554,20 @@ public final class Client implements IClient, IOracle, IOptions
         }
         else if (optname.equals(Options.showLogWindow))
         {
-            Log.setToWindow(bval);
             if (bval)
             {
-                // Force log window to appear.
-                Log.event("");
+                if (logWindow == null) {
+                	// the logger with the empty name is parent to all loggers and thus catches all messages
+                    logWindow = new LogWindow(this, Logger.getLogger(""));
+                }
             }
             else
             {
-                Log.disposeLogWindow();
+                if (logWindow != null) {
+                    logWindow.setVisible(false);
+                    logWindow.dispose();
+                    logWindow = null;
+                }
             }
         }
         else if (optname.equals(Options.showStatusScreen))
@@ -1404,7 +1421,6 @@ public final class Client implements IClient, IOracle, IOptions
             disposeMasterBoard();
             board = new MasterBoard(this);
             focusBoard();
-            Log.setClient(this);
         }
     }
 
@@ -3988,8 +4004,7 @@ public final class Client implements IClient, IOracle, IOptions
                 catch (Exception ex)
                 {
                     Log.error("Failed to change client " + playerName +
-                        " from " + ai.getClass().getName() + " to " + type);
-                    ex.printStackTrace();
+                        " from " + ai.getClass().getName() + " to " + type, ex);
                 }
             }
         }

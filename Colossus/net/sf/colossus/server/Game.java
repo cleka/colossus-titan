@@ -116,7 +116,7 @@ public final class Game
                 Log.event("Add " + type + " player " + name);
             }
         }
-        // No longer need the player name and type options. 
+        // No longer need the player name and type options.
         options.clearPlayerInfo();
 
         Creature.getCreatureByName("Titan").setMaxCount(getNumPlayers());
@@ -717,7 +717,7 @@ public final class Game
     class GamePhaseAdvancer implements PhaseAdvancer
     {
 
-        /** Advance to the next phase, only if the passed oldPhase and 
+        /** Advance to the next phase, only if the passed oldPhase and
          *  playerName are current. */
         public void advancePhase()
         {
@@ -753,7 +753,7 @@ public final class Game
                 turnNumber++;
             }
 
-            /* notify all CustomRecruitBase object that we change the 
+            /* notify all CustomRecruitBase object that we change the
              active player, for bookkeeping purpose */
             CustomRecruitBase.everyoneAdvanceTurn(activePlayerNum);
 
@@ -958,9 +958,9 @@ public final class Game
                 {
                     Legion legion = (Legion)it2.next();
 
-                    el.addContent(dumpLegion(doc, legion, 
+                    el.addContent(dumpLegion(doc, legion,
                             battleInProgress && (
-                              legion == battle.getAttacker() || 
+                              legion == battle.getAttacker() ||
                               legion == battle.getDefender()
                             )
                         ));
@@ -1133,7 +1133,7 @@ public final class Game
                 if (contentList.size() > 0)
                 {
                     String content = ((CDATA)contentList.get(0)).getText();
-                    Log.debug("DataFileKey: " + mapKey + " DataFileContent :\n" 
+                    Log.debug("DataFileKey: " + mapKey + " DataFileContent :\n"
                         + content);
                     ResourceLoader.putIntoFileCache(mapKey,
                         content.getBytes());
@@ -1306,8 +1306,7 @@ public final class Game
         }
         catch (Exception ex)
         {
-            Log.error("Tried to load corrupt savegame");
-            ex.printStackTrace();
+            Log.error("Tried to load corrupt savegame", ex);
             dispose();
         }
     }
@@ -1697,10 +1696,10 @@ public final class Game
         return entrySide;
     }
 
-    /** Recursively find conventional moves from this hex.  
-     *  If block >= 0, go only that way.  If block == -1, use arches and 
+    /** Recursively find conventional moves from this hex.
+     *  If block >= 0, go only that way.  If block == -1, use arches and
      *  arrows.  If block == -2, use only arrows.  Do not double back in
-     *  the direction you just came from.  Return a set of 
+     *  the direction you just came from.  Return a set of
      *  hexLabel:entrySide tuples. */
     private synchronized Set findNormalMoves(MasterHex hex, Legion legion,
             int roll, int block, int cameFrom, boolean ignoreFriends)
@@ -1920,7 +1919,7 @@ public final class Game
     }
 
     /** Return set of hexLabels describing where this legion can teleport.
-     *  Include moves currently blocked by friendly legions if 
+     *  Include moves currently blocked by friendly legions if
      *  ignoreFriends is true. */
     Set listTeleportMoves(Legion legion, MasterHex hex, int movementRoll,
             boolean ignoreFriends)
@@ -2002,7 +2001,7 @@ public final class Game
     }
 
     /** Return a Set of Strings "Left" "Right" or "Bottom" describing
-     *  possible entry sides.  If the hex is unoccupied, just return 
+     *  possible entry sides.  If the hex is unoccupied, just return
      *  one entry side since it doesn't matter. */
     Set listPossibleEntrySides(String markerId, String targetHexLabel,
             boolean teleport)
@@ -2252,7 +2251,7 @@ public final class Game
         return set;
     }
 
-    /** Return true and call Server.didSplit() if the split succeeded. 
+    /** Return true and call Server.didSplit() if the split succeeded.
      *  Return false if it failed. */
     boolean doSplit(String parentId, String childId, String results)
     {
@@ -2483,7 +2482,7 @@ public final class Game
         server.askConcede(attacker, defender);
     }
 
-    // Attacker did not concede early; negotiate. 
+    // Attacker did not concede early; negotiate.
     private void engage3(String hexLabel)
     {
         Player player = getActivePlayer();
@@ -2662,7 +2661,7 @@ public final class Game
 
         // Remove the dead legion.
         loser.remove();
-        
+
 
         // If this was the titan stack, its owner dies and gives half
         // points to the victor.
@@ -2824,14 +2823,14 @@ public final class Game
 
     private void setEngagementResult(
         String aResult,
-        String aWinner, 
-        int aPoints, 
+        String aWinner,
+        int aPoints,
         int aTurn)
     {
         engagementResult = aResult;
         winnerId= aWinner;
         pointsScored = aPoints;
-        turnCombatFinished=aTurn;        
+        turnCombatFinished=aTurn;
     }
 
     private synchronized void checkEngagementDone()
@@ -2844,13 +2843,13 @@ public final class Game
         server.allUpdatePlayerInfo();
 
         server.allTellEngagementResults(
-            winnerId, 
-            engagementResult, 
+            winnerId,
+            engagementResult,
             pointsScored,
             turnCombatFinished);
-        
+
         engagementResult=null;
-        server.nextEngagement();        
+        server.nextEngagement();
     }
 
     /** Return a list of all players' legions. */

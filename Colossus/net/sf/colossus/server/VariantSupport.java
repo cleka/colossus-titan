@@ -59,9 +59,9 @@ public final class VariantSupport
 
     /**
      * Clean-up the ResourceLoader caches to make room for a variant.
-     * @param tempVarName The name of the file holding the 
+     * @param tempVarName The name of the file holding the
      *     soon-to-be-loaded Variant definition.
-     * @param tempVarDirectory The path to the directory holding the 
+     * @param tempVarDirectory The path to the directory holding the
      *     soon-to-be-loaded Variant.
      */
     public static void freshenVariant(String tempVarName,
@@ -84,7 +84,7 @@ public final class VariantSupport
     public static Document loadVariant(String variantName,
             boolean serverSide)
     {
-        return loadVariant(variantName + Constants.varEnd, 
+        return loadVariant(variantName + Constants.varEnd,
             Constants.varPath + variantName, serverSide);
     }
 
@@ -103,7 +103,7 @@ public final class VariantSupport
     }
 
     /**
-     * Load a Colossus Variant from the specified filename 
+     * Load a Colossus Variant from the specified filename
      *   in the specified path.
      * @param tempVarName The name of the file holding the Variant definition.
      * @param tempVarDirectory The path to the directory holding the Variant.
@@ -198,8 +198,7 @@ public final class VariantSupport
         }
         catch (Exception e)
         {
-            Log.error("Variant loading failed : " + e);
-            e.printStackTrace();
+            Log.error("Variant loading failed : " + e, e);
             varDirectory = Constants.defaultDirName;
             variantName = Constants.defaultVARFile;
             mapName = Constants.defaultMAPFile;
@@ -338,7 +337,7 @@ public final class VariantSupport
         java.util.Properties allNames = new java.util.Properties();
         List directories = getVarDirectoriesList();
 
-        /* unlike other, don't use file-level granularity ; 
+        /* unlike other, don't use file-level granularity ;
          load all files in order, so that we get the
          default mapping at the end */
         ListIterator it = directories.listIterator(directories.size());

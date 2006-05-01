@@ -1,20 +1,20 @@
 package net.sf.colossus.server;
 
 
-import java.util.*;
-import java.net.*;
-import java.io.*;
-import javax.swing.*;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.Date;
+import java.util.Iterator;
 
-import com.werken.opt.Option;
-import com.werken.opt.CommandLine;
-import net.sf.colossus.util.Log;
+import javax.swing.JFrame;
+
 import net.sf.colossus.client.Client;
 import net.sf.colossus.client.StartClient;
-
-// This class uses both com.werken.opt.Options and 
-// net.sf.colossus.util.Options, but only the latter is imported.
+import net.sf.colossus.util.Log;
 import net.sf.colossus.util.Options;
+
+import com.werken.opt.CommandLine;
+import com.werken.opt.Option;
 
 
 
@@ -216,7 +216,7 @@ public final class Start
             options.setOption(Options.playerName + j, name);
             options.setOption(Options.playerType + j, Constants.network);
         }
-        for (int k = numHumans + numNetworks; 
+        for (int k = numHumans + numNetworks;
             k < numAIs + numHumans + numNetworks; k++)
         {
             String name = Constants.byColor + k;
@@ -229,7 +229,7 @@ public final class Start
 
     public static void main(String [] args)
     {
-        Log.event("Start for Colossus version " + Client.getVersion() + 
+        Log.event("Start for Colossus version " + Client.getVersion() +
             " at " + new Date().getTime());
 
         com.werken.opt.Options opts = new com.werken.opt.Options();
@@ -258,17 +258,17 @@ public final class Start
             cl = opts.parse(args);
 
             Game game = new Game();
-    
+
             if (cl.optIsSet('h'))
             {
                 usage(opts);
             }
-    
+
             else if (cl.optIsSet('c'))
             {
                 startClient(cl);
             }
-    
+
             else if (cl.optIsSet('l') || cl.optIsSet('z'))
             {
                 String filename = null;
@@ -287,7 +287,7 @@ public final class Start
             {
                 game.getOptions().loadOptions();
                 setupOptionsFromCommandLine(cl, game);
-                game.newGame(); 
+                game.newGame();
             }
             else
             {
@@ -296,13 +296,7 @@ public final class Start
         }
         catch (Exception ex)
         {
-            Log.error(ex.toString());
-            ex.printStackTrace();
-            PrintWriter fileout = Log.getFileout();
-            if (fileout != null)
-            {
-                ex.printStackTrace(fileout);
-            }
+            Log.error(ex);
             System.exit(1);
         }
     }

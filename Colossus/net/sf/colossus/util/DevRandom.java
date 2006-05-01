@@ -28,13 +28,13 @@ public class DevRandom extends Random
     private String source = null;
     private File randomSource = null;
     private FileInputStream randStream = null;
-    
+
     public DevRandom()
     {
         super();
         init();
     }
-    
+
     public DevRandom(String sourcename)
     {
         super();
@@ -50,13 +50,13 @@ public class DevRandom extends Random
         randomSource = new File(source);
 
         if ((randomSource == null) || (!randomSource.exists())) {
-            System.err.println("cannot access " + src);
+            Log.warn("Random source unavailable: " + src);
             return false;
         }
 
         return true;
     }
-    
+
     private void init()
     {
         if ((source != null) && (source.equals(PRNG)))
@@ -71,7 +71,7 @@ public class DevRandom extends Random
                 i++;
             }
         }
-        
+
         if ((randomSource != null) && (randomSource.exists()))
         {
             try
@@ -90,7 +90,7 @@ public class DevRandom extends Random
             Log.debug("Random source unavailable ! Falling back on a PRNG");
         }
     }
-    
+
     protected int next(int bits)
     {
         int nbits = bits;
@@ -129,7 +129,7 @@ public class DevRandom extends Random
         result = (result & mask);
         /*
           String toto = "";
-          for (int i = 0; i < size; i++) toto = toto + "|" + bytes[i]; 
+          for (int i = 0; i < size; i++) toto = toto + "|" + bytes[i];
           Log.debug("For " + source + ", array is " + toto + "|, result is " +
                     result + ", bits is " + bits + ", mask is " + mask);
         */

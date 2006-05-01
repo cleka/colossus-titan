@@ -4,6 +4,7 @@ package net.sf.colossus.util;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.logging.Logger;
 
 import net.sf.colossus.client.Client;
 import net.sf.colossus.client.SaveWindow;
@@ -22,11 +23,14 @@ public final class LogWindow extends JTextArea
     private Point location;
     private Dimension size;
     private SaveWindow saveWindow;
+	private final Logger logger;
+	private SwingDocumentLogHandler handler;
 
 
-    public LogWindow(Client client)
+    public LogWindow(Client client, Logger logger)
     {
         this.client = client;
+		this.logger = logger;
         setEditable(false);
         setBackground(Color.white);
 
@@ -62,6 +66,10 @@ public final class LogWindow extends JTextArea
         logFrame.setLocation(location);
 
         logFrame.setVisible(true);
+        
+        handler = new SwingDocumentLogHandler();
+        logger.addHandler(handler);
+        setDocument(handler.getDocument());
     }
 
 
@@ -97,5 +105,6 @@ public final class LogWindow extends JTextArea
         saveWindow.saveLocation(location);
         logFrame.dispose();
         client.setOption(Options.showLogWindow, false);
+        logger.removeHandler(handler);
     }
 }

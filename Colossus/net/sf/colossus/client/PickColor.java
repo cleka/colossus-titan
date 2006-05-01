@@ -10,6 +10,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowListener;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -133,9 +134,10 @@ final class PickColor extends KDialog implements WindowListener, ActionListener
 
     public static void main(String[] args)
     {
+        Logger logger = Logger.getLogger(PickColor.class.getName());
         List colorsLeft = Arrays.asList(Constants.colorNames);
         String color = pickColor(new JFrame(), "Player", colorsLeft);
-        System.out.println("Picked " + color);
+        logger.info("Picked " + color);
         System.exit(0);
     }
 }

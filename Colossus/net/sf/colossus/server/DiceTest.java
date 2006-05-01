@@ -2,6 +2,9 @@ package net.sf.colossus.server;
 
 
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import junit.framework.*;
 
 
@@ -12,6 +15,8 @@ import junit.framework.*;
  */
 public class DiceTest extends TestCase
 {
+	private static final Logger LOGGER = Logger.getLogger(DiceTest.class.getName());
+	
     private int trials = 5000;
     double epsilon = 0.000001;
 
@@ -51,7 +56,7 @@ public class DiceTest extends TestCase
 
     public void testDevUrandom()
     {
-        System.out.println("---testDevUrandom()---");
+        LOGGER.log(Level.FINEST, "---testDevUrandom()---");
         int[] rolls = new int[trials];
         Dice.init("/dev/urandom");
         for (int i = 0; i < trials; i++)
@@ -63,7 +68,7 @@ public class DiceTest extends TestCase
 
     public void testPRNG()
     {
-        System.out.println("---testPRNG()---");
+        LOGGER.log(Level.FINEST, "---testPRNG()---");
         int[] rolls = new int[trials];
         Dice.init("PRNG");
         for (int i = 0; i < trials; i++)
@@ -75,7 +80,7 @@ public class DiceTest extends TestCase
 
     public void testNonRandomDice()
     {
-        System.out.println("---testNonRandomDice()--- [some should fail]");
+        LOGGER.log(Level.FINEST, "---testNonRandomDice()--- [some should fail]");
         int[] rolls = new int[trials];
         for (int i = 0; i < trials; i++)
         {
@@ -114,7 +119,7 @@ public class DiceTest extends TestCase
                 fixedRolls.length;
 
         double chisquare = findChiSquare(rolls, meanDieRoll) / rolls.length;
-        System.out.println("chi-square test: chi-square=" + chisquare +
+        LOGGER.log(Level.FINEST, "chi-square test: chi-square=" + chisquare +
                 " mean=" + expMean + " var=" + expVariance);
         failIfAbnormal(chisquare, expMean, expVariance, random);
     }
@@ -138,7 +143,7 @@ public class DiceTest extends TestCase
         double meanM = (2.0 * r * (n - r) / n) + 1.;
         double varianceM = ((2.0 * r) * (n - r) / n / n *
                 ((2. * r) * (n - r) - n)) / (n - 1.);
-        System.out.println("M test: r=" + r + " M=" + M + " mean=" + meanM +
+        LOGGER.log(Level.FINEST, "M test: r=" + r + " M=" + M + " mean=" + meanM +
                 " var=" + varianceM);
         failIfAbnormal(M, meanM, varianceM, random);
     }
@@ -152,7 +157,7 @@ public class DiceTest extends TestCase
         double m = (double)countNonZeroDiffs(rolls);
         double meanP = m / 2.;
         double varianceP = m / 12.;
-        System.out.println("Sign test: P=" + P + " m=" + m + " mean=" +
+        LOGGER.log(Level.FINEST, "Sign test: P=" + P + " m=" + m + " mean=" +
                 meanP + " var=" + varianceP);
         failIfAbnormal(P, meanP, varianceP, random);
     }
@@ -167,7 +172,7 @@ public class DiceTest extends TestCase
         double meanR = 1. + (2 * pos * neg) / (pos + neg);
         double varianceR = ((2.0 * pos * neg) * (2 * pos * neg - pos - neg)) /
                 ((pos + neg) * (pos + neg) * (pos + neg - 1));
-        System.out.println("Runs test: R=" + R + " m=" + m + " mean=" +
+        LOGGER.log(Level.FINEST, "Runs test: R=" + R + " m=" + m + " mean=" +
                 meanR + " var=" + varianceR);
         failIfAbnormal(R, meanR, varianceR, random);
     }
@@ -186,7 +191,7 @@ public class DiceTest extends TestCase
         }
         double meanS = 0.;
         double varianceS = (n / 18.) * (n - 1.) * (2. * n + 5.);
-        System.out.println("Mann-Kendall test: S=" + S + " mean=" + meanS +
+        LOGGER.log(Level.FINEST, "Mann-Kendall test: S=" + S + " mean=" + meanS +
                 " var=" + varianceS);
         failIfAbnormal(S, meanS, varianceS, random);
     }
@@ -367,22 +372,22 @@ public class DiceTest extends TestCase
             sd = Math.sqrt(Math.abs(variance));
             z = (val - mean) / sd;
         }
-        System.out.print("sd=" + sd + " z=" + z);
+        LOGGER.log(Level.FINEST, "sd=" + sd + " z=" + z);
         if (Math.abs(z) > 3)
         {
             if (random)
             {
-                System.out.println(" (FAILURE)");
-                fail();
+                LOGGER.log(Level.FINEST, " (FAILURE)");
+                fail("Random result is outside expected normal range.");
             }
             else
             {
-                System.out.println(" (expected failure)");
+                LOGGER.log(Level.FINEST, " (expected failure)");
             }
         }
         else
         {
-            System.out.println(" (success)");
+            LOGGER.log(Level.FINEST, " (success)");
         }
     }
 }

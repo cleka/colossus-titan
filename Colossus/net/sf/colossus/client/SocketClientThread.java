@@ -69,8 +69,7 @@ final class SocketClientThread extends Thread implements IServer
         }
         catch (IOException ex)
         {
-            Log.error(ex.toString());
-            ex.printStackTrace();
+            Log.error(ex);
             return;
         }
 
@@ -81,14 +80,6 @@ final class SocketClientThread extends Thread implements IServer
             {
                 if (fromServer.length() > 0)
                 {
-
-                    /*
-                     if (!fromServer.startsWith(Constants.log))
-                     {
-                     System.out.println("From server to " + 
-                     client.getPlayerName() + ": " + fromServer);
-                     }
-                     */
                     parseLine(fromServer);
                 }
             }

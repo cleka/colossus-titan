@@ -1,15 +1,25 @@
 package net.sf.colossus.server;
 
 
-import java.util.*;
-import java.net.*;
-import java.io.*;
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import net.sf.colossus.client.Client;
+import net.sf.colossus.client.IClient;
+import net.sf.colossus.client.Proposal;
 import net.sf.colossus.util.Log;
 import net.sf.colossus.util.Options;
-import net.sf.colossus.client.IClient;
-import net.sf.colossus.client.Client;
-import net.sf.colossus.client.Proposal;
 import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
 
@@ -22,14 +32,17 @@ import net.sf.colossus.xmlparser.TerrainRecruitLoader;
  */
 public final class Server implements IServer
 {
+	private static final Logger LOGGER = Logger.getLogger(Server.class.getName());
+	
     private Game game;
 
-    /** 
-     *  Maybe also save things like the originating IP, in case a 
-     *  connection breaks and we need to authenticate reconnects.  
+    /**
+     *  Maybe also save things like the originating IP, in case a
+     *  connection breaks and we need to authenticate reconnects.
      *  Do not share these references. */
     private List clients = new ArrayList();
     private List remoteClients = new ArrayList();
+    private List remoteLogHandlers = new ArrayList();
 
     /** Map of player name to client. */
     private Map clientMap = new HashMap();
@@ -54,9 +67,9 @@ public final class Server implements IServer
     private int numClients;
     private int maxClients;
 
-    /* static so that new instance of Server can destroy a 
+    /* static so that new instance of Server can destroy a
      * previously allocated FileServerThread */
-    private static Thread fileServerThread = null; 
+    private static Thread fileServerThread = null;
 
     Server(Game game, int port)
     {
@@ -69,8 +82,8 @@ public final class Server implements IServer
     {
         numClients = 0;
         maxClients = game.getNumLivingPlayers();
-        Log.debug("initSocketServer maxClients = " + maxClients);
-        Log.debug("About to create server socket on port " + port);
+        LOGGER.log(Level.FINEST, "initSocketServer maxClients = " + maxClients);
+        LOGGER.log(Level.FINEST, "About to create server socket on port " + port);
         try
         {
             if (serverSocket != null)
@@ -83,9 +96,7 @@ public final class Server implements IServer
         }
         catch (IOException ex)
         {
-            Log.error("Could not create socket. Configure networking in OS.");
-            Log.error(ex.toString());
-            ex.printStackTrace();
+            Log.error("Could not create socket. Configure networking in OS.", ex);
             System.exit(1);
         }
         createLocalClients();
@@ -103,20 +114,20 @@ public final class Server implements IServer
         // if the client ask for a file *before*
         // the file server is up.
 
-        Log.debug("About to create file server socket on port " + (port + 1));
+        LOGGER.log(Level.FINEST, "About to create file server socket on port " + (port + 1));
 
         if (fileServerThread != null)
         {
             try
             {
-                Log.debug("Stopping the FileServerThread ");
+                LOGGER.log(Level.FINEST, "Stopping the FileServerThread ");
                 ((FileServerThread)fileServerThread).stopGoingOn();
                 fileServerThread.interrupt();
                 fileServerThread.join();
             }
             catch (Exception e)
             {
-                Log.debug("Oups couldn't stop the FileServerThread " + e);
+                LOGGER.log(Level.FINEST, "Oups couldn't stop the FileServerThread " + e);
             }
             fileServerThread = null;
         }
@@ -129,7 +140,7 @@ public final class Server implements IServer
         }
         else
         {
-            Log.debug("No active remote client, not lauching the file server.");
+            LOGGER.log(Level.FINEST, "No active remote client, not lauching the file server.");
         }
     }
 
@@ -149,8 +160,7 @@ public final class Server implements IServer
         }
         catch (IOException ex)
         {
-            Log.error(ex.toString());
-            ex.printStackTrace();
+            Log.error(ex);
             return;
         }
 
@@ -196,14 +206,14 @@ public final class Server implements IServer
 
     private void createLocalClient(String playerName)
     {
-        Log.debug("Called Server.createLocalClient() for " + playerName);
+        LOGGER.log(Level.FINEST, "Called Server.createLocalClient() for " + playerName);
         new Client("127.0.0.1", port, playerName, false);
     }
 
     synchronized void addClient(final IClient client, final String playerName,
             final boolean remote)
     {
-        Log.debug("Called Server.addClient() for " + playerName);
+        LOGGER.log(Level.FINEST, "Called Server.addClient() for " + playerName);
         clients.add(client);
 
         if (remote)
@@ -244,8 +254,11 @@ public final class Server implements IServer
             return;
         }
 
-        Log.setServer(this);
-        Log.setToRemote(true);
+        RemoteLogHandler remoteLogHandler = new RemoteLogHandler();
+        remoteLogHandler.setServer(this);
+        LOGGER.addHandler(remoteLogHandler);
+        remoteLogHandlers.add(remoteLogHandler);
+
         remoteClients.add(client);
 
         if (!game.isLoadingGame())
@@ -269,6 +282,13 @@ public final class Server implements IServer
             client.dispose();
         }
         clients.clear();
+        
+        for (Iterator iter = remoteLogHandlers.iterator(); iter.hasNext();) {
+			RemoteLogHandler handler = (RemoteLogHandler) iter.next();
+			LOGGER.removeHandler(handler);
+		}
+        remoteLogHandlers.clear();
+        
         if (serverSocket != null)
         {
             try
@@ -582,7 +602,7 @@ public final class Server implements IServer
         }
     }
 
-    void allTellEngagementResults(String winnerId, String method, 
+    void allTellEngagementResults(String winnerId, String method,
                                     int points, int turns)
     {
         Iterator it = clients.iterator();
@@ -773,7 +793,7 @@ public final class Server implements IServer
 
     void allTellEngagement(String hexLabel, Legion attacker, Legion defender)
     {
-        Log.debug("allTellEngagement() " + hexLabel);
+        LOGGER.log(Level.FINEST, "allTellEngagement() " + hexLabel);
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
@@ -994,7 +1014,7 @@ public final class Server implements IServer
     }
 
     synchronized void allTellCarryResults(Critter carryTarget,
-            int carryDamageDone, int carryDamageLeft, 
+            int carryDamageDone, int carryDamageLeft,
             Set carryTargetDescriptions)
     {
         if (striker == null || target == null || rolls == null)
@@ -1061,7 +1081,7 @@ public final class Server implements IServer
                     " illegally called assignStrikePenalty()");
             getClient(getPlayerName()).nak(Constants.assignStrikePenalty,
                     "Wrong player");
-        } 
+        }
         else if (striker.hasStruck())
         {
             Log.error(getPlayerName() +
@@ -1194,7 +1214,7 @@ public final class Server implements IServer
         else if (player.legionsMoved() == 0 &&
                 player.countMobileLegions() > 0)
         {
-            Log.debug("At least one legion must move.");
+            LOGGER.log(Level.FINEST, "At least one legion must move.");
             getClient(getPlayerName()).nak(Constants.doneWithMoves,
                     "Must move at least one legion");
         }
@@ -1202,7 +1222,7 @@ public final class Server implements IServer
         // non-teleport move, force one of them to take it.
         else if (player.splitLegionHasForcedMove())
         {
-            Log.debug("Split legions must be separated.");
+            LOGGER.log(Level.FINEST, "Split legions must be separated.");
             getClient(getPlayerName()).nak(Constants.doneWithMoves,
                     "Must separate split legions");
         }
@@ -1309,7 +1329,7 @@ public final class Server implements IServer
 
     public void doSplit(String parentId, String childId, String results)
     {
-        Log.debug("Server.doSplit " + parentId + " " + childId + " " + 
+        LOGGER.log(Level.FINEST, "Server.doSplit " + parentId + " " + childId + " " +
                 results);
         IClient client = getClient(getPlayerName());
         if (!isActivePlayer())
@@ -1328,7 +1348,7 @@ public final class Server implements IServer
     /** Callback from game after this legion was split off. */
     void didSplit(String hexLabel, String parentId, String childId, int height)
     {
-        Log.debug("Server.didSplit " + hexLabel + " " + parentId + " " + 
+        LOGGER.log(Level.FINEST, "Server.didSplit " + hexLabel + " " + parentId + " " +
                 childId + " " + height);
         allUpdatePlayerInfo();
 
@@ -1569,7 +1589,7 @@ public final class Server implements IServer
     }
 
     /** Call from History during load game only */
-    void oneRevealCreatures(String playerName, String markerId, 
+    void oneRevealCreatures(String playerName, String markerId,
             List creatureNames)
     {
         IClient client = getClient(playerName);
@@ -1609,7 +1629,7 @@ public final class Server implements IServer
     /** Used to change a player name after color is assigned. */
     void setPlayerName(String playerName, String newName)
     {
-        Log.debug("Server.setPlayerName() from " + playerName + " to " +
+        LOGGER.log(Level.FINEST, "Server.setPlayerName() from " + playerName + " to " +
                 newName);
         IClient client = getClient(playerName);
         client.setPlayerName(newName);
@@ -1720,8 +1740,11 @@ public final class Server implements IServer
         allSetOption(optname, String.valueOf(value));
     }
 
-    /** public so that it can be called from Log. */
-    public void allLog(String message)
+    /** DO NOT USE:
+     * package so that it can be called from Log4J Appender.
+     *
+     */
+    void allLog(String message)
     {
         Iterator it = remoteClients.iterator();
         while (it.hasNext())
