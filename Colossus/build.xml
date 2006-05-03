@@ -27,10 +27,12 @@
 <property environment="env"/>
 
 <property name="libs.dir" value="libs"/>
+<property name="variants.dir" value="variants"/>
 
 <path id="project.class.path">
     <pathelement path="${classpath}"/>
     <pathelement path="${build.dev.dir}"/>
+    <pathelement path="${variants.dir}"/>
     <fileset dir="${libs.dir}">
         <include name="**/*.jar"/>
     </fileset>
@@ -125,30 +127,7 @@
 			</pathconvert>
 	        <jar jarfile = "Colossus.jar" basedir="."
              includes="**/*.class,
-                       version,
-                       Abyssal6/**,
-                       Abyssal9/**,
-                       Badlands/**,
-                       Badlands-JDG/**,
-                       Balrog/**,
-                       Beelzebub/**,
-                       Beelzebub12/**,
-                       Default/**,
-                       ExtTitan/**,
-                       Infinite/**,
-                       Outlands/**,
-                       Pantheon/**,
-                       Random/**,
-                       SmallTitan/**,
-                       TG-ConceptI/**,
-                       TG-ConceptII/**,
-                       TG-ConceptIII/**,
-                       TG-SetII/**,
-                       TG-SetIII/**,
-                       TG-Wild/**,
-                       TitanPlus/**,
-                       Undead/**,
-                       Unified/**"
+                       version"
              excludes="net/sf/colossus/datatools/*.class,
                        **/*Test.class"
              >
@@ -156,8 +135,9 @@
 				<attribute name="Main-Class" value="net.sf.colossus.server.Start"/>
 				<attribute name="Class-Path" value="${manifest.classpath}"/>
 			</manifest>
-        </jar>
-        <chmod file="Colossus.jar" perm="755"/>
+        	</jar>
+		    <jar jarfile="Colossus.jar" basedir="${variants.dir}" includes="**" update="true"/>
+        	<chmod file="Colossus.jar" perm="755"/>
 </target>
 
 
