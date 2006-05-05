@@ -26,12 +26,14 @@
 
 <property environment="env"/>
 
+<property name="core.src.dir" value="core/src"/>
 <property name="libs.dir" value="libs"/>
 <property name="variants.dir" value="variants"/>
+<property name="build.dir" value="build/classes"/>
+<property name="datatools.src.dir" value="datatools/src"/>
 
 <path id="project.class.path">
-    <pathelement path="${classpath}"/>
-    <pathelement path="${build.dev.dir}"/>
+    <pathelement path="${classes.dir}"/>
     <pathelement path="${variants.dir}"/>
     <fileset dir="${libs.dir}">
         <include name="**/*.jar"/>
@@ -57,6 +59,7 @@
         <property name="ZIPFILE" value="Colossus.${DSTAMP}.zip"/>
         <property name="SERVER" value="shell1.sf.net"/>
 
+		<mkdir dir="${build.dir}"/>
 </target>
 
 
@@ -66,28 +69,38 @@
         />
 </target>
 
+<!--
+  Somehow javamake doesn't like compiling from multiple sources into one build location,
+  it deletes the results of the first build. For this reason we don't use javamake at the
+  moment. TODO: fix this problem.
 <taskdef name="javamake" classname="com.sun.tools.javamake.ant.JavaMake" 
          classpathref="project.class.path"
 /> 
-
+-->
 
 <target name="compile" depends="init"
-        description = "Compile most .java files to .class files using javamake">
-        <javamake debug="yes" deprecation="yes" target="1.4" source="1.4" srcdir="."
-                includes="**/*.java"
-                excludes="**/datatools/*.java">
+        description = "Compiles Colossus without datatools and variants using javamake">
+        <javac debug="yes" deprecation="yes" target="1.4" source="1.4" srcdir="${core.src.dir}"
+                destdir="${build.dir}">
             <classpath refid="project.class.path"/>
-        </javamake>
+        </javac>
 </target>
 
-<target name="compileAll" depends="init"
-        description = "Compile all .java files to .class files using javamake">
-        <javamake debug="yes" deprecation="yes" target="1.4" source="1.4" srcdir="."
-                includes="**/*.java">
+<target name="compileVariants" depends="init"
+        description = "Compiles the variant code using javamake">
+        <javac debug="yes" deprecation="yes" target="1.4" source="1.4" srcdir="${variants.dir}"
+                destdir="${build.dir}" >
             <classpath refid="project.class.path"/>
-        </javamake>
+        </javac>
 </target>
 
+<target name="compileDatatools" depends="init"
+        description = "Compiles the datatools using javamake">
+        <javac debug="yes" deprecation="yes" target="1.4" source="1.4" srcdir="${datatools.src.dir}"
+                destdir="${build.dir}">
+            <classpath refid="project.class.path"/>
+        </javac>
+</target>
 
 <!-- XXX Why does this fail if we set fork to yes? -->
 <target name="test" depends="compile,jar"
@@ -115,7 +128,7 @@
 </target>
 
 
-<target name="jar" depends="init,compile,version"
+<target name="jar" depends="init,compile,compileVariants,version"
         description = "Make jar file">
 			<pathconvert property="manifest.classpath"
 			             pathsep=" ">
@@ -125,18 +138,13 @@
 				    <globmapper from="*" to="libs/*"/>
 	            </chainedmapper>
 			</pathconvert>
-	        <jar jarfile = "Colossus.jar" basedir="."
-             includes="**/*.class,
-                       version"
-             excludes="net/sf/colossus/datatools/*.class,
-                       **/*Test.class"
-             >
-			<manifest>
-				<attribute name="Main-Class" value="net.sf.colossus.server.Start"/>
-				<attribute name="Class-Path" value="${manifest.classpath}"/>
-			</manifest>
+	        <jar jarfile = "Colossus.jar" basedir="${build.dir}" includes="**">
+				<manifest>
+					<attribute name="Main-Class" value="net.sf.colossus.server.Start"/>
+					<attribute name="Class-Path" value="${manifest.classpath}"/>
+				</manifest>
         	</jar>
-		    <jar jarfile="Colossus.jar" basedir="${variants.dir}" includes="**" update="true"/>
+		    <jar jarfile="Colossus.jar" basedir="${variants.dir}" includes="**" excludes="*.java" update="true"/>
         	<chmod file="Colossus.jar" perm="755"/>
 </target>
 
@@ -171,6 +179,7 @@
                          javamake.pdb"
                 />
         </delete>
+		<delete dir="${build.dir}"/>
 </target>
 
 
