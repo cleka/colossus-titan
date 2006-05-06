@@ -66,7 +66,7 @@
 
 <target name="version" depends="init"
         description="Create a timestamp file">
-        <echo file="./version" message="${DSTAMP}&#10;"
+        <echo file="${build.classes.dir}/version" message="${DSTAMP}&#10;"
         />
 </target>
 
