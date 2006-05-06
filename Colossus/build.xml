@@ -26,14 +26,15 @@
 
 <property environment="env"/>
 
-<property name="core.src.dir" value="core/src"/>
+<property name="core.src.dir" value="core/src/main/java"/>
 <property name="libs.dir" value="libs"/>
 <property name="variants.dir" value="variants"/>
-<property name="build.dir" value="build/classes"/>
-<property name="datatools.src.dir" value="datatools/src"/>
+<property name="build.dir" value="build"/>
+<property name="build.classes.dir" value="${build.dir}/classes"/>
+<property name="datatools.src.dir" value="datatools/src/main/java"/>
 
 <path id="project.class.path">
-    <pathelement path="${classes.dir}"/>
+    <pathelement path="${build.classes.dir}"/>
     <pathelement path="${variants.dir}"/>
     <fileset dir="${libs.dir}">
         <include name="**/*.jar"/>
@@ -59,7 +60,7 @@
         <property name="ZIPFILE" value="Colossus.${DSTAMP}.zip"/>
         <property name="SERVER" value="shell1.sf.net"/>
 
-		<mkdir dir="${build.dir}"/>
+		<mkdir dir="${build.classes.dir}"/>
 </target>
 
 
@@ -81,7 +82,7 @@
 <target name="compile" depends="init"
         description = "Compiles Colossus without datatools and variants using javamake">
         <javac debug="yes" deprecation="yes" target="1.4" source="1.4" srcdir="${core.src.dir}"
-                destdir="${build.dir}">
+                destdir="${build.classes.dir}">
             <classpath refid="project.class.path"/>
         </javac>
 </target>
@@ -89,7 +90,7 @@
 <target name="compileVariants" depends="init"
         description = "Compiles the variant code using javamake">
         <javac debug="yes" deprecation="yes" target="1.4" source="1.4" srcdir="${variants.dir}"
-                destdir="${build.dir}" >
+                destdir="${build.classes.dir}" >
             <classpath refid="project.class.path"/>
         </javac>
 </target>
@@ -97,7 +98,7 @@
 <target name="compileDatatools" depends="init"
         description = "Compiles the datatools using javamake">
         <javac debug="yes" deprecation="yes" target="1.4" source="1.4" srcdir="${datatools.src.dir}"
-                destdir="${build.dir}">
+                destdir="${build.classes.dir}">
             <classpath refid="project.class.path"/>
         </javac>
 </target>
@@ -138,12 +139,17 @@
 				    <globmapper from="*" to="libs/*"/>
 	            </chainedmapper>
 			</pathconvert>
-	        <jar jarfile = "Colossus.jar" basedir="${build.dir}" includes="**">
+	        <jar jarfile = "Colossus.jar" basedir="${build.classes.dir}" includes="**">
 				<manifest>
 					<attribute name="Main-Class" value="net.sf.colossus.server.Start"/>
 					<attribute name="Class-Path" value="${manifest.classpath}"/>
 				</manifest>
         	</jar>
+	   		<!-- 
+	   			Add the resources from the variants by including the whole variants folder.
+	   			The variants should have a structure with java source and extra resources, too.
+	   			TODO: create that structure for all variants.
+	   		-->
 		    <jar jarfile="Colossus.jar" basedir="${variants.dir}" includes="**" excludes="*.java" update="true"/>
         	<chmod file="Colossus.jar" perm="755"/>
 </target>
@@ -357,7 +363,7 @@
         <delete verbose="yes" file = "ChangeLog.bak"/>
 </target>
 
-<target name="dist" depends="init,sign,changelog"
+<target name="dist" depends="clean,init,sign,changelog"
         description = "Make zip file for user download">
         <zip zipfile="${ZIPFILE}" basedir="."
              excludes="**/*.sav,
