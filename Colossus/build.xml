@@ -33,6 +33,7 @@
 <property name="variants.dir" value="variants"/>
 <property name="build.dir" value="build"/>
 <property name="build.classes.dir" value="${build.dir}/classes"/>
+<property name="testresults.dir" value="${build.dir}/testresults"/>
 <property name="datatools.src.dir" value="datatools/src/main/java"/>
 
 <path id="project.class.path">
@@ -63,6 +64,7 @@
         <property name="SERVER" value="shell1.sf.net"/>
 
 		<mkdir dir="${build.classes.dir}"/>
+		<mkdir dir="${testresults.dir}"/>
 </target>
 
 
@@ -113,18 +115,14 @@
         </javac>
 </target>
 
-<target name="test" depends="compileTests"
+<target name="test" depends="compileTests,compileVariants"
         description = "Run all unit tests using JUnit">
-        <junit printsummary="yes" fork="yes" haltonfailure="no">
+        <junit printsummary="yes" fork="no" haltonfailure="no">
             <classpath refid="project.class.path"/>
-                <formatter type="plain"/>
-                <test name="net.sf.colossus.util.MultiSetTest"/>
-                <test name="net.sf.colossus.server.DiceTest"/>
-                <test name="net.sf.colossus.util.CombosTest"/>
-                <test name="net.sf.colossus.client.PredictSplitsTest"/>
-                <test name="net.sf.colossus.server.BalancedTowersTest"/>
-                <test name="net.sf.colossus.server.CarryTest"/>
-                <test name="net.sf.colossus.server.LOSTest"/>
+            <formatter type="plain"/>
+    		<batchtest todir="${testresults.dir}">
+    			<fileset dir="${tests.src.dir}"/>
+    		</batchtest>
         </junit>
 </target>
 
