@@ -27,6 +27,7 @@
 <property environment="env"/>
 
 <property name="core.src.dir" value="core/src/main/java"/>
+<property name="tests.src.dir" value="core/src/test/java"/>
 <property name="core.resource.dir" value="core/src/main/resource"/>
 <property name="libs.dir" value="libs"/>
 <property name="variants.dir" value="variants"/>
@@ -104,10 +105,17 @@
         </javac>
 </target>
 
-<!-- XXX Why does this fail if we set fork to yes? -->
-<target name="test" depends="compile,jar"
+<target name="compileTests" depends="compile"
+        description = "Compiles the JUnit tests">
+        <javac debug="yes" deprecation="yes" target="1.4" source="1.4" srcdir="${tests.src.dir}"
+                destdir="${build.classes.dir}">
+            <classpath refid="project.class.path"/>
+        </javac>
+</target>
+
+<target name="test" depends="compileTests"
         description = "Run all unit tests using JUnit">
-        <junit printsummary="yes" fork="no" haltonfailure="no">
+        <junit printsummary="yes" fork="yes" haltonfailure="no">
             <classpath refid="project.class.path"/>
                 <formatter type="plain"/>
                 <test name="net.sf.colossus.util.MultiSetTest"/>
