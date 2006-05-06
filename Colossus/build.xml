@@ -27,6 +27,7 @@
 <property environment="env"/>
 
 <property name="core.src.dir" value="core/src/main/java"/>
+<property name="core.resource.dir" value="core/src/main/resource"/>
 <property name="libs.dir" value="libs"/>
 <property name="variants.dir" value="variants"/>
 <property name="build.dir" value="build"/>
@@ -139,12 +140,14 @@
 				    <globmapper from="*" to="libs/*"/>
 	            </chainedmapper>
 			</pathconvert>
-	        <jar jarfile = "Colossus.jar" basedir="${build.classes.dir}" includes="**">
+	        <jar jarfile="Colossus.jar" basedir="${build.classes.dir}" includes="**">
 				<manifest>
 					<attribute name="Main-Class" value="net.sf.colossus.server.Start"/>
 					<attribute name="Class-Path" value="${manifest.classpath}"/>
 				</manifest>
         	</jar>
+			<!-- add resources such as icons -->
+		    <jar jarfile="Colossus.jar" basedir="${core.resource.dir}" includes="**" update="true"/>
 	   		<!-- 
 	   			Add the resources from the variants by including the whole variants folder.
 	   			The variants should have a structure with java source and extra resources, too.
