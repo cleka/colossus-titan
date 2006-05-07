@@ -24,57 +24,54 @@
 
 <project name="Colossus" default="jar" basedir=".">
 
-<property environment="env"/>
+	<property environment="env" />
 
-<property name="core.src.dir" value="core/src/main/java"/>
-<property name="tests.src.dir" value="core/src/test/java"/>
-<property name="core.resource.dir" value="core/src/main/resource"/>
-<property name="libs.dir" value="libs"/>
-<property name="variants.dir" value="variants"/>
-<property name="build.dir" value="build"/>
-<property name="build.classes.dir" value="${build.dir}/classes"/>
-<property name="testresults.dir" value="${build.dir}/testresults"/>
-<property name="datatools.src.dir" value="datatools/src/main/java"/>
+	<property name="core.src.dir" value="core/src/main/java" />
+	<property name="tests.src.dir" value="core/src/test/java" />
+	<property name="core.resource.dir" value="core/src/main/resource" />
+	<property name="libs.dir" value="libs" />
+	<property name="variants.dir" value="variants" />
+	<property name="build.dir" value="build" />
+	<property name="build.classes.dir" value="${build.dir}/classes" />
+	<property name="testresults.dir" value="${build.dir}/testresults" />
+	<property name="datatools.src.dir" value="datatools/src/main/java" />
 
-<path id="project.class.path">
-    <pathelement path="${build.classes.dir}"/>
-    <pathelement path="${variants.dir}"/>
-    <fileset dir="${libs.dir}">
-        <include name="**/*.jar"/>
-    </fileset>
-    <fileset dir="${libs.dir}">
-        <include name="**/*.zip"/>
-    </fileset>
-</path>
+	<path id="project.class.path">
+		<pathelement path="${build.classes.dir}" />
+		<pathelement path="${variants.dir}" />
+		<fileset dir="${libs.dir}">
+			<include name="**/*.jar" />
+		</fileset>
+		<fileset dir="${libs.dir}">
+			<include name="**/*.zip" />
+		</fileset>
+	</path>
 
-<target name="init"
-        description="Initialization">
+	<target name="init" description="Initialization">
 
-        <tstamp/>
+		<tstamp />
 
-        <!-- Set this to jikes or kjc to use those instead of javac -->
-        <property name="build.compiler" value="modern"/>
-
-
-        <property name="HTML_DIR" value="/home/groups/c/co/colossus/htdocs"/>
-        <property name="DOWNLOAD_DIR" value="${HTML_DIR}/download"/>
-        <property name="DOCS_DIR" value="${HTML_DIR}/docs"/>
-        <property name="LIBS_DIR" value="${HTML_DIR}/libs"/>
-        <property name="ZIPFILE" value="Colossus.${DSTAMP}.zip"/>
-        <property name="SERVER" value="shell1.sf.net"/>
-
-		<mkdir dir="${build.classes.dir}"/>
-		<mkdir dir="${testresults.dir}"/>
-</target>
+		<!-- Set this to jikes or kjc to use those instead of javac -->
+		<property name="build.compiler" value="modern" />
 
 
-<target name="version" depends="init"
-        description="Create a timestamp file">
-        <echo file="${build.classes.dir}/version" message="${DSTAMP}&#10;"
-        />
-</target>
+		<property name="HTML_DIR" value="/home/groups/c/co/colossus/htdocs" />
+		<property name="DOWNLOAD_DIR" value="${HTML_DIR}/download" />
+		<property name="DOCS_DIR" value="${HTML_DIR}/docs" />
+		<property name="LIBS_DIR" value="${HTML_DIR}/libs" />
+		<property name="ZIPFILE" value="Colossus.${DSTAMP}.zip" />
+		<property name="SERVER" value="shell1.sf.net" />
 
-<!--
+		<mkdir dir="${build.classes.dir}" />
+		<mkdir dir="${testresults.dir}" />
+	</target>
+
+
+	<target name="version" depends="init" description="Create a timestamp file">
+		<echo file="${build.classes.dir}/version" message="${DSTAMP}&#10;" />
+	</target>
+
+	<!--
   Somehow javamake doesn't like compiling from multiple sources into one build location,
   it deletes the results of the first build. For this reason we don't use javamake at the
   moment. TODO: fix this problem.
@@ -83,103 +80,85 @@
 /> 
 -->
 
-<target name="compile" depends="init"
-        description = "Compiles Colossus without datatools and variants using javamake">
-        <javac debug="yes" deprecation="yes" target="1.4" source="1.4" srcdir="${core.src.dir}"
-                destdir="${build.classes.dir}">
-            <classpath refid="project.class.path"/>
-        </javac>
-</target>
+	<target name="compile" depends="init" description="Compiles Colossus without datatools and variants using javamake">
+		<javac debug="yes" deprecation="yes" target="1.4" source="1.4" srcdir="${core.src.dir}" destdir="${build.classes.dir}">
+			<classpath refid="project.class.path" />
+		</javac>
+	</target>
 
-<target name="compileVariants" depends="init"
-        description = "Compiles the variant code using javamake">
-        <javac debug="yes" deprecation="yes" target="1.4" source="1.4" srcdir="${variants.dir}"
-                destdir="${build.classes.dir}" >
-            <classpath refid="project.class.path"/>
-        </javac>
-</target>
+	<target name="compileVariants" depends="init" description="Compiles the variant code using javamake">
+		<javac debug="yes" deprecation="yes" target="1.4" source="1.4" srcdir="${variants.dir}" destdir="${build.classes.dir}">
+			<classpath refid="project.class.path" />
+		</javac>
+	</target>
 
-<target name="compileDatatools" depends="init"
-        description = "Compiles the datatools using javamake">
-        <javac debug="yes" deprecation="yes" target="1.4" source="1.4" srcdir="${datatools.src.dir}"
-                destdir="${build.classes.dir}">
-            <classpath refid="project.class.path"/>
-        </javac>
-</target>
+	<target name="compileDatatools" depends="init" description="Compiles the datatools using javamake">
+		<javac debug="yes" deprecation="yes" target="1.4" source="1.4" srcdir="${datatools.src.dir}" destdir="${build.classes.dir}">
+			<classpath refid="project.class.path" />
+		</javac>
+	</target>
 
-<target name="compileTests" depends="compile"
-        description = "Compiles the JUnit tests">
-        <javac debug="yes" deprecation="yes" target="1.4" source="1.4" srcdir="${tests.src.dir}"
-                destdir="${build.classes.dir}">
-            <classpath refid="project.class.path"/>
-        </javac>
-</target>
+	<target name="compileTests" depends="compile" description="Compiles the JUnit tests">
+		<javac debug="yes" deprecation="yes" target="1.4" source="1.4" srcdir="${tests.src.dir}" destdir="${build.classes.dir}">
+			<classpath refid="project.class.path" />
+		</javac>
+	</target>
 
-<target name="test" depends="compileTests,compileVariants"
-        description = "Run all unit tests using JUnit">
-        <junit printsummary="yes" fork="no" haltonfailure="no">
-            <classpath refid="project.class.path"/>
-            <formatter type="plain"/>
-    		<batchtest todir="${testresults.dir}">
-    			<fileset dir="${tests.src.dir}"/>
-    		</batchtest>
-        </junit>
-</target>
+	<target name="test" depends="compileTests,compileVariants" description="Run all unit tests using JUnit">
+		<junit printsummary="yes" fork="no" haltonfailure="no">
+			<classpath refid="project.class.path" />
+			<formatter type="plain" />
+			<batchtest todir="${testresults.dir}">
+				<fileset dir="${tests.src.dir}" />
+			</batchtest>
+		</junit>
+	</target>
 
 
-<target name="javadoc" depends="compile"
-        description = "Make javadoc files">
-        <mkdir dir="javadoc"/>
-        <javadoc sourcepath="." destdir="./javadoc" access="private"
-                 packagenames="net.sf.colossus.*"
-        />
-</target>
+	<target name="javadoc" depends="compile" description="Make javadoc files">
+		<mkdir dir="javadoc" />
+		<javadoc sourcepath="." destdir="./javadoc" access="private" packagenames="net.sf.colossus.*" />
+	</target>
 
 
-<target name="jar" depends="init,compile,compileVariants,version"
-        description = "Make jar file">
-			<pathconvert property="manifest.classpath"
-			             pathsep=" ">
-			  	<path refid="project.class.path"/>
-				<chainedmapper>
-				    <flattenmapper/>
-				    <globmapper from="*" to="libs/*"/>
-	            </chainedmapper>
-			</pathconvert>
-	        <jar jarfile="Colossus.jar" basedir="${build.classes.dir}" includes="**">
-				<manifest>
-					<attribute name="Main-Class" value="net.sf.colossus.server.Start"/>
-					<attribute name="Class-Path" value="${manifest.classpath}"/>
-				</manifest>
-        	</jar>
-			<!-- add resources such as icons -->
-		    <jar jarfile="Colossus.jar" basedir="${core.resource.dir}" includes="**" update="true"/>
-	   		<!-- 
+	<target name="jar" depends="init,compile,compileVariants,version" description="Make jar file">
+		<pathconvert property="manifest.classpath" pathsep=" ">
+			<path refid="project.class.path" />
+			<chainedmapper>
+				<flattenmapper />
+				<globmapper from="*" to="libs/*" />
+			</chainedmapper>
+		</pathconvert>
+		<jar jarfile="Colossus.jar" basedir="${build.classes.dir}" includes="**">
+			<manifest>
+				<attribute name="Main-Class" value="net.sf.colossus.server.Start" />
+				<attribute name="Class-Path" value="${manifest.classpath}" />
+			</manifest>
+		</jar>
+		<!-- add resources such as icons -->
+		<jar jarfile="Colossus.jar" basedir="${core.resource.dir}" includes="**" update="true" />
+		<!-- 
 	   			Add the resources from the variants by including the whole variants folder.
 	   			The variants should have a structure with java source and extra resources, too.
 	   			TODO: create that structure for all variants.
 	   		-->
-		    <jar jarfile="Colossus.jar" basedir="${variants.dir}" includes="**" excludes="*.java" update="true"/>
-        	<chmod file="Colossus.jar" perm="755"/>
-</target>
+		<jar jarfile="Colossus.jar" basedir="${variants.dir}" includes="**" excludes="*.java" update="true" />
+		<chmod file="Colossus.jar" perm="755" />
+	</target>
 
 
-<!-- Delete stale jar files before compiling -->
-<target name="cleanjars" depends=""
-        description = "Delete stale jar files">
-        <delete verbose="yes" quiet = "yes" file = "Colossus.jar"/>
-        <delete verbose="yes" quiet = "yes" file = "BattlelandsBuilder.jar"/>
-        <delete verbose="yes" quiet = "yes" file = "BattlelandsRandomizer.jar"/>
-</target>
+	<!-- Delete stale jar files before compiling -->
+	<target name="cleanjars" depends="" description="Delete stale jar files">
+		<delete verbose="yes" quiet="yes" file="Colossus.jar" />
+		<delete verbose="yes" quiet="yes" file="BattlelandsBuilder.jar" />
+		<delete verbose="yes" quiet="yes" file="BattlelandsRandomizer.jar" />
+	</target>
 
 
-<!-- Be very careful modifying this.  It whacks whole directories easily. -->
-<target name="clean" depends="cleanjars"
-        description = "Delete derived files">
-        <delete verbose="yes" quiet = "yes" includeemptydirs="yes">
-                <fileset dir="."
-                 includes =
-                        "version,
+	<!-- Be very careful modifying this.  It whacks whole directories easily. -->
+	<target name="clean" depends="cleanjars" description="Delete derived files">
+		<delete verbose="yes" quiet="yes" includeemptydirs="yes">
+			<fileset dir="." includes="version,
                          log,
                          fixcrlf*,
                          **/core,
@@ -191,46 +170,34 @@
                          **/Colossus.*.zip,
                          TEST-*Test.txt,
                          javadoc/**,
-                         javamake.pdb"
-                />
-        </delete>
-		<delete dir="${build.dir}"/>
-</target>
+                         javamake.pdb" />
+		</delete>
+		<delete dir="${build.dir}" />
+	</target>
 
 
-<target name="fix"
-        description = "Fix end of line characters and eliminate tabs">
-        <fixcrlf srcDir="." eol="lf" tab="remove" javafiles="yes"
-                eof="remove" tablength="8"
-                includes="**/*.java"
-        />
-        <fixcrlf srcDir="." eol="lf" tab="remove" javafiles="no"
-                eof="remove" tablength="8"
-                includes="**/*.xml,
+	<target name="fix" description="Fix end of line characters and eliminate tabs">
+		<fixcrlf srcDir="." eol="lf" tab="remove" javafiles="yes" eof="remove" tablength="8" includes="**/*.java" />
+		<fixcrlf srcDir="." eol="lf" tab="remove" javafiles="no" eof="remove" tablength="8" includes="**/*.xml,
                           **/*.html,
                           **/*.txt,
                           **/*.py,
-                          **/*.pl"
-        />
-</target>
+                          **/*.pl" />
+	</target>
 
 
-<target name="run" depends="jar"
-        description = "Run the game">
-        <java jar="Colossus.jar"
-              fork="yes"/>
-</target>
+	<target name="run" depends="jar" description="Run the game">
+		<java jar="Colossus.jar" fork="yes" />
+	</target>
 
 
-<!-- Tools -->
+	<!-- Tools -->
 
 
-<target name="tools" depends="bbjar,brjar"/>
+	<target name="tools" depends="bbjar,brjar" />
 
-<target name="bbjar" depends="init,compile,version"
-        description = "Make Battlelands Builder jar file">
-        <jar jarfile = "BattlelandsBuilder.jar" basedir="."
-             includes="net/sf/colossus/datatools/*.class,
+	<target name="bbjar" depends="init,compile,version" description="Make Battlelands Builder jar file">
+		<jar jarfile="BattlelandsBuilder.jar" basedir="." includes="net/sf/colossus/datatools/*.class,
              net/sf/colossus/client/*.class,
              net/sf/colossus/parser/*.class,
              net/sf/colossus/server/*.class,
@@ -240,19 +207,16 @@
              ExtTitan,
              Badlands,
              Undead,
-             Outlands"
-        >
+             Outlands">
 			<manifest>
-				<attribute name="Main-Class" value="net/sf/colossus/datatools/BattlelandsBuilder"/>
+				<attribute name="Main-Class" value="net/sf/colossus/datatools/BattlelandsBuilder" />
 			</manifest>
-        </jar>
-        <chmod file="BattlelandsBuilder.jar" perm="755"/>
-</target>
+		</jar>
+		<chmod file="BattlelandsBuilder.jar" perm="755" />
+	</target>
 
-<target name="brjar" depends="init,compile,version"
-        description = "Make Battlelands Randomizer jar file">
-        <jar jarfile = "BattlelandsRandomizer.jar" basedir="."
-             includes="net/sf/colossus/datatools/*.class,
+	<target name="brjar" depends="init,compile,version" description="Make Battlelands Randomizer jar file">
+		<jar jarfile="BattlelandsRandomizer.jar" basedir="." includes="net/sf/colossus/datatools/*.class,
              net/sf/colossus/client/*.class,
              net/sf/colossus/parser/*.class,
              net/sf/colossus/server/*.class,
@@ -262,120 +226,50 @@
              ExtTitan,
              Badlands,
              Undead,
-             Outlands"
-        >
+             Outlands">
 			<manifest>
-				<attribute name="Main-Class" value="net/sf/colossus/datatools/BattlelandsRandomizer"/>
+				<attribute name="Main-Class" value="net/sf/colossus/datatools/BattlelandsRandomizer" />
 			</manifest>
-        </jar>
-        <chmod file="BattlelandsRandomizer.jar" perm="755"/>
-</target>
+		</jar>
+		<chmod file="BattlelandsRandomizer.jar" perm="755" />
+	</target>
 
-<target name="sign" depends="jar"
-        description = "Sign main jar file">
-        <signjar jar="Colossus.jar"
-                 alias="${user.name}"
-                 keystore="${user.name}Keystore"
-                 storepass="${env.JARPASSWORD}"
-        />
-        <chmod file="Colossus.jar" perm="755"/>
-</target>
+	<target name="sign" depends="jar" description="Sign main jar file">
+		<signjar jar="Colossus.jar" alias="${user.name}" keystore="${user.name}Keystore" storepass="${env.JARPASSWORD}" />
+		<chmod file="Colossus.jar" perm="755" />
+	</target>
 
-<target name="signall" depends="jar, sign"
-        description = "Sign all jar files">
-        <signjar jar="libs/jdom.jar"
-                 alias="${user.name}"
-                 keystore="${user.name}Keystore"
-                 storepass="${env.JARPASSWORD}"
-        />
-        <signjar jar="libs/junit.jar"
-                 alias="${user.name}"
-                 keystore="${user.name}Keystore"
-                 storepass="${env.JARPASSWORD}"
-        />
-        <signjar jar="libs/werken.opt.jar"
-                 alias="${user.name}"
-                 keystore="${user.name}Keystore"
-                 storepass="${env.JARPASSWORD}"
-        />
-        <signjar jar="libs/batik-awt-util.jar"
-                 alias="${user.name}"
-                 keystore="${user.name}Keystore"
-                 storepass="${env.JARPASSWORD}"
-        />
-        <signjar jar="libs/batik-bridge.jar"
-                 alias="${user.name}"
-                 keystore="${user.name}Keystore"
-                 storepass="${env.JARPASSWORD}"
-        />
-        <signjar jar="libs/batik-css.jar"
-                 alias="${user.name}"
-                 keystore="${user.name}Keystore"
-                 storepass="${env.JARPASSWORD}"
-        />
-        <signjar jar="libs/batik-dom.jar"
-                 alias="${user.name}"
-                 keystore="${user.name}Keystore"
-                 storepass="${env.JARPASSWORD}"
-        />
-        <signjar jar="libs/batik-ext.jar"
-                 alias="${user.name}"
-                 keystore="${user.name}Keystore"
-                 storepass="${env.JARPASSWORD}"
-        />
-        <signjar jar="libs/batik-gvt.jar"
-                 alias="${user.name}"
-                 keystore="${user.name}Keystore"
-                 storepass="${env.JARPASSWORD}"
-        />
-        <signjar jar="libs/batik-parser.jar"
-                 alias="${user.name}"
-                 keystore="${user.name}Keystore"
-                 storepass="${env.JARPASSWORD}"
-        />
-        <signjar jar="libs/batik-script.jar"
-                 alias="${user.name}"
-                 keystore="${user.name}Keystore"
-                 storepass="${env.JARPASSWORD}"
-        />
-        <signjar jar="libs/batik-svg-dom.jar"
-                 alias="${user.name}"
-                 keystore="${user.name}Keystore"
-                 storepass="${env.JARPASSWORD}"
-        />
-        <signjar jar="libs/batik-transcoder.jar"
-                 alias="${user.name}"
-                 keystore="${user.name}Keystore"
-                 storepass="${env.JARPASSWORD}"
-        />
-        <signjar jar="libs/batik-util.jar"
-                 alias="${user.name}"
-                 keystore="${user.name}Keystore"
-                 storepass="${env.JARPASSWORD}"
-        />
-        <signjar jar="libs/batik-xml.jar"
-                 alias="${user.name}"
-                 keystore="${user.name}Keystore"
-                 storepass="${env.JARPASSWORD}"
-        />
-</target>
+	<target name="signall" depends="jar, sign" description="Sign all jar files">
+		<signjar jar="libs/jdom.jar" alias="${user.name}" keystore="${user.name}Keystore" storepass="${env.JARPASSWORD}" />
+		<signjar jar="libs/junit.jar" alias="${user.name}" keystore="${user.name}Keystore" storepass="${env.JARPASSWORD}" />
+		<signjar jar="libs/werken.opt.jar" alias="${user.name}" keystore="${user.name}Keystore" storepass="${env.JARPASSWORD}" />
+		<signjar jar="libs/batik-awt-util.jar" alias="${user.name}" keystore="${user.name}Keystore" storepass="${env.JARPASSWORD}" />
+		<signjar jar="libs/batik-bridge.jar" alias="${user.name}" keystore="${user.name}Keystore" storepass="${env.JARPASSWORD}" />
+		<signjar jar="libs/batik-css.jar" alias="${user.name}" keystore="${user.name}Keystore" storepass="${env.JARPASSWORD}" />
+		<signjar jar="libs/batik-dom.jar" alias="${user.name}" keystore="${user.name}Keystore" storepass="${env.JARPASSWORD}" />
+		<signjar jar="libs/batik-ext.jar" alias="${user.name}" keystore="${user.name}Keystore" storepass="${env.JARPASSWORD}" />
+		<signjar jar="libs/batik-gvt.jar" alias="${user.name}" keystore="${user.name}Keystore" storepass="${env.JARPASSWORD}" />
+		<signjar jar="libs/batik-parser.jar" alias="${user.name}" keystore="${user.name}Keystore" storepass="${env.JARPASSWORD}" />
+		<signjar jar="libs/batik-script.jar" alias="${user.name}" keystore="${user.name}Keystore" storepass="${env.JARPASSWORD}" />
+		<signjar jar="libs/batik-svg-dom.jar" alias="${user.name}" keystore="${user.name}Keystore" storepass="${env.JARPASSWORD}" />
+		<signjar jar="libs/batik-transcoder.jar" alias="${user.name}" keystore="${user.name}Keystore" storepass="${env.JARPASSWORD}" />
+		<signjar jar="libs/batik-util.jar" alias="${user.name}" keystore="${user.name}Keystore" storepass="${env.JARPASSWORD}" />
+		<signjar jar="libs/batik-xml.jar" alias="${user.name}" keystore="${user.name}Keystore" storepass="${env.JARPASSWORD}" />
+	</target>
 
 
 
-<!-- Tasks from here down are only needed for installation on the web site. -->
+	<!-- Tasks from here down are only needed for installation on the web site. -->
 
-<target name="changelog" depends=""
-        description = "Create a ChangeLog file from cvs history">
-        <exec executable="cvs2cl.pl">
-            <arg line="-S --no-wrap --utc"/>
-        </exec>
-        <delete verbose="yes" file = "ChangeLog.bak"/>
-</target>
+	<target name="changelog" depends="" description="Create a ChangeLog file from cvs history">
+		<exec executable="cvs2cl.pl">
+			<arg line="-S --no-wrap --utc" />
+		</exec>
+		<delete verbose="yes" file="ChangeLog.bak" />
+	</target>
 
-<target name="dist" depends="clean,init,sign,changelog"
-        description = "Make zip file for user download">
-        <zip zipfile="${ZIPFILE}" basedir="."
-             excludes="**/*.sav,
+	<target name="dist" depends="clean,init,sign,changelog" description="Make zip file for user download">
+		<zip zipfile="${ZIPFILE}" basedir="." excludes="**/*.sav,
                  **/*.zip,
                  **/*.bak,
                  **/*javadoc*/*,
@@ -390,49 +284,50 @@
                  **/*.bib,
                  **/*.blg,
                  **/*.log,
-                 **/*.old"
-        />
-</target>
+                 **/*.old" />
+	</target>
 
 
-<target name="inst" depends="clean,init,sign,dist,changelog"
-        description = "Locally copy files into htdocs tree on SF">
-        <copy file="Colossus.jar" todir="${HTML_DIR}"/>
-        <copy file="Colossus.jnlp" todir="${HTML_DIR}"/>
-        <move file="${ZIPFILE}" todir="${DOWNLOAD_DIR}"/>
-        <copy file="ChangeLog" todir="${HTML_DIR}"/>
-        <copy todir="${DOCS_DIR}"> <fileset dir="docs"/></copy>
-        <copy todir="${LIBS_DIR}"> <fileset dir="libs"/></copy>
-</target>
+	<target name="inst" depends="clean,init,sign,dist,changelog" description="Locally copy files into htdocs tree on SF">
+		<copy file="Colossus.jar" todir="${HTML_DIR}" />
+		<copy file="Colossus.jnlp" todir="${HTML_DIR}" />
+		<move file="${ZIPFILE}" todir="${DOWNLOAD_DIR}" />
+		<copy file="ChangeLog" todir="${HTML_DIR}" />
+		<copy todir="${DOCS_DIR}">
+			<fileset dir="docs" />
+		</copy>
+		<copy todir="${LIBS_DIR}">
+			<fileset dir="libs" />
+		</copy>
+	</target>
 
-<!-- TODO Eliminate double maintenance -->
-<!-- This requires rsync and a good ssh-agent setup. -->
-<target name="remote-inst" depends="clean,init,sign,dist,changelog"
-        description = "copy files into htdocs tree on SF">
-        <exec executable="rsync">
-            <arg line="-e ssh Colossus.jar ${SERVER}:${HTML_DIR}"/>
-        </exec>
-        <exec executable="rsync">
-            <arg line="-e ssh Colossus.jnlp ${SERVER}:${HTML_DIR}"/>
-        </exec>
-        <exec executable="ssh">
-            <arg line="${SERVER} mkdir ${LIBS_DIR}"/>
-        </exec>
-        <exec executable="rsync">
-            <arg line="-e ssh -pt libs/ ${SERVER}:${LIBS_DIR}"/>
-        </exec>
-        <exec executable="rsync">
-            <arg line="-e ssh ChangeLog ${SERVER}:${HTML_DIR}"/>
-        </exec>
-        <exec executable="rsync">
-            <arg line="-e ssh ${ZIPFILE} ${SERVER}:${DOWNLOAD_DIR}"/>
-        </exec>
-        <exec executable="ssh">
-            <arg line="${SERVER} mkdir ${DOCS_DIR}"/>
-        </exec>
-        <exec executable="rsync">
-            <arg line="-e ssh -pt docs/* ${SERVER}:${DOCS_DIR}"/>
-        </exec>
-</target>
+	<!-- TODO Eliminate double maintenance -->
+	<!-- This requires rsync and a good ssh-agent setup. -->
+	<target name="remote-inst" depends="clean,init,sign,dist,changelog" description="copy files into htdocs tree on SF">
+		<exec executable="rsync">
+			<arg line="-e ssh Colossus.jar ${SERVER}:${HTML_DIR}" />
+		</exec>
+		<exec executable="rsync">
+			<arg line="-e ssh Colossus.jnlp ${SERVER}:${HTML_DIR}" />
+		</exec>
+		<exec executable="ssh">
+			<arg line="${SERVER} mkdir ${LIBS_DIR}" />
+		</exec>
+		<exec executable="rsync">
+			<arg line="-e ssh -pt libs/ ${SERVER}:${LIBS_DIR}" />
+		</exec>
+		<exec executable="rsync">
+			<arg line="-e ssh ChangeLog ${SERVER}:${HTML_DIR}" />
+		</exec>
+		<exec executable="rsync">
+			<arg line="-e ssh ${ZIPFILE} ${SERVER}:${DOWNLOAD_DIR}" />
+		</exec>
+		<exec executable="ssh">
+			<arg line="${SERVER} mkdir ${DOCS_DIR}" />
+		</exec>
+		<exec executable="rsync">
+			<arg line="-e ssh -pt docs/* ${SERVER}:${DOCS_DIR}" />
+		</exec>
+	</target>
 
 </project>
