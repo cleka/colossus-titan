@@ -3,11 +3,17 @@ package net.sf.colossus.client;
 import net.sf.colossus.server.Creature;
 
 
-// the AI wants to save some useful informarmation along with 
+// the AI wants to save some useful information along with 
 //   each creature. i thought about extending the Creature class
 //   by a aiData field, but we can have multiple AIs in a game.
 //   so the data must be stored in the AI instance itself.
 //   there is a 1:1 map from each Creature instance to AiCreatureInfo.
+
+/**
+ * TODO: this class breaks a few rules of good design: overriding hashCode() without
+ * overriding equals(), extensive use of package-private access, odd declaration of
+ * final methods and funny naming (what does the "1" behind "killValue" mean?). 
+ */
 class AiCreatureInfo
 {
     /**
