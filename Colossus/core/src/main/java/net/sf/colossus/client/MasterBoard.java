@@ -147,13 +147,11 @@ public final class MasterBoard extends JPanel
                 if (legionFlyouts == null)
                 {
                     List markers = client.getMarkers();
+                    // copy to array so we don't get concurrent modification exceptions when iterating
+                    Marker[] markerArray = (Marker[]) markers.toArray(new Marker[markers.size()]);
                     legionFlyouts = new JPanel[markers.size()];
-                    int i = 0;
-                    for (Iterator iter = markers.iterator(); iter.hasNext();)
-                    {
-                    	// TODO this next line can cause ConcurrentModificationExceptions if the game
-                    	// continues while the flyouts are shown
-                        Marker marker = (Marker)iter.next();
+                    for (int i = 0; i < markerArray.length; i++) {
+						Marker marker = markerArray[i];
                         LegionInfo legion = client.getLegionInfo(
                             marker.getId());
                         List imageNames = legion.getImageNames();
@@ -185,7 +183,6 @@ public final class MasterBoard extends JPanel
 
                         add(panel);
                         legionFlyouts[i] = panel;
-                        i++;
 
                         panel.setSize(imageNames.size() * scale +
                             2 * PANEL_MARGIN,
