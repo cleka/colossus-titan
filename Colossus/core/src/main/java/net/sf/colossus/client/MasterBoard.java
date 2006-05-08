@@ -133,7 +133,6 @@ public final class MasterBoard extends JPanel
         private static final int PANEL_MARGIN = 4;
 
         private final Client client;
-        private Point lastMousePos;
 
         private InfoPopupHandler(Client client)
         {
@@ -152,6 +151,8 @@ public final class MasterBoard extends JPanel
                     int i = 0;
                     for (Iterator iter = markers.iterator(); iter.hasNext();)
                     {
+                    	// TODO this next line can cause ConcurrentModificationExceptions if the game
+                    	// continues while the flyouts are shown
                         Marker marker = (Marker)iter.next();
                         LegionInfo legion = client.getLegionInfo(
                             marker.getId());
@@ -192,29 +193,23 @@ public final class MasterBoard extends JPanel
                         panel.setLocation(marker.getLocation());
                         panel.setVisible(true);
                         panel.addMouseMotionListener(new MouseMotionAdapter() {
+                            private Point lastMousePos;
                             public void mouseDragged(MouseEvent e)
                             {
+                            	Point loc = panel.getLocation();
+                            	// find mouse pos on parent instead of on panel, since the latter moves
+                            	Point newMousePos = e.getPoint();
+                            	newMousePos.translate(loc.x, loc.y);
+                            	
                                 if (lastMousePos != null)
                                 {
-                                    Point loc = panel.getLocation();
-                                    int diffX = e.getPoint().x - 
-                                        lastMousePos.x;
-                                    int diffY = e.getPoint().y - 
-                                        lastMousePos.y;
+                                    int diffX = newMousePos.x - lastMousePos.x;
+                                    int diffY = newMousePos.y - lastMousePos.y;
                                     loc.x += diffX;
                                     loc.y += diffY;
                                     panel.setLocation(loc);
-                                    lastMousePos = e.getPoint();
-                                    // lastMousePos is read relative to panel, 
-                                    // so adjust for movement
-                                    lastMousePos.x -= diffX;
-                                    lastMousePos.x -= diffY;
                                 }
-                                else
-                                {
-                                    lastMousePos = e.getPoint();
-                                }
-                                super.mouseMoved(e);
+                                lastMousePos = newMousePos;
                             }
                         }
                         );
