@@ -11,15 +11,47 @@ import java.awt.GraphicsEnvironment;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.Toolkit;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.InputEvent;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.ConcurrentModificationException;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Map;
+import java.util.Set;
 
-import javax.swing.*;
+import javax.swing.AbstractAction;
+import javax.swing.JButton;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
+import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 
-import net.sf.colossus.xmlparser.StrategicMapLoader;
-import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.Creature;
 import net.sf.colossus.server.VariantSupport;
@@ -28,6 +60,8 @@ import net.sf.colossus.util.HTMLColor;
 import net.sf.colossus.util.Log;
 import net.sf.colossus.util.Options;
 import net.sf.colossus.util.ResourceLoader;
+import net.sf.colossus.xmlparser.StrategicMapLoader;
+import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
 
 /**
@@ -131,6 +165,7 @@ public final class MasterBoard extends JPanel
     private final class InfoPopupHandler extends KeyAdapter {
         private static final int POPUP_KEY = KeyEvent.VK_SHIFT;
         private static final int PANEL_MARGIN = 4;
+        private static final int PANEL_PADDING = 0;
 
         private final Client client;
 
@@ -152,45 +187,20 @@ public final class MasterBoard extends JPanel
                     legionFlyouts = new JPanel[markers.size()];
                     for (int i = 0; i < markerArray.length; i++) {
 						Marker marker = markerArray[i];
-                        LegionInfo legion = client.getLegionInfo(
-                            marker.getId());
-                        List imageNames = legion.getImageNames();
-                        List certainties = legion.getCertainties();
-
-                        final JPanel panel = new JPanel(null);
-                        Color playerColor =
-                            HTMLColor.stringToColor(
-                                legion.getPlayerInfo().getColor() + 
-                                "Colossus");
-                        panel.setBackground(playerColor);
-                        int scale = 2 * Scale.get();
-
-                        Iterator it = imageNames.iterator();
-                        Iterator it2 = certainties.iterator();
-                        int j = 0;
-                        while (it.hasNext())
-                        {
-                            String imageName = (String)it.next();
-                            boolean sure = 
-                                ((Boolean)it2.next()).booleanValue();
-                            Chit chit = new Chit(scale, imageName, panel, 
-                                false, !sure);
-                            panel.add(chit);
-                            chit.setLocation(scale * j + PANEL_MARGIN,
-                                PANEL_MARGIN);
-                            j++;
-                        }
-
+                        LegionInfo legion = client.getLegionInfo( marker.getId());
+                        int scale = 2*Scale.get();
+                        
+						final JPanel panel = new LegionInfoPanel(legion, scale, PANEL_MARGIN, PANEL_PADDING);
                         add(panel);
                         legionFlyouts[i] = panel;
 
-                        panel.setSize(imageNames.size() * scale +
-                            2 * PANEL_MARGIN,
-                            scale + 2 * PANEL_MARGIN);
                         panel.setLocation(marker.getLocation());
                         panel.setVisible(true);
                         panel.addMouseMotionListener(new MouseMotionAdapter() {
+                        	// TODO this needs to be reset on mouse release, otherwise the second and consecutive
+                        	// moves might be jumpy
                             private Point lastMousePos;
+                            
                             public void mouseDragged(MouseEvent e)
                             {
                             	Point loc = panel.getLocation();
@@ -2019,10 +2029,9 @@ public final class MasterBoard extends JPanel
                 // Right-click means to show the contents of the legion.
                 if (isPopupButton(e))
                 {
-                    new ShowLegion(masterFrame, markerId,
-                        client.getLegionImageNames(markerId),
-                        client.getLegionCreatureCertainties(markerId),
-                        point, scrollPane);
+                	LegionInfo legion = client.getLegionInfo(markerId);
+                    new ShowLegion(masterFrame, marker, legion,
+                        point, scrollPane, 4 * Scale.get());
                     return;
                 }
                 else if (client.isMyLegion(markerId))
