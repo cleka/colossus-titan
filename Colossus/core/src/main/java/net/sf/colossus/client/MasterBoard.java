@@ -19,7 +19,6 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionAdapter;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.FileNotFoundException;
@@ -196,30 +195,7 @@ public final class MasterBoard extends JPanel
 
                         panel.setLocation(marker.getLocation());
                         panel.setVisible(true);
-                        panel.addMouseMotionListener(new MouseMotionAdapter() {
-                        	// TODO this needs to be reset on mouse release, otherwise the second and consecutive
-                        	// moves might be jumpy
-                            private Point lastMousePos;
-                            
-                            public void mouseDragged(MouseEvent e)
-                            {
-                            	Point loc = panel.getLocation();
-                            	// find mouse pos on parent instead of on panel, since the latter moves
-                            	Point newMousePos = e.getPoint();
-                            	newMousePos.translate(loc.x, loc.y);
-                            	
-                                if (lastMousePos != null)
-                                {
-                                    int diffX = newMousePos.x - lastMousePos.x;
-                                    int diffY = newMousePos.y - lastMousePos.y;
-                                    loc.x += diffX;
-                                    loc.y += diffY;
-                                    panel.setLocation(loc);
-                                }
-                                lastMousePos = newMousePos;
-                            }
-                        }
-                        );
+                        DragListener.makeDraggable(panel);
 
                         repaint();
                     }
