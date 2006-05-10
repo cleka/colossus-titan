@@ -27,7 +27,7 @@ import net.sf.colossus.xmlparser.TerrainRecruitLoader;
  * @author David Ripton
  * @author Barrie Treloar
  */
-public class AbstractShowRecruits extends KDialog implements MouseListener,
+public abstract class AbstractShowRecruits extends KDialog implements MouseListener,
         WindowListener
 {
 
