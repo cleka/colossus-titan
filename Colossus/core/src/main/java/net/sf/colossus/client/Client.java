@@ -54,6 +54,7 @@ public final class Client implements IClient, IOracle, IOptions
     private SummonAngel summonAngel;
     private MovementDie movementDie;
     private EngagementResults engagementResults;
+    private AutoInspector autoInspector;
 
     /** hexLabel of MasterHex for current or last engagement. */
     private String battleSite;
@@ -313,6 +314,15 @@ public final class Client implements IClient, IOracle, IOptions
         }
     }
 
+    /**
+     * Displays the legion if possible.
+     */
+    public void showLegion(LegionInfo legion) {
+    	if (autoInspector != null) {
+			autoInspector.showLegion(legion);
+		}
+    }
+    
     /** Legion summoner summons unit from legion donor. */
     void doSummon(String summoner, String donor, String unit)
     {
@@ -540,7 +550,7 @@ public final class Client implements IClient, IOracle, IOptions
         else if (optname.equals(Options.logDebug))
         {
             // XXX move this to server
-            // XXX Now this uses Log4J should this be moved to the server still?
+            // XXX Now this uses JDK logging should this be moved to the server still?
             if (bval) {
                 Logger.global.setLevel(Level.ALL);
             }
@@ -573,6 +583,28 @@ public final class Client implements IClient, IOracle, IOptions
         else if (optname.equals(Options.showStatusScreen))
         {
             updateStatusScreen();
+        }
+        else if (optname.equals(Options.showAutoInspector))
+        {
+            if (bval)
+            {
+                if (autoInspector == null) {
+                	JFrame parent = secondaryParent;
+                	if((parent == null) && (board != null)) {
+                		parent = board.getFrame();
+                	}
+                	// TODO it seems board is null here if called on startup, we need to initialize this later
+                	autoInspector = new AutoInspector(parent, this);
+                }
+            }
+            else
+            {
+                if (autoInspector != null) {
+                	autoInspector.setVisible(false);
+                	autoInspector.dispose();
+                	autoInspector = null;
+                }
+            }
         }
         else if (optname.equals(Options.showEngagementResults))
         {

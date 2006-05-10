@@ -55,6 +55,7 @@ public final class Options
     public static final String stealFocus = "Steal focus";
     public static final String showCaretaker = "Show Caretaker's stacks";
     public static final String showStatusScreen = "Show game status";
+    public static final String showAutoInspector = "Show inspector";
     public static final String showLogWindow = "Show log window";
     public static final String showEngagementResults = 
             "Show engagement results";

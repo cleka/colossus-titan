@@ -19,6 +19,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.FileNotFoundException;
@@ -326,6 +327,7 @@ public final class MasterBoard extends JPanel
         setBackground(Color.black);
         masterFrame.addWindowListener(new MasterBoardWindowHandler());
         addMouseListener(new MasterBoardMouseHandler());
+        addMouseMotionListener(new MasterBoardMouseMotionHandler());
         addKeyListener(new InfoPopupHandler(client));
 
         setupGUIHexes();
@@ -769,6 +771,7 @@ public final class MasterBoard extends JPanel
         addCheckBox(graphicsMenu, Options.showStatusScreen, KeyEvent.VK_G);
         addCheckBox(graphicsMenu, Options.showEngagementResults,
             KeyEvent.VK_E);
+        addCheckBox(graphicsMenu, Options.showAutoInspector, KeyEvent.VK_I);
         addCheckBox(graphicsMenu, Options.showLogWindow, KeyEvent.VK_L);
         addCheckBox(graphicsMenu, Options.antialias, KeyEvent.VK_N);
         addCheckBox(graphicsMenu, Options.useOverlay, KeyEvent.VK_V);
@@ -2052,6 +2055,21 @@ public final class MasterBoard extends JPanel
             if (client.getPlayerName().equals(client.getActivePlayerName()))
             {
                 actOnMisclick();
+            }
+        }
+    }
+
+    class MasterBoardMouseMotionHandler extends MouseMotionAdapter
+    {
+        public void mouseMoved(MouseEvent e)
+        {
+            Point point = e.getPoint();
+            Marker marker = getMarkerAtPoint(point);
+            if (marker != null)
+            {
+                String markerId = marker.getId();
+               	LegionInfo legion = client.getLegionInfo(markerId);
+               	client.showLegion(legion);
             }
         }
     }
