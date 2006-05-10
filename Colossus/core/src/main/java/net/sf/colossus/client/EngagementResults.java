@@ -64,7 +64,8 @@ final class EngagementResults extends KDialog
     private boolean advanceToLast=false;
 
     /** 
-     * inits the diaolog, not opens it.
+     * Inits the dialog, not opens it.
+     * 
      * @param frame is the parent window
      * @param oracle gives us information
      */
@@ -81,7 +82,6 @@ final class EngagementResults extends KDialog
         setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
         this.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
-                super.windowClosing(e);
                 options.setOption(Options.showEngagementResults, false);
             }
         }
