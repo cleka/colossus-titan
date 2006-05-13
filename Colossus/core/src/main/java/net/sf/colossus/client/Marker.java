@@ -5,6 +5,8 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 /**
@@ -15,6 +17,8 @@ import java.awt.Graphics;
 
 final class Marker extends Chit
 {
+	private static final Logger LOGGER = Logger.getLogger(Marker.class.getName());
+	
     private Font font;
     private Font oldFont;
     private int fontHeight;
@@ -34,6 +38,7 @@ final class Marker extends Chit
     /** Show the height of the legion. */
     public void paintComponent(Graphics g)
     {
+    	LOGGER.log(Level.FINEST, "Painting marker");
         super.paintComponent(g);
 
         if (client == null)
@@ -41,7 +46,8 @@ final class Marker extends Chit
             return;
         }
 
-        String height = Integer.toString(client.getLegionHeight(getId()));
+        String legionHeightString = Integer.toString(client.getLegionHeight(getId()));
+    	LOGGER.log(Level.FINEST, "Height is " + legionHeightString);
 
         // Construct a font 1.5 times the size of the current font.
         if (font == null)
@@ -56,13 +62,21 @@ final class Marker extends Chit
             // XXX getAscent() seems to return too large a number
             // Test this 80% fudge factor on multiple platforms.
             fontHeight = 4 * fontMetrics.getAscent() / 5;
-            fontWidth = fontMetrics.stringWidth(height);
+            fontWidth = fontMetrics.stringWidth(legionHeightString);
+            if(LOGGER.isLoggable(Level.FINEST)) {
+            	LOGGER.log(Level.FINEST, "New font set: " + font);
+            	LOGGER.log(Level.FINEST, "New font height: " + fontHeight);
+            	LOGGER.log(Level.FINEST, "New font width: " + fontWidth);
+            }
         }
         else
         {
             g.setFont(font);
         }
 
+        if(LOGGER.isLoggable(Level.FINEST)) {
+        	LOGGER.log(Level.FINEST, "Our rectangle is: " + rect);
+        }
         int x = rect.x + rect.width * 3 / 4 - fontWidth / 2;
         int y = rect.y + rect.height * 2 / 3 + fontHeight / 2;
 
@@ -72,7 +86,7 @@ final class Marker extends Chit
 
         // Show height in black.
         g.setColor(Color.black);
-        g.drawString(height, x, y);
+        g.drawString(legionHeightString, x, y);
 
         // Restore the font.
         g.setFont(oldFont);
