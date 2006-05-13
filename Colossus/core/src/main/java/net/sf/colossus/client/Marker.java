@@ -44,6 +44,8 @@ final class Marker extends Chit
 
         if (client == null)
         {
+        	// TODO shouldn't this be caught in the constructor?
+        	LOGGER.log(Level.SEVERE, "Marker has no client attached to it");
             return;
         }
 
