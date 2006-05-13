@@ -2067,9 +2067,7 @@ public final class MasterBoard extends JPanel
             Marker marker = getMarkerAtPoint(point);
             if (marker != null)
             {
-                String markerId = marker.getId();
-               	LegionInfo legion = client.getLegionInfo(markerId);
-               	client.showLegion(legion);
+               	client.showMarker(marker);
             }
         }
     }

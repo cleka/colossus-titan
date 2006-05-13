@@ -8,7 +8,18 @@ import java.awt.Point;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.InputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -17,7 +28,6 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
-import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.Creature;
 import net.sf.colossus.server.Dice;
@@ -29,6 +39,7 @@ import net.sf.colossus.util.LogWindow;
 import net.sf.colossus.util.Options;
 import net.sf.colossus.util.ResourceLoader;
 import net.sf.colossus.util.Split;
+import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
 
 /**
@@ -315,11 +326,13 @@ public final class Client implements IClient, IOracle, IOptions
     }
 
     /**
-     * Displays the legion if possible.
+     * Displays the marker and its legion if possible.
      */
-    public void showLegion(LegionInfo legion) {
+    public void showMarker(Marker marker) {
     	if (autoInspector != null) {
-			autoInspector.showLegion(legion);
+            String markerId = marker.getId();
+           	LegionInfo legion = getLegionInfo(markerId);
+			autoInspector.showLegion(marker, legion);
 		}
     }
     

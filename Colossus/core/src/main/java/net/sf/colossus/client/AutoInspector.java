@@ -4,12 +4,14 @@ package net.sf.colossus.client;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Point;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
 import javax.swing.JDialog;
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import net.sf.colossus.util.KDialog;
@@ -62,9 +64,13 @@ public class AutoInspector extends KDialog
     	return new Dimension(200,50);
     }
     
-    public void showLegion(LegionInfo legion) {
+    public void showLegion(Marker marker, LegionInfo legion) {
 		scrollPane.getViewport().removeAll();
-		scrollPane.getViewport().add(new LegionInfoPanel(legion, 4 * Scale.get(), 5, 2, false));
+		JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+		// TODO for some reason the marker won't display itself properly here
+		//panel.add(marker);
+		panel.add(new LegionInfoPanel(legion, 4 * Scale.get(), 5, 2, false));
+		scrollPane.getViewport().add(panel);
     	repaint();
     }
 }
