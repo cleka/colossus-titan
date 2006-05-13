@@ -20,7 +20,6 @@ final class Marker extends Chit
 	private static final Logger LOGGER = Logger.getLogger(Marker.class.getName());
 	
     private Font font;
-    private Font oldFont;
     private int fontHeight;
     private int fontWidth;
 
@@ -41,6 +40,8 @@ final class Marker extends Chit
     	LOGGER.log(Level.FINEST, "Painting marker");
         super.paintComponent(g);
 
+        Font oldFont = g.getFont();
+
         if (client == null)
         {
             return;
@@ -52,7 +53,6 @@ final class Marker extends Chit
         // Construct a font 1.5 times the size of the current font.
         if (font == null)
         {
-            oldFont = g.getFont();
             String name = oldFont.getName();
             int size = oldFont.getSize();
             int style = oldFont.getStyle();
