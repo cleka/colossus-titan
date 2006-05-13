@@ -26,7 +26,7 @@ final class Marker extends Chit
     Marker(int scale, String id, Client client)
     {
         super(scale, id);
-        setBackground(Color.black);
+        setBackground(Color.BLACK);
         this.client = client;
         if (getId().startsWith("Bk"))
         {
