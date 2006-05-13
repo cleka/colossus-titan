@@ -60,7 +60,7 @@ final class AcquireAngel extends KDialog implements MouseListener,
         while (it.hasNext())
         {
             String creatureName = (String)it.next();
-            Chit chit = new Chit(4 * Scale.get(), creatureName, this);
+            Chit chit = new Chit(4 * Scale.get(), creatureName);
             chits.add(chit);
             contentPane.add(chit);
             chit.addMouseListener(this);

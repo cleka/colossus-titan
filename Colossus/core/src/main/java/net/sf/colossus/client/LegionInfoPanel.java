@@ -35,7 +35,7 @@ public final class LegionInfoPanel extends JPanel {
         {
             String imageName = (String)it.next();
             boolean sure = ((Boolean)it2.next()).booleanValue();
-            Chit chit = new Chit(scale, imageName, this, false, !sure);
+            Chit chit = new Chit(scale, imageName, false, !sure);
             if (effectiveChitSize == 0) {
 				effectiveChitSize = chit.getWidth(); // they should be all the same size
 			}

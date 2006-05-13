@@ -3,7 +3,6 @@ package net.sf.colossus.client;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -38,7 +37,6 @@ class Chit extends JPanel
     private ImageIcon icon;
     private ImageIcon invertedIcon;
     Rectangle rect;
-    private Container container;
     Client client;  // may be null; set for some subclasses
 
     /** Flag to mark chit as dead and paint it with an "X" through it. */
@@ -56,18 +54,17 @@ class Chit extends JPanel
     static BasicStroke oneWide = new BasicStroke(1);
     static BasicStroke threeWide = new BasicStroke(3);
 
-    Chit(int scale, String id, Container container)
+    Chit(int scale, String id)
     {
-        this(scale, id, container, false, false);
+        this(scale, id, false, false);
     }
 
-    Chit(int scale, String id, Container container, boolean inverted)
+    Chit(int scale, String id, boolean inverted)
     {
-        this(scale, id, container, inverted, false);
+        this(scale, id, inverted, false);
     }
 
-    Chit(int scale, String id, Container container, boolean inverted,
-            boolean dubious)
+    Chit(int scale, String id, boolean inverted, boolean dubious)
     {
         super();
 
@@ -84,7 +81,6 @@ class Chit extends JPanel
         rect = new Rectangle(point.x, point.y, scale, scale);
         setBounds(rect);
 
-        this.container = container;
         this.id = id;
 
         setBackground(Color.lightGray);
@@ -203,11 +199,6 @@ class Chit extends JPanel
 
     public void paintComponent(Graphics g)
     {
-        if (container == null)
-        {
-            return;
-        }
-
         Graphics2D g2 = (Graphics2D)g;
         super.paintComponent(g2);
         Image image = icon.getImage();
@@ -239,7 +230,7 @@ class Chit extends JPanel
             image = invertedIcon.getImage();
         }
         g2.drawImage(image, rect.x, rect.y, rect.width,
-                rect.height, container);
+                rect.height, this);
         if (isDead())
         {
             // Draw a triple-wide red X.

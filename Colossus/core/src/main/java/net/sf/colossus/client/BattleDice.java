@@ -140,7 +140,7 @@ final class BattleDice extends Box
                 String imageName = getDieImageName((String)rolls.get(i));
                 if (imageName != null)
                 {
-                    dice[i] = new Chit(2 * Scale.get(), imageName, this);
+                    dice[i] = new Chit(2 * Scale.get(), imageName);
                     if (averageMiss > i)
                     {
                         missBox.add(dice[i]);

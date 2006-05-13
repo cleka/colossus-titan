@@ -434,7 +434,7 @@ public final class Client implements IClient, IOracle, IOptions
         if (board != null)
         {
             movementDie = new MovementDie(4 * Scale.get(),
-                MovementDie.getDieImageName(roll), board);
+                MovementDie.getDieImageName(roll));
         }
     }
 
@@ -1315,7 +1315,7 @@ public final class Client implements IClient, IOracle, IOptions
             colorName = getColorByMarkerId(attackerMarkerId);
         }
         BattleChit chit = new BattleChit((int)(5 * Scale.get()), imageName,
-            map, inverted, tag, hexLabel, colorName, this);
+            inverted, tag, hexLabel, colorName, this);
         battleChits.add(chit);
     }
 
@@ -1328,7 +1328,7 @@ public final class Client implements IClient, IOracle, IOptions
     {
         int scale = 2 * Scale.get();
         GUIMasterHex hex = board.getGUIHexByLabel(hexLabel);
-        Chit chit = new Chit(scale, imageName, board);
+        Chit chit = new Chit(scale, imageName);
         Point startingPoint = hex.getOffCenter();
         Point point = new Point(startingPoint);
         point.x -= scale / 2;
@@ -1362,7 +1362,7 @@ public final class Client implements IClient, IOracle, IOptions
             }
             int scale = 2 * Scale.get();
             GUIMasterHex hex = board.getGUIHexByLabel(hexLabel);
-            Chit chit = new Chit(scale, imageName, board);
+            Chit chit = new Chit(scale, imageName);
             Point startingPoint = hex.getOffCenter();
             Point point = new Point(startingPoint);
             point.x -= scale / 2;
@@ -1384,6 +1384,7 @@ public final class Client implements IClient, IOracle, IOptions
         while (it.hasNext())
         {
             Chit chit = (Chit)it.next();
+            // TODO the next line can cause an NPE when the user closes the client app
             GUIMasterHex hex = board.getGUIHexByLabel(hexLabel);
             if (hex != null && hex.contains(chit.getCenter()))
             {
@@ -2518,7 +2519,7 @@ public final class Client implements IClient, IOracle, IOptions
         if (board != null)
         {
             Marker marker = new Marker(3 * Scale.get(), markerId,
-                board.getFrame(), this);
+                this);
             setMarker(markerId, marker);
             info.setMarker(marker);
             board.alignLegions(hexLabel);
@@ -2538,7 +2539,7 @@ public final class Client implements IClient, IOracle, IOptions
             String markerId = info.getMarkerId();
             String hexLabel = info.getHexLabel();
             Marker marker = new Marker(3 * Scale.get(), markerId,
-                board.getFrame(), this);
+                this);
             info.setMarker(marker);
             markers.add(marker);
             board.alignLegions(hexLabel);
@@ -3837,7 +3838,7 @@ public final class Client implements IClient, IOracle, IOptions
         if (board != null)
         {
             Marker marker = new Marker(3 * Scale.get(), childId,
-                board.getFrame(), this);
+                this);
             setMarker(childId, marker);
             board.alignLegions(hexLabel);
         }

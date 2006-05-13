@@ -86,7 +86,7 @@ final class SummonAngel extends KDialog implements MouseListener,
         {
             Chit tempChit;
             Creature c = (Creature)it.next();
-            tempChit = new Chit(scale, c.getName(), this);
+            tempChit = new Chit(scale, c.getName());
             contentPane.add(tempChit);
             tempChit.addMouseListener(this);
 

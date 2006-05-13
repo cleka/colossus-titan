@@ -85,7 +85,7 @@ public abstract class AbstractShowRecruits extends KDialog implements MouseListe
             panel.add(numToRecruitLabel);
             numToRecruitLabel.addMouseListener(this);
 
-            Chit chit = new Chit(scale, creature.getName(), this);
+            Chit chit = new Chit(scale, creature.getName());
             panel.add(chit);
             chit.addMouseListener(this);
 

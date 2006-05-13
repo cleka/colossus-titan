@@ -102,7 +102,7 @@ final class Concede extends KDialog implements ActionListener, WindowListener
 
         int scale = 4 * Scale.get();
 
-        Marker marker = new Marker(scale, markerId, this, client);
+        Marker marker = new Marker(scale, markerId, client);
         pane.add(marker);
         pane.add(Box.createRigidArea(new Dimension(scale / 4, 0)));
 
@@ -111,7 +111,7 @@ final class Concede extends KDialog implements ActionListener, WindowListener
         while (it.hasNext())
         {
             String imageName = (String)it.next();
-            Chit chit = new Chit(scale, imageName, this);
+            Chit chit = new Chit(scale, imageName);
             pane.add(chit);
         }
     }

@@ -55,7 +55,7 @@ final class PickMarker extends KDialog implements MouseListener, WindowListener
         while (it.hasNext())
         {
             String markerId = (String)it.next();
-            Marker marker = new Marker(4 * Scale.get(), markerId, this, null);
+            Marker marker = new Marker(4 * Scale.get(), markerId, null);
             markers.add(marker);
             contentPane.add(marker);
             marker.addMouseListener(this);

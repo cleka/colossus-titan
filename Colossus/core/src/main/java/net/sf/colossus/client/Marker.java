@@ -2,7 +2,6 @@ package net.sf.colossus.client;
 
 
 import java.awt.Color;
-import java.awt.Container;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
@@ -21,9 +20,9 @@ final class Marker extends Chit
     private int fontHeight;
     private int fontWidth;
 
-    Marker(int scale, String id, Container container, Client client)
+    Marker(int scale, String id, Client client)
     {
-        super(scale, id, container);
+        super(scale, id);
         setBackground(Color.black);
         this.client = client;
         if (getId().startsWith("Bk"))

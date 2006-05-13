@@ -60,7 +60,7 @@ final class PickRecruit extends KDialog implements MouseListener,
         JPanel legionPane = new JPanel();
         contentPane.add(legionPane);
 
-        legionMarker = new Marker(scale, markerId, this, null);
+        legionMarker = new Marker(scale, markerId, null);
         legionPane.add(legionMarker);
 
         List imageNames = client.getLegionImageNames(markerId);
@@ -68,7 +68,7 @@ final class PickRecruit extends KDialog implements MouseListener,
         while (it.hasNext())
         {
             String imageName = (String)it.next();
-            Chit chit = new Chit(scale, imageName, this);
+            Chit chit = new Chit(scale, imageName);
             legionChits.add(chit);
             legionPane.add(chit);
         }
@@ -86,7 +86,7 @@ final class PickRecruit extends KDialog implements MouseListener,
 
             Creature recruit = (Creature)it.next();
             String recruitName = recruit.getName();
-            Chit chit = new Chit(scale, recruitName, this);
+            Chit chit = new Chit(scale, recruitName);
             recruitChits.add(chit);
 
             vertPane.add(chit);

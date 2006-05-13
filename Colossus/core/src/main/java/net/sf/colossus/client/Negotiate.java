@@ -96,7 +96,7 @@ final class Negotiate extends KDialog implements MouseListener, ActionListener
 
         int scale = 4 * Scale.get();
 
-        Marker marker = new Marker(scale, markerId, this, client);
+        Marker marker = new Marker(scale, markerId, client);
         pane.add(marker);
         pane.add(Box.createRigidArea(new Dimension(scale / 4, 0)));
 
@@ -105,7 +105,7 @@ final class Negotiate extends KDialog implements MouseListener, ActionListener
         while (it.hasNext())
         {
             String imageName = (String)it.next();
-            Chit chit = new Chit(scale, imageName, this);
+            Chit chit = new Chit(scale, imageName);
             chit.addMouseListener(this);
             chits.add(chit);
             pane.add(chit);

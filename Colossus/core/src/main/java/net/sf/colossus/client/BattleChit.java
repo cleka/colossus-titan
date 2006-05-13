@@ -3,7 +3,6 @@ package net.sf.colossus.client;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.Container;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
@@ -44,10 +43,10 @@ final class BattleChit extends Chit
     static final int borderRatio = 20;
     private static boolean useColoredBorders = false;
 
-    BattleChit(int scale, String id, Container container, boolean inverted,
-            int tag, String currentHexLabel, String colorName, Client client)
+    BattleChit(int scale, String id, boolean inverted, int tag,
+            String currentHexLabel, String colorName, Client client)
     {
-        super(scale, id, container, inverted);
+        super(scale, id, inverted);
         this.scale = scale;
         this.tag = tag;
         this.currentHexLabel = currentHexLabel;

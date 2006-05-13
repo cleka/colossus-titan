@@ -58,7 +58,7 @@ final class ReplyToProposal extends KDialog implements ActionListener
         JPanel attackerPane = new JPanel();
         contentPane.add(attackerPane);
 
-        attackerMarker = new Marker(scale, attackerId, this, client);
+        attackerMarker = new Marker(scale, attackerId, client);
         attackerPane.add(attackerMarker);
 
         List attackerImageNames = client.getLegionImageNames(
@@ -67,7 +67,7 @@ final class ReplyToProposal extends KDialog implements ActionListener
         while (it.hasNext())
         {
             String imageName = (String)it.next();
-            Chit chit = new Chit(scale, imageName, this);
+            Chit chit = new Chit(scale, imageName);
             attackerChits.add(chit);
             attackerPane.add(chit);
         }
@@ -75,7 +75,7 @@ final class ReplyToProposal extends KDialog implements ActionListener
         JPanel defenderPane = new JPanel();
         contentPane.add(defenderPane);
 
-        defenderMarker = new Marker(scale, defenderId, this, client);
+        defenderMarker = new Marker(scale, defenderId, client);
         defenderPane.add(defenderMarker);
 
         List defenderImageNames = client.getLegionImageNames(
@@ -84,7 +84,7 @@ final class ReplyToProposal extends KDialog implements ActionListener
         while (it.hasNext())
         {
             String imageName = (String)it.next();
-            Chit chit = new Chit(scale, imageName, this);
+            Chit chit = new Chit(scale, imageName);
             defenderChits.add(chit);
             defenderPane.add(chit);
         }

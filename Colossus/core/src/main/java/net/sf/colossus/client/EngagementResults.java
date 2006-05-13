@@ -301,7 +301,7 @@ final class EngagementResults extends KDialog
         }
         int scale = 3 * Scale.get(); // or 3 or 4?
         // add marker
-        Marker marker = new Marker(scale, markerId, panel, null);
+        Marker marker = new Marker(scale, markerId, null);
         panel.add(marker);
         panel.add(Box.createHorizontalStrut(5));
         // towi: you want it upside down or not? then remove "false"
@@ -313,8 +313,8 @@ final class EngagementResults extends KDialog
             final String imageName = (String)it.next();
             final Boolean chitCertain = (Boolean)certainList.get(idx);
             final boolean showDubious = !chitCertain.booleanValue();
-            Chit chit = new Chit(scale, imageName, panel,
-                inverse, showDubious);
+            Chit chit = new Chit(scale, imageName, inverse,
+                showDubious);
             panel.add(chit);
             idx += 1;
         }

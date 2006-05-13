@@ -49,7 +49,7 @@ final class PickLord extends KDialog implements MouseListener, WindowListener
         while (it.hasNext())
         {
             String imageName = (String)it.next();
-            Chit chit = new Chit(4 * Scale.get(), imageName, this);
+            Chit chit = new Chit(4 * Scale.get(), imageName);
             chits.add(chit);
             contentPane.add(chit);
             chit.addMouseListener(this);
