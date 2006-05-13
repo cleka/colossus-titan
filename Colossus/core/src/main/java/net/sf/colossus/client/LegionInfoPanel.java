@@ -14,14 +14,16 @@ import javax.swing.JPanel;
 import net.sf.colossus.util.HTMLColor;
 
 public final class LegionInfoPanel extends JPanel {
-	public LegionInfoPanel(LegionInfo legion, int scale, int margin, int padding) {
+	public LegionInfoPanel(LegionInfo legion, int scale, int margin, int padding, boolean usePlayerColor) {
 		setLayout(null);
         
-        Color playerColor =
-            HTMLColor.stringToColor(
-                legion.getPlayerInfo().getColor() + 
-                "Colossus");
-        setBackground(playerColor);
+        if(usePlayerColor) {
+        	Color playerColor =
+        		HTMLColor.stringToColor(
+        				legion.getPlayerInfo().getColor() + 
+        		"Colossus");
+        	setBackground(playerColor);
+        }
 
         List imageNames = legion.getImageNames();
         List certain = legion.getCertainties();

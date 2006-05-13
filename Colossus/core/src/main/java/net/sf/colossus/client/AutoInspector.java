@@ -64,7 +64,7 @@ public class AutoInspector extends KDialog
     
     public void showLegion(LegionInfo legion) {
 		scrollPane.getViewport().removeAll();
-		scrollPane.getViewport().add(new LegionInfoPanel(legion, 4 * Scale.get(), 5, 2));
+		scrollPane.getViewport().add(new LegionInfoPanel(legion, 4 * Scale.get(), 5, 2, false));
     	repaint();
     }
 }

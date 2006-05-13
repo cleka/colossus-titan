@@ -38,7 +38,7 @@ final class ShowLegion extends KDialog implements MouseListener,
 
         placeRelative(parentFrame, point, pane);
 
-        getContentPane().add(new LegionInfoPanel(legion, scale, 5, 2));
+        getContentPane().add(new LegionInfoPanel(legion, scale, 5, 2, false));
 
         pack();
         addMouseListener(this);

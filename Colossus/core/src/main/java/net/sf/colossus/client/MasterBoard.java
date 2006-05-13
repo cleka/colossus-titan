@@ -190,7 +190,7 @@ public final class MasterBoard extends JPanel
                         LegionInfo legion = client.getLegionInfo( marker.getId());
                         int scale = 2*Scale.get();
                         
-						final JPanel panel = new LegionInfoPanel(legion, scale, PANEL_MARGIN, PANEL_PADDING);
+						final JPanel panel = new LegionInfoPanel(legion, scale, PANEL_MARGIN, PANEL_PADDING, true);
                         add(panel);
                         legionFlyouts[i] = panel;
 
