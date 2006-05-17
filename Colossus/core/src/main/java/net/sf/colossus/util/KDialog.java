@@ -12,41 +12,11 @@ import javax.swing.*;
 
 public class KDialog extends JDialog implements MouseListener, WindowListener
 {
-    private JComponent newContentPane = null;
-    protected JLabel label;
-
     /** Only support one of JDialog's many constructor forms. */    
     public KDialog (Frame owner, String title, boolean modal)
     {
-        // The long title goes in a label.  Just put the class 
-        // name in the title bar.
-        super(owner, modal);
-        String shortTitle = getPackageBaseName(getClass().getName());
-        setTitle(shortTitle);
-
-        Container cont = super.getContentPane();
-        
-        cont.setLayout(new BorderLayout());
-        newContentPane = new JPanel();
-
-        if (title != null && title.length() > 0)
-        {
-            label = new JLabel(title);
-            cont.add(label, BorderLayout.NORTH);
-        }
-        cont.add(newContentPane, BorderLayout.CENTER);
+        super(owner, title, modal);
     }
-
-    private static String getPackageBaseName(final String packageName)
-    {
-        return packageName.substring(packageName.lastIndexOf('.') + 1);
-    }
-
-    public Container getContentPane()
-    {
-        return newContentPane;
-    }
-
 
     /** Place dialog relative to parentFrame's origin, offset by 
      *  point, and fully on-screen. */

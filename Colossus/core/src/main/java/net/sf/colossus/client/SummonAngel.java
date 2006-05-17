@@ -15,6 +15,7 @@ import java.awt.event.MouseListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.JButton;
@@ -80,7 +81,7 @@ final class SummonAngel extends KDialog implements MouseListener,
         int scale = 4 * Scale.get();
 
         List summonableList = Creature.getSummonableCreatures();
-        java.util.Iterator it = summonableList.iterator();
+        Iterator it = summonableList.iterator();
         sumChitList.clear();
         while (it.hasNext())
         {
@@ -144,7 +145,7 @@ final class SummonAngel extends KDialog implements MouseListener,
         }
 
         Object source = e.getSource();
-        java.util.Iterator it = sumChitList.iterator();
+        Iterator it = sumChitList.iterator();
         boolean done = false;
         while (it.hasNext() && !done)
         {
@@ -168,7 +169,7 @@ final class SummonAngel extends KDialog implements MouseListener,
         String donorId = client.getDonorId();
         if (donorId == null)
         {
-            label.setText("<html>" + client.getPlayerName() +
+            setTitle("<html>" + client.getPlayerName() +
                     baseSummonString +
                     Legion.getLongMarkerName(markerId) +
                     noSourceSummonString + "</html>");
@@ -176,13 +177,13 @@ final class SummonAngel extends KDialog implements MouseListener,
         }
         else
         {
-            label.setText("<html>" + client.getPlayerName() +
+        	setTitle("<html>" + client.getPlayerName() +
                     baseSummonString +
                     Legion.getLongMarkerName(markerId) +
                     sourceSummonString +
                     Legion.getLongMarkerName(donorId) + "</html>");
         }
-        java.util.Iterator it = sumChitList.iterator();
+        Iterator it = sumChitList.iterator();
         while (it.hasNext())
         {
             Chit c = (Chit)it.next();
