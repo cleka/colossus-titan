@@ -45,16 +45,15 @@ final class SummonAngel extends KDialog implements MouseListener,
     private static final String baseSummonString =
             ": Summon Angel into Legion ";
     private static final String sourceSummonString =
-            "<p>Selected Legion is ";
+            " Selected Legion is ";
     private static final String noSourceSummonString =
-            "<p>No selected Legion";
+            " No selected Legion";
 
     private SummonAngel(Client client, String markerId)
     {
         super(client.getBoard().getFrame(),
-                "<html>" + client.getPlayerName() +
-                baseSummonString + Legion.getLongMarkerName(markerId) +
-                noSourceSummonString + "</html>",
+                client.getPlayerName() + baseSummonString +
+                Legion.getLongMarkerName(markerId) + noSourceSummonString,
                 false);
 
         this.client = client;
@@ -169,19 +168,15 @@ final class SummonAngel extends KDialog implements MouseListener,
         String donorId = client.getDonorId();
         if (donorId == null)
         {
-            setTitle("<html>" + client.getPlayerName() +
-                    baseSummonString +
-                    Legion.getLongMarkerName(markerId) +
-                    noSourceSummonString + "</html>");
+            setTitle(client.getPlayerName() + baseSummonString +
+                    Legion.getLongMarkerName(markerId) + noSourceSummonString);
             return;
         }
         else
         {
-        	setTitle("<html>" + client.getPlayerName() +
-                    baseSummonString +
-                    Legion.getLongMarkerName(markerId) +
-                    sourceSummonString +
-                    Legion.getLongMarkerName(donorId) + "</html>");
+        	setTitle(client.getPlayerName() + baseSummonString +
+                    Legion.getLongMarkerName(markerId) + sourceSummonString +
+                    Legion.getLongMarkerName(donorId));
         }
         Iterator it = sumChitList.iterator();
         while (it.hasNext())
