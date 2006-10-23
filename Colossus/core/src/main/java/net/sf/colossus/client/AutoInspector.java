@@ -20,13 +20,13 @@ import net.sf.colossus.util.Options;
 
 public class AutoInspector extends KDialog
 {
-	private IOptions options;
-	
+    private IOptions options;
+    
     private SaveWindow saveWindow;
     
     private JScrollPane scrollPane;
 
-	public AutoInspector(JFrame frame, IOptions options)
+    public AutoInspector(JFrame frame, IOptions options)
     {
         super(frame, "Inspector", false);
 
@@ -34,9 +34,11 @@ public class AutoInspector extends KDialog
 
         setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
         addWindowListener(new WindowAdapter(){
-        	public void windowClosing(WindowEvent e) {
-        		AutoInspector.this.options.setOption(Options.showAutoInspector, false);
-        	}
+            public void windowClosing(WindowEvent e) 
+            {
+                AutoInspector.this.options.setOption(Options.showAutoInspector,
+                    false);
+            }
         });
 
         saveWindow = new SaveWindow(options, "AutoInspector");
@@ -45,8 +47,8 @@ public class AutoInspector extends KDialog
         scrollPane = new JScrollPane();
         
         Container contentPane = getContentPane();
-		contentPane.setLayout(new BorderLayout());
-		contentPane.add(scrollPane, BorderLayout.CENTER);
+        contentPane.setLayout(new BorderLayout());
+        contentPane.add(scrollPane, BorderLayout.CENTER);
 
         setVisible(true);
     }
@@ -58,19 +60,21 @@ public class AutoInspector extends KDialog
         super.dispose();
     }
     
-    public Dimension getPreferredSize() {
-    	// this is just a first go to have some size at all
-    	// TODO do a decent estimate of a legion's size
-    	return new Dimension(200,50);
+    public Dimension getPreferredSize() 
+    {
+        // this is just a first go to have some size at all
+        // TODO do a decent estimate of a legion's size
+        return new Dimension(200,50);
     }
     
-    public void showLegion(Marker marker, LegionInfo legion) {
-		scrollPane.getViewport().removeAll();
-		JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-		// TODO for some reason the marker won't display itself properly here
-		//panel.add(marker);
-		panel.add(new LegionInfoPanel(legion, 4 * Scale.get(), 5, 2, false));
-		scrollPane.getViewport().add(panel);
-    	repaint();
+    public void showLegion(Marker marker, LegionInfo legion) 
+    {
+        scrollPane.getViewport().removeAll();
+        JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        // TODO for some reason the marker won't display itself properly here
+        //panel.add(marker);
+        panel.add(new LegionInfoPanel(legion, 4 * Scale.get(), 5, 2, false));
+        scrollPane.getViewport().add(panel);
+        repaint();
     }
 }
