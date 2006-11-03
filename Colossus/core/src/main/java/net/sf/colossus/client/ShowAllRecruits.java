@@ -42,8 +42,7 @@ final class ShowAllRecruits extends AbstractShowRecruits
 
         saveWindow = new SaveWindow(options, "RecruitsScreen");
         Point loadLocation = saveWindow.loadLocation();
-        Point nullPoint = new Point(-1,-1);
-        if (nullPoint.equals(loadLocation)) 
+        if (loadLocation == null) 
         {
             lowerRightCorner();
         }

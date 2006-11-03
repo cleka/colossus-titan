@@ -18,8 +18,6 @@ public final class SaveWindow
     private IOptions options;
     private String name;
 
-    public static final Point nullPoint = new Point(-1, -1);
-    
     public SaveWindow(IOptions options, String name)
     {
         this.options = options;
@@ -45,23 +43,40 @@ public final class SaveWindow
     }
 
     /**
-     * BUG: A Lot of code checks for loadLocation() == null, when in fact this 
-     * can never occur.
-     * As <code>getIntOptions</code> returns -1 for unknown property values.
-     * 
-     * @return
+     * @return saved location, or null if none
      */
     public Point loadLocation()
     {
         int x = options.getIntOption(name + Options.locX);
+        if (x == -1)
+        {
+            return null;
+        }
         int y = options.getIntOption(name + Options.locY);
+        if (y == -1)
+        {
+            return null;
+        }
         return new Point(x, y);
     }
 
     public void saveLocation(final Point location)
     {
-        options.setOption(name + Options.locX, location.x);
-        options.setOption(name + Options.locY, location.y);
+        if (location != null)
+        {
+            int x = location.x;
+            if (x == -1)
+            {
+                x = 0; // tweak to disambiguate from unset
+            }
+            int y = location.y;
+            if (y == -1)
+            {
+                y = 0; // tweak to disambiguate from unset
+            }
+            options.setOption(name + Options.locX, x);
+            options.setOption(name + Options.locY, y);
+        }
     }
     
     public void save(Window window ) {

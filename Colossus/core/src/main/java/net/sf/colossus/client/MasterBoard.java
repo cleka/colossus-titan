@@ -344,13 +344,15 @@ public final class MasterBoard extends JPanel
         saveWindow = new SaveWindow(client, "MasterBoardScreen");
         Point loadLocation = saveWindow.loadLocation();
 
-        if (SaveWindow.nullPoint.equals(loadLocation)) {
+        if (loadLocation == null) 
+        {
             // Copy of code from KDialog.centerOnScreen();
             Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
             masterFrame.setLocation(new Point(d.width / 2 - 
                 getSize().width / 2, d.height / 2 - getSize().height / 2));
         }
-        else {
+        else 
+        {
             masterFrame.setLocation(loadLocation);
         }
 
