@@ -590,14 +590,7 @@ implements
         }
     }
 
-    /** get the non-terrainified part of the kill-value.
-     *
-     * towi: Note that you have to take special care for creatures that
-     * might change their attributes -- like the Power of titans.
-     * since this modifies the return value.
-     * on the other hand... since titans have a killValue>1000 anyway,
-     * this might not matter at all.
-     */
+    /** get the non-terrainified part of the kill-value. */
     public int getKillValue()
     {
         int val = 10 * getPointValue();

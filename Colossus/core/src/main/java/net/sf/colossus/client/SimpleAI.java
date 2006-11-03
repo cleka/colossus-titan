@@ -30,22 +30,6 @@ public class SimpleAI implements AI
     Random random = new DevRandom();
     String[] hintSectionUsed = { Constants.sectionOffensiveAI };
 
-    static HashMap aiCreatureInfos;
-
-    static
-    {
-        final List allCreatures = Creature.getCreatures();
-        aiCreatureInfos = new HashMap(allCreatures.size());
-        Iterator it = allCreatures.iterator();
-        while (it.hasNext())
-        {
-            final Creature creature = (Creature)it.next();
-            AiCreatureInfo info = new AiCreatureInfo(creature);
-            aiCreatureInfos.put(creature, info);
-        }
-    }
-
-
     public SimpleAI(Client client)
     {
         this.client = client;
@@ -2438,18 +2422,7 @@ public class SimpleAI implements AI
             return 0;
         }
         // get non-terrain modified part of kill value
-        if (creature.canChangeValue() || aiCreatureInfos == null)
-        {
-            // titans might change their value
-            val = creature.getKillValue();
-        }
-        else
-        {
-            // use from pre-calced cache
-            final AiCreatureInfo info = 
-                (AiCreatureInfo)aiCreatureInfos.get(creature);
-            val = info.getKillValue1();
-        }
+        val = creature.getKillValue();
         // modify with terrain
         if (terrain != null &&
                 MasterHex.isNativeCombatBonus(creature, terrain))
