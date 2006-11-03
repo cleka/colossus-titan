@@ -887,7 +887,10 @@ public class SimpleAI implements AI
                     String friendId = (String)friendlyLegionIt.next();
                     LegionInfo friendlyLegion = client.getLegionInfo(friendId);
                     List moves = (List)moveMap.get(friendlyLegion);
-                    allmoves.addAll(moves);
+                    if (moves != null)
+                    {
+                        allmoves.addAll(moves);
+                    }
                 }
 
                 Collections.sort(allmoves, new Comparator()
@@ -3662,7 +3665,7 @@ public class SimpleAI implements AI
      *  in the legion. */
     class LegionMove
     {
-        private List critterMoves = new ArrayList();
+        private final List critterMoves = new ArrayList();
 
         void add(CritterMove cm)
         {
