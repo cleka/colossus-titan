@@ -329,11 +329,12 @@ public final class Client implements IClient, IOracle, IOptions
      * Displays the marker and its legion if possible.
      */
     public void showMarker(Marker marker) {
-    	if (autoInspector != null) {
+        if (autoInspector != null)
+        {
             String markerId = marker.getId();
-           	LegionInfo legion = getLegionInfo(markerId);
-			autoInspector.showLegion(marker, legion);
-		}
+            LegionInfo legion = getLegionInfo(markerId);
+            autoInspector.showLegion(marker, legion);
+        }
     }
     
     /** Legion summoner summons unit from legion donor. */
@@ -563,7 +564,8 @@ public final class Client implements IClient, IOracle, IOptions
         else if (optname.equals(Options.logDebug))
         {
             // XXX move this to server
-            // XXX Now this uses JDK logging should this be moved to the server still?
+            // XXX Now this uses JDK logging should this be moved
+            // to the server still?
             if (bval) {
                 Logger.global.setLevel(Level.ALL);
             }
@@ -580,7 +582,8 @@ public final class Client implements IClient, IOracle, IOptions
             if (bval)
             {
                 if (logWindow == null) {
-                	// the logger with the empty name is parent to all loggers and thus catches all messages
+                    // the logger with the empty name is parent to all loggers
+                    // and thus catches all messages
                     logWindow = new LogWindow(this, Logger.getLogger(""));
                 }
             }
@@ -601,21 +604,25 @@ public final class Client implements IClient, IOracle, IOptions
         {
             if (bval)
             {
-                if (autoInspector == null) {
-                	JFrame parent = secondaryParent;
-                	if((parent == null) && (board != null)) {
-                		parent = board.getFrame();
-                	}
-                	// TODO it seems board is null here if called on startup, we need to initialize this later
-                	autoInspector = new AutoInspector(parent, this);
+                if (autoInspector == null)
+                {
+                    JFrame parent = secondaryParent;
+                    if((parent == null) && (board != null))
+                    {
+                        parent = board.getFrame();
+                    }
+                    // TODO it seems board is null here if called on startup,
+                    // we need to initialize this later
+                    autoInspector = new AutoInspector(parent, this);
                 }
             }
             else
             {
-                if (autoInspector != null) {
-                	autoInspector.setVisible(false);
-                	autoInspector.dispose();
-                	autoInspector = null;
+                if (autoInspector != null)
+                {
+                    autoInspector.setVisible(false);
+                    autoInspector.dispose();
+                    autoInspector = null;
                 }
             }
         }
