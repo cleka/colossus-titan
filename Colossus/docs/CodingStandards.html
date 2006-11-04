@@ -13,10 +13,9 @@
       no standard tab stop in Java, so tabs will look bad for anyone whose
       editor is set up differently than that of the person who put tabs in the
       code. Configure your editor to emit the appropriate number of spaces
-      rather than a hard tab when you hit the tab key. (Of course, Makefiles
-      are an exception, because you have to use tabs in them. Ick.) &quot;ant
-      fix&quot; converts tabs to spaces for you, but it assumes a tab stop of 8
-      unless you change it.</li>
+      rather than a hard tab when you hit the tab key.  &quot;ant fix&quot; 
+      converts tabs to spaces for you, but it assumes a tab stop of 8 unless you 
+      change it.</li>
       <li>* Wrap code at 79 characters. This is a pain sometimes, but it allows
       easly working with the code using 80-column editor and terminal windows.
       (Remember, code is not just viewed through your favorite editor in your
@@ -52,25 +51,19 @@
       statements. So feel free to change such things as necessary, until the
       interfaces are finalized and polished and other people depend upon
       them.</li>
-      <li>Always do a cvs diff before you check code in. That way changes you
-      didn't want to commit won't sneak in. And you&#39;ll be able to write a 
-      better check-in comment.</li>
+      <li>Always do a svn status and svn diff before you check code in. That way 
+      changes you didn't want to commit won't sneak in. And you&#39;ll be able 
+      to write a better check-in comment.</li>
       <li>* Fully brace conditionals, even if the clause is only one line and
       doesn&#39;t technically need braces. This makes the code taller, but
       easier to read and change.</li>
-      <li>Keep files in Unix endline format (LF, not Windows format (CR/LF) or
-      old Mac format (CR). This is critical for Makefiles, which will sometimes
-      stop working if the line breaks are wrong. Java files will work either
-      way, but it&#39;s annoying to have a mix of line breaks, false diffs
-      caused by files getting converted back and forth, etc. so consistent Unix
-      format is best. &quot;ant fix&quot; is your friend.</li>
       <li>Otherwise just try to follow the existing format. A foolish
       consistency may be the hobgoblin of little minds, but it sure makes code
       easier to read.</li>
     </ul>
     <p>Thanks for reading this.</p>
-    <p>(Rules marked with '*' are automatically enforced on CVS check-in using
-    <a href="http://www.tiobe.com/jacobe.htm">Jacobe</a>.)
+    <p>(Rules marked with '*' are enforced using the project's 
+    <a href="http://www.tiobe.com/jacobe.htm">Jacobe</a> setup.)
   </body>
 </html>
 
