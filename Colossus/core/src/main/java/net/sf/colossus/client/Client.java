@@ -1096,7 +1096,12 @@ public final class Client implements IClient, IOracle, IOptions
 
     int getLegionHeight(String markerId)
     {
-        return getLegionInfo(markerId).getHeight();
+        LegionInfo legionInfo = getLegionInfo(markerId);
+        if (legionInfo == null)
+        {
+            return 0; //no legion, no height
+        }
+        return legionInfo.getHeight();
     }
 
     /** Needed after loadGame() outside split phase. */
@@ -2538,8 +2543,7 @@ public final class Client implements IClient, IOracle, IOptions
 
         if (board != null)
         {
-            Marker marker = new Marker(3 * Scale.get(), markerId,
-                this);
+            Marker marker = new Marker(3 * Scale.get(), markerId, this);
             setMarker(markerId, marker);
             info.setMarker(marker);
             board.alignLegions(hexLabel);
@@ -2558,8 +2562,7 @@ public final class Client implements IClient, IOracle, IOptions
             LegionInfo info = (LegionInfo)entry.getValue();
             String markerId = info.getMarkerId();
             String hexLabel = info.getHexLabel();
-            Marker marker = new Marker(3 * Scale.get(), markerId,
-                this);
+            Marker marker = new Marker(3 * Scale.get(), markerId, this);
             info.setMarker(marker);
             markers.add(marker);
             board.alignLegions(hexLabel);
@@ -3857,8 +3860,7 @@ public final class Client implements IClient, IOracle, IOptions
 
         if (board != null)
         {
-            Marker marker = new Marker(3 * Scale.get(), childId,
-                this);
+            Marker marker = new Marker(3 * Scale.get(), childId, this);
             setMarker(childId, marker);
             board.alignLegions(hexLabel);
         }

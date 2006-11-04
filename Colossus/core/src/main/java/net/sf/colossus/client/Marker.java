@@ -24,11 +24,28 @@ final class Marker extends Chit
     private int fontHeight;
     private int fontWidth;
 
+    /** Construct a marker without a client.
+        Use this constructor as a bit of documentation when
+        explicitly not wanting a height drawn on the Marker. */
+    Marker(int scale, String id)
+    {
+        this(scale, id, null);
+    }
+
+    /** Construct a marker with a client.
+        By providing a client, a Marker will be adorned
+        with the height of the stack, when that height
+        is non-zero. A null client will prevent the height
+        from being displayed. Sometimes (on the master board,
+        for example) heights should be shown, and sometimes
+        (in the engagement window, for example) they should
+        be omitted. */
     Marker(int scale, String id, Client client)
     {
         super(scale, id);
         setBackground(Color.BLACK);
         this.client = client;
+
         if (getId().startsWith("Bk"))
         {
             setBorderColor(Color.white);
@@ -41,19 +58,21 @@ final class Marker extends Chit
         LOGGER.log(Level.FINEST, "Painting marker");
         super.paintComponent(g);
 
-        Font oldFont = g.getFont();
-
         if (client == null)
         {
-            // TODO shouldn't this be caught in the constructor?
-            LOGGER.log(Level.SEVERE, "Marker has no client attached to it");
-            return;
+            return; //no height labels wanted
         }
 
-        String legionHeightString = Integer.toString(client.getLegionHeight(getId()));
+        int legionHeight = client.getLegionHeight(getId());
+        if (legionHeight == 0)
+        {
+            return; //don't put a zero on top in the picker
+        }
+        String legionHeightString = Integer.toString(legionHeight);
         LOGGER.log(Level.FINEST, "Height is " + legionHeightString);
 
         // Construct a font 1.5 times the size of the current font.
+        Font oldFont = g.getFont();
         if (font == null)
         {
             String name = oldFont.getName();

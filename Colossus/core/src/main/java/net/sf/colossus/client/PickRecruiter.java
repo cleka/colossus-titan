@@ -54,7 +54,7 @@ final class PickRecruiter extends KDialog implements MouseListener,
         JPanel legionPane = new JPanel();
         contentPane.add(legionPane);
 
-        legionMarker = new Marker(scale, markerId, null);
+        legionMarker = new Marker(scale, markerId);
         legionPane.add(legionMarker);
 
         List imageNames = client.getLegionImageNames(markerId);

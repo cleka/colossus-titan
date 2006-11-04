@@ -88,7 +88,7 @@ final class SplitLegion extends KDialog implements MouseListener,
         buttonBox = new Box(BoxLayout.X_AXIS);
         contentPane.add(buttonBox);
 
-        oldMarker = new Marker(scale, parentId, null);
+        oldMarker = new Marker(scale, parentId);
         oldBox.add(oldMarker);
         oldBox.add(Box.createRigidArea(new Dimension(scale / 4, 0)));
         oldBox.add(Box.createHorizontalGlue());
@@ -106,7 +106,7 @@ final class SplitLegion extends KDialog implements MouseListener,
             chit.addMouseListener(this);
         }
 
-        newMarker = new Marker(scale, selectedMarkerId, null);
+        newMarker = new Marker(scale, selectedMarkerId);
         newBox.add(newMarker);
         newBox.add(Box.createRigidArea(new Dimension(scale / 4, 0)));
         newBox.add(Box.createHorizontalGlue());
