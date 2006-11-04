@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
@@ -30,10 +31,11 @@ import net.sf.colossus.xmlparser.TerrainRecruitLoader;
  */
 public class RationalAI extends SimpleAI implements AI
 {
-    private static final Logger logger = Logger.getLogger(RationalAI.class.getName());
+    private static final Logger logger =
+        Logger.getLogger(RationalAI.class.getName());
 
     boolean I_HATE_HUMANS = false;
-    private List legionsToSplit = new ArrayList();
+    private LinkedList legionsToSplit = new LinkedList();
     private Map[] enemyAttackMap;
     private Map evaluateMoveMap = new HashMap();
     private List bestMoveList;
@@ -71,17 +73,26 @@ public class RationalAI extends SimpleAI implements AI
     private boolean fireSplits()
     {
         logger.log(Level.FINEST, "RationalAI.fireSplits " + legionsToSplit);
-        if (legionsToSplit.isEmpty())
+
+        //safe to cache the player out of the loop, ref to mutable object
+        PlayerInfo player = client.getPlayerInfo();
+
+        while(!legionsToSplit.isEmpty())
         {
-            return true;
+            if(player.getNumMarkers() == 0)
+            {
+                logger.log(Level.FINEST, "No more splits. No markers left.");
+                return true; //early exit, out of markers
+            }
+
+            String markerId = (String)legionsToSplit.removeFirst();
+            if(!splitOneLegion(player, markerId))
+            {
+                return false; //early exit, we've decided we won't finish
+            }
         }
-        String markerId = (String)legionsToSplit.remove(0);
-        boolean done = splitOneLegion(client.getPlayerInfo(), markerId);
-        if (done)
-        {
-            return fireSplits();
-        }
-        return false;
+
+        return true; //succesfully looked at all splits
     }
 
     // XXX Undoing a split could release the marker needed to do another
@@ -90,18 +101,10 @@ public class RationalAI extends SimpleAI implements AI
      * an undo split */
     public boolean splitCallback(String parentId, String childId)
     {
-        logger.log(Level.FINEST, "RationalAI.splitCallback " + parentId + " " + childId);
-        if (parentId == null && childId == null)
-        {
-            // Undo split is done; fire off the next split
-            return fireSplits();
-        }
-        boolean done = splitOneLegionCallback(parentId, childId);
-        if (done)
-        {
-            return fireSplits();
-        }
-        return false;
+        logger.log(Level.FINEST, "RationalAI.splitCallback "
+            + parentId + " " + childId);
+
+        return splitOneLegionCallback(parentId, childId) && fireSplits();
     }
 
     // Compute the expected value of a split legion
@@ -278,12 +281,12 @@ public class RationalAI extends SimpleAI implements AI
         }
 
         // Do the split.  If we don't like the result we will undo it.
-        //
         String newMarkerId = pickMarker(player.getMarkersAvailable(),
             player.getShortColor());
 
         if (newMarkerId == null)
         {
+            //should never happen now that we check in fireSplits
             logger.log(Level.FINEST, "No split.  No markers available.");
             return true;
         }
@@ -296,6 +299,11 @@ public class RationalAI extends SimpleAI implements AI
     /** Return true if done, false if waiting for undo split */
     private boolean splitOneLegionCallback(String markerId, String newMarkerId)
     {
+        if(markerId == null && newMarkerId == null)
+        {
+            return true; //nothing to do. splitCallback() depends on this exit
+        }
+
         LegionInfo legion = client.getLegionInfo(markerId);
         logger.log(Level.FINEST, "Split complete");
 
