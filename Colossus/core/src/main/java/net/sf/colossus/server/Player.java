@@ -30,7 +30,8 @@ public final class Player implements Comparable
     private boolean dead;
     private boolean titanEliminated;
     private String donorId;
-    private SortedSet markersAvailable = new TreeSet();
+    private SortedSet markersAvailable
+        = Collections.synchronizedSortedSet(new TreeSet());
     private String type;               // "Human" or ".*AI"
     private String firstMarker;
 
@@ -109,13 +110,16 @@ public final class Player implements Comparable
 
     void initMarkersAvailable(String shortColor)
     {
-        for (int i = 1; i <= 9; i++)
+        synchronized(markersAvailable)
         {
-            addLegionMarker(shortColor + '0' + Integer.toString(i));
-        }
-        for (int i = 10; i <= 12; i++)
-        {
-            addLegionMarker(shortColor + Integer.toString(i));
+            for (int i = 1; i <= 9; i++)
+            {
+                addLegionMarker(shortColor + '0' + Integer.toString(i));
+            }
+            for (int i = 10; i <= 12; i++)
+            {
+                addLegionMarker(shortColor + Integer.toString(i));
+            }
         }
     }
 
@@ -128,20 +132,23 @@ public final class Player implements Comparable
         }
         else
         {
-            initMarkersAvailable();
-            StringBuffer allVictims = new StringBuffer(playersEliminated);
-            for (int i = 0; i < allVictims.length(); i += 2)
+            synchronized(markersAvailable)
             {
-                String shortColor = allVictims.substring(i, i + 2);
-                initMarkersAvailable(shortColor);
-                Player victim = game.getPlayerByShortColor(shortColor);
-                allVictims.append(victim.getPlayersElim());
-            }
-            Iterator it = getLegionIds().iterator();
-            while (it.hasNext())
-            {
-                String markerId = (String)it.next();
-                markersAvailable.remove(markerId);
+                initMarkersAvailable();
+                StringBuffer allVictims = new StringBuffer(playersEliminated);
+                for (int i = 0; i < allVictims.length(); i += 2)
+                {
+                    String shortColor = allVictims.substring(i, i + 2);
+                    initMarkersAvailable(shortColor);
+                    Player victim = game.getPlayerByShortColor(shortColor);
+                    allVictims.append(victim.getPlayersElim());
+                }
+                Iterator it = getLegionIds().iterator();
+                while (it.hasNext())
+                {
+                    String markerId = (String)it.next();
+                    markersAvailable.remove(markerId);
+                }
             }
         }
     }
@@ -608,11 +615,14 @@ public final class Player implements Comparable
 
     String getFirstAvailableMarker()
     {
-        if (markersAvailable.isEmpty())
+        synchronized(markersAvailable)
         {
-            return null;
+            if (markersAvailable.isEmpty())
+            {
+                return null;
+            }
+            return (String)markersAvailable.first();
         }
-        return (String)markersAvailable.first();
     }
 
     boolean isMarkerAvailable(String markerId)
@@ -641,8 +651,11 @@ public final class Player implements Comparable
 
     private void takeLegionMarkers(Player victim)
     {
-        markersAvailable.addAll(victim.getMarkersAvailable());
-        victim.markersAvailable.clear();
+        synchronized(victim.markersAvailable)
+        {
+            markersAvailable.addAll(victim.getMarkersAvailable());
+            victim.markersAvailable.clear();
+        }
     }
 
     /** Add points to this player's score.  Update the status window
@@ -750,26 +763,21 @@ public final class Player implements Comparable
     String getStatusInfo(boolean treatDeadAsAlive)
     {
         List li = new ArrayList();
-        if (treatDeadAsAlive)
-        {
-            li.add("" + false);
-        }
-        else
-        {
-            li.add("" + isDead());
-        }
+        li.add(Boolean.toString(!treatDeadAsAlive && isDead()));
         li.add(name);
         li.add(getTower());
         li.add(getColor());
         li.add(getType());
         li.add(getPlayersElim());
-        li.add("" + getNumLegions());
-        li.add("" + getNumCreatures());
-        li.add("" + getTitanPower());
-        li.add("" + getScore());
-        li.add("" + getMulligansLeft());
-        li.add(Glob.glob(":", getMarkersAvailable()));
-
+        li.add(Integer.toString(getNumLegions()));
+        li.add(Integer.toString(getNumCreatures()));
+        li.add(Integer.toString(getTitanPower()));
+        li.add(Integer.toString(getScore()));
+        li.add(Integer.toString(getMulligansLeft()));
+        synchronized(markersAvailable)
+        {
+            li.addAll(getMarkersAvailable());
+        }
         return Glob.glob(":", li);
     }
 
