@@ -371,7 +371,7 @@ public final class Server implements IServer
             getClient(getPlayerName()).nak(Constants.doneWithStrikes,
                     "Wrong player");
         }
-        else if (battle.getPhase() < Constants.FIGHT)
+        else if (!battle.getBattlePhase().isFightPhase())
         {
             getClient(getPlayerName()).nak(Constants.doneWithStrikes,
                     "Wrong phase");
@@ -574,7 +574,7 @@ public final class Server implements IServer
             IClient client = (IClient)it.next();
             if (battle != null)
             {
-                client.setupBattleFight(battle.getPhase(),
+                client.setupBattleFight(battle.getBattlePhase(),
                         battle.getActivePlayerName());
             }
         }
@@ -697,7 +697,7 @@ public final class Server implements IServer
         }
 
         if (legion != null && (legion.hasMoved() || game.getPhase() ==
-                Constants.FIGHT) && legion.canRecruit())
+                Constants.Phase.FIGHT) && legion.canRecruit())
         {
             legion.sortCritters();
             Creature recruit = null;
@@ -725,7 +725,7 @@ public final class Server implements IServer
         }
 
         // Need to always call this to keep game from hanging.
-        if (game.getPhase() == Constants.FIGHT)
+        if (game.getPhase() == Constants.Phase.FIGHT)
         {
             if (game.getBattle() != null)
             {
@@ -1103,7 +1103,7 @@ public final class Server implements IServer
         {
             IClient client = (IClient)it.next();
             client.initBattle(masterHexLabel, battle.getTurnNumber(),
-                    battle.getActivePlayerName(), battle.getPhase(),
+                    battle.getActivePlayerName(), battle.getBattlePhase(),
                     battle.getAttackerId(), battle.getDefenderId());
         }
     }
@@ -1196,7 +1196,7 @@ public final class Server implements IServer
         }
         else
         {
-            game.advancePhase(Constants.SPLIT, getPlayerName());
+            game.advancePhase(Constants.Phase.SPLIT, getPlayerName());
         }
     }
 
@@ -1231,7 +1231,7 @@ public final class Server implements IServer
         else
         {
             player.recombineIllegalSplits();
-            game.advancePhase(Constants.MOVE, getPlayerName());
+            game.advancePhase(Constants.Phase.MOVE, getPlayerName());
         }
     }
 
@@ -1252,7 +1252,7 @@ public final class Server implements IServer
         }
         else
         {
-            game.advancePhase(Constants.FIGHT, getPlayerName());
+            game.advancePhase(Constants.Phase.FIGHT, getPlayerName());
         }
     }
 
@@ -1273,7 +1273,7 @@ public final class Server implements IServer
             // Mulligans are only allowed on turn 1.
             player.setMulligansLeft(0);
 
-            game.advancePhase(Constants.MUSTER, getPlayerName());
+            game.advancePhase(Constants.Phase.MUSTER, getPlayerName());
         }
     }
 

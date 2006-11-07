@@ -283,7 +283,8 @@ final class SocketClientThread extends Thread implements IServer
             String masterHexLabel = (String)args.remove(0);
             int battleTurnNumber = Integer.parseInt((String)args.remove(0));
             String battleActivePlayerName = (String)args.remove(0);
-            int battlePhase = Integer.parseInt((String)args.remove(0));
+            Constants.BattlePhase battlePhase = Constants.BattlePhase.fromInt(
+                Integer.parseInt((String)args.remove(0)));
             String attackerMarkerId = (String)args.remove(0);
             String defenderMarkerId = (String)args.remove(0);
             client.initBattle(masterHexLabel, battleTurnNumber,
@@ -364,7 +365,8 @@ final class SocketClientThread extends Thread implements IServer
         }
         else if (method.equals(Constants.setupBattleFight))
         {
-            int battlePhase = Integer.parseInt((String)args.remove(0));
+            Constants.BattlePhase battlePhase = Constants.BattlePhase.fromInt(
+                Integer.parseInt((String)args.remove(0)));
             String battleActivePlayerName = (String)args.remove(0);
             client.setupBattleFight(battlePhase, battleActivePlayerName);
         }

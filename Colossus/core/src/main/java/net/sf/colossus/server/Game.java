@@ -47,7 +47,7 @@ public final class Game
     private boolean gameOver;
     private Battle battle;
     private Caretaker caretaker = new Caretaker(this);
-    private int phase;
+    private Constants.Phase phase;
     private Server server;
     // Negotiation
     private Set[] proposals = new HashSet[2];
@@ -128,7 +128,7 @@ public final class Game
         clearFlags();
 
         turnNumber = 1;
-        phase = Constants.SPLIT;
+        phase = Constants.Phase.SPLIT;
         caretaker.resetAllCounts();
         players.clear();
 
@@ -678,22 +678,22 @@ public final class Game
         return loadingGame;
     }
 
-    int getPhase()
+    Constants.Phase getPhase()
     {
         return phase;
     }
 
     /** Advance to the next phase, only if the passed oldPhase and playerName
      *  are current. */
-    synchronized void advancePhase(final int oldPhase, final String playerName)
+    synchronized void advancePhase(final Constants.Phase oldPhase, final String playerName)
     {
         if (oldPhase != phase || pendingAdvancePhase ||
                 !playerName.equals(getActivePlayerName()))
         {
             Log.error("Called advancePhase illegally (reason: " +
                     (oldPhase != phase ? "oldPhase (" +
-                    Constants.getBattlePhaseName(oldPhase) + ") != phase (" +
-                    Constants.getBattlePhaseName(phase) + ")" :
+                    oldPhase + ") != phase (" +
+                    phase + ")" :
                     (pendingAdvancePhase ? "pendingAdvancePhase is true " :
                     (!playerName.equals(getActivePlayerName()) ?
                     "wrong player [" + playerName +
@@ -728,17 +728,30 @@ public final class Game
         /** Advance to the next phase, with no error checking. */
         public void advancePhaseInternal()
         {
-            phase++;
-            if (phase > Constants.MUSTER ||
-                    (getActivePlayer().isDead() && getNumLivingPlayers() > 0))
+            Constants.Phase oldPhase = phase;
+            if (oldPhase == Constants.Phase.SPLIT)
+            {
+                phase = Constants.Phase.MOVE;
+            }
+            else if (oldPhase == Constants.Phase.MOVE)
+            {
+                phase = Constants.Phase.FIGHT;
+            }
+            else if (oldPhase == Constants.Phase.FIGHT)
+            {
+                phase = Constants.Phase.MUSTER;
+            }
+
+            if (oldPhase == Constants.Phase.MUSTER ||
+                (getActivePlayer().isDead() && getNumLivingPlayers() > 0))
             {
                 advanceTurn();
             }
             else
             {
-                Log.event("Phase advances to " +
-                        Constants.getPhaseName(phase));
+                Log.event("Phase advances to " + phase);
             }
+
             pendingAdvancePhase = false;
             setupPhase();
         }
@@ -757,7 +770,7 @@ public final class Game
              active player, for bookkeeping purpose */
             CustomRecruitBase.everyoneAdvanceTurn(activePlayerNum);
 
-            phase = Constants.SPLIT;
+            phase = Constants.Phase.SPLIT;
             if (getActivePlayer().isDead() && getNumLivingPlayers() > 0)
             {
                 advanceTurn();
@@ -773,26 +786,26 @@ public final class Game
 
     private void setupPhase()
     {
-        switch (getPhase())
+        Constants.Phase phase = getPhase();
+        if (phase == Constants.Phase.SPLIT)
         {
-            case Constants.SPLIT:
-                setupSplit();
-                break;
-
-            case Constants.MOVE:
-                setupMove();
-                break;
-
-            case Constants.FIGHT:
-                setupFight();
-                break;
-
-            case Constants.MUSTER:
-                setupMuster();
-                break;
-
-            default:
-                Log.error("Bogus phase");
+            setupSplit();
+        }
+        else if (phase == Constants.Phase.MOVE)
+        {
+            setupMove();
+        }
+        else if (phase == Constants.Phase.FIGHT)
+        {
+            setupFight();
+        }
+        else if (phase == Constants.Phase.MUSTER)
+        {
+            setupMuster();
+        }
+        else
+        {
+            Log.error("Bogus phase");
         }
     }
 
@@ -831,7 +844,7 @@ public final class Game
         // still being around to advance the turn.
         if (player.isDead())
         {
-            advancePhase(Constants.MUSTER, player.getName());
+            advancePhase(Constants.Phase.MUSTER, player.getName());
         }
         else
         {
@@ -908,7 +921,7 @@ public final class Game
             root.addContent(el);
 
             el = new Element("CurrentPhase");
-            el.addContent("" + getPhase());
+            el.addContent("" + getPhase().toInt());
             root.addContent(el);
 
             Element car = new Element("Caretaker");
@@ -984,7 +997,7 @@ public final class Game
                 bat.setAttribute("turnNumber", "" + battle.getTurnNumber());
                 bat.setAttribute("activePlayer", "" +
                         battle.getActivePlayerName());
-                bat.setAttribute("phase", "" + battle.getPhase());
+                bat.setAttribute("phase", "" + battle.getBattlePhase().toInt());
                 bat.setAttribute("summonState", "" + battle.getSummonState());
                 bat.setAttribute("carryDamage", "" + battle.getCarryDamage());
                 bat.setAttribute("driftDamageApplied", "" +
@@ -1156,7 +1169,7 @@ public final class Game
             activePlayerNum = Integer.parseInt(el.getTextTrim());
 
             el = root.getChild("CurrentPhase");
-            phase = Integer.parseInt(el.getTextTrim());
+            phase = Constants.Phase.fromInt(Integer.parseInt(el.getTextTrim()));
 
             Element ct = root.getChild("Caretaker");
             java.util.List kids = ct.getChildren();
@@ -1253,7 +1266,9 @@ public final class Game
                         bat.getAttribute("turnNumber").getIntValue();
                 String battleActivePlayerName =
                         bat.getAttribute("activePlayer").getValue();
-                int battlePhase = bat.getAttribute("phase").getIntValue();
+                Constants.BattlePhase battlePhase =
+                    Constants.BattlePhase.fromInt(
+                        bat.getAttribute("phase").getIntValue());
                 int summonState =
                         bat.getAttribute("summonState").getIntValue();
                 int carryDamage =
@@ -2620,7 +2635,7 @@ public final class Game
 
             battle = new Battle(this, attacker.getMarkerId(),
                     defender.getMarkerId(), Constants.DEFENDER, hexLabel,
-                    1, Constants.MOVE);
+                    1, Constants.BattlePhase.MOVE);
             battle.init();
         }
     }
@@ -3105,7 +3120,7 @@ public final class Game
 
     int mulligan()
     {
-        if (getPhase() != Constants.MOVE)
+        if (getPhase() != Constants.Phase.MOVE)
         {
             return -1;
         }

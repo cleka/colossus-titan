@@ -33,7 +33,7 @@ public final class Battle
     private String masterHexLabel;
     private String terrain;
     private int turnNumber;
-    private int phase;
+    private Constants.BattlePhase phase;
     private int summonState = Constants.NO_KILLS;
     private int carryDamage;
     private boolean attackerElim;
@@ -50,7 +50,7 @@ public final class Battle
 
     Battle(Game game, String attackerId, String defenderId,
             int activeLegionNum, String masterHexLabel, 
-            int turnNumber, int phase)
+            int turnNumber, Constants.BattlePhase phase)
     {
         this.game = game;
         server = game.getServer();
@@ -143,27 +143,26 @@ public final class Battle
         initBattleChits(getDefender());
 
         boolean advance = false;
-        switch (getPhase())
+        Constants.BattlePhase phase = getBattlePhase();
+        if (phase == Constants.BattlePhase.SUMMON)
         {
-            case Constants.SUMMON:
-                advance = setupSummon();
-                break;
-
-            case Constants.RECRUIT:
-                advance = setupRecruit();
-                break;
-
-            case Constants.MOVE:
-                advance = setupMove();
-                break;
-
-            case Constants.FIGHT:
-            case Constants.STRIKEBACK:
-                advance = setupFight();
-                break;
-
-            default:
-                Log.error("Bogus phase");
+            advance = setupSummon();
+        }
+        else if (phase == Constants.BattlePhase.RECRUIT)
+        {
+            advance = setupRecruit();
+        }
+        else if (phase == Constants.BattlePhase.MOVE)
+        {
+            advance = setupMove();
+        }
+        else if (phase.isFightPhase())
+        {
+            advance = setupFight();
+        }
+        else
+        {
+            Log.error("Bogus phase");
         }
         if (advance)
         {
@@ -268,7 +267,7 @@ public final class Battle
         return terrain;
     }
 
-    int getPhase()
+    Constants.BattlePhase getBattlePhase()
     {
         return phase;
     }
@@ -303,23 +302,21 @@ public final class Battle
 
         public void advancePhaseInternal()
         {
-            if (phase == Constants.SUMMON)
+            if (phase == Constants.BattlePhase.SUMMON)
             {
-                phase = Constants.MOVE;
-                Log.event("Battle phase advances to " +
-                        Constants.getBattlePhaseName(phase));
+                phase = Constants.BattlePhase.MOVE;
+                Log.event("Battle phase advances to " + phase);
                 again = setupMove();
             }
 
-            else if (phase == Constants.RECRUIT)
+            else if (phase == Constants.BattlePhase.RECRUIT)
             {
-                phase = Constants.MOVE;
-                Log.event("Battle phase advances to " +
-                        Constants.getBattlePhaseName(phase));
+                phase = Constants.BattlePhase.MOVE;
+                Log.event("Battle phase advances to " + phase);
                 again = setupMove();
             }
 
-            else if (phase == Constants.MOVE)
+            else if (phase == Constants.BattlePhase.MOVE)
             {
                 // IF the attacker makes it to the end of his first movement
                 // phase without conceding, even if he left all legions
@@ -328,25 +325,23 @@ public final class Battle
                 {
                     attackerEntered = true;
                 }
-                phase = Constants.FIGHT;
-                Log.event("Battle phase advances to " +
-                        Constants.getBattlePhaseName(phase));
+                phase = Constants.BattlePhase.FIGHT;
+                Log.event("Battle phase advances to " + phase);
                 again = setupFight();
             }
 
-            else if (phase == Constants.FIGHT)
+            else if (phase == Constants.BattlePhase.FIGHT)
             {
                 // We switch the active legion between the fight and strikeback
                 // phases, not at the end of the player turn.
                 activeLegionNum = (activeLegionNum + 1) & 1;
                 driftDamageApplied = false;
-                phase = Constants.STRIKEBACK;
-                Log.event("Battle phase advances to " +
-                        Constants.getBattlePhaseName(phase));
+                phase = Constants.BattlePhase.STRIKEBACK;
+                Log.event("Battle phase advances to " + phase);
                 again = setupFight();
             }
 
-            else if (phase == Constants.STRIKEBACK)
+            else if (phase == Constants.BattlePhase.STRIKEBACK)
             {
                 removeDeadCreatures();
                 checkForElimination();
@@ -369,7 +364,7 @@ public final class Battle
             // Active legion is the one that was striking back.
             if (activeLegionNum == Constants.ATTACKER)
             {
-                phase = Constants.SUMMON;
+                phase = Constants.BattlePhase.SUMMON;
                 Log.event(getActivePlayerName() + "'s battle turn, number " +
                         turnNumber);
                 again = setupSummon();
@@ -383,7 +378,7 @@ public final class Battle
                 }
                 else
                 {
-                    phase = Constants.RECRUIT;
+                    phase = Constants.BattlePhase.RECRUIT;
                     again = setupRecruit();
                     if (getActivePlayer() != null)
                     {
@@ -473,7 +468,7 @@ public final class Battle
             Critter critter = attacker.getCritter(attacker.getHeight() - 1);
             placeCritter(critter);
         }
-        if (phase == Constants.SUMMON)
+        if (phase == Constants.BattlePhase.SUMMON)
         {
             advancePhase();
         }
@@ -704,7 +699,7 @@ public final class Battle
     {
         // Drift damage is applied only once per player turn,
         //    during the strike phase.
-        if (phase == Constants.FIGHT && !driftDamageApplied)
+        if (phase == Constants.BattlePhase.FIGHT && !driftDamageApplied)
         {
             Iterator it = getAllCritters().iterator();
             driftDamageApplied = true;
@@ -980,18 +975,17 @@ public final class Battle
     boolean doneWithStrikes()
     {
         // Advance only if there are no unresolved strikes.
-        if (getPhase() < Constants.FIGHT || isForcedStrikeRemaining())
-        {
-            Log.error(server.getPlayerName() +
-                    " called battle.doneWithStrikes() illegally");
-            return false;
-        }
-        else
+        Constants.BattlePhase phase = getBattlePhase();
+        if (!isForcedStrikeRemaining() && phase.isFightPhase())
         {
             commitStrikes();
             advancePhase();
             return true;
         }
+
+        Log.error(server.getPlayerName() +
+                " called battle.doneWithStrikes() illegally");
+        return false;
     }
 
     /** Return a set of hex labels for hexes containing targets that the
@@ -1038,7 +1032,7 @@ public final class Battle
         // if the creature can strike normally, so only look for them if
         // no targets have yet been found.
         if (rangestrike && !adjacentEnemy && critter.isRangestriker() &&
-                getPhase() != Constants.STRIKEBACK &&
+                getBattlePhase() != Constants.BattlePhase.STRIKEBACK &&
                 critter.getLegion() == getActiveLegion())
         {
             Iterator it = getInactiveLegion().getCritters().iterator();

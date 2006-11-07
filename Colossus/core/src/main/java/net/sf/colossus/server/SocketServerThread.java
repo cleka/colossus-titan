@@ -489,12 +489,13 @@ final class SocketServerThread extends Thread implements IClient
     }
 
     public void initBattle(String masterHexLabel, int battleTurnNumber,
-            String battleActivePlayerName, int battlePhase,
+            String battleActivePlayerName, Constants.BattlePhase battlePhase,
             String attackerMarkerId, String defenderMarkerId)
     {
         out.println(Constants.initBattle + sep + masterHexLabel + sep +
                 battleTurnNumber + sep + battleActivePlayerName + sep +
-                battlePhase + sep + attackerMarkerId + sep + defenderMarkerId);
+                battlePhase.toInt() + sep + attackerMarkerId + sep +
+                defenderMarkerId);
     }
 
     public void cleanupBattle()
@@ -573,11 +574,11 @@ final class SocketServerThread extends Thread implements IClient
                 battleActivePlayerName + sep + battleTurnNumber);
     }
 
-    public void setupBattleFight(int battlePhase,
+    public void setupBattleFight(Constants.BattlePhase battlePhase,
             String battleActivePlayerName)
     {
-        out.println(Constants.setupBattleFight + sep + battlePhase + sep +
-                battleActivePlayerName);
+        out.println(Constants.setupBattleFight + sep +
+                battlePhase.toInt() + sep + battleActivePlayerName);
     }
 
     public void tellLegionLocation(String markerId, String hexLabel)

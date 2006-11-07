@@ -138,7 +138,7 @@ public final class BattleMap extends HexMap implements MouseListener,
                 {
                     return;
                 }
-                if (client.getBattlePhase() == Constants.MOVE)
+                if (client.getBattlePhase() == Constants.BattlePhase.MOVE)
                 {
                     selectedCritterTag = -1;
                     client.undoLastBattleMove();
@@ -156,7 +156,7 @@ public final class BattleMap extends HexMap implements MouseListener,
                 {
                     return;
                 }
-                if (client.getBattlePhase() == Constants.MOVE)
+                if (client.getBattlePhase() == Constants.BattlePhase.MOVE)
                 {
                     selectedCritterTag = -1;
                     client.undoAllBattleMoves();
@@ -175,26 +175,24 @@ public final class BattleMap extends HexMap implements MouseListener,
                     return;
                 }
 
-                int phase = client.getBattlePhase();
-                switch (phase)
+                Constants.BattlePhase phase = client.getBattlePhase();
+                if (phase == Constants.BattlePhase.MOVE)
                 {
-                    case Constants.MOVE:
-                        if (!client.getOption(Options.autoPlay) &&
-                            client.anyOffboardCreatures() &&
-                            !confirmLeavingCreaturesOffboard())
-                        {
-                            return;
-                        }
-                        client.doneWithBattleMoves();
-                        break;
-
-                    case Constants.FIGHT:
-                    case Constants.STRIKEBACK:
-                        client.doneWithStrikes();
-                        break;
-
-                    default:
-                        Log.error("Bogus phase");
+                    if (!client.getOption(Options.autoPlay) &&
+                        client.anyOffboardCreatures() &&
+                        !confirmLeavingCreaturesOffboard())
+                    {
+                        return;
+                    }
+                    client.doneWithBattleMoves();
+                }
+                else if (phase.isFightPhase())
+                {
+                    client.doneWithStrikes();
+                }
+                else
+                {
+                    Log.error("Bogus phase");
                 }
             }
         };
@@ -509,70 +507,53 @@ public final class BattleMap extends HexMap implements MouseListener,
 
         // XXX Put selected chit at the top of the z-order.
         // Then getGUIHexByLabel(hexLabel).repaint();
-
-        switch (client.getBattlePhase())
+        Constants.BattlePhase phase = client.getBattlePhase();
+        if (phase == Constants.BattlePhase.MOVE)
         {
-            case Constants.MOVE:
-                // Highlight all legal destinations for this critter.
-                highlightMoves(tag);
-                break;
-
-            case Constants.FIGHT:
-            case Constants.STRIKEBACK:
-                client.leaveCarryMode();
-                highlightStrikes(tag);
-                break;
-
-            default:
-                break;
+            highlightMoves(tag);
+        }
+        else if (phase.isFightPhase())
+        {
+            client.leaveCarryMode();
+            highlightStrikes(tag);
         }
     }
 
     private void actOnHex(String hexLabel)
     {
-        switch (client.getBattlePhase())
+        Constants.BattlePhase phase = client.getBattlePhase();
+        if (phase == Constants.BattlePhase.MOVE)
         {
-            case Constants.MOVE:
-                if (selectedCritterTag != -1)
-                {
-                    client.doBattleMove(selectedCritterTag, hexLabel);
-                    selectedCritterTag = -1;
-                    highlightMobileCritters();
-                }
-                break;
-
-            case Constants.FIGHT:
-            case Constants.STRIKEBACK:
-                if (selectedCritterTag != -1)
-                {
-                    client.strike(selectedCritterTag, hexLabel);
-                    selectedCritterTag = -1;
-                }
-                break;
-
-            default:
-                break;
+            if (selectedCritterTag != -1)
+            {
+                client.doBattleMove(selectedCritterTag, hexLabel);
+                selectedCritterTag = -1;
+                highlightMobileCritters();
+            }
+        }
+        else if (phase.isFightPhase())
+        {
+            if (selectedCritterTag != -1)
+            {
+                client.strike(selectedCritterTag, hexLabel);
+                selectedCritterTag = -1;
+            }
         }
     }
 
     private void actOnMisclick()
     {
-        switch (client.getBattlePhase())
+        Constants.BattlePhase phase = client.getBattlePhase();
+        if (phase == Constants.BattlePhase.MOVE)
         {
-            case Constants.MOVE:
-                selectedCritterTag = -1;
-                highlightMobileCritters();
-                break;
-
-            case Constants.FIGHT:
-            case Constants.STRIKEBACK:
-                selectedCritterTag = -1;
-                client.leaveCarryMode();
-                highlightCrittersWithTargets();
-                break;
-
-            default:
-                break;
+            selectedCritterTag = -1;
+            highlightMobileCritters();
+        }
+        else if (phase.isFightPhase())
+        {
+            selectedCritterTag = -1;
+            client.leaveCarryMode();
+            highlightCrittersWithTargets();
         }
     }
 

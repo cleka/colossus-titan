@@ -14,10 +14,97 @@ import java.awt.event.*;
 public final class Constants
 {
     // Constants for phases of a turn.
-    public static final int SPLIT = 1;
-    public static final int MOVE = 2;
-    public static final int FIGHT = 3;
-    public static final int MUSTER = 4;
+    public static class Phase {
+        public static final Phase SPLIT = new Phase("Split", 1);
+        public static final Phase MOVE = new Phase("Move", 2);
+        public static final Phase FIGHT = new Phase("Fight", 3);
+        public static final Phase MUSTER = new Phase("Muster", 4);
+
+        public static Phase fromInt(int i)
+        {
+            switch(i)
+            {
+                case 1: return SPLIT;
+                case 2: return MOVE;
+                case 3: return FIGHT;
+                case 4: return MUSTER;
+                default: return null;
+            }
+        }
+
+        public int toInt()
+        {
+            return value;
+        }
+
+
+        public String toString()
+        {
+            return name;
+        }
+
+        private final String name;
+        private final int value;
+
+        private Phase(String name, int value)
+        {
+            //private constructor
+            this.name = name;
+            this.value = value;
+        }
+    }
+
+    // Phases of a battle turn
+    public static class BattlePhase {
+        public static final BattlePhase SUMMON
+            = new BattlePhase("Summon", 0);
+        public static final BattlePhase RECRUIT
+            = new BattlePhase("Recruit", 1);
+        public static final BattlePhase MOVE
+            = new BattlePhase("Move", 2);
+        public static final BattlePhase FIGHT
+            = new BattlePhase("Fight", 3);
+        public static final BattlePhase STRIKEBACK
+            = new BattlePhase("Strikeback", 4);
+
+        public static BattlePhase fromInt(int i)
+        {
+            switch(i)
+            {
+                case 0: return SUMMON;
+                case 1: return RECRUIT;
+                case 2: return MOVE;
+                case 3: return FIGHT;
+                case 4: return STRIKEBACK;
+                default: return null;
+            }
+        }
+
+        public int toInt()
+        {
+            return value;
+        }
+
+        public boolean isFightPhase()
+        {
+            return value == 3 || value == 4;
+        }
+
+        public String toString()
+        {
+            return name;
+        }
+
+        private final String name;
+        private final int value;
+
+        private BattlePhase(String name, int value)
+        {
+            //private constructor
+            this.name = name;
+            this.value = value;
+        }
+    }
 
     /** Base path for all external game data files. */
     public static final String gameDataPath =
@@ -39,13 +126,6 @@ public final class Constants
     public static final String xmlExtension = ".xml";
     public static final String xmlSnapshotStart = "snap";
     public static final String xmlSnapshotVersion = "12";
-
-    // Phases of a battle turn
-    public static final int SUMMON = 0;
-    public static final int RECRUIT = 1;
-    //public static final int MOVE = 2;
-    //public static final int FIGHT = 3;
-    public static final int STRIKEBACK = 4;
 
     public static final int BIGNUM = 99;
     public static final int OUT_OF_RANGE = 5;
@@ -372,51 +452,6 @@ public final class Constants
         for (int i = 0; i < colorNames.length; i++)
         {
             shortNamesMap.put(colorNames[i], shortColorNames[i]);
-        }
-    }
-
-    public static final String getPhaseName(int phase)
-    {
-        switch (phase)
-        {
-            case SPLIT:
-                return "Split";
-
-            case MOVE:
-                return "Move";
-
-            case FIGHT:
-                return "Fight";
-
-            case MUSTER:
-                return "Muster";
-
-            default:
-                return "";
-        }
-    }
-
-    public static String getBattlePhaseName(int phase)
-    {
-        switch (phase)
-        {
-            case Constants.SUMMON:
-                return "Summon";
-
-            case Constants.RECRUIT:
-                return "Recruit";
-
-            case Constants.MOVE:
-                return "Move";
-
-            case Constants.FIGHT:
-                return "Fight";
-
-            case Constants.STRIKEBACK:
-                return "Strikeback";
-
-            default:
-                return "";
         }
     }
 

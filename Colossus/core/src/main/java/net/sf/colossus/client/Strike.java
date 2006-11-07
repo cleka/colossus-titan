@@ -60,8 +60,7 @@ final class Strike
      *  Returns true if a strike was made. */
     boolean makeForcedStrikes(boolean rangestrike)
     {
-        if (client.getBattlePhase() != Constants.FIGHT &&
-                client.getBattlePhase() != Constants.STRIKEBACK &&
+        if (!client.getBattlePhase().isFightPhase() &&
                 !client.isMyBattlePhase())
         {
             Log.error("Called Strike.makeForcedStrikes() in wrong phase");
@@ -151,7 +150,7 @@ final class Strike
         // if the creature can strike normally, so only look for them if
         // no targets have yet been found.
         if (rangestrike && !adjacentEnemy && creature.isRangestriker() &&
-                client.getBattlePhase() != Constants.STRIKEBACK)
+                client.getBattlePhase() != Constants.BattlePhase.STRIKEBACK)
         {
             Iterator it = client.getInactiveBattleChits().iterator();
             while (it.hasNext())

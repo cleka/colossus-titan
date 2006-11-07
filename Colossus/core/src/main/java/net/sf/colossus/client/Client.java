@@ -110,11 +110,11 @@ public final class Client implements IClient, IOracle, IOptions
 
     private int turnNumber = -1;
     private String activePlayerName = "";
-    private int phase = -1;
+    private Constants.Phase phase;
 
     private int battleTurnNumber = -1;
     private String battleActivePlayerName = null;
-    private int battlePhase = -1;
+    private Constants.BattlePhase battlePhase;
     private String attackerMarkerId = "none";
     private String defenderMarkerId = "none";
 
@@ -1986,7 +1986,7 @@ public final class Client implements IClient, IOracle, IOptions
     }
 
     public void initBattle(String masterHexLabel, int battleTurnNumber,
-        String battleActivePlayerName, int battlePhase,
+        String battleActivePlayerName, Constants.BattlePhase battlePhase,
         String attackerMarkerId, String defenderMarkerId)
     {
         cleanupNegotiationDialogs();
@@ -2023,7 +2023,7 @@ public final class Client implements IClient, IOracle, IOptions
             map = null;
         }
         battleChits.clear();
-        battlePhase = -1;
+        battlePhase = null;
         battleTurnNumber = -1;
         battleActivePlayerName = null;
     }
@@ -2270,7 +2270,7 @@ public final class Client implements IClient, IOracle, IOptions
 
         this.activePlayerName = activePlayerName;
         this.turnNumber = turnNumber;
-        this.phase = Constants.SPLIT;
+        this.phase = Constants.Phase.SPLIT;
 
         numSplitsThisTurn = 0;
 
@@ -2315,7 +2315,7 @@ public final class Client implements IClient, IOracle, IOptions
 
     public void setupMove()
     {
-        this.phase = Constants.MOVE;
+        this.phase = Constants.Phase.MOVE;
         clearUndoStack();
         if (board != null)
         {
@@ -2331,7 +2331,7 @@ public final class Client implements IClient, IOracle, IOptions
     public void setupFight()
     {
         clearUndoStack();
-        this.phase = Constants.FIGHT;
+        this.phase = Constants.Phase.FIGHT;
         if (board != null)
         {
             board.setupFightMenu();
@@ -2361,7 +2361,7 @@ public final class Client implements IClient, IOracle, IOptions
         clearUndoStack();
         cleanupNegotiationDialogs();
 
-        this.phase = Constants.MUSTER;
+        this.phase = Constants.Phase.MUSTER;
 
         if (board != null)
         {
@@ -2394,7 +2394,7 @@ public final class Client implements IClient, IOracle, IOptions
     public void setupBattleSummon(String battleActivePlayerName,
         int battleTurnNumber)
     {
-        this.battlePhase = Constants.SUMMON;
+        this.battlePhase = Constants.BattlePhase.SUMMON;
         setBattleActivePlayerName(battleActivePlayerName);
         this.battleTurnNumber = battleTurnNumber;
 
@@ -2417,7 +2417,7 @@ public final class Client implements IClient, IOracle, IOptions
     public void setupBattleRecruit(String battleActivePlayerName,
         int battleTurnNumber)
     {
-        this.battlePhase = Constants.RECRUIT;
+        this.battlePhase = Constants.BattlePhase.RECRUIT;
         setBattleActivePlayerName(battleActivePlayerName);
         this.battleTurnNumber = battleTurnNumber;
 
@@ -2453,7 +2453,7 @@ public final class Client implements IClient, IOracle, IOptions
         // really quickly.
         cleanupNegotiationDialogs();
         resetAllBattleMoves();
-        this.battlePhase = Constants.MOVE;
+        this.battlePhase = Constants.BattlePhase.MOVE;
         if (map != null && isMyBattlePhase())
         {
             focusMap();
@@ -2507,12 +2507,12 @@ public final class Client implements IClient, IOracle, IOptions
     }
 
     /** Used for both strike and strikeback. */
-    public void setupBattleFight(int battlePhase,
+    public void setupBattleFight(Constants.BattlePhase battlePhase,
         String battleActivePlayerName)
     {
         this.battlePhase = battlePhase;
         setBattleActivePlayerName(battleActivePlayerName);
-        if (battlePhase == Constants.FIGHT)
+        if (battlePhase == Constants.BattlePhase.FIGHT)
         {
             markOffboardCreaturesDead();
         }
@@ -2636,7 +2636,7 @@ public final class Client implements IClient, IOracle, IOptions
         return attackerMarkerId;
     }
 
-    int getBattlePhase()
+    Constants.BattlePhase getBattlePhase()
     {
         return battlePhase;
     }
@@ -2644,10 +2644,12 @@ public final class Client implements IClient, IOracle, IOptions
     // public for IOracle
     public String getBattlePhaseName()
     {
-        if (phase == Constants.FIGHT && battlePhase >= Constants.SUMMON &&
-            battlePhase <= Constants.STRIKEBACK)
+        if (phase == Constants.Phase.FIGHT)
         {
-            return Constants.getBattlePhaseName(battlePhase);
+            if (battlePhase != null)
+            {
+                return battlePhase.toString();
+            }
         }
         return "";
     }
@@ -2892,7 +2894,7 @@ public final class Client implements IClient, IOracle, IOptions
         return activePlayerName;
     }
 
-    int getPhase()
+    Constants.Phase getPhase()
     {
         return phase;
     }
@@ -2900,7 +2902,11 @@ public final class Client implements IClient, IOracle, IOptions
     // public for IOracle
     public String getPhaseName()
     {
-        return Constants.getPhaseName(getPhase());
+        if (phase != null)
+        {
+            return phase.toString();
+        }
+        return "";
     }
 
     // public for IOracle

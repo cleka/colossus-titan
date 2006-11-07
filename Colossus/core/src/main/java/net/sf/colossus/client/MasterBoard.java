@@ -374,32 +374,31 @@ public final class MasterBoard extends JPanel
         {
             public void actionPerformed(ActionEvent e)
             {
-                int phase = client.getPhase();
-                switch (phase)
+                Constants.Phase phase = client.getPhase();
+                if (phase == Constants.Phase.SPLIT)
                 {
-                    case Constants.SPLIT:
-                        client.undoLastSplit();
-                        alignAllLegions();
-                        highlightTallLegions();
-                        repaint();
-                        break;
-
-                    case Constants.MOVE:
-                        client.undoLastMove();
-                        highlightUnmovedLegions();
-                        break;
-
-                    case Constants.FIGHT:
-                        Log.error("called undoLastAction in FIGHT");
-                        break;
-
-                    case Constants.MUSTER:
-                        client.undoLastRecruit();
-                        highlightPossibleRecruits();
-                        break;
-
-                    default:
-                        Log.error("Bogus phase");
+                    client.undoLastSplit();
+                    alignAllLegions();
+                    highlightTallLegions();
+                    repaint();
+                }
+                else if (phase == Constants.Phase.MOVE)
+                {
+                    client.undoLastMove();
+                    highlightUnmovedLegions();
+                }
+                else if (phase == Constants.Phase.FIGHT)
+                {
+                    Log.error("called undoLastAction in FIGHT");
+                }
+                else if (phase == Constants.Phase.MUSTER)
+                {
+                    client.undoLastRecruit();
+                    highlightPossibleRecruits();
+                }
+                else
+                {
+                    Log.error("Bogus phase");
                 }
             }
         };
@@ -408,32 +407,31 @@ public final class MasterBoard extends JPanel
         {
             public void actionPerformed(ActionEvent e)
             {
-                int phase = client.getPhase();
-                switch (phase)
+                Constants.Phase phase = client.getPhase();
+                if (phase == Constants.Phase.SPLIT)
                 {
-                    case Constants.SPLIT:
-                        client.undoAllSplits();
-                        alignAllLegions();
-                        highlightTallLegions();
-                        repaint();
-                        break;
-
-                    case Constants.MOVE:
-                        client.undoAllMoves();
-                        highlightUnmovedLegions();
-                        break;
-
-                    case Constants.FIGHT:
-                        Log.error("called undoAllAction in FIGHT");
-                        break;
-
-                    case Constants.MUSTER:
-                        client.undoAllRecruits();
-                        highlightPossibleRecruits();
-                        break;
-
-                    default:
-                        Log.error("Bogus phase");
+                    client.undoAllSplits();
+                    alignAllLegions();
+                    highlightTallLegions();
+                    repaint();
+                }
+                else if (phase == Constants.Phase.MOVE)
+                {
+                    client.undoAllMoves();
+                    highlightUnmovedLegions();
+                }
+                else if (phase == Constants.Phase.FIGHT)
+                {
+                    Log.error("called undoAllAction in FIGHT");
+                }
+                else if (phase == Constants.Phase.MUSTER)
+                {
+                    client.undoAllRecruits();
+                    highlightPossibleRecruits();
+                }
+                else
+                {
+                    Log.error("Bogus phase");
                 }
             }
         };
@@ -442,31 +440,30 @@ public final class MasterBoard extends JPanel
         {
             public void actionPerformed(ActionEvent e)
             {
-                int phase = client.getPhase();
-                switch (phase)
+                Constants.Phase phase = client.getPhase();
+                if (phase == Constants.Phase.SPLIT)
                 {
-                    case Constants.SPLIT:
-                        bottomBar.disableDoneButton();
-                        client.doneWithSplits();
-                        break;
-
-                    case Constants.MOVE:
-                        bottomBar.disableDoneButton();
-                        client.doneWithMoves();
-                        break;
-
-                    case Constants.FIGHT:
-                        bottomBar.disableDoneButton();
-                        client.doneWithEngagements();
-                        break;
-
-                    case Constants.MUSTER:
-                        bottomBar.disableDoneButton();
-                        client.doneWithRecruits();
-                        break;
-
-                    default:
-                        Log.error("Bogus phase");
+                    bottomBar.disableDoneButton();
+                    client.doneWithSplits();
+                }
+                else if (phase == Constants.Phase.MOVE)
+                {
+                    bottomBar.disableDoneButton();
+                    client.doneWithMoves();
+                }
+                else if (phase == Constants.Phase.FIGHT)
+                {
+                    bottomBar.disableDoneButton();
+                    client.doneWithEngagements();
+                }
+                else if (phase == Constants.Phase.MUSTER)
+                {
+                    bottomBar.disableDoneButton();
+                    client.doneWithRecruits();
+                }
+                else
+                {
+                    Log.error("Bogus phase");
                 }
             }
         };
@@ -1943,37 +1940,33 @@ public final class MasterBoard extends JPanel
 
     void actOnMisclick()
     {
-        switch (client.getPhase())
+        Constants.Phase phase = client.getPhase();
+        if (phase == Constants.Phase.SPLIT)
         {
-            case Constants.SPLIT:
-                highlightTallLegions();
-                break;
-
-            case Constants.MOVE:
-                client.clearRecruitChits();
-                client.setMoverId(null);
-                highlightUnmovedLegions();
-                break;
-
-            case Constants.FIGHT:
-                SummonAngel summonAngel = client.getSummonAngel();
-                if (summonAngel != null)
-                {
-                    highlightSummonableAngels(summonAngel.getMarkerId());
-                    summonAngel.repaint();
-                }
-                else
-                {
-                    highlightEngagements();
-                }
-                break;
-
-            case Constants.MUSTER:
-                highlightPossibleRecruits();
-                break;
-
-            default:
-                break;
+            highlightTallLegions();
+        }
+        else if (phase == Constants.Phase.MOVE)
+        {
+            client.clearRecruitChits();
+            client.setMoverId(null);
+            highlightUnmovedLegions();
+        }
+        else if (phase == Constants.Phase.FIGHT)
+        {
+            SummonAngel summonAngel = client.getSummonAngel();
+            if (summonAngel != null)
+            {
+                highlightSummonableAngels(summonAngel.getMarkerId());
+                summonAngel.repaint();
+            }
+            else
+            {
+                highlightEngagements();
+            }
+        }
+        else if (phase == Constants.Phase.MUSTER)
+        {
+            highlightPossibleRecruits();
         }
     }
 
@@ -2080,62 +2073,58 @@ public final class MasterBoard extends JPanel
         {
             return;
         }
-        switch (client.getPhase())
+
+        Constants.Phase phase = client.getPhase();
+        if (phase == Constants.Phase.SPLIT)
         {
-            case Constants.SPLIT:
-                client.doSplit(markerId);
-                break;
-
-            case Constants.MOVE:
-                // Allow spin cycle by clicking on chit again.
-                if (markerId.equals(client.getMoverId()))
-                {
-                    actOnHex(hexLabel);
-                }
-                else
-                {
-                    client.setMoverId(markerId);
-                    getGUIHexByLabel(hexLabel).repaint();
-                    highlightMoves(markerId);
-                }
-                break;
-
-            case Constants.FIGHT:
-                client.doFight(hexLabel);
-                break;
-
-            case Constants.MUSTER:
-                client.doRecruit(markerId);
-                break;
+            client.doSplit(markerId);
+        }
+        else if (phase == Constants.Phase.MOVE)
+        {
+            // Allow spin cycle by clicking on chit again.
+            if (markerId.equals(client.getMoverId()))
+            {
+                actOnHex(hexLabel);
+            }
+            else
+            {
+                client.setMoverId(markerId);
+                getGUIHexByLabel(hexLabel).repaint();
+                highlightMoves(markerId);
+            }
+        }
+        else if (phase == Constants.Phase.FIGHT)
+        {
+            client.doFight(hexLabel);
+        }
+        else if (phase == Constants.Phase.MUSTER)
+        {
+            client.doRecruit(markerId);
         }
     }
 
     private void actOnHex(String hexLabel)
     {
-        switch (client.getPhase())
+        Constants.Phase phase = client.getPhase();
+        if (phase == Constants.Phase.SPLIT)
         {
-            case Constants.SPLIT:
-                highlightTallLegions();
-                break;
-
+            highlightTallLegions();
+        }
+        else if (phase == Constants.Phase.MOVE)
+        {
             // If we're moving, and have selected a legion which
             // has not yet moved, and this hex is a legal
             // destination, move the legion here.
-            case Constants.MOVE:
-                client.clearRecruitChits();
-                client.doMove(hexLabel);
-                actOnMisclick();   // Yes, even if the move was good.
-                break;
-
+            client.clearRecruitChits();
+            client.doMove(hexLabel);
+            actOnMisclick();   // Yes, even if the move was good.
+        }
+        else if (phase == Constants.Phase.FIGHT)
+        {
             // If we're fighting and there is an engagement here,
             // resolve it.  If an angel is being summoned, mark
             // the donor legion instead.
-            case Constants.FIGHT:
-                client.engage(hexLabel);
-                break;
-
-            default:
-                break;
+            client.engage(hexLabel);
         }
     }
 

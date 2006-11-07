@@ -4,6 +4,8 @@ package net.sf.colossus.client;
 import java.util.List;
 import java.util.Set;
 
+import net.sf.colossus.server.Constants;
+
 
 /**
  *  IClient is a remote interface for the client-accessible parts of Client.
@@ -77,7 +79,7 @@ public interface IClient
             boolean wasCarry, int carryDamageLeft, Set carryTargetDescriptions);
 
     public void initBattle(String masterHexLabel, int battleTurnNumber,
-            String battleActivePlayerName, int battlePhase,
+            String battleActivePlayerName, Constants.BattlePhase battlePhase,
             String attackerMarkerId, String defenderMarkerId);
 
     public void cleanupBattle();
@@ -110,7 +112,7 @@ public interface IClient
     public void setupBattleMove(String battleActivePlayerName,
             int battleTurnNumber);
 
-    public void setupBattleFight(int battlePhase,
+    public void setupBattleFight(Constants.BattlePhase battlePhase,
             String battleActivePlayerName);
 
     public void tellLegionLocation(String markerId, String hexLabel);
