@@ -96,7 +96,7 @@ final class Negotiate extends KDialog implements MouseListener, ActionListener
 
         int scale = 4 * Scale.get();
 
-        Marker marker = new Marker(scale, markerId, client);
+        Marker marker = new Marker(scale, markerId);
         pane.add(marker);
         pane.add(Box.createRigidArea(new Dimension(scale / 4, 0)));
 
