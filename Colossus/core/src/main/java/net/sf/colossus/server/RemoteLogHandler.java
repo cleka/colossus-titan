@@ -38,5 +38,6 @@ public class RemoteLogHandler extends Handler
 	}
 
 	public void flush() {
+        // nothing to do
 	}
 }

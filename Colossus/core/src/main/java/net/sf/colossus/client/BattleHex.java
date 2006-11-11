@@ -272,10 +272,6 @@ public class BattleHex
             : '?' ; 
     }
 
-    final void testXLabel() 
-    {            
-    }
-
     public void setHexside(int i, char hexside)
     {
         this.hexsides[i] = hexside;

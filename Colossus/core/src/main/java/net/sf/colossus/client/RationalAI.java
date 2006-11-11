@@ -1240,7 +1240,6 @@ public class RationalAI extends SimpleAI implements AI
         int roll;
         int result = 0;
 
-        roll_loop:
         for (roll = 1; roll <= 6; roll++)
         {
             List enemies = (List)enemyAttackMap[roll].get(hex.getLabel());

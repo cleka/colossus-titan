@@ -62,9 +62,10 @@ public final class Game
 
     private History history;
 
-    /** Public only for JUnit test setup. */
-    public Game()
+    /** Package-private only for JUnit test setup. */
+    Game()
     {
+        // nothing to do
     }
 
     /** For Start */
@@ -817,6 +818,7 @@ public final class Game
         {
             Log.error("No players");
             dispose();
+            return;
         }
         player.resetTurnState();
         server.allSetupSplit();
@@ -1592,15 +1594,15 @@ public final class Game
     /** Add recruit to legion. */
     void doRecruit(Legion legion, Creature recruit, Creature recruiter)
     {
-        // Check for recruiter legality.
-        java.util.List recruiters = findEligibleRecruiters(
-                legion.getMarkerId(), recruit.getName());
-
         if (recruit == null)
         {
             Log.error("null recruit in Game.doRecruit()");
             return;
         }
+        // Check for recruiter legality.
+        java.util.List recruiters = findEligibleRecruiters(
+                legion.getMarkerId(), recruit.getName());
+
         if (recruiter == null)
         {
             // If recruiter can be anonymous, then this is okay.

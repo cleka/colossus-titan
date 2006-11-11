@@ -402,12 +402,15 @@ class CCVFlowLayout extends FlowLayout implements ComponentListener {
     }
     
     public void componentMoved(ComponentEvent e) {
+        // necessary to implement interface
     }
     
     public void componentShown(ComponentEvent e) {
+        // necessary to implement interface
     }
     
     public void componentHidden(ComponentEvent e) {
+        // necessary to implement interface
     } 
 }
 

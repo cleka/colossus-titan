@@ -46,6 +46,7 @@ final class PickCarry extends KDialog implements ActionListener
         // Don't allow exiting without making a choice, or the game will hang.
         addWindowListener(new WindowAdapter()
         {
+            // @todo: this could probably be done by using setDefaultCloseOperation()
         }
         );
 

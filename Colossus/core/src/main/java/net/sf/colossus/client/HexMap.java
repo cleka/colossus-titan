@@ -647,50 +647,62 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
 
     public void mousePressed(MouseEvent e)
     {
+        // necessary to implement interface
     }
 
     public void mouseReleased(MouseEvent e)
     {
+        // necessary to implement interface
     }
 
     public void mouseClicked(MouseEvent e)
     {
+        // necessary to implement interface
     }
 
     public void mouseEntered(MouseEvent e)
     {
+        // necessary to implement interface
     }
 
     public void mouseExited(MouseEvent e)
     {
+        // necessary to implement interface
     }
 
     public void windowActivated(WindowEvent e)
     {
+        // necessary to implement interface
     }
 
     public void windowClosed(WindowEvent e)
     {
+        // necessary to implement interface
     }
 
     public void windowClosing(WindowEvent e)
     {
+        // necessary to implement interface
     }
 
     public void windowDeactivated(WindowEvent e)
     {
+        // necessary to implement interface
     }
 
     public void windowDeiconified(WindowEvent e)
     {
+        // necessary to implement interface
     }
 
     public void windowIconified(WindowEvent e)
     {
+        // necessary to implement interface
     }
 
     public void windowOpened(WindowEvent e)
     {
+        // necessary to implement interface
     }
 
     public void paintComponent(Graphics g)

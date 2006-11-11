@@ -216,7 +216,6 @@ public final class BattleMap extends HexMap implements MouseListener,
                     Log.event(playerName + " concedes the battle");
                     client.concede();
                 }
-                ;
             }
         };
     }

@@ -84,49 +84,61 @@ public class KDialog extends JDialog implements MouseListener, WindowListener
 
     public void mouseClicked(MouseEvent e)
     {
+        // nothing to do
     }
 
     public void mouseEntered(MouseEvent e)
     {
+        // nothing to do
     }
 
     public void mouseExited(MouseEvent e)
     {
+        // nothing to do
     }
 
     public void mousePressed(MouseEvent e)
     {
+        // nothing to do
     }
 
     public void mouseReleased(MouseEvent e)
     {
+        // nothing to do
     }
 
     public void windowClosed(WindowEvent e)
     {
+        // nothing to do
     }
 
     public void windowActivated(WindowEvent e)
     {
+        // nothing to do
     }
 
     public void windowClosing(WindowEvent e)
     {
+        // nothing to do
     }
 
     public void windowDeactivated(WindowEvent e)
     {
+        // nothing to do
     }
 
     public void windowDeiconified(WindowEvent e)
     {
+        // nothing to do
     }
 
     public void windowIconified(WindowEvent e)
     {
+        // nothing to do
     }
 
     public void windowOpened(WindowEvent e)
     {
+        // nothing to do
     }
 }

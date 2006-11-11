@@ -3023,8 +3023,8 @@ public class SimpleAI implements AI
     {
         ArrayList critterMoves = (ArrayList)allCritterMoves.clone();
         while (trimCritterMoves(critterMoves))
-        {
-        }  // Just trimming
+        { // Just trimming
+        }  
 
         // Now that the list is as small as possible, start finding combos.
         List legionMoves = new ArrayList();
@@ -3631,6 +3631,7 @@ public class SimpleAI implements AI
     /** MoveList is an ArrayList of CritterMoves */
     class MoveList extends ArrayList
     {
+        // @todo what is this inner class for?
     }
 
 

@@ -26,6 +26,7 @@ public final class CaretakerInfo
 
     public CaretakerInfo()
     {
+    	// nothing apart from initializers
     }
 
     public void updateCount(String creatureName, int count, int deadCount)
