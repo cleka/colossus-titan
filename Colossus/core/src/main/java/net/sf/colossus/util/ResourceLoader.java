@@ -331,7 +331,7 @@ public final class ResourceLoader
                     fixFilename(filename));
             // url will not be null even is the file doesn't exist,
             // so we need to check if connection can be opened
-            if ((url != null) && (url.openStream() != null))
+            if (url.openStream() != null)
             {
                 image = Toolkit.getDefaultToolkit().getImage(url);
             }
@@ -370,7 +370,7 @@ public final class ResourceLoader
                     fixFilename(filename));
             // url will not be null even is the file doesn't exist,
             // so we need to check if connection can be opened
-            if ((url != null) && (url.openStream() != null))
+            if (url.openStream() != null)
             {
                 icon = new ImageIcon(url);
             }
@@ -805,10 +805,8 @@ public final class ResourceLoader
                     null);
             waitOnImage(bi);
         }
-        if (bi != null)
-        {
-            imageCache.put(mapKey, bi);
-        }
+        imageCache.put(mapKey, bi);
+
         return bi;
     }
 
@@ -1078,11 +1076,7 @@ public final class ResourceLoader
                 0, 0,
                 width, height,
                 null);
-
-        if (bi != null)
-        {
-            waitOnImage(bi);
-        }
+        waitOnImage(bi);
 
         int[] pi;
         WritableRaster ra = bi.getRaster();
@@ -1446,20 +1440,17 @@ public final class ResourceLoader
                     fixFilename(filename));
             // url will not be null even is the file doesn't exist,
             // so we need to check if connection can be opened
-            if (url != null)
+            InputStream stream = url.openStream();
+            if (stream != null)
             {
-                InputStream stream = url.openStream();
-                if (url.openStream() != null)
-                {
-                    BufferedImageTranscoder t = new BufferedImageTranscoder();
-                    t.addTranscodingHint(ImageTranscoder.KEY_WIDTH,
-                            new Float(width));
-                    t.addTranscodingHint(ImageTranscoder.KEY_HEIGHT,
-                            new Float(height));
-                    TranscoderInput input = new TranscoderInput(stream);
-                    t.transcode(input, null);
-                    image = t.getImage();
-                }
+                BufferedImageTranscoder t = new BufferedImageTranscoder();
+                t.addTranscodingHint(ImageTranscoder.KEY_WIDTH,
+                        new Float(width));
+                t.addTranscodingHint(ImageTranscoder.KEY_HEIGHT,
+                        new Float(height));
+                TranscoderInput input = new TranscoderInput(stream);
+                t.transcode(input, null);
+                image = t.getImage();
             }
         }
         catch (FileNotFoundException e)

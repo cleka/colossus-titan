@@ -637,14 +637,13 @@ public final class Server implements IServer
     public synchronized void acquireAngel(String markerId, String angelType)
     {
         Legion legion = game.getLegionByMarkerId(markerId);
-        if (!getPlayerName().equals(legion.getPlayerName()))
-        {
-            Log.error(getPlayerName() + " illegally called acquireAngel()");
-            return;
-        }
-
         if (legion != null)
         {
+            if (!getPlayerName().equals(legion.getPlayerName()))
+            {
+                Log.error(getPlayerName() + " illegally called acquireAngel()");
+                return;
+            }
             legion.addAngel(angelType);
         }
     }
