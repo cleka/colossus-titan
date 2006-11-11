@@ -76,7 +76,7 @@ public class CarryTest extends TestCase
 
         battle = new Battle(game, attacker.getMarkerId(), 
             defender.getMarkerId(), Constants.DEFENDER, hexLabel,
-            2, Constants.FIGHT);
+            2, Constants.BattlePhase.FIGHT);
 
         Critter centaur1 = attacker.getCritter(0);
         Critter centaur2 = attacker.getCritter(1);
@@ -143,7 +143,7 @@ public class CarryTest extends TestCase
 
         battle = new Battle(game, attacker.getMarkerId(), 
             defender.getMarkerId(), Constants.ATTACKER, hexLabel,
-            3, Constants.FIGHT);
+            3, Constants.BattlePhase.FIGHT);
 
         Critter warlock1 = attacker.getCritter(0);
         Critter warlock2 = attacker.getCritter(1);

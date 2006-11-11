@@ -85,7 +85,7 @@ public class LOSTest extends TestCase
 
         battle = new Battle(game, attacker.getMarkerId(),
                 defender.getMarkerId(), Constants.ATTACKER, hexLabel,
-                1, Constants.FIGHT);
+                1, Constants.BattlePhase.FIGHT);
 
         Critter centaur1 = defender.getCritter(0);
         Critter gargoyle1 = defender.getCritter(1);
@@ -123,7 +123,7 @@ public class LOSTest extends TestCase
 
         battle = new Battle(game, attacker.getMarkerId(),
                 defender.getMarkerId(), Constants.ATTACKER, hexLabel,
-                1, Constants.FIGHT);
+                1, Constants.BattlePhase.FIGHT);
 
         Critter centaur1 = defender.getCritter(0);
         Critter centaur2 = defender.getCritter(1);
@@ -267,7 +267,7 @@ public class LOSTest extends TestCase
 
         battle = new Battle(game, attacker.getMarkerId(),
                 defender.getMarkerId(), Constants.ATTACKER, hexLabel,
-                1, Constants.FIGHT);
+                1, Constants.BattlePhase.FIGHT);
 
         Critter centaur1 = defender.getCritter(0);
         Critter lion1 = defender.getCritter(1);
@@ -399,7 +399,7 @@ public class LOSTest extends TestCase
 
         battle = new Battle(game, attacker.getMarkerId(),
                 defender.getMarkerId(), Constants.ATTACKER, hexLabel,
-                1, Constants.FIGHT);
+                1, Constants.BattlePhase.FIGHT);
 
         Critter centaur1 = defender.getCritter(0);
         Critter centaur2 = defender.getCritter(1);
@@ -516,7 +516,7 @@ public class LOSTest extends TestCase
 
         battle = new Battle(game, attacker.getMarkerId(),
                 defender.getMarkerId(), Constants.ATTACKER, hexLabel,
-                2, Constants.FIGHT);
+                2, Constants.BattlePhase.FIGHT);
 
         Critter troll1 = defender.getCritter(0);
         Critter troll2 = defender.getCritter(1);
@@ -607,7 +607,7 @@ public class LOSTest extends TestCase
 
         battle = new Battle(game, attacker.getMarkerId(),
                 defender.getMarkerId(), Constants.ATTACKER, hexLabel,
-                2, Constants.FIGHT);
+                2, Constants.BattlePhase.FIGHT);
 
         Critter dragon1 = defender.getCritter(0);
         Critter dragon2 = defender.getCritter(1);
@@ -697,7 +697,7 @@ public class LOSTest extends TestCase
 
         battle = new Battle(game, attacker.getMarkerId(),
                 defender.getMarkerId(), Constants.ATTACKER, hexLabel,
-                1, Constants.FIGHT);
+                1, Constants.BattlePhase.FIGHT);
 
         Critter hydra1 = defender.getCritter(0);
         Critter hydra2 = attacker.getCritter(0);
