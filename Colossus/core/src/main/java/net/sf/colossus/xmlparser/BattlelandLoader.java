@@ -105,7 +105,6 @@ public class BattlelandLoader
     }
 
     private void handleStartlistHex(Element el)
-        throws JDOMException
     {
         String label = el.getAttributeValue("label");
         if (startlist == null && label != null)
