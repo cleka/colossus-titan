@@ -28,8 +28,8 @@ import net.sf.colossus.util.KDialog;
 public final class PickIntValue extends KDialog implements WindowListener,
             ChangeListener, ActionListener
 {
-    private static int newValue;
-    private static int oldValue;
+    private int newValue;
+    private int oldValue;
 
     private JSpinner spinner;
     private SpinnerNumberModel model;
@@ -38,6 +38,8 @@ public final class PickIntValue extends KDialog implements WindowListener,
             int min, int max, int step)
     {
         super(parentFrame, title, true);
+        this.newValue = oldValue; // oldValue is also the new unless changed
+        this.oldValue = oldValue;
 
         setBackground(Color.lightGray);
 
@@ -74,8 +76,8 @@ public final class PickIntValue extends KDialog implements WindowListener,
     public static int pickIntValue(JFrame parentFrame, int oldValue,
             String title, int min, int max, int step)
     {
-        new PickIntValue(parentFrame, oldValue, title, min, max, step);
-        return newValue;
+        PickIntValue dialog = new PickIntValue(parentFrame, oldValue, title, min, max, step);
+        return dialog.newValue;
     }
 
     public void stateChanged(ChangeEvent e)
