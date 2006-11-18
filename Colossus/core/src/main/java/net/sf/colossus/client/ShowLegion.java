@@ -23,7 +23,8 @@ import net.sf.colossus.util.KDialog;
 final class ShowLegion extends KDialog implements MouseListener,
             WindowListener
 {
-    ShowLegion(JFrame parentFrame, Marker marker, LegionInfo legion, Point point, JScrollPane pane, int scale)
+    ShowLegion(JFrame parentFrame, Marker marker, LegionInfo legion, 
+               Point point, JScrollPane pane, int scale)
     {
         super(parentFrame, "Legion " + legion.getMarkerId(), false);
 
