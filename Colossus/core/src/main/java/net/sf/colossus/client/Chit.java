@@ -49,7 +49,8 @@ class Chit extends JPanel
     /** Flag to paint the chit upside-down. */
     private boolean inverted = false;
 
-    private String id;
+    // Initialize early to avoid NullPointerException with GTK L&F
+    private String id = "";
 
     static BasicStroke oneWide = new BasicStroke(1);
     static BasicStroke threeWide = new BasicStroke(3);
@@ -68,6 +69,7 @@ class Chit extends JPanel
     {
         super();
 
+        this.id = id;
         this.inverted = inverted;
         Point point = getLocation();
 
@@ -80,8 +82,6 @@ class Chit extends JPanel
 
         rect = new Rectangle(point.x, point.y, scale, scale);
         setBounds(rect);
-
-        this.id = id;
 
         setBackground(Color.lightGray);
 
