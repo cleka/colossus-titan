@@ -3,6 +3,7 @@ package net.sf.colossus.client;
 
 import java.awt.Color;
 import java.awt.Container;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowListener;
@@ -33,9 +34,10 @@ public final class PickIntValue extends KDialog implements WindowListener,
 
     private JSpinner spinner;
     private SpinnerNumberModel model;
+    private SaveWindow saveWindow;
 
     private PickIntValue(JFrame parentFrame, int oldValue, String title,
-            int min, int max, int step)
+            int min, int max, int step, IOptions options)
     {
         super(parentFrame, title, true);
         this.newValue = oldValue; // oldValue is also the new unless changed
@@ -66,7 +68,16 @@ public final class PickIntValue extends KDialog implements WindowListener,
         buttonBar.add(cancel);
 
         pack();
-        centerOnScreen();
+        saveWindow = new SaveWindow(options, "PickIntValue");
+        Point location = saveWindow.loadLocation();
+        if (location == null)
+        {
+            centerOnScreen();
+        }
+        else
+        {
+            setLocation(location);
+        }
         setVisible(true);
         repaint();
     }
@@ -74,9 +85,10 @@ public final class PickIntValue extends KDialog implements WindowListener,
     /** Return the new value if the user accepted it, or oldValue if
      *  user cancelled the dialog. */
     public static int pickIntValue(JFrame parentFrame, int oldValue,
-            String title, int min, int max, int step)
+            String title, int min, int max, int step, IOptions options)
     {
-        PickIntValue dialog = new PickIntValue(parentFrame, oldValue, title, min, max, step);
+        PickIntValue dialog = new PickIntValue(parentFrame, oldValue, title, 
+            min, max, step, options);
         return dialog.newValue;
     }
 
@@ -96,5 +108,11 @@ public final class PickIntValue extends KDialog implements WindowListener,
             newValue = oldValue;
             dispose();
         }
+    }
+
+    public void dispose()
+    {
+        saveWindow.saveLocation(getLocation());
+        super.dispose();
     }
 }

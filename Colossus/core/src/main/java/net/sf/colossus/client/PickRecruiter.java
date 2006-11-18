@@ -3,6 +3,7 @@ package net.sf.colossus.client;
 
 import java.awt.Color;
 import java.awt.Container;
+import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.WindowEvent;
@@ -33,6 +34,7 @@ final class PickRecruiter extends KDialog implements MouseListener,
     private List recruiterChits = new ArrayList();
     private Marker legionMarker;
     private static String recruiterName;
+    private SaveWindow saveWindow;
 
     /** recruiters is a list of creature name strings */
     private PickRecruiter(JFrame parentFrame, List recruiters,
@@ -86,7 +88,16 @@ final class PickRecruiter extends KDialog implements MouseListener,
         }
 
         pack();
-        centerOnScreen();
+        saveWindow = new SaveWindow(client, "PickRecruiter");
+        Point location = saveWindow.loadLocation();
+        if (location == null)
+        {
+            centerOnScreen();
+        }
+        else
+        {
+            setLocation(location);
+        }
         setVisible(true);
         repaint();
     }
@@ -119,5 +130,11 @@ final class PickRecruiter extends KDialog implements MouseListener,
     public void windowClosing(WindowEvent e)
     {
         dispose();
+    }
+
+    public void dispose()
+    {
+        saveWindow.saveLocation(getLocation());
+        super.dispose();
     }
 }

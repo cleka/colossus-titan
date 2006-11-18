@@ -4,6 +4,7 @@ package net.sf.colossus.client;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.FlowLayout;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -34,9 +35,9 @@ final class AcquireAngel extends KDialog implements MouseListener,
     private List recruits;
     private Client client;
     private String markerId;
-    private static int numberOpen = 0;
     private static final int basicXOffset = 16;
     private static final int basicYOffset = 32;
+    private SaveWindow saveWindow;
 
     AcquireAngel(JFrame parentFrame, Client client, String markerId,
             List recruits)
@@ -75,9 +76,16 @@ final class AcquireAngel extends KDialog implements MouseListener,
         cancelButton.addActionListener(this);
 
         pack();
-        numberOpen++;
-        centerOnScreen(basicXOffset * numberOpen,
-                basicYOffset * numberOpen);
+        saveWindow = new SaveWindow(client, "AcquireAngel");
+        Point location = saveWindow.loadLocation();
+        if (location == null)
+        {
+            centerOnScreen();
+        }
+        else
+        {
+            setLocation(location);
+        }
         setVisible(true);
         repaint();
     }
@@ -85,7 +93,7 @@ final class AcquireAngel extends KDialog implements MouseListener,
     void cleanup(String angelType)
     {
         client.acquireAngelCallback(markerId, angelType);
-        numberOpen--;
+        saveWindow.saveLocation(getLocation());
         dispose();
     }
 

@@ -4,6 +4,7 @@ package net.sf.colossus.client;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.FlowLayout;
+import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.WindowListener;
@@ -29,8 +30,9 @@ final class PickLord extends KDialog implements MouseListener, WindowListener
     private List chits = new ArrayList();
     private static String lordType;
     private List imageNames;
+    private SaveWindow saveWindow;
 
-    private PickLord(JFrame parentFrame, List imageNames)
+    private PickLord(IOptions options, JFrame parentFrame, List imageNames)
     {
         super(parentFrame, "Reveal Which Lord?", true);
 
@@ -56,14 +58,24 @@ final class PickLord extends KDialog implements MouseListener, WindowListener
         }
 
         pack();
-        centerOnScreen();
+        saveWindow = new SaveWindow(options, "PickLord");
+        Point location = saveWindow.loadLocation();
+        if (location == null)
+        {
+            centerOnScreen();
+        }
+        else
+        {
+            setLocation(location);
+        }
         setVisible(true);
         repaint();
     }
 
-    static String pickLord(JFrame parentFrame, List imageNames)
+    static String pickLord(IOptions options, JFrame parentFrame, 
+        List imageNames)
     {
-        new PickLord(parentFrame, imageNames);
+        new PickLord(options, parentFrame, imageNames);
         return lordType;
     }
 
@@ -78,6 +90,7 @@ final class PickLord extends KDialog implements MouseListener, WindowListener
             {
                 lordType = Constants.titan;
             }
+            saveWindow.saveLocation(getLocation());
             dispose();
         }
     }

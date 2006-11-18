@@ -4,6 +4,7 @@ package net.sf.colossus.client;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -54,6 +55,8 @@ final class SplitLegion extends KDialog implements MouseListener,
 
     private int totalChits;
     private int scale;
+
+    private SaveWindow saveWindow;
 
     private SplitLegion(Client client, String parentId,
             String selectedMarkerId)
@@ -129,7 +132,16 @@ final class SplitLegion extends KDialog implements MouseListener,
         buttonBox.add(button2);
 
         pack();
-        centerOnScreen();
+        saveWindow = new SaveWindow(client, "SplitLegion");
+        Point location = saveWindow.loadLocation();
+        if (location == null)
+        {
+            centerOnScreen();
+        }
+        else
+        {
+            setLocation(location);
+        }
         setVisible(true);
     }
 
@@ -240,6 +252,15 @@ final class SplitLegion extends KDialog implements MouseListener,
         }
         results = buf.toString();
         dispose();
+    }
+
+    public void dispose()
+    {
+        if (saveWindow != null)
+        {
+            saveWindow.saveLocation(getLocation());
+        }
+        super.dispose();
     }
 
     public void mousePressed(MouseEvent e)

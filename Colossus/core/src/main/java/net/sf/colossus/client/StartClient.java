@@ -3,6 +3,8 @@ package net.sf.colossus.client;
 
 import java.awt.Dimension;
 import java.awt.GridLayout;
+import java.awt.Point;
+import java.awt.event.WindowListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
@@ -39,6 +41,7 @@ public class StartClient extends KDialog implements WindowListener,
     static String hostname;
     int port;
     static net.sf.colossus.util.Options clientOptions;
+    SaveWindow saveWindow;
 
     JComboBox nameBox;
     JComboBox hostBox;
@@ -108,7 +111,16 @@ public class StartClient extends KDialog implements WindowListener,
 
         addWindowListener(this);
         pack();
-        centerOnScreen();
+        saveWindow = new SaveWindow(clientOptions, "StartClient");
+        Point location = saveWindow.loadLocation();
+        if (location == null)
+        {
+            centerOnScreen();
+        }
+        else
+        {
+            setLocation(location);
+        }
         setVisible(true);
     }
 
@@ -132,6 +144,7 @@ public class StartClient extends KDialog implements WindowListener,
         else if (e.getActionCommand().equals("Go"))
         {
             dispose();
+            saveWindow.saveLocation(getLocation());
             connect(playerName, hostname, port);
         }
         else  // A combo box was changed.

@@ -4,6 +4,7 @@ package net.sf.colossus.client;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -41,6 +42,7 @@ final class PickRecruit extends KDialog implements MouseListener,
     private List legionChits = new ArrayList();
     private static String recruit;
     private static boolean active;
+    private SaveWindow saveWindow;
 
     private PickRecruit(JFrame parentFrame, List recruits,
             String hexDescription, String markerId, Client client)
@@ -104,7 +106,16 @@ final class PickRecruit extends KDialog implements MouseListener,
         recruitPane.add(cancelButton);
 
         pack();
-        centerOnScreen();
+        saveWindow = new SaveWindow(client, "PickRecruit");
+        Point location = saveWindow.loadLocation();
+        if (location == null)
+        {
+            centerOnScreen();
+        }
+        else
+        {
+            setLocation(location);
+        }
         setVisible(true);
         repaint();
     }
@@ -145,5 +156,11 @@ final class PickRecruit extends KDialog implements MouseListener,
     public void windowClosing(WindowEvent e)
     {
         dispose();
+    }
+
+    public void dispose()
+    {
+        saveWindow.saveLocation(getLocation());
+        super.dispose();
     }
 }

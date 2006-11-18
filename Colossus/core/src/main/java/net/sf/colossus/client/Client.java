@@ -2947,7 +2947,7 @@ public final class Client implements IClient, IOracle, IOptions
                 }
                 else
                 {
-                    return PickLord.pickLord(board.getFrame(), lords);
+                    return PickLord.pickLord(this, board.getFrame(), lords);
                 }
         }
     }
@@ -3921,7 +3921,7 @@ public final class Client implements IClient, IOracle, IOptions
             do
             {
                 color = PickColor.pickColor(board.getFrame(), playerName,
-                    colorsLeft);
+                    colorsLeft, this);
             }
             while (color == null);
         }

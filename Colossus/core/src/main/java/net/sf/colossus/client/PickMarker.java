@@ -4,6 +4,7 @@ package net.sf.colossus.client;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.GridLayout;
+import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.WindowEvent;
@@ -29,6 +30,7 @@ final class PickMarker extends KDialog implements MouseListener, WindowListener
 {
     private List markers = new ArrayList();
     private Client client;
+    private SaveWindow saveWindow;
 
     PickMarker(JFrame parentFrame, String name, Set markerIds, Client client)
     {
@@ -62,7 +64,16 @@ final class PickMarker extends KDialog implements MouseListener, WindowListener
         }
 
         pack();
-        centerOnScreen();
+        saveWindow = new SaveWindow(client, "PickMarker");
+        Point location = saveWindow.loadLocation();
+        if (location == null)
+        {
+            centerOnScreen();
+        }
+        else
+        {
+            setLocation(location);
+        }
         setVisible(true);
     }
 
@@ -70,6 +81,7 @@ final class PickMarker extends KDialog implements MouseListener, WindowListener
      *  the player aborts the selection. */
     private void cleanup(String markerId)
     {
+        saveWindow.saveLocation(getLocation());
         dispose();
         client.pickMarkerCallback(markerId);
     }

@@ -6,13 +6,16 @@ import java.io.*;
 
 import net.sf.colossus.server.Constants;
 
+// TODO move to util
+import net.sf.colossus.client.IOptions;
+
 
 /** Class Options lists game options for Colossus.
  *  @version $Id$
  *  @author David Ripton
  */
 
-public final class Options
+public final class Options implements IOptions
 {
     // Everything is public because we use this class in both the client
     // and server packages.  (With separate data.)

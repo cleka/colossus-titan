@@ -48,6 +48,7 @@ final class SummonAngel extends KDialog implements MouseListener,
             " Selected Legion is ";
     private static final String noSourceSummonString =
             " No selected Legion";
+    private SaveWindow saveWindow;
 
     private SummonAngel(Client client, String markerId)
     {
@@ -103,9 +104,16 @@ final class SummonAngel extends KDialog implements MouseListener,
 
         pack();
 
-        Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-        setLocation(new Point(d.width / 2 - getSize().width / 2,
-                d.height / 2 - getSize().height / 2));
+        saveWindow = new SaveWindow(client, "SummonAngel");
+        Point location = saveWindow.loadLocation();
+        if (location == null)
+        {
+            centerOnScreen();
+        }
+        else
+        {
+            setLocation(location);
+        }
 
         setVisible(true);
         repaint();
@@ -131,6 +139,7 @@ final class SummonAngel extends KDialog implements MouseListener,
     private void cleanup(String donorId, String angel)
     {
         client.doSummon(markerId, donorId, angel);
+        saveWindow.saveLocation(getLocation());
         dispose();
         active = false;
     }

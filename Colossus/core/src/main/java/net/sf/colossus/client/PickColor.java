@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowListener;
@@ -18,6 +19,7 @@ import javax.swing.JFrame;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.util.HTMLColor;
 import net.sf.colossus.util.KDialog;
+import net.sf.colossus.util.Options;
 
 
 /**
@@ -31,8 +33,8 @@ final class PickColor extends KDialog implements WindowListener, ActionListener
 {
     private static final Color[] background;
     private static final Color[] foreground;
-
     private static String color;
+    private SaveWindow saveWindow;
 
     static
     {
@@ -52,7 +54,7 @@ final class PickColor extends KDialog implements WindowListener, ActionListener
     }
 
     private PickColor(JFrame parentFrame, String playerName,
-            List colorsLeft)
+            List colorsLeft, IOptions options)
     {
         super(parentFrame, playerName + ", Pick a Color", true);
 
@@ -81,15 +83,24 @@ final class PickColor extends KDialog implements WindowListener, ActionListener
         }
 
         pack();
-        centerOnScreen();
+        saveWindow = new SaveWindow(options, "PickColor");
+        Point location = saveWindow.loadLocation();
+        if (location == null)
+        {
+            centerOnScreen();
+        }
+        else
+        {
+            setLocation(location);
+        }
         addWindowListener(this);
         setVisible(true);
     }
 
     static String pickColor(JFrame parentFrame, String playerName,
-            List colorsLeft)
+            List colorsLeft, IOptions options)
     {
-        new PickColor(parentFrame, playerName, colorsLeft);
+        new PickColor(parentFrame, playerName, colorsLeft, options);
         return color;
     }
 
@@ -129,6 +140,7 @@ final class PickColor extends KDialog implements WindowListener, ActionListener
     public void actionPerformed(ActionEvent e)
     {
         color = e.getActionCommand();
+        saveWindow.saveLocation(getLocation());
         dispose();
     }
 
@@ -136,7 +148,8 @@ final class PickColor extends KDialog implements WindowListener, ActionListener
     {
         Logger logger = Logger.getLogger(PickColor.class.getName());
         List colorsLeft = Arrays.asList(Constants.colorNames);
-        String color = pickColor(new JFrame(), "Player", colorsLeft);
+        Options options = new Options("Player");
+        String color = pickColor(new JFrame(), "Player", colorsLeft, options);
         logger.info("Picked " + color);
         System.exit(0);
     }

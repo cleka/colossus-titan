@@ -2,6 +2,7 @@ package net.sf.colossus.client;
 
 
 import java.awt.GridLayout;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -22,6 +23,7 @@ final class PickCarry extends KDialog implements ActionListener
 {
     private Client client;
     private static final String cancel = "Decline carry";
+    private SaveWindow saveWindow;
 
     /** Each choice is a String of form "Warbear in Plains Hex G3" */
     PickCarry(JFrame parentFrame, Client client, int carryDamage,
@@ -46,12 +48,22 @@ final class PickCarry extends KDialog implements ActionListener
         // Don't allow exiting without making a choice, or the game will hang.
         addWindowListener(new WindowAdapter()
         {
-            // @todo: this could probably be done by using setDefaultCloseOperation()
+            // @todo: this could probably be done by using 
+            // setDefaultCloseOperation()
         }
         );
 
         pack();
-        centerOnScreen();
+        saveWindow = new SaveWindow(client, "PickCarry");
+        Point location = saveWindow.loadLocation();
+        if (location == null)
+        {
+            centerOnScreen();
+        }
+        else
+        {
+            setLocation(location);
+        }
         setVisible(true);
     }
 
@@ -74,6 +86,7 @@ final class PickCarry extends KDialog implements ActionListener
             String targetHex = desc.substring(desc.length() - 2);
             client.applyCarries(targetHex);
         }
+        saveWindow.saveLocation(getLocation());
         dispose();
     }
 }
