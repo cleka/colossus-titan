@@ -16,10 +16,6 @@
         with an alias matching your username, and you need to put
         the password for this key in environment var JARPASSWORD.
         (Ant won't do keyboard password input.)
-     To make a ChangeLog file from cvs history, you need cvs2cl.pl
-        http://www.red-bean.com/cvs2cl/  You also need perl in the path.
-        And you need to have ssh-agent set up so that you can do cvs
-        commands over ssh without password prompts.
 -->
 
 <project name="Colossus" default="jar" basedir=".">
@@ -261,14 +257,7 @@
 
 	<!-- Tasks from here down are only needed for installation on the web site. -->
 
-	<target name="changelog" depends="" description="Create a ChangeLog file from cvs history">
-		<exec executable="cvs2cl.pl">
-			<arg line="-S --no-wrap --utc" />
-		</exec>
-		<delete verbose="yes" file="ChangeLog.bak" />
-	</target>
-
-	<target name="dist" depends="clean,init,sign,changelog" description="Make zip file for user download">
+	<target name="dist" depends="clean,init,sign" description="Make zip file for user download">
 		<zip zipfile="${ZIPFILE}" basedir="." excludes="**/*.sav,
                  **/*.zip,
                  **/*.bak,
@@ -288,11 +277,10 @@
 	</target>
 
 
-	<target name="inst" depends="clean,init,sign,dist,changelog" description="Locally copy files into htdocs tree on SF">
+	<target name="inst" depends="clean,init,sign,dist" description="Locally copy files into htdocs tree on SF">
 		<copy file="Colossus.jar" todir="${HTML_DIR}" />
 		<copy file="Colossus.jnlp" todir="${HTML_DIR}" />
 		<move file="${ZIPFILE}" todir="${DOWNLOAD_DIR}" />
-		<copy file="ChangeLog" todir="${HTML_DIR}" />
 		<copy todir="${DOCS_DIR}">
 			<fileset dir="docs" />
 		</copy>
@@ -303,7 +291,7 @@
 
 	<!-- TODO Eliminate double maintenance -->
 	<!-- This requires rsync and a good ssh-agent setup. -->
-	<target name="remote-inst" depends="clean,init,sign,dist,changelog" description="copy files into htdocs tree on SF">
+	<target name="remote-inst" depends="clean,init,sign,dist" description="copy files into htdocs tree on SF">
 		<exec executable="rsync">
 			<arg line="-e ssh Colossus.jar ${SERVER}:${HTML_DIR}" />
 		</exec>
@@ -315,9 +303,6 @@
 		</exec>
 		<exec executable="rsync">
 			<arg line="-e ssh -pt libs/ ${SERVER}:${LIBS_DIR}" />
-		</exec>
-		<exec executable="rsync">
-			<arg line="-e ssh ChangeLog ${SERVER}:${HTML_DIR}" />
 		</exec>
 		<exec executable="rsync">
 			<arg line="-e ssh ${ZIPFILE} ${SERVER}:${DOWNLOAD_DIR}" />
