@@ -11,6 +11,8 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.util.HashMap;
@@ -53,6 +55,8 @@ class CreatureCollectionView extends KDialog implements WindowListener
     /** hash by creature name to the Chit (so we can cross away the dead) */
     Map chitMap = new HashMap();
     private SaveWindow saveWindow;
+    private JScrollPane scrollPane;
+    private JFrame parentFrame;
     private final static Font countFont =
             new Font("Monospaced", Font.PLAIN, 12);
     private final static String baseString = "--/--/--";
@@ -77,13 +81,14 @@ class CreatureCollectionView extends KDialog implements WindowListener
     CreatureCollectionView(JFrame frame, Client client)
     {
         super(frame, "Caretaker's Stacks", false);
+        this.parentFrame = frame;
         setFocusable(false);
 
         this.client = client;
 
         getContentPane().setLayout(new BorderLayout());
 
-        JScrollPane scrollPane =
+        this.scrollPane =
             new JScrollPane(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
                             javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         JPanel panel = makeCreaturePanel(scrollPane);
@@ -159,6 +164,25 @@ class CreatureCollectionView extends KDialog implements WindowListener
             topLabel.setFont(countFont);
             countMap.put(name, label);
             topCountMap.put(name, topLabel);
+
+            // clicking the creature icon invokes the details view
+            final Creature creature = Creature.getCreatureByName(name);
+            assert creature != null : "Expected creature name '" + name + 
+                                      "' to be valid";
+            this.addMouseListener(new MouseAdapter()
+            {
+                public void mouseClicked(MouseEvent e)
+                {
+                    System.out.println(creature.getDisplayName());
+                    if (e.getButton() == MouseEvent.BUTTON1)
+                    {
+                        new ShowCreatureDetails(
+                                CreatureCollectionView.this.parentFrame,
+                                creature, null,
+                                CreatureCollectionView.this.scrollPane);
+                    }
+                }
+            });
 
             // jikes whines because add is defined in both JPanel and JDialog.
             this.add(topLabel, BorderLayout.NORTH);

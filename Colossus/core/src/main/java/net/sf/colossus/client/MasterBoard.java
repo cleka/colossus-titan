@@ -121,8 +121,6 @@ public final class MasterBoard extends JPanel
     public static final String viewFullRecruitTree = "View Full Recruit Tree";
     public static final String viewHexRecruitTree = "View Hex Recruit Tree";
     public static final String viewBattleMap = "View Battle Map";
-    public static final String viewCreatureDetails =
-        "View Creature:Ranger Details";
     public static final String changeScale = "Change Scale";
 
     public static final String chooseScreen = "Choose Screen For Info Windows";
@@ -504,18 +502,6 @@ public final class MasterBoard extends JPanel
                     client,
                     TerrainRecruitLoader.getTerrains(),
                     scrollPane);
-            }
-        };
-
-        viewCreatureDetailsAction = new AbstractAction(viewCreatureDetails)
-        {
-            public void actionPerformed(ActionEvent e)
-            {
-                Creature creature = Creature.getCreatureByName("Ranger");
-                new net.sf.colossus.client.ShowCreatureDetails(
-                    masterFrame,        // daddy
-                    creature,           // about what creature
-                    null, scrollPane);  // relative position
             }
         };
 
