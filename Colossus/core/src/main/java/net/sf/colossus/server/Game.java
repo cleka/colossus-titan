@@ -1637,7 +1637,7 @@ public final class Game
 
             Log.event("Legion " + legion.getLongMarkerName() + " in " +
                     hex.getDescription() + " recruits " + recruit.getName() +
-                    " with " + (numRecruiters == 0 ? "nothing" :
+                    " with " + (recruiter == null ? "nothing" :
                     numRecruiters + " " + (numRecruiters > 1 ?
                     recruiter.getPluralName() : recruiter.getName())));
 

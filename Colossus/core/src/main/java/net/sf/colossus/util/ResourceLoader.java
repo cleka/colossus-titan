@@ -452,10 +452,6 @@ public final class ResourceLoader
                         }
                         catch (Exception e)
                         {
-                            stream = null;
-                        }
-                        if (stream == null)
-                        {
                             stream = cl.getResourceAsStream(fullPath);
                         }
                     }
@@ -466,7 +462,7 @@ public final class ResourceLoader
                             " Couldn't get InputStream for file " +
                             filename + " in " + directories +
                             (cachedOnly ? " (cached only)" : ""));
-                    data = null;
+                    // @TODO this sounds more serious than just a warning in the logs
                 }
                 else
                 {
@@ -497,7 +493,7 @@ public final class ResourceLoader
                                     " for file " +
                                     filename + " in " + directories +
                                     (cachedOnly ? " (cached only)" : ""));
-                            data = null;
+                            // @TODO this sounds more serious than just a warning in the logs
                         }
                         else
                         {
@@ -630,7 +626,10 @@ public final class ResourceLoader
                 }
                 catch (Exception e)
                 {
-                    stream = null;
+                    Log.debug("getOutputStream:: " +
+                            " Couldn't get OutputStream for file " +
+                            filename + " in " + directories +
+                            "(" + e.getMessage() + ")");
                 }
             }
         }
@@ -1275,28 +1274,35 @@ public final class ResourceLoader
     /**
      * Create an instance of the class whose name is in parameter,
      *     using parameters.
-     * @param className The name of the class to use.
-     * @param directories List of directories to search (in order).
-     * @param paramter Array of parameters to pass to the constructor.
-     * @return A new object, instance from the given class.
+     *     
+     * If no parameters are given, the default constructor is used.
+     * 
+     * @TODO this is full of catch(Exception) blocks, which all return null.
+     *       Esp. returning null seems a rather bad idea, since it will most
+     *       likely turn out to be NPEs somewhere later.
+     *     
+     * @param className The name of the class to use, must not be null.
+     * @param directories List of directories to search (in order), must not be null.
+     * @param parameter Array of parameters to pass to the constructor, can be null.
+     * @return A new object, instance from the given class or null if 
+     *         instantiation failed.
      */
     public static Object getNewObject(String className,
             List directories,
             Object[] parameter)
     {
         Class theClass = null;
+        cl.setDirectories(directories);
         try
         {
-            cl.setDirectories(directories);
             theClass = cl.loadClass(className);
         }
         catch (Exception e)
         {
             Log.error("Loading of class \"" + className + "\" failed (" + e +
                     ")");
+            return null;
         }
-        Constructor c = null;
-        Object o = null;
         if (parameter != null)
         {
             Class[] paramClasses = new Class[parameter.length];
@@ -1306,33 +1312,29 @@ public final class ResourceLoader
             }
             try
             {
-                c = theClass.getConstructor(paramClasses);
+                Constructor c = theClass.getConstructor(paramClasses);
+                return c.newInstance(parameter);
             }
             catch (Exception e)
             {
-                Log.error("Loading of class' constructor for \"" + className +
+                Log.error("Loading or instantiating class' constructor for \"" + className +
                         "\" failed (" + e + ")");
                 return null;
             }
         }
-        try
+        else
         {
-            if (parameter != null)
+            try
             {
-                o = c.newInstance(parameter);
-            }
-            else
+                return theClass.newInstance();
+            } 
+            catch (Exception e)
             {
-                o = theClass.newInstance();
+                Log.error("Instantiating \"" + className +
+                        "\" failed (" + e + ")");
+                return null;
             }
         }
-        catch (Exception e)
-        {
-            Log.error("Instantiation of class's constructor for \"" +
-                    className + "\" failed (" + e + ")");
-            return null;
-        }
-        return o;
     }
 
     /**

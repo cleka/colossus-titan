@@ -1047,6 +1047,7 @@ public final class MasterBoard extends JPanel
             Log.error("null pointer ; i=" + i + ", j=" + j + ", k=" + k);
             System.exit(1);
         }
+        assert dh != null; // Static analysis of Eclipse doesn't grok System.exit()
         if (dh.getXCoord() == i)
         {
             if (dh.getYCoord() == (j - 1))

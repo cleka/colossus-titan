@@ -35,8 +35,6 @@ final class AcquireAngel extends KDialog implements MouseListener,
     private List recruits;
     private Client client;
     private String markerId;
-    private static final int basicXOffset = 16;
-    private static final int basicYOffset = 32;
     private SaveWindow saveWindow;
 
     AcquireAngel(JFrame parentFrame, Client client, String markerId,
