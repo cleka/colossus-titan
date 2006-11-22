@@ -35,7 +35,7 @@ import net.sf.colossus.xmlparser.TerrainRecruitLoader;
  * Non-static information that might be shown is the number of creatures
  * left in the caretakes stack.
  *
- * The dioalog is thought to be poped up and closed if needed, displaying
+ * The dialog is thought to be popped up and closed if needed, displaying
  * information about one selected creature type. The info in the dialog is
  * updated if needed.
  *
