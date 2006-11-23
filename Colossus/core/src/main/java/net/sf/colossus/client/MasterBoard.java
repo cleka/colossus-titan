@@ -146,7 +146,6 @@ public final class MasterBoard extends JPanel
     private AbstractAction viewHexRecruitTreeAction;
     private AbstractAction viewBattleMapAction;
     private AbstractAction changeScaleAction;
-    private AbstractAction viewCreatureDetailsAction;
 
     private AbstractAction chooseScreenAction;
 
@@ -771,9 +770,7 @@ public final class MasterBoard extends JPanel
         mi = graphicsMenu.add(viewFullRecruitTreeAction);
         mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, 0));
         mi.setMnemonic(KeyEvent.VK_R);
-        // creature details
-        mi = graphicsMenu.add(viewCreatureDetailsAction);
-        mi.setMnemonic(KeyEvent.VK_E);
+
         if (GraphicsEnvironment.getLocalGraphicsEnvironment()
             .getScreenDevices().length > 1)
         {
