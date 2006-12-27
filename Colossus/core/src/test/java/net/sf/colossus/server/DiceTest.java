@@ -153,8 +153,8 @@ public class DiceTest extends TestCase
      */
     void signTest(int[] rolls, boolean random)
     {
-        double P = (double)countPositiveDiffs(rolls);
-        double m = (double)countNonZeroDiffs(rolls);
+        double P = countPositiveDiffs(rolls);
+        double m = countNonZeroDiffs(rolls);
         double meanP = m / 2.;
         double varianceP = m / 12.;
         LOGGER.log(Level.FINEST, "Sign test: P=" + P + " m=" + m + " mean=" +

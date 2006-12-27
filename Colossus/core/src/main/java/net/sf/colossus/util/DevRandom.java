@@ -123,7 +123,7 @@ public class DevRandom extends Random
         int result = 0;
         for (int i = 0; i < size ; i++)
         {
-            result |= (((int)(bytes[i])) & 0x000000FF) << (i << 3);
+            result |= (bytes[i] & 0x000000FF) << (i << 3);
         }
 
         result = (result & mask);

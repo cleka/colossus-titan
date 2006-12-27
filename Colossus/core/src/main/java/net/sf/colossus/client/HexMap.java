@@ -158,7 +158,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
                 if (show[i][j])
                 {
                     GUIBattleHex hex = new GUIBattleHex
-                        ((int)Math.round(cx + 3 * i * scale),
+                        (Math.round(cx + 3 * i * scale),
                         (int)Math.round(cy + (2 * j + (i & 1)) *
                         GUIHex.SQRT3 * scale), scale, this, i, j);
 
@@ -415,17 +415,17 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
     {
         // Initialize entrances.
         entrances[0] = new GUIBattleHex(cx + 15 * scale,
-            (int)Math.round(cy + 1 * scale), scale, this, -1, 0);
+            Math.round(cy + 1 * scale), scale, this, -1, 0);
         entrances[1] = new GUIBattleHex(cx + 21 * scale,
-            (int)Math.round(cy + 10 * scale), scale, this, -1, 1);
+            Math.round(cy + 10 * scale), scale, this, -1, 1);
         entrances[2] = new GUIBattleHex(cx + 17 * scale,
-            (int)Math.round(cy + 22 * scale), scale, this, -1, 2);
+            Math.round(cy + 22 * scale), scale, this, -1, 2);
         entrances[3] = new GUIBattleHex(cx + 2 * scale,
-            (int)Math.round(cy + 21 * scale), scale, this, -1, 3);
+            Math.round(cy + 21 * scale), scale, this, -1, 3);
         entrances[4] = new GUIBattleHex(cx - 3 * scale,
-            (int)Math.round(cy + 10 * scale), scale, this, -1, 4);
+            Math.round(cy + 10 * scale), scale, this, -1, 4);
         entrances[5] = new GUIBattleHex(cx + 1 * scale,
-            (int)Math.round(cy + 1 * scale), scale, this, -1, 5);
+            Math.round(cy + 1 * scale), scale, this, -1, 5);
 
         hexes.add(entrances[0]);
         hexes.add(entrances[1]);
@@ -606,7 +606,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
             default:
                 Log.error("Label " + label + " is invalid");
         }
-        y = 6 - y - (int)Math.abs(((x - 3) / 2));
+        y = 6 - y - Math.abs((x - 3) / 2);
         GUIBattleHex[][] correctHexes = (GUIBattleHex[][])terrainH.get(terrain);
         return correctHexes[x][y].getBattleHexModel();
     }

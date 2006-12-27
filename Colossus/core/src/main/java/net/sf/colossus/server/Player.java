@@ -296,8 +296,8 @@ public final class Player implements Comparable
 
     int getTitanPower()
     {
-        return (int)(6 + (getScore() /
-                TerrainRecruitLoader.getTitanImprovementValue()));
+        return 6 + getScore() /
+                TerrainRecruitLoader.getTitanImprovementValue();
     }
 
     synchronized int getNumLegions()

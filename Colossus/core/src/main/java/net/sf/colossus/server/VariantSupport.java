@@ -270,7 +270,7 @@ public final class VariantSupport
         Iterator it = dependUpon.iterator();
         while (it.hasNext())
         {
-            directories.add((String)it.next());
+            directories.add(it.next());
         }
         directories.add(Constants.defaultDirName);
         return directories;

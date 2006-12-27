@@ -1148,7 +1148,7 @@ public final class MasterBoard extends JPanel
                     // Adjust for aspect ratio of h array, which has roughly
                     // twice as many horizontal as vertical elements even
                     // though the board is roughly square.
-                    double deltaY = (j - midY) * (double)width / height;
+                    double deltaY = (j - midY) * width / height;
 
                     double ratio;
 

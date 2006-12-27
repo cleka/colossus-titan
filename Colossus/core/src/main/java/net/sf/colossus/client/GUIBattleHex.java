@@ -349,7 +349,7 @@ public class GUIBattleHex extends GUIHex
                 g2.setColor(HTMLColor.skyBlue);
                 Stroke oldStroke = g2.getStroke();
                 g2.setStroke(new BasicStroke((float)5.));
-                g2.draw((Shape)new Line2D.Double(vx1, vy1, vx2, vy2));
+                g2.draw(new Line2D.Double(vx1, vy1, vx2, vy2));
                 g2.setColor(Color.black);
                 g2.setStroke(oldStroke);
                 break;

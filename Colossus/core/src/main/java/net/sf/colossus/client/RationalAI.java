@@ -1339,8 +1339,7 @@ public class RationalAI extends SimpleAI implements AI
                         // ack! we'll fuck up our titan group
                         // use metric below so that if we have no choice
                         // but to attack we pick the least losing battle
-                        value = (int)result.getAttackerDead() *
-                            -100;
+                        value = result.getAttackerDead() * -100;
                     }
                 }
                 else if (result.getAttackerDead() > attackerPointValue / 2)
@@ -1350,7 +1349,7 @@ public class RationalAI extends SimpleAI implements AI
                     // ack! we'll fuck up our titan group
                     // use metric below so that if we have no choice but to
                     // attack we pick the least losing battle
-                    value = -100 + (int)result.getAttackerDead() * -100;
+                    value = -100 + result.getAttackerDead() * -100;
                 }
                 else // win with minimal loss
                 {

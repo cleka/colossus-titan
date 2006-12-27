@@ -1167,11 +1167,9 @@ public class SimpleAI implements AI
                     // and won't score enough points to make up for it
                     else if (legion.numSummonableCreature() > 0 &&
                             !haveOtherSummonables &&
-                            enemyPointValue <
-                            ((int)((float)
-                            TerrainRecruitLoader
-                              .getAcquirableRecruitmentsValue() * .88)
-                            ))
+                            enemyPointValue < TerrainRecruitLoader
+                              .getAcquirableRecruitmentsValue() * .88
+                            )
                     {
                         value += LOSE_LEGION + 5;
                     }
@@ -1586,7 +1584,7 @@ public class SimpleAI implements AI
         }
 
         // really dumb estimator
-        double ratio = (double)attackerPointValue / (double)defenderPointValue;
+        double ratio = attackerPointValue / defenderPointValue;
 
         if (ratio >= RATIO_WIN_MINIMAL_LOSS)
         {
@@ -2193,7 +2191,7 @@ public class SimpleAI implements AI
                 // We probably can't kill this target.
                 // But if it is a Titan it may be more valuable to do fractional damage
                 if (bestTarget == null ||
-                        (0.5 * ((double) (h + target.getHits()) / (double) target.getPower()) * getKillValue(target, terrain) >
+                        (0.5 * ((h + target.getHits()) / target.getPower()) * getKillValue(target, terrain) >
                         getKillValue(bestTarget, terrain)))
                 {
                     bestTarget = target;
@@ -3408,7 +3406,7 @@ public class SimpleAI implements AI
                     {
                         // reward doing damage to target - esp. titan.
                         int targetValue = getKillValue(target, terrain);
-                        killValue = (int) (0.5 * ((double) meanHits / (double)target.getPower()) * Math.max(targetValue, killValue));
+                        killValue = (int) (0.5 * (meanHits / target.getPower()) * Math.max(targetValue, killValue));
                     }
 
                     // Reward ganging up on enemies.

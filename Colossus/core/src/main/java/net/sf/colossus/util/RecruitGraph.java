@@ -437,7 +437,7 @@ public class RecruitGraph
 
             if (e.getNumber() > mun)
             {
-                mun = (int)e.getNumber();
+                mun = e.getNumber();
             }
         }
         return mun;

@@ -257,7 +257,7 @@ public class BattleHex
         }
         else
         {                
-            final int yLabel = 6 - yCoord - (int)Math.abs(((xCoord - 3) / 2));
+            final int yLabel = 6 - yCoord - Math.abs(((xCoord - 3) / 2));
             label = "" + _intXCoordToXLabel(xCoord) + yLabel;
         }
         setLabel(label);
@@ -267,8 +267,8 @@ public class BattleHex
      * */ 
     private final static char _intXCoordToXLabel(final int x) 
     {
-        return (x < (int)'X')    // 'X' is used for -1 
-            ? (char)((int)'A' + x)
+        return (x < 'X')    // 'X' is used for -1 
+            ? (char)('A' + x)
             : '?' ; 
     }
 
