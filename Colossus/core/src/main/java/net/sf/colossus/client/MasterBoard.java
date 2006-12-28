@@ -2048,7 +2048,10 @@ public final class MasterBoard extends JPanel
                	client.showMarker(marker);
             } else {
             	GUIMasterHex hex = getHexContainingPoint(point);
-            	client.showHexRecruitTree(hex);
+                if (hex != null)
+                {
+                    client.showHexRecruitTree(hex);
+                }            	
             }
         }
     }
