@@ -328,12 +328,24 @@ public final class Client implements IClient, IOracle, IOptions
     /**
      * Displays the marker and its legion if possible.
      */
-    public void showMarker(Marker marker) {
+    public void showMarker(Marker marker) 
+    {
         if (autoInspector != null)
         {
             String markerId = marker.getId();
             LegionInfo legion = getLegionInfo(markerId);
             autoInspector.showLegion(marker, legion);
+        }
+    }
+    
+    /**
+     * Displays the recruit tree of the hex if possible.
+     */
+    public void showHexRecruitTree(GUIMasterHex hex) 
+    {
+        if (autoInspector != null)
+        {
+            autoInspector.showHexRecruitTree(hex);
         }
     }
     

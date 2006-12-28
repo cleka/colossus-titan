@@ -6,9 +6,11 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Point;
+import java.awt.event.MouseAdapter;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
+import javax.swing.BoxLayout;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -75,6 +77,16 @@ public class AutoInspector extends KDialog
         //panel.add(marker);
         panel.add(new LegionInfoPanel(legion, 4 * Scale.get(), 5, 2, false));
         scrollPane.getViewport().add(panel);
+        repaint();
+    }
+
+    public void showHexRecruitTree(GUIMasterHex hex) 
+    {
+        scrollPane.getViewport().removeAll();
+        MasterHex hexModel = hex.getMasterHexModel();
+        scrollPane.getViewport().add(new HexRecruitTreePanel(BoxLayout.X_AXIS,hexModel.getTerrain(),hexModel.getLabel(),new MouseAdapter(){
+        	// nothing to do
+        }));
         repaint();
     }
 }

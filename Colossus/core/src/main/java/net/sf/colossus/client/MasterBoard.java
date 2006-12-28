@@ -514,7 +514,6 @@ public final class MasterBoard extends JPanel
                     MasterHex hexModel = hex.getMasterHexModel();
                     new ShowRecruits(masterFrame, hexModel.getTerrain(), 
                         lastPoint, hexModel.getLabel(), scrollPane);
-
                 }
             }
         };
@@ -2047,6 +2046,9 @@ public final class MasterBoard extends JPanel
             if (marker != null)
             {
                	client.showMarker(marker);
+            } else {
+            	GUIMasterHex hex = getHexContainingPoint(point);
+            	client.showHexRecruitTree(hex);
             }
         }
     }
