@@ -138,6 +138,8 @@ public final class Game
         VariantSupport.loadVariant(options.getStringOption(Options.variant),
                 true);
 
+        Creature.resetCache();
+        
         Log.event("Starting new game");
 
         CustomRecruitBase.resetAllInstances();

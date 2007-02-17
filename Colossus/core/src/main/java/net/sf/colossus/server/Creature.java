@@ -464,6 +464,12 @@ implements
         _getCreatureByName_cache.put("null", null);
     }
 
+    public static void resetCache()
+    {
+        _getCreatureByName_cache.clear();
+        _getCreatureByName_cache.put("null", null);
+    }
+
     /** case insensitive creature type lookup. its cached, its fast.
      *
      * implementation description:
