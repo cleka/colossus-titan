@@ -278,6 +278,11 @@ public final class GetPlayers extends KDialog implements WindowListener,
 
         JComboBox playerType = new JComboBox(typeChoices);
 
+        // Avoid scrolling (otherwise "Human" might not be visible directly)
+        // the number is chosen to be larger then the current choices but not
+        // too large to cause havoc if the number of choices increases
+        playerType.setMaximumRowCount(12);
+        
         String type = options.getStringOption(Options.playerType + i);
         if (type == null || type.length() == 0)
         {
