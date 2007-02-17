@@ -551,7 +551,22 @@ public final class Player implements Comparable
     void undoRecruit(String markerId)
     {
         Legion legion = getLegionByMarkerId(markerId);
+        if ( legion == null )
+        {
+            Log.error("Player.undoRecruit: legion for markerId " + markerId + " is null");
+            return;
+        }
+        // this one happens if one presses "U" twice - when there is 
+        // no recruiting to undo any more.
+        // TODO fix the actual bug (this method being called when it shouldn't)
+        // to reproduce: use auto-recruit, deselect an auto-recruited creature,
+        // select your own and undo twice
         String recruitName = legion.getRecruitName();
+        if ( recruitName == null )
+        {
+            Log.error("Player.undoRecruit: Nothing to unrecruit for marker " + markerId);
+            return;    
+        }
         legion.undoRecruit();
 
         // Update number of creatures in status window.
