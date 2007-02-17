@@ -623,8 +623,6 @@ public final class Client implements IClient, IOracle, IOptions
                     {
                         parent = board.getFrame();
                     }
-                    // TODO it seems board is null here if called on startup,
-                    // we need to initialize this later
                     autoInspector = new AutoInspector(parent, this);
                 }
             }
@@ -1490,6 +1488,20 @@ public final class Client implements IClient, IOracle, IOptions
         {
             disposeMasterBoard();
             board = new MasterBoard(this);
+            if ( getOption(Options.showAutoInspector) )
+            {
+                // Recreate the AutoInspector since it does not have the
+                // parent set if it is created during game initialization.
+                // This problem is due to the order in which windows are
+                // created and should normally not exist if the master
+                // board would be initialized before the AutoInspector
+                // window gets created. It is not and this little hack
+                // works around the issue of having a detached window.
+                // A proper fix would involve major changes to the
+                // initialization process.
+                optionTrigger(Options.showAutoInspector, String.valueOf(false));
+                optionTrigger(Options.showAutoInspector, String.valueOf(true));
+            }
             focusBoard();
         }
     }
