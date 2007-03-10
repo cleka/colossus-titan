@@ -1395,7 +1395,8 @@ public final class MasterBoard extends JPanel
         if (client.getPlayerName().equals(activePlayerName))
         {
             bottomBar.setOwnPhase("Movement");
-
+            bottomBar.disableDoneButton();
+            
             JMenuItem mi;
 
             mi = phaseMenu.add(clearRecruitChitsAction);
@@ -2404,6 +2405,11 @@ public final class MasterBoard extends JPanel
             doneButton.setEnabled(false);
         }
 
+        void enableDoneButton()
+        {
+            doneButton.setEnabled(true);
+        }
+
         BottomBar()
         {
             super();
@@ -2423,4 +2429,15 @@ public final class MasterBoard extends JPanel
 
         }
     }
+    
+    public void enableBottomBarDoneButton()
+    {
+    	bottomBar.enableDoneButton();
+    }
+
+    public void disableBottomBarDoneButton()
+    {
+    	bottomBar.disableDoneButton();
+    }
+
 }

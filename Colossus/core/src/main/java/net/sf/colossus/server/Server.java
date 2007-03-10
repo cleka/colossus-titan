@@ -1162,11 +1162,17 @@ public final class Server implements IServer
         String formerHexLabel = legion.getCurrentHexLabel();
         game.getActivePlayer().undoMove(markerId);
         String currentHexLabel = legion.getCurrentHexLabel();
+
+        Player player = game.getPlayer(game.getActivePlayerName());
+        // needed in undidMove to decide whether to dis/enable button
+        boolean splitLegionHasForcedMove = player.splitLegionHasForcedMove();
+
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
             IClient client = (IClient)it.next();
-            client.undidMove(markerId, formerHexLabel, currentHexLabel);
+            client.undidMove(markerId, formerHexLabel, currentHexLabel,
+                    splitLegionHasForcedMove);
         }
     }
 
@@ -1437,12 +1443,16 @@ public final class Server implements IServer
     void allTellDidMove(String markerId, String startingHexLabel,
             String endingHexLabel, String entrySide, boolean teleport)
     {
+        Player player = game.getPlayer(game.getActivePlayerName());
+        // needed in didMove to decide whether to dis/enable button
+        boolean splitLegionHasForcedMove = player.splitLegionHasForcedMove();
+
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
             IClient client = (IClient)it.next();
             client.didMove(markerId, startingHexLabel, endingHexLabel,
-                    entrySide, teleport);
+                    entrySide, teleport, splitLegionHasForcedMove);
         }
     }
 

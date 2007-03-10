@@ -393,15 +393,30 @@ final class SocketClientThread extends Thread implements IServer
             String entrySide = (String)args.remove(0);
             boolean teleport =
                     Boolean.valueOf((String)args.remove(0)).booleanValue();
+            boolean splitLegionHasForcedMove = false;
+            // servers from older versions might not send this arg
+            if ( ! args.isEmpty() )
+            {
+                splitLegionHasForcedMove = 
+                    Boolean.valueOf((String)args.remove(0)).booleanValue();
+            }
             client.didMove(markerId, startingHexLabel, currentHexLabel,
-                    entrySide, teleport);
+                    entrySide, teleport, splitLegionHasForcedMove);
         }
         else if (method.equals(Constants.undidMove))
         {
             String markerId = (String)args.remove(0);
             String formerHexLabel = (String)args.remove(0);
             String currentHexLabel = (String)args.remove(0);
-            client.undidMove(markerId, formerHexLabel, currentHexLabel);
+            boolean splitLegionHasForcedMove = false;
+            // servers from older versions might not send this arg
+            if ( ! args.isEmpty() )
+            {
+                splitLegionHasForcedMove = 
+                    Boolean.valueOf((String)args.remove(0)).booleanValue();
+            }
+            client.undidMove(markerId, formerHexLabel, currentHexLabel,
+                    splitLegionHasForcedMove);
         }
         else if (method.equals(Constants.undidSplit))
         {

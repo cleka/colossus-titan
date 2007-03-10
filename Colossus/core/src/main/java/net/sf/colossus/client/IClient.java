@@ -121,10 +121,11 @@ public interface IClient
             String endingHexLabel, boolean undo);
 
     public void didMove(String markerId, String startingHexLabel,
-            String currentHexLabel, String entrySide, boolean teleport);
+            String currentHexLabel, String entrySide, boolean teleport,
+            boolean splitLegionHasForcedMove);
 
     public void undidMove(String markerId, String formerHexLabel,
-            String currentHexLabel);
+            String currentHexLabel, boolean splitLegionHasForcedMove);
 
     public void undidSplit(String splitoffId, String survivorId, int turn);
 

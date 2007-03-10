@@ -595,18 +595,20 @@ final class SocketServerThread extends Thread implements IClient
     }
 
     public void didMove(String markerId, String startingHexLabel,
-            String currentHexLabel, String entrySide, boolean teleport)
+            String currentHexLabel, String entrySide, boolean teleport,
+            boolean splitLegionHasForcedMove)
     {
         out.println(Constants.didMove + sep + markerId + sep +
                 startingHexLabel + sep + currentHexLabel + sep + entrySide +
-                sep + teleport);
+                sep + teleport + sep + splitLegionHasForcedMove);
     }
 
     public void undidMove(String markerId, String formerHexLabel,
-            String currentHexLabel)
+            String currentHexLabel, boolean splitLegionHasForcedMove)
     {
         out.println(Constants.undidMove + sep + markerId + sep +
-                formerHexLabel + sep + currentHexLabel);
+                formerHexLabel + sep + currentHexLabel + sep + 
+                splitLegionHasForcedMove);
     }
 
     public void undidSplit(String splitoffId, String survivorId, int turn)

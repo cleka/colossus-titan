@@ -2098,6 +2098,10 @@ public final class Client implements IClient, IOracle, IOptions
                  }
                  */
             }
+            if (findEngagements().isEmpty() && board != null )
+            {
+                board.enableBottomBarDoneButton();
+            }
         }
     }
 
@@ -2312,6 +2316,10 @@ public final class Client implements IClient, IOracle, IOptions
             board.fullRepaint();  // Ensure that movement die goes away
             if (isMyTurn())
             {
+                if ( turnNumber == 1 )
+                {
+                    board.disableBottomBarDoneButton();
+                }
                 focusBoard();
                 defaultCursor();
                 if (!getOption(Options.autoSplit) &&
@@ -3107,7 +3115,8 @@ public final class Client implements IClient, IOracle, IOptions
     }
 
     public void didMove(String markerId, String startingHexLabel,
-        String currentHexLabel, String entrySide, boolean teleport)
+        String currentHexLabel, String entrySide, boolean teleport,
+        boolean splitLegionHasForcedMove)
     {
         removeRecruitChit(startingHexLabel);
         if (isMyLegion(markerId))
@@ -3128,12 +3137,16 @@ public final class Client implements IClient, IOracle, IOptions
             board.alignLegions(currentHexLabel);
             board.highlightUnmovedLegions();
             board.repaint();
+            if ( isMyLegion(markerId) && ! splitLegionHasForcedMove )
+            {
+                board.enableBottomBarDoneButton();
+            }
         }
         kickMoves();
     }
 
     public void undidMove(String markerId, String formerHexLabel,
-        String currentHexLabel)
+        String currentHexLabel, boolean splitLegionHasForcedMove)
     {
         removeRecruitChit(formerHexLabel);
         removeRecruitChit(currentHexLabel);
@@ -3145,6 +3158,10 @@ public final class Client implements IClient, IOracle, IOptions
             board.alignLegions(formerHexLabel);
             board.alignLegions(currentHexLabel);
             board.highlightUnmovedLegions();
+            if ( isUndoStackEmpty() || splitLegionHasForcedMove )
+            {
+                board.disableBottomBarDoneButton();
+            }
         }
     }
 
@@ -3608,6 +3625,14 @@ public final class Client implements IClient, IOracle, IOptions
         server.undoSplit(splitoffId);
         getPlayerInfo().addMarkerAvailable(splitoffId);
         numSplitsThisTurn--;
+        if ( turnNumber == 1 && numSplitsThisTurn == 0 )
+        {
+            // must split in first turn - Done not allowed now
+            if ( board != null )
+            {
+                board.disableBottomBarDoneButton();
+            }
+        }
         Log.debug("called server.undoSplit");
     }
 
@@ -3908,6 +3933,10 @@ public final class Client implements IClient, IOracle, IOptions
         }
 
         numSplitsThisTurn++;
+        if ( turnNumber == 1 && board != null )
+        {
+            board.enableBottomBarDoneButton();
+        }
 
         if (board != null)
         {
