@@ -32,8 +32,9 @@ import net.sf.colossus.xmlparser.TerrainRecruitLoader;
  */
 public final class Server implements IServer
 {
-	private static final Logger LOGGER = Logger.getLogger(Server.class.getName());
-	
+    private static final Logger LOGGER = Logger.getLogger(Server.class.getName());
+    private static StartupProgress startLog;
+    
     private Game game;
 
     /**
@@ -75,6 +76,14 @@ public final class Server implements IServer
     {
         this.game = game;
         this.port = port;
+
+        if ( startLog != null ) 
+        {
+            this.startLog.dispose();
+            this.startLog = null;
+        }
+        this.startLog = new StartupProgress(this);
+
         waitingForClients = game.getNumLivingPlayers();
     }
 
@@ -101,6 +110,8 @@ public final class Server implements IServer
         }
         createLocalClients();
 
+        logToStartLog("\nStarting up, waiting for " + waitingForClients 
+                      + " clients");
         while (numClients < maxClients)
         {
             waitForConnection();
@@ -152,6 +163,9 @@ public final class Server implements IServer
             clientSocket = serverSocket.accept();
             Log.event("Got client connection from " +
                     clientSocket.getInetAddress().toString());
+            logToStartLog("Got client connection from IP: " 
+                   + clientSocket.getInetAddress().toString());
+
             synchronized (activeSocketList)
             {
                 activeSocketList.add(clientSocket);
@@ -219,16 +233,27 @@ public final class Server implements IServer
         if (remote)
         {
             addRemoteClient(client, playerName);
+            logToStartLog("Remote player " + playerName + " signed on.");
         }
         else
         {
             addLocalClient(client, playerName);
+            logToStartLog("Local player " + playerName + " signed on.");
         }
 
         waitingForClients--;
         Log.event("Decremented waitingForClients to " + waitingForClients);
+        
+        if ( waitingForClients > 0 )
+        {
+            String pluralS = (waitingForClients > 1 ? "s" : "");
+            logToStartLog(" ==> Waiting for " + waitingForClients
+                    + " more client" + pluralS + " to sign on.\n");
+        }
+          
         if (waitingForClients <= 0)
         {
+            logToStartLog("\nGot all clients, starting the game.\n");
             if (game.isLoadingGame())
             {
                 game.loadGame2();
@@ -237,6 +262,7 @@ public final class Server implements IServer
             {
                 game.newGame2();
             }
+            startLog.setCompleted();
         }
     }
 
@@ -283,10 +309,11 @@ public final class Server implements IServer
         }
         clients.clear();
         
-        for (Iterator iter = remoteLogHandlers.iterator(); iter.hasNext();) {
-			RemoteLogHandler handler = (RemoteLogHandler) iter.next();
-			LOGGER.removeHandler(handler);
-		}
+        for (Iterator iter = remoteLogHandlers.iterator(); iter.hasNext(); )
+        {
+            RemoteLogHandler handler = (RemoteLogHandler) iter.next();
+            LOGGER.removeHandler(handler);
+        }
         remoteLogHandlers.clear();
         
         if (serverSocket != null)
@@ -1761,5 +1788,22 @@ public final class Server implements IServer
             IClient client = (IClient)it.next();
             client.log(message);
         }
+    }
+
+    void logToStartLog(String message)
+    {
+        if ( startLog != null )
+        {
+            startLog.append(message);
+        }
+    }
+    
+    // for ServerSTartupProgress, if users wants to cancel during load
+    // (e.g. one client did not come in)
+    public void panicExit()
+    {
+        System.out.println("Panic exit...");
+        disposeAllClients();
+        System.exit(1);
     }
 }
