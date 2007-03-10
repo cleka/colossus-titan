@@ -623,7 +623,9 @@ public final class Client implements IClient, IOracle, IOptions
                     {
                         parent = board.getFrame();
                     }
-                    autoInspector = new AutoInspector(parent, this);
+                    boolean onlyOwnLegions = getOption(Options.onlyOwnLegions);
+                    autoInspector = new AutoInspector(parent, this, playerName,
+                    		onlyOwnLegions);
                 }
             }
             else

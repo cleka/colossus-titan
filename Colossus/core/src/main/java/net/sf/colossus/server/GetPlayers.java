@@ -106,6 +106,7 @@ public final class GetPlayers extends KDialog implements WindowListener,
         addCheckbox(Options.logDebug, checkboxPane);
         addCheckbox(Options.balancedTowers, checkboxPane);
         addCheckbox(Options.allStacksVisible, checkboxPane);
+        addCheckbox(Options.onlyOwnLegions, checkboxPane);
         addCheckbox(Options.autoStop, checkboxPane);
         addCheckbox(Options.autoQuit, checkboxPane);
 

@@ -39,6 +39,7 @@ public final class Options implements IOptions
 
     public static final String balancedTowers = "Balanced starting towers";
     public static final String allStacksVisible = "All stacks visible";
+    public static final String onlyOwnLegions = "Only own legions viewable";
     public static final String cumulativeSlow = "Slowing is cumulative";
     public static final String oneHexAllowed = "Always allows one hex";
     public static final String nonRandomBattleDice =

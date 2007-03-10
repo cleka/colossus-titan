@@ -34,7 +34,7 @@ public class KDialog extends JDialog implements MouseListener, WindowListener
         
         Point origin = new Point(point.x + parentOrigin.x - viewOrigin.x, 
             point.y + parentOrigin.y - viewOrigin.y);
-       
+        
         setLocation(origin);
     }
 

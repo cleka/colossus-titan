@@ -155,6 +155,7 @@ public final class MasterBoard extends JPanel
     private static Set towerSet = null;
 
     private boolean playerLabelDone;
+    private boolean onlyOwnLegionsOption;
 
     private JMenu lfMenu;
     private SaveWindow saveWindow;
@@ -314,7 +315,8 @@ public final class MasterBoard extends JPanel
     MasterBoard(final Client client)
     {
         this.client = client;
-
+        this.onlyOwnLegionsOption = client.getOption(Options.onlyOwnLegions);
+        
         masterFrame = new JFrame("MasterBoard");
         masterFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         contentPane = masterFrame.getContentPane();
@@ -1987,8 +1989,10 @@ public final class MasterBoard extends JPanel
                 if (isPopupButton(e))
                 {
                 	LegionInfo legion = client.getLegionInfo(markerId);
+                    String playerName = client.getPlayerName();
                     new ShowLegion(masterFrame, marker, legion,
-                        point, scrollPane, 4 * Scale.get());
+                        point, scrollPane, 4 * Scale.get(), playerName,
+                        onlyOwnLegionsOption);
                     return;
                 }
                 else if (client.isMyLegion(markerId))

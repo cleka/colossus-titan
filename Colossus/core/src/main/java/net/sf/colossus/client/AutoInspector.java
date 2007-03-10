@@ -15,6 +15,7 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JLabel;
 
 import net.sf.colossus.util.KDialog;
 import net.sf.colossus.util.Options;
@@ -28,12 +29,20 @@ public class AutoInspector extends KDialog
     
     private JScrollPane scrollPane;
 
-    public AutoInspector(JFrame frame, IOptions options)
+    private String playerName;
+
+    private boolean onlyOwnLegionsOption = false;
+
+   
+    public AutoInspector(JFrame frame, IOptions options, 
+    		String playerName, boolean onlyOwnLegions)
     {
         super(frame, "Inspector", false);
 
         this.options = options;
-
+        this.playerName = playerName;
+        this.onlyOwnLegionsOption = onlyOwnLegions;
+       
         setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
         addWindowListener(new WindowAdapter(){
             public void windowClosing(WindowEvent e) 
@@ -75,7 +84,18 @@ public class AutoInspector extends KDialog
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         // TODO for some reason the marker won't display itself properly here
         //panel.add(marker);
-        panel.add(new LegionInfoPanel(legion, 4 * Scale.get(), 5, 2, false));
+        
+        String legionOwner = legion.getPlayerName();
+        if ( onlyOwnLegionsOption && !playerName.equals(legionOwner) )
+        {
+        	int count = legion.getHeight();
+            panel.add(new JLabel("Sorry, legion " + marker + " ("
+            		+ count + " creatures) is not your legion."));
+        }
+        else
+        {
+            panel.add(new LegionInfoPanel(legion, 4 * Scale.get(), 5, 2, false));
+        }
         scrollPane.getViewport().add(panel);
         repaint();
     }
