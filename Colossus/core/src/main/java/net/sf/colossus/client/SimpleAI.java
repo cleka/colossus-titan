@@ -29,7 +29,9 @@ public class SimpleAI implements AI
     boolean timeIsUp;
     Random random = new DevRandom();
     String[] hintSectionUsed = { Constants.sectionOffensiveAI };
-
+    int splitsDone = 0;
+    int splitsAcked = 0;
+    	
     public SimpleAI(Client client)
     {
         this.client = client;
@@ -165,20 +167,33 @@ public class SimpleAI implements AI
     public boolean split()
     {
         PlayerInfo player = client.getPlayerInfo();
-
+        splitsDone = 0;
+        splitsAcked = 0;
         Iterator it = player.getLegionIds().iterator();
         while (it.hasNext())
         {
             String markerId = (String)it.next();
             splitOneLegion(player, markerId);
         }
-        return true;
+        // if we did splits, don't signal to client that it's done;
+        // because it would do doneWithSplits immediately;
+        // instead the last didSplit Callback will do doneWithSplits
+        // (This is done to avoid the advancePhase illegally messages)
+        if ( splitsDone > 0 )
+        {
+        	return false;
+        }
+        else
+        {
+        	return true;
+        }
     }
 
     /** Unused in this AI; just return true to indicate done. */
     public boolean splitCallback(String parentId, String childId)
     {
-        return true;
+    	splitsAcked++;
+        return(splitsAcked >= splitsDone ? true : false);
     }
 
 
@@ -304,6 +319,11 @@ public class SimpleAI implements AI
                 results.append(",");
             }
         }
+        // increment BEFORE calling client 
+        // (instead of: return true and caller increments). 
+        // Otherwise we might have a race situation, if callback is quicker
+        // than caller incrementing the splitsDone value...
+        this.splitsDone++;
         client.doSplit(legion.getMarkerId(), newMarkerId, results.toString());
     }
 
