@@ -24,6 +24,7 @@ public class DevRandom extends Random
                                           hrandomFilename,
                                           urandomFilename,
                                           randomFilename };
+    static int sourceStartIndex = 0;
     final static String PRNG = "PRNG";
     private String source = null;
     private File randomSource = null;
@@ -64,12 +65,17 @@ public class DevRandom extends Random
             // Don't try other sources.
             return;
         }
-        if (!tryOneSource(source)) {
-            int i = 0;
-            while ((i < sourceOrder.length) &&
-                   (!tryOneSource(sourceOrder[i]))) {
+        if (!tryOneSource(source)) 
+        {
+            int i = sourceStartIndex;
+            while ( i < sourceOrder.length && 
+                    !tryOneSource(sourceOrder[i]) ) 
+            {
                 i++;
             }
+            // Class remembers which worked, or if none,
+            // loop is in future always skipped.
+            sourceStartIndex = i;
         }
 
         if ((randomSource != null) && (randomSource.exists()))
