@@ -520,7 +520,7 @@ public final class ResourceLoader
 
             }
         }
-        return(getInputStreamFromBytes(data));
+        return( data == null ? null : getInputStreamFromBytes(data));
     }
 
     /**
