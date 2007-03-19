@@ -2678,17 +2678,23 @@ public final class Game
 
         // server.allRemoveLegion(loser.getMarkerId());
 
-        // Remove the dead legion.
-        loser.remove();
-
-
+        
         // If this was the titan stack, its owner dies and gives half
         // points to the victor.
         if (loser.hasTitan())
         {
+            // first remove dead legion, then the rest. Cannot do the
+            // loser.remove outside/before the if (or would need to store
+            // the hasTitan information as extra boolean)
+            loser.remove();
             losingPlayer.die(winner.getPlayerName(), true);
         }
-
+        else
+        {
+            // simply remove the dead legion.
+            loser.remove();
+        }
+        
         // No recruiting or angel summoning is allowed after the
         // defender flees or the attacker concedes before entering
         // the battle.
