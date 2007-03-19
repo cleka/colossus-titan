@@ -715,6 +715,14 @@ public final class Server implements IServer
         IClient client = getClient(getPlayerName());
 
         Legion legion = game.getLegionByMarkerId(markerId);
+        if (legion == null)
+        {
+            Log.error(getPlayerName() + " illegally called doRecruit()"
+                    + ": null legion for markerId "+markerId);
+            client.nak(Constants.doRecruit, "Null legion");
+            return;
+        }
+        
         if (!getPlayerName().equals(legion.getPlayerName()))
         {
             Log.error(getPlayerName() + " illegally called doRecruit()");
@@ -722,8 +730,8 @@ public final class Server implements IServer
             return;
         }
 
-        if (legion != null && (legion.hasMoved() || game.getPhase() ==
-                Constants.Phase.FIGHT) && legion.canRecruit())
+        if ( (legion.hasMoved() || game.getPhase() == Constants.Phase.FIGHT) 
+                        && legion.canRecruit())
         {
             legion.sortCritters();
             Creature recruit = null;
