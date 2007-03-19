@@ -16,7 +16,7 @@ import net.sf.colossus.util.KDialog;
 import net.sf.colossus.util.Options;
 import net.sf.colossus.util.Log;
 import net.sf.colossus.client.PickIntValue;
-
+import net.sf.colossus.client.ShowReadme;
 
 /**
  * Class GetPlayers is a dialog used to enter players' 
@@ -179,29 +179,13 @@ public final class GetPlayers extends KDialog implements WindowListener,
         variantPane.add(buttonVariant);
         buttonVariant.addActionListener(this);
 
-        JPanel readmePane = new JPanel();
-        JScrollPane readmeScrollPane = new JScrollPane(readmePane,
-                JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-                JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        readmePane.setLayout(new GridLayout(0, 1));
-        readme.setEditable(false);
-        // Must be tall enough for biggest variant readme file.
-        Dimension readmeMaxSize = new Dimension(600, 2000);
-        Dimension readmePrefSize = new Dimension(600, 2000);
-        Dimension readmeScrollMaxSize = new Dimension(600, 2000);
-        Dimension readmeScrollPrefSize = new Dimension(600, 500);
-        readmePane.setMaximumSize(readmeMaxSize);
-        readmePane.setPreferredSize(readmePrefSize);
-        readmeScrollPane.setMaximumSize(readmeScrollMaxSize);
-        readmeScrollPane.setPreferredSize(readmeScrollPrefSize);
-        readmePane.add(readme);
-        tabbedPane.addTab("Variant README", readmeScrollPane);
-
-        Document doc = VariantSupport.loadVariant(variantName, true);
-        readme.setContentType((String)doc.getProperty(
-                ResourceLoader.keyContentType));
-        readme.setDocument(doc);
         options.setOption(Options.variant, variantName);
+
+        // if we don't pass the JEditorPane ("readme"), 
+        // it won't be updated when Variant changes.
+        JScrollPane readmeScrollPane = ShowReadme.readmeContentScrollPane(
+                        readme, variantName);
+        tabbedPane.addTab("Variant README", readmeScrollPane);
 
         JPanel gamePane = new JPanel();
         gamePane.setBorder(new TitledBorder("Game Startup"));

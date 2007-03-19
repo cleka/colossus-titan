@@ -126,6 +126,7 @@ public final class MasterBoard extends JPanel
     public static final String chooseScreen = "Choose Screen For Info Windows";
 
     public static final String about = "About";
+    public static final String viewReadme = "Show Variant Readme";
 
     private AbstractAction newGameAction;
     private AbstractAction loadGameAction;
@@ -150,6 +151,7 @@ public final class MasterBoard extends JPanel
     private AbstractAction chooseScreenAction;
 
     private AbstractAction aboutAction;
+    private AbstractAction viewReadmeAction;
 
     /* a Set of label (String) of all Tower hex */
     private static Set towerSet = null;
@@ -671,6 +673,14 @@ public final class MasterBoard extends JPanel
                     "java.version:   " + System.getProperty("java.version"));
             }
         };
+
+        viewReadmeAction = new AbstractAction(viewReadme)
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                new ShowReadme(masterFrame, client);
+            }
+        };
     }
 
     private void setupPopupMenu()
@@ -729,7 +739,7 @@ public final class MasterBoard extends JPanel
         // Then per-player options
 
         JMenu playerMenu = new JMenu("Player");
-        playerMenu.setMnemonic(KeyEvent.VK_P);
+        playerMenu.setMnemonic(KeyEvent.VK_Y);
         menuBar.add(playerMenu);
 
         addCheckBox(playerMenu, Options.autoPickColor, KeyEvent.VK_C);
@@ -780,6 +790,7 @@ public final class MasterBoard extends JPanel
 
         // Then Look & Feel
         lfMenu = new JMenu("Look & Feel");
+        lfMenu.setMnemonic(KeyEvent.VK_L);
         menuBar.add(lfMenu);
         UIManager.LookAndFeelInfo[] lfInfo =
             UIManager.getInstalledLookAndFeels();
@@ -796,10 +807,12 @@ public final class MasterBoard extends JPanel
 
         // Then help menu
         JMenu helpMenu = new JMenu("Help");
-        playerMenu.setMnemonic(KeyEvent.VK_H);
+        helpMenu.setMnemonic(KeyEvent.VK_H);
         menuBar.add(helpMenu);
 
         mi = helpMenu.add(aboutAction);
+        mi = helpMenu.add(viewReadmeAction);
+        mi.setMnemonic(KeyEvent.VK_V);
     }
 
     class ChangeLookFeelAction extends AbstractAction
