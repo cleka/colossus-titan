@@ -79,10 +79,10 @@ public final class Server implements IServer
 
         if ( startLog != null ) 
         {
-            this.startLog.dispose();
-            this.startLog = null;
+            startLog.dispose();
+            startLog = null;
         }
-        this.startLog = new StartupProgress(this);
+        startLog = new StartupProgress(this);
 
         waitingForClients = game.getNumLivingPlayers();
     }
