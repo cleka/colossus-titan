@@ -348,9 +348,8 @@ public final class VariantSupport
             singleDirectory.add(it.previous());
             try
             {
-                InputStream mmfIS =
-                        ResourceLoader.getInputStreamIgnoreFail(Constants.markersNameFile,
-                        singleDirectory);
+                InputStream mmfIS = ResourceLoader.getInputStreamIgnoreFail(
+                                Constants.markersNameFile, singleDirectory);
                 if (mmfIS != null)
                 {
                     allNames.load(mmfIS);
@@ -364,8 +363,8 @@ public final class VariantSupport
         }
         if (!foundOne)
         {
-        	Log.warn("No file "+Constants.markersNameFile+
-        			" found anywhere in directories "+directories.toString());
+            Log.warn("No file "+Constants.markersNameFile+
+                     " found anywhere in directories "+directories.toString());
         }
         return allNames;
     }

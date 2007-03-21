@@ -477,15 +477,15 @@ public final class ResourceLoader
                 }
                 if (stream == null)
                 {
-                	if (!ignoreFail)
-                	{
-                		Log.warn("getInputStream:: " +
-                				" Couldn't get InputStream for file " +
-                				filename + " in " + directories +
-                				(cachedOnly ? " (cached only)" : ""));
-                		// @TODO this sounds more serious than just a warning in the logs
-                		// Anyway now at least MarkersLoader does not complain any more...
-                	}
+                    if (!ignoreFail)
+                    {
+                        Log.warn("getInputStream:: " +
+                                " Couldn't get InputStream for file " +
+                                filename + " in " + directories +
+                                (cachedOnly ? " (cached only)" : ""));
+                        // @TODO this sounds more serious than just a warning in the logs
+                        // Anyway now at least MarkersLoader does not complain any more...
+                    }
                 }
                 else
                 {
