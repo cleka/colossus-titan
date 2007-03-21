@@ -398,6 +398,20 @@ public final class ResourceLoader
 
     /**
      * Return the first InputStream from file of name filename in the 
+     * list of directories, tell the getInputStream not to complain
+     * if not found. 
+     * @param filename Name of the file to load.
+     * @param directories List of directories to search (in order).
+     * @return The InputStream, or null if it was not found.
+     */
+    public static InputStream getInputStreamIgnoreFail(String filename,
+            List directories)
+    {
+        return getInputStream(filename, directories, server != null, false, true);
+    }
+
+    /**
+     * Return the first InputStream from file of name filename in the 
      * list of directories.
      * @param filename Name of the file to load.
      * @param directories List of directories to search (in order).
@@ -406,19 +420,24 @@ public final class ResourceLoader
     public static InputStream getInputStream(String filename,
             List directories)
     {
-        return getInputStream(filename, directories, server != null, false);
+        return getInputStream(filename, directories, server != null, false, false);
     }
 
+    
     /**
      * Return the first InputStream from file of name filename in
      * the list of directories.
      * @param filename Name of the file to load.
      * @param directories List of directories to search (in order).
      * @param remote Ask the server for the stream.
+     * @param cachedOnly Only look in the cache file, 
+     *     do not try to load the file from permanent storage.
+     * @param ignoreFail (=don't complain) if file not found    
      * @return The InputStream, or null if it was not found.
      */
     public static InputStream getInputStream(String filename,
-            List directories, boolean remote, boolean cachedOnly)
+            List directories, boolean remote, boolean cachedOnly,
+            boolean ignoreFail)
     {
         String mapKey = getMapKey(filename, directories);
         Object cached = fileCache.get(mapKey);
@@ -458,11 +477,15 @@ public final class ResourceLoader
                 }
                 if (stream == null)
                 {
-                    Log.warn("getInputStream:: " +
-                            " Couldn't get InputStream for file " +
-                            filename + " in " + directories +
-                            (cachedOnly ? " (cached only)" : ""));
-                    // @TODO this sounds more serious than just a warning in the logs
+                	if (!ignoreFail)
+                	{
+                		Log.warn("getInputStream:: " +
+                				" Couldn't get InputStream for file " +
+                				filename + " in " + directories +
+                				(cachedOnly ? " (cached only)" : ""));
+                		// @TODO this sounds more serious than just a warning in the logs
+                		// Anyway now at least MarkersLoader does not complain any more...
+                	}
                 }
                 else
                 {
@@ -520,7 +543,7 @@ public final class ResourceLoader
 
             }
         }
-        return( data == null ? null : getInputStreamFromBytes(data));
+        return( data==null ? null : getInputStreamFromBytes(data));
     }
 
     /**
@@ -537,7 +560,7 @@ public final class ResourceLoader
             boolean cachedOnly)
     {
         InputStream is = getInputStream(filename, directories,
-                server != null, cachedOnly);
+                server != null, cachedOnly, false);
         if (is == null)
         {
             Log.warn("getBytesFromFile:: " +

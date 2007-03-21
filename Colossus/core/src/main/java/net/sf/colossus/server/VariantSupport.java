@@ -341,6 +341,7 @@ public final class VariantSupport
          load all files in order, so that we get the
          default mapping at the end */
         ListIterator it = directories.listIterator(directories.size());
+        boolean foundOne = false;
         while (it.hasPrevious())
         {
             List singleDirectory = new java.util.ArrayList();
@@ -348,17 +349,23 @@ public final class VariantSupport
             try
             {
                 InputStream mmfIS =
-                        ResourceLoader.getInputStream(Constants.markersNameFile,
+                        ResourceLoader.getInputStreamIgnoreFail(Constants.markersNameFile,
                         singleDirectory);
                 if (mmfIS != null)
                 {
                     allNames.load(mmfIS);
+                    foundOne = true;
                 }
             }
             catch (Exception e)
             {
                 Log.warn("Markers name loading partially failed.");
             }
+        }
+        if (!foundOne)
+        {
+        	Log.warn("No file "+Constants.markersNameFile+
+        			" found anywhere in directories "+directories.toString());
         }
         return allNames;
     }
