@@ -40,12 +40,12 @@
         <border number="4" type="w" />
     </battlehex>
     <startlist>
-        <battlehex label="A3" />
-        <battlehex label="B3" />
-        <battlehex label="C4" />
-        <battlehex label="D4" />
-        <battlehex label="E3" />
-        <battlehex label="E2" />
-        <battlehex label="F1" />
+        <battlehexref label="A3" />
+        <battlehexref label="B3" />
+        <battlehexref label="C4" />
+        <battlehexref label="D4" />
+        <battlehexref label="E3" />
+        <battlehexref label="E2" />
+        <battlehexref label="F1" />
     </startlist>
 </battlemap>

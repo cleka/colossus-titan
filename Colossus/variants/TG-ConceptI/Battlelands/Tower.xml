@@ -48,15 +48,15 @@
         <border number="4" type="w" />
     </battlehex>
     <startlist>
-        <battlehex label="B4" />
-        <battlehex label="F2" />
-        <battlehex label="C5" />
-        <battlehex label="C4" />
-        <battlehex label="B3" />
-        <battlehex label="A3" />
-        <battlehex label="F3" />
-        <battlehex label="E3" />
-        <battlehex label="E2" />
-        <battlehex label="F1" />
+        <battlehexref label="B4" />
+        <battlehexref label="F2" />
+        <battlehexref label="C5" />
+        <battlehexref label="C4" />
+        <battlehexref label="B3" />
+        <battlehexref label="A3" />
+        <battlehexref label="F3" />
+        <battlehexref label="E3" />
+        <battlehexref label="E2" />
+        <battlehexref label="F1" />
     </startlist>
 </battlemap>
