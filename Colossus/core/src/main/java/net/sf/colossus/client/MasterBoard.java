@@ -53,7 +53,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
 import net.sf.colossus.server.Constants;
-import net.sf.colossus.server.Creature;
 import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.server.XMLSnapshotFilter;
 import net.sf.colossus.util.HTMLColor;
@@ -1690,34 +1689,7 @@ public final class MasterBoard extends JPanel
         combo.addAll(teleport);
         combo.addAll(normal);
 
-        showBestRecruit(markerId, combo);
-    }
-
-    private void showBestRecruit(String markerId, Set set)
-    {
-        client.clearRecruitChits();
-        Iterator it = set.iterator();
-        while (it.hasNext())
-        {
-            String hexLabel = (String)it.next();
-            List recruits = client.findEligibleRecruits(markerId,
-                hexLabel);
-            if (recruits != null && recruits.size() > 0)
-            {
-                if ((!client.showAllRecruitChits) ||
-                    (recruits.size() == 1))
-                {
-                    Creature recruit =
-                        (Creature)recruits.get(recruits.size() - 1);
-                    String recruitName = recruit.getName();
-                    client.addRecruitChit(recruitName, hexLabel);
-                }
-                else
-                {
-                    client.addRecruitChit(recruits, hexLabel);
-                }
-            }
-        }
+        client.addPossibleRecruitChits(markerId, combo);
     }
 
     void highlightEngagements()
@@ -2188,7 +2160,8 @@ public final class MasterBoard extends JPanel
         {
             paintHighlights((Graphics2D)g);
             paintMarkers(g);
-            paintRecruitChits(g);
+            paintPossibleRecruitChits(g);
+            paintRecruitedChits(g);
             paintMovementDie(g);
         }
         catch (ConcurrentModificationException ex)
@@ -2239,9 +2212,21 @@ public final class MasterBoard extends JPanel
         }
     }
 
-    private void paintRecruitChits(Graphics g)
+    private void paintRecruitedChits(Graphics g)
     {
-        Iterator it = client.getRecruitChits().iterator();
+        Iterator it = client.getRecruitedChits().iterator();
+        while (it.hasNext())
+        {
+            Chit chit = (Chit)it.next();
+            if (chit != null && g.getClipBounds().intersects(chit.getBounds()))
+            {
+                chit.paintComponent(g);
+            }
+        }
+    }
+    private void paintPossibleRecruitChits(Graphics g)
+    {
+        Iterator it = client.getPossibleRecruitChits().iterator();
         while (it.hasNext())
         {
             Chit chit = (Chit)it.next();

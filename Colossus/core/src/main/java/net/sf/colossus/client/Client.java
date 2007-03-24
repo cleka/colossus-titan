@@ -85,7 +85,8 @@ public final class Client implements IClient, IOracle, IOptions
     /** The end of the list is on top in the z-order. */
     private List markers = new ArrayList();
 
-    private List recruitChits = new ArrayList();
+    private List recruitedChits = new ArrayList();
+    private List possibleRecruitChits = new ArrayList();
 
     // Per-client and per-player options.
     private Options options;
@@ -1359,12 +1360,17 @@ public final class Client implements IClient, IOracle, IOptions
         battleChits.add(chit);
     }
 
-    List getRecruitChits()
+    List getRecruitedChits()
     {
-        return Collections.unmodifiableList(recruitChits);
+        return Collections.unmodifiableList(recruitedChits);
     }
 
-    void addRecruitChit(String imageName, String hexLabel)
+    List getPossibleRecruitChits()
+    {
+        return Collections.unmodifiableList(possibleRecruitChits);
+    }
+
+    void addRecruitedChit(String imageName, String hexLabel)
     {
         int scale = 2 * Scale.get();
         GUIMasterHex hex = board.getGUIHexByLabel(hexLabel);
@@ -1374,10 +1380,25 @@ public final class Client implements IClient, IOracle, IOptions
         point.x -= scale / 2;
         point.y -= scale / 2;
         chit.setLocation(point);
-        recruitChits.add(chit);
+        recruitedChits.add(chit);
     }
 
-    void addRecruitChit(List imageNameList, String hexLabel)
+    // one chit, one hex
+    void addPossibleRecruitChit(String imageName, String hexLabel)
+    {
+        int scale = 2 * Scale.get();
+        GUIMasterHex hex = board.getGUIHexByLabel(hexLabel);
+        Chit chit = new Chit(scale, imageName);
+        Point startingPoint = hex.getOffCenter();
+        Point point = new Point(startingPoint);
+        point.x -= scale / 2;
+        point.y -= scale / 2;
+        chit.setLocation(point);
+        possibleRecruitChits.add(chit);
+    }
+
+    // all possible recuit chits, one hex
+    void addPossibleRecruitChits(List imageNameList, String hexLabel)
     {
         Iterator it = imageNameList.iterator();
         int size = imageNameList.size();
@@ -1397,7 +1418,7 @@ public final class Client implements IClient, IOracle, IOptions
             }
             else
             {
-                Log.error("Only String or Creature in addRecruitChit() !");
+                Log.error("Only String or Creature in addPossibleRecruitChits() !");
                 return;
             }
             int scale = 2 * Scale.get();
@@ -1414,13 +1435,43 @@ public final class Client implements IClient, IOracle, IOptions
                 ((size % 2 == 0 ? (scale / 2) : 0))) / size;
             num--;
             chit.setLocation(point);
-            recruitChits.add(chit);
+            possibleRecruitChits.add(chit);
         }
     }
-
+        
+    // all hexes
+    public void addPossibleRecruitChits(String markerId, Set set)
+    {
+        clearPossibleRecruitChits();
+    
+        // set is a set of possible target hexes
+        Iterator it = set.iterator();
+        while (it.hasNext())
+        {
+            String hexLabel = (String)it.next();
+            List recruits = findEligibleRecruits(markerId, hexLabel);
+            if (recruits != null && recruits.size() > 0)
+            {
+                if ((!showAllRecruitChits) || (recruits.size() == 1))
+                {
+                    List oneElemList = new ArrayList();
+                    Creature recruit = (Creature)recruits.get(recruits.size() - 1);
+                    String recruitName = recruit.getName();
+                    oneElemList.add(recruitName);
+                    recruits = oneElemList;
+                }
+                else
+                {
+                }
+                addPossibleRecruitChits(recruits, hexLabel);
+            }
+        }
+    }
+    
+    
     void removeRecruitChit(String hexLabel)
     {
-        Iterator it = recruitChits.iterator();
+        Iterator it = recruitedChits.iterator();
         while (it.hasNext())
         {
             Chit chit = (Chit)it.next();
@@ -1432,11 +1483,29 @@ public final class Client implements IClient, IOracle, IOptions
                 return;
             }
         }
+        Iterator it2 = possibleRecruitChits.iterator();
+        while (it2.hasNext())
+        {
+            Chit chit = (Chit)it.next();
+            // TODO the next line can cause an NPE when the user closes the client app
+            GUIMasterHex hex = board.getGUIHexByLabel(hexLabel);
+            if (hex != null && hex.contains(chit.getCenter()))
+            {
+                it2.remove();
+                return;
+            }
+        }
     }
 
+    void clearPossibleRecruitChits()
+    {
+        clearRecruitChits();
+    }
+    
     void clearRecruitChits()
     {
-        recruitChits.clear();
+        recruitedChits.clear();
+        possibleRecruitChits.clear();
         // XXX Only repaint needed hexes.
         if (board != null)
         {
@@ -2217,7 +2286,7 @@ public final class Client implements IClient, IOracle, IOptions
         if (board != null)
         {
             GUIMasterHex hex = board.getGUIHexByLabel(hexLabel);
-            addRecruitChit(recruitName, hexLabel);
+            addRecruitedChit(recruitName, hexLabel);
             hex.repaint();
             board.highlightPossibleRecruits();
         }
