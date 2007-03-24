@@ -722,7 +722,7 @@ public final class Server implements IServer
             client.nak(Constants.doRecruit, "Null legion");
             return;
         }
-        
+
         if (!getPlayerName().equals(legion.getPlayerName()))
         {
             Log.error(getPlayerName() + " illegally called doRecruit()");
@@ -794,12 +794,16 @@ public final class Server implements IServer
                     recruiterName, numRecruiters);
         }
 
-        List recruiterNames = new ArrayList();
-        for (int i = 0; i < numRecruiters; i++)
+        // reveal only if there is something to tell
+        if (recruiter != null)
         {
-            recruiterNames.add(recruiterName);
+            List recruiterNames = new ArrayList();
+            for (int i = 0; i < numRecruiters; i++)
+            {
+                recruiterNames.add(recruiterName);
+            }
+            game.revealEvent(true, null, legion.getMarkerId(), recruiterNames);
         }
-        game.revealEvent(true, null, legion.getMarkerId(), recruiterNames);
         game.addCreatureEvent(legion.getMarkerId(), recruit.getName());
     }
 
@@ -1224,7 +1228,9 @@ public final class Server implements IServer
     {
         if (!isActivePlayer())
         {
-            Log.error(getPlayerName() + " illegally called doneWithSplits()");
+            Log.error(getPlayerName() + " illegally (wrong player) called "
+                    + "doneWithSplits() - active player is "
+                    + game.getActivePlayer().toString());
             getClient(getPlayerName()).nak(Constants.doneWithSplits,
                     "Wrong player");
         }
