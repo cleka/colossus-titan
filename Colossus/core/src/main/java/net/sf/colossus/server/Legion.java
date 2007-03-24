@@ -465,7 +465,7 @@ public final class Legion implements Comparable
         // Let the clients clean up the legion marker, etc.
         if(updateHistory) 
         {
-        	game.getServer().allRemoveLegion(markerId);
+            game.getServer().allRemoveLegion(markerId);
         }
         if (getPlayer() != null)
         {
@@ -647,9 +647,8 @@ public final class Legion implements Comparable
             }
             else
             {
-                // TODO: looking at stresstest logs shows this event
-                // occuring for some unreported situations, track-em down
-                Log.error("Tried to addCreature when they were all gone!");
+                Log.error("Tried to addCreature "+creature.toString()+
+                          " when there were none of those left!");
                 return false;
             }
         }
