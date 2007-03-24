@@ -92,6 +92,7 @@ public final class Client implements IClient, IOracle, IOptions
 
     /** Player who owns this client. */
     private String playerName;
+    private boolean playerAlive = true;
 
     /** Starting marker color of player who owns this client. */
     private String color;
@@ -1673,6 +1674,11 @@ public final class Client implements IClient, IOracle, IOptions
         info.removeAllLegions();
 
         predictSplits[getPlayerNum(deadPlayerName)] = null;
+        
+        if (this.playerName.equals(deadPlayerName))
+        {
+            playerAlive = false;
+        }
     }
 
     public void tellGameOver(String message)
@@ -2418,8 +2424,10 @@ public final class Client implements IClient, IOracle, IOptions
         }
         updateStatusScreen();
 
-        if (getOption(Options.autoRecruit) && !isGameOver())
+        if (getOption(Options.autoRecruit) && !isGameOver()
+            && isMyTurn() && this.phase == Constants.Phase.MUSTER)
         {
+            // System.out.println("client "+playerName+" calling ai.muster");
             ai.muster();
             // Do not automatically say we are done.
             // Allow humans to override.
@@ -3756,7 +3764,8 @@ public final class Client implements IClient, IOracle, IOptions
             board.alignLegions(info.getHexLabel());
             board.highlightTallLegions();
         }
-        if (isMyTurn() && getOption(Options.autoSplit) && !isGameOver())
+        if (isMyTurn() && this.phase == Constants.Phase.SPLIT 
+                && getOption(Options.autoSplit) && !isGameOver())
         {
             boolean done = ai.splitCallback(null, null);
             if (done)
@@ -3910,7 +3919,7 @@ public final class Client implements IClient, IOracle, IOptions
     {
         // check also for phase, because delayed callbacks could come
         // after our phase is over but activePlayerName not updated yet
-        return playerName.equals(getBattleActivePlayerName())
+        return playerAlive && playerName.equals(getBattleActivePlayerName())
                && this.phase == Constants.Phase.FIGHT;
     }
 
