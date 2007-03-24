@@ -31,7 +31,8 @@ public class SimpleAI implements AI
     String[] hintSectionUsed = { Constants.sectionOffensiveAI };
     int splitsDone = 0;
     int splitsAcked = 0;
-    	
+    ArrayList remainingMarkers = null;
+    
     public SimpleAI(Client client)
     {
         this.client = client;
@@ -56,6 +57,50 @@ public class SimpleAI implements AI
             return (String) it.next();
         }
         return null;
+    }
+
+    /* prepare a list of markers, first those with preferred color,
+     * then all the others, but inside these groups shuffled.
+     * Caller can then always just take next to get a "random" marker.
+     * @param markerIds list of available markers to prepare
+     * @param preferredShortColor thos with this color first
+     * @returns list of markers
+     */
+    private ArrayList prepareMarkers(Set markerIds, String preferredShortColor)
+    {
+        Iterator it = markerIds.iterator();
+        String markerId = null;
+        List myMarkerIds = new ArrayList();
+        List otherMarkerIds = new ArrayList();
+        ArrayList allMarkerIds = new ArrayList();
+        
+        // split between own / other
+        while (it.hasNext())
+        {
+            markerId = (String)it.next();
+            if (preferredShortColor != null &&
+                    markerId.startsWith(preferredShortColor))
+            {
+                myMarkerIds.add(markerId);
+            }
+            else
+            {
+                otherMarkerIds.add(markerId);
+            }
+        }
+
+        if (!(myMarkerIds.isEmpty()))
+        {
+            Collections.shuffle(myMarkerIds, random);
+            allMarkerIds.addAll(myMarkerIds);
+        }
+
+        if (!(otherMarkerIds.isEmpty()))
+        {
+            Collections.shuffle(otherMarkerIds, random);
+            allMarkerIds.addAll(otherMarkerIds);
+        }
+        return allMarkerIds;
     }
 
     public String pickMarker(Set markerIds, String preferredShortColor)
@@ -95,6 +140,10 @@ public class SimpleAI implements AI
 
     public void muster()
     {
+        // System.out.println("ai.muster for "+client.getPlayerName());
+
+        client.resetRecruitReservations();
+        
         // Do not recruit if this legion is a scooby snack.
         double scoobySnackFactor = 0.15;
         int minimumSizeToRecruit = (int)(scoobySnackFactor *
@@ -110,7 +159,8 @@ public class SimpleAI implements AI
                     (legion.hasTitan() || legion.getPointValue() >=
                     minimumSizeToRecruit))
             {
-                Creature recruit = chooseRecruit(legion, legion.getHexLabel());
+                Creature recruit = chooseRecruit(legion, legion.getHexLabel(),
+                                                 true);
                 if (recruit != null)
                 {
                     List recruiters = client.findEligibleRecruiters(
@@ -122,11 +172,14 @@ public class SimpleAI implements AI
                         // Just take the first one.
                         recruiterName = (String)recruiters.get(0);
                     }
-                    client.doRecruit(markerId, recruit.getName(),
+                    String recruitName = recruit.getName();
+                    client.doRecruit(markerId, recruitName,
                             recruiterName);
+                    client.reserveRecruit(recruitName);
                 }
             }
         }
+        client.resetRecruitReservations();
     }
 
     public void reinforce(LegionInfo legion)
@@ -148,11 +201,18 @@ public class SimpleAI implements AI
         client.doRecruit(legion.getMarkerId(), recruitName, recruiterName);
     }
 
+    // support old interface without reserve feature
     Creature chooseRecruit(LegionInfo legion, String hexLabel)
+    {
+        return chooseRecruit(legion, hexLabel, false);
+    }
+    
+    Creature chooseRecruit(LegionInfo legion, String hexLabel, 
+            boolean considerReservations)
     {
         MasterHex hex = MasterBoard.getHexByLabel(hexLabel);
         List recruits = client.findEligibleRecruits(legion.getMarkerId(),
-                hexLabel);
+                hexLabel, considerReservations);
         if (recruits.size() == 0)
         {
             return null;
@@ -167,32 +227,31 @@ public class SimpleAI implements AI
     public boolean split()
     {
         PlayerInfo player = client.getPlayerInfo();
+        remainingMarkers = prepareMarkers(player.getMarkersAvailable(), 
+                player.getShortColor());
+        
         splitsDone = 0;
         splitsAcked = 0;
         Iterator it = player.getLegionIds().iterator();
-        while (it.hasNext())
+        while (it.hasNext() && !remainingMarkers.isEmpty())
         {
             String markerId = (String)it.next();
             splitOneLegion(player, markerId);
         }
+        remainingMarkers.clear();
+        remainingMarkers = null;
+        
         // if we did splits, don't signal to client that it's done;
         // because it would do doneWithSplits immediately;
         // instead the last didSplit Callback will do doneWithSplits
         // (This is done to avoid the advancePhase illegally messages)
-        if ( splitsDone > 0 )
-        {
-        	return false;
-        }
-        else
-        {
-        	return true;
-        }
+        return(splitsDone > 0 ? false : true);
     }
 
     /** Unused in this AI; just return true to indicate done. */
     public boolean splitCallback(String parentId, String childId)
     {
-    	splitsAcked++;
+        splitsAcked++;
         return(splitsAcked >= splitsDone ? true : false);
     }
 
@@ -298,15 +357,16 @@ public class SimpleAI implements AI
             }
         }
 
-        String newMarkerId = pickMarker(player.getMarkersAvailable(),
-                player.getShortColor());
-
-        if (newMarkerId == null)
+        if (remainingMarkers.isEmpty())
         {
             Log.debug("Not splitting " + legion + 
-                      " because no markers available");
+            " because no markers available");
             return;
         }
+        
+        String newMarkerId = (String) remainingMarkers.get(0);
+        remainingMarkers.remove(0);
+        
         StringBuffer results = new StringBuffer();
         List creatures = chooseCreaturesToSplitOut(legion);
         Iterator it = creatures.iterator();
@@ -845,7 +905,7 @@ public class SimpleAI implements AI
             }
 
             // if we found a move that's better than sitting still, move
-            if (bestValue > sitStillMove.value)
+            if (bestValue > sitStillMove.value && bestHex != null)
             {
                 moved = doMove(legion.getMarkerId(), bestHex.getLabel());
                 if (moved)
@@ -1005,7 +1065,9 @@ public class SimpleAI implements AI
 
     private boolean doMove(String markerId, String hexLabel)
     {
-        // Don't *know* move succeeded without asking server.
+        // OLD COMMENT: Don't *know* move succeeded without asking server.
+        //  ... nonsense. Client just sends message to server
+        //      and returns true...
         boolean moved = client.doMove(markerId, hexLabel);
         return moved;
     }
@@ -2141,7 +2203,8 @@ public class SimpleAI implements AI
                 bestAngel = myAngel;
             }
         }
-        return bestAngel + ":" + bestLegion.getMarkerId();
+        return bestAngel == null || bestLegion == null ? null : 
+            (bestAngel + ":" + bestLegion.getMarkerId());
     }
 
     /** Create a map containing each target and the number of hits it would

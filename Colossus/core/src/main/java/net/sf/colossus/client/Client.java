@@ -13,6 +13,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -157,7 +158,8 @@ public final class Client implements IClient, IOracle, IOptions
 
     // XXX Make private and wrap consistently.
     boolean showAllRecruitChits = false;
-
+    private Hashtable recruitReservations = new Hashtable();
+    
     private LogWindow logWindow;
 
     public Client(String host, int port, String playerName, boolean remote)
@@ -625,7 +627,7 @@ public final class Client implements IClient, IOracle, IOptions
                     }
                     boolean onlyOwnLegions = getOption(Options.onlyOwnLegions);
                     autoInspector = new AutoInspector(parent, this, playerName,
-                    		onlyOwnLegions);
+                            onlyOwnLegions);
                 }
             }
             else
@@ -1660,17 +1662,17 @@ public final class Client implements IClient, IOracle, IOptions
     }
 
     // TODO Move legion markers to slayer on client side.
-    public void tellPlayerElim(String playerName, String slayerName)
+    public void tellPlayerElim(String deadPlayerName, String slayerName)
     {
-        Log.debug(this.playerName + " tellPlayerElim(" + playerName +
+        Log.debug(this.playerName + " tellPlayerElim(" + deadPlayerName +
             ", " + slayerName + ")");
-        PlayerInfo info = getPlayerInfo(playerName);
+        PlayerInfo info = getPlayerInfo(deadPlayerName);
 
         // TODO Merge these
         info.setDead(true);
         info.removeAllLegions();
 
-        predictSplits[getPlayerNum(playerName)] = null;
+        predictSplits[getPlayerNum(deadPlayerName)] = null;
     }
 
     public void tellGameOver(String message)
@@ -3165,8 +3167,99 @@ public final class Client implements IClient, IOracle, IOptions
         }
     }
 
-    /** Return a list of Creatures. */
+    /*
+     * Reset the cached reservations. 
+     * Should be called at begin of each recruit turn, if 
+     * reserveRecruit and getReservedCount() are going to be used.
+     * 
+     */
+    public void resetRecruitReservations()
+    {
+        recruitReservations.clear();
+    }
+    
+    /*
+     * Reserve one. Expects that getReservedCount() had been called in this 
+     * turn for same creature before called reserveRecruit (= to cache the 
+     * caretakers stack value).
+     * Returns whether creature can still be recruited (=is available according
+     * to caretakers stack plus reservations)
+     */
+    public boolean reserveRecruit(String recruitName)
+    {
+        boolean ok = false;
+        int remain;
+
+        Integer count = (Integer) recruitReservations.get(recruitName);
+        if ( count != null )
+        {
+            remain = count.intValue();
+            recruitReservations.remove(recruitName);
+        }
+        else
+        {
+            Log.warn(playerName + " reserveRecruit creature "+recruitName+
+                    " not fround from hash, should have been created during getReservedCount!" );
+            remain = getCreatureCount(recruitName);
+        }
+        
+        if (remain > 0)
+        {
+            remain--;
+            ok = true;
+        }
+
+//        System.out.println("reserveRecruit: "+recruitName);
+/*        
+
+        if (remain == 0)
+        {
+            System.out.println("-- remaining == 0 !!");
+        }
+*/        
+        recruitReservations.put(recruitName, new Integer(remain));
+        return ok;
+    }
+
+    /*
+     * On first call (during a turn), cache remaining count from recruiter,
+     * decrement on each further reserve for this creature.
+     * This way we are independent of when the changes which are triggered by 
+     * didRecruit influence the caretaker Stack. 
+     * Returns how many creatures can still be recruited (=according
+     * to caretakers stack plus reservations)
+     */
+    public int getReservedRemain(String recruitName)
+    {
+        int remain;
+
+        Integer count = (Integer) recruitReservations.get(recruitName);
+        if ( count == null )
+        {
+            remain = getCreatureCount(recruitName);
+        }
+        else
+        {
+            remain = count.intValue();
+            recruitReservations.remove(recruitName);
+        }
+        recruitReservations.put(recruitName, new Integer(remain));
+        
+//        System.out.println("getReservedCount: "+recruitName+" remaining: "+remain);
+
+        return remain;
+    }
+    
+    
+    /** Return a list of Creatures (ignore reservations). */
     List findEligibleRecruits(String markerId, String hexLabel)
+    {
+        return findEligibleRecruits(markerId, hexLabel, false);
+    }
+
+    /** Return a list of Creatures. Consider reservations if wanted */
+    List findEligibleRecruits(String markerId, String hexLabel,
+            boolean considerReservations)
     {
         List recruits = new ArrayList();
 
@@ -3213,7 +3306,14 @@ public final class Client implements IClient, IOracle, IOptions
         while (it.hasNext())
         {
             Creature recruit = (Creature)it.next();
-            if (getCreatureCount(recruit) < 1)
+            int remaining = getCreatureCount(recruit);
+            
+            if ( remaining > 0 && considerReservations )
+            {
+                String recruitName = recruit.toString();
+                remaining = getReservedRemain(recruitName);
+            }
+            if ( remaining < 1)
             {
                 it.remove();
             }
@@ -3808,7 +3908,10 @@ public final class Client implements IClient, IOracle, IOptions
 
     boolean isMyBattlePhase()
     {
-        return playerName.equals(getBattleActivePlayerName());
+        // check also for phase, because delayed callbacks could come
+        // after our phase is over but activePlayerName not updated yet
+        return playerName.equals(getBattleActivePlayerName())
+               && this.phase == Constants.Phase.FIGHT;
     }
 
     int getMovementRoll()
@@ -3943,7 +4046,11 @@ public final class Client implements IClient, IOracle, IOptions
             board.alignLegions(hexLabel);
             board.highlightTallLegions();
         }
-        if (isMyTurn() && getOption(Options.autoSplit) && !isGameOver())
+
+        // check also for phase, because delayed callbacks could come
+        // after our phase is over but activePlayerName not updated yet.
+        if (isMyTurn() && this.phase == Constants.Phase.SPLIT
+                && getOption(Options.autoSplit) && !isGameOver())
         {
             boolean done = ai.splitCallback(parentId, childId);
             if (done)
