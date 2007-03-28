@@ -94,7 +94,6 @@ public class CreatureTitan extends Creature
 
     public int getHintedRecruitmentValue()
     {
-        Log.warn("Calling getHintedRecruitmentValue() on CreatureTitan");
         int val = super.getHintedRecruitmentValue();
         Log.debug("getHintedRecruitmentValue() is " + val);
         return val;
@@ -102,7 +101,6 @@ public class CreatureTitan extends Creature
 
     public int getHintedRecruitmentValue(String[] section)
     {
-        Log.warn("Calling getHintedRecruitmentValue([]) on CreatureTitan");
         int val = super.getHintedRecruitmentValue(section);
         Log.debug("getHintedRecruitmentValue() is " + val);
         return val;
