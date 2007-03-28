@@ -17,6 +17,7 @@ import net.sf.colossus.util.Options;
 import net.sf.colossus.util.Log;
 import net.sf.colossus.client.PickIntValue;
 import net.sf.colossus.client.ShowReadme;
+import net.sf.colossus.client.SaveWindow;
 
 /**
  * Class GetPlayers is a dialog used to enter players' 
@@ -48,6 +49,7 @@ public final class GetPlayers extends KDialog implements WindowListener,
     private JLabel delayLabel;
     private int oldLimit;
     private JLabel timeLimitLabel;
+    private SaveWindow saveWindow;
 
     /** Clear options to abort */
     public GetPlayers(JFrame parentFrame, Options options)
@@ -216,7 +218,17 @@ public final class GetPlayers extends KDialog implements WindowListener,
 
         pack();
 
-        centerOnScreen();
+        saveWindow = new SaveWindow(options, "GetPlayers");
+        Point loadLocation = saveWindow.loadLocation();
+        if (loadLocation == null)
+        {
+            centerOnScreen();
+        }
+        else
+        {
+            setLocation(loadLocation);
+        }
+
 
         addWindowListener(this);
         setVisible(true);
@@ -637,5 +649,11 @@ public final class GetPlayers extends KDialog implements WindowListener,
         String text = source.getText();
         boolean selected = (e.getStateChange() == ItemEvent.SELECTED);
         options.setOption(text, selected);
+    }
+
+    public void dispose()
+    {
+        saveWindow.saveLocation(getLocation());
+        super.dispose();
     }
 }
