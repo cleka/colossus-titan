@@ -916,6 +916,7 @@ public final class Client implements IClient, IOracle, IOptions
 
     public void dispose()
     {
+        sct.setGoingDown();
         cleanupBattle();
         disposeMovementDie();
         disposeStatusScreen();

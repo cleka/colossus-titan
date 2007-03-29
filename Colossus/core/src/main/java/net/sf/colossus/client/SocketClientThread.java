@@ -33,6 +33,7 @@ final class SocketClientThread extends Thread implements IServer
     private Socket socket;
     private BufferedReader in;
     private PrintWriter out;
+    private boolean goingDown = false;
 
     private final static String sep = Constants.protocolTermSeparator;
 
@@ -94,11 +95,23 @@ final class SocketClientThread extends Thread implements IServer
         System.exit(0);
     }
 
+    /*
+     * After this is set, SocketClientThread will not call any client
+     * method any more (client might dispose board and exit at any moment).
+     */
+    public void setGoingDown()
+    {
+        this.goingDown = true;
+    }
+    
     private synchronized void parseLine(String s)
     {
         List li = Split.split(sep, s);
-        String method = (String)li.remove(0);
-        callMethod(method, li);
+        if (!goingDown)
+        {
+            String method = (String)li.remove(0);
+            callMethod(method, li);
+        }
     }
 
     private void callMethod(String method, List args)
