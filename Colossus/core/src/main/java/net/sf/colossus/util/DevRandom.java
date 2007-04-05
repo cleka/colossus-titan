@@ -6,33 +6,30 @@ import java.io.*;
 import net.sf.colossus.util.Log;
 
 /**
- * Class DevRandom generates random numbers from the "/dev/random" device,
- * or any file or device supplying random binary data.
- * If the source is unreachable it falls back on the
- * regular java Random implementation.
+ * Class DevRandom generates random bits (same interface as class Random). 
+ * Which random data source to use can be specified by providing a 
+ * property called "net.sf.colossus.randomFile" (see randomPropertyName) 
+ * or as argument to the constructor.
+ * If no special source is specified or the specified source is unreachable 
+ * then it falls back on the regular java Random class.
  * @version $Id$
  * @author Romain Dolbeau
  * @author David Ripton
  */
 public class DevRandom extends Random
 {
-    final static String hwrandomFilename = "/dev/hwrandom";
-    final static String hrandomFilename = "/dev/hrandom";
-    final static String urandomFilename = "/dev/urandom";
-    final static String randomFilename = "/dev/random";
-    final static String[] sourceOrder = { hwrandomFilename,
-                                          hrandomFilename,
-                                          urandomFilename,
-                                          randomFilename };
-    static int sourceStartIndex = 0;
     final static String PRNG = "PRNG";
     private String source = null;
     private File randomSource = null;
     private FileInputStream randStream = null;
 
+    private static String randomPropertyName = "net.sf.colossus.randomFile";
+    private static String randomPropertySource = null;
+    
     public DevRandom()
     {
         super();
+        source = getRandomSourceFromProperties();
         init();
     }
 
@@ -43,7 +40,45 @@ public class DevRandom extends Random
         init();
     }
 
-    private boolean tryOneSource(String src) {
+    /* Returns the source to use.
+     * If set in a property (see randomPropertyName above), 
+     * then try it and remember whether set, or or not, 
+     * and subsequent calls return same source then without checking again.
+     * If not set at all, return PRNG which makes the class using the default
+     * random device.
+     */
+    private String getRandomSourceFromProperties()
+    {
+        // did we check earlier? Use that remembered info
+        // null means, not checked
+        // PRNG means, checked but not set => fall back to default
+        if (randomPropertySource != null)
+        {
+            return randomPropertySource;
+        }
+        // nope. Check if property set, and remember we checked and
+        // the actual value what to use.
+        else
+        {
+            randomPropertySource = PRNG;
+            String randomFile = System.getProperty(randomPropertyName);
+            if ( randomFile != null )
+            {
+                Log.debug(randomPropertyName
+                          +" is set to using random source: "+randomFile);
+                if (tryOneSource(randomFile))
+                {
+                    randomPropertySource = randomFile;
+                    Log.debug("RandomSource looks OK - using it: "+randomFile);
+                }
+                // stays PRNG, i.e. falls back to default
+            }
+            return randomPropertySource;
+        }
+    }
+    
+    private boolean tryOneSource(String src)
+    {
         if (src == null)
             return false;
 
@@ -65,18 +100,8 @@ public class DevRandom extends Random
             // Don't try other sources.
             return;
         }
-        if (!tryOneSource(source)) 
-        {
-            int i = sourceStartIndex;
-            while ( i < sourceOrder.length && 
-                    !tryOneSource(sourceOrder[i]) ) 
-            {
-                i++;
-            }
-            // Class remembers which worked, or if none,
-            // loop is in future always skipped.
-            sourceStartIndex = i;
-        }
+
+        tryOneSource(source);
 
         if ((randomSource != null) && (randomSource.exists()))
         {
