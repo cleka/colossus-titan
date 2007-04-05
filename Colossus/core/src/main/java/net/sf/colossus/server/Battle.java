@@ -1717,9 +1717,14 @@ public final class Battle
         }
         else
         {
+            Legion legion = getActiveLegion();
+            String markerId = legion.getMarkerId();
             Log.warn(critter.getName() + " in " +
                     critter.getCurrentHexLabel() +
-                    " tried to illegally move to " + hexLabel);
+                    " tried to illegally move to " + hexLabel +
+                    " in " + terrain + 
+                    " (" + attackerId + " attacking " + defenderId + 
+                    ", active: "+markerId+")");
             return false;
         }
     }
