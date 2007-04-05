@@ -2841,8 +2841,9 @@ public class SimpleAI implements AI
 
         int bestScore = 0;
         List bestOrder = null;
-        int count = 0;
+        boolean bestAllOK = false;
 
+        int count = 0;
         setupTimer();
 
         it = new Perms(critterMoves).iterator();
@@ -2852,34 +2853,58 @@ public class SimpleAI implements AI
 
             count++;
 
-            int score = testMoveOrder(order);
+            boolean allOK = true;
+            int score = testMoveOrder(order, null);
+            if (score<0)
+            {
+                allOK = false;
+                score = -score; 
+            }
             if (score > bestScore)
             {
                 bestOrder = (ArrayList)order.clone();
                 bestScore = score;
+                bestAllOK = allOK;
                 if (score >= perfectScore)
                 {
                     break;
                 }
             }
 
-            // Bail out early
+            // Bail out early, if there is at least some valid move.
             if (timeIsUp)
             {
-                Log.warn(
-                        "Time is up figuring move order, but we ignore it " +
-                        "(buggy break)");
-                timeIsUp = false;
+                if (bestScore > 0)
+                {
+                    break;
+                }
+                else
+                {
+                    Log.warn("Time is up figuring move order, but we ignore " +
+                             "it (no valid moveOrder found yet... " + 
+                             " - buggy break)");
+                    timeIsUp = false;
+                }
             }
+        }
+        
+        if (!bestAllOK)
+        {
+            ArrayList newOrder = new ArrayList();
+            testMoveOrder(bestOrder, newOrder);
+            bestOrder = (ArrayList)newOrder.clone();
         }
         Log.debug("Got score " + bestScore + " in " + count + " permutations");
         return bestOrder;
     }
 
     /** Try each of the moves in order.  Return the number that succeed,
-     *  scaled by the importance of each critter. */
-    private int testMoveOrder(List order)
+     *  scaled by the importance of each critter. 
+     *  In newOrder, if not null, place the moves that are valid.   
+     */
+    private int testMoveOrder(List order, List newOrder)
     {
+        boolean allOK = true;
         int val = 0;
         Iterator it = order.iterator();
         while (it.hasNext())
@@ -2891,8 +2916,17 @@ public class SimpleAI implements AI
             {
                 // XXX Use kill value instead?
                 val += critter.getPointValue();
+                if (newOrder != null)
+                {
+                    newOrder.add(cm);
+                }
+            }
+            else
+            {
+                allOK = false;
             }
         }
+
         // Move them all back where they started.
         it = order.iterator();
         while (it.hasNext())
@@ -2901,6 +2935,11 @@ public class SimpleAI implements AI
             BattleChit critter = cm.getCritter();
             String hexLabel = cm.getStartingHexLabel();
             critter.setHexLabel(hexLabel);
+        }
+        
+        if (!allOK)
+        {
+            val = -val;
         }
         return val;
     }
