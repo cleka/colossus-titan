@@ -33,6 +33,7 @@ public final class Game
     private List players = new ArrayList(6);
     private int activePlayerNum;
     private int turnNumber;    // Advance when every player has a turn
+    private int lastRecruitTurnNumber;
     private boolean engagementInProgress;
     private boolean battleInProgress;
     private boolean summoning;
@@ -129,6 +130,7 @@ public final class Game
         clearFlags();
 
         turnNumber = 1;
+        lastRecruitTurnNumber = -1;
         phase = Constants.Phase.SPLIT;
         caretaker.resetAllCounts();
         players.clear();
@@ -767,6 +769,14 @@ public final class Game
             {
                 activePlayerNum = 0;
                 turnNumber++;
+                if (turnNumber-lastRecruitTurnNumber > 100 && 
+                                getOption(Options.autoQuit))
+                {
+                    System.out.println("\nLast recruiting is 100 turns ago - " +
+                              "exiting to prevent AIs from endlessly " +
+                              "running around...\n");
+                    System.exit(0);
+                }
             }
 
             /* notify all CustomRecruitBase object that we change the
@@ -3165,6 +3175,7 @@ public final class Game
     // History wrappers.  Time to start obeying the Law of Demeter.
     void addCreatureEvent(String markerId, String creatureName)
     {
+        lastRecruitTurnNumber = turnNumber;
         history.addCreatureEvent(markerId, creatureName, turnNumber);
     }
 
