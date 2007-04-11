@@ -36,7 +36,29 @@ public final class Options implements IOptions
 
     // Rules options
     public static final String variant = "Variant";
+    public static final String viewMode = "ViewMode";
+    public static final String dubiousAsBlanks = "Uncertain as blank (Autoinspector etc.)"; 
 
+    /* selections for viewable Legions */
+    public static final String viewableOwn  = "Only own legions";
+    public static final String viewableLast = "Revealed during last turn"; 
+    public static final String viewableEver = "Ever revealed (or concludable) since start";
+    public static final String viewableAll  =  "True content for all legions";
+    
+    public static final String[] viewModeArray = 
+    { 
+        viewableOwn,
+//        viewableLast,  // not implemented yet.
+        viewableEver,
+        viewableAll
+    };
+
+    public static final int viewableOwnNum  = 1;
+    public static final int viewableLastNum = 2; 
+    public static final int viewableEverNum = 3;
+    public static final int viewableAllNum  = 4;
+    
+    
     public static final String balancedTowers = "Balanced starting towers";
     public static final String allStacksVisible = "All stacks visible";
     public static final String onlyOwnLegions = "Only own legions viewable";
@@ -263,4 +285,17 @@ public final class Options implements IOptions
     {
         return props.toString();
     }
+
+    // client compares then only numeric modes (easier and faster in runtime)
+    public int getNumberForViewMode(String viewMode)
+    {
+        int val = Options.viewableAllNum;
+        if (viewMode == null) return val;
+        if (viewMode.equals(Options.viewableAll))  val = Options.viewableAllNum;
+        if (viewMode.equals(Options.viewableEver)) val = Options.viewableEverNum;
+        if (viewMode.equals(Options.viewableLast)) val = Options.viewableLastNum;
+        if (viewMode.equals(Options.viewableOwn))  val = Options.viewableOwnNum;
+        return val;
+    }
+    
 }

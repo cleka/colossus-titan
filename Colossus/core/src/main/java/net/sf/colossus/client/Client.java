@@ -163,6 +163,7 @@ public final class Client implements IClient, IOracle, IOptions
     private Hashtable recruitReservations = new Hashtable();
     
     private LogWindow logWindow;
+    private int viewMode;
 
     public Client(String host, int port, String playerName, boolean remote)
     {
@@ -192,6 +193,9 @@ public final class Client implements IClient, IOracle, IOptions
         TerrainRecruitLoader.setCaretakerInfo(caretakerInfo);
         net.sf.colossus.server.CustomRecruitBase.addCaretakerInfo(
             caretakerInfo);
+
+        String viewModeName = options.getStringOption(Options.viewMode);
+        viewMode = options.getNumberForViewMode(viewModeName);
     }
 
     boolean isRemote()
@@ -556,6 +560,11 @@ public final class Client implements IClient, IOracle, IOptions
         setOption(optname, String.valueOf(value));
     }
 
+    public int getViewMode()
+    {
+        return this.viewMode;
+    }
+
     /** Fully sync the board state by running all option triggers. */
     private void runAllOptionTriggers()
     {
@@ -650,9 +659,10 @@ public final class Client implements IClient, IOracle, IOptions
                     {
                         parent = board.getFrame();
                     }
-                    boolean onlyOwnLegions = getOption(Options.onlyOwnLegions);
+                    boolean dubiousAsBlanks =
+                        getOption(Options.dubiousAsBlanks);
                     autoInspector = new AutoInspector(parent, this, playerName,
-                            onlyOwnLegions);
+                            viewMode, dubiousAsBlanks);
                 }
             }
             else
@@ -663,6 +673,18 @@ public final class Client implements IClient, IOracle, IOptions
                     autoInspector.dispose();
                     autoInspector = null;
                 }
+            }
+        }
+        else if (optname.equals(Options.viewMode)) 
+        {
+            String viewModeName = options.getStringOption(Options.viewMode);
+            viewMode = options.getNumberForViewMode(viewModeName);
+        }
+        else if (optname.equals(Options.dubiousAsBlanks))
+        {
+            if ( autoInspector != null ) 
+            {
+                autoInspector.setDubiousAsBlanks(bval);
             }
         }
         else if (optname.equals(Options.showEngagementResults))

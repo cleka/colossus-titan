@@ -2454,7 +2454,11 @@ public final class Game
 
         String hexLabel = legion.getCurrentHexLabel();
         server.didSplit(hexLabel, parentId, childId, newLegion.getHeight());
-        if (getOption(Options.allStacksVisible))
+        
+        // viewableAll depends on the splitPrediction to tell then true contents,
+        // and viewableOwn it does not harm; it only helps the AIs :)
+        if ( options.getStringOption(Options.viewMode).equals(Options.viewableAll) ||
+             options.getStringOption(Options.viewMode).equals(Options.viewableOwn))
         {
             server.allRevealLegion(legion);
             server.allRevealLegion(newLegion);

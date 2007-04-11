@@ -9,7 +9,6 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 
 import net.sf.colossus.util.KDialog;
@@ -26,7 +25,7 @@ final class ShowLegion extends KDialog implements MouseListener,
 {
     ShowLegion(JFrame parentFrame, Marker marker, LegionInfo legion, 
                Point point, JScrollPane pane, int scale, 
-               String playerName, boolean onlyOwnLegionsOption)
+               String playerName, int viewMode, boolean dubiousAsBlanks)
     {
         super(parentFrame, "Legion " + legion.getMarkerId(), false);
 
@@ -39,26 +38,11 @@ final class ShowLegion extends KDialog implements MouseListener,
         setBackground(Color.lightGray);
         addWindowListener(this);
 
+        getContentPane().add(new LegionInfoPanel(legion, scale, 5, 2, false, 
+                viewMode, playerName, dubiousAsBlanks));
+                
+        placeRelative(parentFrame, point, pane);
 
-        // this check for owner is duplicated both here and in Autoinspector.
-        // Would perhaps be better to have that in the LegionInfoPanel,
-        // but I didn't manage to display a JLabel there instead of chits...
-        
-        String legionOwner = legion.getPlayerName();
-        if ( onlyOwnLegionsOption && !playerName.equals(legionOwner) )
-        {
-        	int count = legion.getHeight();
-        	getContentPane().add(new JLabel("Sorry, legion " + marker + " ("
-            		+ count + " creatures) is not your legion."));
-            // window will be above mouse if not shifted a bit
-        	placeRelative(parentFrame, new Point(point.x, point.y + 10), pane);
-        }
-        else
-        {
-            getContentPane().add(new LegionInfoPanel(legion, scale, 5, 2, false));
-            placeRelative(parentFrame, point, pane);
-        }
-        
         pack();
         addMouseListener(this);
         setVisible(true);

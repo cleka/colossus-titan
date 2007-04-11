@@ -62,10 +62,16 @@ class Chit extends JPanel
 
     Chit(int scale, String id, boolean inverted)
     {
-        this(scale, id, inverted, false);
+        this(scale, id, inverted, false, false);
     }
 
     Chit(int scale, String id, boolean inverted, boolean dubious)
+    {
+        this(scale, id, inverted, dubious, false);
+    }
+    
+    Chit(int scale, String id, boolean inverted, boolean dubious, 
+            boolean dubiousAsBlank)
     {
         super();
 
@@ -85,7 +91,13 @@ class Chit extends JPanel
 
         setBackground(Color.lightGray);
 
-        if (Creature.isCreature(id))
+        if (dubious && dubiousAsBlank)
+        {
+            String[] names = new String[1];
+            names[0] = "QuestionMarkMask";
+            icon = getImageIcon(names, scale);
+        }
+        else if (Creature.isCreature(id))
         {
             Creature cre = Creature.getCreatureByName(id);
             String[] names = cre.getImageNames();

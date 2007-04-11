@@ -156,7 +156,6 @@ public final class MasterBoard extends JPanel
     private static Set towerSet = null;
 
     private boolean playerLabelDone;
-    private boolean onlyOwnLegionsOption;
 
     private JMenu lfMenu;
     private SaveWindow saveWindow;
@@ -176,6 +175,8 @@ public final class MasterBoard extends JPanel
 
         public void keyPressed(KeyEvent e)
         {
+            String playerName = client.getPlayerName();
+            int viewMode      = client.getViewMode();
             if (e.getKeyCode() == POPUP_KEY)
             {
                 if (legionFlyouts == null)
@@ -186,10 +187,14 @@ public final class MasterBoard extends JPanel
                     legionFlyouts = new JPanel[markers.size()];
                     for (int i = 0; i < markerArray.length; i++) {
 						Marker marker = markerArray[i];
-                        LegionInfo legion = client.getLegionInfo( marker.getId());
+                        LegionInfo legion = client.getLegionInfo(marker.getId());
                         int scale = 2*Scale.get();
                         
-						final JPanel panel = new LegionInfoPanel(legion, scale, PANEL_MARGIN, PANEL_PADDING, true);
+                        boolean dubiousAsBlanks = client.getOption(
+                            Options.dubiousAsBlanks);
+						final JPanel panel = new LegionInfoPanel(legion, 
+                            scale, PANEL_MARGIN, PANEL_PADDING, true, 
+                            viewMode, playerName, dubiousAsBlanks);
                         add(panel);
                         legionFlyouts[i] = panel;
 
@@ -316,7 +321,6 @@ public final class MasterBoard extends JPanel
     MasterBoard(final Client client)
     {
         this.client = client;
-        this.onlyOwnLegionsOption = client.getOption(Options.onlyOwnLegions);
         
         masterFrame = new JFrame("MasterBoard");
         masterFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -766,6 +770,12 @@ public final class MasterBoard extends JPanel
         addCheckBox(graphicsMenu, Options.showEngagementResults,
             KeyEvent.VK_E);
         addCheckBox(graphicsMenu, Options.showAutoInspector, KeyEvent.VK_I);
+        // This option makes only sense with the 
+        //   "view what SplitPrediction tells us" mode.
+        if (client.getViewMode() == Options.viewableEverNum)
+        {
+            addCheckBox(graphicsMenu, Options.dubiousAsBlanks, KeyEvent.VK_D);
+        }
         addCheckBox(graphicsMenu, Options.showLogWindow, KeyEvent.VK_L);
         addCheckBox(graphicsMenu, Options.antialias, KeyEvent.VK_N);
         addCheckBox(graphicsMenu, Options.useOverlay, KeyEvent.VK_V);
@@ -1976,9 +1986,12 @@ public final class MasterBoard extends JPanel
                 {
                 	LegionInfo legion = client.getLegionInfo(markerId);
                     String playerName = client.getPlayerName();
+                    int viewMode = client.getViewMode();
+                    boolean dubiousAsBlanks =
+                        client.getOption(Options.dubiousAsBlanks);
                     new ShowLegion(masterFrame, marker, legion,
                         point, scrollPane, 4 * Scale.get(), playerName,
-                        onlyOwnLegionsOption);
+                        viewMode, dubiousAsBlanks);
                     return;
                 }
                 else if (client.isMyLegion(markerId))

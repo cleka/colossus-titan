@@ -15,7 +15,6 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JLabel;
 
 import net.sf.colossus.util.KDialog;
 import net.sf.colossus.util.Options;
@@ -31,17 +30,20 @@ public class AutoInspector extends KDialog
 
     private String playerName;
 
-    private boolean onlyOwnLegionsOption = false;
+    private int viewMode;
+    
+    private boolean dubiousAsBlanks;
 
    
     public AutoInspector(JFrame frame, IOptions options, 
-    		String playerName, boolean onlyOwnLegions)
+    		String playerName, int viewMode, boolean dubiousAsBlanks)
     {
         super(frame, "Inspector", false);
 
         this.options = options;
         this.playerName = playerName;
-        this.onlyOwnLegionsOption = onlyOwnLegions;
+        this.viewMode = viewMode;
+        this.dubiousAsBlanks = dubiousAsBlanks;
        
         setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
         addWindowListener(new WindowAdapter(){
@@ -82,20 +84,10 @@ public class AutoInspector extends KDialog
     {
         scrollPane.getViewport().removeAll();
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        // TODO for some reason the marker won't display itself properly here
-        //panel.add(marker);
+
+        panel.add(new LegionInfoPanel(legion, 4 * Scale.get(), 5, 2, false, 
+                viewMode, playerName, dubiousAsBlanks));
         
-        String legionOwner = legion.getPlayerName();
-        if ( onlyOwnLegionsOption && !playerName.equals(legionOwner) )
-        {
-        	int count = legion.getHeight();
-            panel.add(new JLabel("Sorry, legion " + marker + " ("
-            		+ count + " creatures) is not your legion."));
-        }
-        else
-        {
-            panel.add(new LegionInfoPanel(legion, 4 * Scale.get(), 5, 2, false));
-        }
         scrollPane.getViewport().add(panel);
         repaint();
     }
@@ -108,5 +100,11 @@ public class AutoInspector extends KDialog
         	// nothing to do
         }));
         repaint();
+    }
+
+    // public so that client can update it when option is changed.
+    public void setDubiousAsBlanks(boolean newVal)
+    {
+        this.dubiousAsBlanks = newVal;
     }
 }

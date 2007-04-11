@@ -41,6 +41,7 @@ public final class GetPlayers extends KDialog implements WindowListener,
     private JEditorPane readme = new JEditorPane();
 
     private JComboBox variantBox;
+    private JComboBox viewModeBox;
 
     /** This is Game's options, which we will modify directly. */
     private Options options;
@@ -107,11 +108,28 @@ public final class GetPlayers extends KDialog implements WindowListener,
         addCheckbox(Options.autosave, checkboxPane);
         addCheckbox(Options.logDebug, checkboxPane);
         addCheckbox(Options.balancedTowers, checkboxPane);
-        addCheckbox(Options.allStacksVisible, checkboxPane);
-        addCheckbox(Options.onlyOwnLegions, checkboxPane);
         addCheckbox(Options.autoStop, checkboxPane);
         addCheckbox(Options.autoQuit, checkboxPane);
 
+        
+        String viewmodeName = options.getStringOption(Options.viewMode);
+        if ( viewmodeName == null )
+        {
+            viewmodeName = Options.viewableAll; 
+        }
+        
+        JPanel viewModePane = new JPanel(new GridLayout(0, 2));
+        viewModePane.setBorder(new TitledBorder("Viewability of legions"));
+        optionPane.add(viewModePane);
+
+        viewModeBox = new JComboBox(Options.viewModeArray);
+        viewModeBox.addActionListener(this);
+        viewModeBox.setSelectedItem(viewmodeName);
+        viewModePane.add(new JLabel("Viewable legion content:"));
+        viewModePane.add(viewModeBox);
+        
+        options.setOption(Options.viewMode, viewmodeName);
+        
         JPanel teleportPane = new JPanel(new GridLayout(0, 2));
         teleportPane.setBorder(new TitledBorder("Teleport"));
         optionPane.add(teleportPane);
@@ -580,6 +598,11 @@ public final class GetPlayers extends KDialog implements WindowListener,
                         enablePlayers();
                     }
                 }
+            }
+            else if ( source == viewModeBox )
+            {
+                String value = (String) viewModeBox.getSelectedItem();
+                options.setOption(Options.viewMode, value);
             }
             else
             {
