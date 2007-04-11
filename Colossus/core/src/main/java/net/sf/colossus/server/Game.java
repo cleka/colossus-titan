@@ -320,6 +320,49 @@ public final class Game
         }
     }
 
+    String makeNameByType(String templateName, String type)
+    {
+        String number = templateName.substring(Constants.byType.length());
+        // type is the full class name of client, e.g.
+        //   "net.sf.colossus.client.SimpleAI"
+        String prefix = "net.sf.colossus.client.";
+        int len = prefix.length();
+        
+        String shortName = type.substring(len);
+        String newName;
+        
+        if (shortName.equals("Human"))
+        {
+            newName = "Human" + number;
+        }
+        else if (shortName.equals("SimpleAI"))
+        {
+            newName = "Simple" + number;
+        }
+        else if (shortName.equals("CowardSimpleAI"))
+        {
+           newName = "Coward" + number;
+        }
+        else if (shortName.equals("RationalAI"))
+        {
+            newName = "Rational" + number;
+        }
+        else if (shortName.equals("HumanHaterRationalAI"))
+        {
+            newName = "Hater" + number;
+        }
+        else if (shortName.equals("MilvangAI"))
+        {
+            newName = "Milvang" + number;
+        }
+        else
+        {
+            newName = null;
+        }
+        return newName;
+    }
+    
+    
     void assignColor(String playerName, String color)
     {
         Player player = getPlayer(playerName);
@@ -327,7 +370,27 @@ public final class Game
         colorPickOrder.remove(playerName);
         colorsLeft.remove(color);
         player.setColor(color);
-        if (player.getName().startsWith(Constants.byColor))
+        String type = player.getType();
+        String gotName = player.getName();
+        if (gotName.startsWith(Constants.byType))
+        {
+            String newName = makeNameByType(gotName, type);
+            if (newName != null)
+            {
+                Log.event("Setting for \"" + gotName + "\" new name: "+newName);
+                server.setPlayerName(gotName, newName);
+                player.setName(newName);
+                playerName = newName;
+            }
+            else
+            {
+                Log.warn("Type "+type+ 
+                        " not recognized. Giving name by color instead ("+color+")");
+                gotName = Constants.byColor;
+            }
+        }
+        
+        if (gotName.startsWith(Constants.byColor))
         {
             server.setPlayerName(player.getName(), color);
             player.setName(color);
@@ -1635,6 +1698,8 @@ public final class Game
             return;
         }
 
+        lastRecruitTurnNumber = turnNumber;
+        
         if (legion.addCreature(recruit, true))
         {
             MasterHex hex = legion.getCurrentHex();

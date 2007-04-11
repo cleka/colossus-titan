@@ -308,6 +308,10 @@ public final class GetPlayers extends KDialog implements WindowListener,
         {
             nameChoices.add(Constants.byColor);
         }
+        if (!nameChoices.contains(Constants.byType))
+        {
+            nameChoices.add(Constants.byType);
+        }
         if (!nameChoices.contains(Constants.username))
         {
             nameChoices.add(Constants.username);
@@ -372,7 +376,9 @@ public final class GetPlayers extends KDialog implements WindowListener,
 
                 // Make by* names unique by appending row number.
                 if (name.equals(Constants.byColor) ||
-                        name.equals(Constants.byClient))
+                        name.equals(Constants.byType) ||
+                        name.equals(Constants.byClient)
+                    )
                 {
                     name = name + i;
                 }

@@ -1,0 +1,124 @@
+#!/bin/sh
+
+# Run 6-AI games in a loop forever, looking for hangs.
+# XXX The log will eventually fill the disk. 
+
+# 11.04.2007 (Clemens Katzer): 
+# New file "fancy_stresstest" based on original stresstest 
+# script, but much more functionality:
+# - counter which game nr. ongoing
+# - stops if stop.flag found
+# - if Colossus exits with non-zero exit code, or backup.flag
+#   found, make backup copy of relevant log + autosave files
+# - call Colossus with property ForceViewBoard set, so that one
+#   sees (even if all are AIs) the MasterBoard and StatusScreen.
+#
+# Perhaps this replace the original stresstest script completely,
+# but I was not sure, perhaps someone would rather like to stay
+# with the old one.
+
+
+# ----------------------------------------------------------------------
+# If on windows (e.g. Cygwin), create also Win-style (CR-LF) newlines into 
+# the log file (Java will print CR-LFs anyway, and if this script does not,
+# we end up with mixed style, and e.g. Emacs shows then those ugly ^M chats...)
+
+if expr "$OS" : "\(WIN\|Win\|win\)" >/dev/null
+then
+  CR="\r"
+else
+  CR=""
+fi
+
+# ----------------------------------------------------------------------
+# Remember from where we started. Have to go back there always after
+# copying files.
+
+currdir=`pwd`
+rm -f stop.flag log
+
+# ----------------------------------------------------------------------
+# Under cygwin, if some other terminal still reads the file (e.g. tail -f),
+# rm removes the file (or directory entry?), but if stresstest then wants
+# to append (re-create??) file with same name, that fails.
+# Try this already here, so that it does not bother us inside the loop 
+# all the time...
+if ! echo "Starting stresstest" > log
+then
+  echo -e "\nAppending to log failed. Perhaps some other terminal still has the file open?"
+  echo -e "Exiting.\n"
+  exit 1
+fi
+
+# ----------------------------------------------------------------------
+# continue the game nr, so that copy-logs-to-dir does not use same
+# numbers. If one cleans up dirs, can also remove the file i.
+if [ -f i ]
+then
+  i=`cat i`
+else
+  i=0
+fi
+
+# Uncomment this fancy properties setting, if you want that even for
+# AI-only-games a board is to be shown:
+
+FORCEBOARD=""
+FORCEBOARD=-Dnet.sf.colossus.forceViewBoard=yes
+
+# ----------------------------------------------------------------------
+# Now loop forever, or until a flag file "stop.flag" is created.
+# Continue with game number "i" from a file i.
+# If colossus game exited with non-zero exit code (or someone created
+# a file "backup.flag" while game still running), copy all relevant
+# files to ./logs.exitonerror.$i/  directory.
+
+while true
+do 
+    cd "$HOME/.Colossus/saves"
+    rm -f snap*.xml
+    cd $currdir
+    i=`expr $i + 1`
+    echo -e $i > i
+    echo -e "\nStarting game #$i"
+    echo -e "$CR\nStarting game #$i$CR" >> log
+
+    java -Djava.util.logging.config.file=logging.properties $FORCEBOARD -Xmx128M -jar Colossus.jar -i 6 -q -g -d 1 $1 $2 $3 $4 $5 $6 $7 $8 $9 >> log 2>&1;
+    ec=$?
+    mkbackup=n
+    if [ $ec -ne 0 ]
+    then
+      echo -e "Exit code is non-zero ($ec) - \c"
+      mkbackup=y
+    elif [ -e backup.flag ]
+    then
+      echo -e "File backup.flag found - \c"
+      mkbackup=y
+    fi
+    if [ "$mkbackup" = "y" ]
+    then
+      echo "making backup of logs and autosave files..."
+      rm -f backup.flag
+      dir=$currdir/logs.exitonerror.$i
+      mkdir $dir
+      cp -p log $dir
+      cd "$HOME/.Colossus/saves"
+      files=`ls -rt -1 snap*.xml 2>/dev/null | tail -20`
+      if [ "X$files" != "X" ]
+      then 
+        cp -p $files $dir
+      else
+        echo "Note: no snap files to copy - autosave not enabled?"
+      fi
+      cd "$TEMP"
+      cp -p Colossus[012].log $dir
+      cd $currdir
+    fi
+    if [ -e stop.flag ]
+    then
+      echo -e "\nFlagfile stop.flag found - exiting..."
+      echo -e "$CR\nFlagfile stop.flag found - exiting...$CR" >> log
+      rm -f stop.flag
+      exit
+    fi
+done

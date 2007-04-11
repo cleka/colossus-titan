@@ -1573,6 +1573,9 @@ public final class Client implements IClient, IOracle, IOptions
         return board;
     }
 
+    private static String propNameForceViewBoard = 
+        "net.sf.colossus.forceViewBoard";
+
     public void initBoard()
     {
         Log.debug(playerName + " Client.initBoard()");
@@ -1582,7 +1585,20 @@ public final class Client implements IClient, IOracle, IOptions
                 Options.variant), false);
         }
 
-        if (!getOption(Options.autoPlay))
+        // Intended for stresstest, to see whats happening, and that graphics
+        // stuff is there done, too.
+        // This here works only if name setting is done "by-type", so that
+        // at least one AI gets a name ending with "1".
+        boolean forceViewBoard = false;
+        String propViewBoard = System.getProperty(propNameForceViewBoard);
+        if (propViewBoard != null && propViewBoard.equalsIgnoreCase("yes"))
+        {
+            forceViewBoard = true;
+            options.setOption(Options.showStatusScreen, new String("true"));
+        }
+
+        if (!getOption(Options.autoPlay) ||
+            ( playerName.endsWith("1") && forceViewBoard))
         {
             disposeMasterBoard();
             board = new MasterBoard(this);

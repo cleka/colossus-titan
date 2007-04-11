@@ -205,7 +205,8 @@ public final class Start
             }
             else
             {
-                name = Constants.byColor + i;
+//                name = Constants.byColor + i;
+                name = Constants.byType + i;
             }
             options.setOption(Options.playerName + i, name);
             options.setOption(Options.playerType + i, Constants.human);
@@ -219,7 +220,8 @@ public final class Start
         for (int k = numHumans + numNetworks;
             k < numAIs + numHumans + numNetworks; k++)
         {
-            String name = Constants.byColor + k;
+//            String name = Constants.byColor + k;
+            String name = Constants.byType + k;
             options.setOption(Options.playerName + k, name);
             options.setOption(Options.playerType + k, Constants.defaultAI);
         }

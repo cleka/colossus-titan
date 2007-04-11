@@ -127,6 +127,7 @@ public final class Options implements IOptions
     {
         // Don't load from temporary player names.
         if (owner.startsWith(Constants.byColor) ||
+                owner.startsWith(Constants.byType) ||
                 owner.startsWith(Constants.byClient))
         {
             return;
@@ -150,6 +151,7 @@ public final class Options implements IOptions
     {
         // Don't save from temporary player names.
         if (owner.startsWith(Constants.byColor) ||
+                owner.startsWith(Constants.byType) ||
                 owner.startsWith(Constants.byClient))
         {
             return;

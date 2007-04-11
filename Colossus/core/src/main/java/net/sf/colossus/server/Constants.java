@@ -278,6 +278,7 @@ public final class Constants
 
     // Player names
     public static final String byColor = "<By color>";
+    public static final String byType = "<By type>";
     public static final String byClient = "<By client>";
     public static final String username = System.getProperty("user.name",
             byColor);
