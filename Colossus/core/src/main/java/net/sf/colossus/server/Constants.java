@@ -438,6 +438,7 @@ public final class Constants
     public static final String tellLegionLocation = "tellLegionLocation";
     public static final String tellBattleMove = "tellBattleMove";
     public static final String didMove = "didMove";
+    public static final String didSummon = "didSummon";
     public static final String undidMove = "undidMove";
     public static final String undidSplit = "undidSplit";
     public static final String didSplit = "didSplit";

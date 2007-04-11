@@ -1472,7 +1472,7 @@ public final class Server implements IServer
                 teleportingLord))
         {
             allTellDidMove(markerId, startingHexLabel, hexLabel, entrySide,
-                    teleport);
+                    teleport, teleportingLord);
         }
         else
         {
@@ -1482,7 +1482,8 @@ public final class Server implements IServer
     }
 
     void allTellDidMove(String markerId, String startingHexLabel,
-            String endingHexLabel, String entrySide, boolean teleport)
+            String endingHexLabel, String entrySide, boolean teleport,
+            String teleportingLord)
     {
         Player player = game.getPlayer(game.getActivePlayerName());
         // needed in didMove to decide whether to dis/enable button
@@ -1493,7 +1494,17 @@ public final class Server implements IServer
         {
             IClient client = (IClient)it.next();
             client.didMove(markerId, startingHexLabel, endingHexLabel,
-                    entrySide, teleport, splitLegionHasForcedMove);
+                    entrySide, teleport, teleportingLord, splitLegionHasForcedMove);
+        }
+    }
+
+    void allTellDidSummon(String summonerId, String donorId, String summon) 
+    {
+        Iterator it = clients.iterator();
+        while (it.hasNext())
+        {
+            IClient client = (IClient)it.next();
+            client.didSummon(summonerId, donorId, summon);
         }
     }
 

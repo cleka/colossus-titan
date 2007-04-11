@@ -406,6 +406,8 @@ final class SocketClientThread extends Thread implements IServer
             String entrySide = (String)args.remove(0);
             boolean teleport =
                     Boolean.valueOf((String)args.remove(0)).booleanValue();
+            String teleportingLord = (String)args.remove(0);
+            if (teleportingLord.equals("null")) teleportingLord = null;
             boolean splitLegionHasForcedMove = false;
             // servers from older versions might not send this arg
             if ( ! args.isEmpty() )
@@ -414,7 +416,7 @@ final class SocketClientThread extends Thread implements IServer
                     Boolean.valueOf((String)args.remove(0)).booleanValue();
             }
             client.didMove(markerId, startingHexLabel, currentHexLabel,
-                    entrySide, teleport, splitLegionHasForcedMove);
+                    entrySide, teleport, teleportingLord, splitLegionHasForcedMove);
         }
         else if (method.equals(Constants.undidMove))
         {
@@ -430,6 +432,13 @@ final class SocketClientThread extends Thread implements IServer
             }
             client.undidMove(markerId, formerHexLabel, currentHexLabel,
                     splitLegionHasForcedMove);
+        }
+        else if (method.equals(Constants.didSummon))
+        {
+            String summonerId = (String)args.remove(0);
+            String donorId = (String)args.remove(0);
+            String summon = (String)args.remove(0);
+            client.didSummon(summonerId, donorId, summon);
         }
         else if (method.equals(Constants.undidSplit))
         {

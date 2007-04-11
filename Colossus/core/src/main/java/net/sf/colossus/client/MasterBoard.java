@@ -770,6 +770,7 @@ public final class MasterBoard extends JPanel
         addCheckBox(graphicsMenu, Options.showEngagementResults,
             KeyEvent.VK_E);
         addCheckBox(graphicsMenu, Options.showAutoInspector, KeyEvent.VK_I);
+        addCheckBox(graphicsMenu, Options.showEventViewer, KeyEvent.VK_E);
         // This option makes only sense with the 
         //   "view what SplitPrediction tells us" mode.
         if (client.getViewMode() == Options.viewableEverNum)

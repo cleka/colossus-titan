@@ -2243,6 +2243,8 @@ public final class Game
             server.allTellAddCreature(legion.getMarkerId(), angel.getName(),
                     true);
 
+            server.allTellDidSummon(legion.getMarkerId(), donor.getMarkerId(), angel.getName());
+            
             Log.event("One " + angel.getName() +
                     " is summoned from legion " + donor.getLongMarkerName() +
                     " into legion " + legion.getLongMarkerName());

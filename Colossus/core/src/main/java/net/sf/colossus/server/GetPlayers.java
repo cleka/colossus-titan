@@ -42,6 +42,7 @@ public final class GetPlayers extends KDialog implements WindowListener,
 
     private JComboBox variantBox;
     private JComboBox viewModeBox;
+    private JComboBox eventExpiringBox;
 
     /** This is Game's options, which we will modify directly. */
     private Options options;
@@ -119,7 +120,7 @@ public final class GetPlayers extends KDialog implements WindowListener,
         }
         
         JPanel viewModePane = new JPanel(new GridLayout(0, 2));
-        viewModePane.setBorder(new TitledBorder("Viewability of legions"));
+        viewModePane.setBorder(new TitledBorder("Viewability of legion and events"));
         optionPane.add(viewModePane);
 
         viewModeBox = new JComboBox(Options.viewModeArray);
@@ -127,6 +128,18 @@ public final class GetPlayers extends KDialog implements WindowListener,
         viewModeBox.setSelectedItem(viewmodeName);
         viewModePane.add(new JLabel("Viewable legion content:"));
         viewModePane.add(viewModeBox);
+
+        String eventExpiringVal = options.getStringOption(Options.eventExpiring);
+        if ( eventExpiringVal == null )
+        {
+            eventExpiringVal = "1"; 
+        }
+
+        eventExpiringBox = new JComboBox(Options.eventExpiringChoices);
+        eventExpiringBox.addActionListener(this);
+        eventExpiringBox.setSelectedItem(eventExpiringVal);
+        viewModePane.add(new JLabel("Events expire after (turns):"));
+        viewModePane.add(eventExpiringBox);
         
         options.setOption(Options.viewMode, viewmodeName);
         
@@ -603,6 +616,11 @@ public final class GetPlayers extends KDialog implements WindowListener,
             {
                 String value = (String) viewModeBox.getSelectedItem();
                 options.setOption(Options.viewMode, value);
+            }
+            else if ( source == eventExpiringBox )
+            {
+                String value = (String) eventExpiringBox.getSelectedItem();
+                options.setOption(Options.eventExpiring, value);
             }
             else
             {

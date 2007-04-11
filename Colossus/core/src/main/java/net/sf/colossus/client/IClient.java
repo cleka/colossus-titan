@@ -122,10 +122,12 @@ public interface IClient
 
     public void didMove(String markerId, String startingHexLabel,
             String currentHexLabel, String entrySide, boolean teleport,
-            boolean splitLegionHasForcedMove);
+            String teleportingLord, boolean splitLegionHasForcedMove);
 
     public void undidMove(String markerId, String formerHexLabel,
             String currentHexLabel, boolean splitLegionHasForcedMove);
+
+    public void didSummon(String summonerId, String donorId, String summon);
 
     public void undidSplit(String splitoffId, String survivorId, int turn);
 

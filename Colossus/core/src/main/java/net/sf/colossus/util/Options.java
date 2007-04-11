@@ -58,6 +58,12 @@ public final class Options implements IOptions
     public static final int viewableEverNum = 3;
     public static final int viewableAllNum  = 4;
     
+    public static final String eventExpiring = "EventExpire";
+    public static final String[] eventExpiringChoices =
+    {
+        "1", "2", "5", "10"
+    };
+    
     
     public static final String balancedTowers = "Balanced starting towers";
     public static final String allStacksVisible = "All stacks visible";
@@ -82,6 +88,7 @@ public final class Options implements IOptions
     public static final String showCaretaker = "Show Caretaker's stacks";
     public static final String showStatusScreen = "Show game status";
     public static final String showAutoInspector = "Show inspector";
+    public static final String showEventViewer = "Show event window";
     public static final String showLogWindow = "Show log window";
     public static final String showEngagementResults = 
             "Show engagement results";
@@ -290,7 +297,10 @@ public final class Options implements IOptions
     public int getNumberForViewMode(String viewMode)
     {
         int val = Options.viewableAllNum;
-        if (viewMode == null) return val;
+        if (viewMode == null) 
+        {
+            return Options.viewableAllNum;
+        }
         if (viewMode.equals(Options.viewableAll))  val = Options.viewableAllNum;
         if (viewMode.equals(Options.viewableEver)) val = Options.viewableEverNum;
         if (viewMode.equals(Options.viewableLast)) val = Options.viewableLastNum;
