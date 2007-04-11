@@ -1825,7 +1825,8 @@ public class SimpleAI implements AI
         if (!(recruits.contains(recruit)))
         {
             Log.warn("HINT: Invalid Hint for this variant ! (can't recruit " +
-                    recruitName + ")");
+                    recruitName + "; recruits="+recruits.toString()+
+                    ") in " + hex.getTerrain() );
             return ((Creature)recruits.get(recruits.size() - 1));
         }
         return recruit;
