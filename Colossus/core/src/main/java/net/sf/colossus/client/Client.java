@@ -284,10 +284,32 @@ public final class Client implements IClient, IOracle, IOptions
         highlightBattleSite();
     }
 
+    private void initShowEngagementResults()
+    {
+        JFrame frame = getMapOrBoardFrame();
+        if (frame == null)
+        {
+            return;
+        }
+
+        if (engagementResults == null)
+        {
+            engagementResults = new EngagementResults(frame, this, this);
+            engagementResults.maybeShow();
+        }
+    }
+    
     private void showEngagementResults(boolean show)
     {
+        if (engagementResults == null && show)
+        {
+            initShowEngagementResults();
+        }
+        // init may not have set it e.g. if board (still) null...
         if (engagementResults != null)
         {
+            // maybeShow decides byitself based on the current value
+            // of the option whether to hide or show. 
             engagementResults.maybeShow();
         }
     }
@@ -315,6 +337,7 @@ public final class Client implements IClient, IOracle, IOptions
             if (engagementResults == null)
             {
                 engagementResults = new EngagementResults(frame, this, this);
+                engagementResults.maybeShow();
             }
             engagementResults.addData(winnerId, method, points, turns,
                 _tellEngagementResults_attackerStartingContents,
@@ -1577,6 +1600,12 @@ public final class Client implements IClient, IOracle, IOptions
                 optionTrigger(Options.showAutoInspector, String.valueOf(false));
                 optionTrigger(Options.showAutoInspector, String.valueOf(true));
             }
+
+            if (getOption(Options.showEngagementResults))
+            {
+                initShowEngagementResults();
+            }
+
             focusBoard();
         }
     }

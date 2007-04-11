@@ -89,6 +89,8 @@ final class EngagementResults extends KDialog
 
         this.saveWindow = new SaveWindow(options, "EngagementResultView");
         saveWindow.restore(this, new Point(0,0));
+        
+        maybeShow();
     }
 
     /**
@@ -141,7 +143,7 @@ final class EngagementResults extends KDialog
             );
         this.engagementLog.add(result);
 
-        if (this.current == -1)
+        if (this.current <= -1)
         {
             this.current = 0;
         }
@@ -285,6 +287,11 @@ final class EngagementResults extends KDialog
         }
         );
         panelSouth.add(hideButton);
+        
+        this.firstButton.setEnabled(false);
+        this.prevButton.setEnabled(false);
+        this.nextButton.setEnabled(false);
+        this.lastButton.setEnabled(false);
     }
 
     private Component createLegionComponent(String markerId,
@@ -335,9 +342,14 @@ final class EngagementResults extends KDialog
             // TODO: this shrinks the dialog to a tiny size.
             //   for this reason we disallowed dropping 
             //   the last in the action handler. 
-            Container contentPane = getContentPane();
-            contentPane.removeAll();
+//            Container contentPane = getContentPane();
+//            contentPane.removeAll();
             this.setTitle("no Engagements");
+            this.firstButton.setEnabled(false);
+            this.prevButton.setEnabled(false);
+            this.nextButton.setEnabled(false);
+            this.lastButton.setEnabled(false);
+
         }
         else
         {
@@ -388,8 +400,7 @@ final class EngagementResults extends KDialog
 
     void maybeShow()
     {
-        if (options.getOption(Options.showEngagementResults) &&
-            engagementLog.size() != 0)
+        if (options.getOption(Options.showEngagementResults))
         {
             pack();
             if (!isVisible())
