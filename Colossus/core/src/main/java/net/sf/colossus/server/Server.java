@@ -715,23 +715,31 @@ public final class Server implements IServer
         IClient client = getClient(getPlayerName());
 
         Legion legion = game.getLegionByMarkerId(markerId);
+        
+        // we can't do the "return" inside the if blocks, because then we miss
+        // the doneReinforcing at the end...
+        // E.g. SimpleAI tried to muster after being attacked, won, acquired
+        // angel (=> legion full) => canRecruit false => "illegal recruit".
+        //   => game hangs.
+        
         if (legion == null)
         {
             Log.error(getPlayerName() + " illegally called doRecruit()"
                     + ": null legion for markerId "+markerId);
             client.nak(Constants.doRecruit, "Null legion");
-            return;
+            // return;
         }
 
-        if (!getPlayerName().equals(legion.getPlayerName()))
+        else if (!getPlayerName().equals(legion.getPlayerName()))
         {
             Log.error(getPlayerName() + " illegally called doRecruit()");
             client.nak(Constants.doRecruit, "Wrong player");
-            return;
+            // return;
         }
 
-        if ( (legion.hasMoved() || game.getPhase() == Constants.Phase.FIGHT) 
-                        && legion.canRecruit())
+        else if ( (legion.hasMoved() || 
+                   game.getPhase() == Constants.Phase.FIGHT) 
+                 && legion.canRecruit())
         {
             legion.sortCritters();
             Creature recruit = null;
@@ -753,9 +761,10 @@ public final class Server implements IServer
         }
         else
         {
-            Log.error("Illegal recruit");
+            Log.error("Illegal recruit with legion "+markerId+
+                    " recruit: "+recruitName+" recruiterName "+recruiterName);
             client.nak(Constants.doRecruit, "Illegal recruit");
-            return;
+            // return;
         }
 
         // Need to always call this to keep game from hanging.
