@@ -724,11 +724,33 @@ public class RationalAI extends SimpleAI implements AI
         if (!bestMoveListIter.hasNext())
         {
             bestMoveList = null;
+
+            // ForcedSplit and ForcedSingle implementations here are perhaps 
+            // quite poor solutions, but better than getting NAKs...
+                            
+            boolean moved = handleForcedSplitMoves(player);
+            if (moved)
+            {
+                return true;
+            }
+        
+            if (player.numLegionsMoved() == 0)
+            {
+                moved = handleForcedSingleMove(player);
+                // Always need to retry.
+                return true;
+            }
+            
             return false;
         }
 
         LegionBoardMove lm = (LegionBoardMove)bestMoveListIter.next();
-        client.doMove(lm.markerId, lm.toHex);
+        boolean wentOk = client.doMove(lm.markerId, lm.toHex);
+        if (!wentOk)
+        {
+            logger.log(Level.WARNING, "RationalAI.masterMove: client.doMove " +
+                "returned false!");
+        }
 
         if (telePort)
         {
@@ -895,6 +917,293 @@ public class RationalAI extends SimpleAI implements AI
         return false;
     }
 
+    /*
+     * Returns true if it did one move, i.e. client needs to call us again
+     * (after that move was done), to check whether there is still something 
+     * to do.
+     * Returns false also if something goes wrong (should never happen, but...)
+     * so that it does not endlessly redoes that and hangs forever.
+     * TODO: not very fancy or clever. All it does is:
+     * if there is a hex remaining with forced moves after split,
+     * pick the smallest one and move it to the hex with best value.
+     * 
+     * However, I still prefer this over the SimpleAI approach, which chooses
+     * based on "Legionvalue * ChangeValue", because I'd rather sacrifice weaker
+     * legions and spare good ones, and not make "unnecessary" damage to good
+     * one and spare weak ones...  
+     */
+    
+    private boolean handleForcedSplitMoves(PlayerInfo player)
+    {
+        int roll = client.getMovementRoll();
+        ArrayList unsplitHexes = new ArrayList();
+        
+        /* Consider one hex after another. It is not necessary to look at
+         * the individual legions, because
+         * a) when looking at one hex, either in "this round" there is no valid
+         *    move, or otherwise we move one.
+         * b) it does not matter whether there are lords or not, because teleport
+         *    moves are not mandatory
+         * c) Once we did move one, we move, return true, get called again,
+         *    then the list of labels is re-considered again.
+         */
+        Iterator it = player.getLegionIds().iterator();
+        while (it.hasNext())
+        {
+            String markerId = (String)it.next();
+            LegionInfo legion = client.getLegionInfo(markerId);
+            String hexLabel = legion.getHexLabel();
+            List friendlyLegions = client.getFriendlyLegions(hexLabel,
+                    player.getName());
+            
+            if (friendlyLegions.size() > 1)
+            {
+                unsplitHexes.add(hexLabel);
+            }
+        }
+        Iterator itHexes = unsplitHexes.iterator();
+        while (itHexes.hasNext())
+        {
+            String hexLabel = (String)itHexes.next();
+            List friendlyLegions = client.getFriendlyLegions(hexLabel,
+                    player.getName());
+
+            // pick just any legion for asking the getMovement
+            Object[] legions = friendlyLegions.toArray(); 
+            String anyLegionId = (String) legions[0];
+            LegionInfo anyLegion = client.getLegionInfo(anyLegionId);
+                
+            if ( !client.getMovement().listNormalMoves(anyLegion,
+                            anyLegion.getCurrentHex(), roll).isEmpty())
+            {
+                // Easiest solution: just move the smallest of them,
+                // usually that is the one with less valuable stuff split off
+                //
+                // If split would be that Titan is in smallest stack, or 2+2+2
+                // and Titan in one of them (and this gets picked by random)
+                // well, ... bad luck :-(
+                // But this happens very rarely, this whole forcedSplitMoves
+                // in games with 6 AIs perhaps one out of 100 games...
+
+                LegionInfo minLegion = anyLegion;
+                int minSize = minLegion.getHeight();
+                
+                Iterator it2 = friendlyLegions.iterator();
+                while (it2.hasNext())
+                {
+                    LegionInfo l = client.getLegionInfo((String) it2.next()); 
+                    int size = l.getHeight();
+                    if (size < minSize)
+                    {
+                        minSize = size;
+                        minLegion = l;
+                    }
+                }
+                
+                String minMarkerId = minLegion.getMarkerId();
+                Set set = client.getMovement().listNormalMoves(minLegion,
+                        minLegion.getCurrentHex(), roll);
+
+                if (set.size() == 0)
+                {
+                    // This should never happen. Most likely we get then a NAK...
+                    logger.log(Level.SEVERE, "Split legion " + minMarkerId +
+                            " in hexlabel " + hexLabel + 
+                            " was supposed to have forced moves left, " +
+                            " but normal moves list is empty?");
+                    // anyway keep on going loop for checking next split legion
+                }
+                else
+                {
+                    Iterator moveIterator = set.iterator();
+                    int bestValue = -1;
+                    String bestHex = null;
+                    
+                    while (moveIterator.hasNext())
+                    {
+                        String targetHex = (String) moveIterator.next();
+      
+                        // The set of moves includes still hexes occupied by our own legions. 
+                        List targetOwnLegions = client.getFriendlyLegions(targetHex,
+                                player.getName());
+                        if (targetOwnLegions.size() == 0 )
+                        {
+                            MasterHex hex = MasterBoard.getHexByLabel(targetHex);
+                            int value = evaluateMove(minLegion, hex, RECRUIT_TRUE, 2, true);
+                            if (value > bestValue || bestValue == -1)
+                            {
+                                bestValue = value;
+                                bestHex = targetHex;
+                            }
+                        }
+                    }
+
+                    if (bestHex == null)
+                    {
+                        // well, no legal move for this one. So, leave it as it is.
+                        logger.log(Level.FINEST, "Forced split moves remain " + 
+                                "(no legal move for legion " + minMarkerId + ")");
+                    }
+                    else
+                    {
+                        boolean wentOk = client.doMove(minMarkerId, bestHex);
+                        if (wentOk)
+                        {
+                            // ok, lets get called again to check if there are more.
+                            return true;
+                        }
+                        else
+                        {
+                            // This should never happen. Most likely we get then a NAK...
+                            logger.log(Level.SEVERE, "Forced split moves remain, " + 
+                                    "but client rejects moving marker " + minMarkerId + 
+                                    " from " + hexLabel + " to " + bestHex);
+                        }
+                    }   
+                    
+                }   
+            }   
+        }   
+        // No forced move remaining
+        return false;
+    }
+
+    
+    /*
+     * Simply move the legion which has the lowest value 
+     * (except Titan legion) to the place which is best for it.
+     * Moves Titan legion only if no other choice.
+     */
+    private boolean handleForcedSingleMove(PlayerInfo player)
+    {
+        int roll = client.getMovementRoll();
+
+        // first we have to find out those that can move at all:
+        
+        ArrayList movableLegions = new ArrayList();
+        
+        Iterator it = player.getLegionIds().iterator();
+        while (it.hasNext())
+        {
+            String markerId = (String)it.next();
+            LegionInfo legion = client.getLegionInfo(markerId);
+
+            Set set = client.getMovement().listNormalMoves(legion,
+                    legion.getCurrentHex(), roll);
+
+            if (set.size() > 0)
+            {
+                boolean couldMove = false;
+                Iterator moveIterator = set.iterator();
+                while (moveIterator.hasNext())
+                {
+                    String targetHex = (String) moveIterator.next();
+
+                    // The set of moves includes still hexes occupied by our own legions. 
+                    List targetOwnLegions = client.getFriendlyLegions(targetHex,
+                            player.getName());
+                    if (targetOwnLegions.size() == 0 )
+                    {
+                        couldMove = true;
+                    }
+                }
+                if (couldMove)
+                {
+                    movableLegions.add(markerId);
+                }
+            }
+        }
+            
+        if (movableLegions.size() == 0)
+        {
+            // No valid move for any legion. Fine.
+            return false;
+        }
+        
+        // OK, now decide which of them to move - the smallest one.
+        
+        int minValue = 0;
+        String minValueMarker = null;
+        String titanMarker = null;
+        
+        it = movableLegions.iterator();
+        while (it.hasNext())
+        {
+            String markerId = (String)it.next();
+            LegionInfo legion = client.getLegionInfo(markerId);
+            int value = legion.getPointValue();
+
+            if (legion.hasTitan())
+            {
+                titanMarker = markerId;
+            }
+            
+            else if (value < minValue || minValueMarker == null)
+            {
+                Set set = client.getMovement().listNormalMoves(legion,
+                        legion.getCurrentHex(), roll);
+                if (set.size() > 0)
+                {
+                    minValue = value;
+                    minValueMarker = markerId;
+                }
+            }
+        }
+        
+        // Arrrgggh. Have to move Titan legion :-(
+        if (minValueMarker == null && titanMarker != null)
+        {
+            logger.log(Level.FINEST, "Rational AI, forced single move: " +
+                    " have to move Titan legion :-(");
+            minValueMarker = titanMarker;
+        }
+        
+        
+        // Now decide where we move this unlucky one to:
+
+        LegionInfo minLegion = client.getLegionInfo(minValueMarker);
+        Set minValueMoves = client.getMovement().listNormalMoves(minLegion,
+                minLegion.getCurrentHex(), roll);
+        
+        Iterator moveIterator = minValueMoves.iterator();
+        int bestValue = -1;
+        String bestHex = null;
+        while (moveIterator.hasNext())
+        {
+            String targetHex = (String) moveIterator.next();
+            MasterHex hex = MasterBoard.getHexByLabel(targetHex);
+            int value = evaluateMove(minLegion, hex, RECRUIT_TRUE, 2, true);
+            if (value > bestValue || bestValue == -1)
+            {
+                bestValue = value;
+                bestHex = targetHex;
+            }
+        }
+            
+        if (bestHex == null)
+        {
+            logger.log(Level.SEVERE, "Forced single moves remain, " + 
+                    "moveIterator left bestHex for minValueMarker" +
+                    minValueMarker + " null ?");
+            return false;
+        }
+        
+        boolean wentOk = client.doMove(minValueMarker, bestHex);
+        if (wentOk)
+        {
+            return true;
+        }
+        else
+        {
+            // This should never happen. Most likely we get then a NAK...
+            logger.log(Level.SEVERE, "Forced single moves remain, " + 
+                 "but client rejects moving marker " + minValueMarker + 
+                 " to " + bestHex);
+            return false;
+        }
+    }
+    
+    
     private class MoveFinder
     {
         private List bestMove = null;
