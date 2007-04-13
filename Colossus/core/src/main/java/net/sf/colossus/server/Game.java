@@ -2459,8 +2459,12 @@ public final class Game
         
         // viewableAll depends on the splitPrediction to tell then true contents,
         // and viewableOwn it does not harm; it only helps the AIs :)
-        if ( options.getStringOption(Options.viewMode).equals(Options.viewableAll) ||
-             options.getStringOption(Options.viewMode).equals(Options.viewableOwn))
+        
+        String viewModeOpt = options.getStringOption(Options.viewMode);
+        int viewModeOptNum = options.getNumberForViewMode(viewModeOpt);
+        
+        if (viewModeOptNum == Options.viewableAllNum ||
+            viewModeOptNum == Options.viewableOwnNum )
         {
             server.allRevealLegion(legion);
             server.allRevealLegion(newLegion);
