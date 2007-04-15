@@ -3574,6 +3574,15 @@ public final class Client implements IClient, IOracle, IOptions
             remain = count.intValue();
             recruitReservations.remove(recruitName);
         }
+        
+        // in case someone called getReservedRemain with bypassing the 
+        // reset or reserve methods, to be sure doublecheck against the 
+        // real remaining value.
+        int realCount = getCreatureCount(recruitName);
+        if (realCount < remain)
+        {
+            remain = realCount;
+        }
         recruitReservations.put(recruitName, new Integer(remain));
 
 //        System.out.println("getReservedCount: "+recruitName+" remaining: "+remain);
