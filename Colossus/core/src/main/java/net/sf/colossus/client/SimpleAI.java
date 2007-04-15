@@ -1716,8 +1716,7 @@ public class SimpleAI implements AI
 
         public int creatureAvailable(String name)
         {
-            int count =
-                    client.getCreatureCount(Creature.getCreatureByName(name));
+            int count = client.getReservedRemain(name);
             return count;
         }
 
