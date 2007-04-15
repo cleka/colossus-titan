@@ -749,7 +749,7 @@ public class RationalAI extends SimpleAI implements AI
         if (!wentOk)
         {
             logger.log(Level.WARNING, "RationalAI.masterMove: client.doMove " +
-                "returned false!");
+                "returned false!!");
         }
 
         if (telePort)
@@ -757,7 +757,6 @@ public class RationalAI extends SimpleAI implements AI
             bestMoveList = null;
         }
         return true;
-
     }
 
     private boolean findMoveList(List markerIds, List all_legionMoves,
@@ -1172,11 +1171,17 @@ public class RationalAI extends SimpleAI implements AI
         {
             String targetHex = (String) moveIterator.next();
             MasterHex hex = MasterBoard.getHexByLabel(targetHex);
-            int value = evaluateMove(minLegion, hex, RECRUIT_TRUE, 2, true);
-            if (value > bestValue || bestValue == -1)
+            
+            List targetOwnLegions = client.getFriendlyLegions(targetHex,
+                    player.getName());
+            if (targetOwnLegions.size() == 0 )
             {
-                bestValue = value;
-                bestHex = targetHex;
+                int value = evaluateMove(minLegion, hex, RECRUIT_TRUE, 2, true);
+                if (value > bestValue || bestValue == -1)
+                {
+                    bestValue = value;
+                    bestHex = targetHex;
+                }
             }
         }
             
