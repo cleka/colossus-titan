@@ -1241,6 +1241,9 @@ public final class Game
 
             el = root.getChild("TurnNumber");
             turnNumber = Integer.parseInt(el.getTextTrim());
+            // not quite the same as it was when saved, but the idea of lastRTN
+            // is only to prevent stresstest games from hanging forever... 
+            lastRecruitTurnNumber = turnNumber;
 
             el = root.getChild("CurrentPlayer");
             activePlayerNum = Integer.parseInt(el.getTextTrim());
