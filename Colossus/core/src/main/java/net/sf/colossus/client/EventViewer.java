@@ -84,6 +84,7 @@ ItemListener, ActionListener
     public static final String evfAcquire = "Acquire events";
     public static final String evfWinner = "Battle won events";
     public static final String evfEliminated = "Battle lost events";
+    public static final String evfMulligan = "Mulligans";
     
     public static final String evfTurnChange = "Turn change info";
     public static final String evfPlayerChange = "Player change info";
@@ -128,6 +129,7 @@ ItemListener, ActionListener
         showEventType[RevealEvent.eventWinner] = getBoolOption(evfWinner, false);
         showEventType[RevealEvent.eventEliminated] = getBoolOption(evfEliminated, false);
 
+        showEventType[RevealEvent.eventMulligan] = getBoolOption(evfMulligan, false);
         showEventType[RevealEvent.eventTurnChange] = getBoolOption(evfTurnChange, true);
         showEventType[RevealEvent.eventPlayerChange] = getBoolOption(evfPlayerChange, false);
         
@@ -226,6 +228,8 @@ ItemListener, ActionListener
         addCheckbox(evfEliminated, checkboxPane);
         checkboxPane.add(new JLabel("NOTE: Teleport events remain in list even if undone."));
         checkboxPane.add(Box.createRigidArea(new Dimension(0,5)));
+        
+        addCheckbox(evfMulligan, checkboxPane);
         addCheckbox(evfTurnChange, checkboxPane);
         addCheckbox(evfPlayerChange, checkboxPane);
 
@@ -639,6 +643,10 @@ ItemListener, ActionListener
         else if (text.equals(evfTurnChange))
         {
             this.showEventType[RevealEvent.eventTurnChange] = selected;
+        }
+        else if (text.equals(evfMulligan))
+        {
+            this.showEventType[RevealEvent.eventMulligan] = selected;
         }
         else if (text.equals(evfPlayerChange))
         {

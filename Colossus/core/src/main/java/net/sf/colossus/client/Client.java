@@ -153,6 +153,7 @@ public final class Client implements IClient, IOracle, IOptions
 
     // XXX temporary until things are synched
     private boolean tookMulligan;
+    private int mulliganOldRoll = -2;
 
     private int delay = -1;
 
@@ -213,6 +214,8 @@ public final class Client implements IClient, IOracle, IOptions
         clearRecruitChits();
         tookMulligan = true;
 
+        mulliganOldRoll = movementRoll;
+        
         server.mulligan();
     }
 
@@ -420,11 +423,10 @@ public final class Client implements IClient, IOracle, IOptions
     void storeRevealEvent(int eventType, String markerId1, int height1, 
             ArrayList rcList, String markerId2, int height2)
     {
-        RevealEvent e = new RevealEvent(this, turnNumber, getActivePlayerNum(),
-                eventType, markerId1, height1, rcList, markerId2, height2);
-
         if (eventViewer != null)
         {
+            RevealEvent e = new RevealEvent(this, turnNumber, getActivePlayerNum(),
+                eventType, markerId1, height1, rcList, markerId2, height2);
             eventViewer.addEvent(e);
         }
     }
@@ -542,6 +544,21 @@ public final class Client implements IClient, IOracle, IOptions
 
     public void tellMovementRoll(int roll)
     {
+        if (mulliganOldRoll == -2)
+        {
+            mulliganOldRoll = roll;
+        }
+        else
+        {
+            if (eventViewer != null)
+            {
+                RevealEvent e = new RevealEvent(this, turnNumber, 
+                        getActivePlayerNum(), RevealEvent.eventMulligan, 
+                        mulliganOldRoll, roll);
+                eventViewer.addEvent(e);
+            }
+        }
+        
         movementRoll = roll;
         if (movementDie == null || roll != movementDie.getLastRoll())
         {
@@ -2573,7 +2590,8 @@ public final class Client implements IClient, IOracle, IOptions
     {
         this.activePlayerName = activePlayerName;
         this.turnNumber = turnNumber;
-
+        mulliganOldRoll = -2;
+        
         if (eventViewer != null)
         {
             eventViewer.turnOrPlayerChange(this, turnNumber, 
@@ -2616,6 +2634,8 @@ public final class Client implements IClient, IOracle, IOptions
 
         this.activePlayerName = activePlayerName;
         this.turnNumber = turnNumber;
+        mulliganOldRoll = -2;
+        
         if (eventViewer != null)
         {
             eventViewer.turnOrPlayerChange(this, turnNumber, 
@@ -2943,6 +2963,13 @@ public final class Client implements IClient, IOracle, IOptions
     String getShortColor()
     {
         return Player.getShortColor(getColor());
+    }
+
+    // public for RevealEvent
+    public String getShortColor(int playerNum)
+    {
+        PlayerInfo player = getPlayerInfo(playerNum);
+        return Player.getShortColor(player.getColor());
     }
 
     // public for IOracle

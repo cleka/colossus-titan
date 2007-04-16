@@ -21,6 +21,9 @@ public class RevealEvent
     private int height;
     private ArrayList knownCreatures;
 
+    private int oldRoll;
+    private int newRoll;
+    
     private int scale;
     private JPanel p;
     
@@ -34,6 +37,7 @@ public class RevealEvent
     public final static int eventEliminated = 6;
     public final static int eventTurnChange = 7;
     public final static int eventPlayerChange = 8;
+    public final static int eventMulligan = 9;
 
     private final static String eventSplitText = "Split";
     private final static String eventRecruitText = "Recruit";
@@ -44,11 +48,12 @@ public class RevealEvent
     private final static String eventEliminatedText = "Eliminated";
     private final static String eventTurnChangeText = "TurnChange";
     private final static String eventPlayerChangeText = "PlayerChange";
+    private final static String eventMulliganText = "Mulligan";
 
     private static String[] eventTypeToString = {
         eventSplitText, eventRecruitText, eventSummonText, eventTeleportText, 
         eventAcquireText, eventWinnerText, eventEliminatedText, 
-        eventTurnChangeText, eventPlayerChangeText
+        eventTurnChangeText, eventPlayerChangeText, eventMulliganText
     };
     
     
@@ -81,12 +86,20 @@ public class RevealEvent
         
        // System.out.println("NEW RevealEvent: "+this.toString());
     }
-    
-    // TODO: Info events, e.g. 
-    //       took mulligan, turn change as event instead of hacked in viewer, 
-    //       player requested to see legions, ... ?
-    
-    
+
+    // mulligan
+    public RevealEvent(Client client, int turnNumber, int playerNr, 
+            int eventType, int oldRoll, int newRoll)
+    {
+        this.client = client;
+        this.turnNumber = turnNumber;
+        this.playerNr = playerNr;
+        this.eventType = eventType;
+
+        this.oldRoll = oldRoll;
+        this.newRoll = newRoll;
+    }
+
     
     public int getEventType()
     {
@@ -167,6 +180,12 @@ public class RevealEvent
             msg = "Revealing event: Player change, now player "+getPlayerNr()+
             " ("+getPlayer()+"), Turn "+getTurn();
         }
+        else if (eventType == eventMulligan)
+        {
+            msg = "Revealing event: Player "+getPlayerNr()+
+            " ("+getPlayer()+"), Turn "+getTurn() + " took mulligan;" +
+            " old="+ oldRoll + ", new=" + newRoll;
+        }
         
         else
         {
@@ -212,9 +231,8 @@ public class RevealEvent
         }
         catch(Exception e)
         {
-            System.out.println("\n\nCATCH: ERROR: markerId null, event type "+getEventTypeText()+" turn" +getTurn());
-
-
+            System.out.println("\n\nCATCH: ERROR: markerId null, event type "+
+              getEventTypeText()+" turn" +getTurn());
         };
         
     }
@@ -238,6 +256,38 @@ public class RevealEvent
         }
     }
  
+    private Chit getSolidMarker()
+    {
+        Chit solidMarker;
+        // I would have liked to paint a solid marker with color of that
+        // player, instead of the Titan picture (or any individual
+        // marker), because this is for the "player as such",
+        // not related to any single marker or the Titan creature.
+        // But even if I had created BrSolid.gif (or even copied
+        // Br01.gif to that name), did compileVariants, and the gif image
+        // was listed in jar tfv usage, still I got "Couldn't get image"
+        // error and everything was hanging.
+        // So, for now we go with the Titan icon.
+/*
+        try
+        {
+            String color = client.getShortColor(playerNr);
+            solidMarker = new Chit(scale, color+"Solid");
+        }
+        catch(Exception e)
+        {
+            System.out.println("exception...");
+            // if solid marker does not exist for this color,
+            // use as fallback the Titan chit.
+            solidMarker = new Chit(scale, getTitanBasename());
+        }
+*/
+        solidMarker = new Chit(scale, getTitanBasename());
+        solidMarker.setAlignmentX(Component.LEFT_ALIGNMENT);
+        
+        return solidMarker;
+    }
+    
     private void addCreature(String creatureName)
     {
         String name = new String(creatureName);
@@ -289,6 +339,29 @@ public class RevealEvent
         p.setLayout(new BoxLayout(p, BoxLayout.X_AXIS));
         p.setAlignmentX(Component.LEFT_ALIGNMENT);
 
+        if (eventType == eventMulligan)
+        {
+            Chit solidMarker = getSolidMarker();
+            p.add(solidMarker);
+
+            p.add(Box.createRigidArea(new Dimension(5,0)));
+            addLabel(getEventTypeText()+": ");
+            
+            Chit oldDie = new MovementDie(this.scale,
+                    MovementDie.getDieImageName(oldRoll));
+            oldDie.setAlignmentX(Component.LEFT_ALIGNMENT);
+            p.add(oldDie);
+
+            addLabel(" => ");
+
+            Chit newDie = new MovementDie(this.scale,
+                    MovementDie.getDieImageName(newRoll));
+            newDie.setAlignmentX(Component.LEFT_ALIGNMENT);
+            p.add(newDie);
+            
+            return p;
+        }
+        
         addMarker(markerId);
         p.add(Box.createRigidArea(new Dimension(5,0)));
         
