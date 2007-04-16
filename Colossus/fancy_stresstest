@@ -75,8 +75,7 @@ FORCEBOARD=-Dnet.sf.colossus.forceViewBoard=yes
 
 while true
 do 
-    cd "$HOME/.Colossus/saves"
-    rm -f snap*.xml
+    cd "$HOME/.colossus/saves"
     cd $currdir
     i=`expr $i + 1`
     echo -e $i > i
