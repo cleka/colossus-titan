@@ -129,7 +129,7 @@ ItemListener, ActionListener
         showEventType[RevealEvent.eventWinner] = getBoolOption(evfWinner, false);
         showEventType[RevealEvent.eventEliminated] = getBoolOption(evfEliminated, false);
 
-        showEventType[RevealEvent.eventMulligan] = getBoolOption(evfMulligan, false);
+        showEventType[RevealEvent.eventMulligan] = getBoolOption(evfMulligan, true);
         showEventType[RevealEvent.eventTurnChange] = getBoolOption(evfTurnChange, true);
         showEventType[RevealEvent.eventPlayerChange] = getBoolOption(evfPlayerChange, false);
         
@@ -265,10 +265,25 @@ ItemListener, ActionListener
         }
                 
         Object[] Choices = alChoices.toArray(); 
-        
+
+        // read user's setting for this, but cannot exceed the Game's
+        // general setting.
+        String maxTurnsOptString = 
+            options.getStringOption(evMaxTurns);
+        if ( maxTurnsOptString == null )
+        {
+            maxTurnsOptString = "3";
+        }
+        int maxTurnsOpt = Integer.parseInt(maxTurnsOptString);
+        if (maxTurnsOpt > maxVal)
+        {
+            maxTurnsOpt = maxVal;
+            maxTurnsOptString = new Integer(maxTurnsOpt).toString();
+        }
+
         maxTurnsDisplayExpiringBox = new JComboBox(Choices);
         maxTurnsDisplayExpiringBox.addActionListener(this);
-        maxTurnsDisplayExpiringBox.setSelectedItem(eventExpiringVal);
+        maxTurnsDisplayExpiringBox.setSelectedItem(maxTurnsOptString);
         miscPane.add(new JLabel("Display max. (turns):"));
         miscPane.add(maxTurnsDisplayExpiringBox);
 

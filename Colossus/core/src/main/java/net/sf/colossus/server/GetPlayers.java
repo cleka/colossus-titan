@@ -132,7 +132,7 @@ public final class GetPlayers extends KDialog implements WindowListener,
         String eventExpiringVal = options.getStringOption(Options.eventExpiring);
         if ( eventExpiringVal == null )
         {
-            eventExpiringVal = "1"; 
+            eventExpiringVal = "5"; 
         }
 
         eventExpiringBox = new JComboBox(Options.eventExpiringChoices);
