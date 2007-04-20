@@ -700,7 +700,10 @@ public final class GetPlayers extends KDialog implements WindowListener,
 
     public void dispose()
     {
-        saveWindow.saveLocation(getLocation());
+        if (!options.isEmpty())
+        {
+            saveWindow.saveLocation(getLocation());
+        }
         super.dispose();
     }
 }
