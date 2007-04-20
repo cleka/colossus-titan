@@ -9,26 +9,38 @@
     <body>
         <h2>Networked Colossus</h2>
         <p>Colossus is now playable over a TCP/IP network. However, the network
-        functionality is still not perfectly stable. And turn-based games are
-        inherently brittle -- if one player stops moving or drops his
+        functionality is still not perfectly stable (it has improved a lot
+        recently, i.e. since beginning of 2007), and the setup of a networked
+        game is not overly easy-to-use or user-friendly. And turn-based games 
+        are inherently brittle -- if one player stops moving or drops his
         connection, then the game is ruined for everybody. (For now --
         we&#39;ll add the ability to reconnect or have an AI take over later.)
         So I recommend starting with 2-player games rather than 6-player
         games.</p>
-        <p>One person needs to run the server. Currently, Colossus servers are
-        short-lived, staying up only for the length of one game.</p>
+        <p>One person needs to run the server; his computer has to be 
+        reachable for the clients (see below). Currently, Colossus servers 
+        are short-lived, staying up only for the length of one game.</p>
         <p>The server operator simply starts the game as usual, using Java Web
-        Start or the 
-        <b>run</b>script for a local copy. The startup dialog should appear,
-        allowing you to set the variant, optional rules, and how many players
-        of which types you want. Human players are local to the server machine.
-        Network players are remote. The game will wait for *exactly* the number
-        of network players you specify, then start the game. If you have a
-        local copy of the game you can use command-line options instead. Use 
-        <b>run -h</b>to see them.</p>
+        Start or the <b>run</b> script for a local copy. The startup dialog
+        should appear, allowing you to set the variant, optional rules, 
+        and how many players of which types you want. Human players are local 
+        to the server machine. Network players are remote. Press the 
+        "Start Game" button. The game will wait for *exactly* the number
+        of network players you specify, before the actual game starts and the
+        masterboard(s) appear. 
+        If you have a local copy of the game you can use command-line options 
+        instead. Use 
+        <b>run -h</b> to see them.
+        </p>
+        <p>A server progress startup dialog (recently added, 2007) shows the
+        progress which clients (their IP and player name) have already 
+        successfully connected. For practicing purposes, I recommend to start 
+        with a server and one "remote" player, but running that network client 
+        on the same machine. 
         <p>Each client needs to wait for the server to be started, then run the
         
-        <b>runclient</b>script or start the game from Java Web Start and select
+        <b>runclient</b> script or start the game from Java Web Start and 
+        select
         &quot;Run client&quot; from the startup dialog. This will pop up a
         small dialog that lets you enter a player name, hostname, and port. The
         player name will default to your OS user name. The server host will
@@ -39,10 +51,8 @@
         <b>runclient -h</b>to see them.</p>
         <p>Once all the clients have connected, then the game should start up
         like a normal Colossus game. When the game ends, kill all the clients
-        and the server and restart from scratch if you want to play again.</p>
-        <p>There is a simple chat client built in, but it&#39;s not very good.
-        I recommend using your favorite IRC or instant messenger client
-        instead.</p>
+        and the server and restart from scratch if you want to play again.
+        </p>
         <h2>FAQ</h2>
         <ul>
             <li>How do I find opponents? 
@@ -50,7 +60,8 @@
             should update this document if someone starts a new one.</p></li>
             <li>What about firewalls? 
             <p>The server accepts connections from clients on port 26567 (used
-            for game traffic) and 26568 (used to serve files). Return traffic
+            for game traffic) and 26568 (used to serve files
+             [[is that still true??]]). Return traffic
             is piggybacked on the same sockets rather than opening more. So
             client machines only need the ability to connect out on those
             ports, while server machines need a publicly visible IP address
