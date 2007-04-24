@@ -1688,7 +1688,7 @@ public final class Client implements IClient, IOracle, IOptions
         Iterator it2 = possibleRecruitChits.iterator();
         while (it2.hasNext())
         {
-            Chit chit = (Chit)it.next();
+            Chit chit = (Chit)it2.next();
             // TODO the next line can cause an NPE when the user closes the client app
             GUIMasterHex hex = board.getGUIHexByLabel(hexLabel);
             if (hex != null && hex.contains(chit.getCenter()))
