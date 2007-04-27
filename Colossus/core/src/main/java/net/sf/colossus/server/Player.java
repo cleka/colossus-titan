@@ -556,11 +556,9 @@ public final class Player implements Comparable
             Log.error("Player.undoRecruit: legion for markerId " + markerId + " is null");
             return;
         }
-        // this one happens if one presses "U" twice - when there is 
-        // no recruiting to undo any more.
-        // TODO fix the actual bug (this method being called when it shouldn't)
-        // to reproduce: use auto-recruit, deselect an auto-recruited creature,
-        // select your own and undo twice
+        // This check for null was workaround for the case if someone did undo
+        // twice it would give here a NPE. Now properly fixed in Player.java,
+        // still leaving this here in place ... just in case :)
         String recruitName = legion.getRecruitName();
         if ( recruitName == null )
         {

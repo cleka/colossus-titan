@@ -4139,6 +4139,10 @@ public final class Client implements IClient, IOracle, IOptions
 
     void undoRecruit(String markerId)
     {
+        if (undoStack.contains(markerId))
+        {
+            undoStack.remove(markerId);
+        }
         server.undoRecruit(markerId);
     }
 
