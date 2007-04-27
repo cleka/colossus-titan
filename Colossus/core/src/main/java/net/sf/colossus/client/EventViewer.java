@@ -50,18 +50,14 @@ ItemListener, ActionListener
 
     private IOptions options;
     
-    // private int viewMode;
-   
     private boolean visible;
     
-    // private ArrayList eventList = new ArrayList();
-
     private List syncdEventList = Collections.synchronizedList(new ArrayList());
-    
     
     private int turnNr;
     private int playerNr;
     
+    // how long back are they kept (from global settings)
     private int expireTurns;
     
     private SaveWindow saveWindow;
@@ -99,6 +95,7 @@ ItemListener, ActionListener
     private boolean autoScroll;
     private JComboBox maxTurnsDisplayExpiringBox;
     
+    // how many back are currently displayed
     private int maxTurns = 1;
 
     /** 
@@ -111,18 +108,18 @@ ItemListener, ActionListener
      */
 
         
-    EventViewer(final JFrame frame, final IOptions options, int viewMode, int expireTurns)
+    EventViewer(final JFrame frame, final IOptions options)
     {
         super(frame, windowTitle, false);
         setFocusable(false);
 
-        this.expireTurns = expireTurns;
         this.options = options;
-        // this.viewMode = viewMode;
 
+        initExpireTurnsFromOptions();
+        
         showEventType = new boolean[10];
         showEventType[RevealEvent.eventRecruit] = getBoolOption(evfRecruit, true);
-        showEventType[RevealEvent.eventSplit] = getBoolOption(evfRecruit, true);
+        showEventType[RevealEvent.eventSplit] = getBoolOption(evfSplit, true);
         showEventType[RevealEvent.eventTeleport] = getBoolOption(evfTeleport, true);
         showEventType[RevealEvent.eventSummon] = getBoolOption(evfSummon, true);
         showEventType[RevealEvent.eventAcquire] = getBoolOption(evfAcquire, true);
@@ -149,6 +146,28 @@ ItemListener, ActionListener
 
         this.saveWindow = new SaveWindow(options, windowTitle);        
         setVisibleMaybe();
+    }
+
+    // How many turns back data is kept; default to 1 if no such
+    // option found from user options file.
+    private void initExpireTurnsFromOptions()
+    {
+        int turnsToKeep = 1;
+        String expOption = options.getStringOption(Options.eventExpiring);
+        if (expOption != null)
+        {
+            int exp = Integer.parseInt(expOption);
+            if (exp > 0 && exp < 99)
+            {
+                turnsToKeep = exp;
+            }
+            else
+            {
+                System.out.println("Invalid value "+exp +" from option "+
+                                Options.eventExpiring);
+            }
+        }
+        this.expireTurns = turnsToKeep;
     }
 
     private boolean getBoolOption(String name, boolean defaultVal)
@@ -249,7 +268,7 @@ ItemListener, ActionListener
         miscPane.add(new JLabel(""));
         
         // selection for how many turns to display the data
-        // (must be less or equal the expiry Option from getPlayers setting)
+        // (must be less or equal the expireTurns value set in getPlayers)
         String eventExpiringVal = options.getStringOption(Options.eventExpiring);
         if ( eventExpiringVal == null )
         {

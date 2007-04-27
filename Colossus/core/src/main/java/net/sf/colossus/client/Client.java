@@ -392,26 +392,7 @@ public final class Client implements IClient, IOracle, IOptions
                 parent = board.getFrame();
             }
 
-            // How many turns back data is kept; default to 1 if no such
-            // option found from user options file.
-            int turnsToKeep = 1;
-            String expiringOption = options.getStringOption(
-                 Options.eventExpiring);
-            if (expiringOption != null)
-            {
-                int exp = Integer.parseInt(expiringOption);
-                if (exp > 0 && exp < 99)
-                {
-                    turnsToKeep = exp;
-                }
-                else
-                {
-                    System.out.println("Invalid value "+exp +" from option "+
-                        Options.eventExpiring);
-                }
-            }
-
-            eventViewer = new EventViewer(parent, this, viewMode, turnsToKeep);
+            eventViewer = new EventViewer(parent, this);
         }
         else
         {
