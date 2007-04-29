@@ -74,7 +74,7 @@ public class ExtTitanHint implements net.sf.colossus.server.HintInterface
                     oracle.creatureAvailable("Mammoth") >= 2 &&
                     oracle.canReach("Swamp"))
             {
-                return "Griffon";
+                return "Wyvern";
             }
         }
         else if (terrain.equals("Tower"))
