@@ -147,6 +147,10 @@ public final class Start
         {
             options.setOption(Options.autoQuit, true);
         }
+        if (cl.optIsSet('S'))
+        {
+            options.setOption(Options.autosave, true);
+        }
         if (cl.optIsSet('u'))
         {
             options.clearPlayerInfo();
@@ -254,6 +258,7 @@ public final class Start
             opts.addOption('t', "timelimit", true, "AI time limit in s");
             opts.addOption('c', "client", false, "Run network client instead");
             opts.addOption('s', "server", true, "Server name or IP");
+            opts.addOption('S', "autosave", false, "Autosave");
             opts.addOption('m', "myname", true, "My player name");
             opts.addOption('x', "quiet", false, "turn off debug log");
 
