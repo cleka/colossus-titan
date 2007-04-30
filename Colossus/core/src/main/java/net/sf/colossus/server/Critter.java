@@ -146,6 +146,9 @@ class Critter implements Comparable
             // Check for death.
             if (hits >= getPower())
             {
+                Log.event("Critter " + getDescription() + " is now dead: " +
+                        "(hits=" + hits + " > power="+getPower()+
+                        "); excess=" + excess);
                 setDead(true);
             }
         }
