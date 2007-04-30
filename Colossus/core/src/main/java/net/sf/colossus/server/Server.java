@@ -1518,13 +1518,13 @@ public final class Server implements IServer
     }
 
     void allTellAddCreature(String markerId, String creatureName,
-            boolean updateHistory)
+            boolean updateHistory, String reason)
     {
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
             IClient client = (IClient)it.next();
-            client.addCreature(markerId, creatureName);
+            client.addCreature(markerId, creatureName, reason);
         }
         if (updateHistory)
         {
@@ -1533,13 +1533,13 @@ public final class Server implements IServer
     }
 
     void allTellRemoveCreature(String markerId, String creatureName,
-            boolean updateHistory)
+            boolean updateHistory, String reason)
     {
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
             IClient client = (IClient)it.next();
-            client.removeCreature(markerId, creatureName);
+            client.removeCreature(markerId, creatureName, reason);
         }
         if (updateHistory)
         {
@@ -1547,14 +1547,14 @@ public final class Server implements IServer
         }
     }
 
-    void allRevealLegion(Legion legion)
+    void allRevealLegion(Legion legion, String reason)
     {
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
             IClient client = (IClient)it.next();
             client.revealCreatures(legion.getMarkerId(),
-                    legion.getImageNames());
+                    legion.getImageNames(), reason);
         }
         game.revealEvent(true, null, legion.getMarkerId(),
                 legion.getImageNames());
@@ -1567,37 +1567,38 @@ public final class Server implements IServer
      * @param isAttacker true if the 'legion' is the atackker in the
      *   battle, false for the defender.
      */
-    void allRevealEngagedLegion(final Legion legion, final boolean isAttacker)
+    void allRevealEngagedLegion(final Legion legion, final boolean isAttacker,
+            String reason)
     {
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
             IClient client = (IClient) it.next();
-            client.revealEngagedCreatures(
-                legion.getMarkerId(), legion.getImageNames(), isAttacker);
+            client.revealEngagedCreatures(legion.getMarkerId(), 
+                 legion.getImageNames(), isAttacker, reason);
         }
         game.revealEvent(true, null, legion.getMarkerId(),
                 legion.getImageNames());
     }
 
     /** Call from History during load game only */
-    void allRevealLegion(String markerId, List creatureNames)
+    void allRevealLegion(String markerId, List creatureNames, String reason)
     {
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
             IClient client = (IClient)it.next();
-            client.revealCreatures(markerId, creatureNames);
+            client.revealCreatures(markerId, creatureNames, reason);
         }
     }
 
-    void oneRevealLegion(Legion legion, String playerName)
+    void oneRevealLegion(Legion legion, String playerName, String reason)
     {
         IClient client = getClient(playerName);
         if (client != null)
         {
             client.revealCreatures(legion.getMarkerId(),
-                    legion.getImageNames());
+                    legion.getImageNames(), reason);
         }
         List li = new ArrayList();
         li.add(playerName);
@@ -1606,12 +1607,13 @@ public final class Server implements IServer
     }
 
     /** Call from History during load game only */
-    void oneRevealLegion(String playerName, String markerId, List creatureNames)
+    void oneRevealLegion(String playerName, String markerId, 
+          List creatureNames, String reason)
     {
         IClient client = getClient(playerName);
         if (client != null)
         {
-            client.revealCreatures(markerId, creatureNames);
+            client.revealCreatures(markerId, creatureNames, reason);
         }
         List li = new ArrayList();
         li.add(playerName);
@@ -1637,46 +1639,46 @@ public final class Server implements IServer
         }
     }
 
-    void allFullyUpdateAllLegionContents()
+    void allFullyUpdateAllLegionContents(String reason)
     {
         Iterator it = game.getAllLegions().iterator();
         while (it.hasNext())
         {
             Legion legion = (Legion)it.next();
-            allRevealLegion(legion);
+            allRevealLegion(legion, reason);
         }
     }
 
-    void allRevealCreatures(Legion legion, List creatureNames)
+    void allRevealCreatures(Legion legion, List creatureNames, String reason)
     {
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
             IClient client = (IClient)it.next();
-            client.revealCreatures(legion.getMarkerId(), creatureNames);
+            client.revealCreatures(legion.getMarkerId(), creatureNames, reason);
         }
         game.revealEvent(true, null, legion.getMarkerId(), creatureNames);
     }
 
     /** Call from History during load game only */
     void oneRevealCreatures(String playerName, String markerId,
-            List creatureNames)
+            List creatureNames, String reason)
     {
         IClient client = getClient(playerName);
         if (client != null)
         {
-            client.revealCreatures(markerId, creatureNames);
+            client.revealCreatures(markerId, creatureNames, reason);
         }
     }
 
     /** Call from History during load game only */
-    void allRevealCreatures(String markerId, List creatureNames)
+    void allRevealCreatures(String markerId, List creatureNames, String reason)
     {
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
             IClient client = (IClient)it.next();
-            client.revealCreatures(markerId, creatureNames);
+            client.revealCreatures(markerId, creatureNames, reason);
         }
     }
 

@@ -372,20 +372,23 @@ final class SocketServerThread extends Thread implements IClient
                 sep + teleported + sep + entrySide + sep + lastRecruit);
     }
 
-    public void addCreature(String markerId, String name)
+    public void addCreature(String markerId, String name, String reason)
     {
-        out.println(Constants.addCreature + sep + markerId + sep + name);
+        out.println(Constants.addCreature + sep + markerId + sep + name + 
+             sep + reason);
     }
 
-    public void removeCreature(String markerId, String name)
+    public void removeCreature(String markerId, String name, String reason)
     {
-        out.println(Constants.removeCreature + sep + markerId + sep + name);
+        out.println(Constants.removeCreature + sep + markerId + sep + name + 
+             sep + reason);
     }
 
-    public void revealCreatures(String markerId, final List names)
+    public void revealCreatures(String markerId, final List names, 
+         String reason)
     {
         out.println(Constants.revealCreatures + sep + markerId + sep +
-                Glob.glob(names));
+                Glob.glob(names) + sep + reason);
     }
 
     /** print the 'revealEngagagedCreature'-message,
@@ -393,13 +396,14 @@ final class SocketServerThread extends Thread implements IClient
      * @param markerId legion marker name that is currently in battle
      * @param names List of creature names in this legion
      * @param isAttacker true for attacker, false for defender
+     * @param reason why this was revealed
      * @author Towi, copied from revealCreatures
      */
     public void revealEngagedCreatures(final String markerId, final List names,
-        final boolean isAttacker)
+        final boolean isAttacker, String reason)
     {
         out.println(Constants.revealEngagedCreatures + sep + markerId
-            + sep + isAttacker + sep + Glob.glob(names));
+            + sep + isAttacker + sep + Glob.glob(names) + sep + reason);
     }
 
     public void removeDeadBattleChits()

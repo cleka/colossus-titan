@@ -26,6 +26,7 @@ import javax.swing.JPanel;
 
 import net.sf.colossus.util.KDialog;
 import net.sf.colossus.util.Options;
+import net.sf.colossus.server.Constants;
 
 
 /**
@@ -520,17 +521,17 @@ final class EngagementResults extends KDialog
         public String getResultText()
         {
             String result = "bogus method";
-            if (method.equals("flee"))
+            if (method.equals(Constants.erMethodFlee))
             {
                 result = winnerId + " won when " + loserId +
                     " fled and earned " + this.points + " points";
             }
-            else if (method.equals("concede"))
+            else if (method.equals(Constants.erMethodConcede))
             {
                 result = winnerId + " won when " + loserId +
                     " conceded and earned " + this.points + " points";
             }
-            else if (method.equals("negotiate"))
+            else if (method.equals(Constants.erMethodConcede))
             {
                 if (winnerId != null)
                 {
@@ -543,7 +544,7 @@ final class EngagementResults extends KDialog
                     result = "Negotiated mutual elimination";
                 }
             }
-            else if (method.equals("fight"))
+            else if (method.equals(Constants.erMethodFight))
             {
                 if (winnerId != null)
                 {

@@ -214,6 +214,7 @@ public final class Client implements IClient, IOracle, IOptions
         clearRecruitChits();
         tookMulligan = true;
 
+        // TODO: should not be needed any more here?
         mulliganOldRoll = movementRoll;
         
         server.mulligan();
@@ -277,6 +278,22 @@ public final class Client implements IClient, IOracle, IOptions
         this.attackerMarkerId = attackerId;
         this.defenderMarkerId = defenderId;
 
+        if (eventViewer != null)
+        {
+            attackerEventLegion = new RevealEvent(this, turnNumber, 
+                getActivePlayerNum(), RevealEvent.eventBattle, attackerId, 
+                getLegionInfo(attackerId).getHeight(), new ArrayList(), null, 0);
+            attackerEventLegion.setEventInfo(Constants.reasonBattleStarts);
+            attackerEventLegion.setRealPlayer(getPlayerNameByMarkerId(attackerId));
+                   
+            defenderEventLegion = new RevealEvent(this, turnNumber, 
+                getActivePlayerNum(), RevealEvent.eventBattle, defenderId, 
+                getLegionInfo(attackerId).getHeight(), new ArrayList(), null, 0);
+        
+            defenderEventLegion.setEventInfo(Constants.reasonBattleStarts);
+            defenderEventLegion.setRealPlayer(getPlayerNameByMarkerId(defenderId));
+        }
+        
         // remember for end of battle.
         _tellEngagementResults_attackerStartingContents =
             getLegionImageNames(attackerId);
@@ -332,33 +349,116 @@ public final class Client implements IClient, IOracle, IOptions
         }
     }
 
-    public void tellEngagementResults(String winnerId, String method,
-        int points, int turns)
+    RevealEvent winnerLegion;
+    RevealEvent loserLegion; 
+
+    public void tellEngagementResultsEventHandling(
+            String winnerId, String method)
     {
+        // if those are not set, we are new version client with old
+        // version server, who does not provide the reason argument
+        // to some other methods; then they do not set up those
+        // eventLegions we would need here. So, can't do anything.
+        if (attackerEventLegion == null || defenderEventLegion == null)
+        {
+            Log.debug("tellEngagementResultHandling, both are null");
+            return;
+        }
+
         if (winnerId == null)
         {
-            // mutual elimination
-            storeRevealEvent(RevealEvent.eventEliminated, 
-                    this.attackerMarkerId, 0, null, null, 0);
-            storeRevealEvent(RevealEvent.eventEliminated, 
-                    this.defenderMarkerId, 0, null, null, 0);
+            Log.debug("winnerId is null value");
+        }
+        else if (winnerId.equals("null"))
+        {
+            Log.debug("winnerId  is string 'null'");
         }
         else
         {
-            storeRevealEvent(RevealEvent.eventWinner, 
-                    winnerId, 0, null, null, 0);
-            String eliminatedId = (winnerId.equals(this.attackerMarkerId) ? 
-                    this.defenderMarkerId : this.attackerMarkerId);
-            storeRevealEvent(RevealEvent.eventEliminated, 
-                    eliminatedId, 0, null, null, 0);
+            Log.debug("winnerId is '"+winnerId+"'");
         }
+        
+        if (winnerId == null || winnerId.equals("null"))
+        {
+            // null value = normal mutual
+            // string with content "null": one legion contained titan, 
+            // titan killed, some others survived, 
+            // titan-killing-legion eliminated.
+            // The above is for normal game. What if load from history??
+            Log.debug("tellEngagementResultHandling, winner " + 
+                (winnerId == null ? null : "string 'null'"));
 
+            // mutual elimination
+            // attackerEventLegion.setAllDead();
+            attackerEventLegion.setEventType(RevealEvent.eventLost);
+            attackerEventLegion.setEventInfo("mutual");
+            eventViewer.addEvent(attackerEventLegion);
+            
+            // defenderEventLegion.setAllDead();
+            defenderEventLegion.setEventType(RevealEvent.eventLost);
+            defenderEventLegion.setEventInfo("mutual");
+            eventViewer.addEvent(defenderEventLegion);
+        }
+        else
+        {
+            Log.event("tellEngagementResultHandling, winner = " + winnerId);
+            if (winnerId.equals(this.attackerMarkerId))
+            {    // attacker won:
+                winnerLegion = attackerEventLegion;
+                loserLegion  = defenderEventLegion;
+            }
+            else
+            {    // defender
+                winnerLegion = defenderEventLegion;
+                loserLegion  = attackerEventLegion;
+            }
+            
+            // fled or concession there didn't come removeCreature messages,
+            // thus make sure they are really shown dead.
+            loserLegion.setAllDead();
+            loserLegion.setEventType(RevealEvent.eventLost);
+            loserLegion.setEventInfo(method);
+            eventViewer.addEvent(loserLegion);
+            
+            int winnerHeight = getLegionInfo(winnerId).getHeight();
+            int winnerEventHeight = winnerLegion.getHeight(); 
+            if ( winnerEventHeight != winnerHeight)
+            {
+                if (winnerEventHeight != 0)
+                {
+                    // @TODO: is that a problem?
+                    Log.debug("Winner legion " + winnerId + 
+                        " event height mismatch: Eventheight="+
+                        winnerLegion.getHeight() + ", actual height=" + 
+                        winnerHeight);
+                }
+            }
+            winnerLegion.setEventType(RevealEvent.eventWon);
+            winnerLegion.setEventInfo(method);
+            eventViewer.addEvent(winnerLegion);
+        }
+        
+        lastAttackerEventLegion = attackerEventLegion;
+        lastDefenderEventLegion = defenderEventLegion;
+        
+        attackerEventLegion = null;
+        defenderEventLegion = null;
+        winnerLegion = null;
+        loserLegion = null;
+    }
+    
+    
+    public void tellEngagementResults(String winnerId, String method,
+        int points, int turns)
+    {
         JFrame frame = getMapOrBoardFrame();
         if (frame == null)
         {
             return;
         }
 
+        tellEngagementResultsEventHandling(winnerId, method);
+        
         if (getOption(Options.showEngagementResults))
         {
             if (engagementResults == null)
@@ -525,6 +625,8 @@ public final class Client implements IClient, IOracle, IOptions
 
     public void tellMovementRoll(int roll)
     {
+        // for eventviewer: if oldroll is -2, this is the first roll;
+        // otherwise, player took mulligan.
         if (mulliganOldRoll == -2)
         {
             mulliganOldRoll = roll;
@@ -959,6 +1061,10 @@ public final class Client implements IClient, IOracle, IOptions
     // so that it loops only if it does not find it ( = first call?)
     int getPlayerNum(String pName)
     {
+        if (pName == null)
+        {
+            return -1;
+        }
         PlayerInfo tryHash = (PlayerInfo) playerInfoByName.get(pName);
         for (int i = 0; i < playerInfo.length; i++)
         {
@@ -1325,8 +1431,8 @@ public final class Client implements IClient, IOracle, IOptions
         }
         else
         {
-            // System.out.println("Client "+playerName + ": FATAL: getLegionCreatureCertainties getLegionInfo for " + markerId + " returned null!");
-            // Log.error("FATAL: getLegionCreatureCertainties getLegionInfo for " + markerId + " returned null!");
+            // Log.error("getLegionCreatureCertainties getLegionInfo for " + 
+            //    markerId + " returned null!");
 
             // TODO: is this the right thing?
             List l = new ArrayList(42/4);  // just longer then max
@@ -1339,7 +1445,7 @@ public final class Client implements IClient, IOracle, IOptions
     }
 
     /** Add a new creature to this legion. */
-    public void addCreature(String markerId, String name)
+    public void addCreature(String markerId, String name, String reason)
     {
         getLegionInfo(markerId).addCreature(name);
         if (board != null)
@@ -1348,11 +1454,80 @@ public final class Client implements IClient, IOracle, IOptions
             GUIMasterHex hex = board.getGUIHexByLabel(hexLabel);
             hex.repaint();
         }
+        
+        if (eventViewer != null)
+        {
+            RevealEvent battleEvent = null;
+            if (attackerEventLegion != null && 
+                    attackerEventLegion.getMarkerId().equals(markerId))
+            {
+                battleEvent = attackerEventLegion;
+                
+            }
+            else if (defenderEventLegion != null &&
+                    defenderEventLegion.getMarkerId().equals(markerId))
+            {
+                battleEvent = defenderEventLegion;
+            }
+
+            if (battleEvent != null)
+            {
+                RevealedCreature rc = new RevealedCreature(name);
+                rc.setReason(reason);
+                battleEvent.addCreature(rc);
+            }
+            else
+            {
+                // no battle events where to add creature
+            }
+            
+            // create also the separate acquire event:
+            if (reason.equals(Constants.reasonAcquire))
+            {
+                int newHeight = getLegionInfo(markerId).getHeight();
+                RevealedCreature rc = new RevealedCreature(name);
+                rc.setWasAcquired(true);
+                ArrayList rcList = new ArrayList(1);
+                rcList.add(rc);
+                storeRevealEvent(RevealEvent.eventAcquire,
+                        markerId, newHeight, rcList, null, 0);
+                
+                if (attackerEventLegion == null || defenderEventLegion == null)
+                {
+                    // This should now never happen any more:
+                    Log.error("no attacker nor defender legion event for acquiring!!" +
+                            " turn" + turnNumber + " player " + activePlayerName +
+                            " phase " + phase + " markerid " + markerId + " marker owner" + 
+                            getLegionInfo(markerId).getPlayerName() + "last engagement were" + 
+                            " attacker " + lastAttackerEventLegion.getMarkerId() +
+                            " defender " + lastDefenderEventLegion.getMarkerId()
+                        );
+                    System.exit(1);
+                }
+            }
+            else if (reason.equals(Constants.reasonUndoSummon))
+            {
+                // addCreature adds summoned creature back to donor:
+                eventViewer.undoEvent(RevealEvent.eventSummon, markerId, null, 
+                        turnNumber, name);
+                if (!attackerEventLegion.undoSummon(turnNumber, name))
+                {
+                    // this should never happen...
+                    Log.warn("Un-Summon "+ name + " out of attacker event failed!");
+                }
+            }
+        }
     }
 
-    public void removeCreature(String markerId, String name)
+    public void removeCreature(String markerId, String name, String reason)
     {
         LegionInfo info = getLegionInfo(markerId);
+
+        if (eventViewer != null)
+        {
+            removeCreatureEventHandling(markerId, name, reason);
+        }
+        
         String hexLabel = info.getHexLabel();
         int height = info.getHeight();
         info.removeCreature(name);
@@ -1373,18 +1548,47 @@ public final class Client implements IClient, IOracle, IOptions
         }
     }
 
+    public void removeCreatureEventHandling(String markerId, String name, 
+            String reason)
+    {
+        if (attackerMarkerId != null && attackerEventLegion != null &&
+                attackerMarkerId.equals(markerId) )
+        {
+            Log.debug("During battle, remove creature " + name + 
+                " from attacker legion " + markerId);
+                    
+            attackerEventLegion.setCreatureDied(name, 
+                getLegionInfo(attackerMarkerId).getHeight());
+        }
+                
+        else if (defenderMarkerId != null && defenderEventLegion != null &&
+                 defenderMarkerId.equals(markerId) )
+        {
+            Log.debug("During battle, remove creature " + name + 
+                 " from defender legion " + markerId);
+            defenderEventLegion.setCreatureDied(name, 
+                 getLegionInfo(defenderMarkerId).getHeight());
+        }
+    }
+   
     /** Reveal creatures in this legion, some of which already may be known. 
      *  - this "reveal" is related to data coming from server being  
      *  revealed to the split prediction 
      * */
-    public void revealCreatures(String markerId, final List names)
+
+    public void revealCreatures(String markerId, final List names, 
+            String reason)
     {
+        // looks as if right now we don't need the reason here in this
+        // method - recruit info is handled by separate didRecruit...
+
         String pName = getPlayerNameByMarkerId(markerId);
         if (predictSplits == null || getPredictSplits(pName) == null)
         {
             initPredictSplits(pName, markerId, names);
             createLegionInfo(markerId);
         }
+
         try
         {
             getLegionInfo(markerId).revealCreatures(names);
@@ -1392,7 +1596,8 @@ public final class Client implements IClient, IOracle, IOptions
         catch (NullPointerException e)
         {
             Log.warn("NPE in revealCreatures, markerId="+markerId+
-                     ", names="+names.toString());
+                     ", reason="+reason+ ", names="+names.toString());
+            Thread.dumpStack();
             // in stresstest uncomment those, to get logs and autosaves
             // copied for troubleshooting...
             // System.out.println("NPE in revealCreatures, markerId="+
@@ -1401,12 +1606,22 @@ public final class Client implements IClient, IOracle, IOptions
         }
     }
 
-    /** additionally remember the images list for later, the engagement report
-     * */
+    
+    // For EventViewer:
+    RevealEvent attackerEventLegion = null;
+    RevealEvent defenderEventLegion = null;
+    
+    RevealEvent lastAttackerEventLegion = null;
+    RevealEvent lastDefenderEventLegion = null;
+
+    
+    /* pass revealed info to the SplitPrediction, and
+     * additionally remember the images list for later, the engagement report
+     */
     public void revealEngagedCreatures(
-        String markerId, final List names, boolean isAttacker)
+        String markerId, final List names, boolean isAttacker, String reason)
     {
-        revealCreatures(markerId, names);
+        revealCreatures(markerId, names, reason);
         // in engagment we need to update the remembered list, too.
         if (isAttacker)
         {
@@ -1424,7 +1639,50 @@ public final class Client implements IClient, IOracle, IOptions
             _tellEngagementResults_defenderLegionCertainities =
                 getLegionCreatureCertainties(markerId);
         }
+        
+        if (eventViewer != null)
+        {
+            revealEngagedCreaturesEventHandling(
+                    markerId, names, isAttacker, reason);
+        }
+        
+    }
+    
+    public void revealEngagedCreaturesEventHandling(String markerId, 
+           final List names, boolean isAttacker, String reason)
+    {
+        // can't co anything if (old) server or history do not provide 
+        // us the reason
+        if (reason == null || reason.equals("<Unknown>"))
+        {
+            return;
+        }
+        
+        if (reason.equals(Constants.reasonBattleStarts) ||
+                reason.equals(Constants.reasonFled) ||
+                reason.equals(Constants.reasonConcession) ) 
+        {                        
+            RevealEvent event;
+            event = isAttacker ? attackerEventLegion : defenderEventLegion;
+         
+            ArrayList rcNames = new ArrayList();
+            Iterator it = names.iterator();
+            while (it.hasNext())
+            {
+                String name = (String) it.next();
+                RevealedCreature rc = new RevealedCreature(name);
+                rcNames.add(rc);
+            }
 
+            event.updateKnownCreatures(rcNames);
+            event.setEventInfo(reason);
+        }
+        else 
+        {
+            // perhaps load from history?
+            Log.error("revealEngagedCreatures, unknown reason " + reason);
+        }
+        
     }
 
     List getBattleChits()
@@ -1487,11 +1745,23 @@ public final class Client implements IClient, IOracle, IOptions
                 String name = chit.getId();
                 if (chit.isInverted())
                 {
-                    getLegionInfo(defenderMarkerId).removeCreature(name);
+                    LegionInfo info = getLegionInfo(defenderMarkerId);
+                    info.removeCreature(name);
+                    if (board != null)
+                    {
+                        defenderEventLegion.setCreatureDied(name, 
+                            info.getHeight());
+                    }
                 }
                 else
                 {
-                    getLegionInfo(attackerMarkerId).removeCreature(name);
+                    LegionInfo info = getLegionInfo(attackerMarkerId);
+                    info.removeCreature(name);
+                    if (board != null)
+                    {
+                        attackerEventLegion.setCreatureDied(name, 
+                             info.getHeight());
+                    }
                 }
             }
         }
@@ -2491,9 +2761,9 @@ public final class Client implements IClient, IOracle, IOptions
                 rc.setDidRecruit(true);
                 rcList.add(rc);
             }
-            revealCreatures(markerId, recruiters);
+            revealCreatures(markerId, recruiters, Constants.reasonRecruiter);
         }
-        addCreature(markerId, recruitName);
+        addCreature(markerId, recruitName, Constants.reasonRecruited);
 
         LegionInfo info = getLegionInfo(markerId);
         info.setRecruited(true);
@@ -2518,7 +2788,7 @@ public final class Client implements IClient, IOracle, IOptions
     public void undidRecruit(String markerId, String recruitName)
     {
         String hexLabel = getHexForLegion(markerId);
-        removeCreature(markerId, recruitName);
+        removeCreature(markerId, recruitName, Constants.reasonUndidRecruit);
         getLegionInfo(markerId).setRecruited(false);
         if (eventViewer != null)
         {
@@ -3462,7 +3732,9 @@ public final class Client implements IClient, IOracle, IOptions
         info.setMoved(true);
         info.setEntrySide(BattleMap.entrySideNum(entrySide));
 
-        if (teleport)
+        // old version server does not send the teleportingLord,
+        // socketCLientThread sets then it to null.
+        if (teleport && teleportingLord != null)
         {
             getLegionInfo(markerId).setTeleported(true);
             RevealedCreature rc = new RevealedCreature(teleportingLord);
@@ -3493,6 +3765,7 @@ public final class Client implements IClient, IOracle, IOptions
         removeRecruitChit(currentHexLabel);
         getLegionInfo(markerId).setHexLabel(currentHexLabel);
         getLegionInfo(markerId).setMoved(false);
+        boolean didTeleport = getLegionInfo(markerId).hasTeleported();
         getLegionInfo(markerId).setTeleported(false);
         if (board != null)
         {
@@ -3502,6 +3775,12 @@ public final class Client implements IClient, IOracle, IOptions
             if ( isUndoStackEmpty() || splitLegionHasForcedMove )
             {
                 board.disableBottomBarDoneButton();
+            }
+            
+            if (didTeleport && eventViewer != null)
+            {
+                eventViewer.undoEvent(RevealEvent.eventTeleport, 
+                    markerId, null, turnNumber, null);
             }
         }
     }

@@ -417,7 +417,8 @@ public final class Game
         {
             Player player = (Player)it.next();
             placeInitialLegion(player, player.getFirstMarker());
-            server.allRevealLegion(player.getLegion(0));
+            server.allRevealLegion(player.getLegion(0), 
+                Constants.reasonInitial);
             server.allUpdatePlayerInfo();
         }
 
@@ -737,7 +738,7 @@ public final class Game
         }
         if (gameOver)
         {
-            server.allFullyUpdateAllLegionContents();
+            server.allFullyUpdateAllLegionContents(Constants.reasonGameOver);
         }
     }
 
@@ -2242,9 +2243,9 @@ public final class Game
             legion.addCreature(angel, false);
 
             server.allTellRemoveCreature(donor.getMarkerId(), angel.getName(),
-                    true);
+                    true, Constants.reasonSummon);
             server.allTellAddCreature(legion.getMarkerId(), angel.getName(),
-                    true);
+                    true, Constants.reasonSummon);
 
             server.allTellDidSummon(legion.getMarkerId(), donor.getMarkerId(), angel.getName());
             
@@ -2284,7 +2285,7 @@ public final class Game
             winner = getFirstLegion(hexLabel);
 
             // Make all creatures in the victorious legion visible.
-            server.allRevealLegion(winner);
+            server.allRevealLegion(winner, Constants.reasonWinner);
             // Remove battle info from winning legion and its creatures.
             winner.clearBattleInfo();
 
@@ -2310,7 +2311,7 @@ public final class Game
         battleInProgress = false;
 
         setEngagementResult(
-            "fight",
+            Constants.erMethodFight,
             winner == null ? null : winner.getMarkerId(),
             points,
             turnDone);
@@ -2469,13 +2470,15 @@ public final class Game
         if (viewModeOptNum == Options.viewableAllNum ||
             viewModeOptNum == Options.viewableOwnNum )
         {
-            server.allRevealLegion(legion);
-            server.allRevealLegion(newLegion);
+            server.allRevealLegion(legion, Constants.reasonSplit);
+            server.allRevealLegion(newLegion, Constants.reasonSplit);
         }
         else
         {
-            server.oneRevealLegion(legion, player.getName());
-            server.oneRevealLegion(newLegion, player.getName());
+            server.oneRevealLegion(legion, player.getName(), 
+                Constants.reasonSplit);
+            server.oneRevealLegion(newLegion, player.getName(), 
+                Constants.reasonSplit);
         }
         return true;
     }
@@ -2537,7 +2540,8 @@ public final class Game
             }
             List creatureNames = new ArrayList();
             creatureNames.add(teleportingLord);
-            server.allRevealCreatures(legion, creatureNames);
+            server.allRevealCreatures(legion, creatureNames, 
+                Constants.reasonTeleport);
         }
         legion.moveToHex(hex, entrySide, teleport, teleportingLord);
         return true;
@@ -2559,8 +2563,10 @@ public final class Game
             attacker.sortCritters();
             defender.sortCritters();
 
-            server.oneRevealLegion(attacker, defender.getPlayerName());
-            server.oneRevealLegion(defender, attacker.getPlayerName());
+            server.oneRevealLegion(attacker, defender.getPlayerName(), 
+                Constants.reasonEngaged);
+            server.oneRevealLegion(defender, attacker.getPlayerName(), 
+                Constants.reasonEngaged);
 
             if (defender.canFlee())
             {
@@ -2722,8 +2728,10 @@ public final class Game
             battleInProgress = true;
 
             // Reveal both legions to all players.
-            server.allRevealEngagedLegion(attacker, true);
-            server.allRevealEngagedLegion(defender, false);
+            server.allRevealEngagedLegion(attacker, true, 
+                Constants.reasonBattleStarts);
+            server.allRevealEngagedLegion(defender, false, 
+                Constants.reasonBattleStarts);
 
             battle = new Battle(this, attacker.getMarkerId(),
                     defender.getMarkerId(), Constants.DEFENDER, hexLabel,
@@ -2760,9 +2768,10 @@ public final class Game
         // removed.
         Player losingPlayer = loser.getPlayer();
 
+        String reason = fled ? 
+             Constants.reasonFled : Constants.reasonConcession;
         server.allRevealEngagedLegion(
-            loser,
-            losingPlayer.equals(getActivePlayer()));
+            loser, losingPlayer.equals(getActivePlayer()), reason);
 
         // server.allRemoveLegion(loser.getMarkerId());
 
@@ -2787,10 +2796,7 @@ public final class Game
         // defender flees or the attacker concedes before entering
         // the battle.
         setEngagementResult(
-            "flee",
-            winner.getMarkerId(),
-            points,
-            0);
+            Constants.erMethodFlee, winner.getMarkerId(), points, 0);
         checkEngagementDone();
     }
 
@@ -2864,12 +2870,14 @@ public final class Game
                 Creature creature = Creature.getCreatureByName(creatureName);
                 winner.removeCreature(creature, true, true);
                 server.allTellRemoveCreature(winner.getMarkerId(),
-                        creatureName, true);
+                        creatureName, true, Constants.reasonNegotiated);
             }
             Log.event(log.toString());
 
-            server.oneRevealLegion(winner, attacker.getPlayerName());
-            server.oneRevealLegion(winner, defender.getPlayerName());
+            server.oneRevealLegion(winner, attacker.getPlayerName(), 
+                Constants.reasonNegotiated);
+            server.oneRevealLegion(winner, defender.getPlayerName(), 
+                Constants.reasonNegotiated);
 
             points = loser.getPointValue();
 
@@ -2914,7 +2922,7 @@ public final class Game
         }
 
         setEngagementResult(
-            "negotiate",
+            Constants.erMethodNegotiate,
             winner == null ? null : winner.getMarkerId(),
             points,
             0);

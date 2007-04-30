@@ -556,9 +556,9 @@ public final class Player implements Comparable
             Log.error("Player.undoRecruit: legion for markerId " + markerId + " is null");
             return;
         }
-        // This check for null was workaround for the case if someone did undo
-        // twice it would give here a NPE. Now properly fixed in Player.java,
-        // still leaving this here in place ... just in case :)
+
+        // This is now permanently fixed in Player.java, so this should
+        // never happen again. Still, leaving this in place, just to be sure...
         String recruitName = legion.getRecruitName();
         if ( recruitName == null )
         {

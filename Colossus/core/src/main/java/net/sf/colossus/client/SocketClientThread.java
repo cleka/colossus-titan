@@ -169,13 +169,17 @@ final class SocketClientThread extends Thread implements IServer
         {
             String markerId = (String)args.remove(0);
             String name = (String)args.remove(0);
-            client.addCreature(markerId, name);
+            String reason = args.isEmpty() ? new String("<Unknown>") : 
+                (String)args.remove(0);
+            client.addCreature(markerId, name, reason);
         }
         else if (method.equals(Constants.removeCreature))
         {
             String markerId = (String)args.remove(0);
             String name = (String)args.remove(0);
-            client.removeCreature(markerId, name);
+            String reason = args.isEmpty() ? new String("<Unknown>") : 
+                (String)args.remove(0);
+            client.removeCreature(markerId, name, reason);
         }
         else if (method.equals(Constants.revealCreatures))
         {
@@ -190,7 +194,9 @@ final class SocketClientThread extends Thread implements IServer
             {
                 names.remove(0);
             }
-            client.revealCreatures(markerId, names);
+            String reason = args.isEmpty() ? new String("<Unknown>") : 
+                 (String)args.remove(0);
+            client.revealCreatures(markerId, names, reason);
         }
         else if (method.equals(Constants.revealEngagedCreatures))
         {
@@ -198,7 +204,9 @@ final class SocketClientThread extends Thread implements IServer
             boolean isAttacker =
                 Boolean.valueOf((String)args.remove(0)).booleanValue();
             List names = Split.split(Glob.sep, (String)args.remove(0));
-            client.revealEngagedCreatures(markerId, names, isAttacker);
+            String reason = args.isEmpty() ? new String("<Unknown>") : 
+                 (String)args.remove(0);
+            client.revealEngagedCreatures(markerId, names, isAttacker, reason);
         }
         else if (method.equals(Constants.removeDeadBattleChits))
         {
@@ -415,8 +423,16 @@ final class SocketClientThread extends Thread implements IServer
             String entrySide = (String)args.remove(0);
             boolean teleport =
                     Boolean.valueOf((String)args.remove(0)).booleanValue();
-            String teleportingLord = (String)args.remove(0);
-            if (teleportingLord.equals("null")) teleportingLord = null;
+            // servers from older versions might not send this arg
+            String teleportingLord = null;
+            if (!args.isEmpty())
+            {
+                teleportingLord = (String)args.remove(0);
+                if (teleportingLord.equals("null")) 
+                { 
+                    teleportingLord = null;
+                }
+            }
             boolean splitLegionHasForcedMove = false;
             // servers from older versions might not send this arg
             if ( ! args.isEmpty() )

@@ -818,9 +818,11 @@ public final class Battle
                 {
                     donor.addCreature(critter.getCreature(), false);
                     server.allTellAddCreature(donor.getMarkerId(),
-                            critter.getName(), true);
+                        critter.getName(), true, Constants.reasonUndoSummon);
                     // This summon doesn't count; the player can
                     // summon again later this turn.
+                    Log.event("undosummon critter " + critter.getName() + 
+                          " back to marker " + donor.getMarkerId() + "");
                     player.setSummoned(false);
                 }
                 else

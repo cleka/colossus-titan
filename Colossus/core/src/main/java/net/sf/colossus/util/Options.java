@@ -59,9 +59,10 @@ public final class Options implements IOptions
     public static final int viewableAllNum  = 4;
     
     public static final String eventExpiring = "EventExpire";
+    public static final String eventExpiringNever = "never";
     public static final String[] eventExpiringChoices =
     {
-        "1", "2", "5", "10"
+        "1", "2", "5", "10", "50", eventExpiringNever
     };
     
     

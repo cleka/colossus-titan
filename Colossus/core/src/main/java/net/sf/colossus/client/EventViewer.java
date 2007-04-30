@@ -7,10 +7,7 @@ import java.awt.Container;
 import java.awt.GridLayout;
 import java.awt.Point;
 
-// import java.awt.event.ActionEvent;
-// import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-// import java.awt.event.ActionListener;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
@@ -23,15 +20,13 @@ import java.util.Iterator;
 import java.util.Collections;
 
 import javax.swing.*;
-// import javax.swing.JScrollPane;
-// import javax.swing.JTextArea;
 import javax.swing.BoxLayout;
 import javax.swing.border.TitledBorder;
 
 
 import net.sf.colossus.util.KDialog;
 import net.sf.colossus.util.Options;
-
+import net.sf.colossus.util.Log;
 
 /**
  * Event Revealing dialog.
@@ -39,7 +34,30 @@ import net.sf.colossus.util.Options;
  * It collects all revealed events and displays all or
  * only the recent ones of them.
  *
- *
+ * @TODO:
+ * @IMPORTANT
+ * - Check compatibility with previous version
+ * - History: make history events carry the "reason" tag so that reloaded
+ *    games have same event view as in running game     
+ *  "TODO: investigate, why does server gives us different turn numbers
+ *         in those Split/undoSplit events?" (=> see undoEvent)
+ * @Nice to have:
+ * - Player dead events
+ * - Legion eliminated (when player dead) events
+ * - Game over, who wins event :)
+ * - scale change: own setting, relative to main board scale or absolut?
+ *       react more quickly when scale changed? 
+ * - checkbox "don't show Dead creatures"
+ * - RevealedCreature could cache the panels
+ * - combined "battle event" - one bordered panel, containing
+ *    all relevant events ( [teleport?], summon, acquire, won, lost)
+ *     plus text info what now in Engagement result window 
+ * - interface for inspector & Co: for viewMode return info revealed during
+ *     one last turn
+ * - Engagement won (fled...), instead of "not revealed" show contents 
+ *     depending on what the viewMode says
+ * - "SolidMarker" instead of Titan for mulligan
+ * 
  * @version $Id: EventViewer.java 2591 2006-01-01 23:41:26Z cleka $
  * @author Clemens Katzer
  */
@@ -47,7 +65,6 @@ import net.sf.colossus.util.Options;
 final class EventViewer extends KDialog implements WindowListener,
 ItemListener, ActionListener
 {
-
     private IOptions options;
     
     private boolean visible;
@@ -59,6 +76,7 @@ ItemListener, ActionListener
     
     // how long back are they kept (from global settings)
     private int expireTurns;
+    private String maxString;
     
     private SaveWindow saveWindow;
 
@@ -78,14 +96,15 @@ ItemListener, ActionListener
     public static final String evfSummon = "Summon events";
     public static final String evfTeleport = "Teleport events";
     public static final String evfAcquire = "Acquire events";
-    public static final String evfWinner = "Battle won events";
-    public static final String evfEliminated = "Battle lost events";
+    public static final String evfWon = "Engagement won events";
+    public static final String evfLoser = "Engagement lost events";
     public static final String evfMulligan = "Mulligans";
     
     public static final String evfTurnChange = "Turn change info";
     public static final String evfPlayerChange = "Player change info";
 
     public static final String evAutoScroll = "Auto-scroll to end";
+    public static final String evHideUndone = "Hide undone events";
     public static final String evMaxTurns = "Maximum number of turns to display";
     
     // boolean flags for them as local flags for quick access:
@@ -93,6 +112,7 @@ ItemListener, ActionListener
     private boolean[] showEventType;
     
     private boolean autoScroll;
+    private boolean hideUndoneEvents;
     private JComboBox maxTurnsDisplayExpiringBox;
     
     // how many back are currently displayed
@@ -123,14 +143,15 @@ ItemListener, ActionListener
         showEventType[RevealEvent.eventTeleport] = getBoolOption(evfTeleport, true);
         showEventType[RevealEvent.eventSummon] = getBoolOption(evfSummon, true);
         showEventType[RevealEvent.eventAcquire] = getBoolOption(evfAcquire, true);
-        showEventType[RevealEvent.eventWinner] = getBoolOption(evfWinner, false);
-        showEventType[RevealEvent.eventEliminated] = getBoolOption(evfEliminated, false);
+        showEventType[RevealEvent.eventWon] = getBoolOption(evfWon, true);
+        showEventType[RevealEvent.eventLost] = getBoolOption(evfLoser, true);
 
         showEventType[RevealEvent.eventMulligan] = getBoolOption(evfMulligan, true);
         showEventType[RevealEvent.eventTurnChange] = getBoolOption(evfTurnChange, true);
         showEventType[RevealEvent.eventPlayerChange] = getBoolOption(evfPlayerChange, false);
         
         autoScroll = getBoolOption(evAutoScroll, true);
+        hideUndoneEvents = getBoolOption(evHideUndone, false);
         
         setupGUI();
         
@@ -156,15 +177,31 @@ ItemListener, ActionListener
         String expOption = options.getStringOption(Options.eventExpiring);
         if (expOption != null)
         {
-            int exp = Integer.parseInt(expOption);
-            if (exp > 0 && exp < 99)
+            if ( expOption.equals(Options.eventExpiringNever))
             {
-                turnsToKeep = exp;
+                turnsToKeep = -1;
             }
             else
             {
-                System.out.println("Invalid value "+exp +" from option "+
-                                Options.eventExpiring);
+                int exp;
+                try 
+                {
+                    exp = Integer.parseInt(expOption);
+                    if (exp > 0 && exp < 9999)
+                    {
+                        turnsToKeep = exp;
+                    }
+                    else
+                    {
+                        Log.error("Invalid value "+exp +" from option '"+
+                                Options.eventExpiring+"' - using default " + turnsToKeep);
+                    }
+                }
+                catch(NumberFormatException e)
+                {
+                    Log.error("Invalid value "+ expOption +" from option '"+
+                            Options.eventExpiring + "' - using default " + turnsToKeep);
+                }
             }
         }
         this.expireTurns = turnsToKeep;
@@ -242,10 +279,11 @@ ItemListener, ActionListener
         addCheckbox(evfSplit, checkboxPane);
         addCheckbox(evfSummon, checkboxPane);
         addCheckbox(evfTeleport, checkboxPane);
-        // addCheckbox(evfAcquire, checkboxPane);
-        addCheckbox(evfWinner, checkboxPane);
-        addCheckbox(evfEliminated, checkboxPane);
-        checkboxPane.add(new JLabel("NOTE: Teleport events remain in list even if undone."));
+        addCheckbox(evfAcquire, checkboxPane);
+        addCheckbox(evfWon, checkboxPane);
+        addCheckbox(evfLoser, checkboxPane);
+        checkboxPane.add(Box.createRigidArea(new Dimension(0,5)));
+        addCheckbox(evHideUndone, checkboxPane);
         checkboxPane.add(Box.createRigidArea(new Dimension(0,5)));
         
         addCheckbox(evfMulligan, checkboxPane);
@@ -265,22 +303,37 @@ ItemListener, ActionListener
         settingsPane.add(Box.createRigidArea(new Dimension(0,5)));
        
         addCheckbox(evAutoScroll, miscPane);
-        miscPane.add(new JLabel(""));
+        miscPane.add(Box.createRigidArea(new Dimension(0,5)));
+
         
         // selection for how many turns to display the data
         // (must be less or equal the expireTurns value set in getPlayers)
-        String eventExpiringVal = options.getStringOption(Options.eventExpiring);
-        if ( eventExpiringVal == null )
-        {
-            eventExpiringVal = "1"; 
-        }
-        int maxVal = Integer.parseInt(eventExpiringVal);
+        
+        int maxVal = this.expireTurns == -1 ? 1000 : this.expireTurns;
 
         ArrayList alChoices = new ArrayList();
         int i;
         for (i=1 ; i <= maxVal ; i++)
         {
-            alChoices.add(new Integer(i).toString());
+            // 1, 2, 3, 4, 5, 
+            if (i<=5 || i==maxVal)
+            {
+                alChoices.add(new Integer(i).toString());
+            }
+            // 10, 50, 100, 500, 1000 if applicable.
+            else if (i==10 || i==50 || i==100 || i==500 || i==1000)
+            {
+                alChoices.add(new Integer(i).toString());
+            }
+        }
+        if (this.expireTurns == -1)
+        {
+            alChoices.add("all");
+        }
+        else
+        {
+            maxString = "max (="+this.expireTurns+")";
+            alChoices.add(maxString);
         }
                 
         Object[] Choices = alChoices.toArray(); 
@@ -289,15 +342,43 @@ ItemListener, ActionListener
         // general setting.
         String maxTurnsOptString = 
             options.getStringOption(evMaxTurns);
-        if ( maxTurnsOptString == null )
+        if (maxTurnsOptString == null )
         {
             maxTurnsOptString = "3";
         }
-        int maxTurnsOpt = Integer.parseInt(maxTurnsOptString);
-        if (maxTurnsOpt > maxVal)
+        
+        if (maxTurnsOptString.equals("all") || maxTurnsOptString.startsWith("max"))
         {
-            maxTurnsOpt = maxVal;
-            maxTurnsOptString = new Integer(maxTurnsOpt).toString();
+            if (this.expireTurns == -1)
+            {
+                maxTurns = -1;
+                maxTurnsOptString = "all";
+            }
+            else
+            {
+                maxTurns = this.expireTurns;
+                maxTurnsOptString = maxString;
+            }
+        }
+        else
+        {
+            int maxTurnsOpt = 1;
+            try
+            {
+                maxTurnsOpt = Integer.parseInt(maxTurnsOptString);
+                if (maxTurnsOpt > maxVal)
+                {
+                    maxTurnsOpt = maxVal;
+                    maxTurnsOptString = new Integer(maxTurnsOpt).toString();
+                }
+            }
+            catch(NumberFormatException e)
+            {
+                Log.error("Illegal value '"+maxTurnsOptString + "' for option '" + 
+                        evMaxTurns + "' - using default 1");
+                maxTurnsOptString = "1";
+                maxTurnsOpt = 1;
+            }
         }
 
         maxTurnsDisplayExpiringBox = new JComboBox(Choices);
@@ -321,23 +402,30 @@ ItemListener, ActionListener
     {
         Container pane = eventPane;
     
-        // System.out.println("Adding event panel for event " + e.getEventTypeText());
+        Log.debug("Adding event panel for event " + e.getEventTypeText());
             
         int oldEventTurn = e.getTurn();
         int oldPlayerNr  = e.getPlayerNr();
         int type = e.getEventType();
         boolean display = true;
         
-        if (turnNr-oldEventTurn > maxTurns-(playerNr>=oldPlayerNr?1:0))
+        if ( maxTurns != -1 &&
+                turnNr-oldEventTurn > maxTurns-(playerNr>=oldPlayerNr?1:0))
         {
-//            System.out.println("Not displaying event "+e.getEventTypeText()+" "+e.getMarkerId() +
+//            Log.debug("Not displaying event "+e.getEventTypeText()+" "+e.getMarkerId() +
 //            " - older than max turns value!");
             display = false;
         }
         else if ( !showEventType[type] )
         {
-//          System.out.println("Not displaying event "+e.getEventTypeText()+" "+e.getMarkerId() +
+//          Log.debug("Not displaying event "+e.getEventTypeText()+" "+e.getMarkerId() +
 //          " - type " + type + " false.");
+            display = false;
+        }
+        else if ( hideUndoneEvents && e.wasUndone())
+        {
+          Log.debug("Not displaying event "+e.getEventTypeText()+" "+e.getMarkerId() +
+          " - was undone and hideUndoneEvents is true.");
             display = false;
         }
             
@@ -351,7 +439,7 @@ ItemListener, ActionListener
             }
             else
             {
-                System.out.println("WARNING: EventViewer.addEventToEventPane: event.toPanel returned null!!");
+                Log.warn("EventViewer.addEventToEventPane: event.toPanel returned null!");
             }
         }
     }
@@ -425,7 +513,10 @@ ItemListener, ActionListener
         
         this.turnNr = turnNr;
         this.playerNr = playerNr;
-        purgeOldEvents();
+        if (this.expireTurns != -1)
+        {
+            purgeOldEvents();
+        }
         if (this.visible)
         {
             updatePanels();
@@ -435,24 +526,14 @@ ItemListener, ActionListener
     
 
     /*
-     * User undid one action. 
-     * So far, this deletes that event from the event list and redisplays all. 
-     * 
-     * Better (long term plan/future improvement idea): 
-     *   mark as "undone"; if viewMode/Inspector asks for "what do we know" 
-     *   the information revealed by the undone event is 
-     *   - even if undone - nevertheless "known to the public". As in real life :)
-     * Until then, we simply remove e.g. Split and Recruit events.
-     * They are removed, because they have side effect to their legion content.
-     * Teleport event is not removed (not "necessary", because no side effects, 
-     * and somewhat difficult to detect in client)
+     * User undid one action. Event is just marked as undone, but not deleted
+     * - information once revealed is known to the public, as in real life :) 
      */
-    public void undoEvent(int type, String parentId, String childId, int turn, String recruitName)
+    public void undoEvent(int type, String parentId, String childId, int turn, String creatureName)
     {
-//        System.out.println("Undoing event "+type+ ": splitoff "+childId+
+//        Log.debug("Undoing event "+type+ ": splitoff "+childId+
 //                ", parent "+parentId+" turn "+turn);
 
-        
         int found = 0;
         if (type == RevealEvent.eventSplit)
         {
@@ -464,12 +545,13 @@ ItemListener, ActionListener
                     RevealEvent e = (RevealEvent)it.next();
                     if (e.getEventType() == type && e.getTurn() == turn &&
                             e.getMarkerId().equals(parentId) &&
-                            e.getMarkerId2().equals(childId) )
+                            e.getMarkerId2().equals(childId) && 
+                            ! e.wasUndone() )
 
                     {
-                        // System.out.println("Split event to be undone found.");
+                        // Log.debug("Split event to be undone found.");
                         found++;
-                        it.remove();
+                        e.setUndone(true);
                     }
                 }
             }
@@ -490,12 +572,13 @@ ItemListener, ActionListener
                         RevealEvent e = (RevealEvent)it2.next();
                         if (e.getEventType() == type && e.getTurn()+1 == turn &&
                                 e.getMarkerId().equals(parentId) &&
-                                e.getMarkerId2().equals(childId)
-                                )
+                                e.getMarkerId2().equals(childId) &&
+                                ! e.wasUndone() )
                         {
-                            // System.out.println("NOTE: Split event to be undone found only from previous turn!!");
+                            // Log.debug("NOTE: Split event to be undone found only " + 
+                            //           "from previous turn!!");
                             found++;
-                            it2.remove();
+                            e.setUndone(true);
                         }
                     }
                 }
@@ -510,30 +593,70 @@ ItemListener, ActionListener
                 {
                     RevealEvent e = (RevealEvent)it.next();
                     if (e.getEventType() == type && e.getTurn() == turn &&
-                            e.getMarkerId().equals(parentId) )
+                            e.getMarkerId().equals(parentId) &&
+                            ! e.wasUndone())
                     {
-                        // System.out.println("Recruit event to be undone found.");
+                        // Log.debug("Recruit event to be undone found.");
                         found++;
-                        it.remove();
+                        e.setUndone(true);
                     }
                 }
             }
         }
+        else if (type == RevealEvent.eventSummon)
+        {
+            synchronized(syncdEventList)
+            {
+                Iterator it = syncdEventList.iterator();
+                while (it.hasNext())
+                {
+                    RevealEvent e = (RevealEvent)it.next();
+                    if (e.getEventType() == type && e.getTurn() == turn &&
+                            e.getMarkerId().equals(parentId) && 
+                            ! e.wasUndone())
+                    {
+                        Log.debug("Recruit event to be undone found.");
+                        found++;
+                        e.setUndone(true);
+                    }
+                }
+            }
+        }
+        else if (type == RevealEvent.eventTeleport)
+        {
+            synchronized(syncdEventList)
+            {
+                Iterator it = syncdEventList.iterator();
+                while (it.hasNext())
+                {
+                    RevealEvent e = (RevealEvent)it.next();
+                    if (e.getEventType() == type && e.getTurn() == turn &&
+                            e.getMarkerId().equals(parentId) && 
+                            ! e.wasUndone())
+                    {
+                        // Log.debug("Teleport event to be undone found.");
+                        found++;
+                        e.setUndone(true);
+                    }
+                }
+            }
+        }
+
         else
         {
-            System.out.println("WARNING: undo event for unknown type "+type+" attempted.");
+            Log.warn("undo event for unknown type "+type+" attempted.");
             return;
         }
        
         if (found == 0)
         {
-            System.out.println("WARNING: '"+type+"' EVENT to undo ("+
+            Log.error("Requested '"+type+"' EVENT to undo ("+
                     parentId+", "+childId+", turn "+turn+") not found");
             System.exit(1);
         }
         if (found > 1)
         {
-            System.out.println("ERROR: '"+type+"' EVENT found " + found + " times!!");
+            Log.error("Requested: '"+type+"' EVENT found " + found+" times!");
             System.exit(1);
         }
         if (this.visible)
@@ -547,8 +670,13 @@ ItemListener, ActionListener
      */
     public void purgeOldEvents()
     {
-//        System.out.println("Purging events, if necessary...");
+        // Log.debug("Purging events, if necessary...");
 
+        if (this.expireTurns == -1)
+        {
+            Log.warn("expireturns -1 - no purgign needed.");
+            return;
+        }
         int purged = 0;
 
         synchronized(syncdEventList)
@@ -561,13 +689,8 @@ ItemListener, ActionListener
                 int oldEventTurn = e.getTurn();
                 int oldPlayerNr  = e.getPlayerNr();
             
-//            System.out.println("turn "+turnNr+ "oldTurn "+oldEventTurn+" plNum" + 
-//                    playerNr + " oldPlNum "+oldPlayerNr);
                 if (turnNr-oldEventTurn > expireTurns-(playerNr>=oldPlayerNr?1:0))
                 {
-//                int oldEventPlayer = e.getPlayerNr();
-//                System.out.println("Purging: newest event turn "+turnNr+", player" + playerNr +
-//                        " - purging old event (turn="+oldEventTurn+", player " + oldEventPlayer + ")");
                     it.remove();
                     purged++;
                 }
@@ -575,7 +698,7 @@ ItemListener, ActionListener
         }
         if (purged > 0)
         {
-            // System.out.println("Purged " + purged + " old events.");
+            // Log.debug("Purged " + purged + " old events.");
             getContentPane().validate();
         }
     }
@@ -627,10 +750,16 @@ ItemListener, ActionListener
         {
             String value = (String) maxTurnsDisplayExpiringBox.getSelectedItem();
             options.setOption(evMaxTurns, value);
-            maxTurns = Integer.parseInt(value);
+            if (value.equals("all") || value.equals(maxString))
+            {
+                maxTurns = -1;
+            }
+            else
+            {
+                maxTurns = Integer.parseInt(value);
+            }
             updatePanels();
         }
-
     }
                 
     public void itemStateChanged(ItemEvent e)
@@ -645,8 +774,12 @@ ItemListener, ActionListener
         {
             this.autoScroll = selected;
         }
+        else if (text.equals(evHideUndone))
+        {
+            this.hideUndoneEvents = selected;
+        }
 
-        if (text.equals(evfRecruit))
+        else if (text.equals(evfRecruit))
         {
             this.showEventType[RevealEvent.eventRecruit] = selected;
         }
@@ -662,13 +795,13 @@ ItemListener, ActionListener
         {
             this.showEventType[RevealEvent.eventSummon] = selected;
         }
-        else if (text.equals(evfWinner))
+        else if (text.equals(evfWon))
         {
-            this.showEventType[RevealEvent.eventWinner] = selected;
+            this.showEventType[RevealEvent.eventWon] = selected;
         }
-        else if (text.equals(evfEliminated))
+        else if (text.equals(evfLoser))
         {
-            this.showEventType[RevealEvent.eventEliminated] = selected;
+            this.showEventType[RevealEvent.eventLost] = selected;
         }
         else if (text.equals(evfAcquire))
         {

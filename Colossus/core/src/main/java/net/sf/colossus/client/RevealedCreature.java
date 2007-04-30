@@ -2,6 +2,7 @@ package net.sf.colossus.client;
 
 
 import net.sf.colossus.util.Log;
+import net.sf.colossus.server.Constants;
 
 
 /*
@@ -10,6 +11,8 @@ import net.sf.colossus.util.Log;
 public class RevealedCreature
 {
     private String creatureName;
+    private String titanBaseName = null;
+    private boolean dead = false;
     
     // possible reasons why this creature was revealed:
     private boolean didRecruit = false;
@@ -18,7 +21,8 @@ public class RevealedCreature
     // private boolean didTowerTeleport = false;
     // private boolean didTitanTeleport = false;
     private boolean wasSummoned = false;
-    private boolean dead = false;
+    private boolean wasAcquired = false;
+
     
     public RevealedCreature(String name)
     {
@@ -30,35 +34,72 @@ public class RevealedCreature
         this.creatureName = name;
     }
 
+    // EventViewer does this when necessary. Would perhaps be cleaner
+    // if our own constructor does this checking, but to construct
+    // the basename needs the client and the marker, which in 95%
+    // of the cases are not needed here in the RevealedCreature.
+    public void setTitanBaseName(String tbName)
+    {
+        titanBaseName = tbName;
+    }
+    
     public String getName()
+    {
+        return titanBaseName != null ? titanBaseName : creatureName;
+    }
+
+    public String getPlainName()
     {
         return creatureName;
     }
 
+    public boolean matches(String name)
+    {
+        if (name.equals(creatureName))
+        {
+            return true;
+        }
+        else if (titanBaseName != null && name.equals(titanBaseName))
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+    
     public String toString()
     {
-        String infoString = creatureName + ": "
+        String infoString = getName() + ": "
             + (didRecruit ? "did recruit; " : "")
             + (wasRecruited ? "was recruited; " : "")
             + (didTeleport ? "teleported; " : "")            
 //            + (didTowerTeleport ? "tower teleported; " : "")
 //            + (didTitanTeleport ? "titan teleported; " : "")
             + (wasSummoned ? "was summoned; " : "")
+            + (wasAcquired ? "was acquired; " : "")
             + (dead ? "is dead; " : "");
          
         return infoString;
     }
-
-    public String toDetails()
+    
+    public Chit toChit(int scale)
     {
-        String infoString = creatureName
-            + ": didRecruit " + didRecruit + ", wasRecruited " + wasRecruited
-            + ", didTeleport" + didTeleport
-//            + ", didTowerTP " + didTowerTeleport 
-//            + ", didTitanTeleport" + didTitanTeleport
-            + ", wasSummoned " + wasSummoned + "; dead " + dead;
-         
-        return infoString;
+        String name = getName();
+        if (name == null)
+        {
+            Log.error("ERROR: revealedCreature.toChit, creature name null!");
+            return null;
+        }
+
+        Chit creature = new Chit(scale, name);
+        if (isDead())
+        {
+            creature.setDead(true);
+        }
+
+        return creature;
     }
     
     public void setDidRecruit(boolean value)
@@ -121,7 +162,17 @@ public class RevealedCreature
     {
         return wasSummoned;
     }
-    
+
+    public void setWasAcquired(boolean value)
+    {
+        this.wasAcquired = value;
+    }
+
+    public boolean wasAcquired()
+    {
+        return wasAcquired;
+    }
+
     public void setDead(boolean value)
     {
         this.dead = value;
@@ -132,4 +183,34 @@ public class RevealedCreature
         return dead;
     }
 
+    // Reason why this creature was added to the legion
+    public void setReason(String reason)
+    {
+        if (reason == null)
+        {
+            Log.error("RevealedCreature.setReason: reason null!!");
+            return;
+        }
+        if (reason.equals(Constants.reasonRecruited))
+        {
+            setWasRecruited(true);
+        }
+        else if (reason.equals(Constants.reasonSummon))
+        {
+            setWasSummoned(true);
+        }
+        else if (reason.equals(Constants.reasonAcquire))
+        {
+            setWasAcquired(true);
+        }
+        else if (reason.equals("<Unknown>"))
+        {
+            // That's ok, probably just old server version does not
+            // send this argument, so socketclientthread sets this dummy.
+        }
+        else
+        {
+            Log.error("RevealedCreature.setReason: unknown reason " + reason + "!!");
+        }
+    }
 }

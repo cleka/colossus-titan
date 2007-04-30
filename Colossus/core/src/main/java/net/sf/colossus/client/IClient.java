@@ -38,14 +38,15 @@ public interface IClient
     public void setLegionStatus(String markerId, boolean moved,
             boolean teleported, int entrySide, String lastRecruit);
 
-    public void addCreature(String markerId, String name);
+    public void addCreature(String markerId, String name, String reason);
 
-    public void removeCreature(String markerId, String name);
+    public void removeCreature(String markerId, String name, String reason);
 
-    public void revealCreatures(String markerId, final List names);
+    public void revealCreatures(String markerId, final List names, 
+            String reason);
 
     public void revealEngagedCreatures(String markerId, final List names, 
-        boolean isAttacker);
+        boolean isAttacker, String reason);
 
     public void removeDeadBattleChits();
 

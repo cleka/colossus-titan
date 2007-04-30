@@ -198,7 +198,7 @@ public final class Legion implements Comparable
                     Log.event("Legion " + getLongMarkerName() +
                             " acquires one " + angelType);
                     game.getServer().allTellAddCreature(getMarkerId(),
-                            angelType, true);
+                            angelType, true, Constants.reasonAcquire);
                 }
             }
         }
@@ -306,6 +306,11 @@ public final class Legion implements Comparable
              * way to Creature.getCreatureByName(), and if one uses the
              * Image Name in there, hell breaks loose.
              */
+            String name = critter.getName();
+            if (name == null || name.equals(""))
+            {
+                Log.error("getImagenames: null or empty name");
+            }
             imageNames.add(critter.getName());
         }
         return imageNames;

@@ -389,6 +389,23 @@ public final class Constants
     //public static final String loadGame = "loadGame";
     //public static final String saveGame = "saveGame";
 
+    public static final String reasonSplit = "Split";
+    public static final String reasonSummon = "Summon";
+    public static final String reasonUndoSummon = "UndoSummon";
+    public static final String reasonAcquire = "Acquire";
+    public static final String reasonRecruiter = "Recruiter";
+    public static final String reasonRecruited = "Recruited";
+    public static final String reasonUndidRecruit = "UndidRecruit";
+    public static final String reasonNegotiated = "Negotiated";
+    public static final String reasonTeleport = "Teleport";
+    public static final String reasonInitial = "Initial";
+    public static final String reasonGameOver = "GameOver";
+    public static final String reasonWinner = "Winner";
+    public static final String reasonBattleStarts = "BattleStarts";
+    public static final String reasonEngaged = "Engaged";
+    public static final String reasonConcession = "Concession";
+    public static final String reasonFled = "Fled";
+    
     // From server to client
     public static final String tellEngagement = "tellEngagement";
     public static final String tellEngagementResults = "tellEngagementResults";
@@ -445,6 +462,13 @@ public final class Constants
     public static final String askPickColor = "askPickColor";
     public static final String log = "log";
     public static final String nak = "nak";
+    
+    // engagement resolved, methods:
+    public static final String erMethodFlee = "flee";
+    public static final String erMethodConcede = "concede";
+    public static final String erMethodFight = "fight";
+    public static final String erMethodNegotiate = "negotiate";
+    
     static
     {
         if (colorNames.length != shortColorNames.length)

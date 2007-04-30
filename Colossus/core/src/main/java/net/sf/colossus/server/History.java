@@ -73,7 +73,14 @@ public class History
     {
         if (creatureNames.isEmpty())
         {
-            Log.warn("Called revealEvent() with empty creatureNames");
+            // this happens e.g. when in final battle (titan vs. titan)
+            // angel was called out of legion which was then empty,
+            // and in the final updateAllLegionContents there is then
+            // this empty legion...
+            Log.warn("Called revealEvent("+allPlayers+", " + 
+                  (playerNames != null ? playerNames.toString() : "-null-") +
+                  ", " + markerId + ", " + creatureNames.toString() + ", " +
+                  turn + ") with empty creatureNames");
             return;
         }
         Element event = new Element("Reveal");
@@ -167,13 +174,15 @@ public class History
                 String creatureName = creature.getTextNormalize();
                 creatureNames.add(creatureName);
             }
+            String reason = "<unknown>";
             if (all)
             {
-                server.allRevealCreatures(markerId, creatureNames);
+                server.allRevealCreatures(markerId, creatureNames, reason);
             }
             else
             {
-                server.oneRevealCreatures(playerName, markerId, creatureNames);
+                server.oneRevealCreatures(playerName, markerId, creatureNames,
+                      reason);
             }
         }
         else if (el.getName().equals("Split"))
@@ -205,13 +214,16 @@ public class History
         {
             String markerId = el.getAttributeValue("markerId");
             String creatureName = el.getAttributeValue("creatureName");
-            server.allTellAddCreature(markerId, creatureName, false);
+            String reason = "<unknown>";
+            server.allTellAddCreature(markerId, creatureName, false, reason);
         }
         else if (el.getName().equals("RemoveCreature"))
         {
             String markerId = el.getAttributeValue("markerId");
             String creatureName = el.getAttributeValue("creatureName");
-            server.allTellRemoveCreature(markerId, creatureName, false);
+            String reason = "<unknown>"; 
+            server.allTellRemoveCreature(markerId, creatureName, false, 
+                   reason);
         }
         else if (el.getName().equals("PlayerElim"))
         {
