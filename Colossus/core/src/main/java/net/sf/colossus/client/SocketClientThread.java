@@ -180,7 +180,16 @@ final class SocketClientThread extends Thread implements IServer
         else if (method.equals(Constants.revealCreatures))
         {
             String markerId = (String)args.remove(0);
-            List names = Split.split(Glob.sep, (String)args.remove(0));
+            String namesString = (String)args.remove(0);
+            List names = Split.split(Glob.sep, namesString);
+
+            // safeguard against getting empty string list from server
+            // TODO: should split be fixed instead??
+            if (namesString.equals("") && names.size() > 0 && 
+                 names.get(0).equals("") )
+            {
+                names.remove(0);
+            }
             client.revealCreatures(markerId, names);
         }
         else if (method.equals(Constants.revealEngagedCreatures))
