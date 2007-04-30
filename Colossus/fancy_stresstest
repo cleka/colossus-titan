@@ -17,6 +17,56 @@
 # but I was not sure, perhaps someone would rather like to stay
 # with the old one.
 
+# Usage:
+#
+# ./fancy_stresstest [-C] [-W] [-V <variants>] [ -N <count>] [ -- <Colossus-Options> ]
+#
+# That means, all options not meant to the script but rather that they
+# shall be given to the Colossus commandline,  must come after an "--".
+#
+#   -C or --cleansnaps      = delete all snap files before start of each game
+#   -W or --forcewindow     = force to get a masterboard windows (usually
+#                             for AI-only games there is no board visible)
+#   -V or --variants        = run stresstest only for this/these variants
+#   -N or --count           = stop latest after N counts
+
+FORCEBOARD=""
+done=no
+variants=""
+
+while [ $# -gt 0 -a "$done" = "no" ]
+do
+  case $1 in
+    --cleansn*|-C)
+        echo "Setting delete_snaps to yes"
+        delete_snaps=yes
+        ;;
+    --forcewind*|-W)
+        echo "Setting forceViewWindow to yes"
+        FORCEBOARD=-Dnet.sf.colossus.forceViewBoard=yes
+        ;;
+     --variants|-V)
+        shift
+        variants=$1
+        echo "Setting list of variants to '$variants'"
+        ;;
+     --count|-N)
+       shift
+       maxcount=$1
+       echo "Setting maxcount to '$maxcount'"
+       ;;
+     --)
+       done=yes
+       ;;
+      *)
+       echo "Option '$1' is not meaningful to stresstest script itself - ignored."
+       echo "Put options meant to starting Colossus.jar itself after a -- separator"
+       exit 1
+
+  esac
+  shift
+done
+
 
 # ----------------------------------------------------------------------
 # If on windows (e.g. Cygwin), create also Win-style (CR-LF) newlines into 
@@ -60,11 +110,11 @@ else
   i=0
 fi
 
-# Uncomment this fancy properties setting, if you want that even for
-# AI-only-games a board is to be shown:
-
-FORCEBOARD=""
-FORCEBOARD=-Dnet.sf.colossus.forceViewBoard=yes
+iMax=""
+if [ "X$maxcount" != "X" ]
+then
+  iMax=`expr $i + $maxcount`
+fi
 
 # ----------------------------------------------------------------------
 # Now loop forever, or until a flag file "stop.flag" is created.
@@ -73,16 +123,47 @@ FORCEBOARD=-Dnet.sf.colossus.forceViewBoard=yes
 # a file "backup.flag" while game still running), copy all relevant
 # files to ./logs.exitonerror.$i/  directory.
 
+# removed variants:
+#   Infinite    - RationalAI move error
+#   Balrog      - not in popup selection in player menu, causes
+#                 errors with "InputStream for file BalrogCre.xml"
+#   Random      - "Recruit-per-terrain loading failed : 
+#                      java.io.FileNotFoundException: RandomTer.xml"
+
+
+variantnr=0
+if [ "X$variants" = "X" ]
+then
+  variants="Abyssal6 Abyssal9 Badlands Beelzebub Default ExtTitan Outlands \
+            Pantheon TG-Wild TitanPlus Undead Unified"
+fi
+
+export variants
+export variantscount=`echo $variants | wc -w`
+
 while true
 do 
     cd "$HOME/.colossus/saves"
+    if [ "X$delete_snaps" = "Xyes" ]
+    then
+      rm -f snap*.xml
+    fi
     cd $currdir
+
+    variantnr=`expr $variantnr + 1`
+    if [ $variantnr -gt "$variantscount" ]
+    then
+      variantnr=1
+    fi
+    variant=`echo $variants | cut -d " " -f $variantnr`
+    # variant=Unified
+
     i=`expr $i + 1`
     echo -e $i > i
-    echo -e "\nStarting game #$i"
-    echo -e "$CR\nStarting game #$i$CR" >> log
+    echo -e "\nStarting game #$i as variant $variant"
+    echo -e "$CR\nStarting game #$i as variant $variant$CR" >> log
 
-    java -Djava.util.logging.config.file=logging.properties $FORCEBOARD -Xmx128M -jar Colossus.jar -i 6 -q -g -d 1 $1 $2 $3 $4 $5 $6 $7 $8 $9 >> log 2>&1;
+    java -Djava.util.logging.config.file=logging.properties $FORCEBOARD -Xmx128M -jar Colossus.jar -i 6 -q -g -d 1 --variant $variant $1 $2 $3 $4 $5 $6 $7 $8 $9 >> log 2>&1;
     ec=$?
     mkbackup=n
     if [ $ec -ne 0 ]
@@ -113,9 +194,18 @@ do
       cp -p Colossus[012].log $dir
       cd $currdir
     fi
+    if [ "X$iMax" != "X" ]
+    then
+      if [ $i -gt $iMax ]
+      then
+        echo -e    "\nReady: i=$i, $maxcount rounds run - exiting..."
+        echo -e "$CR\nReady: i=$i, $maxcount rounds run - exiting...$CR" >> log
+	exit
+      fi
+    fi
     if [ -e stop.flag ]
     then
-      echo -e "\nFlagfile stop.flag found - exiting..."
+      echo -e    "\nFlagfile stop.flag found - exiting..."
       echo -e "$CR\nFlagfile stop.flag found - exiting...$CR" >> log
       rm -f stop.flag
       exit
