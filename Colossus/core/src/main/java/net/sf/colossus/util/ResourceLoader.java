@@ -672,7 +672,8 @@ public final class ResourceLoader
     public static Document getDocument(String filename,
             List directories)
     {
-        InputStream htmlIS = getInputStream(filename + ".html", directories);
+        InputStream htmlIS = getInputStreamIgnoreFail(
+                       filename + ".html", directories);
         if (htmlIS != null)
         {
             try
@@ -690,10 +691,11 @@ public final class ResourceLoader
             }
             return null;
         }
-        InputStream textIS = getInputStream(filename + ".txt", directories);
+        InputStream textIS = getInputStreamIgnoreFail(filename + ".txt", 
+                        directories);
         if (textIS == null)
         {
-            textIS = getInputStream(filename, directories);
+            textIS = getInputStreamIgnoreFail(filename, directories);
         }
         if (textIS != null)
         {
@@ -727,6 +729,8 @@ public final class ResourceLoader
             }
             return null;
         }
+        Log.error("No document for basename " + filename + " found " + 
+                        "(neither .html, .txt nor without extention)!");
         return null;
     }
 
