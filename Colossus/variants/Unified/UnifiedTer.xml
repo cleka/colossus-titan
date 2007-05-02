@@ -104,6 +104,7 @@
         <recruit name="Knight" number="4" />
     </terrain>
     <terrain name="Keep" color="darkGray" regular_recruit="True" >
+        <recruit name="Anything" number="0" />
         <recruit name="GreenDragon" number="0" />
         <recruit name="BlueDragon" number="1" />
         <recruit name="PurpleDragon" number="1" />
