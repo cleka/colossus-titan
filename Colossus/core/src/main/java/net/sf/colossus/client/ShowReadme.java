@@ -75,9 +75,10 @@ public final class ShowReadme
         readmePane.setLayout(new GridLayout(0, 1));
         readme.setEditable(false);
         // Must be tall enough for biggest variant readme file.
-        Dimension readmeMaxSize = new Dimension(580, 2000);
-        Dimension readmePrefSize = new Dimension(580, 2000);
-        Dimension readmeScrollMaxSize = new Dimension(600, 2000);
+        // TODO: proper resizing according to need?
+        Dimension readmeMaxSize = new Dimension(580, 2200);
+        Dimension readmePrefSize = new Dimension(580, 2200);
+        Dimension readmeScrollMaxSize = new Dimension(600, 2200);
         Dimension readmeScrollPrefSize = new Dimension(600, 500);
         readmePane.setMaximumSize(readmeMaxSize);
         readmePane.setPreferredSize(readmePrefSize);
