@@ -82,15 +82,44 @@ final class FileServerThread extends Thread
 
                     Log.debug("Serving request " + request +
                             " from " + fileClient);
+                    
+                    boolean ignoreFail = false;
 
                     List li = Split.split(sep, request);
 
                     String filename = (String)li.remove(0);
+                     
+                    // right now (05/2007) clients should not send this -
+                    // take into use somewhat later.
+                    if (filename.equals(Constants.fileServerIgnoreFailSignal))
+                    {
+                        ignoreFail = true;
+                        filename = (String)li.remove(0);
+                    }
 
+                    // Meanwhile, suppress the warnings at least for the README
+                    // and the markersFile...
+                    // we know that they usually print warnings for other
+                    // than "Default" dir.
+
+                    // @TODO: e.g. when the overnext public build is out
+                    // (the one right now (20.4.2007) does not contain this yet), 
+                    // make the client one day submit the ignorefail signal, 
+                    // and remove this markersFileName/README temporary hack.
+                    if (filename.startsWith(Constants.markersNameFile) ||
+                        filename.startsWith("README") )
+                    {
+                        ignoreFail = true;
+                    }
+                    
                     byte[] data = ResourceLoader.getBytesFromFile(filename, li,
-                            true);
+                            true, ignoreFail);
 
-                    os.write(data);
+                    if (data != null)
+                    {
+                        os.write(data);
+                    }
+                    // else we just write nothing.
                 }
                 else
                 {

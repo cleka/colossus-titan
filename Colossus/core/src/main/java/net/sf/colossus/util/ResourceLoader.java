@@ -445,8 +445,11 @@ public final class ResourceLoader
 
         if ((cached == null) && cachedOnly)
         {
-            Log.warn("Requested file " + filename +
-                    " is requested cached-only but is not is cache.");
+            if (!ignoreFail)
+            {
+                Log.warn("Requested file " + filename +
+                         " is requested cached-only but is not is cache.");
+            }
             return null;
         }
 
@@ -477,6 +480,16 @@ public final class ResourceLoader
                 }
                 if (stream == null)
                 {
+                    if (!remote && ignoreFail)
+                    {
+                        // If someone locally requests it as ignoreFail,
+                        // let's assume a remote requester later sees it the
+                        // same way.
+                        // Right now, the remote-requesting is not able to
+                        // submit the "ignore-fail" property... 
+                        // @TODO: submit that properly?
+                        // fileCacheIgnoreFail.put(mapKey, new Boolean(true));
+                    }
                     if (!ignoreFail)
                     {
                         Log.warn("getInputStream:: " +
@@ -523,6 +536,15 @@ public final class ResourceLoader
                             PrintWriter out =
                                 new PrintWriter(fileSocket.getOutputStream(),
                                 true);
+                            
+                            if (ignoreFail)
+                            {
+                                // Not in this version yet (05/2007). 
+                                // New clients could not talk with old server.
+                                // Take this into full use somewhat later.
+                                //out.print(
+                                //   Constants.fileServerIgnoreFailSignal + sep);
+                            }
                             out.print(filename);
                             java.util.Iterator it = directories.iterator();
                             while (it.hasNext())
@@ -531,6 +553,13 @@ public final class ResourceLoader
                             }
                             out.println();
                             data = getBytesFromInputStream(is);
+                            if ( data != null && data.length == 0 && 
+                                 !ignoreFail)
+                            {
+                                Log.warn("Got empty contents for file " + 
+                                        filename + " directories " + 
+                                        directories.toString());
+                            }
                             fileSocket.close();
                             fileCache.put(mapKey, data);
                         }
@@ -556,17 +585,20 @@ public final class ResourceLoader
      *     or null if it fails.
      */
     public static byte[] getBytesFromFile(String filename,
-            List directories,
-            boolean cachedOnly)
+            List directories, boolean cachedOnly, boolean ignoreFail)
     {
         InputStream is = getInputStream(filename, directories,
-                server != null, cachedOnly, false);
+                server != null, cachedOnly, ignoreFail);
         if (is == null)
         {
-            Log.warn("getBytesFromFile:: " +
-                    " Couldn't get InputStream for file " +
-                    filename + " in " + directories +
-                    (cachedOnly ? " (cached only)" : ""));
+            // right now only FileServerThread is using this method at all.
+            if (!ignoreFail)
+            {
+                Log.warn("getBytesFromFile:: " +
+                        " Couldn't get InputStream for file " +
+                        filename + " in " + directories +
+                        (cachedOnly ? " (cached only)" : ""));
+            }
             return null;
         }
         return getBytesFromInputStream(is);
