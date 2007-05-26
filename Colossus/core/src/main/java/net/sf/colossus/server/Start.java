@@ -203,7 +203,11 @@ public final class Start
         for (int i = 0; i < numHumans; i++)
         {
             String name = null;
-            if (i == 0)
+            if ( i == 0 && cl.optIsSet('m'))
+            {
+                name = cl.getOptValue('m');
+            }
+            else if (i == 0)
             {
                 name = Constants.username;
             }

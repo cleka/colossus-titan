@@ -62,6 +62,7 @@ public class StartClient extends KDialog implements WindowListener,
         nameBox = new JComboBox(new Vector(nameChoices));
         nameBox.setEditable(true);
         nameBox.addActionListener(this);
+        nameBox.setSelectedItem(playerName);
         getContentPane().add(nameBox);
 
         getContentPane().add(new JLabel("Server hostname"));

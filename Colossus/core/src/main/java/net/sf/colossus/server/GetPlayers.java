@@ -324,16 +324,24 @@ public final class GetPlayers extends KDialog implements WindowListener,
         playerType.setEnabled(false);
         playerTypes[i] = playerType;
 
+        String cmdlineName = options.getStringOption(Options.playerName);
         String name = options.getStringOption(Options.playerName + i);
-        if (name == null || name.length() == 0)
+        if (cmdlineName != null)
+        {
+            name = cmdlineName;
+        }
+        else if (name == null || name.length() == 0)
         {
             name = Constants.none;
         }
-        if (name.startsWith(Constants.byColor))
+        else if (name.startsWith(Constants.byColor))
         {
             name = Constants.byColor;
         }
-
+        else if (name.startsWith(Constants.byType))
+        {
+            name = Constants.byType;
+        }
         Vector nameChoices = new Vector();
         nameChoices.add(name);
         if (!nameChoices.contains(Constants.byColor))
