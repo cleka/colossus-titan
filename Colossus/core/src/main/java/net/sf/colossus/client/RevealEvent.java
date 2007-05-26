@@ -313,7 +313,7 @@ public class RevealEvent
         return eventTypeToString[eventType];
     }
 
-    public String getEventTypeText(int type)
+    public static String getEventTypeText(int type)
     {
         return eventTypeToString[type];
     }
