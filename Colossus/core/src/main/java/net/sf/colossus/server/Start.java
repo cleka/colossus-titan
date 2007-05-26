@@ -137,6 +137,16 @@ public final class Start
         int numAIs = 0;
         int numNetworks = 0;
 
+        options.removeOption(Options.autoPlay);
+
+        if (cl.optIsSet('R'))
+        {
+            options.setOption(Options.autosave, false);
+            options.removeOption(Options.autoPlay);
+            options.setOption(Options.autoQuit, false);
+            options.setOption(Options.variant, Constants.variantArray[0]);
+        }
+        
         if (cl.optIsSet('v'))
         {
             String variantName = cl.getOptValue('v');
@@ -150,6 +160,10 @@ public final class Start
         if (cl.optIsSet('S'))
         {
             options.setOption(Options.autosave, true);
+        }
+        if (cl.optIsSet('A'))
+        {
+            options.setOption(Options.autoPlay, true);
         }
         if (cl.optIsSet('u'))
         {
@@ -263,6 +277,8 @@ public final class Start
             opts.addOption('c', "client", false, "Run network client instead");
             opts.addOption('s', "server", true, "Server name or IP");
             opts.addOption('S', "autosave", false, "Autosave");
+            opts.addOption('A', "autoplay", false, "Autoplay");
+            opts.addOption('R', "resetOptions", false, "Reset options");
             opts.addOption('m', "myname", true, "My player name");
             opts.addOption('x', "quiet", false, "turn off debug log");
 
