@@ -108,7 +108,9 @@ public final class Client implements IClient, IOracle, IOptions
     private String parentId;
     private int numSplitsThisTurn;
 
-    private AI ai = new SimpleAI(this);
+    // show best potential recruit chit needs exactly "SimpleAI".
+    private SimpleAI simpleAI = new SimpleAI(this); 
+    private AI ai = simpleAI;
 
     private CaretakerInfo caretakerInfo = new CaretakerInfo();
 
@@ -1905,22 +1907,32 @@ public final class Client implements IClient, IOracle, IOptions
             List recruits = findEligibleRecruits(markerId, hexLabel);
             if (recruits != null && recruits.size() > 0)
             {
-                if ((!showAllRecruitChits) || (recruits.size() == 1))
+                if (!showAllRecruitChits)
                 {
                     List oneElemList = new ArrayList();
-                    Creature recruit = (Creature)recruits.get(recruits.size() - 1);
-                    String recruitName = recruit.getName();
-                    oneElemList.add(recruitName);
+                    Creature recruit = chooseBestPotentialRecruit(markerId, 
+                            hexLabel, recruits);
+                    oneElemList.add(recruit);
                     recruits = oneElemList;
-                }
-                else
-                {
                 }
                 addPossibleRecruitChits(recruits, hexLabel);
             }
         }
     }
 
+    Creature chooseBestPotentialRecruit(String markerId, String hexLabel, 
+            List recruits)
+    {
+        // System.out.println("choosing best recruit for chit to show in " +
+        // "hex " + hexLabel + ", from " + recruits.toString());
+        
+        LegionInfo legion = getLegionInfo(markerId);
+        MasterHex hex = MasterBoard.getHexByLabel(hexLabel);
+        // NOTE! Below the simpleAI is an object, not class! 
+        Creature recruit = simpleAI.getVariantRecruitHint(legion,
+                hex, recruits);
+        return recruit;
+    }
 
     void removeRecruitChit(String hexLabel)
     {
