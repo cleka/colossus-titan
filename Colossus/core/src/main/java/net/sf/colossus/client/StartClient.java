@@ -175,6 +175,12 @@ public class StartClient extends KDialog implements WindowListener,
     public static void connect(String playerName, String hostname, int port)
     {
         saveHostname();
+        if ( clientOptions == null)
+        {
+            // needed e.g. when started as standalone from cmdline with -c -g
+            clientOptions = new net.sf.colossus.util.Options(playerName);
+            clientOptions.loadOptions();
+        }
         new Client(hostname, port, playerName, true);
     }
 
@@ -192,6 +198,10 @@ public class StartClient extends KDialog implements WindowListener,
         names.add(hostname);
         for (int i = 0; i < Constants.numSavedServerNames; i++)
         {
+            if (clientOptions == null)
+            {
+                return;
+            }
             String serverName = clientOptions.getStringOption(
                     net.sf.colossus.util.Options.serverName + i);
             if (serverName != null)
