@@ -17,6 +17,7 @@ import java.awt.event.WindowListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Iterator;
+import java.util.ListIterator;
 import java.util.Collections;
 
 import javax.swing.*;
@@ -529,20 +530,24 @@ ItemListener, ActionListener
      * User undid one action. Event is just marked as undone, but not deleted
      * - information once revealed is known to the public, as in real life :) 
      */
-    public void undoEvent(int type, String parentId, String childId, int turn, String creatureName)
+    public void undoEvent(int type, String parentId, String childId, int turn,
+                          String creatureName)
     {
-//        Log.debug("Undoing event "+type+ ": splitoff "+childId+
-//                ", parent "+parentId+" turn "+turn);
-
+/*
+        String typeText = RevealEvent.getEventTypeText(type);
+        Log.debug("Undoing event "+typeText+ ": marker2 "+childId+
+                ", marker1 "+parentId+" turn "+turn);
+*/
         int found = 0;
         if (type == RevealEvent.eventSplit)
         {
             synchronized(syncdEventList)
             {
-                Iterator it = syncdEventList.iterator();
-                while (it.hasNext())
+                int last = syncdEventList.size();
+                ListIterator it = syncdEventList.listIterator(last);
+                while (it.hasPrevious() && found==0)
                 {
-                    RevealEvent e = (RevealEvent)it.next();
+                    RevealEvent e = (RevealEvent)it.previous();
                     if (e.getEventType() == type && e.getTurn() == turn &&
                             e.getMarkerId().equals(parentId) &&
                             e.getMarkerId2().equals(childId) && 
@@ -566,10 +571,11 @@ ItemListener, ActionListener
             {
                 synchronized(syncdEventList)
                 {
-                    Iterator it2 = syncdEventList.iterator();
-                    while (it2.hasNext())
+                    int last = syncdEventList.size();
+                    ListIterator it2 = syncdEventList.listIterator(last);
+                    while (it2.hasPrevious() && found==0)
                     {
-                        RevealEvent e = (RevealEvent)it2.next();
+                        RevealEvent e = (RevealEvent)it2.previous();
                         if (e.getEventType() == type && e.getTurn()+1 == turn &&
                                 e.getMarkerId().equals(parentId) &&
                                 e.getMarkerId2().equals(childId) &&
@@ -588,10 +594,11 @@ ItemListener, ActionListener
         {
             synchronized(syncdEventList)
             {
-                Iterator it = syncdEventList.iterator();
-                while (it.hasNext())
+                int last = syncdEventList.size();
+                ListIterator it = syncdEventList.listIterator(last);
+                while (it.hasPrevious() && found==0)
                 {
-                    RevealEvent e = (RevealEvent)it.next();
+                    RevealEvent e = (RevealEvent)it.previous();
                     if (e.getEventType() == type && e.getTurn() == turn &&
                             e.getMarkerId().equals(parentId) &&
                             ! e.wasUndone())
@@ -607,15 +614,16 @@ ItemListener, ActionListener
         {
             synchronized(syncdEventList)
             {
-                Iterator it = syncdEventList.iterator();
-                while (it.hasNext())
+                int last = syncdEventList.size();
+                ListIterator it = syncdEventList.listIterator(last);
+                while (it.hasPrevious() && found==0)
                 {
-                    RevealEvent e = (RevealEvent)it.next();
+                    RevealEvent e = (RevealEvent)it.previous();
                     if (e.getEventType() == type && e.getTurn() == turn &&
                             e.getMarkerId().equals(parentId) && 
                             ! e.wasUndone())
                     {
-                        Log.debug("Recruit event to be undone found.");
+                        // Log.debug("Recruit event to be undone found.");
                         found++;
                         e.setUndone(true);
                     }
@@ -626,10 +634,11 @@ ItemListener, ActionListener
         {
             synchronized(syncdEventList)
             {
-                Iterator it = syncdEventList.iterator();
-                while (it.hasNext())
+                int last = syncdEventList.size();
+                ListIterator it = syncdEventList.listIterator(last);
+                while (it.hasPrevious() && found==0)
                 {
-                    RevealEvent e = (RevealEvent)it.next();
+                    RevealEvent e = (RevealEvent)it.previous();
                     if (e.getEventType() == type && e.getTurn() == turn &&
                             e.getMarkerId().equals(parentId) && 
                             ! e.wasUndone())
@@ -652,13 +661,8 @@ ItemListener, ActionListener
         {
             Log.error("Requested '"+type+"' EVENT to undo ("+
                     parentId+", "+childId+", turn "+turn+") not found");
-            System.exit(1);
         }
-        if (found > 1)
-        {
-            Log.error("Requested: '"+type+"' EVENT found " + found+" times!");
-            System.exit(1);
-        }
+
         if (this.visible)
         {
             updatePanels();
