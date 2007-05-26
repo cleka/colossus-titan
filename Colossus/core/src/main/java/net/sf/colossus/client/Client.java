@@ -3006,7 +3006,11 @@ public final class Client implements IClient, IOracle, IOptions
         }
         updateStatusScreen();
 
-        if (getOption(Options.autoRecruit) && !isGameOver()
+        // I changed the "&& !isGameOver()" to "&& I am not dead";
+        // before, this makes autorecruit stop working also for human
+        // when they won against all others and continue playing
+        // (just for growing bigger creatures ;-)
+        if (getOption(Options.autoRecruit) && playerAlive
             && isMyTurn() && this.phase == Constants.Phase.MUSTER)
         {
             // System.out.println("client "+playerName+" calling ai.muster");
