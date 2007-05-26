@@ -2040,7 +2040,10 @@ public final class Client implements IClient, IOracle, IOptions
         }
 
         if (!getOption(Options.autoPlay) ||
-            ( playerName.endsWith("1") && forceViewBoard))
+           ( forceViewBoard && ( playerName.endsWith("1") || 
+                   getStringOption(Options.playerType).endsWith("Human") ||
+                   getStringOption(Options.playerType).endsWith("Network")
+                   ) ))
         {
             disposeEventViewer();
             disposeMasterBoard();
