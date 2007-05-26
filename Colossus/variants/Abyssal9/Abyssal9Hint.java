@@ -96,7 +96,7 @@ public class Abyssal9Hint implements net.sf.colossus.server.HintInterface
                     legion.getHeight() != 6 &&
                     legion.numCreature("Troll") == 2 &&
                     oracle.creatureAvailable("Wyvern") >= 2 &&
-                    oracle.canReach("Desert"))
+                    oracle.canReach("Swamp"))
             {
                 return "Troll";
             }
