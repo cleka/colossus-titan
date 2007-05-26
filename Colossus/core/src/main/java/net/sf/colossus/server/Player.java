@@ -5,6 +5,7 @@ import java.util.*;
 
 import net.sf.colossus.util.Log;
 import net.sf.colossus.util.Glob;
+import net.sf.colossus.util.Options;
 import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
 
@@ -489,7 +490,10 @@ public final class Player implements Comparable
         {
             undoAllMoves();
             Log.event(getName() + " takes a mulligan");
-            mulligansLeft--;
+            if(!game.getOption(Options.unlimitedMulligans)) 
+            {
+                mulligansLeft--;
+            }
             movementRoll = 0;
         }
     }

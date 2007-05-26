@@ -160,6 +160,7 @@ public final class GetPlayers extends KDialog implements WindowListener,
         addCheckbox(Options.cumulativeSlow, rulesOptionsPane);
         addCheckbox(Options.oneHexAllowed, rulesOptionsPane);
         addCheckbox(Options.nonRandomBattleDice, rulesOptionsPane);
+        addCheckbox(Options.unlimitedMulligans, rulesOptionsPane);
 
         JPanel aiTimePane = new JPanel(new FlowLayout());
         aiTimePane.setBorder(new TitledBorder("AI Timing"));

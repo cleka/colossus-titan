@@ -82,6 +82,8 @@ public final class Options implements IOptions
             "Tower-to-Tower Teleport only";
     public static final String noTowerTeleport = "No Tower Teleport";
     public static final String noTitanTeleport = "No Titan Teleport";
+    
+    public static final String unlimitedMulligans = "Unlimited Mulligans";
 
     // Display options (client only)
     public static final String useSVG = "Use SVG chits";

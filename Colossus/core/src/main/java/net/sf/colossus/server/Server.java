@@ -1326,7 +1326,10 @@ public final class Server implements IServer
             player.commitMoves();
 
             // Mulligans are only allowed on turn 1.
-            player.setMulligansLeft(0);
+            if(!game.getOption(Options.unlimitedMulligans)) 
+            {
+                player.setMulligansLeft(0);
+            }
 
             game.advancePhase(Constants.Phase.MUSTER, getPlayerName());
         }
