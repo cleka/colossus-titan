@@ -484,6 +484,9 @@ ItemListener, ActionListener
     
         synchronized(syncdEventList)
         {
+            // @TODO: one day, remove this i++ and relevant++ stuff,
+            // when the updatePanels code is ready / properly transformed
+            // into the invokeLater form etc. ...
             // int i = 0;
             // int relevant = 0;
             Iterator it = syncdEventList.iterator();
@@ -701,7 +704,16 @@ ItemListener, ActionListener
         synchronized(syncdEventList)
         {
             Iterator it = syncdEventList.iterator();
-        
+            StringBuffer DebugBuf = new StringBuffer(200);
+            DebugBuf.append("purging: ");
+            String state = "init";
+
+            // @TODO: loop could stop after first not-to-purge one is found;
+            // For now, build a check that verifies that this really never
+            // breaks.
+            // @TODO-SOMEDAY:
+            // One day, either make this become permanent or remove this
+            // experimental/trial code.
             while (it.hasNext())
             {
                 RevealEvent e = (RevealEvent)it.next();
@@ -712,6 +724,19 @@ ItemListener, ActionListener
                 {
                     it.remove();
                     purged++;
+                    DebugBuf.append("P");
+                    if (state.equals("over"))
+                    {
+                        System.out.println("WARNING: found one event to purge, even after" +
+                                " found one that is not to purge?");
+                        System.out.println(DebugBuf.toString());
+                    }
+                    state = "found";
+                }
+                else
+                {
+                    DebugBuf.append("-");
+                    state = "over";
                 }
             }
         }
