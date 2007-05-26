@@ -399,10 +399,8 @@ ItemListener, ActionListener
     }
 
 
-    private void addEventToEventPane(RevealEvent e)
+    private boolean isEventRelevant(RevealEvent e)
     {
-        Container pane = eventPane;
-    
         Log.debug("Adding event panel for event " + e.getEventTypeText());
             
         int oldEventTurn = e.getTurn();
@@ -429,19 +427,21 @@ ItemListener, ActionListener
           " - was undone and hideUndoneEvents is true.");
             display = false;
         }
-            
-        if (display)
+        return display;
+    }
+
+    private void addEventToEventPane(RevealEvent e)
+    {
+        Container pane = eventPane;
+        JPanel panelForEvent = e.toPanel();
+        if (panelForEvent != null)
         {
-            JPanel panelForEvent = e.toPanel();
-            if (panelForEvent != null)
-            {
-                pane.add(panelForEvent);
-                pane.add(Box.createRigidArea(new Dimension(0,5)));
-            }
-            else
-            {
-                Log.warn("EventViewer.addEventToEventPane: event.toPanel returned null!");
-            }
+            pane.add(panelForEvent);
+            pane.add(Box.createRigidArea(new Dimension(0,5)));
+        }
+        else    
+        {   
+            Log.warn("EventViewer.addEventToEventPane: event.toPanel returned null!");
         }
     }
 
@@ -459,7 +459,11 @@ ItemListener, ActionListener
 
         if (this.visible)
         {
-            addEventToEventPane(e);
+            boolean display = isEventRelevant(e);
+            if (display)
+            {
+                addEventToEventPane(e);
+            }
             getContentPane().validate();
             if (autoScroll)
             {
@@ -480,12 +484,23 @@ ItemListener, ActionListener
     
         synchronized(syncdEventList)
         {
+            // int i = 0;
+            // int relevant = 0;
             Iterator it = syncdEventList.iterator();
             while (it.hasNext())
             {
                 RevealEvent e = (RevealEvent) it.next();
-                addEventToEventPane(e);
+                boolean display = isEventRelevant(e);
+                if (display)
+                {
+                    addEventToEventPane(e);
+                    // relevant++;
+                }
+                // i++;
             }
+            
+            // System.out.println("updatePanels needed " + i + 
+            //        " iterations, " + relevant + " relevant");
         }
 
         getContentPane().validate();
