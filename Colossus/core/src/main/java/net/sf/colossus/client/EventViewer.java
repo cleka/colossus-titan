@@ -42,6 +42,9 @@ import net.sf.colossus.util.Log;
  *    games have same event view as in running game     
  *  "TODO: investigate, why does server gives us different turn numbers
  *         in those Split/undoSplit events?" (=> see undoEvent)
+ *  When fled, instead of "not revealed": at least if involved in battle 
+ *  (winner or defeated) should show the winner's content!
+ *  
  * @Nice to have:
  * - Player dead events
  * - Legion eliminated (when player dead) events
@@ -321,8 +324,11 @@ ItemListener, ActionListener
             {
                 alChoices.add(new Integer(i).toString());
             }
+            /* right now: no big values due to performance issues...
             // 10, 50, 100, 500, 1000 if applicable.
             else if (i==10 || i==50 || i==100 || i==500 || i==1000)
+            */
+            else if (i==10)
             {
                 alChoices.add(new Integer(i).toString());
             }
@@ -398,24 +404,27 @@ ItemListener, ActionListener
         this.pack();
     }
 
-
-    private boolean isEventRelevant(RevealEvent e)
+    private boolean isEventTooOld(RevealEvent e)
     {
-        Log.debug("Adding event panel for event " + e.getEventTypeText());
-            
         int oldEventTurn = e.getTurn();
         int oldPlayerNr  = e.getPlayerNr();
+
+        if ( maxTurns != -1 &&
+               turnNr-oldEventTurn > maxTurns-(playerNr>=oldPlayerNr?1:0))
+        {
+//            Log.debug("Not displaying event "+e.getEventTypeText()+" "+
+//                      e.getMarkerId() + " - older than max turns value!");
+            return true;
+        }
+        return false;
+    }
+    
+    private boolean isEventRelevant(RevealEvent e)
+    {
         int type = e.getEventType();
         boolean display = true;
         
-        if ( maxTurns != -1 &&
-                turnNr-oldEventTurn > maxTurns-(playerNr>=oldPlayerNr?1:0))
-        {
-//            Log.debug("Not displaying event "+e.getEventTypeText()+" "+e.getMarkerId() +
-//            " - older than max turns value!");
-            display = false;
-        }
-        else if ( !showEventType[type] )
+        if ( !showEventType[type] )
         {
 //          Log.debug("Not displaying event "+e.getEventTypeText()+" "+e.getMarkerId() +
 //          " - type " + type + " false.");
@@ -475,8 +484,13 @@ ItemListener, ActionListener
 
     /*
      * Remove all, and add those again which are still in the eventList
+     * @param forceAll: reset the bookmark, start from begin of list.
+     *                  => if not set, can start searching from last 
+     *                  remembered position.
      */
-    private void updatePanels()
+    private static int bookmark = 0;
+    
+    private void updatePanels(boolean forceAll)
     {
         Container pane = this.eventPane;
 
@@ -484,26 +498,36 @@ ItemListener, ActionListener
     
         synchronized(syncdEventList)
         {
-            // @TODO: one day, remove this i++ and relevant++ stuff,
-            // when the updatePanels code is ready / properly transformed
-            // into the invokeLater form etc. ...
-            // int i = 0;
-            // int relevant = 0;
-            Iterator it = syncdEventList.iterator();
+            // if never expires, we never delete, so bookmark stays ok.
+            // But if expiring is happening (!= -1) or force is given
+            // (e.g. when maxTurns changed) then need to start searching 
+            // from start.
+            if (this.expireTurns != -1 || forceAll)
+            {
+                bookmark = 0;
+            }
+            
+            if (bookmark > syncdEventList.size())
+            {
+                // sanity check...
+                Log.error("bookmark " + bookmark + " out of range, size=" +
+                                syncdEventList.size());
+                bookmark = 0;
+            }
+
+            ListIterator it = syncdEventList.listIterator(bookmark);
             while (it.hasNext())
             {
                 RevealEvent e = (RevealEvent) it.next();
-                boolean display = isEventRelevant(e);
-                if (display)
+                if (isEventTooOld(e))
+                {
+                    bookmark++;
+                }
+                else if (isEventRelevant(e))
                 {
                     addEventToEventPane(e);
-                    // relevant++;
                 }
-                // i++;
             }
-            
-            // System.out.println("updatePanels needed " + i + 
-            //        " iterations, " + relevant + " relevant");
         }
 
         getContentPane().validate();
@@ -535,10 +559,21 @@ ItemListener, ActionListener
         if (this.expireTurns != -1)
         {
             purgeOldEvents();
+            if (this.visible)
+            {
+                updatePanels(true);
+            }
         }
-        if (this.visible)
+        else   // expire turns -1 ==> no purging. 
         {
-            updatePanels();
+            if (this.maxTurns != -1)
+            {
+                // something will have got expired now
+                // but we can use the bookmark.
+                updatePanels(false);
+            }
+            // else: maxTurns -1 => stays displaying from begin on,
+            //       so no update needed at all.
         }
     }
 
@@ -683,7 +718,7 @@ ItemListener, ActionListener
 
         if (this.visible)
         {
-            updatePanels();
+            updatePanels(false);
         }
     }
     
@@ -696,7 +731,7 @@ ItemListener, ActionListener
 
         if (this.expireTurns == -1)
         {
-            Log.warn("expireturns -1 - no purgign needed.");
+            Log.warn("expireTurns -1 - no purging needed.");
             return;
         }
         int purged = 0;
@@ -704,17 +739,8 @@ ItemListener, ActionListener
         synchronized(syncdEventList)
         {
             Iterator it = syncdEventList.iterator();
-            StringBuffer DebugBuf = new StringBuffer(200);
-            DebugBuf.append("purging: ");
-            String state = "init";
-
-            // @TODO: loop could stop after first not-to-purge one is found;
-            // For now, build a check that verifies that this really never
-            // breaks.
-            // @TODO-SOMEDAY:
-            // One day, either make this become permanent or remove this
-            // experimental/trial code.
-            while (it.hasNext())
+            boolean done = false;
+            while (it.hasNext() && !done)
             {
                 RevealEvent e = (RevealEvent)it.next();
                 int oldEventTurn = e.getTurn();
@@ -724,26 +750,12 @@ ItemListener, ActionListener
                 {
                     it.remove();
                     purged++;
-                    DebugBuf.append("P");
-                    if (state.equals("over"))
-                    {
-                        System.out.println("WARNING: found one event to purge, even after" +
-                                " found one that is not to purge?");
-                        System.out.println(DebugBuf.toString());
-                    }
-                    state = "found";
                 }
                 else
                 {
-                    DebugBuf.append("-");
-                    state = "over";
+                    done = true;
                 }
             }
-        }
-        if (purged > 0)
-        {
-            // Log.debug("Purged " + purged + " old events.");
-            getContentPane().validate();
         }
     }
     
@@ -776,7 +788,7 @@ ItemListener, ActionListener
             settingsPane.setMinimumSize(settingsPane.getSize());
             // eventPane.setMinimumSize(eventPane.getSize());
             this.visible = true;
-            updatePanels();
+            updatePanels(true);
         }
         else
         {
@@ -802,7 +814,7 @@ ItemListener, ActionListener
             {
                 maxTurns = Integer.parseInt(value);
             }
-            updatePanels();
+            updatePanels(true);
         }
     }
                 
@@ -864,6 +876,6 @@ ItemListener, ActionListener
             this.showEventType[RevealEvent.eventPlayerChange] = selected;
         }
         
-        updatePanels();
+        updatePanels(false);
     }
 }
