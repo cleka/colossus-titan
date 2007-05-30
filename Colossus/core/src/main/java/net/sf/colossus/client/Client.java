@@ -1581,9 +1581,62 @@ public final class Client implements IClient, IOracle, IOptions
     public void revealCreatures(String markerId, final List names, 
             String reason)
     {
-        // looks as if right now we don't need the reason here in this
-        // method - recruit info is handled by separate didRecruit...
+        // EventViewer stuff:
+        // looks as if right now we need this revealedInfo only for
+        // engagements in which we are envolved.
+        // E.g. recruit info is handled by separate didRecruit...
 
+        // If this player is involved in an engagement, then server reveals 
+        // us the opponent, and our own legion we know anyway.
+        // Thus, update the knownCreatures info in the events so that both
+        // the attacker and defender are known in EventViewer (in THIS client)
+        if (reason.equals(Constants.reasonEngaged))
+        {
+            RevealEvent ownEvent = null;
+            RevealEvent otherEvent = null;
+            
+            if (markerId.equals(this.attackerMarkerId))
+            {
+                otherEvent = attackerEventLegion;
+                ownEvent   = defenderEventLegion;
+            }
+            else if (markerId.equals(this.defenderMarkerId))
+            {
+                otherEvent = defenderEventLegion;
+                ownEvent   = attackerEventLegion;
+            }
+            // else: Fine as well. Client just not involved in this engagement.
+            
+            if (otherEvent != null)
+            {
+                ArrayList rcNames = new ArrayList();
+                Iterator it = names.iterator();
+                while (it.hasNext())
+                {
+                    String name = (String) it.next();
+                    RevealedCreature rc = new RevealedCreature(name);
+                    rcNames.add(rc);
+                }
+                otherEvent.updateKnownCreatures(rcNames);
+            }
+            if (ownEvent != null)
+            {
+                String ownMarkerId = ownEvent.getMarkerId();
+                LegionInfo info = getLegionInfo(ownMarkerId);
+                List ownNames = info.getContents();
+                ArrayList rcNames = new ArrayList();
+                Iterator it = ownNames.iterator();
+                while (it.hasNext())
+                {
+                    String name = (String) it.next();
+                    RevealedCreature rc = new RevealedCreature(name);
+                    rcNames.add(rc);
+                }
+                ownEvent.updateKnownCreatures(rcNames);
+            }
+        }
+
+        // "Normal" split prediction stuff:
         String pName = getPlayerNameByMarkerId(markerId);
         if (predictSplits == null || getPredictSplits(pName) == null)
         {
