@@ -136,6 +136,7 @@ class Critter implements Comparable
 
         if (damage > 0)
         {
+            int oldhits = hits;
             hits = hits + damage;
             if (hits > getPower())
             {
@@ -143,12 +144,15 @@ class Critter implements Comparable
                 hits = getPower();
             }
 
+            Log.event("Critter " + getDescription() + ": " + 
+                   oldhits + " + " + damage + " => " + hits + 
+                   "; " + excess + " excess");
+            
             // Check for death.
             if (hits >= getPower())
             {
-                Log.event("Critter " + getDescription() + " is now dead: " +
-                        "(hits=" + hits + " > power="+getPower()+
-                        "); excess=" + excess);
+                Log.event("Critter " + getDescription() + " is now dead: (hits="
+                        + hits + " > power="+getPower()+ ")");
                 setDead(true);
             }
         }
