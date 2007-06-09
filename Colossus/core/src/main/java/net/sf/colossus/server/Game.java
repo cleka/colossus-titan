@@ -2795,8 +2795,9 @@ public final class Game
         // No recruiting or angel summoning is allowed after the
         // defender flees or the attacker concedes before entering
         // the battle.
-        setEngagementResult(
-            Constants.erMethodFlee, winner.getMarkerId(), points, 0);
+        String method = fled ? 
+                Constants.erMethodFlee : Constants.erMethodConcede;
+        setEngagementResult(method, winner.getMarkerId(), points, 0);
         checkEngagementDone();
     }
 
