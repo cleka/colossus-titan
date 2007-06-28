@@ -781,7 +781,10 @@ public final class Client implements IClient, IOracle, IOptions
         else if (optname.equals(Options.useOverlay))
         {
             GUIHex.setOverlay(bval);
-            repaintAllWindows();
+            if (board != null)
+            {
+                board.repaintAfterOverlayChanged();
+            }
         }
         else if (optname.equals(Options.showAllRecruitChits))
         {

@@ -75,6 +75,7 @@ public final class MasterBoard extends JPanel
     private Image offScreenBuffer;
     private static int horizSize = 0;
     private static int vertSize = 0;
+    private boolean overlayChanged = false;
 
     /** "parity" of the board, so that Hexes are displayed the proper way */
     private static int boardParity = 0;
@@ -2141,6 +2142,12 @@ public final class MasterBoard extends JPanel
         }
     }
 
+    void repaintAfterOverlayChanged()
+    {
+        overlayChanged = true;
+        this.getFrame().repaint();
+    }
+
     public void paintComponent(Graphics g)
     {
         // Abort if called too early.
@@ -2149,10 +2156,11 @@ public final class MasterBoard extends JPanel
             return;
         }
 
-        if (offScreenBuffer == null ||
+        if (offScreenBuffer == null || overlayChanged ||
             (!(offScreenBuffer.getWidth(this) == this.getSize().width &&
             offScreenBuffer.getHeight(this) == this.getSize().height)))
         {
+            overlayChanged = false;
             offScreenBuffer = this.createImage(this.getWidth(),
                 this.getHeight());
             Graphics g_im = offScreenBuffer.getGraphics();
