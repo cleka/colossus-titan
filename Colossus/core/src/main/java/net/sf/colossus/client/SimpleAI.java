@@ -807,8 +807,16 @@ public class SimpleAI implements AI
         if (player.numLegionsMoved() == 0)
         {
             moved = handleForcedSingleMove(player, moveMap);
-            // Always need to retry.
-            return true;
+            // Earlier here was a comment: 
+            // "always need to retry" and hardcoded returned true.
+            // In [ 1748718 ] Game halt in Abyssal9 this lead to a deadlock;
+            // - so, if here is returned "false" as for "I won't do any more
+            // move", that problem does not occur (server recognizes that 
+            // there is no legal move and accepts it)
+            // -- does this cause negative side effects elsewhere?? 
+            // Let's try ;-)
+            
+            return moved;
         }
         return false;
     }
@@ -1058,9 +1066,12 @@ public class SimpleAI implements AI
             }
         }
 
-        Log.error("handleForcedSingleMove() didn't move anyone");
-        // Try again, even though it'll probably loop forever.
-        return true;
+        Log.warn("handleForcedSingleMove() didn't move anyone - " + 
+                 "probably no legion can move?? " + 
+                 "(('see [ 1748718 ] Game halt in Abyssal9'))");
+        // Let's hope the server sees it the same way, otherwise
+        // we'll loop forever...
+        return false;
     }
 
     private boolean doMove(String markerId, String hexLabel)
