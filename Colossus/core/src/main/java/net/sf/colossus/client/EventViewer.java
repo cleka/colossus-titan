@@ -42,8 +42,6 @@ import net.sf.colossus.util.Log;
  *    games have same event view as in running game     
  *  "TODO: investigate, why does server gives us different turn numbers
  *         in those Split/undoSplit events?" (=> see undoEvent)
- *  When fled, instead of "not revealed": at least if involved in battle 
- *  (winner or defeated) should show the winner's content!
  *  
  * @Nice to have:
  * - Player dead events
@@ -103,6 +101,7 @@ ItemListener, ActionListener
     public static final String evfWon = "Engagement won events";
     public static final String evfLoser = "Engagement lost events";
     public static final String evfMulligan = "Mulligans";
+    public static final String evfMoveRoll = "Movement rolls";
     
     public static final String evfTurnChange = "Turn change info";
     public static final String evfPlayerChange = "Player change info";
@@ -141,7 +140,7 @@ ItemListener, ActionListener
 
         initExpireTurnsFromOptions();
         
-        showEventType = new boolean[10];
+        showEventType = new boolean[RevealEvent.NUMBEROFEVENTS];
         showEventType[RevealEvent.eventRecruit] = getBoolOption(evfRecruit, true);
         showEventType[RevealEvent.eventSplit] = getBoolOption(evfSplit, true);
         showEventType[RevealEvent.eventTeleport] = getBoolOption(evfTeleport, true);
@@ -151,6 +150,8 @@ ItemListener, ActionListener
         showEventType[RevealEvent.eventLost] = getBoolOption(evfLoser, true);
 
         showEventType[RevealEvent.eventMulligan] = getBoolOption(evfMulligan, true);
+        showEventType[RevealEvent.eventMoveRoll] = getBoolOption(evfMoveRoll, true);
+        
         showEventType[RevealEvent.eventTurnChange] = getBoolOption(evfTurnChange, true);
         showEventType[RevealEvent.eventPlayerChange] = getBoolOption(evfPlayerChange, false);
         
@@ -291,6 +292,7 @@ ItemListener, ActionListener
         checkboxPane.add(Box.createRigidArea(new Dimension(0,5)));
         
         addCheckbox(evfMulligan, checkboxPane);
+        addCheckbox(evfMoveRoll, checkboxPane);
         addCheckbox(evfTurnChange, checkboxPane);
         addCheckbox(evfPlayerChange, checkboxPane);
 
@@ -870,6 +872,10 @@ ItemListener, ActionListener
         else if (text.equals(evfMulligan))
         {
             this.showEventType[RevealEvent.eventMulligan] = selected;
+        }
+        else if (text.equals(evfMoveRoll))
+        {
+            this.showEventType[RevealEvent.eventMoveRoll] = selected;
         }
         else if (text.equals(evfPlayerChange))
         {

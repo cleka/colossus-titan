@@ -51,10 +51,14 @@ public class RevealEvent
     public final static int eventTurnChange = 7;
     public final static int eventPlayerChange = 8;
     public final static int eventMulligan = 9;
+    public final static int eventMoveRoll = 10;
+    
     // Battle is only a temporary state, before it becomes Won or Lost
     // ( = no filter / checkbox setting for that needed, so far at least...)
-    public final static int eventBattle = 10;     
+    public final static int eventBattle = 11;     
+    public final static int NUMBEROFEVENTS = 12;
 
+    
     private final static String eventSplitText = "Split";
     private final static String eventRecruitText = "Recruit";
     private final static String eventSummonText = "Summon";
@@ -65,12 +69,13 @@ public class RevealEvent
     private final static String eventTurnChangeText = "TurnChange";
     private final static String eventPlayerChangeText = "PlayerChange";
     private final static String eventMulliganText = "Mulligan";
+    private final static String eventMoveRollText = "Movement roll";
     private final static String eventBattleText = "Battle";
 
     private static String[] eventTypeToString = {
         eventSplitText, eventRecruitText, eventSummonText, eventTeleportText, 
         eventAcquireText, eventWonText, eventLostText, eventTurnChangeText, 
-        eventPlayerChangeText, eventMulliganText, eventBattleText
+        eventPlayerChangeText, eventMulliganText, eventMoveRollText, eventBattleText
     };
     
             
@@ -101,7 +106,7 @@ public class RevealEvent
         makeCreaturesTitanChangeSafe(knownCreatures);
     }
 
-    // mulligan
+    // mulligan and movement roll
     public RevealEvent(Client client, int turnNumber, int playerNr, 
             int eventType, int oldRoll, int newRoll)
     {
@@ -399,6 +404,12 @@ public class RevealEvent
             " ("+getPlayer()+"), Turn "+getTurn() + " took mulligan;" +
             " old="+ oldRoll + ", new=" + newRoll;
         }
+        else if (eventType == eventMoveRoll)
+        {
+            msg = "Revealing event: Player "+getPlayerNr()+
+            " ("+getPlayer()+"), Turn "+getTurn() + " had movement roll: " +
+            " old="+ oldRoll;
+        }
         
         else
         {
@@ -582,7 +593,7 @@ public class RevealEvent
         p.setLayout(new BoxLayout(p, BoxLayout.X_AXIS));
         p.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        if (eventType == eventMulligan)
+        if (eventType == eventMulligan || eventType == eventMoveRoll)
         {
             Chit solidMarker = getSolidMarker();
             p.add(solidMarker);
@@ -595,12 +606,15 @@ public class RevealEvent
             oldDie.setAlignmentX(Component.LEFT_ALIGNMENT);
             p.add(oldDie);
 
-            addLabel(" => ");
+            if (eventType == eventMulligan)
+            {
+            	addLabel(" => ");
 
-            Chit newDie = new MovementDie(this.scale,
-                    MovementDie.getDieImageName(newRoll));
-            newDie.setAlignmentX(Component.LEFT_ALIGNMENT);
-            p.add(newDie);
+            	Chit newDie = new MovementDie(this.scale,
+            			MovementDie.getDieImageName(newRoll));
+            	newDie.setAlignmentX(Component.LEFT_ALIGNMENT);
+            	p.add(newDie);
+            }
             
             return p;
         }

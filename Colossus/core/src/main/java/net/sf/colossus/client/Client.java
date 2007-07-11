@@ -632,6 +632,13 @@ public final class Client implements IClient, IOracle, IOptions
         if (mulliganOldRoll == -2)
         {
             mulliganOldRoll = roll;
+            if (eventViewer != null)
+            {
+                RevealEvent e = new RevealEvent(this, turnNumber, 
+                        getActivePlayerNum(), RevealEvent.eventMoveRoll, 
+                        roll, -1);
+                eventViewer.addEvent(e);
+            }
         }
         else
         {
