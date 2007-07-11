@@ -391,7 +391,7 @@ final class Strike
             {
                 targetAtop = true;
                 totalObstacles++;
-                if (hexside == 'c')
+                if (hexside2 == 'c')
                 {
                     targetAtopCliff = true;
                 }
