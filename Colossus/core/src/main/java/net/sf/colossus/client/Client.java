@@ -169,6 +169,7 @@ public final class Client implements IClient, IOracle, IOptions
 
     private LogWindow logWindow;
     private int viewMode;
+    private int recruitChitMode;
 
     public Client(String host, int port, String playerName, boolean remote)
     {
@@ -201,6 +202,26 @@ public final class Client implements IClient, IOracle, IOptions
 
         String viewModeName = options.getStringOption(Options.viewMode);
         viewMode = options.getNumberForViewMode(viewModeName);
+        
+        String rcMode = options.getStringOption(Options.showRecruitChitsSubmenu);
+        if(rcMode == null || rcMode.equals(""))
+        {
+        	// not set: convert from old "showAllRecruitChits" option
+        	boolean showAll = options.getOption(Options.showAllRecruitChits);
+        	if (showAll)
+        	{
+        		rcMode = Options.showRecruitChitsAll;
+        	}
+        	else
+        	{
+        		rcMode = Options.showRecruitChitsStrongest;
+        	}
+        	// initialize new option
+        	options.setOption(Options.showRecruitChitsSubmenu, rcMode);
+        	// clean up obsolete option from cfg file
+        	options.removeOption(Options.showAllRecruitChits);
+        }
+        recruitChitMode = options.getNumberForRecruitChitSelection(rcMode);
     }
 
     boolean isRemote()
@@ -761,6 +782,11 @@ public final class Client implements IClient, IOracle, IOptions
         return this.viewMode;
     }
 
+    public int getRecruitChitMode()
+    {
+        return this.recruitChitMode;
+    }
+
     /** Fully sync the board state by running all option triggers. */
     private void runAllOptionTriggers()
     {
@@ -796,6 +822,10 @@ public final class Client implements IClient, IOracle, IOptions
         else if (optname.equals(Options.showAllRecruitChits))
         {
             showAllRecruitChits = bval;
+        }
+        else if (optname.equals(Options.showRecruitChitsSubmenu))
+        {
+            recruitChitMode = options.getNumberForRecruitChitSelection(value);
         }
         else if (optname.equals(Options.noBaseColor))
         {
@@ -992,7 +1022,6 @@ public final class Client implements IClient, IOracle, IOptions
             {
                 PlayerInfo info = new PlayerInfo(this);
                 playerInfo[i] = info;
-                String name = info.getName();
             }
         }
         for (int i = 0; i < numPlayers; i++)
@@ -1962,23 +1991,42 @@ public final class Client implements IClient, IOracle, IOptions
     {
         clearPossibleRecruitChits();
 
+        if (recruitChitMode == Options.showRecruitChitsNumNone)
+        {
+        	return;
+        }
+        
         // set is a set of possible target hexes
+        List oneElemList = new ArrayList();
+        
         Iterator it = set.iterator();
         while (it.hasNext())
         {
             String hexLabel = (String)it.next();
             List recruits = findEligibleRecruits(markerId, hexLabel);
+
             if (recruits != null && recruits.size() > 0)
             {
-                if (!showAllRecruitChits)
-                {
-                    List oneElemList = new ArrayList();
-                    Creature recruit = chooseBestPotentialRecruit(markerId, 
+            	switch(recruitChitMode)
+            	{
+            	case Options.showRecruitChitsNumAll:
+            		break;
+            	case Options.showRecruitChitsNumRecruitHint:
+                    oneElemList.clear();
+                    Creature hint = chooseBestPotentialRecruit(markerId, 
                             hexLabel, recruits);
-                    oneElemList.add(recruit);
+                    oneElemList.add(hint);
                     recruits = oneElemList;
-                }
-                addPossibleRecruitChits(recruits, hexLabel);
+            		break;
+            	case Options.showRecruitChitsNumStrongest:
+            		oneElemList.clear();
+                    Creature strongest = 
+                    	(Creature) recruits.get(recruits.size() - 1);
+                    oneElemList.add(strongest);
+                    recruits = oneElemList;
+            		break;
+            	}
+            	addPossibleRecruitChits(recruits, hexLabel);
             }
         }
     }

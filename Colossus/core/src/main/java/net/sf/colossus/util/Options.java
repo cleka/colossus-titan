@@ -102,6 +102,17 @@ public final class Options implements IOptions
     public static final String doNotInvertDefender =
             "Do not invert defender's Battle Chits";
     public static final String showAllRecruitChits = "Show all recruit Chits";
+    public static final String showRecruitChitsSubmenu = "Show recruit preview chits...";
+    public static final String showRecruitChitsNone = "None";
+    public static final String showRecruitChitsStrongest = "Strongest";
+    public static final String showRecruitChitsRecruitHint = "Recruit Hint";
+    public static final String showRecruitChitsAll = "All";
+    
+    public static final int showRecruitChitsNumNone = 0;
+    public static final int showRecruitChitsNumStrongest = 1;
+    public static final int showRecruitChitsNumRecruitHint = 2;
+    public static final int showRecruitChitsNumAll = 3;
+    
     public static final String antialias = "Antialias";
     public static final String scale = "Scale";
 
@@ -309,6 +320,27 @@ public final class Options implements IOptions
         if (viewMode.equals(Options.viewableLast)) val = Options.viewableLastNum;
         if (viewMode.equals(Options.viewableOwn))  val = Options.viewableOwnNum;
         return val;
+    }
+    
+    // client compares then only numeric modes (easier and faster in runtime)
+    // ((can use switch case statement))
+    public int getNumberForRecruitChitSelection(String s)
+    {
+    	if (s == null || s.equals(""))
+    	{
+    		return Options.showRecruitChitsNumNone; 
+    	}
+
+    	int val = Options.showRecruitChitsNumAll;
+    	if (s.equals(Options.showRecruitChitsNone)) 
+    		val = Options.showRecruitChitsNumNone;
+    	if (s.equals(Options.showRecruitChitsStrongest)) 
+    		val = Options.showRecruitChitsNumStrongest;
+    	if (s.equals(Options.showRecruitChitsRecruitHint)) 
+    		val = Options.showRecruitChitsNumRecruitHint;
+    	if (s.equals(Options.showRecruitChitsAll)) 
+    		val = Options.showRecruitChitsNumAll;
+    	return val;
     }
     
 }

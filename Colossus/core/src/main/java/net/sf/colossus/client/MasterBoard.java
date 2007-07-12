@@ -37,6 +37,8 @@ import java.util.Set;
 
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
+import javax.swing.ButtonGroup;
+import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -712,6 +714,23 @@ public final class MasterBoard extends JPanel
         checkboxes.put(name, cbmi);
     }
 
+    private ItemListener rcmHandler = new MasterBoardRecruitChitMenuHandler();
+
+    private void addRadioButton(JMenu menu, ButtonGroup group, String name)
+    {
+    	JRadioButtonMenuItem rbmi = new JRadioButtonMenuItem(name);
+    	rbmi.addItemListener(rcmHandler);
+    	group.add(rbmi);
+        menu.add(rbmi);
+    	boolean selected = false;
+    	if (name.equals(
+    			client.getStringOption(Options.showRecruitChitsSubmenu)))
+    	{
+    		selected = true;
+    	}
+    	rbmi.setSelected(selected);
+    }
+
     private void setupTopMenu()
     {
         JMenuBar menuBar = new JMenuBar();
@@ -784,7 +803,16 @@ public final class MasterBoard extends JPanel
         addCheckBox(graphicsMenu, Options.noBaseColor, KeyEvent.VK_W);
         addCheckBox(graphicsMenu, Options.useColoredBorders, 0);
         addCheckBox(graphicsMenu, Options.doNotInvertDefender, 0);
-        addCheckBox(graphicsMenu, Options.showAllRecruitChits, 0);
+
+        // addCheckBox(graphicsMenu, Options.showAllRecruitChits, 0);
+        JMenu srcSubmenu = new JMenu(Options.showRecruitChitsSubmenu);
+        ButtonGroup group = new ButtonGroup();
+        addRadioButton(srcSubmenu, group, Options.showRecruitChitsNone);
+        addRadioButton(srcSubmenu, group, Options.showRecruitChitsStrongest);
+        addRadioButton(srcSubmenu, group, Options.showRecruitChitsRecruitHint);
+        addRadioButton(srcSubmenu, group, Options.showRecruitChitsAll);
+        graphicsMenu.add(srcSubmenu);
+
         // change scale
         mi = graphicsMenu.add(changeScaleAction);
         mi.setMnemonic(KeyEvent.VK_S);
@@ -2133,6 +2161,19 @@ public final class MasterBoard extends JPanel
         }
     }
 
+    class MasterBoardRecruitChitMenuHandler implements ItemListener
+    {
+        public void itemStateChanged(ItemEvent e)
+        {
+            JMenuItem source = (JMenuItem)e.getSource();
+            String text = source.getText();
+            boolean selected = (e.getStateChange() == ItemEvent.SELECTED);
+            if (selected && text != null)
+            {
+            	client.setOption(Options.showRecruitChitsSubmenu, text);
+            }
+        }
+    }
 
     class MasterBoardWindowHandler extends WindowAdapter
     {
