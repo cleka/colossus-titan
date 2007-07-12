@@ -703,7 +703,7 @@ public final class MasterBoard extends JPanel
 
     private ItemListener itemHandler = new MasterBoardItemHandler();
 
-    private void addCheckBox(JMenu menu, String name, int mnemonic)
+    private JCheckBoxMenuItem addCheckBox(JMenu menu, String name, int mnemonic)
     {
         JCheckBoxMenuItem cbmi = new JCheckBoxMenuItem(name);
         cbmi.setMnemonic(mnemonic);
@@ -712,6 +712,7 @@ public final class MasterBoard extends JPanel
         cbmi.addItemListener(itemHandler);
         menu.add(cbmi);
         checkboxes.put(name, cbmi);
+        return cbmi;
     }
 
     private ItemListener rcmHandler = new MasterBoardRecruitChitMenuHandler();
@@ -761,8 +762,8 @@ public final class MasterBoard extends JPanel
 
         // Then per-player options
 
-        JMenu playerMenu = new JMenu("Player");
-        playerMenu.setMnemonic(KeyEvent.VK_Y);
+        JMenu playerMenu = new JMenu("Autoplay");
+        playerMenu.setMnemonic(KeyEvent.VK_A);
         menuBar.add(playerMenu);
 
         addCheckBox(playerMenu, Options.autoPickColor, KeyEvent.VK_C);
@@ -782,29 +783,25 @@ public final class MasterBoard extends JPanel
         JMenu graphicsMenu = new JMenu("Graphics");
         graphicsMenu.setMnemonic(KeyEvent.VK_G);
         menuBar.add(graphicsMenu);
-
-        addCheckBox(graphicsMenu, Options.useSVG, KeyEvent.VK_S);
-        addCheckBox(graphicsMenu, Options.stealFocus, KeyEvent.VK_F);
-        addCheckBox(graphicsMenu, Options.showCaretaker, KeyEvent.VK_C);
-        addCheckBox(graphicsMenu, Options.showStatusScreen, KeyEvent.VK_G);
-        addCheckBox(graphicsMenu, Options.showEngagementResults,
-            KeyEvent.VK_E);
-        addCheckBox(graphicsMenu, Options.showAutoInspector, KeyEvent.VK_I);
-        addCheckBox(graphicsMenu, Options.showEventViewer, KeyEvent.VK_E);
-        // This option makes only sense with the 
-        //   "view what SplitPrediction tells us" mode.
-        if (client.getViewMode() == Options.viewableEverNum)
-        {
-            addCheckBox(graphicsMenu, Options.dubiousAsBlanks, KeyEvent.VK_D);
-        }
-        addCheckBox(graphicsMenu, Options.showLogWindow, KeyEvent.VK_L);
+        
         addCheckBox(graphicsMenu, Options.antialias, KeyEvent.VK_N);
         addCheckBox(graphicsMenu, Options.useOverlay, KeyEvent.VK_V);
+        addCheckBox(graphicsMenu, Options.useSVG, KeyEvent.VK_S);
         addCheckBox(graphicsMenu, Options.noBaseColor, KeyEvent.VK_W);
         addCheckBox(graphicsMenu, Options.useColoredBorders, 0);
         addCheckBox(graphicsMenu, Options.doNotInvertDefender, 0);
+        graphicsMenu.addSeparator();
 
-        // addCheckBox(graphicsMenu, Options.showAllRecruitChits, 0);
+        // The "dubious as blanks" option makes only sense with the 
+        //   "view what SplitPrediction tells us" mode => otherwise inactive.
+        JCheckBoxMenuItem cbmi = 
+        	addCheckBox(graphicsMenu, Options.dubiousAsBlanks, KeyEvent.VK_D);
+        if (client.getViewMode() != Options.viewableEverNum)
+        {
+        	cbmi.setEnabled(false);
+        }
+
+        // "Show recruit preview chits ..." submenu 
         JMenu srcSubmenu = new JMenu(Options.showRecruitChitsSubmenu);
         ButtonGroup group = new ButtonGroup();
         addRadioButton(srcSubmenu, group, Options.showRecruitChitsNone);
@@ -812,25 +809,45 @@ public final class MasterBoard extends JPanel
         addRadioButton(srcSubmenu, group, Options.showRecruitChitsRecruitHint);
         addRadioButton(srcSubmenu, group, Options.showRecruitChitsAll);
         graphicsMenu.add(srcSubmenu);
-
-        // change scale
-        mi = graphicsMenu.add(changeScaleAction);
-        mi.setMnemonic(KeyEvent.VK_S);
+        
+        // Menu for the "window-related" 
+        // (satellite windows and graphic options effecting whole "windows")
+        JMenu windowMenu = new JMenu("Window");
+        windowMenu.setMnemonic(KeyEvent.VK_W);
+        menuBar.add(windowMenu);
+ 
+        addCheckBox(windowMenu, Options.showCaretaker, KeyEvent.VK_C);
+        addCheckBox(windowMenu, Options.showStatusScreen, KeyEvent.VK_G);
+        addCheckBox(windowMenu, Options.showEngagementResults,
+            KeyEvent.VK_E);
+        addCheckBox(windowMenu, Options.showAutoInspector, KeyEvent.VK_I);
+        addCheckBox(windowMenu, Options.showEventViewer, KeyEvent.VK_E);
+        addCheckBox(windowMenu, Options.showLogWindow, KeyEvent.VK_L);
         // full recruit tree
-        mi = graphicsMenu.add(viewFullRecruitTreeAction);
+        mi = windowMenu.add(viewFullRecruitTreeAction);
         mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, 0));
         mi.setMnemonic(KeyEvent.VK_R);
 
+        windowMenu.addSeparator();
+
+        // "Window"-behavior and look&feel related ones:
+        addCheckBox(windowMenu, Options.stealFocus, KeyEvent.VK_F);
+
+        // change scale
+        mi = windowMenu.add(changeScaleAction);
+        mi.setMnemonic(KeyEvent.VK_S);
+    
         if (GraphicsEnvironment.getLocalGraphicsEnvironment()
             .getScreenDevices().length > 1)
         {
-            mi = graphicsMenu.add(chooseScreenAction);
+            mi = windowMenu.add(chooseScreenAction);
         }
 
-        // Then Look & Feel
+        // Look & Feel now under other menu instead own
         lfMenu = new JMenu("Look & Feel");
-        lfMenu.setMnemonic(KeyEvent.VK_L);
-        menuBar.add(lfMenu);
+        // lfMenu.setMnemonic(KeyEvent.VK_L);
+        windowMenu.add(lfMenu);
+        
         UIManager.LookAndFeelInfo[] lfInfo =
             UIManager.getInstalledLookAndFeels();
         String currentLF = UIManager.getLookAndFeel().getName();
