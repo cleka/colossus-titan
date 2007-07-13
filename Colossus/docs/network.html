@@ -25,7 +25,7 @@
         should appear, allowing you to set the variant, optional rules, 
         and how many players of which types you want. Human players are local 
         to the server machine. Network players are remote. Press the 
-        "Start Game" button. The game will wait for *exactly* the number
+        "New game" button. The game will wait for *exactly* the number
         of network players you specify, before the actual game starts and the
         masterboard(s) appear. 
         If you have a local copy of the game you can use command-line options 
@@ -37,21 +37,33 @@
         successfully connected. For practicing purposes, I recommend to start 
         with a server and one "remote" player, but running that network client 
         on the same machine. 
-        <p>Each client needs to wait for the server to be started, then run the
-        
-        <b>runclient</b> script or start the game from Java Web Start and 
-        select
-        &quot;Run client&quot; from the startup dialog. This will pop up a
+        <p>Each client needs to wait for the server to be started, then run 
+        the <b>runclient</b> script or start the game from Java Web Start and 
+        select &quot;Run network client&quot; from the startup dialog. 
+        This will pop up a
         small dialog that lets you enter a player name, hostname, and port. The
         player name will default to your OS user name. The server host will
         default to the local machine, which probably isn&#39;t what you want
         unless you&#39;re doing loopback testing. You can use the IP address
         instead of the hostname if you prefer. Most servers will use the
         default port. Again, you can use command-line options instead. 
-        <b>runclient -h</b>to see them.</p>
+        <b>runclient -h</b> to see them.</p>
+        <P>If server is started, startup progress log appeared, and all remote
+        players claim "I have started the client!", but still nothing happens
+        (= MasterBoard window does not appear), check from the startup                 progress log which clients have successfully connected. The one(s) 
+        missing there should restart his client.
+
+        <P>If really nothing helps, you can press the "Abort" button
+        in the bottom of the progress startup dialog to cleanup
+        everything. (Otherwise, it might happen that some threads stay
+        running, and perhaps keep the Port occupied; then it's
+        laborous to kill the Java process manually.)
+
         <p>Once all the clients have connected, then the game should start up
-        like a normal Colossus game. When the game ends, kill all the clients
-        and the server and restart from scratch if you want to play again.
+        like a normal Colossus game. When the game ends you can use the 
+        <B>File</B> - <B>New Game</B> menu option to start another one, 
+        but all the clients will be quit and they have to start connecting
+        using the same procedure as initially.
         </p>
         <h2>FAQ</h2>
         <ul>

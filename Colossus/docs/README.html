@@ -53,8 +53,7 @@
     <h2>Getting the program to run</h2>
     <p>The easiest way to run the game, if you already have Java Web Start
     installed on your computer, is to click on the Java Web Start link on the
-    web page 
-    <a href="http://colossus.sf.net">colossus.sf.net</a>
+    web page <a href="http://colossus.sf.net">colossus.sf.net</a>.
      This will download the latest version of the game, upgrade your JRE if
     necessary, make a shortcut icon if you want, etc. Pretty slick, when it
     works. If it doesn&#39;t work, you have other choices.</p>
@@ -63,12 +62,10 @@
     and find the jar file inside. Then try double-clicking on Colossus.jar in 
     your GUI file manager. If that fails, pop up a command prompt, cd to the 
     directory where you unzipped the zip file, and try typing 
-    <b>java -jar Colossus.jar</b>
-     . (Or use 
+    <b>java -jar Colossus.jar</b> (or use 
     <b>./run</b>
      or 
-    <b>run.bat</b>
-     )</p>
+    <b>run.bat</b>).</p>
      <p>(Note: Other jar files are in the libs/ subdirectory.  If you move
      Colossus.jar somewhere else, it won't work.)</p>
     <p>(Note: The Unix 
@@ -88,155 +85,160 @@
     Titan in something like its original form.)</p>
     <h4>Game start</h4>
     <p>Once you get things running, a dialog should pop up, allowing you to
-    choose up to six player types (human, AI, or not present) and their names.
-    You can also choose a variant. When you&#39;re done, click 
-    <b>OK</b>
-     Another dialog will pop up, telling you which tower each player gets and
-    letting players pick colors in increasing order of tower number. Pick
-    colors for each human player.</p>
-    <p>Now a window will pop up for each player, letting him pick his initial
-    legion marker. Pick one. (If you really don&#39;t care, use the 
-    <b>Auto pick markers</b>
-     option on the Player menu.)</p>
-    <p>After each player has picked his initial legion marker, the MasterBoard
-    window will pop up. You&#39;ll see each player&#39;s initial legion marker
-    sitting in a tower hex. You&#39;ll also see a small window in the lower
-    right corner of the screen. This is the Game Status window, which tracks
-    each player&#39;s score, number of legion markers remaining, etc. And
-    there&#39;s a Caretaker window which tracks how many of each creature
-    remain in the stacks. (These are both optional: turn them on or off from
-    the Graphics menu. There are several other useful viewers windows in the
-    Graphics menu - try them!)</p>
-    <p>You can right-click (or control-click if you have a one-button mouse) on
-    a legion to see its contents - except if the setting <b>Viewable legion 
-    content</b> in Game startup menu was changed from it&#39;s default setting
-    (more detailed <A HREF="GetPlayersOptions.html">option descriptions 
-    here</A>).</p>
-    <P>You can right-click on a hex (empty hex, 
-    or on that small free area beside a legion) to call up a menu, which lets 
-    you either see what you can recruit in that hex, or its battle map.</p>
-    <h4>Splitting</h4>
-    <p>The active player first needs to split his initial 8-high legion.
-    You&#39;ll notice that the hex containing the active player&#39;s legion is
-    lit up as a reminder; in future turns this will happen for all 7-high
-    legions. (It&#39;s also legal to split legions with 4-6 characters in them,
-    even though they are not highlighted.) Click on the legion. A dialog will
-    come up to let you pick the new legion marker to use. Then another dialog
-    will come up, allowing you to move characters between the two legions. The
-    game will not let you leave the split phase on the first turn until each of
-    your legions contains three Creatures and one Lord. When you&#39;re ready,
-    select Done from the Phase menu.</p>
-    <h4>Masterboard movement</h4>
-    <p>Next comes the movement phase. The game will tell you your movement
-    roll. Click on a legion, and the places it can move will light up. Little
-    pictures of the creatures the legion can recruit in hex will also appear.
-    Click on one of those places, and the legion will move there. (In some
-    cases, you will need to choose whether to teleport or move normally, or
-    which lord teleports if there is more than once choice.) The 
-    <b>Undo Last Move</b>
-     and 
-    <b>Undo All Moves</b>
-     actions are there in case you change your mind. During the first turn
-    only, and once only, there will be a 
-    <b>Take Mulligan</b>
-     action which you can use to re-roll your movement. When you&#39;re done
-    moving everything you want to move, select Done. (If you look closely at
-    the menus you&#39;ll see that many of the frequently used options have
-    hotkeys, like 
-    <b>d</b>
-     for 
-    <b>Done</b>
-     .)</p>
-    <h4>Engagements</h4>
-    <p>If you moved any legions onto enemy legions, then next comes the
-    engagement phase. Each hex with an engagement will light up. Click on the
-    one you want to resolve first, and a window will pop up showing both
-    legions and giving the defender a chance to flee, if applicable. If the
-    defender doesn&#39;t flee, then the attacker is given a chance to concede.
-    If both legions stick around, then a negotiation window pops up , where
-    creatures can be clicked on to 
-    <b>X</b>
-     them away. If the combatants can come to an agreement where all the
-    creatures on at least one side die, then there&#39;s no need to fight.
-    Otherwise, it&#39;s time for battle.</p>
-    <p>During a battle, the appropriate BattleMap pops up, with each legion on
-    the appropriate entry side. (You have to choose an entry side during
-    movement when more than one is possible.) The defender goes first. Click on
-    each character, and the places it can move light up. Click on one of those
-    places, and the character moves there. Repeat until all characters are
-    on-board, unless you&#39;d like to leave some off-board to die for some
-    reason. The 
-    <b>Undo Last Move</b>
-     and 
-    <b>Undo All Moves</b>
-     menu options are available. When done moving, click Done. The attacker
-    repeats the process, except that after he finishes moving, it&#39;s
-    striking time.</p>
-    <p>Any creatures adjacent to an enemy must strike; rangestrikers with an
-    enemy in range and line of sight may strike. (If you turn on the 
-    <b>Auto forced strike</b>
-     option, then creatures that are forced to strike and have only one legal
-    target will strike first without any intervention on your part, which
-    speeds things up a bit.) Click the striker, and all his legal targets light
-    up. Pick one, and he tries to strike it. (If it&#39;s legal to take a
-    strike penalty in order to carry, then a dialog will pop up to ask if you
-    want to do so.) The number of hits are displayed on the target. If the
-    target is dead, it will have a big 
-    <b>X</b>
-     displayed over it. If there is excess damage that can legally carry over,
-    then the legal carry target(s) will light up, and the cursor should change
-    to a number, and the striking player needs to pick which one to carry to,
-    or click somewhere else to decline the carry. This carry process can repeat
-    if the strike blows through more than one creature. There&#39;s no way to
-    undo strikes. (That would be cheating.) When done striking, choose
-    Done.</p>
-    <p>After the strike phase, the other player gets a strikeback phase.
-    It&#39;s identical to the strike phase, except that rangestrikes are not
-    allowed. Dead creatures do get to strike back before being removed.</p>
-    <h4>Summoning and acquiring</h4>
-    <p>The first turn after he kills an opposing character, the attacker may be
-    allowed to summon an angel or archangel, if there is one available in an
-    unengaged legion, and he hasn&#39;t yet summoned an angel this turn, and
-    the legion doesn&#39;t already have seven creatures. If so, a dialog will
-    appear and all MasterBoard hexes with summonable angels will light up. The
-    attacker must click on one of those hexes, then select the angel or
-    archangel as appropriate in the dialog.</p>
-    <p>During turn 4 of the battle, the defender may be allowed to muster a
-    recruit. If so, a dialog will pop up showing the legal recruits. If
-    desired, pick one. If no recruit is desired, dismiss the recruit dialog.
-    (Click on the X in the top right corner, or double-click the top left
-    corner, depending on how you normally dismiss dialogs in your OS.)</p>
-    <p>When the battle finishes, the winner gets some points and maybe the
-    option of acquiring one or more angels or archangels. If the winner
-    didn&#39;t summon an angel or recruit a reinforcement earlier, he will get
-    another choice if eligible.</p>
-    <h4>Mustering</h4>
-    <p>After all engagements are resolved, choose Done to proceed to the
-    mustering phase. Legions that moved and can recruit will light up. Click on
-    each one and choose a recruit. If more than one type of creature is capable
-    of summoning that recruit, you&#39;ll have to choose the recruiter(s) to be
-    revealed, unless the 
-    <b>Autopick recruiter</b>
-     option has been selected. When done, click Done and pass the mouse to the
-    next player.</p>
-    <h4>Ending the game</h4>
-    <p>The game ends when zero or one Titans remain. The last player standing
-    is the winner; if the game ends with a mutual elimination, it&#39;s a
-    draw.</p>
-    <h2>Improvements</h2>
-    <p>If you find any bugs that you think we can fix, please let us know, in
-    as much detail as possible. (In particular, include the operating system
-    and Java versions.)</p>
-    <p>The best way to report bugs is via the bug tracker at SourceForge -- go
-    to 
-    <a href="http://colossus.sf.net">colossus.sf.net</a>
-     , click on the SourceForge icon, and click on Bugs. (If that&#39;s too
-    hard you can just send email.)</p>
-    <p>We&#39;ve tried to get the rules right, though a few areas (concession
-    timing, in particular) are still off. Bruno Wolff&#39;s 
-    <a href="http://wolff.to/titan/errata.shtml">Titan Errata and
-    Clarifications</a>
-     is a good place to check for rules issues.</p>
+    choose (usually) up to six player types: Human, Network, Various AI 
+    types (AI = Aritificial Intelligence, i.e. robot players) or None, 
+    and their names. See <A HREF="GetPlayersOptions.html">
+     Get Players startup dialog</A>
+    for how to use this and description of the various options.
+    <P>
+    You can also choose a variant (some variants allow 9 or 12 players).
+     When you&#39;re done, click <b>New game</b>.
+   
+    <p>Now a window ("Server Startup progress log") will appear shortly; 
+    if you have only local Human players, this disappears immediately
+    and you can ignore it; if remote (=Network) players are involved,
+    read here about <A HREF="network.html">Networked Colossus</A>.
+    <P>
+    Once all players (clients) are connected, the MasterBoard(s) appear
+    (one for each local Human player).
+    <P>
+    Next, for each client (the remote players get it on their own
+    sreen, of course) two dialogs will appear: first a flat, wide
+    dialog asking to pick the color (pick one), and then another
+    smaller one to pick his initial legion marker. Pick one. (If you
+    don&#39;t care about color and/or markers, use the <b>Auto pick 
+    markers</b> option on the <A HREF="ClientOptions.html#AutoplayMenu">
+    Autoplay menu</A>.)</p> 
+    <p>
+    After each player has picked his initial legion marker, the
+    MasterBoard window(s) will be available.  Every player can modify
+    some settings (affecting then only him) using the Menu bar in the
+    MasterBoard window.  See <A HREF="ClientOptions.html">Client
+    options</A> for details.
+    <P>
+    You&#39;ll see
+    each player&#39;s initial legion marker sitting in a tower
+    hex. You&#39;ll also see a small window in the lower right corner
+    of the screen. This is the Game Status window, which tracks each
+    player&#39;s score, number of legion markers remaining, etc. And
+    there&#39;s a Caretaker window which tracks how many of each
+    creature remain in the stacks. (These are both optional: turn them
+    on or off from the <B>Window</B> menu. There are several other useful
+    viewers windows in the Window menu - try them!)</p> 
+    You can
+    right-click (or control-click if you have a one-button mouse) on a
+    legion to see its contents - except if the setting <b>Viewable
+    legion content</b> in Game startup menu was changed from it&#39;s
+    default setting (more detailed <A
+    HREF="GetPlayersOptions.html">option descriptions here</A>).</p>
+    <P>You can right-click on a hex (empty hex, or on that small free
+    area beside a legion) to call up a menu, which lets you either see
+    what you can recruit in that hex, or its battle map.</p>
+    <h4>Splitting</h4> <p>The active player first needs to split his
+    initial 8-high legion.  You&#39;ll notice that the hex containing
+    the active player&#39;s legion is lit up as a reminder; in future
+    turns this will happen for all 7-high legions. (It&#39;s also
+    legal to split legions with 4-6 characters in them, even though
+    they are not highlighted.) Click on the legion. A dialog will come
+    up to let you pick the new legion marker to use. Then another
+    dialog will come up, allowing you to move characters between the
+    two legions. The game will not let you leave the split phase on
+    the first turn until each of your legions contains three Creatures
+    and one Lord. When you&#39;re ready, select Done from the Phase
+    menu.</p> <h4>Masterboard movement</h4> <p>Next comes the movement
+    phase. The game will tell you your movement roll. Click on a
+    legion, and the places it can move will light up. Little pictures
+    of the creatures the legion can recruit in hex will also appear.
+    Click on one of those places, and the legion will move there. (In
+    some cases, you will need to choose whether to teleport or move
+    normally, or which lord teleports if there is more than once
+    choice.) The <b>Undo Last Move</b> and <b>Undo All Moves</b>
+    actions are there in case you change your mind. During the first
+    turn only, and once only, there will be a <b>Take Mulligan</b>
+    action which you can use to re-roll your movement. When you&#39;re
+    done moving everything you want to move, select Done. (If you look
+    closely at the menus you&#39;ll see that many of the frequently
+    used options have hotkeys, like <b>d</b> for <b>Done</b> .)</p>
+    <h4>Engagements</h4> <p>If you moved any legions onto enemy
+    legions, then next comes the engagement phase. Each hex with an
+    engagement will light up. Click on the one you want to resolve
+    first, and a window will pop up showing both legions and giving
+    the defender a chance to flee, if applicable. If the defender
+    doesn&#39;t flee, then the attacker is given a chance to concede.
+    If both legions stick around, then a negotiation window pops up ,
+    where creatures can be clicked on to <b>X</b> them away. If the
+    combatants can come to an agreement where all the creatures on at
+    least one side die, then there&#39;s no need to fight.  Otherwise,
+    it&#39;s time for battle.</p> <p>During a battle, the appropriate
+    BattleMap pops up, with each legion on the appropriate entry
+    side. (You have to choose an entry side during movement when more
+    than one is possible.) The defender goes first. Click on each
+    character, and the places it can move light up. Click on one of
+    those places, and the character moves there. Repeat until all
+    characters are on-board, unless you&#39;d like to leave some
+    off-board to die for some reason. The <b>Undo Last Move</b> and
+    <b>Undo All Moves</b> menu options are available. When done
+    moving, click Done. The attacker repeats the process, except that
+    after he finishes moving, it&#39;s striking time.</p> <p>Any
+    creatures adjacent to an enemy must strike; rangestrikers with an
+    enemy in range and line of sight may strike. (If you turn on the
+    <b>Auto forced strike</b> option, then creatures that are forced
+    to strike and have only one legal target will strike first without
+    any intervention on your part, which speeds things up a bit.)
+    Click the striker, and all his legal targets light up. Pick one,
+    and he tries to strike it. (If it&#39;s legal to take a strike
+    penalty in order to carry, then a dialog will pop up to ask if you
+    want to do so.) The number of hits are displayed on the target. If
+    the target is dead, it will have a big <b>X</b> displayed over
+    it. If there is excess damage that can legally carry over, then
+    the legal carry target(s) will light up, and the cursor should
+    change to a number, and the striking player needs to pick which
+    one to carry to, or click somewhere else to decline the
+    carry. This carry process can repeat if the strike blows through
+    more than one creature. There&#39;s no way to undo strikes. (That
+    would be cheating.) When done striking, choose Done.</p> <p>After
+    the strike phase, the other player gets a strikeback phase.
+    It&#39;s identical to the strike phase, except that rangestrikes
+    are not allowed. Dead creatures do get to strike back before being
+    removed.</p> <h4>Summoning and acquiring</h4> <p>The first turn
+    after he kills an opposing character, the attacker may be allowed
+    to summon an angel or archangel, if there is one available in an
+    unengaged legion, and he hasn&#39;t yet summoned an angel this
+    turn, and the legion doesn&#39;t already have seven creatures. If
+    so, a dialog will appear and all MasterBoard hexes with summonable
+    angels will light up. The attacker must click on one of those
+    hexes, then select the angel or archangel as appropriate in the
+    dialog.</p> <p>During turn 4 of the battle, the defender may be
+    allowed to muster a recruit. If so, a dialog will pop up showing
+    the legal recruits. If desired, pick one. If no recruit is
+    desired, dismiss the recruit dialog.  (Click on the X in the top
+    right corner, or double-click the top left corner, depending on
+    how you normally dismiss dialogs in your OS.)</p> <p>When the
+    battle finishes, the winner gets some points and maybe the option
+    of acquiring one or more angels or archangels. If the winner
+    didn&#39;t summon an angel or recruit a reinforcement earlier, he
+    will get another choice if eligible.</p> <h4>Mustering</h4>
+    <p>After all engagements are resolved, choose Done to proceed to
+    the mustering phase. Legions that moved and can recruit will light
+    up. Click on each one and choose a recruit. If more than one type
+    of creature is capable of summoning that recruit, you&#39;ll have
+    to choose the recruiter(s) to be revealed, unless the <b>Autopick
+    recruiter</b> option has been selected. When done, click Done and
+    pass the mouse to the next player.</p> <h4>Ending the game</h4>
+    <p>The game ends when zero or one Titans remain. The last player
+    standing is the winner; if the game ends with a mutual
+    elimination, it&#39;s a draw.</p> <h2>Improvements</h2> <p>If you
+    find any bugs that you think we can fix, please let us know, in as
+    much detail as possible. (In particular, include the operating
+    system and Java versions.)</p> <p>The best way to report bugs is
+    via the bug tracker at SourceForge -- go to <a
+    href="http://colossus.sf.net">colossus.sf.net</a> , click on the
+    SourceForge icon, and click on Bugs. (If that&#39;s too hard you
+    can just send email.)</p> <p>We&#39;ve tried to get the rules
+    right, though a few areas (concession timing, in particular) are
+    still off. Bruno Wolff&#39;s <a
+    href="http://wolff.to/titan/errata.shtml">Titan Errata and
+    Clarifications</a> is a good place to check for rules issues.</p>
     <h2>Links</h2>
     <ul>
       <li>

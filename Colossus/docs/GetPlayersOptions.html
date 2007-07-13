@@ -1,48 +1,58 @@
-<?xml version="1.0" encoding="iso-8859-1"?>
+
 <!-- $Id: $ -->
 <html>
   <head>
     <meta name="generator"
     content="HTML Tidy for Linux/x86 (vers 1st July 2002), see www.w3.org" />
-    <title>Get Players startup dialog</title>
+    <title>Colossus - Get Players startup dialog</title>
   </head>
   <body>
-<h1>Settings in Get Players startup dialog</h1>
-This document is a start to describe the available settings in the 
-Colossus startup dialog (like player selection, which variant, and so on)
-and their meaning. Some descriptions are not too detailed yet.
-<p>
-The top part of the startup dialog consists of a tabbed pane with 3 panes: 
-<b>Players</b>, <b>Options</b> and <b>Variant README</b>.
+<h1>Colossus - Get Players startup dialog</h1>
+<H3>Scope</h3>
+This document is a start to describe the available settings and options in 
+the Colossus startup dialog (like player selection, which variant, and so on)
+and their meaning. 
 <P>
-In the bottom are controls for Variant selection and Game startup, 
+They are selected on server side by the player hosting the game (=being the
+"game server") during the Player Selection / Game setup, affect the
+game globally and cannot be changed any more once the game has
+started.
+<p>
+For the client-local options that individual players can each 
+change on their own individually see the
+<A HREF="ClientOptions.html">Client options</A> page.
+<P>
+<h3>Overview</h3>
+The top part of the startup dialog consists of a tabbed pane with 3
+panes: 
+<A HREF="#PlayerSelection"><b>Players</b></A>, 
+<A HREF="#ServersideOptions"><b>Options</b></A> and 
+<A HREF="#VariantReadmePane"><b>Variant README</b></A>.
+<P>
+In the <A HREF="#GetPlayerBottomPart">bottom part</A> are controls for Variant selection and Game startup, 
 always visible no matter which pane is selected.
-
+<P>
 <hr>
-<h2>Players pane (player selection, variant selection, and action buttons)</h2>
+<h2><A NAME="#PlayerSelection">Player Selection pane</A></h2>
 
 Here you can select the number of players by setting that number of
 player types to a type (different than "none"): human player on same
 host, network player (human player on some remote host), or a number
 of "AI" types, i.e. robot players.
 <P>
-Fill in the wanted number and types of players, leave the remaining one as
-<b>none</b>. For human (local) players give a name; remote players should
+For the numbers of players wanted, set the player type appropriately, 
+and leave (or set so if needed) the remaining one as <b>none</b>. 
+For human (local) players give a name; remote players should
 be left to their default <b>&lt;By client&gt;</b>, and for AI players it 
-is usually useful to leave the setting to <b>&lt;By color&gt;</b>.
+is usually the best to leave the setting to <b>&lt;By color&gt;</b>.
 <P>
-With Colossus on can play Titan (the original board, creatures, etc.) as
-well as a number of variants - modified board or creatures
-(different/additional ones, their skills and abilities modified, different
-recruiting possibilities, and so on).
-<p>
 <hr>
-<h2>Options pane (various settings for the game)</h2>
+<h2><A NAME="#ServersideOptions">Options pane (various settings for the game)</A></h2>
 
 <h3>Section "General"</h3>
 Those are hopefully self-explaining:
 <ul>
-<li>Autosave
+<li><A NAME="#Autosave">Autosave</A>
 <li>Log debug messages
 <li>Balanced starting towers
 <li>AIs stop when humans dead
@@ -51,21 +61,21 @@ Those are hopefully self-explaining:
 
 <h3>Section "Viewability of legions and events"</h3>
 
-This controls whether one is
-allowed to view the contents of other players legions, and how long
-the events which reveal such information are visible before they
-vanish.
+This controls whether one is allowed to view the contents of other
+players legions, and how long the events which reveal such information
+are visible before they vanish.
 <p>
-<b>Viewable legion content:</b><P>
+<b><A NAME="#Viewable_legion_content">Viewable legion content:</A></b><P>
 That is a popup menu box with three possible selections:
 <ul>
 <li>Only own legions
 <li>Ever revealed (or concludable) since start
 <li>True content for all legions
 </ul>
-This setting controls which or how much information is shown to you when
-you look into legions using right-click or the Inspector window (those of other players - for your own ones you see
-always the full true content).
+This setting controls which or how much information is shown to you
+when you look into legions using right-click on a legion or the
+<A HREF="ClientOptions.html#Inspector">Inspector window</A> (those of
+ other players - for your own ones you see always the full true content).
 <p>
 The first one is like standard Titan - you are only allowed to review the
 contents of your own legions; information what is in other players legions
@@ -80,33 +90,35 @@ conclusions ("if the angel is here, then the Titan must be in that
 legion because it is the only other uncertain one right now"). If this option is selected, you see the result of such automatic tracking and conclusions,
 i.e. the same what the AI's will know.
 <p>
-This view shows you for other players legions all creatures which can with
-has ever been shown or can with certainty be concluded that a certain creature
+This view shows you for other players legions all creatures which were ever
+revealed, or can with certainty be concluded that a certain creature
 is in a certain legion.
 <P>
 For the remaining creatures in the legion, the Split prediction has a
 "best guess" - like, parent before a split had Titan, some weak and
 some strong creatures, and Titan teleported and is known, the rest
 not; most likely the strong creatures are with the titan and the weak
-ones in the split-off - but that is not certain.  For those which are
-uncertain (if and only if this view mode is selected), every client (=
-every individual player) has in his Graphics menu (in the running game
-then) a option called "<B>Uncertain as blank</B>" which controls,
-whether for this uncertain ones shall be displayed the best guess
-(with a question mark over it) or rather nothing (just a question
-mark).
+ones in the split-off - but that is not certain.  
 <P>
-<b>Events expire after (turns):</b><P> That is a popup menu box with
-numeric values. The selected value specifies for how (at maximum) 
-long back the
-events are viewable in the players "EventViewer" window (also from
-Graphics menu).  This EventViewer windows "reveals" all those events
-that would in an actual board game be mandatory to be revealed to
-other players - like: splitting, recruiting (what creature was taken,
-and what does he have that allows him to do so), teleport, acquired
-and summoned angels, and battle results (Note: the latter one are not
-fully implemended in the EventViewer, but there is a separate
-"Engagement Results" window). 
+For those which are uncertain (if and only if this view mode is
+selected), every client (= every individual player) has in his
+Graphics menu (in the running game then) a option called <A
+HREF="ClientOptions.html#UncertainAsBlank"> Uncertain as blank</A>
+which controls, whether for this uncertain ones shall be displayed the
+best guess (with a question mark over it) or rather nothing (just a
+question mark).
+<P>
+<b><A NAME="EventsExpireAfter">Events expire after</A> (turns):</b>
+<P> 
+That is a popup menu box with numeric values. The selected value
+specifies for how (at maximum) long back the events are viewable in
+the players "EventViewer" window (now in "Window" menu).  This
+EventViewer windows "reveals" all those events that would in an actual
+board game be mandatory to be revealed to other players - like:
+splitting, recruiting (what creature was taken, and what does he have
+that allows him to do so), teleport, acquired and summoned angels, and
+battle results (Note: the latter one are not fully implemended in the
+EventViewer, but there is a separate "Engagement Results" window).
 <P>
 In the EventViewer itself a player can select to display (beside which 
 types of events) fewer than the number of turns set in "Events expire after
@@ -131,38 +143,75 @@ allowed.
 <li>Always allow one hex
 <li>Use non-random battle dice
 </ul>
-See questions <B>What's the option "Slowing is cumulative"</B> and <b>
-What's the option Always allows one hex?</b> in the <A HREF="FAQ.html">FAQ</A>.
+
+<B><A NAME="#SlowingCumulative">Slowing is cumulative:</A></B>
 <P>
-The last one would use always a predefined sequence of rolls for battle 
-dice rolling. Probably only relevant for debugging purposes.
+In regular Titan, there&#39;s never two slowing reasons together (you
+don&#39;t find a bramble up a slope, for instance). In Variants this is
+possible, so we must decide what to do: do you need 2 (only one slow) or
+3 (count them both) movement points to go to an up-slope bramble
+(assuming you&#39;re non-native) ? Without this option, 2. With this
+option, 3. We don&#39;t decide, you do :-)</p>
+<P>
+<B><A NAME="#AlwaysAllowOneHex">Always allow one hex:</A></B>
+<P>
+This is necessary after introducing the aforementioned option
+<b>Slowing is cumulative</b>. What if a 2-skill creature wants to
+enter an up-slope bramble?  Without this option, it's impossible.
+With this option, any creature can enter any non-impassible hex as its
+first move (it will only move one hex), so our 2-skill creature can
+enter our up-slope bramble if it hasn't moved yet.
+<p>
+<B><A NAME="#NonRandomBattleDice">Use non-random battle dice:</A></B>
+this would use always a predefined sequence of rolls (right now:
+4,3,1,6,5,2) for battle dice rolling instead of random numbers. This
+would not necessarily guarantee "more equal chances" to the players,
+as it might still be that the one gets e.g. 6, 5, 2, 4, next player
+rangestrikes (only 2) gets 3 and 1, first player again the high
+numbers etc. Probably only relevant for debugging purposes.
 
 <h3>Section "AI timing"</h3><p>
 Those values control how long an AI will pause after certain actions and how
 long time it may maximum take for certain steps (calculating what is the best move and so on).
 <hr>
-<h2>Variant README pane</h2>
+<h2><A NAME="#VariantReadmePane">Variant README pane</A></h2>
 
-In the <b>Players</b> pane you can choose from a number of Variants, for
-which in this <b>Variant README</b> pane is then a description shown that
-tells what is different in this variant comparing to the standard Titan.
+With Colossus one can play "Standard Titan" (the original board,
+creatures, etc.) as well as a number of variants - modified board and/or
+creatures (different/additional ones, their skills and abilities
+modified, different recruiting possibilities, and so on).
+<p>
+In the bottom of the Get Players dialog you can choose from a number
+of Variants, for which in this <b>Variant README</b> pane is then a
+description shown that tells what is different in this variant
+comparing to the standard Titan.
 
 <hr>
-<h2>Bottom area</h2>
+<h2><A NAME="#GetPlayerBottomPart">Bottom part</A></h2>
 
-In the <B>Variant</B> section under the tabbed pane you can select which
-variant to play. There are several variants built-in, or alternatively 
-you could load an external variant from local files on your
-computer. By default preselected variant is called <b>Default</b>
-which is corresponding to the original Titan board and creatures.
-
+<H3>Variant selection</H3>
+In the <B>Variant</B> section below the tabbed pane you can select
+from the pulldown-menu which variant to play.  There are several
+variants built-in, or alternatively you could load an external variant
+from local files on your computer [perhaps not working properly right
+now?] using the <B>Load External Variant</B> button on the right side. 
+See <A HREF="Variant-HOWTO.html">Variant-HOWTO</A> for details.
 <P>
-In the bottom (<b>Game Startup</B>) section are action buttons to start
+By default preselected variant is called <b>Default</b> which
+is corresponding to the original Titan masterboard and creatures.
+<H3>Game starting</H3>
+In the bottom-most (<b>Game Startup</B>) section are action buttons to start
 the game, load a previously saved game, run a network client (see <A
 HREF="network.html">Networked Colossus</A> for details), or Quit.
 
+<HR>
+<P>
+<I>
+Created spring 2007, reflecting the state of Colossus at this time.
+<BR>
+Last updated friday, July 13, 2007 19:53 by Clemens Katzer
+</I>
 </body>
 </html>
-
 
 

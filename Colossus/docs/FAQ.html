@@ -23,13 +23,16 @@
       summonable creatures will be highlighted. Pick one, then click on the
       Summon button.</p>
       </li>
-      <li>How come I can see enemy units, but some have question marks over
-      them? 
-      <p>This is a demonstration of the AI&#39;s stack prediction algorithm.
-      Using memory of creatures that it&#39;s seen, process of elimination, and
-      some guesses about reasonable splits, it tries to figure out what&#39;s
-      in enemy stacks. We&#39;ll add the ability to turn this off later, for
-      those who want the extra challenge of doing it yourself.</p>
+      <li>How come I can see enemy units, but some have question marks
+      over them?  <p>This is a demonstration of the AI&#39;s stack
+      prediction algorithm.  Using memory of creatures that it&#39;s
+      seen, process of elimination, and some guesses about reasonable
+      splits, it tries to figure out what&#39;s in enemy stacks. With
+      the setting 
+      <A HREF="GetPlayersOptions.html#Viewable_legion_content">Viewable
+      legion content in Get Players startup dialog</A> (before game start)
+      it can be changed now, whether you are allowed to see enemy
+      legions content fully, partly, or not at all.</p>
       </li>
       <li>How to I make a legion spin around in a circle back to the original
       hex when I roll a 6? 
@@ -46,17 +49,16 @@
       through all possible moves several turns ahead isn&#39;t possible.</p>
       </li>
       <li>What&#39;s the difference between 
-      <b>SimpleAI</b>
-       and 
-      <b>CowardSimpleAI</b>
-       and 
-      <b>A Random AI</b>
-       ? 
+      <b>SimpleAI</b> and <b>CowardSimpleAI</b> and <b>A Random AI</b>? 
       <p>SimpleAI does a straightforward one-ply lookahead for MasterBoard
       moves. It works fairly well. CowardSimpleAI is the same code with some
       constants changed to make it less aggressive. A Random AI just chooses
       one of the available AIs at random -- this will be a more interesting
       option when there are more viable alternatives.</p>
+      Nowadays there is also RationalAI, HumanHaterRationalAI (that one is
+      just a RationalAI with some constants modified to make it more eager
+      to attack human players, but not other AI players) and MilvangAI.
+      <P>
       </li>
       <li>What does the 
       <b>Load External Variant</b>
@@ -65,8 +67,8 @@
       filesystem, not included in the game&#39;s jar file.</p>
       </li>
       <li>Why, in the Caretaker&#39;s Stack, do some creatures have 
-      <b>--</b>
-       instead of a number ? Why, in the Caretaker&#39;s Stack, are some
+      <b>--</b> instead of a number?<BR>
+      Why, in the Caretaker&#39;s Stack, are some
       creatures not red-crossed when there are 0 left? 
       <p>Same reason: those creatures are &quot;immortal&quot;, i.e. when
       they&#39;re killed on the batllefields, they&#39;re put back in the
@@ -75,23 +77,12 @@
       Titan).</p>
       </li>
       <li>What&#39;s the option &quot;Slowing is cumulative&quot; ? 
-      <p>In regular Titan, there&#39;s never two slowing reasons together (you
-      don&#39;t find a bramble up a slope, for instance). In Variants this is
-      possible, so we must decide what to do: do you need 2 (only one slow) or
-      3 (count them both) movement points to go to an up-slope bramble
-      (assuming you&#39;re non-native) ? Without this option, 2. With this
-      option, 3. We don&#39;t decide, you do :-)</p>
+      <p>See description in <A HREF="GetPlayersOptions.html#SlowingCumulative">
+        Get Players startup dialog options document.</A></P>
       </li>
-      <li>What&#39;s the option 
-      <b>Always allows one hex</b>
-       ? 
-      <p>This is necessary after introducing the aforementioned option 
-      <b>Slowing is cumulative</b>
-       . What if a 2-skill creature wants to enter an up-slope bramble ?
-      Without this option, it&#39;s impossible. With this option, any creature
-      can enter any non-impassible hex as its first move (it will only move one
-      hex), so our 2-skill creature can enter our up-slope bramble if it
-      hasn&#39;t moved yet.</p>
+      <li>What&#39;s the option <b>Always allows one hex</b> ? 
+      <p>See description in <A HREF="GetPlayersOptions.html#AlwaysAllowOneHex">
+        Get Players startup dialog options document.</A></P>
       </li>
       <li>How do I make Java Web Start stop upgrading my game to buggy new
       versions?</li>
@@ -115,7 +106,6 @@
       don't get angels if your legion is already 7 high.
       </p>
       </li>
-      <li style="list-style: none">
       <li>How can I help? 
       <p>
       <a href="BugReporting.html">Good bug reports</a>
