@@ -190,14 +190,15 @@ public final class MasterBoard extends JPanel
                     // copy to array so we don't get concurrent modification exceptions when iterating
                     Marker[] markerArray = (Marker[]) markers.toArray(new Marker[markers.size()]);
                     legionFlyouts = new JPanel[markers.size()];
-                    for (int i = 0; i < markerArray.length; i++) {
-						Marker marker = markerArray[i];
+                    for (int i = 0; i < markerArray.length; i++) 
+                    {
+                        Marker marker = markerArray[i];
                         LegionInfo legion = client.getLegionInfo(marker.getId());
                         int scale = 2*Scale.get();
                         
                         boolean dubiousAsBlanks = client.getOption(
                             Options.dubiousAsBlanks);
-						final JPanel panel = new LegionInfoPanel(legion, 
+                        final JPanel panel = new LegionInfoPanel(legion, 
                             scale, PANEL_MARGIN, PANEL_PADDING, true, 
                             viewMode, playerName, dubiousAsBlanks);
                         add(panel);
@@ -729,17 +730,17 @@ public final class MasterBoard extends JPanel
 
     private void addRadioButton(JMenu menu, ButtonGroup group, String name)
     {
-    	JRadioButtonMenuItem rbmi = new JRadioButtonMenuItem(name);
-    	rbmi.addItemListener(rcmHandler);
-    	group.add(rbmi);
+        JRadioButtonMenuItem rbmi = new JRadioButtonMenuItem(name);
+        rbmi.addItemListener(rcmHandler);
+        group.add(rbmi);
         menu.add(rbmi);
-    	boolean selected = false;
-    	if (name.equals(
-    			client.getStringOption(Options.showRecruitChitsSubmenu)))
-    	{
-    		selected = true;
-    	}
-    	rbmi.setSelected(selected);
+        boolean selected = false;
+        if (name.equals(
+                client.getStringOption(Options.showRecruitChitsSubmenu)))
+        {
+            selected = true;
+        }
+        rbmi.setSelected(selected);
     }
 
     private void setupTopMenu()
@@ -805,10 +806,10 @@ public final class MasterBoard extends JPanel
         // The "dubious as blanks" option makes only sense with the 
         //   "view what SplitPrediction tells us" mode => otherwise inactive.
         JCheckBoxMenuItem cbmi = 
-        	addCheckBox(graphicsMenu, Options.dubiousAsBlanks, KeyEvent.VK_D);
+            addCheckBox(graphicsMenu, Options.dubiousAsBlanks, KeyEvent.VK_D);
         if (client.getViewMode() != Options.viewableEverNum)
         {
-        	cbmi.setEnabled(false);
+            cbmi.setEnabled(false);
         }
 
         // "Show recruit preview chits ..." submenu 
@@ -2043,7 +2044,7 @@ public final class MasterBoard extends JPanel
                 // Right-click means to show the contents of the legion.
                 if (isPopupButton(e))
                 {
-                	LegionInfo legion = client.getLegionInfo(markerId);
+                    LegionInfo legion = client.getLegionInfo(markerId);
                     String playerName = client.getPlayerName();
                     int viewMode = client.getViewMode();
                     boolean dubiousAsBlanks =
@@ -2107,13 +2108,15 @@ public final class MasterBoard extends JPanel
             Marker marker = getMarkerAtPoint(point);
             if (marker != null)
             {
-               	client.showMarker(marker);
-            } else {
-            	GUIMasterHex hex = getHexContainingPoint(point);
+                client.showMarker(marker);
+            } 
+            else 
+            {
+                GUIMasterHex hex = getHexContainingPoint(point);
                 if (hex != null)
                 {
                     client.showHexRecruitTree(hex);
-                }            	
+                }
             }
         }
     }
@@ -2199,7 +2202,7 @@ public final class MasterBoard extends JPanel
             boolean selected = (e.getStateChange() == ItemEvent.SELECTED);
             if (selected && text != null)
             {
-            	client.setOption(Options.showRecruitChitsSubmenu, text);
+                client.setOption(Options.showRecruitChitsSubmenu, text);
             }
         }
     }
@@ -2522,12 +2525,12 @@ public final class MasterBoard extends JPanel
     
     public void enableBottomBarDoneButton()
     {
-    	bottomBar.enableDoneButton();
+        bottomBar.enableDoneButton();
     }
 
     public void disableBottomBarDoneButton()
     {
-    	bottomBar.disableDoneButton();
+        bottomBar.disableDoneButton();
     }
 
 }
