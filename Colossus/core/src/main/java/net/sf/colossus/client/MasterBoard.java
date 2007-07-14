@@ -129,6 +129,7 @@ public final class MasterBoard extends JPanel
 
     public static final String about = "About";
     public static final String viewReadme = "Show Variant Readme";
+    public static final String viewHelpDoc = "Options Documentation";
 
     private AbstractAction newGameAction;
     private AbstractAction loadGameAction;
@@ -154,6 +155,7 @@ public final class MasterBoard extends JPanel
 
     private AbstractAction aboutAction;
     private AbstractAction viewReadmeAction;
+    private AbstractAction viewHelpDocAction;
 
     /* a Set of label (String) of all Tower hex */
     private static Set towerSet = null;
@@ -687,6 +689,14 @@ public final class MasterBoard extends JPanel
                 new ShowReadme(masterFrame, client);
             }
         };
+        viewHelpDocAction = new AbstractAction(viewHelpDoc)
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                new ShowHelpDoc(masterFrame, client);
+            }
+        };
+
     }
 
     private void setupPopupMenu()
@@ -869,6 +879,8 @@ public final class MasterBoard extends JPanel
         mi = helpMenu.add(aboutAction);
         mi = helpMenu.add(viewReadmeAction);
         mi.setMnemonic(KeyEvent.VK_V);
+        
+        mi = helpMenu.add(viewHelpDocAction);
     }
 
     class ChangeLookFeelAction extends AbstractAction
