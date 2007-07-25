@@ -293,25 +293,19 @@
 	<!-- This requires rsync and a good ssh-agent setup. -->
 	<target name="remote-inst" depends="clean,init,sign,dist" description="copy files into htdocs tree on SF">
 		<exec executable="rsync">
-			<arg line="-e ssh Colossus.jar ${SERVER}:${HTML_DIR}" />
+			<arg line="-a Colossus.jar ${SERVER}:${HTML_DIR}" />
 		</exec>
 		<exec executable="rsync">
-			<arg line="-e ssh Colossus.jnlp ${SERVER}:${HTML_DIR}" />
-		</exec>
-		<exec executable="ssh">
-			<arg line="${SERVER} mkdir ${LIBS_DIR}" />
+			<arg line="-a Colossus.jnlp ${SERVER}:${HTML_DIR}" />
 		</exec>
 		<exec executable="rsync">
-			<arg line="-e ssh -pt libs/ ${SERVER}:${LIBS_DIR}" />
+			<arg line="-a libs ${SERVER}:${HTML_DIR}" />
 		</exec>
 		<exec executable="rsync">
-			<arg line="-e ssh ${ZIPFILE} ${SERVER}:${DOWNLOAD_DIR}" />
-		</exec>
-		<exec executable="ssh">
-			<arg line="${SERVER} mkdir ${DOCS_DIR}" />
+			<arg line="-a ${ZIPFILE} ${SERVER}:${DOWNLOAD_DIR}" />
 		</exec>
 		<exec executable="rsync">
-			<arg line="-e ssh -pt docs/* ${SERVER}:${DOCS_DIR}" />
+			<arg line="-a docs ${SERVER}:${HTML_DIR}" />
 		</exec>
 	</target>
 
