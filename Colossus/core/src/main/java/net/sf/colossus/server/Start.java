@@ -106,6 +106,7 @@ public final class Start
         else if (loadFilename != null && loadFilename.length() > 0)
         {
             options.clearPlayerInfo();
+            options.saveOptions();
             game.loadGame(loadFilename);
         }
 
