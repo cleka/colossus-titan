@@ -2483,15 +2483,16 @@ public final class Game
         return true;
     }
 
-    /** Move the legion to the hex if legal.  Return true if the
-     *  legion was moved or false if the move was illegal. */
-    boolean doMove(String markerId, String hexLabel, String entrySide,
+    /** Move the legion to the hex if legal.  Return a string telling
+     *  the reason why it is illegal, or null if ok and move was done.
+     */
+    String doMove(String markerId, String hexLabel, String entrySide,
             boolean teleport, String teleportingLord)
     {
         Legion legion = getLegionByMarkerId(markerId);
         if (legion == null)
         {
-            return false;
+            return "Legion null";
         }
 
         Player player = legion.getPlayer();
@@ -2501,7 +2502,13 @@ public final class Game
             if (!listTeleportMoves(legion, legion.getCurrentHex(),
                     player.getMovementRoll(), false).contains(hexLabel))
             {
-                return false;
+                String marker = legion.getMarkerId() + " " + legion.getMarkerName();
+                String from = legion.getCurrentHex().getLabel();
+                Set set = listTeleportMoves(legion, legion.getCurrentHex(),
+                        player.getMovementRoll(), false);
+                return "List for teleport moves " + set.toString()  + " of " + 
+                marker + " from " + from + 
+                " does not contain '" + hexLabel + "'";
             }
         }
         else
@@ -2509,7 +2516,12 @@ public final class Game
             if (!listNormalMoves(legion, legion.getCurrentHex(),
                     player.getMovementRoll(), false).contains(hexLabel))
             {
-                return false;
+                String marker = legion.getMarkerId() + " " + legion.getMarkerName();
+                String from = legion.getCurrentHex().getLabel();
+                Set set = listNormalMoves(legion, legion.getCurrentHex(),
+                        player.getMovementRoll(), false);
+                return "List for normal moves " + set.toString() + " + of " + marker + 
+                " from " + from + " does not contain '" + hexLabel + "'";
             }
         }
 
@@ -2517,7 +2529,7 @@ public final class Game
         Set legalSides = listPossibleEntrySides(markerId, hexLabel, teleport);
         if (!legalSides.contains(entrySide))
         {
-            return false;
+            return "EntrySide '" + entrySide + "' is not valid, valid are: " + legalSides.toString();
         }
 
         MasterHex hex = MasterBoard.getHexByLabel(hexLabel);
@@ -2536,7 +2548,10 @@ public final class Game
             if (teleportingLord == null || !legion.listTeleportingLords(
                     hexLabel).contains(teleportingLord))
             {
-                return false;
+                if (teleportingLord == null) return "teleportingLord null";
+                return "list of telep. lords " + 
+                legion.listTeleportingLords(hexLabel).toString() + 
+                " does not contain '" + teleportingLord + "'";
             }
             List creatureNames = new ArrayList();
             creatureNames.add(teleportingLord);
@@ -2544,7 +2559,7 @@ public final class Game
                 Constants.reasonTeleport);
         }
         legion.moveToHex(hex, entrySide, teleport, teleportingLord);
-        return true;
+        return null;
     }
 
     synchronized void engage(String hexLabel)

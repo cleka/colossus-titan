@@ -1480,8 +1480,9 @@ public final class Server implements IServer
         }
 
         String startingHexLabel = legion.getCurrentHexLabel();
-        if (game.doMove(markerId, hexLabel, entrySide, teleport,
-                teleportingLord))
+        String reasonFail = game.doMove(markerId, hexLabel, entrySide, teleport,
+                teleportingLord); 
+        if (reasonFail == null)
         {
             allTellDidMove(markerId, startingHexLabel, hexLabel, entrySide,
                     teleport, teleportingLord);
@@ -1489,7 +1490,7 @@ public final class Server implements IServer
         else
         {
             Log.error("Move failed");
-            client.nak(Constants.doMove, "Illegal move");
+            client.nak(Constants.doMove, "Illegal move: " + reasonFail);
         }
     }
 
