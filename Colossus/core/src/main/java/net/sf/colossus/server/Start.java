@@ -105,8 +105,8 @@ public final class Start
         // load a game instead of starting a new one.
         else if (loadFilename != null && loadFilename.length() > 0)
         {
-            options.clearPlayerInfo();
             options.saveOptions();
+            options.clearPlayerInfo();
             game.loadGame(loadFilename);
         }
 
