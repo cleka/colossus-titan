@@ -674,7 +674,7 @@ public final class MasterBoard extends JPanel
         {
             public void actionPerformed(ActionEvent e)
             {
-                client.showMessageDialog(
+                JOptionPane.showMessageDialog(masterFrame, 
                     "Colossus build: " + Client.getVersion() +
                     "\n" +
                     "user.home:      " + System.getProperty("user.home") +
