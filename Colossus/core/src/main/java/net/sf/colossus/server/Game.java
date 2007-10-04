@@ -2153,11 +2153,21 @@ public final class Game
                 String buf = (String)parts.get(1);
 
                 entrySides.add(buf);
+
+                // Clemens 4.10.2007:
+                // This optimization can lead to problems ("Illegal entry side")
+                // in mountains/tundra on a movement roll 4, when client and 
+                // server store the items in their Move-hashmaps in different
+                // order (different java version, platform, ... ?)
+                // So, removed this optimization to see whether it fixes the bug:
+                //  [colossus-Bugs-1789116 ] illegal move: 29 plain to 2000 tundra 
+                /*
                 // Don't bother finding more than one entry side if unoccupied.
                 if (!isOccupied(targetHexLabel))
                 {
                     return entrySides;
                 }
+                */
             }
         }
         return entrySides;
