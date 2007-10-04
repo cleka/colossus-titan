@@ -468,6 +468,7 @@ public final class Constants
     public static final String erMethodFlee = "flee";
     public static final String erMethodConcede = "concede";
     public static final String erMethodFight = "fight";
+    public static final String erMethodTimeLoss = "timeloss";
     public static final String erMethodNegotiate = "negotiate";
     
     static

@@ -645,6 +645,10 @@ public class RevealEvent
             {
                 eventTypeText = "Conceded: ";
             }
+            else if (info.equals(Constants.erMethodTimeLoss))
+            {
+                eventTypeText = "Time loss: ";
+            }
             else if (info.equals(Constants.erMethodNegotiate))
             {
                 eventTypeText = "Negotiated: ";

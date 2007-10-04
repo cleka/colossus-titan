@@ -376,7 +376,7 @@ public final class Client implements IClient, IOracle, IOptions
     RevealEvent loserLegion; 
 
     public void tellEngagementResultsEventHandling(
-            String winnerId, String method)
+            String winnerId, String method, int turns)
     {
         // if those are not set, we are new version client with old
         // version server, who does not provide the reason argument
@@ -440,6 +440,10 @@ public final class Client implements IClient, IOracle, IOptions
             // thus make sure they are really shown dead.
             loserLegion.setAllDead();
             loserLegion.setEventType(RevealEvent.eventLost);
+            if (turns > 7)
+            {
+                method = Constants.erMethodTimeLoss;
+            }
             loserLegion.setEventInfo(method);
             eventViewer.addEvent(loserLegion);
             
@@ -480,7 +484,7 @@ public final class Client implements IClient, IOracle, IOptions
             return;
         }
 
-        tellEngagementResultsEventHandling(winnerId, method);
+        tellEngagementResultsEventHandling(winnerId, method, turns);
         
         if (getOption(Options.showEngagementResults))
         {

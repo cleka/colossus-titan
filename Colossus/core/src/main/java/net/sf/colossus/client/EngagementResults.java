@@ -548,8 +548,16 @@ final class EngagementResults extends KDialog
             {
                 if (winnerId != null)
                 {
-                    result = winnerId + " won the battle in " + this.turns +
-                        " turns and earned " + this.points + " points";
+                    if (turns > 7)
+                    {
+                        result = winnerId + " won the battle by time loss" +
+                            " and earned " + this.points + " points";   
+                    }
+                    else
+                    {
+                        result = winnerId + " won the battle in " + this.turns +
+                            " turns and earned " + this.points + " points";
+                    }
                 }
                 else
                 {
