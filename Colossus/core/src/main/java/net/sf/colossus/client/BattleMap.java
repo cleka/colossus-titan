@@ -2,8 +2,8 @@ package net.sf.colossus.client;
 
 
 import java.awt.BorderLayout;
+import java.awt.GridLayout;
 import java.awt.Color;
-import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.Graphics;
 import java.awt.Image;
@@ -22,14 +22,18 @@ import java.util.ListIterator;
 import java.util.Set;
 
 import javax.swing.AbstractAction;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
+import javax.swing.SwingConstants;
 
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.util.Log;
@@ -50,8 +54,8 @@ public final class BattleMap extends HexMap implements MouseListener,
     private JFrame battleFrame;
     private JMenuBar menuBar;
     private JMenu phaseMenu;
+    private InfoPanel infoPanel;
     private Client client;
-    private JLabel playerLabel;
     private Cursor defaultCursor;
 
     /** tag of the selected critter, or -1 if no critter is selected. */
@@ -79,7 +83,8 @@ public final class BattleMap extends HexMap implements MouseListener,
         battleFrame = new JFrame();
         battleFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 
-        Container contentPane = battleFrame.getContentPane();
+        JPanel contentPane = new JPanel();
+        battleFrame.setContentPane(contentPane);
         contentPane.setLayout(new BorderLayout());
 
         setupIcon();
@@ -104,21 +109,28 @@ public final class BattleMap extends HexMap implements MouseListener,
 
         contentPane.add(new JScrollPane(this), BorderLayout.CENTER);
 
-        setupPlayerLabel();
-        contentPane.add(playerLabel, BorderLayout.NORTH);
+        infoPanel = new InfoPanel();
+        contentPane.add(infoPanel, BorderLayout.NORTH);
+
+        String colorName = client.getColor();
+        if ( colorName != null )
+        {
+            Color color = PickColor.getBackgroundColor(colorName);
+            contentPane.setBorder(BorderFactory.createLineBorder(color));
+        }
 
         defaultCursor = battleFrame.getCursor();
 
         // Do not call pack() or setVisible(true) until after
         // BattleDice is added to frame.
 
-        battleFrame.setTitle(
-            net.sf.colossus.server.Legion.getMarkerName(attackerMarkerId) +
-            " (" + attackerMarkerId +
-            ") attacks " +
-            net.sf.colossus.server.Legion.getMarkerName(defenderMarkerId) +
-            " (" + defenderMarkerId +
-            ") in " + masterHexLabel);
+        battleFrame.setTitle(client.getPlayerName() + ": "
+                + net.sf.colossus.server.Legion.getMarkerName(attackerMarkerId)
+                + " ("
+                + attackerMarkerId
+                + ") attacks "
+                + net.sf.colossus.server.Legion.getMarkerName(defenderMarkerId)
+                + " (" + defenderMarkerId + ") in " + masterHexLabel);
     }
 
     // Simple constructor for testing. 
@@ -327,6 +339,26 @@ public final class BattleMap extends HexMap implements MouseListener,
         return battleFrame;
     }
 
+    public void setPhase (Constants.BattlePhase newBattlePhase) 
+    {
+        if ( client.getPlayerName().equals(
+            client.getBattleActivePlayerName()) )
+        {
+            enableDoneButton();
+            infoPanel.setOwnPhase(newBattlePhase.toString());
+        }
+        else
+        {
+            disableDoneButton();
+            infoPanel.setForeignPhase(newBattlePhase.toString());
+        }
+    }
+    
+    public void setTurn(int newturn)
+    {
+        infoPanel.turnPanel.advTurn(newturn);
+    }
+
     private void setupIcon()
     {
         List directories = new java.util.ArrayList();
@@ -356,23 +388,6 @@ public final class BattleMap extends HexMap implements MouseListener,
         {
             battleFrame.setIconImage(image);
         }
-    }
-
-    /** Show which player owns this board. */
-    void setupPlayerLabel()
-    {
-        String playerName = client.getPlayerName();
-        playerLabel = new JLabel(playerName);
-
-        String colorName = client.getColor();
-        // If we call this before player colors are chosen, just use
-        // the defaults.
-        if (colorName != null)
-        {
-            Color color = PickColor.getBackgroundColor(colorName);
-            playerLabel.setForeground(color);
-        }
-        playerLabel.repaint();
     }
 
     public static BattleHex getEntrance(String terrain,
@@ -447,7 +462,16 @@ public final class BattleMap extends HexMap implements MouseListener,
     {
         Set set = client.findMobileCritterHexes();
         unselectAllHexes();
-        selectHexesByLabels(set);
+        int tag = autoSelectOneCritterInEntrance(client, set);
+        if (tag == -1) // No critters in entrances
+        {
+            selectHexesByLabels(set);
+        }
+        else
+        {
+            selectedCritterTag = tag;
+            highlightMoves(tag);
+        }
     }
 
     private void highlightMoves(int tag)
@@ -720,5 +744,155 @@ public final class BattleMap extends HexMap implements MouseListener,
             requestFocus();
             getFrame().toFront();
         }
+    }
+
+
+    private class TurnPanel extends JPanel
+    {
+
+        private JLabel[] turn;
+        private int turnNumber;
+
+        private TurnPanel()
+        {
+            this(client.getMaxBattleTurns());
+        }
+        private TurnPanel(int MAXBATTLETURNS)
+        {
+            super(new GridLayout( (MAXBATTLETURNS + 1) % 8 + 1, 0));
+            turn = new JLabel[MAXBATTLETURNS + 1];
+            // Create Special labels for Recruitment turns
+            int[] REINFORCEMENTTURNS = client.getReinforcementTurns();
+            for ( int i = 0; i < REINFORCEMENTTURNS.length; i++ )
+            {
+                int j = REINFORCEMENTTURNS[i];
+                turn[j - 1] = new JLabel( (j) + "+", SwingConstants.CENTER);
+                resetTurn(j); // Set thin Border
+            }
+            // make the final "extra" turn label to show "time loss"
+            turn[turn.length - 1] = new JLabel("Loss", SwingConstants.CENTER);
+            resetTurn(turn.length);
+            // Create remaining labels
+            for ( int i = 0; i < turn.length; i++ )
+            {
+                if ( turn[i] == null )
+                {
+                    turn[i] = new JLabel(Integer.toString(i + 1),
+                        SwingConstants.CENTER);
+                    resetTurn(i + 1); // Set thin Borders
+                }
+            }
+            turnNumber = 0;
+            
+            for ( int i = 0; i < turn.length; i++ )
+            {
+                this.add(turn[i]);
+            }
+        }
+
+        private void advTurn(int newturn)
+        {
+            if (turnNumber > 0)
+            {
+                resetTurn(turnNumber);
+            }
+            setTurn(newturn);
+        }
+
+        private void resetTurn(int newTurn)
+        {
+            setBorder(turn[newTurn - 1], 1);
+        }
+
+        private void setTurn(int newTurn)
+        {
+            if (client.isMyBattlePhase())
+            {
+                setBorder(turn[newTurn - 1], 5);
+            }
+            else
+            {
+                setBorder(turn[newTurn - 1], 3);
+            }
+            turnNumber = newTurn;
+        }
+
+        private void setBorder(JLabel turn, int thick)
+        {
+            if (thick == 3)
+            {
+                turn.setBorder(BorderFactory.createLineBorder(Color.GRAY,3));
+            } 
+            else
+            {
+                if (thick == 5)
+                {
+                    turn.setBorder(BorderFactory.createLineBorder(Color.RED,5));
+                } 
+                else
+                {
+                    turn.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+                }
+            }
+        }
+    } // class TurnPanel
+
+
+    class InfoPanel extends JPanel
+    {
+        private TurnPanel turnPanel;
+        private JButton doneButton;
+        private JLabel phaseLabel;
+
+        // since inner class most methods can be private.
+        private InfoPanel()
+        {
+            super();
+            setLayout(new java.awt.BorderLayout());
+
+            doneButton = new JButton(doneWithPhaseAction);
+            add(doneButton, BorderLayout.WEST);
+
+            phaseLabel = new JLabel("- phase -");
+            add(phaseLabel, BorderLayout.EAST);
+            
+            turnPanel = new TurnPanel();
+            add(turnPanel, BorderLayout.CENTER);
+        }
+
+        private void setOwnPhase(String s)
+        {
+            phaseLabel.setText(s);
+            doneButton.setEnabled(true);
+        }
+
+        private void setForeignPhase(String s)
+        {
+            String name = client.getBattleActivePlayerName();
+            phaseLabel.setText("(" + name + ") " + s);
+            doneButton.setEnabled(false);
+        }
+
+        private void disableDoneButton()
+        {
+            doneButton.setEnabled(false);
+        }
+
+        private void enableDoneButton()
+        {
+            doneButton.setEnabled(true);
+        }
+
+    }
+
+    // semi-public accessors to private methods
+    void enableDoneButton()
+    {
+        infoPanel.enableDoneButton();
+    }
+
+    void disableDoneButton()
+    {
+        infoPanel.disableDoneButton();
     }
 }

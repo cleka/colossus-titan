@@ -2721,6 +2721,8 @@ public final class Client implements IClient, IOracle, IOptions
                 defenderMarkerId);
             JFrame frame = map.getFrame();
             battleDice = new BattleDice();
+            map.setPhase(battlePhase);
+            map.setTurn(battleTurnNumber);
             frame.getContentPane().add(battleDice, BorderLayout.SOUTH);
             frame.pack();
             frame.setVisible(true);
@@ -2741,6 +2743,17 @@ public final class Client implements IClient, IOracle, IOptions
         battleTurnNumber = -1;
         battleActivePlayerName = null;
     }
+    
+    public int[] getReinforcementTurns()
+    {
+        int[] reinforcementTurns = { 4 };
+        return reinforcementTurns;
+    }
+    public int getMaxBattleTurns() 
+    {
+        return 7;
+    }
+
 
     private void highlightEngagements()
     {
@@ -3163,6 +3176,8 @@ public final class Client implements IClient, IOracle, IOptions
 
         if (map != null)
         {
+            map.setPhase(battlePhase);
+            map.setTurn(battleTurnNumber);
             if (isMyBattlePhase())
             {
                 focusMap();
@@ -3186,6 +3201,8 @@ public final class Client implements IClient, IOracle, IOptions
 
         if (map != null)
         {
+            map.setPhase(battlePhase);
+            map.setTurn(battleTurnNumber);
             if (isMyBattlePhase())
             {
                 focusMap();
@@ -3217,11 +3234,16 @@ public final class Client implements IClient, IOracle, IOptions
         cleanupNegotiationDialogs();
         resetAllBattleMoves();
         this.battlePhase = Constants.BattlePhase.MOVE;
-        if (map != null && isMyBattlePhase())
+        if (map != null)
         {
-            focusMap();
-            defaultCursor();
-            map.setupMoveMenu();
+            map.setPhase(battlePhase);
+            map.setTurn(battleTurnNumber);
+            if (isMyBattlePhase())
+            {
+                focusMap();
+                defaultCursor();
+                map.setupMoveMenu();
+            }
         }
         updateStatusScreen();
         if (isMyBattlePhase() && getOption(Options.autoPlay))
@@ -3282,6 +3304,8 @@ public final class Client implements IClient, IOracle, IOptions
 
         if (map != null)
         {
+            map.setPhase(battlePhase);
+            map.setTurn(battleTurnNumber);
             if (isMyBattlePhase())
             {
                 focusMap();

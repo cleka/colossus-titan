@@ -540,6 +540,24 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
         }
     }
 
+    int autoSelectOneCritterInEntrance(Client client, Set labels)
+    {
+        Iterator it = hexes.iterator();
+        while (it.hasNext())
+        {
+            GUIBattleHex hex = (GUIBattleHex)it.next();
+            BattleHex hexModel = hex.getBattleHexModel();
+            if (hexModel.isEntrance() &&
+                labels.contains(hex.getHexModel().getLabel()))
+            {
+                List battleChits = client.getBattleChits(hexModel.getLabel());
+                BattleChit chit = (BattleChit) battleChits.get(0);
+                return chit.getTag();
+            }
+        }
+        return -1;
+    }
+
     /** Do a brute-force search through the hex array, looking for
      *  a match.  Return the hex, or null. */
     GUIBattleHex getGUIHexByLabel(String label)
