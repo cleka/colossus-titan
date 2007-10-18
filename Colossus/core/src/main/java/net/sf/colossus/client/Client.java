@@ -335,32 +335,20 @@ public final class Client implements IClient, IOracle, IOptions
 
     private void initShowEngagementResults()
     {
-        JFrame frame = getMapOrBoardFrame();
-        if (frame == null)
+        JFrame parent = secondaryParent;
+        if((parent == null) && (board != null))
+        {
+            parent = board.getFrame();
+        }
+
+        // no board at all, e.g. AI - nothing to do.
+        if (parent == null)
         {
             return;
         }
 
-        if (engagementResults == null)
-        {
-            engagementResults = new EngagementResults(frame, this, this);
-            engagementResults.maybeShow();
-        }
-    }
-
-    private void showEngagementResults(boolean show)
-    {
-        if (engagementResults == null && show)
-        {
-            initShowEngagementResults();
-        }
-        // init may not have set it e.g. if board (still) null...
-        if (engagementResults != null)
-        {
-            // maybeShow decides byitself based on the current value
-            // of the option whether to hide or show. 
-            engagementResults.maybeShow();
-        }
+        engagementResults = new EngagementResults(parent, this, this);
+        engagementResults.maybeShow();
     }
 
     void highlightBattleSite()
@@ -486,23 +474,14 @@ public final class Client implements IClient, IOracle, IOptions
 
         tellEngagementResultsEventHandling(winnerId, method, turns);
         
-        if (getOption(Options.showEngagementResults))
+        if (engagementResults != null)
         {
-            if (engagementResults == null)
-            {
-                engagementResults = new EngagementResults(frame, this, this);
-                engagementResults.maybeShow();
-            }
             engagementResults.addData(winnerId, method, points, turns,
                 _tellEngagementResults_attackerStartingContents,
                 _tellEngagementResults_defenderStartingContents,
                 _tellEngagementResults_attackerLegionCertainities,
                 _tellEngagementResults_defenderLegionCertainities,
                 isMyTurn());
-        }
-        else
-        {
-            engagementResults = null;
         }
     }
 
@@ -934,7 +913,13 @@ public final class Client implements IClient, IOracle, IOptions
         }
         else if (optname.equals(Options.showEngagementResults))
         {
-            showEngagementResults(bval);
+            // null if there is no board, e.g. AI
+            if (engagementResults != null)
+            {
+                // maybeShow decides by itself based on the current value
+                // of the option whether to hide or show. 
+                engagementResults.maybeShow();
+            }
         }
         else if (optname.equals(Options.favoriteLookFeel))
         {
@@ -1225,6 +1210,15 @@ public final class Client implements IClient, IOracle, IOptions
         }
     }
 
+    void disposeEngagementResults()
+    {
+        if (engagementResults != null)
+        {
+            engagementResults.dispose();
+            engagementResults = null;
+        }
+    }
+
     public void dispose()
     {
         sct.setGoingDown();
@@ -1232,6 +1226,7 @@ public final class Client implements IClient, IOracle, IOptions
         disposeMovementDie();
         disposeStatusScreen();
         disposeEventViewer();
+        disposeEngagementResults();
         disposeMasterBoard();
         if (isRemote())
         {
@@ -2161,6 +2156,7 @@ public final class Client implements IClient, IOracle, IOptions
                    ) ))
         {
             disposeEventViewer();
+            disposeEngagementResults();
             disposeMasterBoard();
             board = new MasterBoard(this);
             if ( getOption(Options.showAutoInspector) )
@@ -2178,11 +2174,7 @@ public final class Client implements IClient, IOracle, IOptions
                 optionTrigger(Options.showAutoInspector, String.valueOf(true));
             }
 
-            if (getOption(Options.showEngagementResults))
-            {
-                initShowEngagementResults();
-            }
-
+            initShowEngagementResults();
             initEventViewer();
             focusBoard();
         }
