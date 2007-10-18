@@ -6,8 +6,6 @@ import java.net.UnknownHostException;
 import java.util.Date;
 import java.util.Iterator;
 
-import javax.swing.JFrame;
-
 import net.sf.colossus.client.Client;
 import net.sf.colossus.client.StartClient;
 import net.sf.colossus.util.Log;
@@ -92,7 +90,21 @@ public final class Start
         clearNonPersistentOptions(options);
         setupOptionsFromCommandLine(cl, game);
 
-        new GetPlayers(new JFrame(), options);
+        Object mutex = new Object();
+        new GetPlayers(options, mutex);
+        synchronized(mutex)
+        {
+            try
+            { 
+                mutex.wait();
+            }
+            catch(InterruptedException e) 
+            {
+                Log.warn("Start waiting for GetPlayers to complete, wait interrupted?");
+            }
+        }
+        mutex = null;
+        
         String loadFilename = options.getStringOption(Constants.loadGame);
 
         if (options.isEmpty())

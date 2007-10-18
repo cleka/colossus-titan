@@ -12,7 +12,6 @@ import java.util.List;
 import java.net.*;
 
 import net.sf.colossus.util.ResourceLoader;
-import net.sf.colossus.util.KDialog;
 import net.sf.colossus.util.Options;
 import net.sf.colossus.util.Log;
 import net.sf.colossus.client.PickIntValue;
@@ -28,12 +27,12 @@ import net.sf.colossus.client.SaveWindow;
  */
 
 
-public final class GetPlayers extends KDialog implements WindowListener,
+public final class GetPlayers extends JFrame implements WindowListener,
             ActionListener, ItemListener
 {
     public static final String loadVariant = "Load External Variant";
 
-    private JFrame parentFrame;
+    private Object mutex;
 
     private Vector typeChoices = new Vector();
     private JComboBox[] playerTypes = new JComboBox[Constants.MAX_MAX_PLAYERS];
@@ -54,15 +53,15 @@ public final class GetPlayers extends KDialog implements WindowListener,
     private SaveWindow saveWindow;
 
     /** Clear options to abort */
-    public GetPlayers(JFrame parentFrame, Options options)
+    public GetPlayers(Options options, Object mutex)
     {
-        super(parentFrame, "Game Setup", true);
+        super("Game Setup");
 
         this.options = options;
-
+        this.mutex = mutex;
+        
         setupTypeChoices();
 
-        this.parentFrame = parentFrame;
         setBackground(Color.lightGray);
         pack();
 
@@ -459,7 +458,7 @@ public final class GetPlayers extends KDialog implements WindowListener,
     {
         JFileChooser chooser = new JFileChooser(Constants.saveDirname);
         chooser.setFileFilter(new XMLSnapshotFilter());
-        int returnVal = chooser.showOpenDialog(parentFrame);
+        int returnVal = chooser.showOpenDialog(this);
         if (returnVal == JFileChooser.APPROVE_OPTION)
         {
             // Set key to "load game" and value to savegame filename.
@@ -510,7 +509,7 @@ public final class GetPlayers extends KDialog implements WindowListener,
         varChooser.setFileFilter(new varFileFilter());
         varChooser.setDialogTitle(
                 "Choose your variant (or cancel for default game)");
-        int returnVal = varChooser.showOpenDialog(varChooser);
+        int returnVal = varChooser.showOpenDialog(this);
         if (returnVal == javax.swing.JFileChooser.APPROVE_OPTION)
         {
             File varFile = varChooser.getSelectedFile().getAbsoluteFile();
@@ -553,7 +552,7 @@ public final class GetPlayers extends KDialog implements WindowListener,
         }
         else if (e.getActionCommand().equals(Options.aiDelay))
         {
-            final int newDelay = PickIntValue.pickIntValue(parentFrame,
+            final int newDelay = PickIntValue.pickIntValue(this,
                     oldDelay, "Pick AI Delay (in ms)", Constants.MIN_AI_DELAY,
                     Constants.MAX_AI_DELAY, 100, options);
             if (newDelay != oldDelay)
@@ -564,7 +563,7 @@ public final class GetPlayers extends KDialog implements WindowListener,
         }
         else if (e.getActionCommand().equals(Options.aiTimeLimit))
         {
-            final int newLimit = PickIntValue.pickIntValue(parentFrame,
+            final int newLimit = PickIntValue.pickIntValue(this,
                 oldLimit, "Pick AI Time Limit (in s)",
                 Constants.MIN_AI_TIME_LIMIT, Constants.MAX_AI_TIME_LIMIT, 
                 1, options);
@@ -713,5 +712,54 @@ public final class GetPlayers extends KDialog implements WindowListener,
             saveWindow.saveLocation(getLocation());
         }
         super.dispose();
+        synchronized(mutex)
+        {
+            mutex.notify();
+        }
+    }
+    
+    /** Center this dialog on the screen.  Must be called after the dialog
+     *  size has been set. */
+    public void centerOnScreen()
+    {
+        Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
+        setLocation(new Point(d.width / 2 - getSize().width / 2,
+            d.height / 2 - getSize().height / 2));
+    }
+    
+    public void windowActivated(WindowEvent e)
+    {
+        // nothing to do
+    }
+
+    public void windowClosed(WindowEvent e)
+    {
+        // nothing to do
+    }
+
+    public void windowDeactivated(WindowEvent e)
+    {
+        // nothing to do
+    }
+
+    public void windowDeiconified(WindowEvent e)
+    {
+        // nothing to do
+    }
+
+    public void windowIconified(WindowEvent e)
+    {
+        // nothing to do
+    }
+
+    public void windowOpened(WindowEvent e)
+    {
+        // nothing to do
+    }
+
+    
+    public void finalize()
+    {
+        System.out.println("GetPlayers finalized...");
     }
 }
