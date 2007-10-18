@@ -15,9 +15,21 @@ one-line-info on the main pages "News" section.
 <H3>xxx xx 2007, build r27xx</H3>
 Changes so far:
 <UL>
+<LI>Engagement window collects now all results, no matter whether it is
+    enabled or not, and does not forget old results when closed.
+<LI>Game Setup window is now a JFrame  (instead of being a JDialog as it 
+    was before) which means, it can be minimized, and has own taskbar icon.
+<LI>In BattleMap now added: Done button, turn+phase+activePlayer indicator,
+    and for the beginning player possible movement target hexes are 
+    highlighted as if he would have clicked onto the topmost offboard 
+    creature.
+<LI>EngagementResult and EventViewer windows now handle time-losses
+    properly (before, they just told "won in 8 turns" and "destroyed").
 <LI>Updated in documents that recommended Java version is now 1.4.2.
 <LI>After the fix for [1769985], when used Load Game button player 
     types and names were all wiped out. This is now corrected again.
+<LI>Most likely fixed now:  [1789116] and [1737239] ("Illegal move" message
+    when going with a 4 up to tundra/mountain).
 <LI>Fixed: [ 1758248 ] Help - About is now also shown even if autoplay
     is on.
 </UL>
