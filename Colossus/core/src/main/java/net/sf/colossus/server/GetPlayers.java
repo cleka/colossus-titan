@@ -424,6 +424,7 @@ public final class GetPlayers extends JFrame implements WindowListener,
                 // Duplicate names are not allowed.
                 if (names.contains(name))
                 {
+                    JOptionPane.showMessageDialog(this, "Duplicate player names!");
                     options.clearPlayerInfo();
                     return;
                 }
@@ -436,6 +437,7 @@ public final class GetPlayers extends JFrame implements WindowListener,
         // Exit if there aren't enough unique player names.
         if (numPlayers < 1 || names.size() != numPlayers)
         {
+            JOptionPane.showMessageDialog(this, "Not enough different unique player names!");
             options.clearPlayerInfo();
             return;
         }
@@ -755,11 +757,5 @@ public final class GetPlayers extends JFrame implements WindowListener,
     public void windowOpened(WindowEvent e)
     {
         // nothing to do
-    }
-
-    
-    public void finalize()
-    {
-        System.out.println("GetPlayers finalized...");
     }
 }
