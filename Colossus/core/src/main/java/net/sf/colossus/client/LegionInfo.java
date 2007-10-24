@@ -74,6 +74,11 @@ public final class LegionInfo
         return marker;
     }
 
+    public boolean isMyLegion()
+    {
+        return isMyLegon;
+    }
+    
     public int getHeight()
     {
         PredictSplitNode node = getNode();
@@ -330,6 +335,37 @@ public final class LegionInfo
         return sum;
     }
 
+    /** Return the total point value of those creatures of this legion
+     *  which are certain.
+     */
+    public int getCertainPointValue()
+    {
+        int sum = 0;
+        Iterator it = getNode().getCertainCreatures().
+            getCreatureNames().iterator();
+        while (it.hasNext())
+        {
+            String name = (String)it.next();
+            if (name.startsWith(Constants.titan))
+            {
+                PlayerInfo info = client.getPlayerInfo(playerName);
+                // Titan skill is changed by variants.
+                sum += info.getTitanPower() *
+                    Creature.getCreatureByName("Titan").getSkill();
+            }
+            else
+            {
+                sum += Creature.getCreatureByName(name).getPointValue();
+            }
+        }
+        return sum;
+    }
+
+    public int numUncertainCreatures()
+    {
+        return getNode().numUncertainCreatures();
+    }
+    
     /** Legions are sorted in descending order of known total point value,
      with the titan legion always coming first.  This is inconsistent
      with equals().  Really only useful for comparing own legions. */

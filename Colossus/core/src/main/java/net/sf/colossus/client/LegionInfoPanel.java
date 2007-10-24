@@ -18,28 +18,35 @@ import net.sf.colossus.util.Options;
 
 public final class LegionInfoPanel extends JPanel
 {
+    private String valueText = "";
+   
     public LegionInfoPanel(LegionInfo legion, int scale, int margin, 
             int padding, boolean usePlayerColor, int viewMode, 
             String playerName, boolean dubiousAsBlanks)
     {
-    
+        boolean contentCertain = false;
+        boolean hideAll = false;
+        
         if ( viewMode == Options.viewableAllNum )
         {
+            contentCertain = true;
             viewAll(legion, usePlayerColor, scale, margin, padding,
-                    dubiousAsBlanks, false);
+                    dubiousAsBlanks, hideAll);
         }
         else if ( viewMode == Options.viewableOwnNum )
         {
             String legionOwner = legion.getPlayerName();   
             if ( playerName.equals(legionOwner) )
             {
+                contentCertain = true;
                 viewAll(legion, usePlayerColor, scale, margin, padding,
-                        dubiousAsBlanks, false);
+                        dubiousAsBlanks, hideAll);
             }
             else
             {
+                hideAll = true;
                 viewAll(legion, usePlayerColor, scale, margin, padding,
-                        false, true);
+                        false, hideAll);
             }
         }
         else if ( viewMode == Options.viewableEverNum )
@@ -49,14 +56,45 @@ public final class LegionInfoPanel extends JPanel
             // thus we can use the splitPrediction to decide what is
             // "has ever been shown or can be concluded".
             viewAll(legion, usePlayerColor, scale, margin, padding,
-                    dubiousAsBlanks, false);
+                    dubiousAsBlanks, hideAll);
         } 
         else 
         {
             viewOtherText("not implemented...");
         }
+        
+        if (contentCertain)
+        {
+            int value = legion.getPointValue();
+            valueText = " (" + value + " points)";
+        }
+        else
+        {
+            int value = legion.getCertainPointValue();
+            String ucString = "";
+            int numUC = legion.numUncertainCreatures();
+            if (numUC > 0)
+            {
+                StringBuffer uncertainIndicator = new StringBuffer(8);
+                uncertainIndicator.append("+");
+                while (numUC > 0)
+                {
+                    uncertainIndicator.append("?");
+                    numUC--;
+                }
+                // substring so that StringBuffer gets released.
+                ucString = uncertainIndicator.substring(0);
+            }
+            
+            valueText = " (" + value + ucString + " points)";
+        }
     }
 
+    public String getValueText()
+    {
+        return valueText;
+    }
+    
     private void viewOtherText(String text)
     {
         add(new JLabel(text));

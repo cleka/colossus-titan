@@ -84,9 +84,16 @@ public class AutoInspector extends KDialog
     {
         scrollPane.getViewport().removeAll();
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-
-        panel.add(new LegionInfoPanel(legion, 4 * Scale.get(), 5, 2, false, 
-                viewMode, playerName, dubiousAsBlanks));
+        
+        LegionInfoPanel liPanel = new LegionInfoPanel(legion, 4 * Scale.get(),
+                5, 2, false, viewMode, playerName, dubiousAsBlanks);
+        panel.add(liPanel);
+        String valueText = liPanel.getValueText();
+        String ownerText = legion.isMyLegion() ? 
+                "" : " [" + legion.getPlayerName() + "]";
+        setTitle("Inspector: Legion " + legion.getMarkerId() + 
+                valueText + ownerText);
+        liPanel = null;
         
         scrollPane.getViewport().add(panel);
         repaint();
@@ -94,10 +101,13 @@ public class AutoInspector extends KDialog
 
     public void showHexRecruitTree(GUIMasterHex hex) 
     {
+        setTitle("Inspector");
         scrollPane.getViewport().removeAll();
         MasterHex hexModel = hex.getMasterHexModel();
-        scrollPane.getViewport().add(new HexRecruitTreePanel(BoxLayout.X_AXIS,hexModel.getTerrain(),hexModel.getLabel(),new MouseAdapter(){
-        	// nothing to do
+        scrollPane.getViewport().add(new HexRecruitTreePanel(BoxLayout.X_AXIS,
+                hexModel.getTerrain(),hexModel.getLabel(), new MouseAdapter()
+        {
+        	    // nothing to do
         }));
         repaint();
     }

@@ -27,7 +27,7 @@ final class ShowLegion extends KDialog implements MouseListener,
                Point point, JScrollPane pane, int scale, 
                String playerName, int viewMode, boolean dubiousAsBlanks)
     {
-        super(parentFrame, "Legion " + legion.getMarkerId(), false);
+        super(parentFrame, legion.getMarkerId(), false);
 
         if (legion.getImageNames().isEmpty())
         {
@@ -38,8 +38,13 @@ final class ShowLegion extends KDialog implements MouseListener,
         setBackground(Color.lightGray);
         addWindowListener(this);
 
-        getContentPane().add(new LegionInfoPanel(legion, scale, 5, 2, false, 
-                viewMode, playerName, dubiousAsBlanks));
+        LegionInfoPanel liPanel = new LegionInfoPanel(legion, scale, 5, 2, 
+                false, viewMode, playerName, dubiousAsBlanks);
+        getContentPane().add(liPanel);
+        
+        String valueText = liPanel.getValueText();
+        setTitle(legion.getMarkerId() + valueText);
+        liPanel = null;
                 
         placeRelative(parentFrame, point, pane);
 
