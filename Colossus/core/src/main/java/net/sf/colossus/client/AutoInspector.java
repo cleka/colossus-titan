@@ -55,7 +55,8 @@ public class AutoInspector extends KDialog
         });
 
         saveWindow = new SaveWindow(options, "AutoInspector");
-        saveWindow.restore(this, new Point(0,0));
+        Point location = getUpperRightCorner(550);
+        saveWindow.restore(this, location);
         
         scrollPane = new JScrollPane();
         
@@ -77,7 +78,7 @@ public class AutoInspector extends KDialog
     {
         // this is just a first go to have some size at all
         // TODO do a decent estimate of a legion's size
-        return new Dimension(200,50);
+        return new Dimension(550, 110);
     }
     
     public void showLegion(Marker marker, LegionInfo legion) 

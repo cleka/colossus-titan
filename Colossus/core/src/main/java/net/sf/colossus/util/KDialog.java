@@ -57,6 +57,13 @@ public class KDialog extends JDialog implements MouseListener, WindowListener
              (d.height / 2 - getSize().height / 2) + yoffset));
     }
 
+    public Point getUpperRightCorner(int width)
+    {
+        Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
+        Point location = new Point(d.width - width, 0);
+        return location;
+    }
+    
     public void upperRightCorner()
     {
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();

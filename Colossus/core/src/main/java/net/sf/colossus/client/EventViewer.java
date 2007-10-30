@@ -244,13 +244,13 @@ ItemListener, ActionListener
     {
         // A tabbed pane, one tab the events, one tab the settings
         JTabbedPane tabbedPane = new JTabbedPane();
-        tabbedPane.setPreferredSize(new Dimension(220, 250));
+        tabbedPane.setPreferredSize(new Dimension(270, 520));
 
         // Events:
         Box eventTabPane = new Box(BoxLayout.Y_AXIS);
         tabbedPane.addTab("Events", eventTabPane);
         eventTabPane.setAlignmentX(Component.LEFT_ALIGNMENT);
-        eventTabPane.setPreferredSize(new Dimension(200, 400));      
+        eventTabPane.setPreferredSize(new Dimension(250, 500));      
         
         eventPane = new Box(BoxLayout.Y_AXIS);
         eventTabPane.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -786,7 +786,9 @@ ItemListener, ActionListener
     {
         if (visible)
         {
-            saveWindow.restore(this, new Point(0,0));
+            Point defaultLoc = getUpperRightCorner(getWidth());
+            defaultLoc.setLocation(defaultLoc.x, 120);
+            saveWindow.restore(this, defaultLoc);
             settingsPane.setMinimumSize(settingsPane.getSize());
             // eventPane.setMinimumSize(eventPane.getSize());
             this.visible = true;
@@ -794,8 +796,16 @@ ItemListener, ActionListener
         }
         else
         {
-            saveWindow.save(this);
-            this.visible = false;
+            if (this.isVisible())
+            {
+                // do not save when not visible - in particular this
+                // would be run when a new user first time creates a 
+                // board - Inspector option not selected, but EventViewer
+                // gets created anyway and "setVisibleMaybe()" - that 
+                // would save (0, 0) as initial location...
+                saveWindow.save(this);
+                this.visible = false;
+            }
         }
         super.setVisible(visible);
     }
