@@ -18,6 +18,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JLabel;
 
 import net.sf.colossus.server.Legion;
 import net.sf.colossus.util.KDialog;
@@ -104,6 +105,14 @@ final class Concede extends KDialog implements ActionListener, WindowListener
 
         Marker marker = new Marker(scale, markerId, client);
         pane.add(marker);
+        pane.add(Box.createRigidArea(new Dimension(scale / 4, 0)));
+
+        int points = client.getLegionInfo(markerId).getPointValue();
+        Box pointsPanel = new Box(BoxLayout.Y_AXIS);
+        pointsPanel.setSize(marker.getSize());
+        pointsPanel.add(new JLabel(""+points));
+        pointsPanel.add(new JLabel("points"));
+        pane.add(pointsPanel);
         pane.add(Box.createRigidArea(new Dimension(scale / 4, 0)));
 
         List imageNames = client.getLegionImageNames(markerId);
