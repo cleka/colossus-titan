@@ -333,14 +333,19 @@ public final class Client implements IClient, IOracle, IOptions
         highlightBattleSite();
     }
 
-    private void initShowEngagementResults()
+    private JFrame getPreferredParent()
     {
         JFrame parent = secondaryParent;
         if((parent == null) && (board != null))
         {
             parent = board.getFrame();
         }
-
+        return parent;
+    }
+    
+    private void initShowEngagementResults()
+    {
+        JFrame parent = getPreferredParent();
         // no board at all, e.g. AI - nothing to do.
         if (parent == null)
         {
@@ -351,6 +356,43 @@ public final class Client implements IClient, IOracle, IOptions
         engagementResults.maybeShow();
     }
 
+    private void showOrHideAutoInspector(boolean bval)
+    {
+        JFrame parent = getPreferredParent();
+        if (parent == null)
+        {
+            // No board yet, or no board at all - nothing to do.
+            // Initial show will be done in initBoard.
+        }
+        else
+        {
+            if (bval)
+            {
+                if (autoInspector == null)
+                {
+                    boolean dubiousAsBlanks =
+                        getOption(Options.dubiousAsBlanks);
+                    autoInspector = new AutoInspector(parent, this, 
+                            playerName, viewMode, dubiousAsBlanks);
+                }
+            }
+            else
+            {
+                disposeInspector();
+            }
+        }
+    }
+
+    private void disposeInspector()
+    {
+        if (autoInspector != null)
+        {
+            autoInspector.setVisible(false);
+            autoInspector.dispose();
+            autoInspector = null;
+        }
+    }
+    
     void highlightBattleSite()
     {
         if (board != null && battleSite != null && battleSite.length() > 0)
@@ -492,18 +534,8 @@ public final class Client implements IClient, IOracle, IOptions
     {
         if (eventViewer == null)
         {
-            JFrame parent = secondaryParent;
-            if((parent == null) && (board != null))
-            {
-                parent = board.getFrame();
-            }
-
+            JFrame parent = getPreferredParent();
             eventViewer = new EventViewer(parent, this);
-        }
-        else
-        {
-            System.out.println("initEventViewer - nothing to do, " +
-                "eventViewer != null");
         }
     }
 
@@ -862,30 +894,7 @@ public final class Client implements IClient, IOracle, IOptions
         }
         else if (optname.equals(Options.showAutoInspector))
         {
-            if (bval)
-            {
-                if (autoInspector == null)
-                {
-                    JFrame parent = secondaryParent;
-                    if((parent == null) && (board != null))
-                    {
-                        parent = board.getFrame();
-                    }
-                    boolean dubiousAsBlanks =
-                        getOption(Options.dubiousAsBlanks);
-                    autoInspector = new AutoInspector(parent, this, playerName,
-                            viewMode, dubiousAsBlanks);
-                }
-            }
-            else
-            {
-                if (autoInspector != null)
-                {
-                    autoInspector.setVisible(false);
-                    autoInspector.dispose();
-                    autoInspector = null;
-                }
-            }
+            showOrHideAutoInspector(bval);
         }
         else if (optname.equals(Options.showEventViewer))
         {
@@ -2157,25 +2166,15 @@ public final class Client implements IClient, IOracle, IOptions
         {
             disposeEventViewer();
             disposeEngagementResults();
+            disposeInspector();
             disposeMasterBoard();
-            board = new MasterBoard(this);
-            if ( getOption(Options.showAutoInspector) )
-            {
-                // Recreate the AutoInspector since it does not have the
-                // parent set if it is created during game initialization.
-                // This problem is due to the order in which windows are
-                // created and should normally not exist if the master
-                // board would be initialized before the AutoInspector
-                // window gets created. It is not and this little hack
-                // works around the issue of having a detached window.
-                // A proper fix would involve major changes to the
-                // initialization process.
-                optionTrigger(Options.showAutoInspector, String.valueOf(false));
-                optionTrigger(Options.showAutoInspector, String.valueOf(true));
-            }
 
-            initShowEngagementResults();
+            board = new MasterBoard(this);
             initEventViewer();
+            initShowEngagementResults();
+            String value = getStringOption(Options.showAutoInspector);
+            optionTrigger(Options.showAutoInspector, value);
+
             focusBoard();
         }
     }
