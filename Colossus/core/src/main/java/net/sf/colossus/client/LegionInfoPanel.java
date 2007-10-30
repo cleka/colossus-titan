@@ -70,9 +70,20 @@ public final class LegionInfoPanel extends JPanel
         }
         else
         {
-            int value = legion.getCertainPointValue();
+            int value;
+            int numUC;
+            if (viewMode == Options.viewableOwnNum)
+            {
+                value = 0;
+                numUC = legion.getHeight();
+            }
+            else
+            {
+                value = legion.getCertainPointValue();
+                numUC = legion.numUncertainCreatures();
+            }
+            
             String ucString = "";
-            int numUC = legion.numUncertainCreatures();
             if (numUC > 0)
             {
                 StringBuffer uncertainIndicator = new StringBuffer(8);
