@@ -13,10 +13,19 @@
 This describes the recent changes in some more detail than just the
 one-line-info on the main pages "News" section.
 <H3>xxx xx 2007, build r27xx</H3>
-Changes so far:
+Changes so far (just most recent first, i.e. NOT sorted by importance... ;-)
 <UL>
+<LI>Some cleanup and fixing for AutoInspector and EventViewer regarding
+    initial size, position, and showing/disposing code cleanup.
+<LI>Inspector and show-legion (right-click) window show legion value 
+    (and owner, if not own legion) in title; concede and flee dialog also
+    show legion values (=> feature requests [1818878] and [ 503862 ]).
+<LI>If duplicate player names, tell this as message box, instead of
+    silently just doing *nothing*.
 <LI>Engagement window collects now all results, no matter whether it is
-    enabled or not, and does not forget old results when closed.
+    enabled or not, and does not forget old results when closed; and if 
+    at game start (saved via options) enabled, it *IS* vsible (even if
+    empty). I.e. it behaves like all other satellite windows.
 <LI>Game Setup window is now a JFrame  (instead of being a JDialog as it 
     was before) which means, it can be minimized, and has own taskbar icon.
 <LI>In BattleMap now added: Done button, turn+phase+activePlayer indicator,
