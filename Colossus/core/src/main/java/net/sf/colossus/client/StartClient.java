@@ -68,27 +68,35 @@ public class StartClient extends KDialog implements WindowListener,
         getContentPane().add(new JLabel("Server hostname"));
         Set hostChoices = new TreeSet();
         hostChoices.add(hostname);
+        String preferred = hostname;
         try
         {
             InetAddress ia = InetAddress.getLocalHost();
             hostChoices.add(ia.getHostName());
+            preferred = ia.getHostName();
         }
         catch (UnknownHostException ex)
         {
             Log.error(ex.toString());
         }
+        
         loadClientOptions();
-        for (int i = 0; i < Constants.numSavedServerNames; i++)
+        // LRU, i.e. serverName0 is the one last time used.
+        // Combobox will display them alphabetically anyway,
+        // so make at least the last-used-one be preselected.
+        for (int i = Constants.numSavedServerNames; i > 0 ; i--)
         {
             String serverName = clientOptions.getStringOption(
-                    net.sf.colossus.util.Options.serverName + i);
+                    net.sf.colossus.util.Options.serverName + (i-1) );
             if (serverName != null)
             {
+                preferred = serverName;
                 hostChoices.add(serverName);
             }
         }
         hostBox = new JComboBox(new Vector(hostChoices));
         hostBox.setEditable(true);
+        hostBox.setSelectedItem(preferred);
         hostBox.addActionListener(this);
         getContentPane().add(hostBox);
 
@@ -174,7 +182,7 @@ public class StartClient extends KDialog implements WindowListener,
 
     public static void connect(String playerName, String hostname, int port)
     {
-        saveHostname();
+        saveHostnames();
         if ( clientOptions == null)
         {
             // needed e.g. when started as standalone from cmdline with -c -g
@@ -190,10 +198,11 @@ public class StartClient extends KDialog implements WindowListener,
         clientOptions.loadOptions();
     }
 
-    /** Save the chosen hostname as an option.  LRU sort saved hostnames. */
-    private static void saveHostname()
+    /** Put the choosen hostname as first to the LRU sorted list.
+     *  Save the list back to the options. 
+     */
+    private static void saveHostnames()
     {
-        int highestNum = -1;
         List names = new ArrayList();
         names.add(hostname);
         for (int i = 0; i < Constants.numSavedServerNames; i++)
@@ -204,17 +213,18 @@ public class StartClient extends KDialog implements WindowListener,
             }
             String serverName = clientOptions.getStringOption(
                     net.sf.colossus.util.Options.serverName + i);
+
             if (serverName != null)
             {
                 if (!serverName.equals(hostname))
                 {
                     // Don't add it twice.
-                    highestNum = i + 1;
                     names.add(serverName);
                 }
             }
         }
-        for (int i = 0; i <= highestNum; i++)
+        for (int i = 0; i < names.size() && 
+                i < Constants.numSavedServerNames ; i++)
         {
             clientOptions.setOption(net.sf.colossus.util.Options.serverName +
                     i, (String)names.get(i));
