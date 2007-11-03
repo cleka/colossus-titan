@@ -462,16 +462,7 @@ public final class BattleMap extends HexMap implements MouseListener,
     {
         Set set = client.findMobileCritterHexes();
         unselectAllHexes();
-        int tag = autoSelectOneCritterInEntrance(client, set);
-        if (tag == -1) // No critters in entrances
-        {
-            selectHexesByLabels(set);
-        }
-        else
-        {
-            selectedCritterTag = tag;
-            highlightMoves(tag);
-        }
+        selectHexesByLabels(set);
     }
 
     private void highlightMoves(int tag)
