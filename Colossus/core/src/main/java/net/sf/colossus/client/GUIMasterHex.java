@@ -39,7 +39,6 @@ public final class GUIMasterHex extends GUIHex
     private Point offCenter;
     private MasterBoard board;
 
-    /** Terrain display name in upper case. */
     private GeneralPath highlightBorder;
     private Color selectColor = Color.white;
 
@@ -501,18 +500,13 @@ public final class GUIMasterHex extends GUIHex
 
     public GUIMasterHex getNeighbor(int i)
     {
-        if (i < 0 || i > 6)
-        {
-            return null;
-        }
-        else
-        {
-            return neighbors[i];
-        }
+    	assert (i>=0) && (i<=5) : "Neighbor index out of range";
+        return neighbors[i];
     }
 
     public void setNeighbor(int i, GUIMasterHex hex)
     {
+    	assert (i>=0) && (i<=5) : "Neighbor index out of range";
         neighbors[i] = hex;
         neighbors[i].getMasterHexModel().setNeighbor(i, hex.getMasterHexModel());
     }

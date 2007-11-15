@@ -446,23 +446,15 @@ public class GUIBattleHex extends GUIHex
 
     public GUIBattleHex getNeighbor(int i)
     {
-        if (i < 0 || i > 6)
-        {
-            return null;
-        }
-        else
-        {
-            return neighbors[i];
-        }
+    	assert (i>=0) && (i<=5) : "Neighbor index out of range";
+        return neighbors[i];
     }
 
     public void setNeighbor(int i, GUIBattleHex hex)
     {
-        if (i >= 0 && i < 6)
-        {
-            neighbors[i] = hex;
-            getBattleHexModel().setNeighbor(i, hex.getBattleHexModel());
-        }
+    	assert (i>=0) && (i<=5) : "Neighbor index out of range";
+        neighbors[i] = hex;
+        getBattleHexModel().setNeighbor(i, hex.getBattleHexModel());
     }
 }
 

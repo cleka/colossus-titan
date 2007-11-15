@@ -341,22 +341,14 @@ public class BattleHex
 
     public BattleHex getNeighbor(int i)
     {
-        if (i < 0 || i > 6)
-        {
-            return null;
-        }
-        else
-        {
-            return neighbors[i];
-        }
+    	assert (i>=0) && (i<=5) : "Neighbor index out of range";
+        return neighbors[i];
     }
 
     public void setNeighbor(int i, BattleHex hex)
     {
-        if (i >= 0 && i < 6)
-        {
-            neighbors[i] = hex;
-        }
+    	assert (i>=0) && (i<=5) : "Neighbor index out of range";
+        neighbors[i] = hex;
     }
 
     public int getXCoord()

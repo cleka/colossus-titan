@@ -129,18 +129,13 @@ public class MasterHex extends Hex
 
     public MasterHex getNeighbor(int i)
     {
-        if (i < 0 || i > 6)
-        {
-            return null;
-        }
-        else
-        {
-            return neighbors[i];
-        }
+    	assert (i>=0) && (i<=5) : "Neighbor index out of range";
+        return neighbors[i];
     }
 
     void setNeighbor(int i, MasterHex hex)
     {
+    	assert (i>=0) && (i<=5) : "Neighbor index out of range";
         neighbors[i] = hex;
     }
 
