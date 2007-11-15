@@ -63,12 +63,6 @@ public final class GUIMasterHex extends GUIHex
     // Use two-stage initialization so that we can clone the GUIMasterHex
     // from an existing MasterHex, then add the GUI info.
 
-    /**
-     * @todo this is parallel to the code in MasterHex, BattleHex and GUIBattleHex
-     *       --> refactor
-     */
-    private GUIMasterHex[] neighbors = new GUIMasterHex[6];
-
     GUIMasterHex(MasterHex model)
     {
         super(model);
@@ -496,18 +490,5 @@ public final class GUIMasterHex extends GUIHex
             board);
         g.setComposite(oldComp);
         return true;
-    }
-
-    public GUIMasterHex getNeighbor(int i)
-    {
-    	assert (i>=0) && (i<=5) : "Neighbor index out of range";
-        return neighbors[i];
-    }
-
-    public void setNeighbor(int i, GUIMasterHex hex)
-    {
-    	assert (i>=0) && (i<=5) : "Neighbor index out of range";
-        neighbors[i] = hex;
-        neighbors[i].getMasterHexModel().setNeighbor(i, hex.getMasterHexModel());
     }
 }

@@ -982,7 +982,6 @@ public final class MasterBoard extends JPanel
                 }
             }
         }
-        setupNeighbors(guiHexArray);
     }
 
     private static boolean isHexInverted(int i, int j)
@@ -1359,52 +1358,6 @@ public final class MasterBoard extends JPanel
                     }
                     if (hex.getExitType(5) != Constants.NONE ||
                         hex.getEntranceType(5) != Constants.NONE)
-                    {
-                        hex.setNeighbor(5, h[i - 1][j]);
-                    }
-                }
-            }
-        }
-    }
-
-    private static void setupNeighbors(GUIMasterHex[][] h)
-    {
-        for (int i = 0; i < h.length; i++)
-        {
-            for (int j = 0; j < h[0].length; j++)
-            {
-                if (show[i][j])
-                {
-                    GUIMasterHex hex = h[i][j];
-                    MasterHex hexModel = hex.getMasterHexModel();
-
-                    if (hexModel.getExitType(0) != Constants.NONE ||
-                        hexModel.getEntranceType(0) != Constants.NONE)
-                    {
-                        hex.setNeighbor(0, h[i][j - 1]);
-                    }
-                    if (hexModel.getExitType(1) != Constants.NONE ||
-                        hexModel.getEntranceType(1) != Constants.NONE)
-                    {
-                        hex.setNeighbor(1, h[i + 1][j]);
-                    }
-                    if (hexModel.getExitType(2) != Constants.NONE ||
-                        hexModel.getEntranceType(2) != Constants.NONE)
-                    {
-                        hex.setNeighbor(2, h[i + 1][j]);
-                    }
-                    if (hexModel.getExitType(3) != Constants.NONE ||
-                        hexModel.getEntranceType(3) != Constants.NONE)
-                    {
-                        hex.setNeighbor(3, h[i][j + 1]);
-                    }
-                    if (hexModel.getExitType(4) != Constants.NONE ||
-                        hexModel.getEntranceType(4) != Constants.NONE)
-                    {
-                        hex.setNeighbor(4, h[i - 1][j]);
-                    }
-                    if (hexModel.getExitType(5) != Constants.NONE ||
-                        hexModel.getEntranceType(5) != Constants.NONE)
                     {
                         hex.setNeighbor(5, h[i - 1][j]);
                     }
