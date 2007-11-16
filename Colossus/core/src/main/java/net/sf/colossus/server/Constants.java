@@ -380,6 +380,7 @@ public final class Constants
     public static final String doneWithEngagements = "doneWithEngagements";
     public static final String doneWithRecruits = "doneWithRecruits";
     public static final String withdrawFromGame = "withdrawFromGame";
+    public static final String disconnect = "disconnect";
     public static final String setDonor = "setDonor";
     public static final String doSplit = "doSplit";
     public static final String doMove = "doMove";

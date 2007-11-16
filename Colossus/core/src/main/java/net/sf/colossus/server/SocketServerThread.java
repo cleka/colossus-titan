@@ -253,6 +253,12 @@ final class SocketServerThread extends Thread implements IClient
         {
             server.withdrawFromGame();
         }
+        else if (method.equals(Constants.disconnect))
+        {
+            // Ignore. Just for forward compatibility if someone 
+            // will use the "new client" (with WebServer and all the 
+            // "proper shutdown" related changes).
+        }
         else if (method.equals(Constants.setDonor))
         {
             String markerId = (String)args.remove(0);
