@@ -4,6 +4,8 @@ package net.sf.colossus.server;
 import java.io.*;
 import java.util.*;
 
+import javax.swing.JOptionPane;
+
 import org.jdom.*;
 import org.jdom.output.*;
 import org.jdom.input.*;
@@ -950,6 +952,14 @@ public final class Game
                 if (!savesDir.mkdirs())
                 {
                     Log.error("Could not create saves directory");
+                    JOptionPane.showMessageDialog(null,
+                            "Could not create directory " + savesDir +
+                            "\n- saving game failed! Unless the directory " + 
+                            "can be created, you can't use File=>Save, and " +
+                            "make sure Autosave (in Game Setup) is disabled.",
+                            "Can't save game!",
+                            JOptionPane.ERROR_MESSAGE);
+
                     return;
                 }
             }

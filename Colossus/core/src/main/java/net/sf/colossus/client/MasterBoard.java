@@ -22,6 +22,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -600,7 +601,35 @@ public final class MasterBoard extends JPanel
             // TODO: Need a confirmation dialog on overwrite?
             public void actionPerformed(ActionEvent e)
             {
-                JFileChooser chooser = new JFileChooser(Constants.saveDirname);
+                File savesDir = new File(Constants.saveDirname);
+                if (!savesDir.exists())
+                {
+                    Log.event("Trying to make directory " + savesDir.toString());
+                    if (!savesDir.mkdirs())
+                    {
+                        Log.error("Could not create saves directory");
+                        JOptionPane.showMessageDialog(masterFrame,
+                                "Could not create directory " + savesDir +
+                                "\n- FileChooser dialog box will default " + 
+                                "to some other (system dependent) directory!",
+                                "Creating directory " + savesDir + " failed!",
+                                JOptionPane.ERROR_MESSAGE);
+                    }
+                }
+                else if (!savesDir.isDirectory())
+                {
+                    Log.error("Can't create directory " + savesDir.toString() + 
+                    " - name exists but is not a file");
+                    JOptionPane.showMessageDialog(masterFrame,
+                            "Can't create directory " + savesDir + 
+                            " (name exists, but is not a file)\n" +
+                            "- FileChooser dialog box will default to " + 
+                            "some other (system dependent) directory!",
+                            "Creating directory " + savesDir + " failed!",
+                            JOptionPane.ERROR_MESSAGE);
+                }
+                
+                JFileChooser chooser = new JFileChooser(savesDir);
                 chooser.setFileFilter(new XMLSnapshotFilter());
                 int returnVal = chooser.showSaveDialog(masterFrame);
                 if (returnVal == JFileChooser.APPROVE_OPTION)
