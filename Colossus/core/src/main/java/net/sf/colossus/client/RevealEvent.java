@@ -460,7 +460,7 @@ public class RevealEvent
             Log.error("new Chit for markerId " + markerId + ", event type "+
               getEventTypeText() + " turn" + getTurn() + " threw exception:" + 
               e.toString());
-        };
+        }
         addLabel("("+height+")");
     }
 
