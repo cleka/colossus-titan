@@ -15,6 +15,12 @@ one-line-info on the main pages "News" section.
 <H3>xxx xx 2007, build r27xx</H3>
 Changes so far (just most recent first, i.e. NOT sorted by importance... ;-)
 <UL>
+<LI>Some internal cleanup and corrections.
+<LI>Slightly improved handling of Save Game if directory "saves/" does
+    not exist yet or can't even be created.
+<LI>List of hosts in Network Client now not user dependent any more,
+    eliminated one possible NullPointerException (game would hang), and in 
+    the alphabetically sorted list the Most Recently Used one is preselected.
 <LI>Some cleanup and fixing for AutoInspector and EventViewer regarding
     initial size, position, and showing/disposing code cleanup.
 <LI>Inspector and show-legion (right-click) window show legion value 
@@ -26,7 +32,7 @@ Changes so far (just most recent first, i.e. NOT sorted by importance... ;-)
     enabled or not, and does not forget old results when closed; and if 
     at game start (saved via options) enabled, it *IS* vsible (even if
     empty). I.e. it behaves like all other satellite windows.
-<LI>Game Setup window is now a JFrame  (instead of being a JDialog as it 
+<LI>Game Setup window is now a JFrame (instead of being a JDialog as it 
     was before) which means, it can be minimized, and has own taskbar icon.
 <LI>In BattleMap now added: Done button, turn+phase+activePlayer indicator,
     and for the beginning player possible movement target hexes are 
