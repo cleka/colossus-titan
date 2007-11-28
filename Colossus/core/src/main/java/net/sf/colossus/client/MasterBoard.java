@@ -540,7 +540,7 @@ public final class MasterBoard extends JPanel
                 if (hex != null)
                 {
                     new ShowBattleMap(masterFrame,
-                        hex.getMasterHexModel().getLabel());
+                        hex.getMasterHexModel().getLabel(), hex);
                     // Work around a Windows JDK 1.3 bug.
                     hex.repaint();
                 }
