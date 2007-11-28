@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="variants"/>
+	<classpathentry kind="src" path="core/src/test/java"/>
+	<classpathentry kind="src" path="core/src/main/java"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="libs/batik-awt-util.jar"/>
+	<classpathentry kind="lib" path="libs/batik-bridge.jar"/>
+	<classpathentry kind="lib" path="libs/batik-css.jar"/>
+	<classpathentry kind="lib" path="libs/batik-dom.jar"/>
+	<classpathentry kind="lib" path="libs/batik-ext.jar"/>
+	<classpathentry kind="lib" path="libs/batik-gvt.jar"/>
+	<classpathentry kind="lib" path="libs/batik-parser.jar"/>
+	<classpathentry kind="lib" path="libs/batik-script.jar"/>
+	<classpathentry kind="lib" path="libs/batik-svg-dom.jar"/>
+	<classpathentry kind="lib" path="libs/batik-transcoder.jar"/>
+	<classpathentry kind="lib" path="libs/batik-util.jar"/>
+	<classpathentry kind="lib" path="libs/batik-xml.jar"/>
+	<classpathentry kind="lib" path="libs/javamake-ant15.jar"/>
+	<classpathentry kind="lib" path="libs/javamake.jar"/>
+	<classpathentry kind="lib" path="libs/jdom.jar"/>
+	<classpathentry kind="lib" path="libs/junit.jar"/>
+	<classpathentry kind="lib" path="libs/werken.opt.jar"/>
+	<classpathentry kind="output" path="build"/>
+</classpath>
