@@ -2,14 +2,23 @@ package net.sf.colossus.client;
 
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Container;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Rectangle;
 
 import javax.swing.JDialog;
 import javax.swing.JFrame;
+import javax.swing.JButton;
+
+import java.util.HashMap;
+
+import net.sf.colossus.server.Constants;
 
 
 /**
@@ -21,43 +30,83 @@ import javax.swing.JFrame;
 final class ShowBattleMap extends HexMap implements WindowListener,
             MouseListener
 {
+    private static final String NoLandText = "--";
+    
     private JDialog dialog;
-
+    
+    private static JButton leftButton;
+    private static JButton bottomButton;
+    private static JButton rightButton;
+    private static boolean laidOut;
+    
+    private int oldScale = -1;
+    
     ShowBattleMap(JFrame parentFrame, String masterHexLabel, GUIMasterHex guiHex)
     {
         super(masterHexLabel);
         MasterHex hex = MasterBoard.getHexByLabel(masterHexLabel);
-  
-        String neighbors = findOutNeighbors(guiHex);
-        
+
+        HashMap neighbors = findOutNeighbors(guiHex);
+        String neighborsText = (String) neighbors.get("text");
+                
         dialog = new JDialog(parentFrame, "Battle Map for " +
                 hex.getTerrainName() + " " + masterHexLabel + " " +
-                neighbors, true);
+                neighborsText, true);
+        laidOut = false;
 
         Container contentPane = dialog.getContentPane();
-        contentPane.setLayout(new BorderLayout());
+        // contentPane.setLayout(new BorderLayout());
+        contentPane.setLayout(null);
+
+        String text = (String) neighbors.get(Constants.left);
+        if (!text.equals(NoLandText))
+        {
+            leftButton = new JButton(
+                    "<HTML>"+Constants.left + ":<BR>"+text+"</HTML>");
+            leftButton.setEnabled(false);
+            contentPane.add(leftButton);
+        }
+
+        text = (String) neighbors.get(Constants.bottom);
+        if (!text.equals(NoLandText))
+        {
+            bottomButton = new JButton(
+                    "<HTML>"+Constants.bottom  + ":<BR>"+text+"</HTML>");
+            bottomButton.setEnabled(false);
+            contentPane.add(bottomButton);
+        }
+
+        text = (String) neighbors.get(Constants.right);
+        if (!text.equals(NoLandText))
+        {
+            rightButton = new JButton(
+                    "<HTML>"+Constants.right + ":<BR>"+text+"</HTML>");
+            rightButton.setEnabled(false);
+            contentPane.add(rightButton);
+        }
 
         addMouseListener(this);
         dialog.addWindowListener(this);
 
+        setSize(getPreferredSize());
         contentPane.add(this, BorderLayout.CENTER);
         dialog.pack();
+
+        dialog.setSize(getPreferredSize());
+        dialog.setBackground(Color.white);
         dialog.setVisible(true);
     }
 
-    private String findOutNeighbors(GUIMasterHex guiHex)
+    private HashMap findOutNeighbors(GUIMasterHex guiHex)
     {
-        String neighbors = "";
+        String neighborsText = "";
 
         boolean inverted = guiHex.isInverted();
         MasterHex model = guiHex.getMasterHexModel();
-//        String name = model.getTerrainDisplayName();
-//        String label = model.getLabel();
-//        int labelSide = model.getLabelSide();
         
-        String east = "--";
-        String nw   = "--";
-        String sw   = "--";
+        String right  = NoLandText;
+        String left   = NoLandText;
+        String bottom = NoLandText;
         
         for (int i=0 ; i < 6 ; i++)
         {
@@ -67,35 +116,93 @@ final class ShowBattleMap extends HexMap implements WindowListener,
             {
                 String nName = neighbor.getTerrainDisplayName();
                 String nLabel = neighbor.getLabel();
-                int entrySide = (6 + sideConsideringInverting - model.getLabelSide()) % 6;
-//                String direction = BattleMap.entrySideName(i);
-//                String entrySideText = BattleMap.entrySideName(entrySide);
-                
-//                System.out.println("Neighbor at " + direction + 
-//                        "("+ i + ")" + " is " + nName + ", label " + 
-//                        nLabel + ", entrySide: " + entrySide + " txt " + entrySideText );
+                int entrySide = (6 + sideConsideringInverting - 
+                        model.getLabelSide()) % 6;
                 
                 if (entrySide == 1)
                 {
-                    east = nName + " " + nLabel; 
+                    right = nName + " " + nLabel; 
                 }
                 if (entrySide == 3)
                 {
-                    sw = nName + " " + nLabel; 
+                    bottom = nName + " " + nLabel; 
                 }
                 if (entrySide == 5)
                 {
-                    nw = nName + " " + nLabel; 
+                    left = nName + " " + nLabel; 
                 }
             }
         }
 
-        neighbors = "(East: " + east + ", SouthWest: " + sw + ", " +
-                "NorthWest: " + nw + ")";
+        neighborsText = Constants.right + ": " + right + ", " + 
+            Constants.bottom + ": " + bottom + ", " + 
+            Constants.left + ": " + left + ")";
         
+        HashMap neighbors = new HashMap(4);
+        neighbors.put("text", neighborsText);
+        neighbors.put(Constants.right, right);
+        neighbors.put(Constants.bottom, bottom);
+        neighbors.put(Constants.left, left);
+                
         return neighbors;
     }
     
+    public void paintComponent(Graphics g)
+    {
+        super.paintComponent(g);
+
+        // Abort if called too early.
+        Rectangle rectClip = g.getClipBounds();
+        if (rectClip == null)
+        {
+            return;
+        }
+
+        int scale = 2 * Scale.get();
+        if (oldScale != scale)
+        {
+            laidOut = false;
+            this.oldScale = scale;
+        }
+        
+        Dimension d = getSize();
+
+        if (!laidOut)
+        {
+            int height = d.height / 16;
+            if (leftButton != null)
+            {
+                leftButton.setBounds(cx - 20 + 0 * scale, cy + 0 * scale,
+                        d.width / 5, height);
+            }
+            if (bottomButton != null)
+            {
+                bottomButton.setBounds(cx - 20 + 0 * scale, cy + 21 * scale,
+                        d.width / 5, height);
+            }
+            if (rightButton != null)
+            {
+                rightButton.setBounds((int)(cx + 18.5 * scale), 
+                        cy + 11 * scale, d.width / 6, height);
+            }
+
+            laidOut = true;
+        }
+
+        if (rightButton != null)
+        {
+            rightButton.repaint();
+        }
+        if (bottomButton != null)
+        {
+            bottomButton.repaint();
+        }
+        if (leftButton != null)
+        {
+            leftButton.repaint();
+        }
+    }
+
     public void mouseClicked(MouseEvent e)
     {
         dialog.dispose();

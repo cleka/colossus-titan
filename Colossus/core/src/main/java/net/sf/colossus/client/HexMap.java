@@ -7,6 +7,7 @@ import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.geom.Rectangle2D;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
@@ -750,14 +751,25 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
             g.setFont(ResourceLoader.defaultFont.deriveFont((float)48));
             fm = g.getFontMetrics();
             int tma = fm.getMaxAscent();
-            g.drawString(dn, 80, 4 + tma);
 
+            // calculate needed space, set xPos so that it's drawn 
+            // right-aligned 80 away from right window border.
+            Rectangle2D bounds = fm.getStringBounds(dn, g);
+            int width = (int) bounds.getWidth();
+            int windowWidth = super.getWidth();
+            int xPos = windowWidth - 80 - width;
+            g.drawString(dn, xPos, 4 + tma);
+            
             if (sub != null)
             {
                 g.setFont(ResourceLoader.defaultFont.deriveFont((float)24));
                 fm = g.getFontMetrics();
                 int tma2 = fm.getMaxAscent();
-                g.drawString(sub, 80, 4 + tma + 8 + tma2);
+                bounds = fm.getStringBounds(sub, g);
+                width = (int) bounds.getWidth();
+                windowWidth = super.getWidth();
+                xPos = windowWidth - 80 - width;
+                g.drawString(sub, xPos, 4 + tma + 8 + tma2);
             }
 
             /* reset antialiasing */
