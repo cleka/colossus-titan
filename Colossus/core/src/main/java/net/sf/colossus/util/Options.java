@@ -1,13 +1,17 @@
 package net.sf.colossus.util;
 
 
-import java.util.*;
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.Enumeration;
+import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import net.sf.colossus.server.Constants;
-
-// TODO move to util
 import net.sf.colossus.client.IOptions;
+import net.sf.colossus.server.Constants;
 
 
 /** Class Options lists game options for Colossus.
@@ -17,6 +21,8 @@ import net.sf.colossus.client.IOptions;
 
 public final class Options implements IOptions
 {
+	private static final Logger LOGGER = Logger.getLogger(Options.class.getName());
+
     // Everything is public because we use this class in both the client
     // and server packages.  (With separate data.)
 
@@ -177,7 +183,7 @@ public final class Options implements IOptions
         }
 
         String optionsFile = getOptionsFilename();
-        Log.event("Loading options from " + optionsFile);
+        LOGGER.log(Level.INFO, "Loading options from " + optionsFile);
         try
         {
             FileInputStream in = new FileInputStream(optionsFile);
@@ -185,7 +191,7 @@ public final class Options implements IOptions
         }
         catch (IOException e)
         {
-            Log.event("Couldn't read options from " + optionsFile);
+            LOGGER.log(Level.INFO, "Couldn't read options from " + optionsFile);
             return;
         }
     }
@@ -204,10 +210,10 @@ public final class Options implements IOptions
         File optionsDir = new File(Constants.gameDataPath);
         if (!optionsDir.exists() || !optionsDir.isDirectory())
         {
-            Log.event("Trying to make directory " + Constants.gameDataPath);
+            LOGGER.log(Level.INFO, "Trying to make directory " + Constants.gameDataPath);
             if (!optionsDir.mkdirs())
             {
-                Log.error("Could not create options directory");
+                LOGGER.log(Level.SEVERE, "Could not create options directory", (Throwable)null);
                 return;
             }
         }
@@ -220,7 +226,7 @@ public final class Options implements IOptions
         }
         catch (IOException e)
         {
-            Log.error("Couldn't write options to " + optionsFile);
+            LOGGER.log(Level.SEVERE, "Couldn't write options to " + optionsFile, (Throwable)null);
         }
     }
 

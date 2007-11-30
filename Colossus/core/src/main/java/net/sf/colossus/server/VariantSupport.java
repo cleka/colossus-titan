@@ -1,18 +1,20 @@
 package net.sf.colossus.server;
 
 
-import net.sf.colossus.util.ResourceLoader;
-import net.sf.colossus.util.Log;
-import net.sf.colossus.xmlparser.VariantLoader;
-import net.sf.colossus.xmlparser.TerrainRecruitLoader;
-import net.sf.colossus.client.HexMap;
-
-import java.io.*;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import javax.swing.text.*;
+import javax.swing.text.Document;
+
+import net.sf.colossus.client.HexMap;
+import net.sf.colossus.util.ResourceLoader;
+import net.sf.colossus.xmlparser.TerrainRecruitLoader;
+import net.sf.colossus.xmlparser.VariantLoader;
 
 
 /**
@@ -24,6 +26,8 @@ import javax.swing.text.*;
 
 public final class VariantSupport
 {
+	private static final Logger LOGGER = Logger.getLogger(VariantSupport.class.getName());
+
     private static String varDirectory = "";
     private static String variantName = "";
     private static String mapName = "";
@@ -128,8 +132,8 @@ public final class VariantSupport
 
         loadedVariant = false;
 
-        Log.debug("Loading variant " + tempVarName +
-                ", data files in " + tempVarDirectory);
+        LOGGER.log(Level.FINEST, "Loading variant " + tempVarName +
+		", data files in " + tempVarDirectory);
         try
         {
 
@@ -157,10 +161,10 @@ public final class VariantSupport
                 }
                 if (maxPlayers > Constants.MAX_MAX_PLAYERS)
                 {
-                    Log.error("Can't use more than " +
-                            Constants.MAX_MAX_PLAYERS +
-                            " players, while variant requires " +
-                            maxPlayers);
+                    LOGGER.log(Level.SEVERE, "Can't use more than " +
+					Constants.MAX_MAX_PLAYERS +
+					" players, while variant requires " +
+					maxPlayers, (Throwable)null);
                     maxPlayers = Constants.MAX_MAX_PLAYERS;
                 }
                 varDirectory = tempVarDirectory;
@@ -171,26 +175,26 @@ public final class VariantSupport
                 {
                     mapName = Constants.defaultMAPFile;
                 }
-                Log.debug("Variant using MAP " + mapName);
+                LOGGER.log(Level.FINEST, "Variant using MAP " + mapName);
 
                 creaturesName = vl.getCre();
                 if (creaturesName == null)
                 {
                     creaturesName = Constants.defaultCREFile;
                 }
-                Log.debug("Variant using CRE " + creaturesName);
+                LOGGER.log(Level.FINEST, "Variant using CRE " + creaturesName);
 
                 recruitName = vl.getTer();
                 if (recruitName == null)
                 {
                     recruitName = Constants.defaultTERFile;
                 }
-                Log.debug("Variant using TER " + recruitName);
+                LOGGER.log(Level.FINEST, "Variant using TER " + recruitName);
 
                 hintName = vl.getHintName();
-                Log.debug("Variant using hint " + hintName);
+                LOGGER.log(Level.FINEST, "Variant using hint " + hintName);
                 dependUpon = vl.getDepends();
-                Log.debug("Variant depending upon " + dependUpon);
+                LOGGER.log(Level.FINEST, "Variant depending upon " + dependUpon);
             }
             directories = new java.util.ArrayList();
             directories.add(tempVarDirectory);
@@ -198,7 +202,7 @@ public final class VariantSupport
         }
         catch (Exception e)
         {
-            Log.error("Variant loading failed : " + e, e);
+            LOGGER.log(Level.SEVERE, "Variant loading failed : " + e, e);
             varDirectory = Constants.defaultDirName;
             variantName = Constants.defaultVARFile;
             mapName = Constants.defaultMAPFile;
@@ -221,12 +225,12 @@ public final class VariantSupport
         {
             if (tempVarName.equals(Constants.defaultVARFile))
             {
-                Log.error("Default Variant Loading Failed, aborting !");
+                LOGGER.log(Level.SEVERE, "Default Variant Loading Failed, aborting !", (Throwable)null);
                 System.exit(1);
             }
             else
             {
-                Log.debug("Trying to load Default instead...");
+                LOGGER.log(Level.FINEST, "Trying to load Default instead...");
                 varREADME = loadVariant(Constants.defaultVARFile,
                         Constants.defaultDirName, serverSide);
             }
@@ -325,7 +329,7 @@ public final class VariantSupport
         }
         catch (Exception e)
         {
-            Log.error("Recruit-per-terrain loading failed : " + e);
+            LOGGER.log(Level.SEVERE, "Recruit-per-terrain loading failed : " + e, (Throwable)null);
             System.exit(1);
         }
         // initialize the static bits of the MasterBoard
@@ -358,13 +362,13 @@ public final class VariantSupport
             }
             catch (Exception e)
             {
-                Log.warn("Markers name loading partially failed.");
+                LOGGER.log(Level.WARNING, "Markers name loading partially failed.");
             }
         }
         if (!foundOne)
         {
-            Log.warn("No file "+Constants.markersNameFile+
-                     " found anywhere in directories "+directories.toString());
+            LOGGER.log(Level.WARNING, "No file "+Constants.markersNameFile+
+			 " found anywhere in directories "+directories.toString());
         }
         return allNames;
     }
@@ -386,19 +390,19 @@ public final class VariantSupport
         if ((o != null) && (o instanceof HintInterface))
         {
             aihl = (HintInterface)o;
-            Log.debug("Using class " + hintName +
-                    " to supply hints to the AIs.");
+            LOGGER.log(Level.FINEST, "Using class " + hintName +
+			" to supply hints to the AIs.");
         }
         else
         {
             if (hintName.equals(Constants.defaultHINTFile))
             {
-                Log.error("Couldn't load default hints !");
+                LOGGER.log(Level.SEVERE, "Couldn't load default hints !", (Throwable)null);
                 System.exit(1);
             }
             else
             {
-                Log.warn("Couldn't load hints. Trying with Default.");
+                LOGGER.log(Level.WARNING, "Couldn't load hints. Trying with Default.");
                 hintName = Constants.defaultHINTFile;
                 loadHints();
             }
@@ -430,7 +434,7 @@ public final class VariantSupport
         }
         else
         {
-            Log.error("No AIHintLoader available ! Should never happen.");
+            LOGGER.log(Level.SEVERE, "No AIHintLoader available ! Should never happen.", (Throwable)null);
         }
         return null;
     }

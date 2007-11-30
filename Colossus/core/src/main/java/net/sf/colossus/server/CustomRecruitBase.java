@@ -1,12 +1,13 @@
 package net.sf.colossus.server;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import net.sf.colossus.client.PlayerInfo;
 import net.sf.colossus.client.CaretakerInfo;
-import net.sf.colossus.server.Legion;
-import net.sf.colossus.server.Caretaker;
-import net.sf.colossus.util.Log;
+import net.sf.colossus.client.PlayerInfo;
 
 /**
  * Base class to implement custom recruiting functions 
@@ -16,6 +17,8 @@ import net.sf.colossus.util.Log;
  */
 abstract public class CustomRecruitBase
 {
+	private static final Logger LOGGER = Logger.getLogger(CustomRecruitBase.class.getName());
+
     protected static List allPlayerInfo = new ArrayList();
     private static List allCaretakerInfo = new ArrayList();
     private static Caretaker serverCaretaker = null;
@@ -24,7 +27,7 @@ abstract public class CustomRecruitBase
 
     public CustomRecruitBase()
     {
-        Log.debug("CUSTOM: adding " + getClass().getName());
+        LOGGER.log(Level.FINEST, "CUSTOM: adding " + getClass().getName());
         allCustomRecruitBase.add(this);
     }
     
@@ -127,8 +130,8 @@ abstract public class CustomRecruitBase
             if ((oldcount != -1) &&
                 (count != oldcount))
             {
-                Log.error("in CustomRecruitBase, not all CaretakerInfo's"
-                    + " count match !");
+                LOGGER.log(Level.SEVERE, "in CustomRecruitBase, not all CaretakerInfo's"
+				+ " count match !", (Throwable)null);
             }
         }
         // second, update the Caretaker if we're server
@@ -139,8 +142,8 @@ abstract public class CustomRecruitBase
             if ((oldcount != -1) &&
                 (count != oldcount))
             {
-                Log.error("in CustomRecruitBase, Caretaker's count "
-                    + "doesn't match CaretakerInfo's counts!");
+                LOGGER.log(Level.SEVERE, "in CustomRecruitBase, Caretaker's count "
+				+ "doesn't match CaretakerInfo's counts!", (Throwable)null);
             }
         }
         return count;
@@ -180,8 +183,8 @@ abstract public class CustomRecruitBase
             if ((oldcount != -1) &&
                 (count != oldcount))
             {
-                Log.error("in CustomRecruitBase, not all CaretakerInfo's "
-                    +"dead count match !");
+                LOGGER.log(Level.SEVERE, "in CustomRecruitBase, not all CaretakerInfo's "
+				+"dead count match !", (Throwable)null);
             }
         }
         // second, update the Caretaker if we're server
@@ -192,8 +195,8 @@ abstract public class CustomRecruitBase
             if ((oldcount != -1) &&
                 (count != oldcount))
             {
-                Log.error("in CustomRecruitBase, Caretaker's dead count "
-                    + "doesn't match CaretakerInfo's counts!");
+                LOGGER.log(Level.SEVERE, "in CustomRecruitBase, Caretaker's dead count "
+				+ "doesn't match CaretakerInfo's counts!", (Throwable)null);
             }
         }
         return count;
@@ -221,7 +224,7 @@ abstract public class CustomRecruitBase
         }
         // num > 2 this should not happen during recruiting, 
         //   as only a three-way split can do that.
-        Log.warn("CUSTOM: 3 legions in recruiting hex " + hexLabel + " ?!?");
+        LOGGER.log(Level.WARNING, "CUSTOM: 3 legions in recruiting hex " + hexLabel + " ?!?");
         return null;
     }
 

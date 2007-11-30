@@ -1,11 +1,17 @@
 package net.sf.colossus.server;
 
 
-import java.util.*;
-import java.io.*;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.WeakHashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import net.sf.colossus.util.ResourceLoader;
-import net.sf.colossus.util.Log;
 import net.sf.colossus.xmlparser.CreatureLoader;
 
 
@@ -27,6 +33,8 @@ implements
     Comparable,
     net.sf.colossus.util.Terrains // H_xxx constants
 {
+	private static final Logger LOGGER = Logger.getLogger(Creature.class.getName());
+
     private final String name;
     private final String pluralName;
     private final int power;
@@ -94,8 +102,8 @@ implements
         /* warn about likely inapropriate combinations */
         if (waterDwelling && nativeSandDune)
         {
-            Log.warn("Creature " + name +
-                    " is both a Water Dweller and native to Sand and Dune.");
+            LOGGER.log(Level.WARNING, "Creature " + name +
+			" is both a Water Dweller and native to Sand and Dune.");
         }
     }
 
@@ -516,7 +524,7 @@ implements
             }
             // not found the slow way? damn.
             //   then store this as a negative result for the future, too.
-            Log.debug("CUSTOM: unknown creature: " + name);
+            LOGGER.log(Level.FINEST, "CUSTOM: unknown creature: " + name);
             _getCreatureByName_cache.put(name, null);
             return null;
         }

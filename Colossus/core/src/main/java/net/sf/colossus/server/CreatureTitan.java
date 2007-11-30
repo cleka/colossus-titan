@@ -1,7 +1,8 @@
 package net.sf.colossus.server;
 
 
-import net.sf.colossus.util.Log;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 /**
@@ -16,6 +17,8 @@ import net.sf.colossus.util.Log;
 
 public class CreatureTitan extends Creature
 {
+	private static final Logger LOGGER = Logger.getLogger(CreatureTitan.class.getName());
+
     public CreatureTitan(String name,
             int power,
             int skill,
@@ -64,7 +67,7 @@ public class CreatureTitan extends Creature
 
         if (!name.equals(Constants.titan))
         {
-            Log.error("Creating a CreatureTitan but the name is not Titan !");
+            LOGGER.log(Level.SEVERE, "Creating a CreatureTitan but the name is not Titan !", (Throwable)null);
         }
     }
 
@@ -80,7 +83,7 @@ public class CreatureTitan extends Creature
 
     public String[] getImageNames()
     {
-        Log.warn("Calling getImageNames() for Titan");
+        LOGGER.log(Level.WARNING, "Calling getImageNames() for Titan");
         return super.getImageNames();
     }
 
@@ -95,14 +98,14 @@ public class CreatureTitan extends Creature
     public int getHintedRecruitmentValue()
     {
         int val = super.getHintedRecruitmentValue();
-        Log.debug("getHintedRecruitmentValue() is " + val);
+        LOGGER.log(Level.FINEST, "getHintedRecruitmentValue() is " + val);
         return val;
     }
 
     public int getHintedRecruitmentValue(String[] section)
     {
         int val = super.getHintedRecruitmentValue(section);
-        Log.debug("getHintedRecruitmentValue() is " + val);
+        LOGGER.log(Level.FINEST, "getHintedRecruitmentValue() is " + val);
         return val;
     }
 }

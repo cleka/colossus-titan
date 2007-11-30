@@ -1,12 +1,19 @@
 package Balrog;
 
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import net.sf.colossus.client.PlayerInfo;
 import net.sf.colossus.server.Creature;
 import net.sf.colossus.server.CustomRecruitBase;
-import net.sf.colossus.util.Log;
 
 
 /**
@@ -16,6 +23,8 @@ import net.sf.colossus.util.Log;
  */
 public class BalrogRecruitment extends CustomRecruitBase
 {
+	private static final Logger LOGGER = Logger.getLogger(BalrogRecruitment.class.getName());
+
     private Map nameToOldScore = Collections.synchronizedMap(new HashMap());
     private final static int balrogValue = 300;
     private final static String balrogPrefix = "Balrog";
@@ -95,7 +104,7 @@ public class BalrogRecruitment extends CustomRecruitBase
 
         if (pi == null)
         {
-            Log.debug("CUSTOM: no player info for hex " + hexLabel);
+            LOGGER.log(Level.FINEST, "CUSTOM: no player info for hex " + hexLabel);
             return;
         }
 
@@ -126,8 +135,8 @@ public class BalrogRecruitment extends CustomRecruitBase
 
         if (!Creature.isCreature(name))
         {
-            Log.error("CUSTOM: Balrog by the name of " + name +
-                    " doesn't exist !");
+            LOGGER.log(Level.SEVERE, "CUSTOM: Balrog by the name of " + name +
+			" doesn't exist !", (Throwable)null);
             return;
         }
 
@@ -141,15 +150,15 @@ public class BalrogRecruitment extends CustomRecruitBase
 
         if (difference > 0)
         {
-            Log.debug("CUSTOM: Pushing the total number of " + name +
-                    " from " + alreadyNumber + " to " + nowNumber +
-                    " (new available count is: " + newcount + ")");
+            LOGGER.log(Level.FINEST, "CUSTOM: Pushing the total number of " + name +
+			" from " + alreadyNumber + " to " + nowNumber +
+			" (new available count is: " + newcount + ")");
         }
         else if (difference < 0)
         {
-            Log.debug("CUSTOM: WARNING: DIMINISHING the total number of " +
-                    name + " from " + alreadyNumber + " to " + nowNumber +
-                    " (new available count is: " + newcount + ")");
+            LOGGER.log(Level.FINEST, "CUSTOM: WARNING: DIMINISHING the total number of " +
+			name + " from " + alreadyNumber + " to " + nowNumber +
+			" (new available count is: " + newcount + ")");
         }
     }
 
@@ -171,7 +180,7 @@ public class BalrogRecruitment extends CustomRecruitBase
 
     protected void resetInstance()
     {
-        Log.debug("CUSTOM: resetting " + getClass().getName());
+        LOGGER.log(Level.FINEST, "CUSTOM: resetting " + getClass().getName());
         nameToOldScore.clear();
     }
 }

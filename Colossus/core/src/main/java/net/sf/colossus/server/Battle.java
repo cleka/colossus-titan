@@ -1,14 +1,20 @@
 package net.sf.colossus.server;
 
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import net.sf.colossus.util.Log;
+import net.sf.colossus.client.BattleHex;
+import net.sf.colossus.client.BattleMap;
+import net.sf.colossus.client.HexMap;
 import net.sf.colossus.client.MasterBoard;
 import net.sf.colossus.client.MasterHex;
-import net.sf.colossus.client.BattleHex;
-import net.sf.colossus.client.HexMap;
-import net.sf.colossus.client.BattleMap;
 import net.sf.colossus.util.Options;
 
 
@@ -24,6 +30,8 @@ import net.sf.colossus.util.Options;
 
 public final class Battle
 {
+	private static final Logger LOGGER = Logger.getLogger(Battle.class.getName());
+
     private Game game;
     private Server server;
     private String attackerId;
@@ -70,7 +78,7 @@ public final class Battle
         int side = attacker.getEntrySide();
         if (side != 1 && side != 3 && side != 5)
         {
-            Log.warn("Fixing bogus entry side: " + side);
+            LOGGER.log(Level.WARNING, "Fixing bogus entry side: " + side);
             // If invalid, default to bottom, which is always valid.
             attacker.setEntrySide(3);
         }
@@ -79,11 +87,11 @@ public final class Battle
         // Make sure defender can recruit, even if savegame is off.
         defender.setRecruitName(null);
 
-        Log.event(attacker.getLongMarkerName() + " (" +
-                attacker.getPlayerName() + ") attacks " +
-                defender.getLongMarkerName() + " (" +
-                defender.getPlayerName() + ")" + " in " +
-                MasterBoard.getHexByLabel(masterHexLabel).getDescription());
+        LOGGER.log(Level.INFO, attacker.getLongMarkerName() + " (" +
+		attacker.getPlayerName() + ") attacks " +
+		defender.getLongMarkerName() + " (" +
+		defender.getPlayerName() + ")" + " in " +
+		MasterBoard.getHexByLabel(masterHexLabel).getDescription());
 
         placeLegion(attacker);
         placeLegion(defender);
@@ -162,7 +170,7 @@ public final class Battle
         }
         else
         {
-            Log.error("Bogus phase");
+            LOGGER.log(Level.SEVERE, "Bogus phase", (Throwable)null);
         }
         if (advance)
         {
@@ -305,14 +313,14 @@ public final class Battle
             if (phase == Constants.BattlePhase.SUMMON)
             {
                 phase = Constants.BattlePhase.MOVE;
-                Log.event("Battle phase advances to " + phase);
+                LOGGER.log(Level.INFO, "Battle phase advances to " + phase);
                 again = setupMove();
             }
 
             else if (phase == Constants.BattlePhase.RECRUIT)
             {
                 phase = Constants.BattlePhase.MOVE;
-                Log.event("Battle phase advances to " + phase);
+                LOGGER.log(Level.INFO, "Battle phase advances to " + phase);
                 again = setupMove();
             }
 
@@ -326,7 +334,7 @@ public final class Battle
                     attackerEntered = true;
                 }
                 phase = Constants.BattlePhase.FIGHT;
-                Log.event("Battle phase advances to " + phase);
+                LOGGER.log(Level.INFO, "Battle phase advances to " + phase);
                 again = setupFight();
             }
 
@@ -337,7 +345,7 @@ public final class Battle
                 activeLegionNum = (activeLegionNum + 1) & 1;
                 driftDamageApplied = false;
                 phase = Constants.BattlePhase.STRIKEBACK;
-                Log.event("Battle phase advances to " + phase);
+                LOGGER.log(Level.INFO, "Battle phase advances to " + phase);
                 again = setupFight();
             }
 
@@ -365,8 +373,8 @@ public final class Battle
             if (activeLegionNum == Constants.ATTACKER)
             {
                 phase = Constants.BattlePhase.SUMMON;
-                Log.event(getActivePlayerName() + "'s battle turn, number " +
-                        turnNumber);
+                LOGGER.log(Level.INFO, getActivePlayerName() + "'s battle turn, number " +
+				turnNumber);
                 again = setupSummon();
             }
             else
@@ -382,8 +390,8 @@ public final class Battle
                     again = setupRecruit();
                     if (getActivePlayer() != null)
                     {
-                        Log.event(getActivePlayerName() +
-                                "'s battle turn, number " + turnNumber);
+                        LOGGER.log(Level.INFO, getActivePlayerName() +
+						"'s battle turn, number " + turnNumber);
                     }
                 }
             }
@@ -391,7 +399,7 @@ public final class Battle
 
         private void timeLoss()
         {
-            Log.event("Time loss");
+            LOGGER.log(Level.INFO, "Time loss");
             Legion attacker = getAttacker();
             // Time loss.  Attacker is eliminated but defender gets no points.
             if (attacker.hasTitan())
@@ -479,8 +487,8 @@ public final class Battle
         Legion defender = getDefender();
         if (turnNumber == 4 && defender.canRecruit())
         {
-            Log.debug("Calling Game.reinforce()"
-                + " from Battle.recruitReinforcement()");
+            LOGGER.log(Level.FINEST, "Calling Game.reinforce()"
+			+ " from Battle.recruitReinforcement()");
             game.reinforce(defender);
             return false;
         }
@@ -490,7 +498,7 @@ public final class Battle
     /** Needs to be called when reinforcement is done. */
     void doneReinforcing()
     {
-        Log.debug("Called Battle.doneReinforcing()");
+        LOGGER.log(Level.FINEST, "Called Battle.doneReinforcing()");
         Legion defender = getDefender();
         if (defender.hasRecruited())
         {
@@ -636,7 +644,7 @@ public final class Battle
         }
         else
         {
-            Log.error("Undo move error: no critter in " + hexLabel);
+            LOGGER.log(Level.SEVERE, "Undo move error: no critter in " + hexLabel, (Throwable)null);
         }
     }
 
@@ -645,7 +653,7 @@ public final class Battle
     {
         Legion legion = getLegionByPlayerName(playerName);
         String markerId = legion.getMarkerId();
-        Log.event(markerId + " concedes the battle");
+        LOGGER.log(Level.INFO, markerId + " concedes the battle");
         conceded = true;
 
         Iterator it = legion.getCritters().iterator();
@@ -711,7 +719,7 @@ public final class Battle
                 if (dam > 0)
                 {
                     critter.wound(dam);
-                    Log.event(critter.getDescription() + " takes Hex damage");
+                    LOGGER.log(Level.INFO, critter.getDescription() + " takes Hex damage");
                     server.allTellHexDamageResults(critter, dam);
                 }
             }
@@ -821,13 +829,13 @@ public final class Battle
                         critter.getName(), true, Constants.reasonUndoSummon);
                     // This summon doesn't count; the player can
                     // summon again later this turn.
-                    Log.event("undosummon critter " + critter.getName() + 
-                          " back to marker " + donor.getMarkerId() + "");
+                    LOGGER.log(Level.INFO, "undosummon critter " + critter.getName() + 
+					  " back to marker " + donor.getMarkerId() + "");
                     player.setSummoned(false);
                 }
                 else
                 {
-                    Log.error("Null donor in Battle.cleanupOneDeadCritter()");
+                    LOGGER.log(Level.SEVERE, "Null donor in Battle.cleanupOneDeadCritter()", (Throwable)null);
                 }
             }
             else
@@ -985,8 +993,8 @@ public final class Battle
             return true;
         }
 
-        Log.error(server.getPlayerName() +
-                " called battle.doneWithStrikes() illegally");
+        LOGGER.log(Level.SEVERE, server.getPlayerName() +
+		" called battle.doneWithStrikes() illegally", (Throwable)null);
         return false;
     }
 
@@ -1093,7 +1101,7 @@ public final class Battle
     {
         if (!carryTargets.contains(target.getCurrentHexLabel()))
         {
-            Log.warn("Tried illegal carry to " + target.getDescription());
+            LOGGER.log(Level.WARNING, "Tried illegal carry to " + target.getDescription());
             return;
         }
         int dealt = carryDamage;
@@ -1101,8 +1109,8 @@ public final class Battle
         dealt -= carryDamage;
         carryTargets.remove(target.getCurrentHexLabel());
 
-        Log.event(dealt + (dealt == 1 ? " hit carries to " :
-                " hits carry to ") + target.getDescription());
+        LOGGER.log(Level.INFO, dealt + (dealt == 1 ? " hit carries to " :
+		" hits carry to ") + target.getDescription());
 
         if (carryDamage <= 0 || getCarryTargets().isEmpty())
         {
@@ -1110,8 +1118,8 @@ public final class Battle
         }
         else
         {
-            Log.event(carryDamage + (carryDamage == 1 ?
-                    " carry available" : " carries available"));
+            LOGGER.log(Level.INFO, carryDamage + (carryDamage == 1 ?
+			" carry available" : " carries available"));
         }
         server.allTellCarryResults(target, dealt, carryDamage,
                 getCarryTargets());
@@ -1123,7 +1131,7 @@ public final class Battle
     {
         if (hex1 == null || hex2 == null)
         {
-            Log.warn("passed null hex to getRange()");
+            LOGGER.log(Level.WARNING, "passed null hex to getRange()");
             return Constants.OUT_OF_RANGE;
         }
         if (hex1.isEntrance() || hex2.isEntrance())
@@ -1705,15 +1713,15 @@ public final class Battle
         // Allow null moves.
         if (hexLabel.equals(critter.getCurrentHexLabel()))
         {
-            Log.event(critter.getDescription() + " does not move");
+            LOGGER.log(Level.INFO, critter.getDescription() + " does not move");
             // Call moveToHex() anyway to sync client.
             critter.moveToHex(hexLabel, true);
             return true;
         }
         else if (showMoves(critter, false).contains(hexLabel))
         {
-            Log.event(critter.getName() + " moves from " +
-                    critter.getCurrentHexLabel() + " to " + hexLabel);
+            LOGGER.log(Level.INFO, critter.getName() + " moves from " +
+			critter.getCurrentHexLabel() + " to " + hexLabel);
             critter.moveToHex(hexLabel, true);
             return true;
         }
@@ -1721,12 +1729,12 @@ public final class Battle
         {
             Legion legion = getActiveLegion();
             String markerId = legion.getMarkerId();
-            Log.warn(critter.getName() + " in " +
-                    critter.getCurrentHexLabel() +
-                    " tried to illegally move to " + hexLabel +
-                    " in " + terrain + 
-                    " (" + attackerId + " attacking " + defenderId + 
-                    ", active: "+markerId+")");
+            LOGGER.log(Level.WARNING, critter.getName() + " in " +
+			critter.getCurrentHexLabel() +
+			" tried to illegally move to " + hexLabel +
+			" in " + terrain + 
+			" (" + attackerId + " attacking " + defenderId + 
+			", active: "+markerId+")");
             return false;
         }
     }

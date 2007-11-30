@@ -1,20 +1,26 @@
 package net.sf.colossus.client;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import javax.swing.*;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.border.TitledBorder;
 
 import net.sf.colossus.server.Constants;
-import net.sf.colossus.util.Log;
 
 
 public class RevealEvent
 {
+	private static final Logger LOGGER = Logger.getLogger(RevealEvent.class.getName());
+
     private Client client;
     private int turnNumber;
     private int playerNr;
@@ -86,8 +92,8 @@ public class RevealEvent
         if (markerId == null && eventType != eventPlayerChange && 
             eventType != eventTurnChange)
         {
-            Log.error("ERROR: null marker for event " + 
-                getEventTypeText(eventType));
+            LOGGER.log(Level.SEVERE, "ERROR: null marker for event " + 
+			getEventTypeText(eventType), (Throwable)null);
             return;
         }
         this.client = client;
@@ -147,8 +153,8 @@ public class RevealEvent
 
                 if (playerName == null)
                 {
-                    Log.error("For making titan base name: " + 
-                            "playerName is null!");
+                    LOGGER.log(Level.SEVERE, "For making titan base name: " + 
+					"playerName is null!", (Throwable)null);
                 }
                 else
                 {
@@ -182,7 +188,7 @@ public class RevealEvent
         this.realPlayer = realPlayer;
         if (this.realPlayer == null)
         {
-            Log.error("RevealEvent: give realPlayer is null!");
+            LOGGER.log(Level.SEVERE, "RevealEvent: give realPlayer is null!", (Throwable)null);
             this.realPlayer = "dummy?";
         }
     }
@@ -276,9 +282,9 @@ public class RevealEvent
             }
             else
             {
-                Log.warn("got order to kill creature " + 
-                      name + " in legionEvent " + this.toString() + 
-                      " but no such alive creature found!!");
+                LOGGER.log(Level.WARNING, "got order to kill creature " + 
+				  name + " in legionEvent " + this.toString() + 
+				  " but no such alive creature found!!");
             }
         }
         // client tells us new accurate count how many are still alive.
@@ -291,7 +297,7 @@ public class RevealEvent
     {
         if (turnNumber != this.turnNumber)
         {
-            Log.warn("undoSummon for " + this.toString() + " -- wrong turn.");
+            LOGGER.log(Level.WARNING, "undoSummon for " + this.toString() + " -- wrong turn.");
             return false;
         }
         Iterator it = this.knownCreatures.iterator();
@@ -446,8 +452,8 @@ public class RevealEvent
     {
         if (markerId == null)
         {
-            Log.error("ERROR: markerId null, event type " + 
-                 getEventTypeText()+" turn" +getTurn());
+            LOGGER.log(Level.SEVERE, "ERROR: markerId null, event type " + 
+			 getEventTypeText()+" turn" +getTurn(), (Throwable)null);
         }
         try
         {
@@ -457,9 +463,9 @@ public class RevealEvent
         }
         catch(Exception e)
         {
-            Log.error("new Chit for markerId " + markerId + ", event type "+
-              getEventTypeText() + " turn" + getTurn() + " threw exception:" + 
-              e.toString());
+            LOGGER.log(Level.SEVERE, "new Chit for markerId " + markerId + ", event type "+
+			  getEventTypeText() + " turn" + getTurn() + " threw exception:" + 
+			  e.toString(), (Throwable)null);
         }
         addLabel("("+height+")");
     }
@@ -478,8 +484,8 @@ public class RevealEvent
         }
         catch (Exception ex)
         {
-            Log.error("RevealEvent.gettitanbasename, PlayerInfo threw " +
-                      "exception " + ex.toString());
+            LOGGER.log(Level.SEVERE, "RevealEvent.gettitanbasename, PlayerInfo threw " +
+			  "exception " + ex.toString(), (Throwable)null);
             return Constants.titan;
         }
     }

@@ -1,9 +1,14 @@
 package net.sf.colossus.client;
 
 
-import java.util.*;
-
-import net.sf.colossus.util.Log;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.List;
+import java.util.TreeSet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 /**
@@ -16,7 +21,9 @@ import net.sf.colossus.util.Log;
 
 public final class PredictSplits
 {
-    private PredictSplitNode root;    // All contents of root must be known.
+	private static final Logger LOGGER = Logger.getLogger(PredictSplits.class.getName());
+
+	private PredictSplitNode root;    // All contents of root must be known.
     private NodeTurnComparator nodeTurnComparator = new NodeTurnComparator();
 
     PredictSplits(String playerName, String rootId,
@@ -121,29 +128,29 @@ public final class PredictSplits
     /** Print all childless nodes in tree. */
     void printLeaves()
     {
-        Log.debug("");
+        LOGGER.log(Level.FINEST, "");
         List leaves = getLeaves(root);
         Collections.sort(leaves);
         for (Iterator it = leaves.iterator(); it.hasNext(); )
         {
             PredictSplitNode leaf = (PredictSplitNode)it.next();
-            Log.debug(leaf.toString());
+            LOGGER.log(Level.FINEST, leaf.toString());
         }
-        Log.debug("");
+        LOGGER.log(Level.FINEST, "");
     }
 
     /** Print all nodes in tree. */
     void printNodes()
     {
-        Log.debug("");
+        LOGGER.log(Level.FINEST, "");
         List nodes = getNodes(root);
         Collections.sort(nodes, nodeTurnComparator);
         for (Iterator it = nodes.iterator(); it.hasNext(); )
         {
             PredictSplitNode node = (PredictSplitNode)it.next();
-            Log.debug(node.toString());
+            LOGGER.log(Level.FINEST, node.toString());
         }
-        Log.debug("");
+        LOGGER.log(Level.FINEST, "");
     }
 
     /** Return the leaf PredictSplitNode with matching markerId. */

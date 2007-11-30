@@ -6,10 +6,11 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.Creature;
-import net.sf.colossus.util.Log;
 
 
 /**
@@ -21,7 +22,9 @@ import net.sf.colossus.util.Log;
 
 public final class LegionInfo
 {
-    private Client client;
+	private static final Logger LOGGER = Logger.getLogger(LegionInfo.class.getName());
+
+	private Client client;
 
     /** immutable */
     private String markerId;
@@ -245,7 +248,7 @@ public final class LegionInfo
 
     void merge(String splitoffId, int turn)
     {
-        Log.debug("LegionInfo.merge() for " + markerId + " " + splitoffId);
+        LOGGER.log(Level.FINEST, "LegionInfo.merge() for " + markerId + " " + splitoffId);
         getNode().merge(getNode(splitoffId), turn);
         // since this is potentially a merge of a 3-way split, be safe and 
         // find the node again

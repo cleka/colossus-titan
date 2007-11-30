@@ -4,9 +4,10 @@ package net.sf.colossus.client;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import net.sf.colossus.server.Constants;
-import net.sf.colossus.util.Log;
 import net.sf.colossus.util.Options;
 import net.sf.colossus.util.Split;
 
@@ -22,7 +23,9 @@ import net.sf.colossus.util.Split;
 
 public final class Movement
 {
-    Client client;
+	private static final Logger LOGGER = Logger.getLogger(Movement.class.getName());
+
+	Client client;
 
     Movement(Client client)
     {
@@ -104,7 +107,7 @@ public final class Movement
         }
         else if (roll < 0)
         {
-            Log.error("Movement.findNormalMoves() roll < 0");
+            LOGGER.log(Level.SEVERE, "Movement.findNormalMoves() roll < 0", (Throwable)null);
             return null;
         }
 

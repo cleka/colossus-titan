@@ -15,13 +15,14 @@ import java.awt.event.WindowListener;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.JButton;
 
 import net.sf.colossus.server.Creature;
 import net.sf.colossus.server.Legion;
 import net.sf.colossus.util.KDialog;
-import net.sf.colossus.util.Log;
 
 
 /**
@@ -35,6 +36,8 @@ import net.sf.colossus.util.Log;
 final class SummonAngel extends KDialog implements MouseListener,
             ActionListener, WindowListener
 {
+	private static final Logger LOGGER = Logger.getLogger(SummonAngel.class.getName());
+
     private String markerId;
     private List sumChitList = new ArrayList();
     private JButton cancelButton;
@@ -119,11 +122,11 @@ final class SummonAngel extends KDialog implements MouseListener,
 
     static SummonAngel summonAngel(Client client, String markerId)
     {
-        Log.debug("called summonAngel for " + markerId);
+        LOGGER.log(Level.FINEST, "called summonAngel for " + markerId);
         if (!active)
         {
             active = true;
-            Log.debug("returning new SummonAngel dialog for " + markerId);
+            LOGGER.log(Level.FINEST, "returning new SummonAngel dialog for " + markerId);
             return new SummonAngel(client, markerId);
         }
         return null;

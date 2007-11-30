@@ -1,9 +1,16 @@
 package net.sf.colossus.server;
 
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import net.sf.colossus.util.Log;
 import net.sf.colossus.client.BattleHex;
 import net.sf.colossus.client.HexMap;
 import net.sf.colossus.util.Options;
@@ -20,6 +27,8 @@ import net.sf.colossus.util.Options;
 public //  
 class Critter implements Comparable
 {
+	private static final Logger LOGGER = Logger.getLogger(Critter.class.getName());
+
     private Creature creature;
     private String markerId;
     private Battle battle;
@@ -144,15 +153,15 @@ class Critter implements Comparable
                 hits = getPower();
             }
 
-            Log.event("Critter " + getDescription() + ": " + 
-                   oldhits + " + " + damage + " => " + hits + 
-                   "; " + excess + " excess");
+            LOGGER.log(Level.INFO, "Critter " + getDescription() + ": " + 
+			   oldhits + " + " + damage + " => " + hits + 
+			   "; " + excess + " excess");
             
             // Check for death.
             if (hits >= getPower())
             {
-                Log.event("Critter " + getDescription() + " is now dead: (hits="
-                        + hits + " > power="+getPower()+ ")");
+                LOGGER.log(Level.INFO, "Critter " + getDescription() + " is now dead: (hits="
+				+ hits + " > power="+getPower()+ ")");
                 setDead(true);
             }
         }
@@ -293,8 +302,8 @@ class Critter implements Comparable
     {
         String formerHexLabel = currentHexLabel;
         currentHexLabel = startingHexLabel;
-        Log.event(getName() + " undoes move and returns to " +
-                startingHexLabel);
+        LOGGER.log(Level.INFO, getName() + " undoes move and returns to " +
+		startingHexLabel);
         battle.getGame().getServer().allTellBattleMove(tag, formerHexLabel,
                 currentHexLabel, true);
     }
@@ -551,7 +560,7 @@ class Critter implements Comparable
         }
         else
         {
-            Log.warn("Illegal penalty option " + prompt);
+            LOGGER.log(Level.WARNING, "Illegal penalty option " + prompt);
         }
     }
 
@@ -727,10 +736,10 @@ class Critter implements Comparable
             }
         }
 
-        Log.event(getName() + " in " + currentHexLabel +
-                " strikes " + target.getDescription() + " with strike number " +
-                strikeNumber + " : " + rollString + ": " + damage +
-                (damage == 1 ? " hit" : " hits"));
+        LOGGER.log(Level.INFO, getName() + " in " + currentHexLabel +
+		" strikes " + target.getDescription() + " with strike number " +
+		strikeNumber + " : " + rollString + ": " + damage +
+		(damage == 1 ? " hit" : " hits"));
 
         int carryDamage = target.wound(damage);
         if (!carryPossible)
@@ -742,8 +751,8 @@ class Critter implements Comparable
         // Let the attacker choose whether to carry, if applicable.
         if (carryDamage > 0)
         {
-            Log.event(carryDamage + (carryDamage == 1 ?
-                    " carry available" : " carries available"));
+            LOGGER.log(Level.INFO, carryDamage + (carryDamage == 1 ?
+			" carry available" : " carries available"));
         }
 
         // Record that this attacker has struck.

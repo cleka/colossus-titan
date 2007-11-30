@@ -1,8 +1,10 @@
 package net.sf.colossus.server;
 
 
-import junit.framework.*;
-import net.sf.colossus.util.Log;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import junit.framework.TestCase;
 
 
 /** 
@@ -12,6 +14,9 @@ import net.sf.colossus.util.Log;
  */
 public class LOSTest extends TestCase
 {
+	// TODO the unit test might as well use stdout
+	private static final Logger LOGGER = Logger.getLogger(LOSTest.class.getName());
+
     Game game;
     Battle battle;
     Legion attacker;
@@ -68,7 +73,7 @@ public class LOSTest extends TestCase
     // TODO Should allow two different strike numbers against centaur.
     public void testLOS1()
     {
-        Log.debug("testLOS1()");
+        LOGGER.log(Level.FINEST, "testLOS1()");
         String hexLabel = "3";  // Brush
 
         defender = new Legion("Rd03", "Rd01", hexLabel, null,
@@ -105,7 +110,7 @@ public class LOSTest extends TestCase
 
     public void testLOS2()
     {
-        Log.debug("testLOS2()");
+        LOGGER.log(Level.FINEST, "testLOS2()");
         String hexLabel = "40";  // Jungle
 
         defender = new Legion("Gr03", "Gr01", hexLabel, null,
@@ -250,7 +255,7 @@ public class LOSTest extends TestCase
 
     public void testLOS3()
     {
-        Log.debug("testLOS3()");
+        LOGGER.log(Level.FINEST, "testLOS3()");
         String hexLabel = "100";  // Tower
 
         defender = new Legion("Gr03", "Gr01", hexLabel, null,
@@ -382,7 +387,7 @@ public class LOSTest extends TestCase
 
     public void testLOS4()
     {
-        Log.debug("testLOS4()");
+        LOGGER.log(Level.FINEST, "testLOS4()");
         String hexLabel = "4";  // Hills
 
         defender = new Legion("Gr03", "Gr01", hexLabel, null,
@@ -498,7 +503,7 @@ public class LOSTest extends TestCase
 
     public void testLOS5()
     {
-        Log.debug("testLOS5()");
+        LOGGER.log(Level.FINEST, "testLOS5()");
         VariantSupport.loadVariant("TG-ConceptIII", true);
         String hexLabel = "1";  // Plains - Delta
 
@@ -589,7 +594,7 @@ public class LOSTest extends TestCase
 
     public void testLOS6()
     {
-        Log.debug("testLOS6()");
+        LOGGER.log(Level.FINEST, "testLOS6()");
         VariantSupport.loadVariant("Badlands-JDG", true);
         String hexLabel = "5000";  // MountainsAlt
 
@@ -680,7 +685,7 @@ public class LOSTest extends TestCase
 
     public void testLOS7()
     {
-        Log.debug("testLOS7()");
+        LOGGER.log(Level.FINEST, "testLOS7()");
         String hexLabel = "40";  // Jungle
 
         defender = new Legion("Gr03", "Gr01", hexLabel, null,

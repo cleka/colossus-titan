@@ -35,11 +35,12 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
-import javax.swing.JButton;
 import javax.swing.ButtonGroup;
-import javax.swing.JRadioButtonMenuItem;
+import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -50,6 +51,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
@@ -59,7 +61,6 @@ import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.server.XMLSnapshotFilter;
 import net.sf.colossus.util.HTMLColor;
-import net.sf.colossus.util.Log;
 import net.sf.colossus.util.Options;
 import net.sf.colossus.util.ResourceLoader;
 import net.sf.colossus.xmlparser.StrategicMapLoader;
@@ -75,7 +76,9 @@ import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
 public final class MasterBoard extends JPanel
 {
-    private Image offScreenBuffer;
+	private static final Logger LOGGER = Logger.getLogger(MasterBoard.class.getName());
+
+	private Image offScreenBuffer;
     private static int horizSize = 0;
     private static int vertSize = 0;
     private boolean overlayChanged = false;
@@ -316,12 +319,12 @@ public final class MasterBoard extends JPanel
         }
         catch (Exception e)
         {
-            Log.error("Reading map data for non-GUI failed : " + e);
+            LOGGER.log(Level.SEVERE, "Reading map data for non-GUI failed : " + e, (Throwable)null);
             e.printStackTrace();
             System.exit(1);
         }
 
-        Log.debug("Setting up static TowerSet in MasterBoard");
+        LOGGER.log(Level.FINEST, "Setting up static TowerSet in MasterBoard");
         setupTowerSet();
     }
 
@@ -400,7 +403,7 @@ public final class MasterBoard extends JPanel
                 }
                 else if (phase == Constants.Phase.FIGHT)
                 {
-                    Log.error("called undoLastAction in FIGHT");
+                    LOGGER.log(Level.SEVERE, "called undoLastAction in FIGHT", (Throwable)null);
                 }
                 else if (phase == Constants.Phase.MUSTER)
                 {
@@ -409,7 +412,7 @@ public final class MasterBoard extends JPanel
                 }
                 else
                 {
-                    Log.error("Bogus phase");
+                    LOGGER.log(Level.SEVERE, "Bogus phase", (Throwable)null);
                 }
             }
         };
@@ -433,7 +436,7 @@ public final class MasterBoard extends JPanel
                 }
                 else if (phase == Constants.Phase.FIGHT)
                 {
-                    Log.error("called undoAllAction in FIGHT");
+                    LOGGER.log(Level.SEVERE, "called undoAllAction in FIGHT", (Throwable)null);
                 }
                 else if (phase == Constants.Phase.MUSTER)
                 {
@@ -442,7 +445,7 @@ public final class MasterBoard extends JPanel
                 }
                 else
                 {
-                    Log.error("Bogus phase");
+                    LOGGER.log(Level.SEVERE, "Bogus phase", (Throwable)null);
                 }
             }
         };
@@ -474,7 +477,7 @@ public final class MasterBoard extends JPanel
                 }
                 else
                 {
-                    Log.error("Bogus phase");
+                    LOGGER.log(Level.SEVERE, "Bogus phase", (Throwable)null);
                 }
             }
         };
@@ -604,10 +607,10 @@ public final class MasterBoard extends JPanel
                 File savesDir = new File(Constants.saveDirname);
                 if (!savesDir.exists())
                 {
-                    Log.event("Trying to make directory " + savesDir.toString());
+                    LOGGER.log(Level.INFO, "Trying to make directory " + savesDir.toString());
                     if (!savesDir.mkdirs())
                     {
-                        Log.error("Could not create saves directory");
+                        LOGGER.log(Level.SEVERE, "Could not create saves directory", (Throwable)null);
                         JOptionPane.showMessageDialog(masterFrame,
                                 "Could not create directory " + savesDir +
                                 "\n- FileChooser dialog box will default " + 
@@ -618,8 +621,8 @@ public final class MasterBoard extends JPanel
                 }
                 else if (!savesDir.isDirectory())
                 {
-                    Log.error("Can't create directory " + savesDir.toString() + 
-                    " - name exists but is not a file");
+                    LOGGER.log(Level.SEVERE, "Can't create directory " + savesDir.toString() + 
+					" - name exists but is not a file", (Throwable)null);
                     JOptionPane.showMessageDialog(masterFrame,
                             "Can't create directory " + savesDir + 
                             " (name exists, but is not a file)\n" +
@@ -1039,7 +1042,7 @@ public final class MasterBoard extends JPanel
         if (_hexByLabel_last_h != h)
         {
             // alas, we have to rebuild the cache
-            Log.debug("new 'MasterHex[][] h' in MasterBoard.hexByLabel()");
+            LOGGER.log(Level.FINEST, "new 'MasterHex[][] h' in MasterBoard.hexByLabel()");
             _hexByLabel_last_h = h;
             // write all 'h' elements by their int-value into an Array.
             // we can do that here, because the 'label' arg is an int. if it
@@ -1069,7 +1072,7 @@ public final class MasterBoard extends JPanel
         final MasterHex found = (MasterHex)_hexByLabel_cache.get(label);
         if (found == null)
         {
-            Log.warn("Couldn't find Masterhex labeled " + label);
+            LOGGER.log(Level.WARNING, "Couldn't find Masterhex labeled " + label);
         }
         return found;
     }
@@ -1138,7 +1141,7 @@ public final class MasterBoard extends JPanel
         MasterHex dh = hexByLabel(h, h[i][j].getBaseExitLabel(k));
         if (dh == null)
         {
-            Log.error("null pointer ; i=" + i + ", j=" + j + ", k=" + k);
+            LOGGER.log(Level.SEVERE, "null pointer ; i=" + i + ", j=" + j + ", k=" + k, (Throwable)null);
             System.exit(1);
         }
         assert dh != null; // Static analysis of Eclipse doesn't grok System.exit()
@@ -1154,7 +1157,7 @@ public final class MasterBoard extends JPanel
             }
             else
             {
-                Log.warn("bad exit ; i=" + i + ", j=" + j + ", k=" + k);
+                LOGGER.log(Level.WARNING, "bad exit ; i=" + i + ", j=" + j + ", k=" + k);
             }
         }
         else if (dh.getXCoord() == (i + 1))
@@ -1166,7 +1169,7 @@ public final class MasterBoard extends JPanel
             }
             else
             {
-                Log.warn("bad exit ; i=" + i + ", j=" + j + ", k=" + k);
+                LOGGER.log(Level.WARNING, "bad exit ; i=" + i + ", j=" + j + ", k=" + k);
             }
         }
         else if (dh.getXCoord() == (i - 1))
@@ -1178,12 +1181,12 @@ public final class MasterBoard extends JPanel
             }
             else
             {
-                Log.warn("bad exit ; i=" + i + ", j=" + j + ", k=" + k);
+                LOGGER.log(Level.WARNING, "bad exit ; i=" + i + ", j=" + j + ", k=" + k);
             }
         }
         else
         {
-            Log.warn("bad exit ; i=" + i + ", j=" + j + ", k=" + k);
+            LOGGER.log(Level.WARNING, "bad exit ; i=" + i + ", j=" + j + ", k=" + k);
         }
     }
 
@@ -1227,7 +1230,7 @@ public final class MasterBoard extends JPanel
                                     break;
 
                                 default:
-                                    Log.error("Bogus hexside");
+                                    LOGGER.log(Level.SEVERE, "Bogus hexside", (Throwable)null);
                             }
                         }
                     }
@@ -1782,7 +1785,7 @@ public final class MasterBoard extends JPanel
 
         if (image == null)
         {
-            Log.error("Couldn't find Colossus icon");
+            LOGGER.log(Level.SEVERE, "Couldn't find Colossus icon", (Throwable)null);
         }
         else
         {
@@ -2045,7 +2048,7 @@ public final class MasterBoard extends JPanel
                     }
                     else
                     {
-                        Log.warn("null hex in MasterBoard.mousePressed()");
+                        LOGGER.log(Level.WARNING, "null hex in MasterBoard.mousePressed()");
                     }
                     return;
                 }
@@ -2227,7 +2230,7 @@ public final class MasterBoard extends JPanel
             }
             catch (ConcurrentModificationException ex)
             {
-                Log.debug("harmless " + ex.toString());
+                LOGGER.log(Level.FINEST, "harmless " + ex.toString());
                 // Don't worry about it -- we'll just paint again.
             }
         }
@@ -2243,7 +2246,7 @@ public final class MasterBoard extends JPanel
         }
         catch (ConcurrentModificationException ex)
         {
-            Log.debug("harmless " + ex.toString());
+            LOGGER.log(Level.FINEST, "harmless " + ex.toString());
             // Don't worry about it -- we'll just paint again.
         }
     }

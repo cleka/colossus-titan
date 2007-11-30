@@ -5,10 +5,11 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import net.sf.colossus.client.Client;
 import net.sf.colossus.client.StartClient;
-import net.sf.colossus.util.Log;
 import net.sf.colossus.util.Options;
 
 import com.werken.opt.CommandLine;
@@ -24,14 +25,16 @@ import com.werken.opt.Option;
 
 public final class Start
 {
+	private static final Logger LOGGER = Logger.getLogger(Start.class.getName());
+
     private static void usage(com.werken.opt.Options opts)
     {
-        Log.event("Usage: java -jar Colossus.jar [options]");
+        LOGGER.log(Level.INFO, "Usage: java -jar Colossus.jar [options]");
         Iterator it = opts.getOptions().iterator();
         while (it.hasNext())
         {
             Option opt = (Option)it.next();
-            Log.event(opt.toString());
+            LOGGER.log(Level.INFO, opt.toString());
         }
     }
 
@@ -48,7 +51,7 @@ public final class Start
         }
         catch (UnknownHostException ex)
         {
-            Log.error(ex.toString());
+            LOGGER.log(Level.SEVERE, ex.toString(), (Throwable)null);
         }
 
         int port = Constants.defaultPort;
@@ -100,7 +103,7 @@ public final class Start
             }
             catch(InterruptedException e) 
             {
-                Log.warn("Start waiting for GetPlayers to complete, wait interrupted?");
+                LOGGER.log(Level.WARNING, "Start waiting for GetPlayers to complete, wait interrupted?");
             }
         }
         mutex = null;
@@ -222,7 +225,7 @@ public final class Start
         if (numHumans < 0 || numAIs < 0 || numNetworks < 0 ||
             numHumans + numAIs + numNetworks > Constants.MAX_MAX_PLAYERS)
         {
-            Log.error("Illegal number of players");
+            LOGGER.log(Level.SEVERE, "Illegal number of players", (Throwable)null);
             options.clear();
             return;
         }
@@ -266,8 +269,8 @@ public final class Start
 
     public static void main(String [] args)
     {
-        Log.event("Start for Colossus version " + Client.getVersion() +
-            " at " + new Date().getTime());
+        LOGGER.log(Level.INFO, "Start for Colossus version " + Client.getVersion() +
+		" at " + new Date().getTime());
 
         com.werken.opt.Options opts = new com.werken.opt.Options();
         CommandLine cl = null;
@@ -336,7 +339,7 @@ public final class Start
         }
         catch (Exception ex)
         {
-            Log.error(ex);
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             System.exit(1);
         }
     }

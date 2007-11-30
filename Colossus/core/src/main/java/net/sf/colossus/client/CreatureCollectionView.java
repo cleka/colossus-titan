@@ -19,6 +19,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
@@ -30,7 +32,6 @@ import javax.swing.SwingConstants;
 
 import net.sf.colossus.server.Creature;
 import net.sf.colossus.util.KDialog;
-import net.sf.colossus.util.Log;
 
 
 /** 
@@ -41,7 +42,9 @@ import net.sf.colossus.util.Log;
  */
 class CreatureCollectionView extends KDialog implements WindowListener
 {
-    private Client client;
+	private static final Logger LOGGER = Logger.getLogger(CreatureCollectionView.class.getName());
+
+	private Client client;
     private Point location;
     private Dimension size;
     private static final int fixedChitSize = 60;
@@ -237,11 +240,11 @@ class CreatureCollectionView extends KDialog implements WindowListener
                 // safety check
                 if ((inGameCount < 0) || (inGameCount > maxcount))
                 {
-                    Log.error("Something went wrong:" +
-                            " discrepancy between total (" + maxcount +
-                            "), remaining (" + count +
-                            ") and dead (" + deadCount +
-                            ") count for creature " + name);
+                    LOGGER.log(Level.SEVERE, "Something went wrong:" +
+					" discrepancy between total (" + maxcount +
+					"), remaining (" + count +
+					") and dead (" + deadCount +
+					") count for creature " + name, (Throwable)null);
                     return;
                 }
 

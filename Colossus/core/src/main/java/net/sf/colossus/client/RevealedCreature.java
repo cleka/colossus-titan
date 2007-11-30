@@ -1,7 +1,9 @@
 package net.sf.colossus.client;
 
 
-import net.sf.colossus.util.Log;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import net.sf.colossus.server.Constants;
 
 
@@ -10,6 +12,8 @@ import net.sf.colossus.server.Constants;
  */
 public class RevealedCreature
 {
+	private static final Logger LOGGER = Logger.getLogger(RevealedCreature.class.getName());
+
     private String creatureName;
     private String titanBaseName = null;
     private boolean dead = false;
@@ -28,7 +32,7 @@ public class RevealedCreature
     {
         if (name == null)
         {
-            Log.error("Tried to create RevealedCreature with null name");
+            LOGGER.log(Level.SEVERE, "Tried to create RevealedCreature with null name", (Throwable)null);
             return;
         }
         this.creatureName = name;
@@ -89,7 +93,7 @@ public class RevealedCreature
         String name = getName();
         if (name == null)
         {
-            Log.error("ERROR: revealedCreature.toChit, creature name null!");
+            LOGGER.log(Level.SEVERE, "ERROR: revealedCreature.toChit, creature name null!", (Throwable)null);
             return null;
         }
 
@@ -188,7 +192,7 @@ public class RevealedCreature
     {
         if (reason == null)
         {
-            Log.error("RevealedCreature.setReason: reason null!!");
+            LOGGER.log(Level.SEVERE, "RevealedCreature.setReason: reason null!!", (Throwable)null);
             return;
         }
         if (reason.equals(Constants.reasonRecruited))
@@ -210,7 +214,7 @@ public class RevealedCreature
         }
         else
         {
-            Log.error("RevealedCreature.setReason: unknown reason " + reason + "!!");
+            LOGGER.log(Level.SEVERE, "RevealedCreature.setReason: unknown reason " + reason + "!!", (Throwable)null);
         }
     }
 }

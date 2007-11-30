@@ -1,25 +1,45 @@
 package net.sf.colossus.server;
 
 
-import java.io.*;
-import java.util.*;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.JOptionPane;
 
-import org.jdom.*;
-import org.jdom.output.*;
-import org.jdom.input.*;
-
-import net.sf.colossus.util.Log;
-import net.sf.colossus.util.Split;
-import net.sf.colossus.util.Options;
-import net.sf.colossus.util.ResourceLoader;
+import net.sf.colossus.client.BattleMap;
+import net.sf.colossus.client.HexMap;
 import net.sf.colossus.client.MasterBoard;
 import net.sf.colossus.client.MasterHex;
 import net.sf.colossus.client.Proposal;
-import net.sf.colossus.client.BattleMap;
+import net.sf.colossus.util.Options;
+import net.sf.colossus.util.ResourceLoader;
+import net.sf.colossus.util.Split;
 import net.sf.colossus.xmlparser.TerrainRecruitLoader;
-import net.sf.colossus.client.HexMap;
+
+import org.jdom.Attribute;
+import org.jdom.CDATA;
+import org.jdom.DataConversionException;
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.input.SAXBuilder;
+import org.jdom.output.XMLOutputter;
 
 
 /**
@@ -32,6 +52,8 @@ import net.sf.colossus.client.HexMap;
 
 public final class Game
 {
+	private static final Logger LOGGER = Logger.getLogger(Game.class.getName());
+
     private List players = new ArrayList(6);
     private int activePlayerNum;
     private int turnNumber;    // Advance when every player has a turn
@@ -117,7 +139,7 @@ public final class Game
             if (name != null && type != null && !type.equals(Constants.none))
             {
                 addPlayer(name, type);
-                Log.event("Add " + type + " player " + name);
+                LOGGER.log(Level.INFO, "Add " + type + " player " + name);
             }
         }
         // No longer need the player name and type options.
@@ -144,7 +166,7 @@ public final class Game
 
         Creature.resetCache();
         
-        Log.event("Starting new game");
+        LOGGER.log(Level.INFO, "Starting new game");
 
         CustomRecruitBase.resetAllInstances();
         CustomRecruitBase.setCaretaker(caretaker);
@@ -379,15 +401,15 @@ public final class Game
             String newName = makeNameByType(gotName, type);
             if (newName != null)
             {
-                Log.event("Setting for \"" + gotName + "\" new name: "+newName);
+                LOGGER.log(Level.INFO, "Setting for \"" + gotName + "\" new name: "+newName);
                 server.setPlayerName(gotName, newName);
                 player.setName(newName);
                 playerName = newName;
             }
             else
             {
-                Log.warn("Type "+type+ 
-                        " not recognized. Giving name by color instead ("+color+")");
+                LOGGER.log(Level.WARNING, "Type "+type+ 
+				" not recognized. Giving name by color instead ("+color+")");
                 gotName = Constants.byColor;
             }
         }
@@ -398,7 +420,7 @@ public final class Game
             player.setName(color);
             playerName = color;
         }
-        Log.event(player.getName() + " chooses color " + color);
+        LOGGER.log(Level.INFO, player.getName() + " chooses color " + color);
         player.initMarkersAvailable();
         server.allUpdatePlayerInfo();
         server.askPickFirstMarker(playerName);
@@ -461,7 +483,7 @@ public final class Game
         for (int i = 0; i < numPlayers; i++)
         {
             Player player = getPlayer(i);
-            Log.event(player.getName() + " gets tower " + playerTower[i]);
+            LOGGER.log(Level.INFO, player.getName() + " gets tower " + playerTower[i]);
             player.setTower(playerTower[i]);
         }
     }
@@ -475,7 +497,7 @@ public final class Game
 
         if (numPlayers > numTowers)
         {
-            Log.error("More players than towers!");
+            LOGGER.log(Level.SEVERE, "More players than towers!", (Throwable)null);
             return towerList;
         }
 
@@ -707,7 +729,7 @@ public final class Game
         switch (remaining)
         {
             case 0:
-                Log.event("Game over -- Draw at " + new Date().getTime());
+                LOGGER.log(Level.INFO, "Game over -- Draw at " + new Date().getTime());
                 setGameOver(true);
                 server.allTellGameOver("Draw");
                 break;
@@ -715,8 +737,8 @@ public final class Game
             case 1:
                 String winnerName = getWinner().getName();
 
-                Log.event("Game over -- " + winnerName + " wins at " +
-                        new Date().getTime());
+                LOGGER.log(Level.INFO, "Game over -- " + winnerName + " wins at " +
+				new Date().getTime());
                 setGameOver(true);
                 server.allTellGameOver(winnerName + " wins");
                 break;
@@ -761,21 +783,21 @@ public final class Game
         if (oldPhase != phase || pendingAdvancePhase ||
                 !playerName.equals(getActivePlayerName()))
         {
-            Log.error("Called advancePhase illegally (reason: " +
-                    (oldPhase != phase ? "oldPhase (" +
-                    oldPhase + ") != phase (" +
-                    phase + ")" :
-                    (pendingAdvancePhase ? "pendingAdvancePhase is true " :
-                    (!playerName.equals(getActivePlayerName()) ?
-                    "wrong player [" + playerName +
-                    " vs. " + getActivePlayerName() +
-                    "]" :
-                    "UNKNOWN"))) + ")");
+            LOGGER.log(Level.SEVERE, "Called advancePhase illegally (reason: " +
+			(oldPhase != phase ? "oldPhase (" +
+			oldPhase + ") != phase (" +
+			phase + ")" :
+			(pendingAdvancePhase ? "pendingAdvancePhase is true " :
+			(!playerName.equals(getActivePlayerName()) ?
+			"wrong player [" + playerName +
+			" vs. " + getActivePlayerName() +
+			"]" :
+			"UNKNOWN"))) + ")", (Throwable)null);
             return;
         }
         if (getOption(Options.autoStop) && getNumHumansRemaining() < 1)
         {
-            Log.event("Not advancing because no humans remain");
+            LOGGER.log(Level.INFO, "Not advancing because no humans remain");
             // XXX buggy?
             server.allTellGameOver("All humans eliminated");
             setGameOver(true);
@@ -820,7 +842,7 @@ public final class Game
             }
             else
             {
-                Log.event("Phase advances to " + phase);
+                LOGGER.log(Level.INFO, "Phase advances to " + phase);
             }
 
             pendingAdvancePhase = false;
@@ -856,8 +878,8 @@ public final class Game
             }
             else
             {
-                Log.event(getActivePlayerName() + "'s turn, number " +
-                        turnNumber);
+                LOGGER.log(Level.INFO, getActivePlayerName() + "'s turn, number " +
+				turnNumber);
                 autoSave();
             }
         }
@@ -884,7 +906,7 @@ public final class Game
         }
         else
         {
-            Log.error("Bogus phase");
+            LOGGER.log(Level.SEVERE, "Bogus phase", (Throwable)null);
         }
     }
 
@@ -894,7 +916,7 @@ public final class Game
 
         if (player == null)
         {
-            Log.error("No players");
+            LOGGER.log(Level.SEVERE, "No players", (Throwable)null);
             dispose();
             return;
         }
@@ -948,10 +970,10 @@ public final class Game
 
             if (!savesDir.exists() || !savesDir.isDirectory())
             {
-                Log.event("Trying to make directory " + Constants.saveDirname);
+                LOGGER.log(Level.INFO, "Trying to make directory " + Constants.saveDirname);
                 if (!savesDir.mkdirs())
                 {
-                    Log.error("Could not create saves directory");
+                    LOGGER.log(Level.SEVERE, "Could not create saves directory", (Throwable)null);
                     JOptionPane.showMessageDialog(null,
                             "Could not create directory " + savesDir +
                             "\n- saving game failed! Unless the directory " + 
@@ -970,7 +992,7 @@ public final class Game
         else
         {
             fn = new String(filename);
-            Log.event("Saving game to " + filename);
+            LOGGER.log(Level.INFO, "Saving game to " + filename);
         }
 
         FileWriter fileWriter;
@@ -980,8 +1002,8 @@ public final class Game
         }
         catch (IOException e)
         {
-            Log.error(e.toString());
-            Log.error("Couldn't open " + fn);
+            LOGGER.log(Level.SEVERE, e.toString(), (Throwable)null);
+            LOGGER.log(Level.SEVERE, "Couldn't open " + fn, (Throwable)null);
             return;
         }
         PrintWriter out = new PrintWriter(fileWriter);
@@ -1108,7 +1130,7 @@ public final class Game
         }
         catch (IOException ex)
         {
-            Log.error("Error writing XML savegame: " + ex.toString());
+            LOGGER.log(Level.SEVERE, "Error writing XML savegame: " + ex.toString(), (Throwable)null);
         }
     }
 
@@ -1175,14 +1197,14 @@ public final class Game
 
             if (!dir.exists() || !dir.isDirectory())
             {
-                Log.error("No saves directory");
+                LOGGER.log(Level.SEVERE, "No saves directory", (Throwable)null);
                 dispose();
             }
             String[] filenames = dir.list(new XMLSnapshotFilter());
 
             if (filenames.length < 1)
             {
-                Log.error("No XML savegames found in saves directory");
+                LOGGER.log(Level.SEVERE, "No XML savegames found in saves directory", (Throwable)null);
                 dispose();
             }
             file = new File(Constants.saveDirname +
@@ -1200,7 +1222,7 @@ public final class Game
 
         try
         {
-            Log.event("Loading game from " + file);
+            LOGGER.log(Level.INFO, "Loading game from " + file);
             SAXBuilder builder = new SAXBuilder();
             Document doc = builder.build(file);
 
@@ -1209,7 +1231,7 @@ public final class Game
 
             if (!ver.getValue().equals(Constants.xmlSnapshotVersion))
             {
-                Log.error("Can't load this savegame version.");
+                LOGGER.log(Level.SEVERE, "Can't load this savegame version.", (Throwable)null);
                 dispose();
             }
 
@@ -1234,8 +1256,8 @@ public final class Game
                 if (contentList.size() > 0)
                 {
                     String content = ((CDATA)contentList.get(0)).getText();
-                    Log.debug("DataFileKey: " + mapKey + " DataFileContent :\n"
-                        + content);
+                    LOGGER.log(Level.FINEST, "DataFileKey: " + mapKey + " DataFileContent :\n"
+					+ content);
                     ResourceLoader.putIntoFileCache(mapKey,
                         content.getBytes());
                 }
@@ -1412,7 +1434,7 @@ public final class Game
         }
         catch (Exception ex)
         {
-            Log.error("Tried to load corrupt savegame", ex);
+            LOGGER.log(Level.SEVERE, "Tried to load corrupt savegame", ex);
             dispose();
         }
     }
@@ -1685,7 +1707,7 @@ public final class Game
     {
         if (recruit == null)
         {
-            Log.error("null recruit in Game.doRecruit()");
+            LOGGER.log(Level.SEVERE, "null recruit in Game.doRecruit()", (Throwable)null);
             return;
         }
         // Check for recruiter legality.
@@ -1697,18 +1719,18 @@ public final class Game
             // If recruiter can be anonymous, then this is okay.
             if (!anonymousRecruitLegal(legion, recruit))
             {
-                Log.error("null recruiter in Game.doRecruit()");
+                LOGGER.log(Level.SEVERE, "null recruiter in Game.doRecruit()", (Throwable)null);
                 // XXX Let it go for now  Should return later
             }
             else
             {
-                Log.debug("null recruiter okay");
+                LOGGER.log(Level.FINEST, "null recruiter okay");
             }
         }
         else if (!recruiters.contains(recruiter))
         {
-            Log.error("Illegal recruiter " + recruiter.getName() +
-                    " for recruit " + recruit.getName());
+            LOGGER.log(Level.SEVERE, "Illegal recruiter " + recruiter.getName() +
+			" for recruit " + recruit.getName(), (Throwable)null);
             return;
         }
 
@@ -1726,11 +1748,11 @@ public final class Game
                         recruiter, recruit, hex.getTerrain(), hex.getLabel());
             }
 
-            Log.event("Legion " + legion.getLongMarkerName() + " in " +
-                    hex.getDescription() + " recruits " + recruit.getName() +
-                    " with " + (recruiter == null ? "nothing" :
-                    numRecruiters + " " + (numRecruiters > 1 ?
-                    recruiter.getPluralName() : recruiter.getName())));
+            LOGGER.log(Level.INFO, "Legion " + legion.getLongMarkerName() + " in " +
+			hex.getDescription() + " recruits " + recruit.getName() +
+			" with " + (recruiter == null ? "nothing" :
+			numRecruiters + " " + (numRecruiters > 1 ?
+			recruiter.getPluralName() : recruiter.getName())));
 
             // Recruits are one to a customer.
             legion.setRecruitName(recruit.getName());
@@ -1777,7 +1799,7 @@ public final class Game
     {
         String name = player.getName();
         player.selectMarkerId(markerId);
-        Log.event(name + " selects initial marker");
+        LOGGER.log(Level.INFO, name + " selects initial marker");
 
         // Lookup coords for chit starting from player[i].getTower()
         String hexLabel = player.getTower();
@@ -2269,9 +2291,9 @@ public final class Game
 
             server.allTellDidSummon(legion.getMarkerId(), donor.getMarkerId(), angel.getName());
             
-            Log.event("One " + angel.getName() +
-                    " is summoned from legion " + donor.getLongMarkerName() +
-                    " into legion " + legion.getLongMarkerName());
+            LOGGER.log(Level.INFO, "One " + angel.getName() +
+			" is summoned from legion " + donor.getLongMarkerName() +
+			" into legion " + legion.getLongMarkerName());
         }
 
         // Need to call this regardless to advance past the summon phase.
@@ -2322,8 +2344,7 @@ public final class Game
                 // Defender won, so possibly recruit reinforcement.
                 if (attackerEntered && winner.canRecruit())
                 {
-                    Log.debug(
-                        "Calling Game.reinforce() from Game.finishBattle()");
+                    LOGGER.log(Level.FINEST, "Calling Game.reinforce() from Game.finishBattle()");
                     reinforce(winner);
                 }
             }
@@ -2381,21 +2402,21 @@ public final class Game
         // Need a legion marker to split.
         if (!player.isMarkerAvailable(childId))
         {
-            Log.error("Marker " + childId + " is not available.");
+            LOGGER.log(Level.SEVERE, "Marker " + childId + " is not available.", (Throwable)null);
             return false;
         }
 
         // Pre-split legion must have 4+ creatures.
         if (legion.getHeight() < 4)
         {
-            Log.error("Legion " + parentId + " is too short to split.");
+            LOGGER.log(Level.SEVERE, "Legion " + parentId + " is too short to split.", (Throwable)null);
             return false;
         }
 
         if (results == null)
         {
-            Log.debug("Empty split list (" + parentId + ", " +
-                    childId + ")");
+            LOGGER.log(Level.FINEST, "Empty split list (" + parentId + ", " +
+			childId + ")");
             return false;
         }
         java.util.List strings = Split.split(',', results);
@@ -2411,8 +2432,8 @@ public final class Game
         // Each legion must have 2+ creatures after the split.
         if (creatures.size() < 2 || legion.getHeight() - creatures.size() < 2)
         {
-            Log.debug("Too small/big split list (" + parentId + ", " +
-                    childId + ")");
+            LOGGER.log(Level.FINEST, "Too small/big split list (" + parentId + ", " +
+			childId + ")");
             return false;
         }
 
@@ -2434,9 +2455,9 @@ public final class Game
             Creature creature = (Creature)it.next();
             if (!tempCreatures.remove(creature))
             {
-                Log.debug("Unavailable creature in split list (" +
-                        parentId + ", " +
-                        childId + ") : " + creature.getName());
+                LOGGER.log(Level.FINEST, "Unavailable creature in split list (" +
+				parentId + ", " +
+				childId + ") : " + creature.getName());
                 return false;
             }
         }
@@ -2446,7 +2467,7 @@ public final class Game
             // Only allow a single split on turn 1.
             if (player.getNumLegions() > 1)
             {
-                Log.error("Cannot split twice on Turn 1.");
+                LOGGER.log(Level.SEVERE, "Cannot split twice on Turn 1.", (Throwable)null);
                 return false;
             }
             // Each stack must contain exactly 4 creatures.
@@ -2557,7 +2578,7 @@ public final class Game
         if (HexMap.terrainHasStartlist(hex.getTerrain()) &&
                 !entrySide.equals(Constants.bottom))
         {
-            Log.warn("Tried to enter invalid side of tower");
+            LOGGER.log(Level.WARNING, "Tried to enter invalid side of tower");
             entrySide = Constants.bottom;
         }
 
@@ -2616,7 +2637,7 @@ public final class Game
         }
         else
         {
-            Log.debug("illegal call to Game.engage() " + engagementInProgress);
+            LOGGER.log(Level.FINEST, "illegal call to Game.engage() " + engagementInProgress);
         }
     }
 
@@ -2784,13 +2805,13 @@ public final class Game
         if (fled)
         {
             points /= 2;
-            Log.event("Legion " + loser.getLongMarkerName() +
-                    " flees from legion " + winner.getLongMarkerName());
+            LOGGER.log(Level.INFO, "Legion " + loser.getLongMarkerName() +
+			" flees from legion " + winner.getLongMarkerName());
         }
         else
         {
-            Log.event("Legion " + loser.getLongMarkerName() +
-                    " concedes to legion " + winner.getLongMarkerName());
+            LOGGER.log(Level.INFO, "Legion " + loser.getLongMarkerName() +
+			" concedes to legion " + winner.getLongMarkerName());
         }
 
 
@@ -2849,9 +2870,9 @@ public final class Game
             attacker.remove();
             defender.remove();
 
-            Log.event(attacker.getLongMarkerName() + " and " +
-                    defender.getLongMarkerName() +
-                    " agree to mutual elimination");
+            LOGGER.log(Level.INFO, attacker.getLongMarkerName() + " and " +
+			defender.getLongMarkerName() +
+			" agree to mutual elimination");
 
             // If both Titans died, eliminate both players.
             if (attacker.hasTitan() && defender.hasTitan())
@@ -2908,7 +2929,7 @@ public final class Game
                 server.allTellRemoveCreature(winner.getMarkerId(),
                         creatureName, true, Constants.reasonNegotiated);
             }
-            Log.event(log.toString());
+            LOGGER.log(Level.INFO, log.toString());
 
             server.oneRevealLegion(winner, attacker.getPlayerName(), 
                 Constants.reasonNegotiated);
@@ -2925,9 +2946,9 @@ public final class Game
             // Add points, and angels if necessary.
             winner.addPoints(points);
 
-            Log.event("Legion " + loser.getLongMarkerName() +
-                    " is eliminated by legion " + winner.getLongMarkerName() +
-                    " via negotiation");
+            LOGGER.log(Level.INFO, "Legion " + loser.getLongMarkerName() +
+			" is eliminated by legion " + winner.getLongMarkerName() +
+			" via negotiation");
 
             // If this was the titan stack, its owner dies and gives half
             // points to the victor.

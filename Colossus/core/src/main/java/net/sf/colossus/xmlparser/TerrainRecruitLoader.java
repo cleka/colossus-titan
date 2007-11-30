@@ -1,20 +1,27 @@
 package net.sf.colossus.xmlparser;
 
 
-import java.util.*;
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import org.jdom.*;
-import org.jdom.input.*;
-
-import net.sf.colossus.util.Log;
-import net.sf.colossus.util.HTMLColor;
-import net.sf.colossus.server.Creature;
-import net.sf.colossus.server.VariantSupport;
-
-import net.sf.colossus.util.RecruitGraph;
 import net.sf.colossus.client.CaretakerInfo;
+import net.sf.colossus.server.Creature;
 import net.sf.colossus.server.CustomRecruitBase;
+import net.sf.colossus.server.VariantSupport;
+import net.sf.colossus.util.HTMLColor;
+import net.sf.colossus.util.RecruitGraph;
+
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.JDOMException;
+import org.jdom.input.SAXBuilder;
 
 
 /**
@@ -25,6 +32,8 @@ import net.sf.colossus.server.CustomRecruitBase;
  */
 public class TerrainRecruitLoader
 {
+	private static final Logger LOGGER = Logger.getLogger(TerrainRecruitLoader.class.getName());
+
     public static final String Keyword_Anything = "Anything";
     public static final String Keyword_AnyNonLord = "AnyNonLord";
     public static final String Keyword_Lord = "Lord";
@@ -85,7 +94,7 @@ public class TerrainRecruitLoader
      */
     public static void setCaretakerInfo(CaretakerInfo caretakerInfo)
     {
-        Log.debug("GRAPH: Setting the CaretakerInfo");
+        LOGGER.log(Level.FINEST, "GRAPH: Setting the CaretakerInfo");
         graph.setCaretakerInfo(caretakerInfo);
     }
 
@@ -172,7 +181,7 @@ public class TerrainRecruitLoader
         }
         catch (Exception e)
         {
-            Log.error("Couldn't fill graph : " + e);
+            LOGGER.log(Level.SEVERE, "Couldn't fill graph : " + e, (Throwable)null);
         }
     }
 
@@ -182,16 +191,16 @@ public class TerrainRecruitLoader
     {
         if (acquirableList != null)
         {
-            Log.debug("TerrainRecruitLoader: Destroying previous " +
-                    "``acquirableList'' ; this should never happen " +
-                    "during a game...");
+            LOGGER.log(Level.FINEST, "TerrainRecruitLoader: Destroying previous " +
+			"``acquirableList'' ; this should never happen " +
+			"during a game...");
             acquirableList = null;
         }
         if (terrains != null)
         {
-            Log.debug("TerrainRecruitLoader: Destroying previous " +
-                    "``terrains'' ; this should never happen during " +
-                    "a game...");
+            LOGGER.log(Level.FINEST, "TerrainRecruitLoader: Destroying previous " +
+			"``terrains'' ; this should never happen during " +
+			"a game...");
             terrains = null;
         }
         strToRecruits.clear();
@@ -239,15 +248,15 @@ public class TerrainRecruitLoader
         }
         catch (JDOMException ex)
         {
-            Log.error("JDOM" + ex.toString());
+            LOGGER.log(Level.SEVERE, "JDOM" + ex.toString(), (Throwable)null);
         }
         catch (IOException ex)
         {
-            Log.error("IO" + ex.toString());
+            LOGGER.log(Level.SEVERE, "IO" + ex.toString(), (Throwable)null);
         }
         catch (ParseException ex)
         {
-            Log.error("Parse" + ex.toString());
+            LOGGER.log(Level.SEVERE, "Parse" + ex.toString(), (Throwable)null);
         }
     }
 
@@ -402,7 +411,7 @@ public class TerrainRecruitLoader
                 VariantSupport.getVarDirectoriesList());
         if (o == null)
         {
-            Log.error("CustomRecruitBase doesn't exist for: " + specialString);
+            LOGGER.log(Level.SEVERE, "CustomRecruitBase doesn't exist for: " + specialString, (Throwable)null);
             return null;
         }
         cri = (CustomRecruitBase)o;

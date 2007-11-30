@@ -1,9 +1,10 @@
 package net.sf.colossus.server;
 
 
-import java.util.*;
-
-import net.sf.colossus.util.Log;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 /**
@@ -21,7 +22,9 @@ import net.sf.colossus.util.Log;
 
 public final class Caretaker implements Cloneable
 {
-    /** Mapping from String creature name to Integer count. If the
+	private static final Logger LOGGER = Logger.getLogger(Caretaker.class.getName());
+
+	/** Mapping from String creature name to Integer count. If the
      *  creature is not found, assume that we have a full count (equal
      *  to Creature.getMaxCount()) */
     private HashMap map = new HashMap();
@@ -101,7 +104,7 @@ public final class Caretaker implements Cloneable
         Integer count = (Integer)map.remove(creature.getName());
         if (count == null)
         {
-            Log.event("First " + creature.getName() + " recruited");
+            LOGGER.log(Level.INFO, "First " + creature.getName() + " recruited");
             map.put(creature.getName(), new Integer(
                 creature.getMaxCount() - 1));
         }
@@ -110,18 +113,18 @@ public final class Caretaker implements Cloneable
             if (count.intValue() == creature.getMaxCount())
             {
                 // Not quite right for immortals.
-                Log.event("First " + creature.getName() + " recruited");
+                LOGGER.log(Level.INFO, "First " + creature.getName() + " recruited");
             }
             if (count.intValue() == 1)
             {
                 // Not quite right for immortals.
-                Log.event("Last " + creature.getName() + " recruited");
+                LOGGER.log(Level.INFO, "Last " + creature.getName() + " recruited");
             }
             if (count.intValue() <= 0)
             {
-                Log.error("Too many " + creature.getName() +
-                          " recruited, only " + count.intValue() +
-                          " left ?!?");
+                LOGGER.log(Level.SEVERE, "Too many " + creature.getName() +
+				  " recruited, only " + count.intValue() +
+				  " left ?!?", (Throwable)null);
             }
             map.put(creature.getName(), new Integer(count.intValue() - 1));
         }
@@ -154,8 +157,8 @@ public final class Caretaker implements Cloneable
         Integer count = (Integer)map.get(name);
         if (count == null)
         {
-            Log.warn("A Creature by the name of " + name +
-                     " died before any was taken.");
+            LOGGER.log(Level.WARNING, "A Creature by the name of " + name +
+			 " died before any was taken.");
         }
         updateDisplays(creature.getName());
     }

@@ -1,7 +1,17 @@
 package net.sf.colossus.client;
 
 
-import java.awt.*;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.FontMetrics;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.Point;
+import java.awt.RenderingHints;
+import java.awt.Shape;
+import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Arc2D;
 import java.awt.geom.GeneralPath;
@@ -9,10 +19,11 @@ import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.util.HTMLColor;
-import net.sf.colossus.util.Log;
 import net.sf.colossus.util.ResourceLoader;
 
 
@@ -25,7 +36,9 @@ import net.sf.colossus.util.ResourceLoader;
 
 public class GUIBattleHex extends GUIHex
 {
-    private GeneralPath innerHexagon;
+	private static final Logger LOGGER = Logger.getLogger(GUIBattleHex.class.getName());
+
+	private GeneralPath innerHexagon;
     private Component map;
     private static final Color highlightColor = Color.red;
 
@@ -355,7 +368,7 @@ public class GUIBattleHex extends GUIHex
                 break;
 
             default:
-                Log.error("Bogus hexside type");
+                LOGGER.log(Level.SEVERE, "Bogus hexside type", (Throwable)null);
         }
     }
 

@@ -5,10 +5,11 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.Creature;
-import net.sf.colossus.util.Log;
 
 
 /**
@@ -23,6 +24,8 @@ import net.sf.colossus.util.Log;
 
 final class Strike
 {
+	private static final Logger LOGGER = Logger.getLogger(Strike.class.getName());
+
     private Client client;
 
     Strike(Client client)
@@ -63,7 +66,7 @@ final class Strike
         if (!client.getBattlePhase().isFightPhase() &&
                 !client.isMyBattlePhase())
         {
-            Log.error("Called Strike.makeForcedStrikes() in wrong phase");
+            LOGGER.log(Level.SEVERE, "Called Strike.makeForcedStrikes() in wrong phase", (Throwable)null);
             return false;
         }
 
@@ -180,7 +183,7 @@ final class Strike
     {
         if (hex1 == null || hex2 == null)
         {
-            Log.warn("passed null hex to getRange()");
+            LOGGER.log(Level.WARNING, "passed null hex to getRange()");
             return Constants.OUT_OF_RANGE;
         }
         if (hex1.isEntrance() || hex2.isEntrance())

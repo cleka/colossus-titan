@@ -1,9 +1,12 @@
 package net.sf.colossus.util;
 
-import java.util.*;
-import java.io.*;
-
-import net.sf.colossus.util.Log;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Class DevRandom generates random bits (same interface as class Random). 
@@ -18,6 +21,8 @@ import net.sf.colossus.util.Log;
  */
 public class DevRandom extends Random
 {
+	private static final Logger LOGGER = Logger.getLogger(DevRandom.class.getName());
+
     final static String PRNG = "PRNG";
     private String source = null;
     private File randomSource = null;
@@ -64,12 +69,12 @@ public class DevRandom extends Random
             String randomFile = System.getProperty(randomPropertyName);
             if ( randomFile != null )
             {
-                Log.debug(randomPropertyName
-                          +" is set to using random source: "+randomFile);
+                LOGGER.log(Level.FINEST, randomPropertyName
+				  +" is set to using random source: "+randomFile);
                 if (tryOneSource(randomFile))
                 {
                     randomPropertySource = randomFile;
-                    Log.debug("RandomSource looks OK - using it: "+randomFile);
+                    LOGGER.log(Level.FINEST, "RandomSource looks OK - using it: "+randomFile);
                 }
                 // stays PRNG, i.e. falls back to default
             }
@@ -86,7 +91,7 @@ public class DevRandom extends Random
         randomSource = new File(source);
 
         if ((randomSource == null) || (!randomSource.exists())) {
-            Log.warn("Random source unavailable: " + src);
+            LOGGER.log(Level.WARNING, "Random source unavailable: " + src);
             return false;
         }
 
@@ -111,14 +116,14 @@ public class DevRandom extends Random
             }
             catch (FileNotFoundException ex)
             {
-                Log.error("Random source disappeared! " + ex);
+                LOGGER.log(Level.SEVERE, "Random source disappeared! " + ex, (Throwable)null);
                 System.exit(1);
             }
-            Log.debug("Using " + source + " as the random source.");
+            LOGGER.log(Level.FINEST, "Using " + source + " as the random source.");
         }
         else
         {
-            Log.debug("Random source unavailable ! Falling back on a PRNG");
+            LOGGER.log(Level.FINEST, "Random source unavailable ! Falling back on a PRNG");
         }
     }
 
@@ -148,7 +153,7 @@ public class DevRandom extends Random
         }
         catch (IOException ex)
         {
-            Log.error("Problem reading from random source " + source);
+            LOGGER.log(Level.SEVERE, "Problem reading from random source " + source, (Throwable)null);
             return super.next(bits);
         }
         int result = 0;

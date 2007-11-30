@@ -5,8 +5,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
-
-import net.sf.colossus.util.Log;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 /**
@@ -16,7 +16,9 @@ import net.sf.colossus.util.Log;
  */
 class CreatureInfoList extends ArrayList
 {
-    int numCreature(String creatureName)
+	private static final Logger LOGGER = Logger.getLogger(CreatureInfoList.class.getName());
+
+	int numCreature(String creatureName)
     {
         int count = 0;
         for (Iterator it = iterator(); it.hasNext(); )
@@ -56,7 +58,7 @@ class CreatureInfoList extends ArrayList
                 return;
             }
         }
-        Log.error("No uncertain creatures");
+        LOGGER.log(Level.SEVERE, "No uncertain creatures", (Throwable)null);
     }
 
     /** Remove the first element matching name.  Return true if found. */

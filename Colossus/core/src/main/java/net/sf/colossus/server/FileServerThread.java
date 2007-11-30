@@ -1,13 +1,20 @@
 package net.sf.colossus.server;
 
 
-import java.util.*;
-import java.net.*;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.InetAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.Iterator;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import net.sf.colossus.util.Log;
-import net.sf.colossus.util.Split;
 import net.sf.colossus.util.ResourceLoader;
+import net.sf.colossus.util.Split;
 
 
 /**
@@ -18,6 +25,8 @@ import net.sf.colossus.util.ResourceLoader;
 
 final class FileServerThread extends Thread
 {
+	private static final Logger LOGGER = Logger.getLogger(FileServerThread.class.getName());
+
     private ServerSocket fileServer;
     private List activeSocketList;
     private static final String sep = Constants.protocolTermSeparator;
@@ -37,7 +46,7 @@ final class FileServerThread extends Thread
         }
         catch (Exception e)
         {
-            Log.error("FileServerThread : " + e);
+            LOGGER.log(Level.SEVERE, "FileServerThread : " + e, (Throwable)null);
             System.exit(1);
         }
     }
@@ -80,8 +89,8 @@ final class FileServerThread extends Thread
 
                     OutputStream os = fileClient.getOutputStream();
 
-                    Log.debug("Serving request " + request +
-                            " from " + fileClient);
+                    LOGGER.log(Level.FINEST, "Serving request " + request +
+					" from " + fileClient);
                     
                     boolean ignoreFail = false;
 
@@ -123,19 +132,19 @@ final class FileServerThread extends Thread
                 }
                 else
                 {
-                    Log.warn("SOMEBODY NOT A CLIENT "
-                        +"IS TRYING TO ACCESS A FILE !");
-                    Log.warn("Request was from " + fileClient);
+                    LOGGER.log(Level.WARNING, "SOMEBODY NOT A CLIENT "
+					+"IS TRYING TO ACCESS A FILE !");
+                    LOGGER.log(Level.WARNING, "Request was from " + fileClient);
                 }
                 fileClient.close();
             }
             catch (Exception e)
             {
-                Log.warn("FileServerThread : " + e);
+                LOGGER.log(Level.WARNING, "FileServerThread : " + e);
             }
         }
 
-        Log.debug("FileServerThread is done");
+        LOGGER.log(Level.FINEST, "FileServerThread is done");
 
         try
         {
@@ -143,7 +152,7 @@ final class FileServerThread extends Thread
         }
         catch (Exception e)
         {
-            Log.warn("FileServerThread : " + e + " while closing socket");
+            LOGGER.log(Level.WARNING, "FileServerThread : " + e + " while closing socket");
         }
     }
 }

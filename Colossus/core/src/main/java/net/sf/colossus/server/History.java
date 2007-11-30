@@ -1,11 +1,13 @@
 package net.sf.colossus.server;
 
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import org.jdom.*;
-
-import net.sf.colossus.util.Log;
+import org.jdom.Element;
 
 
 /**
@@ -15,6 +17,8 @@ import net.sf.colossus.util.Log;
  */
 public class History
 {
+	private static final Logger LOGGER = Logger.getLogger(History.class.getName());
+
     private Element root = new Element("History");
 
     Element getCopy()
@@ -77,10 +81,10 @@ public class History
             // angel was called out of legion which was then empty,
             // and in the final updateAllLegionContents there is then
             // this empty legion...
-            Log.warn("Called revealEvent("+allPlayers+", " + 
-                  (playerNames != null ? playerNames.toString() : "-null-") +
-                  ", " + markerId + ", " + creatureNames.toString() + ", " +
-                  turn + ") with empty creatureNames");
+            LOGGER.log(Level.WARNING, "Called revealEvent("+allPlayers+", " + 
+			  (playerNames != null ? playerNames.toString() : "-null-") +
+			  ", " + markerId + ", " + creatureNames.toString() + ", " +
+			  turn + ") with empty creatureNames");
             return;
         }
         Element event = new Element("Reveal");

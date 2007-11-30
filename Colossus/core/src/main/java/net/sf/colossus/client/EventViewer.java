@@ -2,11 +2,10 @@ package net.sf.colossus.client;
 
 
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.Point;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -15,19 +14,29 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Iterator;
-import java.util.ListIterator;
 import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import javax.swing.*;
+import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollBar;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JToggleButton;
 import javax.swing.border.TitledBorder;
-
 
 import net.sf.colossus.util.KDialog;
 import net.sf.colossus.util.Options;
-import net.sf.colossus.util.Log;
 
 /**
  * Event Revealing dialog.
@@ -67,7 +76,9 @@ import net.sf.colossus.util.Log;
 final class EventViewer extends KDialog implements WindowListener,
 ItemListener, ActionListener
 {
-    private IOptions options;
+	private static final Logger LOGGER = Logger.getLogger(EventViewer.class.getName());
+
+	private IOptions options;
     
     private boolean visible;
     
@@ -198,14 +209,14 @@ ItemListener, ActionListener
                     }
                     else
                     {
-                        Log.error("Invalid value "+exp +" from option '"+
-                                Options.eventExpiring+"' - using default " + turnsToKeep);
+                        LOGGER.log(Level.SEVERE, "Invalid value "+exp +" from option '"+
+						Options.eventExpiring+"' - using default " + turnsToKeep, (Throwable)null);
                     }
                 }
                 catch(NumberFormatException e)
                 {
-                    Log.error("Invalid value "+ expOption +" from option '"+
-                            Options.eventExpiring + "' - using default " + turnsToKeep);
+                    LOGGER.log(Level.SEVERE, "Invalid value "+ expOption +" from option '"+
+					Options.eventExpiring + "' - using default " + turnsToKeep, (Throwable)null);
                 }
             }
         }
@@ -383,8 +394,8 @@ ItemListener, ActionListener
             }
             catch(NumberFormatException e)
             {
-                Log.error("Illegal value '"+maxTurnsOptString + "' for option '" + 
-                        evMaxTurns + "' - using default 1");
+                LOGGER.log(Level.SEVERE, "Illegal value '"+maxTurnsOptString + "' for option '" + 
+				evMaxTurns + "' - using default 1", (Throwable)null);
                 maxTurnsOptString = "1";
                 maxTurnsOpt = 1;
             }
@@ -434,8 +445,8 @@ ItemListener, ActionListener
         }
         else if ( hideUndoneEvents && e.wasUndone())
         {
-          Log.debug("Not displaying event "+e.getEventTypeText()+" "+e.getMarkerId() +
-          " - was undone and hideUndoneEvents is true.");
+          LOGGER.log(Level.FINEST, "Not displaying event "+e.getEventTypeText()+" "+e.getMarkerId() +
+		  " - was undone and hideUndoneEvents is true.");
             display = false;
         }
         return display;
@@ -452,7 +463,7 @@ ItemListener, ActionListener
         }
         else    
         {   
-            Log.warn("EventViewer.addEventToEventPane: event.toPanel returned null!");
+            LOGGER.log(Level.WARNING, "EventViewer.addEventToEventPane: event.toPanel returned null!");
         }
     }
 
@@ -512,8 +523,8 @@ ItemListener, ActionListener
             if (bookmark > syncdEventList.size())
             {
                 // sanity check...
-                Log.error("bookmark " + bookmark + " out of range, size=" +
-                                syncdEventList.size());
+                LOGGER.log(Level.SEVERE, "bookmark " + bookmark + " out of range, size=" +
+				syncdEventList.size(), (Throwable)null);
                 bookmark = 0;
             }
 
@@ -708,14 +719,14 @@ ItemListener, ActionListener
 
         else
         {
-            Log.warn("undo event for unknown type "+type+" attempted.");
+            LOGGER.log(Level.WARNING, "undo event for unknown type "+type+" attempted.");
             return;
         }
        
         if (found == 0)
         {
-            Log.error("Requested '"+type+"' EVENT to undo ("+
-                    parentId+", "+childId+", turn "+turn+") not found");
+            LOGGER.log(Level.SEVERE, "Requested '"+type+"' EVENT to undo ("+
+			parentId+", "+childId+", turn "+turn+") not found", (Throwable)null);
         }
 
         if (this.visible)
@@ -733,7 +744,7 @@ ItemListener, ActionListener
 
         if (this.expireTurns == -1)
         {
-            Log.warn("expireTurns -1 - no purging needed.");
+            LOGGER.log(Level.WARNING, "expireTurns -1 - no purging needed.");
             return;
         }
         int purged = 0;

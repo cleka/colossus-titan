@@ -13,13 +13,14 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 
 import net.sf.colossus.server.Creature;
 import net.sf.colossus.server.VariantSupport;
-import net.sf.colossus.util.Log;
 import net.sf.colossus.util.Options;
 import net.sf.colossus.util.ResourceLoader;
 
@@ -34,6 +35,8 @@ import net.sf.colossus.util.ResourceLoader;
 
 class Chit extends JPanel
 {
+	private static final Logger LOGGER = Logger.getLogger(Chit.class.getName());
+	
     private ImageIcon icon;
     private ImageIcon invertedIcon;
     Rectangle rect;
@@ -177,7 +180,7 @@ class Chit extends JPanel
                 scale, scale);
         if (tempIcon == null)
         {
-            Log.error("Couldn't get image :" + imageFilename);
+            LOGGER.log(Level.SEVERE, "Couldn't get image :" + imageFilename, (Throwable)null);
             System.exit(1);
         }
 

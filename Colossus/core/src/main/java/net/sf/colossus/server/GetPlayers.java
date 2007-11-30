@@ -1,22 +1,52 @@
 package net.sf.colossus.server;
 
 
-import java.awt.*;
-import java.awt.event.*;
-import java.io.*;
-import javax.swing.*;
-import javax.swing.text.*;
-import javax.swing.border.*;
-import java.util.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.GridLayout;
+import java.awt.Point;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+import java.io.File;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.List;
-import java.net.*;
+import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import net.sf.colossus.util.ResourceLoader;
-import net.sf.colossus.util.Options;
-import net.sf.colossus.util.Log;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JEditorPane;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JToggleButton;
+import javax.swing.border.TitledBorder;
+import javax.swing.text.Document;
+
 import net.sf.colossus.client.PickIntValue;
-import net.sf.colossus.client.ShowReadme;
 import net.sf.colossus.client.SaveWindow;
+import net.sf.colossus.client.ShowReadme;
+import net.sf.colossus.util.Options;
+import net.sf.colossus.util.ResourceLoader;
 
 /**
  * Class GetPlayers is a dialog used to enter players' 
@@ -30,6 +60,8 @@ import net.sf.colossus.client.SaveWindow;
 public final class GetPlayers extends JFrame implements WindowListener,
             ActionListener, ItemListener
 {
+	private static final Logger LOGGER = Logger.getLogger(GetPlayers.class.getName());
+
     public static final String loadVariant = "Load External Variant";
 
     private Object mutex;
@@ -85,7 +117,7 @@ public final class GetPlayers extends JFrame implements WindowListener,
         }
         catch (UnknownHostException ex)
         {
-            Log.error(ex.toString());
+            LOGGER.log(Level.SEVERE, ex.toString(), (Throwable)null);
         }
 
         JTabbedPane tabbedPane = new JTabbedPane();

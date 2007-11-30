@@ -1,9 +1,12 @@
 package net.sf.colossus.server;
 
 
-import java.util.*;
-
-import net.sf.colossus.util.Log;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 /**
@@ -14,6 +17,8 @@ import net.sf.colossus.util.Log;
  */
 final class PenaltyOption implements Comparable
 {
+	private static final Logger LOGGER = Logger.getLogger(PenaltyOption.class.getName());
+
     private Critter striker;
     private Critter target;
     private Set carryTargets = new HashSet();    // of hexLabels
@@ -29,7 +34,7 @@ final class PenaltyOption implements Comparable
         this.strikeNumber = strikeNumber;
         if (striker == target)
         {
-            Log.error("Penalty option with striker and target identical!");
+            LOGGER.log(Level.SEVERE, "Penalty option with striker and target identical!", (Throwable)null);
         }
     }
 

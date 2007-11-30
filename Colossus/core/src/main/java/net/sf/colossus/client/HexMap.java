@@ -7,7 +7,6 @@ import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.geom.Rectangle2D;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
@@ -15,6 +14,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.awt.geom.Rectangle2D;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,14 +23,15 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.JPanel;
 
+import net.sf.colossus.server.VariantSupport;
+import net.sf.colossus.util.ResourceLoader;
 import net.sf.colossus.xmlparser.BattlelandLoader;
 import net.sf.colossus.xmlparser.TerrainRecruitLoader;
-import net.sf.colossus.server.VariantSupport;
-import net.sf.colossus.util.Log;
-import net.sf.colossus.util.ResourceLoader;
 
 
 /**
@@ -42,7 +43,9 @@ import net.sf.colossus.util.ResourceLoader;
 
 public class HexMap extends JPanel implements MouseListener, WindowListener
 {
-    private String masterHexLabel;
+	private static final Logger LOGGER = Logger.getLogger(HexMap.class.getName());
+
+	private String masterHexLabel;
     private String terrain;
 
     // GUI hexes need to be recreated for each object, since scale varies.
@@ -358,7 +361,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
         }
         catch (Exception e)
         {
-            Log.error("Battleland " + terrain + " loading failed : " + e);
+            LOGGER.log(Level.SEVERE, "Battleland " + terrain + " loading failed : " + e, (Throwable)null);
             e.printStackTrace();
         }
     }
@@ -555,7 +558,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
             }
         }
 
-        Log.error("Could not find GUIBattleHex " + label);
+        LOGGER.log(Level.SEVERE, "Could not find GUIBattleHex " + label, (Throwable)null);
         return null;
     }
 
@@ -605,7 +608,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
                 return gameEntrances[y].getBattleHexModel();
 
             default:
-                Log.error("Label " + label + " is invalid");
+                LOGGER.log(Level.SEVERE, "Label " + label + " is invalid", (Throwable)null);
         }
         y = 6 - y - Math.abs((x - 3) / 2);
         GUIBattleHex[][] correctHexes = (GUIBattleHex[][])terrainH.get(terrain);
@@ -807,7 +810,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
         catch (NullPointerException ex)
         // XXX Called too early, before towerStatusMap is setup?
         {
-            Log.error(ex.toString());
+            LOGGER.log(Level.SEVERE, ex.toString(), (Throwable)null);
             return false;
         }
     }

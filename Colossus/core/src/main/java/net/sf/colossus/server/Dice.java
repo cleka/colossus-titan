@@ -1,6 +1,9 @@
 package net.sf.colossus.server;
 
 import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import net.sf.colossus.util.DevRandom;
 
 /**
@@ -11,6 +14,8 @@ import net.sf.colossus.util.DevRandom;
  */
 public final class Dice
 {
+	private static final Logger LOGGER = Logger.getLogger(Dice.class.getName());
+
     private static Random random = new DevRandom();
     private static int[] stats = new int[6];
     private static int rcount = 0;
@@ -31,14 +36,13 @@ public final class Dice
             stats[roll - 1]++;
             rcount ++;
             if ((rcount % 60) == 0) {
-                net.sf.colossus.util.Log.debug(
-                    "[rstats] Current D6 distribution (" + rcount + " rolls, " + (rcount/6)+ " each):\n" +
-                    "[rstats] \t1: " + stats[0] + "\n" +
-                    "[rstats] \t2: " + stats[1] + "\n" +
-                    "[rstats] \t3: " + stats[2] + "\n" +
-                    "[rstats] \t4: " + stats[3] + "\n" +
-                    "[rstats] \t5: " + stats[4] + "\n" +
-                    "[rstats] \t6: " + stats[5]);
+                LOGGER.log(Level.FINEST, "[rstats] Current D6 distribution (" + rcount + " rolls, " + (rcount/6)+ " each):\n" +
+				"[rstats] \t1: " + stats[0] + "\n" +
+				"[rstats] \t2: " + stats[1] + "\n" +
+				"[rstats] \t3: " + stats[2] + "\n" +
+				"[rstats] \t4: " + stats[3] + "\n" +
+				"[rstats] \t5: " + stats[4] + "\n" +
+				"[rstats] \t6: " + stats[5]);
             }
         }
         return roll;

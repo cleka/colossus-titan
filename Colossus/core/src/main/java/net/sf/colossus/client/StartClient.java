@@ -4,10 +4,10 @@ package net.sf.colossus.client;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.Point;
-import java.awt.event.WindowListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -15,6 +15,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -23,7 +25,6 @@ import javax.swing.JLabel;
 
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.util.KDialog;
-import net.sf.colossus.util.Log;
 
 
 /**
@@ -36,6 +37,8 @@ import net.sf.colossus.util.Log;
 public class StartClient extends KDialog implements WindowListener,
             ActionListener
 {
+	private static final Logger LOGGER = Logger.getLogger(StartClient.class.getName());
+
     static String playerName;
     static String hostname;
     int port;
@@ -77,7 +80,7 @@ public class StartClient extends KDialog implements WindowListener,
         }
         catch (UnknownHostException ex)
         {
-            Log.error(ex.toString());
+            LOGGER.log(Level.SEVERE, ex.toString(), (Throwable)null);
         }
         
         loadClientOptions();

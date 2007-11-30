@@ -1,5 +1,8 @@
 package net.sf.colossus.util;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 
 /**
  * Class Probs holds utility methods for working with probabilities.
@@ -10,6 +13,8 @@ package net.sf.colossus.util;
 
 public final class Probs
 {
+	private static final Logger LOGGER = Logger.getLogger(Probs.class.getName());
+
     static int lastFakeDie = 5;
 
 
@@ -100,7 +105,7 @@ public final class Probs
                     break;
             case 6: lastFakeDie = 1;
                     break;
-            default: Log.error("Bogus fake die roll");
+            default: LOGGER.log(Level.SEVERE, "Bogus fake die roll", (Throwable)null);
         }
         return lastFakeDie;
     }

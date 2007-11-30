@@ -1,14 +1,20 @@
 package net.sf.colossus.xmlparser;
 
 
-import java.util.*;
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import org.jdom.*;
-import org.jdom.input.*;
-
-import net.sf.colossus.util.Log;
 import net.sf.colossus.client.BattleHex;
+
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.JDOMException;
+import org.jdom.input.SAXBuilder;
 
 
 /**
@@ -18,6 +24,8 @@ import net.sf.colossus.client.BattleHex;
  */
 public class BattlelandLoader
 {
+	private static final Logger LOGGER = Logger.getLogger(BattlelandLoader.class.getName());
+
 
     /** hold the list of label for the startlist */
     private java.util.List startlist = null;
@@ -57,8 +65,8 @@ public class BattlelandLoader
                     startlistHexes = startlistEl.getChildren("battlehex");
                     if (startlistHexes.size() > 0)
                     {
-                        Log.warn("DEPRECATION WARNING: in 'startlist' use "
-                            +"'battlehexref' instead of 'battlehex'!");
+                        LOGGER.log(Level.WARNING, "DEPRECATION WARNING: in 'startlist' use "
+						+"'battlehexref' instead of 'battlehex'!");
                     }                    
                 }
                 
@@ -72,12 +80,12 @@ public class BattlelandLoader
         catch (JDOMException ex)
         {
             // towi TODO : is it really good to swallow the exception? 
-            Log.error("JDOM " + ex.toString());
+            LOGGER.log(Level.SEVERE, "JDOM " + ex.toString(), (Throwable)null);
         }
         catch (IOException ex)
         {
             // towi TODO: is it really good to swallow the exception? 
-            Log.error("IO " + ex.toString());
+            LOGGER.log(Level.SEVERE, "IO " + ex.toString(), (Throwable)null);
         }
     }
 

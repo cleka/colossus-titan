@@ -1,7 +1,9 @@
 package net.sf.colossus.util;
 
 
-import java.awt.*;
+import java.awt.Color;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 /**
@@ -12,6 +14,8 @@ import java.awt.*;
 
 public final class HTMLColor
 {
+	private static final Logger LOGGER = Logger.getLogger(HTMLColor.class.getName());
+
     // Colors defined in the standard.
     public static final Color aliceBlue = new Color(240, 248, 255);
     public static final Color antiqueWhite = new Color(250, 235, 215);
@@ -196,8 +200,8 @@ public final class HTMLColor
         }
         catch (Exception e)
         {
-            Log.warn("I know nothing about color \"" + colorName + 
-                "\", : " + e);
+            LOGGER.log(Level.WARNING, "I know nothing about color \"" + colorName + 
+			"\", : " + e);
             theColor = Color.black;
         }
         return theColor;

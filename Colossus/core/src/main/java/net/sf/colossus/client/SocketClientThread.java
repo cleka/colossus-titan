@@ -10,11 +10,12 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.IServer;
 import net.sf.colossus.util.Glob;
-import net.sf.colossus.util.Log;
 import net.sf.colossus.util.Split;
 
 
@@ -27,6 +28,8 @@ import net.sf.colossus.util.Split;
 
 final class SocketClientThread extends Thread implements IServer
 {
+	private static final Logger LOGGER = Logger.getLogger(SocketClientThread.class.getName());
+
     private Client client;
     private String host;
     private int port;
@@ -47,7 +50,7 @@ final class SocketClientThread extends Thread implements IServer
 
     public void run()
     {
-        Log.debug("About to connect client socket to " + host + ":" + port);
+        LOGGER.log(Level.FINEST, "About to connect client socket to " + host + ":" + port);
         try
         {
             socket = new Socket(host, port);
@@ -56,7 +59,7 @@ final class SocketClientThread extends Thread implements IServer
         // UnknownHostException, IOException, IllegalBlockingModeException
         catch (Exception ex)
         {
-            Log.error(ex.toString());
+            LOGGER.log(Level.SEVERE, ex.toString(), (Throwable)null);
             ex.printStackTrace();
             System.exit(1);
         }
@@ -70,7 +73,7 @@ final class SocketClientThread extends Thread implements IServer
         }
         catch (IOException ex)
         {
-            Log.error(ex);
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             return;
         }
 
@@ -84,11 +87,11 @@ final class SocketClientThread extends Thread implements IServer
                     parseLine(fromServer);
                 }
             }
-            Log.debug("End of SocketClientThread while loop");
+            LOGGER.log(Level.FINEST, "End of SocketClientThread while loop");
         }
         catch (IOException ex)
         {
-            Log.error(ex.toString());
+            LOGGER.log(Level.SEVERE, ex.toString(), (Throwable)null);
             ex.printStackTrace();
             System.exit(1);
         }
@@ -527,8 +530,8 @@ final class SocketClientThread extends Thread implements IServer
         }
         else
         {
-            Log.error("Bogus packet (Client, method: " +
-                    method + ", args: " + args + ")");
+            LOGGER.log(Level.SEVERE, "Bogus packet (Client, method: " +
+			method + ", args: " + args + ")", (Throwable)null);
         }
     }
 

@@ -2,10 +2,10 @@ package net.sf.colossus.client;
 
 
 import java.awt.BorderLayout;
-import java.awt.GridLayout;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Graphics;
+import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -20,23 +20,24 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 
 import net.sf.colossus.server.Constants;
-import net.sf.colossus.util.Log;
 import net.sf.colossus.util.Options;
 import net.sf.colossus.util.ResourceLoader;
 
@@ -50,7 +51,9 @@ import net.sf.colossus.util.ResourceLoader;
 public final class BattleMap extends HexMap implements MouseListener,
         WindowListener
 {
-    private Point location;
+	private static final Logger LOGGER = Logger.getLogger(BattleMap.class.getName());
+
+	private Point location;
     private JFrame battleFrame;
     private JMenuBar menuBar;
     private JMenu phaseMenu;
@@ -204,7 +207,7 @@ public final class BattleMap extends HexMap implements MouseListener,
                 }
                 else
                 {
-                    Log.error("Bogus phase");
+                    LOGGER.log(Level.SEVERE, "Bogus phase", (Throwable)null);
                 }
             }
         };
@@ -225,7 +228,7 @@ public final class BattleMap extends HexMap implements MouseListener,
                 if (answer == JOptionPane.YES_OPTION)
                 {
                     String playerName = client.getPlayerName();
-                    Log.event(playerName + " concedes the battle");
+                    LOGGER.log(Level.INFO, playerName + " concedes the battle");
                     client.concede();
                 }
             }
@@ -381,7 +384,7 @@ public final class BattleMap extends HexMap implements MouseListener,
 
         if (image == null)
         {
-            Log.error("ERROR: Couldn't find Colossus icon");
+            LOGGER.log(Level.SEVERE, "ERROR: Couldn't find Colossus icon", (Throwable)null);
             dispose();
         }
         else
@@ -653,7 +656,7 @@ public final class BattleMap extends HexMap implements MouseListener,
         catch (ConcurrentModificationException ex)
         {
             // Let the next repaint clean up.
-            Log.debug("harmless " + ex.toString());
+            LOGGER.log(Level.FINEST, "harmless " + ex.toString());
         }
     }
 

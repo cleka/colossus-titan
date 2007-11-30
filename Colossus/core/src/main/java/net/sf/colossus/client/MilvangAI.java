@@ -9,10 +9,11 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import net.sf.colossus.server.Creature;
 import net.sf.colossus.util.Combos;
-import net.sf.colossus.util.Log;
 import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
 /**
@@ -21,6 +22,7 @@ import net.sf.colossus.xmlparser.TerrainRecruitLoader;
  */
 public class MilvangAI extends RationalAI
 {
+	private static final Logger LOGGER = Logger.getLogger(MilvangAI.class.getName());
 
     private static final double PRIMARY_RECRUIT_FACTOR = 1.0;
     private static final double SECONDARY_RECRUIT_FACTOR = 0.1;
@@ -90,7 +92,7 @@ public class MilvangAI extends RationalAI
             return new MusteredCreatures(true, creatures);
         }
 
-        Log.debug("sortCreaturesByValueName() in chooseCreaturesToSplitOut");
+        LOGGER.log(Level.FINEST, "sortCreaturesByValueName() in chooseCreaturesToSplitOut");
 
         boolean hasTitan = legion.contains("Titan");
         String[] terrains = TerrainRecruitLoader.getTerrains();
@@ -165,7 +167,7 @@ public class MilvangAI extends RationalAI
         {
             critters.remove(it2.next());
         }
-        Log.debug("Splitting: " + bestKeep + "/" + critters);
+        LOGGER.log(Level.FINEST, "Splitting: " + bestKeep + "/" + critters);
 
         return new MusteredCreatures(false, critters);
     }

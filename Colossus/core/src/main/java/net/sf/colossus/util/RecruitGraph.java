@@ -1,12 +1,21 @@
 package net.sf.colossus.util;
 
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import net.sf.colossus.client.CaretakerInfo;
 import net.sf.colossus.client.LegionInfo;
 import net.sf.colossus.server.Creature;
-import net.sf.colossus.client.CaretakerInfo;
-import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 import net.sf.colossus.server.CustomRecruitBase;
+import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
 
 /**
@@ -18,6 +27,8 @@ import net.sf.colossus.server.CustomRecruitBase;
 
 public class RecruitGraph
 {
+	private static final Logger LOGGER = Logger.getLogger(RecruitGraph.class.getName());
+
     private CaretakerInfo caretakerInfo;
     private final List allVertex = new ArrayList();
     private final List allEdge = new ArrayList();
@@ -204,8 +215,8 @@ public class RecruitGraph
 
         if (temp == null)
         {
-            Log.debug("CUSTOM: Adding non-existant creature: " + cre +
-                    " to the graph.");
+            LOGGER.log(Level.FINEST, "CUSTOM: Adding non-existant creature: " + cre +
+			" to the graph.");
             temp = addVertex(cre);
         }
 
@@ -268,10 +279,10 @@ public class RecruitGraph
                     }
                     else
                     {
-                        Log.debug("GRAPH: ignoring " + e +
-                                " as not enough creatures are left (a: " +
-                                already + " s: " + s.getRemaining() +
-                                " d: " + v.getRemaining() + ")");
+                        LOGGER.log(Level.FINEST, "GRAPH: ignoring " + e +
+						" as not enough creatures are left (a: " +
+						already + " s: " + s.getRemaining() +
+						" d: " + v.getRemaining() + ")");
                     }
                 }
             }

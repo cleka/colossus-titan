@@ -1,21 +1,49 @@
 package net.sf.colossus.util;
 
 
-import javax.swing.*;
-import javax.swing.text.*;
-import javax.swing.text.html.*;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.MediaTracker;
+import java.awt.Toolkit;
 import java.awt.geom.Rectangle2D;
-import java.awt.image.*;
-import java.net.*;
-import java.io.*;
-import java.util.*;
+import java.awt.image.BufferedImage;
+import java.awt.image.WritableRaster;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.lang.reflect.Constructor;
+import java.net.Socket;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
-import java.lang.reflect.*;
+import java.util.Map;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import javax.swing.ImageIcon;
+import javax.swing.text.DefaultStyledDocument;
+import javax.swing.text.Document;
+import javax.swing.text.StyledDocument;
+import javax.swing.text.html.HTMLDocument;
+import javax.swing.text.html.HTMLEditorKit;
+
 import net.sf.colossus.server.Constants;
 
-/* batik stuff for SVG */
-import org.apache.batik.transcoder.*;
+import org.apache.batik.transcoder.TranscoderException;
+import org.apache.batik.transcoder.TranscoderInput;
+import org.apache.batik.transcoder.TranscoderOutput;
 import org.apache.batik.transcoder.image.ImageTranscoder;
 import org.apache.batik.util.XMLResourceDescriptor;
 
@@ -30,6 +58,7 @@ import org.apache.batik.util.XMLResourceDescriptor;
 
 public final class ResourceLoader
 {
+	private static final Logger LOGGER = Logger.getLogger(ResourceLoader.class.getName());
 
     /**
      * Class ColossusClassLoader allows for class loading outside the
@@ -60,8 +89,8 @@ public final class ResourceLoader
                 String shortClassName = className.substring(index + 1);
                 if (index == -1)
                 {
-                    Log.error("Loading of class \"" + className 
-                        + "\" failed (no dot in class name)");
+                    LOGGER.log(Level.SEVERE, "Loading of class \"" + className 
+					+ "\" failed (no dot in class name)", (Throwable)null);
                     return null;
                 }
                 InputStream classDataIS =
@@ -69,8 +98,8 @@ public final class ResourceLoader
                         directories);
                 if (classDataIS == null)
                 {
-                    Log.error("Couldn't find the class file anywhere ! (" +
-                            shortClassName + ".class)");
+                    LOGGER.log(Level.SEVERE, "Couldn't find the class file anywhere ! (" +
+					shortClassName + ".class)", (Throwable)null);
                     throw new FileNotFoundException("missing " +
                             shortClassName + ".class");
                 }
@@ -128,9 +157,9 @@ public final class ResourceLoader
         }
         catch (Exception e)
         {
-            Log.debug("Couldn't load class \"" +
-                    "org.apache.batik.transcoder.image.ImageTranscoder\", " +
-                    "assuming batik (and SVG files) not available.");
+            LOGGER.log(Level.FINEST, "Couldn't load class \"" +
+			"org.apache.batik.transcoder.image.ImageTranscoder\", " +
+			"assuming batik (and SVG files) not available.");
         }
     }
 
@@ -154,14 +183,14 @@ public final class ResourceLoader
     /** empty the cache so that all Chits have to be redrawn */
     public synchronized static void purgeImageCache()
     {
-        Log.debug("Purging Image Cache.");
+        LOGGER.log(Level.FINEST, "Purging Image Cache.");
         imageCache.clear();
     }
 
     /** empty the cache so that all files have to be reloaded */
     public synchronized static void purgeFileCache()
     {
-        Log.debug("Purging File Cache.");
+        LOGGER.log(Level.FINEST, "Purging File Cache.");
         fileCache.clear();
     }
 
@@ -447,8 +476,8 @@ public final class ResourceLoader
         {
             if (!ignoreFail)
             {
-                Log.warn("Requested file " + filename +
-                         " is requested cached-only but is not is cache.");
+                LOGGER.log(Level.WARNING, "Requested file " + filename +
+				 " is requested cached-only but is not is cache.");
             }
             return null;
         }
@@ -492,10 +521,10 @@ public final class ResourceLoader
                     }
                     if (!ignoreFail)
                     {
-                        Log.warn("getInputStream:: " +
-                                " Couldn't get InputStream for file " +
-                                filename + " in " + directories +
-                                (cachedOnly ? " (cached only)" : ""));
+                        LOGGER.log(Level.WARNING, "getInputStream:: " +
+						" Couldn't get InputStream for file " +
+						filename + " in " + directories +
+						(cachedOnly ? " (cached only)" : ""));
                         // @TODO this sounds more serious than just a warning in the logs
                         // Anyway now at least MarkersLoader does not complain any more...
                     }
@@ -524,11 +553,11 @@ public final class ResourceLoader
 
                         if (is == null)
                         {
-                            Log.warn("getInputStream:: " +
-                                    " Couldn't get InputStream from socket" +
-                                    " for file " +
-                                    filename + " in " + directories +
-                                    (cachedOnly ? " (cached only)" : ""));
+                            LOGGER.log(Level.WARNING, "getInputStream:: " +
+							" Couldn't get InputStream from socket" +
+							" for file " +
+							filename + " in " + directories +
+							(cachedOnly ? " (cached only)" : ""));
                             // @TODO this sounds more serious than just a warning in the logs
                         }
                         else
@@ -556,9 +585,9 @@ public final class ResourceLoader
                             if ( data != null && data.length == 0 && 
                                  !ignoreFail)
                             {
-                                Log.warn("Got empty contents for file " + 
-                                        filename + " directories " + 
-                                        directories.toString());
+                                LOGGER.log(Level.WARNING, "Got empty contents for file " + 
+								filename + " directories " + 
+								directories.toString());
                             }
                             fileSocket.close();
                             fileCache.put(mapKey, data);
@@ -566,7 +595,7 @@ public final class ResourceLoader
                     }
                     catch (Exception e)
                     {
-                        Log.error("ResourceLoader::getInputStream() : " + e);
+                        LOGGER.log(Level.SEVERE, "ResourceLoader::getInputStream() : " + e, (Throwable)null);
                     }
                 }
 
@@ -594,10 +623,10 @@ public final class ResourceLoader
             // right now only FileServerThread is using this method at all.
             if (!ignoreFail)
             {
-                Log.warn("getBytesFromFile:: " +
-                        " Couldn't get InputStream for file " +
-                        filename + " in " + directories +
-                        (cachedOnly ? " (cached only)" : ""));
+                LOGGER.log(Level.WARNING, "getBytesFromFile:: " +
+				" Couldn't get InputStream for file " +
+				filename + " in " + directories +
+				(cachedOnly ? " (cached only)" : ""));
             }
             return null;
         }
@@ -635,7 +664,7 @@ public final class ResourceLoader
         }
         catch (Exception e)
         {
-            Log.error("Can't Stringify stream " + is + " (" + e + ")");
+            LOGGER.log(Level.SEVERE, "Can't Stringify stream " + is + " (" + e + ")", (Throwable)null);
         }
         return all;
     }
@@ -649,8 +678,8 @@ public final class ResourceLoader
     {
         if (data == null)
         {
-            Log.warn("getInputStreamFromBytes:: "
-                  + " Can't create InputStream from null byte array");
+            LOGGER.log(Level.WARNING, "getInputStreamFromBytes:: "
+			  + " Can't create InputStream from null byte array");
             return null;
         }
         return new ByteArrayInputStream(data);
@@ -681,10 +710,10 @@ public final class ResourceLoader
                 }
                 catch (Exception e)
                 {
-                    Log.debug("getOutputStream:: " +
-                            " Couldn't get OutputStream for file " +
-                            filename + " in " + directories +
-                            "(" + e.getMessage() + ")");
+                    LOGGER.log(Level.FINEST, "getOutputStream:: " +
+					" Couldn't get OutputStream for file " +
+					filename + " in " + directories +
+					"(" + e.getMessage() + ")");
                 }
             }
         }
@@ -718,8 +747,8 @@ public final class ResourceLoader
             }
             catch (Exception e)
             {
-                Log.error("html document exists, but cannot be loaded (" +
-                        filename + "): " + e);
+                LOGGER.log(Level.SEVERE, "html document exists, but cannot be loaded (" +
+				filename + "): " + e, (Throwable)null);
             }
             return null;
         }
@@ -756,13 +785,13 @@ public final class ResourceLoader
             }
             catch (Exception e)
             {
-                Log.error("text document exists, but cannot be loaded (" +
-                        filename + "): " + e);
+                LOGGER.log(Level.SEVERE, "text document exists, but cannot be loaded (" +
+				filename + "): " + e, (Throwable)null);
             }
             return null;
         }
-        Log.error("No document for basename " + filename + " found " + 
-                        "(neither .html, .txt nor without extention)!");
+        LOGGER.log(Level.SEVERE, "No document for basename " + filename + " found " + 
+		"(neither .html, .txt nor without extention)!", (Throwable)null);
         return null;
     }
 
@@ -847,8 +876,8 @@ public final class ResourceLoader
             }
             if (tempImage[i] == null)
             {
-                Log.error("during creation of [" + mapKey +
-                        "], loading failed for " + filenames[i]);
+                LOGGER.log(Level.SEVERE, "during creation of [" + mapKey +
+				"], loading failed for " + filenames[i], (Throwable)null);
                 return null;
             }
         }
@@ -944,7 +973,7 @@ public final class ResourceLoader
 
         if (tempImage == null)
         {
-            Log.warn("WARNING: creation failed for " + filename);
+            LOGGER.log(Level.WARNING, "WARNING: creation failed for " + filename);
             return createPlainImage(width, height, Color.white, true);
         }
         waitOnImage(tempImage);
@@ -1122,8 +1151,8 @@ public final class ResourceLoader
         }
         if (tempIcon.getImageLoadStatus() != MediaTracker.COMPLETE)
         {
-            Log.error("Image loading of " + filename + " failed (" +
-                    tempIcon.getImageLoadStatus() + ")");
+            LOGGER.log(Level.SEVERE, "Image loading of " + filename + " failed (" +
+			tempIcon.getImageLoadStatus() + ")", (Throwable)null);
             return null;
         }
 
@@ -1178,8 +1207,8 @@ public final class ResourceLoader
         }
         if (icon.getImageLoadStatus() != MediaTracker.COMPLETE)
         {
-            Log.error("Image loading failed (" + icon.getImageLoadStatus() +
-                    ")");
+            LOGGER.log(Level.SEVERE, "Image loading failed (" + icon.getImageLoadStatus() +
+			")", (Throwable)null);
         }
     }
 
@@ -1193,7 +1222,7 @@ public final class ResourceLoader
     {
         if (!(filename.startsWith(prefix)))
         {
-            Log.warn("Warning: " + prefix + " is not prefix of " + filename);
+            LOGGER.log(Level.WARNING, "Warning: " + prefix + " is not prefix of " + filename);
             return 0;
         }
         int index = prefix.length();
@@ -1235,7 +1264,7 @@ public final class ResourceLoader
         }
         catch (Exception e)
         {
-            Log.error("during number extraction: " + e);
+            LOGGER.log(Level.SEVERE, "during number extraction: " + e, (Throwable)null);
         }
         return val;
     }
@@ -1250,7 +1279,7 @@ public final class ResourceLoader
     {
         if (!(filename.startsWith(prefix)))
         {
-            Log.warn(prefix + " is not prefix of " + filename);
+            LOGGER.log(Level.WARNING, prefix + " is not prefix of " + filename);
             return "black";
         }
         int index = prefix.length();
@@ -1358,8 +1387,8 @@ public final class ResourceLoader
         }
         catch (Exception e)
         {
-            Log.error("Loading of class \"" + className + "\" failed (" + e +
-                    ")");
+            LOGGER.log(Level.SEVERE, "Loading of class \"" + className + "\" failed (" + e +
+			")", (Throwable)null);
             return null;
         }
         if (parameter != null)
@@ -1376,8 +1405,8 @@ public final class ResourceLoader
             }
             catch (Exception e)
             {
-                Log.error("Loading or instantiating class' constructor for \"" + className +
-                        "\" failed (" + e + ")");
+                LOGGER.log(Level.SEVERE, "Loading or instantiating class' constructor for \"" + className +
+				"\" failed (" + e + ")", (Throwable)null);
                 return null;
             }
         }
@@ -1389,8 +1418,8 @@ public final class ResourceLoader
             } 
             catch (Exception e)
             {
-                Log.error("Instantiating \"" + className +
-                        "\" failed (" + e + ")");
+                LOGGER.log(Level.SEVERE, "Instantiating \"" + className +
+				"\" failed (" + e + ")", (Throwable)null);
                 return null;
             }
         }
@@ -1520,8 +1549,8 @@ public final class ResourceLoader
         }
         catch (Exception e)
         {
-            Log.debug("SVG transcoding for " + filename + " in " + path +
-                    " failed with " + e);
+            LOGGER.log(Level.FINEST, "SVG transcoding for " + filename + " in " + path +
+			" failed with " + e);
             // nothing to do
         }
         return image;

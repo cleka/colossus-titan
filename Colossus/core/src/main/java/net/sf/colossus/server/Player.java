@@ -1,9 +1,17 @@
 package net.sf.colossus.server;
 
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import net.sf.colossus.util.Log;
 import net.sf.colossus.util.Glob;
 import net.sf.colossus.util.Options;
 import net.sf.colossus.xmlparser.TerrainRecruitLoader;
@@ -17,6 +25,8 @@ import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
 public final class Player implements Comparable
 {
+	private static final Logger LOGGER = Logger.getLogger(Player.class.getName());
+
     private Game game;
     private String name;
     private String color;              // Black, Blue, Brown, Gold, Green, Red
@@ -71,7 +81,7 @@ public final class Player implements Comparable
     void setType(final String aType)
     {
         String type = new String(aType);
-        Log.debug("Called Player.setType() for " + name + " " + type);
+        LOGGER.log(Level.FINEST, "Called Player.setType() for " + name + " " + type);
         if (type.endsWith(Constants.anyAI))
         {
             int whichAI = Dice.rollDie(Constants.numAITypes) - 1;
@@ -473,13 +483,13 @@ public final class Player implements Comparable
         // Only roll if it hasn't already been done.
         if (movementRoll != 0)
         {
-            Log.warn("Called rollMovement() more than once");
+            LOGGER.log(Level.WARNING, "Called rollMovement() more than once");
         }
         else
         {
             movementRoll = Dice.rollDie();
-            Log.event(getName() + " rolls a " + movementRoll +
-                    " for movement");
+            LOGGER.log(Level.INFO, getName() + " rolls a " + movementRoll +
+			" for movement");
         }
         game.getServer().allTellMovementRoll(movementRoll);
     }
@@ -489,7 +499,7 @@ public final class Player implements Comparable
         if (mulligansLeft > 0)
         {
             undoAllMoves();
-            Log.event(getName() + " takes a mulligan");
+            LOGGER.log(Level.INFO, getName() + " takes a mulligan");
             if(!game.getOption(Options.unlimitedMulligans)) 
             {
                 mulligansLeft--;
@@ -529,8 +539,8 @@ public final class Player implements Comparable
             if (game.getNumFriendlyLegions(hexLabel, this) > 1 &&
                     legion.hasConventionalMove())
             {
-                Log.debug("Found unseparated split legions at hex " +
-                        hexLabel);
+                LOGGER.log(Level.FINEST, "Found unseparated split legions at hex " +
+				hexLabel);
                 return true;
             }
         }
@@ -557,7 +567,7 @@ public final class Player implements Comparable
         Legion legion = getLegionByMarkerId(markerId);
         if ( legion == null )
         {
-            Log.error("Player.undoRecruit: legion for markerId " + markerId + " is null");
+            LOGGER.log(Level.SEVERE, "Player.undoRecruit: legion for markerId " + markerId + " is null", (Throwable)null);
             return;
         }
 
@@ -566,7 +576,7 @@ public final class Player implements Comparable
         String recruitName = legion.getRecruitName();
         if ( recruitName == null )
         {
-            Log.error("Player.undoRecruit: Nothing to unrecruit for marker " + markerId);
+            LOGGER.log(Level.SEVERE, "Player.undoRecruit: Nothing to unrecruit for marker " + markerId, (Throwable)null);
             return;    
         }
         legion.undoRecruit();
@@ -687,7 +697,7 @@ public final class Player implements Comparable
                 game.getServer().allUpdatePlayerInfo();
             }
 
-            Log.event(getName() + " earns " + points + " points");
+            LOGGER.log(Level.INFO, getName() + " earns " + points + " points");
         }
     }
 
@@ -757,7 +767,7 @@ public final class Player implements Comparable
 
         // Handy during stresstesting...
         // System.out.println(getName() + " dies.");
-        Log.event(getName() + " dies");
+        LOGGER.log(Level.INFO, getName() + " dies");
         game.getServer().allTellPlayerElim(name, slayerName, true);
 
         // See if the game is over.

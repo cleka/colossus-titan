@@ -2,10 +2,11 @@ package net.sf.colossus.client;
 
 
 import java.awt.Color;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import net.sf.colossus.server.Creature;
 import net.sf.colossus.util.HTMLColor;
-import net.sf.colossus.util.Log;
 
 
 /**
@@ -19,6 +20,7 @@ public class BattleHex
     extends Hex
     implements net.sf.colossus.util.Terrains  // B_xxx constants
 {
+	private static final Logger LOGGER = Logger.getLogger(BattleHex.class.getName());
 
     /** Valid elevations are 0, 1, and 2.  Also 3 for JDG Badlands. */
     private int elevation;
@@ -44,7 +46,7 @@ public class BattleHex
     /**
      * Links to the neighbors of the BattleHex.
      * Neighbors have one hex side in common.
-     * Non-existant neighbor are marked with <b>null</b>.
+     * Non-existent neighbor are marked with <b>null</b>.
      */
     private BattleHex[] neighbors = new BattleHex[6];
 
@@ -285,7 +287,7 @@ public class BattleHex
         }
         else
         {
-            Log.warn("Called BattleHex.getHexside() with " + i);
+            LOGGER.log(Level.WARNING, "Called BattleHex.getHexside() with " + i);
             return '?';
         }
     }

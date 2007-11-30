@@ -1,14 +1,20 @@
 package net.sf.colossus.server;
 
 
-import java.util.*;
-import java.net.*;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.Socket;
+import java.util.List;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import net.sf.colossus.util.Log;
+import net.sf.colossus.client.IClient;
 import net.sf.colossus.util.Glob;
 import net.sf.colossus.util.Split;
-import net.sf.colossus.client.IClient;
 
 
 /**
@@ -20,6 +26,8 @@ import net.sf.colossus.client.IClient;
 
 final class SocketServerThread extends Thread implements IClient
 {
+	private static final Logger LOGGER = Logger.getLogger(SocketServerThread.class.getName());
+
     private Server server;
     private Socket socket;
     private InputStream is;
@@ -49,7 +57,7 @@ final class SocketServerThread extends Thread implements IClient
         }
         catch (IOException ex)
         {
-            Log.error(ex);
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             return;
         }
 
@@ -58,15 +66,15 @@ final class SocketServerThread extends Thread implements IClient
             String fromClient;
             while ((fromClient = in.readLine()) != null)
             {
-                Log.debug("From client " + playerName + ": " + fromClient);
+                LOGGER.log(Level.FINEST, "From client " + playerName + ": " + fromClient);
                 parseLine(fromClient);
             }
-            Log.debug("End of SocketServerThread while loop");
+            LOGGER.log(Level.FINEST, "End of SocketServerThread while loop");
             server.withdrawFromGame();
         }
         catch (IOException ex)
         {
-            Log.error(ex);
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             server.withdrawFromGame();
         }
 
@@ -82,7 +90,7 @@ final class SocketServerThread extends Thread implements IClient
         }
         catch (IOException ex)
         {
-            Log.error(ex);
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
         }
     }
 
@@ -92,7 +100,7 @@ final class SocketServerThread extends Thread implements IClient
         String method = (String)li.remove(0);
         if (playerName == null && !method.equals(Constants.signOn))
         {
-            Log.error("First packet must be signOn");
+            LOGGER.log(Level.SEVERE, "First packet must be signOn", (Throwable)null);
         }
         else
         {
@@ -308,8 +316,8 @@ final class SocketServerThread extends Thread implements IClient
         }
         else
         {
-            Log.error("Bogus packet (Server, method: " +
-                    method + ", args: " + args + ")");
+            LOGGER.log(Level.SEVERE, "Bogus packet (Server, method: " +
+			method + ", args: " + args + ")", (Throwable)null);
         }
     }
 

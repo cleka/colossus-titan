@@ -1,9 +1,9 @@
 package net.sf.colossus.client;
 
 
-import java.awt.*;
 import java.awt.AlphaComposite;
 import java.awt.Color;
+import java.awt.Composite;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
@@ -17,10 +17,11 @@ import java.awt.geom.GeneralPath;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.VariantSupport;
-import net.sf.colossus.util.Log;
 import net.sf.colossus.util.ResourceLoader;
 
 
@@ -33,7 +34,9 @@ import net.sf.colossus.util.ResourceLoader;
 
 public final class GUIMasterHex extends GUIHex
 {
-    private boolean inverted;
+	private static final Logger LOGGER = Logger.getLogger(GUIMasterHex.class.getName());
+
+	private boolean inverted;
     private FontMetrics fontMetrics;
     private int halfFontHeight;
     private Point offCenter;
@@ -423,7 +426,7 @@ public final class GUIMasterHex extends GUIHex
                 break;
 
             default:
-                Log.error("Bogus gate type");
+                LOGGER.log(Level.SEVERE, "Bogus gate type", (Throwable)null);
         }
     }
 

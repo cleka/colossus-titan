@@ -1,15 +1,20 @@
 package net.sf.colossus.xmlparser;
 
 
-import java.util.*;
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Iterator;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import org.jdom.*;
-import org.jdom.input.*;
-
-import net.sf.colossus.util.Log;
 import net.sf.colossus.client.MasterHex;
 import net.sf.colossus.server.Constants;
+
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.JDOMException;
+import org.jdom.input.SAXBuilder;
 
 
 /**
@@ -19,6 +24,8 @@ import net.sf.colossus.server.Constants;
  */
 public class StrategicMapLoader
 {
+	private static final Logger LOGGER = Logger.getLogger(StrategicMapLoader.class.getName());
+
     private boolean[][] show = null;
     private int horizSize = -1;
     private int vertSize = -1;
@@ -45,11 +52,11 @@ public class StrategicMapLoader
         }
         catch (JDOMException ex)
         {
-            Log.error("JDOM" + ex.toString());
+            LOGGER.log(Level.SEVERE, "JDOM" + ex.toString(), (Throwable)null);
         }
         catch (IOException ex)
         {
-            Log.error("IO" + ex.toString());
+            LOGGER.log(Level.SEVERE, "IO" + ex.toString(), (Throwable)null);
         }
     }
 
