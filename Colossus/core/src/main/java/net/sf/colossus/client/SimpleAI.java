@@ -38,6 +38,55 @@ public class SimpleAI implements AI
 {
 	private static final Logger LOGGER = Logger.getLogger(SimpleAI.class.getName());
 
+	/**
+	 * Stores the skill and power bonuses for a single terrain.
+	 * 
+	 * For internal use only, so we don't bother with encapsulation.
+	 */
+	private static class TerrainBonuses {
+        int attackerPower;
+        int defenderPower;
+        int attackerSkill;
+        int defenderSkill;
+		TerrainBonuses(int attackerPower, int defenderPower,
+				int attackerSkill, int defenderSkill) {
+			this.attackerPower = attackerPower;
+			this.defenderPower = defenderPower;
+			this.attackerSkill = attackerSkill;
+			this.defenderSkill = defenderSkill;
+		}
+	}
+	
+	/**
+	 * Maps the terrain names to their matching bonuses.
+	 * 
+	 * Only the terrains that have bonuses are in this map, so
+	 * users have to expect to retrieve null values.
+	 * 
+	 * This is a Map<String,TerrainBonuses>.
+	 */
+	private static final Map TERRAIN_BONUSES = new HashMap();
+	static {
+        // strike down wall, defender strike up
+		TERRAIN_BONUSES.put("Tower", new TerrainBonuses(0,0,1,1));
+        // native in bramble has skill to hit increased by 1
+		TERRAIN_BONUSES.put("Brush", new TerrainBonuses(0,0,0,1));
+		TERRAIN_BONUSES.put("Jungle", new TerrainBonuses(0,0,0,1));
+		TERRAIN_BONUSES.put("Brambles", new TerrainBonuses(0,0,0,1));
+        // native gets an extra die when attack down slope
+        // non-native loses 1 skill when attacking up slope
+		TERRAIN_BONUSES.put("Hills", new TerrainBonuses(1,0,0,1));
+        // native gets an extra 2 dice when attack down dune
+        // non-native loses 1 die when attacking up dune
+		TERRAIN_BONUSES.put("Desert", new TerrainBonuses(2,1,0,0));
+		TERRAIN_BONUSES.put("Sand", new TerrainBonuses(2,1,0,0));
+        // Native gets extra 1 die when attack down slope
+        // non-native loses 1 skill when attacking up slope
+		TERRAIN_BONUSES.put("Mountains", new TerrainBonuses(1,0,0,1));
+		TERRAIN_BONUSES.put("Volcano", new TerrainBonuses(1,0,0,1));
+		// the other types have only movement bonuses
+	}
+
     Client client;
 
     int timeLimit = Constants.DEFAULT_AI_TIME_LIMIT;  // in s
@@ -2562,13 +2611,7 @@ public class SimpleAI implements AI
 
         public PowerSkill(String nm, int pa, int sa)
         {
-            name = nm;
-            power_attack = pa;
-            power_defend = 0; 
-            skill_attack = sa;
-            skill_defend = sa;
-            hp = pa;
-            value = pa * sa;
+        	this(nm, pa, pa, 0, sa, sa);
         }
 
         public int getPowerAttack()
@@ -2632,82 +2675,42 @@ public class SimpleAI implements AI
         int power = creature.getPower();
         int skill = creature.getSkill();
 
-       
-        // list of terrain bonuses
-        // format is
-        // "Terrain", "power_attack_bonus",  "power_defend_bonus",
-        // "skill_attack_bonus", "skill_defend_bonus"
-        // where the bonuses are versus a non-native creature
-
-        int terrains = 10;
-
-        String[][] allTerrains = { {"Plains", "0", "0", "0", "0"},
-            // strike down wall, defender strike up
-            {"Tower", "0", "0", "1", "1"},
-            // native in bramble has skill to hit increased by 1
-            {"Brush", "0", "0", "0", "1"}, {"Jungle", "0", "0", "0", "1"}, 
-            {"Brambles", "0", "0", "0", "1"},
-            // native gets an extra die when attack down slope
-            // non-native loses 1 skill when attacking up slope
-            {"Hills", "1", "0", "0", "1"},
-            // native gets an extra 2 dice when attack down dune
-            // non-native loses 1 die when attacking up dune
-            {"Desert", "2", "1", "0", "0"},{"Sand", "2", "1", "0", "0"},
-            // Native gets extra 1 die when attack down slope
-            // non-native loses 1 skill when attacking up slope
-            {"Mountains", "1", "0", "0", "1"}, {"Volcano", "1", "0", "0", "1"}
-            // the other types have only movement bonuses
-        };
-
-        int POWER_ATT = 1;
-        int POWER_DEF = 2;
-        int SKILL_ATT = 3;
-        int SKILL_DEF = 4;
-
-        for (int i = 0; i < terrains; i++)
+        TerrainBonuses bonuses = (TerrainBonuses) TERRAIN_BONUSES.get(terrain);
+        if(bonuses == null)
         {
-            if (terrain.equals(allTerrains[i][0]))
-            {
-                if (terrain.equals("Tower") && defender == false)
-                {
-                    // no attacker bonus for tower
-                    return new PowerSkill(creature.getName(), power,
-                        skill);
-                }
-                else if ((terrain.equals("Mountains") || terrain.equals("Volcano"))
-                    && defender == true &&
-                    creature.getName().equals("Dragon"))
-                {
-                    // Dragon gets an extra 3 die when attack down slope
-                    // non-native loses 1 skill  when attacking up slope
-                    return new PowerSkill(
-                        creature.getName(),
-                        power,
-                        power + 3,
-                        Integer.parseInt(allTerrains[i][POWER_DEF]),
-                        skill +
-                        Integer.parseInt(allTerrains[i][SKILL_ATT]),
-                        skill +
-                        Integer.parseInt(allTerrains[i][SKILL_DEF]));
-                }
-                else
-                {
-                    return new PowerSkill(
-                        creature.getName(),
-                        power,
-                        power +
-                        Integer.parseInt(allTerrains[i][POWER_ATT]),
-                        Integer.parseInt(allTerrains[i][POWER_DEF]),
-                        skill +
-                        Integer.parseInt(allTerrains[i][SKILL_ATT]),
-                        skill +
-                        Integer.parseInt(allTerrains[i][SKILL_DEF]));
-                }
-            }
+            // terrain has no special bonuses
+            return new PowerSkill(creature.getName(), power, skill);
         }
-        
-       // terrain not found
-       return new PowerSkill(creature.getName(), power, skill);
+        else if (terrain.equals("Tower") && defender == false)
+        {
+            // no attacker bonus for tower
+            return new PowerSkill(creature.getName(), power,
+                skill);
+        }
+        else if ((terrain.equals("Mountains") || terrain.equals("Volcano"))
+            && defender == true &&
+            creature.getName().equals("Dragon"))
+        {
+            // Dragon gets an extra 3 die when attack down slope
+            // non-native loses 1 skill when attacking up slope
+            return new PowerSkill(
+                creature.getName(),
+                power,
+                power + 3,
+                bonuses.defenderPower,
+                skill + bonuses.attackerSkill,
+                skill + bonuses.defenderSkill);
+        }
+        else
+        {
+            return new PowerSkill(
+                creature.getName(),
+                power,
+                power + bonuses.attackerPower,
+                bonuses.defenderPower,
+                skill + bonuses.attackerSkill,
+                skill + bonuses.defenderSkill);
+        }
     }
 
     // return power and skill of a given creature given the terrain
