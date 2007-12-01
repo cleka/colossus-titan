@@ -24,7 +24,7 @@ public final class ShowHelpDoc
     private static JFrame viewFrame;
    
     
-    ShowHelpDoc (JFrame parentFrame, IOptions options)
+    ShowHelpDoc ()
     {
         // primitive way to avoid having more than one. How to do better?
         if ( viewFrame != null )

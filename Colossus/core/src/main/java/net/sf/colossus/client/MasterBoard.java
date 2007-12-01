@@ -719,14 +719,14 @@ public final class MasterBoard extends JPanel
         {
             public void actionPerformed(ActionEvent e)
             {
-                new ShowReadme(masterFrame, client);
+                new ShowReadme(client);
             }
         };
         viewHelpDocAction = new AbstractAction(viewHelpDoc)
         {
             public void actionPerformed(ActionEvent e)
             {
-                new ShowHelpDoc(masterFrame, client);
+                new ShowHelpDoc();
             }
         };
 
@@ -2034,7 +2034,7 @@ public final class MasterBoard extends JPanel
                     int viewMode = client.getViewMode();
                     boolean dubiousAsBlanks =
                         client.getOption(Options.dubiousAsBlanks);
-                    new ShowLegion(masterFrame, marker, legion,
+                    new ShowLegion(masterFrame, legion,
                         point, scrollPane, 4 * Scale.get(), playerName,
                         viewMode, dubiousAsBlanks);
                     return;

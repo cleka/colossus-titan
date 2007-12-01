@@ -439,8 +439,6 @@ ItemListener, ActionListener
         
         if ( !showEventType[type] )
         {
-//          Log.debug("Not displaying event "+e.getEventTypeText()+" "+e.getMarkerId() +
-//          " - type " + type + " false.");
             display = false;
         }
         else if ( hideUndoneEvents && e.wasUndone())
@@ -596,14 +594,8 @@ ItemListener, ActionListener
      * User undid one action. Event is just marked as undone, but not deleted
      * - information once revealed is known to the public, as in real life :) 
      */
-    public void undoEvent(int type, String parentId, String childId, int turn,
-                          String creatureName)
+    public void undoEvent(int type, String parentId, String childId, int turn)
     {
-/*
-        String typeText = RevealEvent.getEventTypeText(type);
-        Log.debug("Undoing event "+typeText+ ": marker2 "+childId+
-                ", marker1 "+parentId+" turn "+turn);
-*/
         int found = 0;
         if (type == RevealEvent.eventSplit)
         {
@@ -618,9 +610,7 @@ ItemListener, ActionListener
                             e.getMarkerId().equals(parentId) &&
                             e.getMarkerId2().equals(childId) && 
                             ! e.wasUndone() )
-
                     {
-                        // Log.debug("Split event to be undone found.");
                         found++;
                         e.setUndone(true);
                     }
@@ -647,8 +637,6 @@ ItemListener, ActionListener
                                 e.getMarkerId2().equals(childId) &&
                                 ! e.wasUndone() )
                         {
-                            // Log.debug("NOTE: Split event to be undone found only " + 
-                            //           "from previous turn!!");
                             found++;
                             e.setUndone(true);
                         }
@@ -669,7 +657,6 @@ ItemListener, ActionListener
                             e.getMarkerId().equals(parentId) &&
                             ! e.wasUndone())
                     {
-                        // Log.debug("Recruit event to be undone found.");
                         found++;
                         e.setUndone(true);
                     }
@@ -689,7 +676,6 @@ ItemListener, ActionListener
                             e.getMarkerId().equals(parentId) && 
                             ! e.wasUndone())
                     {
-                        // Log.debug("Recruit event to be undone found.");
                         found++;
                         e.setUndone(true);
                     }
@@ -709,7 +695,6 @@ ItemListener, ActionListener
                             e.getMarkerId().equals(parentId) && 
                             ! e.wasUndone())
                     {
-                        // Log.debug("Teleport event to be undone found.");
                         found++;
                         e.setUndone(true);
                     }
@@ -740,8 +725,6 @@ ItemListener, ActionListener
      */
     public void purgeOldEvents()
     {
-        // Log.debug("Purging events, if necessary...");
-
         if (this.expireTurns == -1)
         {
             LOGGER.log(Level.WARNING, "expireTurns -1 - no purging needed.");

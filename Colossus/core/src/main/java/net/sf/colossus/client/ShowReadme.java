@@ -29,7 +29,7 @@ public final class ShowReadme
 {
     private static JFrame viewFrame;
     
-    ShowReadme(JFrame parentFrame, IOptions options)
+    ShowReadme(IOptions options)
     {
         // primitive way to avoid having more than one. How to do better?
         if ( viewFrame != null )

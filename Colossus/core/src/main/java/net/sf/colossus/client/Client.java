@@ -559,7 +559,7 @@ public final class Client implements IClient, IOracle, IOptions
         {
             String markerId = marker.getId();
             LegionInfo legion = getLegionInfo(markerId);
-            autoInspector.showLegion(marker, legion);
+            autoInspector.showLegion(legion);
         }
     }
 
@@ -1557,7 +1557,7 @@ public final class Client implements IClient, IOracle, IOptions
             {
                 // addCreature adds summoned creature back to donor:
                 eventViewer.undoEvent(RevealEvent.eventSummon, markerId, null, 
-                        turnNumber, name);
+                        turnNumber);
                 if (!attackerEventLegion.undoSummon(turnNumber, name))
                 {
                     // this should never happen...
@@ -1573,7 +1573,7 @@ public final class Client implements IClient, IOracle, IOptions
 
         if (eventViewer != null)
         {
-            removeCreatureEventHandling(markerId, name, reason);
+            removeCreatureEventHandling(markerId, name);
         }
         
         String hexLabel = info.getHexLabel();
@@ -1596,8 +1596,7 @@ public final class Client implements IClient, IOracle, IOptions
         }
     }
 
-    public void removeCreatureEventHandling(String markerId, String name, 
-            String reason)
+    public void removeCreatureEventHandling(String markerId, String name)
     {
         if (attackerMarkerId != null && attackerEventLegion != null &&
                 attackerMarkerId.equals(markerId) )
@@ -1744,13 +1743,13 @@ public final class Client implements IClient, IOracle, IOptions
         if (eventViewer != null)
         {
             revealEngagedCreaturesEventHandling(
-                    markerId, names, isAttacker, reason);
+                    names, isAttacker, reason);
         }
         
     }
     
-    public void revealEngagedCreaturesEventHandling(String markerId, 
-           final List names, boolean isAttacker, String reason)
+    public void revealEngagedCreaturesEventHandling(final List names, 
+            boolean isAttacker, String reason)
     {
         // can't co anything if (old) server or history do not provide 
         // us the reason
@@ -2926,7 +2925,7 @@ public final class Client implements IClient, IOracle, IOptions
         if (eventViewer != null)
         {
             eventViewer.undoEvent(RevealEvent.eventRecruit, markerId, null, 
-                    turnNumber, recruitName);
+                    turnNumber);
         }
         if (board != null)
         {
@@ -3928,7 +3927,7 @@ public final class Client implements IClient, IOracle, IOptions
             if (didTeleport && eventViewer != null)
             {
                 eventViewer.undoEvent(RevealEvent.eventTeleport, 
-                    markerId, null, turnNumber, null);
+                    markerId, null, turnNumber);
             }
         }
     }
@@ -4531,7 +4530,7 @@ public final class Client implements IClient, IOracle, IOptions
         if (eventViewer != null)
         {
             eventViewer.undoEvent(RevealEvent.eventSplit, survivorId, 
-                splitoffId, turn, null);
+                splitoffId, turn);
         }
         else
         {

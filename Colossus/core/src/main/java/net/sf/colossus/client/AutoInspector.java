@@ -81,7 +81,7 @@ public class AutoInspector extends KDialog
         return new Dimension(550, 110);
     }
     
-    public void showLegion(Marker marker, LegionInfo legion) 
+    public void showLegion(LegionInfo legion) 
     {
         scrollPane.getViewport().removeAll();
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
