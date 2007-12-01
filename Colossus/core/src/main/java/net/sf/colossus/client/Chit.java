@@ -189,7 +189,7 @@ class Chit extends JPanel
 
     static ImageIcon getImageIcon(String[] imageFilenames, int scale)
     {
-        java.util.List directories = VariantSupport.getImagesDirectoriesList();
+        List directories = VariantSupport.getImagesDirectoriesList();
         Image composite = ResourceLoader.getCompositeImage(imageFilenames,
                 directories, scale, scale);
         return new ImageIcon(composite);
