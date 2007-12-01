@@ -845,7 +845,7 @@ public final class ResourceLoader
      *   from the given directories.
      * @param filenames Names of the Images files to load (without extension).
      * @param directories List of directories to search (in order).
-     * @return The compisite Image, or null if any part was not found.
+     * @return The composite Image, or null if any part was not found.
      */
     public synchronized static Image getCompositeImage(String[] filenames,
             List directories, int width, int height)
