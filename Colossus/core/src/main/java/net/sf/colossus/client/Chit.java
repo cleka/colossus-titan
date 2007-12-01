@@ -37,8 +37,8 @@ class Chit extends JPanel
 {
 	private static final Logger LOGGER = Logger.getLogger(Chit.class.getName());
 	
-    private ImageIcon icon;
-    private ImageIcon invertedIcon;
+    private Image bufferedImage;
+    private Image bufferedInvertedImage;
     Rectangle rect;
     Client client;  // may be null; set for some subclasses
 
@@ -98,7 +98,7 @@ class Chit extends JPanel
         {
             String[] names = new String[1];
             names[0] = "QuestionMarkMask";
-            icon = getImageIcon(names, scale);
+            bufferedImage = getImage(names, scale);
         }
         else if (Creature.isCreature(id))
         {
@@ -115,7 +115,7 @@ class Chit extends JPanel
                         (cre.getBaseColor().equals("black") ? "Red" : "");
                 names = names2;
             }
-            icon = getImageIcon(names, scale);
+            bufferedImage = getImage(names, scale);
         }
         else
         {
@@ -144,11 +144,11 @@ class Chit extends JPanel
                             (color.equals("BlackColossus") ? "Red" : "");
                 }
 
-                icon = getImageIcon(filenames, scale);
+                bufferedImage = getImage(filenames, scale);
             }
             else
             {
-                icon = getImageIcon(id, scale);
+                bufferedImage = getImage(id, scale);
             }
         }
     }
@@ -172,7 +172,7 @@ class Chit extends JPanel
         return power;
     }
 
-    static ImageIcon getImageIcon(String imageFilename, int scale)
+    static Image getImage(String imageFilename, int scale)
     {
         ImageIcon tempIcon = null;
         List directories = VariantSupport.getImagesDirectoriesList();
@@ -180,19 +180,20 @@ class Chit extends JPanel
                 scale, scale);
         if (tempIcon == null)
         {
-            LOGGER.log(Level.SEVERE, "Couldn't get image :" + imageFilename, (Throwable)null);
-            System.exit(1);
+            LOGGER.log(Level.SEVERE, "Couldn't get image :" + imageFilename);
+            throw new RuntimeException("Unable to retrieve image for filename '" +
+            		imageFilename + "'");
         }
 
-        return tempIcon;
+        return tempIcon.getImage();
     }
 
-    static ImageIcon getImageIcon(String[] imageFilenames, int scale)
+    static Image getImage(String[] imageFilenames, int scale)
     {
         List directories = VariantSupport.getImagesDirectoriesList();
         Image composite = ResourceLoader.getCompositeImage(imageFilenames,
                 directories, scale, scale);
-        return new ImageIcon(composite);
+        return composite;
     }
 
     String getId()
@@ -216,16 +217,16 @@ class Chit extends JPanel
     {
         Graphics2D g2 = (Graphics2D)g;
         super.paintComponent(g2);
-        Image image = icon.getImage();
+        Image image = bufferedImage;
 
         if (inverted &&
                 (client == null ||
                 !client.getOption(Options.doNotInvertDefender)))
         {
-            if (invertedIcon == null)
+            if (bufferedInvertedImage == null)
             {
-                int width = icon.getIconWidth();
-                int height = icon.getIconHeight();
+                int width = bufferedImage.getWidth(this);
+                int height = bufferedImage.getHeight(this);
                 BufferedImage bi = new BufferedImage(
                         width, height,
                         BufferedImage.TYPE_INT_RGB);
@@ -240,9 +241,9 @@ class Chit extends JPanel
                         AffineTransformOp.TYPE_BILINEAR);
                 BufferedImage bi2 = ato.createCompatibleDestImage(bi, null);
                 bi2 = ato.filter(bi, bi2);
-                invertedIcon = new ImageIcon(bi2);
+                bufferedInvertedImage = bi2;
             }
-            image = invertedIcon.getImage();
+            image = bufferedInvertedImage;
         }
         g2.drawImage(image, rect.x, rect.y, rect.width,
                 rect.height, this);
