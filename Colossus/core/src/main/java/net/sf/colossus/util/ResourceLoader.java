@@ -63,8 +63,6 @@ public final class ResourceLoader
     /**
      * Class ColossusClassLoader allows for class loading outside the
      * CLASSPATH, i.e. from the various variant directories.
-     * @version $Id$
-     * @author Romain Dolbeau
      */
     private static class ColossusClassLoader extends ClassLoader
     {
@@ -132,7 +130,7 @@ public final class ResourceLoader
     private static final String[] imageExtension = { ".png", ".gif" };
     private static final String[] svgExtension = { ".svg" };
     private static final ClassLoader baseCL =
-            net.sf.colossus.util.ResourceLoader.class.getClassLoader();
+            ResourceLoader.class.getClassLoader();
     private static final ColossusClassLoader cl =
             new ColossusClassLoader(baseCL);
     private static final Map imageCache =
@@ -142,7 +140,7 @@ public final class ResourceLoader
 
     private final static String sep = Constants.protocolTermSeparator;
 
-    // check if we can use batik (SVG files) or not
+    // check if we can use Batik (SVG files) or not
     private static boolean hasBatik = false;
     static
     {
@@ -358,7 +356,7 @@ public final class ResourceLoader
                     path +
                     pathSeparator +
                     fixFilename(filename));
-            // url will not be null even is the file doesn't exist,
+            // URL will not be null even if the file doesn't exist,
             // so we need to check if connection can be opened
             if (url.openStream() != null)
             {
@@ -397,7 +395,7 @@ public final class ResourceLoader
             url = cl.getResource(path +
                     pathSeparator +
                     fixFilename(filename));
-            // url will not be null even is the file doesn't exist,
+            // URL will not be null even if the file doesn't exist,
             // so we need to check if connection can be opened
             if (url.openStream() != null)
             {
@@ -1215,7 +1213,8 @@ public final class ResourceLoader
     /**
      * Extract a number from a filename, ignoring a prefix.
      * @param filename File name to extract from.
-     * @param prefix Prefix to ignore.
+     * @param prefix Prefix to ignore. Has to match the prefix of the file name, otherwise
+     *        0 will be returned.
      * @return The extracted number.
      */
     private static int numberFromFilename(String filename, String prefix)
@@ -1223,6 +1222,8 @@ public final class ResourceLoader
         if (!(filename.startsWith(prefix)))
         {
             LOGGER.log(Level.WARNING, "Warning: " + prefix + " is not prefix of " + filename);
+            // boil out if we are on a developer box, use default otherwise
+            assert false: "illegal combination for filename and prefix";
             return 0;
         }
         int index = prefix.length();
@@ -1264,7 +1265,7 @@ public final class ResourceLoader
         }
         catch (Exception e)
         {
-            LOGGER.log(Level.SEVERE, "during number extraction: " + e, (Throwable)null);
+            LOGGER.log(Level.SEVERE, "during number extraction: " + e.getMessage(), e);
         }
         return val;
     }
@@ -1272,7 +1273,8 @@ public final class ResourceLoader
     /**
      * Extract a color name from a filename, ignoring a prefix
      * @param filename File name to extract from.
-     * @param prefix Prefix to ignore.
+     * @param prefix Prefix to ignore. Has to match the beginning of the file
+     * name, otherwise "black" will be used as default value. 
      * @return The extracted color name.
      */
     private static String colorNameFromFilename(String filename, String prefix)
@@ -1280,6 +1282,8 @@ public final class ResourceLoader
         if (!(filename.startsWith(prefix)))
         {
             LOGGER.log(Level.WARNING, prefix + " is not prefix of " + filename);
+            // boil out if we are on a developer box, use default otherwise
+            assert false: "illegal combination for filename and prefix";
             return "black";
         }
         int index = prefix.length();
@@ -1454,7 +1458,7 @@ public final class ResourceLoader
     }
 
     /**
-     * Dump the filecache as a List of XML "DataFile" Element,
+     * Dump the file cache as a List of XML "DataFile" Element,
      *     with the file key as attribute "DataFileKey", and the 
      *     file data as a CDATA content.
      * @return A list of XML Element.
@@ -1476,7 +1480,7 @@ public final class ResourceLoader
         return allElement;
     }
 
-    /* cheat, using batik transcoder API. we only want the Image */
+    /* cheat, using Batik transcoder API. we only want the Image */
     private static class BufferedImageTranscoder extends ImageTranscoder
     {
         private BufferedImage image;
@@ -1528,7 +1532,7 @@ public final class ResourceLoader
                     path +
                     pathSeparator +
                     fixFilename(filename));
-            // url will not be null even is the file doesn't exist,
+            // URL will not be null even if the file doesn't exist,
             // so we need to check if connection can be opened
             InputStream stream = url.openStream();
             if (stream != null)
@@ -1549,7 +1553,7 @@ public final class ResourceLoader
         }
         catch (Exception e)
         {
-            LOGGER.log(Level.FINEST, "SVG transcoding for " + filename + " in " + path +
+            LOGGER.log(Level.FINE, "SVG transcoding for " + filename + " in " + path +
 			" failed with " + e);
             // nothing to do
         }
