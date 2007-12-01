@@ -78,7 +78,7 @@ public final class Game
     private Set[] proposals = new HashSet[2];
 
     private LinkedList colorPickOrder = new LinkedList();
-    private java.util.List colorsLeft;
+    private List colorsLeft;
     private PhaseAdvancer phaseAdvancer = new GamePhaseAdvancer();
     private Options options = new Options(Constants.optionsServerName);
 
