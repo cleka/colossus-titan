@@ -104,7 +104,8 @@ public class MilvangAI extends RationalAI
         }
 
         double bestValue = 0;
-        List bestKeep = null;
+        // make sure the list is never null even if we don't find anything
+        List bestKeep = new ArrayList(); 
 
         Combos combos = new Combos(critters, critters.size() - 2);
         for (Iterator it = combos.iterator(); it.hasNext();)
