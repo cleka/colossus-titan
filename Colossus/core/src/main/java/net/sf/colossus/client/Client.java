@@ -4974,7 +4974,7 @@ public final class Client implements IClient, IOracle, IOptions
         }
         catch (Exception ex)
         {
-            LOGGER.log(Level.SEVERE, "Problem reading version file " + ex, (Throwable)null);
+            LOGGER.log(Level.WARNING, "Problem reading version file " + ex, (Throwable)null);
         }
         return version;
     }
