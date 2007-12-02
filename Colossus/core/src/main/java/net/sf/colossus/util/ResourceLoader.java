@@ -784,12 +784,12 @@ public final class ResourceLoader
             catch (Exception e)
             {
                 LOGGER.log(Level.SEVERE, "text document exists, but cannot be loaded (" +
-				filename + "): " + e, (Throwable)null);
+				filename + "): " + e, e);
             }
             return null;
         }
-        LOGGER.log(Level.SEVERE, "No document for basename " + filename + " found " + 
-		"(neither .html, .txt nor without extention)!", (Throwable)null);
+        LOGGER.log(Level.WARNING, "No document for basename " + filename + " found " + 
+		"(neither .html, .txt nor without extention)!");
         return null;
     }
 

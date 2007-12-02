@@ -9,7 +9,10 @@ import java.util.ListIterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DefaultStyledDocument;
 import javax.swing.text.Document;
+import javax.swing.text.StyledDocument;
 
 import net.sf.colossus.client.HexMap;
 import net.sf.colossus.util.ResourceLoader;
@@ -199,6 +202,14 @@ public final class VariantSupport
             directories = new java.util.ArrayList();
             directories.add(tempVarDirectory);
             varREADME = ResourceLoader.getDocument("README", directories);
+            
+            // varREADME seems to be used as flag for a successfully loaded
+            // variant, but breaking the whole variant loading just because
+            // there is no readme file seems a bit overkill, thus we set
+            // a default in this case
+            if(varREADME == null) {
+            	varREADME = getMissingReadmeNotification();
+            }
         }
         catch (Exception e)
         {
@@ -239,7 +250,23 @@ public final class VariantSupport
         return varREADME;
     }
 
-    public static String getVarDirectory()
+    private static Document getMissingReadmeNotification() {
+        StyledDocument txtdoc = new DefaultStyledDocument();
+        try {
+			txtdoc.insertString(0, 
+					"No README found -- variant is lacking a README.txt or README.html.", 
+					null);
+		} catch (BadLocationException e) {
+			// really shouldn't happen with the constant offset
+			LOGGER.log(Level.WARNING, 
+					"Failed to insert warning about missing readme into Document object", 
+					e);
+		}
+        txtdoc.putProperty(ResourceLoader.keyContentType, "text/plain");
+        return txtdoc;
+	}
+
+	public static String getVarDirectory()
     {
         return varDirectory;
     }
