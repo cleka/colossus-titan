@@ -32,7 +32,7 @@ import net.sf.colossus.util.KDialog;
  */
 
 final class SplitLegion extends KDialog implements MouseListener,
-            ActionListener, WindowListener
+    ActionListener, WindowListener
 {
     private List oldChits = new ArrayList(8);
     private List newChits = new ArrayList(8);
@@ -59,10 +59,10 @@ final class SplitLegion extends KDialog implements MouseListener,
     private SaveWindow saveWindow;
 
     private SplitLegion(Client client, String parentId,
-            String selectedMarkerId)
+        String selectedMarkerId)
     {
         super(client.getBoard().getFrame(), client.getPlayerName() +
-                ": Split Legion " + parentId, true);
+            ": Split Legion " + parentId, true);
 
         Container contentPane = getContentPane();
         contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
@@ -147,7 +147,7 @@ final class SplitLegion extends KDialog implements MouseListener,
 
     /** Return childMarkerId,splitCreature1,splitCreature2,etc. */
     static String splitLegion(Client client, String parentId,
-            String selectedMarkerId)
+        String selectedMarkerId)
     {
         if (!active)
         {
@@ -161,7 +161,7 @@ final class SplitLegion extends KDialog implements MouseListener,
 
     /** Move a chit to the end of the other line. */
     private void moveChitToOtherLine(List fromChits, List
-            toChits, Container fromBox, Container toBox, int oldPosition)
+        toChits, Container fromBox, Container toBox, int oldPosition)
     {
         Chit chit = (Chit)fromChits.remove(oldPosition);
         fromBox.remove(chit);
@@ -209,7 +209,7 @@ final class SplitLegion extends KDialog implements MouseListener,
                 Chit chit = (Chit)it.next();
                 String id = chit.getId();
                 if (id.startsWith(Constants.titan) ||
-                        id.equals(TerrainRecruitLoader.getPrimaryAcquirable()))
+                    id.equals(TerrainRecruitLoader.getPrimaryAcquirable()))
                 {
                     numLords++;
                 }

@@ -10,11 +10,9 @@ import java.io.*;
  * @version $Id$
  */
 
-public final class ConfigFileFilter extends javax.swing.filechooser.FileFilter
-    implements FilenameFilter
+public final class ConfigFileFilter extends javax.swing.filechooser.FileFilter implements FilenameFilter
 {
     public static final String description = "Colossus options file";
-
 
     public boolean accept(File dir, String name)
     {
@@ -27,7 +25,6 @@ public final class ConfigFileFilter extends javax.swing.filechooser.FileFilter
             return false;
         }
     }
-
 
     public boolean accept(File f)
     {

@@ -21,7 +21,7 @@ import net.sf.colossus.server.Constants;
 
 public final class Options implements IOptions
 {
-	private static final Logger LOGGER = Logger.getLogger(Options.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(Options.class.getName());
 
     // Everything is public because we use this class in both the client
     // and server packages.  (With separate data.)
@@ -43,52 +43,51 @@ public final class Options implements IOptions
     // Rules options
     public static final String variant = "Variant";
     public static final String viewMode = "ViewMode";
-    public static final String dubiousAsBlanks = "Uncertain as blank (Autoinspector etc.)"; 
+    public static final String dubiousAsBlanks = "Uncertain as blank (Autoinspector etc.)";
 
     /* selections for viewable Legions */
     public static final String viewableOwn  = "Only own legions";
-    public static final String viewableLast = "Revealed during last turn"; 
+    public static final String viewableLast = "Revealed during last turn";
     public static final String viewableEver = "Ever revealed (or concludable) since start";
     public static final String viewableAll  =  "True content for all legions";
-    
-    public static final String[] viewModeArray = 
-    { 
+
+    public static final String[] viewModeArray =
+        {
         viewableOwn,
-//        viewableLast,  // not implemented yet.
+        //        viewableLast,  // not implemented yet.
         viewableEver,
         viewableAll
     };
 
     public static final int viewableOwnNum  = 1;
-    public static final int viewableLastNum = 2; 
+    public static final int viewableLastNum = 2;
     public static final int viewableEverNum = 3;
     public static final int viewableAllNum  = 4;
-    
+
     public static final String eventExpiring = "EventExpire";
     public static final String eventExpiringNever = "never";
     public static final String[] eventExpiringChoices =
-    {
+        {
         "1", "2", "5", "10", eventExpiringNever
     };
-    
-    
+
     public static final String balancedTowers = "Balanced starting towers";
     public static final String allStacksVisible = "All stacks visible";
     public static final String onlyOwnLegions = "Only own legions viewable";
     public static final String cumulativeSlow = "Slowing is cumulative";
     public static final String oneHexAllowed = "Always allows one hex";
     public static final String nonRandomBattleDice =
-            "Use non-random battle dice";
+        "Use non-random battle dice";
 
     public static final String noFirstTurnT2TTeleport =
-            "No tower-to-tower Teleport on first turn";
+        "No tower-to-tower Teleport on first turn";
     public static final String noFirstTurnTeleport =
-            "No Teleport on first turn";
+        "No Teleport on first turn";
     public static final String towerToTowerTeleportOnly =
-            "Tower-to-Tower Teleport only";
+        "Tower-to-Tower Teleport only";
     public static final String noTowerTeleport = "No Tower Teleport";
     public static final String noTitanTeleport = "No Titan Teleport";
-    
+
     public static final String unlimitedMulligans = "Unlimited Mulligans";
 
     // Display options (client only)
@@ -99,26 +98,26 @@ public final class Options implements IOptions
     public static final String showAutoInspector = "Show inspector";
     public static final String showEventViewer = "Show event window";
     public static final String showLogWindow = "Show log window";
-    public static final String showEngagementResults = 
-            "Show engagement results";
+    public static final String showEngagementResults =
+        "Show engagement results";
     public static final String useOverlay = "Use Graphical Overlay";
     public static final String noBaseColor = "Use black overlay on Chits";
     public static final String useColoredBorders =
-            "Use colored borders on Battle Chits";
+        "Use colored borders on Battle Chits";
     public static final String doNotInvertDefender =
-            "Do not invert defender's Battle Chits";
+        "Do not invert defender's Battle Chits";
     public static final String showAllRecruitChits = "Show all recruit Chits";
     public static final String showRecruitChitsSubmenu = "Show recruit preview chits...";
     public static final String showRecruitChitsNone = "None";
     public static final String showRecruitChitsStrongest = "Strongest";
     public static final String showRecruitChitsRecruitHint = "Recruit Hint";
     public static final String showRecruitChitsAll = "All";
-    
+
     public static final int showRecruitChitsNumNone = 0;
     public static final int showRecruitChitsNumStrongest = 1;
     public static final int showRecruitChitsNumRecruitHint = 2;
     public static final int showRecruitChitsNumAll = 3;
-    
+
     public static final String antialias = "Antialias";
     public static final String scale = "Scale";
 
@@ -169,15 +168,15 @@ public final class Options implements IOptions
     public String getOptionsFilename()
     {
         return Constants.gameDataPath + Constants.optionsBase + owner +
-                Constants.optionsExtension;
+            Constants.optionsExtension;
     }
 
     public void loadOptions()
     {
         // Don't load from temporary player names.
         if (owner.startsWith(Constants.byColor) ||
-                owner.startsWith(Constants.byType) ||
-                owner.startsWith(Constants.byClient))
+            owner.startsWith(Constants.byType) ||
+            owner.startsWith(Constants.byClient))
         {
             return;
         }
@@ -200,8 +199,8 @@ public final class Options implements IOptions
     {
         // Don't save from temporary player names.
         if (owner.startsWith(Constants.byColor) ||
-                owner.startsWith(Constants.byType) ||
-                owner.startsWith(Constants.byClient))
+            owner.startsWith(Constants.byType) ||
+            owner.startsWith(Constants.byClient))
         {
             return;
         }
@@ -210,10 +209,12 @@ public final class Options implements IOptions
         File optionsDir = new File(Constants.gameDataPath);
         if (!optionsDir.exists() || !optionsDir.isDirectory())
         {
-            LOGGER.log(Level.INFO, "Trying to make directory " + Constants.gameDataPath);
+            LOGGER.log(Level.INFO,
+                "Trying to make directory " + Constants.gameDataPath);
             if (!optionsDir.mkdirs())
             {
-                LOGGER.log(Level.SEVERE, "Could not create options directory", (Throwable)null);
+                LOGGER.log(Level.SEVERE, "Could not create options directory",
+                    (Throwable)null);
                 return;
             }
         }
@@ -226,7 +227,8 @@ public final class Options implements IOptions
         }
         catch (IOException e)
         {
-            LOGGER.log(Level.SEVERE, "Couldn't write options to " + optionsFile, (Throwable)null);
+            LOGGER.log(Level.SEVERE, "Couldn't write options to " + optionsFile,
+                (Throwable)null);
         }
     }
 
@@ -317,36 +319,44 @@ public final class Options implements IOptions
     public int getNumberForViewMode(String viewMode)
     {
         int val = Options.viewableAllNum;
-        if (viewMode == null) 
+        if (viewMode == null)
         {
             return Options.viewableAllNum;
         }
-        if (viewMode.equals(Options.viewableAll))  val = Options.viewableAllNum;
-        if (viewMode.equals(Options.viewableEver)) val = Options.viewableEverNum;
-        if (viewMode.equals(Options.viewableLast)) val = Options.viewableLastNum;
-        if (viewMode.equals(Options.viewableOwn))  val = Options.viewableOwnNum;
+        if (viewMode.equals(Options.viewableAll)) {  val = Options.viewableAllNum;
+        }
+        if (viewMode.equals(Options.viewableEver)) { val = Options.viewableEverNum;
+        }
+        if (viewMode.equals(Options.viewableLast)) { val = Options.viewableLastNum;
+        }
+        if (viewMode.equals(Options.viewableOwn)) {  val = Options.viewableOwnNum;
+        }
         return val;
     }
-    
+
     // client compares then only numeric modes (easier and faster in runtime)
     // ((can use switch case statement))
     public int getNumberForRecruitChitSelection(String s)
     {
-    	if (s == null || s.equals(""))
-    	{
-    		return Options.showRecruitChitsNumNone; 
-    	}
+        if (s == null || s.equals(""))
+        {
+            return Options.showRecruitChitsNumNone;
+        }
 
-    	int val = Options.showRecruitChitsNumAll;
-    	if (s.equals(Options.showRecruitChitsNone)) 
-    		val = Options.showRecruitChitsNumNone;
-    	if (s.equals(Options.showRecruitChitsStrongest)) 
-    		val = Options.showRecruitChitsNumStrongest;
-    	if (s.equals(Options.showRecruitChitsRecruitHint)) 
-    		val = Options.showRecruitChitsNumRecruitHint;
-    	if (s.equals(Options.showRecruitChitsAll)) 
-    		val = Options.showRecruitChitsNumAll;
-    	return val;
+        int val = Options.showRecruitChitsNumAll;
+        if (s.equals(Options.showRecruitChitsNone)) {
+            val = Options.showRecruitChitsNumNone;
+        }
+        if (s.equals(Options.showRecruitChitsStrongest)) {
+            val = Options.showRecruitChitsNumStrongest;
+        }
+        if (s.equals(Options.showRecruitChitsRecruitHint)) {
+            val = Options.showRecruitChitsNumRecruitHint;
+        }
+        if (s.equals(Options.showRecruitChitsAll)) {
+            val = Options.showRecruitChitsNumAll;
+        }
+        return val;
     }
-    
+
 }

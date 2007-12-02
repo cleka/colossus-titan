@@ -40,7 +40,7 @@ final class ReplyToProposal extends KDialog implements ActionListener
     ReplyToProposal(Client client, Proposal proposal)
     {
         super(client.getBoard().getFrame(), client.getPlayerName() +
-                ": Reply to Proposal", false);
+            ": Reply to Proposal", false);
 
         this.client = client;
         this.proposal = proposal;
@@ -62,7 +62,7 @@ final class ReplyToProposal extends KDialog implements ActionListener
         attackerPane.add(attackerMarker);
 
         List attackerImageNames = client.getLegionImageNames(
-                attackerId);
+            attackerId);
         Iterator it = attackerImageNames.iterator();
         while (it.hasNext())
         {
@@ -79,7 +79,7 @@ final class ReplyToProposal extends KDialog implements ActionListener
         defenderPane.add(defenderMarker);
 
         List defenderImageNames = client.getLegionImageNames(
-                defenderId);
+            defenderId);
         it = defenderImageNames.iterator();
         while (it.hasNext())
         {
@@ -213,7 +213,7 @@ final class ReplyToProposal extends KDialog implements ActionListener
         else if (e.getActionCommand().equals("Fight"))
         {
             proposal = new Proposal(attackerId, defenderId, true,
-                    false, null, null);
+                false, null, null);
 
             // Exit this dialog.
             cleanup();

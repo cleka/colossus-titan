@@ -211,8 +211,8 @@ final class StatusScreen extends KDialog implements WindowListener
     }
 
     private void setPlayerLabelColors(JLabel label,
-                                      Color  bgColor,
-                                      Color  fgColor)
+        Color bgColor,
+        Color fgColor)
     {
         if (label.getBackground() != bgColor)
         {
@@ -224,9 +224,8 @@ final class StatusScreen extends KDialog implements WindowListener
         }
     }
 
-
-    private void setPlayerLabelBackground(int   i,
-                                          Color color)
+    private void setPlayerLabelBackground(int i,
+        Color color)
     {
         if (towerLabel[i].getBackground() != color)
         {
@@ -266,8 +265,8 @@ final class StatusScreen extends KDialog implements WindowListener
         {
             PlayerInfo info = client.getPlayerInfo(i);
             Color color,
-                  bgcolor,
-                  fgcolor;
+                bgcolor,
+                fgcolor;
 
             if (info.isDead())
             {
@@ -275,7 +274,7 @@ final class StatusScreen extends KDialog implements WindowListener
                 bgcolor = Color.red;
                 fgcolor = Color.black;
             }
-            else 
+            else
             {
                 if (oracle.getActivePlayerName().equals(info.getName()))
                 {
@@ -298,9 +297,8 @@ final class StatusScreen extends KDialog implements WindowListener
                 }
             }
 
-            setPlayerLabelBackground(i, color); 
+            setPlayerLabelBackground(i, color);
             setPlayerLabelColors(nameLabel[i],  bgcolor, fgcolor);
-
 
             nameLabel[i].setText(info.getName());
             if (info.canTitanTeleport())

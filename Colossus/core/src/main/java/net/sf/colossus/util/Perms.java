@@ -18,7 +18,6 @@ public final class Perms
     private boolean first = true;
     private int nextSwap;
 
-
     /** Set up a permutation generator for the passed list. */
     public Perms(ArrayList list)
     {
@@ -35,6 +34,7 @@ public final class Perms
     {
         return new Iterator()
         {
+
             /** hasNext should not change things if called repeatedly,
              *  so when it's called we'll lazily evaluate the next
              *  permutation, and then keep returning true until next()

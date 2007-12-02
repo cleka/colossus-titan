@@ -1,5 +1,6 @@
 package net.sf.colossus.client;
 
+
 import java.awt.Color;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -11,6 +12,7 @@ import javax.swing.JFrame;
 
 import net.sf.colossus.util.KDialog;
 
+
 /**
  * Common class for displaying recruit trees information.
  * @version $Id$
@@ -18,7 +20,7 @@ import net.sf.colossus.util.KDialog;
  * @author Barrie Treloar
  */
 public abstract class AbstractShowRecruits extends KDialog implements MouseListener,
-        WindowListener
+    WindowListener
 {
 
     AbstractShowRecruits(JFrame parentFrame)
@@ -28,14 +30,15 @@ public abstract class AbstractShowRecruits extends KDialog implements MouseListe
         setBackground(Color.lightGray);
         addWindowListener(this);
         getContentPane().setLayout(
-                new BoxLayout(getContentPane(), BoxLayout.X_AXIS));
+            new BoxLayout(getContentPane(), BoxLayout.X_AXIS));
 
         addMouseListener(this);
     }
 
     void doOneTerrain(String terrain, String hexLabel)
     {
-        getContentPane().add(new HexRecruitTreePanel(BoxLayout.Y_AXIS, terrain, hexLabel, this));
+        getContentPane().add(new HexRecruitTreePanel(BoxLayout.Y_AXIS, terrain,
+            hexLabel, this));
     }
 
     public void mouseClicked(MouseEvent e)

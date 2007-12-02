@@ -27,10 +27,10 @@ final class PickCarry extends KDialog implements ActionListener
 
     /** Each choice is a String of form "Warbear in Plains Hex G3" */
     PickCarry(JFrame parentFrame, Client client, int carryDamage,
-            Set choices)
+        Set choices)
     {
         super(parentFrame, "Apply " + carryDamage +
-                (carryDamage == 1 ? "carry to:" : " carries to:"), false);
+            (carryDamage == 1 ? "carry to:" : " carries to:"), false);
 
         this.client = client;
 

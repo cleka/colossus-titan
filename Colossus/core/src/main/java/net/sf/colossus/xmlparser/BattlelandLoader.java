@@ -24,8 +24,7 @@ import org.jdom.input.SAXBuilder;
  */
 public class BattlelandLoader
 {
-	private static final Logger LOGGER = Logger.getLogger(BattlelandLoader.class.getName());
-
+    private static final Logger LOGGER = Logger.getLogger(BattlelandLoader.class.getName());
 
     /** hold the list of label for the startlist */
     private java.util.List startlist = null;
@@ -65,11 +64,12 @@ public class BattlelandLoader
                     startlistHexes = startlistEl.getChildren("battlehex");
                     if (startlistHexes.size() > 0)
                     {
-                        LOGGER.log(Level.WARNING, "DEPRECATION WARNING: in 'startlist' use "
-						+"'battlehexref' instead of 'battlehex'!");
-                    }                    
+                        LOGGER.log(Level.WARNING,
+                            "DEPRECATION WARNING: in 'startlist' use " +
+                            "'battlehexref' instead of 'battlehex'!");
+                    }
                 }
-                
+
                 for (Iterator it = startlistHexes.iterator(); it.hasNext();)
                 {
                     Element el = (Element)it.next();

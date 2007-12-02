@@ -19,7 +19,7 @@ public interface IServer
     public void doSummon(String markerId, String donorId, String angel);
 
     public void doRecruit(String markerId, String recruitName,
-            String recruiterName);
+        String recruiterName);
 
     public void engage(String hexLabel);
 
@@ -68,7 +68,7 @@ public interface IServer
     public void doSplit(String parentId, String childId, String results);
 
     public void doMove(String markerId, String hexLabel, String entrySide,
-            boolean teleport, String teleportingLord);
+        boolean teleport, String teleportingLord);
 
     public void assignColor(String color);
 

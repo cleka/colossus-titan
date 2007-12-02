@@ -25,9 +25,9 @@ import net.sf.colossus.util.Options;
 
 // final
 public //  
-class Critter implements Comparable
+    class Critter implements Comparable
 {
-	private static final Logger LOGGER = Logger.getLogger(Critter.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(Critter.class.getName());
 
     private Creature creature;
     private String markerId;
@@ -57,7 +57,7 @@ class Critter implements Comparable
     }
 
     void addBattleInfo(String currentHexLabel, String startingHexLabel,
-            Battle battle)
+        Battle battle)
     {
         this.currentHexLabel = currentHexLabel;
         this.startingHexLabel = startingHexLabel;
@@ -153,15 +153,16 @@ class Critter implements Comparable
                 hits = getPower();
             }
 
-            LOGGER.log(Level.INFO, "Critter " + getDescription() + ": " + 
-			   oldhits + " + " + damage + " => " + hits + 
-			   "; " + excess + " excess");
-            
+            LOGGER.log(Level.INFO, "Critter " + getDescription() + ": " +
+                oldhits + " + " + damage + " => " + hits +
+                "; " + excess + " excess");
+
             // Check for death.
             if (hits >= getPower())
             {
-                LOGGER.log(Level.INFO, "Critter " + getDescription() + " is now dead: (hits="
-				+ hits + " > power="+getPower()+ ")");
+                LOGGER.log(Level.INFO,
+                    "Critter " + getDescription() + " is now dead: (hits=" +
+                    hits + " > power="+getPower()+ ")");
                 setDead(true);
             }
         }
@@ -242,7 +243,7 @@ class Critter implements Comparable
                 {
                     Critter other = battle.getCritter(neighbor);
                     if (other != null && other.getPlayer() != getPlayer() &&
-                            (countDead || !other.isDead()))
+                        (countDead || !other.isDead()))
                     {
                         count++;
                     }
@@ -275,7 +276,7 @@ class Critter implements Comparable
                 {
                     Critter other = battle.getCritter(neighbor);
                     if (other != null && other.getPlayer() != getPlayer() &&
-                            (countDead || !other.isDead()))
+                        (countDead || !other.isDead()))
                     {
                         return true;
                     }
@@ -294,7 +295,7 @@ class Critter implements Comparable
         if (tellClients)
         {
             battle.getGame().getServer().allTellBattleMove(tag,
-                    startingHexLabel, currentHexLabel, false);
+                startingHexLabel, currentHexLabel, false);
         }
     }
 
@@ -303,9 +304,9 @@ class Critter implements Comparable
         String formerHexLabel = currentHexLabel;
         currentHexLabel = startingHexLabel;
         LOGGER.log(Level.INFO, getName() + " undoes move and returns to " +
-		startingHexLabel);
+            startingHexLabel);
         battle.getGame().getServer().allTellBattleMove(tag, formerHexLabel,
-                currentHexLabel, true);
+            currentHexLabel, true);
     }
 
     boolean canStrike(Critter target)
@@ -360,7 +361,7 @@ class Critter implements Comparable
             }
             // Non-native striking up a dune hexside: -1
             else if (!isNativeSandDune() &&
-                    hex.getOppositeHexside(direction) == 'd')
+                hex.getOppositeHexside(direction) == 'd')
             {
                 dice--;
             }
@@ -429,7 +430,7 @@ class Critter implements Comparable
             if (targetHex.hasWall())
             {
                 int heightDeficit = targetHex.getElevation() -
-                        hex.getElevation();
+                    hex.getElevation();
                 if (heightDeficit > 0)
                 {
                     // Because of the design of the tower map, a strike to
@@ -468,9 +469,9 @@ class Critter implements Comparable
         // Native defending in bramble, from rangestrike by a non-native
         //     non-magicMissile: +1
         if (target.getCurrentHex().getTerrain().equals("Brambles") &&
-                target.isNativeBramble() &&
-                !isNativeBramble() &&
-                !(rangestrike && useMagicMissile()))
+            target.isNativeBramble() &&
+            !isNativeBramble() &&
+            !(rangestrike && useMagicMissile()))
         {
             strikeNumber++;
         }
@@ -479,9 +480,9 @@ class Critter implements Comparable
         // Native defending in stone, from rangestrike by a non-native
         //     non-magicMissile: +1
         if (target.getCurrentHex().getTerrain().equals("Stone") &&
-                target.isNativeStone() &&
-                !isNativeStone() &&
-                !(rangestrike && useMagicMissile()))
+            target.isNativeStone() &&
+            !isNativeStone() &&
+            !(rangestrike && useMagicMissile()))
         {
             strikeNumber++;
         }
@@ -490,9 +491,9 @@ class Critter implements Comparable
         // Native defending in tree, from rangestrike by a non-native
         //     non-magicMissile: no effect
         if (target.getCurrentHex().getTerrain().equals("Tree") &&
-                target.isNativeTree() &&
-                !isNativeTree() &&
-                !(rangestrike))
+            target.isNativeTree() &&
+            !isNativeTree() &&
+            !(rangestrike))
         {
             strikeNumber++;
         }
@@ -612,7 +613,7 @@ class Critter implements Comparable
         {
             // Add the non-penalty option as a choice.
             PenaltyOption po = new PenaltyOption(this, target, getDice(target),
-                    getStrikeNumber(target));
+                getStrikeNumber(target));
             penaltyOptions.add(po);
 
             // Add all non-penalty carries to every PenaltyOption.
@@ -643,7 +644,7 @@ class Critter implements Comparable
         // Strikes not up across dune hexsides cannot carry up across 
         // dune hexsides.
         if (hex.getOppositeHexside(dir) == 'd' && targetHex.getHexside(
-                Battle.getDirection(targetHex, hex, false)) != 'd')
+            Battle.getDirection(targetHex, hex, false)) != 'd')
         {
             return false;
         }
@@ -660,7 +661,7 @@ class Critter implements Comparable
 
         Critter victim = battle.getCritter(neighbor);
         if (victim == null || victim.getPlayer() == getPlayer() ||
-                victim.isDead())
+            victim.isDead())
         {
             return;
         }
@@ -698,7 +699,7 @@ class Critter implements Comparable
             {
                 PenaltyOption po = (PenaltyOption)it.next();
                 if (po.getDice() == tmpDice &&
-                        po.getStrikeNumber() == tmpStrikeNumber)
+                    po.getStrikeNumber() == tmpStrikeNumber)
                 {
                     po.addCarryTarget(neighbor.getLabel());
                     return;
@@ -706,7 +707,7 @@ class Critter implements Comparable
             }
             // No match, so create a new PenaltyOption.
             PenaltyOption po = new PenaltyOption(this, target,
-                    tmpDice, tmpStrikeNumber);
+                tmpDice, tmpStrikeNumber);
             po.addCarryTarget(neighbor.getLabel());
             penaltyOptions.add(po);
         }
@@ -737,9 +738,9 @@ class Critter implements Comparable
         }
 
         LOGGER.log(Level.INFO, getName() + " in " + currentHexLabel +
-		" strikes " + target.getDescription() + " with strike number " +
-		strikeNumber + " : " + rollString + ": " + damage +
-		(damage == 1 ? " hit" : " hits"));
+            " strikes " + target.getDescription() + " with strike number " +
+            strikeNumber + " : " + rollString + ": " + damage +
+            (damage == 1 ? " hit" : " hits"));
 
         int carryDamage = target.wound(damage);
         if (!carryPossible)
@@ -752,7 +753,7 @@ class Critter implements Comparable
         if (carryDamage > 0)
         {
             LOGGER.log(Level.INFO, carryDamage + (carryDamage == 1 ?
-			" carry available" : " carries available"));
+                " carry available" : " carries available"));
         }
 
         // Record that this attacker has struck.
@@ -761,8 +762,8 @@ class Critter implements Comparable
         if (game != null)
         {
             game.getServer().allTellStrikeResults(this, target,
-                    strikeNumber, rolls, damage, carryDamage,
-                    battle.getCarryTargetDescriptions());
+                strikeNumber, rolls, damage, carryDamage,
+                battle.getCarryTargetDescriptions());
         }
     }
 
@@ -898,8 +899,8 @@ class Critter implements Comparable
         // Must use our local, Titan-aware getPointValue()
         // return creature.getHintedRecruitmentValue();
         return getPointValue() +
-                VariantSupport.getHintedRecruitmentValueOffset(
-                    creature.getName());
+            VariantSupport.getHintedRecruitmentValueOffset(
+            creature.getName());
     }
 
     public int getHintedRecruitmentValue(String[] section)
@@ -907,9 +908,9 @@ class Critter implements Comparable
         // Must use our local, Titan-aware getPointValue()
         // return creature.getHintedRecruitmentValue(section);
         return getPointValue() +
-                VariantSupport.getHintedRecruitmentValueOffset(
-                    creature.getName(),
-                    section);
+            VariantSupport.getHintedRecruitmentValueOffset(
+            creature.getName(),
+            section);
     }
 
     public boolean isRangestriker()

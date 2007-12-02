@@ -1,5 +1,6 @@
 package net.sf.colossus.client;
 
+
 /** Allows getting and setting options.
  *  An attempt to reduce the God-class nature of Client.
  *  @version $Id$

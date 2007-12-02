@@ -1,5 +1,6 @@
 package net.sf.colossus.client;
 
+
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.geom.GeneralPath;
@@ -27,21 +28,21 @@ public abstract class GUIHex {
     // Selection is in-between GUI and game state.
     private boolean selected;
 
-    public GUIHex(Hex model) 
+    public GUIHex(Hex model)
     {
         this.model = model;
     }
-    
-    public Hex getHexModel() 
+
+    public Hex getHexModel()
     {
         return this.model;
     }
-    
-    public void setHexModel(Hex model) 
+
+    public void setHexModel(Hex model)
     {
         this.model = model;
     }
-    
+
     public Rectangle getBounds()
     {
         return rectBound;
@@ -51,6 +52,7 @@ public abstract class GUIHex {
     {
         return (hexagon.contains(point));
     }
+
     public void select()
     {
         selected = true;
@@ -95,10 +97,10 @@ public abstract class GUIHex {
      *  and the passed x and y coordinates.  Close the polygon if the
      *  argument closed is true. */
     static GeneralPath makePolygon(int sides, double[] x, double[] y,
-            boolean closed)
+        boolean closed)
     {
         GeneralPath polygon = new GeneralPath(GeneralPath.WIND_EVEN_ODD,
-                sides);
+            sides);
         polygon.moveTo((float)x[0], (float)y[0]);
         for (int i = 1; i < sides; i++)
         {
@@ -115,13 +117,13 @@ public abstract class GUIHex {
     public Point findCenter()
     {
         return new Point((int)Math.round((xVertex[2] + xVertex[5]) / 2),
-                (int)Math.round((yVertex[0] + yVertex[3]) / 2));
+            (int)Math.round((yVertex[0] + yVertex[3]) / 2));
     }
 
     /** Return the Point2D.Double at the center of the polygon. */
     Point2D.Double findCenter2D()
     {
         return new Point2D.Double((xVertex[2] + xVertex[5]) / 2.0,
-                (yVertex[0] + yVertex[3]) / 2.0);
+            (yVertex[0] + yVertex[3]) / 2.0);
     }
 }

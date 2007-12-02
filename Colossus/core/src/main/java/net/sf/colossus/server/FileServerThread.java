@@ -25,7 +25,7 @@ import net.sf.colossus.util.Split;
 
 final class FileServerThread extends Thread
 {
-	private static final Logger LOGGER = Logger.getLogger(FileServerThread.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(FileServerThread.class.getName());
 
     private ServerSocket fileServer;
     private List activeSocketList;
@@ -41,8 +41,8 @@ final class FileServerThread extends Thread
         try
         {
             fileServer =
-                    new ServerSocket(port,
-                    Constants.MAX_MAX_PLAYERS);
+                new ServerSocket(port,
+                Constants.MAX_MAX_PLAYERS);
         }
         catch (Exception e)
         {
@@ -83,21 +83,21 @@ final class FileServerThread extends Thread
                     InputStream is = fileClient.getInputStream();
 
                     BufferedReader in =
-                            new BufferedReader(new InputStreamReader(is));
+                        new BufferedReader(new InputStreamReader(is));
 
                     String request = in.readLine();
 
                     OutputStream os = fileClient.getOutputStream();
 
                     LOGGER.log(Level.FINEST, "Serving request " + request +
-					" from " + fileClient);
-                    
+                        " from " + fileClient);
+
                     boolean ignoreFail = false;
 
                     List li = Split.split(sep, request);
 
                     String filename = (String)li.remove(0);
-                     
+
                     // right now (05/2007) clients should not send this -
                     // take into use somewhat later.
                     if (filename.equals(Constants.fileServerIgnoreFailSignal))
@@ -120,9 +120,9 @@ final class FileServerThread extends Thread
                     {
                         ignoreFail = true;
                     }
-                    
+
                     byte[] data = ResourceLoader.getBytesFromFile(filename, li,
-                            true, ignoreFail);
+                        true, ignoreFail);
 
                     if (data != null)
                     {
@@ -132,8 +132,9 @@ final class FileServerThread extends Thread
                 }
                 else
                 {
-                    LOGGER.log(Level.WARNING, "SOMEBODY NOT A CLIENT "
-					+"IS TRYING TO ACCESS A FILE !");
+                    LOGGER.log(Level.WARNING,
+                        "SOMEBODY NOT A CLIENT " +
+                        "IS TRYING TO ACCESS A FILE !");
                     LOGGER.log(Level.WARNING, "Request was from " + fileClient);
                 }
                 fileClient.close();
@@ -152,7 +153,8 @@ final class FileServerThread extends Thread
         }
         catch (Exception e)
         {
-            LOGGER.log(Level.WARNING, "FileServerThread : " + e + " while closing socket");
+            LOGGER.log(Level.WARNING,
+                "FileServerThread : " + e + " while closing socket");
         }
     }
 }

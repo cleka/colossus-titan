@@ -1,8 +1,8 @@
 package net.sf.colossus.server;
 
+
 import java.util.*;
 import junit.framework.*;
-
 
 
 /** 
@@ -29,7 +29,6 @@ public class CarryTest extends TestCase
     Creature colossus;
     Creature gargoyle;
     Creature warlock;
-
 
     public CarryTest(String name)
     {
@@ -74,7 +73,7 @@ public class CarryTest extends TestCase
 
         attacker.setEntrySide(5);
 
-        battle = new Battle(game, attacker.getMarkerId(), 
+        battle = new Battle(game, attacker.getMarkerId(),
             defender.getMarkerId(), Constants.DEFENDER, hexLabel,
             2, Constants.BattlePhase.FIGHT);
 
@@ -124,7 +123,6 @@ public class CarryTest extends TestCase
         assertTrue(hydra1.getPenaltyOptions().size() == 0);
     }
 
-
     public void testCarries2()
     {
         String hexLabel = "1";  // Plains
@@ -141,7 +139,7 @@ public class CarryTest extends TestCase
 
         attacker.setEntrySide(5);
 
-        battle = new Battle(game, attacker.getMarkerId(), 
+        battle = new Battle(game, attacker.getMarkerId(),
             defender.getMarkerId(), Constants.ATTACKER, hexLabel,
             3, Constants.BattlePhase.FIGHT);
 

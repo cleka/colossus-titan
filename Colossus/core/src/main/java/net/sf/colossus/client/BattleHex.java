@@ -16,11 +16,9 @@ import net.sf.colossus.util.HTMLColor;
  * @author Romain Dolbeau
  */
 
-public class BattleHex 
-    extends Hex
-    implements net.sf.colossus.util.Terrains  // B_xxx constants
+public class BattleHex extends Hex implements net.sf.colossus.util.Terrains // B_xxx constants
 {
-	private static final Logger LOGGER = Logger.getLogger(BattleHex.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(BattleHex.class.getName());
 
     /** Valid elevations are 0, 1, and 2.  Also 3 for JDG Badlands. */
     private int elevation;
@@ -190,7 +188,7 @@ public class BattleHex
     public static boolean isNativeBonusHazard(String name)
     {
         if (name.equals(H_BRAMBLES) ||
-                name.equals(H_VOLCANO))
+            name.equals(H_VOLCANO))
         {
             return true;
         }
@@ -222,7 +220,7 @@ public class BattleHex
     public static boolean isNonNativePenaltyHazard(String name)
     {
         if (name.equals(H_BRAMBLES) ||
-                name.equals(H_DRIFT))
+            name.equals(H_DRIFT))
         {
             return true;
         }
@@ -258,7 +256,7 @@ public class BattleHex
             label = "X" + yCoord;
         }
         else
-        {                
+        {
             final int yLabel = 6 - yCoord - Math.abs(((xCoord - 3) / 2));
             label = "" + _intXCoordToXLabel(xCoord) + yLabel;
         }
@@ -266,12 +264,11 @@ public class BattleHex
     }
 
     /** a char for an int: 0:'A'=0, 1:'B', ... int(w):'W', else:'?', <0:undef.
-     * */ 
-    private final static char _intXCoordToXLabel(final int x) 
+     * */
+    private final static char _intXCoordToXLabel(final int x)
     {
         return (x < 'X')    // 'X' is used for -1 
-            ? (char)('A' + x)
-            : '?' ; 
+            ? (char)('A' + x) : '?' ;
     }
 
     public void setHexside(int i, char hexside)
@@ -343,13 +340,13 @@ public class BattleHex
 
     public BattleHex getNeighbor(int i)
     {
-    	assert (i>=0) && (i<=5) : "Neighbor index out of range";
+        assert (i>=0) && (i<=5) : "Neighbor index out of range";
         return neighbors[i];
     }
 
     public void setNeighbor(int i, BattleHex hex)
     {
-    	assert (i>=0) && (i<=5) : "Neighbor index out of range";
+        assert (i>=0) && (i<=5) : "Neighbor index out of range";
         neighbors[i] = hex;
     }
 
@@ -401,11 +398,11 @@ public class BattleHex
 
         // Check to see if the hex is occupied or totally impassable.
         if ((getTerrain().equals(H_LAKE) && (!creature.isWaterDwelling())) ||
-                (getTerrain().equals(H_TREE) && (!creature.isNativeTree())) ||
-                (getTerrain().equals(H_STONE) && (!creature.isNativeStone())) ||
-                (getTerrain().equals(H_VOLCANO) &&
-                (!creature.isNativeVolcano())) ||
-                (getTerrain().equals(H_BOG) && (!creature.isNativeBog())))
+            (getTerrain().equals(H_TREE) && (!creature.isNativeTree())) ||
+            (getTerrain().equals(H_STONE) && (!creature.isNativeStone())) ||
+            (getTerrain().equals(H_VOLCANO) &&
+            (!creature.isNativeVolcano())) ||
+            (getTerrain().equals(H_BOG) && (!creature.isNativeBog())))
         {
             cost += IMPASSIBLE_COST;
         }
@@ -414,24 +411,24 @@ public class BattleHex
 
         // Non-fliers may not cross cliffs.
         if ((hexside == 'c' || getOppositeHexside(cameFrom) == 'c') &&
-                !creature.isFlier())
+            !creature.isFlier())
         {
             cost += IMPASSIBLE_COST;
         }
 
         // river slows both way, except native & water dwellers
         if ((hexside == 'r' || getOppositeHexside(cameFrom) == 'r') &&
-                !creature.isFlier() && !creature.isWaterDwelling() &&
-                !creature.isNativeRiver())
+            !creature.isFlier() && !creature.isWaterDwelling() &&
+            !creature.isNativeRiver())
         {
             cost += SLOW_INCREMENT_COST;
         }
 
         // Check for a slowing hexside.
         if ((hexside == 'w' ||
-                (hexside == 's' && !creature.isNativeSlope())) &&
-                !creature.isFlier() &&
-                elevation > getNeighbor(cameFrom).getElevation())
+            (hexside == 's' && !creature.isNativeSlope())) &&
+            !creature.isFlier() &&
+            elevation > getNeighbor(cameFrom).getElevation())
         {
             cost += SLOW_INCREMENT_COST;
         }
@@ -439,9 +436,9 @@ public class BattleHex
         // Bramble, drift, and sand slow non-natives, except that sand
         //     doesn't slow fliers.
         if ((getTerrain().equals(H_BRAMBLES) && !creature.isNativeBramble()) ||
-                (getTerrain().equals(H_DRIFT) && !creature.isNativeDrift()) ||
-                (getTerrain().equals(H_SAND) && !creature.isNativeSandDune() &&
-                !creature.isFlier()))
+            (getTerrain().equals(H_DRIFT) && !creature.isNativeDrift()) ||
+            (getTerrain().equals(H_SAND) && !creature.isNativeSandDune() &&
+            !creature.isFlier()))
         {
             cost += SLOW_INCREMENT_COST;
         }
@@ -504,7 +501,7 @@ public class BattleHex
     public boolean isCliff(int hexside)
     {
         return getHexside(hexside) == 'c' ||
-                getOppositeHexside(hexside) == 'c';
+            getOppositeHexside(hexside) == 'c';
     }
 
     public static String[] getTerrains()

@@ -78,12 +78,12 @@ public final class SaveWindow
             options.setOption(name + Options.locY, y);
         }
     }
-    
+
     public void save(Window window ) {
         saveLocation(window.getLocation());
         saveSize(window.getSize());
     }
-    
+
     public void restore(Window window, Point defaultLocation) {
         Point location = loadLocation();
         if (location == null)

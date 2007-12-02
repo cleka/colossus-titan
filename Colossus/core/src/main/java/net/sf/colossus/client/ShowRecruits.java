@@ -18,7 +18,7 @@ final class ShowRecruits extends AbstractShowRecruits
 {
 
     ShowRecruits(JFrame parentFrame, String terrain, Point point,
-            String terrainHexLabel, JScrollPane pane)
+        String terrainHexLabel, JScrollPane pane)
     {
         super(parentFrame);
 

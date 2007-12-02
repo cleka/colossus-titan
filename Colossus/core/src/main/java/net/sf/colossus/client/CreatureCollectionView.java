@@ -42,9 +42,9 @@ import net.sf.colossus.util.KDialog;
  */
 class CreatureCollectionView extends KDialog implements WindowListener
 {
-	private static final Logger LOGGER = Logger.getLogger(CreatureCollectionView.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(CreatureCollectionView.class.getName());
 
-	private Client client;
+    private Client client;
     private Point location;
     private Dimension size;
     private static final int fixedChitSize = 60;
@@ -61,20 +61,20 @@ class CreatureCollectionView extends KDialog implements WindowListener
     private JScrollPane scrollPane;
     private JFrame parentFrame;
     private final static Font countFont =
-            new Font("Monospaced", Font.PLAIN, 12);
+        new Font("Monospaced", Font.PLAIN, 12);
     private final static String baseString = "--/--/--";
     private final static JLabel baseLabel =
-            new JLabel(baseString, SwingConstants.CENTER);
+        new JLabel(baseString, SwingConstants.CENTER);
     private final static JLabel legendLabel =
-            new JLabel(htmlizeOnly(
-            htmlColorizeOnly("Values are: ", "black") +
-            htmlColorizeOnly("Total", "blue") +
-            htmlColorizeOnly("/", "black") +
-            htmlColorizeOnly("In Stack", "black") +
-            htmlColorizeOnly("/", "black") +
-            htmlColorizeOnly("In Game", "green") +
-            htmlColorizeOnly("/", "black") +
-            htmlColorizeOnly("Dead", "red")));
+        new JLabel(htmlizeOnly(
+        htmlColorizeOnly("Values are: ", "black") +
+        htmlColorizeOnly("Total", "blue") +
+        htmlColorizeOnly("/", "black") +
+        htmlColorizeOnly("In Stack", "black") +
+        htmlColorizeOnly("/", "black") +
+        htmlColorizeOnly("In Game", "green") +
+        htmlColorizeOnly("/", "black") +
+        htmlColorizeOnly("Dead", "red")));
 
     static
     {
@@ -93,11 +93,11 @@ class CreatureCollectionView extends KDialog implements WindowListener
 
         this.scrollPane =
             new JScrollPane(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
-                            javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+            javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         JPanel panel = makeCreaturePanel(scrollPane);
         scrollPane.setViewportView(panel);
         getContentPane().add(scrollPane,
-                             BorderLayout.CENTER);
+            BorderLayout.CENTER);
 
         getContentPane().add(legendLabel, BorderLayout.SOUTH);
 
@@ -158,11 +158,11 @@ class CreatureCollectionView extends KDialog implements WindowListener
             chitMap.put(name, chit);
             label = new JLabel(baseString, SwingConstants.CENTER);
             topLabel =
-                    new JLabel(htmlizeOnly(
-                    htmlColorizeOnly(
-                    Integer.toString(
-                    client.getCreatureMaxCount(name)), "blue")),
-                    SwingConstants.CENTER);
+                new JLabel(htmlizeOnly(
+                htmlColorizeOnly(
+                Integer.toString(
+                client.getCreatureMaxCount(name)), "blue")),
+                SwingConstants.CENTER);
             label.setFont(countFont);
             topLabel.setFont(countFont);
             countMap.put(name, label);
@@ -170,8 +170,8 @@ class CreatureCollectionView extends KDialog implements WindowListener
 
             // clicking the creature icon invokes the details view
             final Creature creature = Creature.getCreatureByName(name);
-            assert creature != null : "Expected creature name '" + name + 
-                                      "' to be valid";
+            assert creature != null : "Expected creature name '" + name +
+                "' to be valid";
             this.addMouseListener(new MouseAdapter()
             {
                 public void mouseClicked(MouseEvent e)
@@ -180,12 +180,13 @@ class CreatureCollectionView extends KDialog implements WindowListener
                     if (e.getButton() == MouseEvent.BUTTON1)
                     {
                         new ShowCreatureDetails(
-                                CreatureCollectionView.this.parentFrame,
-                                creature, null,
-                                CreatureCollectionView.this.scrollPane);
+                            CreatureCollectionView.this.parentFrame,
+                            creature, null,
+                            CreatureCollectionView.this.scrollPane);
                     }
                 }
-            });
+            }
+            );
 
             // jikes whines because add is defined in both JPanel and JDialog.
             this.add(topLabel, BorderLayout.NORTH);
@@ -211,7 +212,8 @@ class CreatureCollectionView extends KDialog implements WindowListener
     {
         List creatures = Creature.getCreatures();
         JPanel creaturePanel = new JPanel();
-        creaturePanel.setLayout(new CCVFlowLayout(scrollPane, creaturePanel, FlowLayout.LEFT, 2, 2));
+        creaturePanel.setLayout(new CCVFlowLayout(scrollPane, creaturePanel,
+            FlowLayout.LEFT, 2, 2));
         Iterator it = creatures.iterator();
         while (it.hasNext())
         {
@@ -241,15 +243,15 @@ class CreatureCollectionView extends KDialog implements WindowListener
                 if ((inGameCount < 0) || (inGameCount > maxcount))
                 {
                     LOGGER.log(Level.SEVERE, "Something went wrong:" +
-					" discrepancy between total (" + maxcount +
-					"), remaining (" + count +
-					") and dead (" + deadCount +
-					") count for creature " + name, (Throwable)null);
+                        " discrepancy between total (" + maxcount +
+                        "), remaining (" + count +
+                        ") and dead (" + deadCount +
+                        ") count for creature " + name, (Throwable)null);
                     return;
                 }
 
                 boolean immortal =
-                        Creature.getCreatureByName(name).isImmortal();
+                    Creature.getCreatureByName(name).isImmortal();
                 String color;
                 if (count == 0)
                 {
@@ -274,25 +276,25 @@ class CreatureCollectionView extends KDialog implements WindowListener
                     }
                 }
                 String htmlCount =
-                        htmlColorizeOnly((count < 10 ? "0" : "") +
-                        Integer.toString(count), color);
+                    htmlColorizeOnly((count < 10 ? "0" : "") +
+                    Integer.toString(count), color);
                 String htmlDeadCount =
-                        htmlColorizeOnly(
-                        immortal && deadCount == 0 ?
-                        "--" :
-                        (deadCount < 10 ? "0" : "") +
-                        Integer.toString(deadCount), "red");
+                    htmlColorizeOnly(
+                    immortal && deadCount == 0 ?
+                    "--" :
+                    (deadCount < 10 ? "0" : "") +
+                    Integer.toString(deadCount), "red");
                 String htmlInGameCount =
-                        htmlColorizeOnly((inGameCount < 10 ? "0" : "") +
-                        Integer.toString(inGameCount),
-                        "green");
+                    htmlColorizeOnly((inGameCount < 10 ? "0" : "") +
+                    Integer.toString(inGameCount),
+                    "green");
                 String htmlSlash = htmlColorizeOnly("/", "black");
                 label.setText(htmlizeOnly(htmlCount + htmlSlash +
-                        htmlInGameCount + htmlSlash +
-                        htmlDeadCount));
+                    htmlInGameCount + htmlSlash +
+                    htmlDeadCount));
                 JLabel topLabel = (JLabel)topCountMap.get(name);
                 topLabel.setText(htmlizeOnly(htmlColorizeOnly(
-                        Integer.toString(maxcount), "blue")));
+                    Integer.toString(maxcount), "blue")));
             }
 
             repaint();
@@ -349,8 +351,8 @@ class CreatureCollectionView extends KDialog implements WindowListener
 
         int minX = minSingleX * 5;
         int minY = ((fixedChitSize + 8 +
-                (2 * (int)baseLabel.getPreferredSize().getHeight())) *
-                ((creatures.size() + 4) / 5)) + fixedChitSize;
+            (2 * (int)baseLabel.getPreferredSize().getHeight())) *
+            ((creatures.size() + 4) / 5)) + fixedChitSize;
 
         return new Dimension(minX, minY);
     }
@@ -361,10 +363,11 @@ class CreatureCollectionView extends KDialog implements WindowListener
     }
 }
 
+
 class CCVFlowLayout extends FlowLayout implements ComponentListener {
     private JScrollPane parentScrollPane;
     private JComponent parentComponent;
-    
+
     public CCVFlowLayout(JScrollPane sp, JComponent me, int al, int sx, int sy)
     {
         super(al, sx, sy);
@@ -372,7 +375,7 @@ class CCVFlowLayout extends FlowLayout implements ComponentListener {
         parentComponent = me;
         parentScrollPane.addComponentListener(this);
     }
-    
+
     protected Dimension getOurSize()
     {
         javax.swing.JViewport viewport = parentScrollPane.getViewport();
@@ -394,7 +397,8 @@ class CCVFlowLayout extends FlowLayout implements ComponentListener {
                     }
                     x += d.width;
                     rowHeight = (rowHeight < d.height ? d.height : rowHeight);
-                } else
+                }
+                else
                 {
                     if (x > maxWidth) {
                         maxWidth = x;
@@ -411,7 +415,7 @@ class CCVFlowLayout extends FlowLayout implements ComponentListener {
         y += getVgap() + rowHeight + insets.bottom;
         return new Dimension(maxWidth, y);
     }
-    
+
     public void componentResized(ComponentEvent e) {
         javax.swing.JViewport viewport = parentScrollPane.getViewport();
         Dimension viewSize = viewport.getViewSize();
@@ -419,25 +423,29 @@ class CCVFlowLayout extends FlowLayout implements ComponentListener {
         Dimension ourSize = getOurSize();
         if ((viewSize.width != extentSize.width) ||
             (viewSize.height != ourSize.height)) {
-            int x = (ourSize.width > extentSize.width ?  ourSize.width : extentSize.width);
-            int y = (ourSize.height > extentSize.height ?  ourSize.height : extentSize.height);
+            int x = (ourSize.width > extentSize.width ?
+                ourSize.width :
+                extentSize.width);
+            int y = (ourSize.height > extentSize.height ?
+                ourSize.height :
+                extentSize.height);
             parentComponent.setPreferredSize(new Dimension(x,y));
             viewport.setViewSize(new Dimension(x,y));
             parentComponent.doLayout();
             parentScrollPane.doLayout();
         }
     }
-    
+
     public void componentMoved(ComponentEvent e) {
         // necessary to implement interface
     }
-    
+
     public void componentShown(ComponentEvent e) {
         // necessary to implement interface
     }
-    
+
     public void componentHidden(ComponentEvent e) {
         // necessary to implement interface
-    } 
+    }
 }
 

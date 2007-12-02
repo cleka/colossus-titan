@@ -12,12 +12,12 @@ import net.sf.colossus.server.Constants;
  */
 public class RevealedCreature
 {
-	private static final Logger LOGGER = Logger.getLogger(RevealedCreature.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(RevealedCreature.class.getName());
 
     private String creatureName;
     private String titanBaseName = null;
     private boolean dead = false;
-    
+
     // possible reasons why this creature was revealed:
     private boolean didRecruit = false;
     private boolean wasRecruited = false;
@@ -27,12 +27,13 @@ public class RevealedCreature
     private boolean wasSummoned = false;
     private boolean wasAcquired = false;
 
-    
     public RevealedCreature(String name)
     {
         if (name == null)
         {
-            LOGGER.log(Level.SEVERE, "Tried to create RevealedCreature with null name", (Throwable)null);
+            LOGGER.log(Level.SEVERE,
+                "Tried to create RevealedCreature with null name",
+                (Throwable)null);
             return;
         }
         this.creatureName = name;
@@ -46,7 +47,7 @@ public class RevealedCreature
     {
         titanBaseName = tbName;
     }
-    
+
     public String getName()
     {
         return titanBaseName != null ? titanBaseName : creatureName;
@@ -72,28 +73,29 @@ public class RevealedCreature
             return false;
         }
     }
-    
+
     public String toString()
     {
-        String infoString = getName() + ": "
-            + (didRecruit ? "did recruit; " : "")
-            + (wasRecruited ? "was recruited; " : "")
-            + (didTeleport ? "teleported; " : "")            
-//            + (didTowerTeleport ? "tower teleported; " : "")
-//            + (didTitanTeleport ? "titan teleported; " : "")
-            + (wasSummoned ? "was summoned; " : "")
-            + (wasAcquired ? "was acquired; " : "")
-            + (dead ? "is dead; " : "");
-         
+        String infoString = getName() + ": " +
+            (didRecruit ? "did recruit; " : "") +
+            (wasRecruited ? "was recruited; " : "") +
+            (didTeleport ? "teleported; " : "") //            + (didTowerTeleport ? "tower teleported; " : "")
+            //            + (didTitanTeleport ? "titan teleported; " : "")
+            +
+            (wasSummoned ? "was summoned; " : "") +
+            (wasAcquired ? "was acquired; " : "") + (dead ? "is dead; " : "");
+
         return infoString;
     }
-    
+
     public Chit toChit(int scale)
     {
         String name = getName();
         if (name == null)
         {
-            LOGGER.log(Level.SEVERE, "ERROR: revealedCreature.toChit, creature name null!", (Throwable)null);
+            LOGGER.log(Level.SEVERE,
+                "ERROR: revealedCreature.toChit, creature name null!",
+                (Throwable)null);
             return null;
         }
 
@@ -105,12 +107,12 @@ public class RevealedCreature
 
         return creature;
     }
-    
+
     public void setDidRecruit(boolean value)
     {
         this.didRecruit = value;
     }
-    
+
     public boolean didRecruit()
     {
         return didRecruit;
@@ -136,27 +138,27 @@ public class RevealedCreature
         return didTeleport;
     }
 
-/*    
-    public void setDidTowerTeleport(boolean value)
-    {
-        this.didTowerTeleport = value;
-    }
+    /*    
+     public void setDidTowerTeleport(boolean value)
+     {
+     this.didTowerTeleport = value;
+     }
 
-    public boolean didTowerTeleport()
-    {
-        return didTowerTeleport;
-    }
+     public boolean didTowerTeleport()
+     {
+     return didTowerTeleport;
+     }
 
-    public void setDidTitanTeleport(boolean value)
-    {
-        this.didTitanTeleport = value;
-    }
+     public void setDidTitanTeleport(boolean value)
+     {
+     this.didTitanTeleport = value;
+     }
 
-    public boolean didTitanTeleport()
-    {
-        return didTitanTeleport;
-    }
-*/
+     public boolean didTitanTeleport()
+     {
+     return didTitanTeleport;
+     }
+     */
     public void setWasSummoned(boolean value)
     {
         this.wasSummoned = value;
@@ -181,7 +183,7 @@ public class RevealedCreature
     {
         this.dead = value;
     }
-    
+
     public boolean isDead()
     {
         return dead;
@@ -192,7 +194,8 @@ public class RevealedCreature
     {
         if (reason == null)
         {
-            LOGGER.log(Level.SEVERE, "RevealedCreature.setReason: reason null!!", (Throwable)null);
+            LOGGER.log(Level.SEVERE,
+                "RevealedCreature.setReason: reason null!!", (Throwable)null);
             return;
         }
         if (reason.equals(Constants.reasonRecruited))
@@ -214,7 +217,9 @@ public class RevealedCreature
         }
         else
         {
-            LOGGER.log(Level.SEVERE, "RevealedCreature.setReason: unknown reason " + reason + "!!", (Throwable)null);
+            LOGGER.log(Level.SEVERE,
+                "RevealedCreature.setReason: unknown reason " + reason + "!!",
+                (Throwable)null);
         }
     }
 }

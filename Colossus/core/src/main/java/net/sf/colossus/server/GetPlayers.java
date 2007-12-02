@@ -48,6 +48,7 @@ import net.sf.colossus.client.ShowReadme;
 import net.sf.colossus.util.Options;
 import net.sf.colossus.util.ResourceLoader;
 
+
 /**
  * Class GetPlayers is a dialog used to enter players' 
  *   names, types, variant, etc.
@@ -58,9 +59,9 @@ import net.sf.colossus.util.ResourceLoader;
 
 
 public final class GetPlayers extends JFrame implements WindowListener,
-            ActionListener, ItemListener
+    ActionListener, ItemListener
 {
-	private static final Logger LOGGER = Logger.getLogger(GetPlayers.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(GetPlayers.class.getName());
 
     public static final String loadVariant = "Load External Variant";
 
@@ -91,7 +92,7 @@ public final class GetPlayers extends JFrame implements WindowListener,
 
         this.options = options;
         this.mutex = mutex;
-        
+
         setupTypeChoices();
 
         setBackground(Color.lightGray);
@@ -100,8 +101,8 @@ public final class GetPlayers extends JFrame implements WindowListener,
         Container mainPane = new Box(BoxLayout.Y_AXIS);
 
         JScrollPane mainScrollPane = new JScrollPane(mainPane,
-                JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-                JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+            JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+            JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 
         getContentPane().setLayout(new BorderLayout());
         getContentPane().add(mainScrollPane, BorderLayout.CENTER);
@@ -143,13 +144,12 @@ public final class GetPlayers extends JFrame implements WindowListener,
         addCheckbox(Options.autoStop, checkboxPane);
         addCheckbox(Options.autoQuit, checkboxPane);
 
-        
         String viewmodeName = options.getStringOption(Options.viewMode);
         if ( viewmodeName == null )
         {
-            viewmodeName = Options.viewableAll; 
+            viewmodeName = Options.viewableAll;
         }
-        
+
         JPanel viewModePane = new JPanel(new GridLayout(0, 2));
         viewModePane.setBorder(new TitledBorder("Viewability of legion and events"));
         optionPane.add(viewModePane);
@@ -163,7 +163,7 @@ public final class GetPlayers extends JFrame implements WindowListener,
         String eventExpiringVal = options.getStringOption(Options.eventExpiring);
         if ( eventExpiringVal == null )
         {
-            eventExpiringVal = "5"; 
+            eventExpiringVal = "5";
         }
 
         eventExpiringBox = new JComboBox(Options.eventExpiringChoices);
@@ -171,9 +171,9 @@ public final class GetPlayers extends JFrame implements WindowListener,
         eventExpiringBox.setSelectedItem(eventExpiringVal);
         viewModePane.add(new JLabel("Events expire after (turns):"));
         viewModePane.add(eventExpiringBox);
-        
+
         options.setOption(Options.viewMode, viewmodeName);
-        
+
         JPanel teleportPane = new JPanel(new GridLayout(0, 2));
         teleportPane.setBorder(new TitledBorder("Teleport"));
         optionPane.add(teleportPane);
@@ -199,7 +199,7 @@ public final class GetPlayers extends JFrame implements WindowListener,
 
         oldDelay = options.getIntOption(Options.aiDelay);
         if (oldDelay < Constants.MIN_AI_DELAY ||
-                oldDelay > Constants.MAX_AI_DELAY)
+            oldDelay > Constants.MAX_AI_DELAY)
         {
             oldDelay = Constants.DEFAULT_AI_DELAY;
         }
@@ -212,7 +212,7 @@ public final class GetPlayers extends JFrame implements WindowListener,
 
         oldLimit = options.getIntOption(Options.aiTimeLimit);
         if (oldLimit < Constants.MIN_AI_TIME_LIMIT ||
-                oldLimit > Constants.MAX_AI_TIME_LIMIT)
+            oldLimit > Constants.MAX_AI_TIME_LIMIT)
         {
             oldLimit = Constants.DEFAULT_AI_TIME_LIMIT;
         }
@@ -249,7 +249,7 @@ public final class GetPlayers extends JFrame implements WindowListener,
         // if we don't pass the JEditorPane ("readme"), 
         // it won't be updated when Variant changes.
         JScrollPane readmeScrollPane = ShowReadme.readmeContentScrollPane(
-                        readme, variantName);
+            readme, variantName);
         tabbedPane.addTab("Variant README", readmeScrollPane);
 
         JPanel gamePane = new JPanel();
@@ -291,7 +291,6 @@ public final class GetPlayers extends JFrame implements WindowListener,
         {
             setLocation(loadLocation);
         }
-
 
         addWindowListener(this);
         setVisible(true);
@@ -342,7 +341,7 @@ public final class GetPlayers extends JFrame implements WindowListener,
         // the number is chosen to be larger then the current choices but not
         // too large to cause havoc if the number of choices increases
         playerType.setMaximumRowCount(12);
-        
+
         String type = options.getStringOption(Options.playerType + i);
         if (type == null || type.length() == 0)
         {
@@ -432,7 +431,7 @@ public final class GetPlayers extends JFrame implements WindowListener,
             String name = (String)(playerNames[i].getSelectedItem());
             String type = (String)(playerTypes[i].getSelectedItem());
             if (name.length() > 0 && !name.equals(Constants.none) &&
-                    !type.equals(Constants.none))
+                !type.equals(Constants.none))
             {
                 // Force all network players to byClient.
                 if (type.equals(Constants.network))
@@ -447,8 +446,8 @@ public final class GetPlayers extends JFrame implements WindowListener,
 
                 // Make by* names unique by appending row number.
                 if (name.equals(Constants.byColor) ||
-                        name.equals(Constants.byType) ||
-                        name.equals(Constants.byClient)
+                    name.equals(Constants.byType) ||
+                    name.equals(Constants.byClient)
                     )
                 {
                     name = name + i;
@@ -456,7 +455,8 @@ public final class GetPlayers extends JFrame implements WindowListener,
                 // Duplicate names are not allowed.
                 if (names.contains(name))
                 {
-                    JOptionPane.showMessageDialog(this, "Duplicate player names!");
+                    JOptionPane.showMessageDialog(this,
+                        "Duplicate player names!");
                     options.clearPlayerInfo();
                     return;
                 }
@@ -469,7 +469,8 @@ public final class GetPlayers extends JFrame implements WindowListener,
         // Exit if there aren't enough unique player names.
         if (numPlayers < 1 || names.size() != numPlayers)
         {
-            JOptionPane.showMessageDialog(this, "Not enough different unique player names!");
+            JOptionPane.showMessageDialog(this,
+                "Not enough different unique player names!");
             options.clearPlayerInfo();
             return;
         }
@@ -497,7 +498,7 @@ public final class GetPlayers extends JFrame implements WindowListener,
         {
             // Set key to "load game" and value to savegame filename.
             options.setOption(Constants.loadGame,
-                    chooser.getSelectedFile().getPath());
+                chooser.getSelectedFile().getPath());
             dispose();
         }
     }
@@ -539,10 +540,10 @@ public final class GetPlayers extends JFrame implements WindowListener,
     {
         int maxPlayers = VariantSupport.getMaxPlayers();
         javax.swing.JFileChooser varChooser =
-                new JFileChooser(Constants.gameDataPath);
+            new JFileChooser(Constants.gameDataPath);
         varChooser.setFileFilter(new varFileFilter());
         varChooser.setDialogTitle(
-                "Choose your variant (or cancel for default game)");
+            "Choose your variant (or cancel for default game)");
         int returnVal = varChooser.showOpenDialog(this);
         if (returnVal == javax.swing.JFileChooser.APPROVE_OPTION)
         {
@@ -554,7 +555,7 @@ public final class GetPlayers extends JFrame implements WindowListener,
                 name = name.substring(0, name.lastIndexOf(Constants.varEnd));
                 options.setOption(Options.variant, name);
                 readme.setContentType((String)doc.getProperty(
-                        ResourceLoader.keyContentType));
+                    ResourceLoader.keyContentType));
                 readme.setDocument(doc);
                 if (maxPlayers != VariantSupport.getMaxPlayers())
                 {
@@ -587,8 +588,8 @@ public final class GetPlayers extends JFrame implements WindowListener,
         else if (e.getActionCommand().equals(Options.aiDelay))
         {
             final int newDelay = PickIntValue.pickIntValue(this,
-                    oldDelay, "Pick AI Delay (in ms)", Constants.MIN_AI_DELAY,
-                    Constants.MAX_AI_DELAY, 100, options);
+                oldDelay, "Pick AI Delay (in ms)", Constants.MIN_AI_DELAY,
+                Constants.MAX_AI_DELAY, 100, options);
             if (newDelay != oldDelay)
             {
                 options.setOption(Options.aiDelay, newDelay);
@@ -599,7 +600,7 @@ public final class GetPlayers extends JFrame implements WindowListener,
         {
             final int newLimit = PickIntValue.pickIntValue(this,
                 oldLimit, "Pick AI Time Limit (in s)",
-                Constants.MIN_AI_TIME_LIMIT, Constants.MAX_AI_TIME_LIMIT, 
+                Constants.MIN_AI_TIME_LIMIT, Constants.MAX_AI_TIME_LIMIT,
                 1, options);
             if (newLimit != oldLimit)
             {
@@ -614,7 +615,7 @@ public final class GetPlayers extends JFrame implements WindowListener,
             if (!(Constants.getVariantList().contains(varName)))
             {
                 String buttonName = varName.substring(0,
-                        varName.lastIndexOf(Constants.varEnd));
+                    varName.lastIndexOf(Constants.varEnd));
                 if (variantBox.getItemCount() > Constants.numVariants)
                 {
                     variantBox.removeItemAt(Constants.numVariants);
@@ -632,8 +633,8 @@ public final class GetPlayers extends JFrame implements WindowListener,
                 int maxPlayers = VariantSupport.getMaxPlayers();
                 String value = (String)variantBox.getSelectedItem();
                 if (VariantSupport.getVarName().equals(value +
-                        Constants.varEnd))
-                { // re-selecting the same ; do nothing
+                    Constants.varEnd))
+                {// re-selecting the same ; do nothing
                 }
                 else
                 { // selecting different ; remove all non-included
@@ -644,7 +645,7 @@ public final class GetPlayers extends JFrame implements WindowListener,
                     Document doc = VariantSupport.loadVariant(value, true);
                     options.setOption(Options.variant, value);
                     String prop = (String)doc.getProperty(
-                            ResourceLoader.keyContentType);
+                        ResourceLoader.keyContentType);
                     readme.setContentType(prop);
                     readme.setDocument(doc);
                     if (maxPlayers != VariantSupport.getMaxPlayers())
@@ -655,12 +656,12 @@ public final class GetPlayers extends JFrame implements WindowListener,
             }
             else if ( source == viewModeBox )
             {
-                String value = (String) viewModeBox.getSelectedItem();
+                String value = (String)viewModeBox.getSelectedItem();
                 options.setOption(Options.viewMode, value);
             }
             else if ( source == eventExpiringBox )
             {
-                String value = (String) eventExpiringBox.getSelectedItem();
+                String value = (String)eventExpiringBox.getSelectedItem();
                 options.setOption(Options.eventExpiring, value);
             }
             else
@@ -692,7 +693,7 @@ public final class GetPlayers extends JFrame implements WindowListener,
                         // If player type was changed away from none, also
                         // change player name to something else.
                         else if (playerNames[i].getSelectedItem().equals(
-                                Constants.none))
+                            Constants.none))
                         {
                             playerNames[i].setSelectedItem(Constants.byColor);
                         }
@@ -711,7 +712,7 @@ public final class GetPlayers extends JFrame implements WindowListener,
                         // If player type was changed away from none, also
                         // change player name to something else.
                         else if (playerTypes[i].getSelectedItem().equals(
-                                Constants.none))
+                            Constants.none))
                         {
                             playerTypes[i].setSelectedItem(Constants.anyAI);
                         }
@@ -746,12 +747,12 @@ public final class GetPlayers extends JFrame implements WindowListener,
             saveWindow.saveLocation(getLocation());
         }
         super.dispose();
-        synchronized(mutex)
+        synchronized (mutex)
         {
             mutex.notify();
         }
     }
-    
+
     /** Center this dialog on the screen.  Must be called after the dialog
      *  size has been set. */
     public void centerOnScreen()
@@ -760,7 +761,7 @@ public final class GetPlayers extends JFrame implements WindowListener,
         setLocation(new Point(d.width / 2 - getSize().width / 2,
             d.height / 2 - getSize().height / 2));
     }
-    
+
     public void windowActivated(WindowEvent e)
     {
         // nothing to do

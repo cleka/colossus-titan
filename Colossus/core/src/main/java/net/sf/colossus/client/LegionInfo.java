@@ -22,9 +22,9 @@ import net.sf.colossus.server.Creature;
 
 public final class LegionInfo
 {
-	private static final Logger LOGGER = Logger.getLogger(LegionInfo.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(LegionInfo.class.getName());
 
-	private Client client;
+    private Client client;
 
     /** immutable */
     private String markerId;
@@ -81,7 +81,7 @@ public final class LegionInfo
     {
         return isMyLegon;
     }
-    
+
     public int getHeight()
     {
         PredictSplitNode node = getNode();
@@ -248,7 +248,8 @@ public final class LegionInfo
 
     void merge(String splitoffId, int turn)
     {
-        LOGGER.log(Level.FINEST, "LegionInfo.merge() for " + markerId + " " + splitoffId);
+        LOGGER.log(Level.FINEST,
+            "LegionInfo.merge() for " + markerId + " " + splitoffId);
         getNode().merge(getNode(splitoffId), turn);
         // since this is potentially a merge of a 3-way split, be safe and 
         // find the node again
@@ -368,7 +369,7 @@ public final class LegionInfo
     {
         return getNode().numUncertainCreatures();
     }
-    
+
     /** Legions are sorted in descending order of known total point value,
      with the titan legion always coming first.  This is inconsistent
      with equals().  Really only useful for comparing own legions. */

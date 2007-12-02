@@ -13,7 +13,7 @@ public final class Glob
 {
     public static final String sep = " %@% ";
 
-    public static String glob(String sep, String [] a)
+    public static String glob(String sep, String[] a)
     {
         StringBuffer sb = new StringBuffer();
         for (int i = 0; i < a.length - 1; i++)
@@ -25,12 +25,12 @@ public final class Glob
         return sb.toString();
     }
 
-    public static String glob(String [] a)
+    public static String glob(String[] a)
     {
         return Glob.glob(Glob.sep, a);
     }
 
-    public static String glob(String sep, int [] a)
+    public static String glob(String sep, int[] a)
     {
         StringBuffer sb = new StringBuffer();
         for (int i = 0; i < a.length - 1; i++)
@@ -42,7 +42,7 @@ public final class Glob
         return sb.toString();
     }
 
-    public static String glob(int [] a)
+    public static String glob(int[] a)
     {
         return Glob.glob(Glob.sep, a);
     }

@@ -28,7 +28,7 @@ import net.sf.colossus.util.ResourceLoader;
 public final class ShowReadme
 {
     private static JFrame viewFrame;
-    
+
     ShowReadme(IOptions options)
     {
         // primitive way to avoid having more than one. How to do better?
@@ -38,8 +38,8 @@ public final class ShowReadme
             viewFrame = null;
         }
 
-        String variantName = options.getStringOption(Options.variant);        
-                
+        String variantName = options.getStringOption(Options.variant);
+
         // XXX Make sure chosen variant is in the list.
         // XXX2 Same code in GetPlayer.java
         if (variantName == null || variantName.length() == 0)
@@ -49,29 +49,28 @@ public final class ShowReadme
         }
 
         String title = new String("README for variant " + variantName);
-        
+
         viewFrame = new JFrame(title);
-       
+
         JEditorPane readme = new JEditorPane();
-        
+
         JScrollPane content = readmeContentScrollPane(readme, variantName);
         viewFrame.getContentPane().add(content);
         viewFrame.pack();
         viewFrame.setVisible(true);
     }
 
-    
     /**
      * Return a scrollable pane that displays the Readme.
      * Also used by GetPlayer.java
-     */  
+     */
     public static final JScrollPane readmeContentScrollPane(
-            JEditorPane readme, String variantName)
+        JEditorPane readme, String variantName)
     {
         JPanel readmePane = new JPanel();
         JScrollPane readmeScrollPane = new JScrollPane(readmePane,
-                JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-                JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+            JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+            JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         readmePane.setLayout(new GridLayout(0, 1));
         readme.setEditable(false);
         // Must be tall enough for biggest variant readme file.
@@ -88,7 +87,7 @@ public final class ShowReadme
 
         Document doc = VariantSupport.loadVariant(variantName, true);
         readme.setContentType((String)doc.getProperty(
-                ResourceLoader.keyContentType));
+            ResourceLoader.keyContentType));
         readme.setDocument(doc);
 
         return readmeScrollPane;

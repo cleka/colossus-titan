@@ -17,14 +17,13 @@ import java.util.logging.Logger;
  */
 final class PenaltyOption implements Comparable
 {
-	private static final Logger LOGGER = Logger.getLogger(PenaltyOption.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(PenaltyOption.class.getName());
 
     private Critter striker;
     private Critter target;
     private Set carryTargets = new HashSet();    // of hexLabels
     private int dice;
     private int strikeNumber;
-
 
     PenaltyOption(Critter striker, Critter target, int dice, int strikeNumber)
     {
@@ -34,10 +33,11 @@ final class PenaltyOption implements Comparable
         this.strikeNumber = strikeNumber;
         if (striker == target)
         {
-            LOGGER.log(Level.SEVERE, "Penalty option with striker and target identical!", (Throwable)null);
+            LOGGER.log(Level.SEVERE,
+                "Penalty option with striker and target identical!",
+                (Throwable)null);
         }
     }
-
 
     Critter getStriker()
     {
@@ -80,7 +80,6 @@ final class PenaltyOption implements Comparable
     {
         return carryTargets.size();
     }
-
 
     /** Sort first by ascending dice, then by descending strike number,
      *  then by striker and target.  Do not consider carryTargets. */
@@ -152,7 +151,7 @@ final class PenaltyOption implements Comparable
         sb.append(strikeNumber);
         if (!carryTargets.isEmpty())
         {
-            sb.append(", able to carry to "); 
+            sb.append(", able to carry to ");
             Iterator it = carryTargets.iterator();
             boolean first = true;
             while (it.hasNext())

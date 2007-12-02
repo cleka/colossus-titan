@@ -3,6 +3,7 @@
  */
 package net.sf.colossus.client;
 
+
 import java.awt.Color;
 import java.awt.Dimension;
 import java.util.Iterator;
@@ -16,37 +17,38 @@ import javax.swing.JLabel;
 import net.sf.colossus.util.HTMLColor;
 import net.sf.colossus.util.Options;
 
+
 public final class LegionInfoPanel extends JPanel
 {
     private String valueText = "";
-   
-    public LegionInfoPanel(LegionInfo legion, int scale, int margin, 
-            int padding, boolean usePlayerColor, int viewMode, 
-            String playerName, boolean dubiousAsBlanks)
+
+    public LegionInfoPanel(LegionInfo legion, int scale, int margin,
+        int padding, boolean usePlayerColor, int viewMode,
+        String playerName, boolean dubiousAsBlanks)
     {
         boolean contentCertain = false;
         boolean hideAll = false;
-        
+
         if ( viewMode == Options.viewableAllNum )
         {
             contentCertain = true;
             viewAll(legion, usePlayerColor, scale, margin, padding,
-                    dubiousAsBlanks, hideAll);
+                dubiousAsBlanks, hideAll);
         }
         else if ( viewMode == Options.viewableOwnNum )
         {
-            String legionOwner = legion.getPlayerName();   
+            String legionOwner = legion.getPlayerName();
             if ( playerName.equals(legionOwner) )
             {
                 contentCertain = true;
                 viewAll(legion, usePlayerColor, scale, margin, padding,
-                        dubiousAsBlanks, hideAll);
+                    dubiousAsBlanks, hideAll);
             }
             else
             {
                 hideAll = true;
                 viewAll(legion, usePlayerColor, scale, margin, padding,
-                        false, hideAll);
+                    false, hideAll);
             }
         }
         else if ( viewMode == Options.viewableEverNum )
@@ -56,13 +58,13 @@ public final class LegionInfoPanel extends JPanel
             // thus we can use the splitPrediction to decide what is
             // "has ever been shown or can be concluded".
             viewAll(legion, usePlayerColor, scale, margin, padding,
-                    dubiousAsBlanks, hideAll);
-        } 
-        else 
+                dubiousAsBlanks, hideAll);
+        }
+        else
         {
             viewOtherText("not implemented...");
         }
-        
+
         if (contentCertain)
         {
             int value = legion.getPointValue();
@@ -82,7 +84,7 @@ public final class LegionInfoPanel extends JPanel
                 value = legion.getCertainPointValue();
                 numUC = legion.numUncertainCreatures();
             }
-            
+
             String ucString = "";
             if (numUC > 0)
             {
@@ -96,7 +98,7 @@ public final class LegionInfoPanel extends JPanel
                 // substring so that StringBuffer gets released.
                 ucString = uncertainIndicator.substring(0);
             }
-            
+
             valueText = " (" + value + ucString + " points)";
         }
     }
@@ -105,7 +107,7 @@ public final class LegionInfoPanel extends JPanel
     {
         return valueText;
     }
-    
+
     private void viewOtherText(String text)
     {
         add(new JLabel(text));
@@ -115,31 +117,32 @@ public final class LegionInfoPanel extends JPanel
         int margin, int padding, boolean dubiousAsBlanks, boolean hideAll)
     {
         setLayout(null);
-        
-        if(usePlayerColor)
+
+        if (usePlayerColor)
         {
             Color playerColor =
-            HTMLColor.stringToColor(legion.getPlayerInfo().getColor() + 
+                HTMLColor.stringToColor(legion.getPlayerInfo().getColor() +
                 "Colossus");
             setBackground(playerColor);
         }
 
         int i = 0;
         int effectiveChitSize = 0; // Chit treats scale as a hint, 
-                                   // actual size might differ
+        // actual size might differ
 
         // We could add the marker, if we want:
         boolean showMarker = false;
         if (showMarker)
         {
-            Chit marker = new Chit(scale, legion.getMarkerId(), 
-                                   false, true, false);
-            if (effectiveChitSize == 0) 
+            Chit marker = new Chit(scale, legion.getMarkerId(),
+                false, true, false);
+            if (effectiveChitSize == 0)
             {
                 effectiveChitSize = marker.getWidth(); // they should be all the same size
             }
             add(marker);
-            marker.setLocation(i * (effectiveChitSize + padding) + margin, margin);
+            marker.setLocation(i * (effectiveChitSize + padding) + margin,
+                margin);
             i++;
         }
 
@@ -160,7 +163,7 @@ public final class LegionInfoPanel extends JPanel
             while (iIt.hasNext())
             {
                 String imageName = (String)iIt.next();
-                Boolean sure = (Boolean) cIt.next();
+                Boolean sure = (Boolean)cIt.next();
                 if (sure.booleanValue())
                 {
                     cNames.add(imageName);
@@ -172,13 +175,13 @@ public final class LegionInfoPanel extends JPanel
                     ucCertain.add(sure);
                 }
             }
-            
+
             imageNames.clear();
             imageNames.addAll(cNames);
             imageNames.addAll(ucNames);
             cNames.clear();
             ucNames.clear();
-            
+
             certain.clear();
             certain.addAll(cCertain);
             certain.addAll(ucCertain);
@@ -203,10 +206,10 @@ public final class LegionInfoPanel extends JPanel
             {
                 chit = new Chit(scale, imageName, false, !sure, dubiousAsBlanks);
             }
-            if (effectiveChitSize == 0) 
+            if (effectiveChitSize == 0)
             {
                 // they should be all the same size
-                effectiveChitSize = chit.getWidth(); 
+                effectiveChitSize = chit.getWidth();
             }
             add(chit);
             chit.setLocation(i * (effectiveChitSize + padding) + margin, margin);
@@ -218,9 +221,10 @@ public final class LegionInfoPanel extends JPanel
         {
             add(Box.createRigidArea(new Dimension(scale, scale)));
         }
-        
-        setSize((legion.getImageNames().size()+(showMarker?1:0)) 
-                * (effectiveChitSize + padding) - padding + 2 * margin,
+
+        setSize((legion.getImageNames().size()+(showMarker?1:0)) *
+            (effectiveChitSize + padding) -
+                padding + 2 * margin,
                 effectiveChitSize + 2 * margin);
         setMinimumSize(getSize());
         setPreferredSize(getSize());

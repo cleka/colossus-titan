@@ -16,7 +16,6 @@ import com.werken.opt.CommandLine;
 import com.werken.opt.Option;
 
 
-
 /**
  *  Class Start contains code to start a hotseat game.
  *  @version $Id$
@@ -25,7 +24,7 @@ import com.werken.opt.Option;
 
 public final class Start
 {
-	private static final Logger LOGGER = Logger.getLogger(Start.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(Start.class.getName());
 
     private static void usage(com.werken.opt.Options opts)
     {
@@ -37,7 +36,6 @@ public final class Start
             LOGGER.log(Level.INFO, opt.toString());
         }
     }
-
 
     // TODO Detect contradictory options.
     private static void startClient(CommandLine cl)
@@ -95,25 +93,26 @@ public final class Start
 
         Object mutex = new Object();
         new GetPlayers(options, mutex);
-        synchronized(mutex)
+        synchronized (mutex)
         {
             try
-            { 
+            {
                 mutex.wait();
             }
-            catch(InterruptedException e) 
+            catch (InterruptedException e)
             {
-                LOGGER.log(Level.WARNING, "Start waiting for GetPlayers to complete, wait interrupted?");
+                LOGGER.log(Level.WARNING,
+                    "Start waiting for GetPlayers to complete, wait interrupted?");
             }
         }
         mutex = null;
-        
+
         String loadFilename = options.getStringOption(Constants.loadGame);
 
         if (options.isEmpty())
         {
-             // Bad input, or user selected Quit.
-             game.dispose();
+            // Bad input, or user selected Quit.
+            game.dispose();
         }
 
         // See if user hit the Load game button, and we should
@@ -138,7 +137,6 @@ public final class Start
         }
     }
 
-
     /** Modify options from command-line args if possible.  Clear
      *  options to abort if something is wrong. */
     private static void setupOptionsFromCommandLine(CommandLine cl, Game game)
@@ -162,7 +160,7 @@ public final class Start
             options.setOption(Options.autoQuit, false);
             options.setOption(Options.variant, Constants.variantArray[0]);
         }
-        
+
         if (cl.optIsSet('v'))
         {
             String variantName = cl.getOptValue('v');
@@ -225,7 +223,8 @@ public final class Start
         if (numHumans < 0 || numAIs < 0 || numNetworks < 0 ||
             numHumans + numAIs + numNetworks > Constants.MAX_MAX_PLAYERS)
         {
-            LOGGER.log(Level.SEVERE, "Illegal number of players", (Throwable)null);
+            LOGGER.log(Level.SEVERE, "Illegal number of players",
+                (Throwable)null);
             options.clear();
             return;
         }
@@ -243,7 +242,7 @@ public final class Start
             }
             else
             {
-//                name = Constants.byColor + i;
+                //                name = Constants.byColor + i;
                 name = Constants.byType + i;
             }
             options.setOption(Options.playerName + i, name);
@@ -258,19 +257,18 @@ public final class Start
         for (int k = numHumans + numNetworks;
             k < numAIs + numHumans + numNetworks; k++)
         {
-//            String name = Constants.byColor + k;
+            //            String name = Constants.byColor + k;
             String name = Constants.byType + k;
             options.setOption(Options.playerName + k, name);
             options.setOption(Options.playerType + k, Constants.defaultAI);
         }
     }
 
-
-
-    public static void main(String [] args)
+    public static void main(String[] args)
     {
-        LOGGER.log(Level.INFO, "Start for Colossus version " + Client.getVersion() +
-		" at " + new Date().getTime());
+        LOGGER.log(Level.INFO,
+            "Start for Colossus version " + Client.getVersion() +
+            " at " + new Date().getTime());
 
         com.werken.opt.Options opts = new com.werken.opt.Options();
         CommandLine cl = null;

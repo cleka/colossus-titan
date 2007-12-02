@@ -1,5 +1,6 @@
 package net.sf.colossus.util;
 
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -7,6 +8,7 @@ import java.io.IOException;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 
 /**
  * Class DevRandom generates random bits (same interface as class Random). 
@@ -21,7 +23,7 @@ import java.util.logging.Logger;
  */
 public class DevRandom extends Random
 {
-	private static final Logger LOGGER = Logger.getLogger(DevRandom.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(DevRandom.class.getName());
 
     final static String PRNG = "PRNG";
     private String source = null;
@@ -30,7 +32,7 @@ public class DevRandom extends Random
 
     private static String randomPropertyName = "net.sf.colossus.randomFile";
     private static String randomPropertySource = null;
-    
+
     public DevRandom()
     {
         super();
@@ -69,23 +71,26 @@ public class DevRandom extends Random
             String randomFile = System.getProperty(randomPropertyName);
             if ( randomFile != null )
             {
-                LOGGER.log(Level.FINEST, randomPropertyName
-				  +" is set to using random source: "+randomFile);
+                LOGGER.log(Level.FINEST,
+                    randomPropertyName +" is set to using random source: "+
+                    randomFile);
                 if (tryOneSource(randomFile))
                 {
                     randomPropertySource = randomFile;
-                    LOGGER.log(Level.FINEST, "RandomSource looks OK - using it: "+randomFile);
+                    LOGGER.log(Level.FINEST,
+                        "RandomSource looks OK - using it: "+randomFile);
                 }
                 // stays PRNG, i.e. falls back to default
             }
             return randomPropertySource;
         }
     }
-    
+
     private boolean tryOneSource(String src)
     {
-        if (src == null)
+        if (src == null) {
             return false;
+        }
 
         source = src;
         randomSource = new File(source);
@@ -116,14 +121,17 @@ public class DevRandom extends Random
             }
             catch (FileNotFoundException ex)
             {
-                LOGGER.log(Level.SEVERE, "Random source disappeared! " + ex, (Throwable)null);
+                LOGGER.log(Level.SEVERE, "Random source disappeared! " + ex,
+                    (Throwable)null);
                 System.exit(1);
             }
-            LOGGER.log(Level.FINEST, "Using " + source + " as the random source.");
+            LOGGER.log(Level.FINEST,
+                "Using " + source + " as the random source.");
         }
         else
         {
-            LOGGER.log(Level.FINEST, "Random source unavailable ! Falling back on a PRNG");
+            LOGGER.log(Level.FINEST,
+                "Random source unavailable ! Falling back on a PRNG");
         }
     }
 
@@ -146,14 +154,15 @@ public class DevRandom extends Random
         int size = (nbits + 7) >> 3;
         // works even in nbits == 32
         int mask = (1 << nbits) - 1;
-        byte [] bytes = new byte[size];
+        byte[] bytes = new byte[size];
         try
         {
             randStream.read(bytes);
         }
         catch (IOException ex)
         {
-            LOGGER.log(Level.SEVERE, "Problem reading from random source " + source, (Throwable)null);
+            LOGGER.log(Level.SEVERE,
+                "Problem reading from random source " + source, (Throwable)null);
             return super.next(bits);
         }
         int result = 0;
@@ -163,12 +172,13 @@ public class DevRandom extends Random
         }
 
         result = (result & mask);
+
         /*
-          String toto = "";
-          for (int i = 0; i < size; i++) toto = toto + "|" + bytes[i];
-          Log.debug("For " + source + ", array is " + toto + "|, result is " +
-                    result + ", bits is " + bits + ", mask is " + mask);
-        */
+         String toto = "";
+         for (int i = 0; i < size; i++) toto = toto + "|" + bytes[i];
+         Log.debug("For " + source + ", array is " + toto + "|, result is " +
+         result + ", bits is " + bits + ", mask is " + mask);
+         */
         return (result);
     }
 }

@@ -29,7 +29,7 @@ import net.sf.colossus.server.Constants;
  */
 
 final class PickEntrySide extends HexMap implements ActionListener,
-            WindowListener
+    WindowListener
 {
     private static JButton leftButton;
     private static JButton bottomButton;
@@ -82,7 +82,7 @@ final class PickEntrySide extends HexMap implements ActionListener,
     }
 
     static String pickEntrySide(JFrame parentFrame, String masterHexLabel,
-            Set sides)
+        Set sides)
     {
         if (sides.size() >= 2)
         {
@@ -118,17 +118,17 @@ final class PickEntrySide extends HexMap implements ActionListener,
             if (leftButton != null)
             {
                 leftButton.setBounds(cx + 1 * scale, cy + 1 * scale,
-                        d.width / 7, d.height / 16);
+                    d.width / 7, d.height / 16);
             }
             if (bottomButton != null)
             {
                 bottomButton.setBounds(cx + 1 * scale, cy + 21 * scale,
-                        d.width / 7, d.height / 16);
+                    d.width / 7, d.height / 16);
             }
             if (rightButton != null)
             {
                 rightButton.setBounds(cx + 19 * scale, cy + 11 * scale,
-                        d.width / 7, d.height / 16);
+                    d.width / 7, d.height / 16);
             }
 
             laidOut = true;

@@ -49,11 +49,11 @@ import net.sf.colossus.util.ResourceLoader;
  */
 
 public final class BattleMap extends HexMap implements MouseListener,
-        WindowListener
+    WindowListener
 {
-	private static final Logger LOGGER = Logger.getLogger(BattleMap.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(BattleMap.class.getName());
 
-	private Point location;
+    private Point location;
     private JFrame battleFrame;
     private JMenuBar menuBar;
     private JMenu phaseMenu;
@@ -127,13 +127,11 @@ public final class BattleMap extends HexMap implements MouseListener,
         // Do not call pack() or setVisible(true) until after
         // BattleDice is added to frame.
 
-        battleFrame.setTitle(client.getPlayerName() + ": "
-                + net.sf.colossus.server.Legion.getMarkerName(attackerMarkerId)
-                + " ("
-                + attackerMarkerId
-                + ") attacks "
-                + net.sf.colossus.server.Legion.getMarkerName(defenderMarkerId)
-                + " (" + defenderMarkerId + ") in " + masterHexLabel);
+        battleFrame.setTitle(client.getPlayerName() + ": " +
+            net.sf.colossus.server.Legion.getMarkerName(attackerMarkerId) +
+            " (" + attackerMarkerId + ") attacks " +
+            net.sf.colossus.server.Legion.getMarkerName(defenderMarkerId) +
+            " (" + defenderMarkerId + ") in " + masterHexLabel);
     }
 
     // Simple constructor for testing. 
@@ -342,7 +340,7 @@ public final class BattleMap extends HexMap implements MouseListener,
         return battleFrame;
     }
 
-    public void setPhase (Constants.BattlePhase newBattlePhase) 
+    public void setPhase(Constants.BattlePhase newBattlePhase)
     {
         if ( client.getPlayerName().equals(
             client.getBattleActivePlayerName()) )
@@ -356,7 +354,7 @@ public final class BattleMap extends HexMap implements MouseListener,
             infoPanel.setForeignPhase(newBattlePhase.toString());
         }
     }
-    
+
     public void setTurn(int newturn)
     {
         infoPanel.turnPanel.advTurn(newturn);
@@ -384,7 +382,8 @@ public final class BattleMap extends HexMap implements MouseListener,
 
         if (image == null)
         {
-            LOGGER.log(Level.SEVERE, "ERROR: Couldn't find Colossus icon", (Throwable)null);
+            LOGGER.log(Level.SEVERE, "ERROR: Couldn't find Colossus icon",
+                (Throwable)null);
             dispose();
         }
         else
@@ -740,7 +739,6 @@ public final class BattleMap extends HexMap implements MouseListener,
         }
     }
 
-
     private class TurnPanel extends JPanel
     {
 
@@ -751,6 +749,7 @@ public final class BattleMap extends HexMap implements MouseListener,
         {
             this(client.getMaxBattleTurns());
         }
+
         private TurnPanel(int MAXBATTLETURNS)
         {
             super(new GridLayout( (MAXBATTLETURNS + 1) % 8 + 1, 0));
@@ -777,7 +776,7 @@ public final class BattleMap extends HexMap implements MouseListener,
                 }
             }
             turnNumber = 0;
-            
+
             for ( int i = 0; i < turn.length; i++ )
             {
                 this.add(turn[i]);
@@ -816,13 +815,13 @@ public final class BattleMap extends HexMap implements MouseListener,
             if (thick == 3)
             {
                 turn.setBorder(BorderFactory.createLineBorder(Color.GRAY,3));
-            } 
+            }
             else
             {
                 if (thick == 5)
                 {
                     turn.setBorder(BorderFactory.createLineBorder(Color.RED,5));
-                } 
+                }
                 else
                 {
                     turn.setBorder(BorderFactory.createLineBorder(Color.BLACK));
@@ -849,7 +848,7 @@ public final class BattleMap extends HexMap implements MouseListener,
 
             phaseLabel = new JLabel("- phase -");
             add(phaseLabel, BorderLayout.EAST);
-            
+
             turnPanel = new TurnPanel();
             add(turnPanel, BorderLayout.CENTER);
         }

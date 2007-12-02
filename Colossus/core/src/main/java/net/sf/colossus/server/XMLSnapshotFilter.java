@@ -10,11 +10,9 @@ import java.io.*;
  * @version $Id$
  */
 
-public final class XMLSnapshotFilter extends javax.swing.filechooser.FileFilter
-    implements FilenameFilter
+public final class XMLSnapshotFilter extends javax.swing.filechooser.FileFilter implements FilenameFilter
 {
     public static final String description = "snapshots";
-
 
     public boolean accept(File dir, String name)
     {

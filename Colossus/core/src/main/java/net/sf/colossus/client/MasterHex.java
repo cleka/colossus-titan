@@ -84,14 +84,14 @@ public class MasterHex extends Hex
         {
             int count = HexMap.getHazardCountInTerrain(hazard[i], terrain);
             if (BattleHex.isNativeBonusHazard(hazard[i]) &&
-                    creature.isNativeTerrain(hazard[i]))
+                creature.isNativeTerrain(hazard[i]))
             {
                 bonusHazardCount += count;
             }
             else
             {
                 if (BattleHex.isNonNativePenaltyHazard(hazard[i]) &&
-                        !creature.isNativeTerrain(hazard[i]))
+                    !creature.isNativeTerrain(hazard[i]))
                 {
                     bonusHazardCount -= count;
                 }
@@ -102,25 +102,25 @@ public class MasterHex extends Hex
         for (int i = 0; i < hazardSide.length; i++)
         {
             int count =
-                    net.sf.colossus.client.HexMap.getHazardSideCountInTerrain(
-                    hazardSide[i],
-                    terrain);
+                net.sf.colossus.client.HexMap.getHazardSideCountInTerrain(
+                hazardSide[i],
+                terrain);
             if (BattleHex.isNativeBonusHexside(hazardSide[i]) &&
-                    creature.isNativeHexside(hazardSide[i]))
+                creature.isNativeHexside(hazardSide[i]))
             {
                 bonusHazardSideCount += count;
             }
             else
             {
                 if (BattleHex.isNonNativePenaltyHexside(hazardSide[i]) &&
-                        !creature.isNativeHexside(hazardSide[i]))
+                    !creature.isNativeHexside(hazardSide[i]))
                 {
                     bonusHazardSideCount -= count;
                 }
             }
         }
         if (((bonusHazardCount + bonusHazardSideCount) > 0) &&
-                ((bonusHazardCount >= 3) || (bonusHazardSideCount >= 5)))
+            ((bonusHazardCount >= 3) || (bonusHazardSideCount >= 5)))
         {
             return true;
         }
@@ -129,13 +129,13 @@ public class MasterHex extends Hex
 
     public MasterHex getNeighbor(int i)
     {
-    	assert (i>=0) && (i<=5) : "Neighbor index out of range";
+        assert (i>=0) && (i<=5) : "Neighbor index out of range";
         return neighbors[i];
     }
 
     void setNeighbor(int i, MasterHex hex)
     {
-    	assert (i>=0) && (i<=5) : "Neighbor index out of range";
+        assert (i>=0) && (i<=5) : "Neighbor index out of range";
         neighbors[i] = hex;
     }
 

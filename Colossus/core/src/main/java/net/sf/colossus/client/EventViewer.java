@@ -38,6 +38,7 @@ import javax.swing.border.TitledBorder;
 import net.sf.colossus.util.KDialog;
 import net.sf.colossus.util.Options;
 
+
 /**
  * Event Revealing dialog.
  *
@@ -74,33 +75,33 @@ import net.sf.colossus.util.Options;
  */
 
 final class EventViewer extends KDialog implements WindowListener,
-ItemListener, ActionListener
+    ItemListener, ActionListener
 {
-	private static final Logger LOGGER = Logger.getLogger(EventViewer.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(EventViewer.class.getName());
 
-	private IOptions options;
-    
+    private IOptions options;
+
     private boolean visible;
-    
+
     private List syncdEventList = Collections.synchronizedList(new ArrayList());
-    
+
     private int turnNr;
     private int playerNr;
-    
+
     // how long back are they kept (from global settings)
     private int expireTurns;
     private String maxString;
-    
+
     private SaveWindow saveWindow;
 
     private final static String windowTitle = "Event Viewer";
 
     private Container eventPane;
-    
+
     private Box settingsPane;
-        
+
     private JScrollPane eventScrollPane;
-        
+
     private JScrollBar eventScrollBar;
 
     // Event Viewer Filter (evf) settings (= option names):
@@ -113,22 +114,22 @@ ItemListener, ActionListener
     public static final String evfLoser = "Engagement lost events";
     public static final String evfMulligan = "Mulligans";
     public static final String evfMoveRoll = "Movement rolls";
-    
+
     public static final String evfTurnChange = "Turn change info";
     public static final String evfPlayerChange = "Player change info";
 
     public static final String evAutoScroll = "Auto-scroll to end";
     public static final String evHideUndone = "Hide undone events";
     public static final String evMaxTurns = "Maximum number of turns to display";
-    
+
     // boolean flags for them as local flags for quick access:
     // Index for this are the EventXXX constants in RevealEvent.java.
     private boolean[] showEventType;
-    
+
     private boolean autoScroll;
     private boolean hideUndoneEvents;
     private JComboBox maxTurnsDisplayExpiringBox;
-    
+
     // how many back are currently displayed
     private int maxTurns = 1;
 
@@ -141,7 +142,7 @@ ItemListener, ActionListener
      * @expireTurns events older than that are deleted from list
      */
 
-        
+
     EventViewer(final JFrame frame, final IOptions options)
     {
         super(frame, windowTitle, false);
@@ -150,38 +151,45 @@ ItemListener, ActionListener
         this.options = options;
 
         initExpireTurnsFromOptions();
-        
+
         showEventType = new boolean[RevealEvent.NUMBEROFEVENTS];
-        showEventType[RevealEvent.eventRecruit] = getBoolOption(evfRecruit, true);
+        showEventType[RevealEvent.eventRecruit] = getBoolOption(evfRecruit,
+            true);
         showEventType[RevealEvent.eventSplit] = getBoolOption(evfSplit, true);
-        showEventType[RevealEvent.eventTeleport] = getBoolOption(evfTeleport, true);
+        showEventType[RevealEvent.eventTeleport] = getBoolOption(evfTeleport,
+            true);
         showEventType[RevealEvent.eventSummon] = getBoolOption(evfSummon, true);
-        showEventType[RevealEvent.eventAcquire] = getBoolOption(evfAcquire, true);
+        showEventType[RevealEvent.eventAcquire] = getBoolOption(evfAcquire,
+            true);
         showEventType[RevealEvent.eventWon] = getBoolOption(evfWon, true);
         showEventType[RevealEvent.eventLost] = getBoolOption(evfLoser, true);
 
-        showEventType[RevealEvent.eventMulligan] = getBoolOption(evfMulligan, true);
-        showEventType[RevealEvent.eventMoveRoll] = getBoolOption(evfMoveRoll, true);
-        
-        showEventType[RevealEvent.eventTurnChange] = getBoolOption(evfTurnChange, true);
-        showEventType[RevealEvent.eventPlayerChange] = getBoolOption(evfPlayerChange, false);
-        
+        showEventType[RevealEvent.eventMulligan] = getBoolOption(evfMulligan,
+            true);
+        showEventType[RevealEvent.eventMoveRoll] = getBoolOption(evfMoveRoll,
+            true);
+
+        showEventType[RevealEvent.eventTurnChange] = getBoolOption(evfTurnChange,
+            true);
+        showEventType[RevealEvent.eventPlayerChange] = getBoolOption(evfPlayerChange,
+            false);
+
         autoScroll = getBoolOption(evAutoScroll, true);
         hideUndoneEvents = getBoolOption(evHideUndone, false);
-        
+
         setupGUI();
-        
+
         setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
-        this.addWindowListener(new WindowAdapter() 
+        this.addWindowListener(new WindowAdapter()
+        {
+            public void windowClosing(WindowEvent e)
             {
-                public void windowClosing(WindowEvent e) 
-                {
-                    options.setOption(Options.showEventViewer, false);
-                }
+                options.setOption(Options.showEventViewer, false);
             }
+        }
         );
 
-        this.saveWindow = new SaveWindow(options, windowTitle);        
+        this.saveWindow = new SaveWindow(options, windowTitle);
         setVisibleMaybe();
     }
 
@@ -200,7 +208,7 @@ ItemListener, ActionListener
             else
             {
                 int exp;
-                try 
+                try
                 {
                     exp = Integer.parseInt(expOption);
                     if (exp > 0 && exp < 9999)
@@ -209,14 +217,20 @@ ItemListener, ActionListener
                     }
                     else
                     {
-                        LOGGER.log(Level.SEVERE, "Invalid value "+exp +" from option '"+
-						Options.eventExpiring+"' - using default " + turnsToKeep, (Throwable)null);
+                        LOGGER.log(Level.SEVERE,
+                            "Invalid value "+exp +" from option '"+
+                            Options.eventExpiring+"' - using default " +
+                            turnsToKeep,
+                            (Throwable)null);
                     }
                 }
-                catch(NumberFormatException e)
+                catch (NumberFormatException e)
                 {
-                    LOGGER.log(Level.SEVERE, "Invalid value "+ expOption +" from option '"+
-					Options.eventExpiring + "' - using default " + turnsToKeep, (Throwable)null);
+                    LOGGER.log(Level.SEVERE,
+                        "Invalid value "+ expOption +" from option '"+
+                        Options.eventExpiring + "' - using default " +
+                        turnsToKeep,
+                        (Throwable)null);
                 }
             }
         }
@@ -226,7 +240,7 @@ ItemListener, ActionListener
     private boolean getBoolOption(String name, boolean defaultVal)
     {
         boolean bVal = defaultVal;
-        
+
         String sVal = options.getStringOption(name);
         if (sVal == null)
         {
@@ -236,10 +250,10 @@ ItemListener, ActionListener
         {
             bVal = sVal.equals("true");
         }
-        
+
         return bVal;
     }
-    
+
     private void addCheckbox(String optname, Container pane)
     {
         JCheckBox cb = new JCheckBox(optname);
@@ -261,23 +275,23 @@ ItemListener, ActionListener
         Box eventTabPane = new Box(BoxLayout.Y_AXIS);
         tabbedPane.addTab("Events", eventTabPane);
         eventTabPane.setAlignmentX(Component.LEFT_ALIGNMENT);
-        eventTabPane.setPreferredSize(new Dimension(250, 500));      
-        
+        eventTabPane.setPreferredSize(new Dimension(250, 500));
+
         eventPane = new Box(BoxLayout.Y_AXIS);
         eventTabPane.setAlignmentX(Component.LEFT_ALIGNMENT);
         //eventPane.setPreferredSize(new Dimension(200, 200));
-        
+
         eventScrollPane = new JScrollPane(eventPane,
-                JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
-                JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+            JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
+            JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         eventTabPane.add(eventScrollPane);
 
         eventScrollBar = eventScrollPane.getVerticalScrollBar();
-        
+
         // eventScrollPane.setPreferredSize(new Dimension(200, 380));
-        
+
         eventPane.add(Box.createVerticalGlue());
-                
+
         // The settings:
         settingsPane = new Box(BoxLayout.Y_AXIS);
         tabbedPane.addTab("Settings", settingsPane);
@@ -285,7 +299,7 @@ ItemListener, ActionListener
         JPanel checkboxPane = new JPanel(new GridLayout(0,1));
         checkboxPane.setAlignmentX(Component.LEFT_ALIGNMENT);
         checkboxPane.setBorder(new TitledBorder("Event Filter"));
-//        checkboxPane.setMinimumSize(new Dimension(200, 100));
+        //        checkboxPane.setMinimumSize(new Dimension(200, 100));
         checkboxPane.setPreferredSize(new Dimension(200, 300));
         checkboxPane.setMaximumSize(new Dimension(600, 300));
         settingsPane.add(checkboxPane);
@@ -301,13 +315,12 @@ ItemListener, ActionListener
         checkboxPane.add(Box.createRigidArea(new Dimension(0,5)));
         addCheckbox(evHideUndone, checkboxPane);
         checkboxPane.add(Box.createRigidArea(new Dimension(0,5)));
-        
+
         addCheckbox(evfMulligan, checkboxPane);
         addCheckbox(evfMoveRoll, checkboxPane);
         addCheckbox(evfTurnChange, checkboxPane);
         addCheckbox(evfPlayerChange, checkboxPane);
 
-        
         JPanel miscPane = new JPanel(new GridLayout(0,2));
         miscPane.setAlignmentX(Component.LEFT_ALIGNMENT);
         miscPane.setBorder(new TitledBorder("Other Settings"));
@@ -318,14 +331,13 @@ ItemListener, ActionListener
 
         settingsPane.add(Box.createVerticalGlue());
         settingsPane.add(Box.createRigidArea(new Dimension(0,5)));
-       
+
         addCheckbox(evAutoScroll, miscPane);
         miscPane.add(Box.createRigidArea(new Dimension(0,5)));
 
-        
         // selection for how many turns to display the data
         // (must be less or equal the expireTurns value set in getPlayers)
-        
+
         int maxVal = this.expireTurns == -1 ? 1000 : this.expireTurns;
 
         ArrayList alChoices = new ArrayList();
@@ -337,10 +349,11 @@ ItemListener, ActionListener
             {
                 alChoices.add(new Integer(i).toString());
             }
+
             /* right now: no big values due to performance issues...
-            // 10, 50, 100, 500, 1000 if applicable.
-            else if (i==10 || i==50 || i==100 || i==500 || i==1000)
-            */
+             // 10, 50, 100, 500, 1000 if applicable.
+             else if (i==10 || i==50 || i==100 || i==500 || i==1000)
+             */
             else if (i==10)
             {
                 alChoices.add(new Integer(i).toString());
@@ -355,19 +368,20 @@ ItemListener, ActionListener
             maxString = "max (="+this.expireTurns+")";
             alChoices.add(maxString);
         }
-                
-        Object[] Choices = alChoices.toArray(); 
+
+        Object[] Choices = alChoices.toArray();
 
         // read user's setting for this, but cannot exceed the Game's
         // general setting.
-        String maxTurnsOptString = 
+        String maxTurnsOptString =
             options.getStringOption(evMaxTurns);
         if (maxTurnsOptString == null )
         {
             maxTurnsOptString = "3";
         }
-        
-        if (maxTurnsOptString.equals("all") || maxTurnsOptString.startsWith("max"))
+
+        if (maxTurnsOptString.equals("all") ||
+            maxTurnsOptString.startsWith("max"))
         {
             if (this.expireTurns == -1)
             {
@@ -392,10 +406,11 @@ ItemListener, ActionListener
                     maxTurnsOptString = new Integer(maxTurnsOpt).toString();
                 }
             }
-            catch(NumberFormatException e)
+            catch (NumberFormatException e)
             {
-                LOGGER.log(Level.SEVERE, "Illegal value '"+maxTurnsOptString + "' for option '" + 
-				evMaxTurns + "' - using default 1", (Throwable)null);
+                LOGGER.log(Level.SEVERE,
+                    "Illegal value '"+maxTurnsOptString + "' for option '" +
+                    evMaxTurns + "' - using default 1", (Throwable)null);
                 maxTurnsOptString = "1";
                 maxTurnsOpt = 1;
             }
@@ -407,13 +422,12 @@ ItemListener, ActionListener
         miscPane.add(new JLabel("Display max. (turns):"));
         miscPane.add(maxTurnsDisplayExpiringBox);
 
-        
         // add all to the main contentPane
         Container contentPane = this.getContentPane();
         contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
         contentPane.add(tabbedPane);
         contentPane.validate();
-        
+
         this.pack();
     }
 
@@ -423,28 +437,30 @@ ItemListener, ActionListener
         int oldPlayerNr  = e.getPlayerNr();
 
         if ( maxTurns != -1 &&
-               turnNr-oldEventTurn > maxTurns-(playerNr>=oldPlayerNr?1:0))
+            turnNr-oldEventTurn > maxTurns-(playerNr>=oldPlayerNr?1:0))
         {
-//            Log.debug("Not displaying event "+e.getEventTypeText()+" "+
-//                      e.getMarkerId() + " - older than max turns value!");
+            //            Log.debug("Not displaying event "+e.getEventTypeText()+" "+
+            //                      e.getMarkerId() + " - older than max turns value!");
             return true;
         }
         return false;
     }
-    
+
     private boolean isEventRelevant(RevealEvent e)
     {
         int type = e.getEventType();
         boolean display = true;
-        
+
         if ( !showEventType[type] )
         {
             display = false;
         }
         else if ( hideUndoneEvents && e.wasUndone())
         {
-          LOGGER.log(Level.FINEST, "Not displaying event "+e.getEventTypeText()+" "+e.getMarkerId() +
-		  " - was undone and hideUndoneEvents is true.");
+            LOGGER.log(Level.FINEST,
+                "Not displaying event "+e.getEventTypeText()+" "+
+                e.getMarkerId() +
+                " - was undone and hideUndoneEvents is true.");
             display = false;
         }
         return display;
@@ -459,20 +475,21 @@ ItemListener, ActionListener
             pane.add(panelForEvent);
             pane.add(Box.createRigidArea(new Dimension(0,5)));
         }
-        else    
-        {   
-            LOGGER.log(Level.WARNING, "EventViewer.addEventToEventPane: event.toPanel returned null!");
+        else
+        {
+            LOGGER.log(Level.WARNING,
+                "EventViewer.addEventToEventPane: event.toPanel returned null!");
         }
     }
 
     private synchronized void addEventToList(RevealEvent e)
     {
-        synchronized(syncdEventList) 
+        synchronized (syncdEventList)
         {
             syncdEventList.add(e);
         }
     }
-    
+
     public void addEvent(RevealEvent e)
     {
         addEventToList(e);
@@ -500,14 +517,14 @@ ItemListener, ActionListener
      *                  remembered position.
      */
     private static int bookmark = 0;
-    
+
     private void updatePanels(boolean forceAll)
     {
         Container pane = this.eventPane;
 
         pane.removeAll();
-    
-        synchronized(syncdEventList)
+
+        synchronized (syncdEventList)
         {
             // if never expires, we never delete, so bookmark stays ok.
             // But if expiring is happening (!= -1) or force is given
@@ -517,19 +534,20 @@ ItemListener, ActionListener
             {
                 bookmark = 0;
             }
-            
+
             if (bookmark > syncdEventList.size())
             {
                 // sanity check...
-                LOGGER.log(Level.SEVERE, "bookmark " + bookmark + " out of range, size=" +
-				syncdEventList.size(), (Throwable)null);
+                LOGGER.log(Level.SEVERE,
+                    "bookmark " + bookmark + " out of range, size=" +
+                    syncdEventList.size(), (Throwable)null);
                 bookmark = 0;
             }
 
             ListIterator it = syncdEventList.listIterator(bookmark);
             while (it.hasNext())
             {
-                RevealEvent e = (RevealEvent) it.next();
+                RevealEvent e = (RevealEvent)it.next();
                 if (isEventTooOld(e))
                 {
                     bookmark++;
@@ -554,17 +572,17 @@ ItemListener, ActionListener
     {
         if (turnNr != this.turnNr)
         {
-            RevealEvent e = new RevealEvent(client, turnNr, playerNr, 
-                    RevealEvent.eventTurnChange, null, 0, null, null, 0);
+            RevealEvent e = new RevealEvent(client, turnNr, playerNr,
+                RevealEvent.eventTurnChange, null, 0, null, null, 0);
             addEvent(e);
         }
         if (playerNr != this.playerNr || turnNr != this.turnNr)
         {
-            RevealEvent e = new RevealEvent(client, turnNr, playerNr, 
-                    RevealEvent.eventPlayerChange, null, 0, null, null, 0);
+            RevealEvent e = new RevealEvent(client, turnNr, playerNr,
+                RevealEvent.eventPlayerChange, null, 0, null, null, 0);
             addEvent(e);
         }
-        
+
         this.turnNr = turnNr;
         this.playerNr = playerNr;
         if (this.expireTurns != -1)
@@ -575,7 +593,7 @@ ItemListener, ActionListener
                 updatePanels(true);
             }
         }
-        else   // expire turns -1 ==> no purging. 
+        else // expire turns -1 ==> no purging. 
         {
             if (this.maxTurns != -1)
             {
@@ -588,8 +606,6 @@ ItemListener, ActionListener
         }
     }
 
-    
-
     /*
      * User undid one action. Event is just marked as undone, but not deleted
      * - information once revealed is known to the public, as in real life :) 
@@ -599,7 +615,7 @@ ItemListener, ActionListener
         int found = 0;
         if (type == RevealEvent.eventSplit)
         {
-            synchronized(syncdEventList)
+            synchronized (syncdEventList)
             {
                 int last = syncdEventList.size();
                 ListIterator it = syncdEventList.listIterator(last);
@@ -607,9 +623,9 @@ ItemListener, ActionListener
                 {
                     RevealEvent e = (RevealEvent)it.previous();
                     if (e.getEventType() == type && e.getTurn() == turn &&
-                            e.getMarkerId().equals(parentId) &&
-                            e.getMarkerId2().equals(childId) && 
-                            ! e.wasUndone() )
+                        e.getMarkerId().equals(parentId) &&
+                        e.getMarkerId2().equals(childId) &&
+                        !e.wasUndone() )
                     {
                         found++;
                         e.setUndone(true);
@@ -625,7 +641,7 @@ ItemListener, ActionListener
             //       in those events?
             if (found == 0)
             {
-                synchronized(syncdEventList)
+                synchronized (syncdEventList)
                 {
                     int last = syncdEventList.size();
                     ListIterator it2 = syncdEventList.listIterator(last);
@@ -633,9 +649,9 @@ ItemListener, ActionListener
                     {
                         RevealEvent e = (RevealEvent)it2.previous();
                         if (e.getEventType() == type && e.getTurn()+1 == turn &&
-                                e.getMarkerId().equals(parentId) &&
-                                e.getMarkerId2().equals(childId) &&
-                                ! e.wasUndone() )
+                            e.getMarkerId().equals(parentId) &&
+                            e.getMarkerId2().equals(childId) &&
+                            !e.wasUndone() )
                         {
                             found++;
                             e.setUndone(true);
@@ -646,7 +662,7 @@ ItemListener, ActionListener
         }
         else if (type == RevealEvent.eventRecruit)
         {
-            synchronized(syncdEventList)
+            synchronized (syncdEventList)
             {
                 int last = syncdEventList.size();
                 ListIterator it = syncdEventList.listIterator(last);
@@ -654,8 +670,8 @@ ItemListener, ActionListener
                 {
                     RevealEvent e = (RevealEvent)it.previous();
                     if (e.getEventType() == type && e.getTurn() == turn &&
-                            e.getMarkerId().equals(parentId) &&
-                            ! e.wasUndone())
+                        e.getMarkerId().equals(parentId) &&
+                        !e.wasUndone())
                     {
                         found++;
                         e.setUndone(true);
@@ -665,7 +681,7 @@ ItemListener, ActionListener
         }
         else if (type == RevealEvent.eventSummon)
         {
-            synchronized(syncdEventList)
+            synchronized (syncdEventList)
             {
                 int last = syncdEventList.size();
                 ListIterator it = syncdEventList.listIterator(last);
@@ -673,8 +689,8 @@ ItemListener, ActionListener
                 {
                     RevealEvent e = (RevealEvent)it.previous();
                     if (e.getEventType() == type && e.getTurn() == turn &&
-                            e.getMarkerId().equals(parentId) && 
-                            ! e.wasUndone())
+                        e.getMarkerId().equals(parentId) &&
+                        !e.wasUndone())
                     {
                         found++;
                         e.setUndone(true);
@@ -684,7 +700,7 @@ ItemListener, ActionListener
         }
         else if (type == RevealEvent.eventTeleport)
         {
-            synchronized(syncdEventList)
+            synchronized (syncdEventList)
             {
                 int last = syncdEventList.size();
                 ListIterator it = syncdEventList.listIterator(last);
@@ -692,8 +708,8 @@ ItemListener, ActionListener
                 {
                     RevealEvent e = (RevealEvent)it.previous();
                     if (e.getEventType() == type && e.getTurn() == turn &&
-                            e.getMarkerId().equals(parentId) && 
-                            ! e.wasUndone())
+                        e.getMarkerId().equals(parentId) &&
+                        !e.wasUndone())
                     {
                         found++;
                         e.setUndone(true);
@@ -704,14 +720,16 @@ ItemListener, ActionListener
 
         else
         {
-            LOGGER.log(Level.WARNING, "undo event for unknown type "+type+" attempted.");
+            LOGGER.log(Level.WARNING,
+                "undo event for unknown type "+type+" attempted.");
             return;
         }
-       
+
         if (found == 0)
         {
             LOGGER.log(Level.SEVERE, "Requested '"+type+"' EVENT to undo ("+
-			parentId+", "+childId+", turn "+turn+") not found", (Throwable)null);
+                parentId+", "+childId+", turn "+turn+") not found",
+                (Throwable)null);
         }
 
         if (this.visible)
@@ -719,7 +737,7 @@ ItemListener, ActionListener
             updatePanels(false);
         }
     }
-    
+
     /* throw away all events which are expireTurns turns older
      * than the given turnNr/playerNr combination.
      */
@@ -732,7 +750,7 @@ ItemListener, ActionListener
         }
         int purged = 0;
 
-        synchronized(syncdEventList)
+        synchronized (syncdEventList)
         {
             Iterator it = syncdEventList.iterator();
             boolean done = false;
@@ -741,8 +759,9 @@ ItemListener, ActionListener
                 RevealEvent e = (RevealEvent)it.next();
                 int oldEventTurn = e.getTurn();
                 int oldPlayerNr  = e.getPlayerNr();
-            
-                if (turnNr-oldEventTurn > expireTurns-(playerNr>=oldPlayerNr?1:0))
+
+                if (turnNr-oldEventTurn >
+                    expireTurns-(playerNr>=oldPlayerNr?1:0))
                 {
                     it.remove();
                     purged++;
@@ -754,15 +773,15 @@ ItemListener, ActionListener
             }
         }
     }
-    
+
     public void cleanup()
     {
-        synchronized(syncdEventList)
+        synchronized (syncdEventList)
         {
             syncdEventList.clear();
         }
     }
-    
+
     public void dispose()
     {
         saveWindow.save(this);
@@ -775,7 +794,7 @@ ItemListener, ActionListener
         boolean visible = options.getOption(Options.showEventViewer);
         setVisible(visible);
     }
-    
+
     public void setVisible(boolean visible)
     {
         if (visible)
@@ -803,14 +822,14 @@ ItemListener, ActionListener
         }
         super.setVisible(visible);
     }
-    
+
     public synchronized void actionPerformed(ActionEvent e)
     {
         // A combo box was changed.
         Object source = e.getSource();
         if ( source == maxTurnsDisplayExpiringBox )
         {
-            String value = (String) maxTurnsDisplayExpiringBox.getSelectedItem();
+            String value = (String)maxTurnsDisplayExpiringBox.getSelectedItem();
             options.setOption(evMaxTurns, value);
             if (value.equals("all") || value.equals(maxString))
             {
@@ -823,7 +842,7 @@ ItemListener, ActionListener
             updatePanels(true);
         }
     }
-                
+
     public void itemStateChanged(ItemEvent e)
     {
         // one of the checkboxes was changed.
@@ -831,7 +850,7 @@ ItemListener, ActionListener
         String text = source.getText();
         boolean selected = (e.getStateChange() == ItemEvent.SELECTED);
         options.setOption(text, selected);
-        
+
         if (text.equals(evAutoScroll))
         {
             this.autoScroll = selected;
@@ -885,7 +904,7 @@ ItemListener, ActionListener
         {
             this.showEventType[RevealEvent.eventPlayerChange] = selected;
         }
-        
+
         updatePanels(false);
     }
 }

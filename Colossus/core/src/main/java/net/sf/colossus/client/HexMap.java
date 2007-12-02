@@ -43,9 +43,9 @@ import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
 public class HexMap extends JPanel implements MouseListener, WindowListener
 {
-	private static final Logger LOGGER = Logger.getLogger(HexMap.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(HexMap.class.getName());
 
-	private String masterHexLabel;
+    private String masterHexLabel;
     private String terrain;
 
     // GUI hexes need to be recreated for each object, since scale varies.
@@ -361,7 +361,9 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
         }
         catch (Exception e)
         {
-            LOGGER.log(Level.SEVERE, "Battleland " + terrain + " loading failed : " + e, (Throwable)null);
+            LOGGER.log(Level.SEVERE,
+                "Battleland " + terrain + " loading failed : " + e,
+                (Throwable)null);
             e.printStackTrace();
         }
     }
@@ -558,7 +560,8 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
             }
         }
 
-        LOGGER.log(Level.SEVERE, "Could not find GUIBattleHex " + label, (Throwable)null);
+        LOGGER.log(Level.SEVERE, "Could not find GUIBattleHex " + label,
+            (Throwable)null);
         return null;
     }
 
@@ -608,7 +611,8 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
                 return gameEntrances[y].getBattleHexModel();
 
             default:
-                LOGGER.log(Level.SEVERE, "Label " + label + " is invalid", (Throwable)null);
+                LOGGER.log(Level.SEVERE, "Label " + label + " is invalid",
+                    (Throwable)null);
         }
         y = 6 - y - Math.abs((x - 3) / 2);
         GUIBattleHex[][] correctHexes = (GUIBattleHex[][])terrainH.get(terrain);
@@ -758,18 +762,18 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
             // calculate needed space, set xPos so that it's drawn 
             // right-aligned 80 away from right window border.
             Rectangle2D bounds = fm.getStringBounds(dn, g);
-            int width = (int) bounds.getWidth();
+            int width = (int)bounds.getWidth();
             int windowWidth = super.getWidth();
             int xPos = windowWidth - 80 - width;
             g.drawString(dn, xPos, 4 + tma);
-            
+
             if (sub != null)
             {
                 g.setFont(ResourceLoader.defaultFont.deriveFont((float)24));
                 fm = g.getFontMetrics();
                 int tma2 = fm.getMaxAscent();
                 bounds = fm.getStringBounds(sub, g);
-                width = (int) bounds.getWidth();
+                width = (int)bounds.getWidth();
                 windowWidth = super.getWidth();
                 xPos = windowWidth - 80 - width;
                 g.drawString(sub, xPos, 4 + tma + 8 + tma2);

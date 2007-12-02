@@ -25,7 +25,7 @@ final class PickStrikePenalty extends KDialog implements ActionListener
     private SaveWindow saveWindow;
 
     PickStrikePenalty(JFrame parentFrame, Client client,
-            List choices)
+        List choices)
     {
         super(parentFrame, "Take strike penalty to carry?", true);
 

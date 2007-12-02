@@ -35,8 +35,8 @@ import net.sf.colossus.util.ResourceLoader;
 
 class Chit extends JPanel
 {
-	private static final Logger LOGGER = Logger.getLogger(Chit.class.getName());
-	
+    private static final Logger LOGGER = Logger.getLogger(Chit.class.getName());
+
     private Image bufferedImage;
     private Image bufferedInvertedImage;
     Rectangle rect;
@@ -72,9 +72,9 @@ class Chit extends JPanel
     {
         this(scale, id, inverted, dubious, false);
     }
-    
-    Chit(int scale, String id, boolean inverted, boolean dubious, 
-            boolean dubiousAsBlank)
+
+    Chit(int scale, String id, boolean inverted, boolean dubious,
+        boolean dubiousAsBlank)
     {
         super();
 
@@ -112,7 +112,7 @@ class Chit extends JPanel
                     names2[i] = names[i];
                 }
                 names2[names.length] = "QuestionMarkMask" +
-                        (cre.getBaseColor().equals("black") ? "Red" : "");
+                    (cre.getBaseColor().equals("black") ? "Red" : "");
                 names = names2;
             }
             bufferedImage = getImage(names, scale);
@@ -141,7 +141,7 @@ class Chit extends JPanel
                 if (dubious)
                 {
                     filenames[4] = "QuestionMarkMask" +
-                            (color.equals("BlackColossus") ? "Red" : "");
+                        (color.equals("BlackColossus") ? "Red" : "");
                 }
 
                 bufferedImage = getImage(filenames, scale);
@@ -177,12 +177,12 @@ class Chit extends JPanel
         ImageIcon tempIcon = null;
         List directories = VariantSupport.getImagesDirectoriesList();
         tempIcon = ResourceLoader.getImageIcon(imageFilename, directories,
-                scale, scale);
+            scale, scale);
         if (tempIcon == null)
         {
             LOGGER.log(Level.SEVERE, "Couldn't get image :" + imageFilename);
             throw new RuntimeException("Unable to retrieve image for filename '" +
-            		imageFilename + "'");
+                imageFilename + "'");
         }
 
         return tempIcon.getImage();
@@ -192,7 +192,7 @@ class Chit extends JPanel
     {
         List directories = VariantSupport.getImagesDirectoriesList();
         Image composite = ResourceLoader.getCompositeImage(imageFilenames,
-                directories, scale, scale);
+            directories, scale, scale);
         return composite;
     }
 
@@ -220,25 +220,25 @@ class Chit extends JPanel
         Image image = bufferedImage;
 
         if (inverted &&
-                (client == null ||
-                !client.getOption(Options.doNotInvertDefender)))
+            (client == null ||
+            !client.getOption(Options.doNotInvertDefender)))
         {
             if (bufferedInvertedImage == null)
             {
                 int width = bufferedImage.getWidth(this);
                 int height = bufferedImage.getHeight(this);
                 BufferedImage bi = new BufferedImage(
-                        width, height,
-                        BufferedImage.TYPE_INT_RGB);
+                    width, height,
+                    BufferedImage.TYPE_INT_RGB);
                 Graphics2D biContext = bi.createGraphics();
                 biContext.drawImage(image, 0, 0, null);
                 double theta = Math.PI;
                 AffineTransform at = AffineTransform.getRotateInstance(
-                        theta,
-                        width / 2,
-                        height / 2);
+                    theta,
+                    width / 2,
+                    height / 2);
                 AffineTransformOp ato = new AffineTransformOp(at,
-                        AffineTransformOp.TYPE_BILINEAR);
+                    AffineTransformOp.TYPE_BILINEAR);
                 BufferedImage bi2 = ato.createCompatibleDestImage(bi, null);
                 bi2 = ato.filter(bi, bi2);
                 bufferedInvertedImage = bi2;
@@ -246,16 +246,16 @@ class Chit extends JPanel
             image = bufferedInvertedImage;
         }
         g2.drawImage(image, rect.x, rect.y, rect.width,
-                rect.height, this);
+            rect.height, this);
         if (isDead())
         {
             // Draw a triple-wide red X.
             g2.setStroke(threeWide);
             g2.setColor(Color.red);
             g2.drawLine(rect.x, rect.y, rect.x + rect.width,
-                    rect.y + rect.height);
+                rect.y + rect.height);
             g2.drawLine(rect.x + rect.width, rect.y, rect.x,
-                    rect.y + rect.height);
+                rect.y + rect.height);
             g2.setStroke(oneWide);
         }
 

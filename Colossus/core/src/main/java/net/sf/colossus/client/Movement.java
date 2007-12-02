@@ -23,9 +23,9 @@ import net.sf.colossus.util.Split;
 
 public final class Movement
 {
-	private static final Logger LOGGER = Logger.getLogger(Movement.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(Movement.class.getName());
 
-	Client client;
+    Client client;
 
     Movement(Client client)
     {
@@ -56,7 +56,7 @@ public final class Movement
      *  the direction you just came from.  Return a set of 
      *  hexLabel:entrySide tuples. */
     private Set findNormalMoves(MasterHex hex, LegionInfo legion,
-            int roll, int block, int cameFrom, String fromHexLabel)
+        int roll, int block, int cameFrom, String fromHexLabel)
     {
         Set set = new HashSet();
         String hexLabel = hex.getLabel();
@@ -68,7 +68,7 @@ public final class Movement
         // Do a check versus fromHexLabel if we are evaluating
         // passing through this hex
         if (client.getNumEnemyLegions(hexLabel, player.getName()) > 0 &&
-                !hexLabel.equals(fromHexLabel))
+            !hexLabel.equals(fromHexLabel))
         {
             if (client.getNumFriendlyLegions(hexLabel, player.getName()) == 0)
             {
@@ -76,7 +76,7 @@ public final class Movement
                 if (cameFrom != -1)
                 {
                     set.add(hexLabel + ":" + BattleMap.entrySideName(
-                            findEntrySide(hex, cameFrom)));
+                        findEntrySide(hex, cameFrom)));
                 }
             }
             return set;
@@ -101,20 +101,21 @@ public final class Movement
             if (cameFrom != -1)
             {
                 set.add(hexLabel + ":" + BattleMap.entrySideName(
-                        findEntrySide(hex, cameFrom)));
+                    findEntrySide(hex, cameFrom)));
                 return set;
             }
         }
         else if (roll < 0)
         {
-            LOGGER.log(Level.SEVERE, "Movement.findNormalMoves() roll < 0", (Throwable)null);
+            LOGGER.log(Level.SEVERE, "Movement.findNormalMoves() roll < 0",
+                (Throwable)null);
             return null;
         }
 
         if (block >= 0)
         {
             set.addAll(findNormalMoves(hex.getNeighbor(block), legion,
-                    roll - 1, Constants.ARROWS_ONLY, (block + 3) % 6, null));
+                roll - 1, Constants.ARROWS_ONLY, (block + 3) % 6, null));
         }
         else if (block == Constants.ARCHES_AND_ARROWS)
         {
@@ -146,7 +147,7 @@ public final class Movement
     /** Recursively find all unoccupied hexes within roll hexes, for
      *  tower teleport. */
     private Set findNearbyUnoccupiedHexes(MasterHex hex, LegionInfo legion,
-            int roll, int cameFrom)
+        int roll, int cameFrom)
     {
         // This hex is the final destination.  Mark it as legal if
         // it is unoccupied.
@@ -163,10 +164,10 @@ public final class Movement
             for (int i = 0; i < 6; i++)
             {
                 if (i != cameFrom && (hex.getExitType(i) != Constants.NONE ||
-                        hex.getEntranceType(i) != Constants.NONE))
+                    hex.getEntranceType(i) != Constants.NONE))
                 {
                     set.addAll(findNearbyUnoccupiedHexes(hex.getNeighbor(i),
-                            legion, roll - 1, (i + 3) % 6));
+                        legion, roll - 1, (i + 3) % 6));
                 }
             }
         }
@@ -182,7 +183,7 @@ public final class Movement
 
     /** Return set of hexLabels describing where this legion can move. */
     public Set listAllMoves(LegionInfo legion, MasterHex hex, int movementRoll,
-            boolean inAdvance)
+        boolean inAdvance)
     {
         Set set = listNormalMoves(legion, hex, movementRoll, inAdvance, null);
         set.addAll(listTeleportMoves(legion, hex, movementRoll, inAdvance));
@@ -206,13 +207,13 @@ public final class Movement
     /** Return set of hexLabels describing where this legion can move
      *  without teleporting. */
     public Set listNormalMoves(LegionInfo legion, MasterHex hex,
-            int movementRoll, String fromHexLabel)
+        int movementRoll, String fromHexLabel)
     {
         return listNormalMoves(legion, hex, movementRoll, false, fromHexLabel);
     }
 
     public Set listNormalMoves(LegionInfo legion, MasterHex hex,
-            int movementRoll)
+        int movementRoll)
     {
         return listNormalMoves(legion, hex, movementRoll, false, null);
     }
@@ -220,7 +221,7 @@ public final class Movement
     /** Return set of hexLabels describing where this legion can move
      *  without teleporting. */
     public Set listNormalMoves(LegionInfo legion, MasterHex hex,
-            int movementRoll, boolean inAdvance, String fromHexLabel)
+        int movementRoll, boolean inAdvance, String fromHexLabel)
     {
         if (hex == null || (legion.hasMoved() && (!inAdvance)))
         {
@@ -228,7 +229,7 @@ public final class Movement
         }
 
         Set tuples = findNormalMoves(hex, legion, movementRoll,
-                findBlock(hex), Constants.NOWHERE, fromHexLabel);
+            findBlock(hex), Constants.NOWHERE, fromHexLabel);
 
         // Extract just the hexLabels from the hexLabel:entrySide tuples.
         Set hexLabels = new HashSet();
@@ -250,7 +251,7 @@ public final class Movement
             return false;
         }
         if (client.getTurnNumber() == 1 &&
-                client.getOption(Options.noFirstTurnTeleport))
+            client.getOption(Options.noFirstTurnTeleport))
         {
             return false;
         }
@@ -264,7 +265,7 @@ public final class Movement
             return false;
         }
         if (client.getTurnNumber() == 1 &&
-                client.getOption(Options.noFirstTurnT2TTeleport))
+            client.getOption(Options.noFirstTurnT2TTeleport))
         {
             return false;
         }
@@ -291,7 +292,7 @@ public final class Movement
             return false;
         }
         if (client.getTurnNumber() == 1 &&
-                client.getOption(Options.noFirstTurnTeleport))
+            client.getOption(Options.noFirstTurnTeleport))
         {
             return false;
         }
@@ -306,26 +307,26 @@ public final class Movement
 
     /** Return set of hexLabels describing where this legion can teleport. */
     Set listTeleportMoves(LegionInfo legion, MasterHex hex, int movementRoll,
-            boolean inAdvance)
+        boolean inAdvance)
     {
         PlayerInfo player = legion.getPlayerInfo();
 
         Set set = new HashSet();
         if (hex == null || ((!inAdvance) && (movementRoll != 6 ||
-                legion.hasMoved() || player.hasTeleported())))
+            legion.hasMoved() || player.hasTeleported())))
         {
             return set;
         }
 
         // Tower teleport
         if (HexMap.terrainIsTower(hex.getTerrain()) && legion.numLords() > 0 &&
-                towerTeleportAllowed())
+            towerTeleportAllowed())
         {
             // Mark every unoccupied hex within 6 hexes.
             if (towerToNonTowerTeleportAllowed())
             {
                 set.addAll(findNearbyUnoccupiedHexes(hex, legion, 6,
-                        Constants.NOWHERE));
+                    Constants.NOWHERE));
             }
 
             if (towerToTowerTeleportAllowed())
@@ -339,7 +340,7 @@ public final class Movement
                     if (MasterBoard.getHexByLabel(hexLabel) != null)
                     {
                         if (!client.isOccupied(hexLabel) &&
-                                (!(hexLabel.equals(hex.getLabel()))))
+                            (!(hexLabel.equals(hex.getLabel()))))
                         {
                             set.add(hexLabel);
                         }
@@ -361,7 +362,7 @@ public final class Movement
 
         // Titan teleport
         if (player.canTitanTeleport() && legion.hasTitan() &&
-                titanTeleportAllowed())
+            titanTeleportAllowed())
         {
             // Mark every hex containing an enemy stack that does not
             // already contain a friendly stack.
@@ -388,7 +389,7 @@ public final class Movement
      *  possible entry sides.  If the hex is unoccupied, just return 
      *  one entry side since it doesn't matter. */
     Set listPossibleEntrySides(String markerId, String targetHexLabel,
-            boolean teleport)
+        boolean teleport)
     {
         Set entrySides = new HashSet();
         LegionInfo legion = client.getLegionInfo(markerId);
@@ -404,7 +405,7 @@ public final class Movement
                 // Startlisted terrain only have bottom entry side.
                 // Don't bother finding more than one entry side if unoccupied.
                 if (!client.isOccupied(targetHexLabel) ||
-                        HexMap.terrainHasStartlist(targetHex.getTerrain()))
+                    HexMap.terrainHasStartlist(targetHex.getTerrain()))
 
                 {
                     entrySides.add(Constants.bottom);
@@ -426,7 +427,7 @@ public final class Movement
 
         // Normal moves.
         Set tuples = findNormalMoves(currentHex, legion, movementRoll,
-                findBlock(currentHex), Constants.NOWHERE, null);
+            findBlock(currentHex), Constants.NOWHERE, null);
         Iterator it = tuples.iterator();
         while (it.hasNext())
         {

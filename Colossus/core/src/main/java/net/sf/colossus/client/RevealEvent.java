@@ -1,5 +1,6 @@
 package net.sf.colossus.client;
 
+
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -19,7 +20,7 @@ import net.sf.colossus.server.Constants;
 
 public class RevealEvent
 {
-	private static final Logger LOGGER = Logger.getLogger(RevealEvent.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(RevealEvent.class.getName());
 
     private Client client;
     private int turnNumber;
@@ -41,7 +42,7 @@ public class RevealEvent
     private boolean undone = false;
     private int scale;
     private JPanel p;
-    
+
     private String info;
     // set for losing battle events, because if Titan killed the
     // marker does already belong to slayer when we ask. 
@@ -58,13 +59,12 @@ public class RevealEvent
     public final static int eventPlayerChange = 8;
     public final static int eventMulligan = 9;
     public final static int eventMoveRoll = 10;
-    
+
     // Battle is only a temporary state, before it becomes Won or Lost
     // ( = no filter / checkbox setting for that needed, so far at least...)
-    public final static int eventBattle = 11;     
+    public final static int eventBattle = 11;
     public final static int NUMBEROFEVENTS = 12;
 
-    
     private final static String eventSplitText = "Split";
     private final static String eventRecruitText = "Recruit";
     private final static String eventSummonText = "Summon";
@@ -79,21 +79,21 @@ public class RevealEvent
     private final static String eventBattleText = "Battle";
 
     private static String[] eventTypeToString = {
-        eventSplitText, eventRecruitText, eventSummonText, eventTeleportText, 
-        eventAcquireText, eventWonText, eventLostText, eventTurnChangeText, 
-        eventPlayerChangeText, eventMulliganText, eventMoveRollText, eventBattleText
+        eventSplitText, eventRecruitText, eventSummonText, eventTeleportText,
+        eventAcquireText, eventWonText, eventLostText, eventTurnChangeText,
+        eventPlayerChangeText, eventMulliganText, eventMoveRollText,
+        eventBattleText
     };
-    
-            
-    public RevealEvent(Client client, int turnNumber, int playerNr, 
-            int eventType, String markerId, int height, ArrayList 
-            knownCreatures, String markerId2, int height2)
+
+    public RevealEvent(Client client, int turnNumber, int playerNr,
+        int eventType, String markerId, int height, ArrayList
+        knownCreatures, String markerId2, int height2)
     {
-        if (markerId == null && eventType != eventPlayerChange && 
+        if (markerId == null && eventType != eventPlayerChange &&
             eventType != eventTurnChange)
         {
-            LOGGER.log(Level.SEVERE, "ERROR: null marker for event " + 
-			getEventTypeText(eventType), (Throwable)null);
+            LOGGER.log(Level.SEVERE, "ERROR: null marker for event " +
+                getEventTypeText(eventType), (Throwable)null);
             return;
         }
         this.client = client;
@@ -108,13 +108,13 @@ public class RevealEvent
         // next 2: child legion or summoner
         this.markerId2 = markerId2;
         this.height2 = height2;
-        
+
         makeCreaturesTitanChangeSafe(knownCreatures);
     }
 
     // mulligan and movement roll
-    public RevealEvent(Client client, int turnNumber, int playerNr, 
-            int eventType, int oldRoll, int newRoll)
+    public RevealEvent(Client client, int turnNumber, int playerNr,
+        int eventType, int oldRoll, int newRoll)
     {
         this.client = client;
         this.turnNumber = turnNumber;
@@ -123,7 +123,7 @@ public class RevealEvent
 
         this.oldRoll = oldRoll;
         this.newRoll = newRoll;
-        
+
         PlayerInfo info = client.getPlayerInfo(playerNr);
         this.mulliganTitanBaseName = getTitanBasename(info);
     }
@@ -140,21 +140,21 @@ public class RevealEvent
         {
             return;
         }
-        
+
         Iterator it = list.iterator();
         while (it.hasNext())
         {
-            RevealedCreature rc = (RevealedCreature) it.next();
-            if (rc != null && rc.getPlainName() != null && 
-                    rc.getPlainName().equals(Constants.titan))
+            RevealedCreature rc = (RevealedCreature)it.next();
+            if (rc != null && rc.getPlainName() != null &&
+                rc.getPlainName().equals(Constants.titan))
             {
-                String playerName = (realPlayer != null ? realPlayer :  
-                        client.getPlayerNameByMarkerId(markerId));
+                String playerName = (realPlayer != null ? realPlayer :
+                    client.getPlayerNameByMarkerId(markerId));
 
                 if (playerName == null)
                 {
-                    LOGGER.log(Level.SEVERE, "For making titan base name: " + 
-					"playerName is null!", (Throwable)null);
+                    LOGGER.log(Level.SEVERE, "For making titan base name: " +
+                        "playerName is null!", (Throwable)null);
                 }
                 else
                 {
@@ -177,7 +177,7 @@ public class RevealEvent
             makeCreaturesTitanChangeSafe(knownCreatures);
         }
     }
-    
+
     public void setEventInfo(String info)
     {
         this.info = info;
@@ -188,39 +188,40 @@ public class RevealEvent
         this.realPlayer = realPlayer;
         if (this.realPlayer == null)
         {
-            LOGGER.log(Level.SEVERE, "RevealEvent: give realPlayer is null!", (Throwable)null);
+            LOGGER.log(Level.SEVERE, "RevealEvent: give realPlayer is null!",
+                (Throwable)null);
             this.realPlayer = "dummy?";
         }
     }
-    
+
     public void setUndone(boolean undone)
     {
         this.undone = undone;
     }
-    
+
     public boolean wasUndone()
     {
         return this.undone;
     }
-    
+
     public void setAllDead()
     {
         Iterator it = this.knownCreatures.iterator();
         while (it.hasNext())
         {
-            RevealedCreature rc = (RevealedCreature) it.next();
+            RevealedCreature rc = (RevealedCreature)it.next();
             rc.setDead(true);
         }
         height = 0;
     }
-    
+
     public int getAliveCount()
     {
         int alive = 0;
         Iterator it = this.knownCreatures.iterator();
         while (it.hasNext())
         {
-            RevealedCreature rc = (RevealedCreature) it.next();
+            RevealedCreature rc = (RevealedCreature)it.next();
             if (!rc.isDead())
             {
                 alive++;
@@ -235,7 +236,7 @@ public class RevealEvent
         Iterator it = this.knownCreatures.iterator();
         while (it.hasNext())
         {
-            RevealedCreature rc = (RevealedCreature) it.next();
+            RevealedCreature rc = (RevealedCreature)it.next();
             if (rc.isDead())
             {
                 dead++;
@@ -260,14 +261,14 @@ public class RevealEvent
         makeCreaturesTitanChangeSafe(knownCreatures);
         this.height = knownCreatures.size();
     }
-    
+
     public void setCreatureDied(String name, int newHeight)
     {
         Iterator it = this.knownCreatures.iterator();
         boolean done = false;
         while (!done && it.hasNext())
         {
-            RevealedCreature rc = (RevealedCreature) it.next();
+            RevealedCreature rc = (RevealedCreature)it.next();
             if (rc.matches(name) && !rc.isDead())
             {
                 rc.setDead(true);
@@ -282,9 +283,9 @@ public class RevealEvent
             }
             else
             {
-                LOGGER.log(Level.WARNING, "got order to kill creature " + 
-				  name + " in legionEvent " + this.toString() + 
-				  " but no such alive creature found!!");
+                LOGGER.log(Level.WARNING, "got order to kill creature " +
+                    name + " in legionEvent " + this.toString() +
+                    " but no such alive creature found!!");
             }
         }
         // client tells us new accurate count how many are still alive.
@@ -297,14 +298,15 @@ public class RevealEvent
     {
         if (turnNumber != this.turnNumber)
         {
-            LOGGER.log(Level.WARNING, "undoSummon for " + this.toString() + " -- wrong turn.");
+            LOGGER.log(Level.WARNING,
+                "undoSummon for " + this.toString() + " -- wrong turn.");
             return false;
         }
         Iterator it = this.knownCreatures.iterator();
         boolean done = false;
         while (!done && it.hasNext())
         {
-            RevealedCreature rc = (RevealedCreature) it.next();
+            RevealedCreature rc = (RevealedCreature)it.next();
             if (rc.matches(name) && rc.wasSummoned())
             {
                 it.remove();
@@ -313,7 +315,7 @@ public class RevealEvent
         }
         return done;
     }
-    
+
     public int getEventType()
     {
         return eventType;
@@ -343,17 +345,17 @@ public class RevealEvent
     {
         return height;
     }
-    
+
     public int getTurn()
     {
         return turnNumber;
     }
-    
+
     public String getPlayer()
     {
         return client.getPlayerInfo(playerNr).getName();
     }
-    
+
     public int getPlayerNr()
     {
         return playerNr;
@@ -364,19 +366,22 @@ public class RevealEvent
         String msg = "<unknown event?>";
         if (eventType == eventSplit)
         {
-            msg = "Revealing event: \"" + getEventTypeText() + "\" (turn "+turnNumber+"):\n" +
-                "- Legion with marker: "+ markerId  + " (now height: " + height+"\n" +
-                "- Splitoff to marker: "+ markerId2 + " (now height: " + height2+"\n";
+            msg = "Revealing event: \"" + getEventTypeText() + "\" (turn "+
+                turnNumber+"):\n" +
+                "- Legion with marker: "+ markerId  + " (now height: " + height+
+                "\n" +
+                "- Splitoff to marker: "+ markerId2 + " (now height: " +
+                height2+"\n";
         }
         else if (eventType == eventSummon)
         {
-            RevealedCreature rc = 
-                (RevealedCreature) this.knownCreatures.get(0);
+            RevealedCreature rc =
+                (RevealedCreature)this.knownCreatures.get(0);
             String summoned = rc.getName();
-            
+
             msg = "Revealing event: \"" + getEventTypeText() + "\":\n" +
-                 "  Summonable \"" + summoned + "\" from " + markerId + 
-                 "(" + height + ") to " + markerId2 + "("+height2+")";
+                "  Summonable \"" + summoned + "\" from " + markerId +
+                "(" + height + ") to " + markerId2 + "("+height2+")";
         }
 
         else if (eventType == eventWon)
@@ -397,63 +402,63 @@ public class RevealEvent
         else if (eventType == eventTurnChange)
         {
             msg = "Revealing event: Turn change, now player "+getPlayerNr()+
-            " ("+getPlayer()+"), Turn "+getTurn();
+                " ("+getPlayer()+"), Turn "+getTurn();
         }
         else if (eventType == eventPlayerChange)
         {
             msg = "Revealing event: Player change, now player "+getPlayerNr()+
-            " ("+getPlayer()+"), Turn "+getTurn();
+                " ("+getPlayer()+"), Turn "+getTurn();
         }
         else if (eventType == eventMulligan)
         {
             msg = "Revealing event: Player "+getPlayerNr()+
-            " ("+getPlayer()+"), Turn "+getTurn() + " took mulligan;" +
-            " old="+ oldRoll + ", new=" + newRoll;
+                " ("+getPlayer()+"), Turn "+getTurn() + " took mulligan;" +
+                " old="+ oldRoll + ", new=" + newRoll;
         }
         else if (eventType == eventMoveRoll)
         {
             msg = "Revealing event: Player "+getPlayerNr()+
-            " ("+getPlayer()+"), Turn "+getTurn() + " had movement roll: " +
-            " old="+ oldRoll;
+                " ("+getPlayer()+"), Turn "+getTurn() + " had movement roll: " +
+                " old="+ oldRoll;
         }
-        
+
         else
         {
             StringBuffer msgBuf = new StringBuffer(1000);
 
-            msgBuf.append("Revealing event: \"" + getEventTypeText() + 
+            msgBuf.append("Revealing event: \"" + getEventTypeText() +
                 "\" for marker " + markerId + "\n");
             Iterator it = knownCreatures.iterator();
-        
+
             int i = 0;
             while (it.hasNext())
-            {   
+            {
                 i++;
                 RevealedCreature rc = (RevealedCreature)it.next();
                 msgBuf.append(i + ". " + rc.toString()+"\n");
             }
-            msgBuf.append(" => legion " + markerId + " now " + height + 
+            msgBuf.append(" => legion " + markerId + " now " + height +
                 " creatures.");
             msg = msgBuf.toString();
         }
 
         return msg;
     }
-    
+
     private void addLabel(String text)
     {
         JLabel label = new JLabel(text);
         label.setAlignmentX(Component.LEFT_ALIGNMENT);
         p.add(label);
     }
-    
+
     // Todo: paint height on top of marker possible?
     private void addMarker(String markerId, int height)
     {
         if (markerId == null)
         {
-            LOGGER.log(Level.SEVERE, "ERROR: markerId null, event type " + 
-			 getEventTypeText()+" turn" +getTurn(), (Throwable)null);
+            LOGGER.log(Level.SEVERE, "ERROR: markerId null, event type " +
+                getEventTypeText()+" turn" +getTurn(), (Throwable)null);
         }
         try
         {
@@ -461,11 +466,13 @@ public class RevealEvent
             marker.setAlignmentX(Component.LEFT_ALIGNMENT);
             p.add(marker);
         }
-        catch(Exception e)
+        catch (Exception e)
         {
-            LOGGER.log(Level.SEVERE, "new Chit for markerId " + markerId + ", event type "+
-			  getEventTypeText() + " turn" + getTurn() + " threw exception:" + 
-			  e.toString(), (Throwable)null);
+            LOGGER.log(Level.SEVERE,
+                "new Chit for markerId " + markerId + ", event type "+
+                getEventTypeText() + " turn" + getTurn() + " threw exception:" +
+                e.toString(),
+                (Throwable)null);
         }
         addLabel("("+height+")");
     }
@@ -484,12 +491,13 @@ public class RevealEvent
         }
         catch (Exception ex)
         {
-            LOGGER.log(Level.SEVERE, "RevealEvent.gettitanbasename, PlayerInfo threw " +
-			  "exception " + ex.toString(), (Throwable)null);
+            LOGGER.log(Level.SEVERE,
+                "RevealEvent.gettitanbasename, PlayerInfo threw " +
+                "exception " + ex.toString(), (Throwable)null);
             return Constants.titan;
         }
     }
- 
+
     // NOTE: this assumes that this event is for the player in whose 
     // turn this happens:
     private Chit getSolidMarker()
@@ -504,28 +512,28 @@ public class RevealEvent
         // was listed in jar tfv usage, still I got "Couldn't get image"
         // error and everything was hanging.
         // So, for now we go with the Titan icon.
-/*
-        try
-        {
-            String color = client.getShortColor(playerNr);
-            solidMarker = new Chit(scale, color+"Solid");
-        }
-        catch(Exception e)
-        {
-            Log.error("exception...");
-            // if solid marker does not exist for this color,
-            // use as fallback the Titan chit.
-            solidMarker = new Chit(scale, getTitanBasename());
-        }
-*/
+        /*
+         try
+         {
+         String color = client.getShortColor(playerNr);
+         solidMarker = new Chit(scale, color+"Solid");
+         }
+         catch(Exception e)
+         {
+         Log.error("exception...");
+         // if solid marker does not exist for this color,
+         // use as fallback the Titan chit.
+         solidMarker = new Chit(scale, getTitanBasename());
+         }
+         */
         // NOTE: this assumes that this event is for the player in whose 
         //       turn this happens:
         solidMarker = new Chit(scale, mulliganTitanBaseName);
         solidMarker.setAlignmentX(Component.LEFT_ALIGNMENT);
-        
+
         return solidMarker;
     }
-    
+
     private void addCreatureWithInfoToPanel(RevealedCreature rc)
     {
         String info = null;
@@ -550,10 +558,10 @@ public class RevealEvent
         }
         addCreatureToPanel(rc);
     }
-    
+
     private void addCreatureToPanel(RevealedCreature rc)
     {
-        
+
         Chit creature = rc.toChit(scale);
         if (creature == null)
         {
@@ -595,7 +603,7 @@ public class RevealEvent
 
         JPanel p = new JPanel();
         this.p = p;
-        
+
         p.setLayout(new BoxLayout(p, BoxLayout.X_AXIS));
         p.setAlignmentX(Component.LEFT_ALIGNMENT);
 
@@ -606,37 +614,37 @@ public class RevealEvent
 
             p.add(Box.createRigidArea(new Dimension(5,0)));
             addLabel(getEventTypeText()+": ");
-            
+
             Chit oldDie = new MovementDie(this.scale,
-                    MovementDie.getDieImageName(oldRoll));
+                MovementDie.getDieImageName(oldRoll));
             oldDie.setAlignmentX(Component.LEFT_ALIGNMENT);
             p.add(oldDie);
 
             if (eventType == eventMulligan)
             {
-            	addLabel(" => ");
+                addLabel(" => ");
 
-            	Chit newDie = new MovementDie(this.scale,
-            			MovementDie.getDieImageName(newRoll));
-            	newDie.setAlignmentX(Component.LEFT_ALIGNMENT);
-            	p.add(newDie);
+                Chit newDie = new MovementDie(this.scale,
+                    MovementDie.getDieImageName(newRoll));
+                newDie.setAlignmentX(Component.LEFT_ALIGNMENT);
+                p.add(newDie);
             }
-            
+
             return p;
         }
-        
+
         int showHeight = height;
         if (eventType == eventSplit)
         {
-            showHeight = height + height2; 
+            showHeight = height + height2;
         }
-        
+
         addMarker(markerId, showHeight);
         p.add(Box.createRigidArea(new Dimension(5,0)));
-        
+
         String eventTypeText = "";
         if ( (eventType == eventLost) &&
-                info != null && !info.equals("") )
+            info != null && !info.equals("") )
         {
             eventTypeText = info;
             if (info.equals(Constants.erMethodFlee))
@@ -673,7 +681,7 @@ public class RevealEvent
             //twoLabels.setBorder(new TitledBorder(""));
             // twoLabels.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
             // twoLabels.setAlignmentX(Component.LEFT_ALIGNMENT);
-            
+
             JLabel label1 = new JLabel(eventTypeText);
             label1.setAlignmentY(Component.TOP_ALIGNMENT);
             label1.setForeground(Color.darkGray);
@@ -690,7 +698,7 @@ public class RevealEvent
         {
             addLabel(eventTypeText);
         }
-        
+
         if (eventType == eventSplit)
         {
             addLabel(" => ");
@@ -703,7 +711,7 @@ public class RevealEvent
         {
             Iterator it = knownCreatures.iterator();
             while (it.hasNext())
-            {   
+            {
                 RevealedCreature rc = (RevealedCreature)it.next();
                 if (rc.wasRecruited())
                 {
@@ -716,7 +724,7 @@ public class RevealEvent
         {
             Iterator it = knownCreatures.iterator();
             while (it.hasNext())
-            {   
+            {
                 RevealedCreature rc = (RevealedCreature)it.next();
                 addCreatureToPanel(rc);
             }
@@ -728,7 +736,7 @@ public class RevealEvent
         {
             Iterator it = knownCreatures.iterator();
             while (it.hasNext())
-            {   
+            {
                 RevealedCreature rc = (RevealedCreature)it.next();
                 addCreatureToPanel(rc);
             }
@@ -738,11 +746,11 @@ public class RevealEvent
         {
             Iterator it = knownCreatures.iterator();
             while (it.hasNext())
-            {   
+            {
                 RevealedCreature rc = (RevealedCreature)it.next();
                 addCreatureWithInfoToPanel(rc);
             }
-            
+
             if (eventType == eventWon && knownCreatures.size() < height)
             {
                 int diff = height-knownCreatures.size();
@@ -756,7 +764,7 @@ public class RevealEvent
                 }
             }
         }
-        
+
         return p;
     }
 }

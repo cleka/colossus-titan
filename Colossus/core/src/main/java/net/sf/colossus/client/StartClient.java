@@ -35,9 +35,9 @@ import net.sf.colossus.util.KDialog;
 
 
 public class StartClient extends KDialog implements WindowListener,
-            ActionListener
+    ActionListener
 {
-	private static final Logger LOGGER = Logger.getLogger(StartClient.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(StartClient.class.getName());
 
     static String playerName;
     static String hostname;
@@ -82,7 +82,7 @@ public class StartClient extends KDialog implements WindowListener,
         {
             LOGGER.log(Level.SEVERE, ex.toString(), (Throwable)null);
         }
-        
+
         loadClientOptions();
         // LRU, i.e. serverName0 is the one last time used.
         // Combobox will display them alphabetically anyway,
@@ -90,7 +90,7 @@ public class StartClient extends KDialog implements WindowListener,
         for (int i = Constants.numSavedServerNames; i > 0 ; i--)
         {
             String serverName = clientOptions.getStringOption(
-                    net.sf.colossus.util.Options.serverName + (i-1) );
+                net.sf.colossus.util.Options.serverName + (i-1) );
             if (serverName != null)
             {
                 preferred = serverName;
@@ -158,7 +158,7 @@ public class StartClient extends KDialog implements WindowListener,
             saveWindow.saveLocation(getLocation());
             connect(playerName, hostname, port);
         }
-        else  // A combo box was changed.
+        else // A combo box was changed.
         {
             Object source = e.getSource();
             if (source == nameBox)
@@ -215,7 +215,7 @@ public class StartClient extends KDialog implements WindowListener,
                 return;
             }
             String serverName = clientOptions.getStringOption(
-                    net.sf.colossus.util.Options.serverName + i);
+                net.sf.colossus.util.Options.serverName + i);
 
             if (serverName != null)
             {
@@ -226,11 +226,11 @@ public class StartClient extends KDialog implements WindowListener,
                 }
             }
         }
-        for (int i = 0; i < names.size() && 
-                i < Constants.numSavedServerNames ; i++)
+        for (int i = 0; i < names.size() &&
+            i < Constants.numSavedServerNames ; i++)
         {
             clientOptions.setOption(net.sf.colossus.util.Options.serverName +
-                    i, (String)names.get(i));
+                i, (String)names.get(i));
         }
         clientOptions.saveOptions();
     }

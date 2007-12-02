@@ -64,7 +64,7 @@ final class BattleDice extends Box
     }
 
     void setValues(String strikerDesc, String targetDesc, int targetNumber,
-            List rolls)
+        List rolls)
     {
         this.strikerDesc = strikerDesc;
         this.targetDesc = targetDesc;
@@ -125,10 +125,10 @@ final class BattleDice extends Box
         else
         {
             diceBoxTitledBorder.setTitle(strikerDesc +
-                    " attacks " +
-                    targetDesc +
-                    " (target number is " +
-                    targetNumber + ")");
+                " attacks " +
+                targetDesc +
+                " (target number is " +
+                targetNumber + ")");
         }
 
         if (numDice > 0)

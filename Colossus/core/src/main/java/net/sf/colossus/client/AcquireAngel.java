@@ -29,7 +29,7 @@ import net.sf.colossus.util.KDialog;
 
 
 final class AcquireAngel extends KDialog implements MouseListener,
-            WindowListener, ActionListener
+    WindowListener, ActionListener
 {
     private List chits = new ArrayList();
     private List recruits;
@@ -38,10 +38,10 @@ final class AcquireAngel extends KDialog implements MouseListener,
     private SaveWindow saveWindow;
 
     AcquireAngel(JFrame parentFrame, Client client, String markerId,
-            List recruits)
+        List recruits)
     {
         super(parentFrame, client.getPlayerName() +
-                ": Acquire Angel in legion " + markerId, false);
+            ": Acquire Angel in legion " + markerId, false);
 
         this.client = client;
         this.markerId = markerId;

@@ -19,27 +19,27 @@ final class Marker extends Chit
 {
     private static final Logger LOGGER =
         Logger.getLogger(Marker.class.getName());
-    
+
     private Font font;
     private int fontHeight;
     private int fontWidth;
 
     /** Construct a marker without a client.
-        Use this constructor as a bit of documentation when
-        explicitly not wanting a height drawn on the Marker. */
+     Use this constructor as a bit of documentation when
+     explicitly not wanting a height drawn on the Marker. */
     Marker(int scale, String id)
     {
         this(scale, id, null);
     }
 
     /** Construct a marker with a client.
-        By providing a client, a Marker will be adorned
-        with the height of the stack, when that height
-        is non-zero. A null client will prevent the height
-        from being displayed. Sometimes (on the master board,
-        for example) heights should be shown, and sometimes
-        (in the engagement window, for example) they should
-        be omitted. */
+     By providing a client, a Marker will be adorned
+     with the height of the stack, when that height
+     is non-zero. A null client will prevent the height
+     from being displayed. Sometimes (on the master board,
+     for example) heights should be shown, and sometimes
+     (in the engagement window, for example) they should
+     be omitted. */
     Marker(int scale, String id, Client client)
     {
         super(scale, id);
@@ -85,7 +85,7 @@ final class Marker extends Chit
             // Test this 80% fudge factor on multiple platforms.
             fontHeight = 4 * fontMetrics.getAscent() / 5;
             fontWidth = fontMetrics.stringWidth(legionHeightString);
-            if(LOGGER.isLoggable(Level.FINEST)) {
+            if (LOGGER.isLoggable(Level.FINEST)) {
                 LOGGER.log(Level.FINEST, "New font set: " + font);
                 LOGGER.log(Level.FINEST, "New font height: " + fontHeight);
                 LOGGER.log(Level.FINEST, "New font width: " + fontWidth);
@@ -96,7 +96,7 @@ final class Marker extends Chit
             g.setFont(font);
         }
 
-        if(LOGGER.isLoggable(Level.FINEST)) {
+        if (LOGGER.isLoggable(Level.FINEST)) {
             LOGGER.log(Level.FINEST, "Our rectangle is: " + rect);
         }
         int x = rect.x + rect.width * 3 / 4 - fontWidth / 2;

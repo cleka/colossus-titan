@@ -3,6 +3,7 @@
  */
 package net.sf.colossus.client;
 
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -26,6 +27,7 @@ import net.sf.colossus.util.RecruitGraph;
 import net.sf.colossus.util.Terrains;
 import net.sf.colossus.util.HTMLColor;
 import net.sf.colossus.xmlparser.TerrainRecruitLoader;
+
 
 /**
  * A dialog frame that displays lots of (almost static) information
@@ -55,9 +57,7 @@ import net.sf.colossus.xmlparser.TerrainRecruitLoader;
  * @author Towi, copied from ShowRecruitTree
  * @version $Id$
  */
-public final class ShowCreatureDetails
-    extends KDialog
-    implements MouseListener, WindowListener
+public final class ShowCreatureDetails extends KDialog implements MouseListener, WindowListener
 {
 
     /** pops up the non-modal dialog. info can be updated if needed.
@@ -117,15 +117,14 @@ public final class ShowCreatureDetails
         _trSpan(s, "Power..Skill",
             creature.getPower() + ".." + creature.getSkill());
         _trSpan(s, "Rangestrike",
-            (creature.isRangestriker() ? "yes" : "no")
-              + (creature.useMagicMissile() ? " <b>(magic missiles)</b>" : ""));
+            (creature.isRangestriker() ? "yes" : "no") +
+            (creature.useMagicMissile() ? " <b>(magic missiles)</b>" : ""));
         _trSpan(s, "Flier",
             creature.isFlier() ? "yes" : "no");
         _trSpan(s, _low("Lord"),
-            creature.isLordOrDemiLord()
-                ? (creature.isLord() ? "<u><b>Lord</b></u>" 
-                                     : "<b>Demi-Lord</b>")
-                : _low("no"));
+            creature.isLordOrDemiLord() ?
+            (creature.isLord() ? "<u><b>Lord</b></u>" : "<b>Demi-Lord</b>") :
+            _low("no"));
         StringBuffer buf = new StringBuffer();
         for (int idx = 0; idx < Terrains.ALL_HAZARD_TERRAINS.length; idx++)
         {
@@ -157,9 +156,9 @@ public final class ShowCreatureDetails
             List recruiters = Creature.getCreatures();
             for (int ri = 0; ri < recruiters.size(); ri++)
             {
-                final Creature recruiter = (Creature) recruiters.get(ri);
+                final Creature recruiter = (Creature)recruiters.get(ri);
                 int num = TerrainRecruitLoader.numberOfRecruiterNeeded(
-                        recruiter, creature, terrains[ti], null
+                    recruiter, creature, terrains[ti], null
                     );
                 if (num == 1)
                 {
@@ -167,8 +166,8 @@ public final class ShowCreatureDetails
                 }
                 else if ((num > 0) && (num < RecruitGraph.BIGNUM))
                 {
-                    buf.append("by " + num + " "
-                      + recruiter.getPluralName() + ", ");
+                    buf.append("by " + num + " " + recruiter.getPluralName() +
+                        ", ");
                 }
             }
             if (buf.length() > 0)
@@ -176,15 +175,16 @@ public final class ShowCreatureDetails
                 Color color = TerrainRecruitLoader.getTerrainColor(terrains[ti])
                     .brighter();
                 s.append(MessageFormat.format(
-                    "<tr><td bgcolor={0}>in {1}</td>"
-                    + "<td colspan={2} nowrap><font color=blue>{3}</font></td>"
-                    + "</tr>",
+                    "<tr><td bgcolor={0}>in {1}</td>" +
+                    "<td colspan={2} nowrap><font color=blue>{3}</font></td>" +
+                    "</tr>",
                     new Object[] {
-                        HTMLColor.colorToCode(color),
-                        terrains[ti],
-                        "" + (HAZARDS.length + 1),
-                        buf.toString(),
-                    }));            }
+                    HTMLColor.colorToCode(color),
+                    terrains[ti],
+                    "" + (HAZARDS.length + 1),
+                    buf.toString(),
+                }));
+            }
         }
         //   out
         for (int ti = 0; ti < terrains.length; ti++)
@@ -193,9 +193,9 @@ public final class ShowCreatureDetails
             List recruits = Creature.getCreatures();
             for (int ri = 0; ri < recruits.size(); ri++)
             {
-                final Creature recruit = (Creature) recruits.get(ri);
+                final Creature recruit = (Creature)recruits.get(ri);
                 int num = TerrainRecruitLoader.numberOfRecruiterNeeded(
-                        creature, recruit, terrains[ti], null
+                    creature, recruit, terrains[ti], null
                     );
                 if ((num > 0) && (num < RecruitGraph.BIGNUM))
                 {
@@ -207,15 +207,16 @@ public final class ShowCreatureDetails
                 Color color = TerrainRecruitLoader.getTerrainColor(terrains[ti])
                     .brighter();
                 s.append(MessageFormat.format(
-                    "<tr><td bgcolor={0}>in {1}</td>"
-                    + "<td colspan={2} nowrap><font color=green>{3}</font></td>"
-                    + "</tr>",
+                    "<tr><td bgcolor={0}>in {1}</td>" +
+                    "<td colspan={2} nowrap><font color=green>{3}</font></td>" +
+                    "</tr>",
                     new Object[] {
-                        HTMLColor.colorToCode(color),
-                        terrains[ti],
-                        "" + (HAZARDS.length + 1),
-                        buf.toString(),
-                    }));            }
+                    HTMLColor.colorToCode(color),
+                    terrains[ti],
+                    "" + (HAZARDS.length + 1),
+                    buf.toString(),
+                }));
+            }
         }
 
         //
@@ -226,14 +227,14 @@ public final class ShowCreatureDetails
         s.append(MessageFormat.format(
             "<tr><td bgcolor=#dddddd colspan={0}>{1}</td></tr>",
             new Object[] {
-                "" + (HAZARDS.length + 2),
-                "Target in Plains",
-            }));
+            "" + (HAZARDS.length + 2),
+            "Target in Plains",
+        }));
         SimulatedCritter critter = new SimulatedCritter(creature, "Plains");
         SimulatedCritter other   = new SimulatedCritter(creature, "Plains");
         //   hazards row 1
-        s.append("<tr><td ROWSPAN=2 align=right>" + creature.getName()
-            + " in</td><td></td>");
+        s.append("<tr><td ROWSPAN=2 align=right>" + creature.getName() +
+            " in</td><td></td>");
         for (int hi = 1; hi < HAZARDS.length; hi += 2)
         {
             critter.setNewHazardHex(HAZARDS[hi]);
@@ -242,10 +243,10 @@ public final class ShowCreatureDetails
             s.append(MessageFormat.format(
                 "<td bgcolor={0} colspan={2}>{1}</td>",
                 new Object[] {
-                    HTMLColor.colorToCode(color),
-                    HAZARDS[hi],
-                    colspan,
-                }));
+                HTMLColor.colorToCode(color),
+                HAZARDS[hi],
+                colspan,
+            }));
         }
         s.append("</tr>");
         //   hazards row 2
@@ -258,10 +259,10 @@ public final class ShowCreatureDetails
             s.append(MessageFormat.format(
                 "<td bgcolor={0} colspan={2}>{1}</td>",
                 new Object[] {
-                    HTMLColor.colorToCode(color),
-                    HAZARDS[hi],
-                    colspan,
-                }));
+                HTMLColor.colorToCode(color),
+                HAZARDS[hi],
+                colspan,
+            }));
         }
         s.append("</tr>");
         //   the info: the table content
@@ -274,9 +275,9 @@ public final class ShowCreatureDetails
             s.append(MessageFormat.format(
                 "<td bgcolor={0}>{1}</td>",
                 new Object[] {
-                    HTMLColor.colorToCode(color),
-                    "" + critter.getSimulatedPower(other),
-                }));
+                HTMLColor.colorToCode(color),
+                "" + critter.getSimulatedPower(other),
+            }));
         }
         s.append("<td bgcolor=#dddddd></td></tr>");
         //   ... my strike skill
@@ -288,9 +289,9 @@ public final class ShowCreatureDetails
             s.append(MessageFormat.format(
                 "<td bgcolor={0}>{1}</td>",
                 new Object[] {
-                    HTMLColor.colorToCode(color),
-                    "" + critter.getSimulatedSkill(other),
-                }));
+                HTMLColor.colorToCode(color),
+                "" + critter.getSimulatedSkill(other),
+            }));
         }
         s.append("<td bgcolor=#dddddd></td></tr>");
 
@@ -313,7 +314,7 @@ public final class ShowCreatureDetails
         scrollPane.setVerticalScrollBarPolicy(
             JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         scrollPane.setPreferredSize(new Dimension(500, 800));
-            scrollPane.setMinimumSize(new Dimension(200, 400));
+        scrollPane.setMinimumSize(new Dimension(200, 400));
         cnt.add(scrollPane, BorderLayout.CENTER);
     }
 
@@ -323,9 +324,11 @@ public final class ShowCreatureDetails
 
     /** my own copy of the hazard names. */
     private static final String[] HAZARDS = Terrains.ALL_HAZARD_TERRAINS;
+
     /** easy access to hex side identifiers. */
     private static final char[] HEXSIDES = {
         ' ', 'd', 'c', 's', 'w', 'r' };
+
     /** define hex side names for table column headers. */
     private static final String[] HEXSIDE_NAMES = {
         "nothing", "dune", "cliff", "slope", "tower", "river" };
@@ -335,8 +338,8 @@ public final class ShowCreatureDetails
         StringBuffer s,
         final Creature cr)
     {
-        s.append("<html><head></head><body bgcolor="
-            + HTMLColor.colorToCode(Color.LIGHT_GRAY) + ">");
+        s.append("<html><head></head><body bgcolor=" +
+            HTMLColor.colorToCode(Color.LIGHT_GRAY) + ">");
         s.append("<h2>Creature Details: <b>" + cr.getName() + "</b></h2>");
         s.append("<table width=100%>");
     }
@@ -363,10 +366,10 @@ public final class ShowCreatureDetails
     {
         s.append(MessageFormat.format(
             "<tr><th>{0}</th><td colspan={1}>{2}</td></tr>", new Object[] {
-                name,                        // 0
-                ""  + (HAZARDS.length + 1),  // 1
-                value,                       // 2
-            }));
+            name,                        // 0
+            ""  + (HAZARDS.length + 1),  // 1
+            value,                       // 2
+        }));
     }
 
     /** wrap HTML code around s to make it dark, or gray. */
@@ -374,7 +377,6 @@ public final class ShowCreatureDetails
     {
         return "<font color=gray>" + s + "</font>";
     }
-
 
     //
     // simulate a battle
@@ -387,12 +389,14 @@ public final class ShowCreatureDetails
             super(4, 4); // 4,4: something in the middle
             setTerrain(hazard);
         }
+
         /** fake, return ' ' nor now. TODO. */
         public char getOppositeHexside(final int i)
         {
             return ' '; // plain hex side for now
         }
     }
+
 
     /** helper class to simulate a battle of the creature in question against
      * an other creature. especially distance and hazard must be simulated.
@@ -401,8 +405,10 @@ public final class ShowCreatureDetails
      */
     final class SimulatedCritter extends Critter
     {
+
         /** catch calls to "underlying" battle hex and proxy it to this. */
         private SimulatedBattleHex hex;
+
         /** @param creature to create a critter for
          * @param hazard that stands in this hazard */
         SimulatedCritter(final Creature creature, final String hazard)
@@ -410,31 +416,37 @@ public final class ShowCreatureDetails
             super(creature, "markerId", null);
             setNewHazardHex(hazard);
         }
+
         /** in hazard Plains. */
         SimulatedCritter(final Creature creature)
         {
             this(creature, "Plains");
         }
+
         /** create the simulated hex. */
         public void setNewHazardHex(final String hazard)
         {
             hex = new SimulatedBattleHex(hazard);
         }
+
         /** power of this creature hitting target. */
         public int getSimulatedPower(final Critter target)
         {
             return getDice(target);
         }
+
         /** skill of this creature hitting target. */
         public int getSimulatedSkill(final Critter target)
         {
             return getStrikeNumber(target);
         }
+
         /** color of hex i stand on. */
         public Color getHazardColor()
         {
             return hex.getTerrainColor();
         }
+
         //
         // to help simulating
         //
@@ -443,18 +455,19 @@ public final class ShowCreatureDetails
         {
             return hex;
         }
+
         /** fake -- true or false as wished. TODO */
         protected boolean isInContact(final boolean countDead)
         {
             return true;
         }
+
         /** not needed here -- fake returns 0. */
         protected int countBrambleHexes(final BattleHex targetHex)
         {
             return 0;
         }
     }
-
 
     //
     // mouse and window events

@@ -25,7 +25,7 @@ import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
 public final class Player implements Comparable
 {
-	private static final Logger LOGGER = Logger.getLogger(Player.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(Player.class.getName());
 
     private Game game;
     private String name;
@@ -81,7 +81,8 @@ public final class Player implements Comparable
     void setType(final String aType)
     {
         String type = new String(aType);
-        LOGGER.log(Level.FINEST, "Called Player.setType() for " + name + " " + type);
+        LOGGER.log(Level.FINEST,
+            "Called Player.setType() for " + name + " " + type);
         if (type.endsWith(Constants.anyAI))
         {
             int whichAI = Dice.rollDie(Constants.numAITypes) - 1;
@@ -121,7 +122,7 @@ public final class Player implements Comparable
 
     void initMarkersAvailable(String shortColor)
     {
-        synchronized(markersAvailable)
+        synchronized (markersAvailable)
         {
             for (int i = 1; i <= 9; i++)
             {
@@ -143,7 +144,7 @@ public final class Player implements Comparable
         }
         else
         {
-            synchronized(markersAvailable)
+            synchronized (markersAvailable)
             {
                 initMarkersAvailable();
                 StringBuffer allVictims = new StringBuffer(playersEliminated);
@@ -308,7 +309,7 @@ public final class Player implements Comparable
     int getTitanPower()
     {
         return 6 + getScore() /
-                TerrainRecruitLoader.getTitanImprovementValue();
+            TerrainRecruitLoader.getTitanImprovementValue();
     }
 
     synchronized int getNumLegions()
@@ -489,7 +490,7 @@ public final class Player implements Comparable
         {
             movementRoll = Dice.rollDie();
             LOGGER.log(Level.INFO, getName() + " rolls a " + movementRoll +
-			" for movement");
+                " for movement");
         }
         game.getServer().allTellMovementRoll(movementRoll);
     }
@@ -500,7 +501,7 @@ public final class Player implements Comparable
         {
             undoAllMoves();
             LOGGER.log(Level.INFO, getName() + " takes a mulligan");
-            if(!game.getOption(Options.unlimitedMulligans)) 
+            if (!game.getOption(Options.unlimitedMulligans))
             {
                 mulligansLeft--;
             }
@@ -537,10 +538,11 @@ public final class Player implements Comparable
             Legion legion = (Legion)it.next();
             String hexLabel = legion.getCurrentHexLabel();
             if (game.getNumFriendlyLegions(hexLabel, this) > 1 &&
-                    legion.hasConventionalMove())
+                legion.hasConventionalMove())
             {
-                LOGGER.log(Level.FINEST, "Found unseparated split legions at hex " +
-				hexLabel);
+                LOGGER.log(Level.FINEST,
+                    "Found unseparated split legions at hex " +
+                    hexLabel);
                 return true;
             }
         }
@@ -567,7 +569,10 @@ public final class Player implements Comparable
         Legion legion = getLegionByMarkerId(markerId);
         if ( legion == null )
         {
-            LOGGER.log(Level.SEVERE, "Player.undoRecruit: legion for markerId " + markerId + " is null", (Throwable)null);
+            LOGGER.log(Level.SEVERE,
+                "Player.undoRecruit: legion for markerId " + markerId +
+                " is null",
+                (Throwable)null);
             return;
         }
 
@@ -576,8 +581,11 @@ public final class Player implements Comparable
         String recruitName = legion.getRecruitName();
         if ( recruitName == null )
         {
-            LOGGER.log(Level.SEVERE, "Player.undoRecruit: Nothing to unrecruit for marker " + markerId, (Throwable)null);
-            return;    
+            LOGGER.log(Level.SEVERE,
+                "Player.undoRecruit: Nothing to unrecruit for marker " +
+                markerId,
+                (Throwable)null);
+            return;
         }
         legion.undoRecruit();
 
@@ -603,7 +611,7 @@ public final class Player implements Comparable
             // Don't use the legion's real parent, as there could have been
             // a 3-way split and the parent could be gone.
             Legion parent = game.getFirstFriendlyLegion(
-                    legion.getCurrentHexLabel(), this);
+                legion.getCurrentHexLabel(), this);
             if (legion != parent)
             {
                 legion.recombine(parent, false);
@@ -642,7 +650,7 @@ public final class Player implements Comparable
 
     String getFirstAvailableMarker()
     {
-        synchronized(markersAvailable)
+        synchronized (markersAvailable)
         {
             if (markersAvailable.isEmpty())
             {
@@ -678,7 +686,7 @@ public final class Player implements Comparable
 
     private void takeLegionMarkers(Player victim)
     {
-        synchronized(victim.markersAvailable)
+        synchronized (victim.markersAvailable)
         {
             markersAvailable.addAll(victim.getMarkersAvailable());
             victim.markersAvailable.clear();
@@ -803,7 +811,7 @@ public final class Player implements Comparable
         li.add(Integer.toString(getTitanPower()));
         li.add(Integer.toString(getScore()));
         li.add(Integer.toString(getMulligansLeft()));
-        synchronized(markersAvailable)
+        synchronized (markersAvailable)
         {
             li.addAll(getMarkersAvailable());
         }

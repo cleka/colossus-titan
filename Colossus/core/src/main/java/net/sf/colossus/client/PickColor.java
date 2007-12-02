@@ -44,17 +44,17 @@ final class PickColor extends KDialog implements WindowListener, ActionListener
         for (int i = 0; i < Constants.MAX_MAX_PLAYERS; i++)
         {
             background[i] = HTMLColor.stringToColor(Constants.colorNames[i] +
-                    "Colossus");
+                "Colossus");
             int sum =
-                    background[i].getRed() +
-                    background[i].getGreen() +
-                    background[i].getBlue();
+                background[i].getRed() +
+                background[i].getGreen() +
+                background[i].getBlue();
             foreground[i] = (sum > 200 ? Color.black : Color.white);
         }
     }
 
     private PickColor(JFrame parentFrame, String playerName,
-            List colorsLeft, IOptions options)
+        List colorsLeft, IOptions options)
     {
         super(parentFrame, playerName + ", Pick a Color", true);
 
@@ -98,7 +98,7 @@ final class PickColor extends KDialog implements WindowListener, ActionListener
     }
 
     static String pickColor(JFrame parentFrame, String playerName,
-            List colorsLeft, IOptions options)
+        List colorsLeft, IOptions options)
     {
         new PickColor(parentFrame, playerName, colorsLeft, options);
         return color;

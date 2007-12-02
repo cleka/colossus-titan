@@ -16,9 +16,9 @@ import java.util.logging.Logger;
  */
 class CreatureInfoList extends ArrayList
 {
-	private static final Logger LOGGER = Logger.getLogger(CreatureInfoList.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(CreatureInfoList.class.getName());
 
-	int numCreature(String creatureName)
+    int numCreature(String creatureName)
     {
         int count = 0;
         for (Iterator it = iterator(); it.hasNext(); )

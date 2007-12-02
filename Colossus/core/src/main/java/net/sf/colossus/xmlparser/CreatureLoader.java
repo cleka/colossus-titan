@@ -26,7 +26,7 @@ import org.jdom.input.SAXBuilder;
  */
 public class CreatureLoader
 {
-	private static final Logger LOGGER = Logger.getLogger(CreatureLoader.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(CreatureLoader.class.getName());
 
     private ArrayList creatures;
 
@@ -63,7 +63,7 @@ public class CreatureLoader
         int power = el.getAttribute("power").getIntValue();
         int skill = el.getAttribute("skill").getIntValue();
         boolean rangestrikes = el.getAttribute(
-                "rangestrikes").getBooleanValue();
+            "rangestrikes").getBooleanValue();
         boolean flies = el.getAttribute("flies").getBooleanValue();
         boolean bramble = el.getAttribute("bramble").getBooleanValue();
         boolean drift = el.getAttribute("drift").getBooleanValue();
@@ -76,7 +76,7 @@ public class CreatureLoader
         boolean tree = el.getAttribute("tree").getBooleanValue();
         boolean water = el.getAttribute("water").getBooleanValue();
         boolean magic_missile = el.getAttribute(
-                "magic_missile").getBooleanValue();
+            "magic_missile").getBooleanValue();
         boolean summonable = el.getAttribute("summonable").getBooleanValue();
         boolean lord = el.getAttribute("lord").getBooleanValue();
         boolean demilord = el.getAttribute("demilord").getBooleanValue();
@@ -88,18 +88,18 @@ public class CreatureLoader
         if (name.equals("Titan"))
         {
             creature = new CreatureTitan(name, power, skill, rangestrikes,
-                    flies, bramble, drift, bog, sanddune, slope, volcano, river,
-                    stone, tree, water, magic_missile, summonable, lord,
-                    demilord,
-                    count, plural_name, base_color);
+                flies, bramble, drift, bog, sanddune, slope, volcano, river,
+                stone, tree, water, magic_missile, summonable, lord,
+                demilord,
+                count, plural_name, base_color);
         }
         else
         {
             creature = new Creature(name, power, skill, rangestrikes,
-                    flies, bramble, drift, bog, sanddune, slope, volcano, river,
-                    stone, tree, water, magic_missile, summonable, lord,
-                    demilord,
-                    count, plural_name, base_color);
+                flies, bramble, drift, bog, sanddune, slope, volcano, river,
+                stone, tree, water, magic_missile, summonable, lord,
+                demilord,
+                count, plural_name, base_color);
         }
         this.creatures.add(creature);
     }

@@ -28,7 +28,7 @@ import net.sf.colossus.util.KDialog;
 
 
 final class PickRecruiter extends KDialog implements MouseListener,
-            WindowListener
+    WindowListener
 {
     private List recruiters;
     private List recruiterChits = new ArrayList();
@@ -38,10 +38,10 @@ final class PickRecruiter extends KDialog implements MouseListener,
 
     /** recruiters is a list of creature name strings */
     private PickRecruiter(JFrame parentFrame, List recruiters,
-            String hexDescription, String markerId, Client client)
+        String hexDescription, String markerId, Client client)
     {
         super(parentFrame, client.getPlayerName() + ": Pick Recruiter in " +
-                hexDescription, true);
+            hexDescription, true);
 
         recruiterName = null;
         this.recruiters = recruiters;
@@ -103,10 +103,10 @@ final class PickRecruiter extends KDialog implements MouseListener,
     }
 
     static String pickRecruiter(JFrame parentFrame, List recruiters,
-            String hexDescription, String markerId, Client client)
+        String hexDescription, String markerId, Client client)
     {
         new PickRecruiter(parentFrame, recruiters, hexDescription, markerId,
-                client);
+            client);
         return recruiterName;
     }
 

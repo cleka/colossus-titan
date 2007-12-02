@@ -23,14 +23,13 @@ public final class LogWindow extends JTextArea
     private Point location;
     private Dimension size;
     private SaveWindow saveWindow;
-	private final Logger logger;
-	private SwingDocumentLogHandler handler;
-
+    private final Logger logger;
+    private SwingDocumentLogHandler handler;
 
     public LogWindow(Client client, Logger logger)
     {
         this.client = client;
-		this.logger = logger;
+        this.logger = logger;
         setEditable(false);
         setBackground(Color.white);
 
@@ -41,7 +40,8 @@ public final class LogWindow extends JTextArea
             {
                 LogWindow.this.dispose();
             }
-        });
+        }
+        );
 
         scrollPane = new JScrollPane(this);
         logFrame.getContentPane().add(scrollPane);
@@ -66,21 +66,19 @@ public final class LogWindow extends JTextArea
         logFrame.setLocation(location);
 
         logFrame.setVisible(true);
-        
+
         handler = new SwingDocumentLogHandler();
         logger.addHandler(handler);
         setDocument(handler.getDocument());
     }
 
-
     public void append(String s)
     {
         super.append(s);
-        
+
         // XXX Removed because of graphical corruption
         // scrollToEnd();   
     }
-
 
     void scrollToEnd()
     {
@@ -89,13 +87,11 @@ public final class LogWindow extends JTextArea
         repaint();
     }
 
-
     public Dimension getMinimumSize()
     {
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
         return new Dimension(Math.min(d.width, 800), 100);
     }
-
 
     public void dispose()
     {

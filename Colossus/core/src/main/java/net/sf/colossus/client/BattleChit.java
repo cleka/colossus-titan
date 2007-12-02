@@ -44,7 +44,7 @@ final class BattleChit extends Chit
     private static boolean useColoredBorders = false;
 
     BattleChit(int scale, String id, boolean inverted, int tag,
-            String currentHexLabel, String colorName, Client client)
+        String currentHexLabel, String colorName, Client client)
     {
         super(scale, id, inverted);
         this.scale = scale;
@@ -220,13 +220,13 @@ final class BattleChit extends Chit
             // Provide a high-contrast background for the number.
             g2.setColor(Color.white);
             g2.fillRect(rect.x + (rect.width - fontWidth) / 2,
-                    rect.y + (rect.height - fontHeight) / 2,
-                    fontWidth, fontHeight);
+                rect.y + (rect.height - fontHeight) / 2,
+                fontWidth, fontHeight);
 
             // Show number of hits taken in red.
             g2.setColor(Color.red);
             g2.drawString(hitString, rect.x + (rect.width - fontWidth) / 2,
-                    rect.y + (rect.height + fontHeight) / 2);
+                rect.y + (rect.height + fontHeight) / 2);
 
             // Restore the font.
             g2.setFont(oldFont);
@@ -241,7 +241,7 @@ final class BattleChit extends Chit
             g2.setColor(Color.black);
             g2.setStroke(oneWide);
             g2.drawRect(outerRect.x, outerRect.y, outerRect.width,
-                    outerRect.height);
+                outerRect.height);
         }
     }
 
@@ -271,14 +271,14 @@ final class BattleChit extends Chit
             innerScale = 60;
         }
         borderStroke = new BasicStroke((int)Math.ceil(
-                (outerRect.width - innerScale) / 2.0));
+            (outerRect.width - innerScale) / 2.0));
         Point center = new Point(outerRect.x + outerRect.width / 2,
-                outerRect.y + outerRect.height / 2);
+            outerRect.y + outerRect.height / 2);
         rect = new Rectangle(center.x - innerScale / 2,
-                center.y - innerScale / 2, innerScale, innerScale);
+            center.y - innerScale / 2, innerScale, innerScale);
         int midScale = (int)(Math.round((scale + innerScale) / 2.0));
         midRect = new Rectangle(center.x - midScale / 2,
-                center.y - midScale / 2, midScale, midScale);
+            center.y - midScale / 2, midScale, midScale);
     }
 
     public String getDescription()

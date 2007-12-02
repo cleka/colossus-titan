@@ -17,11 +17,11 @@ import javax.swing.JScrollPane;
 final class ShowAllRecruits extends AbstractShowRecruits
 {
     private SaveWindow saveWindow;
-    
+
     // Avoid showing multiple allTerrains displays.
     private static boolean allTerrainsDisplayActive = false;
 
-    ShowAllRecruits(JFrame parentFrame, IOptions options, String[] terrains, 
+    ShowAllRecruits(JFrame parentFrame, IOptions options, String[] terrains,
         JScrollPane pane)
     {
         super(parentFrame);
@@ -32,7 +32,7 @@ final class ShowAllRecruits extends AbstractShowRecruits
             return;
         }
         allTerrainsDisplayActive = true;
-        
+
         for (int i = 0; i < terrains.length; i++)
         {
             doOneTerrain(terrains[i], null);
@@ -42,11 +42,11 @@ final class ShowAllRecruits extends AbstractShowRecruits
 
         saveWindow = new SaveWindow(options, "RecruitsScreen");
         Point loadLocation = saveWindow.loadLocation();
-        if (loadLocation == null) 
+        if (loadLocation == null)
         {
             lowerRightCorner();
         }
-        else 
+        else
         {
             setLocation(loadLocation);
         }

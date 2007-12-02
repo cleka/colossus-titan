@@ -22,7 +22,7 @@ import org.jdom.input.SAXBuilder;
  */
 public class VariantLoader
 {
-	private static final Logger LOGGER = Logger.getLogger(VariantLoader.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(VariantLoader.class.getName());
 
     private String map;
     private String ter;
@@ -74,7 +74,7 @@ public class VariantLoader
             Element max_players = root.getChild("max_players");
             if (max_players != null)
             {
-                String s = max_players.getAttributeValue("num"); 
+                String s = max_players.getAttributeValue("num");
                 maxPlayers = Integer.parseInt(s);
             }
         }

@@ -72,7 +72,7 @@ final class PickLord extends KDialog implements MouseListener, WindowListener
         repaint();
     }
 
-    static String pickLord(IOptions options, JFrame parentFrame, 
+    static String pickLord(IOptions options, JFrame parentFrame,
         List imageNames)
     {
         new PickLord(options, parentFrame, imageNames);

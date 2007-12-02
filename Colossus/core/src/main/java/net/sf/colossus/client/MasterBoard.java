@@ -76,9 +76,9 @@ import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
 public final class MasterBoard extends JPanel
 {
-	private static final Logger LOGGER = Logger.getLogger(MasterBoard.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(MasterBoard.class.getName());
 
-	private Image offScreenBuffer;
+    private Image offScreenBuffer;
     private static int horizSize = 0;
     private static int vertSize = 0;
     private boolean overlayChanged = false;
@@ -192,18 +192,18 @@ public final class MasterBoard extends JPanel
                 {
                     List markers = client.getMarkers();
                     // copy to array so we don't get concurrent modification exceptions when iterating
-                    Marker[] markerArray = (Marker[]) markers.toArray(new Marker[markers.size()]);
+                    Marker[] markerArray = (Marker[])markers.toArray(new Marker[markers.size()]);
                     legionFlyouts = new JPanel[markers.size()];
-                    for (int i = 0; i < markerArray.length; i++) 
+                    for (int i = 0; i < markerArray.length; i++)
                     {
                         Marker marker = markerArray[i];
                         LegionInfo legion = client.getLegionInfo(marker.getId());
                         int scale = 2*Scale.get();
-                        
+
                         boolean dubiousAsBlanks = client.getOption(
                             Options.dubiousAsBlanks);
-                        final JPanel panel = new LegionInfoPanel(legion, 
-                            scale, PANEL_MARGIN, PANEL_PADDING, true, 
+                        final JPanel panel = new LegionInfoPanel(legion,
+                            scale, PANEL_MARGIN, PANEL_PADDING, true,
                             viewMode, playerName, dubiousAsBlanks);
                         add(panel);
                         legionFlyouts[i] = panel;
@@ -319,7 +319,8 @@ public final class MasterBoard extends JPanel
         }
         catch (Exception e)
         {
-            LOGGER.log(Level.SEVERE, "Reading map data for non-GUI failed : " + e, (Throwable)null);
+            LOGGER.log(Level.SEVERE,
+                "Reading map data for non-GUI failed : " + e, (Throwable)null);
             e.printStackTrace();
             System.exit(1);
         }
@@ -331,7 +332,7 @@ public final class MasterBoard extends JPanel
     MasterBoard(final Client client)
     {
         this.client = client;
-        
+
         masterFrame = new JFrame("MasterBoard");
         masterFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         contentPane = masterFrame.getContentPane();
@@ -358,14 +359,14 @@ public final class MasterBoard extends JPanel
         saveWindow = new SaveWindow(client, "MasterBoardScreen");
         Point loadLocation = saveWindow.loadLocation();
 
-        if (loadLocation == null) 
+        if (loadLocation == null)
         {
             // Copy of code from KDialog.centerOnScreen();
             Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-            masterFrame.setLocation(new Point(d.width / 2 - 
+            masterFrame.setLocation(new Point(d.width / 2 -
                 getSize().width / 2, d.height / 2 - getSize().height / 2));
         }
-        else 
+        else
         {
             masterFrame.setLocation(loadLocation);
         }
@@ -403,7 +404,8 @@ public final class MasterBoard extends JPanel
                 }
                 else if (phase == Constants.Phase.FIGHT)
                 {
-                    LOGGER.log(Level.SEVERE, "called undoLastAction in FIGHT", (Throwable)null);
+                    LOGGER.log(Level.SEVERE, "called undoLastAction in FIGHT",
+                        (Throwable)null);
                 }
                 else if (phase == Constants.Phase.MUSTER)
                 {
@@ -436,7 +438,8 @@ public final class MasterBoard extends JPanel
                 }
                 else if (phase == Constants.Phase.FIGHT)
                 {
-                    LOGGER.log(Level.SEVERE, "called undoAllAction in FIGHT", (Throwable)null);
+                    LOGGER.log(Level.SEVERE, "called undoAllAction in FIGHT",
+                        (Throwable)null);
                 }
                 else if (phase == Constants.Phase.MUSTER)
                 {
@@ -529,7 +532,7 @@ public final class MasterBoard extends JPanel
                 if (hex != null)
                 {
                     MasterHex hexModel = hex.getMasterHexModel();
-                    new ShowRecruits(masterFrame, hexModel.getTerrain(), 
+                    new ShowRecruits(masterFrame, hexModel.getTerrain(),
                         lastPoint, hexModel.getLabel(), scrollPane);
                 }
             }
@@ -607,31 +610,34 @@ public final class MasterBoard extends JPanel
                 File savesDir = new File(Constants.saveDirname);
                 if (!savesDir.exists())
                 {
-                    LOGGER.log(Level.INFO, "Trying to make directory " + savesDir.toString());
+                    LOGGER.log(Level.INFO,
+                        "Trying to make directory " + savesDir.toString());
                     if (!savesDir.mkdirs())
                     {
-                        LOGGER.log(Level.SEVERE, "Could not create saves directory", (Throwable)null);
+                        LOGGER.log(Level.SEVERE,
+                            "Could not create saves directory", (Throwable)null);
                         JOptionPane.showMessageDialog(masterFrame,
-                                "Could not create directory " + savesDir +
-                                "\n- FileChooser dialog box will default " + 
-                                "to some other (system dependent) directory!",
-                                "Creating directory " + savesDir + " failed!",
-                                JOptionPane.ERROR_MESSAGE);
+                            "Could not create directory " + savesDir +
+                            "\n- FileChooser dialog box will default " +
+                            "to some other (system dependent) directory!",
+                            "Creating directory " + savesDir + " failed!",
+                            JOptionPane.ERROR_MESSAGE);
                     }
                 }
                 else if (!savesDir.isDirectory())
                 {
-                    LOGGER.log(Level.SEVERE, "Can't create directory " + savesDir.toString() + 
-					" - name exists but is not a file", (Throwable)null);
+                    LOGGER.log(Level.SEVERE,
+                        "Can't create directory " + savesDir.toString() +
+                        " - name exists but is not a file", (Throwable)null);
                     JOptionPane.showMessageDialog(masterFrame,
-                            "Can't create directory " + savesDir + 
-                            " (name exists, but is not a file)\n" +
-                            "- FileChooser dialog box will default to " + 
-                            "some other (system dependent) directory!",
-                            "Creating directory " + savesDir + " failed!",
-                            JOptionPane.ERROR_MESSAGE);
+                        "Can't create directory " + savesDir +
+                        " (name exists, but is not a file)\n" +
+                        "- FileChooser dialog box will default to " +
+                        "some other (system dependent) directory!",
+                        "Creating directory " + savesDir + " failed!",
+                        JOptionPane.ERROR_MESSAGE);
                 }
-                
+
                 JFileChooser chooser = new JFileChooser(savesDir);
                 chooser.setFileFilter(new XMLSnapshotFilter());
                 int returnVal = chooser.showSaveDialog(masterFrame);
@@ -706,7 +712,7 @@ public final class MasterBoard extends JPanel
         {
             public void actionPerformed(ActionEvent e)
             {
-                JOptionPane.showMessageDialog(masterFrame, 
+                JOptionPane.showMessageDialog(masterFrame,
                     "Colossus build: " + Client.getVersion() +
                     "\n" +
                     "user.home:      " + System.getProperty("user.home") +
@@ -768,7 +774,7 @@ public final class MasterBoard extends JPanel
         menu.add(rbmi);
         boolean selected = false;
         if (name.equals(
-                client.getStringOption(Options.showRecruitChitsSubmenu)))
+            client.getStringOption(Options.showRecruitChitsSubmenu)))
         {
             selected = true;
         }
@@ -826,7 +832,7 @@ public final class MasterBoard extends JPanel
         JMenu graphicsMenu = new JMenu("Graphics");
         graphicsMenu.setMnemonic(KeyEvent.VK_G);
         menuBar.add(graphicsMenu);
-        
+
         addCheckBox(graphicsMenu, Options.antialias, KeyEvent.VK_N);
         addCheckBox(graphicsMenu, Options.useOverlay, KeyEvent.VK_V);
         addCheckBox(graphicsMenu, Options.useSVG, KeyEvent.VK_S);
@@ -837,7 +843,7 @@ public final class MasterBoard extends JPanel
 
         // The "dubious as blanks" option makes only sense with the 
         //   "view what SplitPrediction tells us" mode => otherwise inactive.
-        JCheckBoxMenuItem cbmi = 
+        JCheckBoxMenuItem cbmi =
             addCheckBox(graphicsMenu, Options.dubiousAsBlanks, KeyEvent.VK_D);
         if (client.getViewMode() != Options.viewableEverNum)
         {
@@ -852,13 +858,13 @@ public final class MasterBoard extends JPanel
         addRadioButton(srcSubmenu, group, Options.showRecruitChitsRecruitHint);
         addRadioButton(srcSubmenu, group, Options.showRecruitChitsAll);
         graphicsMenu.add(srcSubmenu);
-        
+
         // Menu for the "window-related" 
         // (satellite windows and graphic options effecting whole "windows")
         JMenu windowMenu = new JMenu("Window");
         windowMenu.setMnemonic(KeyEvent.VK_W);
         menuBar.add(windowMenu);
- 
+
         addCheckBox(windowMenu, Options.showCaretaker, KeyEvent.VK_C);
         addCheckBox(windowMenu, Options.showStatusScreen, KeyEvent.VK_G);
         addCheckBox(windowMenu, Options.showEngagementResults,
@@ -879,7 +885,7 @@ public final class MasterBoard extends JPanel
         // change scale
         mi = windowMenu.add(changeScaleAction);
         mi.setMnemonic(KeyEvent.VK_S);
-    
+
         if (GraphicsEnvironment.getLocalGraphicsEnvironment()
             .getScreenDevices().length > 1)
         {
@@ -890,7 +896,7 @@ public final class MasterBoard extends JPanel
         lfMenu = new JMenu("Look & Feel");
         // lfMenu.setMnemonic(KeyEvent.VK_L);
         windowMenu.add(lfMenu);
-        
+
         UIManager.LookAndFeelInfo[] lfInfo =
             UIManager.getInstalledLookAndFeels();
         String currentLF = UIManager.getLookAndFeel().getName();
@@ -912,7 +918,7 @@ public final class MasterBoard extends JPanel
         mi = helpMenu.add(aboutAction);
         mi = helpMenu.add(viewReadmeAction);
         mi.setMnemonic(KeyEvent.VK_V);
-        
+
         mi = helpMenu.add(viewHelpDocAction);
     }
 
@@ -1042,7 +1048,8 @@ public final class MasterBoard extends JPanel
         if (_hexByLabel_last_h != h)
         {
             // alas, we have to rebuild the cache
-            LOGGER.log(Level.FINEST, "new 'MasterHex[][] h' in MasterBoard.hexByLabel()");
+            LOGGER.log(Level.FINEST,
+                "new 'MasterHex[][] h' in MasterBoard.hexByLabel()");
             _hexByLabel_last_h = h;
             // write all 'h' elements by their int-value into an Array.
             // we can do that here, because the 'label' arg is an int. if it
@@ -1072,7 +1079,8 @@ public final class MasterBoard extends JPanel
         final MasterHex found = (MasterHex)_hexByLabel_cache.get(label);
         if (found == null)
         {
-            LOGGER.log(Level.WARNING, "Couldn't find Masterhex labeled " + label);
+            LOGGER.log(Level.WARNING,
+                "Couldn't find Masterhex labeled " + label);
         }
         return found;
     }
@@ -1141,7 +1149,9 @@ public final class MasterBoard extends JPanel
         MasterHex dh = hexByLabel(h, h[i][j].getBaseExitLabel(k));
         if (dh == null)
         {
-            LOGGER.log(Level.SEVERE, "null pointer ; i=" + i + ", j=" + j + ", k=" + k, (Throwable)null);
+            LOGGER.log(Level.SEVERE,
+                "null pointer ; i=" + i + ", j=" + j + ", k=" + k,
+                (Throwable)null);
             System.exit(1);
         }
         assert dh != null; // Static analysis of Eclipse doesn't grok System.exit()
@@ -1157,7 +1167,8 @@ public final class MasterBoard extends JPanel
             }
             else
             {
-                LOGGER.log(Level.WARNING, "bad exit ; i=" + i + ", j=" + j + ", k=" + k);
+                LOGGER.log(Level.WARNING,
+                    "bad exit ; i=" + i + ", j=" + j + ", k=" + k);
             }
         }
         else if (dh.getXCoord() == (i + 1))
@@ -1169,7 +1180,8 @@ public final class MasterBoard extends JPanel
             }
             else
             {
-                LOGGER.log(Level.WARNING, "bad exit ; i=" + i + ", j=" + j + ", k=" + k);
+                LOGGER.log(Level.WARNING,
+                    "bad exit ; i=" + i + ", j=" + j + ", k=" + k);
             }
         }
         else if (dh.getXCoord() == (i - 1))
@@ -1181,12 +1193,14 @@ public final class MasterBoard extends JPanel
             }
             else
             {
-                LOGGER.log(Level.WARNING, "bad exit ; i=" + i + ", j=" + j + ", k=" + k);
+                LOGGER.log(Level.WARNING,
+                    "bad exit ; i=" + i + ", j=" + j + ", k=" + k);
             }
         }
         else
         {
-            LOGGER.log(Level.WARNING, "bad exit ; i=" + i + ", j=" + j + ", k=" + k);
+            LOGGER.log(Level.WARNING,
+                "bad exit ; i=" + i + ", j=" + j + ", k=" + k);
         }
     }
 
@@ -1230,7 +1244,8 @@ public final class MasterBoard extends JPanel
                                     break;
 
                                 default:
-                                    LOGGER.log(Level.SEVERE, "Bogus hexside", (Throwable)null);
+                                    LOGGER.log(Level.SEVERE, "Bogus hexside",
+                                        (Throwable)null);
                             }
                         }
                     }
@@ -1463,7 +1478,7 @@ public final class MasterBoard extends JPanel
         {
             bottomBar.setOwnPhase("Movement");
             bottomBar.disableDoneButton();
-            
+
             JMenuItem mi;
 
             mi = phaseMenu.add(clearRecruitChitsAction);
@@ -1785,7 +1800,8 @@ public final class MasterBoard extends JPanel
 
         if (image == null)
         {
-            LOGGER.log(Level.SEVERE, "Couldn't find Colossus icon", (Throwable)null);
+            LOGGER.log(Level.SEVERE, "Couldn't find Colossus icon",
+                (Throwable)null);
         }
         else
         {
@@ -2048,7 +2064,8 @@ public final class MasterBoard extends JPanel
                     }
                     else
                     {
-                        LOGGER.log(Level.WARNING, "null hex in MasterBoard.mousePressed()");
+                        LOGGER.log(Level.WARNING,
+                            "null hex in MasterBoard.mousePressed()");
                     }
                     return;
                 }
@@ -2085,6 +2102,7 @@ public final class MasterBoard extends JPanel
         }
     }
 
+
     class MasterBoardMouseMotionHandler extends MouseMotionAdapter
     {
         public void mouseMoved(MouseEvent e)
@@ -2094,8 +2112,8 @@ public final class MasterBoard extends JPanel
             if (marker != null)
             {
                 client.showMarker(marker);
-            } 
-            else 
+            }
+            else
             {
                 GUIMasterHex hex = getHexContainingPoint(point);
                 if (hex != null)
@@ -2178,6 +2196,7 @@ public final class MasterBoard extends JPanel
         }
     }
 
+
     class MasterBoardRecruitChitMenuHandler implements ItemListener
     {
         public void itemStateChanged(ItemEvent e)
@@ -2191,6 +2210,7 @@ public final class MasterBoard extends JPanel
             }
         }
     }
+
 
     class MasterBoardWindowHandler extends WindowAdapter
     {
@@ -2304,6 +2324,7 @@ public final class MasterBoard extends JPanel
             }
         }
     }
+
     private void paintPossibleRecruitChits(Graphics g)
     {
         Iterator it = client.getPossibleRecruitChits().iterator();
@@ -2507,7 +2528,7 @@ public final class MasterBoard extends JPanel
 
         }
     }
-    
+
     public void enableBottomBarDoneButton()
     {
         bottomBar.enableDoneButton();

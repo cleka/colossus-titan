@@ -1,5 +1,6 @@
 package net.sf.colossus.server;
 
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -9,6 +10,7 @@ import java.util.logging.Logger;
 import net.sf.colossus.client.CaretakerInfo;
 import net.sf.colossus.client.PlayerInfo;
 
+
 /**
  * Base class to implement custom recruiting functions 
  *   (i.e. anything that is not a-number-of-creature to another creature)
@@ -17,7 +19,7 @@ import net.sf.colossus.client.PlayerInfo;
  */
 abstract public class CustomRecruitBase
 {
-	private static final Logger LOGGER = Logger.getLogger(CustomRecruitBase.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(CustomRecruitBase.class.getName());
 
     protected static List allPlayerInfo = new ArrayList();
     private static List allCaretakerInfo = new ArrayList();
@@ -30,7 +32,6 @@ abstract public class CustomRecruitBase
         LOGGER.log(Level.FINEST, "CUSTOM: adding " + getClass().getName());
         allCustomRecruitBase.add(this);
     }
-    
 
     /* full reset (change variant) */
     synchronized public static final void reset()
@@ -50,7 +51,7 @@ abstract public class CustomRecruitBase
         allCaretakerInfo.clear();
         serverGame = null;
         serverCaretaker = null;
-        
+
         Iterator it = allCustomRecruitBase.iterator();
         while (it.hasNext())
         {
@@ -58,7 +59,7 @@ abstract public class CustomRecruitBase
             crb.resetInstance();
         }
     }
-    
+
     synchronized public static final void everyoneAdvanceTurn(
         int newActivePlayer)
     {
@@ -69,7 +70,7 @@ abstract public class CustomRecruitBase
             crb.changeOfTurn(newActivePlayer);
         }
     }
-    
+
     synchronized public static final void addPlayerInfo(PlayerInfo pi)
     {
         allPlayerInfo.add(pi);
@@ -89,9 +90,9 @@ abstract public class CustomRecruitBase
     {
         serverGame = g;
     }
-    
+
     synchronized protected final void setCount(String name,
-                                               int newCount)
+        int newCount)
     {
         // first update all known CaretakerInfo (if we're client(s))
         Iterator it = allCaretakerInfo.iterator();
@@ -99,8 +100,8 @@ abstract public class CustomRecruitBase
         {
             CaretakerInfo ci = (CaretakerInfo)it.next();
             ci.updateCount(name,
-                           newCount,
-                           ci.getDeadCount(name));
+                newCount,
+                ci.getDeadCount(name));
         }
         // update the Caretaker if we're server
         if (serverCaretaker != null)
@@ -116,7 +117,7 @@ abstract public class CustomRecruitBase
             //serverCaretaker.updateDisplays(name);
         }
     }
-    
+
     synchronized protected final int getCount(String name)
     {
         int count = -1;
@@ -130,8 +131,10 @@ abstract public class CustomRecruitBase
             if ((oldcount != -1) &&
                 (count != oldcount))
             {
-                LOGGER.log(Level.SEVERE, "in CustomRecruitBase, not all CaretakerInfo's"
-				+ " count match !", (Throwable)null);
+                LOGGER.log(Level.SEVERE,
+                    "in CustomRecruitBase, not all CaretakerInfo's" +
+                    " count match !",
+                    (Throwable)null);
             }
         }
         // second, update the Caretaker if we're server
@@ -142,15 +145,17 @@ abstract public class CustomRecruitBase
             if ((oldcount != -1) &&
                 (count != oldcount))
             {
-                LOGGER.log(Level.SEVERE, "in CustomRecruitBase, Caretaker's count "
-				+ "doesn't match CaretakerInfo's counts!", (Throwable)null);
+                LOGGER.log(Level.SEVERE,
+                    "in CustomRecruitBase, Caretaker's count " +
+                    "doesn't match CaretakerInfo's counts!",
+                    (Throwable)null);
             }
         }
         return count;
     }
 
     synchronized protected final void setDeadCount(String name,
-                                                   int newDeadCount)
+        int newDeadCount)
     {
         // first update all known CaretakerInfo (if we're client(s))
         Iterator it = allCaretakerInfo.iterator();
@@ -158,8 +163,8 @@ abstract public class CustomRecruitBase
         {
             CaretakerInfo ci = (CaretakerInfo)it.next();
             ci.updateCount(name,
-                           ci.getCount(name),
-                           newDeadCount);
+                ci.getCount(name),
+                newDeadCount);
         }
         // second, update the Caretaker if we're server
         if (serverCaretaker != null)
@@ -183,8 +188,10 @@ abstract public class CustomRecruitBase
             if ((oldcount != -1) &&
                 (count != oldcount))
             {
-                LOGGER.log(Level.SEVERE, "in CustomRecruitBase, not all CaretakerInfo's "
-				+"dead count match !", (Throwable)null);
+                LOGGER.log(Level.SEVERE,
+                    "in CustomRecruitBase, not all CaretakerInfo's " +
+                    "dead count match !",
+                    (Throwable)null);
             }
         }
         // second, update the Caretaker if we're server
@@ -195,8 +202,10 @@ abstract public class CustomRecruitBase
             if ((oldcount != -1) &&
                 (count != oldcount))
             {
-                LOGGER.log(Level.SEVERE, "in CustomRecruitBase, Caretaker's dead count "
-				+ "doesn't match CaretakerInfo's counts!", (Throwable)null);
+                LOGGER.log(Level.SEVERE,
+                    "in CustomRecruitBase, Caretaker's dead count " +
+                    "doesn't match CaretakerInfo's counts!",
+                    (Throwable)null);
             }
         }
         return count;
@@ -224,7 +233,8 @@ abstract public class CustomRecruitBase
         }
         // num > 2 this should not happen during recruiting, 
         //   as only a three-way split can do that.
-        LOGGER.log(Level.WARNING, "CUSTOM: 3 legions in recruiting hex " + hexLabel + " ?!?");
+        LOGGER.log(Level.WARNING,
+            "CUSTOM: 3 legions in recruiting hex " + hexLabel + " ?!?");
         return null;
     }
 
@@ -232,26 +242,26 @@ abstract public class CustomRecruitBase
 
     /** List all Creature that can recruit in this terrain in a special way */
     abstract public List getAllPossibleSpecialRecruiters(String terrain);
-      
+
     /** List all Creature that can be recruited in this terrain 
      * in a special way */
     abstract public List getAllPossibleSpecialRecruits(String terrain);
 
     /** List Creature that can recruit in this terrain in a special way now */
     abstract public List getPossibleSpecialRecruiters(String terrain,
-                                                      String hexLabel);
+        String hexLabel);
 
     /** List Creature that can be recruited in this terrain 
      * in a special way now */
     abstract public List getPossibleSpecialRecruits(String terrain,
-                                                    String hexLabel);
+        String hexLabel);
 
     /** number of recruiter needed to get a recruit 
      * in a special way in this terrain now */
     abstract public int numberOfRecruiterNeeded(String recruiter,
-                                                String recruit,
-                                                String terrain,
-                                                String hexLabel);
+        String recruit,
+        String terrain,
+        String hexLabel);
 
     /** bookkeeping function, called once after every player turn.
      private as it should only be called from everyoneAdvanceTurn() */

@@ -43,7 +43,7 @@ final class Negotiate extends KDialog implements MouseListener, ActionListener
     Negotiate(Client client, String attackerId, String defenderId)
     {
         super(client.getBoard().getFrame(), client.getPlayerName() + ": " +
-                attackerId + " Negotiates with " + defenderId, false);
+            attackerId + " Negotiates with " + defenderId, false);
 
         this.client = client;
         this.attackerId = attackerId;
@@ -164,7 +164,7 @@ final class Negotiate extends KDialog implements MouseListener, ActionListener
             if (attackersLeft && defendersLeft)
             {
                 client.showMessageDialog(
-                        "At least one legion must be eliminated.");
+                    "At least one legion must be eliminated.");
                 return;
             }
 
@@ -172,7 +172,7 @@ final class Negotiate extends KDialog implements MouseListener, ActionListener
             {
                 // Mutual destruction.
                 proposal = new Proposal(attackerId, defenderId,
-                        false, true, null, null);
+                    false, true, null, null);
             }
             else
             {
@@ -197,7 +197,7 @@ final class Negotiate extends KDialog implements MouseListener, ActionListener
                 {
                     Chit chit = (Chit)it.next();
                     if (chit.isDead() && chit.getId().startsWith(
-                            Constants.titan))
+                        Constants.titan))
                     {
                         client.showMessageDialog(
                             "Titan cannot die unless his whole stack dies.");
@@ -222,7 +222,7 @@ final class Negotiate extends KDialog implements MouseListener, ActionListener
                     }
                 }
                 proposal = new Proposal(attackerId, defenderId,
-                        false, false, winnerMarkerId, winnerLosses);
+                    false, false, winnerMarkerId, winnerLosses);
             }
 
             // Exit this dialog.
@@ -232,7 +232,7 @@ final class Negotiate extends KDialog implements MouseListener, ActionListener
         else if (e.getActionCommand().equals("Fight"))
         {
             proposal = new Proposal(attackerId, defenderId, true,
-                    false, null, null);
+                false, null, null);
 
             // Exit this dialog.
             cleanup();

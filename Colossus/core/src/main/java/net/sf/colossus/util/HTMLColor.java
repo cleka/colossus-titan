@@ -14,7 +14,7 @@ import java.util.logging.Logger;
 
 public final class HTMLColor
 {
-	private static final Logger LOGGER = Logger.getLogger(HTMLColor.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(HTMLColor.class.getName());
 
     // Colors defined in the standard.
     public static final Color aliceBlue = new Color(240, 248, 255);
@@ -194,14 +194,15 @@ public final class HTMLColor
         {
             java.lang.Class htmlColor = Class.forName(
                 "net.sf.colossus.util.HTMLColor");
-            java.lang.reflect.Field fieldColor = 
+            java.lang.reflect.Field fieldColor =
                 htmlColor.getDeclaredField(colorName);
             theColor = (Color)fieldColor.get(null);
         }
         catch (Exception e)
         {
-            LOGGER.log(Level.WARNING, "I know nothing about color \"" + colorName + 
-			"\", : " + e);
+            LOGGER.log(Level.WARNING,
+                "I know nothing about color \"" + colorName +
+                "\", : " + e);
             theColor = Color.black;
         }
         return theColor;
@@ -211,18 +212,17 @@ public final class HTMLColor
     public static String colorToCode(Color c)
     {
         // mask alpha out, fill with zeros to length 7, cut rightmost 6. 
-        return ("#"
-            + Integer.toHexString(
-                 (c.getRGB() & 0xffffff) + 0x1000000
-            ).substring(1) 
-        ); 
+        return ("#" + Integer.toHexString(
+            (c.getRGB() & 0xffffff) + 0x1000000
+            ).substring(1)
+            );
     }
 
     public static Color invertRGBColor(Color c)
     {
         Color c2 = new Color(255 - c.getRed(),
-                             255 - c.getGreen(),
-                             255 - c.getBlue());
+            255 - c.getGreen(),
+            255 - c.getBlue());
         return c2;
     }
 }

@@ -3,6 +3,7 @@
  */
 package net.sf.colossus.util;
 
+
 /**
  * Terrain type of hexes.
  *
@@ -30,22 +31,31 @@ public interface Terrains
     //
     /** hazard terrain name Plains */
     String H_PLAINS   = "Plains";
+
     /** hazard terrain name Brambles */
     String H_BRAMBLES = "Brambles";
+
     /** hazard terrain name Sand */
     String H_SAND     = "Sand";
+
     /** hazard terrain name Tree */
     String H_TREE     = "Tree";
+
     /** hazard terrain name Bog */
     String H_BOG      = "Bog";
+
     /** hazard terrain name Volcano */
     String H_VOLCANO  = "Volcano";
+
     /** hazard terrain name Drift */
     String H_DRIFT    = "Drift";
+
     /** hazard terrain name Tower */
     String H_TOWER    = "Tower";
+
     /** hazard terrain name Stone */
     String H_STONE    = "Stone";
+
     /** hazard terrain name Lake, in some variants */
     String H_LAKE     = "Lake";
 

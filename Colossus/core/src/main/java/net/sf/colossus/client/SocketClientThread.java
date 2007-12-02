@@ -28,7 +28,7 @@ import net.sf.colossus.util.Split;
 
 final class SocketClientThread extends Thread implements IServer
 {
-	private static final Logger LOGGER = Logger.getLogger(SocketClientThread.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(SocketClientThread.class.getName());
 
     private Client client;
     private String host;
@@ -50,7 +50,8 @@ final class SocketClientThread extends Thread implements IServer
 
     public void run()
     {
-        LOGGER.log(Level.FINEST, "About to connect client socket to " + host + ":" + port);
+        LOGGER.log(Level.FINEST,
+            "About to connect client socket to " + host + ":" + port);
         try
         {
             socket = new Socket(host, port);
@@ -69,7 +70,7 @@ final class SocketClientThread extends Thread implements IServer
         try
         {
             in = new BufferedReader(new InputStreamReader(
-                    socket.getInputStream()));
+                socket.getInputStream()));
         }
         catch (IOException ex)
         {
@@ -106,7 +107,7 @@ final class SocketClientThread extends Thread implements IServer
     {
         this.goingDown = true;
     }
-    
+
     private synchronized void parseLine(String s)
     {
         List li = Split.split(sep, s);
@@ -160,19 +161,19 @@ final class SocketClientThread extends Thread implements IServer
         {
             String markerId = (String)args.remove(0);
             boolean moved =
-                    Boolean.valueOf((String)args.remove(0)).booleanValue();
+                Boolean.valueOf((String)args.remove(0)).booleanValue();
             boolean teleported =
-                    Boolean.valueOf((String)args.remove(0)).booleanValue();
+                Boolean.valueOf((String)args.remove(0)).booleanValue();
             int entrySide = Integer.parseInt((String)args.remove(0));
             String lastRecruit = (String)args.remove(0);
             client.setLegionStatus(markerId, moved, teleported, entrySide,
-                    lastRecruit);
+                lastRecruit);
         }
         else if (method.equals(Constants.addCreature))
         {
             String markerId = (String)args.remove(0);
             String name = (String)args.remove(0);
-            String reason = args.isEmpty() ? new String("<Unknown>") : 
+            String reason = args.isEmpty() ? new String("<Unknown>") :
                 (String)args.remove(0);
             client.addCreature(markerId, name, reason);
         }
@@ -180,7 +181,7 @@ final class SocketClientThread extends Thread implements IServer
         {
             String markerId = (String)args.remove(0);
             String name = (String)args.remove(0);
-            String reason = args.isEmpty() ? new String("<Unknown>") : 
+            String reason = args.isEmpty() ? new String("<Unknown>") :
                 (String)args.remove(0);
             client.removeCreature(markerId, name, reason);
         }
@@ -192,13 +193,13 @@ final class SocketClientThread extends Thread implements IServer
 
             // safeguard against getting empty string list from server
             // TODO: should split be fixed instead??
-            if (namesString.equals("") && names.size() > 0 && 
-                 names.get(0).equals("") )
+            if (namesString.equals("") && names.size() > 0 &&
+                names.get(0).equals("") )
             {
                 names.remove(0);
             }
-            String reason = args.isEmpty() ? new String("<Unknown>") : 
-                 (String)args.remove(0);
+            String reason = args.isEmpty() ? new String("<Unknown>") :
+                (String)args.remove(0);
             client.revealCreatures(markerId, names, reason);
         }
         else if (method.equals(Constants.revealEngagedCreatures))
@@ -207,8 +208,8 @@ final class SocketClientThread extends Thread implements IServer
             boolean isAttacker =
                 Boolean.valueOf((String)args.remove(0)).booleanValue();
             List names = Split.split(Glob.sep, (String)args.remove(0));
-            String reason = args.isEmpty() ? new String("<Unknown>") : 
-                 (String)args.remove(0);
+            String reason = args.isEmpty() ? new String("<Unknown>") :
+                (String)args.remove(0);
             client.revealEngagedCreatures(markerId, names, isAttacker, reason);
         }
         else if (method.equals(Constants.removeDeadBattleChits))
@@ -219,7 +220,7 @@ final class SocketClientThread extends Thread implements IServer
         {
             String imageName = (String)args.remove(0);
             boolean inverted =
-                    Boolean.valueOf((String)args.remove(0)).booleanValue();
+                Boolean.valueOf((String)args.remove(0)).booleanValue();
             int tag = Integer.parseInt((String)args.remove(0));
             String hexLabel = (String)args.remove(0);
             client.placeNewChit(imageName, inverted, tag, hexLabel);
@@ -291,9 +292,9 @@ final class SocketClientThread extends Thread implements IServer
             List rolls = Split.split(Glob.sep, (String)args.remove(0));
             int damage = Integer.parseInt((String)args.remove(0));
             boolean killed =
-                    Boolean.valueOf((String)args.remove(0)).booleanValue();
+                Boolean.valueOf((String)args.remove(0)).booleanValue();
             boolean wasCarry =
-                    Boolean.valueOf((String)args.remove(0)).booleanValue();
+                Boolean.valueOf((String)args.remove(0)).booleanValue();
             int carryDamageLeft = Integer.parseInt((String)args.remove(0));
 
             Set carryTargetDescriptions = new HashSet();
@@ -308,8 +309,8 @@ final class SocketClientThread extends Thread implements IServer
             }
 
             client.tellStrikeResults(strikerTag, targetTag, strikeNumber,
-                    rolls, damage, killed, wasCarry, carryDamageLeft,
-                    carryTargetDescriptions);
+                rolls, damage, killed, wasCarry, carryDamageLeft,
+                carryTargetDescriptions);
         }
         else if (method.equals(Constants.initBattle))
         {
@@ -321,8 +322,8 @@ final class SocketClientThread extends Thread implements IServer
             String attackerMarkerId = (String)args.remove(0);
             String defenderMarkerId = (String)args.remove(0);
             client.initBattle(masterHexLabel, battleTurnNumber,
-                    battleActivePlayerName, battlePhase, attackerMarkerId,
-                    defenderMarkerId);
+                battleActivePlayerName, battlePhase, attackerMarkerId,
+                defenderMarkerId);
         }
         else if (method.equals(Constants.cleanupBattle))
         {
@@ -344,7 +345,7 @@ final class SocketClientThread extends Thread implements IServer
             String recruiterName = (String)args.remove(0);
             int numRecruiters = Integer.parseInt((String)args.remove(0));
             client.didRecruit(markerId, recruitName, recruiterName,
-                    numRecruiters);
+                numRecruiters);
         }
         else if (method.equals(Constants.undidRecruit))
         {
@@ -387,14 +388,14 @@ final class SocketClientThread extends Thread implements IServer
             String battleActivePlayerName = (String)args.remove(0);
             int battleTurnNumber = Integer.parseInt((String)args.remove(0));
             client.setupBattleRecruit(battleActivePlayerName,
-                    battleTurnNumber);
+                battleTurnNumber);
         }
         else if (method.equals(Constants.setupBattleMove))
         {
             String battleActivePlayerName = (String)args.remove(0);
             int battleTurnNumber = Integer.parseInt((String)args.remove(0));
             client.setupBattleMove(battleActivePlayerName,
-                    battleTurnNumber);
+                battleTurnNumber);
         }
         else if (method.equals(Constants.setupBattleFight))
         {
@@ -415,7 +416,7 @@ final class SocketClientThread extends Thread implements IServer
             String startingHexLabel = (String)args.remove(0);
             String endingHexLabel = (String)args.remove(0);
             boolean undo =
-                    Boolean.valueOf((String)args.remove(0)).booleanValue();
+                Boolean.valueOf((String)args.remove(0)).booleanValue();
             client.tellBattleMove(tag, startingHexLabel, endingHexLabel, undo);
         }
         else if (method.equals(Constants.didMove))
@@ -425,26 +426,26 @@ final class SocketClientThread extends Thread implements IServer
             String currentHexLabel = (String)args.remove(0);
             String entrySide = (String)args.remove(0);
             boolean teleport =
-                    Boolean.valueOf((String)args.remove(0)).booleanValue();
+                Boolean.valueOf((String)args.remove(0)).booleanValue();
             // servers from older versions might not send this arg
             String teleportingLord = null;
             if (!args.isEmpty())
             {
                 teleportingLord = (String)args.remove(0);
-                if (teleportingLord.equals("null")) 
-                { 
+                if (teleportingLord.equals("null"))
+                {
                     teleportingLord = null;
                 }
             }
             boolean splitLegionHasForcedMove = false;
             // servers from older versions might not send this arg
-            if ( ! args.isEmpty() )
+            if ( !args.isEmpty() )
             {
-                splitLegionHasForcedMove = 
+                splitLegionHasForcedMove =
                     Boolean.valueOf((String)args.remove(0)).booleanValue();
             }
             client.didMove(markerId, startingHexLabel, currentHexLabel,
-                    entrySide, teleport, teleportingLord, splitLegionHasForcedMove);
+                entrySide, teleport, teleportingLord, splitLegionHasForcedMove);
         }
         else if (method.equals(Constants.undidMove))
         {
@@ -453,13 +454,13 @@ final class SocketClientThread extends Thread implements IServer
             String currentHexLabel = (String)args.remove(0);
             boolean splitLegionHasForcedMove = false;
             // servers from older versions might not send this arg
-            if ( ! args.isEmpty() )
+            if ( !args.isEmpty() )
             {
-                splitLegionHasForcedMove = 
+                splitLegionHasForcedMove =
                     Boolean.valueOf((String)args.remove(0)).booleanValue();
             }
             client.undidMove(markerId, formerHexLabel, currentHexLabel,
-                    splitLegionHasForcedMove);
+                splitLegionHasForcedMove);
         }
         else if (method.equals(Constants.didSummon))
         {
@@ -489,7 +490,7 @@ final class SocketClientThread extends Thread implements IServer
             }
             int turn = Integer.parseInt((String)args.remove(0));
             client.didSplit(hexLabel, parentId, childId, childHeight,
-                    splitoffs, turn);
+                splitoffs, turn);
         }
         else if (method.equals(Constants.askPickColor))
         {
@@ -517,8 +518,8 @@ final class SocketClientThread extends Thread implements IServer
         else if (method.equals(Constants.tellEngagement))
         {
             client.tellEngagement((String)args.remove(0),
-                    (String)args.remove(0),
-                    (String)args.remove(0));
+                (String)args.remove(0),
+                (String)args.remove(0));
         }
         else if (method.equals(Constants.tellEngagementResults))
         {
@@ -531,7 +532,7 @@ final class SocketClientThread extends Thread implements IServer
         else
         {
             LOGGER.log(Level.SEVERE, "Bogus packet (Client, method: " +
-			method + ", args: " + args + ")", (Throwable)null);
+                method + ", args: " + args + ")", (Throwable)null);
         }
     }
 
@@ -539,7 +540,7 @@ final class SocketClientThread extends Thread implements IServer
     private void signOn()
     {
         out.println(Constants.signOn + sep + client.getPlayerName() + sep +
-                client.isRemote());
+            client.isRemote());
     }
 
     /** Set the thread name to playerName, and tell the server so we
@@ -576,14 +577,14 @@ final class SocketClientThread extends Thread implements IServer
     public void doSummon(String markerId, String donorId, String angel)
     {
         out.println(Constants.doSummon + sep + markerId + sep + donorId +
-                sep + angel);
+            sep + angel);
     }
 
     public void doRecruit(String markerId, String recruitName,
-            String recruiterName)
+        String recruiterName)
     {
         out.println(Constants.doRecruit + sep + markerId + sep + recruitName +
-                sep + recruiterName);
+            sep + recruiterName);
     }
 
     public void engage(String hexLabel)
@@ -699,14 +700,14 @@ final class SocketClientThread extends Thread implements IServer
     public void doSplit(String parentId, String childId, String results)
     {
         out.println(Constants.doSplit + sep + parentId + sep + childId + sep +
-                results);
+            results);
     }
 
     public void doMove(String markerId, String hexLabel, String entrySide,
-            boolean teleport, String teleportingLord)
+        boolean teleport, String teleportingLord)
     {
         out.println(Constants.doMove + sep + markerId + sep + hexLabel + sep +
-                entrySide + sep + teleport + sep + teleportingLord);
+            entrySide + sep + teleport + sep + teleportingLord);
     }
 
     public void assignColor(String color)

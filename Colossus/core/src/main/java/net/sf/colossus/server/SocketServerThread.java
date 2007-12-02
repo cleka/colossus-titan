@@ -26,7 +26,7 @@ import net.sf.colossus.util.Split;
 
 final class SocketServerThread extends Thread implements IClient
 {
-	private static final Logger LOGGER = Logger.getLogger(SocketServerThread.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(SocketServerThread.class.getName());
 
     private Server server;
     private Socket socket;
@@ -39,7 +39,7 @@ final class SocketServerThread extends Thread implements IClient
     private static final String sep = Constants.protocolTermSeparator;
 
     SocketServerThread(Server server, Socket socket,
-            List activeSocketList)
+        List activeSocketList)
     {
         super("SocketServerThread");
         this.server = server;
@@ -66,7 +66,8 @@ final class SocketServerThread extends Thread implements IClient
             String fromClient;
             while ((fromClient = in.readLine()) != null)
             {
-                LOGGER.log(Level.FINEST, "From client " + playerName + ": " + fromClient);
+                LOGGER.log(Level.FINEST,
+                    "From client " + playerName + ": " + fromClient);
                 parseLine(fromClient);
             }
             LOGGER.log(Level.FINEST, "End of SocketServerThread while loop");
@@ -100,7 +101,8 @@ final class SocketServerThread extends Thread implements IClient
         String method = (String)li.remove(0);
         if (playerName == null && !method.equals(Constants.signOn))
         {
-            LOGGER.log(Level.SEVERE, "First packet must be signOn", (Throwable)null);
+            LOGGER.log(Level.SEVERE, "First packet must be signOn",
+                (Throwable)null);
         }
         else
         {
@@ -114,7 +116,7 @@ final class SocketServerThread extends Thread implements IClient
         {
             String playerName = (String)args.remove(0);
             boolean remote =
-                    Boolean.valueOf((String)args.remove(0)).booleanValue();
+                Boolean.valueOf((String)args.remove(0)).booleanValue();
             setPlayerName(playerName);
             server.addClient(this, playerName, remote);
         }
@@ -123,7 +125,7 @@ final class SocketServerThread extends Thread implements IClient
             String newName = (String)args.remove(0);
             // Prevent an infinite loop oscillating between two names.
             if (!newName.equals(playerName) &&
-                    !newName.startsWith(Constants.byColor))
+                !newName.startsWith(Constants.byColor))
             {
                 setPlayerName(newName);
             }
@@ -285,10 +287,10 @@ final class SocketServerThread extends Thread implements IClient
             String hexLabel = (String)args.remove(0);
             String entrySide = (String)args.remove(0);
             boolean teleport =
-                    Boolean.valueOf((String)args.remove(0)).booleanValue();
+                Boolean.valueOf((String)args.remove(0)).booleanValue();
             String teleportingLord = (String)args.remove(0);
             server.doMove(markerId, hexLabel, entrySide, teleport,
-                    teleportingLord);
+                teleportingLord);
         }
         else if (method.equals(Constants.assignColor))
         {
@@ -317,7 +319,7 @@ final class SocketServerThread extends Thread implements IClient
         else
         {
             LOGGER.log(Level.SEVERE, "Bogus packet (Server, method: " +
-			method + ", args: " + args + ")", (Throwable)null);
+                method + ", args: " + args + ")", (Throwable)null);
         }
     }
 
@@ -329,17 +331,17 @@ final class SocketServerThread extends Thread implements IClient
     }
 
     public void tellEngagement(String hexLabel, String attackerId,
-            String defenderId)
+        String defenderId)
     {
         out.println(Constants.tellEngagement + sep + hexLabel + sep +
-                attackerId + sep + defenderId);
+            attackerId + sep + defenderId);
     }
 
     public void tellEngagementResults(String winnerId, String method,
-            int points, int turns)
+        int points, int turns)
     {
         out.println(Constants.tellEngagementResults + sep + winnerId + sep +
-                method + sep + points + sep + turns);
+            method + sep + points + sep + turns);
     }
 
     public void tellMovementRoll(int roll)
@@ -363,10 +365,10 @@ final class SocketServerThread extends Thread implements IClient
     }
 
     public void updateCreatureCount(String creatureName, int count,
-            int deadCount)
+        int deadCount)
     {
         out.println(Constants.updateCreatureCount + sep + creatureName + sep +
-                count + sep + deadCount);
+            count + sep + deadCount);
     }
 
     public void dispose()
@@ -380,29 +382,29 @@ final class SocketServerThread extends Thread implements IClient
     }
 
     public void setLegionStatus(String markerId, boolean moved,
-            boolean teleported, int entrySide, String lastRecruit)
+        boolean teleported, int entrySide, String lastRecruit)
     {
         out.println(Constants.setLegionStatus + sep + markerId + sep + moved +
-                sep + teleported + sep + entrySide + sep + lastRecruit);
+            sep + teleported + sep + entrySide + sep + lastRecruit);
     }
 
     public void addCreature(String markerId, String name, String reason)
     {
-        out.println(Constants.addCreature + sep + markerId + sep + name + 
-             sep + reason);
+        out.println(Constants.addCreature + sep + markerId + sep + name +
+            sep + reason);
     }
 
     public void removeCreature(String markerId, String name, String reason)
     {
-        out.println(Constants.removeCreature + sep + markerId + sep + name + 
-             sep + reason);
+        out.println(Constants.removeCreature + sep + markerId + sep + name +
+            sep + reason);
     }
 
-    public void revealCreatures(String markerId, final List names, 
-         String reason)
+    public void revealCreatures(String markerId, final List names,
+        String reason)
     {
         out.println(Constants.revealCreatures + sep + markerId + sep +
-                Glob.glob(names) + sep + reason);
+            Glob.glob(names) + sep + reason);
     }
 
     /** print the 'revealEngagagedCreature'-message,
@@ -416,8 +418,8 @@ final class SocketServerThread extends Thread implements IClient
     public void revealEngagedCreatures(final String markerId, final List names,
         final boolean isAttacker, String reason)
     {
-        out.println(Constants.revealEngagedCreatures + sep + markerId
-            + sep + isAttacker + sep + Glob.glob(names) + sep + reason);
+        out.println(Constants.revealEngagedCreatures + sep + markerId + sep +
+            isAttacker + sep + Glob.glob(names) + sep + reason);
     }
 
     public void removeDeadBattleChits()
@@ -426,10 +428,10 @@ final class SocketServerThread extends Thread implements IClient
     }
 
     public void placeNewChit(String imageName, boolean inverted, int tag,
-            String hexLabel)
+        String hexLabel)
     {
         out.println(Constants.placeNewChit + sep + imageName + sep +
-                inverted + sep + tag + sep + hexLabel);
+            inverted + sep + tag + sep + hexLabel);
     }
 
     public void initBoard()
@@ -453,13 +455,13 @@ final class SocketServerThread extends Thread implements IClient
     public void askAcquireAngel(String markerId, List recruits)
     {
         out.println(Constants.askAcquireAngel + sep + markerId + sep +
-                Glob.glob(recruits));
+            Glob.glob(recruits));
     }
 
     public void askChooseStrikePenalty(List choices)
     {
         out.println(Constants.askChooseStrikePenalty + sep +
-                Glob.glob(choices));
+            Glob.glob(choices));
     }
 
     public void tellGameOver(String message)
@@ -470,25 +472,25 @@ final class SocketServerThread extends Thread implements IClient
     public void tellPlayerElim(String playerName, String slayerName)
     {
         out.println(Constants.tellPlayerElim + sep + playerName + sep +
-                slayerName);
+            slayerName);
     }
 
     public void askConcede(String allyMarkerId, String enemyMarkerId)
     {
         out.println(Constants.askConcede + sep + allyMarkerId + sep +
-                enemyMarkerId);
+            enemyMarkerId);
     }
 
     public void askFlee(String allyMarkerId, String enemyMarkerId)
     {
         out.println(Constants.askFlee + sep + allyMarkerId + sep +
-                enemyMarkerId);
+            enemyMarkerId);
     }
 
     public void askNegotiate(String attackerId, String defenderId)
     {
         out.println(Constants.askNegotiate + sep + attackerId + sep +
-                defenderId);
+            defenderId);
     }
 
     public void tellProposal(String proposalString)
@@ -497,23 +499,23 @@ final class SocketServerThread extends Thread implements IClient
     }
 
     public void tellStrikeResults(int strikerTag, int targetTag,
-            int strikeNumber, List rolls, int damage, boolean killed,
-            boolean wasCarry, int carryDamageLeft, Set carryTargetDescriptions)
+        int strikeNumber, List rolls, int damage, boolean killed,
+        boolean wasCarry, int carryDamageLeft, Set carryTargetDescriptions)
     {
         out.println(Constants.tellStrikeResults + sep + strikerTag + sep +
-                targetTag + sep + strikeNumber + sep + Glob.glob(rolls) + sep +
-                damage + sep + killed + sep + wasCarry + sep + carryDamageLeft +
-                sep + Glob.glob(carryTargetDescriptions));
+            targetTag + sep + strikeNumber + sep + Glob.glob(rolls) + sep +
+            damage + sep + killed + sep + wasCarry + sep + carryDamageLeft +
+            sep + Glob.glob(carryTargetDescriptions));
     }
 
     public void initBattle(String masterHexLabel, int battleTurnNumber,
-            String battleActivePlayerName, Constants.BattlePhase battlePhase,
-            String attackerMarkerId, String defenderMarkerId)
+        String battleActivePlayerName, Constants.BattlePhase battlePhase,
+        String attackerMarkerId, String defenderMarkerId)
     {
         out.println(Constants.initBattle + sep + masterHexLabel + sep +
-                battleTurnNumber + sep + battleActivePlayerName + sep +
-                battlePhase.toInt() + sep + attackerMarkerId + sep +
-                defenderMarkerId);
+            battleTurnNumber + sep + battleActivePlayerName + sep +
+            battlePhase.toInt() + sep + attackerMarkerId + sep +
+            defenderMarkerId);
     }
 
     public void cleanupBattle()
@@ -532,28 +534,28 @@ final class SocketServerThread extends Thread implements IClient
     }
 
     public void didRecruit(String markerId, String recruitName,
-            String recruiterName, int numRecruiters)
+        String recruiterName, int numRecruiters)
     {
         out.println(Constants.didRecruit + sep + markerId + sep +
-                recruitName + sep + recruiterName + sep + numRecruiters);
+            recruitName + sep + recruiterName + sep + numRecruiters);
     }
 
     public void undidRecruit(String markerId, String recruitName)
     {
         out.println(Constants.undidRecruit + sep + markerId + sep +
-                recruitName);
+            recruitName);
     }
 
     public void setupTurnState(String activePlayerName, int turnNumber)
     {
         out.println(Constants.setupTurnState + sep + activePlayerName + sep +
-                turnNumber);
+            turnNumber);
     }
 
     public void setupSplit(String activePlayerName, int turnNumber)
     {
         out.println(Constants.setupSplit + sep + activePlayerName + sep +
-                turnNumber);
+            turnNumber);
     }
 
     public void setupMove()
@@ -572,84 +574,84 @@ final class SocketServerThread extends Thread implements IClient
     }
 
     public void setupBattleSummon(String battleActivePlayerName,
-            int battleTurnNumber)
+        int battleTurnNumber)
     {
         out.println(Constants.setupBattleSummon + sep +
-                battleActivePlayerName + sep + battleTurnNumber);
+            battleActivePlayerName + sep + battleTurnNumber);
     }
 
     public void setupBattleRecruit(String battleActivePlayerName,
-            int battleTurnNumber)
+        int battleTurnNumber)
     {
         out.println(Constants.setupBattleRecruit + sep +
-                battleActivePlayerName + sep + battleTurnNumber);
+            battleActivePlayerName + sep + battleTurnNumber);
     }
 
     public void setupBattleMove(String battleActivePlayerName,
-            int battleTurnNumber)
+        int battleTurnNumber)
     {
         out.println(Constants.setupBattleMove + sep +
-                battleActivePlayerName + sep + battleTurnNumber);
+            battleActivePlayerName + sep + battleTurnNumber);
     }
 
     public void setupBattleFight(Constants.BattlePhase battlePhase,
-            String battleActivePlayerName)
+        String battleActivePlayerName)
     {
         out.println(Constants.setupBattleFight + sep +
-                battlePhase.toInt() + sep + battleActivePlayerName);
+            battlePhase.toInt() + sep + battleActivePlayerName);
     }
 
     public void tellLegionLocation(String markerId, String hexLabel)
     {
         out.println(Constants.tellLegionLocation + sep + markerId + sep +
-                hexLabel);
+            hexLabel);
     }
 
     public void tellBattleMove(int tag, String startingHexLabel,
-            String endingHexLabel, boolean undo)
+        String endingHexLabel, boolean undo)
     {
         out.println(Constants.tellBattleMove + sep + tag + sep +
-                startingHexLabel + sep + endingHexLabel + sep + undo);
+            startingHexLabel + sep + endingHexLabel + sep + undo);
     }
 
     public void didMove(String markerId, String startingHexLabel,
-            String currentHexLabel, String entrySide, boolean teleport,
-            String teleportingLord, boolean splitLegionHasForcedMove)
+        String currentHexLabel, String entrySide, boolean teleport,
+        String teleportingLord, boolean splitLegionHasForcedMove)
     {
         out.println(Constants.didMove + sep + markerId + sep +
-                startingHexLabel + sep + currentHexLabel + sep + entrySide +
-                sep + teleport + sep + 
-                (teleportingLord == null ? "null" : teleportingLord) +
-                sep + splitLegionHasForcedMove);
+            startingHexLabel + sep + currentHexLabel + sep + entrySide +
+            sep + teleport + sep +
+            (teleportingLord == null ? "null" : teleportingLord) +
+            sep + splitLegionHasForcedMove);
     }
 
     public void undidMove(String markerId, String formerHexLabel,
-            String currentHexLabel, boolean splitLegionHasForcedMove)
+        String currentHexLabel, boolean splitLegionHasForcedMove)
     {
         out.println(Constants.undidMove + sep + markerId + sep +
-                formerHexLabel + sep + currentHexLabel + sep + 
-                splitLegionHasForcedMove);
+            formerHexLabel + sep + currentHexLabel + sep +
+            splitLegionHasForcedMove);
     }
 
     public void didSummon(String summonerId, String donorId, String summon)
     {
         out.println(Constants.didSummon + sep + summonerId + sep +
-                donorId + sep + summon);
-    
+            donorId + sep + summon);
+
     }
 
     public void undidSplit(String splitoffId, String survivorId, int turn)
     {
         out.println(Constants.undidSplit + sep + splitoffId + sep +
-                survivorId + sep + turn);
+            survivorId + sep + turn);
     }
 
     public void didSplit(String hexLabel, String parentId, String childId,
-            int childHeight, List splitoffs, int turn)
+        int childHeight, List splitoffs, int turn)
     {
         out.println(Constants.didSplit + sep + hexLabel + sep + parentId +
-                sep + childId + sep + childHeight + sep +
-                Glob.glob(splitoffs) + sep + turn);
+            sep + childId + sep + childHeight + sep +
+            Glob.glob(splitoffs) + sep + turn);
     }
 
     public void askPickColor(List colorsLeft)

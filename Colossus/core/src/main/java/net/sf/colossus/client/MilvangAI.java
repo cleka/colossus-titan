@@ -4,6 +4,7 @@
  */
 package net.sf.colossus.client;
 
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -16,13 +17,14 @@ import net.sf.colossus.server.Creature;
 import net.sf.colossus.util.Combos;
 import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
+
 /**
  * @author kmilvangjens
  * 
  */
 public class MilvangAI extends RationalAI
 {
-	private static final Logger LOGGER = Logger.getLogger(MilvangAI.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(MilvangAI.class.getName());
 
     private static final double PRIMARY_RECRUIT_FACTOR = 1.0;
     private static final double SECONDARY_RECRUIT_FACTOR = 0.1;
@@ -39,26 +41,26 @@ public class MilvangAI extends RationalAI
         int recruitLater = 0;
 
         List tempRecruits = TerrainRecruitLoader.getPossibleRecruits(terrain,
-                "");
+            "");
         List recruiters = TerrainRecruitLoader.getPossibleRecruiters(terrain,
-                "");
+            "");
 
         recruiters.retainAll(critters.keySet());
 
         Iterator lit = tempRecruits.iterator();
         while (lit.hasNext())
         {
-            Creature creature = (Creature) lit.next();
+            Creature creature = (Creature)lit.next();
             Iterator liter = recruiters.iterator();
             while (liter.hasNext())
             {
-                Creature lesser = (Creature) liter.next();
+                Creature lesser = (Creature)liter.next();
                 int numNeeded = TerrainRecruitLoader.numberOfRecruiterNeeded(
-                        lesser, creature, terrain, "");
+                    lesser, creature, terrain, "");
                 int hintValue = creature.getHintedRecruitmentValue();
-                if (hintValue > recruitNow
-                        && numNeeded <= ((Integer) critters.get(lesser))
-                                .intValue())
+                if (hintValue > recruitNow &&
+                    numNeeded <= ((Integer)critters.get(lesser))
+                    .intValue())
                 {
                     recruitNow = hintValue;
                 }
@@ -78,7 +80,7 @@ public class MilvangAI extends RationalAI
      *      boolean)
      */
     MusteredCreatures chooseCreaturesToSplitOut(LegionInfo legion,
-            boolean at_risk)
+        boolean at_risk)
     {
 
         //
@@ -92,7 +94,8 @@ public class MilvangAI extends RationalAI
             return new MusteredCreatures(true, creatures);
         }
 
-        LOGGER.log(Level.FINEST, "sortCreaturesByValueName() in chooseCreaturesToSplitOut");
+        LOGGER.log(Level.FINEST,
+            "sortCreaturesByValueName() in chooseCreaturesToSplitOut");
 
         boolean hasTitan = legion.contains("Titan");
         String[] terrains = TerrainRecruitLoader.getTerrains();
@@ -100,34 +103,35 @@ public class MilvangAI extends RationalAI
         List critters = new ArrayList();
         for (Iterator it = legion.getContents().iterator(); it.hasNext();)
         {
-            critters.add(Creature.getCreatureByName((String) it.next()));
+            critters.add(Creature.getCreatureByName((String)it.next()));
         }
 
         double bestValue = 0;
         // make sure the list is never null even if we don't find anything
-        List bestKeep = new ArrayList(); 
+        List bestKeep = new ArrayList();
 
         Combos combos = new Combos(critters, critters.size() - 2);
         for (Iterator it = combos.iterator(); it.hasNext();)
         {
-            List keepers = (List) it.next();
+            List keepers = (List)it.next();
             double critterValue = 0;
             boolean keepTitan = false;
             Map critterMap = new HashMap();
             for (Iterator it2 = keepers.iterator(); it2.hasNext();)
             {
-                Creature critter = (Creature) it2.next();
+                Creature critter = (Creature)it2.next();
                 keepTitan |= critter.getName().equals("Titan");
                 int tmp = critter.getHintedRecruitmentValue();
                 critterValue += tmp * tmp;
-                Integer numCritters = (Integer) critterMap.get(critter);
+                Integer numCritters = (Integer)critterMap.get(critter);
                 if (numCritters == null)
                 {
                     critterMap.put(critter, new Integer(1));
-                } else
+                }
+                else
                 {
                     critterMap.put(critter, new Integer(
-                            numCritters.intValue() + 1));
+                        numCritters.intValue() + 1));
                 }
             }
 
@@ -141,17 +145,18 @@ public class MilvangAI extends RationalAI
             for (int i = 0; i < terrains.length; i++)
             {
                 double currRecruitValue = findRecruitPotential(critterMap,
-                        terrains[i]);
-                if (currRecruitValue > bestRecruitValue
-                        && !terrains[i].equals("Tower"))
+                    terrains[i]);
+                if (currRecruitValue > bestRecruitValue &&
+                    !terrains[i].equals("Tower"))
                 {
-                    totalRecruitValue += SECONDARY_RECRUIT_FACTOR
-                            * bestRecruitValue;
+                    totalRecruitValue += SECONDARY_RECRUIT_FACTOR *
+                        bestRecruitValue;
                     bestRecruitValue = currRecruitValue;
-                } else
+                }
+                else
                 {
-                    totalRecruitValue += SECONDARY_RECRUIT_FACTOR
-                            * currRecruitValue;
+                    totalRecruitValue += SECONDARY_RECRUIT_FACTOR *
+                        currRecruitValue;
                 }
             }
             totalRecruitValue += PRIMARY_RECRUIT_FACTOR * bestRecruitValue;

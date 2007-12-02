@@ -65,8 +65,8 @@ public final class PlayerInfo
         setTower((String)data.remove(0));
 
         setColor((String)data.remove(0));
-        
-        setType((String)data.remove(0));  
+
+        setType((String)data.remove(0));
 
         setPlayersElim((String)data.remove(0));
 
@@ -86,13 +86,13 @@ public final class PlayerInfo
         setMulligansLeft(Integer.parseInt(buf));
 
         setMarkersAvailable(data);
-        
+
         /*
-        Log.debug("Player info " + infoString);
-        Log.debug("player color " + color);
-        Log.debug("player type " + type);
-        Log.debug("players elim " + playersElim);
-        Log.debug("player legions " + numLegions);
+         Log.debug("Player info " + infoString);
+         Log.debug("player color " + color);
+         Log.debug("player type " + type);
+         Log.debug("players elim " + playersElim);
+         Log.debug("player legions " + numLegions);
          **/
     }
 
@@ -105,7 +105,7 @@ public final class PlayerInfo
     {
         return dead;
     }
-    
+
     boolean isAI()
     {
         return type.endsWith(Constants.ai);
@@ -135,17 +135,17 @@ public final class PlayerInfo
     {
         this.color = color;
     }
-    
+
     String getColor()
     {
         return color;
     }
-    
+
     void setType(String type)
     {
         this.type = type;
     }
-       
+
     String getType()
     {
         return type;

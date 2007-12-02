@@ -34,9 +34,9 @@ import net.sf.colossus.util.ResourceLoader;
 
 public final class GUIMasterHex extends GUIHex
 {
-	private static final Logger LOGGER = Logger.getLogger(GUIMasterHex.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(GUIMasterHex.class.getName());
 
-	private boolean inverted;
+    private boolean inverted;
     private FontMetrics fontMetrics;
     private int halfFontHeight;
     private Point offCenter;

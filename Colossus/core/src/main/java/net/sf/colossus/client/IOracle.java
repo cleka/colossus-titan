@@ -1,6 +1,8 @@
 package net.sf.colossus.client;
 
+
 import java.util.*;
+
 
 /** Knows a lot of things, but cannot actually take any actions.
  *  Everything returned by this interface must be immutable, or a copy.

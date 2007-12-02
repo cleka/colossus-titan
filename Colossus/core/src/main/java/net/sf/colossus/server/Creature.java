@@ -28,12 +28,11 @@ import net.sf.colossus.xmlparser.CreatureLoader;
  * @author Romain Dolbeau
  */
 
-public class Creature
-implements
+public class Creature implements
     Comparable,
     net.sf.colossus.util.Terrains // H_xxx constants
 {
-	private static final Logger LOGGER = Logger.getLogger(Creature.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(Creature.class.getName());
 
     private final String name;
     private final String pluralName;
@@ -60,21 +59,21 @@ implements
     private static boolean noBaseColor = false;
 
     public static final Creature unknown = new Creature("Unknown", 1, 1,
-            false, false, false, false, false, false, false, false,
-            false, false, false, false, false, false, false, false,
-            1, "Unknown", null);
+        false, false, false, false, false, false, false, false,
+        false, false, false, false, false, false, false, false,
+        1, "Unknown", null);
 
     /** Sometimes we need to iterate through all creature types. */
     private static List creatures = new ArrayList();
     private static List summonableCreatures = new ArrayList();
 
     public Creature(String name, int power, int skill, boolean rangestrikes,
-            boolean flies, boolean nativeBramble, boolean nativeDrift,
-            boolean nativeBog, boolean nativeSandDune, boolean nativeSlope,
-            boolean nativeVolcano, boolean nativeRiver, boolean nativeStone,
-            boolean nativeTree, boolean waterDwelling, boolean magicMissile,
-            boolean summonable, boolean lord, boolean demilord, int maxCount,
-            String pluralName, String baseColor)
+        boolean flies, boolean nativeBramble, boolean nativeDrift,
+        boolean nativeBog, boolean nativeSandDune, boolean nativeSlope,
+        boolean nativeVolcano, boolean nativeRiver, boolean nativeStone,
+        boolean nativeTree, boolean waterDwelling, boolean magicMissile,
+        boolean summonable, boolean lord, boolean demilord, int maxCount,
+        String pluralName, String baseColor)
     {
         this.name = name;
         this.power = power;
@@ -103,7 +102,7 @@ implements
         if (waterDwelling && nativeSandDune)
         {
             LOGGER.log(Level.WARNING, "Creature " + name +
-			" is both a Water Dweller and native to Sand and Dune.");
+                " is both a Water Dweller and native to Sand and Dune.");
         }
     }
 
@@ -141,11 +140,11 @@ implements
             creatures.clear();
             List directories = VariantSupport.getVarDirectoriesList();
             InputStream creIS = ResourceLoader.getInputStream(
-                    VariantSupport.getCreaturesName(), directories);
+                VariantSupport.getCreaturesName(), directories);
             if (creIS == null)
             {
                 throw new FileNotFoundException(
-                        VariantSupport.getCreaturesName());
+                    VariantSupport.getCreaturesName());
             }
             CreatureLoader creatureLoader = new CreatureLoader(creIS);
             creatures.addAll(creatureLoader.getCreatures());
@@ -263,8 +262,8 @@ implements
             if (specialIncrement > 0)
             {
                 tempNames[4] =
-                        (isFlier() ? "Flying" : "") +
-                        (isRangestriker() ? "Rangestrike" : "") + colorSuffix;
+                    (isFlier() ? "Flying" : "") +
+                    (isRangestriker() ? "Rangestrike" : "") + colorSuffix;
             }
         }
         else
@@ -293,13 +292,13 @@ implements
     public int getHintedRecruitmentValue()
     { // this function is replicated in Critter
         return getPointValue() +
-                VariantSupport.getHintedRecruitmentValueOffset(name);
+            VariantSupport.getHintedRecruitmentValueOffset(name);
     }
 
     public int getHintedRecruitmentValue(String[] section)
     { // this function is replicated in Critter
         return getPointValue() +
-                VariantSupport.getHintedRecruitmentValueOffset(name, section);
+            VariantSupport.getHintedRecruitmentValueOffset(name, section);
     }
 
     public boolean isRangestriker()
@@ -505,7 +504,7 @@ implements
         {
             // we found it. can be null, from earlier adding null
             //   as "not found" marker.
-            return (Creature) _getCreatureByName_cache.get(name);
+            return (Creature)_getCreatureByName_cache.get(name);
         }
         else
         {
@@ -513,7 +512,7 @@ implements
             Iterator it = creatures.iterator();
             while (it.hasNext())
             {
-                Creature creature = (Creature) it.next();
+                Creature creature = (Creature)it.next();
                 if (name.equalsIgnoreCase(creature.getName()))
                 {
                     // found it the hard way. now add this spelling to cache
@@ -540,7 +539,7 @@ implements
         Iterator it = creatures.iterator();
         while (it.hasNext())
         {
-            Creature creature = (Creature) it.next();
+            Creature creature = (Creature)it.next();
             if (name != null && name.equals(creature.getName()))
             {
                 return true;

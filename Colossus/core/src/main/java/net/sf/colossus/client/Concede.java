@@ -39,13 +39,13 @@ final class Concede extends KDialog implements ActionListener, WindowListener
     private SaveWindow saveWindow;
 
     private Concede(Client client, JFrame parentFrame, String allyMarkerId,
-            String enemyMarkerId, boolean flee)
+        String enemyMarkerId, boolean flee)
     {
         super(parentFrame, (flee ? "Flee" : "Concede") + " with Legion " +
-                Legion.getLongMarkerName(allyMarkerId) + " in " +
-                MasterBoard.getHexByLabel(
-                client.getHexForLegion(allyMarkerId)).getDescription() + "?",
-                false);
+            Legion.getLongMarkerName(allyMarkerId) + " in " +
+            MasterBoard.getHexByLabel(
+            client.getHexForLegion(allyMarkerId)).getDescription() + "?",
+            false);
 
         Container contentPane = getContentPane();
         contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
@@ -126,13 +126,13 @@ final class Concede extends KDialog implements ActionListener, WindowListener
     }
 
     static void concede(Client client, JFrame parentFrame,
-            String allyMarkerId, String enemyMarkerId)
+        String allyMarkerId, String enemyMarkerId)
     {
         new Concede(client, parentFrame, allyMarkerId, enemyMarkerId, false);
     }
 
     static void flee(Client client, JFrame parentFrame, String allyMarkerId,
-            String enemyMarkerId)
+        String enemyMarkerId)
     {
         new Concede(client, parentFrame, allyMarkerId, enemyMarkerId, true);
     }
@@ -155,7 +155,7 @@ final class Concede extends KDialog implements ActionListener, WindowListener
     public void actionPerformed(ActionEvent e)
     {
         if (e.getActionCommand().equals("Flee") ||
-                e.getActionCommand().equals("Concede"))
+            e.getActionCommand().equals("Concede"))
         {
             cleanup(true);
         }

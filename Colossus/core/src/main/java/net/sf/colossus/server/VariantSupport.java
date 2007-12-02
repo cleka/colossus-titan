@@ -29,7 +29,7 @@ import net.sf.colossus.xmlparser.VariantLoader;
 
 public final class VariantSupport
 {
-	private static final Logger LOGGER = Logger.getLogger(VariantSupport.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(VariantSupport.class.getName());
 
     private static String varDirectory = "";
     private static String variantName = "";
@@ -72,10 +72,10 @@ public final class VariantSupport
      *     soon-to-be-loaded Variant.
      */
     public static void freshenVariant(String tempVarName,
-            String tempVarDirectory)
+        String tempVarDirectory)
     {
         if (!(loadedVariant && variantName.equals(tempVarName) &&
-                varDirectory.equals(tempVarDirectory)))
+            varDirectory.equals(tempVarDirectory)))
         {
             ResourceLoader.purgeImageCache();
             ResourceLoader.purgeFileCache();
@@ -89,7 +89,7 @@ public final class VariantSupport
      * @return A Document describing the variant.
      */
     public static Document loadVariant(String variantName,
-            boolean serverSide)
+        boolean serverSide)
     {
         return loadVariant(variantName + Constants.varEnd,
             Constants.varPath + variantName, serverSide);
@@ -102,7 +102,7 @@ public final class VariantSupport
      * @return A Document describing the variant.
      */
     public static Document loadVariant(java.io.File varFile,
-            boolean serverSide)
+        boolean serverSide)
     {
         String tempVarName = varFile.getName();
         String tempVarDirectory = varFile.getParentFile().getAbsolutePath();
@@ -118,11 +118,11 @@ public final class VariantSupport
      * @return A Document describing the variant.
      */
     public static Document loadVariant(String tempVarName,
-            String tempVarDirectory,
-            boolean serverSide)
+        String tempVarDirectory,
+        boolean serverSide)
     {
         if (loadedVariant && variantName.equals(tempVarName) &&
-                varDirectory.equals(tempVarDirectory))
+            varDirectory.equals(tempVarDirectory))
         {
             return varREADME;
         }
@@ -136,7 +136,7 @@ public final class VariantSupport
         loadedVariant = false;
 
         LOGGER.log(Level.FINEST, "Loading variant " + tempVarName +
-		", data files in " + tempVarDirectory);
+            ", data files in " + tempVarDirectory);
         try
         {
 
@@ -145,8 +145,8 @@ public final class VariantSupport
             directories.add(tempVarDirectory);
             directories.add(Constants.defaultDirName);
             InputStream varIS = ResourceLoader.getInputStream(
-                    tempVarName,
-                    directories);
+                tempVarName,
+                directories);
             if (varIS == null)
             {
                 throw new FileNotFoundException(tempVarName);
@@ -165,9 +165,9 @@ public final class VariantSupport
                 if (maxPlayers > Constants.MAX_MAX_PLAYERS)
                 {
                     LOGGER.log(Level.SEVERE, "Can't use more than " +
-					Constants.MAX_MAX_PLAYERS +
-					" players, while variant requires " +
-					maxPlayers, (Throwable)null);
+                        Constants.MAX_MAX_PLAYERS +
+                        " players, while variant requires " +
+                        maxPlayers, (Throwable)null);
                     maxPlayers = Constants.MAX_MAX_PLAYERS;
                 }
                 varDirectory = tempVarDirectory;
@@ -202,13 +202,13 @@ public final class VariantSupport
             directories = new java.util.ArrayList();
             directories.add(tempVarDirectory);
             varREADME = ResourceLoader.getDocument("README", directories);
-            
+
             // varREADME seems to be used as flag for a successfully loaded
             // variant, but breaking the whole variant loading just because
             // there is no readme file seems a bit overkill, thus we set
             // a default in this case
-            if(varREADME == null) {
-            	varREADME = getMissingReadmeNotification();
+            if (varREADME == null) {
+                varREADME = getMissingReadmeNotification();
             }
         }
         catch (Exception e)
@@ -236,14 +236,16 @@ public final class VariantSupport
         {
             if (tempVarName.equals(Constants.defaultVARFile))
             {
-                LOGGER.log(Level.SEVERE, "Default Variant Loading Failed, aborting !", (Throwable)null);
+                LOGGER.log(Level.SEVERE,
+                    "Default Variant Loading Failed, aborting !",
+                    (Throwable)null);
                 System.exit(1);
             }
             else
             {
                 LOGGER.log(Level.FINEST, "Trying to load Default instead...");
                 varREADME = loadVariant(Constants.defaultVARFile,
-                        Constants.defaultDirName, serverSide);
+                    Constants.defaultDirName, serverSide);
             }
         }
 
@@ -253,20 +255,21 @@ public final class VariantSupport
     private static Document getMissingReadmeNotification() {
         StyledDocument txtdoc = new DefaultStyledDocument();
         try {
-			txtdoc.insertString(0, 
-					"No README found -- variant is lacking a README.txt or README.html.", 
-					null);
-		} catch (BadLocationException e) {
-			// really shouldn't happen with the constant offset
-			LOGGER.log(Level.WARNING, 
-					"Failed to insert warning about missing readme into Document object", 
-					e);
-		}
+            txtdoc.insertString(0,
+                "No README found -- variant is lacking a README.txt or README.html.",
+                null);
+        }
+        catch (BadLocationException e) {
+            // really shouldn't happen with the constant offset
+            LOGGER.log(Level.WARNING,
+                "Failed to insert warning about missing readme into Document object",
+                e);
+        }
         txtdoc.putProperty(ResourceLoader.keyContentType, "text/plain");
         return txtdoc;
-	}
+    }
 
-	public static String getVarDirectory()
+    public static String getVarDirectory()
     {
         return varDirectory;
     }
@@ -316,8 +319,8 @@ public final class VariantSupport
         {
             String dir = (String)it.next();
             suffixedDirs.add(dir +
-                    ResourceLoader.getPathSeparator() +
-                    suffixPath);
+                ResourceLoader.getPathSeparator() +
+                suffixPath);
         }
         return suffixedDirs;
     }
@@ -343,7 +346,7 @@ public final class VariantSupport
         {
             List directories = getVarDirectoriesList();
             InputStream terIS = ResourceLoader.getInputStream(
-                    getRecruitName(), directories);
+                getRecruitName(), directories);
             if (terIS == null)
             {
                 throw new FileNotFoundException(getRecruitName());
@@ -356,7 +359,8 @@ public final class VariantSupport
         }
         catch (Exception e)
         {
-            LOGGER.log(Level.SEVERE, "Recruit-per-terrain loading failed : " + e, (Throwable)null);
+            LOGGER.log(Level.SEVERE,
+                "Recruit-per-terrain loading failed : " + e, (Throwable)null);
             System.exit(1);
         }
         // initialize the static bits of the MasterBoard
@@ -380,7 +384,7 @@ public final class VariantSupport
             try
             {
                 InputStream mmfIS = ResourceLoader.getInputStreamIgnoreFail(
-                                Constants.markersNameFile, singleDirectory);
+                    Constants.markersNameFile, singleDirectory);
                 if (mmfIS != null)
                 {
                     allNames.load(mmfIS);
@@ -389,13 +393,14 @@ public final class VariantSupport
             }
             catch (Exception e)
             {
-                LOGGER.log(Level.WARNING, "Markers name loading partially failed.");
+                LOGGER.log(Level.WARNING,
+                    "Markers name loading partially failed.");
             }
         }
         if (!foundOne)
         {
             LOGGER.log(Level.WARNING, "No file "+Constants.markersNameFile+
-			 " found anywhere in directories "+directories.toString());
+                " found anywhere in directories "+directories.toString());
         }
         return allNames;
     }
@@ -412,24 +417,26 @@ public final class VariantSupport
         if (hintName != null)
         {
             o = ResourceLoader.getNewObject(hintName,
-                    getVarDirectoriesList());
+                getVarDirectoriesList());
         }
         if ((o != null) && (o instanceof HintInterface))
         {
             aihl = (HintInterface)o;
             LOGGER.log(Level.FINEST, "Using class " + hintName +
-			" to supply hints to the AIs.");
+                " to supply hints to the AIs.");
         }
         else
         {
             if (hintName.equals(Constants.defaultHINTFile))
             {
-                LOGGER.log(Level.SEVERE, "Couldn't load default hints !", (Throwable)null);
+                LOGGER.log(Level.SEVERE, "Couldn't load default hints !",
+                    (Throwable)null);
                 System.exit(1);
             }
             else
             {
-                LOGGER.log(Level.WARNING, "Couldn't load hints. Trying with Default.");
+                LOGGER.log(Level.WARNING,
+                    "Couldn't load hints. Trying with Default.");
                 hintName = Constants.defaultHINTFile;
                 loadHints();
             }
@@ -437,10 +444,10 @@ public final class VariantSupport
     }
 
     public synchronized static String getRecruitHint(
-            String terrain,
-            net.sf.colossus.client.LegionInfo legion,
-            List recruits,
-            net.sf.colossus.server.HintOracleInterface oracle)
+        String terrain,
+        net.sf.colossus.client.LegionInfo legion,
+        List recruits,
+        net.sf.colossus.server.HintOracleInterface oracle)
     {
         String[] section = new String[1];
         section[0] = Constants.sectionAllAI;
@@ -448,20 +455,22 @@ public final class VariantSupport
     }
 
     public synchronized static String getRecruitHint(
-            String terrain,
-            net.sf.colossus.client.LegionInfo legion,
-            List recruits,
-            net.sf.colossus.server.HintOracleInterface oracle,
-            String[] section)
+        String terrain,
+        net.sf.colossus.client.LegionInfo legion,
+        List recruits,
+        net.sf.colossus.server.HintOracleInterface oracle,
+        String[] section)
     {
         if (aihl != null)
         {
             return aihl.getRecruitHint(terrain, legion, recruits, oracle,
-                    section);
+                section);
         }
         else
         {
-            LOGGER.log(Level.SEVERE, "No AIHintLoader available ! Should never happen.", (Throwable)null);
+            LOGGER.log(Level.SEVERE,
+                "No AIHintLoader available ! Should never happen.",
+                (Throwable)null);
         }
         return null;
     }
@@ -474,7 +483,7 @@ public final class VariantSupport
     }
 
     public synchronized static List getInitialSplitHint(String label,
-            String[] section)
+        String[] section)
     {
         if (aihl != null)
         {
@@ -491,7 +500,7 @@ public final class VariantSupport
     }
 
     public synchronized static int getHintedRecruitmentValueOffset(String name,
-            String[] section)
+        String[] section)
     {
         return aihl.getHintedRecruitmentValueOffset(name, section);
     }

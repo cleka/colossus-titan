@@ -15,8 +15,8 @@ import junit.framework.*;
  */
 public class DiceTest extends TestCase
 {
-	private static final Logger LOGGER = Logger.getLogger(DiceTest.class.getName());
-	
+    private static final Logger LOGGER = Logger.getLogger(DiceTest.class.getName());
+
     private int trials = 5000;
     double epsilon = 0.000001;
 
@@ -116,11 +116,11 @@ public class DiceTest extends TestCase
         final double meanDieRoll = 3.5;
         double expVariance = findExpectedVariance(fixedRolls, meanDieRoll);
         double expMean = findChiSquare(fixedRolls, meanDieRoll) /
-                fixedRolls.length;
+            fixedRolls.length;
 
         double chisquare = findChiSquare(rolls, meanDieRoll) / rolls.length;
         LOGGER.log(Level.FINEST, "chi-square test: chi-square=" + chisquare +
-                " mean=" + expMean + " var=" + expVariance);
+            " mean=" + expMean + " var=" + expVariance);
         failIfAbnormal(chisquare, expMean, expVariance, random);
     }
 
@@ -142,9 +142,10 @@ public class DiceTest extends TestCase
         int n = trials;
         double meanM = (2.0 * r * (n - r) / n) + 1.;
         double varianceM = ((2.0 * r) * (n - r) / n / n *
-                ((2. * r) * (n - r) - n)) / (n - 1.);
-        LOGGER.log(Level.FINEST, "M test: r=" + r + " M=" + M + " mean=" + meanM +
-                " var=" + varianceM);
+            ((2. * r) * (n - r) - n)) / (n - 1.);
+        LOGGER.log(Level.FINEST,
+            "M test: r=" + r + " M=" + M + " mean=" + meanM +
+            " var=" + varianceM);
         failIfAbnormal(M, meanM, varianceM, random);
     }
 
@@ -158,7 +159,7 @@ public class DiceTest extends TestCase
         double meanP = m / 2.;
         double varianceP = m / 12.;
         LOGGER.log(Level.FINEST, "Sign test: P=" + P + " m=" + m + " mean=" +
-                meanP + " var=" + varianceP);
+            meanP + " var=" + varianceP);
         failIfAbnormal(P, meanP, varianceP, random);
     }
 
@@ -171,9 +172,9 @@ public class DiceTest extends TestCase
         double R = 0. + pos;
         double meanR = 1. + (2 * pos * neg) / (pos + neg);
         double varianceR = ((2.0 * pos * neg) * (2 * pos * neg - pos - neg)) /
-                ((pos + neg) * (pos + neg) * (pos + neg - 1));
+            ((pos + neg) * (pos + neg) * (pos + neg - 1));
         LOGGER.log(Level.FINEST, "Runs test: R=" + R + " m=" + m + " mean=" +
-                meanR + " var=" + varianceR);
+            meanR + " var=" + varianceR);
         failIfAbnormal(R, meanR, varianceR, random);
     }
 
@@ -191,8 +192,9 @@ public class DiceTest extends TestCase
         }
         double meanS = 0.;
         double varianceS = (n / 18.) * (n - 1.) * (2. * n + 5.);
-        LOGGER.log(Level.FINEST, "Mann-Kendall test: S=" + S + " mean=" + meanS +
-                " var=" + varianceS);
+        LOGGER.log(Level.FINEST,
+            "Mann-Kendall test: S=" + S + " mean=" + meanS +
+            " var=" + varianceS);
         failIfAbnormal(S, meanS, varianceS, random);
     }
 
@@ -218,7 +220,7 @@ public class DiceTest extends TestCase
         else
         {
             return (copy[(int)Math.round(midpoint - 0.5)] +
-                    copy[(int)Math.round(midpoint + 0.5)]) / 2.0;
+                copy[(int)Math.round(midpoint + 0.5)]) / 2.0;
         }
     }
 
@@ -357,7 +359,7 @@ public class DiceTest extends TestCase
 
     /** Fail if an expected random result is outside the normal range. */
     void failIfAbnormal(double val, double mean, double variance,
-            boolean random)
+        boolean random)
     {
         double sd;
         double z;

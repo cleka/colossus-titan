@@ -36,9 +36,9 @@ import net.sf.colossus.util.ResourceLoader;
 
 public class GUIBattleHex extends GUIHex
 {
-	private static final Logger LOGGER = Logger.getLogger(GUIBattleHex.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(GUIBattleHex.class.getName());
 
-	private GeneralPath innerHexagon;
+    private GeneralPath innerHexagon;
     private Component map;
     private static final Color highlightColor = Color.red;
 
@@ -459,13 +459,13 @@ public class GUIBattleHex extends GUIHex
 
     public GUIBattleHex getNeighbor(int i)
     {
-    	assert (i>=0) && (i<=5) : "Neighbor index out of range";
+        assert (i>=0) && (i<=5) : "Neighbor index out of range";
         return neighbors[i];
     }
 
     public void setNeighbor(int i, GUIBattleHex hex)
     {
-    	assert (i>=0) && (i<=5) : "Neighbor index out of range";
+        assert (i>=0) && (i<=5) : "Neighbor index out of range";
         neighbors[i] = hex;
         getBattleHexModel().setNeighbor(i, hex.getBattleHexModel());
     }

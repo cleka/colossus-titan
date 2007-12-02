@@ -1,5 +1,6 @@
 package net.sf.colossus.util;
 
+
 import java.util.*;
 import junit.framework.*;
 

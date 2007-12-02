@@ -52,7 +52,7 @@ import org.jdom.output.XMLOutputter;
 
 public final class Game
 {
-	private static final Logger LOGGER = Logger.getLogger(Game.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(Game.class.getName());
 
     private List players = new ArrayList(6);
     private int activePlayerNum;
@@ -162,10 +162,10 @@ public final class Game
         options.saveOptions();
 
         VariantSupport.loadVariant(options.getStringOption(Options.variant),
-                true);
+            true);
 
         Creature.resetCache();
-        
+
         LOGGER.log(Level.INFO, "Starting new game");
 
         CustomRecruitBase.resetAllInstances();
@@ -258,9 +258,9 @@ public final class Game
             Player player = (Player)it.next();
 
             server.oneSetOption(player.getName(), Options.autoPlay,
-                    player.isAI());
+                player.isAI());
             server.oneSetOption(player.getName(), Options.playerType,
-                    player.getType());
+                player.getType());
         }
     }
 
@@ -292,7 +292,7 @@ public final class Game
         for (int i = 0; i < Constants.DEFAULT_MAX_PLAYERS; i++)
         {
             colorsLeft.add(cli.remove(Dice.rollDie(
-                    Constants.DEFAULT_MAX_PLAYERS - i) - 1));
+                Constants.DEFAULT_MAX_PLAYERS - i) - 1));
         }
 
         /* ... and finish with the newer ones, also in random order */
@@ -351,10 +351,10 @@ public final class Game
         //   "net.sf.colossus.client.SimpleAI"
         String prefix = "net.sf.colossus.client.";
         int len = prefix.length();
-        
+
         String shortName = type.substring(len);
         String newName;
-        
+
         if (shortName.equals("Human"))
         {
             newName = "Human" + number;
@@ -365,7 +365,7 @@ public final class Game
         }
         else if (shortName.equals("CowardSimpleAI"))
         {
-           newName = "Coward" + number;
+            newName = "Coward" + number;
         }
         else if (shortName.equals("RationalAI"))
         {
@@ -385,8 +385,7 @@ public final class Game
         }
         return newName;
     }
-    
-    
+
     void assignColor(String playerName, String color)
     {
         Player player = getPlayer(playerName);
@@ -401,19 +400,20 @@ public final class Game
             String newName = makeNameByType(gotName, type);
             if (newName != null)
             {
-                LOGGER.log(Level.INFO, "Setting for \"" + gotName + "\" new name: "+newName);
+                LOGGER.log(Level.INFO,
+                    "Setting for \"" + gotName + "\" new name: "+newName);
                 server.setPlayerName(gotName, newName);
                 player.setName(newName);
                 playerName = newName;
             }
             else
             {
-                LOGGER.log(Level.WARNING, "Type "+type+ 
-				" not recognized. Giving name by color instead ("+color+")");
+                LOGGER.log(Level.WARNING, "Type "+type+
+                    " not recognized. Giving name by color instead ("+color+")");
                 gotName = Constants.byColor;
             }
         }
-        
+
         if (gotName.startsWith(Constants.byColor))
         {
             server.setPlayerName(player.getName(), color);
@@ -441,7 +441,7 @@ public final class Game
         {
             Player player = (Player)it.next();
             placeInitialLegion(player, player.getFirstMarker());
-            server.allRevealLegion(player.getLegion(0), 
+            server.allRevealLegion(player.getLegion(0),
                 Constants.reasonInitial);
             server.allUpdatePlayerInfo();
         }
@@ -483,7 +483,8 @@ public final class Game
         for (int i = 0; i < numPlayers; i++)
         {
             Player player = getPlayer(i);
-            LOGGER.log(Level.INFO, player.getName() + " gets tower " + playerTower[i]);
+            LOGGER.log(Level.INFO,
+                player.getName() + " gets tower " + playerTower[i]);
             player.setTower(playerTower[i]);
         }
     }
@@ -491,13 +492,14 @@ public final class Game
     /** Return a list with a balanced order of numPlayer towers chosen
      from towerList, which must hold numeric strings. */
     static ArrayList getBalancedTowers(int numPlayers,
-            final ArrayList towerList)
+        final ArrayList towerList)
     {
         int numTowers = towerList.size();
 
         if (numPlayers > numTowers)
         {
-            LOGGER.log(Level.SEVERE, "More players than towers!", (Throwable)null);
+            LOGGER.log(Level.SEVERE, "More players than towers!",
+                (Throwable)null);
             return towerList;
         }
 
@@ -729,7 +731,8 @@ public final class Game
         switch (remaining)
         {
             case 0:
-                LOGGER.log(Level.INFO, "Game over -- Draw at " + new Date().getTime());
+                LOGGER.log(Level.INFO,
+                    "Game over -- Draw at " + new Date().getTime());
                 setGameOver(true);
                 server.allTellGameOver("Draw");
                 break;
@@ -737,8 +740,9 @@ public final class Game
             case 1:
                 String winnerName = getWinner().getName();
 
-                LOGGER.log(Level.INFO, "Game over -- " + winnerName + " wins at " +
-				new Date().getTime());
+                LOGGER.log(Level.INFO,
+                    "Game over -- " + winnerName + " wins at " +
+                    new Date().getTime());
                 setGameOver(true);
                 server.allTellGameOver(winnerName + " wins");
                 break;
@@ -781,18 +785,19 @@ public final class Game
     synchronized void advancePhase(final Constants.Phase oldPhase, final String playerName)
     {
         if (oldPhase != phase || pendingAdvancePhase ||
-                !playerName.equals(getActivePlayerName()))
+            !playerName.equals(getActivePlayerName()))
         {
-            LOGGER.log(Level.SEVERE, "Called advancePhase illegally (reason: " +
-			(oldPhase != phase ? "oldPhase (" +
-			oldPhase + ") != phase (" +
-			phase + ")" :
-			(pendingAdvancePhase ? "pendingAdvancePhase is true " :
-			(!playerName.equals(getActivePlayerName()) ?
-			"wrong player [" + playerName +
-			" vs. " + getActivePlayerName() +
-			"]" :
-			"UNKNOWN"))) + ")", (Throwable)null);
+            LOGGER.log(Level.SEVERE,
+                "Called advancePhase illegally (reason: " +
+                (oldPhase != phase ? "oldPhase (" +
+                oldPhase + ") != phase (" +
+                phase + ")" :
+                (pendingAdvancePhase ? "pendingAdvancePhase is true " :
+                (!playerName.equals(getActivePlayerName()) ?
+                "wrong player [" + playerName +
+                " vs. " + getActivePlayerName() +
+                "]" :
+                "UNKNOWN"))) + ")", (Throwable)null);
             return;
         }
         if (getOption(Options.autoStop) && getNumHumansRemaining() < 1)
@@ -857,12 +862,12 @@ public final class Game
             {
                 activePlayerNum = 0;
                 turnNumber++;
-                if (turnNumber-lastRecruitTurnNumber > 100 && 
-                                getOption(Options.autoQuit))
+                if (turnNumber-lastRecruitTurnNumber > 100 &&
+                    getOption(Options.autoQuit))
                 {
                     System.out.println("\nLast recruiting is 100 turns ago - " +
-                              "exiting to prevent AIs from endlessly " +
-                              "running around...\n");
+                        "exiting to prevent AIs from endlessly " +
+                        "running around...\n");
                     System.exit(0);
                 }
             }
@@ -878,8 +883,9 @@ public final class Game
             }
             else
             {
-                LOGGER.log(Level.INFO, getActivePlayerName() + "'s turn, number " +
-				turnNumber);
+                LOGGER.log(Level.INFO,
+                    getActivePlayerName() + "'s turn, number " +
+                    turnNumber);
                 autoSave();
             }
         }
@@ -970,24 +976,26 @@ public final class Game
 
             if (!savesDir.exists() || !savesDir.isDirectory())
             {
-                LOGGER.log(Level.INFO, "Trying to make directory " + Constants.saveDirname);
+                LOGGER.log(Level.INFO,
+                    "Trying to make directory " + Constants.saveDirname);
                 if (!savesDir.mkdirs())
                 {
-                    LOGGER.log(Level.SEVERE, "Could not create saves directory", (Throwable)null);
+                    LOGGER.log(Level.SEVERE, "Could not create saves directory",
+                        (Throwable)null);
                     JOptionPane.showMessageDialog(null,
-                            "Could not create directory " + savesDir +
-                            "\n- saving game failed! Unless the directory " + 
-                            "can be created, you can't use File=>Save, and " +
-                            "make sure Autosave (in Game Setup) is disabled.",
-                            "Can't save game!",
-                            JOptionPane.ERROR_MESSAGE);
+                        "Could not create directory " + savesDir +
+                        "\n- saving game failed! Unless the directory " +
+                        "can be created, you can't use File=>Save, and " +
+                        "make sure Autosave (in Game Setup) is disabled.",
+                        "Can't save game!",
+                        JOptionPane.ERROR_MESSAGE);
 
                     return;
                 }
             }
 
             fn = Constants.saveDirname + Constants.xmlSnapshotStart +
-                    date.getTime() + Constants.xmlExtension;
+                date.getTime() + Constants.xmlExtension;
         }
         else
         {
@@ -1049,7 +1057,7 @@ public final class Game
                 el = new Element("Creature");
                 el.setAttribute("name", creature.getName());
                 el.setAttribute("remaining", "" +
-                        caretaker.getCount(creature));
+                    caretaker.getCount(creature));
                 el.setAttribute("dead", "" + caretaker.getDeadCount(creature));
                 car.addContent(el);
             }
@@ -1068,7 +1076,7 @@ public final class Game
                 el.setAttribute("score", "" + player.getScore());
                 el.setAttribute("dead", "" + player.isDead());
                 el.setAttribute("mulligansLeft", "" +
-                        player.getMulligansLeft());
+                    player.getMulligansLeft());
                 el.setAttribute("colorsElim", player.getPlayersElim());
                 el.setAttribute("movementRoll", "" + player.getMovementRoll());
                 el.setAttribute("teleported", "" + player.hasTeleported());
@@ -1082,10 +1090,10 @@ public final class Game
                     Legion legion = (Legion)it2.next();
 
                     el.addContent(dumpLegion(doc, legion,
-                            battleInProgress && (
-                              legion == battle.getAttacker() ||
-                              legion == battle.getDefender()
-                            )
+                        battleInProgress && (
+                        legion == battle.getAttacker() ||
+                        legion == battle.getDefender()
+                        )
                         ));
                 }
                 root.addContent(el);
@@ -1106,12 +1114,12 @@ public final class Game
                 bat.setAttribute("masterHexLabel", battle.getMasterHexLabel());
                 bat.setAttribute("turnNumber", "" + battle.getTurnNumber());
                 bat.setAttribute("activePlayer", "" +
-                        battle.getActivePlayerName());
+                    battle.getActivePlayerName());
                 bat.setAttribute("phase", "" + battle.getBattlePhase().toInt());
                 bat.setAttribute("summonState", "" + battle.getSummonState());
                 bat.setAttribute("carryDamage", "" + battle.getCarryDamage());
                 bat.setAttribute("driftDamageApplied", "" +
-                        battle.isDriftDamageApplied());
+                    battle.isDriftDamageApplied());
 
                 it = battle.getCarryTargets().iterator();
                 while (it.hasNext())
@@ -1130,7 +1138,8 @@ public final class Game
         }
         catch (IOException ex)
         {
-            LOGGER.log(Level.SEVERE, "Error writing XML savegame: " + ex.toString(), (Throwable)null);
+            LOGGER.log(Level.SEVERE,
+                "Error writing XML savegame: " + ex.toString(), (Throwable)null);
         }
     }
 
@@ -1204,11 +1213,13 @@ public final class Game
 
             if (filenames.length < 1)
             {
-                LOGGER.log(Level.SEVERE, "No XML savegames found in saves directory", (Throwable)null);
+                LOGGER.log(Level.SEVERE,
+                    "No XML savegames found in saves directory",
+                    (Throwable)null);
                 dispose();
             }
             file = new File(Constants.saveDirname +
-                    latestSaveFilename(filenames));
+                latestSaveFilename(filenames));
         }
         else if (filename.indexOf("/") >= 0 || filename.indexOf("\\") >= 0)
         {
@@ -1231,7 +1242,8 @@ public final class Game
 
             if (!ver.getValue().equals(Constants.xmlSnapshotVersion))
             {
-                LOGGER.log(Level.SEVERE, "Can't load this savegame version.", (Throwable)null);
+                LOGGER.log(Level.SEVERE, "Can't load this savegame version.",
+                    (Throwable)null);
                 dispose();
             }
 
@@ -1256,15 +1268,16 @@ public final class Game
                 if (contentList.size() > 0)
                 {
                     String content = ((CDATA)contentList.get(0)).getText();
-                    LOGGER.log(Level.FINEST, "DataFileKey: " + mapKey + " DataFileContent :\n"
-					+ content);
+                    LOGGER.log(Level.FINEST,
+                        "DataFileKey: " + mapKey + " DataFileContent :\n" +
+                        content);
                     ResourceLoader.putIntoFileCache(mapKey,
                         content.getBytes());
                 }
                 else
                 {
                     ResourceLoader.putIntoFileCache(mapKey,
-                            new byte[0]);
+                        new byte[0]);
                 }
             }
 
@@ -1333,20 +1346,20 @@ public final class Game
                 player.setDead(pla.getAttribute("dead").getBooleanValue());
 
                 int mulligansLeft =
-                        pla.getAttribute("mulligansLeft").getIntValue();
+                    pla.getAttribute("mulligansLeft").getIntValue();
                 player.setMulligansLeft(mulligansLeft);
 
                 player.setMovementRoll(
-                        pla.getAttribute("movementRoll").getIntValue());
+                    pla.getAttribute("movementRoll").getIntValue());
 
                 player.setTeleported(
-                        pla.getAttribute("teleported").getBooleanValue());
+                    pla.getAttribute("teleported").getBooleanValue());
 
                 player.setSummoned(
-                        pla.getAttribute("summoned").getBooleanValue());
+                    pla.getAttribute("summoned").getBooleanValue());
 
                 String playersElim =
-                        pla.getAttribute("colorsElim").getValue();
+                    pla.getAttribute("colorsElim").getValue();
                 if (playersElim == "null")
                 {
                     playersElim = "";
@@ -1374,18 +1387,18 @@ public final class Game
             if (bat != null)
             {
                 String engagementHexLabel =
-                        bat.getAttribute("masterHexLabel").getValue();
+                    bat.getAttribute("masterHexLabel").getValue();
                 int battleTurnNum =
-                        bat.getAttribute("turnNumber").getIntValue();
+                    bat.getAttribute("turnNumber").getIntValue();
                 String battleActivePlayerName =
-                        bat.getAttribute("activePlayer").getValue();
+                    bat.getAttribute("activePlayer").getValue();
                 Constants.BattlePhase battlePhase =
                     Constants.BattlePhase.fromInt(
-                        bat.getAttribute("phase").getIntValue());
+                    bat.getAttribute("phase").getIntValue());
                 int summonState =
-                        bat.getAttribute("summonState").getIntValue();
+                    bat.getAttribute("summonState").getIntValue();
                 int carryDamage =
-                        bat.getAttribute("carryDamage").getIntValue();
+                    bat.getAttribute("carryDamage").getIntValue();
                 boolean driftDamageApplied =
                     bat.getAttribute("driftDamageApplied").getBooleanValue();
 
@@ -1400,9 +1413,9 @@ public final class Game
 
                 Player attackingPlayer = getActivePlayer();
                 Legion attacker = getFirstFriendlyLegion(engagementHexLabel,
-                        attackingPlayer);
+                    attackingPlayer);
                 Legion defender = getFirstEnemyLegion(engagementHexLabel,
-                        attackingPlayer);
+                    attackingPlayer);
 
                 int activeLegionNum;
                 if (battleActivePlayerName.equals(attackingPlayer.getName()))
@@ -1415,8 +1428,8 @@ public final class Game
                 }
 
                 battle = new Battle(this, attacker.getMarkerId(),
-                        defender.getMarkerId(), activeLegionNum,
-                        engagementHexLabel, battleTurnNum, battlePhase);
+                    defender.getMarkerId(), activeLegionNum,
+                    engagementHexLabel, battleTurnNum, battlePhase);
                 battle.setSummonState(summonState);
                 battle.setCarryDamage(carryDamage);
                 battle.setDriftDamageApplied(driftDamageApplied);
@@ -1471,7 +1484,7 @@ public final class Game
             Element cre = (Element)it.next();
             String name = cre.getAttribute("name").getValue();
             Critter critter = new Critter(
-                    Creature.getCreatureByName(name), null, this);
+                Creature.getCreatureByName(name), null, this);
 
             // Battle stuff
             if (cre.getAttribute("hits") != null)
@@ -1481,11 +1494,11 @@ public final class Game
                 critter.setHits(hits);
 
                 String currentBattleHexLabel =
-                        cre.getAttribute("currentHex").getValue();
+                    cre.getAttribute("currentHex").getValue();
 
                 critter.setCurrentHexLabel(currentBattleHexLabel);
                 String startingBattleHexLabel =
-                        cre.getAttribute("startingHex").getValue();
+                    cre.getAttribute("startingHex").getValue();
 
                 critter.setStartingHexLabel(startingBattleHexLabel);
 
@@ -1511,20 +1524,20 @@ public final class Game
         else
         {
             legion = new Legion(
-                    markerId,
-                    parentId,
-                    currentHexLabel,
-                    startingHexLabel,
-                    critters[0] == null ? null : critters[0].getCreature(),
-                    critters[1] == null ? null : critters[1].getCreature(),
-                    critters[2] == null ? null : critters[2].getCreature(),
-                    critters[3] == null ? null : critters[3].getCreature(),
-                    critters[4] == null ? null : critters[4].getCreature(),
-                    critters[5] == null ? null : critters[5].getCreature(),
-                    critters[6] == null ? null : critters[6].getCreature(),
-                    critters[7] == null ? null : critters[7].getCreature(),
-                    player.getName(),
-                    this);
+                markerId,
+                parentId,
+                currentHexLabel,
+                startingHexLabel,
+                critters[0] == null ? null : critters[0].getCreature(),
+                critters[1] == null ? null : critters[1].getCreature(),
+                critters[2] == null ? null : critters[2].getCreature(),
+                critters[3] == null ? null : critters[3].getCreature(),
+                critters[4] == null ? null : critters[4].getCreature(),
+                critters[5] == null ? null : critters[5].getCreature(),
+                critters[6] == null ? null : critters[6].getCreature(),
+                critters[7] == null ? null : critters[7].getCreature(),
+                player.getName(),
+                this);
             player.addLegion(legion);
         }
 
@@ -1585,7 +1598,7 @@ public final class Game
     private String latestSaveFilename(String[] filenames)
     {
         return (String)Collections.max(Arrays.asList(filenames), new
-                Comparator()
+            Comparator()
         {
             public int compare(Object o1, Object o2)
             {
@@ -1594,7 +1607,7 @@ public final class Game
                     throw new ClassCastException();
                 }
                 long diff = (numberValue((String)o1) -
-                        numberValue((String)o2));
+                    numberValue((String)o2));
 
                 if (diff > Integer.MAX_VALUE)
                 {
@@ -1621,9 +1634,9 @@ public final class Game
 
         recruits = new ArrayList();
         java.util.List tempRecruits =
-                TerrainRecruitLoader.getPossibleRecruits(terrain, hexLabel);
+            TerrainRecruitLoader.getPossibleRecruits(terrain, hexLabel);
         java.util.List recruiters =
-                TerrainRecruitLoader.getPossibleRecruiters(terrain, hexLabel);
+            TerrainRecruitLoader.getPossibleRecruiters(terrain, hexLabel);
 
         ListIterator lit = tempRecruits.listIterator();
 
@@ -1637,9 +1650,9 @@ public final class Game
                 Creature lesser = (Creature)liter.next();
 
                 if ((TerrainRecruitLoader.numberOfRecruiterNeeded(lesser,
-                        creature, terrain, hexLabel) <=
-                        legion.numCreature(lesser)) &&
-                        (recruits.indexOf(creature) == -1))
+                    creature, terrain, hexLabel) <=
+                    legion.numCreature(lesser)) &&
+                    (recruits.indexOf(creature) == -1))
                 {
                     recruits.add(creature);
                 }
@@ -1674,13 +1687,13 @@ public final class Game
         MasterHex hex = MasterBoard.getHexByLabel(hexLabel);
         String terrain = hex.getTerrain();
         recruiters = TerrainRecruitLoader.getPossibleRecruiters(
-                terrain, hexLabel);
+            terrain, hexLabel);
         Iterator it = recruiters.iterator();
         while (it.hasNext())
         {
             Creature possibleRecruiter = (Creature)it.next();
             int needed = TerrainRecruitLoader.numberOfRecruiterNeeded(
-                    possibleRecruiter, recruit, terrain, hexLabel);
+                possibleRecruiter, recruit, terrain, hexLabel);
 
             if (needed < 1 || needed > legion.numCreature(possibleRecruiter))
             {
@@ -1698,8 +1711,8 @@ public final class Game
     private boolean anonymousRecruitLegal(Legion legion, Creature recruit)
     {
         return TerrainRecruitLoader.anonymousRecruitLegal(recruit,
-                legion.getCurrentHex().getTerrain(),
-                legion.getCurrentHex().getLabel());
+            legion.getCurrentHex().getTerrain(),
+            legion.getCurrentHex().getLabel());
     }
 
     /** Add recruit to legion. */
@@ -1707,19 +1720,21 @@ public final class Game
     {
         if (recruit == null)
         {
-            LOGGER.log(Level.SEVERE, "null recruit in Game.doRecruit()", (Throwable)null);
+            LOGGER.log(Level.SEVERE, "null recruit in Game.doRecruit()",
+                (Throwable)null);
             return;
         }
         // Check for recruiter legality.
         java.util.List recruiters = findEligibleRecruiters(
-                legion.getMarkerId(), recruit.getName());
+            legion.getMarkerId(), recruit.getName());
 
         if (recruiter == null)
         {
             // If recruiter can be anonymous, then this is okay.
             if (!anonymousRecruitLegal(legion, recruit))
             {
-                LOGGER.log(Level.SEVERE, "null recruiter in Game.doRecruit()", (Throwable)null);
+                LOGGER.log(Level.SEVERE, "null recruiter in Game.doRecruit()",
+                    (Throwable)null);
                 // XXX Let it go for now  Should return later
             }
             else
@@ -1729,13 +1744,14 @@ public final class Game
         }
         else if (!recruiters.contains(recruiter))
         {
-            LOGGER.log(Level.SEVERE, "Illegal recruiter " + recruiter.getName() +
-			" for recruit " + recruit.getName(), (Throwable)null);
+            LOGGER.log(Level.SEVERE,
+                "Illegal recruiter " + recruiter.getName() +
+                " for recruit " + recruit.getName(), (Throwable)null);
             return;
         }
 
         lastRecruitTurnNumber = turnNumber;
-        
+
         if (legion.addCreature(recruit, true))
         {
             MasterHex hex = legion.getCurrentHex();
@@ -1745,14 +1761,15 @@ public final class Game
             {
                 // Mark the recruiter(s) as visible.
                 numRecruiters = TerrainRecruitLoader.numberOfRecruiterNeeded(
-                        recruiter, recruit, hex.getTerrain(), hex.getLabel());
+                    recruiter, recruit, hex.getTerrain(), hex.getLabel());
             }
 
-            LOGGER.log(Level.INFO, "Legion " + legion.getLongMarkerName() + " in " +
-			hex.getDescription() + " recruits " + recruit.getName() +
-			" with " + (recruiter == null ? "nothing" :
-			numRecruiters + " " + (numRecruiters > 1 ?
-			recruiter.getPluralName() : recruiter.getName())));
+            LOGGER.log(Level.INFO,
+                "Legion " + legion.getLongMarkerName() + " in " +
+                hex.getDescription() + " recruits " + recruit.getName() +
+                " with " + (recruiter == null ? "nothing" :
+                numRecruiters + " " + (numRecruiters > 1 ?
+                recruiter.getPluralName() : recruiter.getName())));
 
             // Recruits are one to a customer.
             legion.setRecruitName(recruit.getName());
@@ -1770,15 +1787,15 @@ public final class Game
         java.util.List recruits = new ArrayList();
         String terrain = legion.getCurrentHex().getTerrain();
         java.util.List allRecruits =
-                TerrainRecruitLoader.getRecruitableAcquirableList(terrain,
-                score);
+            TerrainRecruitLoader.getRecruitableAcquirableList(terrain,
+            score);
         java.util.Iterator it = allRecruits.iterator();
         while (it.hasNext())
         {
             String name = (String)it.next();
 
             if (caretaker.getCount(Creature.getCreatureByName(name)) >= 1 &&
-                    !recruits.contains(name))
+                !recruits.contains(name))
             {
                 recruits.add(name);
             }
@@ -1804,7 +1821,7 @@ public final class Game
         // Lookup coords for chit starting from player[i].getTower()
         String hexLabel = player.getTower();
         Legion legion = Legion.getStartingLegion(markerId, hexLabel,
-                player.getName(), this);
+            player.getName(), this);
         player.addLegion(legion);
     }
 
@@ -1832,7 +1849,7 @@ public final class Game
      *  the direction you just came from.  Return a set of
      *  hexLabel:entrySide tuples. */
     private synchronized Set findNormalMoves(MasterHex hex, Legion legion,
-            int roll, int block, int cameFrom, boolean ignoreFriends)
+        int roll, int block, int cameFrom, boolean ignoreFriends)
     {
         Set set = new HashSet();
         String hexLabel = hex.getLabel();
@@ -1849,7 +1866,7 @@ public final class Game
                 if (cameFrom != -1)
                 {
                     set.add(hexLabel + ":" + BattleMap.entrySideName(
-                            findEntrySide(hex, cameFrom)));
+                        findEntrySide(hex, cameFrom)));
                 }
             }
             return set;
@@ -1868,7 +1885,7 @@ public final class Game
                 Legion otherLegion = (Legion)it.next();
 
                 if (!ignoreFriends && otherLegion != legion &&
-                        hexLabel.equals(otherLegion.getCurrentHexLabel()))
+                    hexLabel.equals(otherLegion.getCurrentHexLabel()))
                 {
                     return set;
                 }
@@ -1877,7 +1894,7 @@ public final class Game
             if (cameFrom != -1)
             {
                 set.add(hexLabel + ":" + BattleMap.entrySideName(
-                        findEntrySide(hex, cameFrom)));
+                    findEntrySide(hex, cameFrom)));
                 return set;
             }
         }
@@ -1885,8 +1902,8 @@ public final class Game
         if (block >= 0)
         {
             set.addAll(findNormalMoves(hex.getNeighbor(block), legion,
-                    roll - 1, Constants.ARROWS_ONLY, (block + 3) % 6,
-                    ignoreFriends));
+                roll - 1, Constants.ARROWS_ONLY, (block + 3) % 6,
+                ignoreFriends));
         }
         else if (block == Constants.ARCHES_AND_ARROWS)
         {
@@ -1895,8 +1912,8 @@ public final class Game
                 if (hex.getExitType(i) >= Constants.ARCH && i != cameFrom)
                 {
                     set.addAll(findNormalMoves(hex.getNeighbor(i), legion,
-                            roll - 1, Constants.ARROWS_ONLY, (i + 3) % 6,
-                            ignoreFriends));
+                        roll - 1, Constants.ARROWS_ONLY, (i + 3) % 6,
+                        ignoreFriends));
                 }
             }
         }
@@ -1907,8 +1924,8 @@ public final class Game
                 if (hex.getExitType(i) >= Constants.ARROW && i != cameFrom)
                 {
                     set.addAll(findNormalMoves(hex.getNeighbor(i), legion,
-                            roll - 1, Constants.ARROWS_ONLY, (i + 3) % 6,
-                            ignoreFriends));
+                        roll - 1, Constants.ARROWS_ONLY, (i + 3) % 6,
+                        ignoreFriends));
                 }
             }
         }
@@ -1918,7 +1935,7 @@ public final class Game
     /** Recursively find all unoccupied hexes within roll hexes, for
      *  tower teleport. */
     private Set findNearbyUnoccupiedHexes(MasterHex hex, Legion legion,
-            int roll, int cameFrom, boolean ignoreFriends)
+        int roll, int cameFrom, boolean ignoreFriends)
     {
         // This hex is the final destination.  Mark it as legal if
         // it is unoccupied.
@@ -1933,10 +1950,10 @@ public final class Game
             for (int i = 0; i < 6; i++)
             {
                 if (i != cameFrom && (hex.getExitType(i) != Constants.NONE ||
-                        hex.getEntranceType(i) != Constants.NONE))
+                    hex.getEntranceType(i) != Constants.NONE))
                 {
                     set.addAll(findNearbyUnoccupiedHexes(hex.getNeighbor(i),
-                            legion, roll - 1, (i + 3) % 6, ignoreFriends));
+                        legion, roll - 1, (i + 3) % 6, ignoreFriends));
                 }
             }
         }
@@ -1947,11 +1964,11 @@ public final class Game
      *  Include moves currently blocked by friendly
      *  legions if ignoreFriends is true. */
     Set listAllMoves(Legion legion, MasterHex hex, int movementRoll,
-            boolean ignoreFriends)
+        boolean ignoreFriends)
     {
         Set set = listNormalMoves(legion, hex, movementRoll, ignoreFriends);
         set.addAll(listTeleportMoves(legion, hex, movementRoll,
-                ignoreFriends));
+            ignoreFriends));
         return set;
     }
 
@@ -1973,14 +1990,14 @@ public final class Game
      *  without teleporting.  Include moves currently blocked by friendly
      *  legions if ignoreFriends is true. */
     Set listNormalMoves(Legion legion, MasterHex hex, int movementRoll,
-            boolean ignoreFriends)
+        boolean ignoreFriends)
     {
         if (legion.hasMoved())
         {
             return new HashSet();
         }
         Set tuples = findNormalMoves(hex, legion, movementRoll, findBlock(hex),
-                Constants.NOWHERE, ignoreFriends);
+            Constants.NOWHERE, ignoreFriends);
 
         // Extract just the hexLabels from the hexLabel:entrySide tuples.
         Set hexLabels = new HashSet();
@@ -2052,7 +2069,7 @@ public final class Game
      *  Include moves currently blocked by friendly legions if
      *  ignoreFriends is true. */
     Set listTeleportMoves(Legion legion, MasterHex hex, int movementRoll,
-            boolean ignoreFriends)
+        boolean ignoreFriends)
     {
         Player player = legion.getPlayer();
         Set set = new HashSet();
@@ -2063,13 +2080,13 @@ public final class Game
 
         // Tower teleport
         if (HexMap.terrainIsTower(hex.getTerrain()) && legion.numLords() > 0 &&
-                towerTeleportAllowed())
+            towerTeleportAllowed())
         {
             // Mark every unoccupied hex within 6 hexes.
             if (towerToNonTowerTeleportAllowed())
             {
                 set.addAll(findNearbyUnoccupiedHexes(hex, legion, 6,
-                        Constants.NOWHERE, ignoreFriends));
+                    Constants.NOWHERE, ignoreFriends));
             }
 
             if (towerToTowerTeleportAllowed())
@@ -2084,8 +2101,8 @@ public final class Game
                     if (MasterBoard.getHexByLabel(hexLabel) != null)
                     {
                         if ((!isOccupied(hexLabel) || (ignoreFriends &&
-                                getNumEnemyLegions(hexLabel, player) == 0)) &&
-                                (!(hexLabel.equals(hex.getLabel()))))
+                            getNumEnemyLegions(hexLabel, player) == 0)) &&
+                            (!(hexLabel.equals(hex.getLabel()))))
                         {
                             set.add(hexLabel);
                         }
@@ -2108,7 +2125,7 @@ public final class Game
 
         // Titan teleport
         if (player.canTitanTeleport() && legion.hasTitan() &&
-                titanTeleportAllowed())
+            titanTeleportAllowed())
         {
             // Mark every hex containing an enemy stack that does not
             // already contain a friendly stack.
@@ -2134,7 +2151,7 @@ public final class Game
      *  possible entry sides.  If the hex is unoccupied, just return
      *  one entry side since it doesn't matter. */
     Set listPossibleEntrySides(String markerId, String targetHexLabel,
-            boolean teleport)
+        boolean teleport)
     {
         Set entrySides = new HashSet();
         Legion legion = getLegionByMarkerId(markerId);
@@ -2146,12 +2163,12 @@ public final class Game
         if (teleport)
         {
             if (listTeleportMoves(legion, currentHex, movementRoll,
-                    false).contains(targetHexLabel))
+                false).contains(targetHexLabel))
             {
                 // Startlisted terrain only have bottom entry side.
                 // Don't bother finding more than one entry side if unoccupied.
                 if (!isOccupied(targetHexLabel) ||
-                        HexMap.terrainHasStartlist(targetHex.getTerrain()))
+                    HexMap.terrainHasStartlist(targetHex.getTerrain()))
                 {
                     entrySides.add(Constants.bottom);
                     return entrySides;
@@ -2172,7 +2189,7 @@ public final class Game
 
         // Normal moves.
         Set tuples = findNormalMoves(currentHex, legion, movementRoll,
-                findBlock(currentHex), Constants.NOWHERE, false);
+            findBlock(currentHex), Constants.NOWHERE, false);
         Iterator it = tuples.iterator();
         while (it.hasNext())
         {
@@ -2194,12 +2211,12 @@ public final class Game
                 // So, removed this optimization to see whether it fixes the bug:
                 //  [colossus-Bugs-1789116 ] illegal move: 29 plain to 2000 tundra 
                 /*
-                // Don't bother finding more than one entry side if unoccupied.
-                if (!isOccupied(targetHexLabel))
-                {
-                    return entrySides;
-                }
-                */
+                 // Don't bother finding more than one entry side if unoccupied.
+                 if (!isOccupied(targetHexLabel))
+                 {
+                 return entrySides;
+                 }
+                 */
             }
         }
         return entrySides;
@@ -2285,15 +2302,16 @@ public final class Game
             legion.addCreature(angel, false);
 
             server.allTellRemoveCreature(donor.getMarkerId(), angel.getName(),
-                    true, Constants.reasonSummon);
+                true, Constants.reasonSummon);
             server.allTellAddCreature(legion.getMarkerId(), angel.getName(),
-                    true, Constants.reasonSummon);
+                true, Constants.reasonSummon);
 
-            server.allTellDidSummon(legion.getMarkerId(), donor.getMarkerId(), angel.getName());
-            
+            server.allTellDidSummon(legion.getMarkerId(), donor.getMarkerId(),
+                angel.getName());
+
             LOGGER.log(Level.INFO, "One " + angel.getName() +
-			" is summoned from legion " + donor.getLongMarkerName() +
-			" into legion " + legion.getLongMarkerName());
+                " is summoned from legion " + donor.getLongMarkerName() +
+                " into legion " + legion.getLongMarkerName());
         }
 
         // Need to call this regardless to advance past the summon phase.
@@ -2315,7 +2333,7 @@ public final class Game
     }
 
     synchronized void finishBattle(String hexLabel, boolean attackerEntered,
-            int points, int turnDone)
+        int points, int turnDone)
     {
         battle = null;
         server.allCleanupBattle();
@@ -2344,7 +2362,8 @@ public final class Game
                 // Defender won, so possibly recruit reinforcement.
                 if (attackerEntered && winner.canRecruit())
                 {
-                    LOGGER.log(Level.FINEST, "Calling Game.reinforce() from Game.finishBattle()");
+                    LOGGER.log(Level.FINEST,
+                        "Calling Game.reinforce() from Game.finishBattle()");
                     reinforce(winner);
                 }
             }
@@ -2374,14 +2393,14 @@ public final class Game
                 String hexLabel = candidate.getCurrentHexLabel();
                 boolean hasSummonable = false;
                 java.util.List summonableList =
-                        Creature.getSummonableCreatures();
+                    Creature.getSummonableCreatures();
                 Iterator sumIt = summonableList.iterator();
                 while (sumIt.hasNext() && !hasSummonable)
                 {
                     Creature c = (Creature)sumIt.next();
 
                     hasSummonable = hasSummonable ||
-                            (candidate.numCreature(c) > 0);
+                        (candidate.numCreature(c) > 0);
                 }
                 if (hasSummonable && !isEngagement(hexLabel))
                 {
@@ -2402,21 +2421,24 @@ public final class Game
         // Need a legion marker to split.
         if (!player.isMarkerAvailable(childId))
         {
-            LOGGER.log(Level.SEVERE, "Marker " + childId + " is not available.", (Throwable)null);
+            LOGGER.log(Level.SEVERE, "Marker " + childId + " is not available.",
+                (Throwable)null);
             return false;
         }
 
         // Pre-split legion must have 4+ creatures.
         if (legion.getHeight() < 4)
         {
-            LOGGER.log(Level.SEVERE, "Legion " + parentId + " is too short to split.", (Throwable)null);
+            LOGGER.log(Level.SEVERE,
+                "Legion " + parentId + " is too short to split.",
+                (Throwable)null);
             return false;
         }
 
         if (results == null)
         {
             LOGGER.log(Level.FINEST, "Empty split list (" + parentId + ", " +
-			childId + ")");
+                childId + ")");
             return false;
         }
         java.util.List strings = Split.split(',', results);
@@ -2432,8 +2454,9 @@ public final class Game
         // Each legion must have 2+ creatures after the split.
         if (creatures.size() < 2 || legion.getHeight() - creatures.size() < 2)
         {
-            LOGGER.log(Level.FINEST, "Too small/big split list (" + parentId + ", " +
-			childId + ")");
+            LOGGER.log(Level.FINEST,
+                "Too small/big split list (" + parentId + ", " +
+                childId + ")");
             return false;
         }
 
@@ -2455,9 +2478,10 @@ public final class Game
             Creature creature = (Creature)it.next();
             if (!tempCreatures.remove(creature))
             {
-                LOGGER.log(Level.FINEST, "Unavailable creature in split list (" +
-				parentId + ", " +
-				childId + ") : " + creature.getName());
+                LOGGER.log(Level.FINEST,
+                    "Unavailable creature in split list (" +
+                    parentId + ", " +
+                    childId + ") : " + creature.getName());
                 return false;
             }
         }
@@ -2467,7 +2491,8 @@ public final class Game
             // Only allow a single split on turn 1.
             if (player.getNumLegions() > 1)
             {
-                LOGGER.log(Level.SEVERE, "Cannot split twice on Turn 1.", (Throwable)null);
+                LOGGER.log(Level.SEVERE, "Cannot split twice on Turn 1.",
+                    (Throwable)null);
                 return false;
             }
             // Each stack must contain exactly 4 creatures.
@@ -2501,13 +2526,13 @@ public final class Game
 
         String hexLabel = legion.getCurrentHexLabel();
         server.didSplit(hexLabel, parentId, childId, newLegion.getHeight());
-        
+
         // viewableAll depends on the splitPrediction to tell then true contents,
         // and viewableOwn it does not harm; it only helps the AIs :)
-        
+
         String viewModeOpt = options.getStringOption(Options.viewMode);
         int viewModeOptNum = options.getNumberForViewMode(viewModeOpt);
-        
+
         if (viewModeOptNum == Options.viewableAllNum ||
             viewModeOptNum == Options.viewableOwnNum )
         {
@@ -2516,9 +2541,9 @@ public final class Game
         }
         else
         {
-            server.oneRevealLegion(legion, player.getName(), 
+            server.oneRevealLegion(legion, player.getName(),
                 Constants.reasonSplit);
-            server.oneRevealLegion(newLegion, player.getName(), 
+            server.oneRevealLegion(newLegion, player.getName(),
                 Constants.reasonSplit);
         }
         return true;
@@ -2528,7 +2553,7 @@ public final class Game
      *  the reason why it is illegal, or null if ok and move was done.
      */
     String doMove(String markerId, String hexLabel, String entrySide,
-            boolean teleport, String teleportingLord)
+        boolean teleport, String teleportingLord)
     {
         Legion legion = getLegionByMarkerId(markerId);
         if (legion == null)
@@ -2541,28 +2566,31 @@ public final class Game
         if (teleport)
         {
             if (!listTeleportMoves(legion, legion.getCurrentHex(),
-                    player.getMovementRoll(), false).contains(hexLabel))
+                player.getMovementRoll(), false).contains(hexLabel))
             {
-                String marker = legion.getMarkerId() + " " + legion.getMarkerName();
+                String marker = legion.getMarkerId() + " " +
+                    legion.getMarkerName();
                 String from = legion.getCurrentHex().getLabel();
                 Set set = listTeleportMoves(legion, legion.getCurrentHex(),
-                        player.getMovementRoll(), false);
-                return "List for teleport moves " + set.toString()  + " of " + 
-                marker + " from " + from + 
-                " does not contain '" + hexLabel + "'";
+                    player.getMovementRoll(), false);
+                return "List for teleport moves " + set.toString()  + " of " +
+                    marker + " from " + from +
+                    " does not contain '" + hexLabel + "'";
             }
         }
         else
         {
             if (!listNormalMoves(legion, legion.getCurrentHex(),
-                    player.getMovementRoll(), false).contains(hexLabel))
+                player.getMovementRoll(), false).contains(hexLabel))
             {
-                String marker = legion.getMarkerId() + " " + legion.getMarkerName();
+                String marker = legion.getMarkerId() + " " +
+                    legion.getMarkerName();
                 String from = legion.getCurrentHex().getLabel();
                 Set set = listNormalMoves(legion, legion.getCurrentHex(),
-                        player.getMovementRoll(), false);
-                return "List for normal moves " + set.toString() + " + of " + marker + 
-                " from " + from + " does not contain '" + hexLabel + "'";
+                    player.getMovementRoll(), false);
+                return "List for normal moves " + set.toString() + " + of " +
+                    marker +
+                    " from " + from + " does not contain '" + hexLabel + "'";
             }
         }
 
@@ -2570,13 +2598,14 @@ public final class Game
         Set legalSides = listPossibleEntrySides(markerId, hexLabel, teleport);
         if (!legalSides.contains(entrySide))
         {
-            return "EntrySide '" + entrySide + "' is not valid, valid are: " + legalSides.toString();
+            return "EntrySide '" + entrySide + "' is not valid, valid are: " +
+                legalSides.toString();
         }
 
         MasterHex hex = MasterBoard.getHexByLabel(hexLabel);
         // If this is a tower hex, the only entry side is the bottom.
         if (HexMap.terrainHasStartlist(hex.getTerrain()) &&
-                !entrySide.equals(Constants.bottom))
+            !entrySide.equals(Constants.bottom))
         {
             LOGGER.log(Level.WARNING, "Tried to enter invalid side of tower");
             entrySide = Constants.bottom;
@@ -2587,16 +2616,17 @@ public final class Game
         {
             // Verify teleporting lord.
             if (teleportingLord == null || !legion.listTeleportingLords(
-                    hexLabel).contains(teleportingLord))
+                hexLabel).contains(teleportingLord))
             {
-                if (teleportingLord == null) return "teleportingLord null";
-                return "list of telep. lords " + 
-                legion.listTeleportingLords(hexLabel).toString() + 
-                " does not contain '" + teleportingLord + "'";
+                if (teleportingLord == null) { return "teleportingLord null";
+                }
+                return "list of telep. lords " +
+                    legion.listTeleportingLords(hexLabel).toString() +
+                    " does not contain '" + teleportingLord + "'";
             }
             List creatureNames = new ArrayList();
             creatureNames.add(teleportingLord);
-            server.allRevealCreatures(legion, creatureNames, 
+            server.allRevealCreatures(legion, creatureNames,
                 Constants.reasonTeleport);
         }
         legion.moveToHex(hex, entrySide, teleport, teleportingLord);
@@ -2619,9 +2649,9 @@ public final class Game
             attacker.sortCritters();
             defender.sortCritters();
 
-            server.oneRevealLegion(attacker, defender.getPlayerName(), 
+            server.oneRevealLegion(attacker, defender.getPlayerName(),
                 Constants.reasonEngaged);
-            server.oneRevealLegion(defender, attacker.getPlayerName(), 
+            server.oneRevealLegion(defender, attacker.getPlayerName(),
                 Constants.reasonEngaged);
 
             if (defender.canFlee())
@@ -2637,7 +2667,8 @@ public final class Game
         }
         else
         {
-            LOGGER.log(Level.FINEST, "illegal call to Game.engage() " + engagementInProgress);
+            LOGGER.log(Level.FINEST,
+                "illegal call to Game.engage() " + engagementInProgress);
         }
     }
 
@@ -2683,7 +2714,7 @@ public final class Game
             Legion attacker = getLegionByMarkerId(markerId);
             String hexLabel = attacker.getCurrentHexLabel();
             Legion defender = getFirstEnemyLegion(hexLabel,
-                    attacker.getPlayer());
+                attacker.getPlayer());
 
             handleConcession(attacker, defender, false);
         }
@@ -2751,7 +2782,7 @@ public final class Game
             if (playerName.equals(getActivePlayerName()))
             {
                 Legion defender = getLegionByMarkerId(
-                        proposal.getDefenderId());
+                    proposal.getDefenderId());
 
                 other = defender.getPlayerName();
             }
@@ -2784,20 +2815,20 @@ public final class Game
             battleInProgress = true;
 
             // Reveal both legions to all players.
-            server.allRevealEngagedLegion(attacker, true, 
+            server.allRevealEngagedLegion(attacker, true,
                 Constants.reasonBattleStarts);
-            server.allRevealEngagedLegion(defender, false, 
+            server.allRevealEngagedLegion(defender, false,
                 Constants.reasonBattleStarts);
 
             battle = new Battle(this, attacker.getMarkerId(),
-                    defender.getMarkerId(), Constants.DEFENDER, hexLabel,
-                    1, Constants.BattlePhase.MOVE);
+                defender.getMarkerId(), Constants.DEFENDER, hexLabel,
+                1, Constants.BattlePhase.MOVE);
             battle.init();
         }
     }
 
     private synchronized void handleConcession(Legion loser, Legion winner,
-            boolean fled)
+        boolean fled)
     {
         // Figure how many points the victor receives.
         int points = loser.getPointValue();
@@ -2806,14 +2837,13 @@ public final class Game
         {
             points /= 2;
             LOGGER.log(Level.INFO, "Legion " + loser.getLongMarkerName() +
-			" flees from legion " + winner.getLongMarkerName());
+                " flees from legion " + winner.getLongMarkerName());
         }
         else
         {
             LOGGER.log(Level.INFO, "Legion " + loser.getLongMarkerName() +
-			" concedes to legion " + winner.getLongMarkerName());
+                " concedes to legion " + winner.getLongMarkerName());
         }
-
 
         // Add points, and angels if necessary.
         winner.addPoints(points);
@@ -2824,14 +2854,14 @@ public final class Game
         // removed.
         Player losingPlayer = loser.getPlayer();
 
-        String reason = fled ? 
-             Constants.reasonFled : Constants.reasonConcession;
+        String reason = fled ?
+            Constants.reasonFled : Constants.reasonConcession;
         server.allRevealEngagedLegion(
             loser, losingPlayer.equals(getActivePlayer()), reason);
 
         // server.allRemoveLegion(loser.getMarkerId());
 
-        
+
         // If this was the titan stack, its owner dies and gives half
         // points to the victor.
         if (loser.hasTitan())
@@ -2847,12 +2877,12 @@ public final class Game
             // simply remove the dead legion.
             loser.remove();
         }
-        
+
         // No recruiting or angel summoning is allowed after the
         // defender flees or the attacker concedes before entering
         // the battle.
-        String method = fled ? 
-                Constants.erMethodFlee : Constants.erMethodConcede;
+        String method = fled ?
+            Constants.erMethodFlee : Constants.erMethodConcede;
         setEngagementResult(method, winner.getMarkerId(), points, 0);
         checkEngagementDone();
     }
@@ -2871,8 +2901,8 @@ public final class Game
             defender.remove();
 
             LOGGER.log(Level.INFO, attacker.getLongMarkerName() + " and " +
-			defender.getLongMarkerName() +
-			" agree to mutual elimination");
+                defender.getLongMarkerName() +
+                " agree to mutual elimination");
 
             // If both Titans died, eliminate both players.
             if (attacker.hasTitan() && defender.hasTitan())
@@ -2927,13 +2957,13 @@ public final class Game
                 Creature creature = Creature.getCreatureByName(creatureName);
                 winner.removeCreature(creature, true, true);
                 server.allTellRemoveCreature(winner.getMarkerId(),
-                        creatureName, true, Constants.reasonNegotiated);
+                    creatureName, true, Constants.reasonNegotiated);
             }
             LOGGER.log(Level.INFO, log.toString());
 
-            server.oneRevealLegion(winner, attacker.getPlayerName(), 
+            server.oneRevealLegion(winner, attacker.getPlayerName(),
                 Constants.reasonNegotiated);
-            server.oneRevealLegion(winner, defender.getPlayerName(), 
+            server.oneRevealLegion(winner, defender.getPlayerName(),
                 Constants.reasonNegotiated);
 
             points = loser.getPointValue();
@@ -2947,8 +2977,8 @@ public final class Game
             winner.addPoints(points);
 
             LOGGER.log(Level.INFO, "Legion " + loser.getLongMarkerName() +
-			" is eliminated by legion " + winner.getLongMarkerName() +
-			" via negotiation");
+                " is eliminated by legion " + winner.getLongMarkerName() +
+                " via negotiation");
 
             // If this was the titan stack, its owner dies and gives half
             // points to the victor.
@@ -2969,7 +2999,7 @@ public final class Game
             else
             {
                 if (attacker.getHeight() < 7 &&
-                        !attacker.getPlayer().hasSummoned())
+                    !attacker.getPlayer().hasSummoned())
                 {
                     // If the attacker won the battle by agreement,
                     // he may summon an angel.
@@ -2987,7 +3017,7 @@ public final class Game
     }
 
     synchronized void askAcquireAngel(String playerName, String markerId,
-            java.util.List recruits)
+        java.util.List recruits)
     {
         acquiring = true;
         server.askAcquireAngel(playerName, markerId, recruits);
@@ -3013,8 +3043,9 @@ public final class Game
 
     private synchronized void checkEngagementDone()
     {
-        if (summoning || reinforcing || acquiring || engagementResult == null)
+        if (summoning || reinforcing || acquiring || engagementResult == null) {
             return;
+        }
 
         engagementInProgress = false;
 
@@ -3233,7 +3264,7 @@ public final class Game
     }
 
     synchronized java.util.List getFriendlyLegions(String hexLabel,
-            Player player)
+        Player player)
     {
         java.util.List newLegions = new ArrayList();
         java.util.List legions = player.getLegions();
@@ -3314,7 +3345,6 @@ public final class Game
         }
     }
 
-
     // History wrappers.  Time to start obeying the Law of Demeter.
     void addCreatureEvent(String markerId, String creatureName)
     {
@@ -3338,10 +3368,10 @@ public final class Game
     }
 
     void revealEvent(boolean allPlayers, List playerNames, String markerId,
-            List creatureNames)
+        List creatureNames)
     {
         history.revealEvent(allPlayers, playerNames, markerId, creatureNames,
-                turnNumber);
+            turnNumber);
     }
 
     void playerElimEvent(String playerName, String slayerName)

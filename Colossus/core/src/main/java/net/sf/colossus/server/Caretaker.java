@@ -22,23 +22,22 @@ import java.util.logging.Logger;
 
 public final class Caretaker implements Cloneable
 {
-	private static final Logger LOGGER = Logger.getLogger(Caretaker.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(Caretaker.class.getName());
 
-	/** Mapping from String creature name to Integer count. If the
+    /** Mapping from String creature name to Integer count. If the
      *  creature is not found, assume that we have a full count (equal
      *  to Creature.getMaxCount()) */
     private HashMap map = new HashMap();
+
     /** Mapping from String creature name to Integer count. If the
      *  creature is not found, assume that we have a 0 count */
     private HashMap deadMap = new HashMap();
     private Game game;
 
-
     Caretaker(Game game)
     {
         this.game = game;
     }
-
 
     public int getCount(String creatureName)
     {
@@ -72,7 +71,7 @@ public final class Caretaker implements Cloneable
 
     public void setCount(String creatureName, int count)
     {
-        map.put(creatureName, new Integer(count)); 
+        map.put(creatureName, new Integer(count));
         updateDisplays(creatureName);
     }
 
@@ -81,7 +80,7 @@ public final class Caretaker implements Cloneable
         deadMap.put(creatureName, new Integer(count));
         updateDisplays(creatureName);
     }
-    
+
     void setCount(Creature creature, int count)
     {
         setCount(creature.getName(), count);
@@ -91,7 +90,7 @@ public final class Caretaker implements Cloneable
     {
         setDeadCount(creature.getName(), count);
     }
-    
+
     void resetAllCounts()
     {
         map.clear();
@@ -113,24 +112,26 @@ public final class Caretaker implements Cloneable
             if (count.intValue() == creature.getMaxCount())
             {
                 // Not quite right for immortals.
-                LOGGER.log(Level.INFO, "First " + creature.getName() + " recruited");
+                LOGGER.log(Level.INFO,
+                    "First " + creature.getName() + " recruited");
             }
             if (count.intValue() == 1)
             {
                 // Not quite right for immortals.
-                LOGGER.log(Level.INFO, "Last " + creature.getName() + " recruited");
+                LOGGER.log(Level.INFO,
+                    "Last " + creature.getName() + " recruited");
             }
             if (count.intValue() <= 0)
             {
                 LOGGER.log(Level.SEVERE, "Too many " + creature.getName() +
-				  " recruited, only " + count.intValue() +
-				  " left ?!?", (Throwable)null);
+                    " recruited, only " + count.intValue() +
+                    " left ?!?", (Throwable)null);
             }
             map.put(creature.getName(), new Integer(count.intValue() - 1));
         }
         updateDisplays(creature.getName());
     }
-    
+
     void putOneBack(Creature creature)
     {
         Integer count = (Integer)map.get(creature.getName());
@@ -142,7 +143,7 @@ public final class Caretaker implements Cloneable
         map.put(creature.getName(), new Integer(count.intValue() + 1));
         updateDisplays(creature.getName());
     }
-    
+
     void putDeadOne(Creature creature)
     {
         String name = creature.getName();
@@ -158,11 +159,11 @@ public final class Caretaker implements Cloneable
         if (count == null)
         {
             LOGGER.log(Level.WARNING, "A Creature by the name of " + name +
-			 " died before any was taken.");
+                " died before any was taken.");
         }
         updateDisplays(creature.getName());
     }
-    
+
     /** Update creatureName's count on all clients. */
     private void updateDisplays(String creatureName)
     {
@@ -171,7 +172,7 @@ public final class Caretaker implements Cloneable
         {
             if (creatureName != null)
             {
-                server.allUpdateCreatureCount(creatureName, 
+                server.allUpdateCreatureCount(creatureName,
                     getCount(creatureName),
                     getDeadCount(creatureName));
             }
@@ -190,7 +191,6 @@ public final class Caretaker implements Cloneable
         }
     }
 
-
     public Object clone()
     {
         Caretaker newCaretaker = new Caretaker(game);
@@ -200,7 +200,6 @@ public final class Caretaker implements Cloneable
         newCaretaker.deadMap = (HashMap)deadMap.clone();
         return newCaretaker;
     }
-
 
     /** Move dead non-Titan immortals back to stacks. */
     void resurrectImmortals()
@@ -218,7 +217,7 @@ public final class Caretaker implements Cloneable
                     int live = getCount(name);
                     // Don't use setCount() / setDeadCount(), because we 
                     // want to update displays only at the end. 
-                    map.put(name, new Integer(live + dead)); 
+                    map.put(name, new Integer(live + dead));
                     deadMap.put(name, new Integer(0));
                 }
             }

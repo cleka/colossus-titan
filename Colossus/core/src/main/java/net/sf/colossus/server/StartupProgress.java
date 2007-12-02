@@ -17,7 +17,7 @@ import net.sf.colossus.server.Server;
  *  @version $Id: StartupProgress.java 0000 2007-02-14 00:00:00Z cleka $
  *  @author Clemens Katzer
  */
-public final class StartupProgress implements ActionListener 
+public final class StartupProgress implements ActionListener
 {
     private JFrame logFrame;
     private TextArea text;
@@ -25,24 +25,24 @@ public final class StartupProgress implements ActionListener
     private Server server;
     private JButton b;
     private JCheckBox autoCloseCheckBox;
-    
-    public StartupProgress (Server server)
+
+    public StartupProgress(Server server)
     {
         this.server = server;
-        
+
         //Create and set up the window.
         JFrame logFrame = new JFrame("Server startup progress log");
         this.logFrame = logFrame;
-        
+
         logFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        
+
         Container pane = logFrame.getContentPane();
         this.pane = pane;
-                
+
         TextArea text = new TextArea("", 20, 80);
         this.text = text;
         pane.add(text, BorderLayout.CENTER);
-         
+
         JButton b1 = new JButton("Abort");
         this.b = b1;
         b1.setVerticalTextPosition(JButton.CENTER);
@@ -52,17 +52,17 @@ public final class StartupProgress implements ActionListener
         b1.addActionListener(this);
         b1.setToolTipText("Click this button to abort the start process.");
         pane.add(b1, BorderLayout.SOUTH);
-        
+
         this.autoCloseCheckBox = new JCheckBox("Automatically close when game starts");
         autoCloseCheckBox.setSelected(true);
         pane.add(autoCloseCheckBox, BorderLayout.NORTH);
-        
+
         //Display the window.
         logFrame.pack();
         logFrame.setVisible(true);
-        
+
     }
-      
+
     public void append(String s)
     {
         this.text.append(s + "\n");
@@ -70,7 +70,7 @@ public final class StartupProgress implements ActionListener
 
     public void setCompleted()
     {
-        if(this.autoCloseCheckBox.isSelected()) {
+        if (this.autoCloseCheckBox.isSelected()) {
             this.dispose();
             return;
         }
@@ -95,16 +95,16 @@ public final class StartupProgress implements ActionListener
             this.logFrame = null;
         }
     }
-    
-    public void actionPerformed(ActionEvent e) 
+
+    public void actionPerformed(ActionEvent e)
     {
         if ("abort".equals(e.getActionCommand()))
         {
             this.text.append("\nAbort requested, please wait...\n");
             this.server.panicExit();
         }
-        
-        if ("close".equals(e.getActionCommand())) 
+
+        if ("close".equals(e.getActionCommand()))
         {
             this.text.append("\nClosing...\n");
             this.dispose();

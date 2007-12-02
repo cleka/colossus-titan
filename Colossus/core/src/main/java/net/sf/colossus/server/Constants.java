@@ -22,13 +22,22 @@ public final class Constants
 
         public static Phase fromInt(int i)
         {
-            switch(i)
+            switch (i)
             {
-                case 1: return SPLIT;
-                case 2: return MOVE;
-                case 3: return FIGHT;
-                case 4: return MUSTER;
-                default: return null;
+                case 1:
+                    return SPLIT;
+
+                case 2:
+                    return MOVE;
+
+                case 3:
+                    return FIGHT;
+
+                case 4:
+                    return MUSTER;
+
+                default:
+                    return null;
             }
         }
 
@@ -36,7 +45,6 @@ public final class Constants
         {
             return value;
         }
-
 
         public String toString()
         {
@@ -54,6 +62,7 @@ public final class Constants
         }
     }
 
+
     // Phases of a battle turn
     public static class BattlePhase {
         public static final BattlePhase SUMMON
@@ -69,14 +78,25 @@ public final class Constants
 
         public static BattlePhase fromInt(int i)
         {
-            switch(i)
+            switch (i)
             {
-                case 0: return SUMMON;
-                case 1: return RECRUIT;
-                case 2: return MOVE;
-                case 3: return FIGHT;
-                case 4: return STRIKEBACK;
-                default: return null;
+                case 0:
+                    return SUMMON;
+
+                case 1:
+                    return RECRUIT;
+
+                case 2:
+                    return MOVE;
+
+                case 3:
+                    return FIGHT;
+
+                case 4:
+                    return STRIKEBACK;
+
+                default:
+                    return null;
             }
         }
 
@@ -108,7 +128,7 @@ public final class Constants
 
     /** Base path for all external game data files. */
     public static final String gameDataPath =
-            System.getProperty("user.home") + "/.colossus/";
+        System.getProperty("user.home") + "/.colossus/";
 
     // Constants related to the options config files
     public static final String optionsPath = gameDataPath;
@@ -117,7 +137,7 @@ public final class Constants
     public static final String optionsExtension = ".cfg";
 
     public static final String configVersion =
-            "Colossus config file version 2";
+        "Colossus config file version 2";
 
     // Constants for savegames
 
@@ -175,12 +195,12 @@ public final class Constants
 
     /* all should be MAX_MAX_PLAYERS long */
     public static final String[] colorNames =
-    {
+        {
         "Black", "Blue", "Brown", "Gold", "Green", "Red",
         "Orange", "Purple", "Silver", "Sky", "Pine", "Indigo"
     };
     public static final String[] shortColorNames =
-    {
+        {
         "Bk", "Bu", "Br", "Gd", "Gr", "Rd",
         "Or", "Pu", "Si", "Sk", "Pi", "In"
     };
@@ -207,7 +227,7 @@ public final class Constants
     public static final String left = "Left";
 
     /** all variants are subdirectories of this dir.
-    /*  the default dir name can is not prepended by this. */
+     /*  the default dir name can is not prepended by this. */
     public static final String varPath = "";
 
     /** Default directory for datafiles, can be outside variants,
@@ -281,7 +301,7 @@ public final class Constants
     public static final String byType = "<By type>";
     public static final String byClient = "<By client>";
     public static final String username = System.getProperty("user.name",
-            byColor);
+        byColor);
 
     public static final String titan = "Titan";
     public static final String angel = "Angel";
@@ -407,7 +427,7 @@ public final class Constants
     public static final String reasonEngaged = "Engaged";
     public static final String reasonConcession = "Concession";
     public static final String reasonFled = "Fled";
-    
+
     // From server to client
     public static final String tellEngagement = "tellEngagement";
     public static final String tellEngagementResults = "tellEngagementResults";
@@ -431,7 +451,7 @@ public final class Constants
     public static final String createSummonAngel = "createSummonAngel";
     public static final String askAcquireAngel = "askAcquireAngel";
     public static final String askChooseStrikePenalty =
-            "askChooseStrikePenalty";
+        "askChooseStrikePenalty";
     public static final String tellGameOver = "tellGameOver";
     public static final String tellPlayerElim = "tellPlayerElim";
     public static final String askConcede = "askConcede";
@@ -464,14 +484,14 @@ public final class Constants
     public static final String askPickColor = "askPickColor";
     public static final String log = "log";
     public static final String nak = "nak";
-    
+
     // engagement resolved, methods:
     public static final String erMethodFlee = "flee";
     public static final String erMethodConcede = "concede";
     public static final String erMethodFight = "fight";
     public static final String erMethodTimeLoss = "timeloss";
     public static final String erMethodNegotiate = "negotiate";
-    
+
     static
     {
         if (colorNames.length != shortColorNames.length)

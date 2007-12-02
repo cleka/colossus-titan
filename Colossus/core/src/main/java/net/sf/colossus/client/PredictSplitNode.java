@@ -1,10 +1,12 @@
 package net.sf.colossus.client;
 
+
 import java.util.*;
 
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.Creature;
 import net.sf.colossus.util.Combos;
+
 
 /**
  *  Predicts splits for one enemy player, and adjusts predictions as 
@@ -190,10 +192,9 @@ public class PredictSplitNode implements Comparable
         }
         else
         {
-            return child1.allCertain()
-                && child2.allCertain()
-                && child1.allDescendentsCertain()
-                && child2.allDescendentsCertain();
+            return child1.allCertain() && child2.allCertain() &&
+                child1.allDescendentsCertain() &&
+                child2.allDescendentsCertain();
         }
     }
 
@@ -297,12 +298,12 @@ public class PredictSplitNode implements Comparable
             cnl = new ArrayList();
             cnl.addAll(
                 child1
-                    .getCertainAtSplitOrRemovedCreatures()
-                    .getCreatureNames());
+                .getCertainAtSplitOrRemovedCreatures()
+                .getCreatureNames());
             cnl.addAll(
                 child2
-                    .getCertainAtSplitOrRemovedCreatures()
-                    .getCreatureNames());
+                .getCertainAtSplitOrRemovedCreatures()
+                .getCreatureNames());
         }
 
         List certainInfoGained =
@@ -333,10 +334,8 @@ public class PredictSplitNode implements Comparable
             // Make sure the parent updates the guess to be consistant
             // with the actual size.
             throw new PredictSplitsException(
-                "Certainty error in revealCreatures -- size is "
-                    + this.creatures.size()
-                    + " height is "
-                    + getHeight());
+                "Certainty error in revealCreatures -- size is " +
+                this.creatures.size() + " height is " + getHeight());
         }
 
     }
@@ -376,7 +375,7 @@ public class PredictSplitNode implements Comparable
         if (knownSplit.size() > childSize)
         {
             throw new PredictSplitsException(
-                    "More known splitoffs than splitoffs");
+                "More known splitoffs than splitoffs");
         }
         if (creatures.size() > 8)
         {
@@ -405,7 +404,7 @@ public class PredictSplitNode implements Comparable
         if (!superset(certain, knownCombo))
         {
             throw new PredictSplitsException(
-                    "knownCombo contains uncertain creatures");
+                "knownCombo contains uncertain creatures");
         }
 
         // Now determine by count arguments if we can determine know keepers
@@ -456,7 +455,7 @@ public class PredictSplitNode implements Comparable
             }
         }
 
-        int numUnknownsToKeep = creatures.size() - childSize - 
+        int numUnknownsToKeep = creatures.size() - childSize -
             knownKeep.size();
         int numUnknownsToSplit = childSize - knownSplit.size();
 
@@ -564,9 +563,9 @@ public class PredictSplitNode implements Comparable
                 Creature creature = Creature.getCreatureByName(name);
                 totalKillValue += creature.getKillValue();
             }
-            if ((bestKillValue < 0)
-                || (!maximize && totalKillValue < bestKillValue)
-                || (maximize && totalKillValue > bestKillValue))
+            if ((bestKillValue < 0) ||
+                (!maximize && totalKillValue < bestKillValue) ||
+                (maximize && totalKillValue > bestKillValue))
             {
                 bestKillValue = totalKillValue;
                 creaturesToRemove = li;
@@ -660,7 +659,7 @@ public class PredictSplitNode implements Comparable
         if (hasSplit())
         {
             throw new PredictSplitsException(
-                    "use reSplit to recalculate old splits");
+                "use reSplit to recalculate old splits");
         }
 
         List knownKeep = new ArrayList();
@@ -726,17 +725,17 @@ public class PredictSplitNode implements Comparable
     }
 
     /** Recombine this legion and other, because it was not possible to
-    *  move.  They must share a parent.  If either legion has the parent's
-    *  markerId, then that legion will remain.  Otherwise this legion
-    *  will remain.  Also used to undo splits.
-    */
+     *  move.  They must share a parent.  If either legion has the parent's
+     *  markerId, then that legion will remain.  Otherwise this legion
+     *  will remain.  Also used to undo splits.
+     */
     void merge(PredictSplitNode other, int turn)
     {
         if (this.parent == other.parent)
         {
             // this is regular merge
-            if (getMarkerId().equals(parent.getMarkerId())
-                || other.getMarkerId().equals(parent.getMarkerId()))
+            if (getMarkerId().equals(parent.getMarkerId()) ||
+                other.getMarkerId().equals(parent.getMarkerId()))
             { // Cancel split.
                 parent.clearChildren();
             }
@@ -836,7 +835,7 @@ public class PredictSplitNode implements Comparable
         if (getHeight() <= 0)
         {
             throw new PredictSplitsException(
-                    "Tried removing from 0-high legion");
+                "Tried removing from 0-high legion");
         }
         List cnl = new ArrayList();
         cnl.add(creatureName);
@@ -851,7 +850,7 @@ public class PredictSplitNode implements Comparable
             if (!it.hasNext())
             {
                 throw new PredictSplitsException(
-                        "Tried to remove nonexistant creature");
+                    "Tried to remove nonexistant creature");
             }
             ci = (CreatureInfo)it.next();
         }
@@ -930,6 +929,7 @@ public class PredictSplitNode implements Comparable
         return min;
     }
 }
+
 
 class PredictSplitsException extends RuntimeException
 {

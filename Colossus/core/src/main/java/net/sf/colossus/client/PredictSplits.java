@@ -21,13 +21,13 @@ import java.util.logging.Logger;
 
 public final class PredictSplits
 {
-	private static final Logger LOGGER = Logger.getLogger(PredictSplits.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(PredictSplits.class.getName());
 
-	private PredictSplitNode root;    // All contents of root must be known.
+    private PredictSplitNode root;    // All contents of root must be known.
     private NodeTurnComparator nodeTurnComparator = new NodeTurnComparator();
 
     PredictSplits(String playerName, String rootId,
-            List creatureNames)
+        List creatureNames)
     {
         CreatureInfoList infoList = new CreatureInfoList();
         for (Iterator it = creatureNames.iterator(); it.hasNext(); )
@@ -75,7 +75,7 @@ public final class PredictSplits
                                 "Two leaf nodes with same markerId and turn");
                         }
                         else if (leaf1.getTurnCreated() <
-                                leaf2.getTurnCreated())
+                            leaf2.getTurnCreated())
                         {
                             prunes.add(new Integer(i));
                         }
@@ -184,7 +184,7 @@ class NodeTurnComparator implements Comparator
                 return diff;
             }
             diff = n1.getParent().toString().compareTo(
-                    n2.getParent().toString());
+                n2.getParent().toString());
             if (diff != 0)
             {
                 return diff;

@@ -24,7 +24,7 @@ import org.jdom.input.SAXBuilder;
  */
 public class StrategicMapLoader
 {
-	private static final Logger LOGGER = Logger.getLogger(StrategicMapLoader.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(StrategicMapLoader.class.getName());
 
     private boolean[][] show = null;
     private int horizSize = -1;
@@ -83,7 +83,7 @@ public class StrategicMapLoader
             Element exit = (Element)it.next();
             String sExitType = exit.getAttributeValue("type");
             int iExitType = ((Integer)Constants.hexsideMap.get(
-                    sExitType)).intValue();
+                sExitType)).intValue();
             hex.setBaseExitType(i, iExitType);
             int exitLabel = exit.getAttribute("label").getIntValue();
             hex.setBaseExitLabel(i, exitLabel);

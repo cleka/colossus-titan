@@ -32,7 +32,7 @@ final class BattleMovement
     /** Recursively find moves from this hex.  Return an array of hex IDs for
      *  all legal destinations.  Do not double back.  */
     private Set findMoves(BattleHex hex, Creature creature, boolean flies,
-            int movesLeft, int cameFrom, boolean first)
+        int movesLeft, int cameFrom, boolean first)
     {
         Set set = new HashSet();
         for (int i = 0; i < 6; i++)
@@ -47,14 +47,14 @@ final class BattleMovement
                     int entryCost;
 
                     BattleChit bogey = client.getBattleChit(
-                            neighbor.getLabel());
+                        neighbor.getLabel());
                     if (bogey == null)
                     {
                         entryCost =
-                                neighbor.getEntryCost(
-                                creature,
-                                reverseDir,
-                                client.getOption(Options.cumulativeSlow));
+                            neighbor.getEntryCost(
+                            creature,
+                            reverseDir,
+                            client.getOption(Options.cumulativeSlow));
                     }
                     else
                     {
@@ -62,8 +62,8 @@ final class BattleMovement
                     }
 
                     if ((entryCost != BattleHex.IMPASSIBLE_COST) &&
-                            ((entryCost <= movesLeft) ||
-                            (first && client.getOption(Options.oneHexAllowed))))
+                        ((entryCost <= movesLeft) ||
+                        (first && client.getOption(Options.oneHexAllowed))))
                     {
                         // Mark that hex as a legal move.
                         set.add(neighbor.getLabel());
@@ -74,18 +74,18 @@ final class BattleMovement
                         if (!flies && movesLeft > entryCost)
                         {
                             set.addAll(findMoves(neighbor, creature, flies,
-                                    movesLeft - entryCost, reverseDir, false));
+                                movesLeft - entryCost, reverseDir, false));
                         }
                     }
 
                     // Fliers can fly over any hex for 1 movement point,
                     // but some Hex cannot be flown over by some creatures.
                     if (flies &&
-                            movesLeft > 1 &&
-                            neighbor.canBeFlownOverBy(creature))
+                        movesLeft > 1 &&
+                        neighbor.canBeFlownOverBy(creature))
                     {
                         set.addAll(findMoves(neighbor, creature, flies,
-                                movesLeft - 1, reverseDir, false));
+                            movesLeft - 1, reverseDir, false));
                     }
                 }
             }
@@ -134,19 +134,19 @@ final class BattleMovement
         if (!chit.hasMoved() && !client.isInContact(chit, false))
         {
             if (HexMap.terrainHasStartlist(client.getBattleTerrain()) && (
-                    client.getBattleTurnNumber() == 1) &&
-                    client.getBattleActiveMarkerId().equals(
-                    client.getDefenderMarkerId()))
+                client.getBattleTurnNumber() == 1) &&
+                client.getBattleActiveMarkerId().equals(
+                client.getDefenderMarkerId()))
             {
                 set = findUnoccupiedStartlistHexes();
             }
             else
             {
                 Creature creature = Creature.getCreatureByName(
-                        chit.getCreatureName());
+                    chit.getCreatureName());
                 BattleHex hex = client.getBattleHex(chit);
                 set = findMoves(hex, creature, creature.isFlier(),
-                        creature.getSkill(), -1, true);
+                    creature.getSkill(), -1, true);
             }
         }
         return set;

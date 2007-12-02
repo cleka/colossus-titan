@@ -90,7 +90,7 @@ final class EngagementResults extends KDialog
 
         this.saveWindow = new SaveWindow(options, "EngagementResultView");
         saveWindow.restore(this, new Point(0,0));
-        
+
         maybeShow();
     }
 
@@ -288,7 +288,7 @@ final class EngagementResults extends KDialog
         }
         );
         panelSouth.add(hideButton);
-        
+
         this.firstButton.setEnabled(false);
         this.prevButton.setEnabled(false);
         this.nextButton.setEnabled(false);
@@ -343,8 +343,8 @@ final class EngagementResults extends KDialog
             // TODO: this shrinks the dialog to a tiny size.
             //   for this reason we disallowed dropping 
             //   the last in the action handler. 
-//            Container contentPane = getContentPane();
-//            contentPane.removeAll();
+            //            Container contentPane = getContentPane();
+            //            contentPane.removeAll();
             this.setTitle("no Engagements");
             this.firstButton.setEnabled(false);
             this.prevButton.setEnabled(false);
@@ -551,7 +551,7 @@ final class EngagementResults extends KDialog
                     if (turns > 7)
                     {
                         result = winnerId + " won the battle by time loss" +
-                            " and earned " + this.points + " points";   
+                            " and earned " + this.points + " points";
                     }
                     else
                     {
