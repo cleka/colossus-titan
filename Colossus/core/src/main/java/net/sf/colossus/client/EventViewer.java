@@ -45,6 +45,11 @@ import net.sf.colossus.util.Options;
  * It collects all revealed events and displays all or
  * only the recent ones of them.
  *
+ * @version $Id$
+ * @author Clemens Katzer
+ */
+
+/*
  * @TODO:
  * @IMPORTANT
  * - Check compatibility with previous version
@@ -70,8 +75,6 @@ import net.sf.colossus.util.Options;
  *     depending on what the viewMode says
  * - "SolidMarker" instead of Titan for mulligan
  * 
- * @version $Id$
- * @author Clemens Katzer
  */
 
 final class EventViewer extends KDialog implements WindowListener,
@@ -189,7 +192,6 @@ final class EventViewer extends KDialog implements WindowListener,
         }
         );
 
-        this.saveWindow = new SaveWindow(options, windowTitle);
         setVisibleMaybe();
     }
 
@@ -439,8 +441,8 @@ final class EventViewer extends KDialog implements WindowListener,
         if ( maxTurns != -1 &&
             turnNr-oldEventTurn > maxTurns-(playerNr>=oldPlayerNr?1:0))
         {
-            //            Log.debug("Not displaying event "+e.getEventTypeText()+" "+
-            //                      e.getMarkerId() + " - older than max turns value!");
+            // Log.debug("Not displaying event "+e.getEventTypeText()+" "+
+            //     e.getMarkerId() + " - older than max turns value!");
             return true;
         }
         return false;
@@ -780,11 +782,15 @@ final class EventViewer extends KDialog implements WindowListener,
         {
             syncdEventList.clear();
         }
+        this.options = null;
     }
 
     public void dispose()
     {
-        saveWindow.save(this);
+        if (saveWindow != null)
+        {
+            saveWindow.save(this);
+        }
         cleanup();
         super.dispose();
     }
@@ -799,6 +805,10 @@ final class EventViewer extends KDialog implements WindowListener,
     {
         if (visible)
         {
+            if (this.saveWindow == null)
+            {
+                this.saveWindow = new SaveWindow(options, windowTitle);
+            }
             Point defaultLoc = getUpperRightCorner(getWidth());
             defaultLoc.setLocation(defaultLoc.x, 120);
             saveWindow.restore(this, defaultLoc);
@@ -817,8 +827,8 @@ final class EventViewer extends KDialog implements WindowListener,
                 // gets created anyway and "setVisibleMaybe()" - that 
                 // would save (0, 0) as initial location...
                 saveWindow.save(this);
-                this.visible = false;
             }
+            this.visible = false;
         }
         super.setVisible(visible);
     }
