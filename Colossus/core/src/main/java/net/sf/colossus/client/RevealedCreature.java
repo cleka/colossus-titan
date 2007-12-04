@@ -7,9 +7,13 @@ import java.util.logging.Logger;
 import net.sf.colossus.server.Constants;
 
 
-/*
- * Contains info about one revealed creature.
+/**
+ * Contains info about one revealed creature for RevealEvent.
+ * 
+ * @version $Id$
+ * @author Clemens Katzer
  */
+
 public class RevealedCreature
 {
     private static final Logger LOGGER = Logger.getLogger(RevealedCreature.class.getName());
@@ -79,9 +83,9 @@ public class RevealedCreature
         String infoString = getName() + ": " +
             (didRecruit ? "did recruit; " : "") +
             (wasRecruited ? "was recruited; " : "") +
-            (didTeleport ? "teleported; " : "") //            + (didTowerTeleport ? "tower teleported; " : "")
-            //            + (didTitanTeleport ? "titan teleported; " : "")
-            +
+            (didTeleport ? "teleported; " : "") +
+            // (didTowerTeleport ? "tower teleported; " : "") +
+            // (didTitanTeleport ? "titan teleported; " : "") +
             (wasSummoned ? "was summoned; " : "") +
             (wasAcquired ? "was acquired; " : "") + (dead ? "is dead; " : "");
 
