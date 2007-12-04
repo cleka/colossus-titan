@@ -99,7 +99,7 @@ public final class Battle
 
     private void placeLegion(Legion legion)
     {
-        BattleHex entrance = BattleMap.getEntrance(terrain, masterHexLabel,
+        BattleHex entrance = BattleMap.getEntrance(terrain,
             legion.getEntrySide());
         String entranceLabel = entrance.getLabel();
         Iterator it = legion.getCritters().iterator();
@@ -125,7 +125,7 @@ public final class Battle
 
     private void placeCritter(Critter critter)
     {
-        BattleHex entrance = BattleMap.getEntrance(terrain, masterHexLabel,
+        BattleHex entrance = BattleMap.getEntrance(terrain,
             critter.getLegion().getEntrySide());
         String entranceLabel = entrance.getLabel();
         critter.addBattleInfo(entranceLabel, entranceLabel, this);
