@@ -190,7 +190,8 @@ public final class Options implements IOptions
         }
         catch (IOException e)
         {
-            LOGGER.log(Level.INFO, "Couldn't read options from " + optionsFile);
+            LOGGER.log(Level.INFO,
+                "Couldn't read options from " + optionsFile);
             return;
         }
     }
@@ -213,7 +214,9 @@ public final class Options implements IOptions
                 "Trying to make directory " + Constants.gameDataPath);
             if (!optionsDir.mkdirs())
             {
-                LOGGER.log(Level.SEVERE, "Could not create options directory",
+                LOGGER.log(Level.SEVERE, 
+                    "Could not create options directory " + 
+                    optionsDir.toString(), 
                     (Throwable)null);
                 return;
             }
@@ -227,8 +230,8 @@ public final class Options implements IOptions
         }
         catch (IOException e)
         {
-            LOGGER.log(Level.SEVERE, "Couldn't write options to " + optionsFile,
-                (Throwable)null);
+            LOGGER.log(Level.SEVERE, 
+                "Couldn't write options to " + optionsFile, e);
         }
     }
 
@@ -323,13 +326,21 @@ public final class Options implements IOptions
         {
             return Options.viewableAllNum;
         }
-        if (viewMode.equals(Options.viewableAll)) {  val = Options.viewableAllNum;
+        if (viewMode.equals(Options.viewableAll))
+        {
+            val = Options.viewableAllNum;
         }
-        if (viewMode.equals(Options.viewableEver)) { val = Options.viewableEverNum;
+        if (viewMode.equals(Options.viewableEver))
+        {
+            val = Options.viewableEverNum;
         }
-        if (viewMode.equals(Options.viewableLast)) { val = Options.viewableLastNum;
+        if (viewMode.equals(Options.viewableLast))
+        {
+            val = Options.viewableLastNum;
         }
-        if (viewMode.equals(Options.viewableOwn)) {  val = Options.viewableOwnNum;
+        if (viewMode.equals(Options.viewableOwn))
+        {
+            val = Options.viewableOwnNum;
         }
         return val;
     }
@@ -344,16 +355,20 @@ public final class Options implements IOptions
         }
 
         int val = Options.showRecruitChitsNumAll;
-        if (s.equals(Options.showRecruitChitsNone)) {
+        if (s.equals(Options.showRecruitChitsNone))
+        {
             val = Options.showRecruitChitsNumNone;
         }
-        if (s.equals(Options.showRecruitChitsStrongest)) {
+        if (s.equals(Options.showRecruitChitsStrongest))
+        {
             val = Options.showRecruitChitsNumStrongest;
         }
-        if (s.equals(Options.showRecruitChitsRecruitHint)) {
+        if (s.equals(Options.showRecruitChitsRecruitHint))
+        {
             val = Options.showRecruitChitsNumRecruitHint;
         }
-        if (s.equals(Options.showRecruitChitsAll)) {
+        if (s.equals(Options.showRecruitChitsAll))
+        {
             val = Options.showRecruitChitsNumAll;
         }
         return val;
