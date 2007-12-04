@@ -2901,7 +2901,7 @@ public class SimpleAI implements AI
         boolean bestAllOK = false;
 
         int count = 0;
-        setupTimer();
+        Timer findMoveTimer = setupTimer();
 
         it = new Perms(critterMoves).iterator();
         while (it.hasNext())
@@ -2945,7 +2945,7 @@ public class SimpleAI implements AI
                 }
             }
         }
-
+        findMoveTimer.cancel();
         if (!bestAllOK)
         {
             ArrayList newOrder = new ArrayList();
@@ -3131,7 +3131,7 @@ public class SimpleAI implements AI
         return moveList;
     }
 
-    void setupTimer()
+    Timer setupTimer()
     {
         // java.util.Timer, not Swing Timer
         Timer timer = new Timer();
@@ -3143,6 +3143,7 @@ public class SimpleAI implements AI
             timeLimit = Constants.DEFAULT_AI_TIME_LIMIT;
         }
         timer.schedule(new TriggerTimeIsUp(), MS_PER_S * timeLimit);
+        return timer;
     }
 
     private final static int MIN_ITERATIONS = 50;
@@ -3156,8 +3157,8 @@ public class SimpleAI implements AI
 
         Collections.shuffle(legionMoves, random);
 
-        setupTimer();
-
+        Timer findBestLegionMoveTimer = setupTimer();
+        
         int count = 0;
         Iterator it = legionMoves.iterator();
         while (it.hasNext())
@@ -3190,6 +3191,7 @@ public class SimpleAI implements AI
                 }
             }
         }
+        findBestLegionMoveTimer.cancel();
         LOGGER.log(Level.FINEST,
             "Best legion move: " + ((best == null) ? "none " :
             best.toString()) + " (" + bestScore + ")");
@@ -3873,5 +3875,14 @@ public class SimpleAI implements AI
         {
             timeIsUp = true;
         }
+    }
+    
+    public void dispose()
+    {
+        if (remainingMarkers != null)
+        {
+            remainingMarkers.clear();
+        }
+        this.client = null;
     }
 }
