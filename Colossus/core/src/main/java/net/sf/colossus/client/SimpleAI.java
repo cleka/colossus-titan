@@ -3396,7 +3396,6 @@ public class SimpleAI implements AI
     private int evaluateCritterMove(BattleChit critter, Map strikeMap)
     {
         final String terrain = client.getBattleTerrain();
-        final String masterHexLabel = client.getBattleSite();
         final LegionInfo legion = client.getLegionInfo(
             client.getMyEngagedMarkerId());
         final int skill = critter.getSkill();
@@ -3590,7 +3589,8 @@ public class SimpleAI implements AI
                     {
                         // reward doing damage to target - esp. titan.
                         int targetValue = getKillValue(target, terrain);
-                        killValue = (int)(0.5 * (meanHits / target.getPower()) *
+                        killValue = (int)
+                            (0.5 * (meanHits / target.getPower()) *
                             Math.max(targetValue, killValue));
                     }
 
@@ -3665,8 +3665,8 @@ public class SimpleAI implements AI
             }
         }
 
-        BattleHex entrance = BattleMap.getEntrance(terrain, masterHexLabel,
-            legion.getEntrySide());
+        BattleHex entrance = BattleMap.getEntrance(terrain,
+                legion.getEntrySide());
 
         // Reward titans sticking to the edges of the back row
         // surrounded by allies.  We need to relax this in the
