@@ -11,7 +11,7 @@ import javax.swing.JTextArea;
  * Eventually one day this should show the option documents
  * itself as an own JEditorPane, let user browse them etc...
  * 
- * @version $Id: ShowHelpDoc.java 0000 2007-07-13 00:00:00Z cleka $
+ * @version $Id$
  * @author Clemens Katzer
  */
 

@@ -20,7 +20,7 @@ import net.sf.colossus.util.ResourceLoader;
  * Provides a JScrollPane to display the Variant README,
  * either within GetPlayer selection tab, 
  * or from main boards help (then in own JFrame). 
- * @version $Id: ShowReadme.java 0000 2007-02-16 00:00:00Z cleka $
+ * @version $Id$
  * @author Clemens Katzer
  */
 

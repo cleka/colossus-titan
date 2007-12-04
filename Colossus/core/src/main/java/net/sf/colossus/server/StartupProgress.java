@@ -14,7 +14,7 @@ import net.sf.colossus.server.Server;
 
 /** 
  *  Simple log window for Startup progress (waiting for clients)
- *  @version $Id: StartupProgress.java 0000 2007-02-14 00:00:00Z cleka $
+ *  @version $Id$
  *  @author Clemens Katzer
  */
 public final class StartupProgress implements ActionListener

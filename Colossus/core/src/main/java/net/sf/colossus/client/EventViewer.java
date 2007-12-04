@@ -70,7 +70,7 @@ import net.sf.colossus.util.Options;
  *     depending on what the viewMode says
  * - "SolidMarker" instead of Titan for mulligan
  * 
- * @version $Id: EventViewer.java 2591 2006-01-01 23:41:26Z cleka $
+ * @version $Id$
  * @author Clemens Katzer
  */
 
