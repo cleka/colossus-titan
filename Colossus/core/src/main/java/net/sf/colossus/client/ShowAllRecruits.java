@@ -4,7 +4,6 @@ package net.sf.colossus.client;
 import java.awt.Point;
 
 import javax.swing.JFrame;
-import javax.swing.JScrollPane;
 
 
 /**
@@ -21,8 +20,7 @@ final class ShowAllRecruits extends AbstractShowRecruits
     // Avoid showing multiple allTerrains displays.
     private static boolean allTerrainsDisplayActive = false;
 
-    ShowAllRecruits(JFrame parentFrame, IOptions options, String[] terrains,
-        JScrollPane pane)
+    ShowAllRecruits(JFrame parentFrame, IOptions options, String[] terrains)
     {
         super(parentFrame);
 

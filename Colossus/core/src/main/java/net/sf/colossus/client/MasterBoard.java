@@ -517,10 +517,8 @@ public final class MasterBoard extends JPanel
         {
             public void actionPerformed(ActionEvent e)
             {
-                new ShowAllRecruits(masterFrame,
-                    client,
-                    TerrainRecruitLoader.getTerrains(),
-                    scrollPane);
+                new ShowAllRecruits(masterFrame, client,
+                    TerrainRecruitLoader.getTerrains());
             }
         };
 
