@@ -38,6 +38,7 @@ import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 
 import net.sf.colossus.server.Constants;
+import net.sf.colossus.server.Legion;
 import net.sf.colossus.util.Options;
 import net.sf.colossus.util.ResourceLoader;
 
@@ -128,9 +129,9 @@ public final class BattleMap extends HexMap implements MouseListener,
         // BattleDice is added to frame.
 
         battleFrame.setTitle(client.getPlayerName() + ": " +
-            net.sf.colossus.server.Legion.getMarkerName(attackerMarkerId) +
+            Legion.getMarkerName(attackerMarkerId) +
             " (" + attackerMarkerId + ") attacks " +
-            net.sf.colossus.server.Legion.getMarkerName(defenderMarkerId) +
+            Legion.getMarkerName(defenderMarkerId) +
             " (" + defenderMarkerId + ") in " + masterHexLabel);
     }
 
