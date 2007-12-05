@@ -20,7 +20,7 @@ import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
 /**
  * @author kmilvangjens
- * 
+ * @version $Id$
  */
 public class MilvangAI extends RationalAI
 {
@@ -59,8 +59,7 @@ public class MilvangAI extends RationalAI
                     lesser, creature, terrain, "");
                 int hintValue = creature.getHintedRecruitmentValue();
                 if (hintValue > recruitNow &&
-                    numNeeded <= ((Integer)critters.get(lesser))
-                    .intValue())
+                    numNeeded <= ((Integer)critters.get(lesser)).intValue())
                 {
                     recruitNow = hintValue;
                 }
