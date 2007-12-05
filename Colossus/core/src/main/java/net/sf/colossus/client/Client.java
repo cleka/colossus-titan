@@ -2840,8 +2840,8 @@ public final class Client implements IClient, IOracle, IOptions
             return;
         }
 
-        String recruiterName = findRecruiterName(hexLabel, markerId,
-            recruitName, hexDescription);
+        String recruiterName = findRecruiterName(markerId, recruitName,
+            hexDescription);
         if (recruiterName == null)
         {
             return;
@@ -2879,8 +2879,8 @@ public final class Client implements IClient, IOracle, IOptions
             String recruiterName = null;
             if (recruitName != null)
             {
-                recruiterName = findRecruiterName(hexLabel, markerId,
-                    recruitName, hexDescription);
+                recruiterName = findRecruiterName(markerId, recruitName,
+                    hexDescription);
             }
             doRecruit(markerId, recruitName, recruiterName);
         }
@@ -2958,8 +2958,8 @@ public final class Client implements IClient, IOracle, IOptions
     }
 
     /** null means cancel.  "none" means no recruiter (tower creature). */
-    private String findRecruiterName(String hexLabel, String markerId, String
-        recruitName, String hexDescription)
+    private String findRecruiterName(String markerId, String recruitName,
+        String hexDescription)
     {
         String recruiterName = null;
 
