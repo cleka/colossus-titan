@@ -118,13 +118,13 @@ public class RationalAI extends SimpleAI implements AI
 
         // Compute value of staying for each split stack
         double stay_here_value1 = hexRisk(legion, legion.getCurrentHex(),
-            null, false);
+            false);
         double stay_here_value2;
 
         if (child_legion != null)
         {
             stay_here_value2 = hexRisk(child_legion, legion.getCurrentHex(),
-                null, false);
+                false);
             logger.log(Level.FINEST, "expectedValueSplitLegion(), value of " +
                 "staying here for split legion1 " + stay_here_value1);
             logger.log(Level.FINEST, "expectedValueSplitLegion(), value of " +
@@ -238,7 +238,7 @@ public class RationalAI extends SimpleAI implements AI
             return true;
         }
 
-        double stay_here_risk = hexRisk(legion, legion.getCurrentHex(), null,
+        double stay_here_risk = hexRisk(legion, legion.getCurrentHex(),
             false);
 
         boolean at_risk = false;
@@ -1563,8 +1563,7 @@ public class RationalAI extends SimpleAI implements AI
 
     // Compute risk of being attacked
     // Value returned is expected point value cost
-    double hexRisk(LegionInfo legion, MasterHex hex, Creature recruit,
-        boolean invert)
+    double hexRisk(LegionInfo legion, MasterHex hex, boolean invert)
     {
         double risk = 0.0;
 
@@ -1862,7 +1861,7 @@ public class RationalAI extends SimpleAI implements AI
         // i.e. what is risk we will be attacked if we stay at this hex
         // (if invert = true, this becomes value of potentially
         // attacking something at this hex)
-        stay_at_hex = hexRisk(legion, hex, null, invert);
+        stay_at_hex = hexRisk(legion, hex, invert);
 
         // when we move to this hex we may get attacked and not have
         // a next turn
