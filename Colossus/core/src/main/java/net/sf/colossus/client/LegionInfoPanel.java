@@ -1,6 +1,3 @@
-/**
- * 
- */
 package net.sf.colossus.client;
 
 
@@ -17,6 +14,13 @@ import javax.swing.JLabel;
 import net.sf.colossus.util.HTMLColor;
 import net.sf.colossus.util.Options;
 
+
+/** 
+ * Creates a JPanel displaying one legion, 
+ * used by AutoInspector and ShowLegion (right-click on legion)
+ * 
+ * @version $Id$
+ */
 
 public final class LegionInfoPanel extends JPanel
 {
