@@ -2007,7 +2007,7 @@ public class RationalAI extends SimpleAI implements AI
     BattleResults estimateBattleResults(LegionInfo attacker,
         LegionInfo defender, MasterHex hex)
     {
-        return estimateBattleResults(attacker, defender, hex, null, null);
+        return estimateBattleResults(attacker, defender, hex, null);
     }
 
     // add in value of points received for killing group / 100
@@ -2016,8 +2016,7 @@ public class RationalAI extends SimpleAI implements AI
     final double KILLPOINTS = (24.0 + 12.0 / 5.0 + 10.0) / 100.0;
 
     private BattleResults estimateBattleResults(LegionInfo attacker,
-        LegionInfo defender,
-        MasterHex hex, Creature recruit, Creature callable)
+        LegionInfo defender, MasterHex hex, Creature callable)
     {
         if (I_HATE_HUMANS &&
             !isHumanLegion(attacker) && !isHumanLegion(defender))
