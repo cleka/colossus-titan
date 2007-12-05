@@ -296,10 +296,7 @@ final class EngagementResults extends KDialog
     }
 
     private Component createLegionComponent(String markerId,
-        List imageNames,
-        List certainList,
-        boolean isStarting,
-        boolean isDefender)
+        List imageNames, List certainList, boolean isDefender)
     {
         // prepare my box
         Box panel = Box.createHorizontalBox();
@@ -371,24 +368,24 @@ final class EngagementResults extends KDialog
             this.panelCenter.add(createLegionComponent(result.attackerId,
                 result.attackerStartingContents,
                 result.attackerStartingCertainities,
-                true, false));
+                false));
             this.panelCenter.add(createLegionComponent(result.defenderId,
                 result.defenderStartingContents,
                 result.defenderStartingCertainities,
-                true, true));
+                true));
             if (result.attackerId.equals(result.winnerId))
             {
                 this.panelCenter.add(createLegionComponent(result.attackerId,
                     result.attackerEndingContents,
                     result.attackerEndingCertainties,
-                    false, false));
+                    false));
             }
             else if (result.defenderId.equals(result.winnerId))
             {
                 this.panelCenter.add(createLegionComponent(result.defenderId,
                     result.defenderEndingContents,
                     result.defenderEndingCertainties,
-                    false, true));
+                    true));
             }
             else
             {
