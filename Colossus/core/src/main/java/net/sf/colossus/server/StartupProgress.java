@@ -1,4 +1,3 @@
-
 package net.sf.colossus.server;
 
 
@@ -53,14 +52,14 @@ public final class StartupProgress implements ActionListener
         b1.setToolTipText("Click this button to abort the start process.");
         pane.add(b1, BorderLayout.SOUTH);
 
-        this.autoCloseCheckBox = new JCheckBox("Automatically close when game starts");
+        this.autoCloseCheckBox = new JCheckBox(
+            "Automatically close when game starts");
         autoCloseCheckBox.setSelected(true);
         pane.add(autoCloseCheckBox, BorderLayout.NORTH);
 
         //Display the window.
         logFrame.pack();
         logFrame.setVisible(true);
-
     }
 
     public void append(String s)
