@@ -1254,8 +1254,6 @@ public class RationalAI extends SimpleAI implements AI
 
             logger.log(Level.FINEST, "Starting computing the best move");
 
-            setupTimer();
-
             Collections.shuffle(all_legionMoves,random);
 
             branchAndBound(new ArrayList(), all_legionMoves, 0);
