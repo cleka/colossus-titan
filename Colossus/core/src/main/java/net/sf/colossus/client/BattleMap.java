@@ -516,7 +516,7 @@ public final class BattleMap extends HexMap implements MouseListener,
         return (answer == JOptionPane.YES_OPTION);
     }
 
-    private void actOnCritter(int tag, String hexLabel)
+    private void actOnCritter(int tag)
     {
         selectedCritterTag = tag;
 
@@ -593,7 +593,7 @@ public final class BattleMap extends HexMap implements MouseListener,
         if (chit != null && client.getPlayerNameByTag(chit.getTag()).equals(
             client.getBattleActivePlayerName()))
         {
-            actOnCritter(chit.getTag(), hexLabel);
+            actOnCritter(chit.getTag());
         }
 
         // No hits on friendly chits, so check map.
