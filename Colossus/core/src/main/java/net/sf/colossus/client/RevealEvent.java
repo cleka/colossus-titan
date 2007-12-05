@@ -18,6 +18,14 @@ import javax.swing.border.TitledBorder;
 import net.sf.colossus.server.Constants;
 
 
+/**
+ * Contains info about one event that revealed some interestng information,
+ * stored in EventViewer.
+ * 
+ * @version $Id$
+ * @author Clemens Katzer
+ */
+
 public class RevealEvent
 {
     private static final Logger LOGGER = Logger.getLogger(RevealEvent.class.getName());
@@ -92,8 +100,9 @@ public class RevealEvent
         if (markerId == null && eventType != eventPlayerChange &&
             eventType != eventTurnChange)
         {
-            LOGGER.log(Level.SEVERE, "ERROR: null marker for event " +
-                getEventTypeText(eventType), (Throwable)null);
+            LOGGER.log(Level.SEVERE, 
+                "null marker for event " + getEventTypeText(eventType), 
+                (Throwable)null);
             return;
         }
         this.client = client;
@@ -468,10 +477,9 @@ public class RevealEvent
         }
         catch (Exception e)
         {
-            LOGGER.log(Level.SEVERE,
-                "new Chit for markerId " + markerId + ", event type "+
-                getEventTypeText() + " turn" + getTurn() + " threw exception:" +
-                e.toString(),
+            LOGGER.log(Level.SEVERE, "new Chit for markerId " + markerId +
+                ", event type " + getEventTypeText() + " turn" + getTurn() +
+                " threw exception:" + e.toString(),
                 (Throwable)null);
         }
         addLabel("("+height+")");
@@ -512,20 +520,24 @@ public class RevealEvent
         // was listed in jar tfv usage, still I got "Couldn't get image"
         // error and everything was hanging.
         // So, for now we go with the Titan icon.
-        /*
-         try
-         {
-         String color = client.getShortColor(playerNr);
-         solidMarker = new Chit(scale, color+"Solid");
-         }
-         catch(Exception e)
-         {
-         Log.error("exception...");
-         // if solid marker does not exist for this color,
-         // use as fallback the Titan chit.
-         solidMarker = new Chit(scale, getTitanBasename());
-         }
-         */
+        boolean tryUseSolidChit = false;
+        if (tryUseSolidChit)
+        {
+            try
+            {
+                String color = client.getShortColor(playerNr);
+                solidMarker = new Chit(scale, color+"Solid");
+            }
+            catch(Exception e)
+            {
+                LOGGER.log(Level.SEVERE, "While trying to get chit: ", e);
+                // if solid marker does not exist for this color,
+                // use as fallback the Titan chit.
+                PlayerInfo info = client.getPlayerInfo(playerNr);
+                solidMarker = new Chit(scale, getTitanBasename(info));
+            }
+        }
+
         // NOTE: this assumes that this event is for the player in whose 
         //       turn this happens:
         solidMarker = new Chit(scale, mulliganTitanBaseName);
