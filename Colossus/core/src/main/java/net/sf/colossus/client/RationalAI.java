@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.Timer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -1254,10 +1255,14 @@ public class RationalAI extends SimpleAI implements AI
 
             logger.log(Level.FINEST, "Starting computing the best move");
 
+            Timer fomTimer = setupTimer();
+
             Collections.shuffle(all_legionMoves,random);
 
             branchAndBound(new ArrayList(), all_legionMoves, 0);
 
+            fomTimer.cancel();
+            
             logger.log(Level.FINEST, "Total nodes explored = " + nodesExplored);
 
             for (Iterator it = bestMove.iterator(); it.hasNext();)
