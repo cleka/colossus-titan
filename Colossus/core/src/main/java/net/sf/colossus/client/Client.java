@@ -4545,7 +4545,7 @@ public final class Client implements IClient, IOracle, IOptions
     public void undidSplit(String splitoffId, String survivorId, int turn)
     {
         LegionInfo info = getLegionInfo(survivorId);
-        info.merge(splitoffId, turn);
+        info.merge(splitoffId);
         removeLegion(splitoffId);
         // do the eventViewer stuff before the board, so we are sure to get
         // a repaint.
@@ -5132,8 +5132,7 @@ public final class Client implements IClient, IOracle, IOptions
             predictSplits = new PredictSplits[numPlayers];
         }
         int playerNum = getPlayerNum(pName);
-        predictSplits[playerNum] = new PredictSplits(pName, rootMarkerId,
-            creatureNames);
+        predictSplits[playerNum] = new PredictSplits(rootMarkerId, creatureNames);
     }
 
     PredictSplits getPredictSplits(String pName)

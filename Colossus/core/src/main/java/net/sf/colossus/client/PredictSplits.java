@@ -26,8 +26,7 @@ public final class PredictSplits
     private PredictSplitNode root;    // All contents of root must be known.
     private NodeTurnComparator nodeTurnComparator = new NodeTurnComparator();
 
-    PredictSplits(String playerName, String rootId,
-        List creatureNames)
+    PredictSplits(String rootId, List creatureNames)
     {
         CreatureInfoList infoList = new CreatureInfoList();
         for (Iterator it = creatureNames.iterator(); it.hasNext(); )

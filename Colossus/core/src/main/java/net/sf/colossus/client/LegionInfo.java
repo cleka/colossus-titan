@@ -246,11 +246,11 @@ public final class LegionInfo
         myNode=myNode.getChild1();
     }
 
-    void merge(String splitoffId, int turn)
+    void merge(String splitoffId)
     {
         LOGGER.log(Level.FINEST,
             "LegionInfo.merge() for " + markerId + " " + splitoffId);
-        getNode().merge(getNode(splitoffId), turn);
+        getNode().merge(getNode(splitoffId));
         // since this is potentially a merge of a 3-way split, be safe and 
         // find the node again
         myNode= getNode(this.markerId);

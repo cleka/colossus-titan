@@ -729,7 +729,7 @@ public class PredictSplitNode implements Comparable
      *  markerId, then that legion will remain.  Otherwise this legion
      *  will remain.  Also used to undo splits.
      */
-    void merge(PredictSplitNode other, int turn)
+    void merge(PredictSplitNode other)
     {
         if (this.parent == other.parent)
         {
