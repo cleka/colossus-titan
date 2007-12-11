@@ -2585,9 +2585,8 @@ public final class Client implements IClient, IOracle, IOptions
 
     public void nak(String reason, String errmsg)
     {
-        LOGGER.log(Level.SEVERE,
-            playerName + " got nak for " + reason + " " + errmsg,
-            (Throwable)null);
+        LOGGER.log(Level.INFO,
+            playerName + " got nak for " + reason + " " + errmsg);
         recoverFromNak(reason, errmsg);
     }
 
