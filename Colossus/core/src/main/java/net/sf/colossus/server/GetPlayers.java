@@ -118,7 +118,7 @@ public final class GetPlayers extends JFrame implements WindowListener,
         }
         catch (UnknownHostException ex)
         {
-            LOGGER.log(Level.SEVERE, ex.toString(), (Throwable)null);
+            LOGGER.log(Level.SEVERE, "Can not resolve host", ex);
         }
 
         JTabbedPane tabbedPane = new JTabbedPane();

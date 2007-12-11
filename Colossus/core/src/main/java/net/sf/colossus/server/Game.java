@@ -498,8 +498,7 @@ public final class Game
 
         if (numPlayers > numTowers)
         {
-            LOGGER.log(Level.SEVERE, "More players than towers!",
-                (Throwable)null);
+            LOGGER.log(Level.SEVERE, "More players than towers!");
             return towerList;
         }
 
@@ -797,7 +796,7 @@ public final class Game
                 "wrong player [" + playerName +
                 " vs. " + getActivePlayerName() +
                 "]" :
-                "UNKNOWN"))) + ")", (Throwable)null);
+                "UNKNOWN"))) + ")");
             return;
         }
         if (getOption(Options.autoStop) && getNumHumansRemaining() < 1)
@@ -912,7 +911,7 @@ public final class Game
         }
         else
         {
-            LOGGER.log(Level.SEVERE, "Bogus phase", (Throwable)null);
+            LOGGER.log(Level.SEVERE, "Bogus phase");
         }
     }
 
@@ -922,7 +921,7 @@ public final class Game
 
         if (player == null)
         {
-            LOGGER.log(Level.SEVERE, "No players", (Throwable)null);
+            LOGGER.log(Level.SEVERE, "No players");
             dispose();
             return;
         }
@@ -980,8 +979,7 @@ public final class Game
                     "Trying to make directory " + Constants.saveDirname);
                 if (!savesDir.mkdirs())
                 {
-                    LOGGER.log(Level.SEVERE, "Could not create saves directory",
-                        (Throwable)null);
+                    LOGGER.log(Level.SEVERE, "Could not create saves directory");
                     JOptionPane.showMessageDialog(null,
                         "Could not create directory " + savesDir +
                         "\n- saving game failed! Unless the directory " +
@@ -1010,8 +1008,7 @@ public final class Game
         }
         catch (IOException e)
         {
-            LOGGER.log(Level.SEVERE, e.toString(), (Throwable)null);
-            LOGGER.log(Level.SEVERE, "Couldn't open " + fn, (Throwable)null);
+            LOGGER.log(Level.SEVERE, "Couldn't open " + fn, e);
             return;
         }
         PrintWriter out = new PrintWriter(fileWriter);
@@ -1139,7 +1136,7 @@ public final class Game
         catch (IOException ex)
         {
             LOGGER.log(Level.SEVERE,
-                "Error writing XML savegame: " + ex.toString(), (Throwable)null);
+                "Error writing XML savegame." , ex);
         }
     }
 
@@ -1206,7 +1203,7 @@ public final class Game
 
             if (!dir.exists() || !dir.isDirectory())
             {
-                LOGGER.log(Level.SEVERE, "No saves directory", (Throwable)null);
+                LOGGER.log(Level.SEVERE, "No saves directory");
                 dispose();
             }
             String[] filenames = dir.list(new XMLSnapshotFilter());
@@ -1214,8 +1211,7 @@ public final class Game
             if (filenames.length < 1)
             {
                 LOGGER.log(Level.SEVERE,
-                    "No XML savegames found in saves directory",
-                    (Throwable)null);
+                    "No XML savegames found in saves directory");
                 dispose();
             }
             file = new File(Constants.saveDirname +
@@ -1242,8 +1238,7 @@ public final class Game
 
             if (!ver.getValue().equals(Constants.xmlSnapshotVersion))
             {
-                LOGGER.log(Level.SEVERE, "Can't load this savegame version.",
-                    (Throwable)null);
+                LOGGER.log(Level.SEVERE, "Can't load this savegame version.");
                 dispose();
             }
 
@@ -1720,8 +1715,7 @@ public final class Game
     {
         if (recruit == null)
         {
-            LOGGER.log(Level.SEVERE, "null recruit in Game.doRecruit()",
-                (Throwable)null);
+            LOGGER.log(Level.SEVERE, "null recruit in Game.doRecruit()");
             return;
         }
         // Check for recruiter legality.
@@ -1733,8 +1727,7 @@ public final class Game
             // If recruiter can be anonymous, then this is okay.
             if (!anonymousRecruitLegal(legion, recruit))
             {
-                LOGGER.log(Level.SEVERE, "null recruiter in Game.doRecruit()",
-                    (Throwable)null);
+                LOGGER.log(Level.SEVERE, "null recruiter in Game.doRecruit()");
                 // XXX Let it go for now  Should return later
             }
             else
@@ -1746,7 +1739,7 @@ public final class Game
         {
             LOGGER.log(Level.SEVERE,
                 "Illegal recruiter " + recruiter.getName() +
-                " for recruit " + recruit.getName(), (Throwable)null);
+                " for recruit " + recruit.getName());
             return;
         }
 
@@ -2421,8 +2414,7 @@ public final class Game
         // Need a legion marker to split.
         if (!player.isMarkerAvailable(childId))
         {
-            LOGGER.log(Level.SEVERE, "Marker " + childId + " is not available.",
-                (Throwable)null);
+            LOGGER.log(Level.SEVERE, "Marker " + childId + " is not available.");
             return false;
         }
 
@@ -2430,8 +2422,7 @@ public final class Game
         if (legion.getHeight() < 4)
         {
             LOGGER.log(Level.SEVERE,
-                "Legion " + parentId + " is too short to split.",
-                (Throwable)null);
+                "Legion " + parentId + " is too short to split.");
             return false;
         }
 
@@ -2491,8 +2482,7 @@ public final class Game
             // Only allow a single split on turn 1.
             if (player.getNumLegions() > 1)
             {
-                LOGGER.log(Level.SEVERE, "Cannot split twice on Turn 1.",
-                    (Throwable)null);
+                LOGGER.log(Level.SEVERE, "Cannot split twice on Turn 1.");
                 return false;
             }
             // Each stack must contain exactly 4 creatures.

@@ -362,8 +362,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
         catch (Exception e)
         {
             LOGGER.log(Level.SEVERE,
-                "Battleland " + terrain + " loading failed : " + e,
-                (Throwable)null);
+                "Battleland " + terrain + " loading failed.", e);
             e.printStackTrace();
         }
     }
@@ -560,8 +559,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
             }
         }
 
-        LOGGER.log(Level.SEVERE, "Could not find GUIBattleHex " + label,
-            (Throwable)null);
+        LOGGER.log(Level.SEVERE, "Could not find GUIBattleHex " + label);
         return null;
     }
 
@@ -611,8 +609,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
                 return gameEntrances[y].getBattleHexModel();
 
             default:
-                LOGGER.log(Level.SEVERE, "Label " + label + " is invalid",
-                    (Throwable)null);
+                LOGGER.log(Level.SEVERE, "Label " + label + " is invalid");
         }
         y = 6 - y - Math.abs((x - 3) / 2);
         GUIBattleHex[][] correctHexes = (GUIBattleHex[][])terrainH.get(terrain);
@@ -814,7 +811,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
         catch (NullPointerException ex)
         // XXX Called too early, before towerStatusMap is setup?
         {
-            LOGGER.log(Level.SEVERE, ex.toString(), (Throwable)null);
+            LOGGER.log(Level.SEVERE, "Null pointer exception caught", ex);
             return false;
         }
     }

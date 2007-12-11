@@ -1554,8 +1554,7 @@ public final class Client implements IClient, IOracle, IOptions
                         getLegionInfo(markerId).getPlayerName() +
                         "last engagement were" +
                         " attacker " + lastAttackerEventLegion.getMarkerId() +
-                        " defender " + lastDefenderEventLegion.getMarkerId(),
-                        (Throwable)null);
+                        " defender " + lastDefenderEventLegion.getMarkerId());
                     System.exit(1);
                 }
             }
@@ -1757,7 +1756,7 @@ public final class Client implements IClient, IOracle, IOptions
     public void revealEngagedCreaturesEventHandling(final List names,
         boolean isAttacker, String reason)
     {
-        // can't co anything if (old) server or history do not provide 
+        // can't do anything if (old) server or history do not provide 
         // us the reason
         if (reason == null || reason.equals("<Unknown>"))
         {
@@ -1787,8 +1786,7 @@ public final class Client implements IClient, IOracle, IOptions
         {
             // perhaps load from history?
             LOGGER.log(Level.SEVERE,
-                "revealEngagedCreatures, unknown reason " + reason,
-                (Throwable)null);
+                "revealEngagedCreatures, unknown reason " + reason);
         }
 
     }
@@ -1980,8 +1978,7 @@ public final class Client implements IClient, IOracle, IOptions
             else
             {
                 LOGGER.log(Level.SEVERE,
-                    "Only String or Creature in addPossibleRecruitChits() !",
-                    (Throwable)null);
+                    "Only String or Creature in addPossibleRecruitChits() !");
                 return;
             }
             int scale = 2 * Scale.get();
@@ -2385,8 +2382,7 @@ public final class Client implements IClient, IOracle, IOptions
             List legions = getLegionsByHex(hexLabel);
             if (legions.size() != 1)
             {
-                LOGGER.log(Level.SEVERE, "Not exactly one legion in donor hex",
-                    (Throwable)null);
+                LOGGER.log(Level.SEVERE, "Not exactly one legion in donor hex");
                 return;
             }
             String markerId = (String)legions.get(0);
@@ -2596,8 +2592,7 @@ public final class Client implements IClient, IOracle, IOptions
             playerName + " recoverFromNak " + reason + " " + errmsg);
         if (reason == null)
         {
-            LOGGER.log(Level.SEVERE, "recoverFromNak with null reason!",
-                (Throwable)null);
+            LOGGER.log(Level.SEVERE, "recoverFromNak with null reason!");
         }
         else if (reason.equals(Constants.doSplit))
         {
@@ -2892,8 +2887,7 @@ public final class Client implements IClient, IOracle, IOptions
         if (hexLabel == null)
         {
             LOGGER.log(Level.SEVERE,
-                "Client.didRecruit() null hexLabel for " + markerId,
-                (Throwable)null);
+                "Client.didRecruit() null hexLabel for " + markerId);
         }
         if (isMyLegion(markerId))
         {
@@ -4745,14 +4739,14 @@ public final class Client implements IClient, IOracle, IOptions
 
         if (!isMyTurn())
         {
-            LOGGER.log(Level.SEVERE, "Not my turn!", (Throwable)null);
+            LOGGER.log(Level.SEVERE, "Not my turn!");
             kickSplit();
             return;
         }
         // Can't split other players' legions.
         if (!isMyLegion(parentId))
         {
-            LOGGER.log(Level.SEVERE, "Not my legion!", (Throwable)null);
+            LOGGER.log(Level.SEVERE, "Not my legion!");
             kickSplit();
             return;
         }
@@ -4956,8 +4950,8 @@ public final class Client implements IClient, IOracle, IOptions
         catch (Exception e)
         {
             LOGGER.log(Level.SEVERE,
-                "Look & Feel " + lfName + " not usable (" + e + ")",
-                (Throwable)null);
+                "Look & Feel " + lfName + " not usable",
+                e);
         }
     }
 
@@ -4999,8 +4993,7 @@ public final class Client implements IClient, IOracle, IOptions
         }
         catch (Exception ex)
         {
-            LOGGER.log(Level.WARNING, "Problem reading version file " + ex,
-                (Throwable)null);
+            LOGGER.log(Level.WARNING, "Problem reading version file", ex);
         }
         return version;
     }
@@ -5073,8 +5066,7 @@ public final class Client implements IClient, IOracle, IOptions
         }
         catch (InterruptedException ex)
         {
-            LOGGER.log(Level.SEVERE, "Client.aiPause() " + ex.toString(),
-                (Throwable)null);
+            LOGGER.log(Level.SEVERE, "Client.aiPause() interrupted", ex);
         }
     }
 

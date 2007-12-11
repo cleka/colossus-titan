@@ -58,7 +58,7 @@ class CreatureInfoList extends ArrayList
                 return;
             }
         }
-        LOGGER.log(Level.SEVERE, "No uncertain creatures", (Throwable)null);
+        LOGGER.log(Level.SEVERE, "No uncertain creatures");
     }
 
     /** Remove the first element matching name.  Return true if found. */

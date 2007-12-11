@@ -125,7 +125,7 @@ public final class Caretaker implements Cloneable
             {
                 LOGGER.log(Level.SEVERE, "Too many " + creature.getName() +
                     " recruited, only " + count.intValue() +
-                    " left ?!?", (Throwable)null);
+                    " left ?!?");
             }
             map.put(creature.getName(), new Integer(count.intValue() - 1));
         }

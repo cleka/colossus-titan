@@ -34,8 +34,7 @@ final class PenaltyOption implements Comparable
         if (striker == target)
         {
             LOGGER.log(Level.SEVERE,
-                "Penalty option with striker and target identical!",
-                (Throwable)null);
+                "Penalty option with striker and target identical!");
         }
     }
 

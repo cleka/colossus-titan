@@ -89,8 +89,7 @@ public final class ResourceLoader
                 {
                     LOGGER.log(Level.SEVERE,
                         "Loading of class \"" + className +
-                        "\" failed (no dot in class name)",
-                        (Throwable)null);
+                        "\" failed (no dot in class name)");
                     return null;
                 }
                 InputStream classDataIS =
@@ -100,7 +99,7 @@ public final class ResourceLoader
                 {
                     LOGGER.log(Level.SEVERE,
                         "Couldn't find the class file anywhere ! (" +
-                        shortClassName + ".class)", (Throwable)null);
+                        shortClassName + ".class)");
                     throw new FileNotFoundException("missing " +
                         shortClassName + ".class");
                 }
@@ -599,8 +598,7 @@ public final class ResourceLoader
                     catch (Exception e)
                     {
                         LOGGER.log(Level.SEVERE,
-                            "ResourceLoader::getInputStream() : " + e,
-                            (Throwable)null);
+                            "Failed to read from stream", e);
                     }
                 }
 
@@ -670,8 +668,7 @@ public final class ResourceLoader
         catch (Exception e)
         {
             LOGGER.log(Level.SEVERE,
-                "Can't Stringify stream " + is + " (" + e + ")",
-                (Throwable)null);
+                "Can't Stringify stream " + is + ".", e);
         }
         return all;
     }
@@ -757,7 +754,7 @@ public final class ResourceLoader
             {
                 LOGGER.log(Level.SEVERE,
                     "html document exists, but cannot be loaded (" +
-                    filename + "): " + e, (Throwable)null);
+                    filename + "): ", e);
             }
             return null;
         }
@@ -888,7 +885,7 @@ public final class ResourceLoader
             if (tempImage[i] == null)
             {
                 LOGGER.log(Level.SEVERE, "during creation of [" + mapKey +
-                    "], loading failed for " + filenames[i], (Throwable)null);
+                    "], loading failed for " + filenames[i]);
                 return null;
             }
         }
@@ -1165,7 +1162,7 @@ public final class ResourceLoader
         {
             LOGGER.log(Level.SEVERE,
                 "Image loading of " + filename + " failed (" +
-                tempIcon.getImageLoadStatus() + ")", (Throwable)null);
+                tempIcon.getImageLoadStatus() + ")");
             return null;
         }
 
@@ -1222,7 +1219,7 @@ public final class ResourceLoader
         {
             LOGGER.log(Level.SEVERE,
                 "Image loading failed (" + icon.getImageLoadStatus() +
-                ")", (Throwable)null);
+                ")");
         }
     }
 
@@ -1410,8 +1407,7 @@ public final class ResourceLoader
         catch (Exception e)
         {
             LOGGER.log(Level.SEVERE,
-                "Loading of class \"" + className + "\" failed (" + e +
-                ")", (Throwable)null);
+                "Loading of class \"" + className + "\" failed.", e);
             return null;
         }
         if (parameter != null)
@@ -1431,8 +1427,7 @@ public final class ResourceLoader
                 LOGGER.log(Level.SEVERE,
                     "Loading or instantiating class' constructor for \"" +
                     className +
-                    "\" failed (" + e + ")",
-                    (Throwable)null);
+                    "\" failed", e);
                 return null;
             }
         }
@@ -1445,7 +1440,7 @@ public final class ResourceLoader
             catch (Exception e)
             {
                 LOGGER.log(Level.SEVERE, "Instantiating \"" + className +
-                    "\" failed (" + e + ")", (Throwable)null);
+                    "\" failed", e);
                 return null;
             }
         }
@@ -1577,7 +1572,7 @@ public final class ResourceLoader
         {
             LOGGER.log(Level.FINE,
                 "SVG transcoding for " + filename + " in " + path +
-                " failed with " + e);
+                " failed.", e);
             // nothing to do
         }
         return image;

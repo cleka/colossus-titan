@@ -426,7 +426,7 @@ public final class GUIMasterHex extends GUIHex
                 break;
 
             default:
-                LOGGER.log(Level.SEVERE, "Bogus gate type", (Throwable)null);
+                LOGGER.log(Level.SEVERE, "Bogus gate type");
         }
     }
 

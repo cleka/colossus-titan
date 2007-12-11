@@ -136,7 +136,7 @@ public class BalrogRecruitment extends CustomRecruitBase
         if (!Creature.isCreature(name))
         {
             LOGGER.log(Level.SEVERE, "CUSTOM: Balrog by the name of " + name +
-			" doesn't exist !", (Throwable)null);
+			" doesn't exist !");
             return;
         }
 

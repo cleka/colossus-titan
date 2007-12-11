@@ -121,8 +121,7 @@ public class DevRandom extends Random
             }
             catch (FileNotFoundException ex)
             {
-                LOGGER.log(Level.SEVERE, "Random source disappeared! " + ex,
-                    (Throwable)null);
+                LOGGER.log(Level.SEVERE, "Random source disappeared!", ex);
                 System.exit(1);
             }
             LOGGER.log(Level.FINEST,
@@ -162,7 +161,7 @@ public class DevRandom extends Random
         catch (IOException ex)
         {
             LOGGER.log(Level.SEVERE,
-                "Problem reading from random source " + source, (Throwable)null);
+                "Problem reading from random source " + source);
             return super.next(bits);
         }
         int result = 0;

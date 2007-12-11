@@ -46,7 +46,7 @@ final class FileServerThread extends Thread
         }
         catch (Exception e)
         {
-            LOGGER.log(Level.SEVERE, "FileServerThread : " + e, (Throwable)null);
+            LOGGER.log(Level.SEVERE, "Can not open server socket", e);
             System.exit(1);
         }
     }

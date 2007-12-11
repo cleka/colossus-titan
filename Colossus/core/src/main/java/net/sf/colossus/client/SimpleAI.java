@@ -806,7 +806,7 @@ public class SimpleAI implements AI
             {
                 LOGGER.log(Level.SEVERE,
                     "HINT: Unknown creature in hint (" + name +
-                    "), aborting.", (Throwable)null);
+                    "), aborting.");
                 return null;
             }
             byCreature.add(cre);
@@ -1402,8 +1402,7 @@ public class SimpleAI implements AI
                     break;
 
                 default:
-                    LOGGER.log(Level.SEVERE, "Bogus battle result case",
-                        (Throwable)null);
+                    LOGGER.log(Level.SEVERE, "Bogus battle result case");
             }
         }
 
@@ -1530,8 +1529,7 @@ public class SimpleAI implements AI
                 else
                 {
                     LOGGER.log(Level.SEVERE,
-                        "Bogus legion height " + legion.getHeight(),
-                        (Throwable)null);
+                        "Bogus legion height " + legion.getHeight());
                 }
 
                 LOGGER.log(Level.FINEST,
@@ -2276,8 +2274,7 @@ public class SimpleAI implements AI
             if (legions.size() != 1)
             {
                 LOGGER.log(Level.SEVERE,
-                    "SimpleAI.summonAngel(): Engagement in " + hexLabel,
-                    (Throwable)null);
+                    "SimpleAI.summonAngel(): Engagement in " + hexLabel);
                 continue;
             }
             String markerId = (String)legions.get(0);
@@ -2286,8 +2283,7 @@ public class SimpleAI implements AI
             if (myAngel == null)
             {
                 LOGGER.log(Level.SEVERE,
-                    "SimpleAI.summonAngel(): No angel in " + markerId,
-                    (Throwable)null);
+                    "SimpleAI.summonAngel(): No angel in " + markerId);
                 continue;
             }
 

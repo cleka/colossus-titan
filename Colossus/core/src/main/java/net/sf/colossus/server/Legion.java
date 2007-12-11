@@ -314,8 +314,7 @@ public final class Legion implements Comparable
             String name = critter.getName();
             if (name == null || name.equals(""))
             {
-                LOGGER.log(Level.SEVERE, "getImagenames: null or empty name",
-                    (Throwable)null);
+                LOGGER.log(Level.SEVERE, "getImagenames: null or empty name");
             }
             imageNames.add(critter.getName());
         }
@@ -648,8 +647,7 @@ public final class Legion implements Comparable
     {
         if (getHeight() > 7 || (getHeight() == 7 && game.getTurnNumber() > 1))
         {
-            LOGGER.log(Level.SEVERE, "Tried to add to 7-high legion!",
-                (Throwable)null);
+            LOGGER.log(Level.SEVERE, "Tried to add to 7-high legion!");
             return false;
         }
         if (takeFromStack)
@@ -663,7 +661,7 @@ public final class Legion implements Comparable
             {
                 LOGGER.log(Level.SEVERE,
                     "Tried to addCreature "+creature.toString()+
-                    " when there were none of those left!", (Throwable)null);
+                    " when there were none of those left!");
                 return false;
             }
         }
@@ -731,8 +729,7 @@ public final class Legion implements Comparable
         if (critter == null || !critters.contains(critter))
         {
             LOGGER.log(Level.SEVERE,
-                "Called prepareToRemoveCritter with bad critter",
-                (Throwable)null);
+                "Called prepareToRemoveCritter with bad critter");
             return;
         }
         // Put even immortal creatures in the graveyard; they will be

@@ -67,8 +67,7 @@ final class Strike
             !client.isMyBattlePhase())
         {
             LOGGER.log(Level.SEVERE,
-                "Called Strike.makeForcedStrikes() in wrong phase",
-                (Throwable)null);
+                "Called Strike.makeForcedStrikes() in wrong phase");
             return false;
         }
 

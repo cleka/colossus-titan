@@ -206,7 +206,7 @@ public final class BattleMap extends HexMap implements MouseListener,
                 }
                 else
                 {
-                    LOGGER.log(Level.SEVERE, "Bogus phase", (Throwable)null);
+                    LOGGER.log(Level.SEVERE, "Bogus phase");
                 }
             }
         };
@@ -383,8 +383,7 @@ public final class BattleMap extends HexMap implements MouseListener,
 
         if (image == null)
         {
-            LOGGER.log(Level.SEVERE, "ERROR: Couldn't find Colossus icon",
-                (Throwable)null);
+            LOGGER.log(Level.SEVERE, "ERROR: Couldn't find Colossus icon");
             dispose();
         }
         else

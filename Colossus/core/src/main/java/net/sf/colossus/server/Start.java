@@ -49,7 +49,7 @@ public final class Start
         }
         catch (UnknownHostException ex)
         {
-            LOGGER.log(Level.SEVERE, ex.toString(), (Throwable)null);
+            LOGGER.log(Level.SEVERE, "Could not resolve host name", ex);
         }
 
         int port = Constants.defaultPort;
@@ -223,8 +223,7 @@ public final class Start
         if (numHumans < 0 || numAIs < 0 || numNetworks < 0 ||
             numHumans + numAIs + numNetworks > Constants.MAX_MAX_PLAYERS)
         {
-            LOGGER.log(Level.SEVERE, "Illegal number of players",
-                (Throwable)null);
+            LOGGER.log(Level.SEVERE, "Illegal number of players");
             options.clear();
             return;
         }

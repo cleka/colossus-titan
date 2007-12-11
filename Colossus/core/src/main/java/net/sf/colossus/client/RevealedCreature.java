@@ -36,8 +36,7 @@ public class RevealedCreature
         if (name == null)
         {
             LOGGER.log(Level.SEVERE,
-                "Tried to create RevealedCreature with null name",
-                (Throwable)null);
+                "Tried to create RevealedCreature with null name");
             return;
         }
         this.creatureName = name;
@@ -98,8 +97,7 @@ public class RevealedCreature
         if (name == null)
         {
             LOGGER.log(Level.SEVERE,
-                "ERROR: revealedCreature.toChit, creature name null!",
-                (Throwable)null);
+                "revealedCreature.toChit, creature name null!");
             return null;
         }
 
@@ -199,7 +197,7 @@ public class RevealedCreature
         if (reason == null)
         {
             LOGGER.log(Level.SEVERE,
-                "RevealedCreature.setReason: reason null!!", (Throwable)null);
+                "RevealedCreature.setReason: reason null!!");
             return;
         }
         if (reason.equals(Constants.reasonRecruited))
@@ -222,8 +220,7 @@ public class RevealedCreature
         else
         {
             LOGGER.log(Level.SEVERE,
-                "RevealedCreature.setReason: unknown reason " + reason + "!!",
-                (Throwable)null);
+                "RevealedCreature.setReason: unknown reason " + reason + "!!");
         }
     }
 }

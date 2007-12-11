@@ -571,8 +571,7 @@ public final class Player implements Comparable
         {
             LOGGER.log(Level.SEVERE,
                 "Player.undoRecruit: legion for markerId " + markerId +
-                " is null",
-                (Throwable)null);
+                " is null");
             return;
         }
 
@@ -583,8 +582,7 @@ public final class Player implements Comparable
         {
             LOGGER.log(Level.SEVERE,
                 "Player.undoRecruit: Nothing to unrecruit for marker " +
-                markerId,
-                (Throwable)null);
+                markerId);
             return;
         }
         legion.undoRecruit();

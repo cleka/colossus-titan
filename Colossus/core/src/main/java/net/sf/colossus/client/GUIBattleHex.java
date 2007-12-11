@@ -368,7 +368,7 @@ public class GUIBattleHex extends GUIHex
                 break;
 
             default:
-                LOGGER.log(Level.SEVERE, "Bogus hexside type", (Throwable)null);
+                LOGGER.log(Level.SEVERE, "Bogus hexside type");
         }
     }
 

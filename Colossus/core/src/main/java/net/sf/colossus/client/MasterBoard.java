@@ -320,7 +320,7 @@ public final class MasterBoard extends JPanel
         catch (Exception e)
         {
             LOGGER.log(Level.SEVERE,
-                "Reading map data for non-GUI failed : " + e, (Throwable)null);
+                "Reading map data for non-GUI failed.", e);
             e.printStackTrace();
             System.exit(1);
         }
@@ -404,8 +404,7 @@ public final class MasterBoard extends JPanel
                 }
                 else if (phase == Constants.Phase.FIGHT)
                 {
-                    LOGGER.log(Level.SEVERE, "called undoLastAction in FIGHT",
-                        (Throwable)null);
+                    LOGGER.log(Level.SEVERE, "called undoLastAction in FIGHT");
                 }
                 else if (phase == Constants.Phase.MUSTER)
                 {
@@ -414,7 +413,7 @@ public final class MasterBoard extends JPanel
                 }
                 else
                 {
-                    LOGGER.log(Level.SEVERE, "Bogus phase", (Throwable)null);
+                    LOGGER.log(Level.SEVERE, "Bogus phase");
                 }
             }
         };
@@ -438,8 +437,7 @@ public final class MasterBoard extends JPanel
                 }
                 else if (phase == Constants.Phase.FIGHT)
                 {
-                    LOGGER.log(Level.SEVERE, "called undoAllAction in FIGHT",
-                        (Throwable)null);
+                    LOGGER.log(Level.SEVERE, "called undoAllAction in FIGHT");
                 }
                 else if (phase == Constants.Phase.MUSTER)
                 {
@@ -448,7 +446,7 @@ public final class MasterBoard extends JPanel
                 }
                 else
                 {
-                    LOGGER.log(Level.SEVERE, "Bogus phase", (Throwable)null);
+                    LOGGER.log(Level.SEVERE, "Bogus phase");
                 }
             }
         };
@@ -480,7 +478,7 @@ public final class MasterBoard extends JPanel
                 }
                 else
                 {
-                    LOGGER.log(Level.SEVERE, "Bogus phase", (Throwable)null);
+                    LOGGER.log(Level.SEVERE, "Bogus phase");
                 }
             }
         };
@@ -613,7 +611,7 @@ public final class MasterBoard extends JPanel
                     if (!savesDir.mkdirs())
                     {
                         LOGGER.log(Level.SEVERE,
-                            "Could not create saves directory", (Throwable)null);
+                            "Could not create saves directory");
                         JOptionPane.showMessageDialog(masterFrame,
                             "Could not create directory " + savesDir +
                             "\n- FileChooser dialog box will default " +
@@ -626,7 +624,7 @@ public final class MasterBoard extends JPanel
                 {
                     LOGGER.log(Level.SEVERE,
                         "Can't create directory " + savesDir.toString() +
-                        " - name exists but is not a file", (Throwable)null);
+                        " - name exists but is not a file");
                     JOptionPane.showMessageDialog(masterFrame,
                         "Can't create directory " + savesDir +
                         " (name exists, but is not a file)\n" +
@@ -1148,8 +1146,7 @@ public final class MasterBoard extends JPanel
         if (dh == null)
         {
             LOGGER.log(Level.SEVERE,
-                "null pointer ; i=" + i + ", j=" + j + ", k=" + k,
-                (Throwable)null);
+                "null pointer ; i=" + i + ", j=" + j + ", k=" + k);
             System.exit(1);
         }
         assert dh != null; // Static analysis of Eclipse doesn't grok System.exit()
@@ -1242,8 +1239,7 @@ public final class MasterBoard extends JPanel
                                     break;
 
                                 default:
-                                    LOGGER.log(Level.SEVERE, "Bogus hexside",
-                                        (Throwable)null);
+                                    LOGGER.log(Level.SEVERE, "Bogus hexside");
                             }
                         }
                     }
@@ -1798,8 +1794,7 @@ public final class MasterBoard extends JPanel
 
         if (image == null)
         {
-            LOGGER.log(Level.SEVERE, "Couldn't find Colossus icon",
-                (Throwable)null);
+            LOGGER.log(Level.WARNING, "Couldn't find Colossus icon");
         }
         else
         {

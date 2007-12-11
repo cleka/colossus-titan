@@ -101,8 +101,7 @@ final class SocketServerThread extends Thread implements IClient
         String method = (String)li.remove(0);
         if (playerName == null && !method.equals(Constants.signOn))
         {
-            LOGGER.log(Level.SEVERE, "First packet must be signOn",
-                (Throwable)null);
+            LOGGER.log(Level.SEVERE, "First packet must be signOn");
         }
         else
         {
@@ -319,7 +318,7 @@ final class SocketServerThread extends Thread implements IClient
         else
         {
             LOGGER.log(Level.SEVERE, "Bogus packet (Server, method: " +
-                method + ", args: " + args + ")", (Throwable)null);
+                method + ", args: " + args + ")");
         }
     }
 

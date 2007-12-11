@@ -246,7 +246,7 @@ class CreatureCollectionView extends KDialog implements WindowListener
                         " discrepancy between total (" + maxcount +
                         "), remaining (" + count +
                         ") and dead (" + deadCount +
-                        ") count for creature " + name, (Throwable)null);
+                        ") count for creature " + name);
                     return;
                 }
 

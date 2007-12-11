@@ -107,8 +107,7 @@ public final class Movement
         }
         else if (roll < 0)
         {
-            LOGGER.log(Level.SEVERE, "Movement.findNormalMoves() roll < 0",
-                (Throwable)null);
+            LOGGER.log(Level.SEVERE, "Movement.findNormalMoves() roll < 0");
             return null;
         }
 

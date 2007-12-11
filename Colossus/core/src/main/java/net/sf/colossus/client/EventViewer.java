@@ -222,8 +222,7 @@ final class EventViewer extends KDialog implements WindowListener,
                         LOGGER.log(Level.SEVERE,
                             "Invalid value "+exp +" from option '"+
                             Options.eventExpiring+"' - using default " +
-                            turnsToKeep,
-                            (Throwable)null);
+                            turnsToKeep);
                     }
                 }
                 catch (NumberFormatException e)
@@ -231,8 +230,7 @@ final class EventViewer extends KDialog implements WindowListener,
                     LOGGER.log(Level.SEVERE,
                         "Invalid value "+ expOption +" from option '"+
                         Options.eventExpiring + "' - using default " +
-                        turnsToKeep,
-                        (Throwable)null);
+                        turnsToKeep);
                 }
             }
         }
@@ -412,7 +410,7 @@ final class EventViewer extends KDialog implements WindowListener,
             {
                 LOGGER.log(Level.SEVERE,
                     "Illegal value '"+maxTurnsOptString + "' for option '" +
-                    evMaxTurns + "' - using default 1", (Throwable)null);
+                    evMaxTurns + "' - using default 1");
                 maxTurnsOptString = "1";
                 maxTurnsOpt = 1;
             }
@@ -542,7 +540,7 @@ final class EventViewer extends KDialog implements WindowListener,
                 // sanity check...
                 LOGGER.log(Level.SEVERE,
                     "bookmark " + bookmark + " out of range, size=" +
-                    syncdEventList.size(), (Throwable)null);
+                    syncdEventList.size());
                 bookmark = 0;
             }
 
@@ -730,8 +728,7 @@ final class EventViewer extends KDialog implements WindowListener,
         if (found == 0)
         {
             LOGGER.log(Level.SEVERE, "Requested '"+type+"' EVENT to undo ("+
-                parentId+", "+childId+", turn "+turn+") not found",
-                (Throwable)null);
+                parentId+", "+childId+", turn "+turn+") not found");
         }
 
         if (this.visible)

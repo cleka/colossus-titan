@@ -80,12 +80,12 @@ public class BattlelandLoader
         catch (JDOMException ex)
         {
             // towi TODO : is it really good to swallow the exception? 
-            LOGGER.log(Level.SEVERE, "JDOM " + ex.toString(), (Throwable)null);
+            LOGGER.log(Level.SEVERE, "JDOM exception caught", ex);
         }
         catch (IOException ex)
         {
             // towi TODO: is it really good to swallow the exception? 
-            LOGGER.log(Level.SEVERE, "IO " + ex.toString(), (Throwable)null);
+            LOGGER.log(Level.SEVERE, "IO exception caught", ex);
         }
     }
 

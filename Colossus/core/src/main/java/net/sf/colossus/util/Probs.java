@@ -111,7 +111,7 @@ public final class Probs
                 break;
 
             default:
-                LOGGER.log(Level.SEVERE, "Bogus fake die roll", (Throwable)null);
+                LOGGER.log(Level.SEVERE, "Bogus fake die roll");
         }
         return lastFakeDie;
     }

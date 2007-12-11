@@ -216,8 +216,7 @@ public final class Options implements IOptions
             {
                 LOGGER.log(Level.SEVERE, 
                     "Could not create options directory " + 
-                    optionsDir.toString(), 
-                    (Throwable)null);
+                    optionsDir.toString());
                 return;
             }
         }

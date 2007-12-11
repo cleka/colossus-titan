@@ -167,7 +167,7 @@ public final class VariantSupport
                     LOGGER.log(Level.SEVERE, "Can't use more than " +
                         Constants.MAX_MAX_PLAYERS +
                         " players, while variant requires " +
-                        maxPlayers, (Throwable)null);
+                        maxPlayers);
                     maxPlayers = Constants.MAX_MAX_PLAYERS;
                 }
                 varDirectory = tempVarDirectory;
@@ -237,8 +237,7 @@ public final class VariantSupport
             if (tempVarName.equals(Constants.defaultVARFile))
             {
                 LOGGER.log(Level.SEVERE,
-                    "Default Variant Loading Failed, aborting !",
-                    (Throwable)null);
+                    "Default Variant Loading Failed, aborting !");
                 System.exit(1);
             }
             else
@@ -360,7 +359,7 @@ public final class VariantSupport
         catch (Exception e)
         {
             LOGGER.log(Level.SEVERE,
-                "Recruit-per-terrain loading failed : " + e, (Throwable)null);
+                "Recruit-per-terrain loading failed.", e);
             System.exit(1);
         }
         // initialize the static bits of the MasterBoard
@@ -429,8 +428,7 @@ public final class VariantSupport
         {
             if (hintName.equals(Constants.defaultHINTFile))
             {
-                LOGGER.log(Level.SEVERE, "Couldn't load default hints !",
-                    (Throwable)null);
+                LOGGER.log(Level.SEVERE, "Couldn't load default hints !");
                 System.exit(1);
             }
             else
@@ -469,8 +467,7 @@ public final class VariantSupport
         else
         {
             LOGGER.log(Level.SEVERE,
-                "No AIHintLoader available ! Should never happen.",
-                (Throwable)null);
+                "No AIHintLoader available ! Should never happen.");
         }
         return null;
     }

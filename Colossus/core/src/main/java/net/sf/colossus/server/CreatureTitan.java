@@ -68,8 +68,7 @@ public class CreatureTitan extends Creature
         if (!name.equals(Constants.titan))
         {
             LOGGER.log(Level.SEVERE,
-                "Creating a CreatureTitan but the name is not Titan !",
-                (Throwable)null);
+                "Creating a CreatureTitan but the name is not Titan !");
         }
     }
 

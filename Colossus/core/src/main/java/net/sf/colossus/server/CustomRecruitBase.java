@@ -133,8 +133,7 @@ abstract public class CustomRecruitBase
             {
                 LOGGER.log(Level.SEVERE,
                     "in CustomRecruitBase, not all CaretakerInfo's" +
-                    " count match !",
-                    (Throwable)null);
+                    " count match !");
             }
         }
         // second, update the Caretaker if we're server
@@ -147,8 +146,7 @@ abstract public class CustomRecruitBase
             {
                 LOGGER.log(Level.SEVERE,
                     "in CustomRecruitBase, Caretaker's count " +
-                    "doesn't match CaretakerInfo's counts!",
-                    (Throwable)null);
+                    "doesn't match CaretakerInfo's counts!");
             }
         }
         return count;
@@ -190,8 +188,7 @@ abstract public class CustomRecruitBase
             {
                 LOGGER.log(Level.SEVERE,
                     "in CustomRecruitBase, not all CaretakerInfo's " +
-                    "dead count match !",
-                    (Throwable)null);
+                    "dead count match !");
             }
         }
         // second, update the Caretaker if we're server
@@ -204,8 +201,7 @@ abstract public class CustomRecruitBase
             {
                 LOGGER.log(Level.SEVERE,
                     "in CustomRecruitBase, Caretaker's dead count " +
-                    "doesn't match CaretakerInfo's counts!",
-                    (Throwable)null);
+                    "doesn't match CaretakerInfo's counts!");
             }
         }
         return count;

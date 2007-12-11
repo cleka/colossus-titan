@@ -60,7 +60,7 @@ final class SocketClientThread extends Thread implements IServer
         // UnknownHostException, IOException, IllegalBlockingModeException
         catch (Exception ex)
         {
-            LOGGER.log(Level.SEVERE, ex.toString(), (Throwable)null);
+            LOGGER.log(Level.SEVERE, "Could not open socket", ex);
             ex.printStackTrace();
             System.exit(1);
         }
@@ -92,7 +92,7 @@ final class SocketClientThread extends Thread implements IServer
         }
         catch (IOException ex)
         {
-            LOGGER.log(Level.SEVERE, ex.toString(), (Throwable)null);
+            LOGGER.log(Level.SEVERE, "IO exception on socket", ex);
             ex.printStackTrace();
             System.exit(1);
         }
@@ -532,7 +532,7 @@ final class SocketClientThread extends Thread implements IServer
         else
         {
             LOGGER.log(Level.SEVERE, "Bogus packet (Client, method: " +
-                method + ", args: " + args + ")", (Throwable)null);
+                method + ", args: " + args + ")");
         }
     }
 

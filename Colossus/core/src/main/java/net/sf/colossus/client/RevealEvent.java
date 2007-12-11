@@ -101,8 +101,7 @@ public class RevealEvent
             eventType != eventTurnChange)
         {
             LOGGER.log(Level.SEVERE, 
-                "null marker for event " + getEventTypeText(eventType), 
-                (Throwable)null);
+                "null marker for event " + getEventTypeText(eventType));
             return;
         }
         this.client = client;
@@ -163,7 +162,7 @@ public class RevealEvent
                 if (playerName == null)
                 {
                     LOGGER.log(Level.SEVERE, "For making titan base name: " +
-                        "playerName is null!", (Throwable)null);
+                        "playerName is null!");
                 }
                 else
                 {
@@ -197,8 +196,7 @@ public class RevealEvent
         this.realPlayer = realPlayer;
         if (this.realPlayer == null)
         {
-            LOGGER.log(Level.SEVERE, "RevealEvent: give realPlayer is null!",
-                (Throwable)null);
+            LOGGER.log(Level.SEVERE, "RevealEvent: give realPlayer is null!");
             this.realPlayer = "dummy?";
         }
     }
@@ -467,7 +465,7 @@ public class RevealEvent
         if (markerId == null)
         {
             LOGGER.log(Level.SEVERE, "ERROR: markerId null, event type " +
-                getEventTypeText()+" turn" +getTurn(), (Throwable)null);
+                getEventTypeText()+" turn" +getTurn());
         }
         try
         {
@@ -479,8 +477,7 @@ public class RevealEvent
         {
             LOGGER.log(Level.SEVERE, "new Chit for markerId " + markerId +
                 ", event type " + getEventTypeText() + " turn" + getTurn() +
-                " threw exception:" + e.toString(),
-                (Throwable)null);
+                " threw exception.", e);
         }
         addLabel("("+height+")");
     }
@@ -500,8 +497,7 @@ public class RevealEvent
         catch (Exception ex)
         {
             LOGGER.log(Level.SEVERE,
-                "RevealEvent.gettitanbasename, PlayerInfo threw " +
-                "exception " + ex.toString(), (Throwable)null);
+                "PlayerInfo threw an exception.", ex);
             return Constants.titan;
         }
     }

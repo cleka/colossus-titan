@@ -170,7 +170,7 @@ public final class Battle
         }
         else
         {
-            LOGGER.log(Level.SEVERE, "Bogus phase", (Throwable)null);
+            LOGGER.log(Level.SEVERE, "Bogus phase");
         }
         if (advance)
         {
@@ -647,7 +647,7 @@ public final class Battle
         else
         {
             LOGGER.log(Level.SEVERE,
-                "Undo move error: no critter in " + hexLabel, (Throwable)null);
+                "Undo move error: no critter in " + hexLabel);
         }
     }
 
@@ -841,8 +841,7 @@ public final class Battle
                 else
                 {
                     LOGGER.log(Level.SEVERE,
-                        "Null donor in Battle.cleanupOneDeadCritter()",
-                        (Throwable)null);
+                        "Null donor in Battle.cleanupOneDeadCritter()");
                 }
             }
             else
@@ -1001,7 +1000,7 @@ public final class Battle
         }
 
         LOGGER.log(Level.SEVERE, server.getPlayerName() +
-            " called battle.doneWithStrikes() illegally", (Throwable)null);
+            " called battle.doneWithStrikes() illegally");
         return false;
     }
 

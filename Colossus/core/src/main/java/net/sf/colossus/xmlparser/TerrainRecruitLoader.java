@@ -181,8 +181,7 @@ public class TerrainRecruitLoader
         }
         catch (Exception e)
         {
-            LOGGER.log(Level.SEVERE, "Couldn't fill graph : " + e,
-                (Throwable)null);
+            LOGGER.log(Level.SEVERE, "Couldn't fill graph.", e);
         }
     }
 
@@ -251,15 +250,15 @@ public class TerrainRecruitLoader
         }
         catch (JDOMException ex)
         {
-            LOGGER.log(Level.SEVERE, "JDOM" + ex.toString(), (Throwable)null);
+            LOGGER.log(Level.SEVERE, "JDOM exception caught", ex);
         }
         catch (IOException ex)
         {
-            LOGGER.log(Level.SEVERE, "IO" + ex.toString(), (Throwable)null);
+            LOGGER.log(Level.SEVERE, "IO exception caught", ex);
         }
         catch (ParseException ex)
         {
-            LOGGER.log(Level.SEVERE, "Parse" + ex.toString(), (Throwable)null);
+            LOGGER.log(Level.SEVERE, "Parse exception caught", ex);
         }
     }
 
@@ -415,8 +414,7 @@ public class TerrainRecruitLoader
         if (o == null)
         {
             LOGGER.log(Level.SEVERE,
-                "CustomRecruitBase doesn't exist for: " + specialString,
-                (Throwable)null);
+                "CustomRecruitBase doesn't exist for: " + specialString);
             return null;
         }
         cri = (CustomRecruitBase)o;

@@ -52,11 +52,11 @@ public class StrategicMapLoader
         }
         catch (JDOMException ex)
         {
-            LOGGER.log(Level.SEVERE, "JDOM" + ex.toString(), (Throwable)null);
+            LOGGER.log(Level.SEVERE, "JDOM exception caught", ex);
         }
         catch (IOException ex)
         {
-            LOGGER.log(Level.SEVERE, "IO" + ex.toString(), (Throwable)null);
+            LOGGER.log(Level.SEVERE, "IO exception caught", ex);
         }
     }
 
