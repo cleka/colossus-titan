@@ -78,7 +78,7 @@ public final class Start
     }
 
     private static void clearNonPersistentOptions(
-        net.sf.colossus.util.Options options)
+        Options options)
     {
         options.setOption(Constants.runClient, false);
         options.removeOption(Constants.loadGame);
@@ -86,7 +86,7 @@ public final class Start
 
     static void startupDialog(Game game, CommandLine cl)
     {
-        net.sf.colossus.util.Options options = game.getOptions();
+        Options options = game.getOptions();
         options.loadOptions();
         clearNonPersistentOptions(options);
         setupOptionsFromCommandLine(cl, game);
@@ -145,7 +145,7 @@ public final class Start
         {
             return;
         }
-        net.sf.colossus.util.Options options = game.getOptions();
+        Options options = game.getOptions();
 
         int numHumans = 0;
         int numAIs = 0;

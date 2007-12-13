@@ -25,6 +25,7 @@ import javax.swing.JLabel;
 
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.util.KDialog;
+import net.sf.colossus.util.Options;
 
 
 /**
@@ -42,7 +43,7 @@ public class StartClient extends KDialog implements WindowListener,
     static String playerName;
     static String hostname;
     int port;
-    static net.sf.colossus.util.Options clientOptions;
+    static Options clientOptions;
     SaveWindow saveWindow;
 
     JComboBox nameBox;
@@ -90,7 +91,7 @@ public class StartClient extends KDialog implements WindowListener,
         for (int i = Constants.numSavedServerNames; i > 0 ; i--)
         {
             String serverName = clientOptions.getStringOption(
-                net.sf.colossus.util.Options.serverName + (i-1) );
+                Options.serverName + (i-1) );
             if (serverName != null)
             {
                 preferred = serverName;
@@ -189,7 +190,7 @@ public class StartClient extends KDialog implements WindowListener,
         if ( clientOptions == null)
         {
             // needed e.g. when started as standalone from cmdline with -c -g
-            clientOptions = new net.sf.colossus.util.Options(playerName);
+            clientOptions = new Options(playerName);
             clientOptions.loadOptions();
         }
         new Client(hostname, port, playerName, true);
@@ -197,11 +198,11 @@ public class StartClient extends KDialog implements WindowListener,
 
     private void loadClientOptions()
     {
-        clientOptions = new net.sf.colossus.util.Options(playerName);
+        clientOptions = new Options(playerName);
         clientOptions.loadOptions();
     }
 
-    /** Put the choosen hostname as first to the LRU sorted list.
+    /** Put the chosen hostname as first to the LRU sorted list.
      *  Save the list back to the options. 
      */
     private static void saveHostnames()
@@ -215,7 +216,7 @@ public class StartClient extends KDialog implements WindowListener,
                 return;
             }
             String serverName = clientOptions.getStringOption(
-                net.sf.colossus.util.Options.serverName + i);
+                Options.serverName + i);
 
             if (serverName != null)
             {
@@ -229,7 +230,7 @@ public class StartClient extends KDialog implements WindowListener,
         for (int i = 0; i < names.size() &&
             i < Constants.numSavedServerNames ; i++)
         {
-            clientOptions.setOption(net.sf.colossus.util.Options.serverName +
+            clientOptions.setOption(Options.serverName +
                 i, (String)names.get(i));
         }
         clientOptions.saveOptions();
