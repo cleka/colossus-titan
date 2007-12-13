@@ -17,6 +17,8 @@ import net.sf.colossus.server.Constants;
 /** Class Options lists game options for Colossus.
  *  @version $Id$
  *  @author David Ripton
+ *  
+ *  TODO constants should be all uppercase
  */
 
 public final class Options implements IOptions
@@ -252,6 +254,12 @@ public final class Options implements IOptions
     public String getStringOption(String optname)
     {
         String value = props.getProperty(optname);
+        return value;
+    }
+
+    public String getStringOption(String optname, String defaultValue)
+    {
+        String value = props.getProperty(optname, defaultValue);
         return value;
     }
 

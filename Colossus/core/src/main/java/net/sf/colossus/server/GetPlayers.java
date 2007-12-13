@@ -144,12 +144,7 @@ public final class GetPlayers extends JFrame implements WindowListener,
         addCheckbox(Options.autoStop, checkboxPane);
         addCheckbox(Options.autoQuit, checkboxPane);
 
-        String viewmodeName = options.getStringOption(Options.viewMode);
-        if ( viewmodeName == null )
-        {
-            viewmodeName = Options.viewableEver;
-        }
-
+        String viewmodeName = options.getStringOption(Options.viewMode, Options.viewableEver);
         JPanel viewModePane = new JPanel(new GridLayout(0, 2));
         viewModePane.setBorder(new TitledBorder("Viewability of legion and events"));
         optionPane.add(viewModePane);
@@ -160,12 +155,7 @@ public final class GetPlayers extends JFrame implements WindowListener,
         viewModePane.add(new JLabel("Viewable legion content:"));
         viewModePane.add(viewModeBox);
 
-        String eventExpiringVal = options.getStringOption(Options.eventExpiring);
-        if ( eventExpiringVal == null )
-        {
-            eventExpiringVal = "5";
-        }
-
+        String eventExpiringVal = options.getStringOption(Options.eventExpiring, "5");
         eventExpiringBox = new JComboBox(Options.eventExpiringChoices);
         eventExpiringBox.addActionListener(this);
         eventExpiringBox.setSelectedItem(eventExpiringVal);
@@ -228,14 +218,8 @@ public final class GetPlayers extends JFrame implements WindowListener,
         variantPane.setLayout(new GridLayout(0, 2));
         mainPane.add(variantPane);
 
-        String variantName = options.getStringOption(Options.variant);
         // XXX Make sure chosen variant is in the list.
-        if (variantName == null || variantName.length() == 0)
-        {
-            // Default variant
-            variantName = Constants.variantArray[0];
-        }
-
+        String variantName = options.getStringOption(Options.variant, Constants.variantArray[0]);
         variantBox = new JComboBox(Constants.variantArray);
         variantBox.addActionListener(this);
         variantBox.setSelectedItem(variantName);
@@ -342,11 +326,7 @@ public final class GetPlayers extends JFrame implements WindowListener,
         // too large to cause havoc if the number of choices increases
         playerType.setMaximumRowCount(12);
 
-        String type = options.getStringOption(Options.playerType + i);
-        if (type == null || type.length() == 0)
-        {
-            type = Constants.none;
-        }
+        String type = options.getStringOption(Options.playerType + i, Constants.none);
         playerType.setSelectedItem(type);
 
         onePlayerPane.add(playerType);
