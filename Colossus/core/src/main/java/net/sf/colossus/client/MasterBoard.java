@@ -481,22 +481,22 @@ public final class MasterBoard extends JPanel
                 Constants.Phase phase = client.getPhase();
                 if (phase == Constants.Phase.SPLIT)
                 {
-                    bottomBar.disableDoneButton();
+                    doneWithPhaseAction.setEnabled(false);
                     client.doneWithSplits();
                 }
                 else if (phase == Constants.Phase.MOVE)
                 {
-                    bottomBar.disableDoneButton();
+                    doneWithPhaseAction.setEnabled(false);
                     client.doneWithMoves();
                 }
                 else if (phase == Constants.Phase.FIGHT)
                 {
-                    bottomBar.disableDoneButton();
+                    doneWithPhaseAction.setEnabled(false);
                     client.doneWithEngagements();
                 }
                 else if (phase == Constants.Phase.MUSTER)
                 {
-                    bottomBar.disableDoneButton();
+                    doneWithPhaseAction.setEnabled(false);
                     client.doneWithRecruits();
                 }
                 else
@@ -1444,7 +1444,7 @@ public final class MasterBoard extends JPanel
 
         if (client.getPlayerName().equals(activePlayerName))
         {
-            bottomBar.setOwnPhase("Split stacks");
+            bottomBar.setPhase("Split stacks");
 
             JMenuItem mi;
 
@@ -1475,8 +1475,9 @@ public final class MasterBoard extends JPanel
         }
         else
         {
-            bottomBar.setForeignPhase("(" + activePlayerName + " splits)");
+            bottomBar.setPhase("(" + activePlayerName + " splits)");
         }
+        doneWithPhaseAction.setEnabled(true);
     }
 
     void setupMoveMenu()
@@ -1493,8 +1494,8 @@ public final class MasterBoard extends JPanel
 
         if (client.getPlayerName().equals(activePlayerName))
         {
-            bottomBar.setOwnPhase("Movement");
-            bottomBar.disableDoneButton();
+            bottomBar.setPhase("Movement");
+            doneWithPhaseAction.setEnabled(true);
 
             JMenuItem mi;
 
@@ -1533,8 +1534,9 @@ public final class MasterBoard extends JPanel
         }
         else
         {
-            bottomBar.setForeignPhase("(" + activePlayerName + " moves)");
+            bottomBar.setPhase("(" + activePlayerName + " moves)");
         }
+        doneWithPhaseAction.setEnabled(true);
 
         // Force showing the updated movement die.
         repaint();
@@ -1554,8 +1556,8 @@ public final class MasterBoard extends JPanel
 
         if (client.getPlayerName().equals(activePlayerName))
         {
-            bottomBar.setOwnPhase("Resolve Engagements");
-            bottomBar.disableDoneButton();
+            bottomBar.setPhase("Resolve Engagements");
+            bottomBar.setEnabled(false);
 
             JMenuItem mi;
 
@@ -1578,8 +1580,9 @@ public final class MasterBoard extends JPanel
         }
         else
         {
-            bottomBar.setForeignPhase("(" + activePlayerName + " fights)");
+            bottomBar.setPhase("(" + activePlayerName + " fights)");
         }
+        doneWithPhaseAction.setEnabled(true);
     }
 
     void setupMusterMenu()
@@ -1596,7 +1599,7 @@ public final class MasterBoard extends JPanel
 
         if (client.getPlayerName().equals(activePlayerName))
         {
-            bottomBar.setOwnPhase("Muster Recruits");
+            bottomBar.setPhase("Muster Recruits");
 
             JMenuItem mi;
 
@@ -1627,9 +1630,10 @@ public final class MasterBoard extends JPanel
         }
         else
         {
-            bottomBar.setForeignPhase("(" + activePlayerName + " musters)");
+            bottomBar.setPhase("(" + activePlayerName + " musters)");
         }
-    }
+        doneWithPhaseAction.setEnabled(true);
+   }
 
     void highlightPossibleRecruits()
     {
@@ -2503,26 +2507,9 @@ public final class MasterBoard extends JPanel
             playerLabel.setForeground(color);
         }
 
-        void setOwnPhase(String s)
+        void setPhase(String s)
         {
             phaseLabel.setText(s);
-            doneButton.setEnabled(true);
-        }
-
-        void setForeignPhase(String s)
-        {
-            phaseLabel.setText(s);
-            doneButton.setEnabled(false);
-        }
-
-        void disableDoneButton()
-        {
-            doneButton.setEnabled(false);
-        }
-
-        void enableDoneButton()
-        {
-            doneButton.setEnabled(true);
         }
 
         BottomBar()
@@ -2545,14 +2532,11 @@ public final class MasterBoard extends JPanel
         }
     }
 
-    public void enableBottomBarDoneButton()
-    {
-        bottomBar.enableDoneButton();
+    public void enableDoneAction() {
+        doneWithPhaseAction.setEnabled(true);
     }
 
-    public void disableBottomBarDoneButton()
-    {
-        bottomBar.disableDoneButton();
+    public void disableDoneAction() {
+        doneWithPhaseAction.setEnabled(false);
     }
-
 }

@@ -2800,7 +2800,7 @@ public final class Client implements IClient, IOracle, IOptions
             }
             if (findEngagements().isEmpty() && board != null )
             {
-                board.enableBottomBarDoneButton();
+                board.enableDoneAction();
             }
         }
     }
@@ -3054,7 +3054,7 @@ public final class Client implements IClient, IOracle, IOptions
             {
                 if ( turnNumber == 1 )
                 {
-                    board.disableBottomBarDoneButton();
+                    board.disableDoneAction();
                 }
                 focusBoard();
                 defaultCursor();
@@ -3913,7 +3913,7 @@ public final class Client implements IClient, IOracle, IOptions
             board.repaint();
             if ( isMyLegion(markerId) && !splitLegionHasForcedMove )
             {
-                board.enableBottomBarDoneButton();
+                board.enableDoneAction();
             }
         }
         kickMoves();
@@ -3935,7 +3935,7 @@ public final class Client implements IClient, IOracle, IOptions
             board.highlightUnmovedLegions();
             if ( isUndoStackEmpty() || splitLegionHasForcedMove )
             {
-                board.disableBottomBarDoneButton();
+                board.disableDoneAction();
             }
 
             if (didTeleport && eventViewer != null)
@@ -4519,7 +4519,7 @@ public final class Client implements IClient, IOracle, IOptions
             // must split in first turn - Done not allowed now
             if ( board != null )
             {
-                board.disableBottomBarDoneButton();
+                board.disableDoneAction();
             }
         }
         LOGGER.log(Level.FINEST, "called server.undoSplit");
@@ -4850,7 +4850,7 @@ public final class Client implements IClient, IOracle, IOptions
         numSplitsThisTurn++;
         if ( turnNumber == 1 && board != null )
         {
-            board.enableBottomBarDoneButton();
+            board.enableDoneAction();
         }
 
         if (board != null)
