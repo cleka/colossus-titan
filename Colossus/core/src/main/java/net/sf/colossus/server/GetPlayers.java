@@ -147,7 +147,7 @@ public final class GetPlayers extends JFrame implements WindowListener,
         String viewmodeName = options.getStringOption(Options.viewMode);
         if ( viewmodeName == null )
         {
-            viewmodeName = Options.viewableAll;
+            viewmodeName = Options.viewableEver;
         }
 
         JPanel viewModePane = new JPanel(new GridLayout(0, 2));
