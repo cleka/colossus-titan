@@ -39,8 +39,8 @@ public final class LegionInfo
     private boolean teleported;
     private int entrySide;
     private boolean recruited;
-    PredictSplitNode myNode;
-    boolean isMyLegon;
+    private PredictSplitNode myNode;
+    private boolean isMyLegion;
 
     LegionInfo(String markerId, Client client)
     {
@@ -48,7 +48,7 @@ public final class LegionInfo
         this.playerName = client.getPlayerNameByMarkerId(markerId);
         this.client = client;
         myNode=null;
-        isMyLegon = playerName.equals(client.getPlayerName());
+        isMyLegion = playerName.equals(client.getPlayerName());
     }
 
     private PredictSplitNode getNode(String markerId)
@@ -79,7 +79,7 @@ public final class LegionInfo
 
     public boolean isMyLegion()
     {
-        return isMyLegon;
+        return isMyLegion;
     }
 
     public int getHeight()
