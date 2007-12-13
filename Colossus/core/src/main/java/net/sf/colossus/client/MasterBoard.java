@@ -170,7 +170,8 @@ public final class MasterBoard extends JPanel
     private SaveWindow saveWindow;
 
     private final class InfoPopupHandler extends KeyAdapter {
-        private static final int POPUP_KEY = KeyEvent.VK_SHIFT;
+        private static final int POPUP_KEY_ALL_LEGIONS = KeyEvent.VK_SHIFT;
+        private static final int POPUP_KEY_MY_LEGIONS = KeyEvent.VK_CONTROL;
         private static final int PANEL_MARGIN = 4;
         private static final int PANEL_PADDING = 0;
 
@@ -184,36 +185,30 @@ public final class MasterBoard extends JPanel
 
         public void keyPressed(KeyEvent e)
         {
-            String playerName = client.getPlayerName();
-            int viewMode      = client.getViewMode();
-            if (e.getKeyCode() == POPUP_KEY)
+            boolean allLegionsAllowed = !client.getStringOption(Options.viewMode).equals(Options.viewableOwn);
+            if ((e.getKeyCode() == POPUP_KEY_ALL_LEGIONS) && (allLegionsAllowed ))
             {
                 if (legionFlyouts == null)
                 {
-                    List markers = client.getMarkers();
-                    // copy to array so we don't get concurrent modification exceptions when iterating
-                    Marker[] markerArray = (Marker[])markers.toArray(new Marker[markers.size()]);
-                    legionFlyouts = new JPanel[markers.size()];
-                    for (int i = 0; i < markerArray.length; i++)
+                    createLegionFlyouts(client.getMarkers());
+                }
+            }
+            else if (e.getKeyCode() == POPUP_KEY_MY_LEGIONS)
+            {
+                if (legionFlyouts == null)
+                {
+                    // copy only local players markers
+                    List myMarkers = new ArrayList();
+                    for (Iterator iterator = client.getMarkers().iterator(); iterator
+                        .hasNext();)
                     {
-                        Marker marker = markerArray[i];
-                        LegionInfo legion = client.getLegionInfo(marker.getId());
-                        int scale = 2*Scale.get();
-
-                        boolean dubiousAsBlanks = client.getOption(
-                            Options.dubiousAsBlanks);
-                        final JPanel panel = new LegionInfoPanel(legion,
-                            scale, PANEL_MARGIN, PANEL_PADDING, true,
-                            viewMode, playerName, dubiousAsBlanks);
-                        add(panel);
-                        legionFlyouts[i] = panel;
-
-                        panel.setLocation(marker.getLocation());
-                        panel.setVisible(true);
-                        DragListener.makeDraggable(panel);
-
-                        repaint();
+                        Marker marker = (Marker)iterator.next();
+                        LegionInfo legionInfo = client.getLegionInfo(marker.getId());
+                        if(legionInfo.isMyLegion()) {
+                            myMarkers.add(marker);
+                        }
                     }
+                    createLegionFlyouts(myMarkers);
                 }
             }
             else
@@ -222,9 +217,37 @@ public final class MasterBoard extends JPanel
             }
         }
 
+        private void createLegionFlyouts(List markers)
+        {
+            // copy to array so we don't get concurrent modification exceptions when iterating
+            Marker[] markerArray = (Marker[])markers.toArray(new Marker[markers.size()]);
+            legionFlyouts = new JPanel[markers.size()];
+            for (int i = 0; i < markerArray.length; i++)
+            {
+                Marker marker = markerArray[i];
+                LegionInfo legion = client.getLegionInfo(marker.getId());
+                int scale = 2*Scale.get();
+
+                boolean dubiousAsBlanks = client.getOption(
+                    Options.dubiousAsBlanks);
+                final JPanel panel = new LegionInfoPanel(legion,
+                    scale, PANEL_MARGIN, PANEL_PADDING, true,
+                    client.getViewMode(), client.getPlayerName(), dubiousAsBlanks);
+                add(panel);
+                legionFlyouts[i] = panel;
+
+                panel.setLocation(marker.getLocation());
+                panel.setVisible(true);
+                DragListener.makeDraggable(panel);
+
+                repaint();
+            }
+        }
+
         public void keyReleased(KeyEvent e)
         {
-            if (e.getKeyCode() == POPUP_KEY)
+            if ((e.getKeyCode() == POPUP_KEY_ALL_LEGIONS) || 
+                (e.getKeyCode() == POPUP_KEY_MY_LEGIONS)) 
             {
                 if (legionFlyouts != null)
                 {
