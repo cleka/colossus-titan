@@ -185,8 +185,7 @@ public final class MasterBoard extends JPanel
 
         public void keyPressed(KeyEvent e)
         {
-            boolean allLegionsAllowed = !client.getStringOption(Options.viewMode).equals(Options.viewableOwn);
-            if ((e.getKeyCode() == POPUP_KEY_ALL_LEGIONS) && (allLegionsAllowed ))
+            if (e.getKeyCode() == POPUP_KEY_ALL_LEGIONS)
             {
                 if (legionFlyouts == null)
                 {
