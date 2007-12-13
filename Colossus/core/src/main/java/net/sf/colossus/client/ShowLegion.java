@@ -39,7 +39,7 @@ final class ShowLegion extends KDialog implements MouseListener,
         addWindowListener(this);
 
         LegionInfoPanel liPanel = new LegionInfoPanel(legion, scale, 5, 2,
-            false, viewMode, playerName, dubiousAsBlanks);
+            false, viewMode, playerName, dubiousAsBlanks, false);
         getContentPane().add(liPanel);
 
         String valueText = liPanel.getValueText();

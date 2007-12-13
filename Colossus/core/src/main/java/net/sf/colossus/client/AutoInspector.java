@@ -87,7 +87,7 @@ public class AutoInspector extends KDialog
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
         LegionInfoPanel liPanel = new LegionInfoPanel(legion, 4 * Scale.get(),
-            5, 2, false, viewMode, playerName, dubiousAsBlanks);
+            5, 2, false, viewMode, playerName, dubiousAsBlanks, false);
         panel.add(liPanel);
         String valueText = liPanel.getValueText();
         String ownerText = legion.isMyLegion() ?

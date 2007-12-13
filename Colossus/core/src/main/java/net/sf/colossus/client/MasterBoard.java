@@ -231,7 +231,7 @@ public final class MasterBoard extends JPanel
                     Options.dubiousAsBlanks);
                 final JPanel panel = new LegionInfoPanel(legion,
                     scale, PANEL_MARGIN, PANEL_PADDING, true,
-                    client.getViewMode(), client.getPlayerName(), dubiousAsBlanks);
+                    client.getViewMode(), client.getPlayerName(), dubiousAsBlanks, true);
                 add(panel);
                 legionFlyouts[i] = panel;
 

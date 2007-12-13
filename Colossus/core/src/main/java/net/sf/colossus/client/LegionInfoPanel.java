@@ -3,13 +3,13 @@ package net.sf.colossus.client;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.ArrayList;
 
 import javax.swing.Box;
-import javax.swing.JPanel;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 
 import net.sf.colossus.util.HTMLColor;
 import net.sf.colossus.util.Options;
@@ -27,42 +27,42 @@ public final class LegionInfoPanel extends JPanel
     private String valueText = "";
 
     public LegionInfoPanel(LegionInfo legion, int scale, int margin,
-        int padding, boolean usePlayerColor, int viewMode,
-        String playerName, boolean dubiousAsBlanks)
+        int padding, boolean usePlayerColor, int viewMode, String playerName,
+        boolean dubiousAsBlanks, boolean showLegionValue)
     {
         boolean contentCertain = false;
         boolean hideAll = false;
 
-        if ( viewMode == Options.viewableAllNum )
+        if (viewMode == Options.viewableAllNum)
         {
             contentCertain = true;
             viewAll(legion, usePlayerColor, scale, margin, padding,
-                dubiousAsBlanks, hideAll);
+                dubiousAsBlanks, hideAll, showLegionValue);
         }
-        else if ( viewMode == Options.viewableOwnNum )
+        else if (viewMode == Options.viewableOwnNum)
         {
             String legionOwner = legion.getPlayerName();
-            if ( playerName.equals(legionOwner) )
+            if (playerName.equals(legionOwner))
             {
                 contentCertain = true;
                 viewAll(legion, usePlayerColor, scale, margin, padding,
-                    dubiousAsBlanks, hideAll);
+                    dubiousAsBlanks, hideAll, showLegionValue);
             }
             else
             {
                 hideAll = true;
-                viewAll(legion, usePlayerColor, scale, margin, padding,
-                    false, hideAll);
+                viewAll(legion, usePlayerColor, scale, margin, padding, false,
+                    hideAll, showLegionValue);
             }
         }
-        else if ( viewMode == Options.viewableEverNum )
+        else if (viewMode == Options.viewableEverNum)
         {
             // for this mode, in Game/Server broadcasting of revealed info
             // is limited to those that are entitled to know;
             // thus we can use the splitPrediction to decide what is
             // "has ever been shown or can be concluded".
             viewAll(legion, usePlayerColor, scale, margin, padding,
-                dubiousAsBlanks, hideAll);
+                dubiousAsBlanks, hideAll, showLegionValue);
         }
         else
         {
@@ -118,15 +118,15 @@ public final class LegionInfoPanel extends JPanel
     }
 
     private void viewAll(LegionInfo legion, boolean usePlayerColor, int scale,
-        int margin, int padding, boolean dubiousAsBlanks, boolean hideAll)
+        int margin, int padding, boolean dubiousAsBlanks, boolean hideAll, boolean showLegionValue)
     {
         setLayout(null);
 
         if (usePlayerColor)
         {
-            Color playerColor =
-                HTMLColor.stringToColor(legion.getPlayerInfo().getColor() +
-                "Colossus");
+            Color playerColor = HTMLColor.stringToColor(legion.getPlayerInfo()
+                .getColor()
+                + "Colossus");
             setBackground(playerColor);
         }
 
@@ -138,8 +138,8 @@ public final class LegionInfoPanel extends JPanel
         boolean showMarker = false;
         if (showMarker)
         {
-            Chit marker = new Chit(scale, legion.getMarkerId(),
-                false, true, false);
+            Chit marker = new Chit(scale, legion.getMarkerId(), false, true,
+                false);
             if (effectiveChitSize == 0)
             {
                 effectiveChitSize = marker.getWidth(); // they should be all the same size
@@ -152,6 +152,7 @@ public final class LegionInfoPanel extends JPanel
 
         List imageNames = legion.getImageNames();
         List certain = legion.getCertainties();
+        boolean allCertain = !hideAll;
 
         // if uncertain shall be shown ones only as blanks, then 
         // also sort the blanks all to the end:
@@ -202,13 +203,18 @@ public final class LegionInfoPanel extends JPanel
             String imageName = (String)it.next();
             Chit chit;
             boolean sure = ((Boolean)it2.next()).booleanValue();
+            if (!sure)
+            {
+                allCertain = false;
+            }
             if (hideAll)
             {
                 chit = new Chit(scale, "QuestionMarkMask", false, true, false);
             }
             else
             {
-                chit = new Chit(scale, imageName, false, !sure, dubiousAsBlanks);
+                chit = new Chit(scale, imageName, false, !sure,
+                    dubiousAsBlanks);
             }
             if (effectiveChitSize == 0)
             {
@@ -216,7 +222,19 @@ public final class LegionInfoPanel extends JPanel
                 effectiveChitSize = chit.getWidth();
             }
             add(chit);
-            chit.setLocation(i * (effectiveChitSize + padding) + margin, margin);
+            chit.setLocation(i * (effectiveChitSize + padding) + margin,
+                margin);
+            i++;
+        }
+        
+        if (showLegionValue && allCertain)
+        {
+            JLabel sizeLabel = new JLabel(String.valueOf(legion.getPointValue()));
+            sizeLabel.setForeground(Color.WHITE);
+            add(sizeLabel);
+            sizeLabel.setLocation(i * (effectiveChitSize + padding) + margin,
+                margin);
+            sizeLabel.setSize(new Dimension(effectiveChitSize, effectiveChitSize));
             i++;
         }
 
@@ -226,10 +244,10 @@ public final class LegionInfoPanel extends JPanel
             add(Box.createRigidArea(new Dimension(scale, scale)));
         }
 
-        setSize((legion.getImageNames().size()+(showMarker?1:0)) *
-            (effectiveChitSize + padding) -
-                padding + 2 * margin,
-                effectiveChitSize + 2 * margin);
+        setSize((legion.getImageNames().size() + (showMarker ? 1 : 0)
+            + (showLegionValue && allCertain ? 1 : 0))
+            * (effectiveChitSize + padding) - padding + 2 * margin,
+            effectiveChitSize + 2 * margin);
         setMinimumSize(getSize());
         setPreferredSize(getSize());
         setMaximumSize(getSize());
