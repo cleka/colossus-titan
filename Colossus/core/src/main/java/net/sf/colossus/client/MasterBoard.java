@@ -1444,6 +1444,7 @@ public final class MasterBoard extends JPanel
         if (client.getPlayerName().equals(activePlayerName))
         {
             bottomBar.setPhase("Split stacks");
+            doneWithPhaseAction.setEnabled(true);
 
             JMenuItem mi;
 
@@ -1476,7 +1477,6 @@ public final class MasterBoard extends JPanel
         {
             bottomBar.setPhase("(" + activePlayerName + " splits)");
         }
-        doneWithPhaseAction.setEnabled(true);
     }
 
     void setupMoveMenu()
@@ -1494,7 +1494,6 @@ public final class MasterBoard extends JPanel
         if (client.getPlayerName().equals(activePlayerName))
         {
             bottomBar.setPhase("Movement");
-            doneWithPhaseAction.setEnabled(true);
 
             JMenuItem mi;
 
@@ -1535,7 +1534,6 @@ public final class MasterBoard extends JPanel
         {
             bottomBar.setPhase("(" + activePlayerName + " moves)");
         }
-        doneWithPhaseAction.setEnabled(true);
 
         // Force showing the updated movement die.
         repaint();
@@ -1556,7 +1554,6 @@ public final class MasterBoard extends JPanel
         if (client.getPlayerName().equals(activePlayerName))
         {
             bottomBar.setPhase("Resolve Engagements");
-            bottomBar.setEnabled(false);
 
             JMenuItem mi;
 
@@ -1581,7 +1578,6 @@ public final class MasterBoard extends JPanel
         {
             bottomBar.setPhase("(" + activePlayerName + " fights)");
         }
-        doneWithPhaseAction.setEnabled(true);
     }
 
     void setupMusterMenu()
@@ -1599,6 +1595,7 @@ public final class MasterBoard extends JPanel
         if (client.getPlayerName().equals(activePlayerName))
         {
             bottomBar.setPhase("Muster Recruits");
+            doneWithPhaseAction.setEnabled(true);
 
             JMenuItem mi;
 
@@ -1631,7 +1628,6 @@ public final class MasterBoard extends JPanel
         {
             bottomBar.setPhase("(" + activePlayerName + " musters)");
         }
-        doneWithPhaseAction.setEnabled(true);
    }
 
     void highlightPossibleRecruits()
