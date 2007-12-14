@@ -425,7 +425,7 @@ public final class Client implements IClient, IOracle, IOptions
         }
         else if (winnerId.equals("null"))
         {
-            LOGGER.log(Level.FINEST, "winnerId  is string 'null'");
+            LOGGER.log(Level.FINEST, "winnerId is string 'null'");
         }
         else
         {
@@ -1482,7 +1482,8 @@ public final class Client implements IClient, IOracle, IOptions
         }
         else
         {
-            // Log.error("getLegionCreatureCertainties getLegionInfo for " + 
+            // LOGGER.log(Level.SEVERE,
+            //    "getLegionCreatureCertainties getLegionInfo for " + 
             //    markerId + " returned null!");
 
             // TODO: is this the right thing?
@@ -1702,14 +1703,16 @@ public final class Client implements IClient, IOracle, IOptions
         catch (NullPointerException e)
         {
             LOGGER.log(Level.WARNING,
-                "NPE in revealCreatures, markerId="+markerId+
-                ", reason="+reason+ ", names="+names.toString());
-            Thread.dumpStack();
+                "NPE in revealCreatures, markerId=" + markerId +
+                ", reason=" + reason + ", names=" + names.toString());
             // in stresstest uncomment those, to get logs and autosaves
             // copied for troubleshooting...
-            // System.out.println("NPE in revealCreatures, markerId="+
-            //        markerId+", names="+names.toString());
-            // System.exit(1);
+            /*
+            Thread.dumpStack();
+            System.out.println("NPE in revealCreatures, markerId=" +
+            markerId + ", names=" + names.toString());
+            System.exit(1);
+            */
         }
     }
 
@@ -2049,9 +2052,6 @@ public final class Client implements IClient, IOracle, IOptions
     Creature chooseBestPotentialRecruit(String markerId, String hexLabel,
         List recruits)
     {
-        // System.out.println("choosing best recruit for chit to show in " +
-        // "hex " + hexLabel + ", from " + recruits.toString());
-
         LegionInfo legion = getLegionInfo(markerId);
         MasterHex hex = MasterBoard.getHexByLabel(hexLabel);
         // NOTE! Below the simpleAI is an object, not class! 
@@ -3159,7 +3159,6 @@ public final class Client implements IClient, IOracle, IOptions
         if (getOption(Options.autoRecruit) && playerAlive && isMyTurn() &&
             this.phase == Constants.Phase.MUSTER)
         {
-            // System.out.println("client "+playerName+" calling ai.muster");
             ai.muster();
             // Do not automatically say we are done.
             // Allow humans to override.
@@ -3978,8 +3977,9 @@ public final class Client implements IClient, IOracle, IOptions
         else
         {
             LOGGER.log(Level.WARNING,
-                playerName + " reserveRecruit creature "+recruitName+
-                " not fround from hash, should have been created during getReservedCount!");
+                playerName + " reserveRecruit creature " + recruitName +
+                " not fround from hash, should have been created" + 
+                " during getReservedCount!");
             remain = getCreatureCount(recruitName);
         }
 
@@ -3989,14 +3989,6 @@ public final class Client implements IClient, IOracle, IOptions
             ok = true;
         }
 
-        //        System.out.println("reserveRecruit: "+recruitName);
-        /*        
-
-         if (remain == 0)
-         {
-         System.out.println("-- remaining == 0 !!");
-         }
-         */
         recruitReservations.put(recruitName, new Integer(remain));
         return ok;
     }
@@ -4033,8 +4025,6 @@ public final class Client implements IClient, IOracle, IOptions
             remain = realCount;
         }
         recruitReservations.put(recruitName, new Integer(remain));
-
-        //        System.out.println("getReservedCount: "+recruitName+" remaining: "+remain);
 
         return remain;
     }
@@ -5045,8 +5035,8 @@ public final class Client implements IClient, IOracle, IOptions
                 catch (Exception ex)
                 {
                     LOGGER.log(Level.SEVERE,
-                        "Failed to change client " + playerName +
-                        " from " + ai.getClass().getName() + " to " + type, ex);
+                        "Failed to change client " + playerName + " from " +
+                        ai.getClass().getName() + " to " + type, ex);
                 }
             }
         }
