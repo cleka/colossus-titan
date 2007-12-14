@@ -309,4 +309,13 @@
 		</exec>
 	</target>
 
+	<target name="remote-trunk-inst" depends="clean,init,sign" description="copy files into htdocs tree on SF">
+		<exec executable="rsync">
+			<arg line="-a Colossus.jar ${SERVER}:${HTML_DIR}/Colossus-trunk.jar" />
+		</exec>
+		<exec executable="rsync">
+			<arg line="-a Colossus-trunk.jnlp ${SERVER}:${HTML_DIR}" />
+		</exec>
+	</target>
+
 </project>

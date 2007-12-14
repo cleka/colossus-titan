@@ -1,0 +1,24 @@
+<? header ("Content-Type: application/x-java-jnlp-file"); ?>
+<?xml version="1.0" encoding="utf-8"?>
+     <!-- JNLP File for Colossus -->
+     <jnlp
+       codebase="http://colossus.sf.net/"
+       href="Colossus-trunk.jnlp">
+       <application-desc main-class="net.sf.colossus.server.Start"/>
+       <information>
+         <title>Colossus</title>
+         <vendor>Colossus dev team</vendor>
+         <icon href="Colossus.gif"/>
+         <offline-allowed/>
+         <homepage href="index.html"/>
+       </information>
+       <resources>
+         <jar href="Colossus-trunk.jar"/>
+         <jar href="libs/werken.opt.jar"/>
+         <jar href="libs/jdom.jar"/>
+         <j2se version="1.4+" max-heap-size="128M"/>
+       </resources>
+       <security>
+           <all-permissions/>
+       </security>
+     </jnlp>
