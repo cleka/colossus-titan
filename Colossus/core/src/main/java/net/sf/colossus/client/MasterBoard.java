@@ -504,6 +504,7 @@ public final class MasterBoard extends JPanel
                 }
             }
         };
+        doneWithPhaseAction.setEnabled(false); // will be enabled if it is player's turn
 
         takeMulliganAction = new AbstractAction(takeMulligan)
         {
