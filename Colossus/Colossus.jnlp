@@ -7,7 +7,7 @@
        <application-desc main-class="net.sf.colossus.server.Start"/>
        <information>
          <title>Colossus</title>
-         <vendor>David Ripton</vendor>
+         <vendor>Colossus dev team</vendor>
          <icon href="Colossus.gif"/>
          <offline-allowed/>
          <homepage href="index.html"/>
