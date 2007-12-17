@@ -104,7 +104,7 @@ public final class MasterBoard extends JPanel
     /** Last point clicked is needed for popup menus. */
     private Point lastPoint;
 
-    /**The scrollbarspanel, needed to correct lastPoint.*/
+    /** The scrollbarspanel, needed to correct lastPoint. */
     private JScrollPane scrollPane;
 
     private Container contentPane;
@@ -169,7 +169,8 @@ public final class MasterBoard extends JPanel
     private JMenu lfMenu;
     private SaveWindow saveWindow;
 
-    private final class InfoPopupHandler extends KeyAdapter {
+    private final class InfoPopupHandler extends KeyAdapter
+    {
         private static final int POPUP_KEY_ALL_LEGIONS = KeyEvent.VK_SHIFT;
         private static final int POPUP_KEY_MY_LEGIONS = KeyEvent.VK_CONTROL;
         private static final int PANEL_MARGIN = 4;
@@ -198,11 +199,12 @@ public final class MasterBoard extends JPanel
                 {
                     // copy only local players markers
                     List myMarkers = new ArrayList();
-                    for (Iterator iterator = client.getMarkers().iterator(); iterator
-                        .hasNext();)
+                    for (Iterator iterator = client.getMarkers().iterator(); 
+                        iterator.hasNext(); )
                     {
                         Marker marker = (Marker)iterator.next();
-                        LegionInfo legionInfo = client.getLegionInfo(marker.getId());
+                        LegionInfo legionInfo =
+                            client.getLegionInfo(marker.getId());
                         if(legionInfo.isMyLegion()) {
                             myMarkers.add(marker);
                         }
@@ -218,8 +220,10 @@ public final class MasterBoard extends JPanel
 
         private void createLegionFlyouts(List markers)
         {
-            // copy to array so we don't get concurrent modification exceptions when iterating
-            Marker[] markerArray = (Marker[])markers.toArray(new Marker[markers.size()]);
+            // copy to array so we don't get concurrent modification
+            // exceptions when iterating
+            Marker[] markerArray =
+                (Marker[])markers.toArray(new Marker[markers.size()]);
             legionFlyouts = new JPanel[markers.size()];
             for (int i = 0; i < markerArray.length; i++)
             {
@@ -231,7 +235,8 @@ public final class MasterBoard extends JPanel
                     Options.dubiousAsBlanks);
                 final JPanel panel = new LegionInfoPanel(legion,
                     scale, PANEL_MARGIN, PANEL_PADDING, true,
-                    client.getViewMode(), client.getPlayerName(), dubiousAsBlanks, true);
+                    client.getViewMode(), client.getPlayerName(),
+                    dubiousAsBlanks, true);
                 add(panel);
                 legionFlyouts[i] = panel;
 
@@ -504,7 +509,8 @@ public final class MasterBoard extends JPanel
                 }
             }
         };
-        doneWithPhaseAction.setEnabled(false); // will be enabled if it is player's turn
+        // will be enabled if it is player's turn
+        doneWithPhaseAction.setEnabled(false);
 
         takeMulliganAction = new AbstractAction(takeMulligan)
         {
@@ -582,7 +588,8 @@ public final class MasterBoard extends JPanel
                     options[0] = "Yes";
                     options[1] = "No";
                     int answer = JOptionPane.showOptionDialog(masterFrame,
-                        "Are you sure you with to start a new game?",
+                        "Are you sure you want to quit this game and " +
+                        "start a new one?",
                         "New Game?",
                         JOptionPane.YES_NO_OPTION,
                         JOptionPane.QUESTION_MESSAGE, null, options,
@@ -869,7 +876,7 @@ public final class MasterBoard extends JPanel
             cbmi.setEnabled(false);
         }
 
-        // "Show recruit preview chits ..." submenu 
+        // "Show recruit preview chits ..." submenu
         JMenu srcSubmenu = new JMenu(Options.showRecruitChitsSubmenu);
         ButtonGroup group = new ButtonGroup();
         addRadioButton(srcSubmenu, group, Options.showRecruitChitsNone);
@@ -878,7 +885,7 @@ public final class MasterBoard extends JPanel
         addRadioButton(srcSubmenu, group, Options.showRecruitChitsAll);
         graphicsMenu.add(srcSubmenu);
 
-        // Menu for the "window-related" 
+        // Menu for the "window-related"
         // (satellite windows and graphic options effecting whole "windows")
         JMenu windowMenu = new JMenu("Window");
         windowMenu.setMnemonic(KeyEvent.VK_W);
@@ -886,11 +893,11 @@ public final class MasterBoard extends JPanel
 
         addCheckBox(windowMenu, Options.showCaretaker, KeyEvent.VK_C);
         addCheckBox(windowMenu, Options.showStatusScreen, KeyEvent.VK_G);
-        addCheckBox(windowMenu, Options.showEngagementResults,
-            KeyEvent.VK_E);
+        addCheckBox(windowMenu, Options.showEngagementResults, KeyEvent.VK_E);
         addCheckBox(windowMenu, Options.showAutoInspector, KeyEvent.VK_I);
         addCheckBox(windowMenu, Options.showEventViewer, KeyEvent.VK_E);
         addCheckBox(windowMenu, Options.showLogWindow, KeyEvent.VK_L);
+
         // full recruit tree
         mi = windowMenu.add(viewFullRecruitTreeAction);
         mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, 0));
@@ -1046,8 +1053,8 @@ public final class MasterBoard extends JPanel
         return (((i + j) & 1) == boardParity);
     }
 
-    /** reference to the 'h' the cache was built for.
-     * we have to rebuild the cache for a new 'h'
+    /** Reference to the 'h' the cache was built for.
+     *  We have to rebuild the cache for a new 'h'
      */
     private static MasterHex[][] _hexByLabel_last_h = null;
 
@@ -1073,7 +1080,7 @@ public final class MasterBoard extends JPanel
             // write all 'h' elements by their int-value into an Array.
             // we can do that here, because the 'label' arg is an int. if it
             // were a string we could not rely on that all h-entries are ints.
-            //  (Vector: lots of unused space, i am afraid. about 80kB...)
+            // (Vector: lots of unused space, i am afraid. about 80kB...)
             _hexByLabel_cache = new java.util.Vector(1000);
             for (int i = 0; i < h.length; i++)
             {
@@ -1172,7 +1179,8 @@ public final class MasterBoard extends JPanel
                 "null pointer ; i=" + i + ", j=" + j + ", k=" + k);
             System.exit(1);
         }
-        assert dh != null; // Static analysis of Eclipse doesn't grok System.exit()
+        // Static analysis of Eclipse doesn't grok System.exit()
+        assert dh != null;
         if (dh.getXCoord() == i)
         {
             if (dh.getYCoord() == (j - 1))
@@ -1899,7 +1907,7 @@ public final class MasterBoard extends JPanel
                     hex.unselect();
                     hex.repaint();
                 }
-                return false; //keep going
+                return false; // keep going
             }
         }
         );
@@ -1918,7 +1926,7 @@ public final class MasterBoard extends JPanel
                     hex.repaint();
                     return true;
                 }
-                return false; //keep going
+                return false; // keep going
             }
         }
         );
@@ -1936,7 +1944,7 @@ public final class MasterBoard extends JPanel
                     hex.unselect();
                     hex.repaint();
                 }
-                return false; //keep going
+                return false; // keep going
             }
         }
         );
@@ -1954,7 +1962,7 @@ public final class MasterBoard extends JPanel
                     hex.select();
                     hex.repaint();
                 }
-                return false; //keep going
+                return false; // keep going
             }
         }
         );
@@ -1972,7 +1980,7 @@ public final class MasterBoard extends JPanel
                     hex.select();
                     hex.repaint();
                 }
-                return false; //keep going
+                return false; // keep going
             }
         }
         );
@@ -2037,7 +2045,7 @@ public final class MasterBoard extends JPanel
     {
         int modifiers = e.getModifiers();
         return (((modifiers & InputEvent.BUTTON2_MASK) != 0) ||
-            ((modifiers & InputEvent.BUTTON3_MASK) != 0) ||
+            (    (modifiers & InputEvent.BUTTON3_MASK) != 0) ||
             e.isAltDown() || e.isControlDown());
     }
 
@@ -2524,15 +2532,16 @@ public final class MasterBoard extends JPanel
 
             phaseLabel = new JLabel("- phase -");
             add(phaseLabel);
-
         }
     }
 
-    public void enableDoneAction() {
+    public void enableDoneAction()
+    {
         doneWithPhaseAction.setEnabled(true);
     }
 
-    public void disableDoneAction() {
+    public void disableDoneAction()
+    {
         doneWithPhaseAction.setEnabled(false);
     }
 }

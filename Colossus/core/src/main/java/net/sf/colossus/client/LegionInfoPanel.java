@@ -117,16 +117,17 @@ public final class LegionInfoPanel extends JPanel
         add(new JLabel(text));
     }
 
-    private void viewAll(LegionInfo legion, boolean usePlayerColor, int scale,
-        int margin, int padding, boolean dubiousAsBlanks, boolean hideAll, boolean showLegionValue)
+    private void viewAll(LegionInfo legion, boolean usePlayerColor,
+        int scale, int margin, int padding,
+        boolean dubiousAsBlanks, boolean hideAll, boolean showLegionValue)
     {
         setLayout(null);
 
         if (usePlayerColor)
         {
-            Color playerColor = HTMLColor.stringToColor(legion.getPlayerInfo()
-                .getColor()
-                + "Colossus");
+            Color playerColor =
+                HTMLColor.stringToColor(legion.getPlayerInfo().getColor() +
+                "Colossus");
             setBackground(playerColor);
         }
 
@@ -138,11 +139,12 @@ public final class LegionInfoPanel extends JPanel
         boolean showMarker = false;
         if (showMarker)
         {
-            Chit marker = new Chit(scale, legion.getMarkerId(), false, true,
-                false);
+            Chit marker = new Chit(scale, legion.getMarkerId(),
+                false, true, false);
             if (effectiveChitSize == 0)
             {
-                effectiveChitSize = marker.getWidth(); // they should be all the same size
+                // they should be all the same size
+                effectiveChitSize = marker.getWidth();
             }
             add(marker);
             marker.setLocation(i * (effectiveChitSize + padding) + margin,
@@ -229,12 +231,14 @@ public final class LegionInfoPanel extends JPanel
         
         if (showLegionValue && allCertain)
         {
-            JLabel sizeLabel = new JLabel(String.valueOf(legion.getPointValue()));
+            JLabel sizeLabel =
+                new JLabel(String.valueOf(legion.getPointValue()));
             sizeLabel.setForeground(Color.WHITE);
             add(sizeLabel);
             sizeLabel.setLocation(i * (effectiveChitSize + padding) + margin,
                 margin);
-            sizeLabel.setSize(new Dimension(effectiveChitSize, effectiveChitSize));
+            sizeLabel.setSize(new Dimension(effectiveChitSize,
+                effectiveChitSize));
             i++;
         }
 
