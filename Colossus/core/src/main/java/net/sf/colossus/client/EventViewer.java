@@ -33,6 +33,7 @@ import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JToggleButton;
+import javax.swing.SwingUtilities;
 import javax.swing.border.TitledBorder;
 
 import net.sf.colossus.util.KDialog;
@@ -77,16 +78,21 @@ import net.sf.colossus.util.Options;
  * 
  */
 
-final class EventViewer extends KDialog implements WindowListener,
-    ItemListener, ActionListener
+final class EventViewer extends KDialog
+    implements WindowListener, ItemListener, ActionListener
 {
     private static final Logger LOGGER = Logger.getLogger(EventViewer.class.getName());
 
+    private final static String windowTitle = "Event Viewer";
+
     private IOptions options;
+    private SaveWindow saveWindow;
 
     private boolean visible;
 
     private List syncdEventList = Collections.synchronizedList(new ArrayList());
+    private int bookmark = 0;
+    final private ArrayList displayQueue = new ArrayList();
 
     private int turnNr;
     private int playerNr;
@@ -95,16 +101,9 @@ final class EventViewer extends KDialog implements WindowListener,
     private int expireTurns;
     private String maxString;
 
-    private SaveWindow saveWindow;
-
-    private final static String windowTitle = "Event Viewer";
-
     private Container eventPane;
-
     private Box settingsPane;
-
     private JScrollPane eventScrollPane;
-
     private JScrollBar eventScrollBar;
 
     // Event Viewer Filter (evf) settings (= option names):
@@ -139,12 +138,9 @@ final class EventViewer extends KDialog implements WindowListener,
     /** 
      * Inits the dialog, not necessarily displays it.
      * 
-     * @param frame is the parent window
-     * @param options
-     * @viewMode viewMode, related to AutoInspector, currently not used
-     * @expireTurns events older than that are deleted from list
+     * @param frame is the parent window frame (MasterBoard)
+     * @param options IOptions reference to the client 
      */
-
 
     EventViewer(final JFrame frame, final IOptions options)
     {
@@ -276,21 +272,15 @@ final class EventViewer extends KDialog implements WindowListener,
         tabbedPane.addTab("Events", eventTabPane);
         eventTabPane.setAlignmentX(Component.LEFT_ALIGNMENT);
         eventTabPane.setPreferredSize(new Dimension(250, 500));
+        eventTabPane.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         eventPane = new Box(BoxLayout.Y_AXIS);
-        eventTabPane.setAlignmentX(Component.LEFT_ALIGNMENT);
-        //eventPane.setPreferredSize(new Dimension(200, 200));
-
+        eventPane.add(Box.createVerticalGlue());
         eventScrollPane = new JScrollPane(eventPane,
             JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
             JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        eventTabPane.add(eventScrollPane);
-
         eventScrollBar = eventScrollPane.getVerticalScrollBar();
-
-        // eventScrollPane.setPreferredSize(new Dimension(200, 380));
-
-        eventPane.add(Box.createVerticalGlue());
+        eventTabPane.add(eventScrollPane);
 
         // The settings:
         settingsPane = new Box(BoxLayout.Y_AXIS);
@@ -299,7 +289,6 @@ final class EventViewer extends KDialog implements WindowListener,
         JPanel checkboxPane = new JPanel(new GridLayout(0,1));
         checkboxPane.setAlignmentX(Component.LEFT_ALIGNMENT);
         checkboxPane.setBorder(new TitledBorder("Event Filter"));
-        //        checkboxPane.setMinimumSize(new Dimension(200, 100));
         checkboxPane.setPreferredSize(new Dimension(200, 300));
         checkboxPane.setMaximumSize(new Dimension(600, 300));
         settingsPane.add(checkboxPane);
@@ -466,14 +455,72 @@ final class EventViewer extends KDialog implements WindowListener,
         return display;
     }
 
+    private void queueForDisplaying(JPanel eventPanel)
+    {
+        synchronized(displayQueue)
+        {
+            displayQueue.add(eventPanel);
+        }
+    }
+
+    /** Remove all pending events, and queue a null event to signal the
+     *  displayer to remove all from panel first before adding again. */ 
+
+    private void queueSignalRemoveAllForDisplaying()
+    {
+        synchronized(displayQueue)
+        {
+            displayQueue.clear();
+            displayQueue.add(null);
+        }
+    }
+
+    private void displayFromQueue()
+    {
+        synchronized(displayQueue)
+        {
+            if (displayQueue.size() > 0)
+            {
+                Iterator it = displayQueue.iterator();
+                while (it.hasNext())
+                {
+                    JPanel panelForEvent = (JPanel)it.next();
+                    if (panelForEvent == null)
+                    {
+                        eventPane.removeAll();                
+                    }
+                    else
+                    {
+                        eventPane.add(panelForEvent);
+                        eventPane.add(Box.createRigidArea(new Dimension(0,5)));
+                    }
+                }
+                displayQueue.clear();
+                postAddEventActions();
+            }
+            else
+            {
+                // ok, queue was empty, nothing to do
+            }
+        }
+    }
+
+    private void postAddEventActions()
+    {
+        getContentPane().validate();
+        if (autoScroll)
+        {
+            eventScrollBar.setValue(eventScrollBar.getMaximum());
+        }
+        getContentPane().validate();
+    }
+
     private void addEventToEventPane(RevealEvent e)
     {
-        Container pane = eventPane;
         JPanel panelForEvent = e.toPanel();
         if (panelForEvent != null)
         {
-            pane.add(panelForEvent);
-            pane.add(Box.createRigidArea(new Dimension(0,5)));
+            queueForDisplaying(panelForEvent);
         }
         else
         {
@@ -490,6 +537,25 @@ final class EventViewer extends KDialog implements WindowListener,
         }
     }
 
+    private void triggerDisplaying()
+    {
+        if (SwingUtilities.isEventDispatchThread())
+        {
+            displayFromQueue();
+        }
+        else
+        {
+            SwingUtilities.invokeLater(new Runnable()
+            {
+                public void run()
+                {
+                    displayFromQueue();
+                }
+            }
+            );
+        }
+    }
+
     public void addEvent(RevealEvent e)
     {
         addEventToList(e);
@@ -500,13 +566,8 @@ final class EventViewer extends KDialog implements WindowListener,
             if (display)
             {
                 addEventToEventPane(e);
+                triggerDisplaying();
             }
-            getContentPane().validate();
-            if (autoScroll)
-            {
-                eventScrollBar.setValue(eventScrollBar.getMaximum());
-            }
-            getContentPane().validate();
         }
     }
 
@@ -516,14 +577,10 @@ final class EventViewer extends KDialog implements WindowListener,
      *                  => if not set, can start searching from last 
      *                  remembered position.
      */
-    private static int bookmark = 0;
-
     private void updatePanels(boolean forceAll)
     {
-        Container pane = this.eventPane;
-
-        pane.removeAll();
-
+        queueSignalRemoveAllForDisplaying();
+        
         synchronized (syncdEventList)
         {
             // if never expires, we never delete, so bookmark stays ok.
@@ -559,12 +616,7 @@ final class EventViewer extends KDialog implements WindowListener,
             }
         }
 
-        getContentPane().validate();
-        if (autoScroll)
-        {
-            eventScrollBar.setValue(eventScrollBar.getMaximum());
-        }
-        getContentPane().validate();
+        triggerDisplaying();
         this.repaint();
     }
 
@@ -778,6 +830,10 @@ final class EventViewer extends KDialog implements WindowListener,
         synchronized (syncdEventList)
         {
             syncdEventList.clear();
+        }
+        synchronized(displayQueue)
+        {
+            displayQueue.clear();
         }
         this.options = null;
     }
