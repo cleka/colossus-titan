@@ -2714,8 +2714,9 @@ public final class Client implements IClient, IOracle, IOptions
         this.defenderMarkerId = defenderMarkerId;
         this.battleSite = masterHexLabel;
 
-        getLegionInfo(defenderMarkerId).setEntrySide((getLegionInfo(
-            attackerMarkerId).getEntrySide() + 3) % 6);
+        int attackerSide = getLegionInfo(attackerMarkerId).getEntrySide();
+        int defenderSide = (attackerSide + 3) % 6;
+        getLegionInfo(defenderMarkerId).setEntrySide(defenderSide);
 
         if (board != null)
         {
@@ -2725,6 +2726,8 @@ public final class Client implements IClient, IOracle, IOptions
             battleDice = new BattleDice();
             map.setPhase(battlePhase);
             map.setTurn(battleTurnNumber);
+            map.setBattleMarkerLocation(false, "X" + attackerSide);
+            map.setBattleMarkerLocation(true, "X" + defenderSide);
             frame.getContentPane().add(battleDice, BorderLayout.SOUTH);
             frame.pack();
             frame.setVisible(true);
@@ -3529,6 +3532,7 @@ public final class Client implements IClient, IOracle, IOptions
     /** Attempt to have critter tag strike the critter in hexLabel. */
     void strike(int tag, String hexLabel)
     {
+        resetStrikeNumbers();
         server.strike(tag, hexLabel);
     }
 
@@ -3660,6 +3664,47 @@ public final class Client implements IClient, IOracle, IOptions
     Set findStrikes(int tag)
     {
         return strike.findStrikes(tag);
+    }
+    
+    void setStrikeNumbers(int tag, Set targetHexes)
+    {
+        BattleChit chit = getBattleChit(tag);
+        Iterator it = targetHexes.iterator();
+        while (it.hasNext())
+        {
+            String targetHex = (String)it.next();
+            BattleChit target = getBattleChit(targetHex);
+            target.setStrikeNumber(strike.getStrikeNumber(chit, target));
+            Creature striker = 
+                Creature.getCreatureByName(chit.getCreatureName());
+            int dice;
+            if (striker.isTitan())
+            {
+                dice = chit.getTitanPower();
+            }
+            else
+            {
+                dice = striker.getPower();
+            }
+            int baseDice = 0;
+            int strikeDice = strike.getDice(chit, target, baseDice);
+            if (baseDice == dice || !getOption(Options.hideAdjStrikeDiceRangeStrike))
+                {
+                    target.setStrikeDice(strikeDice - dice);
+                }
+        }
+    }
+    
+    /** reset all strike numbers on chits */
+    void resetStrikeNumbers()
+    {
+        Iterator it = battleChits.iterator();
+        while (it.hasNext())
+        {
+            BattleChit chit = (BattleChit)it.next();
+            chit.setStrikeNumber(0);
+            chit.setStrikeDice(0);
+        }
     }
 
     String getPlayerNameByTag(int tag)

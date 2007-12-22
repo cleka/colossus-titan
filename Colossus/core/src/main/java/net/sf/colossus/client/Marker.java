@@ -5,6 +5,9 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.Rectangle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -23,26 +26,43 @@ final class Marker extends Chit
     private Font font;
     private int fontHeight;
     private int fontWidth;
+    String hexLabel;
+    private boolean highlight;
 
     /** Construct a marker without a client.
      Use this constructor as a bit of documentation when
      explicitly not wanting a height drawn on the Marker. */
     Marker(int scale, String id)
     {
-        this(scale, id, null);
+        this(scale, id, null, false);
     }
 
-    /** Construct a marker with a client.
-     By providing a client, a Marker will be adorned
-     with the height of the stack, when that height
-     is non-zero. A null client will prevent the height
-     from being displayed. Sometimes (on the master board,
-     for example) heights should be shown, and sometimes
-     (in the engagement window, for example) they should
-     be omitted. */
+    /** Construct a marker without a client and specified inverted display. */
+    Marker(int scale, String id, boolean inverted)
+    {
+        this(scale, id, null, inverted);
+    }
+
+    /** Construct a marker with a client. By providing a client, a Marker will be
+    * adorned with the height of the stack, when that height is non-zero. A
+    * null client will prevent the height from being displayed. Sometimes (on
+    * the master board, for example) heights should be shown, and sometimes (in
+    * the engagement window, for example) they should be omitted. */
     Marker(int scale, String id, Client client)
     {
-        super(scale, id);
+        this(scale, id, client, false);
+    }
+
+    /**
+     * Construct a marker 
+     * Scale is Scale of chit 
+     * id is the marker label (aka BK05) 
+     * Client != null will add the height of the stack 
+     * inverted == true will invert the marker
+     */
+    Marker(int scale, String id, Client client, boolean inverted)
+    {
+        super(scale, id, inverted);
         setBackground(Color.BLACK);
         this.client = client;
 
@@ -52,11 +72,36 @@ final class Marker extends Chit
         }
     }
 
-    /** Show the height of the legion. */
+    /** this is only used by Battle markers marking entrances. */
+    void setLocation(Point point, String hexLabel)
+    {
+        setLocation(point);
+        this.hexLabel = hexLabel;
+        
+    }
+    
+    /* Highlight borders of Markers on BattleMap */
+    void highlightMarker ()
+    {
+        highlight = true;
+    }
+    void resetMarkerHighlight ()
+    {
+        highlight = false;
+    }
+
+    /** Show the height of the legion if marker.client != NULL. */
     public void paintComponent(Graphics g)
     {
         LOGGER.log(Level.FINEST, "Painting marker");
-        super.paintComponent(g);
+        Graphics2D g2 = (Graphics2D)g;
+        if (highlight)
+        {
+            g2.setColor(Color.RED);
+            Rectangle rect = getBounds();
+            g.fillRect(rect.x - 4, rect.y - 4, rect.width + 8, rect.height + 8);
+        }
+        super.paintComponent(g2);
 
         if (client == null)
         {

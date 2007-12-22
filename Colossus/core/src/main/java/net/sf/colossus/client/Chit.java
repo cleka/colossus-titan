@@ -50,7 +50,7 @@ class Chit extends JPanel
     Color borderColor = Color.black;
 
     /** Flag to paint the chit upside-down. */
-    private boolean inverted = false;
+    protected boolean inverted = false;
 
     // Initialize early to avoid NullPointerException with GTK L&F
     private String id = "";

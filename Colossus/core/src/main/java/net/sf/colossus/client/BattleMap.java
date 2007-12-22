@@ -76,6 +76,8 @@ public final class BattleMap extends HexMap implements MouseListener,
     private AbstractAction concedeBattleAction;
 
     private SaveWindow saveWindow;
+    private Marker attackerMarker;
+    private Marker defenderMarker;
 
     BattleMap(Client client, String masterHexLabel, String attackerMarkerId,
         String defenderMarkerId)
@@ -122,7 +124,10 @@ public final class BattleMap extends HexMap implements MouseListener,
             Color color = PickColor.getBackgroundColor(colorName);
             contentPane.setBorder(BorderFactory.createLineBorder(color));
         }
-
+        attackerMarker = new Marker(3 * Scale.get(), attackerMarkerId, false);
+        defenderMarker = new Marker(3 * Scale.get(), defenderMarkerId, true);
+        attackerMarker.setOpaque(false);
+        defenderMarker.setOpaque(false);
         defaultCursor = battleFrame.getCursor();
 
         // Do not call pack() or setVisible(true) until after
@@ -356,9 +361,32 @@ public final class BattleMap extends HexMap implements MouseListener,
         }
     }
 
-    public void setTurn(int newturn)
+    void setTurn(int newturn)
     {
         infoPanel.turnPanel.advTurn(newturn);
+    }
+
+    void setBattleMarkerLocation(boolean isDefender, String hexLabel)
+    {
+        GUIBattleHex hex = getGUIHexByLabel(hexLabel);
+        Rectangle rect = hex.getBounds();
+        Point point;
+        if ("X1".equals(hexLabel) || "X4".equals(hexLabel))
+        {
+            point = new Point(rect.x, rect.height + rect.y);
+        }
+        else
+        {
+            point = new Point(rect.x + rect.width, rect.y);
+        }
+        if (isDefender)
+        {
+            defenderMarker.setLocation(point, hexLabel);
+        }
+        else
+        {
+            attackerMarker.setLocation(point, hexLabel);
+        }
     }
 
     private void setupIcon()
@@ -462,13 +490,16 @@ public final class BattleMap extends HexMap implements MouseListener,
     {
         Set set = client.findMobileCritterHexes();
         unselectAllHexes();
+        unselectEntranceHexes();
         selectHexesByLabels(set);
+        selectEntranceHexes(set);
     }
 
     private void highlightMoves(int tag)
     {
         Set set = client.showBattleMoves(tag);
         unselectAllHexes();
+        unselectEntranceHexes();
         selectHexesByLabels(set);
     }
 
@@ -487,11 +518,39 @@ public final class BattleMap extends HexMap implements MouseListener,
     {
         Set set = client.findStrikes(tag);
         unselectAllHexes();
+        client.resetStrikeNumbers();
         selectHexesByLabels(set);
+        client.setStrikeNumbers(tag, set);
         // XXX Needed?
         repaint();
     }
 
+    private void selectEntranceHexes(Set labels)
+    {
+        Iterator it = labels.iterator();
+        while (it.hasNext())
+        {
+            String hexLabel = (String)it.next();
+            if (hexLabel.startsWith("X"))
+            {
+                if (hexLabel.equals(defenderMarker.hexLabel))
+                {
+                    defenderMarker.highlightMarker();
+                }
+                if (hexLabel.equals(attackerMarker.hexLabel))
+                {
+                    attackerMarker.highlightMarker();
+                }
+            }
+        }
+    }
+ 
+    private void unselectEntranceHexes()
+    {
+        defenderMarker.resetMarkerHighlight();
+        attackerMarker.resetMarkerHighlight();
+    }
+    
     void setDefaultCursor()
     {
         battleFrame.setCursor(defaultCursor);
@@ -584,6 +643,7 @@ public final class BattleMap extends HexMap implements MouseListener,
         BattleChit chit = getBattleChitAtPoint(point);
         GUIBattleHex hex = getHexContainingPoint(point);
         String hexLabel = "";
+        client.resetStrikeNumbers();
         if (hex != null)
         {
             hexLabel = hex.getHexModel().getLabel();
@@ -648,6 +708,14 @@ public final class BattleMap extends HexMap implements MouseListener,
                 {
                     chit.paintComponent(g);
                 }
+            }
+            if (attackerMarker.getLocation().x > 0) // don't paint till placed
+            {
+                attackerMarker.paintComponent(g);
+            }
+            if (defenderMarker.getLocation().x > 0) // don't paint till placed
+            {
+                defenderMarker.paintComponent(g);
             }
         }
         catch (ConcurrentModificationException ex)

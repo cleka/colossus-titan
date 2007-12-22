@@ -865,6 +865,7 @@ public final class MasterBoard extends JPanel
         addCheckBox(graphicsMenu, Options.noBaseColor, KeyEvent.VK_W);
         addCheckBox(graphicsMenu, Options.useColoredBorders, 0);
         addCheckBox(graphicsMenu, Options.doNotInvertDefender, 0);
+        addCheckBox(graphicsMenu, Options.hideAdjStrikeDiceRangeStrike, 0);
         graphicsMenu.addSeparator();
 
         // The "dubious as blanks" option makes only sense with the 

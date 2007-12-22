@@ -1,0 +1,114 @@
+<!-- $Id: $ -->
+<html>
+  <head>
+    <title>Battle Map Features</title>
+  </head>
+  <body>
+<h1>Colossus - Battle Map Features</h1>
+<H3>Scope</h3>
+This document describes a few of the current features on the battle maps
+for Colossus.  Many of these resulted simply because Colossus is on a Computer.
+<p>
+There are a few options on the Main playing window (called the "MasterBoard")
+that have direct effects on the battle map.
+
+See: <A HREF="ClientOptions.html">Client options</A> page with attention to:
+<UL>
+<li><A HREF="ClientOptions.html#AutoplayMenu">Autoplay menu</A>
+<li><A HREF="ClientOptions.html#GraphicsMenu">Graphics menu</A>
+</UL> 
+<P>
+<h3>Overview</h3>
+The Battle map consists 5 main areas (From Top to Bottom):
+<UL>
+<li><A HREF="#TitleBar">Title</A>
+<li><A HREF="#PhaseMenu">Phase Menu</A>
+<li><A HREF="#InfoBar">Info Bar</A>
+<li><A HREF="#BattleArea">Battle Area</A>
+<li><A HREF="#DiceTray">Dice Tray</A>
+</UL> <P>
+The different areas are described in detail in the sections below.
+<P>
+<HR>
+<H2><A NAME="#TitleBar">Title</A></H2>
+The title shows 6 bits of Information:
+<ol>
+<li> Which player "owns" the Battle map. If more than one Human is playing 
+hotseat style at this computer, this is one easy way to differentiate which 
+board belongs to whom.
+<li> The name of the Legion doing the attacking
+<li> The CodeName for that Legion (used in saved game files and logs)
+<li> The name of the Legion defending
+<li> The CodeName for that Legion (used in saved game files and logs)
+<li> The number of the hex on the MasterBoard.
+</ol> 
+<P>
+<HR>
+<H2><A NAME="#PhaseMenu">Phase Menu</A></H2>
+If it is your turn you can:
+<ul>
+<li> Undo your last action this Phase
+<li> Undo all actions you've taken this Phase
+<li> Be "Done" with the current Phase and attempt to advance to the next Phase.
+<li> Concede (Surrender) the current Battle and return to the main board.
+</ul>
+<P>
+<HR>
+<H2><A NAME="#InfoBar">Info Bar</A></H2>
+On the Left end is a "Done" button.  It is identical to the Done action 
+on the Menu. 
+<p>
+On the Right end is the current Phase.  If it is not your turn/phase you'll see 
+the name of the current player listed in parenthesis before the current Phase.
+<P>
+In Colossus there are 5 Phases to a Battle on each turn for each player:
+<ul>
+<li>Summon - Summon a summonable Lord or Angel via the Masterboard.
+<li>Recruit (Reinforce) - In standard Titan and current variants the Defender 
+is allowed to recruit a reinforcement before moving on turn 4.
+<li>Move (Maneuver) - Move your creatures on the Battle map.
+<li>Strike - the current Player can attack the enemy - Strike adjacent 
+enemy creatures and execute rangestrikes.  
+<li>StrikeBack - the non-current player can have creatures adjacent to the 
+current players execute a counter attack or reposte. 
+<p>
+In the middle is a chart showing the Current turn. On the current players 
+battle map the current turn will have a Red border. On the other players screen
+it will be grey.  Turn(s) where the Defender can recruit will have a "+" symbol. 
+If the battle advances to the "Loss" turn, the attacker is automatically 
+eliminated by "Time Loss".     
+<P>
+<HR>
+<H2><A NAME="#BattleArea">Battle Area</A></H2>
+In the Upper Right corner is listed the type of land.
+<br>
+In the center is the BattleLand.
+<br>
+The attacker will indicate which long side his Creatures will enter according to 
+the rules. The marker for that legion (stack) will be displayed near that side.
+The opposite short side will be the marker for the defenders legion. His 
+creatures will now enter the battle on this side of the board. (Exception: 
+In some battlelands the defender will start in a special position. For 
+example the defenders will instead start on the Tower in the Tower battleland.) 
+The attacker will enter the side near his marker. The markers will be 
+highlighted with a red border when there are creatures ready to be 
+moved onto the battleland.  Damage taken by creatures will be displayed in 
+red text. Dying creatures will be crossed by a red X.  When striking, the 
+roll required to make a successful hit on an enemy creature is displayed 
+by a small red die.  Adjustments to the number of dice rolled is shown by 
+green text on a split red and blue Die.
+<P>
+<HR>
+<H2><A NAME="#DiceTray">Dice Tray</A></H2>
+The last set of dice rolled along with the threshold for a successful hit are 
+displayed in the tray at the bottom of the Map.  Successful hits are depicted
+in red dice, misses are in blue.
+<HR>
+<P>
+<I>
+Created December 2007, reflecting the state of Colossus at this time.
+<BR>
+Last updated Tuesday, December 19, 2007 19:53 by Dranathi
+</I>
+</body>
+</html>

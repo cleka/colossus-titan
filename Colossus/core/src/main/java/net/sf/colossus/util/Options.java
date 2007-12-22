@@ -108,6 +108,8 @@ public final class Options implements IOptions
         "Use colored borders on Battle Chits";
     public static final String doNotInvertDefender =
         "Do not invert defender's Battle Chits";
+    public static final String hideAdjStrikeDiceRangeStrike = 
+        "Hide Adjustments to Dice for Rangestrike";
     public static final String showAllRecruitChits = "Show all recruit Chits";
     public static final String showRecruitChitsSubmenu = "Show recruit preview chits...";
     public static final String showRecruitChitsNone = "None";

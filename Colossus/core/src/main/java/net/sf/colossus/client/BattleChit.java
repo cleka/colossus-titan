@@ -37,6 +37,10 @@ final class BattleChit extends Chit
     private static BasicStroke borderStroke;
     private Rectangle midRect;
     private Rectangle outerRect;
+    private int strikeNumber; // Number required for successful strike.
+    private int numDice; // modifier for number of Dice rolled.
+    private StrikeDie strikeDie; // Graphical representation of strikeNumber.
+    private StrikeDie strikeAdjDie; // representation of dice gained or lost.
     private int scale;
 
     // inner scale divided by border thickness
@@ -193,41 +197,64 @@ final class BattleChit extends Chit
 
         Graphics2D g2 = (Graphics2D)g;
 
-        if (hits > 0 && !isDead())
+        if (!isDead())
         {
+            // The power and skill are drawn with a font that is one fifth the
+            // size of the Chit.
+            // Construct a font that is two fifths the size of the chit
+            // for drawing Hits and strike die adjustments.
+            // All overlays (hits, dice) have gaps of 2.
+            oldFont = g2.getFont();
+            String name = oldFont.getName();
+            int fifthChitSize = (rect.height > rect.width 
+                ? (rect.width - 8) / 5
+                : (rect.height - 8) / 5);
+            int style = oldFont.getStyle();
+            font = new Font(name, style, fifthChitSize * 2);
+            g2.setFont(font);
+            FontMetrics fontMetrics = g2.getFontMetrics();
+            fontHeight = fontMetrics.getAscent();
+            
             String hitString = Integer.toString(hits);
-            FontMetrics fontMetrics;
+            int hitsFontWidth = fontMetrics.stringWidth(hitString);
 
-            // Construct a font twice the size of the current font.
-            if (font == null)
+         // Setup spaces to show Hits and Strike Target.
+            Rectangle hitRect = new Rectangle();
+            if (strikeNumber > 0)
             {
-                oldFont = g2.getFont();
-                String name = oldFont.getName();
-                int size = oldFont.getSize();
-                int style = oldFont.getStyle();
-                font = new Font(name, style, 2 * size);
-                g2.setFont(font);
-                fontMetrics = g2.getFontMetrics();
-                fontHeight = 4 * fontMetrics.getAscent() / 5;
+                Rectangle strikeRect = strikeDie.getBounds();
+                Point point = new Point(rect.x + rect.width - strikeRect.width
+                    - 2, (inverted ? rect.y + fifthChitSize + 4 : rect.y + 2));
+                strikeDie.setLocation(point);
+                strikeDie.paintComponent(g2);
+                if (numDice != 0)
+                {
+                    String diceString = numDice < 0 ? Integer
+                        .toString(numDice) : "+" + Integer.toString(numDice);
+                    Point dicePoint = new Point(point.x, point.y
+                        + (fifthChitSize * 2) + 2);
+                    strikeAdjDie.setLocation(dicePoint);
+                    strikeAdjDie.paintComponent(g2);
+                    g2.setColor(Color.GREEN);
+                    g2.drawString(diceString, dicePoint.x, dicePoint.y
+                        + strikeRect.height - 2);
+                }          
             }
-            else
+            if (hits > 0)
             {
-                g2.setFont(font);
-                fontMetrics = g2.getFontMetrics();
+                hitRect = new Rectangle(rect.x + 2, rect.y + 2
+                    + (inverted ? fifthChitSize + 2 : 0), hitsFontWidth,
+                    fontHeight);
+
+                // Provide a high-contrast background for the number.
+                g2.setColor(Color.white);
+                g2.fillRect(hitRect.x, hitRect.y, hitRect.width,
+                    hitRect.height);
+                
+                // Show number of hits taken in red.
+                g2.setColor(Color.red);
+                g2.drawString(hitString, hitRect.x, hitRect.y + fontHeight);
             }
-            int fontWidth = fontMetrics.stringWidth(hitString);
-
-            // Provide a high-contrast background for the number.
-            g2.setColor(Color.white);
-            g2.fillRect(rect.x + (rect.width - fontWidth) / 2,
-                rect.y + (rect.height - fontHeight) / 2,
-                fontWidth, fontHeight);
-
-            // Show number of hits taken in red.
-            g2.setColor(Color.red);
-            g2.drawString(hitString, rect.x + (rect.width - fontWidth) / 2,
-                rect.y + (rect.height + fontHeight) / 2);
-
             // Restore the font.
             g2.setFont(oldFont);
 
@@ -295,4 +322,33 @@ final class BattleChit extends Chit
     {
         useColoredBorders = bval;
     }
+
+    public int getStrikeNumber()
+    {
+        return strikeNumber;
+    }
+
+    public void setStrikeNumber(int strikeNumber)
+    {
+        this.strikeNumber = strikeNumber;
+        if (strikeNumber > 0)
+        {
+            int fifthChitSize = (rect.height > rect.width ? (rect.width - 8) / 5
+                : (rect.height - 8) / 5);
+            strikeDie = new StrikeDie(fifthChitSize * 2, strikeNumber, "Hit");
+            strikeAdjDie = new StrikeDie(fifthChitSize * 2, strikeNumber, 
+                "RedBlue");
+        }
+        else
+        {
+            strikeDie = null;
+            strikeAdjDie = null;
+        }
+    }
+
+    public void setStrikeDice(int numDice)
+    {
+        this.numDice = numDice;
+    }
+
 }
