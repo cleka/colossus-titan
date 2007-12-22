@@ -15,18 +15,49 @@ one-line-info on the main pages "News" section.
 <H3>xxx xx 2007, build r27xx</H3>
 Changes so far (just most recent first, i.e. NOT sorted by importance... ;-)
 <UL>
+<LI>We have now the <A HREF="http://colossus.wiki.sourceforge.net/">Wiki 
+    pages</A> in use. Mostly for developers, but there there are also web 
+    start file(s) for more experimental builds - i.e. already some while 
+    before the public build is done.<BR>
+    For details check out the 
+      <A HREF="http://colossus.wiki.sourceforge.net/ExperimentalBuilds">
+    ExperimentalBuilds</A> wiki page.
+<LI>Improvements to Battle Map:
+<UL>
+<LI>Shows the die roll needed to hit.
+<LI>Shows adjustments (get more/less dice due to hazard or rangestrike)
+<LI>Legion markers show near the legions entry side
+<LI>Done button, turn+phase+activePlayer indicator
+<LI>An own page in the docs folder describes the features of the Battle Map:
+    <A HREF="BattleFeatures.html">Description for the features of the BattleMap window</A>.
+    You can also find this page from the documentation index ("The full docs are here.")
+    on Colossus main page.
+     
+</UL>
+<LI>Changes in EventViewer which should eliminate some (harmless?) exception
+    in AWT Event Queue.
+<LI>Vendor tag in Java Web Start file now "Colossus development team"
+    instead of David Ripton.
+<LI>Action key and menu item for "Done" now in sync with "Done" button.
+<LI>Default setting for legion visibility now "Ever revealed ..." instead
+    of "Only own".
+<LI>Legion info popups: holding shift key, ever each legion will appear a
+    small legion flyout showing it's contents, and if known the legion value.
+    Holding control key, they are shown only for own legions.
 <LI>Improvements to "View Battle Map": land name now top-right, so the normal
     "Land name corresponds to land number on MasterBoard" rule applies now.
     Additionally it shows the neighbor lands (both in the title, 
     and in the map are inactive buttons telling e.g. "Left: Woods 39").
-<LI>Some internal cleanup and corrections.
+<LI>A LOT of internal cleanup and corrections.
 <LI>Slightly improved handling of Save Game if directory "saves/" does
     not exist yet or can't even be created.
 <LI>List of hosts in Network Client now not user dependent any more,
     eliminated one possible NullPointerException (game would hang), and in 
     the alphabetically sorted list the Most Recently Used one is preselected.
 <LI>Some cleanup and fixing for AutoInspector and EventViewer regarding
-    initial size, position, and showing/disposing code cleanup.
+    initial size, position, and showing/disposing code cleanup;
+    size+location were forgotten/reset to default if EventViewer 
+    was left disabled for one full game; now fixed.
 <LI>Inspector and show-legion (right-click) window show legion value 
     (and owner, if not own legion) in title; concede and flee dialog also
     show legion values (=> feature requests [1818878] and [ 503862 ]).
@@ -38,10 +69,6 @@ Changes so far (just most recent first, i.e. NOT sorted by importance... ;-)
     empty). I.e. it behaves like all other satellite windows.
 <LI>Game Setup window is now a JFrame (instead of being a JDialog as it 
     was before) which means, it can be minimized, and has own taskbar icon.
-<LI>In BattleMap now added: Done button, turn+phase+activePlayer indicator,
-    and for the beginning player possible movement target hexes are 
-    highlighted as if he would have clicked onto the topmost offboard 
-    creature.
 <LI>EngagementResult and EventViewer windows now handle time-losses
     properly (before, they just told "won in 8 turns" and "destroyed").
 <LI>Updated in documents that recommended Java version is now 1.4.2.
