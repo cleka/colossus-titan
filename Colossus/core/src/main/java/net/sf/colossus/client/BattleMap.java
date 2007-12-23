@@ -144,12 +144,6 @@ public final class BattleMap extends HexMap implements MouseListener,
             " (" + defenderMarkerId + ") in " + masterHexLabel);
     }
 
-    // Simple constructor for testing. 
-    BattleMap(String masterHexLabel)
-    {
-        super(masterHexLabel);
-    }
-
     private void setupActions()
     {
         undoLastAction = new AbstractAction(undoLast)
