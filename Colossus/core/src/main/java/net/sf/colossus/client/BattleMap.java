@@ -128,6 +128,10 @@ public final class BattleMap extends HexMap implements MouseListener,
         defenderMarker = new Marker(3 * Scale.get(), defenderMarkerId, true);
         attackerMarker.setOpaque(false);
         defenderMarker.setOpaque(false);
+        attackerMarker.setToolTipText("Attacking Legion");
+        defenderMarker.setToolTipText("Defending Legion");
+        this.add(attackerMarker);
+        this.add(defenderMarker);
         defaultCursor = battleFrame.getCursor();
 
         // Do not call pack() or setVisible(true) until after
@@ -463,6 +467,7 @@ public final class BattleMap extends HexMap implements MouseListener,
         point.x -= offset;
         point.y -= offset;
 
+        this.add(chit);
         chit.setLocation(point);
 
         for (int i = 1; i < numChits; i++)

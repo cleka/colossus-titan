@@ -18,6 +18,11 @@ import net.sf.colossus.util.HTMLColor;
 /**
  * Class BattleChit implements the GUI for a Titan chit representing
  * a creature on a BattleMap.
+ * 
+ * TODO this is a pretty wild mixture of GUI code with game logic -- there
+ * is no representation of the creature in battle in the model, so this GUI
+ * class does all that work, too.
+ * 
  * @version $Id$
  * @author David Ripton
  */
@@ -336,6 +341,8 @@ final class BattleChit extends Chit
             int fifthChitSize = (rect.height > rect.width ? (rect.width - 8) / 5
                 : (rect.height - 8) / 5);
             strikeDie = new StrikeDie(fifthChitSize * 2, strikeNumber, "Hit");
+            strikeDie.setToolTipText("Test");
+            this.add(strikeDie);
             strikeAdjDie = new StrikeDie(fifthChitSize * 2, strikeNumber, 
                 "RedBlue");
         }

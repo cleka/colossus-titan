@@ -77,7 +77,9 @@ class Chit extends JPanel
         boolean dubiousAsBlank)
     {
         super();
-
+        
+        setLayout(null); // we want to place things ourselves
+        
         this.id = id;
         this.inverted = inverted;
         Point point = getLocation();

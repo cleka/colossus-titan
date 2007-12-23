@@ -46,6 +46,12 @@ import net.sf.colossus.xmlparser.TerrainRecruitLoader;
  *  Lives on the client side and handles all communication
  *  with the server.  It talks to the client classes locally, and to
  *  Server via the network protocol.  There is one client per player.
+ *  
+ *  TODO the logic for the battles could probably be separated from the
+ *  rest of this code. At the moment the battle logic seems to bounce
+ *  back and forth between BattleMap (which is really a GUI class) and
+ *  this class.
+ *  
  *  @version $Id$
  *  @author David Ripton
  *  @author Romain Dolbeau

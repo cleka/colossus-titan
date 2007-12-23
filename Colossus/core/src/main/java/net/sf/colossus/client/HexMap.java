@@ -81,6 +81,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
         this.terrain = getMasterHex().getTerrain();
 
         setOpaque(true);
+        setLayout(null); // we want to manage things ourselves
         setBackground(Color.white);
         setupHexes();
     }
@@ -645,9 +646,9 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
         return set;
     }
 
-    public static java.util.List getTowerStartList(String terrain)
+    public static List getTowerStartList(String terrain)
     {
-        return (java.util.List)startlistMap.get(terrain);
+        return (List)startlistMap.get(terrain);
     }
 
     public void mousePressed(MouseEvent e)
@@ -712,6 +713,9 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
 
     public void paintComponent(Graphics g)
     {
+        // TODO the hexes should be on a separate background component
+        // that is below the other components, then we wouldn't need
+        // complicated drawing code doing it all ourselves
         try
         {
             super.paintComponent(g);
@@ -741,6 +745,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                 RenderingHints.VALUE_ANTIALIAS_ON);
 
+            // TODO this should probably be a standard JLabel placed properly
             Font oldFont = g.getFont();
             FontMetrics fm;
             String dn = getMasterHex().getTerrainDisplayName();
