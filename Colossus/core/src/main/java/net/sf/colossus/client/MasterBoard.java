@@ -482,31 +482,8 @@ public final class MasterBoard extends JPanel
         {
             public void actionPerformed(ActionEvent e)
             {
-                Constants.Phase phase = client.getPhase();
-                if (phase == Constants.Phase.SPLIT)
-                {
-                    doneWithPhaseAction.setEnabled(false);
-                    client.doneWithSplits();
-                }
-                else if (phase == Constants.Phase.MOVE)
-                {
-                    doneWithPhaseAction.setEnabled(false);
-                    client.doneWithMoves();
-                }
-                else if (phase == Constants.Phase.FIGHT)
-                {
-                    doneWithPhaseAction.setEnabled(false);
-                    client.doneWithEngagements();
-                }
-                else if (phase == Constants.Phase.MUSTER)
-                {
-                    doneWithPhaseAction.setEnabled(false);
-                    client.doneWithRecruits();
-                }
-                else
-                {
-                    LOGGER.log(Level.SEVERE, "Bogus phase");
-                }
+                client.doneWithPhase();
+                doneWithPhaseAction.setEnabled(false);
             }
         };
         // will be enabled if it is player's turn

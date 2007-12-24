@@ -4652,6 +4652,41 @@ public final class Client implements IClient, IOracle, IOptions
         }
     }
 
+    /**
+     * Finishes the current phase.
+     * 
+     * Depending on the current phase this method dispatches to
+     * the different done methods.
+     * 
+     * @see Client#doneWithSplits()
+     * @see Client#doneWithMoves()
+     * @see Client#doneWithEngagements()()
+     * @see Client#doneWithRecruits()()
+     */
+    void doneWithPhase()
+    {
+        if (phase == Constants.Phase.SPLIT)
+        {
+            doneWithSplits();
+        }
+        else if (phase == Constants.Phase.MOVE)
+        {
+            doneWithMoves();
+        }
+        else if (phase == Constants.Phase.FIGHT)
+        {
+            doneWithEngagements();
+        }
+        else if (phase == Constants.Phase.MUSTER)
+        {
+            doneWithRecruits();
+        }
+        else 
+        {
+            throw new IllegalStateException("Client has unknown phase value");
+        }
+    }
+    
     void doneWithSplits()
     {
         if (!isMyTurn())
