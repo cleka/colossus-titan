@@ -484,8 +484,10 @@ public final class MasterBoard extends JPanel
         {
             public void actionPerformed(ActionEvent e)
             {
-                client.doneWithPhase();
+                // first set disabled...
                 doneWithPhaseAction.setEnabled(false);
+                // because response from server might set it to enabled again
+                client.doneWithPhase();
             }
         };
         // will be enabled if it is player's turn
