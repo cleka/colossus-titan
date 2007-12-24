@@ -121,6 +121,7 @@ public final class MasterBoard extends JPanel
     public static final String undoLast = "Undo";
     public static final String undoAll = "Undo All";
     public static final String doneWithPhase = "Done";
+    public static final String forcedDoneWithPhase = "Forced Done";
 
     public static final String takeMulligan = "Take Mulligan";
     public static final String concedeBattle = "Concede battle";
@@ -148,6 +149,7 @@ public final class MasterBoard extends JPanel
     private AbstractAction undoLastAction;
     private AbstractAction undoAllAction;
     private AbstractAction doneWithPhaseAction;
+    private AbstractAction forcedDoneWithPhaseAction;
 
     private AbstractAction takeMulliganAction;
     private AbstractAction withdrawFromGameAction;
@@ -492,6 +494,16 @@ public final class MasterBoard extends JPanel
         };
         // will be enabled if it is player's turn
         doneWithPhaseAction.setEnabled(false);
+
+        forcedDoneWithPhaseAction = new AbstractAction(forcedDoneWithPhase)
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                client.doneWithPhase();
+            }
+        };
+        // make this always be available
+        forcedDoneWithPhaseAction.setEnabled(true);
 
         takeMulliganAction = new AbstractAction(takeMulligan)
         {
@@ -1457,6 +1469,10 @@ public final class MasterBoard extends JPanel
             mi.setMnemonic(KeyEvent.VK_D);
             mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, 0));
 
+            mi = phaseMenu.add(forcedDoneWithPhaseAction);
+            mi.setMnemonic(KeyEvent.VK_F);
+            // mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, 0));
+
             phaseMenu.addSeparator();
 
             mi = phaseMenu.add(withdrawFromGameAction);
@@ -1505,6 +1521,10 @@ public final class MasterBoard extends JPanel
             mi = phaseMenu.add(doneWithPhaseAction);
             mi.setMnemonic(KeyEvent.VK_D);
             mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, 0));
+
+            mi = phaseMenu.add(forcedDoneWithPhaseAction);
+            mi.setMnemonic(KeyEvent.VK_F);
+            // mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, 0));
 
             if (client.getMulligansLeft() > 0)
             {
@@ -1560,6 +1580,10 @@ public final class MasterBoard extends JPanel
             mi.setMnemonic(KeyEvent.VK_D);
             mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, 0));
 
+            mi = phaseMenu.add(forcedDoneWithPhaseAction);
+            mi.setMnemonic(KeyEvent.VK_F);
+            // mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, 0));
+
             phaseMenu.addSeparator();
 
             mi = phaseMenu.add(withdrawFromGameAction);
@@ -1609,6 +1633,10 @@ public final class MasterBoard extends JPanel
             mi = phaseMenu.add(doneWithPhaseAction);
             mi.setMnemonic(KeyEvent.VK_D);
             mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, 0));
+
+            mi = phaseMenu.add(forcedDoneWithPhaseAction);
+            mi.setMnemonic(KeyEvent.VK_F);
+            // mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, 0));
 
             phaseMenu.addSeparator();
 
