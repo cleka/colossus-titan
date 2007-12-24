@@ -13,13 +13,23 @@ import java.awt.event.*;
 
 public final class Constants
 {
-    // Constants for phases of a turn.
+    /**
+     * A typesafe enumeration for the different phases of the main game.
+     */
     public static class Phase {
         public static final Phase SPLIT = new Phase("Split", 1);
         public static final Phase MOVE = new Phase("Move", 2);
         public static final Phase FIGHT = new Phase("Fight", 3);
         public static final Phase MUSTER = new Phase("Muster", 4);
 
+        /**
+         * Deserialize enum from integer value.
+         * 
+         * @param i The number for the phase.
+         * @return The matching Phase instance.
+         * 
+         * @throws IllegalArgumentException iff the number is not valid.
+         */
         public static Phase fromInt(int i)
         {
             switch (i)
@@ -37,15 +47,25 @@ public final class Constants
                     return MUSTER;
 
                 default:
-                    return null;
+                    throw new IllegalArgumentException("Invalid number for phase");
             }
         }
 
+        /**
+         * Serialize the object to an integer code.
+         * 
+         * Used for savegames.
+         * 
+         * @return An integer code representing the phase.
+         */
         public int toInt()
         {
             return value;
         }
 
+        /**
+         * Returns a non-localized UI string for the phase.
+         */
         public String toString()
         {
             return name;
@@ -63,7 +83,9 @@ public final class Constants
     }
 
 
-    // Phases of a battle turn
+    /**
+     * A typesafe enumeration of the phases of a battle.
+     */
     public static class BattlePhase {
         public static final BattlePhase SUMMON
             = new BattlePhase("Summon", 0);
@@ -76,6 +98,14 @@ public final class Constants
         public static final BattlePhase STRIKEBACK
             = new BattlePhase("Strikeback", 4);
 
+        /**
+         * Deserialize enum from integer value.
+         * 
+         * @param i The number for the phase.
+         * @return The matching Phase instance.
+         * 
+         * @throws IllegalArgumentException iff the number is not valid.
+         */
         public static BattlePhase fromInt(int i)
         {
             switch (i)
@@ -96,20 +126,35 @@ public final class Constants
                     return STRIKEBACK;
 
                 default:
-                    return null;
+                    throw new IllegalArgumentException("Invalid number for battle phase");
             }
         }
 
+        /**
+         * Serialize the object to an integer code.
+         * 
+         * Used for savegames.
+         * 
+         * @return An integer code representing the phase.
+         */
         public int toInt()
         {
             return value;
         }
 
+        /**
+         * Determine if the phase is part of the fighting.
+         * 
+         * @return true iff the phase is either FIGHT or STRIKEBACK.
+         */
         public boolean isFightPhase()
         {
             return value == 3 || value == 4;
         }
 
+        /**
+         * Returns a non-localized UI string for the phase.
+         */
         public String toString()
         {
             return name;
