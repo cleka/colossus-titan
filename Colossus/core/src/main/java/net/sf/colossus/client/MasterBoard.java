@@ -22,6 +22,8 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
@@ -1431,7 +1433,7 @@ public final class MasterBoard extends JPanel
         if (client.getPlayerName().equals(activePlayerName))
         {
             bottomBar.setPhase("Split stacks");
-            doneWithPhaseAction.setEnabled(true);
+            enableDoneAction();
 
             JMenuItem mi;
 
@@ -1516,6 +1518,8 @@ public final class MasterBoard extends JPanel
             mi.setMnemonic(KeyEvent.VK_W);
 
             highlightUnmovedLegions();
+            
+            disableDoneAction("At least one legion must move");
         }
         else
         {
@@ -1582,7 +1586,7 @@ public final class MasterBoard extends JPanel
         if (client.getPlayerName().equals(activePlayerName))
         {
             bottomBar.setPhase("Muster Recruits");
-            doneWithPhaseAction.setEnabled(true);
+            enableDoneAction();
 
             JMenuItem mi;
 
@@ -2478,38 +2482,57 @@ public final class MasterBoard extends JPanel
 
         /** display the current phase in the bottom bar */
         private JLabel phaseLabel;
+        
+        /**
+         * Displays reasons why "Done" can not be used.
+         */
+        private JLabel todoLabel;
 
-        void setPlayerName(String s)
+        public void setPlayerName(String s)
         {
             playerLabel.setText(s);
         }
 
-        void setPlayerColor(Color color)
+        public void setPlayerColor(Color color)
         {
             playerLabel.setForeground(color);
         }
 
-        void setPhase(String s)
+        public void setPhase(String s)
         {
             phaseLabel.setText(s);
         }
-
-        BottomBar()
+        
+        public void setReasonForDisabledDone(String reason)
+        {
+            todoLabel.setText("(" + reason  + ")");
+        }
+        
+        public BottomBar()
         {
             super();
 
             setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
-            // add elements to bottom bar
             playerLabel = new JLabel("- player -");
             add(playerLabel);
 
-            // useful buttons
             doneButton = new JButton(doneWithPhaseAction);
+            doneWithPhaseAction.addPropertyChangeListener(new PropertyChangeListener(){
+                public void propertyChange(PropertyChangeEvent evt)
+                {
+                    if(evt.getPropertyName().equals("enabled") && 
+                        evt.getNewValue().equals(Boolean.TRUE) ) {
+                        todoLabel.setText("");
+                    }
+                }});
             add(doneButton);
 
             phaseLabel = new JLabel("- phase -");
             add(phaseLabel);
+
+            todoLabel = new JLabel();
+            add(todoLabel);
         }
     }
 
@@ -2518,8 +2541,9 @@ public final class MasterBoard extends JPanel
         doneWithPhaseAction.setEnabled(true);
     }
 
-    public void disableDoneAction()
+    public void disableDoneAction(String reason)
     {
         doneWithPhaseAction.setEnabled(false);
+        bottomBar.setReasonForDisabledDone(reason);
     }
 }

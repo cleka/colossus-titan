@@ -3063,7 +3063,7 @@ public final class Client implements IClient, IOracle, IOptions
             {
                 if ( turnNumber == 1 )
                 {
-                    board.disableDoneAction();
+                    board.disableDoneAction("Split legions in first round");
                 }
                 focusBoard();
                 defaultCursor();
@@ -3983,9 +3983,13 @@ public final class Client implements IClient, IOracle, IOptions
             board.alignLegions(formerHexLabel);
             board.alignLegions(currentHexLabel);
             board.highlightUnmovedLegions();
-            if ( isUndoStackEmpty() || splitLegionHasForcedMove )
+            if ( isUndoStackEmpty() )
             {
-                board.disableDoneAction();
+                board.disableDoneAction("At least one legion must move");
+            }
+            if ( splitLegionHasForcedMove )
+            {
+                board.disableDoneAction("Split legion needs to move");
             }
 
             if (didTeleport && eventViewer != null)
@@ -4560,7 +4564,7 @@ public final class Client implements IClient, IOracle, IOptions
             // must split in first turn - Done not allowed now
             if ( board != null )
             {
-                board.disableDoneAction();
+                board.disableDoneAction("Split required in first round");
             }
         }
         LOGGER.log(Level.FINEST, "called server.undoSplit");
