@@ -442,12 +442,46 @@ public final class BattleBoard extends KFrame
 
     public void alignChits(String hexLabel)
     {
-        battleMap.alignChits(hexLabel);
+        GUIBattleHex hex = battleMap.getGUIHexByLabel(hexLabel);
+        List chits = client.getBattleChits(hexLabel);
+        int numChits = chits.size();
+        if (numChits < 1)
+        {
+            hex.repaint();
+            return;
+        }
+        BattleChit chit = (BattleChit)chits.get(0);
+        int chitscale = chit.getBounds().width;
+        int chitscale4 = chitscale / 4;
+
+        Point point = new Point(hex.findCenter());
+
+        // Cascade chits diagonally.
+        int offset = ((chitscale * (1 + numChits))) / 4;
+        point.x -= offset;
+        point.y -= offset;
+
+        battleMap.add(chit);
+        chit.setLocation(point);
+
+        for (int i = 1; i < numChits; i++)
+        {
+            point.x += chitscale4;
+            point.y += chitscale4;
+            chit = (BattleChit)chits.get(i);
+            chit.setLocation(point);
+        }
+        hex.repaint();
     }
 
     public void alignChits(Set hexLabels)
     {
-        battleMap.alignChits(hexLabels);
+        Iterator it = hexLabels.iterator();
+        while (it.hasNext())
+        {
+            String hexLabel = (String)it.next();
+            alignChits(hexLabel);
+        }
     }
 
     /** Select all hexes containing critters eligible to move. */
