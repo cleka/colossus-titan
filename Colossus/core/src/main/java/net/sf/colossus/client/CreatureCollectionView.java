@@ -7,7 +7,6 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
-import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
@@ -46,8 +45,6 @@ class CreatureCollectionView extends KDialog
         .getLogger(CreatureCollectionView.class.getName());
 
     private Client client;
-    private Point location;
-    private Dimension size;
     private static final int fixedChitSize = 60;
 
     /** hash by creature name to the label that displays the bottom counts */
@@ -317,10 +314,6 @@ class CreatureCollectionView extends KDialog
         chitMap = null;
 
         super.dispose();
-        location = getLocation();
-        size = getSize();
-        saveWindow.saveLocation(location);
-        saveWindow.saveSize(size);
     }
 
     public void windowClosing(WindowEvent e)
