@@ -1,7 +1,6 @@
 package net.sf.colossus.client;
 
 
-import java.awt.BorderLayout;
 import java.awt.Cursor;
 import java.awt.GraphicsDevice;
 import java.awt.Point;
@@ -86,26 +85,25 @@ public final class Client implements IClient, IOracle, IOptions
 
     /** hexLabel of MasterHex for current or last engagement. */
     private String battleSite;
-    private BattleMap map;
-    private BattleDice battleDice;
+    private BattleBoard battleBoard;
 
-    private List battleChits = new ArrayList();
+    private final List battleChits = new ArrayList();
 
     /** Stack of legion marker ids, to allow multiple levels of undo for
      *  splits, moves, and recruits. */
-    private LinkedList undoStack = new LinkedList();
+    private final LinkedList undoStack = new LinkedList();
 
     // Information on the current moving legion.
     private String moverId;
 
     /** The end of the list is on top in the z-order. */
-    private List markers = new ArrayList();
+    private final List markers = new ArrayList();
 
-    private List recruitedChits = new ArrayList();
-    private List possibleRecruitChits = new ArrayList();
+    private final List recruitedChits = new ArrayList();
+    private final List possibleRecruitChits = new ArrayList();
 
     // Per-client and per-player options.
-    private Options options;
+    private final Options options;
 
     /** Player who owns this client. */
     private String playerName;
@@ -127,7 +125,7 @@ public final class Client implements IClient, IOracle, IOptions
     private SimpleAI simpleAI = new SimpleAI(this);
     private AI ai = simpleAI;
 
-    private CaretakerInfo caretakerInfo = new CaretakerInfo();
+    private final CaretakerInfo caretakerInfo = new CaretakerInfo();
 
     private int turnNumber = -1;
     private String activePlayerName = "";
@@ -187,7 +185,7 @@ public final class Client implements IClient, IOracle, IOptions
 
     // XXX Make private and wrap consistently.
     boolean showAllRecruitChits = false;
-    private Hashtable recruitReservations = new Hashtable();
+    private final Hashtable recruitReservations = new Hashtable();
 
     private LogWindow logWindow;
     private int viewMode;
@@ -731,13 +729,9 @@ public final class Client implements IClient, IOracle, IOptions
         {
             board.getFrame().repaint();
         }
-        if (battleDice != null)
+        if (battleBoard != null)
         {
-            battleDice.repaint();
-        }
-        if (map != null)
-        {
-            map.repaint();
+            battleBoard.repaint();
         }
     }
 
@@ -753,13 +747,9 @@ public final class Client implements IClient, IOracle, IOptions
         {
             board.rescale();
         }
-        if (battleDice != null)
+        if (battleBoard != null)
         {
-            battleDice.rescale();
-        }
-        if (map != null)
-        {
-            map.rescale();
+            battleBoard.rescale();
         }
         repaintAllWindows();
     }
@@ -1277,10 +1267,10 @@ public final class Client implements IClient, IOracle, IOptions
 
     private void disposeBattleMap()
     {
-        if (map != null)
+        if (battleBoard != null)
         {
-            map.dispose();
-            map = null;
+            battleBoard.dispose();
+            battleBoard = null;
         }
     }
 
@@ -1718,9 +1708,9 @@ public final class Client implements IClient, IOracle, IOptions
             else
             {
                 boolean struck = makeForcedStrikes();
-                if (map != null)
+                if (battleBoard != null)
                 {
-                    map.highlightCrittersWithTargets();
+                    battleBoard.highlightCrittersWithTargets();
                 }
                 if (!struck && findCrittersWithTargets().isEmpty())
                 {
@@ -2257,9 +2247,9 @@ public final class Client implements IClient, IOracle, IOptions
                 }
             }
         }
-        if (map != null)
+        if (battleBoard != null)
         {
-            map.repaint();
+            battleBoard.repaint();
         }
     }
 
@@ -2267,9 +2257,9 @@ public final class Client implements IClient, IOracle, IOptions
         String hexLabel)
     {
         addBattleChit(imageName, inverted, tag, hexLabel);
-        if (map != null)
+        if (battleBoard != null)
         {
-            map.alignChits(hexLabel);
+            battleBoard.alignChits(hexLabel);
             // Make sure map is visible after summon or muster.
             focusMap();
         }
@@ -2602,16 +2592,6 @@ public final class Client implements IClient, IOracle, IOptions
         }
     }
 
-    BattleMap getBattleMap()
-    {
-        return map;
-    }
-
-    void setBattleMap(BattleMap map)
-    {
-        this.map = map;
-    }
-
     public String getPlayerName()
     {
         return playerName;
@@ -2726,7 +2706,7 @@ public final class Client implements IClient, IOracle, IOptions
         }
         else
         {
-            new PickStrikePenalty(map.getFrame(), this, choices);
+            new PickStrikePenalty(battleBoard, this, choices);
         }
     }
 
@@ -2738,9 +2718,9 @@ public final class Client implements IClient, IOracle, IOptions
     private JFrame getMapOrBoardFrame()
     {
         JFrame frame = null;
-        if (map != null)
+        if (battleBoard != null)
         {
-            frame = map.getFrame();
+            frame = battleBoard;
         }
         else if (board != null)
         {
@@ -3036,15 +3016,11 @@ public final class Client implements IClient, IOracle, IOptions
         }
 
         BattleChit targetChit = getBattleChit(targetTag);
-        if (battleDice != null)
+        if (battleBoard != null)
         {
-            battleDice.setValues(getBattleChitDescription(chit),
+            battleBoard.setDiceValues(getBattleChitDescription(chit),
                 getBattleChitDescription(targetChit), strikeNumber, rolls);
-            battleDice.showRoll();
-        }
-        if (map != null)
-        {
-            map.unselectAllHexes();
+            battleBoard.unselectAllHexes();
         }
 
         if (targetChit != null)
@@ -3178,7 +3154,7 @@ public final class Client implements IClient, IOracle, IOptions
             }
             else
             {
-                new PickCarry(map.getFrame(), this, carryDamage,
+                new PickCarry(battleBoard, this, carryDamage,
                     carryTargetDescriptions);
             }
         }
@@ -3217,17 +3193,13 @@ public final class Client implements IClient, IOracle, IOptions
 
         if (board != null)
         {
-            map = new BattleMap(this, masterHexLabel, attackerMarkerId,
-                defenderMarkerId);
-            JFrame frame = map.getFrame();
-            battleDice = new BattleDice();
-            map.setPhase(battlePhase);
-            map.setTurn(battleTurnNumber);
-            map.setBattleMarkerLocation(false, "X" + attackerSide);
-            map.setBattleMarkerLocation(true, "X" + defenderSide);
-            frame.getContentPane().add(battleDice, BorderLayout.SOUTH);
-            frame.pack();
-            frame.setVisible(true);
+            // TODO should be done on the EDT
+            battleBoard = new BattleBoard(this, masterHexLabel,
+                attackerMarkerId, defenderMarkerId);
+            battleBoard.setPhase(battlePhase);
+            battleBoard.setTurn(battleTurnNumber);
+            battleBoard.setBattleMarkerLocation(false, "X" + attackerSide);
+            battleBoard.setBattleMarkerLocation(true, "X" + defenderSide);
             focusMap();
         }
     }
@@ -3235,10 +3207,10 @@ public final class Client implements IClient, IOracle, IOptions
     public void cleanupBattle()
     {
         LOGGER.log(Level.FINEST, playerName + " Client.cleanupBattle()");
-        if (map != null)
+        if (battleBoard != null)
         {
-            map.dispose();
-            map = null;
+            battleBoard.dispose();
+            battleBoard = null;
         }
         battleChits.clear();
         battlePhase = null;
@@ -3675,14 +3647,14 @@ public final class Client implements IClient, IOracle, IOptions
         setBattleActivePlayerName(battleActivePlayerName);
         this.battleTurnNumber = battleTurnNumber;
 
-        if (map != null)
+        if (battleBoard != null)
         {
-            map.setPhase(battlePhase);
-            map.setTurn(battleTurnNumber);
+            battleBoard.setPhase(battlePhase);
+            battleBoard.setTurn(battleTurnNumber);
             if (isMyBattlePhase())
             {
                 focusMap();
-                map.setupSummonMenu();
+                battleBoard.setupSummonMenu();
                 defaultCursor();
             }
             else
@@ -3700,14 +3672,14 @@ public final class Client implements IClient, IOracle, IOptions
         setBattleActivePlayerName(battleActivePlayerName);
         this.battleTurnNumber = battleTurnNumber;
 
-        if (map != null)
+        if (battleBoard != null)
         {
-            map.setPhase(battlePhase);
-            map.setTurn(battleTurnNumber);
+            battleBoard.setPhase(battlePhase);
+            battleBoard.setTurn(battleTurnNumber);
             if (isMyBattlePhase())
             {
                 focusMap();
-                map.setupRecruitMenu();
+                battleBoard.setupRecruitMenu();
             }
         }
         updateStatusScreen();
@@ -3735,15 +3707,15 @@ public final class Client implements IClient, IOracle, IOptions
         cleanupNegotiationDialogs();
         resetAllBattleMoves();
         this.battlePhase = Constants.BattlePhase.MOVE;
-        if (map != null)
+        if (battleBoard != null)
         {
-            map.setPhase(battlePhase);
-            map.setTurn(battleTurnNumber);
+            battleBoard.setPhase(battlePhase);
+            battleBoard.setTurn(battleTurnNumber);
             if (isMyBattlePhase())
             {
                 focusMap();
                 defaultCursor();
-                map.setupMoveMenu();
+                battleBoard.setupMoveMenu();
             }
         }
         updateStatusScreen();
@@ -3803,10 +3775,10 @@ public final class Client implements IClient, IOracle, IOptions
             markOffboardCreaturesDead();
         }
 
-        if (map != null)
+        if (battleBoard != null)
         {
-            map.setPhase(battlePhase);
-            map.setTurn(battleTurnNumber);
+            battleBoard.setPhase(battlePhase);
+            battleBoard.setTurn(battleTurnNumber);
             if (isMyBattlePhase())
             {
                 focusMap();
@@ -3816,7 +3788,7 @@ public final class Client implements IClient, IOracle, IOptions
             {
                 waitCursor();
             }
-            map.setupFightMenu();
+            battleBoard.setupFightMenu();
         }
         updateStatusScreen();
 
@@ -4016,12 +3988,12 @@ public final class Client implements IClient, IOracle, IOptions
             chit.setHexLabel(endingHexLabel);
             chit.setMoved(!undo);
         }
-        if (map != null)
+        if (battleBoard != null)
         {
-            map.alignChits(startingHexLabel);
-            map.alignChits(endingHexLabel);
-            map.repaint();
-            map.highlightMobileCritters();
+            battleBoard.alignChits(startingHexLabel);
+            battleBoard.alignChits(endingHexLabel);
+            battleBoard.repaint();
+            battleBoard.highlightMobileCritters();
         }
     }
 
@@ -4036,10 +4008,10 @@ public final class Client implements IClient, IOracle, IOptions
     void applyCarries(String hexLabel)
     {
         server.applyCarries(hexLabel);
-        if (map != null)
+        if (battleBoard != null)
         {
-            map.unselectHexByLabel(hexLabel);
-            map.repaint();
+            battleBoard.unselectHexByLabel(hexLabel);
+            battleBoard.repaint();
         }
     }
 
@@ -5729,9 +5701,9 @@ public final class Client implements IClient, IOracle, IOptions
 
     private void focusMap()
     {
-        if (map != null)
+        if (battleBoard != null)
         {
-            map.reqFocus();
+            battleBoard.reqFocus();
         }
     }
 
