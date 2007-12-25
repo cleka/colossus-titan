@@ -71,14 +71,15 @@ public class FinalizeManager
     {
         String type = o.getClass().getName();
         if ((interestedIn.contains(type) || interestedInAll)
-            //              &&  !type.equals("net.sf.colossus.util.DummyFrameWithMenu") 
-            )
+        //              &&  !type.equals("net.sf.colossus.util.DummyFrameWithMenu") 
+        )
         {
             // System.out.println("Registering object of type " + type + " with id " + id);
             if (instanceGroups.containsKey(type))
             {
                 // System.out.println("Adding to existing group " + type);
-                FinalizeClassGroup group = (FinalizeClassGroup)instanceGroups.get(type);
+                FinalizeClassGroup group = (FinalizeClassGroup)instanceGroups
+                    .get(type);
                 group.addInstance(o, id);
             }
             else
@@ -111,7 +112,8 @@ public class FinalizeManager
 
         if (instanceGroups.containsKey(type))
         {
-            FinalizeClassGroup group = (FinalizeClassGroup)instanceGroups.get(type);
+            FinalizeClassGroup group = (FinalizeClassGroup)instanceGroups
+                .get(type);
             FinalizeClassGroup.typeInstance i = group.getInstance(o);
             if (i != null)
             {
@@ -145,7 +147,8 @@ public class FinalizeManager
         while (it.hasNext())
         {
             String type = (String)it.next();
-            FinalizeClassGroup group = (FinalizeClassGroup)instanceGroups.get(type);
+            FinalizeClassGroup group = (FinalizeClassGroup)instanceGroups
+                .get(type);
             // System.out.println(group.toString());
             group.printStatistics(detailed);
         }
@@ -158,7 +161,8 @@ public class FinalizeManager
         while (it.hasNext())
         {
             String type = (String)it.next();
-            FinalizeClassGroup group = (FinalizeClassGroup)instanceGroups.get(type);
+            FinalizeClassGroup group = (FinalizeClassGroup)instanceGroups
+                .get(type);
             if (group.amountLeft() != 0)
             {
                 return false;

@@ -23,9 +23,9 @@ import net.sf.colossus.util.KDialog;
 final class ShowLegion extends KDialog implements MouseListener,
     WindowListener
 {
-    ShowLegion(JFrame parentFrame, LegionInfo legion,
-        Point point, JScrollPane pane, int scale,
-        String playerName, int viewMode, boolean dubiousAsBlanks)
+    ShowLegion(JFrame parentFrame, LegionInfo legion, Point point,
+        JScrollPane pane, int scale, String playerName, int viewMode,
+        boolean dubiousAsBlanks)
     {
         super(parentFrame, legion.getMarkerId(), false);
 
@@ -43,8 +43,8 @@ final class ShowLegion extends KDialog implements MouseListener,
         getContentPane().add(liPanel);
 
         String valueText = liPanel.getValueText();
-        String ownerText = legion.isMyLegion() ?
-            "" : " [" + legion.getPlayerName() + "]";
+        String ownerText = legion.isMyLegion() ? "" : " ["
+            + legion.getPlayerName() + "]";
 
         setTitle(legion.getMarkerId() + valueText + ownerText);
         liPanel = null;

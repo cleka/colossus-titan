@@ -53,7 +53,8 @@ import net.sf.colossus.util.ResourceLoader;
 public final class BattleMap extends HexMap implements MouseListener,
     WindowListener
 {
-    private static final Logger LOGGER = Logger.getLogger(BattleMap.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(BattleMap.class
+        .getName());
 
     private static int count = 1;
 
@@ -89,8 +90,8 @@ public final class BattleMap extends HexMap implements MouseListener,
 
         this.client = client;
 
-        battleFrame = new KFrame("BattleFrame for Client" +
-            client.getPlayerName());
+        battleFrame = new KFrame("BattleFrame for Client"
+            + client.getPlayerName());
         battleFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 
         JPanel contentPane = new JPanel();
@@ -123,7 +124,7 @@ public final class BattleMap extends HexMap implements MouseListener,
         contentPane.add(infoPanel, BorderLayout.NORTH);
 
         String colorName = client.getColor();
-        if ( colorName != null )
+        if (colorName != null)
         {
             Color color = PickColor.getBackgroundColor(colorName);
             contentPane.setBorder(BorderFactory.createLineBorder(color));
@@ -141,14 +142,13 @@ public final class BattleMap extends HexMap implements MouseListener,
         // Do not call pack() or setVisible(true) until after
         // BattleDice is added to frame.
 
-        battleFrame.setTitle(client.getPlayerName() + ": " +
-            Legion.getMarkerName(attackerMarkerId) +
-            " (" + attackerMarkerId + ") attacks " +
-            Legion.getMarkerName(defenderMarkerId) +
-            " (" + defenderMarkerId + ") in " + masterHexLabel);
+        battleFrame.setTitle(client.getPlayerName() + ": "
+            + Legion.getMarkerName(attackerMarkerId) + " (" + attackerMarkerId
+            + ") attacks " + Legion.getMarkerName(defenderMarkerId) + " ("
+            + defenderMarkerId + ") in " + masterHexLabel);
 
-        String finalizeId = client.getPlayerName() + ": " +
-            attackerMarkerId + "/" + defenderMarkerId + " ("+count+")";
+        String finalizeId = client.getPlayerName() + ": " + attackerMarkerId
+            + "/" + defenderMarkerId + " (" + count + ")";
         count++;
         net.sf.colossus.webcommon.FinalizeManager.setId(this, finalizeId);
 
@@ -205,9 +205,9 @@ public final class BattleMap extends HexMap implements MouseListener,
                 Constants.BattlePhase phase = client.getBattlePhase();
                 if (phase == Constants.BattlePhase.MOVE)
                 {
-                    if (!client.getOption(Options.autoPlay) &&
-                        client.anyOffboardCreatures() &&
-                        !confirmLeavingCreaturesOffboard())
+                    if (!client.getOption(Options.autoPlay)
+                        && client.anyOffboardCreatures()
+                        && !confirmLeavingCreaturesOffboard())
                     {
                         return;
                     }
@@ -233,14 +233,14 @@ public final class BattleMap extends HexMap implements MouseListener,
                 options[1] = "No";
                 int answer = JOptionPane.showOptionDialog(battleFrame,
                     "Are you sure you wish to concede the battle?",
-                    "Confirm Concession?",
-                    JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
-                    null, options, options[1]);
+                    "Confirm Concession?", JOptionPane.YES_NO_OPTION,
+                    JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
 
                 if (answer == JOptionPane.YES_OPTION)
                 {
                     String playerName = client.getPlayerName();
-                    LOGGER.log(Level.INFO, playerName + " concedes the battle");
+                    LOGGER
+                        .log(Level.INFO, playerName + " concedes the battle");
                     client.concede();
                 }
             }
@@ -356,8 +356,7 @@ public final class BattleMap extends HexMap implements MouseListener,
 
     public void setPhase(Constants.BattlePhase newBattlePhase)
     {
-        if ( client.getPlayerName().equals(
-            client.getBattleActivePlayerName()) )
+        if (client.getPlayerName().equals(client.getBattleActivePlayerName()))
         {
             enableDoneButton();
             infoPanel.setOwnPhase(newBattlePhase.toString());
@@ -400,21 +399,17 @@ public final class BattleMap extends HexMap implements MouseListener,
     private void setupIcon()
     {
         List directories = new java.util.ArrayList();
-        directories.add(Constants.defaultDirName +
-            ResourceLoader.getPathSeparator() +
-            Constants.imagesDirName);
+        directories.add(Constants.defaultDirName
+            + ResourceLoader.getPathSeparator() + Constants.imagesDirName);
 
-        String[] iconNames = { Constants.battlemapIconImage,
-            Constants.battlemapIconText +
-                "-Name-" +
-                Constants.battlemapIconTextColor,
-            Constants.battlemapIconSubscript +
-                "-Subscript-" +
-                Constants.battlemapIconTextColor };
+        String[] iconNames = {
+            Constants.battlemapIconImage,
+            Constants.battlemapIconText + "-Name-"
+                + Constants.battlemapIconTextColor,
+            Constants.battlemapIconSubscript + "-Subscript-"
+                + Constants.battlemapIconTextColor };
 
-        Image image =
-            ResourceLoader.getCompositeImage(iconNames,
-            directories,
+        Image image = ResourceLoader.getCompositeImage(iconNames, directories,
             60, 60);
 
         if (image == null)
@@ -553,13 +548,13 @@ public final class BattleMap extends HexMap implements MouseListener,
             }
         }
     }
- 
+
     private void unselectEntranceHexes()
     {
         defenderMarker.resetMarkerHighlight();
         attackerMarker.resetMarkerHighlight();
     }
-    
+
     void setDefaultCursor()
     {
         battleFrame.setCursor(defaultCursor);
@@ -577,9 +572,8 @@ public final class BattleMap extends HexMap implements MouseListener,
         options[1] = "No";
         int answer = JOptionPane.showOptionDialog(battleFrame,
             "Are you sure you want to leave creatures offboard?",
-            "Confirm Leaving Creatures Offboard?",
-            JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
-            null, options, options[1]);
+            "Confirm Leaving Creatures Offboard?", JOptionPane.YES_NO_OPTION,
+            JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
         return (answer == JOptionPane.YES_OPTION);
     }
 
@@ -658,8 +652,9 @@ public final class BattleMap extends HexMap implements MouseListener,
             hexLabel = hex.getHexModel().getLabel();
         }
 
-        if (chit != null && client.getPlayerNameByTag(chit.getTag()).equals(
-            client.getBattleActivePlayerName()))
+        if (chit != null
+            && client.getPlayerNameByTag(chit.getTag()).equals(
+                client.getBattleActivePlayerName()))
         {
             actOnCritter(chit.getTag());
         }
@@ -841,23 +836,23 @@ public final class BattleMap extends HexMap implements MouseListener,
 
         private TurnPanel(int MAXBATTLETURNS)
         {
-            super(new GridLayout( (MAXBATTLETURNS + 1) % 8 + 1, 0));
+            super(new GridLayout((MAXBATTLETURNS + 1) % 8 + 1, 0));
             turn = new JLabel[MAXBATTLETURNS + 1];
             // Create Special labels for Recruitment turns
             int[] REINFORCEMENTTURNS = client.getReinforcementTurns();
-            for ( int i = 0; i < REINFORCEMENTTURNS.length; i++ )
+            for (int i = 0; i < REINFORCEMENTTURNS.length; i++)
             {
                 int j = REINFORCEMENTTURNS[i];
-                turn[j - 1] = new JLabel( (j) + "+", SwingConstants.CENTER);
+                turn[j - 1] = new JLabel((j) + "+", SwingConstants.CENTER);
                 resetTurn(j); // Set thin Border
             }
             // make the final "extra" turn label to show "time loss"
             turn[turn.length - 1] = new JLabel("Loss", SwingConstants.CENTER);
             resetTurn(turn.length);
             // Create remaining labels
-            for ( int i = 0; i < turn.length; i++ )
+            for (int i = 0; i < turn.length; i++)
             {
-                if ( turn[i] == null )
+                if (turn[i] == null)
                 {
                     turn[i] = new JLabel(Integer.toString(i + 1),
                         SwingConstants.CENTER);
@@ -866,7 +861,7 @@ public final class BattleMap extends HexMap implements MouseListener,
             }
             turnNumber = 0;
 
-            for ( int i = 0; i < turn.length; i++ )
+            for (int i = 0; i < turn.length; i++)
             {
                 this.add(turn[i]);
             }
@@ -903,22 +898,23 @@ public final class BattleMap extends HexMap implements MouseListener,
         {
             if (thick == 3)
             {
-                turn.setBorder(BorderFactory.createLineBorder(Color.GRAY,3));
+                turn.setBorder(BorderFactory.createLineBorder(Color.GRAY, 3));
             }
             else
             {
                 if (thick == 5)
                 {
-                    turn.setBorder(BorderFactory.createLineBorder(Color.RED,5));
+                    turn.setBorder(BorderFactory
+                        .createLineBorder(Color.RED, 5));
                 }
                 else
                 {
-                    turn.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+                    turn
+                        .setBorder(BorderFactory.createLineBorder(Color.BLACK));
                 }
             }
         }
     } // class TurnPanel
-
 
     class InfoPanel extends JPanel
     {

@@ -24,7 +24,6 @@ import net.sf.colossus.util.HTMLColor;
  * @author Romain Dolbeau
  */
 
-
 final class BattleDice extends Box
 {
     private String strikerDesc = "";
@@ -124,11 +123,8 @@ final class BattleDice extends Box
         }
         else
         {
-            diceBoxTitledBorder.setTitle(strikerDesc +
-                " attacks " +
-                targetDesc +
-                " (target number is " +
-                targetNumber + ")");
+            diceBoxTitledBorder.setTitle(strikerDesc + " attacks "
+                + targetDesc + " (target number is " + targetNumber + ")");
         }
 
         if (numDice > 0)

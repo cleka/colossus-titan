@@ -24,7 +24,8 @@ import net.sf.colossus.xmlparser.TerrainRecruitLoader;
  */
 public class MilvangAI extends RationalAI
 {
-    private static final Logger LOGGER = Logger.getLogger(MilvangAI.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(MilvangAI.class
+        .getName());
 
     private static final double PRIMARY_RECRUIT_FACTOR = 1.0;
     private static final double SECONDARY_RECRUIT_FACTOR = 0.1;
@@ -58,8 +59,8 @@ public class MilvangAI extends RationalAI
                 int numNeeded = TerrainRecruitLoader.numberOfRecruiterNeeded(
                     lesser, creature, terrain, "");
                 int hintValue = creature.getHintedRecruitmentValue();
-                if (hintValue > recruitNow &&
-                    numNeeded <= ((Integer)critters.get(lesser)).intValue())
+                if (hintValue > recruitNow
+                    && numNeeded <= ((Integer)critters.get(lesser)).intValue())
                 {
                     recruitNow = hintValue;
                 }
@@ -145,17 +146,17 @@ public class MilvangAI extends RationalAI
             {
                 double currRecruitValue = findRecruitPotential(critterMap,
                     terrains[i]);
-                if (currRecruitValue > bestRecruitValue &&
-                    !terrains[i].equals("Tower"))
+                if (currRecruitValue > bestRecruitValue
+                    && !terrains[i].equals("Tower"))
                 {
-                    totalRecruitValue += SECONDARY_RECRUIT_FACTOR *
-                        bestRecruitValue;
+                    totalRecruitValue += SECONDARY_RECRUIT_FACTOR
+                        * bestRecruitValue;
                     bestRecruitValue = currRecruitValue;
                 }
                 else
                 {
-                    totalRecruitValue += SECONDARY_RECRUIT_FACTOR *
-                        currRecruitValue;
+                    totalRecruitValue += SECONDARY_RECRUIT_FACTOR
+                        * currRecruitValue;
                 }
             }
             totalRecruitValue += PRIMARY_RECRUIT_FACTOR * bestRecruitValue;

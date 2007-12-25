@@ -27,7 +27,6 @@ public class MasterHex extends Hex
     // Outer ring: 101-142
     // Towers: 100, 200, 300, 400, 500, 600
     // Inner ring: 1000, 2000, 3000, 4000, 5000, 6000
-
     // n, ne, se, s, sw, nw
     private int labelSide;
     private int[] exitType = new int[6];
@@ -51,7 +50,6 @@ public class MasterHex extends Hex
     //         \                /              \          /
     //          \              /                \        /
     //           4------------3                  4------3
-
 
     public MasterHex()
     {
@@ -83,15 +81,15 @@ public class MasterHex extends Hex
         for (int i = 0; i < hazard.length; i++)
         {
             int count = HexMap.getHazardCountInTerrain(hazard[i], terrain);
-            if (BattleHex.isNativeBonusHazard(hazard[i]) &&
-                creature.isNativeTerrain(hazard[i]))
+            if (BattleHex.isNativeBonusHazard(hazard[i])
+                && creature.isNativeTerrain(hazard[i]))
             {
                 bonusHazardCount += count;
             }
             else
             {
-                if (BattleHex.isNonNativePenaltyHazard(hazard[i]) &&
-                    !creature.isNativeTerrain(hazard[i]))
+                if (BattleHex.isNonNativePenaltyHazard(hazard[i])
+                    && !creature.isNativeTerrain(hazard[i]))
                 {
                     bonusHazardCount -= count;
                 }
@@ -101,26 +99,24 @@ public class MasterHex extends Hex
 
         for (int i = 0; i < hazardSide.length; i++)
         {
-            int count =
-                net.sf.colossus.client.HexMap.getHazardSideCountInTerrain(
-                hazardSide[i],
-                terrain);
-            if (BattleHex.isNativeBonusHexside(hazardSide[i]) &&
-                creature.isNativeHexside(hazardSide[i]))
+            int count = net.sf.colossus.client.HexMap
+                .getHazardSideCountInTerrain(hazardSide[i], terrain);
+            if (BattleHex.isNativeBonusHexside(hazardSide[i])
+                && creature.isNativeHexside(hazardSide[i]))
             {
                 bonusHazardSideCount += count;
             }
             else
             {
-                if (BattleHex.isNonNativePenaltyHexside(hazardSide[i]) &&
-                    !creature.isNativeHexside(hazardSide[i]))
+                if (BattleHex.isNonNativePenaltyHexside(hazardSide[i])
+                    && !creature.isNativeHexside(hazardSide[i]))
                 {
                     bonusHazardSideCount -= count;
                 }
             }
         }
-        if (((bonusHazardCount + bonusHazardSideCount) > 0) &&
-            ((bonusHazardCount >= 3) || (bonusHazardSideCount >= 5)))
+        if (((bonusHazardCount + bonusHazardSideCount) > 0)
+            && ((bonusHazardCount >= 3) || (bonusHazardSideCount >= 5)))
         {
             return true;
         }
@@ -129,13 +125,13 @@ public class MasterHex extends Hex
 
     public MasterHex getNeighbor(int i)
     {
-        assert (i>=0) && (i<=5) : "Neighbor index out of range";
+        assert (i >= 0) && (i <= 5) : "Neighbor index out of range";
         return neighbors[i];
     }
 
     void setNeighbor(int i, MasterHex hex)
     {
-        assert (i>=0) && (i<=5) : "Neighbor index out of range";
+        assert (i >= 0) && (i <= 5) : "Neighbor index out of range";
         neighbors[i] = hex;
     }
 

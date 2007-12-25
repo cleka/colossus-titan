@@ -24,7 +24,8 @@ import org.jdom.input.SAXBuilder;
  */
 public class BattlelandLoader
 {
-    private static final Logger LOGGER = Logger.getLogger(BattlelandLoader.class.getName());
+    private static final Logger LOGGER = Logger
+        .getLogger(BattlelandLoader.class.getName());
 
     /** hold the list of label for the startlist */
     private java.util.List startlist = null;
@@ -65,8 +66,8 @@ public class BattlelandLoader
                     if (startlistHexes.size() > 0)
                     {
                         LOGGER.log(Level.WARNING,
-                            "DEPRECATION WARNING: in 'startlist' use " +
-                            "'battlehexref' instead of 'battlehex'!");
+                            "DEPRECATION WARNING: in 'startlist' use "
+                                + "'battlehexref' instead of 'battlehex'!");
                     }
                 }
 
@@ -89,8 +90,7 @@ public class BattlelandLoader
         }
     }
 
-    private void handleHex(Element el, BattleHex[][] h)
-        throws JDOMException
+    private void handleHex(Element el, BattleHex[][] h) throws JDOMException
     {
         int xpos = el.getAttribute("x").getIntValue();
         int ypos = el.getAttribute("y").getIntValue();

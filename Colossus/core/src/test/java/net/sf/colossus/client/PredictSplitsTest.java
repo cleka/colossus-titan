@@ -16,7 +16,7 @@ class AllPredictSplits extends ArrayList
 {
     PredictSplitNode getLeaf(String markerId)
     {
-        for (Iterator it = iterator(); it.hasNext(); )
+        for (Iterator it = iterator(); it.hasNext();)
         {
             PredictSplits ps = (PredictSplits)it.next();
             PredictSplitNode leaf = ps.getLeaf(markerId);
@@ -30,7 +30,7 @@ class AllPredictSplits extends ArrayList
 
     void printLeaves()
     {
-        for (Iterator it = iterator(); it.hasNext(); )
+        for (Iterator it = iterator(); it.hasNext();)
         {
             PredictSplits ps = (PredictSplits)it.next();
             ps.printLeaves();
@@ -39,7 +39,7 @@ class AllPredictSplits extends ArrayList
 
     void printNodes()
     {
-        for (Iterator it = iterator(); it.hasNext(); )
+        for (Iterator it = iterator(); it.hasNext();)
         {
             PredictSplits ps = (PredictSplits)it.next();
             ps.printNodes();
@@ -56,7 +56,8 @@ class AllPredictSplits extends ArrayList
 public class PredictSplitsTest extends TestCase
 {
     // TODO the unit test might as well use stdout
-    private static final Logger LOGGER = Logger.getLogger(PredictSplitsTest.class.getName());
+    private static final Logger LOGGER = Logger
+        .getLogger(PredictSplitsTest.class.getName());
 
     List cnl;
     AllPredictSplits aps;

@@ -80,7 +80,8 @@ import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
 public final class MasterBoard extends JPanel
 {
-    private static final Logger LOGGER = Logger.getLogger(MasterBoard.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(MasterBoard.class
+        .getName());
 
     private Image offScreenBuffer;
     private static int horizSize = 0;
@@ -198,8 +199,8 @@ public final class MasterBoard extends JPanel
         {
             super();
             this.clientRef = new WeakReference(client);
-            net.sf.colossus.webcommon.FinalizeManager.register(this,
-                client.getPlayerName());
+            net.sf.colossus.webcommon.FinalizeManager.register(this, client
+                .getPlayerName());
         }
 
         public void keyPressed(KeyEvent e)
@@ -222,13 +223,14 @@ public final class MasterBoard extends JPanel
                 {
                     // copy only local players markers
                     List myMarkers = new ArrayList();
-                    for (Iterator iterator = client.getMarkers().iterator(); 
-                        iterator.hasNext(); )
+                    for (Iterator iterator = client.getMarkers().iterator(); iterator
+                        .hasNext();)
                     {
                         Marker marker = (Marker)iterator.next();
-                        LegionInfo legionInfo =
-                            client.getLegionInfo(marker.getId());
-                        if(legionInfo.isMyLegion()) {
+                        LegionInfo legionInfo = client.getLegionInfo(marker
+                            .getId());
+                        if (legionInfo.isMyLegion())
+                        {
                             myMarkers.add(marker);
                         }
                     }
@@ -245,21 +247,20 @@ public final class MasterBoard extends JPanel
         {
             // copy to array so we don't get concurrent modification
             // exceptions when iterating
-            Marker[] markerArray =
-                (Marker[])markers.toArray(new Marker[markers.size()]);
+            Marker[] markerArray = (Marker[])markers
+                .toArray(new Marker[markers.size()]);
             legionFlyouts = new JPanel[markers.size()];
             for (int i = 0; i < markerArray.length; i++)
             {
                 Marker marker = markerArray[i];
                 LegionInfo legion = client.getLegionInfo(marker.getId());
-                int scale = 2*Scale.get();
+                int scale = 2 * Scale.get();
 
-                boolean dubiousAsBlanks = client.getOption(
-                    Options.dubiousAsBlanks);
-                final JPanel panel = new LegionInfoPanel(legion,
-                    scale, PANEL_MARGIN, PANEL_PADDING, true,
-                    client.getViewMode(), client.getPlayerName(),
-                    dubiousAsBlanks, true);
+                boolean dubiousAsBlanks = client
+                    .getOption(Options.dubiousAsBlanks);
+                final JPanel panel = new LegionInfoPanel(legion, scale,
+                    PANEL_MARGIN, PANEL_PADDING, true, client.getViewMode(),
+                    client.getPlayerName(), dubiousAsBlanks, true);
                 add(panel);
                 legionFlyouts[i] = panel;
 
@@ -273,8 +274,8 @@ public final class MasterBoard extends JPanel
 
         public void keyReleased(KeyEvent e)
         {
-            if ((e.getKeyCode() == POPUP_KEY_ALL_LEGIONS) || 
-                (e.getKeyCode() == POPUP_KEY_MY_LEGIONS)) 
+            if ((e.getKeyCode() == POPUP_KEY_ALL_LEGIONS)
+                || (e.getKeyCode() == POPUP_KEY_MY_LEGIONS))
             {
                 if (legionFlyouts != null)
                 {
@@ -293,14 +294,12 @@ public final class MasterBoard extends JPanel
         }
     }
 
-
     private static interface MasterHexVisitor
     {
 
         /** Returns true iff the Hex matches **/
         boolean visitHex(MasterHex hex);
     }
-
 
     private static interface GUIMasterHexVisitor
     {
@@ -369,8 +368,8 @@ public final class MasterBoard extends JPanel
         }
         catch (Exception e)
         {
-            LOGGER.log(Level.SEVERE,
-                "Reading map data for non-GUI failed.", e);
+            LOGGER
+                .log(Level.SEVERE, "Reading map data for non-GUI failed.", e);
             e.printStackTrace();
             System.exit(1);
         }
@@ -382,8 +381,8 @@ public final class MasterBoard extends JPanel
     MasterBoard(final Client client)
     {
         this.client = client;
-        net.sf.colossus.webcommon.FinalizeManager.register(this,
-            client.getPlayerName());
+        net.sf.colossus.webcommon.FinalizeManager.register(this, client
+            .getPlayerName());
 
         String pname = client.getPlayerName();
         if (pname == null)
@@ -422,8 +421,8 @@ public final class MasterBoard extends JPanel
         {
             // Copy of code from KDialog.centerOnScreen();
             Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-            masterFrame.setLocation(new Point(d.width / 2 -
-                getSize().width / 2, d.height / 2 - getSize().height / 2));
+            masterFrame.setLocation(new Point(d.width / 2 - getSize().width
+                / 2, d.height / 2 - getSize().height / 2));
         }
         else
         {
@@ -550,9 +549,8 @@ public final class MasterBoard extends JPanel
                 options[1] = "No";
                 int answer = JOptionPane.showOptionDialog(masterFrame,
                     "Are you sure you with to withdraw from the game?",
-                    "Confirm Withdrawal?",
-                    JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
-                    null, options, options[1]);
+                    "Confirm Withdrawal?", JOptionPane.YES_NO_OPTION,
+                    JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
 
                 if (answer == JOptionPane.YES_OPTION)
                 {
@@ -565,8 +563,8 @@ public final class MasterBoard extends JPanel
         {
             public void actionPerformed(ActionEvent e)
             {
-                new ShowAllRecruits(masterFrame, client,
-                    TerrainRecruitLoader.getTerrains());
+                new ShowAllRecruits(masterFrame, client, TerrainRecruitLoader
+                    .getTerrains());
             }
         };
 
@@ -599,8 +597,8 @@ public final class MasterBoard extends JPanel
                 GUIMasterHex hex = getHexContainingPoint(lastPoint);
                 if (hex != null)
                 {
-                    new ShowBattleMap(masterFrame,
-                        hex.getMasterHexModel().getLabel(), hex);
+                    new ShowBattleMap(masterFrame, hex.getMasterHexModel()
+                        .getLabel(), hex);
                     // Work around a Windows JDK 1.3 bug.
                     hex.repaint();
                 }
@@ -656,9 +654,8 @@ public final class MasterBoard extends JPanel
                     options[0] = "Yes";
                     options[1] = "No";
                     int answer = JOptionPane.showOptionDialog(masterFrame,
-                        "Are you sure you want to quit this game and " +
-                        "start a new one?",
-                        "New Game?",
+                        "Are you sure you want to quit this game and "
+                            + "start a new one?", "New Game?",
                         JOptionPane.YES_NO_OPTION,
                         JOptionPane.QUESTION_MESSAGE, null, options,
                         options[1]);
@@ -704,30 +701,33 @@ public final class MasterBoard extends JPanel
                 File savesDir = new File(Constants.saveDirname);
                 if (!savesDir.exists())
                 {
-                    LOGGER.log(Level.INFO,
-                        "Trying to make directory " + savesDir.toString());
+                    LOGGER.log(Level.INFO, "Trying to make directory "
+                        + savesDir.toString());
                     if (!savesDir.mkdirs())
                     {
                         LOGGER.log(Level.SEVERE,
                             "Could not create saves directory");
-                        JOptionPane.showMessageDialog(masterFrame,
-                            "Could not create directory " + savesDir +
-                            "\n- FileChooser dialog box will default " +
-                            "to some other (system dependent) directory!",
-                            "Creating directory " + savesDir + " failed!",
-                            JOptionPane.ERROR_MESSAGE);
+                        JOptionPane
+                            .showMessageDialog(
+                                masterFrame,
+                                "Could not create directory "
+                                    + savesDir
+                                    + "\n- FileChooser dialog box will default "
+                                    + "to some other (system dependent) directory!",
+                                "Creating directory " + savesDir + " failed!",
+                                JOptionPane.ERROR_MESSAGE);
                     }
                 }
                 else if (!savesDir.isDirectory())
                 {
-                    LOGGER.log(Level.SEVERE,
-                        "Can't create directory " + savesDir.toString() +
-                        " - name exists but is not a file");
+                    LOGGER.log(Level.SEVERE, "Can't create directory "
+                        + savesDir.toString()
+                        + " - name exists but is not a file");
                     JOptionPane.showMessageDialog(masterFrame,
-                        "Can't create directory " + savesDir +
-                        " (name exists, but is not a file)\n" +
-                        "- FileChooser dialog box will default to " +
-                        "some other (system dependent) directory!",
+                        "Can't create directory " + savesDir
+                            + " (name exists, but is not a file)\n"
+                            + "- FileChooser dialog box will default to "
+                            + "some other (system dependent) directory!",
                         "Creating directory " + savesDir + " failed!",
                         JOptionPane.ERROR_MESSAGE);
                 }
@@ -737,8 +737,8 @@ public final class MasterBoard extends JPanel
                 int returnVal = chooser.showSaveDialog(masterFrame);
                 if (returnVal == JFileChooser.APPROVE_OPTION)
                 {
-                    String dirname =
-                        chooser.getCurrentDirectory().getAbsolutePath();
+                    String dirname = chooser.getCurrentDirectory()
+                        .getAbsolutePath();
                     String basename = chooser.getSelectedFile().getName();
                     // Add default savegame extension.
                     if (!basename.endsWith(Constants.xmlExtension))
@@ -791,12 +791,10 @@ public final class MasterBoard extends JPanel
         {
             public void actionPerformed(ActionEvent e)
             {
-                JOptionPane.showMessageDialog(masterFrame,
-                    "Colossus build: " + Client.getVersion() +
-                    "\n" +
-                    "user.home:      " + System.getProperty("user.home") +
-                    "\n" +
-                    "java.version:   " + System.getProperty("java.version"));
+                JOptionPane.showMessageDialog(masterFrame, "Colossus build: "
+                    + Client.getVersion() + "\n" + "user.home:      "
+                    + System.getProperty("user.home") + "\n"
+                    + "java.version:   " + System.getProperty("java.version"));
             }
         };
 
@@ -879,8 +877,8 @@ public final class MasterBoard extends JPanel
         group.add(rbmi);
         menu.add(rbmi);
         boolean selected = false;
-        if (name.equals(
-            client.getStringOption(Options.showRecruitChitsSubmenu)))
+        if (name.equals(client
+            .getStringOption(Options.showRecruitChitsSubmenu)))
         {
             selected = true;
         }
@@ -955,8 +953,8 @@ public final class MasterBoard extends JPanel
 
         // The "dubious as blanks" option makes only sense with the 
         //   "view what SplitPrediction tells us" mode => otherwise inactive.
-        JCheckBoxMenuItem cbmi =
-            addCheckBox(graphicsMenu, Options.dubiousAsBlanks, KeyEvent.VK_D);
+        JCheckBoxMenuItem cbmi = addCheckBox(graphicsMenu,
+            Options.dubiousAsBlanks, KeyEvent.VK_D);
         if (client.getViewMode() != Options.viewableEverNum)
         {
             cbmi.setEnabled(false);
@@ -1014,14 +1012,13 @@ public final class MasterBoard extends JPanel
         // lfMenu.setMnemonic(KeyEvent.VK_L);
         windowMenu.add(lfMenu);
 
-        UIManager.LookAndFeelInfo[] lfInfo =
-            UIManager.getInstalledLookAndFeels();
+        UIManager.LookAndFeelInfo[] lfInfo = UIManager
+            .getInstalledLookAndFeels();
         String currentLF = UIManager.getLookAndFeel().getName();
         for (int i = 0; i < lfInfo.length; i++)
         {
-            AbstractAction lfAction =
-                new ChangeLookFeelAction(lfInfo[i].getName(),
-                lfInfo[i].getClassName());
+            AbstractAction lfAction = new ChangeLookFeelAction(lfInfo[i]
+                .getName(), lfInfo[i].getClassName());
             JCheckBoxMenuItem temp = new JCheckBoxMenuItem(lfAction);
             lfMenu.add(temp);
             temp.setState(lfInfo[i].getName().equals(currentLF));
@@ -1042,6 +1039,7 @@ public final class MasterBoard extends JPanel
     class ChangeLookFeelAction extends AbstractAction
     {
         String className;
+
         ChangeLookFeelAction(String t, String className)
         {
             super(t);
@@ -1122,18 +1120,15 @@ public final class MasterBoard extends JPanel
                 if (show[i][j])
                 {
                     GUIMasterHex hex = new GUIMasterHex(plainHexArray[i][j]);
-                    hex.init(
-                        cx + 4 * i * scale,
-                        (int)Math.round(cy +
-                        (3 * j +
-                        ((i + boardParity) & 1) * (1 + 2 * (j / 2)) +
-                        ((i + 1 + boardParity) & 1) * 2 *
-                        ((j + 1) / 2)) *
-                        GUIHex.SQRT3 *
-                        scale),
-                        scale,
-                        isHexInverted(i, j),
-                        this);
+                    hex
+                        .init(
+                            cx + 4 * i * scale,
+                            (int)Math
+                                .round(cy
+                                    + (3 * j + ((i + boardParity) & 1)
+                                        * (1 + 2 * (j / 2)) + ((i + 1 + boardParity) & 1)
+                                        * 2 * ((j + 1) / 2)) * GUIHex.SQRT3
+                                    * scale), scale, isHexInverted(i, j), this);
                     guiHexArray[i][j] = hex;
                 }
             }
@@ -1196,8 +1191,8 @@ public final class MasterBoard extends JPanel
                 {
                     if (show[i][j])
                     {
-                        final int iLabel =
-                            Integer.parseInt(h[i][j].getLabel());
+                        final int iLabel = Integer
+                            .parseInt(h[i][j].getLabel());
                         if (_hexByLabel_cache.size() <= iLabel)
                         {
                             _hexByLabel_cache.setSize(iLabel + 1);
@@ -1213,18 +1208,17 @@ public final class MasterBoard extends JPanel
         final MasterHex found = (MasterHex)_hexByLabel_cache.get(label);
         if (found == null)
         {
-            LOGGER.log(Level.WARNING,
-                "Couldn't find Masterhex labeled " + label);
+            LOGGER.log(Level.WARNING, "Couldn't find Masterhex labeled "
+                + label);
         }
         return found;
     }
 
-    private static synchronized void readMapData()
-        throws Exception
+    private static synchronized void readMapData() throws Exception
     {
         List directories = VariantSupport.getVarDirectoriesList();
-        InputStream mapIS = ResourceLoader.getInputStream(
-            VariantSupport.getMapName(), directories);
+        InputStream mapIS = ResourceLoader.getInputStream(VariantSupport
+            .getMapName(), directories);
         if (mapIS == null)
         {
             throw new FileNotFoundException(VariantSupport.getMapName());
@@ -1283,8 +1277,8 @@ public final class MasterBoard extends JPanel
         MasterHex dh = hexByLabel(h, h[i][j].getBaseExitLabel(k));
         if (dh == null)
         {
-            LOGGER.log(Level.SEVERE,
-                "null pointer ; i=" + i + ", j=" + j + ", k=" + k);
+            LOGGER.log(Level.SEVERE, "null pointer ; i=" + i + ", j=" + j
+                + ", k=" + k);
             System.exit(1);
         }
         // Static analysis of Eclipse doesn't grok System.exit()
@@ -1301,40 +1295,40 @@ public final class MasterBoard extends JPanel
             }
             else
             {
-                LOGGER.log(Level.WARNING,
-                    "bad exit ; i=" + i + ", j=" + j + ", k=" + k);
+                LOGGER.log(Level.WARNING, "bad exit ; i=" + i + ", j=" + j
+                    + ", k=" + k);
             }
         }
         else if (dh.getXCoord() == (i + 1))
         {
             if (dh.getYCoord() == j)
             {
-                h[i][j].setExitType(2 - ((i + j + boardParity) & 1),
-                    h[i][j].getBaseExitType(k));
+                h[i][j].setExitType(2 - ((i + j + boardParity) & 1), h[i][j]
+                    .getBaseExitType(k));
             }
             else
             {
-                LOGGER.log(Level.WARNING,
-                    "bad exit ; i=" + i + ", j=" + j + ", k=" + k);
+                LOGGER.log(Level.WARNING, "bad exit ; i=" + i + ", j=" + j
+                    + ", k=" + k);
             }
         }
         else if (dh.getXCoord() == (i - 1))
         {
             if (dh.getYCoord() == j)
             {
-                h[i][j].setExitType(4 + ((i + j + boardParity) & 1),
-                    h[i][j].getBaseExitType(k));
+                h[i][j].setExitType(4 + ((i + j + boardParity) & 1), h[i][j]
+                    .getBaseExitType(k));
             }
             else
             {
-                LOGGER.log(Level.WARNING,
-                    "bad exit ; i=" + i + ", j=" + j + ", k=" + k);
+                LOGGER.log(Level.WARNING, "bad exit ; i=" + i + ", j=" + j
+                    + ", k=" + k);
             }
         }
         else
         {
-            LOGGER.log(Level.WARNING,
-                "bad exit ; i=" + i + ", j=" + j + ", k=" + k);
+            LOGGER.log(Level.WARNING, "bad exit ; i=" + i + ", j=" + j
+                + ", k=" + k);
         }
     }
 
@@ -1511,33 +1505,33 @@ public final class MasterBoard extends JPanel
                 {
                     MasterHex hex = h[i][j];
 
-                    if (hex.getExitType(0) != Constants.NONE ||
-                        hex.getEntranceType(0) != Constants.NONE)
+                    if (hex.getExitType(0) != Constants.NONE
+                        || hex.getEntranceType(0) != Constants.NONE)
                     {
                         hex.setNeighbor(0, h[i][j - 1]);
                     }
-                    if (hex.getExitType(1) != Constants.NONE ||
-                        hex.getEntranceType(1) != Constants.NONE)
+                    if (hex.getExitType(1) != Constants.NONE
+                        || hex.getEntranceType(1) != Constants.NONE)
                     {
                         hex.setNeighbor(1, h[i + 1][j]);
                     }
-                    if (hex.getExitType(2) != Constants.NONE ||
-                        hex.getEntranceType(2) != Constants.NONE)
+                    if (hex.getExitType(2) != Constants.NONE
+                        || hex.getEntranceType(2) != Constants.NONE)
                     {
                         hex.setNeighbor(2, h[i + 1][j]);
                     }
-                    if (hex.getExitType(3) != Constants.NONE ||
-                        hex.getEntranceType(3) != Constants.NONE)
+                    if (hex.getExitType(3) != Constants.NONE
+                        || hex.getEntranceType(3) != Constants.NONE)
                     {
                         hex.setNeighbor(3, h[i][j + 1]);
                     }
-                    if (hex.getExitType(4) != Constants.NONE ||
-                        hex.getEntranceType(4) != Constants.NONE)
+                    if (hex.getExitType(4) != Constants.NONE
+                        || hex.getEntranceType(4) != Constants.NONE)
                     {
                         hex.setNeighbor(4, h[i - 1][j]);
                     }
-                    if (hex.getExitType(5) != Constants.NONE ||
-                        hex.getEntranceType(5) != Constants.NONE)
+                    if (hex.getExitType(5) != Constants.NONE
+                        || hex.getEntranceType(5) != Constants.NONE)
                     {
                         hex.setNeighbor(5, h[i - 1][j]);
                     }
@@ -1553,8 +1547,8 @@ public final class MasterBoard extends JPanel
 
         String activePlayerName = client.getActivePlayerName();
 
-        masterFrame.setTitle(activePlayerName + " Turn " +
-            client.getTurnNumber() + " : Split stacks");
+        masterFrame.setTitle(activePlayerName + " Turn "
+            + client.getTurnNumber() + " : Split stacks");
 
         phaseMenu.removeAll();
 
@@ -1606,9 +1600,9 @@ public final class MasterBoard extends JPanel
         reqFocus();
 
         String activePlayerName = client.getActivePlayerName();
-        masterFrame.setTitle(activePlayerName + " Turn " +
-            client.getTurnNumber() + " : Movement Roll: " +
-            client.getMovementRoll());
+        masterFrame.setTitle(activePlayerName + " Turn "
+            + client.getTurnNumber() + " : Movement Roll: "
+            + client.getMovementRoll());
 
         phaseMenu.removeAll();
 
@@ -1654,7 +1648,7 @@ public final class MasterBoard extends JPanel
             mi.setMnemonic(KeyEvent.VK_W);
 
             highlightUnmovedLegions();
-            
+
             disableDoneAction("At least one legion must move");
         }
         else
@@ -1673,8 +1667,8 @@ public final class MasterBoard extends JPanel
 
         String activePlayerName = client.getActivePlayerName();
 
-        masterFrame.setTitle(activePlayerName + " Turn " +
-            client.getTurnNumber() + " : Resolve Engagements ");
+        masterFrame.setTitle(activePlayerName + " Turn "
+            + client.getTurnNumber() + " : Resolve Engagements ");
 
         phaseMenu.removeAll();
 
@@ -1718,8 +1712,8 @@ public final class MasterBoard extends JPanel
 
         String activePlayerName = client.getActivePlayerName();
 
-        masterFrame.setTitle(activePlayerName + " Turn " +
-            client.getTurnNumber() + " : Muster Recruits ");
+        masterFrame.setTitle(activePlayerName + " Turn "
+            + client.getTurnNumber() + " : Muster Recruits ");
 
         phaseMenu.removeAll();
 
@@ -1763,7 +1757,7 @@ public final class MasterBoard extends JPanel
         {
             bottomBar.setPhase("(" + activePlayerName + " musters)");
         }
-   }
+    }
 
     void highlightPossibleRecruits()
     {
@@ -1878,8 +1872,7 @@ public final class MasterBoard extends JPanel
                 alignLegions(hex.getLabel());
                 return false;
             }
-        }
-        );
+        });
     }
 
     void highlightTallLegions()
@@ -1932,21 +1925,17 @@ public final class MasterBoard extends JPanel
     private void setupIcon()
     {
         List directories = new ArrayList();
-        directories.add(Constants.defaultDirName +
-            ResourceLoader.getPathSeparator() +
-            Constants.imagesDirName);
+        directories.add(Constants.defaultDirName
+            + ResourceLoader.getPathSeparator() + Constants.imagesDirName);
 
-        String[] iconNames = { Constants.masterboardIconImage,
-            Constants.masterboardIconText +
-                "-Name-" +
-                Constants.masterboardIconTextColor,
-            Constants.masterboardIconSubscript +
-                "-Subscript-" +
-                Constants.masterboardIconTextColor };
+        String[] iconNames = {
+            Constants.masterboardIconImage,
+            Constants.masterboardIconText + "-Name-"
+                + Constants.masterboardIconTextColor,
+            Constants.masterboardIconSubscript + "-Subscript-"
+                + Constants.masterboardIconTextColor };
 
-        Image image =
-            ResourceLoader.getCompositeImage(iconNames,
-            directories,
+        Image image = ResourceLoader.getCompositeImage(iconNames, directories,
             60, 60);
 
         if (image == null)
@@ -1973,8 +1962,7 @@ public final class MasterBoard extends JPanel
                 }
                 return false;
             }
-        }
-        );
+        });
     }
 
     /** Do a brute-force search through the hex array, looking for
@@ -1987,8 +1975,7 @@ public final class MasterBoard extends JPanel
             {
                 return hex.getMasterHexModel().getLabel().equals(label);
             }
-        }
-        );
+        });
     }
 
     /** Return the MasterHex that contains the given point, or
@@ -2001,8 +1988,7 @@ public final class MasterBoard extends JPanel
             {
                 return hex.contains(point);
             }
-        }
-        );
+        });
     }
 
     /** Return the topmost Marker that contains the given point, or
@@ -2035,8 +2021,7 @@ public final class MasterBoard extends JPanel
                 }
                 return false; // keep going
             }
-        }
-        );
+        });
     }
 
     void unselectHexByLabel(final String label)
@@ -2045,8 +2030,8 @@ public final class MasterBoard extends JPanel
         {
             public boolean visitHex(GUIMasterHex hex)
             {
-                if (hex.isSelected() &&
-                    label.equals(hex.getMasterHexModel().getLabel()))
+                if (hex.isSelected()
+                    && label.equals(hex.getMasterHexModel().getLabel()))
                 {
                     hex.unselect();
                     hex.repaint();
@@ -2054,8 +2039,7 @@ public final class MasterBoard extends JPanel
                 }
                 return false; // keep going
             }
-        }
-        );
+        });
     }
 
     void unselectHexesByLabels(final Set labels)
@@ -2064,16 +2048,15 @@ public final class MasterBoard extends JPanel
         {
             public boolean visitHex(GUIMasterHex hex)
             {
-                if (hex.isSelected() &&
-                    labels.contains(hex.getMasterHexModel().getLabel()))
+                if (hex.isSelected()
+                    && labels.contains(hex.getMasterHexModel().getLabel()))
                 {
                     hex.unselect();
                     hex.repaint();
                 }
                 return false; // keep going
             }
-        }
-        );
+        });
     }
 
     void selectHexByLabel(final String label)
@@ -2082,16 +2065,15 @@ public final class MasterBoard extends JPanel
         {
             public boolean visitHex(GUIMasterHex hex)
             {
-                if (!hex.isSelected() &&
-                    label.equals(hex.getMasterHexModel().getLabel()))
+                if (!hex.isSelected()
+                    && label.equals(hex.getMasterHexModel().getLabel()))
                 {
                     hex.select();
                     hex.repaint();
                 }
                 return false; // keep going
             }
-        }
-        );
+        });
     }
 
     void selectHexesByLabels(final Set labels)
@@ -2100,16 +2082,15 @@ public final class MasterBoard extends JPanel
         {
             public boolean visitHex(GUIMasterHex hex)
             {
-                if (!hex.isSelected() &&
-                    labels.contains(hex.getMasterHexModel().getLabel()))
+                if (!hex.isSelected()
+                    && labels.contains(hex.getMasterHexModel().getLabel()))
                 {
                     hex.select();
                     hex.repaint();
                 }
                 return false; // keep going
             }
-        }
-        );
+        });
     }
 
     void selectHexesByLabels(final Set labels, final Color color)
@@ -2126,8 +2107,7 @@ public final class MasterBoard extends JPanel
                 }
                 return false; // keep going
             }
-        }
-        );
+        });
     }
 
     void actOnMisclick()
@@ -2170,9 +2150,9 @@ public final class MasterBoard extends JPanel
     private static boolean isPopupButton(MouseEvent e)
     {
         int modifiers = e.getModifiers();
-        return (((modifiers & InputEvent.BUTTON2_MASK) != 0) ||
-            (    (modifiers & InputEvent.BUTTON3_MASK) != 0) ||
-            e.isAltDown() || e.isControlDown());
+        return (((modifiers & InputEvent.BUTTON2_MASK) != 0)
+            || ((modifiers & InputEvent.BUTTON3_MASK) != 0) || e.isAltDown() || e
+            .isControlDown());
     }
 
     class MasterBoardMouseHandler extends MouseAdapter
@@ -2198,19 +2178,18 @@ public final class MasterBoard extends JPanel
                     LegionInfo legion = client.getLegionInfo(markerId);
                     String playerName = client.getPlayerName();
                     int viewMode = client.getViewMode();
-                    boolean dubiousAsBlanks =
-                        client.getOption(Options.dubiousAsBlanks);
-                    new ShowLegion(masterFrame, legion,
-                        point, scrollPane, 4 * Scale.get(), playerName,
-                        viewMode, dubiousAsBlanks);
+                    boolean dubiousAsBlanks = client
+                        .getOption(Options.dubiousAsBlanks);
+                    new ShowLegion(masterFrame, legion, point, scrollPane,
+                        4 * Scale.get(), playerName, viewMode, dubiousAsBlanks);
                     return;
                 }
                 else if (client.isMyLegion(markerId))
                 {
                     if (hex != null)
                     {
-                        actOnLegion(markerId,
-                            hex.getMasterHexModel().getLabel());
+                        actOnLegion(markerId, hex.getMasterHexModel()
+                            .getLabel());
                     }
                     else
                     {
@@ -2227,16 +2206,16 @@ public final class MasterBoard extends JPanel
                 if (isPopupButton(e))
                 {
                     lastPoint = point;
-                    popupMenu.setLabel(
-                        hex.getMasterHexModel().getDescription());
+                    popupMenu.setLabel(hex.getMasterHexModel()
+                        .getDescription());
                     popupMenu.show(e.getComponent(), point.x, point.y);
                     return;
                 }
 
                 // Otherwise, the action to take depends on the phase.
                 // Only the current player can manipulate game state.
-                if (client.getPlayerName().equals(
-                    client.getActivePlayerName()))
+                if (client.getPlayerName()
+                    .equals(client.getActivePlayerName()))
                 {
                     actOnHex(hex.getMasterHexModel().getLabel());
                     hex.repaint();
@@ -2251,7 +2230,6 @@ public final class MasterBoard extends JPanel
             }
         }
     }
-
 
     class MasterBoardMouseMotionHandler extends MouseMotionAdapter
     {
@@ -2324,7 +2302,7 @@ public final class MasterBoard extends JPanel
             // destination, move the legion here.
             client.clearRecruitChits();
             client.doMove(hexLabel);
-            actOnMisclick();   // Yes, even if the move was good.
+            actOnMisclick(); // Yes, even if the move was good.
         }
         else if (phase == Constants.Phase.FIGHT)
         {
@@ -2353,7 +2331,6 @@ public final class MasterBoard extends JPanel
         }
     }
 
-
     class MasterBoardRecruitChitMenuHandler implements ItemListener
     {
         public void itemStateChanged(ItemEvent e)
@@ -2367,7 +2344,6 @@ public final class MasterBoard extends JPanel
             }
         }
     }
-
 
     class MasterBoardWindowHandler extends WindowAdapter
     {
@@ -2391,13 +2367,14 @@ public final class MasterBoard extends JPanel
             return;
         }
 
-        if (offScreenBuffer == null || overlayChanged ||
-            (!(offScreenBuffer.getWidth(this) == this.getSize().width &&
-            offScreenBuffer.getHeight(this) == this.getSize().height)))
+        if (offScreenBuffer == null
+            || overlayChanged
+            || (!(offScreenBuffer.getWidth(this) == this.getSize().width && offScreenBuffer
+                .getHeight(this) == this.getSize().height)))
         {
             overlayChanged = false;
-            offScreenBuffer = this.createImage(this.getWidth(),
-                this.getHeight());
+            offScreenBuffer = this.createImage(this.getWidth(), this
+                .getHeight());
             Graphics g_im = offScreenBuffer.getGraphics();
             super.paintComponent(g_im);
 
@@ -2437,8 +2414,7 @@ public final class MasterBoard extends JPanel
                 hex.paint(g);
                 return false; // keep going
             }
-        }
-        );
+        });
     }
 
     private void paintHighlights(final Graphics2D g)
@@ -2450,8 +2426,7 @@ public final class MasterBoard extends JPanel
                 hex.paintHighlightIfNeeded(g);
                 return false; // keep going
             }
-        }
-        );
+        });
     }
 
     /** Paint markers in z-order. */
@@ -2461,8 +2436,8 @@ public final class MasterBoard extends JPanel
         while (it.hasNext())
         {
             Marker marker = (Marker)it.next();
-            if (marker != null &&
-                g.getClipBounds().intersects(marker.getBounds()))
+            if (marker != null
+                && g.getClipBounds().intersects(marker.getBounds()))
             {
                 marker.paintComponent(g);
             }
@@ -2517,8 +2492,8 @@ public final class MasterBoard extends JPanel
     public Dimension getMinimumSize()
     {
         int scale = Scale.get();
-        return new Dimension(((horizSize + 1) * 4) * scale,
-            (vertSize * 7) * scale);
+        return new Dimension(((horizSize + 1) * 4) * scale, (vertSize * 7)
+            * scale);
     }
 
     public Dimension getPreferredSize()
@@ -2597,8 +2572,7 @@ public final class MasterBoard extends JPanel
                 }
                 return false;
             }
-        }
-        );
+        });
     }
 
     JScrollPane getScrollPane()
@@ -2617,8 +2591,7 @@ public final class MasterBoard extends JPanel
                 set.add(hex.getLabel());
                 return false;
             }
-        }
-        );
+        });
         return set;
     }
 
@@ -2659,7 +2632,7 @@ public final class MasterBoard extends JPanel
 
         /** display the current phase in the bottom bar */
         private JLabel phaseLabel;
-        
+
         /**
          * Displays reasons why "Done" can not be used.
          */
@@ -2679,12 +2652,12 @@ public final class MasterBoard extends JPanel
         {
             phaseLabel.setText(s);
         }
-        
+
         public void setReasonForDisabledDone(String reason)
         {
-            todoLabel.setText("(" + reason  + ")");
+            todoLabel.setText("(" + reason + ")");
         }
-        
+
         public BottomBar()
         {
             super();
@@ -2695,14 +2668,18 @@ public final class MasterBoard extends JPanel
             add(playerLabel);
 
             doneButton = new JButton(doneWithPhaseAction);
-            doneWithPhaseAction.addPropertyChangeListener(new PropertyChangeListener(){
-                public void propertyChange(PropertyChangeEvent evt)
+            doneWithPhaseAction
+                .addPropertyChangeListener(new PropertyChangeListener()
                 {
-                    if(evt.getPropertyName().equals("enabled") && 
-                        evt.getNewValue().equals(Boolean.TRUE) ) {
-                        todoLabel.setText("");
+                    public void propertyChange(PropertyChangeEvent evt)
+                    {
+                        if (evt.getPropertyName().equals("enabled")
+                            && evt.getNewValue().equals(Boolean.TRUE))
+                        {
+                            todoLabel.setText("");
+                        }
                     }
-                }});
+                });
             add(doneButton);
 
             phaseLabel = new JLabel("- phase -");

@@ -13,13 +13,16 @@ package net.sf.colossus.util;
 
 public class SwingReferenceCleanupHacks
 {
-    public static void CleanupJPopupMenuGlobals(boolean removeOnlyMenuKeyboardHelpers)
+    public static void CleanupJPopupMenuGlobals(
+        boolean removeOnlyMenuKeyboardHelpers)
     {
         try
         {
-            javax.swing.MenuSelectionManager aMenuSelectionManager = javax.swing.MenuSelectionManager.defaultManager();
-            Object anObject = SafelyGetReflectedField("javax.swing.MenuSelectionManager",
-                "listenerList", aMenuSelectionManager);
+            javax.swing.MenuSelectionManager aMenuSelectionManager = javax.swing.MenuSelectionManager
+                .defaultManager();
+            Object anObject = SafelyGetReflectedField(
+                "javax.swing.MenuSelectionManager", "listenerList",
+                aMenuSelectionManager);
             if (null != anObject)
             {
                 javax.swing.event.EventListenerList anEventListenerList = (javax.swing.event.EventListenerList)anObject;
@@ -36,12 +39,14 @@ public class SwingReferenceCleanupHacks
                     // the memory leak down to this javax.swing.plaf.basic.BasicPopupMenuUI$MenuKeyboardHelper
                     // holding onto an instance of the JRootPane.  Therefore we just remove all of the
                     // instances of this class and it cleans up fine and seems to work.
-                    Class aClass = Class.forName("javax.swing.plaf.basic.BasicPopupMenuUI$MenuKeyboardHelper");
+                    Class aClass = Class
+                        .forName("javax.swing.plaf.basic.BasicPopupMenuUI$MenuKeyboardHelper");
                     for (int i = listeners.length - 1; i >= 0; i -= 2)
                     {
                         if (aClass.isInstance(listeners[i]))
                         {
-                            aMenuSelectionManager.removeChangeListener((javax.swing.event.ChangeListener)listeners[i]);
+                            aMenuSelectionManager
+                                .removeChangeListener((javax.swing.event.ChangeListener)listeners[i]);
                         }
                     }
                 }
@@ -49,7 +54,8 @@ public class SwingReferenceCleanupHacks
                 {
                     for (int i = listeners.length - 1; i >= 0; i -= 2)
                     {
-                        aMenuSelectionManager.removeChangeListener((javax.swing.event.ChangeListener)listeners[i]);
+                        aMenuSelectionManager
+                            .removeChangeListener((javax.swing.event.ChangeListener)listeners[i]);
                     }
                 }
             }
@@ -61,7 +67,8 @@ public class SwingReferenceCleanupHacks
 
         try
         {
-            javax.swing.ActionMap anActionMap = (javax.swing.ActionMap)javax.swing.UIManager.getLookAndFeelDefaults().get("PopupMenu.actionMap");
+            javax.swing.ActionMap anActionMap = (javax.swing.ActionMap)javax.swing.UIManager
+                .getLookAndFeelDefaults().get("PopupMenu.actionMap");
             while (anActionMap != null)
             {
                 Object[] keys = { "press", "release" };
@@ -85,10 +92,12 @@ public class SwingReferenceCleanupHacks
             //      e.printStackTrace();
         }
 
-        SafelySetReflectedFieldToNull("javax.swing.plaf.basic.BasicPopupMenuUI",
-            "menuKeyboardHelper", null);
+        SafelySetReflectedFieldToNull(
+            "javax.swing.plaf.basic.BasicPopupMenuUI", "menuKeyboardHelper",
+            null);
 
-        Object anObject = SafelyGetReflectedField("com.sun.java.swing.plaf.windows.WindowsPopupMenuUI",
+        Object anObject = SafelyGetReflectedField(
+            "com.sun.java.swing.plaf.windows.WindowsPopupMenuUI",
             "mnemonicListener", null);
         if (null != anObject)
         {
@@ -98,11 +107,13 @@ public class SwingReferenceCleanupHacks
 
     }
 
-    private static void SafelySetReflectedFieldToNull(Class aClass, String aFieldName, Object anObject)
+    private static void SafelySetReflectedFieldToNull(Class aClass,
+        String aFieldName, Object anObject)
     {
         try
         {
-            java.lang.reflect.Field aField = aClass.getDeclaredField(aFieldName);
+            java.lang.reflect.Field aField = aClass
+                .getDeclaredField(aFieldName);
             aField.setAccessible(true);
             aField.set(anObject, null);
         }
@@ -112,7 +123,8 @@ public class SwingReferenceCleanupHacks
         }
     }
 
-    private static void SafelySetReflectedFieldToNull(String aClassName, String aFieldName, Object anObject)
+    private static void SafelySetReflectedFieldToNull(String aClassName,
+        String aFieldName, Object anObject)
     {
         try
         {
@@ -125,12 +137,14 @@ public class SwingReferenceCleanupHacks
         }
     }
 
-    private static Object SafelyGetReflectedField(String aClassName, String aFieldName, Object anObject)
+    private static Object SafelyGetReflectedField(String aClassName,
+        String aFieldName, Object anObject)
     {
         try
         {
             Class aClass = Class.forName(aClassName);
-            java.lang.reflect.Field aField = aClass.getDeclaredField(aFieldName);
+            java.lang.reflect.Field aField = aClass
+                .getDeclaredField(aFieldName);
             aField.setAccessible(true);
             return aField.get(anObject);
         }
@@ -142,10 +156,11 @@ public class SwingReferenceCleanupHacks
 
     public static void CleanupJMenuBarGlobals()
     {
-        SafelySetReflectedFieldToNull("com.sun.java.swing.plaf.windows.WindowsRootPaneUI$AltProcessor",
+        SafelySetReflectedFieldToNull(
+            "com.sun.java.swing.plaf.windows.WindowsRootPaneUI$AltProcessor",
             "root", null);
-        SafelySetReflectedFieldToNull("com.sun.java.swing.plaf.windows.WindowsRootPaneUI$AltProcessor",
+        SafelySetReflectedFieldToNull(
+            "com.sun.java.swing.plaf.windows.WindowsRootPaneUI$AltProcessor",
             "winAncestor", null);
     }
 }
-

@@ -35,7 +35,8 @@ import net.sf.colossus.util.ResourceLoader;
 
 public final class GUIMasterHex extends GUIHex
 {
-    private static final Logger LOGGER = Logger.getLogger(GUIMasterHex.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(GUIMasterHex.class
+        .getName());
 
     private boolean inverted;
     private FontMetrics fontMetrics;
@@ -63,7 +64,6 @@ public final class GUIMasterHex extends GUIHex
     //          \              /                \        /
     //           4------------3                  4------3
 
-
     // Use two-stage initialization so that we can clone the GUIMasterHex
     // from an existing MasterHex, then add the GUI info.
 
@@ -72,7 +72,8 @@ public final class GUIMasterHex extends GUIHex
         super(model);
     }
 
-    public MasterHex getMasterHexModel() {
+    public MasterHex getMasterHexModel()
+    {
         return (MasterHex)this.getHexModel();
     }
 
@@ -115,8 +116,8 @@ public final class GUIMasterHex extends GUIHex
         hexagon = makePolygon(6, xVertex, yVertex, true);
         rectBound = hexagon.getBounds();
         offCenter = new Point((int)Math.round((xVertex[0] + xVertex[1]) / 2),
-            (int)Math.round(((yVertex[0] + yVertex[3]) / 2) +
-            (inverted ? -(scale / 6.0) : (scale / 6.0))));
+            (int)Math.round(((yVertex[0] + yVertex[3]) / 2)
+                + (inverted ? -(scale / 6.0) : (scale / 6.0))));
 
         Point2D.Double center = findCenter2D();
 
@@ -127,11 +128,11 @@ public final class GUIMasterHex extends GUIHex
 
         // Translate innerHexagon to make it concentric.
         Rectangle2D innerBounds = highlightBorder.getBounds2D();
-        Point2D.Double innerCenter = new Point2D.Double(innerBounds.getX() +
-            innerBounds.getWidth() / 2.0, innerBounds.getY() +
-            innerBounds.getHeight() / 2.0);
-        at = AffineTransform.getTranslateInstance(center.getX() -
-            innerCenter.getX(), center.getY() - innerCenter.getY());
+        Point2D.Double innerCenter = new Point2D.Double(innerBounds.getX()
+            + innerBounds.getWidth() / 2.0, innerBounds.getY()
+            + innerBounds.getHeight() / 2.0);
+        at = AffineTransform.getTranslateInstance(center.getX()
+            - innerCenter.getX(), center.getY() - innerCenter.getY());
         highlightBorder.transform(at);
 
         highlightBorder.append(hexagon, false);
@@ -149,8 +150,8 @@ public final class GUIMasterHex extends GUIHex
 
         g2.setFont(oldFont.deriveFont(oldFont.getSize2D() * 0.9f));
         fontMetrics = g2.getFontMetrics();
-        halfFontHeight = (fontMetrics.getMaxAscent() +
-            fontMetrics.getLeading()) / 2;
+        halfFontHeight = (fontMetrics.getMaxAscent() + fontMetrics
+            .getLeading()) / 2;
 
         if (getAntialias())
         {
@@ -232,39 +233,39 @@ public final class GUIMasterHex extends GUIHex
         switch (model.getLabelSide())
         {
             case 0:
-                g2.drawString(label, rectBound.x +
-                    ((rectBound.width - stringWidth(label, g2)) / 2),
+                g2.drawString(label, rectBound.x
+                    + ((rectBound.width - stringWidth(label, g2)) / 2),
                     rectBound.y + halfFontHeight + rectBound.height / 10);
                 break;
 
             case 1:
-                g2.drawString(label, rectBound.x + ((rectBound.width -
-                    stringWidth(label, g2)) * 5 / 6), rectBound.y +
-                    halfFontHeight + rectBound.height / 8);
+                g2.drawString(label, rectBound.x
+                    + ((rectBound.width - stringWidth(label, g2)) * 5 / 6),
+                    rectBound.y + halfFontHeight + rectBound.height / 8);
                 break;
 
             case 2:
-                g2.drawString(label, rectBound.x + (rectBound.width -
-                    stringWidth(label, g2)) * 5 / 6, rectBound.y +
-                    halfFontHeight + rectBound.height * 7 / 8);
+                g2.drawString(label, rectBound.x
+                    + (rectBound.width - stringWidth(label, g2)) * 5 / 6,
+                    rectBound.y + halfFontHeight + rectBound.height * 7 / 8);
                 break;
 
             case 3:
-                g2.drawString(label, rectBound.x + ((rectBound.width -
-                    stringWidth(label, g2)) / 2), rectBound.y +
-                    halfFontHeight + rectBound.height * 9 / 10);
+                g2.drawString(label, rectBound.x
+                    + ((rectBound.width - stringWidth(label, g2)) / 2),
+                    rectBound.y + halfFontHeight + rectBound.height * 9 / 10);
                 break;
 
             case 4:
-                g2.drawString(label, rectBound.x + (rectBound.width -
-                    stringWidth(label, g2)) / 6, rectBound.y +
-                    halfFontHeight + rectBound.height * 5 / 6);
+                g2.drawString(label, rectBound.x
+                    + (rectBound.width - stringWidth(label, g2)) / 6,
+                    rectBound.y + halfFontHeight + rectBound.height * 5 / 6);
                 break;
 
             case 5:
-                g2.drawString(label, rectBound.x + (rectBound.width -
-                    stringWidth(label, g2)) / 6, rectBound.y +
-                    halfFontHeight + rectBound.height / 8);
+                g2.drawString(label, rectBound.x
+                    + (rectBound.width - stringWidth(label, g2)) / 6,
+                    rectBound.y + halfFontHeight + rectBound.height / 8);
                 break;
         }
     }
@@ -277,18 +278,17 @@ public final class GUIMasterHex extends GUIHex
         if (fontMetrics == null)
         {
             fontMetrics = g2.getFontMetrics();
-            halfFontHeight = (fontMetrics.getMaxAscent() +
-                fontMetrics.getLeading()) / 2;
+            halfFontHeight = (fontMetrics.getMaxAscent() + fontMetrics
+                .getLeading()) / 2;
         }
         fontMetrics = g2.getFontMetrics();
-        halfFontHeight = (fontMetrics.getMaxAscent() +
-            fontMetrics.getLeading()) / 2;
-        String name = 
-            getMasterHexModel().getTerrainDisplayName().toUpperCase();
-        g2.drawString(name,
-            rectBound.x + ((rectBound.width - stringWidth(name, g2)) / 2),
-            rectBound.y + halfFontHeight + rectBound.height *
-            (isInverted() ? 1 : 2) / 3);
+        halfFontHeight = (fontMetrics.getMaxAscent() + fontMetrics
+            .getLeading()) / 2;
+        String name = getMasterHexModel().getTerrainDisplayName()
+            .toUpperCase();
+        g2.drawString(name, rectBound.x
+            + ((rectBound.width - stringWidth(name, g2)) / 2), rectBound.y
+            + halfFontHeight + rectBound.height * (isInverted() ? 1 : 2) / 3);
     }
 
     public void repaint()
@@ -305,14 +305,14 @@ public final class GUIMasterHex extends GUIHex
     private void drawGate(Graphics2D g2, double vx1, double vy1, double vx2,
         double vy2, int gateType)
     {
-        double x0;                    // first focus point
+        double x0; // first focus point
         double y0;
-        double x1;                    // second focus point
+        double x1; // second focus point
         double y1;
-        double x2;                    // center point
+        double x2; // center point
         double y2;
-        double theta;                 // gate angle
-        double[] x = new double[4];  // gate points
+        double theta; // gate angle
+        double[] x = new double[4]; // gate points
         double[] y = new double[4];
 
         x0 = vx1 + (vx2 - vx1) / 6;
@@ -362,8 +362,8 @@ public final class GUIMasterHex extends GUIHex
                 rect.height = 2 * len;
 
                 Arc2D.Double arc = new Arc2D.Double(rect.x, rect.y,
-                    rect.width, rect.height,
-                    Math.toDegrees(-theta), 180, Arc2D.OPEN);
+                    rect.width, rect.height, Math.toDegrees(-theta), 180,
+                    Arc2D.OPEN);
 
                 g2.setColor(Color.white);
                 g2.fill(arc);
@@ -472,11 +472,10 @@ public final class GUIMasterHex extends GUIHex
     private Image getOverlayImage()
     {
         Image overlay = null;
-        overlay = ResourceLoader.getImage(getMasterHexModel().getTerrainDisplayName() +
-            (!inverted ? invertedPostfix : ""),
-            VariantSupport.getImagesDirectoriesList(),
-            rectBound.width,
-            rectBound.height);
+        overlay = ResourceLoader.getImage(getMasterHexModel()
+            .getTerrainDisplayName()
+            + (!inverted ? invertedPostfix : ""), VariantSupport
+            .getImagesDirectoriesList(), rectBound.width, rectBound.height);
         return overlay;
     }
 
@@ -495,14 +494,10 @@ public final class GUIMasterHex extends GUIHex
             return false;
         }
         Composite oldComp = g.getComposite();
-        g.setComposite(AlphaComposite.getInstance(
-            AlphaComposite.SRC_OVER, 0.3f));
-        g.drawImage(overlay,
-            rectBound.x,
-            rectBound.y,
-            rectBound.width,
-            rectBound.height,
-            board);
+        g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,
+            0.3f));
+        g.drawImage(overlay, rectBound.x, rectBound.y, rectBound.width,
+            rectBound.height, board);
         g.setComposite(oldComp);
         return true;
     }

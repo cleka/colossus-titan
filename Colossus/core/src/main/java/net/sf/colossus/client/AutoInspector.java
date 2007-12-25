@@ -34,8 +34,8 @@ public class AutoInspector extends KDialog
 
     private boolean dubiousAsBlanks;
 
-    public AutoInspector(JFrame frame, IOptions options,
-        String playerName, int viewMode, boolean dubiousAsBlanks)
+    public AutoInspector(JFrame frame, IOptions options, String playerName,
+        int viewMode, boolean dubiousAsBlanks)
     {
         super(frame, "Inspector", false);
 
@@ -45,14 +45,14 @@ public class AutoInspector extends KDialog
         this.dubiousAsBlanks = dubiousAsBlanks;
 
         setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
-        addWindowListener(new WindowAdapter() {
+        addWindowListener(new WindowAdapter()
+        {
             public void windowClosing(WindowEvent e)
             {
-                AutoInspector.this.options.setOption(Options.showAutoInspector,
-                    false);
+                AutoInspector.this.options.setOption(
+                    Options.showAutoInspector, false);
             }
-        }
-        );
+        });
 
         saveWindow = new SaveWindow(options, "AutoInspector");
         Point location = getUpperRightCorner(550);
@@ -90,10 +90,10 @@ public class AutoInspector extends KDialog
             5, 2, false, viewMode, playerName, dubiousAsBlanks, false);
         panel.add(liPanel);
         String valueText = liPanel.getValueText();
-        String ownerText = legion.isMyLegion() ?
-            "" : " [" + legion.getPlayerName() + "]";
-        setTitle("Inspector: Legion " + legion.getMarkerId() +
-            valueText + ownerText);
+        String ownerText = legion.isMyLegion() ? "" : " ["
+            + legion.getPlayerName() + "]";
+        setTitle("Inspector: Legion " + legion.getMarkerId() + valueText
+            + ownerText);
         liPanel = null;
 
         scrollPane.getViewport().add(panel);
@@ -105,12 +105,12 @@ public class AutoInspector extends KDialog
         setTitle("Inspector");
         scrollPane.getViewport().removeAll();
         MasterHex hexModel = hex.getMasterHexModel();
-        scrollPane.getViewport().add(new HexRecruitTreePanel(BoxLayout.X_AXIS,
-            hexModel.getTerrain(),hexModel.getLabel(), new MouseAdapter()
-        {
-            // nothing to do
-        }
-        ));
+        scrollPane.getViewport().add(
+            new HexRecruitTreePanel(BoxLayout.X_AXIS, hexModel.getTerrain(),
+                hexModel.getLabel(), new MouseAdapter()
+                {
+                    // nothing to do
+                }));
         repaint();
     }
 

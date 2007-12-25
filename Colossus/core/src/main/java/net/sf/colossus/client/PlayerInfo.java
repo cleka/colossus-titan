@@ -21,7 +21,6 @@ import net.sf.colossus.xmlparser.TerrainRecruitLoader;
  * @author David Ripton
  */
 
-
 public final class PlayerInfo
 {
     private Client client;
@@ -47,8 +46,8 @@ public final class PlayerInfo
     {
         this.client = client;
         net.sf.colossus.server.CustomRecruitBase.addPlayerInfo(this);
-        net.sf.colossus.webcommon.FinalizeManager.register(this,
-            client.getPlayerName());
+        net.sf.colossus.webcommon.FinalizeManager.register(this, client
+            .getPlayerName());
     }
 
     /** Takes a colon-separated string of form

@@ -62,7 +62,7 @@ final class EngagementResults extends KDialog
     private JLabel defenderIdLabel;
     private JPanel panelCenter;
     private boolean moveNext;
-    private boolean advanceToLast=false;
+    private boolean advanceToLast = false;
 
     /** 
      * Inits the dialog, not opens it.
@@ -81,15 +81,16 @@ final class EngagementResults extends KDialog
         setupGUI();
 
         setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
-        this.addWindowListener(new WindowAdapter() {
-            public void windowClosing(WindowEvent e) {
+        this.addWindowListener(new WindowAdapter()
+        {
+            public void windowClosing(WindowEvent e)
+            {
                 options.setOption(Options.showEngagementResults, false);
             }
-        }
-        );
+        });
 
         this.saveWindow = new SaveWindow(options, "EngagementResultView");
-        saveWindow.restore(this, new Point(0,0));
+        saveWindow.restore(this, new Point(0, 0));
 
         maybeShow();
     }
@@ -122,26 +123,13 @@ final class EngagementResults extends KDialog
      */
     void addData(
         String winnerId, // null on mutual elim, flee, concede, negotiate
-        String method,
-        int points,
-        int turns,
-        List attackerStartingContents,
-        List defenderStartingContents,
-        List attackerStartingCertainities,
-        List defenderStartingCertainities,
-        boolean attackersTurn
-        )
+        String method, int points, int turns, List attackerStartingContents,
+        List defenderStartingContents, List attackerStartingCertainities,
+        List defenderStartingCertainities, boolean attackersTurn)
     {
-        Engagement result = new Engagement(winnerId,
-            method,
-            points,
-            turns,
-            attackerStartingContents,
-            defenderStartingContents,
-            attackerStartingCertainities,
-            defenderStartingCertainities,
-            oracle
-            );
+        Engagement result = new Engagement(winnerId, method, points, turns,
+            attackerStartingContents, defenderStartingContents,
+            attackerStartingCertainities, defenderStartingCertainities, oracle);
         this.engagementLog.add(result);
 
         if (this.current <= -1)
@@ -149,7 +137,8 @@ final class EngagementResults extends KDialog
             this.current = 0;
         }
 
-        if (attackersTurn || this.moveNext || advanceToLast) {
+        if (attackersTurn || this.moveNext || advanceToLast)
+        {
             this.current = this.engagementLog.size() - 1;
         }
         // iff we are in the attackers turn, the next engagement
@@ -190,23 +179,23 @@ final class EngagementResults extends KDialog
         contentPane.setLayout(new BorderLayout());
 
         //    space for Labels
-        JPanel panelNorth  = new JPanel();
-        panelNorth.setLayout(new GridLayout(2,1, 0,2));
+        JPanel panelNorth = new JPanel();
+        panelNorth.setLayout(new GridLayout(2, 1, 0, 2));
         panelNorth.setBackground(Color.GRAY);
-        contentPane.add(panelNorth,  BorderLayout.NORTH);
+        contentPane.add(panelNorth, BorderLayout.NORTH);
 
         //    space for imagelists
         this.panelCenter = new JPanel();
-        panelCenter.setLayout(new GridLayout(3,1, 0,2));
+        panelCenter.setLayout(new GridLayout(3, 1, 0, 2));
         contentPane.add(panelCenter, BorderLayout.CENTER);
 
         //    space for list labels
         JPanel panelWest = new JPanel();
-        panelWest.setLayout(new GridLayout(6,1, 0,2));
+        panelWest.setLayout(new GridLayout(6, 1, 0, 2));
         contentPane.add(panelWest, BorderLayout.WEST);
 
         //    space for navigate buttons
-        JPanel panelSouth  = new JPanel();
+        JPanel panelSouth = new JPanel();
         panelSouth.setLayout(new FlowLayout(FlowLayout.LEFT));
         contentPane.add(panelSouth, BorderLayout.SOUTH);
         panelSouth.setBackground(Color.GRAY);
@@ -237,56 +226,61 @@ final class EngagementResults extends KDialog
 
         //  south
         this.firstButton = new JButton("First");
-        firstButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
+        firstButton.addActionListener(new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
                 current = 0;
-                advanceToLast=false;
+                advanceToLast = false;
                 showCurrent();
             }
-        }
-        );
+        });
         panelSouth.add(firstButton);
 
         this.prevButton = new JButton("Previous");
-        prevButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
+        prevButton.addActionListener(new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
                 current--;
-                advanceToLast=false;
+                advanceToLast = false;
                 showCurrent();
             }
-        }
-        );
+        });
         panelSouth.add(prevButton);
 
         this.nextButton = new JButton("Next");
-        nextButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
+        nextButton.addActionListener(new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
                 current++;
-                advanceToLast=false;
+                advanceToLast = false;
                 showCurrent();
             }
-        }
-        );
+        });
         panelSouth.add(nextButton);
 
         this.lastButton = new JButton("Last");
-        lastButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
+        lastButton.addActionListener(new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
                 current = engagementLog.size() - 1;
-                advanceToLast=true;
+                advanceToLast = true;
                 showCurrent();
             }
-        }
-        );
+        });
         panelSouth.add(lastButton);
 
         JButton hideButton = new JButton("Hide");
-        hideButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
+        hideButton.addActionListener(new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
                 setVisible(false);
             }
-        }
-        );
+        });
         panelSouth.add(hideButton);
 
         this.firstButton.setEnabled(false);
@@ -295,8 +289,8 @@ final class EngagementResults extends KDialog
         this.lastButton.setEnabled(false);
     }
 
-    private Component createLegionComponent(String markerId,
-        List imageNames, List certainList, boolean isDefender)
+    private Component createLegionComponent(String markerId, List imageNames,
+        List certainList, boolean isDefender)
     {
         // prepare my box
         Box panel = Box.createHorizontalBox();
@@ -313,13 +307,12 @@ final class EngagementResults extends KDialog
         final boolean inverse = false && isDefender;
         // add chits
         int idx = 0;
-        for (Iterator it = imageNames.iterator(); it.hasNext(); )
+        for (Iterator it = imageNames.iterator(); it.hasNext();)
         {
             final String imageName = (String)it.next();
             final Boolean chitCertain = (Boolean)certainList.get(idx);
             final boolean showDubious = !chitCertain.booleanValue();
-            Chit chit = new Chit(scale, imageName, inverse,
-                showDubious);
+            Chit chit = new Chit(scale, imageName, inverse, showDubious);
             panel.add(chit);
             idx += 1;
         }
@@ -352,8 +345,8 @@ final class EngagementResults extends KDialog
         else
         {
             Engagement result = (Engagement)engagementLog.get(current);
-            this.setTitle("Engagement " + (current + 1) + " of " +
-                engagementLog.size());
+            this.setTitle("Engagement " + (current + 1) + " of "
+                + engagementLog.size());
             this.summaryLabel.setText(result.getSummary());
             this.resultLabel.setText(result.getResultText());
             this.attackerIdLabel.setText(result.attackerId);
@@ -361,31 +354,27 @@ final class EngagementResults extends KDialog
 
             this.firstButton.setEnabled(current != 0);
             this.prevButton.setEnabled(current != 0);
-            this.nextButton.setEnabled(current != engagementLog.size()-1);
-            this.lastButton.setEnabled(current != engagementLog.size()-1);
+            this.nextButton.setEnabled(current != engagementLog.size() - 1);
+            this.lastButton.setEnabled(current != engagementLog.size() - 1);
 
             this.panelCenter.removeAll();
             this.panelCenter.add(createLegionComponent(result.attackerId,
                 result.attackerStartingContents,
-                result.attackerStartingCertainities,
-                false));
+                result.attackerStartingCertainities, false));
             this.panelCenter.add(createLegionComponent(result.defenderId,
                 result.defenderStartingContents,
-                result.defenderStartingCertainities,
-                true));
+                result.defenderStartingCertainities, true));
             if (result.attackerId.equals(result.winnerId))
             {
                 this.panelCenter.add(createLegionComponent(result.attackerId,
                     result.attackerEndingContents,
-                    result.attackerEndingCertainties,
-                    false));
+                    result.attackerEndingCertainties, false));
             }
             else if (result.defenderId.equals(result.winnerId))
             {
                 this.panelCenter.add(createLegionComponent(result.defenderId,
                     result.defenderEndingContents,
-                    result.defenderEndingCertainties,
-                    true));
+                    result.defenderEndingCertainties, true));
             }
             else
             {
@@ -454,17 +443,10 @@ final class EngagementResults extends KDialog
         List attackerEndingCertainties;
         List defenderEndingCertainties;
 
-        public Engagement(
-            String winnerId,
-            String method,
-            int points,
-            int turns,
-            List attackerStartingContents,
-            List defenderStartingContents,
-            List attackerStartingCertainities,
-            List defenderStartingCertainities,
-            IOracle oracle
-            )
+        public Engagement(String winnerId, String method, int points,
+            int turns, List attackerStartingContents,
+            List defenderStartingContents, List attackerStartingCertainities,
+            List defenderStartingCertainities, IOracle oracle)
         {
             this.winnerId = winnerId;
             this.method = method;
@@ -479,22 +461,23 @@ final class EngagementResults extends KDialog
             this.defenderId = oracle.getDefenderMarkerId();
             this.gameTurn = oracle.getTurnNumber();
 
-            this.attackerEndingContents =
-                oracle.getLegionImageNames(this.attackerId);
-            this.defenderEndingContents =
-                oracle.getLegionImageNames(this.defenderId);
-            this.attackerEndingCertainties =
-                oracle.getLegionCreatureCertainties(this.attackerId);
-            this.defenderEndingCertainties =
-                oracle.getLegionCreatureCertainties(this.defenderId);
+            this.attackerEndingContents = oracle
+                .getLegionImageNames(this.attackerId);
+            this.defenderEndingContents = oracle
+                .getLegionImageNames(this.defenderId);
+            this.attackerEndingCertainties = oracle
+                .getLegionCreatureCertainties(this.attackerId);
+            this.defenderEndingCertainties = oracle
+                .getLegionCreatureCertainties(this.defenderId);
 
             this.setWinnerAndLoserId();
         }
 
-        public String getSummary() {
-            return "On turn " + this.gameTurn + ", " + this.attackerId +
-                " attacked " + this.defenderId + " in " +
-                MasterBoard.getHexByLabel(this.hexLabel).getDescription();
+        public String getSummary()
+        {
+            return "On turn " + this.gameTurn + ", " + this.attackerId
+                + " attacked " + this.defenderId + " in "
+                + MasterBoard.getHexByLabel(this.hexLabel).getDescription();
         }
 
         private void setWinnerAndLoserId()
@@ -512,7 +495,7 @@ final class EngagementResults extends KDialog
                 }
                 else
                 {
-                    this.winnerId=null; // @todo is this case possible at all? What does it mean?
+                    this.winnerId = null; // @todo is this case possible at all? What does it mean?
                 }
             }
         }
@@ -522,21 +505,21 @@ final class EngagementResults extends KDialog
             String result = "bogus method";
             if (method.equals(Constants.erMethodFlee))
             {
-                result = winnerId + " won when " + loserId +
-                    " fled and earned " + this.points + " points";
+                result = winnerId + " won when " + loserId
+                    + " fled and earned " + this.points + " points";
             }
             else if (method.equals(Constants.erMethodConcede))
             {
-                result = winnerId + " won when " + loserId +
-                    " conceded and earned " + this.points + " points";
+                result = winnerId + " won when " + loserId
+                    + " conceded and earned " + this.points + " points";
             }
             else if (method.equals(Constants.erMethodConcede))
             {
                 if (winnerId != null)
                 {
-                    result = winnerId +
-                        " won a negotiated settlement and earned " +
-                        this.points + " points";
+                    result = winnerId
+                        + " won a negotiated settlement and earned "
+                        + this.points + " points";
                 }
                 else
                 {
@@ -549,13 +532,13 @@ final class EngagementResults extends KDialog
                 {
                     if (turns > 7)
                     {
-                        result = winnerId + " won the battle by time loss" +
-                            " and earned " + this.points + " points";
+                        result = winnerId + " won the battle by time loss"
+                            + " and earned " + this.points + " points";
                     }
                     else
                     {
-                        result = winnerId + " won the battle in " + this.turns +
-                            " turns and earned " + this.points + " points";
+                        result = winnerId + " won the battle in " + this.turns
+                            + " turns and earned " + this.points + " points";
                     }
                 }
                 else

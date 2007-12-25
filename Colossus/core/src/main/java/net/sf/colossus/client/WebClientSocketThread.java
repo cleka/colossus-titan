@@ -47,8 +47,7 @@ public class WebClientSocketThread extends Thread implements IWebServer
     private PrintWriter out;
     private boolean stillNeedsRun = true;
 
-    private final static String sep =
-        net.sf.colossus.server.Constants.protocolTermSeparator;
+    private final static String sep = net.sf.colossus.server.Constants.protocolTermSeparator;
 
     private boolean loggedIn = false;
     private AckWaiter ackWaiter;
@@ -59,16 +58,16 @@ public class WebClientSocketThread extends Thread implements IWebServer
     {
         super("WebClientSocketThread for user " + username);
         this.webClient = wcGUI;
-        this.hostname  = hostname;
-        this.port      = port;
-        this.username  = username;
-        this.password  = password;
-        this.force     = force;
-        this.email     = email;
+        this.hostname = hostname;
+        this.port = port;
+        this.username = username;
+        this.password = password;
+        this.force = force;
+        this.email = email;
         this.ackWaiter = new AckWaiter();
 
-        net.sf.colossus.webcommon.FinalizeManager.register(this,
-            "WCST " + username);
+        net.sf.colossus.webcommon.FinalizeManager.register(this, "WCST "
+            + username);
 
         try
         {
@@ -98,8 +97,7 @@ public class WebClientSocketThread extends Thread implements IWebServer
         return failedException;
     }
 
-    private void connect()
-        throws WebClientSocketThreadException
+    private void connect() throws WebClientSocketThreadException
     {
         String info = null;
         writeLog("About to connect client socket to " + hostname + ":" + port);
@@ -116,8 +114,8 @@ public class WebClientSocketThread extends Thread implements IWebServer
 
         catch (ConnectException e)
         {
-            info = "Could not connect: '" + e.getMessage() +
-                "' - wrong address/port, or server not running?";
+            info = "Could not connect: '" + e.getMessage()
+                + "' - wrong address/port, or server not running?";
             writeLog(e.toString());
         }
         catch (Exception e) // IOException, IllegalBlockingModeException
@@ -133,15 +131,14 @@ public class WebClientSocketThread extends Thread implements IWebServer
         }
     }
 
-    private void register()
-        throws WebClientSocketThreadException
+    private void register() throws WebClientSocketThreadException
     {
         String info = null;
 
         try
         {
-            this.in = new BufferedReader(new InputStreamReader(
-                socket.getInputStream()));
+            this.in = new BufferedReader(new InputStreamReader(socket
+                .getInputStream()));
 
             send(RegisterUser + sep + username + sep + password + sep + email);
             String fromServer = null;
@@ -154,7 +151,7 @@ public class WebClientSocketThread extends Thread implements IWebServer
                 }
                 else
                 {
-                    String prefix ="NACK: " + IWebServer.RegisterUser + sep;
+                    String prefix = "NACK: " + IWebServer.RegisterUser + sep;
                     if (fromServer.startsWith(prefix))
                     {
                         info = fromServer.substring(prefix.length());
@@ -185,15 +182,14 @@ public class WebClientSocketThread extends Thread implements IWebServer
         }
     }
 
-    private void login()
-        throws WebClientSocketThreadException
+    private void login() throws WebClientSocketThreadException
     {
         String info = null;
         boolean duplicateLogin = false;
         try
         {
-            this.in = new BufferedReader(new InputStreamReader(
-                socket.getInputStream()));
+            this.in = new BufferedReader(new InputStreamReader(socket
+                .getInputStream()));
 
             send(Login + sep + username + sep + password + sep + force);
             String fromServer = null;
@@ -207,15 +203,15 @@ public class WebClientSocketThread extends Thread implements IWebServer
                     // System.out.println("WCST.login(): ok, got ACK! ("+fromServer+")");
                     loggedIn = true;
                 }
-                else if (fromServer.equals("NACK: " + IWebServer.Login + sep +
-                    IWebClient.alreadyLoggedIn))
+                else if (fromServer.equals("NACK: " + IWebServer.Login + sep
+                    + IWebClient.alreadyLoggedIn))
                 {
                     duplicateLogin = true;
                     info = "Already logged in!";
                 }
                 else
                 {
-                    String prefix ="NACK: " + IWebServer.Login + sep;
+                    String prefix = "NACK: " + IWebServer.Login + sep;
                     if (fromServer.startsWith(prefix))
                     {
                         info = fromServer.substring(prefix.length());
@@ -266,7 +262,7 @@ public class WebClientSocketThread extends Thread implements IWebServer
         boolean forcedLogout = false;
         try
         {
-            while ( !done && (fromServer = this.in.readLine()) != null)
+            while (!done && (fromServer = this.in.readLine()) != null)
             {
                 String[] tokens = fromServer.split(sep);
                 String command = tokens[0];
@@ -351,7 +347,8 @@ public class WebClientSocketThread extends Thread implements IWebServer
                     String sender = tokens[3];
                     String message = tokens[4];
                     boolean resent = Boolean.valueOf(tokens[5]).booleanValue();
-                    webClient.chatDeliver(chatId, when, sender, message, resent);
+                    webClient.chatDeliver(chatId, when, sender, message,
+                        resent);
                 }
                 else if (command.equals(IWebClient.grantAdmin))
                 {
@@ -368,9 +365,9 @@ public class WebClientSocketThread extends Thread implements IWebServer
 
             } // while !done && readLine != null
 
-            writeLog("End of SocketClientThread while loop, done = " + done +
-                " readline " +
-                (fromServer==null ? " null " : "'"+fromServer+"'"));
+            writeLog("End of SocketClientThread while loop, done = " + done
+                + " readline "
+                + (fromServer == null ? " null " : "'" + fromServer + "'"));
             if (loggedIn)
             {
                 // Unexpectedly got a connection closed, at least we did not
@@ -381,13 +378,15 @@ public class WebClientSocketThread extends Thread implements IWebServer
         }
         catch (IOException ex)
         {
-            System.out.println("\n\n=========WebClientSocketThread IOException!");
+            System.out
+                .println("\n\n=========WebClientSocketThread IOException!");
             webClient.connectionReset(false);
         }
         catch (Exception e)
         {
-            System.out.println("\n\n=========WebClientSocketThread whatever Exception!" +
-                e.toString());
+            System.out
+                .println("\n\n=========WebClientSocketThread whatever Exception!"
+                    + e.toString());
             Thread.dumpStack();
 
             webClient.connectionReset(false);
@@ -406,7 +405,8 @@ public class WebClientSocketThread extends Thread implements IWebServer
             }
             catch (IOException ex)
             {
-                System.out.println("WebClientSocketThread close() IOException!");
+                System.out
+                    .println("WebClientSocketThread close() IOException!");
             }
         }
         socket = null;
@@ -472,8 +472,8 @@ public class WebClientSocketThread extends Thread implements IWebServer
             }
             catch (InterruptedException e)
             {
-                System.out.println("Woooah. AckWait for command " + command +
-                    " got exception " + e.toString());
+                System.out.println("Woooah. AckWait for command " + command
+                    + " got exception " + e.toString());
             }
             return result;
         }
@@ -494,8 +494,8 @@ public class WebClientSocketThread extends Thread implements IWebServer
     public String changeProperties(String username, String oldPW,
         String newPW, String email, Boolean isAdminObj)
     {
-        String reason = ackWaiter.sendAndWait(ChangePassword, username + sep +
-            oldPW + sep + newPW + sep + email + sep + isAdminObj);
+        String reason = ackWaiter.sendAndWait(ChangePassword, username + sep
+            + oldPW + sep + newPW + sep + email + sep + isAdminObj);
         return reason;
     }
 
@@ -510,19 +510,19 @@ public class WebClientSocketThread extends Thread implements IWebServer
             }
             else
             {
-                System.out.println("NOT same command ? - " + cmd + ", " +
-                    command);
+                System.out.println("NOT same command ? - " + cmd + ", "
+                    + command);
             }
         }
     }
 
-    public GameInfo proposeGame(String initiator, String variant, String viewmode,
-        String expire, boolean unlimitedMulligans, boolean balancedTowers,
-        int min, int target, int max)
+    public GameInfo proposeGame(String initiator, String variant,
+        String viewmode, String expire, boolean unlimitedMulligans,
+        boolean balancedTowers, int min, int target, int max)
     {
-        send(Propose + sep +  initiator + sep + variant + sep + viewmode + sep +
-            expire + sep + unlimitedMulligans + sep + balancedTowers +
-            sep + min + sep + target + sep + max);
+        send(Propose + sep + initiator + sep + variant + sep + viewmode + sep
+            + expire + sep + unlimitedMulligans + sep + balancedTowers + sep
+            + min + sep + target + sep + max);
         return null;
     }
 
@@ -548,8 +548,8 @@ public class WebClientSocketThread extends Thread implements IWebServer
 
     public void chatSubmit(String chatId, String sender, String message)
     {
-        String sending = ChatSubmit + sep + chatId + sep + sender + sep +
-            message;
+        String sending = ChatSubmit + sep + chatId + sep + sender + sep
+            + message;
         send(sending);
     }
 

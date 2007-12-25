@@ -44,4 +44,3 @@ public class MarkerComparator implements Comparator
         return s1.compareTo(s2);
     }
 }
-

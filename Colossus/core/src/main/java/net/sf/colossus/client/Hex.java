@@ -25,7 +25,7 @@ public abstract class Hex
 
     // Game state variables
     private String baseName = "";
-    private String label = "";  // Avoid null pointer in stringWidth()
+    private String label = ""; // Avoid null pointer in stringWidth()
     private int xCoord = -1;
     private int yCoord = -1;
 

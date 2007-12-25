@@ -36,7 +36,7 @@ public class FinalizeClassGroup
         }
         else
         {
-            return type.substring(index+1);
+            return type.substring(index + 1);
         }
     }
 
@@ -97,12 +97,12 @@ public class FinalizeClassGroup
     public synchronized void removeInstance(Object o)
     {
         String type = o.getClass().getName();
-        System.out.println("removeInstance, trying to find object of type " +
-            type + "o="+ o);
+        System.out.println("removeInstance, trying to find object of type "
+            + type + "o=" + o);
 
         int count = instances.size();
-        System.out.println("this group has " + count + " entries: " +
-            instances.toString());
+        System.out.println("this group has " + count + " entries: "
+            + instances.toString());
         Iterator it = instances.keySet().iterator();
         boolean done = false;
 
@@ -113,16 +113,16 @@ public class FinalizeClassGroup
             System.out.println("comparing it to object " + o2);
             if (i.getObj() == o)
             {
-                System.out.println("Found object, removing it, id is " +
-                    i.getId());
+                System.out.println("Found object, removing it, id is "
+                    + i.getId());
                 it.remove();
                 done = true;
             }
         }
         if (!done)
         {
-            System.out.println("removeInstance: Ooops! object of type " + type +
-                " to remove not found!");
+            System.out.println("removeInstance: Ooops! object of type " + type
+                + " to remove not found!");
         }
     }
 

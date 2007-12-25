@@ -7,7 +7,6 @@ package net.sf.colossus.client;
  * @author David Ripton
  */
 
-
 class CritterMove
 {
     private int value;

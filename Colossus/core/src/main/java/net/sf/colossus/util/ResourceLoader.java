@@ -58,7 +58,8 @@ import org.apache.batik.util.XMLResourceDescriptor;
 
 public final class ResourceLoader
 {
-    private static final Logger LOGGER = Logger.getLogger(ResourceLoader.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(ResourceLoader.class
+        .getName());
 
     /**
      * Class ColossusClassLoader allows for class loading outside the
@@ -78,8 +79,7 @@ public final class ResourceLoader
             super();
         }
 
-        public Class findClass(String className)
-            throws ClassNotFoundException
+        public Class findClass(String className) throws ClassNotFoundException
         {
             try
             {
@@ -87,26 +87,24 @@ public final class ResourceLoader
                 String shortClassName = className.substring(index + 1);
                 if (index == -1)
                 {
-                    LOGGER.log(Level.SEVERE,
-                        "Loading of class \"" + className +
-                        "\" failed (no dot in class name)");
+                    LOGGER.log(Level.SEVERE, "Loading of class \"" + className
+                        + "\" failed (no dot in class name)");
                     return null;
                 }
-                InputStream classDataIS =
-                    getInputStream(shortClassName + ".class",
-                    directories);
+                InputStream classDataIS = getInputStream(shortClassName
+                    + ".class", directories);
                 if (classDataIS == null)
                 {
                     LOGGER.log(Level.SEVERE,
-                        "Couldn't find the class file anywhere ! (" +
-                        shortClassName + ".class)");
-                    throw new FileNotFoundException("missing " +
-                        shortClassName + ".class");
+                        "Couldn't find the class file anywhere ! ("
+                            + shortClassName + ".class)");
+                    throw new FileNotFoundException("missing "
+                        + shortClassName + ".class");
                 }
                 byte[] classDataBytes = new byte[classDataIS.available()];
                 classDataIS.read(classDataBytes);
-                return defineClass(className, classDataBytes,
-                    0, classDataBytes.length);
+                return defineClass(className, classDataBytes, 0,
+                    classDataBytes.length);
             }
             catch (Exception e)
             {
@@ -131,14 +129,14 @@ public final class ResourceLoader
     private static final String pathSeparator = "/";
     private static final String[] imageExtension = { ".png", ".gif" };
     private static final String[] svgExtension = { ".svg" };
-    private static final ClassLoader baseCL =
-        ResourceLoader.class.getClassLoader();
-    private static final ColossusClassLoader cl =
-        new ColossusClassLoader(baseCL);
-    private static final Map imageCache =
-        Collections.synchronizedMap(new HashMap());
-    private static final Map fileCache =
-        Collections.synchronizedMap(new HashMap());
+    private static final ClassLoader baseCL = ResourceLoader.class
+        .getClassLoader();
+    private static final ColossusClassLoader cl = new ColossusClassLoader(
+        baseCL);
+    private static final Map imageCache = Collections
+        .synchronizedMap(new HashMap());
+    private static final Map fileCache = Collections
+        .synchronizedMap(new HashMap());
 
     private final static String sep = Constants.protocolTermSeparator;
 
@@ -148,23 +146,24 @@ public final class ResourceLoader
     {
         try
         {
-            baseCL.loadClass(
-                "org.apache.batik.transcoder.image.ImageTranscoder");
+            baseCL
+                .loadClass("org.apache.batik.transcoder.image.ImageTranscoder");
             hasBatik = true;
             // Use Crimson, not Xerces
-            XMLResourceDescriptor.setXMLParserClassName(
-                "org.apache.crimson.parser.XMLReaderImpl");
+            XMLResourceDescriptor
+                .setXMLParserClassName("org.apache.crimson.parser.XMLReaderImpl");
         }
         catch (Exception e)
         {
-            LOGGER.log(Level.FINEST, "Couldn't load class \"" +
-                "org.apache.batik.transcoder.image.ImageTranscoder\", " +
-                "assuming batik (and SVG files) not available.");
+            LOGGER.log(Level.FINEST, "Couldn't load class \""
+                + "org.apache.batik.transcoder.image.ImageTranscoder\", "
+                + "assuming batik (and SVG files) not available.");
         }
     }
 
     private static String server = null;
     private static int serverPort = 0;
+
     public static void setDataServer(String server, int port)
     {
         ResourceLoader.server = server;
@@ -228,29 +227,19 @@ public final class ResourceLoader
             if (o instanceof String)
             {
                 String path = (String)o;
-                for (int i = 0;
-                    ((i < svgExtension.length) &&
-                    (image == null));
-                    i++)
+                for (int i = 0; ((i < svgExtension.length) && (image == null)); i++)
                 {
-                    image = tryLoadSVGImageFromFile(filename +
-                        svgExtension[i], path,
-                        width, height);
+                    image = tryLoadSVGImageFromFile(
+                        filename + svgExtension[i], path, width, height);
                 }
-                for (int i = 0;
-                    ((i < imageExtension.length) &&
-                    (image == null));
-                    i++)
+                for (int i = 0; ((i < imageExtension.length) && (image == null)); i++)
                 {
-                    image = tryLoadImageFromFile(filename +
-                        imageExtension[i], path,
-                        width, height);
+                    image = tryLoadImageFromFile(filename + imageExtension[i],
+                        path, width, height);
                     if (image == null)
                     {
-                        ImageIcon
-                            temp = tryLoadImageIconFromResource(
-                            filename + imageExtension[i], path,
-                            width, height);
+                        ImageIcon temp = tryLoadImageIconFromResource(filename
+                            + imageExtension[i], path, width, height);
                         if (temp != null)
                         {
                             image = temp.getImage();
@@ -267,7 +256,7 @@ public final class ResourceLoader
         {
             waitOnImage(image);
         }
-        return(image);
+        return (image);
     }
 
     /**
@@ -299,33 +288,23 @@ public final class ResourceLoader
             {
                 String path = (String)o;
 
-                for (int i = 0;
-                    ((i < svgExtension.length) &&
-                    (icon == null));
-                    i++)
+                for (int i = 0; ((i < svgExtension.length) && (icon == null)); i++)
                 {
-                    Image temp = tryLoadSVGImageFromFile(filename +
-                        svgExtension[i], path,
-                        width, height);
+                    Image temp = tryLoadSVGImageFromFile(filename
+                        + svgExtension[i], path, width, height);
                     if (temp != null)
                     {
                         icon = new ImageIcon(temp);
                     }
                 }
-                for (int i = 0;
-                    ((i < imageExtension.length) &&
-                    (icon == null));
-                    i++)
+                for (int i = 0; ((i < imageExtension.length) && (icon == null)); i++)
                 {
-                    Image temp =
-                        tryLoadImageFromFile(
-                        filename + imageExtension[i], path, width, height);
+                    Image temp = tryLoadImageFromFile(filename
+                        + imageExtension[i], path, width, height);
                     if (temp == null)
                     {
-                        icon =
-                            tryLoadImageIconFromResource(filename +
-                            imageExtension[i],
-                            path, width, height);
+                        icon = tryLoadImageIconFromResource(filename
+                            + imageExtension[i], path, width, height);
                     }
                     else
                     {
@@ -338,12 +317,12 @@ public final class ResourceLoader
                 }
             }
         }
-        while (icon != null &&
-            icon.getImageLoadStatus() == MediaTracker.LOADING)
+        while (icon != null
+            && icon.getImageLoadStatus() == MediaTracker.LOADING)
         { // no need for CPU time
             Thread.yield();
         }
-        return(icon);
+        return (icon);
     }
 
     /**
@@ -360,10 +339,8 @@ public final class ResourceLoader
         try
         {
             java.net.URL url;
-            url = new java.net.URL("file:" +
-                path +
-                pathSeparator +
-                fixFilename(filename));
+            url = new java.net.URL("file:" + path + pathSeparator
+                + fixFilename(filename));
             // URL will not be null even if the file doesn't exist,
             // so we need to check if connection can be opened
             if (url.openStream() != null)
@@ -400,9 +377,7 @@ public final class ResourceLoader
         try
         {
             java.net.URL url;
-            url = cl.getResource(path +
-                pathSeparator +
-                fixFilename(filename));
+            url = cl.getResource(path + pathSeparator + fixFilename(filename));
             // URL will not be null even if the file doesn't exist,
             // so we need to check if connection can be opened
             if (url.openStream() != null)
@@ -419,8 +394,7 @@ public final class ResourceLoader
         {
             return null;
         }
-        if ((icon.getIconWidth() == width) &&
-            (icon.getIconHeight() == height))
+        if ((icon.getIconWidth() == width) && (icon.getIconHeight() == height))
         {
             return icon;
         }
@@ -453,8 +427,7 @@ public final class ResourceLoader
      * @param directories List of directories to search (in order).
      * @return The InputStream, or null if it was not found.
      */
-    public static InputStream getInputStream(String filename,
-        List directories)
+    public static InputStream getInputStream(String filename, List directories)
     {
         return getInputStream(filename, directories, server != null, false,
             false);
@@ -483,8 +456,8 @@ public final class ResourceLoader
         {
             if (!ignoreFail)
             {
-                LOGGER.log(Level.WARNING, "Requested file " + filename +
-                    " is requested cached-only but is not is cache.");
+                LOGGER.log(Level.WARNING, "Requested file " + filename
+                    + " is requested cached-only but is not is cache.");
             }
             return null;
         }
@@ -501,8 +474,8 @@ public final class ResourceLoader
                     if (o instanceof String)
                     {
                         String path = (String)o;
-                        String fullPath = path + pathSeparator +
-                            fixFilename(filename);
+                        String fullPath = path + pathSeparator
+                            + fixFilename(filename);
                         try
                         {
                             File tempFile = new File(fullPath);
@@ -528,10 +501,10 @@ public final class ResourceLoader
                     }
                     if (!ignoreFail)
                     {
-                        LOGGER.log(Level.WARNING, "getInputStream:: " +
-                            " Couldn't get InputStream for file " +
-                            filename + " in " + directories +
-                            (cachedOnly ? " (cached only)" : ""));
+                        LOGGER.log(Level.WARNING, "getInputStream:: "
+                            + " Couldn't get InputStream for file " + filename
+                            + " in " + directories
+                            + (cachedOnly ? " (cached only)" : ""));
                         // @TODO this sounds more serious than just a warning in the logs
                         // Anyway now at least MarkersLoader does not complain any more...
                     }
@@ -560,18 +533,17 @@ public final class ResourceLoader
 
                         if (is == null)
                         {
-                            LOGGER.log(Level.WARNING, "getInputStream:: " +
-                                " Couldn't get InputStream from socket" +
-                                " for file " +
-                                filename + " in " + directories +
-                                (cachedOnly ? " (cached only)" : ""));
+                            LOGGER.log(Level.WARNING, "getInputStream:: "
+                                + " Couldn't get InputStream from socket"
+                                + " for file " + filename + " in "
+                                + directories
+                                + (cachedOnly ? " (cached only)" : ""));
                             // @TODO this sounds more serious than just a warning in the logs
                         }
                         else
                         {
-                            PrintWriter out =
-                                new PrintWriter(fileSocket.getOutputStream(),
-                                true);
+                            PrintWriter out = new PrintWriter(fileSocket
+                                .getOutputStream(), true);
 
                             if (ignoreFail)
                             {
@@ -589,13 +561,13 @@ public final class ResourceLoader
                             }
                             out.println();
                             data = getBytesFromInputStream(is);
-                            if ( data != null && data.length == 0 &&
-                                !ignoreFail)
+                            if (data != null && data.length == 0
+                                && !ignoreFail)
                             {
                                 LOGGER.log(Level.WARNING,
-                                    "Got empty contents for file " +
-                                    filename + " directories " +
-                                    directories.toString());
+                                    "Got empty contents for file " + filename
+                                        + " directories "
+                                        + directories.toString());
                             }
                             fileSocket.close();
                             fileCache.put(mapKey, data);
@@ -603,14 +575,14 @@ public final class ResourceLoader
                     }
                     catch (Exception e)
                     {
-                        LOGGER.log(Level.SEVERE,
-                            "Failed to read from stream", e);
+                        LOGGER.log(Level.SEVERE, "Failed to read from stream",
+                            e);
                     }
                 }
 
             }
         }
-        return( data==null ? null : getInputStreamFromBytes(data));
+        return (data == null ? null : getInputStreamFromBytes(data));
     }
 
     /**
@@ -622,20 +594,20 @@ public final class ResourceLoader
      * @return An array of byte representing the content of the file, 
      *     or null if it fails.
      */
-    public static byte[] getBytesFromFile(String filename,
-        List directories, boolean cachedOnly, boolean ignoreFail)
+    public static byte[] getBytesFromFile(String filename, List directories,
+        boolean cachedOnly, boolean ignoreFail)
     {
-        InputStream is = getInputStream(filename, directories,
-            server != null, cachedOnly, ignoreFail);
+        InputStream is = getInputStream(filename, directories, server != null,
+            cachedOnly, ignoreFail);
         if (is == null)
         {
             // right now only FileServerThread is using this method at all.
             if (!ignoreFail)
             {
-                LOGGER.log(Level.WARNING, "getBytesFromFile:: " +
-                    " Couldn't get InputStream for file " +
-                    filename + " in " + directories +
-                    (cachedOnly ? " (cached only)" : ""));
+                LOGGER.log(Level.WARNING, "getBytesFromFile:: "
+                    + " Couldn't get InputStream for file " + filename
+                    + " in " + directories
+                    + (cachedOnly ? " (cached only)" : ""));
             }
             return null;
         }
@@ -673,8 +645,7 @@ public final class ResourceLoader
         }
         catch (Exception e)
         {
-            LOGGER.log(Level.SEVERE,
-                "Can't Stringify stream " + is + ".", e);
+            LOGGER.log(Level.SEVERE, "Can't Stringify stream " + is + ".", e);
         }
         return all;
     }
@@ -688,9 +659,8 @@ public final class ResourceLoader
     {
         if (data == null)
         {
-            LOGGER.log(Level.WARNING,
-                "getInputStreamFromBytes:: " +
-                " Can't create InputStream from null byte array");
+            LOGGER.log(Level.WARNING, "getInputStreamFromBytes:: "
+                + " Can't create InputStream from null byte array");
             return null;
         }
         return new ByteArrayInputStream(data);
@@ -721,14 +691,13 @@ public final class ResourceLoader
                 }
                 catch (Exception e)
                 {
-                    LOGGER.log(Level.FINEST, "getOutputStream:: " +
-                        " Couldn't get OutputStream for file " +
-                        filename + " in " + directories +
-                        "(" + e.getMessage() + ")");
+                    LOGGER.log(Level.FINEST, "getOutputStream:: "
+                        + " Couldn't get OutputStream for file " + filename
+                        + " in " + directories + "(" + e.getMessage() + ")");
                 }
             }
         }
-        return(stream);
+        return (stream);
     }
 
     /**
@@ -741,11 +710,10 @@ public final class ResourceLoader
      * @param directories List of directories to search (in order).
      * @return The Document, or null if it was not found.
      */
-    public static Document getDocument(String filename,
-        List directories)
+    public static Document getDocument(String filename, List directories)
     {
-        InputStream htmlIS = getInputStreamIgnoreFail(
-            filename + ".html", directories);
+        InputStream htmlIS = getInputStreamIgnoreFail(filename + ".html",
+            directories);
         if (htmlIS != null)
         {
             try
@@ -759,8 +727,8 @@ public final class ResourceLoader
             catch (Exception e)
             {
                 LOGGER.log(Level.SEVERE,
-                    "html document exists, but cannot be loaded (" +
-                    filename + "): ", e);
+                    "html document exists, but cannot be loaded (" + filename
+                        + "): ", e);
             }
             return null;
         }
@@ -787,8 +755,7 @@ public final class ResourceLoader
                     if (read != -1)
                     {
                         txtdoc.insertString(offset,
-                            new String(buffer, 0, read),
-                            null);
+                            new String(buffer, 0, read), null);
                         offset += read;
                     }
                 }
@@ -798,14 +765,13 @@ public final class ResourceLoader
             catch (Exception e)
             {
                 LOGGER.log(Level.SEVERE,
-                    "text document exists, but cannot be loaded (" +
-                    filename + "): " + e, e);
+                    "text document exists, but cannot be loaded (" + filename
+                        + "): " + e, e);
             }
             return null;
         }
-        LOGGER.log(Level.WARNING,
-            "No document for basename " + filename + " found " +
-            "(neither .html, .txt nor without extention)!");
+        LOGGER.log(Level.WARNING, "No document for basename " + filename
+            + " found " + "(neither .html, .txt nor without extention)!");
         return null;
     }
 
@@ -816,8 +782,7 @@ public final class ResourceLoader
      * @return A String to use as a key when storing/loading in a cache
      *   the specified file from the specified list of directories.
      */
-    private static String getMapKey(String filename,
-        List directories)
+    private static String getMapKey(String filename, List directories)
     {
         String[] filenames = new String[1];
         filenames[0] = filename;
@@ -832,8 +797,7 @@ public final class ResourceLoader
      *   the specified array of name of files from the specified 
      *   list of directories.
      */
-    private static String getMapKey(String[] filenames,
-        List directories)
+    private static String getMapKey(String[] filenames, List directories)
     {
         StringBuffer buf = new StringBuffer(filenames[0]);
         for (int i = 1; i < filenames.length; i++)
@@ -875,35 +839,29 @@ public final class ResourceLoader
         }
         if ((cached != null) && (cached instanceof ImageIcon))
         {
-            return((ImageIcon)cached).getImage();
+            return ((ImageIcon)cached).getImage();
         }
         Image[] tempImage = new Image[filenames.length];
         for (int i = 0; i < filenames.length; i++)
         {
-            tempImage[i] =
-                getImage(filenames[i], directories, width, height);
+            tempImage[i] = getImage(filenames[i], directories, width, height);
             if (tempImage[i] == null)
             {
                 tempImage[i] = tryBuildingNonexistentImage(filenames[i],
-                    width, height,
-                    directories);
+                    width, height, directories);
             }
             if (tempImage[i] == null)
             {
-                LOGGER.log(Level.SEVERE, "during creation of [" + mapKey +
-                    "], loading failed for " + filenames[i]);
+                LOGGER.log(Level.SEVERE, "during creation of [" + mapKey
+                    + "], loading failed for " + filenames[i]);
                 return null;
             }
         }
-        bi = new BufferedImage(width, height,
-            BufferedImage.TYPE_INT_ARGB);
+        bi = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         Graphics2D biContext = bi.createGraphics();
         for (int i = 0; (biContext != null) && (i < filenames.length); i++)
         {
-            biContext.drawImage(tempImage[i],
-                0, 0,
-                width, height,
-                null);
+            biContext.drawImage(tempImage[i], 0, 0, width, height, null);
             waitOnImage(bi);
         }
         imageCache.put(mapKey, bi);
@@ -929,73 +887,57 @@ public final class ResourceLoader
 
         if (filename.startsWith("Plain-"))
         {
-            tempImage =
-                createPlainImage(width, height,
-                colorFromFilename(filename,
-                "Plain-"));
+            tempImage = createPlainImage(width, height, colorFromFilename(
+                filename, "Plain-"));
         }
         if (filename.startsWith("Power-"))
         {
             int val = numberFromFilename(filename, "Power-");
-            tempImage =
-                createNumberImage(width, height, val, false,
-                colorFromFilename(filename,
-                "Power-"));
+            tempImage = createNumberImage(width, height, val, false,
+                colorFromFilename(filename, "Power-"));
         }
         if (filename.startsWith("Skill-"))
         {
             int val = numberFromFilename(filename, "Skill-");
-            tempImage =
-                createNumberImage(width, height, val, true,
-                colorFromFilename(filename,
-                "Skill-"));
+            tempImage = createNumberImage(width, height, val, true,
+                colorFromFilename(filename, "Skill-"));
         }
-        if (filename.startsWith("Flying") ||
-            filename.startsWith("Rangestrike"))
+        if (filename.startsWith("Flying")
+            || filename.startsWith("Rangestrike"))
         {
             int fly_ix = filename.indexOf("Flying");
             int rgs_ix = filename.indexOf("Rangestrike");
-            String prefix =
-                (fly_ix != -1 ? "Flying" : "") +
-                (rgs_ix != -1 ? "Rangestrike" : "");
-            tempImage =
-                createColorizedImage(prefix + "Base",
-                colorFromFilename(filename,
-                prefix),
-                directories, width, height);
+            String prefix = (fly_ix != -1 ? "Flying" : "")
+                + (rgs_ix != -1 ? "Rangestrike" : "");
+            tempImage = createColorizedImage(prefix + "Base",
+                colorFromFilename(filename, prefix), directories, width,
+                height);
         }
         if (filename.indexOf("-Name") != -1)
         {
-            String name =
-                filename.substring(0,
-                filename.indexOf("-Name"));
-            tempImage =
-                createNameImage(width, height, name, false,
-                colorFromFilename(filename,
-                name + "-Name"));
+            String name = filename.substring(0, filename.indexOf("-Name"));
+            tempImage = createNameImage(width, height, name, false,
+                colorFromFilename(filename, name + "-Name"));
         }
         if (filename.indexOf("-Subscript") != -1)
         {
-            String name =
-                filename.substring(0,
-                filename.indexOf("-Subscript"));
-            tempImage =
-                createNameImage(width, height, name, true,
-                colorFromFilename(filename,
-                name + "-Subscript"));
+            String name = filename
+                .substring(0, filename.indexOf("-Subscript"));
+            tempImage = createNameImage(width, height, name, true,
+                colorFromFilename(filename, name + "-Subscript"));
         }
 
         if (tempImage == null)
         {
-            LOGGER.log(Level.WARNING,
-                "WARNING: creation failed for " + filename);
+            LOGGER.log(Level.WARNING, "WARNING: creation failed for "
+                + filename);
             return createPlainImage(width, height, Color.white, true);
         }
         waitOnImage(tempImage);
         String mapKey = getMapKey(filename, directories);
         mapKey = mapKey + "(" + width + "," + height + ")";
         imageCache.put(mapKey, tempImage);
-        return(tempImage);
+        return (tempImage);
     }
 
     /**
@@ -1013,8 +955,8 @@ public final class ResourceLoader
         BufferedImage bi = new BufferedImage(width, height,
             BufferedImage.TYPE_INT_ARGB);
         Graphics2D biContext = bi.createGraphics();
-        biContext.setColor(
-            new Color((float)1., (float)1., (float)1., (float)0.));
+        biContext.setColor(new Color((float)1., (float)1., (float)1.,
+            (float)0.));
         biContext.fillRect(0, 0, width, height);
         biContext.setColor(color);
         int fontsize = (width + height) / 10;
@@ -1026,15 +968,11 @@ public final class ResourceLoader
 
         if (right)
         {
-            biContext.drawString(valueTxt,
-                (width - (sw + 2)),
-                height - 2);
+            biContext.drawString(valueTxt, (width - (sw + 2)), height - 2);
         }
         else
         {
-            biContext.drawString(valueTxt,
-                2,
-                height - 2);
+            biContext.drawString(valueTxt, 2, height - 2);
         }
         waitOnImage(bi);
 
@@ -1050,14 +988,14 @@ public final class ResourceLoader
      * @param color The color to use to draw the String.
      * @return The generated Image.
      */
-    private static Image createNameImage(int width, int height,
-        String name, boolean down, Color color)
+    private static Image createNameImage(int width, int height, String name,
+        boolean down, Color color)
     {
         BufferedImage bi = new BufferedImage(width, height,
             BufferedImage.TYPE_INT_ARGB);
         Graphics2D biContext = bi.createGraphics();
-        biContext.setColor(
-            new Color((float)1., (float)1., (float)1., (float)0.));
+        biContext.setColor(new Color((float)1., (float)1., (float)1.,
+            (float)0.));
         biContext.fillRect(0, 0, width, height);
         biContext.setColor(color);
         int fontsize = (width + height) / 10;
@@ -1076,8 +1014,8 @@ public final class ResourceLoader
             sw = (int)sb.getWidth();
         }
         int offset = (width - sw) / 2;
-        biContext.drawString(name, offset,
-            (down ? (height - 2) : (1 + fm.getMaxAscent())));
+        biContext.drawString(name, offset, (down ? (height - 2) : (1 + fm
+            .getMaxAscent())));
         waitOnImage(bi);
 
         return bi;
@@ -1092,8 +1030,7 @@ public final class ResourceLoader
      */
     private static Image createPlainImage(int width, int height, Color color)
     {
-        return createPlainImage(width, height, color,
-            0, 0, width, height,
+        return createPlainImage(width, height, color, 0, 0, width, height,
             false);
     }
 
@@ -1108,8 +1045,7 @@ public final class ResourceLoader
     private static Image createPlainImage(int width, int height, Color color,
         boolean border)
     {
-        return createPlainImage(width, height, color,
-            0, 0, width, height,
+        return createPlainImage(width, height, color, 0, 0, width, height,
             border);
     }
 
@@ -1127,14 +1063,13 @@ public final class ResourceLoader
      * @return The generated Image.
      */
     private static Image createPlainImage(int width, int height, Color color,
-        int t_x, int t_y, int t_w, int t_h,
-        boolean border)
+        int t_x, int t_y, int t_w, int t_h, boolean border)
     {
         BufferedImage bi = new BufferedImage(width, height,
             BufferedImage.TYPE_INT_ARGB);
         Graphics2D biContext = bi.createGraphics();
-        biContext.setColor(
-            new Color((float)1., (float)1., (float)1., (float)0.));
+        biContext.setColor(new Color((float)1., (float)1., (float)1.,
+            (float)0.));
         biContext.fillRect(0, 0, width, height);
         biContext.setColor(color);
         biContext.fillRect(t_x, t_y, t_w, t_h);
@@ -1166,19 +1101,15 @@ public final class ResourceLoader
         }
         if (tempIcon.getImageLoadStatus() != MediaTracker.COMPLETE)
         {
-            LOGGER.log(Level.SEVERE,
-                "Image loading of " + filename + " failed (" +
-                tempIcon.getImageLoadStatus() + ")");
+            LOGGER.log(Level.SEVERE, "Image loading of " + filename
+                + " failed (" + tempIcon.getImageLoadStatus() + ")");
             return null;
         }
 
         BufferedImage bi = new BufferedImage(width, height,
             BufferedImage.TYPE_INT_ARGB);
         Graphics2D biContext = bi.createGraphics();
-        biContext.drawImage(temp,
-            0, 0,
-            width, height,
-            null);
+        biContext.drawImage(temp, 0, 0, width, height, null);
         waitOnImage(bi);
 
         int[] pi;
@@ -1223,9 +1154,8 @@ public final class ResourceLoader
         }
         if (icon.getImageLoadStatus() != MediaTracker.COMPLETE)
         {
-            LOGGER.log(Level.SEVERE,
-                "Image loading failed (" + icon.getImageLoadStatus() +
-                ")");
+            LOGGER.log(Level.SEVERE, "Image loading failed ("
+                + icon.getImageLoadStatus() + ")");
         }
     }
 
@@ -1240,10 +1170,10 @@ public final class ResourceLoader
     {
         if (!(filename.startsWith(prefix)))
         {
-            LOGGER.log(Level.WARNING,
-                "Warning: " + prefix + " is not prefix of " + filename);
+            LOGGER.log(Level.WARNING, "Warning: " + prefix
+                + " is not prefix of " + filename);
             // boil out if we are on a developer box, use default otherwise
-            assert false: "illegal combination for filename and prefix";
+            assert false : "illegal combination for filename and prefix";
             return 0;
         }
         int index = prefix.length();
@@ -1285,8 +1215,8 @@ public final class ResourceLoader
         }
         catch (Exception e)
         {
-            LOGGER.log(Level.SEVERE,
-                "during number extraction: " + e.getMessage(), e);
+            LOGGER.log(Level.SEVERE, "during number extraction: "
+                + e.getMessage(), e);
         }
         return val;
     }
@@ -1302,9 +1232,10 @@ public final class ResourceLoader
     {
         if (!(filename.startsWith(prefix)))
         {
-            LOGGER.log(Level.WARNING, prefix + " is not prefix of " + filename);
+            LOGGER
+                .log(Level.WARNING, prefix + " is not prefix of " + filename);
             // boil out if we are on a developer box, use default otherwise
-            assert false: "illegal combination for filename and prefix";
+            assert false : "illegal combination for filename and prefix";
             return "black";
         }
         int index = prefix.length();
@@ -1358,8 +1289,8 @@ public final class ResourceLoader
      */
     private static Color colorFromFilename(String filename, String prefix)
     {
-        return HTMLColor.stringToColor(colorNameFromFilename(filename,
-            prefix));
+        return HTMLColor
+            .stringToColor(colorNameFromFilename(filename, prefix));
     }
 
     /**
@@ -1378,8 +1309,7 @@ public final class ResourceLoader
      * @param directories List of directories to search (in order).
      * @return A new object, instance from the given class.
      */
-    public static Object getNewObject(String className,
-        List directories)
+    public static Object getNewObject(String className, List directories)
     {
         return getNewObject(className, directories, null);
     }
@@ -1400,8 +1330,7 @@ public final class ResourceLoader
      * @return A new object, instance from the given class or null if 
      *         instantiation failed.
      */
-    public static Object getNewObject(String className,
-        List directories,
+    public static Object getNewObject(String className, List directories,
         Object[] parameter)
     {
         Class theClass = null;
@@ -1412,8 +1341,8 @@ public final class ResourceLoader
         }
         catch (Exception e)
         {
-            LOGGER.log(Level.SEVERE,
-                "Loading of class \"" + className + "\" failed.", e);
+            LOGGER.log(Level.SEVERE, "Loading of class \"" + className
+                + "\" failed.", e);
             return null;
         }
         if (parameter != null)
@@ -1431,9 +1360,8 @@ public final class ResourceLoader
             catch (Exception e)
             {
                 LOGGER.log(Level.SEVERE,
-                    "Loading or instantiating class' constructor for \"" +
-                    className +
-                    "\" failed", e);
+                    "Loading or instantiating class' constructor for \""
+                        + className + "\" failed", e);
                 return null;
             }
         }
@@ -1445,8 +1373,8 @@ public final class ResourceLoader
             }
             catch (Exception e)
             {
-                LOGGER.log(Level.SEVERE, "Instantiating \"" + className +
-                    "\" failed", e);
+                LOGGER.log(Level.SEVERE, "Instantiating \"" + className
+                    + "\" failed", e);
                 return null;
             }
         }
@@ -1459,8 +1387,8 @@ public final class ResourceLoader
      * @param directories List of directories to search (in order).
      * @param data File content to add.
      */
-    public static void putIntoFileCache(String filename,
-        List directories, byte[] data)
+    public static void putIntoFileCache(String filename, List directories,
+        byte[] data)
     {
         String mapKey = getMapKey(filename, directories);
         fileCache.put(mapKey, data);
@@ -1474,8 +1402,7 @@ public final class ResourceLoader
      * @param mapKey Key to use in the cache.
      * @param data File content to add.
      */
-    public static void putIntoFileCache(String mapKey,
-        byte[] data)
+    public static void putIntoFileCache(String mapKey, byte[] data)
     {
         fileCache.put(mapKey, data);
     }
@@ -1527,6 +1454,7 @@ public final class ResourceLoader
     }
 
     static boolean useSVG = false;
+
     public static void setUseSVG(boolean useSVG)
     {
         ResourceLoader.useSVG = useSVG;
@@ -1551,20 +1479,18 @@ public final class ResourceLoader
         try
         {
             java.net.URL url;
-            url = new java.net.URL("file:" +
-                path +
-                pathSeparator +
-                fixFilename(filename));
+            url = new java.net.URL("file:" + path + pathSeparator
+                + fixFilename(filename));
             // URL will not be null even if the file doesn't exist,
             // so we need to check if connection can be opened
             InputStream stream = url.openStream();
             if (stream != null)
             {
                 BufferedImageTranscoder t = new BufferedImageTranscoder();
-                t.addTranscodingHint(ImageTranscoder.KEY_WIDTH,
-                    new Float(width));
-                t.addTranscodingHint(ImageTranscoder.KEY_HEIGHT,
-                    new Float(height));
+                t.addTranscodingHint(ImageTranscoder.KEY_WIDTH, new Float(
+                    width));
+                t.addTranscodingHint(ImageTranscoder.KEY_HEIGHT, new Float(
+                    height));
                 TranscoderInput input = new TranscoderInput(stream);
                 t.transcode(input, null);
                 image = t.getImage();
@@ -1576,9 +1502,8 @@ public final class ResourceLoader
         }
         catch (Exception e)
         {
-            LOGGER.log(Level.FINE,
-                "SVG transcoding for " + filename + " in " + path +
-                " failed.", e);
+            LOGGER.log(Level.FINE, "SVG transcoding for " + filename + " in "
+                + path + " failed.", e);
             // nothing to do
         }
         return image;

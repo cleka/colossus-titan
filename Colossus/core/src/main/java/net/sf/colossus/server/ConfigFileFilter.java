@@ -11,7 +11,8 @@ import java.io.FilenameFilter;
  * @version $Id$
  */
 
-public final class ConfigFileFilter extends javax.swing.filechooser.FileFilter implements FilenameFilter
+public final class ConfigFileFilter extends javax.swing.filechooser.FileFilter
+    implements FilenameFilter
 {
     public static final String description = "Colossus options file";
 

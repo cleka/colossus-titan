@@ -23,7 +23,8 @@ import net.sf.colossus.server.CustomRecruitBase;
  */
 public class BalrogRecruitment extends CustomRecruitBase
 {
-	private static final Logger LOGGER = Logger.getLogger(BalrogRecruitment.class.getName());
+    private static final Logger LOGGER = Logger
+        .getLogger(BalrogRecruitment.class.getName());
 
     private Map nameToOldScore = Collections.synchronizedMap(new HashMap());
     private final static int balrogValue = 300;
@@ -78,7 +79,8 @@ public class BalrogRecruitment extends CustomRecruitBase
         return temp;
     }
 
-    public int numberOfRecruiterNeeded(String recruiter, String recruit, String terrain, String hexLabel)
+    public int numberOfRecruiterNeeded(String recruiter, String recruit,
+        String terrain, String hexLabel)
     {
         return 0;
     }
@@ -104,7 +106,8 @@ public class BalrogRecruitment extends CustomRecruitBase
 
         if (pi == null)
         {
-            LOGGER.log(Level.FINEST, "CUSTOM: no player info for hex " + hexLabel);
+            LOGGER.log(Level.FINEST, "CUSTOM: no player info for hex "
+                + hexLabel);
             return;
         }
 
@@ -135,8 +138,8 @@ public class BalrogRecruitment extends CustomRecruitBase
 
         if (!Creature.isCreature(name))
         {
-            LOGGER.log(Level.SEVERE, "CUSTOM: Balrog by the name of " + name +
-			" doesn't exist !");
+            LOGGER.log(Level.SEVERE, "CUSTOM: Balrog by the name of " + name
+                + " doesn't exist !");
             return;
         }
 
@@ -150,15 +153,16 @@ public class BalrogRecruitment extends CustomRecruitBase
 
         if (difference > 0)
         {
-            LOGGER.log(Level.FINEST, "CUSTOM: Pushing the total number of " + name +
-			" from " + alreadyNumber + " to " + nowNumber +
-			" (new available count is: " + newcount + ")");
+            LOGGER.log(Level.FINEST, "CUSTOM: Pushing the total number of "
+                + name + " from " + alreadyNumber + " to " + nowNumber
+                + " (new available count is: " + newcount + ")");
         }
         else if (difference < 0)
         {
-            LOGGER.log(Level.FINEST, "CUSTOM: WARNING: DIMINISHING the total number of " +
-			name + " from " + alreadyNumber + " to " + nowNumber +
-			" (new available count is: " + newcount + ")");
+            LOGGER.log(Level.FINEST,
+                "CUSTOM: WARNING: DIMINISHING the total number of " + name
+                    + " from " + alreadyNumber + " to " + nowNumber
+                    + " (new available count is: " + newcount + ")");
         }
     }
 

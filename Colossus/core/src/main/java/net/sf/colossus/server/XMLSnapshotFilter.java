@@ -11,7 +11,8 @@ import java.io.FilenameFilter;
  * @version $Id$
  */
 
-public final class XMLSnapshotFilter extends javax.swing.filechooser.FileFilter implements FilenameFilter
+public final class XMLSnapshotFilter extends
+    javax.swing.filechooser.FileFilter implements FilenameFilter
 {
     public static final String description = "snapshots";
 
@@ -42,4 +43,3 @@ public final class XMLSnapshotFilter extends javax.swing.filechooser.FileFilter 
         return description;
     }
 }
-

@@ -48,7 +48,8 @@ public class SystemExitManager
         // System.out.println("SystemExitManager: now " + viableEntities.size() + " entities registered.");
     }
 
-    public static synchronized void doSystemExitMaybe(Object viableEntity, int exitCode)
+    public static synchronized void doSystemExitMaybe(Object viableEntity,
+        int exitCode)
     {
         SystemExitManager.exitCode = exitCode;
 
@@ -113,7 +114,8 @@ public class SystemExitManager
             }
             catch (InterruptedException e)
             {
-                System.out.println("SystemExitManager.waitUntilAllGone(): InterruptedException!");
+                System.out
+                    .println("SystemExitManager.waitUntilAllGone(): InterruptedException!");
             }
         }
     }
@@ -139,7 +141,6 @@ public class SystemExitManager
      *  has cleaned up all, stopped all other (own) socket threads,
      *  see all finalizers, etc.
      */
-
 
     /* Actually, since I use the SwingCleanup stuff,
      * I did not need to do this interrupt thing any more...
@@ -175,7 +176,8 @@ public class SystemExitManager
         System.out.println("\nPRESS RETURN TO CONTINUE!");
         try
         {
-            BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+            BufferedReader in = new BufferedReader(new InputStreamReader(
+                System.in));
             in.readLine();
         }
         catch (IOException e)
@@ -195,15 +197,16 @@ public class SystemExitManager
             }
         }
 
-        System.out.println("SystemExitManager.waitReturn(), run by thread " +
-            Thread.currentThread().getName());
+        System.out.println("SystemExitManager.waitReturn(), run by thread "
+            + Thread.currentThread().getName());
         System.out.println("\n----------\nStart.main() has done it's job\n");
 
         System.gc();
         System.runFinalization();
         net.sf.colossus.webcommon.FinalizeManager.printStatistics(false);
 
-        System.out.println("Press return to proceed with cleanup...\n----------\n");
+        System.out
+            .println("Press return to proceed with cleanup...\n----------\n");
         int cnt = 2;
         String line = "";
         boolean done = false;
@@ -214,7 +217,8 @@ public class SystemExitManager
 
             try
             {
-                BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+                BufferedReader in = new BufferedReader(new InputStreamReader(
+                    System.in));
                 line = in.readLine();
 
                 if (line.equals("h"))
@@ -225,11 +229,13 @@ public class SystemExitManager
 
                 if (line.equals("f"))
                 {
-                    net.sf.colossus.util.DummyFrameWithMenu f1 =
-                        new net.sf.colossus.util.DummyFrameWithMenu(""+cnt);
+                    net.sf.colossus.util.DummyFrameWithMenu f1 = new net.sf.colossus.util.DummyFrameWithMenu(
+                        "" + cnt);
                     cnt++;
 
-                    try { Thread.sleep(500);
+                    try
+                    {
+                        Thread.sleep(500);
                     }
                     catch (InterruptedException ex)
                     {
@@ -252,7 +258,8 @@ public class SystemExitManager
                     System.gc();
                     System.runFinalization();
 
-                    net.sf.colossus.webcommon.FinalizeManager.printStatistics(false);
+                    net.sf.colossus.webcommon.FinalizeManager
+                        .printStatistics(false);
                 }
 
                 if (line.equals("x"))
@@ -273,7 +280,8 @@ public class SystemExitManager
             System.gc();
             System.runFinalization();
         }
-        System.out.println("ok, list empty or x entered... finishing shutdown...");
+        System.out
+            .println("ok, list empty or x entered... finishing shutdown...");
     }
 
     //                         E N D   D E B U G    S T U F F

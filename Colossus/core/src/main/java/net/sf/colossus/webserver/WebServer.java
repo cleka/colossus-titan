@@ -33,11 +33,11 @@ import net.sf.colossus.webcommon.User;
  *  @author Clemens Katzer
  */
 
-
 public class WebServer implements IWebServer, IRunWebServer
 {
 
-    private static final Logger LOGGER = Logger.getLogger(WebServer.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(WebServer.class
+        .getName());
 
     private WebServerOptions options = null;
     private PortBookKeeper portBookKeeper = null;
@@ -67,8 +67,8 @@ public class WebServer implements IWebServer, IRunWebServer
     private int port;
 
     private ServerSocket serverSocket;
-    private List activeSocketList =
-        Collections.synchronizedList(new ArrayList());
+    private List activeSocketList = Collections
+        .synchronizedList(new ArrayList());
 
     private List lastNChatMessages = new ArrayList();
 
@@ -90,9 +90,12 @@ public class WebServer implements IWebServer, IRunWebServer
         // (shutDownRequested set to true, so that the loop quits)
         server = null;
 
-        try { Thread.sleep(1000);
+        try
+        {
+            Thread.sleep(1000);
         }
-        catch (InterruptedException e) {/* ignore */
+        catch (InterruptedException e)
+        {/* ignore */
         }
         System.gc();
         System.runFinalization();
@@ -109,15 +112,20 @@ public class WebServer implements IWebServer, IRunWebServer
         this.options = new WebServerOptions(optionsFile);
         options.loadOptions();
 
-        this.port = options.getIntOptionNoUndef(WebServerConstants.optServerPort);
-        this.maxClients = options.getIntOptionNoUndef(WebServerConstants.optMaxClients);
+        this.port = options
+            .getIntOptionNoUndef(WebServerConstants.optServerPort);
+        this.maxClients = options
+            .getIntOptionNoUndef(WebServerConstants.optMaxClients);
 
-        int portRangeFrom = options.getIntOptionNoUndef(WebServerConstants.optPortRangeFrom);
-        int availablePorts = options.getIntOptionNoUndef(WebServerConstants.optAvailablePorts);
+        int portRangeFrom = options
+            .getIntOptionNoUndef(WebServerConstants.optPortRangeFrom);
+        int availablePorts = options
+            .getIntOptionNoUndef(WebServerConstants.optAvailablePorts);
 
         portBookKeeper = new PortBookKeeper(portRangeFrom, availablePorts);
 
-        String usersFile = options.getStringOption(WebServerConstants.optUsersFile);
+        String usersFile = options
+            .getStringOption(WebServerConstants.optUsersFile);
         int maxUsers = options.getIntOption(WebServerConstants.optMaxUsers);
 
         User.readUsersFromFile(usersFile, maxUsers);
@@ -125,8 +133,8 @@ public class WebServer implements IWebServer, IRunWebServer
         System.out.println("OK: port " + port + ", maxClients " + maxClients);
 
         long now = new Date().getTime();
-        ChatMessage startMsg = new ChatMessage(IWebServer.generalChatName, now,
-            "SYSTEM", "WebServer started. Welcome!!");
+        ChatMessage startMsg = new ChatMessage(IWebServer.generalChatName,
+            now, "SYSTEM", "WebServer started. Welcome!!");
         storeMessage(lastNChatMessages, startMsg);
 
         if (runGUI)
@@ -150,18 +158,19 @@ public class WebServer implements IWebServer, IRunWebServer
          }
          */
 
-        LOGGER.log(Level.FINEST, "WebServer instantiated, maxClients = " +
-            maxClients + " , port = " + port);
+        LOGGER.log(Level.FINEST, "WebServer instantiated, maxClients = "
+            + maxClients + " , port = " + port);
     }
 
     void initSocketServer()
     {
         numClients = 0;
 
-        int socketQueueLen = options.getIntOptionNoUndef(WebServerConstants.optSocketQueueLen);
+        int socketQueueLen = options
+            .getIntOptionNoUndef(WebServerConstants.optSocketQueueLen);
 
-        LOGGER.log(Level.FINEST,
-            "About to create server socket on port " + port);
+        LOGGER.log(Level.FINEST, "About to create server socket on port "
+            + port);
         try
         {
             if (serverSocket != null)
@@ -174,8 +183,8 @@ public class WebServer implements IWebServer, IRunWebServer
         }
         catch (IOException ex)
         {
-            LOGGER.log(Level.FINEST, "Could not create socket. " +
-                "Configure networking in OS.", ex);
+            LOGGER.log(Level.FINEST, "Could not create socket. "
+                + "Configure networking in OS.", ex);
             System.exit(1);
         }
 
@@ -223,9 +232,10 @@ public class WebServer implements IWebServer, IRunWebServer
         {
             shutdownServer();
         }
-        catch(Exception e)
+        catch (Exception e)
         {
-            System.out.println("initiateShutdown - got exception " + e.toString());
+            System.out.println("initiateShutdown - got exception "
+                + e.toString());
         }
     }
 
@@ -248,11 +258,11 @@ public class WebServer implements IWebServer, IRunWebServer
         // UnknownHostException, IOException, IllegalBlockingModeException
         catch (Exception e)
         {
-            System.out.println("WebServer.initiateShutdown: got exception " +
-                e.toString());
+            System.out.println("WebServer.initiateShutdown: got exception "
+                + e.toString());
         }
     }
-    
+
     private boolean waitForUser()
     {
         boolean rejected = false;
@@ -260,11 +270,10 @@ public class WebServer implements IWebServer, IRunWebServer
         try
         {
             clientSocket = serverSocket.accept();
-            LOGGER.log(Level.FINEST, "Got client connection from " +
-                clientSocket.getInetAddress().toString());
-            LOGGER.log(Level.FINEST,
-                "Got client connection from IP: " +
-                clientSocket.getInetAddress().toString());
+            LOGGER.log(Level.FINEST, "Got client connection from "
+                + clientSocket.getInetAddress().toString());
+            LOGGER.log(Level.FINEST, "Got client connection from IP: "
+                + clientSocket.getInetAddress().toString());
 
             if (shutdownRequested)
             {
@@ -291,15 +300,14 @@ public class WebServer implements IWebServer, IRunWebServer
             if (shutdownRequested)
             {
                 LOGGER.log(Level.SEVERE,
-                    "Waiting for user did throw exception: " +
-                    ex.toString());
+                    "Waiting for user did throw exception: " + ex.toString());
             }
             else
             {
                 // does not matter
                 LOGGER.log(Level.FINEST,
-                    "ShutdownRequested, closing caused an exception: " +
-                    ex.toString());
+                    "ShutdownRequested, closing caused an exception: "
+                        + ex.toString());
 
             }
             return false;
@@ -307,8 +315,8 @@ public class WebServer implements IWebServer, IRunWebServer
 
         if (!rejected)
         {
-            WebServerClientSocketThread cst = new WebServerClientSocketThread(this,
-                clientSocket);
+            WebServerClientSocketThread cst = new WebServerClientSocketThread(
+                this, clientSocket);
             cst.start();
         }
 
@@ -333,7 +341,8 @@ public class WebServer implements IWebServer, IRunWebServer
         {
             User u = (User)it.next();
 
-            WebServerClientSocketThread thread = (WebServerClientSocketThread)u.getThread();
+            WebServerClientSocketThread thread = (WebServerClientSocketThread)u
+                .getThread();
             try
             {
                 thread.interrupt();
@@ -346,8 +355,9 @@ public class WebServer implements IWebServer, IRunWebServer
             }
             catch (Exception e)
             {
-                System.out.println("Different exception than usual while tried to interrupt 'other': " +
-                    e.toString());
+                System.out
+                    .println("Different exception than usual while tried to interrupt 'other': "
+                        + e.toString());
             }
 
             // System.out.println("WebServer.closeAllWscst's: before join");
@@ -377,16 +387,15 @@ public class WebServer implements IWebServer, IRunWebServer
     public void updateGUI()
     {
         assert gui != null;
-        gui.setPotentialGamesInfo(potentialGames.size() +
-            " potential games stored");
+        gui.setPotentialGamesInfo(potentialGames.size()
+            + " potential games stored");
         gui.setRunningGamesInfo(runningGames.size() + " running games");
         gui.setEndingGamesInfo(endingGames.size() + " games just ending");
     }
 
     public GameInfo proposeGame(String initiator, String variant,
-        String viewmode, String expire,
-        boolean unlimitedMulligans, boolean balancedTowers,
-        int min, int target, int max)
+        String viewmode, String expire, boolean unlimitedMulligans,
+        boolean balancedTowers, int min, int target, int max)
     {
         GameInfo gi = new GameInfo(initiator, variant, viewmode, expire,
             unlimitedMulligans, balancedTowers, min, target, max);
@@ -424,8 +433,7 @@ public class WebServer implements IWebServer, IRunWebServer
                 // System.out.println("\n++++\nTelling user " + newUser.getName() + 
                 //        " that he is still enrolled in game " + gi.getGameId());
                 // userMap finds already new user for that name
-                client.didEnroll(gi.getGameId(),
-                    newUser.getName());
+                client.didEnroll(gi.getGameId(), newUser.getName());
             }
         }
     }
@@ -455,7 +463,8 @@ public class WebServer implements IWebServer, IRunWebServer
 
     public void gameFailed(GameInfo gi, String reason)
     {
-        System.out.println("GAME starting/running failed!!! Reason: " + reason);
+        System.out
+            .println("GAME starting/running failed!!! Reason: " + reason);
     }
 
     public void tellEnrolledGameStartsSoon(GameInfo gi)
@@ -505,7 +514,6 @@ public class WebServer implements IWebServer, IRunWebServer
 
     // =========== Client actions ========== 
 
-
     public void enrollUserToGame(String gameId, String username)
     {
         GameInfo gi = findByGameId(gameId);
@@ -546,7 +554,7 @@ public class WebServer implements IWebServer, IRunWebServer
         if (gi != null)
         {
             gi.setServerNull();
-            gi.start();   // does nothing, just to get it GC'd and finalized
+            gi.start(); // does nothing, just to get it GC'd and finalized
 
             Iterator it = User.getLoggedInUsersIterator();
             while (it.hasNext())
@@ -569,10 +577,12 @@ public class WebServer implements IWebServer, IRunWebServer
             boolean success = startOneGame(gi);
 
             // System.out.println("Found gi, got port " + port);
-            if ( !success )
+            if (!success)
             {
-                System.out.println("\n#####\nWebServer, fatal error: " +
-                    "starting/running game " + gameId + " failed!!\n#####\n");
+                System.out
+                    .println("\n#####\nWebServer, fatal error: "
+                        + "starting/running game " + gameId
+                        + " failed!!\n#####\n");
             }
         }
     }
@@ -594,8 +604,8 @@ public class WebServer implements IWebServer, IRunWebServer
         }
         else
         {
-            System.out.println("Chat for chatId " + chatId +
-                " not implemented.");
+            System.out.println("Chat for chatId " + chatId
+                + " not implemented.");
         }
     }
 
@@ -609,8 +619,8 @@ public class WebServer implements IWebServer, IRunWebServer
         }
         else
         {
-            System.out.println("tellLastChatMessagesToOne: illegal chat id " +
-                chatId + " - doing nothing");
+            System.out.println("tellLastChatMessagesToOne: illegal chat id "
+                + chatId + " - doing nothing");
             return;
         }
         IWebClient client = cst;
@@ -621,8 +631,8 @@ public class WebServer implements IWebServer, IRunWebServer
             while (it.hasNext())
             {
                 ChatMessage m = (ChatMessage)it.next();
-                client.chatDeliver(m.getChatId(), m.getWhen(),
-                    m.getSender(), m.getMessage(), true);
+                client.chatDeliver(m.getChatId(), m.getWhen(), m.getSender(),
+                    m.getMessage(), true);
             }
             long now = new Date().getTime();
             client.chatDeliver(chatId, now, null, null, true);
@@ -635,7 +645,8 @@ public class WebServer implements IWebServer, IRunWebServer
         // only listed here to satisfy the interface.
     }
 
-    public String registerUser(String username, String password, String email, boolean isAdmin)
+    public String registerUser(String username, String password, String email,
+        boolean isAdmin)
     {
         String reason = User.registerUser(username, password, email, isAdmin);
         return reason;
@@ -701,7 +712,7 @@ public class WebServer implements IWebServer, IRunWebServer
         boolean ok = gi.makeRunningGame(this, workFilesBaseDir, template,
             javaCommand, colossusJar, port);
 
-        if (!ok )
+        if (!ok)
         {
             System.out.println("makeRunningGame returned false?!?");
             return false;
@@ -886,7 +897,6 @@ public class WebServer implements IWebServer, IRunWebServer
      }
      */
 
-
     /**
      * A Null Object for the web server GUI interface.
      *
@@ -924,7 +934,6 @@ public class WebServer implements IWebServer, IRunWebServer
             // nothing
         }
     }
-
 
     class WebServerOptions
     {
@@ -999,8 +1008,8 @@ public class WebServer implements IWebServer, IRunWebServer
             int val = getIntOption(optname);
             if (val == -1)
             {
-                System.out.println("Invalid or not set value for " + optname +
-                    " from WebServer config file " + filename);
+                System.out.println("Invalid or not set value for " + optname
+                    + " from WebServer config file " + filename);
                 System.exit(1);
             }
             return val;
@@ -1045,8 +1054,8 @@ public class WebServer implements IWebServer, IRunWebServer
                     {
                         GameInfo game = (GameInfo)it.next();
                         String name = game.getName();
-                        System.out.println("REAPER: wait for '" + name +
-                            "' to end...");
+                        System.out.println("REAPER: wait for '" + name
+                            + "' to end...");
                         try
                         {
                             game.join();
@@ -1054,8 +1063,8 @@ public class WebServer implements IWebServer, IRunWebServer
                         }
                         catch (InterruptedException e)
                         {
-                            System.out.println("Ups??? Catched exception " +
-                                e.toString());
+                            System.out.println("Ups??? Catched exception "
+                                + e.toString());
                         }
                         it.remove();
                     }
@@ -1082,7 +1091,6 @@ public class WebServer implements IWebServer, IRunWebServer
         }
     }
 
-
     private class ChatMessage
     {
         String chatId;
@@ -1090,7 +1098,8 @@ public class WebServer implements IWebServer, IRunWebServer
         String sender;
         String message;
 
-        public ChatMessage(String chatId, long when, String sender, String message)
+        public ChatMessage(String chatId, long when, String sender,
+            String message)
         {
             this.chatId = chatId;
             this.when = when;
@@ -1137,4 +1146,3 @@ public class WebServer implements IWebServer, IRunWebServer
         }
     }
 }
-

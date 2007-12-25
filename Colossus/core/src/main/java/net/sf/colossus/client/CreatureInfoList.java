@@ -16,12 +16,13 @@ import java.util.logging.Logger;
  */
 class CreatureInfoList extends ArrayList
 {
-    private static final Logger LOGGER = Logger.getLogger(CreatureInfoList.class.getName());
+    private static final Logger LOGGER = Logger
+        .getLogger(CreatureInfoList.class.getName());
 
     int numCreature(String creatureName)
     {
         int count = 0;
-        for (Iterator it = iterator(); it.hasNext(); )
+        for (Iterator it = iterator(); it.hasNext();)
         {
             CreatureInfo ci = (CreatureInfo)it.next();
             if (creatureName.equals(ci.getName()))
@@ -35,7 +36,7 @@ class CreatureInfoList extends ArrayList
     /** Return the first CreatureInfo that matches the passed name. */
     CreatureInfo getCreatureInfo(String creatureName)
     {
-        for (Iterator it = iterator(); it.hasNext(); )
+        for (Iterator it = iterator(); it.hasNext();)
         {
             CreatureInfo ci = (CreatureInfo)it.next();
             if (ci.getName().equals(creatureName))
@@ -68,7 +69,7 @@ class CreatureInfoList extends ArrayList
         {
             name = "Titan";
         }
-        for (Iterator it = iterator(); it.hasNext(); )
+        for (Iterator it = iterator(); it.hasNext();)
         {
             CreatureInfo ci = (CreatureInfo)it.next();
             if (name.equals(ci.getName()))
@@ -83,7 +84,7 @@ class CreatureInfoList extends ArrayList
     List getCreatureNames()
     {
         List list = new ArrayList();
-        for (Iterator it = iterator(); it.hasNext(); )
+        for (Iterator it = iterator(); it.hasNext();)
         {
             CreatureInfo ci = (CreatureInfo)it.next();
             list.add(ci.getName());
@@ -95,7 +96,7 @@ class CreatureInfoList extends ArrayList
     public Object clone()
     {
         CreatureInfoList dupe = new CreatureInfoList();
-        for (Iterator it = iterator(); it.hasNext(); )
+        for (Iterator it = iterator(); it.hasNext();)
         {
             CreatureInfo ci = (CreatureInfo)it.next();
             dupe.add(ci.clone());

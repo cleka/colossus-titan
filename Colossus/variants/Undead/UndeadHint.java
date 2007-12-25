@@ -14,42 +14,35 @@ public class UndeadHint implements net.sf.colossus.server.HintInterface
 {
     private DevRandom rnd = new DevRandom();
 
-    public String getRecruitHint(String terrain,
-            LegionInfo legion,
-            List recruits,
-            HintOracleInterface oracle,
-            String[] section)
+    public String getRecruitHint(String terrain, LegionInfo legion,
+        List recruits, HintOracleInterface oracle, String[] section)
     {
         recruits = DefaultHint.creaturesToStrings(recruits);
 
         if (terrain.equals("Brush"))
         {
-            if (recruits.contains("Zombie") &&
-                    !legion.contains("Wraith") &&
-                    legion.numCreature("Zombie") == 2 &&
-                    oracle.creatureAvailable("Wraith") >= 2)
+            if (recruits.contains("Zombie") && !legion.contains("Wraith")
+                && legion.numCreature("Zombie") == 2
+                && oracle.creatureAvailable("Wraith") >= 2)
             {
                 return "Zombie";
             }
         }
         else if (terrain.equals("Plains"))
         {
-            if (recruits.contains("Naga") &&
-                    !legion.contains("Griffon") &&
-                    legion.numCreature("Naga") == 2 &&
-                    oracle.canReach("Desert") &&
-                    oracle.creatureAvailable("Griffon") >= 2)
+            if (recruits.contains("Naga") && !legion.contains("Griffon")
+                && legion.numCreature("Naga") == 2
+                && oracle.canReach("Desert")
+                && oracle.creatureAvailable("Griffon") >= 2)
             {
                 return "Naga";
             }
         }
         else if (terrain.equals("Marsh"))
         {
-            if (recruits.contains("Orc") &&
-                    !legion.contains("Wyvern") &&
-                    legion.numCreature("Orc") == 2 &&
-                    oracle.canReach("Swamp") &&
-                    oracle.creatureAvailable("Wyvern") >= 2)
+            if (recruits.contains("Orc") && !legion.contains("Wyvern")
+                && legion.numCreature("Orc") == 2 && oracle.canReach("Swamp")
+                && oracle.creatureAvailable("Wyvern") >= 2)
             {
                 return "Orc";
             }
@@ -72,39 +65,39 @@ public class UndeadHint implements net.sf.colossus.server.HintInterface
             {
                 return "Wizard";
             }
-            if (recruits.contains("Skeleton") &&
-                    legion.numCreature("Skeleton") == 1 &&
-                    oracle.creatureAvailable("Zombie") >= 3)
+            if (recruits.contains("Skeleton")
+                && legion.numCreature("Skeleton") == 1
+                && oracle.creatureAvailable("Zombie") >= 3)
             {
                 return "Skeleton";
             }
-            if (recruits.contains("Troglodyte") &&
-                    legion.numCreature("Troglodyte") == 1 &&
-                    oracle.creatureAvailable("Orc") >= 2)
+            if (recruits.contains("Troglodyte")
+                && legion.numCreature("Troglodyte") == 1
+                && oracle.creatureAvailable("Orc") >= 2)
             {
                 return "Troglodyte";
             }
-            if (recruits.contains("Paladin") &&
-                    legion.numCreature("Paladin") == 1 &&
-                    oracle.creatureAvailable("Naga") >= 2)
+            if (recruits.contains("Paladin")
+                && legion.numCreature("Paladin") == 1
+                && oracle.creatureAvailable("Naga") >= 2)
             {
                 return "Paladin";
             }
-            if (recruits.contains("Skeleton") &&
-                    legion.numCreature("Skeleton") == 0 &&
-                    oracle.creatureAvailable("Zombie") >= 6)
+            if (recruits.contains("Skeleton")
+                && legion.numCreature("Skeleton") == 0
+                && oracle.creatureAvailable("Zombie") >= 6)
             {
                 return "Skeleton";
             }
-            if (recruits.contains("Troglodyte") &&
-                    legion.numCreature("Troglodyte") == 0 &&
-                    oracle.creatureAvailable("Orc") >= 6)
+            if (recruits.contains("Troglodyte")
+                && legion.numCreature("Troglodyte") == 0
+                && oracle.creatureAvailable("Orc") >= 6)
             {
                 return "Troglodyte";
             }
-            if (recruits.contains("Paladin") &&
-                    legion.numCreature("Paladin") == 0 &&
-                    oracle.creatureAvailable("Naga") >= 6)
+            if (recruits.contains("Paladin")
+                && legion.numCreature("Paladin") == 0
+                && oracle.creatureAvailable("Naga") >= 6)
             {
                 return "Paladin";
             }
@@ -113,8 +106,7 @@ public class UndeadHint implements net.sf.colossus.server.HintInterface
         return (String)recruits.get(recruits.size() - 1);
     }
 
-    public List getInitialSplitHint(String label,
-            String[] section)
+    public List getInitialSplitHint(String label, String[] section)
     {
         List li = new ArrayList();
         if (label.equals("100"))
@@ -206,8 +198,7 @@ public class UndeadHint implements net.sf.colossus.server.HintInterface
         return li;
     }
 
-    public int getHintedRecruitmentValueOffset(String name,
-            String[] section)
+    public int getHintedRecruitmentValueOffset(String name, String[] section)
     {
         return 0;
     }

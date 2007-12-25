@@ -30,42 +30,40 @@ public interface Terrains
     //   lake, stone
     //
     /** hazard terrain name Plains */
-    String H_PLAINS   = "Plains";
+    String H_PLAINS = "Plains";
 
     /** hazard terrain name Brambles */
     String H_BRAMBLES = "Brambles";
 
     /** hazard terrain name Sand */
-    String H_SAND     = "Sand";
+    String H_SAND = "Sand";
 
     /** hazard terrain name Tree */
-    String H_TREE     = "Tree";
+    String H_TREE = "Tree";
 
     /** hazard terrain name Bog */
-    String H_BOG      = "Bog";
+    String H_BOG = "Bog";
 
     /** hazard terrain name Volcano */
-    String H_VOLCANO  = "Volcano";
+    String H_VOLCANO = "Volcano";
 
     /** hazard terrain name Drift */
-    String H_DRIFT    = "Drift";
+    String H_DRIFT = "Drift";
 
     /** hazard terrain name Tower */
-    String H_TOWER    = "Tower";
+    String H_TOWER = "Tower";
 
     /** hazard terrain name Stone */
-    String H_STONE    = "Stone";
+    String H_STONE = "Stone";
 
     /** hazard terrain name Lake, in some variants */
-    String H_LAKE     = "Lake";
+    String H_LAKE = "Lake";
 
     /**
      * The array of all the valid terrain type for a BattleHex.
      * TODO: in Java 1.5 make an enum of this.
      */
-    String[] ALL_HAZARD_TERRAINS = {
-        H_PLAINS, H_TOWER, H_BRAMBLES,
-        H_SAND, H_TREE, H_BOG, H_VOLCANO, H_DRIFT,
-        H_LAKE, H_STONE };
+    String[] ALL_HAZARD_TERRAINS = { H_PLAINS, H_TOWER, H_BRAMBLES, H_SAND,
+        H_TREE, H_BOG, H_VOLCANO, H_DRIFT, H_LAKE, H_STONE };
 
 }

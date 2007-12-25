@@ -11,10 +11,10 @@ import java.util.logging.Logger;
  * @author David Ripton
  */
 
-
 public final class Probs
 {
-    private static final Logger LOGGER = Logger.getLogger(Probs.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(Probs.class
+        .getName());
 
     static int lastFakeDie = 5;
 
@@ -36,12 +36,11 @@ public final class Probs
     }
 
     /** Return the probability of getting exactly this number of hits. */
-    public static double probHits(int dice, int strikeNumber,
-        int hits)
+    public static double probHits(int dice, int strikeNumber, int hits)
     {
         double p = (7.0 - strikeNumber) / 6.0;
-        return Math.pow(p, hits) * Math.pow(1 - p, dice - hits) *
-            choose(dice, hits);
+        return Math.pow(p, hits) * Math.pow(1 - p, dice - hits)
+            * choose(dice, hits);
     }
 
     /** Return the probability of getting this number of hits or more. */

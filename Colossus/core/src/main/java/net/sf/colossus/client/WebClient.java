@@ -71,7 +71,8 @@ import net.sf.colossus.webcommon.IWebServer;
  *  @author Clemens Katzer
  */
 
-public class WebClient extends KFrame implements WindowListener, ActionListener, IWebClient
+public class WebClient extends KFrame implements WindowListener,
+    ActionListener, IWebClient
 {
     private String hostname;
     private int port;
@@ -98,8 +99,7 @@ public class WebClient extends KFrame implements WindowListener, ActionListener,
     private final static int maxPort = 65535;
     private final static String defaultEmail = "your.email@some.domain";
 
-    private final static String sep =
-        net.sf.colossus.server.Constants.protocolTermSeparator;
+    private final static String sep = net.sf.colossus.server.Constants.protocolTermSeparator;
 
     boolean failedDueToDuplicateLogin = false;
 
@@ -115,7 +115,7 @@ public class WebClient extends KFrame implements WindowListener, ActionListener,
     Box scheduledGamesTab;
     Box adminTab;
 
-    private Point defaultLocation = new Point(600,100);
+    private Point defaultLocation = new Point(600, 100);
 
     // Server/Login pane:
     private JTextField webserverHostField;
@@ -203,10 +203,8 @@ public class WebClient extends KFrame implements WindowListener, ActionListener,
     // private final static String closeButtonText = "Close";
     private final static String quitButtonText = "Quit";
     private final static String HideButtonText = "Hide Web Client";
-    private final static String CantHideText =
-        "(You can hide web client only if game client is open)";
-    private final static String HowtoUnhideText =
-        "You can get web client back from MasterBoard - Window menu";
+    private final static String CantHideText = "(You can hide web client only if game client is open)";
+    private final static String HowtoUnhideText = "You can get web client back from MasterBoard - Window menu";
 
     private final static String ProposeButtonText = "Propose";
     private final static String EnrollButtonText = "Enroll";
@@ -231,8 +229,7 @@ public class WebClient extends KFrame implements WindowListener, ActionListener,
 
     private final static String chatSubmitButtonText = "Submit";
 
-    public WebClient(String hostname, int port,
-        String login, String password)
+    public WebClient(String hostname, int port, String login, String password)
     {
         super(windowTitle + " - not logged in");
 
@@ -244,8 +241,8 @@ public class WebClient extends KFrame implements WindowListener, ActionListener,
         initValues(hostname, port, login, password);
 
         SystemExitManager.register(this, "WebClient " + login);
-        net.sf.colossus.webcommon.FinalizeManager.register(this,
-            "WebClient " + login);
+        net.sf.colossus.webcommon.FinalizeManager.register(this, "WebClient "
+            + login);
 
         if (SwingUtilities.isEventDispatchThread())
         {
@@ -263,18 +260,19 @@ public class WebClient extends KFrame implements WindowListener, ActionListener,
                         setupGUI();
                         autoActions();
                     }
-                }
-                );
+                });
             }
-            catch (InterruptedException e) {/* ignore */
+            catch (InterruptedException e)
+            {/* ignore */
             }
-            catch (InvocationTargetException e2) {/* ignore */
+            catch (InvocationTargetException e2)
+            {/* ignore */
             }
         }
     }
 
-    private void initValues(String hostname, int port,
-        String login, String password)
+    private void initValues(String hostname, int port, String login,
+        String password)
     {
         if (hostname != null && !hostname.equals(""))
         {
@@ -301,7 +299,7 @@ public class WebClient extends KFrame implements WindowListener, ActionListener,
         else
         {
             int cfPort = options.getIntOption(Options.webServerPort);
-            if (cfPort >= 1 )
+            if (cfPort >= 1)
             {
                 this.port = cfPort;
             }
@@ -341,11 +339,13 @@ public class WebClient extends KFrame implements WindowListener, ActionListener,
         }
         else
         {
-            String cfPassword = options.getStringOption(Options.webClientPassword);
-            if (cfPassword != null && !cfPassword.equals("") &&
+            String cfPassword = options
+                .getStringOption(Options.webClientPassword);
+            if (cfPassword != null && !cfPassword.equals("")
+                &&
                 // Use stored password only if its same user:
-                cfLogin != null && cfLogin.equals(this.login) &&
-                !this.login.equals("") )
+                cfLogin != null && cfLogin.equals(this.login)
+                && !this.login.equals(""))
             {
                 this.password = cfPassword;
             }
@@ -391,8 +391,7 @@ public class WebClient extends KFrame implements WindowListener, ActionListener,
                 {
                     doAutoGSAction();
                 }
-            }
-            );
+            });
         }
     }
 
@@ -403,9 +402,8 @@ public class WebClient extends KFrame implements WindowListener, ActionListener,
         getContentPane().add(mainPane, BorderLayout.CENTER);
 
         tabbedPane = new JTabbedPane();
-        tabbedPane.setPreferredSize(new Dimension(600, 600));  // width x height
-        tabbedPane.setMinimumSize(new Dimension(600,
-            530));  // width x height
+        tabbedPane.setPreferredSize(new Dimension(600, 600)); // width x height
+        tabbedPane.setMinimumSize(new Dimension(600, 530)); // width x height
         mainPane.add(tabbedPane);
 
         // ========== Server Tab ===============
@@ -417,7 +415,7 @@ public class WebClient extends KFrame implements WindowListener, ActionListener,
         JPanel loginPane = new JPanel(new GridLayout(0, 2));
         loginPane.setBorder(new TitledBorder("Connection information"));
 
-        loginPane.setPreferredSize(new Dimension(150,200));
+        loginPane.setPreferredSize(new Dimension(150, 200));
 
         loginPane.add(new JLabel("Web Server"));
         webserverHostField = new JTextField(this.hostname);
@@ -425,7 +423,7 @@ public class WebClient extends KFrame implements WindowListener, ActionListener,
         loginPane.add(webserverHostField);
 
         loginPane.add(new JLabel("Port"));
-        webserverPortField = new JTextField(this.port+"");
+        webserverPortField = new JTextField(this.port + "");
         // webserverPortField.addActionListener(this);
         loginPane.add(webserverPortField);
 
@@ -497,7 +495,7 @@ public class WebClient extends KFrame implements WindowListener, ActionListener,
 
         JPanel adminPane = new JPanel(new GridLayout(0, 1));
         adminPane.setBorder(new TitledBorder("Admin mode"));
-        adminPane.setPreferredSize(new Dimension(30,200));
+        adminPane.setPreferredSize(new Dimension(30, 200));
 
         commandField = new JTextField("");
         adminPane.add(commandField);
@@ -527,7 +525,8 @@ public class WebClient extends KFrame implements WindowListener, ActionListener,
 
         scheduledGamesTab = new Box(BoxLayout.Y_AXIS);
         tabbedPane.addTab("Scheduled Games", scheduledGamesTab);
-        scheduledGamesTab.add(new JLabel("This feature is not implemented yet."));
+        scheduledGamesTab.add(new JLabel(
+            "This feature is not implemented yet."));
 
         JPanel preferencesPane = new JPanel(new GridLayout(0, 2));
         preferencesPane.setBorder(new TitledBorder("Game preferences"));
@@ -548,7 +547,7 @@ public class WebClient extends KFrame implements WindowListener, ActionListener,
         // Viewmode:
         // String viewmodesArray[] = { "all-public", "auto-tracked", "only-own" };
         String viewmodeName = options.getStringOption(Options.viewMode);
-        if ( viewmodeName == null )
+        if (viewmodeName == null)
         {
             viewmodeName = Options.viewableAll;
         }
@@ -560,8 +559,9 @@ public class WebClient extends KFrame implements WindowListener, ActionListener,
         preferencesPane.add(viewmodeBox);
 
         // event expiring policy: 
-        String eventExpiringVal = options.getStringOption(Options.eventExpiring);
-        if ( eventExpiringVal == null )
+        String eventExpiringVal = options
+            .getStringOption(Options.eventExpiring);
+        if (eventExpiringVal == null)
         {
             eventExpiringVal = "5";
         }
@@ -574,12 +574,14 @@ public class WebClient extends KFrame implements WindowListener, ActionListener,
 
         // checkboxes (unlimited mulligans and balanced tower):
         Box checkboxPane = new Box(BoxLayout.X_AXIS);
-        boolean unlimitedMulligans = options.getOption(Options.unlimitedMulligans);
+        boolean unlimitedMulligans = options
+            .getOption(Options.unlimitedMulligans);
         unlimitedMulligansCB = new JCheckBox(Options.unlimitedMulligans,
             unlimitedMulligans);
         unlimitedMulligansCB.addActionListener(this);
         boolean balancedTowers = options.getOption(Options.balancedTowers);
-        balancedTowersCB = new JCheckBox(Options.balancedTowers, balancedTowers);
+        balancedTowersCB = new JCheckBox(Options.balancedTowers,
+            balancedTowers);
         balancedTowersCB.addActionListener(this);
         checkboxPane.add(unlimitedMulligansCB);
         checkboxPane.add(balancedTowersCB);
@@ -597,7 +599,7 @@ public class WebClient extends KFrame implements WindowListener, ActionListener,
         int max = options.getIntOption(Options.maxPlayersWeb);
         max = (max < min || max > 6 ? 6 : max);
 
-        int middle = java.lang.Math.round(((float)min+(float)max)/2);
+        int middle = java.lang.Math.round(((float)min + (float)max) / 2);
 
         int targ = options.getIntOption(Options.targPlayersWeb);
         targ = (targ < min || targ > max ? middle : targ);
@@ -659,7 +661,8 @@ public class WebClient extends KFrame implements WindowListener, ActionListener,
 
         Box potGamesPane = new Box(BoxLayout.Y_AXIS);
         potGamesPane.setBorder(new TitledBorder("Proposed Games"));
-        JLabel dummyField = new JLabel("The following games are accepting players:");
+        JLabel dummyField = new JLabel(
+            "The following games are accepting players:");
         potGamesPane.add(dummyField);
 
         potGameDataModel = new GameTableModel();
@@ -667,10 +670,11 @@ public class WebClient extends KFrame implements WindowListener, ActionListener,
         potGameTable = new JTable(potGameDataModel);
 
         potGameListSelectionModel = potGameTable.getSelectionModel();
-        potGameListSelectionModel.addListSelectionListener(new gameTableSelectionHandler());
+        potGameListSelectionModel
+            .addListSelectionListener(new gameTableSelectionHandler());
         potGameTable.setSelectionModel(potGameListSelectionModel);
 
-        potGameTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION );
+        potGameTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         JScrollPane tablescrollpane = new JScrollPane(potGameTable);
         potGamesPane.add(tablescrollpane);
 
@@ -695,7 +699,8 @@ public class WebClient extends KFrame implements WindowListener, ActionListener,
         Box runningGamesPane = new Box(BoxLayout.Y_AXIS);
         // runningGamesPane.setAlignmentY(0);
         runningGamesPane.setBorder(new TitledBorder("Running Games"));
-        runningGamesPane.add(new JLabel("The following games are already running:"));
+        runningGamesPane.add(new JLabel(
+            "The following games are already running:"));
 
         runGameDataModel = new GameTableModel();
 
@@ -709,10 +714,11 @@ public class WebClient extends KFrame implements WindowListener, ActionListener,
          */
 
         runGameListSelectionModel = runGameTable.getSelectionModel();
-        runGameListSelectionModel.addListSelectionListener(new gameTableSelectionHandler());
+        runGameListSelectionModel
+            .addListSelectionListener(new gameTableSelectionHandler());
         runGameTable.setSelectionModel(runGameListSelectionModel);
 
-        runGameTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION );
+        runGameTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         JScrollPane runtablescrollpane = new JScrollPane(runGameTable);
         runningGamesPane.add(runtablescrollpane);
 
@@ -799,11 +805,11 @@ public class WebClient extends KFrame implements WindowListener, ActionListener,
     {
         if (autologinCB.isSelected())
         {
-            String login    = loginField.getText();
+            String login = loginField.getText();
             String password = new String(passwordField.getPassword());
 
             // Eclipse warning says password can never be null. Well...
-            if (login != null && !login.equals("") && !password.equals("") )
+            if (login != null && !login.equals("") && !password.equals(""))
             {
                 doLogin();
             }
@@ -834,8 +840,8 @@ public class WebClient extends KFrame implements WindowListener, ActionListener,
         }
         else
         {
-            System.out.println("ooops! auto Game Start Action option is '" +
-                whatToDo + "' ???");
+            System.out.println("ooops! auto Game Start Action option is '"
+                + whatToDo + "' ???");
         }
     }
 
@@ -868,8 +874,7 @@ public class WebClient extends KFrame implements WindowListener, ActionListener,
                 {
                     addAdminTab();
                 }
-            }
-            );
+            });
         }
         else
         {
@@ -879,8 +884,7 @@ public class WebClient extends KFrame implements WindowListener, ActionListener,
                 {
                     removeAdminTab();
                 }
-            }
-            );
+            });
         }
     }
 
@@ -902,7 +906,8 @@ public class WebClient extends KFrame implements WindowListener, ActionListener,
         // email is null: WCST does login
         cst = new WebClientSocketThread(this, hostname, port, username,
             password, force, null);
-        WebClientSocketThread.WebClientSocketThreadException e = cst.getException();
+        WebClientSocketThread.WebClientSocketThreadException e = cst
+            .getException();
         if (e == null)
         {
             cst.start();
@@ -935,7 +940,7 @@ public class WebClient extends KFrame implements WindowListener, ActionListener,
 
             // if it is the duplicate login case: if force was not set, give
             // user a 2nd chance to login with force, without the original message.
-            if ( !force && e.failedBecauseAlreadyLoggedIn())
+            if (!force && e.failedBecauseAlreadyLoggedIn())
             {
                 failedDueToDuplicateLogin = true;
                 return reason;
@@ -957,20 +962,21 @@ public class WebClient extends KFrame implements WindowListener, ActionListener,
         boolean force = false; // dummy
 
         // email is NOT null: WCST does register first instead of login
-        cst = new WebClientSocketThread(this, hostname, port,
-            username, password, force, email);
+        cst = new WebClientSocketThread(this, hostname, port, username,
+            password, force, email);
 
-        WebClientSocketThread.WebClientSocketThreadException e = cst.getException();
+        WebClientSocketThread.WebClientSocketThreadException e = cst
+            .getException();
         if (e == null)
         {
             cst.start();
             server = cst;
             JOptionPane.showMessageDialog(registerPanel,
-                "Account was created successfully.",
-                "Registration OK", JOptionPane.INFORMATION_MESSAGE);
+                "Account was created successfully.", "Registration OK",
+                JOptionPane.INFORMATION_MESSAGE);
             loginField.setText(username);
             passwordField.setText(password);
-            WebClient.this.login    = username;
+            WebClient.this.login = username;
             WebClient.this.username = username;
             WebClient.this.password = password;
 
@@ -1034,9 +1040,9 @@ public class WebClient extends KFrame implements WindowListener, ActionListener,
         }
 
         saveWindow.save(this);
-        int min    = ((Integer)spinner1.getValue()).intValue();
+        int min = ((Integer)spinner1.getValue()).intValue();
         int target = ((Integer)spinner2.getValue()).intValue();
-        int max    = ((Integer)spinner3.getValue()).intValue();
+        int max = ((Integer)spinner3.getValue()).intValue();
         options.setOption(Options.minPlayersWeb, min);
         options.setOption(Options.maxPlayersWeb, max);
         options.setOption(Options.targPlayersWeb, target);
@@ -1068,8 +1074,7 @@ public class WebClient extends KFrame implements WindowListener, ActionListener,
             {
                 actualUpdateGUI();
             }
-        }
-        );
+        });
 
     }
 
@@ -1152,7 +1157,7 @@ public class WebClient extends KFrame implements WindowListener, ActionListener,
             GameInfo gi = findGameById(enrolledGameId);
             if (gi != null)
             {
-                if (gi.getEnrolledCount().intValue() >= gi.getMin().intValue() )
+                if (gi.getEnrolledCount().intValue() >= gi.getMin().intValue())
                 {
                     startButton.setEnabled(true);
                 }
@@ -1164,12 +1169,13 @@ public class WebClient extends KFrame implements WindowListener, ActionListener,
             }
             else
             {
-                System.out.println("Huuuh? UpdateGUI, get game from hash null??");
+                System.out
+                    .println("Huuuh? UpdateGUI, get game from hash null??");
             }
 
             infoTextLabel.setText(enrolledText);
-            this.setTitle(windowTitle + " - " + username +
-                " - enrolled to game " + enrolledGameId);
+            this.setTitle(windowTitle + " - " + username
+                + " - enrolled to game " + enrolledGameId);
         }
         else if (state == Playing)
         {
@@ -1183,8 +1189,8 @@ public class WebClient extends KFrame implements WindowListener, ActionListener,
             potGameTable.setEnabled(true);
 
             infoTextLabel.setText(playingText);
-            this.setTitle(windowTitle + " - " + username + " - playing game " +
-                enrolledGameId);
+            this.setTitle(windowTitle + " - " + username + " - playing game "
+                + enrolledGameId);
         }
         else
         {
@@ -1232,7 +1238,8 @@ public class WebClient extends KFrame implements WindowListener, ActionListener,
      * false; if valid, returns true.
      */
 
-    private boolean validateField(Component parent, String content, String fieldName)
+    private boolean validateField(Component parent, String content,
+        String fieldName)
     {
         String problem = null;
         String temp = content.trim();
@@ -1247,28 +1254,29 @@ public class WebClient extends KFrame implements WindowListener, ActionListener,
         }
         else if (temp.equalsIgnoreCase("null"))
         {
-            problem = fieldName +
-                " must not be the string 'null', no matter which case!";
+            problem = fieldName
+                + " must not be the string 'null', no matter which case!";
         }
         else if (content.indexOf(sep) != -1)
         {
-            problem = fieldName + " must not contain the string '" + sep + "'!";
+            problem = fieldName + " must not contain the string '" + sep
+                + "'!";
         }
         else
         {
-            for (int i=0 ; i < sep.length() && problem == null; i++)
+            for (int i = 0; i < sep.length() && problem == null; i++)
             {
-                String critChar = sep.substring(i, i+1);
+                String critChar = sep.substring(i, i + 1);
 
                 if (content.startsWith(critChar))
                 {
-                    problem = fieldName + " must not start with '" + critChar +
-                        "'!";
+                    problem = fieldName + " must not start with '" + critChar
+                        + "'!";
                 }
                 else if (content.endsWith(critChar))
                 {
-                    problem = fieldName + " must not end with '" + critChar +
-                        "'!";
+                    problem = fieldName + " must not end with '" + critChar
+                        + "'!";
                 }
             }
         }
@@ -1288,7 +1296,7 @@ public class WebClient extends KFrame implements WindowListener, ActionListener,
         try
         {
             port = Integer.parseInt(portText);
-            if (port < minPort || port > maxPort )
+            if (port < minPort || port > maxPort)
             {
                 ok = false;
             }
@@ -1311,11 +1319,12 @@ public class WebClient extends KFrame implements WindowListener, ActionListener,
         String portText = webserverPortField.getText();
 
         ok = ok && validatePort(this, portText);
-        ok = ok && validateField(this, webserverHostField.getText(),
-            "Host name");
+        ok = ok
+            && validateField(this, webserverHostField.getText(), "Host name");
         ok = ok && validateField(this, loginField.getText(), "Login name");
-        ok = ok && validateField(this, new String(passwordField.getPassword()),
-            "Password");
+        ok = ok
+            && validateField(this, new String(passwordField.getPassword()),
+                "Password");
 
         if (!ok)
         {
@@ -1334,9 +1343,9 @@ public class WebClient extends KFrame implements WindowListener, ActionListener,
         {
             Object[] options = { "Force", "Cancel" };
             int answer = JOptionPane.showOptionDialog(this,
-                "Server has already/still another connection open with " +
-                "that login name. Click Force to forcefully logout the " +
-                "other connection, or Cancel to abort.",
+                "Server has already/still another connection open with "
+                    + "that login name. Click Force to forcefully logout the "
+                    + "other connection, or Cancel to abort.",
                 "WebClient login: Force logout of other connection?",
                 JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE,
                 null, options, options[1]);
@@ -1402,12 +1411,12 @@ public class WebClient extends KFrame implements WindowListener, ActionListener,
         updateGUI();
     }
 
-    private void do_proposeGame(String variant, String viewmode, String expire,
-        boolean unlimMulli, boolean balTowers,
-        int min, int target, int max)
+    private void do_proposeGame(String variant, String viewmode,
+        String expire, boolean unlimMulli, boolean balTowers, int min,
+        int target, int max)
     {
-        server.proposeGame(username, variant, viewmode, expire,
-            unlimMulli, balTowers, min, target, max);
+        server.proposeGame(username, variant, viewmode, expire, unlimMulli,
+            balTowers, min, target, max);
     }
 
     private boolean doEnroll(String gameId)
@@ -1536,8 +1545,8 @@ public class WebClient extends KFrame implements WindowListener, ActionListener,
             {
                 gc = null;
                 JOptionPane.showMessageDialog(this, "Starting game failed!",
-                    "Connecting to the game server " +
-                    "(starting own MasterBoard) failed!",
+                    "Connecting to the game server "
+                        + "(starting own MasterBoard) failed!",
                     JOptionPane.ERROR_MESSAGE);
 
                 state = LoggedIn;
@@ -1579,11 +1588,13 @@ public class WebClient extends KFrame implements WindowListener, ActionListener,
                 }
                 else
                 {
-                    JOptionPane.showMessageDialog(this,
-                        "Starting game failed!",
-                        "Own client could connect, but game did not start " +
-                        "(probably some other player connecting failed?)",
-                        JOptionPane.ERROR_MESSAGE);
+                    JOptionPane
+                        .showMessageDialog(
+                            this,
+                            "Starting game failed!",
+                            "Own client could connect, but game did not start "
+                                + "(probably some other player connecting failed?)",
+                            JOptionPane.ERROR_MESSAGE);
                     state = LoggedIn;
                     updateGUI();
                 }
@@ -1592,10 +1603,9 @@ public class WebClient extends KFrame implements WindowListener, ActionListener,
         catch (Exception e)
         {
             // client startup failed for some reason
-            JOptionPane.showMessageDialog(this,
-                "Starting game failed!",
-                "Unexpected exception while starting the game client: " +
-                e.toString(), JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Starting game failed!",
+                "Unexpected exception while starting the game client: "
+                    + e.toString(), JOptionPane.ERROR_MESSAGE);
             state = LoggedIn;
             updateGUI();
         }
@@ -1605,8 +1615,8 @@ public class WebClient extends KFrame implements WindowListener, ActionListener,
     {
         if (state == Enrolled && enrolledGameId.equals(gameId))
         {
-            String message = "Game " + gameId + " was cancelled by user " +
-                byUser;
+            String message = "Game " + gameId + " was cancelled by user "
+                + byUser;
             JOptionPane.showMessageDialog(this, message);
             state = LoggedIn;
             enrolledGameId = "";
@@ -1678,16 +1688,15 @@ public class WebClient extends KFrame implements WindowListener, ActionListener,
                         }
                         else
                         {
-                            System.out.println("Huups, unhandled game state " +
-                                game.getStateString());
+                            System.out.println("Huups, unhandled game state "
+                                + game.getStateString());
                         }
                     }
                     gamesUpdates.clear();
                 }
                 updateGUI();
             }
-        }
-        );
+        });
 
     }
 
@@ -1708,9 +1717,8 @@ public class WebClient extends KFrame implements WindowListener, ActionListener,
 
     public void connectionReset(boolean forced)
     {
-        String message = (forced ?
-            "Some other connection to server with same login name forced your logout." :
-            "Connection reset by server! You are logged out.");
+        String message = (forced ? "Some other connection to server with same login name forced your logout."
+            : "Connection reset by server! You are logged out.");
         JOptionPane.showMessageDialog(this, message);
         setAdmin(false);
         state = NotLoggedIn;
@@ -1740,17 +1748,15 @@ public class WebClient extends KFrame implements WindowListener, ActionListener,
 
         if (source == proposeButton)
         {
-            int min    = ((Integer)spinner1.getValue()).intValue();
+            int min = ((Integer)spinner1.getValue()).intValue();
             int target = ((Integer)spinner2.getValue()).intValue();
-            int max    = ((Integer)spinner3.getValue()).intValue();
+            int max = ((Integer)spinner3.getValue()).intValue();
 
-            do_proposeGame(
-                variantBox.getSelectedItem().toString(),
-                viewmodeBox.getSelectedItem().toString(),
-                eventExpiringBox.getSelectedItem().toString(),
-                unlimitedMulligansCB.isSelected(),
-                balancedTowersCB.isSelected(),
-                min, target, max);
+            do_proposeGame(variantBox.getSelectedItem().toString(),
+                viewmodeBox.getSelectedItem().toString(), eventExpiringBox
+                    .getSelectedItem().toString(), unlimitedMulligansCB
+                    .isSelected(), balancedTowersCB.isSelected(), min, target,
+                max);
         }
 
         else if (source == enrollButton)
@@ -1871,8 +1877,8 @@ public class WebClient extends KFrame implements WindowListener, ActionListener,
             server.shutdownServer();
         }
 
-        else if (  source == autoGSNothingRB || source == autoGSHideRB ||
-            source == autoGSCloseRB )
+        else if (source == autoGSNothingRB || source == autoGSHideRB
+            || source == autoGSCloseRB)
         {
             String autoGSAction = new String(command);
             options.setOption(optAutoGameStartAction, autoGSAction);
@@ -1880,33 +1886,33 @@ public class WebClient extends KFrame implements WindowListener, ActionListener,
 
         else if (source == variantBox)
         {
-            options.setOption(Options.variant,
-                (String)variantBox.getSelectedItem());
+            options.setOption(Options.variant, (String)variantBox
+                .getSelectedItem());
             // don't care here - we read it when user does the propose action
         }
 
         else if (source == viewmodeBox)
         {
-            options.setOption(Options.viewMode,
-                (String)viewmodeBox.getSelectedItem());
+            options.setOption(Options.viewMode, (String)viewmodeBox
+                .getSelectedItem());
         }
 
         else if (source == eventExpiringBox)
         {
-            options.setOption(Options.eventExpiring,
-                (String)eventExpiringBox.getSelectedItem());
+            options.setOption(Options.eventExpiring, (String)eventExpiringBox
+                .getSelectedItem());
         }
 
         else if (source == balancedTowersCB)
         {
-            options.setOption(Options.balancedTowers,
-                balancedTowersCB.isSelected());
+            options.setOption(Options.balancedTowers, balancedTowersCB
+                .isSelected());
         }
 
         else if (source == unlimitedMulligansCB)
         {
-            options.setOption(Options.unlimitedMulligans,
-                unlimitedMulligansCB.isSelected());
+            options.setOption(Options.unlimitedMulligans, unlimitedMulligansCB
+                .isSelected());
         }
 
         else if (generalChat.submitWasHandled(source))
@@ -1914,7 +1920,8 @@ public class WebClient extends KFrame implements WindowListener, ActionListener,
             // chatHandler did all what is needed; returned true
             // iff it was an event in that chatTab
         }
-        else // A combo box was changed.
+        else
+        // A combo box was changed.
         {
             // Only combo boxes are variant and view mode.
             // We don't react on their change right now;
@@ -2000,10 +2007,9 @@ public class WebClient extends KFrame implements WindowListener, ActionListener,
 
     class GameTableModel extends AbstractTableModel
     {
-        private String[] columnNames = { "#", "state", "by",
-            "Variant", "Viewmode", "Expire",
-            "Mull", "Towers", "min", "target", "max", "actual", "players"
-        };
+        private String[] columnNames = { "#", "state", "by", "Variant",
+            "Viewmode", "Expire", "Mull", "Towers", "min", "target", "max",
+            "actual", "players" };
 
         private Vector data = new Vector(13, 1);
         private HashMap rowIndex = new HashMap();
@@ -2132,7 +2138,7 @@ public class WebClient extends KFrame implements WindowListener, ActionListener,
 
         public void setValueAt(Object value, int row, int col)
         {
-            if (col==-1)
+            if (col == -1)
             {
                 setRowAt(value, row);
                 return;
@@ -2241,7 +2247,7 @@ public class WebClient extends KFrame implements WindowListener, ActionListener,
             {
                 data.clear();
                 rowIndex.clear();
-                fireTableRowsDeleted(0, size-1);
+                fireTableRowsDeleted(0, size - 1);
             }
         }
 
@@ -2300,7 +2306,6 @@ public class WebClient extends KFrame implements WindowListener, ActionListener,
 
     } // END Class GameTableModel
 
-
     class gameTableSelectionHandler implements ListSelectionListener
     {
         public void valueChanged(ListSelectionEvent e)
@@ -2321,7 +2326,6 @@ public class WebClient extends KFrame implements WindowListener, ActionListener,
             }
         }
     } // END Class gameTableSelectionHandler 
-
 
     public class ChatHandler
     {
@@ -2441,7 +2445,8 @@ public class WebClient extends KFrame implements WindowListener, ActionListener,
             }
         }
 
-        public void chatDeliver(long when, String sender, String message, boolean resent)
+        public void chatDeliver(long when, String sender, String message,
+            boolean resent)
         {
             if (resent)
             {
@@ -2451,14 +2456,14 @@ public class WebClient extends KFrame implements WindowListener, ActionListener,
                 {
                     if (resentMode)
                     {
-                        displayArea.append(dashes +
-                            " end of redisplaying older messages " + dashes +
-                            "\n");
+                        displayArea.append(dashes
+                            + " end of redisplaying older messages " + dashes
+                            + "\n");
                     }
                     else
                     {
-                        displayArea.append(dashes +
-                            " (no messages to redisplay) " + dashes + "\n");
+                        displayArea.append(dashes
+                            + " (no messages to redisplay) " + dashes + "\n");
                     }
                     resentMode = false;
                     if (afterResentSender != null)
@@ -2478,9 +2483,9 @@ public class WebClient extends KFrame implements WindowListener, ActionListener,
                 {
                     if (!resentMode)
                     {
-                        displayArea.append("\n" + dashes +
-                            " redisplaying last (up to 10) messages " + dashes +
-                            "\n");
+                        displayArea.append("\n" + dashes
+                            + " redisplaying last (up to 10) messages "
+                            + dashes + "\n");
                     }
                     resentMode = true;
                     lastMsgWhen = when;
@@ -2497,22 +2502,22 @@ public class WebClient extends KFrame implements WindowListener, ActionListener,
 
         private void chatDisplay(long when, String sender, String message)
         {
-            String whenTime   = whenFormatter.timeAsString(when);
+            String whenTime = whenFormatter.timeAsString(when);
             String dateChange = whenFormatter.hasDateChanged();
             if (dateChange != null)
             {
-                displayArea.append("\n" + doubledashes + " " + dateChange + " " +
-                    doubledashes + "\n");
+                displayArea.append("\n" + doubledashes + " " + dateChange
+                    + " " + doubledashes + "\n");
             }
-            displayArea.append(whenTime + " " + sender + ": " + message + "\n");
-            if ( displayArea.getLineCount() - 2 > displayArea.getRows())
+            displayArea
+                .append(whenTime + " " + sender + ": " + message + "\n");
+            if (displayArea.getLineCount() - 2 > displayArea.getRows())
             {
                 displayScrollBar.setValue(displayScrollBar.getMaximum());
             }
         }
 
     } // END class ChatHandler
-
 
     public class FormatWhen
     {
@@ -2562,7 +2567,6 @@ public class WebClient extends KFrame implements WindowListener, ActionListener,
 
     } // END class FormatWhen
 
-
     class RegisterPasswordPanel extends JDialog implements ActionListener
     {
         private boolean isRegister;
@@ -2576,7 +2580,8 @@ public class WebClient extends KFrame implements WindowListener, ActionListener,
 
         private JButton rpButton;
 
-        public RegisterPasswordPanel(KFrame frame, String title, String username)
+        public RegisterPasswordPanel(KFrame frame, String title,
+            String username)
         {
             super(frame, title, true);
             isRegister = (title.equals(createAccountButtonText) ? true : false);
@@ -2615,9 +2620,8 @@ public class WebClient extends KFrame implements WindowListener, ActionListener,
             rpNewPW2 = new JPasswordField("");
             p.add(rpNewPW2);
 
-            String buttonText = (isRegister ?
-                createAccountButtonText :
-                chgPasswordButtonText);
+            String buttonText = (isRegister ? createAccountButtonText
+                : chgPasswordButtonText);
 
             rpButton = new JButton(buttonText);
             rpButton.addActionListener(this);
@@ -2682,7 +2686,7 @@ public class WebClient extends KFrame implements WindowListener, ActionListener,
                 {
                     String hostname = webserverHostField.getText();
                     String portText = webserverPortField.getText();
-                    String email    = rpEmailField.getText();
+                    String email = rpEmailField.getText();
 
                     ok = ok && validateField(this, hostname, "Host name");
                     ok = ok && validatePort(this, portText);
@@ -2702,8 +2706,8 @@ public class WebClient extends KFrame implements WindowListener, ActionListener,
                     String email = null;
                     Boolean isAdminObj = null;
 
-                    String reason = server.changeProperties(name, oldPW, newPW1,
-                        email, isAdminObj);
+                    String reason = server.changeProperties(name, oldPW,
+                        newPW1, email, isAdminObj);
                     if (reason == null || reason.equals("null"))
                     {
                         JOptionPane.showMessageDialog(this,
@@ -2724,12 +2728,11 @@ public class WebClient extends KFrame implements WindowListener, ActionListener,
                 }
                 else
                 {
-                    System.out.println("ooops? Unexpected command " +
-                        command + " in RegisterPasswordPanel action?");
+                    System.out.println("ooops? Unexpected command " + command
+                        + " in RegisterPasswordPanel action?");
                 }
             }
         }
 
     } // END class RegisterPasswordPanel 
 }
-

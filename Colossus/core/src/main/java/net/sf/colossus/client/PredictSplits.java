@@ -21,15 +21,16 @@ import java.util.logging.Logger;
 
 public final class PredictSplits
 {
-    private static final Logger LOGGER = Logger.getLogger(PredictSplits.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(PredictSplits.class
+        .getName());
 
-    private PredictSplitNode root;    // All contents of root must be known.
+    private PredictSplitNode root; // All contents of root must be known.
     private NodeTurnComparator nodeTurnComparator = new NodeTurnComparator();
 
     PredictSplits(String rootId, List creatureNames)
     {
         CreatureInfoList infoList = new CreatureInfoList();
-        for (Iterator it = creatureNames.iterator(); it.hasNext(); )
+        for (Iterator it = creatureNames.iterator(); it.hasNext();)
         {
             String name = (String)it.next();
             CreatureInfo ci = new CreatureInfo(name, true, true);
@@ -73,8 +74,8 @@ public final class PredictSplits
                             throw new PredictSplitsException(
                                 "Two leaf nodes with same markerId and turn");
                         }
-                        else if (leaf1.getTurnCreated() <
-                            leaf2.getTurnCreated())
+                        else if (leaf1.getTurnCreated() < leaf2
+                            .getTurnCreated())
                         {
                             prunes.add(new Integer(i));
                         }
@@ -87,7 +88,7 @@ public final class PredictSplits
             }
         }
         // Remove in reverse order to keep indexes consistent.
-        for (Iterator it = prunes.iterator(); it.hasNext(); )
+        for (Iterator it = prunes.iterator(); it.hasNext();)
         {
             Integer in = (Integer)it.next();
             leaves.remove(in.intValue());
@@ -130,7 +131,7 @@ public final class PredictSplits
         LOGGER.log(Level.FINEST, "");
         List leaves = getLeaves(root);
         Collections.sort(leaves);
-        for (Iterator it = leaves.iterator(); it.hasNext(); )
+        for (Iterator it = leaves.iterator(); it.hasNext();)
         {
             PredictSplitNode leaf = (PredictSplitNode)it.next();
             LOGGER.log(Level.FINEST, leaf.toString());
@@ -144,7 +145,7 @@ public final class PredictSplits
         LOGGER.log(Level.FINEST, "");
         List nodes = getNodes(root);
         Collections.sort(nodes, nodeTurnComparator);
-        for (Iterator it = nodes.iterator(); it.hasNext(); )
+        for (Iterator it = nodes.iterator(); it.hasNext();)
         {
             PredictSplitNode node = (PredictSplitNode)it.next();
             LOGGER.log(Level.FINEST, node.toString());
@@ -156,7 +157,7 @@ public final class PredictSplits
     PredictSplitNode getLeaf(String markerId)
     {
         List leaves = getLeaves(root);
-        for (Iterator it = leaves.iterator(); it.hasNext(); )
+        for (Iterator it = leaves.iterator(); it.hasNext();)
         {
             PredictSplitNode leaf = (PredictSplitNode)it.next();
             if (markerId.equals(leaf.getMarkerId()))

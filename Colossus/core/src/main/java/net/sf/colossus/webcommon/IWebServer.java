@@ -28,12 +28,11 @@ public interface IWebServer
     // register is treated specially, too:
     // public String registerUser(String username, String password, String email);
 
-
     // does not really return a GI object over socket, but method needs
     // that return value (internally) when used in server side.
     public GameInfo proposeGame(String initiator, String variant,
-        String viewmode, String expire, boolean unlimMulli,
-        boolean balTowers, int min, int target, int max);
+        String viewmode, String expire, boolean unlimMulli, boolean balTowers,
+        int min, int target, int max);
 
     public void enrollUserToGame(String gameId, String username);
 
@@ -54,8 +53,8 @@ public interface IWebServer
 
     public void shutdownServer();
 
-    public String changeProperties(String username, String oldPW, String newPW,
-        String email, Boolean isAdminObj);
+    public String changeProperties(String username, String oldPW,
+        String newPW, String email, Boolean isAdminObj);
 
     public void logout();
 

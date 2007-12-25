@@ -16,12 +16,14 @@ import java.awt.event.MouseMotionListener;
  * done by the static method #makeDraggable(Component) to make sure it is done
  * the right way.
  */
-public class DragListener extends MouseAdapter implements MouseMotionListener {
+public class DragListener extends MouseAdapter implements MouseMotionListener
+{
     private final Component component;
 
     private Point lastMousePos;
 
-    private DragListener(Component component) {
+    private DragListener(Component component)
+    {
         this.component = component;
     }
 
@@ -43,16 +45,19 @@ public class DragListener extends MouseAdapter implements MouseMotionListener {
         lastMousePos = newMousePos;
     }
 
-    public void mouseMoved(MouseEvent e) {
+    public void mouseMoved(MouseEvent e)
+    {
         // nothing to do
     }
 
-    public void mouseReleased(MouseEvent e) {
+    public void mouseReleased(MouseEvent e)
+    {
         // reset stored mouse position in case a second drag occurs
         this.lastMousePos = null;
     }
 
-    public static void makeDraggable(Component component) {
+    public static void makeDraggable(Component component)
+    {
         DragListener listener = new DragListener(component);
         component.addMouseListener(listener);
         component.addMouseMotionListener(listener);

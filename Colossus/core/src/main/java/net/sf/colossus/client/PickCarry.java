@@ -26,11 +26,10 @@ final class PickCarry extends KDialog implements ActionListener
     private SaveWindow saveWindow;
 
     /** Each choice is a String of form "Warbear in Plains Hex G3" */
-    PickCarry(JFrame parentFrame, Client client, int carryDamage,
-        Set choices)
+    PickCarry(JFrame parentFrame, Client client, int carryDamage, Set choices)
     {
-        super(parentFrame, "Apply " + carryDamage +
-            (carryDamage == 1 ? "carry to:" : " carries to:"), false);
+        super(parentFrame, "Apply " + carryDamage
+            + (carryDamage == 1 ? "carry to:" : " carries to:"), false);
 
         this.client = client;
 
@@ -50,8 +49,7 @@ final class PickCarry extends KDialog implements ActionListener
         {
             // @todo: this could probably be done by using 
             // setDefaultCloseOperation()
-        }
-        );
+        });
 
         pack();
         saveWindow = new SaveWindow(client, "PickCarry");

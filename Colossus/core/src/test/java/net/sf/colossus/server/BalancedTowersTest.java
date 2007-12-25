@@ -32,13 +32,11 @@ public class BalancedTowersTest extends TestCase
         ArrayList results = Game.getBalancedTowers(numPlayers, towerList);
 
         assertTrue(results.size() == 4);
-        assertTrue(
-            (results.contains("100") && results.contains("200") &&
-            results.contains("400") && results.contains("500")) ||
-            (results.contains("100") && results.contains("300") &&
-            results.contains("400") && results.contains("600")) ||
-            (results.contains("200") && results.contains("300") &&
-            results.contains("500") && results.contains("600"))
-            );
+        assertTrue((results.contains("100") && results.contains("200")
+            && results.contains("400") && results.contains("500"))
+            || (results.contains("100") && results.contains("300")
+                && results.contains("400") && results.contains("600"))
+            || (results.contains("200") && results.contains("300")
+                && results.contains("500") && results.contains("600")));
     }
 }

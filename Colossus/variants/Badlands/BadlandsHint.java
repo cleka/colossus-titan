@@ -16,62 +16,56 @@ public class BadlandsHint implements net.sf.colossus.server.HintInterface
 {
     private DevRandom rnd = new DevRandom();
 
-    public String getRecruitHint(String terrain,
-            LegionInfo legion,
-            List recruits,
-            HintOracleInterface oracle,
-            String[] section)
+    public String getRecruitHint(String terrain, LegionInfo legion,
+        List recruits, HintOracleInterface oracle, String[] section)
     {
         recruits = DefaultHint.creaturesToStrings(recruits);
         List sect = Arrays.asList(section);
 
         if (terrain.equals("Brush") || terrain.equals("BrushAlt"))
         {
-            if (recruits.contains("Cyclops") &&
-                    !legion.contains("Behemoth") &&
-                    legion.numCreature("Cyclops") == 2 &&
-                    oracle.creatureAvailable("Behemoth") >= 2)
+            if (recruits.contains("Cyclops") && !legion.contains("Behemoth")
+                && legion.numCreature("Cyclops") == 2
+                && oracle.creatureAvailable("Behemoth") >= 2)
             {
                 return "Cyclops";
             }
         }
-        else if (terrain.equals("Plains") || terrain.equals("Fort") ||
-                terrain.equals("Town") || terrain.equals("Waterhole"))
+        else if (terrain.equals("Plains") || terrain.equals("Fort")
+            || terrain.equals("Town") || terrain.equals("Waterhole"))
         {
-            if (recruits.contains("Lion") &&
-                    !legion.contains("Griffon") &&
-                    legion.numCreature("Lion") == 2 &&
-                    (oracle.canReach("Desert") ||
-                    oracle.canReach("DesertAlt")) &&
-                    oracle.creatureAvailable("Griffon") >= 2)
+            if (recruits.contains("Lion") && !legion.contains("Griffon")
+                && legion.numCreature("Lion") == 2
+                && (oracle.canReach("Desert") || oracle.canReach("DesertAlt"))
+                && oracle.creatureAvailable("Griffon") >= 2)
             {
                 return "Lion";
             }
             if (sect.contains(Constants.sectionDefensiveAI))
             {
-                if (recruits.contains("Centaur") &&
-                        legion.numCreature("Centaur") == 2 &&
-                        !legion.contains("Warbear") &&
-                        legion.getHeight() < 6 &&
-                        oracle.biggestAttackerHeight() == 0 &&
-                        (oracle.canReach("Woods") ||
-                        oracle.canReach("WoodsAlt")) &&
-                        !oracle.hexLabel().equals("1") &&
-                        !oracle.hexLabel().equals("15") &&
-                        !oracle.hexLabel().equals("29"))
+                if (recruits.contains("Centaur")
+                    && legion.numCreature("Centaur") == 2
+                    && !legion.contains("Warbear")
+                    && legion.getHeight() < 6
+                    && oracle.biggestAttackerHeight() == 0
+                    && (oracle.canReach("Woods") || oracle
+                        .canReach("WoodsAlt"))
+                    && !oracle.hexLabel().equals("1")
+                    && !oracle.hexLabel().equals("15")
+                    && !oracle.hexLabel().equals("29"))
                 {
                     return "Centaur";
                 }
             }
             else if (sect.contains(Constants.sectionOffensiveAI))
             {
-                if (recruits.contains("Centaur") &&
-                        legion.numCreature("Centaur") == 2 &&
-                        !legion.contains("Warbear") &&
-                        legion.getHeight() <= 2 &&
-                        oracle.biggestAttackerHeight() == 0 &&
-                        (oracle.canReach("Woods") ||
-                        oracle.canReach("WoodsAlt")))
+                if (recruits.contains("Centaur")
+                    && legion.numCreature("Centaur") == 2
+                    && !legion.contains("Warbear")
+                    && legion.getHeight() <= 2
+                    && oracle.biggestAttackerHeight() == 0
+                    && (oracle.canReach("Woods") || oracle
+                        .canReach("WoodsAlt")))
                 {
                     return "Centaur";
                 }
@@ -79,40 +73,38 @@ public class BadlandsHint implements net.sf.colossus.server.HintInterface
         }
         else if (terrain.equals("Marsh") || terrain.equals("MarshAlt"))
         {
-            if (recruits.contains("Troll") &&
-                    !legion.contains("Wyvern") &&
-                    legion.numCreature("Troll") == 2 &&
-                    (oracle.canReach("Swamp") ||
-                    oracle.canReach("SwampAlt")) &&
-                    oracle.creatureAvailable("Wyvern") >= 2)
+            if (recruits.contains("Troll") && !legion.contains("Wyvern")
+                && legion.numCreature("Troll") == 2
+                && (oracle.canReach("Swamp") || oracle.canReach("SwampAlt"))
+                && oracle.creatureAvailable("Wyvern") >= 2)
             {
                 return "Troll";
             }
             if (sect.contains(Constants.sectionDefensiveAI))
             {
-                if (recruits.contains("Ogre") &&
-                        legion.numCreature("Ogre") == 2 &&
-                        !legion.contains("Minotaur") &&
-                        legion.getHeight() < 6 &&
-                        oracle.biggestAttackerHeight() == 0 &&
-                        (oracle.canReach("Hills") ||
-                        oracle.canReach("HillsAlt")) &&
-                        !oracle.hexLabel().equals("8") &&
-                        !oracle.hexLabel().equals("22") &&
-                        !oracle.hexLabel().equals("36"))
+                if (recruits.contains("Ogre")
+                    && legion.numCreature("Ogre") == 2
+                    && !legion.contains("Minotaur")
+                    && legion.getHeight() < 6
+                    && oracle.biggestAttackerHeight() == 0
+                    && (oracle.canReach("Hills") || oracle
+                        .canReach("HillsAlt"))
+                    && !oracle.hexLabel().equals("8")
+                    && !oracle.hexLabel().equals("22")
+                    && !oracle.hexLabel().equals("36"))
                 {
                     return "Ogre";
                 }
             }
             else if (sect.contains(Constants.sectionOffensiveAI))
             {
-                if (recruits.contains("Ogre") &&
-                        legion.numCreature("Ogre") == 2 &&
-                        !legion.contains("Minotaur") &&
-                        legion.getHeight() <= 2 &&
-                        oracle.biggestAttackerHeight() == 0 &&
-                        (oracle.canReach("Hills") ||
-                        oracle.canReach("HillsAlt")))
+                if (recruits.contains("Ogre")
+                    && legion.numCreature("Ogre") == 2
+                    && !legion.contains("Minotaur")
+                    && legion.getHeight() <= 2
+                    && oracle.biggestAttackerHeight() == 0
+                    && (oracle.canReach("Hills") || oracle
+                        .canReach("HillsAlt")))
                 {
                     return "Ogre";
                 }
@@ -129,49 +121,46 @@ public class BadlandsHint implements net.sf.colossus.server.HintInterface
             {
                 return "Guardian";
             }
-            if (recruits.contains("Ogre") &&
-                    legion.numCreature("Ogre") == 2)
+            if (recruits.contains("Ogre") && legion.numCreature("Ogre") == 2)
             {
                 return "Ogre";
             }
-            if (recruits.contains("Centaur") &&
-                    legion.numCreature("Centaur") == 2)
+            if (recruits.contains("Centaur")
+                && legion.numCreature("Centaur") == 2)
             {
                 return "Centaur";
             }
-            if (recruits.contains("Gargoyle") &&
-                    legion.numCreature("Gargoyle") == 1 &&
-                    oracle.creatureAvailable("Cyclops") >= 3)
+            if (recruits.contains("Gargoyle")
+                && legion.numCreature("Gargoyle") == 1
+                && oracle.creatureAvailable("Cyclops") >= 3)
             {
                 return "Gargoyle";
             }
-            if (recruits.contains("Ogre") &&
-                    legion.numCreature("Ogre") == 1 &&
-                    oracle.creatureAvailable("Troll") >= 2)
+            if (recruits.contains("Ogre") && legion.numCreature("Ogre") == 1
+                && oracle.creatureAvailable("Troll") >= 2)
             {
                 return "Ogre";
             }
-            if (recruits.contains("Centaur") &&
-                    legion.numCreature("Centaur") == 1 &&
-                    oracle.creatureAvailable("Lion") >= 2)
+            if (recruits.contains("Centaur")
+                && legion.numCreature("Centaur") == 1
+                && oracle.creatureAvailable("Lion") >= 2)
             {
                 return "Centaur";
             }
-            if (recruits.contains("Gargoyle") &&
-                    legion.numCreature("Gargoyle") == 0 &&
-                    oracle.creatureAvailable("Cyclops") >= 6)
+            if (recruits.contains("Gargoyle")
+                && legion.numCreature("Gargoyle") == 0
+                && oracle.creatureAvailable("Cyclops") >= 6)
             {
                 return "Gargoyle";
             }
-            if (recruits.contains("Ogre") &&
-                    legion.numCreature("Ogre") == 0 &&
-                    oracle.creatureAvailable("Troll") >= 6)
+            if (recruits.contains("Ogre") && legion.numCreature("Ogre") == 0
+                && oracle.creatureAvailable("Troll") >= 6)
             {
                 return "Ogre";
             }
-            if (recruits.contains("Centaur") &&
-                    legion.numCreature("Centaur") == 0 &&
-                    oracle.creatureAvailable("Lion") >= 6)
+            if (recruits.contains("Centaur")
+                && legion.numCreature("Centaur") == 0
+                && oracle.creatureAvailable("Lion") >= 6)
             {
                 return "Centaur";
             }
@@ -180,8 +169,7 @@ public class BadlandsHint implements net.sf.colossus.server.HintInterface
         return (String)recruits.get(recruits.size() - 1);
     }
 
-    public List getInitialSplitHint(String label,
-            String[] section)
+    public List getInitialSplitHint(String label, String[] section)
     {
         List li = new ArrayList();
         if (label.equals("100"))
@@ -273,8 +261,7 @@ public class BadlandsHint implements net.sf.colossus.server.HintInterface
         return li;
     }
 
-    public int getHintedRecruitmentValueOffset(String name,
-            String[] section)
+    public int getHintedRecruitmentValueOffset(String name, String[] section)
     {
         return 0;
     }

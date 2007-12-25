@@ -78,10 +78,11 @@ import net.sf.colossus.util.Options;
  * 
  */
 
-final class EventViewer extends KDialog
-    implements WindowListener, ItemListener, ActionListener
+final class EventViewer extends KDialog implements WindowListener,
+    ItemListener, ActionListener
 {
-    private static final Logger LOGGER = Logger.getLogger(EventViewer.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(EventViewer.class
+        .getName());
 
     private final static String windowTitle = "Event Viewer";
 
@@ -90,7 +91,8 @@ final class EventViewer extends KDialog
 
     private boolean visible;
 
-    private List syncdEventList = Collections.synchronizedList(new ArrayList());
+    private List syncdEventList = Collections
+        .synchronizedList(new ArrayList());
     private int bookmark = 0;
     final private ArrayList displayQueue = new ArrayList();
 
@@ -168,10 +170,10 @@ final class EventViewer extends KDialog
         showEventType[RevealEvent.eventMoveRoll] = getBoolOption(evfMoveRoll,
             true);
 
-        showEventType[RevealEvent.eventTurnChange] = getBoolOption(evfTurnChange,
-            true);
-        showEventType[RevealEvent.eventPlayerChange] = getBoolOption(evfPlayerChange,
-            false);
+        showEventType[RevealEvent.eventTurnChange] = getBoolOption(
+            evfTurnChange, true);
+        showEventType[RevealEvent.eventPlayerChange] = getBoolOption(
+            evfPlayerChange, false);
 
         autoScroll = getBoolOption(evAutoScroll, true);
         hideUndoneEvents = getBoolOption(evHideUndone, false);
@@ -185,8 +187,7 @@ final class EventViewer extends KDialog
             {
                 options.setOption(Options.showEventViewer, false);
             }
-        }
-        );
+        });
 
         setVisibleMaybe();
     }
@@ -199,7 +200,7 @@ final class EventViewer extends KDialog
         String expOption = options.getStringOption(Options.eventExpiring);
         if (expOption != null)
         {
-            if ( expOption.equals(Options.eventExpiringNever))
+            if (expOption.equals(Options.eventExpiringNever))
             {
                 turnsToKeep = -1;
             }
@@ -215,18 +216,16 @@ final class EventViewer extends KDialog
                     }
                     else
                     {
-                        LOGGER.log(Level.SEVERE,
-                            "Invalid value "+exp +" from option '"+
-                            Options.eventExpiring+"' - using default " +
-                            turnsToKeep);
+                        LOGGER.log(Level.SEVERE, "Invalid value " + exp
+                            + " from option '" + Options.eventExpiring
+                            + "' - using default " + turnsToKeep);
                     }
                 }
                 catch (NumberFormatException e)
                 {
-                    LOGGER.log(Level.SEVERE,
-                        "Invalid value "+ expOption +" from option '"+
-                        Options.eventExpiring + "' - using default " +
-                        turnsToKeep);
+                    LOGGER.log(Level.SEVERE, "Invalid value " + expOption
+                        + " from option '" + Options.eventExpiring
+                        + "' - using default " + turnsToKeep);
                 }
             }
         }
@@ -286,13 +285,13 @@ final class EventViewer extends KDialog
         settingsPane = new Box(BoxLayout.Y_AXIS);
         tabbedPane.addTab("Settings", settingsPane);
 
-        JPanel checkboxPane = new JPanel(new GridLayout(0,1));
+        JPanel checkboxPane = new JPanel(new GridLayout(0, 1));
         checkboxPane.setAlignmentX(Component.LEFT_ALIGNMENT);
         checkboxPane.setBorder(new TitledBorder("Event Filter"));
         checkboxPane.setPreferredSize(new Dimension(200, 300));
         checkboxPane.setMaximumSize(new Dimension(600, 300));
         settingsPane.add(checkboxPane);
-        settingsPane.add(Box.createRigidArea(new Dimension(0,5)));
+        settingsPane.add(Box.createRigidArea(new Dimension(0, 5)));
 
         addCheckbox(evfRecruit, checkboxPane);
         addCheckbox(evfSplit, checkboxPane);
@@ -301,16 +300,16 @@ final class EventViewer extends KDialog
         addCheckbox(evfAcquire, checkboxPane);
         addCheckbox(evfWon, checkboxPane);
         addCheckbox(evfLoser, checkboxPane);
-        checkboxPane.add(Box.createRigidArea(new Dimension(0,5)));
+        checkboxPane.add(Box.createRigidArea(new Dimension(0, 5)));
         addCheckbox(evHideUndone, checkboxPane);
-        checkboxPane.add(Box.createRigidArea(new Dimension(0,5)));
+        checkboxPane.add(Box.createRigidArea(new Dimension(0, 5)));
 
         addCheckbox(evfMulligan, checkboxPane);
         addCheckbox(evfMoveRoll, checkboxPane);
         addCheckbox(evfTurnChange, checkboxPane);
         addCheckbox(evfPlayerChange, checkboxPane);
 
-        JPanel miscPane = new JPanel(new GridLayout(0,2));
+        JPanel miscPane = new JPanel(new GridLayout(0, 2));
         miscPane.setAlignmentX(Component.LEFT_ALIGNMENT);
         miscPane.setBorder(new TitledBorder("Other Settings"));
         miscPane.setMinimumSize(new Dimension(200, 100));
@@ -319,10 +318,10 @@ final class EventViewer extends KDialog
         settingsPane.add(miscPane);
 
         settingsPane.add(Box.createVerticalGlue());
-        settingsPane.add(Box.createRigidArea(new Dimension(0,5)));
+        settingsPane.add(Box.createRigidArea(new Dimension(0, 5)));
 
         addCheckbox(evAutoScroll, miscPane);
-        miscPane.add(Box.createRigidArea(new Dimension(0,5)));
+        miscPane.add(Box.createRigidArea(new Dimension(0, 5)));
 
         // selection for how many turns to display the data
         // (must be less or equal the expireTurns value set in getPlayers)
@@ -331,10 +330,10 @@ final class EventViewer extends KDialog
 
         ArrayList alChoices = new ArrayList();
         int i;
-        for (i=1 ; i <= maxVal ; i++)
+        for (i = 1; i <= maxVal; i++)
         {
             // 1, 2, 3, 4, 5, 
-            if (i<=5 || i==maxVal)
+            if (i <= 5 || i == maxVal)
             {
                 alChoices.add(new Integer(i).toString());
             }
@@ -343,7 +342,7 @@ final class EventViewer extends KDialog
              // 10, 50, 100, 500, 1000 if applicable.
              else if (i==10 || i==50 || i==100 || i==500 || i==1000)
              */
-            else if (i==10)
+            else if (i == 10)
             {
                 alChoices.add(new Integer(i).toString());
             }
@@ -354,7 +353,7 @@ final class EventViewer extends KDialog
         }
         else
         {
-            maxString = "max (="+this.expireTurns+")";
+            maxString = "max (=" + this.expireTurns + ")";
             alChoices.add(maxString);
         }
 
@@ -362,15 +361,14 @@ final class EventViewer extends KDialog
 
         // read user's setting for this, but cannot exceed the Game's
         // general setting.
-        String maxTurnsOptString =
-            options.getStringOption(evMaxTurns);
-        if (maxTurnsOptString == null )
+        String maxTurnsOptString = options.getStringOption(evMaxTurns);
+        if (maxTurnsOptString == null)
         {
             maxTurnsOptString = "3";
         }
 
-        if (maxTurnsOptString.equals("all") ||
-            maxTurnsOptString.startsWith("max"))
+        if (maxTurnsOptString.equals("all")
+            || maxTurnsOptString.startsWith("max"))
         {
             if (this.expireTurns == -1)
             {
@@ -397,9 +395,8 @@ final class EventViewer extends KDialog
             }
             catch (NumberFormatException e)
             {
-                LOGGER.log(Level.SEVERE,
-                    "Illegal value '"+maxTurnsOptString + "' for option '" +
-                    evMaxTurns + "' - using default 1");
+                LOGGER.log(Level.SEVERE, "Illegal value '" + maxTurnsOptString
+                    + "' for option '" + evMaxTurns + "' - using default 1");
                 maxTurnsOptString = "1";
                 maxTurnsOpt = 1;
             }
@@ -423,10 +420,11 @@ final class EventViewer extends KDialog
     private boolean isEventTooOld(RevealEvent e)
     {
         int oldEventTurn = e.getTurn();
-        int oldPlayerNr  = e.getPlayerNr();
+        int oldPlayerNr = e.getPlayerNr();
 
-        if ( maxTurns != -1 &&
-            turnNr-oldEventTurn > maxTurns-(playerNr>=oldPlayerNr?1:0))
+        if (maxTurns != -1
+            && turnNr - oldEventTurn > maxTurns
+                - (playerNr >= oldPlayerNr ? 1 : 0))
         {
             // Log.debug("Not displaying event "+e.getEventTypeText()+" "+
             //     e.getMarkerId() + " - older than max turns value!");
@@ -440,16 +438,15 @@ final class EventViewer extends KDialog
         int type = e.getEventType();
         boolean display = true;
 
-        if ( !showEventType[type] )
+        if (!showEventType[type])
         {
             display = false;
         }
-        else if ( hideUndoneEvents && e.wasUndone())
+        else if (hideUndoneEvents && e.wasUndone())
         {
-            LOGGER.log(Level.FINEST,
-                "Not displaying event "+e.getEventTypeText()+" "+
-                e.getMarkerId() +
-                " - was undone and hideUndoneEvents is true.");
+            LOGGER.log(Level.FINEST, "Not displaying event "
+                + e.getEventTypeText() + " " + e.getMarkerId()
+                + " - was undone and hideUndoneEvents is true.");
             display = false;
         }
         return display;
@@ -457,18 +454,18 @@ final class EventViewer extends KDialog
 
     private void queueForDisplaying(JPanel eventPanel)
     {
-        synchronized(displayQueue)
+        synchronized (displayQueue)
         {
             displayQueue.add(eventPanel);
         }
     }
 
     /** Remove all pending events, and queue a null event to signal the
-     *  displayer to remove all from panel first before adding again. */ 
+     *  displayer to remove all from panel first before adding again. */
 
     private void queueSignalRemoveAllForDisplaying()
     {
-        synchronized(displayQueue)
+        synchronized (displayQueue)
         {
             displayQueue.clear();
             displayQueue.add(null);
@@ -477,7 +474,7 @@ final class EventViewer extends KDialog
 
     private void displayFromQueue()
     {
-        synchronized(displayQueue)
+        synchronized (displayQueue)
         {
             if (displayQueue.size() > 0)
             {
@@ -487,12 +484,13 @@ final class EventViewer extends KDialog
                     JPanel panelForEvent = (JPanel)it.next();
                     if (panelForEvent == null)
                     {
-                        eventPane.removeAll();                
+                        eventPane.removeAll();
                     }
                     else
                     {
                         eventPane.add(panelForEvent);
-                        eventPane.add(Box.createRigidArea(new Dimension(0,5)));
+                        eventPane
+                            .add(Box.createRigidArea(new Dimension(0, 5)));
                     }
                 }
                 displayQueue.clear();
@@ -524,8 +522,9 @@ final class EventViewer extends KDialog
         }
         else
         {
-            LOGGER.log(Level.WARNING,
-                "EventViewer.addEventToEventPane: event.toPanel returned null!");
+            LOGGER
+                .log(Level.WARNING,
+                    "EventViewer.addEventToEventPane: event.toPanel returned null!");
         }
     }
 
@@ -551,8 +550,7 @@ final class EventViewer extends KDialog
                 {
                     displayFromQueue();
                 }
-            }
-            );
+            });
         }
     }
 
@@ -580,7 +578,7 @@ final class EventViewer extends KDialog
     private void updatePanels(boolean forceAll)
     {
         queueSignalRemoveAllForDisplaying();
-        
+
         synchronized (syncdEventList)
         {
             // if never expires, we never delete, so bookmark stays ok.
@@ -595,9 +593,8 @@ final class EventViewer extends KDialog
             if (bookmark > syncdEventList.size())
             {
                 // sanity check...
-                LOGGER.log(Level.SEVERE,
-                    "bookmark " + bookmark + " out of range, size=" +
-                    syncdEventList.size());
+                LOGGER.log(Level.SEVERE, "bookmark " + bookmark
+                    + " out of range, size=" + syncdEventList.size());
                 bookmark = 0;
             }
 
@@ -645,7 +642,8 @@ final class EventViewer extends KDialog
                 updatePanels(true);
             }
         }
-        else // expire turns -1 ==> no purging. 
+        else
+        // expire turns -1 ==> no purging. 
         {
             if (this.maxTurns != -1)
             {
@@ -671,13 +669,12 @@ final class EventViewer extends KDialog
             {
                 int last = syncdEventList.size();
                 ListIterator it = syncdEventList.listIterator(last);
-                while (it.hasPrevious() && found==0)
+                while (it.hasPrevious() && found == 0)
                 {
                     RevealEvent e = (RevealEvent)it.previous();
-                    if (e.getEventType() == type && e.getTurn() == turn &&
-                        e.getMarkerId().equals(parentId) &&
-                        e.getMarkerId2().equals(childId) &&
-                        !e.wasUndone() )
+                    if (e.getEventType() == type && e.getTurn() == turn
+                        && e.getMarkerId().equals(parentId)
+                        && e.getMarkerId2().equals(childId) && !e.wasUndone())
                     {
                         found++;
                         e.setUndone(true);
@@ -697,13 +694,14 @@ final class EventViewer extends KDialog
                 {
                     int last = syncdEventList.size();
                     ListIterator it2 = syncdEventList.listIterator(last);
-                    while (it2.hasPrevious() && found==0)
+                    while (it2.hasPrevious() && found == 0)
                     {
                         RevealEvent e = (RevealEvent)it2.previous();
-                        if (e.getEventType() == type && e.getTurn()+1 == turn &&
-                            e.getMarkerId().equals(parentId) &&
-                            e.getMarkerId2().equals(childId) &&
-                            !e.wasUndone() )
+                        if (e.getEventType() == type
+                            && e.getTurn() + 1 == turn
+                            && e.getMarkerId().equals(parentId)
+                            && e.getMarkerId2().equals(childId)
+                            && !e.wasUndone())
                         {
                             found++;
                             e.setUndone(true);
@@ -718,12 +716,11 @@ final class EventViewer extends KDialog
             {
                 int last = syncdEventList.size();
                 ListIterator it = syncdEventList.listIterator(last);
-                while (it.hasPrevious() && found==0)
+                while (it.hasPrevious() && found == 0)
                 {
                     RevealEvent e = (RevealEvent)it.previous();
-                    if (e.getEventType() == type && e.getTurn() == turn &&
-                        e.getMarkerId().equals(parentId) &&
-                        !e.wasUndone())
+                    if (e.getEventType() == type && e.getTurn() == turn
+                        && e.getMarkerId().equals(parentId) && !e.wasUndone())
                     {
                         found++;
                         e.setUndone(true);
@@ -737,12 +734,11 @@ final class EventViewer extends KDialog
             {
                 int last = syncdEventList.size();
                 ListIterator it = syncdEventList.listIterator(last);
-                while (it.hasPrevious() && found==0)
+                while (it.hasPrevious() && found == 0)
                 {
                     RevealEvent e = (RevealEvent)it.previous();
-                    if (e.getEventType() == type && e.getTurn() == turn &&
-                        e.getMarkerId().equals(parentId) &&
-                        !e.wasUndone())
+                    if (e.getEventType() == type && e.getTurn() == turn
+                        && e.getMarkerId().equals(parentId) && !e.wasUndone())
                     {
                         found++;
                         e.setUndone(true);
@@ -756,12 +752,11 @@ final class EventViewer extends KDialog
             {
                 int last = syncdEventList.size();
                 ListIterator it = syncdEventList.listIterator(last);
-                while (it.hasPrevious() && found==0)
+                while (it.hasPrevious() && found == 0)
                 {
                     RevealEvent e = (RevealEvent)it.previous();
-                    if (e.getEventType() == type && e.getTurn() == turn &&
-                        e.getMarkerId().equals(parentId) &&
-                        !e.wasUndone())
+                    if (e.getEventType() == type && e.getTurn() == turn
+                        && e.getMarkerId().equals(parentId) && !e.wasUndone())
                     {
                         found++;
                         e.setUndone(true);
@@ -772,15 +767,16 @@ final class EventViewer extends KDialog
 
         else
         {
-            LOGGER.log(Level.WARNING,
-                "undo event for unknown type "+type+" attempted.");
+            LOGGER.log(Level.WARNING, "undo event for unknown type " + type
+                + " attempted.");
             return;
         }
 
         if (found == 0)
         {
-            LOGGER.log(Level.SEVERE, "Requested '"+type+"' EVENT to undo ("+
-                parentId+", "+childId+", turn "+turn+") not found");
+            LOGGER.log(Level.SEVERE, "Requested '" + type
+                + "' EVENT to undo (" + parentId + ", " + childId + ", turn "
+                + turn + ") not found");
         }
 
         if (this.visible)
@@ -809,10 +805,10 @@ final class EventViewer extends KDialog
             {
                 RevealEvent e = (RevealEvent)it.next();
                 int oldEventTurn = e.getTurn();
-                int oldPlayerNr  = e.getPlayerNr();
+                int oldPlayerNr = e.getPlayerNr();
 
-                if (turnNr-oldEventTurn >
-                    expireTurns-(playerNr>=oldPlayerNr?1:0))
+                if (turnNr - oldEventTurn > expireTurns
+                    - (playerNr >= oldPlayerNr ? 1 : 0))
                 {
                     it.remove();
                     purged++;
@@ -831,7 +827,7 @@ final class EventViewer extends KDialog
         {
             syncdEventList.clear();
         }
-        synchronized(displayQueue)
+        synchronized (displayQueue)
         {
             displayQueue.clear();
         }
@@ -890,9 +886,10 @@ final class EventViewer extends KDialog
     {
         // A combo box was changed.
         Object source = e.getSource();
-        if ( source == maxTurnsDisplayExpiringBox )
+        if (source == maxTurnsDisplayExpiringBox)
         {
-            String value = (String)maxTurnsDisplayExpiringBox.getSelectedItem();
+            String value = (String)maxTurnsDisplayExpiringBox
+                .getSelectedItem();
             options.setOption(evMaxTurns, value);
             if (value.equals("all") || value.equals(maxString))
             {

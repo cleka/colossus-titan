@@ -81,12 +81,14 @@ public final class SaveWindow
         }
     }
 
-    public void save(Window window ) {
+    public void save(Window window)
+    {
         saveLocation(window.getLocation());
         saveSize(window.getSize());
     }
 
-    public void restore(Window window, Point defaultLocation) {
+    public void restore(Window window, Point defaultLocation)
+    {
         Point location = loadLocation();
         if (location == null)
         {
@@ -146,4 +148,3 @@ public final class SaveWindow
     }
 
 }
-

@@ -19,8 +19,8 @@ import net.sf.colossus.util.KDialog;
  * @author David Ripton
  * @author Barrie Treloar
  */
-public abstract class AbstractShowRecruits extends KDialog implements MouseListener,
-    WindowListener
+public abstract class AbstractShowRecruits extends KDialog implements
+    MouseListener, WindowListener
 {
 
     AbstractShowRecruits(JFrame parentFrame)
@@ -37,8 +37,10 @@ public abstract class AbstractShowRecruits extends KDialog implements MouseListe
 
     void doOneTerrain(String terrain, String hexLabel)
     {
-        getContentPane().add(new HexRecruitTreePanel(BoxLayout.Y_AXIS, terrain,
-            hexLabel, this));
+        getContentPane()
+            .add(
+                new HexRecruitTreePanel(BoxLayout.Y_AXIS, terrain, hexLabel,
+                    this));
     }
 
     public void mouseClicked(MouseEvent e)

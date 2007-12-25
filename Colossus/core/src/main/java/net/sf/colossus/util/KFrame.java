@@ -38,8 +38,8 @@ public class KFrame extends JFrame implements MouseListener, WindowListener
     public void centerOnScreen()
     {
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-        setLocation(new Point(d.width / 2 - getSize().width / 2,
-            d.height / 2 - getSize().height / 2));
+        setLocation(new Point(d.width / 2 - getSize().width / 2, d.height / 2
+            - getSize().height / 2));
     }
 
     // Add the do-nothing mouse and window listener methods here, rather 

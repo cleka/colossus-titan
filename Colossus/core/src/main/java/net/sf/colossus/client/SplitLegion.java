@@ -58,11 +58,10 @@ final class SplitLegion extends KDialog implements MouseListener,
 
     private SaveWindow saveWindow;
 
-    private SplitLegion(Client client, String parentId,
-        String selectedMarkerId)
+    private SplitLegion(Client client, String parentId, String selectedMarkerId)
     {
-        super(client.getBoard().getFrame(), client.getPlayerName() +
-            ": Split Legion " + parentId, true);
+        super(client.getBoard().getFrame(), client.getPlayerName()
+            + ": Split Legion " + parentId, true);
 
         Container contentPane = getContentPane();
         contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
@@ -160,8 +159,8 @@ final class SplitLegion extends KDialog implements MouseListener,
     }
 
     /** Move a chit to the end of the other line. */
-    private void moveChitToOtherLine(List fromChits, List
-        toChits, Container fromBox, Container toBox, int oldPosition)
+    private void moveChitToOtherLine(List fromChits, List toChits,
+        Container fromBox, Container toBox, int oldPosition)
     {
         Chit chit = (Chit)fromChits.remove(oldPosition);
         fromBox.remove(chit);
@@ -208,8 +207,8 @@ final class SplitLegion extends KDialog implements MouseListener,
             {
                 Chit chit = (Chit)it.next();
                 String id = chit.getId();
-                if (id.startsWith(Constants.titan) ||
-                    id.equals(TerrainRecruitLoader.getPrimaryAcquirable()))
+                if (id.startsWith(Constants.titan)
+                    || id.equals(TerrainRecruitLoader.getPrimaryAcquirable()))
                 {
                     numLords++;
                 }

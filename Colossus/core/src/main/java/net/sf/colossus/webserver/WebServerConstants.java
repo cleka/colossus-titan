@@ -33,4 +33,3 @@ final class WebServerConstants
     // those who just log in:
     public final static int keepLastNMessages = 10;
 }
-

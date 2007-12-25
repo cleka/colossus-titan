@@ -16,9 +16,6 @@ import net.sf.colossus.util.KFrame;
  * @author Clemens Katzer
  */
 
-
-
-
 public final class ShowHelpDoc extends KFrame
 {
     private static String title = "Pointer to Options documentation";
@@ -27,19 +24,18 @@ public final class ShowHelpDoc extends KFrame
     {
         super(title);
 
-        String text = "\n" +
-            "  Help on the options is not built-in into Colossus yet, " +
-            "but available from the Colossus home page.\n\n" +
-            "  Documentation for client side options (MasterBoard menu " +
-            "bar) can be found from page: \n" +
-            "     http://colossus.sourceforge.net/docs/ClientOptions.html" +
-            "\n\n" +
-            "  Documentation for server side options " +
-            "(Player Selection dialog) can be found from page: \n" +
-            "     http://colossus.sourceforge.net/docs/GetPlayersOptions.html" +
-            "\n\n" +
-            "  Eventually one day this may become a proper help " +
-            "browsing here...\n";
+        String text = "\n"
+            + "  Help on the options is not built-in into Colossus yet, "
+            + "but available from the Colossus home page.\n\n"
+            + "  Documentation for client side options (MasterBoard menu "
+            + "bar) can be found from page: \n"
+            + "     http://colossus.sourceforge.net/docs/ClientOptions.html"
+            + "\n\n"
+            + "  Documentation for server side options "
+            + "(Player Selection dialog) can be found from page: \n"
+            + "     http://colossus.sourceforge.net/docs/GetPlayersOptions.html"
+            + "\n\n" + "  Eventually one day this may become a proper help "
+            + "browsing here...\n";
 
         JTextArea contentPanel = new JTextArea(text, 10, 60);
 

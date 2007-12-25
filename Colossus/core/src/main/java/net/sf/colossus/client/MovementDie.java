@@ -7,7 +7,6 @@ package net.sf.colossus.client;
  * @author David Ripton
  */
 
-
 final class MovementDie extends Chit
 {
     private int lastRoll = 0;

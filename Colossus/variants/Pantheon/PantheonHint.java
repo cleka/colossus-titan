@@ -16,55 +16,46 @@ public class PantheonHint implements net.sf.colossus.server.HintInterface
 {
     private DevRandom rnd = new DevRandom();
 
-    public String getRecruitHint(String terrain,
-            LegionInfo legion,
-            List recruits,
-            HintOracleInterface oracle,
-            String[] section)
+    public String getRecruitHint(String terrain, LegionInfo legion,
+        List recruits, HintOracleInterface oracle, String[] section)
     {
         recruits = DefaultHint.creaturesToStrings(recruits);
         if (terrain.equals("Plains"))
         {
-            if (recruits.contains("Lion") &&
-                    !legion.contains("Griffon") &&
-                    legion.getHeight() != 6 &&
-                    legion.numCreature("Lion") == 2 &&
-                    oracle.creatureAvailable("Griffon") >= 2 &&
-                    oracle.canReach("Desert"))
+            if (recruits.contains("Lion") && !legion.contains("Griffon")
+                && legion.getHeight() != 6 && legion.numCreature("Lion") == 2
+                && oracle.creatureAvailable("Griffon") >= 2
+                && oracle.canReach("Desert"))
             {
                 return "Lion";
             }
         }
         else if (terrain.equals("Marsh"))
         {
-            if (recruits.contains("Troll") &&
-                    !legion.contains("Wyvern") &&
-                    legion.getHeight() != 6 &&
-                    legion.numCreature("Troll") == 2 &&
-                    oracle.creatureAvailable("Wyvern") >= 2 &&
-                    oracle.canReach("Swamp"))
+            if (recruits.contains("Troll") && !legion.contains("Wyvern")
+                && legion.getHeight() != 6 && legion.numCreature("Troll") == 2
+                && oracle.creatureAvailable("Wyvern") >= 2
+                && oracle.canReach("Swamp"))
             {
                 return "Troll";
             }
         }
         else if (terrain.equals("Woods"))
         {
-            if (recruits.contains("Griffon") &&
-                    !legion.contains("Salamander") &&
-                    legion.numCreature("Griffon") == 2 &&
-                    oracle.creatureAvailable("Salamander") >= 2 &&
-                    oracle.canReach("Desert"))
+            if (recruits.contains("Griffon") && !legion.contains("Salamander")
+                && legion.numCreature("Griffon") == 2
+                && oracle.creatureAvailable("Salamander") >= 2
+                && oracle.canReach("Desert"))
             {
                 return "Griffon";
             }
         }
         else if (terrain.equals("Hills"))
         {
-            if (recruits.contains("Wyvern") &&
-                    !legion.contains("Mammoth") &&
-                    legion.numCreature("Wyvern") == 2 &&
-                    oracle.creatureAvailable("Mammoth") >= 2 &&
-                    oracle.canReach("Swamp"))
+            if (recruits.contains("Wyvern") && !legion.contains("Mammoth")
+                && legion.numCreature("Wyvern") == 2
+                && oracle.creatureAvailable("Mammoth") >= 2
+                && oracle.canReach("Swamp"))
             {
                 return "Griffon";
             }
@@ -83,39 +74,37 @@ public class PantheonHint implements net.sf.colossus.server.HintInterface
             {
                 return "Guardian";
             }
-            if (recruits.contains("Gargoyle") &&
-                    legion.numCreature("Gargoyle") == 1 &&
-                    oracle.creatureAvailable("Cyclops") >= 3)
+            if (recruits.contains("Gargoyle")
+                && legion.numCreature("Gargoyle") == 1
+                && oracle.creatureAvailable("Cyclops") >= 3)
             {
                 return "Gargoyle";
             }
-            if (recruits.contains("Ogre") &&
-                    legion.numCreature("Ogre") == 1 &&
-                    oracle.creatureAvailable("Troll") >= 2)
+            if (recruits.contains("Ogre") && legion.numCreature("Ogre") == 1
+                && oracle.creatureAvailable("Troll") >= 2)
             {
                 return "Ogre";
             }
-            if (recruits.contains("Centaur") &&
-                    legion.numCreature("Centaur") == 1 &&
-                    oracle.creatureAvailable("Lion") >= 2)
+            if (recruits.contains("Centaur")
+                && legion.numCreature("Centaur") == 1
+                && oracle.creatureAvailable("Lion") >= 2)
             {
                 return "Centaur";
             }
-            if (recruits.contains("Gargoyle") &&
-                    legion.numCreature("Gargoyle") == 0 &&
-                    oracle.creatureAvailable("Cyclops") >= 6)
+            if (recruits.contains("Gargoyle")
+                && legion.numCreature("Gargoyle") == 0
+                && oracle.creatureAvailable("Cyclops") >= 6)
             {
                 return "Gargoyle";
             }
-            if (recruits.contains("Ogre") &&
-                    legion.numCreature("Ogre") == 0 &&
-                    oracle.creatureAvailable("Troll") >= 6)
+            if (recruits.contains("Ogre") && legion.numCreature("Ogre") == 0
+                && oracle.creatureAvailable("Troll") >= 6)
             {
                 return "Ogre";
             }
-            if (recruits.contains("Centaur") &&
-                    legion.numCreature("Centaur") == 0 &&
-                    oracle.creatureAvailable("Lion") >= 6)
+            if (recruits.contains("Centaur")
+                && legion.numCreature("Centaur") == 0
+                && oracle.creatureAvailable("Lion") >= 6)
             {
                 return "Centaur";
             }
@@ -124,8 +113,7 @@ public class PantheonHint implements net.sf.colossus.server.HintInterface
         return (String)recruits.get(recruits.size() - 1);
     }
 
-    public List getInitialSplitHint(String label,
-            String[] section)
+    public List getInitialSplitHint(String label, String[] section)
     {
         List sect = Arrays.asList(section);
 
@@ -383,8 +371,7 @@ public class PantheonHint implements net.sf.colossus.server.HintInterface
         return li;
     }
 
-    public int getHintedRecruitmentValueOffset(String name,
-            String[] section)
+    public int getHintedRecruitmentValueOffset(String name, String[] section)
     {
         return 0;
     }

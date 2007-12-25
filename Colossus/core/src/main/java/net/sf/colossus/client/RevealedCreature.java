@@ -16,7 +16,8 @@ import net.sf.colossus.server.Constants;
 
 public class RevealedCreature
 {
-    private static final Logger LOGGER = Logger.getLogger(RevealedCreature.class.getName());
+    private static final Logger LOGGER = Logger
+        .getLogger(RevealedCreature.class.getName());
 
     private String creatureName;
     private String titanBaseName = null;
@@ -79,14 +80,17 @@ public class RevealedCreature
 
     public String toString()
     {
-        String infoString = getName() + ": " +
-            (didRecruit ? "did recruit; " : "") +
-            (wasRecruited ? "was recruited; " : "") +
-            (didTeleport ? "teleported; " : "") +
+        String infoString = getName()
+            + ": "
+            + (didRecruit ? "did recruit; " : "")
+            + (wasRecruited ? "was recruited; " : "")
+            + (didTeleport ? "teleported; " : "")
+            +
             // (didTowerTeleport ? "tower teleported; " : "") +
             // (didTitanTeleport ? "titan teleported; " : "") +
-            (wasSummoned ? "was summoned; " : "") +
-            (wasAcquired ? "was acquired; " : "") + (dead ? "is dead; " : "");
+            (wasSummoned ? "was summoned; " : "")
+            + (wasAcquired ? "was acquired; " : "")
+            + (dead ? "is dead; " : "");
 
         return infoString;
     }

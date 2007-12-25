@@ -25,8 +25,8 @@ import net.sf.colossus.util.KDialog;
  * @author David Ripton
  */
 
-
-final class PickMarker extends KDialog implements MouseListener, WindowListener
+final class PickMarker extends KDialog implements MouseListener,
+    WindowListener
 {
     private List markers = new ArrayList();
     private Client client;

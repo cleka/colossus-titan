@@ -27,7 +27,8 @@ import com.werken.opt.Option;
 
 public final class Start
 {
-    private static final Logger LOGGER = Logger.getLogger(Start.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(Start.class
+        .getName());
 
     // game static, so that (a local) Client can ask from Start for 
     // current game, to end it (before perhaps starting a new one).
@@ -93,7 +94,7 @@ public final class Start
                 break;
 
             default:
-                text = "<unknown>" ;
+                text = "<unknown>";
                 break;
         }
         return text;
@@ -132,13 +133,12 @@ public final class Start
         startObj.setWhatToDoNext(whatToDoNext);
     }
 
-    public static void setCurrentWhatToDoNext(int whatToDoNext,
-        String loadFile)
+    public static void setCurrentWhatToDoNext(int whatToDoNext, String loadFile)
     {
         Start startObj = Start.getCurrentStartObject();
         startObj.setWhatToDoNext(whatToDoNext);
-        startObj.getStartOptions().
-            setOption(Options.loadGameFileName, loadFile);
+        startObj.getStartOptions().setOption(Options.loadGameFileName,
+            loadFile);
     }
 
     public static Start getCurrentStartObject()
@@ -176,8 +176,8 @@ public final class Start
             }
             catch (InterruptedException e)
             {
-                LOGGER.log(Level.WARNING, "Start waiting for GetPlayers " +
-                    "to complete, wait interrupted?");
+                LOGGER.log(Level.WARNING, "Start waiting for GetPlayers "
+                    + "to complete, wait interrupted?");
                 // just to be sure to do something useful there...
                 startObject.setWhatToDoNext(Start.GetPlayersDialog);
             }
@@ -198,8 +198,8 @@ public final class Start
             }
             catch (InterruptedException e)
             {
-                LOGGER.log(Level.WARNING, "Start waiting for GetPlayers " +
-                    "to complete, wait interrupted?");
+                LOGGER.log(Level.WARNING, "Start waiting for GetPlayers "
+                    + "to complete, wait interrupted?");
                 // just to be sure to do something useful there...
                 startObject.setWhatToDoNext(Start.GetPlayersDialog);
             }
@@ -211,8 +211,8 @@ public final class Start
     {
         boolean dontWait = false;
 
-        String playerName =
-            startOptions.getStringOption(Options.runClientPlayer);
+        String playerName = startOptions
+            .getStringOption(Options.runClientPlayer);
         String hostname = startOptions.getStringOption(Options.runClientHost);
         int port = startOptions.getIntOption(Options.runClientPort);
 
@@ -249,8 +249,8 @@ public final class Start
      * 
      */
     public static void setInitialAction(CommandLine cl,
-        Options netclientOptions, Options serverOptions,
-        Options startOptions, Start startObject)
+        Options netclientOptions, Options serverOptions, Options startOptions,
+        Start startObject)
     {
         // Host, port and playername are stored back only to the startObject.
         // They would be copied to the server cf file in GetPlayers, when one
@@ -265,7 +265,7 @@ public final class Start
         {
             hostname = cl.getOptValue('s');
         }
-        else if (cl.optIsSet('g') && cl.optIsSet('c') )
+        else if (cl.optIsSet('g') && cl.optIsSet('c'))
         {
             // Host empty means for StartClient: no cmdline wish given
             //  => it will initialize hostname box based on mostly LRU list.
@@ -277,8 +277,8 @@ public final class Start
             //   ( = would end up same host).
 
             Set dummy = new TreeSet();
-            String preferred = StartClient.initServerNames(hostname,
-                dummy, netclientOptions);
+            String preferred = StartClient.initServerNames(hostname, dummy,
+                netclientOptions);
             hostname = preferred;
             dummy.clear();
         }
@@ -316,7 +316,8 @@ public final class Start
         startOptions.setOption(Options.serveAtPort, sp);
         startOptions.setOption(Options.webServerPort, wp);
 
-        String playerName = netclientOptions.getStringOption(Options.runClientPlayer);
+        String playerName = netclientOptions
+            .getStringOption(Options.runClientPlayer);
         String webLogin = "";
 
         if (playerName == null || playerName.equals(""))
@@ -392,7 +393,7 @@ public final class Start
     private static boolean setupOptionsFromCommandLine(CommandLine cl,
         Options startOptions, Options options)
     {
-        if (cl == null )
+        if (cl == null)
         {
             return true;
         }
@@ -478,8 +479,8 @@ public final class Start
         }
 
         // Quit if values are bogus.
-        if (numHumans < 0 || numAIs < 0 || numNetworks < 0 ||
-            numHumans + numAIs + numNetworks > Constants.MAX_MAX_PLAYERS)
+        if (numHumans < 0 || numAIs < 0 || numNetworks < 0
+            || numHumans + numAIs + numNetworks > Constants.MAX_MAX_PLAYERS)
         {
             LOGGER.log(Level.SEVERE, "Illegal number of players");
             return false;
@@ -488,10 +489,10 @@ public final class Start
         for (int i = 0; i < numHumans; i++)
         {
             String name = null;
-            String preferredHumanName =
-                startOptions.getStringOption(Options.runClientPlayer);
-            if ( i == 0 && preferredHumanName != null &&
-                !preferredHumanName.equals(""))
+            String preferredHumanName = startOptions
+                .getStringOption(Options.runClientPlayer);
+            if (i == 0 && preferredHumanName != null
+                && !preferredHumanName.equals(""))
             {
                 name = preferredHumanName;
             }
@@ -509,8 +510,8 @@ public final class Start
             options.setOption(Options.playerName + j, name);
             options.setOption(Options.playerType + j, Constants.network);
         }
-        for (int k = numHumans + numNetworks;
-            k < numAIs + numHumans + numNetworks; k++)
+        for (int k = numHumans + numNetworks; k < numAIs + numHumans
+            + numNetworks; k++)
         {
             //            String name = Constants.byColor + k;
             String name = Constants.byType + k;
@@ -608,31 +609,34 @@ public final class Start
         {
             System.out.println("Cleanup waiting, round " + i);
             int j;
-            for (j=0 ; j <= i ; j++)
+            for (j = 0; j <= i; j++)
             {
                 System.gc();
                 System.runFinalization();
             }
-            sleepFor((long)(i+1)*500);
+            sleepFor((long)(i + 1) * 500);
 
             System.gc();
             System.runFinalization();
 
-            allGone =  net.sf.colossus.webcommon.FinalizeManager.allGone();
+            allGone = net.sf.colossus.webcommon.FinalizeManager.allGone();
             if (!allGone)
             {
-                net.sf.colossus.webcommon.FinalizeManager.printStatistics(false);
+                net.sf.colossus.webcommon.FinalizeManager
+                    .printStatistics(false);
             }
             i++;
         }
 
         if (allGone)
         {
-            System.out.println("\n=====\nOK, all registered instances are gone!\n");
+            System.out
+                .println("\n=====\nOK, all registered instances are gone!\n");
         }
         else
         {
-            System.out.println("\n=====\nGiving up, some instances remained!\n");
+            System.out
+                .println("\n=====\nGiving up, some instances remained!\n");
 
             if (false)
             {
@@ -645,8 +649,9 @@ public final class Start
         int cnt = SystemExitManager.getWaitingCnt();
         if (cnt > 0)
         {
-            System.out.println("\n!!!!\nNOTE: SystemExitManager waiting count != 0: " +
-                cnt);
+            System.out
+                .println("\n!!!!\nNOTE: SystemExitManager waiting count != 0: "
+                    + cnt);
         }
 
         // right now this InterruptAWTThreads() is necessary to do, 
@@ -669,12 +674,10 @@ public final class Start
     // END DEBUG STUFF
     // ==============================================================
 
-
     public static void main(String[] args)
     {
-        LOGGER.log(Level.INFO,
-            "Start for Colossus version " + Client.getVersion() +
-            " at " + new Date().getTime());
+        LOGGER.log(Level.INFO, "Start for Colossus version "
+            + Client.getVersion() + " at " + new Date().getTime());
 
         com.werken.opt.Options opts = new com.werken.opt.Options();
         CommandLine cl = null;
@@ -714,7 +717,7 @@ public final class Start
                 "Exception during commandline processing: " + ex.toString(),
                 ex);
             System.exit(1);
-            return;  // just to avoid the warning "cl might be null" ...
+            return; // just to avoid the warning "cl might be null" ...
         }
 
         if (cl.optIsSet('h'))
@@ -745,17 +748,16 @@ public final class Start
 
         // set in startObject and startOptions the values related to
         // what-to-do, host, port, playername:
-        setInitialAction(cl, serverOptions, netclientOptions,
-            startOptions, startObject);
+        setInitialAction(cl, serverOptions, netclientOptions, startOptions,
+            startObject);
 
         // Set in options the remaining options
         // Needs startOptions only to get the playername to use in some cases.
         if (!setupOptionsFromCommandLine(cl, startOptions, serverOptions))
         {
             LOGGER.log(Level.SEVERE,
-                "setupOptionsFromCommandLine signalled error, " +
-                "continuing anyway.",
-                (Throwable)null);
+                "setupOptionsFromCommandLine signalled error, "
+                    + "continuing anyway.", (Throwable)null);
         }
 
         // Cmdline arguments have effect only to first game - or
@@ -768,7 +770,7 @@ public final class Start
         int whatToDoNext;
 
         // Now loop until user requested Quitting the whole application: 
-        while ( (whatToDoNext = startObject.getWhatToDoNext()) != Start.QuitAll )
+        while ((whatToDoNext = startObject.getWhatToDoNext()) != Start.QuitAll)
         {
             // re-initialize options, except in first loop round,
             // there they have been loaded already and modified 
@@ -810,8 +812,8 @@ public final class Start
             // ----------------------------------------------------------------
             // Longish if-elseif-else - now we do the thing user wants:
 
-            if (whatToDoNext == GetPlayersDialog ||
-                whatToDoNext == NetClientDialog)
+            if (whatToDoNext == GetPlayersDialog
+                || whatToDoNext == NetClientDialog)
             {
                 // ok, just done. Need if also in this else-if chain
                 // otherwise the "else" would complain...
@@ -822,15 +824,15 @@ public final class Start
             {
                 startObject.setWhatToDoNext(GetPlayersDialog);
                 int port = startOptions.getIntOption(Options.serveAtPort);
-                String webGameFlagFileName = startOptions.getStringOption(
-                    Options.webFlagFileName);
+                String webGameFlagFileName = startOptions
+                    .getStringOption(Options.webFlagFileName);
                 startOptions.removeOption(Options.webFlagFileName);
 
                 game = new Game();
                 game.setPort(port);
                 game.setOptions(serverOptions);
-                if (webGameFlagFileName != null &&
-                    !webGameFlagFileName.equals(""))
+                if (webGameFlagFileName != null
+                    && !webGameFlagFileName.equals(""))
                 {
                     startObject.setWhatToDoNext(QuitAll);
                     game.setFlagFilename(webGameFlagFileName);
@@ -842,8 +844,8 @@ public final class Start
             {
                 startObject.setWhatToDoNext(GetPlayersDialog);
                 int port = startOptions.getIntOption(Options.serveAtPort);
-                String filename = startOptions.getStringOption(
-                    Options.loadGameFileName);
+                String filename = startOptions
+                    .getStringOption(Options.loadGameFileName);
                 startOptions.removeOption(Options.loadGameFileName);
 
                 if (filename != null && filename.length() > 0)
@@ -857,8 +859,8 @@ public final class Start
                 else
                 {
                     LOGGER.log(Level.SEVERE,
-                        "Selected action LoadGame, but filename is '" +
-                        filename+ "' (= null or empty)!",
+                        "Selected action LoadGame, but filename is '"
+                            + filename + "' (= null or empty)!",
                         (Throwable)null);
                 }
             }
@@ -879,11 +881,11 @@ public final class Start
                 // By default get back to Main dialog.
                 startObject.setWhatToDoNext(GetPlayersDialog);
 
-                String hostname =
-                    startOptions.getStringOption(Options.webServerHost);
+                String hostname = startOptions
+                    .getStringOption(Options.webServerHost);
                 int port = startOptions.getIntOption(Options.webServerPort);
-                String login =
-                    startOptions.getStringOption(Options.webClientLogin);
+                String login = startOptions
+                    .getStringOption(Options.webClientLogin);
                 String password = null;
                 new WebClient(hostname, port, login, password);
             }
@@ -892,7 +894,7 @@ public final class Start
             //  --or--
             // User selected File=>Quit in the game started from previous
             //  loop round.
-            else if (whatToDoNext == QuitAll )
+            else if (whatToDoNext == QuitAll)
             {
                 // Nothing to do, loop will end.
                 dontWait = true;
@@ -901,9 +903,8 @@ public final class Start
             // What else??
             else
             {
-                LOGGER.log(Level.SEVERE,
-                    "Unknown value '" + whatToDoNext + "' in main() loop???",
-                    (Throwable)null);
+                LOGGER.log(Level.SEVERE, "Unknown value '" + whatToDoNext
+                    + "' in main() loop???", (Throwable)null);
             }
 
             // ----------------------------------------------------------
@@ -937,8 +938,8 @@ public final class Start
             // For Stresstesting (controlled by a system property):
             if (--howManyGamesLeft > 0)
             {
-                System.out.println("\n++++++++++\nhowManyGamesLeft now " +
-                    howManyGamesLeft + "\n");
+                System.out.println("\n++++++++++\nhowManyGamesLeft now "
+                    + howManyGamesLeft + "\n");
                 startObject.setWhatToDoNext(Start.StartGame);
             }
 

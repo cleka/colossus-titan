@@ -42,8 +42,8 @@ final class Negotiate extends KDialog implements MouseListener, ActionListener
 
     Negotiate(Client client, String attackerId, String defenderId)
     {
-        super(client.getBoard().getFrame(), client.getPlayerName() + ": " +
-            attackerId + " Negotiates with " + defenderId, false);
+        super(client.getBoard().getFrame(), client.getPlayerName() + ": "
+            + attackerId + " Negotiates with " + defenderId, false);
 
         this.client = client;
         this.attackerId = attackerId;
@@ -163,16 +163,16 @@ final class Negotiate extends KDialog implements MouseListener, ActionListener
             // Ensure that at least one legion is completely eliminated.
             if (attackersLeft && defendersLeft)
             {
-                client.showMessageDialog(
-                    "At least one legion must be eliminated.");
+                client
+                    .showMessageDialog("At least one legion must be eliminated.");
                 return;
             }
 
             if (!attackersLeft && !defendersLeft)
             {
                 // Mutual destruction.
-                proposal = new Proposal(attackerId, defenderId,
-                    false, true, null, null);
+                proposal = new Proposal(attackerId, defenderId, false, true,
+                    null, null);
             }
             else
             {
@@ -196,11 +196,11 @@ final class Negotiate extends KDialog implements MouseListener, ActionListener
                 while (it.hasNext())
                 {
                     Chit chit = (Chit)it.next();
-                    if (chit.isDead() && chit.getId().startsWith(
-                        Constants.titan))
+                    if (chit.isDead()
+                        && chit.getId().startsWith(Constants.titan))
                     {
-                        client.showMessageDialog(
-                            "Titan cannot die unless his whole stack dies.");
+                        client
+                            .showMessageDialog("Titan cannot die unless his whole stack dies.");
                         return;
                     }
                 }
@@ -221,8 +221,8 @@ final class Negotiate extends KDialog implements MouseListener, ActionListener
                         winnerLosses.add(name);
                     }
                 }
-                proposal = new Proposal(attackerId, defenderId,
-                    false, false, winnerMarkerId, winnerLosses);
+                proposal = new Proposal(attackerId, defenderId, false, false,
+                    winnerMarkerId, winnerLosses);
             }
 
             // Exit this dialog.
@@ -231,8 +231,8 @@ final class Negotiate extends KDialog implements MouseListener, ActionListener
 
         else if (e.getActionCommand().equals("Fight"))
         {
-            proposal = new Proposal(attackerId, defenderId, true,
-                false, null, null);
+            proposal = new Proposal(attackerId, defenderId, true, false, null,
+                null);
 
             // Exit this dialog.
             cleanup();

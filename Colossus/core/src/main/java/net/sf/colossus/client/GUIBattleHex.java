@@ -36,7 +36,8 @@ import net.sf.colossus.util.ResourceLoader;
 
 public class GUIBattleHex extends GUIHex
 {
-    private static final Logger LOGGER = Logger.getLogger(GUIBattleHex.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(GUIBattleHex.class
+        .getName());
 
     private GeneralPath innerHexagon;
     private Component map;
@@ -67,9 +68,8 @@ public class GUIBattleHex extends GUIHex
     // A1-A3, B1-B4, C1-C5, D1-D6, E1-E5, F1-F4.
     // Letters increase left to right; numbers increase bottom to top.
 
-
-    public GUIBattleHex(int cx, int cy, int scale, Component map,
-        int xCoord, int yCoord)
+    public GUIBattleHex(int cx, int cy, int scale, Component map, int xCoord,
+        int yCoord)
     {
         super(new BattleHex(xCoord, yCoord));
         this.map = map;
@@ -101,11 +101,11 @@ public class GUIBattleHex extends GUIHex
 
         // Translate innerHexagon to make it concentric.
         Rectangle2D innerBounds = innerHexagon.getBounds2D();
-        Point2D.Double innerCenter = new Point2D.Double(innerBounds.getX() +
-            innerBounds.getWidth() / 2.0, innerBounds.getY() +
-            innerBounds.getHeight() / 2.0);
-        at = AffineTransform.getTranslateInstance(center.getX() -
-            innerCenter.getX(), center.getY() - innerCenter.getY());
+        Point2D.Double innerCenter = new Point2D.Double(innerBounds.getX()
+            + innerBounds.getWidth() / 2.0, innerBounds.getY()
+            + innerBounds.getHeight() / 2.0);
+        at = AffineTransform.getTranslateInstance(center.getX()
+            - innerCenter.getX(), center.getY() - innerCenter.getY());
         innerHexagon.transform(at);
     }
 
@@ -170,10 +170,8 @@ public class GUIBattleHex extends GUIHex
                 if (hexside != ' ')
                 {
                     n = (i + 1) % 6;
-                    drawHexside(g2,
-                        xVertex[i], yVertex[i],
-                        xVertex[n], yVertex[n],
-                        hexside);
+                    drawHexside(g2, xVertex[i], yVertex[i], xVertex[n],
+                        yVertex[n], hexside);
                 }
 
                 // Draw them again from the other side.
@@ -181,10 +179,8 @@ public class GUIBattleHex extends GUIHex
                 if (hexside != ' ')
                 {
                     n = (i + 1) % 6;
-                    drawHexside(g2,
-                        xVertex[n], yVertex[n],
-                        xVertex[i], yVertex[i],
-                        hexside);
+                    drawHexside(g2, xVertex[n], yVertex[n], xVertex[i],
+                        yVertex[i], hexside);
                 }
             }
         }
@@ -196,20 +192,19 @@ public class GUIBattleHex extends GUIHex
 
         FontMetrics fontMetrics = g2.getFontMetrics();
 
-        g2.drawString(name, rectBound.x + ((rectBound.width -
-            fontMetrics.stringWidth(name)) / 2),
-            rectBound.y +
-            ((fontMetrics.getHeight() + rectBound.height) / 2));
+        g2.drawString(name, rectBound.x
+            + ((rectBound.width - fontMetrics.stringWidth(name)) / 2),
+            rectBound.y + ((fontMetrics.getHeight() + rectBound.height) / 2));
 
         // Show hex label in upper left corner.
-        g2.drawString(getBattleHexModel().getLabel(),
-            rectBound.x + (rectBound.width -
-            fontMetrics.stringWidth(getBattleHexModel().getLabel())) / 3,
-            rectBound.y +
-            ((fontMetrics.getHeight() + rectBound.height) / 4));
+        g2.drawString(getBattleHexModel().getLabel(), rectBound.x
+            + (rectBound.width - fontMetrics.stringWidth(getBattleHexModel()
+                .getLabel())) / 3, rectBound.y
+            + ((fontMetrics.getHeight() + rectBound.height) / 4));
     }
 
-    public BattleHex getBattleHexModel() {
+    public BattleHex getBattleHexModel()
+    {
         return (BattleHex)getHexModel();
     }
 
@@ -230,15 +225,15 @@ public class GUIBattleHex extends GUIHex
     void drawHexside(Graphics2D g2, double vx1, double vy1, double vx2,
         double vy2, char hexsideType)
     {
-        double x0;                     // first focus point
+        double x0; // first focus point
         double y0;
-        double x1;                     // second focus point
+        double x1; // second focus point
         double y1;
-        double x2;                     // center point
+        double x2; // center point
         double y2;
-        double theta;                  // gate angle
-        double[] x = new double[4];   // hexside points
-        double[] y = new double[4];   // hexside points
+        double theta; // gate angle
+        double[] x = new double[4]; // hexside points
+        double[] y = new double[4]; // hexside points
 
         x0 = vx1 + (vx2 - vx1) / 6;
         y0 = vy1 + (vy2 - vy1) / 6;
@@ -249,7 +244,7 @@ public class GUIBattleHex extends GUIHex
 
         switch (hexsideType)
         {
-            case 'c':     // cliff -- triangles
+            case 'c': // cliff -- triangles
                 for (int j = 0; j < 3; j++)
                 {
                     x0 = vx1 + (vx2 - vx1) * (2 + 3 * j) / 12;
@@ -273,7 +268,7 @@ public class GUIBattleHex extends GUIHex
                 }
                 break;
 
-            case 'd':     // dune --  arcs
+            case 'd': // dune --  arcs
                 for (int j = 0; j < 3; j++)
                 {
                     x0 = vx1 + (vx2 - vx1) * (2 + 3 * j) / 12;
@@ -300,16 +295,15 @@ public class GUIBattleHex extends GUIHex
 
                     g2.setColor(Color.white);
                     Arc2D.Double arc = new Arc2D.Double(rect.x, rect.y,
-                        rect.width, rect.height,
-                        Math.toDegrees(2 * Math.PI - theta), 180,
-                        Arc2D.OPEN);
+                        rect.width, rect.height, Math.toDegrees(2 * Math.PI
+                            - theta), 180, Arc2D.OPEN);
                     g2.fill(arc);
                     g2.setColor(Color.black);
                     g2.draw(arc);
                 }
                 break;
 
-            case 's':     // slope -- lines
+            case 's': // slope -- lines
                 for (int j = 0; j < 3; j++)
                 {
                     x0 = vx1 + (vx2 - vx1) * (2 + 3 * j) / 12;
@@ -332,7 +326,7 @@ public class GUIBattleHex extends GUIHex
                 }
                 break;
 
-            case 'w':     // wall --  blocks
+            case 'w': // wall --  blocks
                 for (int j = 0; j < 3; j++)
                 {
                     x0 = vx1 + (vx2 - vx1) * (2 + 3 * j) / 12;
@@ -358,7 +352,7 @@ public class GUIBattleHex extends GUIHex
                 }
                 break;
 
-            case 'r':     // river -- single blue line
+            case 'r': // river -- single blue line
                 g2.setColor(HTMLColor.skyBlue);
                 Stroke oldStroke = g2.getStroke();
                 g2.setStroke(new BasicStroke((float)5.));
@@ -394,12 +388,8 @@ public class GUIBattleHex extends GUIHex
             rectBound.width, rectBound.height);
         if (overlay != null)
         { // first, draw the Hex itself
-            g.drawImage(overlay,
-                rectBound.x,
-                rectBound.y,
-                rectBound.width,
-                rectBound.height,
-                map);
+            g.drawImage(overlay, rectBound.x, rectBound.y, rectBound.width,
+                rectBound.height, map);
         }
         boolean didAllHexside = true;
         Shape oldClip = g.getClip();
@@ -437,14 +427,13 @@ public class GUIBattleHex extends GUIHex
                 dx2 = (int)xi;
                 dy2 = (int)yi;
 
-                Image sideOverlay = loadOneOverlay(
-                    neighbor.getBattleHexModel().getHexsideName((i + 3) % 6),
-                    dx2 - dx1, dy2 - dy1);
+                Image sideOverlay = loadOneOverlay(neighbor
+                    .getBattleHexModel().getHexsideName((i + 3) % 6), dx2
+                    - dx1, dy2 - dy1);
 
                 if (sideOverlay != null)
                 {
-                    g.drawImage(sideOverlay,
-                        dx1, dy1, dx2 - dx1, dy2 - dy1,
+                    g.drawImage(sideOverlay, dx1, dy1, dx2 - dx1, dy2 - dy1,
                         map);
                 }
                 else
@@ -459,15 +448,14 @@ public class GUIBattleHex extends GUIHex
 
     public GUIBattleHex getNeighbor(int i)
     {
-        assert (i>=0) && (i<=5) : "Neighbor index out of range";
+        assert (i >= 0) && (i <= 5) : "Neighbor index out of range";
         return neighbors[i];
     }
 
     public void setNeighbor(int i, GUIBattleHex hex)
     {
-        assert (i>=0) && (i<=5) : "Neighbor index out of range";
+        assert (i >= 0) && (i <= 5) : "Neighbor index out of range";
         neighbors[i] = hex;
         getBattleHexModel().setNeighbor(i, hex.getBattleHexModel());
     }
 }
-

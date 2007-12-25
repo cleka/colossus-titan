@@ -34,13 +34,16 @@ public class RemoteLogHandler extends Handler
         server = null;
     }
 
-    public void publish(LogRecord record) {
-        if (server != null) {
+    public void publish(LogRecord record)
+    {
+        if (server != null)
+        {
             server.allLog(record.toString());
         }
     }
 
-    public void flush() {
+    public void flush()
+    {
         // nothing to do
     }
 }

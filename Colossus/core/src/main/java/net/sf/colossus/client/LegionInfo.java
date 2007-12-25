@@ -19,10 +19,10 @@ import net.sf.colossus.server.Creature;
  * @author David Ripton
  */
 
-
 public final class LegionInfo
 {
-    private static final Logger LOGGER = Logger.getLogger(LegionInfo.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(LegionInfo.class
+        .getName());
 
     private Client client;
 
@@ -47,7 +47,7 @@ public final class LegionInfo
         this.markerId = markerId;
         this.playerName = client.getPlayerNameByMarkerId(markerId);
         this.client = client;
-        myNode=null;
+        myNode = null;
         isMyLegion = playerName.equals(client.getPlayerName());
     }
 
@@ -60,9 +60,9 @@ public final class LegionInfo
 
     private PredictSplitNode getNode()
     {
-        if (myNode==null)
+        if (myNode == null)
         {
-            myNode= getNode(this.markerId);
+            myNode = getNode(this.markerId);
         }
         return myNode;
     }
@@ -85,7 +85,8 @@ public final class LegionInfo
     public int getHeight()
     {
         PredictSplitNode node = getNode();
-        if (node == null) {
+        if (node == null)
+        {
             return 0;
         }
         return node.getHeight();
@@ -121,8 +122,8 @@ public final class LegionInfo
     {
         try
         {
-            return Collections.unmodifiableList(
-                getNode().getCreatures().getCreatureNames());
+            return Collections.unmodifiableList(getNode().getCreatures()
+                .getCreatureNames());
         }
         catch (NullPointerException ex)
         {
@@ -243,17 +244,17 @@ public final class LegionInfo
     void split(int childHeight, String childId, int turn)
     {
         getNode().split(childHeight, childId, turn);
-        myNode=myNode.getChild1();
+        myNode = myNode.getChild1();
     }
 
     void merge(String splitoffId)
     {
-        LOGGER.log(Level.FINEST,
-            "LegionInfo.merge() for " + markerId + " " + splitoffId);
+        LOGGER.log(Level.FINEST, "LegionInfo.merge() for " + markerId + " "
+            + splitoffId);
         getNode().merge(getNode(splitoffId));
         // since this is potentially a merge of a 3-way split, be safe and 
         // find the node again
-        myNode= getNode(this.markerId);
+        myNode = getNode(this.markerId);
     }
 
     public boolean hasTitan()
@@ -296,8 +297,8 @@ public final class LegionInfo
             Creature creature = Creature.getCreatureByName(name);
             if (creature.isSummonable())
             {
-                if (best == null || creature.getPointValue() >
-                    best.getPointValue())
+                if (best == null
+                    || creature.getPointValue() > best.getPointValue())
                 {
                     best = creature;
                 }
@@ -328,8 +329,8 @@ public final class LegionInfo
             {
                 PlayerInfo info = client.getPlayerInfo(playerName);
                 // Titan skill is changed by variants.
-                sum += info.getTitanPower() *
-                    Creature.getCreatureByName("Titan").getSkill();
+                sum += info.getTitanPower()
+                    * Creature.getCreatureByName("Titan").getSkill();
             }
             else
             {
@@ -345,8 +346,8 @@ public final class LegionInfo
     public int getCertainPointValue()
     {
         int sum = 0;
-        Iterator it = getNode().getCertainCreatures().
-            getCreatureNames().iterator();
+        Iterator it = getNode().getCertainCreatures().getCreatureNames()
+            .iterator();
         while (it.hasNext())
         {
             String name = (String)it.next();
@@ -354,8 +355,8 @@ public final class LegionInfo
             {
                 PlayerInfo info = client.getPlayerInfo(playerName);
                 // Titan skill is changed by variants.
-                sum += info.getTitanPower() *
-                    Creature.getCreatureByName("Titan").getSkill();
+                sum += info.getTitanPower()
+                    * Creature.getCreatureByName("Titan").getSkill();
             }
             else
             {
@@ -466,10 +467,12 @@ public final class LegionInfo
     /** Return true if the legion has moved and can recruit. */
     public boolean canRecruit()
     {
-        return hasMoved() && getHeight() < 7 &&
-            !hasRecruited() && !getPlayerInfo().isDead() &&
-            !client.findEligibleRecruits(getMarkerId(),
-            getHexLabel()).isEmpty();
+        return hasMoved()
+            && getHeight() < 7
+            && !hasRecruited()
+            && !getPlayerInfo().isDead()
+            && !client.findEligibleRecruits(getMarkerId(), getHexLabel())
+                .isEmpty();
     }
 
     public String toString()

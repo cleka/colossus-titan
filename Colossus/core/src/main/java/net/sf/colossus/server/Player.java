@@ -25,25 +25,26 @@ import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
 public final class Player implements Comparable
 {
-    private static final Logger LOGGER = Logger.getLogger(Player.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(Player.class
+        .getName());
 
     private Game game;
     private String name;
-    private String color;              // Black, Blue, Brown, Gold, Green, Red
-    private String startingTower;      // hex label
-    private double score;              // track half-points, then round
+    private String color; // Black, Blue, Brown, Gold, Green, Red
+    private String startingTower; // hex label
+    private double score; // track half-points, then round
     private boolean summoned;
     private boolean teleported;
-    private String playersEliminated = "";  // RdBkGr
+    private String playersEliminated = ""; // RdBkGr
     private int mulligansLeft = 1;
-    private int movementRoll;          // 0 if movement has not been rolled.
+    private int movementRoll; // 0 if movement has not been rolled.
     private List legions = new ArrayList();
     private boolean dead;
     private boolean titanEliminated;
     private String donorId;
-    private SortedSet markersAvailable
-        = Collections.synchronizedSortedSet(new TreeSet());
-    private String type;               // "Human" or ".*AI"
+    private SortedSet markersAvailable = Collections
+        .synchronizedSortedSet(new TreeSet());
+    private String type; // "Human" or ".*AI"
     private String firstMarker;
 
     Player(String name, Game game)
@@ -83,8 +84,8 @@ public final class Player implements Comparable
     void setType(final String aType)
     {
         String type = new String(aType);
-        LOGGER.log(Level.FINEST,
-            "Called Player.setType() for " + name + " " + type);
+        LOGGER.log(Level.FINEST, "Called Player.setType() for " + name + " "
+            + type);
         if (type.endsWith(Constants.anyAI))
         {
             int whichAI = Dice.rollDie(Constants.numAITypes) - 1;
@@ -310,8 +311,8 @@ public final class Player implements Comparable
 
     int getTitanPower()
     {
-        return 6 + getScore() /
-            TerrainRecruitLoader.getTitanImprovementValue();
+        return 6 + getScore()
+            / TerrainRecruitLoader.getTitanImprovementValue();
     }
 
     synchronized int getNumLegions()
@@ -492,8 +493,8 @@ public final class Player implements Comparable
         else
         {
             movementRoll = Dice.rollDie();
-            LOGGER.log(Level.INFO, getName() + " rolls a " + movementRoll +
-                " for movement");
+            LOGGER.log(Level.INFO, getName() + " rolls a " + movementRoll
+                + " for movement");
         }
         game.getServer().allTellMovementRoll(movementRoll);
     }
@@ -540,12 +541,11 @@ public final class Player implements Comparable
         {
             Legion legion = (Legion)it.next();
             String hexLabel = legion.getCurrentHexLabel();
-            if (game.getNumFriendlyLegions(hexLabel, this) > 1 &&
-                legion.hasConventionalMove())
+            if (game.getNumFriendlyLegions(hexLabel, this) > 1
+                && legion.hasConventionalMove())
             {
                 LOGGER.log(Level.FINEST,
-                    "Found unseparated split legions at hex " +
-                    hexLabel);
+                    "Found unseparated split legions at hex " + hexLabel);
                 return true;
             }
         }
@@ -570,22 +570,22 @@ public final class Player implements Comparable
     void undoRecruit(String markerId)
     {
         Legion legion = getLegionByMarkerId(markerId);
-        if ( legion == null )
+        if (legion == null)
         {
             LOGGER.log(Level.SEVERE,
-                "Player.undoRecruit: legion for markerId " + markerId +
-                " is null");
+                "Player.undoRecruit: legion for markerId " + markerId
+                    + " is null");
             return;
         }
 
         // This is now permanently fixed in Player.java, so this should
         // never happen again. Still, leaving this in place, just to be sure...
         String recruitName = legion.getRecruitName();
-        if ( recruitName == null )
+        if (recruitName == null)
         {
             LOGGER.log(Level.SEVERE,
-                "Player.undoRecruit: Nothing to unrecruit for marker " +
-                markerId);
+                "Player.undoRecruit: Nothing to unrecruit for marker "
+                    + markerId);
             return;
         }
         legion.undoRecruit();
@@ -611,8 +611,8 @@ public final class Player implements Comparable
             Legion legion = (Legion)it.next();
             // Don't use the legion's real parent, as there could have been
             // a 3-way split and the parent could be gone.
-            Legion parent = game.getFirstFriendlyLegion(
-                legion.getCurrentHexLabel(), this);
+            Legion parent = game.getFirstFriendlyLegion(legion
+                .getCurrentHexLabel(), this);
             if (legion != parent)
             {
                 legion.recombine(parent, false);

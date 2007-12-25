@@ -27,7 +27,8 @@ import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
 public class RecruitGraph
 {
-    private static final Logger LOGGER = Logger.getLogger(RecruitGraph.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(RecruitGraph.class
+        .getName());
 
     private CaretakerInfo caretakerInfo;
     private final List allVertex = new ArrayList();
@@ -118,11 +119,10 @@ public class RecruitGraph
 
         public String toString()
         {
-            return "RecruitVertex " + cre + " with " +
-                outgoingEdges.size() + "exits";
+            return "RecruitVertex " + cre + " with " + outgoingEdges.size()
+                + "exits";
         }
     }
-
 
     /**
      * The edge of the Recruit Graph
@@ -136,9 +136,8 @@ public class RecruitGraph
         private final int number;
         private final String terrain;
 
-        RecruitEdge(RecruitVertex src,
-            RecruitVertex dst,
-            int number, String terrain)
+        RecruitEdge(RecruitVertex src, RecruitVertex dst, int number,
+            String terrain)
         {
             this.src = src;
             this.dst = dst;
@@ -173,17 +172,15 @@ public class RecruitGraph
                 return false;
             }
             RecruitEdge o2 = (RecruitEdge)obj;
-            return ((o2.getSource() == src) &&
-                (o2.getDestination() == dst) &&
-                (o2.getNumber() == number) &&
-                (o2.getTerrain().equals(terrain)));
+            return ((o2.getSource() == src) && (o2.getDestination() == dst)
+                && (o2.getNumber() == number) && (o2.getTerrain()
+                .equals(terrain)));
         }
 
         public String toString()
         {
-            return "RecruitEdge from " + number + " " +
-                src.getCreatureName() + " to " +
-                dst.getCreatureName() + " in " + terrain;
+            return "RecruitEdge from " + number + " " + src.getCreatureName()
+                + " to " + dst.getCreatureName() + " in " + terrain;
         }
     }
 
@@ -215,17 +212,15 @@ public class RecruitGraph
 
         if (temp == null)
         {
-            LOGGER.log(Level.FINEST,
-                "CUSTOM: Adding non-existant creature: " + cre +
-                " to the graph.");
+            LOGGER.log(Level.FINEST, "CUSTOM: Adding non-existant creature: "
+                + cre + " to the graph.");
             temp = addVertex(cre);
         }
 
         return temp;
     }
 
-    private RecruitEdge addEdge(RecruitVertex src,
-        RecruitVertex dst,
+    private RecruitEdge addEdge(RecruitVertex src, RecruitVertex dst,
         int number, String terrain)
     {
         RecruitEdge e = new RecruitEdge(src, dst, number, terrain);
@@ -263,8 +258,8 @@ public class RecruitGraph
             {
                 RecruitEdge e = (RecruitEdge)it.next();
                 RecruitVertex v = e.getDestination();
-                int already = (legion == null ? 0 :
-                    legion.numCreature(s.getCreatureName()));
+                int already = (legion == null ? 0 : legion.numCreature(s
+                    .getCreatureName()));
 
                 /* only explore if
                  (1) not already visited
@@ -273,17 +268,17 @@ public class RecruitGraph
                  */
                 if (!(visited.contains(v)))
                 {
-                    if (((s.getRemaining() + already) >= e.getNumber()) &&
-                        (v.getRemaining() > 0))
+                    if (((s.getRemaining() + already) >= e.getNumber())
+                        && (v.getRemaining() > 0))
                     {
                         all.addAll(traverse(v, visited, legion));
                     }
                     else
                     {
-                        LOGGER.log(Level.FINEST, "GRAPH: ignoring " + e +
-                            " as not enough creatures are left (a: " +
-                            already + " s: " + s.getRemaining() +
-                            " d: " + v.getRemaining() + ")");
+                        LOGGER.log(Level.FINEST, "GRAPH: ignoring " + e
+                            + " as not enough creatures are left (a: "
+                            + already + " s: " + s.getRemaining() + " d: "
+                            + v.getRemaining() + ")");
                     }
                 }
             }
@@ -326,9 +321,7 @@ public class RecruitGraph
      */
     private List traverse(String cre, LegionInfo legion)
     {
-        return traverse(getVertex(cre),
-            new HashSet(),
-            legion);
+        return traverse(getVertex(cre), new HashSet(), legion);
     }
 
     /* PUBLIC */
@@ -342,31 +335,22 @@ public class RecruitGraph
      * @param terrain Terrain where the recruiting occurs
      * @return The new RecruitEdge.
      */
-    public void addEdge(String src,
-        String dst,
-        int number, String terrain)
+    public void addEdge(String src, String dst, int number, String terrain)
     {
-        addEdge(addVertex(src),
-            addVertex(dst),
-            number, terrain);
+        addEdge(addVertex(src), addVertex(dst), number, terrain);
     }
 
-    public int numberOfRecruiterNeeded(String recruiter,
-        String recruit,
-        String terrain,
-        String hexLabel)
+    public int numberOfRecruiterNeeded(String recruiter, String recruit,
+        String terrain, String hexLabel)
     {
         List allEdge = getIncomingEdges(recruit);
         RecruitVertex source = getVertex(recruiter);
         Creature recruiterCre = Creature.getCreatureByName(recruiter);
         // if the recruiter is a special such as Anything, avoid
         // crashing with NullPointerException
-        boolean isLord = (recruiterCre == null ?
-            false :
-            recruiterCre.isLord());
-        boolean isDemiLord = (recruiterCre == null ?
-            false :
-            recruiterCre.isDemiLord());
+        boolean isLord = (recruiterCre == null ? false : recruiterCre.isLord());
+        boolean isDemiLord = (recruiterCre == null ? false : recruiterCre
+            .isDemiLord());
         int minValue = BIGNUM;
 
         Iterator it = allEdge.iterator();
@@ -376,15 +360,14 @@ public class RecruitGraph
             if (theEdge.getTerrain().equals(terrain))
             {
                 RecruitVertex tempSrc = theEdge.getSource();
-                if ((source == tempSrc) ||
-                    (tempSrc.getCreatureName().equals(
-                    TerrainRecruitLoader.Keyword_Anything)) ||
-                    ((!isLord) &&
-                    (!isDemiLord) &&
-                    (tempSrc.getCreatureName().equals(
-                    TerrainRecruitLoader.Keyword_AnyNonLord))) ||
-                    ((isLord) && (tempSrc.getCreatureName().equals(
-                    TerrainRecruitLoader.Keyword_Lord))))
+                if ((source == tempSrc)
+                    || (tempSrc.getCreatureName()
+                        .equals(TerrainRecruitLoader.Keyword_Anything))
+                    || ((!isLord) && (!isDemiLord) && (tempSrc
+                        .getCreatureName()
+                        .equals(TerrainRecruitLoader.Keyword_AnyNonLord)))
+                    || ((isLord) && (tempSrc.getCreatureName()
+                        .equals(TerrainRecruitLoader.Keyword_Lord))))
                 {
                     if (minValue > theEdge.getNumber())
                     {
@@ -396,10 +379,8 @@ public class RecruitGraph
                 {
                     CustomRecruitBase cri = TerrainRecruitLoader
                         .getCustomRecruitBase(tempSrc.getCreatureName());
-                    int v = cri.numberOfRecruiterNeeded(recruiter,
-                        recruit,
-                        terrain,
-                        hexLabel);
+                    int v = cri.numberOfRecruiterNeeded(recruiter, recruit,
+                        terrain, hexLabel);
                     if (v < minValue)
                     {
                         minValue = v;
@@ -543,8 +524,7 @@ public class RecruitGraph
      * @param t Terrain in which the recruiting may occur.
      * @return Name of the recruit.
      */
-    public String getRecruitFromRecruiterTerrainNumber(String cre,
-        String t,
+    public String getRecruitFromRecruiterTerrainNumber(String cre, String t,
         int number)
     {
         List outgoing = getOutgoingEdges(cre);
@@ -556,8 +536,7 @@ public class RecruitGraph
         {
             RecruitEdge e = (RecruitEdge)it.next();
 
-            if ((e.getNumber() == number) &&
-                (e.getTerrain().equals(t)))
+            if ((e.getNumber() == number) && (e.getTerrain().equals(t)))
             {
                 v2 = e.getDestination().getCreatureName();
             }
@@ -572,8 +551,7 @@ public class RecruitGraph
      * @param legion The recruiting legion or null.
      * @return Name of the best possible recruit.
      */
-    public String getBestPossibleRecruitEver(String cre,
-        LegionInfo legion)
+    public String getBestPossibleRecruitEver(String cre, LegionInfo legion)
     {
         String best = cre;
         int maxVP = -1;
@@ -582,8 +560,8 @@ public class RecruitGraph
         while (it.hasNext())
         {
             RecruitVertex v2 = (RecruitVertex)it.next();
-            Creature creature = Creature.getCreatureByName(
-                v2.getCreatureName());
+            Creature creature = Creature.getCreatureByName(v2
+                .getCreatureName());
             int vp = (creature == null ? -1 : creature.getPointValue());
             if (vp > maxVP)
             {

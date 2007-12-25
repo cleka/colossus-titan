@@ -20,8 +20,8 @@ import java.util.logging.Logger;
 
 final class Marker extends Chit
 {
-    private static final Logger LOGGER =
-        Logger.getLogger(Marker.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(Marker.class
+        .getName());
 
     private Font font;
     private int fontHeight;
@@ -77,15 +77,16 @@ final class Marker extends Chit
     {
         setLocation(point);
         this.hexLabel = hexLabel;
-        
+
     }
-    
+
     /* Highlight borders of Markers on BattleMap */
-    void highlightMarker ()
+    void highlightMarker()
     {
         highlight = true;
     }
-    void resetMarkerHighlight ()
+
+    void resetMarkerHighlight()
     {
         highlight = false;
     }
@@ -99,7 +100,9 @@ final class Marker extends Chit
         {
             g2.setColor(Color.RED);
             Rectangle rect = getBounds();
-            g.fillRect(rect.x - 4, rect.y - 4, rect.width + 8, rect.height + 8);
+            g
+                .fillRect(rect.x - 4, rect.y - 4, rect.width + 8,
+                    rect.height + 8);
         }
         super.paintComponent(g2);
 
@@ -130,7 +133,8 @@ final class Marker extends Chit
             // Test this 80% fudge factor on multiple platforms.
             fontHeight = 4 * fontMetrics.getAscent() / 5;
             fontWidth = fontMetrics.stringWidth(legionHeightString);
-            if (LOGGER.isLoggable(Level.FINEST)) {
+            if (LOGGER.isLoggable(Level.FINEST))
+            {
                 LOGGER.log(Level.FINEST, "New font set: " + font);
                 LOGGER.log(Level.FINEST, "New font height: " + fontHeight);
                 LOGGER.log(Level.FINEST, "New font width: " + fontWidth);
@@ -141,7 +145,8 @@ final class Marker extends Chit
             g.setFont(font);
         }
 
-        if (LOGGER.isLoggable(Level.FINEST)) {
+        if (LOGGER.isLoggable(Level.FINEST))
+        {
             LOGGER.log(Level.FINEST, "Our rectangle is: " + rect);
         }
         int x = rect.x + rect.width * 3 / 4 - fontWidth / 2;

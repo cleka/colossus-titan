@@ -23,11 +23,11 @@ import net.sf.colossus.server.Constants;
 
 public final class Options implements IOptions
 {
-    private static final Logger LOGGER = Logger.getLogger(Options.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(Options.class
+        .getName());
 
     // Everything is public because we use this class in both the client
     // and server packages.  (With separate data.)
-
 
     // Non-options that use the options framework
     // Will add player numbers 0 through n-1 to the end of these.
@@ -61,50 +61,40 @@ public final class Options implements IOptions
     public static final String dubiousAsBlanks = "Uncertain as blank (Autoinspector etc.)";
 
     // Web Client specific:
-    public static final String minPlayersWeb  = "Min Players Web Client";
+    public static final String minPlayersWeb = "Min Players Web Client";
     public static final String targPlayersWeb = "Target Players Web Client";
-    public static final String maxPlayersWeb  = "Max Players Web Client";
+    public static final String maxPlayersWeb = "Max Players Web Client";
 
     /* selections for viewable Legions */
-    public static final String viewableOwn  = "Only own legions";
+    public static final String viewableOwn = "Only own legions";
     public static final String viewableLast = "Revealed during last turn";
     public static final String viewableEver = "Ever revealed (or concludable) since start";
-    public static final String viewableAll  =  "True content for all legions";
+    public static final String viewableAll = "True content for all legions";
 
-    public static final String[] viewModeArray =
-        {
-        viewableOwn,
-        //        viewableLast,  // not implemented yet.
-        viewableEver,
-        viewableAll
-    };
+    public static final String[] viewModeArray = { viewableOwn,
+    //        viewableLast,  // not implemented yet.
+        viewableEver, viewableAll };
 
-    public static final int viewableOwnNum  = 1;
+    public static final int viewableOwnNum = 1;
     public static final int viewableLastNum = 2;
     public static final int viewableEverNum = 3;
-    public static final int viewableAllNum  = 4;
+    public static final int viewableAllNum = 4;
 
     public static final String eventExpiring = "EventExpire";
     public static final String eventExpiringNever = "never";
-    public static final String[] eventExpiringChoices =
-        {
-        "1", "2", "5", "10", eventExpiringNever
-    };
+    public static final String[] eventExpiringChoices = { "1", "2", "5", "10",
+        eventExpiringNever };
 
     public static final String balancedTowers = "Balanced starting towers";
     public static final String allStacksVisible = "All stacks visible";
     public static final String onlyOwnLegions = "Only own legions viewable";
     public static final String cumulativeSlow = "Slowing is cumulative";
     public static final String oneHexAllowed = "Always allows one hex";
-    public static final String nonRandomBattleDice =
-        "Use non-random battle dice";
+    public static final String nonRandomBattleDice = "Use non-random battle dice";
 
-    public static final String noFirstTurnT2TTeleport =
-        "No tower-to-tower Teleport on first turn";
-    public static final String noFirstTurnTeleport =
-        "No Teleport on first turn";
-    public static final String towerToTowerTeleportOnly =
-        "Tower-to-Tower Teleport only";
+    public static final String noFirstTurnT2TTeleport = "No tower-to-tower Teleport on first turn";
+    public static final String noFirstTurnTeleport = "No Teleport on first turn";
+    public static final String towerToTowerTeleportOnly = "Tower-to-Tower Teleport only";
     public static final String noTowerTeleport = "No Tower Teleport";
     public static final String noTitanTeleport = "No Titan Teleport";
 
@@ -119,16 +109,12 @@ public final class Options implements IOptions
     public static final String showEventViewer = "Show event window";
     public static final String showLogWindow = "Show log window";
     public static final String showWebClient = "Show web client";
-    public static final String showEngagementResults =
-        "Show engagement results";
+    public static final String showEngagementResults = "Show engagement results";
     public static final String useOverlay = "Use Graphical Overlay";
     public static final String noBaseColor = "Use black overlay on Chits";
-    public static final String useColoredBorders =
-        "Use colored borders on Battle Chits";
-    public static final String doNotInvertDefender =
-        "Do not invert defender's Battle Chits";
-    public static final String hideAdjStrikeDiceRangeStrike = 
-        "Hide Adjustments to Dice for Rangestrike";
+    public static final String useColoredBorders = "Use colored borders on Battle Chits";
+    public static final String doNotInvertDefender = "Do not invert defender's Battle Chits";
+    public static final String hideAdjStrikeDiceRangeStrike = "Hide Adjustments to Dice for Rangestrike";
     public static final String showAllRecruitChits = "Show all recruit Chits";
     public static final String showRecruitChitsSubmenu = "Show recruit preview chits...";
     public static final String showRecruitChitsNone = "None";
@@ -181,8 +167,9 @@ public final class Options implements IOptions
     public static final String serverName = "Server name";
 
     private Properties props = new Properties();
-    private String owner;      // playerName, or Constants.optionsServerName
-    private String dataPath;   // WebServer sets to create a server.cfg file
+    private String owner; // playerName, or Constants.optionsServerName
+    private String dataPath; // WebServer sets to create a server.cfg file
+
     // in the directory in which the game is run
 
     public Options(String owner)
@@ -199,16 +186,16 @@ public final class Options implements IOptions
 
     public String getOptionsFilename()
     {
-        return dataPath + Constants.optionsBase + owner +
-            Constants.optionsExtension;
+        return dataPath + Constants.optionsBase + owner
+            + Constants.optionsExtension;
     }
 
     public void loadOptions()
     {
         // Don't load from temporary player names.
-        if (owner.startsWith(Constants.byColor) ||
-            owner.startsWith(Constants.byType) ||
-            owner.startsWith(Constants.byClient))
+        if (owner.startsWith(Constants.byColor)
+            || owner.startsWith(Constants.byType)
+            || owner.startsWith(Constants.byClient))
         {
             return;
         }
@@ -222,8 +209,8 @@ public final class Options implements IOptions
         }
         catch (IOException e)
         {
-            LOGGER.log(Level.INFO,
-                "Couldn't read options from " + optionsFile);
+            LOGGER
+                .log(Level.INFO, "Couldn't read options from " + optionsFile);
             return;
         }
     }
@@ -231,9 +218,9 @@ public final class Options implements IOptions
     public void saveOptions()
     {
         // Don't save from temporary player names.
-        if (owner.startsWith(Constants.byColor) ||
-            owner.startsWith(Constants.byType) ||
-            owner.startsWith(Constants.byClient))
+        if (owner.startsWith(Constants.byColor)
+            || owner.startsWith(Constants.byType)
+            || owner.startsWith(Constants.byClient))
         {
             return;
         }
@@ -242,13 +229,11 @@ public final class Options implements IOptions
         File optionsDir = new File(dataPath);
         if (!optionsDir.exists() || !optionsDir.isDirectory())
         {
-            LOGGER.log(Level.INFO,
-                "Trying to make directory " + dataPath);
+            LOGGER.log(Level.INFO, "Trying to make directory " + dataPath);
             if (!optionsDir.mkdirs())
             {
-                LOGGER.log(Level.SEVERE,
-                    "Could not create options directory " +
-                    optionsDir.toString());
+                LOGGER.log(Level.SEVERE, "Could not create options directory "
+                    + optionsDir.toString());
                 return;
             }
         }
@@ -261,8 +246,8 @@ public final class Options implements IOptions
         }
         catch (IOException e)
         {
-            LOGGER.log(Level.SEVERE,
-                "Couldn't write options to " + optionsFile, e);
+            LOGGER.log(Level.SEVERE, "Couldn't write options to "
+                + optionsFile, e);
         }
     }
 
@@ -430,8 +415,7 @@ public final class Options implements IOptions
         return val;
     }
 
-    private static String propNameStresstestRounds =
-        "net.sf.colossus.stressTestRounds";
+    private static String propNameStresstestRounds = "net.sf.colossus.stressTestRounds";
 
     public static boolean isStresstest()
     {
@@ -450,18 +434,17 @@ public final class Options implements IOptions
                 int i = Integer.parseInt(propHowMany);
                 howMany = i;
 
-                System.out.println("\nNOTE: Using value " + i +
-                    " from property " +
-                    propNameStresstestRounds + " as counter for stresstest, " +
-                    "how many rounds to do inside one JVM run.\n");
+                System.out.println("\nNOTE: Using value " + i
+                    + " from property " + propNameStresstestRounds
+                    + " as counter for stresstest, "
+                    + "how many rounds to do inside one JVM run.\n");
             }
             catch (NumberFormatException ex)
             {
                 howMany = 1;
-                System.out.println("\nNOTE: Value '" + propHowMany +
-                    "' from property " +
-                    propNameStresstestRounds +
-                    " is not a valid number - using default value 1!\n");
+                System.out.println("\nNOTE: Value '" + propHowMany
+                    + "' from property " + propNameStresstestRounds
+                    + " is not a valid number - using default value 1!\n");
             }
         }
         return howMany;

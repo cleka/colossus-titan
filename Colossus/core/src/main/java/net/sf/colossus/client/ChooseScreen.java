@@ -37,14 +37,13 @@ final class ChooseScreen extends KDialog implements ActionListener
 
         setBackground(Color.lightGray);
 
-        GraphicsDevice[] all =
-            GraphicsEnvironment.getLocalGraphicsEnvironment()
-            .getScreenDevices();
+        GraphicsDevice[] all = GraphicsEnvironment
+            .getLocalGraphicsEnvironment().getScreenDevices();
 
         for (int i = 0; i < all.length; i++)
         {
-            JButton sb = new JButton("Screen: " + all[i].getClass().getName() +
-                " " + all[i].getIDstring());
+            JButton sb = new JButton("Screen: " + all[i].getClass().getName()
+                + " " + all[i].getIDstring());
 
             contentPane.add(sb);
             sb.addActionListener(this);
@@ -66,8 +65,8 @@ final class ChooseScreen extends KDialog implements ActionListener
 
         for (int i = 0; i < all.length; i++)
         {
-            if (fullName.equals("Screen: " + all[i].getClass().getName() +
-                " " + all[i].getIDstring()))
+            if (fullName.equals("Screen: " + all[i].getClass().getName() + " "
+                + all[i].getIDstring()))
             {
                 chosen = all[i];
             }

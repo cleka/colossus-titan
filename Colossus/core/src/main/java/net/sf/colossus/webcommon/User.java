@@ -26,7 +26,6 @@ import java.util.Iterator;
  *  @author Clemens Katzer
  */
 
-
 public class User
 {
     private static HashMap userMap = new HashMap();
@@ -52,7 +51,8 @@ public class User
         this.name = name;
     }
 
-    public User(String name, String password, String email, boolean isAdmin, String created)
+    public User(String name, String password, String email, boolean isAdmin,
+        String created)
     {
         this.name = name;
         this.password = password;
@@ -138,8 +138,8 @@ public class User
         {
             reasonLoginFailed = "Invalid username";
         }
-        else if (password != null && password.equals(user.password) &&
-            username.equals(user.name))
+        else if (password != null && password.equals(user.password)
+            && username.equals(user.name))
         {
             // ok, return null to indicate all is fine
         }
@@ -169,7 +169,8 @@ public class User
         return loggedInUserMap.values().iterator();
     }
 
-    public static String registerUser(String username, String password, String email, boolean isAdmin)
+    public static String registerUser(String username, String password,
+        String email, boolean isAdmin)
     {
         User alreadyExisting = findUserByName(username);
         if (alreadyExisting != null)
@@ -179,9 +180,9 @@ public class User
         }
         else if (userMap.size() >= maxUsers)
         {
-            String problem = "Maximum number of accounts )" + maxUsers +
-                ") reached - no more registrations possible," +
-                " until some administrator checks the situation.";
+            String problem = "Maximum number of accounts )" + maxUsers
+                + ") reached - no more registrations possible,"
+                + " until some administrator checks the situation.";
             return problem;
         }
         else
@@ -206,7 +207,7 @@ public class User
             reason = "User does not exist";
             return reason;
         }
-        else if ( (reason = User.verifyLogin(username, oldPW)) != null)
+        else if ((reason = User.verifyLogin(username, oldPW)) != null)
         {
             return reason;
         }
@@ -220,8 +221,8 @@ public class User
 
     public static final String CREATION_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
-    private static SimpleDateFormat createdDateFormatter
-        = new SimpleDateFormat(CREATION_FORMAT);
+    private static SimpleDateFormat createdDateFormatter = new SimpleDateFormat(
+        CREATION_FORMAT);
 
     private static String makeCreatedDate(long when)
     {
@@ -237,7 +238,7 @@ public class User
         String[] tokens = line.split(new String(sep));
         if (tokens.length != 5)
         {
-            System.out.println("invalid line '"+line+"' in user file.");
+            System.out.println("invalid line '" + line + "' in user file.");
             System.exit(1);
         }
         String name = tokens[0].trim();
@@ -256,8 +257,8 @@ public class User
         }
         else
         {
-            System.out.println("WARNING: invalid type '" + type +
-                "' in user file line '"+line+"'");
+            System.out.println("WARNING: invalid type '" + type
+                + "' in user file line '" + line + "'");
         }
         User u = new User(name, password, email, isAdmin, created);
         storeUser(u);
@@ -270,12 +271,11 @@ public class User
 
         try
         {
-            BufferedReader users = new BufferedReader(
-                new InputStreamReader(
+            BufferedReader users = new BufferedReader(new InputStreamReader(
                 new FileInputStream(filename)));
 
             String line = null;
-            while ( (line = users.readLine()) != null)
+            while ((line = users.readLine()) != null)
             {
                 if (line.startsWith("#"))
                 {
@@ -293,13 +293,14 @@ public class User
         }
         catch (FileNotFoundException e)
         {
-            System.out.println("ERROR: Users file " + filename + " not found!");
+            System.out
+                .println("ERROR: Users file " + filename + " not found!");
             System.exit(1);
         }
         catch (IOException e)
         {
-            System.out.println("ERROR: IOException while reading users file " +
-                filename + "!");
+            System.out.println("ERROR: IOException while reading users file "
+                + filename + "!");
             System.exit(1);
         }
     }
@@ -309,8 +310,8 @@ public class User
         String sep = net.sf.colossus.server.Constants.protocolTermSeparator;
         String type = (isAdmin ? typeAdmin : typeUser);
 
-        String line = this.name + sep + password + sep + email +
-            sep + type + sep + created;
+        String line = this.name + sep + password + sep + email + sep + type
+            + sep + created;
         return line;
     }
 
@@ -323,9 +324,9 @@ public class User
             System.out.println("ERROR: UsersFile name is null!");
             System.exit(1);
         }
-        
-        System.out.println("\n####\nStore users back to file " +
-            filename + "\n#####\n");
+
+        System.out.println("\n####\nStore users back to file " + filename
+            + "\n#####\n");
 
         PrintWriter out = null;
         try
@@ -345,8 +346,8 @@ public class User
         }
         catch (FileNotFoundException e)
         {
-            System.out.println("ERROR: Writing users file " + filename +
-                ": FileNotFoundException: " + e.toString());
+            System.out.println("ERROR: Writing users file " + filename
+                + ": FileNotFoundException: " + e.toString());
             System.exit(1);
         }
     }

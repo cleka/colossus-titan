@@ -34,11 +34,11 @@ import net.sf.colossus.util.Options;
  *  @author David Ripton
  */
 
-
 public class StartClient extends KFrame implements WindowListener,
     ActionListener
 {
-    private static final Logger LOGGER = Logger.getLogger(StartClient.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(StartClient.class
+        .getName());
 
     private Object mutex;
     private Options netclientOptions;
@@ -67,8 +67,8 @@ public class StartClient extends KFrame implements WindowListener,
 
         // player, preferred host (or null) and port from main() / cmdline 
         this.playerName = stOptions.getStringOption(Options.runClientPlayer);
-        this.hostname   = stOptions.getStringOption(Options.runClientHost);
-        this.port       = stOptions.getIntOption(Options.runClientPort);
+        this.hostname = stOptions.getStringOption(Options.runClientHost);
+        this.port = stOptions.getIntOption(Options.runClientPort);
 
         // LRU list of hsots, and window geometry from NetClient cf file
         netclientOptions = new Options(Constants.optionsNetClientName);
@@ -163,10 +163,10 @@ public class StartClient extends KFrame implements WindowListener,
         // that's why we go backwards.
         // Combobox will display them alphabetically anyway,
         // so make at least the last-used-one be preselected.
-        for (int i = Constants.numSavedServerNames-1; i >= 0 ; i--)
+        for (int i = Constants.numSavedServerNames - 1; i >= 0; i--)
         {
-            String serverName = netclientOptions.getStringOption(
-                Options.serverName + i );
+            String serverName = netclientOptions
+                .getStringOption(Options.serverName + i);
             if (serverName != null)
             {
                 hostChoices.add(serverName);
@@ -217,7 +217,8 @@ public class StartClient extends KFrame implements WindowListener,
         {
             doRunNetClient();
         }
-        else // A combo box was changed.
+        else
+        // A combo box was changed.
         {
             Object source = e.getSource();
             if (source == nameBox)
@@ -282,8 +283,8 @@ public class StartClient extends KFrame implements WindowListener,
         names.add(hostname);
         for (int i = 0; i < Constants.numSavedServerNames; i++)
         {
-            String serverName = netclientOptions.getStringOption(
-                Options.serverName + i);
+            String serverName = netclientOptions
+                .getStringOption(Options.serverName + i);
             if (serverName != null)
             {
                 // Don't add it twice:
@@ -293,11 +294,10 @@ public class StartClient extends KFrame implements WindowListener,
                 }
             }
         }
-        for (int i = 0; i < names.size() &&
-            i < Constants.numSavedServerNames ; i++)
+        for (int i = 0; i < names.size() && i < Constants.numSavedServerNames; i++)
         {
-            netclientOptions.setOption(
-                Options.serverName + i, (String)names.get(i));
+            netclientOptions.setOption(Options.serverName + i, (String)names
+                .get(i));
         }
     }
 }

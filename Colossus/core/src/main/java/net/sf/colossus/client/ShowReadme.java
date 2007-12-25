@@ -24,7 +24,6 @@ import net.sf.colossus.util.ResourceLoader;
  * @author Clemens Katzer
  */
 
-
 public final class ShowReadme extends KFrame
 {
     JEditorPane myReadme;
@@ -93,8 +92,8 @@ public final class ShowReadme extends KFrame
         readmePane.add(readme);
 
         Document doc = VariantSupport.loadVariant(variantName, true);
-        readme.setContentType((String)doc.getProperty(
-            ResourceLoader.keyContentType));
+        readme.setContentType((String)doc
+            .getProperty(ResourceLoader.keyContentType));
         readme.setDocument(doc);
 
         return readmeScrollPane;

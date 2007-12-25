@@ -19,7 +19,8 @@ public final class Constants
     /**
      * A typesafe enumeration for the different phases of the main game.
      */
-    public static class Phase {
+    public static class Phase
+    {
         public static final Phase SPLIT = new Phase("Split", 1);
         public static final Phase MOVE = new Phase("Move", 2);
         public static final Phase FIGHT = new Phase("Fight", 3);
@@ -50,7 +51,8 @@ public final class Constants
                     return MUSTER;
 
                 default:
-                    throw new IllegalArgumentException("Invalid number for phase");
+                    throw new IllegalArgumentException(
+                        "Invalid number for phase");
             }
         }
 
@@ -85,21 +87,17 @@ public final class Constants
         }
     }
 
-
     /**
      * A typesafe enumeration of the phases of a battle.
      */
-    public static class BattlePhase {
-        public static final BattlePhase SUMMON
-            = new BattlePhase("Summon", 0);
-        public static final BattlePhase RECRUIT
-            = new BattlePhase("Recruit", 1);
-        public static final BattlePhase MOVE
-            = new BattlePhase("Move", 2);
-        public static final BattlePhase FIGHT
-            = new BattlePhase("Fight", 3);
-        public static final BattlePhase STRIKEBACK
-            = new BattlePhase("Strikeback", 4);
+    public static class BattlePhase
+    {
+        public static final BattlePhase SUMMON = new BattlePhase("Summon", 0);
+        public static final BattlePhase RECRUIT = new BattlePhase("Recruit", 1);
+        public static final BattlePhase MOVE = new BattlePhase("Move", 2);
+        public static final BattlePhase FIGHT = new BattlePhase("Fight", 3);
+        public static final BattlePhase STRIKEBACK = new BattlePhase(
+            "Strikeback", 4);
 
         /**
          * Deserialize enum from integer value.
@@ -129,7 +127,8 @@ public final class Constants
                     return STRIKEBACK;
 
                 default:
-                    throw new IllegalArgumentException("Invalid number for battle phase");
+                    throw new IllegalArgumentException(
+                        "Invalid number for battle phase");
             }
         }
 
@@ -175,8 +174,8 @@ public final class Constants
     }
 
     /** Base path for all external game data files. */
-    public static final String gameDataPath =
-        System.getProperty("user.home") + "/.colossus/";
+    public static final String gameDataPath = System.getProperty("user.home")
+        + "/.colossus/";
 
     // Constants related to the options config files
     public static final String optionsPath = gameDataPath;
@@ -188,8 +187,7 @@ public final class Constants
     public static final String optionsStart = "start";
     public static final String optionsExtension = ".cfg";
 
-    public static final String configVersion =
-        "Colossus config file version 2";
+    public static final String configVersion = "Colossus config file version 2";
 
     // Constants for savegames
 
@@ -246,30 +244,24 @@ public final class Constants
      shortened name directly */
 
     /* all should be MAX_MAX_PLAYERS long */
-    public static final String[] colorNames =
-        {
-        "Black", "Blue", "Brown", "Gold", "Green", "Red",
-        "Orange", "Purple", "Silver", "Sky", "Pine", "Indigo"
-    };
-    public static final String[] shortColorNames =
-        {
-        "Bk", "Bu", "Br", "Gd", "Gr", "Rd",
-        "Or", "Pu", "Si", "Sk", "Pi", "In"
-    };
+    public static final String[] colorNames = { "Black", "Blue", "Brown",
+        "Gold", "Green", "Red", "Orange", "Purple", "Silver", "Sky", "Pine",
+        "Indigo" };
+    public static final String[] shortColorNames = { "Bk", "Bu", "Br", "Gd",
+        "Gr", "Rd", "Or", "Pu", "Si", "Sk", "Pi", "In" };
     public static final int[] colorMnemonics = { KeyEvent.VK_B, KeyEvent.VK_L,
-        KeyEvent.VK_O,
-        KeyEvent.VK_G, KeyEvent.VK_E, KeyEvent.VK_R,
-        KeyEvent.VK_A, KeyEvent.VK_P, KeyEvent.VK_S,
-        KeyEvent.VK_K, KeyEvent.VK_N, KeyEvent.VK_I};
+        KeyEvent.VK_O, KeyEvent.VK_G, KeyEvent.VK_E, KeyEvent.VK_R,
+        KeyEvent.VK_A, KeyEvent.VK_P, KeyEvent.VK_S, KeyEvent.VK_K,
+        KeyEvent.VK_N, KeyEvent.VK_I };
 
     public static final String noShortName = "XX";
     private static final HashMap shortNamesMap = new HashMap();
 
-    public static final int MIN_AI_DELAY = 0;      //in ms
+    public static final int MIN_AI_DELAY = 0; //in ms
     public static final int MAX_AI_DELAY = 3000;
     public static final int DEFAULT_AI_DELAY = 300;
 
-    public static final int MIN_AI_TIME_LIMIT = 1;      //in s
+    public static final int MIN_AI_TIME_LIMIT = 1; //in s
     public static final int MAX_AI_TIME_LIMIT = 200;
     public static final int DEFAULT_AI_TIME_LIMIT = 30;
 
@@ -341,8 +333,8 @@ public final class Constants
     public static final String ai = "AI";
     public static final String anyAI = "A Random AI";
     public static final String defaultAI = anyAI;
-    public static final String[] aiArray = { "SimpleAI",
-        "CowardSimpleAI", "RationalAI", "HumanHaterRationalAI", "MilvangAI"};
+    public static final String[] aiArray = { "SimpleAI", "CowardSimpleAI",
+        "RationalAI", "HumanHaterRationalAI", "MilvangAI" };
 
     public static final int numAITypes = aiArray.length;
     public static final String all = "All";
@@ -366,8 +358,8 @@ public final class Constants
     // Web clients:
     public static String defaultWebServer = "localhost";
     public static int defaultWebPort = 26766;
-    public static String defaultWebLogin =
-        System.getProperty("user.name", "webuser");
+    public static String defaultWebLogin = System.getProperty("user.name",
+        "webuser");
     public static String defaultWebPassword = "webpassword";
 
     public static final int numSavedServerNames = 10;
@@ -384,27 +376,11 @@ public final class Constants
 
     /** Available internal variants  Try to keep this list mostly
      *  alphabetized for easier searching, with Default at the top. */
-    public static final String[] variantArray = { "Default",
-        "Abyssal6",
-        "Abyssal9",
-        "Badlands",
-        "Badlands-JDG",
-        "Beelzebub",
-        "Beelzebub12",
-        "ExtTitan",
-        "Infinite",
-        "Outlands",
-        "Pantheon",
-        "SmallTitan",
-        "TG-ConceptI",
-        "TG-ConceptII",
-        "TG-ConceptIII",
-        "TG-SetII",
-        "TG-SetIII",
-        "TG-Wild",
-        "TitanPlus",
-        "Undead",
-        "Unified" };
+    public static final String[] variantArray = { "Default", "Abyssal6",
+        "Abyssal9", "Badlands", "Badlands-JDG", "Beelzebub", "Beelzebub12",
+        "ExtTitan", "Infinite", "Outlands", "Pantheon", "SmallTitan",
+        "TG-ConceptI", "TG-ConceptII", "TG-ConceptIII", "TG-SetII",
+        "TG-SetIII", "TG-Wild", "TitanPlus", "Undead", "Unified" };
     // XXX Currently broken variants
     //    "Balrog",
     //    "Random"
@@ -506,16 +482,14 @@ public final class Constants
     public static final String addCreature = "addCreature";
     public static final String removeCreature = "removeCreature";
     public static final String revealCreatures = "revealCreatures";
-    public static final String revealEngagedCreatures =
-        "revealEngagedCreatures"; //towi
+    public static final String revealEngagedCreatures = "revealEngagedCreatures"; //towi
     public static final String removeDeadBattleChits = "removeDeadBattleChits";
     public static final String placeNewChit = "placeNewChit";
     public static final String initBoard = "initBoard";
     public static final String setPlayerName = "setPlayerName";
     public static final String createSummonAngel = "createSummonAngel";
     public static final String askAcquireAngel = "askAcquireAngel";
-    public static final String askChooseStrikePenalty =
-        "askChooseStrikePenalty";
+    public static final String askChooseStrikePenalty = "askChooseStrikePenalty";
     public static final String tellGameOver = "tellGameOver";
     public static final String tellPlayerElim = "tellPlayerElim";
     public static final String askConcede = "askConcede";
@@ -560,7 +534,8 @@ public final class Constants
     {
         if (colorNames.length != shortColorNames.length)
         {
-            throw new RuntimeException("ERROR: colorNames length does not match size of shortColorNames length.");
+            throw new RuntimeException(
+                "ERROR: colorNames length does not match size of shortColorNames length.");
         }
         for (int i = 0; i < colorNames.length; i++)
         {

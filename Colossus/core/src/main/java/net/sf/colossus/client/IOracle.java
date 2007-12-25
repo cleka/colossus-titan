@@ -13,15 +13,26 @@ import java.util.List;
 public interface IOracle
 {
     String getBattleSite();
+
     String getAttackerMarkerId();
+
     String getDefenderMarkerId();
+
     int getBattleTurnNumber();
+
     int getTurnNumber();
+
     List getLegionImageNames(String markerId);
+
     List getLegionCreatureCertainties(String markerId);
+
     int getNumPlayers();
+
     String getActivePlayerName();
+
     String getPhaseName();
+
     String getBattleActivePlayerName();
+
     String getBattlePhaseName();
 }

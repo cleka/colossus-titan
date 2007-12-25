@@ -117,17 +117,17 @@ public final class LegionInfoPanel extends JPanel
         add(new JLabel(text));
     }
 
-    private void viewAll(LegionInfo legion, boolean usePlayerColor,
-        int scale, int margin, int padding,
-        boolean dubiousAsBlanks, boolean hideAll, boolean showLegionValue)
+    private void viewAll(LegionInfo legion, boolean usePlayerColor, int scale,
+        int margin, int padding, boolean dubiousAsBlanks, boolean hideAll,
+        boolean showLegionValue)
     {
         setLayout(null);
 
         if (usePlayerColor)
         {
-            Color playerColor =
-                HTMLColor.stringToColor(legion.getPlayerInfo().getColor() +
-                "Colossus");
+            Color playerColor = HTMLColor.stringToColor(legion.getPlayerInfo()
+                .getColor()
+                + "Colossus");
             setBackground(playerColor);
         }
 
@@ -139,8 +139,8 @@ public final class LegionInfoPanel extends JPanel
         boolean showMarker = false;
         if (showMarker)
         {
-            Chit marker = new Chit(scale, legion.getMarkerId(),
-                false, true, false);
+            Chit marker = new Chit(scale, legion.getMarkerId(), false, true,
+                false);
             if (effectiveChitSize == 0)
             {
                 // they should be all the same size
@@ -228,11 +228,11 @@ public final class LegionInfoPanel extends JPanel
                 margin);
             i++;
         }
-        
+
         if (showLegionValue && allCertain)
         {
-            JLabel sizeLabel =
-                new JLabel(String.valueOf(legion.getPointValue()));
+            JLabel sizeLabel = new JLabel(String.valueOf(legion
+                .getPointValue()));
             sizeLabel.setForeground(Color.WHITE);
             add(sizeLabel);
             sizeLabel.setLocation(i * (effectiveChitSize + padding) + margin,
@@ -248,9 +248,10 @@ public final class LegionInfoPanel extends JPanel
             add(Box.createRigidArea(new Dimension(scale, scale)));
         }
 
-        setSize((legion.getImageNames().size() + (showMarker ? 1 : 0)
-            + (showLegionValue && allCertain ? 1 : 0))
-            * (effectiveChitSize + padding) - padding + 2 * margin,
+        setSize(
+            (legion.getImageNames().size() + (showMarker ? 1 : 0) + (showLegionValue
+                && allCertain ? 1 : 0))
+                * (effectiveChitSize + padding) - padding + 2 * margin,
             effectiveChitSize + 2 * margin);
         setMinimumSize(getSize());
         setPreferredSize(getSize());

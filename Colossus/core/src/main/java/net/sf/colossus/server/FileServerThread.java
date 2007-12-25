@@ -27,7 +27,8 @@ import net.sf.colossus.util.Split;
 
 final class FileServerThread extends Thread
 {
-    private static final Logger LOGGER = Logger.getLogger(FileServerThread.class.getName());
+    private static final Logger LOGGER = Logger
+        .getLogger(FileServerThread.class.getName());
 
     private ServerSocket fileServer;
     private List activeSocketList;
@@ -80,8 +81,8 @@ final class FileServerThread extends Thread
         // UnknownHostException, IOException, IllegalBlockingModeException
         catch (Exception e)
         {
-            LOGGER.log(Level.SEVERE, "FileServerThread: " + e,
-                (Throwable)null);
+            LOGGER
+                .log(Level.SEVERE, "FileServerThread: " + e, (Throwable)null);
         }
     }
 
@@ -110,8 +111,8 @@ final class FileServerThread extends Thread
                         Iterator it = activeSocketList.iterator();
                         while (it.hasNext() && !knownIP)
                         {
-                            InetAddress cIP =
-                                ((Socket)it.next()).getInetAddress();
+                            InetAddress cIP = ((Socket)it.next())
+                                .getInetAddress();
                             knownIP = requester.equals(cIP);
                         }
                     }
@@ -120,15 +121,15 @@ final class FileServerThread extends Thread
                     {
                         InputStream is = fileClient.getInputStream();
 
-                        BufferedReader in =
-                            new BufferedReader(new InputStreamReader(is));
+                        BufferedReader in = new BufferedReader(
+                            new InputStreamReader(is));
 
                         String request = in.readLine();
 
                         OutputStream os = fileClient.getOutputStream();
 
-                        LOGGER.log(Level.FINEST, "Serving request " +
-                            request + " from " + fileClient);
+                        LOGGER.log(Level.FINEST, "Serving request " + request
+                            + " from " + fileClient);
 
                         boolean ignoreFail = false;
 
@@ -138,8 +139,8 @@ final class FileServerThread extends Thread
 
                         // right now (05/2007) clients should not send this -
                         // take into use somewhat later.
-                        if (filename.equals(
-                            Constants.fileServerIgnoreFailSignal))
+                        if (filename
+                            .equals(Constants.fileServerIgnoreFailSignal))
                         {
                             ignoreFail = true;
                             filename = (String)li.remove(0);
@@ -155,8 +156,8 @@ final class FileServerThread extends Thread
                         // this yet), make the client one day submit the 
                         // ignorefail signal, and remove this
                         //  markersFileName/README temporary hack.
-                        if (filename.startsWith(Constants.markersNameFile) ||
-                            filename.startsWith("README") )
+                        if (filename.startsWith(Constants.markersNameFile)
+                            || filename.startsWith("README"))
                         {
                             ignoreFail = true;
                         }
@@ -172,18 +173,17 @@ final class FileServerThread extends Thread
                     }
                     else
                     {
-                        LOGGER.log(Level.WARNING,
-                            "SOMEBODY NOT A CLIENT " +
-                            "IS TRYING TO ACCESS A FILE !");
-                        LOGGER.log(Level.WARNING,
-                            "Request was from " + fileClient);
+                        LOGGER.log(Level.WARNING, "SOMEBODY NOT A CLIENT "
+                            + "IS TRYING TO ACCESS A FILE !");
+                        LOGGER.log(Level.WARNING, "Request was from "
+                            + fileClient);
                     }
                     fileClient.close();
                 }
                 catch (Exception e)
                 {
-                    LOGGER.log(Level.WARNING,
-                        "FileServerThread : " + e.toString());
+                    LOGGER.log(Level.WARNING, "FileServerThread : "
+                        + e.toString());
                 }
             }
 
@@ -195,16 +195,16 @@ final class FileServerThread extends Thread
             }
             catch (IOException e)
             {
-                LOGGER.log(Level.WARNING, "FileServerThread : " + e +
-                    " while closing socket");
+                LOGGER.log(Level.WARNING, "FileServerThread : " + e
+                    + " while closing socket");
             }
         }
 
         // catch whatever it be, to make sure the unregister is done
         catch (Exception e)
         {
-            LOGGER.log(Level.WARNING, "FileServerThread : " + e +
-                " outer try/catch block");
+            LOGGER.log(Level.WARNING, "FileServerThread : " + e
+                + " outer try/catch block");
         }
 
         threadMgr.unregisterFromThreadManager(this);

@@ -24,7 +24,6 @@ import net.sf.colossus.util.KDialog;
  * @author David Ripton
  */
 
-
 final class PickLord extends KDialog implements MouseListener, WindowListener
 {
     private List chits = new ArrayList();

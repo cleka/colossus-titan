@@ -9,7 +9,6 @@ package net.sf.colossus.client;
  * @author Dranathi
  */
 
-
 final class StrikeDie extends Chit
 {
     private int lastRoll = 0;

@@ -1,5 +1,6 @@
 package net.sf.colossus.webserver;
 
+
 public interface IWebServerGUI
 {
     public abstract void setUserInfo(String s);

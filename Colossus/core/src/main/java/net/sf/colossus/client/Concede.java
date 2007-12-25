@@ -41,11 +41,12 @@ final class Concede extends KDialog implements ActionListener, WindowListener
     private Concede(Client client, JFrame parentFrame, String allyMarkerId,
         String enemyMarkerId, boolean flee)
     {
-        super(parentFrame, (flee ? "Flee" : "Concede") + " with Legion " +
-            Legion.getLongMarkerName(allyMarkerId) + " in " +
-            MasterBoard.getHexByLabel(
-            client.getHexForLegion(allyMarkerId)).getDescription() + "?",
-            false);
+        super(parentFrame, (flee ? "Flee" : "Concede")
+            + " with Legion "
+            + Legion.getLongMarkerName(allyMarkerId)
+            + " in "
+            + MasterBoard.getHexByLabel(client.getHexForLegion(allyMarkerId))
+                .getDescription() + "?", false);
 
         Container contentPane = getContentPane();
         contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
@@ -110,7 +111,7 @@ final class Concede extends KDialog implements ActionListener, WindowListener
         int points = client.getLegionInfo(markerId).getPointValue();
         Box pointsPanel = new Box(BoxLayout.Y_AXIS);
         pointsPanel.setSize(marker.getSize());
-        pointsPanel.add(new JLabel(""+points));
+        pointsPanel.add(new JLabel("" + points));
         pointsPanel.add(new JLabel("points"));
         pane.add(pointsPanel);
         pane.add(Box.createRigidArea(new Dimension(scale / 4, 0)));
@@ -154,8 +155,8 @@ final class Concede extends KDialog implements ActionListener, WindowListener
 
     public void actionPerformed(ActionEvent e)
     {
-        if (e.getActionCommand().equals("Flee") ||
-            e.getActionCommand().equals("Concede"))
+        if (e.getActionCommand().equals("Flee")
+            || e.getActionCommand().equals("Concede"))
         {
             cleanup(true);
         }

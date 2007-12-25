@@ -39,10 +39,7 @@ public class PredictSplitNode implements Comparable
     private PredictSplitNode child2; // child with the new marker
     private static CreatureInfoComparator cic = new CreatureInfoComparator();
 
-    PredictSplitNode(
-        String markerId,
-        int turnCreated,
-        CreatureInfoList cil,
+    PredictSplitNode(String markerId, int turnCreated, CreatureInfoList cil,
         PredictSplitNode parent)
     {
         this.markerId = markerId;
@@ -197,9 +194,9 @@ public class PredictSplitNode implements Comparable
         }
         else
         {
-            return child1.allCertain() && child2.allCertain() &&
-                child1.allDescendentsCertain() &&
-                child2.allDescendentsCertain();
+            return child1.allCertain() && child2.allCertain()
+                && child1.allDescendentsCertain()
+                && child2.allDescendentsCertain();
         }
     }
 
@@ -301,18 +298,14 @@ public class PredictSplitNode implements Comparable
             // this means we are updating the parent, and the info gained is
             // computed from children
             cnl = new ArrayList();
-            cnl.addAll(
-                child1
-                .getCertainAtSplitOrRemovedCreatures()
+            cnl.addAll(child1.getCertainAtSplitOrRemovedCreatures()
                 .getCreatureNames());
-            cnl.addAll(
-                child2
-                .getCertainAtSplitOrRemovedCreatures()
+            cnl.addAll(child2.getCertainAtSplitOrRemovedCreatures()
                 .getCreatureNames());
         }
 
-        List certainInfoGained =
-            subtractLists(cnl, getCertainCreatures().getCreatureNames());
+        List certainInfoGained = subtractLists(cnl, getCertainCreatures()
+            .getCreatureNames());
 
         if (!certainInfoGained.isEmpty())
         {
@@ -339,8 +332,8 @@ public class PredictSplitNode implements Comparable
             // Make sure the parent updates the guess to be consistant
             // with the actual size.
             throw new PredictSplitsException(
-                "Certainty error in revealCreatures -- size is " +
-                this.creatures.size() + " height is " + getHeight());
+                "Certainty error in revealCreatures -- size is "
+                    + this.creatures.size() + " height is " + getHeight());
         }
 
     }
@@ -460,8 +453,8 @@ public class PredictSplitNode implements Comparable
             }
         }
 
-        int numUnknownsToKeep = creatures.size() - childSize -
-            knownKeep.size();
+        int numUnknownsToKeep = creatures.size() - childSize
+            - knownKeep.size();
         int numUnknownsToSplit = childSize - knownSplit.size();
 
         if (!certainsToSplit.isEmpty())
@@ -488,10 +481,10 @@ public class PredictSplitNode implements Comparable
                 if (!nextCreature.equals(currCreature))
                 {
                     // Compute how many to keep or splt, and update the lists.
-                    int numToKeep =
-                        count - numUnknownsToSplit + firstTurnUnknownLord;
-                    int numToSplit =
-                        count - numUnknownsToKeep + firstTurnUnknownLord;
+                    int numToKeep = count - numUnknownsToSplit
+                        + firstTurnUnknownLord;
+                    int numToSplit = count - numUnknownsToKeep
+                        + firstTurnUnknownLord;
                     for (int i = 0; i < numToKeep; i++)
                     {
                         knownKeep.add(currCreature);
@@ -568,9 +561,9 @@ public class PredictSplitNode implements Comparable
                 Creature creature = Creature.getCreatureByName(name);
                 totalKillValue += creature.getKillValue();
             }
-            if ((bestKillValue < 0) ||
-                (!maximize && totalKillValue < bestKillValue) ||
-                (maximize && totalKillValue > bestKillValue))
+            if ((bestKillValue < 0)
+                || (!maximize && totalKillValue < bestKillValue)
+                || (maximize && totalKillValue > bestKillValue))
             {
                 bestKillValue = totalKillValue;
                 creaturesToRemove = li;
@@ -605,16 +598,12 @@ public class PredictSplitNode implements Comparable
      * @param keepList return argument
      * @param splitList return argument
      */
-    void computeSplit(
-        int childSize,
-        List knownKeep,
-        List knownSplit,
-        CreatureInfoList keepList,
-        CreatureInfoList splitList)
+    void computeSplit(int childSize, List knownKeep, List knownSplit,
+        CreatureInfoList keepList, CreatureInfoList splitList)
     {
 
-        List possibleSplits =
-            findAllPossibleSplits(childSize, knownKeep, knownSplit);
+        List possibleSplits = findAllPossibleSplits(childSize, knownKeep,
+            knownSplit);
 
         List splitoffNames = chooseCreaturesToSplitOut(possibleSplits);
 
@@ -692,10 +681,10 @@ public class PredictSplitNode implements Comparable
             throw new PredictSplitsException("> 8 creatures in legion");
         }
 
-        List knownKeep =
-            child1.getCertainAtSplitOrRemovedCreatures().getCreatureNames();
-        List knownSplit =
-            child2.getCertainAtSplitOrRemovedCreatures().getCreatureNames();
+        List knownKeep = child1.getCertainAtSplitOrRemovedCreatures()
+            .getCreatureNames();
+        List knownSplit = child2.getCertainAtSplitOrRemovedCreatures()
+            .getCreatureNames();
 
         CreatureInfoList keepList = new CreatureInfoList();
         CreatureInfoList splitList = new CreatureInfoList();
@@ -739,8 +728,8 @@ public class PredictSplitNode implements Comparable
         if (this.parent == other.parent)
         {
             // this is regular merge
-            if (getMarkerId().equals(parent.getMarkerId()) ||
-                other.getMarkerId().equals(parent.getMarkerId()))
+            if (getMarkerId().equals(parent.getMarkerId())
+                || other.getMarkerId().equals(parent.getMarkerId()))
             { // Cancel split.
                 parent.clearChildren();
             }
@@ -795,7 +784,7 @@ public class PredictSplitNode implements Comparable
                 // the splitoff from the origNode, just add creatures from nodeB
                 nodeA.creatures.addAll(nodeB.creatures);
                 origNode.childSize2 = nodeA.getHeight();
-                origNode.child1=thirdLegion;
+                origNode.child1 = thirdLegion;
             }
             else
             {

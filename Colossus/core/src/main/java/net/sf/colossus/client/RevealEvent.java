@@ -28,7 +28,8 @@ import net.sf.colossus.server.Constants;
 
 public class RevealEvent
 {
-    private static final Logger LOGGER = Logger.getLogger(RevealEvent.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(RevealEvent.class
+        .getName());
 
     private Client client;
     private int turnNumber;
@@ -45,7 +46,7 @@ public class RevealEvent
     // for mulligan:
     private int oldRoll;
     private int newRoll;
-    private String mulliganTitanBaseName;  // for titan in place of solid marker
+    private String mulliganTitanBaseName; // for titan in place of solid marker
 
     private boolean undone = false;
     private int scale;
@@ -86,22 +87,21 @@ public class RevealEvent
     private final static String eventMoveRollText = "Movement roll";
     private final static String eventBattleText = "Battle";
 
-    private static String[] eventTypeToString = {
-        eventSplitText, eventRecruitText, eventSummonText, eventTeleportText,
+    private static String[] eventTypeToString = { eventSplitText,
+        eventRecruitText, eventSummonText, eventTeleportText,
         eventAcquireText, eventWonText, eventLostText, eventTurnChangeText,
         eventPlayerChangeText, eventMulliganText, eventMoveRollText,
-        eventBattleText
-    };
+        eventBattleText };
 
     public RevealEvent(Client client, int turnNumber, int playerNr,
-        int eventType, String markerId, int height, ArrayList
-        knownCreatures, String markerId2, int height2)
+        int eventType, String markerId, int height, ArrayList knownCreatures,
+        String markerId2, int height2)
     {
-        if (markerId == null && eventType != eventPlayerChange &&
-            eventType != eventTurnChange)
+        if (markerId == null && eventType != eventPlayerChange
+            && eventType != eventTurnChange)
         {
-            LOGGER.log(Level.SEVERE, 
-                "null marker for event " + getEventTypeText(eventType));
+            LOGGER.log(Level.SEVERE, "null marker for event "
+                + getEventTypeText(eventType));
             return;
         }
         this.client = client;
@@ -153,16 +153,16 @@ public class RevealEvent
         while (it.hasNext())
         {
             RevealedCreature rc = (RevealedCreature)it.next();
-            if (rc != null && rc.getPlainName() != null &&
-                rc.getPlainName().equals(Constants.titan))
+            if (rc != null && rc.getPlainName() != null
+                && rc.getPlainName().equals(Constants.titan))
             {
-                String playerName = (realPlayer != null ? realPlayer :
-                    client.getPlayerNameByMarkerId(markerId));
+                String playerName = (realPlayer != null ? realPlayer : client
+                    .getPlayerNameByMarkerId(markerId));
 
                 if (playerName == null)
                 {
-                    LOGGER.log(Level.SEVERE, "For making titan base name: " +
-                        "playerName is null!");
+                    LOGGER.log(Level.SEVERE, "For making titan base name: "
+                        + "playerName is null!");
                 }
                 else
                 {
@@ -290,9 +290,9 @@ public class RevealEvent
             }
             else
             {
-                LOGGER.log(Level.WARNING, "got order to kill creature " +
-                    name + " in legionEvent " + this.toString() +
-                    " but no such alive creature found!!");
+                LOGGER.log(Level.WARNING, "got order to kill creature " + name
+                    + " in legionEvent " + this.toString()
+                    + " but no such alive creature found!!");
             }
         }
         // client tells us new accurate count how many are still alive.
@@ -305,8 +305,8 @@ public class RevealEvent
     {
         if (turnNumber != this.turnNumber)
         {
-            LOGGER.log(Level.WARNING,
-                "undoSummon for " + this.toString() + " -- wrong turn.");
+            LOGGER.log(Level.WARNING, "undoSummon for " + this.toString()
+                + " -- wrong turn.");
             return false;
         }
         Iterator it = this.knownCreatures.iterator();
@@ -373,22 +373,19 @@ public class RevealEvent
         String msg = "<unknown event?>";
         if (eventType == eventSplit)
         {
-            msg = "Revealing event: \"" + getEventTypeText() + "\" (turn "+
-                turnNumber+"):\n" +
-                "- Legion with marker: "+ markerId  + " (now height: " + height+
-                "\n" +
-                "- Splitoff to marker: "+ markerId2 + " (now height: " +
-                height2+"\n";
+            msg = "Revealing event: \"" + getEventTypeText() + "\" (turn "
+                + turnNumber + "):\n" + "- Legion with marker: " + markerId
+                + " (now height: " + height + "\n" + "- Splitoff to marker: "
+                + markerId2 + " (now height: " + height2 + "\n";
         }
         else if (eventType == eventSummon)
         {
-            RevealedCreature rc =
-                (RevealedCreature)this.knownCreatures.get(0);
+            RevealedCreature rc = (RevealedCreature)this.knownCreatures.get(0);
             String summoned = rc.getName();
 
-            msg = "Revealing event: \"" + getEventTypeText() + "\":\n" +
-                "  Summonable \"" + summoned + "\" from " + markerId +
-                "(" + height + ") to " + markerId2 + "("+height2+")";
+            msg = "Revealing event: \"" + getEventTypeText() + "\":\n"
+                + "  Summonable \"" + summoned + "\" from " + markerId + "("
+                + height + ") to " + markerId2 + "(" + height2 + ")";
         }
 
         else if (eventType == eventWon)
@@ -408,33 +405,33 @@ public class RevealEvent
 
         else if (eventType == eventTurnChange)
         {
-            msg = "Revealing event: Turn change, now player "+getPlayerNr()+
-                " ("+getPlayer()+"), Turn "+getTurn();
+            msg = "Revealing event: Turn change, now player " + getPlayerNr()
+                + " (" + getPlayer() + "), Turn " + getTurn();
         }
         else if (eventType == eventPlayerChange)
         {
-            msg = "Revealing event: Player change, now player "+getPlayerNr()+
-                " ("+getPlayer()+"), Turn "+getTurn();
+            msg = "Revealing event: Player change, now player "
+                + getPlayerNr() + " (" + getPlayer() + "), Turn " + getTurn();
         }
         else if (eventType == eventMulligan)
         {
-            msg = "Revealing event: Player "+getPlayerNr()+
-                " ("+getPlayer()+"), Turn "+getTurn() + " took mulligan;" +
-                " old="+ oldRoll + ", new=" + newRoll;
+            msg = "Revealing event: Player " + getPlayerNr() + " ("
+                + getPlayer() + "), Turn " + getTurn() + " took mulligan;"
+                + " old=" + oldRoll + ", new=" + newRoll;
         }
         else if (eventType == eventMoveRoll)
         {
-            msg = "Revealing event: Player "+getPlayerNr()+
-                " ("+getPlayer()+"), Turn "+getTurn() + " had movement roll: " +
-                " old="+ oldRoll;
+            msg = "Revealing event: Player " + getPlayerNr() + " ("
+                + getPlayer() + "), Turn " + getTurn()
+                + " had movement roll: " + " old=" + oldRoll;
         }
 
         else
         {
             StringBuffer msgBuf = new StringBuffer(1000);
 
-            msgBuf.append("Revealing event: \"" + getEventTypeText() +
-                "\" for marker " + markerId + "\n");
+            msgBuf.append("Revealing event: \"" + getEventTypeText()
+                + "\" for marker " + markerId + "\n");
             Iterator it = knownCreatures.iterator();
 
             int i = 0;
@@ -442,10 +439,10 @@ public class RevealEvent
             {
                 i++;
                 RevealedCreature rc = (RevealedCreature)it.next();
-                msgBuf.append(i + ". " + rc.toString()+"\n");
+                msgBuf.append(i + ". " + rc.toString() + "\n");
             }
-            msgBuf.append(" => legion " + markerId + " now " + height +
-                " creatures.");
+            msgBuf.append(" => legion " + markerId + " now " + height
+                + " creatures.");
             msg = msgBuf.toString();
         }
 
@@ -464,8 +461,8 @@ public class RevealEvent
     {
         if (markerId == null)
         {
-            LOGGER.log(Level.SEVERE, "ERROR: markerId null, event type " +
-                getEventTypeText()+" turn" +getTurn());
+            LOGGER.log(Level.SEVERE, "ERROR: markerId null, event type "
+                + getEventTypeText() + " turn" + getTurn());
         }
         try
         {
@@ -475,11 +472,11 @@ public class RevealEvent
         }
         catch (Exception e)
         {
-            LOGGER.log(Level.SEVERE, "new Chit for markerId " + markerId +
-                ", event type " + getEventTypeText() + " turn" + getTurn() +
-                " threw exception.", e);
+            LOGGER.log(Level.SEVERE, "new Chit for markerId " + markerId
+                + ", event type " + getEventTypeText() + " turn" + getTurn()
+                + " threw exception.", e);
         }
-        addLabel("("+height+")");
+        addLabel("(" + height + ")");
     }
 
     // TODO duplicated from LegionInfo.java:
@@ -496,8 +493,7 @@ public class RevealEvent
         }
         catch (Exception ex)
         {
-            LOGGER.log(Level.SEVERE,
-                "PlayerInfo threw an exception.", ex);
+            LOGGER.log(Level.SEVERE, "PlayerInfo threw an exception.", ex);
             return Constants.titan;
         }
     }
@@ -522,9 +518,9 @@ public class RevealEvent
             try
             {
                 String color = client.getShortColor(playerNr);
-                solidMarker = new Chit(scale, color+"Solid");
+                solidMarker = new Chit(scale, color + "Solid");
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 LOGGER.log(Level.SEVERE, "While trying to get chit: ", e);
                 // if solid marker does not exist for this color,
@@ -602,11 +598,11 @@ public class RevealEvent
 
         if (eventType == eventTurnChange)
         {
-            return infoEvent("Turn "+turnNumber+" starts");
+            return infoEvent("Turn " + turnNumber + " starts");
         }
         if (eventType == eventPlayerChange)
         {
-            return infoEvent("Turn "+turnNumber+", player "+getPlayer());
+            return infoEvent("Turn " + turnNumber + ", player " + getPlayer());
         }
 
         JPanel p = new JPanel();
@@ -620,11 +616,11 @@ public class RevealEvent
             Chit solidMarker = getSolidMarker();
             p.add(solidMarker);
 
-            p.add(Box.createRigidArea(new Dimension(5,0)));
-            addLabel(getEventTypeText()+": ");
+            p.add(Box.createRigidArea(new Dimension(5, 0)));
+            addLabel(getEventTypeText() + ": ");
 
-            Chit oldDie = new MovementDie(this.scale,
-                MovementDie.getDieImageName(oldRoll));
+            Chit oldDie = new MovementDie(this.scale, MovementDie
+                .getDieImageName(oldRoll));
             oldDie.setAlignmentX(Component.LEFT_ALIGNMENT);
             p.add(oldDie);
 
@@ -632,8 +628,8 @@ public class RevealEvent
             {
                 addLabel(" => ");
 
-                Chit newDie = new MovementDie(this.scale,
-                    MovementDie.getDieImageName(newRoll));
+                Chit newDie = new MovementDie(this.scale, MovementDie
+                    .getDieImageName(newRoll));
                 newDie.setAlignmentX(Component.LEFT_ALIGNMENT);
                 p.add(newDie);
             }
@@ -648,11 +644,10 @@ public class RevealEvent
         }
 
         addMarker(markerId, showHeight);
-        p.add(Box.createRigidArea(new Dimension(5,0)));
+        p.add(Box.createRigidArea(new Dimension(5, 0)));
 
         String eventTypeText = "";
-        if ( (eventType == eventLost) &&
-            info != null && !info.equals("") )
+        if ((eventType == eventLost) && info != null && !info.equals(""))
         {
             eventTypeText = info;
             if (info.equals(Constants.erMethodFlee))
@@ -678,14 +673,14 @@ public class RevealEvent
         }
         else
         {
-            eventTypeText = getEventTypeText()+": ";
+            eventTypeText = getEventTypeText() + ": ";
         }
 
         if (wasUndone())
         {
             // two labels below each other, first syaing the event,
             // seconds telling "undone"; both in grey color instead of black;
-            Box twoLabels = new Box(BoxLayout.Y_AXIS );
+            Box twoLabels = new Box(BoxLayout.Y_AXIS);
             //twoLabels.setBorder(new TitledBorder(""));
             // twoLabels.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
             // twoLabels.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -712,7 +707,7 @@ public class RevealEvent
             addLabel(" => ");
             addMarker(markerId, height);
 
-            p.add(Box.createRigidArea(new Dimension(5,0)));
+            p.add(Box.createRigidArea(new Dimension(5, 0)));
             addMarker(markerId2, height2);
         }
         else if (eventType == eventRecruit)
@@ -723,7 +718,7 @@ public class RevealEvent
                 RevealedCreature rc = (RevealedCreature)it.next();
                 if (rc.wasRecruited())
                 {
-                    addLabel( " => ");
+                    addLabel(" => ");
                 }
                 addCreatureToPanel(rc);
             }
@@ -750,7 +745,7 @@ public class RevealEvent
             }
         }
 
-        else if ( knownCreatures != null )
+        else if (knownCreatures != null)
         {
             Iterator it = knownCreatures.iterator();
             while (it.hasNext())
@@ -761,7 +756,7 @@ public class RevealEvent
 
             if (eventType == eventWon && knownCreatures.size() < height)
             {
-                int diff = height-knownCreatures.size();
+                int diff = height - knownCreatures.size();
                 if (knownCreatures.isEmpty())
                 {
                     addLabel(diff + " creatures (not revealed)");

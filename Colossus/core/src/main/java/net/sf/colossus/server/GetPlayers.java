@@ -57,11 +57,11 @@ import net.sf.colossus.util.ResourceLoader;
  * @author Romain Dolbeau
  */
 
-
 public final class GetPlayers extends KFrame implements WindowListener,
     ActionListener, ItemListener
 {
-    private static final Logger LOGGER = Logger.getLogger(GetPlayers.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(GetPlayers.class
+        .getName());
 
     public static final String loadVariant = "Load External Variant";
 
@@ -81,7 +81,7 @@ public final class GetPlayers extends KFrame implements WindowListener,
     private JComboBox viewModeBox;
     private JComboBox eventExpiringBox;
 
-    private int serveAtPort = -1;    // server serves at that.
+    private int serveAtPort = -1; // server serves at that.
 
     /** This is Game's options, which we will modify directly. */
     private Options options;
@@ -126,7 +126,7 @@ public final class GetPlayers extends KFrame implements WindowListener,
         runningOnPane.setLayout(new GridLayout(0, 1));
         runningOnPane.add(runningOnLabel);
         mainPane.add(runningOnPane);
-        
+
         tabbedPane = new JTabbedPane();
 
         // ================== Players tab =====================
@@ -146,11 +146,11 @@ public final class GetPlayers extends KFrame implements WindowListener,
         portPane.add(new JLabel("Serve game at port: "));
 
         sPortChoices = new TreeSet();
-        sPortChoices.add(""+Constants.defaultPort);
+        sPortChoices.add("" + Constants.defaultPort);
         int stPort = stOptions.getIntOption(Options.serveAtPort);
         if (stPort != -1 && stPort != Constants.defaultPort)
         {
-            sPortChoices.add(""+stPort);
+            sPortChoices.add("" + stPort);
         }
         else
         {
@@ -158,7 +158,7 @@ public final class GetPlayers extends KFrame implements WindowListener,
         }
         serveAtPortBox = new JComboBox(new Vector(sPortChoices));
         serveAtPortBox.setEditable(true);
-        serveAtPortBox.setSelectedItem(""+stPort);
+        serveAtPortBox.setSelectedItem("" + stPort);
         serveAtPortBox.addActionListener(this);
         serveAtPort = stPort;
         portPane.add(serveAtPortBox);
@@ -176,9 +176,11 @@ public final class GetPlayers extends KFrame implements WindowListener,
         addCheckbox(Options.autoStop, checkboxPane);
         addCheckbox(Options.autoQuit, checkboxPane);
 
-        String viewmodeName = options.getStringOption(Options.viewMode, Options.viewableEver);
+        String viewmodeName = options.getStringOption(Options.viewMode,
+            Options.viewableEver);
         JPanel viewModePane = new JPanel(new GridLayout(0, 2));
-        viewModePane.setBorder(new TitledBorder("Viewability of legion and events"));
+        viewModePane.setBorder(new TitledBorder(
+            "Viewability of legion and events"));
         optionPane.add(viewModePane);
 
         viewModeBox = new JComboBox(Options.viewModeArray);
@@ -187,7 +189,8 @@ public final class GetPlayers extends KFrame implements WindowListener,
         viewModePane.add(new JLabel("Viewable legion content:"));
         viewModePane.add(viewModeBox);
 
-        String eventExpiringVal = options.getStringOption(Options.eventExpiring, "5");
+        String eventExpiringVal = options.getStringOption(
+            Options.eventExpiring, "5");
         eventExpiringBox = new JComboBox(Options.eventExpiringChoices);
         eventExpiringBox.addActionListener(this);
         eventExpiringBox.setSelectedItem(eventExpiringVal);
@@ -220,8 +223,8 @@ public final class GetPlayers extends KFrame implements WindowListener,
         optionPane.add(aiTimePane);
 
         oldDelay = options.getIntOption(Options.aiDelay);
-        if (oldDelay < Constants.MIN_AI_DELAY ||
-            oldDelay > Constants.MAX_AI_DELAY)
+        if (oldDelay < Constants.MIN_AI_DELAY
+            || oldDelay > Constants.MAX_AI_DELAY)
         {
             oldDelay = Constants.DEFAULT_AI_DELAY;
         }
@@ -233,8 +236,8 @@ public final class GetPlayers extends KFrame implements WindowListener,
         aiTimePane.add(delayButton);
 
         oldLimit = options.getIntOption(Options.aiTimeLimit);
-        if (oldLimit < Constants.MIN_AI_TIME_LIMIT ||
-            oldLimit > Constants.MAX_AI_TIME_LIMIT)
+        if (oldLimit < Constants.MIN_AI_TIME_LIMIT
+            || oldLimit > Constants.MAX_AI_TIME_LIMIT)
         {
             oldLimit = Constants.DEFAULT_AI_TIME_LIMIT;
         }
@@ -251,7 +254,8 @@ public final class GetPlayers extends KFrame implements WindowListener,
         mainPane.add(variantPane);
 
         // XXX Make sure chosen variant is in the list.
-        String variantName = options.getStringOption(Options.variant, Constants.variantArray[0]);
+        String variantName = options.getStringOption(Options.variant,
+            Constants.variantArray[0]);
         variantBox = new JComboBox(Constants.variantArray);
         variantBox.addActionListener(this);
         variantBox.setSelectedItem(variantName);
@@ -265,8 +269,8 @@ public final class GetPlayers extends KFrame implements WindowListener,
         // ================== Variant README tab =====================
         // if we don't pass the JEditorPane ("readme"), 
         // it won't be updated when Variant changes.
-        readmeScrollPane = ShowReadme.readmeContentScrollPane(
-            readme, variantName);
+        readmeScrollPane = ShowReadme.readmeContentScrollPane(readme,
+            variantName);
         tabbedPane.addTab("Variant README", readmeScrollPane);
 
         JPanel clientPane = new JPanel();
@@ -397,7 +401,8 @@ public final class GetPlayers extends KFrame implements WindowListener,
         // too large to cause havoc if the number of choices increases
         playerType.setMaximumRowCount(12);
 
-        String type = options.getStringOption(Options.playerType + i, Constants.none);
+        String type = options.getStringOption(Options.playerType + i,
+            Constants.none);
         playerType.setSelectedItem(type);
 
         onePlayerPane.add(playerType);
@@ -473,7 +478,7 @@ public final class GetPlayers extends KFrame implements WindowListener,
         int cnt = box.getItemCount();
         int found = -1;
         int i;
-        for (i=0 ; i < cnt ; i++)
+        for (i = 0; i < cnt; i++)
         {
             String p = (String)box.getItemAt(i);
             if (p.equals(port))
@@ -500,8 +505,8 @@ public final class GetPlayers extends KFrame implements WindowListener,
         {
             String name = (String)(playerNames[i].getSelectedItem());
             String type = (String)(playerTypes[i].getSelectedItem());
-            if (name.length() > 0 && !name.equals(Constants.none) &&
-                !type.equals(Constants.none))
+            if (name.length() > 0 && !name.equals(Constants.none)
+                && !type.equals(Constants.none))
             {
                 // Force all network players to byClient.
                 if (type.equals(Constants.network))
@@ -515,10 +520,9 @@ public final class GetPlayers extends KFrame implements WindowListener,
                 }
 
                 // Make by* names unique by appending row number.
-                if (name.equals(Constants.byColor) ||
-                    name.equals(Constants.byType) ||
-                    name.equals(Constants.byClient)
-                    )
+                if (name.equals(Constants.byColor)
+                    || name.equals(Constants.byType)
+                    || name.equals(Constants.byClient))
                 {
                     name = name + i;
                 }
@@ -602,9 +606,8 @@ public final class GetPlayers extends KFrame implements WindowListener,
         if (quitAlreadyTried)
         {
             LOGGER.log(Level.SEVERE,
-                "It seems the clean 'Quit' did fail - doing it now " +
-                "the hard way using System.exit(1)",
-                (Throwable)null);
+                "It seems the clean 'Quit' did fail - doing it now "
+                    + "the hard way using System.exit(1)", (Throwable)null);
             System.exit(1);
         }
         quitAlreadyTried = true;
@@ -634,29 +637,29 @@ public final class GetPlayers extends KFrame implements WindowListener,
         {
             if (f.isDirectory())
             {
-                return(true);
+                return (true);
             }
             if (f.getName().endsWith(Constants.varEnd))
             {
-                return(true);
+                return (true);
             }
-            return(false);
+            return (false);
         }
 
         public String getDescription()
         {
-            return("Colossus VARiant file");
+            return ("Colossus VARiant file");
         }
     }
 
     private void doLoadVariant()
     {
         int maxPlayers = VariantSupport.getMaxPlayers();
-        javax.swing.JFileChooser varChooser =
-            new JFileChooser(Constants.gameDataPath);
+        javax.swing.JFileChooser varChooser = new JFileChooser(
+            Constants.gameDataPath);
         varChooser.setFileFilter(new varFileFilter());
-        varChooser.setDialogTitle(
-            "Choose your variant (or cancel for default game)");
+        varChooser
+            .setDialogTitle("Choose your variant (or cancel for default game)");
         int returnVal = varChooser.showOpenDialog(this);
         if (returnVal == javax.swing.JFileChooser.APPROVE_OPTION)
         {
@@ -667,8 +670,8 @@ public final class GetPlayers extends KFrame implements WindowListener,
                 String name = varFile.getName();
                 name = name.substring(0, name.lastIndexOf(Constants.varEnd));
                 options.setOption(Options.variant, name);
-                readme.setContentType((String)doc.getProperty(
-                    ResourceLoader.keyContentType));
+                readme.setContentType((String)doc
+                    .getProperty(ResourceLoader.keyContentType));
                 readme.setDocument(doc);
                 if (maxPlayers != VariantSupport.getMaxPlayers())
                 {
@@ -702,8 +705,8 @@ public final class GetPlayers extends KFrame implements WindowListener,
         }
         else if (e.getActionCommand().equals(Options.aiDelay))
         {
-            final int newDelay = PickIntValue.pickIntValue(this,
-                oldDelay, "Pick AI Delay (in ms)", Constants.MIN_AI_DELAY,
+            final int newDelay = PickIntValue.pickIntValue(this, oldDelay,
+                "Pick AI Delay (in ms)", Constants.MIN_AI_DELAY,
                 Constants.MAX_AI_DELAY, 100, options);
             if (newDelay != oldDelay)
             {
@@ -713,10 +716,9 @@ public final class GetPlayers extends KFrame implements WindowListener,
         }
         else if (e.getActionCommand().equals(Options.aiTimeLimit))
         {
-            final int newLimit = PickIntValue.pickIntValue(this,
-                oldLimit, "Pick AI Time Limit (in s)",
-                Constants.MIN_AI_TIME_LIMIT, Constants.MAX_AI_TIME_LIMIT,
-                1, options);
+            final int newLimit = PickIntValue.pickIntValue(this, oldLimit,
+                "Pick AI Time Limit (in s)", Constants.MIN_AI_TIME_LIMIT,
+                Constants.MAX_AI_TIME_LIMIT, 1, options);
             if (newLimit != oldLimit)
             {
                 options.setOption(Options.aiTimeLimit, newLimit);
@@ -729,8 +731,8 @@ public final class GetPlayers extends KFrame implements WindowListener,
             String varName = VariantSupport.getVarName();
             if (!(Constants.getVariantList().contains(varName)))
             {
-                String buttonName = varName.substring(0,
-                    varName.lastIndexOf(Constants.varEnd));
+                String buttonName = varName.substring(0, varName
+                    .lastIndexOf(Constants.varEnd));
                 if (variantBox.getItemCount() > Constants.numVariants)
                 {
                     variantBox.removeItemAt(Constants.numVariants);
@@ -747,8 +749,8 @@ public final class GetPlayers extends KFrame implements WindowListener,
             {
                 int maxPlayers = VariantSupport.getMaxPlayers();
                 String value = (String)variantBox.getSelectedItem();
-                if (VariantSupport.getVarName().equals(value +
-                    Constants.varEnd))
+                if (VariantSupport.getVarName().equals(
+                    value + Constants.varEnd))
                 {
                     // re-selecting the same ; do nothing
                 }
@@ -760,8 +762,8 @@ public final class GetPlayers extends KFrame implements WindowListener,
                     }
                     Document doc = VariantSupport.loadVariant(value, true);
                     options.setOption(Options.variant, value);
-                    String prop = (String)doc.getProperty(
-                        ResourceLoader.keyContentType);
+                    String prop = (String)doc
+                        .getProperty(ResourceLoader.keyContentType);
                     readme.setContentType(prop);
                     readme.setDocument(doc);
                     if (maxPlayers != VariantSupport.getMaxPlayers())
@@ -770,12 +772,12 @@ public final class GetPlayers extends KFrame implements WindowListener,
                     }
                 }
             }
-            else if ( source == viewModeBox )
+            else if (source == viewModeBox)
             {
                 String value = (String)viewModeBox.getSelectedItem();
                 options.setOption(Options.viewMode, value);
             }
-            else if ( source == eventExpiringBox )
+            else if (source == eventExpiringBox)
             {
                 String value = (String)eventExpiringBox.getSelectedItem();
                 options.setOption(Options.eventExpiring, value);

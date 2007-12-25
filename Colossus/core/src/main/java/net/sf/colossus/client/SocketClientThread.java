@@ -30,10 +30,10 @@ import net.sf.colossus.util.Split;
  *  @author David Ripton
  */
 
-
 final class SocketClientThread extends Thread implements IServer
 {
-    private static final Logger LOGGER = Logger.getLogger(SocketClientThread.class.getName());
+    private static final Logger LOGGER = Logger
+        .getLogger(SocketClientThread.class.getName());
 
     private Client client;
     private ChildThreadManager threadMgr;
@@ -55,8 +55,8 @@ final class SocketClientThread extends Thread implements IServer
 
         this.client = client;
         this.threadMgr = client.getThreadMgr();
-        net.sf.colossus.webcommon.FinalizeManager.register(this,
-            "SCT " + client.getPlayerName());
+        net.sf.colossus.webcommon.FinalizeManager.register(this, "SCT "
+            + client.getPlayerName());
 
         String task = "";
 
@@ -76,8 +76,8 @@ final class SocketClientThread extends Thread implements IServer
 
             task = "preparing BufferedReader";
             LOGGER.log(Level.FINEST, "Next: " + task);
-            in = new BufferedReader(new InputStreamReader(
-                socket.getInputStream()));
+            in = new BufferedReader(new InputStreamReader(socket
+                .getInputStream()));
 
         }
         // Could not connect - probably Firewall/NAT, or wrong IP or port
@@ -87,53 +87,52 @@ final class SocketClientThread extends Thread implements IServer
             String possReason = "";
             if (msg.startsWith("Connection timed out"))
             {
-                possReason = ".\n(This probably means: " +
-                    "Either you have given wrong Server name or " +
-                    "address, or a network issue (firewall, proxy, NAT) is " +
-                    "preventing the connection)";
+                possReason = ".\n(This probably means: "
+                    + "Either you have given wrong Server name or "
+                    + "address, or a network issue (firewall, proxy, NAT) is "
+                    + "preventing the connection)";
             }
             else if (msg.startsWith("Connection refused"))
             {
-                possReason = ".\n(This probably means: " +
-                    "Either you have given wrong Server and/or port, " +
-                    "or tried it too early and server side wasn't up yet)";
+                possReason = ".\n(This probably means: "
+                    + "Either you have given wrong Server and/or port, "
+                    + "or tried it too early and server side wasn't up yet)";
             }
             else
             {
-                possReason = ".\n(No typical case is known causing this " +
-                    "situation; check the exception details for any " +
-                    "information what might be wrong)";
+                possReason = ".\n(No typical case is known causing this "
+                    + "situation; check the exception details for any "
+                    + "information what might be wrong)";
             }
 
-            LOGGER.log(Level.INFO, "ConnectException (\"" + msg + "\") " +
-                "in SCT during " + task);
-            reasonFail = "ConnectException (\"" + e.getMessage() + "\") " +
-                "during " + task + possReason;
+            LOGGER.log(Level.INFO, "ConnectException (\"" + msg + "\") "
+                + "in SCT during " + task);
+            reasonFail = "ConnectException (\"" + e.getMessage() + "\") "
+                + "during " + task + possReason;
 
             return;
         }
 
         catch (UnknownHostException e)
         {
-            LOGGER.log(Level.INFO,
-                "UnknownHostException ('" + e.getMessage() + "') " +
-                "in SCT during " + task);
-            reasonFail = "UnknownHostException ('" + e.getMessage() + "') " +
-                "during " + task + ".\n(This probably means:\n" +
-                "You have given a server as name istead of IP address and " +
-                "the name cannot be resolved to an address (typo?).";
+            LOGGER.log(Level.INFO, "UnknownHostException ('" + e.getMessage()
+                + "') " + "in SCT during " + task);
+            reasonFail = "UnknownHostException ('" + e.getMessage() + "') "
+                + "during " + task + ".\n(This probably means:\n"
+                + "You have given a server as name istead of IP address and "
+                + "the name cannot be resolved to an address (typo?).";
             return;
         }
 
         // probably IOException
         catch (Exception e)
         {
-            LOGGER.log(Level.SEVERE,
-                "Unusual Exception in SCT during " + task + ": ", e);
-            reasonFail = "Exception during " + task + ": " + e.toString() +
-                "\n(No typical case is known causing this situation; " +
-                "check the exception details for any information what " +
-                "might be wrong)";
+            LOGGER.log(Level.SEVERE, "Unusual Exception in SCT during " + task
+                + ": ", e);
+            reasonFail = "Exception during " + task + ": " + e.toString()
+                + "\n(No typical case is known causing this situation; "
+                + "check the exception details for any information what "
+                + "might be wrong)";
             return;
         }
     }
@@ -155,17 +154,17 @@ final class SocketClientThread extends Thread implements IServer
         }
         catch (SocketTimeoutException ex)
         {
-            reasonFail = "Server not responding (could connect, " +
-                "but didn't got any initial data within 5 seconds. " +
-                "Probably the game has already as many clients as " +
-                "it expects).";
+            reasonFail = "Server not responding (could connect, "
+                + "but didn't got any initial data within 5 seconds. "
+                + "Probably the game has already as many clients as "
+                + "it expects).";
             return;
 
         }
         catch (Exception ex)
         {
-            reasonFail = "Unanticipated exception during" +
-                " reading first line from server: " + ex.toString();
+            reasonFail = "Unanticipated exception during"
+                + " reading first line from server: " + ex.toString();
 
             return;
         }
@@ -198,9 +197,9 @@ final class SocketClientThread extends Thread implements IServer
         if (reasonFail != null)
         {
             goingDown = true;
-            String message = "Server not responding (could connect, " +
-                "but didn't got any initial data within 5 seconds. " +
-                "Probably the game has already as many clients as it expects).";
+            String message = "Server not responding (could connect, "
+                + "but didn't got any initial data within 5 seconds. "
+                + "Probably the game has already as many clients as it expects).";
             String title = "Joining game failed!";
             client.showErrorMessage(message, title);
         }
@@ -213,14 +212,16 @@ final class SocketClientThread extends Thread implements IServer
         // ---------------------------------------------------------------
         // After here: Cleaning up...
 
-        if ( serverReceiveTimedout )
+        if (serverReceiveTimedout)
         {
             // Right now this should never happen, but since we have
             // the catch and set the flag, let's do something with it:)
-            client.showErrorMessage("No messages from server for very long time. " +
-                "Right now this should never happen because in normal game " +
-                "situation we work with infinite timeout... ??",
-                "No messages from server!");
+            client
+                .showErrorMessage(
+                    "No messages from server for very long time. "
+                        + "Right now this should never happen because in normal game "
+                        + "situation we work with infinite timeout... ??",
+                    "No messages from server!");
         }
 
         cleanupSocket();
@@ -232,8 +233,8 @@ final class SocketClientThread extends Thread implements IServer
         }
         else
         {
-            LOGGER.log(Level.WARNING, "SCT run() " + getName() +
-                ": after loop, client already null??");
+            LOGGER.log(Level.WARNING, "SCT run() " + getName()
+                + ": after loop, client already null??");
         }
 
         threadMgr.unregisterFromThreadManager(this);
@@ -255,8 +256,8 @@ final class SocketClientThread extends Thread implements IServer
             // second !goingDown: Client side did set goingDown to true, while
             //    SCT was waiting for line from socket, and interrupted it.
             //    So SCT returns from waitForLine and shall exit the loop.
-            while ( !goingDown &&
-                (fromServer = waitForLine()) != null && !goingDown)
+            while (!goingDown && (fromServer = waitForLine()) != null
+                && !goingDown)
             {
                 if (fromServer.length() > 0)
                 {
@@ -267,10 +268,10 @@ final class SocketClientThread extends Thread implements IServer
                     catch (Exception ex)
                     {
                         LOGGER.log(Level.WARNING,
-                            "\n++++++\nSCT SocketClientThread " + getName() +
-                            ", parseLine(): got Exception " + ex.toString() +
-                            "\n" + ex.getMessage() + "\nline=" + fromServer,
-                            ex);
+                            "\n++++++\nSCT SocketClientThread " + getName()
+                                + ", parseLine(): got Exception "
+                                + ex.toString() + "\n" + ex.getMessage()
+                                + "\nline=" + fromServer, ex);
                     }
                 }
             }
@@ -343,18 +344,18 @@ final class SocketClientThread extends Thread implements IServer
                 {
                     // @TODO: message to user?
                     client.setClosedByServer();
-                    LOGGER.log(Level.WARNING,
-                        "SCT SocketClientThread " + getName() +
-                        ": got SocketException " + ex.toString());
+                    LOGGER
+                        .log(Level.WARNING, "SCT SocketClientThread "
+                            + getName() + ": got SocketException "
+                            + ex.toString());
                 }
                 goingDown = true;
             }
 
             catch (IOException ex)
             {
-                LOGGER.log(Level.SEVERE,
-                    "SCT SocketClientThread " + getName() +
-                    ", got Exception ", ex);
+                LOGGER.log(Level.SEVERE, "SCT SocketClientThread " + getName()
+                    + ", got Exception ", ex);
                 goingDown = true;
             }
         }
@@ -379,21 +380,19 @@ final class SocketClientThread extends Thread implements IServer
             }
             catch (IOException e)
             {
-                LOGGER.log(Level.WARNING,
-                    "SocketClientThread " + getName() +
-                    ", during socket.close(), got IOException ", e);
+                LOGGER.log(Level.WARNING, "SocketClientThread " + getName()
+                    + ", during socket.close(), got IOException ", e);
             }
             catch (Exception e)
             {
-                LOGGER.log(Level.WARNING,
-                    "SocketClientThread " + getName() +
-                    ", during socket.close(), got Whatever Exception ", e);
+                LOGGER.log(Level.WARNING, "SocketClientThread " + getName()
+                    + ", during socket.close(), got Whatever Exception ", e);
             }
         }
         else
         {
-            LOGGER.log(Level.FINEST,
-                "SCT Closing socket not needed in " + getName());
+            LOGGER.log(Level.FINEST, "SCT Closing socket not needed in "
+                + getName());
         }
     }
 
@@ -414,9 +413,8 @@ final class SocketClientThread extends Thread implements IServer
         }
         catch (Exception e)
         {
-            LOGGER.log(Level.SEVERE,
-                "SCT.interrupt() in "  + this.getName() +
-                ": unexpected Exception.",  e);
+            LOGGER.log(Level.SEVERE, "SCT.interrupt() in " + this.getName()
+                + ": unexpected Exception.", e);
         }
     }
 
@@ -504,10 +502,10 @@ final class SocketClientThread extends Thread implements IServer
         else if (method.equals(Constants.setLegionStatus))
         {
             String markerId = (String)args.remove(0);
-            boolean moved =
-                Boolean.valueOf((String)args.remove(0)).booleanValue();
-            boolean teleported =
-                Boolean.valueOf((String)args.remove(0)).booleanValue();
+            boolean moved = Boolean.valueOf((String)args.remove(0))
+                .booleanValue();
+            boolean teleported = Boolean.valueOf((String)args.remove(0))
+                .booleanValue();
             int entrySide = Integer.parseInt((String)args.remove(0));
             String lastRecruit = (String)args.remove(0);
             client.setLegionStatus(markerId, moved, teleported, entrySide,
@@ -517,16 +515,16 @@ final class SocketClientThread extends Thread implements IServer
         {
             String markerId = (String)args.remove(0);
             String name = (String)args.remove(0);
-            String reason = args.isEmpty() ? new String("<Unknown>") :
-                (String)args.remove(0);
+            String reason = args.isEmpty() ? new String("<Unknown>")
+                : (String)args.remove(0);
             client.addCreature(markerId, name, reason);
         }
         else if (method.equals(Constants.removeCreature))
         {
             String markerId = (String)args.remove(0);
             String name = (String)args.remove(0);
-            String reason = args.isEmpty() ? new String("<Unknown>") :
-                (String)args.remove(0);
+            String reason = args.isEmpty() ? new String("<Unknown>")
+                : (String)args.remove(0);
             client.removeCreature(markerId, name, reason);
         }
         else if (method.equals(Constants.revealCreatures))
@@ -537,23 +535,23 @@ final class SocketClientThread extends Thread implements IServer
 
             // safeguard against getting empty string list from server
             // TODO: should split be fixed instead??
-            if (namesString.equals("") && names.size() > 0 &&
-                names.get(0).equals("") )
+            if (namesString.equals("") && names.size() > 0
+                && names.get(0).equals(""))
             {
                 names.remove(0);
             }
-            String reason = args.isEmpty() ? new String("<Unknown>") :
-                (String)args.remove(0);
+            String reason = args.isEmpty() ? new String("<Unknown>")
+                : (String)args.remove(0);
             client.revealCreatures(markerId, names, reason);
         }
         else if (method.equals(Constants.revealEngagedCreatures))
         {
             String markerId = (String)args.remove(0);
-            boolean isAttacker =
-                Boolean.valueOf((String)args.remove(0)).booleanValue();
+            boolean isAttacker = Boolean.valueOf((String)args.remove(0))
+                .booleanValue();
             List names = Split.split(Glob.sep, (String)args.remove(0));
-            String reason = args.isEmpty() ? new String("<Unknown>") :
-                (String)args.remove(0);
+            String reason = args.isEmpty() ? new String("<Unknown>")
+                : (String)args.remove(0);
             client.revealEngagedCreatures(markerId, names, isAttacker, reason);
         }
         else if (method.equals(Constants.removeDeadBattleChits))
@@ -563,8 +561,8 @@ final class SocketClientThread extends Thread implements IServer
         else if (method.equals(Constants.placeNewChit))
         {
             String imageName = (String)args.remove(0);
-            boolean inverted =
-                Boolean.valueOf((String)args.remove(0)).booleanValue();
+            boolean inverted = Boolean.valueOf((String)args.remove(0))
+                .booleanValue();
             int tag = Integer.parseInt((String)args.remove(0));
             String hexLabel = (String)args.remove(0);
             client.placeNewChit(imageName, inverted, tag, hexLabel);
@@ -635,10 +633,10 @@ final class SocketClientThread extends Thread implements IServer
             int strikeNumber = Integer.parseInt((String)args.remove(0));
             List rolls = Split.split(Glob.sep, (String)args.remove(0));
             int damage = Integer.parseInt((String)args.remove(0));
-            boolean killed =
-                Boolean.valueOf((String)args.remove(0)).booleanValue();
-            boolean wasCarry =
-                Boolean.valueOf((String)args.remove(0)).booleanValue();
+            boolean killed = Boolean.valueOf((String)args.remove(0))
+                .booleanValue();
+            boolean wasCarry = Boolean.valueOf((String)args.remove(0))
+                .booleanValue();
             int carryDamageLeft = Integer.parseInt((String)args.remove(0));
 
             Set carryTargetDescriptions = new HashSet();
@@ -661,8 +659,8 @@ final class SocketClientThread extends Thread implements IServer
             String masterHexLabel = (String)args.remove(0);
             int battleTurnNumber = Integer.parseInt((String)args.remove(0));
             String battleActivePlayerName = (String)args.remove(0);
-            Constants.BattlePhase battlePhase = Constants.BattlePhase.fromInt(
-                Integer.parseInt((String)args.remove(0)));
+            Constants.BattlePhase battlePhase = Constants.BattlePhase
+                .fromInt(Integer.parseInt((String)args.remove(0)));
             String attackerMarkerId = (String)args.remove(0);
             String defenderMarkerId = (String)args.remove(0);
             client.initBattle(masterHexLabel, battleTurnNumber,
@@ -731,20 +729,19 @@ final class SocketClientThread extends Thread implements IServer
         {
             String battleActivePlayerName = (String)args.remove(0);
             int battleTurnNumber = Integer.parseInt((String)args.remove(0));
-            client.setupBattleRecruit(battleActivePlayerName,
-                battleTurnNumber);
+            client
+                .setupBattleRecruit(battleActivePlayerName, battleTurnNumber);
         }
         else if (method.equals(Constants.setupBattleMove))
         {
             String battleActivePlayerName = (String)args.remove(0);
             int battleTurnNumber = Integer.parseInt((String)args.remove(0));
-            client.setupBattleMove(battleActivePlayerName,
-                battleTurnNumber);
+            client.setupBattleMove(battleActivePlayerName, battleTurnNumber);
         }
         else if (method.equals(Constants.setupBattleFight))
         {
-            Constants.BattlePhase battlePhase = Constants.BattlePhase.fromInt(
-                Integer.parseInt((String)args.remove(0)));
+            Constants.BattlePhase battlePhase = Constants.BattlePhase
+                .fromInt(Integer.parseInt((String)args.remove(0)));
             String battleActivePlayerName = (String)args.remove(0);
             client.setupBattleFight(battlePhase, battleActivePlayerName);
         }
@@ -759,8 +756,8 @@ final class SocketClientThread extends Thread implements IServer
             int tag = Integer.parseInt((String)args.remove(0));
             String startingHexLabel = (String)args.remove(0);
             String endingHexLabel = (String)args.remove(0);
-            boolean undo =
-                Boolean.valueOf((String)args.remove(0)).booleanValue();
+            boolean undo = Boolean.valueOf((String)args.remove(0))
+                .booleanValue();
             client.tellBattleMove(tag, startingHexLabel, endingHexLabel, undo);
         }
         else if (method.equals(Constants.didMove))
@@ -769,8 +766,8 @@ final class SocketClientThread extends Thread implements IServer
             String startingHexLabel = (String)args.remove(0);
             String currentHexLabel = (String)args.remove(0);
             String entrySide = (String)args.remove(0);
-            boolean teleport =
-                Boolean.valueOf((String)args.remove(0)).booleanValue();
+            boolean teleport = Boolean.valueOf((String)args.remove(0))
+                .booleanValue();
             // servers from older versions might not send this arg
             String teleportingLord = null;
             if (!args.isEmpty())
@@ -783,13 +780,15 @@ final class SocketClientThread extends Thread implements IServer
             }
             boolean splitLegionHasForcedMove = false;
             // servers from older versions might not send this arg
-            if ( !args.isEmpty() )
+            if (!args.isEmpty())
             {
-                splitLegionHasForcedMove =
-                    Boolean.valueOf((String)args.remove(0)).booleanValue();
+                splitLegionHasForcedMove = Boolean.valueOf(
+                    (String)args.remove(0)).booleanValue();
             }
-            client.didMove(markerId, startingHexLabel, currentHexLabel,
-                entrySide, teleport, teleportingLord, splitLegionHasForcedMove);
+            client
+                .didMove(markerId, startingHexLabel, currentHexLabel,
+                    entrySide, teleport, teleportingLord,
+                    splitLegionHasForcedMove);
         }
         else if (method.equals(Constants.undidMove))
         {
@@ -798,10 +797,10 @@ final class SocketClientThread extends Thread implements IServer
             String currentHexLabel = (String)args.remove(0);
             boolean splitLegionHasForcedMove = false;
             // servers from older versions might not send this arg
-            if ( !args.isEmpty() )
+            if (!args.isEmpty())
             {
-                splitLegionHasForcedMove =
-                    Boolean.valueOf((String)args.remove(0)).booleanValue();
+                splitLegionHasForcedMove = Boolean.valueOf(
+                    (String)args.remove(0)).booleanValue();
             }
             client.undidMove(markerId, formerHexLabel, currentHexLabel,
                 splitLegionHasForcedMove);
@@ -861,9 +860,8 @@ final class SocketClientThread extends Thread implements IServer
         }
         else if (method.equals(Constants.tellEngagement))
         {
-            client.tellEngagement((String)args.remove(0),
-                (String)args.remove(0),
-                (String)args.remove(0));
+            client.tellEngagement((String)args.remove(0), (String)args
+                .remove(0), (String)args.remove(0));
         }
         else if (method.equals(Constants.tellEngagementResults))
         {
@@ -871,12 +869,12 @@ final class SocketClientThread extends Thread implements IServer
             String resMethod = (String)args.remove(0);
             int points = Integer.parseInt((String)args.remove(0));
             int turns = Integer.parseInt((String)args.remove(0));
-            client.tellEngagementResults(winnerId, resMethod, points,turns);
+            client.tellEngagementResults(winnerId, resMethod, points, turns);
         }
         else
         {
-            LOGGER.log(Level.SEVERE, "Bogus packet (Client, method: " +
-                method + ", args: " + args + ")");
+            LOGGER.log(Level.SEVERE, "Bogus packet (Client, method: " + method
+                + ", args: " + args + ")");
         }
     }
 
@@ -888,17 +886,16 @@ final class SocketClientThread extends Thread implements IServer
         }
         else
         {
-            LOGGER.log(Level.SEVERE,
-                "Attempt to send message '" + message +
-                "' but the socket is closed??");
+            LOGGER.log(Level.SEVERE, "Attempt to send message '" + message
+                + "' but the socket is closed??");
         }
     }
 
     // Setup method
     private void signOn()
     {
-        sendToServer(Constants.signOn + sep + client.getPlayerName() + sep +
-            client.isRemote());
+        sendToServer(Constants.signOn + sep + client.getPlayerName() + sep
+            + client.isRemote());
     }
 
     /** Set the thread name to playerName, and tell the server so we
@@ -929,21 +926,20 @@ final class SocketClientThread extends Thread implements IServer
 
     public void acquireAngel(String markerId, String angelType)
     {
-        sendToServer(Constants.acquireAngel + sep + markerId +
-            sep + angelType);
+        sendToServer(Constants.acquireAngel + sep + markerId + sep + angelType);
     }
 
     public void doSummon(String markerId, String donorId, String angel)
     {
-        sendToServer(Constants.doSummon + sep + markerId + sep + donorId +
-            sep + angel);
+        sendToServer(Constants.doSummon + sep + markerId + sep + donorId + sep
+            + angel);
     }
 
     public void doRecruit(String markerId, String recruitName,
         String recruiterName)
     {
-        sendToServer(Constants.doRecruit + sep + markerId + sep + recruitName +
-            sep + recruiterName);
+        sendToServer(Constants.doRecruit + sep + markerId + sep + recruitName
+            + sep + recruiterName);
     }
 
     public void engage(String hexLabel)
@@ -1071,15 +1067,15 @@ final class SocketClientThread extends Thread implements IServer
 
     public void doSplit(String parentId, String childId, String results)
     {
-        sendToServer(Constants.doSplit + sep + parentId + sep + childId + sep +
-            results);
+        sendToServer(Constants.doSplit + sep + parentId + sep + childId + sep
+            + results);
     }
 
     public void doMove(String markerId, String hexLabel, String entrySide,
         boolean teleport, String teleportingLord)
     {
-        sendToServer(Constants.doMove + sep + markerId + sep + hexLabel + sep +
-            entrySide + sep + teleport + sep + teleportingLord);
+        sendToServer(Constants.doMove + sep + markerId + sep + hexLabel + sep
+            + entrySide + sep + teleport + sep + teleportingLord);
     }
 
     public void assignColor(String color)

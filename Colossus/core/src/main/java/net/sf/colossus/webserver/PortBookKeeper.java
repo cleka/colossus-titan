@@ -26,7 +26,7 @@ public class PortBookKeeper
 
         portUsed = new boolean[availablePorts];
 
-        for (int i=0; i < availablePorts ; i++)
+        for (int i = 0; i < availablePorts; i++)
         {
             portUsed[i] = false;
         }
@@ -39,11 +39,11 @@ public class PortBookKeeper
         int port = -1;
         synchronized (portUsed)
         {
-            for (int i=0; i < availablePorts && port == -1; i+=2)
+            for (int i = 0; i < availablePorts && port == -1; i += 2)
             {
                 if (!portUsed[i])
                 {
-                    int tryPort = portRangeFrom+i;
+                    int tryPort = portRangeFrom + i;
                     boolean ok = testThatPortReallyFree(tryPort);
                     if (ok)
                     {
@@ -52,8 +52,10 @@ public class PortBookKeeper
                     }
                     else
                     {
-                        System.out.println("SEVERE: port " + tryPort +
-                            " is supposed to be free but test shows it is in use...");
+                        System.out
+                            .println("SEVERE: port "
+                                + tryPort
+                                + " is supposed to be free but test shows it is in use...");
                     }
                 }
             }
@@ -88,8 +90,9 @@ public class PortBookKeeper
         }
         catch (IOException ex)
         {
-            System.out.println("testThatPortReallyFree: anyway trying to close, " +
-                "got: IOException!" + ex.toString());
+            System.out
+                .println("testThatPortReallyFree: anyway trying to close, "
+                    + "got: IOException!" + ex.toString());
 
         }
         return ok;
@@ -97,11 +100,11 @@ public class PortBookKeeper
 
     public void releasePort(int port)
     {
-        int index = port-portRangeFrom;
+        int index = port - portRangeFrom;
         if (index < 0 || index > availablePorts)
         {
-            System.out.println("ERROR: attempt to release invalid port " +
-                port + " (index = " + index + ")!");
+            System.out.println("ERROR: attempt to release invalid port "
+                + port + " (index = " + index + ")!");
         }
         else
         {
@@ -115,4 +118,3 @@ public class PortBookKeeper
         // System.out.println("finalize(): " + this.getClass().getName());
     }
 }
-

@@ -105,6 +105,7 @@ public class DummyFrameWithMenu extends KFrame
     }
 
     boolean disposed = false;
+
     public void dispose()
     {
         if (disposed)
@@ -140,7 +141,8 @@ public class DummyFrameWithMenu extends KFrame
 
         net.sf.colossus.webcommon.FinalizeManager.printStatistics(false);
 
-        System.out.println("\nDummyFrameWithMenu.main() should end now by itself.");
+        System.out
+            .println("\nDummyFrameWithMenu.main() should end now by itself.");
     }
 
     /*    

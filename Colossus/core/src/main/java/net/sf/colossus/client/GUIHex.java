@@ -107,8 +107,7 @@ public abstract class GUIHex
     static GeneralPath makePolygon(int sides, double[] x, double[] y,
         boolean closed)
     {
-        GeneralPath polygon = new GeneralPath(GeneralPath.WIND_EVEN_ODD,
-            sides);
+        GeneralPath polygon = new GeneralPath(GeneralPath.WIND_EVEN_ODD, sides);
         polygon.moveTo((float)x[0], (float)y[0]);
         for (int i = 1; i < sides; i++)
         {

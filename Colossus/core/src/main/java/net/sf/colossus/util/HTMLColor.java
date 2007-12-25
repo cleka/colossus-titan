@@ -14,7 +14,8 @@ import java.util.logging.Logger;
 
 public final class HTMLColor
 {
-    private static final Logger LOGGER = Logger.getLogger(HTMLColor.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(HTMLColor.class
+        .getName());
 
     // Colors defined in the standard.
     public static final Color aliceBlue = new Color(240, 248, 255);
@@ -70,8 +71,8 @@ public final class HTMLColor
     public static final Color greenYellow = new Color(173, 255, 47);
     public static final Color honeyDew = new Color(240, 255, 240);
     public static final Color hotPink = new Color(255, 105, 180);
-    public static final Color indianRed  = new Color(205, 92, 92);
-    public static final Color indigo  = new Color(75, 0, 130);
+    public static final Color indianRed = new Color(205, 92, 92);
+    public static final Color indigo = new Color(75, 0, 130);
     public static final Color ivory = new Color(255, 255, 240);
     public static final Color khaki = new Color(240, 230, 140);
     public static final Color lavender = new Color(230, 230, 250);
@@ -161,28 +162,28 @@ public final class HTMLColor
     // My additions.
     public static final Color darkYellow = new Color(200, 200, 0);
     public static final Color lightOlive = new Color(150, 150, 0);
-    public static final Color brambleGreen1 = new Color(0,200,0);
-    public static final Color brambleGreen2 = new Color(0,150,0);
+    public static final Color brambleGreen1 = new Color(0, 200, 0);
+    public static final Color brambleGreen2 = new Color(0, 150, 0);
 
     // More additions, for Creatures (based on Chit)
-    public static final Color ogreRed = new Color(128,0,0);
-    public static final Color hydraOrange = new Color(255,132,21);
-    public static final Color behemothGreen = new Color(2,129,2);
-    public static final Color centaurGold = new Color(129,129,1);
-    public static final Color colossusPink = new Color(207,6,207);
-    public static final Color giantBlue = new Color(3,3,213);
+    public static final Color ogreRed = new Color(128, 0, 0);
+    public static final Color hydraOrange = new Color(255, 132, 21);
+    public static final Color behemothGreen = new Color(2, 129, 2);
+    public static final Color centaurGold = new Color(129, 129, 1);
+    public static final Color colossusPink = new Color(207, 6, 207);
+    public static final Color giantBlue = new Color(3, 3, 213);
 
     // The Player Colors (based on Chit)
     public static final Color BlackColossus = HTMLColor.black;
-    public static final Color BlueColossus = new Color(16,24,123);
-    public static final Color BrownColossus = new Color(120,40,40);
-    public static final Color GoldColossus = new Color(165,148,49);
-    public static final Color GreenColossus = new Color(24,173,66);
-    public static final Color RedColossus = new Color(189,0,24);
+    public static final Color BlueColossus = new Color(16, 24, 123);
+    public static final Color BrownColossus = new Color(120, 40, 40);
+    public static final Color GoldColossus = new Color(165, 148, 49);
+    public static final Color GreenColossus = new Color(24, 173, 66);
+    public static final Color RedColossus = new Color(189, 0, 24);
     // newer Player Colors
     public static final Color OrangeColossus = hydraOrange;
     public static final Color PurpleColossus = colossusPink;
-    public static final Color SilverColossus = new Color(153,153,153);
+    public static final Color SilverColossus = new Color(153, 153, 153);
     public static final Color SkyColossus = skyBlue;
     public static final Color PineColossus = forestGreen;
     public static final Color IndigoColossus = indigo;
@@ -192,17 +193,16 @@ public final class HTMLColor
         Color theColor;
         try
         {
-            java.lang.Class htmlColor = Class.forName(
-                "net.sf.colossus.util.HTMLColor");
-            java.lang.reflect.Field fieldColor =
-                htmlColor.getDeclaredField(colorName);
+            java.lang.Class htmlColor = Class
+                .forName("net.sf.colossus.util.HTMLColor");
+            java.lang.reflect.Field fieldColor = htmlColor
+                .getDeclaredField(colorName);
             theColor = (Color)fieldColor.get(null);
         }
         catch (Exception e)
         {
-            LOGGER.log(Level.WARNING,
-                "I know nothing about color \"" + colorName +
-                "\", : " + e);
+            LOGGER.log(Level.WARNING, "I know nothing about color \""
+                + colorName + "\", : " + e);
             theColor = Color.black;
         }
         return theColor;
@@ -212,17 +212,14 @@ public final class HTMLColor
     public static String colorToCode(Color c)
     {
         // mask alpha out, fill with zeros to length 7, cut rightmost 6. 
-        return ("#" + Integer.toHexString(
-            (c.getRGB() & 0xffffff) + 0x1000000
-            ).substring(1)
-            );
+        return ("#" + Integer.toHexString((c.getRGB() & 0xffffff) + 0x1000000)
+            .substring(1));
     }
 
     public static Color invertRGBColor(Color c)
     {
-        Color c2 = new Color(255 - c.getRed(),
-            255 - c.getGreen(),
-            255 - c.getBlue());
+        Color c2 = new Color(255 - c.getRed(), 255 - c.getGreen(), 255 - c
+            .getBlue());
         return c2;
     }
 }

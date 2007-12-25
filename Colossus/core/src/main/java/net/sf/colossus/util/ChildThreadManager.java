@@ -66,7 +66,7 @@ public class ChildThreadManager
 
     private synchronized void reaper()
     {
-        if ( !unregisteringChilds.isEmpty() )
+        if (!unregisteringChilds.isEmpty())
         {
             Iterator it = unregisteringChilds.iterator();
             while (it.hasNext())
@@ -76,15 +76,15 @@ public class ChildThreadManager
                 try
                 {
                     child.join();
-                    printdebug("-- ok, join for child " + name +
-                        " went fine. Removing it from list...");
+                    printdebug("-- ok, join for child " + name
+                        + " went fine. Removing it from list...");
                     it.remove();
                     childThreads.remove(child);
                 }
                 catch (InterruptedException e)
                 {
-                    printdebug("###### reaper() #######: join for " +
-                        name + " got InterruptedException!!");
+                    printdebug("###### reaper() #######: join for " + name
+                        + " got InterruptedException!!");
                 }
             }
 
@@ -97,9 +97,9 @@ public class ChildThreadManager
                 list.add(name);
             }
 
-            printdebug("\n###########\nreaper(): now there are " +
-                childThreads.size() + " children threads left:" +
-                list.toString());
+            printdebug("\n###########\nreaper(): now there are "
+                + childThreads.size() + " children threads left:"
+                + list.toString());
         }
         else
         {
@@ -144,7 +144,8 @@ public class ChildThreadManager
         printdebug("unregisterFromTM " + child);
         unregisteringChilds.add(child);
 
-        printdebug("Unregistrering list now: " + unregisteringChilds.toString());
+        printdebug("Unregistrering list now: "
+            + unregisteringChilds.toString());
         printdebug("Still alive    list now: " + childThreads.toString());
         printdebug("Callin notify...");
         this.notify();

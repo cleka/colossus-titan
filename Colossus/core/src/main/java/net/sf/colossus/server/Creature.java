@@ -28,11 +28,10 @@ import net.sf.colossus.xmlparser.CreatureLoader;
  * @author Romain Dolbeau
  */
 
-public class Creature implements
-    Comparable,
-    net.sf.colossus.util.Terrains // H_xxx constants
+public class Creature implements Comparable, net.sf.colossus.util.Terrains // H_xxx constants
 {
-    private static final Logger LOGGER = Logger.getLogger(Creature.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(Creature.class
+        .getName());
 
     private final String name;
     private final String pluralName;
@@ -54,14 +53,13 @@ public class Creature implements
     private final boolean summonable;
     private final boolean lord;
     private final boolean demilord;
-    private int maxCount;  // Not final because we adjust for titans.
+    private int maxCount; // Not final because we adjust for titans.
     private final String baseColor;
     private static boolean noBaseColor = false;
 
     public static final Creature unknown = new Creature("Unknown", 1, 1,
-        false, false, false, false, false, false, false, false,
-        false, false, false, false, false, false, false, false,
-        1, "Unknown", null);
+        false, false, false, false, false, false, false, false, false, false,
+        false, false, false, false, false, false, 1, "Unknown", null);
 
     /** Sometimes we need to iterate through all creature types. */
     private static List creatures = new ArrayList();
@@ -101,8 +99,8 @@ public class Creature implements
         /* warn about likely inapropriate combinations */
         if (waterDwelling && nativeSandDune)
         {
-            LOGGER.log(Level.WARNING, "Creature " + name +
-                " is both a Water Dweller and native to Sand and Dune.");
+            LOGGER.log(Level.WARNING, "Creature " + name
+                + " is both a Water Dweller and native to Sand and Dune.");
         }
     }
 
@@ -139,19 +137,20 @@ public class Creature implements
         {
             creatures.clear();
             List directories = VariantSupport.getVarDirectoriesList();
-            InputStream creIS = ResourceLoader.getInputStream(
-                VariantSupport.getCreaturesName(), directories);
+            InputStream creIS = ResourceLoader.getInputStream(VariantSupport
+                .getCreaturesName(), directories);
             if (creIS == null)
             {
-                throw new FileNotFoundException(
-                    VariantSupport.getCreaturesName());
+                throw new FileNotFoundException(VariantSupport
+                    .getCreaturesName());
             }
             CreatureLoader creatureLoader = new CreatureLoader(creIS);
             creatures.addAll(creatureLoader.getCreatures());
         }
         catch (Exception e)
         {
-            throw new RuntimeException("Failed to load Creatures definition", e);
+            throw new RuntimeException("Failed to load Creatures definition",
+                e);
         }
         summonableCreatures.clear();
         Iterator it = creatures.iterator();
@@ -261,9 +260,8 @@ public class Creature implements
             tempNames[3] = getDisplayName() + "-Name" + colorSuffix;
             if (specialIncrement > 0)
             {
-                tempNames[4] =
-                    (isFlier() ? "Flying" : "") +
-                    (isRangestriker() ? "Rangestrike" : "") + colorSuffix;
+                tempNames[4] = (isFlier() ? "Flying" : "")
+                    + (isRangestriker() ? "Rangestrike" : "") + colorSuffix;
             }
         }
         else
@@ -291,14 +289,14 @@ public class Creature implements
 
     public int getHintedRecruitmentValue()
     { // this function is replicated in Critter
-        return getPointValue() +
-            VariantSupport.getHintedRecruitmentValueOffset(name);
+        return getPointValue()
+            + VariantSupport.getHintedRecruitmentValueOffset(name);
     }
 
     public int getHintedRecruitmentValue(String[] section)
     { // this function is replicated in Critter
-        return getPointValue() +
-            VariantSupport.getHintedRecruitmentValueOffset(name, section);
+        return getPointValue()
+            + VariantSupport.getHintedRecruitmentValueOffset(name, section);
     }
 
     public boolean isRangestriker()
@@ -464,7 +462,8 @@ public class Creature implements
      */
     private static java.util.Map _getCreatureByName_cache = new WeakHashMap();
     // init the cache with predefined values.
-    static {
+    static
+    {
         // "null" (not a null pointer...) is used for recruiter
         // when it is anonoymous, so it is known and legal,
         // mapped to null (a null pointer, this time).

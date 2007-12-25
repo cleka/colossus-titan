@@ -28,8 +28,8 @@ import net.sf.colossus.util.Options;
  * @author David Ripton
  */
 
-
-final class PickColor extends KDialog implements WindowListener, ActionListener
+final class PickColor extends KDialog implements WindowListener,
+    ActionListener
 {
     private static final Color[] background;
     private static final Color[] foreground;
@@ -43,18 +43,16 @@ final class PickColor extends KDialog implements WindowListener, ActionListener
 
         for (int i = 0; i < Constants.MAX_MAX_PLAYERS; i++)
         {
-            background[i] = HTMLColor.stringToColor(Constants.colorNames[i] +
-                "Colossus");
-            int sum =
-                background[i].getRed() +
-                background[i].getGreen() +
-                background[i].getBlue();
+            background[i] = HTMLColor.stringToColor(Constants.colorNames[i]
+                + "Colossus");
+            int sum = background[i].getRed() + background[i].getGreen()
+                + background[i].getBlue();
             foreground[i] = (sum > 200 ? Color.black : Color.white);
         }
     }
 
-    private PickColor(JFrame parentFrame, String playerName,
-        List colorsLeft, IOptions options)
+    private PickColor(JFrame parentFrame, String playerName, List colorsLeft,
+        IOptions options)
     {
         super(parentFrame, playerName + ", Pick a Color", true);
 

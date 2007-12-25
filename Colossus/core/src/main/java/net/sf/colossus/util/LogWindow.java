@@ -48,8 +48,7 @@ public final class LogWindow extends JTextArea
             {
                 LogWindow.this.client.setOption(Options.showLogWindow, false);
             }
-        }
-        );
+        });
 
         scrollPane = new JScrollPane(this);
         logFrame.getContentPane().add(scrollPane);

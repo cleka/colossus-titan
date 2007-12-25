@@ -23,7 +23,8 @@ import java.util.logging.Logger;
  */
 public class DevRandom extends Random
 {
-    private static final Logger LOGGER = Logger.getLogger(DevRandom.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(DevRandom.class
+        .getName());
 
     final static String PRNG = "PRNG";
     private String source = null;
@@ -69,16 +70,15 @@ public class DevRandom extends Random
         {
             randomPropertySource = PRNG;
             String randomFile = System.getProperty(randomPropertyName);
-            if ( randomFile != null )
+            if (randomFile != null)
             {
-                LOGGER.log(Level.FINEST,
-                    randomPropertyName +" is set to using random source: "+
-                    randomFile);
+                LOGGER.log(Level.FINEST, randomPropertyName
+                    + " is set to using random source: " + randomFile);
                 if (tryOneSource(randomFile))
                 {
                     randomPropertySource = randomFile;
                     LOGGER.log(Level.FINEST,
-                        "RandomSource looks OK - using it: "+randomFile);
+                        "RandomSource looks OK - using it: " + randomFile);
                 }
                 // stays PRNG, i.e. falls back to default
             }
@@ -88,14 +88,16 @@ public class DevRandom extends Random
 
     private boolean tryOneSource(String src)
     {
-        if (src == null) {
+        if (src == null)
+        {
             return false;
         }
 
         source = src;
         randomSource = new File(source);
 
-        if ((randomSource == null) || (!randomSource.exists())) {
+        if ((randomSource == null) || (!randomSource.exists()))
+        {
             LOGGER.log(Level.WARNING, "Random source unavailable: " + src);
             return false;
         }
@@ -124,8 +126,8 @@ public class DevRandom extends Random
                 LOGGER.log(Level.SEVERE, "Random source disappeared!", ex);
                 System.exit(1);
             }
-            LOGGER.log(Level.FINEST,
-                "Using " + source + " as the random source.");
+            LOGGER.log(Level.FINEST, "Using " + source
+                + " as the random source.");
         }
         else
         {
@@ -160,12 +162,12 @@ public class DevRandom extends Random
         }
         catch (IOException ex)
         {
-            LOGGER.log(Level.SEVERE,
-                "Problem reading from random source " + source);
+            LOGGER.log(Level.SEVERE, "Problem reading from random source "
+                + source);
             return super.next(bits);
         }
         int result = 0;
-        for (int i = 0; i < size ; i++)
+        for (int i = 0; i < size; i++)
         {
             result |= (bytes[i] & 0x000000FF) << (i << 3);
         }

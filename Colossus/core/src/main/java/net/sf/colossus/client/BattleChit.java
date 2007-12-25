@@ -211,19 +211,18 @@ final class BattleChit extends Chit
             // All overlays (hits, dice) have gaps of 2.
             oldFont = g2.getFont();
             String name = oldFont.getName();
-            int fifthChitSize = (rect.height > rect.width 
-                ? (rect.width - 8) / 5
+            int fifthChitSize = (rect.height > rect.width ? (rect.width - 8) / 5
                 : (rect.height - 8) / 5);
             int style = oldFont.getStyle();
             font = new Font(name, style, fifthChitSize * 2);
             g2.setFont(font);
             FontMetrics fontMetrics = g2.getFontMetrics();
             fontHeight = fontMetrics.getAscent();
-            
+
             String hitString = Integer.toString(hits);
             int hitsFontWidth = fontMetrics.stringWidth(hitString);
 
-         // Setup spaces to show Hits and Strike Target.
+            // Setup spaces to show Hits and Strike Target.
             Rectangle hitRect = new Rectangle();
             if (strikeNumber > 0)
             {
@@ -243,7 +242,7 @@ final class BattleChit extends Chit
                     g2.setColor(Color.GREEN);
                     g2.drawString(diceString, dicePoint.x, dicePoint.y
                         + strikeRect.height - 2);
-                }          
+                }
             }
             if (hits > 0)
             {
@@ -255,7 +254,7 @@ final class BattleChit extends Chit
                 g2.setColor(Color.white);
                 g2.fillRect(hitRect.x, hitRect.y, hitRect.width,
                     hitRect.height);
-                
+
                 // Show number of hits taken in red.
                 g2.setColor(Color.red);
                 g2.drawString(hitString, hitRect.x, hitRect.y + fontHeight);
@@ -302,15 +301,15 @@ final class BattleChit extends Chit
         {
             innerScale = 60;
         }
-        borderStroke = new BasicStroke((int)Math.ceil(
-            (outerRect.width - innerScale) / 2.0));
+        borderStroke = new BasicStroke((int)Math
+            .ceil((outerRect.width - innerScale) / 2.0));
         Point center = new Point(outerRect.x + outerRect.width / 2,
             outerRect.y + outerRect.height / 2);
-        rect = new Rectangle(center.x - innerScale / 2,
-            center.y - innerScale / 2, innerScale, innerScale);
+        rect = new Rectangle(center.x - innerScale / 2, center.y - innerScale
+            / 2, innerScale, innerScale);
         int midScale = (int)(Math.round((scale + innerScale) / 2.0));
-        midRect = new Rectangle(center.x - midScale / 2,
-            center.y - midScale / 2, midScale, midScale);
+        midRect = new Rectangle(center.x - midScale / 2, center.y - midScale
+            / 2, midScale, midScale);
     }
 
     public String getDescription()
@@ -343,7 +342,7 @@ final class BattleChit extends Chit
             strikeDie = new StrikeDie(fifthChitSize * 2, strikeNumber, "Hit");
             strikeDie.setToolTipText("Test");
             this.add(strikeDie);
-            strikeAdjDie = new StrikeDie(fifthChitSize * 2, strikeNumber, 
+            strikeAdjDie = new StrikeDie(fifthChitSize * 2, strikeNumber,
                 "RedBlue");
         }
         else

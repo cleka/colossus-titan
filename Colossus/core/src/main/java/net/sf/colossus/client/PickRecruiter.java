@@ -26,7 +26,6 @@ import net.sf.colossus.util.KDialog;
  * @author David Ripton
  */
 
-
 final class PickRecruiter extends KDialog implements MouseListener,
     WindowListener
 {
@@ -40,8 +39,8 @@ final class PickRecruiter extends KDialog implements MouseListener,
     private PickRecruiter(JFrame parentFrame, List recruiters,
         String hexDescription, String markerId, Client client)
     {
-        super(parentFrame, client.getPlayerName() + ": Pick Recruiter in " +
-            hexDescription, true);
+        super(parentFrame, client.getPlayerName() + ": Pick Recruiter in "
+            + hexDescription, true);
 
         recruiterName = null;
         this.recruiters = recruiters;

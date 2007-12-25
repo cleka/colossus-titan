@@ -24,10 +24,11 @@ import net.sf.colossus.util.Options;
  */
 
 // final
-public //  
-    class Critter implements Comparable
+public//  
+class Critter implements Comparable
 {
-    private static final Logger LOGGER = Logger.getLogger(Critter.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(Critter.class
+        .getName());
 
     private Creature creature;
     private String markerId;
@@ -153,16 +154,16 @@ public //
                 hits = getPower();
             }
 
-            LOGGER.log(Level.INFO, "Critter " + getDescription() + ": " +
-                oldhits + " + " + damage + " => " + hits +
-                "; " + excess + " excess");
+            LOGGER.log(Level.INFO, "Critter " + getDescription() + ": "
+                + oldhits + " + " + damage + " => " + hits + "; " + excess
+                + " excess");
 
             // Check for death.
             if (hits >= getPower())
             {
-                LOGGER.log(Level.INFO,
-                    "Critter " + getDescription() + " is now dead: (hits=" +
-                    hits + " > power="+getPower()+ ")");
+                LOGGER.log(Level.INFO, "Critter " + getDescription()
+                    + " is now dead: (hits=" + hits + " > power=" + getPower()
+                    + ")");
                 setDead(true);
             }
         }
@@ -242,8 +243,8 @@ public //
                 if (neighbor != null)
                 {
                     Critter other = battle.getCritter(neighbor);
-                    if (other != null && other.getPlayer() != getPlayer() &&
-                        (countDead || !other.isDead()))
+                    if (other != null && other.getPlayer() != getPlayer()
+                        && (countDead || !other.isDead()))
                     {
                         count++;
                     }
@@ -275,8 +276,8 @@ public //
                 if (neighbor != null)
                 {
                     Critter other = battle.getCritter(neighbor);
-                    if (other != null && other.getPlayer() != getPlayer() &&
-                        (countDead || !other.isDead()))
+                    if (other != null && other.getPlayer() != getPlayer()
+                        && (countDead || !other.isDead()))
                     {
                         return true;
                     }
@@ -303,8 +304,8 @@ public //
     {
         String formerHexLabel = currentHexLabel;
         currentHexLabel = startingHexLabel;
-        LOGGER.log(Level.INFO, getName() + " undoes move and returns to " +
-            startingHexLabel);
+        LOGGER.log(Level.INFO, getName() + " undoes move and returns to "
+            + startingHexLabel);
         battle.getGame().getServer().allTellBattleMove(tag, formerHexLabel,
             currentHexLabel, true);
     }
@@ -360,8 +361,8 @@ public //
                 dice++;
             }
             // Non-native striking up a dune hexside: -1
-            else if (!isNativeSandDune() &&
-                hex.getOppositeHexside(direction) == 'd')
+            else if (!isNativeSandDune()
+                && hex.getOppositeHexside(direction) == 'd')
             {
                 dice--;
             }
@@ -429,8 +430,8 @@ public //
             // Rangestrike up across wall: -1 per wall
             if (targetHex.hasWall())
             {
-                int heightDeficit = targetHex.getElevation() -
-                    hex.getElevation();
+                int heightDeficit = targetHex.getElevation()
+                    - hex.getElevation();
                 if (heightDeficit > 0)
                 {
                     // Because of the design of the tower map, a strike to
@@ -468,10 +469,9 @@ public //
         // Native defending in bramble, from strike by a non-native: +1
         // Native defending in bramble, from rangestrike by a non-native
         //     non-magicMissile: +1
-        if (target.getCurrentHex().getTerrain().equals("Brambles") &&
-            target.isNativeBramble() &&
-            !isNativeBramble() &&
-            !(rangestrike && useMagicMissile()))
+        if (target.getCurrentHex().getTerrain().equals("Brambles")
+            && target.isNativeBramble() && !isNativeBramble()
+            && !(rangestrike && useMagicMissile()))
         {
             strikeNumber++;
         }
@@ -479,10 +479,9 @@ public //
         // Native defending in stone, from strike by a non-native: +1
         // Native defending in stone, from rangestrike by a non-native
         //     non-magicMissile: +1
-        if (target.getCurrentHex().getTerrain().equals("Stone") &&
-            target.isNativeStone() &&
-            !isNativeStone() &&
-            !(rangestrike && useMagicMissile()))
+        if (target.getCurrentHex().getTerrain().equals("Stone")
+            && target.isNativeStone() && !isNativeStone()
+            && !(rangestrike && useMagicMissile()))
         {
             strikeNumber++;
         }
@@ -490,10 +489,8 @@ public //
         // Native defending in tree, from strike by a non-native: +1
         // Native defending in tree, from rangestrike by a non-native
         //     non-magicMissile: no effect
-        if (target.getCurrentHex().getTerrain().equals("Tree") &&
-            target.isNativeTree() &&
-            !isNativeTree() &&
-            !(rangestrike))
+        if (target.getCurrentHex().getTerrain().equals("Tree")
+            && target.isNativeTree() && !isNativeTree() && !(rangestrike))
         {
             strikeNumber++;
         }
@@ -612,8 +609,8 @@ public //
         if (!penaltyOptions.isEmpty())
         {
             // Add the non-penalty option as a choice.
-            PenaltyOption po = new PenaltyOption(this, target, getDice(target),
-                getStrikeNumber(target));
+            PenaltyOption po = new PenaltyOption(this, target,
+                getDice(target), getStrikeNumber(target));
             penaltyOptions.add(po);
 
             // Add all non-penalty carries to every PenaltyOption.
@@ -643,8 +640,9 @@ public //
         }
         // Strikes not up across dune hexsides cannot carry up across 
         // dune hexsides.
-        if (hex.getOppositeHexside(dir) == 'd' && targetHex.getHexside(
-            Battle.getDirection(targetHex, hex, false)) != 'd')
+        if (hex.getOppositeHexside(dir) == 'd'
+            && targetHex
+                .getHexside(Battle.getDirection(targetHex, hex, false)) != 'd')
         {
             return false;
         }
@@ -660,8 +658,8 @@ public //
         final int strikeNumber = getStrikeNumber(target);
 
         Critter victim = battle.getCritter(neighbor);
-        if (victim == null || victim.getPlayer() == getPlayer() ||
-            victim.isDead())
+        if (victim == null || victim.getPlayer() == getPlayer()
+            || victim.isDead())
         {
             return;
         }
@@ -698,16 +696,16 @@ public //
             while (it.hasNext())
             {
                 PenaltyOption po = (PenaltyOption)it.next();
-                if (po.getDice() == tmpDice &&
-                    po.getStrikeNumber() == tmpStrikeNumber)
+                if (po.getDice() == tmpDice
+                    && po.getStrikeNumber() == tmpStrikeNumber)
                 {
                     po.addCarryTarget(neighbor.getLabel());
                     return;
                 }
             }
             // No match, so create a new PenaltyOption.
-            PenaltyOption po = new PenaltyOption(this, target,
-                tmpDice, tmpStrikeNumber);
+            PenaltyOption po = new PenaltyOption(this, target, tmpDice,
+                tmpStrikeNumber);
             po.addCarryTarget(neighbor.getLabel());
             penaltyOptions.add(po);
         }
@@ -737,10 +735,10 @@ public //
             }
         }
 
-        LOGGER.log(Level.INFO, getName() + " in " + currentHexLabel +
-            " strikes " + target.getDescription() + " with strike number " +
-            strikeNumber + " : " + rollString + ": " + damage +
-            (damage == 1 ? " hit" : " hits"));
+        LOGGER.log(Level.INFO, getName() + " in " + currentHexLabel
+            + " strikes " + target.getDescription() + " with strike number "
+            + strikeNumber + " : " + rollString + ": " + damage
+            + (damage == 1 ? " hit" : " hits"));
 
         int carryDamage = target.wound(damage);
         if (!carryPossible)
@@ -752,8 +750,9 @@ public //
         // Let the attacker choose whether to carry, if applicable.
         if (carryDamage > 0)
         {
-            LOGGER.log(Level.INFO, carryDamage + (carryDamage == 1 ?
-                " carry available" : " carries available"));
+            LOGGER.log(Level.INFO, carryDamage
+                + (carryDamage == 1 ? " carry available"
+                    : " carries available"));
         }
 
         // Record that this attacker has struck.
@@ -761,8 +760,8 @@ public //
 
         if (game != null)
         {
-            game.getServer().allTellStrikeResults(this, target,
-                strikeNumber, rolls, damage, carryDamage,
+            game.getServer().allTellStrikeResults(this, target, strikeNumber,
+                rolls, damage, carryDamage,
                 battle.getCarryTargetDescriptions());
         }
     }
@@ -898,19 +897,18 @@ public //
     {
         // Must use our local, Titan-aware getPointValue()
         // return creature.getHintedRecruitmentValue();
-        return getPointValue() +
-            VariantSupport.getHintedRecruitmentValueOffset(
-            creature.getName());
+        return getPointValue()
+            + VariantSupport.getHintedRecruitmentValueOffset(creature
+                .getName());
     }
 
     public int getHintedRecruitmentValue(String[] section)
     {
         // Must use our local, Titan-aware getPointValue()
         // return creature.getHintedRecruitmentValue(section);
-        return getPointValue() +
-            VariantSupport.getHintedRecruitmentValueOffset(
-            creature.getName(),
-            section);
+        return getPointValue()
+            + VariantSupport.getHintedRecruitmentValueOffset(creature
+                .getName(), section);
     }
 
     public boolean isRangestriker()

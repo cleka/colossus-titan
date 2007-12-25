@@ -27,7 +27,6 @@ import net.sf.colossus.util.KDialog;
  * @author David Ripton
  */
 
-
 final class AcquireAngel extends KDialog implements MouseListener,
     WindowListener, ActionListener
 {
@@ -40,8 +39,8 @@ final class AcquireAngel extends KDialog implements MouseListener,
     AcquireAngel(JFrame parentFrame, Client client, String markerId,
         List recruits)
     {
-        super(parentFrame, client.getPlayerName() +
-            ": Acquire Angel in legion " + markerId, false);
+        super(parentFrame, client.getPlayerName()
+            + ": Acquire Angel in legion " + markerId, false);
 
         this.client = client;
         this.markerId = markerId;

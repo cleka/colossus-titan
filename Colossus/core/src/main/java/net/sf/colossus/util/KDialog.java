@@ -33,8 +33,7 @@ public class KDialog extends JDialog implements MouseListener, WindowListener
 
     /** Place dialog relative to parentFrame's origin, offset by 
      *  point, and fully on-screen. */
-    public void placeRelative(JFrame parentFrame, Point point,
-        JScrollPane pane)
+    public void placeRelative(JFrame parentFrame, Point point, JScrollPane pane)
     {
 
         JViewport viewPort = pane.getViewport();
@@ -56,8 +55,8 @@ public class KDialog extends JDialog implements MouseListener, WindowListener
     public void centerOnScreen()
     {
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-        setLocation(new Point(d.width / 2 - getSize().width / 2,
-            d.height / 2 - getSize().height / 2));
+        setLocation(new Point(d.width / 2 - getSize().width / 2, d.height / 2
+            - getSize().height / 2));
     }
 
     /** Center this dialog on the screen, with an additional offset.
@@ -65,8 +64,7 @@ public class KDialog extends JDialog implements MouseListener, WindowListener
     public void centerOnScreen(int xoffset, int yoffset)
     {
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-        setLocation(new Point(
-            (d.width / 2 - getSize().width / 2) + xoffset,
+        setLocation(new Point((d.width / 2 - getSize().width / 2) + xoffset,
             (d.height / 2 - getSize().height / 2) + yoffset));
     }
 
@@ -88,8 +86,8 @@ public class KDialog extends JDialog implements MouseListener, WindowListener
     public void lowerRightCorner()
     {
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-        setLocation(new Point(d.width - getSize().width,
-            d.height - getSize().height - 30));
+        setLocation(new Point(d.width - getSize().width, d.height
+            - getSize().height - 30));
     }
 
     // Add the do-nothing mouse and window listener methods here, rather 

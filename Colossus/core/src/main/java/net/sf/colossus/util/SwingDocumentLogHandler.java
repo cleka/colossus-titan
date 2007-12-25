@@ -19,7 +19,8 @@ import javax.swing.text.PlainDocument;
  */
 public class SwingDocumentLogHandler extends Handler
 {
-    private static final Logger LOGGER = Logger.getLogger(SwingDocumentLogHandler.class.getName());
+    private static final Logger LOGGER = Logger
+        .getLogger(SwingDocumentLogHandler.class.getName());
 
     private Document document = new PlainDocument();
 
@@ -33,11 +34,12 @@ public class SwingDocumentLogHandler extends Handler
         return document;
     }
 
-    public void publish(LogRecord record) {
+    public void publish(LogRecord record)
+    {
         try
         {
-            document.insertString(document.getLength(),
-                record.getMessage() + "\n", null);
+            document.insertString(document.getLength(), record.getMessage()
+                + "\n", null);
         }
         catch (BadLocationException e)
         {
@@ -45,12 +47,13 @@ public class SwingDocumentLogHandler extends Handler
         }
     }
 
-    public void flush() {
+    public void flush()
+    {
         // nothing to do, just making the method concrete
     }
 
-    public void close()
-        throws SecurityException {
+    public void close() throws SecurityException
+    {
         try
         {
             document.remove(0, document.getLength());

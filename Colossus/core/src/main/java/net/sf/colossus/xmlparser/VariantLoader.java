@@ -22,7 +22,8 @@ import org.jdom.input.SAXBuilder;
  */
 public class VariantLoader
 {
-    private static final Logger LOGGER = Logger.getLogger(VariantLoader.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(VariantLoader.class
+        .getName());
 
     private String map;
     private String ter;

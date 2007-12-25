@@ -21,10 +21,10 @@ import net.sf.colossus.server.Creature;
  */
 
 // XXX Massive code duplication.
-
 final class Strike
 {
-    private static final Logger LOGGER = Logger.getLogger(Strike.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(Strike.class
+        .getName());
 
     private Client client;
 
@@ -63,8 +63,8 @@ final class Strike
      *  Returns true if a strike was made. */
     boolean makeForcedStrikes(boolean rangestrike)
     {
-        if (!client.getBattlePhase().isFightPhase() &&
-            !client.isMyBattlePhase())
+        if (!client.getBattlePhase().isFightPhase()
+            && !client.isMyBattlePhase())
         {
             LOGGER.log(Level.SEVERE,
                 "Called Strike.makeForcedStrikes() in wrong phase");
@@ -131,11 +131,11 @@ final class Strike
             if (!currentHex.isCliff(i))
             {
                 BattleHex targetHex = currentHex.getNeighbor(i);
-                if (targetHex != null && client.isOccupied(targetHex) &&
-                    !targetHex.isEntrance())
+                if (targetHex != null && client.isOccupied(targetHex)
+                    && !targetHex.isEntrance())
                 {
-                    BattleChit target = client.getBattleChit(
-                        targetHex.getLabel());
+                    BattleChit target = client.getBattleChit(targetHex
+                        .getLabel());
                     if (target.isInverted() != inverted)
                     {
                         adjacentEnemy = true;
@@ -153,8 +153,8 @@ final class Strike
         // Then do rangestrikes if applicable.  Rangestrikes are not allowed
         // if the creature can strike normally, so only look for them if
         // no targets have yet been found.
-        if (rangestrike && !adjacentEnemy && creature.isRangestriker() &&
-            client.getBattlePhase() != Constants.BattlePhase.STRIKEBACK)
+        if (rangestrike && !adjacentEnemy && creature.isRangestriker()
+            && client.getBattlePhase() != Constants.BattlePhase.STRIKEBACK)
         {
             Iterator it = client.getInactiveBattleChits().iterator();
             while (it.hasNext())
@@ -197,7 +197,8 @@ final class Strike
                 {
                     return 1 + minRangeToNeighbor(hex1, hex2);
                 }
-                else // hex2.isEntrance()
+                else
+                // hex2.isEntrance()
                 {
                     return 1 + minRangeToNeighbor(hex2, hex1);
                 }
@@ -298,8 +299,8 @@ final class Strike
     private static boolean toLeft(double xDist, double yDist)
     {
         double ratio = xDist / yDist;
-        if (ratio >= 1.5 || (ratio >= 0 && ratio <= .75) ||
-            (ratio >= -1.5 && ratio <= -.75))
+        if (ratio >= 1.5 || (ratio >= 0 && ratio <= .75)
+            || (ratio >= -1.5 && ratio <= -.75))
         {
             return true;
         }
@@ -316,10 +317,11 @@ final class Strike
 
     /** Check LOS, going to the left of hexspines if argument left is true, or
      *  to the right if it is false. */
-    private boolean isLOSBlockedDir(BattleHex initialHex, BattleHex currentHex,
-        BattleHex finalHex, boolean left, int strikeElevation,
-        boolean strikerAtop, boolean strikerAtopCliff, boolean midObstacle,
-        boolean midCliff, boolean midChit, int totalObstacles)
+    private boolean isLOSBlockedDir(BattleHex initialHex,
+        BattleHex currentHex, BattleHex finalHex, boolean left,
+        int strikeElevation, boolean strikerAtop, boolean strikerAtopCliff,
+        boolean midObstacle, boolean midCliff, boolean midChit,
+        int totalObstacles)
     {
         boolean targetAtop = false;
         boolean targetAtopCliff = false;
@@ -418,8 +420,8 @@ final class Strike
 
             // If there are three slopes, striker and target must each
             //     be atop one.
-            if (totalObstacles >= 3 && (!strikerAtop || !targetAtop) &&
-                (!strikerAtopCliff && !targetAtopCliff))
+            if (totalObstacles >= 3 && (!strikerAtop || !targetAtop)
+                && (!strikerAtopCliff && !targetAtopCliff))
             {
                 return true;
             }
@@ -427,7 +429,8 @@ final class Strike
             // Success!
             return false;
         }
-        else // not leaving first or entering last hex
+        else
+        // not leaving first or entering last hex
         {
             if (midChit)
             {
@@ -456,16 +459,16 @@ final class Strike
         // Creatures block LOS, unless both striker and target are at higher
         //     elevation than the creature, or unless the creature is at
         //     the base of a cliff and the striker or target is atop it.
-        if (client.isOccupied(nextHex) && nextHex.getElevation() >=
-            strikeElevation &&
-            (!strikerAtopCliff || currentHex != initialHex))
+        if (client.isOccupied(nextHex)
+            && nextHex.getElevation() >= strikeElevation
+            && (!strikerAtopCliff || currentHex != initialHex))
         {
             midChit = true;
         }
 
         return isLOSBlockedDir(initialHex, nextHex, finalHex, left,
-            strikeElevation, strikerAtop, strikerAtopCliff,
-            midObstacle, midCliff, midChit, totalObstacles);
+            strikeElevation, strikerAtop, strikerAtopCliff, midObstacle,
+            midCliff, midChit, totalObstacles);
     }
 
     /** Check to see if the LOS from hex1 to hex2 is blocked.  If the LOS
@@ -503,16 +506,16 @@ final class Strike
         double yDist = y2 - y1;
 
         // Creatures below the level of the strike do not block LOS.
-        int strikeElevation = Math.min(hex1.getElevation(),
-            hex2.getElevation());
+        int strikeElevation = Math.min(hex1.getElevation(), hex2
+            .getElevation());
 
         if (yDist == 0 || Math.abs(yDist) == 1.5 * Math.abs(xDist))
         {
             // Hexspine; try both sides.
             return (isLOSBlockedDir(hex1, hex1, hex2, true, strikeElevation,
-                false, false, false, false, false, 0) &&
-                isLOSBlockedDir(hex1, hex1, hex2, false, strikeElevation,
-                false, false, false, false, false, 0));
+                false, false, false, false, false, 0) && isLOSBlockedDir(hex1,
+                hex1, hex2, false, strikeElevation, false, false, false,
+                false, false, 0));
         }
         else
         {
@@ -525,8 +528,8 @@ final class Strike
     private boolean isRangestrikePossible(BattleChit chit, BattleChit target)
     {
         Creature creature = Creature.getCreatureByName(chit.getCreatureName());
-        Creature targetCreature = Creature.getCreatureByName(
-            target.getCreatureName());
+        Creature targetCreature = Creature.getCreatureByName(target
+            .getCreatureName());
 
         BattleHex currentHex = client.getBattleHex(chit);
         BattleHex targetHex = client.getBattleHex(target);
@@ -546,8 +549,9 @@ final class Strike
 
         // Only magicMissile can rangestrike at range 2, rangestrike Lords,
         // or rangestrike without LOS.
-        else if (!creature.useMagicMissile() && (range < 3 ||
-            targetCreature.isLord() || isLOSBlocked(currentHex, targetHex)))
+        else if (!creature.useMagicMissile()
+            && (range < 3 || targetCreature.isLord() || isLOSBlocked(
+                currentHex, targetHex)))
         {
             return false;
         }
@@ -632,7 +636,8 @@ final class Strike
             {
                 return 1;
             }
-            else // yDist == 0
+            else
+            // yDist == 0
             {
                 if (left)
                 {
@@ -644,7 +649,8 @@ final class Strike
                 }
             }
         }
-        else // xDist < 0
+        else
+        // xDist < 0
         {
             if (yDist < xDistAndAHalf)
             {
@@ -684,7 +690,8 @@ final class Strike
             {
                 return 5;
             }
-            else // yDist == 0
+            else
+            // yDist == 0
             {
                 if (left)
                 {
@@ -770,8 +777,8 @@ final class Strike
 
         if (yDist == 0 || Math.abs(yDist) == 1.5 * Math.abs(xDist))
         {
-            int strikeElevation = Math.min(hex1.getElevation(),
-                hex2.getElevation());
+            int strikeElevation = Math.min(hex1.getElevation(), hex2
+                .getElevation());
             // Hexspine; try unblocked side(s).
             if (isLOSBlockedDir(hex1, hex1, hex2, true, strikeElevation,
                 false, false, false, false, false, 0))
@@ -808,7 +815,7 @@ final class Strike
      *  also return the number of dice before terrain adjustments. */
     int getDice(BattleChit chit, BattleChit target, int baseDice)
     {
-            BattleHex hex = client.getBattleHex(chit);
+        BattleHex hex = client.getBattleHex(chit);
         BattleHex targetHex = client.getBattleHex(target);
         Creature striker = Creature.getCreatureByName(chit.getCreatureName());
 
@@ -823,7 +830,7 @@ final class Strike
         }
 
         baseDice = (baseDice != dice ? dice : baseDice);
-        
+
         boolean rangestrike = !client.isInContact(chit, true);
         if (rangestrike)
         {
@@ -831,7 +838,8 @@ final class Strike
             dice /= 2;
 
             // volcanoNative rangestriking from volcano: +2
-            if (striker.isNativeVolcano() && hex.getTerrain().equals("Volcano"))
+            if (striker.isNativeVolcano()
+                && hex.getTerrain().equals("Volcano"))
             {
                 dice += 2;
             }
@@ -840,7 +848,8 @@ final class Strike
         {
             // Dice can be modified by terrain.
             // volcanoNative striking from volcano: +2
-            if (striker.isNativeVolcano() && hex.getTerrain().equals("Volcano"))
+            if (striker.isNativeVolcano()
+                && hex.getTerrain().equals("Volcano"))
             {
                 dice += 2;
             }
@@ -860,8 +869,8 @@ final class Strike
                 dice++;
             }
             // Non-native striking up a dune hexside: -1
-            else if (!striker.isNativeSandDune() &&
-                hex.getOppositeHexside(direction) == 'd')
+            else if (!striker.isNativeSandDune()
+                && hex.getOppositeHexside(direction) == 'd')
             {
                 dice--;
             }
@@ -883,8 +892,8 @@ final class Strike
         if (!rangestrike)
         {
             // Non-native striking out of bramble: -1
-            if (hex.getTerrain().equals("Brambles") &&
-                !striker.getCreature().isNativeBramble())
+            if (hex.getTerrain().equals("Brambles")
+                && !striker.getCreature().isNativeBramble())
             {
                 attackerSkill--;
             }
@@ -907,8 +916,8 @@ final class Strike
                 char hexside = targetHex.getHexside(direction);
                 // Non-native striking up slope: -1
                 // Striking up across wall: -1
-                if ((hexside == 's' && !striker.getCreature().isNativeSlope()
-                    ) || hexside == 'w')
+                if ((hexside == 's' && !striker.getCreature().isNativeSlope())
+                    || hexside == 'w')
                 {
                     attackerSkill--;
                 }
@@ -931,8 +940,8 @@ final class Strike
             // Rangestrike up across wall: -1 per wall
             if (targetHex.hasWall())
             {
-                int heightDeficit = targetHex.getElevation() -
-                    hex.getElevation();
+                int heightDeficit = targetHex.getElevation()
+                    - hex.getElevation();
                 if (heightDeficit > 0)
                 {
                     // Because of the design of the tower map, a strike to
@@ -965,10 +974,10 @@ final class Strike
         // Native defending in bramble, from strike by a non-native: +1
         // Native defending in bramble, from rangestrike by a non-native
         //     non-magicMissile: +1
-        if (client.getBattleHex(target).getTerrain().equals("Brambles") &&
-            target.getCreature().isNativeBramble() &&
-            !striker.getCreature().isNativeBramble() &&
-            !(rangestrike && striker.getCreature().useMagicMissile()))
+        if (client.getBattleHex(target).getTerrain().equals("Brambles")
+            && target.getCreature().isNativeBramble()
+            && !striker.getCreature().isNativeBramble()
+            && !(rangestrike && striker.getCreature().useMagicMissile()))
         {
             strikeNumber++;
         }
@@ -976,10 +985,10 @@ final class Strike
         // Native defending in stone, from strike by a non-native: +1
         // Native defending in stone, from rangestrike by a non-native
         //     non-magicMissile: +1
-        if (client.getBattleHex(target).getTerrain().equals("Stone") &&
-            target.getCreature().isNativeStone() &&
-            !striker.getCreature().isNativeStone() &&
-            !(rangestrike && striker.getCreature().useMagicMissile()))
+        if (client.getBattleHex(target).getTerrain().equals("Stone")
+            && target.getCreature().isNativeStone()
+            && !striker.getCreature().isNativeStone()
+            && !(rangestrike && striker.getCreature().useMagicMissile()))
         {
             strikeNumber++;
         }
@@ -987,10 +996,9 @@ final class Strike
         // Native defending in tree, from strike by a non-native: +1
         // Native defending in tree, from rangestrike by a non-native
         //     non-magicMissile: no effect
-        if (client.getBattleHex(target).getTerrain().equals("Tree") &&
-            target.getCreature().isNativeTree() &&
-            !striker.getCreature().isNativeTree() &&
-            !(rangestrike))
+        if (client.getBattleHex(target).getTerrain().equals("Tree")
+            && target.getCreature().isNativeTree()
+            && !striker.getCreature().isNativeTree() && !(rangestrike))
         {
             strikeNumber++;
         }

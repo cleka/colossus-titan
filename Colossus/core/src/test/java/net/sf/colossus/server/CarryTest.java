@@ -60,23 +60,21 @@ public class CarryTest extends TestCase
 
     public void testCarries()
     {
-        String hexLabel = "35";  // Desert
+        String hexLabel = "35"; // Desert
 
-        attacker = new Legion("Rd03", "Rd01", hexLabel, null,
-            centaur, centaur, lion, colossus, null, null, null, null,
-            "Red", game);
-        defender = new Legion("Bu03", "Bu01", hexLabel, null,
-            hydra, null, null, null, null, null, null, null,
-            "Blue", game);
+        attacker = new Legion("Rd03", "Rd01", hexLabel, null, centaur,
+            centaur, lion, colossus, null, null, null, null, "Red", game);
+        defender = new Legion("Bu03", "Bu01", hexLabel, null, hydra, null,
+            null, null, null, null, null, null, "Blue", game);
 
         game.getPlayer("Red").addLegion(attacker);
         game.getPlayer("Blue").addLegion(defender);
 
         attacker.setEntrySide(5);
 
-        battle = new Battle(game, attacker.getMarkerId(),
-            defender.getMarkerId(), Constants.DEFENDER, hexLabel,
-            2, Constants.BattlePhase.FIGHT);
+        battle = new Battle(game, attacker.getMarkerId(), defender
+            .getMarkerId(), Constants.DEFENDER, hexLabel, 2,
+            Constants.BattlePhase.FIGHT);
 
         Critter centaur1 = attacker.getCritter(0);
         Critter centaur2 = attacker.getCritter(1);
@@ -126,23 +124,21 @@ public class CarryTest extends TestCase
 
     public void testCarries2()
     {
-        String hexLabel = "1";  // Plains
+        String hexLabel = "1"; // Plains
 
-        attacker = new Legion("Rd03", "Rd01", hexLabel, null,
-            warlock, warlock, colossus, null, null, null, null, null,
-            "Red", game);
-        defender = new Legion("Bu03", "Bu01", hexLabel, null,
-            gargoyle, ogre, ogre, null, null, null, null, null,
-            "Blue", game);
+        attacker = new Legion("Rd03", "Rd01", hexLabel, null, warlock,
+            warlock, colossus, null, null, null, null, null, "Red", game);
+        defender = new Legion("Bu03", "Bu01", hexLabel, null, gargoyle, ogre,
+            ogre, null, null, null, null, null, "Blue", game);
 
         game.getPlayer("Red").addLegion(attacker);
         game.getPlayer("Blue").addLegion(defender);
 
         attacker.setEntrySide(5);
 
-        battle = new Battle(game, attacker.getMarkerId(),
-            defender.getMarkerId(), Constants.ATTACKER, hexLabel,
-            3, Constants.BattlePhase.FIGHT);
+        battle = new Battle(game, attacker.getMarkerId(), defender
+            .getMarkerId(), Constants.ATTACKER, hexLabel, 3,
+            Constants.BattlePhase.FIGHT);
 
         Critter warlock1 = attacker.getCritter(0);
         Critter warlock2 = attacker.getCritter(1);

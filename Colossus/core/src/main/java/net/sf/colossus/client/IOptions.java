@@ -9,9 +9,14 @@ package net.sf.colossus.client;
 public interface IOptions
 {
     boolean getOption(String optname);
+
     String getStringOption(String optname);
+
     int getIntOption(String optname);
+
     void setOption(String optname, String value);
+
     void setOption(String optname, boolean value);
+
     void setOption(String optname, int value);
 }

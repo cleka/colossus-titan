@@ -19,10 +19,10 @@ import java.util.logging.Logger;
  * @author Romain Dolbeau
  */
 
-
 public final class Caretaker implements Cloneable
 {
-    private static final Logger LOGGER = Logger.getLogger(Caretaker.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(Caretaker.class
+        .getName());
 
     /** Mapping from String creature name to Integer count. If the
      *  creature is not found, assume that we have a full count (equal
@@ -103,29 +103,29 @@ public final class Caretaker implements Cloneable
         Integer count = (Integer)map.remove(creature.getName());
         if (count == null)
         {
-            LOGGER.log(Level.INFO, "First " + creature.getName() + " recruited");
-            map.put(creature.getName(), new Integer(
-                creature.getMaxCount() - 1));
+            LOGGER.log(Level.INFO, "First " + creature.getName()
+                + " recruited");
+            map.put(creature.getName(),
+                new Integer(creature.getMaxCount() - 1));
         }
         else
         {
             if (count.intValue() == creature.getMaxCount())
             {
                 // Not quite right for immortals.
-                LOGGER.log(Level.INFO,
-                    "First " + creature.getName() + " recruited");
+                LOGGER.log(Level.INFO, "First " + creature.getName()
+                    + " recruited");
             }
             if (count.intValue() == 1)
             {
                 // Not quite right for immortals.
-                LOGGER.log(Level.INFO,
-                    "Last " + creature.getName() + " recruited");
+                LOGGER.log(Level.INFO, "Last " + creature.getName()
+                    + " recruited");
             }
             if (count.intValue() <= 0)
             {
-                LOGGER.log(Level.SEVERE, "Too many " + creature.getName() +
-                    " recruited, only " + count.intValue() +
-                    " left ?!?");
+                LOGGER.log(Level.SEVERE, "Too many " + creature.getName()
+                    + " recruited, only " + count.intValue() + " left ?!?");
             }
             map.put(creature.getName(), new Integer(count.intValue() - 1));
         }
@@ -158,8 +158,8 @@ public final class Caretaker implements Cloneable
         Integer count = (Integer)map.get(name);
         if (count == null)
         {
-            LOGGER.log(Level.WARNING, "A Creature by the name of " + name +
-                " died before any was taken.");
+            LOGGER.log(Level.WARNING, "A Creature by the name of " + name
+                + " died before any was taken.");
         }
         updateDisplays(creature.getName());
     }
@@ -173,8 +173,7 @@ public final class Caretaker implements Cloneable
             if (creatureName != null)
             {
                 server.allUpdateCreatureCount(creatureName,
-                    getCount(creatureName),
-                    getDeadCount(creatureName));
+                    getCount(creatureName), getDeadCount(creatureName));
             }
         }
     }

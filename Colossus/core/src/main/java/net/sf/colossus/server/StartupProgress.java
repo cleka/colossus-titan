@@ -75,11 +75,13 @@ public final class StartupProgress implements ActionListener
 
     public void setCompleted()
     {
-        if (this.autoCloseCheckBox.isSelected()) {
+        if (this.autoCloseCheckBox.isSelected())
+        {
             this.dispose();
             return;
         }
-        this.text.append("OK, all clients have come in. You can close this window now.");
+        this.text
+            .append("OK, all clients have come in. You can close this window now.");
 
         JButton b2 = new JButton("Close");
         b2.setMnemonic(KeyEvent.VK_C);
@@ -95,7 +97,7 @@ public final class StartupProgress implements ActionListener
 
     public void dispose()
     {
-        if ( this.logFrame != null )
+        if (this.logFrame != null)
         {
             this.logFrame.dispose();
             this.logFrame = null;
@@ -119,8 +121,8 @@ public final class StartupProgress implements ActionListener
             b3.setMnemonic(KeyEvent.VK_C);
             b3.setActionCommand("totallyquit");
             b3.addActionListener(this);
-            b3.setToolTipText("Click this button to totally exit " +
-                "this application.");
+            b3.setToolTipText("Click this button to totally exit "
+                + "this application.");
             this.pane.remove(this.b);
             this.pane.add(b3, BorderLayout.SOUTH);
             this.logFrame.pack();
@@ -133,8 +135,8 @@ public final class StartupProgress implements ActionListener
         // so user can request a System.exit() then.
         else if (e.getActionCommand().equals("totallyquit"))
         {
-            this.text.append("\nQUIT - Total Exit requested, " +
-                "doing System.exit() !!\n");
+            this.text.append("\nQUIT - Total Exit requested, "
+                + "doing System.exit() !!\n");
             this.server.startupProgressQuit();
         }
 

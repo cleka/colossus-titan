@@ -49,9 +49,9 @@ final class ShowBattleMap extends HexMap implements WindowListener,
         HashMap neighbors = findOutNeighbors(guiHex);
         String neighborsText = (String)neighbors.get("text");
 
-        dialog = new JDialog(parentFrame, "Battle Map for " +
-            hex.getTerrainName() + " " + masterHexLabel + " " +
-            neighborsText, true);
+        dialog = new JDialog(parentFrame, "Battle Map for "
+            + hex.getTerrainName() + " " + masterHexLabel + " "
+            + neighborsText, true);
         laidOut = false;
 
         Container contentPane = dialog.getContentPane();
@@ -61,8 +61,8 @@ final class ShowBattleMap extends HexMap implements WindowListener,
         String text = (String)neighbors.get(Constants.left);
         if (!text.equals(NoLandText))
         {
-            leftButton = new JButton(
-                "<HTML>"+Constants.left + ":<BR>"+text+"</HTML>");
+            leftButton = new JButton("<HTML>" + Constants.left + ":<BR>"
+                + text + "</HTML>");
             leftButton.setEnabled(false);
             contentPane.add(leftButton);
         }
@@ -70,8 +70,8 @@ final class ShowBattleMap extends HexMap implements WindowListener,
         text = (String)neighbors.get(Constants.bottom);
         if (!text.equals(NoLandText))
         {
-            bottomButton = new JButton(
-                "<HTML>"+Constants.bottom  + ":<BR>"+text+"</HTML>");
+            bottomButton = new JButton("<HTML>" + Constants.bottom + ":<BR>"
+                + text + "</HTML>");
             bottomButton.setEnabled(false);
             contentPane.add(bottomButton);
         }
@@ -79,8 +79,8 @@ final class ShowBattleMap extends HexMap implements WindowListener,
         text = (String)neighbors.get(Constants.right);
         if (!text.equals(NoLandText))
         {
-            rightButton = new JButton(
-                "<HTML>"+Constants.right + ":<BR>"+text+"</HTML>");
+            rightButton = new JButton("<HTML>" + Constants.right + ":<BR>"
+                + text + "</HTML>");
             rightButton.setEnabled(false);
             contentPane.add(rightButton);
         }
@@ -104,20 +104,20 @@ final class ShowBattleMap extends HexMap implements WindowListener,
         boolean inverted = guiHex.isInverted();
         MasterHex model = guiHex.getMasterHexModel();
 
-        String right  = NoLandText;
-        String left   = NoLandText;
+        String right = NoLandText;
+        String left = NoLandText;
         String bottom = NoLandText;
 
-        for (int i=0 ; i < 6 ; i++)
+        for (int i = 0; i < 6; i++)
         {
-            int sideConsideringInverting = inverted ? ((i+3) % 6) : i;
+            int sideConsideringInverting = inverted ? ((i + 3) % 6) : i;
             MasterHex neighbor = model.getNeighbor(sideConsideringInverting);
             if (neighbor != null)
             {
                 String nName = neighbor.getTerrainDisplayName();
                 String nLabel = neighbor.getLabel();
-                int entrySide = (6 + sideConsideringInverting -
-                    model.getLabelSide()) % 6;
+                int entrySide = (6 + sideConsideringInverting - model
+                    .getLabelSide()) % 6;
 
                 if (entrySide == 1)
                 {
@@ -134,9 +134,9 @@ final class ShowBattleMap extends HexMap implements WindowListener,
             }
         }
 
-        neighborsText = Constants.right + ": " + right + ", " +
-            Constants.bottom + ": " + bottom + ", " +
-            Constants.left + ": " + left + ")";
+        neighborsText = Constants.right + ": " + right + ", "
+            + Constants.bottom + ": " + bottom + ", " + Constants.left + ": "
+            + left + ")";
 
         HashMap neighbors = new HashMap(4);
         neighbors.put("text", neighborsText);
@@ -182,8 +182,8 @@ final class ShowBattleMap extends HexMap implements WindowListener,
             }
             if (rightButton != null)
             {
-                rightButton.setBounds((int)(cx + 18.5 * scale),
-                    cy + 11 * scale, d.width / 6, height);
+                rightButton.setBounds((int)(cx + 18.5 * scale), cy + 11
+                    * scale, d.width / 6, height);
             }
 
             laidOut = true;

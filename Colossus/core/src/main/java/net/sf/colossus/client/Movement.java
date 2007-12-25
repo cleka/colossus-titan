@@ -20,10 +20,10 @@ import net.sf.colossus.util.Split;
 
 // XXX There is massive duplication of code between this class and
 // the server-side movement code in Game.  Need to completely refactor.
-
 public final class Movement
 {
-    private static final Logger LOGGER = Logger.getLogger(Movement.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(Movement.class
+        .getName());
 
     Client client;
 
@@ -55,8 +55,8 @@ public final class Movement
      *  arrows.  If block == -2, use only arrows.  Do not double back in
      *  the direction you just came from.  Return a set of 
      *  hexLabel:entrySide tuples. */
-    private Set findNormalMoves(MasterHex hex, LegionInfo legion,
-        int roll, int block, int cameFrom, String fromHexLabel)
+    private Set findNormalMoves(MasterHex hex, LegionInfo legion, int roll,
+        int block, int cameFrom, String fromHexLabel)
     {
         Set set = new HashSet();
         String hexLabel = hex.getLabel();
@@ -67,16 +67,18 @@ public final class Movement
         // also a friendly legion there, just stop recursing.
         // Do a check versus fromHexLabel if we are evaluating
         // passing through this hex
-        if (client.getNumEnemyLegions(hexLabel, player.getName()) > 0 &&
-            !hexLabel.equals(fromHexLabel))
+        if (client.getNumEnemyLegions(hexLabel, player.getName()) > 0
+            && !hexLabel.equals(fromHexLabel))
         {
             if (client.getNumFriendlyLegions(hexLabel, player.getName()) == 0)
             {
                 // Set the entry side relative to the hex label.
                 if (cameFrom != -1)
                 {
-                    set.add(hexLabel + ":" + BattleMap.entrySideName(
-                        findEntrySide(hex, cameFrom)));
+                    set.add(hexLabel
+                        + ":"
+                        + BattleMap
+                            .entrySideName(findEntrySide(hex, cameFrom)));
                 }
             }
             return set;
@@ -100,8 +102,8 @@ public final class Movement
 
             if (cameFrom != -1)
             {
-                set.add(hexLabel + ":" + BattleMap.entrySideName(
-                    findEntrySide(hex, cameFrom)));
+                set.add(hexLabel + ":"
+                    + BattleMap.entrySideName(findEntrySide(hex, cameFrom)));
                 return set;
             }
         }
@@ -162,8 +164,9 @@ public final class Movement
         {
             for (int i = 0; i < 6; i++)
             {
-                if (i != cameFrom && (hex.getExitType(i) != Constants.NONE ||
-                    hex.getEntranceType(i) != Constants.NONE))
+                if (i != cameFrom
+                    && (hex.getExitType(i) != Constants.NONE || hex
+                        .getEntranceType(i) != Constants.NONE))
                 {
                     set.addAll(findNearbyUnoccupiedHexes(hex.getNeighbor(i),
                         legion, roll - 1, (i + 3) % 6));
@@ -181,8 +184,8 @@ public final class Movement
     }
 
     /** Return set of hexLabels describing where this legion can move. */
-    public Set listAllMoves(LegionInfo legion, MasterHex hex, int movementRoll,
-        boolean inAdvance)
+    public Set listAllMoves(LegionInfo legion, MasterHex hex,
+        int movementRoll, boolean inAdvance)
     {
         Set set = listNormalMoves(legion, hex, movementRoll, inAdvance, null);
         set.addAll(listTeleportMoves(legion, hex, movementRoll, inAdvance));
@@ -249,8 +252,8 @@ public final class Movement
         {
             return false;
         }
-        if (client.getTurnNumber() == 1 &&
-            client.getOption(Options.noFirstTurnTeleport))
+        if (client.getTurnNumber() == 1
+            && client.getOption(Options.noFirstTurnTeleport))
         {
             return false;
         }
@@ -263,8 +266,8 @@ public final class Movement
         {
             return false;
         }
-        if (client.getTurnNumber() == 1 &&
-            client.getOption(Options.noFirstTurnT2TTeleport))
+        if (client.getTurnNumber() == 1
+            && client.getOption(Options.noFirstTurnT2TTeleport))
         {
             return false;
         }
@@ -290,8 +293,8 @@ public final class Movement
         {
             return false;
         }
-        if (client.getTurnNumber() == 1 &&
-            client.getOption(Options.noFirstTurnTeleport))
+        if (client.getTurnNumber() == 1
+            && client.getOption(Options.noFirstTurnTeleport))
         {
             return false;
         }
@@ -311,15 +314,16 @@ public final class Movement
         PlayerInfo player = legion.getPlayerInfo();
 
         Set set = new HashSet();
-        if (hex == null || ((!inAdvance) && (movementRoll != 6 ||
-            legion.hasMoved() || player.hasTeleported())))
+        if (hex == null
+            || ((!inAdvance) && (movementRoll != 6 || legion.hasMoved() || player
+                .hasTeleported())))
         {
             return set;
         }
 
         // Tower teleport
-        if (HexMap.terrainIsTower(hex.getTerrain()) && legion.numLords() > 0 &&
-            towerTeleportAllowed())
+        if (HexMap.terrainIsTower(hex.getTerrain()) && legion.numLords() > 0
+            && towerTeleportAllowed())
         {
             // Mark every unoccupied hex within 6 hexes.
             if (towerToNonTowerTeleportAllowed())
@@ -338,8 +342,8 @@ public final class Movement
                     String hexLabel = (String)it.next();
                     if (MasterBoard.getHexByLabel(hexLabel) != null)
                     {
-                        if (!client.isOccupied(hexLabel) &&
-                            (!(hexLabel.equals(hex.getLabel()))))
+                        if (!client.isOccupied(hexLabel)
+                            && (!(hexLabel.equals(hex.getLabel()))))
                         {
                             set.add(hexLabel);
                         }
@@ -360,8 +364,8 @@ public final class Movement
         }
 
         // Titan teleport
-        if (player.canTitanTeleport() && legion.hasTitan() &&
-            titanTeleportAllowed())
+        if (player.canTitanTeleport() && legion.hasTitan()
+            && titanTeleportAllowed())
         {
             // Mark every hex containing an enemy stack that does not
             // already contain a friendly stack.
@@ -398,13 +402,13 @@ public final class Movement
 
         if (teleport)
         {
-            if (listTeleportMoves(legion, currentHex, movementRoll)
-                .contains(targetHexLabel))
+            if (listTeleportMoves(legion, currentHex, movementRoll).contains(
+                targetHexLabel))
             {
                 // Startlisted terrain only have bottom entry side.
                 // Don't bother finding more than one entry side if unoccupied.
-                if (!client.isOccupied(targetHexLabel) ||
-                    HexMap.terrainHasStartlist(targetHex.getTerrain()))
+                if (!client.isOccupied(targetHexLabel)
+                    || HexMap.terrainHasStartlist(targetHex.getTerrain()))
 
                 {
                     entrySides.add(Constants.bottom);

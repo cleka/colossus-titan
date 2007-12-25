@@ -30,7 +30,6 @@ import net.sf.colossus.util.Options;
  *  @author Clemens Katzer
  */
 
-
 public class GameInfo extends Thread
 {
     // the possible states of a game:
@@ -274,7 +273,7 @@ public class GameInfo extends Thread
         Iterator it = players.iterator();
         while (it.hasNext())
         {
-            if (playerList.length() != 0 )
+            if (playerList.length() != 0)
             {
                 playerList.append(", ");
             }
@@ -354,13 +353,14 @@ public class GameInfo extends Thread
                 enrolledPlayers--;
                 if (players.size() != enrolledPlayers)
                 {
-                    System.out.println("\n\nSEVERE: players.size() != enrolledPlayers!!");
+                    System.out
+                        .println("\n\nSEVERE: players.size() != enrolledPlayers!!");
                 }
             }
             else
             {
-                reason = "Player " + user.getName() +
-                    " to unenroll not found in game " + gameId;
+                reason = "Player " + user.getName()
+                    + " to unenroll not found in game " + gameId;
             }
         }
 
@@ -378,12 +378,11 @@ public class GameInfo extends Thread
             playerList.append(user.getName());
         }
 
-        String message = gameId + sep + state + sep + initiator + sep + variant +
-            sep + viewmode +
-            sep + eventExpiring + sep + unlimitedMulligans + sep +
-            balancedTowers +
-            sep + min + sep + target + sep + max + sep + enrolledPlayers +
-            playerList.toString();
+        String message = gameId + sep + state + sep + initiator + sep
+            + variant + sep + viewmode + sep + eventExpiring + sep
+            + unlimitedMulligans + sep + balancedTowers + sep + min + sep
+            + target + sep + max + sep + enrolledPlayers
+            + playerList.toString();
 
         return message;
     }
@@ -439,16 +438,16 @@ public class GameInfo extends Thread
             games.put(key, gi);
         }
 
-        gi.state     = Integer.parseInt(tokens[2]);
+        gi.state = Integer.parseInt(tokens[2]);
         gi.initiator = tokens[3];
-        gi.variant   = tokens[4];
-        gi.viewmode  = tokens[5];
+        gi.variant = tokens[4];
+        gi.viewmode = tokens[5];
         gi.eventExpiring = tokens[6];
         gi.unlimitedMulligans = Boolean.valueOf(tokens[7]).booleanValue();
         gi.balancedTowers = Boolean.valueOf(tokens[8]).booleanValue();
-        gi.min       = Integer.parseInt(tokens[9]);
-        gi.target    = Integer.parseInt(tokens[10]);
-        gi.max       = Integer.parseInt(tokens[11]);
+        gi.min = Integer.parseInt(tokens[9]);
+        gi.target = Integer.parseInt(tokens[10]);
+        gi.max = Integer.parseInt(tokens[11]);
         int lastIndex = 12;
         gi.enrolledPlayers = Integer.parseInt(tokens[lastIndex]);
 
@@ -456,7 +455,7 @@ public class GameInfo extends Thread
         int i = 1;
         while (i <= gi.enrolledPlayers)
         {
-            String name = tokens[lastIndex+i];
+            String name = tokens[lastIndex + i];
             User user = new User(name);
             players.add(user);
             i++;
@@ -481,11 +480,11 @@ public class GameInfo extends Thread
 
     // ================= now the stuff for running the game on server side ===============
 
-    public boolean makeRunningGame(IRunWebServer server, String baseDir, String template,
-        String javaCommand, String colossusJar, int portNr)
+    public boolean makeRunningGame(IRunWebServer server, String baseDir,
+        String template, String javaCommand, String colossusJar, int portNr)
     {
         this.server = server;
-        this.AIplayers = 0;  // not supported yet
+        this.AIplayers = 0; // not supported yet
 
         this.workFilesBaseDir = baseDir;
         this.template = template;
@@ -503,7 +502,7 @@ public class GameInfo extends Thread
         File gameDir = new File(workFilesBaseDir, gameId);
         gameDir.mkdirs();
 
-        String fileName = "Game."+gameId+".running.flag";
+        String fileName = "Game." + gameId + ".running.flag";
 
         this.flagFile = new File(gameDir, fileName);
         if (flagFile.exists())
@@ -520,21 +519,23 @@ public class GameInfo extends Thread
 
         Runtime rt = Runtime.getRuntime();
 
-        String loggingFileArg = propFileOk ?
-            "-Djava.util.logging.config.file=" + logPropFile : "";
+        String loggingFileArg = propFileOk ? "-Djava.util.logging.config.file="
+            + logPropFile
+            : "";
 
-        String command = javaCommand + " " + loggingFileArg +
-            " -Duser.home=" + gameDir +
-            " -jar " + colossusJar + " -p " + portNr +
-            " -n " + this.enrolledPlayers + " -i " + this.AIplayers +
-            " -g --flagfile " + fileName;
+        String command = javaCommand + " " + loggingFileArg + " -Duser.home="
+            + gameDir + " -jar " + colossusJar + " -p " + portNr + " -n "
+            + this.enrolledPlayers + " -i " + this.AIplayers
+            + " -g --flagfile " + fileName;
 
         try
         {
             Process p = rt.exec(command, null, gameDir);
             p.getOutputStream().close();
-            NullDumper ndout = new NullDumper(p, false, p.getInputStream(), gameId+"_OUT: ").start();
-            NullDumper nderr = new NullDumper(p, false, p.getErrorStream(), gameId+"_ERR: ").start();
+            NullDumper ndout = new NullDumper(p, false, p.getInputStream(),
+                gameId + "_OUT: ").start();
+            NullDumper nderr = new NullDumper(p, false, p.getErrorStream(),
+                gameId + "_ERR: ").start();
 
             superviseGameStartup();
 
@@ -543,8 +544,8 @@ public class GameInfo extends Thread
         }
         catch (Exception e)
         {
-            System.out.println("Executing\n" + command +
-                "\ndid throw exception:\n" + e.toString());
+            System.out.println("Executing\n" + command
+                + "\ndid throw exception:\n" + e.toString());
         }
     }
 
@@ -569,17 +570,20 @@ public class GameInfo extends Thread
             }
             else
             {
-                System.out.println("\n\n!!!!!!!!!!!!!!!!!\nSEVERE: game started but not all clients came in!!");
+                System.out
+                    .println("\n\n!!!!!!!!!!!!!!!!!\nSEVERE: game started but not all clients came in!!");
             }
         }
         else
         {
-            System.out.println("\n\n!!!!!!!!!!!!!!!!!\nSEVERE: game did not came up!!");
+            System.out
+                .println("\n\n!!!!!!!!!!!!!!!!!\nSEVERE: game did not came up!!");
         }
 
     }
 
-    private void waitForGameShutdown(Process p, NullDumper ndout, NullDumper nderr)
+    private void waitForGameShutdown(Process p, NullDumper ndout,
+        NullDumper nderr)
     {
         try
         {
@@ -598,8 +602,8 @@ public class GameInfo extends Thread
 
             if (exitCode != 0)
             {
-                System.out.println("After waitFor... - exit code is " +
-                    exitCode);
+                System.out.println("After waitFor... - exit code is "
+                    + exitCode);
             }
         }
         catch (InterruptedException e)
@@ -610,9 +614,10 @@ public class GameInfo extends Thread
 
         if (flagFile.exists())
         {
-            System.out.println("Game " + gameId + " ended but flagfile " +
-                flagFile.toString() +
-                " does still exist...? Deleting it...");
+            System.out
+                .println("Game " + gameId + " ended but flagfile "
+                    + flagFile.toString()
+                    + " does still exist...? Deleting it...");
             flagFile.delete();
         }
         else
@@ -633,13 +638,13 @@ public class GameInfo extends Thread
         try
         {
             String line;
-            BufferedReader in =
-                new BufferedReader(new InputStreamReader(
+            BufferedReader in = new BufferedReader(new InputStreamReader(
                 new FileInputStream(logPropTemplate)));
 
-            PrintWriter out = new PrintWriter(new FileOutputStream(logPropFile));
+            PrintWriter out = new PrintWriter(
+                new FileOutputStream(logPropFile));
 
-            while ( (line = in.readLine()) != null )
+            while ((line = in.readLine()) != null)
             {
                 if (line.startsWith(patternLine))
                 {
@@ -650,7 +655,7 @@ public class GameInfo extends Thread
                     // replace the \ of a Windows directory to /'es,
                     // because as it looks the java logger only accepts those,
                     // and uses backslashes just as quote character...
-                    line = new String(patternLine+"Colossus%g.log");
+                    line = new String(patternLine + "Colossus%g.log");
                 }
                 out.println(line);
             }
@@ -675,7 +680,8 @@ public class GameInfo extends Thread
         boolean ok = true;
 
         String gameDirPath = gameDir.getPath();
-        Options gameOptions = new Options("server", gameDirPath + "/.colossus/");
+        Options gameOptions = new Options("server", gameDirPath
+            + "/.colossus/");
 
         gameOptions.setOption(Options.variant, this.variant);
         gameOptions.setOption(Options.viewMode, this.viewmode);
@@ -723,7 +729,7 @@ public class GameInfo extends Thread
     {
         boolean up = false;
 
-        for (int i=0 ; !up && i < timeout ; i++)
+        for (int i = 0; !up && i < timeout; i++)
         {
             up = isSocketUp();
             if (!up)
@@ -764,25 +770,26 @@ public class GameInfo extends Thread
         BufferedReader in = null;
         try
         {
-            in = new BufferedReader(new InputStreamReader(
-                new FileInputStream(flagFile)));
+            in = new BufferedReader(new InputStreamReader(new FileInputStream(
+                flagFile)));
         }
         catch (FileNotFoundException ef)
         {
-            System.out.println("FATAL ERROR: FileNotFoundExcepton " +
-                ef.toString());
+            System.out.println("FATAL ERROR: FileNotFoundExcepton "
+                + ef.toString());
         }
 
         if (in == null)
         {
-            System.out.println("FATAL ERROR: could not open flagfile for reading!!");
+            System.out
+                .println("FATAL ERROR: could not open flagfile for reading!!");
             return false;
         }
 
         int connected = 0;
         int checkInterval = 1000; // every second
 
-        for (int i=0 ; !ok && i < timeout ; i++)
+        for (int i = 0; !ok && i < timeout; i++)
         {
             line = waitForLine(in, checkInterval);
             if (line == null)
@@ -799,7 +806,7 @@ public class GameInfo extends Thread
                 ok = true;
             }
 
-            if ( connected >= players.size())
+            if (connected >= players.size())
             {
                 ok = true;
             }
@@ -851,7 +858,8 @@ public class GameInfo extends Thread
         String prefix;
         Thread thread;
 
-        public NullDumper(Process p, boolean toNull, InputStream is, String prefix)
+        public NullDumper(Process p, boolean toNull, InputStream is,
+            String prefix)
         {
             this.process = p;
             this.toNull = toNull;
@@ -922,4 +930,3 @@ public class GameInfo extends Thread
     } // END Class NullDumper
 
 }
-

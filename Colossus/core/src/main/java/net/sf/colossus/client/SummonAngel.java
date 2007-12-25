@@ -32,31 +32,27 @@ import net.sf.colossus.util.KDialog;
  * @author Romain Dolbeau
  */
 
-
 final class SummonAngel extends KDialog implements MouseListener,
     ActionListener, WindowListener
 {
-    private static final Logger LOGGER = Logger.getLogger(SummonAngel.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(SummonAngel.class
+        .getName());
 
     private String markerId;
     private List sumChitList = new ArrayList();
     private JButton cancelButton;
     private static boolean active;
     private Client client;
-    private static final String baseSummonString =
-        ": Summon Angel into Legion ";
-    private static final String sourceSummonString =
-        " Selected Legion is ";
-    private static final String noSourceSummonString =
-        " No selected Legion";
+    private static final String baseSummonString = ": Summon Angel into Legion ";
+    private static final String sourceSummonString = " Selected Legion is ";
+    private static final String noSourceSummonString = " No selected Legion";
     private SaveWindow saveWindow;
 
     private SummonAngel(Client client, String markerId)
     {
-        super(client.getBoard().getFrame(),
-            client.getPlayerName() + baseSummonString +
-            Legion.getLongMarkerName(markerId) + noSourceSummonString,
-            false);
+        super(client.getBoard().getFrame(), client.getPlayerName()
+            + baseSummonString + Legion.getLongMarkerName(markerId)
+            + noSourceSummonString, false);
 
         this.client = client;
         this.markerId = markerId;
@@ -126,8 +122,8 @@ final class SummonAngel extends KDialog implements MouseListener,
         if (!active)
         {
             active = true;
-            LOGGER.log(Level.FINEST,
-                "returning new SummonAngel dialog for " + markerId);
+            LOGGER.log(Level.FINEST, "returning new SummonAngel dialog for "
+                + markerId);
             return new SummonAngel(client, markerId);
         }
         return null;
@@ -179,15 +175,15 @@ final class SummonAngel extends KDialog implements MouseListener,
         String donorId = client.getDonorId();
         if (donorId == null)
         {
-            setTitle(client.getPlayerName() + baseSummonString +
-                Legion.getLongMarkerName(markerId) + noSourceSummonString);
+            setTitle(client.getPlayerName() + baseSummonString
+                + Legion.getLongMarkerName(markerId) + noSourceSummonString);
             return;
         }
         else
         {
-            setTitle(client.getPlayerName() + baseSummonString +
-                Legion.getLongMarkerName(markerId) + sourceSummonString +
-                Legion.getLongMarkerName(donorId));
+            setTitle(client.getPlayerName() + baseSummonString
+                + Legion.getLongMarkerName(markerId) + sourceSummonString
+                + Legion.getLongMarkerName(donorId));
         }
         Iterator it = sumChitList.iterator();
         while (it.hasNext())

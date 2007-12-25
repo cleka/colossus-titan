@@ -24,9 +24,10 @@ import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
 public final class Legion implements Comparable
 {
-    private static final Logger LOGGER = Logger.getLogger(Legion.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(Legion.class
+        .getName());
 
-    private String markerId;    // Bk03, Rd12, etc.
+    private String markerId; // Bk03, Rd12, etc.
     private String parentId;
     private List critters = new ArrayList();
     private String currentHexLabel;
@@ -95,20 +96,15 @@ public final class Legion implements Comparable
     static Legion getStartingLegion(String markerId, String hexLabel,
         String playerName, Game game)
     {
-        Creature[] startCre = TerrainRecruitLoader.getStartingCreatures(
-            MasterBoard.getHexByLabel(hexLabel).getTerrain());
-        Legion legion =
-            new Legion(markerId, null, hexLabel, hexLabel,
+        Creature[] startCre = TerrainRecruitLoader
+            .getStartingCreatures(MasterBoard.getHexByLabel(hexLabel)
+                .getTerrain());
+        Legion legion = new Legion(markerId, null, hexLabel, hexLabel,
             Creature.getCreatureByName(Constants.titan),
-            Creature.getCreatureByName(
-            TerrainRecruitLoader.getPrimaryAcquirable()),
-            startCre[2],
-            startCre[2],
-            startCre[0],
-            startCre[0],
-            startCre[1],
-            startCre[1],
-            playerName, game);
+            Creature.getCreatureByName(TerrainRecruitLoader
+                .getPrimaryAcquirable()), startCre[2], startCre[2],
+            startCre[0], startCre[0], startCre[1], startCre[1], playerName,
+            game);
 
         Iterator it = legion.getCritters().iterator();
         while (it.hasNext())
@@ -122,10 +118,8 @@ public final class Legion implements Comparable
     static Legion getEmptyLegion(String markerId, String parentId,
         String hexLabel, String playerName, Game game)
     {
-        Legion legion =
-            new Legion(markerId, parentId, hexLabel, hexLabel, null,
-            null, null, null, null, null, null, null,
-            playerName, game);
+        Legion legion = new Legion(markerId, parentId, hexLabel, hexLabel,
+            null, null, null, null, null, null, null, null, playerName, game);
         return legion;
     }
 
@@ -149,29 +143,29 @@ public final class Legion implements Comparable
             return;
         }
         Player player = getPlayer();
-        int score = player.getScore();   // 375
-        player.addPoints(points);        // 375 + 150 = 525
+        int score = player.getScore(); // 375
+        player.addPoints(points); // 375 + 150 = 525
         int value = TerrainRecruitLoader.getAcquirableRecruitmentsValue();
         // 100
-        int tmpScore = score;            // 375
-        int tmpPoints = points;          // 150
+        int tmpScore = score; // 375
+        int tmpPoints = points; // 150
 
         // round Score down, and tmpPoints by the same amount.
         // this allow to keep all points
-        int round = (tmpScore % value);  //  75
-        tmpScore -= round;               // 300
-        tmpPoints += round;              // 225
+        int round = (tmpScore % value); //  75
+        tmpScore -= round; // 300
+        tmpPoints += round; // 225
 
         List recruits;
 
         while ((getHeight() < 7) && (tmpPoints >= value))
         {
-            tmpScore += value;           // 400   500
-            tmpPoints -= value;          // 125    25
+            tmpScore += value; // 400   500
+            tmpPoints -= value; // 125    25
             recruits = game.findEligibleAngels(this, tmpScore);
             if ((recruits != null) && (!recruits.isEmpty()))
             {
-                angelsToAcquire++;       // 1       2
+                angelsToAcquire++; // 1       2
                 game.askAcquireAngel(getPlayerName(), getMarkerId(), recruits);
             }
         }
@@ -191,8 +185,8 @@ public final class Legion implements Comparable
         {
             if (getHeight() >= 7)
             {
-                LOGGER.log(Level.INFO, "Legion " + getLongMarkerName() +
-                    " is full and cannot acquire: " + angelType);
+                LOGGER.log(Level.INFO, "Legion " + getLongMarkerName()
+                    + " is full and cannot acquire: " + angelType);
             }
             else
             {
@@ -200,8 +194,8 @@ public final class Legion implements Comparable
                 if (angel != null)
                 {
                     addCreature(angel, true);
-                    LOGGER.log(Level.INFO, "Legion " + getLongMarkerName() +
-                        " acquires one " + angelType);
+                    LOGGER.log(Level.INFO, "Legion " + getLongMarkerName()
+                        + " acquires one " + angelType);
                     game.getServer().allTellAddCreature(getMarkerId(),
                         angelType, true, Constants.reasonAcquire);
                 }
@@ -260,8 +254,7 @@ public final class Legion implements Comparable
 
     public static String getMarkerName(String markerId)
     {
-        return VariantSupport.getMarkerNamesProperties()
-            .getProperty(markerId);
+        return VariantSupport.getMarkerNamesProperties().getProperty(markerId);
     }
 
     public static String getLongMarkerName(String markerId)
@@ -456,8 +449,8 @@ public final class Legion implements Comparable
     /** Do the cleanup required before this legion can be removed. */
     void prepareToRemove(boolean returnCrittersToStacks, boolean updateHistory)
     {
-        LOGGER.log(Level.INFO,
-            "Legion " + markerId + critters.toString() + " is eliminated");
+        LOGGER.log(Level.INFO, "Legion " + markerId + critters.toString()
+            + " is eliminated");
         if (getHeight() > 0)
         {
             // Return immortals to the stacks, others to the Graveyard
@@ -502,15 +495,14 @@ public final class Legion implements Comparable
             player.setTeleported(true);
         }
 
-        LOGGER.log(Level.INFO, "Legion " + getLongMarkerName() + " in " +
-            getStartingHexLabel() +
-            (teleported ?
-            (game.getNumEnemyLegions(hexLabel, game.getPlayer(playerName)) >
-            0 ?
-            " titan teleports " :
-            " tower teleports (" + teleportingLord + ") ") :
-            " moves ") +
-            "to " + hex.getDescription() + " entering on " + entrySide);
+        LOGGER.log(Level.INFO, "Legion "
+            + getLongMarkerName()
+            + " in "
+            + getStartingHexLabel()
+            + (teleported ? (game.getNumEnemyLegions(hexLabel, game
+                .getPlayer(playerName)) > 0 ? " titan teleports "
+                : " tower teleports (" + teleportingLord + ") ") : " moves ")
+            + "to " + hex.getDescription() + " entering on " + entrySide);
     }
 
     boolean hasConventionalMove()
@@ -533,8 +525,8 @@ public final class Legion implements Comparable
             currentHexLabel = startingHexLabel;
 
             moved = false;
-            LOGGER.log(Level.INFO,
-                "Legion " + getLongMarkerName() + " undoes its move");
+            LOGGER.log(Level.INFO, "Legion " + getLongMarkerName()
+                + " undoes its move");
         }
     }
 
@@ -565,9 +557,8 @@ public final class Legion implements Comparable
      *  battle as well as during the muster phase. */
     boolean canRecruit()
     {
-        return (recruitName == null && getHeight() <= 6 &&
-            !getPlayer().isDead() &&
-            !(game.findEligibleRecruits(
+        return (recruitName == null && getHeight() <= 6
+            && !getPlayer().isDead() && !(game.findEligibleRecruits(
             getMarkerId(), getCurrentHexLabel()).isEmpty()));
     }
 
@@ -579,8 +570,8 @@ public final class Legion implements Comparable
             game.getCaretaker().putOneBack(creature);
             removeCreature(creature, false, true);
             recruitName = null;
-            LOGGER.log(Level.INFO, "Legion " + getLongMarkerName() +
-                " undoes its recruit");
+            LOGGER.log(Level.INFO, "Legion " + getLongMarkerName()
+                + " undoes its recruit");
         }
     }
 
@@ -659,9 +650,9 @@ public final class Legion implements Comparable
             }
             else
             {
-                LOGGER.log(Level.SEVERE,
-                    "Tried to addCreature "+creature.toString()+
-                    " when there were none of those left!");
+                LOGGER.log(Level.SEVERE, "Tried to addCreature "
+                    + creature.toString()
+                    + " when there were none of those left!");
                 return false;
             }
         }
@@ -702,8 +693,8 @@ public final class Legion implements Comparable
 
     /** Remove the first creature matching the passed creature's type
      from the legion.  Return the removed creature. */
-    Creature removeCreature(Creature creature, boolean
-        returnImmortalToStack, boolean disbandIfEmpty)
+    Creature removeCreature(Creature creature, boolean returnImmortalToStack,
+        boolean disbandIfEmpty)
     {
         // indexOf wants the same object, not just the same type.
         // So use getCritter() to get the correct object.
@@ -851,14 +842,14 @@ public final class Legion implements Comparable
             prepareToRemove(false, false);
         }
 
-        LOGGER.log(Level.INFO, "Legion " + getLongMarkerName() +
-            " recombined into legion " + legion.getLongMarkerName());
+        LOGGER.log(Level.INFO, "Legion " + getLongMarkerName()
+            + " recombined into legion " + legion.getLongMarkerName());
 
         sortCritters();
 
         // Let the clients know that the legions have recombined.
-        game.getServer().undidSplit(getMarkerId(), legion.getMarkerId(),
-            true, game.getTurnNumber());
+        game.getServer().undidSplit(getMarkerId(), legion.getMarkerId(), true,
+            game.getTurnNumber());
     }
 
     /**
@@ -895,9 +886,9 @@ public final class Legion implements Comparable
         player.addLegion(newLegion);
 
         game.getServer().allUpdatePlayerInfo();
-        LOGGER.log(Level.INFO, newLegion.getHeight() +
-            " creatures are split off from legion " + getLongMarkerName() +
-            " into new legion " + newLegion.getLongMarkerName());
+        LOGGER.log(Level.INFO, newLegion.getHeight()
+            + " creatures are split off from legion " + getLongMarkerName()
+            + " into new legion " + newLegion.getLongMarkerName());
 
         sortCritters();
         newLegion.sortCritters();

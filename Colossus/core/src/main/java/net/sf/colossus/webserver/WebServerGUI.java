@@ -26,7 +26,8 @@ import javax.swing.JScrollPane;
  *  @author Clemens Katzer
  */
 
-public class WebServerGUI extends JFrame implements WindowListener, ActionListener, IWebServerGUI
+public class WebServerGUI extends JFrame implements WindowListener,
+    ActionListener, IWebServerGUI
 {
 
     private WebServer webServer;
@@ -111,7 +112,8 @@ public class WebServerGUI extends JFrame implements WindowListener, ActionListen
             System.runFinalization();
         }
 
-        else // A combo box was changed.
+        else
+        // A combo box was changed.
         {
             //     no combo boxes yet.
         }

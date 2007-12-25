@@ -27,7 +27,6 @@ import net.sf.colossus.webcommon.User;
  *  @author Clemens Katzer
  */
 
-
 public class WebServerClientSocketThread extends Thread implements IWebClient
 {
     private WebServer server;
@@ -36,15 +35,14 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
     private BufferedReader in;
     private PrintWriter out;
     private User user = null;
-    private String cachedUsername = "<not set>";  // only for finalizer
+    private String cachedUsername = "<not set>"; // only for finalizer
 
     private boolean loggedIn = false;
 
-    private final static String sep =
-        net.sf.colossus.server.Constants.protocolTermSeparator;
+    private final static String sep = net.sf.colossus.server.Constants.protocolTermSeparator;
 
     private Thread stopper = null;
-    
+
     public WebServerClientSocketThread(WebServer server, Socket socket)
     {
         super("WebServerClientSocketThread");
@@ -60,16 +58,19 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
             out.println(tooManyUsers);
             out.println(connectionClosed);
             // give client some time to process the response
-            try { Thread.sleep(500);
+            try
+            {
+                Thread.sleep(500);
             }
-            catch (InterruptedException e) {/* ignore */
+            catch (InterruptedException e)
+            {/* ignore */
             }
             socket.close();
         }
         catch (IOException ex)
         {
-            System.out.println("Rejecting a user did throw exception: " +
-                ex.toString());
+            System.out.println("Rejecting a user did throw exception: "
+                + ex.toString());
         }
     }
 
@@ -118,12 +119,12 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
         }
         catch (IOException ex)
         {
-            System.out.println("Preparing socket streams caused IOException: " +
-                ex.toString());
+            System.out.println("Preparing socket streams caused IOException: "
+                + ex.toString());
             return;
         }
 
-        while (!done && fromClient != null )
+        while (!done && fromClient != null)
         {
             fromClient = null;
             try
@@ -160,8 +161,8 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
             }
             catch (Exception e)
             {
-                System.out.println("WebServerClientSocketThread in read " +
-                    "loop, whatever Exception" + e.toString());
+                System.out.println("WebServerClientSocketThread in read "
+                    + "loop, whatever Exception" + e.toString());
                 Thread.dumpStack();
             }
 
@@ -187,8 +188,8 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
         }
         catch (IOException ex)
         {
-            System.out.println("socket.close caused IOException: " +
-                ex.toString());
+            System.out.println("socket.close caused IOException: "
+                + ex.toString());
         }
 
         // if did not log in (wrong password, or duplicate name and without force,
@@ -233,7 +234,7 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
             {
                 String username = tokens[1];
                 String password = tokens[2];
-                boolean force   = Boolean.valueOf(tokens[3]).booleanValue();
+                boolean force = Boolean.valueOf(tokens[3]).booleanValue();
 
                 reason = User.verifyLogin(username, password);
 
@@ -248,8 +249,8 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
                 if (reason == null)
                 {
                     user = User.findUserByName(username);
-                    WebServerClientSocketThread cst =
-                        (WebServerClientSocketThread)user.getThread();
+                    WebServerClientSocketThread cst = (WebServerClientSocketThread)user
+                        .getThread();
                     if (cst != null)
                     {
                         if (force)
@@ -302,7 +303,7 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
             {
                 String username = tokens[1];
                 String password = tokens[2];
-                String email    = tokens[3];
+                String email = tokens[3];
 
                 reason = server.registerUser(username, password, email, false);
                 if (reason == null)
@@ -385,8 +386,8 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
             String newPassword = tokens[3];
             String email = null;
             Boolean isAdminObj = null;
-            reason = server.changeProperties(username, oldPassword, newPassword,
-                email, isAdminObj);
+            reason = server.changeProperties(username, oldPassword,
+                newPassword, email, isAdminObj);
             if (reason != null)
             {
                 ok = false;
@@ -402,18 +403,18 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
                     {
                         server.initiateShutdown(false);
                     }
-                }
-                );
+                });
             }
             else
             {
-                System.out.println("Non-admin user " + user.getName() +
-                        " requested shutdown - ignored.");
+                System.out.println("Non-admin user " + user.getName()
+                    + " requested shutdown - ignored.");
             }
         }
         else
         {
-            System.out.println("Unexpected command '"+command+"' from client");
+            System.out.println("Unexpected command '" + command
+                + "' from client");
             ok = false;
         }
 
@@ -428,18 +429,16 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
             else
             {
                 //                System.out.println("ACK: " + command + sep + reason);
-                out.println("ACK: " +
-                    command + sep + reason);
+                out.println("ACK: " + command + sep + reason);
             }
         }
         else
         {
             //            System.out.println("NACK: " + command + sep + reason);
-            out.println("NACK: " +
-                command + sep + reason);
+            out.println("NACK: " + command + sep + reason);
         }
 
-        if (command.equals(IWebServer.Propose) && gi != null )
+        if (command.equals(IWebServer.Propose) && gi != null)
         {
             server.enrollUserToGame(gi.getGameId(), user.getName());
         }
@@ -471,8 +470,7 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
     {
         if (other == null)
         {
-            System.out.println(
-                "In forceLogout(), parameter other is null!");
+            System.out.println("In forceLogout(), parameter other is null!");
             return;
         }
 
@@ -491,8 +489,9 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
             }
             catch (Exception e)
             {
-                System.out.println("Different exception than usual while tried to interrupt 'other': " +
-                    e.toString());
+                System.out
+                    .println("Different exception than usual while tried to interrupt 'other': "
+                        + e.toString());
             }
 
             // System.out.println("after tellToTerminate");
@@ -500,12 +499,12 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
             other.join();
             // System.out.println("In CST after  join");
 
-
         }
         catch (Exception e)
         {
-            System.out.println("Oups couldn't stop the other WebServerClientSocketThread" +
-                e);
+            System.out
+                .println("Oups couldn't stop the other WebServerClientSocketThread"
+                    + e);
             Thread.dumpStack();
         }
 
@@ -563,18 +562,16 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
     {
         //        System.out.println("WSCST.chatDeliver() to client " + user.getName() + ": "+ chatId + ", " + sender + 
         //                ": " + message);
-        sendToClient(chatDeliver +
-            sep + chatId + sep + when + sep + sender +
-            sep + message + sep + resent);
+        sendToClient(chatDeliver + sep + chatId + sep + when + sep + sender
+            + sep + message + sep + resent);
     }
 
     public void finalize()
     {
         if (false)
         {
-            System.out.println("finalize(): " + this.getClass().getName() +
-                " for user " + this.cachedUsername);
+            System.out.println("finalize(): " + this.getClass().getName()
+                + " for user " + this.cachedUsername);
         }
     }
 }
-

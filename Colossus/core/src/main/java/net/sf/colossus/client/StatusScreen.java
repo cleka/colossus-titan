@@ -25,7 +25,6 @@ import net.sf.colossus.util.Options;
  * @author David Ripton
  */
 
-
 final class StatusScreen extends KDialog implements WindowListener
 {
     private int numPlayers;
@@ -210,8 +209,7 @@ final class StatusScreen extends KDialog implements WindowListener
         setVisible(true);
     }
 
-    private void setPlayerLabelColors(JLabel label,
-        Color bgColor,
+    private void setPlayerLabelColors(JLabel label, Color bgColor,
         Color fgColor)
     {
         if (label.getBackground() != bgColor)
@@ -224,8 +222,7 @@ final class StatusScreen extends KDialog implements WindowListener
         }
     }
 
-    private void setPlayerLabelBackground(int i,
-        Color color)
+    private void setPlayerLabelBackground(int i, Color color)
     {
         if (towerLabel[i].getBackground() != color)
         {
@@ -264,13 +261,11 @@ final class StatusScreen extends KDialog implements WindowListener
         for (int i = 0; i < numPlayers; i++)
         {
             PlayerInfo info = client.getPlayerInfo(i);
-            Color color,
-                bgcolor,
-                fgcolor;
+            Color color, bgcolor, fgcolor;
 
             if (info.isDead())
             {
-                color   = Color.red;
+                color = Color.red;
                 bgcolor = Color.red;
                 fgcolor = Color.black;
             }
@@ -298,7 +293,7 @@ final class StatusScreen extends KDialog implements WindowListener
             }
 
             setPlayerLabelBackground(i, color);
-            setPlayerLabelColors(nameLabel[i],  bgcolor, fgcolor);
+            setPlayerLabelColors(nameLabel[i], bgcolor, fgcolor);
 
             nameLabel[i].setText(info.getName());
             if (info.canTitanTeleport())

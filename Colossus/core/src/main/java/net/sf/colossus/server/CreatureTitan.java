@@ -18,53 +18,22 @@ import java.util.logging.Logger;
 
 public class CreatureTitan extends Creature
 {
-    private static final Logger LOGGER = Logger.getLogger(CreatureTitan.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(CreatureTitan.class
+        .getName());
 
-    public CreatureTitan(String name,
-        int power,
-        int skill,
-        boolean rangestrikes,
-        boolean flies,
-        boolean nativeBramble,
-        boolean nativeDrift,
-        boolean nativeBog,
-        boolean nativeSandDune,
-        boolean nativeSlope,
-        boolean nativeVolcano,
-        boolean nativeRiver,
-        boolean nativeStone,
-        boolean nativeTree,
-        boolean waterDwelling,
-        boolean magicMissile,
-        boolean summonable,
-        boolean lord,
-        boolean demilord,
-        int maxCount,
-        String pluralName,
-        String baseColor)
+    public CreatureTitan(String name, int power, int skill,
+        boolean rangestrikes, boolean flies, boolean nativeBramble,
+        boolean nativeDrift, boolean nativeBog, boolean nativeSandDune,
+        boolean nativeSlope, boolean nativeVolcano, boolean nativeRiver,
+        boolean nativeStone, boolean nativeTree, boolean waterDwelling,
+        boolean magicMissile, boolean summonable, boolean lord,
+        boolean demilord, int maxCount, String pluralName, String baseColor)
     {
-        super(name,
-            power,
-            skill,
-            rangestrikes,
-            flies,
-            nativeBramble,
-            nativeDrift,
-            nativeBog,
-            nativeSandDune,
-            nativeSlope,
-            nativeVolcano,
-            nativeRiver,
-            nativeStone,
-            nativeTree,
-            waterDwelling,
-            magicMissile,
-            summonable,
-            lord,
-            demilord,
-            maxCount,
-            pluralName,
-            baseColor);
+        super(name, power, skill, rangestrikes, flies, nativeBramble,
+            nativeDrift, nativeBog, nativeSandDune, nativeSlope,
+            nativeVolcano, nativeRiver, nativeStone, nativeTree,
+            waterDwelling, magicMissile, summonable, lord, demilord, maxCount,
+            pluralName, baseColor);
 
         if (!name.equals(Constants.titan))
         {

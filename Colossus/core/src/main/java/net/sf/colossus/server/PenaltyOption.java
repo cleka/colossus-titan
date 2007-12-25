@@ -17,11 +17,12 @@ import java.util.logging.Logger;
  */
 final class PenaltyOption implements Comparable
 {
-    private static final Logger LOGGER = Logger.getLogger(PenaltyOption.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(PenaltyOption.class
+        .getName());
 
     private Critter striker;
     private Critter target;
-    private Set carryTargets = new HashSet();    // of hexLabels
+    private Set carryTargets = new HashSet(); // of hexLabels
     private int dice;
     private int strikeNumber;
 
@@ -128,8 +129,8 @@ final class PenaltyOption implements Comparable
             return false;
         }
         PenaltyOption other = (PenaltyOption)object;
-        return (dice == other.dice && strikeNumber == other.strikeNumber &&
-            striker.equals(other.striker) && target.equals(other.target));
+        return (dice == other.dice && strikeNumber == other.strikeNumber
+            && striker.equals(other.striker) && target.equals(other.target));
     }
 
     /** Do not consider carryTargets. */

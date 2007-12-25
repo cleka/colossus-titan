@@ -14,42 +14,36 @@ public class TitanPlusHint implements net.sf.colossus.server.HintInterface
 {
     private DevRandom rnd = new DevRandom();
 
-    public String getRecruitHint(String terrain,
-            LegionInfo legion,
-            List recruits,
-            HintOracleInterface oracle,
-            String[] section)
+    public String getRecruitHint(String terrain, LegionInfo legion,
+        List recruits, HintOracleInterface oracle, String[] section)
     {
         recruits = DefaultHint.creaturesToStrings(recruits);
 
         if (terrain.equals("Brush"))
         {
-            if (recruits.contains("Cyclops") &&
-                    !legion.contains("Behemoth") &&
-                    legion.numCreature("Cyclops") == 2 &&
-                    oracle.creatureAvailable("Behemoth") >= 2)
+            if (recruits.contains("Cyclops") && !legion.contains("Behemoth")
+                && legion.numCreature("Cyclops") == 2
+                && oracle.creatureAvailable("Behemoth") >= 2)
             {
                 return "Cyclops";
             }
         }
         else if (terrain.equals("Plains"))
         {
-            if (recruits.contains("Lion") &&
-                    !legion.contains("Griffon") &&
-                    legion.numCreature("Lion") == 2 &&
-                    oracle.canReach("Desert") &&
-                    oracle.creatureAvailable("Griffon") >= 2)
+            if (recruits.contains("Lion") && !legion.contains("Griffon")
+                && legion.numCreature("Lion") == 2
+                && oracle.canReach("Desert")
+                && oracle.creatureAvailable("Griffon") >= 2)
             {
                 return "Lion";
             }
         }
         else if (terrain.equals("Marsh"))
         {
-            if (recruits.contains("Troll") &&
-                    !legion.contains("Wyvern") &&
-                    legion.numCreature("Troll") == 2 &&
-                    oracle.canReach("Swamp") &&
-                    oracle.creatureAvailable("Wyvern") >= 2)
+            if (recruits.contains("Troll") && !legion.contains("Wyvern")
+                && legion.numCreature("Troll") == 2
+                && oracle.canReach("Swamp")
+                && oracle.creatureAvailable("Wyvern") >= 2)
             {
                 return "Troll";
             }
@@ -64,18 +58,16 @@ public class TitanPlusHint implements net.sf.colossus.server.HintInterface
             {
                 return "Guardian";
             }
-            if (recruits.contains("Cyclops") &&
-                    legion.numCreature("Cyclops") == 2)
+            if (recruits.contains("Cyclops")
+                && legion.numCreature("Cyclops") == 2)
             {
                 return "Cyclops";
             }
-            if (recruits.contains("Troll") &&
-                    legion.numCreature("Troll") == 2)
+            if (recruits.contains("Troll") && legion.numCreature("Troll") == 2)
             {
                 return "Troll";
             }
-            if (recruits.contains("Lion") &&
-                    legion.numCreature("Lion") == 2)
+            if (recruits.contains("Lion") && legion.numCreature("Lion") == 2)
             {
                 return "Lion";
             }
@@ -84,8 +76,7 @@ public class TitanPlusHint implements net.sf.colossus.server.HintInterface
         return (String)recruits.get(recruits.size() - 1);
     }
 
-    public List getInitialSplitHint(String label,
-            String[] section)
+    public List getInitialSplitHint(String label, String[] section)
     {
         List li = new ArrayList();
         if (label.equals("100"))
@@ -177,8 +168,7 @@ public class TitanPlusHint implements net.sf.colossus.server.HintInterface
         return li;
     }
 
-    public int getHintedRecruitmentValueOffset(String name,
-            String[] section)
+    public int getHintedRecruitmentValueOffset(String name, String[] section)
     {
         return 0;
     }
