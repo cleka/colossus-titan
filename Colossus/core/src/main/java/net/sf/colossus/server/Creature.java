@@ -28,7 +28,8 @@ import net.sf.colossus.xmlparser.CreatureLoader;
  * @author Romain Dolbeau
  */
 
-public class Creature implements Comparable, net.sf.colossus.util.Terrains // H_xxx constants
+public class Creature implements Comparable,
+    net.sf.colossus.util.HazardTerrain // H_xxx constants
 {
     private static final Logger LOGGER = Logger.getLogger(Creature.class
         .getName());
@@ -96,38 +97,12 @@ public class Creature implements Comparable, net.sf.colossus.util.Terrains // H_
         this.pluralName = pluralName;
         this.baseColor = baseColor;
 
-        /* warn about likely inapropriate combinations */
+        /* warn about likely inappropriate combinations */
         if (waterDwelling && nativeSandDune)
         {
             LOGGER.log(Level.WARNING, "Creature " + name
                 + " is both a Water Dweller and native to Sand and Dune.");
         }
-    }
-
-    public Creature(Creature creature)
-    {
-        this.name = creature.name;
-        this.power = creature.power;
-        this.skill = creature.skill;
-        this.rangestrikes = creature.rangestrikes;
-        this.flies = creature.flies;
-        this.nativeBramble = creature.nativeBramble;
-        this.nativeDrift = creature.nativeDrift;
-        this.nativeBog = creature.nativeBog;
-        this.nativeSandDune = creature.nativeSandDune;
-        this.nativeSlope = creature.nativeSlope;
-        this.nativeVolcano = creature.nativeVolcano;
-        this.nativeRiver = creature.nativeRiver;
-        this.nativeStone = creature.nativeStone;
-        this.nativeTree = creature.nativeTree;
-        this.waterDwelling = creature.waterDwelling;
-        this.magicMissile = creature.magicMissile;
-        this.summonable = creature.summonable;
-        this.lord = creature.lord;
-        this.demilord = creature.demilord;
-        this.maxCount = creature.maxCount;
-        this.pluralName = creature.pluralName;
-        this.baseColor = creature.baseColor;
     }
 
     /** Call immediately after loading variant, before using creatures. */
