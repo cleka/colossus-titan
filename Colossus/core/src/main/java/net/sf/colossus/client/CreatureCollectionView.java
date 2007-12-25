@@ -111,8 +111,8 @@ class CreatureCollectionView extends KDialog
     /** the count for an individual creature */
     class CreatureCount extends JPanel
     {
-        private JLabel label;
-        private JLabel topLabel;
+        private final JLabel label;
+        private final JLabel topLabel;
         private Chit chit;
 
         CreatureCount(String name)
@@ -146,7 +146,6 @@ class CreatureCollectionView extends KDialog
             {
                 public void mouseClicked(MouseEvent e)
                 {
-                    System.out.println(creature.getDisplayName());
                     if (e.getButton() == MouseEvent.BUTTON1)
                     {
                         new ShowCreatureDetails(
@@ -350,8 +349,8 @@ class CreatureCollectionView extends KDialog
 
 class CCVFlowLayout extends FlowLayout implements ComponentListener
 {
-    private JScrollPane parentScrollPane;
-    private JComponent parentComponent;
+    private final JScrollPane parentScrollPane;
+    private final JComponent parentComponent;
 
     public CCVFlowLayout(JScrollPane sp, JComponent me, int al, int sx, int sy)
     {
