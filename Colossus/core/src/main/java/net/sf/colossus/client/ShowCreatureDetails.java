@@ -244,9 +244,11 @@ public final class ShowCreatureDetails extends KDialog implements
             critter.setNewHazardHex(terrain);
             Color color = critter.getHazardColor().brighter();
             String colspan = "2";
-            s.append(MessageFormat.format(
-                "<td bgcolor={0} colspan={2}>{1}</td>", new Object[] {
-                    HTMLColor.colorToCode(color), terrain, colspan }));
+            s
+                .append(MessageFormat.format(
+                    "<td bgcolor={0} colspan={2}>{1}</td>", new Object[] {
+                        HTMLColor.colorToCode(color), terrain.getName(),
+                        colspan }));
         }
         s.append("</tr>");
         //   hazards row 2
@@ -259,8 +261,9 @@ public final class ShowCreatureDetails extends KDialog implements
             Color color = critter.getHazardColor().brighter();
             String colspan = "2";
             s.append(MessageFormat.format(
-                "<td bgcolor={0} colspan={2}>{1}</td>", new Object[] {
-                    HTMLColor.colorToCode(color), terrain, colspan, }));
+                "<td bgcolor={0} colspan={2}>{1}</td>",
+                new Object[] { HTMLColor.colorToCode(color),
+                    terrain.getName(), colspan, }));
             if (iterator.hasNext())
             {
                 iterator.next(); // skip one
