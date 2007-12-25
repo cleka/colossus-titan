@@ -13,7 +13,7 @@ import net.sf.colossus.server.Constants;
 
 public class CowardSimpleAI extends SimpleAI
 {
-    CowardSimpleAI(Client client)
+    public CowardSimpleAI(Client client)
     {
         super(client);
 

@@ -13,7 +13,7 @@ import net.sf.colossus.server.Constants;
 
 public class HumanHaterRationalAI extends RationalAI
 {
-    HumanHaterRationalAI(Client client)
+    public HumanHaterRationalAI(Client client)
     {
         super(client);
 

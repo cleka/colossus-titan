@@ -418,7 +418,7 @@ public final class Game
         String number = templateName.substring(Constants.byType.length());
         // type is the full class name of client, e.g.
         //   "net.sf.colossus.client.SimpleAI"
-        String prefix = "net.sf.colossus.client.";
+        String prefix = Constants.aiPackage;
         int len = prefix.length();
 
         String shortName = type.substring(len);

@@ -322,7 +322,7 @@ public final class Constants
 
     public static final int DEFAULT_MAX_PLAYERS = 6;
 
-    /* number of available colours/markers */
+    /* number of available colors/markers */
     public static final int MAX_MAX_PLAYERS = 12;
 
     // Player types
@@ -338,7 +338,7 @@ public final class Constants
 
     public static final int numAITypes = aiArray.length;
     public static final String all = "All";
-    public static final String aiPackage = "net.sf.colossus.client.";
+    public static final String aiPackage = "net.sf.colossus.ai.";
 
     // Player names
     public static final String byColor = "<By color>";
@@ -352,8 +352,6 @@ public final class Constants
 
     // Network stuff
     public static final int defaultPort = 26567;
-    // next one unused, the filr server port is (serverPort + 1)
-    // public static final int defaultFileServerPort = 26568;
 
     // Web clients:
     public static String defaultWebServer = "localhost";
@@ -482,7 +480,7 @@ public final class Constants
     public static final String addCreature = "addCreature";
     public static final String removeCreature = "removeCreature";
     public static final String revealCreatures = "revealCreatures";
-    public static final String revealEngagedCreatures = "revealEngagedCreatures"; //towi
+    public static final String revealEngagedCreatures = "revealEngagedCreatures";
     public static final String removeDeadBattleChits = "removeDeadBattleChits";
     public static final String placeNewChit = "placeNewChit";
     public static final String initBoard = "initBoard";
