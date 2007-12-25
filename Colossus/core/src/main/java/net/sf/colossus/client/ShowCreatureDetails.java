@@ -14,18 +14,19 @@ import java.awt.event.MouseListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.text.MessageFormat;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 
+import net.sf.colossus.game.HazardTerrain;
 import net.sf.colossus.server.Creature;
 import net.sf.colossus.server.Critter;
 import net.sf.colossus.util.HTMLColor;
 import net.sf.colossus.util.KDialog;
 import net.sf.colossus.util.RecruitGraph;
-import net.sf.colossus.util.Terrains;
 import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
 
@@ -120,11 +121,13 @@ public final class ShowCreatureDetails extends KDialog implements
             .isLord() ? "<u><b>Lord</b></u>" : "<b>Demi-Lord</b>")
             : _low("no"));
         StringBuffer buf = new StringBuffer();
-        for (int idx = 0; idx < Terrains.ALL_HAZARD_TERRAINS.length; idx++)
+        for (Iterator iterator = HazardTerrain.getAllHazardTerrains()
+            .iterator(); iterator.hasNext();)
         {
-            if (creature.isNativeTerrain(Terrains.ALL_HAZARD_TERRAINS[idx]))
+            HazardTerrain terrain = (HazardTerrain)iterator.next();
+            if (creature.isNativeTerrain(terrain))
             {
-                buf.append(Terrains.ALL_HAZARD_TERRAINS[idx]);
+                buf.append(terrain.getName());
                 buf.append(", ");
             }
         }
@@ -173,8 +176,11 @@ public final class ShowCreatureDetails extends KDialog implements
                             "<tr><td bgcolor={0}>in {1}</td>"
                                 + "<td colspan={2} nowrap><font color=blue>{3}</font></td>"
                                 + "</tr>", new Object[] {
-                                HTMLColor.colorToCode(color), terrains[ti],
-                                "" + (HAZARDS.length + 1), buf.toString(), }));
+                                HTMLColor.colorToCode(color),
+                                terrains[ti],
+                                ""
+                                    + (HazardTerrain.getAllHazardTerrains()
+                                        .size() + 1), buf.toString(), }));
             }
         }
         //   out
@@ -202,8 +208,11 @@ public final class ShowCreatureDetails extends KDialog implements
                             "<tr><td bgcolor={0}>in {1}</td>"
                                 + "<td colspan={2} nowrap><font color=green>{3}</font></td>"
                                 + "</tr>", new Object[] {
-                                HTMLColor.colorToCode(color), terrains[ti],
-                                "" + (HAZARDS.length + 1), buf.toString(), }));
+                                HTMLColor.colorToCode(color),
+                                terrains[ti],
+                                ""
+                                    + (HazardTerrain.getAllHazardTerrains()
+                                        .size() + 1), buf.toString(), }));
             }
         }
 
@@ -214,40 +223,58 @@ public final class ShowCreatureDetails extends KDialog implements
         //   subtable title
         s.append(MessageFormat.format(
             "<tr><td bgcolor=#dddddd colspan={0}>{1}</td></tr>", new Object[] {
-                "" + (HAZARDS.length + 2), "Target in Plains", }));
-        SimulatedCritter critter = new SimulatedCritter(creature, "Plains");
-        SimulatedCritter other = new SimulatedCritter(creature, "Plains");
+                "" + (HazardTerrain.getAllHazardTerrains().size() + 2),
+                "Target in Plains", }));
+        SimulatedCritter critter = new SimulatedCritter(creature,
+            HazardTerrain.PLAINS);
+        SimulatedCritter other = new SimulatedCritter(creature,
+            HazardTerrain.PLAINS);
         //   hazards row 1
         s.append("<tr><td ROWSPAN=2 align=right>" + creature.getName()
             + " in</td><td></td>");
-        for (int hi = 1; hi < HAZARDS.length; hi += 2)
+        for (Iterator iterator = HazardTerrain.getAllHazardTerrains()
+            .iterator(); iterator.hasNext();)
         {
-            critter.setNewHazardHex(HAZARDS[hi]);
+            iterator.next(); // skip one
+            if (!iterator.hasNext())
+            {
+                break;
+            }
+            HazardTerrain terrain = (HazardTerrain)iterator.next();
+            critter.setNewHazardHex(terrain);
             Color color = critter.getHazardColor().brighter();
             String colspan = "2";
             s.append(MessageFormat.format(
                 "<td bgcolor={0} colspan={2}>{1}</td>", new Object[] {
-                    HTMLColor.colorToCode(color), HAZARDS[hi], colspan, }));
+                    HTMLColor.colorToCode(color), terrain, colspan }));
         }
         s.append("</tr>");
         //   hazards row 2
         s.append("<tr>");
-        for (int hi = 0; hi < HAZARDS.length; hi += 2)
+        for (Iterator iterator = HazardTerrain.getAllHazardTerrains()
+            .iterator(); iterator.hasNext();)
         {
-            critter.setNewHazardHex(HAZARDS[hi]);
+            HazardTerrain terrain = (HazardTerrain)iterator.next();
+            critter.setNewHazardHex(terrain);
             Color color = critter.getHazardColor().brighter();
             String colspan = "2";
             s.append(MessageFormat.format(
                 "<td bgcolor={0} colspan={2}>{1}</td>", new Object[] {
-                    HTMLColor.colorToCode(color), HAZARDS[hi], colspan, }));
+                    HTMLColor.colorToCode(color), terrain, colspan, }));
+            if (iterator.hasNext())
+            {
+                iterator.next(); // skip one
+            }
         }
         s.append("</tr>");
         //   the info: the table content
         //   ... my strike power
         s.append("<tr><th nowrap>my Strike Power</th>");
-        for (int hi = 0; hi < HAZARDS.length; hi++)
+        for (Iterator iterator = HazardTerrain.getAllHazardTerrains()
+            .iterator(); iterator.hasNext();)
         {
-            critter.setNewHazardHex(HAZARDS[hi]);
+            HazardTerrain terrain = (HazardTerrain)iterator.next();
+            critter.setNewHazardHex(terrain);
             Color color = critter.getHazardColor().brighter();
             s.append(MessageFormat.format("<td bgcolor={0}>{1}</td>",
                 new Object[] { HTMLColor.colorToCode(color),
@@ -256,9 +283,11 @@ public final class ShowCreatureDetails extends KDialog implements
         s.append("<td bgcolor=#dddddd></td></tr>");
         //   ... my strike skill
         s.append("<tr><th nowrap>my Strike Skill</th>");
-        for (int hi = 0; hi < HAZARDS.length; hi++)
+        for (Iterator iterator = HazardTerrain.getAllHazardTerrains()
+            .iterator(); iterator.hasNext();)
         {
-            critter.setNewHazardHex(HAZARDS[hi]);
+            HazardTerrain terrain = (HazardTerrain)iterator.next();
+            critter.setNewHazardHex(terrain);
             Color color = critter.getHazardColor().brighter();
             s.append(MessageFormat.format("<td bgcolor={0}>{1}</td>",
                 new Object[] { HTMLColor.colorToCode(color),
@@ -292,9 +321,6 @@ public final class ShowCreatureDetails extends KDialog implements
     // helpers
     //
 
-    /** my own copy of the hazard names. */
-    private static final String[] HAZARDS = Terrains.ALL_HAZARD_TERRAINS;
-
     /** easy access to hex side identifiers. */
     private static final char[] HEXSIDES = { ' ', 'd', 'c', 's', 'w', 'r' };
 
@@ -316,7 +342,8 @@ public final class ShowCreatureDetails extends KDialog implements
      */
     private static void _section(StringBuffer s, final String name)
     {
-        s.append("<tr bgcolor=gray><td colspan=" + (HAZARDS.length + 1) + ">");
+        s.append("<tr bgcolor=gray><td colspan="
+            + (HazardTerrain.getAllHazardTerrains().size() + 1) + ">");
         s.append("<b>" + name + "</b>");
         s.append("</td></tr>");
     }
@@ -330,7 +357,7 @@ public final class ShowCreatureDetails extends KDialog implements
         s.append(MessageFormat.format(
             "<tr><th>{0}</th><td colspan={1}>{2}</td></tr>", new Object[] {
                 name, // 0
-                "" + (HAZARDS.length + 1), // 1
+                "" + (HazardTerrain.getAllHazardTerrains().size() + 1), // 1
                 value, // 2
             }));
     }
@@ -347,7 +374,7 @@ public final class ShowCreatureDetails extends KDialog implements
     /** helper class that catches some calls for the simulated critter. */
     final class SimulatedBattleHex extends BattleHex
     {
-        SimulatedBattleHex(final String hazard)
+        SimulatedBattleHex(final HazardTerrain hazard)
         {
             super(4, 4); // 4,4: something in the middle
             setTerrain(hazard);
@@ -373,7 +400,7 @@ public final class ShowCreatureDetails extends KDialog implements
 
         /** @param creature to create a critter for
          * @param hazard that stands in this hazard */
-        SimulatedCritter(final Creature creature, final String hazard)
+        SimulatedCritter(final Creature creature, final HazardTerrain hazard)
         {
             super(creature, "markerId", null);
             setNewHazardHex(hazard);
@@ -382,11 +409,11 @@ public final class ShowCreatureDetails extends KDialog implements
         /** in hazard Plains. */
         SimulatedCritter(final Creature creature)
         {
-            this(creature, "Plains");
+            this(creature, HazardTerrain.PLAINS);
         }
 
         /** create the simulated hex. */
-        public void setNewHazardHex(final String hazard)
+        public void setNewHazardHex(final HazardTerrain hazard)
         {
             hex = new SimulatedBattleHex(hazard);
         }

@@ -427,7 +427,7 @@ public class TerrainRecruitLoader
     public static Creature[] getStartingCreatures(String terrain)
     {
         Creature[] bc = new Creature[3];
-        java.util.List to = getPossibleRecruits(terrain, null);
+        List to = getPossibleRecruits(terrain, null);
         bc[0] = (Creature)to.get(0);
         bc[1] = (Creature)to.get(1);
         bc[2] = (Creature)to.get(2);
@@ -471,8 +471,7 @@ public class TerrainRecruitLoader
      * @return List of Creatures that can be recruited in the terrain.
      * @see net.sf.colossus.server.Creature
      */
-    public static java.util.List getPossibleRecruits(String terrain,
-        String hexLabel)
+    public static List getPossibleRecruits(String terrain, String hexLabel)
     {
         ArrayList al = (ArrayList)strToRecruits.get(terrain);
         ArrayList re = new ArrayList();

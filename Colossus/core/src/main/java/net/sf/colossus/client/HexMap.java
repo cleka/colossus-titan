@@ -28,6 +28,7 @@ import java.util.logging.Logger;
 
 import javax.swing.JPanel;
 
+import net.sf.colossus.game.HazardTerrain;
 import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.util.ResourceLoader;
 import net.sf.colossus.xmlparser.BattlelandLoader;
@@ -46,12 +47,12 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
     private static final Logger LOGGER = Logger.getLogger(HexMap.class
         .getName());
 
-    private String masterHexLabel;
-    private String terrain;
+    private final String masterHexLabel;
+    private final String terrain;
 
     // GUI hexes need to be recreated for each object, since scale varies.
-    private GUIBattleHex[][] h = new GUIBattleHex[6][6];
-    private List hexes = new ArrayList(33);
+    private final GUIBattleHex[][] h = new GUIBattleHex[6][6];
+    private final List hexes = new ArrayList(33);
 
     // The game state hexes can be set up once for each terrain type.
     private static Map terrainH = new HashMap();
@@ -64,7 +65,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
     private static Map hazardSideNumberMap = new HashMap();
 
     /** ne, e, se, sw, w, nw */
-    private GUIBattleHex[] entrances = new GUIBattleHex[6];
+    private final GUIBattleHex[] entrances = new GUIBattleHex[6];
 
     private static final boolean[][] show = {
         { false, false, true, true, true, false },
@@ -299,10 +300,11 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
             /* count all hazards & hazard sides */
 
             /* slow & inefficient... */
-            final String[] hazards = BattleHex.getTerrains();
             HashMap t2n = new HashMap();
-            for (int i = 0; i < hazards.length; i++)
+            for (Iterator iterator = HazardTerrain.getAllHazardTerrains()
+                .iterator(); iterator.hasNext();)
             {
+                HazardTerrain hTerrain = (HazardTerrain)iterator.next();
                 int count = 0;
                 for (int x = 0; x < 6; x++)
                 {
@@ -310,7 +312,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
                     {
                         if (show[x][y])
                         {
-                            if (hexModel[x][y].getTerrain().equals(hazards[i]))
+                            if (hexModel[x][y].getTerrain().equals(hTerrain))
                             {
                                 count++;
                             }
@@ -319,7 +321,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
                 }
                 if (count > 0)
                 {
-                    t2n.put(hazards[i], new Integer(count));
+                    t2n.put(hTerrain, new Integer(count));
                 }
             }
             hazardNumberMap.put(terrain, t2n);
@@ -837,7 +839,8 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
         return (!(temp == null));
     }
 
-    public static int getHazardCountInTerrain(String hazard, String terrain)
+    public static int getHazardCountInTerrain(HazardTerrain hazard,
+        String terrain)
     {
         HashMap t2n = (HashMap)hazardNumberMap.get(terrain);
         Object o = null;

@@ -11,6 +11,7 @@ import java.util.WeakHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.sf.colossus.game.HazardTerrain;
 import net.sf.colossus.util.ResourceLoader;
 import net.sf.colossus.xmlparser.CreatureLoader;
 
@@ -28,8 +29,7 @@ import net.sf.colossus.xmlparser.CreatureLoader;
  * @author Romain Dolbeau
  */
 
-public class Creature implements Comparable,
-    net.sf.colossus.util.HazardTerrain // H_xxx constants
+public class Creature implements Comparable
 {
     private static final Logger LOGGER = Logger.getLogger(Creature.class
         .getName());
@@ -284,45 +284,45 @@ public class Creature implements Comparable,
         return flies;
     }
 
-    public boolean isNativeTerrain(String t)
+    public boolean isNativeTerrain(HazardTerrain t)
     {
-        if (t.equals(H_PLAINS))
+        if (t.equals(HazardTerrain.PLAINS))
         { /* undefined */
             return false;
         }
-        else if (t.equals(H_TOWER))
+        else if (t.equals(HazardTerrain.TOWER))
         { /* undefined, beneficial for everyone */
             return true;
         }
-        else if (t.equals(H_BRAMBLES))
+        else if (t.equals(HazardTerrain.BRAMBLES))
         {
             return isNativeBramble();
         }
-        else if (t.equals(H_SAND))
+        else if (t.equals(HazardTerrain.SAND))
         {
             return isNativeSandDune();
         }
-        else if (t.equals(H_TREE))
+        else if (t.equals(HazardTerrain.TREE))
         {
             return isNativeTree();
         }
-        else if (t.equals(H_BOG))
+        else if (t.equals(HazardTerrain.BOG))
         {
             return isNativeBog();
         }
-        else if (t.equals(H_VOLCANO))
+        else if (t.equals(HazardTerrain.VOLCANO))
         {
             return isNativeVolcano();
         }
-        else if (t.equals(H_DRIFT))
+        else if (t.equals(HazardTerrain.DRIFT))
         {
             return isNativeDrift();
         }
-        else if (t.equals(H_LAKE))
+        else if (t.equals(HazardTerrain.LAKE))
         {
             return isWaterDwelling();
         }
-        else if (t.equals(H_STONE))
+        else if (t.equals(HazardTerrain.STONE))
         {
             return isNativeStone();
         }

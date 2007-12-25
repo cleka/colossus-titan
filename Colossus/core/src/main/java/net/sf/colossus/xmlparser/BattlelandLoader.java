@@ -10,6 +10,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.colossus.client.BattleHex;
+import net.sf.colossus.game.HazardTerrain;
 
 import org.jdom.Document;
 import org.jdom.Element;
@@ -97,7 +98,7 @@ public class BattlelandLoader
         BattleHex hex = h[xpos][ypos];
 
         String terrain = el.getAttributeValue("terrain");
-        hex.setTerrain(terrain);
+        hex.setTerrain(HazardTerrain.getTerrainByName(terrain));
 
         int elevation = el.getAttribute("elevation").getIntValue();
         hex.setElevation(elevation);

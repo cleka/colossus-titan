@@ -2,7 +2,9 @@ package net.sf.colossus.client;
 
 
 import java.awt.Color;
+import java.util.Iterator;
 
+import net.sf.colossus.game.HazardTerrain;
 import net.sf.colossus.server.Creature;
 import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
@@ -16,7 +18,7 @@ import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
 public class MasterHex extends Hex
 {
-    private MasterHex[] neighbors = new MasterHex[6];
+    private final MasterHex[] neighbors = new MasterHex[6];
 
     /** Terrain types are:
      *  Brush, Desert, Hills, Jungle, mountains, Marsh, Plains,
@@ -29,10 +31,11 @@ public class MasterHex extends Hex
     // Inner ring: 1000, 2000, 3000, 4000, 5000, 6000
     // n, ne, se, s, sw, nw
     private int labelSide;
-    private int[] exitType = new int[6];
-    private int[] baseExitType = new int[3];
-    private int[] baseExitLabel = new int[3];
-    private int[] entranceType = new int[6];
+    private final int[] exitType = new int[6];
+    private final int[] baseExitType = new int[3];
+    private final int[] baseExitLabel = new int[3];
+    private final int[] entranceType = new int[6];
+    private String terrain; // TODO should be typesafe enum
 
     // The hex vertexes are numbered like this:
     //
@@ -56,19 +59,29 @@ public class MasterHex extends Hex
         super();
     }
 
+    public String getTerrain()
+    {
+        return this.terrain;
+    }
+
+    public void setTerrain(String terrain)
+    {
+        this.terrain = terrain;
+    }
+
     public String getTerrainName()
     {
-        return getTerrain();
+        return this.terrain;
     }
 
     public String getTerrainDisplayName()
     {
-        return (TerrainRecruitLoader.getTerrainDisplayName(getTerrain()));
+        return (TerrainRecruitLoader.getTerrainDisplayName(terrain));
     }
 
     public Color getTerrainColor()
     {
-        return (TerrainRecruitLoader.getTerrainColor(getTerrain()));
+        return (TerrainRecruitLoader.getTerrainColor(terrain));
     }
 
     public static boolean isNativeCombatBonus(Creature creature, String terrain)
@@ -76,20 +89,20 @@ public class MasterHex extends Hex
         int bonusHazardCount = 0;
         int bonusHazardSideCount = 0;
 
-        final String[] hazard = BattleHex.getTerrains();
-
-        for (int i = 0; i < hazard.length; i++)
+        for (Iterator iterator = HazardTerrain.getAllHazardTerrains()
+            .iterator(); iterator.hasNext();)
         {
-            int count = HexMap.getHazardCountInTerrain(hazard[i], terrain);
-            if (BattleHex.isNativeBonusHazard(hazard[i])
-                && creature.isNativeTerrain(hazard[i]))
+            HazardTerrain hTerrain = (HazardTerrain)iterator.next();
+            int count = HexMap.getHazardCountInTerrain(hTerrain, terrain);
+            if (hTerrain.isNativeBonusTerrain()
+                && creature.isNativeTerrain(hTerrain))
             {
                 bonusHazardCount += count;
             }
             else
             {
-                if (BattleHex.isNonNativePenaltyHazard(hazard[i])
-                    && !creature.isNativeTerrain(hazard[i]))
+                if (hTerrain.isNonNativePenaltyTerrain()
+                    && !creature.isNativeTerrain(hTerrain))
                 {
                     bonusHazardCount -= count;
                 }

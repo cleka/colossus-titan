@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.sf.colossus.game.HazardTerrain;
 import net.sf.colossus.server.Creature;
 import net.sf.colossus.util.HTMLColor;
 
@@ -16,7 +17,7 @@ import net.sf.colossus.util.HTMLColor;
  * @author Romain Dolbeau
  */
 
-public class BattleHex extends Hex implements net.sf.colossus.util.Terrains // B_xxx constants
+public class BattleHex extends Hex
 {
     private static final Logger LOGGER = Logger.getLogger(BattleHex.class
         .getName());
@@ -40,21 +41,26 @@ public class BattleHex extends Hex implements net.sf.colossus.util.Terrains // B
      * Hold the type of the six side of the BattleHex.
      * The hexside is marked only in the higher hex.
      */
-    private char[] hexsides = new char[6];
+    private final char[] hexsides = new char[6];
 
     /**
      * Links to the neighbors of the BattleHex.
      * Neighbors have one hex side in common.
      * Non-existent neighbor are marked with <b>null</b>.
      */
-    private BattleHex[] neighbors = new BattleHex[6];
+    private final BattleHex[] neighbors = new BattleHex[6];
 
-    private int xCoord;
-    private int yCoord;
+    private final int xCoord;
+    private final int yCoord;
 
     // Hex labels are:
     // A1-A3, B1-B4, C1-C5, D1-D6, E1-E5, F1-F4.
     // Letters increase left to right; numbers increase bottom to top.
+
+    /*
+     * TODO this should be final, but can't be at the moment
+     */
+    private HazardTerrain terrain;
 
     /** Movement costs */
     public static final int IMPASSIBLE_COST = 99;
@@ -72,25 +78,36 @@ public class BattleHex extends Hex implements net.sf.colossus.util.Terrains // B
             hexsides[i] = ' ';
         }
 
-        setTerrain(H_PLAINS);
+        terrain = HazardTerrain.PLAINS;
         assignLabel();
+    }
+
+    public HazardTerrain getTerrain()
+    {
+        return this.terrain;
+    }
+
+    public void setTerrain(HazardTerrain terrain)
+    {
+        this.terrain = terrain;
     }
 
     public String getTerrainName()
     {
+        String terrainName = terrain.getName();
         if (elevation == 0)
         {
-            return (getTerrain());
+            return terrainName;
         }
         else
         {
-            return (getTerrain() + " (" + elevation + ")");
+            return terrainName + " (" + elevation + ")";
         }
     }
 
     public Color getTerrainColor()
     {
-        if (getTerrain().equals(H_PLAINS))
+        if (terrain.equals(HazardTerrain.PLAINS))
         {
             switch (elevation)
             {
@@ -108,7 +125,7 @@ public class BattleHex extends Hex implements net.sf.colossus.util.Terrains // B
                     return HTMLColor.lightYellow;
             }
         }
-        else if (getTerrain().equals(H_TOWER))
+        else if (terrain.equals(HazardTerrain.TOWER))
         {
             switch (elevation)
             {
@@ -126,7 +143,7 @@ public class BattleHex extends Hex implements net.sf.colossus.util.Terrains // B
                     return HTMLColor.lightGray;
             }
         }
-        else if (getTerrain().equals(H_BRAMBLES))
+        else if (terrain.equals(HazardTerrain.BRAMBLES))
         {
             switch (elevation)
             {
@@ -144,19 +161,19 @@ public class BattleHex extends Hex implements net.sf.colossus.util.Terrains // B
                     return HTMLColor.darkGreen;
             }
         }
-        else if (getTerrain().equals(H_SAND))
+        else if (terrain.equals(HazardTerrain.SAND))
         {
             return Color.orange;
         }
-        else if (getTerrain().equals(H_TREE))
+        else if (terrain.equals(HazardTerrain.TREE))
         {
             return HTMLColor.brown;
         }
-        else if (getTerrain().equals(H_BOG))
+        else if (terrain.equals(HazardTerrain.BOG))
         {
             return Color.gray;
         }
-        else if (getTerrain().equals(H_VOLCANO))
+        else if (terrain.equals(HazardTerrain.VOLCANO))
         {
             switch (elevation)
             {
@@ -168,15 +185,15 @@ public class BattleHex extends Hex implements net.sf.colossus.util.Terrains // B
                     return HTMLColor.darkRed;
             }
         }
-        else if (getTerrain().equals(H_DRIFT))
+        else if (terrain.equals(HazardTerrain.DRIFT))
         {
             return Color.blue;
         }
-        else if (getTerrain().equals(H_LAKE))
+        else if (terrain.equals(HazardTerrain.LAKE))
         {
             return HTMLColor.skyBlue;
         }
-        else if (getTerrain().equals(H_STONE))
+        else if (terrain.equals(HazardTerrain.STONE))
         {
             return HTMLColor.dimGray;
         }
@@ -184,15 +201,6 @@ public class BattleHex extends Hex implements net.sf.colossus.util.Terrains // B
         {
             return Color.black;
         }
-    }
-
-    public static boolean isNativeBonusHazard(String name)
-    {
-        if (name.equals(H_BRAMBLES) || name.equals(H_VOLCANO))
-        {
-            return true;
-        }
-        return false;
     }
 
     public static boolean isNativeBonusHexside(char h)
@@ -207,7 +215,7 @@ public class BattleHex extends Hex implements net.sf.colossus.util.Terrains // B
     public boolean isNativeBonusTerrain()
     {
         boolean result;
-        result = isNativeBonusHazard(getTerrain());
+        result = terrain.isNativeBonusTerrain();
 
         for (int i = 0; i < 6; i++)
         {
@@ -215,15 +223,6 @@ public class BattleHex extends Hex implements net.sf.colossus.util.Terrains // B
             result = result || isNativeBonusHexside(h);
         }
         return result;
-    }
-
-    public static boolean isNonNativePenaltyHazard(String name)
-    {
-        if (name.equals(H_BRAMBLES) || name.equals(H_DRIFT))
-        {
-            return true;
-        }
-        return false;
     }
 
     public static boolean isNonNativePenaltyHexside(char h)
@@ -238,7 +237,7 @@ public class BattleHex extends Hex implements net.sf.colossus.util.Terrains // B
     public boolean isNonNativePenaltyTerrain()
     {
         boolean result;
-        result = isNonNativePenaltyHazard(getTerrain());
+        result = terrain.isNonNativePenaltyTerrain();
         for (int i = 0; i < 6; i++)
         {
             char h = getOppositeHexside(i);
@@ -380,7 +379,8 @@ public class BattleHex extends Hex implements net.sf.colossus.util.Terrains // B
 
     public boolean blocksLineOfSight()
     {
-        return (getTerrain().equals(H_TREE) || getTerrain().equals(H_STONE));
+        return (terrain.equals(HazardTerrain.TREE) || terrain
+            .equals(HazardTerrain.STONE));
     }
 
     /**
@@ -398,11 +398,15 @@ public class BattleHex extends Hex implements net.sf.colossus.util.Terrains // B
         int cost = NORMAL_COST;
 
         // Check to see if the hex is occupied or totally impassable.
-        if ((getTerrain().equals(H_LAKE) && (!creature.isWaterDwelling()))
-            || (getTerrain().equals(H_TREE) && (!creature.isNativeTree()))
-            || (getTerrain().equals(H_STONE) && (!creature.isNativeStone()))
-            || (getTerrain().equals(H_VOLCANO) && (!creature.isNativeVolcano()))
-            || (getTerrain().equals(H_BOG) && (!creature.isNativeBog())))
+        if ((terrain.equals(HazardTerrain.LAKE) && (!creature
+            .isWaterDwelling()))
+            || (terrain.equals(HazardTerrain.TREE) && (!creature
+                .isNativeTree()))
+            || (terrain.equals(HazardTerrain.STONE) && (!creature
+                .isNativeStone()))
+            || (terrain.equals(HazardTerrain.VOLCANO) && (!creature
+                .isNativeVolcano()))
+            || (terrain.equals(HazardTerrain.BOG) && (!creature.isNativeBog())))
         {
             cost += IMPASSIBLE_COST;
         }
@@ -434,10 +438,12 @@ public class BattleHex extends Hex implements net.sf.colossus.util.Terrains // B
 
         // Bramble, drift, and sand slow non-natives, except that sand
         //     doesn't slow fliers.
-        if ((getTerrain().equals(H_BRAMBLES) && !creature.isNativeBramble())
-            || (getTerrain().equals(H_DRIFT) && !creature.isNativeDrift())
-            || (getTerrain().equals(H_SAND) && !creature.isNativeSandDune() && !creature
-                .isFlier()))
+        if ((terrain.equals(HazardTerrain.BRAMBLES) && !creature
+            .isNativeBramble())
+            || (terrain.equals(HazardTerrain.DRIFT) && !creature
+                .isNativeDrift())
+            || (terrain.equals(HazardTerrain.SAND)
+                && !creature.isNativeSandDune() && !creature.isFlier()))
         {
             cost += SLOW_INCREMENT_COST;
         }
@@ -467,11 +473,11 @@ public class BattleHex extends Hex implements net.sf.colossus.util.Terrains // B
         { // non-flyer can't fly, obviously...
             return false;
         }
-        if (getTerrain().equals(H_STONE))
+        if (terrain.equals(HazardTerrain.STONE))
         { // no one can fly through stone
             return false;
         }
-        if (getTerrain().equals(H_VOLCANO))
+        if (terrain.equals(HazardTerrain.VOLCANO))
         { // only volcano-native can fly over volcano
             return creature.isNativeVolcano();
         }
@@ -485,11 +491,11 @@ public class BattleHex extends Hex implements net.sf.colossus.util.Terrains // B
      */
     public int damageToCreature(Creature creature)
     {
-        if (getTerrain().equals(H_DRIFT) && (!creature.isNativeDrift()))
+        if (terrain.equals(HazardTerrain.DRIFT) && (!creature.isNativeDrift()))
         { // Non-native take damage in Drift
             return 1;
         }
-        if (getTerrain().equals(H_SAND) && (creature.isWaterDwelling()))
+        if (terrain.equals(HazardTerrain.SAND) && (creature.isWaterDwelling()))
         { // Water Dweller (amphibious) take damage in Sand
             return 1;
         }
@@ -501,11 +507,6 @@ public class BattleHex extends Hex implements net.sf.colossus.util.Terrains // B
     {
         return getHexside(hexside) == 'c'
             || getOppositeHexside(hexside) == 'c';
-    }
-
-    public static String[] getTerrains()
-    {
-        return ALL_HAZARD_TERRAINS;
     }
 
     public static char[] getHexsides()

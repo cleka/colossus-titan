@@ -17,6 +17,7 @@ import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.sf.colossus.game.HazardTerrain;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.Creature;
 import net.sf.colossus.server.Dice;
@@ -65,7 +66,14 @@ public class SimpleAI implements AI
      * Maps the terrain names to their matching bonuses.
      * 
      * Only the terrains that have bonuses are in this map, so
-     * users have to expect to retrieve null values.
+     * users have to expect to retrieve null values. Note that
+     * the terrain names include names for master board and
+     * hazard terrains, so it can be used for lookup up either
+     * type.
+     * 
+     * TODO there seems to be some overlap with 
+     * {@link HazardTerrain#isNativeBonusTerrain()} and
+     * {@link HazardTerrain#isNonNativePenaltyTerrain()}.
      * 
      * This is a Map<String,TerrainBonuses>.
      */
@@ -2594,13 +2602,13 @@ public class SimpleAI implements AI
 
     class PowerSkill
     {
-        private String name;
-        private int power_attack;
-        private int power_defend; // how many dice attackers lose
-        private int skill_attack;
-        private int skill_defend;
+        private final String name;
+        private final int power_attack;
+        private final int power_defend; // how many dice attackers lose
+        private final int skill_attack;
+        private final int skill_defend;
         private double hp; // how many hit points or power left
-        private double value;
+        private final double value;
 
         public PowerSkill(String nm, int p, int pa, int pd, int sa, int sd)
         {
@@ -2671,7 +2679,7 @@ public class SimpleAI implements AI
 
     // return power and skill of a given creature given the terrain
     // terrain here is either a board hex label OR
-    // a Hex terrain label (see the util.Terrains class)
+    // a Hex terrain label
     private PowerSkill calc_bonus(Creature creature, String terrain,
         boolean defender)
     {
@@ -2724,11 +2732,11 @@ public class SimpleAI implements AI
     }
 
     // return power and skill of a given creature given 
-    // a Hex terrain label (see the util.Terrains class)
+    // a hazard terrain
     protected PowerSkill getNativeTerrainValue(Creature creature,
-        String terrain, boolean defender)
+        HazardTerrain terrain, boolean defender)
     {
-        return calc_bonus(creature, terrain, defender);
+        return calc_bonus(creature, terrain.getName(), defender);
     }
 
     ////////////////////////////////////////////////////////////////
@@ -3182,7 +3190,7 @@ public class SimpleAI implements AI
         return legionMoves;
     }
 
-    private Set duplicateHexChecker = new HashSet();
+    private final Set duplicateHexChecker = new HashSet();
 
     private void nestForLoop(int[] indexes, final int level,
         final List critterMoves, List legionMoves)
@@ -3366,6 +3374,10 @@ public class SimpleAI implements AI
         final int power = critter.getPower();
         final BattleHex hex = client.getBattleHex(critter);
         final int turn = client.getBattleTurnNumber();
+
+        // TODO this is broken: the method expects a master terrain name,
+        // not the hazard terrain name -- most likely the expectation of
+        // the method should be changed to expect a HazardTerrain instance
         PowerSkill ps = getNativeTerrainValue(critter.getCreature(), hex
             .getTerrain(), true);
 

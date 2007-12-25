@@ -50,7 +50,7 @@ public class GUIBattleHex extends GUIHex
      * 
      * @todo check if we can avoid this
      */
-    private GUIBattleHex[] neighbors = new GUIBattleHex[6];
+    private final GUIBattleHex[] neighbors = new GUIBattleHex[6];
 
     // Hex terrain types are:
     // p, r, s, t, o, v, d, w
@@ -384,8 +384,8 @@ public class GUIBattleHex extends GUIHex
 
     public boolean paintOverlay(Graphics2D g)
     {
-        Image overlay = loadOneOverlay(getBattleHexModel().getTerrain(),
-            rectBound.width, rectBound.height);
+        Image overlay = loadOneOverlay(getBattleHexModel().getTerrain()
+            .getName(), rectBound.width, rectBound.height);
         if (overlay != null)
         { // first, draw the Hex itself
             g.drawImage(overlay, rectBound.x, rectBound.y, rectBound.width,

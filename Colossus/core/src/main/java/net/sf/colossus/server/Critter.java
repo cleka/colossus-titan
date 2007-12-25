@@ -13,6 +13,7 @@ import java.util.logging.Logger;
 
 import net.sf.colossus.client.BattleHex;
 import net.sf.colossus.client.HexMap;
+import net.sf.colossus.game.HazardTerrain;
 import net.sf.colossus.util.Options;
 
 
@@ -30,7 +31,7 @@ class Critter implements Comparable
     private static final Logger LOGGER = Logger.getLogger(Critter.class
         .getName());
 
-    private Creature creature;
+    private final Creature creature;
     private String markerId;
     private Battle battle;
     private boolean struck;
@@ -39,14 +40,14 @@ class Critter implements Comparable
 
     /** Damage taken */
     private int hits = 0;
-    private Game game;
+    private final Game game;
 
     /** Unique identifier for each critter. */
-    private int tag;
+    private final int tag;
 
     /** Counter used to assign unique tags. */
     private static int tagCounter = -1;
-    private SortedSet penaltyOptions = new TreeSet();
+    private final SortedSet penaltyOptions = new TreeSet();
     private boolean carryPossible;
 
     public Critter(Creature creature, String markerId, Game game)
@@ -921,7 +922,7 @@ class Critter implements Comparable
         return creature.isFlier();
     }
 
-    public boolean isNativeTerrain(String t)
+    public boolean isNativeTerrain(HazardTerrain t)
     {
         return creature.isNativeTerrain(t);
     }
