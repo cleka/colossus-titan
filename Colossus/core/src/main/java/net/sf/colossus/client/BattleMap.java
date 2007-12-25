@@ -216,23 +216,6 @@ public final class BattleMap extends HexMap implements MouseListener,
         }
     }
 
-    public void rescale()
-    {
-        setupHexes();
-
-        int chitScale = 4 * Scale.get();
-        List battleChits = client.getBattleChits();
-        Iterator it = battleChits.iterator();
-        while (it.hasNext())
-        {
-            BattleChit chit = (BattleChit)it.next();
-            chit.rescale(chitScale);
-        }
-        alignChits(getAllHexLabels());
-        setSize(getPreferredSize());
-        repaint();
-    }
-
     public static String entrySideName(int side)
     {
         switch (side)
