@@ -36,25 +36,28 @@ import net.sf.colossus.xmlparser.TerrainRecruitLoader;
  * and the abilities in the different hazards.
  *
  * Non-static information that might be shown is the number of creatures
- * left in the caretakes stack.
+ * left in the caretaker's stack.
  *
  * The dialog is thought to be popped up and closed if needed, displaying
  * information about one selected creature type. The info in the dialog is
  * updated if needed.
  *
  * Implementation details:
- *   The diaplog mainly contains one JTextEdit control which itself
+ *   The dialog mainly contains one JTextEdit control which itself
  *   display HTML text! It is thinkable, that the HTML text comes from
  *   an URL (easy to implement). Currently the whole HTML is built
  *   line by line like a servlet would do it.
  *
  *   To figure out some of the more difficult properties of the creature
  *   I "simulate" a tiny battlefield, where the creature in question
- *   engagages other creatures in different hazard tarrains. This is
+ *   engages other creatures in different hazard terrains. This is
  *   of course highly dependent on the battle implementation. It can easily
  *   break. I tried to be very generic -- things that might break, should
  *   break on compilation time, and not display wrong information.
  *
+ *
+ * TODO this dialog should have a SaveWindow attached to it.
+ * 
  * @author Towi, copied from ShowRecruitTree
  * @version $Id$
  */
