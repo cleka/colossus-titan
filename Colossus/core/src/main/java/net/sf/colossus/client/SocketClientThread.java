@@ -3,6 +3,10 @@ package net.sf.colossus.client;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.net.ConnectException;
+import java.net.SocketException;
+import java.net.SocketTimeoutException;
+import java.net.UnknownHostException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
@@ -17,6 +21,7 @@ import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.IServer;
 import net.sf.colossus.util.Glob;
 import net.sf.colossus.util.Split;
+import net.sf.colossus.util.ChildThreadManager;
 
 
 /**
@@ -31,81 +36,419 @@ final class SocketClientThread extends Thread implements IServer
     private static final Logger LOGGER = Logger.getLogger(SocketClientThread.class.getName());
 
     private Client client;
-    private String host;
-    private int port;
+    private ChildThreadManager threadMgr;
     private Socket socket;
     private BufferedReader in;
     private PrintWriter out;
     private boolean goingDown = false;
+    private boolean selfInterrupted = false;
+    private boolean serverReceiveTimedout = false;
 
     private final static String sep = Constants.protocolTermSeparator;
+
+    private String reasonFail = null;
+    private String initialLine = null;
 
     SocketClientThread(Client client, String host, int port)
     {
         super("Client " + client.getPlayerName());
+
         this.client = client;
-        this.host = host;
-        this.port = port;
+        this.threadMgr = client.getThreadMgr();
+        net.sf.colossus.webcommon.FinalizeManager.register(this,
+            "SCT " + client.getPlayerName());
+
+        String task = "";
+
+        try
+        {
+            task = "creating Socket to connect to " + host + ":" + port;
+            LOGGER.log(Level.FINEST, "Next: " + task);
+            socket = new Socket(host, port);
+
+            task = "preparing PrintWriter";
+            LOGGER.log(Level.FINEST, "Next: " + task);
+            out = new PrintWriter(socket.getOutputStream(), true);
+
+            task = "signing on";
+            LOGGER.log(Level.FINEST, "Next: " + task);
+            signOn();
+
+            task = "preparing BufferedReader";
+            LOGGER.log(Level.FINEST, "Next: " + task);
+            in = new BufferedReader(new InputStreamReader(
+                socket.getInputStream()));
+
+        }
+        // Could not connect - probably Firewall/NAT, or wrong IP or port
+        catch (ConnectException e)
+        {
+            String msg = e.getMessage();
+            String possReason = "";
+            if (msg.startsWith("Connection timed out"))
+            {
+                possReason = ".\n(This probably means: " +
+                    "Either you have given wrong Server name or " +
+                    "address, or a network issue (firewall, proxy, NAT) is " +
+                    "preventing the connection)";
+            }
+            else if (msg.startsWith("Connection refused"))
+            {
+                possReason = ".\n(This probably means: " +
+                    "Either you have given wrong Server and/or port, " +
+                    "or tried it too early and server side wasn't up yet)";
+            }
+            else
+            {
+                possReason = ".\n(No typical case is known causing this " +
+                    "situation; check the exception details for any " +
+                    "information what might be wrong)";
+            }
+
+            LOGGER.log(Level.INFO, "ConnectException (\"" + msg + "\") " +
+                "in SCT during " + task);
+            reasonFail = "ConnectException (\"" + e.getMessage() + "\") " +
+                "during " + task + possReason;
+
+            return;
+        }
+
+        catch (UnknownHostException e)
+        {
+            LOGGER.log(Level.INFO,
+                "UnknownHostException ('" + e.getMessage() + "') " +
+                "in SCT during " + task);
+            reasonFail = "UnknownHostException ('" + e.getMessage() + "') " +
+                "during " + task + ".\n(This probably means:\n" +
+                "You have given a server as name istead of IP address and " +
+                "the name cannot be resolved to an address (typo?).";
+            return;
+        }
+
+        // probably IOException
+        catch (Exception e)
+        {
+            LOGGER.log(Level.SEVERE,
+                "Unusual Exception in SCT during " + task + ": ", e);
+            reasonFail = "Exception during " + task + ": " + e.toString() +
+                "\n(No typical case is known causing this situation; " +
+                "check the exception details for any information what " +
+                "might be wrong)";
+            return;
+        }
+    }
+
+    public void tryInitialRead()
+    {
+        try
+        {
+            // Directly after connect we should get some first message
+            // rather quickly... if not, probably Server has already enough
+            // clients and we would hang in the queue...
+            socket.setSoTimeout(5000);
+            initialLine = in.readLine();
+            // ... but after we got first data, during game it might take
+            // unpredictable time before next thing comes, so reset it to 0
+            //  ( = wait forever).
+            socket.setSoTimeout(0);
+            reasonFail = null;
+        }
+        catch (SocketTimeoutException ex)
+        {
+            reasonFail = "Server not responding (could connect, " +
+                "but didn't got any initial data within 5 seconds. " +
+                "Probably the game has already as many clients as " +
+                "it expects).";
+            return;
+
+        }
+        catch (Exception ex)
+        {
+            reasonFail = "Unanticipated exception during" +
+                " reading first line from server: " + ex.toString();
+
+            return;
+        }
+
+        threadMgr.registerToThreadManager(this);
+
+        return;
+    }
+
+    public String getReasonFail()
+    {
+        return reasonFail;
     }
 
     public void run()
     {
-        LOGGER.log(Level.FINEST,
-            "About to connect client socket to " + host + ":" + port);
-        try
+        if (reasonFail != null)
         {
-            socket = new Socket(host, port);
-            out = new PrintWriter(socket.getOutputStream(), true);
-        }
-        // UnknownHostException, IOException, IllegalBlockingModeException
-        catch (Exception ex)
-        {
-            LOGGER.log(Level.SEVERE, "Could not open socket", ex);
-            ex.printStackTrace();
-            System.exit(1);
-        }
-
-        signOn();
-
-        try
-        {
-            in = new BufferedReader(new InputStreamReader(
-                socket.getInputStream()));
-        }
-        catch (IOException ex)
-        {
-            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
+            // If SCT setup (constructor or tryInitRead() failed,
+            // they set the reasonFail. SCT.start() is then only called
+            // so that thread "was run" - otherwise GC would not collect it.
+            // Then we end up here, do some cleanup, and that's it...
+            cleanupSocket();
+            client = null;
+            goingDown = true;
             return;
         }
 
+        tryInitialRead();
+        if (reasonFail != null)
+        {
+            goingDown = true;
+            String message = "Server not responding (could connect, " +
+                "but didn't got any initial data within 5 seconds. " +
+                "Probably the game has already as many clients as it expects).";
+            String title = "Joining game failed!";
+            client.showErrorMessage(message, title);
+        }
+
+        // ---------------------------------------------------------------
+        // This is the heart of the whole SocketClientThread.run():
+
+        readAndParseUntilDone();
+
+        // ---------------------------------------------------------------
+        // After here: Cleaning up...
+
+        if ( serverReceiveTimedout )
+        {
+            // Right now this should never happen, but since we have
+            // the catch and set the flag, let's do something with it:)
+            client.showErrorMessage("No messages from server for very long time. " +
+                "Right now this should never happen because in normal game " +
+                "situation we work with infinite timeout... ??",
+                "No messages from server!");
+        }
+
+        cleanupSocket();
+
+        if (client != null)
+        {
+            client.dispose();
+            client = null;
+        }
+        else
+        {
+            LOGGER.log(Level.WARNING, "SCT run() " + getName() +
+                ": after loop, client already null??");
+        }
+
+        threadMgr.unregisterFromThreadManager(this);
+        threadMgr = null;
+
+        LOGGER.log(Level.FINEST, "SCT run() ending " + getName());
+    }
+
+    private void readAndParseUntilDone()
+    {
+        // -----------------------------------------
+        // Now the "read and parse until done" loop:
         String fromServer = null;
         try
         {
-            while ((fromServer = in.readLine()) != null)
+            // first !goingDown: server did send dispose, parseLine did set
+            //    goingDown true; when body of loop completes it ends the loop.
+            //    Or client side did set it to true while SCT was in parseLine.
+            // second !goingDown: Client side did set goingDown to true, while
+            //    SCT was waiting for line from socket, and interrupted it.
+            //    So SCT returns from waitForLine and shall exit the loop.
+            while ( !goingDown &&
+                (fromServer = waitForLine()) != null && !goingDown)
             {
                 if (fromServer.length() > 0)
                 {
-                    parseLine(fromServer);
+                    try
+                    {
+                        parseLine(fromServer);
+                    }
+                    catch (Exception ex)
+                    {
+                        LOGGER.log(Level.WARNING,
+                            "\n++++++\nSCT SocketClientThread " + getName() +
+                            ", parseLine(): got Exception " + ex.toString() +
+                            "\n" + ex.getMessage() + "\nline=" + fromServer,
+                            ex);
+                    }
                 }
             }
-            LOGGER.log(Level.FINEST, "End of SocketClientThread while loop");
+
+            LOGGER.log(Level.FINEST,
+                "Clean end of SocketClientThread while loop");
         }
-        catch (IOException ex)
+
+        // just in case...
+        catch (Exception e)
         {
-            LOGGER.log(Level.SEVERE, "IO exception on socket", ex);
-            ex.printStackTrace();
-            System.exit(1);
+            LOGGER.log(Level.WARNING,
+                "\n^^^^^^^^^^\nSCT.run() major try/catch???\n", e);
+            setWaiting(false);
         }
-        System.exit(0);
     }
 
-    /*
-     * After this is set, SocketClientThread will not call any client
-     * method any more (client might dispose board and exit at any moment).
-     */
-    public void setGoingDown()
+    private Object isWaitingLock = new Object();
+    private boolean isWaiting = false;
+
+    private void setWaiting(boolean val)
     {
-        this.goingDown = true;
+        synchronized (isWaitingLock)
+        {
+            isWaiting = val;
+        }
+    }
+
+    /*    
+     private void dummy()
+     {
+     //
+     }
+     */
+
+    private String waitForLine()
+    {
+        String line = null;
+
+        setWaiting(true);
+
+        // try { Thread.sleep(100); } catch (InterruptedException ex) { dummy(); }
+
+        // First round, the unhandled line from tryInitialRead:
+        if (initialLine != null)
+        {
+            line = initialLine;
+            initialLine = null;
+        }
+        // if client did set it while we were doing parseLine or 
+        // waited in line above we can skip the next read.
+        else if (!goingDown)
+        {
+            try
+            {
+                line = in.readLine();
+            }
+            catch (SocketTimeoutException ex)
+            {
+                serverReceiveTimedout = true;
+                goingDown = true;
+            }
+            catch (SocketException ex)
+            {
+                if (selfInterrupted)
+                {
+                    // ok, interrupted to go down.
+                }
+                else
+                {
+                    // @TODO: message to user?
+                    client.setClosedByServer();
+                    LOGGER.log(Level.WARNING,
+                        "SCT SocketClientThread " + getName() +
+                        ": got SocketException " + ex.toString());
+                }
+                goingDown = true;
+            }
+
+            catch (IOException ex)
+            {
+                LOGGER.log(Level.SEVERE,
+                    "SCT SocketClientThread " + getName() +
+                    ", got Exception ", ex);
+                goingDown = true;
+            }
+        }
+        setWaiting(false);
+        return line;
+    }
+
+    public boolean isAlreadyDown()
+    {
+        return (client == null);
+    }
+
+    private void cleanupSocket()
+    {
+        if (socket != null)
+        {
+            try
+            {
+                socket.close();
+                socket = null;
+
+            }
+            catch (IOException e)
+            {
+                LOGGER.log(Level.WARNING,
+                    "SocketClientThread " + getName() +
+                    ", during socket.close(), got IOException ", e);
+            }
+            catch (Exception e)
+            {
+                LOGGER.log(Level.WARNING,
+                    "SocketClientThread " + getName() +
+                    ", during socket.close(), got Whatever Exception ", e);
+            }
+        }
+        else
+        {
+            LOGGER.log(Level.FINEST,
+                "SCT Closing socket not needed in " + getName());
+        }
+    }
+
+    public void interrupt()
+    {
+        super.interrupt();
+
+        try
+        {
+            if (socket != null)
+            {
+                socket.close();
+            }
+        }
+        catch (IOException e)
+        {
+            // quietly close  
+        }
+        catch (Exception e)
+        {
+            LOGGER.log(Level.SEVERE,
+                "SCT.interrupt() in "  + this.getName() +
+                ": unexpected Exception.",  e);
+        }
+    }
+
+    /** Client originates the dispose: */
+    public void stopSocketClientThread()
+    {
+        if (goingDown)
+        {
+            return;
+        }
+        goingDown = true;
+
+        disconnect();
+
+        synchronized (isWaitingLock)
+        {
+            // If socketReader is currently waiting on the socket, 
+            // we need to interrupt it. 
+            if (isWaiting)
+            {
+                selfInterrupted = true;
+                this.interrupt();
+            }
+            // Otherwise, it will return to back of loop
+            // anyway once it has done the parseLine execution.
+            else
+            {
+                // no need to interrupt - nothing to do.
+            }
+        }
+
+        // Now cleanup things go same way as if server would have send dispose.
     }
 
     private synchronized void parseLine(String s)
@@ -150,7 +493,8 @@ final class SocketClientThread extends Thread implements IServer
         }
         else if (method.equals(Constants.dispose))
         {
-            client.dispose();
+            client.setClosedByServer();
+            goingDown = true;
         }
         else if (method.equals(Constants.removeLegion))
         {
@@ -536,10 +880,24 @@ final class SocketClientThread extends Thread implements IServer
         }
     }
 
+    private void sendToServer(String message)
+    {
+        if (socket != null)
+        {
+            out.println(message);
+        }
+        else
+        {
+            LOGGER.log(Level.SEVERE,
+                "Attempt to send message '" + message +
+                "' but the socket is closed??");
+        }
+    }
+
     // Setup method
     private void signOn()
     {
-        out.println(Constants.signOn + sep + client.getPlayerName() + sep +
+        sendToServer(Constants.signOn + sep + client.getPlayerName() + sep +
             client.isRemote());
     }
 
@@ -548,7 +906,7 @@ final class SocketClientThread extends Thread implements IServer
     void fixName(String playerName)
     {
         setName("Client " + playerName);
-        out.println(Constants.fixName + sep + playerName);
+        sendToServer(Constants.fixName + sep + playerName);
     }
 
     // IServer methods, called from client and sent over the
@@ -556,183 +914,197 @@ final class SocketClientThread extends Thread implements IServer
 
     public void leaveCarryMode()
     {
-        out.println(Constants.leaveCarryMode);
+        sendToServer(Constants.leaveCarryMode);
     }
 
     public void doneWithBattleMoves()
     {
-        out.println(Constants.doneWithBattleMoves);
+        sendToServer(Constants.doneWithBattleMoves);
     }
 
     public void doneWithStrikes()
     {
-        out.println(Constants.doneWithStrikes);
+        sendToServer(Constants.doneWithStrikes);
     }
 
     public void acquireAngel(String markerId, String angelType)
     {
-        out.println(Constants.acquireAngel + sep + markerId + sep + angelType);
+        sendToServer(Constants.acquireAngel + sep + markerId +
+            sep + angelType);
     }
 
     public void doSummon(String markerId, String donorId, String angel)
     {
-        out.println(Constants.doSummon + sep + markerId + sep + donorId +
+        sendToServer(Constants.doSummon + sep + markerId + sep + donorId +
             sep + angel);
     }
 
     public void doRecruit(String markerId, String recruitName,
         String recruiterName)
     {
-        out.println(Constants.doRecruit + sep + markerId + sep + recruitName +
+        sendToServer(Constants.doRecruit + sep + markerId + sep + recruitName +
             sep + recruiterName);
     }
 
     public void engage(String hexLabel)
     {
-        out.println(Constants.engage + sep + hexLabel);
+        sendToServer(Constants.engage + sep + hexLabel);
     }
 
     public void concede(String markerId)
     {
-        out.println(Constants.concede + sep + markerId);
+        sendToServer(Constants.concede + sep + markerId);
     }
 
     public void doNotConcede(String markerId)
     {
-        out.println(Constants.doNotConcede + sep + markerId);
+        sendToServer(Constants.doNotConcede + sep + markerId);
     }
 
     public void flee(String markerId)
     {
-        out.println(Constants.flee + sep + markerId);
+        sendToServer(Constants.flee + sep + markerId);
     }
 
     public void doNotFlee(String markerId)
     {
-        out.println(Constants.doNotFlee + sep + markerId);
+        sendToServer(Constants.doNotFlee + sep + markerId);
     }
 
     public void makeProposal(String proposalString)
     {
-        out.println(Constants.makeProposal + sep + proposalString);
+        sendToServer(Constants.makeProposal + sep + proposalString);
     }
 
     public void fight(String hexLabel)
     {
-        out.println(Constants.fight + sep + hexLabel);
+        sendToServer(Constants.fight + sep + hexLabel);
     }
 
     public void doBattleMove(int tag, String hexLabel)
     {
-        out.println(Constants.doBattleMove + sep + tag + sep + hexLabel);
+        sendToServer(Constants.doBattleMove + sep + tag + sep + hexLabel);
     }
 
     public synchronized void strike(int tag, String hexLabel)
     {
-        out.println(Constants.strike + sep + tag + sep + hexLabel);
+        sendToServer(Constants.strike + sep + tag + sep + hexLabel);
     }
 
     public synchronized void applyCarries(String hexLabel)
     {
-        out.println(Constants.applyCarries + sep + hexLabel);
+        sendToServer(Constants.applyCarries + sep + hexLabel);
     }
 
     public void undoBattleMove(String hexLabel)
     {
-        out.println(Constants.undoBattleMove + sep + hexLabel);
+        sendToServer(Constants.undoBattleMove + sep + hexLabel);
     }
 
     public void assignStrikePenalty(String prompt)
     {
-        out.println(Constants.assignStrikePenalty + sep + prompt);
+        sendToServer(Constants.assignStrikePenalty + sep + prompt);
     }
 
     public void mulligan()
     {
-        out.println(Constants.mulligan);
+        sendToServer(Constants.mulligan);
     }
 
     public void undoSplit(String splitoffId)
     {
-        out.println(Constants.undoSplit + sep + splitoffId);
+        sendToServer(Constants.undoSplit + sep + splitoffId);
     }
 
     public void undoMove(String markerId)
     {
-        out.println(Constants.undoMove + sep + markerId);
+        sendToServer(Constants.undoMove + sep + markerId);
     }
 
     public void undoRecruit(String markerId)
     {
-        out.println(Constants.undoRecruit + sep + markerId);
+        sendToServer(Constants.undoRecruit + sep + markerId);
     }
 
     public void doneWithSplits()
     {
-        out.println(Constants.doneWithSplits);
+        sendToServer(Constants.doneWithSplits);
     }
 
     public void doneWithMoves()
     {
-        out.println(Constants.doneWithMoves);
+        sendToServer(Constants.doneWithMoves);
     }
 
     public void doneWithEngagements()
     {
-        out.println(Constants.doneWithEngagements);
+        sendToServer(Constants.doneWithEngagements);
     }
 
     public void doneWithRecruits()
     {
-        out.println(Constants.doneWithRecruits);
+        sendToServer(Constants.doneWithRecruits);
     }
 
     public void withdrawFromGame()
     {
-        out.println(Constants.withdrawFromGame);
+        LOGGER.log(Level.FINEST, "SCT " + getName() + " sending withDraw");
+        sendToServer(Constants.withdrawFromGame);
+    }
+
+    public void disconnect()
+    {
+        LOGGER.log(Level.FINEST, "SCT " + getName() + " sending disconnect");
+        sendToServer(Constants.disconnect);
+    }
+
+    public void stopGame()
+    {
+        LOGGER.log(Level.FINEST, "SCT " + getName() + " sending stopGame");
+        sendToServer(Constants.stopGame);
     }
 
     public void setDonor(String markerId)
     {
-        out.println(Constants.setDonor + sep + markerId);
+        sendToServer(Constants.setDonor + sep + markerId);
     }
 
     public void doSplit(String parentId, String childId, String results)
     {
-        out.println(Constants.doSplit + sep + parentId + sep + childId + sep +
+        sendToServer(Constants.doSplit + sep + parentId + sep + childId + sep +
             results);
     }
 
     public void doMove(String markerId, String hexLabel, String entrySide,
         boolean teleport, String teleportingLord)
     {
-        out.println(Constants.doMove + sep + markerId + sep + hexLabel + sep +
+        sendToServer(Constants.doMove + sep + markerId + sep + hexLabel + sep +
             entrySide + sep + teleport + sep + teleportingLord);
     }
 
     public void assignColor(String color)
     {
-        out.println(Constants.assignColor + sep + color);
+        sendToServer(Constants.assignColor + sep + color);
     }
 
     public void assignFirstMarker(String markerId)
     {
-        out.println(Constants.assignFirstMarker + sep + markerId);
+        sendToServer(Constants.assignFirstMarker + sep + markerId);
     }
 
     // XXX Disallow the following methods in network games
     public void newGame()
     {
-        out.println(Constants.newGame);
+        sendToServer(Constants.newGame);
     }
 
     public void loadGame(String filename)
     {
-        out.println(Constants.loadGame + sep + filename);
+        sendToServer(Constants.loadGame + sep + filename);
     }
 
     public void saveGame(String filename)
     {
-        out.println(Constants.saveGame + sep + filename);
+        sendToServer(Constants.saveGame + sep + filename);
     }
 }

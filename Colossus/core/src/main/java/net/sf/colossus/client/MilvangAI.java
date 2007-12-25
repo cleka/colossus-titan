@@ -176,5 +176,4 @@ public class MilvangAI extends RationalAI
 
         return new MusteredCreatures(false, critters);
     }
-
 }

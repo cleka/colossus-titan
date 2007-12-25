@@ -34,6 +34,18 @@ public final class Options implements IOptions
     public static final String playerName = "Player name ";
     public static final String playerType = "Player type ";
 
+    public static final String runClientPlayer = "Network client playername";
+    public static final String runClientHost = "Network client hostname";
+    public static final String runClientPort = "Network client port";
+    public static final String loadGameFileName = "Load game file name";
+    public static final String webFlagFileName = "Web game flag file";
+    public static final String serveAtPort = "Run server on port";
+
+    public static final String webServerHost = "Web server name";
+    public static final String webServerPort = "Web server port";
+    public static final String webClientLogin = "Web client login";
+    public static final String webClientPassword = "Web client password";
+
     // Option names
 
     // Server administrative options
@@ -41,11 +53,17 @@ public final class Options implements IOptions
     public static final String logDebug = "Log debug messages";
     public static final String autoStop = "AIs stop when humans dead";
     public static final String autoQuit = "Auto quit when game over";
+    public static final String goOnWithoutObserver = "Go on without observer";
 
     // Rules options
     public static final String variant = "Variant";
     public static final String viewMode = "ViewMode";
     public static final String dubiousAsBlanks = "Uncertain as blank (Autoinspector etc.)";
+
+    // Web Client specific:
+    public static final String minPlayersWeb  = "Min Players Web Client";
+    public static final String targPlayersWeb = "Target Players Web Client";
+    public static final String maxPlayersWeb  = "Max Players Web Client";
 
     /* selections for viewable Legions */
     public static final String viewableOwn  = "Only own legions";
@@ -100,6 +118,7 @@ public final class Options implements IOptions
     public static final String showAutoInspector = "Show inspector";
     public static final String showEventViewer = "Show event window";
     public static final String showLogWindow = "Show log window";
+    public static final String showWebClient = "Show web client";
     public static final String showEngagementResults =
         "Show engagement results";
     public static final String useOverlay = "Use Graphical Overlay";
@@ -163,15 +182,24 @@ public final class Options implements IOptions
 
     private Properties props = new Properties();
     private String owner;      // playerName, or Constants.optionsServerName
+    private String dataPath;   // WebServer sets to create a server.cfg file
+    // in the directory in which the game is run
 
     public Options(String owner)
     {
         this.owner = owner;
+        this.dataPath = Constants.gameDataPath;
+    }
+
+    public Options(String owner, String customPath)
+    {
+        this.owner = owner;
+        this.dataPath = customPath;
     }
 
     public String getOptionsFilename()
     {
-        return Constants.gameDataPath + Constants.optionsBase + owner +
+        return dataPath + Constants.optionsBase + owner +
             Constants.optionsExtension;
     }
 
@@ -211,15 +239,15 @@ public final class Options implements IOptions
         }
         String optionsFile = getOptionsFilename();
 
-        File optionsDir = new File(Constants.gameDataPath);
+        File optionsDir = new File(dataPath);
         if (!optionsDir.exists() || !optionsDir.isDirectory())
         {
             LOGGER.log(Level.INFO,
-                "Trying to make directory " + Constants.gameDataPath);
+                "Trying to make directory " + dataPath);
             if (!optionsDir.mkdirs())
             {
-                LOGGER.log(Level.SEVERE, 
-                    "Could not create options directory " + 
+                LOGGER.log(Level.SEVERE,
+                    "Could not create options directory " +
                     optionsDir.toString());
                 return;
             }
@@ -233,7 +261,7 @@ public final class Options implements IOptions
         }
         catch (IOException e)
         {
-            LOGGER.log(Level.SEVERE, 
+            LOGGER.log(Level.SEVERE,
                 "Couldn't write options to " + optionsFile, e);
         }
     }
@@ -354,6 +382,25 @@ public final class Options implements IOptions
         return val;
     }
 
+    /*
+     // Right now (09/2007) not used anywhere; but perhaps web server should
+     // store and transmit only the numerical modes, then this would be needed.
+     // so I keep it here for now.
+     public static String xgetStringForViewMode(int val)
+     {
+         String text = Options.viewableAll;
+         switch(val)
+         {
+         case Options.viewableAllNum: text = Options.viewableAll; break;
+         case Options.viewableEverNum: text = Options.viewableEver; break;
+         case Options.viewableLastNum: text = Options.viewableLast; break;
+         case Options.viewableOwnNum: text = Options.viewableOwn; break;
+         default: text = Options.viewableAll; break;
+         }
+     
+         return text;
+     }
+     */
     // client compares then only numeric modes (easier and faster in runtime)
     // ((can use switch case statement))
     public int getNumberForRecruitChitSelection(String s)
@@ -381,6 +428,43 @@ public final class Options implements IOptions
             val = Options.showRecruitChitsNumAll;
         }
         return val;
+    }
+
+    private static String propNameStresstestRounds =
+        "net.sf.colossus.stressTestRounds";
+
+    public static boolean isStresstest()
+    {
+        return (System.getProperty(propNameStresstestRounds) != null);
+    }
+
+    public static int getHowManyStresstestRoundsProperty()
+    {
+        String propHowMany = System.getProperty(propNameStresstestRounds);
+        int howMany = 1;
+
+        if (propHowMany != null)
+        {
+            try
+            {
+                int i = Integer.parseInt(propHowMany);
+                howMany = i;
+
+                System.out.println("\nNOTE: Using value " + i +
+                    " from property " +
+                    propNameStresstestRounds + " as counter for stresstest, " +
+                    "how many rounds to do inside one JVM run.\n");
+            }
+            catch (NumberFormatException ex)
+            {
+                howMany = 1;
+                System.out.println("\nNOTE: Value '" + propHowMany +
+                    "' from property " +
+                    propNameStresstestRounds +
+                    " is not a valid number - using default value 1!\n");
+            }
+        }
+        return howMany;
     }
 
 }

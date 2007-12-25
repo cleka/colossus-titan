@@ -17,6 +17,8 @@ public class KDialog extends JDialog implements MouseListener, WindowListener
     public KDialog(Frame owner, String title, boolean modal)
     {
         super(owner, title, modal);
+        net.sf.colossus.webcommon.FinalizeManager.register(this,
+            "KDialog-for-?");
     }
 
     /** Place dialog relative to parentFrame's origin, offset by 

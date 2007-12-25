@@ -1,0 +1,159 @@
+<html>
+  <head>
+    <meta name="generator"
+    content="HTML Tidy for Linux/x86 (vers 1st July 2002), see www.w3.org" />
+    <title>Changes to Game startup, window closing, quitting</title>
+  </head>
+  <body>
+<h1>Changes to Game startup, window closing, quitting</h1>
+
+Related to adding the WebServer/Client functionality, I did quite some
+cleanup and changes (improvements, IMHO, although some others might 
+disagree;-) to the overall Start and Shutdown of Colossus.
+<P>
+This document describes those changes (done around december 2007) and
+some reasons behind. When the transition is complete, this document is
+not needed any more...
+
+<H3>Close vs. Quit</H3>
+
+There is now a difference between "close" and "quit".
+<P>
+File menu has now "Close" and "Quit". Close just closes this board,
+and only Quit completely/immediately ends the whole JVM; Closing the 
+MasterBoard now asks whether to Quit, Close, New Game or Cancel. In near 
+future I would like to have a choice for that in a new "Setting/Preferences"
+dialog, whether to ask or do one of the above without asking.
+[The "Close" feature is missing right now, I'll try to add that
+as soon as possible after merging back to trunk.]
+<P>
+
+In hotseat game ( = more than one local player), if one player closes
+his board, just this board is closed and game continues. (This is in
+particularly nice when one player after another dies - right now you
+can't dispose those dead players board, if you do, whole game is
+gone). Only if last board is closed, the game and server ends.<BR>
+
+Note that this does NOT terminate the whole Colossus application, instead
+one is back to one of the dialogs (Game setup or Network client or, upcoming,
+the Web Client).
+<P>
+Also note that from Network Client and Web Client, you can easily get back
+to the "main" (Game Setup) dialog by just cosing e.g. Network client
+dialog with the small "x" type button in rigt upper corner.
+<P>
+This also applies when starting a game fails - when the player hosting the
+game in the startup dialog decides to press "Abort", or the Network Client
+connecting fails (timout, wrong address, etc.) - you are then back to
+the dialog from where you initiated that action and can try once more
+(and do not need to start whole Colossus application again).
+<P>
+Altogether this mostly means a change from the "run one Colossus for one game
+and when it's over start a new instance" approach to the "after one is over
+you are ready to start another", and one needs explicit do a Quit.
+<P>My changes include a proper cleanup of all relevant major classes
+like Game, Server, SocketServerThread, Client, SocketClientThread, MasterBoard
+(i.e. they are garbage collected.)
+
+For comparison, earlier starting a new game from inside did not cleanup
+basically anything, and any "Close window" (MasterBoard) mostly did directly
+a "System.exit()", happily causing SocketClosed exceptions on several places.
+<P>
+Kind of "System.exit(0)" is the answer to everything ;-)
+<P>
+<H3>Application lifecycle / main control flow</H3>
+
+<H4>Behavior so far</H4>
+
+Earlier Colossus was like:
+<P>
+<OL>
+<LI>main() starts some GUI (e.g. GetPlayers)
+<LI>main() starts game and server<BR>
+  -or- <BR> 
+   Network Client GUI starts the Client
+<LI>main() ends
+<LI>New game is started from inside MasterBoard menu
+</OL>
+
+I.e. if one does that several times, the chain "who started whom"
+is always getting longer, and from "how did the method call / control flow"
+go point of view, it was totally different issue whether one used -g or not.
+<P>
+For example, there was the funny effect as described in:<BR>
+
+<A HREF="http://sourceforge.net/tracker/index.php?func=detail&aid=1715752&group_id=1939&atid=101939">
+[ 1715752 ] Autoquit hangs when Log window and -g</A>
+<BR>
+
+This is quite a pain, if one tries to find a bug, and the application
+behaves (apart from the intended having to confirm in a GUI or not) 
+differently with or without -g.
+
+<P>
+Furthermore, <B> all games played in one Colossus instance were played
+in the same instance of "Game"</B> - just Server object recreated and
+(hopefully) all values reset (are we sure all were reset?).
+<P>
+All Socket Threads did stay hanging waiting for input forever (until
+System.exit(0) was done), and basically none of the major Classes objects
+(Socket threads, Client, MasterBoard) were recycled by GC -- because the
+threads were still running and thread and client were referencing each other
+(there was some code to stop those threads, but it did not effect anything).
+
+
+
+
+<H4>Control flow now</H4>
+
+The main() is after some initialization just a loop:
+<PRE>
+while ( ! user requested Quit )
+{
+    if necessary, bring up some GUI to let user pick what to do;
+    inititiate the activity what user wanted to do;
+       ( = Game as server, start a network client, OR start a web client)
+    wait until that activity notifies us that it is over and main shall
+       go up to begin of loop again;
+}
+</PRE>
+
+For example if "activity user wanted to do" was running a game with a board,
+when game was over, user can select (as now) New Game from File menu;
+this will store the info "as next thing do the GetPlayers dialog" to somewhere,
+and "somehow" stop the game and all clients, and make the dialog come up.
+<P>
+main() notices that the activity is completed, and does what it's supposed 
+to do next.
+<P>
+Alternatively, user just closed his board (last board, or e.g. just one player
+with several AIs) - main() notices that the activity is over, and since
+nothing was set to be done next, it comes up with a dialog.
+(Depending whether user started his game from GetPlayers, Start Client
+or Web Client, it might come up with that specific dialog).
+
+
+<BR>
+
+<H3>Client startup</H3>
+
+For connection refused (wrong server, wrong port, no network
+connection possible due to e.g. firewall), user gets now after
+(currently) 5 seconds a message about that, and is back to the client
+start window to try again.
+<P>
+Also for "Right server and port", but that server does not wait for more
+clients (perhaps some other accidentally connected twice?) one gets
+a message after some timeout, and can try again.
+<P>
+
+The GetPlayers dialog on server side tells the port it would use in
+the top, one can change it in some place, and when starting, the
+server startup progress log tells on which port it is listening.
+
+<P>
+<HR>
+Created during November 2007 by Cleka. Updated december 24 by CleKa.
+
+</body>
+</html>

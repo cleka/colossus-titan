@@ -1,0 +1,17 @@
+# Example WebServer.cf file, for windows;
+# For usage rename to WebServer.cf and adjust pathnames
+#
+# @version $Id$
+# @author Clemens Katzer
+#
+ServerPort=26766
+SocketQueueLen=5
+MaxClients=50
+MaxUsers=500
+PortRangeFrom=26767
+AvailablePorts=20
+UsersFile=users.dat
+JavaCommand=C:\\apps\\j2sdk_1.4.2_12\\bin\\java.exe
+ColossusJar=C:\\workspace\\colossus\\Colossus.jar
+LogPropTemplate=C:\\workspace\\colossus\\logging.properties
+WorkFilesBaseDir=C:\\temp\\colossus

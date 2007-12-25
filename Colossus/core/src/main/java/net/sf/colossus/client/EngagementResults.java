@@ -419,6 +419,8 @@ final class EngagementResults extends KDialog
     {
         saveWindow.save(this);
         super.dispose();
+        this.options = null;
+        this.oracle = null;
     }
 
     public void setVisible(boolean visible)

@@ -5,8 +5,6 @@ import java.awt.BorderLayout;
 import java.awt.Cursor;
 import java.awt.GraphicsDevice;
 import java.awt.Point;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -24,6 +22,8 @@ import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import java.lang.reflect.InvocationTargetException;
+
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
@@ -35,10 +35,14 @@ import net.sf.colossus.server.Dice;
 import net.sf.colossus.server.IServer;
 import net.sf.colossus.server.Player;
 import net.sf.colossus.server.VariantSupport;
+import net.sf.colossus.server.Start;
 import net.sf.colossus.util.LogWindow;
 import net.sf.colossus.util.Options;
 import net.sf.colossus.util.ResourceLoader;
 import net.sf.colossus.util.Split;
+import net.sf.colossus.util.ChildThreadManager;
+import net.sf.colossus.util.SystemExitManager;
+import net.sf.colossus.util.KFrame;
 import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
 
@@ -65,6 +69,12 @@ public final class Client implements IClient, IOracle, IOptions
     /** This will eventually be a network interface rather than a
      *  direct reference.  So don't share this reference. */
     private IServer server;
+    private ChildThreadManager threadMgr;
+
+    private WebClient webClient = null;
+    private boolean startedByWebClient = false;
+
+    public boolean failed = false;
 
     private MasterBoard board;
     private StatusScreen statusScreen;
@@ -159,6 +169,13 @@ public final class Client implements IClient, IOracle, IOptions
     private Negotiate negotiate;
     private ReplyToProposal replyToProposal;
 
+    // Constants for closedBy:
+    public static final int notYet      = 0;
+    public static final int byServer    = 1;
+    public static final int byClient    = 2;
+    public static final int byWebClient = 3;
+    public int closedBy = notYet;
+
     // XXX temporary until things are synched
     private boolean tookMulligan;
     private int mulliganOldRoll = -2;
@@ -177,62 +194,129 @@ public final class Client implements IClient, IOracle, IOptions
     private int viewMode;
     private int recruitChitMode;
 
-    public Client(String host, int port, String playerName, boolean remote)
+    // Once we got dispose from server (or user initiated it himself), 
+    // we'll ignore it if we we get it from server again 
+    // - it's then up to the user to do some "disposing" action.
+    private boolean gotDisposeAlready = false;
+
+    private boolean disposeInProgress = false;
+
+    public Client(String host, int port, String playerName,
+        boolean remote, boolean byWebClient)
     {
         super();
 
         this.playerName = playerName;
         this.remote = remote;
+        this.startedByWebClient = byWebClient;
+        this.threadMgr = new ChildThreadManager("Client " + playerName);
+
+        SystemExitManager.register(this, "Client " + playerName);
+        net.sf.colossus.webcommon.FinalizeManager.register(this,
+            "Client " + playerName);
 
         options = new Options(playerName);
         // Need to load options early so they don't overwrite server options.
         loadOptions();
 
         sct = new SocketClientThread(this, host, port);
-        this.server = sct;
 
-        if (remote)
+        String reasonFail = sct.getReasonFail();
+        if (reasonFail != null)
         {
-            net.sf.colossus.util.ResourceLoader.setDataServer(host, port + 1);
+            // If this failed here, it is usually a "could not connect"-problem
+            // (wrong host or port or server not yet up).
+            // In this case we just do cleanup and end.
+
+            // start needs to be run, otherwise thread won't be GC'd.
+            sct.start();
+            sct = null;
+
+            String title = "Socket initialialization failed!";
+            showErrorMessage(reasonFail, title);
+
+            if (remote)
+            {
+                Start.setCurrentWhatToDoNext(Start.NetClientDialog);
+            }
+            failed = true;
+            SystemExitManager.doSystemExitMaybe(this, 0);
         }
         else
         {
-            net.sf.colossus.util.ResourceLoader.setDataServer(null, 0);
-        }
-
-        sct.start();
-
-        TerrainRecruitLoader.setCaretakerInfo(caretakerInfo);
-        net.sf.colossus.server.CustomRecruitBase.addCaretakerInfo(
-            caretakerInfo);
-
-        String viewModeName = options.getStringOption(Options.viewMode);
-        viewMode = options.getNumberForViewMode(viewModeName);
-
-        String rcMode = options.getStringOption(Options.showRecruitChitsSubmenu);
-        if (rcMode == null || rcMode.equals(""))
-        {
-            // not set: convert from old "showAllRecruitChits" option
-            boolean showAll = options.getOption(Options.showAllRecruitChits);
-            if (showAll)
+            this.server = sct;
+            if (remote)
             {
-                rcMode = Options.showRecruitChitsAll;
+                net.sf.colossus.util.ResourceLoader.setDataServer(host,
+                    port + 1);
             }
             else
             {
-                rcMode = Options.showRecruitChitsStrongest;
+                net.sf.colossus.util.ResourceLoader.setDataServer(null, 0);
             }
-            // initialize new option
-            options.setOption(Options.showRecruitChitsSubmenu, rcMode);
-            // clean up obsolete option from cfg file
-            options.removeOption(Options.showAllRecruitChits);
+
+            sct.start();
+
+            TerrainRecruitLoader.setCaretakerInfo(caretakerInfo);
+            net.sf.colossus.server.CustomRecruitBase.addCaretakerInfo(
+                caretakerInfo);
+            failed = false;
         }
-        recruitChitMode = options.getNumberForRecruitChitSelection(rcMode);
+    }
+
+    public ChildThreadManager getThreadMgr()
+    {
+        return threadMgr;
     }
 
     boolean isRemote()
     {
         return remote;
+    }
+
+    public void setWebClient(WebClient wc)
+    {
+        this.webClient = wc;
+    }
+
+    public boolean getFailed()
+    {
+        return failed;
+    }
+
+    /*
+     * If webclient is just hidden, bring it back; 
+     * if it had been used, ask whether to restore;
+     * Otherwise just do nothing
+     */
+    void handleWebClientRestore()
+    {
+        if (this.webClient != null)
+        {
+            // was only Hidden, so bring it up without asking
+            this.webClient.setVisible(true);
+        }
+        else
+        {
+            // webclient never used (local game), or explicitly closed
+            // - don't bother user with it
+            // If he now said quit -- he probably wants quit.
+            // if he now used close or new game, he can get to web client
+            // from GetPlayers dialog.
+        }
+    }
+
+    public void showWebClient()
+    {
+        if (this.webClient == null)
+        {
+            this.webClient = new WebClient(null, -1, null, null);
+            this.webClient.setGameClient(this);
+        }
+        else
+        {
+            this.webClient.setVisible(true);
+        }
     }
 
     /** Take a mulligan. */
@@ -282,7 +366,10 @@ public final class Client implements IClient, IOracle, IOptions
 
     private void concede(String markerId)
     {
-        server.concede(markerId);
+        if (markerId != null)
+        {
+            server.concede(markerId);
+        }
     }
 
     private void doNotConcede(String markerId)
@@ -369,33 +456,42 @@ public final class Client implements IClient, IOracle, IOptions
         {
             // No board yet, or no board at all - nothing to do.
             // Initial show will be done in initBoard.
+            return;
+        }
+        if (bval)
+        {
+            if (autoInspector == null)
+            {
+                autoInspector = new AutoInspector(parent, this, playerName,
+                    viewMode, getOption(Options.dubiousAsBlanks));
+            }
         }
         else
         {
-            if (bval)
-            {
-                if (autoInspector == null)
-                {
-                    boolean dubiousAsBlanks =
-                        getOption(Options.dubiousAsBlanks);
-                    autoInspector = new AutoInspector(parent, this,
-                        playerName, viewMode, dubiousAsBlanks);
-                }
-            }
-            else
-            {
-                disposeInspector();
-            }
+            disposeInspector();
         }
     }
 
-    private void disposeInspector()
+    private void showOrHideCaretaker(boolean bval)
     {
-        if (autoInspector != null)
+        if (board == null)
         {
-            autoInspector.setVisible(false);
-            autoInspector.dispose();
-            autoInspector = null;
+            // No board yet, or no board at all - nothing to do.
+            // Initial show will be done in initBoard.
+            return;
+        }
+
+        if (bval)
+        {
+            if (caretakerDisplay == null)
+            {
+                JFrame parent = getPreferredParent();
+                caretakerDisplay = new CreatureCollectionView(parent, this);
+            }
+        }
+        else
+        {
+            disposeCaretakerDisplay();
         }
     }
 
@@ -614,7 +710,7 @@ public final class Client implements IClient, IOracle, IOptions
     /** This player quits the whole game. The server needs to always honor
      *  this request, because if it doesn't players will just drop
      *  connections when they want to quit in a hurry. */
-    void withdrawFromGame()
+    public void withdrawFromGame()
     {
         if (!isGameOver())
         {
@@ -805,11 +901,6 @@ public final class Client implements IClient, IOracle, IOptions
         return this.viewMode;
     }
 
-    public int getRecruitChitMode()
-    {
-        return this.recruitChitMode;
-    }
-
     /** Fully sync the board state by running all option triggers. */
     private void runAllOptionTriggers()
     {
@@ -821,6 +912,12 @@ public final class Client implements IClient, IOracle, IOptions
             optionTrigger(name, value);
         }
         syncOptions();
+    }
+
+    private void optionTrigger(String optname)
+    {
+        String value = getStringOption(optname);
+        optionTrigger(optname, value);
     }
 
     /** Trigger side effects after changing an option value. */
@@ -875,13 +972,14 @@ public final class Client implements IClient, IOracle, IOptions
         }
         else if (optname.equals(Options.showCaretaker))
         {
-            updateCreatureCountDisplay();
+            showOrHideCaretaker(bval);
         }
         else if (optname.equals(Options.showLogWindow))
         {
-            if (bval)
+            if (board != null && bval)
             {
-                if (logWindow == null) {
+                if (logWindow == null)
+                {
                     // the logger with the empty name is parent to all loggers
                     // and thus catches all messages
                     logWindow = new LogWindow(this, Logger.getLogger(""));
@@ -889,11 +987,7 @@ public final class Client implements IClient, IOracle, IOptions
             }
             else
             {
-                if (logWindow != null) {
-                    logWindow.setVisible(false);
-                    logWindow.dispose();
-                    logWindow = null;
-                }
+                disposeLogWindow();
             }
         }
         else if (optname.equals(Options.showStatusScreen))
@@ -1054,9 +1148,8 @@ public final class Client implements IClient, IOracle, IOptions
             {
                 if (board != null)
                 {
-                    statusScreen = new StatusScreen((secondaryParent == null ?
-                        board.getFrame() : secondaryParent), this, this,
-                        this);
+                    statusScreen = new StatusScreen(getPreferredParent(),
+                        this, this, this);
                 }
             }
         }
@@ -1124,7 +1217,8 @@ public final class Client implements IClient, IOracle, IOptions
                 // should never happen... just for to be sure.
                 else if (tryHash != playerInfo[i])
                 {
-                    System.out.println("Wooooah! Found by hash differs from loop?");
+                    LOGGER.log(Level.SEVERE,
+                        "Wooooah! Found by hash differs from loop?");
                 }
                 return i;
             }
@@ -1162,41 +1256,13 @@ public final class Client implements IClient, IOracle, IOptions
 
     private void updateCreatureCountDisplay()
     {
-        if (getOption(Options.showCaretaker))
+        if (board == null)
         {
-            if (caretakerDisplay == null)
-            {
-                if (board != null)
-                {
-                    caretakerDisplay = new CreatureCollectionView(
-                        (secondaryParent == null ? board.getFrame() :
-                        secondaryParent), this);
-                    caretakerDisplay.addWindowListener(new WindowAdapter()
-                    {
-                        public void windowClosing(WindowEvent e)
-                        {
-                            setOption(Options.showCaretaker, false);
-                        }
-                    }
-                    );
-                }
-            }
-            else
-            {
-                caretakerDisplay.update();
-            }
+            return;
         }
-        else
+        if (caretakerDisplay != null)
         {
-            if (board != null)
-            {
-                board.twiddleOption(Options.showCaretaker, false);
-            }
-            if (caretakerDisplay != null)
-            {
-                caretakerDisplay.dispose();
-                caretakerDisplay = null;
-            }
+            caretakerDisplay.update();
         }
     }
 
@@ -1209,7 +1275,16 @@ public final class Client implements IClient, IOracle, IOptions
         }
     }
 
-    void disposeStatusScreen()
+    private void disposeBattleMap()
+    {
+        if (map != null)
+        {
+            map.dispose();
+            map = null;
+        }
+    }
+
+    private void disposeStatusScreen()
     {
         if (statusScreen != null)
         {
@@ -1218,7 +1293,17 @@ public final class Client implements IClient, IOracle, IOptions
         }
     }
 
-    void disposeEventViewer()
+    private void disposeLogWindow()
+    {
+        if (logWindow != null)
+        {
+            logWindow.setVisible(false);
+            logWindow.dispose();
+            logWindow = null;
+        }
+    }
+
+    private void disposeEventViewer()
     {
         if (eventViewer != null)
         {
@@ -1236,19 +1321,291 @@ public final class Client implements IClient, IOracle, IOptions
         }
     }
 
-    public void dispose()
+    private void disposeCaretakerDisplay()
     {
-        sct.setGoingDown();
+        if (caretakerDisplay != null)
+        {
+            caretakerDisplay.dispose();
+            caretakerDisplay = null;
+        }
+    }
+
+    private void disposeInspector()
+    {
+        if (autoInspector != null)
+        {
+            autoInspector.setVisible(false);
+            autoInspector.dispose();
+            autoInspector = null;
+        }
+    }
+
+    public void setClosedByServer()
+    {
+        closedBy = byServer;
+    }
+
+    // called by WebClient
+    public void doConfirmAndQuit()
+    {
+        if (board != null)
+        {
+            // Board does the "Really Quit?" confirmation and initiates
+            // then (if user confirmed) the disposal of everything.
+            board.doQuitGameAction();
+        }
+    }
+
+    // Used by MasterBoard and by BattleMap
+    public void closeBoardAfterConfirm(JFrame frame, boolean fromBattleBoard)
+    {
+        String[] options = new String[3];
+        options[0] = "New Game";
+        options[1] = "Quit";
+        options[2] = "Cancel";
+        int answer = JOptionPane.showOptionDialog(frame,
+            "Choose one of: Play another game, Quit, or Cancel",
+            "Play another game?",
+            JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
+            null, options, options[2]);
+        frame = null;
+        if (answer == -1 || answer == 2)
+        {
+            return;
+        }
+        else
+        {
+            if (fromBattleBoard)
+            {
+                concede();
+            }
+        }
+        if (answer == 0)
+        {
+            menuNewGame();
+        }
+        else if (answer == 1)
+        {
+            menuQuitGame();
+        }
+    }
+
+    private void disposeClientOriginated()
+    {
+        if (disposeInProgress)
+        {
+            return;
+        }
+        closedBy = byClient;
+
+        if (sct != null && !sct.isAlreadyDown())
+        {
+            {
+                // SCT will then end the loop and do the dispose.
+                // So nothing else to do any more here in EDT.
+                sct.stopSocketClientThread();
+            }
+        }
+        else
+        {
+            // SCT already closed and requested to dispose client,
+            // but user declined. Now, when user manually wants to
+            // close the board, have to do it directly.
+            disposeWholeClient();
+        }
+    }
+
+    // used from server, when game is over and server closes all sockets
+    public synchronized void dispose()
+    {
+        if (gotDisposeAlready)
+        {
+            return;
+        }
+        gotDisposeAlready = true;
+        disposeWholeClient();
+    }
+
+    // Clean up everything related to _this_ client:
+
+    public void disposeWholeClient()
+    {
+        handleWebClientRestore();
+
+        // -----------------------------------------------
+        // Now a long decision making, whether to actually close
+        // everything or not... - depending on the situation.
+        boolean close = true;
+
+        try
+        {
+            close = decideWhetherClose();
+        }
+        catch (Exception e)
+        {
+            LOGGER.log(Level.SEVERE, "Exception " + e.toString() +
+                " while deciding whether to close", e);
+        }
+
+        if (close)
+        {
+            try
+            {
+                disposeInProgress = true;
+                disposeAll();
+                if (webClient != null)
+                {
+                    webClient.setGameClient(null);
+                    webClient = null;
+                }
+            }
+            // just in case, so we are sure to get the unregistering done
+            catch (Exception e)
+            {
+                LOGGER.log(Level.SEVERE,
+                    "During close in client " + playerName +
+                    ": got Exception!!!" + e.toString(), e);
+            }
+            SystemExitManager.doSystemExitMaybe(this, 0);
+        }
+    }
+
+    private boolean decideWhetherClose()
+    {
+        boolean close = true;
+
+        // I don't use "getPlayerInfo().isAI() here, because if done
+        // so very early, getPlayerInfo delivers null. 
+        boolean isAI = true;
+        String pType = getStringOption(Options.playerType);
+        if ( pType != null &&
+            (pType.endsWith("Human") || pType.endsWith("Network")) )
+        {
+            isAI = false;
+        }
+
+        // AIs in general, and any (local or remote) client during 
+        // stresstesting should close without asking...
+        if (isAI || Options.isStresstest())
+        {
+            close = true;
+        }
+        else if (closedBy == byServer)
+        {
+            if (remote)
+            {
+                defaultCursor();
+                board.setServerClosedMessage(gameOver);
+
+                String message = (gameOver ?
+                    "Game over: Connection closed from server side." :
+                    "Connection to server unexpectedly lost?");
+
+                JOptionPane.showMessageDialog(getMapOrBoardFrame(),
+                    message,
+                    "Server closed connection",
+                    JOptionPane.INFORMATION_MESSAGE);
+                close = false;
+            }
+            else
+            {
+                // NOT remote, forced closed: just closing without asking
+            }
+        }
+        return close;
+    }
+
+    /* Dispose all windows, and clean up lot of references, 
+     * so that GC can do it's job
+     * - in case we keep JVM open to play another one...
+     */
+    private void disposeAll()
+    {
+        disposeInProgress = true;
+
+        if (sct == null)
+        {
+            return;
+        }
+
+        sct = null;
+        server = null;
+
+        threadMgr.cleanup();
+        threadMgr = null;
+
+        if (ai != simpleAI)
+        {
+            ((SimpleAI)ai).dispose();
+        }
+        simpleAI.dispose();
+        simpleAI = null;
+        ai = null;
+
+        attackerEventLegion = null;
+        defenderEventLegion = null;
+
+        lastAttackerEventLegion = null;
+        lastDefenderEventLegion = null;
+
+        if (SwingUtilities.isEventDispatchThread())
+        {
+            cleanupGUI();
+        }
+        else
+        {
+            try
+            {
+                SwingUtilities.invokeAndWait(new Runnable()
+                {
+                    public void run()
+                    {
+                        cleanupGUI();
+                    }
+                }
+                );
+            }
+            catch (InterruptedException e) {/* ignore */
+            }
+            catch (InvocationTargetException e2) {/* ignore */
+            }
+        }
+    }
+
+    private void cleanupGUI()
+    {
+        try
+        {
+            disposeInspector();
+            disposeCaretakerDisplay();
+        }
+        catch (Exception e)
+        {
+            LOGGER.log(Level.SEVERE,
+                "During disposal of Inspector and Caretaker: " + e.toString(),
+                e);
+        }
+
         cleanupBattle();
+        disposeLogWindow();
         disposeMovementDie();
         disposeStatusScreen();
         disposeEventViewer();
         disposeEngagementResults();
+        disposeBattleMap();
         disposeMasterBoard();
-        if (isRemote())
-        {
-            System.exit(0);
-        }
+
+        movement.dispose();
+
+        this.movement = null;
+        this.battleMovement = null;
+        this.strike = null;
+        this.secondaryParent = null;
+        this.legionInfo = null;
+        this.playerInfoByName = null;
+        this.playerInfo = null;
+
+        net.sf.colossus.server.CustomRecruitBase.reset();
     }
 
     /** Called from BattleMap to leave carry mode. */
@@ -1445,7 +1802,7 @@ public final class Client implements IClient, IOracle, IOptions
         return legionInfo.getHeight();
     }
 
-    /** Needed after loadGame() outside split phase. */
+    /** Needed when loading a game outside split phase. */
     public void setLegionStatus(String markerId, boolean moved,
         boolean teleported, int entrySide, String lastRecruit)
     {
@@ -1553,8 +1910,8 @@ public final class Client implements IClient, IOracle, IOptions
                 if (attackerEventLegion == null || defenderEventLegion == null)
                 {
                     // This should now never happen any more:
-                    LOGGER.log(Level.SEVERE,
-                        "no attacker nor defender legion event for acquiring!!" +
+                    LOGGER.log(Level.SEVERE, "no attacker nor defender " +
+                        " legion event for acquiring!!" +
                         " turn" + turnNumber + " player " + activePlayerName +
                         " phase " + phase + " markerid " + markerId +
                         " marker owner" +
@@ -1704,21 +2061,50 @@ public final class Client implements IClient, IOracle, IOptions
 
         try
         {
-            getLegionInfo(markerId).revealCreatures(names);
+            LegionInfo info = getLegionInfo(markerId);
+            if (info == null)
+            {
+                if (reason.equals(Constants.reasonGameOver))
+                {
+
+                    /* Should not happen any more anyway since in server side
+                     * the unregisterSocket is now done before the withdraw. 
+                     * (See r2757 in "web" branch, and see also the longer
+                     *  comment in Client.java in r2755, also in web branch.)
+                     */
+                    LOGGER.log(Level.SEVERE,
+                        "revealCreatures - no legioninfo " +
+                        "for marker " + markerId + " -- ignoring it, " +
+                        "because reason is GameOver");
+                }
+                else
+                {
+                    LOGGER.log(Level.SEVERE,
+                        "revealCreatures - no legioninfo " +
+                        "for marker " + markerId + " and it is NOT " +
+                        "the Game Over case!!!");
+                }
+            }
+            else
+            {
+                info.revealCreatures(names);
+            }
         }
         catch (NullPointerException e)
         {
+            // I believe we will not get those any more now, but let's
+            // leave it in place for a while. (17.11.2007, CleKa).
             LOGGER.log(Level.WARNING,
                 "NPE in revealCreatures, markerId=" + markerId +
-                ", reason=" + reason + ", names=" + names.toString());
+                ", reason="+reason+ ", names="+names.toString());
+            Thread.dumpStack();
             // in stresstest uncomment those, to get logs and autosaves
             // copied for troubleshooting...
             /*
-            Thread.dumpStack();
-            System.out.println("NPE in revealCreatures, markerId=" +
-            markerId + ", names=" + names.toString());
-            System.exit(1);
-            */
+             System.out.println("NPE in revealCreatures, markerId="+
+             markerId+", names="+names.toString());
+             System.exit(1);
+             */
         }
     }
 
@@ -1797,7 +2183,6 @@ public final class Client implements IClient, IOracle, IOptions
             LOGGER.log(Level.SEVERE,
                 "revealEngagedCreatures, unknown reason " + reason);
         }
-
     }
 
     List getBattleChits()
@@ -2158,6 +2543,30 @@ public final class Client implements IClient, IOracle, IOptions
                 Options.variant), false);
         }
 
+        String viewModeName = options.getStringOption(Options.viewMode);
+        viewMode = options.getNumberForViewMode(viewModeName);
+
+        String rcMode = options.getStringOption(
+            Options.showRecruitChitsSubmenu);
+        if (rcMode == null || rcMode.equals(""))
+        {
+            // not set: convert from old "showAllRecruitChits" option
+            boolean showAll = options.getOption(Options.showAllRecruitChits);
+            if (showAll)
+            {
+                rcMode = Options.showRecruitChitsAll;
+            }
+            else
+            {
+                rcMode = Options.showRecruitChitsStrongest;
+            }
+            // initialize new option
+            options.setOption(Options.showRecruitChitsSubmenu, rcMode);
+            // clean up obsolete option from cfg file
+            options.removeOption(Options.showAllRecruitChits);
+        }
+        recruitChitMode = options.getNumberForRecruitChitSelection(rcMode);
+
         // Intended for stresstest, to see whats happening, and that graphics
         // stuff is there done, too.
         // This here works only if name setting is done "by-type", so that
@@ -2180,15 +2589,26 @@ public final class Client implements IClient, IOracle, IOptions
             disposeEventViewer();
             disposeEngagementResults();
             disposeInspector();
+            disposeCaretakerDisplay();
+            disposeLogWindow();
             disposeMasterBoard();
 
             board = new MasterBoard(this);
             initEventViewer();
             initShowEngagementResults();
-            String value = getStringOption(Options.showAutoInspector);
-            optionTrigger(Options.showAutoInspector, value);
+            optionTrigger(Options.showAutoInspector);
+            optionTrigger(Options.showLogWindow);
+            optionTrigger(Options.showCaretaker);
 
             focusBoard();
+        }
+
+        if (startedByWebClient)
+        {
+            if (webClient != null)
+            {
+                webClient.notifyComingUp();
+            }
         }
     }
 
@@ -2210,6 +2630,18 @@ public final class Client implements IClient, IOracle, IOptions
     public void setPlayerName(String playerName)
     {
         this.playerName = playerName;
+        // all those just for debugging purposes:
+        net.sf.colossus.webcommon.FinalizeManager.setId(this,
+            "Client " + playerName);
+        // set name right for the autoplay-AI
+        net.sf.colossus.webcommon.FinalizeManager.setId(this.simpleAI,
+            "Autoplay-SimpleAI " + playerName);
+        if (ai != simpleAI)
+        {
+            // set name right for the AI if this is an AI player
+            net.sf.colossus.webcommon.FinalizeManager.setId(ai,
+                "AI: " + playerName);
+        }
         sct.fixName(playerName);
     }
 
@@ -2328,13 +2760,67 @@ public final class Client implements IClient, IOracle, IOptions
         return frame;
     }
 
-    void showMessageDialog(String message)
+    public void showErrorMessage(String reason, String title)
+    {
+        // I do not use null or a simple frame, because then the System.exit(0)
+        // does not exit by itself (due to some bug in Swing/AWT).
+        KFrame f = new KFrame("Dummyframe for Client error message dialog");
+        JOptionPane.showMessageDialog(f, reason, title,
+            JOptionPane.ERROR_MESSAGE);
+        f.dispose();
+        f = null;
+    }
+
+    String getMessage()
+    {
+        return this.message;
+    }
+
+    String message = "";
+    public void showMessageDialog(String message)
+    {
+        if (SwingUtilities.isEventDispatchThread())
+        {
+            doShowMessageDialog(message);
+        }
+        else
+        {
+            this.message = message;
+            try
+            {
+                SwingUtilities.invokeAndWait(new Runnable()
+                {
+                    public void run()
+                    {
+                        doShowMessageDialog(getMessage());
+                    }
+                }
+                );
+            }
+            catch (InterruptedException e) {/* ignore */
+            }
+            catch (InvocationTargetException e2) {/* ignore */
+            }
+        }
+    }
+
+    void doShowMessageDialog(String message)
     {
         // Don't bother showing messages to AI players.  Perhaps we
         // should log them.
         if (getOption(Options.autoPlay))
         {
-            return;
+            boolean isAI = getPlayerInfo().isAI();
+            if ((message.equals("Draw") || message.endsWith(" wins")) && !isAI &&
+                !getOption(Options.autoQuit))
+            {
+                // show it for humans, even in autoplay,
+                //  but not when autoQuit set (=> remote stresstest)
+            }
+            else
+            {
+                return;
+            }
         }
         JFrame frame = getMapOrBoardFrame();
         if (frame != null)
@@ -2351,11 +2837,19 @@ public final class Client implements IClient, IOracle, IOptions
             ", " + slayerName + ")");
         PlayerInfo info = getPlayerInfo(deadPlayerName);
 
-        // TODO Merge these
-        info.setDead(true);
-        info.removeAllLegions();
+        if (info != null)
+        {
+            // TODO Merge these
+            info.setDead(true);
+            info.removeAllLegions();
+            // otherwise called too early, e.g. someone quitted
+            // already during game start...
+            if (predictSplits != null)
+            {
+                predictSplits[getPlayerNum(deadPlayerName)] = null;
+            }
 
-        predictSplits[getPlayerNum(deadPlayerName)] = null;
+        }
 
         if (this.playerName.equals(deadPlayerName))
         {
@@ -2366,8 +2860,16 @@ public final class Client implements IClient, IOracle, IOptions
     public void tellGameOver(String message)
     {
         gameOver = true;
+        if (webClient != null)
+        {
+            webClient.tellGameEnds();
+        }
+
         if (board != null)
         {
+            // @@ TODO CleKa: take those in use?
+            // defaultCursor();
+            // board.setGameOverState();
             showMessageDialog(message);
         }
     }
@@ -2388,7 +2890,8 @@ public final class Client implements IClient, IOracle, IOptions
             List legions = getLegionsByHex(hexLabel);
             if (legions.size() != 1)
             {
-                LOGGER.log(Level.SEVERE, "Not exactly one legion in donor hex");
+                LOGGER.log(Level.SEVERE,
+                    "Not exactly one legion in donor hex");
                 return;
             }
             String markerId = (String)legions.get(0);
@@ -4032,8 +4535,8 @@ public final class Client implements IClient, IOracle, IOptions
         else
         {
             LOGGER.log(Level.WARNING,
-                playerName + " reserveRecruit creature " + recruitName +
-                " not fround from hash, should have been created" + 
+                playerName + " reserveRecruit creature "+ recruitName +
+                " not fround from hash, should have been created" +
                 " during getReservedCount!");
             remain = getCreatureCount(recruitName);
         }
@@ -4525,19 +5028,88 @@ public final class Client implements IClient, IOracle, IOptions
         return getFriendlyLegions(hexLabel, pName).size();
     }
 
-    void newGame()
+    // Used by File=>Close and Window closing 
+    public void setWhatToDoNextForClose()
     {
-        clearUndoStack();
-        server.newGame();
+        if (startedByWebClient)
+        {
+            Start.setCurrentWhatToDoNext(Start.StartWebClient);
+        }
+        else if (remote)
+        {
+            // Remote clients get back to Network Client dialog
+            Start.setCurrentWhatToDoNext(Start.NetClientDialog);
+        }
+        else
+        {
+            Start.setCurrentWhatToDoNext(Start.GetPlayersDialog);
+        }
     }
 
-    void loadGame(String filename)
+    public void notifyServer()
     {
         clearUndoStack();
-        server.loadGame(filename);
+        if (!remote)
+        {
+            server.stopGame();
+        }
+        disposeClientOriginated();
     }
 
-    void saveGame(String filename)
+    boolean quitAlreadyTried = false;
+
+    public void menuQuitGame()
+    {
+        // Note that if this called from webclient, webclient has already 
+        // beforehand called client to set webclient to null :)
+        if (webClient != null)
+        {
+            webClient.dispose();
+            webClient = null;
+        }
+
+        // as a fallback/safety: if the close/dispose chain does not work,
+        // on 2nd attempt directly do System.exit() so that user can somehow
+        // get rid of the game "cleanly"...
+        if (quitAlreadyTried)
+        {
+            JOptionPane.showMessageDialog(getMapOrBoardFrame(),
+                "Arggh!! Seems the standard Quit procedure does not work.\n" +
+                "Doing System.exit() now the hard way.",
+                "Proper quitting failed!",
+                JOptionPane.INFORMATION_MESSAGE);
+
+            System.exit(1);
+        }
+        quitAlreadyTried = true;
+
+        Start.setCurrentWhatToDoNext(Start.QuitAll);
+        notifyServer();
+    }
+
+    void menuNewGame()
+    {
+        if (webClient != null)
+        {
+            webClient.dispose();
+            webClient = null;
+        }
+        setWhatToDoNextForClose();
+        notifyServer();
+    }
+
+    void menuLoadGame(String filename)
+    {
+        if (webClient != null)
+        {
+            webClient.dispose();
+            webClient = null;
+        }
+        Start.setCurrentWhatToDoNext(Start.LoadGame, filename);
+        notifyServer();
+    }
+
+    void menuSaveGame(String filename)
     {
         server.saveGame(filename);
     }
@@ -5170,12 +5742,9 @@ public final class Client implements IClient, IOracle, IOptions
             secondaryParent = new JFrame(chosen.getDefaultConfiguration());
             disposeStatusScreen();
             updateStatusScreen();
-            if (caretakerDisplay != null)
-            {
-                caretakerDisplay.dispose();
-            }
-            caretakerDisplay = null;
-            updateCreatureCountDisplay();
+            disposeCaretakerDisplay();
+            boolean bval = getOption(Options.showCaretaker);
+            showOrHideCaretaker(bval);
         }
     }
 
@@ -5203,7 +5772,8 @@ public final class Client implements IClient, IOracle, IOptions
             predictSplits = new PredictSplits[numPlayers];
         }
         int playerNum = getPlayerNum(pName);
-        predictSplits[playerNum] = new PredictSplits(rootMarkerId, creatureNames);
+        predictSplits[playerNum] = new PredictSplits(rootMarkerId,
+            creatureNames);
     }
 
     PredictSplits getPredictSplits(String pName)

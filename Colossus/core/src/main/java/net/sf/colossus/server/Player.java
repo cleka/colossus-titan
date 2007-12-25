@@ -51,6 +51,8 @@ public final class Player implements Comparable
         this.name = name;
         this.game = game;
         type = "Human";
+
+        net.sf.colossus.webcommon.FinalizeManager.register(this, name);
     }
 
     boolean isHuman()
@@ -440,6 +442,7 @@ public final class Player implements Comparable
     void setName(String name)
     {
         this.name = name;
+        net.sf.colossus.webcommon.FinalizeManager.setId(this, name);
     }
 
     public String toString()

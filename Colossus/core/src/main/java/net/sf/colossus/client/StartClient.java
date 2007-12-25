@@ -1,9 +1,9 @@
 package net.sf.colossus.client;
 
 
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GridLayout;
-import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
@@ -20,11 +20,11 @@ import java.util.logging.Logger;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 
 import net.sf.colossus.server.Constants;
-import net.sf.colossus.util.KDialog;
+import net.sf.colossus.server.Start;
+import net.sf.colossus.util.KFrame;
 import net.sf.colossus.util.Options;
 
 
@@ -35,31 +35,48 @@ import net.sf.colossus.util.Options;
  */
 
 
-public class StartClient extends KDialog implements WindowListener,
+public class StartClient extends KFrame implements WindowListener,
     ActionListener
 {
     private static final Logger LOGGER = Logger.getLogger(StartClient.class.getName());
 
-    static String playerName;
-    static String hostname;
-    int port;
-    static Options clientOptions;
-    SaveWindow saveWindow;
+    private Object mutex;
+    private Options netclientOptions;
+    private Options stOptions;
+    private Start startObject;
 
-    JComboBox nameBox;
-    JComboBox hostBox;
-    JComboBox portBox;
+    private String playerName;
+    private String hostname;
+    private int port;
+    private SaveWindow saveWindow;
 
-    public StartClient(String playerName, String hostname, int port)
+    private JComboBox nameBox;
+    private JComboBox hostBox;
+    private JComboBox portBox;
+
+    public StartClient(Object mutex, Start startObject)
     {
-        super(new JFrame(), "Client startup options", false);
+        super("Client startup options");
         getContentPane().setLayout(new GridLayout(0, 2));
 
-        StartClient.playerName = playerName;
-        StartClient.hostname = hostname;
-        this.port = port;
+        net.sf.colossus.webcommon.FinalizeManager.register(this, "only one");
 
-        getContentPane().add(new JLabel("Player name"));
+        this.mutex = mutex;
+        this.startObject = startObject;
+        this.stOptions = startObject.getStartOptions();
+
+        // player, preferred host (or null) and port from main() / cmdline 
+        this.playerName = stOptions.getStringOption(Options.runClientPlayer);
+        this.hostname   = stOptions.getStringOption(Options.runClientHost);
+        this.port       = stOptions.getIntOption(Options.runClientPort);
+
+        // LRU list of hsots, and window geometry from NetClient cf file
+        netclientOptions = new Options(Constants.optionsNetClientName);
+        netclientOptions.loadOptions();
+
+        Container panel = getContentPane();
+
+        panel.add(new JLabel("Player name"));
         Set nameChoices = new TreeSet();
         nameChoices.add(playerName);
         nameChoices.add(Constants.username);
@@ -67,78 +84,121 @@ public class StartClient extends KDialog implements WindowListener,
         nameBox.setEditable(true);
         nameBox.addActionListener(this);
         nameBox.setSelectedItem(playerName);
-        getContentPane().add(nameBox);
+        panel.add(nameBox);
 
-        getContentPane().add(new JLabel("Server hostname"));
+        panel.add(new JLabel("Server hostname"));
         Set hostChoices = new TreeSet();
-        hostChoices.add(hostname);
-        String preferred = hostname;
-        try
-        {
-            InetAddress ia = InetAddress.getLocalHost();
-            hostChoices.add(ia.getHostName());
-            preferred = ia.getHostName();
-        }
-        catch (UnknownHostException ex)
-        {
-            LOGGER.log(Level.SEVERE, "Can not resolve host", ex);
-        }
-
-        loadClientOptions();
-        // LRU, i.e. serverName0 is the one last time used.
-        // Combobox will display them alphabetically anyway,
-        // so make at least the last-used-one be preselected.
-        for (int i = Constants.numSavedServerNames; i > 0 ; i--)
-        {
-            String serverName = clientOptions.getStringOption(
-                Options.serverName + (i-1) );
-            if (serverName != null)
-            {
-                preferred = serverName;
-                hostChoices.add(serverName);
-            }
-        }
+        String preferred = initServerNames(hostname, hostChoices,
+            netclientOptions);
+        this.hostname = preferred;
         hostBox = new JComboBox(new Vector(hostChoices));
         hostBox.setEditable(true);
         hostBox.setSelectedItem(preferred);
         hostBox.addActionListener(this);
-        getContentPane().add(hostBox);
+        panel.add(hostBox);
 
-        getContentPane().add(new JLabel("Server port"));
+        panel.add(new JLabel("Server port"));
         Set portChoices = new TreeSet();
         portChoices.add("" + port);
         portChoices.add("" + Constants.defaultPort);
         portBox = new JComboBox(new Vector(portChoices));
         portBox.setEditable(true);
         portBox.addActionListener(this);
-        getContentPane().add(portBox);
+        panel.add(portBox);
 
         JButton goButton = new JButton("Go");
         goButton.addActionListener(this);
-        getContentPane().add(goButton);
+        panel.add(goButton);
 
-        JButton quitButton = new JButton(Constants.quit);
+        JButton quitButton = new JButton(Constants.quitGame);
         quitButton.addActionListener(this);
-        getContentPane().add(quitButton);
+        panel.add(quitButton);
 
         addWindowListener(this);
         pack();
-        saveWindow = new SaveWindow(clientOptions, "StartClient");
-        Point location = saveWindow.loadLocation();
-        if (location == null)
+        saveWindow = new SaveWindow(netclientOptions, "StartClient");
+        saveWindow.restoreOrCenter(this);
+
+        setVisible(true);
+    }
+
+    /* Public and static for Start.java.
+     * Initializes the hostChoices set for the ComboBox with
+     * - current running host name and IP
+     * - wantedHost hostname got as parameter (got from cmdline), 
+     *   can be null
+     * - LRU list from cf file
+     * Returns the "preferred" servername, i.e. the one that shall be
+     * set as preselected item in the hostbox. The preferred one is 
+     * server name the one given as parameter, or if none, then the 
+     * one last used from LRU list (or if even that is empty, defaults
+     * to current hostname).
+     */
+    public static String initServerNames(String wantedHost, Set hostChoices,
+        Options netclientOptions)
+    {
+        String preferred = null;
+        try
         {
-            centerOnScreen();
+            InetAddress ia = InetAddress.getLocalHost();
+            String hostAddr = ia.getHostAddress();
+            if (hostAddr != null)
+            {
+                hostChoices.add(hostAddr);
+                preferred = ia.getHostAddress();
+            }
+            String hostName = ia.getHostName();
+            if (hostName != null)
+            {
+                hostChoices.add(hostName);
+                preferred = ia.getHostName();
+            }
+        }
+        catch (UnknownHostException ex)
+        {
+            LOGGER.log(Level.SEVERE, "Can not resolve host", ex);
+        }
+
+        // LRU, i.e. serverName0 is the one last time used,
+        // that's why we go backwards.
+        // Combobox will display them alphabetically anyway,
+        // so make at least the last-used-one be preselected.
+        for (int i = Constants.numSavedServerNames-1; i >= 0 ; i--)
+        {
+            String serverName = netclientOptions.getStringOption(
+                Options.serverName + i );
+            if (serverName != null)
+            {
+                hostChoices.add(serverName);
+                preferred = serverName;
+            }
+        }
+
+        if (wantedHost != null && !wantedHost.equals(""))
+        {
+            // given one overrides all others: add it and make it preferred:
+            hostChoices.add(wantedHost);
+            preferred = wantedHost;
+        }
+        // Just as paranoid fail-safe, should never happen:
+        else if (preferred == null)
+        {
+            preferred = "localhost";
         }
         else
         {
-            setLocation(location);
+            // no name given - default to what we otherwise decided
+            // to be the "preferred" one.
+            // No asignment here - caller will assing his "hostname" 
+            // be become what we give back
         }
-        setVisible(true);
+
+        return preferred;
     }
 
     public Dimension getMinimumSize()
     {
-        return new Dimension(300, 200);
+        return new Dimension(350, 200);
     }
 
     public Dimension getPreferredSize()
@@ -148,16 +208,14 @@ public class StartClient extends KDialog implements WindowListener,
 
     public void actionPerformed(ActionEvent e)
     {
-        if (e.getActionCommand().equals(Constants.quit))
+        if (e.getActionCommand().equals(Constants.quitGame))
         {
+            startObject.setWhatToDoNext(Start.QuitAll);
             dispose();
-            System.exit(0);
         }
         else if (e.getActionCommand().equals("Go"))
         {
-            dispose();
-            saveWindow.saveLocation(getLocation());
-            connect(playerName, hostname, port);
+            doRunNetClient();
         }
         else // A combo box was changed.
         {
@@ -165,7 +223,6 @@ public class StartClient extends KDialog implements WindowListener,
             if (source == nameBox)
             {
                 playerName = (String)nameBox.getSelectedItem();
-                loadClientOptions();
             }
             else if (source == hostBox)
             {
@@ -180,49 +237,58 @@ public class StartClient extends KDialog implements WindowListener,
 
     public void windowClosing(WindowEvent e)
     {
+        startObject.setWhatToDoNext(Start.GetPlayersDialog);
         dispose();
-        System.exit(0);
     }
 
-    public static void connect(String playerName, String hostname, int port)
+    public void dispose()
     {
-        saveHostnames();
-        if ( clientOptions == null)
+        // Dispose dialog and notify main() so that game starts:
+        super.dispose();
+        synchronized (mutex)
         {
-            // needed e.g. when started as standalone from cmdline with -c -g
-            clientOptions = new Options(playerName);
-            clientOptions.loadOptions();
+            mutex.notify();
         }
-        new Client(hostname, port, playerName, true);
     }
 
-    private void loadClientOptions()
+    private void doRunNetClient()
     {
-        clientOptions = new Options(playerName);
-        clientOptions.loadOptions();
+        stOptions.setOption(Options.runClientPlayer, playerName);
+        stOptions.setOption(Options.runClientHost, hostname);
+        stOptions.setOption(Options.runClientPort, port);
+
+        // prepend used hostname to LRU list
+        saveHostname(netclientOptions);
+        saveWindow.save(this);
+        netclientOptions.saveOptions();
+
+        startObject.setWhatToDoNext(Start.StartNetClient);
+        dispose();
     }
 
-    /** Put the chosen hostname as first to the LRU sorted list.
-     *  Save the list back to the options. 
+    /** 
+     *  Put the chosen hostname as first to the LRU sorted list
+     *  in NetClient cf file. 
      */
-    private static void saveHostnames()
+    private void saveHostname(Options netclientOptions)
     {
+        if (netclientOptions == null)
+        {
+            return;
+        }
+
         List names = new ArrayList();
+        // Last used one to front of LRU list:
         names.add(hostname);
         for (int i = 0; i < Constants.numSavedServerNames; i++)
         {
-            if (clientOptions == null)
-            {
-                return;
-            }
-            String serverName = clientOptions.getStringOption(
+            String serverName = netclientOptions.getStringOption(
                 Options.serverName + i);
-
             if (serverName != null)
             {
+                // Don't add it twice:
                 if (!serverName.equals(hostname))
                 {
-                    // Don't add it twice.
                     names.add(serverName);
                 }
             }
@@ -230,9 +296,8 @@ public class StartClient extends KDialog implements WindowListener,
         for (int i = 0; i < names.size() &&
             i < Constants.numSavedServerNames ; i++)
         {
-            clientOptions.setOption(Options.serverName +
-                i, (String)names.get(i));
+            netclientOptions.setOption(
+                Options.serverName + i, (String)names.get(i));
         }
-        clientOptions.saveOptions();
     }
 }

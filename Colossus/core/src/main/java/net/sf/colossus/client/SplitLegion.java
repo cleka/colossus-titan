@@ -260,6 +260,9 @@ final class SplitLegion extends KDialog implements MouseListener,
         {
             saveWindow.saveLocation(getLocation());
         }
+        removeMouseListener(this);
+        removeWindowListener(this);
+        client = null;
         super.dispose();
     }
 

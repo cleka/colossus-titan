@@ -5,8 +5,10 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.InterruptedIOException;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
@@ -15,6 +17,8 @@ import java.util.logging.Logger;
 import net.sf.colossus.client.IClient;
 import net.sf.colossus.util.Glob;
 import net.sf.colossus.util.Split;
+
+import net.sf.colossus.webcommon.FinalizeManager;
 
 
 /**
@@ -34,65 +38,227 @@ final class SocketServerThread extends Thread implements IClient
     private BufferedReader in;
     private PrintWriter out;
     private String playerName;
-    private List activeSocketList;
+
+    private boolean done = false;
+    private boolean isGone = false;
+    private boolean toldToTerminate = false;
+    private boolean withdrawnAlready = false;
+    private boolean selfInterrupted = false;
 
     private static final String sep = Constants.protocolTermSeparator;
 
-    SocketServerThread(Server server, Socket socket,
-        List activeSocketList)
+    private static int counter = 0;
+
+    SocketServerThread(Server server, Socket socket)
     {
         super("SocketServerThread");
         this.server = server;
         this.socket = socket;
-        this.activeSocketList = activeSocketList;
+        String tempId = "<no name yet #" + (counter++) + ">";
+        FinalizeManager.register(this, tempId);
+        // We must register already in constructor. Otherwise, clients
+        // might have connected, but none yet registered to threadmgr.
+        // So Server continues with "waitUntilAllGone", there are no
+        // threads [yet, but thinks "not any more"],
+        // and does cleanup, set game to null, etc...
+        server.getThreadMgr().registerToThreadManager(this);
     }
 
     public void run()
     {
         try
         {
-            is = socket.getInputStream();
-            in = new BufferedReader(new InputStreamReader(is));
-            out = new PrintWriter(socket.getOutputStream(), true);
-        }
-        catch (IOException ex)
-        {
-            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
-            return;
-        }
-
-        try
-        {
-            String fromClient;
-            while ((fromClient = in.readLine()) != null)
+            // especially the unregister is after a catch-all
+            // block, to make sure we unregister in any case.
+            try
             {
+                is = socket.getInputStream();
+                in = new BufferedReader(new InputStreamReader(is));
+                out = new PrintWriter(socket.getOutputStream(), true);
+            }
+            catch (IOException ex)
+            {
+                LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
+                return;
+            }
+
+            try
+            {
+                String fromClient;
+                setWaiting(true);
+                while ( !done && (fromClient = in.readLine()) != null && !done)
+                {
+                    setWaiting(false);
+                    LOGGER.log(Level.FINEST,
+                        "From client " + playerName + ": " + fromClient);
+                    parseLine(fromClient);
+                    setWaiting(true);
+                }
+                setWaiting(false);
                 LOGGER.log(Level.FINEST,
-                    "From client " + playerName + ": " + fromClient);
-                parseLine(fromClient);
+                    "End of SocketServerThread while loop");
             }
-            LOGGER.log(Level.FINEST, "End of SocketServerThread while loop");
-            server.withdrawFromGame();
-        }
-        catch (IOException ex)
-        {
-            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
-            server.withdrawFromGame();
-        }
+            catch (InterruptedIOException ex)
+            {
+                LOGGER.log(Level.SEVERE,
+                    "InterruptedIOException while read loop; ", ex);
+                Thread.currentThread().interrupt();
+            }
+            catch (SocketException ex)
+            {
+                if (selfInterrupted)
+                {
+                    // all right. Server (some other SST) interrupted us 
+                    // in order to make us stop waiting on the socket...
+                }
+                else if (done)
+                {
+                    // all right. Client told it will disconnect.
+                }
+                else
+                {
+                    // ooops. Exception, perhaps client closed his side?
+                    LOGGER.log(Level.FINE,
+                        "SocketException in " + getName() + " while " +
+                        "read loop (client terminated unexpectedly?)");
+                }
+            }
+            catch (IOException ex)
+            {
+                LOGGER.log(Level.SEVERE, "IOException while read loop; ", ex);
+            }
 
-        // Shut down the client.
-        dispose();
+            isGone = true;
+
+            try
+            {
+                server.unregisterSocket(socket);
+            }
+            catch (Exception e)
+            {
+                LOGGER.log(Level.SEVERE,
+                    "Exception while unregisterSocket; ", e);
+            }
+
+            if (selfInterrupted)
+            {
+                // no need to withdraw any more
+            }
+            else if (toldToTerminate)
+            {
+                // told to terminate - ok
+            }
+            else if ( !withdrawnAlready )
+            {
+                withdrawnAlready = true;
+                server.withdrawFromGame();
+            }
+
+            // Still tell client to shutdown... if necessary.
+            dispose();
+
+            try
+            {
+                if (socket != null)
+                {
+                    socket.close();
+                }
+            }
+            catch (IOException ex)
+            {
+                LOGGER.log(Level.SEVERE,
+                    "IOException while socket.close; ", ex);
+            }
+
+            socket = null;
+        }
+        catch (Exception e)
+        {
+            LOGGER.log(Level.SEVERE, "Exception in major try/catch; ", e);
+        }
+        // just to be sure...
+        setWaiting(false);
+        isGone = true;
+
+        server.getThreadMgr().unregisterFromThreadManager(this);
+
+        this.server = null;
+        this.socket = null;
+    }
+
+    private Object isWaitingLock = new Object();
+    private boolean isWaiting = false;
+
+    private void setWaiting(boolean val)
+    {
+        synchronized (isWaitingLock)
+        {
+            isWaiting = val;
+        }
+    }
+
+    public synchronized void tellToTerminate()
+    {
+        toldToTerminate = true;
+        done = true;
         try
         {
-            socket.close();
-            synchronized (activeSocketList)
+            out.println(Constants.dispose);
+        }
+        catch (Exception e)
+        {
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
+        }
+
+        if (Thread.currentThread() == this)
+        {
+            // no need to interrupt ourselves; we'll get to the top of loop
+            // after parseLine completed anyway.
+        }
+        else
+        {
+            synchronized (isWaitingLock)
             {
-                activeSocketList.remove(activeSocketList.indexOf(socket));
+                // If socketReader is currently waiting on the socket, 
+                // we need to interrupt it. 
+                if (isWaiting)
+                {
+                    selfInterrupted = true;
+                    this.interrupt();
+                }
+                // Otherwise, it will return to back of loop
+                // anyway once it has done the parseLine execution.
+                else
+                {
+                    // no need to interrupt - nothing to do.
+                }
             }
         }
-        catch (IOException ex)
+    }
+
+    public void interrupt()
+    {
+        super.interrupt();
+
+        try
         {
-            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
+            if (socket != null)
+            {
+                socket.close();
+            }
         }
+        catch (IOException e)
+        {
+            // quietly close  
+        }
+    }
+
+    // if true, connection to this client is gone
+    // Server uses this to decide whether any nonAI player is 
+    // (even if perhaps dead) still connected (= watching).
+    public boolean isGone()
+    {
+        return this.isGone;
     }
 
     private synchronized void parseLine(String s)
@@ -118,6 +284,7 @@ final class SocketServerThread extends Thread implements IClient
                 Boolean.valueOf((String)args.remove(0)).booleanValue();
             setPlayerName(playerName);
             server.addClient(this, playerName, remote);
+            FinalizeManager.setId(this, playerName);
         }
         else if (method.equals(Constants.fixName))
         {
@@ -260,13 +427,28 @@ final class SocketServerThread extends Thread implements IClient
         }
         else if (method.equals(Constants.withdrawFromGame))
         {
+            withdrawnAlready = true;
             server.withdrawFromGame();
         }
         else if (method.equals(Constants.disconnect))
         {
-            // Ignore. Just for forward compatibility if someone 
-            // will use the "new client" (with WebServer and all the 
-            // "proper shutdown" related changes).
+            if (withdrawnAlready)
+            {
+                LOGGER.log(Level.FINE,
+                    "Client disconnected without explicit withdraw - " +
+                    "doing automatic withdraw for player " + playerName);
+                server.withdrawFromGame();
+                withdrawnAlready = true;
+            }
+            done = true;
+            server.disconnect();
+        }
+        else if (method.equals(Constants.stopGame))
+        {
+            // client will dispose itself soon, 
+            // do not attempt to further read from there.
+            done = true;
+            server.stopGame();
         }
         else if (method.equals(Constants.setDonor))
         {
@@ -322,87 +504,104 @@ final class SocketServerThread extends Thread implements IClient
         }
     }
 
-    // IClient methods to sent requests to client over socket.
-
-    public String getPlayerName()
+    // Wrapper for all the send-over-socket methods:
+    public void sendToClient(String message)
     {
-        return playerName;
+        if (done || isGone || out == null)
+        {
+            // do not send any more
+            /*
+             LOGGER.log(Level.WARNING, 
+             "Attempt to send to player " + playerName + 
+             " when client connection already gone - message: " + message);
+             */
+        }
+        else
+        {
+            out.println(message);
+        }
     }
+
+    // IClient methods to sent requests to client over socket.
 
     public void tellEngagement(String hexLabel, String attackerId,
         String defenderId)
     {
-        out.println(Constants.tellEngagement + sep + hexLabel + sep +
+        sendToClient(Constants.tellEngagement + sep + hexLabel + sep +
             attackerId + sep + defenderId);
     }
 
     public void tellEngagementResults(String winnerId, String method,
         int points, int turns)
     {
-        out.println(Constants.tellEngagementResults + sep + winnerId + sep +
+        sendToClient(Constants.tellEngagementResults + sep + winnerId + sep +
             method + sep + points + sep + turns);
     }
 
     public void tellMovementRoll(int roll)
     {
-        out.println(Constants.tellMovementRoll + sep + roll);
+        sendToClient(Constants.tellMovementRoll + sep + roll);
     }
 
     public void setOption(String optname, String value)
     {
-        out.println(Constants.setOption + sep + optname + sep + value);
+        sendToClient(Constants.setOption + sep + optname + sep + value);
     }
 
     public void updatePlayerInfo(List infoStrings)
     {
-        out.println(Constants.updatePlayerInfo + sep + Glob.glob(infoStrings));
+        sendToClient(Constants.updatePlayerInfo + sep +
+            Glob.glob(infoStrings));
     }
 
     public void setColor(String color)
     {
-        out.println(Constants.setColor + sep + color);
+        sendToClient(Constants.setColor + sep + color);
     }
 
     public void updateCreatureCount(String creatureName, int count,
         int deadCount)
     {
-        out.println(Constants.updateCreatureCount + sep + creatureName + sep +
-            count + sep + deadCount);
+        sendToClient(Constants.updateCreatureCount + sep + creatureName +
+            sep + count + sep + deadCount);
     }
 
     public void dispose()
     {
-        out.println(Constants.dispose);
+        if (!done)
+        {
+            tellToTerminate();
+        }
     }
 
     public void removeLegion(String id)
     {
-        out.println(Constants.removeLegion + sep + id);
+        sendToClient(Constants.removeLegion + sep + id);
     }
 
     public void setLegionStatus(String markerId, boolean moved,
         boolean teleported, int entrySide, String lastRecruit)
     {
-        out.println(Constants.setLegionStatus + sep + markerId + sep + moved +
+        sendToClient(Constants.setLegionStatus + sep + markerId + sep + moved +
             sep + teleported + sep + entrySide + sep + lastRecruit);
     }
 
     public void addCreature(String markerId, String name, String reason)
     {
-        out.println(Constants.addCreature + sep + markerId + sep + name +
+        sendToClient(Constants.addCreature + sep + markerId + sep + name +
             sep + reason);
     }
 
     public void removeCreature(String markerId, String name, String reason)
     {
-        out.println(Constants.removeCreature + sep + markerId + sep + name +
+        sendToClient(Constants.removeCreature + sep + markerId + sep + name +
             sep + reason);
     }
 
     public void revealCreatures(String markerId, final List names,
         String reason)
     {
-        out.println(Constants.revealCreatures + sep + markerId + sep +
+        sendToClient(Constants.revealCreatures + sep + markerId + sep +
             Glob.glob(names) + sep + reason);
     }
 
@@ -417,25 +616,25 @@ final class SocketServerThread extends Thread implements IClient
     public void revealEngagedCreatures(final String markerId, final List names,
         final boolean isAttacker, String reason)
     {
-        out.println(Constants.revealEngagedCreatures + sep + markerId + sep +
-            isAttacker + sep + Glob.glob(names) + sep + reason);
+        sendToClient(Constants.revealEngagedCreatures + sep + markerId +
+            sep + isAttacker + sep + Glob.glob(names) + sep + reason);
     }
 
     public void removeDeadBattleChits()
     {
-        out.println(Constants.removeDeadBattleChits);
+        sendToClient(Constants.removeDeadBattleChits);
     }
 
     public void placeNewChit(String imageName, boolean inverted, int tag,
         String hexLabel)
     {
-        out.println(Constants.placeNewChit + sep + imageName + sep +
+        sendToClient(Constants.placeNewChit + sep + imageName + sep +
             inverted + sep + tag + sep + hexLabel);
     }
 
     public void initBoard()
     {
-        out.println(Constants.initBoard);
+        sendToClient(Constants.initBoard);
     }
 
     public void setPlayerName(String playerName)
@@ -443,65 +642,65 @@ final class SocketServerThread extends Thread implements IClient
         this.playerName = playerName;
         setName(playerName);
 
-        out.println(Constants.setPlayerName + sep + playerName);
+        sendToClient(Constants.setPlayerName + sep + playerName);
     }
 
     public void createSummonAngel(String markerId)
     {
-        out.println(Constants.createSummonAngel + sep + markerId);
+        sendToClient(Constants.createSummonAngel + sep + markerId);
     }
 
     public void askAcquireAngel(String markerId, List recruits)
     {
-        out.println(Constants.askAcquireAngel + sep + markerId + sep +
+        sendToClient(Constants.askAcquireAngel + sep + markerId + sep +
             Glob.glob(recruits));
     }
 
     public void askChooseStrikePenalty(List choices)
     {
-        out.println(Constants.askChooseStrikePenalty + sep +
+        sendToClient(Constants.askChooseStrikePenalty + sep +
             Glob.glob(choices));
     }
 
     public void tellGameOver(String message)
     {
-        out.println(Constants.tellGameOver + sep + message);
+        sendToClient(Constants.tellGameOver + sep + message);
     }
 
     public void tellPlayerElim(String playerName, String slayerName)
     {
-        out.println(Constants.tellPlayerElim + sep + playerName + sep +
+        sendToClient(Constants.tellPlayerElim + sep + playerName + sep +
             slayerName);
     }
 
     public void askConcede(String allyMarkerId, String enemyMarkerId)
     {
-        out.println(Constants.askConcede + sep + allyMarkerId + sep +
+        sendToClient(Constants.askConcede + sep + allyMarkerId + sep +
             enemyMarkerId);
     }
 
     public void askFlee(String allyMarkerId, String enemyMarkerId)
     {
-        out.println(Constants.askFlee + sep + allyMarkerId + sep +
+        sendToClient(Constants.askFlee + sep + allyMarkerId + sep +
             enemyMarkerId);
     }
 
     public void askNegotiate(String attackerId, String defenderId)
     {
-        out.println(Constants.askNegotiate + sep + attackerId + sep +
+        sendToClient(Constants.askNegotiate + sep + attackerId + sep +
             defenderId);
     }
 
     public void tellProposal(String proposalString)
     {
-        out.println(Constants.tellProposal + sep + proposalString);
+        sendToClient(Constants.tellProposal + sep + proposalString);
     }
 
     public void tellStrikeResults(int strikerTag, int targetTag,
         int strikeNumber, List rolls, int damage, boolean killed,
         boolean wasCarry, int carryDamageLeft, Set carryTargetDescriptions)
     {
-        out.println(Constants.tellStrikeResults + sep + strikerTag + sep +
+        sendToClient(Constants.tellStrikeResults + sep + strikerTag + sep +
             targetTag + sep + strikeNumber + sep + Glob.glob(rolls) + sep +
             damage + sep + killed + sep + wasCarry + sep + carryDamageLeft +
             sep + Glob.glob(carryTargetDescriptions));
@@ -511,7 +710,7 @@ final class SocketServerThread extends Thread implements IClient
         String battleActivePlayerName, Constants.BattlePhase battlePhase,
         String attackerMarkerId, String defenderMarkerId)
     {
-        out.println(Constants.initBattle + sep + masterHexLabel + sep +
+        sendToClient(Constants.initBattle + sep + masterHexLabel + sep +
             battleTurnNumber + sep + battleActivePlayerName + sep +
             battlePhase.toInt() + sep + attackerMarkerId + sep +
             defenderMarkerId);
@@ -519,97 +718,97 @@ final class SocketServerThread extends Thread implements IClient
 
     public void cleanupBattle()
     {
-        out.println(Constants.cleanupBattle);
+        sendToClient(Constants.cleanupBattle);
     }
 
     public void nextEngagement()
     {
-        out.println(Constants.nextEngagement);
+        sendToClient(Constants.nextEngagement);
     }
 
     public void doReinforce(String markerId)
     {
-        out.println(Constants.doReinforce + sep + markerId);
+        sendToClient(Constants.doReinforce + sep + markerId);
     }
 
     public void didRecruit(String markerId, String recruitName,
         String recruiterName, int numRecruiters)
     {
-        out.println(Constants.didRecruit + sep + markerId + sep +
+        sendToClient(Constants.didRecruit + sep + markerId + sep +
             recruitName + sep + recruiterName + sep + numRecruiters);
     }
 
     public void undidRecruit(String markerId, String recruitName)
     {
-        out.println(Constants.undidRecruit + sep + markerId + sep +
+        sendToClient(Constants.undidRecruit + sep + markerId + sep +
             recruitName);
     }
 
     public void setupTurnState(String activePlayerName, int turnNumber)
     {
-        out.println(Constants.setupTurnState + sep + activePlayerName + sep +
+        sendToClient(Constants.setupTurnState + sep + activePlayerName + sep +
             turnNumber);
     }
 
     public void setupSplit(String activePlayerName, int turnNumber)
     {
-        out.println(Constants.setupSplit + sep + activePlayerName + sep +
+        sendToClient(Constants.setupSplit + sep + activePlayerName + sep +
             turnNumber);
     }
 
     public void setupMove()
     {
-        out.println(Constants.setupMove);
+        sendToClient(Constants.setupMove);
     }
 
     public void setupFight()
     {
-        out.println(Constants.setupFight);
+        sendToClient(Constants.setupFight);
     }
 
     public void setupMuster()
     {
-        out.println(Constants.setupMuster);
+        sendToClient(Constants.setupMuster);
     }
 
     public void setupBattleSummon(String battleActivePlayerName,
         int battleTurnNumber)
     {
-        out.println(Constants.setupBattleSummon + sep +
+        sendToClient(Constants.setupBattleSummon + sep +
             battleActivePlayerName + sep + battleTurnNumber);
     }
 
     public void setupBattleRecruit(String battleActivePlayerName,
         int battleTurnNumber)
     {
-        out.println(Constants.setupBattleRecruit + sep +
+        sendToClient(Constants.setupBattleRecruit + sep +
             battleActivePlayerName + sep + battleTurnNumber);
     }
 
     public void setupBattleMove(String battleActivePlayerName,
         int battleTurnNumber)
     {
-        out.println(Constants.setupBattleMove + sep +
+        sendToClient(Constants.setupBattleMove + sep +
             battleActivePlayerName + sep + battleTurnNumber);
     }
 
     public void setupBattleFight(Constants.BattlePhase battlePhase,
         String battleActivePlayerName)
     {
-        out.println(Constants.setupBattleFight + sep +
+        sendToClient(Constants.setupBattleFight + sep +
             battlePhase.toInt() + sep + battleActivePlayerName);
     }
 
     public void tellLegionLocation(String markerId, String hexLabel)
     {
-        out.println(Constants.tellLegionLocation + sep + markerId + sep +
+        sendToClient(Constants.tellLegionLocation + sep + markerId + sep +
             hexLabel);
     }
 
     public void tellBattleMove(int tag, String startingHexLabel,
         String endingHexLabel, boolean undo)
     {
-        out.println(Constants.tellBattleMove + sep + tag + sep +
+        sendToClient(Constants.tellBattleMove + sep + tag + sep +
             startingHexLabel + sep + endingHexLabel + sep + undo);
     }
 
@@ -617,7 +816,7 @@ final class SocketServerThread extends Thread implements IClient
         String currentHexLabel, String entrySide, boolean teleport,
         String teleportingLord, boolean splitLegionHasForcedMove)
     {
-        out.println(Constants.didMove + sep + markerId + sep +
+        sendToClient(Constants.didMove + sep + markerId + sep +
             startingHexLabel + sep + currentHexLabel + sep + entrySide +
             sep + teleport + sep +
             (teleportingLord == null ? "null" : teleportingLord) +
@@ -627,49 +826,48 @@ final class SocketServerThread extends Thread implements IClient
     public void undidMove(String markerId, String formerHexLabel,
         String currentHexLabel, boolean splitLegionHasForcedMove)
     {
-        out.println(Constants.undidMove + sep + markerId + sep +
+        sendToClient(Constants.undidMove + sep + markerId + sep +
             formerHexLabel + sep + currentHexLabel + sep +
             splitLegionHasForcedMove);
     }
 
     public void didSummon(String summonerId, String donorId, String summon)
     {
-        out.println(Constants.didSummon + sep + summonerId + sep +
+        sendToClient(Constants.didSummon + sep + summonerId + sep +
             donorId + sep + summon);
-
     }
 
     public void undidSplit(String splitoffId, String survivorId, int turn)
     {
-        out.println(Constants.undidSplit + sep + splitoffId + sep +
+        sendToClient(Constants.undidSplit + sep + splitoffId + sep +
             survivorId + sep + turn);
     }
 
     public void didSplit(String hexLabel, String parentId, String childId,
         int childHeight, List splitoffs, int turn)
     {
-        out.println(Constants.didSplit + sep + hexLabel + sep + parentId +
+        sendToClient(Constants.didSplit + sep + hexLabel + sep + parentId +
             sep + childId + sep + childHeight + sep +
             Glob.glob(splitoffs) + sep + turn);
     }
 
     public void askPickColor(List colorsLeft)
     {
-        out.println(Constants.askPickColor + sep + Glob.glob(colorsLeft));
+        sendToClient(Constants.askPickColor + sep + Glob.glob(colorsLeft));
     }
 
     public void askPickFirstMarker()
     {
-        out.println(Constants.askPickFirstMarker);
+        sendToClient(Constants.askPickFirstMarker);
     }
 
     public void log(String message)
     {
-        out.println(Constants.log + sep + message);
+        sendToClient(Constants.log + sep + message);
     }
 
     public void nak(String reason, String errmsg)
     {
-        out.println(Constants.nak + sep + reason + sep + errmsg);
+        sendToClient(Constants.nak + sep + reason + sep + errmsg);
     }
 }

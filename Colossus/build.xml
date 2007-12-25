@@ -57,6 +57,8 @@
 		<property name="LIBS_DIR" value="${HTML_DIR}/libs" />
 		<property name="ZIPFILE" value="Colossus.${DSTAMP}.zip" />
 		<property name="SERVER" value="shell1.sf.net" />
+<!--		<property name="SFUSER" value=""${env.SFUSER}" /> -->
+		<property name="SFUSER" value="cleka" />
 
 		<mkdir dir="${build.classes.dir}" />
 		<mkdir dir="${testresults.dir}" />
@@ -125,7 +127,7 @@
 				<globmapper from="*" to="libs/*" />
 			</chainedmapper>
 		</pathconvert>
-		<jar jarfile="Colossus.jar" basedir="${build.classes.dir}" includes="**">
+		<jar jarfile="Colossus.jar" basedir="${build.classes.dir}" includes="**" excludes="**/webserver/**">
 			<manifest>
 				<attribute name="Main-Class" value="net.sf.colossus.server.Start" />
 				<attribute name="Class-Path" value="${manifest.classpath}" />
@@ -142,10 +144,23 @@
 		<chmod file="Colossus.jar" perm="755" />
 	</target>
 
+	<target name="webjar" depends="init,compile,version" description="Make WebServer jar file">
+		<jar jarfile="ColossusWeb.jar" basedir="${build.classes.dir}" 
+		    includes="**/webcommon/**, **/webserver/**, **/util/Log.class, 
+                              **/util/Options.class, **/client/IOptions.class, **/server/Constants.class">
+			<manifest>
+				<attribute name="Main-Class" value="net.sf.colossus.webserver.WebServer" />
+				<attribute name="Class-Path" value="${manifest.classpath}" />
+			</manifest>
+		</jar>
+		<chmod file="ColossusWeb.jar" perm="755" />
+	</target>
+
 
 	<!-- Delete stale jar files before compiling -->
 	<target name="cleanjars" depends="" description="Delete stale jar files">
 		<delete verbose="yes" quiet="yes" file="Colossus.jar" />
+		<delete verbose="yes" quiet="yes" file="ColossusWeb.jar" />
 		<delete verbose="yes" quiet="yes" file="BattlelandsBuilder.jar" />
 		<delete verbose="yes" quiet="yes" file="BattlelandsRandomizer.jar" />
 	</target>
@@ -311,11 +326,18 @@
 
 	<target name="remote-trunk-inst" depends="clean,init,sign" description="copy files into htdocs tree on SF">
 		<exec executable="rsync">
-			<arg line="-rltgoD --chmod=ug+rw Colossus.jar ${SERVER}:${HTML_DIR}/Colossus-trunk.jar" />
+			<arg line="-rltgoD --chmod=ug+rw Colossus.jar ${SFUSER}@${SERVER}:${HTML_DIR}/head/Colossus.jar" />
 		</exec>
 		<exec executable="rsync">
-			<arg line="-rltgoD --chmod=ug+rw Colossus-trunk.jnlp ${SERVER}:${HTML_DIR}" />
+			<arg line="--rltgoD --chmod=ug+rw libs/werken.opt.jar ${SFUSER}@${SERVER}:${HTML_DIR}/head/libs/werken.opt.jar" />
+		</exec>
+		<exec executable="rsync">
+			<arg line="--rltgoD --chmod=ug+rw  libs/jdom.jar ${SFUSER}@${SERVER}:${HTML_DIR}/head/libs/jdom.jar" />
+		</exec>
+		<exec executable="rsync">
+			<arg line="-rltgoD --chmod=ug+rw  Colossus-head.jnlp ${SFUSER}@${SERVER}:${HTML_DIR}" />
 		</exec>
 	</target>
 
 </project>
+

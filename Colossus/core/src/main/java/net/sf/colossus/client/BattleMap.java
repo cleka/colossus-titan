@@ -39,6 +39,7 @@ import javax.swing.SwingConstants;
 
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.Legion;
+import net.sf.colossus.util.KFrame;
 import net.sf.colossus.util.Options;
 import net.sf.colossus.util.ResourceLoader;
 
@@ -54,8 +55,10 @@ public final class BattleMap extends HexMap implements MouseListener,
 {
     private static final Logger LOGGER = Logger.getLogger(BattleMap.class.getName());
 
+    private static int count = 1;
+
     private Point location;
-    private JFrame battleFrame;
+    private KFrame battleFrame;
     private JMenuBar menuBar;
     private JMenu phaseMenu;
     private InfoPanel infoPanel;
@@ -86,7 +89,8 @@ public final class BattleMap extends HexMap implements MouseListener,
 
         this.client = client;
 
-        battleFrame = new JFrame();
+        battleFrame = new KFrame("BattleFrame for Client" +
+            client.getPlayerName());
         battleFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 
         JPanel contentPane = new JPanel();
@@ -142,6 +146,12 @@ public final class BattleMap extends HexMap implements MouseListener,
             " (" + attackerMarkerId + ") attacks " +
             Legion.getMarkerName(defenderMarkerId) +
             " (" + defenderMarkerId + ") in " + masterHexLabel);
+
+        String finalizeId = client.getPlayerName() + ": " +
+            attackerMarkerId + "/" + defenderMarkerId + " ("+count+")";
+        count++;
+        net.sf.colossus.webcommon.FinalizeManager.setId(this, finalizeId);
+
     }
 
     private void setupActions()
@@ -669,20 +679,24 @@ public final class BattleMap extends HexMap implements MouseListener,
 
     public void windowClosing(WindowEvent e)
     {
-        String[] options = new String[2];
-        options[0] = "Yes";
-        options[1] = "No";
-        int answer = JOptionPane.showOptionDialog(battleFrame,
-            "Are you sure you wish to quit?",
-            "Quit Game?",
-            JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
-            null, options, options[1]);
+        client.closeBoardAfterConfirm(battleFrame, true);
 
-        if (answer == JOptionPane.YES_OPTION)
-        {
-            client.withdrawFromGame();
-            System.exit(0);
-        }
+        /*
+         String[] options = new String[2];
+         options[0] = "Yes";
+         options[1] = "No";
+         int answer = JOptionPane.showOptionDialog(battleFrame,
+         "Are you sure you wish to quit?",
+         "Quit Game?",
+         JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
+         null, options, options[1]);
+
+         if (answer == JOptionPane.YES_OPTION)
+         {
+         client.withdrawFromGame();
+         client.dispose();
+         }
+         */
     }
 
     public void paintComponent(Graphics g)
@@ -726,13 +740,23 @@ public final class BattleMap extends HexMap implements MouseListener,
 
     void dispose()
     {
-        location = battleFrame.getLocation();
-        saveWindow.saveLocation(location);
+        if (client == null)
+        {
+            return;
+        }
 
         if (battleFrame != null)
         {
+            battleFrame.setVisible(false);
+            location = battleFrame.getLocation();
+            saveWindow.saveLocation(location);
+            battleFrame.removeWindowListener(this);
             battleFrame.dispose();
+            battleFrame = null;
         }
+        removeMouseListener(this);
+
+        client = null;
     }
 
     void rescale()

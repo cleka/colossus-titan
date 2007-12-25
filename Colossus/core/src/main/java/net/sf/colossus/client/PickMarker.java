@@ -82,8 +82,11 @@ final class PickMarker extends KDialog implements MouseListener, WindowListener
     private void cleanup(String markerId)
     {
         saveWindow.saveLocation(getLocation());
+        removeMouseListener(this);
+        removeWindowListener(this);
         dispose();
         client.pickMarkerCallback(markerId);
+        client = null;
     }
 
     public void mousePressed(MouseEvent e)

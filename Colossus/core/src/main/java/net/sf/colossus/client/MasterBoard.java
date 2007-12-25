@@ -27,6 +27,7 @@ import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.ConcurrentModificationException;
@@ -63,6 +64,7 @@ import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.server.XMLSnapshotFilter;
 import net.sf.colossus.util.HTMLColor;
+import net.sf.colossus.util.KFrame;
 import net.sf.colossus.util.Options;
 import net.sf.colossus.util.ResourceLoader;
 import net.sf.colossus.xmlparser.StrategicMapLoader;
@@ -97,11 +99,16 @@ public final class MasterBoard extends JPanel
 
     private Client client;
 
-    private JFrame masterFrame;
+    private KFrame masterFrame;
+    private ShowReadme showReadme;
+    private ShowHelpDoc showHelpDoc;
     private JMenu phaseMenu;
     private JPopupMenu popupMenu;
     private Map checkboxes = new HashMap();
     private JPanel[] legionFlyouts;
+
+    private MasterBoardWindowHandler mbwh;
+    private InfoPopupHandler iph;
 
     /** Last point clicked is needed for popup menus. */
     private Point lastPoint;
@@ -127,6 +134,7 @@ public final class MasterBoard extends JPanel
     public static final String concedeBattle = "Concede battle";
     public static final String withdrawFromGame = "Withdraw from Game";
 
+    public static final String viewWebClient = "View Web Client";
     public static final String viewFullRecruitTree = "View Full Recruit Tree";
     public static final String viewHexRecruitTree = "View Hex Recruit Tree";
     public static final String viewBattleMap = "View Battle Map";
@@ -142,6 +150,7 @@ public final class MasterBoard extends JPanel
     private AbstractAction loadGameAction;
     private AbstractAction saveGameAction;
     private AbstractAction saveGameAsAction;
+    private AbstractAction closeBoardAction;
     private AbstractAction quitGameAction;
 
     private AbstractAction clearRecruitChitsAction;
@@ -154,6 +163,7 @@ public final class MasterBoard extends JPanel
     private AbstractAction takeMulliganAction;
     private AbstractAction withdrawFromGameAction;
 
+    private AbstractAction viewWebClientAction;
     private AbstractAction viewFullRecruitTreeAction;
     private AbstractAction viewHexRecruitTreeAction;
     private AbstractAction viewBattleMapAction;
@@ -173,6 +183,8 @@ public final class MasterBoard extends JPanel
     private JMenu lfMenu;
     private SaveWindow saveWindow;
 
+    private String cachedPlayerName = "<not set yet>";
+
     private final class InfoPopupHandler extends KeyAdapter
     {
         private static final int POPUP_KEY_ALL_LEGIONS = KeyEvent.VK_SHIFT;
@@ -180,16 +192,23 @@ public final class MasterBoard extends JPanel
         private static final int PANEL_MARGIN = 4;
         private static final int PANEL_PADDING = 0;
 
-        private final Client client;
+        private final WeakReference clientRef;
 
         private InfoPopupHandler(Client client)
         {
             super();
-            this.client = client;
+            this.clientRef = new WeakReference(client);
+            net.sf.colossus.webcommon.FinalizeManager.register(this,
+                client.getPlayerName());
         }
 
         public void keyPressed(KeyEvent e)
         {
+            Client client = (Client)clientRef.get();
+            if (client == null)
+            {
+                return;
+            }
             if (e.getKeyCode() == POPUP_KEY_ALL_LEGIONS)
             {
                 if (legionFlyouts == null)
@@ -363,18 +382,27 @@ public final class MasterBoard extends JPanel
     MasterBoard(final Client client)
     {
         this.client = client;
+        net.sf.colossus.webcommon.FinalizeManager.register(this,
+            client.getPlayerName());
 
-        masterFrame = new JFrame("MasterBoard");
+        String pname = client.getPlayerName();
+        if (pname == null)
+        {
+            pname = "unknown";
+        }
+        masterFrame = new KFrame("MasterBoard " + pname);
         masterFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         contentPane = masterFrame.getContentPane();
         contentPane.setLayout(new BorderLayout());
         setOpaque(true);
         setupIcon();
         setBackground(Color.black);
-        masterFrame.addWindowListener(new MasterBoardWindowHandler());
+        this.mbwh = new MasterBoardWindowHandler();
+        masterFrame.addWindowListener(mbwh);
         addMouseListener(new MasterBoardMouseHandler());
         addMouseMotionListener(new MasterBoardMouseMotionHandler());
-        masterFrame.addKeyListener(new InfoPopupHandler(client));
+        this.iph = new InfoPopupHandler(client);
+        masterFrame.addKeyListener(this.iph);
 
         setupGUIHexes();
 
@@ -542,6 +570,14 @@ public final class MasterBoard extends JPanel
             }
         };
 
+        viewWebClientAction = new AbstractAction(viewWebClient)
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                client.showWebClient();
+            }
+        };
+
         viewHexRecruitTreeAction = new AbstractAction(viewHexRecruitTree)
         {
             public void actionPerformed(ActionEvent e)
@@ -571,6 +607,45 @@ public final class MasterBoard extends JPanel
             }
         };
 
+        /*
+         * After confirmation (if necessary, i.e. not gameover yet), 
+         * totally quit everything (shut down server and all windows)
+         * so that the SystemExitManager knows it can let the main
+         * go to the end, ending the JVM. 
+         */
+        quitGameAction = new AbstractAction(Constants.quitGame)
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                boolean quitAll = false;
+                if (client.isGameOver())
+                {
+                    quitAll = true;
+                }
+                else
+                {
+                    String[] options = new String[2];
+                    options[0] = "Yes";
+                    options[1] = "No";
+                    int answer = JOptionPane.showOptionDialog(masterFrame,
+                        "Are you sure you wish to quit?", "Quit Game?",
+                        JOptionPane.YES_NO_OPTION,
+                        JOptionPane.QUESTION_MESSAGE, null, options,
+                        options[1]);
+                    if (answer == JOptionPane.YES_OPTION)
+                    {
+                        quitAll = true;
+                    }
+                }
+
+                if (quitAll)
+                {
+                    // In startObject, set up what to do next
+                    client.menuQuitGame();
+                }
+            }
+        };
+
         newGameAction = new AbstractAction(Constants.newGame)
         {
             public void actionPerformed(ActionEvent e)
@@ -593,7 +668,7 @@ public final class MasterBoard extends JPanel
                         return;
                     }
                 }
-                client.newGame();
+                client.menuNewGame();
             }
         };
 
@@ -608,7 +683,7 @@ public final class MasterBoard extends JPanel
                 int returnVal = chooser.showOpenDialog(masterFrame);
                 if (returnVal == JFileChooser.APPROVE_OPTION)
                 {
-                    client.loadGame(chooser.getSelectedFile().getPath());
+                    client.menuLoadGame(chooser.getSelectedFile().getPath());
                 }
             }
         };
@@ -617,7 +692,7 @@ public final class MasterBoard extends JPanel
         {
             public void actionPerformed(ActionEvent e)
             {
-                client.saveGame(null);
+                client.menuSaveGame(null);
             }
         };
 
@@ -670,35 +745,20 @@ public final class MasterBoard extends JPanel
                     {
                         basename += Constants.xmlExtension;
                     }
-                    client.saveGame(dirname + '/' + basename);
+                    client.menuSaveGame(dirname + '/' + basename);
                 }
             }
         };
 
-        quitGameAction = new AbstractAction(Constants.quit)
+        /*
+         * after confirmation, close board and perhaps battle board, but
+         * Webclient (and server, if running here), will go on.
+         */
+        closeBoardAction = new AbstractAction(Constants.closeBoard)
         {
             public void actionPerformed(ActionEvent e)
             {
-                if (client.isGameOver())
-                {
-                    client.dispose();
-                    System.exit(0);
-                }
-
-                String[] options = new String[2];
-                options[0] = "Yes";
-                options[1] = "No";
-                int answer = JOptionPane.showOptionDialog(masterFrame,
-                    "Are you sure you wish to quit?",
-                    "Quit Game?",
-                    JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
-                    null, options, options[1]);
-                if (answer == JOptionPane.YES_OPTION)
-                {
-                    client.withdrawFromGame();
-                    client.dispose();
-                    System.exit(0);
-                }
+                client.closeBoardAfterConfirm(masterFrame, false);
             }
         };
 
@@ -744,17 +804,30 @@ public final class MasterBoard extends JPanel
         {
             public void actionPerformed(ActionEvent e)
             {
-                new ShowReadme(client);
+                if (showReadme != null)
+                {
+                    showReadme.dispose();
+                }
+                showReadme = new ShowReadme(client);
             }
         };
         viewHelpDocAction = new AbstractAction(viewHelpDoc)
         {
             public void actionPerformed(ActionEvent e)
             {
-                new ShowHelpDoc();
+                if (showHelpDoc != null)
+                {
+                    showHelpDoc.dispose();
+                }
+                showHelpDoc = new ShowHelpDoc();
             }
         };
 
+    }
+
+    public void doQuitGameAction()
+    {
+        quitGameAction.actionPerformed(null);
     }
 
     private void setupPopupMenu()
@@ -781,6 +854,20 @@ public final class MasterBoard extends JPanel
         menu.add(cbmi);
         checkboxes.put(name, cbmi);
         return cbmi;
+    }
+
+    private void cleanCBListeners()
+    {
+        Iterator it = checkboxes.keySet().iterator();
+        while (it.hasNext())
+        {
+            String key = (String)it.next();
+            JCheckBoxMenuItem cbmi = (JCheckBoxMenuItem)checkboxes.get(key);
+            cbmi.removeItemListener(itemHandler);
+        }
+        checkboxes.clear();
+        checkboxes = null;
+        itemHandler = null;
     }
 
     private ItemListener rcmHandler = new MasterBoardRecruitChitMenuHandler();
@@ -814,12 +901,17 @@ public final class MasterBoard extends JPanel
 
         mi = fileMenu.add(newGameAction);
         mi.setMnemonic(KeyEvent.VK_N);
-        mi = fileMenu.add(loadGameAction);
-        mi.setMnemonic(KeyEvent.VK_L);
-        mi = fileMenu.add(saveGameAction);
-        mi.setMnemonic(KeyEvent.VK_S);
-        mi = fileMenu.add(saveGameAsAction);
-        mi.setMnemonic(KeyEvent.VK_A);
+        if (!client.isRemote())
+        {
+            mi = fileMenu.add(loadGameAction);
+            mi.setMnemonic(KeyEvent.VK_L);
+            mi = fileMenu.add(saveGameAction);
+            mi.setMnemonic(KeyEvent.VK_S);
+            mi = fileMenu.add(saveGameAsAction);
+            mi.setMnemonic(KeyEvent.VK_A);
+        }
+        mi = fileMenu.add(closeBoardAction);
+        mi.setMnemonic(KeyEvent.VK_C);
         mi = fileMenu.add(quitGameAction);
         mi.setMnemonic(KeyEvent.VK_Q);
 
@@ -896,6 +988,11 @@ public final class MasterBoard extends JPanel
         mi = windowMenu.add(viewFullRecruitTreeAction);
         mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, 0));
         mi.setMnemonic(KeyEvent.VK_R);
+
+        // web client
+        mi = windowMenu.add(viewWebClientAction);
+        mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, 0));
+        mi.setMnemonic(KeyEvent.VK_W);
 
         windowMenu.addSeparator();
 
@@ -986,6 +1083,7 @@ public final class MasterBoard extends JPanel
             return;
         }
         String playerName = client.getPlayerName();
+        cachedPlayerName = playerName;
         if (bottomBar == null)
         {
             // add a bottom bar
@@ -1037,6 +1135,22 @@ public final class MasterBoard extends JPanel
                         isHexInverted(i, j),
                         this);
                     guiHexArray[i][j] = hex;
+                }
+            }
+        }
+    }
+
+    private void cleanGUIHexes()
+    {
+        for (int i = 0; i < guiHexArray.length; i++)
+        {
+            for (int j = 0; j < guiHexArray[0].length; j++)
+            {
+                if (show[i][j])
+                {
+                    GUIMasterHex hex = guiHexArray[i][j];
+                    hex.cleanup();
+                    guiHexArray[i][j] = null;
                 }
             }
         }
@@ -1657,7 +1771,7 @@ public final class MasterBoard extends JPanel
         selectHexesByLabels(client.getPossibleRecruitHexes());
     }
 
-    JFrame getFrame()
+    KFrame getFrame()
     {
         return masterFrame;
     }
@@ -2223,6 +2337,13 @@ public final class MasterBoard extends JPanel
 
     class MasterBoardItemHandler implements ItemListener
     {
+        public MasterBoardItemHandler()
+        {
+            super();
+            net.sf.colossus.webcommon.FinalizeManager.register(this,
+                cachedPlayerName);
+        }
+
         public void itemStateChanged(ItemEvent e)
         {
             JMenuItem source = (JMenuItem)e.getSource();
@@ -2252,7 +2373,7 @@ public final class MasterBoard extends JPanel
     {
         public void windowClosing(WindowEvent e)
         {
-            quitGameAction.actionPerformed(null);
+            closeBoardAction.actionPerformed(null);
         }
     }
 
@@ -2427,9 +2548,35 @@ public final class MasterBoard extends JPanel
         setVisible(false);
         setEnabled(false);
         saveWindow.saveLocation(masterFrame.getLocation());
+        saveWindow = null;
+        cleanCBListeners();
         masterFrame.setVisible(false);
         masterFrame.setEnabled(false);
+        masterFrame.removeWindowListener(mbwh);
         masterFrame.dispose();
+        masterFrame = null;
+        scrollPane = null;
+        removeKeyListener(this.iph);
+        if (showReadme != null)
+        {
+            showReadme.dispose();
+            showReadme = null;
+        }
+        if (showHelpDoc != null)
+        {
+            showHelpDoc.dispose();
+            showHelpDoc = null;
+        }
+        offScreenBuffer = null;
+        iph = null;
+        cleanGUIHexes();
+
+        // not those, they are static (common for all objects)
+        // first client disposing would set it null, others get NPE's ...
+        //plainHexArray = null;
+        //towerSet = null;
+
+        this.client = null;
     }
 
     public static Set getTowerSet()
@@ -2575,5 +2722,19 @@ public final class MasterBoard extends JPanel
     {
         doneWithPhaseAction.setEnabled(false);
         bottomBar.setReasonForDisabledDone(reason);
+    }
+
+    public void setServerClosedMessage(boolean gameOver)
+    {
+        if (gameOver)
+        {
+            bottomBar.setPhase("Game over");
+            disableDoneAction("game server closed connection");
+        }
+        else
+        {
+            bottomBar.setPhase("Unable to continue game");
+            disableDoneAction("connection to server lost");
+        }
     }
 }

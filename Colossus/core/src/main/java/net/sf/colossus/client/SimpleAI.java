@@ -101,6 +101,8 @@ public class SimpleAI implements AI
     {
         this.client = client;
         // initialize the creature info needed by the AI
+        net.sf.colossus.webcommon.FinalizeManager.register(this,
+            client.getPlayerName());
     }
 
     public String pickColor(List colors, List favoriteColors)
@@ -2371,7 +2373,7 @@ public class SimpleAI implements AI
                 if (bestTarget == null ||
                     (0.5 * ((h + target.getHits()) / target.getPower()) *
                     getKillValue(target, terrain) >
-                        getKillValue(bestTarget, terrain)))
+                    getKillValue(bestTarget, terrain)))
                 {
                     bestTarget = target;
                 }
@@ -3154,7 +3156,7 @@ public class SimpleAI implements AI
         Collections.shuffle(legionMoves, random);
 
         Timer findBestLegionMoveTimer = setupTimer();
-        
+
         int count = 0;
         Iterator it = legionMoves.iterator();
         while (it.hasNext())
@@ -3664,7 +3666,7 @@ public class SimpleAI implements AI
         }
 
         BattleHex entrance = BattleMap.getEntrance(terrain,
-                legion.getEntrySide());
+            legion.getEntrySide());
 
         // Reward titans sticking to the edges of the back row
         // surrounded by allies.  We need to relax this in the
@@ -3872,7 +3874,7 @@ public class SimpleAI implements AI
             timeIsUp = true;
         }
     }
-    
+
     public void dispose()
     {
         if (remainingMarkers != null)

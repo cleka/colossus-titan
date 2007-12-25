@@ -171,6 +171,12 @@ public final class ResourceLoader
         ResourceLoader.serverPort = port;
     }
 
+    public static void resetDataServer()
+    {
+        ResourceLoader.server = null;
+        ResourceLoader.serverPort = 0;
+    }
+
     /**
      * Give the String to mark directories.
      * @return The String to mark directories.

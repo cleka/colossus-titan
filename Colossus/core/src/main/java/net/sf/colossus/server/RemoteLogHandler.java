@@ -20,6 +20,8 @@ public class RemoteLogHandler extends Handler
     public RemoteLogHandler()
     {
         super();
+        net.sf.colossus.webcommon.FinalizeManager.register(this,
+            "TheServerRLH");
     }
 
     public boolean requiresLayout()

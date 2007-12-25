@@ -1,5 +1,6 @@
 package net.sf.colossus.client;
 
+
 /**
  *  Arranges the recruit tree for one hex in a panel, which can be
  *  displayed e.g. in Autoinspector or right-click popup.
@@ -22,12 +23,13 @@ import net.sf.colossus.server.Creature;
 import net.sf.colossus.util.RecruitGraph;
 import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
-public class HexRecruitTreePanel extends Box 
+
+public class HexRecruitTreePanel extends Box
 {
-	public HexRecruitTreePanel(int direction, String terrain, String hexLabel,
-        MouseListener listener) 
+    public HexRecruitTreePanel(int direction, String terrain, String hexLabel,
+        MouseListener listener)
     {
-		super(direction);
+        super(direction);
         setAlignmentY(0);
         setBorder(BorderFactory.createLineBorder(Color.black));
         setBackground(TerrainRecruitLoader.getTerrainColor(terrain));

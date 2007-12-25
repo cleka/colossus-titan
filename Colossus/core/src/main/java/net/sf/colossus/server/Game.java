@@ -31,6 +31,7 @@ import net.sf.colossus.client.Proposal;
 import net.sf.colossus.util.Options;
 import net.sf.colossus.util.ResourceLoader;
 import net.sf.colossus.util.Split;
+import net.sf.colossus.util.SystemExitManager;
 import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
 import org.jdom.Attribute;
@@ -80,40 +81,90 @@ public final class Game
     private LinkedList colorPickOrder = new LinkedList();
     private List colorsLeft;
     private PhaseAdvancer phaseAdvancer = new GamePhaseAdvancer();
-    private Options options = new Options(Constants.optionsServerName);
+    private Options options = null;
 
     /** Server port number. */
-    private int port = Constants.defaultPort;
+    private int port;
+    private String flagFilename = null;
+    private NotifyWebServer notifyWebServer = null;
 
     private History history;
+
+    private static int gameCounter = 1;
+    private String gameId;
 
     /** Package-private only for JUnit test setup. */
     Game()
     {
-        // nothing to do
+        // later perhaps from cmdline, GUI, or WebServer set it?
+        gameId = "#" + (gameCounter++);
     }
 
-    /** For Start */
-    Options getOptions()
+    // TODO: Get via Options instead?
+    public void setPort(int portNr)
     {
-        return options;
+        this.port = portNr;
+        net.sf.colossus.webcommon.FinalizeManager.register(
+            this, "Game at port " + port);
     }
 
-    // TODO: Set from option instead.
-    void setPort(int port)
+    public void setOptions(Options options)
     {
-        this.port = port;
+        this.options = options;
+    }
+
+    public void setFlagFilename(String flagFilename)
+    {
+        this.flagFilename = flagFilename;
     }
 
     private void initServer()
     {
+        // create it even if not needed (=no web server). 
+        // This way we can have all the "if <there is a webserver>"
+        // wrappers inside the notify Class, instead spread over the code...
+        notifyWebServer = new NotifyWebServer(flagFilename);
+
         if (server != null)
         {
+            server.setObsolete();
             server.disposeAllClients();
         }
         server = new Server(this, port);
-        server.initSocketServer();
-        server.initFileServer();
+        try
+        {
+            // Clemens 12/2007:
+            // initFileServer can now done before creating local clients,
+            // starting the SSTs and accepting the clients.
+            // It decides whether to start a FST or not based on whether there
+            // are *Network type* players in the Player list (instead of
+            // whether there is something in the socket list, which was bogus,
+            // because also local clients will be in socket list).
+            // It's also not necessary to be after the socket server-start 
+            //   / client-accepting, "because FST accepts only request from known
+            //       client addresses"  -- in fact a client won't request files
+            // before he is registered. So, do the FST start first and we are safe.
+            server.initFileServer();
+            server.initSocketServer();
+            notifyWebServer.readyToAcceptClients();
+            if (server.waitForClients())
+            {
+                SystemExitManager.register(this, "Server/Game " + gameId);
+            }
+        }
+        catch (Exception e)
+        {
+            LOGGER.log(Level.SEVERE, "Game.initServer(): got Exception " + e);
+        }
+    }
+
+    private void cleanupWhenGameOver()
+    {
+        server.waitUntilGameFinishes();
+        server.cleanup();
+        server = null;
+
+        SystemExitManager.doSystemExitMaybe(this, 0);
     }
 
     private synchronized void clearFlags()
@@ -124,7 +175,7 @@ public final class Game
         reinforcing = false;
         acquiring = false;
         pendingAdvancePhase = false;
-        gameOver = false;
+        // gameOver = false;  // Nope. Because advanceTurn calls this.
         loadingGame = false;
         engagementResult=null;
     }
@@ -152,14 +203,14 @@ public final class Game
     void newGame()
     {
         clearFlags();
+        // additionally, because clearFlags must NOT do that:
+        gameOver = false;
 
         turnNumber = 1;
         lastRecruitTurnNumber = -1;
         phase = Constants.Phase.SPLIT;
         caretaker.resetAllCounts();
         players.clear();
-
-        options.saveOptions();
 
         VariantSupport.loadVariant(options.getStringOption(Options.variant),
             true);
@@ -177,8 +228,25 @@ public final class Game
         history = new History();
 
         initServer();
+        // Some more stuff is done from newGame2() when the last
+        // expected client has connected.
+        // Main thread has now nothing to do any more, can wait
+        // until game finishes.
+
+        if (server.isServerRunning())
+        {
+            cleanupWhenGameOver();
+        }
+        else
+        {
+            server.cleanup();
+            server = null;
+        }
     }
 
+    /* Called from the last SocketServerThread connecting 
+     *  ( = when expected nr. of clients has connected).
+     */
     void newGame2()
     {
         // We need to set the autoPlay option before loading the board,
@@ -408,8 +476,8 @@ public final class Game
             }
             else
             {
-                LOGGER.log(Level.WARNING, "Type "+type+
-                    " not recognized. Giving name by color instead ("+color+")");
+                LOGGER.log(Level.WARNING, "Type " + type + " not recognized" +
+                    ". Giving name by color instead ("+color+")");
                 gotName = Constants.byColor;
             }
         }
@@ -697,6 +765,24 @@ public final class Game
         return remaining;
     }
 
+    // Server uses this to decide whether it needs to start a file server
+    int getNumRemoteRemaining()
+    {
+        int remaining = 0;
+        Iterator it = players.iterator();
+
+        while (it.hasNext())
+        {
+            Player player = (Player)it.next();
+
+            if (player.isNetwork() && !player.isDead())
+            {
+                remaining++;
+            }
+        }
+        return remaining;
+    }
+
     Player getWinner()
     {
         int remaining = 0;
@@ -723,8 +809,15 @@ public final class Game
         return winner;
     }
 
-    void checkForVictory()
+    synchronized void checkForVictory()
     {
+        if (gameOver)
+        {
+            LOGGER.log(Level.SEVERE,
+                "checkForVictory called although game is already over!!");
+            return;
+        }
+
         int remaining = getNumPlayersRemaining();
 
         switch (remaining)
@@ -732,18 +825,16 @@ public final class Game
             case 0:
                 LOGGER.log(Level.INFO,
                     "Game over -- Draw at " + new Date().getTime());
-                setGameOver(true);
                 server.allTellGameOver("Draw");
+                setGameOver(true);
                 break;
 
             case 1:
                 String winnerName = getWinner().getName();
-
-                LOGGER.log(Level.INFO,
-                    "Game over -- " + winnerName + " wins at " +
-                    new Date().getTime());
-                setGameOver(true);
+                LOGGER.log(Level.INFO, "Game over -- " + winnerName +
+                    " wins at " + new Date().getTime());
                 server.allTellGameOver(winnerName + " wins");
+                setGameOver(true);
                 break;
 
             default:
@@ -756,13 +847,9 @@ public final class Game
         return gameOver;
     }
 
-    private synchronized void setGameOver(boolean gameOver)
+    public synchronized void setGameOver(boolean gameOver)
     {
         this.gameOver = gameOver;
-        if (gameOver && getOption(Options.autoQuit))
-        {
-            dispose();
-        }
         if (gameOver)
         {
             server.allFullyUpdateAllLegionContents(Constants.reasonGameOver);
@@ -786,8 +873,8 @@ public final class Game
         if (oldPhase != phase || pendingAdvancePhase ||
             !playerName.equals(getActivePlayerName()))
         {
-            LOGGER.log(Level.SEVERE,
-                "Called advancePhase illegally (reason: " +
+            LOGGER.log(Level.SEVERE, "Player " + playerName +
+                " called advancePhase illegally (reason: " +
                 (oldPhase != phase ? "oldPhase (" +
                 oldPhase + ") != phase (" +
                 phase + ")" :
@@ -799,12 +886,14 @@ public final class Game
                 "UNKNOWN"))) + ")");
             return;
         }
-        if (getOption(Options.autoStop) && getNumHumansRemaining() < 1)
+        if (getOption(Options.autoStop) && getNumHumansRemaining() < 1 &&
+            !gameOver)
         {
             LOGGER.log(Level.INFO, "Not advancing because no humans remain");
             // XXX buggy?
             server.allTellGameOver("All humans eliminated");
             setGameOver(true);
+            checkAutoQuitOrGoOn();
             return;
         }
         phaseAdvancer.advancePhase();
@@ -862,9 +951,10 @@ public final class Game
                 activePlayerNum = 0;
                 turnNumber++;
                 if (turnNumber-lastRecruitTurnNumber > 100 &&
-                    getOption(Options.autoQuit))
+                    Options.isStresstest())
                 {
-                    System.out.println("\nLast recruiting is 100 turns ago - " +
+                    LOGGER.log(Level.INFO,
+                        "\nLast recruiting is 100 turns ago - " +
                         "exiting to prevent AIs from endlessly " +
                         "running around...\n");
                     System.exit(0);
@@ -1136,7 +1226,7 @@ public final class Game
         catch (IOException ex)
         {
             LOGGER.log(Level.SEVERE,
-                "Error writing XML savegame." , ex);
+                "Error writing XML savegame.", ex);
         }
     }
 
@@ -1205,6 +1295,7 @@ public final class Game
             {
                 LOGGER.log(Level.SEVERE, "No saves directory");
                 dispose();
+                return;
             }
             String[] filenames = dir.list(new XMLSnapshotFilter());
 
@@ -1213,6 +1304,7 @@ public final class Game
                 LOGGER.log(Level.SEVERE,
                     "No XML savegames found in saves directory");
                 dispose();
+                return;
             }
             file = new File(Constants.saveDirname +
                 latestSaveFilename(filenames));
@@ -1240,6 +1332,7 @@ public final class Game
             {
                 LOGGER.log(Level.SEVERE, "Can't load this savegame version.");
                 dispose();
+                return;
             }
 
             // Reset flags that are not in the savegame file.
@@ -1439,11 +1532,18 @@ public final class Game
 
             initServer();
             // Remaining stuff has been moved to loadGame2()
+
+            // Some more stuff is done from loadGame2() when the last
+            // expected client has connected.
+            // Main thread has now nothing to do any more, can wait
+            // until game finishes.
+            cleanupWhenGameOver();
         }
         catch (Exception ex)
         {
             LOGGER.log(Level.SEVERE, "Tried to load corrupt savegame", ex);
             dispose();
+            return;
         }
     }
 
@@ -1542,6 +1642,9 @@ public final class Game
         legion.addToBattleTally(battleTally);
     }
 
+    /* Called from the last SocketServerThread connecting 
+     *  ( = when expected nr. of clients has connected).
+     */
     void loadGame2()
     {
         server.allSetColor();
@@ -1800,9 +1903,10 @@ public final class Game
     {
         if (server != null)
         {
-            server.disposeAllClients();
+            server.stopServerRunning();
         }
-        System.exit(0);
+        notifyWebServer.serverStoppedRunning();
+        notifyWebServer = null;
     }
 
     private void placeInitialLegion(Player player, String markerId)
@@ -2328,6 +2432,7 @@ public final class Game
     synchronized void finishBattle(String hexLabel, boolean attackerEntered,
         int points, int turnDone)
     {
+        battle.cleanRefs();
         battle = null;
         server.allCleanupBattle();
         Legion winner = null;
@@ -2608,7 +2713,9 @@ public final class Game
             if (teleportingLord == null || !legion.listTeleportingLords(
                 hexLabel).contains(teleportingLord))
             {
-                if (teleportingLord == null) { return "teleportingLord null";
+                if (teleportingLord == null)
+                {
+                    return "teleportingLord null";
                 }
                 return "list of telep. lords " +
                     legion.listTeleportingLords(hexLabel).toString() +
@@ -3033,7 +3140,8 @@ public final class Game
 
     private synchronized void checkEngagementDone()
     {
-        if (summoning || reinforcing || acquiring || engagementResult == null) {
+        if (summoning || reinforcing || acquiring || engagementResult == null)
+        {
             return;
         }
 
@@ -3048,7 +3156,29 @@ public final class Game
             turnCombatFinished);
 
         engagementResult=null;
-        server.nextEngagement();
+        if (checkAutoQuitOrGoOn())
+        {
+            server.nextEngagement();
+        }
+    }
+
+    /*
+     * returns true if game should go on.
+     */
+    public boolean checkAutoQuitOrGoOn()
+    {
+        if (gameOver && getOption(Options.autoQuit))
+        {
+            Start.setCurrentWhatToDoNext(Start.QuitAll);
+            dispose();
+            // if dispose does System.exit(), we would never come here, 
+            // but when we get rid of all System.exit()'s ...
+            return false;
+        }
+        else
+        {
+            return true;
+        }
     }
 
     /** Return a list of all players' legions. */
@@ -3368,4 +3498,115 @@ public final class Game
     {
         history.playerElimEvent(playerName, slayerName, turnNumber);
     }
+
+    public NotifyWebServer getNotifyWebServer()
+    {
+        return this.notifyWebServer;
+    }
+
+    /* Interface from Game/Server to WebServer who started this.
+     * Perhaps later replaced with a two-way socket connection?
+     * Class is always created, no matter whether we have a web
+     * server ( => active == true) or not ( => active == false); 
+     * but this way, we can have all the
+     *    "if (we have a web server) { } " 
+     * checking done inside this class and do not clutter the 
+     * main server code.
+     */
+
+    class NotifyWebServer
+    {
+        private String flagFilename = null;
+        private PrintWriter out;
+        private File flagFile = null;
+        // Do we even have a web server to notify at all?
+        private boolean active = false;
+
+        public NotifyWebServer(String name)
+        {
+            if (name != null && !name.equals(""))
+            {
+                this.flagFilename = name;
+                active = true;
+            }
+        }
+
+        public boolean isActive()
+        {
+            return active;
+        }
+
+        public void readyToAcceptClients()
+        {
+            if (active)
+            {
+                createFlagfile();
+            }
+        }
+
+        public void gotClient(String name, String type)
+        {
+            if (active)
+            {
+                out.println("Client (type " + type + ") connected: " + name);
+                out.flush();
+            }
+        }
+
+        public void allClientsConnected()
+        {
+            if (active)
+            {
+                out.println("All clients connected");
+                out.flush();
+            }
+        }
+
+        public void serverStoppedRunning()
+        {
+            if (active)
+            {
+                removeFlagfile();
+            }
+        }
+
+        public void createFlagfile()
+        {
+            if (active)
+            {
+                flagFile = new File(flagFilename);
+                try
+                {
+                    // flagFile.createNewFile();
+                    out = new PrintWriter(new FileWriter(flagFile));
+                }
+                catch (IOException e)
+                {
+                    LOGGER.log(Level.SEVERE,
+                        "Could not create web server flag file " +
+                        flagFilename + "!!",
+                        (Throwable)null);
+                }
+            }
+        }
+
+        public void removeFlagfile()
+        {
+            out.close();
+            if (active)
+            {
+                try
+                {
+                    flagFile.delete();
+                }
+                catch (Exception e)
+                {
+                    LOGGER.log(Level.SEVERE,
+                        "Could not delete web server flag file " +
+                        flagFilename + "!!" + e.toString(),
+                        (Throwable)null);
+                }
+            }
+        }
+    } // END Class NotifyWebServer
 }

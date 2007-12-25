@@ -47,6 +47,8 @@ public final class PlayerInfo
     {
         this.client = client;
         net.sf.colossus.server.CustomRecruitBase.addPlayerInfo(this);
+        net.sf.colossus.webcommon.FinalizeManager.register(this,
+            client.getPlayerName());
     }
 
     /** Takes a colon-separated string of form
@@ -309,5 +311,15 @@ public final class PlayerInfo
             String id = (String)it.next();
             client.removeLegion(id);
         }
+    }
+
+    public void setClientNull()
+    {
+        this.client = null;
+    }
+
+    public void finalize()
+    {
+        net.sf.colossus.webcommon.FinalizeManager.unregister(this);
     }
 }

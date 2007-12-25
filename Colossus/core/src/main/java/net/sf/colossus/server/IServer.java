@@ -63,6 +63,10 @@ public interface IServer
 
     public void withdrawFromGame();
 
+    public void disconnect();
+
+    public void stopGame();
+
     public void setDonor(String markerId);
 
     public void doSplit(String parentId, String childId, String results);

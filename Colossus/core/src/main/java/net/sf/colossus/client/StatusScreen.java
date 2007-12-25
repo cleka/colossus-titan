@@ -328,6 +328,9 @@ final class StatusScreen extends KDialog implements WindowListener
         saveWindow.saveSize(size);
         location = getLocation();
         saveWindow.saveLocation(location);
+        this.options = null;
+        this.client = null;
+        this.oracle = null;
     }
 
     public void windowClosing(WindowEvent e)

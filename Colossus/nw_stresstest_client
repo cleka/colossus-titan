@@ -16,6 +16,9 @@
 # meaning, do 10 rounds and exit then), it will create that stop.flag
 # then by itself so that, if stresstest is run in same machine,
 # all the remote clients exit, too...
+#
+# @version: $Id$
+# @author: Clemens Katzer
 
 FORCEBOARD=""
 done=no
@@ -51,6 +54,10 @@ done
 
 LOG=client.$playername.log
 
+# for stresstest, this should always be set, even if 1, 
+# so that client does not ask whether to dispose.
+INTERNALROUNDS="-Dnet.sf.colossus.stressTestRounds=1"
+
 # ----------------------------------------------------------------------
 # If on windows (e.g. Cygwin), create also Win-style (CR-LF) newlines into 
 # the log file (Java will print CR-LFs anyway, and if this script does not,
@@ -70,7 +77,10 @@ while true
 do 
     echo -e "\nStarting client $playername again\n" 
     echo -e "$CR\nStarting client $playername again$CR" >> $LOG
-    java -Djava.util.logging.config.file=logging.properties $FORCEBOARD -Xmx128M -jar Colossus.jar -c -m $playername -A -g  $1 $2 $3 $4 $5 $6 $7 $8 >> $LOG 2>&1
+    CMD="java -Djava.util.logging.config.file=logging.properties $FORCEBOARD $INTERNALROUNDS -Xmx128M -jar Colossus.jar -c -m $playername -g -q $1 $2 $3 $4 $5 $6 $7 $8 $9"
+    echo $CMD
+    echo $CMD >> $LOG 2>&1
+    $CMD      >> $LOG 2>&1
     sleep 1
     if [ -e stop.flag ]
     then

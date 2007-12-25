@@ -12,12 +12,12 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 
-import javax.swing.JDialog;
-import javax.swing.JFrame;
 import javax.swing.JButton;
+import javax.swing.JDialog;
 
 import java.util.HashMap;
 
+import net.sf.colossus.util.KFrame;
 import net.sf.colossus.server.Constants;
 
 
@@ -41,7 +41,8 @@ final class ShowBattleMap extends HexMap implements WindowListener,
 
     private int oldScale = -1;
 
-    ShowBattleMap(JFrame parentFrame, String masterHexLabel, GUIMasterHex guiHex)
+    ShowBattleMap(KFrame parentFrame, String masterHexLabel,
+        GUIMasterHex guiHex)
     {
         super(masterHexLabel);
         MasterHex hex = MasterBoard.getHexByLabel(masterHexLabel);

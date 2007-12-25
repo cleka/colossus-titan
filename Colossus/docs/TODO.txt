@@ -1,27 +1,87 @@
+
+Probably easy tasks (at least easy to explain/understand whay and why ;-)
+====================-----------------------------------------------------
+
 Bug: The duplicate name detection code for network players is now
-   failing with the new initialization timing -- oscillating fixNames
-   between dripton and dripton4
+     failing with the new initialization timing -- oscillating fixNames
+     between dripton and dripton4
 
-Bug: 2-high titan stack did not run away even though it could be caught
-   on 4-6 by a 6-high stack:
-Gold rolls a 4 for movement
-considering risk of leaving Gd01 in Brush hex 109
-got enemies that can attack on a 1 :[Rd04]
-got enemies that can attack on a 2 :[Rd04, Rd11]
-got enemies that can attack on a 3 :[Rd04, Rd11]
-got enemies that can attack on a 4 :[Rd02, Rd04, Rd11]
-got enemies that can attack on a 5 :[Rd01, Rd02, Rd04, Rd11]
-got enemies that can attack on a 6 :[Rd01, Rd02, Rd04, Rd11]
-EVAL Gd01 stay in Brush hex 109 = 0
-considering risk of moving Gd01 to Plains hex 105
-got enemies that can attack on a 5 :[Bu03]
-got enemies that can attack on a 6 :[Bu03]
-EVAL Gd01 move to Plains hex 105 = 0
+Bug: During a battle against an opponent's titan stack, right-clicking on
+     another one of his stacks showed a titan with a ?.  Looks like we're not
+     updating certainties at the beginning of the engagement.  This fixes 
+     itself at the end of the battle.
 
-Bug: Loaded a game with 2 human players and 4 AIs.  Only got one board.
+To be checked - still an issue:
+  Dead players' markers should be zero in StatusScreen.
+
+Observer clients, which can attach in mid-game.
+
+Sometimes refuse remote newGame/loadGame/saveGame calls?
+
+(still useful?)
+Change Quit button in GetPlayers dialog to Cancel.  Go back to existing 
+   game if there is one from Cancel, or quit if just starting.  Eliminate
+   confirmation before calling dialog.
+
+Add "no 2s or 5s" mulligan option.
+
+Add UI for players to specify favorite colors.
+
+Add a window that shows all players' units
+
+Add a ShowLegionMarkers window that shows each player's remaining markers.
+
+Add a window that shows all game options.
+
+Add confirm dialogs (for conceding with titan, skipping recruits, ...)
+
+Show zoomed area around mouse cursor in a small window, for big maps.
+
+Closing certain dialogs (Penalty, ...) should cancel the action (strike)
+rather than using default.
+
+Summon angel: should be an "I click it when I want" e.g button 
+instead of modal dialog (once rejected, no chance to get again)
+Same for reinforcement.
+
+
+Disable "AIs stop when humans dead" if no human players at start of game.
+
+
+
+######################################################################
+
+Now OK ??
+=========
 
 Bug: Out of memory error after many consecutive Load Game actions.  Find leak.
-   Not enough memory to copy history from from savegame JDOM tree to new one?
+     Not enough memory to copy history from from savegame JDOM tree to new one?
+     DONE: => probably now ok. All socket threads stayed in loop, so 
+              sockethtreads, clients, boards and all their related data was
+              still referenced and could not be garbage collected.
+
+
+Bug: CowardSimpleAI ran out of markers, started trying to split with
+     marker "null", entered infinite loop
+
+Cleanup network shutdown -- when game over or player eliminated, don't
+whine if its client drops.
+=> DONE now with the whole WebClient related changes.
+
+Add optional additional handicap mulligans that can be used after turn 1.
+=> DONE: Unlimited Mulligans options
+
+ShowLegion on mouseover, not click, with permanent dialog.
+=> DONE: AutoInspector
+
+Make split prediction optional.
+=> DONE (??): ViewModes
+
+
+######################################################################
+
+
+Probably not reproducable:
 
 Bug: After clicking on engagement, after computer declined to flee and I
    declined to concede:
@@ -38,10 +98,6 @@ java.lang.NullPointerException
         at net.sf.colossus.server.SocketServerThread.parseLine(SocketServerThread.java:104)
         at net.sf.colossus.server.SocketServerThread.run(SocketServerThread.java:65)
 
-Bug: During a battle against an opponent's titan stack, right-clicking on
-another one of his stacks showed a titan with a ?.  Looks like we're not
-updating certainties at the beginning of the engagement.  This fixes itself at
-the end of the battle.
 
 Bug: Blue's turn, number 24
 - We can safely split AND attack with Bu01
@@ -78,8 +134,6 @@ java.util.ConcurrentModificationException
 - Client.didSplit 134 Bu01 Bu07 2 24
 - From client Blue: doneWithSplits
 
-Bug: CowardSimpleAI ran out of markers, started trying to split with
-   marker "null", entered infinite loop
 
 Remove advancePhaseInternal from PhaseAdvancer; make private
 
@@ -95,7 +149,6 @@ The updateHistory flag used to avoid infinite loops should be an instance
 EASY Compute numLegions, numMarkers, numCreatures, titan power, total point 
    value on client side rather than passing them in player info.
 
-EASY Disable "AIs stop when humans dead" if no human players at start of game.
 
 Animated timer showing time left for AI in battles.
 
@@ -127,41 +180,22 @@ When getting both a PickRecruit and an AcquireAngel after a battle,
    make sure the PickRecruit is on top, because it's modal.
    Or make PickRecruit non-modal.
 
-Observer clients, which can attach in mid-game.
-
-Sometimes refuse remote newGame/loadGame/saveGame calls?
-
-Cleanup network shutdown -- when game over or player eliminated, don't
-   whine if its client drops.
 
 Fully event-driven savegames.
 Use identical events for network protocol.
 Use events to support infinite undo/redo, toolbar with VCR controls to 
    step through games, stepping AI, etc.
 
-Change Quit button in GetPlayers dialog to Cancel.  Go back to existing 
-   game if there is one from Cancel, or quit if just starting.  Eliminate
-   confirmation before calling dialog.
 
 L&F should not show Windows if not allowed on this platform.
 L&F needs to include GTK on Linux
 Eliminate L&F menu entirely?
 
-Add "no 2s or 5s" mulligan option.
-Add optional additional handicap mulligans that can be used after turn 1.
-
-Add UI for players to specify favorite colors.
-
-ShowLegion on mouseover, not click, with permanent dialog.
-Show zoomed area around mouse cursor in a small window, for big maps.
-
-Add confirm dialogs (for conceding with titan, skipping recruits, ...)
-
 Highlight entrances somehow.  Maybe use fixed boxes with an arrow to
    show entry side, instead of cascading.
-Turn map to move player's entrance (or attacker's if observing) to 
-   bottom.  Line up entering creatures rather than overlapping.
-   Color-code entrances.
+Turn map to move player's entrance (or attacker's if observing) to bottom.  
+Line up entering creatures rather than overlapping.
+Color-code entrances.
 Make BattleMap less tall.  Move dice, etc. to one side.
 
 Add SetupBattle dialog, to allow setting up standalone battles.
@@ -170,11 +204,6 @@ Add SetupBattle dialog, to allow setting up standalone battles.
    type, player scores for titan power.)
 
 Track all players' markers on client side.
-Add a ShowLegionMarkers window that shows each player's remaining markers.
-
-Add a window that shows all players' units
-
-Add a window that shows all game options.
 
 Add movement and recruit animation.  Requires returning full paths for
    moves, not just destination hex.
@@ -187,7 +216,6 @@ JDK 1.4 changes:
    asserts (make sure they're on)
    NetworkInterface / localhost
 
-Make split prediction optional.
 
 SVG chits.  Maybe SVG board and map, after we have SVG chits.  (No point
    before then -- just drags in Batik without giving infinite rescaling.)
@@ -201,8 +229,6 @@ Use creature-only images without chit background, and scale onto chits,
    images without editing.
 
 Try PMD (lint tool).
-
-Dead players' markers should be zero in StatusScreen.
 
 PickRecruiter should allow clicking on the top row (if applicable),
    not just the bottom.

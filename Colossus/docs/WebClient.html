@@ -1,0 +1,170 @@
+<!-- $Id: $ -->
+<html>
+  <head>
+    <meta name="generator"
+    content="HTML Tidy for Linux/x86 (vers 1st July 2002), see www.w3.org" />
+    <title>Colossus - Web Server and Client</title>
+  </head>
+  <body>
+<h1>Colossus - Web Client</h1>
+<H3>Scope</h3>
+This document describes how to use the Colossus WebClient. The functionality 
+is currently available as a branch called <B>web</B> in SVN repository.
+<P>
+
+<H2>Running the WebClient</H2>
+
+I assume the version of Colossus which includes the Web Client functionality
+will be available soon via Java Web Start. Until then, you need
+to build your own Colossus from the SVN branch (branches/web/ ) as described
+in <A HREF="WebServer.html">WebServer</A> document.
+
+<H3>Starting the application</H3>
+
+The WebClient is integrated into the normal Colossus.jar. It can be started
+via the button <B>Run Web Client</B> in the "<B>Game Setup</B>" 
+(GetPlayers.java) dialog, or directly with a commandline option, e.g.:
+<PRE>
+ <B>run -w</B>
+</PRE>
+In the dialog, it forms now together with the <B>Run Network Client</B>
+a new row of buttons (2nd last row) and the
+last row is only three buttons (New Game, Load Game and Quit) instead 
+of four as before.
+<P>
+(We could put NetClient and WebClient as buttons 3 and 4 in last row
+and remove the Quit button totally - one can Quit by closing the GetPlayers
+dialog with the close window "x" in upper right corner... - but this way
+it is more obvious how to Quit.)
+
+<H3>Getting started with WebClient</H3>
+
+On first use, a user would usually use the "Register" button to
+create an login.
+<P>After that, you can change to the <B>Instant Games</B> tab. Note that
+on the <B>Server</B> tab are checkboxes for <B>Auto-login on start</B>
+and <B>After login Game pane</B>. 
+<P>
+The first does as it says - whenever you start the web client, it will
+automatically login with the login name you have last used for the web 
+client; it stores both login and password in a webclient specific config
+file.
+
+<P>The other checkbox: if enabled, when login succeeds successfully,
+it immediately changed you to the <B>Instant Games</B> tab.
+
+<H3>Instant Games</H3>
+
+In the <B>Instant Games</B> tab, you can see if some other player has
+proposed a game. 
+<P>
+If there is no proposed game interesting for you, you can
+propose one by yourself - it will proposed with the settings which
+are currently set in your <B>Game preferences</B> section. Make there
+the settings according to your interests, and press the <B>Propose</B>
+button. And wait whether someone else enrolls ;-)
+<BR>
+If nobody enrolls, you can unenroll and cancel it, and logout... :-(
+<P>
+Or if someone has proposed a game (and it has not started yet), 
+it is shown in the <B>Proposed Games</B> list. 
+<P>If one of the games in the proposed games list looks suitable to 
+you, click onto it to select it, and then you can press the
+<B>Enroll</B> button.
+<P>
+<B>Note: when you are enrolled, you cannot do much else any more
+- at least not propose one or enroll to other games!</B>
+<P>When the minimum number of players is enrolled, the <B>Start</B>
+button becomes active. Players can then wait some longer, if more
+players join (perhaps someone else in chat still asking, clarifiying
+things etc., so you know one will come?)
+<P>
+Anyway, when one player presses the <B>Start</B> button, the WebServer
+will start the game, and notify the WebClient, and after a few seconds
+the MasterBoard should come up like a normal network client. Just some 
+less hassle :)
+<P>
+When the board comes up, you can leave the web client open, for example
+for chatting; one day, I would like to have "game-specific" chats, too.
+For example, game with GameId #23 starts, then the involved players
+would have a <B>Chat #23</B> tab, and could discuss there matters
+relevant only for this specific game. Well, one day...
+<P>
+You can hide (Hide button in the bottom of <B>Instant Games</B> tab) 
+or close the web client (with the small "x" button in
+upper right corner), or you could have set it in the bottom of the
+<B>Instant Games</B> tab to do one of "Nothing", "Hide" or "Quit"
+automatically when game starts.
+<P>
+When game is over, the Server/Game run on WebServer will do AutoQuit,
+so your Game Client will get a "Game over - socket closed" or something 
+like that;
+if WebClient was only hidden, it will come back automatically upon
+closing the MasterBoard, otherwise it will prompt you whether to restore 
+it - or otherwise all windows are closed and the Java Virtual Machine will
+be terminated.
+
+
+<H3>Scheduled Games</H3>
+
+This is meant to be one day, that someone can propose a game, e.g.
+like: <I>next saturday evening, 20:00 [WebClient will convert it to your
+ timezone, of course], I would like to play a game with 2-4 players,
+Abyssal6, Viewmode "all public" and Expire setting "Never"</I>.
+<P>
+Similar to Instant Games, players can enroll; and at that given
+time, when all enrolled players are logged in (or, if someone is 
+missing, perhaps after some time anyway), the game can start.
+<P>
+Details to be clarified for this...
+
+
+<H3>Chat</H3>
+
+There is some simple chat functionality. The idea is, that people can
+agree/ask here, whether someone else is currently online, interested in
+a game (or what kind of game), etc. 
+<P>
+Even if you login and nobody else is currently there, the server
+always keeps the last 10 messages in memory, and sends them to a 
+newly logged in user. This way you can see, when the last time someone
+else had posted/asked something in chat, or perhaps left a note "I'll be back in ten minutes" or "... back at &lt;some time&gt;".
+<P>
+At some point, I would rather/additionally like to have a kind of pinboard 
+where
+someone can post somewhat longer messages, and they are kept for
+example for one week or something, and, of course, the <B>Scheduled
+Games</B> functionality.
+<P>But for now, I hope this is better than nothing...
+
+<H4><FONT color="red">Chat and Modal dialogs </FONT></H4>
+
+<FONT color="red">Please note, that all of the windows run in the same Java; and 
+modal dialogs</FONT> (such as dialog boxes waiting for clicking some OK
+or Cancel or something) <FONT color="red">block all other windows.</FONT>
+<P>
+This means, that e.g. if there is a modal dialog like for making a
+proposal to resolve a battle (instead of flee, concede or fight), you
+can't use the chat window to discuss/agree it. That's inconvenient,
+but this limitation is caused by how Java's modal windows operate.
+<P>
+If you really want to be able to use the chat all the time,
+Logout and Close (with the window upper right corner cross symbol) the
+ WeblClient from which you started the game 
+(<B>but do not press Quit button!</B>);
+and start a totally new Java instance of Colossus 
+(i.e. Web Start or Commandline)
+and start another, independent WebClient there. Since that is a different
+Java Virtual Machine, the modality of the windows in the running game
+does not effect the behavior of the WebClient.
+
+<!--------------------------------------------------------------->
+<HR>
+<P>
+<I>
+Created october 2007, reflecting the state of Colossus in the branch.
+<BR>
+Last updated thursday, December 20, 2007 by Clemens Katzer
+</I>
+</body>
+</html>

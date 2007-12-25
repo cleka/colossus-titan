@@ -7,6 +7,8 @@ import java.util.*;
 /**
  * Class MultiSet is a set that can contain more than one of the same
  * element, built around a HashMap that maps objects to Integer counts.
+ * 
+ * @version $Id$
  */
 public class MultiSet
 {

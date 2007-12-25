@@ -8,7 +8,6 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.Point;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -21,6 +20,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TreeSet;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -32,7 +32,6 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JEditorPane;
 import javax.swing.JFileChooser;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -45,6 +44,7 @@ import javax.swing.text.Document;
 import net.sf.colossus.client.PickIntValue;
 import net.sf.colossus.client.SaveWindow;
 import net.sf.colossus.client.ShowReadme;
+import net.sf.colossus.util.KFrame;
 import net.sf.colossus.util.Options;
 import net.sf.colossus.util.ResourceLoader;
 
@@ -58,7 +58,7 @@ import net.sf.colossus.util.ResourceLoader;
  */
 
 
-public final class GetPlayers extends JFrame implements WindowListener,
+public final class GetPlayers extends KFrame implements WindowListener,
     ActionListener, ItemListener
 {
     private static final Logger LOGGER = Logger.getLogger(GetPlayers.class.getName());
@@ -66,18 +66,27 @@ public final class GetPlayers extends JFrame implements WindowListener,
     public static final String loadVariant = "Load External Variant";
 
     private Object mutex;
+    private JLabel runningOnLabel;
+    private JComboBox serveAtPortBox;
+    private TreeSet sPortChoices;
 
     private Vector typeChoices = new Vector();
     private JComboBox[] playerTypes = new JComboBox[Constants.MAX_MAX_PLAYERS];
     private JComboBox[] playerNames = new JComboBox[Constants.MAX_MAX_PLAYERS];
     private JEditorPane readme = new JEditorPane();
+    private JScrollPane readmeScrollPane;
+    private JTabbedPane tabbedPane;
 
     private JComboBox variantBox;
     private JComboBox viewModeBox;
     private JComboBox eventExpiringBox;
 
+    private int serveAtPort = -1;    // server serves at that.
+
     /** This is Game's options, which we will modify directly. */
     private Options options;
+    private Options stOptions;
+    private Start startObject;
 
     private int oldDelay;
     private JLabel delayLabel;
@@ -86,12 +95,16 @@ public final class GetPlayers extends JFrame implements WindowListener,
     private SaveWindow saveWindow;
 
     /** Clear options to abort */
-    public GetPlayers(Options options, Object mutex)
+    public GetPlayers(Options options, Object mutex, Start startObject)
     {
         super("Game Setup");
 
+        net.sf.colossus.webcommon.FinalizeManager.register(this, "only one");
+
         this.options = options;
         this.mutex = mutex;
+        this.startObject = startObject;
+        this.stOptions = startObject.getStartOptions();
 
         setupTypeChoices();
 
@@ -107,22 +120,17 @@ public final class GetPlayers extends JFrame implements WindowListener,
         getContentPane().setLayout(new BorderLayout());
         getContentPane().add(mainScrollPane, BorderLayout.CENTER);
 
-        try
-        {
-            InetAddress ia = InetAddress.getLocalHost();
-            JLabel iaLabel = new JLabel("Running on " + ia.toString());
-            Container iaPane = new Container();
-            iaPane.setLayout(new GridLayout(0, 1));
-            mainPane.add(iaPane);
-            iaPane.add(iaLabel);
-        }
-        catch (UnknownHostException ex)
-        {
-            LOGGER.log(Level.SEVERE, "Can not resolve host", ex);
-        }
+        // dummy text, will be set finally when serveAtPort is handled.
+        runningOnLabel = new JLabel("Running on...");
+        JPanel runningOnPane = new JPanel();
+        runningOnPane.setLayout(new GridLayout(0, 1));
+        runningOnPane.add(runningOnLabel);
+        mainPane.add(runningOnPane);
+        
+        tabbedPane = new JTabbedPane();
 
-        JTabbedPane tabbedPane = new JTabbedPane();
-
+        // ================== Players tab =====================
+        //
         Box allPlayersPane = new Box(BoxLayout.Y_AXIS);
         tabbedPane.addTab("Players", allPlayersPane);
         mainPane.add(tabbedPane);
@@ -133,6 +141,30 @@ public final class GetPlayers extends JFrame implements WindowListener,
 
         Box optionPane = new Box(BoxLayout.Y_AXIS);
         tabbedPane.addTab("Options", optionPane);
+
+        Box portPane = new Box(BoxLayout.X_AXIS);
+        portPane.add(new JLabel("Serve game at port: "));
+
+        sPortChoices = new TreeSet();
+        sPortChoices.add(""+Constants.defaultPort);
+        int stPort = stOptions.getIntOption(Options.serveAtPort);
+        if (stPort != -1 && stPort != Constants.defaultPort)
+        {
+            sPortChoices.add(""+stPort);
+        }
+        else
+        {
+            stPort = Constants.defaultPort;
+        }
+        serveAtPortBox = new JComboBox(new Vector(sPortChoices));
+        serveAtPortBox.setEditable(true);
+        serveAtPortBox.setSelectedItem(""+stPort);
+        serveAtPortBox.addActionListener(this);
+        serveAtPort = stPort;
+        portPane.add(serveAtPortBox);
+        optionPane.add(portPane);
+
+        setRunningOnLabel(stPort);
 
         JPanel checkboxPane = new JPanel(new GridLayout(0, 3));
         checkboxPane.setBorder(new TitledBorder("General"));
@@ -230,15 +262,31 @@ public final class GetPlayers extends JFrame implements WindowListener,
 
         options.setOption(Options.variant, variantName);
 
+        // ================== Variant README tab =====================
         // if we don't pass the JEditorPane ("readme"), 
         // it won't be updated when Variant changes.
-        JScrollPane readmeScrollPane = ShowReadme.readmeContentScrollPane(
+        readmeScrollPane = ShowReadme.readmeContentScrollPane(
             readme, variantName);
         tabbedPane.addTab("Variant README", readmeScrollPane);
 
+        JPanel clientPane = new JPanel();
+        clientPane.setBorder(new TitledBorder("Clients"));
+        clientPane.setLayout(new GridLayout(0, 2));
+        mainPane.add(clientPane);
+
+        JButton button3 = new JButton(Constants.runClient);
+        button3.setMnemonic(KeyEvent.VK_C);
+        clientPane.add(button3);
+        button3.addActionListener(this);
+
+        JButton button5 = new JButton(Constants.runWebClient);
+        button5.setMnemonic(KeyEvent.VK_W);
+        clientPane.add(button5);
+        button5.addActionListener(this);
+
         JPanel gamePane = new JPanel();
         gamePane.setBorder(new TitledBorder("Game Startup"));
-        gamePane.setLayout(new GridLayout(0, 4));
+        gamePane.setLayout(new GridLayout(0, 3));
         mainPane.add(gamePane);
 
         JButton button1 = new JButton(Constants.newGame);
@@ -251,12 +299,7 @@ public final class GetPlayers extends JFrame implements WindowListener,
         gamePane.add(button2);
         button2.addActionListener(this);
 
-        JButton button3 = new JButton(Constants.runClient);
-        button3.setMnemonic(KeyEvent.VK_C);
-        gamePane.add(button3);
-        button3.addActionListener(this);
-
-        JButton button4 = new JButton(Constants.quit);
+        JButton button4 = new JButton(Constants.quitGame);
         button4.setMnemonic(KeyEvent.VK_Q);
         gamePane.add(button4);
         button4.addActionListener(this);
@@ -269,6 +312,9 @@ public final class GetPlayers extends JFrame implements WindowListener,
         Point loadLocation = saveWindow.loadLocation();
         if (loadLocation == null)
         {
+            // if we would save&restore both size + pos,
+            // could use KFrame's restoreOrCenter and don't
+            // need own centerOnScreen in here...
             centerOnScreen();
         }
         else
@@ -278,6 +324,31 @@ public final class GetPlayers extends JFrame implements WindowListener,
 
         addWindowListener(this);
         setVisible(true);
+    }
+
+    private Object makeObj(final String item)
+    {
+        String strObject = new String(item);
+        return strObject;
+    }
+
+    private void setRunningOnLabel(int port)
+    {
+        InetAddress ia = null;
+        String hostString = "<unknown>";
+        try
+        {
+            ia = InetAddress.getLocalHost();
+            hostString = ia.toString();
+        }
+        catch (UnknownHostException ex)
+        {
+            // In this case the UHExc. is not that a serious problem, because
+            // it's for the displaying in GUI only.
+            LOGGER.log(Level.WARNING, ex.toString(), ex);
+        }
+        String runningOnString = "Running on " + hostString + ", port " + port;
+        runningOnLabel.setText(runningOnString);
     }
 
     private void setDelayLabel(int delay)
@@ -397,8 +468,27 @@ public final class GetPlayers extends JFrame implements WindowListener,
         pane.add(cb);
     }
 
-    /** Start new game if values are legal. */
-    private void validateInputs()
+    public void addItemToBox(JComboBox box, String port)
+    {
+        int cnt = box.getItemCount();
+        int found = -1;
+        int i;
+        for (i=0 ; i < cnt ; i++)
+        {
+            String p = (String)box.getItemAt(i);
+            if (p.equals(port))
+            {
+                found = i;
+            }
+        }
+        if (found == -1)
+        {
+            box.addItem(makeObj(port));
+        }
+    }
+
+    /** Check if values are legal; if yes, caller can start the game. */
+    private boolean validateInputs()
     {
         options.clearPlayerInfo();
 
@@ -438,7 +528,7 @@ public final class GetPlayers extends JFrame implements WindowListener,
                     JOptionPane.showMessageDialog(this,
                         "Duplicate player names!");
                     options.clearPlayerInfo();
-                    return;
+                    return false;
                 }
                 numPlayers++;
                 names.add(name);
@@ -452,7 +542,7 @@ public final class GetPlayers extends JFrame implements WindowListener,
             JOptionPane.showMessageDialog(this,
                 "Not enough different unique player names!");
             options.clearPlayerInfo();
-            return;
+            return false;
         }
 
         // Okay.  Copy names and types to options.
@@ -465,8 +555,7 @@ public final class GetPlayers extends JFrame implements WindowListener,
             options.setOption(Options.playerType + i, type);
         }
 
-        // Eliminate modal dialog, allowing game to start.
-        dispose();
+        return true;
     }
 
     private void doLoadGame()
@@ -476,23 +565,67 @@ public final class GetPlayers extends JFrame implements WindowListener,
         int returnVal = chooser.showOpenDialog(this);
         if (returnVal == JFileChooser.APPROVE_OPTION)
         {
-            // Set key to "load game" and value to savegame filename.
-            options.setOption(Constants.loadGame,
-                chooser.getSelectedFile().getPath());
+            // Set startObject to "load game" and value to filename.
+            String filename = chooser.getSelectedFile().getPath();
+            stOptions.setOption(Options.loadGameFileName, filename);
+            stOptions.setOption(Options.serveAtPort, serveAtPort);
+            options.setOption(Options.serveAtPort, serveAtPort);
+            Start.setCurrentWhatToDoNext(Start.LoadGame);
             dispose();
         }
     }
 
-    private void doRunClient()
+    private void doClientDialog()
     {
-        options.setOption(Constants.runClient, true);
+        startObject.setWhatToDoNext(Start.NetClientDialog);
+        dispose();
+    }
+
+    private void doRunWebClient()
+    {
+        startObject.setWhatToDoNext(Start.StartWebClient);
         dispose();
     }
 
     public void windowClosing(WindowEvent e)
     {
+        doQuit();
+    }
+
+    private boolean quitAlreadyTried = false;
+
+    private void doQuit()
+    {
+        // If "clean quit" fails (e.g. one modifies the Colossus.jar
+        // while game is running;-), provide a way that on 2nd click
+        // one can get rid of the application...
+        if (quitAlreadyTried)
+        {
+            LOGGER.log(Level.SEVERE,
+                "It seems the clean 'Quit' did fail - doing it now " +
+                "the hard way using System.exit(1)",
+                (Throwable)null);
+            System.exit(1);
+        }
+        quitAlreadyTried = true;
+        startObject.setWhatToDoNext(Start.QuitAll);
         dispose();
-        System.exit(0);
+    }
+
+    private void doNewGame()
+    {
+        boolean ok = validateInputs();
+        if (ok)
+        {
+            startObject.setWhatToDoNext(Start.StartGame);
+            stOptions.setOption(Options.serveAtPort, serveAtPort);
+            options.setOption(Options.serveAtPort, serveAtPort);
+            dispose();
+        }
+        else
+        {
+            // ValidateInputs showed an error message box.
+        }
     }
 
     static class varFileFilter extends javax.swing.filechooser.FileFilter
@@ -547,15 +680,13 @@ public final class GetPlayers extends JFrame implements WindowListener,
 
     public synchronized void actionPerformed(ActionEvent e)
     {
-        if (e.getActionCommand().equals(Constants.quit))
+        if (e.getActionCommand().equals(Constants.quitGame))
         {
-            options.clear();
-            dispose();
-            System.exit(0);
+            doQuit();
         }
         else if (e.getActionCommand().equals(Constants.newGame))
         {
-            validateInputs();
+            doNewGame();
         }
         else if (e.getActionCommand().equals(Constants.loadGame))
         {
@@ -563,7 +694,11 @@ public final class GetPlayers extends JFrame implements WindowListener,
         }
         else if (e.getActionCommand().equals(Constants.runClient))
         {
-            doRunClient();
+            doClientDialog();
+        }
+        else if (e.getActionCommand().equals(Constants.runWebClient))
+        {
+            doRunWebClient();
         }
         else if (e.getActionCommand().equals(Options.aiDelay))
         {
@@ -614,7 +749,8 @@ public final class GetPlayers extends JFrame implements WindowListener,
                 String value = (String)variantBox.getSelectedItem();
                 if (VariantSupport.getVarName().equals(value +
                     Constants.varEnd))
-                {// re-selecting the same ; do nothing
+                {
+                    // re-selecting the same ; do nothing
                 }
                 else
                 { // selecting different ; remove all non-included
@@ -643,6 +779,12 @@ public final class GetPlayers extends JFrame implements WindowListener,
             {
                 String value = (String)eventExpiringBox.getSelectedItem();
                 options.setOption(Options.eventExpiring, value);
+            }
+            else if (source == serveAtPortBox)
+            {
+                String portString = (String)serveAtPortBox.getSelectedItem();
+                serveAtPort = Integer.parseInt(portString);
+                setRunningOnLabel(serveAtPort);
             }
             else
             {
@@ -720,26 +862,29 @@ public final class GetPlayers extends JFrame implements WindowListener,
         options.setOption(text, selected);
     }
 
+    /*
+     * Eliminate dialog and notify mutex, allowing game to start,
+     * or main to run web client or netclient dialog.
+     */
     public void dispose()
     {
         if (!options.isEmpty())
         {
             saveWindow.saveLocation(getLocation());
         }
+        options.saveOptions();
+        // some cleanup, to ensure proper GC:
+        readme.getParent().remove(readme);
+        tabbedPane.remove(readmeScrollPane);
+        readmeScrollPane = null;
+        readme = null;
+
+        // Dispose dialog and notify main() so that game starts:
         super.dispose();
         synchronized (mutex)
         {
             mutex.notify();
         }
-    }
-
-    /** Center this dialog on the screen.  Must be called after the dialog
-     *  size has been set. */
-    public void centerOnScreen()
-    {
-        Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-        setLocation(new Point(d.width / 2 - getSize().width / 2,
-            d.height / 2 - getSize().height / 2));
     }
 
     public void windowActivated(WindowEvent e)

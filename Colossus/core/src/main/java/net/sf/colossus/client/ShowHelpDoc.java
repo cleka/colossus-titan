@@ -1,7 +1,7 @@
 package net.sf.colossus.client;
 
 
-import javax.swing.JFrame;
+import net.sf.colossus.util.KFrame;
 import javax.swing.JTextArea;
 
 
@@ -18,22 +18,13 @@ import javax.swing.JTextArea;
 
 
 
-public final class ShowHelpDoc
+public final class ShowHelpDoc extends KFrame
 {
-    private static JFrame viewFrame;
+    private static String title = "Pointer to Options documentation";
 
     ShowHelpDoc()
     {
-        // primitive way to avoid having more than one. How to do better?
-        if ( viewFrame != null )
-        {
-            viewFrame.dispose();
-            viewFrame = null;
-        }
-
-        String title = "Pointer to Options documentation";
-
-        viewFrame = new JFrame(title);
+        super(title);
 
         String text = "\n" +
             "  Help on the options is not built-in into Colossus yet, " +
@@ -51,9 +42,8 @@ public final class ShowHelpDoc
 
         JTextArea contentPanel = new JTextArea(text, 10, 60);
 
-        viewFrame.getContentPane().add(contentPanel);
-        viewFrame.pack();
-        viewFrame.setVisible(true);
+        this.getContentPane().add(contentPanel);
+        this.pack();
+        this.setVisible(true);
     }
 }
-

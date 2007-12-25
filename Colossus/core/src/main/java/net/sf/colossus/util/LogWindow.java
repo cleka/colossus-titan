@@ -38,7 +38,7 @@ public final class LogWindow extends JTextArea
         {
             public void windowClosing(WindowEvent e)
             {
-                LogWindow.this.dispose();
+                LogWindow.this.client.setOption(Options.showLogWindow, false);
             }
         }
         );
@@ -95,12 +95,9 @@ public final class LogWindow extends JTextArea
 
     public void dispose()
     {
-        size = logFrame.getSize();
-        saveWindow.saveSize(size);
-        location = logFrame.getLocation();
-        saveWindow.saveLocation(location);
+        saveWindow.save(logFrame);
         logFrame.dispose();
-        client.setOption(Options.showLogWindow, false);
         logger.removeHandler(handler);
+        client = null;
     }
 }

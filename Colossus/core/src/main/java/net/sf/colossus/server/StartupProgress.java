@@ -9,6 +9,7 @@ import javax.swing.JFrame;
 import javax.swing.JButton;
 
 import net.sf.colossus.server.Server;
+import net.sf.colossus.util.KFrame;
 
 
 /** 
@@ -18,7 +19,7 @@ import net.sf.colossus.server.Server;
  */
 public final class StartupProgress implements ActionListener
 {
-    private JFrame logFrame;
+    private KFrame logFrame;
     private TextArea text;
     private Container pane;
     private Server server;
@@ -29,8 +30,10 @@ public final class StartupProgress implements ActionListener
     {
         this.server = server;
 
+        net.sf.colossus.webcommon.FinalizeManager.register(this, "only one");
+
         //Create and set up the window.
-        JFrame logFrame = new JFrame("Server startup progress log");
+        KFrame logFrame = new KFrame("Server startup progress log");
         this.logFrame = logFrame;
 
         logFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -83,6 +86,7 @@ public final class StartupProgress implements ActionListener
 
         this.pane.remove(this.b);
         this.pane.add(b2, BorderLayout.SOUTH);
+        this.b = b2;
         this.logFrame.pack();
     }
 
@@ -95,15 +99,43 @@ public final class StartupProgress implements ActionListener
         }
     }
 
+    public void cleanRef()
+    {
+        this.server = null;
+    }
+
     public void actionPerformed(ActionEvent e)
     {
-        if ("abort".equals(e.getActionCommand()))
+        if (e.getActionCommand().equals("abort"))
         {
+            // change the abort button to a QUIT button, with which
+            // one could request a System.exit() if the attempted
+            // "clean up everything nicely and return to GetPlayers menu"
+            // fails or hangs or something ...
+            JButton b3 = new JButton("QUIT");
+            b3.setMnemonic(KeyEvent.VK_C);
+            b3.setActionCommand("totallyquit");
+            b3.addActionListener(this);
+            b3.setToolTipText("Click this button to totally exit " +
+                "this application.");
+            this.pane.remove(this.b);
+            this.pane.add(b3, BorderLayout.SOUTH);
+            this.logFrame.pack();
+
             this.text.append("\nAbort requested, please wait...\n");
-            this.server.panicExit();
+            this.server.startupProgressAbort();
         }
 
-        if ("close".equals(e.getActionCommand()))
+        // if abort fails (hangs, NPE, ... , button is a QUIT instead,
+        // so user can request a System.exit() then.
+        else if (e.getActionCommand().equals("totallyquit"))
+        {
+            this.text.append("\nQUIT - Total Exit requested, " +
+                "doing System.exit() !!\n");
+            this.server.startupProgressQuit();
+        }
+
+        else if (e.getActionCommand().equals("close"))
         {
             this.text.append("\nClosing...\n");
             this.dispose();

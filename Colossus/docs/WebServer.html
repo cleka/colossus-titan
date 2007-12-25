@@ -1,0 +1,112 @@
+<!-- $Id: $ -->
+<html>
+  <head>
+    <meta name="generator"
+    content="HTML Tidy for Linux/x86 (vers 1st July 2002), see www.w3.org" />
+    <title>Colossus - Web Server and Client</title>
+  </head>
+  <body>
+<h1>Colossus - Web Server and Client</h1>
+<H3>Scope</h3>
+This document is a start to describe the new Colossus WebServer and WebClient
+functionality. The functionality is currently available as a branch.
+<P>
+<H2>Building the software</h2>
+
+Use Eclipse or SVN to replace your current working copy with the newest
+revision of the colossus/branches/web/Colossus branch.
+<P>
+Building it is basically the same as building the usual Colossus, 
+but additionally there is a target "webjar". So the standard procedure is:
+<pre>
+ant clean
+ant 
+ant webjar
+</pre>
+Now it's ready to be run, but when you do it first time, you first
+still have to edit one configuration file.
+ 
+<H2>Configuration</H2>
+You have to create and adjust the file WebServer.cf (in the Colossus 
+main directory, there where also Colossus.jar and build.xml are).
+Copy either WebServer_win.cf or WebServer_unix.cf to WebServer.cf
+and open it with your favorite editor.
+<P>
+Typically you will have to edit the lines with the following keys:
+<PRE>
+JavaCommand=C:\\apps\\j2sdk_1.4.2_12\\bin\\java.exe
+ColossusJar=C:\\workspace\\ColossusSVNJavaRaw\\Colossus.jar
+LogPropTemplate=C:\\workspace\\ColossusSVNJavaRaw\\logging.properties
+WorkFilesBaseDir=C:\\temp\\SomeColossus
+</PRE>
+Make JavaCommand point to your Java binary. (The WebServer starts a new 
+java binary with a System.exec call - depending on the environment setup
+it may or may not be sufficient that java binary is in the PATH.)
+<P>I mostly tested it against Java 1.4.2. Peter once tested it against 1.6, 
+he reported one problem (Thread now defined a getState(), which name I
+had used, too; now fixed); if there is anything else not working in 
+1.5 or 1.6 let me know!
+<P>
+Edit ColossusJar and LogPropTemplate to point to your Colossus Directory
+in which you built the new jars.
+<P>
+You may make WorkFilesBaseDir point to some other temporary directory.
+For every game the WebServer starts, it creates in that directory one
+subdirectory for the relevant gameId, and stores there the cf files
+and autosave files, which would usually be in the 
+directory <B>.Colossus/</B> under user's home directory.
+<P>
+You could edit also edit users.dat file, but you can create users using 
+the WebClient GUI, and right now there's not much special what only admin
+type users can do - add it manually, or create one and edit the file later 
+and replace user with admin according to the example data.
+
+
+<H2>Running WebServer and WebClients</H2>
+
+<H3>Starting the applications</H3>
+
+For testing, I propose you open 3 commandline windows - one for the server
+and two for two clients.
+<P>In the first one, type
+<pre>
+runwebserver
+</pre>
+and in the two other ones for example in the beginning, to see what it does, 
+just
+<PRE>
+run
+</PRE>
+or, when you have seen the startup often enough, and just want to test the 
+WebClient functionality, I run them directly with username and the argument
+to directly start the webclient (e.g. I use users test1 and test2), so in 
+the one window do this
+<PRE>
+run -w -m test1
+</PRE>
+and in the other one the same with username test2. Or any other name...
+<P>
+<B><FONT color="red">Note that the WebClient window saves its size and
+position, but all instances use same file - so, if you have 2 or more
+of them open, next time they both will reappear at the same position 
+- the one saved latest by any of the earlier instances...</FONT></B>
+
+<H3>Using the WebClient</H3>
+
+In the web server, there's not much to see or do. How to use the
+WebClient is documented in  <A HREF="WebClient.html">WebClient</A> 
+- that document is intended
+to become the general "How to use the WebClient" documentation once
+the whole thing becomes available to the general public.
+
+
+<!--------------------------------------------------------------->
+<HR>
+<P>
+<I>
+Created october 2007, reflecting the state of Colossus in the branch.
+<BR>
+Last updated monday, November 14, 2007 by Clemens Katzer
+</I>
+</body>
+</html>

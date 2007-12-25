@@ -97,6 +97,12 @@ public final class Battle
         placeLegion(defender);
     }
 
+    public void cleanRefs()
+    {
+        this.server = null;
+        this.game = null;
+    }
+
     private void placeLegion(Legion legion)
     {
         BattleHex entrance = BattleMap.getEntrance(terrain,

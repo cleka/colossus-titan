@@ -7,7 +7,15 @@ import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
 
 
-public abstract class GUIHex {
+/**
+ *  Abstract parent class for various hexes
+ *  
+ *  @version $Id$
+ * 
+ */
+
+public abstract class GUIHex
+{
     public static final double SQRT3 = Math.sqrt(3.0);
 
     private Hex model;

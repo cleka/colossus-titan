@@ -12,6 +12,7 @@ import java.util.logging.Logger;
  * Game related info is in Critter.  Counts of
  * recruited/available/dead are in Caretaker.
  *
+ * @version $Id$
  * @author Romain Dolbeau
  */
 

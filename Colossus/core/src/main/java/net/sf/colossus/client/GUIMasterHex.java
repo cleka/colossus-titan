@@ -24,6 +24,8 @@ import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.util.ResourceLoader;
 
+import java.lang.ref.WeakReference;
+
 
 /**
  * Class GUIMasterHex holds GUI information for a MasterHex.
@@ -40,7 +42,7 @@ public final class GUIMasterHex extends GUIHex
     private FontMetrics fontMetrics;
     private int halfFontHeight;
     private Point offCenter;
-    private MasterBoard board;
+    private WeakReference weakBoardRef;
 
     private GeneralPath highlightBorder;
     private Color selectColor = Color.white;
@@ -78,7 +80,7 @@ public final class GUIMasterHex extends GUIHex
     void init(int cx, int cy, int scale, boolean inverted, MasterBoard board)
     {
         this.inverted = inverted;
-        this.board = board;
+        this.weakBoardRef = new WeakReference(board);
         len = scale / 3.0;
         if (inverted)
         {
@@ -282,7 +284,8 @@ public final class GUIMasterHex extends GUIHex
         fontMetrics = g2.getFontMetrics();
         halfFontHeight = (fontMetrics.getMaxAscent() +
             fontMetrics.getLeading()) / 2;
-        String name = getMasterHexModel().getTerrainDisplayName().toUpperCase();
+        String name = 
+            getMasterHexModel().getTerrainDisplayName().toUpperCase();
         g2.drawString(name,
             rectBound.x + ((rectBound.width - stringWidth(name, g2)) / 2),
             rectBound.y + halfFontHeight + rectBound.height *
@@ -291,6 +294,11 @@ public final class GUIMasterHex extends GUIHex
 
     public void repaint()
     {
+        MasterBoard board = (MasterBoard)weakBoardRef.get();
+        if (board == null)
+        {
+            return;
+        }
         board.repaint(rectBound.x, rectBound.y, rectBound.width,
             rectBound.height);
     }
@@ -482,6 +490,11 @@ public final class GUIMasterHex extends GUIHex
             return false;
         }
 
+        MasterBoard board = (MasterBoard)weakBoardRef.get();
+        if (board == null)
+        {
+            return false;
+        }
         Composite oldComp = g.getComposite();
         g.setComposite(AlphaComposite.getInstance(
             AlphaComposite.SRC_OVER, 0.3f));
@@ -494,4 +507,10 @@ public final class GUIMasterHex extends GUIHex
         g.setComposite(oldComp);
         return true;
     }
+
+    public void cleanup()
+    {
+        this.weakBoardRef = null;
+    }
+
 }

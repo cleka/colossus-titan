@@ -2,6 +2,7 @@ package net.sf.colossus.server;
 
 
 import java.io.IOException;
+import java.net.SocketException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -19,6 +20,7 @@ import net.sf.colossus.client.Client;
 import net.sf.colossus.client.IClient;
 import net.sf.colossus.client.Proposal;
 import net.sf.colossus.util.Options;
+import net.sf.colossus.util.ChildThreadManager;
 import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
 
@@ -71,6 +73,12 @@ public final class Server implements IServer
      * previously allocated FileServerThread */
     private static Thread fileServerThread = null;
 
+    private ChildThreadManager threadMgr;
+
+    private boolean serverRunning = false;
+    private boolean obsolete = false;
+    private boolean shuttingDown = false;
+
     Server(Game game, int port)
     {
         this.game = game;
@@ -81,16 +89,33 @@ public final class Server implements IServer
             startLog.dispose();
             startLog = null;
         }
-        startLog = new StartupProgress(this);
+
+        if (game.getNotifyWebServer().isActive())
+        {
+            // If started by WebServer, do not log to StartupProgressLog.
+        }
+        else
+        {
+            startLog = new StartupProgress(this);
+        }
+
+        threadMgr = new ChildThreadManager("Server");
 
         waitingForClients = game.getNumLivingPlayers();
+        net.sf.colossus.webcommon.FinalizeManager.register(this, "only one");
+    }
+
+    public ChildThreadManager getThreadMgr()
+    {
+        return threadMgr;
     }
 
     void initSocketServer()
     {
         numClients = 0;
         maxClients = game.getNumLivingPlayers();
-        LOGGER.log(Level.FINEST, "initSocketServer maxClients = " + maxClients);
+        LOGGER.log(Level.FINEST,
+            "initSocketServer maxClients = " + maxClients);
         LOGGER.log(Level.FINEST,
             "About to create server socket on port " + port);
         try
@@ -106,57 +131,54 @@ public final class Server implements IServer
         catch (IOException ex)
         {
             LOGGER.log(Level.SEVERE,
-                "Could not create socket. Configure networking in OS.", ex);
+                "Could not create socket. Configure networking in OS, " +
+                "or check that no previous Colossus instance got stuck " +
+                "and is blocking the socket.", ex);
             System.exit(1);
         }
         createLocalClients();
+    }
 
+    /** Returns true if all clients came in, false if startup was aborted
+     *  before that. */
+    boolean waitForClients()
+    {
         logToStartLog("\nStarting up, waiting for " + waitingForClients +
-            " clients");
-        while (numClients < maxClients)
+            " clients at port " + port + "\n");
+        serverRunning = true;
+        while (numClients < maxClients && serverRunning && !shuttingDown)
         {
             waitForConnection();
         }
+        
+        return(numClients >= maxClients);
     }
 
     void initFileServer()
     {
-        // must be called *after* initSocketServer()
-        // this may induce a race condition
-        // if the client ask for a file *before*
-        // the file server is up.
+        stopFileServer();
 
-        LOGGER.log(Level.FINEST,
-            "About to create file server socket on port " + (port + 1));
-
-        if (fileServerThread != null)
-        {
-            try
-            {
-                LOGGER.log(Level.FINEST, "Stopping the FileServerThread ");
-                ((FileServerThread)fileServerThread).stopGoingOn();
-                fileServerThread.interrupt();
-                fileServerThread.join();
-            }
-            catch (Exception e)
-            {
-                LOGGER.log(Level.FINEST,
-                    "Oups couldn't stop the FileServerThread " + e);
-            }
-            fileServerThread = null;
-        }
-
-        if (!activeSocketList.isEmpty())
+        if (game.getNumRemoteRemaining() > 0)
         {
             fileServerThread = new FileServerThread(activeSocketList,
-                port + 1);
+                port + 1, threadMgr);
             fileServerThread.start();
         }
         else
         {
             LOGGER.log(Level.FINEST,
-                "No active remote client, not lauching the file server.");
+                "No alive remote client, not launching the file server.");
         }
+    }
+
+    public void waitUntilGameFinishes()
+    {
+        LOGGER.log(Level.FINEST, "Server.waitUntilGameFinishes: " +
+            "waitUntilAllChildThreadsGone is next");
+        threadMgr.waitUntilAllChildThreadsGone();
+        threadMgr.cleanup();
+        LOGGER.log(Level.FINEST, "Server.waitUntilGameFinishes: " +
+            "waitUntilAllChildThreadsGone completed.");
     }
 
     private void waitForConnection()
@@ -165,7 +187,7 @@ public final class Server implements IServer
         try
         {
             clientSocket = serverSocket.accept();
-            LOGGER.log(Level.INFO, "Got client connection from " +
+            LOGGER.log(Level.FINE, "Got client connection from " +
                 clientSocket.getInetAddress().toString());
             logToStartLog("Got client connection from IP: " +
                 clientSocket.getInetAddress().toString());
@@ -176,13 +198,181 @@ public final class Server implements IServer
             }
             numClients++;
         }
+        catch (SocketException ex)
+        {
+            if (shuttingDown)
+            {
+                LOGGER.log(Level.FINE,
+                    "Server.waitForConnection SocketException - but " +
+                    "that's ok, it seems shutdown is in progress.");
+            }
+            return;
+
+        }
         catch (IOException ex)
         {
-            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
+            if (shuttingDown)
+            {
+                LOGGER.log(Level.FINE,
+                    "Server.waitForConnection SocketException - but " +
+                    "that's ok, it seems shutdown is in progress.");
+            }
+            else
+            {
+                LOGGER.log(Level.SEVERE, ex.toString(), ex);
+            }
             return;
         }
 
-        new SocketServerThread(this, clientSocket, activeSocketList).start();
+        new SocketServerThread(this, clientSocket).start();
+    }
+
+    /*
+     * Stops the file server (closes FileServerSocket), 
+     * disposes all clients, and closes ServerSockets
+     */
+    public void stopServerRunning()
+    {
+        serverRunning = false;
+        if (!game.isOver())
+        {
+            game.setGameOver(true);
+        }
+
+        stopFileServer();
+
+        System.gc();
+        System.runFinalization();
+
+        // particularly to remove the loggers
+        if (!clients.isEmpty())
+        {
+            disposeAllClients();
+        }
+    }
+
+    public boolean isServerRunning()
+    {
+        return serverRunning;
+    }
+
+    // last SocketClientThread going down calls this
+    public synchronized void stopFileServer()
+    {
+        LOGGER.log(Level.FINEST,
+            "About to stop file server socket on port " + (port + 1));
+
+        if (fileServerThread != null)
+        {
+            try
+            {
+                LOGGER.log(Level.FINEST, "Stopping the FileServerThread ");
+                ((FileServerThread)fileServerThread).stopGoingOn();
+            }
+            catch (Exception e)
+            {
+                LOGGER.log(Level.FINE,
+                    "Couldn't stop FileServerThread, got Exception: " + e);
+            }
+            fileServerThread = null;
+        }
+        else
+        {
+            // no fileserver running
+        }
+    }
+
+    public void unregisterSocket(Socket socket)
+    {
+        if (activeSocketList == null)
+        {
+            return;
+        }
+        synchronized (activeSocketList)
+        {
+            int index = activeSocketList.indexOf(socket);
+            if (index == -1)
+            {
+                return;
+            }
+            activeSocketList.remove(index);
+
+            if (!serverRunning)
+            {
+                return;
+            }
+
+            // no client whatsoever left => end the game and close server stuff
+            // Even if socket list is empty, client list may not be empty yet,
+            // and need to empty it and close all loggers.
+            if (activeSocketList.isEmpty())
+            {
+                LOGGER.log(Level.FINEST,
+                    "Server.unregisterSocket() thread " +
+                    Thread.currentThread().getName() +
+                    ": activeSocketList empty - stopping server...");
+                stopServerRunning();
+            }
+
+            else if (game.getOption(Options.goOnWithoutObserver))
+            {
+                LOGGER.log(Level.FINEST,
+                    "\n==========\nOne socket went away, " +
+                    "but we go on because goOnWithoutObserver is set...\n");
+            }
+            // or, if only AI player clients left as "observers", 
+            // then close everything, too 
+            else if (!anyNonAiSocketsLeft())
+            {
+                LOGGER.log(Level.FINEST,
+                    "Server.unregisterSocket() thread " +
+                    Thread.currentThread().getName() +
+                    ": All connections to human or network players gone " +
+                    " (no point to keep AIs running if noone sees it) " +
+                    "- stopping server...");
+                stopServerRunning();
+            }
+        }
+    }
+
+    private boolean anyNonAiSocketsLeft()
+    {
+        if (clientMap.isEmpty())
+        {
+            return false;
+        }
+
+        Iterator it = game.getPlayers().iterator();
+        while ( it.hasNext())
+        {
+            Player p = (Player)it.next();
+            if (p.isHuman())
+            {
+                SocketServerThread sst = (SocketServerThread)getClient(p.getName());
+                if (sst != null && !sst.isGone())
+                {
+                    return true;
+                }
+            }
+        }
+
+        // no nonAI connected any more - return false:
+        return false;
+    }
+
+    // Game calls this, when a new game starts and new Server is created,
+    // so that old SocketServerThreads can see from this flag
+    // that they shall not do anything any more
+    // - otherwise it can happen that PlayerEliminated messages from
+    // dying game reach clients of the new game...
+
+    public void setObsolete()
+    {
+        this.obsolete = true;
+        if (startLog != null)
+        {
+            startLog.cleanRef();
+        }
     }
 
     /** Each server thread's name is set to its player's name. */
@@ -226,7 +416,7 @@ public final class Server implements IServer
     {
         LOGGER.log(Level.FINEST,
             "Called Server.createLocalClient() for " + playerName);
-        new Client("127.0.0.1", port, playerName, false);
+        new Client("127.0.0.1", port, playerName, false, false);
     }
 
     synchronized void addClient(final IClient client, final String playerName,
@@ -239,11 +429,13 @@ public final class Server implements IServer
         {
             addRemoteClient(client, playerName);
             logToStartLog("Remote player " + playerName + " signed on.");
+            game.getNotifyWebServer().gotClient(playerName, "remote");
         }
         else
         {
             addLocalClient(client, playerName);
             logToStartLog("Local player " + playerName + " signed on.");
+            game.getNotifyWebServer().gotClient(playerName, "local");
         }
 
         waitingForClients--;
@@ -268,7 +460,11 @@ public final class Server implements IServer
             {
                 game.newGame2();
             }
-            startLog.setCompleted();
+            game.getNotifyWebServer().allClientsConnected();
+            if (startLog != null)
+            {
+                startLog.setCompleted();
+            }
         }
     }
 
@@ -305,8 +501,24 @@ public final class Server implements IServer
         setPlayerName(name, name);
     }
 
+    // Earlier I have locked on an Boolean object itself, 
+    // which I modify... and when this is done too often,
+    // e.g. in ClientSocketThread every read, it caused
+    // StockOverflowException... :-/
+    private Object disposeAllClientsDoneMutex = new Object();
+    private boolean disposeAllClientsDone = false;
+
     void disposeAllClients()
     {
+        synchronized (disposeAllClientsDoneMutex)
+        {
+            if (disposeAllClientsDone)
+            {
+                return;
+            }
+            disposeAllClientsDone = true;
+        }
+
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
@@ -314,16 +526,20 @@ public final class Server implements IServer
             client.dispose();
         }
         clients.clear();
+        clientMap.clear();
+        remoteClients.clear();
 
         for (Iterator iter = remoteLogHandlers.iterator(); iter.hasNext(); )
         {
             RemoteLogHandler handler = (RemoteLogHandler)iter.next();
             LOGGER.removeHandler(handler);
+            handler.close();
         }
         remoteLogHandlers.clear();
 
         if (serverSocket != null)
         {
+            shuttingDown = true;
             try
             {
                 serverSocket.close();
@@ -332,7 +548,18 @@ public final class Server implements IServer
             {
                 LOGGER.log(Level.SEVERE, "Could not close server socket", ex);
             }
+            shuttingDown = false;
         }
+    }
+
+    public void cleanup()
+    {
+        if (startLog != null)
+        {
+            startLog.dispose();
+            startLog = null;
+        }
+        game = null;
     }
 
     void allUpdatePlayerInfo(boolean treatDeadAsAlive)
@@ -490,6 +717,7 @@ public final class Server implements IServer
             IClient client = (IClient)it.next();
             client.tellPlayerElim(playerName, slayerName);
         }
+
         if (updateHistory)
         {
             game.playerElimEvent(playerName, slayerName);
@@ -1364,22 +1592,61 @@ public final class Server implements IServer
         }
     }
 
+    // made synchronized by Clemens 1.10.2007:
+    // a bunch of calls inside this all go into methods in Game which
+    // are synchronized; if several threads do withdrawFromGame nearly
+    // same time,they will block each other.
+
     // XXX Notify all players.
-    public void withdrawFromGame()
+    public synchronized void withdrawFromGame()
     {
+        if (obsolete || game.isOver())
+        {
+            return;
+        }
+
         Player player = getPlayer();
+
+        String name = player.getName();
+        LOGGER.log(Level.FINE, "Player " + name + " withdraws from the game.");
+
+        if (player.isDead())
+        {
+            return;
+        }
+
         // If player quits while engaged, set slayer.
         String slayerName = null;
         Legion legion = player.getTitanLegion();
-        if (legion != null && game.isEngagement(legion.getCurrentHexLabel()))
+        if (legion != null &&
+            game.isEngagement(legion.getCurrentHexLabel()))
         {
             slayerName = game.getFirstEnemyLegion(
                 legion.getCurrentHexLabel(), player).getPlayerName();
         }
         player.die(slayerName, true);
-        if (player == game.getActivePlayer())
+
+        // if it returns, it returns true and that means game shall go on.
+        if (game.checkAutoQuitOrGoOn())
         {
-            game.advancePhase(game.getPhase(), getPlayerName());
+            if (player == game.getActivePlayer())
+            {
+                game.advancePhase(game.getPhase(), getPlayerName());
+            }
+        }
+    }
+
+    public void disconnect()
+    {
+        // nothing to do. ServerSocketThread handled this
+        //  ( = closed the socket and exits the loop etc.)
+    }
+
+    public void stopGame()
+    {
+        if (game != null)
+        {
+            game.dispose();
         }
     }
 
@@ -1419,8 +1686,7 @@ public final class Server implements IServer
     public void doSplit(String parentId, String childId, String results)
     {
         LOGGER.log(Level.FINEST,
-            "Server.doSplit " + parentId + " " + childId + " " +
-            results);
+            "Server.doSplit " + parentId + " " + childId + " " + results);
         IClient client = getClient(getPlayerName());
         if (!isActivePlayer())
         {
@@ -1724,7 +1990,9 @@ public final class Server implements IServer
     // XXX Disallow these in network games?
     public void newGame()
     {
-        Start.startupDialog(game, null);
+        // Nothing special to do, just stop everything and return
+        // back to the main, so that it goes to top of loop and
+        // brings up a new GetPlayers dialog.
     }
 
     public void loadGame(String filename)
@@ -1741,8 +2009,8 @@ public final class Server implements IServer
     void setPlayerName(String playerName, String newName)
     {
         LOGGER.log(Level.FINEST,
-            "Server.setPlayerName() from " + playerName + " to " +
-            newName);
+            "Server.setPlayerName() from " + playerName +
+            " to " + newName);
         IClient client = getClient(playerName);
         client.setPlayerName(newName);
         clientMap.remove(playerName);
@@ -1875,12 +2143,30 @@ public final class Server implements IServer
         }
     }
 
-    // for ServerSTartupProgress, if users wants to cancel during load
-    // (e.g. one client did not come in)
-    public void panicExit()
+    /* Called from ServerStartupProgress, if user wants to cancel during load
+     * (e.g. one client did not come in). Clean up everything and get
+     *  back to the GetPlayers / Game Setup dialog.
+     */
+    public void startupProgressAbort()
     {
-        System.out.println("Panic exit...");
-        disposeAllClients();
+        Start.setCurrentWhatToDoNext(Start.GetPlayersDialog);
+        stopServerRunning();
+        if (startLog != null)
+        {
+            startLog.dispose();
+            startLog.cleanRef();
+        }
+    }
+
+    /* if the startupProgressAbort did not succeed well, the button
+     * there changes to a QUIT button, and with that one can request
+     * the whole application
+     */
+    public void startupProgressQuit()
+    {
+        LOGGER.log(Level.SEVERE,
+            "User pressed 'QUIT' in startupProgress window " +
+            "- doing System.exit(1)");
         System.exit(1);
     }
 }

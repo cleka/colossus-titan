@@ -1262,7 +1262,7 @@ public class RationalAI extends SimpleAI implements AI
             branchAndBound(new ArrayList(), all_legionMoves, 0);
 
             fomTimer.cancel();
-            
+
             logger.log(Level.FINEST, "Total nodes explored = " + nodesExplored);
 
             for (Iterator it = bestMove.iterator(); it.hasNext();)

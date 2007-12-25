@@ -446,4 +446,9 @@ public final class Movement
         }
         return entrySides;
     }
+
+    public void dispose()
+    {
+        this.client = null;
+    }
 }

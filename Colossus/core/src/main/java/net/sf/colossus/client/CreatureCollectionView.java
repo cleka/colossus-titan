@@ -14,7 +14,6 @@ import java.awt.event.ComponentListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -32,6 +31,7 @@ import javax.swing.SwingConstants;
 
 import net.sf.colossus.server.Creature;
 import net.sf.colossus.util.KDialog;
+import net.sf.colossus.util.Options;
 
 
 /** 
@@ -40,7 +40,7 @@ import net.sf.colossus.util.KDialog;
  *  @author Tom Fruchterman
  *  @author David Ripton
  */
-class CreatureCollectionView extends KDialog implements WindowListener
+class CreatureCollectionView extends KDialog
 {
     private static final Logger LOGGER = Logger.getLogger(CreatureCollectionView.class.getName());
 
@@ -91,45 +91,22 @@ class CreatureCollectionView extends KDialog implements WindowListener
 
         getContentPane().setLayout(new BorderLayout());
 
-        this.scrollPane =
-            new JScrollPane(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+        this.scrollPane = new JScrollPane(
+            javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
             javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         JPanel panel = makeCreaturePanel(scrollPane);
         scrollPane.setViewportView(panel);
-        getContentPane().add(scrollPane,
-            BorderLayout.CENTER);
-
+        getContentPane().add(scrollPane, BorderLayout.CENTER);
         getContentPane().add(legendLabel, BorderLayout.SOUTH);
 
         addWindowListener(this);
 
         pack();
 
+        setDefaultCloseOperation(KDialog.HIDE_ON_CLOSE);
+
         saveWindow = new SaveWindow(client, "CreatureCollectionView");
-
-        if (location == null)
-        {
-            location = saveWindow.loadLocation();
-        }
-        if (location == null)
-        {
-            upperRightCorner();
-            location = getLocation();
-        }
-        else
-        {
-            setLocation(location);
-        }
-
-        if (size == null)
-        {
-            size = saveWindow.loadSize();
-        }
-        if (size == null)
-        {
-            size = getPreferredSize();
-        }
-        setSize(size);
+        saveWindow.restoreOrCenter(this);
 
         update();
         setVisible(true);
@@ -326,6 +303,32 @@ class CreatureCollectionView extends KDialog implements WindowListener
 
     public void dispose()
     {
+        // Don't do anything if dispose already done.
+        if (client == null)
+        {
+            return;
+        }
+
+        saveWindow.save(this);
+        saveWindow = null;
+
+        setVisible(false);
+
+        // We MUST remove this. Otherwise the object does not get 
+        // garbage-collected.
+        getContentPane().remove(legendLabel);
+
+        client = null;
+        parentFrame = null;
+        scrollPane = null;
+
+        countMap.clear();
+        countMap = null;
+        topCountMap.clear();
+        topCountMap = null;
+        chitMap.clear();
+        chitMap = null;
+
         super.dispose();
         location = getLocation();
         size = getSize();
@@ -335,7 +338,8 @@ class CreatureCollectionView extends KDialog implements WindowListener
 
     public void windowClosing(WindowEvent e)
     {
-        dispose();
+        CreatureCollectionView.this.client.setOption(
+            Options.showCaretaker, false);
     }
 
     public Dimension getMinimumSize()
@@ -364,7 +368,8 @@ class CreatureCollectionView extends KDialog implements WindowListener
 }
 
 
-class CCVFlowLayout extends FlowLayout implements ComponentListener {
+class CCVFlowLayout extends FlowLayout implements ComponentListener
+{
     private JScrollPane parentScrollPane;
     private JComponent parentComponent;
 
@@ -416,7 +421,8 @@ class CCVFlowLayout extends FlowLayout implements ComponentListener {
         return new Dimension(maxWidth, y);
     }
 
-    public void componentResized(ComponentEvent e) {
+    public void componentResized(ComponentEvent e)
+    {
         javax.swing.JViewport viewport = parentScrollPane.getViewport();
         Dimension viewSize = viewport.getViewSize();
         Dimension extentSize = viewport.getExtentSize();
@@ -436,15 +442,18 @@ class CCVFlowLayout extends FlowLayout implements ComponentListener {
         }
     }
 
-    public void componentMoved(ComponentEvent e) {
+    public void componentMoved(ComponentEvent e)
+    {
         // necessary to implement interface
     }
 
-    public void componentShown(ComponentEvent e) {
+    public void componentShown(ComponentEvent e)
+    {
         // necessary to implement interface
     }
 
-    public void componentHidden(ComponentEvent e) {
+    public void componentHidden(ComponentEvent e)
+    {
         // necessary to implement interface
     }
 }

@@ -179,6 +179,10 @@ public final class Constants
     public static final String optionsPath = gameDataPath;
     public static final String optionsBase = "Colossus-";
     public static final String optionsServerName = "server";
+    public static final String optionsNetClientName = "netclient";
+    public static final String optionsWebClientName = "webclient";
+    // virtual "name" for Options instance in GetPlayers (never saved)
+    public static final String optionsStart = "start";
     public static final String optionsExtension = ".cfg";
 
     public static final String configVersion =
@@ -355,14 +359,25 @@ public final class Constants
     public static final int defaultPort = 26567;
     // next one unused, the filr server port is (serverPort + 1)
     // public static final int defaultFileServerPort = 26568;
+
+    // Web clients:
+    public static String defaultWebServer = "localhost";
+    public static int defaultWebPort = 26766;
+    public static String defaultWebLogin =
+        System.getProperty("user.name", "webuser");
+    public static String defaultWebPassword = "webpassword";
+
     public static final int numSavedServerNames = 10;
 
     // Game actions used in several places.
     public static final String newGame = "New game";
     public static final String loadGame = "Load game";
     public static final String saveGame = "Save game";
-    public static final String quit = "Quit";
+    public static final String quitGame = "Quit Game";
+    public static final String closeBoard = "Close MasterBoard";
+
     public static final String runClient = "Run network client";
+    public static final String runWebClient = "Run web client";
 
     /** Available internal variants  Try to keep this list mostly
      *  alphabetized for easier searching, with Default at the top. */
@@ -446,6 +461,7 @@ public final class Constants
     public static final String doneWithRecruits = "doneWithRecruits";
     public static final String withdrawFromGame = "withdrawFromGame";
     public static final String disconnect = "disconnect";
+    public static final String stopGame = "stopGame";
     public static final String setDonor = "setDonor";
     public static final String doSplit = "doSplit";
     public static final String doMove = "doMove";

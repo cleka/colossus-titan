@@ -6,6 +6,8 @@ import java.awt.Point;
 import java.awt.Window;
 
 import net.sf.colossus.util.Options;
+import net.sf.colossus.util.KDialog;
+import net.sf.colossus.util.KFrame;
 
 
 /** 
@@ -99,5 +101,49 @@ public final class SaveWindow
         }
         window.setSize(size);
     }
+
+    /* 
+     * Restore size and location, center on screen if no saved location.
+     */
+    public void restoreOrCenter(KDialog window)
+    {
+        Dimension size = loadSize();
+        if (size == null)
+        {
+            size = window.getPreferredSize();
+        }
+        window.setSize(size);
+
+        Point location = loadLocation();
+        if (location != null)
+        {
+            window.setLocation(location);
+        }
+        else
+        {
+            window.centerOnScreen();
+        }
+    }
+
+    public void restoreOrCenter(KFrame window)
+    {
+        Dimension size = loadSize();
+        if (size == null)
+        {
+            size = window.getPreferredSize();
+        }
+        window.setSize(size);
+
+        Point location = loadLocation();
+        if (location != null)
+        {
+            window.setLocation(location);
+        }
+        else
+        {
+            window.centerOnScreen();
+        }
+    }
+
 }
 
