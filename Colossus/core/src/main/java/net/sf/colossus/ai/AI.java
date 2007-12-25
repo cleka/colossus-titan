@@ -1,8 +1,10 @@
-package net.sf.colossus.client;
+package net.sf.colossus.ai;
 
 
 import java.util.List;
 import java.util.Set;
+
+import net.sf.colossus.client.LegionInfo;
 
 
 /**

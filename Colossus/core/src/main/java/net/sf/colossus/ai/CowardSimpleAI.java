@@ -1,6 +1,7 @@
-package net.sf.colossus.client;
+package net.sf.colossus.ai;
 
 
+import net.sf.colossus.client.Client;
 import net.sf.colossus.server.Constants;
 
 

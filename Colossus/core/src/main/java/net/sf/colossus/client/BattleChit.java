@@ -27,9 +27,9 @@ import net.sf.colossus.util.HTMLColor;
  * @author David Ripton
  */
 
-final class BattleChit extends Chit
+public final class BattleChit extends Chit
 {
-    private int tag;
+    private final int tag;
     private static Font font;
     private static Font oldFont;
     private static int fontHeight;
@@ -38,7 +38,7 @@ final class BattleChit extends Chit
     private String startingHexLabel;
     private boolean moved;
     private boolean struck;
-    private Color color;
+    private final Color color;
     private static BasicStroke borderStroke;
     private Rectangle midRect;
     private Rectangle outerRect;
@@ -46,7 +46,7 @@ final class BattleChit extends Chit
     private int numDice; // modifier for number of Dice rolled.
     private StrikeDie strikeDie; // Graphical representation of strikeNumber.
     private StrikeDie strikeAdjDie; // representation of dice gained or lost.
-    private int scale;
+    private final int scale;
 
     // inner scale divided by border thickness
     static final int borderRatio = 20;
@@ -64,12 +64,12 @@ final class BattleChit extends Chit
         setBackground(Color.white);
     }
 
-    int getTag()
+    public int getTag()
     {
         return tag;
     }
 
-    int getHits()
+    public int getHits()
     {
         return hits;
     }
@@ -80,7 +80,7 @@ final class BattleChit extends Chit
         repaint();
     }
 
-    boolean wouldDieFrom(int hits)
+    public boolean wouldDieFrom(int hits)
     {
         return (hits + getHits() >= getPower());
     }
@@ -94,17 +94,17 @@ final class BattleChit extends Chit
         }
     }
 
-    String getCurrentHexLabel()
+    public String getCurrentHexLabel()
     {
         return currentHexLabel;
     }
 
-    String getStartingHexLabel()
+    public String getStartingHexLabel()
     {
         return startingHexLabel;
     }
 
-    void setHexLabel(String hexLabel)
+    public void setHexLabel(String hexLabel)
     {
         this.currentHexLabel = hexLabel;
     }
@@ -114,7 +114,7 @@ final class BattleChit extends Chit
         this.currentHexLabel = hexLabel;
     }
 
-    void moveToHex(String hexLabel)
+    public void moveToHex(String hexLabel)
     {
         if (!hexLabel.equals(startingHexLabel))
         {
@@ -157,12 +157,12 @@ final class BattleChit extends Chit
         return getCreatureName();
     }
 
-    boolean isTitan()
+    public boolean isTitan()
     {
         return getCreatureName().equals(Constants.titan);
     }
 
-    int getPower()
+    public int getPower()
     {
         if (getId().startsWith("Titan-"))
         {
@@ -174,23 +174,23 @@ final class BattleChit extends Chit
         }
     }
 
-    int getSkill()
+    public int getSkill()
     {
         return getCreature().getSkill();
     }
 
-    int getPointValue()
+    public int getPointValue()
     {
         return getPower() * getSkill();
     }
 
-    boolean isRangestriker()
+    public boolean isRangestriker()
     {
         return getCreature().isRangestriker();
     }
 
     // XXX Titans
-    Creature getCreature()
+    public Creature getCreature()
     {
         Creature creature = Creature.getCreatureByName(getCreatureName());
         return creature;

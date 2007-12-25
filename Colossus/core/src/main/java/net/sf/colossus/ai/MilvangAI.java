@@ -2,7 +2,7 @@
  * Created on 07-01-2005
  *
  */
-package net.sf.colossus.client;
+package net.sf.colossus.ai;
 
 
 import java.util.ArrayList;
@@ -13,6 +13,8 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.sf.colossus.client.Client;
+import net.sf.colossus.client.LegionInfo;
 import net.sf.colossus.server.Creature;
 import net.sf.colossus.util.Combos;
 import net.sf.colossus.xmlparser.TerrainRecruitLoader;

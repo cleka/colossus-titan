@@ -38,8 +38,8 @@ public final class PlayerInfo
     private int mulligansLeft;
 
     /** Sorted set of available legion markers for this player. */
-    private SortedSet markersAvailable = new TreeSet(new MarkerComparator(
-        getShortColor()));
+    private final SortedSet markersAvailable = new TreeSet(
+        new MarkerComparator(getShortColor()));
 
     /** Two-stage initialization. */
     PlayerInfo(Client client)
@@ -107,7 +107,7 @@ public final class PlayerInfo
         return dead;
     }
 
-    boolean isAI()
+    public boolean isAI()
     {
         return type.endsWith(Constants.ai);
     }
@@ -152,7 +152,7 @@ public final class PlayerInfo
         return type;
     }
 
-    String getShortColor()
+    public String getShortColor()
     {
         return Player.getShortColor(getColor());
     }
@@ -172,7 +172,7 @@ public final class PlayerInfo
         this.numLegions = numLegions;
     }
 
-    int getNumLegions()
+    public int getNumLegions()
     {
         return numLegions;
     }
@@ -196,12 +196,12 @@ public final class PlayerInfo
         markersAvailable.remove(markerId);
     }
 
-    Set getMarkersAvailable()
+    public Set getMarkersAvailable()
     {
         return Collections.unmodifiableSortedSet(markersAvailable);
     }
 
-    int getNumMarkers()
+    public int getNumMarkers()
     {
         if (markersAvailable == null)
         {
@@ -228,7 +228,7 @@ public final class PlayerInfo
         this.titanPower = titanPower;
     }
 
-    int getTitanPower()
+    public int getTitanPower()
     {
         return titanPower;
     }
@@ -243,7 +243,7 @@ public final class PlayerInfo
         return score;
     }
 
-    boolean canTitanTeleport()
+    public boolean canTitanTeleport()
     {
         return (score >= TerrainRecruitLoader.getTitanTeleportValue());
     }
@@ -253,7 +253,7 @@ public final class PlayerInfo
         this.mulligansLeft = mulligansLeft;
     }
 
-    int getMulligansLeft()
+    public int getMulligansLeft()
     {
         return mulligansLeft;
     }
@@ -274,7 +274,7 @@ public final class PlayerInfo
     }
 
     /** Return the number of this player's legions that have moved. */
-    int numLegionsMoved()
+    public int numLegionsMoved()
     {
         int count = 0;
 
@@ -291,13 +291,13 @@ public final class PlayerInfo
         return count;
     }
 
-    int numMobileLegions()
+    public int numMobileLegions()
     {
         return getNumLegions() - numLegionsMoved();
     }
 
     /** Return a List of markerIds. */
-    List getLegionIds()
+    public List getLegionIds()
     {
         return client.getLegionsByPlayer(name);
     }

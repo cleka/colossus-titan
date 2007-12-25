@@ -1,4 +1,4 @@
-package net.sf.colossus.client;
+package net.sf.colossus.ai;
 
 
 import java.util.ArrayList;
@@ -17,6 +17,17 @@ import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.sf.colossus.client.BattleChit;
+import net.sf.colossus.client.BattleHex;
+import net.sf.colossus.client.BattleMap;
+import net.sf.colossus.client.Client;
+import net.sf.colossus.client.CritterMove;
+import net.sf.colossus.client.HexMap;
+import net.sf.colossus.client.LegionInfo;
+import net.sf.colossus.client.MasterBoard;
+import net.sf.colossus.client.MasterHex;
+import net.sf.colossus.client.PlayerInfo;
+import net.sf.colossus.client.Strike;
 import net.sf.colossus.game.HazardTerrain;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.Creature;
@@ -219,8 +230,6 @@ public class SimpleAI implements AI
 
     public void muster()
     {
-        // System.out.println("ai.muster for "+client.getPlayerName());
-
         client.resetRecruitReservations();
 
         // Do not recruit if this legion is a scooby snack.
@@ -1884,7 +1893,7 @@ public class SimpleAI implements AI
         }
     }
 
-    Creature getVariantRecruitHint(LegionInfo legion, MasterHex hex,
+    public Creature getVariantRecruitHint(LegionInfo legion, MasterHex hex,
         List recruits)
     {
         String recruitName = VariantSupport.getRecruitHint(hex.getTerrain(),

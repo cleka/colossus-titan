@@ -287,7 +287,7 @@ public final class Movement
         return true;
     }
 
-    boolean titanTeleportAllowed()
+    public boolean titanTeleportAllowed()
     {
         if (client.getOption(Options.noTitanTeleport))
         {
@@ -302,7 +302,8 @@ public final class Movement
     }
 
     /** Return set of hexLabels describing where this legion can teleport. */
-    Set listTeleportMoves(LegionInfo legion, MasterHex hex, int movementRoll)
+    public Set listTeleportMoves(LegionInfo legion, MasterHex hex,
+        int movementRoll)
     {
         return listTeleportMoves(legion, hex, movementRoll, false);
     }

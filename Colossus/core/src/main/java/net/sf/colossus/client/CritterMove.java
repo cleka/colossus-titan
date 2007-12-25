@@ -7,14 +7,14 @@ package net.sf.colossus.client;
  * @author David Ripton
  */
 
-class CritterMove
+public class CritterMove
 {
     private int value;
-    private BattleChit critter;
-    private String startingHexLabel;
-    private String endingHexLabel;
+    private final BattleChit critter;
+    private final String startingHexLabel;
+    private final String endingHexLabel;
 
-    CritterMove(BattleChit critter, String startingHexLabel,
+    public CritterMove(BattleChit critter, String startingHexLabel,
         String endingHexLabel)
     {
         super();
@@ -33,7 +33,7 @@ class CritterMove
         return value;
     }
 
-    BattleChit getCritter()
+    public BattleChit getCritter()
     {
         return critter;
     }
@@ -43,24 +43,14 @@ class CritterMove
         return critter.getTag();
     }
 
-    String getStartingHexLabel()
+    public String getStartingHexLabel()
     {
         return startingHexLabel;
     }
 
-    String getEndingHexLabel()
+    public String getEndingHexLabel()
     {
         return endingHexLabel;
-    }
-
-    BattleHex getStartingHex(String terrain)
-    {
-        return HexMap.getHexByLabel(terrain, startingHexLabel);
-    }
-
-    BattleHex getEndingHex(String terrain)
-    {
-        return HexMap.getHexByLabel(terrain, endingHexLabel);
     }
 
     public String toString()

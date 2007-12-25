@@ -329,7 +329,7 @@ class Chit extends JPanel
         this.borderColor = borderColor;
     }
 
-    boolean isInverted()
+    public boolean isInverted()
     {
         return inverted;
     }

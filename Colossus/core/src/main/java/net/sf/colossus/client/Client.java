@@ -27,6 +27,8 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
+import net.sf.colossus.ai.AI;
+import net.sf.colossus.ai.SimpleAI;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.Creature;
 import net.sf.colossus.server.Dice;
@@ -317,7 +319,7 @@ public final class Client implements IClient, IOracle, IOptions
     }
 
     /** Take a mulligan. */
-    void mulligan()
+    public void mulligan()
     {
         undoAllMoves(); // XXX Maybe move entirely to server
         clearUndoStack();
@@ -331,7 +333,7 @@ public final class Client implements IClient, IOracle, IOptions
     }
 
     // XXX temp
-    boolean tookMulligan()
+    public boolean tookMulligan()
     {
         return tookMulligan;
     }
@@ -342,7 +344,7 @@ public final class Client implements IClient, IOracle, IOptions
         server.engage(land);
     }
 
-    String getMyEngagedMarkerId()
+    public String getMyEngagedMarkerId()
     {
         String markerId = null;
         if (isMyLegion(attackerMarkerId))
@@ -1088,7 +1090,7 @@ public final class Client implements IClient, IOracle, IOptions
         return numPlayers;
     }
 
-    int getNumLivingPlayers()
+    public int getNumLivingPlayers()
     {
         int total = 0;
         for (int i = 0; i < playerInfo.length; i++)
@@ -1165,18 +1167,18 @@ public final class Client implements IClient, IOracle, IOptions
         return playerInfo[playerNum];
     }
 
-    PlayerInfo getPlayerInfo(String name)
+    public PlayerInfo getPlayerInfo(String name)
     {
         int num = getPlayerNum(name);
         return (num == -1 ? null : playerInfo[num]);
     }
 
-    PlayerInfo getPlayerInfo()
+    public PlayerInfo getPlayerInfo()
     {
         return getPlayerInfo(playerName);
     }
 
-    List getPlayerNames()
+    public List getPlayerNames()
     {
         List names = new ArrayList();
         for (int i = 0; i < playerInfo.length; i++)
@@ -1217,7 +1219,7 @@ public final class Client implements IClient, IOracle, IOptions
     }
 
     /** Return the average point value of all legions in the game. */
-    int getAverageLegionPointValue()
+    public int getAverageLegionPointValue()
     {
         int totalValue = 0;
         int totalLegions = 0;
@@ -1596,7 +1598,7 @@ public final class Client implements IClient, IOracle, IOptions
     }
 
     /** Called from BattleMap to leave carry mode. */
-    void leaveCarryMode()
+    public void leaveCarryMode()
     {
         server.leaveCarryMode();
         doAutoStrikes();
@@ -1623,7 +1625,7 @@ public final class Client implements IClient, IOracle, IOptions
         return false;
     }
 
-    List getActiveBattleChits()
+    public List getActiveBattleChits()
     {
         List chits = new ArrayList();
         Iterator it = battleChits.iterator();
@@ -1733,7 +1735,7 @@ public final class Client implements IClient, IOracle, IOptions
     }
 
     /** Get this legion's info.  Create it first if necessary. */
-    LegionInfo getLegionInfo(String markerId)
+    public LegionInfo getLegionInfo(String markerId)
     {
         LegionInfo info = (LegionInfo)legionInfo.get(markerId);
         return info;
@@ -2188,7 +2190,7 @@ public final class Client implements IClient, IOracle, IOptions
         return chits;
     }
 
-    BattleChit getBattleChit(String hexLabel)
+    public BattleChit getBattleChit(String hexLabel)
     {
         List chits = getBattleChits(hexLabel);
         if (chits.isEmpty())
@@ -2978,7 +2980,7 @@ public final class Client implements IClient, IOracle, IOptions
         new ReplyToProposal(this, proposal);
     }
 
-    BattleHex getBattleHex(BattleChit chit)
+    public BattleHex getBattleHex(BattleChit chit)
     {
         return HexMap.getHexByLabel(getBattleTerrain(), chit
             .getCurrentHexLabel());
@@ -2990,7 +2992,7 @@ public final class Client implements IClient, IOracle, IOptions
             .getStartingHexLabel());
     }
 
-    boolean isOccupied(BattleHex hex)
+    public boolean isOccupied(BattleHex hex)
     {
         return !getBattleChits(hex.getLabel()).isEmpty();
     }
@@ -3316,7 +3318,8 @@ public final class Client implements IClient, IOracle, IOptions
         doRecruit(markerId, recruitName, recruiterName);
     }
 
-    void doRecruit(String markerId, String recruitName, String recruiterName)
+    public void doRecruit(String markerId, String recruitName,
+        String recruiterName)
     {
         // Call server even if some arguments are null, to get past
         // reinforcement.
@@ -3748,7 +3751,7 @@ public final class Client implements IClient, IOracle, IOptions
         }
     }
 
-    void tryBattleMove(CritterMove cm)
+    public void tryBattleMove(CritterMove cm)
     {
         BattleChit critter = cm.getCritter();
         String hexLabel = cm.getEndingHexLabel();
@@ -3998,14 +4001,14 @@ public final class Client implements IClient, IOracle, IOptions
     }
 
     /** Attempt to have critter tag strike the critter in hexLabel. */
-    void strike(int tag, String hexLabel)
+    public void strike(int tag, String hexLabel)
     {
         resetStrikeNumbers();
         server.strike(tag, hexLabel);
     }
 
     /** Attempt to apply carries to the critter in hexLabel. */
-    void applyCarries(String hexLabel)
+    public void applyCarries(String hexLabel)
     {
         server.applyCarries(hexLabel);
         if (battleBoard != null)
@@ -4038,7 +4041,7 @@ public final class Client implements IClient, IOracle, IOptions
         return battleSite;
     }
 
-    String getBattleTerrain()
+    public String getBattleTerrain()
     {
         MasterHex mHex = MasterBoard.getHexByLabel(battleSite);
         return mHex.getTerrain();
@@ -4046,7 +4049,7 @@ public final class Client implements IClient, IOracle, IOptions
 
     /** Return true if there are any enemies adjacent to this chit.
      *  Dead critters count as being in contact only if countDead is true. */
-    boolean isInContact(BattleChit chit, boolean countDead)
+    public boolean isInContact(BattleChit chit, boolean countDead)
     {
         BattleHex hex = getBattleHex(chit);
 
@@ -4101,7 +4104,7 @@ public final class Client implements IClient, IOracle, IOptions
     }
 
     /** Return a set of BattleChits. */
-    Set findMobileBattleChits()
+    public Set findMobileBattleChits()
     {
         Set set = new HashSet();
         Iterator it = getActiveBattleChits().iterator();
@@ -4117,7 +4120,7 @@ public final class Client implements IClient, IOracle, IOptions
     }
 
     /** Return a set of hexLabels. */
-    Set showBattleMoves(int tag)
+    public Set showBattleMoves(int tag)
     {
         return battleMovement.showMoves(tag);
     }
@@ -4129,7 +4132,7 @@ public final class Client implements IClient, IOracle, IOptions
     }
 
     /** Return a set of hexLabels. */
-    Set findStrikes(int tag)
+    public Set findStrikes(int tag)
     {
         return strike.findStrikes(tag);
     }
@@ -4316,7 +4319,7 @@ public final class Client implements IClient, IOracle, IOptions
     }
 
     /** Return true if the move looks legal. */
-    boolean doMove(String moverId, String hexLabel)
+    public boolean doMove(String moverId, String hexLabel)
     {
         if (moverId == null)
         {
@@ -4547,13 +4550,13 @@ public final class Client implements IClient, IOracle, IOptions
     }
 
     /** Return a list of Creatures (ignore reservations). */
-    List findEligibleRecruits(String markerId, String hexLabel)
+    public List findEligibleRecruits(String markerId, String hexLabel)
     {
         return findEligibleRecruits(markerId, hexLabel, false);
     }
 
     /** Return a list of Creatures. Consider reservations if wanted */
-    List findEligibleRecruits(String markerId, String hexLabel,
+    public List findEligibleRecruits(String markerId, String hexLabel,
         boolean considerReservations)
     {
         List recruits = new ArrayList();
@@ -4618,7 +4621,7 @@ public final class Client implements IClient, IOracle, IOptions
     }
 
     /** Return a list of creature name strings. */
-    List findEligibleRecruiters(String markerId, String recruitName)
+    public List findEligibleRecruiters(String markerId, String recruitName)
     {
         java.util.Set recruiters;
         Creature recruit = Creature.getCreatureByName(recruitName);
@@ -4678,7 +4681,7 @@ public final class Client implements IClient, IOracle, IOptions
     /** Return a set of hexLabels for all other unengaged legions of
      *  markerId's player that have summonables.
      * public for client-side AI -- do not call from server side. */
-    Set findSummonableAngelHexes(String summonerId)
+    public Set findSummonableAngelHexes(String summonerId)
     {
         Set set = new HashSet();
         LegionInfo summonerInfo = getLegionInfo(summonerId);
@@ -4699,12 +4702,12 @@ public final class Client implements IClient, IOracle, IOptions
         return set;
     }
 
-    Movement getMovement()
+    public Movement getMovement()
     {
         return movement;
     }
 
-    Strike getStrike()
+    public Strike getStrike()
     {
         return strike;
     }
@@ -4762,7 +4765,7 @@ public final class Client implements IClient, IOracle, IOptions
     }
 
     /** Returns a list of markerIds. */
-    List getLegionsByHex(String hexLabel)
+    public List getLegionsByHex(String hexLabel)
     {
         List markerIds = new ArrayList();
         Iterator it = legionInfo.entrySet().iterator();
@@ -4780,7 +4783,7 @@ public final class Client implements IClient, IOracle, IOptions
     }
 
     /** Returns a list of markerIds. */
-    List getLegionsByPlayer(String name)
+    public List getLegionsByPlayer(String name)
     {
         List markerIds = new ArrayList();
         Iterator it = legionInfo.entrySet().iterator();
@@ -4841,7 +4844,7 @@ public final class Client implements IClient, IOracle, IOptions
     }
 
     /** Return a set of hexLabels for all hexes with engagements. */
-    Set findEngagements()
+    public Set findEngagements()
     {
         Set set = new HashSet();
         Iterator it = MasterBoard.getAllHexLabels().iterator();
@@ -4923,7 +4926,7 @@ public final class Client implements IClient, IOracle, IOptions
         return markerIds;
     }
 
-    String getFirstEnemyLegion(String hexLabel, String pName)
+    public String getFirstEnemyLegion(String hexLabel, String pName)
     {
         List markerIds = getEnemyLegions(hexLabel, pName);
         if (markerIds.isEmpty())
@@ -4933,12 +4936,12 @@ public final class Client implements IClient, IOracle, IOptions
         return (String)markerIds.get(0);
     }
 
-    int getNumEnemyLegions(String hexLabel, String pName)
+    public int getNumEnemyLegions(String hexLabel, String pName)
     {
         return getEnemyLegions(hexLabel, pName).size();
     }
 
-    List getFriendlyLegions(String pName)
+    public List getFriendlyLegions(String pName)
     {
         List markerIds = new ArrayList();
         Iterator it = legionInfo.values().iterator();
@@ -4954,7 +4957,7 @@ public final class Client implements IClient, IOracle, IOptions
         return markerIds;
     }
 
-    List getFriendlyLegions(String hexLabel, String pName)
+    public List getFriendlyLegions(String hexLabel, String pName)
     {
         List markerIds = new ArrayList();
         List legions = getLegionsByHex(hexLabel);
@@ -4970,7 +4973,7 @@ public final class Client implements IClient, IOracle, IOptions
         return markerIds;
     }
 
-    String getFirstFriendlyLegion(String hexLabel, String pName)
+    public String getFirstFriendlyLegion(String hexLabel, String pName)
     {
         List markerIds = getFriendlyLegions(hexLabel, pName);
         if (markerIds.isEmpty())
@@ -4980,7 +4983,7 @@ public final class Client implements IClient, IOracle, IOptions
         return (String)markerIds.get(0);
     }
 
-    int getNumFriendlyLegions(String hexLabel, String pName)
+    public int getNumFriendlyLegions(String hexLabel, String pName)
     {
         return getFriendlyLegions(hexLabel, pName).size();
     }
@@ -5082,7 +5085,7 @@ public final class Client implements IClient, IOracle, IOptions
     // because of synchronization issues we need to
     // be able to pass an undo split request to the server even if it is not
     // yet in the client UndoStack
-    void undoSplit(String splitoffId)
+    public void undoSplit(String splitoffId)
     {
         server.undoSplit(splitoffId);
         getPlayerInfo().addMarkerAvailable(splitoffId);
@@ -5329,7 +5332,7 @@ public final class Client implements IClient, IOracle, IOptions
             && this.phase == Constants.Phase.FIGHT;
     }
 
-    int getMovementRoll()
+    public int getMovementRoll()
     {
         return movementRoll;
     }
@@ -5416,7 +5419,7 @@ public final class Client implements IClient, IOracle, IOptions
     }
 
     /** Called by AI, and by pickMarkerCallback() */
-    void doSplit(String parentId, String childId, String results)
+    public void doSplit(String parentId, String childId, String results)
     {
         LOGGER.log(Level.FINEST, "Client.doSplit " + parentId + " " + childId
             + " " + results);
@@ -5602,7 +5605,7 @@ public final class Client implements IClient, IOracle, IOptions
         return version;
     }
 
-    boolean testBattleMove(BattleChit chit, String hexLabel)
+    public boolean testBattleMove(BattleChit chit, String hexLabel)
     {
         if (showBattleMoves(chit.getTag()).contains(hexLabel))
         {

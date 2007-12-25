@@ -24,13 +24,13 @@ public final class LegionInfo
     private static final Logger LOGGER = Logger.getLogger(LegionInfo.class
         .getName());
 
-    private Client client;
+    private final Client client;
 
     /** immutable */
-    private String markerId;
+    private final String markerId;
 
     /** immutable */
-    private String playerName;
+    private final String playerName;
 
     private String hexLabel;
     private Marker marker;
@@ -40,7 +40,7 @@ public final class LegionInfo
     private int entrySide;
     private boolean recruited;
     private PredictSplitNode myNode;
-    private boolean isMyLegion;
+    private final boolean isMyLegion;
 
     LegionInfo(String markerId, Client client)
     {
@@ -152,7 +152,7 @@ public final class LegionInfo
         return count;
     }
 
-    int numSummonableCreature()
+    public int numSummonableCreature()
     {
         int count = 0;
         Iterator it = getContents().iterator();
@@ -449,7 +449,7 @@ public final class LegionInfo
         this.entrySide = entrySide;
     }
 
-    int getEntrySide()
+    public int getEntrySide()
     {
         return entrySide;
     }

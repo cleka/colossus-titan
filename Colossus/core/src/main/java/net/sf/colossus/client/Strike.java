@@ -21,12 +21,12 @@ import net.sf.colossus.server.Creature;
  */
 
 // XXX Massive code duplication.
-final class Strike
+public final class Strike
 {
     private static final Logger LOGGER = Logger.getLogger(Strike.class
         .getName());
 
-    private Client client;
+    private final Client client;
 
     Strike(Client client)
     {
@@ -89,7 +89,7 @@ final class Strike
         return false;
     }
 
-    boolean canStrike(BattleChit striker, BattleChit target)
+    public boolean canStrike(BattleChit striker, BattleChit target)
     {
         String targetHexLabel = target.getCurrentHexLabel();
         return findStrikes(striker, true).contains(targetHexLabel);
@@ -180,7 +180,8 @@ final class Strike
 
     /** Return the range in hexes from hex1 to hex2.  Titan ranges are
      *  inclusive at both ends. */
-    static int getRange(BattleHex hex1, BattleHex hex2, boolean allowEntrance)
+    public static int getRange(BattleHex hex1, BattleHex hex2,
+        boolean allowEntrance)
     {
         if (hex1 == null || hex2 == null)
         {
@@ -267,7 +268,7 @@ final class Strike
 
     /** Return the titan range (inclusive at both ends) from the critter to the
      *  closest enemy critter.  Return OUT_OF_RANGE if there are none. */
-    int minRangeToEnemy(BattleChit chit)
+    public int minRangeToEnemy(BattleChit chit)
     {
         BattleHex hex = client.getBattleHex(chit);
         int min = Constants.OUT_OF_RANGE;
@@ -804,7 +805,7 @@ final class Strike
 
     /** Return the number of dice that will be rolled when striking this
      *  target, including modifications for terrain. */
-    int getDice(BattleChit chit, BattleChit target)
+    public int getDice(BattleChit chit, BattleChit target)
     {
         int baseDice = 0;
         return getDice(chit, target, baseDice);
@@ -961,7 +962,7 @@ final class Strike
         return attackerSkill;
     }
 
-    int getStrikeNumber(BattleChit striker, BattleChit target)
+    public int getStrikeNumber(BattleChit striker, BattleChit target)
     {
         boolean rangestrike = !client.isInContact(striker, true);
 
