@@ -47,7 +47,7 @@ public class HazardTerrain
         boolean nonNativePenalty)
     {
         this.name = name;
-        this.token = Character.valueOf(token);
+        this.token = new Character(token);
         this.isNativeBonusTerrain = nativeBonus;
         this.isNonNativePenaltyTerrain = nonNativePenalty;
         assert TERRAIN_MAP.get(this.token) == null : "Duplicate terrain token not allowed";
