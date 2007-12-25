@@ -1,7 +1,7 @@
 package net.sf.colossus.util;
 
 
-import junit.framework.*;
+import junit.framework.TestCase;
 
 
 /** 

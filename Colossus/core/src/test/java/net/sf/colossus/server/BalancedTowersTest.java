@@ -1,8 +1,9 @@
 package net.sf.colossus.server;
 
 
-import java.util.*;
-import junit.framework.*;
+import java.util.ArrayList;
+
+import junit.framework.TestCase;
 
 
 /** 

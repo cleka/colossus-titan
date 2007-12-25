@@ -1,70 +1,64 @@
 package net.sf.colossus.client;
 
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.HashMap;
-import java.util.Vector;
-import java.util.Date;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.text.SimpleDateFormat;
-
-import java.awt.Color;
-import java.awt.Container;
-import java.awt.Point;
-import java.awt.Dimension;
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.GridLayout;
-import java.awt.event.WindowListener;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.WindowEvent;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+import java.lang.reflect.InvocationTargetException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.Vector;
 
-import javax.swing.JOptionPane;
-import java.awt.Component;
-
-import javax.swing.JComponent;
-import javax.swing.JPanel;
-import javax.swing.JLabel;
-import javax.swing.JButton;
-import javax.swing.JRadioButton;
-import javax.swing.JComboBox;
-import javax.swing.JScrollBar;
-import javax.swing.JTextField;
-import javax.swing.JTextArea;
-import javax.swing.JPasswordField;
-import javax.swing.JDialog;
-import javax.swing.JCheckBox;
-import javax.swing.JTabbedPane;
-import javax.swing.JScrollPane;
-import javax.swing.JSpinner;
-import javax.swing.SpinnerNumberModel;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JPasswordField;
+import javax.swing.JRadioButton;
+import javax.swing.JScrollBar;
+import javax.swing.JScrollPane;
+import javax.swing.JSpinner;
+import javax.swing.JTabbedPane;
 import javax.swing.JTable;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
+import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingUtilities;
-
-import java.lang.reflect.InvocationTargetException;
-import javax.swing.table.AbstractTableModel;
-
+import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.border.TitledBorder;
+import javax.swing.table.AbstractTableModel;
 
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.Start;
-
+import net.sf.colossus.util.KFrame;
+import net.sf.colossus.util.Options;
+import net.sf.colossus.util.SystemExitManager;
 import net.sf.colossus.webcommon.GameInfo;
 import net.sf.colossus.webcommon.IWebClient;
 import net.sf.colossus.webcommon.IWebServer;
-
-import net.sf.colossus.util.Options;
-import net.sf.colossus.util.KFrame;
-import net.sf.colossus.util.SystemExitManager;
 
 
 /** This is the main class for one user client for the web server.

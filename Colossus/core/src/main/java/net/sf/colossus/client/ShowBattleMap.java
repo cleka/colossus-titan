@@ -4,21 +4,20 @@ package net.sf.colossus.client;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Rectangle;
+import java.util.HashMap;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
 
-import java.util.HashMap;
-
-import net.sf.colossus.util.KFrame;
 import net.sf.colossus.server.Constants;
+import net.sf.colossus.util.KFrame;
 
 
 /**

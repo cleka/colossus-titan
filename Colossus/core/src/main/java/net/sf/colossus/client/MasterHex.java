@@ -3,8 +3,8 @@ package net.sf.colossus.client;
 
 import java.awt.Color;
 
-import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 import net.sf.colossus.server.Creature;
+import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
 
 /**

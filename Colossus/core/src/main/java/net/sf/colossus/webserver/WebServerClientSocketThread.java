@@ -1,15 +1,14 @@
 package net.sf.colossus.webserver;
 
 
-import java.net.Socket;
-import java.net.SocketException;
-
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InterruptedIOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.InterruptedIOException;
 import java.io.PrintWriter;
+import java.net.Socket;
+import java.net.SocketException;
 
 import net.sf.colossus.webcommon.GameInfo;
 import net.sf.colossus.webcommon.IWebClient;

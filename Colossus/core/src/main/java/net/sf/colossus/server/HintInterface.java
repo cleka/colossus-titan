@@ -1,8 +1,9 @@
 package net.sf.colossus.server;
 
 
-import net.sf.colossus.client.LegionInfo;
 import java.util.List;
+
+import net.sf.colossus.client.LegionInfo;
 
 
 /**

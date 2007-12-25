@@ -5,9 +5,9 @@ import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Window;
 
-import net.sf.colossus.util.Options;
 import net.sf.colossus.util.KDialog;
 import net.sf.colossus.util.KFrame;
+import net.sf.colossus.util.Options;
 
 
 /** 

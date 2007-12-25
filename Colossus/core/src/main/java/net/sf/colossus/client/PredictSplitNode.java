@@ -1,7 +1,12 @@
 package net.sf.colossus.client;
 
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.Creature;

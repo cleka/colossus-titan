@@ -1,7 +1,8 @@
 package net.sf.colossus.util;
 
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Iterator;
 
 
 /** Stringify contents of various container classes.

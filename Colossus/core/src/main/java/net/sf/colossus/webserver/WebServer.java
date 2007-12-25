@@ -2,27 +2,23 @@ package net.sf.colossus.webserver;
 
 
 import java.awt.GraphicsEnvironment;
-import java.io.IOException;
 import java.io.FileInputStream;
-//import java.io.*;        // for console
-
+import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-
-import java.util.Date;
-import java.util.List;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.Collections;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Properties;
-
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.colossus.webcommon.GameInfo;
+import net.sf.colossus.webcommon.IRunWebServer;
 import net.sf.colossus.webcommon.IWebClient;
 import net.sf.colossus.webcommon.IWebServer;
-import net.sf.colossus.webcommon.IRunWebServer;
 import net.sf.colossus.webcommon.User;
 
 

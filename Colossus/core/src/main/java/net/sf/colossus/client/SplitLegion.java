@@ -20,9 +20,9 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 
-import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.util.KDialog;
+import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
 
 /**

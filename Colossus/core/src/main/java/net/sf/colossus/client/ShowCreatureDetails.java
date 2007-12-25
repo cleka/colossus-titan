@@ -6,9 +6,9 @@ package net.sf.colossus.client;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Point;
-import java.awt.Container;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.WindowEvent;
@@ -22,10 +22,10 @@ import javax.swing.JScrollPane;
 
 import net.sf.colossus.server.Creature;
 import net.sf.colossus.server.Critter;
+import net.sf.colossus.util.HTMLColor;
 import net.sf.colossus.util.KDialog;
 import net.sf.colossus.util.RecruitGraph;
 import net.sf.colossus.util.Terrains;
-import net.sf.colossus.util.HTMLColor;
 import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
 

@@ -3,13 +3,13 @@ package net.sf.colossus.client;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.ConnectException;
+import java.net.Socket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -19,9 +19,9 @@ import java.util.logging.Logger;
 
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.IServer;
+import net.sf.colossus.util.ChildThreadManager;
 import net.sf.colossus.util.Glob;
 import net.sf.colossus.util.Split;
-import net.sf.colossus.util.ChildThreadManager;
 
 
 /**

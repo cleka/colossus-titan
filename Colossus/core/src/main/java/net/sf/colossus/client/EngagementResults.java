@@ -2,12 +2,12 @@ package net.sf.colossus.client;
 
 
 import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.GridLayout;
-import java.awt.FlowLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.GridLayout;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -24,9 +24,9 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import net.sf.colossus.server.Constants;
 import net.sf.colossus.util.KDialog;
 import net.sf.colossus.util.Options;
-import net.sf.colossus.server.Constants;
 
 
 /**

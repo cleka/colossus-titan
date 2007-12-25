@@ -1,8 +1,9 @@
 package net.sf.colossus.client;
 
 
-import net.sf.colossus.util.KFrame;
 import javax.swing.JTextArea;
+
+import net.sf.colossus.util.KFrame;
 
 
 /**

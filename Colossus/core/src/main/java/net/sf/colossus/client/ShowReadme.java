@@ -11,9 +11,9 @@ import javax.swing.text.Document;
 
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.VariantSupport;
+import net.sf.colossus.util.KFrame;
 import net.sf.colossus.util.Options;
 import net.sf.colossus.util.ResourceLoader;
-import net.sf.colossus.util.KFrame;
 
 
 /**

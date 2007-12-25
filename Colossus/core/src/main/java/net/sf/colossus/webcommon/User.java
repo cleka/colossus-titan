@@ -1,19 +1,17 @@
 package net.sf.colossus.webcommon;
 
 
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
 import java.io.BufferedReader;
-import java.io.PrintWriter;
-import java.io.FileOutputStream;
-
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
-
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Date;
-import java.text.SimpleDateFormat;
 
 
 /** One user at the WebServer side.

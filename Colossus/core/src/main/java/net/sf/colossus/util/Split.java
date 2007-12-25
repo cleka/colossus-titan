@@ -1,7 +1,8 @@
 package net.sf.colossus.util;
 
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 
 /** Perl-style split function.

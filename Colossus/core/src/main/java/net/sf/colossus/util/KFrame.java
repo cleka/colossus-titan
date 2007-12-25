@@ -1,13 +1,15 @@
 package net.sf.colossus.util;
 
 
-import javax.swing.JFrame;
+import java.awt.Dimension;
+import java.awt.Point;
+import java.awt.Toolkit;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 
-import java.awt.*;
+import javax.swing.JFrame;
 
 
 /** KFrame adds some generally useful functions to JFrame.

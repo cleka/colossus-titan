@@ -17,7 +17,6 @@ import java.util.logging.Logger;
 import net.sf.colossus.client.IClient;
 import net.sf.colossus.util.Glob;
 import net.sf.colossus.util.Split;
-
 import net.sf.colossus.webcommon.FinalizeManager;
 
 

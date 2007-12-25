@@ -1,7 +1,7 @@
 package net.sf.colossus.client;
 
 
-import java.util.*;
+import java.util.List;
 
 
 /** Knows a lot of things, but cannot actually take any actions.

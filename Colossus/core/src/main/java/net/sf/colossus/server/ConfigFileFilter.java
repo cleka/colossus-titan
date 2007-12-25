@@ -1,7 +1,8 @@
 package net.sf.colossus.server;
 
 
-import java.io.*;
+import java.io.File;
+import java.io.FilenameFilter;
 
 
 /**

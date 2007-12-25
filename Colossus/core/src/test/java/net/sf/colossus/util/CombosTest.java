@@ -1,8 +1,10 @@
 package net.sf.colossus.util;
 
 
-import java.util.*;
-import junit.framework.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+
+import junit.framework.TestCase;
 
 
 /** 

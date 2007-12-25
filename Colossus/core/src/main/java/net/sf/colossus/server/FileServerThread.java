@@ -14,9 +14,9 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.sf.colossus.util.ChildThreadManager;
 import net.sf.colossus.util.ResourceLoader;
 import net.sf.colossus.util.Split;
-import net.sf.colossus.util.ChildThreadManager;
 
 
 /**

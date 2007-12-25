@@ -6,6 +6,7 @@ import java.awt.Cursor;
 import java.awt.GraphicsDevice;
 import java.awt.Point;
 import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -22,8 +23,6 @@ import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import java.lang.reflect.InvocationTargetException;
-
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
@@ -34,15 +33,15 @@ import net.sf.colossus.server.Creature;
 import net.sf.colossus.server.Dice;
 import net.sf.colossus.server.IServer;
 import net.sf.colossus.server.Player;
-import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.server.Start;
+import net.sf.colossus.server.VariantSupport;
+import net.sf.colossus.util.ChildThreadManager;
+import net.sf.colossus.util.KFrame;
 import net.sf.colossus.util.LogWindow;
 import net.sf.colossus.util.Options;
 import net.sf.colossus.util.ResourceLoader;
 import net.sf.colossus.util.Split;
-import net.sf.colossus.util.ChildThreadManager;
 import net.sf.colossus.util.SystemExitManager;
-import net.sf.colossus.util.KFrame;
 import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
 

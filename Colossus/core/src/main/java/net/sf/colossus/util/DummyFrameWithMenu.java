@@ -1,17 +1,13 @@
 package net.sf.colossus.util;
 
 
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+
+import javax.swing.AbstractAction;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
-
 import javax.swing.JMenuItem;
-import java.awt.event.KeyEvent;
-import java.awt.event.ActionEvent;
-import javax.swing.AbstractAction;
-// import javax.swing.SwingUtilities;
-// import java.lang.reflect.InvocationTargetException;
-
-import net.sf.colossus.util.KFrame;
 
 
 /**

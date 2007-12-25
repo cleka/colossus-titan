@@ -5,10 +5,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.net.Socket;
 import java.net.ConnectException;
+import java.net.Socket;
 import java.net.UnknownHostException;
-
 import java.util.HashMap;
 
 import net.sf.colossus.webcommon.GameInfo;

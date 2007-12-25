@@ -2,9 +2,9 @@ package net.sf.colossus.server;
 
 
 import java.io.IOException;
-import java.net.SocketException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -19,8 +19,8 @@ import java.util.logging.Logger;
 import net.sf.colossus.client.Client;
 import net.sf.colossus.client.IClient;
 import net.sf.colossus.client.Proposal;
-import net.sf.colossus.util.Options;
 import net.sf.colossus.util.ChildThreadManager;
+import net.sf.colossus.util.Options;
 import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
 
