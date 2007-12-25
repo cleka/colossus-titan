@@ -17,6 +17,9 @@ import javax.swing.JViewport;
 
 
 /** KDialog adds some generally useful functions to JDialog.
+ * 
+ * TODO SaveWindow handling should be on this level
+ * 
  *  @version $Id$
  *  @author David Ripton */
 

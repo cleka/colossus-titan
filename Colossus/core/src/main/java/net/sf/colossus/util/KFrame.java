@@ -13,6 +13,9 @@ import javax.swing.JFrame;
 
 
 /** KFrame adds some generally useful functions to JFrame.
+ * 
+ * TODO SaveWindow handling should be on this level
+ * 
  *  @version $Id$
  *  @author Clemens Katzer */
 
