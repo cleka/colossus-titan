@@ -56,7 +56,7 @@ public final class Game
     private static final Logger LOGGER = Logger
         .getLogger(Game.class.getName());
 
-    private List players = new ArrayList(6);
+    private final List players = new ArrayList(6);
     private int activePlayerNum;
     private int turnNumber; // Advance when every player has a turn
     private int lastRecruitTurnNumber;
@@ -73,15 +73,15 @@ public final class Game
     private boolean loadingGame;
     private boolean gameOver;
     private Battle battle;
-    private Caretaker caretaker = new Caretaker(this);
+    private final Caretaker caretaker = new Caretaker(this);
     private Constants.Phase phase;
     private Server server;
     // Negotiation
-    private Set[] proposals = new HashSet[2];
+    private final Set[] proposals = new HashSet[2];
 
-    private LinkedList colorPickOrder = new LinkedList();
+    private final LinkedList colorPickOrder = new LinkedList();
     private List colorsLeft;
-    private PhaseAdvancer phaseAdvancer = new GamePhaseAdvancer();
+    private final PhaseAdvancer phaseAdvancer = new GamePhaseAdvancer();
     private Options options = null;
 
     /** Server port number. */
@@ -92,7 +92,7 @@ public final class Game
     private History history;
 
     private static int gameCounter = 1;
-    private String gameId;
+    private final String gameId;
 
     /** Package-private only for JUnit test setup. */
     Game()
@@ -349,7 +349,7 @@ public final class Game
 
     private void assignColors()
     {
-        java.util.List cli = new ArrayList();
+        List cli = new ArrayList();
 
         colorsLeft = new ArrayList();
         for (int i = 0; i < Constants.colorNames.length; i++)
@@ -1141,7 +1141,7 @@ public final class Game
             root.addContent(car);
 
             // Caretaker stacks
-            java.util.List creatures = Creature.getCreatures();
+            List creatures = Creature.getCreatures();
             Iterator it = creatures.iterator();
 
             while (it.hasNext())
@@ -1352,13 +1352,13 @@ public final class Game
             VariantSupport.freshenVariant(fil.getValue(), dir.getValue());
 
             // then load data files
-            java.util.List datafilesElements = root.getChildren("DataFile");
+            List datafilesElements = root.getChildren("DataFile");
             Iterator it = datafilesElements.iterator();
             while (it.hasNext())
             {
                 Element dea = (Element)it.next();
                 String mapKey = dea.getAttributeValue("DataFileKey");
-                java.util.List contentList = dea.getContent();
+                List contentList = dea.getContent();
                 if (contentList.size() > 0)
                 {
                     String content = ((CDATA)contentList.get(0)).getText();
@@ -1391,7 +1391,7 @@ public final class Game
                 .fromInt(Integer.parseInt(el.getTextTrim()));
 
             Element ct = root.getChild("Caretaker");
-            java.util.List kids = ct.getChildren();
+            List kids = ct.getChildren();
             it = kids.iterator();
 
             while (it.hasNext())
@@ -1413,7 +1413,7 @@ public final class Game
             }
 
             // Players
-            java.util.List playerElements = root.getChildren("Player");
+            List playerElements = root.getChildren("Player");
 
             it = playerElements.iterator();
             while (it.hasNext())
@@ -1458,7 +1458,7 @@ public final class Game
                 }
                 player.setPlayersElim(playersElim);
 
-                java.util.List legionElements = pla.getChildren("Legion");
+                List legionElements = pla.getChildren("Legion");
                 Iterator it2 = legionElements.iterator();
                 while (it2.hasNext())
                 {
@@ -1493,7 +1493,7 @@ public final class Game
                 boolean driftDamageApplied = bat.getAttribute(
                     "driftDamageApplied").getBooleanValue();
 
-                java.util.List cts = bat.getChildren("CarryTarget");
+                List cts = bat.getChildren("CarryTarget");
                 Set carryTargets = new HashSet();
                 Iterator it2 = cts.iterator();
                 while (it2.hasNext())
@@ -1573,7 +1573,7 @@ public final class Game
 
         // Critters
         Critter[] critters = new Critter[8];
-        java.util.List creatureElements = leg.getChildren("Creature");
+        List creatureElements = leg.getChildren("Creature");
         Iterator it = creatureElements.iterator();
         int k = 0;
 
@@ -1718,19 +1718,19 @@ public final class Game
     }
 
     /** Return a list of eligible recruits, as Creatures. */
-    java.util.List findEligibleRecruits(String markerId, String hexLabel)
+    List findEligibleRecruits(String markerId, String hexLabel)
     {
         Legion legion = getLegionByMarkerId(markerId);
-        java.util.List recruits;
+        List recruits;
 
         MasterHex hex = MasterBoard.getHexByLabel(hexLabel);
         String terrain = hex.getTerrain();
 
         recruits = new ArrayList();
-        java.util.List tempRecruits = TerrainRecruitLoader
-            .getPossibleRecruits(terrain, hexLabel);
-        java.util.List recruiters = TerrainRecruitLoader
-            .getPossibleRecruiters(terrain, hexLabel);
+        List tempRecruits = TerrainRecruitLoader.getPossibleRecruits(terrain,
+            hexLabel);
+        List recruiters = TerrainRecruitLoader.getPossibleRecruiters(terrain,
+            hexLabel);
 
         ListIterator lit = tempRecruits.listIterator();
 
@@ -1766,9 +1766,9 @@ public final class Game
     }
 
     /** Return a list of eligible recruiter creatures. */
-    java.util.List findEligibleRecruiters(String markerId, String recruitName)
+    List findEligibleRecruiters(String markerId, String recruitName)
     {
-        java.util.List recruiters;
+        List recruiters;
         Creature recruit = Creature.getCreatureByName(recruitName);
         if (recruit == null)
         {
@@ -1816,8 +1816,8 @@ public final class Game
             return;
         }
         // Check for recruiter legality.
-        java.util.List recruiters = findEligibleRecruiters(legion
-            .getMarkerId(), recruit.getName());
+        List recruiters = findEligibleRecruiters(legion.getMarkerId(), recruit
+            .getName());
 
         if (recruiter == null)
         {
@@ -1872,17 +1872,17 @@ public final class Game
     }
 
     /** Return a list of names of angel types that can be acquired. */
-    java.util.List findEligibleAngels(Legion legion, int score)
+    List findEligibleAngels(Legion legion, int score)
     {
         if (legion.getHeight() >= 7)
         {
             return null;
         }
-        java.util.List recruits = new ArrayList();
+        List recruits = new ArrayList();
         String terrain = legion.getCurrentHex().getTerrain();
-        java.util.List allRecruits = TerrainRecruitLoader
-            .getRecruitableAcquirableList(terrain, score);
-        java.util.Iterator it = allRecruits.iterator();
+        List allRecruits = TerrainRecruitLoader.getRecruitableAcquirableList(
+            terrain, score);
+        Iterator it = allRecruits.iterator();
         while (it.hasNext())
         {
             String name = (String)it.next();
@@ -1973,7 +1973,7 @@ public final class Game
             // XXX fix
             // This hex is the final destination.  Mark it as legal if
             // it is unoccupied by friendly legions.
-            java.util.List legions = player.getLegions();
+            List legions = player.getLegions();
             Iterator it = legions.iterator();
             while (it.hasNext())
             {
@@ -2102,7 +2102,7 @@ public final class Game
         while (it.hasNext())
         {
             String tuple = (String)it.next();
-            java.util.List parts = Split.split(':', tuple);
+            List parts = Split.split(':', tuple);
             String hexLabel = (String)parts.get(0);
 
             hexLabels.add(hexLabel);
@@ -2291,7 +2291,7 @@ public final class Game
         while (it.hasNext())
         {
             String tuple = (String)it.next();
-            java.util.List parts = Split.split(':', tuple);
+            List parts = Split.split(':', tuple);
             String hl = (String)parts.get(0);
 
             if (hl.equals(targetHexLabel))
@@ -2323,7 +2323,7 @@ public final class Game
     {
         if (getNumLegions(hexLabel) > 1)
         {
-            java.util.List markerIds = getLegionMarkerIds(hexLabel);
+            List markerIds = getLegionMarkerIds(hexLabel);
             Iterator it = markerIds.iterator();
             String markerId = (String)it.next();
             Player player = getPlayerByMarkerId(markerId);
@@ -2346,7 +2346,7 @@ public final class Game
         Set set = new HashSet();
         Player player = getActivePlayer();
 
-        java.util.List legions = player.getLegions();
+        List legions = player.getLegions();
         Iterator it = legions.iterator();
 
         while (it.hasNext())
@@ -2478,7 +2478,7 @@ public final class Game
     {
         Legion legion = getLegionByMarkerId(markerId);
         Set set = new HashSet();
-        java.util.List legions = legion.getPlayer().getLegions();
+        List legions = legion.getPlayer().getLegions();
         Iterator it = legions.iterator();
         while (it.hasNext())
         {
@@ -2487,8 +2487,7 @@ public final class Game
             {
                 String hexLabel = candidate.getCurrentHexLabel();
                 boolean hasSummonable = false;
-                java.util.List summonableList = Creature
-                    .getSummonableCreatures();
+                List summonableList = Creature.getSummonableCreatures();
                 Iterator sumIt = summonableList.iterator();
                 while (sumIt.hasNext() && !hasSummonable)
                 {
@@ -2535,8 +2534,8 @@ public final class Game
                 + childId + ")");
             return false;
         }
-        java.util.List strings = Split.split(',', results);
-        java.util.List creatures = new ArrayList();
+        List strings = Split.split(',', results);
+        List creatures = new ArrayList();
         Iterator it = strings.iterator();
         while (it.hasNext())
         {
@@ -2557,8 +2556,8 @@ public final class Game
         // WARNING: Legion.getCritters() return Critters,
         // not Creature - different things now.
         // so we must clone "by hand" the List.
-        java.util.List tempCritters = legion.getCritters();
-        java.util.List tempCreatures = new ArrayList();
+        List tempCritters = legion.getCritters();
+        List tempCreatures = new ArrayList();
 
         it = tempCritters.iterator();
         while (it.hasNext())
@@ -3036,7 +3035,7 @@ public final class Game
             log.append(" loses creatures ");
 
             // Remove all dead creatures from the winning legion.
-            java.util.List winnerLosses = results.getWinnerLosses();
+            List winnerLosses = results.getWinnerLosses();
             Iterator it = winnerLosses.iterator();
             while (it.hasNext())
             {
@@ -3106,7 +3105,7 @@ public final class Game
     }
 
     synchronized void askAcquireAngel(String playerName, String markerId,
-        java.util.List recruits)
+        List recruits)
     {
         acquiring = true;
         server.askAcquireAngel(playerName, markerId, recruits);
@@ -3168,13 +3167,13 @@ public final class Game
     }
 
     /** Return a list of all players' legions. */
-    synchronized java.util.List getAllLegions()
+    synchronized List getAllLegions()
     {
-        java.util.List list = new ArrayList();
+        List list = new ArrayList();
         for (Iterator it = players.iterator(); it.hasNext();)
         {
             Player player = (Player)it.next();
-            java.util.List legions = player.getLegions();
+            List legions = player.getLegions();
 
             list.addAll(legions);
         }
@@ -3182,9 +3181,9 @@ public final class Game
     }
 
     /** Return a list of all players' legions' marker ids. */
-    java.util.List getAllLegionIds()
+    List getAllLegionIds()
     {
-        java.util.List list = new ArrayList();
+        List list = new ArrayList();
         for (Iterator it = players.iterator(); it.hasNext();)
         {
             Player player = (Player)it.next();
@@ -3195,16 +3194,16 @@ public final class Game
     }
 
     /** Return a list of all legions not belonging to player. */
-    synchronized java.util.List getAllEnemyLegions(Player player)
+    synchronized List getAllEnemyLegions(Player player)
     {
-        java.util.List list = new ArrayList();
+        List list = new ArrayList();
         for (Iterator it = players.iterator(); it.hasNext();)
         {
             Player nextPlayer = (Player)it.next();
 
             if (nextPlayer != player)
             {
-                java.util.List legions = nextPlayer.getLegions();
+                List legions = nextPlayer.getLegions();
 
                 list.addAll(legions);
             }
@@ -3213,9 +3212,9 @@ public final class Game
     }
 
     /** Return a list of ids for all legions not belonging to player. */
-    java.util.List getAllEnemyLegionIds(Player player)
+    List getAllEnemyLegionIds(Player player)
     {
-        java.util.List list = new ArrayList();
+        List list = new ArrayList();
         for (Iterator it = players.iterator(); it.hasNext();)
         {
             Player nextPlayer = (Player)it.next();
@@ -3264,7 +3263,7 @@ public final class Game
     int getAverageLegionPointValue()
     {
         int total = 0;
-        java.util.List legions = getAllLegions();
+        List legions = getAllLegions();
         Iterator it = legions.iterator();
         while (it.hasNext())
         {
@@ -3320,9 +3319,9 @@ public final class Game
         return null;
     }
 
-    java.util.List getLegionMarkerIds(String hexLabel)
+    List getLegionMarkerIds(String hexLabel)
     {
-        java.util.List markerIds = new ArrayList();
+        List markerIds = new ArrayList();
         Iterator it = getAllLegions().iterator();
         while (it.hasNext())
         {
@@ -3339,7 +3338,7 @@ public final class Game
     synchronized int getNumFriendlyLegions(String hexLabel, Player player)
     {
         int count = 0;
-        java.util.List legions = player.getLegions();
+        List legions = player.getLegions();
         Iterator it = legions.iterator();
         while (it.hasNext())
         {
@@ -3355,7 +3354,7 @@ public final class Game
 
     synchronized Legion getFirstFriendlyLegion(String hexLabel, Player player)
     {
-        java.util.List legions = player.getLegions();
+        List legions = player.getLegions();
         Iterator it = legions.iterator();
         while (it.hasNext())
         {
@@ -3369,11 +3368,10 @@ public final class Game
         return null;
     }
 
-    synchronized java.util.List getFriendlyLegions(String hexLabel,
-        Player player)
+    synchronized List getFriendlyLegions(String hexLabel, Player player)
     {
-        java.util.List newLegions = new ArrayList();
-        java.util.List legions = player.getLegions();
+        List newLegions = new ArrayList();
+        List legions = player.getLegions();
         Iterator it = legions.iterator();
         while (it.hasNext())
         {
