@@ -316,9 +316,4 @@ public final class PlayerInfo
     {
         this.client = null;
     }
-
-    public void finalize()
-    {
-        net.sf.colossus.webcommon.FinalizeManager.unregister(this);
-    }
 }
