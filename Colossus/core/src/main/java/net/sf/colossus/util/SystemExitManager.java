@@ -5,6 +5,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.WeakHashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 /**
@@ -30,22 +32,32 @@ import java.util.WeakHashMap;
 
 public class SystemExitManager
 {
+    private static final Logger LOGGER =
+        Logger.getLogger(SystemExitManager.class.getName());
+
+    private static boolean debug = false;
 
     private static WeakHashMap viableEntities = new WeakHashMap();
-
-    public static int waiting = 0;
-
+    private static int waiting = 0;
     private static int exitCode = 0;
-
-    public SystemExitManager()
+    private static Object mutex = new Object();
+    
+    public static int getWaitingCnt()
     {
-        // nothing to do
+        return waiting;
     }
-
+    
+    // currently not used anywhere...
+    public static int getExitCode()
+    {
+        return exitCode;
+    }
+    
     public static synchronized void register(Object viableEntity, String name)
     {
         viableEntities.put(viableEntity, name);
-        // System.out.println("SystemExitManager: now " + viableEntities.size() + " entities registered.");
+        LOGGER.log(Level.FINEST, "SystemExitManager: now " +
+            viableEntities.size() + " entities registered.");
     }
 
     public static synchronized void doSystemExitMaybe(Object viableEntity,
@@ -58,38 +70,23 @@ public class SystemExitManager
             viableEntities.remove(viableEntity);
             if (viableEntities.isEmpty())
             {
-                // System.out.println("\n\nSystemExitManager: " + 
-                //      "last viable entitity is gone!!");
+                LOGGER.log(Level.FINEST, 
+                    "\n\nSystemExitManager: last viable entity is gone!!");
 
-                boolean debug = true;
-
-                if (debug)
+                // notify that all gone:
+                synchronized (mutex)
                 {
-                    System.gc();
-                    System.runFinalization();
+                    mutex.notify();
                 }
-
-                notifyThatAllGone();
             }
         }
 
-        // int count = viableEntities.size();
-        // String list = viableEntities.values().toString();
-        // System.out.println("SystemExitManager: now " + count + " entities registered: " + list);
-    }
-
-    public int getLastExitCode()
-    {
-        return SystemExitManager.exitCode;
-    }
-
-    private static Object mutex = new Object();
-
-    private static void notifyThatAllGone()
-    {
-        synchronized (mutex)
+        if (debug)
         {
-            mutex.notify();
+            int count = viableEntities.size();
+            String list = viableEntities.values().toString();
+            LOGGER.log(Level.FINEST, "SystemExitManager: now " + count +
+                " entities registered: " + list);
         }
     }
 
@@ -99,7 +96,9 @@ public class SystemExitManager
         {
             if (viableEntities.isEmpty())
             {
-                // System.out.println("waitUntilAllGone: viableEntities already empty! - returning.");
+                LOGGER.log(Level.FINEST,
+                    "waitUntilAllGone: viableEntities already empty! " + 
+                    "- returning.");
                 return;
             }
         }
@@ -114,70 +113,23 @@ public class SystemExitManager
             }
             catch (InterruptedException e)
             {
-                System.out
-                    .println("SystemExitManager.waitUntilAllGone(): InterruptedException!");
+                LOGGER.log(Level.WARNING,
+                    "waitUntilAllGone(): interrupted!", e);
             }
         }
     }
 
-    public static int getWaitingCnt()
-    {
-        return waiting;
-    }
 
     // ===================================================================
-    //                         D E B U G   S T U F F
-
-    /*
-     * Those below (InterruptAWTThreads() and  waitReturn*() )
-     * are for debugging/development purposes.
-     * Due to a bug in AWT, an application that ever did
-     * getDefaultToolkit(), will never return to the prompt
-     * by itself (i.e. without System.exit()) because
-     * the AWT threads are not demons and don't end by themselves.
-     * ==> non-demon threads still running => JVM does not shutdown.
-     * 
-     *  With this here, can try whether the application otherwise
-     *  has cleaned up all, stopped all other (own) socket threads,
-     *  see all finalizers, etc.
-     */
-
-    /* Actually, since I use the SwingCleanup stuff,
-     * I did not need to do this interrupt thing any more...
-     */
-
-    /*
-     public static void InterruptAWTThreads()
-     {
-     System.out.println("@@@ start interrupting the AWT's");
-     ThreadGroup tg = Thread.currentThread().getThreadGroup(); 
-     
-     Thread[] list = new Thread[20];
-     int cnt = tg.enumerate(list);
-     
-     int i;
-     for ( i=0 ; i < cnt ; i++)
-     {
-     Thread t = list[i];
-     String name = t.getName();
-     if (name.startsWith("AWT-Shutdow")
-     || name.startsWith("AWT-EventQueue") )
-     {
-     System.out.println("@@@ Interrupting " + name);
-     t.interrupt();
-     }
-     }
-     System.out.println("@@@ after interrupting the AWT's");
-     }
-     */
+    //                   D E B U G    S T U F F
 
     public static void waitReturn()
     {
         System.out.println("\nPRESS RETURN TO CONTINUE!");
         try
         {
-            BufferedReader in = new BufferedReader(new InputStreamReader(
-                System.in));
+            BufferedReader in =
+                new BufferedReader(new InputStreamReader(System.in));
             in.readLine();
         }
         catch (IOException e)
@@ -197,16 +149,16 @@ public class SystemExitManager
             }
         }
 
-        System.out.println("SystemExitManager.waitReturn(), run by thread "
-            + Thread.currentThread().getName());
+        System.out.println("SystemExitManager.waitReturn(), run by thread " +
+            Thread.currentThread().getName());
         System.out.println("\n----------\nStart.main() has done it's job\n");
 
         System.gc();
         System.runFinalization();
-        net.sf.colossus.webcommon.FinalizeManager.printStatistics(false);
+        net.sf.colossus.webcommon.FinalizeManager.printStatistics();
 
-        System.out
-            .println("Press return to proceed with cleanup...\n----------\n");
+        System.out.println(
+            "Press return to proceed with cleanup...\n----------\n");
         int cnt = 2;
         String line = "";
         boolean done = false;
@@ -254,12 +206,11 @@ public class SystemExitManager
 
                 if (line.equals("s"))
                 {
-
                     System.gc();
                     System.runFinalization();
 
                     net.sf.colossus.webcommon.FinalizeManager
-                        .printStatistics(false);
+                        .printStatistics();
                 }
 
                 if (line.equals("x"))
@@ -280,11 +231,10 @@ public class SystemExitManager
             System.gc();
             System.runFinalization();
         }
-        System.out
-            .println("ok, list empty or x entered... finishing shutdown...");
+        System.out.println(
+            "ok, list empty or x entered... finishing shutdown...");
     }
 
     //                         E N D   D E B U G    S T U F F
     // ===================================================================
-
 }

@@ -4,6 +4,8 @@ package net.sf.colossus.webcommon;
 import java.lang.ref.WeakReference;
 import java.util.Iterator;
 import java.util.WeakHashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 /**
@@ -17,8 +19,10 @@ import java.util.WeakHashMap;
 
 public class FinalizeClassGroup
 {
+    private static final Logger LOGGER =
+        Logger.getLogger(FinalizeClassGroup.class.getName());
+
     private WeakHashMap instances;
-    // private String type;
     private String shortType;
 
     public FinalizeClassGroup(String type)
@@ -42,29 +46,21 @@ public class FinalizeClassGroup
 
     public synchronized void addInstance(Object o, String id)
     {
-        if (id == null)
-        {
-            // System.out.println("\n00000000\naddInstance, id null!");
-        }
         typeInstance i = new typeInstance(o, id);
         instances.put(o, i);
     }
 
-    public synchronized void printStatistics(boolean detailed)
+    public synchronized String getPrintStatistics()
     {
+        StringBuffer gstat = new StringBuffer("");
+        
         int count = instances.size();
         if (count == 0)
         {
-            return;
+            return gstat.substring(0);
         }
 
         System.out.print("  " + count + " instances of type " + shortType);
-
-        if (!detailed)
-        {
-            // System.out.println("");
-            // return;
-        }
 
         String sep = ": ";
         Iterator it = instances.keySet().iterator();
@@ -73,19 +69,20 @@ public class FinalizeClassGroup
             Object key = it.next();
             if (key == null)
             {
-                System.out.println("object key already null, removing it...");
+                LOGGER.log(Level.FINEST,
+                    "object key already null, removing it...");
                 it.remove();
             }
             else
             {
                 typeInstance i = (typeInstance)instances.get(key);
-                String id = i.getId();
-                System.out.print(sep + id);
+                gstat.append(sep + i.getId());
                 sep = ", ";
             }
         }
         it = null;
-        System.out.println("");
+        gstat.append("\n");
+        return gstat.substring(0);
     }
 
     public synchronized int amountLeft()
@@ -94,44 +91,8 @@ public class FinalizeClassGroup
         return amount;
     }
 
-    public synchronized void removeInstance(Object o)
-    {
-        String type = o.getClass().getName();
-        System.out.println("removeInstance, trying to find object of type "
-            + type + "o=" + o);
-
-        int count = instances.size();
-        System.out.println("this group has " + count + " entries: "
-            + instances.toString());
-        Iterator it = instances.keySet().iterator();
-        boolean done = false;
-
-        while (!done && it.hasNext())
-        {
-            typeInstance i = (typeInstance)it.next();
-            Object o2 = i.getObj();
-            System.out.println("comparing it to object " + o2);
-            if (i.getObj() == o)
-            {
-                System.out.println("Found object, removing it, id is "
-                    + i.getId());
-                it.remove();
-                done = true;
-            }
-        }
-        if (!done)
-        {
-            System.out.println("removeInstance: Ooops! object of type " + type
-                + " to remove not found!");
-        }
-    }
-
     public synchronized typeInstance getInstance(Object o)
     {
-        // String type = o.getClass().getName();
-        // System.out.println("getInstance, trying to find object of type " + type + "o="+ o);
-
-        // int count = instances.size();
         Iterator it = instances.keySet().iterator();
         typeInstance foundInstance = null;
 
@@ -173,7 +134,6 @@ public class FinalizeClassGroup
 
         public void setId(String id)
         {
-            // System.out.println("instance.setId: old="+this.id+", new="+id);
             this.id = id;
         }
 

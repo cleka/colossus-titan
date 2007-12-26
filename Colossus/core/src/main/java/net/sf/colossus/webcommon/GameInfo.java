@@ -13,6 +13,8 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import net.sf.colossus.util.Options;
 
@@ -32,6 +34,9 @@ import net.sf.colossus.util.Options;
 
 public class GameInfo extends Thread
 {
+    private static final Logger LOGGER =
+        Logger.getLogger(GameInfo.class.getName());
+
     // the possible states of a game:
     public final static int Proposed = 1;
     public final static int Running = 3;
@@ -99,8 +104,9 @@ public class GameInfo extends Thread
         this.players = new ArrayList();
 
         this.server = null;
-        // System.out.println("A new potential game was created!! - variant " + variant + " viewmode " + viewmode);
-
+        LOGGER.log(Level.FINEST,
+            "A new potential game was created!! - variant " + variant +
+            " viewmode " + viewmode);
     }
 
     public void setState(int state)
@@ -293,7 +299,6 @@ public class GameInfo extends Thread
         {
             User user = (User)it.next();
             String name = user.getName();
-            // System.out.println("comparing against enrolled " + name);
             if (newName.equals(name))
             {
                 it.remove();
@@ -303,11 +308,11 @@ public class GameInfo extends Thread
         it = null;
         if (found)
         {
-            // System.out.println("reEnroll: Adding new user to players.");
+            LOGGER.log(Level.FINEST, "reEnroll: Adding new user to players.");
             players.add(newUser);
         }
 
-        // System.out.println("Players now: " + players.toString());
+        LOGGER.log(Level.FINEST, "Players now: " + players.toString());
         return found;
     }
 
@@ -465,17 +470,9 @@ public class GameInfo extends Thread
         return gi;
     }
 
-    /*
-     public boolean makeRunningGame(int port)
-     {
-     this.portNr = port;
-     return true;
-     }
-     */
-
     public void run_on_client()
     {
-        // System.out.println("Running game on client side - dummy");
+        // dummy
     }
 
     // ================= now the stuff for running the game on server side ===============
@@ -519,9 +516,8 @@ public class GameInfo extends Thread
 
         Runtime rt = Runtime.getRuntime();
 
-        String loggingFileArg = propFileOk ? "-Djava.util.logging.config.file="
-            + logPropFile
-            : "";
+        String loggingFileArg = propFileOk ?
+            "-Djava.util.logging.config.file=" + logPropFile : "";
 
         String command = javaCommand + " " + loggingFileArg + " -Duser.home="
             + gameDir + " -jar " + colossusJar + " -p " + portNr + " -n "
@@ -544,8 +540,8 @@ public class GameInfo extends Thread
         }
         catch (Exception e)
         {
-            System.out.println("Executing\n" + command
-                + "\ndid throw exception:\n" + e.toString());
+            LOGGER.log(Level.SEVERE,
+                "Executing\n  " + command + "\ndid throw exception", e);
         }
     }
 
@@ -553,13 +549,14 @@ public class GameInfo extends Thread
     {
 
         server.tellEnrolledGameStartsSoon(this);
-        // System.out.println("\nSeems starting game went ok, informing enrolled players!");
+        LOGGER.log(Level.FINEST,
+            "Seems starting game went ok, informing enrolled players!");
 
         int timeout = 30; // seconds
         boolean up = waitUntilReadyToAcceptClients(timeout);
         if (up)
         {
-            // System.out.println("Game is up - informing clients!");
+            LOGGER.log(Level.FINEST, "Game is up - informing clients!");
             server.tellEnrolledGameStartsNow(this, portNr);
             server.allTellGameInfo(this);
 
@@ -570,8 +567,8 @@ public class GameInfo extends Thread
             }
             else
             {
-                System.out
-                    .println("\n\n!!!!!!!!!!!!!!!!!\nSEVERE: game started but not all clients came in!!");
+                LOGGER.log(Level.SEVERE,
+                "  !!! game started but not all clients came in!!!");
             }
         }
         else
@@ -602,8 +599,8 @@ public class GameInfo extends Thread
 
             if (exitCode != 0)
             {
-                System.out.println("After waitFor... - exit code is "
-                    + exitCode);
+                LOGGER.log(Level.FINEST,
+                    "After waitFor... - exit code is " + exitCode);
             }
         }
         catch (InterruptedException e)
@@ -614,20 +611,18 @@ public class GameInfo extends Thread
 
         if (flagFile.exists())
         {
-            System.out
-                .println("Game " + gameId + " ended but flagfile "
-                    + flagFile.toString()
-                    + " does still exist...? Deleting it...");
+            LOGGER.log(Level.WARNING,
+                "Game " + gameId + " ended but flagfile " +
+                flagFile.toString() + " does still exist...? Deleting it...");
             flagFile.delete();
         }
         else
         {
-            // System.out.println("Game " + gameId + " ended and flagfile " + fileName +
-            //        " is gone. Fine!");
+            LOGGER.log(Level.FINEST,
+                "Game " + gameId + " ended and flagfile " +
+                flagFile.toString() + " is gone. Fine!");
         }
-
         server.unregisterGame(this, portNr);
-
     }
 
     private boolean createLoggingPropertiesFromTemplate(File logPropTemplate,
@@ -734,7 +729,6 @@ public class GameInfo extends Thread
             up = isSocketUp();
             if (!up)
             {
-                // System.out.println("GameInfo.waitURTAC(): socket not up yet - sleeping a second...");
                 sleepFor(1000);
             }
             i++;
@@ -756,7 +750,8 @@ public class GameInfo extends Thread
         }
         catch (IOException e1)
         {
-            System.out.println("wait for line: IOException: " + e1.toString());
+            LOGGER.log(Level.SEVERE,
+                "during wait for line: IOException: ", e1);
         }
         return line;
     }
@@ -775,14 +770,14 @@ public class GameInfo extends Thread
         }
         catch (FileNotFoundException ef)
         {
-            System.out.println("FATAL ERROR: FileNotFoundExcepton "
-                + ef.toString());
+            LOGGER.log(Level.SEVERE, 
+                "while waiting until game started successfully: ", ef);
         }
 
         if (in == null)
         {
-            System.out
-                .println("FATAL ERROR: could not open flagfile for reading!!");
+            LOGGER.log(Level.SEVERE,
+                "could not open flagfile for reading!!");
             return false;
         }
 
@@ -814,12 +809,13 @@ public class GameInfo extends Thread
 
         if (ok)
         {
-            System.out.println("Game started ok - fine!");
+            LOGGER.log(Level.FINEST, "Game started ok - fine!");
         }
         else
         {
-            // System.out.println("## RESULT: game started, but not all clients did connect");
-            // System.out.println("Got only " + connected + " players");
+            LOGGER.log(Level.WARNING,
+                "RESULT: game started, but not all clients did connect\n" +
+                "Got only " + connected + " players");
         }
 
         try
@@ -841,7 +837,8 @@ public class GameInfo extends Thread
         }
         catch (InterruptedException e)
         {
-            // System.out.println("InterruptException caught... ignoring it...");
+            LOGGER.log(Level.FINEST,
+                "sleepFor: InterruptException caught... ignoring it...");
         }
     }
 
@@ -910,7 +907,7 @@ public class GameInfo extends Thread
                 }
                 if (line != null && !this.toNull)
                 {
-                    System.out.println(prefix + line);
+                    LOGGER.log(Level.INFO, prefix + line);
                 }
             }
         }

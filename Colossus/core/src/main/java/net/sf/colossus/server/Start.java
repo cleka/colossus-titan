@@ -623,7 +623,7 @@ public final class Start
             if (!allGone)
             {
                 net.sf.colossus.webcommon.FinalizeManager
-                    .printStatistics(false);
+                    .printStatistics();
             }
             i++;
         }
@@ -643,7 +643,7 @@ public final class Start
                 SystemExitManager.waitReturnLoop(true);
             }
 
-            net.sf.colossus.webcommon.FinalizeManager.printStatistics(false);
+            net.sf.colossus.webcommon.FinalizeManager.printStatistics();
         }
 
         int cnt = SystemExitManager.getWaitingCnt();
@@ -954,7 +954,7 @@ public final class Start
 
         // SystemExitManager.waitReturnLoop(false);
 
-        net.sf.colossus.webcommon.FinalizeManager.printStatistics(false);
+        net.sf.colossus.webcommon.FinalizeManager.printStatistics();
 
         // If want to have a way to prevent it from straight exit,
         // e.g. look at it with Profiler when everything is supposed to
@@ -966,7 +966,7 @@ public final class Start
             SystemExitManager.waitReturn();
         }
 
-        System.out.println("Start.main() should end now by itself.");
+        System.out.println("\nStart.main() should end now by itself.");
 
         // JVM should do a clean exit now, no System.exit() needed.
         // @TODO: does it work on all platforms, all Java versions?

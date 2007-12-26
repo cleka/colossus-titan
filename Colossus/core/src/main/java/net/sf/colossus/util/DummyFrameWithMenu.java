@@ -3,6 +3,8 @@ package net.sf.colossus.util;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.JMenu;
@@ -113,7 +115,6 @@ public class DummyFrameWithMenu extends KFrame
             return;
         }
         disposed = true;
-        // swingCleanup();
         super.dispose();
     }
 
@@ -139,16 +140,11 @@ public class DummyFrameWithMenu extends KFrame
 
         SystemExitManager.waitReturn();
 
-        net.sf.colossus.webcommon.FinalizeManager.printStatistics(false);
-
-        System.out
-            .println("\nDummyFrameWithMenu.main() should end now by itself.");
+        net.sf.colossus.webcommon.FinalizeManager.printStatistics();
+        
+        Logger LOGGER =
+            Logger.getLogger(DummyFrameWithMenu.class.getName());
+        LOGGER.log(Level.FINEST,
+            "\nDummyFrameWithMenu.main() should end now by itself.");
     }
-
-    /*    
-     public void finalize()
-     {
-     System.out.println("finalize(): " + this.getClass().getName() + " " + id);
-     }
-     */
 }

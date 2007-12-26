@@ -35,9 +35,8 @@ import net.sf.colossus.webcommon.User;
 
 public class WebServer implements IWebServer, IRunWebServer
 {
-
-    private static final Logger LOGGER = Logger.getLogger(WebServer.class
-        .getName());
+    private static final Logger LOGGER =
+        Logger.getLogger(WebServer.class.getName());
 
     private WebServerOptions options = null;
     private PortBookKeeper portBookKeeper = null;

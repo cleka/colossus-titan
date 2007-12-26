@@ -3,6 +3,8 @@ package net.sf.colossus.webserver;
 
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 /** This class keeps track of which ports are currently occupied
@@ -14,6 +16,9 @@ import java.net.ServerSocket;
 
 public class PortBookKeeper
 {
+    private static final Logger LOGGER =
+        Logger.getLogger(PortBookKeeper.class.getName());
+
     private int portRangeFrom;
     private int availablePorts;
 
@@ -34,8 +39,6 @@ public class PortBookKeeper
 
     public int getFreePort()
     {
-        // System.out.println("searching a free port...");
-
         int port = -1;
         synchronized (portUsed)
         {
@@ -52,15 +55,14 @@ public class PortBookKeeper
                     }
                     else
                     {
-                        System.out
-                            .println("SEVERE: port "
-                                + tryPort
-                                + " is supposed to be free but test shows it is in use...");
+                        LOGGER.log(Level.SEVERE,
+                            "port " + tryPort + " is supposed to be free " +
+                            "but test shows it is in use?");
                     }
                 }
             }
         }
-        System.out.println("reserving port " + port);
+        LOGGER.log(Level.FINEST, "reserving port " + port);
 
         return port;
     }
@@ -75,10 +77,10 @@ public class PortBookKeeper
             serverSocket.setReuseAddress(true);
             ok = true;
         }
-        catch (IOException ex)
+        catch (IOException e)
         {
-            System.out.println("testThatPortReallyFree: IOException!");
-
+            LOGGER.log(Level.WARNING, "testThatPortReallyFree IOException " +
+                "while attempting to open", e);
         }
 
         try
@@ -88,12 +90,10 @@ public class PortBookKeeper
                 serverSocket.close();
             }
         }
-        catch (IOException ex)
+        catch (IOException e)
         {
-            System.out
-                .println("testThatPortReallyFree: anyway trying to close, "
-                    + "got: IOException!" + ex.toString());
-
+            LOGGER.log(Level.WARNING, "testThatPortReallyFree IOException " +
+                "while attempting to close", e);
         }
         return ok;
     }
@@ -103,18 +103,13 @@ public class PortBookKeeper
         int index = port - portRangeFrom;
         if (index < 0 || index > availablePorts)
         {
-            System.out.println("ERROR: attempt to release invalid port "
-                + port + " (index = " + index + ")!");
+            LOGGER.log(Level.WARNING,
+                "attempt to release invalid port " +
+                port + " (index = " + index + ")!");
         }
         else
         {
-            // System.out.println("Releasing port " + port);
             portUsed[index] = false;
         }
-    }
-
-    public void finalize()
-    {
-        // System.out.println("finalize(): " + this.getClass().getName());
     }
 }

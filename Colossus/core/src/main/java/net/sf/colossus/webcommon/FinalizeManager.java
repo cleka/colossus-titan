@@ -4,6 +4,8 @@ package net.sf.colossus.webcommon;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.WeakHashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 /**
@@ -32,19 +34,22 @@ import java.util.WeakHashMap;
 
 public class FinalizeManager
 {
+    private static final Logger LOGGER =
+        Logger.getLogger(FinalizeManager.class.getName());
+    
     private static WeakHashMap instanceGroups = new WeakHashMap();
 
     private static HashSet interestedIn = new HashSet();
     // private static String prefix = "net.sf.colossus.";
 
     private static boolean interestedInAll = true;
+    private static boolean ignoreDummyFrame = true;
 
     // if interestedInAll is false, then it registers only those
     // put into the HashSet with the block below:
     static
     {
         interestedIn.add("net.sf.colossus.server.Player");
-
         interestedIn.add("net.sf.colossus.client.Client");
         interestedIn.add("net.sf.colossus.client.SocketClientThread");
         interestedIn.add("net.sf.colossus.client.MasterBoard");
@@ -71,20 +76,21 @@ public class FinalizeManager
     {
         String type = o.getClass().getName();
         if ((interestedIn.contains(type) || interestedInAll)
-        //              &&  !type.equals("net.sf.colossus.util.DummyFrameWithMenu") 
-        )
+            && (ignoreDummyFrame || 
+                !type.equals("net.sf.colossus.util.DummyFrameWithMenu")))
         {
-            // System.out.println("Registering object of type " + type + " with id " + id);
+            LOGGER.log(Level.FINEST, "Registering object of type " + type
+                + " with id " + id);
             if (instanceGroups.containsKey(type))
             {
-                // System.out.println("Adding to existing group " + type);
+                LOGGER.log(Level.FINEST, "Adding to existing group " + type);
                 FinalizeClassGroup group = (FinalizeClassGroup)instanceGroups
                     .get(type);
                 group.addInstance(o, id);
             }
             else
             {
-                // System.out.println("Creating new group for " + type);
+                LOGGER.log(Level.FINEST, "Creating new group for " + type);
                 FinalizeClassGroup group = new FinalizeClassGroup(type);
                 group.addInstance(o, id);
                 instanceGroups.put(type, group);
@@ -92,19 +98,21 @@ public class FinalizeManager
         }
         else
         {
-            // System.out.println("NOT registering object of type " + type + " with id " + id);
+            LOGGER.log(Level.FINEST,
+                "NOT registering object of type " + type + " with id " + id);
         }
     }
 
     public static synchronized void setId(Object o, String id)
     {
         String type = o.getClass().getName();
-        // String shortType = FinalizeClassGroup.shortType(type);
+        String shortType = FinalizeClassGroup.shortType(type);
 
         if (interestedIn.contains(type))
         {
-            // System.out.println("FinalizeManager.setId(): One object of type " + 
-            //        shortType + " changes ID to '" + id + "'");
+            LOGGER.log(Level.FINEST, 
+                "FinalizeManager.setId(): One object of type " + 
+                shortType + " changes ID to '" + id + "'");
         }
 
         // nothing needs to be actually done, it will disappear by itself
@@ -122,37 +130,27 @@ public class FinalizeManager
         }
     }
 
-    public static synchronized void unregister(Object o)
+    public static synchronized void printStatistics()
     {
-        String type = o.getClass().getName();
-        //        String shortType = FinalizeClassGroup.shortType(type);
-
-        //        System.out.println("finalize(): One object of type " + shortType + " unregisters...");
-
-        // nothing needs to be actually done, it will disappear by itself
-        // from the WeakHashMap...
-
-        if (instanceGroups.containsKey(type))
-        {
-            //            FinalizeClassGroup group = (FinalizeClassGroup) instanceGroups.get(type);
-            //            group.removeInstance(o);
-            //            group.printStatistics(false);
-        }
+        String stat = getPrintStatistics();
+        LOGGER.log(Level.INFO, stat);
     }
-
-    public static synchronized void printStatistics(boolean detailed)
+    
+    private static synchronized String getPrintStatistics()
     {
-        System.out.println("==========\nObject instances statistics:");
+        StringBuffer stat = new StringBuffer();
+        stat.append("==========\nObject instances statistics:");
+
         Iterator it = instanceGroups.keySet().iterator();
         while (it.hasNext())
         {
             String type = (String)it.next();
-            FinalizeClassGroup group = (FinalizeClassGroup)instanceGroups
-                .get(type);
-            // System.out.println(group.toString());
-            group.printStatistics(detailed);
+            FinalizeClassGroup group =
+                (FinalizeClassGroup)instanceGroups.get(type);
+            stat.append(group.getPrintStatistics());
         }
-        System.out.println("\n");
+        stat.append("\n");
+        return stat.substring(0);
     }
 
     public static synchronized boolean allGone()

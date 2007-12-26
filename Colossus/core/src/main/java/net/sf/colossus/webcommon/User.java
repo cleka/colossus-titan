@@ -12,6 +12,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 /** One user at the WebServer side.
@@ -28,6 +30,9 @@ import java.util.Iterator;
 
 public class User
 {
+    private static final Logger LOGGER =
+        Logger.getLogger(User.class.getName());
+
     private static HashMap userMap = new HashMap();
     private static HashMap loggedInUserMap = new HashMap();
 
@@ -238,8 +243,9 @@ public class User
         String[] tokens = line.split(new String(sep));
         if (tokens.length != 5)
         {
-            System.out.println("invalid line '" + line + "' in user file.");
-            System.exit(1);
+            LOGGER.log(Level.WARNING,
+                "invalid line '" + line + "' in user file!");
+            return;
         }
         String name = tokens[0].trim();
         String password = tokens[1].trim();
@@ -257,7 +263,7 @@ public class User
         }
         else
         {
-            System.out.println("WARNING: invalid type '" + type
+            LOGGER.log(Level.WARNING, "invalid type '" + type
                 + "' in user file line '" + line + "'");
         }
         User u = new User(name, password, email, isAdmin, created);
@@ -279,11 +285,11 @@ public class User
             {
                 if (line.startsWith("#"))
                 {
-                    // System.out.println(filename+ ": ignoring comment line '" + line + "'");
+                    // ignore comment line
                 }
                 else if (line.matches(new String("\\s*")))
                 {
-                    // System.out.println(filename+ ": ignoring empty line '" + line + "'");
+                    // ignore empty line
                 }
                 else
                 {
@@ -293,14 +299,15 @@ public class User
         }
         catch (FileNotFoundException e)
         {
-            System.out
-                .println("ERROR: Users file " + filename + " not found!");
+            LOGGER.log(Level.SEVERE,
+                "Users file " + filename + " not found!", e);
             System.exit(1);
         }
         catch (IOException e)
         {
-            System.out.println("ERROR: IOException while reading users file "
-                + filename + "!");
+            LOGGER.log(Level.SEVERE,
+                "IOException while reading users file "
+                + filename + "!", e);
             System.exit(1);
         }
     }
@@ -321,12 +328,11 @@ public class User
 
         if (usersFile == null)
         {
-            System.out.println("ERROR: UsersFile name is null!");
+            LOGGER.log(Level.SEVERE, "UsersFile name is null!");
             System.exit(1);
         }
 
-        System.out.println("\n####\nStore users back to file " + filename
-            + "\n#####\n");
+        LOGGER.log(Level.FINE, "Storing users back to file " + filename);
 
         PrintWriter out = null;
         try
@@ -341,13 +347,12 @@ public class User
                 String line = user.makeLine();
                 out.println(line);
             }
-
             out.close();
         }
         catch (FileNotFoundException e)
         {
-            System.out.println("ERROR: Writing users file " + filename
-                + ": FileNotFoundException: " + e.toString());
+            LOGGER.log(Level.SEVERE, "Writing users file " + filename +
+                "failed: FileNotFoundException: ", e);
             System.exit(1);
         }
     }
