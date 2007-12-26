@@ -36,6 +36,7 @@ import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
 import javax.swing.border.TitledBorder;
 
+import net.sf.colossus.server.Constants;
 import net.sf.colossus.util.KDialog;
 import net.sf.colossus.util.Options;
 
@@ -87,6 +88,7 @@ final class EventViewer extends KDialog implements WindowListener,
     private final static String windowTitle = "Event Viewer";
 
     private IOptions options;
+    private Client client;
     private SaveWindow saveWindow;
 
     private boolean visible;
@@ -137,19 +139,37 @@ final class EventViewer extends KDialog implements WindowListener,
     // how many back are currently displayed
     private int maxTurns = 1;
 
+    
+    private int mulliganOldRoll = -2;
+    
+    private String attackerId;
+    private String defenderId;
+    
+    private RevealEvent attackerEventLegion = null;
+    private RevealEvent defenderEventLegion = null;
+
+    private RevealEvent lastAttackerEventLegion = null;
+    private RevealEvent lastDefenderEventLegion = null;
+
+    private RevealEvent winnerLegion = null;
+    private RevealEvent loserLegion = null;
+
+    
     /** 
      * Inits the dialog, not necessarily displays it.
      * 
      * @param frame is the parent window frame (MasterBoard)
-     * @param options IOptions reference to the client 
+     * @param options IOptions reference to the client
+     * @param client The client, needed to ask all kind of info  
      */
 
-    EventViewer(final JFrame frame, final IOptions options)
+    EventViewer(final JFrame frame, final IOptions options, Client client)
     {
         super(frame, windowTitle, false);
         setFocusable(false);
 
         this.options = options;
+        this.client = client;
 
         initExpireTurnsFromOptions();
 
@@ -617,8 +637,39 @@ final class EventViewer extends KDialog implements WindowListener,
         this.repaint();
     }
 
+    // Helper methods to ask something from client:
+    private int getActivePlayerNum()
+    {
+        return client.getActivePlayerNum();
+    }
+
+    private LegionInfo getLegionInfo(String marker)
+    {
+        return client.getLegionInfo(marker);
+    }
+
+    // shortcuts:
+    private void newRollEvent(int eventType, int roll1, int roll2)
+    {
+        RevealEvent e = new RevealEvent(client, client.getTurnNumber(),
+            getActivePlayerNum(), eventType, roll1, roll2);
+        addEvent(e);    
+    }
+
+    // creature related event:
+    private void newEvent(int eventType, String markerId1, int height1,
+        ArrayList rcList, String markerId2, int height2)
+    {
+        RevealEvent e = new RevealEvent(client, client.getTurnNumber(),
+            getActivePlayerNum(), eventType, markerId1, height1, rcList,
+            markerId2, height2);
+        addEvent(e);
+    }
+
+    // Now come the methods with which Client can add/modify event data:
     public void turnOrPlayerChange(Client client, int turnNr, int playerNr)
     {
+        setMulliganOldRoll(-2);
         if (turnNr != this.turnNr)
         {
             RevealEvent e = new RevealEvent(client, turnNr, playerNr,
@@ -655,7 +706,404 @@ final class EventViewer extends KDialog implements WindowListener,
             //       so no update needed at all.
         }
     }
+    
+    public void setMulliganOldRoll(int roll)
+    {
+        mulliganOldRoll = roll;    
+    }
 
+    public void tellMovementRoll(int roll)
+    {
+        // if oldroll is -2, this is the first roll;
+        // otherwise, player took mulligan.
+        if (mulliganOldRoll == -2)
+        {
+            mulliganOldRoll = roll;
+            newRollEvent(RevealEvent.eventMoveRoll, roll, -1);
+        }
+        else
+        {
+            newRollEvent(RevealEvent.eventMulligan, mulliganOldRoll, roll);
+        }
+    }
+
+    public void tellEngagement(String attackerId, String defenderId,
+        int turnNumber)
+    {
+        this.attackerId = attackerId;
+        this.defenderId = defenderId;
+        
+        attackerEventLegion = new RevealEvent(client, turnNumber,
+            getActivePlayerNum(), RevealEvent.eventBattle, attackerId,
+            getLegionInfo(attackerId).getHeight(), new ArrayList(),
+            null, 0);
+        attackerEventLegion.setEventInfo(Constants.reasonBattleStarts);
+        attackerEventLegion
+            .setRealPlayer(client.getPlayerNameByMarkerId(attackerId));
+
+        defenderEventLegion = new RevealEvent(client, turnNumber,
+            getActivePlayerNum(), RevealEvent.eventBattle, defenderId,
+            getLegionInfo(defenderId).getHeight(), new ArrayList(),
+            null, 0);
+
+        defenderEventLegion.setEventInfo(Constants.reasonBattleStarts);
+        defenderEventLegion
+            .setRealPlayer(client.getPlayerNameByMarkerId(defenderId));
+    }
+    
+    public void tellEngagementResults(String winnerId,
+        String method, int turns)
+    {
+        // if those are not set, we are new version client with old
+        // version server, who does not provide the reason argument
+        // to some other methods; then they do not set up those
+        // eventLegions we would need here. So, can't do anything.
+        if (attackerEventLegion == null || defenderEventLegion == null)
+        {
+            LOGGER.log(Level.FINEST,
+                "tellEngagementResultHandling, both are null");
+            return;
+        }
+
+        if (winnerId == null)
+        {
+            LOGGER.log(Level.FINEST, "winnerId is null value");
+        }
+        else if (winnerId.equals("null"))
+        {
+            LOGGER.log(Level.FINEST, "winnerId is string 'null'");
+        }
+        else
+        {
+            LOGGER.log(Level.FINEST, "winnerId is '" + winnerId + "'");
+        }
+
+        if (winnerId == null || winnerId.equals("null"))
+        {
+            // null value = normal mutual
+            // string with content "null": one legion contained titan, 
+            // titan killed, some others survived, 
+            // titan-killing-legion eliminated.
+            // The above is for normal game. What if load from history??
+            LOGGER.log(Level.FINEST, "tellEngagementResultHandling, winner "
+                + (winnerId == null ? null : "string 'null'"));
+
+            // mutual elimination
+            // attackerEventLegion.setAllDead();
+            attackerEventLegion.setEventType(RevealEvent.eventLost);
+            attackerEventLegion.setEventInfo("mutual");
+            addEvent(attackerEventLegion);
+           
+            // defenderEventLegion.setAllDead();
+            defenderEventLegion.setEventType(RevealEvent.eventLost);
+            defenderEventLegion.setEventInfo("mutual");
+            addEvent(defenderEventLegion);
+        }
+        else
+        {
+            LOGGER.log(Level.INFO, "tellEngagementResultHandling, winner = "
+                + winnerId);
+            if (winnerId.equals(this.attackerId))
+            { // attacker won:
+                winnerLegion = attackerEventLegion;
+                loserLegion = defenderEventLegion;
+            }
+            else
+            { // defender
+                winnerLegion = defenderEventLegion;
+                loserLegion = attackerEventLegion;
+            }
+
+            // fled or concession there didn't come removeCreature messages,
+            // thus make sure they are really shown dead.
+            loserLegion.setAllDead();
+            loserLegion.setEventType(RevealEvent.eventLost);
+            if (turns > 7)
+            {
+                method = Constants.erMethodTimeLoss;
+            }
+            loserLegion.setEventInfo(method);
+            addEvent(loserLegion);
+
+            int winnerHeight = getLegionInfo(winnerId).getHeight();
+            int winnerEventHeight = winnerLegion.getHeight();
+            if (winnerEventHeight != winnerHeight)
+            {
+                if (winnerEventHeight != 0)
+                {
+                    // @TODO: is that a problem?
+                    LOGGER.log(Level.FINEST, "Winner legion " + winnerId
+                        + " event height mismatch: Eventheight="
+                        + winnerLegion.getHeight() + ", actual height="
+                        + winnerHeight);
+                }
+            }
+            winnerLegion.setEventType(RevealEvent.eventWon);
+            winnerLegion.setEventInfo(method);
+            addEvent(winnerLegion);
+        }
+
+        lastAttackerEventLegion = attackerEventLegion;
+        lastDefenderEventLegion = defenderEventLegion;
+
+        attackerEventLegion = null;
+        defenderEventLegion = null;
+        winnerLegion = null;
+        loserLegion = null;
+    }
+    
+    public void newCreatureRevealEvent(int eventType, String markerId1, 
+        int height1, String creature, String markerId2, int height2)
+    {
+        RevealedCreature rc = new RevealedCreature(creature);
+        switch(eventType)
+        {
+            case RevealEvent.eventSummon:
+                rc.setWasSummoned(true);
+                break;
+            case RevealEvent.eventTeleport:
+                rc.setDidTeleport(true);
+                break;
+            default:
+                LOGGER.log(Level.SEVERE, "Invalid event type " +
+                    RevealEvent.getEventTypeText(eventType) +
+                    " in newCreatureRevealEvent: markerId " + markerId1 +
+                    ", creature " + creature);  
+        }
+
+        ArrayList rcList = new ArrayList(1);
+        rcList.add(rc);
+
+        newEvent(eventType, markerId1, height1, rcList, markerId2, height2);
+    }
+
+    public void newSplitEvent(String markerId1, int height1,
+        ArrayList rcList, String markerId2, int height2)
+    {
+        RevealEvent e = new RevealEvent(client, client.getTurnNumber(),
+            getActivePlayerNum(), RevealEvent.eventSplit, markerId1, height1,
+            rcList, markerId2, height2);
+        addEvent(e);
+    }
+
+    public void revealCreatures(String markerId, final List names,
+        String reason)
+    {
+        // EventViewer stuff:
+        // looks as if right now we need this revealedInfo only for
+        // engagements in which we are envolved.
+        // E.g. recruit info is handled by separate didRecruit...
+
+        // If this player is involved in an engagement, then server reveals 
+        // us the opponent, and our own legion we know anyway.
+        // Thus, update the knownCreatures info in the events so that both
+        // the attacker and defender are known in EventViewer (in THIS client)
+        if (reason.equals(Constants.reasonEngaged))
+        {
+            RevealEvent ownEvent = null;
+            RevealEvent otherEvent = null;
+
+            if (markerId.equals(attackerId))
+            {
+                otherEvent = attackerEventLegion;
+                ownEvent = defenderEventLegion;
+            }
+            else if (markerId.equals(defenderId))
+            {
+                otherEvent = defenderEventLegion;
+                ownEvent = attackerEventLegion;
+            }
+            // else: Fine as well. Client just not involved in this engagement.
+
+            if (otherEvent != null)
+            {
+                ArrayList rcNames = new ArrayList();
+                Iterator it = names.iterator();
+                while (it.hasNext())
+                {
+                    String name = (String)it.next();
+                    RevealedCreature rc = new RevealedCreature(name);
+                    rcNames.add(rc);
+                }
+                otherEvent.updateKnownCreatures(rcNames);
+            }
+            if (ownEvent != null)
+            {
+                String ownMarkerId = ownEvent.getMarkerId();
+                LegionInfo info = getLegionInfo(ownMarkerId);
+                List ownNames = info.getContents();
+                ArrayList rcNames = new ArrayList();
+                Iterator it = ownNames.iterator();
+                while (it.hasNext())
+                {
+                    String name = (String)it.next();
+                    RevealedCreature rc = new RevealedCreature(name);
+                    rcNames.add(rc);
+                }
+                ownEvent.updateKnownCreatures(rcNames);
+            }
+        }
+    }
+    
+    public void revealEngagedCreatures(final List names,
+        boolean isAttacker, String reason)
+    {
+        // can't do anything if (old) server or history do not provide 
+        // us the reason
+        if (reason == null || reason.equals("<Unknown>"))
+        {
+            return;
+        }
+
+        if (reason.equals(Constants.reasonBattleStarts)
+            || reason.equals(Constants.reasonFled)
+            || reason.equals(Constants.reasonConcession))
+        {
+            RevealEvent event;
+            event = isAttacker ? attackerEventLegion : defenderEventLegion;
+
+            ArrayList rcNames = new ArrayList();
+            Iterator it = names.iterator();
+            while (it.hasNext())
+            {
+                String name = (String)it.next();
+                RevealedCreature rc = new RevealedCreature(name);
+                rcNames.add(rc);
+            }
+
+            event.updateKnownCreatures(rcNames);
+            event.setEventInfo(reason);
+        }
+        else
+        {
+            // perhaps load from history?
+            LOGGER.log(Level.SEVERE, "revealEngagedCreatures, unknown reason "
+                + reason);
+        }
+    }
+
+    public void addCreature(String markerId, String name, String reason)
+    {
+        RevealEvent battleEvent = null;
+        if (attackerEventLegion != null
+            && attackerEventLegion.getMarkerId().equals(markerId))
+        {
+            battleEvent = attackerEventLegion;
+
+        }
+        else if (defenderEventLegion != null
+            && defenderEventLegion.getMarkerId().equals(markerId))
+        {
+            battleEvent = defenderEventLegion;
+        }
+
+        if (battleEvent != null)
+        {
+            RevealedCreature rc = new RevealedCreature(name);
+            rc.setReason(reason);
+            battleEvent.addCreature(rc);
+        }
+        else
+        {
+            // no battle events where to add creature
+        }
+
+        // create also the separate acquire event:
+        if (reason.equals(Constants.reasonAcquire))
+        {
+            int newHeight = getLegionInfo(markerId).getHeight();
+            RevealedCreature rc = new RevealedCreature(name);
+            rc.setWasAcquired(true);
+            ArrayList rcList = new ArrayList(1);
+            rcList.add(rc);
+            newEvent(RevealEvent.eventAcquire, markerId,
+                newHeight, rcList, null, 0);
+
+            if (attackerEventLegion == null || defenderEventLegion == null)
+            {
+                // This should now never happen any more:
+                LOGGER.log(Level.SEVERE, "no attacker nor defender " +
+                    " legion event for acquiring!!" +
+                    " turn" + client.getTurnNumber() +
+                    " player " + client.getActivePlayerName() +
+                    " phase " + client.getPhase() + " markerid " + markerId +
+                    " marker owner" +
+                    getLegionInfo(markerId).getPlayerName() +
+                    "last engagement were" + " attacker " +
+                    lastAttackerEventLegion.getMarkerId() + " defender " +
+                    lastDefenderEventLegion.getMarkerId());
+                System.exit(1);
+            }
+        }
+        else if (reason.equals(Constants.reasonUndoSummon))
+        {
+            // addCreature adds summoned creature back to donor:
+            undoEvent(RevealEvent.eventSummon, markerId, null,
+                client.getTurnNumber());
+            if (!attackerEventLegion.undoSummon(client.getTurnNumber(), name))
+            {
+                // this should never happen...
+                LOGGER.log(Level.WARNING, "Un-Summon " + name
+                    + " out of attacker event failed!");
+            }
+        }
+    }
+    
+    public void removeCreature(String markerId, String name)
+    {
+        if (attackerId != null && attackerEventLegion != null
+            && attackerId.equals(markerId))
+        {
+            LOGGER.log(Level.FINEST, "During battle, remove creature " + name
+                + " from attacker legion " + markerId);
+
+            attackerEventLegion.setCreatureDied(name, getLegionInfo(
+                attackerId).getHeight());
+        }
+
+        else if (defenderId != null && defenderEventLegion != null
+            && defenderId.equals(markerId))
+        {
+            LOGGER.log(Level.FINEST, "During battle, remove creature " + name
+                + " from defender legion " + markerId);
+            defenderEventLegion.setCreatureDied(name, getLegionInfo(
+                defenderId).getHeight());
+        }
+    }
+
+    public void recruitEvent(String markerId, int height, String recruitName,
+        List recruiters)
+    {
+        ArrayList rcList = new ArrayList();
+        RevealedCreature rc;
+
+        Iterator it = recruiters.iterator();
+        while (it.hasNext())
+        {
+            String recruiterName = (String)it.next();
+            rc = new RevealedCreature(recruiterName);
+            rc.setDidRecruit(true);
+            rcList.add(rc);
+        }
+    
+        rc = new RevealedCreature(recruitName);
+        rc.setWasRecruited(true);
+        rcList.add(rc);
+
+        newEvent(RevealEvent.eventRecruit, markerId, height, rcList, null, 0);
+    }
+    
+    // next two are for removeDeadBattleChits:
+    public void attackerSetCreatureDead(String name, int height)
+    {
+        attackerEventLegion.setCreatureDied(name, height);
+    }
+
+    public void defenderSetCreatureDead(String name, int height)
+    {
+        defenderEventLegion.setCreatureDied(name, height);
+    }
+        
     /*
      * User undid one action. Event is just marked as undone, but not deleted
      * - information once revealed is known to the public, as in real life :) 
@@ -785,6 +1233,7 @@ final class EventViewer extends KDialog implements WindowListener,
         }
     }
 
+    // Now the methods for internal data management:
     /* throw away all events which are expireTurns turns older
      * than the given turnNr/playerNr combination.
      */
@@ -832,6 +1281,13 @@ final class EventViewer extends KDialog implements WindowListener,
             displayQueue.clear();
         }
         this.options = null;
+        this.client = null;
+        
+        attackerEventLegion = null;
+        defenderEventLegion = null;
+
+        lastAttackerEventLegion = null;
+        lastDefenderEventLegion = null;
     }
 
     public void dispose()
