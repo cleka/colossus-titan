@@ -122,6 +122,8 @@ public final class MasterBoard extends JPanel
     /** our own little bar implementation */
     private BottomBar bottomBar;
 
+    private KFrame preferencesWindow;
+    
     public static final String saveGameAs = "Save game as";
 
     public static final String clearRecruitChits = "Clear recruit chits";
@@ -142,6 +144,7 @@ public final class MasterBoard extends JPanel
     public static final String changeScale = "Change Scale";
 
     public static final String chooseScreen = "Choose Screen For Info Windows";
+    public static final String preferences = "Preferences";
 
     public static final String about = "About";
     public static final String viewReadme = "Show Variant Readme";
@@ -172,6 +175,8 @@ public final class MasterBoard extends JPanel
 
     private AbstractAction chooseScreenAction;
 
+    private AbstractAction preferencesAction;
+    
     private AbstractAction aboutAction;
     private AbstractAction viewReadmeAction;
     private AbstractAction viewHelpDocAction;
@@ -409,6 +414,8 @@ public final class MasterBoard extends JPanel
         setupPopupMenu();
         setupTopMenu();
 
+        preferencesWindow = new PreferencesWindow(client);
+        
         scrollPane = new JScrollPane(this);
         contentPane.add(scrollPane, BorderLayout.CENTER);
 
@@ -787,6 +794,14 @@ public final class MasterBoard extends JPanel
             }
         };
 
+        preferencesAction = new AbstractAction(preferences)
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                preferencesWindow.setVisible(true);
+            }
+        };
+
         aboutAction = new AbstractAction(about)
         {
             public void actionPerformed(ActionEvent e)
@@ -1023,6 +1038,14 @@ public final class MasterBoard extends JPanel
             lfMenu.add(temp);
             temp.setState(lfInfo[i].getName().equals(currentLF));
         }
+
+        // Setting menu
+        JMenu settingsMenu = new JMenu("Settings");
+        settingsMenu.setMnemonic(KeyEvent.VK_S);
+        menuBar.add(settingsMenu);
+
+        mi = settingsMenu.add(preferencesAction);
+        mi.setMnemonic(KeyEvent.VK_P);
 
         // Then help menu
         JMenu helpMenu = new JMenu("Help");
@@ -2520,6 +2543,9 @@ public final class MasterBoard extends JPanel
 
     public void dispose()
     {
+        preferencesWindow.dispose();
+        preferencesWindow = null;
+
         setVisible(false);
         setEnabled(false);
         saveWindow.saveLocation(masterFrame.getLocation());
@@ -2531,6 +2557,7 @@ public final class MasterBoard extends JPanel
         masterFrame.dispose();
         masterFrame = null;
         scrollPane = null;
+        
         removeKeyListener(this.iph);
         if (showReadme != null)
         {
@@ -2618,6 +2645,27 @@ public final class MasterBoard extends JPanel
         {
             requestFocus();
             getFrame().toFront();
+        }
+    }
+
+    class PreferencesWindow extends KFrame
+    {
+        public PreferencesWindow(IOptions options)
+        {
+            super("Preferences");
+            getContentPane().add(new JLabel("Dummy"));
+            
+            setDefaultCloseOperation(KFrame.HIDE_ON_CLOSE);
+            pack();
+            
+            setPreferredSize(getSize());
+            
+            useSaveWindow(options, "Preferences", null);
+        }
+        
+        public void dispose()
+        {
+            super.dispose();
         }
     }
 
