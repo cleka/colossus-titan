@@ -40,19 +40,7 @@ public class ViableEntityManager
 
     private static WeakHashMap viableEntities = new WeakHashMap();
     private static int waiting = 0;
-    private static int exitCode = 0;
     private static Object mutex = new Object();
-    
-    public static int getWaitingCnt()
-    {
-        return waiting;
-    }
-    
-    // currently not used anywhere...
-    public static int getExitCode()
-    {
-        return exitCode;
-    }
     
     public static synchronized void register(Object viableEntity, String name)
     {
@@ -61,11 +49,8 @@ public class ViableEntityManager
             viableEntities.size() + " entities registered.");
     }
 
-    public static synchronized void doSystemExitMaybe(Object viableEntity,
-        int exitCode)
+    public static synchronized void unregister(Object viableEntity)
     {
-        ViableEntityManager.exitCode = exitCode;
-
         if (viableEntities.containsKey(viableEntity))
         {
             viableEntities.remove(viableEntity);
@@ -91,6 +76,11 @@ public class ViableEntityManager
         }
     }
 
+    public static int getWaitingCnt()
+    {
+        return waiting;
+    }
+    
     public static void waitUntilAllGone()
     {
         synchronized (viableEntities)
