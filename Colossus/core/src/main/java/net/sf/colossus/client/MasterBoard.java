@@ -3,11 +3,13 @@ package net.sf.colossus.client;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GraphicsEnvironment;
+import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.Toolkit;
@@ -42,9 +44,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -59,6 +65,7 @@ import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
+import javax.swing.border.TitledBorder;
 
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.VariantSupport;
@@ -961,9 +968,7 @@ public final class MasterBoard extends JPanel
         addCheckBox(graphicsMenu, Options.useOverlay, KeyEvent.VK_V);
         addCheckBox(graphicsMenu, Options.useSVG, KeyEvent.VK_S);
         addCheckBox(graphicsMenu, Options.noBaseColor, KeyEvent.VK_W);
-        addCheckBox(graphicsMenu, Options.useColoredBorders, 0);
-        addCheckBox(graphicsMenu, Options.doNotInvertDefender, 0);
-        addCheckBox(graphicsMenu, Options.hideAdjStrikeDiceRangeStrike, 0);
+        
         graphicsMenu.addSeparator();
 
         // The "dubious as blanks" option makes only sense with the 
@@ -2650,12 +2655,25 @@ public final class MasterBoard extends JPanel
 
     class PreferencesWindow extends KFrame
     {
+        private IOptions options;
+        
+        private Map prefCheckboxes = new HashMap();
+        
+        private JButton closeButton;
+        
+        private AbstractAction closePrefsAction;
+        
         public PreferencesWindow(IOptions options)
         {
             super("Preferences");
+            this.options = options;
+            
             getContentPane().add(new JLabel("Dummy"));
             
             setDefaultCloseOperation(KFrame.HIDE_ON_CLOSE);
+            
+            setupGUI();
+            
             pack();
             
             setPreferredSize(getSize());
@@ -2663,10 +2681,102 @@ public final class MasterBoard extends JPanel
             useSaveWindow(options, "Preferences", null);
         }
         
+        private ItemListener prefItemHandler = new PrefWindowItemHandler();
+
+        public ItemListener getItemHandler()
+        {
+            return prefItemHandler;
+        }
+        
+        private JCheckBox addCheckBox(Container pane, String name)
+        {
+            JCheckBox cb = new JCheckBox(name);
+            cb.setSelected(options.getOption(name));
+
+            cb.addItemListener(prefItemHandler);
+            pane.add(cb);
+            prefCheckboxes.put(name, cb);
+            return cb;
+        }
+
+        private void setupGUI()
+        {
+            Container prefPane = new Box(BoxLayout.Y_AXIS);
+            getContentPane().setLayout(new BorderLayout());
+            getContentPane().add(prefPane, BorderLayout.CENTER);
+           
+            // Battle Map settings:
+            JPanel battlePane = new JPanel(new GridLayout(0, 1));
+            battlePane.setBorder(new TitledBorder("Battle Map"));
+            addCheckBox(battlePane, Options.useColoredBorders);
+            addCheckBox(battlePane, Options.doNotInvertDefender);
+            addCheckBox(battlePane, Options.hideAdjStrikeDiceRangeStrike);
+            prefPane.add(battlePane);
+            
+            // Autoplay settings:
+            JPanel apPane = new JPanel(new GridLayout(0, 1));
+            apPane.setBorder(new TitledBorder("Autoplay"));
+            addCheckBox(apPane, Options.autoPickColor);
+            addCheckBox(apPane, Options.autoPickMarker);
+            addCheckBox(apPane, Options.autoPickEntrySide);
+            addCheckBox(apPane, Options.autoForcedStrike);
+            addCheckBox(apPane, Options.autoCarrySingle);
+            addCheckBox(apPane, Options.autoRangeSingle);
+            addCheckBox(apPane, Options.autoSummonAngels);
+            addCheckBox(apPane, Options.autoAcquireAngels);
+            addCheckBox(apPane, Options.autoRecruit);
+            addCheckBox(apPane, Options.autoPickRecruiter);
+            addCheckBox(apPane, Options.autoReinforce);
+            addCheckBox(apPane, Options.autoPlay);
+            prefPane.add(apPane);
+
+            prefPane.add(Box.createVerticalGlue());
+            
+            closePrefsAction = new AbstractAction("Close")
+            {
+                public void actionPerformed(ActionEvent e)
+                {
+                    setVisible(false);
+                }
+            };
+
+            closeButton = new JButton(closePrefsAction);
+            getContentPane().add(closeButton, BorderLayout.SOUTH);
+        }
+        
+        private void cleanPrefCBListeners()
+        {
+            Iterator it = prefCheckboxes.keySet().iterator();
+            while (it.hasNext())
+            {
+                String key = (String)it.next();
+                JCheckBox cb = (JCheckBox)prefCheckboxes.get(key);
+                cb.removeItemListener(prefItemHandler);
+            }
+            prefCheckboxes.clear();
+            prefCheckboxes = null;
+            prefItemHandler = null;
+        }
+
         public void dispose()
         {
+            cleanPrefCBListeners();
+            prefItemHandler = null;
             super.dispose();
+            options = null;
         }
+        
+        class PrefWindowItemHandler implements ItemListener
+        {
+            public void itemStateChanged(ItemEvent e)
+            {
+                JCheckBox source = (JCheckBox)e.getSource();
+                String text = source.getText();
+                boolean selected = (e.getStateChange() == ItemEvent.SELECTED);
+                client.setOption(text, selected);
+            }
+        }
+
     }
 
     class BottomBar extends JPanel
