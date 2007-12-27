@@ -238,7 +238,7 @@ public final class Client implements IClient, IOracle, IOptions
                 Start.setCurrentWhatToDoNext(Start.NetClientDialog);
             }
             failed = true;
-            ViableEntityManager.doSystemExitMaybe(this, 0);
+            ViableEntityManager.unregister(this);
         }
         else
         {
@@ -1304,7 +1304,7 @@ public final class Client implements IClient, IOracle, IOptions
                 LOGGER.log(Level.SEVERE, "During close in client "
                     + playerName + ": got Exception!!!" + e.toString(), e);
             }
-            ViableEntityManager.doSystemExitMaybe(this, 0);
+            ViableEntityManager.unregister(this);
         }
     }
 

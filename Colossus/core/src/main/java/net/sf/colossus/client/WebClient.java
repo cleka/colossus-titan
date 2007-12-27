@@ -1059,7 +1059,7 @@ public class WebClient extends KFrame implements WindowListener,
             gamesUpdates.clear();
         }
 
-        ViableEntityManager.doSystemExitMaybe(this, 0);
+        ViableEntityManager.unregister(this);
     }
 
     public void updateGUI()

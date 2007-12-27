@@ -165,7 +165,7 @@ public final class Game
         server.cleanup();
         server = null;
 
-        ViableEntityManager.doSystemExitMaybe(this, 0);
+        ViableEntityManager.unregister(this);
     }
 
     private synchronized void clearFlags()

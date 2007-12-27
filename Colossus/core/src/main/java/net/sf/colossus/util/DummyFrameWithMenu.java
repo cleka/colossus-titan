@@ -128,7 +128,7 @@ public class DummyFrameWithMenu extends KFrame
         DummyFrameWithMenu f2 = new DummyFrameWithMenu("2");
         DummyFrameWithMenu f3 = new DummyFrameWithMenu("3");
 
-        ViableEntityManager.waitReturn();
+        DebugMethods.waitReturn();
 
         f3.dispose();
         f2.dispose();
@@ -138,7 +138,7 @@ public class DummyFrameWithMenu extends KFrame
         f1 = null;
         f2 = null;
 
-        ViableEntityManager.waitReturn();
+        DebugMethods.waitReturn();
 
         net.sf.colossus.webcommon.FinalizeManager.printStatistics();
         

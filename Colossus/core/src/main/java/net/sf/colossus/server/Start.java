@@ -11,6 +11,7 @@ import java.util.logging.Logger;
 import net.sf.colossus.client.Client;
 import net.sf.colossus.client.StartClient;
 import net.sf.colossus.client.WebClient;
+import net.sf.colossus.util.DebugMethods;
 import net.sf.colossus.util.Options;
 import net.sf.colossus.util.ViableEntityManager;
 
@@ -640,7 +641,7 @@ public final class Start
 
             if (false)
             {
-                ViableEntityManager.waitReturnLoop(true);
+                DebugMethods.waitReturnLoop(true);
             }
 
             net.sf.colossus.webcommon.FinalizeManager.printStatistics();
@@ -952,7 +953,7 @@ public final class Start
 
         waitLoopUntilAllIsCleanedUp();
 
-        // ViableEntityManager.waitReturnLoop(false);
+        // DebugMethods.waitReturnLoop(false);
 
         net.sf.colossus.webcommon.FinalizeManager.printStatistics();
 
@@ -963,7 +964,7 @@ public final class Start
         if (waitReturnBeforeExiting)
         {
             System.out.println("OK, after next RETURN it will really end.");
-            ViableEntityManager.waitReturn();
+            DebugMethods.waitReturn();
         }
 
         System.out.println("\nStart.main() should end now by itself.");
