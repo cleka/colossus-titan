@@ -9,6 +9,8 @@ import java.io.InterruptedIOException;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.SocketException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import net.sf.colossus.webcommon.GameInfo;
 import net.sf.colossus.webcommon.IWebClient;
@@ -29,6 +31,9 @@ import net.sf.colossus.webcommon.User;
 
 public class WebServerClientSocketThread extends Thread implements IWebClient
 {
+    private static final Logger LOGGER =
+        Logger.getLogger(WebServerClientSocketThread.class.getName());
+
     private WebServer server;
     private Socket socket;
     private InputStream is;
@@ -69,8 +74,8 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
         }
         catch (IOException ex)
         {
-            System.out.println("Rejecting a user did throw exception: "
-                + ex.toString());
+            LOGGER.log(Level.WARNING,
+                "Rejecting a user did throw exception: ", ex);
         }
     }
 
@@ -110,7 +115,8 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
     {
         String fromClient = "dummy";
 
-        // System.out.println("A new WSCST started running: " + this.toString());
+        LOGGER.log(Level.FINEST,
+            "A new WSCST started running: " + this.toString());
         try
         {
             is = socket.getInputStream();
@@ -119,8 +125,8 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
         }
         catch (IOException ex)
         {
-            System.out.println("Preparing socket streams caused IOException: "
-                + ex.toString());
+            LOGGER.log(Level.WARNING,
+                "Preparing socket streams caused IOException: ", ex);
             return;
         }
 
@@ -156,20 +162,19 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
                 }
                 else
                 {
-                    // System.out.println("Interrupted");
+                    LOGGER.log(Level.FINEST, "Interrupted");
                 }
             }
             catch (Exception e)
             {
-                System.out.println("WebServerClientSocketThread in read "
-                    + "loop, whatever Exception" + e.toString());
-                Thread.dumpStack();
+                LOGGER.log(Level.SEVERE,
+                    "WebServerClientSocketThread in read loop", e);
             }
 
             if (fromClient != null)
             {
                 done = parseLine(fromClient);
-                // System.out.println("parseLine returns done = " + done);
+                LOGGER.log(Level.FINEST, "parseLine returns done = " + done);
             }
             else
             {
@@ -180,7 +185,7 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
         withdrawFromServer();
 
         // Shut down the client.
-        // System.out.println("(Trying to) shut down the client.");
+        LOGGER.log(Level.FINEST, "(Trying to) shut down the client.");
         try
         {
             out.println(connectionClosed);
@@ -188,8 +193,8 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
         }
         catch (IOException ex)
         {
-            System.out.println("socket.close caused IOException: "
-                + ex.toString());
+            LOGGER.log(Level.WARNING,
+                "IOException while closing connection", ex);
         }
 
         // if did not log in (wrong password, or duplicate name and without force,
@@ -228,7 +233,7 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
 
         if (!loggedIn && command.equals(IWebServer.Login))
         {
-            // System.out.println("client attempts login.");
+            LOGGER.log(Level.FINEST, "client attempts login.");
             ok = false;
             if (tokens.length >= 3)
             {
@@ -264,7 +269,7 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
                     }
                     else
                     {
-                        // System.out.println("ok, not logged in yet");
+                        LOGGER.log(Level.FINEST, "ok, not logged in yet");
                     }
                 }
 
@@ -407,14 +412,14 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
             }
             else
             {
-                System.out.println("Non-admin user " + user.getName()
+                LOGGER.log(Level.INFO, "Non-admin user " + user.getName()
                     + " requested shutdown - ignored.");
             }
         }
         else
         {
-            System.out.println("Unexpected command '" + command
-                + "' from client");
+            LOGGER.log(Level.INFO,
+                "Unexpected command '" + command + "' from client");
             ok = false;
         }
 
@@ -422,19 +427,19 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
         {
             if (command.equals(IWebServer.Logout))
             {
-                // Client cannont handle both the ACK:Logout and
+                // Client cannot handle both the ACK:Logout and
                 // ConnectionClosed before connection is gone...
                 // so don't send a ACK for this one.
             }
             else
             {
-                //                System.out.println("ACK: " + command + sep + reason);
+                LOGGER.log(Level.FINEST, "ACK: " + command + sep + reason);
                 out.println("ACK: " + command + sep + reason);
             }
         }
         else
         {
-            //            System.out.println("NACK: " + command + sep + reason);
+            LOGGER.log(Level.FINEST, "NACK: " + command + sep + reason);
             out.println("NACK: " + command + sep + reason);
         }
 
@@ -445,7 +450,8 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
 
         if (ok && loggedIn && command.equals(IWebServer.Login))
         {
-            // System.out.println("a new user logged in, sending proposed Games");
+            LOGGER.log(Level.FINEST,
+                "a new user logged in, sending proposed Games");
             if (user.isAdmin())
             {
                 grantAdminStatus();
@@ -470,7 +476,8 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
     {
         if (other == null)
         {
-            System.out.println("In forceLogout(), parameter other is null!");
+            LOGGER.log(Level.WARNING,
+                "In forceLogout(), parameter other is null!");
             return;
         }
 
@@ -481,31 +488,27 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
             {
                 other.interrupt();
             }
-            // It's funny. It seems the interrupt above always gives a null pointer
-            // exception, but the interrupting has done it's job anyway...
             catch (NullPointerException e)
             {
-                // System.out.println("all right, the familiar NPE here...");
+                // It's funny. It seems the interrupt above always gives a 
+                // null pointer exception, but the interrupting has done
+                // it's job anyway...
             }
             catch (Exception e)
             {
-                System.out
-                    .println("Different exception than usual while tried to interrupt 'other': "
-                        + e.toString());
+                LOGGER.log(Level.WARNING,
+                    "Different exception than usual while tried to " + 
+                    "interrupt 'other': ", e);
             }
 
-            // System.out.println("after tellToTerminate");
-            // System.out.println("In CST before join");
+            // LOGGER.log(Level.FINEST, "In CST before join");
             other.join();
-            // System.out.println("In CST after  join");
-
+            // LOGGER.log(Level.FINEST, "In CST after  join");
         }
         catch (Exception e)
         {
-            System.out
-                .println("Oups couldn't stop the other WebServerClientSocketThread"
-                    + e);
-            Thread.dumpStack();
+            LOGGER.log(Level.WARNING,
+                "Oups couldn't stop the other WebServerClientSocketThread", e);
         }
 
         this.loggedIn = false;
@@ -560,8 +563,9 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
     public void chatDeliver(String chatId, long when, String sender,
         String message, boolean resent)
     {
-        //        System.out.println("WSCST.chatDeliver() to client " + user.getName() + ": "+ chatId + ", " + sender + 
-        //                ": " + message);
+        LOGGER.log(Level.FINEST,
+            "chatDeliver() to client " + user.getName() + ": "+ chatId +
+            ", " + sender + ": " + message);
         sendToClient(chatDeliver + sep + chatId + sep + when + sep + sender
             + sep + message + sep + resent);
     }
@@ -570,7 +574,7 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
     {
         if (false)
         {
-            System.out.println("finalize(): " + this.getClass().getName()
+            LOGGER.log(Level.FINE, "finalize(): " + this.getClass().getName()
                 + " for user " + this.cachedUsername);
         }
     }

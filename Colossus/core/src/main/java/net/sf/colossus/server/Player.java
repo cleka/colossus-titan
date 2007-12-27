@@ -774,8 +774,6 @@ public final class Player implements Comparable
 
         game.getServer().allUpdatePlayerInfo();
 
-        // Handy during stresstesting...
-        // System.out.println(getName() + " dies.");
         LOGGER.log(Level.INFO, getName() + " dies");
         game.getServer().allTellPlayerElim(name, slayerName, true);
 

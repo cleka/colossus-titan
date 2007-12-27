@@ -82,8 +82,8 @@ public class WebServer implements IWebServer, IRunWebServer
 
         WebServer server = new WebServer(optionsFileName);
 
-        // System.out.println("before init socket");
-        server.initSocketServer();
+        LOGGER.log(Level.FINEST, "before init socket");
+        server.runSocketServer();
 
         // execution comes to here only when server is shut down
         // (shutDownRequested set to true, so that the loop quits)
@@ -98,7 +98,8 @@ public class WebServer implements IWebServer, IRunWebServer
         }
         System.gc();
         System.runFinalization();
-        System.out.println("WebServer.main() will end...");
+        
+        LOGGER.log(Level.ALL, "WebServer.main() will end...");
 
         // JVM should do a clean exit now, no System.exit() needed.
         // @TODO: does it work on all platforms, all Java versions?
@@ -129,7 +130,8 @@ public class WebServer implements IWebServer, IRunWebServer
 
         User.readUsersFromFile(usersFile, maxUsers);
 
-        System.out.println("OK: port " + port + ", maxClients " + maxClients);
+        LOGGER.log(Level.ALL, "Server started: port " + port +
+            ", maxClients " + maxClients);
 
         long now = new Date().getTime();
         ChatMessage startMsg = new ChatMessage(IWebServer.generalChatName,
@@ -161,15 +163,15 @@ public class WebServer implements IWebServer, IRunWebServer
             + maxClients + " , port = " + port);
     }
 
-    void initSocketServer()
+    void runSocketServer()
     {
         numClients = 0;
 
-        int socketQueueLen = options
-            .getIntOptionNoUndef(WebServerConstants.optSocketQueueLen);
+        int socketQueueLen =
+            options.getIntOptionNoUndef(WebServerConstants.optSocketQueueLen);
 
-        LOGGER.log(Level.FINEST, "About to create server socket on port "
-            + port);
+        LOGGER.log(Level.FINEST,
+            "About to create server socket on port " + port);
         try
         {
             if (serverSocket != null)
@@ -195,12 +197,12 @@ public class WebServer implements IWebServer, IRunWebServer
             boolean rejected = waitForUser();
             if (rejected)
             {
-                // System.out.println("accepted one client but rejected " + 
-                //        "it - maxClients limit reached.");
+                LOGGER.log(Level.FINEST, "accepted one client but " + 
+                    "rejected it - maxClients limit reached.");
             }
             else
             {
-                // System.out.println("added one client");
+                LOGGER.log(Level.FINEST, "added one client");
             }
         }
 
@@ -233,8 +235,7 @@ public class WebServer implements IWebServer, IRunWebServer
         }
         catch (Exception e)
         {
-            System.out.println("initiateShutdown - got exception "
-                + e.toString());
+            LOGGER.log(Level.WARNING, "exception in initiateShutdown() ", e);
         }
     }
 
@@ -257,8 +258,7 @@ public class WebServer implements IWebServer, IRunWebServer
         // UnknownHostException, IOException, IllegalBlockingModeException
         catch (Exception e)
         {
-            System.out.println("WebServer.initiateShutdown: got exception "
-                + e.toString());
+            LOGGER.log(Level.WARNING, "exception in makeDummyConnection", e);
         }
     }
 
@@ -346,27 +346,27 @@ public class WebServer implements IWebServer, IRunWebServer
             {
                 thread.interrupt();
             }
-            // It's funny. It seems the interrupt above always gives a null pointer
-            // exception, but the interrupting has done it's job anyway...
             catch (NullPointerException e)
             {
-                System.out.println("all right, the familiar NPE here...");
+                // It's funny. It seems the interrupt above always gives a 
+                // null pointer exception, but the interrupting has done 
+                // it's job anyway...
             }
             catch (Exception e)
             {
-                System.out
-                    .println("Different exception than usual while tried to interrupt 'other': "
-                        + e.toString());
+                LOGGER.log(Level.WARNING, "Different exception than usual " +
+                    "while tried to interrupt 'other': ", e);
             }
 
-            // System.out.println("WebServer.closeAllWscst's: before join");
+            LOGGER.log(Level.FINEST, "WebServer.closeAllWscst's: before join");
             try
             {
                 thread.join();
             }
             catch (InterruptedException e)
             {
-                System.out.println("thread.join() interrupted?? Well...");
+                LOGGER.log(Level.FINE,
+                    "thread.join() interrupted?? Ignoring it.", e);
             }
         }
 
@@ -429,8 +429,9 @@ public class WebServer implements IWebServer, IRunWebServer
             GameInfo gi = (GameInfo)it.next();
             if (gi.isEnrolled(newUser))
             {
-                // System.out.println("\n++++\nTelling user " + newUser.getName() + 
-                //        " that he is still enrolled in game " + gi.getGameId());
+                LOGGER.log(Level.FINEST,
+                    "Telling user " + newUser.getName() + 
+                    " that he is still enrolled in game " + gi.getGameId());
                 // userMap finds already new user for that name
                 client.didEnroll(gi.getGameId(), newUser.getName());
             }
@@ -462,8 +463,8 @@ public class WebServer implements IWebServer, IRunWebServer
 
     public void gameFailed(GameInfo gi, String reason)
     {
-        System.out
-            .println("GAME starting/running failed!!! Reason: " + reason);
+        LOGGER.log(Level.WARNING,
+            "GAME starting/running failed!!! Reason: " + reason);
     }
 
     public void tellEnrolledGameStartsSoon(GameInfo gi)
@@ -575,13 +576,11 @@ public class WebServer implements IWebServer, IRunWebServer
         {
             boolean success = startOneGame(gi);
 
-            // System.out.println("Found gi, got port " + port);
+            LOGGER.log(Level.FINEST, "Found gi, got port " + port);
             if (!success)
             {
-                System.out
-                    .println("\n#####\nWebServer, fatal error: "
-                        + "starting/running game " + gameId
-                        + " failed!!\n#####\n");
+                LOGGER.log(Level.SEVERE,
+                    "\nstarting/running game " + gameId + " failed!!\n");
             }
         }
     }
@@ -603,8 +602,8 @@ public class WebServer implements IWebServer, IRunWebServer
         }
         else
         {
-            System.out.println("Chat for chatId " + chatId
-                + " not implemented.");
+            LOGGER.log(Level.WARNING,
+                "Chat for chatId " + chatId + " not implemented.");
         }
     }
 
@@ -618,8 +617,8 @@ public class WebServer implements IWebServer, IRunWebServer
         }
         else
         {
-            System.out.println("tellLastChatMessagesToOne: illegal chat id "
-                + chatId + " - doing nothing");
+            LOGGER.log(Level.WARNING, "tellLastChatMessagesToOne: " +
+                "illegal chat id " + chatId + " - doing nothing");
             return;
         }
         IWebClient client = cst;
@@ -698,28 +697,32 @@ public class WebServer implements IWebServer, IRunWebServer
         int port = portBookKeeper.getFreePort();
         if (port == -1)
         {
-            System.out.println("No free ports!!");
+            LOGGER.log(Level.SEVERE, "No free ports!!");
             return false;
         }
 
-        // System.out.println("Running a game...");
-        String workFilesBaseDir = getStringOption(WebServerConstants.optWorkFilesBaseDir);
-        String template = getStringOption(WebServerConstants.optLogPropTemplate);
-        String javaCommand = getStringOption(WebServerConstants.optJavaCommand);
-        String colossusJar = getStringOption(WebServerConstants.optColossusJar);
+        LOGGER.log(Level.FINEST, "startOneGame, id " + gi.getGameId());
+        String workFilesBaseDir =
+            getStringOption(WebServerConstants.optWorkFilesBaseDir);
+        String template =
+            getStringOption(WebServerConstants.optLogPropTemplate);
+        String javaCommand =
+            getStringOption(WebServerConstants.optJavaCommand);
+        String colossusJar =
+            getStringOption(WebServerConstants.optColossusJar);
 
         boolean ok = gi.makeRunningGame(this, workFilesBaseDir, template,
             javaCommand, colossusJar, port);
 
         if (!ok)
         {
-            System.out.println("makeRunningGame returned false?!?");
+            LOGGER.log(Level.WARNING, "makeRunningGame returned false?!?");
             return false;
         }
         else
         {
             gi.start();
-            // System.out.println("Returned from starter");
+            LOGGER.log(Level.FINEST, "Returned from starter");
 
             potentialGames.remove(gi);
             runningGames.add(gi);
@@ -727,7 +730,7 @@ public class WebServer implements IWebServer, IRunWebServer
             updateGUI();
         }
 
-        // System.out.println("port is " + port);
+        LOGGER.log(Level.FINEST, "port is " + port);
         success = true;
         return success;
     }
@@ -743,10 +746,10 @@ public class WebServer implements IWebServer, IRunWebServer
 
         synchronized (runningGames)
         {
-            // System.out.println("trying to remove...");
+            LOGGER.log(Level.FINEST, "trying to remove...");
             if (runningGames.contains(st))
             {
-                // System.out.println("removing...");
+                LOGGER.log(Level.FINEST, "removing...");
                 runningGames.remove(st);
             }
         }
@@ -759,142 +762,11 @@ public class WebServer implements IWebServer, IRunWebServer
 
         GameThreadReaper r = new GameThreadReaper();
         r.start();
-        // System.out.println("GameThreadReaper started");
+        LOGGER.log(Level.FINEST, "GameThreadReaper started");
 
         updateGUI();
 
     }
-
-    // #####################################################################
-
-    /*  
-     // was used during development, commandline control    
-     private void console()
-     {
-     String currentLine;
-     
-     try
-     {
-     System.out.print("> ");
-     
-     BufferedReader in = new BufferedReader(  
-     new InputStreamReader(System.in));
-     
-     boolean done = false;
-     
-     while (! done)
-     {
-     if ( in.ready() )
-     {
-     currentLine = in.readLine ();
-     // System.out.println ("GOT: '" + currentLine + "'");
-     if (currentLine.equals("run"))
-     {
-     System.out.println("run command not in use...");
-     // startGame(2, 0);
-     
-     }
-     
-     else if (currentLine.equals("quit") || currentLine.equals("q"))
-     {
-     done = true;
-     System.exit(0);
-     }
-     else if (currentLine.equals(""))
-     {
-     // do nothing...                 
-     }
-     else if (currentLine.equals("status"))
-     {
-     status();
-     }
-     else
-     {
-     System.out.println("???");
-     }
-     
-     System.out.print("> ");
-     }
-     
-     else
-     {
-
-     Thread.sleep(10);
-     }
-
-     boolean didSomething = gameReaper();
-     if (didSomething)
-     {
-     System.out.println();
-     System.out.print("> ");
-     }
-     }
-     
-     }
-     catch(Exception e)
-     {
-     System.out.println("Caught exception: " + e.toString());
-     }
-     
-     System.out.println("After loop - console exiting.");
-     
-     }
-     */
-
-    /*  
-     // was used during development, commandline control
-     public void status()
-     {
-     int cnt = Thread.activeCount();
-     System.out.println("Active count: " + cnt);
-     
-     ThreadGroup tg = Thread.currentThread().getThreadGroup();
-     System.out.println(tg.toString());
-     
-     Thread list[] = new Thread[tg.activeCount()];
-     tg.enumerate(list);
-     
-     for (int i = 0; i < list.length; i++) {
-     Thread t = (Thread) list[i];
-     System.out.println("Thread: " + t.getName());
-     }
-     
-     System.out.println();
-     System.out.println("> ");
-     }
-     */
-
-    /*    
-     // used during development from commandline control
-     public void startGame(int players, int ais)
-     {
-     System.out.println("Running a game...");
-     RunningGame runningGame = new RunningGame(this, players, ais);
-     if (runningGame == null )
-     {
-     System.out.println("new STarter(...) returned null ?!?");
-     }
-     else if (runningGame.getPort() == -1)
-     {
-     System.out.println("new RunningGame failed: port == -1 !!");
-     if (runningGame.isAlive())
-     {
-     System.out.println("still alive ?");
-     }
-     else
-     {
-     System.out.println("thread has ended... fine.");
-     }
-     }
-     else
-     {
-     runningGame.start();    
-     System.out.println("Returned from starter");
-     runningGames.add(runningGame);
-     }
-
-     }
-     */
 
     /**
      * A Null Object for the web server GUI interface.
@@ -953,10 +825,10 @@ public class WebServer implements IWebServer, IRunWebServer
             }
             catch (IOException e)
             {
-                System.out.println("Couldn't read options from " + filename);
+                LOGGER.log(Level.SEVERE, 
+                    "Couldn't read options from " + filename, e);
                 return;
             }
-
         }
 
         public void setOption(String optname, String value)
@@ -1007,8 +879,8 @@ public class WebServer implements IWebServer, IRunWebServer
             int val = getIntOption(optname);
             if (val == -1)
             {
-                System.out.println("Invalid or not set value for " + optname
-                    + " from WebServer config file " + filename);
+                LOGGER.log(Level.SEVERE, "Invalid or not set value for " +
+                    optname + " from WebServer config file " + filename);
                 System.exit(1);
             }
             return val;
@@ -1018,7 +890,6 @@ public class WebServer implements IWebServer, IRunWebServer
         {
             props.remove(optname);
         }
-
     }
 
     public String getStringOption(String key)
@@ -1053,26 +924,26 @@ public class WebServer implements IWebServer, IRunWebServer
                     {
                         GameInfo game = (GameInfo)it.next();
                         String name = game.getName();
-                        System.out.println("REAPER: wait for '" + name
-                            + "' to end...");
+                        LOGGER.log(Level.FINE,
+                            "REAPER: wait for '" + name + "' to end...");
                         try
                         {
                             game.join();
-                            System.out.println("        ok, ended...");
+                            LOGGER.log(Level.FINE, "        ok, ended...");
                         }
                         catch (InterruptedException e)
                         {
-                            System.out.println("Ups??? Catched exception "
-                                + e.toString());
+                            LOGGER.log(Level.WARNING,
+                                "Ups??? Catched exception ", e);
                         }
                         it.remove();
                     }
 
-                    // System.out.println("Reaper ended");
+                    LOGGER.log(Level.FINEST, "Reaper ended");
                 }
                 else
                 {
-                    System.out.println("Reaper: nothing to do...");
+                    // nothing to do
                 }
 
                 if (didSomething)
@@ -1081,12 +952,7 @@ public class WebServer implements IWebServer, IRunWebServer
                 }
             }
 
-            // System.out.println("GameThreadReaper ending");
-        }
-
-        public void finalize()
-        {
-            // System.out.println("finalize(): " + this.getClass().getName());
+            LOGGER.log(Level.FINEST, "GameThreadReaper ending");
         }
     }
 
@@ -1124,11 +990,6 @@ public class WebServer implements IWebServer, IRunWebServer
         public String getMessage()
         {
             return this.message;
-        }
-
-        public void finalize()
-        {
-            // System.out.println("finalize(): " + this.getClass().getName());
         }
     }
 

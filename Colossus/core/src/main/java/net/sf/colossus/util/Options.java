@@ -433,21 +433,16 @@ public final class Options implements IOptions
             {
                 int i = Integer.parseInt(propHowMany);
                 howMany = i;
-
-                System.out.println("\nNOTE: Using value " + i
-                    + " from property " + propNameStresstestRounds
-                    + " as counter for stresstest, "
-                    + "how many rounds to do inside one JVM run.\n");
             }
             catch (NumberFormatException ex)
             {
                 howMany = 1;
-                System.out.println("\nNOTE: Value '" + propHowMany
-                    + "' from property " + propNameStresstestRounds
-                    + " is not a valid number - using default value 1!\n");
+                LOGGER.log(Level.WARNING,
+                    "NOTE: Value '" + propHowMany + "' from property " +
+                    propNameStresstestRounds +
+                    " is not a valid number - using default value 1!");
             }
         }
         return howMany;
     }
-
 }

@@ -3,6 +3,8 @@ package net.sf.colossus.util;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 /** Keeps track of children threads (usually the socket threads), 
@@ -25,6 +27,9 @@ import java.util.Iterator;
 
 public class ChildThreadManager
 {
+    private static final Logger LOGGER =
+        Logger.getLogger(ChildThreadManager.class.getName());
+
     private ArrayList childThreads;
     private ArrayList unregisteringChilds;
 
@@ -144,8 +149,8 @@ public class ChildThreadManager
         printdebug("unregisterFromTM " + child);
         unregisteringChilds.add(child);
 
-        printdebug("Unregistrering list now: "
-            + unregisteringChilds.toString());
+        printdebug("Unregistrering list now: " + 
+            unregisteringChilds.toString());
         printdebug("Still alive    list now: " + childThreads.toString());
         printdebug("Callin notify...");
         this.notify();
@@ -161,7 +166,7 @@ public class ChildThreadManager
     {
         if (debug)
         {
-            System.out.println("CTM " + id + ": " + message);
+            LOGGER.log(Level.FINEST, "CTM " + id + ": " + message);
         }
     }
 }

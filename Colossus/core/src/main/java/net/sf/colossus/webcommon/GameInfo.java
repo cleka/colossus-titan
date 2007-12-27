@@ -358,8 +358,8 @@ public class GameInfo extends Thread
                 enrolledPlayers--;
                 if (players.size() != enrolledPlayers)
                 {
-                    System.out
-                        .println("\n\nSEVERE: players.size() != enrolledPlayers!!");
+                    LOGGER.log(Level.SEVERE,
+                        "players.size() != enrolledPlayers!!");
                 }
             }
             else
@@ -568,13 +568,12 @@ public class GameInfo extends Thread
             else
             {
                 LOGGER.log(Level.SEVERE,
-                "  !!! game started but not all clients came in!!!");
+                    "  !!! game started but not all clients came in!!!");
             }
         }
         else
         {
-            System.out
-                .println("\n\n!!!!!!!!!!!!!!!!!\nSEVERE: game did not came up!!");
+            LOGGER.log(Level.SEVERE, "game did not came up!!!");
         }
 
     }
@@ -590,7 +589,8 @@ public class GameInfo extends Thread
         }
         catch (Exception e)
         {
-            System.err.println(e.toString());
+            LOGGER.log(Level.SEVERE,
+                "Exception durimg waitForGameShutdown", e);
         }
 
         try

@@ -119,7 +119,7 @@ public class SwingReferenceCleanupHacks
         }
         catch (Exception e)
         {
-            //      System.out.println(e)
+            // ignored...
         }
     }
 
