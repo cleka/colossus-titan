@@ -85,7 +85,6 @@ public class WebClient extends KFrame implements WindowListener,
     private Options options;
     private Client gameClient;
 
-    private SaveWindow saveWindow;
     private RegisterPasswordPanel registerPanel;
 
     private final static int NotLoggedIn = 1;
@@ -794,10 +793,7 @@ public class WebClient extends KFrame implements WindowListener,
         addWindowListener(this);
         pack();
 
-        // Finishing:
-        this.saveWindow = new SaveWindow(options, "WebClient");
-        saveWindow.restore(this, defaultLocation);
-
+        useSaveWindow(options, "WebClient", defaultLocation);
         setVisible(true);
     }
 
@@ -1039,7 +1035,8 @@ public class WebClient extends KFrame implements WindowListener,
             doLogout();
         }
 
-        saveWindow.save(this);
+        super.dispose();
+        
         int min = ((Integer)spinner1.getValue()).intValue();
         int target = ((Integer)spinner2.getValue()).intValue();
         int max = ((Integer)spinner3.getValue()).intValue();
@@ -1062,7 +1059,6 @@ public class WebClient extends KFrame implements WindowListener,
             gamesUpdates.clear();
         }
 
-        super.dispose();
         SystemExitManager.doSystemExitMaybe(this, 0);
     }
 
