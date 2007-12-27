@@ -22,18 +22,19 @@ import java.util.logging.Logger;
  *  was dead and you closed that MasterBoard, the whole application
  *  did exit.
  *  
- *  Now, each of those tells the SystemExitManager "I'm done",
+ *  Now, each of those tells the ViableEntityManager "I'm done",
  *  and if the last one says so, THEN the System.exit() is 
- *  actually executed.
+ *  actually executed. Or rather, nowadays, the main() thread
+ *  can go on, come up with a menu again or something.
  *  
  *  @version $Id$
  *  @author Clemens Katzer
  */
 
-public class SystemExitManager
+public class ViableEntityManager
 {
     private static final Logger LOGGER =
-        Logger.getLogger(SystemExitManager.class.getName());
+        Logger.getLogger(ViableEntityManager.class.getName());
 
     private static boolean debug = false;
 
@@ -56,14 +57,14 @@ public class SystemExitManager
     public static synchronized void register(Object viableEntity, String name)
     {
         viableEntities.put(viableEntity, name);
-        LOGGER.log(Level.FINEST, "SystemExitManager: now " +
+        LOGGER.log(Level.FINEST, "ViableEntityManager: now " +
             viableEntities.size() + " entities registered.");
     }
 
     public static synchronized void doSystemExitMaybe(Object viableEntity,
         int exitCode)
     {
-        SystemExitManager.exitCode = exitCode;
+        ViableEntityManager.exitCode = exitCode;
 
         if (viableEntities.containsKey(viableEntity))
         {
@@ -85,7 +86,7 @@ public class SystemExitManager
         {
             int count = viableEntities.size();
             String list = viableEntities.values().toString();
-            LOGGER.log(Level.FINEST, "SystemExitManager: now " + count +
+            LOGGER.log(Level.FINEST, "ViableEntityManager: now " + count +
                 " entities registered: " + list);
         }
     }
@@ -149,7 +150,7 @@ public class SystemExitManager
             }
         }
 
-        System.out.println("SystemExitManager.waitReturn(), run by thread " +
+        System.out.println("ViableEntityManager.waitReturn(), run by thread " +
             Thread.currentThread().getName());
         System.out.println("\n----------\nStart.main() has done it's job\n");
 

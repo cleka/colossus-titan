@@ -42,7 +42,7 @@ import net.sf.colossus.util.LogWindow;
 import net.sf.colossus.util.Options;
 import net.sf.colossus.util.ResourceLoader;
 import net.sf.colossus.util.Split;
-import net.sf.colossus.util.SystemExitManager;
+import net.sf.colossus.util.ViableEntityManager;
 import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
 
@@ -209,7 +209,7 @@ public final class Client implements IClient, IOracle, IOptions
         this.startedByWebClient = byWebClient;
         this.threadMgr = new ChildThreadManager("Client " + playerName);
 
-        SystemExitManager.register(this, "Client " + playerName);
+        ViableEntityManager.register(this, "Client " + playerName);
         net.sf.colossus.webcommon.FinalizeManager.register(this, "Client "
             + playerName);
 
@@ -238,7 +238,7 @@ public final class Client implements IClient, IOracle, IOptions
                 Start.setCurrentWhatToDoNext(Start.NetClientDialog);
             }
             failed = true;
-            SystemExitManager.doSystemExitMaybe(this, 0);
+            ViableEntityManager.doSystemExitMaybe(this, 0);
         }
         else
         {
@@ -1304,7 +1304,7 @@ public final class Client implements IClient, IOracle, IOptions
                 LOGGER.log(Level.SEVERE, "During close in client "
                     + playerName + ": got Exception!!!" + e.toString(), e);
             }
-            SystemExitManager.doSystemExitMaybe(this, 0);
+            ViableEntityManager.doSystemExitMaybe(this, 0);
         }
     }
 

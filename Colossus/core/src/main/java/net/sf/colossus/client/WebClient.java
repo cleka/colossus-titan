@@ -55,7 +55,7 @@ import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.Start;
 import net.sf.colossus.util.KFrame;
 import net.sf.colossus.util.Options;
-import net.sf.colossus.util.SystemExitManager;
+import net.sf.colossus.util.ViableEntityManager;
 import net.sf.colossus.webcommon.GameInfo;
 import net.sf.colossus.webcommon.IWebClient;
 import net.sf.colossus.webcommon.IWebServer;
@@ -239,7 +239,7 @@ public class WebClient extends KFrame implements WindowListener,
         // arguments, loaded from cf file, or reasonable default.
         initValues(hostname, port, login, password);
 
-        SystemExitManager.register(this, "WebClient " + login);
+        ViableEntityManager.register(this, "WebClient " + login);
         net.sf.colossus.webcommon.FinalizeManager.register(this, "WebClient "
             + login);
 
@@ -1059,7 +1059,7 @@ public class WebClient extends KFrame implements WindowListener,
             gamesUpdates.clear();
         }
 
-        SystemExitManager.doSystemExitMaybe(this, 0);
+        ViableEntityManager.doSystemExitMaybe(this, 0);
     }
 
     public void updateGUI()

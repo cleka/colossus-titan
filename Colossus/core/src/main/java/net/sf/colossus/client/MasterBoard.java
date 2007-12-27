@@ -615,7 +615,7 @@ public final class MasterBoard extends JPanel
         /*
          * After confirmation (if necessary, i.e. not gameover yet), 
          * totally quit everything (shut down server and all windows)
-         * so that the SystemExitManager knows it can let the main
+         * so that the ViableEntityManager knows it can let the main
          * go to the end, ending the JVM. 
          */
         quitGameAction = new AbstractAction(Constants.quitGame)

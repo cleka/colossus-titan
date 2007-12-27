@@ -31,7 +31,7 @@ import net.sf.colossus.client.Proposal;
 import net.sf.colossus.util.Options;
 import net.sf.colossus.util.ResourceLoader;
 import net.sf.colossus.util.Split;
-import net.sf.colossus.util.SystemExitManager;
+import net.sf.colossus.util.ViableEntityManager;
 import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
 import org.jdom.Attribute;
@@ -150,7 +150,7 @@ public final class Game
             notifyWebServer.readyToAcceptClients();
             if (server.waitForClients())
             {
-                SystemExitManager.register(this, "Server/Game " + gameId);
+                ViableEntityManager.register(this, "Server/Game " + gameId);
             }
         }
         catch (Exception e)
@@ -165,7 +165,7 @@ public final class Game
         server.cleanup();
         server = null;
 
-        SystemExitManager.doSystemExitMaybe(this, 0);
+        ViableEntityManager.doSystemExitMaybe(this, 0);
     }
 
     private synchronized void clearFlags()

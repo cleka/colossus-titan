@@ -12,7 +12,7 @@ import net.sf.colossus.client.Client;
 import net.sf.colossus.client.StartClient;
 import net.sf.colossus.client.WebClient;
 import net.sf.colossus.util.Options;
-import net.sf.colossus.util.SystemExitManager;
+import net.sf.colossus.util.ViableEntityManager;
 
 import com.werken.opt.CommandLine;
 import com.werken.opt.Option;
@@ -640,17 +640,17 @@ public final class Start
 
             if (false)
             {
-                SystemExitManager.waitReturnLoop(true);
+                ViableEntityManager.waitReturnLoop(true);
             }
 
             net.sf.colossus.webcommon.FinalizeManager.printStatistics();
         }
 
-        int cnt = SystemExitManager.getWaitingCnt();
+        int cnt = ViableEntityManager.getWaitingCnt();
         if (cnt > 0)
         {
             System.out
-                .println("\n!!!!\nNOTE: SystemExitManager waiting count != 0: "
+                .println("\n!!!!\nNOTE: ViableEntityManager waiting count != 0: "
                     + cnt);
         }
 
@@ -667,7 +667,7 @@ public final class Start
 
         // Actually it's nowadays not necessary in any case
         // - at least in Java 1.4.2.
-        // SystemExitManager.InterruptAWTThreads();
+        // ViableEntityManager.InterruptAWTThreads();
     }
 
     // 
@@ -920,7 +920,7 @@ public final class Start
             }
             else
             {
-                SystemExitManager.waitUntilAllGone();
+                ViableEntityManager.waitUntilAllGone();
             }
 
             game = null;
@@ -952,7 +952,7 @@ public final class Start
 
         waitLoopUntilAllIsCleanedUp();
 
-        // SystemExitManager.waitReturnLoop(false);
+        // ViableEntityManager.waitReturnLoop(false);
 
         net.sf.colossus.webcommon.FinalizeManager.printStatistics();
 
@@ -963,7 +963,7 @@ public final class Start
         if (waitReturnBeforeExiting)
         {
             System.out.println("OK, after next RETURN it will really end.");
-            SystemExitManager.waitReturn();
+            ViableEntityManager.waitReturn();
         }
 
         System.out.println("\nStart.main() should end now by itself.");
