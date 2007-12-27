@@ -9,6 +9,8 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.Creature;
@@ -29,6 +31,9 @@ import net.sf.colossus.util.HTMLColor;
 
 public final class BattleChit extends Chit
 {
+    private static final Logger LOGGER =
+        Logger.getLogger(BattleChit.class.getName());
+
     private final int tag;
     private static Font font;
     private static Font oldFont;
@@ -56,6 +61,11 @@ public final class BattleChit extends Chit
         String currentHexLabel, String colorName, Client client)
     {
         super(scale, id, inverted);
+        if (id == null)
+        {
+            LOGGER.log(Level.WARNING,
+                "Created BattleChit with null id!");
+        }
         this.scale = scale;
         this.tag = tag;
         this.currentHexLabel = currentHexLabel;
@@ -145,11 +155,16 @@ public final class BattleChit extends Chit
 
     public String getCreatureName()
     {
-        if (getId().startsWith(Constants.titan))
+        String id = getId();
+        if (id == null)
+        {
+            LOGGER.log(Level.SEVERE, "Chit.getId() returned null id ?");
+        }
+        else if (id.startsWith(Constants.titan))
         {
             return Constants.titan;
         }
-        return getId();
+        return id;
     }
 
     public String getName()

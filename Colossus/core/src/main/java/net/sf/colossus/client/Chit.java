@@ -7,6 +7,7 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.LayoutManager;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
@@ -77,9 +78,8 @@ class Chit extends JPanel
     Chit(int scale, String id, boolean inverted, boolean dubious,
         boolean dubiousAsBlank)
     {
-        super();
-
-        setLayout(null); // we want to place things ourselves
+        // LayoutManager null - we want to place things ourselves
+        super((LayoutManager)null);
 
         this.id = id;
         this.inverted = inverted;
@@ -202,12 +202,20 @@ class Chit extends JPanel
 
     String getId()
     {
+        if (id == null)
+        {
+            // this should never happen, since id is initialized
+            // already from beginning on, still someone gets a NPE
+            // just for this id; perhaps due to using GTK L&F ? 
+            LOGGER.log(Level.SEVERE, "Chit id is still null ?");
+            id = "<notdefined?>";
+        }
         return id;
     }
 
     public String toString()
     {
-        return id;
+        return getId();
     }
 
     void rescale(int scale)
