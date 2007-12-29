@@ -801,16 +801,13 @@ public final class Client implements IClient, IOracle, IOptions
         }
         else if (optname.equals(Options.logDebug))
         {
-            // XXX move this to server
-            // XXX Now this uses JDK logging should this be moved
-            // to the server still?
             if (bval)
             {
-                Logger.global.setLevel(Level.ALL);
+                Logger.getLogger("net.sf.colossus").setLevel(Level.ALL);
             }
             else
             {
-                Logger.global.setLevel(Level.INFO);
+                Logger.getLogger("net.sf.colossus").setLevel(Level.OFF);
             }
         }
         else if (optname.equals(Options.showCaretaker))
