@@ -53,7 +53,7 @@ public class FinalizeManager
         interestedIn.add("net.sf.colossus.client.Client");
         interestedIn.add("net.sf.colossus.client.SocketClientThread");
         interestedIn.add("net.sf.colossus.client.MasterBoard");
-        interestedIn.add("net.sf.colossus.client.SimpleAI");
+        interestedIn.add("net.sf.colossus.ai.SimpleAI");
 
         interestedIn.add("net.sf.colossus.util.KFrame");
         interestedIn.add("net.sf.colossus.client.BattleMap");
