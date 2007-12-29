@@ -94,6 +94,11 @@ public final class Game
     private static int gameCounter = 1;
     private final String gameId;
 
+    private boolean hotSeatMode = false;
+    // currently visible board-player (for hotSeatMode)
+    Player cvbPlayer = null;
+
+    
     /** Package-private only for JUnit test setup. */
     Game()
     {
@@ -226,6 +231,8 @@ public final class Game
 
         addPlayersFromOptions();
 
+        hotSeatMode = options.getOption(Options.hotSeatMode);
+        
         history = new History();
 
         initServer();
@@ -1021,6 +1028,57 @@ public final class Game
         }
         player.resetTurnState();
         server.allSetupSplit();
+        if (hotSeatMode)
+        {
+            hotSeatModeChangeBoards();
+        }
+    }
+
+    public void hotSeatModeChangeBoards()
+    {
+        Player activePlayer = getActivePlayer();
+
+        // game just started - find the local player which shall
+        // get the board first, and hide all other local ones.
+        if (cvbPlayer == null)
+        {
+            int i;
+            for (i=0 ; i < getNumPlayers() ; i++)
+            {
+                Player iPlayer = getPlayer(i);
+                if (iPlayer.isHuman() && !iPlayer.isNetwork() &&
+                    !server.isClientGone(iPlayer))
+                {
+                    // This is a local alive player.
+                    if (cvbPlayer == null)
+                    {
+                        cvbPlayer = iPlayer;
+                        server.setBoardVisibility(iPlayer,true);
+                    }
+                    else
+                    {
+                        server.setBoardVisibility(iPlayer, false);
+                    }
+                }
+            }
+            return;
+        }
+
+        // otherwise, switch board to next, then and only then
+        // if activePlayer is now the next local human which is
+        // still connected ( = has not closed his board).
+        boolean isHuman = activePlayer.isHuman() && !activePlayer.isNetwork();
+        boolean isGone = server.isClientGone(activePlayer);
+
+        if (isHuman && !isGone)
+        {
+            if (cvbPlayer != null)
+            {
+                server.setBoardVisibility(cvbPlayer, false);
+            }
+            server.setBoardVisibility(activePlayer, true);
+            cvbPlayer = activePlayer;
+        }
     }
 
     private void setupMove()

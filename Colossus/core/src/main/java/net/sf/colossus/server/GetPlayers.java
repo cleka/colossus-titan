@@ -175,6 +175,7 @@ public final class GetPlayers extends KFrame implements WindowListener,
         addCheckbox(Options.balancedTowers, checkboxPane);
         addCheckbox(Options.autoStop, checkboxPane);
         addCheckbox(Options.autoQuit, checkboxPane);
+        addCheckbox(Options.hotSeatMode, checkboxPane);
 
         String viewmodeName = options.getStringOption(Options.viewMode,
             Options.viewableEver);

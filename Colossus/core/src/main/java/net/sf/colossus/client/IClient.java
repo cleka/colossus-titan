@@ -142,4 +142,6 @@ public interface IClient
     public void log(String message);
 
     public void nak(String reason, String errmsg);
+    
+    public void setBoardVisibility(boolean val);
 }

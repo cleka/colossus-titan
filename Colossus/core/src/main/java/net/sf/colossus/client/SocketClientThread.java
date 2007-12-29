@@ -858,6 +858,12 @@ final class SocketClientThread extends Thread implements IServer
         {
             client.nak((String)args.remove(0), (String)args.remove(0));
         }
+        else if (method.equals(Constants.boardVisible))
+        {
+            boolean val = Boolean.valueOf((String)args.remove(0))
+                .booleanValue();
+            client.setBoardVisibility(val);
+        }
         else if (method.equals(Constants.tellEngagement))
         {
             client.tellEngagement((String)args.remove(0), (String)args

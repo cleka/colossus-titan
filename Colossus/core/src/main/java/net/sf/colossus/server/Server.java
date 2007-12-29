@@ -336,6 +336,21 @@ public final class Server implements IServer
         }
     }
 
+    public void setBoardVisibility(Player p, boolean val)
+    {
+        getClient(p.getName()).setBoardVisibility(val);    
+    }
+
+    public boolean isClientGone(Player p)
+    {
+        SocketServerThread sst = (SocketServerThread)getClient(p.getName());
+        if (sst == null || sst.isGone())
+        {
+            return true;
+        }
+        return false;
+    }
+    
     private boolean anyNonAiSocketsLeft()
     {
         if (clientMap.isEmpty())
@@ -347,14 +362,9 @@ public final class Server implements IServer
         while (it.hasNext())
         {
             Player p = (Player)it.next();
-            if (p.isHuman())
+            if (p.isHuman() && !isClientGone(p))
             {
-                SocketServerThread sst = (SocketServerThread)getClient(p
-                    .getName());
-                if (sst != null && !sst.isGone())
-                {
-                    return true;
-                }
+                return true;
             }
         }
 

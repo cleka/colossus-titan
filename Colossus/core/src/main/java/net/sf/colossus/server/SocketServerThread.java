@@ -868,4 +868,9 @@ final class SocketServerThread extends Thread implements IClient
     {
         sendToClient(Constants.nak + sep + reason + sep + errmsg);
     }
+    
+    public void setBoardVisibility(boolean val)
+    {
+        sendToClient(Constants.boardVisible + sep + val);
+    }
 }

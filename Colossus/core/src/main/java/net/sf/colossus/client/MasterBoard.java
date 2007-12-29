@@ -445,6 +445,11 @@ public final class MasterBoard extends JPanel
         masterFrame.setVisible(true);
     }
 
+    public void setBoardVisibility(boolean val)
+    {
+        masterFrame.setVisible(val);
+    }
+    
     private void setupActions()
     {
         clearRecruitChitsAction = new AbstractAction(clearRecruitChits)

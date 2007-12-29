@@ -3152,6 +3152,11 @@ public final class Client implements IClient, IOracle, IOptions
         }
     }
 
+    public void setBoardVisibility(boolean val)
+    {
+        board.setBoardVisibility(val);
+    }
+    
     public void setupSplit(String activePlayerName, int turnNumber)
     {
         clearUndoStack();
