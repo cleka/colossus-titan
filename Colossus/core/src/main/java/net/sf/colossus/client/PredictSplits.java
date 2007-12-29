@@ -69,12 +69,9 @@ public final class PredictSplits
                     PredictSplitNode leaf2 = (PredictSplitNode)leaves.get(j);
                     if (leaf1.getMarkerId().equals(leaf2.getMarkerId()))
                     {
-                        if (leaf1.getTurnCreated() == leaf2.getTurnCreated())
-                        {
-                            throw new PredictSplitsException(
-                                "Two leaf nodes with same markerId and turn");
-                        }
-                        else if (leaf1.getTurnCreated() < leaf2
+                        assert leaf1.getTurnCreated() != leaf2.getTurnCreated() : 
+                            "Leaf nodes have to have different markerId or turn";
+                        if (leaf1.getTurnCreated() < leaf2
                             .getTurnCreated())
                         {
                             prunes.add(new Integer(i));
