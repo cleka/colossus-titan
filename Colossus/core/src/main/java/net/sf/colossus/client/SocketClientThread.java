@@ -49,6 +49,9 @@ final class SocketClientThread extends Thread implements IServer
     private String reasonFail = null;
     private String initialLine = null;
 
+    private Object isWaitingLock = new Object();
+    private boolean isWaiting = false;
+
     SocketClientThread(Client client, String host, int port)
     {
         super("Client " + client.getPlayerName());
@@ -289,9 +292,6 @@ final class SocketClientThread extends Thread implements IServer
         }
     }
 
-    private Object isWaitingLock = new Object();
-    private boolean isWaiting = false;
-
     private void setWaiting(boolean val)
     {
         synchronized (isWaitingLock)
@@ -300,20 +300,11 @@ final class SocketClientThread extends Thread implements IServer
         }
     }
 
-    /*    
-     private void dummy()
-     {
-     //
-     }
-     */
-
     private String waitForLine()
     {
         String line = null;
 
         setWaiting(true);
-
-        // try { Thread.sleep(100); } catch (InterruptedException ex) { dummy(); }
 
         // First round, the unhandled line from tryInitialRead:
         if (initialLine != null)
