@@ -362,7 +362,7 @@ public final class Server implements IServer
         while (it.hasNext())
         {
             Player p = (Player)it.next();
-            if (p.isHuman() && !isClientGone(p))
+            if (!p.isAI() && !isClientGone(p))
             {
                 return true;
             }

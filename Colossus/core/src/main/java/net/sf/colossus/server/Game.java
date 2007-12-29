@@ -756,6 +756,10 @@ public final class Game
         return remaining;
     }
 
+    /**
+     * Returns the number of real players (Human or Network)
+     * which are still alive.
+     */
     int getNumHumansRemaining()
     {
         int remaining = 0;
@@ -1046,8 +1050,7 @@ public final class Game
             for (i=0 ; i < getNumPlayers() ; i++)
             {
                 Player iPlayer = getPlayer(i);
-                if (iPlayer.isHuman() && !iPlayer.isNetwork() &&
-                    !server.isClientGone(iPlayer))
+                if (iPlayer.isLocalHuman() && !server.isClientGone(iPlayer))
                 {
                     // This is a local alive player.
                     if (cvbPlayer == null)
@@ -1067,10 +1070,7 @@ public final class Game
         // otherwise, switch board to next, then and only then
         // if activePlayer is now the next local human which is
         // still connected ( = has not closed his board).
-        boolean isHuman = activePlayer.isHuman() && !activePlayer.isNetwork();
-        boolean isGone = server.isClientGone(activePlayer);
-
-        if (isHuman && !isGone)
+        if (activePlayer.isLocalHuman() && !server.isClientGone(activePlayer))
         {
             server.setBoardVisibility(cvbPlayer, false);
             server.setBoardVisibility(activePlayer, true);

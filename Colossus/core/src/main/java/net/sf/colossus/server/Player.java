@@ -61,6 +61,11 @@ public final class Player implements Comparable
         return type.endsWith(Constants.human) || isNetwork();
     }
 
+    boolean isLocalHuman()
+    {
+        return type.endsWith(Constants.human);
+    }
+
     boolean isNetwork()
     {
         return type.endsWith(Constants.network);
