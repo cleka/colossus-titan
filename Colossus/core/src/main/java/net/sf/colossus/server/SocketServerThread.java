@@ -48,6 +48,9 @@ final class SocketServerThread extends Thread implements IClient
 
     private static int counter = 0;
 
+    private Object isWaitingLock = new Object();
+    private boolean isWaiting = false;
+
     SocketServerThread(Server server, Socket socket)
     {
         super("SocketServerThread");
@@ -184,9 +187,6 @@ final class SocketServerThread extends Thread implements IClient
         this.server = null;
         this.socket = null;
     }
-
-    private Object isWaitingLock = new Object();
-    private boolean isWaiting = false;
 
     private void setWaiting(boolean val)
     {
