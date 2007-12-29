@@ -830,15 +830,8 @@ public class PredictSplitNode implements Comparable
 
     public int compareTo(Object object)
     {
-        if (object instanceof PredictSplitNode)
-        {
-            PredictSplitNode other = (PredictSplitNode)object;
-            return (toString().compareTo(other.toString()));
-        }
-        else
-        {
-            throw new ClassCastException();
-        }
+        PredictSplitNode other = (PredictSplitNode)object;
+        return (toString().compareTo(other.toString()));
     }
 
     static List subtractLists(List big, List little)
