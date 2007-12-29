@@ -333,7 +333,6 @@ final class SocketClientThread extends Thread implements IServer
                 }
                 else
                 {
-                    // @TODO: message to user?
                     client.setClosedByServer();
                     LOGGER
                         .log(Level.WARNING, "SCT SocketClientThread "
