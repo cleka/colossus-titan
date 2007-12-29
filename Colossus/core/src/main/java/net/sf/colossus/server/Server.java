@@ -80,6 +80,13 @@ public final class Server implements IServer
     private boolean obsolete = false;
     private boolean shuttingDown = false;
 
+    // Earlier I have locked on an Boolean object itself, 
+    // which I modify... and when this is done too often,
+    // e.g. in ClientSocketThread every read, it caused
+    // StockOverflowException... :-/
+    private Object disposeAllClientsDoneMutex = new Object();
+    private boolean disposeAllClientsDone = false;
+
     Server(Game game, int port)
     {
         this.game = game;
@@ -513,13 +520,6 @@ public final class Server implements IServer
         // In case we had to change a duplicate name.
         setPlayerName(name, name);
     }
-
-    // Earlier I have locked on an Boolean object itself, 
-    // which I modify... and when this is done too often,
-    // e.g. in ClientSocketThread every read, it caused
-    // StockOverflowException... :-/
-    private Object disposeAllClientsDoneMutex = new Object();
-    private boolean disposeAllClientsDone = false;
 
     void disposeAllClients()
     {
