@@ -445,9 +445,19 @@ public final class MasterBoard extends JPanel
         masterFrame.setVisible(true);
     }
 
-    public void setBoardVisibility(boolean val)
+    // For HotSeatMode
+    public void setBoardActive(boolean val)
     {
-        masterFrame.setVisible(val);
+        if (val)
+        {
+            masterFrame.setExtendedState(JFrame.NORMAL);
+            masterFrame.repaint();
+            reqFocus();
+        }
+        else
+        {
+            masterFrame.setExtendedState(JFrame.ICONIFIED);
+        }
     }
     
     private void setupActions()

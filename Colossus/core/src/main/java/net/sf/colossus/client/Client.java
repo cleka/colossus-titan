@@ -638,7 +638,10 @@ public final class Client implements IClient, IOracle, IOptions
             initMovementDie(roll);
             if (board != null)
             {
-                board.repaint();
+                if (board.getFrame().getExtendedState() != JFrame.ICONIFIED)
+                {
+                    board.repaint();
+                }
             }
         }
         kickMoves();
@@ -3152,9 +3155,9 @@ public final class Client implements IClient, IOracle, IOptions
         }
     }
 
-    public void setBoardVisibility(boolean val)
+    public void setBoardActive(boolean val)
     {
-        board.setBoardVisibility(val);
+        board.setBoardActive(val);
     }
     
     public void setupSplit(String activePlayerName, int turnNumber)

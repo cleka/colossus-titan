@@ -520,7 +520,7 @@ public final class Constants
     public static final String askPickColor = "askPickColor";
     public static final String log = "log";
     public static final String nak = "nak";
-    public static final String boardVisible = "boardVisible";
+    public static final String boardActive = "boardActive";
 
     // engagement resolved, methods:
     public static final String erMethodFlee = "flee";

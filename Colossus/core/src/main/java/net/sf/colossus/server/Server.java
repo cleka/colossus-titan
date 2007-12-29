@@ -338,7 +338,7 @@ public final class Server implements IServer
 
     public void setBoardVisibility(Player p, boolean val)
     {
-        getClient(p.getName()).setBoardVisibility(val);    
+        getClient(p.getName()).setBoardActive(val);    
     }
 
     public boolean isClientGone(Player p)

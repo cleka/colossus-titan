@@ -1072,10 +1072,7 @@ public final class Game
 
         if (isHuman && !isGone)
         {
-            if (cvbPlayer != null)
-            {
-                server.setBoardVisibility(cvbPlayer, false);
-            }
+            server.setBoardVisibility(cvbPlayer, false);
             server.setBoardVisibility(activePlayer, true);
             cvbPlayer = activePlayer;
         }

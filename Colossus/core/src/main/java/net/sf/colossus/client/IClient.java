@@ -143,5 +143,5 @@ public interface IClient
 
     public void nak(String reason, String errmsg);
     
-    public void setBoardVisibility(boolean val);
+    public void setBoardActive(boolean val);
 }
