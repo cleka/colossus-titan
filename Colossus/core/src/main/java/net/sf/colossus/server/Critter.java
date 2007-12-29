@@ -333,7 +333,8 @@ class Critter implements Comparable
             dice /= 2;
 
             // volcanoNative rangestriking from volcano: +2
-            if (isNativeVolcano() && hex.getTerrain().equals("Volcano"))
+            if (isNativeVolcano()
+                && hex.getTerrain().equals(HazardTerrain.VOLCANO))
             {
                 dice += 2;
             }
@@ -342,7 +343,8 @@ class Critter implements Comparable
         {
             // Dice can be modified by terrain.
             // volcanoNative striking from volcano: +2
-            if (isNativeVolcano() && hex.getTerrain().equals("Volcano"))
+            if (isNativeVolcano()
+                && hex.getTerrain().equals(HazardTerrain.VOLCANO))
             {
                 dice += 2;
             }
@@ -385,7 +387,8 @@ class Critter implements Comparable
         if (!rangestrike)
         {
             // Non-native striking out of bramble: -1
-            if (hex.getTerrain().equals("Brambles") && !isNativeBramble())
+            if (hex.getTerrain().equals(HazardTerrain.BRAMBLES)
+                && !isNativeBramble())
             {
                 attackerSkill--;
             }
@@ -443,7 +446,7 @@ class Critter implements Comparable
             }
 
             // Rangestrike into volcano: -1
-            if (targetHex.getTerrain().equals("Volcano"))
+            if (targetHex.getTerrain().equals(HazardTerrain.VOLCANO))
             {
                 attackerSkill--;
             }
@@ -470,7 +473,7 @@ class Critter implements Comparable
         // Native defending in bramble, from strike by a non-native: +1
         // Native defending in bramble, from rangestrike by a non-native
         //     non-magicMissile: +1
-        if (target.getCurrentHex().getTerrain().equals("Brambles")
+        if (target.getCurrentHex().getTerrain().equals(HazardTerrain.BRAMBLES)
             && target.isNativeBramble() && !isNativeBramble()
             && !(rangestrike && useMagicMissile()))
         {
@@ -480,7 +483,7 @@ class Critter implements Comparable
         // Native defending in stone, from strike by a non-native: +1
         // Native defending in stone, from rangestrike by a non-native
         //     non-magicMissile: +1
-        if (target.getCurrentHex().getTerrain().equals("Stone")
+        if (target.getCurrentHex().getTerrain().equals(HazardTerrain.STONE)
             && target.isNativeStone() && !isNativeStone()
             && !(rangestrike && useMagicMissile()))
         {
@@ -490,7 +493,7 @@ class Critter implements Comparable
         // Native defending in tree, from strike by a non-native: +1
         // Native defending in tree, from rangestrike by a non-native
         //     non-magicMissile: no effect
-        if (target.getCurrentHex().getTerrain().equals("Tree")
+        if (target.getCurrentHex().getTerrain().equals(HazardTerrain.TREE)
             && target.isNativeTree() && !isNativeTree() && !(rangestrike))
         {
             strikeNumber++;

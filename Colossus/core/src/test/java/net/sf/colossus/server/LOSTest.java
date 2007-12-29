@@ -701,6 +701,6 @@ public class LOSTest extends TestCase
 
         assertTrue(!battle.isLOSBlocked(hydra1.getCurrentHex(), hydra2
             .getCurrentHex()));
-        assertEquals(hydra2.getStrikeNumber(hydra1), 5);
+        assertEquals(5, hydra2.getStrikeNumber(hydra1));
     }
 }

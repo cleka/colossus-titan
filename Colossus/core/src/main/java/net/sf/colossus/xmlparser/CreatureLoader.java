@@ -29,7 +29,7 @@ public class CreatureLoader
     private static final Logger LOGGER = Logger.getLogger(CreatureLoader.class
         .getName());
 
-    private ArrayList creatures;
+    private final ArrayList creatures;
 
     public CreatureLoader(InputStream creIS)
     {
@@ -65,6 +65,7 @@ public class CreatureLoader
         boolean rangestrikes = el.getAttribute("rangestrikes")
             .getBooleanValue();
         boolean flies = el.getAttribute("flies").getBooleanValue();
+        // TODO why is this "bramble" while the string for the terrain is "Brambles"?
         boolean bramble = el.getAttribute("bramble").getBooleanValue();
         boolean drift = el.getAttribute("drift").getBooleanValue();
         boolean bog = el.getAttribute("bog").getBooleanValue();

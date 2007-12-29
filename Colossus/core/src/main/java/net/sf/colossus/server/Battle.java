@@ -15,6 +15,7 @@ import net.sf.colossus.client.BattleMap;
 import net.sf.colossus.client.HexMap;
 import net.sf.colossus.client.MasterBoard;
 import net.sf.colossus.client.MasterHex;
+import net.sf.colossus.game.HazardTerrain;
 import net.sf.colossus.util.Options;
 
 
@@ -35,12 +36,12 @@ public final class Battle
 
     private Game game;
     private Server server;
-    private String attackerId;
-    private String defenderId;
-    private String[] legions = new String[2];
+    private final String attackerId;
+    private final String defenderId;
+    private final String[] legions = new String[2];
     private int activeLegionNum;
-    private String masterHexLabel;
-    private String terrain;
+    private final String masterHexLabel;
+    private final String terrain;
     private int turnNumber;
     private Constants.BattlePhase phase;
     private int summonState = Constants.NO_KILLS;
@@ -53,8 +54,8 @@ public final class Battle
     private boolean driftDamageApplied = false;
 
     /** Set of hexLabels for valid carry targets */
-    private Set carryTargets = new HashSet();
-    private PhaseAdvancer phaseAdvancer = new BattlePhaseAdvancer();
+    private final Set carryTargets = new HashSet();
+    private final PhaseAdvancer phaseAdvancer = new BattlePhaseAdvancer();
     private int pointsScored = 0;
 
     Battle(Game game, String attackerId, String defenderId,
@@ -1648,7 +1649,7 @@ public final class Battle
         }
 
         // Add one if it's bramble.
-        if (nextHex.getTerrain().equals("Brambles"))
+        if (nextHex.getTerrain().equals(HazardTerrain.BRAMBLES))
         {
             count++;
         }

@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.sf.colossus.game.HazardTerrain;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.Creature;
 
@@ -735,7 +736,7 @@ public final class Strike
         }
 
         // Add one if it's bramble.
-        if (nextHex.getTerrain().equals("Brambles"))
+        if (nextHex.getTerrain().equals(HazardTerrain.BRAMBLES))
         {
             count++;
         }
@@ -840,7 +841,7 @@ public final class Strike
 
             // volcanoNative rangestriking from volcano: +2
             if (striker.isNativeVolcano()
-                && hex.getTerrain().equals("Volcano"))
+                && hex.getTerrain().equals(HazardTerrain.VOLCANO))
             {
                 dice += 2;
             }
@@ -850,7 +851,7 @@ public final class Strike
             // Dice can be modified by terrain.
             // volcanoNative striking from volcano: +2
             if (striker.isNativeVolcano()
-                && hex.getTerrain().equals("Volcano"))
+                && hex.getTerrain().equals(HazardTerrain.VOLCANO))
             {
                 dice += 2;
             }
@@ -893,7 +894,7 @@ public final class Strike
         if (!rangestrike)
         {
             // Non-native striking out of bramble: -1
-            if (hex.getTerrain().equals("Brambles")
+            if (hex.getTerrain().equals(HazardTerrain.BRAMBLES)
                 && !striker.getCreature().isNativeBramble())
             {
                 attackerSkill--;
@@ -953,7 +954,7 @@ public final class Strike
             }
 
             // Rangestrike into volcano: -1
-            if (targetHex.getTerrain().equals("Volcano"))
+            if (targetHex.getTerrain().equals(HazardTerrain.VOLCANO))
             {
                 attackerSkill--;
             }
@@ -975,7 +976,8 @@ public final class Strike
         // Native defending in bramble, from strike by a non-native: +1
         // Native defending in bramble, from rangestrike by a non-native
         //     non-magicMissile: +1
-        if (client.getBattleHex(target).getTerrain().equals("Brambles")
+        if (client.getBattleHex(target).getTerrain().equals(
+            HazardTerrain.BRAMBLES)
             && target.getCreature().isNativeBramble()
             && !striker.getCreature().isNativeBramble()
             && !(rangestrike && striker.getCreature().useMagicMissile()))
@@ -986,7 +988,8 @@ public final class Strike
         // Native defending in stone, from strike by a non-native: +1
         // Native defending in stone, from rangestrike by a non-native
         //     non-magicMissile: +1
-        if (client.getBattleHex(target).getTerrain().equals("Stone")
+        if (client.getBattleHex(target).getTerrain().equals(
+            HazardTerrain.STONE)
             && target.getCreature().isNativeStone()
             && !striker.getCreature().isNativeStone()
             && !(rangestrike && striker.getCreature().useMagicMissile()))
@@ -997,7 +1000,8 @@ public final class Strike
         // Native defending in tree, from strike by a non-native: +1
         // Native defending in tree, from rangestrike by a non-native
         //     non-magicMissile: no effect
-        if (client.getBattleHex(target).getTerrain().equals("Tree")
+        if (client.getBattleHex(target).getTerrain()
+            .equals(HazardTerrain.TREE)
             && target.getCreature().isNativeTree()
             && !striker.getCreature().isNativeTree() && !(rangestrike))
         {
