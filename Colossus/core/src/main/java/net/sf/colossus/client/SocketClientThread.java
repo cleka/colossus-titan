@@ -1085,7 +1085,6 @@ final class SocketClientThread extends Thread implements IServer
         sendToServer(Constants.assignFirstMarker + sep + markerId);
     }
 
-    // XXX Disallow the following methods in network games
     public void newGame()
     {
         sendToServer(Constants.newGame);
