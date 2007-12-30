@@ -27,23 +27,23 @@ import net.sf.colossus.util.Options;
 
 final class StatusScreen extends KDialog implements WindowListener
 {
-    private int numPlayers;
+    private final int numPlayers;
 
-    private JLabel[] nameLabel;
-    private JLabel[] towerLabel;
-    private JLabel[] elimLabel;
-    private JLabel[] legionsLabel;
-    private JLabel[] markersLabel;
-    private JLabel[] creaturesLabel;
-    private JLabel[] titanLabel;
-    private JLabel[] scoreLabel;
+    private final JLabel[] nameLabel;
+    private final JLabel[] towerLabel;
+    private final JLabel[] elimLabel;
+    private final JLabel[] legionsLabel;
+    private final JLabel[] markersLabel;
+    private final JLabel[] creaturesLabel;
+    private final JLabel[] titanLabel;
+    private final JLabel[] scoreLabel;
 
-    private JLabel activePlayerLabel;
-    private JLabel turnLabel;
-    private JLabel phaseLabel;
-    private JLabel battleActivePlayerLabel;
-    private JLabel battleTurnLabel;
-    private JLabel battlePhaseLabel;
+    private final JLabel activePlayerLabel;
+    private final JLabel turnLabel;
+    private final JLabel phaseLabel;
+    private final JLabel battleActivePlayerLabel;
+    private final JLabel battleTurnLabel;
+    private final JLabel battlePhaseLabel;
 
     private IOracle oracle;
     private IOptions options;
@@ -51,7 +51,7 @@ final class StatusScreen extends KDialog implements WindowListener
 
     private Point location;
     private Dimension size;
-    private SaveWindow saveWindow;
+    private final SaveWindow saveWindow;
 
     StatusScreen(JFrame frame, IOracle oracle, IOptions options, Client client)
     {
@@ -226,7 +226,6 @@ final class StatusScreen extends KDialog implements WindowListener
     {
         if (towerLabel[i].getBackground() != color)
         {
-            nameLabel[i].setBackground(color);
             towerLabel[i].setBackground(color);
             elimLabel[i].setBackground(color);
             legionsLabel[i].setBackground(color);
@@ -265,19 +264,18 @@ final class StatusScreen extends KDialog implements WindowListener
 
             if (info.isDead())
             {
-                color = Color.red;
-                bgcolor = Color.red;
-                fgcolor = Color.black;
+                color = Color.RED;
+                setPlayerLabelBackground(i, color);
             }
             else
             {
                 if (oracle.getActivePlayerName().equals(info.getName()))
                 {
-                    color = Color.yellow;
+                    color = Color.YELLOW;
                 }
                 else
                 {
-                    color = Color.lightGray;
+                    color = Color.LIGHT_GRAY;
                 }
 
                 if (!info.getColor().equals("null"))
@@ -287,13 +285,12 @@ final class StatusScreen extends KDialog implements WindowListener
                 }
                 else
                 {
-                    bgcolor = Color.lightGray;
-                    fgcolor = Color.black;
+                    bgcolor = Color.LIGHT_GRAY;
+                    fgcolor = Color.BLACK;
                 }
+                setPlayerLabelBackground(i, color);
+                setPlayerLabelColors(nameLabel[i], bgcolor, fgcolor);
             }
-
-            setPlayerLabelBackground(i, color);
-            setPlayerLabelColors(nameLabel[i], bgcolor, fgcolor);
 
             nameLabel[i].setText(info.getName());
             if (info.canTitanTeleport())
