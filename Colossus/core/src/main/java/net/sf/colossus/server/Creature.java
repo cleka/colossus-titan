@@ -18,7 +18,7 @@ import net.sf.colossus.xmlparser.CreatureLoader;
 
 /**
  * Class Creature represents the CONSTANT information about a
- * Titan (the game) Creature. Titan (the creature) use
+ * Titan (the game) creature. Titan (the creature) use
  * class CreatureTitan.
  *
  * Game related info is in Critter.  Counts of
@@ -424,7 +424,7 @@ public class Creature implements Comparable
      *    method getCreatureByName(). i had to do something about that!
      *
      *    since the names of the creatures do NOT change during a game
-     *    i implemented a simple caching mechanism, filles upon requests.
+     *    i implemented a simple caching mechanism, fills upon requests.
      *    in this cache (aka Hashtable) we map from upper/lowercase variants
      *    to the wanted creature.
      *
@@ -460,9 +460,9 @@ public class Creature implements Comparable
      * - put pair into cache, with this specific spelling variant
      * - return the creature
      *
-     * @param name case insensitive (!) name of a creature type
+     * @param name case insensitive (!) name of a creature type, not null
      * @return creature with the given name, null if not a creature.
-     * @raise NullPointerException whenname is null
+     * @throws NullPointerException if name is null
      */
     public static Creature getCreatureByName(final String name)
     {
@@ -503,23 +503,15 @@ public class Creature implements Comparable
         }
     }
 
-    /** @param name (exact) name of a creature.
+    /**
+     * Checks if a creature with the given name exists.
+     *  
+     * @param name (case insensitive) name of a creature, must not be null.
      * @return true if this names represents a creature
-     * TODO: make more efficient. maybe use getCreatureByName()
-     * TODO: maybe param name will become case insensitive.
      */
     public static boolean isCreature(final String name)
     {
-        Iterator it = creatures.iterator();
-        while (it.hasNext())
-        {
-            Creature creature = (Creature)it.next();
-            if (name != null && name.equals(creature.getName()))
-            {
-                return true;
-            }
-        }
-        return false;
+        return getCreatureByName(name) != null;
     }
 
     public String toString()
@@ -529,25 +521,17 @@ public class Creature implements Comparable
 
     /**
      * Compare by name.
-     * overloaded in Critter w/ a different semantic
      */
     public int compareTo(Object object)
     {
-        if (object instanceof Creature)
-        {
-            Creature other = (Creature)object;
-            return (name.compareTo(other.name));
-        }
-        else
-        {
-            throw new ClassCastException();
-        }
+        Creature other = (Creature)object;
+        return (name.compareTo(other.name));
     }
 
     /** Compare by name. */
     public final boolean equals(Object object)
     {
-        if (!(object instanceof Creature))
+        if (object.getClass() != this.getClass())
         {
             return false;
         }
@@ -577,7 +561,12 @@ public class Creature implements Comparable
         }
     }
 
-    /** get the non-terrainified part of the kill-value. */
+    /** 
+     * Get the non-terrainified part of the kill-value.
+     * 
+     * TODO this is not model, but AI related (but also used in client for
+     * sorting creatures -- the client uses the AI for recruit hints, too) 
+     */
     public int getKillValue()
     {
         int val = 10 * getPointValue();
