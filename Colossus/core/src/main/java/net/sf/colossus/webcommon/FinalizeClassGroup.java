@@ -60,7 +60,7 @@ public class FinalizeClassGroup
             return gstat.substring(0);
         }
 
-        System.out.print("  " + count + " instances of type " + shortType);
+        gstat.append("  " + count + " instances of type " + shortType);
 
         String sep = ": ";
         Iterator it = instances.keySet().iterator();

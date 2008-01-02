@@ -71,7 +71,8 @@ public final class Client implements IClient, IOracle, IOptions
      *  direct reference.  So don't share this reference. */
     private IServer server;
     private ChildThreadManager threadMgr;
-
+    private boolean stresstestStopOnFatal = false;
+    
     private WebClient webClient = null;
     private boolean startedByWebClient = false;
 
@@ -1839,15 +1840,18 @@ public final class Client implements IClient, IOracle, IOptions
             // leave it in place for a while. (17.11.2007, CleKa).
             LOGGER.log(Level.WARNING, "NPE in revealCreatures, markerId="
                 + markerId + ", reason=" + reason + ", names="
-                + names.toString());
-            Thread.dumpStack();
-            // in stresstest uncomment those, to get logs and autosaves
+                + names.toString(), e);
+            
+            // in stresstest activeate those, to get logs and autosaves
             // copied for troubleshooting...
-            /*
-             System.out.println("NPE in revealCreatures, markerId="+
-             markerId+", names="+names.toString());
-             System.exit(1);
-             */
+            if (stresstestStopOnFatal)
+            {  
+                LOGGER.log(Level.SEVERE,
+                    "NPE in revealCreatures, markerId=" + markerId +
+                    ", names="+names.toString());
+                System.exit(1);
+            }
+             
         }
     }
 

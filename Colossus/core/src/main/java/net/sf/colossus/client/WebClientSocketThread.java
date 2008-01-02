@@ -9,6 +9,8 @@ import java.net.ConnectException;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.HashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import net.sf.colossus.webcommon.GameInfo;
 import net.sf.colossus.webcommon.IWebClient;
@@ -31,6 +33,8 @@ import net.sf.colossus.webcommon.IWebServer;
 
 public class WebClientSocketThread extends Thread implements IWebServer
 {
+    private static final Logger LOGGER =
+        Logger.getLogger(WebClientSocketThread.class.getName());
 
     private WebClient webClient = null;
 
@@ -82,7 +86,7 @@ public class WebClientSocketThread extends Thread implements IWebServer
             }
             else
             {
-                // System.out.println("no email, login instead.");
+                // no email, login instead
                 login();
             }
         }
@@ -147,7 +151,7 @@ public class WebClientSocketThread extends Thread implements IWebServer
             {
                 if (fromServer.startsWith("ACK:"))
                 {
-                    // System.out.println("WCST.register(): ok, got ACK! ("+fromServer+")");
+                    // ("WCST.register(): ok, got ACK! ("+fromServer+")");
                 }
                 else
                 {
@@ -196,11 +200,8 @@ public class WebClientSocketThread extends Thread implements IWebServer
 
             if ((fromServer = this.in.readLine()) != null)
             {
-                // System.out.println("fromServer: " + fromServer);
-
                 if (fromServer.startsWith("ACK:"))
                 {
-                    // System.out.println("WCST.login(): ok, got ACK! ("+fromServer+")");
                     loggedIn = true;
                 }
                 else if (fromServer.equals("NACK: " + IWebServer.Login + sep
@@ -267,11 +268,6 @@ public class WebClientSocketThread extends Thread implements IWebServer
                 String[] tokens = fromServer.split(sep);
                 String command = tokens[0];
 
-                /*              if (fromServer.length() > 0)
-                 {
-                 System.out.println("GOT from server: " + fromServer);
-                 }
-                 */
                 if (fromServer.startsWith("ACK: "))
                 {
                     command = tokens[0].substring(5);
@@ -298,7 +294,6 @@ public class WebClientSocketThread extends Thread implements IWebServer
                     HashMap gameHash = webClient.getGameHash();
                     GameInfo gi = GameInfo.fromString(tokens, gameHash);
 
-                    // System.out.println("FROM SERVER: GameInfo, gi = " + gi.toString(sep));
                     webClient.gameInfo(gi);
                 }
                 else if (command.equals(IWebClient.didEnroll))
@@ -378,17 +373,15 @@ public class WebClientSocketThread extends Thread implements IWebServer
         }
         catch (IOException ex)
         {
-            System.out
-                .println("\n\n=========WebClientSocketThread IOException!");
+            LOGGER.log(Level.SEVERE,
+            "WebClientSocketThread IOException!");
             webClient.connectionReset(false);
         }
         catch (Exception e)
         {
-            System.out
-                .println("\n\n=========WebClientSocketThread whatever Exception!"
-                    + e.toString());
+                LOGGER.log(Level.WARNING,
+                    "WebClientSocketThread whatever Exception!", e);
             Thread.dumpStack();
-
             webClient.connectionReset(false);
         }
 
@@ -405,8 +398,7 @@ public class WebClientSocketThread extends Thread implements IWebServer
             }
             catch (IOException ex)
             {
-                System.out
-                    .println("WebClientSocketThread close() IOException!");
+                LOGGER.log(Level.WARNING, "WebClientSocketThread close() IOException!", ex);
             }
         }
         socket = null;
@@ -421,7 +413,6 @@ public class WebClientSocketThread extends Thread implements IWebServer
 
     private void send(String s)
     {
-        // System.out.println("SENDING: " + s);
         out.println(s);
     }
 
@@ -472,8 +463,8 @@ public class WebClientSocketThread extends Thread implements IWebServer
             }
             catch (InterruptedException e)
             {
-                System.out.println("Woooah. AckWait for command " + command
-                    + " got exception " + e.toString());
+                LOGGER.log(Level.WARNING,
+                    " got exception " + e.toString());
             }
             return result;
         }
@@ -510,8 +501,9 @@ public class WebClientSocketThread extends Thread implements IWebServer
             }
             else
             {
-                System.out.println("NOT same command ? - " + cmd + ", "
-                    + command);
+                LOGGER.log(Level.WARNING,
+                    "Waiting for (N)ACK for command " + cmd +" but " +
+                    "got " + command);
             }
         }
     }
@@ -575,13 +567,9 @@ public class WebClientSocketThread extends Thread implements IWebServer
     {
         if (false)
         {
-            System.out.println(s);
+            LOGGER.log(Level.INFO, s);
+         
         }
-    }
-
-    public void finalize()
-    {
-        // System.out.println("finalize(): " + this.getClass().getName());
     }
 
     public class WebClientSocketThreadException extends Throwable

@@ -22,6 +22,8 @@ import java.util.Iterator;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -74,6 +76,9 @@ import net.sf.colossus.webcommon.IWebServer;
 public class WebClient extends KFrame implements WindowListener,
     ActionListener, IWebClient
 {
+    private static final Logger LOGGER =
+        Logger.getLogger(WebClient.class.getName());
+
     private String hostname;
     private int port;
     private String login;
@@ -836,8 +841,9 @@ public class WebClient extends KFrame implements WindowListener,
         }
         else
         {
-            System.out.println("ooops! auto Game Start Action option is '"
-                + whatToDo + "' ???");
+            LOGGER.log(Level.WARNING,
+                "ooops! auto Game Start Action option is '" +
+                whatToDo + "' ???");
         }
     }
 
@@ -1165,8 +1171,8 @@ public class WebClient extends KFrame implements WindowListener,
             }
             else
             {
-                System.out
-                    .println("Huuuh? UpdateGUI, get game from hash null??");
+                LOGGER.log(Level.WARNING,
+                    "Huuuh? UpdateGUI, get game from hash null??");
             }
 
             infoTextLabel.setText(enrolledText);
@@ -1190,7 +1196,8 @@ public class WebClient extends KFrame implements WindowListener,
         }
         else
         {
-            System.out.println("Web Client - Bogus state " + state);
+            LOGGER.log(Level.WARNING, 
+                "Web Client - Bogus state " + state);
         }
     }
 
@@ -1206,8 +1213,7 @@ public class WebClient extends KFrame implements WindowListener,
         GameInfo gi = (GameInfo)gameHash.get(gameId);
         if (gi == null)
         {
-            System.out.println("\n\ngame from hash is null!!");
-            System.out.println("dump: " + gameHash.toString());
+            LOGGER.log(Level.SEVERE, "Game from hash is null!!");
         }
 
         return gi;
@@ -1371,7 +1377,7 @@ public class WebClient extends KFrame implements WindowListener,
         }
         else
         {
-            // System.out.println("connect/login failed...");
+            LOGGER.log(Level.FINEST, "connect/login failed...");
         }
     }
 
@@ -1521,20 +1527,6 @@ public class WebClient extends KFrame implements WindowListener,
         try
         {
             int p = port;
-
-            /*          // for debug: what happens if client needs long to react  
-             if (username.equals("test1"))
-             {
-             System.out.println("sleeping 5 seconds");
-             sleepFor(5000);
-             System.out.println("sleeping 5 seconds over ");
-             }
-
-             // For debug: what happens if client does not get
-             // through to that port:
-             if (username.equals("test3")) p=port+3;
-             */
-
             gc = new Client(hostname, p, username, true, true);
             boolean failed = gc.getFailed();
             if (failed)
@@ -1684,8 +1676,9 @@ public class WebClient extends KFrame implements WindowListener,
                         }
                         else
                         {
-                            System.out.println("Huups, unhandled game state "
-                                + game.getStateString());
+                            LOGGER.log(Level.WARNING,
+                                "Huups, unhandled game state " +
+                                game.getStateString());
                         }
                     }
                     gamesUpdates.clear();
@@ -2724,8 +2717,8 @@ public class WebClient extends KFrame implements WindowListener,
                 }
                 else
                 {
-                    System.out.println("ooops? Unexpected command " + command
-                        + " in RegisterPasswordPanel action?");
+                    LOGGER.log(Level.FINE, "ooops? Unexpected command " +
+                        command + " in RegisterPasswordPanel action?");
                 }
             }
         }
