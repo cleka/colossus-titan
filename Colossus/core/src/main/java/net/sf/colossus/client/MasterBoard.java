@@ -8,7 +8,6 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GraphicsEnvironment;
-import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.Toolkit;
@@ -43,11 +42,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.ButtonGroup;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -58,12 +53,9 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
-import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
-import javax.swing.border.TitledBorder;
 
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.VariantSupport;
@@ -127,8 +119,6 @@ public final class MasterBoard extends JPanel
     /** our own little bar implementation */
     private BottomBar bottomBar;
 
-    private KFrame preferencesWindow;
-    
     public static final String saveGameAs = "Save game as";
 
     public static final String clearRecruitChits = "Clear recruit chits";
@@ -146,10 +136,9 @@ public final class MasterBoard extends JPanel
     public static final String viewFullRecruitTree = "View Full Recruit Tree";
     public static final String viewHexRecruitTree = "View Hex Recruit Tree";
     public static final String viewBattleMap = "View Battle Map";
-    public static final String changeScale = "Change Scale";
 
     public static final String chooseScreen = "Choose Screen For Info Windows";
-    public static final String preferences = "Preferences";
+    public static final String preferences = "Preferences...";
 
     public static final String about = "About";
     public static final String viewReadme = "Show Variant Readme";
@@ -176,7 +165,6 @@ public final class MasterBoard extends JPanel
     private AbstractAction viewFullRecruitTreeAction;
     private AbstractAction viewHexRecruitTreeAction;
     private AbstractAction viewBattleMapAction;
-    private AbstractAction changeScaleAction;
 
     private AbstractAction chooseScreenAction;
 
@@ -191,7 +179,6 @@ public final class MasterBoard extends JPanel
 
     private boolean playerLabelDone;
 
-    private JMenu lfMenu;
     private SaveWindow saveWindow;
 
     private String cachedPlayerName = "<not set yet>";
@@ -419,8 +406,6 @@ public final class MasterBoard extends JPanel
         setupPopupMenu();
         setupTopMenu();
 
-        preferencesWindow = new PreferencesWindow(client);
-        
         scrollPane = new JScrollPane(this);
         contentPane.add(scrollPane, BorderLayout.CENTER);
 
@@ -789,23 +774,6 @@ public final class MasterBoard extends JPanel
             }
         };
 
-        changeScaleAction = new AbstractAction(changeScale)
-        {
-            public void actionPerformed(ActionEvent e)
-            {
-                final int oldScale = Scale.get();
-                final int newScale = PickIntValue.pickIntValue(masterFrame,
-                    oldScale, "Pick scale", 5, 25, 1, client);
-                if (newScale != oldScale)
-                {
-                    client.setOption(Options.scale, newScale);
-                    Scale.set(newScale);
-                    net.sf.colossus.util.ResourceLoader.purgeImageCache();
-                    client.rescaleAllWindows();
-                }
-            }
-        };
-
         chooseScreenAction = new AbstractAction(chooseScreen)
         {
             public void actionPerformed(ActionEvent e)
@@ -818,7 +786,7 @@ public final class MasterBoard extends JPanel
         {
             public void actionPerformed(ActionEvent e)
             {
-                preferencesWindow.setVisible(true);
+                client.setPreferencesWindowVisible(true);
             }
         };
 
@@ -903,23 +871,6 @@ public final class MasterBoard extends JPanel
         itemHandler = null;
     }
 
-    private ItemListener rcmHandler = new MasterBoardRecruitChitMenuHandler();
-
-    private void addRadioButton(JMenu menu, ButtonGroup group, String name)
-    {
-        JRadioButtonMenuItem rbmi = new JRadioButtonMenuItem(name);
-        rbmi.addItemListener(rcmHandler);
-        group.add(rbmi);
-        menu.add(rbmi);
-        boolean selected = false;
-        if (name.equals(client
-            .getStringOption(Options.showRecruitChitsSubmenu)))
-        {
-            selected = true;
-        }
-        rbmi.setSelected(selected);
-    }
-
     private void setupTopMenu()
     {
         JMenuBar menuBar = new JMenuBar();
@@ -953,57 +904,10 @@ public final class MasterBoard extends JPanel
         phaseMenu.setMnemonic(KeyEvent.VK_P);
         menuBar.add(phaseMenu);
 
-        // Then per-player options
-
-        JMenu playerMenu = new JMenu("Autoplay");
-        playerMenu.setMnemonic(KeyEvent.VK_A);
-        menuBar.add(playerMenu);
-
-        addCheckBox(playerMenu, Options.autoPickColor, KeyEvent.VK_C);
-        addCheckBox(playerMenu, Options.autoPickMarker, KeyEvent.VK_I);
-        addCheckBox(playerMenu, Options.autoPickEntrySide, KeyEvent.VK_E);
-        addCheckBox(playerMenu, Options.autoForcedStrike, KeyEvent.VK_K);
-        addCheckBox(playerMenu, Options.autoCarrySingle, KeyEvent.VK_Y);
-        addCheckBox(playerMenu, Options.autoRangeSingle, KeyEvent.VK_G);
-        addCheckBox(playerMenu, Options.autoSummonAngels, KeyEvent.VK_O);
-        addCheckBox(playerMenu, Options.autoAcquireAngels, KeyEvent.VK_A);
-        addCheckBox(playerMenu, Options.autoRecruit, KeyEvent.VK_R);
-        addCheckBox(playerMenu, Options.autoPickRecruiter, KeyEvent.VK_U);
-        addCheckBox(playerMenu, Options.autoReinforce, KeyEvent.VK_N);
-        addCheckBox(playerMenu, Options.autoPlay, KeyEvent.VK_P);
-
-        // Then per-client GUI options
-        JMenu graphicsMenu = new JMenu("Graphics");
-        graphicsMenu.setMnemonic(KeyEvent.VK_G);
-        menuBar.add(graphicsMenu);
-
-        addCheckBox(graphicsMenu, Options.antialias, KeyEvent.VK_N);
-        addCheckBox(graphicsMenu, Options.useOverlay, KeyEvent.VK_V);
-        addCheckBox(graphicsMenu, Options.useSVG, KeyEvent.VK_S);
-        addCheckBox(graphicsMenu, Options.noBaseColor, KeyEvent.VK_W);
+        // Window menu: menu for the "window-related"
+        // (satellite windows and graphic actions effecting whole "windows"),
+        // Plus the Preferences window as last entry.
         
-        graphicsMenu.addSeparator();
-
-        // The "dubious as blanks" option makes only sense with the 
-        //   "view what SplitPrediction tells us" mode => otherwise inactive.
-        JCheckBoxMenuItem cbmi = addCheckBox(graphicsMenu,
-            Options.dubiousAsBlanks, KeyEvent.VK_D);
-        if (client.getViewMode() != Options.viewableEverNum)
-        {
-            cbmi.setEnabled(false);
-        }
-
-        // "Show recruit preview chits ..." submenu
-        JMenu srcSubmenu = new JMenu(Options.showRecruitChitsSubmenu);
-        ButtonGroup group = new ButtonGroup();
-        addRadioButton(srcSubmenu, group, Options.showRecruitChitsNone);
-        addRadioButton(srcSubmenu, group, Options.showRecruitChitsStrongest);
-        addRadioButton(srcSubmenu, group, Options.showRecruitChitsRecruitHint);
-        addRadioButton(srcSubmenu, group, Options.showRecruitChitsAll);
-        graphicsMenu.add(srcSubmenu);
-
-        // Menu for the "window-related"
-        // (satellite windows and graphic options effecting whole "windows")
         JMenu windowMenu = new JMenu("Window");
         windowMenu.setMnemonic(KeyEvent.VK_W);
         menuBar.add(windowMenu);
@@ -1027,45 +931,21 @@ public final class MasterBoard extends JPanel
 
         windowMenu.addSeparator();
 
-        // "Window"-behavior and look&feel related ones:
-        addCheckBox(windowMenu, Options.stealFocus, KeyEvent.VK_F);
-
-        // change scale
-        mi = windowMenu.add(changeScaleAction);
-        mi.setMnemonic(KeyEvent.VK_S);
+ 
+        // Then the "do something to a Window" actions;
+        // and Preferences Window as last:
 
         if (GraphicsEnvironment.getLocalGraphicsEnvironment()
             .getScreenDevices().length > 1)
         {
             mi = windowMenu.add(chooseScreenAction);
         }
-
-        // Look & Feel now under other menu instead own
-        lfMenu = new JMenu("Look & Feel");
-        // lfMenu.setMnemonic(KeyEvent.VK_L);
-        windowMenu.add(lfMenu);
-
-        UIManager.LookAndFeelInfo[] lfInfo = UIManager
-            .getInstalledLookAndFeels();
-        String currentLF = UIManager.getLookAndFeel().getName();
-        for (int i = 0; i < lfInfo.length; i++)
-        {
-            AbstractAction lfAction = new ChangeLookFeelAction(lfInfo[i]
-                .getName(), lfInfo[i].getClassName());
-            JCheckBoxMenuItem temp = new JCheckBoxMenuItem(lfAction);
-            lfMenu.add(temp);
-            temp.setState(lfInfo[i].getName().equals(currentLF));
-        }
-
-        // Setting menu
-        JMenu settingsMenu = new JMenu("Settings");
-        settingsMenu.setMnemonic(KeyEvent.VK_S);
-        menuBar.add(settingsMenu);
-
-        mi = settingsMenu.add(preferencesAction);
+       
+        mi = windowMenu.add(preferencesAction);
         mi.setMnemonic(KeyEvent.VK_P);
 
         // Then help menu
+
         JMenu helpMenu = new JMenu("Help");
         helpMenu.setMnemonic(KeyEvent.VK_H);
         menuBar.add(helpMenu);
@@ -1075,28 +955,6 @@ public final class MasterBoard extends JPanel
         mi.setMnemonic(KeyEvent.VK_V);
 
         mi = helpMenu.add(viewHelpDocAction);
-    }
-
-    class ChangeLookFeelAction extends AbstractAction
-    {
-        String className;
-
-        ChangeLookFeelAction(String t, String className)
-        {
-            super(t);
-            this.className = className;
-        }
-
-        public void actionPerformed(ActionEvent e)
-        {
-            client.setLookAndFeel(className);
-            String currentLF = UIManager.getLookAndFeel().getName();
-            for (int i = 0; i < lfMenu.getItemCount(); i++)
-            {
-                JCheckBoxMenuItem it = (JCheckBoxMenuItem)lfMenu.getItem(i);
-                it.setState(it.getText().equals(currentLF));
-            }
-        }
     }
 
     void twiddleOption(String name, boolean enable)
@@ -2372,20 +2230,6 @@ public final class MasterBoard extends JPanel
         }
     }
 
-    class MasterBoardRecruitChitMenuHandler implements ItemListener
-    {
-        public void itemStateChanged(ItemEvent e)
-        {
-            JMenuItem source = (JMenuItem)e.getSource();
-            String text = source.getText();
-            boolean selected = (e.getStateChange() == ItemEvent.SELECTED);
-            if (selected && text != null)
-            {
-                client.setOption(Options.showRecruitChitsSubmenu, text);
-            }
-        }
-    }
-
     class MasterBoardWindowHandler extends WindowAdapter
     {
         public void windowClosing(WindowEvent e)
@@ -2561,9 +2405,6 @@ public final class MasterBoard extends JPanel
 
     public void dispose()
     {
-        preferencesWindow.dispose();
-        preferencesWindow = null;
-
         setVisible(false);
         setEnabled(false);
         saveWindow.saveLocation(masterFrame.getLocation());
@@ -2664,132 +2505,6 @@ public final class MasterBoard extends JPanel
             requestFocus();
             getFrame().toFront();
         }
-    }
-
-    class PreferencesWindow extends KFrame
-    {
-        private IOptions options;
-        
-        private Map prefCheckboxes = new HashMap();
-        
-        private JButton closeButton;
-        
-        private AbstractAction closePrefsAction;
-        
-        public PreferencesWindow(IOptions options)
-        {
-            super("Preferences");
-            this.options = options;
-            
-            getContentPane().add(new JLabel("Dummy"));
-            
-            setDefaultCloseOperation(KFrame.HIDE_ON_CLOSE);
-            
-            setupGUI();
-            
-            pack();
-            
-            setPreferredSize(getSize());
-            
-            useSaveWindow(options, "Preferences", null);
-        }
-        
-        private ItemListener prefItemHandler = new PrefWindowItemHandler();
-
-        public ItemListener getItemHandler()
-        {
-            return prefItemHandler;
-        }
-        
-        private JCheckBox addCheckBox(Container pane, String name)
-        {
-            JCheckBox cb = new JCheckBox(name);
-            cb.setSelected(options.getOption(name));
-
-            cb.addItemListener(prefItemHandler);
-            pane.add(cb);
-            prefCheckboxes.put(name, cb);
-            return cb;
-        }
-
-        private void setupGUI()
-        {
-            Container prefPane = new Box(BoxLayout.Y_AXIS);
-            getContentPane().setLayout(new BorderLayout());
-            getContentPane().add(prefPane, BorderLayout.CENTER);
-           
-            // Battle Map settings:
-            JPanel battlePane = new JPanel(new GridLayout(0, 1));
-            battlePane.setBorder(new TitledBorder("Battle Map"));
-            addCheckBox(battlePane, Options.useColoredBorders);
-            addCheckBox(battlePane, Options.doNotInvertDefender);
-            addCheckBox(battlePane, Options.hideAdjStrikeDiceRangeStrike);
-            prefPane.add(battlePane);
-            
-            // Autoplay settings:
-            JPanel apPane = new JPanel(new GridLayout(0, 1));
-            apPane.setBorder(new TitledBorder("Autoplay"));
-            addCheckBox(apPane, Options.autoPickColor);
-            addCheckBox(apPane, Options.autoPickMarker);
-            addCheckBox(apPane, Options.autoPickEntrySide);
-            addCheckBox(apPane, Options.autoForcedStrike);
-            addCheckBox(apPane, Options.autoCarrySingle);
-            addCheckBox(apPane, Options.autoRangeSingle);
-            addCheckBox(apPane, Options.autoSummonAngels);
-            addCheckBox(apPane, Options.autoAcquireAngels);
-            addCheckBox(apPane, Options.autoRecruit);
-            addCheckBox(apPane, Options.autoPickRecruiter);
-            addCheckBox(apPane, Options.autoReinforce);
-            addCheckBox(apPane, Options.autoPlay);
-            prefPane.add(apPane);
-
-            prefPane.add(Box.createVerticalGlue());
-            
-            closePrefsAction = new AbstractAction("Close")
-            {
-                public void actionPerformed(ActionEvent e)
-                {
-                    setVisible(false);
-                }
-            };
-
-            closeButton = new JButton(closePrefsAction);
-            getContentPane().add(closeButton, BorderLayout.SOUTH);
-        }
-        
-        private void cleanPrefCBListeners()
-        {
-            Iterator it = prefCheckboxes.keySet().iterator();
-            while (it.hasNext())
-            {
-                String key = (String)it.next();
-                JCheckBox cb = (JCheckBox)prefCheckboxes.get(key);
-                cb.removeItemListener(prefItemHandler);
-            }
-            prefCheckboxes.clear();
-            prefCheckboxes = null;
-            prefItemHandler = null;
-        }
-
-        public void dispose()
-        {
-            cleanPrefCBListeners();
-            prefItemHandler = null;
-            super.dispose();
-            options = null;
-        }
-        
-        class PrefWindowItemHandler implements ItemListener
-        {
-            public void itemStateChanged(ItemEvent e)
-            {
-                JCheckBox source = (JCheckBox)e.getSource();
-                String text = source.getText();
-                boolean selected = (e.getStateChange() == ItemEvent.SELECTED);
-                client.setOption(text, selected);
-            }
-        }
-
     }
 
     class BottomBar extends JPanel

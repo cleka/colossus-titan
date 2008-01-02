@@ -10,6 +10,8 @@ public interface IOptions
 {
     boolean getOption(String optname);
 
+    boolean getOption(String optname, boolean defaultValue);
+
     String getStringOption(String optname);
 
     int getIntOption(String optname);

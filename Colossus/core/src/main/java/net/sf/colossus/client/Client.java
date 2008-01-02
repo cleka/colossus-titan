@@ -4,6 +4,7 @@ package net.sf.colossus.client;
 import java.awt.Cursor;
 import java.awt.GraphicsDevice;
 import java.awt.Point;
+import java.awt.Window;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -84,6 +85,7 @@ public final class Client implements IClient, IOracle, IOptions
     private EngagementResults engagementResults;
     private AutoInspector autoInspector;
     private EventViewer eventViewer;
+    private PreferencesWindow preferencesWindow;
 
     /** hexLabel of MasterHex for current or last engagement. */
     private String battleSite;
@@ -526,6 +528,22 @@ public final class Client implements IClient, IOracle, IOptions
         }
     }
 
+    private void initPreferencesWindow()
+    {
+        if (preferencesWindow == null)
+        {
+            preferencesWindow = new PreferencesWindow(this, this);
+        }
+    }
+
+    public void setPreferencesWindowVisible(boolean val)
+    {
+        if (preferencesWindow != null)
+        {
+            preferencesWindow.setVisible(val);
+        }
+    }
+    
     /**
      * Displays the marker and its legion if possible.
      */
@@ -683,6 +701,12 @@ public final class Client implements IClient, IOracle, IOptions
     MovementDie getMovementDie()
     {
         return movementDie;
+    }
+
+    // public for IOptions
+    public boolean getOption(String optname, boolean defaultValue)
+    {
+        return options.getOption(optname, defaultValue);
     }
 
     // public for IOptions
@@ -1152,6 +1176,15 @@ public final class Client implements IClient, IOracle, IOptions
         }
     }
 
+    private void disposePreferencesWindow()
+    {
+        if (preferencesWindow != null)
+        {
+            preferencesWindow.dispose();
+            preferencesWindow = null;
+        }
+    }
+    
     void disposeEngagementResults()
     {
         if (engagementResults != null)
@@ -1422,6 +1455,7 @@ public final class Client implements IClient, IOracle, IOptions
         disposeMovementDie();
         disposeStatusScreen();
         disposeEventViewer();
+        disposePreferencesWindow();
         disposeEngagementResults();
         disposeBattleMap();
         disposeMasterBoard();
@@ -2235,6 +2269,7 @@ public final class Client implements IClient, IOracle, IOptions
                 Options.playerType).endsWith("Network"))))
         {
             disposeEventViewer();
+            disposePreferencesWindow();
             disposeEngagementResults();
             disposeInspector();
             disposeCaretakerDisplay();
@@ -2244,6 +2279,7 @@ public final class Client implements IClient, IOracle, IOptions
             board = new MasterBoard(this);
             initEventViewer();
             initShowEngagementResults();
+            initPreferencesWindow();
             optionTrigger(Options.showAutoInspector);
             optionTrigger(Options.showLogWindow);
             optionTrigger(Options.showCaretaker);
@@ -3821,7 +3857,7 @@ public final class Client implements IClient, IOracle, IOptions
             int baseDice = 0;
             int strikeDice = strike.getDice(chit, target, baseDice);
             if (baseDice == dice
-                || !getOption(Options.hideAdjStrikeDiceRangeStrike))
+                || getOption(Options.showDiceAjustmentsRange))
             {
                 target.setStrikeDice(strikeDice - dice);
             }
@@ -5225,6 +5261,15 @@ public final class Client implements IClient, IOracle, IOptions
         }
     }
 
+    private void updateTreeAndPack(Window window)
+    {
+        if (window != null)
+        {
+            SwingUtilities.updateComponentTreeUI(window);
+            window.pack();
+        }
+    }
+    
     private void updateEverything()
     {
         if (board != null)
@@ -5232,16 +5277,10 @@ public final class Client implements IClient, IOracle, IOptions
             board.updateComponentTreeUI();
             board.pack();
         }
-        if (statusScreen != null)
-        {
-            SwingUtilities.updateComponentTreeUI(statusScreen);
-            statusScreen.pack();
-        }
-        if (caretakerDisplay != null)
-        {
-            SwingUtilities.updateComponentTreeUI(caretakerDisplay);
-            caretakerDisplay.pack();
-        }
+        updateTreeAndPack(statusScreen);
+        updateTreeAndPack(caretakerDisplay );
+        updateTreeAndPack(webClient);
+        updateTreeAndPack(preferencesWindow); 
         repaintAllWindows();
     }
 

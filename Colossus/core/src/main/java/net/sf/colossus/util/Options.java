@@ -115,7 +115,9 @@ public final class Options implements IOptions
     public static final String noBaseColor = "Use black overlay on Chits";
     public static final String useColoredBorders = "Use colored borders on Battle Chits";
     public static final String doNotInvertDefender = "Do not invert defender's Battle Chits";
-    public static final String hideAdjStrikeDiceRangeStrike = "Hide Adjustments to Dice for Rangestrike";
+    public static final String showHitThreshold = "Show needed roll for hit";
+    public static final String showDiceAjustmentsTerrain = "Show added/lost dice due to terrain";
+    public static final String showDiceAjustmentsRange = "Show lost dice due to rangestrike";
     public static final String showAllRecruitChits = "Show all recruit Chits";
     public static final String showRecruitChitsSubmenu = "Show recruit preview chits...";
     public static final String showRecruitChitsNone = "None";
@@ -282,6 +284,13 @@ public final class Options implements IOptions
     public boolean getOption(String optname)
     {
         String value = getStringOption(optname);
+        return (value != null && value.equals("true"));
+    }
+
+    public boolean getOption(String optname, boolean defaultValue)
+    {
+        String value = getStringOption(optname,
+            (defaultValue ? "true" : "false"));
         return (value != null && value.equals("true"));
     }
 
