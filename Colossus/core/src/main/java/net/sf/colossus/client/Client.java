@@ -274,6 +274,11 @@ public final class Client implements IClient, IOracle, IOptions
         return remote;
     }
 
+    boolean isAlive()
+    {
+        return playerAlive;
+    }
+
     public void setWebClient(WebClient wc)
     {
         this.webClient = wc;
@@ -1230,18 +1235,19 @@ public final class Client implements IClient, IOracle, IOptions
     }
 
     // Used by MasterBoard and by BattleMap
-    public void closeBoardAfterConfirm(JFrame frame, boolean fromBattleBoard)
+    public void askNewCloseQuitCancel(JFrame frame, boolean fromBattleBoard)
     {
-        String[] options = new String[3];
+        String[] options = new String[4];
         options[0] = "New Game";
         options[1] = "Quit";
-        options[2] = "Cancel";
+        options[2] = "Close";
+        options[3] = "Cancel";
         int answer = JOptionPane.showOptionDialog(frame,
-            "Choose one of: Play another game, Quit, or Cancel",
+            "Choose one of: Play another game, Quit, Close just this board, or Cancel",
             "Play another game?", JOptionPane.YES_NO_OPTION,
-            JOptionPane.QUESTION_MESSAGE, null, options, options[2]);
+            JOptionPane.QUESTION_MESSAGE, null, options, options[3]);
         frame = null;
-        if (answer == -1 || answer == 2)
+        if (answer == -1 || answer == 3)
         {
             return;
         }
@@ -1259,6 +1265,10 @@ public final class Client implements IClient, IOracle, IOptions
         else if (answer == 1)
         {
             menuQuitGame();
+        }
+        else if (answer == 2)
+        {
+            disposeClientOriginated();
         }
     }
 
@@ -4714,6 +4724,13 @@ public final class Client implements IClient, IOracle, IOptions
 
     boolean quitAlreadyTried = false;
 
+    public void menuCloseBoard()
+    {
+        clearUndoStack();
+        Start.setCurrentWhatToDoNext(Start.GetPlayersDialog);
+        disposeClientOriginated();
+    }
+    
     public void menuQuitGame()
     {
         // Note that if this called from webclient, webclient has already 

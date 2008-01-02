@@ -99,7 +99,7 @@ public final class BattleBoard extends KFrame
         {
             public void windowClosing(WindowEvent e)
             {
-                client.closeBoardAfterConfirm(BattleBoard.this, true);
+                client.askNewCloseQuitCancel(BattleBoard.this, true);
             }
         });
 

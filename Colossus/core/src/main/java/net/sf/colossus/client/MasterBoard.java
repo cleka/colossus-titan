@@ -770,7 +770,31 @@ public final class MasterBoard extends JPanel
         {
             public void actionPerformed(ActionEvent e)
             {
-                client.closeBoardAfterConfirm(masterFrame, false);
+                boolean closeBoard = false;
+                if (client.isGameOver() || !client.isAlive() )
+                {
+                    closeBoard = true;
+                }
+                else
+                {
+                    String[] options = new String[2];
+                    options[0] = "Yes";
+                    options[1] = "No";
+                    int answer = JOptionPane.showOptionDialog(masterFrame,
+                        "Are you sure you wish to withdraw and close the board?", "Close Board?",
+                        JOptionPane.YES_NO_OPTION,
+                        JOptionPane.QUESTION_MESSAGE, null, options,
+                        options[1]);
+                    if (answer == JOptionPane.YES_OPTION)
+                    {
+                        closeBoard = true;
+                    }
+                }
+
+                if (closeBoard)
+                {
+                    client.menuCloseBoard();
+                }
             }
         };
 
@@ -823,7 +847,6 @@ public final class MasterBoard extends JPanel
                 showHelpDoc = new ShowHelpDoc();
             }
         };
-
     }
 
     public void doQuitGameAction()
@@ -2234,7 +2257,7 @@ public final class MasterBoard extends JPanel
     {
         public void windowClosing(WindowEvent e)
         {
-            closeBoardAction.actionPerformed(null);
+            client.askNewCloseQuitCancel(masterFrame, false);
         }
     }
 
