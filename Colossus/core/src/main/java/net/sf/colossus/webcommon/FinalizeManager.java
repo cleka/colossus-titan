@@ -9,12 +9,12 @@ import java.util.logging.Logger;
 
 
 /**
- *  Objects can register here during their constructor and
- *  and unregister when their finalizer is run. This class 
- *  keeps then track which instances are still running.
+ *  Objects can register here when they are created.
+ *  This class notices when it an object is garbage collected 
+ *  and keeps then track which instances are still running/alive.
  *   
  *  One can configure for which classes one is interested
- *  in seeing the created/finalized/delta.
+ *  in seeing the created/removed delta.
  *   
  *  This is meant for debug/development purposes, to verify
  *  that cleanup is usually done properly, and not threads

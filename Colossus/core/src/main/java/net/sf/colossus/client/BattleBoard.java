@@ -183,10 +183,10 @@ public final class BattleBoard extends KFrame
             + ") attacks " + Legion.getMarkerName(defenderMarkerId) + " ("
             + defenderMarkerId + ") in " + masterHexLabel);
 
-        String finalizeId = client.getPlayerName() + ": " + attackerMarkerId
+        String instanceId = client.getPlayerName() + ": " + attackerMarkerId
             + "/" + defenderMarkerId + " (" + count + ")";
         count++;
-        net.sf.colossus.webcommon.FinalizeManager.setId(this, finalizeId);
+        net.sf.colossus.webcommon.FinalizeManager.setId(this, instanceId);
 
         pack();
         setVisible(true);

@@ -52,10 +52,10 @@ public final class BattleMap extends HexMap implements MouseListener,
         this.add(attackerMarker);
         this.add(defenderMarker);
 
-        String finalizeId = client.getPlayerName() + ": " + attackerMarkerId
+        String instanceId = client.getPlayerName() + ": " + attackerMarkerId
             + "/" + defenderMarkerId + " (" + count + ")";
         count++;
-        net.sf.colossus.webcommon.FinalizeManager.setId(this, finalizeId);
+        net.sf.colossus.webcommon.FinalizeManager.setId(this, instanceId);
 
     }
 

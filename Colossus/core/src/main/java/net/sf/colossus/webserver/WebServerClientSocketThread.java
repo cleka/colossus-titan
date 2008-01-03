@@ -40,7 +40,6 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
     private BufferedReader in;
     private PrintWriter out;
     private User user = null;
-    private String cachedUsername = "<not set>"; // only for finalizer
 
     private boolean loggedIn = false;
 
@@ -568,14 +567,5 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
             ", " + sender + ": " + message);
         sendToClient(chatDeliver + sep + chatId + sep + when + sep + sender
             + sep + message + sep + resent);
-    }
-
-    public void finalize()
-    {
-        if (false)
-        {
-            LOGGER.log(Level.FINE, "finalize(): " + this.getClass().getName()
-                + " for user " + this.cachedUsername);
-        }
     }
 }
