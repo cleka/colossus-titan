@@ -6,7 +6,7 @@ import java.io.InputStreamReader;
 
 
 /**
- *  two small methods helpful during development,
+ *  some small methods helpful during development,
  *  to wait before program ends to see object instance
  *  statistics, once just until return is pressed,
  *  once a loop in which one can force GC, see object statistics,
