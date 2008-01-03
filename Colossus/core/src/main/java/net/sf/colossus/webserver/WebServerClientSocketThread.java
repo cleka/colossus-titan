@@ -278,11 +278,7 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
                     user = User.findUserByName(username);
                     loggedIn = true;
                     ok = true;
-
                     user.setThread(this);
-
-                    this.cachedUsername = username;
-
                     setName("WebServerClientSocketThread " + username);
                 }
             }
