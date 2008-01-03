@@ -141,7 +141,6 @@ public class WebClient extends KFrame implements WindowListener,
     private JButton registerOrPasswordButton;
 
     private JButton debugSubmitButton;
-    private JButton gcButton;
     private JButton shutdownButton;
 
     private JLabel statusField;
@@ -512,10 +511,6 @@ public class WebClient extends KFrame implements WindowListener,
         adminPane.add(new JLabel("Server answered:"));
         receivedField = new JLabel("");
         adminPane.add(receivedField);
-
-        gcButton = new JButton("Garbage Collection");
-        gcButton.addActionListener(this);
-        adminPane.add(gcButton);
 
         shutdownButton = new JButton("Shutdown Server");
         shutdownButton.addActionListener(this);
@@ -1855,12 +1850,6 @@ public class WebClient extends KFrame implements WindowListener,
             commandField.setText("");
         }
 
-        else if (command.equals("Garbage Collection"))
-        {
-            System.gc();
-            System.runFinalization();
-        }
-
         else if (command.equals("Shutdown Server"))
         {
             server.shutdownServer();
@@ -1973,8 +1962,7 @@ public class WebClient extends KFrame implements WindowListener,
 
     public void windowIconified(WindowEvent e)
     {
-        System.gc();
-        System.runFinalization();
+        //
     }
 
     public void windowOpened(WindowEvent e)

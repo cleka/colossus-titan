@@ -89,16 +89,6 @@ public class WebServer implements IWebServer, IRunWebServer
         // (shutDownRequested set to true, so that the loop quits)
         server = null;
 
-        try
-        {
-            Thread.sleep(1000);
-        }
-        catch (InterruptedException e)
-        {/* ignore */
-        }
-        System.gc();
-        System.runFinalization();
-        
         LOGGER.log(Level.ALL, "WebServer.main() will end...");
 
         // JVM should do a clean exit now, no System.exit() needed.

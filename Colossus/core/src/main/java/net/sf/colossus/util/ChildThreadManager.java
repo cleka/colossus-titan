@@ -110,8 +110,6 @@ public class ChildThreadManager
         {
             printdebug("\n#######\nreaper(): list empty...");
         }
-        System.gc();
-        System.runFinalization();
     }
 
     private boolean allChildrenGone()

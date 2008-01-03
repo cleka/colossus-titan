@@ -249,9 +249,6 @@ public final class Server implements IServer
 
         stopFileServer();
 
-        System.gc();
-        System.runFinalization();
-
         // particularly to remove the loggers
         if (!clients.isEmpty())
         {

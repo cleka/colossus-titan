@@ -19,8 +19,7 @@ import javax.swing.JScrollPane;
 
 /** The web server GUI - so far shows only simple info
  *  like amount of users logged in, potential-, running-
- *  and ending games, and for debugging purposes provides
- *  a "garbage collection" (and runFinalizers) button.
+ *  and ending games.
  *  
  *  @version $Id$
  *  @author Clemens Katzer
@@ -36,8 +35,6 @@ public class WebServerGUI extends JFrame implements WindowListener,
     private JLabel potentialGamesInfo;
     private JLabel runningGamesInfo;
     private JLabel endingGamesInfo;
-
-    private JButton gcButton;
 
     public WebServerGUI(WebServer webServer)
     {
@@ -66,10 +63,6 @@ public class WebServerGUI extends JFrame implements WindowListener,
 
         endingGamesInfo = new JLabel("No ending games.");
         mainPane.add(endingGamesInfo);
-
-        gcButton = new JButton("Garbage Collection");
-        gcButton.addActionListener(this);
-        mainPane.add(gcButton);
 
         addWindowListener(this);
         pack();
@@ -103,13 +96,6 @@ public class WebServerGUI extends JFrame implements WindowListener,
         {
             dispose();
             webServer.initiateShutdown(true);
-        }
-
-        else if (e.getActionCommand().equals("Garbage Collection"))
-        {
-            webServer.updateGUI();
-            System.gc();
-            System.runFinalization();
         }
 
         else
