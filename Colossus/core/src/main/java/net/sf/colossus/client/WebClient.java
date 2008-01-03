@@ -245,7 +245,7 @@ public class WebClient extends KFrame implements WindowListener,
         initValues(hostname, port, login, password);
 
         ViableEntityManager.register(this, "WebClient " + login);
-        net.sf.colossus.webcommon.FinalizeManager.register(this, "WebClient "
+        net.sf.colossus.webcommon.InstanceTracker.register(this, "WebClient "
             + login);
 
         if (SwingUtilities.isEventDispatchThread())

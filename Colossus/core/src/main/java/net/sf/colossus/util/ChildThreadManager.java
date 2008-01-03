@@ -41,7 +41,7 @@ public class ChildThreadManager
         childThreads = new ArrayList();
         unregisteringChilds = new ArrayList();
         this.id = id;
-        net.sf.colossus.webcommon.FinalizeManager.register(this, id);
+        net.sf.colossus.webcommon.InstanceTracker.register(this, id);
     }
 
     public void setDebug(boolean val)

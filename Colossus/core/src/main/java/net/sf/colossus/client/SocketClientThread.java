@@ -58,7 +58,7 @@ final class SocketClientThread extends Thread implements IServer
 
         this.client = client;
         this.threadMgr = client.getThreadMgr();
-        net.sf.colossus.webcommon.FinalizeManager.register(this, "SCT "
+        net.sf.colossus.webcommon.InstanceTracker.register(this, "SCT "
             + client.getPlayerName());
 
         String task = "";

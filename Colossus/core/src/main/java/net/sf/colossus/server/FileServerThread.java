@@ -89,7 +89,7 @@ final class FileServerThread extends Thread
     public void run()
     {
         threadMgr.registerToThreadManager(this);
-        net.sf.colossus.webcommon.FinalizeManager.register(this, "only 1");
+        net.sf.colossus.webcommon.InstanceTracker.register(this, "only 1");
         try
         {
             while (keepGoingOn)

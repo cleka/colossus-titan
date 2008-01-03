@@ -110,7 +110,7 @@ public final class Game
     public void setPort(int portNr)
     {
         this.port = portNr;
-        net.sf.colossus.webcommon.FinalizeManager.register(this,
+        net.sf.colossus.webcommon.InstanceTracker.register(this,
             "Game at port " + port);
     }
 

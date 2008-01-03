@@ -10,22 +10,22 @@ import java.util.logging.Logger;
 
 /**
  *  Storage object for all objects of one class type registered
- *  in FinalizeManager.
+ *  in InstanceTracker.
  *   
  *  @version $Id$
  *  @author Clemens Katzer
  *    
  */
 
-public class FinalizeClassGroup
+public class InstanceGroup
 {
     private static final Logger LOGGER =
-        Logger.getLogger(FinalizeClassGroup.class.getName());
+        Logger.getLogger(InstanceGroup.class.getName());
 
     private WeakHashMap instances;
     private String shortType;
 
-    public FinalizeClassGroup(String type)
+    public InstanceGroup(String type)
     {
         instances = new WeakHashMap();
         this.shortType = shortType(type);

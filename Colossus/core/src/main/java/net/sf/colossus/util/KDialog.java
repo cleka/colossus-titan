@@ -30,7 +30,7 @@ public class KDialog extends JDialog implements MouseListener, WindowListener
     public KDialog(Frame owner, String title, boolean modal)
     {
         super(owner, title, modal);
-        net.sf.colossus.webcommon.FinalizeManager.register(this,
+        net.sf.colossus.webcommon.InstanceTracker.register(this,
             "KDialog-for-?");
     }
 

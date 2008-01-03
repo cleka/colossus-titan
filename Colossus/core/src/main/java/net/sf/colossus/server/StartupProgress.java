@@ -33,7 +33,7 @@ public final class StartupProgress implements ActionListener
     {
         this.server = server;
 
-        net.sf.colossus.webcommon.FinalizeManager.register(this, "only one");
+        net.sf.colossus.webcommon.InstanceTracker.register(this, "only one");
 
         //Create and set up the window.
         KFrame logFrame = new KFrame("Server startup progress log");

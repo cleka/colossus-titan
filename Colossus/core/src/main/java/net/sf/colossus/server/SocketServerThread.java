@@ -17,7 +17,7 @@ import java.util.logging.Logger;
 import net.sf.colossus.client.IClient;
 import net.sf.colossus.util.Glob;
 import net.sf.colossus.util.Split;
-import net.sf.colossus.webcommon.FinalizeManager;
+import net.sf.colossus.webcommon.InstanceTracker;
 
 
 /**
@@ -57,7 +57,7 @@ final class SocketServerThread extends Thread implements IClient
         this.server = server;
         this.socket = socket;
         String tempId = "<no name yet #" + (counter++) + ">";
-        FinalizeManager.register(this, tempId);
+        InstanceTracker.register(this, tempId);
         // We must register already in constructor. Otherwise, clients
         // might have connected, but none yet registered to threadmgr.
         // So Server continues with "waitUntilAllGone", there are no
@@ -283,7 +283,7 @@ final class SocketServerThread extends Thread implements IClient
                 .booleanValue();
             setPlayerName(playerName);
             server.addClient(this, playerName, remote);
-            FinalizeManager.setId(this, playerName);
+            InstanceTracker.setId(this, playerName);
         }
         else if (method.equals(Constants.fixName))
         {

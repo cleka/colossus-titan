@@ -196,7 +196,7 @@ public final class MasterBoard extends JPanel
         {
             super();
             this.clientRef = new WeakReference(client);
-            net.sf.colossus.webcommon.FinalizeManager.register(this, client
+            net.sf.colossus.webcommon.InstanceTracker.register(this, client
                 .getPlayerName());
         }
 
@@ -378,7 +378,7 @@ public final class MasterBoard extends JPanel
     MasterBoard(final Client client)
     {
         this.client = client;
-        net.sf.colossus.webcommon.FinalizeManager.register(this, client
+        net.sf.colossus.webcommon.InstanceTracker.register(this, client
             .getPlayerName());
 
         String pname = client.getPlayerName();
@@ -2240,7 +2240,7 @@ public final class MasterBoard extends JPanel
         public MasterBoardItemHandler()
         {
             super();
-            net.sf.colossus.webcommon.FinalizeManager.register(this,
+            net.sf.colossus.webcommon.InstanceTracker.register(this,
                 cachedPlayerName);
         }
 

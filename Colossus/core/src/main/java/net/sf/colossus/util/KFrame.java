@@ -32,13 +32,13 @@ public class KFrame extends JFrame implements MouseListener, WindowListener
     public KFrame()
     {
         super();
-        net.sf.colossus.webcommon.FinalizeManager.register(this, "<no title>");
+        net.sf.colossus.webcommon.InstanceTracker.register(this, "<no title>");
     }
 
     public KFrame(String title)
     {
         super(title);
-        net.sf.colossus.webcommon.FinalizeManager.register(this, title);
+        net.sf.colossus.webcommon.InstanceTracker.register(this, title);
     }
 
     /**

@@ -213,7 +213,7 @@ public final class Client implements IClient, IOracle, IOptions
         this.threadMgr = new ChildThreadManager("Client " + playerName);
 
         ViableEntityManager.register(this, "Client " + playerName);
-        net.sf.colossus.webcommon.FinalizeManager.register(this, "Client "
+        net.sf.colossus.webcommon.InstanceTracker.register(this, "Client "
             + playerName);
 
         options = new Options(playerName);
@@ -2319,15 +2319,15 @@ public final class Client implements IClient, IOracle, IOptions
     {
         this.playerName = playerName;
         // all those just for debugging purposes:
-        net.sf.colossus.webcommon.FinalizeManager.setId(this, "Client "
+        net.sf.colossus.webcommon.InstanceTracker.setId(this, "Client "
             + playerName);
         // set name right for the autoplay-AI
-        net.sf.colossus.webcommon.FinalizeManager.setId(this.simpleAI,
+        net.sf.colossus.webcommon.InstanceTracker.setId(this.simpleAI,
             "Autoplay-SimpleAI " + playerName);
         if (ai != simpleAI)
         {
             // set name right for the AI if this is an AI player
-            net.sf.colossus.webcommon.FinalizeManager.setId(ai, "AI: "
+            net.sf.colossus.webcommon.InstanceTracker.setId(ai, "AI: "
                 + playerName);
         }
         sct.fixName(playerName);

@@ -32,10 +32,10 @@ import java.util.logging.Logger;
  *    
  */
 
-public class FinalizeManager
+public class InstanceTracker
 {
     private static final Logger LOGGER =
-        Logger.getLogger(FinalizeManager.class.getName());
+        Logger.getLogger(InstanceTracker.class.getName());
     
     private static WeakHashMap instanceGroups = new WeakHashMap();
 
@@ -84,14 +84,14 @@ public class FinalizeManager
             if (instanceGroups.containsKey(type))
             {
                 LOGGER.log(Level.FINEST, "Adding to existing group " + type);
-                FinalizeClassGroup group = (FinalizeClassGroup)instanceGroups
+                InstanceGroup group = (InstanceGroup)instanceGroups
                     .get(type);
                 group.addInstance(o, id);
             }
             else
             {
                 LOGGER.log(Level.FINEST, "Creating new group for " + type);
-                FinalizeClassGroup group = new FinalizeClassGroup(type);
+                InstanceGroup group = new InstanceGroup(type);
                 group.addInstance(o, id);
                 instanceGroups.put(type, group);
             }
@@ -106,12 +106,12 @@ public class FinalizeManager
     public static synchronized void setId(Object o, String id)
     {
         String type = o.getClass().getName();
-        String shortType = FinalizeClassGroup.shortType(type);
+        String shortType = InstanceGroup.shortType(type);
 
         if (interestedIn.contains(type))
         {
             LOGGER.log(Level.FINEST, 
-                "FinalizeManager.setId(): One object of type " + 
+                "InstanceTracker.setId(): One object of type " + 
                 shortType + " changes ID to '" + id + "'");
         }
 
@@ -120,9 +120,9 @@ public class FinalizeManager
 
         if (instanceGroups.containsKey(type))
         {
-            FinalizeClassGroup group = (FinalizeClassGroup)instanceGroups
+            InstanceGroup group = (InstanceGroup)instanceGroups
                 .get(type);
-            FinalizeClassGroup.typeInstance i = group.getInstance(o);
+            InstanceGroup.typeInstance i = group.getInstance(o);
             if (i != null)
             {
                 i.setId(id);
@@ -145,8 +145,8 @@ public class FinalizeManager
         while (it.hasNext())
         {
             String type = (String)it.next();
-            FinalizeClassGroup group =
-                (FinalizeClassGroup)instanceGroups.get(type);
+            InstanceGroup group =
+                (InstanceGroup)instanceGroups.get(type);
             stat.append(group.getPrintStatistics());
         }
         stat.append("\n");
@@ -159,7 +159,7 @@ public class FinalizeManager
         while (it.hasNext())
         {
             String type = (String)it.next();
-            FinalizeClassGroup group = (FinalizeClassGroup)instanceGroups
+            InstanceGroup group = (InstanceGroup)instanceGroups
                 .get(type);
             if (group.amountLeft() != 0)
             {

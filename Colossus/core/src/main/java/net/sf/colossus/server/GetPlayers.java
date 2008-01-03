@@ -99,7 +99,7 @@ public final class GetPlayers extends KFrame implements WindowListener,
     {
         super("Game Setup");
 
-        net.sf.colossus.webcommon.FinalizeManager.register(this, "only one");
+        net.sf.colossus.webcommon.InstanceTracker.register(this, "only one");
 
         this.options = options;
         this.mutex = mutex;

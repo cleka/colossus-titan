@@ -110,7 +110,7 @@ public final class Server implements IServer
         threadMgr = new ChildThreadManager("Server");
 
         waitingForClients = game.getNumLivingPlayers();
-        net.sf.colossus.webcommon.FinalizeManager.register(this, "only one");
+        net.sf.colossus.webcommon.InstanceTracker.register(this, "only one");
     }
 
     public ChildThreadManager getThreadMgr()

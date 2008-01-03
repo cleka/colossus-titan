@@ -96,7 +96,7 @@ public class DummyFrameWithMenu extends KFrame
     // will always be behind with some objects.
 
     // The main reason why I try to ensure this proper cleanup
-    // is that this way I can use the FinalizeManager in between
+    // is that this way I can use the InstanceTracker in between
     // and at program end, to check how well GC cleanup is working
     // (would be working )if there weren't this Swing issue.
 
@@ -140,7 +140,7 @@ public class DummyFrameWithMenu extends KFrame
 
         DebugMethods.waitReturn();
 
-        net.sf.colossus.webcommon.FinalizeManager.printStatistics();
+        net.sf.colossus.webcommon.InstanceTracker.printStatistics();
         
         Logger LOGGER =
             Logger.getLogger(DummyFrameWithMenu.class.getName());

@@ -34,7 +34,7 @@ public class DebugMethods
 
     public static void waitReturnLoop(boolean force)
     {
-        if (net.sf.colossus.webcommon.FinalizeManager.allGone())
+        if (net.sf.colossus.webcommon.InstanceTracker.allGone())
         {
             if (!force)
             {
@@ -48,7 +48,7 @@ public class DebugMethods
 
         System.gc();
         System.runFinalization();
-        net.sf.colossus.webcommon.FinalizeManager.printStatistics();
+        net.sf.colossus.webcommon.InstanceTracker.printStatistics();
 
         System.out.println(
             "Press return to proceed with cleanup...\n----------\n");
@@ -102,7 +102,7 @@ public class DebugMethods
                     System.gc();
                     System.runFinalization();
 
-                    net.sf.colossus.webcommon.FinalizeManager
+                    net.sf.colossus.webcommon.InstanceTracker
                         .printStatistics();
                 }
 
@@ -111,7 +111,7 @@ public class DebugMethods
                     done = true;
                 }
 
-                if (net.sf.colossus.webcommon.FinalizeManager.allGone())
+                if (net.sf.colossus.webcommon.InstanceTracker.allGone())
                 {
                     System.out.println("OK, allGone now true, we can stop.");
                     done = true;
@@ -200,7 +200,7 @@ public class DebugMethods
         // now all objects gone, each time waiting little longer.
         // Often they were finally gone when i=5 or 7 or so...
 
-        boolean allGone = net.sf.colossus.webcommon.FinalizeManager.allGone();
+        boolean allGone = net.sf.colossus.webcommon.InstanceTracker.allGone();
 
         if (!allGone)
         {
@@ -222,10 +222,10 @@ public class DebugMethods
             System.gc();
             System.runFinalization();
 
-            allGone = net.sf.colossus.webcommon.FinalizeManager.allGone();
+            allGone = net.sf.colossus.webcommon.InstanceTracker.allGone();
             if (!allGone)
             {
-                net.sf.colossus.webcommon.FinalizeManager
+                net.sf.colossus.webcommon.InstanceTracker
                     .printStatistics();
             }
             i++;
@@ -246,7 +246,7 @@ public class DebugMethods
                 DebugMethods.waitReturnLoop(true);
             }
 
-            net.sf.colossus.webcommon.FinalizeManager.printStatistics();
+            net.sf.colossus.webcommon.InstanceTracker.printStatistics();
         }
 
         int cnt = ViableEntityManager.getWaitingCnt();

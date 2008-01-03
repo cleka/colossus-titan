@@ -46,7 +46,7 @@ public final class PlayerInfo
     {
         this.client = client;
         net.sf.colossus.server.CustomRecruitBase.addPlayerInfo(this);
-        net.sf.colossus.webcommon.FinalizeManager.register(this, client
+        net.sf.colossus.webcommon.InstanceTracker.register(this, client
             .getPlayerName());
     }
 

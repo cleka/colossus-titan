@@ -20,7 +20,7 @@ public class RemoteLogHandler extends Handler
     public RemoteLogHandler()
     {
         super();
-        net.sf.colossus.webcommon.FinalizeManager.register(this,
+        net.sf.colossus.webcommon.InstanceTracker.register(this,
             "TheServerRLH");
     }
 
