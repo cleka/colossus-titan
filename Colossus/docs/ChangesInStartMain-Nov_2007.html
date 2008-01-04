@@ -20,12 +20,11 @@ not needed any more...
 There is now a difference between "close" and "quit".
 <P>
 File menu has now "Close" and "Quit". Close just closes this board,
-and only Quit completely/immediately ends the whole JVM; Closing the 
-MasterBoard now asks whether to Quit, Close, New Game or Cancel. In near 
-future I would like to have a choice for that in a new "Setting/Preferences"
+and only Quit completely ends the whole JVM.
+<P>
+Closing the MasterBoard now asks whether to Quit, Close, New Game or Cancel. 
+In near future I would like to have a choice for that in a new "Setting/Preferences"
 dialog, whether to ask or do one of the above without asking.
-[The "Close" feature is missing right now, I'll try to add that
-as soon as possible after merging back to trunk.]
 <P>
 
 In hotseat game ( = more than one local player), if one player closes
@@ -34,13 +33,14 @@ particularly nice when one player after another dies - right now you
 can't dispose those dead players board, if you do, whole game is
 gone). Only if last board is closed, the game and server ends.<BR>
 
-Note that this does NOT terminate the whole Colossus application, instead
-one is back to one of the dialogs (Game setup or Network client or, upcoming,
-the Web Client).
+Note that closing the last MasterBoard does NOT terminate the whole 
+Colossus application, instead one is back to one of the dialogs 
+(Game setup or Network client or, upcoming, the Web Client -- the one,
+from which you started that game).
 <P>
 Also note that from Network Client and Web Client, you can easily get back
 to the "main" (Game Setup) dialog by just cosing e.g. Network client
-dialog with the small "x" type button in rigt upper corner.
+dialog with the small "x" type button in right upper corner.
 <P>
 This also applies when starting a game fails - when the player hosting the
 game in the startup dialog decides to press "Abort", or the Network Client
@@ -51,7 +51,8 @@ the dialog from where you initiated that action and can try once more
 Altogether this mostly means a change from the "run one Colossus for one game
 and when it's over start a new instance" approach to the "after one is over
 you are ready to start another", and one needs explicit do a Quit.
-<P>My changes include a proper cleanup of all relevant major classes
+<P>
+My changes include a proper cleanup of all relevant major classes
 like Game, Server, SocketServerThread, Client, SocketClientThread, MasterBoard
 (i.e. they are garbage collected.)
 
@@ -153,7 +154,7 @@ server startup progress log tells on which port it is listening.
 
 <P>
 <HR>
-Created during November 2007 by Cleka. Updated december 24 by CleKa.
+Created during November 2007 by Cleka. Updated January 4, 2008 by CleKa.
 
 </body>
 </html>

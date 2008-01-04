@@ -13,11 +13,30 @@
 This describes the recent changes in some more detail than just the
 one-line-info on the main pages "News" section.
 
-<h3>Trunk</h3>
+
+<h3>January xx, 2008, build r29xx</h3>
 <ul>
 <li>Player name in the status screen stays in player's color. This allows
     telling who e.g. the green player was when green is dead.</li>
+<li>Includes now the <a href="WebClient.html">WebClient</a> (and 
+    <a href="WebServer.html">WebServer</a>) functionality.
+<li>The items in the MasterBoard menu which are more like "Preferences" 
+    (as opposed to: "actions") are now moved into an own window (Window => Preferences).
+<li>In Game setup a checkbox for "HotSeatMode". If mode is active,
+    it restores on player change the <b>MasterBoard</b> of the active player and
+    minimizes the others. <b>Does not cover the battle maps yet.</b> Also the satellites
+    (game status, eventviewer, ...) come and go with their respective MasterBoard.
+    <br>
+    So, something left to do here...</li>
+<li>Changes which eliminate or at least provide more logging info related to 
+    [ colossus-Bugs-1813362 ] "Battle hangs game, perhaps due to Java 1.5 ?" 
+    {perhaps caused by GTK window Look & Feel?}.
+<li>Quite some internal cleanup.
 </ul>
+
+<h3>December 28, 2007, build r2890</h3>
+
+Just a rebuild of same codebase to get also a proper ZIP file.
 
 <h3>December 24, 2007, build r2882</h3>
 Changes so far (just most recent first, i.e. NOT sorted by importance... ;-)

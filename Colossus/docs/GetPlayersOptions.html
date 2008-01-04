@@ -50,15 +50,33 @@ is usually the best to leave the setting to <b>&lt;By color&gt;</b>.
 <h2><A NAME="#ServersideOptions">Options pane (various settings for the game)</A></h2>
 
 <h3>Section "General"</h3>
-Those are hopefully self-explaining:
+Most of those are hopefully self-explaining:
 <ul>
 <li><A NAME="#Autosave">Autosave</A>
 <li>Log debug messages
 <li>Balanced starting towers
 <li>AIs stop when humans dead
 <li>Auto quit when game over
+<li>Hot seat mode
 </ul>
 
+<B><A NAME="#HotSeatMode">Hot seat mode:</A></B>
+<P>
+This is intended to reduce the problems with the many open windows
+when several players sit around the same computer, all as local 
+players (always the one who's turn it is sits down in front of
+computer, thus "hot seat"...)
+<P>
+If this mode is enabled, when one of the local players is the active 
+player, his MasterBoard is restored to normal size, 
+and that which was until then normal, will be iconified.
+<P>
+This feature does not cover the BattleBoards yet (i.e. you will still
+get as many as local players); and the information windows like
+Game Status, Inspector, Event Viewer etc. all come and go with their
+respective MasterBoard. This needs still some work.
+
+<P>
 <h3>Section "Viewability of legions and events"</h3>
 
 This controls whether one is allowed to view the contents of other
@@ -199,17 +217,35 @@ See <A HREF="Variant-HOWTO.html">Variant-HOWTO</A> for details.
 <P>
 By default preselected variant is called <b>Default</b> which
 is corresponding to the original Titan masterboard and creatures.
-<H3>Game starting</H3>
-In the bottom-most (<b>Game Startup</B>) section are action buttons to start
-the game, load a previously saved game, run a network client (see <A
-HREF="network.html">Networked Colossus</A> for details), or Quit.
 
+<H3>Clients</H3>
+Next section is <B>Clients</B>. The button <B>Run network client</B> brings
+up a small dialog in which you can enter a server address and port, and your
+name in that game. With that you can directly connect to some computer
+where someone is hosting a game and has one player configured for you 
+to join as network player (see <A HREF="network.html"> Networked 
+Colossus</A>).
+<P>
+The button <B>Run web client</B> starts the <A HREF="WebClient.html">
+Colossus Web Client</A>). With that client one can/could connect to some 
+server where a <A HREF="WebServer.html">Colossus Web Server</A> is running.
+When connected to that server, one can propose a game or enroll to a proposed game, 
+and when enough players have enrolled, the game can start.
+<P>
+We have the software ready for such a server, but we do not have
+access to a public server where to run it. Anyone willing to 
+help organizing such a thing is welcome.
+<P>
+
+<H3>Game starting</H3>
+In the bottom-most (<b>Game Startup</B>) section are action buttons to 
+start a new game, load a previously saved game, or Quit.
 <HR>
 <P>
 <I>
 Created spring 2007, reflecting the state of Colossus at this time.
 <BR>
-Last updated friday, July 13, 2007 19:53 by Clemens Katzer
+Last updated friday, January 4, 2008 by Clemens Katzer
 </I>
 </body>
 </html>

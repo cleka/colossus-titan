@@ -3,30 +3,35 @@
   <head>
     <meta name="generator"
     content="HTML Tidy for Linux/x86 (vers 1st July 2002), see www.w3.org" />
-    <title>Colossus - Web Server and Client</title>
+    <title>Colossus - Web Client</title>
   </head>
   <body>
 <h1>Colossus - Web Client</h1>
 <H3>Scope</h3>
 This document describes how to use the Colossus WebClient. The functionality 
-is currently available as a branch called <B>web</B> in SVN repository.
+is now available in the public build.
+
+<H3>Preface</H3>
+
+Someone might consider the terms "WebClient" and "WebServer" misleading. They
+are a plain Java Server/Client application, nothing related to Applets, Servlets,
+HTTP etc. at all. 
 <P>
+We just couldn't come up with a nice catchy term which would describe all
+aspects properly and still be handy and short...
+- you may read it as "There's a server somewhere in the web 
+( = Internet) where I can find other Colossus players, and the WebClient is the
+interface to connect to it".
 
-<H2>Running the WebClient</H2>
+<H2>Using the WebClient</H2>
 
-I assume the version of Colossus which includes the Web Client functionality
-will be available soon via Java Web Start. Until then, you need
-to build your own Colossus from the SVN branch (branches/web/ ) as described
-in <A HREF="WebServer.html">WebServer</A> document.
-
-<H3>Starting the application</H3>
-
-The WebClient is integrated into the normal Colossus.jar. It can be started
+The WebClient is integrated into the normal Colossus application.
+It can be brought up
 via the button <B>Run Web Client</B> in the "<B>Game Setup</B>" 
 (GetPlayers.java) dialog, or directly with a commandline option, e.g.:
-<PRE>
+<pre>
  <B>run -w</B>
-</PRE>
+</pre>
 In the dialog, it forms now together with the <B>Run Network Client</B>
 a new row of buttons (2nd last row) and the
 last row is only three buttons (New Game, Load Game and Quit) instead 
@@ -36,11 +41,39 @@ of four as before.
 and remove the Quit button totally - one can Quit by closing the GetPlayers
 dialog with the close window "x" in upper right corner... - but this way
 it is more obvious how to Quit.)
+<P>
+Clicking that <B>Run Web Client</B> button brings up the WebClient window,
+on which are four tabs:
+<UL>
+<LI>Login</LI>
+<LI>Instant Games</LI>
+<LI>Scheduled Games</LI>
+<LI>Chat</LI>
+</UL>
 
-<H3>Getting started with WebClient</H3>
+Usually the game will start on the Login tab, but that can be changed (see below).
+<H3>"Login" tab</H3>
 
+First fill in server name or address into the "Web Server" field (and possibly
+the port, if it differs). 
+<P>
+We do not have a permanent server up yet; ask on the developer's mailing list what is
+the status, has someone temporarily running one (privately), etc.
+<P>
 On first use, a user would usually use the "Register" button to
-create an login.
+create in a small additional window a login (username and password; 
+the email-address
+filled in there is currently not used at all, it's just for 
+completeness already part of the GUI and the data structures).
+<P><B>NOTE:</B> As address to where the register request is sent it will use 
+the server and port settings from the "main" WebClient window.
+<P>
+After filling in username and password, click <B>Register</B> in that small
+register window.
+
+On success, you are back to the Login pane. Click <B>Login</B> to actually
+connect and log in to the server now.
+
 <P>After that, you can change to the <B>Instant Games</B> tab. Note that
 on the <B>Server</B> tab are checkboxes for <B>Auto-login on start</B>
 and <B>After login Game pane</B>. 
@@ -53,13 +86,13 @@ file.
 <P>The other checkbox: if enabled, when login succeeds successfully,
 it immediately changed you to the <B>Instant Games</B> tab.
 
-<H3>Instant Games</H3>
+<H3>"Instant Games" tab</H3>
 
 In the <B>Instant Games</B> tab, you can see if some other player has
 proposed a game. 
 <P>
 If there is no proposed game interesting for you, you can
-propose one by yourself - it will proposed with the settings which
+propose one by yourself - it will be proposed with the settings which
 are currently set in your <B>Game preferences</B> section. Make there
 the settings according to your interests, and press the <B>Propose</B>
 button. And wait whether someone else enrolls ;-)
@@ -105,7 +138,7 @@ it - or otherwise all windows are closed and the Java Virtual Machine will
 be terminated.
 
 
-<H3>Scheduled Games</H3>
+<H3>"Scheduled Games" tab</H3>
 
 This is meant to be one day, that someone can propose a game, e.g.
 like: <I>next saturday evening, 20:00 [WebClient will convert it to your
@@ -119,7 +152,7 @@ missing, perhaps after some time anyway), the game can start.
 Details to be clarified for this...
 
 
-<H3>Chat</H3>
+<H3>"Chat" tab</H3>
 
 There is some simple chat functionality. The idea is, that people can
 agree/ask here, whether someone else is currently online, interested in
@@ -162,9 +195,9 @@ does not effect the behavior of the WebClient.
 <HR>
 <P>
 <I>
-Created october 2007, reflecting the state of Colossus in the branch.
+Created October 2007.
 <BR>
-Last updated thursday, December 20, 2007 by Clemens Katzer
+Last updated friday, January 4, 2008 by Clemens Katzer
 </I>
 </body>
 </html>
