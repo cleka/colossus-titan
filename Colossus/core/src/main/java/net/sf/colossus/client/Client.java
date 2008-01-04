@@ -5300,7 +5300,6 @@ public final class Client implements IClient, IOracle, IOptions
         }
         updateTreeAndPack(statusScreen);
         updateTreeAndPack(caretakerDisplay );
-        updateTreeAndPack(webClient);
         updateTreeAndPack(preferencesWindow); 
         repaintAllWindows();
     }
