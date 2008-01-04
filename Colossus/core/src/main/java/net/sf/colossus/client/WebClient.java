@@ -1970,18 +1970,6 @@ public class WebClient extends KFrame implements WindowListener,
         // nothing to do
     }
 
-    public void sleepFor(long millis)
-    {
-        try
-        {
-            Thread.sleep(millis);
-        }
-        catch (InterruptedException e)
-        {
-            // InterruptException caught... ignoring it...
-        }
-    }
-
     class GameTableModel extends AbstractTableModel
     {
         private String[] columnNames = { "#", "state", "by", "Variant",
