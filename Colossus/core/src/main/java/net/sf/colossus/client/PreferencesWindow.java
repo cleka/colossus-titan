@@ -62,9 +62,9 @@ public class PreferencesWindow extends KFrame
     static 
     {
         CONTROL_CONSTRAINTS.gridx = 1; // first in new line
+        CONTROL_CONSTRAINTS.weightx = 1; // expand cell horizontally to use width of pane
         CONTROL_CONSTRAINTS.anchor = GridBagConstraints.NORTHWEST; // align top left
         CONTROL_CONSTRAINTS.insets = new Insets(0,5,0,5); // add a bit extra space around it
-        CONTROL_CONSTRAINTS.weightx = 1; // expand horizontally to use width of pane
     }
     
     /**
@@ -74,8 +74,7 @@ public class PreferencesWindow extends KFrame
     static 
     {
         SUBPANEL_CONSTRAINTS.gridx = 1; // first in new line
-        SUBPANEL_CONSTRAINTS.anchor = GridBagConstraints.NORTHWEST; // align top left
-        SUBPANEL_CONSTRAINTS.weightx = 1; // expand horizontally to use width of pane
+        SUBPANEL_CONSTRAINTS.weightx = 1; // expand cell horizontally to use width of pane
         SUBPANEL_CONSTRAINTS.fill = GridBagConstraints.BOTH; // panel should use all of cell
     }
     
