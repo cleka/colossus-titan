@@ -2,7 +2,9 @@ package net.sf.colossus.client;
 
 import java.awt.BorderLayout;
 import java.awt.Container;
-import java.awt.GridLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -33,6 +35,50 @@ import net.sf.colossus.util.Options;
 public class PreferencesWindow extends KFrame
     implements ItemListener, ActionListener
 {
+    /**
+     * Gridbag constraints for a vertical filling (use with empty JPanel).
+     */
+    private static final GridBagConstraints FILL_CONSTRAINTS = new GridBagConstraints();
+    static 
+    {
+        FILL_CONSTRAINTS.gridx = 1;   // first in new line
+        FILL_CONSTRAINTS.weighty = 1; // expand vertically (others should have weighty set to 0)
+    }
+
+    /**
+     * Gridbag constraints for a vertical spacer (use with empty JPanel).
+     */
+    private static final GridBagConstraints SPACER_CONSTRAINTS = new GridBagConstraints();
+    static 
+    {
+        SPACER_CONSTRAINTS.gridx = 1;  // first in new line
+        SPACER_CONSTRAINTS.ipady = 10; // expand vsize by this many pixels
+    }
+
+    /**
+     * Gridbag constraints for the controls itself.
+     */
+    private static final GridBagConstraints CONTROL_CONSTRAINTS = new GridBagConstraints();
+    static 
+    {
+        CONTROL_CONSTRAINTS.gridx = 1; // first in new line
+        CONTROL_CONSTRAINTS.anchor = GridBagConstraints.NORTHWEST; // align top left
+        CONTROL_CONSTRAINTS.insets = new Insets(0,5,0,5); // add a bit extra space around it
+        CONTROL_CONSTRAINTS.weightx = 1; // expand horizontally to use width of pane
+    }
+    
+    /**
+     * Gridbag constraints for nested panels.
+     */
+    private static final GridBagConstraints SUBPANEL_CONSTRAINTS = new GridBagConstraints();
+    static 
+    {
+        SUBPANEL_CONSTRAINTS.gridx = 1; // first in new line
+        SUBPANEL_CONSTRAINTS.anchor = GridBagConstraints.NORTHWEST; // align top left
+        SUBPANEL_CONSTRAINTS.weightx = 1; // expand horizontally to use width of pane
+        SUBPANEL_CONSTRAINTS.fill = GridBagConstraints.BOTH; // panel should use all of cell
+    }
+    
     private IOptions options;
     private Client client;
     private Map prefCheckboxes = new HashMap();
@@ -70,7 +116,7 @@ public class PreferencesWindow extends KFrame
         cb.setSelected(options.getOption(name, defVal));
         cb.setEnabled(enabled);
         cb.addItemListener(this);
-        pane.add(cb);
+        pane.add(cb, CONTROL_CONSTRAINTS);
         prefCheckboxes.put(name, cb);
     }
 
@@ -84,7 +130,7 @@ public class PreferencesWindow extends KFrame
         }
         rb.addItemListener(this);
         group.add(rb);
-        cont.add(rb);
+        cont.add(rb, CONTROL_CONSTRAINTS);
         boolean selected = (text.equals(current));
         rb.setSelected(selected);
     }
@@ -96,15 +142,15 @@ public class PreferencesWindow extends KFrame
         getContentPane().add(tabbedPane, BorderLayout.CENTER);
 
         // Battle Map tab:
-        JPanel battlePane = new JPanel(new GridLayout(0, 1));
+        JPanel battlePane = new JPanel(new GridBagLayout());
         tabbedPane.addTab("Battle", battlePane);
         addCheckBox(battlePane, Options.useColoredBorders);
         addCheckBox(battlePane, Options.doNotInvertDefender);
-        battlePane.add(new JLabel(""));
+        battlePane.add(new JPanel(), SPACER_CONSTRAINTS);
         addCheckBox(battlePane, Options.showHitThreshold, true, true);
         addCheckBox(battlePane, Options.showDiceAjustmentsTerrain, true, true);
         addCheckBox(battlePane, Options.showDiceAjustmentsRange, true, true);
-        battlePane.add(Box.createVerticalGlue());
+        battlePane.add(new JPanel(), FILL_CONSTRAINTS);
 
         // Autoplay tab:
         /* 
@@ -126,7 +172,7 @@ public class PreferencesWindow extends KFrame
         addCheckBox(playerMenu, Options.autoReinforce, KeyEvent.VK_N);
         addCheckBox(playerMenu, Options.autoPlay, KeyEvent.VK_P);
         */
-        JPanel apPane = new JPanel(new GridLayout(0, 1));
+        JPanel apPane = new JPanel(new GridBagLayout());
         tabbedPane.addTab("Autoplay", apPane);
         addCheckBox(apPane, Options.autoPickColor);
         addCheckBox(apPane, Options.autoPickMarker);
@@ -140,28 +186,28 @@ public class PreferencesWindow extends KFrame
         addCheckBox(apPane, Options.autoPickRecruiter);
         addCheckBox(apPane, Options.autoReinforce);
         addCheckBox(apPane, Options.autoPlay);
-        apPane.add(Box.createVerticalGlue());
+        apPane.add(new JPanel(), FILL_CONSTRAINTS);
         
         // Graphics/View tab
-        Box viewPane = new Box(BoxLayout.Y_AXIS);
+        JPanel viewPane = new JPanel(new GridBagLayout());
         tabbedPane.addTab("Graphics/View", viewPane);
 
         //   - graphics features panel in Garhpics tab
-        JPanel graphicsPane = new JPanel(new GridLayout(0, 1));
+        JPanel graphicsPane = new JPanel(new GridBagLayout());
         graphicsPane.setBorder(new TitledBorder("Graphics features"));
         graphicsPane.setAlignmentX(LEFT_ALIGNMENT);
         addCheckBox(graphicsPane, Options.antialias);
         addCheckBox(graphicsPane, Options.useOverlay);
         addCheckBox(graphicsPane, Options.useSVG);
         addCheckBox(graphicsPane, Options.noBaseColor);
-        viewPane.add(graphicsPane);
+        viewPane.add(graphicsPane, SUBPANEL_CONSTRAINTS);
        
         //   - "Show recruit preview chits ..." panel in Graphics tab
         ButtonGroup group = new ButtonGroup();
         rcModes = new Box(BoxLayout.Y_AXIS);
         rcModes.setAlignmentX(LEFT_ALIGNMENT);
         rcModes.setBorder(new TitledBorder(Options.showRecruitChitsSubmenu));
-        viewPane.add(rcModes);
+        viewPane.add(rcModes, SUBPANEL_CONSTRAINTS);
 
         String current = options.getStringOption(Options.showRecruitChitsSubmenu);
         // NOTE! : event handling is based on that the RB is partof this rcModes Box!
@@ -173,7 +219,7 @@ public class PreferencesWindow extends KFrame
         //   -- misc. Panel in Graphics tab: 
         //        so far only dubious as blanks
         Box miscPane = new Box(BoxLayout.Y_AXIS);
-        viewPane.add(miscPane);
+        viewPane.add(miscPane, SUBPANEL_CONSTRAINTS);
         miscPane.setBorder(new TitledBorder("Misc."));
         miscPane.setAlignmentX(LEFT_ALIGNMENT);
         //  The "dubious as blanks" option makes only sense with the 
@@ -181,11 +227,11 @@ public class PreferencesWindow extends KFrame
         boolean avail = (client.getViewMode() == Options.viewableEverNum);
         addCheckBox(miscPane, Options.dubiousAsBlanks, avail, false); 
         // , KeyEvent.VK_D);
-        viewPane.add(Box.createVerticalGlue());
+        viewPane.add(new JPanel(), FILL_CONSTRAINTS);
 
         
         // Window tab
-        Box windowPane = new Box(BoxLayout.Y_AXIS);
+        JPanel windowPane = new JPanel(new GridBagLayout());
         tabbedPane.addTab("Windows", windowPane);
 
         addCheckBox(windowPane, Options.stealFocus); // KeyEvent.VK_F
@@ -193,7 +239,7 @@ public class PreferencesWindow extends KFrame
         //   Look & Feel panel in Window tab
         ButtonGroup lfGroup = new ButtonGroup();
         lfBox = new Box(BoxLayout.Y_AXIS);
-        windowPane.add(lfBox);
+        windowPane.add(lfBox, SUBPANEL_CONSTRAINTS);
         lfBox.setAlignmentX(LEFT_ALIGNMENT);
         lfBox.setBorder(new TitledBorder("Look & Feel"));
         lfBox.add(new JLabel("Choose your preferred \"Look & Feel\":"));
@@ -213,9 +259,9 @@ public class PreferencesWindow extends KFrame
         int step = 1;
         ScaleValue scalePane = new ScaleValue(oldValue, min, max, step);
         scalePane.setAlignmentX(LEFT_ALIGNMENT);
-        windowPane.add(scalePane);
+        windowPane.add(scalePane, SUBPANEL_CONSTRAINTS);
 
-        windowPane.add(Box.createVerticalGlue());
+        windowPane.add(new JPanel(), FILL_CONSTRAINTS);
         
         closeButton = new JButton("Close");
         closeButton.addActionListener(this);
