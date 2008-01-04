@@ -923,6 +923,14 @@ public class GameInfo extends Thread
                 }
                 thread = null;
             }
+            try
+            {
+                this.reader.close();
+            }
+            catch(IOException e)
+            {
+                LOGGER.log(Level.WARNING, "Nulldumper reader.close got " + e);
+            }
         }
     } // END Class NullDumper
 
