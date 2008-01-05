@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import net.sf.colossus.game.PlayerState;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.Player;
 import net.sf.colossus.util.Split;
@@ -21,7 +22,7 @@ import net.sf.colossus.xmlparser.TerrainRecruitLoader;
  * @author David Ripton
  */
 
-public final class PlayerInfo
+public final class PlayerInfo extends PlayerState
 {
     private Client client;
 
@@ -44,6 +45,7 @@ public final class PlayerInfo
     /** Two-stage initialization. */
     PlayerInfo(Client client)
     {
+        super(null, null);
         this.client = client;
         net.sf.colossus.server.CustomRecruitBase.addPlayerInfo(this);
         net.sf.colossus.webcommon.InstanceTracker.register(this, client

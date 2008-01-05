@@ -13,8 +13,8 @@ import java.util.logging.Logger;
 
 import net.sf.colossus.client.BattleHex;
 import net.sf.colossus.client.HexMap;
-import net.sf.colossus.game.HazardTerrain;
 import net.sf.colossus.util.Options;
+import net.sf.colossus.variant.HazardTerrain;
 
 
 /**

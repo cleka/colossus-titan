@@ -28,9 +28,9 @@ import java.util.logging.Logger;
 
 import javax.swing.JPanel;
 
-import net.sf.colossus.game.HazardTerrain;
 import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.util.ResourceLoader;
+import net.sf.colossus.variant.HazardTerrain;
 import net.sf.colossus.xmlparser.BattlelandLoader;
 import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 

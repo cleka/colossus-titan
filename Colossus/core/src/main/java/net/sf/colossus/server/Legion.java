@@ -22,23 +22,24 @@ import net.sf.colossus.xmlparser.TerrainRecruitLoader;
  * @author Romain Dolbeau
  */
 
-public final class Legion implements Comparable
+public final class Legion extends net.sf.colossus.game.Legion implements
+    Comparable
 {
     private static final Logger LOGGER = Logger.getLogger(Legion.class
         .getName());
 
-    private String markerId; // Bk03, Rd12, etc.
-    private String parentId;
-    private List critters = new ArrayList();
+    private final String markerId; // Bk03, Rd12, etc.
+    private final String parentId;
+    private final List critters = new ArrayList();
     private String currentHexLabel;
     private String startingHexLabel;
     private boolean moved;
     private int entrySide = -1;
     private boolean teleported;
     private String recruitName;
-    private String playerName;
+    private final String playerName;
     private int battleTally;
-    private Game game;
+    private final Game game;
     private int angelsToAcquire;
 
     Legion(String markerId, String parentId, String currentHexLabel,

@@ -4,8 +4,8 @@ package net.sf.colossus.client;
 import java.awt.Color;
 import java.util.Iterator;
 
-import net.sf.colossus.game.HazardTerrain;
 import net.sf.colossus.server.Creature;
+import net.sf.colossus.variant.HazardTerrain;
 import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
 

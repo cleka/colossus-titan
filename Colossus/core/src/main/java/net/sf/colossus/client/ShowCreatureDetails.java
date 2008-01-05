@@ -21,12 +21,12 @@ import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 
-import net.sf.colossus.game.HazardTerrain;
 import net.sf.colossus.server.Creature;
 import net.sf.colossus.server.Critter;
 import net.sf.colossus.util.HTMLColor;
 import net.sf.colossus.util.KDialog;
 import net.sf.colossus.util.RecruitGraph;
+import net.sf.colossus.variant.HazardTerrain;
 import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
 

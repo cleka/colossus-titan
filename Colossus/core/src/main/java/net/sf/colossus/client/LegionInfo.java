@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.sf.colossus.game.Legion;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.Creature;
 
@@ -19,7 +20,7 @@ import net.sf.colossus.server.Creature;
  * @author David Ripton
  */
 
-public final class LegionInfo
+public final class LegionInfo extends Legion
 {
     private static final Logger LOGGER = Logger.getLogger(LegionInfo.class
         .getName());

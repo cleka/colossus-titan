@@ -19,6 +19,7 @@ import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
 /**
  * Class Player holds the data for one player in a Titan game.
+ * 
  * @version $Id$
  * @author David Ripton
  */
@@ -28,7 +29,7 @@ public final class Player implements Comparable
     private static final Logger LOGGER = Logger.getLogger(Player.class
         .getName());
 
-    private Game game;
+    private final Game game;
     private String name;
     private String color; // Black, Blue, Brown, Gold, Green, Red
     private String startingTower; // hex label
@@ -38,11 +39,11 @@ public final class Player implements Comparable
     private String playersEliminated = ""; // RdBkGr
     private int mulligansLeft = 1;
     private int movementRoll; // 0 if movement has not been rolled.
-    private List legions = new ArrayList();
+    private final List legions = new ArrayList();
     private boolean dead;
     private boolean titanEliminated;
     private String donorId;
-    private SortedSet markersAvailable = Collections
+    private final SortedSet markersAvailable = Collections
         .synchronizedSortedSet(new TreeSet());
     private String type; // "Human" or ".*AI"
     private String firstMarker;
@@ -51,7 +52,7 @@ public final class Player implements Comparable
     {
         this.name = name;
         this.game = game;
-        type = "Human";
+        type = Constants.human;
 
         net.sf.colossus.webcommon.InstanceTracker.register(this, name);
     }

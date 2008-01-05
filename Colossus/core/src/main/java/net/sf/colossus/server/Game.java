@@ -45,13 +45,19 @@ import org.jdom.output.XMLOutputter;
 
 /**
  * Class Game gets and holds high-level data about a Titan game.
+ * 
+ * This is the old design with the game information in the server. Some
+ * of the functionality here is supposed to be moved into the {@link net.sf.colossus.game.Game}
+ * class which then can be shared between server and clients (the class, not the instances).
+ * Other parts should be moved into the {@link Server} class or elsewhere.
+ * 
  * @version $Id$
  * @author David Ripton
  * @author Bruce Sherrod
  * @author Romain Dolbeau
  */
 
-public final class Game
+public final class Game extends net.sf.colossus.game.Game
 {
     private static final Logger LOGGER = Logger
         .getLogger(Game.class.getName());
@@ -98,10 +104,10 @@ public final class Game
     // currently visible board-player (for hotSeatMode)
     Player cvbPlayer = null;
 
-    
     /** Package-private only for JUnit test setup. */
     Game()
     {
+        super(null, new net.sf.colossus.Player[0]);
         // later perhaps from cmdline, GUI, or WebServer set it?
         gameId = "#" + (gameCounter++);
     }
@@ -232,7 +238,7 @@ public final class Game
         addPlayersFromOptions();
 
         hotSeatMode = options.getOption(Options.hotSeatMode);
-        
+
         history = new History();
 
         initServer();
@@ -1047,7 +1053,7 @@ public final class Game
         if (cvbPlayer == null)
         {
             int i;
-            for (i=0 ; i < getNumPlayers() ; i++)
+            for (i = 0; i < getNumPlayers(); i++)
             {
                 Player iPlayer = getPlayer(i);
                 if (iPlayer.isLocalHuman() && !server.isClientGone(iPlayer))
@@ -1056,7 +1062,7 @@ public final class Game
                     if (cvbPlayer == null)
                     {
                         cvbPlayer = iPlayer;
-                        server.setBoardVisibility(iPlayer,true);
+                        server.setBoardVisibility(iPlayer, true);
                     }
                     else
                     {

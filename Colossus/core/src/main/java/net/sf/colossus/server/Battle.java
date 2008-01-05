@@ -15,8 +15,8 @@ import net.sf.colossus.client.BattleMap;
 import net.sf.colossus.client.HexMap;
 import net.sf.colossus.client.MasterBoard;
 import net.sf.colossus.client.MasterHex;
-import net.sf.colossus.game.HazardTerrain;
 import net.sf.colossus.util.Options;
+import net.sf.colossus.variant.HazardTerrain;
 
 
 /**
@@ -29,7 +29,7 @@ import net.sf.colossus.util.Options;
  * @author Romain Dolbeau
  */
 
-public final class Battle
+public final class Battle extends net.sf.colossus.game.Battle
 {
     private static final Logger LOGGER = Logger.getLogger(Battle.class
         .getName());
@@ -62,6 +62,8 @@ public final class Battle
         int activeLegionNum, String masterHexLabel, int turnNumber,
         Constants.BattlePhase phase)
     {
+        super(game.getLegionByMarkerId(attackerId), game
+            .getLegionByMarkerId(defenderId), null);
         this.game = game;
         server = game.getServer();
         this.masterHexLabel = masterHexLabel;
@@ -211,7 +213,7 @@ public final class Battle
 
     Legion getAttacker()
     {
-        return game.getLegionByMarkerId(attackerId);
+        return (Legion)getAttackingLegion();
     }
 
     String getDefenderId()
@@ -221,7 +223,7 @@ public final class Battle
 
     Legion getDefender()
     {
-        return game.getLegionByMarkerId(defenderId);
+        return (Legion)getDefendingLegion();
     }
 
     Legion getActiveLegion()

@@ -10,7 +10,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.colossus.client.BattleHex;
-import net.sf.colossus.game.HazardTerrain;
+import net.sf.colossus.variant.HazardTerrain;
 
 import org.jdom.Document;
 import org.jdom.Element;
