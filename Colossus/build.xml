@@ -4,7 +4,7 @@
 <!-- $Id$ -->
 
 <!-- To use this you need:
-     Sun JDK 1.4+    http://java.sun.com  (currently recommend 1.4.2)
+     Sun JDK 1.5+    http://java.sun.com  (currently recommend 1.5.0)
      Ant 1.5+        http://jakarta.apache.org/ant/
      Javamake 1.2.8+ http://www.experimentalstuff.com/Technologies/JavaMake/
         javamake.jar and javamake-ant15.jar need to be in your CLASSPATH.
@@ -31,6 +31,8 @@
 	<property name="build.classes.dir" value="${build.dir}/classes" />
 	<property name="testresults.dir" value="${build.dir}/testresults" />
 	<property name="datatools.src.dir" value="datatools/src/main/java" />
+	<property name="source.level" value="1.5" />
+	<property name="target.level" value="1.5" />
 
 	<path id="project.class.path">
 		<pathelement path="${build.classes.dir}" />
@@ -79,25 +81,25 @@
 -->
 
 	<target name="compile" depends="init" description="Compiles Colossus without datatools and variants using javamake">
-		<javac debug="yes" deprecation="yes" target="1.4" source="1.4" srcdir="${core.src.dir}" destdir="${build.classes.dir}">
+		<javac debug="yes" deprecation="yes" target="${target.level}" source="${source.level}" srcdir="${core.src.dir}" destdir="${build.classes.dir}">
 			<classpath refid="project.class.path" />
 		</javac>
 	</target>
 
 	<target name="compileVariants" depends="init" description="Compiles the variant code using javamake">
-		<javac debug="yes" deprecation="yes" target="1.4" source="1.4" srcdir="${variants.dir}" destdir="${build.classes.dir}">
+		<javac debug="yes" deprecation="yes" target="${target.level}" source="${source.level}" srcdir="${variants.dir}" destdir="${build.classes.dir}">
 			<classpath refid="project.class.path" />
 		</javac>
 	</target>
 
 	<target name="compileDatatools" depends="init" description="Compiles the datatools using javamake">
-		<javac debug="yes" deprecation="yes" target="1.4" source="1.4" srcdir="${datatools.src.dir}" destdir="${build.classes.dir}">
+		<javac debug="yes" deprecation="yes" target="${target.level}" source="${source.level}" srcdir="${datatools.src.dir}" destdir="${build.classes.dir}">
 			<classpath refid="project.class.path" />
 		</javac>
 	</target>
 
 	<target name="compileTests" depends="compile" description="Compiles the JUnit tests">
-		<javac debug="yes" deprecation="yes" target="1.4" source="1.4" srcdir="${tests.src.dir}" destdir="${build.classes.dir}">
+		<javac debug="yes" deprecation="yes" target="${target.level}" source="${source.level}" srcdir="${tests.src.dir}" destdir="${build.classes.dir}">
 			<classpath refid="project.class.path" />
 		</javac>
 	</target>
