@@ -742,11 +742,6 @@ public final class Legion extends net.sf.colossus.game.Legion implements
         return critters;
     }
 
-    Creature getCreature(int i)
-    {
-        return getCritter(i).getCreature();
-    }
-
     Critter getCritter(int i)
     {
         return critters.get(i);
