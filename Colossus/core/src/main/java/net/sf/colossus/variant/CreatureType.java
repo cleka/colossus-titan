@@ -1,8 +1,6 @@
 package net.sf.colossus.variant;
 
 
-
-
 /**
  * A type of creature in a variant.
  * 
