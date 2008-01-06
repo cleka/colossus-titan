@@ -652,7 +652,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
         return set;
     }
 
-    public static List getTowerStartList(String terrain)
+    public static List<String> getTowerStartList(String terrain)
     {
         return startlistMap.get(terrain);
     }

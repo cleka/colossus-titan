@@ -49,7 +49,7 @@ final class SocketClientThread extends Thread implements IServer
     private String reasonFail = null;
     private String initialLine = null;
 
-    private Object isWaitingLock = new Object();
+    private final Object isWaitingLock = new Object();
     private boolean isWaiting = false;
 
     SocketClientThread(Client client, String host, int port)
@@ -464,7 +464,8 @@ final class SocketClientThread extends Thread implements IServer
         }
         else if (method.equals(Constants.updatePlayerInfo))
         {
-            List infoStrings = Split.split(Glob.sep, (String)args.remove(0));
+            List<String> infoStrings = Split.split(Glob.sep, (String)args
+                .remove(0));
             client.updatePlayerInfo(infoStrings);
         }
         else if (method.equals(Constants.setColor))
@@ -521,7 +522,7 @@ final class SocketClientThread extends Thread implements IServer
         {
             String markerId = (String)args.remove(0);
             String namesString = (String)args.remove(0);
-            List names = Split.split(Glob.sep, namesString);
+            List<String> names = Split.split(Glob.sep, namesString);
 
             // safeguard against getting empty string list from server
             // TODO: should split be fixed instead??
@@ -539,7 +540,7 @@ final class SocketClientThread extends Thread implements IServer
             String markerId = (String)args.remove(0);
             boolean isAttacker = Boolean.valueOf((String)args.remove(0))
                 .booleanValue();
-            List names = Split.split(Glob.sep, (String)args.remove(0));
+            List<String> names = Split.split(Glob.sep, (String)args.remove(0));
             String reason = args.isEmpty() ? new String("<Unknown>")
                 : (String)args.remove(0);
             client.revealEngagedCreatures(markerId, names, isAttacker, reason);
@@ -574,12 +575,14 @@ final class SocketClientThread extends Thread implements IServer
         else if (method.equals(Constants.askAcquireAngel))
         {
             String markerId = (String)args.remove(0);
-            List recruits = Split.split(Glob.sep, (String)args.remove(0));
+            List<String> recruits = Split.split(Glob.sep, (String)args
+                .remove(0));
             client.askAcquireAngel(markerId, recruits);
         }
         else if (method.equals(Constants.askChooseStrikePenalty))
         {
-            List choices = Split.split(Glob.sep, (String)args.remove(0));
+            List<String> choices = Split.split(Glob.sep, (String)args
+                .remove(0));
             client.askChooseStrikePenalty(choices);
         }
         else if (method.equals(Constants.tellGameOver))
@@ -621,7 +624,7 @@ final class SocketClientThread extends Thread implements IServer
             int strikerTag = Integer.parseInt((String)args.remove(0));
             int targetTag = Integer.parseInt((String)args.remove(0));
             int strikeNumber = Integer.parseInt((String)args.remove(0));
-            List rolls = Split.split(Glob.sep, (String)args.remove(0));
+            List<String> rolls = Split.split(Glob.sep, (String)args.remove(0));
             int damage = Integer.parseInt((String)args.remove(0));
             boolean killed = Boolean.valueOf((String)args.remove(0))
                 .booleanValue();
@@ -629,13 +632,13 @@ final class SocketClientThread extends Thread implements IServer
                 .booleanValue();
             int carryDamageLeft = Integer.parseInt((String)args.remove(0));
 
-            Set carryTargetDescriptions = new HashSet();
+            Set<String> carryTargetDescriptions = new HashSet<String>();
             if (!args.isEmpty())
             {
                 String buf = (String)args.remove(0);
                 if (buf != null && buf.length() > 0)
                 {
-                    List ctdList = Split.split(Glob.sep, buf);
+                    List<String> ctdList = Split.split(Glob.sep, buf);
                     carryTargetDescriptions.addAll(ctdList);
                 }
             }
@@ -815,10 +818,11 @@ final class SocketClientThread extends Thread implements IServer
             String parentId = (String)args.remove(0);
             String childId = (String)args.remove(0);
             int childHeight = Integer.parseInt((String)args.remove(0));
-            List splitoffs = new ArrayList();
+            List<String> splitoffs = new ArrayList<String>();
             if (!args.isEmpty())
             {
-                List soList = Split.split(Glob.sep, (String)args.remove(0));
+                List<String> soList = Split.split(Glob.sep, (String)args
+                    .remove(0));
                 splitoffs.addAll(soList);
             }
             int turn = Integer.parseInt((String)args.remove(0));
@@ -827,8 +831,9 @@ final class SocketClientThread extends Thread implements IServer
         }
         else if (method.equals(Constants.askPickColor))
         {
-            List clList = Split.split(Glob.sep, (String)args.remove(0));
-            List colorsLeft = new ArrayList();
+            List<String> clList = Split
+                .split(Glob.sep, (String)args.remove(0));
+            List<String> colorsLeft = new ArrayList<String>();
             colorsLeft.addAll(clList);
             client.askPickColor(colorsLeft);
         }

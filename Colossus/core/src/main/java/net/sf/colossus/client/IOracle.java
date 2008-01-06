@@ -22,7 +22,7 @@ public interface IOracle
 
     int getTurnNumber();
 
-    List getLegionImageNames(String markerId);
+    List<String> getLegionImageNames(String markerId);
 
     List<Boolean> getLegionCreatureCertainties(String markerId);
 

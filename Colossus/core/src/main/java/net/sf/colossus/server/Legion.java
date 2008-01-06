@@ -23,14 +23,14 @@ import net.sf.colossus.xmlparser.TerrainRecruitLoader;
  */
 
 public final class Legion extends net.sf.colossus.game.Legion implements
-    Comparable
+    Comparable<Legion>
 {
     private static final Logger LOGGER = Logger.getLogger(Legion.class
         .getName());
 
     private final String markerId; // Bk03, Rd12, etc.
     private final String parentId;
-    private final List critters = new ArrayList();
+    private final List<Critter> critters = new ArrayList<Critter>();
     private String currentHexLabel;
     private String startingHexLabel;
     private boolean moved;
@@ -107,10 +107,10 @@ public final class Legion extends net.sf.colossus.game.Legion implements
             startCre[0], startCre[0], startCre[1], startCre[1], playerName,
             game);
 
-        Iterator it = legion.getCritters().iterator();
+        Iterator<Critter> it = legion.getCritters().iterator();
         while (it.hasNext())
         {
-            Critter critter = (Critter)it.next();
+            Critter critter = it.next();
             game.getCaretaker().takeOne(critter.getCreature());
         }
         return legion;
@@ -127,10 +127,10 @@ public final class Legion extends net.sf.colossus.game.Legion implements
     public int getPointValue()
     {
         int pointValue = 0;
-        Iterator it = critters.iterator();
+        Iterator<Critter> it = critters.iterator();
         while (it.hasNext())
         {
-            Critter critter = (Critter)it.next();
+            Critter critter = it.next();
             pointValue += critter.getPointValue();
         }
         return pointValue;
@@ -157,7 +157,7 @@ public final class Legion extends net.sf.colossus.game.Legion implements
         tmpScore -= round; // 300
         tmpPoints += round; // 225
 
-        List recruits;
+        List<String> recruits;
 
         while ((getHeight() < 7) && (tmpPoints >= value))
         {
@@ -223,10 +223,10 @@ public final class Legion extends net.sf.colossus.game.Legion implements
     {
         clearBattleTally();
 
-        Iterator it = critters.iterator();
+        Iterator<Critter> it = critters.iterator();
         while (it.hasNext())
         {
-            Critter critter = (Critter)it.next();
+            Critter critter = it.next();
             critter.heal();
             critter.addBattleInfo(null, null, null);
         }
@@ -289,14 +289,14 @@ public final class Legion extends net.sf.colossus.game.Legion implements
     }
 
     /** Return a list of imageNames for all critters in this legion. */
-    List getImageNames()
+    List<String> getImageNames()
     {
         sortCritters();
-        List imageNames = new ArrayList();
-        Iterator it = getCritters().iterator();
+        List<String> imageNames = new ArrayList<String>();
+        Iterator<Critter> it = getCritters().iterator();
         while (it.hasNext())
         {
-            Critter critter = (Critter)it.next();
+            Critter critter = it.next();
 
             /*
              * Use getName(), not getImageName(), as
@@ -323,10 +323,10 @@ public final class Legion extends net.sf.colossus.game.Legion implements
 
     boolean canFlee()
     {
-        Iterator it = critters.iterator();
+        Iterator<Critter> it = critters.iterator();
         while (it.hasNext())
         {
-            Critter critter = (Critter)it.next();
+            Critter critter = it.next();
             if (critter.isLord())
             {
                 return false;
@@ -338,10 +338,10 @@ public final class Legion extends net.sf.colossus.game.Legion implements
     int numCreature(Creature creature)
     {
         int count = 0;
-        Iterator it = critters.iterator();
+        Iterator<Critter> it = critters.iterator();
         while (it.hasNext())
         {
-            Critter critter = (Critter)it.next();
+            Critter critter = it.next();
             if (critter.getName().equals(creature.getName()))
             {
                 count++;
@@ -353,10 +353,10 @@ public final class Legion extends net.sf.colossus.game.Legion implements
     public int numLords()
     {
         int count = 0;
-        Iterator it = critters.iterator();
+        Iterator<Critter> it = critters.iterator();
         while (it.hasNext())
         {
-            Critter critter = (Critter)it.next();
+            Critter critter = it.next();
             if (critter.isLord())
             {
                 count++;
@@ -368,10 +368,10 @@ public final class Legion extends net.sf.colossus.game.Legion implements
     public int numRangestrikers()
     {
         int count = 0;
-        Iterator it = critters.iterator();
+        Iterator<Critter> it = critters.iterator();
         while (it.hasNext())
         {
-            Critter critter = (Critter)it.next();
+            Critter critter = it.next();
             if (critter.isRangestriker())
             {
                 count++;
@@ -382,10 +382,10 @@ public final class Legion extends net.sf.colossus.game.Legion implements
 
     public boolean hasTitan()
     {
-        Iterator it = critters.iterator();
+        Iterator<Critter> it = critters.iterator();
         while (it.hasNext())
         {
-            Critter critter = (Critter)it.next();
+            Critter critter = it.next();
             if (critter.isTitan())
             {
                 return true;
@@ -396,10 +396,10 @@ public final class Legion extends net.sf.colossus.game.Legion implements
 
     public boolean hasSummonable()
     {
-        Iterator it = critters.iterator();
+        Iterator<Critter> it = critters.iterator();
         while (it.hasNext())
         {
-            Critter critter = (Critter)it.next();
+            Critter critter = it.next();
             if (critter.isSummonable())
             {
                 return true;
@@ -456,10 +456,10 @@ public final class Legion extends net.sf.colossus.game.Legion implements
         if (getHeight() > 0)
         {
             // Return immortals to the stacks, others to the Graveyard
-            Iterator it = critters.iterator();
+            Iterator<Critter> it = critters.iterator();
             while (it.hasNext())
             {
-                Critter critter = (Critter)it.next();
+                Critter critter = it.next();
                 prepareToRemoveCritter(critter, returnCrittersToStacks,
                     updateHistory);
                 it.remove();
@@ -669,7 +669,7 @@ public final class Legion extends net.sf.colossus.game.Legion implements
     Creature removeCreature(int i, boolean returnToStack,
         boolean disbandIfEmpty)
     {
-        Critter critter = (Critter)critters.remove(i);
+        Critter critter = critters.remove(i);
 
         // If the creature is an immortal, put it back in the stacks.
         if (returnToStack)
@@ -737,7 +737,7 @@ public final class Legion extends net.sf.colossus.game.Legion implements
         }
     }
 
-    List getCritters()
+    List<Critter> getCritters()
     {
         return critters;
     }
@@ -749,7 +749,7 @@ public final class Legion extends net.sf.colossus.game.Legion implements
 
     Critter getCritter(int i)
     {
-        return (Critter)critters.get(i);
+        return critters.get(i);
     }
 
     void setCritter(int i, Critter critter)
@@ -761,10 +761,10 @@ public final class Legion extends net.sf.colossus.game.Legion implements
     /** Return the first critter with a matching tag. */
     Critter getCritterByTag(int tag)
     {
-        Iterator it = critters.iterator();
+        Iterator<Critter> it = critters.iterator();
         while (it.hasNext())
         {
-            Critter critter = (Critter)it.next();
+            Critter critter = it.next();
             if (tag == critter.getTag())
             {
                 return critter;
@@ -795,10 +795,10 @@ public final class Legion extends net.sf.colossus.game.Legion implements
      type as the passed creature. */
     Critter getCritter(Creature creature)
     {
-        Iterator it = critters.iterator();
+        Iterator<Critter> it = critters.iterator();
         while (it.hasNext())
         {
-            Critter critter = (Critter)it.next();
+            Critter critter = it.next();
             if (critter.getName().equals(creature.getName()))
             {
                 return critter;
@@ -828,10 +828,10 @@ public final class Legion extends net.sf.colossus.game.Legion implements
                 "Tried to recombine a legion with itself!");
             return;
         }
-        Iterator it = critters.iterator();
+        Iterator<Critter> it = critters.iterator();
         while (it.hasNext())
         {
-            Critter critter = (Critter)it.next();
+            Critter critter = it.next();
             legion.addCreature(critter.getCreature(), false);
         }
 
@@ -859,7 +859,7 @@ public final class Legion extends net.sf.colossus.game.Legion implements
      * (Or the first available marker, if markerId is null.)
      * Return the new legion, or null if there's an error.
      */
-    Legion split(List creatures, String newMarkerId)
+    Legion split(List<Creature> creatures, String newMarkerId)
     {
         Player player = getPlayer();
         if (newMarkerId == null)
@@ -871,10 +871,10 @@ public final class Legion extends net.sf.colossus.game.Legion implements
         Legion newLegion = Legion.getEmptyLegion(newMarkerId, markerId,
             currentHexLabel, playerName, game);
 
-        Iterator it = creatures.iterator();
+        Iterator<Creature> it = creatures.iterator();
         while (it.hasNext())
         {
-            Creature creature = (Creature)it.next();
+            Creature creature = it.next();
             creature = removeCreature(creature, false, false);
             if (creature == null)
             {
@@ -920,10 +920,10 @@ public final class Legion extends net.sf.colossus.game.Legion implements
         // Tower teleport
         else
         {
-            Iterator it = critters.iterator();
+            Iterator<Critter> it = critters.iterator();
             while (it.hasNext())
             {
-                Critter critter = (Critter)it.next();
+                Critter critter = it.next();
                 if (critter.isLord())
                 {
                     String name = critter.getName();
@@ -941,27 +941,19 @@ public final class Legion extends net.sf.colossus.game.Legion implements
     /** Legions are sorted in descending order of total point value,
      with the titan legion always coming first.  This is inconsistent
      with equals(). */
-    public int compareTo(Object object)
+    public int compareTo(Legion other)
     {
-        if (object instanceof Legion)
+        if (hasTitan())
         {
-            Legion other = (Legion)object;
-            if (hasTitan())
-            {
-                return Integer.MIN_VALUE;
-            }
-            else if (other.hasTitan())
-            {
-                return Integer.MAX_VALUE;
-            }
-            else
-            {
-                return (other.getPointValue() - this.getPointValue());
-            }
+            return Integer.MIN_VALUE;
+        }
+        else if (other.hasTitan())
+        {
+            return Integer.MAX_VALUE;
         }
         else
         {
-            throw new ClassCastException();
+            return (other.getPointValue() - this.getPointValue());
         }
     }
 }

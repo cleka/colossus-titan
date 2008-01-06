@@ -32,7 +32,7 @@ final class PickMarker extends KDialog implements MouseListener,
     private Client client;
     private SaveWindow saveWindow;
 
-    PickMarker(JFrame parentFrame, String name, Set markerIds, Client client)
+    PickMarker(JFrame parentFrame, String name, Set<String> markerIds, Client client)
     {
         super(parentFrame, name + ": Pick Legion Marker", true);
 
@@ -53,10 +53,10 @@ final class PickMarker extends KDialog implements MouseListener,
         pack();
         setBackground(Color.lightGray);
 
-        Iterator it = markerIds.iterator();
+        Iterator<String> it = markerIds.iterator();
         while (it.hasNext())
         {
-            String markerId = (String)it.next();
+            String markerId = it.next();
             Marker marker = new Marker(4 * Scale.get(), markerId);
             markers.add(marker);
             contentPane.add(marker);

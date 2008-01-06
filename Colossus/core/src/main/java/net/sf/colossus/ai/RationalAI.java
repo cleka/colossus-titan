@@ -41,9 +41,9 @@ public class RationalAI extends SimpleAI implements AI
         .getName());
 
     boolean I_HATE_HUMANS = false;
-    private LinkedList<String> legionsToSplit = new LinkedList<String>();
+    private final LinkedList<String> legionsToSplit = new LinkedList<String>();
     private Map[] enemyAttackMap;
-    private Map<String, Integer> evaluateMoveMap = new HashMap<String, Integer>();
+    private final Map<String, Integer> evaluateMoveMap = new HashMap<String, Integer>();
     private List<LegionBoardMove> bestMoveList;
     private Iterator<LegionBoardMove> bestMoveListIter;
 
@@ -421,8 +421,8 @@ public class RationalAI extends SimpleAI implements AI
 
                 while (it.hasNext())
                 {
-                    Creature tempRecruit = Creature
-                        .getCreatureByName(it.next());
+                    Creature tempRecruit = Creature.getCreatureByName(it
+                        .next());
 
                     if ((bestRecruit == null)
                         || (ghrv(tempRecruit, legion, hintSectionUsed) >= ghrv(
@@ -456,13 +456,11 @@ public class RationalAI extends SimpleAI implements AI
         outer: for (int index1 = 0; index1 < 4
             && index1 < sortedCreatures.size(); index1++)
         {
-            String critter1 = sortedCreatures.get(index1)
-                .getName();
+            String critter1 = sortedCreatures.get(index1).getName();
 
             for (int index2 = index1 + 1; index2 < sortedCreatures.size(); index2++)
             {
-                String critter2 = sortedCreatures.get(index2)
-                    .getName();
+                String critter2 = sortedCreatures.get(index2).getName();
 
                 if (critter1 == critter2)
                 { // mustering yourself does not count
@@ -484,7 +482,7 @@ public class RationalAI extends SimpleAI implements AI
 
     public class CompCreaturesByValueName implements Comparator
     {
-        private LegionInfo legion;
+        private final LegionInfo legion;
 
         public CompCreaturesByValueName(LegionInfo l)
         {
@@ -538,8 +536,8 @@ public class RationalAI extends SimpleAI implements AI
     // Count number of creatures in the stack that have mustered
     int countMustered(LegionInfo legion)
     {
-        List<Creature> sortedCreatures = sortCreaturesByValueName(legion.getContents(),
-            legion);
+        List<Creature> sortedCreatures = sortCreaturesByValueName(legion
+            .getContents(), legion);
         List<Creature> creaturesThatHaveMustered = removeMustered(sortedCreatures);
 
         return creaturesThatHaveMustered.size();
@@ -586,8 +584,8 @@ public class RationalAI extends SimpleAI implements AI
         logger.log(Level.FINEST,
             "sortCreaturesByValueName() in chooseCreaturesToSplitOut");
 
-        List<Creature> sortedCreatures = sortCreaturesByValueName(legion.getContents(),
-            legion);
+        List<Creature> sortedCreatures = sortCreaturesByValueName(legion
+            .getContents(), legion);
 
         logger.log(Level.FINEST, "Sorted stack - minus titan: "
             + sortedCreatures);
@@ -780,14 +778,15 @@ public class RationalAI extends SimpleAI implements AI
         return true;
     }
 
-    private boolean findMoveList(List markerIds, List<List> all_legionMoves,
-        MultiSet occupiedHexes, boolean teleportsOnly)
+    private boolean findMoveList(List<String> markerIds,
+        List<List<LegionBoardMove>> all_legionMoves, MultiSet occupiedHexes,
+        boolean teleportsOnly)
     {
         boolean moved = false;
-        Iterator it = markerIds.iterator();
+        Iterator<String> it = markerIds.iterator();
         while (it.hasNext())
         {
-            String markerId = (String)it.next();
+            String markerId = it.next();
             LegionInfo legion = client.getLegionInfo(markerId);
             if (legion.hasMoved())
             {
@@ -798,7 +797,7 @@ public class RationalAI extends SimpleAI implements AI
             logger.log(Level.FINEST, "consider marker " + markerId);
 
             // compute the value of sitting still
-            List legionMoves = new ArrayList();
+            List<LegionBoardMove> legionMoves = new ArrayList<LegionBoardMove>();
             MasterHex hex = MasterBoard.getHexByLabel(legion.getCurrentHex()
                 .getLabel());
             double value = evaluateMove(legion, hex, RECRUIT_FALSE, 2, true);
@@ -846,13 +845,11 @@ public class RationalAI extends SimpleAI implements AI
             }
 
             // Sort moves in the order of descending value.
-            Collections.sort(legionMoves, new Comparator()
+            Collections.sort(legionMoves, new Comparator<LegionBoardMove>()
             {
-                public int compare(Object o1, Object o2)
+                public int compare(LegionBoardMove o1, LegionBoardMove o2)
                 {
-                    LegionBoardMove L1 = (LegionBoardMove)o1;
-                    LegionBoardMove L2 = (LegionBoardMove)o2;
-                    return (int)L2.val - (int)L1.val; // want descending order
+                    return (int)o2.val - (int)o1.val; // want descending order
                 }
             });
 
@@ -867,8 +864,8 @@ public class RationalAI extends SimpleAI implements AI
         logger.log(Level.FINEST, "handleVoluntaryMoves()");
 
         boolean moved = false;
-        List markerIds = player.getLegionIds();
-        List<List> all_legionMoves = new ArrayList<List>();
+        List<String> markerIds = player.getLegionIds();
+        List<List<LegionBoardMove>> all_legionMoves = new ArrayList<List<LegionBoardMove>>();
 
         MultiSet occupiedHexes = new MultiSet();
 
@@ -877,10 +874,11 @@ public class RationalAI extends SimpleAI implements AI
         logger.log(Level.FINEST, "done computing move values for legions");
 
         logger.log(Level.FINEST, "raw best moves:");
-        for (Iterator<List> it = all_legionMoves.iterator(); it.hasNext();)
+        for (Iterator<List<LegionBoardMove>> it = all_legionMoves.iterator(); it
+            .hasNext();)
         {
-            List moves = it.next();
-            LegionBoardMove lbm = (LegionBoardMove)moves.get(0);
+            List<LegionBoardMove> moves = it.next();
+            LegionBoardMove lbm = moves.get(0);
             logger.log(Level.FINEST, lbm.markerId + " to " + lbm.toHex
                 + " value " + lbm.val);
         }
@@ -893,22 +891,23 @@ public class RationalAI extends SimpleAI implements AI
         // to figure this out though.
         if (client.getMovementRoll() == 6)
         {
-            List<List> teleport_legionMoves = new ArrayList<List>();
+            List<List<LegionBoardMove>> teleport_legionMoves = new ArrayList<List<LegionBoardMove>>();
             MultiSet dummy = new MultiSet();
             findMoveList(markerIds, teleport_legionMoves, dummy, true);
 
-            ListIterator<List> legit = teleport_legionMoves.listIterator();
+            Iterator<List<LegionBoardMove>> legit = teleport_legionMoves
+                .iterator();
             LegionBoardMove best_move = new LegionBoardMove("", "", "", 0,
                 true);
             double best_value = 0;
             while (legit.hasNext())
             {
-                List legionMoves = legit.next();
+                List<LegionBoardMove> legionMoves = legit.next();
                 if (legionMoves.isEmpty())
                 {
                     continue; // not a teleporting legion
                 }
-                LegionBoardMove lm = (LegionBoardMove)legionMoves.get(0);
+                LegionBoardMove lm = legionMoves.get(0);
                 if (lm.val > best_value)
                 {
                     logger
@@ -975,8 +974,8 @@ public class RationalAI extends SimpleAI implements AI
             String markerId = (String)it.next();
             LegionInfo legion = client.getLegionInfo(markerId);
             String hexLabel = legion.getHexLabel();
-            List<String> friendlyLegions = client.getFriendlyLegions(hexLabel, player
-                .getName());
+            List<String> friendlyLegions = client.getFriendlyLegions(hexLabel,
+                player.getName());
 
             if (friendlyLegions.size() > 1)
             {
@@ -987,8 +986,8 @@ public class RationalAI extends SimpleAI implements AI
         while (itHexes.hasNext())
         {
             String hexLabel = itHexes.next();
-            List<String> friendlyLegions = client.getFriendlyLegions(hexLabel, player
-                .getName());
+            List<String> friendlyLegions = client.getFriendlyLegions(hexLabel,
+                player.getName());
 
             // pick just any legion for asking the getMovement
             Object[] legions = friendlyLegions.toArray();
@@ -1023,8 +1022,8 @@ public class RationalAI extends SimpleAI implements AI
                 }
 
                 String minMarkerId = minLegion.getMarkerId();
-                Set<String> set = client.getMovement().listNormalMoves(minLegion,
-                    minLegion.getCurrentHex(), roll);
+                Set<String> set = client.getMovement().listNormalMoves(
+                    minLegion, minLegion.getCurrentHex(), roll);
 
                 if (set.size() == 0)
                 {
@@ -1046,8 +1045,8 @@ public class RationalAI extends SimpleAI implements AI
                         String targetHex = moveIterator.next();
 
                         // The set of moves includes still hexes occupied by our own legions. 
-                        List<String> targetOwnLegions = client.getFriendlyLegions(
-                            targetHex, player.getName());
+                        List<String> targetOwnLegions = client
+                            .getFriendlyLegions(targetHex, player.getName());
                         if (targetOwnLegions.size() == 0)
                         {
                             MasterHex hex = MasterBoard
@@ -1107,12 +1106,12 @@ public class RationalAI extends SimpleAI implements AI
 
         // first we have to find out those that can move at all:
 
-        ArrayList movableLegions = new ArrayList();
+        ArrayList<String> movableLegions = new ArrayList<String>();
 
-        Iterator it = player.getLegionIds().iterator();
+        Iterator<String> it = player.getLegionIds().iterator();
         while (it.hasNext())
         {
-            String markerId = (String)it.next();
+            String markerId = it.next();
             LegionInfo legion = client.getLegionInfo(markerId);
 
             Set<String> set = client.getMovement().listNormalMoves(legion,
@@ -1156,7 +1155,7 @@ public class RationalAI extends SimpleAI implements AI
         it = movableLegions.iterator();
         while (it.hasNext())
         {
-            String markerId = (String)it.next();
+            String markerId = it.next();
             LegionInfo legion = client.getLegionInfo(markerId);
             int value = legion.getPointValue();
 
@@ -1188,8 +1187,8 @@ public class RationalAI extends SimpleAI implements AI
         // Now decide where we move this unlucky one to:
 
         LegionInfo minLegion = client.getLegionInfo(minValueMarker);
-        Set<String> minValueMoves = client.getMovement().listNormalMoves(minLegion,
-            minLegion.getCurrentHex(), roll);
+        Set<String> minValueMoves = client.getMovement().listNormalMoves(
+            minLegion, minLegion.getCurrentHex(), roll);
 
         Iterator<String> moveIterator = minValueMoves.iterator();
         int bestValue = -1;
@@ -1199,8 +1198,8 @@ public class RationalAI extends SimpleAI implements AI
             String targetHex = moveIterator.next();
             MasterHex hex = MasterBoard.getHexByLabel(targetHex);
 
-            List<String> targetOwnLegions = client.getFriendlyLegions(targetHex,
-                player.getName());
+            List<String> targetOwnLegions = client.getFriendlyLegions(
+                targetHex, player.getName());
             if (targetOwnLegions.size() == 0)
             {
                 int value = evaluateMove(minLegion, hex, RECRUIT_TRUE, 2, true);
@@ -1247,7 +1246,8 @@ public class RationalAI extends SimpleAI implements AI
         private final static double INITIAL_SCORE = -1000000;
         private final static double NO_MOVE_EXISTS = 2 * INITIAL_SCORE;
 
-        public List<LegionBoardMove> findOptimalMove(List<List> all_legionMoves, boolean mustMove)
+        public List<LegionBoardMove> findOptimalMove(
+            List<List<LegionBoardMove>> all_legionMoves, boolean mustMove)
         {
             bestMove = new ArrayList<LegionBoardMove>(); // just in case there is no legal move
             bestScore = INITIAL_SCORE;
@@ -1260,14 +1260,16 @@ public class RationalAI extends SimpleAI implements AI
 
             Collections.shuffle(all_legionMoves, random);
 
-            branchAndBound(new ArrayList<LegionBoardMove>(), all_legionMoves, 0);
+            branchAndBound(new ArrayList<LegionBoardMove>(), all_legionMoves,
+                0);
 
             fomTimer.cancel();
 
             logger
                 .log(Level.FINEST, "Total nodes explored = " + nodesExplored);
 
-            for (Iterator<LegionBoardMove> it = bestMove.iterator(); it.hasNext();)
+            for (Iterator<LegionBoardMove> it = bestMove.iterator(); it
+                .hasNext();)
             {
                 if (it.next().noMove)
                 {
@@ -1278,19 +1280,21 @@ public class RationalAI extends SimpleAI implements AI
             return bestMove;
         }
 
-        private double moveValueBound(List<List> availableMoves)
+        private double moveValueBound(
+            List<List<LegionBoardMove>> availableMoves)
         {
             double ret = 0;
-            for (Iterator<List> it = availableMoves.iterator(); it.hasNext();)
+            for (Iterator<List<LegionBoardMove>> it = availableMoves
+                .iterator(); it.hasNext();)
             {
-                List moves = it.next();
+                List<LegionBoardMove> moves = it.next();
                 if (moves.isEmpty())
                 {
                     // at least one peice has no legal moves
                     return NO_MOVE_EXISTS;
                 }
                 // each move list is assmed t be sorted, so just use the first
-                ret += ((LegionBoardMove)moves.get(0)).val;
+                ret += (moves.get(0)).val;
             }
             return ret;
         }
@@ -1302,12 +1306,14 @@ public class RationalAI extends SimpleAI implements AI
          * @param performedMoves
          * @return
          */
-        private List<LegionBoardMove> getValidMove(List<LegionBoardMove> performedMoves)
+        private List<LegionBoardMove> getValidMove(
+            List<LegionBoardMove> performedMoves)
         {
             if (mustMove)
             {
                 boolean moved = false;
-                for (Iterator<LegionBoardMove> it = performedMoves.iterator(); it.hasNext();)
+                for (Iterator<LegionBoardMove> it = performedMoves.iterator(); it
+                    .hasNext();)
                 {
                     LegionBoardMove lm = it.next();
                     if (!lm.noMove)
@@ -1325,7 +1331,8 @@ public class RationalAI extends SimpleAI implements AI
             Map<String, List> occupiedHexes = new Hashtable<String, List>();
             Set<String> newOccupiedHexes = new HashSet<String>();
             List<LegionBoardMove> newBestMove = new ArrayList<LegionBoardMove>();
-            for (Iterator<LegionBoardMove> it = performedMoves.iterator(); it.hasNext();)
+            for (Iterator<LegionBoardMove> it = performedMoves.iterator(); it
+                .hasNext();)
             {
                 LegionBoardMove lm = it.next();
                 List<String> markers = occupiedHexes.get(lm.fromHex);
@@ -1342,7 +1349,8 @@ public class RationalAI extends SimpleAI implements AI
             {
                 moved = false;
                 // move all pieces that has an open move
-                for (Iterator<LegionBoardMove> it = performedMoves.iterator(); it.hasNext();)
+                for (Iterator<LegionBoardMove> it = performedMoves.iterator(); it
+                    .hasNext();)
                 {
                     LegionBoardMove lm = it.next();
                     List destConflicts = occupiedHexes.get(lm.toHex);
@@ -1366,7 +1374,8 @@ public class RationalAI extends SimpleAI implements AI
 
             // if there are moves left in perfornmedMoves
             // check if there is a cycle or a split didnt seperate
-            for (Iterator<LegionBoardMove> it = performedMoves.iterator(); it.hasNext();)
+            for (Iterator<LegionBoardMove> it = performedMoves.iterator(); it
+                .hasNext();)
             {
                 LegionBoardMove lm = it.next();
                 if (!lm.noMove)
@@ -1378,8 +1387,8 @@ public class RationalAI extends SimpleAI implements AI
                 // now we know we have a split legion not moving since
                 // that is the only way to have a noMove conflict
                 LegionInfo legion = client.getLegionInfo(lm.markerId);
-                Set<String> moves = client.getMovement().listNormalMoves(legion,
-                    legion.getCurrentHex(), client.getMovementRoll());
+                Set<String> moves = client.getMovement().listNormalMoves(
+                    legion, legion.getCurrentHex(), client.getMovementRoll());
                 for (Iterator<String> it2 = moves.iterator(); it2.hasNext();)
                 {
                     // make sure move is blocked
@@ -1397,8 +1406,8 @@ public class RationalAI extends SimpleAI implements AI
             return newBestMove;
         }
 
-        private void branchAndBound(List<LegionBoardMove> performedMoves, List<List> availableMoves,
-            double currentValue)
+        private void branchAndBound(List<LegionBoardMove> performedMoves,
+            List<List<LegionBoardMove>> availableMoves, double currentValue)
         {
             nodesExplored++;
             if (timeIsUp)
@@ -1447,16 +1456,18 @@ public class RationalAI extends SimpleAI implements AI
                 return;
             }
 
-            List nextMoves = availableMoves.get(0);
-            for (Iterator it = nextMoves.iterator(); it.hasNext();)
+            List<LegionBoardMove> nextMoves = availableMoves.get(0);
+            for (Iterator<LegionBoardMove> it = nextMoves.iterator(); it
+                .hasNext();)
             {
-                LegionBoardMove lm = (LegionBoardMove)it.next();
+                LegionBoardMove lm = it.next();
                 if (!lm.noMove
                     && checkNewCycle(lm.fromHex, lm.toHex, performedMoves))
                 {
                     continue;
                 }
-                List<LegionBoardMove> newPerformedMoves = new ArrayList<LegionBoardMove>(performedMoves);
+                List<LegionBoardMove> newPerformedMoves = new ArrayList<LegionBoardMove>(
+                    performedMoves);
                 newPerformedMoves.add(lm);
                 branchAndBound(newPerformedMoves, removeHeadAndConflicts(
                     availableMoves, lm), currentValue + lm.val);
@@ -1473,7 +1484,8 @@ public class RationalAI extends SimpleAI implements AI
          * @param moves
          * @return
          */
-        private boolean checkNewCycle(String target, String from, List<LegionBoardMove> moves)
+        private boolean checkNewCycle(String target, String from,
+            List<LegionBoardMove> moves)
         {
             for (Iterator<LegionBoardMove> it = moves.iterator(); it.hasNext();)
             {
@@ -1495,26 +1507,26 @@ public class RationalAI extends SimpleAI implements AI
             return false;
         }
 
-        private List<List> removeHeadAndConflicts(List<List> availableMoves,
-            LegionBoardMove lm)
+        private List<List<LegionBoardMove>> removeHeadAndConflicts(
+            List<List<LegionBoardMove>> availableMoves, LegionBoardMove lm)
         {
-            List<List> newAvailableMoves = new ArrayList<List>();
+            List<List<LegionBoardMove>> newAvailableMoves = new ArrayList<List<LegionBoardMove>>();
 
-            for (Iterator<List> it = availableMoves.listIterator(1); it.hasNext();)
+            for (Iterator<List<LegionBoardMove>> it = availableMoves
+                .listIterator(1); it.hasNext();)
             {
-                List moves = it.next();
+                List<LegionBoardMove> moves = it.next();
                 List<LegionBoardMove> newMoves = new ArrayList<LegionBoardMove>();
-                if (lm.noMove
-                    && !moves.isEmpty()
-                    && lm.fromHex
-                        .equals(((LegionBoardMove)moves.get(0)).fromHex))
+                if (lm.noMove && !moves.isEmpty()
+                    && lm.fromHex.equals((moves.get(0)).fromHex))
                 {
                     // special case, these two legions are split, make
                     // sure to try the move off moves first
                     LegionBoardMove stayMove = null;
-                    for (Iterator it2 = moves.iterator(); it2.hasNext();)
+                    for (Iterator<LegionBoardMove> it2 = moves.iterator(); it2
+                        .hasNext();)
                     {
-                        LegionBoardMove move = (LegionBoardMove)it2.next();
+                        LegionBoardMove move = it2.next();
                         if (move.noMove)
                         {
                             stayMove = move;
@@ -1527,14 +1539,15 @@ public class RationalAI extends SimpleAI implements AI
                     if (stayMove != null)
                     { // there should be one, but just checking
                         newMoves.add(stayMove);
-                        // make shure staymove is explored last
+                        // make sure staymove is explored last
                     }
                 }
                 else
                 {
-                    for (Iterator it2 = moves.iterator(); it2.hasNext();)
+                    for (Iterator<LegionBoardMove> it2 = moves.iterator(); it2
+                        .hasNext();)
                     {
-                        LegionBoardMove move = (LegionBoardMove)it2.next();
+                        LegionBoardMove move = it2.next();
                         if (!lm.toHex.equals(move.toHex))
                         {
                             newMoves.add(move);
@@ -1879,10 +1892,10 @@ public class RationalAI extends SimpleAI implements AI
         // value of next turn
         for (int roll = 1; roll <= 6; roll++)
         {
-            Set<String> normal_moves = client.getMovement().listNormalMoves(legion,
-                hex, roll);
-            Set<String> tele_moves = client.getMovement().listTeleportMoves(legion,
-                hex, roll);
+            Set<String> normal_moves = client.getMovement().listNormalMoves(
+                legion, hex, roll);
+            Set<String> tele_moves = client.getMovement().listTeleportMoves(
+                legion, hex, roll);
             double bestMoveVal = stay_at_hex; // can always stay here
             boolean no_attack = false;
 
@@ -1937,10 +1950,10 @@ public class RationalAI extends SimpleAI implements AI
 
     static class BattleResults
     {
-        private double ev; // expected value of attack
-        private int att_dead;
-        private int def_dead;
-        private List log = new ArrayList();
+        private final double ev; // expected value of attack
+        private final int att_dead;
+        private final int def_dead;
+        private List<String> log = new ArrayList<String>();
 
         public BattleResults(double e, int a, int d)
         {
@@ -1955,7 +1968,8 @@ public class RationalAI extends SimpleAI implements AI
          * @param def_dead
          * @param log
          */
-        public BattleResults(double ev, int att_dead, int def_dead, List log)
+        public BattleResults(double ev, int att_dead, int def_dead,
+            List<String> log)
         {
             super();
             this.ev = ev;
@@ -1967,7 +1981,7 @@ public class RationalAI extends SimpleAI implements AI
         /**
          * @return Returns the log.
          */
-        public List getLog()
+        public List<String> getLog()
         {
             return log;
         }
@@ -1990,9 +2004,9 @@ public class RationalAI extends SimpleAI implements AI
         void log()
         {
             logger.log(Level.FINEST, "Expected battle log");
-            for (Iterator it = log.iterator(); it.hasNext();)
+            for (Iterator<String> it = log.iterator(); it.hasNext();)
             {
-                logger.log(Level.FINEST, (String)it.next());
+                logger.log(Level.FINEST, it.next());
             }
         }
     }
@@ -2020,8 +2034,10 @@ public class RationalAI extends SimpleAI implements AI
         String terrain = hex.getTerrain();
 
         // Get list of PowerSkill creatures
-        List<PowerSkill> attackerCreatures = getCombatList(attacker, terrain, false);
-        List<PowerSkill> defenderCreatures = getCombatList(defender, terrain, true);
+        List<PowerSkill> attackerCreatures = getCombatList(attacker, terrain,
+            false);
+        List<PowerSkill> defenderCreatures = getCombatList(defender, terrain,
+            true);
         ListIterator<PowerSkill> a;
 
         // simulate combat
@@ -2029,11 +2045,11 @@ public class RationalAI extends SimpleAI implements AI
         int defenderKilled = 0;
         int defenderMuster = 0;
         int round;
-        List log = new ArrayList(14);
+        List<String> log = new ArrayList<String>(14);
 
         round_loop: for (round = 2; round <= 7; round++)
         {
-            // note start on turn 2, because often there wil be no contact in turn 1
+            // note start on turn 2, because often there will be no contact in turn 1
             log.add("Round " + round + " attacker" + attackerCreatures);
             log.add("Round " + round + " defender" + defenderCreatures);
 
@@ -2090,7 +2106,8 @@ public class RationalAI extends SimpleAI implements AI
                 {
                     // mutual attacks
                     a = attackerCreatures.listIterator();
-                    ListIterator<PowerSkill> d = defenderCreatures.listIterator();
+                    ListIterator<PowerSkill> d = defenderCreatures
+                        .listIterator();
                     double rollover_power = 0;
                     int attack_skill = 3;
                     for (int attacks = 0; attacks < Math.max(attackerCreatures

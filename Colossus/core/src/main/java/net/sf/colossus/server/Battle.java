@@ -112,10 +112,10 @@ public final class Battle extends net.sf.colossus.game.Battle
         BattleHex entrance = BattleMap.getEntrance(terrain, legion
             .getEntrySide());
         String entranceLabel = entrance.getLabel();
-        Iterator it = legion.getCritters().iterator();
+        Iterator<Critter> it = legion.getCritters().iterator();
         while (it.hasNext())
         {
-            Critter critter = (Critter)it.next();
+            Critter critter = it.next();
 
             String currentHexLabel = critter.getCurrentHexLabel();
             if (currentHexLabel == null)
@@ -143,10 +143,10 @@ public final class Battle extends net.sf.colossus.game.Battle
 
     private synchronized void initBattleChits(Legion legion)
     {
-        Iterator it = legion.getCritters().iterator();
+        Iterator<Critter> it = legion.getCritters().iterator();
         while (it.hasNext())
         {
-            Critter critter = (Critter)it.next();
+            Critter critter = it.next();
             server.allPlaceNewChit(critter);
         }
     }
@@ -659,10 +659,10 @@ public final class Battle extends net.sf.colossus.game.Battle
         LOGGER.log(Level.INFO, markerId + " concedes the battle");
         conceded = true;
 
-        Iterator it = legion.getCritters().iterator();
+        Iterator<Critter> it = legion.getCritters().iterator();
         while (it.hasNext())
         {
-            Critter critter = (Critter)it.next();
+            Critter critter = it.next();
             critter.setDead(true);
         }
 
@@ -677,10 +677,10 @@ public final class Battle extends net.sf.colossus.game.Battle
     private void removeOffboardCreatures()
     {
         Legion legion = getActiveLegion();
-        Iterator it = legion.getCritters().iterator();
+        Iterator<Critter> it = legion.getCritters().iterator();
         while (it.hasNext())
         {
-            Critter critter = (Critter)it.next();
+            Critter critter = it.next();
             if (critter.getCurrentHex().isEntrance())
             {
                 critter.setDead(true);
@@ -691,10 +691,10 @@ public final class Battle extends net.sf.colossus.game.Battle
 
     private void commitMoves()
     {
-        Iterator it = getActiveLegion().getCritters().iterator();
+        Iterator<Critter> it = getActiveLegion().getCritters().iterator();
         while (it.hasNext())
         {
-            Critter critter = (Critter)it.next();
+            Critter critter = it.next();
             critter.commitMove();
         }
     }
@@ -712,11 +712,11 @@ public final class Battle extends net.sf.colossus.game.Battle
         //    during the strike phase.
         if (phase == Constants.BattlePhase.FIGHT && !driftDamageApplied)
         {
-            Iterator it = getAllCritters().iterator();
+            Iterator<Critter> it = getAllCritters().iterator();
             driftDamageApplied = true;
             while (it.hasNext())
             {
-                Critter critter = (Critter)it.next();
+                Critter critter = it.next();
                 int dam = critter.getCurrentHex().damageToCreature(
                     critter.getCreature());
                 if (dam > 0)
@@ -784,13 +784,13 @@ public final class Battle extends net.sf.colossus.game.Battle
         {
             return;
         }
-        List critters = legion.getCritters();
+        List<Critter> critters = legion.getCritters();
         if (critters != null)
         {
-            Iterator it = critters.iterator();
+            Iterator<Critter> it = critters.iterator();
             while (it.hasNext())
             {
-                Critter critter = (Critter)it.next();
+                Critter critter = it.next();
                 if (critter.isDead())
                 {
                     cleanupOneDeadCritter(critter);
@@ -962,10 +962,10 @@ public final class Battle extends net.sf.colossus.game.Battle
         Legion legion = getActiveLegion();
         if (legion != null)
         {
-            Iterator it = legion.getCritters().iterator();
+            Iterator<Critter> it = legion.getCritters().iterator();
             while (it.hasNext())
             {
-                Critter critter = (Critter)it.next();
+                Critter critter = it.next();
                 critter.setStruck(false);
             }
         }
@@ -976,10 +976,10 @@ public final class Battle extends net.sf.colossus.game.Battle
         Legion legion = getActiveLegion();
         if (legion != null)
         {
-            Iterator it = legion.getCritters().iterator();
+            Iterator<Critter> it = legion.getCritters().iterator();
             while (it.hasNext())
             {
-                Critter critter = (Critter)it.next();
+                Critter critter = it.next();
                 if (!critter.hasStruck() && critter.isInContact(false))
                 {
                     return true;
@@ -1053,10 +1053,11 @@ public final class Battle extends net.sf.colossus.game.Battle
             && getBattlePhase() != Constants.BattlePhase.STRIKEBACK
             && critter.getLegion() == getActiveLegion())
         {
-            Iterator it = getInactiveLegion().getCritters().iterator();
+            Iterator<Critter> it = getInactiveLegion().getCritters()
+                .iterator();
             while (it.hasNext())
             {
-                Critter target = (Critter)it.next();
+                Critter target = it.next();
                 if (!target.isDead())
                 {
                     BattleHex targetHex = target.getCurrentHex();
@@ -1765,9 +1766,9 @@ public final class Battle extends net.sf.colossus.game.Battle
     }
 
     /** Return a list of all critters in the battle. */
-    private List getAllCritters()
+    private List<Critter> getAllCritters()
     {
-        List critters = new ArrayList();
+        List<Critter> critters = new ArrayList<Critter>();
         Legion defender = getDefender();
         if (defender != null)
         {
@@ -1783,10 +1784,10 @@ public final class Battle extends net.sf.colossus.game.Battle
 
     private boolean isOccupied(String hexLabel)
     {
-        Iterator it = getAllCritters().iterator();
+        Iterator<Critter> it = getAllCritters().iterator();
         while (it.hasNext())
         {
-            Critter critter = (Critter)it.next();
+            Critter critter = it.next();
             if (hexLabel.equals(critter.getCurrentHexLabel()))
             {
                 return true;
@@ -1807,10 +1808,10 @@ public final class Battle extends net.sf.colossus.game.Battle
 
     Critter getCritter(String hexLabel)
     {
-        Iterator it = getAllCritters().iterator();
+        Iterator<Critter> it = getAllCritters().iterator();
         while (it.hasNext())
         {
-            Critter critter = (Critter)it.next();
+            Critter critter = it.next();
             if (hexLabel.equals(critter.getCurrentHexLabel()))
             {
                 return critter;

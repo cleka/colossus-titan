@@ -22,12 +22,12 @@ public final class Proposal
     private boolean fight;
     private boolean mutual;
     private String winnerId;
-    private List winnerLosses;
+    private List<String> winnerLosses;
 
     private static final String sep = Glob.sep;
 
     Proposal(String attackerId, String defenderId, boolean fight,
-        boolean mutual, String winnerId, List winnerLosses)
+        boolean mutual, String winnerId, List<String> winnerLosses)
     {
         this.attackerId = attackerId;
         this.defenderId = defenderId;
@@ -66,7 +66,7 @@ public final class Proposal
         return winnerId;
     }
 
-    public List getWinnerLosses()
+    public List<String> getWinnerLosses()
     {
         return winnerLosses;
     }
@@ -140,10 +140,10 @@ public final class Proposal
         sb.append(sep);
         if (winnerLosses != null)
         {
-            Iterator it = winnerLosses.iterator();
+            Iterator<String> it = winnerLosses.iterator();
             while (it.hasNext())
             {
-                String creatureName = (String)it.next();
+                String creatureName = it.next();
                 sb.append(creatureName);
                 sb.append(sep);
             }
@@ -158,14 +158,14 @@ public final class Proposal
     /** Create a Proposal from a {sep}-separated list of fields. */
     public static Proposal makeFromString(String s)
     {
-        List li = Split.split(sep, s);
+        List<String> li = Split.split(sep, s);
 
-        boolean fight = Boolean.valueOf((String)li.remove(0)).booleanValue();
-        boolean mutual = Boolean.valueOf((String)li.remove(0)).booleanValue();
-        String attackerId = (String)li.remove(0);
-        String defenderId = (String)li.remove(0);
-        String winnerId = (String)li.remove(0);
-        List winnerLosses = li;
+        boolean fight = Boolean.valueOf(li.remove(0)).booleanValue();
+        boolean mutual = Boolean.valueOf(li.remove(0)).booleanValue();
+        String attackerId = li.remove(0);
+        String defenderId = li.remove(0);
+        String winnerId = li.remove(0);
+        List<String> winnerLosses = li;
 
         return new Proposal(attackerId, defenderId, fight, mutual, winnerId,
             winnerLosses);

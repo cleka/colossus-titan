@@ -207,7 +207,7 @@ final class Negotiate extends KDialog implements MouseListener, ActionListener
                 }
 
                 // Remove all dead creatures from the winning legion.
-                java.util.List winnerLosses = new ArrayList();
+                java.util.List<String> winnerLosses = new ArrayList<String>();
                 it = winnerChits.iterator();
                 while (it.hasNext())
                 {

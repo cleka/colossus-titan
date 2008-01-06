@@ -39,7 +39,7 @@ public final class PlayerInfo extends PlayerState
     private int mulligansLeft;
 
     /** Sorted set of available legion markers for this player. */
-    private final SortedSet markersAvailable = new TreeSet(
+    private final SortedSet<String> markersAvailable = new TreeSet<String>(
         new MarkerComparator(getShortColor()));
 
     /** Two-stage initialization. */
@@ -198,7 +198,7 @@ public final class PlayerInfo extends PlayerState
         markersAvailable.remove(markerId);
     }
 
-    public Set getMarkersAvailable()
+    public Set<String> getMarkersAvailable()
     {
         return Collections.unmodifiableSortedSet(markersAvailable);
     }
@@ -299,7 +299,7 @@ public final class PlayerInfo extends PlayerState
     }
 
     /** Return a List of markerIds. */
-    public List getLegionIds()
+    public List<String> getLegionIds()
     {
         return client.getLegionsByPlayer(name);
     }

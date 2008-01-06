@@ -18,10 +18,9 @@ import net.sf.colossus.util.Options;
  */
 
 // XXX Massively duplicated code.  Merge later.
-
 final class BattleMovement
 {
-    private Client client;
+    private final Client client;
 
     BattleMovement(Client client)
     {
@@ -30,10 +29,10 @@ final class BattleMovement
 
     /** Recursively find moves from this hex.  Return an array of hex IDs for
      *  all legal destinations.  Do not double back.  */
-    private Set findMoves(BattleHex hex, Creature creature, boolean flies,
-        int movesLeft, int cameFrom, boolean first)
+    private Set<String> findMoves(BattleHex hex, Creature creature,
+        boolean flies, int movesLeft, int cameFrom, boolean first)
     {
-        Set set = new HashSet();
+        Set<String> set = new HashSet<String>();
         for (int i = 0; i < 6; i++)
         {
             // Do not double back.
@@ -94,14 +93,14 @@ final class BattleMovement
      *  so we know that there are no enemies on board, and all allies
      *  are mobile.
      */
-    private Set findUnoccupiedStartlistHexes()
+    private Set<String> findUnoccupiedStartlistHexes()
     {
         String terrain = client.getBattleTerrain();
-        Set set = new HashSet();
-        Iterator it = HexMap.getTowerStartList(terrain).iterator();
+        Set<String> set = new HashSet<String>();
+        Iterator<String> it = HexMap.getTowerStartList(terrain).iterator();
         while (it.hasNext())
         {
-            String hexLabel = (String)it.next();
+            String hexLabel = it.next();
             BattleHex hex = HexMap.getHexByLabel(terrain, hexLabel);
             if (!isOccupied(hexLabel))
             {
@@ -124,9 +123,9 @@ final class BattleMovement
 
     /** Find all legal moves for this critter. The returned list
      *  contains hex IDs, not hexes. */
-    Set showMoves(BattleChit chit)
+    Set<String> showMoves(BattleChit chit)
     {
-        Set set = new HashSet();
+        Set<String> set = new HashSet<String>();
         if (!chit.hasMoved() && !client.isInContact(chit, false))
         {
             if (HexMap.terrainHasStartlist(client.getBattleTerrain())

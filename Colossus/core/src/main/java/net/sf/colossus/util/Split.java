@@ -6,6 +6,10 @@ import java.util.List;
 
 
 /** Perl-style split function.
+ * 
+ * TODO check if this is obsolete since JDK 1.4 introduced String.split(..)
+ *  and document why not if not. 
+ * 
  *  @version $Id$
  *  @author David Ripton
  */
@@ -14,14 +18,14 @@ public final class Split
 {
 
     /** Split the string into a list of substrings delimited by sep. */
-    public static List split(final char sep, final String s)
+    public static List<String> split(final char sep, final String s)
     {
         return split("" + sep, s);
     }
 
-    public static List split(final String sep, final String s)
+    public static List<String> split(final String sep, final String s)
     {
-        List list = new ArrayList();
+        List<String> list = new ArrayList<String>();
 
         int pos = 0;
         int len = s.length();

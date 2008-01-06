@@ -24,7 +24,7 @@ public interface IClient
 
     public void setOption(String optname, String value);
 
-    public void updatePlayerInfo(List infoStrings);
+    public void updatePlayerInfo(List<String> infoStrings);
 
     public void setColor(String color);
 
@@ -42,11 +42,11 @@ public interface IClient
 
     public void removeCreature(String markerId, String name, String reason);
 
-    public void revealCreatures(String markerId, final List names,
+    public void revealCreatures(String markerId, final List<String> names,
         String reason);
 
-    public void revealEngagedCreatures(String markerId, final List names,
-        boolean isAttacker, String reason);
+    public void revealEngagedCreatures(String markerId,
+        final List<String> names, boolean isAttacker, String reason);
 
     public void removeDeadBattleChits();
 
@@ -59,9 +59,9 @@ public interface IClient
 
     public void createSummonAngel(String markerId);
 
-    public void askAcquireAngel(String markerId, List recruits);
+    public void askAcquireAngel(String markerId, List<String> recruits);
 
-    public void askChooseStrikePenalty(List choices);
+    public void askChooseStrikePenalty(List<String> choices);
 
     public void tellGameOver(String message);
 
@@ -76,8 +76,9 @@ public interface IClient
     public void tellProposal(String proposalString);
 
     public void tellStrikeResults(int strikerTag, int targetTag,
-        int strikeNumber, List rolls, int damage, boolean killed,
-        boolean wasCarry, int carryDamageLeft, Set carryTargetDescriptions);
+        int strikeNumber, List<String> rolls, int damage, boolean killed,
+        boolean wasCarry, int carryDamageLeft,
+        Set<String> carryTargetDescriptions);
 
     public void initBattle(String masterHexLabel, int battleTurnNumber,
         String battleActivePlayerName, Constants.BattlePhase battlePhase,
@@ -133,15 +134,15 @@ public interface IClient
     public void undidSplit(String splitoffId, String survivorId, int turn);
 
     public void didSplit(String hexLabel, String parentId, String childId,
-        int childHeight, List splitoffs, int turn);
+        int childHeight, List<String> splitoffs, int turn);
 
-    public void askPickColor(List colorsLeft);
+    public void askPickColor(List<String> colorsLeft);
 
     public void askPickFirstMarker();
 
     public void log(String message);
 
     public void nak(String reason, String errmsg);
-    
+
     public void setBoardActive(boolean val);
 }

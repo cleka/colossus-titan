@@ -3,37 +3,41 @@ package net.sf.colossus.util;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 
 /**
  * Class Perms returns all possible permutations of an ArrayList.
+ * 
  * @version $Id$
  * @author David Ripton
  */
-public final class Perms
+public final class Perms<T>
 {
-    private ArrayList<Object> permList = new ArrayList<Object>();
-    private PermGen pg;
+    private final ArrayList<T> permList;
+    private final PermGen pg;
     private boolean foundNext = false;
     private boolean anyLeft = true;
     private boolean first = true;
     private int nextSwap;
 
     /** Set up a permutation generator for the passed list. */
-    public Perms(ArrayList<Object> list)
+    // ArrayList.clone() not covariant in return type
+    @SuppressWarnings("unchecked")
+    public Perms(ArrayList<T> list)
     {
         pg = new PermGen(list.size());
 
         // Since we're not going to mess with the elements, just
         // their order, a shallow copy should be fine.
-        permList = (ArrayList<Object>)list.clone();
+        permList = (ArrayList<T>)list.clone();
     }
 
     /** Returns an iterator that returns permutations of the originally
      *  passed list.  The first permutation is the unmodified list. */
-    public Iterator<Object> iterator()
+    public Iterator<List<T>> iterator()
     {
-        return new Iterator()
+        return new Iterator<List<T>>()
         {
 
             /** hasNext should not change things if called repeatedly,
@@ -59,7 +63,7 @@ public final class Perms
                 }
             }
 
-            public Object next()
+            public List<T> next()
             {
                 // Return the unmodified list the first time.
                 if (first)
@@ -94,7 +98,7 @@ public final class Perms
             /** Swap elements lower and lower + 1 of permList */
             private void swap(int lower)
             {
-                Object temp = permList.get(lower);
+                T temp = permList.get(lower);
                 permList.set(lower, permList.get(lower + 1));
                 permList.set(lower + 1, temp);
             }

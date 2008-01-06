@@ -64,7 +64,7 @@ public interface AI
     String pickColor(List colors, List favoriteColors);
 
     /** pick a legion marker */
-    String pickMarker(Set markerIds, String preferredShortColor);
+    String pickMarker(Set<String> markerIds, String preferredShortColor);
 
     /** choose carry target */
     void handleCarries(int carryDamage, Set carryTargets);
