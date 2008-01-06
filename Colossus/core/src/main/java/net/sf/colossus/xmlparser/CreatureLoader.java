@@ -29,11 +29,11 @@ public class CreatureLoader
     private static final Logger LOGGER = Logger.getLogger(CreatureLoader.class
         .getName());
 
-    private final ArrayList creatures;
+    private final ArrayList<Creature> creatures;
 
     public CreatureLoader(InputStream creIS)
     {
-        this.creatures = new ArrayList();
+        this.creatures = new ArrayList<Creature>();
         SAXBuilder builder = new SAXBuilder();
         try
         {
@@ -103,9 +103,9 @@ public class CreatureLoader
         this.creatures.add(creature);
     }
 
-    public List getCreatures()
+    public List<Creature> getCreatures()
     {
-        List copy = new ArrayList();
+        List<Creature> copy = new ArrayList<Creature>();
         try
         {
             copy.addAll(this.creatures);

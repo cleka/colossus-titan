@@ -57,7 +57,7 @@ class CreatureInfo implements Cloneable
     }
 
     @Override
-    public Object clone()
+    public CreatureInfo clone()
     {
         return new CreatureInfo(name, certain, atSplit);
     }

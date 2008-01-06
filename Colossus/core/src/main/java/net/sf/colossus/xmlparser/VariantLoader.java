@@ -30,8 +30,10 @@ public class VariantLoader
     private String cre;
     private String hintName;
     private int maxPlayers = 0;
-    private ArrayList depends = new ArrayList();
+    private final ArrayList<String> depends = new ArrayList<String>();
 
+    // no generics in JDOM
+    @SuppressWarnings("unchecked")
     public VariantLoader(InputStream varIS)
     {
         SAXBuilder builder = new SAXBuilder();
@@ -44,10 +46,10 @@ public class VariantLoader
             Element deps = root.getChild("depends");
             if (deps != null)
             {
-                List dep = deps.getChildren("depend");
-                for (Iterator it = dep.iterator(); it.hasNext();)
+                List<Element> dep = deps.getChildren("depend");
+                for (Iterator<Element> it = dep.iterator(); it.hasNext();)
                 {
-                    Element el = (Element)it.next();
+                    Element el = it.next();
                     depends.add(el.getAttributeValue("variant"));
                 }
             }
@@ -114,9 +116,11 @@ public class VariantLoader
         return maxPlayers;
     }
 
-    public List getDepends()
+    // ArrayList.clone() not covariant in return type
+    @SuppressWarnings("unchecked")
+    public List<String> getDepends()
     {
-        return (List)depends.clone();
+        return (List<String>)depends.clone();
     }
 
 }

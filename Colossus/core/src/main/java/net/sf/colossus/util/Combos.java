@@ -8,20 +8,21 @@ import java.util.List;
 
 /**
  * Returns all possible combinations of n elements of an ArrayList.
+ * 
  * @version $Id$
  * @author David Ripton
  */
-public final class Combos
+public final class Combos<T>
 {
-    private ArrayList<List> retlist;
+    private final ArrayList<List<T>> retlist;
 
-    public Combos(List list, int n)
+    public Combos(List<T> list, int n)
     {
-        retlist = new ArrayList<List>();
-        findCombinations(list, n, new ArrayList());
+        retlist = new ArrayList<List<T>>();
+        findCombinations(list, n, new ArrayList<T>());
     }
 
-    void findCombinations(List alist, int n, List blist)
+    void findCombinations(List<T> alist, int n, List<T> blist)
     {
         if (n < 0 || n > alist.size())
         {
@@ -29,7 +30,7 @@ public final class Combos
         }
         if (n == 0)
         {
-            List copy = new ArrayList();
+            List<T> copy = new ArrayList<T>();
             copy.addAll(blist);
             retlist.add(copy);
             return;
@@ -37,15 +38,15 @@ public final class Combos
         for (int i = 0; i < alist.size(); i++)
         {
             blist.add(alist.get(i));
-            List sub = alist.subList(i + 1, alist.size());
-            List subclone = new ArrayList();
+            List<T> sub = alist.subList(i + 1, alist.size());
+            List<T> subclone = new ArrayList<T>();
             subclone.addAll(sub);
             findCombinations(subclone, n - 1, blist);
             blist.remove(blist.size() - 1);
         }
     }
 
-    public Iterator<List> iterator()
+    public Iterator<List<T>> iterator()
     {
         return retlist.iterator();
     }

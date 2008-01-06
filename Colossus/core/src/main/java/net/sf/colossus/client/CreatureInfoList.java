@@ -14,7 +14,7 @@ import java.util.logging.Logger;
  *  @version $Id$
  *  @author David Ripton
  */
-class CreatureInfoList extends ArrayList
+class CreatureInfoList extends ArrayList<CreatureInfo>
 {
     private static final Logger LOGGER = Logger
         .getLogger(CreatureInfoList.class.getName());
@@ -22,9 +22,9 @@ class CreatureInfoList extends ArrayList
     int numCreature(String creatureName)
     {
         int count = 0;
-        for (Iterator it = iterator(); it.hasNext();)
+        for (Iterator<CreatureInfo> it = iterator(); it.hasNext();)
         {
-            CreatureInfo ci = (CreatureInfo)it.next();
+            CreatureInfo ci = it.next();
             if (creatureName.equals(ci.getName()))
             {
                 count++;
@@ -36,9 +36,9 @@ class CreatureInfoList extends ArrayList
     /** Return the first CreatureInfo that matches the passed name. */
     CreatureInfo getCreatureInfo(String creatureName)
     {
-        for (Iterator it = iterator(); it.hasNext();)
+        for (Iterator<CreatureInfo> it = iterator(); it.hasNext();)
         {
-            CreatureInfo ci = (CreatureInfo)it.next();
+            CreatureInfo ci = it.next();
             if (ci.getName().equals(creatureName))
             {
                 return ci;
@@ -49,10 +49,10 @@ class CreatureInfoList extends ArrayList
 
     void removeLastUncertainCreature()
     {
-        ListIterator lit = this.listIterator(this.size());
+        ListIterator<CreatureInfo> lit = this.listIterator(this.size());
         while (lit.hasPrevious())
         {
-            CreatureInfo ci = (CreatureInfo)lit.previous();
+            CreatureInfo ci = lit.previous();
             if (!ci.isCertain())
             {
                 lit.remove();
@@ -69,9 +69,9 @@ class CreatureInfoList extends ArrayList
         {
             name = "Titan";
         }
-        for (Iterator it = iterator(); it.hasNext();)
+        for (Iterator<CreatureInfo> it = iterator(); it.hasNext();)
         {
-            CreatureInfo ci = (CreatureInfo)it.next();
+            CreatureInfo ci = it.next();
             if (name.equals(ci.getName()))
             {
                 it.remove();
@@ -81,12 +81,12 @@ class CreatureInfoList extends ArrayList
         return false;
     }
 
-    List getCreatureNames()
+    List<String> getCreatureNames()
     {
-        List list = new ArrayList();
-        for (Iterator it = iterator(); it.hasNext();)
+        List<String> list = new ArrayList<String>();
+        for (Iterator<CreatureInfo> it = iterator(); it.hasNext();)
         {
-            CreatureInfo ci = (CreatureInfo)it.next();
+            CreatureInfo ci = it.next();
             list.add(ci.getName());
         }
         return list;
@@ -94,12 +94,12 @@ class CreatureInfoList extends ArrayList
 
     /** Deep copy */
     @Override
-    public Object clone()
+    public CreatureInfoList clone()
     {
         CreatureInfoList dupe = new CreatureInfoList();
-        for (Iterator it = iterator(); it.hasNext();)
+        for (Iterator<CreatureInfo> it = iterator(); it.hasNext();)
         {
-            CreatureInfo ci = (CreatureInfo)it.next();
+            CreatureInfo ci = it.next();
             dupe.add(ci.clone());
         }
         return dupe;

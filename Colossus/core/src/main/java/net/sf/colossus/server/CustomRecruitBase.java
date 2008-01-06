@@ -236,12 +236,12 @@ abstract public class CustomRecruitBase
     abstract public List<Creature> getAllPossibleSpecialRecruits(String terrain);
 
     /** List Creature that can recruit in this terrain in a special way now */
-    abstract public List getPossibleSpecialRecruiters(String terrain,
+    abstract public List<Creature> getPossibleSpecialRecruiters(String terrain,
         String hexLabel);
 
     /** List Creature that can be recruited in this terrain 
      * in a special way now */
-    abstract public List getPossibleSpecialRecruits(String terrain,
+    abstract public List<Creature> getPossibleSpecialRecruits(String terrain,
         String hexLabel);
 
     /** number of recruiter needed to get a recruit 

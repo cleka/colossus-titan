@@ -152,7 +152,7 @@ public final class LegionInfoPanel extends JPanel
             i++;
         }
 
-        List imageNames = legion.getImageNames();
+        List<String> imageNames = legion.getImageNames();
         List<Boolean> certain = legion.getCertainties();
         boolean allCertain = !hideAll;
 
@@ -161,15 +161,15 @@ public final class LegionInfoPanel extends JPanel
         // (just unnecessary work if hideAll is set.)
         if (dubiousAsBlanks && !hideAll)
         {
-            Iterator iIt = imageNames.iterator();
+            Iterator<String> iIt = imageNames.iterator();
             Iterator<Boolean> cIt = certain.iterator();
-            List cNames = new ArrayList();
+            List<String> cNames = new ArrayList<String>();
             List<Boolean> cCertain = new ArrayList<Boolean>();
-            List ucNames = new ArrayList();
+            List<String> ucNames = new ArrayList<String>();
             List<Boolean> ucCertain = new ArrayList<Boolean>();
             while (iIt.hasNext())
             {
-                String imageName = (String)iIt.next();
+                String imageName = iIt.next();
                 Boolean sure = cIt.next();
                 if (sure.booleanValue())
                 {
@@ -196,13 +196,13 @@ public final class LegionInfoPanel extends JPanel
             ucCertain.clear();
         }
 
-        Iterator it = imageNames.iterator();
+        Iterator<String> it = imageNames.iterator();
         Iterator<Boolean> it2 = certain.iterator();
 
         // now add the chits one by one to the panel:
         while (it.hasNext())
         {
-            String imageName = (String)it.next();
+            String imageName = it.next();
             Chit chit;
             boolean sure = it2.next().booleanValue();
             if (!sure)

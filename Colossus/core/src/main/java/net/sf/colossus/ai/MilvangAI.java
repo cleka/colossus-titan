@@ -92,7 +92,7 @@ public class MilvangAI extends RationalAI
 
         if (legion.getHeight() == 8)
         {
-            List creatures = doInitialGameSplit(legion.getHexLabel());
+            List<Creature> creatures = doInitialGameSplit(legion.getHexLabel());
 
             return new MusteredCreatures(true, creatures);
         }
@@ -103,26 +103,28 @@ public class MilvangAI extends RationalAI
         boolean hasTitan = legion.contains("Titan");
         String[] terrains = TerrainRecruitLoader.getTerrains();
 
-        List critters = new ArrayList();
-        for (Iterator it = legion.getContents().iterator(); it.hasNext();)
+        List<Creature> critters = new ArrayList<Creature>();
+        for (Iterator<String> it = legion.getContents().iterator(); it
+            .hasNext();)
         {
-            critters.add(Creature.getCreatureByName((String)it.next()));
+            critters.add(Creature.getCreatureByName(it.next()));
         }
 
         double bestValue = 0;
         // make sure the list is never null even if we don't find anything
-        List bestKeep = new ArrayList();
+        List<Creature> bestKeep = new ArrayList<Creature>();
 
-        Combos combos = new Combos(critters, critters.size() - 2);
-        for (Iterator<List> it = combos.iterator(); it.hasNext();)
+        Combos<Creature> combos = new Combos<Creature>(critters, critters
+            .size() - 2);
+        for (Iterator<List<Creature>> it = combos.iterator(); it.hasNext();)
         {
-            List keepers = it.next();
+            List<Creature> keepers = it.next();
             double critterValue = 0;
             boolean keepTitan = false;
             Map<Creature, Integer> critterMap = new HashMap<Creature, Integer>();
-            for (Iterator it2 = keepers.iterator(); it2.hasNext();)
+            for (Iterator<Creature> it2 = keepers.iterator(); it2.hasNext();)
             {
-                Creature critter = (Creature)it2.next();
+                Creature critter = it2.next();
                 keepTitan |= critter.getName().equals("Titan");
                 int tmp = critter.getHintedRecruitmentValue();
                 critterValue += tmp * tmp;
@@ -172,7 +174,7 @@ public class MilvangAI extends RationalAI
         }
 
         // remove the keep from critters to obtain the split
-        for (Iterator it2 = bestKeep.iterator(); it2.hasNext();)
+        for (Iterator<Creature> it2 = bestKeep.iterator(); it2.hasNext();)
         {
             critters.remove(it2.next());
         }

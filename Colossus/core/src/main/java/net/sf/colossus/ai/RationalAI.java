@@ -262,15 +262,15 @@ public class RationalAI extends SimpleAI implements AI
         boolean hasMustered = false;
 
         MusteredCreatures mc = chooseCreaturesToSplitOut(legion, at_risk);
-        List creatures = mc.creatures;
+        List<Creature> creatures = mc.creatures;
 
         hasMustered = mc.mustered;
-        Iterator it = creatures.iterator();
+        Iterator<Creature> it = creatures.iterator();
         int child_value = 0;
 
         while (it.hasNext())
         {
-            Creature creature = (Creature)it.next();
+            Creature creature = it.next();
 
             child_value += creature.getPointValue();
             results.append(creature.getName());
@@ -548,9 +548,9 @@ public class RationalAI extends SimpleAI implements AI
     class MusteredCreatures
     {
         public boolean mustered;
-        public List creatures;
+        public List<Creature> creatures;
 
-        MusteredCreatures(boolean m, List c)
+        MusteredCreatures(boolean m, List<Creature> c)
         {
             mustered = m;
             creatures = c;
@@ -578,7 +578,7 @@ public class RationalAI extends SimpleAI implements AI
         //
         if (legion.getHeight() == 8)
         {
-            List creatures = doInitialGameSplit(legion.getHexLabel());
+            List<Creature> creatures = doInitialGameSplit(legion.getHexLabel());
 
             return new MusteredCreatures(true, creatures);
         }
@@ -610,7 +610,7 @@ public class RationalAI extends SimpleAI implements AI
             hasMustered = true;
         }
 
-        List creaturesToRemove = new ArrayList();
+        List<Creature> creaturesToRemove = new ArrayList<Creature>();
 
         // Try to pull out pair that has already mustered.
         logger.log(Level.FINEST,
@@ -640,7 +640,7 @@ public class RationalAI extends SimpleAI implements AI
         // but it seems to give a better result
         if (sortIt.hasNext() && !at_risk)
         {
-            Creature first_remove = (Creature)creaturesToRemove.get(0);
+            Creature first_remove = creaturesToRemove.get(0);
             Creature critter = sortIt.next();
             String s_first = first_remove.getName();
             String s_critter = critter.getName();
@@ -1503,7 +1503,7 @@ public class RationalAI extends SimpleAI implements AI
             for (Iterator<List> it = availableMoves.listIterator(1); it.hasNext();)
             {
                 List moves = it.next();
-                List newMoves = new ArrayList();
+                List<LegionBoardMove> newMoves = new ArrayList<LegionBoardMove>();
                 if (lm.noMove
                     && !moves.isEmpty()
                     && lm.fromHex

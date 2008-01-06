@@ -3,9 +3,11 @@ package net.sf.colossus.server;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -39,11 +41,11 @@ public final class VariantSupport
     private static String hintName = "";
     private static String creaturesName = "";
     private static Document varREADME = null;
-    private static List dependUpon = null;
+    private static List<String> dependUpon = null;
     private static boolean loadedVariant = false;
     private static int maxPlayers;
     private static HintInterface aihl = null;
-    private static java.util.Properties markerNames;
+    private static Properties markerNames;
 
     /**
      * Clean-up the ResourceLoader caches to make room for a variant.
@@ -139,7 +141,7 @@ public final class VariantSupport
         {
 
             /* Can't use getVarDirectoriesList yet ! */
-            List directories = new java.util.ArrayList();
+            List<String> directories = new ArrayList<String>();
             directories.add(tempVarDirectory);
             directories.add(Constants.defaultDirName);
             InputStream varIS = ResourceLoader.getInputStream(tempVarName,
@@ -196,7 +198,7 @@ public final class VariantSupport
                 LOGGER.log(Level.FINEST, "Variant depending upon "
                     + dependUpon);
             }
-            directories = new java.util.ArrayList();
+            directories = new ArrayList<String>();
             directories.add(tempVarDirectory);
             varREADME = ResourceLoader.getDocument("README", directories);
 
@@ -298,14 +300,14 @@ public final class VariantSupport
         return creaturesName;
     }
 
-    public static List getVarDirectoriesList()
+    public static List<String> getVarDirectoriesList()
     {
-        List directories = new java.util.ArrayList();
+        List<String> directories = new ArrayList<String>();
         if (!(varDirectory.equals(Constants.defaultDirName)))
         {
             directories.add(varDirectory);
         }
-        Iterator it = dependUpon.iterator();
+        Iterator<String> it = dependUpon.iterator();
         while (it.hasNext())
         {
             directories.add(it.next());
@@ -314,26 +316,26 @@ public final class VariantSupport
         return directories;
     }
 
-    public static List getVarDirectoriesList(String suffixPath)
+    public static List<String> getVarDirectoriesList(String suffixPath)
     {
-        List directories = getVarDirectoriesList();
-        List suffixedDirs = new java.util.ArrayList();
-        Iterator it = directories.iterator();
+        List<String> directories = getVarDirectoriesList();
+        List<String> suffixedDirs = new ArrayList<String>();
+        Iterator<String> it = directories.iterator();
         while (it.hasNext())
         {
-            String dir = (String)it.next();
+            String dir = it.next();
             suffixedDirs.add(dir + ResourceLoader.getPathSeparator()
                 + suffixPath);
         }
         return suffixedDirs;
     }
 
-    public static List getImagesDirectoriesList()
+    public static List<String> getImagesDirectoriesList()
     {
         return getVarDirectoriesList(Constants.imagesDirName);
     }
 
-    public static List getBattlelandsDirectoriesList()
+    public static List<String> getBattlelandsDirectoriesList()
     {
         return getVarDirectoriesList(Constants.battlelandsDirName);
     }
@@ -347,7 +349,7 @@ public final class VariantSupport
 
         try
         {
-            List directories = getVarDirectoriesList();
+            List<String> directories = getVarDirectoriesList();
             InputStream terIS = ResourceLoader.getInputStream(
                 getRecruitName(), directories);
             if (terIS == null)
@@ -369,19 +371,19 @@ public final class VariantSupport
         net.sf.colossus.client.MasterBoard.staticMasterboardInit();
     }
 
-    private static java.util.Properties loadMarkerNamesProperties()
+    private static Properties loadMarkerNamesProperties()
     {
-        java.util.Properties allNames = new java.util.Properties();
-        List directories = getVarDirectoriesList();
+        Properties allNames = new Properties();
+        List<String> directories = getVarDirectoriesList();
 
         /* unlike other, don't use file-level granularity ;
          load all files in order, so that we get the
          default mapping at the end */
-        ListIterator it = directories.listIterator(directories.size());
+        ListIterator<String> it = directories.listIterator(directories.size());
         boolean foundOne = false;
         while (it.hasPrevious())
         {
-            List singleDirectory = new java.util.ArrayList();
+            List<String> singleDirectory = new ArrayList<String>();
             singleDirectory.add(it.previous());
             try
             {
@@ -407,7 +409,7 @@ public final class VariantSupport
         return allNames;
     }
 
-    public static java.util.Properties getMarkerNamesProperties()
+    public static Properties getMarkerNamesProperties()
     {
         return markerNames;
     }

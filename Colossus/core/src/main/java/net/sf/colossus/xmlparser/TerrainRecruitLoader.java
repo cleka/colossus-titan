@@ -44,7 +44,7 @@ public class TerrainRecruitLoader
     /**
      * Map a String (representing a terrain) to a list of recruits.
      */
-    private static HashMap<String, ArrayList<recruitNumber>> strToRecruits = new HashMap<String, ArrayList<recruitNumber>>();
+    private static HashMap<String, List<RecruitNumber>> strToRecruits = new HashMap<String, List<RecruitNumber>>();
 
     /**
      * Map a String (representing a terrain) to a terrain display name.
@@ -104,16 +104,16 @@ public class TerrainRecruitLoader
      * Add an entire terrain recruiting list to the Recruiting Graph.
      * @param rl The list of RecruitNumber to add to the graph.
      */
-    private static void addToGraph(ArrayList<recruitNumber> rl, String t)
+    private static void addToGraph(ArrayList<RecruitNumber> rl, String t)
     {
-        Iterator<recruitNumber> it = rl.iterator();
+        Iterator<RecruitNumber> it = rl.iterator();
         String v1 = null;
         boolean regularRecruit = strToBelow.get(t).booleanValue();
         try
         {
             while (it.hasNext())
             {
-                recruitNumber tr = it.next();
+                RecruitNumber tr = it.next();
                 String v2 = tr.getName();
                 if ((v2 != null) && !(v2.equals(Keyword_Anything))
                     && !(v2.equals(Keyword_AnyNonLord))
@@ -126,11 +126,11 @@ public class TerrainRecruitLoader
                         graph.addEdge(v1, v2, tr.getNumber(), t);
                     }
                     // add the self-recruit & below-recruit loop
-                    Iterator<recruitNumber> it2 = rl.iterator();
+                    Iterator<RecruitNumber> it2 = rl.iterator();
                     boolean done = false;
                     while (it2.hasNext() && !done)
                     {
-                        recruitNumber tr2 = it2.next();
+                        RecruitNumber tr2 = it2.next();
                         if ((tr == tr2) || // same List, same objects
                             regularRecruit)
                         {
@@ -270,7 +270,7 @@ public class TerrainRecruitLoader
             displayName = name;
         }
         String color = el.getAttributeValue("color");
-        ArrayList<recruitNumber> rl = new ArrayList<recruitNumber>();
+        ArrayList<RecruitNumber> rl = new ArrayList<RecruitNumber>();
 
         boolean regularRecruit = el.getAttribute("regular_recruit")
             .getBooleanValue();
@@ -280,7 +280,7 @@ public class TerrainRecruitLoader
             Element recruit = (Element)it.next();
             String recruitName = recruit.getAttributeValue("name");
             int recruitNum = recruit.getAttribute("number").getIntValue();
-            recruitNumber rn = new recruitNumber(recruitName, recruitNum);
+            RecruitNumber rn = new RecruitNumber(recruitName, recruitNum);
             rl.add(rn);
         }
 
@@ -352,7 +352,7 @@ public class TerrainRecruitLoader
      * @author Romain Dolbeau
      * @version $Id$
      */
-    private class recruitNumber
+    private class RecruitNumber
     {
 
         /**
@@ -370,7 +370,7 @@ public class TerrainRecruitLoader
          * @param i Number of creatures needed to recruit it in the
          * terrain considered.
          */
-        public recruitNumber(String n, int i)
+        public RecruitNumber(String n, int i)
         {
             name = n;
             number = i;
@@ -399,8 +399,7 @@ public class TerrainRecruitLoader
 
     public static CustomRecruitBase getCustomRecruitBase(String specialString)
     {
-        CustomRecruitBase cri = nameToInstance
-            .get(specialString);
+        CustomRecruitBase cri = nameToInstance.get(specialString);
         if (cri != null)
         {
             return cri;
@@ -473,14 +472,15 @@ public class TerrainRecruitLoader
      * @return List of Creatures that can be recruited in the terrain.
      * @see net.sf.colossus.server.Creature
      */
-    public static List getPossibleRecruits(String terrain, String hexLabel)
+    public static List<Creature> getPossibleRecruits(String terrain,
+        String hexLabel)
     {
-        ArrayList al = strToRecruits.get(terrain);
-        ArrayList re = new ArrayList();
-        Iterator it = al.iterator();
+        List<RecruitNumber> al = strToRecruits.get(terrain);
+        List<Creature> re = new ArrayList<Creature>();
+        Iterator<RecruitNumber> it = al.iterator();
         while (it.hasNext())
         {
-            recruitNumber tr = (recruitNumber)it.next();
+            RecruitNumber tr = it.next();
             if ((tr.getNumber() >= 0)
                 && !(tr.getName().equals(Keyword_Anything))
                 && !(tr.getName().equals(Keyword_AnyNonLord))
@@ -495,8 +495,8 @@ public class TerrainRecruitLoader
                 CustomRecruitBase cri = getCustomRecruitBase(tr.getName());
                 if (cri != null)
                 {
-                    List temp = cri.getPossibleSpecialRecruits(terrain,
-                        hexLabel);
+                    List<Creature> temp = cri.getPossibleSpecialRecruits(
+                        terrain, hexLabel);
                     re.addAll(temp);
                 }
             }
@@ -510,15 +510,15 @@ public class TerrainRecruitLoader
      * @return List of Creatures that can recruit in the terrain.
      * @see net.sf.colossus.server.Creature
      */
-    public static java.util.List getPossibleRecruiters(String terrain,
+    public static List<Creature> getPossibleRecruiters(String terrain,
         String hexLabel)
     {
-        ArrayList al = strToRecruits.get(terrain);
-        ArrayList re = new ArrayList();
+        List al = strToRecruits.get(terrain);
+        List<Creature> re = new ArrayList<Creature>();
         Iterator it = al.iterator();
         while (it.hasNext())
         {
-            recruitNumber tr = (recruitNumber)it.next();
+            RecruitNumber tr = (RecruitNumber)it.next();
             if (!(tr.getName().equals(Keyword_Anything))
                 && !(tr.getName().equals(Keyword_AnyNonLord))
                 && !(tr.getName().equals(Keyword_Lord))
@@ -530,17 +530,17 @@ public class TerrainRecruitLoader
             {
                 if (tr.getName().equals(Keyword_Anything))
                 { // anyone can recruit here...
-                    java.util.List creatures = Creature.getCreatures();
-                    return (new ArrayList(creatures));
+                    List<Creature> creatures = Creature.getCreatures();
+                    return (new ArrayList<Creature>(creatures));
                 }
                 if (tr.getName().equals(Keyword_AnyNonLord))
                 { // anyone can recruit here...
-                    java.util.List creatures = Creature.getCreatures();
-                    return (new ArrayList(creatures));
+                    List<Creature> creatures = Creature.getCreatures();
+                    return (new ArrayList<Creature>(creatures));
                 }
                 if (tr.getName().equals(Keyword_Lord))
                 {
-                    java.util.List potential = Creature.getCreatures();
+                    List potential = Creature.getCreatures();
                     ListIterator lit = potential.listIterator();
                     while (lit.hasNext())
                     {
@@ -556,8 +556,8 @@ public class TerrainRecruitLoader
                     CustomRecruitBase cri = getCustomRecruitBase(tr.getName());
                     if (cri != null)
                     {
-                        List temp = cri.getPossibleSpecialRecruiters(terrain,
-                            hexLabel);
+                        List<Creature> temp = cri
+                            .getPossibleSpecialRecruiters(terrain, hexLabel);
                         re.addAll(temp);
                     }
                 }

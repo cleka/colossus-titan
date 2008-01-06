@@ -64,7 +64,7 @@ public class Creature implements Comparable
         false, false, false, false, false, false, 1, "Unknown", null);
 
     /** Sometimes we need to iterate through all creature types. */
-    private static List creatures = new ArrayList();
+    private static List<Creature> creatures = new ArrayList<Creature>();
     private static List<Creature> summonableCreatures = new ArrayList<Creature>();
 
     public Creature(String name, int power, int skill, boolean rangestrikes,
@@ -129,10 +129,10 @@ public class Creature implements Comparable
                 e);
         }
         summonableCreatures.clear();
-        Iterator it = creatures.iterator();
+        Iterator<Creature> it = creatures.iterator();
         while (it.hasNext())
         {
-            Creature c = (Creature)it.next();
+            Creature c = it.next();
             if (c.isSummonable())
             {
                 summonableCreatures.add(c);
@@ -141,7 +141,7 @@ public class Creature implements Comparable
         Collections.sort(creatures);
     }
 
-    public static List getCreatures()
+    public static List<Creature> getCreatures()
     {
         return Collections.unmodifiableList(creatures);
     }
@@ -484,10 +484,10 @@ public class Creature implements Comparable
         else
         {
             // find it the slow way and add to cache.
-            Iterator it = creatures.iterator();
+            Iterator<Creature> it = creatures.iterator();
             while (it.hasNext())
             {
-                Creature creature = (Creature)it.next();
+                Creature creature = it.next();
                 if (name.equalsIgnoreCase(creature.getName()))
                 {
                     // found it the hard way. now add this spelling to cache

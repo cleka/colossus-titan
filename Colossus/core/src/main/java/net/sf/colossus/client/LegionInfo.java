@@ -119,7 +119,7 @@ public final class LegionInfo extends Legion
     }
 
     /** Return an immutable copy of the legion's contents, in sorted order. */
-    public List getContents()
+    public List<String> getContents()
     {
         try
         {
@@ -128,7 +128,7 @@ public final class LegionInfo extends Legion
         }
         catch (NullPointerException ex)
         {
-            return new ArrayList();
+            return new ArrayList<String>();
         }
     }
 
@@ -141,10 +141,10 @@ public final class LegionInfo extends Legion
     public int numCreature(String creatureName)
     {
         int count = 0;
-        Iterator it = getContents().iterator();
+        Iterator<String> it = getContents().iterator();
         while (it.hasNext())
         {
-            String name = (String)it.next();
+            String name = it.next();
             if (name.equals(creatureName))
             {
                 count++;
@@ -156,10 +156,10 @@ public final class LegionInfo extends Legion
     public int numSummonableCreature()
     {
         int count = 0;
-        Iterator it = getContents().iterator();
+        Iterator<String> it = getContents().iterator();
         while (it.hasNext())
         {
-            Creature c = Creature.getCreatureByName((String)it.next());
+            Creature c = Creature.getCreatureByName(it.next());
             if (c.isSummonable())
             {
                 count++;
@@ -176,9 +176,9 @@ public final class LegionInfo extends Legion
 
     /** Return a list of Strings.  Use the proper string for titans and
      *  unknown creatures. */
-    List getImageNames()
+    List<String> getImageNames()
     {
-        List names = new ArrayList();
+        List<String> names = new ArrayList<String>();
         names.addAll(getContents());
         int j = names.indexOf(Constants.titan);
         if (j != -1)
@@ -267,10 +267,10 @@ public final class LegionInfo extends Legion
     {
         int count = 0;
 
-        Iterator it = getContents().iterator();
+        Iterator<String> it = getContents().iterator();
         while (it.hasNext())
         {
-            String name = (String)it.next();
+            String name = it.next();
             if (name.startsWith(Constants.titan))
             {
                 count++;
@@ -291,10 +291,10 @@ public final class LegionInfo extends Legion
     {
         Creature best = null;
 
-        Iterator it = getContents().iterator();
+        Iterator<String> it = getContents().iterator();
         while (it.hasNext())
         {
-            String name = (String)it.next();
+            String name = it.next();
             Creature creature = Creature.getCreatureByName(name);
             if (creature.isSummonable())
             {
@@ -322,10 +322,10 @@ public final class LegionInfo extends Legion
     public int getPointValue()
     {
         int sum = 0;
-        Iterator it = getContents().iterator();
+        Iterator<String> it = getContents().iterator();
         while (it.hasNext())
         {
-            String name = (String)it.next();
+            String name = it.next();
             if (name.startsWith(Constants.titan))
             {
                 PlayerInfo info = client.getPlayerInfo(playerName);

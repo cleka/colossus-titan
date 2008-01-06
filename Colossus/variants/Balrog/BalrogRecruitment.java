@@ -54,16 +54,16 @@ public class BalrogRecruitment extends CustomRecruitBase
     }
 
     @Override
-    public List getPossibleSpecialRecruiters(String terrain, String hexLabel)
+    public List<Creature> getPossibleSpecialRecruiters(String terrain, String hexLabel)
     {
         // Balrog recruited in Tower, where everything recruit anyway.
-        return new ArrayList();
+        return new ArrayList<Creature>();
     }
 
     @Override
-    public List getPossibleSpecialRecruits(String terrain, String hexLabel)
+    public List<Creature> getPossibleSpecialRecruits(String terrain, String hexLabel)
     {
-        List temp = new ArrayList();
+        List<Creature> temp = new ArrayList<Creature>();
 
         if (hexLabel == null)
         {
