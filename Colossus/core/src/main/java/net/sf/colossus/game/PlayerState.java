@@ -29,10 +29,8 @@ public class PlayerState
 
     /**
      * The current legions owned by this player.
-     * 
-     * A List of {@link Legion}s.
      */
-    private final List legions = new ArrayList();
+    private final List<Legion> legions = new ArrayList<Legion>();
 
     public PlayerState(Game game, Player player)
     {
@@ -50,7 +48,7 @@ public class PlayerState
         return game;
     }
 
-    public List getLegions()
+    public List<Legion> getLegions()
     {
         return Collections.unmodifiableList(this.legions);
     }

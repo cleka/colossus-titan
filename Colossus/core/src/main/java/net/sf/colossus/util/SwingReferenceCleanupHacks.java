@@ -1,6 +1,9 @@
 package net.sf.colossus.util;
 
 
+import java.lang.reflect.Field;
+
+
 /**
  *  Special hack to cleanup some static reference to the JFrame
  *  inside Swing; copied from here:
@@ -39,7 +42,7 @@ public class SwingReferenceCleanupHacks
                     // the memory leak down to this javax.swing.plaf.basic.BasicPopupMenuUI$MenuKeyboardHelper
                     // holding onto an instance of the JRootPane.  Therefore we just remove all of the
                     // instances of this class and it cleans up fine and seems to work.
-                    Class aClass = Class
+                    Class<?> aClass = Class
                         .forName("javax.swing.plaf.basic.BasicPopupMenuUI$MenuKeyboardHelper");
                     for (int i = listeners.length - 1; i >= 0; i -= 2)
                     {
@@ -107,7 +110,7 @@ public class SwingReferenceCleanupHacks
 
     }
 
-    private static void SafelySetReflectedFieldToNull(Class aClass,
+    private static void SafelySetReflectedFieldToNull(Class<?> aClass,
         String aFieldName, Object anObject)
     {
         try
@@ -128,7 +131,7 @@ public class SwingReferenceCleanupHacks
     {
         try
         {
-            Class aClass = Class.forName(aClassName);
+            Class<?> aClass = Class.forName(aClassName);
             SafelySetReflectedFieldToNull(aClass, aFieldName, anObject);
         }
         catch (Exception e)
@@ -142,9 +145,8 @@ public class SwingReferenceCleanupHacks
     {
         try
         {
-            Class aClass = Class.forName(aClassName);
-            java.lang.reflect.Field aField = aClass
-                .getDeclaredField(aFieldName);
+            Class<?> aClass = Class.forName(aClassName);
+            Field aField = aClass.getDeclaredField(aFieldName);
             aField.setAccessible(true);
             return aField.get(anObject);
         }

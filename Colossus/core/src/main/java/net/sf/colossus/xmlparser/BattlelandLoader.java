@@ -37,6 +37,8 @@ public class BattlelandLoader
     /** optional subtitle for the Battlelands */
     private String subtitle = null;
 
+    // we need to cast since JDOM is not generified
+    @SuppressWarnings("unchecked")
     public BattlelandLoader(InputStream batIS, BattleHex[][] h)
     {
         SAXBuilder builder = new SAXBuilder();
@@ -59,7 +61,8 @@ public class BattlelandLoader
             {
                 // towi: the DTD "battlehex" definitions clashed.
                 //    renamed to "battlehexref"
-                List<Element> startlistHexes = startlistEl.getChildren("battlehexref");
+                List<Element> startlistHexes = startlistEl
+                    .getChildren("battlehexref");
                 if (startlistHexes.size() == 0)
                 {
                     // support old format with warning
@@ -72,7 +75,8 @@ public class BattlelandLoader
                     }
                 }
 
-                for (Iterator<Element> it = startlistHexes.iterator(); it.hasNext();)
+                for (Iterator<Element> it = startlistHexes.iterator(); it
+                    .hasNext();)
                 {
                     Element el = it.next();
                     handleStartlistHex(el);
@@ -91,6 +95,8 @@ public class BattlelandLoader
         }
     }
 
+    // we need to cast since JDOM is not generified
+    @SuppressWarnings("unchecked")
     private void handleHex(Element el, BattleHex[][] h) throws JDOMException
     {
         int xpos = el.getAttribute("x").getIntValue();

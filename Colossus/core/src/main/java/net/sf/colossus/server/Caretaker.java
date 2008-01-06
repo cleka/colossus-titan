@@ -183,32 +183,34 @@ public final class Caretaker implements Cloneable
     void fullySyncDisplays()
     {
         // Do *all* creatures, not just the ones in the map.
-        Iterator it = Creature.getCreatures().iterator();
+        Iterator<Creature> it = Creature.getCreatures().iterator();
         while (it.hasNext())
         {
-            Creature creature = (Creature)it.next();
+            Creature creature = it.next();
             updateDisplays(creature.getName());
         }
     }
 
+    // unchecked conversions since retVal of HashMap.clone() not covariant
+    @SuppressWarnings("unchecked")
     @Override
     public Object clone()
     {
         Caretaker newCaretaker = new Caretaker(game);
         // because String and Integer are both immutable, a shallow copy is
         // the same as a deep copy
-        newCaretaker.map = (HashMap)map.clone();
-        newCaretaker.deadMap = (HashMap)deadMap.clone();
+        newCaretaker.map = (HashMap<String, Integer>)map.clone();
+        newCaretaker.deadMap = (HashMap<String, Integer>)deadMap.clone();
         return newCaretaker;
     }
 
     /** Move dead non-Titan immortals back to stacks. */
     void resurrectImmortals()
     {
-        Iterator it = Creature.getCreatures().iterator();
+        Iterator<Creature> it = Creature.getCreatures().iterator();
         while (it.hasNext())
         {
-            Creature creature = (Creature)it.next();
+            Creature creature = it.next();
             if (creature.isImmortal())
             {
                 String name = creature.getName();

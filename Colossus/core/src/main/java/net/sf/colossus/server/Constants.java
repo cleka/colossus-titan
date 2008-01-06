@@ -72,6 +72,7 @@ public final class Constants
         /**
          * Returns a non-localized UI string for the phase.
          */
+        @Override
         public String toString()
         {
             return name;
@@ -158,6 +159,7 @@ public final class Constants
         /**
          * Returns a non-localized UI string for the phase.
          */
+        @Override
         public String toString()
         {
             return name;

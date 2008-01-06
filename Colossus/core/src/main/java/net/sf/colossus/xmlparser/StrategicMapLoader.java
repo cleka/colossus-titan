@@ -32,6 +32,8 @@ public class StrategicMapLoader
     private int vertSize = -1;
     private MasterHex[][] hexes = null;
 
+    // we need to cast since JDOM is not generified
+    @SuppressWarnings("unchecked")
     public StrategicMapLoader(InputStream mapIS)
     {
         SAXBuilder builder = new SAXBuilder();
@@ -61,6 +63,8 @@ public class StrategicMapLoader
         }
     }
 
+    // we need to cast since JDOM is not generified
+    @SuppressWarnings("unchecked")
     private void handleHex(Element el) throws JDOMException
     {
         String label = el.getAttributeValue("label");
@@ -82,8 +86,7 @@ public class StrategicMapLoader
         {
             Element exit = it.next();
             String sExitType = exit.getAttributeValue("type");
-            int iExitType = Constants.hexsideMap.get(sExitType)
-                .intValue();
+            int iExitType = Constants.hexsideMap.get(sExitType).intValue();
             hex.setBaseExitType(i, iExitType);
             int exitLabel = exit.getAttribute("label").getIntValue();
             hex.setBaseExitLabel(i, exitLabel);

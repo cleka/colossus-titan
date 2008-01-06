@@ -12,13 +12,13 @@ import net.sf.colossus.server.VariantSupport;
 
 
 /** Test helper */
-class AllPredictSplits extends ArrayList
+class AllPredictSplits extends ArrayList<PredictSplits>
 {
     PredictSplitNode getLeaf(String markerId)
     {
-        for (Iterator it = iterator(); it.hasNext();)
+        for (Iterator<PredictSplits> it = iterator(); it.hasNext();)
         {
-            PredictSplits ps = (PredictSplits)it.next();
+            PredictSplits ps = it.next();
             PredictSplitNode leaf = ps.getLeaf(markerId);
             if (leaf != null)
             {
@@ -30,18 +30,18 @@ class AllPredictSplits extends ArrayList
 
     void printLeaves()
     {
-        for (Iterator it = iterator(); it.hasNext();)
+        for (Iterator<PredictSplits> it = iterator(); it.hasNext();)
         {
-            PredictSplits ps = (PredictSplits)it.next();
+            PredictSplits ps = it.next();
             ps.printLeaves();
         }
     }
 
     void printNodes()
     {
-        for (Iterator it = iterator(); it.hasNext();)
+        for (Iterator<PredictSplits> it = iterator(); it.hasNext();)
         {
-            PredictSplits ps = (PredictSplits)it.next();
+            PredictSplits ps = it.next();
             ps.printNodes();
         }
     }
@@ -59,7 +59,7 @@ public class PredictSplitsTest extends TestCase
     private static final Logger LOGGER = Logger
         .getLogger(PredictSplitsTest.class.getName());
 
-    List cnl;
+    List<String> cnl;
     AllPredictSplits aps;
     PredictSplits ps;
     int turn = 0;
@@ -69,12 +69,13 @@ public class PredictSplitsTest extends TestCase
         super(name);
     }
 
+    @Override
     protected void setUp()
     {
         VariantSupport.loadVariant("Default", true);
         aps = new AllPredictSplits();
 
-        cnl = new ArrayList();
+        cnl = new ArrayList<String>();
         cnl.add("Titan");
         cnl.add("Angel");
         cnl.add("Centaur");

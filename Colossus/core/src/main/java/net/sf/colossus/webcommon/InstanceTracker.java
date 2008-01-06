@@ -3,6 +3,8 @@ package net.sf.colossus.webcommon;
 
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 import java.util.WeakHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -34,12 +36,12 @@ import java.util.logging.Logger;
 
 public class InstanceTracker
 {
-    private static final Logger LOGGER =
-        Logger.getLogger(InstanceTracker.class.getName());
-    
-    private static WeakHashMap<String, InstanceGroup> instanceGroups = new WeakHashMap<String, InstanceGroup>();
+    private static final Logger LOGGER = Logger
+        .getLogger(InstanceTracker.class.getName());
 
-    private static HashSet interestedIn = new HashSet();
+    private static Map<String, InstanceGroup> instanceGroups = new WeakHashMap<String, InstanceGroup>();
+
+    private static Set<String> interestedIn = new HashSet<String>();
     // private static String prefix = "net.sf.colossus.";
 
     private static boolean interestedInAll = true;
@@ -76,16 +78,15 @@ public class InstanceTracker
     {
         String type = o.getClass().getName();
         if ((interestedIn.contains(type) || interestedInAll)
-            && (ignoreDummyFrame || 
-                !type.equals("net.sf.colossus.util.DummyFrameWithMenu")))
+            && (ignoreDummyFrame || !type
+                .equals("net.sf.colossus.util.DummyFrameWithMenu")))
         {
             LOGGER.log(Level.FINEST, "Registering object of type " + type
                 + " with id " + id);
             if (instanceGroups.containsKey(type))
             {
                 LOGGER.log(Level.FINEST, "Adding to existing group " + type);
-                InstanceGroup group = instanceGroups
-                    .get(type);
+                InstanceGroup group = instanceGroups.get(type);
                 group.addInstance(o, id);
             }
             else
@@ -98,8 +99,8 @@ public class InstanceTracker
         }
         else
         {
-            LOGGER.log(Level.FINEST,
-                "NOT registering object of type " + type + " with id " + id);
+            LOGGER.log(Level.FINEST, "NOT registering object of type " + type
+                + " with id " + id);
         }
     }
 
@@ -110,9 +111,9 @@ public class InstanceTracker
 
         if (interestedIn.contains(type))
         {
-            LOGGER.log(Level.FINEST, 
-                "InstanceTracker.setId(): One object of type " + 
-                shortType + " changes ID to '" + id + "'");
+            LOGGER.log(Level.FINEST,
+                "InstanceTracker.setId(): One object of type " + shortType
+                    + " changes ID to '" + id + "'");
         }
 
         // nothing needs to be actually done, it will disappear by itself
@@ -120,8 +121,7 @@ public class InstanceTracker
 
         if (instanceGroups.containsKey(type))
         {
-            InstanceGroup group = instanceGroups
-                .get(type);
+            InstanceGroup group = instanceGroups.get(type);
             InstanceGroup.typeInstance i = group.getInstance(o);
             if (i != null)
             {
@@ -135,7 +135,7 @@ public class InstanceTracker
         String stat = getPrintStatistics();
         LOGGER.log(Level.INFO, stat);
     }
-    
+
     private static synchronized String getPrintStatistics()
     {
         StringBuffer stat = new StringBuffer();
@@ -145,8 +145,7 @@ public class InstanceTracker
         while (it.hasNext())
         {
             String type = it.next();
-            InstanceGroup group =
-                instanceGroups.get(type);
+            InstanceGroup group = instanceGroups.get(type);
             stat.append(group.getPrintStatistics());
         }
         stat.append("\n");
@@ -159,8 +158,7 @@ public class InstanceTracker
         while (it.hasNext())
         {
             String type = it.next();
-            InstanceGroup group = instanceGroups
-                .get(type);
+            InstanceGroup group = instanceGroups.get(type);
             if (group.amountLeft() != 0)
             {
                 return false;

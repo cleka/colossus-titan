@@ -40,15 +40,16 @@ public class RecruitGraph
 
     /**
      * The vertex of the Recruit Graph
+     * 
      * @version $Id$
      * @author Romain Dolbeau
      */
-    private class RecruitVertex
+    private static class RecruitVertex
     {
         private final String cre;
         private final RecruitGraph graph;
-        private List<RecruitEdge> outgoingEdges = new ArrayList<RecruitEdge>();
-        private List<RecruitEdge> incomingEdges = new ArrayList<RecruitEdge>();
+        private final List<RecruitEdge> outgoingEdges = new ArrayList<RecruitEdge>();
+        private final List<RecruitEdge> incomingEdges = new ArrayList<RecruitEdge>();
 
         RecruitVertex(String name, RecruitGraph graph)
         {
@@ -131,7 +132,7 @@ public class RecruitGraph
      * @version $Id$
      * @author Romain Dolbeau
      */
-    private class RecruitEdge
+    private static class RecruitEdge
     {
         private final RecruitVertex src;
         private final RecruitVertex dst;
@@ -185,6 +186,51 @@ public class RecruitGraph
         {
             return "RecruitEdge from " + number + " " + src.getCreatureName()
                 + " to " + dst.getCreatureName() + " in " + terrain;
+        }
+    }
+
+    /**
+     * Models a recruit option for a given creature.
+     * 
+     * This is an return object for the question which recruit options a particular
+     * creature has. Each option consists of a terrain to muster in, a target creatures
+     * and a number of start creatures required to upgrade.
+     */
+    public static final class RecruitOption
+    {
+        private final String terrain;
+        private final String startCreature;
+        private final String targetCreature;
+        private final int numberRequired;
+
+        public RecruitOption(String terrain, String startCreature,
+            String targetCreature, int numberRequired)
+        {
+            super();
+            this.terrain = terrain;
+            this.startCreature = startCreature;
+            this.targetCreature = targetCreature;
+            this.numberRequired = numberRequired;
+        }
+
+        public String getTerrain()
+        {
+            return terrain;
+        }
+
+        public String getStartCreature()
+        {
+            return startCreature;
+        }
+
+        public String getTargetCreature()
+        {
+            return targetCreature;
+        }
+
+        public int getNumberRequired()
+        {
+            return numberRequired;
         }
     }
 
@@ -245,7 +291,8 @@ public class RecruitGraph
      * @param legion The legion to use for availability
      * @return The list of all reachable Vertex from parameter s.
      */
-    private List<RecruitVertex> traverse(RecruitVertex s, Set<RecruitVertex> visited, LegionInfo legion)
+    private List<RecruitVertex> traverse(RecruitVertex s,
+        Set<RecruitVertex> visited, LegionInfo legion)
     {
         List<RecruitVertex> all = new ArrayList<RecruitVertex>();
 
@@ -449,8 +496,8 @@ public class RecruitGraph
      * @return A List of String representing all Terrains where recruitment
      *     is possible.
      */
-    public List<String> getAllTerrainsWhereThisNumberOfCreatureRecruit(String cre,
-        int number)
+    public List<String> getAllTerrainsWhereThisNumberOfCreatureRecruit(
+        String cre, int number)
     {
         List<String> at = new ArrayList<String>();
 
@@ -469,53 +516,37 @@ public class RecruitGraph
     }
 
     /**
-     * a triple if lists what the creature 'CRE' can recruit.
-     * the positions in the lists accord to each other.
-     * <code>[ [ter1, ter2, ...], [cre1, cre2, ...], [num1, num2, ...] ]</code>
-     * means that in terrain='ter1' with 'num1' of 'CRE' you get one 'cre1'.
-     * @return [ [terrains], [creature names], [numbers] ]
+     * A list of what a creature can recruit.
      */
-    public List[] getAllThatThisCreatureCanRecruit(String cre)
+    public List<RecruitOption> getAllThatThisCreatureCanRecruit(String cre)
     {
-        List[] result = new List[3]; // [[terrain],[creature],[number]] 
-        result[0] = new ArrayList();
-        result[1] = new ArrayList();
-        result[2] = new ArrayList();
-        //
+        List<RecruitOption> result = new ArrayList<RecruitOption>();
+
         List<RecruitEdge> outgoing = getOutgoingEdges(cre);
         Iterator<RecruitEdge> it = outgoing.iterator();
         while (it.hasNext())
         {
             RecruitEdge e = it.next();
-            result[2].add(new Integer(e.getNumber()));
-            result[1].add(e.getDestination().getCreatureName());
-            result[0].add(e.getTerrain());
+            result.add(new RecruitOption(e.getTerrain(), cre, e
+                .getDestination().getCreatureName(), e.getNumber()));
         }
         return result;
     }
 
     /** 
-     * a triple if lists what can recruit the creature 'CRE'.
-     * the positions in the lists accord to each other.
-     * <code>[ [ter1, ter2, ...], [cre1, cre2, ...], [num1, num2, ...] ]</code>
-     * means that in terrain='ter1' with 'num1' of 'cre1' you get one 'cre'.
-     * @return [ [terrains], [creature names], [numbers] ]
+     * A list of what can recruit a creature.
      */
-    public List[] getAllThatCanRecruitThisCreature(String cre)
+    public List<RecruitOption> getAllThatCanRecruitThisCreature(String cre)
     {
-        List[] result = new List[3]; // [[terrain],[creature],[number]] 
-        result[0] = new ArrayList();
-        result[1] = new ArrayList();
-        result[2] = new ArrayList();
-        //
+        List<RecruitOption> result = new ArrayList<RecruitOption>();
+
         List<RecruitEdge> outgoing = getIncomingEdges(cre);
         Iterator<RecruitEdge> it = outgoing.iterator();
         while (it.hasNext())
         {
             RecruitEdge e = it.next();
-            result[2].add(new Integer(e.getNumber()));
-            result[1].add(e.getSource().getCreatureName());
-            result[0].add(e.getTerrain());
+            result.add(new RecruitOption(e.getTerrain(), e.getSource()
+                .getCreatureName(), cre, e.getNumber()));
         }
         return result;
     }

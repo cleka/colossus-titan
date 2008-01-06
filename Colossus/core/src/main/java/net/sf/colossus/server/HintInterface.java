@@ -27,7 +27,7 @@ public interface HintInterface
      * @return The name of the suggested recruit
      */
     public String getRecruitHint(String terrain, LegionInfo legion,
-        List recruits, HintOracleInterface oracle, String[] section);
+        List<Creature> recruits, HintOracleInterface oracle, String[] section);
 
     /**
      * To obtain the list of creature to split on turn one.
@@ -36,7 +36,7 @@ public interface HintInterface
      *     (usually one or more of "AllAI:", "DefensiveAI:", "OffensiveAI:")
      * @return The list of creature to split (listed by name)
      */
-    public List getInitialSplitHint(String label, String[] section);
+    public List<String> getInitialSplitHint(String label, String[] section);
 
     /**
      * Give an offset to apply to the creature Point Value 

@@ -31,12 +31,12 @@ final class FileServerThread extends Thread
         .getLogger(FileServerThread.class.getName());
 
     private ServerSocket fileServer;
-    private List<Socket> activeSocketList;
+    private final List<Socket> activeSocketList;
     private ChildThreadManager threadMgr;
 
     private static final String sep = Constants.protocolTermSeparator;
 
-    private int port;
+    private final int port;
     private boolean keepGoingOn = true;
 
     FileServerThread(java.util.List<Socket> activeSocketList, int port,
@@ -112,8 +112,7 @@ final class FileServerThread extends Thread
                         Iterator<Socket> it = activeSocketList.iterator();
                         while (it.hasNext() && !knownIP)
                         {
-                            InetAddress cIP = it.next()
-                                .getInetAddress();
+                            InetAddress cIP = it.next().getInetAddress();
                             knownIP = requester.equals(cIP);
                         }
                     }
@@ -134,9 +133,9 @@ final class FileServerThread extends Thread
 
                         boolean ignoreFail = false;
 
-                        List li = Split.split(sep, request);
+                        List<String> li = Split.split(sep, request);
 
-                        String filename = (String)li.remove(0);
+                        String filename = li.remove(0);
 
                         // right now (05/2007) clients should not send this -
                         // take into use somewhat later.
@@ -144,7 +143,7 @@ final class FileServerThread extends Thread
                             .equals(Constants.fileServerIgnoreFailSignal))
                         {
                             ignoreFail = true;
-                            filename = (String)li.remove(0);
+                            filename = li.remove(0);
                         }
 
                         // Meanwhile, suppress the warnings at least for the

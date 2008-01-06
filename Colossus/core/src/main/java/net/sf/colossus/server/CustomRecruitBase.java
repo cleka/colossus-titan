@@ -229,15 +229,16 @@ abstract public class CustomRecruitBase
     /* subclasses must reimplement the following */
 
     /** List all Creature that can recruit in this terrain in a special way */
-    abstract public List getAllPossibleSpecialRecruiters(String terrain);
+    abstract public List<Creature> getAllPossibleSpecialRecruiters(
+        String terrain);
 
     /** List all Creature that can be recruited in this terrain 
      * in a special way */
     abstract public List<Creature> getAllPossibleSpecialRecruits(String terrain);
 
     /** List Creature that can recruit in this terrain in a special way now */
-    abstract public List<Creature> getPossibleSpecialRecruiters(String terrain,
-        String hexLabel);
+    abstract public List<Creature> getPossibleSpecialRecruiters(
+        String terrain, String hexLabel);
 
     /** List Creature that can be recruited in this terrain 
      * in a special way now */

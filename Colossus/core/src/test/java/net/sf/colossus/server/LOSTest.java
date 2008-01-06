@@ -43,6 +43,7 @@ public class LOSTest extends TestCase
         super(name);
     }
 
+    @Override
     protected void setUp()
     {
         game = new Game();

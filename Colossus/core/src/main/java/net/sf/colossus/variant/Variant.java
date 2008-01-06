@@ -20,25 +20,25 @@ import net.sf.colossus.game.Game;
  */
 public class Variant
 {
-    private final List creatureTypes;
-    private final List battleLands;
+    private final List<CreatureType> creatureTypes;
+    private final List<BattleLand> battleLands;
     private final MasterBoard masterBoard;
 
-    public Variant(List creatureTypes, List battleLands,
-        MasterBoard masterBoard)
+    public Variant(List<CreatureType> creatureTypes,
+        List<BattleLand> battleLands, MasterBoard masterBoard)
     {
         // defensive copies to ensure immutability
-        this.creatureTypes = new ArrayList(creatureTypes);
-        this.battleLands = new ArrayList(battleLands);
+        this.creatureTypes = new ArrayList<CreatureType>(creatureTypes);
+        this.battleLands = new ArrayList<BattleLand>(battleLands);
         this.masterBoard = masterBoard;
     }
 
-    public List getCreatureTypes()
+    public List<CreatureType> getCreatureTypes()
     {
         return Collections.unmodifiableList(this.creatureTypes);
     }
 
-    public List getBattleLands()
+    public List<BattleLand> getBattleLands()
     {
         return Collections.unmodifiableList(this.battleLands);
     }

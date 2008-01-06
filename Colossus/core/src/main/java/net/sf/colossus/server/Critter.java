@@ -26,7 +26,7 @@ import net.sf.colossus.variant.HazardTerrain;
 
 // final
 public//  
-class Critter implements Comparable
+class Critter implements Comparable<Critter>
 {
     private static final Logger LOGGER = Logger.getLogger(Critter.class
         .getName());
@@ -724,7 +724,7 @@ class Critter implements Comparable
         // Check if we roll or if we don't
         boolean randomized = !(game.getOption(Options.nonRandomBattleDice));
 
-        List rolls = new ArrayList();
+        List<String> rolls = new ArrayList<String>();
         StringBuffer rollString = new StringBuffer(36);
 
         for (int i = 0; i < dice; i++)
@@ -789,10 +789,8 @@ class Critter implements Comparable
     }
 
     /** Inconsistent with equals() */
-    public int compareTo(Object object)
+    public int compareTo(Critter critter)
     {
-        Critter critter = (Critter)object;
-
         if (isTitan())
         {
             return -1;

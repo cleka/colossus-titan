@@ -22,20 +22,20 @@ public class CombosTest extends TestCase
 
     public void testCombos()
     {
-        ArrayList startlist = new ArrayList();
+        List<String> startlist = new ArrayList<String>();
         startlist.add("a");
         startlist.add("b");
         startlist.add("c");
         startlist.add("d");
         int n = 3;
 
-        ArrayList<ArrayList> results = new ArrayList<ArrayList>();
+        List<List<String>> results = new ArrayList<List<String>>();
 
-        Combos combos = new Combos(startlist, n);
-        Iterator<List> it = combos.iterator();
+        Combos<String> combos = new Combos<String>(startlist, n);
+        Iterator<List<String>> it = combos.iterator();
         while (it.hasNext())
         {
-            ArrayList nextCombo = (ArrayList)it.next();
+            List<String> nextCombo = it.next();
             results.add(nextCombo);
         }
 

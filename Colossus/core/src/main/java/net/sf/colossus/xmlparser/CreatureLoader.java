@@ -31,6 +31,8 @@ public class CreatureLoader
 
     private final ArrayList<Creature> creatures;
 
+    // we need to cast since JDOM is not generified
+    @SuppressWarnings("unchecked")
     public CreatureLoader(InputStream creIS)
     {
         this.creatures = new ArrayList<Creature>();

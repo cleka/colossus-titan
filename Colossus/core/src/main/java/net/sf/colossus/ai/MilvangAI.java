@@ -43,21 +43,21 @@ public class MilvangAI extends RationalAI
         int recruitNow = 0;
         int recruitLater = 0;
 
-        List tempRecruits = TerrainRecruitLoader.getPossibleRecruits(terrain,
-            "");
-        List recruiters = TerrainRecruitLoader.getPossibleRecruiters(terrain,
-            "");
+        List<Creature> tempRecruits = TerrainRecruitLoader
+            .getPossibleRecruits(terrain, "");
+        List<Creature> recruiters = TerrainRecruitLoader
+            .getPossibleRecruiters(terrain, "");
 
         recruiters.retainAll(critters.keySet());
 
-        Iterator lit = tempRecruits.iterator();
+        Iterator<Creature> lit = tempRecruits.iterator();
         while (lit.hasNext())
         {
-            Creature creature = (Creature)lit.next();
-            Iterator liter = recruiters.iterator();
+            Creature creature = lit.next();
+            Iterator<Creature> liter = recruiters.iterator();
             while (liter.hasNext())
             {
-                Creature lesser = (Creature)liter.next();
+                Creature lesser = liter.next();
                 int numNeeded = TerrainRecruitLoader.numberOfRecruiterNeeded(
                     lesser, creature, terrain, "");
                 int hintValue = creature.getHintedRecruitmentValue();
@@ -75,12 +75,6 @@ public class MilvangAI extends RationalAI
         return recruitNow * recruitNow + 0.1 * recruitLater * recruitLater;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see net.sf.colossus.client.RationalAI#chooseCreaturesToSplitOut(net.sf.colossus.client.LegionInfo,
-     *      boolean)
-     */
     @Override
     MusteredCreatures chooseCreaturesToSplitOut(LegionInfo legion,
         boolean at_risk)
@@ -89,7 +83,6 @@ public class MilvangAI extends RationalAI
         //
         // split a 5 to 8 high legion
         //
-
         if (legion.getHeight() == 8)
         {
             List<Creature> creatures = doInitialGameSplit(legion.getHexLabel());

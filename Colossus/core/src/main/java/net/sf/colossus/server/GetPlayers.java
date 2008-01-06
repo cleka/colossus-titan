@@ -66,34 +66,34 @@ public final class GetPlayers extends KFrame implements WindowListener,
 
     public static final String loadVariant = "Load External Variant";
 
-    private Object mutex;
-    private JLabel runningOnLabel;
-    private JComboBox serveAtPortBox;
-    private TreeSet sPortChoices;
+    private final Object mutex;
+    private final JLabel runningOnLabel;
+    private final JComboBox serveAtPortBox;
+    private final TreeSet<String> sPortChoices;
 
-    private Vector<String> typeChoices = new Vector<String>();
-    private JComboBox[] playerTypes = new JComboBox[Constants.MAX_MAX_PLAYERS];
-    private JComboBox[] playerNames = new JComboBox[Constants.MAX_MAX_PLAYERS];
+    private final Vector<String> typeChoices = new Vector<String>();
+    private final JComboBox[] playerTypes = new JComboBox[Constants.MAX_MAX_PLAYERS];
+    private final JComboBox[] playerNames = new JComboBox[Constants.MAX_MAX_PLAYERS];
     private JEditorPane readme = new JEditorPane();
     private JScrollPane readmeScrollPane;
-    private JTabbedPane tabbedPane;
+    private final JTabbedPane tabbedPane;
 
-    private JComboBox variantBox;
-    private JComboBox viewModeBox;
-    private JComboBox eventExpiringBox;
+    private final JComboBox variantBox;
+    private final JComboBox viewModeBox;
+    private final JComboBox eventExpiringBox;
 
     private int serveAtPort = -1; // server serves at that.
 
     /** This is Game's options, which we will modify directly. */
-    private Options options;
-    private Options stOptions;
-    private Start startObject;
+    private final Options options;
+    private final Options stOptions;
+    private final Start startObject;
 
     private int oldDelay;
-    private JLabel delayLabel;
+    private final JLabel delayLabel;
     private int oldLimit;
-    private JLabel timeLimitLabel;
-    private SaveWindow saveWindow;
+    private final JLabel timeLimitLabel;
+    private final SaveWindow saveWindow;
 
     /** Clear options to abort */
     public GetPlayers(Options options, Object mutex, Start startObject)
@@ -146,7 +146,7 @@ public final class GetPlayers extends KFrame implements WindowListener,
         Box portPane = new Box(BoxLayout.X_AXIS);
         portPane.add(new JLabel("Serve game at port: "));
 
-        sPortChoices = new TreeSet();
+        sPortChoices = new TreeSet<String>();
         sPortChoices.add("" + Constants.defaultPort);
         int stPort = stOptions.getIntOption(Options.serveAtPort);
         if (stPort != -1 && stPort != Constants.defaultPort)
@@ -157,7 +157,8 @@ public final class GetPlayers extends KFrame implements WindowListener,
         {
             stPort = Constants.defaultPort;
         }
-        serveAtPortBox = new JComboBox(new Vector(sPortChoices));
+        serveAtPortBox = new JComboBox(sPortChoices
+            .toArray(new String[sPortChoices.size()]));
         serveAtPortBox.setEditable(true);
         serveAtPortBox.setSelectedItem("" + stPort);
         serveAtPortBox.addActionListener(this);

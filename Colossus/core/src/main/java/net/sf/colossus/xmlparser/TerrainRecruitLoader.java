@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -44,30 +44,30 @@ public class TerrainRecruitLoader
     /**
      * Map a String (representing a terrain) to a list of recruits.
      */
-    private static HashMap<String, List<RecruitNumber>> strToRecruits = new HashMap<String, List<RecruitNumber>>();
+    private static Map<String, List<RecruitNumber>> strToRecruits = new HashMap<String, List<RecruitNumber>>();
 
     /**
      * Map a String (representing a terrain) to a terrain display name.
      */
 
-    private static HashMap<String, String> strToDisplayName = new HashMap<String, String>();
+    private static Map<String, String> strToDisplayName = new HashMap<String, String>();
 
     /**
      * Map a String (representing a terrain) to a terrain color.
      */
-    private static HashMap<String, Color> strToColor = new HashMap<String, Color>();
+    private static Map<String, Color> strToColor = new HashMap<String, Color>();
 
     /**
      * Map a String (representing a terrain) to a boolean,
      * telling if a Creature can recruit in the usual way or not.
      */
-    private static HashMap<String, Boolean> strToBelow = new HashMap<String, Boolean>();
+    private static Map<String, Boolean> strToBelow = new HashMap<String, Boolean>();
 
     /**
      * Map a String (representing a terrain) to an 
      *   optional BattlelandsRandomizer filename.
      */
-    private static HashMap strToRnd = new HashMap();
+    private static Map<String, String> strToRnd = new HashMap<String, String>();
 
     /**
      * All the Strings that are valid terrains.
@@ -213,6 +213,8 @@ public class TerrainRecruitLoader
         graph.clear();
     }
 
+    // we need to cast since JDOM is not generified
+    @SuppressWarnings("unchecked")
     public TerrainRecruitLoader(InputStream terIS)
     {
         SAXBuilder builder = new SAXBuilder();
@@ -261,6 +263,8 @@ public class TerrainRecruitLoader
         }
     }
 
+    // we need to cast since JDOM is not generified
+    @SuppressWarnings("unchecked")
     private void handleTerrain(Element el) throws JDOMException
     {
         String name = el.getAttributeValue("name");
@@ -428,10 +432,10 @@ public class TerrainRecruitLoader
     public static Creature[] getStartingCreatures(String terrain)
     {
         Creature[] bc = new Creature[3];
-        List to = getPossibleRecruits(terrain, null);
-        bc[0] = (Creature)to.get(0);
-        bc[1] = (Creature)to.get(1);
-        bc[2] = (Creature)to.get(2);
+        List<Creature> to = getPossibleRecruits(terrain, null);
+        bc[0] = to.get(0);
+        bc[1] = to.get(1);
+        bc[2] = to.get(2);
         return (bc);
     }
 
@@ -463,7 +467,7 @@ public class TerrainRecruitLoader
      */
     public static String getTerrainRandomName(String tc)
     {
-        return ((String)strToRnd.get(tc));
+        return (strToRnd.get(tc));
     }
 
     /**
@@ -513,12 +517,12 @@ public class TerrainRecruitLoader
     public static List<Creature> getPossibleRecruiters(String terrain,
         String hexLabel)
     {
-        List al = strToRecruits.get(terrain);
+        List<RecruitNumber> al = strToRecruits.get(terrain);
         List<Creature> re = new ArrayList<Creature>();
-        Iterator it = al.iterator();
+        Iterator<RecruitNumber> it = al.iterator();
         while (it.hasNext())
         {
-            RecruitNumber tr = (RecruitNumber)it.next();
+            RecruitNumber tr = it.next();
             if (!(tr.getName().equals(Keyword_Anything))
                 && !(tr.getName().equals(Keyword_AnyNonLord))
                 && !(tr.getName().equals(Keyword_Lord))
@@ -540,11 +544,11 @@ public class TerrainRecruitLoader
                 }
                 if (tr.getName().equals(Keyword_Lord))
                 {
-                    List potential = Creature.getCreatures();
-                    ListIterator lit = potential.listIterator();
-                    while (lit.hasNext())
+                    List<Creature> potential = Creature.getCreatures();
+                    Iterator<Creature> itCr = potential.iterator();
+                    while (itCr.hasNext())
                     {
-                        Creature creature = (Creature)lit.next();
+                        Creature creature = itCr.next();
                         if (creature.isLord())
                         {
                             re.add(creature);

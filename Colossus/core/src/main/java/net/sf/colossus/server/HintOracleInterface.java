@@ -16,7 +16,7 @@ public interface HintOracleInterface
     public boolean hasCreature(String name);
 
     /** in a different Stack/Legion */
-    public boolean otherFriendlyStackHasCreature(List allNames);
+    public boolean otherFriendlyStackHasCreature(List<String> allNames);
 
     /** name could be recruited */
     public boolean canRecruit(String name);

@@ -446,7 +446,7 @@ public final class VariantSupport
     }
 
     public synchronized static String getRecruitHint(String terrain,
-        net.sf.colossus.client.LegionInfo legion, List recruits,
+        net.sf.colossus.client.LegionInfo legion, List<Creature> recruits,
         net.sf.colossus.server.HintOracleInterface oracle)
     {
         String[] section = new String[1];
@@ -455,7 +455,7 @@ public final class VariantSupport
     }
 
     public synchronized static String getRecruitHint(String terrain,
-        net.sf.colossus.client.LegionInfo legion, List recruits,
+        net.sf.colossus.client.LegionInfo legion, List<Creature> recruits,
         net.sf.colossus.server.HintOracleInterface oracle, String[] section)
     {
         if (aihl != null)
@@ -471,14 +471,14 @@ public final class VariantSupport
         return null;
     }
 
-    public synchronized static List getInitialSplitHint(String label)
+    public synchronized static List<String> getInitialSplitHint(String label)
     {
         String[] section = new String[1];
         section[0] = Constants.sectionAllAI;
         return getInitialSplitHint(label, section);
     }
 
-    public synchronized static List getInitialSplitHint(String label,
+    public synchronized static List<String> getInitialSplitHint(String label,
         String[] section)
     {
         if (aihl != null)

@@ -26,25 +26,26 @@ public class BalrogRecruitment extends CustomRecruitBase
     private static final Logger LOGGER = Logger
         .getLogger(BalrogRecruitment.class.getName());
 
-    private Map<String, Integer> nameToOldScore = Collections.synchronizedMap(new HashMap<String, Integer>());
+    private final Map<String, Integer> nameToOldScore = Collections
+        .synchronizedMap(new HashMap<String, Integer>());
     private final static int balrogValue = 300;
     private final static String balrogPrefix = "Balrog";
 
     @Override
-    public List getAllPossibleSpecialRecruiters(String terrain)
+    public List<Creature> getAllPossibleSpecialRecruiters(String terrain)
     {
         // Balrog recruited in Tower, where everything recruit anyway.
-        return new ArrayList();
+        return new ArrayList<Creature>();
     }
 
     @Override
     public List<Creature> getAllPossibleSpecialRecruits(String terrain)
     {
         List<Creature> temp = new ArrayList<Creature>();
-        Iterator it = Creature.getCreatures().iterator();
+        Iterator<Creature> it = Creature.getCreatures().iterator();
         while (it.hasNext())
         {
-            Creature cre = (Creature)it.next();
+            Creature cre = it.next();
             if (cre.getName().startsWith(balrogPrefix))
             {
                 temp.add(cre);
@@ -54,14 +55,16 @@ public class BalrogRecruitment extends CustomRecruitBase
     }
 
     @Override
-    public List<Creature> getPossibleSpecialRecruiters(String terrain, String hexLabel)
+    public List<Creature> getPossibleSpecialRecruiters(String terrain,
+        String hexLabel)
     {
         // Balrog recruited in Tower, where everything recruit anyway.
         return new ArrayList<Creature>();
     }
 
     @Override
-    public List<Creature> getPossibleSpecialRecruits(String terrain, String hexLabel)
+    public List<Creature> getPossibleSpecialRecruits(String terrain,
+        String hexLabel)
     {
         List<Creature> temp = new ArrayList<Creature>();
 
@@ -93,14 +96,15 @@ public class BalrogRecruitment extends CustomRecruitBase
     @Override
     protected void changeOfTurn(int newActivePlayer)
     {
-        Set towerSet = net.sf.colossus.client.MasterBoard.getTowerSet();
+        Set<String> towerSet = net.sf.colossus.client.MasterBoard
+            .getTowerSet();
 
         // update all Balrogs, as a lost fight may have given points
         // to a different Player
-        Iterator it = towerSet.iterator();
+        Iterator<String> it = towerSet.iterator();
         while (it.hasNext())
         {
-            updateBalrogCount((String)it.next());
+            updateBalrogCount(it.next());
         }
     }
 

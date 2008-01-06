@@ -10,12 +10,10 @@ public class Legion
 {
     /**
      * The creatures in this legion.
-     * 
-     * A List of {@link Creature}s.
      */
-    private final List creatures = new ArrayList();
+    private final List<Creature> creatures = new ArrayList<Creature>();
 
-    public List getCreatures()
+    public List<Creature> getCreatures()
     {
         return Collections.unmodifiableList(creatures);
     }

@@ -30,7 +30,7 @@ import net.sf.colossus.xmlparser.CreatureLoader;
  * @author Romain Dolbeau
  */
 
-public class Creature implements Comparable
+public class Creature implements Comparable<Creature>
 {
     private static final Logger LOGGER = Logger.getLogger(Creature.class
         .getName());
@@ -112,7 +112,7 @@ public class Creature implements Comparable
         try
         {
             creatures.clear();
-            List directories = VariantSupport.getVarDirectoriesList();
+            List<String> directories = VariantSupport.getVarDirectoriesList();
             InputStream creIS = ResourceLoader.getInputStream(VariantSupport
                 .getCreaturesName(), directories);
             if (creIS == null)
@@ -524,9 +524,8 @@ public class Creature implements Comparable
     /**
      * Compare by name.
      */
-    public int compareTo(Object object)
+    public int compareTo(Creature other)
     {
-        Creature other = (Creature)object;
         return (name.compareTo(other.name));
     }
 

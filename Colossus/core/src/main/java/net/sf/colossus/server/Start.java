@@ -53,7 +53,7 @@ public final class Start
     // related to "what to do next".
 
     private int whatToDoNext;
-    private Options stOptions;
+    private final Options stOptions;
 
     public Start(int whatToDoNext, Options stOptions)
     {
@@ -109,8 +109,8 @@ public final class Start
     public void setWhatToDoNext(int whatToDoNext)
     {
         this.whatToDoNext = whatToDoNext;
-        LOGGER.log(Level.FINEST, "Set what to do next to " + whatToDoNext +
-            " ("+ Start.valToString(whatToDoNext) + ")");
+        LOGGER.log(Level.FINEST, "Set what to do next to " + whatToDoNext
+            + " (" + Start.valToString(whatToDoNext) + ")");
     }
 
     public void setWhatToDoNext(int whatToDoNext, String loadFile)
@@ -147,13 +147,15 @@ public final class Start
         return startObject;
     }
 
+    // unchecked conversion from options library
+    @SuppressWarnings("unchecked")
     private static void usage(com.werken.opt.Options opts)
     {
         LOGGER.log(Level.INFO, "Usage: java -jar Colossus.jar [options]");
-        Iterator it = opts.getOptions().iterator();
+        Iterator<Option> it = opts.getOptions().iterator();
         while (it.hasNext())
         {
-            Option opt = (Option)it.next();
+            Option opt = it.next();
             LOGGER.log(Level.INFO, opt.toString());
         }
     }
@@ -792,7 +794,6 @@ public final class Start
             }
 
         } // end WHILE not QuitAll
-
 
         // DebugMethods.doCleanupStuff(true);
 

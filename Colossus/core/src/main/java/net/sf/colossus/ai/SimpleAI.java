@@ -31,6 +31,7 @@ import net.sf.colossus.client.Strike;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.Creature;
 import net.sf.colossus.server.Dice;
+import net.sf.colossus.server.HintOracleInterface;
 import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.util.DevRandom;
 import net.sf.colossus.util.Options;
@@ -129,12 +130,12 @@ public class SimpleAI implements AI
             .getPlayerName());
     }
 
-    public String pickColor(List colors, List favoriteColors)
+    public String pickColor(List<String> colors, List<String> favoriteColors)
     {
-        Iterator it = favoriteColors.iterator();
+        Iterator<String> it = favoriteColors.iterator();
         while (it.hasNext())
         {
-            String preferredColor = (String)it.next();
+            String preferredColor = it.next();
             if (colors.contains(preferredColor))
             {
                 return preferredColor;
@@ -144,7 +145,7 @@ public class SimpleAI implements AI
         it = colors.iterator();
         if (it.hasNext())
         {
-            return (String)it.next();
+            return it.next();
         }
         return null;
     }
@@ -237,11 +238,12 @@ public class SimpleAI implements AI
         double scoobySnackFactor = 0.15;
         int minimumSizeToRecruit = (int)(scoobySnackFactor * client
             .getAverageLegionPointValue());
-        List markerIds = client.getLegionsByPlayer(client.getPlayerName());
-        Iterator it = markerIds.iterator();
+        List<String> markerIds = client.getLegionsByPlayer(client
+            .getPlayerName());
+        Iterator<String> it = markerIds.iterator();
         while (it.hasNext())
         {
-            String markerId = (String)it.next();
+            String markerId = it.next();
             LegionInfo legion = client.getLegionInfo(markerId);
 
             if (legion.hasMoved()
@@ -252,14 +254,14 @@ public class SimpleAI implements AI
                     true);
                 if (recruit != null)
                 {
-                    List recruiters = client.findEligibleRecruiters(markerId,
-                        recruit.getName());
+                    List<String> recruiters = client.findEligibleRecruiters(
+                        markerId, recruit.getName());
 
                     String recruiterName = null;
                     if (!recruiters.isEmpty())
                     {
                         // Just take the first one.
-                        recruiterName = (String)recruiters.get(0);
+                        recruiterName = recruiters.get(0);
                     }
                     String recruitName = recruit.getName();
                     client.doRecruit(markerId, recruitName, recruiterName);
@@ -278,11 +280,11 @@ public class SimpleAI implements AI
         if (recruit != null)
         {
             recruitName = recruit.getName();
-            List recruiters = client.findEligibleRecruiters(legion
+            List<String> recruiters = client.findEligibleRecruiters(legion
                 .getMarkerId(), recruit.getName());
             if (!recruiters.isEmpty())
             {
-                recruiterName = (String)recruiters.get(0);
+                recruiterName = recruiters.get(0);
             }
         }
         // Call regardless to advance past recruiting.
@@ -299,8 +301,8 @@ public class SimpleAI implements AI
         boolean considerReservations)
     {
         MasterHex hex = MasterBoard.getHexByLabel(hexLabel);
-        List recruits = client.findEligibleRecruits(legion.getMarkerId(),
-            hexLabel, considerReservations);
+        List<Creature> recruits = client.findEligibleRecruits(legion
+            .getMarkerId(), hexLabel, considerReservations);
         if (recruits.size() == 0)
         {
             return null;
@@ -320,10 +322,10 @@ public class SimpleAI implements AI
 
         splitsDone = 0;
         splitsAcked = 0;
-        Iterator it = player.getLegionIds().iterator();
+        Iterator<String> it = player.getLegionIds().iterator();
         while (it.hasNext() && !remainingMarkers.isEmpty())
         {
-            String markerId = (String)it.next();
+            String markerId = it.next();
             splitOneLegion(player, markerId);
         }
         remainingMarkers.clear();
@@ -483,11 +485,11 @@ public class SimpleAI implements AI
             .get(legion.getHeight() - 1));
 
         // Consider recruiting.
-        List recruits = client.findEligibleRecruits(legion.getMarkerId(),
-            hexLabel);
+        List<Creature> recruits = client.findEligibleRecruits(legion
+            .getMarkerId(), hexLabel);
         if (!recruits.isEmpty())
         {
-            Creature bestRecruit = (Creature)recruits.get(recruits.size() - 1);
+            Creature bestRecruit = recruits.get(recruits.size() - 1);
             if (bestRecruit != null
                 && ghrv(bestRecruit, legion, hintSectionUsed) > ghrv(weakest,
                     legion, hintSectionUsed))
@@ -572,10 +574,10 @@ public class SimpleAI implements AI
         Creature weakest1 = null;
         Creature weakest2 = null;
 
-        Iterator critterIt = legion.getContents().iterator();
+        Iterator<String> critterIt = legion.getContents().iterator();
         while (critterIt.hasNext())
         {
-            String name = (String)critterIt.next();
+            String name = critterIt.next();
             Creature critter = Creature.getCreatureByName(name);
 
             // Never split out the titan.
@@ -811,7 +813,7 @@ public class SimpleAI implements AI
 
     List<Creature> getInitialSplitHint(String label)
     {
-        List byName = VariantSupport.getInitialSplitHint(label,
+        List<String> byName = VariantSupport.getInitialSplitHint(label,
             hintSectionUsed);
 
         if (byName == null)
@@ -821,10 +823,10 @@ public class SimpleAI implements AI
 
         List<Creature> byCreature = new ArrayList<Creature>();
 
-        Iterator it = byName.iterator();
+        Iterator<String> it = byName.iterator();
         while (it.hasNext())
         {
-            String name = (String)it.next();
+            String name = it.next();
             Creature cre = Creature.getCreatureByName(name);
             if (cre == null)
             {
@@ -871,7 +873,7 @@ public class SimpleAI implements AI
         }
 
         /** cache all places enemies can move to, for use in risk analysis. */
-        Map[] enemyAttackMap = buildEnemyAttackMap(player);
+        Map<String, List<LegionInfo>>[] enemyAttackMap = buildEnemyAttackMap(player);
 
         // A mapping from Legion to List of MoveInfo objects,
         // listing all moves that we've evaluated.  We use this if
@@ -927,7 +929,8 @@ public class SimpleAI implements AI
 
     /** Return true if we moved something. */
     private boolean handleVoluntaryMoves(PlayerInfo player,
-        Map<LegionInfo, List<MoveInfo>> moveMap, Map[] enemyAttackMap)
+        Map<LegionInfo, List<MoveInfo>> moveMap,
+        Map<String, List<LegionInfo>>[] enemyAttackMap)
     {
         boolean moved = false;
         List<String> markerIds = player.getLegionIds();
@@ -943,10 +946,10 @@ public class SimpleAI implements AI
             }
         });
 
-        Iterator it = markerIds.iterator();
+        Iterator<String> it = markerIds.iterator();
         while (it.hasNext())
         {
-            String markerId = (String)it.next();
+            String markerId = it.next();
             LegionInfo legion = client.getLegionInfo(markerId);
 
             if (legion.hasMoved() || legion.getCurrentHex() == null)
@@ -1096,26 +1099,24 @@ public class SimpleAI implements AI
         // first, concatenate all the moves all legions, and
         // sort them by their difference from sitting still
 
-        List allmoves = new ArrayList();
-        List markerIds = player.getLegionIds();
-        Iterator friendlyLegionIt = markerIds.iterator();
+        List<MoveInfo> allmoves = new ArrayList<MoveInfo>();
+        List<String> markerIds = player.getLegionIds();
+        Iterator<String> friendlyLegionIt = markerIds.iterator();
         while (friendlyLegionIt.hasNext())
         {
-            String friendlyMarkerId = (String)friendlyLegionIt.next();
+            String friendlyMarkerId = friendlyLegionIt.next();
             LegionInfo friendlyLegion = client.getLegionInfo(friendlyMarkerId);
-            List moves = moveMap.get(friendlyLegion);
+            List<MoveInfo> moves = moveMap.get(friendlyLegion);
             if (moves != null)
             {
                 allmoves.addAll(moves);
             }
         }
 
-        Collections.sort(allmoves, new Comparator()
+        Collections.sort(allmoves, new Comparator<MoveInfo>()
         {
-            public int compare(Object o1, Object o2)
+            public int compare(MoveInfo m1, MoveInfo m2)
             {
-                MoveInfo m1 = (MoveInfo)o1;
-                MoveInfo m2 = (MoveInfo)o2;
                 return m2.difference * m2.legion.getPointValue()
                     - m1.difference * m1.legion.getPointValue();
             }
@@ -1123,11 +1124,11 @@ public class SimpleAI implements AI
 
         // now, one at a time, try applying moves until we
         // have moved a legion
-        Iterator moveIt = allmoves.iterator();
+        Iterator<MoveInfo> moveIt = allmoves.iterator();
         while (moveIt.hasNext() && player.numLegionsMoved() == 0
             && player.numMobileLegions() > 0)
         {
-            MoveInfo move = (MoveInfo)moveIt.next();
+            MoveInfo move = moveIt.next();
 
             if (move.hex == null)
             {
@@ -1164,12 +1165,15 @@ public class SimpleAI implements AI
         return moved;
     }
 
-    Map[] buildEnemyAttackMap(PlayerInfo player)
+    // arrays and generics don't work well together -- TODO replace the
+    // array with a list or model some intermediate classes
+    @SuppressWarnings("unchecked")
+    Map<String, List<LegionInfo>>[] buildEnemyAttackMap(PlayerInfo player)
     {
-        Map[] enemyMap = new HashMap[7];
+        Map<String, List<LegionInfo>>[] enemyMap = (Map<String, List<LegionInfo>>[])new HashMap<?, ?>[7];
         for (int i = 1; i <= 6; i++)
         {
-            enemyMap[i] = new HashMap();
+            enemyMap[i] = new HashMap<String, List<LegionInfo>>();
         }
 
         // for each enemy player
@@ -1185,11 +1189,11 @@ public class SimpleAI implements AI
             }
 
             // for each legion that player controls
-            Iterator legionIt = client.getLegionsByPlayer(enemyPlayerName)
-                .iterator();
+            Iterator<String> legionIt = client.getLegionsByPlayer(
+                enemyPlayerName).iterator();
             while (legionIt.hasNext())
             {
-                String markerId = (String)legionIt.next();
+                String markerId = legionIt.next();
                 LegionInfo legion = client.getLegionInfo(markerId);
 
                 // for each movement roll he might make
@@ -1221,7 +1225,7 @@ public class SimpleAI implements AI
                         for (int effectiveRoll = roll; effectiveRoll <= 6; effectiveRoll++)
                         {
                             // legion can attack to hexlabel on a effectiveRoll
-                            List<LegionInfo> list = (List<LegionInfo>)enemyMap[effectiveRoll]
+                            List<LegionInfo> list = enemyMap[effectiveRoll]
                                 .get(hexlabel);
 
                             if (list == null)
@@ -1252,7 +1256,7 @@ public class SimpleAI implements AI
     // TODO: should be parameterized with weights
     //
     int evaluateMove(LegionInfo legion, MasterHex hex, boolean moved,
-        Map[] enemyAttackMap)
+        Map<String, List<LegionInfo>>[] enemyAttackMap)
     {
         // Avoid using MIN_VALUE and MAX_VALUE because of possible overflow.
         final int WIN_GAME = Integer.MAX_VALUE / 2;
@@ -1299,11 +1303,11 @@ public class SimpleAI implements AI
                     // don't do this with our titan unless we can win the game
                     boolean haveOtherSummonables = false;
                     PlayerInfo player = legion.getPlayerInfo();
-                    List markerIds = player.getLegionIds();
-                    Iterator it = markerIds.iterator();
+                    List<String> markerIds = player.getLegionIds();
+                    Iterator<String> it = markerIds.iterator();
                     while (it.hasNext())
                     {
-                        String markerId = (String)it.next();
+                        String markerId = it.next();
                         LegionInfo l = client.getLegionInfo(markerId);
 
                         if (l == legion)
@@ -1451,10 +1455,11 @@ public class SimpleAI implements AI
                     Creature weakest1 = null;
                     Creature weakest2 = null;
 
-                    Iterator critterIt = legion.getContents().iterator();
+                    Iterator<String> critterIt = legion.getContents()
+                        .iterator();
                     while (critterIt.hasNext())
                     {
-                        String name = (String)critterIt.next();
+                        String name = critterIt.next();
                         // XXX Titan
                         Creature critter = Creature.getCreatureByName(name);
 
@@ -1584,16 +1589,16 @@ public class SimpleAI implements AI
                     continue;
                 }
 
-                List nextRecruits = client.findEligibleRecruits(legion
-                    .getMarkerId(), nextLabel);
+                List<Creature> nextRecruits = client.findEligibleRecruits(
+                    legion.getMarkerId(), nextLabel);
 
                 if (nextRecruits.size() == 0)
                 {
                     continue;
                 }
 
-                Creature nextRecruit = (Creature)nextRecruits.get(nextRecruits
-                    .size() - 1);
+                Creature nextRecruit = nextRecruits
+                    .get(nextRecruits.size() - 1);
                 // Reduced val by 5 to make current turn recruits more
                 // valuable than next turn's recruits
                 int val = nextRecruit.getSkill() * nextRecruit.getPower() - 5;
@@ -1623,23 +1628,23 @@ public class SimpleAI implements AI
                     + legion + " in " + hex);
             }
 
-            Map[] enemiesThatCanAttackOnA = enemyAttackMap;
+            Map<String, List<LegionInfo>>[] enemiesThatCanAttackOnA = enemyAttackMap;
             int roll;
 
             for (roll = 1; roll <= 6; roll++)
             {
-                List enemies = (List)enemiesThatCanAttackOnA[roll].get(hex
-                    .getLabel());
+                List<LegionInfo> enemies = enemiesThatCanAttackOnA[roll]
+                    .get(hex.getLabel());
 
                 if (enemies == null)
                 {
                     continue;
                 }
 
-                Iterator it = enemies.iterator();
+                Iterator<LegionInfo> it = enemies.iterator();
                 while (it.hasNext())
                 {
-                    LegionInfo enemy = (LegionInfo)it.next();
+                    LegionInfo enemy = it.next();
                     final int result = estimateBattleResults(enemy, false,
                         legion, hex, recruit);
 
@@ -1784,14 +1789,15 @@ public class SimpleAI implements AI
         }
     }
 
-    class SimpleAIOracle implements net.sf.colossus.server.HintOracleInterface
+    class SimpleAIOracle implements HintOracleInterface
     {
         LegionInfo legion;
         MasterHex hex;
-        List recruits;
-        Map[] enemyAttackMap = null;
+        List<Creature> recruits;
+        Map<String, List<LegionInfo>>[] enemyAttackMap = null;
 
-        SimpleAIOracle(LegionInfo legion, MasterHex hex, List recruits)
+        SimpleAIOracle(LegionInfo legion, MasterHex hex,
+            List<Creature> recruits)
         {
             this.legion = legion;
             this.hex = hex;
@@ -1811,7 +1817,7 @@ public class SimpleAI implements AI
             return count;
         }
 
-        public boolean otherFriendlyStackHasCreature(List allNames)
+        public boolean otherFriendlyStackHasCreature(List<String> allNames)
         {
             List<String> all = client.getFriendlyLegions(client
                 .getPlayerName());
@@ -1825,10 +1831,10 @@ public class SimpleAI implements AI
                     LegionInfo other = client.getLegionInfo(markerId);
                     boolean hasAll = true;
 
-                    Iterator it2 = allNames.iterator();
+                    Iterator<String> it2 = allNames.iterator();
                     while (it2.hasNext() && hasAll)
                     {
-                        String name = (String)it2.next();
+                        String name = it2.next();
                         if (other.numCreature(name) <= 0)
                         {
                             hasAll = false;
@@ -1875,14 +1881,14 @@ public class SimpleAI implements AI
             int worst = 0;
             for (int i = 1; i < 6; i++)
             {
-                List enemyList = (List)enemyAttackMap[i].get(legion
+                List<LegionInfo> enemyList = enemyAttackMap[i].get(legion
                     .getHexLabel());
                 if (enemyList != null)
                 {
-                    Iterator it = enemyList.iterator();
+                    Iterator<LegionInfo> it = enemyList.iterator();
                     while (it.hasNext())
                     {
-                        LegionInfo enemy = (LegionInfo)it.next();
+                        LegionInfo enemy = it.next();
                         if (enemy.getHeight() > worst)
                         {
                             worst = enemy.getHeight();
@@ -1895,7 +1901,7 @@ public class SimpleAI implements AI
     }
 
     public Creature getVariantRecruitHint(LegionInfo legion, MasterHex hex,
-        List recruits)
+        List<Creature> recruits)
     {
         String recruitName = VariantSupport.getRecruitHint(hex.getTerrain(),
             legion, recruits, new SimpleAIOracle(legion, hex, recruits),
@@ -1903,7 +1909,7 @@ public class SimpleAI implements AI
 
         if (recruitName == null)
         {
-            return (Creature)recruits.get(recruits.size() - 1);
+            return recruits.get(recruits.size() - 1);
         }
         if ((recruitName.equals("nothing")) || (recruitName.equals("Nothing")))
         {
@@ -1918,7 +1924,7 @@ public class SimpleAI implements AI
                 "HINT: Invalid Hint for this variant ! (can't recruit "
                     + recruitName + "; recruits=" + recruits.toString()
                     + ") in " + hex.getTerrain());
-            return ((Creature)recruits.get(recruits.size() - 1));
+            return (recruits.get(recruits.size() - 1));
         }
         return recruit;
     }
@@ -1959,7 +1965,7 @@ public class SimpleAI implements AI
     // In particular, the AI should pick a side that will let it enter
     // as many creatures as possible.
     public String pickEntrySide(String hexLabel, String markerId,
-        Set entrySides)
+        Set<String> entrySides)
     {
         // Default to bottom to simplify towers.
         if (entrySides.contains(Constants.bottom))
@@ -2119,12 +2125,12 @@ public class SimpleAI implements AI
                 }
                 if (enemy.getHeight() == 7)
                 {
-                    List recruits = client.findEligibleRecruits(enemy
-                        .getMarkerId(), legion.getCurrentHex().getLabel());
+                    List<Creature> recruits = client
+                        .findEligibleRecruits(enemy.getMarkerId(), legion
+                            .getCurrentHex().getLabel());
                     if (recruits.size() > 0)
                     {
-                        Creature best = (Creature)recruits
-                            .get(recruits.size() - 1);
+                        Creature best = recruits.get(recruits.size() - 1);
                         int lValue = enemy.getPointValue();
                         if (best.getPointValue() > (lValue / enemy.getHeight()))
                         {
@@ -2190,7 +2196,7 @@ public class SimpleAI implements AI
     }
 
     // should be correct for most variants.
-    public String acquireAngel(String markerId, List angels)
+    public String acquireAngel(String markerId, List<String> angels)
     {
         // TODO If the legion is a tiny scooby snack that's about to get
         // smooshed, turn down the angel.
@@ -2206,9 +2212,9 @@ public class SimpleAI implements AI
         LegionInfo legion = client.getLegionInfo(markerId);
         if (legion.getHeight() == 6 && legion.canRecruit())
         {
-            List recruits = client.findEligibleRecruits(markerId, legion
-                .getHexLabel());
-            Creature bestRecruit = (Creature)recruits.get(recruits.size() - 1);
+            List<Creature> recruits = client.findEligibleRecruits(markerId,
+                legion.getHexLabel());
+            Creature bestRecruit = recruits.get(recruits.size() - 1);
             if (getKillValue(bestRecruit) > getKillValue(bestAngel))
             {
                 LOGGER.log(Level.FINEST, "AI declines acquiring to recruit "
@@ -2221,26 +2227,18 @@ public class SimpleAI implements AI
 
     /** Return the most important Creature in the list of Creatures or
      * creature name strings.. */
-    Creature getBestCreature(List creatures)
+    Creature getBestCreature(List<String> creatures)
     {
         if (creatures == null || creatures.isEmpty())
         {
             return null;
         }
         Creature best = null;
-        Iterator it = creatures.iterator();
+        Iterator<String> it = creatures.iterator();
         while (it.hasNext())
         {
-            Object ob = it.next();
-            Creature creature = null;
-            if (ob instanceof Creature)
-            {
-                creature = (Creature)ob;
-            }
-            else if (ob instanceof String)
-            {
-                creature = Creature.getCreatureByName((String)ob);
-            }
+            String creatureName = it.next();
+            Creature creature = Creature.getCreatureByName(creatureName);
             if (best == null || getKillValue(creature) > getKillValue(best))
             {
                 best = creature;
@@ -2266,14 +2264,14 @@ public class SimpleAI implements AI
         while (it.hasNext())
         {
             String hexLabel = it.next();
-            List legions = client.getLegionsByHex(hexLabel);
+            List<String> legions = client.getLegionsByHex(hexLabel);
             if (legions.size() != 1)
             {
                 LOGGER.log(Level.SEVERE,
                     "SimpleAI.summonAngel(): Engagement in " + hexLabel);
                 continue;
             }
-            String markerId = (String)legions.get(0);
+            String markerId = legions.get(0);
             LegionInfo info = client.getLegionInfo(markerId);
             String myAngel = info.bestSummonable();
             if (myAngel == null)
@@ -2313,11 +2311,11 @@ public class SimpleAI implements AI
             {
                 continue;
             }
-            Set set = client.findStrikes(critter.getTag());
-            Iterator it2 = set.iterator();
+            Set<String> set = client.findStrikes(critter.getTag());
+            Iterator<String> it2 = set.iterator();
             while (it2.hasNext())
             {
-                String hexLabel = (String)it2.next();
+                String hexLabel = it2.next();
                 BattleChit target = client.getBattleChit(hexLabel);
                 int dice = client.getStrike().getDice(critter, target);
                 int strikeNumber = client.getStrike().getStrikeNumber(critter,
@@ -2395,15 +2393,15 @@ public class SimpleAI implements AI
     /** Apply carries first to the biggest creature that could be killed
      *  with them, then to the biggest creature.  carryTargets are
      *  hexLabel description strings. */
-    public void handleCarries(int carryDamage, Set carryTargets)
+    public void handleCarries(int carryDamage, Set<String> carryTargets)
     {
         String terrain = client.getBattleTerrain();
         BattleChit bestTarget = null;
 
-        Iterator it = carryTargets.iterator();
+        Iterator<String> it = carryTargets.iterator();
         while (it.hasNext())
         {
-            String desc = (String)it.next();
+            String desc = it.next();
             String targetHexLabel = desc.substring(desc.length() - 2);
             BattleChit target = client.getBattleChit(targetHexLabel);
 
@@ -2442,10 +2440,10 @@ public class SimpleAI implements AI
     }
 
     /** Pick one of the list of String strike penalty options. */
-    public String pickStrikePenalty(List choices)
+    public String pickStrikePenalty(List<String> choices)
     {
         // XXX Stupid placeholder.
-        return (String)choices.get(choices.size() - 1);
+        return choices.get(choices.size() - 1);
     }
 
     /** Simple one-ply group strike algorithm.  Return false if there were
@@ -2560,10 +2558,10 @@ public class SimpleAI implements AI
     static int getCombatValue(LegionInfo legion, String terrain)
     {
         int val = 0;
-        Iterator it = legion.getContents().iterator();
+        Iterator<String> it = legion.getContents().iterator();
         while (it.hasNext())
         {
-            String name = (String)it.next();
+            String name = it.next();
             if (name.startsWith(Constants.titan))
             {
                 val += getTitanCombatValue(legion.getPlayerInfo()
@@ -2681,6 +2679,7 @@ public class SimpleAI implements AI
             return name;
         }
 
+        @Override
         public String toString()
         {
             return name + "(" + hp + ")";
@@ -3216,12 +3215,12 @@ public class SimpleAI implements AI
             boolean offboard = false;
             for (int j = 0; j < indexes.length; j++)
             {
-                List moveList = critterMoves.get(j);
+                List<CritterMove> moveList = critterMoves.get(j);
                 if (indexes[j] >= moveList.size())
                 {
                     return;
                 }
-                CritterMove cm = (CritterMove)moveList.get(indexes[j]);
+                CritterMove cm = moveList.get(indexes[j]);
                 String endingHexLabel = cm.getEndingHexLabel();
                 if (endingHexLabel.startsWith("X"))
                 {
@@ -3264,8 +3263,8 @@ public class SimpleAI implements AI
         LegionMove lm = new LegionMove();
         for (int i = 0; i < indexes.length; i++)
         {
-            List moveList = critterMoves.get(i);
-            CritterMove cm = (CritterMove)moveList.get(indexes[i]);
+            List<CritterMove> moveList = critterMoves.get(i);
+            CritterMove cm = moveList.get(indexes[i]);
             lm.add(cm);
         }
         return lm;
@@ -3282,11 +3281,11 @@ public class SimpleAI implements AI
         Iterator<List<CritterMove>> it = allCritterMoves.iterator();
         while (it.hasNext())
         {
-            List moveList = it.next();
+            List<CritterMove> moveList = it.next();
             if (moveList.size() == 1)
             {
                 // This critter is not mobile, and its hex is taken.
-                CritterMove cm = (CritterMove)moveList.get(0);
+                CritterMove cm = moveList.get(0);
                 takenHexLabels.add(cm.getStartingHexLabel());
                 it.remove();
                 changed = true;
@@ -3297,11 +3296,11 @@ public class SimpleAI implements AI
         it = allCritterMoves.iterator();
         while (it.hasNext())
         {
-            List moveList = it.next();
-            Iterator it2 = moveList.iterator();
+            List<CritterMove> moveList = it.next();
+            Iterator<CritterMove> it2 = moveList.iterator();
             while (it2.hasNext())
             {
-                CritterMove cm = (CritterMove)it2.next();
+                CritterMove cm = it2.next();
                 if (takenHexLabels.contains(cm.getEndingHexLabel()))
                 {
                     it.remove();
@@ -3359,11 +3358,11 @@ public class SimpleAI implements AI
         while (it.hasNext())
         {
             BattleChit critter = it.next();
-            Set targets = client.findStrikes(critter.getTag());
-            Iterator it2 = targets.iterator();
+            Set<String> targets = client.findStrikes(critter.getTag());
+            Iterator<String> it2 = targets.iterator();
             while (it2.hasNext())
             {
-                String hexLabel = (String)it2.next();
+                String hexLabel = it2.next();
                 Integer old = map.get(hexLabel);
                 if (old == null)
                 {
@@ -3467,7 +3466,7 @@ public class SimpleAI implements AI
         value += bec.PENALTY_DAMAGE_TERRAIN
             * hex.damageToCreature(critter.getCreature());
 
-        Set targetHexLabels = client.findStrikes(critter.getTag());
+        Set<String> targetHexLabels = client.findStrikes(critter.getTag());
         int numTargets = targetHexLabels.size();
 
         if (numTargets >= 1)
@@ -3489,10 +3488,10 @@ public class SimpleAI implements AI
                 // prefer strikes not through bramble.  Warlocks should
                 // try to rangestrike titans.
                 boolean penalty = true;
-                Iterator it = targetHexLabels.iterator();
+                Iterator<String> it = targetHexLabels.iterator();
                 while (it.hasNext())
                 {
-                    String hexLabel = (String)it.next();
+                    String hexLabel = it.next();
                     BattleChit target = client.getBattleChit(hexLabel);
                     if (target.isTitan())
                     {
@@ -3540,10 +3539,10 @@ public class SimpleAI implements AI
                 int numKillableTargets = 0;
                 int hitsExpected = 0;
 
-                Iterator it = targetHexLabels.iterator();
+                Iterator<String> it = targetHexLabels.iterator();
                 while (it.hasNext())
                 {
-                    String hexLabel = (String)it.next();
+                    String hexLabel = it.next();
                     BattleChit target = client.getBattleChit(hexLabel);
 
                     // Reward being next to enemy titans.  (Banzai!)
@@ -3821,6 +3820,7 @@ public class SimpleAI implements AI
             return Collections.unmodifiableList(critterMoves);
         }
 
+        @Override
         public String toString()
         {
             StringBuffer sb = new StringBuffer();
@@ -3837,6 +3837,7 @@ public class SimpleAI implements AI
             return sb.toString();
         }
 
+        @Override
         public boolean equals(Object ob)
         {
             if (!(ob instanceof LegionMove))
@@ -3847,6 +3848,7 @@ public class SimpleAI implements AI
             return toString().equals(lm.toString());
         }
 
+        @Override
         public int hashCode()
         {
             return toString().hashCode();
@@ -3855,6 +3857,7 @@ public class SimpleAI implements AI
 
     class TriggerTimeIsUp extends TimerTask
     {
+        @Override
         public void run()
         {
             timeIsUp = true;

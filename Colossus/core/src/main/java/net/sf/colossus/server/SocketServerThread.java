@@ -48,7 +48,7 @@ final class SocketServerThread extends Thread implements IClient
 
     private static int counter = 0;
 
-    private Object isWaitingLock = new Object();
+    private final Object isWaitingLock = new Object();
     private boolean isWaiting = false;
 
     SocketServerThread(Server server, Socket socket)
@@ -264,8 +264,8 @@ final class SocketServerThread extends Thread implements IClient
 
     private synchronized void parseLine(String s)
     {
-        List li = Split.split(sep, s);
-        String method = (String)li.remove(0);
+        List<String> li = Split.split(sep, s);
+        String method = li.remove(0);
         if (playerName == null && !method.equals(Constants.signOn))
         {
             LOGGER.log(Level.SEVERE, "First packet must be signOn");
@@ -276,20 +276,19 @@ final class SocketServerThread extends Thread implements IClient
         }
     }
 
-    private void callMethod(String method, List args)
+    private void callMethod(String method, List<String> args)
     {
         if (method.equals(Constants.signOn))
         {
-            String playerName = (String)args.remove(0);
-            boolean remote = Boolean.valueOf((String)args.remove(0))
-                .booleanValue();
+            String playerName = args.remove(0);
+            boolean remote = Boolean.valueOf(args.remove(0)).booleanValue();
             setPlayerName(playerName);
             server.addClient(this, playerName, remote);
             InstanceTracker.setId(this, playerName);
         }
         else if (method.equals(Constants.fixName))
         {
-            String newName = (String)args.remove(0);
+            String newName = args.remove(0);
             // Prevent an infinite loop oscillating between two names.
             if (!newName.equals(playerName)
                 && !newName.startsWith(Constants.byColor))
@@ -311,84 +310,84 @@ final class SocketServerThread extends Thread implements IClient
         }
         else if (method.equals(Constants.acquireAngel))
         {
-            String markerId = (String)args.remove(0);
-            String angelType = (String)args.remove(0);
+            String markerId = args.remove(0);
+            String angelType = args.remove(0);
             server.acquireAngel(markerId, angelType);
         }
         else if (method.equals(Constants.doSummon))
         {
-            String markerId = (String)args.remove(0);
-            String donorId = (String)args.remove(0);
-            String angel = (String)args.remove(0);
+            String markerId = args.remove(0);
+            String donorId = args.remove(0);
+            String angel = args.remove(0);
             server.doSummon(markerId, donorId, angel);
         }
         else if (method.equals(Constants.doRecruit))
         {
-            String markerId = (String)args.remove(0);
-            String recruitName = (String)args.remove(0);
-            String recruiterName = (String)args.remove(0);
+            String markerId = args.remove(0);
+            String recruitName = args.remove(0);
+            String recruiterName = args.remove(0);
             server.doRecruit(markerId, recruitName, recruiterName);
         }
         else if (method.equals(Constants.engage))
         {
-            String hexLabel = (String)args.remove(0);
+            String hexLabel = args.remove(0);
             server.engage(hexLabel);
         }
         else if (method.equals(Constants.concede))
         {
-            String markerId = (String)args.remove(0);
+            String markerId = args.remove(0);
             server.concede(markerId);
         }
         else if (method.equals(Constants.doNotConcede))
         {
-            String markerId = (String)args.remove(0);
+            String markerId = args.remove(0);
             server.doNotConcede(markerId);
         }
         else if (method.equals(Constants.flee))
         {
-            String markerId = (String)args.remove(0);
+            String markerId = args.remove(0);
             server.flee(markerId);
         }
         else if (method.equals(Constants.doNotFlee))
         {
-            String markerId = (String)args.remove(0);
+            String markerId = args.remove(0);
             server.doNotFlee(markerId);
         }
         else if (method.equals(Constants.makeProposal))
         {
-            String proposalString = (String)args.remove(0);
+            String proposalString = args.remove(0);
             server.makeProposal(proposalString);
         }
         else if (method.equals(Constants.fight))
         {
-            String hexLabel = (String)args.remove(0);
+            String hexLabel = args.remove(0);
             server.fight(hexLabel);
         }
         else if (method.equals(Constants.doBattleMove))
         {
-            int tag = Integer.parseInt((String)args.remove(0));
-            String hexLabel = (String)args.remove(0);
+            int tag = Integer.parseInt(args.remove(0));
+            String hexLabel = args.remove(0);
             server.doBattleMove(tag, hexLabel);
         }
         else if (method.equals(Constants.strike))
         {
-            int tag = Integer.parseInt((String)args.remove(0));
-            String hexLabel = (String)args.remove(0);
+            int tag = Integer.parseInt(args.remove(0));
+            String hexLabel = args.remove(0);
             server.strike(tag, hexLabel);
         }
         else if (method.equals(Constants.applyCarries))
         {
-            String hexLabel = (String)args.remove(0);
+            String hexLabel = args.remove(0);
             server.applyCarries(hexLabel);
         }
         else if (method.equals(Constants.undoBattleMove))
         {
-            String hexLabel = (String)args.remove(0);
+            String hexLabel = args.remove(0);
             server.undoBattleMove(hexLabel);
         }
         else if (method.equals(Constants.assignStrikePenalty))
         {
-            String prompt = (String)args.remove(0);
+            String prompt = args.remove(0);
             server.assignStrikePenalty(prompt);
         }
         else if (method.equals(Constants.mulligan))
@@ -397,17 +396,17 @@ final class SocketServerThread extends Thread implements IClient
         }
         else if (method.equals(Constants.undoSplit))
         {
-            String splitoffId = (String)args.remove(0);
+            String splitoffId = args.remove(0);
             server.undoSplit(splitoffId);
         }
         else if (method.equals(Constants.undoMove))
         {
-            String markerId = (String)args.remove(0);
+            String markerId = args.remove(0);
             server.undoMove(markerId);
         }
         else if (method.equals(Constants.undoRecruit))
         {
-            String markerId = (String)args.remove(0);
+            String markerId = args.remove(0);
             server.undoRecruit(markerId);
         }
         else if (method.equals(Constants.doneWithSplits))
@@ -453,35 +452,34 @@ final class SocketServerThread extends Thread implements IClient
         }
         else if (method.equals(Constants.setDonor))
         {
-            String markerId = (String)args.remove(0);
+            String markerId = args.remove(0);
             server.setDonor(markerId);
         }
         else if (method.equals(Constants.doSplit))
         {
-            String parentId = (String)args.remove(0);
-            String childId = (String)args.remove(0);
-            String results = (String)args.remove(0);
+            String parentId = args.remove(0);
+            String childId = args.remove(0);
+            String results = args.remove(0);
             server.doSplit(parentId, childId, results);
         }
         else if (method.equals(Constants.doMove))
         {
-            String markerId = (String)args.remove(0);
-            String hexLabel = (String)args.remove(0);
-            String entrySide = (String)args.remove(0);
-            boolean teleport = Boolean.valueOf((String)args.remove(0))
-                .booleanValue();
-            String teleportingLord = (String)args.remove(0);
+            String markerId = args.remove(0);
+            String hexLabel = args.remove(0);
+            String entrySide = args.remove(0);
+            boolean teleport = Boolean.valueOf(args.remove(0)).booleanValue();
+            String teleportingLord = args.remove(0);
             server.doMove(markerId, hexLabel, entrySide, teleport,
                 teleportingLord);
         }
         else if (method.equals(Constants.assignColor))
         {
-            String color = (String)args.remove(0);
+            String color = args.remove(0);
             server.assignColor(color);
         }
         else if (method.equals(Constants.assignFirstMarker))
         {
-            String markerId = (String)args.remove(0);
+            String markerId = args.remove(0);
             server.assignFirstMarker(markerId);
         }
         else if (method.equals(Constants.newGame))
@@ -490,12 +488,12 @@ final class SocketServerThread extends Thread implements IClient
         }
         else if (method.equals(Constants.loadGame))
         {
-            String filename = (String)args.remove(0);
+            String filename = args.remove(0);
             server.loadGame(filename);
         }
         else if (method.equals(Constants.saveGame))
         {
-            String filename = (String)args.remove(0);
+            String filename = args.remove(0);
             server.saveGame(filename);
         }
         else
@@ -549,7 +547,7 @@ final class SocketServerThread extends Thread implements IClient
         sendToClient(Constants.setOption + sep + optname + sep + value);
     }
 
-    public void updatePlayerInfo(List infoStrings)
+    public void updatePlayerInfo(List<String> infoStrings)
     {
         sendToClient(Constants.updatePlayerInfo + sep + Glob.glob(infoStrings));
     }
@@ -598,7 +596,7 @@ final class SocketServerThread extends Thread implements IClient
             + sep + reason);
     }
 
-    public void revealCreatures(String markerId, final List names,
+    public void revealCreatures(String markerId, final List<String> names,
         String reason)
     {
         sendToClient(Constants.revealCreatures + sep + markerId + sep
@@ -614,7 +612,7 @@ final class SocketServerThread extends Thread implements IClient
      * @author Towi, copied from revealCreatures
      */
     public void revealEngagedCreatures(final String markerId,
-        final List names, final boolean isAttacker, String reason)
+        final List<String> names, final boolean isAttacker, String reason)
     {
         sendToClient(Constants.revealEngagedCreatures + sep + markerId + sep
             + isAttacker + sep + Glob.glob(names) + sep + reason);
@@ -650,13 +648,13 @@ final class SocketServerThread extends Thread implements IClient
         sendToClient(Constants.createSummonAngel + sep + markerId);
     }
 
-    public void askAcquireAngel(String markerId, List recruits)
+    public void askAcquireAngel(String markerId, List<String> recruits)
     {
         sendToClient(Constants.askAcquireAngel + sep + markerId + sep
             + Glob.glob(recruits));
     }
 
-    public void askChooseStrikePenalty(List choices)
+    public void askChooseStrikePenalty(List<String> choices)
     {
         sendToClient(Constants.askChooseStrikePenalty + sep
             + Glob.glob(choices));
@@ -697,8 +695,9 @@ final class SocketServerThread extends Thread implements IClient
     }
 
     public void tellStrikeResults(int strikerTag, int targetTag,
-        int strikeNumber, List rolls, int damage, boolean killed,
-        boolean wasCarry, int carryDamageLeft, Set carryTargetDescriptions)
+        int strikeNumber, List<String> rolls, int damage, boolean killed,
+        boolean wasCarry, int carryDamageLeft,
+        Set<String> carryTargetDescriptions)
     {
         sendToClient(Constants.tellStrikeResults + sep + strikerTag + sep
             + targetTag + sep + strikeNumber + sep + Glob.glob(rolls) + sep
@@ -844,14 +843,14 @@ final class SocketServerThread extends Thread implements IClient
     }
 
     public void didSplit(String hexLabel, String parentId, String childId,
-        int childHeight, List splitoffs, int turn)
+        int childHeight, List<String> splitoffs, int turn)
     {
         sendToClient(Constants.didSplit + sep + hexLabel + sep + parentId
             + sep + childId + sep + childHeight + sep + Glob.glob(splitoffs)
             + sep + turn);
     }
 
-    public void askPickColor(List colorsLeft)
+    public void askPickColor(List<String> colorsLeft)
     {
         sendToClient(Constants.askPickColor + sep + Glob.glob(colorsLeft));
     }
@@ -870,7 +869,7 @@ final class SocketServerThread extends Thread implements IClient
     {
         sendToClient(Constants.nak + sep + reason + sep + errmsg);
     }
-    
+
     public void setBoardActive(boolean val)
     {
         sendToClient(Constants.boardActive + sep + val);

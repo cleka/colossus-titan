@@ -2,6 +2,7 @@ package net.sf.colossus.util;
 
 
 import java.awt.Color;
+import java.lang.reflect.Field;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -193,10 +194,9 @@ public final class HTMLColor
         Color theColor;
         try
         {
-            java.lang.Class htmlColor = Class
+            Class<?> htmlColor = Class
                 .forName("net.sf.colossus.util.HTMLColor");
-            java.lang.reflect.Field fieldColor = htmlColor
-                .getDeclaredField(colorName);
+            Field fieldColor = htmlColor.getDeclaredField(colorName);
             theColor = (Color)fieldColor.get(null);
         }
         catch (Exception e)

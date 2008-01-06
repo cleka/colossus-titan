@@ -48,12 +48,12 @@ public final class Glob
         return Glob.glob(Glob.sep, a);
     }
 
-    public static String glob(String sep, Collection col)
+    public static String glob(String sep, Collection<?> col)
     {
         StringBuffer sb = new StringBuffer();
         if (col != null)
         {
-            Iterator it = col.iterator();
+            Iterator<?> it = col.iterator();
             while (it.hasNext())
             {
                 Object ob = it.next();
@@ -71,7 +71,7 @@ public final class Glob
         return sb.toString();
     }
 
-    public static String glob(Collection col)
+    public static String glob(Collection<?> col)
     {
         return Glob.glob(Glob.sep, col);
     }

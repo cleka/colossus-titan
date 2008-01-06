@@ -8,19 +8,20 @@ import java.util.List;
 
 import net.sf.colossus.client.LegionInfo;
 import net.sf.colossus.server.Constants;
+import net.sf.colossus.server.Creature;
 import net.sf.colossus.server.HintOracleInterface;
 import net.sf.colossus.util.DevRandom;
 
 
 public class DefaultHint implements net.sf.colossus.server.HintInterface
 {
-    private DevRandom rnd = new DevRandom();
+    private final DevRandom rnd = new DevRandom();
 
     // Convert list of recruits from Creature to String for easier compares.
-    public static List creaturesToStrings(List creatures)
+    public static List<String> creaturesToStrings(List<Creature> creatures)
     {
-        List recruits = new ArrayList();
-        for (Iterator it = creatures.iterator(); it.hasNext();)
+        List<String> recruits = new ArrayList<String>();
+        for (Iterator<Creature> it = creatures.iterator(); it.hasNext();)
         {
             Object ob = it.next();
             String str = ob.toString();
@@ -30,9 +31,9 @@ public class DefaultHint implements net.sf.colossus.server.HintInterface
     }
 
     public String getRecruitHint(String terrain, LegionInfo legion,
-        List recruits, HintOracleInterface oracle, String[] section)
+        List<Creature> recruits, HintOracleInterface oracle, String[] section)
     {
-        recruits = creaturesToStrings(recruits);
+        List<String> recruitNames = creaturesToStrings(recruits);
         List<String> sect = Arrays.asList(section);
 
         if (terrain.equals("Brush") || terrain.equals("Jungle"))
@@ -48,7 +49,7 @@ public class DefaultHint implements net.sf.colossus.server.HintInterface
         }
         else if (terrain.equals("Plains"))
         {
-            if (recruits.contains("Lion") && !legion.contains("Griffon")
+            if (recruitNames.contains("Lion") && !legion.contains("Griffon")
                 && legion.numCreature("Lion") == 2
                 && oracle.canReach("Desert")
                 && oracle.creatureAvailable("Griffon") >= 2)
@@ -57,7 +58,7 @@ public class DefaultHint implements net.sf.colossus.server.HintInterface
             }
             if (sect.contains(Constants.sectionDefensiveAI))
             {
-                if (recruits.contains("Centaur")
+                if (recruitNames.contains("Centaur")
                     && legion.numCreature("Centaur") == 2
                     && !legion.contains("Warbear") && legion.getHeight() < 6
                     && oracle.biggestAttackerHeight() == 0
@@ -71,7 +72,7 @@ public class DefaultHint implements net.sf.colossus.server.HintInterface
             }
             else if (sect.contains(Constants.sectionOffensiveAI))
             {
-                if (recruits.contains("Centaur")
+                if (recruitNames.contains("Centaur")
                     && legion.numCreature("Centaur") == 2
                     && !legion.contains("Warbear") && legion.getHeight() <= 2
                     && oracle.biggestAttackerHeight() == 0
@@ -83,7 +84,7 @@ public class DefaultHint implements net.sf.colossus.server.HintInterface
         }
         else if (terrain.equals("Marsh"))
         {
-            if (recruits.contains("Troll") && !legion.contains("Wyvern")
+            if (recruitNames.contains("Troll") && !legion.contains("Wyvern")
                 && legion.numCreature("Troll") == 2
                 && oracle.canReach("Swamp")
                 && oracle.creatureAvailable("Wyvern") >= 2)
@@ -92,7 +93,7 @@ public class DefaultHint implements net.sf.colossus.server.HintInterface
             }
             if (sect.contains(Constants.sectionDefensiveAI))
             {
-                if (recruits.contains("Ogre")
+                if (recruitNames.contains("Ogre")
                     && legion.numCreature("Ogre") == 2
                     && !legion.contains("Minotaur") && legion.getHeight() < 6
                     && oracle.biggestAttackerHeight() == 0
@@ -106,7 +107,7 @@ public class DefaultHint implements net.sf.colossus.server.HintInterface
             }
             else if (sect.contains(Constants.sectionOffensiveAI))
             {
-                if (recruits.contains("Ogre")
+                if (recruitNames.contains("Ogre")
                     && legion.numCreature("Ogre") == 2
                     && !legion.contains("Minotaur") && legion.getHeight() <= 2
                     && oracle.biggestAttackerHeight() == 0
@@ -118,52 +119,55 @@ public class DefaultHint implements net.sf.colossus.server.HintInterface
         }
         else if (terrain.equals("Tower"))
         {
-            if (recruits.contains("Warlock"))
+            if (recruitNames.contains("Warlock"))
             {
                 return "Warlock";
             }
-            if (recruits.contains("Guardian"))
+            if (recruitNames.contains("Guardian"))
             {
                 return "Guardian";
             }
-            if (recruits.contains("Ogre") && legion.numCreature("Ogre") == 2)
+            if (recruitNames.contains("Ogre")
+                && legion.numCreature("Ogre") == 2)
             {
                 return "Ogre";
             }
-            if (recruits.contains("Centaur")
+            if (recruitNames.contains("Centaur")
                 && legion.numCreature("Centaur") == 2)
             {
                 return "Centaur";
             }
-            if (recruits.contains("Gargoyle")
+            if (recruitNames.contains("Gargoyle")
                 && legion.numCreature("Gargoyle") == 1
                 && oracle.creatureAvailable("Cyclops") >= 3)
             {
                 return "Gargoyle";
             }
-            if (recruits.contains("Ogre") && legion.numCreature("Ogre") == 1
+            if (recruitNames.contains("Ogre")
+                && legion.numCreature("Ogre") == 1
                 && oracle.creatureAvailable("Troll") >= 2)
             {
                 return "Ogre";
             }
-            if (recruits.contains("Centaur")
+            if (recruitNames.contains("Centaur")
                 && legion.numCreature("Centaur") == 1
                 && oracle.creatureAvailable("Lion") >= 2)
             {
                 return "Centaur";
             }
-            if (recruits.contains("Gargoyle")
+            if (recruitNames.contains("Gargoyle")
                 && legion.numCreature("Gargoyle") == 0
                 && oracle.creatureAvailable("Cyclops") >= 6)
             {
                 return "Gargoyle";
             }
-            if (recruits.contains("Ogre") && legion.numCreature("Ogre") == 0
+            if (recruitNames.contains("Ogre")
+                && legion.numCreature("Ogre") == 0
                 && oracle.creatureAvailable("Troll") >= 6)
             {
                 return "Ogre";
             }
-            if (recruits.contains("Centaur")
+            if (recruitNames.contains("Centaur")
                 && legion.numCreature("Centaur") == 0
                 && oracle.creatureAvailable("Lion") >= 6)
             {
@@ -171,12 +175,12 @@ public class DefaultHint implements net.sf.colossus.server.HintInterface
             }
         }
 
-        return (String)recruits.get(recruits.size() - 1);
+        return recruitNames.get(recruitNames.size() - 1);
     }
 
-    public List getInitialSplitHint(String label, String[] section)
+    public List<String> getInitialSplitHint(String label, String[] section)
     {
-        List li = new ArrayList();
+        List<String> li = new ArrayList<String>();
         if (label.equals("100"))
         {
             if (rnd.nextFloat() < 0.5)

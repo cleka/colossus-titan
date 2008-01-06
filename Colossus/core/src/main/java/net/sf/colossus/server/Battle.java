@@ -530,10 +530,11 @@ public final class Battle extends net.sf.colossus.game.Battle
      *  all legal destinations.  Do not double back.  If ignoreMobileAllies
      *  is true, pretend that allied creatures that can move out of the
      *  way are not there. */
-    private Set findMoves(BattleHex hex, Critter critter, boolean flies,
-        int movesLeft, int cameFrom, boolean ignoreMobileAllies, boolean first)
+    private Set<String> findMoves(BattleHex hex, Critter critter,
+        boolean flies, int movesLeft, int cameFrom,
+        boolean ignoreMobileAllies, boolean first)
     {
-        Set set = new HashSet();
+        Set<String> set = new HashSet<String>();
         for (int i = 0; i < 6; i++)
         {
             // Do not double back.
@@ -599,14 +600,14 @@ public final class Battle extends net.sf.colossus.game.Battle
      *  so we know that there are no enemies on board, and all allies
      *  are mobile.
      */
-    private Set findUnoccupiedStartlistHexes(boolean ignoreMobileAllies,
-        String terrain)
+    private Set<String> findUnoccupiedStartlistHexes(
+        boolean ignoreMobileAllies, String terrain)
     {
-        Set set = new HashSet();
-        Iterator it = HexMap.getTowerStartList(terrain).iterator();
+        Set<String> set = new HashSet<String>();
+        Iterator<String> it = HexMap.getTowerStartList(terrain).iterator();
         while (it.hasNext())
         {
-            BattleHex hex = HexMap.getHexByLabel(terrain, (String)it.next());
+            BattleHex hex = HexMap.getHexByLabel(terrain, it.next());
             if (ignoreMobileAllies || !isOccupied(hex))
             {
                 set.add(hex.getLabel());
@@ -617,9 +618,9 @@ public final class Battle extends net.sf.colossus.game.Battle
 
     /** Find all legal moves for this critter. The returned list
      *  contains hex IDs, not hexes. */
-    private Set showMoves(Critter critter, boolean ignoreMobileAllies)
+    private Set<String> showMoves(Critter critter, boolean ignoreMobileAllies)
     {
-        Set set = new HashSet();
+        Set<String> set = new HashSet<String>();
         if (!critter.hasMoved() && !critter.isInContact(false))
         {
             if (HexMap.terrainHasStartlist(terrain) && (turnNumber == 1)
@@ -1009,9 +1010,9 @@ public final class Battle extends net.sf.colossus.game.Battle
     /** Return a set of hex labels for hexes containing targets that the
      *  critter may strike.  Only include rangestrikes if rangestrike
      *  is true. */
-    Set findStrikes(Critter critter, boolean rangestrike)
+    Set<String> findStrikes(Critter critter, boolean rangestrike)
     {
-        Set set = new HashSet();
+        Set<String> set = new HashSet<String>();
 
         // Each creature may strike only once per turn.
         if (critter.hasStruck())
@@ -1077,13 +1078,13 @@ public final class Battle extends net.sf.colossus.game.Battle
         return Collections.unmodifiableSet(carryTargets);
     }
 
-    Set getCarryTargetDescriptions()
+    Set<String> getCarryTargetDescriptions()
     {
-        Set set = new HashSet();
-        Iterator it = getCarryTargets().iterator();
+        Set<String> set = new HashSet<String>();
+        Iterator<String> it = getCarryTargets().iterator();
         while (it.hasNext())
         {
-            String hexLabel = (String)it.next();
+            String hexLabel = it.next();
             Critter critter = getCritter(hexLabel);
             set.add(critter.getDescription());
         }
@@ -1095,7 +1096,7 @@ public final class Battle extends net.sf.colossus.game.Battle
         carryTargets.clear();
     }
 
-    void setCarryTargets(Set carryTargets)
+    void setCarryTargets(Set<String> carryTargets)
     {
         this.carryTargets.clear();
         this.carryTargets.addAll(carryTargets);

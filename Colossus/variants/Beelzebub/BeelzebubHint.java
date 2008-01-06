@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.colossus.client.LegionInfo;
+import net.sf.colossus.server.Creature;
 import net.sf.colossus.server.HintOracleInterface;
 import net.sf.colossus.util.DevRandom;
 import Default.DefaultHint;
@@ -12,27 +13,28 @@ import Default.DefaultHint;
 
 public class BeelzebubHint implements net.sf.colossus.server.HintInterface
 {
-    private DevRandom rnd = new DevRandom();
+    private final DevRandom rnd = new DevRandom();
 
     public String getRecruitHint(String terrain, LegionInfo legion,
-        List recruits, HintOracleInterface oracle, String[] section)
+        List<Creature> recruits, HintOracleInterface oracle, String[] section)
     {
-        recruits = DefaultHint.creaturesToStrings(recruits);
+        List<String> recruitNames = DefaultHint.creaturesToStrings(recruits);
 
         if (terrain.equals("Plains"))
         {
-            if (recruits.contains("Centaur") && !legion.contains("Warbear")
-                && !legion.contains("Ent") && !legion.contains("Unicorn")
-                && !legion.contains("Ranger") && !legion.contains("Knight")
-                && !oracle.canRecruit("Ranger") && legion.getHeight() != 6
+            if (recruitNames.contains("Centaur")
+                && !legion.contains("Warbear") && !legion.contains("Ent")
+                && !legion.contains("Unicorn") && !legion.contains("Ranger")
+                && !legion.contains("Knight") && !oracle.canRecruit("Ranger")
+                && legion.getHeight() != 6
                 && legion.numCreature("Centaur") == 2
                 && oracle.canReach("Woods")
                 && oracle.creatureAvailable("Warbear") >= 2)
             {
                 return "Centaur";
             }
-            if (recruits.contains("Ranger") && !legion.contains("Basilisk")
-                && legion.getHeight() != 6
+            if (recruitNames.contains("Ranger")
+                && !legion.contains("Basilisk") && legion.getHeight() != 6
                 && legion.numCreature("Ranger") == 2
                 && oracle.canReach("Marsh")
                 && oracle.creatureAvailable("Basilisk") >= 1)
@@ -43,9 +45,10 @@ public class BeelzebubHint implements net.sf.colossus.server.HintInterface
         }
         else if (terrain.equals("Marsh"))
         {
-            if (recruits.contains("Goblin") && !legion.contains("Minotaur")
-                && !legion.contains("Djinn") && !legion.contains("Manticore")
-                && !legion.contains("Ranger") && !legion.contains("Basilisk")
+            if (recruitNames.contains("Goblin")
+                && !legion.contains("Minotaur") && !legion.contains("Djinn")
+                && !legion.contains("Manticore") && !legion.contains("Ranger")
+                && !legion.contains("Basilisk")
                 && !oracle.canRecruit("Ranger")
                 && legion.numCreature("Goblin") == 2
                 && legion.getHeight() != 6 && oracle.canReach("Hills")
@@ -56,8 +59,9 @@ public class BeelzebubHint implements net.sf.colossus.server.HintInterface
         }
         else if (terrain.equals("Ruins"))
         {
-            if (recruits.contains("Skeleton") && !legion.contains("Zombie")
-                && !legion.contains("Ghost") && !legion.contains("Vampire")
+            if (recruitNames.contains("Skeleton")
+                && !legion.contains("Zombie") && !legion.contains("Ghost")
+                && !legion.contains("Vampire")
                 && !oracle.canRecruit("Vampire") && !legion.contains("Lich")
                 && !legion.contains("Death") && !legion.contains("Mummy")
                 && legion.numCreature("Skeleton") == 2
@@ -66,7 +70,7 @@ public class BeelzebubHint implements net.sf.colossus.server.HintInterface
             {
                 return "Skeleton";
             }
-            if (recruits.contains("Shade") && !legion.contains("Ghost")
+            if (recruitNames.contains("Shade") && !legion.contains("Ghost")
                 && !legion.contains("Wraith") && !legion.contains("Beelzebub")
                 && !legion.contains("Lich") && !oracle.canRecruit("Lich")
                 && !legion.contains("Death")
@@ -79,7 +83,7 @@ public class BeelzebubHint implements net.sf.colossus.server.HintInterface
         }
         else if (terrain.equals("Tombs"))
         {
-            if (recruits.contains("Ghost") && !legion.contains("Wraith")
+            if (recruitNames.contains("Ghost") && !legion.contains("Wraith")
                 && !legion.contains("Beelzebub") && !legion.contains("Death")
                 && !oracle.canRecruit("Death")
                 && legion.numCreature("Ghost") == 2 && legion.getHeight() != 6
@@ -91,7 +95,8 @@ public class BeelzebubHint implements net.sf.colossus.server.HintInterface
         }
         else if (terrain.equals("Desert"))
         {
-            if (recruits.contains("Djinn") && !legion.contains("Manticore")
+            if (recruitNames.contains("Djinn")
+                && !legion.contains("Manticore")
                 && legion.numCreature("Djinn") == 2 && legion.getHeight() != 6
                 && oracle.canReach("Hills")
                 && oracle.creatureAvailable("Manticore") >= 1)
@@ -101,7 +106,7 @@ public class BeelzebubHint implements net.sf.colossus.server.HintInterface
         }
         else if (terrain.equals("Swamp"))
         {
-            if (recruits.contains("Ent") && !legion.contains("Unicorn")
+            if (recruitNames.contains("Ent") && !legion.contains("Unicorn")
                 && legion.numCreature("Ent") == 2 && legion.getHeight() != 6
                 && oracle.canReach("Woods")
                 && oracle.creatureAvailable("Unicorn") >= 1)
@@ -111,7 +116,7 @@ public class BeelzebubHint implements net.sf.colossus.server.HintInterface
         }
         else if (terrain.equals("Tower"))
         {
-            if (recruits.contains("Skeleton")
+            if (recruitNames.contains("Skeleton")
                 && legion.contains("Skeleton")
                 && legion.numCreature("Skeleton") == 2
                 && !oracle.canRecruit("Golem")
@@ -121,21 +126,23 @@ public class BeelzebubHint implements net.sf.colossus.server.HintInterface
             {
                 return "Skeleton";
             }
-            if (recruits.contains("Skeleton") && legion.contains("Skeleton")
+            if (recruitNames.contains("Skeleton")
+                && legion.contains("Skeleton")
                 && legion.numCreature("Skeleton") == 1
                 && !legion.contains("Shade") && !oracle.canRecruit("Golem")
                 && oracle.creatureAvailable("Shade") >= 2)
             {
                 return "Skeleton";
             }
-            if (recruits.contains("Skeleton") && !legion.contains("Skeleton")
-                && !legion.contains("Shade") && legion.getHeight() != 6
+            if (recruitNames.contains("Skeleton")
+                && !legion.contains("Skeleton") && !legion.contains("Shade")
+                && legion.getHeight() != 6
                 && oracle.creatureAvailable("Shade") >= 6
                 && !oracle.canRecruit("Golem"))
             {
                 return "Skeleton";
             }
-            if (recruits.contains("Goblin")
+            if (recruitNames.contains("Goblin")
                 && legion.contains("Goblin")
                 && legion.numCreature("Goblin") == 2
                 && !oracle.canRecruit("Golem")
@@ -145,21 +152,21 @@ public class BeelzebubHint implements net.sf.colossus.server.HintInterface
             {
                 return "Goblin";
             }
-            if (recruits.contains("Goblin") && legion.contains("Goblin")
+            if (recruitNames.contains("Goblin") && legion.contains("Goblin")
                 && legion.numCreature("Goblin") == 1
                 && !legion.contains("Naga") && !oracle.canRecruit("Golem")
                 && oracle.creatureAvailable("Naga") >= 2)
             {
                 return "Goblin";
             }
-            if (recruits.contains("Goblin") && !legion.contains("Goblin")
+            if (recruitNames.contains("Goblin") && !legion.contains("Goblin")
                 && !legion.contains("Naga") && legion.getHeight() != 6
                 && oracle.creatureAvailable("Naga") >= 6
                 && !oracle.canRecruit("Golem"))
             {
                 return "Goblin";
             }
-            if (recruits.contains("Centaur")
+            if (recruitNames.contains("Centaur")
                 && legion.contains("Centaur")
                 && legion.numCreature("Centaur") == 2
                 && !oracle.canRecruit("Golem")
@@ -169,27 +176,28 @@ public class BeelzebubHint implements net.sf.colossus.server.HintInterface
             {
                 return "Centaur";
             }
-            if (recruits.contains("Centaur") && legion.contains("Centaur")
+            if (recruitNames.contains("Centaur") && legion.contains("Centaur")
                 && legion.numCreature("Centaur") == 1
                 && !legion.contains("Lion") && !oracle.canRecruit("Golem")
                 && oracle.creatureAvailable("Lion") >= 2)
             {
                 return "Centaur";
             }
-            if (recruits.contains("Centaur") && !legion.contains("Centaur")
-                && !legion.contains("Lion") && legion.getHeight() != 6
+            if (recruitNames.contains("Centaur")
+                && !legion.contains("Centaur") && !legion.contains("Lion")
+                && legion.getHeight() != 6
                 && oracle.creatureAvailable("Lion") >= 6
                 && !oracle.canRecruit("Golem"))
             {
                 return "Centaur";
             }
         }
-        return (String)recruits.get(recruits.size() - 1);
+        return recruitNames.get(recruitNames.size() - 1);
     }
 
-    public List getInitialSplitHint(String label, String[] section)
+    public List<String> getInitialSplitHint(String label, String[] section)
     {
-        List li = new ArrayList();
+        List<String> li = new ArrayList<String>();
         if (label.equals("100"))
         {
             if (rnd.nextFloat() < 0.5)

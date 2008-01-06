@@ -45,7 +45,8 @@ public class History
         root.addContent(event);
     }
 
-    void splitEvent(String parentId, String childId, List splitoffs, int turn)
+    void splitEvent(String parentId, String childId, List<String> splitoffs,
+        int turn)
     {
         Element event = new Element("Split");
         event.setAttribute("parentId", parentId);
@@ -53,10 +54,10 @@ public class History
         event.setAttribute("turn", "" + turn);
         Element creatures = new Element("splitoffs");
         event.addContent(creatures);
-        Iterator it = splitoffs.iterator();
+        Iterator<String> it = splitoffs.iterator();
         while (it.hasNext())
         {
-            String creatureName = (String)it.next();
+            String creatureName = it.next();
             Element cr = new Element("creature");
             cr.addContent(creatureName);
             creatures.addContent(cr);
@@ -73,8 +74,8 @@ public class History
         root.addContent(event);
     }
 
-    void revealEvent(boolean allPlayers, List<String> playerNames, String markerId,
-        List creatureNames, int turn)
+    void revealEvent(boolean allPlayers, List<String> playerNames,
+        String markerId, List<String> creatureNames, int turn)
     {
         if (creatureNames.isEmpty())
         {
@@ -108,10 +109,10 @@ public class History
         }
         Element creatures = new Element("creatures");
         event.addContent(creatures);
-        Iterator it = creatureNames.iterator();
+        Iterator<String> it = creatureNames.iterator();
         while (it.hasNext())
         {
-            String creatureName = (String)it.next();
+            String creatureName = it.next();
             Element creature = new Element("creature");
             creature.addContent(creatureName);
             creatures.addContent(creature);
@@ -136,6 +137,8 @@ public class History
         root = (Element)his.clone();
     }
 
+    // unchecked conversions from JDOM
+    @SuppressWarnings("unchecked")
     void fireEventsFromXML(Server server)
     {
         if (root == null)
@@ -151,6 +154,8 @@ public class History
         }
     }
 
+    // unchecked conversions from JDOM
+    @SuppressWarnings("unchecked")
     void fireEventFromElement(Server server, Element el)
     {
         if (el.getName().equals("Reveal"))
@@ -172,7 +177,7 @@ public class History
                     playerNames.add(playerName);
                 }
             }
-            List creatureNames = new ArrayList();
+            List<String> creatureNames = new ArrayList<String>();
             List<Element> creatures = el.getChild("creatures").getChildren();
             for (Iterator<Element> it = creatures.iterator(); it.hasNext();)
             {
@@ -197,7 +202,7 @@ public class History
             String childId = el.getAttributeValue("childId");
             String turnString = el.getAttributeValue("turn");
             int turn = Integer.parseInt(turnString);
-            List creatureNames = new ArrayList();
+            List<String> creatureNames = new ArrayList<String>();
             List<Element> splitoffs = el.getChild("splitoffs").getChildren();
             Iterator<Element> it = splitoffs.iterator();
             while (it.hasNext())

@@ -15,16 +15,16 @@ import java.util.logging.Logger;
  * @version $Id$
  * @author David Ripton
  */
-final class PenaltyOption implements Comparable
+final class PenaltyOption implements Comparable<PenaltyOption>
 {
     private static final Logger LOGGER = Logger.getLogger(PenaltyOption.class
         .getName());
 
-    private Critter striker;
-    private Critter target;
-    private Set carryTargets = new HashSet(); // of hexLabels
-    private int dice;
-    private int strikeNumber;
+    private final Critter striker;
+    private final Critter target;
+    private final Set<String> carryTargets = new HashSet<String>(); // of hexLabels
+    private final int dice;
+    private final int strikeNumber;
 
     PenaltyOption(Critter striker, Critter target, int dice, int strikeNumber)
     {
@@ -66,12 +66,12 @@ final class PenaltyOption implements Comparable
     }
 
     /** Add all hexLabel Strings in Set to carry targets list. */
-    void addCarryTargets(Set targets)
+    void addCarryTargets(Set<String> targets)
     {
         carryTargets.addAll(targets);
     }
 
-    Set getCarryTargets()
+    Set<String> getCarryTargets()
     {
         return Collections.unmodifiableSet(carryTargets);
     }
@@ -83,18 +83,8 @@ final class PenaltyOption implements Comparable
 
     /** Sort first by ascending dice, then by descending strike number,
      *  then by striker and target.  Do not consider carryTargets. */
-    public int compareTo(Object object)
+    public int compareTo(PenaltyOption other)
     {
-        PenaltyOption other;
-        if (object instanceof PenaltyOption)
-        {
-            other = (PenaltyOption)object;
-        }
-        else
-        {
-            throw new ClassCastException();
-        }
-
         if (dice < other.dice)
         {
             return -1;
@@ -155,7 +145,7 @@ final class PenaltyOption implements Comparable
         if (!carryTargets.isEmpty())
         {
             sb.append(", able to carry to ");
-            Iterator it = carryTargets.iterator();
+            Iterator<String> it = carryTargets.iterator();
             boolean first = true;
             while (it.hasNext())
             {
@@ -164,7 +154,7 @@ final class PenaltyOption implements Comparable
                     sb.append(", ");
                 }
                 first = false;
-                String hexLabel = (String)it.next();
+                String hexLabel = it.next();
                 Critter critter = striker.getBattle().getCritter(hexLabel);
                 sb.append(critter.getDescription());
             }

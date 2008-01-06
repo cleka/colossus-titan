@@ -68,7 +68,7 @@ public final class ResourceLoader
      */
     private static class ColossusClassLoader extends ClassLoader
     {
-        List directories = null;
+        List<String> directories = null;
 
         ColossusClassLoader(ClassLoader parent)
         {
@@ -80,7 +80,9 @@ public final class ResourceLoader
             super();
         }
 
-        public Class findClass(String className) throws ClassNotFoundException
+        @Override
+        public Class<?> findClass(String className)
+            throws ClassNotFoundException
         {
             try
             {
@@ -113,7 +115,7 @@ public final class ResourceLoader
             }
         }
 
-        void setDirectories(List d)
+        void setDirectories(List<String> d)
         {
             directories = d;
         }
@@ -207,7 +209,7 @@ public final class ResourceLoader
      * @return The Image, or null if it was not found.
      */
     public synchronized static Image getImage(String filename,
-        List directories, int width, int height)
+        List<String> directories, int width, int height)
     {
         Image image = null;
         String mapKey = getMapKey(filename, directories);
@@ -221,36 +223,32 @@ public final class ResourceLoader
         {
             image = ((ImageIcon)cached).getImage();
         }
-        java.util.Iterator it = directories.iterator();
+        Iterator<String> it = directories.iterator();
         while (it.hasNext() && (image == null))
         {
-            Object o = it.next();
-            if (o instanceof String)
+            String path = it.next();
+            for (int i = 0; ((i < svgExtension.length) && (image == null)); i++)
             {
-                String path = (String)o;
-                for (int i = 0; ((i < svgExtension.length) && (image == null)); i++)
+                image = tryLoadSVGImageFromFile(filename + svgExtension[i],
+                    path, width, height);
+            }
+            for (int i = 0; ((i < imageExtension.length) && (image == null)); i++)
+            {
+                image = tryLoadImageFromFile(filename + imageExtension[i],
+                    path, width, height);
+                if (image == null)
                 {
-                    image = tryLoadSVGImageFromFile(
-                        filename + svgExtension[i], path, width, height);
-                }
-                for (int i = 0; ((i < imageExtension.length) && (image == null)); i++)
-                {
-                    image = tryLoadImageFromFile(filename + imageExtension[i],
-                        path, width, height);
-                    if (image == null)
+                    ImageIcon temp = tryLoadImageIconFromResource(filename
+                        + imageExtension[i], path, width, height);
+                    if (temp != null)
                     {
-                        ImageIcon temp = tryLoadImageIconFromResource(filename
-                            + imageExtension[i], path, width, height);
-                        if (temp != null)
-                        {
-                            image = temp.getImage();
-                        }
+                        image = temp.getImage();
                     }
                 }
-                if (image != null)
-                {
-                    imageCache.put(mapKey, image);
-                }
+            }
+            if (image != null)
+            {
+                imageCache.put(mapKey, image);
             }
         }
         if (image != null)
@@ -267,7 +265,7 @@ public final class ResourceLoader
      * @return The ImageIcon, or null if it was not found.
      */
     public synchronized static ImageIcon getImageIcon(String filename,
-        List directories, int width, int height)
+        List<String> directories, int width, int height)
     {
         ImageIcon icon = null;
         String mapKey = getMapKey(filename, directories);
@@ -281,41 +279,37 @@ public final class ResourceLoader
         {
             icon = (ImageIcon)cached;
         }
-        java.util.Iterator it = directories.iterator();
+        Iterator<String> it = directories.iterator();
         while (it.hasNext() && (icon == null))
         {
-            Object o = it.next();
-            if (o instanceof String)
-            {
-                String path = (String)o;
+            String path = it.next();
 
-                for (int i = 0; ((i < svgExtension.length) && (icon == null)); i++)
+            for (int i = 0; ((i < svgExtension.length) && (icon == null)); i++)
+            {
+                Image temp = tryLoadSVGImageFromFile(filename
+                    + svgExtension[i], path, width, height);
+                if (temp != null)
                 {
-                    Image temp = tryLoadSVGImageFromFile(filename
-                        + svgExtension[i], path, width, height);
-                    if (temp != null)
-                    {
-                        icon = new ImageIcon(temp);
-                    }
+                    icon = new ImageIcon(temp);
                 }
-                for (int i = 0; ((i < imageExtension.length) && (icon == null)); i++)
+            }
+            for (int i = 0; ((i < imageExtension.length) && (icon == null)); i++)
+            {
+                Image temp = tryLoadImageFromFile(
+                    filename + imageExtension[i], path, width, height);
+                if (temp == null)
                 {
-                    Image temp = tryLoadImageFromFile(filename
+                    icon = tryLoadImageIconFromResource(filename
                         + imageExtension[i], path, width, height);
-                    if (temp == null)
-                    {
-                        icon = tryLoadImageIconFromResource(filename
-                            + imageExtension[i], path, width, height);
-                    }
-                    else
-                    {
-                        icon = new ImageIcon(temp);
-                    }
                 }
-                if (icon != null)
+                else
                 {
-                    imageCache.put(mapKey, icon);
+                    icon = new ImageIcon(temp);
                 }
+            }
+            if (icon != null)
+            {
+                imageCache.put(mapKey, icon);
             }
         }
         while (icon != null
@@ -415,7 +409,7 @@ public final class ResourceLoader
      * @return The InputStream, or null if it was not found.
      */
     public static InputStream getInputStreamIgnoreFail(String filename,
-        List directories)
+        List<String> directories)
     {
         return getInputStream(filename, directories, server != null, false,
             true);
@@ -428,7 +422,8 @@ public final class ResourceLoader
      * @param directories List of directories to search (in order).
      * @return The InputStream, or null if it was not found.
      */
-    public static InputStream getInputStream(String filename, List directories)
+    public static InputStream getInputStream(String filename,
+        List<String> directories)
     {
         return getInputStream(filename, directories, server != null, false,
             false);
@@ -446,7 +441,7 @@ public final class ResourceLoader
      * @return The InputStream, or null if it was not found.
      */
     public static InputStream getInputStream(String filename,
-        List directories, boolean remote, boolean cachedOnly,
+        List<String> directories, boolean remote, boolean cachedOnly,
         boolean ignoreFail)
     {
         String mapKey = getMapKey(filename, directories);
@@ -468,24 +463,20 @@ public final class ResourceLoader
             synchronized (fileCache)
             {
                 InputStream stream = null;
-                java.util.Iterator it = directories.iterator();
+                Iterator<String> it = directories.iterator();
                 while (it.hasNext() && (stream == null))
                 {
-                    Object o = it.next();
-                    if (o instanceof String)
+                    String path = it.next();
+                    String fullPath = path + pathSeparator
+                        + fixFilename(filename);
+                    try
                     {
-                        String path = (String)o;
-                        String fullPath = path + pathSeparator
-                            + fixFilename(filename);
-                        try
-                        {
-                            File tempFile = new File(fullPath);
-                            stream = new FileInputStream(tempFile);
-                        }
-                        catch (Exception e)
-                        {
-                            stream = cl.getResourceAsStream(fullPath);
-                        }
+                        File tempFile = new File(fullPath);
+                        stream = new FileInputStream(tempFile);
+                    }
+                    catch (Exception e)
+                    {
+                        stream = cl.getResourceAsStream(fullPath);
                     }
                 }
                 if (stream == null)
@@ -555,10 +546,10 @@ public final class ResourceLoader
                                 //   Constants.fileServerIgnoreFailSignal + sep);
                             }
                             out.print(filename);
-                            java.util.Iterator it = directories.iterator();
+                            Iterator<String> it = directories.iterator();
                             while (it.hasNext())
                             {
-                                out.print(sep + (String)it.next());
+                                out.print(sep + it.next());
                             }
                             out.println();
                             data = getBytesFromInputStream(is);
@@ -595,8 +586,8 @@ public final class ResourceLoader
      * @return An array of byte representing the content of the file, 
      *     or null if it fails.
      */
-    public static byte[] getBytesFromFile(String filename, List directories,
-        boolean cachedOnly, boolean ignoreFail)
+    public static byte[] getBytesFromFile(String filename,
+        List<String> directories, boolean cachedOnly, boolean ignoreFail)
     {
         InputStream is = getInputStream(filename, directories, server != null,
             cachedOnly, ignoreFail);
@@ -675,27 +666,23 @@ public final class ResourceLoader
      * @return The OutputStream, or null if it was not found.
      */
     public static OutputStream getOutputStream(String filename,
-        List directories)
+        List<String> directories)
     {
         OutputStream stream = null;
-        java.util.Iterator it = directories.iterator();
+        Iterator<String> it = directories.iterator();
         while (it.hasNext() && (stream == null))
         {
-            Object o = it.next();
-            if (o instanceof String)
+            String path = it.next();
+            String fullPath = path + pathSeparator + fixFilename(filename);
+            try
             {
-                String path = (String)o;
-                String fullPath = path + pathSeparator + fixFilename(filename);
-                try
-                {
-                    stream = new FileOutputStream(fullPath);
-                }
-                catch (Exception e)
-                {
-                    LOGGER.log(Level.FINEST, "getOutputStream:: "
-                        + " Couldn't get OutputStream for file " + filename
-                        + " in " + directories + "(" + e.getMessage() + ")");
-                }
+                stream = new FileOutputStream(fullPath);
+            }
+            catch (Exception e)
+            {
+                LOGGER.log(Level.FINEST, "getOutputStream:: "
+                    + " Couldn't get OutputStream for file " + filename
+                    + " in " + directories + "(" + e.getMessage() + ")");
             }
         }
         return (stream);
@@ -711,7 +698,8 @@ public final class ResourceLoader
      * @param directories List of directories to search (in order).
      * @return The Document, or null if it was not found.
      */
-    public static Document getDocument(String filename, List directories)
+    public static Document getDocument(String filename,
+        List<String> directories)
     {
         InputStream htmlIS = getInputStreamIgnoreFail(filename + ".html",
             directories);
@@ -783,7 +771,7 @@ public final class ResourceLoader
      * @return A String to use as a key when storing/loading in a cache
      *   the specified file from the specified list of directories.
      */
-    private static String getMapKey(String filename, List directories)
+    private static String getMapKey(String filename, List<String> directories)
     {
         String[] filenames = new String[1];
         filenames[0] = filename;
@@ -798,7 +786,8 @@ public final class ResourceLoader
      *   the specified array of name of files from the specified 
      *   list of directories.
      */
-    private static String getMapKey(String[] filenames, List directories)
+    private static String getMapKey(String[] filenames,
+        List<String> directories)
     {
         StringBuffer buf = new StringBuffer(filenames[0]);
         for (int i = 1; i < filenames.length; i++)
@@ -806,15 +795,12 @@ public final class ResourceLoader
             buf.append(",");
             buf.append(filenames[i]);
         }
-        Iterator it = directories.iterator();
+        Iterator<String> it = directories.iterator();
         while (it.hasNext())
         {
-            Object o = it.next();
-            if (o instanceof String)
-            {
-                buf.append(",");
-                buf.append(o);
-            }
+            String dir = it.next();
+            buf.append(",");
+            buf.append(dir);
         }
         return buf.toString();
     }
@@ -827,7 +813,7 @@ public final class ResourceLoader
      * @return The composite Image, or null if any part was not found.
      */
     public synchronized static Image getCompositeImage(String[] filenames,
-        List directories, int width, int height)
+        List<String> directories, int width, int height)
     {
         BufferedImage bi;
         String mapKey = getMapKey(filenames, directories);
@@ -882,7 +868,7 @@ public final class ResourceLoader
      * @return The generated Image.
      */
     private synchronized static Image tryBuildingNonexistentImage(
-        String filename, int width, int height, List directories)
+        String filename, int width, int height, List<String> directories)
     {
         Image tempImage = null;
 
@@ -1092,7 +1078,7 @@ public final class ResourceLoader
      *     with the transparent part filled the the given color.
      */
     private static Image createColorizedImage(String filename, Color color,
-        List directories, int width, int height)
+        List<String> directories, int width, int height)
     {
         Image temp = getImage(filename, directories, width, height);
         ImageIcon tempIcon = new ImageIcon(temp);
@@ -1310,7 +1296,8 @@ public final class ResourceLoader
      * @param directories List of directories to search (in order).
      * @return A new object, instance from the given class.
      */
-    public static Object getNewObject(String className, List directories)
+    public static Object getNewObject(String className,
+        List<String> directories)
     {
         return getNewObject(className, directories, null);
     }
@@ -1331,10 +1318,10 @@ public final class ResourceLoader
      * @return A new object, instance from the given class or null if 
      *         instantiation failed.
      */
-    public static Object getNewObject(String className, List directories,
-        Object[] parameter)
+    public static Object getNewObject(String className,
+        List<String> directories, Object[] parameter)
     {
-        Class theClass = null;
+        Class<?> theClass = null;
         cl.setDirectories(directories);
         try
         {
@@ -1348,14 +1335,14 @@ public final class ResourceLoader
         }
         if (parameter != null)
         {
-            Class[] paramClasses = new Class[parameter.length];
+            Class<?>[] paramClasses = new Class[parameter.length];
             for (int i = 0; i < parameter.length; i++)
             {
                 paramClasses[i] = parameter[i].getClass();
             }
             try
             {
-                Constructor c = theClass.getConstructor(paramClasses);
+                Constructor<?> c = theClass.getConstructor(paramClasses);
                 return c.newInstance(parameter);
             }
             catch (Exception e)
@@ -1388,8 +1375,8 @@ public final class ResourceLoader
      * @param directories List of directories to search (in order).
      * @param data File content to add.
      */
-    public static void putIntoFileCache(String filename, List directories,
-        byte[] data)
+    public static void putIntoFileCache(String filename,
+        List<String> directories, byte[] data)
     {
         String mapKey = getMapKey(filename, directories);
         fileCache.put(mapKey, data);
@@ -1436,12 +1423,14 @@ public final class ResourceLoader
     {
         private BufferedImage image;
 
+        @Override
         public BufferedImage createImage(int width, int height)
         {
             return new BufferedImage(width, height,
                 BufferedImage.TYPE_INT_ARGB);
         }
 
+        @Override
         public void writeImage(BufferedImage image, TranscoderOutput output)
             throws TranscoderException
         {
