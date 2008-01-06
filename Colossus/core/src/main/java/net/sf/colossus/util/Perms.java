@@ -14,7 +14,7 @@ import java.util.List;
  */
 public final class Perms<T>
 {
-    private final ArrayList<T> permList;
+    private final List<T> permList;
     private final PermGen pg;
     private boolean foundNext = false;
     private boolean anyLeft = true;
@@ -22,15 +22,13 @@ public final class Perms<T>
     private int nextSwap;
 
     /** Set up a permutation generator for the passed list. */
-    // ArrayList.clone() not covariant in return type
-    @SuppressWarnings("unchecked")
-    public Perms(ArrayList<T> list)
+    public Perms(List<T> list)
     {
         pg = new PermGen(list.size());
 
         // Since we're not going to mess with the elements, just
         // their order, a shallow copy should be fine.
-        permList = (ArrayList<T>)list.clone();
+        permList = new ArrayList<T>(list);
     }
 
     /** Returns an iterator that returns permutations of the originally
