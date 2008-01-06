@@ -34,11 +34,11 @@ import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 final class SplitLegion extends KDialog implements MouseListener,
     ActionListener, WindowListener
 {
-    private List<Chit> oldChits = new ArrayList<Chit>(8);
-    private List<Chit> newChits = new ArrayList<Chit>(8);
+    private final List<Chit> oldChits = new ArrayList<Chit>(8);
+    private final List<Chit> newChits = new ArrayList<Chit>(8);
 
-    private Marker oldMarker;
-    private Marker newMarker;
+    private final Marker oldMarker;
+    private final Marker newMarker;
 
     private Client client;
     private static boolean active;
@@ -46,17 +46,17 @@ final class SplitLegion extends KDialog implements MouseListener,
     /** new marker id,creature1,creature2... */
     private static String results;
 
-    private Box oldBox;
-    private Box newBox;
-    private Box buttonBox;
+    private final Box oldBox;
+    private final Box newBox;
+    private final Box buttonBox;
 
-    private JButton button1;
-    private JButton button2;
+    private final JButton button1;
+    private final JButton button2;
 
-    private int totalChits;
-    private int scale;
+    private final int totalChits;
+    private final int scale;
 
-    private SaveWindow saveWindow;
+    private final SaveWindow saveWindow;
 
     private SplitLegion(Client client, String parentId, String selectedMarkerId)
     {
@@ -70,6 +70,18 @@ final class SplitLegion extends KDialog implements MouseListener,
 
         if (selectedMarkerId == null)
         {
+            // TODO this should probably just throw an exception or
+            // even use an assert statement
+            oldMarker = null;
+            newMarker = null;
+            oldBox = null;
+            newBox = null;
+            buttonBox = null;
+            button1 = null;
+            button2 = null;
+            scale = 0;
+            totalChits = 0;
+            saveWindow = null;
             dispose();
             return;
         }
@@ -95,13 +107,13 @@ final class SplitLegion extends KDialog implements MouseListener,
         oldBox.add(Box.createRigidArea(new Dimension(scale / 4, 0)));
         oldBox.add(Box.createHorizontalGlue());
 
-        List imageNames = client.getLegionImageNames(parentId);
+        List<String> imageNames = client.getLegionImageNames(parentId);
         totalChits = imageNames.size();
 
-        Iterator it = imageNames.iterator();
+        Iterator<String> it = imageNames.iterator();
         while (it.hasNext())
         {
-            String imageName = (String)it.next();
+            String imageName = it.next();
             Chit chit = new Chit(scale, imageName);
             oldChits.add(chit);
             oldBox.add(chit);

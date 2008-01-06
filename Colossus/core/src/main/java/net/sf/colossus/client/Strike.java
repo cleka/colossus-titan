@@ -36,9 +36,9 @@ public final class Strike
 
     /** Return the set of hex labels for hexes with critters that have
      *  valid strike targets. */
-    Set findCrittersWithTargets()
+    Set<String> findCrittersWithTargets()
     {
-        Set set = new HashSet();
+        Set<String> set = new HashSet<String>();
         Iterator<BattleChit> it = client.getActiveBattleChits().iterator();
         while (it.hasNext())
         {
@@ -78,10 +78,10 @@ public final class Strike
             BattleChit chit = it.next();
             if (!chit.hasStruck())
             {
-                Set set = findStrikes(chit, rangestrike);
+                Set<String> set = findStrikes(chit, rangestrike);
                 if (set.size() == 1)
                 {
-                    String hexLabel = (String)(set.iterator().next());
+                    String hexLabel = (set.iterator().next());
                     client.strike(chit.getTag(), hexLabel);
                     return true;
                 }
@@ -96,7 +96,7 @@ public final class Strike
         return findStrikes(striker, true).contains(targetHexLabel);
     }
 
-    Set findStrikes(int tag)
+    Set<String> findStrikes(int tag)
     {
         BattleChit chit = client.getBattleChit(tag);
         return findStrikes(chit, true);
@@ -105,9 +105,9 @@ public final class Strike
     /** Return a set of hex labels for hexes containing targets that the
      *  critter may strike.  Only include rangestrikes if rangestrike
      *  is true. */
-    private Set findStrikes(BattleChit chit, boolean rangestrike)
+    private Set<String> findStrikes(BattleChit chit, boolean rangestrike)
     {
-        Set set = new HashSet();
+        Set<String> set = new HashSet<String>();
 
         // Each creature may strike only once per turn.
         if (chit.hasStruck())
@@ -157,7 +157,8 @@ public final class Strike
         if (rangestrike && !adjacentEnemy && creature.isRangestriker()
             && client.getBattlePhase() != Constants.BattlePhase.STRIKEBACK)
         {
-            Iterator<BattleChit> it = client.getInactiveBattleChits().iterator();
+            Iterator<BattleChit> it = client.getInactiveBattleChits()
+                .iterator();
             while (it.hasNext())
             {
                 BattleChit target = it.next();

@@ -31,14 +31,14 @@ import net.sf.colossus.util.KDialog;
 
 final class Negotiate extends KDialog implements MouseListener, ActionListener
 {
-    private String attackerId;
-    private String defenderId;
-    private List<Chit> attackerChits = new ArrayList<Chit>();
-    private List<Chit> defenderChits = new ArrayList<Chit>();
-    private Client client;
+    private final String attackerId;
+    private final String defenderId;
+    private final List<Chit> attackerChits = new ArrayList<Chit>();
+    private final List<Chit> defenderChits = new ArrayList<Chit>();
+    private final Client client;
     private Proposal proposal;
     private Point location;
-    private SaveWindow saveWindow;
+    private final SaveWindow saveWindow;
 
     Negotiate(Client client, String attackerId, String defenderId)
     {
@@ -100,11 +100,11 @@ final class Negotiate extends KDialog implements MouseListener, ActionListener
         pane.add(marker);
         pane.add(Box.createRigidArea(new Dimension(scale / 4, 0)));
 
-        List imageNames = client.getLegionImageNames(markerId);
-        Iterator it = imageNames.iterator();
+        List<String> imageNames = client.getLegionImageNames(markerId);
+        Iterator<String> it = imageNames.iterator();
         while (it.hasNext())
         {
-            String imageName = (String)it.next();
+            String imageName = it.next();
             Chit chit = new Chit(scale, imageName);
             chit.addMouseListener(this);
             chits.add(chit);

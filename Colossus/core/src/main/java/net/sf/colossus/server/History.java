@@ -142,11 +142,11 @@ public class History
         {
             return;
         }
-        List kids = root.getChildren();
-        Iterator it = kids.iterator();
+        List<Element> kids = root.getChildren();
+        Iterator<Element> it = kids.iterator();
         while (it.hasNext())
         {
-            Element el = (Element)it.next();
+            Element el = it.next();
             fireEventFromElement(server, el);
         }
     }
@@ -163,20 +163,20 @@ public class History
             String playerName = null;
             if (viewEl != null)
             {
-                List viewers = viewEl.getChildren();
-                Iterator it = viewers.iterator();
+                List<Element> viewers = viewEl.getChildren();
+                Iterator<Element> it = viewers.iterator();
                 while (it.hasNext())
                 {
-                    Element viewer = (Element)it.next();
+                    Element viewer = it.next();
                     playerName = viewer.getTextNormalize();
                     playerNames.add(playerName);
                 }
             }
             List creatureNames = new ArrayList();
-            List creatures = el.getChild("creatures").getChildren();
-            for (Iterator it = creatures.iterator(); it.hasNext();)
+            List<Element> creatures = el.getChild("creatures").getChildren();
+            for (Iterator<Element> it = creatures.iterator(); it.hasNext();)
             {
-                Element creature = (Element)it.next();
+                Element creature = it.next();
                 String creatureName = creature.getTextNormalize();
                 creatureNames.add(creatureName);
             }
@@ -198,11 +198,11 @@ public class History
             String turnString = el.getAttributeValue("turn");
             int turn = Integer.parseInt(turnString);
             List creatureNames = new ArrayList();
-            List splitoffs = el.getChild("splitoffs").getChildren();
-            Iterator it = splitoffs.iterator();
+            List<Element> splitoffs = el.getChild("splitoffs").getChildren();
+            Iterator<Element> it = splitoffs.iterator();
             while (it.hasNext())
             {
-                Element creature = (Element)it.next();
+                Element creature = it.next();
                 String creatureName = creature.getTextNormalize();
                 creatureNames.add(creatureName);
             }

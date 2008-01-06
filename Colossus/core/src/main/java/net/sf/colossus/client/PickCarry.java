@@ -21,12 +21,13 @@ import net.sf.colossus.util.KDialog;
  */
 final class PickCarry extends KDialog implements ActionListener
 {
-    private Client client;
+    private final Client client;
     private static final String cancel = "Decline carry";
-    private SaveWindow saveWindow;
+    private final SaveWindow saveWindow;
 
     /** Each choice is a String of form "Warbear in Plains Hex G3" */
-    PickCarry(JFrame parentFrame, Client client, int carryDamage, Set choices)
+    PickCarry(JFrame parentFrame, Client client, int carryDamage,
+        Set<String> choices)
     {
         super(parentFrame, "Apply " + carryDamage
             + (carryDamage == 1 ? "carry to:" : " carries to:"), false);
@@ -37,10 +38,10 @@ final class PickCarry extends KDialog implements ActionListener
 
         addButton(cancel);
 
-        Iterator it = choices.iterator();
+        Iterator<String> it = choices.iterator();
         while (it.hasNext())
         {
-            String choice = (String)it.next();
+            String choice = it.next();
             addButton(choice);
         }
 

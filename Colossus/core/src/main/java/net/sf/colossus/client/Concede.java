@@ -32,11 +32,11 @@ import net.sf.colossus.util.KDialog;
 
 final class Concede extends KDialog implements ActionListener, WindowListener
 {
-    private boolean flee;
+    private final boolean flee;
     private Point location;
-    private Client client;
-    private String allyMarkerId;
-    private SaveWindow saveWindow;
+    private final Client client;
+    private final String allyMarkerId;
+    private final SaveWindow saveWindow;
 
     private Concede(Client client, JFrame parentFrame, String allyMarkerId,
         String enemyMarkerId, boolean flee)
@@ -116,11 +116,11 @@ final class Concede extends KDialog implements ActionListener, WindowListener
         pane.add(pointsPanel);
         pane.add(Box.createRigidArea(new Dimension(scale / 4, 0)));
 
-        List imageNames = client.getLegionImageNames(markerId);
-        Iterator it = imageNames.iterator();
+        List<String> imageNames = client.getLegionImageNames(markerId);
+        Iterator<String> it = imageNames.iterator();
         while (it.hasNext())
         {
-            String imageName = (String)it.next();
+            String imageName = it.next();
             Chit chit = new Chit(scale, imageName);
             pane.add(chit);
         }

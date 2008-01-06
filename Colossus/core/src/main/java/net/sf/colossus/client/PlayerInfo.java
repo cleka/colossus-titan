@@ -18,6 +18,7 @@ import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
 /**
  * PlayerInfo holds client-side public info about a player.
+ * 
  * @version $Id$ 
  * @author David Ripton
  */
@@ -57,35 +58,35 @@ public final class PlayerInfo extends PlayerState
      */
     void update(String infoString)
     {
-        List data = Split.split(":", infoString);
+        List<String> data = Split.split(":", infoString);
         String buf;
 
-        buf = (String)data.remove(0);
+        buf = data.remove(0);
         setDead(Boolean.valueOf(buf).booleanValue());
 
-        setName((String)data.remove(0));
+        setName(data.remove(0));
 
-        setTower((String)data.remove(0));
+        setTower(data.remove(0));
 
-        setColor((String)data.remove(0));
+        setColor(data.remove(0));
 
-        setType((String)data.remove(0));
+        setType(data.remove(0));
 
-        setPlayersElim((String)data.remove(0));
+        setPlayersElim(data.remove(0));
 
-        buf = (String)data.remove(0);
+        buf = data.remove(0);
         setNumLegions(Integer.parseInt(buf));
 
-        buf = (String)data.remove(0);
+        buf = data.remove(0);
         setNumCreatures(Integer.parseInt(buf));
 
-        buf = (String)data.remove(0);
+        buf = data.remove(0);
         setTitanPower(Integer.parseInt(buf));
 
-        buf = (String)data.remove(0);
+        buf = data.remove(0);
         setScore(Integer.parseInt(buf));
 
-        buf = (String)data.remove(0);
+        buf = data.remove(0);
         setMulligansLeft(Integer.parseInt(buf));
 
         setMarkersAvailable(data);
@@ -179,7 +180,7 @@ public final class PlayerInfo extends PlayerState
         return numLegions;
     }
 
-    void setMarkersAvailable(Collection markersAvailable)
+    void setMarkersAvailable(Collection<String> markersAvailable)
     {
         this.markersAvailable.clear();
         if (!markersAvailable.isEmpty())
@@ -262,10 +263,10 @@ public final class PlayerInfo extends PlayerState
 
     boolean hasTeleported()
     {
-        Iterator it = getLegionIds().iterator();
+        Iterator<String> it = getLegionIds().iterator();
         while (it.hasNext())
         {
-            String markerId = (String)it.next();
+            String markerId = it.next();
             LegionInfo info = client.getLegionInfo(markerId);
             if (info.hasTeleported())
             {
@@ -280,10 +281,10 @@ public final class PlayerInfo extends PlayerState
     {
         int count = 0;
 
-        Iterator it = getLegionIds().iterator();
+        Iterator<String> it = getLegionIds().iterator();
         while (it.hasNext())
         {
-            String markerId = (String)it.next();
+            String markerId = it.next();
             LegionInfo legion = client.getLegionInfo(markerId);
             if (legion.hasMoved())
             {
@@ -306,10 +307,10 @@ public final class PlayerInfo extends PlayerState
 
     void removeAllLegions()
     {
-        Iterator it = getLegionIds().iterator();
+        Iterator<String> it = getLegionIds().iterator();
         while (it.hasNext())
         {
-            String id = (String)it.next();
+            String id = it.next();
             client.removeLegion(id);
         }
     }

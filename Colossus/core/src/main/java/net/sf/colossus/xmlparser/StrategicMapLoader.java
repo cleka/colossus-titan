@@ -44,10 +44,10 @@ public class StrategicMapLoader
             hexes = new MasterHex[this.horizSize][this.vertSize];
             show = new boolean[this.horizSize][this.vertSize];
 
-            List hexlist = root.getChildren("hex");
-            for (Iterator it = hexlist.iterator(); it.hasNext();)
+            List<Element> hexlist = root.getChildren("hex");
+            for (Iterator<Element> it = hexlist.iterator(); it.hasNext();)
             {
-                Element el = (Element)it.next();
+                Element el = it.next();
                 handleHex(el);
             }
         }
@@ -76,11 +76,11 @@ public class StrategicMapLoader
         hex.setXCoord(xpos);
         hex.setYCoord(ypos);
 
-        List exits = el.getChildren("exit");
+        List<Element> exits = el.getChildren("exit");
         int i = 0;
-        for (Iterator it = exits.iterator(); it.hasNext();)
+        for (Iterator<Element> it = exits.iterator(); it.hasNext();)
         {
-            Element exit = (Element)it.next();
+            Element exit = it.next();
             String sExitType = exit.getAttributeValue("type");
             int iExitType = Constants.hexsideMap.get(sExitType)
                 .intValue();

@@ -2,6 +2,7 @@ package net.sf.colossus.server;
 
 
 import java.util.ArrayList;
+import java.util.List;
 
 import junit.framework.TestCase;
 
@@ -23,13 +24,13 @@ public class BalancedTowersTest extends TestCase
         int numPlayers = 4;
         int numTowers = 6;
 
-        ArrayList towerList = new ArrayList();
+        List<String> towerList = new ArrayList<String>();
         for (int i = 0; i < numTowers; i++)
         {
             towerList.add("" + 100 * (i + 1));
         }
 
-        ArrayList results = Game.getBalancedTowers(numPlayers, towerList);
+        List<String> results = Game.getBalancedTowers(numPlayers, towerList);
 
         assertTrue(results.size() == 4);
         assertTrue((results.contains("100") && results.contains("200")

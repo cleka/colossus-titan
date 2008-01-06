@@ -34,7 +34,7 @@ final class PickColor extends KDialog implements WindowListener,
     private static final Color[] background;
     private static final Color[] foreground;
     private static String color;
-    private SaveWindow saveWindow;
+    private final SaveWindow saveWindow;
 
     static
     {
@@ -51,8 +51,8 @@ final class PickColor extends KDialog implements WindowListener,
         }
     }
 
-    private PickColor(JFrame parentFrame, String playerName, List colorsLeft,
-        IOptions options)
+    private PickColor(JFrame parentFrame, String playerName,
+        List<String> colorsLeft, IOptions options)
     {
         super(parentFrame, playerName + ", Pick a Color", true);
 
@@ -96,7 +96,7 @@ final class PickColor extends KDialog implements WindowListener,
     }
 
     static String pickColor(JFrame parentFrame, String playerName,
-        List colorsLeft, IOptions options)
+        List<String> colorsLeft, IOptions options)
     {
         new PickColor(parentFrame, playerName, colorsLeft, options);
         return color;
@@ -145,7 +145,7 @@ final class PickColor extends KDialog implements WindowListener,
     public static void main(String[] args)
     {
         Logger logger = Logger.getLogger(PickColor.class.getName());
-        List colorsLeft = Arrays.asList(Constants.colorNames);
+        List<String> colorsLeft = Arrays.asList(Constants.colorNames);
         Options options = new Options("Player");
         String color = pickColor(new JFrame(), "Player", colorsLeft, options);
         logger.info("Picked " + color);

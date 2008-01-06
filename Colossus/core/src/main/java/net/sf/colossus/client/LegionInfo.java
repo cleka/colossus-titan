@@ -192,11 +192,11 @@ public final class LegionInfo extends Legion
     List<Boolean> getCertainties()
     {
         List<Boolean> booleans = new ArrayList<Boolean>();
-        List cil = getNode().getCreatures();
-        Iterator it = cil.iterator();
+        List<CreatureInfo> cil = getNode().getCreatures();
+        Iterator<CreatureInfo> it = cil.iterator();
         while (it.hasNext())
         {
-            CreatureInfo ci = (CreatureInfo)it.next();
+            CreatureInfo ci = it.next();
             booleans.add(new Boolean(ci.isCertain()));
         }
         return booleans;
@@ -237,7 +237,7 @@ public final class LegionInfo extends Legion
     }
 
     /** Reveal creatures in this legion, some of which already may be known. */
-    void revealCreatures(final List names)
+    void revealCreatures(final List<String> names)
     {
         getNode().revealCreatures(names);
     }
@@ -347,11 +347,11 @@ public final class LegionInfo extends Legion
     public int getCertainPointValue()
     {
         int sum = 0;
-        Iterator it = getNode().getCertainCreatures().getCreatureNames()
-            .iterator();
+        Iterator<String> it = getNode().getCertainCreatures()
+            .getCreatureNames().iterator();
         while (it.hasNext())
         {
-            String name = (String)it.next();
+            String name = it.next();
             if (name.startsWith(Constants.titan))
             {
                 PlayerInfo info = client.getPlayerInfo(playerName);
@@ -484,12 +484,10 @@ public final class LegionInfo extends Legion
 
     /** Sorts Titans first, then decreasing order of kill value, then
      *  Unknowns last */
-    class CreatureNameComparator implements Comparator
+    class CreatureNameComparator implements Comparator<String>
     {
-        public int compare(Object o1, Object o2)
+        public int compare(String s1, String s2)
         {
-            String s1 = (String)o1;
-            String s2 = (String)o2;
             if (s1.equals(s2))
             {
                 return 0;

@@ -115,7 +115,7 @@ final class BattleMovement
         return !client.getBattleChits(hexLabel).isEmpty();
     }
 
-    Set showMoves(int tag)
+    Set<String> showMoves(int tag)
     {
         BattleChit chit = client.getBattleChit(tag);
         return showMoves(chit);

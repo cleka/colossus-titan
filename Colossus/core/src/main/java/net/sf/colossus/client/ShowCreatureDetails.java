@@ -125,8 +125,8 @@ public final class ShowCreatureDetails extends KDialog implements
             .isLord() ? "<u><b>Lord</b></u>" : "<b>Demi-Lord</b>")
             : _low("no"));
         StringBuffer buf = new StringBuffer();
-        for (Iterator<HazardTerrain> iterator = HazardTerrain.getAllHazardTerrains()
-            .iterator(); iterator.hasNext();)
+        for (Iterator<HazardTerrain> iterator = HazardTerrain
+            .getAllHazardTerrains().iterator(); iterator.hasNext();)
         {
             HazardTerrain terrain = iterator.next();
             if (creature.isNativeTerrain(terrain))
@@ -154,10 +154,10 @@ public final class ShowCreatureDetails extends KDialog implements
         for (int ti = 0; ti < terrains.length; ti++)
         {
             buf = new StringBuffer();
-            List recruiters = Creature.getCreatures();
+            List<Creature> recruiters = Creature.getCreatures();
             for (int ri = 0; ri < recruiters.size(); ri++)
             {
-                final Creature recruiter = (Creature)recruiters.get(ri);
+                final Creature recruiter = recruiters.get(ri);
                 int num = TerrainRecruitLoader.numberOfRecruiterNeeded(
                     recruiter, creature, terrains[ti], null);
                 if (num == 1)
@@ -191,10 +191,10 @@ public final class ShowCreatureDetails extends KDialog implements
         for (int ti = 0; ti < terrains.length; ti++)
         {
             buf = new StringBuffer();
-            List recruits = Creature.getCreatures();
+            List<Creature> recruits = Creature.getCreatures();
             for (int ri = 0; ri < recruits.size(); ri++)
             {
-                final Creature recruit = (Creature)recruits.get(ri);
+                final Creature recruit = recruits.get(ri);
                 int num = TerrainRecruitLoader.numberOfRecruiterNeeded(
                     creature, recruit, terrains[ti], null);
                 if ((num > 0) && (num < RecruitGraph.BIGNUM))
@@ -236,8 +236,8 @@ public final class ShowCreatureDetails extends KDialog implements
         //   hazards row 1
         s.append("<tr><td ROWSPAN=2 align=right>" + creature.getName()
             + " in</td><td></td>");
-        for (Iterator<HazardTerrain> iterator = HazardTerrain.getAllHazardTerrains()
-            .iterator(); iterator.hasNext();)
+        for (Iterator<HazardTerrain> iterator = HazardTerrain
+            .getAllHazardTerrains().iterator(); iterator.hasNext();)
         {
             iterator.next(); // skip one
             if (!iterator.hasNext())
@@ -257,8 +257,8 @@ public final class ShowCreatureDetails extends KDialog implements
         s.append("</tr>");
         //   hazards row 2
         s.append("<tr>");
-        for (Iterator<HazardTerrain> iterator = HazardTerrain.getAllHazardTerrains()
-            .iterator(); iterator.hasNext();)
+        for (Iterator<HazardTerrain> iterator = HazardTerrain
+            .getAllHazardTerrains().iterator(); iterator.hasNext();)
         {
             HazardTerrain terrain = iterator.next();
             critter.setNewHazardHex(terrain);
@@ -277,8 +277,8 @@ public final class ShowCreatureDetails extends KDialog implements
         //   the info: the table content
         //   ... my strike power
         s.append("<tr><th nowrap>my Strike Power</th>");
-        for (Iterator<HazardTerrain> iterator = HazardTerrain.getAllHazardTerrains()
-            .iterator(); iterator.hasNext();)
+        for (Iterator<HazardTerrain> iterator = HazardTerrain
+            .getAllHazardTerrains().iterator(); iterator.hasNext();)
         {
             HazardTerrain terrain = iterator.next();
             critter.setNewHazardHex(terrain);
@@ -290,8 +290,8 @@ public final class ShowCreatureDetails extends KDialog implements
         s.append("<td bgcolor=#dddddd></td></tr>");
         //   ... my strike skill
         s.append("<tr><th nowrap>my Strike Skill</th>");
-        for (Iterator<HazardTerrain> iterator = HazardTerrain.getAllHazardTerrains()
-            .iterator(); iterator.hasNext();)
+        for (Iterator<HazardTerrain> iterator = HazardTerrain
+            .getAllHazardTerrains().iterator(); iterator.hasNext();)
         {
             HazardTerrain terrain = iterator.next();
             critter.setNewHazardHex(terrain);

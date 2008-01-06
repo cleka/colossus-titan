@@ -26,12 +26,13 @@ import net.sf.colossus.util.KDialog;
 
 final class PickLord extends KDialog implements MouseListener, WindowListener
 {
-    private List<Chit> chits = new ArrayList<Chit>();
+    private final List<Chit> chits = new ArrayList<Chit>();
     private static String lordType;
-    private List imageNames;
-    private SaveWindow saveWindow;
+    private final List<String> imageNames;
+    private final SaveWindow saveWindow;
 
-    private PickLord(IOptions options, JFrame parentFrame, List imageNames)
+    private PickLord(IOptions options, JFrame parentFrame,
+        List<String> imageNames)
     {
         super(parentFrame, "Reveal Which Lord?", true);
 
@@ -46,10 +47,10 @@ final class PickLord extends KDialog implements MouseListener, WindowListener
         pack();
         setBackground(Color.lightGray);
 
-        Iterator it = imageNames.iterator();
+        Iterator<String> it = imageNames.iterator();
         while (it.hasNext())
         {
-            String imageName = (String)it.next();
+            String imageName = it.next();
             Chit chit = new Chit(4 * Scale.get(), imageName);
             chits.add(chit);
             contentPane.add(chit);
@@ -72,7 +73,7 @@ final class PickLord extends KDialog implements MouseListener, WindowListener
     }
 
     static String pickLord(IOptions options, JFrame parentFrame,
-        List imageNames)
+        List<String> imageNames)
     {
         new PickLord(options, parentFrame, imageNames);
         return lordType;
@@ -85,7 +86,7 @@ final class PickLord extends KDialog implements MouseListener, WindowListener
         int i = chits.indexOf(source);
         if (i != -1)
         {
-            lordType = (String)imageNames.get(i);
+            lordType = imageNames.get(i);
             if (lordType.startsWith(Constants.titan))
             {
                 lordType = Constants.titan;

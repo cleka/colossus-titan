@@ -29,14 +29,14 @@ import net.sf.colossus.util.KDialog;
 final class PickRecruiter extends KDialog implements MouseListener,
     WindowListener
 {
-    private List recruiters;
-    private List<Chit> recruiterChits = new ArrayList<Chit>();
-    private Marker legionMarker;
+    private final List<String> recruiters;
+    private final List<Chit> recruiterChits = new ArrayList<Chit>();
+    private final Marker legionMarker;
     private static String recruiterName;
-    private SaveWindow saveWindow;
+    private final SaveWindow saveWindow;
 
     /** recruiters is a list of creature name strings */
-    private PickRecruiter(JFrame parentFrame, List recruiters,
+    private PickRecruiter(JFrame parentFrame, List<String> recruiters,
         String hexDescription, String markerId, Client client)
     {
         super(parentFrame, client.getPlayerName() + ": Pick Recruiter in "
@@ -58,11 +58,11 @@ final class PickRecruiter extends KDialog implements MouseListener,
         legionMarker = new Marker(scale, markerId);
         legionPane.add(legionMarker);
 
-        List imageNames = client.getLegionImageNames(markerId);
-        Iterator it = imageNames.iterator();
+        List<String> imageNames = client.getLegionImageNames(markerId);
+        Iterator<String> it = imageNames.iterator();
         while (it.hasNext())
         {
-            String imageName = (String)it.next();
+            String imageName = it.next();
             Chit chit = new Chit(scale, imageName);
             legionPane.add(chit);
         }
@@ -74,7 +74,7 @@ final class PickRecruiter extends KDialog implements MouseListener,
         it = recruiters.iterator();
         while (it.hasNext())
         {
-            String recruiterName = (String)it.next();
+            String recruiterName = it.next();
             if (recruiterName.equals(Constants.titan))
             {
                 recruiterName = client.getTitanBasename(markerId);
@@ -101,7 +101,7 @@ final class PickRecruiter extends KDialog implements MouseListener,
         repaint();
     }
 
-    static String pickRecruiter(JFrame parentFrame, List recruiters,
+    static String pickRecruiter(JFrame parentFrame, List<String> recruiters,
         String hexDescription, String markerId, Client client)
     {
         new PickRecruiter(parentFrame, recruiters, hexDescription, markerId,
@@ -116,7 +116,7 @@ final class PickRecruiter extends KDialog implements MouseListener,
         int i = recruiterChits.indexOf(source);
         if (i != -1)
         {
-            recruiterName = (String)recruiters.get(i);
+            recruiterName = recruiters.get(i);
             if (recruiterName.startsWith(Constants.titan))
             {
                 recruiterName = Constants.titan;

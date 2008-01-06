@@ -30,14 +30,14 @@ import net.sf.colossus.util.KDialog;
 final class AcquireAngel extends KDialog implements MouseListener,
     WindowListener, ActionListener
 {
-    private List<Chit> chits = new ArrayList<Chit>();
-    private List recruits;
-    private Client client;
-    private String markerId;
-    private SaveWindow saveWindow;
+    private final List<Chit> chits = new ArrayList<Chit>();
+    private final List<String> recruits;
+    private final Client client;
+    private final String markerId;
+    private final SaveWindow saveWindow;
 
     AcquireAngel(JFrame parentFrame, Client client, String markerId,
-        List recruits)
+        List<String> recruits)
     {
         super(parentFrame, client.getPlayerName()
             + ": Acquire Angel in legion " + markerId, false);
@@ -54,10 +54,10 @@ final class AcquireAngel extends KDialog implements MouseListener,
 
         setBackground(Color.lightGray);
 
-        Iterator it = recruits.iterator();
+        Iterator<String> it = recruits.iterator();
         while (it.hasNext())
         {
-            String creatureName = (String)it.next();
+            String creatureName = it.next();
             Chit chit = new Chit(4 * Scale.get(), creatureName);
             chits.add(chit);
             contentPane.add(chit);
@@ -101,7 +101,7 @@ final class AcquireAngel extends KDialog implements MouseListener,
         int i = chits.indexOf(source);
         if (i != -1)
         {
-            cleanup((String)recruits.get(i));
+            cleanup(recruits.get(i));
         }
     }
 
@@ -121,7 +121,7 @@ final class AcquireAngel extends KDialog implements MouseListener,
         {
             if (recruits.size() == 1)
             {
-                cleanup((String)recruits.get(0));
+                cleanup(recruits.get(0));
             }
             else
             {

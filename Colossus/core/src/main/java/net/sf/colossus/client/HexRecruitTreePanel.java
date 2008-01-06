@@ -38,15 +38,15 @@ public class HexRecruitTreePanel extends Box
         terrainLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         add(terrainLabel);
 
-        List creatures = TerrainRecruitLoader.getPossibleRecruits(terrain,
-            hexLabel);
-        Iterator it = creatures.iterator();
+        List<Creature> creatures = TerrainRecruitLoader.getPossibleRecruits(
+            terrain, hexLabel);
+        Iterator<Creature> it = creatures.iterator();
         boolean firstTime = true;
         int scale = 4 * Scale.get();
         Creature prevCreature = Creature.getCreatureByName(Constants.titan);
         while (it.hasNext())
         {
-            Creature creature = (Creature)it.next();
+            Creature creature = it.next();
 
             int numToRecruit;
             if (firstTime)

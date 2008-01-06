@@ -35,15 +35,15 @@ import net.sf.colossus.util.KDialog;
 final class PickRecruit extends KDialog implements MouseListener,
     WindowListener, ActionListener
 {
-    private List recruits; // of Creatures
-    private List<Chit> recruitChits = new ArrayList<Chit>();
-    private Marker legionMarker;
-    private List<Chit> legionChits = new ArrayList<Chit>();
+    private final List<Creature> recruits;
+    private final List<Chit> recruitChits = new ArrayList<Chit>();
+    private final Marker legionMarker;
+    private final List<Chit> legionChits = new ArrayList<Chit>();
     private static String recruit;
     private static boolean active;
-    private SaveWindow saveWindow;
+    private final SaveWindow saveWindow;
 
-    private PickRecruit(JFrame parentFrame, List recruits,
+    private PickRecruit(JFrame parentFrame, List<Creature> recruits,
         String hexDescription, String markerId, Client client)
     {
         super(parentFrame, client.getPlayerName() + ": Pick Recruit in "
@@ -64,11 +64,11 @@ final class PickRecruit extends KDialog implements MouseListener,
         legionMarker = new Marker(scale, markerId);
         legionPane.add(legionMarker);
 
-        List imageNames = client.getLegionImageNames(markerId);
-        Iterator it = imageNames.iterator();
-        while (it.hasNext())
+        List<String> imageNames = client.getLegionImageNames(markerId);
+        Iterator<String> itName = imageNames.iterator();
+        while (itName.hasNext())
         {
-            String imageName = (String)it.next();
+            String imageName = itName.next();
             Chit chit = new Chit(scale, imageName);
             legionChits.add(chit);
             legionPane.add(chit);
@@ -77,7 +77,7 @@ final class PickRecruit extends KDialog implements MouseListener,
         JPanel recruitPane = new JPanel();
         contentPane.add(recruitPane);
 
-        it = recruits.iterator();
+        Iterator<Creature> it = recruits.iterator();
         int i = 0;
         while (it.hasNext())
         {
@@ -85,7 +85,7 @@ final class PickRecruit extends KDialog implements MouseListener,
             vertPane.setAlignmentY(0);
             recruitPane.add(vertPane);
 
-            Creature recruit = (Creature)it.next();
+            Creature recruit = it.next();
             String recruitName = recruit.getName();
             Chit chit = new Chit(scale, recruitName);
             recruitChits.add(chit);
@@ -120,7 +120,7 @@ final class PickRecruit extends KDialog implements MouseListener,
     }
 
     /** Return the creature recruited, or null if none. */
-    static String pickRecruit(JFrame parentFrame, java.util.List recruits,
+    static String pickRecruit(JFrame parentFrame, List<Creature> recruits,
         String hexDescription, String markerId, Client client)
     {
         recruit = null;
@@ -142,7 +142,7 @@ final class PickRecruit extends KDialog implements MouseListener,
         if (i != -1)
         {
             // Recruit the chosen creature.
-            recruit = ((Creature)recruits.get(i)).getName();
+            recruit = (recruits.get(i)).getName();
             dispose();
         }
     }

@@ -25,7 +25,6 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
-import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -95,7 +94,7 @@ final class EventViewer extends KDialog implements WindowListener,
 
     private boolean visible;
 
-    private List<RevealEvent> syncdEventList = Collections
+    private final List<RevealEvent> syncdEventList = Collections
         .synchronizedList(new ArrayList<RevealEvent>());
     private int bookmark = 0;
     final private ArrayList<JPanel> displayQueue = new ArrayList<JPanel>();
@@ -132,7 +131,7 @@ final class EventViewer extends KDialog implements WindowListener,
 
     // boolean flags for them as local flags for quick access:
     // Index for this are the EventXXX constants in RevealEvent.java.
-    private boolean[] showEventType;
+    private final boolean[] showEventType;
 
     private boolean autoScroll;
     private boolean hideUndoneEvents;
@@ -141,12 +140,11 @@ final class EventViewer extends KDialog implements WindowListener,
     // how many back are currently displayed
     private int maxTurns = 1;
 
-    
     private int mulliganOldRoll = -2;
-    
+
     private String attackerId;
     private String defenderId;
-    
+
     private RevealEvent attackerEventLegion = null;
     private RevealEvent defenderEventLegion = null;
 
@@ -156,7 +154,6 @@ final class EventViewer extends KDialog implements WindowListener,
     private RevealEvent winnerLegion = null;
     private RevealEvent loserLegion = null;
 
-    
     /** 
      * Inits the dialog, not necessarily displays it.
      * 
@@ -351,7 +348,7 @@ final class EventViewer extends KDialog implements WindowListener,
 
         int maxVal = this.expireTurns == -1 ? 1000 : this.expireTurns;
 
-        ArrayList alChoices = new ArrayList();
+        List<String> alChoices = new ArrayList<String>();
         int i;
         for (i = 1; i <= maxVal; i++)
         {
@@ -621,7 +618,8 @@ final class EventViewer extends KDialog implements WindowListener,
                 bookmark = 0;
             }
 
-            ListIterator<RevealEvent> it = syncdEventList.listIterator(bookmark);
+            ListIterator<RevealEvent> it = syncdEventList
+                .listIterator(bookmark);
             while (it.hasNext())
             {
                 RevealEvent e = it.next();
@@ -656,7 +654,7 @@ final class EventViewer extends KDialog implements WindowListener,
     {
         RevealEvent e = new RevealEvent(client, client.getTurnNumber(),
             getActivePlayerNum(), eventType, roll1, roll2);
-        addEvent(e);    
+        addEvent(e);
     }
 
     // creature related event:
@@ -709,10 +707,10 @@ final class EventViewer extends KDialog implements WindowListener,
             //       so no update needed at all.
         }
     }
-    
+
     public void setMulliganOldRoll(int roll)
     {
-        mulliganOldRoll = roll;    
+        mulliganOldRoll = roll;
     }
 
     public void tellMovementRoll(int roll)
@@ -735,27 +733,26 @@ final class EventViewer extends KDialog implements WindowListener,
     {
         this.attackerId = attackerId;
         this.defenderId = defenderId;
-        
+
         attackerEventLegion = new RevealEvent(client, turnNumber,
             getActivePlayerNum(), RevealEvent.eventBattle, attackerId,
-            getLegionInfo(attackerId).getHeight(), new ArrayList<RevealedCreature>(),
-            null, 0);
+            getLegionInfo(attackerId).getHeight(),
+            new ArrayList<RevealedCreature>(), null, 0);
         attackerEventLegion.setEventInfo(Constants.reasonBattleStarts);
-        attackerEventLegion
-            .setRealPlayer(client.getPlayerNameByMarkerId(attackerId));
+        attackerEventLegion.setRealPlayer(client
+            .getPlayerNameByMarkerId(attackerId));
 
         defenderEventLegion = new RevealEvent(client, turnNumber,
             getActivePlayerNum(), RevealEvent.eventBattle, defenderId,
-            getLegionInfo(defenderId).getHeight(), new ArrayList<RevealedCreature>(),
-            null, 0);
+            getLegionInfo(defenderId).getHeight(),
+            new ArrayList<RevealedCreature>(), null, 0);
 
         defenderEventLegion.setEventInfo(Constants.reasonBattleStarts);
-        defenderEventLegion
-            .setRealPlayer(client.getPlayerNameByMarkerId(defenderId));
+        defenderEventLegion.setRealPlayer(client
+            .getPlayerNameByMarkerId(defenderId));
     }
-    
-    public void tellEngagementResults(String winnerId,
-        String method, int turns)
+
+    public void tellEngagementResults(String winnerId, String method, int turns)
     {
         // if those are not set, we are new version client with old
         // version server, who does not provide the reason argument
@@ -796,7 +793,7 @@ final class EventViewer extends KDialog implements WindowListener,
             attackerEventLegion.setEventType(RevealEvent.eventLost);
             attackerEventLegion.setEventInfo("mutual");
             addEvent(attackerEventLegion);
-           
+
             // defenderEventLegion.setAllDead();
             defenderEventLegion.setEventType(RevealEvent.eventLost);
             defenderEventLegion.setEventInfo("mutual");
@@ -854,12 +851,12 @@ final class EventViewer extends KDialog implements WindowListener,
         winnerLegion = null;
         loserLegion = null;
     }
-    
-    public void newCreatureRevealEvent(int eventType, String markerId1, 
+
+    public void newCreatureRevealEvent(int eventType, String markerId1,
         int height1, String creature, String markerId2, int height2)
     {
         RevealedCreature rc = new RevealedCreature(creature);
-        switch(eventType)
+        switch (eventType)
         {
             case RevealEvent.eventSummon:
                 rc.setWasSummoned(true);
@@ -868,10 +865,10 @@ final class EventViewer extends KDialog implements WindowListener,
                 rc.setDidTeleport(true);
                 break;
             default:
-                LOGGER.log(Level.SEVERE, "Invalid event type " +
-                    RevealEvent.getEventTypeText(eventType) +
-                    " in newCreatureRevealEvent: markerId " + markerId1 +
-                    ", creature " + creature);  
+                LOGGER.log(Level.SEVERE, "Invalid event type "
+                    + RevealEvent.getEventTypeText(eventType)
+                    + " in newCreatureRevealEvent: markerId " + markerId1
+                    + ", creature " + creature);
         }
 
         ArrayList<RevealedCreature> rcList = new ArrayList<RevealedCreature>(1);
@@ -889,7 +886,7 @@ final class EventViewer extends KDialog implements WindowListener,
         addEvent(e);
     }
 
-    public void revealCreatures(String markerId, final List names,
+    public void revealCreatures(String markerId, final List<String> names,
         String reason)
     {
         // EventViewer stuff:
@@ -920,11 +917,11 @@ final class EventViewer extends KDialog implements WindowListener,
 
             if (otherEvent != null)
             {
-                ArrayList<RevealedCreature> rcNames = new ArrayList<RevealedCreature>();
-                Iterator it = names.iterator();
+                List<RevealedCreature> rcNames = new ArrayList<RevealedCreature>();
+                Iterator<String> it = names.iterator();
                 while (it.hasNext())
                 {
-                    String name = (String)it.next();
+                    String name = it.next();
                     RevealedCreature rc = new RevealedCreature(name);
                     rcNames.add(rc);
                 }
@@ -934,12 +931,12 @@ final class EventViewer extends KDialog implements WindowListener,
             {
                 String ownMarkerId = ownEvent.getMarkerId();
                 LegionInfo info = getLegionInfo(ownMarkerId);
-                List ownNames = info.getContents();
+                List<String> ownNames = info.getContents();
                 ArrayList<RevealedCreature> rcNames = new ArrayList<RevealedCreature>();
-                Iterator it = ownNames.iterator();
+                Iterator<String> it = ownNames.iterator();
                 while (it.hasNext())
                 {
-                    String name = (String)it.next();
+                    String name = it.next();
                     RevealedCreature rc = new RevealedCreature(name);
                     rcNames.add(rc);
                 }
@@ -947,8 +944,8 @@ final class EventViewer extends KDialog implements WindowListener,
             }
         }
     }
-    
-    public void revealEngagedCreatures(final List names,
+
+    public void revealEngagedCreatures(final List<String> names,
         boolean isAttacker, String reason)
     {
         // can't do anything if (old) server or history do not provide 
@@ -966,10 +963,10 @@ final class EventViewer extends KDialog implements WindowListener,
             event = isAttacker ? attackerEventLegion : defenderEventLegion;
 
             ArrayList<RevealedCreature> rcNames = new ArrayList<RevealedCreature>();
-            Iterator it = names.iterator();
+            Iterator<String> it = names.iterator();
             while (it.hasNext())
             {
-                String name = (String)it.next();
+                String name = it.next();
                 RevealedCreature rc = new RevealedCreature(name);
                 rcNames.add(rc);
             }
@@ -1017,32 +1014,33 @@ final class EventViewer extends KDialog implements WindowListener,
             int newHeight = getLegionInfo(markerId).getHeight();
             RevealedCreature rc = new RevealedCreature(name);
             rc.setWasAcquired(true);
-            ArrayList<RevealedCreature> rcList = new ArrayList<RevealedCreature>(1);
+            ArrayList<RevealedCreature> rcList = new ArrayList<RevealedCreature>(
+                1);
             rcList.add(rc);
-            newEvent(RevealEvent.eventAcquire, markerId,
-                newHeight, rcList, null, 0);
+            newEvent(RevealEvent.eventAcquire, markerId, newHeight, rcList,
+                null, 0);
 
             if (attackerEventLegion == null || defenderEventLegion == null)
             {
                 // This should now never happen any more:
-                LOGGER.log(Level.SEVERE, "no attacker nor defender " +
-                    " legion event for acquiring!!" +
-                    " turn" + client.getTurnNumber() +
-                    " player " + client.getActivePlayerName() +
-                    " phase " + client.getPhase() + " markerid " + markerId +
-                    " marker owner" +
-                    getLegionInfo(markerId).getPlayerName() +
-                    "last engagement were" + " attacker " +
-                    lastAttackerEventLegion.getMarkerId() + " defender " +
-                    lastDefenderEventLegion.getMarkerId());
+                LOGGER.log(Level.SEVERE, "no attacker nor defender "
+                    + " legion event for acquiring!!" + " turn"
+                    + client.getTurnNumber() + " player "
+                    + client.getActivePlayerName() + " phase "
+                    + client.getPhase() + " markerid " + markerId
+                    + " marker owner"
+                    + getLegionInfo(markerId).getPlayerName()
+                    + "last engagement were" + " attacker "
+                    + lastAttackerEventLegion.getMarkerId() + " defender "
+                    + lastDefenderEventLegion.getMarkerId());
                 System.exit(1);
             }
         }
         else if (reason.equals(Constants.reasonUndoSummon))
         {
             // addCreature adds summoned creature back to donor:
-            undoEvent(RevealEvent.eventSummon, markerId, null,
-                client.getTurnNumber());
+            undoEvent(RevealEvent.eventSummon, markerId, null, client
+                .getTurnNumber());
             if (!attackerEventLegion.undoSummon(client.getTurnNumber(), name))
             {
                 // this should never happen...
@@ -1051,7 +1049,7 @@ final class EventViewer extends KDialog implements WindowListener,
             }
         }
     }
-    
+
     public void removeCreature(String markerId, String name)
     {
         if (attackerId != null && attackerEventLegion != null
@@ -1060,8 +1058,8 @@ final class EventViewer extends KDialog implements WindowListener,
             LOGGER.log(Level.FINEST, "During battle, remove creature " + name
                 + " from attacker legion " + markerId);
 
-            attackerEventLegion.setCreatureDied(name, getLegionInfo(
-                attackerId).getHeight());
+            attackerEventLegion.setCreatureDied(name,
+                getLegionInfo(attackerId).getHeight());
         }
 
         else if (defenderId != null && defenderEventLegion != null
@@ -1069,33 +1067,33 @@ final class EventViewer extends KDialog implements WindowListener,
         {
             LOGGER.log(Level.FINEST, "During battle, remove creature " + name
                 + " from defender legion " + markerId);
-            defenderEventLegion.setCreatureDied(name, getLegionInfo(
-                defenderId).getHeight());
+            defenderEventLegion.setCreatureDied(name,
+                getLegionInfo(defenderId).getHeight());
         }
     }
 
     public void recruitEvent(String markerId, int height, String recruitName,
-        List recruiters)
+        List<String> recruiters)
     {
         ArrayList<RevealedCreature> rcList = new ArrayList<RevealedCreature>();
         RevealedCreature rc;
 
-        Iterator it = recruiters.iterator();
+        Iterator<String> it = recruiters.iterator();
         while (it.hasNext())
         {
-            String recruiterName = (String)it.next();
+            String recruiterName = it.next();
             rc = new RevealedCreature(recruiterName);
             rc.setDidRecruit(true);
             rcList.add(rc);
         }
-    
+
         rc = new RevealedCreature(recruitName);
         rc.setWasRecruited(true);
         rcList.add(rc);
 
         newEvent(RevealEvent.eventRecruit, markerId, height, rcList, null, 0);
     }
-    
+
     // next two are for removeDeadBattleChits:
     public void attackerSetCreatureDead(String name, int height)
     {
@@ -1106,7 +1104,7 @@ final class EventViewer extends KDialog implements WindowListener,
     {
         defenderEventLegion.setCreatureDied(name, height);
     }
-        
+
     /*
      * User undid one action. Event is just marked as undone, but not deleted
      * - information once revealed is known to the public, as in real life :) 
@@ -1119,7 +1117,8 @@ final class EventViewer extends KDialog implements WindowListener,
             synchronized (syncdEventList)
             {
                 int last = syncdEventList.size();
-                ListIterator<RevealEvent> it = syncdEventList.listIterator(last);
+                ListIterator<RevealEvent> it = syncdEventList
+                    .listIterator(last);
                 while (it.hasPrevious() && found == 0)
                 {
                     RevealEvent e = it.previous();
@@ -1144,7 +1143,8 @@ final class EventViewer extends KDialog implements WindowListener,
                 synchronized (syncdEventList)
                 {
                     int last = syncdEventList.size();
-                    ListIterator<RevealEvent> it2 = syncdEventList.listIterator(last);
+                    ListIterator<RevealEvent> it2 = syncdEventList
+                        .listIterator(last);
                     while (it2.hasPrevious() && found == 0)
                     {
                         RevealEvent e = it2.previous();
@@ -1166,7 +1166,8 @@ final class EventViewer extends KDialog implements WindowListener,
             synchronized (syncdEventList)
             {
                 int last = syncdEventList.size();
-                ListIterator<RevealEvent> it = syncdEventList.listIterator(last);
+                ListIterator<RevealEvent> it = syncdEventList
+                    .listIterator(last);
                 while (it.hasPrevious() && found == 0)
                 {
                     RevealEvent e = it.previous();
@@ -1184,7 +1185,8 @@ final class EventViewer extends KDialog implements WindowListener,
             synchronized (syncdEventList)
             {
                 int last = syncdEventList.size();
-                ListIterator<RevealEvent> it = syncdEventList.listIterator(last);
+                ListIterator<RevealEvent> it = syncdEventList
+                    .listIterator(last);
                 while (it.hasPrevious() && found == 0)
                 {
                     RevealEvent e = it.previous();
@@ -1202,7 +1204,8 @@ final class EventViewer extends KDialog implements WindowListener,
             synchronized (syncdEventList)
             {
                 int last = syncdEventList.size();
-                ListIterator<RevealEvent> it = syncdEventList.listIterator(last);
+                ListIterator<RevealEvent> it = syncdEventList
+                    .listIterator(last);
                 while (it.hasPrevious() && found == 0)
                 {
                     RevealEvent e = it.previous();
@@ -1285,7 +1288,7 @@ final class EventViewer extends KDialog implements WindowListener,
         }
         this.options = null;
         this.client = null;
-        
+
         attackerEventLegion = null;
         defenderEventLegion = null;
 

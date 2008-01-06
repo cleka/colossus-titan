@@ -221,17 +221,17 @@ public class TerrainRecruitLoader
             Document doc = builder.build(terIS);
             Element root = doc.getRootElement();
 
-            List terrains = root.getChildren("terrain");
-            for (Iterator it = terrains.iterator(); it.hasNext();)
+            List<Element> terrains = root.getChildren("terrain");
+            for (Iterator<Element> it = terrains.iterator(); it.hasNext();)
             {
-                Element el = (Element)it.next();
+                Element el = it.next();
                 handleTerrain(el);
             }
 
-            List acquirables = root.getChildren("acquirable");
-            for (Iterator it = acquirables.iterator(); it.hasNext();)
+            List<Element> acquirables = root.getChildren("acquirable");
+            for (Iterator<Element> it = acquirables.iterator(); it.hasNext();)
             {
-                Element el = (Element)it.next();
+                Element el = it.next();
                 handleAcquirable(el);
             }
 
@@ -274,10 +274,10 @@ public class TerrainRecruitLoader
 
         boolean regularRecruit = el.getAttribute("regular_recruit")
             .getBooleanValue();
-        List recruits = el.getChildren("recruit");
-        for (Iterator it = recruits.iterator(); it.hasNext();)
+        List<Element> recruits = el.getChildren("recruit");
+        for (Iterator<Element> it = recruits.iterator(); it.hasNext();)
         {
-            Element recruit = (Element)it.next();
+            Element recruit = it.next();
             String recruitName = recruit.getAttributeValue("name");
             int recruitNum = recruit.getAttribute("number").getIntValue();
             RecruitNumber rn = new RecruitNumber(recruitName, recruitNum);

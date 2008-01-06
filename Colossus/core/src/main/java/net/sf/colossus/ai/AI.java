@@ -49,26 +49,27 @@ public interface AI
     void retryFailedBattleMoves(List<CritterMove> bestMoveOrder);
 
     /** pick an entry side */
-    String pickEntrySide(String hexLabel, String markerId, Set entrySides);
+    String pickEntrySide(String hexLabel, String markerId,
+        Set<String> entrySides);
 
     /** pick an engagement to resolve */
     String pickEngagement();
 
     /** choose whether to acquire an angel or archangel */
-    String acquireAngel(String markerId, List recruits);
+    String acquireAngel(String markerId, List<String> recruits);
 
     /** choose whether to summon an angel or archangel */
     String summonAngel(String summonerId);
 
     /** pick a color of legion markers */
-    String pickColor(List colors, List favoriteColors);
+    String pickColor(List<String> colors, List<String> favoriteColors);
 
     /** pick a legion marker */
     String pickMarker(Set<String> markerIds, String preferredShortColor);
 
     /** choose carry target */
-    void handleCarries(int carryDamage, Set carryTargets);
+    void handleCarries(int carryDamage, Set<String> carryTargets);
 
     /** pick an optional strike penalty */
-    String pickStrikePenalty(List choices);
+    String pickStrikePenalty(List<String> choices);
 }

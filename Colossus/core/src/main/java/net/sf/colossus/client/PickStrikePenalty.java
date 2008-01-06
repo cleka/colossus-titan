@@ -21,20 +21,20 @@ import net.sf.colossus.util.KDialog;
  */
 final class PickStrikePenalty extends KDialog implements ActionListener
 {
-    private Client client;
-    private SaveWindow saveWindow;
+    private final Client client;
+    private final SaveWindow saveWindow;
 
-    PickStrikePenalty(JFrame parentFrame, Client client, List choices)
+    PickStrikePenalty(JFrame parentFrame, Client client, List<String> choices)
     {
         super(parentFrame, "Take strike penalty to carry?", true);
 
         this.client = client;
 
         getContentPane().setLayout(new GridLayout(choices.size(), 1));
-        Iterator it = choices.iterator();
+        Iterator<String> it = choices.iterator();
         while (it.hasNext())
         {
-            String choice = (String)it.next();
+            String choice = it.next();
             JButton button = new JButton(choice);
             button.addActionListener(this);
             getContentPane().add(button);

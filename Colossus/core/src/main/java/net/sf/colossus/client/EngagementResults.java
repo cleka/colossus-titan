@@ -19,7 +19,6 @@ import java.util.List;
 
 import javax.swing.Box;
 import javax.swing.JButton;
-import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -50,8 +49,8 @@ final class EngagementResults extends KDialog
     private int current = -1;
     private int lastSeen = -1;
 
-    private ArrayList<Engagement> engagementLog = new ArrayList<Engagement>();
-    private SaveWindow saveWindow;
+    private final ArrayList<Engagement> engagementLog = new ArrayList<Engagement>();
+    private final SaveWindow saveWindow;
 
     private JButton firstButton;
     private JButton prevButton;
@@ -125,8 +124,10 @@ final class EngagementResults extends KDialog
      */
     void addData(
         String winnerId, // null on mutual elim, flee, concede, negotiate
-        String method, int points, int turns, List attackerStartingContents,
-        List defenderStartingContents, List<Boolean> attackerStartingCertainities,
+        String method, int points, int turns,
+        List<String> attackerStartingContents,
+        List<String> defenderStartingContents,
+        List<Boolean> attackerStartingCertainities,
         List<Boolean> defenderStartingCertainities, boolean attackersTurn)
     {
         Engagement result = new Engagement(winnerId, method, points, turns,
@@ -291,8 +292,8 @@ final class EngagementResults extends KDialog
         this.lastButton.setEnabled(false);
     }
 
-    private Component createLegionComponent(String markerId, List imageNames,
-        List<Boolean> certainList, boolean isDefender)
+    private Component createLegionComponent(String markerId,
+        List<String> imageNames, List<Boolean> certainList, boolean isDefender)
     {
         // prepare my box
         Box panel = Box.createHorizontalBox();
@@ -309,9 +310,9 @@ final class EngagementResults extends KDialog
         final boolean inverse = false && isDefender;
         // add chits
         int idx = 0;
-        for (Iterator it = imageNames.iterator(); it.hasNext();)
+        for (Iterator<String> it = imageNames.iterator(); it.hasNext();)
         {
-            final String imageName = (String)it.next();
+            final String imageName = it.next();
             final Boolean chitCertain = certainList.get(idx);
             final boolean showDubious = !chitCertain.booleanValue();
             Chit chit = new Chit(scale, imageName, inverse, showDubious);
@@ -436,20 +437,21 @@ final class EngagementResults extends KDialog
         String method;
         int points;
         int turns;
-        List attackerStartingContents;
-        List defenderStartingContents;
+        List<String> attackerStartingContents;
+        List<String> defenderStartingContents;
         List<Boolean> attackerStartingCertainities;
         List<Boolean> defenderStartingCertainities;
         String hexLabel;
         int gameTurn;
-        List attackerEndingContents;
-        List defenderEndingContents;
+        List<String> attackerEndingContents;
+        List<String> defenderEndingContents;
         List<Boolean> attackerEndingCertainties;
         List<Boolean> defenderEndingCertainties;
 
         public Engagement(String winnerId, String method, int points,
-            int turns, List attackerStartingContents,
-            List defenderStartingContents, List<Boolean> attackerStartingCertainities,
+            int turns, List<String> attackerStartingContents,
+            List<String> defenderStartingContents,
+            List<Boolean> attackerStartingCertainities,
             List<Boolean> defenderStartingCertainities, IOracle oracle)
         {
             this.winnerId = winnerId;

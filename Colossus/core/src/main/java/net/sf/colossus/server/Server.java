@@ -43,29 +43,29 @@ public final class Server implements IServer
      *  Maybe also save things like the originating IP, in case a
      *  connection breaks and we need to authenticate reconnects.
      *  Do not share these references. */
-    private List<IClient> clients = new ArrayList<IClient>();
-    private List<IClient> remoteClients = new ArrayList<IClient>();
-    private List<RemoteLogHandler> remoteLogHandlers = new ArrayList<RemoteLogHandler>();
+    private final List<IClient> clients = new ArrayList<IClient>();
+    private final List<IClient> remoteClients = new ArrayList<IClient>();
+    private final List<RemoteLogHandler> remoteLogHandlers = new ArrayList<RemoteLogHandler>();
 
     /** Map of player name to client. */
-    private Map<String, IClient> clientMap = new HashMap<String, IClient>();
+    private final Map<String, IClient> clientMap = new HashMap<String, IClient>();
 
     /** Number of remote clients we're waiting for. */
     private int waitingForClients;
 
     /** Server socket port. */
-    private int port;
+    private final int port;
 
     // Cached strike information.
     private Critter striker;
     private Critter target;
     private int strikeNumber;
-    private List rolls;
+    private List<String> rolls;
 
     // Network stuff
     private ServerSocket serverSocket;
     // list of Socket that are currently active
-    private List<Socket> activeSocketList = Collections
+    private final List<Socket> activeSocketList = Collections
         .synchronizedList(new ArrayList<Socket>());
     private int numClients;
     private int maxClients;
@@ -74,7 +74,7 @@ public final class Server implements IServer
      * previously allocated FileServerThread */
     private static Thread fileServerThread = null;
 
-    private ChildThreadManager threadMgr;
+    private final ChildThreadManager threadMgr;
 
     private boolean serverRunning = false;
     private boolean obsolete = false;
@@ -84,7 +84,7 @@ public final class Server implements IServer
     // which I modify... and when this is done too often,
     // e.g. in ClientSocketThread every read, it caused
     // StockOverflowException... :-/
-    private Object disposeAllClientsDoneMutex = new Object();
+    private final Object disposeAllClientsDoneMutex = new Object();
     private boolean disposeAllClientsDone = false;
 
     Server(Game game, int port)
@@ -342,7 +342,7 @@ public final class Server implements IServer
 
     public void setBoardVisibility(Player p, boolean val)
     {
-        getClient(p.getName()).setBoardActive(val);    
+        getClient(p.getName()).setBoardActive(val);
     }
 
     public boolean isClientGone(Player p)
@@ -354,7 +354,7 @@ public final class Server implements IServer
         }
         return false;
     }
-    
+
     private boolean anyNonAiSocketsLeft()
     {
         if (clientMap.isEmpty())
@@ -362,10 +362,10 @@ public final class Server implements IServer
             return false;
         }
 
-        Iterator it = game.getPlayers().iterator();
+        Iterator<Player> it = game.getPlayers().iterator();
         while (it.hasNext())
         {
-            Player p = (Player)it.next();
+            Player p = it.next();
             if (!p.isAI() && !isClientGone(p))
             {
                 return true;
@@ -539,7 +539,8 @@ public final class Server implements IServer
         clientMap.clear();
         remoteClients.clear();
 
-        for (Iterator<RemoteLogHandler> iter = remoteLogHandlers.iterator(); iter.hasNext();)
+        for (Iterator<RemoteLogHandler> iter = remoteLogHandlers.iterator(); iter
+            .hasNext();)
         {
             RemoteLogHandler handler = iter.next();
             LOGGER.removeHandler(handler);
@@ -669,10 +670,10 @@ public final class Server implements IServer
 
     synchronized void allInitBoard()
     {
-        Iterator it = game.getPlayers().iterator();
+        Iterator<Player> it = game.getPlayers().iterator();
         while (it.hasNext())
         {
-            Player player = (Player)it.next();
+            Player player = it.next();
             if (!player.isDead())
             {
                 IClient client = getClient(player.getName());
@@ -758,10 +759,10 @@ public final class Server implements IServer
 
     void allSetupSplit()
     {
-        Iterator it = game.getPlayers().iterator();
+        Iterator<Player> it = game.getPlayers().iterator();
         while (it.hasNext())
         {
-            Player player = (Player)it.next();
+            Player player = it.next();
             IClient client = getClient(player.getName());
             if (client != null)
             {
@@ -894,7 +895,7 @@ public final class Server implements IServer
 
     /** Find out if the player wants to acquire an angel or archangel. */
     synchronized void askAcquireAngel(String playerName, String markerId,
-        List recruits)
+        List<String> recruits)
     {
         Legion legion = game.getLegionByMarkerId(markerId);
         if (legion.getHeight() < 7)
@@ -1056,7 +1057,7 @@ public final class Server implements IServer
         // reveal only if there is something to tell
         if (recruiter != null)
         {
-            List recruiterNames = new ArrayList();
+            List<String> recruiterNames = new ArrayList<String>();
             for (int i = 0; i < numRecruiters; i++)
             {
                 recruiterNames.add(recruiterName);
@@ -1303,8 +1304,8 @@ public final class Server implements IServer
     }
 
     synchronized void allTellStrikeResults(Critter striker, Critter target,
-        int strikeNumber, List rolls, int damage, int carryDamageLeft,
-        Set carryTargetDescriptions)
+        int strikeNumber, List<String> rolls, int damage, int carryDamageLeft,
+        Set<String> carryTargetDescriptions)
     {
         // Save strike info so that it can be reused for carries.
         this.striker = striker;
@@ -1323,7 +1324,8 @@ public final class Server implements IServer
     }
 
     synchronized void allTellCarryResults(Critter carryTarget,
-        int carryDamageDone, int carryDamageLeft, Set carryTargetDescriptions)
+        int carryDamageDone, int carryDamageLeft,
+        Set<String> carryTargetDescriptions)
     {
         if (striker == null || target == null || rolls == null)
         {
@@ -1371,7 +1373,7 @@ public final class Server implements IServer
     {
         String playerName = game.getBattle().getActivePlayerName();
         IClient client = getClient(playerName);
-        ArrayList choices = new ArrayList();
+        List<String> choices = new ArrayList<String>();
         Iterator<PenaltyOption> it = penaltyOptions.iterator();
         while (it.hasNext())
         {
@@ -1678,13 +1680,13 @@ public final class Server implements IServer
         }
     }
 
-    private List getPlayerInfo(boolean treatDeadAsAlive)
+    private List<String> getPlayerInfo(boolean treatDeadAsAlive)
     {
-        List info = new ArrayList(game.getNumPlayers());
-        Iterator it = game.getPlayers().iterator();
+        List<String> info = new ArrayList<String>(game.getNumPlayers());
+        Iterator<Player> it = game.getPlayers().iterator();
         while (it.hasNext())
         {
-            Player player = (Player)it.next();
+            Player player = it.next();
             info.add(player.getStatusInfo(treatDeadAsAlive));
         }
         return info;
@@ -1719,7 +1721,7 @@ public final class Server implements IServer
         IClient activeClient = getClient(game.getActivePlayerName());
 
         Legion child = game.getLegionByMarkerId(childId);
-        List splitoffs = child.getImageNames();
+        List<String> splitoffs = child.getImageNames();
         activeClient.didSplit(hexLabel, parentId, childId, height, splitoffs,
             game.getTurnNumber());
 
@@ -1743,7 +1745,8 @@ public final class Server implements IServer
     }
 
     /** Call from History during load game only */
-    void didSplit(String parentId, String childId, List splitoffs, int turn)
+    void didSplit(String parentId, String childId, List<String> splitoffs,
+        int turn)
     {
         IClient activeClient = getClient(game.getActivePlayerName());
         int childSize = splitoffs.size();
@@ -1895,7 +1898,8 @@ public final class Server implements IServer
     }
 
     /** Call from History during load game only */
-    void allRevealLegion(String markerId, List creatureNames, String reason)
+    void allRevealLegion(String markerId, List<String> creatureNames,
+        String reason)
     {
         Iterator<IClient> it = clients.iterator();
         while (it.hasNext())
@@ -1921,7 +1925,7 @@ public final class Server implements IServer
 
     /** Call from History during load game only */
     void oneRevealLegion(String playerName, String markerId,
-        List creatureNames, String reason)
+        List<String> creatureNames, String reason)
     {
         IClient client = getClient(playerName);
         if (client != null)
@@ -1940,10 +1944,10 @@ public final class Server implements IServer
             IClient client = it.next();
             if (client != null)
             {
-                Iterator it2 = game.getAllLegions().iterator();
+                Iterator<Legion> it2 = game.getAllLegions().iterator();
                 while (it2.hasNext())
                 {
-                    Legion legion = (Legion)it2.next();
+                    Legion legion = it2.next();
                     client.setLegionStatus(legion.getMarkerId(), legion
                         .hasMoved(), legion.hasTeleported(), legion
                         .getEntrySide(), legion.getRecruitName());
@@ -1954,15 +1958,16 @@ public final class Server implements IServer
 
     void allFullyUpdateAllLegionContents(String reason)
     {
-        Iterator it = game.getAllLegions().iterator();
+        Iterator<Legion> it = game.getAllLegions().iterator();
         while (it.hasNext())
         {
-            Legion legion = (Legion)it.next();
+            Legion legion = it.next();
             allRevealLegion(legion, reason);
         }
     }
 
-    void allRevealCreatures(Legion legion, List creatureNames, String reason)
+    void allRevealCreatures(Legion legion, List<String> creatureNames,
+        String reason)
     {
         Iterator<IClient> it = clients.iterator();
         while (it.hasNext())
@@ -1976,7 +1981,7 @@ public final class Server implements IServer
 
     /** Call from History during load game only */
     void oneRevealCreatures(String playerName, String markerId,
-        List creatureNames, String reason)
+        List<String> creatureNames, String reason)
     {
         IClient client = getClient(playerName);
         if (client != null)
@@ -1986,7 +1991,8 @@ public final class Server implements IServer
     }
 
     /** Call from History during load game only */
-    void allRevealCreatures(String markerId, List creatureNames, String reason)
+    void allRevealCreatures(String markerId, List<String> creatureNames,
+        String reason)
     {
         Iterator<IClient> it = clients.iterator();
         while (it.hasNext())
@@ -2025,7 +2031,8 @@ public final class Server implements IServer
         clientMap.put(newName, client);
     }
 
-    synchronized void askPickColor(String playerName, final List colorsLeft)
+    synchronized void askPickColor(String playerName,
+        final List<String> colorsLeft)
     {
         IClient client = getClient(playerName);
         if (client != null)
@@ -2073,10 +2080,10 @@ public final class Server implements IServer
     /** Hack to set color on load game. */
     synchronized void allSetColor()
     {
-        Iterator it = game.getPlayers().iterator();
+        Iterator<Player> it = game.getPlayers().iterator();
         while (it.hasNext())
         {
-            Player player = (Player)it.next();
+            Player player = it.next();
             String name = player.getName();
             String color = player.getColor();
             IClient client = getClient(name);

@@ -30,12 +30,12 @@ final class BattleDice extends Box
     private String targetDesc = "";
     private int numDice = 0;
     private int targetNumber = 0;
-    private List rolls = new ArrayList();
+    private final List<String> rolls = new ArrayList<String>();
     private Chit[] dice;
     private int averageMiss = -1;
 
-    private JPanel diceBox, missBox, hitBox;
-    private TitledBorder diceBoxTitledBorder;
+    private final JPanel diceBox, missBox, hitBox;
+    private final TitledBorder diceBoxTitledBorder;
 
     BattleDice()
     {
@@ -63,7 +63,7 @@ final class BattleDice extends Box
     }
 
     void setValues(String strikerDesc, String targetDesc, int targetNumber,
-        List rolls)
+        List<String> rolls)
     {
         this.strikerDesc = strikerDesc;
         this.targetDesc = targetDesc;
@@ -133,7 +133,7 @@ final class BattleDice extends Box
 
             for (int i = 0; i < numDice; i++)
             {
-                String imageName = getDieImageName((String)rolls.get(i));
+                String imageName = getDieImageName(rolls.get(i));
                 if (imageName != null)
                 {
                     dice[i] = new Chit(2 * Scale.get(), imageName);

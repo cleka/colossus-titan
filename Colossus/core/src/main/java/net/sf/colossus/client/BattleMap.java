@@ -90,7 +90,7 @@ public final class BattleMap extends HexMap implements MouseListener,
     /** Select all hexes containing critters eligible to move. */
     public void highlightMobileCritters()
     {
-        Set set = client.findMobileCritterHexes();
+        Set<String> set = client.findMobileCritterHexes();
         unselectAllHexes();
         unselectEntranceHexes();
         selectHexesByLabels(set);
@@ -100,19 +100,19 @@ public final class BattleMap extends HexMap implements MouseListener,
     /** Select hexes containing critters that have valid strike targets. */
     public void highlightCrittersWithTargets()
     {
-        Set set = client.findCrittersWithTargets();
+        Set<String> set = client.findCrittersWithTargets();
         unselectAllHexes();
         selectHexesByLabels(set);
         // XXX Needed?
         repaint();
     }
 
-    public void selectEntranceHexes(Set labels)
+    public void selectEntranceHexes(Set<String> labels)
     {
-        Iterator it = labels.iterator();
+        Iterator<String> it = labels.iterator();
         while (it.hasNext())
         {
-            String hexLabel = (String)it.next();
+            String hexLabel = it.next();
             if (hexLabel.startsWith("X"))
             {
                 if (hexLabel.equals(defenderMarker.hexLabel))
@@ -148,7 +148,8 @@ public final class BattleMap extends HexMap implements MouseListener,
         try
         {
             List<BattleChit> battleChits = client.getBattleChits();
-            ListIterator<BattleChit> lit = battleChits.listIterator(battleChits.size());
+            ListIterator<BattleChit> lit = battleChits
+                .listIterator(battleChits.size());
             while (lit.hasPrevious())
             {
                 BattleChit chit = lit.previous();

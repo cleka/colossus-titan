@@ -376,7 +376,7 @@ public class GUIBattleHex extends GUIHex
     private static Image loadOneOverlay(String name, int width, int height)
     {
         Image overlay = null;
-        List directories = VariantSupport.getImagesDirectoriesList();
+        List<String> directories = VariantSupport.getImagesDirectoriesList();
         overlay = ResourceLoader.getImage(name + imagePostfix, directories,
             width, height);
         return overlay;

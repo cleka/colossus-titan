@@ -48,10 +48,10 @@ public class BattlelandLoader
             isTower = root.getAttribute("tower").getBooleanValue();
             subtitle = root.getAttributeValue("subtitle");
 
-            List hexlist = root.getChildren("battlehex");
-            for (Iterator it = hexlist.iterator(); it.hasNext();)
+            List<Element> hexlist = root.getChildren("battlehex");
+            for (Iterator<Element> it = hexlist.iterator(); it.hasNext();)
             {
-                Element el = (Element)it.next();
+                Element el = it.next();
                 handleHex(el, h);
             }
             Element startlistEl = root.getChild("startlist");
@@ -59,7 +59,7 @@ public class BattlelandLoader
             {
                 // towi: the DTD "battlehex" definitions clashed.
                 //    renamed to "battlehexref"
-                List startlistHexes = startlistEl.getChildren("battlehexref");
+                List<Element> startlistHexes = startlistEl.getChildren("battlehexref");
                 if (startlistHexes.size() == 0)
                 {
                     // support old format with warning
@@ -72,9 +72,9 @@ public class BattlelandLoader
                     }
                 }
 
-                for (Iterator it = startlistHexes.iterator(); it.hasNext();)
+                for (Iterator<Element> it = startlistHexes.iterator(); it.hasNext();)
                 {
-                    Element el = (Element)it.next();
+                    Element el = it.next();
                     handleStartlistHex(el);
                 }
             }
@@ -103,10 +103,10 @@ public class BattlelandLoader
         int elevation = el.getAttribute("elevation").getIntValue();
         hex.setElevation(elevation);
 
-        List borders = el.getChildren("border");
-        for (Iterator it = borders.iterator(); it.hasNext();)
+        List<Element> borders = el.getChildren("border");
+        for (Iterator<Element> it = borders.iterator(); it.hasNext();)
         {
-            Element border = (Element)it.next();
+            Element border = it.next();
             int number = border.getAttribute("number").getIntValue();
             char type = border.getAttributeValue("type").charAt(0);
             hex.setHexside(number, type);

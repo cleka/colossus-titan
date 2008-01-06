@@ -14,6 +14,7 @@ import java.util.logging.Logger;
 /**
  *  Predicts splits for one enemy player, and adjusts predictions as 
  *  creatures are revealed.
+ *  
  *  @version $Id$
  *  @author David Ripton
  *  @see SplitPrediction.txt
@@ -24,15 +25,15 @@ public final class PredictSplits
     private static final Logger LOGGER = Logger.getLogger(PredictSplits.class
         .getName());
 
-    private PredictSplitNode root; // All contents of root must be known.
-    private NodeTurnComparator nodeTurnComparator = new NodeTurnComparator();
+    private final PredictSplitNode root; // All contents of root must be known.
+    private final NodeTurnComparator nodeTurnComparator = new NodeTurnComparator();
 
-    PredictSplits(String rootId, List creatureNames)
+    PredictSplits(String rootId, List<String> creatureNames)
     {
         CreatureInfoList infoList = new CreatureInfoList();
-        for (Iterator it = creatureNames.iterator(); it.hasNext();)
+        for (Iterator<String> it = creatureNames.iterator(); it.hasNext();)
         {
-            String name = (String)it.next();
+            String name = it.next();
             CreatureInfo ci = new CreatureInfo(name, true, true);
             infoList.add(ci);
         }
@@ -56,7 +57,8 @@ public final class PredictSplits
             leaves.addAll(getLeaves(node.getChild2()));
         }
 
-        TreeSet<Integer> prunes = new TreeSet<Integer>(new ReverseIntegerComparator());
+        TreeSet<Integer> prunes = new TreeSet<Integer>(
+            new ReverseIntegerComparator());
 
         // If duplicate markerIds, prune the older node.
         for (int i = 0; i < leaves.size(); i++)
@@ -69,10 +71,9 @@ public final class PredictSplits
                     PredictSplitNode leaf2 = leaves.get(j);
                     if (leaf1.getMarkerId().equals(leaf2.getMarkerId()))
                     {
-                        assert leaf1.getTurnCreated() != leaf2.getTurnCreated() : 
-                            "Leaf nodes have to have different markerId or turn";
-                        if (leaf1.getTurnCreated() < leaf2
-                            .getTurnCreated())
+                        assert leaf1.getTurnCreated() != leaf2
+                            .getTurnCreated() : "Leaf nodes have to have different markerId or turn";
+                        if (leaf1.getTurnCreated() < leaf2.getTurnCreated())
                         {
                             prunes.add(new Integer(i));
                         }
@@ -110,14 +111,12 @@ public final class PredictSplits
         return nodes;
     }
 
-    class ReverseIntegerComparator implements Comparator
+    class ReverseIntegerComparator implements Comparator<Integer>
     {
         // Sort in reverse, so we don't disturb array 
         // indexes when removing.
-        public int compare(Object o1, Object o2)
+        public int compare(Integer in1, Integer in2)
         {
-            Integer in1 = (Integer)o1;
-            Integer in2 = (Integer)o2;
             return in2.compareTo(in1);
         }
     }
@@ -167,35 +166,25 @@ public final class PredictSplits
 }
 
 
-class NodeTurnComparator implements Comparator
+class NodeTurnComparator implements Comparator<PredictSplitNode>
 {
-    public int compare(Object o1, Object o2)
+    public int compare(PredictSplitNode n1, PredictSplitNode n2)
     {
-        if (o1 instanceof PredictSplitNode && o2 instanceof PredictSplitNode)
+        int diff = n1.getTurnCreated() - n2.getTurnCreated();
+        if (diff != 0)
         {
-            PredictSplitNode n1 = (PredictSplitNode)o1;
-            PredictSplitNode n2 = (PredictSplitNode)o2;
-            int diff = n1.getTurnCreated() - n2.getTurnCreated();
-            if (diff != 0)
-            {
-                return diff;
-            }
-            diff = n1.getParent().toString().compareTo(
-                n2.getParent().toString());
-            if (diff != 0)
-            {
-                return diff;
-            }
-            diff = n2.getCreatures().size() - n1.getCreatures().size();
-            if (diff != 0)
-            {
-                return diff;
-            }
-            return (n1.toString().compareTo(n2.toString()));
+            return diff;
         }
-        else
+        diff = n1.getParent().toString().compareTo(n2.getParent().toString());
+        if (diff != 0)
         {
-            throw new ClassCastException();
+            return diff;
         }
+        diff = n2.getCreatures().size() - n1.getCreatures().size();
+        if (diff != 0)
+        {
+            return diff;
+        }
+        return (n1.toString().compareTo(n2.toString()));
     }
 }

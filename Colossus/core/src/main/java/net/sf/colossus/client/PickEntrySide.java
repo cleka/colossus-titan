@@ -35,10 +35,11 @@ final class PickEntrySide extends HexMap implements ActionListener,
     private static JButton bottomButton;
     private static JButton rightButton;
     private static boolean laidOut;
-    private JDialog dialog;
+    private final JDialog dialog;
     private static String entrySide = "";
 
-    private PickEntrySide(JFrame parentFrame, String masterHexLabel, Set sides)
+    private PickEntrySide(JFrame parentFrame, String masterHexLabel,
+        Set<String> sides)
     {
         super(masterHexLabel);
         dialog = new JDialog(parentFrame, "Pick entry side", true);
@@ -82,7 +83,7 @@ final class PickEntrySide extends HexMap implements ActionListener,
     }
 
     static String pickEntrySide(JFrame parentFrame, String masterHexLabel,
-        Set sides)
+        Set<String> sides)
     {
         if (sides.size() >= 2)
         {
@@ -90,10 +91,10 @@ final class PickEntrySide extends HexMap implements ActionListener,
         }
         else
         {
-            Iterator it = sides.iterator();
+            Iterator<String> it = sides.iterator();
             if (it.hasNext())
             {
-                entrySide = (String)it.next();
+                entrySide = it.next();
             }
         }
         return entrySide;

@@ -46,6 +46,7 @@ import org.apache.batik.transcoder.TranscoderInput;
 import org.apache.batik.transcoder.TranscoderOutput;
 import org.apache.batik.transcoder.image.ImageTranscoder;
 import org.apache.batik.util.XMLResourceDescriptor;
+import org.jdom.Element;
 
 
 /**
@@ -1413,16 +1414,16 @@ public final class ResourceLoader
      *     file data as a CDATA content.
      * @return A list of XML Element.
      */
-    public static List getFileCacheDump()
+    public static List<Element> getFileCacheDump()
     {
-        List allElement = new ArrayList();
+        List<Element> allElement = new ArrayList<Element>();
         Set<String> allKeys = fileCache.keySet();
         Iterator<String> it = allKeys.iterator();
         while (it.hasNext())
         {
             String mapKey = it.next();
             byte[] data = fileCache.get(mapKey);
-            org.jdom.Element el = new org.jdom.Element("DataFile");
+            Element el = new Element("DataFile");
             el.setAttribute("DataFileKey", mapKey);
             el.addContent(new org.jdom.CDATA(new String(data)));
             allElement.add(el);

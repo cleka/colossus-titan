@@ -40,10 +40,10 @@ public class CreatureLoader
             Document doc = builder.build(creIS);
             Element root = doc.getRootElement();
 
-            List creatures = root.getChildren("creature");
-            for (Iterator it = creatures.iterator(); it.hasNext();)
+            List<Element> creatures = root.getChildren("creature");
+            for (Iterator<Element> it = creatures.iterator(); it.hasNext();)
             {
-                Element el = (Element)it.next();
+                Element el = it.next();
                 handleCreature(el);
             }
         }

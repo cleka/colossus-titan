@@ -54,7 +54,7 @@ public final class Battle extends net.sf.colossus.game.Battle
     private boolean driftDamageApplied = false;
 
     /** Set of hexLabels for valid carry targets */
-    private final Set carryTargets = new HashSet();
+    private final Set<String> carryTargets = new HashSet<String>();
     private final PhaseAdvancer phaseAdvancer = new BattlePhaseAdvancer();
     private int pointsScored = 0;
 
@@ -1072,7 +1072,7 @@ public final class Battle extends net.sf.colossus.game.Battle
     }
 
     /** Return the set of hex labels for hexes with valid carry targets. */
-    Set getCarryTargets()
+    Set<String> getCarryTargets()
     {
         return Collections.unmodifiableSet(carryTargets);
     }

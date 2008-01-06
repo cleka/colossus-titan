@@ -26,16 +26,16 @@ import net.sf.colossus.util.KDialog;
 
 final class ReplyToProposal extends KDialog implements ActionListener
 {
-    private String attackerId;
-    private String defenderId;
-    private List<Chit> attackerChits = new ArrayList<Chit>();
-    private List<Chit> defenderChits = new ArrayList<Chit>();
-    private Marker attackerMarker;
-    private Marker defenderMarker;
-    private Client client;
+    private final String attackerId;
+    private final String defenderId;
+    private final List<Chit> attackerChits = new ArrayList<Chit>();
+    private final List<Chit> defenderChits = new ArrayList<Chit>();
+    private final Marker attackerMarker;
+    private final Marker defenderMarker;
+    private final Client client;
     private Proposal proposal;
     private Point location;
-    private SaveWindow saveWindow;
+    private final SaveWindow saveWindow;
 
     ReplyToProposal(Client client, Proposal proposal)
     {
@@ -61,11 +61,12 @@ final class ReplyToProposal extends KDialog implements ActionListener
         attackerMarker = new Marker(scale, attackerId, client);
         attackerPane.add(attackerMarker);
 
-        List attackerImageNames = client.getLegionImageNames(attackerId);
-        Iterator it = attackerImageNames.iterator();
+        List<String> attackerImageNames = client
+            .getLegionImageNames(attackerId);
+        Iterator<String> it = attackerImageNames.iterator();
         while (it.hasNext())
         {
-            String imageName = (String)it.next();
+            String imageName = it.next();
             Chit chit = new Chit(scale, imageName);
             attackerChits.add(chit);
             attackerPane.add(chit);
@@ -77,11 +78,12 @@ final class ReplyToProposal extends KDialog implements ActionListener
         defenderMarker = new Marker(scale, defenderId, client);
         defenderPane.add(defenderMarker);
 
-        List defenderImageNames = client.getLegionImageNames(defenderId);
+        List<String> defenderImageNames = client
+            .getLegionImageNames(defenderId);
         it = defenderImageNames.iterator();
         while (it.hasNext())
         {
-            String imageName = (String)it.next();
+            String imageName = it.next();
             Chit chit = new Chit(scale, imageName);
             defenderChits.add(chit);
             defenderPane.add(chit);

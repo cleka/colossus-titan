@@ -13,6 +13,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -22,7 +23,6 @@ import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -396,7 +396,7 @@ public final class BattleBoard extends KFrame
 
     private void setupIcon()
     {
-        List directories = new java.util.ArrayList();
+        List<String> directories = new ArrayList<String>();
         directories.add(Constants.defaultDirName
             + ResourceLoader.getPathSeparator() + Constants.imagesDirName);
 
@@ -477,12 +477,12 @@ public final class BattleBoard extends KFrame
         hex.repaint();
     }
 
-    public void alignChits(Set hexLabels)
+    public void alignChits(Set<String> hexLabels)
     {
-        Iterator it = hexLabels.iterator();
+        Iterator<String> it = hexLabels.iterator();
         while (it.hasNext())
         {
-            String hexLabel = (String)it.next();
+            String hexLabel = it.next();
             alignChits(hexLabel);
         }
     }
@@ -490,7 +490,7 @@ public final class BattleBoard extends KFrame
     /** Select all hexes containing critters eligible to move. */
     public void highlightMobileCritters()
     {
-        Set set = client.findMobileCritterHexes();
+        Set<String> set = client.findMobileCritterHexes();
         unselectAllHexes();
         battleMap.unselectEntranceHexes();
         battleMap.selectHexesByLabels(set);
@@ -499,7 +499,7 @@ public final class BattleBoard extends KFrame
 
     private void highlightMoves(int tag)
     {
-        Set set = client.showBattleMoves(tag);
+        Set<String> set = client.showBattleMoves(tag);
         battleMap.unselectAllHexes();
         battleMap.unselectEntranceHexes();
         battleMap.selectHexesByLabels(set);
@@ -508,7 +508,7 @@ public final class BattleBoard extends KFrame
     /** Select hexes containing critters that have valid strike targets. */
     public void highlightCrittersWithTargets()
     {
-        Set set = client.findCrittersWithTargets();
+        Set<String> set = client.findCrittersWithTargets();
         unselectAllHexes();
         battleMap.selectHexesByLabels(set);
         // XXX Needed?
@@ -518,7 +518,7 @@ public final class BattleBoard extends KFrame
     /** Highlight all hexes with targets that the critter can strike. */
     private void highlightStrikes(int tag)
     {
-        Set set = client.findStrikes(tag);
+        Set<String> set = client.findStrikes(tag);
         unselectAllHexes();
         client.resetStrikeNumbers();
         battleMap.selectHexesByLabels(set);
@@ -838,7 +838,7 @@ public final class BattleBoard extends KFrame
     }
 
     public void setDiceValues(String strikerDesc, String targetDesc,
-        int targetNumber, List rolls)
+        int targetNumber, List<String> rolls)
     {
         battleDice.setValues(strikerDesc, targetDesc, targetNumber, rolls);
         battleDice.showRoll();

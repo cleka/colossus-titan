@@ -11,7 +11,6 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
 import javax.swing.BoxLayout;
-import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -23,15 +22,15 @@ import net.sf.colossus.util.Options;
 
 public class AutoInspector extends KDialog
 {
-    private IOptions options;
+    private final IOptions options;
 
-    private SaveWindow saveWindow;
+    private final SaveWindow saveWindow;
 
-    private JScrollPane scrollPane;
+    private final JScrollPane scrollPane;
 
-    private String playerName;
+    private final String playerName;
 
-    private int viewMode;
+    private final int viewMode;
 
     private boolean dubiousAsBlanks;
 

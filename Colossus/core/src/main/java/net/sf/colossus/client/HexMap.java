@@ -61,8 +61,8 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
     private static Map<String, List<String>> startlistMap = new HashMap<String, List<String>>();
     private static Map<String, String> subtitleMap = new HashMap<String, String>();
     private static Map<String, Boolean> towerStatusMap = new HashMap<String, Boolean>();
-    private static Map<String, HashMap<HazardTerrain, Integer>> hazardNumberMap = new HashMap<String, HashMap<HazardTerrain, Integer>>();
-    private static Map<String, HashMap<Character, Integer>> hazardSideNumberMap = new HashMap<String, HashMap<Character, Integer>>();
+    private static Map<String, Map<HazardTerrain, Integer>> hazardNumberMap = new HashMap<String, Map<HazardTerrain, Integer>>();
+    private static Map<String, Map<Character, Integer>> hazardSideNumberMap = new HashMap<String, Map<Character, Integer>>();
 
     /** ne, e, se, sw, w, nw */
     private final GUIBattleHex[] entrances = new GUIBattleHex[6];
@@ -184,7 +184,8 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
     private static synchronized void setupHexesGameState(String terrain,
         GUIBattleHex[][] h, boolean serverSideFirstLoad)
     {
-        List directories = VariantSupport.getBattlelandsDirectoriesList();
+        List<String> directories = VariantSupport
+            .getBattlelandsDirectoriesList();
         String rndSourceName = TerrainRecruitLoader
             .getTerrainRandomName(terrain);
         BattleHex[][] hexModel = new BattleHex[h.length][h[0].length];
@@ -507,7 +508,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
         }
     }
 
-    void unselectHexesByLabels(Set labels)
+    void unselectHexesByLabels(Set<String> labels)
     {
         Iterator<GUIBattleHex> it = hexes.iterator();
         while (it.hasNext())
@@ -538,7 +539,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
         }
     }
 
-    void selectHexesByLabels(Set labels)
+    void selectHexesByLabels(Set<String> labels)
     {
         Iterator<GUIBattleHex> it = hexes.iterator();
         while (it.hasNext())
@@ -836,64 +837,36 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
 
     public static boolean terrainHasStartlist(String t)
     {
-        java.util.List temp = startlistMap.get(t);
+        List<String> temp = startlistMap.get(t);
         return (!(temp == null));
     }
 
     public static int getHazardCountInTerrain(HazardTerrain hazard,
         String terrain)
     {
-        HashMap t2n = hazardNumberMap.get(terrain);
-        Object o = null;
+        Map<HazardTerrain, Integer> t2n = hazardNumberMap.get(terrain);
 
-        if (t2n == null)
-        {
+        assert t2n != null : "Accessing terrain that does not exist in Variant";
 
-            /*
-             Log.debug("Terrain " + terrain +
-             " doesn't exist in this variant.");
-             */
-        }
-        else
-        {
-            o = t2n.get(hazard);
-        }
-
-        if (o == null)
+        Integer number = t2n.get(hazard);
+        if (number == null)
         {
             return 0;
         }
-
-        Integer number = (Integer)o;
-
-        return (number.intValue());
+        return number.intValue();
     }
 
     public static int getHazardSideCountInTerrain(char hazard, String terrain)
     {
-        HashMap s2n = hazardSideNumberMap.get(terrain);
-        Object o = null;
+        Map<Character, Integer> s2n = hazardSideNumberMap.get(terrain);
 
-        if (s2n == null)
-        {
+        assert s2n != null : "Accessing terrain that does not exist in Variant";
 
-            /*
-             Log.debug("Terrain " + terrain +
-             " doesn't exist in this variant.");
-             */
-        }
-        else
-        {
-            o = s2n.get(new Character(hazard));
-        }
-
-        if (o == null)
+        Integer number = s2n.get(new Character(hazard));
+        if (number == null)
         {
             return 0;
         }
-
-        Integer number = (Integer)o;
-
-        return (number.intValue());
+        return number.intValue();
     }
 }

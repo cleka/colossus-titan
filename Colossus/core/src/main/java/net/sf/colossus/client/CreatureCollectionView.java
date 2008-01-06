@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -180,14 +181,14 @@ class CreatureCollectionView extends KDialog
 
     private JPanel makeCreaturePanel(JScrollPane scrollPane)
     {
-        List creatures = Creature.getCreatures();
+        List<Creature> creatures = Creature.getCreatures();
         JPanel creaturePanel = new JPanel();
         creaturePanel.setLayout(new CCVFlowLayout(scrollPane, creaturePanel,
             FlowLayout.LEFT, 2, 2));
-        Iterator it = creatures.iterator();
+        Iterator<Creature> it = creatures.iterator();
         while (it.hasNext())
         {
-            Creature creature = (Creature)it.next();
+            Creature creature = it.next();
             creaturePanel.add(new CreatureCount(creature.getName()));
         }
 
@@ -198,12 +199,13 @@ class CreatureCollectionView extends KDialog
     {
         try
         {
-            Iterator it = countMap.entrySet().iterator();
+            Iterator<Entry<String, JLabel>> it = countMap.entrySet()
+                .iterator();
             while (it.hasNext())
             {
-                Map.Entry entry = (Map.Entry)it.next();
-                String name = (String)entry.getKey();
-                JLabel label = (JLabel)entry.getValue();
+                Entry<String, JLabel> entry = it.next();
+                String name = entry.getKey();
+                JLabel label = entry.getValue();
                 int count = client.getCreatureCount(name);
                 int maxcount = client.getCreatureMaxCount(name);
                 int deadCount = client.getCreatureDeadCount(name);
@@ -329,7 +331,7 @@ class CreatureCollectionView extends KDialog
     @Override
     public Dimension getMinimumSize()
     {
-        java.util.List creatures = Creature.getCreatures();
+        List<Creature> creatures = Creature.getCreatures();
         // default : 5 creatures wide 
 
         int minSingleX = fixedChitSize + 8;

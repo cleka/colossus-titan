@@ -40,19 +40,19 @@ public class StartClient extends KFrame implements WindowListener,
     private static final Logger LOGGER = Logger.getLogger(StartClient.class
         .getName());
 
-    private Object mutex;
-    private Options netclientOptions;
-    private Options stOptions;
-    private Start startObject;
+    private final Object mutex;
+    private final Options netclientOptions;
+    private final Options stOptions;
+    private final Start startObject;
 
     private String playerName;
     private String hostname;
     private int port;
-    private SaveWindow saveWindow;
+    private final SaveWindow saveWindow;
 
-    private JComboBox nameBox;
-    private JComboBox hostBox;
-    private JComboBox portBox;
+    private final JComboBox nameBox;
+    private final JComboBox hostBox;
+    private final JComboBox portBox;
 
     public StartClient(Object mutex, Start startObject)
     {
@@ -70,7 +70,7 @@ public class StartClient extends KFrame implements WindowListener,
         this.hostname = stOptions.getStringOption(Options.runClientHost);
         this.port = stOptions.getIntOption(Options.runClientPort);
 
-        // LRU list of hsots, and window geometry from NetClient cf file
+        // LRU list of hosts, and window geometry from NetClient cf file
         netclientOptions = new Options(Constants.optionsNetClientName);
         netclientOptions.loadOptions();
 
@@ -98,10 +98,11 @@ public class StartClient extends KFrame implements WindowListener,
         panel.add(hostBox);
 
         panel.add(new JLabel("Server port"));
-        Set portChoices = new TreeSet();
+        Set<String> portChoices = new TreeSet<String>();
         portChoices.add("" + port);
         portChoices.add("" + Constants.defaultPort);
-        portBox = new JComboBox(new Vector(portChoices));
+        portBox = new JComboBox(portChoices.toArray(new String[portChoices
+            .size()]));
         portBox.setEditable(true);
         portBox.addActionListener(this);
         panel.add(portBox);
@@ -134,8 +135,8 @@ public class StartClient extends KFrame implements WindowListener,
      * one last used from LRU list (or if even that is empty, defaults
      * to current hostname).
      */
-    public static String initServerNames(String wantedHost, Set<String> hostChoices,
-        Options netclientOptions)
+    public static String initServerNames(String wantedHost,
+        Set<String> hostChoices, Options netclientOptions)
     {
         String preferred = null;
         try
@@ -300,8 +301,7 @@ public class StartClient extends KFrame implements WindowListener,
         }
         for (int i = 0; i < names.size() && i < Constants.numSavedServerNames; i++)
         {
-            netclientOptions.setOption(Options.serverName + i, names
-                .get(i));
+            netclientOptions.setOption(Options.serverName + i, names.get(i));
         }
     }
 }

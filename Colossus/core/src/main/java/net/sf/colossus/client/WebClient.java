@@ -77,8 +77,8 @@ import net.sf.colossus.webcommon.User;
 public class WebClient extends KFrame implements WindowListener,
     ActionListener, IWebClient
 {
-    private static final Logger LOGGER =
-        Logger.getLogger(WebClient.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(WebClient.class
+        .getName());
 
     private String hostname;
     private int port;
@@ -88,7 +88,7 @@ public class WebClient extends KFrame implements WindowListener,
 
     private boolean isAdmin = false;
 
-    private Options options;
+    private final Options options;
     private Client gameClient;
 
     private RegisterPasswordPanel registerPanel;
@@ -120,7 +120,7 @@ public class WebClient extends KFrame implements WindowListener,
     Box scheduledGamesTab;
     Box adminTab;
 
-    private Point defaultLocation = new Point(600, 100);
+    private final Point defaultLocation = new Point(600, 100);
 
     // Server/Login pane:
     private JTextField webserverHostField;
@@ -838,8 +838,8 @@ public class WebClient extends KFrame implements WindowListener,
         else
         {
             LOGGER.log(Level.WARNING,
-                "ooops! auto Game Start Action option is '" +
-                whatToDo + "' ???");
+                "ooops! auto Game Start Action option is '" + whatToDo
+                    + "' ???");
         }
     }
 
@@ -1028,6 +1028,7 @@ public class WebClient extends KFrame implements WindowListener,
         }
     }
 
+    @Override
     public void dispose()
     {
         // we have a server ( = a WebClientSocketThread) 
@@ -1038,7 +1039,7 @@ public class WebClient extends KFrame implements WindowListener,
         }
 
         super.dispose();
-        
+
         int min = ((Integer)spinner1.getValue()).intValue();
         int target = ((Integer)spinner2.getValue()).intValue();
         int max = ((Integer)spinner3.getValue()).intValue();
@@ -1192,8 +1193,7 @@ public class WebClient extends KFrame implements WindowListener,
         }
         else
         {
-            LOGGER.log(Level.WARNING, 
-                "Web Client - Bogus state " + state);
+            LOGGER.log(Level.WARNING, "Web Client - Bogus state " + state);
         }
     }
 
@@ -1479,7 +1479,7 @@ public class WebClient extends KFrame implements WindowListener,
         infoTextLabel.setText(startedText);
     }
 
-    private Object comingUpMutex = new Object();
+    private final Object comingUpMutex = new Object();
     private boolean clientIsUp = false;
 
     // Client calls this
@@ -1507,6 +1507,7 @@ public class WebClient extends KFrame implements WindowListener,
 
     class TriggerTimeIsUp extends TimerTask
     {
+        @Override
         public void run()
         {
             timeIsUp = true;
@@ -1673,8 +1674,8 @@ public class WebClient extends KFrame implements WindowListener,
                         else
                         {
                             LOGGER.log(Level.WARNING,
-                                "Huups, unhandled game state " +
-                                game.getStateString());
+                                "Huups, unhandled game state "
+                                    + game.getStateString());
                         }
                     }
                     gamesUpdates.clear();
@@ -1909,6 +1910,7 @@ public class WebClient extends KFrame implements WindowListener,
         }
     }
 
+    @Override
     public void windowClosing(WindowEvent e)
     {
         Start startObj = Start.getCurrentStartObject();
@@ -1916,56 +1918,67 @@ public class WebClient extends KFrame implements WindowListener,
         dispose();
     }
 
+    @Override
     public void mouseClicked(MouseEvent e)
     {
         // nothing to do
     }
 
+    @Override
     public void mouseEntered(MouseEvent e)
     {
         // nothing to do
     }
 
+    @Override
     public void mouseExited(MouseEvent e)
     {
         // nothing to do
     }
 
+    @Override
     public void mousePressed(MouseEvent e)
     {
         // nothing to do
     }
 
+    @Override
     public void mouseReleased(MouseEvent e)
     {
         // nothing to do
     }
 
+    @Override
     public void windowClosed(WindowEvent e)
     {
         // nothing to do
     }
 
+    @Override
     public void windowActivated(WindowEvent e)
     {
         // nothing to do
     }
 
+    @Override
     public void windowDeactivated(WindowEvent e)
     {
         // nothing to do
     }
 
+    @Override
     public void windowDeiconified(WindowEvent e)
     {
         // nothing to do
     }
 
+    @Override
     public void windowIconified(WindowEvent e)
     {
         //
     }
 
+    @Override
     public void windowOpened(WindowEvent e)
     {
         // nothing to do
@@ -1973,12 +1986,12 @@ public class WebClient extends KFrame implements WindowListener,
 
     class GameTableModel extends AbstractTableModel
     {
-        private String[] columnNames = { "#", "state", "by", "Variant",
+        private final String[] columnNames = { "#", "state", "by", "Variant",
             "Viewmode", "Expire", "Mull", "Towers", "min", "target", "max",
             "actual", "players" };
 
-        private Vector<GameInfo> data = new Vector<GameInfo>(13, 1);
-        private HashMap<String, Integer> rowIndex = new HashMap<String, Integer>();
+        private final Vector<GameInfo> data = new Vector<GameInfo>(13, 1);
+        private final HashMap<String, Integer> rowIndex = new HashMap<String, Integer>();
 
         public int getColumnCount()
         {
@@ -1990,6 +2003,7 @@ public class WebClient extends KFrame implements WindowListener,
             return data.size();
         }
 
+        @Override
         public String getColumnName(int col)
         {
             return columnNames[col];
@@ -2067,9 +2081,10 @@ public class WebClient extends KFrame implements WindowListener,
             return o;
         }
 
-        public Class getColumnClass(int col)
+        @Override
+        public Class<?> getColumnClass(int col)
         {
-            Class c = new String("").getClass();
+            Class<?> c = String.class;
 
             switch (col)
             {
@@ -2079,29 +2094,32 @@ public class WebClient extends KFrame implements WindowListener,
                 case 3:
                 case 4:
                 case 5:
-                    c = new String("").getClass();
+                    c = String.class;
                     break;
 
                 case 6:
                 case 7:
-                    c = new Boolean(true).getClass();
+                    c = Boolean.class;
                     break;
 
                 case 8:
                 case 9:
                 case 10:
                 case 11:
-                    c = new Integer(1).getClass();
+                    c = Integer.class;
                     break;
 
                 case 12:
-                    c = new String("").getClass();
+                    c = String.class;
                     break;
             }
 
             return c;
         }
 
+        // TableModel forces us into casting
+        @SuppressWarnings("unchecked")
+        @Override
         public void setValueAt(Object value, int row, int col)
         {
             if (col == -1)
@@ -2296,17 +2314,17 @@ public class WebClient extends KFrame implements WindowListener,
     public class ChatHandler
     {
         private final int textAreaHeight = 20;
-        private String id;
-        private String title;
-        private JPanel chatTab;
+        private final String id;
+        private final String title;
+        private final JPanel chatTab;
 
-        private JButton chatSubmitButton;
-        private JTextArea displayArea;
-        private JScrollPane displayScrollPane;
-        private JScrollBar displayScrollBar;
-        private JTextField newMessage;
+        private final JButton chatSubmitButton;
+        private final JTextArea displayArea;
+        private final JScrollPane displayScrollPane;
+        private final JScrollBar displayScrollBar;
+        private final JTextField newMessage;
 
-        private FormatWhen whenFormatter;
+        private final FormatWhen whenFormatter;
         private boolean loginState = false;
 
         private long lastMsgWhen = -1;
@@ -2490,8 +2508,8 @@ public class WebClient extends KFrame implements WindowListener,
         public static final String DATE_FORMAT = "yyyy-MM-dd";
         public static final String TIME_FORMAT = "HH:mm:ss";
 
-        private SimpleDateFormat dateFormatter;
-        private SimpleDateFormat timeFormatter;
+        private final SimpleDateFormat dateFormatter;
+        private final SimpleDateFormat timeFormatter;
 
         private String datePrev;
         private String changedDateString = null;
@@ -2537,14 +2555,14 @@ public class WebClient extends KFrame implements WindowListener,
     {
         private boolean isRegister;
 
-        private JTextField rploginField;
+        private final JTextField rploginField;
         private JTextField rpEmailField;
 
         private JPasswordField rpOldPW;
-        private JPasswordField rpNewPW1;
-        private JPasswordField rpNewPW2;
+        private final JPasswordField rpNewPW1;
+        private final JPasswordField rpNewPW2;
 
-        private JButton rpButton;
+        private final JButton rpButton;
 
         public RegisterPasswordPanel(KFrame frame, String title,
             String username)
@@ -2603,6 +2621,7 @@ public class WebClient extends KFrame implements WindowListener,
             setVisible(true);
         }
 
+        @Override
         public void dispose()
         {
             setVisible(false);
@@ -2694,8 +2713,8 @@ public class WebClient extends KFrame implements WindowListener,
                 }
                 else
                 {
-                    LOGGER.log(Level.FINE, "ooops? Unexpected command " +
-                        command + " in RegisterPasswordPanel action?");
+                    LOGGER.log(Level.FINE, "ooops? Unexpected command "
+                        + command + " in RegisterPasswordPanel action?");
                 }
             }
         }

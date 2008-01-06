@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -392,8 +393,8 @@ public final class Client implements IClient, IOracle, IOptions
         server.fight(land);
     }
 
-    private List _tellEngagementResults_attackerStartingContents = null;
-    private List _tellEngagementResults_defenderStartingContents = null;
+    private List<String> _tellEngagementResults_attackerStartingContents = null;
+    private List<String> _tellEngagementResults_defenderStartingContents = null;
     private List<Boolean> _tellEngagementResults_attackerLegionCertainities = null;
     private List<Boolean> _tellEngagementResults_defenderLegionCertainities = null;
 
@@ -778,10 +779,10 @@ public final class Client implements IClient, IOracle, IOptions
     /** Fully sync the board state by running all option triggers. */
     private void runAllOptionTriggers()
     {
-        Enumeration en = options.propertyNames();
+        Enumeration<String> en = options.propertyNames();
         while (en.hasMoreElements())
         {
-            String name = (String)en.nextElement();
+            String name = en.nextElement();
             String value = getStringOption(name);
             optionTrigger(name, value);
         }
@@ -953,10 +954,10 @@ public final class Client implements IClient, IOracle, IOptions
         {
             return;
         }
-        Enumeration en = options.propertyNames();
+        Enumeration<String> en = options.propertyNames();
         while (en.hasMoreElements())
         {
-            String name = (String)en.nextElement();
+            String name = en.nextElement();
             boolean value = getOption(name);
             board.twiddleOption(name, value);
         }
@@ -982,7 +983,7 @@ public final class Client implements IClient, IOracle, IOptions
         return total;
     }
 
-    public void updatePlayerInfo(List infoStrings)
+    public void updatePlayerInfo(List<String> infoStrings)
     {
         numPlayers = infoStrings.size();
         if (playerInfo == null)
@@ -996,7 +997,7 @@ public final class Client implements IClient, IOracle, IOptions
         }
         for (int i = 0; i < numPlayers; i++)
         {
-            playerInfo[i].update((String)infoStrings.get(i));
+            playerInfo[i].update(infoStrings.get(i));
         }
         updateStatusScreen();
     }
@@ -1702,14 +1703,14 @@ public final class Client implements IClient, IOracle, IOptions
     /** Return a list of Strings.  Use the proper string for titans and
      *  unknown creatures. */
     // public for IOracle
-    public List getLegionImageNames(String markerId)
+    public List<String> getLegionImageNames(String markerId)
     {
         LegionInfo info = getLegionInfo(markerId);
         if (info != null)
         {
             return info.getImageNames();
         }
-        return new ArrayList();
+        return new ArrayList<String>();
     }
 
     /** Return a list of Booleans */
@@ -2341,9 +2342,9 @@ public final class Client implements IClient, IOracle, IOptions
         if (getOption(Options.autoSummonAngels))
         {
             String typeColonDonor = ai.summonAngel(markerId);
-            List parts = Split.split(':', typeColonDonor);
-            String unit = (String)parts.get(0);
-            String donor = (String)parts.get(1);
+            List<String> parts = Split.split(':', typeColonDonor);
+            String unit = parts.get(0);
+            String donor = parts.get(1);
             doSummon(markerId, donor, unit);
         }
         else
@@ -2369,7 +2370,7 @@ public final class Client implements IClient, IOracle, IOptions
         return info.getContents().contains(name);
     }
 
-    public void askAcquireAngel(String markerId, List recruits)
+    public void askAcquireAngel(String markerId, List<String> recruits)
     {
         if (getOption(Options.autoAcquireAngels))
         {
@@ -2413,7 +2414,7 @@ public final class Client implements IClient, IOracle, IOptions
 
     /** Allow the player to choose whether to take a penalty (fewer dice
      *  or higher strike number) in order to be allowed to carry. */
-    public void askChooseStrikePenalty(List choices)
+    public void askChooseStrikePenalty(List<String> choices)
     {
         if (getOption(Options.autoPlay))
         {
@@ -2722,8 +2723,9 @@ public final class Client implements IClient, IOracle, IOptions
     }
 
     public void tellStrikeResults(int strikerTag, int targetTag,
-        int strikeNumber, List rolls, int damage, boolean killed,
-        boolean wasCarry, int carryDamageLeft, Set carryTargetDescriptions)
+        int strikeNumber, List<String> rolls, int damage, boolean killed,
+        boolean wasCarry, int carryDamageLeft,
+        Set<String> carryTargetDescriptions)
     {
         BattleChit chit = getBattleChit(strikerTag);
         if (chit != null)
@@ -2842,7 +2844,8 @@ public final class Client implements IClient, IOracle, IOptions
         }
     }
 
-    private void pickCarries(int carryDamage, Set carryTargetDescriptions)
+    private void pickCarries(int carryDamage,
+        Set<String> carryTargetDescriptions)
     {
         if (!isMyBattlePhase())
         {
@@ -2856,8 +2859,8 @@ public final class Client implements IClient, IOracle, IOptions
         else if (carryTargetDescriptions.size() == 1
             && getOption(Options.autoCarrySingle))
         {
-            Iterator it = carryTargetDescriptions.iterator();
-            String desc = (String)it.next();
+            Iterator<String> it = carryTargetDescriptions.iterator();
+            String desc = it.next();
             String targetHex = desc.substring(desc.length() - 2);
             applyCarries(targetHex);
         }
@@ -3527,11 +3530,12 @@ public final class Client implements IClient, IOracle, IOptions
     {
         markers.clear();
 
-        Iterator it = legionInfo.entrySet().iterator();
+        Iterator<Entry<String, LegionInfo>> it = legionInfo.entrySet()
+            .iterator();
         while (it.hasNext())
         {
-            Map.Entry entry = (Map.Entry)it.next();
-            LegionInfo info = (LegionInfo)entry.getValue();
+            Entry<String, LegionInfo> entry = it.next();
+            LegionInfo info = entry.getValue();
             String markerId = info.getMarkerId();
             String hexLabel = info.getHexLabel();
             Marker marker = new Marker(3 * Scale.get(), markerId, this);
@@ -3835,24 +3839,24 @@ public final class Client implements IClient, IOracle, IOptions
     }
 
     /** Return a set of hexLabels. */
-    Set findCrittersWithTargets()
+    Set<String> findCrittersWithTargets()
     {
         return strike.findCrittersWithTargets();
     }
 
     /** Return a set of hexLabels. */
-    public Set findStrikes(int tag)
+    public Set<String> findStrikes(int tag)
     {
         return strike.findStrikes(tag);
     }
 
-    void setStrikeNumbers(int tag, Set targetHexes)
+    void setStrikeNumbers(int tag, Set<String> targetHexes)
     {
         BattleChit chit = getBattleChit(tag);
-        Iterator it = targetHexes.iterator();
+        Iterator<String> it = targetHexes.iterator();
         while (it.hasNext())
         {
-            String targetHex = (String)it.next();
+            String targetHex = it.next();
             BattleChit target = getBattleChit(targetHex);
             target.setStrikeNumber(strike.getStrikeNumber(chit, target));
             Creature striker = Creature.getCreatureByName(chit
@@ -3999,10 +4003,10 @@ public final class Client implements IClient, IOracle, IOptions
         // Tower teleport
         else
         {
-            Iterator it = info.getContents().iterator();
+            Iterator<String> it = info.getContents().iterator();
             while (it.hasNext())
             {
-                String name = (String)it.next();
+                String name = it.next();
                 Creature creature = Creature.getCreatureByName(name);
                 if (creature != null && creature.isLord()
                     && !lords.contains(name))
@@ -4055,7 +4059,8 @@ public final class Client implements IClient, IOracle, IOptions
             return false;
         }
 
-        Set entrySides = listPossibleEntrySides(moverId, hexLabel, teleport);
+        Set<String> entrySides = listPossibleEntrySides(moverId, hexLabel,
+            teleport);
 
         String entrySide = null;
         if (getOption(Options.autoPickEntrySide))
@@ -4331,7 +4336,7 @@ public final class Client implements IClient, IOracle, IOptions
     public List<String> findEligibleRecruiters(String markerId,
         String recruitName)
     {
-        Set recruiters;
+        Set<Creature> recruiters;
         Creature recruit = Creature.getCreatureByName(recruitName);
         if (recruit == null)
         {
@@ -4343,12 +4348,12 @@ public final class Client implements IClient, IOracle, IOptions
         MasterHex hex = MasterBoard.getHexByLabel(hexLabel);
         String terrain = hex.getTerrain();
 
-        recruiters = new HashSet(TerrainRecruitLoader.getPossibleRecruiters(
-            terrain, hexLabel));
-        Iterator it = recruiters.iterator();
+        recruiters = new HashSet<Creature>(TerrainRecruitLoader
+            .getPossibleRecruiters(terrain, hexLabel));
+        Iterator<Creature> it = recruiters.iterator();
         while (it.hasNext())
         {
-            Creature possibleRecruiter = (Creature)it.next();
+            Creature possibleRecruiter = it.next();
             int needed = TerrainRecruitLoader.numberOfRecruiterNeeded(
                 possibleRecruiter, recruit, terrain, hexLabel);
             if (needed < 1 || needed > info.numCreature(possibleRecruiter))
@@ -4362,7 +4367,7 @@ public final class Client implements IClient, IOracle, IOptions
         it = recruiters.iterator();
         while (it.hasNext())
         {
-            Creature creature = (Creature)it.next();
+            Creature creature = it.next();
             strings.add(creature.getName());
         }
         return strings;
@@ -4394,10 +4399,10 @@ public final class Client implements IClient, IOracle, IOptions
         Set<String> set = new HashSet<String>();
         LegionInfo summonerInfo = getLegionInfo(summonerId);
         String pName = summonerInfo.getPlayerName();
-        Iterator it = getLegionsByPlayer(pName).iterator();
+        Iterator<String> it = getLegionsByPlayer(pName).iterator();
         while (it.hasNext())
         {
-            String markerId = (String)it.next();
+            String markerId = it.next();
             if (!markerId.equals(summonerId))
             {
                 LegionInfo info = getLegionInfo(markerId);
@@ -4436,7 +4441,7 @@ public final class Client implements IClient, IOracle, IOptions
         return movement.listNormalMoves(info, hex, movementRoll);
     }
 
-    Set listPossibleEntrySides(String moverId, String hexLabel,
+    Set<String> listPossibleEntrySides(String moverId, String hexLabel,
         boolean teleport)
     {
         return movement.listPossibleEntrySides(moverId, hexLabel, teleport);
@@ -4476,11 +4481,12 @@ public final class Client implements IClient, IOracle, IOptions
     public List<String> getLegionsByHex(String hexLabel)
     {
         List<String> markerIds = new ArrayList<String>();
-        Iterator it = legionInfo.entrySet().iterator();
+        Iterator<Entry<String, LegionInfo>> it = legionInfo.entrySet()
+            .iterator();
         while (it.hasNext())
         {
-            Map.Entry entry = (Map.Entry)it.next();
-            LegionInfo info = (LegionInfo)entry.getValue();
+            Entry<String, LegionInfo> entry = it.next();
+            LegionInfo info = entry.getValue();
             if (info != null && info.getHexLabel() != null && hexLabel != null
                 && hexLabel.equals(info.getHexLabel()))
             {
@@ -4498,8 +4504,8 @@ public final class Client implements IClient, IOracle, IOptions
             .iterator();
         while (it.hasNext())
         {
-            Map.Entry entry = it.next();
-            LegionInfo info = (LegionInfo)entry.getValue();
+            Entry<String, LegionInfo> entry = it.next();
+            LegionInfo info = entry.getValue();
             if (name.equals(info.getPlayerName()))
             {
                 markerIds.add(info.getMarkerId());
@@ -4538,11 +4544,12 @@ public final class Client implements IClient, IOracle, IOptions
     {
         Set<String> set = new HashSet<String>();
 
-        Iterator it = legionInfo.entrySet().iterator();
+        Iterator<Entry<String, LegionInfo>> it = legionInfo.entrySet()
+            .iterator();
         while (it.hasNext())
         {
-            Map.Entry entry = (Map.Entry)it.next();
-            LegionInfo info = (LegionInfo)entry.getValue();
+            Entry<String, LegionInfo> entry = it.next();
+            LegionInfo info = entry.getValue();
             if (info.getHeight() >= minHeight
                 && activePlayerName.equals(info.getPlayerName()))
             {
@@ -4556,10 +4563,10 @@ public final class Client implements IClient, IOracle, IOptions
     public Set<String> findEngagements()
     {
         Set<String> set = new HashSet<String>();
-        Iterator it = MasterBoard.getAllHexLabels().iterator();
+        Iterator<String> it = MasterBoard.getAllHexLabels().iterator();
         while (it.hasNext())
         {
-            String hexLabel = (String)it.next();
+            String hexLabel = it.next();
             List<String> markerIds = getLegionsByHex(hexLabel);
             if (markerIds.size() == 2)
             {
@@ -5200,21 +5207,21 @@ public final class Client implements IClient, IOracle, IOptions
         }
     }
 
-    public void askPickColor(List colorsLeft)
+    public void askPickColor(List<String> colorsLeft)
     {
         String color = null;
         if (getOption(Options.autoPickColor))
         {
             // Convert favorite colors from a comma-separated string to a list.
             String favorites = getStringOption(Options.favoriteColors);
-            List favoriteColors = null;
+            List<String> favoriteColors = null;
             if (favorites != null)
             {
                 favoriteColors = Split.split(',', favorites);
             }
             else
             {
-                favoriteColors = new ArrayList();
+                favoriteColors = new ArrayList<String>();
             }
             color = ai.pickColor(colorsLeft, favoriteColors);
         }
@@ -5361,7 +5368,9 @@ public final class Client implements IClient, IOracle, IOptions
                     + " from " + ai.getClass().getName() + " to " + type);
                 try
                 {
-                    Class[] classArray = new Class[1];
+                    // TODO these seem to be classes of either AI or Client, there
+                    // should be a common ancestor
+                    Class<?>[] classArray = new Class<?>[1];
                     classArray[0] = Class
                         .forName("net.sf.colossus.client.Client");
                     Object[] objArray = new Object[1];
@@ -5463,21 +5472,15 @@ public final class Client implements IClient, IOracle, IOptions
         }
     }
 
-    class MarkerComparator implements Comparator
+    class MarkerComparator implements Comparator<String>
     {
-        public int compare(Object o1, Object o2)
+        public int compare(String s1, String s2)
         {
             String shortColor = "None"; // In case not initialized yet.
             if (color != null)
             {
                 shortColor = getShortColor();
             }
-            if (!(o1 instanceof String) || !(o2 instanceof String))
-            {
-                throw new ClassCastException();
-            }
-            String s1 = (String)o1;
-            String s2 = (String)o2;
             if (s1.startsWith(shortColor) && !s2.startsWith(shortColor))
             {
                 return -1;

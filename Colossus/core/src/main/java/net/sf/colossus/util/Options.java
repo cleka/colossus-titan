@@ -169,9 +169,9 @@ public final class Options implements IOptions
     public static final String favoriteLookFeel = "Favorite Look And Feel";
     public static final String serverName = "Server name";
 
-    private Properties props = new Properties();
-    private String owner; // playerName, or Constants.optionsServerName
-    private String dataPath; // WebServer sets to create a server.cfg file
+    private final Properties props = new Properties();
+    private final String owner; // playerName, or Constants.optionsServerName
+    private final String dataPath; // WebServer sets to create a server.cfg file
 
     // in the directory in which the game is run
 
@@ -289,8 +289,8 @@ public final class Options implements IOptions
 
     public boolean getOption(String optname, boolean defaultValue)
     {
-        String value = getStringOption(optname,
-            (defaultValue ? "true" : "false"));
+        String value = getStringOption(optname, (defaultValue ? "true"
+            : "false"));
         return (value != null && value.equals("true"));
     }
 
@@ -315,18 +315,20 @@ public final class Options implements IOptions
         props.remove(optname);
     }
 
-    public Enumeration propertyNames()
+    // we know we didn't mistreat Properties by adding non-Strings
+    @SuppressWarnings("unchecked")
+    public Enumeration<String> propertyNames()
     {
-        return props.propertyNames();
+        return (Enumeration<String>)props.propertyNames();
     }
 
     /** Remove all playerName and playerType entries. */
     public void clearPlayerInfo()
     {
-        Enumeration en = props.propertyNames();
+        Enumeration<String> en = propertyNames();
         while (en.hasMoreElements())
         {
-            String name = (String)en.nextElement();
+            String name = en.nextElement();
             if (name.startsWith(playerName) || name.startsWith(playerType))
             {
                 props.remove(name);
@@ -345,6 +347,7 @@ public final class Options implements IOptions
         return props.isEmpty();
     }
 
+    @Override
     public String toString()
     {
         return props.toString();
@@ -447,10 +450,9 @@ public final class Options implements IOptions
             catch (NumberFormatException ex)
             {
                 howMany = 1;
-                LOGGER.log(Level.WARNING,
-                    "NOTE: Value '" + propHowMany + "' from property " +
-                    propNameStresstestRounds +
-                    " is not a valid number - using default value 1!");
+                LOGGER.log(Level.WARNING, "NOTE: Value '" + propHowMany
+                    + "' from property " + propNameStresstestRounds
+                    + " is not a valid number - using default value 1!");
             }
         }
         return howMany;

@@ -4,8 +4,8 @@ package net.sf.colossus.client;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -31,13 +31,13 @@ public class RevealEvent
     private static final Logger LOGGER = Logger.getLogger(RevealEvent.class
         .getName());
 
-    private Client client;
-    private int turnNumber;
-    private int playerNr;
+    private final Client client;
+    private final int turnNumber;
+    private final int playerNr;
     private int eventType;
     private String markerId;
     private int height;
-    private ArrayList<RevealedCreature> knownCreatures;
+    private List<RevealedCreature> knownCreatures;
 
     // child legion or summoner (for split or summon events)
     private String markerId2;
@@ -94,15 +94,15 @@ public class RevealEvent
         eventBattleText };
 
     public RevealEvent(Client client, int turnNumber, int playerNr,
-        int eventType, String markerId, int height, ArrayList<RevealedCreature> knownCreatures,
-        String markerId2, int height2)
+        int eventType, String markerId, int height,
+        List<RevealedCreature> knownCreatures, String markerId2, int height2)
     {
         if (markerId == null && eventType != eventPlayerChange
             && eventType != eventTurnChange)
         {
             LOGGER.log(Level.SEVERE, "null marker for event "
                 + getEventTypeText(eventType));
-            return;
+            throw new IllegalArgumentException("Missing markerId");
         }
         this.client = client;
         this.turnNumber = turnNumber;
@@ -142,7 +142,7 @@ public class RevealEvent
      * Called also after battle to update to new power after
      * points were rewarded.
      */
-    private void makeCreaturesTitanChangeSafe(ArrayList<RevealedCreature> list)
+    private void makeCreaturesTitanChangeSafe(List<RevealedCreature> list)
     {
         if (list == null || list.isEmpty())
         {
@@ -262,7 +262,7 @@ public class RevealEvent
 
     // creatures were revealed some while after event was created.
     // E.g. engagements.
-    public void updateKnownCreatures(ArrayList<RevealedCreature> revealedCreatures)
+    public void updateKnownCreatures(List<RevealedCreature> revealedCreatures)
     {
         this.knownCreatures = revealedCreatures;
         makeCreaturesTitanChangeSafe(knownCreatures);
@@ -368,6 +368,7 @@ public class RevealEvent
         return playerNr;
     }
 
+    @Override
     public String toString()
     {
         String msg = "<unknown event?>";

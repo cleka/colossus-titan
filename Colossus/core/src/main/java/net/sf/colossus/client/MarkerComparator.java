@@ -9,7 +9,7 @@ import java.util.Comparator;
  *  @version $Id$
  *  @author David Ripton
  */
-public class MarkerComparator implements Comparator
+public class MarkerComparator implements Comparator<String>
 {
     private String shortColor;
 
@@ -25,14 +25,8 @@ public class MarkerComparator implements Comparator
         }
     }
 
-    public int compare(Object o1, Object o2)
+    public int compare(String s1, String s2)
     {
-        if (!(o1 instanceof String) || !(o2 instanceof String))
-        {
-            throw new ClassCastException();
-        }
-        String s1 = (String)o1;
-        String s2 = (String)o2;
         if (s1.startsWith(shortColor) && !s2.startsWith(shortColor))
         {
             return -1;
