@@ -142,12 +142,12 @@ public class Creature implements Comparable
 
     public static List getCreatures()
     {
-        return java.util.Collections.unmodifiableList(creatures);
+        return Collections.unmodifiableList(creatures);
     }
 
     public static List getSummonableCreatures()
     {
-        return java.util.Collections.unmodifiableList(summonableCreatures);
+        return Collections.unmodifiableList(summonableCreatures);
     }
 
     public int getMaxCount()
