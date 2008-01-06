@@ -24,14 +24,12 @@ import net.sf.colossus.variant.HazardTerrain;
  * @author Romain Dolbeau
  */
 
-// final
-public//  
-class Critter implements Comparable<Critter>
+public class Critter extends net.sf.colossus.game.Creature implements
+    Comparable<Critter>
 {
     private static final Logger LOGGER = Logger.getLogger(Critter.class
         .getName());
 
-    private final Creature creature;
     private String markerId;
     private Battle battle;
     private boolean struck;
@@ -52,7 +50,7 @@ class Critter implements Comparable<Critter>
 
     public Critter(Creature creature, String markerId, Game game)
     {
-        this.creature = creature;
+        super(creature);
         this.markerId = markerId;
         this.game = game;
         tag = ++tagCounter;
@@ -66,9 +64,13 @@ class Critter implements Comparable<Critter>
         this.battle = battle;
     }
 
+    /**
+     * TODO MODEL -- getType() should be used once everything needed is moved
+     *      up into the CreatureType class
+     */
     Creature getCreature()
     {
-        return creature;
+        return (Creature)getType();
     }
 
     String getMarkerId()
@@ -121,7 +123,7 @@ class Critter implements Comparable<Critter>
                 return 6;
             }
         }
-        return creature.getPower();
+        return getCreature().getPower();
     }
 
     int getHits()
@@ -830,178 +832,178 @@ class Critter implements Comparable<Critter>
 
     public String getName()
     {
-        return creature.getName();
+        return getCreature().getName();
     }
 
     public int getMaxCount()
     {
-        return creature.getMaxCount();
+        return getCreature().getMaxCount();
     }
 
     public boolean isLord()
     {
-        return creature.isLord();
+        return getCreature().isLord();
     }
 
     public boolean isDemiLord()
     {
-        return creature.isDemiLord();
+        return getCreature().isDemiLord();
     }
 
     public boolean isLordOrDemiLord()
     {
-        return creature.isLordOrDemiLord();
+        return getCreature().isLordOrDemiLord();
     }
 
     public boolean isImmortal()
     {
-        return creature.isImmortal();
+        return getCreature().isImmortal();
     }
 
     public boolean isTitan()
     {
-        return creature.isTitan();
+        return getCreature().isTitan();
     }
 
     public String getPluralName()
     {
-        return creature.getPluralName();
+        return getCreature().getPluralName();
     }
 
     public String getImageName()
     {
-        return creature.getImageName();
+        return getCreature().getImageName();
     }
 
     public String getDisplayName()
     {
-        return creature.getDisplayName();
+        return getCreature().getDisplayName();
     }
 
     public String[] getImageNames()
     {
-        return creature.getImageNames();
+        return getCreature().getImageNames();
     }
 
     public int getSkill()
     {
-        return creature.getSkill();
+        return getCreature().getSkill();
     }
 
     public int getPointValue()
     {
         // Must use our local, Titan-aware getPower()
-        // return creature.getPointValue();
+        // return getCreature().getPointValue();
         return getPower() * getSkill();
     }
 
     public int getHintedRecruitmentValue()
     {
         // Must use our local, Titan-aware getPointValue()
-        // return creature.getHintedRecruitmentValue();
+        // return getCreature().getHintedRecruitmentValue();
         return getPointValue()
-            + VariantSupport.getHintedRecruitmentValueOffset(creature
+            + VariantSupport.getHintedRecruitmentValueOffset(getCreature()
                 .getName());
     }
 
     public int getHintedRecruitmentValue(String[] section)
     {
         // Must use our local, Titan-aware getPointValue()
-        // return creature.getHintedRecruitmentValue(section);
+        // return getCreature().getHintedRecruitmentValue(section);
         return getPointValue()
-            + VariantSupport.getHintedRecruitmentValueOffset(creature
+            + VariantSupport.getHintedRecruitmentValueOffset(getCreature()
                 .getName(), section);
     }
 
     public boolean isRangestriker()
     {
-        return creature.isRangestriker();
+        return getCreature().isRangestriker();
     }
 
     public boolean isFlier()
     {
-        return creature.isFlier();
+        return getCreature().isFlier();
     }
 
     public boolean isNativeTerrain(HazardTerrain t)
     {
-        return creature.isNativeTerrain(t);
+        return getCreature().isNativeTerrain(t);
     }
 
     public boolean isNativeHexside(char h)
     {
-        return creature.isNativeHexside(h);
+        return getCreature().isNativeHexside(h);
     }
 
     public boolean isNativeBramble()
     {
-        return creature.isNativeBramble();
+        return getCreature().isNativeBramble();
     }
 
     public boolean isNativeDrift()
     {
-        return creature.isNativeDrift();
+        return getCreature().isNativeDrift();
     }
 
     public boolean isNativeBog()
     {
-        return creature.isNativeBog();
+        return getCreature().isNativeBog();
     }
 
     public boolean isNativeSandDune()
     {
-        return creature.isNativeSandDune();
+        return getCreature().isNativeSandDune();
     }
 
     public boolean isNativeSlope()
     {
-        return creature.isNativeSlope();
+        return getCreature().isNativeSlope();
     }
 
     public boolean isNativeVolcano()
     {
-        return creature.isNativeVolcano();
+        return getCreature().isNativeVolcano();
     }
 
     public boolean isNativeRiver()
     {
-        return creature.isNativeRiver();
+        return getCreature().isNativeRiver();
     }
 
     public boolean isNativeStone()
     {
-        return creature.isNativeStone();
+        return getCreature().isNativeStone();
     }
 
     public boolean isNativeTree()
     {
-        return creature.isNativeTree();
+        return getCreature().isNativeTree();
     }
 
     public boolean isWaterDwelling()
     {
-        return creature.isWaterDwelling();
+        return getCreature().isWaterDwelling();
     }
 
     public boolean useMagicMissile()
     {
-        return creature.useMagicMissile();
+        return getCreature().useMagicMissile();
     }
 
     public boolean isSummonable()
     {
-        return creature.isSummonable();
+        return getCreature().isSummonable();
     }
 
     @Override
     public String toString()
     {
-        return creature.toString();
+        return getCreature().toString();
     }
 
     @Override
     public int hashCode()
     {
-        return creature.hashCode();
+        return getCreature().hashCode();
     }
 }

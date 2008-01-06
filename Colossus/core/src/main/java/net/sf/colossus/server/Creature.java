@@ -13,6 +13,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.colossus.util.ResourceLoader;
+import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.HazardTerrain;
 import net.sf.colossus.xmlparser.CreatureLoader;
 
@@ -30,7 +31,7 @@ import net.sf.colossus.xmlparser.CreatureLoader;
  * @author Romain Dolbeau
  */
 
-public class Creature implements Comparable<Creature>
+public class Creature extends CreatureType implements Comparable<Creature>
 {
     private static final Logger LOGGER = Logger.getLogger(Creature.class
         .getName());
