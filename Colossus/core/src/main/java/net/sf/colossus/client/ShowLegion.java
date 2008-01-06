@@ -57,21 +57,25 @@ final class ShowLegion extends KDialog implements MouseListener,
         repaint();
     }
 
+    @Override
     public void mouseClicked(MouseEvent e)
     {
         dispose();
     }
 
+    @Override
     public void mousePressed(MouseEvent e)
     {
         dispose();
     }
 
+    @Override
     public void mouseReleased(MouseEvent e)
     {
         dispose();
     }
 
+    @Override
     public void windowClosing(WindowEvent e)
     {
         dispose();

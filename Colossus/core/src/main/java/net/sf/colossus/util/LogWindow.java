@@ -44,6 +44,7 @@ public final class LogWindow extends JTextArea
         logFrame = new JFrame("Log Window");
         logFrame.addWindowListener(new WindowAdapter()
         {
+            @Override
             public void windowClosing(WindowEvent e)
             {
                 LogWindow.this.client.setOption(Options.showLogWindow, false);
@@ -79,6 +80,7 @@ public final class LogWindow extends JTextArea
         setDocument(handler.getDocument());
     }
 
+    @Override
     public void append(String s)
     {
         super.append(s);
@@ -94,6 +96,7 @@ public final class LogWindow extends JTextArea
         repaint();
     }
 
+    @Override
     public Dimension getMinimumSize()
     {
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();

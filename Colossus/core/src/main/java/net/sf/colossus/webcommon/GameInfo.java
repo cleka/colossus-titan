@@ -392,6 +392,7 @@ public class GameInfo extends Thread
         return message;
     }
 
+    @Override
     public void run()
     {
         if (server != null)

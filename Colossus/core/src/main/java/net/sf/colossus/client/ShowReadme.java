@@ -7,6 +7,7 @@ import java.awt.GridLayout;
 import javax.swing.JEditorPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.text.Document;
 
 import net.sf.colossus.server.Constants;
@@ -56,6 +57,7 @@ public final class ShowReadme extends KFrame
         setVisible(true);
     }
 
+    @Override
     public void dispose()
     {
         if (myReadme != null)
@@ -75,8 +77,8 @@ public final class ShowReadme extends KFrame
     {
         JPanel readmePane = new JPanel();
         JScrollPane readmeScrollPane = new JScrollPane(readmePane,
-            JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-            JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+            ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+            ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         readmePane.setLayout(new GridLayout(0, 1));
         readme.setEditable(false);
         // Must be tall enough for biggest variant readme file.

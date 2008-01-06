@@ -90,6 +90,7 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
 
     private boolean done = false;
 
+    @Override
     public void interrupt()
     {
         super.interrupt();
@@ -110,6 +111,7 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
      * prepare socket to read/write, and then loop as long
      * as lines from client come, and parse them
      */
+    @Override
     public void run()
     {
         String fromClient = "dummy";

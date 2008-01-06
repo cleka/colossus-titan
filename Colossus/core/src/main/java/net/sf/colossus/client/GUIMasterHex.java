@@ -454,12 +454,14 @@ public final class GUIMasterHex extends GUIHex
         this.selectColor = color;
     }
 
+    @Override
     public void select()
     {
         super.select();
         selectColor = Color.white;
     }
 
+    @Override
     public void unselect()
     {
         super.unselect();

@@ -343,7 +343,7 @@ public class TerrainRecruitLoader
      */
     public static String[] getTerrains()
     {
-        return (String[])terrains.clone();
+        return terrains.clone();
     }
 
     /**
@@ -390,6 +390,7 @@ public class TerrainRecruitLoader
          * Textual representation of the data.
          * @return Textual representation of the data as a String.
          */
+        @Override
         public String toString()
         {
             return ("(" + number + "," + name + ")");
@@ -648,6 +649,7 @@ public class TerrainRecruitLoader
             }
         }
 
+        @Override
         public String toString()
         {
             return ("Acquirable by name of " + name + ", available every "

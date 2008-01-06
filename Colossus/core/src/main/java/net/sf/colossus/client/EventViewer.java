@@ -33,7 +33,9 @@ import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JToggleButton;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
+import javax.swing.WindowConstants;
 import javax.swing.border.TitledBorder;
 
 import net.sf.colossus.server.Constants;
@@ -200,9 +202,10 @@ final class EventViewer extends KDialog implements WindowListener,
 
         setupGUI();
 
-        setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
         this.addWindowListener(new WindowAdapter()
         {
+            @Override
             public void windowClosing(WindowEvent e)
             {
                 options.setOption(Options.showEventViewer, false);
@@ -296,8 +299,8 @@ final class EventViewer extends KDialog implements WindowListener,
         eventPane = new Box(BoxLayout.Y_AXIS);
         eventPane.add(Box.createVerticalGlue());
         eventScrollPane = new JScrollPane(eventPane,
-            JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
-            JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+            ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
+            ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         eventScrollBar = eventScrollPane.getVerticalScrollBar();
         eventTabPane.add(eventScrollPane);
 
@@ -1290,6 +1293,7 @@ final class EventViewer extends KDialog implements WindowListener,
         lastDefenderEventLegion = null;
     }
 
+    @Override
     public void dispose()
     {
         if (saveWindow != null)
@@ -1306,6 +1310,7 @@ final class EventViewer extends KDialog implements WindowListener,
         setVisible(visible);
     }
 
+    @Override
     public void setVisible(boolean visible)
     {
         if (visible)

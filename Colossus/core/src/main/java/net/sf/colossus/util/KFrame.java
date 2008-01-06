@@ -68,6 +68,7 @@ public class KFrame extends JFrame implements MouseListener, WindowListener
         }
     }
 
+    @Override
     public void setVisible(boolean val)
     {
         if (!val && kSaveWindow != null)
@@ -77,6 +78,7 @@ public class KFrame extends JFrame implements MouseListener, WindowListener
         super.setVisible(val);
     }
 
+    @Override
     public void dispose()
     {
         super.dispose();

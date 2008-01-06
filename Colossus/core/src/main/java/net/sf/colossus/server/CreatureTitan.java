@@ -42,22 +42,26 @@ public class CreatureTitan extends Creature
         }
     }
 
+    @Override
     public boolean isImmortal()
     { // Titan aren't immortal
         return false;
     }
 
+    @Override
     public boolean isTitan()
     {
         return true;
     }
 
+    @Override
     public String[] getImageNames()
     {
         LOGGER.log(Level.WARNING, "Calling getImageNames() for Titan");
         return super.getImageNames();
     }
 
+    @Override
     public int getPointValue()
     {
         // Log.warn("Calling getPointValue() on Titan Creature"); 
@@ -66,6 +70,7 @@ public class CreatureTitan extends Creature
         return val;
     }
 
+    @Override
     public int getHintedRecruitmentValue()
     {
         int val = super.getHintedRecruitmentValue();
@@ -73,6 +78,7 @@ public class CreatureTitan extends Creature
         return val;
     }
 
+    @Override
     public int getHintedRecruitmentValue(String[] section)
     {
         int val = super.getHintedRecruitmentValue(section);

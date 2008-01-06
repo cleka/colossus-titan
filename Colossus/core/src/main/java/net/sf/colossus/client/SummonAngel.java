@@ -142,6 +142,7 @@ final class SummonAngel extends KDialog implements MouseListener,
         active = false;
     }
 
+    @Override
     public void mousePressed(MouseEvent e)
     {
         String donorId = client.getDonorId();
@@ -164,6 +165,7 @@ final class SummonAngel extends KDialog implements MouseListener,
         }
     }
 
+    @Override
     public void windowClosing(WindowEvent e)
     {
         cleanup(null, null);

@@ -21,6 +21,7 @@ public class VerySimpleFormatter extends Formatter
     public static final String LINE_SEPARATOR = System
         .getProperty("line.separator");
 
+    @Override
     public String format(LogRecord record)
     {
         StringBuffer sb = new StringBuffer();

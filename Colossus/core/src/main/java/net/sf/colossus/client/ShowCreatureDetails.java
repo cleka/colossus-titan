@@ -20,6 +20,7 @@ import java.util.List;
 import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
+import javax.swing.ScrollPaneConstants;
 
 import net.sf.colossus.server.Creature;
 import net.sf.colossus.server.Critter;
@@ -317,7 +318,7 @@ public final class ShowCreatureDetails extends KDialog implements
         // layout everything
         JScrollPane scrollPane = new JScrollPane(pane);
         scrollPane
-            .setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+            .setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
         scrollPane.setPreferredSize(new Dimension(500, 800));
         scrollPane.setMinimumSize(new Dimension(200, 400));
         cnt.add(scrollPane, BorderLayout.CENTER);
@@ -387,6 +388,7 @@ public final class ShowCreatureDetails extends KDialog implements
         }
 
         /** fake, return ' ' nor now. TODO. */
+        @Override
         public char getOppositeHexside(final int i)
         {
             return ' '; // plain hex side for now
@@ -446,18 +448,21 @@ public final class ShowCreatureDetails extends KDialog implements
         // to help simulating
         //
         /** prox to simulated hex. */
+        @Override
         protected BattleHex getCurrentHex()
         {
             return hex;
         }
 
         /** fake -- true or false as wished. TODO */
+        @Override
         protected boolean isInContact(final boolean countDead)
         {
             return true;
         }
 
         /** not needed here -- fake returns 0. */
+        @Override
         protected int countBrambleHexes(final BattleHex targetHex)
         {
             return 0;
@@ -468,24 +473,28 @@ public final class ShowCreatureDetails extends KDialog implements
     // mouse and window events
     //
     /** disposes. */
+    @Override
     public void mouseClicked(MouseEvent e)
     {
         dispose();
     }
 
     /** disposes. */
+    @Override
     public void mousePressed(MouseEvent e)
     {
         dispose();
     }
 
     /** disposes. */
+    @Override
     public void mouseReleased(MouseEvent e)
     {
         dispose();
     }
 
     /** disposes. */
+    @Override
     public void windowClosing(WindowEvent e)
     {
         dispose();

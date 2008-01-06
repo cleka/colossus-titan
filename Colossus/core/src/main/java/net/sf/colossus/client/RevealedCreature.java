@@ -78,6 +78,7 @@ public class RevealedCreature
         }
     }
 
+    @Override
     public String toString()
     {
         String infoString = getName()

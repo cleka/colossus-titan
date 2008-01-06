@@ -133,6 +133,7 @@ public final class BattleMap extends HexMap implements MouseListener,
         attackerMarker.resetMarkerHighlight();
     }
 
+    @Override
     public void paintComponent(Graphics g)
     {
         super.paintComponent(g);

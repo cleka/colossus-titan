@@ -515,6 +515,7 @@ public class Creature implements Comparable
         return getCreatureByName(name) != null;
     }
 
+    @Override
     public String toString()
     {
         return name;
@@ -530,6 +531,7 @@ public class Creature implements Comparable
     }
 
     /** Compare by name. */
+    @Override
     public final boolean equals(Object object)
     {
         if (object.getClass() != this.getClass())
@@ -540,6 +542,7 @@ public class Creature implements Comparable
         return name.equals(other.getName());
     }
 
+    @Override
     public int hashCode()
     {
         return name.hashCode();

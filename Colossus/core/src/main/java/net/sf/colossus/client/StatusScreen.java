@@ -313,6 +313,7 @@ final class StatusScreen extends KDialog implements WindowListener
         repaint();
     }
 
+    @Override
     public void dispose()
     {
         super.dispose();
@@ -325,17 +326,20 @@ final class StatusScreen extends KDialog implements WindowListener
         this.oracle = null;
     }
 
+    @Override
     public void windowClosing(WindowEvent e)
     {
         options.setOption(Options.showStatusScreen, false);
     }
 
+    @Override
     public Dimension getMinimumSize()
     {
         int scale = Scale.get();
         return new Dimension(25 * scale, 20 * scale);
     }
 
+    @Override
     public Dimension getPreferredSize()
     {
         return getMinimumSize();

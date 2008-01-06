@@ -92,6 +92,7 @@ public class BattleHex extends Hex
         this.terrain = terrain;
     }
 
+    @Override
     public String getTerrainName()
     {
         String terrainName = terrain.getName();
@@ -350,11 +351,13 @@ public class BattleHex extends Hex
         neighbors[i] = hex;
     }
 
+    @Override
     public int getXCoord()
     {
         return xCoord;
     }
 
+    @Override
     public int getYCoord()
     {
         return yCoord;

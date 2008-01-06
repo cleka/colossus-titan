@@ -166,6 +166,7 @@ final class Concede extends KDialog implements ActionListener, WindowListener
         }
     }
 
+    @Override
     public void windowClosing(WindowEvent e)
     {
         cleanup(false);

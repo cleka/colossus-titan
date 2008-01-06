@@ -142,6 +142,7 @@ public class InstanceGroup
             return objRef.get();
         }
 
+        @Override
         public String toString()
         {
             return "Object with id " + id;

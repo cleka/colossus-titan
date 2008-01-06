@@ -93,6 +93,7 @@ class CreatureInfoList extends ArrayList
     }
 
     /** Deep copy */
+    @Override
     public Object clone()
     {
         CreatureInfoList dupe = new CreatureInfoList();

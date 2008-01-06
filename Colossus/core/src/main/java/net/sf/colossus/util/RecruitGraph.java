@@ -103,6 +103,7 @@ public class RecruitGraph
             }
         }
 
+        @Override
         public boolean equals(Object obj)
         {
             if (!(obj instanceof RecruitVertex))
@@ -117,6 +118,7 @@ public class RecruitGraph
             return false;
         }
 
+        @Override
         public String toString()
         {
             return "RecruitVertex " + cre + " with " + outgoingEdges.size()
@@ -165,6 +167,7 @@ public class RecruitGraph
             return terrain;
         }
 
+        @Override
         public boolean equals(Object obj)
         {
             if (!(obj instanceof RecruitEdge))
@@ -177,6 +180,7 @@ public class RecruitGraph
                 .equals(terrain)));
         }
 
+        @Override
         public String toString()
         {
             return "RecruitEdge from " + number + " " + src.getCreatureName()

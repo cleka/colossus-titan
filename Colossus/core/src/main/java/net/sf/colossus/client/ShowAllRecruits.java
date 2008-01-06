@@ -53,6 +53,7 @@ final class ShowAllRecruits extends AbstractShowRecruits
         repaint();
     }
 
+    @Override
     public void dispose()
     {
         allTerrainsDisplayActive = false;

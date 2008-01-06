@@ -95,6 +95,7 @@ public final class BattleChit extends Chit
         return (hits + getHits() >= getPower());
     }
 
+    @Override
     void setDead(boolean dead)
     {
         super.setDead(dead);
@@ -167,6 +168,7 @@ public final class BattleChit extends Chit
         return id;
     }
 
+    @Override
     public String getName()
     {
         return getCreatureName();
@@ -211,6 +213,7 @@ public final class BattleChit extends Chit
         return creature;
     }
 
+    @Override
     public void paintComponent(Graphics g)
     {
         super.paintComponent(g);
@@ -291,22 +294,26 @@ public final class BattleChit extends Chit
         }
     }
 
+    @Override
     public void setLocation(Point point)
     {
         outerRect.setLocation(point);
         setBounds(outerRect);
     }
 
+    @Override
     public boolean contains(Point point)
     {
         return outerRect.contains(point);
     }
 
+    @Override
     public Rectangle getBounds()
     {
         return outerRect;
     }
 
+    @Override
     public void setBounds(Rectangle outerRect)
     {
         this.outerRect = outerRect;
@@ -332,6 +339,7 @@ public final class BattleChit extends Chit
         return getCreatureName() + " in " + getCurrentHexLabel();
     }
 
+    @Override
     public String toString()
     {
         return getDescription();

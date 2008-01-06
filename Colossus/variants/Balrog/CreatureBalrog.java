@@ -31,21 +31,25 @@ public class CreatureBalrog extends net.sf.colossus.server.Creature
         localMaxCount = maxCount.intValue();
     }
 
+    @Override
     public boolean isImmortal()
     { // demilord yet not immortal
         return false;
     }
 
+    @Override
     public String getImageName()
     {
         return "Balrog";
     }
 
+    @Override
     public String getDisplayName()
     {
         return "Balrog";
     }
 
+    @Override
     public int getMaxCount()
     {
         return localMaxCount;

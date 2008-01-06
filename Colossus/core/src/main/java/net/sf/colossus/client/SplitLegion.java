@@ -253,6 +253,7 @@ final class SplitLegion extends KDialog implements MouseListener,
         dispose();
     }
 
+    @Override
     public void dispose()
     {
         if (saveWindow != null)
@@ -265,6 +266,7 @@ final class SplitLegion extends KDialog implements MouseListener,
         super.dispose();
     }
 
+    @Override
     public void mousePressed(MouseEvent e)
     {
         Object source = e.getSource();
@@ -285,6 +287,7 @@ final class SplitLegion extends KDialog implements MouseListener,
         }
     }
 
+    @Override
     public void windowClosing(WindowEvent e)
     {
         cancel();

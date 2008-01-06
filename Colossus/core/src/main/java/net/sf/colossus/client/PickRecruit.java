@@ -134,6 +134,7 @@ final class PickRecruit extends KDialog implements MouseListener,
         return recruit;
     }
 
+    @Override
     public void mousePressed(MouseEvent e)
     {
         Object source = e.getSource();
@@ -152,11 +153,13 @@ final class PickRecruit extends KDialog implements MouseListener,
         dispose();
     }
 
+    @Override
     public void windowClosing(WindowEvent e)
     {
         dispose();
     }
 
+    @Override
     public void dispose()
     {
         saveWindow.saveLocation(getLocation());

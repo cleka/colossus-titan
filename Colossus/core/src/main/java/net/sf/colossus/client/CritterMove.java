@@ -53,6 +53,7 @@ public class CritterMove
         return endingHexLabel;
     }
 
+    @Override
     public String toString()
     {
         return critter.getDescription() + " to " + getEndingHexLabel();

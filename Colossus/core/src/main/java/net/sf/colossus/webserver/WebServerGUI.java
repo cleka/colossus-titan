@@ -14,6 +14,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
+import javax.swing.ScrollPaneConstants;
 
 
 /** The web server GUI - so far shows only simple info
@@ -45,8 +46,8 @@ public class WebServerGUI extends JFrame implements WindowListener,
 
         Container mainPane = new Box(BoxLayout.Y_AXIS);
         JScrollPane mainScrollPane = new JScrollPane(mainPane,
-            JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-            JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+            ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+            ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 
         getContentPane().setLayout(new BorderLayout());
         getContentPane().add(mainScrollPane, BorderLayout.CENTER);

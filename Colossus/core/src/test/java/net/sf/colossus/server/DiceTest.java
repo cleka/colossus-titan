@@ -211,7 +211,7 @@ public class DiceTest extends TestCase
 
     double findMedian(int[] rolls)
     {
-        int[] copy = (int[])rolls.clone();
+        int[] copy = rolls.clone();
         Arrays.sort(copy);
         double midpoint = (rolls.length - 1) / 2.0;
         if (Math.abs(midpoint - Math.round(midpoint)) < epsilon)

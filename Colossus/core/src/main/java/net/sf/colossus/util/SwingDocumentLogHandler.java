@@ -34,6 +34,7 @@ public class SwingDocumentLogHandler extends Handler
         return document;
     }
 
+    @Override
     public void publish(LogRecord record)
     {
         try
@@ -47,11 +48,13 @@ public class SwingDocumentLogHandler extends Handler
         }
     }
 
+    @Override
     public void flush()
     {
         // nothing to do, just making the method concrete
     }
 
+    @Override
     public void close() throws SecurityException
     {
         try

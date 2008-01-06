@@ -17,7 +17,6 @@ import java.util.Timer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.sf.colossus.ai.SimpleAI.PowerSkill;
 import net.sf.colossus.client.Client;
 import net.sf.colossus.client.LegionInfo;
 import net.sf.colossus.client.MasterBoard;

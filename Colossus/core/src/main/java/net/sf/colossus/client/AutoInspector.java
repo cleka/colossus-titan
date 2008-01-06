@@ -15,6 +15,7 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.WindowConstants;
 
 import net.sf.colossus.util.KDialog;
 import net.sf.colossus.util.Options;
@@ -44,9 +45,10 @@ public class AutoInspector extends KDialog
         this.viewMode = viewMode;
         this.dubiousAsBlanks = dubiousAsBlanks;
 
-        setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
         addWindowListener(new WindowAdapter()
         {
+            @Override
             public void windowClosing(WindowEvent e)
             {
                 AutoInspector.this.options.setOption(
@@ -67,6 +69,7 @@ public class AutoInspector extends KDialog
         setVisible(true);
     }
 
+    @Override
     public void dispose()
     {
         saveWindow.saveSize(getSize());
@@ -74,6 +77,7 @@ public class AutoInspector extends KDialog
         super.dispose();
     }
 
+    @Override
     public Dimension getPreferredSize()
     {
         // this is just a first go to have some size at all

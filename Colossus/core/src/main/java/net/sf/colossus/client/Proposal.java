@@ -71,6 +71,7 @@ public final class Proposal
         return winnerLosses;
     }
 
+    @Override
     public boolean equals(Object other)
     {
         if (!(other instanceof Proposal))
@@ -108,6 +109,7 @@ public final class Proposal
         return true;
     }
 
+    @Override
     public int hashCode()
     {
         if (fight)
@@ -121,6 +123,7 @@ public final class Proposal
         return winnerId.hashCode() + winnerLosses.hashCode();
     }
 
+    @Override
     public String toString()
     {
         StringBuffer sb = new StringBuffer();

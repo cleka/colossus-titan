@@ -29,11 +29,13 @@ public class RemoteLogHandler extends Handler
         return true;
     }
 
+    @Override
     public void close()
     {
         server = null;
     }
 
+    @Override
     public void publish(LogRecord record)
     {
         if (server != null)
@@ -42,6 +44,7 @@ public class RemoteLogHandler extends Handler
         }
     }
 
+    @Override
     public void flush()
     {
         // nothing to do

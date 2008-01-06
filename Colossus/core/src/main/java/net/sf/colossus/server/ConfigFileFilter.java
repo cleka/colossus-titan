@@ -28,6 +28,7 @@ public final class ConfigFileFilter extends javax.swing.filechooser.FileFilter
         }
     }
 
+    @Override
     public boolean accept(File f)
     {
         if (f.isDirectory())
@@ -38,6 +39,7 @@ public final class ConfigFileFilter extends javax.swing.filechooser.FileFilter
         return accept(null, name);
     }
 
+    @Override
     public String getDescription()
     {
         return description;

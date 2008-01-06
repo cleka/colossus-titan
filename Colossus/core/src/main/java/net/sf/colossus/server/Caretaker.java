@@ -191,6 +191,7 @@ public final class Caretaker implements Cloneable
         }
     }
 
+    @Override
     public Object clone()
     {
         Caretaker newCaretaker = new Caretaker(game);

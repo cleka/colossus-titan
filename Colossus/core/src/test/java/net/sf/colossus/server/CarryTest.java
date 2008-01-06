@@ -36,6 +36,7 @@ public class CarryTest extends TestCase
         super(name);
     }
 
+    @Override
     protected void setUp()
     {
         game = new Game();

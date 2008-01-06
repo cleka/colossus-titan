@@ -120,6 +120,7 @@ final class Negotiate extends KDialog implements MouseListener, ActionListener
         client.negotiateCallback(proposal, true);
     }
 
+    @Override
     public void mousePressed(MouseEvent e)
     {
         Object source = e.getSource();

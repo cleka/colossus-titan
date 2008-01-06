@@ -30,12 +30,14 @@ public class BalrogRecruitment extends CustomRecruitBase
     private final static int balrogValue = 300;
     private final static String balrogPrefix = "Balrog";
 
+    @Override
     public List getAllPossibleSpecialRecruiters(String terrain)
     {
         // Balrog recruited in Tower, where everything recruit anyway.
         return new ArrayList();
     }
 
+    @Override
     public List<Creature> getAllPossibleSpecialRecruits(String terrain)
     {
         List<Creature> temp = new ArrayList<Creature>();
@@ -51,12 +53,14 @@ public class BalrogRecruitment extends CustomRecruitBase
         return temp;
     }
 
+    @Override
     public List getPossibleSpecialRecruiters(String terrain, String hexLabel)
     {
         // Balrog recruited in Tower, where everything recruit anyway.
         return new ArrayList();
     }
 
+    @Override
     public List getPossibleSpecialRecruits(String terrain, String hexLabel)
     {
         List temp = new ArrayList();
@@ -79,12 +83,14 @@ public class BalrogRecruitment extends CustomRecruitBase
         return temp;
     }
 
+    @Override
     public int numberOfRecruiterNeeded(String recruiter, String recruit,
         String terrain, String hexLabel)
     {
         return 0;
     }
 
+    @Override
     protected void changeOfTurn(int newActivePlayer)
     {
         Set towerSet = net.sf.colossus.client.MasterBoard.getTowerSet();
@@ -182,6 +188,7 @@ public class BalrogRecruitment extends CustomRecruitBase
         return null;
     }
 
+    @Override
     protected void resetInstance()
     {
         LOGGER.log(Level.FINEST, "CUSTOM: resetting " + getClass().getName());

@@ -108,6 +108,7 @@ public class DummyFrameWithMenu extends KFrame
 
     boolean disposed = false;
 
+    @Override
     public void dispose()
     {
         if (disposed)

@@ -50,6 +50,7 @@ public class DragListener extends MouseAdapter implements MouseMotionListener
         // nothing to do
     }
 
+    @Override
     public void mouseReleased(MouseEvent e)
     {
         // reset stored mouse position in case a second drag occurs

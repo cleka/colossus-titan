@@ -136,6 +136,7 @@ public class DevRandom extends Random
         }
     }
 
+    @Override
     protected int next(int bits)
     {
         int nbits = bits;

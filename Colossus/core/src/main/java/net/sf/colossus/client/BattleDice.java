@@ -172,11 +172,13 @@ final class BattleDice extends Box
         showRoll();
     }
 
+    @Override
     public Dimension getMinimumSize()
     {
         return getPreferredSize();
     }
 
+    @Override
     public Dimension getPreferredSize()
     {
         int scale = Scale.get();

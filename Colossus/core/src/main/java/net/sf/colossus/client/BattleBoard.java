@@ -32,6 +32,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
+import javax.swing.WindowConstants;
 
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.Legion;
@@ -87,7 +88,7 @@ public final class BattleBoard extends KFrame
 
         this.client = client;
 
-        setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 
         JPanel contentPane = new JPanel();
         setContentPane(contentPane);
@@ -97,6 +98,7 @@ public final class BattleBoard extends KFrame
 
         addWindowListener(new WindowAdapter()
         {
+            @Override
             public void windowClosing(WindowEvent e)
             {
                 client.askNewCloseQuitCancel(BattleBoard.this, true);
@@ -123,6 +125,7 @@ public final class BattleBoard extends KFrame
         contentPane.add(new JScrollPane(battleMap), BorderLayout.CENTER);
         battleMap.addMouseListener(new MouseAdapter()
         {
+            @Override
             public void mousePressed(MouseEvent e)
             {
                 // Only the active player can click on stuff.

@@ -717,6 +717,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
         // necessary to implement interface
     }
 
+    @Override
     public void paintComponent(Graphics g)
     {
         // TODO the hexes should be on a separate background component
@@ -797,11 +798,13 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
         }
     }
 
+    @Override
     public Dimension getMinimumSize()
     {
         return getPreferredSize();
     }
 
+    @Override
     public Dimension getPreferredSize()
     {
         return new Dimension(60 * Scale.get(), 55 * Scale.get());

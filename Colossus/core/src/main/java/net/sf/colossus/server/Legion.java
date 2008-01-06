@@ -282,6 +282,7 @@ public final class Legion extends net.sf.colossus.game.Legion implements
         return getPlayer().getLegionByMarkerId(parentId);
     }
 
+    @Override
     public String toString()
     {
         return markerId;

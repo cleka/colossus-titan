@@ -43,26 +43,31 @@ public abstract class AbstractShowRecruits extends KDialog implements
                     this));
     }
 
+    @Override
     public void mouseClicked(MouseEvent e)
     {
         dispose();
     }
 
+    @Override
     public void mousePressed(MouseEvent e)
     {
         dispose();
     }
 
+    @Override
     public void mouseReleased(MouseEvent e)
     {
         dispose();
     }
 
+    @Override
     public void windowClosing(WindowEvent e)
     {
         dispose();
     }
 
+    @Override
     public void dispose()
     {
         super.dispose();

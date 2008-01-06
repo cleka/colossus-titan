@@ -995,11 +995,13 @@ class Critter implements Comparable
         return creature.isSummonable();
     }
 
+    @Override
     public String toString()
     {
         return creature.toString();
     }
 
+    @Override
     public int hashCode()
     {
         return creature.hashCode();

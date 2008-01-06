@@ -66,6 +66,7 @@ final class SocketServerThread extends Thread implements IClient
         server.getThreadMgr().registerToThreadManager(this);
     }
 
+    @Override
     public void run()
     {
         try
@@ -235,6 +236,7 @@ final class SocketServerThread extends Thread implements IClient
         }
     }
 
+    @Override
     public void interrupt()
     {
         super.interrupt();

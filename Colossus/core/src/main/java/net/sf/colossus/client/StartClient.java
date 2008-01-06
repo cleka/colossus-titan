@@ -196,11 +196,13 @@ public class StartClient extends KFrame implements WindowListener,
         return preferred;
     }
 
+    @Override
     public Dimension getMinimumSize()
     {
         return new Dimension(350, 200);
     }
 
+    @Override
     public Dimension getPreferredSize()
     {
         return getMinimumSize();
@@ -236,12 +238,14 @@ public class StartClient extends KFrame implements WindowListener,
         }
     }
 
+    @Override
     public void windowClosing(WindowEvent e)
     {
         startObject.setWhatToDoNext(Start.GetPlayersDialog);
         dispose();
     }
 
+    @Override
     public void dispose()
     {
         // Dispose dialog and notify main() so that game starts:

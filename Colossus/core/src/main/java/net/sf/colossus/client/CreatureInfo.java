@@ -56,12 +56,14 @@ class CreatureInfo implements Cloneable
         return atSplit;
     }
 
+    @Override
     public Object clone()
     {
         return new CreatureInfo(name, certain, atSplit);
     }
 
     /** Two CreatureInfo objects match if the names match. */
+    @Override
     public boolean equals(Object other)
     {
         if (!(other instanceof CreatureInfo))
@@ -72,11 +74,13 @@ class CreatureInfo implements Cloneable
     }
 
     /** Two CreatureInfo objects match if the names match. */
+    @Override
     public int hashCode()
     {
         return name.hashCode();
     }
 
+    @Override
     public String toString()
     {
         StringBuffer sb = new StringBuffer(name);

@@ -25,6 +25,7 @@ import javax.swing.JSpinner;
 import javax.swing.JTabbedPane;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.UIManager;
+import javax.swing.WindowConstants;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -94,7 +95,7 @@ public class PreferencesWindow extends KFrame
         
         getContentPane().add(new JLabel("Dummy"));
         
-        setDefaultCloseOperation(KFrame.HIDE_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
         
         setupGUI();
         
@@ -267,6 +268,7 @@ public class PreferencesWindow extends KFrame
         getContentPane().add(closeButton, BorderLayout.SOUTH);
     }
     
+    @Override
     public void dispose()
     {
 //        cleanPrefCBListeners();

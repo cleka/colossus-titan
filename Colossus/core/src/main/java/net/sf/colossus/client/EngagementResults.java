@@ -23,6 +23,7 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.WindowConstants;
 
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.util.KDialog;
@@ -80,9 +81,10 @@ final class EngagementResults extends KDialog
         setBackground(Color.lightGray);
         setupGUI();
 
-        setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
         this.addWindowListener(new WindowAdapter()
         {
+            @Override
             public void windowClosing(WindowEvent e)
             {
                 options.setOption(Options.showEngagementResults, false);
@@ -404,6 +406,7 @@ final class EngagementResults extends KDialog
         }
     }
 
+    @Override
     public void dispose()
     {
         saveWindow.save(this);
@@ -412,6 +415,7 @@ final class EngagementResults extends KDialog
         this.oracle = null;
     }
 
+    @Override
     public void setVisible(boolean visible)
     {
         saveWindow.save(this);

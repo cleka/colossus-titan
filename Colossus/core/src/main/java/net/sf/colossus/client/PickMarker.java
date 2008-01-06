@@ -89,6 +89,7 @@ final class PickMarker extends KDialog implements MouseListener,
         client = null;
     }
 
+    @Override
     public void mousePressed(MouseEvent e)
     {
         Object source = e.getSource();
@@ -100,6 +101,7 @@ final class PickMarker extends KDialog implements MouseListener,
         }
     }
 
+    @Override
     public void windowClosing(WindowEvent e)
     {
         cleanup(null);

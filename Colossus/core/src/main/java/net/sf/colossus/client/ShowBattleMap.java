@@ -148,6 +148,7 @@ final class ShowBattleMap extends HexMap implements WindowListener,
         return neighbors;
     }
 
+    @Override
     public void paintComponent(Graphics g)
     {
         super.paintComponent(g);
@@ -204,21 +205,25 @@ final class ShowBattleMap extends HexMap implements WindowListener,
         }
     }
 
+    @Override
     public void mouseClicked(MouseEvent e)
     {
         dialog.dispose();
     }
 
+    @Override
     public void mousePressed(MouseEvent e)
     {
         dialog.dispose();
     }
 
+    @Override
     public void mouseReleased(MouseEvent e)
     {
         dialog.dispose();
     }
 
+    @Override
     public void windowClosing(WindowEvent e)
     {
         dialog.dispose();

@@ -69,6 +69,7 @@ public class MasterHex extends Hex
         this.terrain = terrain;
     }
 
+    @Override
     public String getTerrainName()
     {
         return this.terrain;

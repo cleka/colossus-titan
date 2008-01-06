@@ -110,6 +110,7 @@ public final class PickIntValue extends KDialog implements WindowListener,
         }
     }
 
+    @Override
     public void dispose()
     {
         saveWindow.saveLocation(getLocation());

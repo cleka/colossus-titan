@@ -122,6 +122,7 @@ final class PenaltyOption implements Comparable
     }
 
     /** Do not consider carryTargets. */
+    @Override
     public boolean equals(Object object)
     {
         if (!(object instanceof PenaltyOption))
@@ -134,11 +135,13 @@ final class PenaltyOption implements Comparable
     }
 
     /** Do not consider carryTargets. */
+    @Override
     public int hashCode()
     {
         return dice + 100 * strikeNumber + striker.hashCode();
     }
 
+    @Override
     public String toString()
     {
         StringBuffer sb = new StringBuffer();

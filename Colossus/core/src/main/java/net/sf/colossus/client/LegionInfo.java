@@ -476,6 +476,7 @@ public final class LegionInfo extends Legion
                 .isEmpty();
     }
 
+    @Override
     public String toString()
     {
         return markerId;

@@ -78,6 +78,7 @@ final class PickLord extends KDialog implements MouseListener, WindowListener
         return lordType;
     }
 
+    @Override
     public void mousePressed(MouseEvent e)
     {
         Object source = e.getSource();

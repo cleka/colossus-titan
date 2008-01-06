@@ -38,6 +38,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JToggleButton;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.border.TitledBorder;
 import javax.swing.text.Document;
 
@@ -114,8 +115,8 @@ public final class GetPlayers extends KFrame implements WindowListener,
         Container mainPane = new Box(BoxLayout.Y_AXIS);
 
         JScrollPane mainScrollPane = new JScrollPane(mainPane,
-            JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-            JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+            ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+            ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 
         getContentPane().setLayout(new BorderLayout());
         getContentPane().add(mainScrollPane, BorderLayout.CENTER);
@@ -592,6 +593,7 @@ public final class GetPlayers extends KFrame implements WindowListener,
         dispose();
     }
 
+    @Override
     public void windowClosing(WindowEvent e)
     {
         doQuit();
@@ -634,6 +636,7 @@ public final class GetPlayers extends KFrame implements WindowListener,
 
     static class varFileFilter extends javax.swing.filechooser.FileFilter
     {
+        @Override
         public boolean accept(File f)
         {
             if (f.isDirectory())
@@ -647,6 +650,7 @@ public final class GetPlayers extends KFrame implements WindowListener,
             return (false);
         }
 
+        @Override
         public String getDescription()
         {
             return ("Colossus VARiant file");
@@ -847,11 +851,13 @@ public final class GetPlayers extends KFrame implements WindowListener,
         }
     }
 
+    @Override
     public Dimension getMinimumSize()
     {
         return new Dimension(640, 480);
     }
 
+    @Override
     public Dimension getPreferredSize()
     {
         return new Dimension(640, 768);
@@ -869,6 +875,7 @@ public final class GetPlayers extends KFrame implements WindowListener,
      * Eliminate dialog and notify mutex, allowing game to start,
      * or main to run web client or netclient dialog.
      */
+    @Override
     public void dispose()
     {
         if (!options.isEmpty())
@@ -890,31 +897,37 @@ public final class GetPlayers extends KFrame implements WindowListener,
         }
     }
 
+    @Override
     public void windowActivated(WindowEvent e)
     {
         // nothing to do
     }
 
+    @Override
     public void windowClosed(WindowEvent e)
     {
         // nothing to do
     }
 
+    @Override
     public void windowDeactivated(WindowEvent e)
     {
         // nothing to do
     }
 
+    @Override
     public void windowDeiconified(WindowEvent e)
     {
         // nothing to do
     }
 
+    @Override
     public void windowIconified(WindowEvent e)
     {
         // nothing to do
     }
 
+    @Override
     public void windowOpened(WindowEvent e)
     {
         // nothing to do

@@ -27,6 +27,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingConstants;
+import javax.swing.WindowConstants;
 
 import net.sf.colossus.server.Creature;
 import net.sf.colossus.util.KDialog;
@@ -99,7 +100,7 @@ class CreatureCollectionView extends KDialog
 
         pack();
 
-        setDefaultCloseOperation(KDialog.HIDE_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
 
         saveWindow = new SaveWindow(client, "CreatureCollectionView");
         saveWindow.restoreOrCenter(this);
@@ -144,6 +145,7 @@ class CreatureCollectionView extends KDialog
                 + "' to be valid";
             this.addMouseListener(new MouseAdapter()
             {
+                @Override
                 public void mouseClicked(MouseEvent e)
                 {
                     if (e.getButton() == MouseEvent.BUTTON1)
@@ -161,6 +163,7 @@ class CreatureCollectionView extends KDialog
             this.add(label, BorderLayout.SOUTH);
         }
 
+        @Override
         public Dimension getPreferredSize()
         {
             Dimension labelDim = label.getPreferredSize();
@@ -284,6 +287,7 @@ class CreatureCollectionView extends KDialog
         return sb.toString();
     }
 
+    @Override
     public void dispose()
     {
         // Don't do anything if dispose already done.
@@ -315,12 +319,14 @@ class CreatureCollectionView extends KDialog
         super.dispose();
     }
 
+    @Override
     public void windowClosing(WindowEvent e)
     {
         CreatureCollectionView.this.client.setOption(Options.showCaretaker,
             false);
     }
 
+    @Override
     public Dimension getMinimumSize()
     {
         java.util.List creatures = Creature.getCreatures();
@@ -340,6 +346,7 @@ class CreatureCollectionView extends KDialog
         return new Dimension(minX, minY);
     }
 
+    @Override
     public Dimension getPreferredSize()
     {
         return getMinimumSize();

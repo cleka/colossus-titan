@@ -81,6 +81,7 @@ public class MilvangAI extends RationalAI
      * @see net.sf.colossus.client.RationalAI#chooseCreaturesToSplitOut(net.sf.colossus.client.LegionInfo,
      *      boolean)
      */
+    @Override
     MusteredCreatures chooseCreaturesToSplitOut(LegionInfo legion,
         boolean at_risk)
     {

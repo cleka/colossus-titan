@@ -99,6 +99,7 @@ final class PickEntrySide extends HexMap implements ActionListener,
         return entrySide;
     }
 
+    @Override
     public void paintComponent(Graphics g)
     {
         super.paintComponent(g);
@@ -161,6 +162,7 @@ final class PickEntrySide extends HexMap implements ActionListener,
         cleanup(e.getActionCommand());
     }
 
+    @Override
     public void windowClosing(WindowEvent e)
     {
         // Abort the move.

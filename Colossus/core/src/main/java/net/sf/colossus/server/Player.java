@@ -452,6 +452,7 @@ public final class Player implements Comparable
         net.sf.colossus.webcommon.InstanceTracker.setId(this, name);
     }
 
+    @Override
     public String toString()
     {
         return name;

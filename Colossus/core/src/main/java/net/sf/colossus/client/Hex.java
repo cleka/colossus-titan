@@ -45,6 +45,7 @@ public abstract class Hex
         return getTerrainName() + " hex " + getLabel();
     }
 
+    @Override
     public String toString()
     {
         return getDescription();

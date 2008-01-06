@@ -11,6 +11,8 @@ import java.awt.event.KeyEvent;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
+import javax.swing.SwingConstants;
+import javax.swing.WindowConstants;
 
 import net.sf.colossus.util.KFrame;
 
@@ -39,7 +41,7 @@ public final class StartupProgress implements ActionListener
         KFrame logFrame = new KFrame("Server startup progress log");
         this.logFrame = logFrame;
 
-        logFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        logFrame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 
         Container pane = logFrame.getContentPane();
         this.pane = pane;
@@ -50,8 +52,8 @@ public final class StartupProgress implements ActionListener
 
         JButton b1 = new JButton("Abort");
         this.b = b1;
-        b1.setVerticalTextPosition(JButton.CENTER);
-        b1.setHorizontalTextPosition(JButton.LEADING); //aka LEFT, for left-to-right locales
+        b1.setVerticalTextPosition(SwingConstants.CENTER);
+        b1.setHorizontalTextPosition(SwingConstants.LEADING); //aka LEFT, for left-to-right locales
         b1.setMnemonic(KeyEvent.VK_A);
         b1.setActionCommand("abort");
         b1.addActionListener(this);

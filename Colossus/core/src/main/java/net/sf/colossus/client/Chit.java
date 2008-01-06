@@ -213,6 +213,7 @@ class Chit extends JPanel
         return id;
     }
 
+    @Override
     public String toString()
     {
         return getId();
@@ -225,6 +226,7 @@ class Chit extends JPanel
         setBounds(rect);
     }
 
+    @Override
     public void paintComponent(Graphics g)
     {
         Graphics2D g2 = (Graphics2D)g;
@@ -275,17 +277,20 @@ class Chit extends JPanel
         }
     }
 
+    @Override
     public void setLocation(Point point)
     {
         rect.setLocation(point);
         setBounds(rect);
     }
 
+    @Override
     public boolean contains(Point point)
     {
         return rect.contains(point);
     }
 
+    @Override
     public Rectangle getBounds()
     {
         return rect;
@@ -296,16 +301,19 @@ class Chit extends JPanel
         return new Point(rect.x + rect.width / 2, rect.y + rect.height / 2);
     }
 
+    @Override
     public Dimension getPreferredSize()
     {
         return new Dimension(rect.width, rect.height);
     }
 
+    @Override
     public Dimension getMinimumSize()
     {
         return getPreferredSize();
     }
 
+    @Override
     public Dimension getMaximumSize()
     {
         return getPreferredSize();

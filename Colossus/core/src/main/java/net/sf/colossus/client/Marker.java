@@ -92,6 +92,7 @@ final class Marker extends Chit
     }
 
     /** Show the height of the legion if marker.client != NULL. */
+    @Override
     public void paintComponent(Graphics g)
     {
         LOGGER.log(Level.FINEST, "Painting marker");
