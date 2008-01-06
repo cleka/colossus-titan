@@ -34,7 +34,7 @@ import net.sf.colossus.server.Dice;
 import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.util.DevRandom;
 import net.sf.colossus.util.Options;
-import net.sf.colossus.util.Perms;
+import net.sf.colossus.util.PermutationIterator;
 import net.sf.colossus.util.Probs;
 import net.sf.colossus.variant.HazardTerrain;
 import net.sf.colossus.xmlparser.TerrainRecruitLoader;
@@ -2883,8 +2883,8 @@ public class SimpleAI implements AI
         int count = 0;
         Timer findMoveTimer = setupTimer();
 
-        Iterator<List<CritterMove>> it = new Perms<CritterMove>(critterMoves)
-            .iterator();
+        Iterator<List<CritterMove>> it = new PermutationIterator<CritterMove>(
+            critterMoves);
         while (it.hasNext())
         {
             List<CritterMove> order = it.next();
