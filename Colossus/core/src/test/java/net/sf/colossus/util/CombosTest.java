@@ -3,6 +3,7 @@ package net.sf.colossus.util;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import junit.framework.TestCase;
 
@@ -28,10 +29,10 @@ public class CombosTest extends TestCase
         startlist.add("d");
         int n = 3;
 
-        ArrayList results = new ArrayList();
+        ArrayList<ArrayList> results = new ArrayList<ArrayList>();
 
         Combos combos = new Combos(startlist, n);
-        Iterator it = combos.iterator();
+        Iterator<List> it = combos.iterator();
         while (it.hasNext())
         {
             ArrayList nextCombo = (ArrayList)it.next();

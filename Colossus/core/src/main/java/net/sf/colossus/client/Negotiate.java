@@ -33,8 +33,8 @@ final class Negotiate extends KDialog implements MouseListener, ActionListener
 {
     private String attackerId;
     private String defenderId;
-    private List attackerChits = new ArrayList();
-    private List defenderChits = new ArrayList();
+    private List<Chit> attackerChits = new ArrayList<Chit>();
+    private List<Chit> defenderChits = new ArrayList<Chit>();
     private Client client;
     private Proposal proposal;
     private Point location;
@@ -88,7 +88,7 @@ final class Negotiate extends KDialog implements MouseListener, ActionListener
         repaint();
     }
 
-    private void showLegion(String markerId, List chits)
+    private void showLegion(String markerId, List<Chit> chits)
     {
         Box pane = new Box(BoxLayout.X_AXIS);
         pane.setAlignmentX(0);
@@ -137,10 +137,10 @@ final class Negotiate extends KDialog implements MouseListener, ActionListener
         {
             // Count remaining chits.
             boolean attackersLeft = false;
-            Iterator it = attackerChits.iterator();
+            Iterator<Chit> it = attackerChits.iterator();
             while (it.hasNext())
             {
-                Chit chit = (Chit)it.next();
+                Chit chit = it.next();
                 if (!chit.isDead())
                 {
                     attackersLeft = true;
@@ -152,7 +152,7 @@ final class Negotiate extends KDialog implements MouseListener, ActionListener
             it = defenderChits.iterator();
             while (it.hasNext())
             {
-                Chit chit = (Chit)it.next();
+                Chit chit = it.next();
                 if (!chit.isDead())
                 {
                     defendersLeft = true;
@@ -177,7 +177,7 @@ final class Negotiate extends KDialog implements MouseListener, ActionListener
             else
             {
                 String winnerMarkerId;
-                java.util.List winnerChits;
+                java.util.List<Chit> winnerChits;
 
                 if (!defendersLeft)
                 {
@@ -195,7 +195,7 @@ final class Negotiate extends KDialog implements MouseListener, ActionListener
                 it = winnerChits.iterator();
                 while (it.hasNext())
                 {
-                    Chit chit = (Chit)it.next();
+                    Chit chit = it.next();
                     if (chit.isDead()
                         && chit.getId().startsWith(Constants.titan))
                     {
@@ -210,7 +210,7 @@ final class Negotiate extends KDialog implements MouseListener, ActionListener
                 it = winnerChits.iterator();
                 while (it.hasNext())
                 {
-                    Chit chit = (Chit)it.next();
+                    Chit chit = it.next();
                     if (chit.isDead())
                     {
                         String name = chit.getId();

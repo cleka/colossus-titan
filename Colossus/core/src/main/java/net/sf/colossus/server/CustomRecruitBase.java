@@ -22,11 +22,11 @@ abstract public class CustomRecruitBase
     private static final Logger LOGGER = Logger
         .getLogger(CustomRecruitBase.class.getName());
 
-    protected static List allPlayerInfo = new ArrayList();
-    private static List allCaretakerInfo = new ArrayList();
+    protected static List<PlayerInfo> allPlayerInfo = new ArrayList<PlayerInfo>();
+    private static List<CaretakerInfo> allCaretakerInfo = new ArrayList<CaretakerInfo>();
     private static Caretaker serverCaretaker = null;
     private static Game serverGame = null;
-    private static List allCustomRecruitBase = new ArrayList();
+    private static List<CustomRecruitBase> allCustomRecruitBase = new ArrayList<CustomRecruitBase>();
 
     public CustomRecruitBase()
     {
@@ -53,10 +53,10 @@ abstract public class CustomRecruitBase
         serverGame = null;
         serverCaretaker = null;
 
-        Iterator it = allCustomRecruitBase.iterator();
+        Iterator<CustomRecruitBase> it = allCustomRecruitBase.iterator();
         while (it.hasNext())
         {
-            CustomRecruitBase crb = (CustomRecruitBase)it.next();
+            CustomRecruitBase crb = it.next();
             crb.resetInstance();
         }
     }
@@ -64,10 +64,10 @@ abstract public class CustomRecruitBase
     synchronized public static final void everyoneAdvanceTurn(
         int newActivePlayer)
     {
-        Iterator it = allCustomRecruitBase.iterator();
+        Iterator<CustomRecruitBase> it = allCustomRecruitBase.iterator();
         while (it.hasNext())
         {
-            CustomRecruitBase crb = (CustomRecruitBase)it.next();
+            CustomRecruitBase crb = it.next();
             crb.changeOfTurn(newActivePlayer);
         }
     }
@@ -95,10 +95,10 @@ abstract public class CustomRecruitBase
     synchronized protected final void setCount(String name, int newCount)
     {
         // first update all known CaretakerInfo (if we're client(s))
-        Iterator it = allCaretakerInfo.iterator();
+        Iterator<CaretakerInfo> it = allCaretakerInfo.iterator();
         while (it.hasNext())
         {
-            CaretakerInfo ci = (CaretakerInfo)it.next();
+            CaretakerInfo ci = it.next();
             ci.updateCount(name, newCount, ci.getDeadCount(name));
         }
         // update the Caretaker if we're server
@@ -120,10 +120,10 @@ abstract public class CustomRecruitBase
     {
         int count = -1;
         int oldcount = -1;
-        Iterator it = allCaretakerInfo.iterator();
+        Iterator<CaretakerInfo> it = allCaretakerInfo.iterator();
         while (it.hasNext() && (count == -1))
         {
-            CaretakerInfo ci = (CaretakerInfo)it.next();
+            CaretakerInfo ci = it.next();
             oldcount = count;
             count = ci.getCount(name);
             if ((oldcount != -1) && (count != oldcount))
@@ -152,10 +152,10 @@ abstract public class CustomRecruitBase
         int newDeadCount)
     {
         // first update all known CaretakerInfo (if we're client(s))
-        Iterator it = allCaretakerInfo.iterator();
+        Iterator<CaretakerInfo> it = allCaretakerInfo.iterator();
         while (it.hasNext())
         {
-            CaretakerInfo ci = (CaretakerInfo)it.next();
+            CaretakerInfo ci = it.next();
             ci.updateCount(name, ci.getCount(name), newDeadCount);
         }
         // second, update the Caretaker if we're server
@@ -171,10 +171,10 @@ abstract public class CustomRecruitBase
     {
         int count = -1;
         int oldcount = -1;
-        Iterator it = allCaretakerInfo.iterator();
+        Iterator<CaretakerInfo> it = allCaretakerInfo.iterator();
         while (it.hasNext() && (count == -1))
         {
-            CaretakerInfo ci = (CaretakerInfo)it.next();
+            CaretakerInfo ci = it.next();
             oldcount = count;
             count = ci.getDeadCount(name);
             if ((oldcount != -1) && (count != oldcount))
@@ -233,7 +233,7 @@ abstract public class CustomRecruitBase
 
     /** List all Creature that can be recruited in this terrain 
      * in a special way */
-    abstract public List getAllPossibleSpecialRecruits(String terrain);
+    abstract public List<Creature> getAllPossibleSpecialRecruits(String terrain);
 
     /** List Creature that can recruit in this terrain in a special way now */
     abstract public List getPossibleSpecialRecruiters(String terrain,

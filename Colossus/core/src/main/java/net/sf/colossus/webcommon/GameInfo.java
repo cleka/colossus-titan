@@ -75,7 +75,7 @@ public class GameInfo extends Thread
     private String javaCommand;
     private String colossusJar;
 
-    private ArrayList players = null;
+    private ArrayList<User> players = null;
 
     private static int nextFreeGameId = 1;
 
@@ -101,7 +101,7 @@ public class GameInfo extends Thread
 
         this.state = Proposed;
         this.enrolledPlayers = 0;
-        this.players = new ArrayList();
+        this.players = new ArrayList<User>();
 
         this.server = null;
         LOGGER.log(Level.FINEST,
@@ -268,7 +268,7 @@ public class GameInfo extends Thread
         enrolledPlayers = val.intValue();
     }
 
-    public ArrayList getPlayers()
+    public ArrayList<User> getPlayers()
     {
         return this.players;
     }
@@ -276,14 +276,14 @@ public class GameInfo extends Thread
     public String getPlayerListAsString()
     {
         StringBuffer playerList = new StringBuffer("");
-        Iterator it = players.iterator();
+        Iterator<User> it = players.iterator();
         while (it.hasNext())
         {
             if (playerList.length() != 0)
             {
                 playerList.append(", ");
             }
-            User user = (User)it.next();
+            User user = it.next();
             playerList.append(user.getName());
         }
 
@@ -293,11 +293,11 @@ public class GameInfo extends Thread
     public boolean isEnrolled(User newUser)
     {
         String newName = newUser.getName();
-        Iterator it = players.iterator();
+        Iterator<User> it = players.iterator();
         boolean found = false;
         while (!found && it.hasNext())
         {
-            User user = (User)it.next();
+            User user = it.next();
             String name = user.getName();
             if (newName.equals(name))
             {
@@ -316,7 +316,7 @@ public class GameInfo extends Thread
         return found;
     }
 
-    public void setPlayerList(ArrayList playerlist)
+    public void setPlayerList(ArrayList<User> playerlist)
     {
         players = playerlist;
 
@@ -375,11 +375,11 @@ public class GameInfo extends Thread
     public String toString(String sep)
     {
         StringBuffer playerList = new StringBuffer();
-        Iterator it = players.iterator();
+        Iterator<User> it = players.iterator();
         while (it.hasNext())
         {
             playerList.append(sep);
-            User user = (User)it.next();
+            User user = it.next();
             playerList.append(user.getName());
         }
 
@@ -424,7 +424,7 @@ public class GameInfo extends Thread
         this.gameId = gameId;
     }
 
-    public static GameInfo fromString(String[] tokens, HashMap games)
+    public static GameInfo fromString(String[] tokens, HashMap<String, GameInfo> games)
     {
         GameInfo gi;
 
@@ -435,7 +435,7 @@ public class GameInfo extends Thread
         if (games.containsKey(gameId))
         {
             // use the object webclient has created earlier
-            gi = (GameInfo)games.get(key);
+            gi = games.get(key);
         }
         else
         {
@@ -456,7 +456,7 @@ public class GameInfo extends Thread
         int lastIndex = 12;
         gi.enrolledPlayers = Integer.parseInt(tokens[lastIndex]);
 
-        ArrayList players = new ArrayList();
+        ArrayList<User> players = new ArrayList<User>();
         int i = 1;
         while (i <= gi.enrolledPlayers)
         {

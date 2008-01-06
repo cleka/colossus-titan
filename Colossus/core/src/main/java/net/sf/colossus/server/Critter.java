@@ -47,7 +47,7 @@ class Critter implements Comparable
 
     /** Counter used to assign unique tags. */
     private static int tagCounter = -1;
-    private final SortedSet penaltyOptions = new TreeSet();
+    private final SortedSet<PenaltyOption> penaltyOptions = new TreeSet<PenaltyOption>();
     private boolean carryPossible;
 
     public Critter(Creature creature, String markerId, Game game)
@@ -574,10 +574,10 @@ class Critter implements Comparable
         {
             return null;
         }
-        Iterator it = penaltyOptions.iterator();
+        Iterator<PenaltyOption> it = penaltyOptions.iterator();
         while (it.hasNext())
         {
-            PenaltyOption po = (PenaltyOption)it.next();
+            PenaltyOption po = it.next();
             if (prompt.equals(po.toString()))
             {
                 return po;
@@ -618,10 +618,10 @@ class Critter implements Comparable
             penaltyOptions.add(po);
 
             // Add all non-penalty carries to every PenaltyOption.
-            Iterator it = penaltyOptions.iterator();
+            Iterator<PenaltyOption> it = penaltyOptions.iterator();
             while (it.hasNext())
             {
-                po = (PenaltyOption)it.next();
+                po = it.next();
                 po.addCarryTargets(battle.getCarryTargets());
             }
         }
@@ -696,10 +696,10 @@ class Critter implements Comparable
         {
             // Add this scenario to the list, reusing an
             // existing PenaltyOption if possible.
-            Iterator it = penaltyOptions.iterator();
+            Iterator<PenaltyOption> it = penaltyOptions.iterator();
             while (it.hasNext())
             {
-                PenaltyOption po = (PenaltyOption)it.next();
+                PenaltyOption po = it.next();
                 if (po.getDice() == tmpDice
                     && po.getStrikeNumber() == tmpStrikeNumber)
                 {
@@ -770,7 +770,7 @@ class Critter implements Comparable
         }
     }
 
-    Set getPenaltyOptions()
+    Set<PenaltyOption> getPenaltyOptions()
     {
         return Collections.unmodifiableSortedSet(penaltyOptions);
     }

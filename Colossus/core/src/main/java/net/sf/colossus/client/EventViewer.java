@@ -93,10 +93,10 @@ final class EventViewer extends KDialog implements WindowListener,
 
     private boolean visible;
 
-    private List syncdEventList = Collections
-        .synchronizedList(new ArrayList());
+    private List<RevealEvent> syncdEventList = Collections
+        .synchronizedList(new ArrayList<RevealEvent>());
     private int bookmark = 0;
-    final private ArrayList displayQueue = new ArrayList();
+    final private ArrayList<JPanel> displayQueue = new ArrayList<JPanel>();
 
     private int turnNr;
     private int playerNr;
@@ -498,10 +498,10 @@ final class EventViewer extends KDialog implements WindowListener,
         {
             if (displayQueue.size() > 0)
             {
-                Iterator it = displayQueue.iterator();
+                Iterator<JPanel> it = displayQueue.iterator();
                 while (it.hasNext())
                 {
-                    JPanel panelForEvent = (JPanel)it.next();
+                    JPanel panelForEvent = it.next();
                     if (panelForEvent == null)
                     {
                         eventPane.removeAll();
@@ -618,10 +618,10 @@ final class EventViewer extends KDialog implements WindowListener,
                 bookmark = 0;
             }
 
-            ListIterator it = syncdEventList.listIterator(bookmark);
+            ListIterator<RevealEvent> it = syncdEventList.listIterator(bookmark);
             while (it.hasNext())
             {
-                RevealEvent e = (RevealEvent)it.next();
+                RevealEvent e = it.next();
                 if (isEventTooOld(e))
                 {
                     bookmark++;
@@ -658,7 +658,7 @@ final class EventViewer extends KDialog implements WindowListener,
 
     // creature related event:
     private void newEvent(int eventType, String markerId1, int height1,
-        ArrayList rcList, String markerId2, int height2)
+        ArrayList<RevealedCreature> rcList, String markerId2, int height2)
     {
         RevealEvent e = new RevealEvent(client, client.getTurnNumber(),
             getActivePlayerNum(), eventType, markerId1, height1, rcList,
@@ -735,7 +735,7 @@ final class EventViewer extends KDialog implements WindowListener,
         
         attackerEventLegion = new RevealEvent(client, turnNumber,
             getActivePlayerNum(), RevealEvent.eventBattle, attackerId,
-            getLegionInfo(attackerId).getHeight(), new ArrayList(),
+            getLegionInfo(attackerId).getHeight(), new ArrayList<RevealedCreature>(),
             null, 0);
         attackerEventLegion.setEventInfo(Constants.reasonBattleStarts);
         attackerEventLegion
@@ -743,7 +743,7 @@ final class EventViewer extends KDialog implements WindowListener,
 
         defenderEventLegion = new RevealEvent(client, turnNumber,
             getActivePlayerNum(), RevealEvent.eventBattle, defenderId,
-            getLegionInfo(defenderId).getHeight(), new ArrayList(),
+            getLegionInfo(defenderId).getHeight(), new ArrayList<RevealedCreature>(),
             null, 0);
 
         defenderEventLegion.setEventInfo(Constants.reasonBattleStarts);
@@ -871,14 +871,14 @@ final class EventViewer extends KDialog implements WindowListener,
                     ", creature " + creature);  
         }
 
-        ArrayList rcList = new ArrayList(1);
+        ArrayList<RevealedCreature> rcList = new ArrayList<RevealedCreature>(1);
         rcList.add(rc);
 
         newEvent(eventType, markerId1, height1, rcList, markerId2, height2);
     }
 
     public void newSplitEvent(String markerId1, int height1,
-        ArrayList rcList, String markerId2, int height2)
+        ArrayList<RevealedCreature> rcList, String markerId2, int height2)
     {
         RevealEvent e = new RevealEvent(client, client.getTurnNumber(),
             getActivePlayerNum(), RevealEvent.eventSplit, markerId1, height1,
@@ -917,7 +917,7 @@ final class EventViewer extends KDialog implements WindowListener,
 
             if (otherEvent != null)
             {
-                ArrayList rcNames = new ArrayList();
+                ArrayList<RevealedCreature> rcNames = new ArrayList<RevealedCreature>();
                 Iterator it = names.iterator();
                 while (it.hasNext())
                 {
@@ -932,7 +932,7 @@ final class EventViewer extends KDialog implements WindowListener,
                 String ownMarkerId = ownEvent.getMarkerId();
                 LegionInfo info = getLegionInfo(ownMarkerId);
                 List ownNames = info.getContents();
-                ArrayList rcNames = new ArrayList();
+                ArrayList<RevealedCreature> rcNames = new ArrayList<RevealedCreature>();
                 Iterator it = ownNames.iterator();
                 while (it.hasNext())
                 {
@@ -962,7 +962,7 @@ final class EventViewer extends KDialog implements WindowListener,
             RevealEvent event;
             event = isAttacker ? attackerEventLegion : defenderEventLegion;
 
-            ArrayList rcNames = new ArrayList();
+            ArrayList<RevealedCreature> rcNames = new ArrayList<RevealedCreature>();
             Iterator it = names.iterator();
             while (it.hasNext())
             {
@@ -1014,7 +1014,7 @@ final class EventViewer extends KDialog implements WindowListener,
             int newHeight = getLegionInfo(markerId).getHeight();
             RevealedCreature rc = new RevealedCreature(name);
             rc.setWasAcquired(true);
-            ArrayList rcList = new ArrayList(1);
+            ArrayList<RevealedCreature> rcList = new ArrayList<RevealedCreature>(1);
             rcList.add(rc);
             newEvent(RevealEvent.eventAcquire, markerId,
                 newHeight, rcList, null, 0);
@@ -1074,7 +1074,7 @@ final class EventViewer extends KDialog implements WindowListener,
     public void recruitEvent(String markerId, int height, String recruitName,
         List recruiters)
     {
-        ArrayList rcList = new ArrayList();
+        ArrayList<RevealedCreature> rcList = new ArrayList<RevealedCreature>();
         RevealedCreature rc;
 
         Iterator it = recruiters.iterator();
@@ -1116,10 +1116,10 @@ final class EventViewer extends KDialog implements WindowListener,
             synchronized (syncdEventList)
             {
                 int last = syncdEventList.size();
-                ListIterator it = syncdEventList.listIterator(last);
+                ListIterator<RevealEvent> it = syncdEventList.listIterator(last);
                 while (it.hasPrevious() && found == 0)
                 {
-                    RevealEvent e = (RevealEvent)it.previous();
+                    RevealEvent e = it.previous();
                     if (e.getEventType() == type && e.getTurn() == turn
                         && e.getMarkerId().equals(parentId)
                         && e.getMarkerId2().equals(childId) && !e.wasUndone())
@@ -1141,10 +1141,10 @@ final class EventViewer extends KDialog implements WindowListener,
                 synchronized (syncdEventList)
                 {
                     int last = syncdEventList.size();
-                    ListIterator it2 = syncdEventList.listIterator(last);
+                    ListIterator<RevealEvent> it2 = syncdEventList.listIterator(last);
                     while (it2.hasPrevious() && found == 0)
                     {
-                        RevealEvent e = (RevealEvent)it2.previous();
+                        RevealEvent e = it2.previous();
                         if (e.getEventType() == type
                             && e.getTurn() + 1 == turn
                             && e.getMarkerId().equals(parentId)
@@ -1163,10 +1163,10 @@ final class EventViewer extends KDialog implements WindowListener,
             synchronized (syncdEventList)
             {
                 int last = syncdEventList.size();
-                ListIterator it = syncdEventList.listIterator(last);
+                ListIterator<RevealEvent> it = syncdEventList.listIterator(last);
                 while (it.hasPrevious() && found == 0)
                 {
-                    RevealEvent e = (RevealEvent)it.previous();
+                    RevealEvent e = it.previous();
                     if (e.getEventType() == type && e.getTurn() == turn
                         && e.getMarkerId().equals(parentId) && !e.wasUndone())
                     {
@@ -1181,10 +1181,10 @@ final class EventViewer extends KDialog implements WindowListener,
             synchronized (syncdEventList)
             {
                 int last = syncdEventList.size();
-                ListIterator it = syncdEventList.listIterator(last);
+                ListIterator<RevealEvent> it = syncdEventList.listIterator(last);
                 while (it.hasPrevious() && found == 0)
                 {
-                    RevealEvent e = (RevealEvent)it.previous();
+                    RevealEvent e = it.previous();
                     if (e.getEventType() == type && e.getTurn() == turn
                         && e.getMarkerId().equals(parentId) && !e.wasUndone())
                     {
@@ -1199,10 +1199,10 @@ final class EventViewer extends KDialog implements WindowListener,
             synchronized (syncdEventList)
             {
                 int last = syncdEventList.size();
-                ListIterator it = syncdEventList.listIterator(last);
+                ListIterator<RevealEvent> it = syncdEventList.listIterator(last);
                 while (it.hasPrevious() && found == 0)
                 {
-                    RevealEvent e = (RevealEvent)it.previous();
+                    RevealEvent e = it.previous();
                     if (e.getEventType() == type && e.getTurn() == turn
                         && e.getMarkerId().equals(parentId) && !e.wasUndone())
                     {
@@ -1248,11 +1248,11 @@ final class EventViewer extends KDialog implements WindowListener,
 
         synchronized (syncdEventList)
         {
-            Iterator it = syncdEventList.iterator();
+            Iterator<RevealEvent> it = syncdEventList.iterator();
             boolean done = false;
             while (it.hasNext() && !done)
             {
-                RevealEvent e = (RevealEvent)it.next();
+                RevealEvent e = it.next();
                 int oldEventTurn = e.getTurn();
                 int oldPlayerNr = e.getPlayerNr();
 

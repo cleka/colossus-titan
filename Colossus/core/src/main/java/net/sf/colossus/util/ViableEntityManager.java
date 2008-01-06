@@ -35,7 +35,7 @@ public class ViableEntityManager
 
     private static boolean debug = false;
 
-    private static WeakHashMap viableEntities = new WeakHashMap();
+    private static WeakHashMap<Object, String> viableEntities = new WeakHashMap<Object, String>();
     private static int waiting = 0;
     private static Object mutex = new Object();
     

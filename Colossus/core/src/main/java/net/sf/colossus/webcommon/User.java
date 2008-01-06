@@ -33,8 +33,8 @@ public class User
     private static final Logger LOGGER =
         Logger.getLogger(User.class.getName());
 
-    private static HashMap userMap = new HashMap();
-    private static HashMap loggedInUserMap = new HashMap();
+    private static HashMap<String, User> userMap = new HashMap<String, User>();
+    private static HashMap<String, User> loggedInUserMap = new HashMap<String, User>();
 
     private static String usersFile = null;
 
@@ -166,10 +166,10 @@ public class User
     public static User findUserByName(String name)
     {
         String nameAllLower = name.toLowerCase();
-        return (User)userMap.get(nameAllLower);
+        return userMap.get(nameAllLower);
     }
 
-    public static Iterator getLoggedInUsersIterator()
+    public static Iterator<User> getLoggedInUsersIterator()
     {
         return loggedInUserMap.values().iterator();
     }
@@ -339,11 +339,11 @@ public class User
         {
             out = new PrintWriter(new FileOutputStream(filename));
 
-            Iterator it = userMap.keySet().iterator();
+            Iterator<String> it = userMap.keySet().iterator();
             while (it.hasNext())
             {
-                String key = (String)it.next();
-                User user = (User)userMap.get(key);
+                String key = it.next();
+                User user = userMap.get(key);
                 String line = user.makeLine();
                 out.println(line);
             }

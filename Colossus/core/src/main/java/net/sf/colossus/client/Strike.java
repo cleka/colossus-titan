@@ -39,10 +39,10 @@ public final class Strike
     Set findCrittersWithTargets()
     {
         Set set = new HashSet();
-        Iterator it = client.getActiveBattleChits().iterator();
+        Iterator<BattleChit> it = client.getActiveBattleChits().iterator();
         while (it.hasNext())
         {
-            BattleChit chit = (BattleChit)it.next();
+            BattleChit chit = it.next();
             if (countStrikes(chit, true) > 0)
             {
                 set.add(chit.getCurrentHexLabel());
@@ -72,10 +72,10 @@ public final class Strike
             return false;
         }
 
-        Iterator it = client.getActiveBattleChits().iterator();
+        Iterator<BattleChit> it = client.getActiveBattleChits().iterator();
         while (it.hasNext())
         {
-            BattleChit chit = (BattleChit)it.next();
+            BattleChit chit = it.next();
             if (!chit.hasStruck())
             {
                 Set set = findStrikes(chit, rangestrike);
@@ -157,10 +157,10 @@ public final class Strike
         if (rangestrike && !adjacentEnemy && creature.isRangestriker()
             && client.getBattlePhase() != Constants.BattlePhase.STRIKEBACK)
         {
-            Iterator it = client.getInactiveBattleChits().iterator();
+            Iterator<BattleChit> it = client.getInactiveBattleChits().iterator();
             while (it.hasNext())
             {
-                BattleChit target = (BattleChit)it.next();
+                BattleChit target = it.next();
                 if (!target.isDead())
                 {
                     BattleHex targetHex = client.getBattleHex(target);
@@ -274,11 +274,11 @@ public final class Strike
         BattleHex hex = client.getBattleHex(chit);
         int min = Constants.OUT_OF_RANGE;
 
-        List battleChits = client.getBattleChits();
-        Iterator it = battleChits.iterator();
+        List<BattleChit> battleChits = client.getBattleChits();
+        Iterator<BattleChit> it = battleChits.iterator();
         while (it.hasNext())
         {
-            BattleChit target = (BattleChit)it.next();
+            BattleChit target = it.next();
             if (chit.isInverted() != target.isInverted())
             {
                 BattleHex targetHex = client.getBattleHex(target);

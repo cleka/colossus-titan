@@ -39,7 +39,7 @@ final class SummonAngel extends KDialog implements MouseListener,
         .getName());
 
     private String markerId;
-    private List sumChitList = new ArrayList();
+    private List<Chit> sumChitList = new ArrayList<Chit>();
     private JButton cancelButton;
     private static boolean active;
     private Client client;
@@ -77,13 +77,13 @@ final class SummonAngel extends KDialog implements MouseListener,
 
         int scale = 4 * Scale.get();
 
-        List summonableList = Creature.getSummonableCreatures();
-        Iterator it = summonableList.iterator();
+        List<Creature> summonableList = Creature.getSummonableCreatures();
+        Iterator<Creature> it = summonableList.iterator();
         sumChitList.clear();
         while (it.hasNext())
         {
             Chit tempChit;
-            Creature c = (Creature)it.next();
+            Creature c = it.next();
             tempChit = new Chit(scale, c.getName());
             contentPane.add(tempChit);
             tempChit.addMouseListener(this);
@@ -151,11 +151,11 @@ final class SummonAngel extends KDialog implements MouseListener,
         }
 
         Object source = e.getSource();
-        Iterator it = sumChitList.iterator();
+        Iterator<Chit> it = sumChitList.iterator();
         boolean done = false;
         while (it.hasNext() && !done)
         {
-            Chit c = (Chit)it.next();
+            Chit c = it.next();
             if ((source == c) && !(c.isDead()))
             {
                 cleanup(donorId, c.getId());
@@ -185,10 +185,10 @@ final class SummonAngel extends KDialog implements MouseListener,
                 + Legion.getLongMarkerName(markerId) + sourceSummonString
                 + Legion.getLongMarkerName(donorId));
         }
-        Iterator it = sumChitList.iterator();
+        Iterator<Chit> it = sumChitList.iterator();
         while (it.hasNext())
         {
-            Chit c = (Chit)it.next();
+            Chit c = it.next();
             c.setDead(!client.donorHas(c.getId()));
         }
     }

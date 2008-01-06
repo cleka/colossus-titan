@@ -41,7 +41,7 @@ public class HazardTerrain
      * 
      * This is a Map<String,HazardTerrain>.
      */
-    private final static Map TERRAIN_MAP = new HashMap();
+    private final static Map<String, HazardTerrain> TERRAIN_MAP = new HashMap<String, HazardTerrain>();
 
     public HazardTerrain(String name, char token, boolean nativeBonus,
         boolean nonNativePenalty)
@@ -76,10 +76,10 @@ public class HazardTerrain
 
     public static HazardTerrain getTerrainByName(String name)
     {
-        return (HazardTerrain)TERRAIN_MAP.get(name);
+        return TERRAIN_MAP.get(name);
     }
 
-    public static final Collection getAllHazardTerrains()
+    public static final Collection<HazardTerrain> getAllHazardTerrains()
     {
         return TERRAIN_MAP.values();
     }

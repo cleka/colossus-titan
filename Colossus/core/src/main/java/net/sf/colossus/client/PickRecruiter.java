@@ -30,7 +30,7 @@ final class PickRecruiter extends KDialog implements MouseListener,
     WindowListener
 {
     private List recruiters;
-    private List recruiterChits = new ArrayList();
+    private List<Chit> recruiterChits = new ArrayList<Chit>();
     private Marker legionMarker;
     private static String recruiterName;
     private SaveWindow saveWindow;

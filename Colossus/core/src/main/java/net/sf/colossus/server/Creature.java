@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -64,7 +65,7 @@ public class Creature implements Comparable
 
     /** Sometimes we need to iterate through all creature types. */
     private static List creatures = new ArrayList();
-    private static List summonableCreatures = new ArrayList();
+    private static List<Creature> summonableCreatures = new ArrayList<Creature>();
 
     public Creature(String name, int power, int skill, boolean rangestrikes,
         boolean flies, boolean nativeBramble, boolean nativeDrift,
@@ -145,7 +146,7 @@ public class Creature implements Comparable
         return Collections.unmodifiableList(creatures);
     }
 
-    public static List getSummonableCreatures()
+    public static List<Creature> getSummonableCreatures()
     {
         return Collections.unmodifiableList(summonableCreatures);
     }
@@ -435,12 +436,12 @@ public class Creature implements Comparable
      *    of the game a certain set of different spelling variants might occur.
      *    these can be discarded later. Hmm, doesnt matter really, i think.
      */
-    private static java.util.Map _getCreatureByName_cache = new WeakHashMap();
+    private static Map<String, Creature> _getCreatureByName_cache = new WeakHashMap<String, Creature>();
     // init the cache with predefined values.
     static
     {
         // "null" (not a null pointer...) is used for recruiter
-        // when it is anonoymous, so it is known and legal,
+        // when it is anonymous, so it is known and legal,
         // mapped to null (a null pointer, this time).
         _getCreatureByName_cache.put("null", null);
     }
@@ -478,7 +479,7 @@ public class Creature implements Comparable
         {
             // we found it. can be null, from earlier adding null
             //   as "not found" marker.
-            return (Creature)_getCreatureByName_cache.get(name);
+            return _getCreatureByName_cache.get(name);
         }
         else
         {

@@ -37,7 +37,7 @@ public class RevealEvent
     private int eventType;
     private String markerId;
     private int height;
-    private ArrayList knownCreatures;
+    private ArrayList<RevealedCreature> knownCreatures;
 
     // child legion or summoner (for split or summon events)
     private String markerId2;
@@ -94,7 +94,7 @@ public class RevealEvent
         eventBattleText };
 
     public RevealEvent(Client client, int turnNumber, int playerNr,
-        int eventType, String markerId, int height, ArrayList knownCreatures,
+        int eventType, String markerId, int height, ArrayList<RevealedCreature> knownCreatures,
         String markerId2, int height2)
     {
         if (markerId == null && eventType != eventPlayerChange
@@ -142,17 +142,17 @@ public class RevealEvent
      * Called also after battle to update to new power after
      * points were rewarded.
      */
-    private void makeCreaturesTitanChangeSafe(ArrayList list)
+    private void makeCreaturesTitanChangeSafe(ArrayList<RevealedCreature> list)
     {
         if (list == null || list.isEmpty())
         {
             return;
         }
 
-        Iterator it = list.iterator();
+        Iterator<RevealedCreature> it = list.iterator();
         while (it.hasNext())
         {
-            RevealedCreature rc = (RevealedCreature)it.next();
+            RevealedCreature rc = it.next();
             if (rc != null && rc.getPlainName() != null
                 && rc.getPlainName().equals(Constants.titan))
             {
@@ -213,10 +213,10 @@ public class RevealEvent
 
     public void setAllDead()
     {
-        Iterator it = this.knownCreatures.iterator();
+        Iterator<RevealedCreature> it = this.knownCreatures.iterator();
         while (it.hasNext())
         {
-            RevealedCreature rc = (RevealedCreature)it.next();
+            RevealedCreature rc = it.next();
             rc.setDead(true);
         }
         height = 0;
@@ -225,10 +225,10 @@ public class RevealEvent
     public int getAliveCount()
     {
         int alive = 0;
-        Iterator it = this.knownCreatures.iterator();
+        Iterator<RevealedCreature> it = this.knownCreatures.iterator();
         while (it.hasNext())
         {
-            RevealedCreature rc = (RevealedCreature)it.next();
+            RevealedCreature rc = it.next();
             if (!rc.isDead())
             {
                 alive++;
@@ -240,10 +240,10 @@ public class RevealEvent
     public int getDeadCount()
     {
         int dead = 0;
-        Iterator it = this.knownCreatures.iterator();
+        Iterator<RevealedCreature> it = this.knownCreatures.iterator();
         while (it.hasNext())
         {
-            RevealedCreature rc = (RevealedCreature)it.next();
+            RevealedCreature rc = it.next();
             if (rc.isDead())
             {
                 dead++;
@@ -262,7 +262,7 @@ public class RevealEvent
 
     // creatures were revealed some while after event was created.
     // E.g. engagements.
-    public void updateKnownCreatures(ArrayList revealedCreatures)
+    public void updateKnownCreatures(ArrayList<RevealedCreature> revealedCreatures)
     {
         this.knownCreatures = revealedCreatures;
         makeCreaturesTitanChangeSafe(knownCreatures);
@@ -271,11 +271,11 @@ public class RevealEvent
 
     public void setCreatureDied(String name, int newHeight)
     {
-        Iterator it = this.knownCreatures.iterator();
+        Iterator<RevealedCreature> it = this.knownCreatures.iterator();
         boolean done = false;
         while (!done && it.hasNext())
         {
-            RevealedCreature rc = (RevealedCreature)it.next();
+            RevealedCreature rc = it.next();
             if (rc.matches(name) && !rc.isDead())
             {
                 rc.setDead(true);
@@ -309,11 +309,11 @@ public class RevealEvent
                 + " -- wrong turn.");
             return false;
         }
-        Iterator it = this.knownCreatures.iterator();
+        Iterator<RevealedCreature> it = this.knownCreatures.iterator();
         boolean done = false;
         while (!done && it.hasNext())
         {
-            RevealedCreature rc = (RevealedCreature)it.next();
+            RevealedCreature rc = it.next();
             if (rc.matches(name) && rc.wasSummoned())
             {
                 it.remove();
@@ -380,7 +380,7 @@ public class RevealEvent
         }
         else if (eventType == eventSummon)
         {
-            RevealedCreature rc = (RevealedCreature)this.knownCreatures.get(0);
+            RevealedCreature rc = this.knownCreatures.get(0);
             String summoned = rc.getName();
 
             msg = "Revealing event: \"" + getEventTypeText() + "\":\n"
@@ -432,13 +432,13 @@ public class RevealEvent
 
             msgBuf.append("Revealing event: \"" + getEventTypeText()
                 + "\" for marker " + markerId + "\n");
-            Iterator it = knownCreatures.iterator();
+            Iterator<RevealedCreature> it = knownCreatures.iterator();
 
             int i = 0;
             while (it.hasNext())
             {
                 i++;
-                RevealedCreature rc = (RevealedCreature)it.next();
+                RevealedCreature rc = it.next();
                 msgBuf.append(i + ". " + rc.toString() + "\n");
             }
             msgBuf.append(" => legion " + markerId + " now " + height
@@ -712,10 +712,10 @@ public class RevealEvent
         }
         else if (eventType == eventRecruit)
         {
-            Iterator it = knownCreatures.iterator();
+            Iterator<RevealedCreature> it = knownCreatures.iterator();
             while (it.hasNext())
             {
-                RevealedCreature rc = (RevealedCreature)it.next();
+                RevealedCreature rc = it.next();
                 if (rc.wasRecruited())
                 {
                     addLabel(" => ");
@@ -725,10 +725,10 @@ public class RevealEvent
         }
         else if (eventType == eventSummon)
         {
-            Iterator it = knownCreatures.iterator();
+            Iterator<RevealedCreature> it = knownCreatures.iterator();
             while (it.hasNext())
             {
-                RevealedCreature rc = (RevealedCreature)it.next();
+                RevealedCreature rc = it.next();
                 addCreatureToPanel(rc);
             }
             addLabel(" to ");
@@ -737,20 +737,20 @@ public class RevealEvent
 
         else if (eventType == eventAcquire)
         {
-            Iterator it = knownCreatures.iterator();
+            Iterator<RevealedCreature> it = knownCreatures.iterator();
             while (it.hasNext())
             {
-                RevealedCreature rc = (RevealedCreature)it.next();
+                RevealedCreature rc = it.next();
                 addCreatureToPanel(rc);
             }
         }
 
         else if (knownCreatures != null)
         {
-            Iterator it = knownCreatures.iterator();
+            Iterator<RevealedCreature> it = knownCreatures.iterator();
             while (it.hasNext())
             {
-                RevealedCreature rc = (RevealedCreature)it.next();
+                RevealedCreature rc = it.next();
                 addCreatureWithInfoToPanel(rc);
             }
 

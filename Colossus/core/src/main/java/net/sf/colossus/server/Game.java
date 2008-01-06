@@ -85,7 +85,7 @@ public final class Game extends net.sf.colossus.game.Game
     // Negotiation
     private final Set[] proposals = new HashSet[2];
 
-    private final LinkedList colorPickOrder = new LinkedList();
+    private final LinkedList<String> colorPickOrder = new LinkedList<String>();
     private List colorsLeft;
     private final PhaseAdvancer phaseAdvancer = new GamePhaseAdvancer();
     private Options options = null;
@@ -415,7 +415,7 @@ public final class Game extends net.sf.colossus.game.Game
     {
         if (colorPickOrder.size() >= 1)
         {
-            String playerName = (String)colorPickOrder.getFirst();
+            String playerName = colorPickOrder.getFirst();
 
             server.askPickColor(playerName, colorsLeft);
         }
@@ -510,7 +510,7 @@ public final class Game extends net.sf.colossus.game.Game
 
     String getNextColorPicker()
     {
-        return (String)colorPickOrder.getFirst();
+        return colorPickOrder.getFirst();
     }
 
     /** Done picking player colors; proceed to start game. */
@@ -585,7 +585,7 @@ public final class Game extends net.sf.colossus.game.Game
         }
 
         // Make a sorted copy, converting String to Integer.
-        ArrayList numericList = new ArrayList();
+        ArrayList<Integer> numericList = new ArrayList<Integer>();
         Iterator it = towerList.iterator();
 
         while (it.hasNext())
@@ -626,7 +626,7 @@ public final class Game extends net.sf.colossus.game.Game
         {
             Integer raw = (Integer)it.next();
             int cooked = (raw.intValue() + startingTower) % numTowers;
-            Integer numericLabel = (Integer)numericList.get(cooked);
+            Integer numericLabel = numericList.get(cooked);
 
             returnList.add(numericLabel.toString());
             numDone++;
@@ -1779,15 +1779,15 @@ public final class Game extends net.sf.colossus.game.Game
     }
 
     /** Return a list of eligible recruits, as Creatures. */
-    List findEligibleRecruits(String markerId, String hexLabel)
+    List<Creature> findEligibleRecruits(String markerId, String hexLabel)
     {
         Legion legion = getLegionByMarkerId(markerId);
-        List recruits;
+        List<Creature> recruits;
 
         MasterHex hex = MasterBoard.getHexByLabel(hexLabel);
         String terrain = hex.getTerrain();
 
-        recruits = new ArrayList();
+        recruits = new ArrayList<Creature>();
         List tempRecruits = TerrainRecruitLoader.getPossibleRecruits(terrain,
             hexLabel);
         List recruiters = TerrainRecruitLoader.getPossibleRecruiters(terrain,
@@ -1814,10 +1814,10 @@ public final class Game extends net.sf.colossus.game.Game
         }
 
         // Make sure that the potential recruits are available.
-        Iterator it = recruits.iterator();
+        Iterator<Creature> it = recruits.iterator();
         while (it.hasNext())
         {
-            Creature recruit = (Creature)it.next();
+            Creature recruit = it.next();
             if (caretaker.getCount(recruit) < 1)
             {
                 it.remove();
@@ -1941,12 +1941,12 @@ public final class Game extends net.sf.colossus.game.Game
         }
         List recruits = new ArrayList();
         String terrain = legion.getCurrentHex().getTerrain();
-        List allRecruits = TerrainRecruitLoader.getRecruitableAcquirableList(
+        List<String> allRecruits = TerrainRecruitLoader.getRecruitableAcquirableList(
             terrain, score);
-        Iterator it = allRecruits.iterator();
+        Iterator<String> it = allRecruits.iterator();
         while (it.hasNext())
         {
-            String name = (String)it.next();
+            String name = it.next();
 
             if (caretaker.getCount(Creature.getCreatureByName(name)) >= 1
                 && !recruits.contains(name))
@@ -2091,13 +2091,13 @@ public final class Game extends net.sf.colossus.game.Game
 
     /** Recursively find all unoccupied hexes within roll hexes, for
      *  tower teleport. */
-    private Set findNearbyUnoccupiedHexes(MasterHex hex, Legion legion,
+    private Set<String> findNearbyUnoccupiedHexes(MasterHex hex, Legion legion,
         int roll, int cameFrom, boolean ignoreFriends)
     {
         // This hex is the final destination.  Mark it as legal if
         // it is unoccupied.
         String hexLabel = hex.getLabel();
-        Set set = new HashSet();
+        Set<String> set = new HashSet<String>();
         if (!isOccupied(hexLabel))
         {
             set.add(hexLabel);
@@ -2121,10 +2121,10 @@ public final class Game extends net.sf.colossus.game.Game
     /** Return set of hexLabels describing where this legion can move.
      *  Include moves currently blocked by friendly
      *  legions if ignoreFriends is true. */
-    Set listAllMoves(Legion legion, MasterHex hex, int movementRoll,
+    Set<String> listAllMoves(Legion legion, MasterHex hex, int movementRoll,
         boolean ignoreFriends)
     {
-        Set set = listNormalMoves(legion, hex, movementRoll, ignoreFriends);
+        Set<String> set = listNormalMoves(legion, hex, movementRoll, ignoreFriends);
         set
             .addAll(listTeleportMoves(legion, hex, movementRoll, ignoreFriends));
         return set;
@@ -2147,18 +2147,18 @@ public final class Game extends net.sf.colossus.game.Game
     /** Return set of hexLabels describing where this legion can move
      *  without teleporting.  Include moves currently blocked by friendly
      *  legions if ignoreFriends is true. */
-    Set listNormalMoves(Legion legion, MasterHex hex, int movementRoll,
+    Set<String> listNormalMoves(Legion legion, MasterHex hex, int movementRoll,
         boolean ignoreFriends)
     {
         if (legion.hasMoved())
         {
-            return new HashSet();
+            return new HashSet<String>();
         }
         Set tuples = findNormalMoves(hex, legion, movementRoll,
             findBlock(hex), Constants.NOWHERE, ignoreFriends);
 
         // Extract just the hexLabels from the hexLabel:entrySide tuples.
-        Set hexLabels = new HashSet();
+        Set<String> hexLabels = new HashSet<String>();
         Iterator it = tuples.iterator();
         while (it.hasNext())
         {
@@ -2226,11 +2226,11 @@ public final class Game extends net.sf.colossus.game.Game
     /** Return set of hexLabels describing where this legion can teleport.
      *  Include moves currently blocked by friendly legions if
      *  ignoreFriends is true. */
-    Set listTeleportMoves(Legion legion, MasterHex hex, int movementRoll,
+    Set<String> listTeleportMoves(Legion legion, MasterHex hex, int movementRoll,
         boolean ignoreFriends)
     {
         Player player = legion.getPlayer();
-        Set set = new HashSet();
+        Set<String> set = new HashSet<String>();
         if (movementRoll != 6 || legion.hasMoved() || player.hasTeleported())
         {
             return set;
@@ -2384,14 +2384,14 @@ public final class Game extends net.sf.colossus.game.Game
     {
         if (getNumLegions(hexLabel) > 1)
         {
-            List markerIds = getLegionMarkerIds(hexLabel);
-            Iterator it = markerIds.iterator();
-            String markerId = (String)it.next();
+            List<String> markerIds = getLegionMarkerIds(hexLabel);
+            Iterator<String> it = markerIds.iterator();
+            String markerId = it.next();
             Player player = getPlayerByMarkerId(markerId);
 
             while (it.hasNext())
             {
-                markerId = (String)it.next();
+                markerId = it.next();
                 if (getPlayerByMarkerId(markerId) != player)
                 {
                     return true;
@@ -2402,9 +2402,9 @@ public final class Game extends net.sf.colossus.game.Game
     }
 
     /** Return set of hexLabels for engagements found. */
-    synchronized Set findEngagements()
+    synchronized Set<String> findEngagements()
     {
-        Set set = new HashSet();
+        Set<String> set = new HashSet<String>();
         Player player = getActivePlayer();
 
         List legions = player.getLegions();
@@ -2535,10 +2535,10 @@ public final class Game extends net.sf.colossus.game.Game
     }
 
     /** Return a set of hexLabels. */
-    synchronized Set findSummonableAngels(String markerId)
+    synchronized Set<String> findSummonableAngels(String markerId)
     {
         Legion legion = getLegionByMarkerId(markerId);
-        Set set = new HashSet();
+        Set<String> set = new HashSet<String>();
         List legions = legion.getPlayer().getLegions();
         Iterator it = legions.iterator();
         while (it.hasNext())
@@ -2548,11 +2548,11 @@ public final class Game extends net.sf.colossus.game.Game
             {
                 String hexLabel = candidate.getCurrentHexLabel();
                 boolean hasSummonable = false;
-                List summonableList = Creature.getSummonableCreatures();
-                Iterator sumIt = summonableList.iterator();
+                List<Creature> summonableList = Creature.getSummonableCreatures();
+                Iterator<Creature> sumIt = summonableList.iterator();
                 while (sumIt.hasNext() && !hasSummonable)
                 {
-                    Creature c = (Creature)sumIt.next();
+                    Creature c = sumIt.next();
 
                     hasSummonable = hasSummonable
                         || (candidate.numCreature(c) > 0);
@@ -2618,7 +2618,7 @@ public final class Game extends net.sf.colossus.game.Game
         // not Creature - different things now.
         // so we must clone "by hand" the List.
         List tempCritters = legion.getCritters();
-        List tempCreatures = new ArrayList();
+        List<Creature> tempCreatures = new ArrayList<Creature>();
 
         it = tempCritters.iterator();
         while (it.hasNext())
@@ -2722,7 +2722,7 @@ public final class Game extends net.sf.colossus.game.Game
                 String marker = legion.getMarkerId() + " "
                     + legion.getMarkerName();
                 String from = legion.getCurrentHex().getLabel();
-                Set set = listTeleportMoves(legion, legion.getCurrentHex(),
+                Set<String> set = listTeleportMoves(legion, legion.getCurrentHex(),
                     player.getMovementRoll(), false);
                 return "List for teleport moves " + set.toString() + " of "
                     + marker + " from " + from + " does not contain '"
@@ -2737,7 +2737,7 @@ public final class Game extends net.sf.colossus.game.Game
                 String marker = legion.getMarkerId() + " "
                     + legion.getMarkerName();
                 String from = legion.getCurrentHex().getLabel();
-                Set set = listNormalMoves(legion, legion.getCurrentHex(),
+                Set<String> set = listNormalMoves(legion, legion.getCurrentHex(),
                     player.getMovementRoll(), false);
                 return "List for normal moves " + set.toString() + " + of "
                     + marker + " from " + from + " does not contain '"
@@ -3242,9 +3242,9 @@ public final class Game extends net.sf.colossus.game.Game
     }
 
     /** Return a list of all players' legions' marker ids. */
-    List getAllLegionIds()
+    List<String> getAllLegionIds()
     {
-        List list = new ArrayList();
+        List<String> list = new ArrayList<String>();
         for (Iterator it = players.iterator(); it.hasNext();)
         {
             Player player = (Player)it.next();
@@ -3273,9 +3273,9 @@ public final class Game extends net.sf.colossus.game.Game
     }
 
     /** Return a list of ids for all legions not belonging to player. */
-    List getAllEnemyLegionIds(Player player)
+    List<String> getAllEnemyLegionIds(Player player)
     {
-        List list = new ArrayList();
+        List<String> list = new ArrayList<String>();
         for (Iterator it = players.iterator(); it.hasNext();)
         {
             Player nextPlayer = (Player)it.next();
@@ -3380,9 +3380,9 @@ public final class Game extends net.sf.colossus.game.Game
         return null;
     }
 
-    List getLegionMarkerIds(String hexLabel)
+    List<String> getLegionMarkerIds(String hexLabel)
     {
-        List markerIds = new ArrayList();
+        List<String> markerIds = new ArrayList<String>();
         Iterator it = getAllLegions().iterator();
         while (it.hasNext())
         {
@@ -3429,9 +3429,9 @@ public final class Game extends net.sf.colossus.game.Game
         return null;
     }
 
-    synchronized List getFriendlyLegions(String hexLabel, Player player)
+    synchronized List<Legion> getFriendlyLegions(String hexLabel, Player player)
     {
-        List newLegions = new ArrayList();
+        List<Legion> newLegions = new ArrayList<Legion>();
         List legions = player.getLegions();
         Iterator it = legions.iterator();
         while (it.hasNext())
@@ -3532,7 +3532,7 @@ public final class Game extends net.sf.colossus.game.Game
         history.mergeEvent(splitoffId, survivorId, turnNumber);
     }
 
-    void revealEvent(boolean allPlayers, List playerNames, String markerId,
+    void revealEvent(boolean allPlayers, List<String> playerNames, String markerId,
         List creatureNames)
     {
         history.revealEvent(allPlayers, playerNames, markerId, creatureNames,

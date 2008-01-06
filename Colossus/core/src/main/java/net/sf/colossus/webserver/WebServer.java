@@ -58,18 +58,18 @@ public class WebServer implements IWebServer, IRunWebServer
     private int numClients = 0;
     private int maxClients;
 
-    private ArrayList potentialGames = null;
-    private ArrayList runningGames = null;
-    private ArrayList endingGames = null;
+    private ArrayList<GameInfo> potentialGames = null;
+    private ArrayList<GameInfo> runningGames = null;
+    private ArrayList<GameInfo> endingGames = null;
 
     // Server socket port where we listen for WebClient connections
     private int port;
 
     private ServerSocket serverSocket;
-    private List activeSocketList = Collections
-        .synchronizedList(new ArrayList());
+    private List<Socket> activeSocketList = Collections
+        .synchronizedList(new ArrayList<Socket>());
 
-    private List lastNChatMessages = new ArrayList();
+    private List<ChatMessage> lastNChatMessages = new ArrayList<ChatMessage>();
 
     public static void main(String[] args)
     {
@@ -137,9 +137,9 @@ public class WebServer implements IWebServer, IRunWebServer
             this.gui = new NullWebServerGUI();
         }
 
-        potentialGames = new ArrayList();
-        runningGames = new ArrayList();
-        endingGames = new ArrayList();
+        potentialGames = new ArrayList<GameInfo>();
+        runningGames = new ArrayList<GameInfo>();
+        endingGames = new ArrayList<GameInfo>();
 
         /*
          boolean runGameConsole = false;
@@ -314,21 +314,21 @@ public class WebServer implements IWebServer, IRunWebServer
 
     private void closeAllWscst()
     {
-        ArrayList toDo = new ArrayList();
+        ArrayList<User> toDo = new ArrayList<User>();
 
         // copy them first to own list. 
         // Otherwise we get a ConcurrentModificationException
-        Iterator it2 = User.getLoggedInUsersIterator();
+        Iterator<User> it2 = User.getLoggedInUsersIterator();
         while (it2.hasNext())
         {
-            User u = (User)it2.next();
+            User u = it2.next();
             toDo.add(u);
         }
 
-        Iterator it = toDo.iterator();
+        Iterator<User> it = toDo.iterator();
         while (it.hasNext())
         {
-            User u = (User)it.next();
+            User u = it.next();
 
             WebServerClientSocketThread thread = (WebServerClientSocketThread)u
                 .getThread();
@@ -400,10 +400,10 @@ public class WebServer implements IWebServer, IRunWebServer
     {
         IWebClient client = cst;
 
-        Iterator it = potentialGames.iterator();
+        Iterator<GameInfo> it = potentialGames.iterator();
         while (it.hasNext())
         {
-            GameInfo gi = (GameInfo)it.next();
+            GameInfo gi = it.next();
             client.gameInfo(gi);
         }
     }
@@ -413,10 +413,10 @@ public class WebServer implements IWebServer, IRunWebServer
         IWebClient client = newCst;
         User newUser = newCst.getUser();
 
-        Iterator it = potentialGames.iterator();
+        Iterator<GameInfo> it = potentialGames.iterator();
         while (it.hasNext())
         {
-            GameInfo gi = (GameInfo)it.next();
+            GameInfo gi = it.next();
             if (gi.isEnrolled(newUser))
             {
                 LOGGER.log(Level.FINEST,
@@ -432,20 +432,20 @@ public class WebServer implements IWebServer, IRunWebServer
     {
         IWebClient client = cst;
 
-        Iterator it = runningGames.iterator();
+        Iterator<GameInfo> it = runningGames.iterator();
         while (it.hasNext())
         {
-            GameInfo gi = (GameInfo)it.next();
+            GameInfo gi = it.next();
             client.gameInfo(gi);
         }
     }
 
     public void allTellGameInfo(GameInfo gi)
     {
-        Iterator it = User.getLoggedInUsersIterator();
+        Iterator<User> it = User.getLoggedInUsersIterator();
         while (it.hasNext())
         {
-            User u = (User)it.next();
+            User u = it.next();
             IWebClient client = (IWebClient)u.getThread();
             client.gameInfo(gi);
         }
@@ -461,12 +461,12 @@ public class WebServer implements IWebServer, IRunWebServer
     {
         String gameId = gi.getGameId();
 
-        ArrayList players = gi.getPlayers();
-        Iterator it = players.iterator();
+        ArrayList<User> players = gi.getPlayers();
+        Iterator<User> it = players.iterator();
 
         while (it.hasNext())
         {
-            User u = (User)it.next();
+            User u = it.next();
             IWebClient client = (IWebClient)u.getThread();
             client.gameStartsSoon(gameId);
         }
@@ -476,12 +476,12 @@ public class WebServer implements IWebServer, IRunWebServer
     {
         String gameId = gi.getGameId();
 
-        ArrayList players = gi.getPlayers();
-        Iterator it = players.iterator();
+        ArrayList<User> players = gi.getPlayers();
+        Iterator<User> it = players.iterator();
 
         while (it.hasNext())
         {
-            User u = (User)it.next();
+            User u = it.next();
             IWebClient client = (IWebClient)u.getThread();
             client.gameStartsNow(gameId, port);
         }
@@ -491,12 +491,12 @@ public class WebServer implements IWebServer, IRunWebServer
     {
         String gameId = gi.getGameId();
 
-        ArrayList players = gi.getPlayers();
-        Iterator it = players.iterator();
+        ArrayList<User> players = gi.getPlayers();
+        Iterator<User> it = players.iterator();
 
         while (it.hasNext())
         {
-            User u = (User)it.next();
+            User u = it.next();
             IWebClient client = (IWebClient)u.getThread();
             client.gameStarted(gameId);
         }
@@ -546,10 +546,10 @@ public class WebServer implements IWebServer, IRunWebServer
             gi.setServerNull();
             gi.start(); // does nothing, just to get it GC'd and finalized
 
-            Iterator it = User.getLoggedInUsersIterator();
+            Iterator<User> it = User.getLoggedInUsersIterator();
             while (it.hasNext())
             {
-                User u = (User)it.next();
+                User u = it.next();
                 IWebClient client = (IWebClient)u.getThread();
                 client.gameCancelled(gameId, byUser);
             }
@@ -579,10 +579,10 @@ public class WebServer implements IWebServer, IRunWebServer
     {
         if (chatId.equals(IWebServer.generalChatName))
         {
-            Iterator it = User.getLoggedInUsersIterator();
+            Iterator<User> it = User.getLoggedInUsersIterator();
             while (it.hasNext())
             {
-                User u = (User)it.next();
+                User u = it.next();
                 IWebClient client = (IWebClient)u.getThread();
                 long now = new Date().getTime();
                 ChatMessage msg = new ChatMessage(chatId, now, sender, message);
@@ -600,7 +600,7 @@ public class WebServer implements IWebServer, IRunWebServer
     public void tellLastChatMessagesToOne(WebServerClientSocketThread cst,
         String chatId)
     {
-        List messageList;
+        List<ChatMessage> messageList;
         if (chatId.equals(IWebServer.generalChatName))
         {
             messageList = lastNChatMessages;
@@ -615,10 +615,10 @@ public class WebServer implements IWebServer, IRunWebServer
 
         synchronized (messageList)
         {
-            Iterator it = messageList.iterator();
+            Iterator<ChatMessage> it = messageList.iterator();
             while (it.hasNext())
             {
-                ChatMessage m = (ChatMessage)it.next();
+                ChatMessage m = it.next();
                 client.chatDeliver(m.getChatId(), m.getWhen(), m.getSender(),
                     m.getMessage(), true);
             }
@@ -667,10 +667,10 @@ public class WebServer implements IWebServer, IRunWebServer
     {
         GameInfo gi_found = null;
 
-        Iterator it = potentialGames.iterator();
+        Iterator<GameInfo> it = potentialGames.iterator();
         while (it.hasNext())
         {
-            GameInfo gi = (GameInfo)it.next();
+            GameInfo gi = it.next();
             if (gi.getGameId().equals(gameId))
             {
                 gi_found = gi;
@@ -909,10 +909,10 @@ public class WebServer implements IWebServer, IRunWebServer
                 if (!endingGames.isEmpty())
                 {
                     didSomething = true;
-                    Iterator it = endingGames.iterator();
+                    Iterator<GameInfo> it = endingGames.iterator();
                     while (it.hasNext())
                     {
-                        GameInfo game = (GameInfo)it.next();
+                        GameInfo game = it.next();
                         String name = game.getName();
                         LOGGER.log(Level.FINE,
                             "REAPER: wait for '" + name + "' to end...");
@@ -983,7 +983,7 @@ public class WebServer implements IWebServer, IRunWebServer
         }
     }
 
-    private void storeMessage(List list, ChatMessage msg)
+    private void storeMessage(List<ChatMessage> list, ChatMessage msg)
     {
         synchronized (list)
         {

@@ -170,9 +170,9 @@ public class PredictSplitNode implements Comparable
         return true;
     }
 
-    List getChildren()
+    List<PredictSplitNode> getChildren()
     {
-        List li = new ArrayList();
+        List<PredictSplitNode> li = new ArrayList<PredictSplitNode>();
         if (hasSplit())
         {
             li.add(child1);
@@ -364,7 +364,7 @@ public class PredictSplitNode implements Comparable
      * @param knownSplit
      * @return
      */
-    List findAllPossibleSplits(int childSize, List knownKeep, List knownSplit)
+    List<List> findAllPossibleSplits(int childSize, List knownKeep, List knownSplit)
     {
         // Sanity checks
         assert knownSplit.size() <= childSize : "More known splitoffs than splitoffs";
@@ -495,10 +495,10 @@ public class PredictSplitNode implements Comparable
 
         Combos combos = new Combos(unknowns, numUnknownsToSplit);
 
-        Set possibleSplitsSet = new HashSet();
-        for (Iterator it = combos.iterator(); it.hasNext();)
+        Set<List> possibleSplitsSet = new HashSet<List>();
+        for (Iterator<List> it = combos.iterator(); it.hasNext();)
         {
-            List combo = (List)it.next();
+            List combo = it.next();
             List pos = new ArrayList();
             pos.addAll(knownSplit);
             pos.addAll(combo);
@@ -514,7 +514,7 @@ public class PredictSplitNode implements Comparable
                 }
             }
         }
-        List possibleSplits = new ArrayList(possibleSplitsSet);
+        List<List> possibleSplits = new ArrayList<List>(possibleSplitsSet);
         return possibleSplits;
     }
 
@@ -523,15 +523,15 @@ public class PredictSplitNode implements Comparable
      * Decide how to split this legion, and return a list of creatures names to
      * remove. Return empty list on error.
      */
-    List chooseCreaturesToSplitOut(List possibleSplits)
+    List chooseCreaturesToSplitOut(List<List> possibleSplits)
     {
-        List firstElement = (List)possibleSplits.get(0);
+        List firstElement = possibleSplits.get(0);
         boolean maximize = (2 * firstElement.size() > getHeight());
         int bestKillValue = -1;
         List creaturesToRemove = new ArrayList();
-        for (Iterator it = possibleSplits.iterator(); it.hasNext();)
+        for (Iterator<List> it = possibleSplits.iterator(); it.hasNext();)
         {
-            List li = (List)it.next();
+            List li = it.next();
             int totalKillValue = 0;
             for (Iterator it2 = li.iterator(); it2.hasNext();)
             {
@@ -584,7 +584,7 @@ public class PredictSplitNode implements Comparable
         CreatureInfoList keepList, CreatureInfoList splitList)
     {
 
-        List possibleSplits = findAllPossibleSplits(childSize, knownKeep,
+        List<List> possibleSplits = findAllPossibleSplits(childSize, knownKeep,
             knownSplit);
 
         List splitoffNames = chooseCreaturesToSplitOut(possibleSplits);

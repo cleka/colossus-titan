@@ -102,7 +102,7 @@ public final class MasterBoard extends JPanel
     private ShowHelpDoc showHelpDoc;
     private JMenu phaseMenu;
     private JPopupMenu popupMenu;
-    private Map checkboxes = new HashMap();
+    private Map<String, JCheckBoxMenuItem> checkboxes = new HashMap<String, JCheckBoxMenuItem>();
     private JPanel[] legionFlyouts;
 
     private MasterBoardWindowHandler mbwh;
@@ -190,19 +190,19 @@ public final class MasterBoard extends JPanel
         private static final int PANEL_MARGIN = 4;
         private static final int PANEL_PADDING = 0;
 
-        private final WeakReference clientRef;
+        private final WeakReference<Client> clientRef;
 
         private InfoPopupHandler(Client client)
         {
             super();
-            this.clientRef = new WeakReference(client);
+            this.clientRef = new WeakReference<Client>(client);
             net.sf.colossus.webcommon.InstanceTracker.register(this, client
                 .getPlayerName());
         }
 
         public void keyPressed(KeyEvent e)
         {
-            Client client = (Client)clientRef.get();
+            Client client = clientRef.get();
             if (client == null)
             {
                 return;
@@ -219,11 +219,11 @@ public final class MasterBoard extends JPanel
                 if (legionFlyouts == null)
                 {
                     // copy only local players markers
-                    List myMarkers = new ArrayList();
-                    for (Iterator iterator = client.getMarkers().iterator(); iterator
+                    List<Marker> myMarkers = new ArrayList<Marker>();
+                    for (Iterator<Marker> iterator = client.getMarkers().iterator(); iterator
                         .hasNext();)
                     {
-                        Marker marker = (Marker)iterator.next();
+                        Marker marker = iterator.next();
                         LegionInfo legionInfo = client.getLegionInfo(marker
                             .getId());
                         if (legionInfo.isMyLegion())
@@ -240,11 +240,11 @@ public final class MasterBoard extends JPanel
             }
         }
 
-        private void createLegionFlyouts(List markers)
+        private void createLegionFlyouts(List<Marker> markers)
         {
             // copy to array so we don't get concurrent modification
             // exceptions when iterating
-            Marker[] markerArray = (Marker[])markers
+            Marker[] markerArray = markers
                 .toArray(new Marker[markers.size()]);
             legionFlyouts = new JPanel[markers.size()];
             for (int i = 0; i < markerArray.length; i++)
@@ -882,11 +882,11 @@ public final class MasterBoard extends JPanel
 
     private void cleanCBListeners()
     {
-        Iterator it = checkboxes.keySet().iterator();
+        Iterator<String> it = checkboxes.keySet().iterator();
         while (it.hasNext())
         {
-            String key = (String)it.next();
-            JCheckBoxMenuItem cbmi = (JCheckBoxMenuItem)checkboxes.get(key);
+            String key = it.next();
+            JCheckBoxMenuItem cbmi = checkboxes.get(key);
             cbmi.removeItemListener(itemHandler);
         }
         checkboxes.clear();
@@ -982,7 +982,7 @@ public final class MasterBoard extends JPanel
 
     void twiddleOption(String name, boolean enable)
     {
-        JCheckBoxMenuItem cbmi = (JCheckBoxMenuItem)checkboxes.get(name);
+        JCheckBoxMenuItem cbmi = checkboxes.get(name);
         if (cbmi != null)
         {
             // Only set the selected state if it has changed,
@@ -1084,7 +1084,7 @@ public final class MasterBoard extends JPanel
     private static MasterHex[][] _hexByLabel_last_h = null;
 
     /** the cache used inside 'hexByLabel'. */
-    private static java.util.Vector _hexByLabel_cache = null;
+    private static java.util.Vector<MasterHex> _hexByLabel_cache = null;
 
     /**
      * towi changes: here is now a cache implemented so that the nested
@@ -1106,7 +1106,7 @@ public final class MasterBoard extends JPanel
             // we can do that here, because the 'label' arg is an int. if it
             // were a string we could not rely on that all h-entries are ints.
             // (Vector: lots of unused space, i am afraid. about 80kB...)
-            _hexByLabel_cache = new java.util.Vector(1000);
+            _hexByLabel_cache = new java.util.Vector<MasterHex>(1000);
             for (int i = 0; i < h.length; i++)
             {
                 for (int j = 0; j < h[i].length; j++)
@@ -1127,7 +1127,7 @@ public final class MasterBoard extends JPanel
         // the cache is built and looks like this:
         //   _hexByLabel_cache[0...] =
         //      [ h00,h01,h02, ..., null, null, ..., h30,h31,... ]
-        final MasterHex found = (MasterHex)_hexByLabel_cache.get(label);
+        final MasterHex found = _hexByLabel_cache.get(label);
         if (found == null)
         {
             LOGGER.log(Level.WARNING, "Couldn't find Masterhex labeled "
@@ -1815,13 +1815,13 @@ public final class MasterBoard extends JPanel
     {
         unselectAllHexes();
 
-        Set teleport = client.listTeleportMoves(markerId);
+        Set<String> teleport = client.listTeleportMoves(markerId);
         selectHexesByLabels(teleport, HTMLColor.purple);
 
-        Set normal = client.listNormalMoves(markerId);
+        Set<String> normal = client.listNormalMoves(markerId);
         selectHexesByLabels(normal, Color.white);
 
-        Set combo = new HashSet();
+        Set<String> combo = new HashSet<String>();
         combo.addAll(teleport);
         combo.addAll(normal);
 
@@ -1830,7 +1830,7 @@ public final class MasterBoard extends JPanel
 
     void highlightEngagements()
     {
-        Set set = client.findEngagements();
+        Set<String> set = client.findEngagements();
         unselectAllHexes();
         selectHexesByLabels(set);
     }
@@ -1838,7 +1838,7 @@ public final class MasterBoard extends JPanel
     /** Return number of legions with summonable angels. */
     int highlightSummonableAngels(String markerId)
     {
-        Set set = client.findSummonableAngelHexes(markerId);
+        Set<String> set = client.findSummonableAngelHexes(markerId);
         unselectAllHexes();
         selectHexesByLabels(set);
         return set.size();
@@ -1917,11 +1917,11 @@ public final class MasterBoard extends JPanel
      *  null if none does. */
     private Marker getMarkerAtPoint(Point point)
     {
-        List markers = client.getMarkers();
-        ListIterator lit = markers.listIterator(markers.size());
+        List<Marker> markers = client.getMarkers();
+        ListIterator<Marker> lit = markers.listIterator(markers.size());
         while (lit.hasPrevious())
         {
-            Marker marker = (Marker)lit.previous();
+            Marker marker = lit.previous();
             if (marker != null && marker.contains(point))
             {
                 return marker;
@@ -1998,7 +1998,7 @@ public final class MasterBoard extends JPanel
         });
     }
 
-    void selectHexesByLabels(final Set labels)
+    void selectHexesByLabels(final Set<String> labels)
     {
         visitGUIMasterHexes(new GUIMasterHexVisitor()
         {
@@ -2015,7 +2015,7 @@ public final class MasterBoard extends JPanel
         });
     }
 
-    void selectHexesByLabels(final Set labels, final Color color)
+    void selectHexesByLabels(final Set<String> labels, final Color color)
     {
         visitGUIMasterHexes(new GUIMasterHexVisitor()
         {
@@ -2340,10 +2340,10 @@ public final class MasterBoard extends JPanel
     /** Paint markers in z-order. */
     private void paintMarkers(Graphics g)
     {
-        Iterator it = client.getMarkers().iterator();
+        Iterator<Marker> it = client.getMarkers().iterator();
         while (it.hasNext())
         {
-            Marker marker = (Marker)it.next();
+            Marker marker = it.next();
             if (marker != null
                 && g.getClipBounds().intersects(marker.getBounds()))
             {
@@ -2354,10 +2354,10 @@ public final class MasterBoard extends JPanel
 
     private void paintRecruitedChits(Graphics g)
     {
-        Iterator it = client.getRecruitedChits().iterator();
+        Iterator<Chit> it = client.getRecruitedChits().iterator();
         while (it.hasNext())
         {
-            Chit chit = (Chit)it.next();
+            Chit chit = it.next();
             if (chit != null && g.getClipBounds().intersects(chit.getBounds()))
             {
                 chit.paintComponent(g);
@@ -2367,10 +2367,10 @@ public final class MasterBoard extends JPanel
 
     private void paintPossibleRecruitChits(Graphics g)
     {
-        Iterator it = client.getPossibleRecruitChits().iterator();
+        Iterator<Chit> it = client.getPossibleRecruitChits().iterator();
         while (it.hasNext())
         {
-            Chit chit = (Chit)it.next();
+            Chit chit = it.next();
             if (chit != null && g.getClipBounds().intersects(chit.getBounds()))
             {
                 chit.paintComponent(g);

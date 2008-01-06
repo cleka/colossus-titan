@@ -13,11 +13,11 @@ import java.util.List;
  */
 public final class Combos
 {
-    private ArrayList retlist;
+    private ArrayList<List> retlist;
 
     public Combos(List list, int n)
     {
-        retlist = new ArrayList();
+        retlist = new ArrayList<List>();
         findCombinations(list, n, new ArrayList());
     }
 
@@ -45,7 +45,7 @@ public final class Combos
         }
     }
 
-    public Iterator iterator()
+    public Iterator<List> iterator()
     {
         return retlist.iterator();
     }

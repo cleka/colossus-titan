@@ -26,7 +26,7 @@ import net.sf.colossus.util.KDialog;
 
 final class PickLord extends KDialog implements MouseListener, WindowListener
 {
-    private List chits = new ArrayList();
+    private List<Chit> chits = new ArrayList<Chit>();
     private static String lordType;
     private List imageNames;
     private SaveWindow saveWindow;

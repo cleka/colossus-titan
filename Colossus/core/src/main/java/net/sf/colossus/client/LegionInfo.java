@@ -189,9 +189,9 @@ public final class LegionInfo extends Legion
     }
 
     /** Return a list of Booleans. */
-    List getCertainties()
+    List<Boolean> getCertainties()
     {
-        List booleans = new ArrayList();
+        List<Boolean> booleans = new ArrayList<Boolean>();
         List cil = getNode().getCreatures();
         Iterator it = cil.iterator();
         while (it.hasNext())

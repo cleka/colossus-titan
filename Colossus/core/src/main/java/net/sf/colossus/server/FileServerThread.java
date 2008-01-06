@@ -31,7 +31,7 @@ final class FileServerThread extends Thread
         .getLogger(FileServerThread.class.getName());
 
     private ServerSocket fileServer;
-    private List activeSocketList;
+    private List<Socket> activeSocketList;
     private ChildThreadManager threadMgr;
 
     private static final String sep = Constants.protocolTermSeparator;
@@ -39,7 +39,7 @@ final class FileServerThread extends Thread
     private int port;
     private boolean keepGoingOn = true;
 
-    FileServerThread(java.util.List activeSocketList, int port,
+    FileServerThread(java.util.List<Socket> activeSocketList, int port,
         ChildThreadManager mgr)
     {
         super();
@@ -108,10 +108,10 @@ final class FileServerThread extends Thread
 
                     synchronized (activeSocketList)
                     {
-                        Iterator it = activeSocketList.iterator();
+                        Iterator<Socket> it = activeSocketList.iterator();
                         while (it.hasNext() && !knownIP)
                         {
-                            InetAddress cIP = ((Socket)it.next())
+                            InetAddress cIP = it.next()
                                 .getInetAddress();
                             knownIP = requester.equals(cIP);
                         }

@@ -49,7 +49,7 @@ final class EngagementResults extends KDialog
     private int current = -1;
     private int lastSeen = -1;
 
-    private ArrayList engagementLog = new ArrayList();
+    private ArrayList<Engagement> engagementLog = new ArrayList<Engagement>();
     private SaveWindow saveWindow;
 
     private JButton firstButton;
@@ -124,8 +124,8 @@ final class EngagementResults extends KDialog
     void addData(
         String winnerId, // null on mutual elim, flee, concede, negotiate
         String method, int points, int turns, List attackerStartingContents,
-        List defenderStartingContents, List attackerStartingCertainities,
-        List defenderStartingCertainities, boolean attackersTurn)
+        List defenderStartingContents, List<Boolean> attackerStartingCertainities,
+        List<Boolean> defenderStartingCertainities, boolean attackersTurn)
     {
         Engagement result = new Engagement(winnerId, method, points, turns,
             attackerStartingContents, defenderStartingContents,
@@ -290,7 +290,7 @@ final class EngagementResults extends KDialog
     }
 
     private Component createLegionComponent(String markerId, List imageNames,
-        List certainList, boolean isDefender)
+        List<Boolean> certainList, boolean isDefender)
     {
         // prepare my box
         Box panel = Box.createHorizontalBox();
@@ -310,7 +310,7 @@ final class EngagementResults extends KDialog
         for (Iterator it = imageNames.iterator(); it.hasNext();)
         {
             final String imageName = (String)it.next();
-            final Boolean chitCertain = (Boolean)certainList.get(idx);
+            final Boolean chitCertain = certainList.get(idx);
             final boolean showDubious = !chitCertain.booleanValue();
             Chit chit = new Chit(scale, imageName, inverse, showDubious);
             panel.add(chit);
@@ -344,7 +344,7 @@ final class EngagementResults extends KDialog
         }
         else
         {
-            Engagement result = (Engagement)engagementLog.get(current);
+            Engagement result = engagementLog.get(current);
             this.setTitle("Engagement " + (current + 1) + " of "
                 + engagementLog.size());
             this.summaryLabel.setText(result.getSummary());
@@ -434,19 +434,19 @@ final class EngagementResults extends KDialog
         int turns;
         List attackerStartingContents;
         List defenderStartingContents;
-        List attackerStartingCertainities;
-        List defenderStartingCertainities;
+        List<Boolean> attackerStartingCertainities;
+        List<Boolean> defenderStartingCertainities;
         String hexLabel;
         int gameTurn;
         List attackerEndingContents;
         List defenderEndingContents;
-        List attackerEndingCertainties;
-        List defenderEndingCertainties;
+        List<Boolean> attackerEndingCertainties;
+        List<Boolean> defenderEndingCertainties;
 
         public Engagement(String winnerId, String method, int points,
             int turns, List attackerStartingContents,
-            List defenderStartingContents, List attackerStartingCertainities,
-            List defenderStartingCertainities, IOracle oracle)
+            List defenderStartingContents, List<Boolean> attackerStartingCertainities,
+            List<Boolean> defenderStartingCertainities, IOracle oracle)
         {
             this.winnerId = winnerId;
             this.method = method;

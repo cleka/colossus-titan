@@ -37,7 +37,7 @@ public class InstanceTracker
     private static final Logger LOGGER =
         Logger.getLogger(InstanceTracker.class.getName());
     
-    private static WeakHashMap instanceGroups = new WeakHashMap();
+    private static WeakHashMap<String, InstanceGroup> instanceGroups = new WeakHashMap<String, InstanceGroup>();
 
     private static HashSet interestedIn = new HashSet();
     // private static String prefix = "net.sf.colossus.";
@@ -84,7 +84,7 @@ public class InstanceTracker
             if (instanceGroups.containsKey(type))
             {
                 LOGGER.log(Level.FINEST, "Adding to existing group " + type);
-                InstanceGroup group = (InstanceGroup)instanceGroups
+                InstanceGroup group = instanceGroups
                     .get(type);
                 group.addInstance(o, id);
             }
@@ -120,7 +120,7 @@ public class InstanceTracker
 
         if (instanceGroups.containsKey(type))
         {
-            InstanceGroup group = (InstanceGroup)instanceGroups
+            InstanceGroup group = instanceGroups
                 .get(type);
             InstanceGroup.typeInstance i = group.getInstance(o);
             if (i != null)
@@ -141,12 +141,12 @@ public class InstanceTracker
         StringBuffer stat = new StringBuffer();
         stat.append("==========\nObject instances statistics:");
 
-        Iterator it = instanceGroups.keySet().iterator();
+        Iterator<String> it = instanceGroups.keySet().iterator();
         while (it.hasNext())
         {
-            String type = (String)it.next();
+            String type = it.next();
             InstanceGroup group =
-                (InstanceGroup)instanceGroups.get(type);
+                instanceGroups.get(type);
             stat.append(group.getPrintStatistics());
         }
         stat.append("\n");
@@ -155,11 +155,11 @@ public class InstanceTracker
 
     public static synchronized boolean allGone()
     {
-        Iterator it = instanceGroups.keySet().iterator();
+        Iterator<String> it = instanceGroups.keySet().iterator();
         while (it.hasNext())
         {
-            String type = (String)it.next();
-            InstanceGroup group = (InstanceGroup)instanceGroups
+            String type = it.next();
+            InstanceGroup group = instanceGroups
                 .get(type);
             if (group.amountLeft() != 0)
             {

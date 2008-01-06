@@ -73,7 +73,7 @@ public class History
         root.addContent(event);
     }
 
-    void revealEvent(boolean allPlayers, List playerNames, String markerId,
+    void revealEvent(boolean allPlayers, List<String> playerNames, String markerId,
         List creatureNames, int turn)
     {
         if (creatureNames.isEmpty())
@@ -97,10 +97,10 @@ public class History
         {
             Element viewers = new Element("viewers");
             event.addContent(viewers);
-            Iterator it = playerNames.iterator();
+            Iterator<String> it = playerNames.iterator();
             while (it.hasNext())
             {
-                String playerName = (String)it.next();
+                String playerName = it.next();
                 Element viewer = new Element("viewer");
                 viewer.addContent(playerName);
                 viewers.addContent(viewer);
@@ -158,7 +158,7 @@ public class History
             String allPlayers = el.getAttributeValue("allPlayers");
             boolean all = allPlayers != null && allPlayers.equals("true");
             String markerId = el.getAttributeValue("markerId");
-            List playerNames = new ArrayList();
+            List<String> playerNames = new ArrayList<String>();
             Element viewEl = el.getChild("viewers");
             String playerName = null;
             if (viewEl != null)

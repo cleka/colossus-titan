@@ -80,7 +80,7 @@ public class PreferencesWindow extends KFrame
     
     private IOptions options;
     private Client client;
-    private Map prefCheckboxes = new HashMap();
+    private Map<String, JCheckBox> prefCheckboxes = new HashMap<String, JCheckBox>();
     private JButton closeButton;
     private Box lfBox;    // Look & Feel
     private Box rcModes;  // Recruit Chit modes

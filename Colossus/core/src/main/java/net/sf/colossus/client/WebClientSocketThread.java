@@ -291,7 +291,7 @@ public class WebClientSocketThread extends Thread implements IWebServer
                 }
                 else if (command.equals(IWebClient.gameInfo))
                 {
-                    HashMap gameHash = webClient.getGameHash();
+                    HashMap<String, GameInfo> gameHash = webClient.getGameHash();
                     GameInfo gi = GameInfo.fromString(tokens, gameHash);
 
                     webClient.gameInfo(gi);

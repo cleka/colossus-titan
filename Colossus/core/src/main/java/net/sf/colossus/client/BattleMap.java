@@ -146,11 +146,11 @@ public final class BattleMap extends HexMap implements MouseListener,
 
         try
         {
-            List battleChits = client.getBattleChits();
-            ListIterator lit = battleChits.listIterator(battleChits.size());
+            List<BattleChit> battleChits = client.getBattleChits();
+            ListIterator<BattleChit> lit = battleChits.listIterator(battleChits.size());
             while (lit.hasPrevious())
             {
-                BattleChit chit = (BattleChit)lit.previous();
+                BattleChit chit = lit.previous();
                 if (rectClip.intersects(chit.getBounds()))
                 {
                     chit.paintComponent(g);

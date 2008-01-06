@@ -42,7 +42,7 @@ public final class GUIMasterHex extends GUIHex
     private FontMetrics fontMetrics;
     private int halfFontHeight;
     private Point offCenter;
-    private WeakReference weakBoardRef;
+    private WeakReference<MasterBoard> weakBoardRef;
 
     private GeneralPath highlightBorder;
     private Color selectColor = Color.white;
@@ -80,7 +80,7 @@ public final class GUIMasterHex extends GUIHex
     void init(int cx, int cy, int scale, boolean inverted, MasterBoard board)
     {
         this.inverted = inverted;
-        this.weakBoardRef = new WeakReference(board);
+        this.weakBoardRef = new WeakReference<MasterBoard>(board);
         len = scale / 3.0;
         if (inverted)
         {
@@ -293,7 +293,7 @@ public final class GUIMasterHex extends GUIHex
 
     public void repaint()
     {
-        MasterBoard board = (MasterBoard)weakBoardRef.get();
+        MasterBoard board = weakBoardRef.get();
         if (board == null)
         {
             return;
@@ -488,7 +488,7 @@ public final class GUIMasterHex extends GUIHex
             return false;
         }
 
-        MasterBoard board = (MasterBoard)weakBoardRef.get();
+        MasterBoard board = weakBoardRef.get();
         if (board == null)
         {
             return false;

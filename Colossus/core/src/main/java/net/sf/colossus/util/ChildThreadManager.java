@@ -30,16 +30,16 @@ public class ChildThreadManager
     private static final Logger LOGGER =
         Logger.getLogger(ChildThreadManager.class.getName());
 
-    private ArrayList childThreads;
-    private ArrayList unregisteringChilds;
+    private ArrayList<Thread> childThreads;
+    private ArrayList<Thread> unregisteringChilds;
 
     private String id;
     private boolean debug = false;
 
     public ChildThreadManager(String id)
     {
-        childThreads = new ArrayList();
-        unregisteringChilds = new ArrayList();
+        childThreads = new ArrayList<Thread>();
+        unregisteringChilds = new ArrayList<Thread>();
         this.id = id;
         net.sf.colossus.webcommon.InstanceTracker.register(this, id);
     }
@@ -73,10 +73,10 @@ public class ChildThreadManager
     {
         if (!unregisteringChilds.isEmpty())
         {
-            Iterator it = unregisteringChilds.iterator();
+            Iterator<Thread> it = unregisteringChilds.iterator();
             while (it.hasNext())
             {
-                Thread child = (Thread)it.next();
+                Thread child = it.next();
                 String name = child.getName();
                 try
                 {
@@ -93,11 +93,11 @@ public class ChildThreadManager
                 }
             }
 
-            ArrayList list = new ArrayList();
-            Iterator it2 = childThreads.iterator();
+            ArrayList<String> list = new ArrayList<String>();
+            Iterator<Thread> it2 = childThreads.iterator();
             while (it2.hasNext())
             {
-                Thread c = (Thread)it2.next();
+                Thread c = it2.next();
                 String name = c.getName();
                 list.add(name);
             }

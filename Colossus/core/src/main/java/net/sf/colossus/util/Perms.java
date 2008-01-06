@@ -12,7 +12,7 @@ import java.util.Iterator;
  */
 public final class Perms
 {
-    private ArrayList permList = new ArrayList();
+    private ArrayList<Object> permList = new ArrayList<Object>();
     private PermGen pg;
     private boolean foundNext = false;
     private boolean anyLeft = true;
@@ -20,18 +20,18 @@ public final class Perms
     private int nextSwap;
 
     /** Set up a permutation generator for the passed list. */
-    public Perms(ArrayList list)
+    public Perms(ArrayList<Object> list)
     {
         pg = new PermGen(list.size());
 
         // Since we're not going to mess with the elements, just
         // their order, a shallow copy should be fine.
-        permList = (ArrayList)list.clone();
+        permList = (ArrayList<Object>)list.clone();
     }
 
     /** Returns an iterator that returns permutations of the originally
      *  passed list.  The first permutation is the unmodified list. */
-    public Iterator iterator()
+    public Iterator<Object> iterator()
     {
         return new Iterator()
         {

@@ -901,11 +901,11 @@ public final class Legion extends net.sf.colossus.game.Legion implements
 
     /** List the lords eligible to teleport this legion to hexLabel,
      *  as strings. */
-    List listTeleportingLords(String hexLabel)
+    List<String> listTeleportingLords(String hexLabel)
     {
         // Needs to be a List not a Set so that it can be passed as
         // an imageList.
-        List lords = new ArrayList();
+        List<String> lords = new ArrayList<String>();
 
         // Titan teleport
         if (game.getNumEnemyLegions(hexLabel, getPlayer()) >= 1)

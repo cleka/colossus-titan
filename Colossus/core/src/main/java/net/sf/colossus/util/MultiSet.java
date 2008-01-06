@@ -16,11 +16,11 @@ import java.util.TreeSet;
  */
 public class MultiSet
 {
-    private Map map;
+    private Map<Object, Integer> map;
 
     public MultiSet()
     {
-        map = new HashMap();
+        map = new HashMap<Object, Integer>();
     }
 
     public void add(Object key)
@@ -31,7 +31,7 @@ public class MultiSet
         }
         else
         {
-            Integer val = (Integer)map.get(key);
+            Integer val = map.get(key);
             int prev = val.intValue();
             int cur = prev + 1;
             map.put(key, new Integer(cur));
@@ -47,7 +47,7 @@ public class MultiSet
         {
             return false;
         }
-        Integer val = (Integer)map.get(key);
+        Integer val = map.get(key);
         int prev = val.intValue();
         int cur = prev - 1;
         if (cur >= 1)
@@ -77,16 +77,16 @@ public class MultiSet
         {
             return 0;
         }
-        Integer val = (Integer)map.get(key);
+        Integer val = map.get(key);
         return val.intValue();
     }
 
-    public Collection keySet()
+    public Collection<Object> keySet()
     {
         return map.keySet();
     }
 
-    public Collection values()
+    public Collection<Integer> values()
     {
         return map.values();
     }
@@ -102,8 +102,8 @@ public class MultiSet
         {
             return 0;
         }
-        SortedSet sorted = new TreeSet(values());
-        Integer val = (Integer)sorted.last();
+        SortedSet<Integer> sorted = new TreeSet<Integer>(values());
+        Integer val = sorted.last();
         return val.intValue();
     }
 }

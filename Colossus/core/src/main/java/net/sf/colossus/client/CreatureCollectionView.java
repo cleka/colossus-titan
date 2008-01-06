@@ -48,13 +48,13 @@ class CreatureCollectionView extends KDialog
     private static final int fixedChitSize = 60;
 
     /** hash by creature name to the label that displays the bottom counts */
-    Map countMap = new HashMap();
+    Map<String, JLabel> countMap = new HashMap<String, JLabel>();
 
     /** hash by creature name to the label that displays the top count */
-    Map topCountMap = new HashMap();
+    Map<String, JLabel> topCountMap = new HashMap<String, JLabel>();
 
     /** hash by creature name to the Chit (so we can cross away the dead) */
-    Map chitMap = new HashMap();
+    Map<String, Chit> chitMap = new HashMap<String, Chit>();
     private SaveWindow saveWindow;
     private JScrollPane scrollPane;
     private JFrame parentFrame;
@@ -224,13 +224,13 @@ class CreatureCollectionView extends KDialog
                     color = "yellow";
                     if (!immortal)
                     {
-                        Chit chit = (Chit)chitMap.get(name);
+                        Chit chit = chitMap.get(name);
                         chit.setDead(true);
                     }
                 }
                 else
                 {
-                    Chit chit = (Chit)chitMap.get(name);
+                    Chit chit = chitMap.get(name);
                     chit.setDead(false);
                     if (count == maxcount)
                     {
@@ -252,7 +252,7 @@ class CreatureCollectionView extends KDialog
                 String htmlSlash = htmlColorizeOnly("/", "black");
                 label.setText(htmlizeOnly(htmlCount + htmlSlash
                     + htmlInGameCount + htmlSlash + htmlDeadCount));
-                JLabel topLabel = (JLabel)topCountMap.get(name);
+                JLabel topLabel = topCountMap.get(name);
                 topLabel.setText(htmlizeOnly(htmlColorizeOnly(Integer
                     .toString(maxcount), "blue")));
             }

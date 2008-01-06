@@ -77,21 +77,21 @@ public class StartClient extends KFrame implements WindowListener,
         Container panel = getContentPane();
 
         panel.add(new JLabel("Player name"));
-        Set nameChoices = new TreeSet();
+        Set<String> nameChoices = new TreeSet<String>();
         nameChoices.add(playerName);
         nameChoices.add(Constants.username);
-        nameBox = new JComboBox(new Vector(nameChoices));
+        nameBox = new JComboBox(new Vector<String>(nameChoices));
         nameBox.setEditable(true);
         nameBox.addActionListener(this);
         nameBox.setSelectedItem(playerName);
         panel.add(nameBox);
 
         panel.add(new JLabel("Server hostname"));
-        Set hostChoices = new TreeSet();
+        Set<String> hostChoices = new TreeSet<String>();
         String preferred = initServerNames(hostname, hostChoices,
             netclientOptions);
         this.hostname = preferred;
-        hostBox = new JComboBox(new Vector(hostChoices));
+        hostBox = new JComboBox(new Vector<String>(hostChoices));
         hostBox.setEditable(true);
         hostBox.setSelectedItem(preferred);
         hostBox.addActionListener(this);
@@ -134,7 +134,7 @@ public class StartClient extends KFrame implements WindowListener,
      * one last used from LRU list (or if even that is empty, defaults
      * to current hostname).
      */
-    public static String initServerNames(String wantedHost, Set hostChoices,
+    public static String initServerNames(String wantedHost, Set<String> hostChoices,
         Options netclientOptions)
     {
         String preferred = null;
@@ -278,7 +278,7 @@ public class StartClient extends KFrame implements WindowListener,
             return;
         }
 
-        List names = new ArrayList();
+        List<String> names = new ArrayList<String>();
         // Last used one to front of LRU list:
         names.add(hostname);
         for (int i = 0; i < Constants.numSavedServerNames; i++)
@@ -296,7 +296,7 @@ public class StartClient extends KFrame implements WindowListener,
         }
         for (int i = 0; i < names.size() && i < Constants.numSavedServerNames; i++)
         {
-            netclientOptions.setOption(Options.serverName + i, (String)names
+            netclientOptions.setOption(Options.serverName + i, names
                 .get(i));
         }
     }

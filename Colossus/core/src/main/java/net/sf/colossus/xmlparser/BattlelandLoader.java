@@ -29,7 +29,7 @@ public class BattlelandLoader
         .getLogger(BattlelandLoader.class.getName());
 
     /** hold the list of label for the startlist */
-    private java.util.List startlist = null;
+    private java.util.List<String> startlist = null;
 
     /** is the terrain a Tower ? */
     private boolean isTower = false;
@@ -118,7 +118,7 @@ public class BattlelandLoader
         String label = el.getAttributeValue("label");
         if (startlist == null && label != null)
         {
-            startlist = new ArrayList();
+            startlist = new ArrayList<String>();
         }
         if (label != null)
         {
@@ -126,7 +126,7 @@ public class BattlelandLoader
         }
     }
 
-    public java.util.List getStartList()
+    public java.util.List<String> getStartList()
     {
         return startlist;
     }

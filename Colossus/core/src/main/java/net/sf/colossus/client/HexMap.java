@@ -52,17 +52,17 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
 
     // GUI hexes need to be recreated for each object, since scale varies.
     private final GUIBattleHex[][] h = new GUIBattleHex[6][6];
-    private final List hexes = new ArrayList(33);
+    private final List<GUIBattleHex> hexes = new ArrayList<GUIBattleHex>(33);
 
     // The game state hexes can be set up once for each terrain type.
-    private static Map terrainH = new HashMap();
-    private static Map terrainHexes = new HashMap();
-    private static Map entranceHexes = new HashMap();
-    private static Map startlistMap = new HashMap();
-    private static Map subtitleMap = new HashMap();
-    private static Map towerStatusMap = new HashMap();
-    private static Map hazardNumberMap = new HashMap();
-    private static Map hazardSideNumberMap = new HashMap();
+    private static Map<String, GUIBattleHex[][]> terrainH = new HashMap<String, GUIBattleHex[][]>();
+    private static Map<String, List<GUIBattleHex>> terrainHexes = new HashMap<String, List<GUIBattleHex>>();
+    private static Map<String, GUIBattleHex[]> entranceHexes = new HashMap<String, GUIBattleHex[]>();
+    private static Map<String, List<String>> startlistMap = new HashMap<String, List<String>>();
+    private static Map<String, String> subtitleMap = new HashMap<String, String>();
+    private static Map<String, Boolean> towerStatusMap = new HashMap<String, Boolean>();
+    private static Map<String, HashMap<HazardTerrain, Integer>> hazardNumberMap = new HashMap<String, HashMap<HazardTerrain, Integer>>();
+    private static Map<String, HashMap<Character, Integer>> hazardSideNumberMap = new HashMap<String, HashMap<Character, Integer>>();
 
     /** ne, e, se, sw, w, nw */
     private final GUIBattleHex[] entrances = new GUIBattleHex[6];
@@ -108,7 +108,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
             String terrain = terrains[t];
 
             GUIBattleHex[][] gameH = new GUIBattleHex[6][6];
-            List gameHexes = new ArrayList();
+            List<GUIBattleHex> gameHexes = new ArrayList<GUIBattleHex>();
 
             // Initialize game state hex array.
             for (int i = 0; i < gameH.length; i++)
@@ -206,7 +206,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
                     + ".xml", directories);
 
                 BattlelandLoader bl = new BattlelandLoader(batIS, hexModel);
-                List tempTowerStartList = bl.getStartList();
+                List<String> tempTowerStartList = bl.getStartList();
                 if (tempTowerStartList != null)
                 {
                     startlistMap.put(terrain, tempTowerStartList);
@@ -300,11 +300,11 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
             /* count all hazards & hazard sides */
 
             /* slow & inefficient... */
-            HashMap t2n = new HashMap();
-            for (Iterator iterator = HazardTerrain.getAllHazardTerrains()
-                .iterator(); iterator.hasNext();)
+            HashMap<HazardTerrain, Integer> t2n = new HashMap<HazardTerrain, Integer>();
+            for (Iterator<HazardTerrain> iterator = HazardTerrain
+                .getAllHazardTerrains().iterator(); iterator.hasNext();)
             {
-                HazardTerrain hTerrain = (HazardTerrain)iterator.next();
+                HazardTerrain hTerrain = iterator.next();
                 int count = 0;
                 for (int x = 0; x < 6; x++)
                 {
@@ -326,7 +326,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
             }
             hazardNumberMap.put(terrain, t2n);
             char[] hazardSides = BattleHex.getHexsides();
-            HashMap s2n = new HashMap();
+            HashMap<Character, Integer> s2n = new HashMap<Character, Integer>();
             for (int i = 0; i < hazardSides.length; i++)
             {
                 int count = 0;
@@ -480,10 +480,10 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
 
     void unselectAllHexes()
     {
-        Iterator it = hexes.iterator();
+        Iterator<GUIBattleHex> it = hexes.iterator();
         while (it.hasNext())
         {
-            GUIBattleHex hex = (GUIBattleHex)it.next();
+            GUIBattleHex hex = it.next();
             if (hex.isSelected())
             {
                 hex.unselect();
@@ -494,10 +494,10 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
 
     void unselectHexByLabel(String label)
     {
-        Iterator it = hexes.iterator();
+        Iterator<GUIBattleHex> it = hexes.iterator();
         while (it.hasNext())
         {
-            GUIBattleHex hex = (GUIBattleHex)it.next();
+            GUIBattleHex hex = it.next();
             if (hex.isSelected() && label.equals(hex.getHexModel().getLabel()))
             {
                 hex.unselect();
@@ -509,10 +509,10 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
 
     void unselectHexesByLabels(Set labels)
     {
-        Iterator it = hexes.iterator();
+        Iterator<GUIBattleHex> it = hexes.iterator();
         while (it.hasNext())
         {
-            GUIBattleHex hex = (GUIBattleHex)it.next();
+            GUIBattleHex hex = it.next();
             if (hex.isSelected()
                 && labels.contains(hex.getHexModel().getLabel()))
             {
@@ -524,10 +524,10 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
 
     void selectHexByLabel(String label)
     {
-        Iterator it = hexes.iterator();
+        Iterator<GUIBattleHex> it = hexes.iterator();
         while (it.hasNext())
         {
-            GUIBattleHex hex = (GUIBattleHex)it.next();
+            GUIBattleHex hex = it.next();
             if (!hex.isSelected()
                 && label.equals(hex.getHexModel().getLabel()))
             {
@@ -540,10 +540,10 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
 
     void selectHexesByLabels(Set labels)
     {
-        Iterator it = hexes.iterator();
+        Iterator<GUIBattleHex> it = hexes.iterator();
         while (it.hasNext())
         {
-            GUIBattleHex hex = (GUIBattleHex)it.next();
+            GUIBattleHex hex = it.next();
             if (!hex.isSelected()
                 && labels.contains(hex.getHexModel().getLabel()))
             {
@@ -557,10 +557,10 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
      *  a match.  Return the hex, or null. */
     GUIBattleHex getGUIHexByLabel(String label)
     {
-        Iterator it = hexes.iterator();
+        Iterator<GUIBattleHex> it = hexes.iterator();
         while (it.hasNext())
         {
-            GUIBattleHex hex = (GUIBattleHex)it.next();
+            GUIBattleHex hex = it.next();
             if (hex.getHexModel().getLabel().equals(label))
             {
                 return hex;
@@ -612,16 +612,14 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
             case 'x':
 
                 /* entrances */
-                GUIBattleHex[] gameEntrances = (GUIBattleHex[])entranceHexes
-                    .get(terrain);
+                GUIBattleHex[] gameEntrances = entranceHexes.get(terrain);
                 return gameEntrances[y].getBattleHexModel();
 
             default:
                 LOGGER.log(Level.SEVERE, "Label " + label + " is invalid");
         }
         y = 6 - y - Math.abs((x - 3) / 2);
-        GUIBattleHex[][] correctHexes = (GUIBattleHex[][])terrainH
-            .get(terrain);
+        GUIBattleHex[][] correctHexes = terrainH.get(terrain);
         return correctHexes[x][y].getBattleHexModel();
     }
 
@@ -629,10 +627,10 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
      *  null if none does. */
     GUIBattleHex getHexContainingPoint(Point point)
     {
-        Iterator it = hexes.iterator();
+        Iterator<GUIBattleHex> it = hexes.iterator();
         while (it.hasNext())
         {
-            GUIBattleHex hex = (GUIBattleHex)it.next();
+            GUIBattleHex hex = it.next();
             if (hex.contains(point))
             {
                 return hex;
@@ -642,21 +640,21 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
         return null;
     }
 
-    Set getAllHexLabels()
+    Set<String> getAllHexLabels()
     {
-        Set set = new HashSet();
-        Iterator it = hexes.iterator();
+        Set<String> set = new HashSet<String>();
+        Iterator<GUIBattleHex> it = hexes.iterator();
         while (it.hasNext())
         {
-            BattleHex hex = (BattleHex)it.next();
-            set.add(hex.getLabel());
+            GUIBattleHex hex = it.next();
+            set.add(hex.getBattleHexModel().getLabel());
         }
         return set;
     }
 
     public static List getTowerStartList(String terrain)
     {
-        return (List)startlistMap.get(terrain);
+        return startlistMap.get(terrain);
     }
 
     public void mousePressed(MouseEvent e)
@@ -736,10 +734,10 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
                 return;
             }
 
-            Iterator it = hexes.iterator();
+            Iterator<GUIBattleHex> it = hexes.iterator();
             while (it.hasNext())
             {
-                GUIBattleHex hex = (GUIBattleHex)it.next();
+                GUIBattleHex hex = it.next();
                 if (!hex.getBattleHexModel().isEntrance()
                     && rectClip.intersects(hex.getBounds()))
                 {
@@ -758,7 +756,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
             FontMetrics fm;
             String dn = getMasterHex().getTerrainDisplayName();
             String bn = getMasterHex().getTerrainName();
-            String sub = (String)subtitleMap.get(terrain);
+            String sub = subtitleMap.get(terrain);
 
             if (sub == null)
             {
@@ -818,7 +816,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
     {
         try
         {
-            return ((Boolean)towerStatusMap.get(t)).booleanValue();
+            return towerStatusMap.get(t).booleanValue();
         }
         catch (NullPointerException ex)
         // XXX Called too early, before towerStatusMap is setup?
@@ -835,14 +833,14 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
 
     public static boolean terrainHasStartlist(String t)
     {
-        java.util.List temp = (java.util.List)startlistMap.get(t);
+        java.util.List temp = startlistMap.get(t);
         return (!(temp == null));
     }
 
     public static int getHazardCountInTerrain(HazardTerrain hazard,
         String terrain)
     {
-        HashMap t2n = (HashMap)hazardNumberMap.get(terrain);
+        HashMap t2n = hazardNumberMap.get(terrain);
         Object o = null;
 
         if (t2n == null)
@@ -870,7 +868,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
 
     public static int getHazardSideCountInTerrain(char hazard, String terrain)
     {
-        HashMap s2n = (HashMap)hazardSideNumberMap.get(terrain);
+        HashMap s2n = hazardSideNumberMap.get(terrain);
         Object o = null;
 
         if (s2n == null)

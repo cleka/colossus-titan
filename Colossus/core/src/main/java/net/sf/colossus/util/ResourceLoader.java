@@ -133,10 +133,10 @@ public final class ResourceLoader
         .getClassLoader();
     private static final ColossusClassLoader cl = new ColossusClassLoader(
         baseCL);
-    private static final Map imageCache = Collections
-        .synchronizedMap(new HashMap());
-    private static final Map fileCache = Collections
-        .synchronizedMap(new HashMap());
+    private static final Map<String, Object> imageCache = Collections
+        .synchronizedMap(new HashMap<String, Object>());
+    private static final Map<String, byte[]> fileCache = Collections
+        .synchronizedMap(new HashMap<String, byte[]>());
 
     private final static String sep = Constants.protocolTermSeparator;
 
@@ -1416,12 +1416,12 @@ public final class ResourceLoader
     public static List getFileCacheDump()
     {
         List allElement = new ArrayList();
-        Set allKeys = fileCache.keySet();
-        Iterator it = allKeys.iterator();
+        Set<String> allKeys = fileCache.keySet();
+        Iterator<String> it = allKeys.iterator();
         while (it.hasNext())
         {
-            String mapKey = (String)it.next();
-            byte[] data = (byte[])fileCache.get(mapKey);
+            String mapKey = it.next();
+            byte[] data = fileCache.get(mapKey);
             org.jdom.Element el = new org.jdom.Element("DataFile");
             el.setAttribute("DataFileKey", mapKey);
             el.addContent(new org.jdom.CDATA(new String(data)));

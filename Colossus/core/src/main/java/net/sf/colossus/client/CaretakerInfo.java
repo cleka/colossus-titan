@@ -18,11 +18,11 @@ public final class CaretakerInfo
 
     /** Map of creature name to Integer count.  As in Caretaker, if an entry
      *  is missing then we assume it is set to the maximum. */
-    private Map creatureCounts = new HashMap();
+    private Map<String, Integer> creatureCounts = new HashMap<String, Integer>();
 
     /** Map of creature name to Integer count.  As in Caretaker, if an entry
      *  is missing then we assume it is set to 0. */
-    private Map creatureDeadCounts = new HashMap();
+    private Map<String, Integer> creatureDeadCounts = new HashMap<String, Integer>();
 
     public CaretakerInfo()
     {
@@ -40,7 +40,7 @@ public final class CaretakerInfo
 
     public int getCount(String creatureName)
     {
-        Integer count = (Integer)creatureCounts.get(creatureName);
+        Integer count = creatureCounts.get(creatureName);
         if (count == null)
         {
             Creature cre = Creature.getCreatureByName(creatureName);
@@ -70,7 +70,7 @@ public final class CaretakerInfo
 
     public int getDeadCount(String creatureName)
     {
-        Integer count = (Integer)creatureDeadCounts.get(creatureName);
+        Integer count = creatureDeadCounts.get(creatureName);
         if (count == null)
         {
             return 0;

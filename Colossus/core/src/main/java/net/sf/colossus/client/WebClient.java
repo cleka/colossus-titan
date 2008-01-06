@@ -61,6 +61,7 @@ import net.sf.colossus.util.ViableEntityManager;
 import net.sf.colossus.webcommon.GameInfo;
 import net.sf.colossus.webcommon.IWebClient;
 import net.sf.colossus.webcommon.IWebServer;
+import net.sf.colossus.webcommon.User;
 
 
 /** This is the main class for one user client for the web server.
@@ -185,9 +186,9 @@ public class WebClient extends KFrame implements WindowListener,
 
     ChatHandler generalChat;
 
-    final ArrayList gamesUpdates = new ArrayList();
+    final ArrayList<GameInfo> gamesUpdates = new ArrayList<GameInfo>();
 
-    HashMap gameHash = new HashMap();
+    HashMap<String, GameInfo> gameHash = new HashMap<String, GameInfo>();
 
     // potential games:
     JTable potGameTable;
@@ -1198,14 +1199,14 @@ public class WebClient extends KFrame implements WindowListener,
 
     // SocketThread needs this to find games when "reinstantiating" it
     // from tokens got from server
-    public HashMap getGameHash()
+    public HashMap<String, GameInfo> getGameHash()
     {
         return gameHash;
     }
 
     private GameInfo findGameById(String gameId)
     {
-        GameInfo gi = (GameInfo)gameHash.get(gameId);
+        GameInfo gi = gameHash.get(gameId);
         if (gi == null)
         {
             LOGGER.log(Level.SEVERE, "Game from hash is null!!");
@@ -1650,10 +1651,10 @@ public class WebClient extends KFrame implements WindowListener,
             {
                 synchronized (gamesUpdates)
                 {
-                    Iterator it = gamesUpdates.iterator();
+                    Iterator<GameInfo> it = gamesUpdates.iterator();
                     while (it.hasNext())
                     {
-                        GameInfo game = (GameInfo)it.next();
+                        GameInfo game = it.next();
 
                         int state = game.getGameState();
                         if (state == GameInfo.Proposed)
@@ -1976,8 +1977,8 @@ public class WebClient extends KFrame implements WindowListener,
             "Viewmode", "Expire", "Mull", "Towers", "min", "target", "max",
             "actual", "players" };
 
-        private Vector data = new Vector(13, 1);
-        private HashMap rowIndex = new HashMap();
+        private Vector<GameInfo> data = new Vector<GameInfo>(13, 1);
+        private HashMap<String, Integer> rowIndex = new HashMap<String, Integer>();
 
         public int getColumnCount()
         {
@@ -2003,7 +2004,7 @@ public class WebClient extends KFrame implements WindowListener,
                 return new String("-");
             }
 
-            GameInfo gi = (GameInfo)data.get(row);
+            GameInfo gi = data.get(row);
             if (gi == null)
             {
                 return new String("-");
@@ -2108,7 +2109,7 @@ public class WebClient extends KFrame implements WindowListener,
                 setRowAt(value, row);
                 return;
             }
-            GameInfo gi = (GameInfo)data.get(row);
+            GameInfo gi = data.get(row);
             if (gi == null)
             {
                 gi = new GameInfo("");
@@ -2170,7 +2171,7 @@ public class WebClient extends KFrame implements WindowListener,
                     break;
 
                 case 12:
-                    gi.setPlayerList((ArrayList)value);
+                    gi.setPlayerList((ArrayList<User>)value);
                     break;
             }
             fireTableCellUpdated(row, col);
@@ -2223,7 +2224,7 @@ public class WebClient extends KFrame implements WindowListener,
             int i = 0;
             while (i < size)
             {
-                GameInfo gi = (GameInfo)data.get(i);
+                GameInfo gi = data.get(i);
                 String gameId = gi.getGameId();
                 rowIndex.put(gameId, new Integer(i));
                 i++;
@@ -2243,7 +2244,7 @@ public class WebClient extends KFrame implements WindowListener,
 
         public int findRowIndex(String gameId)
         {
-            Integer iI = (Integer)rowIndex.get(gameId);
+            Integer iI = rowIndex.get(gameId);
             if (iI == null)
             {
                 return -1;
@@ -2256,7 +2257,7 @@ public class WebClient extends KFrame implements WindowListener,
 
         public Integer getRowIndex(String gameId)
         {
-            Integer index = (Integer)rowIndex.get(gameId);
+            Integer index = rowIndex.get(gameId);
             if (index == null)
             {
                 index = new Integer(data.size());

@@ -124,10 +124,10 @@ public final class ShowCreatureDetails extends KDialog implements
             .isLord() ? "<u><b>Lord</b></u>" : "<b>Demi-Lord</b>")
             : _low("no"));
         StringBuffer buf = new StringBuffer();
-        for (Iterator iterator = HazardTerrain.getAllHazardTerrains()
+        for (Iterator<HazardTerrain> iterator = HazardTerrain.getAllHazardTerrains()
             .iterator(); iterator.hasNext();)
         {
-            HazardTerrain terrain = (HazardTerrain)iterator.next();
+            HazardTerrain terrain = iterator.next();
             if (creature.isNativeTerrain(terrain))
             {
                 buf.append(terrain.getName());
@@ -235,7 +235,7 @@ public final class ShowCreatureDetails extends KDialog implements
         //   hazards row 1
         s.append("<tr><td ROWSPAN=2 align=right>" + creature.getName()
             + " in</td><td></td>");
-        for (Iterator iterator = HazardTerrain.getAllHazardTerrains()
+        for (Iterator<HazardTerrain> iterator = HazardTerrain.getAllHazardTerrains()
             .iterator(); iterator.hasNext();)
         {
             iterator.next(); // skip one
@@ -243,7 +243,7 @@ public final class ShowCreatureDetails extends KDialog implements
             {
                 break;
             }
-            HazardTerrain terrain = (HazardTerrain)iterator.next();
+            HazardTerrain terrain = iterator.next();
             critter.setNewHazardHex(terrain);
             Color color = critter.getHazardColor().brighter();
             String colspan = "2";
@@ -256,10 +256,10 @@ public final class ShowCreatureDetails extends KDialog implements
         s.append("</tr>");
         //   hazards row 2
         s.append("<tr>");
-        for (Iterator iterator = HazardTerrain.getAllHazardTerrains()
+        for (Iterator<HazardTerrain> iterator = HazardTerrain.getAllHazardTerrains()
             .iterator(); iterator.hasNext();)
         {
-            HazardTerrain terrain = (HazardTerrain)iterator.next();
+            HazardTerrain terrain = iterator.next();
             critter.setNewHazardHex(terrain);
             Color color = critter.getHazardColor().brighter();
             String colspan = "2";
@@ -276,10 +276,10 @@ public final class ShowCreatureDetails extends KDialog implements
         //   the info: the table content
         //   ... my strike power
         s.append("<tr><th nowrap>my Strike Power</th>");
-        for (Iterator iterator = HazardTerrain.getAllHazardTerrains()
+        for (Iterator<HazardTerrain> iterator = HazardTerrain.getAllHazardTerrains()
             .iterator(); iterator.hasNext();)
         {
-            HazardTerrain terrain = (HazardTerrain)iterator.next();
+            HazardTerrain terrain = iterator.next();
             critter.setNewHazardHex(terrain);
             Color color = critter.getHazardColor().brighter();
             s.append(MessageFormat.format("<td bgcolor={0}>{1}</td>",
@@ -289,10 +289,10 @@ public final class ShowCreatureDetails extends KDialog implements
         s.append("<td bgcolor=#dddddd></td></tr>");
         //   ... my strike skill
         s.append("<tr><th nowrap>my Strike Skill</th>");
-        for (Iterator iterator = HazardTerrain.getAllHazardTerrains()
+        for (Iterator<HazardTerrain> iterator = HazardTerrain.getAllHazardTerrains()
             .iterator(); iterator.hasNext();)
         {
-            HazardTerrain terrain = (HazardTerrain)iterator.next();
+            HazardTerrain terrain = iterator.next();
             critter.setNewHazardHex(terrain);
             Color color = critter.getHazardColor().brighter();
             s.append(MessageFormat.format("<td bgcolor={0}>{1}</td>",

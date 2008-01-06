@@ -427,11 +427,11 @@ public final class BattleBoard extends KFrame
      *  or null if none does. */
     private BattleChit getBattleChitAtPoint(Point point)
     {
-        List battleChits = client.getBattleChits();
-        Iterator it = battleChits.iterator();
+        List<BattleChit> battleChits = client.getBattleChits();
+        Iterator<BattleChit> it = battleChits.iterator();
         while (it.hasNext())
         {
-            BattleChit chit = (BattleChit)it.next();
+            BattleChit chit = it.next();
             if (chit.contains(point))
             {
                 return chit;
@@ -443,14 +443,14 @@ public final class BattleBoard extends KFrame
     public void alignChits(String hexLabel)
     {
         GUIBattleHex hex = battleMap.getGUIHexByLabel(hexLabel);
-        List chits = client.getBattleChits(hexLabel);
+        List<BattleChit> chits = client.getBattleChits(hexLabel);
         int numChits = chits.size();
         if (numChits < 1)
         {
             hex.repaint();
             return;
         }
-        BattleChit chit = (BattleChit)chits.get(0);
+        BattleChit chit = chits.get(0);
         int chitscale = chit.getBounds().width;
         int chitscale4 = chitscale / 4;
 
@@ -468,7 +468,7 @@ public final class BattleBoard extends KFrame
         {
             point.x += chitscale4;
             point.y += chitscale4;
-            chit = (BattleChit)chits.get(i);
+            chit = chits.get(i);
             chit.setLocation(point);
         }
         hex.repaint();
@@ -607,11 +607,11 @@ public final class BattleBoard extends KFrame
         battleMap.setupHexes();
 
         int chitScale = 4 * Scale.get();
-        List battleChits = client.getBattleChits();
-        Iterator it = battleChits.iterator();
+        List<BattleChit> battleChits = client.getBattleChits();
+        Iterator<BattleChit> it = battleChits.iterator();
         while (it.hasNext())
         {
-            BattleChit chit = (BattleChit)it.next();
+            BattleChit chit = it.next();
             chit.rescale(chitScale);
         }
         alignChits(battleMap.getAllHexLabels());

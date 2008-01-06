@@ -1,6 +1,7 @@
 package net.sf.colossus.xmlparser;
 
 
+import java.awt.Color;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -43,24 +44,24 @@ public class TerrainRecruitLoader
     /**
      * Map a String (representing a terrain) to a list of recruits.
      */
-    private static HashMap strToRecruits = new HashMap();
+    private static HashMap<String, ArrayList<recruitNumber>> strToRecruits = new HashMap<String, ArrayList<recruitNumber>>();
 
     /**
      * Map a String (representing a terrain) to a terrain display name.
      */
 
-    private static HashMap strToDisplayName = new HashMap();
+    private static HashMap<String, String> strToDisplayName = new HashMap<String, String>();
 
     /**
      * Map a String (representing a terrain) to a terrain color.
      */
-    private static HashMap strToColor = new HashMap();
+    private static HashMap<String, Color> strToColor = new HashMap<String, Color>();
 
     /**
      * Map a String (representing a terrain) to a boolean,
      * telling if a Creature can recruit in the usual way or not.
      */
-    private static HashMap strToBelow = new HashMap();
+    private static HashMap<String, Boolean> strToBelow = new HashMap<String, Boolean>();
 
     /**
      * Map a String (representing a terrain) to an 
@@ -77,11 +78,11 @@ public class TerrainRecruitLoader
      * The list of Acquirable Creature, as acquirableData.
      * @see net.sf.colossus.xmlparser.TerrainRecruitLoader.acquirableData
      */
-    private static List acquirableList = null;
+    private static List<acquirableData> acquirableList = null;
 
     /** support for the custom recruiting functions ; map the class name to an
      instance of the class. */
-    private static HashMap nameToInstance = new HashMap();
+    private static HashMap<String, CustomRecruitBase> nameToInstance = new HashMap<String, CustomRecruitBase>();
 
     /**
      * Representation of the Recruiting Graph (for use)
@@ -103,16 +104,16 @@ public class TerrainRecruitLoader
      * Add an entire terrain recruiting list to the Recruiting Graph.
      * @param rl The list of RecruitNumber to add to the graph.
      */
-    private static void addToGraph(ArrayList rl, String t)
+    private static void addToGraph(ArrayList<recruitNumber> rl, String t)
     {
-        Iterator it = rl.iterator();
+        Iterator<recruitNumber> it = rl.iterator();
         String v1 = null;
-        boolean regularRecruit = ((Boolean)strToBelow.get(t)).booleanValue();
+        boolean regularRecruit = strToBelow.get(t).booleanValue();
         try
         {
             while (it.hasNext())
             {
-                recruitNumber tr = (recruitNumber)it.next();
+                recruitNumber tr = it.next();
                 String v2 = tr.getName();
                 if ((v2 != null) && !(v2.equals(Keyword_Anything))
                     && !(v2.equals(Keyword_AnyNonLord))
@@ -125,11 +126,11 @@ public class TerrainRecruitLoader
                         graph.addEdge(v1, v2, tr.getNumber(), t);
                     }
                     // add the self-recruit & below-recruit loop
-                    Iterator it2 = rl.iterator();
+                    Iterator<recruitNumber> it2 = rl.iterator();
                     boolean done = false;
                     while (it2.hasNext() && !done)
                     {
-                        recruitNumber tr2 = (recruitNumber)it2.next();
+                        recruitNumber tr2 = it2.next();
                         if ((tr == tr2) || // same List, same objects
                             regularRecruit)
                         {
@@ -163,12 +164,12 @@ public class TerrainRecruitLoader
                     // special recruitment, need to add edge 
                     // between the special aned every possible recruit
                     CustomRecruitBase cri = getCustomRecruitBase(v2);
-                    java.util.List allRecruits = cri
+                    java.util.List<Creature> allRecruits = cri
                         .getAllPossibleSpecialRecruits(t);
-                    Iterator it3 = allRecruits.iterator();
+                    Iterator<Creature> it3 = allRecruits.iterator();
                     while (it3.hasNext())
                     {
-                        Creature cre = (Creature)it3.next();
+                        Creature cre = it3.next();
                         // use 99 so no-one will rely on this
                         graph.addEdge(v2, cre.getName(), RecruitGraph.BIGNUM,
                             t);
@@ -269,7 +270,7 @@ public class TerrainRecruitLoader
             displayName = name;
         }
         String color = el.getAttributeValue("color");
-        ArrayList rl = new ArrayList();
+        ArrayList<recruitNumber> rl = new ArrayList<recruitNumber>();
 
         boolean regularRecruit = el.getAttribute("regular_recruit")
             .getBooleanValue();
@@ -397,7 +398,7 @@ public class TerrainRecruitLoader
 
     public static CustomRecruitBase getCustomRecruitBase(String specialString)
     {
-        CustomRecruitBase cri = (CustomRecruitBase)nameToInstance
+        CustomRecruitBase cri = nameToInstance
             .get(specialString);
         if (cri != null)
         {
@@ -441,7 +442,7 @@ public class TerrainRecruitLoader
      */
     public static String getTerrainDisplayName(String tc)
     {
-        return ((String)strToDisplayName.get(tc));
+        return strToDisplayName.get(tc);
     }
 
     /**
@@ -451,7 +452,7 @@ public class TerrainRecruitLoader
      */
     public static java.awt.Color getTerrainColor(String tc)
     {
-        return ((java.awt.Color)strToColor.get(tc));
+        return strToColor.get(tc);
     }
 
     /**
@@ -473,7 +474,7 @@ public class TerrainRecruitLoader
      */
     public static List getPossibleRecruits(String terrain, String hexLabel)
     {
-        ArrayList al = (ArrayList)strToRecruits.get(terrain);
+        ArrayList al = strToRecruits.get(terrain);
         ArrayList re = new ArrayList();
         Iterator it = al.iterator();
         while (it.hasNext())
@@ -511,7 +512,7 @@ public class TerrainRecruitLoader
     public static java.util.List getPossibleRecruiters(String terrain,
         String hexLabel)
     {
-        ArrayList al = (ArrayList)strToRecruits.get(terrain);
+        ArrayList al = strToRecruits.get(terrain);
         ArrayList re = new ArrayList();
         Iterator it = al.iterator();
         while (it.hasNext())
@@ -605,13 +606,13 @@ public class TerrainRecruitLoader
     {
         private final String name;
         private final int value;
-        private final List where;
+        private final List<String> where;
 
         acquirableData(String n, int v)
         {
             name = n;
             value = v;
-            where = new ArrayList();
+            where = new ArrayList<String>();
         }
 
         String getName()
@@ -658,7 +659,7 @@ public class TerrainRecruitLoader
     {
         if (acquirableList == null)
         {
-            acquirableList = new ArrayList();
+            acquirableList = new ArrayList<acquirableData>();
         }
         acquirableList.add(ad);
         if ((ad.getValue() % getAcquirableRecruitmentsValue()) != 0)
@@ -672,13 +673,13 @@ public class TerrainRecruitLoader
      * To obtain all the Creature that can be Acquired.
      * @return The list of name (as String) that can be Acquired
      */
-    public static List getAcquirableList()
+    public static List<String> getAcquirableList()
     {
-        List al = new ArrayList();
-        Iterator it = acquirableList.iterator();
+        List<String> al = new ArrayList<String>();
+        Iterator<acquirableData> it = acquirableList.iterator();
         while (it.hasNext())
         {
-            acquirableData ad = (acquirableData)it.next();
+            acquirableData ad = it.next();
             al.add(ad.getName());
         }
         return al;
@@ -691,7 +692,7 @@ public class TerrainRecruitLoader
      */
     public static int getAcquirableRecruitmentsValue()
     {
-        acquirableData ad = (acquirableData)acquirableList.get(0);
+        acquirableData ad = acquirableList.get(0);
         return ad.getValue();
     }
 
@@ -702,7 +703,7 @@ public class TerrainRecruitLoader
      */
     public static String getPrimaryAcquirable()
     {
-        acquirableData ad = (acquirableData)acquirableList.get(0);
+        acquirableData ad = acquirableList.get(0);
         return ad.getName();
     }
 
@@ -716,17 +717,17 @@ public class TerrainRecruitLoader
      * terrain, for this amount of points.
      * @see #getAcquirableRecruitmentsValue()
      */
-    public static List getRecruitableAcquirableList(String t, int value)
+    public static List<String> getRecruitableAcquirableList(String t, int value)
     {
-        List al = new ArrayList();
+        List<String> al = new ArrayList<String>();
         if ((value % getAcquirableRecruitmentsValue()) != 0)
         {
             return al;
         }
-        Iterator it = acquirableList.iterator();
+        Iterator<acquirableData> it = acquirableList.iterator();
         while (it.hasNext())
         {
-            acquirableData ad = (acquirableData)it.next();
+            acquirableData ad = it.next();
             if (ad.isAvailable(t) && ((value % ad.getValue()) == 0))
             {
                 al.add(ad.getName());
@@ -743,10 +744,10 @@ public class TerrainRecruitLoader
      */
     public boolean isAcquirable(String name)
     {
-        Iterator it = acquirableList.iterator();
+        Iterator<acquirableData> it = acquirableList.iterator();
         while (it.hasNext())
         {
-            acquirableData ad = (acquirableData)it.next();
+            acquirableData ad = it.next();
             if (name.equals(ad.getName()))
             {
                 return true;

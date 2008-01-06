@@ -40,9 +40,9 @@ public final class PredictSplits
     }
 
     /** Return all non-empty childless nodes in subtree starting from node. */
-    List getLeaves(PredictSplitNode node)
+    List<PredictSplitNode> getLeaves(PredictSplitNode node)
     {
-        List leaves = new ArrayList();
+        List<PredictSplitNode> leaves = new ArrayList<PredictSplitNode>();
         if (node.getChild1() == null)
         {
             if (!node.getCreatures().isEmpty())
@@ -56,7 +56,7 @@ public final class PredictSplits
             leaves.addAll(getLeaves(node.getChild2()));
         }
 
-        TreeSet prunes = new TreeSet(new ReverseIntegerComparator());
+        TreeSet<Integer> prunes = new TreeSet<Integer>(new ReverseIntegerComparator());
 
         // If duplicate markerIds, prune the older node.
         for (int i = 0; i < leaves.size(); i++)
@@ -65,8 +65,8 @@ public final class PredictSplits
             {
                 if (i != j)
                 {
-                    PredictSplitNode leaf1 = (PredictSplitNode)leaves.get(i);
-                    PredictSplitNode leaf2 = (PredictSplitNode)leaves.get(j);
+                    PredictSplitNode leaf1 = leaves.get(i);
+                    PredictSplitNode leaf2 = leaves.get(j);
                     if (leaf1.getMarkerId().equals(leaf2.getMarkerId()))
                     {
                         assert leaf1.getTurnCreated() != leaf2.getTurnCreated() : 
@@ -85,9 +85,9 @@ public final class PredictSplits
             }
         }
         // Remove in reverse order to keep indexes consistent.
-        for (Iterator it = prunes.iterator(); it.hasNext();)
+        for (Iterator<Integer> it = prunes.iterator(); it.hasNext();)
         {
-            Integer in = (Integer)it.next();
+            Integer in = it.next();
             leaves.remove(in.intValue());
         }
 
@@ -95,9 +95,9 @@ public final class PredictSplits
     }
 
     /** Return all non-empty nodes in subtree starting from node. */
-    List getNodes(PredictSplitNode node)
+    List<PredictSplitNode> getNodes(PredictSplitNode node)
     {
-        List nodes = new ArrayList();
+        List<PredictSplitNode> nodes = new ArrayList<PredictSplitNode>();
         if (!node.getCreatures().isEmpty())
         {
             nodes.add(node);
@@ -126,11 +126,11 @@ public final class PredictSplits
     void printLeaves()
     {
         LOGGER.log(Level.FINEST, "");
-        List leaves = getLeaves(root);
+        List<PredictSplitNode> leaves = getLeaves(root);
         Collections.sort(leaves);
-        for (Iterator it = leaves.iterator(); it.hasNext();)
+        for (Iterator<PredictSplitNode> it = leaves.iterator(); it.hasNext();)
         {
-            PredictSplitNode leaf = (PredictSplitNode)it.next();
+            PredictSplitNode leaf = it.next();
             LOGGER.log(Level.FINEST, leaf.toString());
         }
         LOGGER.log(Level.FINEST, "");
@@ -140,11 +140,11 @@ public final class PredictSplits
     void printNodes()
     {
         LOGGER.log(Level.FINEST, "");
-        List nodes = getNodes(root);
+        List<PredictSplitNode> nodes = getNodes(root);
         Collections.sort(nodes, nodeTurnComparator);
-        for (Iterator it = nodes.iterator(); it.hasNext();)
+        for (Iterator<PredictSplitNode> it = nodes.iterator(); it.hasNext();)
         {
-            PredictSplitNode node = (PredictSplitNode)it.next();
+            PredictSplitNode node = it.next();
             LOGGER.log(Level.FINEST, node.toString());
         }
         LOGGER.log(Level.FINEST, "");
@@ -153,10 +153,10 @@ public final class PredictSplits
     /** Return the leaf PredictSplitNode with matching markerId. */
     PredictSplitNode getLeaf(String markerId)
     {
-        List leaves = getLeaves(root);
-        for (Iterator it = leaves.iterator(); it.hasNext();)
+        List<PredictSplitNode> leaves = getLeaves(root);
+        for (Iterator<PredictSplitNode> it = leaves.iterator(); it.hasNext();)
         {
-            PredictSplitNode leaf = (PredictSplitNode)it.next();
+            PredictSplitNode leaf = it.next();
             if (markerId.equals(leaf.getMarkerId()))
             {
                 return leaf;

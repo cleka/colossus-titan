@@ -28,7 +28,7 @@ import net.sf.colossus.util.KDialog;
 final class PickMarker extends KDialog implements MouseListener,
     WindowListener
 {
-    private List markers = new ArrayList();
+    private List<Marker> markers = new ArrayList<Marker>();
     private Client client;
     private SaveWindow saveWindow;
 
@@ -95,7 +95,7 @@ final class PickMarker extends KDialog implements MouseListener,
         int i = markers.indexOf(source);
         if (i != -1)
         {
-            Chit chit = (Chit)markers.get(i);
+            Chit chit = markers.get(i);
             cleanup(chit.getId());
         }
     }

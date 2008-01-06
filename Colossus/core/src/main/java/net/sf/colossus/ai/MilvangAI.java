@@ -38,7 +38,7 @@ public class MilvangAI extends RationalAI
         // TODO Auto-generated constructor stub
     }
 
-    double findRecruitPotential(Map critters, String terrain)
+    double findRecruitPotential(Map<Creature, Integer> critters, String terrain)
     {
         int recruitNow = 0;
         int recruitLater = 0;
@@ -62,7 +62,7 @@ public class MilvangAI extends RationalAI
                     lesser, creature, terrain, "");
                 int hintValue = creature.getHintedRecruitmentValue();
                 if (hintValue > recruitNow
-                    && numNeeded <= ((Integer)critters.get(lesser)).intValue())
+                    && numNeeded <= critters.get(lesser).intValue())
                 {
                     recruitNow = hintValue;
                 }
@@ -113,19 +113,19 @@ public class MilvangAI extends RationalAI
         List bestKeep = new ArrayList();
 
         Combos combos = new Combos(critters, critters.size() - 2);
-        for (Iterator it = combos.iterator(); it.hasNext();)
+        for (Iterator<List> it = combos.iterator(); it.hasNext();)
         {
-            List keepers = (List)it.next();
+            List keepers = it.next();
             double critterValue = 0;
             boolean keepTitan = false;
-            Map critterMap = new HashMap();
+            Map<Creature, Integer> critterMap = new HashMap<Creature, Integer>();
             for (Iterator it2 = keepers.iterator(); it2.hasNext();)
             {
                 Creature critter = (Creature)it2.next();
                 keepTitan |= critter.getName().equals("Titan");
                 int tmp = critter.getHintedRecruitmentValue();
                 critterValue += tmp * tmp;
-                Integer numCritters = (Integer)critterMap.get(critter);
+                Integer numCritters = critterMap.get(critter);
                 if (numCritters == null)
                 {
                     critterMap.put(critter, new Integer(1));

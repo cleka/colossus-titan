@@ -26,7 +26,7 @@ public class BalrogRecruitment extends CustomRecruitBase
     private static final Logger LOGGER = Logger
         .getLogger(BalrogRecruitment.class.getName());
 
-    private Map nameToOldScore = Collections.synchronizedMap(new HashMap());
+    private Map<String, Integer> nameToOldScore = Collections.synchronizedMap(new HashMap<String, Integer>());
     private final static int balrogValue = 300;
     private final static String balrogPrefix = "Balrog";
 
@@ -36,9 +36,9 @@ public class BalrogRecruitment extends CustomRecruitBase
         return new ArrayList();
     }
 
-    public List getAllPossibleSpecialRecruits(String terrain)
+    public List<Creature> getAllPossibleSpecialRecruits(String terrain)
     {
-        List temp = new ArrayList();
+        List<Creature> temp = new ArrayList<Creature>();
         Iterator it = Creature.getCreatures().iterator();
         while (it.hasNext())
         {
@@ -118,7 +118,7 @@ public class BalrogRecruitment extends CustomRecruitBase
 
         synchronized (nameToOldScore)
         {
-            Integer score = (Integer)nameToOldScore.remove(pi.getName());
+            Integer score = nameToOldScore.remove(pi.getName());
 
             if (score == null)
             {
@@ -168,10 +168,10 @@ public class BalrogRecruitment extends CustomRecruitBase
 
     private PlayerInfo findPlayerWithStartingTower(String hexLabel)
     {
-        Iterator it = allPlayerInfo.iterator();
+        Iterator<PlayerInfo> it = allPlayerInfo.iterator();
         while (it.hasNext())
         {
-            PlayerInfo pi = (PlayerInfo)it.next();
+            PlayerInfo pi = it.next();
             String towerLabel = pi.getTower();
 
             if (towerLabel.equals(hexLabel))

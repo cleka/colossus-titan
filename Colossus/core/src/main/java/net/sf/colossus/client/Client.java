@@ -92,20 +92,20 @@ public final class Client implements IClient, IOracle, IOptions
     private String battleSite;
     private BattleBoard battleBoard;
 
-    private final List battleChits = new ArrayList();
+    private final List<BattleChit> battleChits = new ArrayList<BattleChit>();
 
     /** Stack of legion marker ids, to allow multiple levels of undo for
      *  splits, moves, and recruits. */
-    private final LinkedList undoStack = new LinkedList();
+    private final LinkedList<Object> undoStack = new LinkedList<Object>();
 
     // Information on the current moving legion.
     private String moverId;
 
     /** The end of the list is on top in the z-order. */
-    private final List markers = new ArrayList();
+    private final List<Marker> markers = new ArrayList<Marker>();
 
-    private final List recruitedChits = new ArrayList();
-    private final List possibleRecruitChits = new ArrayList();
+    private final List<Chit> recruitedChits = new ArrayList<Chit>();
+    private final List<Chit> possibleRecruitChits = new ArrayList<Chit>();
 
     // Per-client and per-player options.
     private final Options options;
@@ -150,13 +150,13 @@ public final class Client implements IClient, IOracle, IOptions
 
     /** One per player. */
     private PlayerInfo[] playerInfo;
-    private Hashtable playerInfoByName = new Hashtable(12);
+    private Hashtable<String, PlayerInfo> playerInfoByName = new Hashtable<String, PlayerInfo>(12);
 
     /** One per player. */
     private PredictSplits[] predictSplits;
 
     /** One LegionInfo per legion, keyed by markerId.  Never null. */
-    private SortedMap legionInfo = new TreeMap();
+    private SortedMap<String, LegionInfo> legionInfo = new TreeMap<String, LegionInfo>();
 
     private int numPlayers;
 
@@ -184,12 +184,12 @@ public final class Client implements IClient, IOracle, IOptions
     private int delay = -1;
 
     /** For battle AI. */
-    private List bestMoveOrder = null;
-    private List failedBattleMoves = null;
+    private List<CritterMove> bestMoveOrder = null;
+    private List<CritterMove> failedBattleMoves = null;
 
     // XXX Make private and wrap consistently.
     boolean showAllRecruitChits = false;
-    private final Hashtable recruitReservations = new Hashtable();
+    private final Hashtable<String, Integer> recruitReservations = new Hashtable<String, Integer>();
 
     private LogWindow logWindow;
     private int viewMode;
@@ -393,8 +393,8 @@ public final class Client implements IClient, IOracle, IOptions
 
     private List _tellEngagementResults_attackerStartingContents = null;
     private List _tellEngagementResults_defenderStartingContents = null;
-    private List _tellEngagementResults_attackerLegionCertainities = null;
-    private List _tellEngagementResults_defenderLegionCertainities = null;
+    private List<Boolean> _tellEngagementResults_attackerLegionCertainities = null;
+    private List<Boolean> _tellEngagementResults_defenderLegionCertainities = null;
 
     public void tellEngagement(String hexLabel, String attackerId,
         String defenderId)
@@ -1056,9 +1056,9 @@ public final class Client implements IClient, IOracle, IOptions
         return getPlayerInfo(playerName);
     }
 
-    public List getPlayerNames()
+    public List<String> getPlayerNames()
     {
-        List names = new ArrayList();
+        List<String> names = new ArrayList<String>();
         for (int i = 0; i < playerInfo.length; i++)
         {
             names.add(playerInfo[i].getName());
@@ -1075,7 +1075,7 @@ public final class Client implements IClient, IOracle, IOptions
         {
             return -1;
         }
-        PlayerInfo tryHash = (PlayerInfo)playerInfoByName.get(pName);
+        PlayerInfo tryHash = playerInfoByName.get(pName);
         for (int i = 0; i < playerInfo.length; i++)
         {
             if (pName.equals(playerInfo[i].getName()))
@@ -1102,10 +1102,10 @@ public final class Client implements IClient, IOracle, IOptions
         int totalValue = 0;
         int totalLegions = 0;
 
-        Iterator it = legionInfo.values().iterator();
+        Iterator<LegionInfo> it = legionInfo.values().iterator();
         while (it.hasNext())
         {
-            LegionInfo info = (LegionInfo)it.next();
+            LegionInfo info = it.next();
             totalLegions++;
             totalValue = info.getPointValue();
         }
@@ -1500,10 +1500,10 @@ public final class Client implements IClient, IOracle, IOptions
 
     boolean anyOffboardCreatures()
     {
-        Iterator it = getActiveBattleChits().iterator();
+        Iterator<BattleChit> it = getActiveBattleChits().iterator();
         while (it.hasNext())
         {
-            BattleChit chit = (BattleChit)it.next();
+            BattleChit chit = it.next();
             if (chit.getCurrentHexLabel().startsWith("X"))
             {
                 return true;
@@ -1512,13 +1512,13 @@ public final class Client implements IClient, IOracle, IOptions
         return false;
     }
 
-    public List getActiveBattleChits()
+    public List<BattleChit> getActiveBattleChits()
     {
-        List chits = new ArrayList();
-        Iterator it = battleChits.iterator();
+        List<BattleChit> chits = new ArrayList<BattleChit>();
+        Iterator<BattleChit> it = battleChits.iterator();
         while (it.hasNext())
         {
-            BattleChit chit = (BattleChit)it.next();
+            BattleChit chit = it.next();
             if (getBattleActivePlayerName().equals(
                 getPlayerNameByTag(chit.getTag())))
             {
@@ -1528,13 +1528,13 @@ public final class Client implements IClient, IOracle, IOptions
         return chits;
     }
 
-    List getInactiveBattleChits()
+    List<BattleChit> getInactiveBattleChits()
     {
-        List chits = new ArrayList();
-        Iterator it = battleChits.iterator();
+        List<BattleChit> chits = new ArrayList<BattleChit>();
+        Iterator<BattleChit> it = battleChits.iterator();
         while (it.hasNext())
         {
-            BattleChit chit = (BattleChit)it.next();
+            BattleChit chit = it.next();
             if (!getBattleActivePlayerName().equals(
                 getPlayerNameByTag(chit.getTag())))
             {
@@ -1546,10 +1546,10 @@ public final class Client implements IClient, IOracle, IOptions
 
     private void markOffboardCreaturesDead()
     {
-        Iterator it = getActiveBattleChits().iterator();
+        Iterator<BattleChit> it = getActiveBattleChits().iterator();
         while (it.hasNext())
         {
-            BattleChit chit = (BattleChit)it.next();
+            BattleChit chit = it.next();
             if (chit.getCurrentHexLabel().startsWith("X"))
             {
                 chit.setDead(true);
@@ -1609,7 +1609,7 @@ public final class Client implements IClient, IOracle, IOptions
         }
     }
 
-    List getMarkers()
+    List<Marker> getMarkers()
     {
         return Collections.unmodifiableList(markers);
     }
@@ -1624,7 +1624,7 @@ public final class Client implements IClient, IOracle, IOptions
     /** Get this legion's info.  Create it first if necessary. */
     public LegionInfo getLegionInfo(String markerId)
     {
-        LegionInfo info = (LegionInfo)legionInfo.get(markerId);
+        LegionInfo info = legionInfo.get(markerId);
         return info;
     }
 
@@ -1712,7 +1712,7 @@ public final class Client implements IClient, IOracle, IOptions
 
     /** Return a list of Booleans */
     // public for IOracle
-    public List getLegionCreatureCertainties(String markerId)
+    public List<Boolean> getLegionCreatureCertainties(String markerId)
     {
         LegionInfo info = getLegionInfo(markerId);
         if (info != null)
@@ -1726,7 +1726,7 @@ public final class Client implements IClient, IOracle, IOptions
             //    markerId + " returned null!");
 
             // TODO: is this the right thing?
-            List l = new ArrayList(42 / 4); // just longer then max
+            List<Boolean> l = new ArrayList<Boolean>(42 / 4); // just longer then max
             for (int idx = 0; idx < (42 / 4); idx++)
             {
                 l.add(new Boolean(true)); // all true
@@ -1883,19 +1883,19 @@ public final class Client implements IClient, IOracle, IOptions
     }
 
 
-    List getBattleChits()
+    List<BattleChit> getBattleChits()
     {
         return Collections.unmodifiableList(battleChits);
     }
 
-    List getBattleChits(String hexLabel)
+    List<BattleChit> getBattleChits(String hexLabel)
     {
-        List chits = new ArrayList();
+        List<BattleChit> chits = new ArrayList<BattleChit>();
 
-        Iterator it = battleChits.iterator();
+        Iterator<BattleChit> it = battleChits.iterator();
         while (it.hasNext())
         {
-            BattleChit chit = (BattleChit)it.next();
+            BattleChit chit = it.next();
             if (hexLabel.equals(chit.getCurrentHexLabel()))
             {
                 chits.add(chit);
@@ -1906,21 +1906,21 @@ public final class Client implements IClient, IOracle, IOptions
 
     public BattleChit getBattleChit(String hexLabel)
     {
-        List chits = getBattleChits(hexLabel);
+        List<BattleChit> chits = getBattleChits(hexLabel);
         if (chits.isEmpty())
         {
             return null;
         }
-        return (BattleChit)chits.get(0);
+        return chits.get(0);
     }
 
     /** Get the BattleChit with this tag. */
     BattleChit getBattleChit(int tag)
     {
-        Iterator it = battleChits.iterator();
+        Iterator<BattleChit> it = battleChits.iterator();
         while (it.hasNext())
         {
-            BattleChit chit = (BattleChit)it.next();
+            BattleChit chit = it.next();
             if (chit.getTag() == tag)
             {
                 return chit;
@@ -1931,10 +1931,10 @@ public final class Client implements IClient, IOracle, IOptions
 
     public void removeDeadBattleChits()
     {
-        Iterator it = battleChits.iterator();
+        Iterator<BattleChit> it = battleChits.iterator();
         while (it.hasNext())
         {
-            BattleChit chit = (BattleChit)it.next();
+            BattleChit chit = it.next();
             if (chit.isDead())
             {
                 it.remove();
@@ -2011,12 +2011,12 @@ public final class Client implements IClient, IOracle, IOptions
         battleChits.add(chit);
     }
 
-    List getRecruitedChits()
+    List<Chit> getRecruitedChits()
     {
         return Collections.unmodifiableList(recruitedChits);
     }
 
-    List getPossibleRecruitChits()
+    List<Chit> getPossibleRecruitChits()
     {
         return Collections.unmodifiableList(possibleRecruitChits);
     }
@@ -2092,7 +2092,7 @@ public final class Client implements IClient, IOracle, IOptions
     }
 
     // all hexes
-    public void addPossibleRecruitChits(String markerId, Set set)
+    public void addPossibleRecruitChits(String markerId, Set<String> set)
     {
         clearPossibleRecruitChits();
 
@@ -2104,10 +2104,10 @@ public final class Client implements IClient, IOracle, IOptions
         // set is a set of possible target hexes
         List oneElemList = new ArrayList();
 
-        Iterator it = set.iterator();
+        Iterator<String> it = set.iterator();
         while (it.hasNext())
         {
-            String hexLabel = (String)it.next();
+            String hexLabel = it.next();
             List recruits = findEligibleRecruits(markerId, hexLabel);
 
             if (recruits != null && recruits.size() > 0)
@@ -2151,10 +2151,10 @@ public final class Client implements IClient, IOracle, IOptions
 
     void removeRecruitChit(String hexLabel)
     {
-        Iterator it = recruitedChits.iterator();
+        Iterator<Chit> it = recruitedChits.iterator();
         while (it.hasNext())
         {
-            Chit chit = (Chit)it.next();
+            Chit chit = it.next();
             // TODO the next line can cause an NPE when the user closes the client app
             GUIMasterHex hex = board.getGUIHexByLabel(hexLabel);
             if (hex != null && hex.contains(chit.getCenter()))
@@ -2163,10 +2163,10 @@ public final class Client implements IClient, IOracle, IOptions
                 return;
             }
         }
-        Iterator it2 = possibleRecruitChits.iterator();
+        Iterator<Chit> it2 = possibleRecruitChits.iterator();
         while (it2.hasNext())
         {
-            Chit chit = (Chit)it2.next();
+            Chit chit = it2.next();
             // TODO the next line can cause an NPE when the user closes the client app
             GUIMasterHex hex = board.getGUIHexByLabel(hexLabel);
             if (hex != null && hex.contains(chit.getCenter()))
@@ -3179,10 +3179,10 @@ public final class Client implements IClient, IOracle, IOptions
 
     private void resetAllMoves()
     {
-        Iterator it = legionInfo.values().iterator();
+        Iterator<LegionInfo> it = legionInfo.values().iterator();
         while (it.hasNext())
         {
-            LegionInfo info = (LegionInfo)it.next();
+            LegionInfo info = it.next();
             info.setMoved(false);
             info.setTeleported(false);
             info.setRecruited(false);
@@ -3401,10 +3401,10 @@ public final class Client implements IClient, IOracle, IOptions
 
     private void resetAllBattleMoves()
     {
-        Iterator it = battleChits.iterator();
+        Iterator<BattleChit> it = battleChits.iterator();
         while (it.hasNext())
         {
-            BattleChit chit = (BattleChit)it.next();
+            BattleChit chit = it.next();
             chit.setMoved(false);
             chit.setStruck(false);
         }
@@ -3436,7 +3436,7 @@ public final class Client implements IClient, IOracle, IOptions
         if (isMyBattlePhase() && getOption(Options.autoPlay))
         {
             bestMoveOrder = ai.battleMove();
-            failedBattleMoves = new ArrayList();
+            failedBattleMoves = new ArrayList<CritterMove>();
             kickBattleMove();
         }
     }
@@ -3456,8 +3456,8 @@ public final class Client implements IClient, IOracle, IOptions
         }
         else
         {
-            Iterator it = bestMoveOrder.iterator();
-            CritterMove cm = (CritterMove)it.next();
+            Iterator<CritterMove> it = bestMoveOrder.iterator();
+            CritterMove cm = it.next();
             tryBattleMove(cm);
         }
     }
@@ -3650,10 +3650,10 @@ public final class Client implements IClient, IOracle, IOptions
     {
         if (bestMoveOrder != null)
         {
-            Iterator it = bestMoveOrder.iterator();
+            Iterator<CritterMove> it = bestMoveOrder.iterator();
             while (it.hasNext())
             {
-                CritterMove cm = (CritterMove)it.next();
+                CritterMove cm = it.next();
                 if (tag == cm.getTag()
                     && endingHexLabel.equals(cm.getEndingHexLabel()))
                 {
@@ -3671,10 +3671,10 @@ public final class Client implements IClient, IOracle, IOptions
         LOGGER.log(Level.FINEST, playerName + "handleFailedBattleMove");
         if (bestMoveOrder != null)
         {
-            Iterator it = bestMoveOrder.iterator();
+            Iterator<CritterMove> it = bestMoveOrder.iterator();
             if (it.hasNext())
             {
-                CritterMove cm = (CritterMove)it.next();
+                CritterMove cm = it.next();
                 it.remove();
                 if (failedBattleMoves != null)
                 {
@@ -3802,10 +3802,10 @@ public final class Client implements IClient, IOracle, IOptions
     Set findMobileCritterHexes()
     {
         Set set = new HashSet();
-        Iterator it = getActiveBattleChits().iterator();
+        Iterator<BattleChit> it = getActiveBattleChits().iterator();
         while (it.hasNext())
         {
-            BattleChit chit = (BattleChit)it.next();
+            BattleChit chit = it.next();
             if (!chit.hasMoved() && !isInContact(chit, false))
             {
                 set.add(chit.getCurrentHexLabel());
@@ -3815,13 +3815,13 @@ public final class Client implements IClient, IOracle, IOptions
     }
 
     /** Return a set of BattleChits. */
-    public Set findMobileBattleChits()
+    public Set<BattleChit> findMobileBattleChits()
     {
-        Set set = new HashSet();
-        Iterator it = getActiveBattleChits().iterator();
+        Set<BattleChit> set = new HashSet<BattleChit>();
+        Iterator<BattleChit> it = getActiveBattleChits().iterator();
         while (it.hasNext())
         {
-            BattleChit chit = (BattleChit)it.next();
+            BattleChit chit = it.next();
             if (!chit.hasMoved() && !isInContact(chit, false))
             {
                 set.add(chit);
@@ -3881,10 +3881,10 @@ public final class Client implements IClient, IOracle, IOptions
     /** reset all strike numbers on chits */
     void resetStrikeNumbers()
     {
-        Iterator it = battleChits.iterator();
+        Iterator<BattleChit> it = battleChits.iterator();
         while (it.hasNext())
         {
-            BattleChit chit = (BattleChit)it.next();
+            BattleChit chit = it.next();
             chit.setStrikeNumber(0);
             chit.setStrikeDice(0);
         }
@@ -4039,8 +4039,8 @@ public final class Client implements IClient, IOracle, IOptions
 
         boolean teleport = false;
 
-        Set teleports = listTeleportMoves(moverId);
-        Set normals = listNormalMoves(moverId);
+        Set<String> teleports = listTeleportMoves(moverId);
+        Set<String> normals = listNormalMoves(moverId);
         if (teleports.contains(hexLabel) && normals.contains(hexLabel))
         {
             teleport = chooseWhetherToTeleport(hexLabel);
@@ -4198,7 +4198,7 @@ public final class Client implements IClient, IOracle, IOptions
         boolean ok = false;
         int remain;
 
-        Integer count = (Integer)recruitReservations.get(recruitName);
+        Integer count = recruitReservations.get(recruitName);
         if (count != null)
         {
             remain = count.intValue();
@@ -4235,7 +4235,7 @@ public final class Client implements IClient, IOracle, IOptions
     {
         int remain;
 
-        Integer count = (Integer)recruitReservations.get(recruitName);
+        Integer count = recruitReservations.get(recruitName);
         if (count == null)
         {
             remain = getCreatureCount(recruitName);
@@ -4371,14 +4371,14 @@ public final class Client implements IClient, IOracle, IOptions
     }
 
     /** Return a set of hexLabels. */
-    Set getPossibleRecruitHexes()
+    Set<String> getPossibleRecruitHexes()
     {
-        Set set = new HashSet();
+        Set<String> set = new HashSet<String>();
 
-        Iterator it = legionInfo.values().iterator();
+        Iterator<LegionInfo> it = legionInfo.values().iterator();
         while (it.hasNext())
         {
-            LegionInfo info = (LegionInfo)it.next();
+            LegionInfo info = it.next();
             if (activePlayerName.equals(info.getPlayerName())
                 && info.canRecruit())
             {
@@ -4391,9 +4391,9 @@ public final class Client implements IClient, IOracle, IOptions
     /** Return a set of hexLabels for all other unengaged legions of
      *  markerId's player that have summonables.
      * public for client-side AI -- do not call from server side. */
-    public Set findSummonableAngelHexes(String summonerId)
+    public Set<String> findSummonableAngelHexes(String summonerId)
     {
-        Set set = new HashSet();
+        Set<String> set = new HashSet<String>();
         LegionInfo summonerInfo = getLegionInfo(summonerId);
         String pName = summonerInfo.getPlayerName();
         Iterator it = getLegionsByPlayer(pName).iterator();
@@ -4423,7 +4423,7 @@ public final class Client implements IClient, IOracle, IOptions
     }
 
     /** Return a set of hexLabels. */
-    Set listTeleportMoves(String markerId)
+    Set<String> listTeleportMoves(String markerId)
     {
         LegionInfo info = getLegionInfo(markerId);
         MasterHex hex = MasterBoard.getHexByLabel(info.getHexLabel());
@@ -4431,7 +4431,7 @@ public final class Client implements IClient, IOracle, IOptions
     }
 
     /** Return a set of hexLabels. */
-    Set listNormalMoves(String markerId)
+    Set<String> listNormalMoves(String markerId)
     {
         LegionInfo info = getLegionInfo(markerId);
         MasterHex hex = MasterBoard.getHexByLabel(info.getHexLabel());
@@ -4509,14 +4509,14 @@ public final class Client implements IClient, IOracle, IOptions
         return markerIds;
     }
 
-    Set findUnmovedLegionHexes()
+    Set<String> findUnmovedLegionHexes()
     {
-        Set set = new HashSet();
+        Set<String> set = new HashSet<String>();
 
-        Iterator it = legionInfo.values().iterator();
+        Iterator<LegionInfo> it = legionInfo.values().iterator();
         while (it.hasNext())
         {
-            LegionInfo info = (LegionInfo)it.next();
+            LegionInfo info = it.next();
             if (!info.hasMoved()
                 && getActivePlayerName().equals(info.getPlayerName()))
             {
@@ -4528,16 +4528,16 @@ public final class Client implements IClient, IOracle, IOptions
 
     /** Return a set of hexLabels for the active player's legions with
      *  7 or more creatures. */
-    Set findTallLegionHexes()
+    Set<String> findTallLegionHexes()
     {
         return findTallLegionHexes(7);
     }
 
     /** Return a set of hexLabels for the active player's legions with
      *  minHeight or more creatures. */
-    Set findTallLegionHexes(int minHeight)
+    Set<String> findTallLegionHexes(int minHeight)
     {
-        Set set = new HashSet();
+        Set<String> set = new HashSet<String>();
 
         Iterator it = legionInfo.entrySet().iterator();
         while (it.hasNext())
@@ -4554,9 +4554,9 @@ public final class Client implements IClient, IOracle, IOptions
     }
 
     /** Return a set of hexLabels for all hexes with engagements. */
-    public Set findEngagements()
+    public Set<String> findEngagements()
     {
-        Set set = new HashSet();
+        Set<String> set = new HashSet<String>();
         Iterator it = MasterBoard.getAllHexLabels().iterator();
         while (it.hasNext())
         {
@@ -4604,13 +4604,13 @@ public final class Client implements IClient, IOracle, IOptions
         return false;
     }
 
-    List getEnemyLegions(String pName)
+    List<String> getEnemyLegions(String pName)
     {
-        List markerIds = new ArrayList();
-        Iterator it = legionInfo.values().iterator();
+        List<String> markerIds = new ArrayList<String>();
+        Iterator<LegionInfo> it = legionInfo.values().iterator();
         while (it.hasNext())
         {
-            LegionInfo info = (LegionInfo)it.next();
+            LegionInfo info = it.next();
             String markerId = info.getMarkerId();
             if (!pName.equals(info.getPlayerName()))
             {
@@ -4620,9 +4620,9 @@ public final class Client implements IClient, IOracle, IOptions
         return markerIds;
     }
 
-    List getEnemyLegions(String hexLabel, String pName)
+    List<String> getEnemyLegions(String hexLabel, String pName)
     {
-        List markerIds = new ArrayList();
+        List<String> markerIds = new ArrayList<String>();
         List legions = getLegionsByHex(hexLabel);
         Iterator it = legions.iterator();
         while (it.hasNext())
@@ -4638,12 +4638,12 @@ public final class Client implements IClient, IOracle, IOptions
 
     public String getFirstEnemyLegion(String hexLabel, String pName)
     {
-        List markerIds = getEnemyLegions(hexLabel, pName);
+        List<String> markerIds = getEnemyLegions(hexLabel, pName);
         if (markerIds.isEmpty())
         {
             return null;
         }
-        return (String)markerIds.get(0);
+        return markerIds.get(0);
     }
 
     public int getNumEnemyLegions(String hexLabel, String pName)
@@ -4651,13 +4651,13 @@ public final class Client implements IClient, IOracle, IOptions
         return getEnemyLegions(hexLabel, pName).size();
     }
 
-    public List getFriendlyLegions(String pName)
+    public List<String> getFriendlyLegions(String pName)
     {
-        List markerIds = new ArrayList();
-        Iterator it = legionInfo.values().iterator();
+        List<String> markerIds = new ArrayList<String>();
+        Iterator<LegionInfo> it = legionInfo.values().iterator();
         while (it.hasNext())
         {
-            LegionInfo info = (LegionInfo)it.next();
+            LegionInfo info = it.next();
             String markerId = info.getMarkerId();
             if (pName.equals(info.getPlayerName()))
             {
@@ -4667,9 +4667,9 @@ public final class Client implements IClient, IOracle, IOptions
         return markerIds;
     }
 
-    public List getFriendlyLegions(String hexLabel, String pName)
+    public List<String> getFriendlyLegions(String hexLabel, String pName)
     {
-        List markerIds = new ArrayList();
+        List<String> markerIds = new ArrayList<String>();
         List legions = getLegionsByHex(hexLabel);
         Iterator it = legions.iterator();
         while (it.hasNext())
@@ -4685,12 +4685,12 @@ public final class Client implements IClient, IOracle, IOptions
 
     public String getFirstFriendlyLegion(String hexLabel, String pName)
     {
-        List markerIds = getFriendlyLegions(hexLabel, pName);
+        List<String> markerIds = getFriendlyLegions(hexLabel, pName);
         if (markerIds.isEmpty())
         {
             return null;
         }
-        return (String)markerIds.get(0);
+        return markerIds.get(0);
     }
 
     public int getNumFriendlyLegions(String hexLabel, String pName)

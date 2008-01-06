@@ -22,12 +22,12 @@ public class InstanceGroup
     private static final Logger LOGGER =
         Logger.getLogger(InstanceGroup.class.getName());
 
-    private WeakHashMap instances;
+    private WeakHashMap<Object, typeInstance> instances;
     private String shortType;
 
     public InstanceGroup(String type)
     {
-        instances = new WeakHashMap();
+        instances = new WeakHashMap<Object, typeInstance>();
         this.shortType = shortType(type);
     }
 
@@ -63,7 +63,7 @@ public class InstanceGroup
         gstat.append("  " + count + " instances of type " + shortType);
 
         String sep = ": ";
-        Iterator it = instances.keySet().iterator();
+        Iterator<Object> it = instances.keySet().iterator();
         while (it.hasNext())
         {
             Object key = it.next();
@@ -75,7 +75,7 @@ public class InstanceGroup
             }
             else
             {
-                typeInstance i = (typeInstance)instances.get(key);
+                typeInstance i = instances.get(key);
                 gstat.append(sep + i.getId());
                 sep = ", ";
             }
@@ -93,7 +93,7 @@ public class InstanceGroup
 
     public synchronized typeInstance getInstance(Object o)
     {
-        Iterator it = instances.keySet().iterator();
+        Iterator<Object> it = instances.keySet().iterator();
         typeInstance foundInstance = null;
 
         while (foundInstance == null && it.hasNext())
@@ -105,7 +105,7 @@ public class InstanceGroup
             }
             else
             {
-                typeInstance i = (typeInstance)instances.get(key);
+                typeInstance i = instances.get(key);
                 if (i.getObj() == o)
                 {
                     foundInstance = i;
@@ -118,12 +118,12 @@ public class InstanceGroup
 
     public class typeInstance
     {
-        private WeakReference objRef;
+        private WeakReference<Object> objRef;
         private String id;
 
         private typeInstance(Object o, String id)
         {
-            this.objRef = new WeakReference(o);
+            this.objRef = new WeakReference<Object>(o);
             this.id = id;
         }
 

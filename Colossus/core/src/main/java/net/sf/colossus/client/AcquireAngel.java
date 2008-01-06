@@ -30,7 +30,7 @@ import net.sf.colossus.util.KDialog;
 final class AcquireAngel extends KDialog implements MouseListener,
     WindowListener, ActionListener
 {
-    private List chits = new ArrayList();
+    private List<Chit> chits = new ArrayList<Chit>();
     private List recruits;
     private Client client;
     private String markerId;

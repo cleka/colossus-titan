@@ -70,7 +70,7 @@ public final class GetPlayers extends KFrame implements WindowListener,
     private JComboBox serveAtPortBox;
     private TreeSet sPortChoices;
 
-    private Vector typeChoices = new Vector();
+    private Vector<String> typeChoices = new Vector<String>();
     private JComboBox[] playerTypes = new JComboBox[Constants.MAX_MAX_PLAYERS];
     private JComboBox[] playerNames = new JComboBox[Constants.MAX_MAX_PLAYERS];
     private JEditorPane readme = new JEditorPane();
@@ -429,7 +429,7 @@ public final class GetPlayers extends KFrame implements WindowListener,
         {
             name = Constants.byType;
         }
-        Vector nameChoices = new Vector();
+        Vector<String> nameChoices = new Vector<String>();
         nameChoices.add(name);
         if (!nameChoices.contains(Constants.byColor))
         {
@@ -499,8 +499,8 @@ public final class GetPlayers extends KFrame implements WindowListener,
         options.clearPlayerInfo();
 
         int numPlayers = 0;
-        List names = new ArrayList();
-        List types = new ArrayList();
+        List<String> names = new ArrayList<String>();
+        List<String> types = new ArrayList<String>();
 
         for (int i = 0; i < Constants.MAX_MAX_PLAYERS; i++)
         {
@@ -553,10 +553,10 @@ public final class GetPlayers extends KFrame implements WindowListener,
         // Okay.  Copy names and types to options.
         for (int i = 0; i < numPlayers; i++)
         {
-            String name = (String)names.get(i);
+            String name = names.get(i);
             options.setOption(Options.playerName + i, name);
 
-            String type = (String)types.get(i);
+            String type = types.get(i);
             options.setOption(Options.playerType + i, type);
         }
 

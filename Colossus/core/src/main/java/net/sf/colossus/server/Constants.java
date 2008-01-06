@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -223,7 +224,7 @@ public final class Constants
     public static final int ARROWS_ONLY = -2;
     public static final int NOWHERE = -1;
 
-    public static final HashMap hexsideMap = new HashMap();
+    public static final Map<String, Integer> hexsideMap = new HashMap<String, Integer>();
     static
     {
         hexsideMap.put("NONE", new Integer(NONE));
@@ -255,7 +256,7 @@ public final class Constants
         KeyEvent.VK_N, KeyEvent.VK_I };
 
     public static final String noShortName = "XX";
-    private static final HashMap shortNamesMap = new HashMap();
+    private static final Map<String, String> shortNamesMap = new HashMap<String, String>();
 
     public static final int MIN_AI_DELAY = 0; //in ms
     public static final int MAX_AI_DELAY = 3000;
@@ -385,7 +386,7 @@ public final class Constants
 
     public static final int numVariants = variantArray.length;
 
-    private static final List variantList = new ArrayList();
+    private static final List<String> variantList = new ArrayList<String>();
 
     // static initializer
     {
@@ -395,7 +396,7 @@ public final class Constants
         }
     }
 
-    public static List getVariantList()
+    public static List<String> getVariantList()
     {
         return Collections.unmodifiableList(variantList);
     }
@@ -544,7 +545,7 @@ public final class Constants
 
     public static String getShortColorName(String c)
     {
-        String temp = (String)shortNamesMap.get(c);
+        String temp = shortNamesMap.get(c);
         if (temp != null)
         {
             return temp;

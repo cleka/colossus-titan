@@ -124,7 +124,7 @@ public class BalrogHint implements net.sf.colossus.server.HintInterface
 
     public List getInitialSplitHint(String label, String[] section)
     {
-        List sect = Arrays.asList(section);
+        List<String> sect = Arrays.asList(section);
 
         List li = new ArrayList();
         if (label.equals("100"))

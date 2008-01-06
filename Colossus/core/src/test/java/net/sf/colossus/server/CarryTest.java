@@ -179,15 +179,15 @@ public class CarryTest extends TestCase
         colossus1.findCarries(ogre1);
         assertTrue(battle.getCarryTargets().size() == 1);
         assertTrue(colossus1.getPenaltyOptions().size() == 2);
-        Iterator it = colossus1.getPenaltyOptions().iterator();
-        PenaltyOption po = (PenaltyOption)it.next();
+        Iterator<PenaltyOption> it = colossus1.getPenaltyOptions().iterator();
+        PenaltyOption po = it.next();
         assertTrue(po.getCarryTargets().size() == 2);
 
         colossus1.findCarries(ogre2);
         assertTrue(battle.getCarryTargets().size() == 1);
         assertTrue(colossus1.getPenaltyOptions().size() == 2);
         it = colossus1.getPenaltyOptions().iterator();
-        po = (PenaltyOption)it.next();
+        po = it.next();
         assertTrue(po.getCarryTargets().size() == 2);
     }
 }

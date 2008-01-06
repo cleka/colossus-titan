@@ -12,6 +12,7 @@ import java.awt.event.MouseListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.util.HashMap;
+import java.util.Map;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -31,7 +32,7 @@ final class ShowBattleMap extends HexMap implements WindowListener,
 {
     private static final String NoLandText = "--";
 
-    private JDialog dialog;
+    private final JDialog dialog;
 
     private static JButton leftButton;
     private static JButton bottomButton;
@@ -46,8 +47,8 @@ final class ShowBattleMap extends HexMap implements WindowListener,
         super(masterHexLabel);
         MasterHex hex = MasterBoard.getHexByLabel(masterHexLabel);
 
-        HashMap neighbors = findOutNeighbors(guiHex);
-        String neighborsText = (String)neighbors.get("text");
+        Map<String, String> neighbors = findOutNeighbors(guiHex);
+        String neighborsText = neighbors.get("text");
 
         dialog = new JDialog(parentFrame, "Battle Map for "
             + hex.getTerrainName() + " " + masterHexLabel + " "
@@ -58,7 +59,7 @@ final class ShowBattleMap extends HexMap implements WindowListener,
         // contentPane.setLayout(new BorderLayout());
         contentPane.setLayout(null);
 
-        String text = (String)neighbors.get(Constants.left);
+        String text = neighbors.get(Constants.left);
         if (!text.equals(NoLandText))
         {
             leftButton = new JButton("<HTML>" + Constants.left + ":<BR>"
@@ -67,7 +68,7 @@ final class ShowBattleMap extends HexMap implements WindowListener,
             contentPane.add(leftButton);
         }
 
-        text = (String)neighbors.get(Constants.bottom);
+        text = neighbors.get(Constants.bottom);
         if (!text.equals(NoLandText))
         {
             bottomButton = new JButton("<HTML>" + Constants.bottom + ":<BR>"
@@ -76,7 +77,7 @@ final class ShowBattleMap extends HexMap implements WindowListener,
             contentPane.add(bottomButton);
         }
 
-        text = (String)neighbors.get(Constants.right);
+        text = neighbors.get(Constants.right);
         if (!text.equals(NoLandText))
         {
             rightButton = new JButton("<HTML>" + Constants.right + ":<BR>"
@@ -97,7 +98,7 @@ final class ShowBattleMap extends HexMap implements WindowListener,
         dialog.setVisible(true);
     }
 
-    private HashMap findOutNeighbors(GUIMasterHex guiHex)
+    private Map<String, String> findOutNeighbors(GUIMasterHex guiHex)
     {
         String neighborsText = "";
 
@@ -138,7 +139,7 @@ final class ShowBattleMap extends HexMap implements WindowListener,
             + Constants.bottom + ": " + bottom + ", " + Constants.left + ": "
             + left + ")";
 
-        HashMap neighbors = new HashMap(4);
+        Map<String, String> neighbors = new HashMap<String, String>(4);
         neighbors.put("text", neighborsText);
         neighbors.put(Constants.right, right);
         neighbors.put(Constants.bottom, bottom);

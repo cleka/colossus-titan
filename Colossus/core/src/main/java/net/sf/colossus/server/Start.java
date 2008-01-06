@@ -277,7 +277,7 @@ public final class Start
             // whether one has to click somewhere or not) otherwise same,
             //   ( = would end up same host).
 
-            Set dummy = new TreeSet();
+            Set<String> dummy = new TreeSet<String>();
             String preferred = StartClient.initServerNames(hostname, dummy,
                 netclientOptions);
             hostname = preferred;

@@ -27,12 +27,13 @@ public final class Caretaker implements Cloneable
     /** Mapping from String creature name to Integer count. If the
      *  creature is not found, assume that we have a full count (equal
      *  to Creature.getMaxCount()) */
-    private HashMap map = new HashMap();
+    private HashMap<String, Integer> map = new HashMap<String, Integer>();
 
     /** Mapping from String creature name to Integer count. If the
      *  creature is not found, assume that we have a 0 count */
-    private HashMap deadMap = new HashMap();
-    private Game game;
+    private HashMap<String, Integer> deadMap = new HashMap<String, Integer>();
+
+    private final Game game;
 
     Caretaker(Game game)
     {
@@ -41,7 +42,7 @@ public final class Caretaker implements Cloneable
 
     public int getCount(String creatureName)
     {
-        Integer count = (Integer)map.get(creatureName);
+        Integer count = map.get(creatureName);
         if (count == null)
         {
             return (Creature.getCreatureByName(creatureName).getMaxCount());
@@ -56,7 +57,7 @@ public final class Caretaker implements Cloneable
 
     public int getDeadCount(String creatureName)
     {
-        Integer count = (Integer)deadMap.get(creatureName);
+        Integer count = deadMap.get(creatureName);
         if (count == null)
         {
             return (0);
@@ -100,7 +101,7 @@ public final class Caretaker implements Cloneable
 
     void takeOne(Creature creature)
     {
-        Integer count = (Integer)map.remove(creature.getName());
+        Integer count = map.remove(creature.getName());
         if (count == null)
         {
             LOGGER.log(Level.INFO, "First " + creature.getName()
@@ -134,7 +135,7 @@ public final class Caretaker implements Cloneable
 
     void putOneBack(Creature creature)
     {
-        Integer count = (Integer)map.get(creature.getName());
+        Integer count = map.get(creature.getName());
         // count can be null if we're testing a battle.
         if (count == null)
         {
@@ -147,7 +148,7 @@ public final class Caretaker implements Cloneable
     void putDeadOne(Creature creature)
     {
         String name = creature.getName();
-        Integer deadCount = (Integer)deadMap.get(name);
+        Integer deadCount = deadMap.get(name);
         if (deadCount == null)
         {
             deadCount = new Integer(0);
@@ -155,7 +156,7 @@ public final class Caretaker implements Cloneable
         deadMap.put(name, new Integer(deadCount.intValue() + 1));
 
         // safety check
-        Integer count = (Integer)map.get(name);
+        Integer count = map.get(name);
         if (count == null)
         {
             LOGGER.log(Level.WARNING, "A Creature by the name of " + name

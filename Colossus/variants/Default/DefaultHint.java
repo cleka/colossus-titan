@@ -33,7 +33,7 @@ public class DefaultHint implements net.sf.colossus.server.HintInterface
         List recruits, HintOracleInterface oracle, String[] section)
     {
         recruits = creaturesToStrings(recruits);
-        List sect = Arrays.asList(section);
+        List<String> sect = Arrays.asList(section);
 
         if (terrain.equals("Brush") || terrain.equals("Jungle"))
         {

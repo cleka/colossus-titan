@@ -34,8 +34,8 @@ import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 final class SplitLegion extends KDialog implements MouseListener,
     ActionListener, WindowListener
 {
-    private List oldChits = new ArrayList(8);
-    private List newChits = new ArrayList(8);
+    private List<Chit> oldChits = new ArrayList<Chit>(8);
+    private List<Chit> newChits = new ArrayList<Chit>(8);
 
     private Marker oldMarker;
     private Marker newMarker;
@@ -159,10 +159,10 @@ final class SplitLegion extends KDialog implements MouseListener,
     }
 
     /** Move a chit to the end of the other line. */
-    private void moveChitToOtherLine(List fromChits, List toChits,
+    private void moveChitToOtherLine(List<Chit> fromChits, List<Chit> toChits,
         Container fromBox, Container toBox, int oldPosition)
     {
-        Chit chit = (Chit)fromChits.remove(oldPosition);
+        Chit chit = fromChits.remove(oldPosition);
         fromBox.remove(chit);
         fromBox.add(Box.createRigidArea(new Dimension(scale, 0)));
 
@@ -202,10 +202,10 @@ final class SplitLegion extends KDialog implements MouseListener,
             }
 
             int numLords = 0;
-            Iterator it = oldChits.iterator();
+            Iterator<Chit> it = oldChits.iterator();
             while (it.hasNext())
             {
-                Chit chit = (Chit)it.next();
+                Chit chit = it.next();
                 String id = chit.getId();
                 if (id.startsWith(Constants.titan)
                     || id.equals(TerrainRecruitLoader.getPrimaryAcquirable()))
@@ -234,10 +234,10 @@ final class SplitLegion extends KDialog implements MouseListener,
     private void returnSplitResults()
     {
         StringBuffer buf = new StringBuffer();
-        Iterator it = newChits.iterator();
+        Iterator<Chit> it = newChits.iterator();
         while (it.hasNext())
         {
-            Chit chit = (Chit)it.next();
+            Chit chit = it.next();
             String creatureName = chit.getId();
             if (creatureName.startsWith(Constants.titan))
             {

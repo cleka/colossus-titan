@@ -28,8 +28,8 @@ final class ReplyToProposal extends KDialog implements ActionListener
 {
     private String attackerId;
     private String defenderId;
-    private List attackerChits = new ArrayList();
-    private List defenderChits = new ArrayList();
+    private List<Chit> attackerChits = new ArrayList<Chit>();
+    private List<Chit> defenderChits = new ArrayList<Chit>();
     private Marker attackerMarker;
     private Marker defenderMarker;
     private Client client;
@@ -138,7 +138,7 @@ final class ReplyToProposal extends KDialog implements ActionListener
 
     private void markAllDead(String markerId)
     {
-        Iterator it = null;
+        Iterator<Chit> it = null;
         if (markerId.equals(attackerId))
         {
             it = attackerChits.iterator();
@@ -149,7 +149,7 @@ final class ReplyToProposal extends KDialog implements ActionListener
         }
         while (it.hasNext())
         {
-            Chit chit = (Chit)it.next();
+            Chit chit = it.next();
             chit.setDead(true);
         }
     }
@@ -159,7 +159,7 @@ final class ReplyToProposal extends KDialog implements ActionListener
         // Don't mess with the original list.
         List creatures = new ArrayList(losses);
 
-        Iterator it = null;
+        Iterator<Chit> it = null;
         if (markerId.equals(attackerId))
         {
             it = attackerChits.iterator();
@@ -171,7 +171,7 @@ final class ReplyToProposal extends KDialog implements ActionListener
 
         while (it.hasNext())
         {
-            Chit chit = (Chit)it.next();
+            Chit chit = it.next();
             Iterator it2 = creatures.iterator();
             while (it2.hasNext())
             {

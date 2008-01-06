@@ -4,6 +4,7 @@ package net.sf.colossus.ai;
 import java.util.List;
 import java.util.Set;
 
+import net.sf.colossus.client.CritterMove;
 import net.sf.colossus.client.LegionInfo;
 
 
@@ -42,10 +43,10 @@ public interface AI
     boolean strike(LegionInfo legion);
 
     /** return a list of battle moves for the active legion */
-    List battleMove();
+    List<CritterMove> battleMove();
 
     /** Try another move for creatures whose moves failed. */
-    void retryFailedBattleMoves(List bestMoveOrder);
+    void retryFailedBattleMoves(List<CritterMove> bestMoveOrder);
 
     /** pick an entry side */
     String pickEntrySide(String hexLabel, String markerId, Set entrySides);

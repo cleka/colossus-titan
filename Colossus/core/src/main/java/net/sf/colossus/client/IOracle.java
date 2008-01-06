@@ -24,7 +24,7 @@ public interface IOracle
 
     List getLegionImageNames(String markerId);
 
-    List getLegionCreatureCertainties(String markerId);
+    List<Boolean> getLegionCreatureCertainties(String markerId);
 
     int getNumPlayers();
 

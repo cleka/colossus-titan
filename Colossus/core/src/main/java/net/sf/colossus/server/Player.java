@@ -164,10 +164,10 @@ public final class Player implements Comparable
                     Player victim = game.getPlayerByShortColor(shortColor);
                     allVictims.append(victim.getPlayersElim());
                 }
-                Iterator it = getLegionIds().iterator();
+                Iterator<String> it = getLegionIds().iterator();
                 while (it.hasNext())
                 {
-                    String markerId = (String)it.next();
+                    String markerId = it.next();
                     markersAvailable.remove(markerId);
                 }
             }
@@ -364,9 +364,9 @@ public final class Player implements Comparable
         return legions;
     }
 
-    synchronized List getLegionIds()
+    synchronized List<String> getLegionIds()
     {
-        List ids = new ArrayList();
+        List<String> ids = new ArrayList<String>();
         Iterator it = legions.iterator();
         while (it.hasNext())
         {

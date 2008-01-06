@@ -297,7 +297,7 @@ public class DiceTest extends TestCase
     /** Return the list with runs of identical rolls reduced to just one */
     int[] trimZeroRuns(int[] rolls)
     {
-        List li = new ArrayList();
+        List<Integer> li = new ArrayList<Integer>();
         int lastroll = -1;
         for (int i = 0; i < rolls.length; i++)
         {
@@ -310,7 +310,7 @@ public class DiceTest extends TestCase
         int[] results = new int[li.size()];
         for (int i = 0; i < results.length; i++)
         {
-            results[i] = ((Integer)li.get(i)).intValue();
+            results[i] = li.get(i).intValue();
         }
         return results;
     }
