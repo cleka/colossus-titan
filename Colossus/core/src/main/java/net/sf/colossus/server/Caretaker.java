@@ -19,7 +19,7 @@ import java.util.logging.Logger;
  * @author Romain Dolbeau
  */
 
-public final class Caretaker implements Cloneable
+public final class Caretaker
 {
     private static final Logger LOGGER = Logger.getLogger(Caretaker.class
         .getName());
@@ -27,11 +27,11 @@ public final class Caretaker implements Cloneable
     /** Mapping from String creature name to Integer count. If the
      *  creature is not found, assume that we have a full count (equal
      *  to Creature.getMaxCount()) */
-    private HashMap<String, Integer> map = new HashMap<String, Integer>();
+    private final HashMap<String, Integer> map = new HashMap<String, Integer>();
 
     /** Mapping from String creature name to Integer count. If the
      *  creature is not found, assume that we have a 0 count */
-    private HashMap<String, Integer> deadMap = new HashMap<String, Integer>();
+    private final HashMap<String, Integer> deadMap = new HashMap<String, Integer>();
 
     private final Game game;
 
@@ -189,19 +189,6 @@ public final class Caretaker implements Cloneable
             Creature creature = it.next();
             updateDisplays(creature.getName());
         }
-    }
-
-    // unchecked conversions since retVal of HashMap.clone() not covariant
-    @SuppressWarnings("unchecked")
-    @Override
-    public Object clone()
-    {
-        Caretaker newCaretaker = new Caretaker(game);
-        // because String and Integer are both immutable, a shallow copy is
-        // the same as a deep copy
-        newCaretaker.map = (HashMap<String, Integer>)map.clone();
-        newCaretaker.deadMap = (HashMap<String, Integer>)deadMap.clone();
-        return newCaretaker;
     }
 
     /** Move dead non-Titan immortals back to stacks. */
