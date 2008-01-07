@@ -1,0 +1,543 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!-- $Id: $ -->
+<html>
+  <head>
+    <meta name="generator"
+    content="HTML Tidy for Linux/x86 (vers 1st July 2002), see www.w3.org" />
+    <title>Setting in Preferences Window</title>
+  </head>
+  <body>
+<h1>Settings in Preferences Window</h1>
+
+This document describes the various available settings in the Preferences 
+Window (displayable by "MasterBoard menu" =&gt; "Window" =&gt; "Preferences...")
+<p>
+This window has four tabbed panes:
+<ul>
+<li><a HREF="#BattleTab">Battle tab</a>
+<li><a HREF="#AutoplayTab">Autoplay tab</a>
+<li><a HREF="#GraphicsTab">Graphics/View tab</a>
+<li><a HREF="#WindowsTab">Windows tab</a>
+</ul>
+<p>
+<hr>
+<p>
+<h2><a NAME="#BattleTab">Battle tab</a></h2>
+
+<ul>
+<li><a HREF="#ColoredBordersChits">Use colored borders on Battle Chits</a></li>
+<li><a HREF="#NotInvertBattleChits">Do not invert defender's Battle Chits</a></li>
+<br>
+<li><a HREF="#ShowNeededRoll">Show needed roll for hit</a></li>
+<li><a HREF="#ShowDiceTerrain">Show added/lost dice due to terrain</a></li>
+<li><a HREF="#ShowDiceRangestrike">Show lost dice due to rangestrike</a></li>
+</ul>
+
+The first two help to distinct on the Battle Map which chits belong
+to which player.
+
+<h3><a NAME="#ColoredBordersChits">Use colored borders on Battle Chits</a></h3>
+
+As name says. 
+
+<h3><a NAME="#NotInvertBattleChits">Do not invert defender's Battle Chits</a></h3>
+
+Normally defender's battle chits are shown upside down, so that one can distinct
+attacker and defender. With this setting they are not upside down.
+<p>
+
+<h3><u>Hit Roll and Dice indicators</u></h3>
+
+From the <i>Law of Titan</i> rulebook: "The number of dice thrown in a
+rangestrike is determined by the character's Range-strength, which is
+equal to one half the character's Power-factor, rounded down."
+<p>
+In Colossus, when you click on a creature that is able to strike or
+rangestrike a red die indicating the roll needed for a successful hit will be
+displayed on each creature in range.
+<p>If the number of dice to be rolled for striking a certain creature is 
+different than what it would be just based on the striker's power-factor 
+(e.g. due to hazards or rangestrike) a green number (positive or negative) 
+will be displayed over a second, blue/red die on that creature.
+<p>
+The following three options decide whether a certain indicator is
+displayed or not.
+
+<h3><a NAME="#ShowNeededRoll">Show needed roll for hit</a></h3>
+
+Will show some red dice indicating which roll you need to make a hit.
+E.g. for equal-skilled characters and no terrain influences that is a 
+four; but if they have different skill or e.g. a non-native trying to 
+strike a native creature in a bramble hex, there might be a different
+roll needed (less than four if the attackers skill is higher than 
+the defenders, or e.g. 5 or 6 for the bramble example).
+
+<h3><a NAME="#ShowDiceTerrain">Show added/lost dice due to terrain</a></h3>
+
+Some terrains, like dunes in the desert, cause a non-native attacker
+striking up to have less dice to roll, or the attacker (e.g. a lion)
+striking down to have 1 or 2 dice added.
+<p>
+
+<h3><a NAME="#ShowDiceRangestrike">Show lost dice due to rangestrike</a></h3>
+
+Similar to the previous, but this one affects whether to show
+it if the difference is caused by rangestriking.
+
+<p>
+<hr>
+<p>
+
+<h2><a NAME="#AutoplayTab">Autoplay tab</a></h2>
+
+Here are several options that you can make the game automatically do
+certain tasks for you; they would then be done mostly the same way as the
+SimpleAI would do it.
+
+<ul>
+<li><a HREF="#Auto_pick_color">Auto pick color</a></li>
+<li><a HREF="#Auto_pick_markers">Auto pick markers</a></li>
+<li><a HREF="#Auto_pick_entry_sides">Auto pick entry sides</a></li>
+<li><a HREF="#Auto_forced_strike">Auto forced strike</a></li>
+<li><a HREF="#Auto_carry_single">Auto carry single</a></li>
+<li><a HREF="#Auto_angestrike_single">Auto rangestrike single</a></li>
+<li><a HREF="#Auto_summon_angels">Auto summon angels</a></li>
+<li><a HREF="#Auto_acquire angels">Auto acquire angels</a></li>
+<li><a HREF="#Auto_recruit">Auto recruit</a></li>
+<li><a HREF="#Auto_pick_recruiters">Auto pick recruiters</a></li>
+<li><a HREF="#Auto_reinforce">Auto reinforce</a></li>
+<li><a HREF="#Auto_play">Auto play</a></li>
+</ul>
+
+<h3><a NAME="#Auto_pick_color">Autoplay - Auto pick color</a></h3>
+During begin of the game, you are asked to select a color. If you don't
+care which color you get, mark this option. The system will then pick
+any color for you randomly.
+<p>
+<b>Tip for "hacker-type" users:</b>
+There is the possibility to put a line in the Options file, what your 
+favorite (=preferred) colors are; then this option will try to give you 
+one of those preferred colors (if possible - if you are the last of 
+several human players to choose and the previous players picked all of 
+those colors, you still get a random color). Human players have 
+precedence before AI players.
+<p>
+Unfortunately there is (so far) no menu functionality to put this
+preferred color to the Options file. The file in question is
+normally called <br>
+<PRE>  Colossus-&lt;your player name&gt;.cfg</PRE> 
+and it is located in the .colossus directory mentioned above.
+You would need to manually add a line *exactly* like this:
+<PRE>
+  Favorite\ colors=Green,Black,Orange
+</PRE>
+to that file, to get (if possible) one of those colors.
+Note the backslash before the space, and the proper spelling (case-sensitive!) of the color names, and no spaces around the comma!
+<p>
+Such a change must be done while Colossus is not running - otherwise, when Colossus ends it will write back the options/settings you possibly modified during the game (and thus wiping out the manual editing of the file).
+<p>
+Perhaps one day someone makes a GUI functionality for this...
+
+<h3><a NAME="#Auto_pick_markers">Autoplay - Auto pick markers</a></h3>
+If you don't care which marker will be taken for splitting a legion, mark this option - it will just pick one by random.
+
+<h3><a NAME="#Auto_pick_entry_sides">Autoplay - Auto pick entry sides</a></h3>
+
+When teleporting or when there is more than one path how you can reach
+a certain target land to attack an enemy legion there, you have to choose
+from which side you want to enter. For example, from
+Woods 30 with a movement roll of 5 or 6, you can get to the Desert 35
+directly (entering from left), or going around (entering from bottom).
+This makes only a difference if the target land is occupied by another
+player's legion, i.e. there will be an engagement.
+<p>
+Normally you would be prompted to pick the entry side; this option
+automatically picks one side for you.
+
+<h3><a NAME="#Auto_forced_strike">Autoplay - Auto forced strike</a></h3>
+
+Creatures engaged in a battle with exactly one opponent creature,
+can naturally only strike that opponent creature, and this strike is
+mandatory - thus this option would automatically do all those strikes.
+It leaves the one where there is more than one possible strike target
+for you. (Those are still mandatory, but it's your choice where to strike).
+
+<h3><a NAME="#Auto_carry_single">Autoplay - Auto carry single</a></h3>
+
+Similar to the above, if there is only one possible carry target for excess hits (more hits than needed to kill the primary target).
+
+<h3><a NAME="#Auto_angestrike_single">Autoplay - Auto rangestrike single</a></h3>
+
+Similar to the above, if there is only one possible rangestrike
+target.  One notable difference is, rangestrikes are not mandatory -
+there might be rare situations where you do not want to use all
+rangestrikes; if you play with such subtle strategy skills, in this
+case you should not use this option.
+
+<h3><a NAME="#Auto_summon_angels">Autoplay - Auto summon angels</a></h3>
+
+Will automatically decide whether to summon an angel, and if so, which
+one.  It uses the AI functionality for the decision whether to summon.
+There might be situations when you want not to summon (especially the
+after battle summon), e.g. to muster something stronger
+instead. Usually the AI should decide "right" in this case but...
+
+<h3><a NAME="#Auto_acquire angels">Autoplay - Auto acquire angels</a></h3>
+
+Will automatically acquire the angel(s) after a won battle. Uses also
+ the AI functionality to decide whether to acquire (or not, e.g. to
+have still space for a possible stronger recruit).
+<p>
+If you want full control - don't use this. Then you will be prompted.
+
+<h3><a NAME="#Auto_recruit">Autoplay - Auto recruit</a></h3>
+
+This will, at the beginning of your Muster Recruits phase, already
+select one recruit for every legion that can do so. <b>This speeds up
+the game enormously</b>, since in the majority of cases it will pick
+for you the one you would pick anyway, and you can review already
+during your movement phase what you would get there (but see note
+below).
+<p>
+And you can then always override the choice this automatic mode had
+made for you - same as how you could undo and redo any other of the
+recruit choices you made yourself.  Just click the legion once (then
+the chit disappears and nothing is mustered) and click again to get
+the "Pick recruit" dialog.
+<p>
+This auto recruit will usually pick the "best" possible recruit -
+which is in most (but not in all!) cases the "strongest" possible one;
+the best might instead be something that we call a "recruit hint". For
+example, if you have two Lions, no griffon yet, you are in a plains,
+and a Desert is in reach, then you could take a Lion or a Ranger: in
+this case the recruit hint is to take the Lion (not the Ranger), to
+enable you to get then in the Desert the griffon.  
+<p>
+(Naturally someone might want to take the 3rd Lion even if no Desert
+is directly in reach [with one dice roll], but the situation above is
+how the hint is written and how thus the AIs play.)
+<p>
+<b>See under <a HREF="#RecruitPreviewChits">Show
+recruit preview chits... in Graphics/View tab</a> for some 
+related details</b>!
+<p>
+<b><font color="red">NOTE: There are some very rare cases, where the
+actual pick recruit will pick something different than what the
+recruit preview (during move phase) showed, even in "Recruit hint"
+mode.  Details see also under the "Show recruit preview chits..."
+description.</b></font> I hope to tackle this one day...
+
+
+<h3><a NAME="#Auto_pick_recruiters">Autoplay - Auto pick recruiters</a></h3>
+
+When you have several different creatures that allow you to muster a
+new recruit, you have to decide which creatures to reveal to the other
+players - what entitles you to muster a certain creature: for example,
+do you take the Cyclops with the two Gargoyles or the Cyclops you
+already have?
+<p>
+If you don't care what is revealed, for example if every player can
+peek into everyone's legions anyway (most people play like this, and
+that is the default mode), it's just convenient to let the game just
+pick whatever choice for you.
+<p>
+If, at the other hand, you play with the option setting "Only own
+legions" (see option "Viewable legion content" in <a
+HREF="GetPlayersOptions.html#Viewable_legion_content">Setting in Get
+Players startup dialog</a>), i.e. as close to "real board game Titan
+possible", you might want to have control what is revealed and not use this
+option.
+
+<h3><a NAME="#Auto_reinforce">Autoplay - Auto reinforce</a></h3>
+
+Will automatically decide whether and which reinforcement to take during 
+a battle.
+
+<h3><a NAME="#Auto_play">Autoplay - Auto play</a></h3>
+
+This will automatically play for you - everything. It will play with
+the same logic as the SimpleAI plays. Note that this "play like an AI"
+also affects to certain other behavior aspects. For example, you will
+not get the "Game over, XXX wins" dialog.
+<p>
+After selecting this option (when it is currently already your turn),
+<b>you still have to do one action (split or move one legion, or press
+the Done button)</b> before the AI kicks in and continues.  If you
+enable this while it is currently another player's turn the AI should
+start automatically play for you once your turn starts. 
+<font color="red">(Enabling it during a battle does <b>not</b> work).</font>
+<p>
+Unlike all other options, this one here is not saved in your user options!
+<p>
+If it would be saved, or you would put it manually there, when the
+game starts your player won't even get a MasterBoard (nor any other
+window... perhaps the AutoInspector window, but that's a bug ;-) - this
+is, because this player is treated like an AI client then, and AIs simply do not get a board.
+<p>
+One possible use case for this is, if you play with several
+remote/network players and you have to postpone the game to another
+date. At that new date some player might not have time, or not be
+interested to continue. In this case, one of the remaining players can
+start another network client (on his own machine!) in place of the
+missing one, and mostly immediatey set this client to <b>Auto
+play</b>. You will then get an additional window, but you can minimize
+that and it should not bother too much. Better than not be able to
+play at all.
+<p>
+<b>Tip for "hacker-type" users:</b> For the missing-player scenario,
+you can even modify the saved .xml file and replace there the player
+type "Human" with something else, like "SimpleAI" or
+"RationalAI". (Technical implementation of this file may change, or
+perhaps may never change, but right now, technically there is no problem to
+do this trick). Then you don't even get the superfluous window(s).
+<p> 
+<hr>
+<p>
+<h2><a NAME="#GraphicsTab">Graphics/View tab</a></h2>
+
+The first four settings somehow effect the graphics - what or how something
+is shown. The first group are all kind of just optical differences 
+- which colors, rounded corners and such.
+<ul>
+<li><a HREF="#Antialias">Antialias</a></li>
+<li><a HREF="#UseGraphicalOverlay">Use Graphical Overlay</a></li>
+<li><a HREF="#UseSvgChits">Use SVG chits</a></li>
+<li><a HREF="#BlackOverlayChits">Use black overlay on Chits</a></li>
+</ul>
+The other two affect more the "View", whether/how something is shown. 
+<ul>
+<li><a HREF="#UncertainAsBlank">Uncertain as blank (Autoinspector etc.)</a></li>
+<li><a HREF="#RecruitPreviewChits">Show recruit preview chits...</a></li>
+</ul>
+
+Okay, here the detailed descriptions for both groups:
+
+<h3><a NAME="#Antialias">Antialias</a></h3>
+
+Slightly different showing of some corners of something ... *shrug*
+
+<h3><a NAME="#UseGraphicalOverlay">Use Graphical Overlay</a></h3>
+
+The different lands on the masterboard can just be a base color and a
+text printed in it, or show some fancy small graphical "overlay" picture, 
+resembling the picture in original Titan masterboard.
+<p>
+Until recently changing this setting took only effect after a rescale, 
+should be fixed now (2007 July).
+
+<h3><a NAME="#UseSvgChits">Use SVG chits</a></h3>
+
+Some different graphics files used for some purposes - anyone knowing
+details here?
+
+<h3><a NAME="#BlackOverlayChits">Use black overlay on Chits</a></h3>
+
+Print the name and values (skill and power) on creatures in black
+rather than in the creature's color.
+<p>
+After changing this only newly added chits will look different. The
+ones already visible on the board do not change immediately...
+<p>
+<hr>
+<p>
+And now the two "content"-affecting ones:
+<p>
+<h3><a NAME="#RecruitPreviewChits">Show recruit preview chits...</a></h3>
+
+When you click on a legion to move somewhere, lands light up where this
+legion can move to. In those lands are then shown small chits denoting which
+creatures this legion could muster there. This is called the recruit preview.
+<p>
+This offers 4 different (multiple exlusive) settings to decide
+what is shown as recruit preview.
+<p>
+<ul>
+<li><b>None</b> - Nothing is shown. Not sure if anyone needs this...</li>
+<li><b>Strongest</b> - The "strongest" possible recruit is shown (see below).</li>
+<li><b>Recruit hint</b> - A "recruit hint" is shown (see below).</li>
+<li><b>All</b> - All possible recruits (that this legion could get there) are shown.</li>
+</ul>
+<h4>"Strongest" vs. "Recruit Hint"</h4>
+
+Earlier there was only a setting "Show all recruit chits [or not]", and when not selected 
+that recruit preview showed then only one, the best recruit ... 
+but what is "the best", depends on the point of view.
+<p>
+<b>Strongest</b> is the one which is highest position in the recruit tree of that land 
+(visible with right click in that land, or autoinspector),
+which is not in all cases the same as the one with the highest point value 
+(skill * power). Most notifiably in Tower, Warlock has point value 20, Guardian has 24,
+still Warlock is the one highest in the tree, so with this setting "Strongest"
+you will (given you are eligible both for Guardian and Warlock) 
+always be shown the Warlock (except in some exotic variants, perhaps).
+<p>
+This is also the setting which was in effect all the last years when there was
+only the option "Show all recruit chits" (or not) and that was not selected -
+it just showed the highest from the recruit tree. Which often was the same as what
+autorecruit would take, but not always (see <a HREF="#PreviewVsAutorecruit">
+Recruit preview vs. Auto recruit</a> below).
+<p>
+<b>Recruit hint</b> shows, well, a recruit hint - a suggestion, what would be best
+to take now considering "long term strategy". 
+<p>
+For the different variants, there are (or can be) recruit hints. They suggest
+to take, depending on (beside other things) land, creatures in the legion,
+lands in reach etc., to take something different than "simply the strongest".
+Only if there is no special hint, this hint defaults to the strongest.
+<p>
+Examples for such hints are, as under auto recruit already mentioned:
+<ul>
+<li>Take a third Lion instead Ranger (to get later Griffon)</li>
+<li>Take a third Troll instead of Ranger (to get later Wyvern)</li>
+<li>Similar 3rd Centaur, 3rd Ogre, 3rd Cyclops</li>
+</ul>
+Other variants might have more, exotic combinations.
+<p>
+These hints are used also by the AI players to decide what to take.
+
+<h4><font color="red"><a NAME="#PreviewVsAutorecruit">
+    Recruit preview vs. Auto recruit</a></font></h4>
+
+Since the AIs behave mostly according to those hints, and Autoplay
+options (Auto Recruit, in this case) behave like an AI, this recruit
+hint preview mode <b>basically</b> (but see below) tells you which
+creature the auto recruit will take then in the recruit phase. Using
+this Auto recruit speeds up the game enormously: you can review
+already during your move phase what you would get there, and during
+the muster phase auto recruit picks that - in most cases this will be
+the one you would pick anyway. Thus you basically need only to do
+something special when you notice during move "ok, it suggests the
+Ranger but I <b>want</b> a Lion!"; and <b>only in this case</b>
+remember to change the recruitee in your recruit phase then for this
+one or two legions.
+<p>
+(Comment 1: Unfortunately it happens, that when there are engagements, after them,
+thus several minutes later, one has forgotten that one wanted to override
+the auto recruit decition. Make a node to your ear to remind yourself of it  ;-)
+<p>
+(Comment 2: I have a plan to, one day, implement some real "recruit already during move"
+functionality, but this still needs to consider the "after engagement situation may have changed"
+situation - due to the "according to the rules muster happen after the engagements").
+<p>
+Above it says <b>basically</b>, because there are rare situations
+where this differs.  <b><font color="red">Thus Auto recruit would then
+pick something else than what was shown as preview</font></b> (with
+"recruit hint" setting) - but as said, it's very rare.
+<p>
+There are basically two possibilities causing this:
+<ol>
+<li>Creatures running out (including defender reinforcements)<br>
+If there is one Troll left, and you move 3 legions to a land where you
+can get (as "best according to the recruit hint" of course) a Troll,
+each of it will display the Troll. But only one of them can get it
+later (this case perhaps *could* be fixed).<br>
+Also, according to rules, recruiting happens <b>after</b> all
+engagements. This means, if a defender reinforces a Troll in his 4th
+battle round, there will - when your recruit phase starts, after all
+engagements resolved - be one Troll less in the caretakers stack than
+it was during your move phase.
+
+</li>
+<li>Ongoing engagement blocks a path<br> Some (not all) recruit hints
+depend on "which lands can you reach in next roll". If there is an
+engagement somewhere in the possible movement pathes of a legion, the
+evalutation "where can this legion move to?" cannot (will not) go
+beyond this land where is an engagement. Whether you could go there
+(in your next movement turn) will depend on the outcome of that
+engagement (and/or the legion moves away by itself); thus, as example,
+some Desert does not count as reachable and thus the recruit hint
+would not suggest the 3rd Lion, show the Ranger instead.<br>If you
+then win the engagement, your own legion does not block the path to
+that Desert thus the Auto-recruit will now take the 3rd Lion.
+</ol>
+
+On the long run, the recruit phase later should then at least notify
+about this differences, e.g.: "Note: recruit preview for legion
+... showed you a Troll but now the autorecruit will take a Ranger" (=
+not enough Trolls left) - so that you can review and revise your
+recruit decisions, if needed.<br>
+Probably there is no way to make
+this 100% bulletproof already during move phase - one cannot predict
+what will happen during the engagements. (For the 1 Troll left but 3
+legions go to a land and get Troll shown as preview there are some
+possibilities).
+<p>
+<h3><a NAME="#UncertainAsBlank">Uncertain as blank (Autoinspector
+etc.)</a></h3> 
+
+This option is only available if you play with the setting/mode
+ "Ever revealed (or concludable) since start" 
+(see option "Viewable legion content" in 
+<a HREF="GetPlayersOptions.html#Viewable_legion_content">Setting in Get
+Players startup dialog</a>). For the other two modes ("Only own
+legions" and "True content for all legions") this option is simply
+irrelevant/not meaningful, thus then it is inactive (greyed out).
+<p>
+In the "Ever revealed ..." mode, some creatures had been revealed, and some
+others might be safely concluded (= are "certain") to be in a particular
+legion you are looking at - e.g. with Autoinspector, or right-clicking
+a legion marker.
+<p>
+For the remaining ones, the game always calculates some "best guess" -
+what is most likely to be there; but this information is just a guess,
+not "certain".  Depending on this setting, for the uncertain ones are
+then either shown the best guess (with a question mark over them), or
+if <b>Uncertain as blank</b> is selected, it just shows a "blank" (=no
+creature), only a question mark.
+<p>
+The rationale behind this is, if the best guess is shown, one might be
+influenced by it, unconciously trusting it, and be fooled by it. Also sometimes
+the question mark is easily overlooked on some creatures.
+<p>
+
+<hr>
+
+<h2><a NAME="#WindowsTab">Windows tab</a></h2>
+Here are some settings which effect the windows as a whole.
+<ul>
+<li><a HREF="#StealFocus">Steal focus</a></li>
+<li><a HREF="#ChangeScale">Change Scale</a></li>
+<li><a HREF="#LookFeel">Look &amp; Feel</a></li>
+</ul>
+
+<h3><a NAME="#StealFocus">Steal focus</a></h3>
+
+When a different window becomes relevant (as in "here is your action
+needed now"), like, summoning during a battle you should select the
+donor stack from master board, with this option enabled the
+"to-become-active" window might grab the focus by itself (i.e. raise
+on top of all other windows), instead of waiting for you to click on
+it (or something like that... not sure ;-)
+
+<h3><a NAME="#ChangeScale">Change Scale</a></h3>
+
+Change the scale (zoom factor) of the masterboard and all other windows.
+This is very useful e.g. in Abyssal9, where the masterboard
+is much bigger. Depending on the screen resolution some icons or
+texts might then be too small to read them, but always scrolling is
+annoying too...
+
+
+<h3><a NAME="#LookFeel">Look &amp; Feel</a></h3>
+
+This somewhat influences the Look &amp; Feel, i.e. the borders and
+text styles of the single windows (e.g. menus). Which "Look &amp; Feel"
+settings are available to you, might depend on your environment
+(OS, Java version, Window system); e.g. for me on Windows XP the
+following choices are offered:
+<ul>
+<li>Metal</li>
+<li>CDE/Motif</li>
+<li>Windows</li>
+</ul>
+
+<p>
+<hr>
+<p>
+<i>
+Created January 2008.
+<br>
+Last updated tuesday, January 8, 2008 by Clemens Katzer
+</i>
+</body>
+</html>
