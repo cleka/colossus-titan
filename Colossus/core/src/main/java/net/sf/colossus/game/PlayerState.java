@@ -34,6 +34,8 @@ public class PlayerState
 
     public PlayerState(Game game, Player player)
     {
+        assert player != null : "Player required for joining a game";
+        assert game != null : "No game without Game";
         this.player = player;
         this.game = game;
     }
@@ -48,7 +50,7 @@ public class PlayerState
         return game;
     }
 
-    public List<Legion> getLegions()
+    public List<? extends Legion> getLegions()
     {
         return Collections.unmodifiableList(this.legions);
     }

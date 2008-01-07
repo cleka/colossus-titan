@@ -12,6 +12,7 @@ import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.sf.colossus.game.PlayerState;
 import net.sf.colossus.util.Glob;
 import net.sf.colossus.util.Options;
 import net.sf.colossus.xmlparser.TerrainRecruitLoader;
@@ -24,13 +25,11 @@ import net.sf.colossus.xmlparser.TerrainRecruitLoader;
  * @author David Ripton
  */
 
-public final class Player implements Comparable<Player>
+public final class Player extends PlayerState implements Comparable<Player>
 {
     private static final Logger LOGGER = Logger.getLogger(Player.class
         .getName());
 
-    private final Game game;
-    private String name;
     private String color; // Black, Blue, Brown, Gold, Green, Red
     private String startingTower; // hex label
     private double score; // track half-points, then round
@@ -39,6 +38,13 @@ public final class Player implements Comparable<Player>
     private String playersEliminated = ""; // RdBkGr
     private int mulligansLeft = 1;
     private int movementRoll; // 0 if movement has not been rolled.
+
+    /**
+     * The server-specific copy of the legions.
+     * 
+     * TODO The base class currently has a list of legions, but that is not yet
+     * maintained. Things should move up.
+     */
     private final List<Legion> legions = new ArrayList<Legion>();
     private boolean dead;
     private boolean titanEliminated;
@@ -50,11 +56,19 @@ public final class Player implements Comparable<Player>
 
     Player(String name, Game game)
     {
-        this.name = name;
-        this.game = game;
+        super(game, net.sf.colossus.Player.getPlayerByName(name));
         type = Constants.human;
 
         net.sf.colossus.webcommon.InstanceTracker.register(this, name);
+    }
+
+    /**
+     * Overridden to return specific flavor of Game until the upper class is sufficient. 
+     */
+    @Override
+    public Game getGame()
+    {
+        return (Game)super.getGame();
     }
 
     boolean isHuman()
@@ -90,8 +104,8 @@ public final class Player implements Comparable<Player>
     void setType(final String aType)
     {
         String type = new String(aType);
-        LOGGER.log(Level.FINEST, "Called Player.setType() for " + name + " "
-            + type);
+        LOGGER.log(Level.FINEST, "Called Player.setType() for "
+            + getPlayer().getName() + " " + type);
         if (type.endsWith(Constants.anyAI))
         {
             int whichAI = Dice.rollDie(Constants.numAITypes) - 1;
@@ -161,7 +175,8 @@ public final class Player implements Comparable<Player>
                 {
                     String shortColor = allVictims.substring(i, i + 2);
                     initMarkersAvailable(shortColor);
-                    Player victim = game.getPlayerByShortColor(shortColor);
+                    Player victim = getGame()
+                        .getPlayerByShortColor(shortColor);
                     allVictims.append(victim.getPlayersElim());
                 }
                 Iterator<String> it = getLegionIds().iterator();
@@ -351,7 +366,8 @@ public final class Player implements Comparable<Player>
         return null;
     }
 
-    synchronized List<Legion> getLegions()
+    @Override
+    synchronized public List<Legion> getLegions()
     {
         return legions;
     }
@@ -433,23 +449,6 @@ public final class Player implements Comparable<Player>
         }
     }
 
-    String getName()
-    {
-        return name;
-    }
-
-    void setName(String name)
-    {
-        this.name = name;
-        net.sf.colossus.webcommon.InstanceTracker.setId(this, name);
-    }
-
-    @Override
-    public String toString()
-    {
-        return name;
-    }
-
     int getMovementRoll()
     {
         return movementRoll;
@@ -492,10 +491,10 @@ public final class Player implements Comparable<Player>
         else
         {
             movementRoll = Dice.rollDie();
-            LOGGER.log(Level.INFO, getName() + " rolls a " + movementRoll
-                + " for movement");
+            LOGGER.log(Level.INFO, getPlayer().getName() + " rolls a "
+                + movementRoll + " for movement");
         }
-        game.getServer().allTellMovementRoll(movementRoll);
+        getGame().getServer().allTellMovementRoll(movementRoll);
     }
 
     void takeMulligan()
@@ -503,8 +502,9 @@ public final class Player implements Comparable<Player>
         if (mulligansLeft > 0)
         {
             undoAllMoves();
-            LOGGER.log(Level.INFO, getName() + " takes a mulligan");
-            if (!game.getOption(Options.unlimitedMulligans))
+            LOGGER
+                .log(Level.INFO, getPlayer().getName() + " takes a mulligan");
+            if (!getGame().getOption(Options.unlimitedMulligans))
             {
                 mulligansLeft--;
             }
@@ -540,7 +540,7 @@ public final class Player implements Comparable<Player>
         {
             Legion legion = it.next();
             String hexLabel = legion.getCurrentHexLabel();
-            if (game.getNumFriendlyLegions(hexLabel, this) > 1
+            if (getGame().getNumFriendlyLegions(hexLabel, this) > 1
                 && legion.hasConventionalMove())
             {
                 LOGGER.log(Level.FINEST,
@@ -590,8 +590,8 @@ public final class Player implements Comparable<Player>
         legion.undoRecruit();
 
         // Update number of creatures in status window.
-        game.getServer().allUpdatePlayerInfo();
-        game.getServer().undidRecruit(legion, recruitName);
+        getGame().getServer().allUpdatePlayerInfo();
+        getGame().getServer().undidRecruit(legion, recruitName);
     }
 
     void undoSplit(String splitoffId)
@@ -599,7 +599,7 @@ public final class Player implements Comparable<Player>
         Legion splitoff = getLegionByMarkerId(splitoffId);
         Legion parent = splitoff.getParent();
         splitoff.recombine(parent, true);
-        game.getServer().allUpdatePlayerInfo();
+        getGame().getServer().allUpdatePlayerInfo();
     }
 
     synchronized void recombineIllegalSplits()
@@ -610,15 +610,15 @@ public final class Player implements Comparable<Player>
             Legion legion = it.next();
             // Don't use the legion's real parent, as there could have been
             // a 3-way split and the parent could be gone.
-            Legion parent = game.getFirstFriendlyLegion(legion
-                .getCurrentHexLabel(), this);
+            Legion parent = getGame().getFirstFriendlyLegion(
+                legion.getCurrentHexLabel(), this);
             if (legion != parent)
             {
                 legion.recombine(parent, false);
                 it.remove();
             }
         }
-        game.getServer().allUpdatePlayerInfo();
+        getGame().getServer().allUpdatePlayerInfo();
     }
 
     synchronized int getNumCreatures()
@@ -700,12 +700,13 @@ public final class Player implements Comparable<Player>
         if (points > 0)
         {
             score += points;
-            if (game != null)
+            if (getGame() != null)
             {
-                game.getServer().allUpdatePlayerInfo();
+                getGame().getServer().allUpdatePlayerInfo();
             }
 
-            LOGGER.log(Level.INFO, getName() + " earns " + points + " points");
+            LOGGER.log(Level.INFO, getPlayer().getName() + " earns " + points
+                + " points");
         }
     }
 
@@ -721,14 +722,14 @@ public final class Player implements Comparable<Player>
         // engaged with.  All others give half points to slayer,
         // if non-null.
 
-        Player slayer = game.getPlayer(slayerName);
+        Player slayer = getGame().getPlayer(slayerName);
 
         Iterator<Legion> itLeg = legions.iterator();
         while (itLeg.hasNext())
         {
             Legion legion = itLeg.next();
             String hexLabel = legion.getCurrentHexLabel();
-            Legion enemyLegion = game.getFirstEnemyLegion(hexLabel, this);
+            Legion enemyLegion = getGame().getFirstEnemyLegion(hexLabel, this);
             double halfPoints = legion.getPointValue() / 2.0;
 
             Player scorer;
@@ -753,7 +754,7 @@ public final class Player implements Comparable<Player>
         }
 
         // Truncate every player's score to an integer value.
-        Collection<Player> players = game.getPlayers();
+        Collection<Player> players = getGame().getPlayers();
         Iterator<Player> itPl = players.iterator();
         while (itPl.hasNext())
         {
@@ -771,15 +772,16 @@ public final class Player implements Comparable<Player>
             slayer.takeLegionMarkers(this);
         }
 
-        game.getServer().allUpdatePlayerInfo();
+        getGame().getServer().allUpdatePlayerInfo();
 
-        LOGGER.log(Level.INFO, getName() + " dies");
-        game.getServer().allTellPlayerElim(name, slayerName, true);
+        LOGGER.log(Level.INFO, getPlayer().getName() + " dies");
+        getGame().getServer().allTellPlayerElim(getPlayer().getName(),
+            slayerName, true);
 
         // See if the game is over.
         if (checkForVictory)
         {
-            game.checkForVictory();
+            getGame().checkForVictory();
         }
     }
 
@@ -799,7 +801,7 @@ public final class Player implements Comparable<Player>
     {
         List<String> li = new ArrayList<String>();
         li.add(Boolean.toString(!treatDeadAsAlive && isDead()));
-        li.add(name);
+        li.add(getPlayer().getName());
         li.add(getTower());
         li.add(getColor());
         li.add(getType());

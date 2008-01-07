@@ -1,6 +1,8 @@
 package net.sf.colossus;
 
 
+import java.util.HashMap;
+import java.util.Map;
 
 import net.sf.colossus.game.Game;
 import net.sf.colossus.game.PlayerState;
@@ -16,7 +18,42 @@ import net.sf.colossus.variant.Variant;
  * the dynamic aspects of a game and stores the player's state in the game in
  * {@link PlayerState}.
  */
-public interface Player
+public class Player
 {
-    // TODO
+    /**
+     * A name for this player for UI purposes.
+     */
+    private String name;
+
+    private static final Map<String, Player> KNOWN_PLAYERS = new HashMap<String, Player>();
+
+    public Player(String name)
+    {
+        this.name = name;
+        KNOWN_PLAYERS.put(name, this);
+    }
+
+    public String getName()
+    {
+        return name;
+    }
+
+    public void setName(String name)
+    {
+        KNOWN_PLAYERS.remove(this.name);
+        this.name = name;
+        KNOWN_PLAYERS.put(name, this);
+    }
+
+    public static Player getPlayerByName(String name)
+    {
+        Player player = KNOWN_PLAYERS.get(name);
+        // TODO remove implicit player creation once the rest of the code
+        // creates the players
+        if (player == null)
+        {
+            player = new Player(name);
+        }
+        return player;
+    }
 }

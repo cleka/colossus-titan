@@ -282,7 +282,7 @@ public final class Game extends net.sf.colossus.game.Game
         {
             Player player = players.get(i);
 
-            if (player.getName().equals(name))
+            if (player.getPlayer().getName().equals(name))
             {
                 return true;
             }
@@ -314,14 +314,15 @@ public final class Game extends net.sf.colossus.game.Game
             {
                 if (isLoadingGame())
                 {
-                    if (playerName.equals(player.getName()))
+                    if (playerName.equals(player.getPlayer().getName()))
                     {
                         return i;
                     }
                 }
                 else
                 {
-                    if (player.getName().startsWith(Constants.byClient))
+                    if (player.getPlayer().getName().startsWith(
+                        Constants.byClient))
                     {
                         return i;
                     }
@@ -339,10 +340,10 @@ public final class Game extends net.sf.colossus.game.Game
         {
             Player player = it.next();
 
-            server.oneSetOption(player.getName(), Options.autoPlay, player
-                .isAI());
-            server.oneSetOption(player.getName(), Options.playerType, player
-                .getType());
+            server.oneSetOption(player.getPlayer().getName(),
+                Options.autoPlay, player.isAI());
+            server.oneSetOption(player.getPlayer().getName(),
+                Options.playerType, player.getType());
         }
     }
 
@@ -395,7 +396,7 @@ public final class Game extends net.sf.colossus.game.Game
 
             if (player.isHuman())
             {
-                colorPickOrder.add(player.getName());
+                colorPickOrder.add(player.getPlayer().getName());
             }
         }
         for (int i = getNumPlayers() - 1; i >= 0; i--)
@@ -404,7 +405,7 @@ public final class Game extends net.sf.colossus.game.Game
 
             if (player.isAI())
             {
-                colorPickOrder.add(player.getName());
+                colorPickOrder.add(player.getPlayer().getName());
             }
         }
 
@@ -476,7 +477,7 @@ public final class Game extends net.sf.colossus.game.Game
         colorsLeft.remove(color);
         player.setColor(color);
         String type = player.getType();
-        String gotName = player.getName();
+        String gotName = player.getPlayer().getName();
         if (gotName.startsWith(Constants.byType))
         {
             String newName = makeNameByType(gotName, type);
@@ -485,7 +486,7 @@ public final class Game extends net.sf.colossus.game.Game
                 LOGGER.log(Level.INFO, "Setting for \"" + gotName
                     + "\" new name: " + newName);
                 server.setPlayerName(gotName, newName);
-                player.setName(newName);
+                player.getPlayer().setName(newName);
                 playerName = newName;
             }
             else
@@ -498,11 +499,12 @@ public final class Game extends net.sf.colossus.game.Game
 
         if (gotName.startsWith(Constants.byColor))
         {
-            server.setPlayerName(player.getName(), color);
-            player.setName(color);
+            server.setPlayerName(player.getPlayer().getName(), color);
+            player.getPlayer().setName(color);
             playerName = color;
         }
-        LOGGER.log(Level.INFO, player.getName() + " chooses color " + color);
+        LOGGER.log(Level.INFO, player.getPlayer().getName()
+            + " chooses color " + color);
         player.initMarkersAvailable();
         server.allUpdatePlayerInfo();
         server.askPickFirstMarker(playerName);
@@ -565,8 +567,8 @@ public final class Game extends net.sf.colossus.game.Game
         for (int i = 0; i < numPlayers; i++)
         {
             Player player = getPlayer(i);
-            LOGGER.log(Level.INFO, player.getName() + " gets tower "
-                + playerTower[i]);
+            LOGGER.log(Level.INFO, player.getPlayer().getName()
+                + " gets tower " + playerTower[i]);
             player.setTower(playerTower[i]);
         }
     }
@@ -689,7 +691,7 @@ public final class Game extends net.sf.colossus.game.Game
 
     String getActivePlayerName()
     {
-        return getActivePlayer().getName();
+        return getActivePlayer().getPlayer().getName();
     }
 
     int getActivePlayerNum()
@@ -717,7 +719,7 @@ public final class Game extends net.sf.colossus.game.Game
             {
                 Player player = it.next();
 
-                if (name.equals(player.getName()))
+                if (name.equals(player.getPlayer().getName()))
                 {
                     return player;
                 }
@@ -848,7 +850,7 @@ public final class Game extends net.sf.colossus.game.Game
                 break;
 
             case 1:
-                String winnerName = getWinner().getName();
+                String winnerName = getWinner().getPlayer().getName();
                 LOGGER.log(Level.INFO, "Game over -- " + winnerName
                     + " wins at " + new Date().getTime());
                 server.allTellGameOver(winnerName + " wins");
@@ -1106,7 +1108,7 @@ public final class Game extends net.sf.colossus.game.Game
         // still being around to advance the turn.
         if (player.isDead())
         {
-            advancePhase(Constants.Phase.MUSTER, player.getName());
+            advancePhase(Constants.Phase.MUSTER, player.getPlayer().getName());
         }
         else
         {
@@ -1225,7 +1227,7 @@ public final class Game extends net.sf.colossus.game.Game
                 Player player = itPl.next();
 
                 el = new Element("Player");
-                el.setAttribute("name", player.getName());
+                el.setAttribute("name", player.getPlayer().getName());
                 el.setAttribute("type", player.getType());
                 el.setAttribute("color", player.getColor());
                 el.setAttribute("startingTower", player.getTower());
@@ -1573,7 +1575,8 @@ public final class Game extends net.sf.colossus.game.Game
                     attackingPlayer);
 
                 int activeLegionNum;
-                if (battleActivePlayerName.equals(attackingPlayer.getName()))
+                if (battleActivePlayerName.equals(attackingPlayer.getPlayer()
+                    .getName()))
                 {
                     activeLegionNum = Constants.ATTACKER;
                 }
@@ -1696,7 +1699,7 @@ public final class Game extends net.sf.colossus.game.Game
                     .getCreature(), critters[5] == null ? null : critters[5]
                     .getCreature(), critters[6] == null ? null : critters[6]
                     .getCreature(), critters[7] == null ? null : critters[7]
-                    .getCreature(), player.getName(), this);
+                    .getCreature(), player.getPlayer().getName(), this);
             player.addLegion(legion);
         }
 
@@ -1970,14 +1973,14 @@ public final class Game extends net.sf.colossus.game.Game
 
     private void placeInitialLegion(Player player, String markerId)
     {
-        String name = player.getName();
+        String name = player.getPlayer().getName();
         player.selectMarkerId(markerId);
         LOGGER.log(Level.INFO, name + " selects initial marker");
 
         // Lookup coords for chit starting from player[i].getTower()
         String hexLabel = player.getTower();
         Legion legion = Legion.getStartingLegion(markerId, hexLabel, player
-            .getName(), this);
+            .getPlayer().getName(), this);
         player.addLegion(legion);
     }
 
@@ -2695,9 +2698,9 @@ public final class Game extends net.sf.colossus.game.Game
         }
         else
         {
-            server.oneRevealLegion(legion, player.getName(),
+            server.oneRevealLegion(legion, player.getPlayer().getName(),
                 Constants.reasonSplit);
-            server.oneRevealLegion(newLegion, player.getName(),
+            server.oneRevealLegion(newLegion, player.getPlayer().getName(),
                 Constants.reasonSplit);
         }
         return true;

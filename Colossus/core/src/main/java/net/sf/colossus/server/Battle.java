@@ -203,7 +203,7 @@ public final class Battle extends net.sf.colossus.game.Battle
         {
             return null;
         }
-        return getActivePlayer().getName();
+        return getActivePlayer().getPlayer().getName();
     }
 
     String getAttackerId()
