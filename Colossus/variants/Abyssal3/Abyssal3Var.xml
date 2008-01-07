@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<variant name="Abyssal3">
+    <strategic_map filename="Abyssal3Map.xml" />
+    <creatures filename="Abyssal3Cre.xml" />
+    <terrain_recruits filename="Abyssal3Ter.xml" />
+    <depends>
+        <depend variant="Abyssal6" />
+        <depend variant="ExtTitan" />
+    </depends>
+    <max_players num="3" />
+    <hint classname="Abyssal3.Abyssal3Hint" />
+</variant>
