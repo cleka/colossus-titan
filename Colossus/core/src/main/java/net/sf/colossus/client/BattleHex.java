@@ -401,15 +401,7 @@ public class BattleHex extends Hex
         int cost = NORMAL_COST;
 
         // Check to see if the hex is occupied or totally impassable.
-        if ((terrain.equals(HazardTerrain.LAKE) && (!creature
-            .isWaterDwelling()))
-            || (terrain.equals(HazardTerrain.TREE) && (!creature
-                .isNativeTree()))
-            || (terrain.equals(HazardTerrain.STONE) && (!creature
-                .isNativeStone()))
-            || (terrain.equals(HazardTerrain.VOLCANO) && (!creature
-                .isNativeVolcano()))
-            || (terrain.equals(HazardTerrain.BOG) && (!creature.isNativeBog())))
+        if (terrain.isNativeOnly() && (!creature.isNativeIn(terrain)))
         {
             cost += IMPASSIBLE_COST;
         }
@@ -442,11 +434,12 @@ public class BattleHex extends Hex
         // Bramble, drift, and sand slow non-natives, except that sand
         //     doesn't slow fliers.
         if ((terrain.equals(HazardTerrain.BRAMBLES) && !creature
-            .isNativeBramble())
+            .isNativeIn(HazardTerrain.BRAMBLES))
             || (terrain.equals(HazardTerrain.DRIFT) && !creature
-                .isNativeDrift())
+                .isNativeIn(HazardTerrain.DRIFT))
             || (terrain.equals(HazardTerrain.SAND)
-                && !creature.isNativeSandDune() && !creature.isFlier()))
+                && !creature.isNativeIn(HazardTerrain.SAND) && !creature
+                .isFlier()))
         {
             cost += SLOW_INCREMENT_COST;
         }
@@ -476,13 +469,13 @@ public class BattleHex extends Hex
         { // non-flyer can't fly, obviously...
             return false;
         }
-        if (terrain.equals(HazardTerrain.STONE))
-        { // no one can fly through stone
+        if (terrain.blocksFlying())
+        {
             return false;
         }
-        if (terrain.equals(HazardTerrain.VOLCANO))
-        { // only volcano-native can fly over volcano
-            return creature.isNativeVolcano();
+        if (terrain.isNativeOnly())
+        {
+            return creature.isNativeIn(terrain);
         }
         return (true);
     }
@@ -494,7 +487,8 @@ public class BattleHex extends Hex
      */
     public int damageToCreature(Creature creature)
     {
-        if (terrain.equals(HazardTerrain.DRIFT) && (!creature.isNativeDrift()))
+        if (terrain.equals(HazardTerrain.DRIFT)
+            && (!creature.isNativeIn(terrain)))
         { // Non-native take damage in Drift
             return 1;
         }

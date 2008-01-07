@@ -4,13 +4,17 @@ package net.sf.colossus.xmlparser;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.colossus.server.Creature;
 import net.sf.colossus.server.CreatureTitan;
+import net.sf.colossus.variant.HazardTerrain;
 
 import org.jdom.Document;
 import org.jdom.Element;
@@ -67,17 +71,44 @@ public class CreatureLoader
         boolean rangestrikes = el.getAttribute("rangestrikes")
             .getBooleanValue();
         boolean flies = el.getAttribute("flies").getBooleanValue();
+        Set<HazardTerrain> nativeTerrains = new HashSet<HazardTerrain>();
+
         // TODO why is this "bramble" while the string for the terrain is "Brambles"?
-        boolean bramble = el.getAttribute("bramble").getBooleanValue();
-        boolean drift = el.getAttribute("drift").getBooleanValue();
-        boolean bog = el.getAttribute("bog").getBooleanValue();
-        boolean sanddune = el.getAttribute("sanddune").getBooleanValue();
+        if (el.getAttribute("bramble").getBooleanValue())
+        {
+            nativeTerrains.add(HazardTerrain.BRAMBLES);
+        }
+        if (el.getAttribute("drift").getBooleanValue())
+        {
+            nativeTerrains.add(HazardTerrain.DRIFT);
+        }
+        if (el.getAttribute("bog").getBooleanValue())
+        {
+            nativeTerrains.add(HazardTerrain.BOG);
+        }
+        if (el.getAttribute("sanddune").getBooleanValue())
+        {
+            nativeTerrains.add(HazardTerrain.SAND);
+        }
         boolean slope = el.getAttribute("slope").getBooleanValue();
-        boolean volcano = el.getAttribute("volcano").getBooleanValue();
+        if (el.getAttribute("volcano").getBooleanValue())
+        {
+            nativeTerrains.add(HazardTerrain.VOLCANO);
+        }
         boolean river = el.getAttribute("river").getBooleanValue();
-        boolean stone = el.getAttribute("stone").getBooleanValue();
-        boolean tree = el.getAttribute("tree").getBooleanValue();
+        if (el.getAttribute("stone").getBooleanValue())
+        {
+            nativeTerrains.add(HazardTerrain.STONE);
+        }
+        if (el.getAttribute("tree").getBooleanValue())
+        {
+            nativeTerrains.add(HazardTerrain.TREE);
+        }
         boolean water = el.getAttribute("water").getBooleanValue();
+        if (water)
+        {
+            nativeTerrains.add(HazardTerrain.LAKE);
+        }
         boolean magic_missile = el.getAttribute("magic_missile")
             .getBooleanValue();
         boolean summonable = el.getAttribute("summonable").getBooleanValue();
@@ -91,31 +122,20 @@ public class CreatureLoader
         if (name.equals("Titan"))
         {
             creature = new CreatureTitan(name, power, skill, rangestrikes,
-                flies, bramble, drift, bog, sanddune, slope, volcano, river,
-                stone, tree, water, magic_missile, summonable, lord, demilord,
-                count, plural_name, base_color);
+                flies, nativeTerrains, slope, river, water, magic_missile,
+                summonable, lord, demilord, count, plural_name, base_color);
         }
         else
         {
             creature = new Creature(name, power, skill, rangestrikes, flies,
-                bramble, drift, bog, sanddune, slope, volcano, river, stone,
-                tree, water, magic_missile, summonable, lord, demilord, count,
-                plural_name, base_color);
+                nativeTerrains, slope, river, water, magic_missile,
+                summonable, lord, demilord, count, plural_name, base_color);
         }
         this.creatures.add(creature);
     }
 
     public List<Creature> getCreatures()
     {
-        List<Creature> copy = new ArrayList<Creature>();
-        try
-        {
-            copy.addAll(this.creatures);
-        }
-        catch (NullPointerException ex)
-        {
-            LOGGER.log(Level.WARNING, "Caught in CreatureLoader " + ex);
-        }
-        return copy;
+        return Collections.unmodifiableList(this.creatures);
     }
 }

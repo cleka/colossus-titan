@@ -37,6 +37,26 @@ public class HazardTerrain
     private final boolean isNonNativePenaltyTerrain;
 
     /**
+     * Determines if only native characters can enter the terrain.
+     */
+    private final boolean isNativeOnly;
+
+    /**
+     * Determines if only flyers can enter the terrain.
+     */
+    private final boolean isFlyersOnly;
+
+    /**
+     * Determines if a non-native gets slowed in the terrain.
+     */
+    private final boolean slowsNonNative;
+
+    /**
+     * Determines if flyers are not allowed to pass either.
+     */
+    private final boolean blocksFlying;
+
+    /**
      * A map from the serialization string of a terrain to the instances.
      * 
      * This is a Map<String,HazardTerrain>.
@@ -44,12 +64,17 @@ public class HazardTerrain
     private final static Map<String, HazardTerrain> TERRAIN_MAP = new HashMap<String, HazardTerrain>();
 
     public HazardTerrain(String name, char token, boolean nativeBonus,
-        boolean nonNativePenalty)
+        boolean nonNativePenalty, boolean nativeOnly, boolean flyerOnly,
+        boolean slowsNonNative, boolean blocksFlying)
     {
         this.name = name;
         this.token = new Character(token);
         this.isNativeBonusTerrain = nativeBonus;
         this.isNonNativePenaltyTerrain = nonNativePenalty;
+        this.isNativeOnly = nativeOnly;
+        this.isFlyersOnly = flyerOnly;
+        this.slowsNonNative = slowsNonNative;
+        this.blocksFlying = blocksFlying;
         assert TERRAIN_MAP.get(this.token) == null : "Duplicate terrain token not allowed";
         TERRAIN_MAP.put(name, this);
     }
@@ -74,6 +99,26 @@ public class HazardTerrain
         return isNonNativePenaltyTerrain;
     }
 
+    public boolean isNativeOnly()
+    {
+        return isNativeOnly;
+    }
+
+    public boolean isFlyersOnly()
+    {
+        return isFlyersOnly;
+    }
+
+    public boolean slowsNonNative()
+    {
+        return slowsNonNative;
+    }
+
+    public boolean blocksFlying()
+    {
+        return blocksFlying;
+    }
+
     public static HazardTerrain getTerrainByName(String name)
     {
         return TERRAIN_MAP.get(name);
@@ -85,32 +130,32 @@ public class HazardTerrain
     }
 
     public static final HazardTerrain PLAINS = new HazardTerrain("Plains",
-        'p', false, false);
+        'p', false, false, false, false, false, false);
 
     public static final HazardTerrain BRAMBLES = new HazardTerrain("Brambles",
-        'r', true, true);
+        'r', true, true, false, false, false, false);
 
     public static final HazardTerrain SAND = new HazardTerrain("Sand", 's',
-        false, false);
+        false, false, false, false, false, false);
 
     public static final HazardTerrain TREE = new HazardTerrain("Tree", 't',
-        false, false);
+        false, false, true, false, false, false);
 
     public static final HazardTerrain BOG = new HazardTerrain("Bog", 'o',
-        false, false);
+        false, false, true, false, false, false);
 
     public static final HazardTerrain VOLCANO = new HazardTerrain("Volcano",
-        'v', true, false);
+        'v', true, false, true, false, false, false);
 
     public static final HazardTerrain DRIFT = new HazardTerrain("Drift", 'd',
-        false, true);
+        false, true, false, false, false, false);
 
     public static final HazardTerrain TOWER = new HazardTerrain("Tower", 'w',
-        false, false);
+        false, false, false, false, false, false);
 
     public static final HazardTerrain LAKE = new HazardTerrain("Lake", 'l',
-        false, false);
+        false, false, true, false, false, false);
 
     public static final HazardTerrain STONE = new HazardTerrain("Stone", 'n',
-        false, false);
+        false, false, true, false, false, true);
 }

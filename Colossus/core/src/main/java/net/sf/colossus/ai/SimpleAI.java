@@ -3409,7 +3409,7 @@ public class SimpleAI implements AI
                 * getCombatValue(critter, terrain);
         }
         else if (hex.isNativeBonusTerrain()
-            && critter.getCreature().isNativeTerrain(hex.getTerrain()))
+            && critter.getCreature().isNativeIn(hex.getTerrain()))
         {
             value += bec.NATIVE_BONUS_TERRAIN;
 
@@ -3449,7 +3449,7 @@ public class SimpleAI implements AI
         // Critter is not native or the terrain is not beneficial
         {
             if (hex.isNonNativePenaltyTerrain()
-                && (!critter.getCreature().isNativeTerrain(hex.getTerrain())))
+                && (!critter.getCreature().isNativeIn(hex.getTerrain())))
             {
                 value += bec.NON_NATIVE_PENALTY_TERRAIN;
 

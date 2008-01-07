@@ -90,20 +90,20 @@ public class MasterHex extends Hex
         int bonusHazardCount = 0;
         int bonusHazardSideCount = 0;
 
-        for (Iterator<HazardTerrain> iterator = HazardTerrain.getAllHazardTerrains()
-            .iterator(); iterator.hasNext();)
+        for (Iterator<HazardTerrain> iterator = HazardTerrain
+            .getAllHazardTerrains().iterator(); iterator.hasNext();)
         {
             HazardTerrain hTerrain = iterator.next();
             int count = HexMap.getHazardCountInTerrain(hTerrain, terrain);
             if (hTerrain.isNativeBonusTerrain()
-                && creature.isNativeTerrain(hTerrain))
+                && creature.isNativeIn(hTerrain))
             {
                 bonusHazardCount += count;
             }
             else
             {
                 if (hTerrain.isNonNativePenaltyTerrain()
-                    && !creature.isNativeTerrain(hTerrain))
+                    && !creature.isNativeIn(hTerrain))
                 {
                     bonusHazardCount -= count;
                 }

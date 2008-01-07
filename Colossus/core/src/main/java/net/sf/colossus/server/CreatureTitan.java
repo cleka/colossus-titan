@@ -1,8 +1,11 @@
 package net.sf.colossus.server;
 
 
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import net.sf.colossus.variant.HazardTerrain;
 
 
 /**
@@ -22,18 +25,15 @@ public class CreatureTitan extends Creature
         .getName());
 
     public CreatureTitan(String name, int power, int skill,
-        boolean rangestrikes, boolean flies, boolean nativeBramble,
-        boolean nativeDrift, boolean nativeBog, boolean nativeSandDune,
-        boolean nativeSlope, boolean nativeVolcano, boolean nativeRiver,
-        boolean nativeStone, boolean nativeTree, boolean waterDwelling,
-        boolean magicMissile, boolean summonable, boolean lord,
-        boolean demilord, int maxCount, String pluralName, String baseColor)
+        boolean rangestrikes, boolean flies,
+        Set<HazardTerrain> nativeTerrrains, boolean nativeSlope,
+        boolean nativeRiver, boolean waterDwelling, boolean magicMissile,
+        boolean summonable, boolean lord, boolean demilord, int maxCount,
+        String pluralName, String baseColor)
     {
-        super(name, power, skill, rangestrikes, flies, nativeBramble,
-            nativeDrift, nativeBog, nativeSandDune, nativeSlope,
-            nativeVolcano, nativeRiver, nativeStone, nativeTree,
-            waterDwelling, magicMissile, summonable, lord, demilord, maxCount,
-            pluralName, baseColor);
+        super(name, power, skill, rangestrikes, flies, nativeTerrrains,
+            nativeSlope, nativeRiver, waterDwelling, magicMissile, summonable,
+            lord, demilord, maxCount, pluralName, baseColor);
 
         if (!name.equals(Constants.titan))
         {

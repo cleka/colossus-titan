@@ -129,7 +129,7 @@ public final class ShowCreatureDetails extends KDialog implements
             .getAllHazardTerrains().iterator(); iterator.hasNext();)
         {
             HazardTerrain terrain = iterator.next();
-            if (creature.isNativeTerrain(terrain))
+            if (creature.isNativeIn(terrain))
             {
                 buf.append(terrain.getName());
                 buf.append(", ");

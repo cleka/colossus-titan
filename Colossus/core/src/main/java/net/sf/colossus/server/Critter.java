@@ -927,7 +927,7 @@ public class Critter extends net.sf.colossus.game.Creature implements
 
     public boolean isNativeTerrain(HazardTerrain t)
     {
-        return getCreature().isNativeTerrain(t);
+        return getCreature().isNativeIn(t);
     }
 
     public boolean isNativeHexside(char h)
@@ -937,22 +937,22 @@ public class Critter extends net.sf.colossus.game.Creature implements
 
     public boolean isNativeBramble()
     {
-        return getCreature().isNativeBramble();
+        return getCreature().isNativeIn(HazardTerrain.BRAMBLES);
     }
 
     public boolean isNativeDrift()
     {
-        return getCreature().isNativeDrift();
+        return getCreature().isNativeIn(HazardTerrain.DRIFT);
     }
 
     public boolean isNativeBog()
     {
-        return getCreature().isNativeBog();
+        return getCreature().isNativeIn(HazardTerrain.BOG);
     }
 
     public boolean isNativeSandDune()
     {
-        return getCreature().isNativeSandDune();
+        return getCreature().isNativeIn(HazardTerrain.SAND);
     }
 
     public boolean isNativeSlope()
@@ -962,7 +962,7 @@ public class Critter extends net.sf.colossus.game.Creature implements
 
     public boolean isNativeVolcano()
     {
-        return getCreature().isNativeVolcano();
+        return getCreature().isNativeIn(HazardTerrain.VOLCANO);
     }
 
     public boolean isNativeRiver()
@@ -972,12 +972,12 @@ public class Critter extends net.sf.colossus.game.Creature implements
 
     public boolean isNativeStone()
     {
-        return getCreature().isNativeStone();
+        return getCreature().isNativeIn(HazardTerrain.STONE);
     }
 
     public boolean isNativeTree()
     {
-        return getCreature().isNativeTree();
+        return getCreature().isNativeIn(HazardTerrain.TREE);
     }
 
     public boolean isWaterDwelling()

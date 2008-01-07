@@ -835,14 +835,15 @@ public final class Strike
         baseDice = (baseDice != dice ? dice : baseDice);
 
         boolean rangestrike = !client.isInContact(chit, true);
+        HazardTerrain terrain = hex.getTerrain();
         if (rangestrike)
         {
             // Divide power in half, rounding down.
             dice /= 2;
 
             // volcanoNative rangestriking from volcano: +2
-            if (striker.isNativeVolcano()
-                && hex.getTerrain().equals(HazardTerrain.VOLCANO))
+            if (terrain.equals(HazardTerrain.VOLCANO)
+                && striker.isNativeIn(terrain))
             {
                 dice += 2;
             }
@@ -851,8 +852,8 @@ public final class Strike
         {
             // Dice can be modified by terrain.
             // volcanoNative striking from volcano: +2
-            if (striker.isNativeVolcano()
-                && hex.getTerrain().equals(HazardTerrain.VOLCANO))
+            if (terrain.equals(HazardTerrain.VOLCANO)
+                && striker.isNativeIn(terrain))
             {
                 dice += 2;
             }
@@ -862,7 +863,7 @@ public final class Strike
             char hexside = hex.getHexside(direction);
 
             // Native striking down a dune hexside: +2
-            if (hexside == 'd' && striker.isNativeSandDune())
+            if (hexside == 'd' && striker.isNativeIn(HazardTerrain.SAND))
             {
                 dice += 2;
             }
@@ -872,7 +873,7 @@ public final class Strike
                 dice++;
             }
             // Non-native striking up a dune hexside: -1
-            else if (!striker.isNativeSandDune()
+            else if (!striker.isNativeIn(HazardTerrain.SAND)
                 && hex.getOppositeHexside(direction) == 'd')
             {
                 dice--;
@@ -895,8 +896,9 @@ public final class Strike
         if (!rangestrike)
         {
             // Non-native striking out of bramble: -1
-            if (hex.getTerrain().equals(HazardTerrain.BRAMBLES)
-                && !striker.getCreature().isNativeBramble())
+            HazardTerrain terrain = hex.getTerrain();
+            if (terrain.isNonNativePenaltyTerrain()
+                && !striker.getCreature().isNativeIn(terrain))
             {
                 attackerSkill--;
             }
@@ -935,7 +937,7 @@ public final class Strike
             }
 
             // Non-native rangestrikes: -1 per intervening bramble hex
-            if (!striker.getCreature().isNativeBramble())
+            if (!striker.getCreature().isNativeIn(HazardTerrain.BRAMBLES))
             {
                 attackerSkill -= countBrambleHexes(hex, targetHex);
             }
@@ -979,8 +981,8 @@ public final class Strike
         //     non-magicMissile: +1
         if (client.getBattleHex(target).getTerrain().equals(
             HazardTerrain.BRAMBLES)
-            && target.getCreature().isNativeBramble()
-            && !striker.getCreature().isNativeBramble()
+            && target.getCreature().isNativeIn(HazardTerrain.BRAMBLES)
+            && !striker.getCreature().isNativeIn(HazardTerrain.BRAMBLES)
             && !(rangestrike && striker.getCreature().useMagicMissile()))
         {
             strikeNumber++;
@@ -991,8 +993,8 @@ public final class Strike
         //     non-magicMissile: +1
         if (client.getBattleHex(target).getTerrain().equals(
             HazardTerrain.STONE)
-            && target.getCreature().isNativeStone()
-            && !striker.getCreature().isNativeStone()
+            && target.getCreature().isNativeIn(HazardTerrain.STONE)
+            && !striker.getCreature().isNativeIn(HazardTerrain.STONE)
             && !(rangestrike && striker.getCreature().useMagicMissile()))
         {
             strikeNumber++;
@@ -1003,8 +1005,9 @@ public final class Strike
         //     non-magicMissile: no effect
         if (client.getBattleHex(target).getTerrain()
             .equals(HazardTerrain.TREE)
-            && target.getCreature().isNativeTree()
-            && !striker.getCreature().isNativeTree() && !(rangestrike))
+            && target.getCreature().isNativeIn(HazardTerrain.TREE)
+            && !striker.getCreature().isNativeIn(HazardTerrain.TREE)
+            && !(rangestrike))
         {
             strikeNumber++;
         }

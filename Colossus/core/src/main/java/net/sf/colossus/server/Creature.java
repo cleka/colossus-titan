@@ -5,9 +5,11 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.WeakHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -42,15 +44,8 @@ public class Creature extends CreatureType implements Comparable<Creature>
     private final int skill;
     private final boolean rangestrikes;
     private final boolean flies;
-    private final boolean nativeBramble;
-    private final boolean nativeDrift;
-    private final boolean nativeBog;
-    private final boolean nativeSandDune;
     private final boolean nativeSlope;
-    private final boolean nativeVolcano;
     private final boolean nativeRiver;
-    private final boolean nativeStone;
-    private final boolean nativeTree;
     private final boolean waterDwelling;
     private final boolean magicMissile;
     private final boolean summonable;
@@ -61,35 +56,27 @@ public class Creature extends CreatureType implements Comparable<Creature>
     private static boolean noBaseColor = false;
 
     public static final Creature unknown = new Creature("Unknown", 1, 1,
-        false, false, false, false, false, false, false, false, false, false,
-        false, false, false, false, false, false, 1, "Unknown", null);
+        false, false, new HashSet<HazardTerrain>(), false, false, false,
+        false, false, false, false, 1, "Unknown", null);
 
     /** Sometimes we need to iterate through all creature types. */
     private static List<Creature> creatures = new ArrayList<Creature>();
     private static List<Creature> summonableCreatures = new ArrayList<Creature>();
 
     public Creature(String name, int power, int skill, boolean rangestrikes,
-        boolean flies, boolean nativeBramble, boolean nativeDrift,
-        boolean nativeBog, boolean nativeSandDune, boolean nativeSlope,
-        boolean nativeVolcano, boolean nativeRiver, boolean nativeStone,
-        boolean nativeTree, boolean waterDwelling, boolean magicMissile,
-        boolean summonable, boolean lord, boolean demilord, int maxCount,
-        String pluralName, String baseColor)
+        boolean flies, Set<HazardTerrain> nativeTerrrains,
+        boolean nativeSlope, boolean nativeRiver, boolean waterDwelling,
+        boolean magicMissile, boolean summonable, boolean lord,
+        boolean demilord, int maxCount, String pluralName, String baseColor)
     {
+        super(nativeTerrrains);
         this.name = name;
         this.power = power;
         this.skill = skill;
         this.rangestrikes = rangestrikes;
         this.flies = flies;
-        this.nativeBramble = nativeBramble;
-        this.nativeDrift = nativeDrift;
-        this.nativeBog = nativeBog;
-        this.nativeSandDune = nativeSandDune;
         this.nativeSlope = nativeSlope;
-        this.nativeVolcano = nativeVolcano;
         this.nativeRiver = nativeRiver;
-        this.nativeStone = nativeStone;
-        this.nativeTree = nativeTree;
         this.waterDwelling = waterDwelling;
         this.magicMissile = magicMissile;
         this.summonable = summonable;
@@ -100,7 +87,7 @@ public class Creature extends CreatureType implements Comparable<Creature>
         this.baseColor = baseColor;
 
         /* warn about likely inappropriate combinations */
-        if (waterDwelling && nativeSandDune)
+        if (waterDwelling && isNativeIn(HazardTerrain.SAND))
         {
             LOGGER.log(Level.WARNING, "Creature " + name
                 + " is both a Water Dweller and native to Sand and Dune.");
@@ -286,54 +273,6 @@ public class Creature extends CreatureType implements Comparable<Creature>
         return flies;
     }
 
-    public boolean isNativeTerrain(HazardTerrain t)
-    {
-        if (t.equals(HazardTerrain.PLAINS))
-        { /* undefined */
-            return false;
-        }
-        else if (t.equals(HazardTerrain.TOWER))
-        { /* undefined, beneficial for everyone */
-            return true;
-        }
-        else if (t.equals(HazardTerrain.BRAMBLES))
-        {
-            return isNativeBramble();
-        }
-        else if (t.equals(HazardTerrain.SAND))
-        {
-            return isNativeSandDune();
-        }
-        else if (t.equals(HazardTerrain.TREE))
-        {
-            return isNativeTree();
-        }
-        else if (t.equals(HazardTerrain.BOG))
-        {
-            return isNativeBog();
-        }
-        else if (t.equals(HazardTerrain.VOLCANO))
-        {
-            return isNativeVolcano();
-        }
-        else if (t.equals(HazardTerrain.DRIFT))
-        {
-            return isNativeDrift();
-        }
-        else if (t.equals(HazardTerrain.LAKE))
-        {
-            return isWaterDwelling();
-        }
-        else if (t.equals(HazardTerrain.STONE))
-        {
-            return isNativeStone();
-        }
-        else
-        {
-            return false;
-        }
-    }
-
     public boolean isNativeHexside(char h)
     {
         switch (h)
@@ -345,7 +284,7 @@ public class Creature extends CreatureType implements Comparable<Creature>
                 return false;
 
             case 'd':
-                return isNativeSandDune();
+                return isNativeIn(HazardTerrain.SAND);
 
             case 'c': /* undefined */
                 return false;
@@ -361,49 +300,14 @@ public class Creature extends CreatureType implements Comparable<Creature>
         }
     }
 
-    public boolean isNativeBramble()
-    {
-        return nativeBramble;
-    }
-
-    public boolean isNativeDrift()
-    {
-        return nativeDrift;
-    }
-
-    public boolean isNativeBog()
-    {
-        return nativeBog;
-    }
-
-    public boolean isNativeSandDune()
-    {
-        return nativeSandDune;
-    }
-
     public boolean isNativeSlope()
     {
         return nativeSlope;
     }
 
-    public boolean isNativeVolcano()
-    {
-        return nativeVolcano;
-    }
-
     public boolean isNativeRiver()
     {
         return nativeRiver;
-    }
-
-    public boolean isNativeStone()
-    {
-        return nativeStone;
-    }
-
-    public boolean isNativeTree()
-    {
-        return nativeTree;
     }
 
     public boolean isWaterDwelling()
