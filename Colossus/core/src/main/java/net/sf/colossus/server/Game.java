@@ -2012,7 +2012,7 @@ public final class Game extends net.sf.colossus.game.Game
     {
         Set<String> set = new HashSet<String>();
         String hexLabel = hex.getLabel();
-        Player player = legion.getPlayer();
+        Player player = legion.getPlayerState();
 
         // If there are enemy legions in this hex, mark it
         // as a legal move and stop recursing.  If there is
@@ -2234,7 +2234,7 @@ public final class Game extends net.sf.colossus.game.Game
     Set<String> listTeleportMoves(Legion legion, MasterHex hex,
         int movementRoll, boolean ignoreFriends)
     {
-        Player player = legion.getPlayer();
+        Player player = legion.getPlayerState();
         Set<String> set = new HashSet<String>();
         if (movementRoll != 6 || legion.hasMoved() || player.hasTeleported())
         {
@@ -2318,7 +2318,7 @@ public final class Game extends net.sf.colossus.game.Game
     {
         Set<String> entrySides = new HashSet<String>();
         Legion legion = getLegionByMarkerId(markerId);
-        Player player = legion.getPlayer();
+        Player player = legion.getPlayerState();
         int movementRoll = player.getMovementRoll();
         MasterHex currentHex = legion.getCurrentHex();
         MasterHex targetHex = MasterBoard.getHexByLabel(targetHexLabel);
@@ -2513,7 +2513,7 @@ public final class Game extends net.sf.colossus.game.Game
             // Remove battle info from winning legion and its creatures.
             winner.clearBattleInfo();
 
-            if (winner.getPlayer() == getActivePlayer())
+            if (winner.getPlayerState() == getActivePlayer())
             {
                 // Attacker won, so possibly summon angel.
                 if (winner.canSummonAngel())
@@ -2544,7 +2544,7 @@ public final class Game extends net.sf.colossus.game.Game
     {
         Legion legion = getLegionByMarkerId(markerId);
         Set<String> set = new HashSet<String>();
-        List<Legion> legions = legion.getPlayer().getLegions();
+        List<Legion> legions = legion.getPlayerState().getLegions();
         Iterator<Legion> it = legions.iterator();
         while (it.hasNext())
         {
@@ -2577,7 +2577,7 @@ public final class Game extends net.sf.colossus.game.Game
     boolean doSplit(String parentId, String childId, String results)
     {
         Legion legion = getLegionByMarkerId(parentId);
-        Player player = legion.getPlayer();
+        Player player = legion.getPlayerState();
 
         // Need a legion marker to split.
         if (!player.isMarkerAvailable(childId))
@@ -2718,7 +2718,7 @@ public final class Game extends net.sf.colossus.game.Game
             return "Legion null";
         }
 
-        Player player = legion.getPlayer();
+        Player player = legion.getPlayerState();
         // Verify that the move is legal.
         if (teleport)
         {
@@ -2859,7 +2859,7 @@ public final class Game extends net.sf.colossus.game.Game
     {
         Legion defender = getLegionByMarkerId(markerId);
         String hexLabel = defender.getCurrentHexLabel();
-        Legion attacker = getFirstEnemyLegion(hexLabel, defender.getPlayer());
+        Legion attacker = getFirstEnemyLegion(hexLabel, defender.getPlayerState());
 
         handleConcession(defender, attacker, true);
     }
@@ -2875,7 +2875,7 @@ public final class Game extends net.sf.colossus.game.Game
             Legion attacker = getLegionByMarkerId(markerId);
             String hexLabel = attacker.getCurrentHexLabel();
             Legion defender = getFirstEnemyLegion(hexLabel, attacker
-                .getPlayer());
+                .getPlayerState());
 
             handleConcession(attacker, defender, false);
         }
@@ -3010,11 +3010,11 @@ public final class Game extends net.sf.colossus.game.Game
         // Add points, and angels if necessary.
         winner.addPoints(points);
         // Remove any fractional points.
-        winner.getPlayer().truncScore();
+        winner.getPlayerState().truncScore();
 
         // Need to grab the player reference before the legion is
         // removed.
-        Player losingPlayer = loser.getPlayer();
+        Player losingPlayer = loser.getPlayerState();
 
         String reason = fled ? Constants.reasonFled
             : Constants.reasonConcession;
@@ -3069,20 +3069,20 @@ public final class Game extends net.sf.colossus.game.Game
             if (attacker.hasTitan() && defender.hasTitan())
             {
                 // Make defender die first, to simplify turn advancing.
-                defender.getPlayer().die(null, false);
-                attacker.getPlayer().die(null, true);
+                defender.getPlayerState().die(null, false);
+                attacker.getPlayerState().die(null, true);
             }
 
             // If either was the titan stack, its owner dies and gives
             // half points to the victor.
             else if (attacker.hasTitan())
             {
-                attacker.getPlayer().die(defender.getPlayerName(), true);
+                attacker.getPlayerState().die(defender.getPlayerName(), true);
             }
 
             else if (defender.hasTitan())
             {
-                defender.getPlayer().die(attacker.getPlayerName(), true);
+                defender.getPlayerState().die(attacker.getPlayerName(), true);
             }
         }
         else
@@ -3129,7 +3129,7 @@ public final class Game extends net.sf.colossus.game.Game
 
             points = loser.getPointValue();
 
-            Player losingPlayer = loser.getPlayer();
+            Player losingPlayer = loser.getPlayerState();
 
             // Remove the losing legion.
             loser.remove();
@@ -3160,7 +3160,7 @@ public final class Game extends net.sf.colossus.game.Game
             else
             {
                 if (attacker.getHeight() < 7
-                    && !attacker.getPlayer().hasSummoned())
+                    && !attacker.getPlayerState().hasSummoned())
                 {
                     // If the attacker won the battle by agreement,
                     // he may summon an angel.

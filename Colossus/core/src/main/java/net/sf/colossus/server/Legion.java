@@ -37,7 +37,6 @@ public final class Legion extends net.sf.colossus.game.Legion implements
     private int entrySide = -1;
     private boolean teleported;
     private String recruitName;
-    private final String playerName;
     private int battleTally;
     private final Game game;
     private int angelsToAcquire;
@@ -48,6 +47,7 @@ public final class Legion extends net.sf.colossus.game.Legion implements
         Creature creature5, Creature creature6, Creature creature7,
         String playerName, Game game)
     {
+        super(net.sf.colossus.Player.getPlayerByName(playerName));
         this.markerId = markerId;
         this.parentId = parentId;
         // Sanity check
@@ -57,7 +57,6 @@ public final class Legion extends net.sf.colossus.game.Legion implements
         }
         this.currentHexLabel = currentHexLabel;
         this.startingHexLabel = startingHexLabel;
-        this.playerName = playerName;
         this.game = game;
 
         if (creature0 != null)
@@ -143,7 +142,7 @@ public final class Legion extends net.sf.colossus.game.Legion implements
         {
             return;
         }
-        Player player = getPlayer();
+        Player player = getPlayerState();
         int score = player.getScore(); // 375
         player.addPoints(points); // 375 + 150 = 525
         int value = TerrainRecruitLoader.getAcquirableRecruitmentsValue();
@@ -279,7 +278,7 @@ public final class Legion extends net.sf.colossus.game.Legion implements
 
     Legion getParent()
     {
-        return getPlayer().getLegionByMarkerId(parentId);
+        return getPlayerState().getLegionByMarkerId(parentId);
     }
 
     @Override
@@ -415,10 +414,10 @@ public final class Legion extends net.sf.colossus.game.Legion implements
 
     public String getPlayerName()
     {
-        return playerName;
+        return getPlayer().getName();
     }
 
-    Player getPlayer()
+    Player getPlayerState()
     {
         return game.getPlayerByMarkerId(markerId);
     }
@@ -437,9 +436,9 @@ public final class Legion extends net.sf.colossus.game.Legion implements
     void remove(boolean returnCrittersToStacks, boolean updateHistory)
     {
         prepareToRemove(returnCrittersToStacks, updateHistory);
-        if (getPlayer() != null)
+        if (getPlayerState() != null)
         {
-            getPlayer().removeLegion(this);
+            getPlayerState().removeLegion(this);
         }
     }
 
@@ -473,16 +472,16 @@ public final class Legion extends net.sf.colossus.game.Legion implements
         {
             game.getServer().allRemoveLegion(markerId);
         }
-        if (getPlayer() != null)
+        if (getPlayerState() != null)
         {
-            getPlayer().addLegionMarker(getMarkerId());
+            getPlayerState().addLegionMarker(getMarkerId());
         }
     }
 
     void moveToHex(MasterHex hex, String entrySide, boolean teleported,
         String teleportingLord)
     {
-        Player player = getPlayer();
+        Player player = getPlayerState();
         String hexLabel = hex.getLabel();
 
         currentHexLabel = hexLabel;
@@ -502,7 +501,7 @@ public final class Legion extends net.sf.colossus.game.Legion implements
             + " in "
             + getStartingHexLabel()
             + (teleported ? (game.getNumEnemyLegions(hexLabel, game
-                .getPlayer(playerName)) > 0 ? " titan teleports "
+                .getPlayer(getPlayer().getName())) > 0 ? " titan teleports "
                 : " tower teleports (" + teleportingLord + ") ") : " moves ")
             + "to " + hex.getDescription() + " entering on " + entrySide);
     }
@@ -510,7 +509,7 @@ public final class Legion extends net.sf.colossus.game.Legion implements
     boolean hasConventionalMove()
     {
         return !game.listNormalMoves(this, getCurrentHex(),
-            getPlayer().getMovementRoll(), false).isEmpty();
+            getPlayerState().getMovementRoll(), false).isEmpty();
     }
 
     void undoMove()
@@ -521,7 +520,7 @@ public final class Legion extends net.sf.colossus.game.Legion implements
             if (hasTeleported())
             {
                 setTeleported(false);
-                getPlayer().setTeleported(false);
+                getPlayerState().setTeleported(false);
             }
 
             currentHexLabel = startingHexLabel;
@@ -560,7 +559,7 @@ public final class Legion extends net.sf.colossus.game.Legion implements
     boolean canRecruit()
     {
         return (recruitName == null && getHeight() <= 6
-            && !getPlayer().isDead() && !(game.findEligibleRecruits(
+            && !getPlayerState().isDead() && !(game.findEligibleRecruits(
             getMarkerId(), getCurrentHexLabel()).isEmpty()));
     }
 
@@ -580,7 +579,7 @@ public final class Legion extends net.sf.colossus.game.Legion implements
     /** Return true if this legion can summon. */
     boolean canSummonAngel()
     {
-        Player player = getPlayer();
+        Player player = getPlayerState();
         if (getHeight() >= 7 || player.hasSummoned())
         {
             return false;
@@ -856,7 +855,7 @@ public final class Legion extends net.sf.colossus.game.Legion implements
      */
     Legion split(List<Creature> creatures, String newMarkerId)
     {
-        Player player = getPlayer();
+        Player player = getPlayerState();
         if (newMarkerId == null)
         {
             return null;
@@ -864,7 +863,7 @@ public final class Legion extends net.sf.colossus.game.Legion implements
 
         player.selectMarkerId(newMarkerId);
         Legion newLegion = Legion.getEmptyLegion(newMarkerId, markerId,
-            currentHexLabel, playerName, game);
+            currentHexLabel, getPlayer().getName(), game);
 
         Iterator<Creature> it = creatures.iterator();
         while (it.hasNext())
@@ -904,7 +903,7 @@ public final class Legion extends net.sf.colossus.game.Legion implements
         List<String> lords = new ArrayList<String>();
 
         // Titan teleport
-        if (game.getNumEnemyLegions(hexLabel, getPlayer()) >= 1)
+        if (game.getNumEnemyLegions(hexLabel, getPlayerState()) >= 1)
         {
             if (hasTitan())
             {

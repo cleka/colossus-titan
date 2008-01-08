@@ -736,7 +736,7 @@ public final class Player extends PlayerState implements Comparable<Player>
 
             if (enemyLegion != null)
             {
-                scorer = enemyLegion.getPlayer();
+                scorer = enemyLegion.getPlayerState();
             }
             else
             {

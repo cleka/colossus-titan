@@ -1,7 +1,6 @@
 package net.sf.colossus.client;
 
 
-import java.rmi.server.UID;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -30,7 +29,6 @@ public final class PlayerInfo extends PlayerState
     private Client client;
 
     private boolean dead;
-    private String name;
     private String tower;
     private String color;
     private String type;
@@ -46,13 +44,12 @@ public final class PlayerInfo extends PlayerState
         new MarkerComparator(getShortColor()));
 
     /** Two-stage initialization. */
-    PlayerInfo(Client client)
+    PlayerInfo(Client client, net.sf.colossus.Player player)
     {
         // a total hack to pass something into the super constructor. The name of the new player
         // is just designed to be unique enough not to confuse the static map in the Player class
         // the actual name will be set later (which needs to change).
-        super(new Game(null, new net.sf.colossus.Player[0]),
-            new net.sf.colossus.Player(new UID().toString()));
+        super(new Game(null, new net.sf.colossus.Player[0]), player);
         this.client = client;
         net.sf.colossus.server.CustomRecruitBase.addPlayerInfo(this);
         net.sf.colossus.webcommon.InstanceTracker.register(this, client
@@ -70,7 +67,7 @@ public final class PlayerInfo extends PlayerState
         buf = data.remove(0);
         setDead(Boolean.valueOf(buf).booleanValue());
 
-        setName(data.remove(0));
+        getPlayer().setName(data.remove(0));
 
         setTower(data.remove(0));
 
@@ -111,16 +108,6 @@ public final class PlayerInfo extends PlayerState
     public boolean isAI()
     {
         return type.endsWith(Constants.ai);
-    }
-
-    void setName(String name)
-    {
-        this.name = name;
-    }
-
-    public String getName()
-    {
-        return name;
     }
 
     void setTower(String tower)
@@ -300,7 +287,7 @@ public final class PlayerInfo extends PlayerState
     /** Return a List of markerIds. */
     public List<String> getLegionIds()
     {
-        return client.getLegionsByPlayer(name);
+        return client.getLegionsByPlayer(getPlayer());
     }
 
     void removeAllLegions()

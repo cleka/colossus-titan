@@ -40,6 +40,10 @@ public class PlayerState
         this.game = game;
     }
 
+    /**
+     * TODO there are quite a few places (mostly in the Client) where PlayerInfo/PlayerState
+     * should be used instead of player -- calling this getter will be an indication of that.
+     */
     public Player getPlayer()
     {
         return player;

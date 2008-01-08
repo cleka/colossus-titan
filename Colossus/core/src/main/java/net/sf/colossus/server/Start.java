@@ -8,6 +8,7 @@ import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.sf.colossus.Player;
 import net.sf.colossus.client.Client;
 import net.sf.colossus.client.StartClient;
 import net.sf.colossus.client.WebClient;
@@ -224,7 +225,7 @@ public final class Start
         {
             boolean remote = true;
             boolean byWeb = false;
-            Client c = new Client(hostname, port, playerName, remote, byWeb);
+            Client c = new Client(hostname, port, Player.getPlayerByName(playerName), remote, byWeb);
             failed = c.getFailed();
             c = null;
         }

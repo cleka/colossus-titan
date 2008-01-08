@@ -740,7 +740,7 @@ final class EventViewer extends KDialog implements WindowListener,
             new ArrayList<RevealedCreature>(), null, 0);
         attackerEventLegion.setEventInfo(Constants.reasonBattleStarts);
         attackerEventLegion.setRealPlayer(client
-            .getPlayerNameByMarkerId(attackerId));
+            .getPlayerByMarkerId(attackerId));
 
         defenderEventLegion = new RevealEvent(client, turnNumber,
             getActivePlayerNum(), RevealEvent.eventBattle, defenderId,
@@ -749,7 +749,7 @@ final class EventViewer extends KDialog implements WindowListener,
 
         defenderEventLegion.setEventInfo(Constants.reasonBattleStarts);
         defenderEventLegion.setRealPlayer(client
-            .getPlayerNameByMarkerId(defenderId));
+            .getPlayerByMarkerId(defenderId));
     }
 
     public void tellEngagementResults(String winnerId, String method, int turns)

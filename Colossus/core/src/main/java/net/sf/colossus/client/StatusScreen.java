@@ -269,7 +269,7 @@ final class StatusScreen extends KDialog implements WindowListener
             }
             else
             {
-                if (oracle.getActivePlayerName().equals(info.getName()))
+                if (oracle.getActivePlayer().equals(info.getPlayer()))
                 {
                     color = Color.YELLOW;
                 }
@@ -292,14 +292,14 @@ final class StatusScreen extends KDialog implements WindowListener
                 setPlayerLabelColors(nameLabel[i], bgcolor, fgcolor);
             }
 
-            nameLabel[i].setText(info.getName());
+            nameLabel[i].setText(info.getPlayer().getName());
             if (info.canTitanTeleport())
             {
-                nameLabel[i].setText(info.getName() + "*");
+                nameLabel[i].setText(info.getPlayer().getName() + "*");
             }
             else
             {
-                nameLabel[i].setText(info.getName());
+                nameLabel[i].setText(info.getPlayer().getName());
             }
             towerLabel[i].setText("" + info.getTower());
             elimLabel[i].setText(info.getPlayersElim());

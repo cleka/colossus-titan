@@ -15,6 +15,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.TitledBorder;
 
+import net.sf.colossus.Player;
 import net.sf.colossus.server.Constants;
 
 
@@ -55,7 +56,7 @@ public class RevealEvent
     private String info;
     // set for losing battle events, because if Titan killed the
     // marker does already belong to slayer when we ask. 
-    private String realPlayer;
+    private Player realPlayer;
 
     public final static int eventSplit = 0;
     public final static int eventRecruit = 1;
@@ -156,17 +157,17 @@ public class RevealEvent
             if (rc != null && rc.getPlainName() != null
                 && rc.getPlainName().equals(Constants.titan))
             {
-                String playerName = (realPlayer != null ? realPlayer : client
-                    .getPlayerNameByMarkerId(markerId));
+                Player player = (realPlayer != null ? realPlayer : client
+                    .getPlayerByMarkerId(markerId));
 
-                if (playerName == null)
+                if (player == null)
                 {
                     LOGGER.log(Level.SEVERE, "For making titan base name: "
-                        + "playerName is null!");
+                        + "player is null!");
                 }
                 else
                 {
-                    PlayerInfo info = client.getPlayerInfo(playerName);
+                    PlayerInfo info = client.getPlayerInfo(player.getName());
                     String tbName = getTitanBasename(info);
                     rc.setTitanBaseName(tbName);
                 }
@@ -191,14 +192,10 @@ public class RevealEvent
         this.info = info;
     }
 
-    public void setRealPlayer(String realPlayer)
+    public void setRealPlayer(Player realPlayer)
     {
+        assert realPlayer != null;
         this.realPlayer = realPlayer;
-        if (this.realPlayer == null)
-        {
-            LOGGER.log(Level.SEVERE, "RevealEvent: give realPlayer is null!");
-            this.realPlayer = "dummy?";
-        }
     }
 
     public void setUndone(boolean undone)
@@ -358,9 +355,9 @@ public class RevealEvent
         return turnNumber;
     }
 
-    public String getPlayer()
+    public Player getPlayer()
     {
-        return client.getPlayerInfo(playerNr).getName();
+        return client.getPlayerInfo(playerNr).getPlayer();
     }
 
     public int getPlayerNr()

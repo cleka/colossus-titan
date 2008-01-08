@@ -128,7 +128,7 @@ public class BalrogRecruitment extends CustomRecruitBase
 
         synchronized (nameToOldScore)
         {
-            Integer score = nameToOldScore.remove(pi.getName());
+            Integer score = nameToOldScore.remove(pi.getPlayer().getName());
 
             if (score == null)
             {
@@ -140,7 +140,8 @@ public class BalrogRecruitment extends CustomRecruitBase
             }
             newscore = pi.getScore();
 
-            nameToOldScore.put(pi.getName(), new Integer(newscore));
+            nameToOldScore
+                .put(pi.getPlayer().getName(), new Integer(newscore));
 
             alreadyNumber = (oldscore / balrogValue);
             nowNumber = (newscore / balrogValue);

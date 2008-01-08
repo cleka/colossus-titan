@@ -17,6 +17,7 @@ import java.util.Timer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.sf.colossus.Player;
 import net.sf.colossus.client.Client;
 import net.sf.colossus.client.LegionInfo;
 import net.sf.colossus.client.MasterBoard;
@@ -711,7 +712,7 @@ public class RationalAI extends SimpleAI implements AI
     public boolean masterMove()
     {
         logger.log(Level.FINEST, "This is RationalAI.");
-        PlayerInfo player = client.getPlayerInfo();
+        PlayerInfo playerInfo = client.getPlayerInfo();
 
         if (enemyAttackMap == null)
         {
@@ -721,7 +722,7 @@ public class RationalAI extends SimpleAI implements AI
         }
 
         // consider mulligans
-        if (handleMulligans(player))
+        if (handleMulligans(playerInfo))
         {
             return true;
         }
@@ -730,7 +731,7 @@ public class RationalAI extends SimpleAI implements AI
         if (bestMoveList == null)
         {
             bestMoveList = new ArrayList<LegionBoardMove>();
-            telePort = handleVoluntaryMoves(player);
+            telePort = handleVoluntaryMoves(playerInfo);
             bestMoveListIter = bestMoveList.iterator();
         }
 
@@ -741,15 +742,15 @@ public class RationalAI extends SimpleAI implements AI
             // ForcedSplit and ForcedSingle implementations here are perhaps 
             // quite poor solutions, but better than getting NAKs...
 
-            boolean moved = handleForcedSplitMoves(player);
+            boolean moved = handleForcedSplitMoves(playerInfo.getPlayer());
             if (moved)
             {
                 return true;
             }
 
-            if (player.numLegionsMoved() == 0)
+            if (playerInfo.numLegionsMoved() == 0)
             {
-                moved = handleForcedSingleMove(player);
+                moved = handleForcedSingleMove(playerInfo.getPlayer());
 
                 // Earlier here was a comment: 
                 // "always need to retry" and hardcoded returned true.
@@ -958,7 +959,7 @@ public class RationalAI extends SimpleAI implements AI
      * one and spare weak ones...  
      */
 
-    private boolean handleForcedSplitMoves(PlayerInfo player)
+    private boolean handleForcedSplitMoves(Player player)
     {
         int roll = client.getMovementRoll();
         ArrayList<String> unsplitHexes = new ArrayList<String>();
@@ -972,14 +973,14 @@ public class RationalAI extends SimpleAI implements AI
          * c) Once we did move one, we move, return true, get called again,
          *    then the list of labels is re-considered again.
          */
-        Iterator<String> it = player.getLegionIds().iterator();
+        Iterator<String> it = client.getPlayerInfo(player).getLegionIds().iterator();
         while (it.hasNext())
         {
             String markerId = it.next();
             LegionInfo legion = client.getLegionInfo(markerId);
             String hexLabel = legion.getHexLabel();
             List<String> friendlyLegions = client.getFriendlyLegions(hexLabel,
-                player.getName());
+                player);
 
             if (friendlyLegions.size() > 1)
             {
@@ -991,7 +992,7 @@ public class RationalAI extends SimpleAI implements AI
         {
             String hexLabel = itHexes.next();
             List<String> friendlyLegions = client.getFriendlyLegions(hexLabel,
-                player.getName());
+                player);
 
             // pick just any legion for asking the getMovement
             Object[] legions = friendlyLegions.toArray();
@@ -1050,7 +1051,7 @@ public class RationalAI extends SimpleAI implements AI
 
                         // The set of moves includes still hexes occupied by our own legions. 
                         List<String> targetOwnLegions = client
-                            .getFriendlyLegions(targetHex, player.getName());
+                            .getFriendlyLegions(targetHex, player);
                         if (targetOwnLegions.size() == 0)
                         {
                             MasterHex hex = MasterBoard
@@ -1104,7 +1105,7 @@ public class RationalAI extends SimpleAI implements AI
      * (except Titan legion) to the place which is best for it.
      * Moves Titan legion only if no other choice.
      */
-    private boolean handleForcedSingleMove(PlayerInfo player)
+    private boolean handleForcedSingleMove(Player player)
     {
         int roll = client.getMovementRoll();
 
@@ -1112,7 +1113,7 @@ public class RationalAI extends SimpleAI implements AI
 
         ArrayList<String> movableLegions = new ArrayList<String>();
 
-        Iterator<String> it = player.getLegionIds().iterator();
+        Iterator<String> it = client.getPlayerInfo(player).getLegionIds().iterator();
         while (it.hasNext())
         {
             String markerId = it.next();
@@ -1131,7 +1132,7 @@ public class RationalAI extends SimpleAI implements AI
 
                     // The set of moves includes still hexes occupied by our own legions. 
                     List<String> targetOwnLegions = client.getFriendlyLegions(
-                        targetHex, player.getName());
+                        targetHex, player);
                     if (targetOwnLegions.size() == 0)
                     {
                         couldMove = true;
@@ -1203,7 +1204,7 @@ public class RationalAI extends SimpleAI implements AI
             MasterHex hex = MasterBoard.getHexByLabel(targetHex);
 
             List<String> targetOwnLegions = client.getFriendlyLegions(
-                targetHex, player.getName());
+                targetHex, player);
             if (targetOwnLegions.size() == 0)
             {
                 int value = evaluateMove(minLegion, hex, RECRUIT_TRUE, 2, true);
@@ -1765,12 +1766,12 @@ public class RationalAI extends SimpleAI implements AI
         int value = 0;
         // consider making an attack
         final String enemyMarkerId = client.getFirstEnemyLegion(
-            hex.getLabel(), attacker.getPlayerName());
+            hex.getLabel(), attacker.getPlayer());
 
         if (enemyMarkerId != null)
         {
             LegionInfo defender = client.getLegionInfo(enemyMarkerId);
-            if (!attacker.getPlayerName().equals(defender.getPlayerName()))
+            if (!attacker.getPlayer().equals(defender.getPlayer()))
             {
                 value = evaluateCombat(attacker, defender, hex);
             }

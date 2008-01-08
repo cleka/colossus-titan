@@ -17,6 +17,7 @@ import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.sf.colossus.Player;
 import net.sf.colossus.client.BattleChit;
 import net.sf.colossus.client.BattleHex;
 import net.sf.colossus.client.BattleMap;
@@ -238,8 +239,7 @@ public class SimpleAI implements AI
         double scoobySnackFactor = 0.15;
         int minimumSizeToRecruit = (int)(scoobySnackFactor * client
             .getAverageLegionPointValue());
-        List<String> markerIds = client.getLegionsByPlayer(client
-            .getPlayerName());
+        List<String> markerIds = client.getLegionsByPlayer(client.getPlayer());
         Iterator<String> it = markerIds.iterator();
         while (it.hasNext())
         {
@@ -316,17 +316,17 @@ public class SimpleAI implements AI
 
     public boolean split()
     {
-        PlayerInfo player = client.getPlayerInfo();
-        remainingMarkers = prepareMarkers(player.getMarkersAvailable(), player
-            .getShortColor());
+        PlayerInfo playerInfo = client.getPlayerInfo();
+        remainingMarkers = prepareMarkers(playerInfo.getMarkersAvailable(),
+            playerInfo.getShortColor());
 
         splitsDone = 0;
         splitsAcked = 0;
-        Iterator<String> it = player.getLegionIds().iterator();
+        Iterator<String> it = playerInfo.getLegionIds().iterator();
         while (it.hasNext() && !remainingMarkers.isEmpty())
         {
             String markerId = it.next();
-            splitOneLegion(player, markerId);
+            splitOneLegion(playerInfo.getPlayer(), markerId);
         }
         remainingMarkers.clear();
         remainingMarkers = null;
@@ -345,7 +345,7 @@ public class SimpleAI implements AI
         return (splitsAcked >= splitsDone ? true : false);
     }
 
-    private void splitOneLegion(PlayerInfo player, String markerId)
+    private void splitOneLegion(Player player, String markerId)
     {
         LegionInfo legion = client.getLegionInfo(markerId);
         if (legion.getHeight() < 7)
@@ -377,7 +377,7 @@ public class SimpleAI implements AI
                 {
                     String hexLabel = moveIt.next();
                     MasterHex hex = MasterBoard.getHexByLabel(hexLabel);
-                    if (client.getNumEnemyLegions(hexLabel, player.getName()) == 0)
+                    if (client.getNumEnemyLegions(hexLabel, player) == 0)
                     {
                         safeMoves++;
                         if (!goodRecruit
@@ -390,7 +390,7 @@ public class SimpleAI implements AI
                     else
                     {
                         LegionInfo enemy = client.getLegionInfo(client
-                            .getFirstEnemyLegion(hexLabel, player.getName()));
+                            .getFirstEnemyLegion(hexLabel, player));
                         int result = estimateBattleResults(legion, true,
                             enemy, hex);
 
@@ -864,39 +864,39 @@ public class SimpleAI implements AI
     {
         boolean moved = false;
 
-        PlayerInfo player = client.getPlayerInfo();
+        PlayerInfo playerInfo = client.getPlayerInfo();
 
         // consider mulligans
-        if (handleMulligans(player))
+        if (handleMulligans(playerInfo))
         {
             return true;
         }
 
         /** cache all places enemies can move to, for use in risk analysis. */
-        Map<String, List<LegionInfo>>[] enemyAttackMap = buildEnemyAttackMap(player);
+        Map<String, List<LegionInfo>>[] enemyAttackMap = buildEnemyAttackMap(playerInfo);
 
         // A mapping from Legion to List of MoveInfo objects,
         // listing all moves that we've evaluated.  We use this if
         // we're forced to move.
         Map<LegionInfo, List<MoveInfo>> moveMap = new HashMap<LegionInfo, List<MoveInfo>>();
 
-        moved = handleVoluntaryMoves(player, moveMap, enemyAttackMap);
+        moved = handleVoluntaryMoves(playerInfo, moveMap, enemyAttackMap);
         if (moved)
         {
             return true;
         }
 
         // make sure we move splits (when forced)
-        moved = handleForcedSplitMoves(player, moveMap);
+        moved = handleForcedSplitMoves(playerInfo.getPlayer(), moveMap);
         if (moved)
         {
             return true;
         }
 
         // make sure we move at least one legion
-        if (player.numLegionsMoved() == 0)
+        if (playerInfo.numLegionsMoved() == 0)
         {
-            moved = handleForcedSingleMove(player, moveMap);
+            moved = handleForcedSingleMove(playerInfo, moveMap);
             // Earlier here was a comment: 
             // "always need to retry" and hardcoded returned true.
             // In [ 1748718 ] Game halt in Abyssal9 this lead to a deadlock;
@@ -928,12 +928,12 @@ public class SimpleAI implements AI
     }
 
     /** Return true if we moved something. */
-    private boolean handleVoluntaryMoves(PlayerInfo player,
+    private boolean handleVoluntaryMoves(PlayerInfo playerInfo,
         Map<LegionInfo, List<MoveInfo>> moveMap,
         Map<String, List<LegionInfo>>[] enemyAttackMap)
     {
         boolean moved = false;
-        List<String> markerIds = player.getLegionIds();
+        List<String> markerIds = playerInfo.getLegionIds();
 
         // Sort markerIds in descending order of legion importance.
         Collections.sort(markerIds, new Comparator<String>()
@@ -979,7 +979,8 @@ public class SimpleAI implements AI
                 // Do not consider moves onto hexes where we already have a 
                 // legion. This is sub-optimal since the legion in this hex 
                 // may be able to move and "get out of the way"
-                if (client.getNumFriendlyLegions(hexLabel, player.getName()) > 0)
+                if (client.getNumFriendlyLegions(hexLabel, playerInfo
+                    .getPlayer()) > 0)
                 {
                     continue;
                 }
@@ -1011,10 +1012,10 @@ public class SimpleAI implements AI
     }
 
     /** Return true if we moved something. */
-    private boolean handleForcedSplitMoves(PlayerInfo player,
+    private boolean handleForcedSplitMoves(Player player,
         Map<LegionInfo, List<MoveInfo>> moveMap)
     {
-        List<String> markerIds = player.getLegionIds();
+        List<String> markerIds = client.getPlayerInfo(player).getLegionIds();
         Iterator<String> it = markerIds.iterator();
         while (it.hasNext())
         {
@@ -1022,7 +1023,7 @@ public class SimpleAI implements AI
             LegionInfo legion = client.getLegionInfo(markerId);
             String hexLabel = legion.getHexLabel();
             List<String> friendlyLegions = client.getFriendlyLegions(hexLabel,
-                player.getName());
+                player);
 
             if (friendlyLegions.size() > 1
                 && !client.getMovement().listNormalMoves(legion,
@@ -1190,7 +1191,7 @@ public class SimpleAI implements AI
 
             // for each legion that player controls
             Iterator<String> legionIt = client.getLegionsByPlayer(
-                enemyPlayerName).iterator();
+                Player.getPlayerByName(enemyPlayerName)).iterator();
             while (legionIt.hasNext())
             {
                 String markerId = legionIt.next();
@@ -1265,7 +1266,7 @@ public class SimpleAI implements AI
         int value = 0;
         // consider making an attack
         final String enemyMarkerId = client.getFirstEnemyLegion(
-            hex.getLabel(), legion.getPlayerName());
+            hex.getLabel(), legion.getPlayer());
 
         if (enemyMarkerId != null)
         {
@@ -1576,7 +1577,7 @@ public class SimpleAI implements AI
                 // this would be essentially minimax but ignoring the
                 // others players ability to move.
                 String markerId = client.getFirstEnemyLegion(nextHex
-                    .getLabel(), legion.getPlayerName());
+                    .getLabel(), legion.getPlayer());
                 LegionInfo enemy = null;
                 if (markerId != null)
                 {
@@ -2026,11 +2027,11 @@ public class SimpleAI implements AI
         //    that could recruit later this turn) and push them
         //    over 100-point boundaries.
 
-        String playerName = client.getActivePlayerName();
+        Player player = client.getActivePlayer();
         LegionInfo attacker = client.getLegionInfo(client
-            .getFirstFriendlyLegion(hexLabel, playerName));
+            .getFirstFriendlyLegion(hexLabel, player));
         LegionInfo defender = client.getLegionInfo(client.getFirstEnemyLegion(
-            hexLabel, playerName));
+            hexLabel, player));
         MasterHex hex = MasterBoard.getHexByLabel(hexLabel);
         int value = 0;
 
@@ -2046,7 +2047,7 @@ public class SimpleAI implements AI
         boolean wouldFlee = flee(defender, attacker);
         if (wouldFlee)
         {
-            int currentScore = client.getPlayerInfo(playerName).getScore();
+            int currentScore = client.getPlayerInfo(player).getScore();
             int fleeValue = defender.getPointValue() / 2;
             if (((currentScore + fleeValue) / TerrainRecruitLoader
                 .getAcquirableRecruitmentsValue()) > (currentScore / TerrainRecruitLoader

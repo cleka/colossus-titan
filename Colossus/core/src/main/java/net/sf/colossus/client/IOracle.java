@@ -3,6 +3,8 @@ package net.sf.colossus.client;
 
 import java.util.List;
 
+import net.sf.colossus.Player;
+
 
 /** Knows a lot of things, but cannot actually take any actions.
  *  Everything returned by this interface must be immutable, or a copy.
@@ -29,6 +31,8 @@ public interface IOracle
     int getNumPlayers();
 
     String getActivePlayerName();
+
+    Player getActivePlayer();
 
     String getPhaseName();
 

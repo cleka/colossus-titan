@@ -53,6 +53,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
 
+import net.sf.colossus.Player;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.Start;
 import net.sf.colossus.util.KFrame;
@@ -1524,7 +1525,7 @@ public class WebClient extends KFrame implements WindowListener,
         try
         {
             int p = port;
-            gc = new Client(hostname, p, username, true, true);
+            gc = new Client(hostname, p, Player.getPlayerByName(username), true, true);
             boolean failed = gc.getFailed();
             if (failed)
             {

@@ -433,7 +433,7 @@ public final class Server implements IServer
     {
         LOGGER.log(Level.FINEST, "Called Server.createLocalClient() for "
             + playerName);
-        new Client("127.0.0.1", port, playerName, false, false);
+        new Client("127.0.0.1", port, net.sf.colossus.Player.getPlayerByName(playerName), false, false);
     }
 
     synchronized void addClient(final IClient client, final String playerName,
@@ -1670,7 +1670,7 @@ public final class Server implements IServer
         }
         Player player = game.getActivePlayer();
         Legion donor = game.getLegionByMarkerId(markerId);
-        if (donor != null && donor.getPlayer() == player)
+        if (donor != null && donor.getPlayerState() == player)
         {
             player.setDonor(donor);
         }

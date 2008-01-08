@@ -33,6 +33,9 @@ public class Player
         KNOWN_PLAYERS.put(name, this);
     }
 
+    /**
+     * TODO this is still called to be used as identity -- the object itself should serve that purpose.
+     */
     public String getName()
     {
         return name;

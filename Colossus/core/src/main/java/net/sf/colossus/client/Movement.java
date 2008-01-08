@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.sf.colossus.Player;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.util.Options;
 import net.sf.colossus.util.Split;
@@ -61,17 +62,17 @@ public final class Movement
     {
         Set<String> set = new HashSet<String>();
         String hexLabel = hex.getLabel();
-        PlayerInfo player = legion.getPlayerInfo();
+        Player player = legion.getPlayer();
 
         // If there are enemy legions in this hex, mark it
         // as a legal move and stop recursing.  If there is
         // also a friendly legion there, just stop recursing.
         // Do a check versus fromHexLabel if we are evaluating
         // passing through this hex
-        if (client.getNumEnemyLegions(hexLabel, player.getName()) > 0
+        if (client.getNumEnemyLegions(hexLabel, player) > 0
             && !hexLabel.equals(fromHexLabel))
         {
-            if (client.getNumFriendlyLegions(hexLabel, player.getName()) == 0)
+            if (client.getNumFriendlyLegions(hexLabel, player) == 0)
             {
                 // Set the entry side relative to the hex label.
                 if (cameFrom != -1)
@@ -90,7 +91,7 @@ public final class Movement
             // This hex is the final destination.  Mark it as legal if
             // it is unoccupied by friendly legions that have already moved.
             // Account for spin cycles.
-            if (client.getNumFriendlyLegions(hexLabel, player.getName()) > 0)
+            if (client.getNumFriendlyLegions(hexLabel, player) > 0)
             {
                 List<String> markerIds = client.getLegionsByHex(hexLabel);
                 String markerId = markerIds.get(0);
@@ -373,7 +374,7 @@ public final class Movement
         {
             // Mark every hex containing an enemy stack that does not
             // already contain a friendly stack.
-            Iterator<String> it = client.getEnemyLegions(player.getName())
+            Iterator<String> it = client.getEnemyLegions(player.getPlayer())
                 .iterator();
             while (it.hasNext())
             {

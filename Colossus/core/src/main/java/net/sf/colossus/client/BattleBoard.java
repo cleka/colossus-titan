@@ -129,8 +129,8 @@ public final class BattleBoard extends KFrame
             public void mousePressed(MouseEvent e)
             {
                 // Only the active player can click on stuff.
-                if (!client.getPlayerName().equals(
-                    client.getBattleActivePlayerName()))
+                if (!client.getPlayer().equals(
+                    client.getBattleActivePlayer()))
                 {
                     return;
                 }
@@ -147,8 +147,8 @@ public final class BattleBoard extends KFrame
                 }
 
                 if (chit != null
-                    && client.getPlayerNameByTag(chit.getTag()).equals(
-                        client.getBattleActivePlayerName()))
+                    && client.getPlayerByTag(chit.getTag()).equals(
+                        client.getBattleActivePlayer()))
                 {
                     actOnCritter(chit.getTag());
                 }
