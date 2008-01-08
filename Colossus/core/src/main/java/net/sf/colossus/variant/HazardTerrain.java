@@ -47,6 +47,11 @@ public class HazardTerrain
     private final boolean isFlyersOnly;
 
     /**
+     * Determines if only native flyers can enter the terrain.
+     */
+    private final boolean isNativeFlyersOnly;
+
+    /**
      * Determines if a non-native gets slowed in the terrain.
      */
     private final boolean slowsNonNative;
@@ -65,7 +70,7 @@ public class HazardTerrain
 
     public HazardTerrain(String name, char token, boolean nativeBonus,
         boolean nonNativePenalty, boolean nativeOnly, boolean flyerOnly,
-        boolean slowsNonNative, boolean blocksFlying)
+        boolean nativeFlyerOnly, boolean slowsNonNative, boolean blocksFlying)
     {
         this.name = name;
         this.token = new Character(token);
@@ -73,6 +78,7 @@ public class HazardTerrain
         this.isNonNativePenaltyTerrain = nonNativePenalty;
         this.isNativeOnly = nativeOnly;
         this.isFlyersOnly = flyerOnly;
+        this.isNativeFlyersOnly = nativeFlyerOnly;
         this.slowsNonNative = slowsNonNative;
         this.blocksFlying = blocksFlying;
         assert TERRAIN_MAP.get(this.token) == null : "Duplicate terrain token not allowed";
@@ -104,6 +110,11 @@ public class HazardTerrain
         return isNativeOnly;
     }
 
+    public boolean isNativeFlyersOnly()
+    {
+        return isNativeFlyersOnly;
+    }
+
     public boolean isFlyersOnly()
     {
         return isFlyersOnly;
@@ -130,32 +141,32 @@ public class HazardTerrain
     }
 
     public static final HazardTerrain PLAINS = new HazardTerrain("Plains",
-        'p', false, false, false, false, false, false);
+        'p', false, false, false, false, false, false, false);
 
     public static final HazardTerrain BRAMBLES = new HazardTerrain("Brambles",
-        'r', true, true, false, false, false, false);
+        'r', true, true, false, false, false, false, false);
 
     public static final HazardTerrain SAND = new HazardTerrain("Sand", 's',
-        false, false, false, false, false, false);
+        false, false, false, false, false, false, false);
 
     public static final HazardTerrain TREE = new HazardTerrain("Tree", 't',
-        false, false, true, false, false, false);
+        false, false, true, false, false, false, false);
 
     public static final HazardTerrain BOG = new HazardTerrain("Bog", 'o',
-        false, false, true, false, false, false);
+        false, false, true, false, false, false, false);
 
     public static final HazardTerrain VOLCANO = new HazardTerrain("Volcano",
-        'v', true, false, true, false, false, false);
+        'v', true, false, true, false, true, false, false);
 
     public static final HazardTerrain DRIFT = new HazardTerrain("Drift", 'd',
-        false, true, false, false, false, false);
+        false, true, false, false, false, false, false);
 
     public static final HazardTerrain TOWER = new HazardTerrain("Tower", 'w',
-        false, false, false, false, false, false);
+        false, false, false, false, false, false, false);
 
     public static final HazardTerrain LAKE = new HazardTerrain("Lake", 'l',
-        false, false, true, false, false, false);
+        false, false, true, false, false, false, false);
 
     public static final HazardTerrain STONE = new HazardTerrain("Stone", 'n',
-        false, false, true, false, false, true);
+        false, false, true, false, false, false, true);
 }

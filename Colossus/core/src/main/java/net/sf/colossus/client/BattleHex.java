@@ -473,7 +473,7 @@ public class BattleHex extends Hex
         {
             return false;
         }
-        if (terrain.isNativeOnly())
+        if (terrain.isNativeFlyersOnly())
         {
             return creature.isNativeIn(terrain);
         }
