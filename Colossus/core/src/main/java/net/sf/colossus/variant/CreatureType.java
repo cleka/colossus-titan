@@ -5,8 +5,6 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
 
-import Balrog.CreatureBalrog;
-
 
 /**
  * A type of creature in a variant.
@@ -58,7 +56,7 @@ public class CreatureType
     /**
      * A display name.
      * 
-     * This is overridden by {@link CreatureBalrog} at the moment -- not sure why this 
+     * This is overridden by CreatureBalrog at the moment -- not sure why this 
      * is necessary. TODO check need for this method
      */
     public String getDisplayName()
