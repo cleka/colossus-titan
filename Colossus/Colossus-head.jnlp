@@ -16,7 +16,7 @@
          <jar href="head/Colossus.jar"/>
          <jar href="head/libs/werken.opt.jar"/>
          <jar href="head/libs/jdom.jar"/>
-         <j2se version="1.4+" max-heap-size="128M"/>
+         <j2se version="1.5+" max-heap-size="128M"/>
        </resources>
        <security>
            <all-permissions/>
