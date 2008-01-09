@@ -31,8 +31,8 @@ import net.sf.colossus.util.HTMLColor;
 
 public final class BattleChit extends Chit
 {
-    private static final Logger LOGGER =
-        Logger.getLogger(BattleChit.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(BattleChit.class
+        .getName());
 
     private final int tag;
     private static Font font;
@@ -63,8 +63,7 @@ public final class BattleChit extends Chit
         super(scale, id, inverted);
         if (id == null)
         {
-            LOGGER.log(Level.WARNING,
-                "Created BattleChit with null id!");
+            LOGGER.log(Level.WARNING, "Created BattleChit with null id!");
         }
         this.scale = scale;
         this.tag = tag;
@@ -209,7 +208,8 @@ public final class BattleChit extends Chit
     // XXX Titans
     public Creature getCreature()
     {
-        Creature creature = Creature.getCreatureByName(getCreatureName());
+        Creature creature = (Creature)client.getGame().getVariant()
+            .getCreatureByName(getCreatureName());
         return creature;
     }
 

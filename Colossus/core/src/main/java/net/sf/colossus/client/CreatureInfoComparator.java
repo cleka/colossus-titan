@@ -4,6 +4,7 @@ package net.sf.colossus.client;
 import java.util.Comparator;
 
 import net.sf.colossus.server.Creature;
+import net.sf.colossus.server.VariantSupport;
 
 
 /** Sort creatures in decreasing order of importance, then by creature
@@ -12,8 +13,10 @@ final class CreatureInfoComparator implements Comparator<CreatureInfo>
 {
     public int compare(CreatureInfo info1, CreatureInfo info2)
     {
-        Creature creature1 = Creature.getCreatureByName(info1.getName());
-        Creature creature2 = Creature.getCreatureByName(info2.getName());
+        Creature creature1 = (Creature)VariantSupport.getCurrentVariant()
+            .getCreatureByName(info1.getName());
+        Creature creature2 = (Creature)VariantSupport.getCurrentVariant()
+            .getCreatureByName(info2.getName());
         int diff = creature2.getKillValue() - creature1.getKillValue();
         if (diff != 0)
         {

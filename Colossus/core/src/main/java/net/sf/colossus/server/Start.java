@@ -225,7 +225,14 @@ public final class Start
         {
             boolean remote = true;
             boolean byWeb = false;
-            Client c = new Client(hostname, port, Player.getPlayerByName(playerName), remote, byWeb);
+
+            // a hack to pass something into the Client constructor
+            // TODO needs to be constructed properly
+            net.sf.colossus.game.Game dummyGame = new net.sf.colossus.game.Game(
+                null, new net.sf.colossus.Player[0]);
+
+            Client c = new Client(hostname, port, dummyGame, Player
+                .getPlayerByName(playerName), remote, byWeb);
             failed = c.getFailed();
             c = null;
         }

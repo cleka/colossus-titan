@@ -29,6 +29,7 @@ import net.sf.colossus.client.MasterBoard;
 import net.sf.colossus.client.MasterHex;
 import net.sf.colossus.client.PlayerInfo;
 import net.sf.colossus.client.Strike;
+import net.sf.colossus.game.PlayerState;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.Creature;
 import net.sf.colossus.server.Dice;
@@ -38,6 +39,7 @@ import net.sf.colossus.util.DevRandom;
 import net.sf.colossus.util.Options;
 import net.sf.colossus.util.PermutationIterator;
 import net.sf.colossus.util.Probs;
+import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.HazardTerrain;
 import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
@@ -301,14 +303,15 @@ public class SimpleAI implements AI
         boolean considerReservations)
     {
         MasterHex hex = MasterBoard.getHexByLabel(hexLabel);
-        List<Creature> recruits = client.findEligibleRecruits(legion
+        List<CreatureType> recruits = client.findEligibleRecruits(legion
             .getMarkerId(), hexLabel, considerReservations);
         if (recruits.size() == 0)
         {
             return null;
         }
 
-        Creature recruit = getVariantRecruitHint(legion, hex, recruits);
+        Creature recruit = (Creature)getVariantRecruitHint(legion, hex,
+            recruits);
 
         /* use the hinted value as the actual recruit */
         return recruit;
@@ -326,7 +329,7 @@ public class SimpleAI implements AI
         while (it.hasNext() && !remainingMarkers.isEmpty())
         {
             String markerId = it.next();
-            splitOneLegion(playerInfo.getPlayer(), markerId);
+            splitOneLegion(playerInfo, markerId);
         }
         remainingMarkers.clear();
         remainingMarkers = null;
@@ -345,7 +348,7 @@ public class SimpleAI implements AI
         return (splitsAcked >= splitsDone ? true : false);
     }
 
-    private void splitOneLegion(Player player, String markerId)
+    private void splitOneLegion(PlayerState player, String markerId)
     {
         LegionInfo legion = client.getLegionInfo(markerId);
         if (legion.getHeight() < 7)
@@ -481,15 +484,16 @@ public class SimpleAI implements AI
     private boolean couldRecruitUp(LegionInfo legion, String hexLabel,
         LegionInfo enemy, String terrain)
     {
-        Creature weakest = Creature.getCreatureByName(legion.getContents()
-            .get(legion.getHeight() - 1));
+        Creature weakest = (Creature)client.getGame().getVariant()
+            .getCreatureByName(
+                legion.getContents().get(legion.getHeight() - 1));
 
         // Consider recruiting.
-        List<Creature> recruits = client.findEligibleRecruits(legion
+        List<CreatureType> recruits = client.findEligibleRecruits(legion
             .getMarkerId(), hexLabel);
         if (!recruits.isEmpty())
         {
-            Creature bestRecruit = recruits.get(recruits.size() - 1);
+            Creature bestRecruit = (Creature)recruits.get(recruits.size() - 1);
             if (bestRecruit != null
                 && ghrv(bestRecruit, legion, hintSectionUsed) > ghrv(weakest,
                     legion, hintSectionUsed))
@@ -521,8 +525,8 @@ public class SimpleAI implements AI
                 java.util.Iterator<String> it = ral.iterator();
                 while (it.hasNext())
                 {
-                    Creature tempRecruit = Creature.getCreatureByName(it
-                        .next());
+                    Creature tempRecruit = (Creature)client.getGame()
+                        .getVariant().getCreatureByName(it.next());
                     if ((bestRecruit == null)
                         || (ghrv(tempRecruit, legion, hintSectionUsed) >= ghrv(
                             bestRecruit, legion, hintSectionUsed)))
@@ -578,7 +582,8 @@ public class SimpleAI implements AI
         while (critterIt.hasNext())
         {
             String name = critterIt.next();
-            Creature critter = Creature.getCreatureByName(name);
+            Creature critter = (Creature)client.getGame().getVariant()
+                .getCreatureByName(name);
 
             // Never split out the titan.
             if (critter.isTitan())
@@ -712,15 +717,17 @@ public class SimpleAI implements AI
         {
             if (Dice.rollDie() <= 3)
             {
-                splitoffs.add(Creature.getCreatureByName(Constants.titan));
+                splitoffs.add((Creature)client.getGame().getVariant()
+                    .getCreatureByName(Constants.titan));
                 splitoffs.add(startCre[1]);
                 splitoffs.add(startCre[1]);
                 splitoffs.add(splitCreature);
             }
             else
             {
-                splitoffs.add(Creature.getCreatureByName(TerrainRecruitLoader
-                    .getPrimaryAcquirable()));
+                splitoffs.add((Creature)client.getGame().getVariant()
+                    .getCreatureByName(
+                        TerrainRecruitLoader.getPrimaryAcquirable()));
                 splitoffs.add(nonsplitCreature);
                 splitoffs.add(nonsplitCreature);
                 splitoffs.add(splitCreature);
@@ -730,12 +737,14 @@ public class SimpleAI implements AI
         {
             if (Dice.rollDie() <= 3)
             {
-                splitoffs.add(Creature.getCreatureByName(Constants.titan));
+                splitoffs.add((Creature)client.getGame().getVariant()
+                    .getCreatureByName(Constants.titan));
             }
             else
             {
-                splitoffs.add(Creature.getCreatureByName(TerrainRecruitLoader
-                    .getPrimaryAcquirable()));
+                splitoffs.add((Creature)client.getGame().getVariant()
+                    .getCreatureByName(
+                        TerrainRecruitLoader.getPrimaryAcquirable()));
             }
 
             if (Dice.rollDie() <= 3)
@@ -768,15 +777,17 @@ public class SimpleAI implements AI
         {
             if (Dice.rollDie() <= 3)
             {
-                splitoffs.add(Creature.getCreatureByName(Constants.titan));
+                splitoffs.add((Creature)client.getGame().getVariant()
+                    .getCreatureByName(Constants.titan));
                 splitoffs.add(nonsplitCreature);
                 splitoffs.add(nonsplitCreature);
                 splitoffs.add(startCre[1]);
             }
             else
             {
-                splitoffs.add(Creature.getCreatureByName(TerrainRecruitLoader
-                    .getPrimaryAcquirable()));
+                splitoffs.add((Creature)client.getGame().getVariant()
+                    .getCreatureByName(
+                        TerrainRecruitLoader.getPrimaryAcquirable()));
                 splitoffs.add(splitCreature);
                 splitoffs.add(splitCreature);
                 splitoffs.add(startCre[1]);
@@ -786,12 +797,14 @@ public class SimpleAI implements AI
         {
             if (Dice.rollDie() <= 3)
             {
-                splitoffs.add(Creature.getCreatureByName(Constants.titan));
+                splitoffs.add((Creature)client.getGame().getVariant()
+                    .getCreatureByName(Constants.titan));
             }
             else
             {
-                splitoffs.add(Creature.getCreatureByName(TerrainRecruitLoader
-                    .getPrimaryAcquirable()));
+                splitoffs.add((Creature)client.getGame().getVariant()
+                    .getCreatureByName(
+                        TerrainRecruitLoader.getPrimaryAcquirable()));
             }
 
             if (Dice.rollDie() <= 3)
@@ -827,7 +840,8 @@ public class SimpleAI implements AI
         while (it.hasNext())
         {
             String name = it.next();
-            Creature cre = Creature.getCreatureByName(name);
+            Creature cre = (Creature)client.getGame().getVariant()
+                .getCreatureByName(name);
             if (cre == null)
             {
                 LOGGER.log(Level.SEVERE, "HINT: Unknown creature in hint ("
@@ -887,7 +901,7 @@ public class SimpleAI implements AI
         }
 
         // make sure we move splits (when forced)
-        moved = handleForcedSplitMoves(playerInfo.getPlayer(), moveMap);
+        moved = handleForcedSplitMoves(playerInfo, moveMap);
         if (moved)
         {
             return true;
@@ -979,8 +993,7 @@ public class SimpleAI implements AI
                 // Do not consider moves onto hexes where we already have a 
                 // legion. This is sub-optimal since the legion in this hex 
                 // may be able to move and "get out of the way"
-                if (client.getNumFriendlyLegions(hexLabel, playerInfo
-                    .getPlayer()) > 0)
+                if (client.getNumFriendlyLegions(hexLabel, playerInfo) > 0)
                 {
                     continue;
                 }
@@ -1012,10 +1025,10 @@ public class SimpleAI implements AI
     }
 
     /** Return true if we moved something. */
-    private boolean handleForcedSplitMoves(Player player,
+    private boolean handleForcedSplitMoves(PlayerState player,
         Map<LegionInfo, List<MoveInfo>> moveMap)
     {
-        List<String> markerIds = client.getPlayerInfo(player).getLegionIds();
+        List<String> markerIds = ((PlayerInfo)player).getLegionIds();
         Iterator<String> it = markerIds.iterator();
         while (it.hasNext())
         {
@@ -1282,8 +1295,10 @@ public class SimpleAI implements AI
                         + " and WIN_WITH_MINIMAL_LOSSES");
 
                     // we score a fraction of a basic acquirable
-                    value += ((Creature.getCreatureByName(TerrainRecruitLoader
-                        .getPrimaryAcquirable())).getPointValue() * enemyPointValue)
+                    value += (((Creature)client.getGame().getVariant()
+                        .getCreatureByName(
+                            TerrainRecruitLoader.getPrimaryAcquirable()))
+                        .getPointValue() * enemyPointValue)
                         / TerrainRecruitLoader
                             .getAcquirableRecruitmentsValue();
                     // plus a fraction of a titan strength
@@ -1353,9 +1368,10 @@ public class SimpleAI implements AI
                     else
                     {
                         // we score a fraction of a basic acquirable
-                        value += ((Creature
-                            .getCreatureByName(TerrainRecruitLoader
-                                .getPrimaryAcquirable())).getPointValue() * enemyPointValue)
+                        value += (((Creature)client.getGame().getVariant()
+                            .getCreatureByName(
+                                TerrainRecruitLoader.getPrimaryAcquirable()))
+                            .getPointValue() * enemyPointValue)
                             / TerrainRecruitLoader
                                 .getAcquirableRecruitmentsValue();
                         // plus a fraction of a titan strength
@@ -1462,7 +1478,8 @@ public class SimpleAI implements AI
                     {
                         String name = critterIt.next();
                         // XXX Titan
-                        Creature critter = Creature.getCreatureByName(name);
+                        Creature critter = (Creature)client.getGame()
+                            .getVariant().getCreatureByName(name);
 
                         if (weakest1 == null)
                         {
@@ -1590,7 +1607,7 @@ public class SimpleAI implements AI
                     continue;
                 }
 
-                List<Creature> nextRecruits = client.findEligibleRecruits(
+                List<CreatureType> nextRecruits = client.findEligibleRecruits(
                     legion.getMarkerId(), nextLabel);
 
                 if (nextRecruits.size() == 0)
@@ -1598,8 +1615,8 @@ public class SimpleAI implements AI
                     continue;
                 }
 
-                Creature nextRecruit = nextRecruits
-                    .get(nextRecruits.size() - 1);
+                Creature nextRecruit = (Creature)nextRecruits.get(nextRecruits
+                    .size() - 1);
                 // Reduced val by 5 to make current turn recruits more
                 // valuable than next turn's recruits
                 int val = nextRecruit.getSkill() * nextRecruit.getPower() - 5;
@@ -1794,15 +1811,15 @@ public class SimpleAI implements AI
     {
         LegionInfo legion;
         MasterHex hex;
-        List<Creature> recruits;
+        List<CreatureType> recruits;
         Map<String, List<LegionInfo>>[] enemyAttackMap = null;
 
         SimpleAIOracle(LegionInfo legion, MasterHex hex,
-            List<Creature> recruits)
+            List<CreatureType> recruits2)
         {
             this.legion = legion;
             this.hex = hex;
-            this.recruits = recruits;
+            this.recruits = recruits2;
 
         }
 
@@ -1858,7 +1875,7 @@ public class SimpleAI implements AI
 
         public boolean canRecruit(String name)
         {
-            boolean contains = recruits.contains(Creature
+            boolean contains = recruits.contains(client.getGame().getVariant()
                 .getCreatureByName(name));
             return contains;
         }
@@ -1901,8 +1918,8 @@ public class SimpleAI implements AI
         }
     }
 
-    public Creature getVariantRecruitHint(LegionInfo legion, MasterHex hex,
-        List<Creature> recruits)
+    public CreatureType getVariantRecruitHint(LegionInfo legion,
+        MasterHex hex, List<CreatureType> recruits)
     {
         String recruitName = VariantSupport.getRecruitHint(hex.getTerrain(),
             legion, recruits, new SimpleAIOracle(legion, hex, recruits),
@@ -1918,7 +1935,8 @@ public class SimpleAI implements AI
             return null;
         }
 
-        Creature recruit = Creature.getCreatureByName(recruitName);
+        Creature recruit = (Creature)client.getGame().getVariant()
+            .getCreatureByName(recruitName);
         if (!(recruits.contains(recruit)))
         {
             LOGGER.log(Level.WARNING,
@@ -2027,7 +2045,7 @@ public class SimpleAI implements AI
         //    that could recruit later this turn) and push them
         //    over 100-point boundaries.
 
-        Player player = client.getActivePlayer();
+        PlayerState player = client.getActivePlayerState();
         LegionInfo attacker = client.getLegionInfo(client
             .getFirstFriendlyLegion(hexLabel, player));
         LegionInfo defender = client.getLegionInfo(client.getFirstEnemyLegion(
@@ -2047,7 +2065,7 @@ public class SimpleAI implements AI
         boolean wouldFlee = flee(defender, attacker);
         if (wouldFlee)
         {
-            int currentScore = client.getPlayerInfo(player).getScore();
+            int currentScore = ((PlayerInfo)player).getScore();
             int fleeValue = defender.getPointValue() / 2;
             if (((currentScore + fleeValue) / TerrainRecruitLoader
                 .getAcquirableRecruitmentsValue()) > (currentScore / TerrainRecruitLoader
@@ -2126,12 +2144,13 @@ public class SimpleAI implements AI
                 }
                 if (enemy.getHeight() == 7)
                 {
-                    List<Creature> recruits = client
+                    List<CreatureType> recruits = client
                         .findEligibleRecruits(enemy.getMarkerId(), legion
                             .getCurrentHex().getLabel());
                     if (recruits.size() > 0)
                     {
-                        Creature best = recruits.get(recruits.size() - 1);
+                        Creature best = (Creature)recruits
+                            .get(recruits.size() - 1);
                         int lValue = enemy.getPointValue();
                         if (best.getPointValue() > (lValue / enemy.getHeight()))
                         {
@@ -2213,9 +2232,9 @@ public class SimpleAI implements AI
         LegionInfo legion = client.getLegionInfo(markerId);
         if (legion.getHeight() == 6 && legion.canRecruit())
         {
-            List<Creature> recruits = client.findEligibleRecruits(markerId,
-                legion.getHexLabel());
-            Creature bestRecruit = recruits.get(recruits.size() - 1);
+            List<CreatureType> recruits = client.findEligibleRecruits(
+                markerId, legion.getHexLabel());
+            CreatureType bestRecruit = recruits.get(recruits.size() - 1);
             if (getKillValue(bestRecruit) > getKillValue(bestAngel))
             {
                 LOGGER.log(Level.FINEST, "AI declines acquiring to recruit "
@@ -2239,7 +2258,8 @@ public class SimpleAI implements AI
         while (it.hasNext())
         {
             String creatureName = it.next();
-            Creature creature = Creature.getCreatureByName(creatureName);
+            Creature creature = (Creature)client.getGame().getVariant()
+                .getCreatureByName(creatureName);
             if (best == null || getKillValue(creature) > getKillValue(best))
             {
                 best = creature;
@@ -2284,11 +2304,15 @@ public class SimpleAI implements AI
 
             if (bestAngel == null
                 || bestLegion == null
-                || Creature.getCreatureByName(myAngel).getPointValue() > Creature
-                    .getCreatureByName(bestAngel).getPointValue()
+                || ((Creature)client.getGame().getVariant().getCreatureByName(
+                    myAngel)).getPointValue() > ((Creature)client.getGame()
+                    .getVariant().getCreatureByName(bestAngel))
+                    .getPointValue()
                 || info.compareTo(bestLegion) > 0
-                && (Creature.getCreatureByName(myAngel).getPointValue() == Creature
-                    .getCreatureByName(bestAngel).getPointValue()))
+                && (((Creature)client.getGame().getVariant()
+                    .getCreatureByName(myAngel)).getPointValue() == ((Creature)client
+                    .getGame().getVariant().getCreatureByName(bestAngel))
+                    .getPointValue()))
             {
                 bestLegion = info;
                 bestAngel = myAngel;
@@ -2516,14 +2540,15 @@ public class SimpleAI implements AI
     }
 
     /** XXX Inaccurate for titans. */
-    static int getCombatValue(Creature creature, String terrain)
+    int getCombatValue(Creature creature, String terrain)
     {
         if (creature.isTitan())
         {
             // Don't know the power, so just estimate.
             LOGGER.log(Level.WARNING,
                 "Called SimpleAI.getCombatValue() for Titan");
-            return 6 * Creature.getCreatureByName("Titan").getSkill();
+            return 6 * ((Creature)client.getGame().getVariant()
+                .getCreatureByName("Titan")).getSkill();
         }
 
         int val = creature.getPointValue();
@@ -2546,9 +2571,11 @@ public class SimpleAI implements AI
         return val;
     }
 
-    static int getTitanCombatValue(int power)
+    int getTitanCombatValue(int power)
     {
-        int val = power * Creature.getCreatureByName("Titan").getSkill();
+        int val = power
+            * ((Creature)client.getGame().getVariant().getCreatureByName(
+                "Titan")).getSkill();
         if (power < 9)
         {
             val -= (6 + 2 * (9 - power));
@@ -2556,7 +2583,7 @@ public class SimpleAI implements AI
         return val;
     }
 
-    static int getCombatValue(LegionInfo legion, String terrain)
+    int getCombatValue(LegionInfo legion, String terrain)
     {
         int val = 0;
         Iterator<String> it = legion.getContents().iterator();
@@ -2570,7 +2597,8 @@ public class SimpleAI implements AI
             }
             else
             {
-                Creature creature = Creature.getCreatureByName(name);
+                Creature creature = (Creature)client.getGame().getVariant()
+                    .getCreatureByName(name);
                 val += getCombatValue(creature, terrain);
             }
         }
@@ -2578,9 +2606,9 @@ public class SimpleAI implements AI
         return val;
     }
 
-    static int getKillValue(final Creature creature)
+    static int getKillValue(final CreatureType creature)
     {
-        return getKillValue(creature, null);
+        return getKillValue((Creature)creature, null);
     }
 
     // XXX titan power
@@ -3430,7 +3458,7 @@ public class SimpleAI implements AI
             // We want marsh natives to slightly prefer moving to bog hexes,
             // even though there's no real bonus there, to leave other hexes
             // clear for non-native allies.
-            if (hex.getTerrain().equals("Bog"))
+            if (hex.getTerrain().equals(HazardTerrain.BOG))
             {
                 value += bec.NATIVE_BOG;
             }
@@ -3681,7 +3709,8 @@ public class SimpleAI implements AI
                     {
                         BattleHex neighbor = hex.getNeighbor(i);
                         if (neighbor == null
-                            || neighbor.getTerrain().equals("Tree"))
+                            || neighbor.getTerrain()
+                                .equals(HazardTerrain.TREE))
                         {
                             value += bec.TITAN_BY_EDGE_OR_TREE_BONUS;
                         }

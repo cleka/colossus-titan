@@ -1,23 +1,13 @@
 package net.sf.colossus.server;
 
 
-import java.io.FileNotFoundException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.WeakHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.sf.colossus.util.ResourceLoader;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.HazardTerrain;
-import net.sf.colossus.xmlparser.CreatureLoader;
 
 
 /**
@@ -33,13 +23,11 @@ import net.sf.colossus.xmlparser.CreatureLoader;
  * @author Romain Dolbeau
  */
 
-public class Creature extends CreatureType implements Comparable<Creature>
+public class Creature extends CreatureType
 {
     private static final Logger LOGGER = Logger.getLogger(Creature.class
         .getName());
 
-    private final String name;
-    private final String pluralName;
     private final int power;
     private final int skill;
     private final boolean rangestrikes;
@@ -48,7 +36,6 @@ public class Creature extends CreatureType implements Comparable<Creature>
     private final boolean nativeRiver;
     private final boolean waterDwelling;
     private final boolean magicMissile;
-    private final boolean summonable;
     private final boolean lord;
     private final boolean demilord;
     private int maxCount; // Not final because we adjust for titans.
@@ -59,18 +46,13 @@ public class Creature extends CreatureType implements Comparable<Creature>
         false, false, new HashSet<HazardTerrain>(), false, false, false,
         false, false, false, false, 1, "Unknown", null);
 
-    /** Sometimes we need to iterate through all creature types. */
-    private static List<Creature> creatures = new ArrayList<Creature>();
-    private static List<Creature> summonableCreatures = new ArrayList<Creature>();
-
     public Creature(String name, int power, int skill, boolean rangestrikes,
         boolean flies, Set<HazardTerrain> nativeTerrrains,
         boolean nativeSlope, boolean nativeRiver, boolean waterDwelling,
         boolean magicMissile, boolean summonable, boolean lord,
         boolean demilord, int maxCount, String pluralName, String baseColor)
     {
-        super(nativeTerrrains);
-        this.name = name;
+        super(name, pluralName, nativeTerrrains, summonable);
         this.power = power;
         this.skill = skill;
         this.rangestrikes = rangestrikes;
@@ -79,11 +61,9 @@ public class Creature extends CreatureType implements Comparable<Creature>
         this.nativeRiver = nativeRiver;
         this.waterDwelling = waterDwelling;
         this.magicMissile = magicMissile;
-        this.summonable = summonable;
         this.lord = lord;
         this.demilord = demilord;
         this.maxCount = maxCount;
-        this.pluralName = pluralName;
         this.baseColor = baseColor;
 
         /* warn about likely inappropriate combinations */
@@ -92,51 +72,6 @@ public class Creature extends CreatureType implements Comparable<Creature>
             LOGGER.log(Level.WARNING, "Creature " + name
                 + " is both a Water Dweller and native to Sand and Dune.");
         }
-    }
-
-    /** Call immediately after loading variant, before using creatures. */
-    public static void loadCreatures()
-    {
-        try
-        {
-            creatures.clear();
-            List<String> directories = VariantSupport.getVarDirectoriesList();
-            InputStream creIS = ResourceLoader.getInputStream(VariantSupport
-                .getCreaturesName(), directories);
-            if (creIS == null)
-            {
-                throw new FileNotFoundException(VariantSupport
-                    .getCreaturesName());
-            }
-            CreatureLoader creatureLoader = new CreatureLoader(creIS);
-            creatures.addAll(creatureLoader.getCreatures());
-        }
-        catch (Exception e)
-        {
-            throw new RuntimeException("Failed to load Creatures definition",
-                e);
-        }
-        summonableCreatures.clear();
-        Iterator<Creature> it = creatures.iterator();
-        while (it.hasNext())
-        {
-            Creature c = it.next();
-            if (c.isSummonable())
-            {
-                summonableCreatures.add(c);
-            }
-        }
-        Collections.sort(creatures);
-    }
-
-    public static List<Creature> getCreatures()
-    {
-        return Collections.unmodifiableList(creatures);
-    }
-
-    public static List<Creature> getSummonableCreatures()
-    {
-        return Collections.unmodifiableList(summonableCreatures);
     }
 
     public int getMaxCount()
@@ -187,26 +122,9 @@ public class Creature extends CreatureType implements Comparable<Creature>
         return isTitan();
     }
 
-    /* The name is an unique identifier and must not be changed,
-     so this function is final */
-    public final String getName()
-    {
-        return name;
-    }
-
-    public String getPluralName()
-    {
-        return pluralName;
-    }
-
     public String getImageName()
     {
-        return name;
-    }
-
-    public String getDisplayName()
-    {
-        return name;
+        return getName();
     }
 
     public String[] getImageNames()
@@ -221,7 +139,7 @@ public class Creature extends CreatureType implements Comparable<Creature>
             tempNames[1] = "Power-" + getPower() + colorSuffix;
 
             tempNames[2] = "Skill-" + getSkill() + colorSuffix;
-            tempNames[3] = getDisplayName() + "-Name" + colorSuffix;
+            tempNames[3] = getName() + "-Name" + colorSuffix;
             if (specialIncrement > 0)
             {
                 tempNames[4] = (isFlier() ? "Flying" : "")
@@ -254,13 +172,14 @@ public class Creature extends CreatureType implements Comparable<Creature>
     public int getHintedRecruitmentValue()
     { // this function is replicated in Critter
         return getPointValue()
-            + VariantSupport.getHintedRecruitmentValueOffset(name);
+            + VariantSupport.getHintedRecruitmentValueOffset(getName());
     }
 
     public int getHintedRecruitmentValue(String[] section)
     { // this function is replicated in Critter
         return getPointValue()
-            + VariantSupport.getHintedRecruitmentValueOffset(name, section);
+            + VariantSupport.getHintedRecruitmentValueOffset(getName(),
+                section);
     }
 
     public boolean isRangestriker()
@@ -320,118 +239,10 @@ public class Creature extends CreatureType implements Comparable<Creature>
         return magicMissile;
     }
 
-    public boolean isSummonable()
-    {
-        return summonable;
-    }
-
-    /** getCreatureByName cache.
-     *  towi: do you believe it? 20% of the time was spent in the
-     *    method getCreatureByName(). i had to do something about that!
-     *
-     *    since the names of the creatures do NOT change during a game
-     *    i implemented a simple caching mechanism, fills upon requests.
-     *    in this cache (aka Hashtable) we map from upper/lowercase variants
-     *    to the wanted creature.
-     *
-     *    we add null values when a creature is not found. if these are
-     *    queried we can transparently return this null.
-     *
-     *    Why do I use a "weak" HashMap? I dunno. I guessed in the init phase
-     *    of the game a certain set of different spelling variants might occur.
-     *    these can be discarded later. Hmm, doesnt matter really, i think.
-     */
-    private static Map<String, Creature> _getCreatureByName_cache = new WeakHashMap<String, Creature>();
-    // init the cache with predefined values.
-    static
-    {
-        // "null" (not a null pointer...) is used for recruiter
-        // when it is anonymous, so it is known and legal,
-        // mapped to null (a null pointer, this time).
-        _getCreatureByName_cache.put("null", null);
-    }
-
-    public static void resetCache()
-    {
-        _getCreatureByName_cache.clear();
-        _getCreatureByName_cache.put("null", null);
-    }
-
-    /** case insensitive creature type lookup. its cached, its fast.
-     *
-     * implementation description:
-     * - if creaturen name is found in cache (hash map String->Creature)
-     *   return it
-     * - if not, find it iterating
-     * - put pair into cache, with this specific spelling variant
-     * - return the creature
-     *
-     * @param name case insensitive (!) name of a creature type, not null
-     * @return creature with the given name, null if not a creature.
-     * @throws NullPointerException if name is null
-     */
-    public static Creature getCreatureByName(final String name)
-    {
-        // do not allow null key/name.
-        if (name == null)
-        {
-            throw new NullPointerException(
-                "Calling Creature.getCreatureByName() on null");
-        }
-
-        // first check the cache.
-        if (_getCreatureByName_cache.containsKey(name))
-        {
-            // we found it. can be null, from earlier adding null
-            //   as "not found" marker.
-            return _getCreatureByName_cache.get(name);
-        }
-        else
-        {
-            // find it the slow way and add to cache.
-            Iterator<Creature> it = creatures.iterator();
-            while (it.hasNext())
-            {
-                Creature creature = it.next();
-                if (name.equalsIgnoreCase(creature.getName()))
-                {
-                    // found it the hard way. now add this spelling to cache
-                    _getCreatureByName_cache.put(name, creature);
-                    // end search on success.
-                    return creature;
-                }
-            }
-            // not found the slow way? damn.
-            //   then store this as a negative result for the future, too.
-            LOGGER.log(Level.FINEST, "CUSTOM: unknown creature: " + name);
-            _getCreatureByName_cache.put(name, null);
-            return null;
-        }
-    }
-
-    /**
-     * Checks if a creature with the given name exists.
-     *  
-     * @param name (case insensitive) name of a creature, must not be null.
-     * @return true if this names represents a creature
-     */
-    public static boolean isCreature(final String name)
-    {
-        return getCreatureByName(name) != null;
-    }
-
     @Override
     public String toString()
     {
-        return name;
-    }
-
-    /**
-     * Compare by name.
-     */
-    public int compareTo(Creature other)
-    {
-        return (name.compareTo(other.name));
+        return getName();
     }
 
     /** Compare by name. */
@@ -443,13 +254,13 @@ public class Creature extends CreatureType implements Comparable<Creature>
             return false;
         }
         Creature other = (Creature)object;
-        return name.equals(other.getName());
+        return getName().equals(other.getName());
     }
 
     @Override
     public int hashCode()
     {
-        return name.hashCode();
+        return getName().hashCode();
     }
 
     public static void setNoBaseColor(boolean b)

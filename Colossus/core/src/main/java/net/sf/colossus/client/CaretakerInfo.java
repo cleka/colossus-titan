@@ -4,7 +4,9 @@ package net.sf.colossus.client;
 import java.util.HashMap;
 import java.util.Map;
 
+import net.sf.colossus.game.Game;
 import net.sf.colossus.server.Creature;
+import net.sf.colossus.variant.CreatureType;
 
 
 /**
@@ -18,15 +20,20 @@ public final class CaretakerInfo
 
     /** Map of creature name to Integer count.  As in Caretaker, if an entry
      *  is missing then we assume it is set to the maximum. */
-    private Map<String, Integer> creatureCounts = new HashMap<String, Integer>();
+    private final Map<String, Integer> creatureCounts = new HashMap<String, Integer>();
 
     /** Map of creature name to Integer count.  As in Caretaker, if an entry
      *  is missing then we assume it is set to 0. */
-    private Map<String, Integer> creatureDeadCounts = new HashMap<String, Integer>();
+    private final Map<String, Integer> creatureDeadCounts = new HashMap<String, Integer>();
 
-    public CaretakerInfo()
+    /**
+     * The game of which we manage the creatures.
+     */
+    private final Game game;
+
+    public CaretakerInfo(Game game)
     {
-        // nothing apart from initializers
+        this.game = game;
     }
 
     public void updateCount(String creatureName, int count, int deadCount)
@@ -43,7 +50,8 @@ public final class CaretakerInfo
         Integer count = creatureCounts.get(creatureName);
         if (count == null)
         {
-            Creature cre = Creature.getCreatureByName(creatureName);
+            Creature cre = (Creature)game.getVariant().getCreatureByName(
+                creatureName);
             if (cre != null)
             {
                 return cre.getMaxCount();
@@ -56,7 +64,7 @@ public final class CaretakerInfo
         return count.intValue();
     }
 
-    public int getCount(Creature creature)
+    public int getCount(CreatureType creature)
     {
         if (creature != null)
         {
@@ -78,7 +86,7 @@ public final class CaretakerInfo
         return count.intValue();
     }
 
-    public int getDeadCount(Creature creature)
+    public int getDeadCount(CreatureType creature)
     {
         if (creature != null)
         {
@@ -92,14 +100,14 @@ public final class CaretakerInfo
 
     public int getMaxCount(String creatureName)
     {
-        return getMaxCount(Creature.getCreatureByName(creatureName));
+        return getMaxCount(game.getVariant().getCreatureByName(creatureName));
     }
 
-    public int getMaxCount(Creature creature)
+    public int getMaxCount(CreatureType creature)
     {
         if (creature != null)
         {
-            return creature.getMaxCount();
+            return ((Creature)creature).getMaxCount();
         }
         else
         {

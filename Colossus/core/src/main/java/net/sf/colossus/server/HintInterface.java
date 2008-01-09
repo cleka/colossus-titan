@@ -4,6 +4,7 @@ package net.sf.colossus.server;
 import java.util.List;
 
 import net.sf.colossus.client.LegionInfo;
+import net.sf.colossus.variant.CreatureType;
 
 
 /**
@@ -27,7 +28,8 @@ public interface HintInterface
      * @return The name of the suggested recruit
      */
     public String getRecruitHint(String terrain, LegionInfo legion,
-        List<Creature> recruits, HintOracleInterface oracle, String[] section);
+        List<CreatureType> recruits, HintOracleInterface oracle,
+        String[] section);
 
     /**
      * To obtain the list of creature to split on turn one.

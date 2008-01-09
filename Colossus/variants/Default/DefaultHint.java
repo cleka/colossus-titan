@@ -8,9 +8,9 @@ import java.util.List;
 
 import net.sf.colossus.client.LegionInfo;
 import net.sf.colossus.server.Constants;
-import net.sf.colossus.server.Creature;
 import net.sf.colossus.server.HintOracleInterface;
 import net.sf.colossus.util.DevRandom;
+import net.sf.colossus.variant.CreatureType;
 
 
 public class DefaultHint implements net.sf.colossus.server.HintInterface
@@ -18,10 +18,10 @@ public class DefaultHint implements net.sf.colossus.server.HintInterface
     private final DevRandom rnd = new DevRandom();
 
     // Convert list of recruits from Creature to String for easier compares.
-    public static List<String> creaturesToStrings(List<Creature> creatures)
+    public static List<String> creaturesToStrings(List<CreatureType> creatures)
     {
         List<String> recruits = new ArrayList<String>();
-        for (Iterator<Creature> it = creatures.iterator(); it.hasNext();)
+        for (Iterator<CreatureType> it = creatures.iterator(); it.hasNext();)
         {
             Object ob = it.next();
             String str = ob.toString();
@@ -31,7 +31,8 @@ public class DefaultHint implements net.sf.colossus.server.HintInterface
     }
 
     public String getRecruitHint(String terrain, LegionInfo legion,
-        List<Creature> recruits, HintOracleInterface oracle, String[] section)
+        List<CreatureType> recruits, HintOracleInterface oracle,
+        String[] section)
     {
         List<String> recruitNames = creaturesToStrings(recruits);
         List<String> sect = Arrays.asList(section);

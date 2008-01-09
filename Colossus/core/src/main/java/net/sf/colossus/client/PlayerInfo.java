@@ -9,7 +9,6 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import net.sf.colossus.game.Game;
 import net.sf.colossus.game.PlayerState;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.Player;
@@ -46,10 +45,7 @@ public final class PlayerInfo extends PlayerState
     /** Two-stage initialization. */
     PlayerInfo(Client client, net.sf.colossus.Player player)
     {
-        // a total hack to pass something into the super constructor. The name of the new player
-        // is just designed to be unique enough not to confuse the static map in the Player class
-        // the actual name will be set later (which needs to change).
-        super(new Game(null, new net.sf.colossus.Player[0]), player);
+        super(client.getGame(), player);
         this.client = client;
         net.sf.colossus.server.CustomRecruitBase.addPlayerInfo(this);
         net.sf.colossus.webcommon.InstanceTracker.register(this, client

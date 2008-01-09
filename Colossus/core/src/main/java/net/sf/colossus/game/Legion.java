@@ -5,29 +5,27 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import net.sf.colossus.Player;
-
 
 public class Legion
 {
     /**
-     * The player who owns this Legion.
+     * The player/game combination owning this Legion.
      */
-    private final Player player;
+    private final PlayerState playerState;
 
     /**
      * The creatures in this legion.
      */
     private final List<Creature> creatures = new ArrayList<Creature>();
 
-    public Legion(final Player player)
+    public Legion(final PlayerState playerState)
     {
-        this.player = player;
+        this.playerState = playerState;
     }
 
-    public Player getPlayer()
+    public PlayerState getPlayer()
     {
-        return player;
+        return playerState;
     }
 
     public List<Creature> getCreatures()

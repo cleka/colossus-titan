@@ -24,9 +24,11 @@ import javax.swing.ScrollPaneConstants;
 
 import net.sf.colossus.server.Creature;
 import net.sf.colossus.server.Critter;
+import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.util.HTMLColor;
 import net.sf.colossus.util.KDialog;
 import net.sf.colossus.util.RecruitGraph;
+import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.HazardTerrain;
 import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
@@ -154,10 +156,11 @@ public final class ShowCreatureDetails extends KDialog implements
         for (int ti = 0; ti < terrains.length; ti++)
         {
             buf = new StringBuffer();
-            List<Creature> recruiters = Creature.getCreatures();
+            List<CreatureType> recruiters = VariantSupport.getCurrentVariant()
+                .getCreatureTypes();
             for (int ri = 0; ri < recruiters.size(); ri++)
             {
-                final Creature recruiter = recruiters.get(ri);
+                final CreatureType recruiter = recruiters.get(ri);
                 int num = TerrainRecruitLoader.numberOfRecruiterNeeded(
                     recruiter, creature, terrains[ti], null);
                 if (num == 1)
@@ -191,10 +194,11 @@ public final class ShowCreatureDetails extends KDialog implements
         for (int ti = 0; ti < terrains.length; ti++)
         {
             buf = new StringBuffer();
-            List<Creature> recruits = Creature.getCreatures();
+            List<CreatureType> recruits = VariantSupport.getCurrentVariant()
+                .getCreatureTypes();
             for (int ri = 0; ri < recruits.size(); ri++)
             {
-                final Creature recruit = recruits.get(ri);
+                final CreatureType recruit = recruits.get(ri);
                 int num = TerrainRecruitLoader.numberOfRecruiterNeeded(
                     creature, recruit, terrains[ti], null);
                 if ((num > 0) && (num < RecruitGraph.BIGNUM))

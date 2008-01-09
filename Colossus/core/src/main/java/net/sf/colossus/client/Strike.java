@@ -149,7 +149,8 @@ public final class Strike
             }
         }
 
-        Creature creature = Creature.getCreatureByName(chit.getCreatureName());
+        Creature creature = (Creature)client.getGame().getVariant()
+            .getCreatureByName(chit.getCreatureName());
 
         // Then do rangestrikes if applicable.  Rangestrikes are not allowed
         // if the creature can strike normally, so only look for them if
@@ -530,9 +531,10 @@ public final class Strike
     /** Return true if the rangestrike is possible. */
     private boolean isRangestrikePossible(BattleChit chit, BattleChit target)
     {
-        Creature creature = Creature.getCreatureByName(chit.getCreatureName());
-        Creature targetCreature = Creature.getCreatureByName(target
-            .getCreatureName());
+        Creature creature = (Creature)client.getGame().getVariant()
+            .getCreatureByName(chit.getCreatureName());
+        Creature targetCreature = (Creature)client.getGame().getVariant()
+            .getCreatureByName(target.getCreatureName());
 
         BattleHex currentHex = client.getBattleHex(chit);
         BattleHex targetHex = client.getBattleHex(target);
@@ -820,7 +822,8 @@ public final class Strike
     {
         BattleHex hex = client.getBattleHex(chit);
         BattleHex targetHex = client.getBattleHex(target);
-        Creature striker = Creature.getCreatureByName(chit.getCreatureName());
+        Creature striker = (Creature)client.getGame().getVariant()
+            .getCreatureByName(chit.getCreatureName());
 
         int dice;
         if (striker.isTitan())

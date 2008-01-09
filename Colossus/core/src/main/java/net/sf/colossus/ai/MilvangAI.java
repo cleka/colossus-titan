@@ -17,6 +17,7 @@ import net.sf.colossus.client.Client;
 import net.sf.colossus.client.LegionInfo;
 import net.sf.colossus.server.Creature;
 import net.sf.colossus.util.Combos;
+import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
 
@@ -43,21 +44,21 @@ public class MilvangAI extends RationalAI
         int recruitNow = 0;
         int recruitLater = 0;
 
-        List<Creature> tempRecruits = TerrainRecruitLoader
+        List<CreatureType> tempRecruits = TerrainRecruitLoader
             .getPossibleRecruits(terrain, "");
-        List<Creature> recruiters = TerrainRecruitLoader
+        List<CreatureType> recruiters = TerrainRecruitLoader
             .getPossibleRecruiters(terrain, "");
 
         recruiters.retainAll(critters.keySet());
 
-        Iterator<Creature> lit = tempRecruits.iterator();
+        Iterator<CreatureType> lit = tempRecruits.iterator();
         while (lit.hasNext())
         {
-            Creature creature = lit.next();
-            Iterator<Creature> liter = recruiters.iterator();
+            Creature creature = (Creature)lit.next();
+            Iterator<CreatureType> liter = recruiters.iterator();
             while (liter.hasNext())
             {
-                Creature lesser = liter.next();
+                Creature lesser = (Creature)liter.next();
                 int numNeeded = TerrainRecruitLoader.numberOfRecruiterNeeded(
                     lesser, creature, terrain, "");
                 int hintValue = creature.getHintedRecruitmentValue();
@@ -100,7 +101,8 @@ public class MilvangAI extends RationalAI
         for (Iterator<String> it = legion.getContents().iterator(); it
             .hasNext();)
         {
-            critters.add(Creature.getCreatureByName(it.next()));
+            critters.add((Creature)client.getGame().getVariant()
+                .getCreatureByName(it.next()));
         }
 
         double bestValue = 0;

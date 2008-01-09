@@ -3,37 +3,25 @@ package Abyssal9;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 
 import net.sf.colossus.client.LegionInfo;
 import net.sf.colossus.server.Constants;
-import net.sf.colossus.server.Creature;
 import net.sf.colossus.server.HintOracleInterface;
 import net.sf.colossus.util.DevRandom;
+import net.sf.colossus.variant.CreatureType;
+import Default.DefaultHint;
 
 
 public class Abyssal9Hint implements net.sf.colossus.server.HintInterface
 {
     private final DevRandom rnd = new DevRandom();
 
-    // Convert list of recruits from Creature to String for easier compares.
-    public static List<String> creaturesToStrings(List<Creature> creatures)
-    {
-        List<String> recruits = new ArrayList<String>();
-        for (Iterator<Creature> it = creatures.iterator(); it.hasNext();)
-        {
-            Object ob = it.next();
-            String str = ob.toString();
-            recruits.add(str);
-        }
-        return recruits;
-    }
-
     public String getRecruitHint(String terrain, LegionInfo legion,
-        List<Creature> recruits, HintOracleInterface oracle, String[] section)
+        List<CreatureType> recruits, HintOracleInterface oracle,
+        String[] section)
     {
-        List<String> recruitNames = creaturesToStrings(recruits);
+        List<String> recruitNames = DefaultHint.creaturesToStrings(recruits);
         List<String> sect = Arrays.asList(section);
 
         if (terrain.equals("Brush"))

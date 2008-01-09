@@ -20,9 +20,9 @@ import java.util.logging.Logger;
 
 import javax.swing.JButton;
 
-import net.sf.colossus.server.Creature;
 import net.sf.colossus.server.Legion;
 import net.sf.colossus.util.KDialog;
+import net.sf.colossus.variant.CreatureType;
 
 
 /**
@@ -38,15 +38,15 @@ final class SummonAngel extends KDialog implements MouseListener,
     private static final Logger LOGGER = Logger.getLogger(SummonAngel.class
         .getName());
 
-    private String markerId;
-    private List<Chit> sumChitList = new ArrayList<Chit>();
-    private JButton cancelButton;
+    private final String markerId;
+    private final List<Chit> sumChitList = new ArrayList<Chit>();
+    private final JButton cancelButton;
     private static boolean active;
-    private Client client;
+    private final Client client;
     private static final String baseSummonString = ": Summon Angel into Legion ";
     private static final String sourceSummonString = " Selected Legion is ";
     private static final String noSourceSummonString = " No selected Legion";
-    private SaveWindow saveWindow;
+    private final SaveWindow saveWindow;
 
     private SummonAngel(Client client, String markerId)
     {
@@ -59,9 +59,13 @@ final class SummonAngel extends KDialog implements MouseListener,
 
         // Count and highlight legions with summonable angels, and put
         // board into a state where those legions can be selected.
+        // TODO this should really not happen in a constructor
         if (client.getBoard().highlightSummonableAngels(markerId) < 1)
         {
             cleanup(null, null);
+            // trying to keep things final despite awkward exit point
+            saveWindow = null;
+            cancelButton = null;
             return;
         }
 
@@ -77,13 +81,14 @@ final class SummonAngel extends KDialog implements MouseListener,
 
         int scale = 4 * Scale.get();
 
-        List<Creature> summonableList = Creature.getSummonableCreatures();
-        Iterator<Creature> it = summonableList.iterator();
+        List<CreatureType> summonableList = client.getGame().getVariant()
+            .getSummonableCreatureTypes();
+        Iterator<CreatureType> it = summonableList.iterator();
         sumChitList.clear();
         while (it.hasNext())
         {
             Chit tempChit;
-            Creature c = it.next();
+            CreatureType c = it.next();
             tempChit = new Chit(scale, c.getName());
             contentPane.add(tempChit);
             tempChit.addMouseListener(this);

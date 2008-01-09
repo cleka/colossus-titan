@@ -14,6 +14,8 @@ import java.util.logging.Logger;
 import net.sf.colossus.client.PlayerInfo;
 import net.sf.colossus.server.Creature;
 import net.sf.colossus.server.CustomRecruitBase;
+import net.sf.colossus.server.VariantSupport;
+import net.sf.colossus.variant.CreatureType;
 
 
 /**
@@ -42,10 +44,11 @@ public class BalrogRecruitment extends CustomRecruitBase
     public List<Creature> getAllPossibleSpecialRecruits(String terrain)
     {
         List<Creature> temp = new ArrayList<Creature>();
-        Iterator<Creature> it = Creature.getCreatures().iterator();
+        Iterator<CreatureType> it = VariantSupport.getCurrentVariant()
+            .getCreatureTypes().iterator();
         while (it.hasNext())
         {
-            Creature cre = it.next();
+            Creature cre = (Creature)it.next();
             if (cre.getName().startsWith(balrogPrefix))
             {
                 temp.add(cre);
@@ -81,7 +84,8 @@ public class BalrogRecruitment extends CustomRecruitBase
 
         if (getCount(name) > 0)
         {
-            temp.add(Creature.getCreatureByName(name));
+            temp.add((Creature)VariantSupport.getCurrentVariant()
+                .getCreatureByName(name));
         }
         return temp;
     }
@@ -147,14 +151,15 @@ public class BalrogRecruitment extends CustomRecruitBase
             nowNumber = (newscore / balrogValue);
         }
 
-        if (!Creature.isCreature(name))
+        if (!VariantSupport.getCurrentVariant().isCreature(name))
         {
             LOGGER.log(Level.SEVERE, "CUSTOM: Balrog by the name of " + name
                 + " doesn't exist !");
             return;
         }
 
-        Creature cre = Creature.getCreatureByName(name);
+        Creature cre = (Creature)VariantSupport.getCurrentVariant()
+            .getCreatureByName(name);
         ((CreatureBalrog)cre).setNewMaxCount(nowNumber);
 
         int difference = nowNumber - alreadyNumber;

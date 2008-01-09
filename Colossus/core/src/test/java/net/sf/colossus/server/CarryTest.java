@@ -45,18 +45,18 @@ public class CarryTest extends TestCase
         game.addPlayer("Red", "SimpleAI");
         game.addPlayer("Blue", "SimpleAI");
 
-        cyclops = Creature.getCreatureByName("Cyclops");
-        troll = Creature.getCreatureByName("Troll");
-        ogre = Creature.getCreatureByName("Ogre");
-        ranger = Creature.getCreatureByName("Ranger");
-        gorgon = Creature.getCreatureByName("Gorgon");
-        lion = Creature.getCreatureByName("Lion");
-        griffon = Creature.getCreatureByName("Griffon");
-        hydra = Creature.getCreatureByName("Hydra");
-        centaur = Creature.getCreatureByName("Centaur");
-        colossus = Creature.getCreatureByName("Colossus");
-        gargoyle = Creature.getCreatureByName("Gargoyle");
-        warlock = Creature.getCreatureByName("Warlock");
+        cyclops = (Creature)game.getVariant().getCreatureByName("Cyclops");
+        troll = (Creature)game.getVariant().getCreatureByName("Troll");
+        ogre = (Creature)game.getVariant().getCreatureByName("Ogre");
+        ranger = (Creature)game.getVariant().getCreatureByName("Ranger");
+        gorgon = (Creature)game.getVariant().getCreatureByName("Gorgon");
+        lion = (Creature)game.getVariant().getCreatureByName("Lion");
+        griffon = (Creature)game.getVariant().getCreatureByName("Griffon");
+        hydra = (Creature)game.getVariant().getCreatureByName("Hydra");
+        centaur = (Creature)game.getVariant().getCreatureByName("Centaur");
+        colossus = (Creature)game.getVariant().getCreatureByName("Colossus");
+        gargoyle = (Creature)game.getVariant().getCreatureByName("Gargoyle");
+        warlock = (Creature)game.getVariant().getCreatureByName("Warlock");
     }
 
     public void testCarries()

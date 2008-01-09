@@ -17,15 +17,16 @@ import java.util.Timer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.sf.colossus.Player;
 import net.sf.colossus.client.Client;
 import net.sf.colossus.client.LegionInfo;
 import net.sf.colossus.client.MasterBoard;
 import net.sf.colossus.client.MasterHex;
 import net.sf.colossus.client.PlayerInfo;
+import net.sf.colossus.game.PlayerState;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.Creature;
 import net.sf.colossus.util.MultiSet;
+import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
 
@@ -388,12 +389,12 @@ public class RationalAI extends SimpleAI implements AI
         // the mobility value of a particular hex in evaluateMove
 
         // Consider recruiting.
-        List<Creature> recruits = client.findEligibleRecruits(legion
+        List<CreatureType> recruits = client.findEligibleRecruits(legion
             .getMarkerId(), hexLabel);
 
         if (!recruits.isEmpty())
         {
-            Creature bestRecruit = recruits.get(recruits.size() - 1);
+            Creature bestRecruit = (Creature)recruits.get(recruits.size() - 1);
 
             value = ghrv(bestRecruit, legion, hintSectionUsed);
         }
@@ -424,8 +425,8 @@ public class RationalAI extends SimpleAI implements AI
 
                 while (it.hasNext())
                 {
-                    Creature tempRecruit = Creature.getCreatureByName(it
-                        .next());
+                    Creature tempRecruit = (Creature)client.getGame()
+                        .getVariant().getCreatureByName(it.next());
 
                     if ((bestRecruit == null)
                         || (ghrv(tempRecruit, legion, hintSectionUsed) >= ghrv(
@@ -522,7 +523,8 @@ public class RationalAI extends SimpleAI implements AI
         while (critterIt.hasNext())
         {
             String name = critterIt.next();
-            Creature critter = Creature.getCreatureByName(name);
+            Creature critter = (Creature)client.getGame().getVariant()
+                .getCreatureByName(name);
 
             // Never split out the titan.
             if (critter.isTitan())
@@ -742,7 +744,7 @@ public class RationalAI extends SimpleAI implements AI
             // ForcedSplit and ForcedSingle implementations here are perhaps 
             // quite poor solutions, but better than getting NAKs...
 
-            boolean moved = handleForcedSplitMoves(playerInfo.getPlayer());
+            boolean moved = handleForcedSplitMoves(playerInfo);
             if (moved)
             {
                 return true;
@@ -750,7 +752,7 @@ public class RationalAI extends SimpleAI implements AI
 
             if (playerInfo.numLegionsMoved() == 0)
             {
-                moved = handleForcedSingleMove(playerInfo.getPlayer());
+                moved = handleForcedSingleMove(playerInfo);
 
                 // Earlier here was a comment: 
                 // "always need to retry" and hardcoded returned true.
@@ -959,7 +961,7 @@ public class RationalAI extends SimpleAI implements AI
      * one and spare weak ones...  
      */
 
-    private boolean handleForcedSplitMoves(Player player)
+    private boolean handleForcedSplitMoves(PlayerState player)
     {
         int roll = client.getMovementRoll();
         ArrayList<String> unsplitHexes = new ArrayList<String>();
@@ -973,7 +975,7 @@ public class RationalAI extends SimpleAI implements AI
          * c) Once we did move one, we move, return true, get called again,
          *    then the list of labels is re-considered again.
          */
-        Iterator<String> it = client.getPlayerInfo(player).getLegionIds().iterator();
+        Iterator<String> it = ((PlayerInfo)player).getLegionIds().iterator();
         while (it.hasNext())
         {
             String markerId = it.next();
@@ -1105,7 +1107,7 @@ public class RationalAI extends SimpleAI implements AI
      * (except Titan legion) to the place which is best for it.
      * Moves Titan legion only if no other choice.
      */
-    private boolean handleForcedSingleMove(Player player)
+    private boolean handleForcedSingleMove(PlayerState player)
     {
         int roll = client.getMovementRoll();
 
@@ -1113,7 +1115,7 @@ public class RationalAI extends SimpleAI implements AI
 
         ArrayList<String> movableLegions = new ArrayList<String>();
 
-        Iterator<String> it = client.getPlayerInfo(player).getLegionIds().iterator();
+        Iterator<String> it = ((PlayerInfo)player).getLegionIds().iterator();
         while (it.hasNext())
         {
             String markerId = it.next();
@@ -2081,12 +2083,13 @@ public class RationalAI extends SimpleAI implements AI
             if (round == 4 && defenderCreatures.size() > 1)
             {
                 // add in enemy's most likely turn 4 recruit
-                List<Creature> recruits = client.findEligibleRecruits(defender
-                    .getMarkerId(), hex.getLabel());
+                List<CreatureType> recruits = client.findEligibleRecruits(
+                    defender.getMarkerId(), hex.getLabel());
 
                 if (!recruits.isEmpty())
                 {
-                    Creature bestRecruit = recruits.get(recruits.size() - 1);
+                    Creature bestRecruit = (Creature)recruits.get(recruits
+                        .size() - 1);
 
                     defenderMuster = ghrv(bestRecruit, defender,
                         hintSectionUsed);
@@ -2236,12 +2239,13 @@ public class RationalAI extends SimpleAI implements AI
         if (attackerCreatures.size() > 2)
         {
             // add in attacker's most likely recruit
-            List<Creature> recruits = client.findEligibleRecruits(attacker
+            List<CreatureType> recruits = client.findEligibleRecruits(attacker
                 .getMarkerId(), hex.getLabel());
 
             if (!recruits.isEmpty())
             {
-                Creature bestRecruit = recruits.get(recruits.size() - 1);
+                Creature bestRecruit = (Creature)recruits
+                    .get(recruits.size() - 1);
                 attackerMuster = bestRecruit.getPointValue();
             }
         }
@@ -2250,12 +2254,13 @@ public class RationalAI extends SimpleAI implements AI
         if (round < 4 && defenderCreatures.size() > 1)
         {
             // add in enemy's most likely turn 4 recruit
-            List<Creature> recruits = client.findEligibleRecruits(defender
+            List<CreatureType> recruits = client.findEligibleRecruits(defender
                 .getMarkerId(), hex.getLabel());
 
             if (!recruits.isEmpty())
             {
-                Creature bestRecruit = recruits.get(recruits.size() - 1);
+                Creature bestRecruit = (Creature)recruits
+                    .get(recruits.size() - 1);
 
                 defenderMuster = ghrv(bestRecruit, defender, hintSectionUsed);
             }
@@ -2336,12 +2341,12 @@ public class RationalAI extends SimpleAI implements AI
 
         // find attacker's most likely recruit
         double deniedMuster = 0;
-        List<Creature> recruits = client.findEligibleRecruits(enemy
+        List<CreatureType> recruits = client.findEligibleRecruits(enemy
             .getMarkerId(), legion.getCurrentHex().getLabel());
 
         if (!recruits.isEmpty())
         {
-            Creature bestRecruit = recruits.get(recruits.size() - 1);
+            Creature bestRecruit = (Creature)recruits.get(recruits.size() - 1);
             deniedMuster = bestRecruit.getPointValue();
         }
 
@@ -2487,13 +2492,15 @@ public class RationalAI extends SimpleAI implements AI
                 // of creatures so that the AI knows to jump
                 // titan singletons
                 ps = new PowerSkill("Titan", Math.max(titanPower - 5, 1),
-                    Creature.getCreatureByName("Titan").getSkill());
+                    ((Creature)client.getGame().getVariant()
+                        .getCreatureByName("Titan")).getSkill());
                 powerskills.add(ps);
 
             }
             else
             {
-                Creature creature = Creature.getCreatureByName(name);
+                Creature creature = (Creature)client.getGame().getVariant()
+                    .getCreatureByName(name);
                 PowerSkill ps = getNativeValue(creature, terrain, defender);
                 powerskills.add(ps);
             }

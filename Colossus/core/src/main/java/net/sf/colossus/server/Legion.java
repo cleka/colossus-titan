@@ -11,6 +11,8 @@ import java.util.logging.Logger;
 import net.sf.colossus.client.BattleMap;
 import net.sf.colossus.client.MasterBoard;
 import net.sf.colossus.client.MasterHex;
+import net.sf.colossus.game.PlayerState;
+import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
 
@@ -47,7 +49,9 @@ public final class Legion extends net.sf.colossus.game.Legion implements
         Creature creature5, Creature creature6, Creature creature7,
         String playerName, Game game)
     {
-        super(net.sf.colossus.Player.getPlayerByName(playerName));
+        // TODO we just fake a playerstate here
+        super(new PlayerState(game, net.sf.colossus.Player
+            .getPlayerByName(playerName)));
         this.markerId = markerId;
         this.parentId = parentId;
         // Sanity check
@@ -100,11 +104,12 @@ public final class Legion extends net.sf.colossus.game.Legion implements
             .getStartingCreatures(MasterBoard.getHexByLabel(hexLabel)
                 .getTerrain());
         Legion legion = new Legion(markerId, null, hexLabel, hexLabel,
-            Creature.getCreatureByName(Constants.titan),
-            Creature.getCreatureByName(TerrainRecruitLoader
-                .getPrimaryAcquirable()), startCre[2], startCre[2],
-            startCre[0], startCre[0], startCre[1], startCre[1], playerName,
-            game);
+            (Creature)VariantSupport.getCurrentVariant().getCreatureByName(
+                Constants.titan),
+            (Creature)VariantSupport.getCurrentVariant().getCreatureByName(
+                TerrainRecruitLoader.getPrimaryAcquirable()), startCre[2],
+            startCre[2], startCre[0], startCre[0], startCre[1], startCre[1],
+            playerName, game);
 
         Iterator<Critter> it = legion.getCritters().iterator();
         while (it.hasNext())
@@ -190,7 +195,8 @@ public final class Legion extends net.sf.colossus.game.Legion implements
             }
             else
             {
-                Creature angel = Creature.getCreatureByName(angelType);
+                Creature angel = (Creature)game.getVariant()
+                    .getCreatureByName(angelType);
                 if (angel != null)
                 {
                     addCreature(angel, true);
@@ -334,7 +340,7 @@ public final class Legion extends net.sf.colossus.game.Legion implements
         return true;
     }
 
-    int numCreature(Creature creature)
+    int numCreature(CreatureType creature)
     {
         int count = 0;
         Iterator<Critter> it = critters.iterator();
@@ -414,7 +420,7 @@ public final class Legion extends net.sf.colossus.game.Legion implements
 
     public String getPlayerName()
     {
-        return getPlayer().getName();
+        return getPlayer().getPlayer().getName();
     }
 
     Player getPlayerState()
@@ -501,7 +507,7 @@ public final class Legion extends net.sf.colossus.game.Legion implements
             + " in "
             + getStartingHexLabel()
             + (teleported ? (game.getNumEnemyLegions(hexLabel, game
-                .getPlayer(getPlayer().getName())) > 0 ? " titan teleports "
+                .getPlayer(getPlayerName())) > 0 ? " titan teleports "
                 : " tower teleports (" + teleportingLord + ") ") : " moves ")
             + "to " + hex.getDescription() + " entering on " + entrySide);
     }
@@ -567,7 +573,8 @@ public final class Legion extends net.sf.colossus.game.Legion implements
     {
         if (recruitName != null)
         {
-            Creature creature = Creature.getCreatureByName(recruitName);
+            Creature creature = (Creature)game.getVariant().getCreatureByName(
+                recruitName);
             game.getCaretaker().putOneBack(creature);
             removeCreature(creature, false, true);
             recruitName = null;
@@ -863,7 +870,7 @@ public final class Legion extends net.sf.colossus.game.Legion implements
 
         player.selectMarkerId(newMarkerId);
         Legion newLegion = Legion.getEmptyLegion(newMarkerId, markerId,
-            currentHexLabel, getPlayer().getName(), game);
+            currentHexLabel, getPlayerName(), game);
 
         Iterator<Creature> it = creatures.iterator();
         while (it.hasNext())

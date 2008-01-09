@@ -31,6 +31,7 @@ import net.sf.colossus.util.Options;
 import net.sf.colossus.util.ResourceLoader;
 import net.sf.colossus.util.Split;
 import net.sf.colossus.util.ViableEntityManager;
+import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
 import org.jdom.Attribute;
@@ -208,7 +209,8 @@ public final class Game extends net.sf.colossus.game.Game
         // No longer need the player name and type options.
         options.clearPlayerInfo();
 
-        Creature.getCreatureByName("Titan").setMaxCount(getNumPlayers());
+        ((Creature)getVariant().getCreatureByName("Titan"))
+            .setMaxCount(getNumPlayers());
     }
 
     /** Start a new game. */
@@ -226,8 +228,6 @@ public final class Game extends net.sf.colossus.game.Game
 
         VariantSupport.loadVariant(options.getStringOption(Options.variant),
             true);
-
-        Creature.resetCache();
 
         LOGGER.log(Level.INFO, "Starting new game");
 
@@ -1204,12 +1204,12 @@ public final class Game extends net.sf.colossus.game.Game
             root.addContent(car);
 
             // Caretaker stacks
-            List<Creature> creatures = Creature.getCreatures();
-            Iterator<Creature> itCre = creatures.iterator();
+            List<CreatureType> creatures = getVariant().getCreatureTypes();
+            Iterator<CreatureType> itCre = creatures.iterator();
 
             while (itCre.hasNext())
             {
-                Creature creature = itCre.next();
+                CreatureType creature = itCre.next();
 
                 el = new Element("Creature");
                 el.setAttribute("name", creature.getName());
@@ -1466,7 +1466,8 @@ public final class Game extends net.sf.colossus.game.Game
                 String creatureName = el.getAttribute("name").getValue();
                 int remaining = el.getAttribute("remaining").getIntValue();
                 int dead = el.getAttribute("dead").getIntValue();
-                Creature creature = Creature.getCreatureByName(creatureName);
+                Creature creature = (Creature)getVariant().getCreatureByName(
+                    creatureName);
 
                 caretaker.setCount(creature, remaining);
                 caretaker.setDeadCount(creature, dead);
@@ -1650,8 +1651,8 @@ public final class Game extends net.sf.colossus.game.Game
         {
             Element cre = it.next();
             String name = cre.getAttribute("name").getValue();
-            Critter critter = new Critter(Creature.getCreatureByName(name),
-                null, this);
+            Critter critter = new Critter((Creature)getVariant()
+                .getCreatureByName(name), null, this);
 
             // Battle stuff
             if (cre.getAttribute("hits") != null)
@@ -1792,21 +1793,21 @@ public final class Game extends net.sf.colossus.game.Game
         String terrain = hex.getTerrain();
 
         recruits = new ArrayList<Creature>();
-        List<Creature> tempRecruits = TerrainRecruitLoader
+        List<CreatureType> tempRecruits = TerrainRecruitLoader
             .getPossibleRecruits(terrain, hexLabel);
-        List<Creature> recruiters = TerrainRecruitLoader
+        List<CreatureType> recruiters = TerrainRecruitLoader
             .getPossibleRecruiters(terrain, hexLabel);
 
-        Iterator<Creature> lit = tempRecruits.iterator();
+        Iterator<CreatureType> lit = tempRecruits.iterator();
 
         while (lit.hasNext())
         {
-            Creature creature = lit.next();
-            Iterator<Creature> itRec = recruiters.iterator();
+            Creature creature = (Creature)lit.next();
+            Iterator<CreatureType> itRec = recruiters.iterator();
 
             while (itRec.hasNext())
             {
-                Creature lesser = itRec.next();
+                Creature lesser = (Creature)itRec.next();
 
                 if ((TerrainRecruitLoader.numberOfRecruiterNeeded(lesser,
                     creature, terrain, hexLabel) <= legion.numCreature(lesser))
@@ -1831,13 +1832,15 @@ public final class Game extends net.sf.colossus.game.Game
     }
 
     /** Return a list of eligible recruiter creatures. */
-    List<Creature> findEligibleRecruiters(String markerId, String recruitName)
+    List<CreatureType> findEligibleRecruiters(String markerId,
+        String recruitName)
     {
-        List<Creature> recruiters;
-        Creature recruit = Creature.getCreatureByName(recruitName);
+        List<CreatureType> recruiters;
+        Creature recruit = (Creature)getVariant().getCreatureByName(
+            recruitName);
         if (recruit == null)
         {
-            return new ArrayList<Creature>();
+            return new ArrayList<CreatureType>();
         }
 
         Legion legion = getLegionByMarkerId(markerId);
@@ -1846,10 +1849,10 @@ public final class Game extends net.sf.colossus.game.Game
         String terrain = hex.getTerrain();
         recruiters = TerrainRecruitLoader.getPossibleRecruiters(terrain,
             hexLabel);
-        Iterator<Creature> it = recruiters.iterator();
+        Iterator<CreatureType> it = recruiters.iterator();
         while (it.hasNext())
         {
-            Creature possibleRecruiter = it.next();
+            CreatureType possibleRecruiter = it.next();
             int needed = TerrainRecruitLoader.numberOfRecruiterNeeded(
                 possibleRecruiter, recruit, terrain, hexLabel);
 
@@ -1881,7 +1884,7 @@ public final class Game extends net.sf.colossus.game.Game
             return;
         }
         // Check for recruiter legality.
-        List<Creature> recruiters = findEligibleRecruiters(legion
+        List<CreatureType> recruiters = findEligibleRecruiters(legion
             .getMarkerId(), recruit.getName());
 
         if (recruiter == null)
@@ -1952,7 +1955,7 @@ public final class Game extends net.sf.colossus.game.Game
         {
             String name = it.next();
 
-            if (caretaker.getCount(Creature.getCreatureByName(name)) >= 1
+            if (caretaker.getCount(getVariant().getCreatureByName(name)) >= 1
                 && !recruits.contains(name))
             {
                 recruits.add(name);
@@ -2553,12 +2556,12 @@ public final class Game extends net.sf.colossus.game.Game
             {
                 String hexLabel = candidate.getCurrentHexLabel();
                 boolean hasSummonable = false;
-                List<Creature> summonableList = Creature
-                    .getSummonableCreatures();
-                Iterator<Creature> sumIt = summonableList.iterator();
+                List<CreatureType> summonableList = getVariant()
+                    .getSummonableCreatureTypes();
+                Iterator<CreatureType> sumIt = summonableList.iterator();
                 while (sumIt.hasNext() && !hasSummonable)
                 {
-                    Creature c = sumIt.next();
+                    CreatureType c = sumIt.next();
 
                     hasSummonable = hasSummonable
                         || (candidate.numCreature(c) > 0);
@@ -2607,7 +2610,7 @@ public final class Game extends net.sf.colossus.game.Game
         while (it.hasNext())
         {
             String name = it.next();
-            Creature creature = Creature.getCreatureByName(name);
+            Creature creature = (Creature)getVariant().getCreatureByName(name);
             creatures.add(creature);
         }
 
@@ -2859,7 +2862,8 @@ public final class Game extends net.sf.colossus.game.Game
     {
         Legion defender = getLegionByMarkerId(markerId);
         String hexLabel = defender.getCurrentHexLabel();
-        Legion attacker = getFirstEnemyLegion(hexLabel, defender.getPlayerState());
+        Legion attacker = getFirstEnemyLegion(hexLabel, defender
+            .getPlayerState());
 
         handleConcession(defender, attacker, true);
     }
@@ -3115,7 +3119,8 @@ public final class Game extends net.sf.colossus.game.Game
                 {
                     log.append(", ");
                 }
-                Creature creature = Creature.getCreatureByName(creatureName);
+                Creature creature = (Creature)getVariant().getCreatureByName(
+                    creatureName);
                 winner.removeCreature(creature, true, true);
                 server.allTellRemoveCreature(winner.getMarkerId(),
                     creatureName, true, Constants.reasonNegotiated);

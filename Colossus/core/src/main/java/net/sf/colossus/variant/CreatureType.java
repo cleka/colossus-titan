@@ -1,8 +1,11 @@
 package net.sf.colossus.variant;
 
 
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
+
+import Balrog.CreatureBalrog;
 
 
 /**
@@ -13,12 +16,62 @@ import java.util.Set;
  */
 public class CreatureType
 {
+    /**
+     * A comparator sorting creature types by name.
+     */
+    public static final Comparator<CreatureType> NAME_ORDER = new Comparator<CreatureType>()
+    {
+        public int compare(CreatureType type1, CreatureType type2)
+        {
+            return type1.getName().compareTo(type2.getName());
+        }
+    };
+
+    private final String name;
+
+    private final String pluralName;
+
     private final Set<HazardTerrain> nativeTerrains = new HashSet<HazardTerrain>();
 
-    public CreatureType(Set<HazardTerrain> nativeTerrains)
+    private final boolean isSummonable;
+
+    public CreatureType(String name, String pluralName,
+        Set<HazardTerrain> nativeTerrains, boolean isSummonable)
     {
-        // defensive, but shallow copy
+        this.name = name;
+        this.pluralName = pluralName;
+
+        // defensive, but shallow copy of terrains
         this.nativeTerrains.addAll(nativeTerrains);
+
+        this.isSummonable = isSummonable;
+    }
+
+    /**
+     * The name used for creatures of this type.
+     */
+    public String getName()
+    {
+        return name;
+    }
+
+    /**
+     * A display name.
+     * 
+     * This is overridden by {@link CreatureBalrog} at the moment -- not sure why this 
+     * is necessary. TODO check need for this method
+     */
+    public String getDisplayName()
+    {
+        return getName();
+    }
+
+    /**
+     * The name used for multiple creatures of this type.
+     */
+    public String getPluralName()
+    {
+        return pluralName;
     }
 
     /**
@@ -31,5 +84,10 @@ public class CreatureType
     {
         assert terrain != null;
         return nativeTerrains.contains(terrain);
+    }
+
+    public boolean isSummonable()
+    {
+        return isSummonable;
     }
 }

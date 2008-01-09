@@ -18,6 +18,7 @@ import net.sf.colossus.server.CustomRecruitBase;
 import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.util.HTMLColor;
 import net.sf.colossus.util.RecruitGraph;
+import net.sf.colossus.variant.CreatureType;
 
 import org.jdom.Document;
 import org.jdom.Element;
@@ -432,10 +433,10 @@ public class TerrainRecruitLoader
     public static Creature[] getStartingCreatures(String terrain)
     {
         Creature[] bc = new Creature[3];
-        List<Creature> to = getPossibleRecruits(terrain, null);
-        bc[0] = to.get(0);
-        bc[1] = to.get(1);
-        bc[2] = to.get(2);
+        List<CreatureType> to = getPossibleRecruits(terrain, null);
+        bc[0] = (Creature)to.get(0);
+        bc[1] = (Creature)to.get(1);
+        bc[2] = (Creature)to.get(2);
         return (bc);
     }
 
@@ -476,11 +477,11 @@ public class TerrainRecruitLoader
      * @return List of Creatures that can be recruited in the terrain.
      * @see net.sf.colossus.server.Creature
      */
-    public static List<Creature> getPossibleRecruits(String terrain,
+    public static List<CreatureType> getPossibleRecruits(String terrain,
         String hexLabel)
     {
         List<RecruitNumber> al = strToRecruits.get(terrain);
-        List<Creature> re = new ArrayList<Creature>();
+        List<CreatureType> re = new ArrayList<CreatureType>();
         Iterator<RecruitNumber> it = al.iterator();
         while (it.hasNext())
         {
@@ -492,15 +493,16 @@ public class TerrainRecruitLoader
                 && !(tr.getName().equals(Keyword_Lord))
                 && !(tr.getName().startsWith(Keyword_Special)))
             {
-                re.add(Creature.getCreatureByName(tr.getName()));
+                re.add(VariantSupport.getCurrentVariant().getCreatureByName(
+                    tr.getName()));
             }
             if (tr.getName().startsWith(Keyword_Special))
             {
                 CustomRecruitBase cri = getCustomRecruitBase(tr.getName());
                 if (cri != null)
                 {
-                    List<Creature> temp = cri.getPossibleSpecialRecruits(
-                        terrain, hexLabel);
+                    List<? extends CreatureType> temp = cri
+                        .getPossibleSpecialRecruits(terrain, hexLabel);
                     re.addAll(temp);
                 }
             }
@@ -510,15 +512,19 @@ public class TerrainRecruitLoader
 
     /**
      * Give a modifiable list of the possible recruiters in a terrain.
+     * 
+     * TODO if clients need to modify they should make copies themselves, it
+     * seems better if have this class return an unmodifiable list
+     * 
      * @param terrain String representing a terrain.
      * @return List of Creatures that can recruit in the terrain.
      * @see net.sf.colossus.server.Creature
      */
-    public static List<Creature> getPossibleRecruiters(String terrain,
+    public static List<CreatureType> getPossibleRecruiters(String terrain,
         String hexLabel)
     {
         List<RecruitNumber> al = strToRecruits.get(terrain);
-        List<Creature> re = new ArrayList<Creature>();
+        List<CreatureType> re = new ArrayList<CreatureType>();
         Iterator<RecruitNumber> it = al.iterator();
         while (it.hasNext())
         {
@@ -528,27 +534,30 @@ public class TerrainRecruitLoader
                 && !(tr.getName().equals(Keyword_Lord))
                 && !(tr.getName().startsWith(Keyword_Special)))
             {
-                re.add(Creature.getCreatureByName(tr.getName()));
+                re.add(VariantSupport.getCurrentVariant().getCreatureByName(
+                    tr.getName()));
             }
             else
             {
                 if (tr.getName().equals(Keyword_Anything))
                 { // anyone can recruit here...
-                    List<Creature> creatures = Creature.getCreatures();
-                    return (new ArrayList<Creature>(creatures));
+                    return new ArrayList<CreatureType>(VariantSupport
+                        .getCurrentVariant().getCreatureTypes());
                 }
                 if (tr.getName().equals(Keyword_AnyNonLord))
                 { // anyone can recruit here...
-                    List<Creature> creatures = Creature.getCreatures();
-                    return (new ArrayList<Creature>(creatures));
+                    // TODO: why two cases if the same result as the last one
+                    return new ArrayList<CreatureType>(VariantSupport
+                        .getCurrentVariant().getCreatureTypes());
                 }
                 if (tr.getName().equals(Keyword_Lord))
                 {
-                    List<Creature> potential = Creature.getCreatures();
-                    Iterator<Creature> itCr = potential.iterator();
+                    List<CreatureType> potential = VariantSupport
+                        .getCurrentVariant().getCreatureTypes();
+                    Iterator<CreatureType> itCr = potential.iterator();
                     while (itCr.hasNext())
                     {
-                        Creature creature = itCr.next();
+                        Creature creature = (Creature)itCr.next();
                         if (creature.isLord())
                         {
                             re.add(creature);
@@ -580,21 +589,21 @@ public class TerrainRecruitLoader
      * @return Number of recruiter needed.
      * @see net.sf.colossus.server.Creature
      */
-    public static int numberOfRecruiterNeeded(Creature recruiter,
-        Creature recruit, String terrain, String hexLabel)
+    public static int numberOfRecruiterNeeded(CreatureType recruiter,
+        CreatureType recruit, String terrain, String hexLabel)
     {
         int g_value = graph.numberOfRecruiterNeeded(recruiter.getName(),
             recruit.getName(), terrain, hexLabel);
         return g_value;
     }
 
-    public static boolean anonymousRecruitLegal(Creature recruit,
+    public static boolean anonymousRecruitLegal(CreatureType recruit,
         String terrain, String hexLabel)
     {
         int g_value = graph.numberOfRecruiterNeeded(Keyword_Anything, recruit
             .getName(), terrain, hexLabel);
         if (g_value != 0)
-        { // we really shoud ensure the caller *has* AnyNonLord...
+        { // we really should ensure the caller *has* AnyNonLord...
             g_value = graph.numberOfRecruiterNeeded(Keyword_AnyNonLord,
                 recruit.getName(), terrain, hexLabel);
         }

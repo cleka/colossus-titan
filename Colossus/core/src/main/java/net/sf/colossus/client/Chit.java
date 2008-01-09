@@ -103,9 +103,10 @@ class Chit extends JPanel
             names[0] = "QuestionMarkMask";
             bufferedImage = getImage(names, scale);
         }
-        else if (Creature.isCreature(id))
+        else if (VariantSupport.getCurrentVariant().isCreature(id))
         {
-            Creature cre = Creature.getCreatureByName(id);
+            Creature cre = (Creature)VariantSupport.getCurrentVariant()
+                .getCreatureByName(id);
             String[] names = cre.getImageNames();
             if (dubious)
             {
@@ -138,7 +139,8 @@ class Chit extends JPanel
                 filenames[0] = "Plain" + color;
                 filenames[1] = "TitanMask";
                 filenames[2] = "Power-" + power + color;
-                int skill = Creature.getCreatureByName("Titan").getSkill();
+                int skill = ((Creature)VariantSupport.getCurrentVariant()
+                    .getCreatureByName("Titan")).getSkill();
                 filenames[3] = "Skill-" + skill + "" + color;
 
                 if (dubious)

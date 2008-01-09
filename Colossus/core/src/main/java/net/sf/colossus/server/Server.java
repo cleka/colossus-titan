@@ -433,7 +433,14 @@ public final class Server implements IServer
     {
         LOGGER.log(Level.FINEST, "Called Server.createLocalClient() for "
             + playerName);
-        new Client("127.0.0.1", port, net.sf.colossus.Player.getPlayerByName(playerName), false, false);
+
+        // a hack to pass something into the Client constructor
+        // TODO needs to be constructed properly
+        net.sf.colossus.game.Game dummyGame = new net.sf.colossus.game.Game(
+            null, new net.sf.colossus.Player[0]);
+
+        new Client("127.0.0.1", port, dummyGame, net.sf.colossus.Player
+            .getPlayerByName(playerName), false, false);
     }
 
     synchronized void addClient(final IClient client, final String playerName,
@@ -949,7 +956,7 @@ public final class Server implements IServer
         Creature creature = null;
         if (angel != null)
         {
-            creature = Creature.getCreatureByName(angel);
+            creature = (Creature)game.getVariant().getCreatureByName(angel);
         }
         game.doSummon(legion, donor, creature);
     }
@@ -997,8 +1004,10 @@ public final class Server implements IServer
             Creature recruiter = null;
             if (recruitName != null)
             {
-                recruit = Creature.getCreatureByName(recruitName);
-                recruiter = Creature.getCreatureByName(recruiterName);
+                recruit = (Creature)game.getVariant().getCreatureByName(
+                    recruitName);
+                recruiter = (Creature)game.getVariant().getCreatureByName(
+                    recruiterName);
                 if (recruit != null)
                 {
                     game.doRecruit(legion, recruit, recruiter);

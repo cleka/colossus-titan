@@ -22,8 +22,8 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import net.sf.colossus.server.Creature;
 import net.sf.colossus.util.KDialog;
+import net.sf.colossus.variant.CreatureType;
 
 
 /**
@@ -35,7 +35,7 @@ import net.sf.colossus.util.KDialog;
 final class PickRecruit extends KDialog implements MouseListener,
     WindowListener, ActionListener
 {
-    private final List<Creature> recruits;
+    private final List<CreatureType> recruits;
     private final List<Chit> recruitChits = new ArrayList<Chit>();
     private final Marker legionMarker;
     private final List<Chit> legionChits = new ArrayList<Chit>();
@@ -43,7 +43,7 @@ final class PickRecruit extends KDialog implements MouseListener,
     private static boolean active;
     private final SaveWindow saveWindow;
 
-    private PickRecruit(JFrame parentFrame, List<Creature> recruits,
+    private PickRecruit(JFrame parentFrame, List<CreatureType> recruits,
         String hexDescription, String markerId, Client client)
     {
         super(parentFrame, client.getPlayerName() + ": Pick Recruit in "
@@ -77,7 +77,7 @@ final class PickRecruit extends KDialog implements MouseListener,
         JPanel recruitPane = new JPanel();
         contentPane.add(recruitPane);
 
-        Iterator<Creature> it = recruits.iterator();
+        Iterator<CreatureType> it = recruits.iterator();
         int i = 0;
         while (it.hasNext())
         {
@@ -85,7 +85,7 @@ final class PickRecruit extends KDialog implements MouseListener,
             vertPane.setAlignmentY(0);
             recruitPane.add(vertPane);
 
-            Creature recruit = it.next();
+            CreatureType recruit = it.next();
             String recruitName = recruit.getName();
             Chit chit = new Chit(scale, recruitName);
             recruitChits.add(chit);
@@ -120,7 +120,7 @@ final class PickRecruit extends KDialog implements MouseListener,
     }
 
     /** Return the creature recruited, or null if none. */
-    static String pickRecruit(JFrame parentFrame, List<Creature> recruits,
+    static String pickRecruit(JFrame parentFrame, List<CreatureType> recruits,
         String hexDescription, String markerId, Client client)
     {
         recruit = null;

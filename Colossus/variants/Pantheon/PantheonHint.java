@@ -7,9 +7,9 @@ import java.util.List;
 
 import net.sf.colossus.client.LegionInfo;
 import net.sf.colossus.server.Constants;
-import net.sf.colossus.server.Creature;
 import net.sf.colossus.server.HintOracleInterface;
 import net.sf.colossus.util.DevRandom;
+import net.sf.colossus.variant.CreatureType;
 import Default.DefaultHint;
 
 
@@ -18,7 +18,8 @@ public class PantheonHint implements net.sf.colossus.server.HintInterface
     private final DevRandom rnd = new DevRandom();
 
     public String getRecruitHint(String terrain, LegionInfo legion,
-        List<Creature> recruits, HintOracleInterface oracle, String[] section)
+        List<CreatureType> recruits, HintOracleInterface oracle,
+        String[] section)
     {
         List<String> recruitNames = DefaultHint.creaturesToStrings(recruits);
         if (terrain.equals("Plains"))

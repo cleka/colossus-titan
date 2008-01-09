@@ -875,11 +875,6 @@ public class Critter extends net.sf.colossus.game.Creature implements
         return getCreature().getImageName();
     }
 
-    public String getDisplayName()
-    {
-        return getCreature().getDisplayName();
-    }
-
     public String[] getImageNames()
     {
         return getCreature().getImageNames();

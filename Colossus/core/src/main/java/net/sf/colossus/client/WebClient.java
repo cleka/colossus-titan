@@ -54,6 +54,7 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
 
 import net.sf.colossus.Player;
+import net.sf.colossus.game.Game;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.Start;
 import net.sf.colossus.util.KFrame;
@@ -1525,7 +1526,13 @@ public class WebClient extends KFrame implements WindowListener,
         try
         {
             int p = port;
-            gc = new Client(hostname, p, Player.getPlayerByName(username), true, true);
+
+            // a hack to pass something into the Client constructor
+            // TODO needs to be constructed properly
+            Game dummyGame = new Game(null, new net.sf.colossus.Player[0]);
+
+            gc = new Client(hostname, p, dummyGame, Player
+                .getPlayerByName(username), true, true);
             boolean failed = gc.getFailed();
             if (failed)
             {

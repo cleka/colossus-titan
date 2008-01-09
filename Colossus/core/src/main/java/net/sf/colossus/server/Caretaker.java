@@ -6,6 +6,8 @@ import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.sf.colossus.variant.CreatureType;
+
 
 /**
  *
@@ -45,12 +47,13 @@ public final class Caretaker
         Integer count = map.get(creatureName);
         if (count == null)
         {
-            return (Creature.getCreatureByName(creatureName).getMaxCount());
+            return ((Creature)game.getVariant()
+                .getCreatureByName(creatureName)).getMaxCount();
         }
         return count.intValue();
     }
 
-    public int getCount(Creature creature)
+    public int getCount(CreatureType creature)
     {
         return getCount(creature.getName());
     }
@@ -65,7 +68,7 @@ public final class Caretaker
         return count.intValue();
     }
 
-    public int getDeadCount(Creature creature)
+    public int getDeadCount(CreatureType creature)
     {
         return getDeadCount(creature.getName());
     }
@@ -183,10 +186,11 @@ public final class Caretaker
     void fullySyncDisplays()
     {
         // Do *all* creatures, not just the ones in the map.
-        Iterator<Creature> it = Creature.getCreatures().iterator();
+        Iterator<CreatureType> it = game.getVariant().getCreatureTypes()
+            .iterator();
         while (it.hasNext())
         {
-            Creature creature = it.next();
+            CreatureType creature = it.next();
             updateDisplays(creature.getName());
         }
     }
@@ -194,10 +198,11 @@ public final class Caretaker
     /** Move dead non-Titan immortals back to stacks. */
     void resurrectImmortals()
     {
-        Iterator<Creature> it = Creature.getCreatures().iterator();
+        Iterator<CreatureType> it = game.getVariant().getCreatureTypes()
+            .iterator();
         while (it.hasNext())
         {
-            Creature creature = it.next();
+            Creature creature = (Creature)it.next();
             if (creature.isImmortal())
             {
                 String name = creature.getName();

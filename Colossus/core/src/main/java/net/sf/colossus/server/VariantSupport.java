@@ -4,6 +4,7 @@ package net.sf.colossus.server;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
@@ -18,6 +19,11 @@ import javax.swing.text.StyledDocument;
 
 import net.sf.colossus.client.HexMap;
 import net.sf.colossus.util.ResourceLoader;
+import net.sf.colossus.variant.BattleLand;
+import net.sf.colossus.variant.CreatureType;
+import net.sf.colossus.variant.MasterBoard;
+import net.sf.colossus.variant.Variant;
+import net.sf.colossus.xmlparser.CreatureLoader;
 import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 import net.sf.colossus.xmlparser.VariantLoader;
 
@@ -46,6 +52,8 @@ public final class VariantSupport
     private static int maxPlayers;
     private static HintInterface aihl = null;
     private static Properties markerNames;
+
+    private static Variant CURRENT_VARIANT;
 
     /**
      * Clean-up the ResourceLoader caches to make room for a variant.
@@ -227,10 +235,16 @@ public final class VariantSupport
         if (varREADME != null)
         {
             loadedVariant = true;
-            Creature.loadCreatures();
             loadTerrainsAndRecruits(serverSide);
             loadHints();
             markerNames = loadMarkerNamesProperties();
+
+            // TODO add things as the variant package gets fleshed out
+            List<CreatureType> creatureTypes = loadCreatures();
+            List<BattleLand> battleLands = new ArrayList<BattleLand>();
+            MasterBoard masterBoard = null;
+            CURRENT_VARIANT = new Variant(creatureTypes, battleLands,
+                masterBoard);
         }
         else
         {
@@ -249,6 +263,33 @@ public final class VariantSupport
         }
 
         return varREADME;
+    }
+
+    /** Call immediately after loading variant, before using creatures. */
+    public static List<CreatureType> loadCreatures()
+    {
+        List<CreatureType> creatures = new ArrayList<CreatureType>();
+        try
+        {
+            creatures.clear();
+            List<String> directories = VariantSupport.getVarDirectoriesList();
+            InputStream creIS = ResourceLoader.getInputStream(VariantSupport
+                .getCreaturesName(), directories);
+            if (creIS == null)
+            {
+                throw new FileNotFoundException(VariantSupport
+                    .getCreaturesName());
+            }
+            CreatureLoader creatureLoader = new CreatureLoader(creIS);
+            creatures.addAll(creatureLoader.getCreatures());
+        }
+        catch (Exception e)
+        {
+            throw new RuntimeException("Failed to load Creatures definition",
+                e);
+        }
+        Collections.sort(creatures, CreatureType.NAME_ORDER);
+        return creatures;
     }
 
     private static Document getMissingReadmeNotification()
@@ -446,7 +487,7 @@ public final class VariantSupport
     }
 
     public synchronized static String getRecruitHint(String terrain,
-        net.sf.colossus.client.LegionInfo legion, List<Creature> recruits,
+        net.sf.colossus.client.LegionInfo legion, List<CreatureType> recruits,
         net.sf.colossus.server.HintOracleInterface oracle)
     {
         String[] section = new String[1];
@@ -455,7 +496,7 @@ public final class VariantSupport
     }
 
     public synchronized static String getRecruitHint(String terrain,
-        net.sf.colossus.client.LegionInfo legion, List<Creature> recruits,
+        net.sf.colossus.client.LegionInfo legion, List<CreatureType> recruits,
         net.sf.colossus.server.HintOracleInterface oracle, String[] section)
     {
         if (aihl != null)
@@ -505,5 +546,17 @@ public final class VariantSupport
     public static int getMaxPlayers()
     {
         return maxPlayers;
+    }
+
+    /**
+     * Retrieves the currently loaded variant.
+     * 
+     * TODO this is a helper method to introduce the Variant objects into the code,
+     * in the long run they should be passed around instead of being in a static
+     * member here.
+     */
+    public static Variant getCurrentVariant()
+    {
+        return CURRENT_VARIANT;
     }
 }

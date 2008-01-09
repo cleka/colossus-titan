@@ -2,6 +2,7 @@ package net.sf.colossus.game;
 
 
 import net.sf.colossus.Player;
+import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.variant.Variant;
 
 
@@ -37,6 +38,15 @@ public class Game
 
     public Variant getVariant()
     {
-        return variant;
+        if (variant != null)
+        {
+            return variant;
+        }
+        else
+        {
+            // TODO this is just temporarily until the variant member always gets initialized
+            // properly
+            return VariantSupport.getCurrentVariant();
+        }
     }
 }

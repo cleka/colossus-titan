@@ -8,7 +8,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.sf.colossus.Player;
+import net.sf.colossus.game.PlayerState;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.util.Options;
 import net.sf.colossus.util.Split;
@@ -62,7 +62,7 @@ public final class Movement
     {
         Set<String> set = new HashSet<String>();
         String hexLabel = hex.getLabel();
-        Player player = legion.getPlayer();
+        PlayerState player = legion.getPlayer();
 
         // If there are enemy legions in this hex, mark it
         // as a legal move and stop recursing.  If there is

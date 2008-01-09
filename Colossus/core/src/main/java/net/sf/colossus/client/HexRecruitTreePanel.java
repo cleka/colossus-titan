@@ -19,8 +19,9 @@ import javax.swing.Box;
 import javax.swing.JLabel;
 
 import net.sf.colossus.server.Constants;
-import net.sf.colossus.server.Creature;
+import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.util.RecruitGraph;
+import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
 
@@ -38,15 +39,16 @@ public class HexRecruitTreePanel extends Box
         terrainLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         add(terrainLabel);
 
-        List<Creature> creatures = TerrainRecruitLoader.getPossibleRecruits(
-            terrain, hexLabel);
-        Iterator<Creature> it = creatures.iterator();
+        List<CreatureType> creatures = TerrainRecruitLoader
+            .getPossibleRecruits(terrain, hexLabel);
+        Iterator<CreatureType> it = creatures.iterator();
         boolean firstTime = true;
         int scale = 4 * Scale.get();
-        Creature prevCreature = Creature.getCreatureByName(Constants.titan);
+        CreatureType prevCreature = VariantSupport.getCurrentVariant()
+            .getCreatureByName(Constants.titan);
         while (it.hasNext())
         {
-            Creature creature = it.next();
+            CreatureType creature = it.next();
 
             int numToRecruit;
             if (firstTime)

@@ -33,6 +33,7 @@ import javax.swing.WindowConstants;
 import net.sf.colossus.server.Creature;
 import net.sf.colossus.util.KDialog;
 import net.sf.colossus.util.Options;
+import net.sf.colossus.variant.CreatureType;
 
 
 /** 
@@ -141,7 +142,8 @@ class CreatureCollectionView extends KDialog
             topCountMap.put(name, topLabel);
 
             // clicking the creature icon invokes the details view
-            final Creature creature = Creature.getCreatureByName(name);
+            final Creature creature = (Creature)client.getGame().getVariant()
+                .getCreatureByName(name);
             assert creature != null : "Expected creature name '" + name
                 + "' to be valid";
             this.addMouseListener(new MouseAdapter()
@@ -181,14 +183,15 @@ class CreatureCollectionView extends KDialog
 
     private JPanel makeCreaturePanel(JScrollPane scrollPane)
     {
-        List<Creature> creatures = Creature.getCreatures();
+        List<CreatureType> creatures = client.getGame().getVariant()
+            .getCreatureTypes();
         JPanel creaturePanel = new JPanel();
         creaturePanel.setLayout(new CCVFlowLayout(scrollPane, creaturePanel,
             FlowLayout.LEFT, 2, 2));
-        Iterator<Creature> it = creatures.iterator();
+        Iterator<CreatureType> it = creatures.iterator();
         while (it.hasNext())
         {
-            Creature creature = it.next();
+            CreatureType creature = it.next();
             creaturePanel.add(new CreatureCount(creature.getName()));
         }
 
@@ -221,8 +224,8 @@ class CreatureCollectionView extends KDialog
                     return;
                 }
 
-                boolean immortal = Creature.getCreatureByName(name)
-                    .isImmortal();
+                boolean immortal = ((Creature)client.getGame().getVariant()
+                    .getCreatureByName(name)).isImmortal();
                 String color;
                 if (count == 0)
                 {
@@ -331,7 +334,8 @@ class CreatureCollectionView extends KDialog
     @Override
     public Dimension getMinimumSize()
     {
-        List<Creature> creatures = Creature.getCreatures();
+        List<CreatureType> creatures = client.getGame().getVariant()
+            .getCreatureTypes();
         // default : 5 creatures wide 
 
         int minSingleX = fixedChitSize + 8;

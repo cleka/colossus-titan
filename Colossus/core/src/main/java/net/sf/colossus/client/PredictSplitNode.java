@@ -10,6 +10,7 @@ import java.util.Set;
 
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.Creature;
+import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.util.Combos;
 
 
@@ -551,7 +552,8 @@ public class PredictSplitNode implements Comparable<PredictSplitNode>
             for (Iterator<String> it2 = li.iterator(); it2.hasNext();)
             {
                 String name = it2.next();
-                Creature creature = Creature.getCreatureByName(name);
+                Creature creature = (Creature)VariantSupport
+                    .getCurrentVariant().getCreatureByName(name);
                 totalKillValue += creature.getKillValue();
             }
             if ((bestKillValue < 0)

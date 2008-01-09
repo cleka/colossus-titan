@@ -54,21 +54,21 @@ public class LOSTest extends TestCase
         game.addPlayer("Red", "SimpleAI");
         game.addPlayer("Blue", "SimpleAI");
 
-        cyclops = Creature.getCreatureByName("Cyclops");
-        troll = Creature.getCreatureByName("Troll");
-        ogre = Creature.getCreatureByName("Ogre");
-        ranger = Creature.getCreatureByName("Ranger");
-        gorgon = Creature.getCreatureByName("Gorgon");
-        lion = Creature.getCreatureByName("Lion");
-        griffon = Creature.getCreatureByName("Griffon");
-        hydra = Creature.getCreatureByName("Hydra");
-        centaur = Creature.getCreatureByName("Centaur");
-        colossus = Creature.getCreatureByName("Colossus");
-        gargoyle = Creature.getCreatureByName("Gargoyle");
-        wyvern = Creature.getCreatureByName("Wyvern");
-        dragon = Creature.getCreatureByName("Dragon");
-        minotaur = Creature.getCreatureByName("Minotaur");
-        guardian = Creature.getCreatureByName("Guardian");
+        cyclops = (Creature)game.getVariant().getCreatureByName("Cyclops");
+        troll = (Creature)game.getVariant().getCreatureByName("Troll");
+        ogre = (Creature)game.getVariant().getCreatureByName("Ogre");
+        ranger = (Creature)game.getVariant().getCreatureByName("Ranger");
+        gorgon = (Creature)game.getVariant().getCreatureByName("Gorgon");
+        lion = (Creature)game.getVariant().getCreatureByName("Lion");
+        griffon = (Creature)game.getVariant().getCreatureByName("Griffon");
+        hydra = (Creature)game.getVariant().getCreatureByName("Hydra");
+        centaur = (Creature)game.getVariant().getCreatureByName("Centaur");
+        colossus = (Creature)game.getVariant().getCreatureByName("Colossus");
+        gargoyle = (Creature)game.getVariant().getCreatureByName("Gargoyle");
+        wyvern = (Creature)game.getVariant().getCreatureByName("Wyvern");
+        dragon = (Creature)game.getVariant().getCreatureByName("Dragon");
+        minotaur = (Creature)game.getVariant().getCreatureByName("Minotaur");
+        guardian = (Creature)game.getVariant().getCreatureByName("Guardian");
     }
 
     // Example 6 from Bruno Wolff's clarifications.
