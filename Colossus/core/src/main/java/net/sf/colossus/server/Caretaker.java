@@ -185,6 +185,13 @@ public final class Caretaker
     /** Update ALL creatures' counts on all clients. */
     void fullySyncDisplays()
     {
+        if (game.getVariant() == null)
+        {
+            // no variant loaded yet.
+            // hack 9.1.2008 to get stresstest working again.
+            return;
+        }
+
         // Do *all* creatures, not just the ones in the map.
         Iterator<CreatureType> it = game.getVariant().getCreatureTypes()
             .iterator();
