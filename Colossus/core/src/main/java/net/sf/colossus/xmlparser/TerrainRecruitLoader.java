@@ -455,7 +455,7 @@ public class TerrainRecruitLoader
      * @param tc String representing a terrain.
      * @return The color of the terrain as Color.
      */
-    public static java.awt.Color getTerrainColor(String tc)
+    public static Color getTerrainColor(String tc)
     {
         return strToColor.get(tc);
     }
@@ -468,7 +468,7 @@ public class TerrainRecruitLoader
      */
     public static String getTerrainRandomName(String tc)
     {
-        return (strToRnd.get(tc));
+        return strToRnd.get(tc);
     }
 
     /**
