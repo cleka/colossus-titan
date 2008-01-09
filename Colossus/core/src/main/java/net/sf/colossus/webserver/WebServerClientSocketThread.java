@@ -183,8 +183,6 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
             }
         }
 
-        withdrawFromServer();
-
         // Shut down the client.
         LOGGER.log(Level.FINEST, "(Trying to) shut down the client.");
         try
@@ -208,17 +206,13 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
             }
             user = null;
         }
-        socket = null;
-        server = null;
-    }
 
-    private void withdrawFromServer()
-    {
         if (server != null)
         {
-            server.withdrawFromServer(socket);
+            server.updateUserCounts();
             server = null;
         }
+        socket = null;
     }
 
     private boolean parseLine(String fromClient)
@@ -457,6 +451,7 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
             server.tellAllRunningGamesToOne(this);
             server.tellLastChatMessagesToOne(this, IWebServer.generalChatName);
             server.reEnrollIfNecessary(this);
+            server.updateUserCounts();
         }
 
         return done;
@@ -535,6 +530,13 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
     public void gameCancelled(String gameId, String byUser)
     {
         sendToClient(gameCancelled + sep + gameId + sep + byUser);
+    }
+
+    public void userInfo(int loggedin, int enrolled, int playing, int dead,
+        long ago, String text)
+    {
+        sendToClient(userInfo + sep + loggedin + sep + enrolled + sep +
+            playing + sep + dead + sep + ago + sep + text);
     }
 
     public void gameInfo(GameInfo gi)

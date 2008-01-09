@@ -112,6 +112,13 @@ public class WebClient extends KFrame implements WindowListener,
 
     private int state = NotLoggedIn;
     private String enrolledGameId = null;
+    
+    private int usersLoggedIn = 0;
+    private int usersEnrolled = 0;
+    private int usersPlaying = 0;
+    private int usersDead = 0;
+    private long usersLogoffAgo = 0;
+    private String usersText = "";
 
     private IWebServer server = null;
     private WebClientSocketThread cst = null;
@@ -124,7 +131,9 @@ public class WebClient extends KFrame implements WindowListener,
 
     private final Point defaultLocation = new Point(600, 100);
 
-    // Server/Login pane:
+    private JLabel statusLabel;
+    private JLabel userinfoLabel;    // Server/Login pane:
+
     private JTextField webserverHostField;
     private JTextField webserverPortField;
     private JTextField loginField;
@@ -202,7 +211,7 @@ public class WebClient extends KFrame implements WindowListener,
     GameTableModel runGameDataModel;
     ListSelectionModel runGameListSelectionModel;
 
-    private static String windowTitle = "Colossus Web Client";
+    private static String windowTitle = "Web Client";
 
     private final static String LoginButtonText = "Login";
     private final static String LogoutButtonText = "Logout";
@@ -237,7 +246,7 @@ public class WebClient extends KFrame implements WindowListener,
 
     public WebClient(String hostname, int port, String login, String password)
     {
-        super(windowTitle + " - not logged in");
+        super(windowTitle);
 
         options = new Options(Constants.optionsWebClientName);
         options.loadOptions();
@@ -403,8 +412,17 @@ public class WebClient extends KFrame implements WindowListener,
 
     private void setupGUI()
     {
-        Container mainPane = new Box(BoxLayout.Y_AXIS);
         getContentPane().setLayout(new BorderLayout());
+        
+        Box headPane = new Box(BoxLayout.Y_AXIS);
+        getContentPane().add(headPane, BorderLayout.NORTH);
+        
+        statusLabel = new JLabel("login status");
+        userinfoLabel = new JLabel("user info status");
+        headPane.add(statusLabel);
+        headPane.add(userinfoLabel);
+        
+        Box mainPane = new Box(BoxLayout.Y_AXIS);
         getContentPane().add(mainPane, BorderLayout.CENTER);
 
         tabbedPane = new JTabbedPane();
@@ -813,6 +831,10 @@ public class WebClient extends KFrame implements WindowListener,
                 doLogin();
             }
         }
+        else
+        {
+            actualUpdateGUI();
+        }
     }
 
     private void doAutoGSAction()
@@ -1067,6 +1089,34 @@ public class WebClient extends KFrame implements WindowListener,
         ViableEntityManager.unregister(this);
     }
 
+    private String getUserinfoText()
+    {
+        String text;
+        if (state == NotLoggedIn)
+        {
+            text = "<unknown>";
+        }
+        else if (usersLoggedIn <= 1)
+        {
+            text = "No other users logged in.";
+        }
+        else
+        {
+            text = usersLoggedIn + " logged in.";
+            // just to get rid of the "never read locally" warning...:
+            String dummy = (usersEnrolled + usersPlaying + usersDead +
+                usersLogoffAgo) + usersText;
+            LOGGER.log(Level.FINEST, "Loggedin: " + usersLoggedIn +
+                ", others dummy: " + dummy); 
+            // // Server doesn't tell actual values for the other stuff yet.
+            // text = usersLoggedIn + " logged in, of that " +
+            //     usersEnrolled + " enrolled, " +
+            //     usersPlaying + "playing and " +
+            //     usersDead + "playing but eliminated.";
+        }
+        return text;
+    }
+
     public void updateGUI()
     {
         SwingUtilities.invokeLater(new Runnable()
@@ -1079,7 +1129,7 @@ public class WebClient extends KFrame implements WindowListener,
 
     }
 
-    // this should always be called inside a invokeLater!!
+    // this should always be called inside a invokeLater (i.e. in EDT)!!
     public void actualUpdateGUI()
     {
         // Many settings are only "loggedIn or not" specific - those first:
@@ -1112,7 +1162,9 @@ public class WebClient extends KFrame implements WindowListener,
             potGameTable.setEnabled(true);
 
             infoTextLabel.setText(needLoginText);
-            this.setTitle(windowTitle + " - not logged in");
+            statusLabel.setText("Status: not logged in");
+            userinfoLabel.setText("Userinfo: " + getUserinfoText());
+            this.setTitle(windowTitle + "(not logged in)");
         }
         else if (state == LoggedIn)
         {
@@ -1143,7 +1195,10 @@ public class WebClient extends KFrame implements WindowListener,
             potGameTable.setEnabled(true);
 
             infoTextLabel.setText(enrollText);
-            this.setTitle(windowTitle + " - logged in as " + username);
+            statusLabel.setText("Status: logged in as " + username);
+            userinfoLabel.setText("Userinfo: " + getUserinfoText());
+            this.setTitle(windowTitle + " " + username + " (logged in)");
+            
         }
         else if (state == Enrolled)
         {
@@ -1175,8 +1230,11 @@ public class WebClient extends KFrame implements WindowListener,
             }
 
             infoTextLabel.setText(enrolledText);
-            this.setTitle(windowTitle + " - " + username
+            userinfoLabel.setText("Userinfo: " + getUserinfoText());
+            statusLabel.setText("Status: As " + username
                 + " - enrolled to game " + enrolledGameId);
+            this.setTitle(windowTitle + " " + username
+                + " (enrolled)");
         }
         else if (state == Playing)
         {
@@ -1190,8 +1248,10 @@ public class WebClient extends KFrame implements WindowListener,
             potGameTable.setEnabled(true);
 
             infoTextLabel.setText(playingText);
-            this.setTitle(windowTitle + " - " + username + " - playing game "
+            userinfoLabel.setText("Userinfo: " + getUserinfoText());
+            statusLabel.setText("Status: As " + username + " - playing game "
                 + enrolledGameId);
+            this.setTitle(windowTitle + " " + username + " (playing)");
         }
         else
         {
@@ -1638,6 +1698,19 @@ public class WebClient extends KFrame implements WindowListener,
     {
         state = LoggedIn;
         enrolledGameId = "";
+        updateGUI();
+    }
+
+    // Server tells us the amount of players in the different states
+    public void userInfo(int loggedin, int enrolled, int playing, int dead,
+        long ago, String text)
+    {
+        usersLoggedIn = loggedin;
+        usersEnrolled = enrolled;
+        usersPlaying = playing;
+        usersDead = dead;
+        usersLogoffAgo = ago;
+        usersText = text;
         updateGUI();
     }
 
@@ -2578,10 +2651,10 @@ public class WebClient extends KFrame implements WindowListener,
             super(frame, title, true);
             isRegister = (title.equals(createAccountButtonText) ? true : false);
 
-            Container mainPane = getContentPane();
+            Container rootPane = getContentPane();
 
             JPanel p = new JPanel(new GridLayout(0, 2));
-            mainPane.add(p);
+            rootPane.add(p);
 
             p.add(new JLabel("Login name"));
             rploginField = new JTextField(username);

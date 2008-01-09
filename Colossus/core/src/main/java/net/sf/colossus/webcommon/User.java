@@ -174,6 +174,29 @@ public class User
         return loggedInUserMap.values().iterator();
     }
 
+    public static int getLoggedInCount()
+    {
+        return loggedInUserMap.size();
+    }
+
+    // still dummy
+    public static int getEnrolledCount()
+    {
+        return 0;
+    }
+
+    // still dummy
+    public static int getPlayingCount()
+    {
+        return 0;
+    }
+
+    // still dummy
+    public static int getDeadCount()
+    {
+        return 0;
+    }
+
     public static String registerUser(String username, String password,
         String email, boolean isAdmin)
     {

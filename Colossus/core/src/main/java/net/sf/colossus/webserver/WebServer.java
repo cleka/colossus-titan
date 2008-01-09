@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -55,7 +54,6 @@ public class WebServer implements IWebServer, IRunWebServer
     private boolean shutdownRequested = false;
     private boolean shutdownInitiatedByGUI = false;
 
-    private int numClients = 0;
     private int maxClients;
 
     private ArrayList<GameInfo> potentialGames = null;
@@ -66,8 +64,6 @@ public class WebServer implements IWebServer, IRunWebServer
     private int port;
 
     private ServerSocket serverSocket;
-    private List<Socket> activeSocketList = Collections
-        .synchronizedList(new ArrayList<Socket>());
 
     private List<ChatMessage> lastNChatMessages = new ArrayList<ChatMessage>();
 
@@ -155,8 +151,6 @@ public class WebServer implements IWebServer, IRunWebServer
 
     void runSocketServer()
     {
-        numClients = 0;
-
         int socketQueueLen =
             options.getIntOptionNoUndef(WebServerConstants.optSocketQueueLen);
 
@@ -269,19 +263,14 @@ public class WebServer implements IWebServer, IRunWebServer
                 serverSocket.close();
                 return false;
             }
-            else if (numClients >= maxClients)
+            else if (User.getLoggedInCount() >= maxClients)
             {
                 rejected = true;
                 WebServerClientSocketThread.reject(clientSocket);
             }
             else
             {
-                synchronized (activeSocketList)
-                {
-                    activeSocketList.add(clientSocket);
-                    numClients++;
-                }
-                gui.setUserInfo(numClients + " users connected.");
+                // ok, can log in
             }
         }
         catch (IOException ex)
@@ -307,6 +296,7 @@ public class WebServer implements IWebServer, IRunWebServer
             WebServerClientSocketThread cst = new WebServerClientSocketThread(
                 this, clientSocket);
             cst.start();
+            updateUserCounts();
         }
 
         return rejected;
@@ -329,9 +319,14 @@ public class WebServer implements IWebServer, IRunWebServer
         while (it.hasNext())
         {
             User u = it.next();
-
             WebServerClientSocketThread thread = (WebServerClientSocketThread)u
                 .getThread();
+            if (thread == null)
+            {
+                LOGGER.log(Level.FINE,
+                    "Thread for user is empty - skipping interrupt and join.");
+                continue;
+            }
             try
             {
                 thread.interrupt();
@@ -575,6 +570,36 @@ public class WebServer implements IWebServer, IRunWebServer
         }
     }
 
+    public void updateUserCounts()
+    {
+        int connected = User.getLoggedInCount();
+        allTellUserCounts();
+        gui.setUserInfo(connected + " users connected.");
+    }
+
+    public void allTellUserCounts()
+    {
+        if (User.getLoggedInCount() > 0)
+        {
+            int loggedin = User.getLoggedInCount();
+            
+            // the other five are still dummies.
+            int enrolled = User.getEnrolledCount();
+            int playing  = User.getPlayingCount();
+            int dead     = User.getDeadCount();
+            long ago = 0;
+            String text = "";
+            
+            Iterator<User> it = User.getLoggedInUsersIterator();
+            while (it.hasNext())
+            {
+                User u = it.next();
+                IWebClient client = (IWebClient)u.getThread();
+                client.userInfo(loggedin, enrolled, playing, dead, ago, text);
+            }
+        }
+    }
+
     public void chatSubmit(String chatId, String sender, String message)
     {
         if (chatId.equals(IWebServer.generalChatName))
@@ -646,19 +671,6 @@ public class WebServer implements IWebServer, IRunWebServer
         String reason = User.changeProperties(username, oldPW, newPW, email,
             isAdminObj);
         return reason;
-    }
-
-    public void withdrawFromServer(Socket socket)
-    {
-        synchronized (activeSocketList)
-        {
-            activeSocketList.remove(activeSocketList.indexOf(socket));
-            numClients--;
-        }
-
-        gui.setUserInfo(numClients + " users connected.");
-
-        LOGGER.log(Level.FINEST, "User client withdraws from server...");
     }
 
     // =========== internal workers ============

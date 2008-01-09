@@ -17,6 +17,7 @@ public interface IWebClient
     public static String didEnroll = "didEnroll";
     public static String didUnenroll = "didUnenroll";
     public static String gameInfo = "gameInfo";
+    public static String userInfo = "userInfo";
     public static String gameStarted = "gameStarted";
     public static String gameStartsNow = "gameStartsNow";
     public static String gameStartsSoon = "gameStartsSoon";
@@ -29,6 +30,9 @@ public interface IWebClient
 
     public void didUnenroll(String gameId, String username);
 
+    public void userInfo(int loggedin, int enrolled, int playing, int dead,
+        long ago, String text);
+    
     public void gameInfo(GameInfo gi);
 
     public void gameStartsNow(String gameId, int port);

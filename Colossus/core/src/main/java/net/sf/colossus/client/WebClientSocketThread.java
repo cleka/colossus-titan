@@ -266,7 +266,7 @@ public class WebClientSocketThread extends Thread implements IWebServer
         {
             while (!done && (fromServer = this.in.readLine()) != null)
             {
-                String[] tokens = fromServer.split(sep);
+                String[] tokens = fromServer.split(sep, -1);
                 String command = tokens[0];
 
                 if (fromServer.startsWith("ACK: "))
@@ -297,6 +297,18 @@ public class WebClientSocketThread extends Thread implements IWebServer
 
                     webClient.gameInfo(gi);
                 }
+                else if (command.equals(IWebClient.userInfo))
+                {
+                    int loggedin = Integer.parseInt(tokens[1]);
+                    int enrolled = Integer.parseInt(tokens[2]);
+                    int playing  = Integer.parseInt(tokens[3]);
+                    int dead     = Integer.parseInt(tokens[4]);
+                    long ago     = Long.parseLong(tokens[5]);
+                    String text  = tokens[6];
+                    webClient.userInfo(loggedin, enrolled, playing, dead,
+                        ago, text);
+                }
+
                 else if (command.equals(IWebClient.didEnroll))
                 {
                     String gameId = tokens[1];
