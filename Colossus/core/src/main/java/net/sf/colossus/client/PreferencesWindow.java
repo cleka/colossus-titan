@@ -13,7 +13,6 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -32,6 +31,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.UIManager;
 import javax.swing.WindowConstants;
+import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -272,12 +272,12 @@ public class PreferencesWindow extends KFrame implements ItemListener,
         lfBox.setBorder(new TitledBorder("Look & Feel"));
         lfBox.add(new JLabel("Choose your preferred \"Look & Feel\":"));
         String currentLF = UIManager.getLookAndFeel().getName();
-        UIManager.LookAndFeelInfo[] lfInfo = UIManager
+        UIManager.LookAndFeelInfo[] lnfInfos = UIManager
             .getInstalledLookAndFeels();
-        for (int i = 0; i < lfInfo.length; i++)
+        for (LookAndFeelInfo lnfInfo : lnfInfos)
         {
-            // NOTE! : event handling is based on that the RB is partof this lfBox Box!
-            addRadioButton(lfBox, lfGroup, lfInfo[i].getName(), lfInfo[i]
+            // NOTE! : event handling is based on that the RB is part of this lnfBox Box!
+            addRadioButton(lfBox, lfGroup, lnfInfo.getName(), lnfInfo
                 .getClassName(), currentLF);
         }
 
@@ -309,9 +309,9 @@ public class PreferencesWindow extends KFrame implements ItemListener,
         String favorites = client.getStringOption(Options.favoriteColors);
         favoriteColors = null;
         colorsLeft = new ArrayList<String>();
-        for (int i = 0; i < Constants.colorNames.length; i++)
+        for (String colorName : Constants.colorNames)
         {
-            colorsLeft.add(Constants.colorNames[i]);
+            colorsLeft.add(colorName);
         }
         if (favorites != null)
         {
@@ -401,13 +401,13 @@ public class PreferencesWindow extends KFrame implements ItemListener,
         if (favoriteColors.size() > 0)
         {
             StringBuilder favorites = new StringBuilder();
-            for (Iterator<String> it = favoriteColors.iterator(); it.hasNext();)
+            for (String string : favoriteColors)
             {
                 if (favorites.length() > 0)
                 {
                     favorites.append(',');
                 }
-                favorites.append(it.next());
+                favorites.append(string);
             }
             client.setOption(Options.favoriteColors, favorites.toString());
         }
@@ -418,9 +418,9 @@ public class PreferencesWindow extends KFrame implements ItemListener,
         favoriteColors = new ArrayList<String>();
         favColorPane.removeAll();
         colorsLeft = new ArrayList<String>();
-        for (int i = 0; i < Constants.colorNames.length; i++)
+        for (String colorName : Constants.colorNames)
         {
-            colorsLeft.add(Constants.colorNames[i]);
+            colorsLeft.add(colorName);
         }
         this.repaint();
         saveFavColor();

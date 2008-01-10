@@ -98,11 +98,10 @@ public class MilvangAI extends RationalAI
         String[] terrains = TerrainRecruitLoader.getTerrains();
 
         List<Creature> critters = new ArrayList<Creature>();
-        for (Iterator<String> it = legion.getContents().iterator(); it
-            .hasNext();)
+        for (String string : legion.getContents())
         {
             critters.add((Creature)client.getGame().getVariant()
-                .getCreatureByName(it.next()));
+                .getCreatureByName(string));
         }
 
         double bestValue = 0;
@@ -117,9 +116,8 @@ public class MilvangAI extends RationalAI
             double critterValue = 0;
             boolean keepTitan = false;
             Map<Creature, Integer> critterMap = new HashMap<Creature, Integer>();
-            for (Iterator<Creature> it2 = keepers.iterator(); it2.hasNext();)
+            for (Creature critter : keepers)
             {
-                Creature critter = it2.next();
                 keepTitan |= critter.getName().equals("Titan");
                 int tmp = critter.getHintedRecruitmentValue();
                 critterValue += tmp * tmp;
@@ -169,9 +167,9 @@ public class MilvangAI extends RationalAI
         }
 
         // remove the keep from critters to obtain the split
-        for (Iterator<Creature> it2 = bestKeep.iterator(); it2.hasNext();)
+        for (Creature creature : bestKeep)
         {
-            critters.remove(it2.next());
+            critters.remove(creature);
         }
         LOGGER.log(Level.FINEST, "Splitting: " + bestKeep + "/" + critters);
 

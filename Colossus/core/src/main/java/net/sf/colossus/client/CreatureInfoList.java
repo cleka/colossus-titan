@@ -22,9 +22,8 @@ class CreatureInfoList extends ArrayList<CreatureInfo>
     int numCreature(String creatureName)
     {
         int count = 0;
-        for (Iterator<CreatureInfo> it = iterator(); it.hasNext();)
+        for (CreatureInfo ci : this)
         {
-            CreatureInfo ci = it.next();
             if (creatureName.equals(ci.getName()))
             {
                 count++;
@@ -36,9 +35,8 @@ class CreatureInfoList extends ArrayList<CreatureInfo>
     /** Return the first CreatureInfo that matches the passed name. */
     CreatureInfo getCreatureInfo(String creatureName)
     {
-        for (Iterator<CreatureInfo> it = iterator(); it.hasNext();)
+        for (CreatureInfo ci : this)
         {
-            CreatureInfo ci = it.next();
             if (ci.getName().equals(creatureName))
             {
                 return ci;
@@ -84,9 +82,8 @@ class CreatureInfoList extends ArrayList<CreatureInfo>
     List<String> getCreatureNames()
     {
         List<String> list = new ArrayList<String>();
-        for (Iterator<CreatureInfo> it = iterator(); it.hasNext();)
+        for (CreatureInfo ci : this)
         {
-            CreatureInfo ci = it.next();
             list.add(ci.getName());
         }
         return list;
@@ -97,9 +94,8 @@ class CreatureInfoList extends ArrayList<CreatureInfo>
     public CreatureInfoList clone()
     {
         CreatureInfoList dupe = new CreatureInfoList();
-        for (Iterator<CreatureInfo> it = iterator(); it.hasNext();)
+        for (CreatureInfo ci : this)
         {
-            CreatureInfo ci = it.next();
             dupe.add(ci.clone());
         }
         return dupe;

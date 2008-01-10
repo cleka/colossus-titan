@@ -225,16 +225,14 @@ public class TerrainRecruitLoader
             Element root = doc.getRootElement();
 
             List<Element> terrains = root.getChildren("terrain");
-            for (Iterator<Element> it = terrains.iterator(); it.hasNext();)
+            for (Element el : terrains)
             {
-                Element el = it.next();
                 handleTerrain(el);
             }
 
             List<Element> acquirables = root.getChildren("acquirable");
-            for (Iterator<Element> it = acquirables.iterator(); it.hasNext();)
+            for (Element el : acquirables)
             {
-                Element el = it.next();
                 handleAcquirable(el);
             }
 
@@ -280,9 +278,8 @@ public class TerrainRecruitLoader
         boolean regularRecruit = el.getAttribute("regular_recruit")
             .getBooleanValue();
         List<Element> recruits = el.getChildren("recruit");
-        for (Iterator<Element> it = recruits.iterator(); it.hasNext();)
+        for (Element recruit : recruits)
         {
-            Element recruit = it.next();
             String recruitName = recruit.getAttributeValue("name");
             int recruitNum = recruit.getAttribute("number").getIntValue();
             RecruitNumber rn = new RecruitNumber(recruitName, recruitNum);

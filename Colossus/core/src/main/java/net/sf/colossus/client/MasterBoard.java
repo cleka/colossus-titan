@@ -221,10 +221,8 @@ public final class MasterBoard extends JPanel
                 {
                     // copy only local players markers
                     List<Marker> myMarkers = new ArrayList<Marker>();
-                    for (Iterator<Marker> iterator = client.getMarkers()
-                        .iterator(); iterator.hasNext();)
+                    for (Marker marker : client.getMarkers())
                     {
-                        Marker marker = iterator.next();
                         LegionInfo legionInfo = client.getLegionInfo(marker
                             .getId());
                         if (legionInfo.isMyLegion())
@@ -277,9 +275,9 @@ public final class MasterBoard extends JPanel
             {
                 if (legionFlyouts != null)
                 {
-                    for (int i = 0; i < legionFlyouts.length; i++)
+                    for (JPanel flyout : legionFlyouts)
                     {
-                        remove(legionFlyouts[i]);
+                        remove(flyout);
                     }
                     repaint();
                     legionFlyouts = null;
@@ -308,11 +306,10 @@ public final class MasterBoard extends JPanel
 
     private static MasterHex visitMasterHexes(MasterHexVisitor visitor)
     {
-        for (int i = 0; i < plainHexArray.length; i++)
+        for (MasterHex[] hexes : plainHexArray)
         {
-            for (int j = 0; j < plainHexArray[i].length; j++)
+            for (MasterHex hex : hexes)
             {
-                MasterHex hex = plainHexArray[i][j];
                 if (hex == null)
                 {
                     continue;
@@ -329,11 +326,10 @@ public final class MasterBoard extends JPanel
 
     private GUIMasterHex visitGUIMasterHexes(GUIMasterHexVisitor visitor)
     {
-        for (int i = 0; i < guiHexArray.length; i++)
+        for (GUIMasterHex[] hexes : guiHexArray)
         {
-            for (int j = 0; j < guiHexArray[i].length; j++)
+            for (GUIMasterHex hex : hexes)
             {
-                GUIMasterHex hex = guiHexArray[i][j];
                 if (hex == null)
                 {
                     continue;

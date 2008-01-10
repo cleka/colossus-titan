@@ -127,10 +127,8 @@ public final class ShowCreatureDetails extends KDialog implements
             .isLord() ? "<u><b>Lord</b></u>" : "<b>Demi-Lord</b>")
             : _low("no"));
         StringBuffer buf = new StringBuffer();
-        for (Iterator<HazardTerrain> iterator = HazardTerrain
-            .getAllHazardTerrains().iterator(); iterator.hasNext();)
+        for (HazardTerrain terrain : HazardTerrain.getAllHazardTerrains())
         {
-            HazardTerrain terrain = iterator.next();
             if (creature.isNativeIn(terrain))
             {
                 buf.append(terrain.getName());
@@ -153,7 +151,7 @@ public final class ShowCreatureDetails extends KDialog implements
         _section(s, "Recruit");
         final String[] terrains = TerrainRecruitLoader.getTerrains();
         //   in
-        for (int ti = 0; ti < terrains.length; ti++)
+        for (String terrainName : terrains)
         {
             buf = new StringBuffer();
             List<CreatureType> recruiters = VariantSupport.getCurrentVariant()
@@ -162,7 +160,7 @@ public final class ShowCreatureDetails extends KDialog implements
             {
                 final CreatureType recruiter = recruiters.get(ri);
                 int num = TerrainRecruitLoader.numberOfRecruiterNeeded(
-                    recruiter, creature, terrains[ti], null);
+                    recruiter, creature, terrainName, null);
                 if (num == 1)
                 {
                     buf.append("by 1 " + recruiter.getName() + ", ");
@@ -175,8 +173,8 @@ public final class ShowCreatureDetails extends KDialog implements
             }
             if (buf.length() > 0)
             {
-                Color color = TerrainRecruitLoader.getTerrainColor(
-                    terrains[ti]).brighter();
+                Color color = TerrainRecruitLoader
+                    .getTerrainColor(terrainName).brighter();
                 s
                     .append(MessageFormat
                         .format(
@@ -184,14 +182,14 @@ public final class ShowCreatureDetails extends KDialog implements
                                 + "<td colspan={2} nowrap><font color=blue>{3}</font></td>"
                                 + "</tr>", new Object[] {
                                 HTMLColor.colorToCode(color),
-                                terrains[ti],
+                                terrainName,
                                 ""
                                     + (HazardTerrain.getAllHazardTerrains()
                                         .size() + 1), buf.toString(), }));
             }
         }
         //   out
-        for (int ti = 0; ti < terrains.length; ti++)
+        for (String terrainName : terrains)
         {
             buf = new StringBuffer();
             List<CreatureType> recruits = VariantSupport.getCurrentVariant()
@@ -200,7 +198,7 @@ public final class ShowCreatureDetails extends KDialog implements
             {
                 final CreatureType recruit = recruits.get(ri);
                 int num = TerrainRecruitLoader.numberOfRecruiterNeeded(
-                    creature, recruit, terrains[ti], null);
+                    creature, recruit, terrainName, null);
                 if ((num > 0) && (num < RecruitGraph.BIGNUM))
                 {
                     buf.append(num + " recruit a " + recruit.getName() + ", ");
@@ -208,8 +206,8 @@ public final class ShowCreatureDetails extends KDialog implements
             }
             if (buf.length() > 0)
             {
-                Color color = TerrainRecruitLoader.getTerrainColor(
-                    terrains[ti]).brighter();
+                Color color = TerrainRecruitLoader
+                    .getTerrainColor(terrainName).brighter();
                 s
                     .append(MessageFormat
                         .format(
@@ -217,7 +215,7 @@ public final class ShowCreatureDetails extends KDialog implements
                                 + "<td colspan={2} nowrap><font color=green>{3}</font></td>"
                                 + "</tr>", new Object[] {
                                 HTMLColor.colorToCode(color),
-                                terrains[ti],
+                                terrainName,
                                 ""
                                     + (HazardTerrain.getAllHazardTerrains()
                                         .size() + 1), buf.toString(), }));
@@ -281,10 +279,8 @@ public final class ShowCreatureDetails extends KDialog implements
         //   the info: the table content
         //   ... my strike power
         s.append("<tr><th nowrap>my Strike Power</th>");
-        for (Iterator<HazardTerrain> iterator = HazardTerrain
-            .getAllHazardTerrains().iterator(); iterator.hasNext();)
+        for (HazardTerrain terrain : HazardTerrain.getAllHazardTerrains())
         {
-            HazardTerrain terrain = iterator.next();
             critter.setNewHazardHex(terrain);
             Color color = critter.getHazardColor().brighter();
             s.append(MessageFormat.format("<td bgcolor={0}>{1}</td>",
@@ -294,10 +290,8 @@ public final class ShowCreatureDetails extends KDialog implements
         s.append("<td bgcolor=#dddddd></td></tr>");
         //   ... my strike skill
         s.append("<tr><th nowrap>my Strike Skill</th>");
-        for (Iterator<HazardTerrain> iterator = HazardTerrain
-            .getAllHazardTerrains().iterator(); iterator.hasNext();)
+        for (HazardTerrain terrain : HazardTerrain.getAllHazardTerrains())
         {
-            HazardTerrain terrain = iterator.next();
             critter.setNewHazardHex(terrain);
             Color color = critter.getHazardColor().brighter();
             s.append(MessageFormat.format("<td bgcolor={0}>{1}</td>",

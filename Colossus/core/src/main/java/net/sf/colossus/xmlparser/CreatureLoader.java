@@ -6,7 +6,6 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
@@ -47,9 +46,8 @@ public class CreatureLoader
             Element root = doc.getRootElement();
 
             List<Element> creatures = root.getChildren("creature");
-            for (Iterator<Element> it = creatures.iterator(); it.hasNext();)
+            for (Element el : creatures)
             {
-                Element el = it.next();
                 handleCreature(el);
             }
         }

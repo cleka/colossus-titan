@@ -2,7 +2,7 @@ package net.sf.colossus.server;
 
 
 import java.awt.event.KeyEvent;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -388,15 +388,8 @@ public final class Constants
 
     public static final int numVariants = variantArray.length;
 
-    private static final List<String> variantList = new ArrayList<String>();
-
-    // static initializer
-    {
-        for (int i = 0; i < variantArray.length; i++)
-        {
-            variantList.add(variantArray[i]);
-        }
-    }
+    private static final List<String> variantList = Arrays
+        .asList(variantArray);
 
     public static List<String> getVariantList()
     {

@@ -24,7 +24,7 @@ import net.sf.colossus.util.KDialog;
 
 final class ChooseScreen extends KDialog implements ActionListener
 {
-    private Client client;
+    private final Client client;
 
     ChooseScreen(JFrame parentFrame, Client client)
     {
@@ -40,10 +40,10 @@ final class ChooseScreen extends KDialog implements ActionListener
         GraphicsDevice[] all = GraphicsEnvironment
             .getLocalGraphicsEnvironment().getScreenDevices();
 
-        for (int i = 0; i < all.length; i++)
+        for (GraphicsDevice device : all)
         {
-            JButton sb = new JButton("Screen: " + all[i].getClass().getName()
-                + " " + all[i].getIDstring());
+            JButton sb = new JButton("Screen: " + device.getClass().getName()
+                + " " + device.getIDstring());
 
             contentPane.add(sb);
             sb.addActionListener(this);
@@ -63,12 +63,12 @@ final class ChooseScreen extends KDialog implements ActionListener
             .getLocalGraphicsEnvironment().getScreenDevices();
         GraphicsDevice chosen = null;
 
-        for (int i = 0; i < all.length; i++)
+        for (GraphicsDevice device : all)
         {
-            if (fullName.equals("Screen: " + all[i].getClass().getName() + " "
-                + all[i].getIDstring()))
+            if (fullName.equals("Screen: " + device.getClass().getName() + " "
+                + device.getIDstring()))
             {
-                chosen = all[i];
+                chosen = device;
             }
         }
         setVisible(false);

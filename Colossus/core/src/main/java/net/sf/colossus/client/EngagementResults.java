@@ -14,7 +14,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.Box;
@@ -310,9 +309,8 @@ final class EngagementResults extends KDialog
         final boolean inverse = false && isDefender;
         // add chits
         int idx = 0;
-        for (Iterator<String> it = imageNames.iterator(); it.hasNext();)
+        for (String imageName : imageNames)
         {
-            final String imageName = it.next();
             final Boolean chitCertain = certainList.get(idx);
             final boolean showDubious = !chitCertain.booleanValue();
             Chit chit = new Chit(scale, imageName, inverse, showDubious);

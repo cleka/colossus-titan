@@ -129,8 +129,7 @@ public final class BattleBoard extends KFrame
             public void mousePressed(MouseEvent e)
             {
                 // Only the active player can click on stuff.
-                if (!client.getPlayer().equals(
-                    client.getBattleActivePlayer()))
+                if (!client.getPlayer().equals(client.getBattleActivePlayer()))
                 {
                     return;
                 }
@@ -694,9 +693,8 @@ public final class BattleBoard extends KFrame
             turn = new JLabel[MAXBATTLETURNS + 1];
             // Create Special labels for Recruitment turns
             int[] REINFORCEMENTTURNS = client.getReinforcementTurns();
-            for (int i = 0; i < REINFORCEMENTTURNS.length; i++)
+            for (int j : REINFORCEMENTTURNS)
             {
-                int j = REINFORCEMENTTURNS[i];
                 turn[j - 1] = new JLabel((j) + "+", SwingConstants.CENTER);
                 resetTurn(j); // Set thin Border
             }
@@ -715,9 +713,9 @@ public final class BattleBoard extends KFrame
             }
             turnNumber = 0;
 
-            for (int i = 0; i < turn.length; i++)
+            for (JLabel label : turn)
             {
-                this.add(turn[i]);
+                this.add(label);
             }
         }
 

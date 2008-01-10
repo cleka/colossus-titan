@@ -20,7 +20,7 @@ public class DiceTest extends TestCase
     private static final Logger LOGGER = Logger.getLogger(DiceTest.class
         .getName());
 
-    private int trials = 5000;
+    private final int trials = 5000;
     double epsilon = 0.000001;
 
     public DiceTest(String name)
@@ -202,9 +202,9 @@ public class DiceTest extends TestCase
     double findMean(int[] rolls)
     {
         double sum = 0.0;
-        for (int i = 0; i < rolls.length; i++)
+        for (int roll : rolls)
         {
-            sum += rolls[i];
+            sum += roll;
         }
         return sum / rolls.length;
     }
@@ -245,9 +245,9 @@ public class DiceTest extends TestCase
     int countZeros(int[] rolls)
     {
         int count = 0;
-        for (int i = 0; i < rolls.length; i++)
+        for (int roll : rolls)
         {
-            if (rolls[i] == 0)
+            if (roll == 0)
             {
                 count++;
             }
@@ -299,11 +299,11 @@ public class DiceTest extends TestCase
     {
         List<Integer> li = new ArrayList<Integer>();
         int lastroll = -1;
-        for (int i = 0; i < rolls.length; i++)
+        for (int roll : rolls)
         {
-            if (rolls[i] != lastroll)
+            if (roll != lastroll)
             {
-                lastroll = rolls[i];
+                lastroll = roll;
                 li.add(new Integer(lastroll));
             }
         }
@@ -338,9 +338,9 @@ public class DiceTest extends TestCase
     double findChiSquare(int[] rolls, double mean)
     {
         double sum = 0.;
-        for (int i = 0; i < rolls.length; i++)
+        for (int roll : rolls)
         {
-            double diff = rolls[i] - mean;
+            double diff = roll - mean;
             sum += diff * diff;
         }
         return sum / mean;

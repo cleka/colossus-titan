@@ -382,11 +382,11 @@ class CCVFlowLayout extends FlowLayout implements ComponentListener
         int x = 0, y = insets.top + getVgap();
         int rowHeight = 0, maxWidth = 0;
         Component[] allComponents = parentComponent.getComponents();
-        for (int i = 0; i < allComponents.length; i++)
+        for (Component component : allComponents)
         {
-            if (allComponents[i].isVisible())
+            if (component.isVisible())
             {
-                Dimension d = allComponents[i].getPreferredSize();
+                Dimension d = component.getPreferredSize();
                 if ((x == 0) || ((x + getHgap() + d.width) <= maxLegalWidth))
                 {
                     if (x > 0)

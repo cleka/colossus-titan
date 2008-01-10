@@ -4,7 +4,6 @@ package net.sf.colossus.xmlparser;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -51,9 +50,8 @@ public class BattlelandLoader
             subtitle = root.getAttributeValue("subtitle");
 
             List<Element> hexlist = root.getChildren("battlehex");
-            for (Iterator<Element> it = hexlist.iterator(); it.hasNext();)
+            for (Element el : hexlist)
             {
-                Element el = it.next();
                 handleHex(el, h);
             }
             Element startlistEl = root.getChild("startlist");
@@ -75,10 +73,8 @@ public class BattlelandLoader
                     }
                 }
 
-                for (Iterator<Element> it = startlistHexes.iterator(); it
-                    .hasNext();)
+                for (Element el : startlistHexes)
                 {
-                    Element el = it.next();
                     handleStartlistHex(el);
                 }
             }
@@ -110,9 +106,8 @@ public class BattlelandLoader
         hex.setElevation(elevation);
 
         List<Element> borders = el.getChildren("border");
-        for (Iterator<Element> it = borders.iterator(); it.hasNext();)
+        for (Element border : borders)
         {
-            Element border = it.next();
             int number = border.getAttribute("number").getIntValue();
             char type = border.getAttributeValue("type").charAt(0);
             hex.setHexside(number, type);

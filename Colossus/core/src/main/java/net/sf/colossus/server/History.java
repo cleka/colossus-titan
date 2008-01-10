@@ -179,9 +179,8 @@ public class History
             }
             List<String> creatureNames = new ArrayList<String>();
             List<Element> creatures = el.getChild("creatures").getChildren();
-            for (Iterator<Element> it = creatures.iterator(); it.hasNext();)
+            for (Element creature : creatures)
             {
-                Element creature = it.next();
                 String creatureName = creature.getTextNormalize();
                 creatureNames.add(creatureName);
             }

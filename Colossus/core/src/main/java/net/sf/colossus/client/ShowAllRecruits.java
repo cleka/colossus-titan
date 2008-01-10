@@ -15,7 +15,7 @@ import javax.swing.JFrame;
 
 final class ShowAllRecruits extends AbstractShowRecruits
 {
-    private SaveWindow saveWindow;
+    private final SaveWindow saveWindow;
 
     // Avoid showing multiple allTerrains displays.
     private static boolean allTerrainsDisplayActive = false;
@@ -26,14 +26,16 @@ final class ShowAllRecruits extends AbstractShowRecruits
 
         if (allTerrainsDisplayActive)
         {
+            // TODO another bit of boilout code that ain't no good
             super.dispose();
+            saveWindow = null; // otherwise it couldn't be final
             return;
         }
         allTerrainsDisplayActive = true;
 
-        for (int i = 0; i < terrains.length; i++)
+        for (String terrainName : terrains)
         {
-            doOneTerrain(terrains[i], null);
+            doOneTerrain(terrainName, null);
         }
 
         pack();

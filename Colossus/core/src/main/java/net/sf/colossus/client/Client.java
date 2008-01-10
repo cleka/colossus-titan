@@ -28,6 +28,7 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
+import javax.swing.UIManager.LookAndFeelInfo;
 
 import net.sf.colossus.Player;
 import net.sf.colossus.ai.AI;
@@ -993,9 +994,8 @@ public final class Client implements IClient, IOracle, IOptions
     public int getNumLivingPlayers()
     {
         int total = 0;
-        for (int i = 0; i < playerInfo.length; i++)
+        for (PlayerInfo info : playerInfo)
         {
-            PlayerInfo info = playerInfo[i];
             if (!info.isDead())
             {
                 total++;
@@ -1093,9 +1093,9 @@ public final class Client implements IClient, IOracle, IOptions
     public List<String> getPlayerNames()
     {
         List<String> names = new ArrayList<String>();
-        for (int i = 0; i < playerInfo.length; i++)
+        for (PlayerInfo info : playerInfo)
         {
-            names.add(playerInfo[i].getPlayer().getName());
+            names.add(info.getPlayer().getName());
         }
         return names;
     }
@@ -5066,12 +5066,9 @@ public final class Client implements IClient, IOracle, IOptions
         assert this.playerInfo != null : "Client not yet initialized";
         assert shortColor != null : "Parameter must not be null";
 
-        PlayerInfo info = null;
-
         // Stage 1: See if the player who started with this color is alive.
-        for (int i = 0; i < playerInfo.length; i++)
+        for (PlayerInfo info : playerInfo)
         {
-            info = playerInfo[i];
             if (shortColor.equals(info.getShortColor()) && !info.isDead())
             {
                 return info;
@@ -5079,9 +5076,8 @@ public final class Client implements IClient, IOracle, IOptions
         }
 
         // Stage 2: He's dead.  Find who killed him and see if he's alive.
-        for (int i = 0; i < playerInfo.length; i++)
+        for (PlayerInfo info : playerInfo)
         {
-            info = playerInfo[i];
             if (info.getPlayersElim().indexOf(shortColor) != -1)
             {
                 // We have the killer.
@@ -5334,12 +5330,12 @@ public final class Client implements IClient, IOracle, IOptions
         try
         {
             UIManager.setLookAndFeel(lfName);
-            UIManager.LookAndFeelInfo[] lfInfo = UIManager
+            UIManager.LookAndFeelInfo[] lnfInfos = UIManager
                 .getInstalledLookAndFeels();
             boolean exist = false;
-            for (int i = 0; i < lfInfo.length; i++)
+            for (LookAndFeelInfo lnfInfo : lnfInfos)
             {
-                exist = exist || lfInfo[i].getClassName().equals(lfName);
+                exist = exist || lnfInfo.getClassName().equals(lfName);
             }
             if (!exist)
             {

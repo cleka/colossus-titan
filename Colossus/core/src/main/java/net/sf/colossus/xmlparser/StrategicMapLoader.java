@@ -3,7 +3,6 @@ package net.sf.colossus.xmlparser;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -47,9 +46,8 @@ public class StrategicMapLoader
             show = new boolean[this.horizSize][this.vertSize];
 
             List<Element> hexlist = root.getChildren("hex");
-            for (Iterator<Element> it = hexlist.iterator(); it.hasNext();)
+            for (Element el : hexlist)
             {
-                Element el = it.next();
                 handleHex(el);
             }
         }
@@ -82,9 +80,8 @@ public class StrategicMapLoader
 
         List<Element> exits = el.getChildren("exit");
         int i = 0;
-        for (Iterator<Element> it = exits.iterator(); it.hasNext();)
+        for (Element exit : exits)
         {
-            Element exit = it.next();
             String sExitType = exit.getAttributeValue("type");
             int iExitType = Constants.hexsideMap.get(sExitType).intValue();
             hex.setBaseExitType(i, iExitType);

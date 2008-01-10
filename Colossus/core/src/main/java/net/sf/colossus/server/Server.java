@@ -547,10 +547,8 @@ public final class Server implements IServer
         clientMap.clear();
         remoteClients.clear();
 
-        for (Iterator<RemoteLogHandler> iter = remoteLogHandlers.iterator(); iter
-            .hasNext();)
+        for (RemoteLogHandler handler : remoteLogHandlers)
         {
-            RemoteLogHandler handler = iter.next();
             LOGGER.removeHandler(handler);
             handler.close();
         }

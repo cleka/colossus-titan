@@ -103,10 +103,8 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
         hazardSideNumberMap.clear();
 
         String[] terrains = TerrainRecruitLoader.getTerrains();
-        for (int t = 0; t < terrains.length; t++)
+        for (String terrain : terrains)
         {
-            String terrain = terrains[t];
-
             GUIBattleHex[][] gameH = new GUIBattleHex[6][6];
             List<GUIBattleHex> gameHexes = new ArrayList<GUIBattleHex>();
 
@@ -302,10 +300,8 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
 
             /* slow & inefficient... */
             HashMap<HazardTerrain, Integer> t2n = new HashMap<HazardTerrain, Integer>();
-            for (Iterator<HazardTerrain> iterator = HazardTerrain
-                .getAllHazardTerrains().iterator(); iterator.hasNext();)
+            for (HazardTerrain hTerrain : HazardTerrain.getAllHazardTerrains())
             {
-                HazardTerrain hTerrain = iterator.next();
                 int count = 0;
                 for (int x = 0; x < 6; x++)
                 {
@@ -328,7 +324,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
             hazardNumberMap.put(terrain, t2n);
             char[] hazardSides = BattleHex.getHexsides();
             HashMap<Character, Integer> s2n = new HashMap<Character, Integer>();
-            for (int i = 0; i < hazardSides.length; i++)
+            for (char side : hazardSides)
             {
                 int count = 0;
                 for (int x = 0; x < 6; x++)
@@ -339,7 +335,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
                         {
                             for (int k = 0; k < 6; k++)
                             {
-                                if (hexModel[x][y].getHexside(k) == hazardSides[i])
+                                if (hexModel[x][y].getHexside(k) == side)
                                 {
                                     count++;
                                 }
@@ -349,7 +345,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
                 }
                 if (count > 0)
                 {
-                    s2n.put(new Character(hazardSides[i]), new Integer(count));
+                    s2n.put(new Character(side), new Integer(count));
                 }
             }
             hazardSideNumberMap.put(terrain, s2n);

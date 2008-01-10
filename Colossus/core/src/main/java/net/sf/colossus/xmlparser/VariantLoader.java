@@ -4,7 +4,6 @@ package net.sf.colossus.xmlparser;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -47,9 +46,8 @@ public class VariantLoader
             if (deps != null)
             {
                 List<Element> dep = deps.getChildren("depend");
-                for (Iterator<Element> it = dep.iterator(); it.hasNext();)
+                for (Element el : dep)
                 {
-                    Element el = it.next();
                     depends.add(el.getAttributeValue("variant"));
                 }
             }

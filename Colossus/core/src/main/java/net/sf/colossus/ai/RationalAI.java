@@ -881,10 +881,8 @@ public class RationalAI extends SimpleAI implements AI
         logger.log(Level.FINEST, "done computing move values for legions");
 
         logger.log(Level.FINEST, "raw best moves:");
-        for (Iterator<List<LegionBoardMove>> it = all_legionMoves.iterator(); it
-            .hasNext();)
+        for (List<LegionBoardMove> moves : all_legionMoves)
         {
-            List<LegionBoardMove> moves = it.next();
             LegionBoardMove lbm = moves.get(0);
             logger.log(Level.FINEST, lbm.markerId + " to " + lbm.toHex
                 + " value " + lbm.val);
@@ -1291,10 +1289,8 @@ public class RationalAI extends SimpleAI implements AI
             List<List<LegionBoardMove>> availableMoves)
         {
             double ret = 0;
-            for (Iterator<List<LegionBoardMove>> it = availableMoves
-                .iterator(); it.hasNext();)
+            for (List<LegionBoardMove> moves : availableMoves)
             {
-                List<LegionBoardMove> moves = it.next();
                 if (moves.isEmpty())
                 {
                     // at least one peice has no legal moves
@@ -1319,10 +1315,8 @@ public class RationalAI extends SimpleAI implements AI
             if (mustMove)
             {
                 boolean moved = false;
-                for (Iterator<LegionBoardMove> it = performedMoves.iterator(); it
-                    .hasNext();)
+                for (LegionBoardMove lm : performedMoves)
                 {
-                    LegionBoardMove lm = it.next();
                     if (!lm.noMove)
                     {
                         moved = true;
@@ -1338,10 +1332,8 @@ public class RationalAI extends SimpleAI implements AI
             Map<String, List<String>> occupiedHexes = new Hashtable<String, List<String>>();
             Set<String> newOccupiedHexes = new HashSet<String>();
             List<LegionBoardMove> newBestMove = new ArrayList<LegionBoardMove>();
-            for (Iterator<LegionBoardMove> it = performedMoves.iterator(); it
-                .hasNext();)
+            for (LegionBoardMove lm : performedMoves)
             {
-                LegionBoardMove lm = it.next();
                 List<String> markers = occupiedHexes.get(lm.fromHex);
                 if (markers == null)
                 {
@@ -1381,10 +1373,8 @@ public class RationalAI extends SimpleAI implements AI
 
             // if there are moves left in perfornmedMoves
             // check if there is a cycle or a split didnt seperate
-            for (Iterator<LegionBoardMove> it = performedMoves.iterator(); it
-                .hasNext();)
+            for (LegionBoardMove lm : performedMoves)
             {
-                LegionBoardMove lm = it.next();
                 if (!lm.noMove)
                 {
                     // A marker that cant move at this point
@@ -1396,10 +1386,8 @@ public class RationalAI extends SimpleAI implements AI
                 LegionInfo legion = client.getLegionInfo(lm.markerId);
                 Set<String> moves = client.getMovement().listNormalMoves(
                     legion, legion.getCurrentHex(), client.getMovementRoll());
-                for (Iterator<String> it2 = moves.iterator(); it2.hasNext();)
+                for (String dest : moves)
                 {
-                    // make sure move is blocked
-                    String dest = it2.next();
                     if (!(newOccupiedHexes.contains(dest) || occupiedHexes
                         .containsKey(dest)))
                     {
@@ -1464,10 +1452,8 @@ public class RationalAI extends SimpleAI implements AI
             }
 
             List<LegionBoardMove> nextMoves = availableMoves.get(0);
-            for (Iterator<LegionBoardMove> it = nextMoves.iterator(); it
-                .hasNext();)
+            for (LegionBoardMove lm : nextMoves)
             {
-                LegionBoardMove lm = it.next();
                 if (!lm.noMove
                     && checkNewCycle(lm.fromHex, lm.toHex, performedMoves))
                 {
@@ -1494,11 +1480,8 @@ public class RationalAI extends SimpleAI implements AI
         private boolean checkNewCycle(String target, String from,
             List<LegionBoardMove> moves)
         {
-            for (Iterator<LegionBoardMove> it = moves.iterator(); it.hasNext();)
+            for (LegionBoardMove lm : moves)
             {
-                // note the when we hit a split there can be several
-                // paths to explore.
-                LegionBoardMove lm = it.next();
                 if (lm.fromHex.equals(from))
                 {
                     if (lm.toHex.equals(target))
@@ -1530,10 +1513,8 @@ public class RationalAI extends SimpleAI implements AI
                     // special case, these two legions are split, make
                     // sure to try the move off moves first
                     LegionBoardMove stayMove = null;
-                    for (Iterator<LegionBoardMove> it2 = moves.iterator(); it2
-                        .hasNext();)
+                    for (LegionBoardMove move : moves)
                     {
-                        LegionBoardMove move = it2.next();
                         if (move.noMove)
                         {
                             stayMove = move;
@@ -1551,10 +1532,8 @@ public class RationalAI extends SimpleAI implements AI
                 }
                 else
                 {
-                    for (Iterator<LegionBoardMove> it2 = moves.iterator(); it2
-                        .hasNext();)
+                    for (LegionBoardMove move : moves)
                     {
-                        LegionBoardMove move = it2.next();
                         if (!lm.toHex.equals(move.toHex))
                         {
                             newMoves.add(move);
@@ -2012,9 +1991,9 @@ public class RationalAI extends SimpleAI implements AI
         void log()
         {
             logger.log(Level.FINEST, "Expected battle log");
-            for (Iterator<String> it = log.iterator(); it.hasNext();)
+            for (String string : log)
             {
-                logger.log(Level.FINEST, it.next());
+                logger.log(Level.FINEST, string);
             }
         }
     }

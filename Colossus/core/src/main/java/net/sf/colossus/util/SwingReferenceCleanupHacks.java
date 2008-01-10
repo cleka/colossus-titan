@@ -76,9 +76,8 @@ public class SwingReferenceCleanupHacks
             {
                 Object[] keys = { "press", "release" };
                 boolean anyFound = false;
-                for (int i = 0; i < keys.length; i++)
+                for (Object aKey : keys)
                 {
-                    Object aKey = keys[i];
                     Object aValue = anActionMap.get(aKey);
                     anyFound = anyFound || aValue != null;
                     anActionMap.remove(aKey);

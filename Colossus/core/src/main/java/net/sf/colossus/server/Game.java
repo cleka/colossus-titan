@@ -366,9 +366,9 @@ public final class Game extends net.sf.colossus.game.Game
         List<String> cli = new ArrayList<String>();
 
         colorsLeft = new ArrayList<String>();
-        for (int i = 0; i < Constants.colorNames.length; i++)
+        for (String colorName : Constants.colorNames)
         {
-            cli.add(Constants.colorNames[i]);
+            cli.add(colorName);
         }
 
         /* Add the first 6 colors in random order, ... */
@@ -3245,9 +3245,8 @@ public final class Game extends net.sf.colossus.game.Game
     synchronized List<Legion> getAllLegions()
     {
         List<Legion> list = new ArrayList<Legion>();
-        for (Iterator<Player> it = players.iterator(); it.hasNext();)
+        for (Player player : players)
         {
-            Player player = it.next();
             List<Legion> legions = player.getLegions();
 
             list.addAll(legions);
@@ -3259,10 +3258,8 @@ public final class Game extends net.sf.colossus.game.Game
     List<String> getAllLegionIds()
     {
         List<String> list = new ArrayList<String>();
-        for (Iterator<Player> it = players.iterator(); it.hasNext();)
+        for (Player player : players)
         {
-            Player player = it.next();
-
             list.addAll(player.getLegionIds());
         }
         return list;
@@ -3272,10 +3269,8 @@ public final class Game extends net.sf.colossus.game.Game
     synchronized List<Legion> getAllEnemyLegions(Player player)
     {
         List<Legion> list = new ArrayList<Legion>();
-        for (Iterator<Player> it = players.iterator(); it.hasNext();)
+        for (Player nextPlayer : players)
         {
-            Player nextPlayer = it.next();
-
             if (nextPlayer != player)
             {
                 List<Legion> legions = nextPlayer.getLegions();
@@ -3290,10 +3285,8 @@ public final class Game extends net.sf.colossus.game.Game
     List<String> getAllEnemyLegionIds(Player player)
     {
         List<String> list = new ArrayList<String>();
-        for (Iterator<Player> it = players.iterator(); it.hasNext();)
+        for (Player nextPlayer : players)
         {
-            Player nextPlayer = it.next();
-
             if (nextPlayer != player)
             {
                 list.addAll(nextPlayer.getLegionIds());
