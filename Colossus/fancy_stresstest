@@ -201,7 +201,7 @@ do
     echo -e "\n$timestamp: Starting game #$i as variant $variant"
     echo -e "$CR\n$timestamp: Starting game #$i as variant $variant$CR" >> log
     
-    CMD="java -Djava.util.logging.config.file=logging.properties $FORCEBOARD $INTERNALROUNDS -Xmx128M -jar Colossus.jar $humans -i$AIs $remoteclients -qgS -d 1 --variant $variant $1 $2 $3 $4 $5 $6 $7 $8 $9"
+    CMD="java -ea -Djava.util.logging.config.file=logging.properties $FORCEBOARD $INTERNALROUNDS -Xmx128M -jar Colossus.jar $humans -i$AIs $remoteclients -qgS -d 1 --variant $variant $1 $2 $3 $4 $5 $6 $7 $8 $9"
     echo $CMD
     echo $CMD >> log 2>&1
     $CMD >> log 2>&1;
