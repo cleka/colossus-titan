@@ -2,7 +2,6 @@ package net.sf.colossus.client;
 
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -16,9 +15,8 @@ class AllPredictSplits extends ArrayList<PredictSplits>
 {
     PredictSplitNode getLeaf(String markerId)
     {
-        for (Iterator<PredictSplits> it = iterator(); it.hasNext();)
+        for (PredictSplits ps: this)
         {
-            PredictSplits ps = it.next();
             PredictSplitNode leaf = ps.getLeaf(markerId);
             if (leaf != null)
             {
@@ -30,18 +28,16 @@ class AllPredictSplits extends ArrayList<PredictSplits>
 
     void printLeaves()
     {
-        for (Iterator<PredictSplits> it = iterator(); it.hasNext();)
+        for (PredictSplits ps: this)
         {
-            PredictSplits ps = it.next();
             ps.printLeaves();
         }
     }
 
     void printNodes()
     {
-        for (Iterator<PredictSplits> it = iterator(); it.hasNext();)
+        for (PredictSplits ps: this)
         {
-            PredictSplits ps = it.next();
             ps.printNodes();
         }
     }

@@ -4,7 +4,6 @@ package net.sf.colossus.client;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.List;
 import java.util.TreeSet;
 import java.util.logging.Level;
@@ -31,9 +30,8 @@ public final class PredictSplits
     PredictSplits(String rootId, List<String> creatureNames)
     {
         CreatureInfoList infoList = new CreatureInfoList();
-        for (Iterator<String> it = creatureNames.iterator(); it.hasNext();)
+        for (String name: creatureNames)
         {
-            String name = it.next();
             CreatureInfo ci = new CreatureInfo(name, true, true);
             infoList.add(ci);
         }
@@ -86,9 +84,8 @@ public final class PredictSplits
             }
         }
         // Remove in reverse order to keep indexes consistent.
-        for (Iterator<Integer> it = prunes.iterator(); it.hasNext();)
+        for (Integer in: prunes)
         {
-            Integer in = it.next();
             leaves.remove(in.intValue());
         }
 
@@ -127,9 +124,8 @@ public final class PredictSplits
         LOGGER.log(Level.FINEST, "");
         List<PredictSplitNode> leaves = getLeaves(root);
         Collections.sort(leaves);
-        for (Iterator<PredictSplitNode> it = leaves.iterator(); it.hasNext();)
+        for (PredictSplitNode leaf: leaves)
         {
-            PredictSplitNode leaf = it.next();
             LOGGER.log(Level.FINEST, leaf.toString());
         }
         LOGGER.log(Level.FINEST, "");
@@ -141,9 +137,8 @@ public final class PredictSplits
         LOGGER.log(Level.FINEST, "");
         List<PredictSplitNode> nodes = getNodes(root);
         Collections.sort(nodes, nodeTurnComparator);
-        for (Iterator<PredictSplitNode> it = nodes.iterator(); it.hasNext();)
+        for (PredictSplitNode node: nodes)
         {
-            PredictSplitNode node = it.next();
             LOGGER.log(Level.FINEST, node.toString());
         }
         LOGGER.log(Level.FINEST, "");
@@ -153,9 +148,8 @@ public final class PredictSplits
     PredictSplitNode getLeaf(String markerId)
     {
         List<PredictSplitNode> leaves = getLeaves(root);
-        for (Iterator<PredictSplitNode> it = leaves.iterator(); it.hasNext();)
+        for (PredictSplitNode leaf: leaves)
         {
-            PredictSplitNode leaf = it.next();
             if (markerId.equals(leaf.getMarkerId()))
             {
                 return leaf;

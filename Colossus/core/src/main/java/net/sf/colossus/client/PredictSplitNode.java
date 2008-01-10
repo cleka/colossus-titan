@@ -91,16 +91,12 @@ public class PredictSplitNode implements Comparable<PredictSplitNode>
     public String toString()
     {
         StringBuffer sb = new StringBuffer(getFullName() + ":");
-        for (Iterator<CreatureInfo> it = getCreatures().iterator(); it
-            .hasNext();)
+        for (CreatureInfo ci: getCreatures())
         {
-            CreatureInfo ci = it.next();
             sb.append(" " + ci.toString());
         }
-        for (Iterator<CreatureInfo> it = getRemovedCreatures().iterator(); it
-            .hasNext();)
+        for (CreatureInfo ci: getRemovedCreatures())
         {
-            CreatureInfo ci = it.next();
             sb.append(" " + ci.toString() + "-");
         }
         return sb.toString();
@@ -130,10 +126,8 @@ public class PredictSplitNode implements Comparable<PredictSplitNode>
     CreatureInfoList getCertainCreatures()
     {
         CreatureInfoList list = new CreatureInfoList();
-        for (Iterator<CreatureInfo> it = getCreatures().iterator(); it
-            .hasNext();)
+        for (CreatureInfo ci: getCreatures())
         {
-            CreatureInfo ci = it.next();
             if (ci.isCertain())
             {
                 list.add(ci);
@@ -154,10 +148,8 @@ public class PredictSplitNode implements Comparable<PredictSplitNode>
 
     boolean allCertain()
     {
-        for (Iterator<CreatureInfo> it = getCreatures().iterator(); it
-            .hasNext();)
+        for (CreatureInfo ci: getCreatures())
         {
-            CreatureInfo ci = it.next();
             if (!ci.isCertain())
             {
                 return false;
@@ -212,19 +204,15 @@ public class PredictSplitNode implements Comparable<PredictSplitNode>
     CreatureInfoList getAtSplitOrRemovedCreatures()
     {
         CreatureInfoList list = new CreatureInfoList();
-        for (Iterator<CreatureInfo> it = getCreatures().iterator(); it
-            .hasNext();)
+        for (CreatureInfo ci: getCreatures())
         {
-            CreatureInfo ci = it.next();
             if (ci.isAtSplit())
             {
                 list.add(ci);
             }
         }
-        for (Iterator<CreatureInfo> it = getRemovedCreatures().iterator(); it
-            .hasNext();)
+        for (CreatureInfo ci: getRemovedCreatures())
         {
-            CreatureInfo ci = it.next();
             list.add(ci);
         }
         return list;
@@ -234,10 +222,8 @@ public class PredictSplitNode implements Comparable<PredictSplitNode>
     CreatureInfoList getAfterSplitCreatures()
     {
         CreatureInfoList list = new CreatureInfoList();
-        for (Iterator<CreatureInfo> it = getCreatures().iterator(); it
-            .hasNext();)
+        for (CreatureInfo ci: getCreatures())
         {
-            CreatureInfo ci = it.next();
             if (!ci.isAtSplit())
             {
                 list.add(ci);
@@ -253,19 +239,15 @@ public class PredictSplitNode implements Comparable<PredictSplitNode>
     CreatureInfoList getCertainAtSplitOrRemovedCreatures()
     {
         CreatureInfoList list = new CreatureInfoList();
-        for (Iterator<CreatureInfo> it = getCreatures().iterator(); it
-            .hasNext();)
+        for (CreatureInfo ci: getCreatures())
         {
-            CreatureInfo ci = it.next();
             if (ci.isCertain() && ci.isAtSplit())
             {
                 list.add(ci);
             }
         }
-        for (Iterator<CreatureInfo> it = getRemovedCreatures().iterator(); it
-            .hasNext();)
+        for (CreatureInfo ci: getRemovedCreatures())
         {
-            CreatureInfo ci = it.next();
             list.add(ci);
         }
         return list;
@@ -293,8 +275,8 @@ public class PredictSplitNode implements Comparable<PredictSplitNode>
     {
         List<String> bigclone = new ArrayList<String>(big);
         for (Iterator<String> it = little.iterator(); it.hasNext();)
+        for (String ob: little)
         {
-            Object ob = it.next();
             if (!bigclone.remove(ob))
             {
                 return false;
@@ -324,10 +306,8 @@ public class PredictSplitNode implements Comparable<PredictSplitNode>
 
         if (!certainInfoGained.isEmpty())
         {
-            for (Iterator<String> it = certainInfoGained.iterator(); it
-                .hasNext();)
+            for (String name: certainInfoGained)
             {
-                String name = it.next();
                 this.creatures.add(new CreatureInfo(name, true, true));
             }
             this.parent.revealCreatures(null);
@@ -469,7 +449,7 @@ public class PredictSplitNode implements Comparable<PredictSplitNode>
 
                 if (!nextCreature.equals(currCreature))
                 {
-                    // Compute how many to keep or splt, and update the lists.
+                    // Compute how many to keep or split, and update the lists.
                     int numToKeep = count - numUnknownsToSplit
                         + firstTurnUnknownLord;
                     int numToSplit = count - numUnknownsToKeep
@@ -500,9 +480,8 @@ public class PredictSplitNode implements Comparable<PredictSplitNode>
         knownCombo.addAll(knownSplit);
         knownCombo.addAll(knownKeep);
 
-        for (Iterator<String> it = knownCombo.iterator(); it.hasNext();)
+        for (String name: knownCombo)
         {
-            String name = it.next();
             unknowns.remove(name);
         }
 
@@ -544,14 +523,11 @@ public class PredictSplitNode implements Comparable<PredictSplitNode>
         boolean maximize = (2 * firstElement.size() > getHeight());
         int bestKillValue = -1;
         List<String> creaturesToRemove = new ArrayList<String>();
-        for (Iterator<List<String>> it = possibleSplits.iterator(); it
-            .hasNext();)
+        for (List<String>li: possibleSplits)
         {
-            List<String> li = it.next();
             int totalKillValue = 0;
-            for (Iterator<String> it2 = li.iterator(); it2.hasNext();)
+            for (String name: li)
             {
-                String name = it2.next();
                 Creature creature = (Creature)VariantSupport
                     .getCurrentVariant().getCreatureByName(name);
                 totalKillValue += creature.getKillValue();
@@ -571,9 +547,9 @@ public class PredictSplitNode implements Comparable<PredictSplitNode>
     int count(List<?> li, Object ob)
     {
         int num = 0;
-        for (Iterator<?> it = li.iterator(); it.hasNext();)
+        for (Object ob2: li)
         {
-            if (ob.equals(it.next()))
+            if (ob.equals(ob2))
             {
                 num++;
             }
@@ -609,9 +585,8 @@ public class PredictSplitNode implements Comparable<PredictSplitNode>
 
         // We now know how we want to split, caculate certainty and
         // make the new creatureInfoLists
-        for (Iterator<CreatureInfo> it = creatures.iterator(); it.hasNext();)
+        for (CreatureInfo ci: creatures)
         {
-            CreatureInfo ci = it.next();
             String name = ci.getName();
             CreatureInfo newinfo = new CreatureInfo(name, false, true);
             if (splitoffNames.contains(name))
@@ -698,10 +673,9 @@ public class PredictSplitNode implements Comparable<PredictSplitNode>
     {
         // TODO Check if any new information was gained and stop if not.
         newList.addAll(getAfterSplitCreatures());
-        for (Iterator<CreatureInfo> it = getRemovedCreatures().iterator(); it
-            .hasNext();)
+        for (CreatureInfo ci: getRemovedCreatures())
         {
-            newList.remove(it.next());
+            newList.remove(ci);
         }
         setCreatures(newList);
 
@@ -839,9 +813,8 @@ public class PredictSplitNode implements Comparable<PredictSplitNode>
     void removeCreatures(List<String> creatureNames)
     {
         revealCreatures(creatureNames);
-        for (Iterator<String> it = creatureNames.iterator(); it.hasNext();)
+        for (String name: creatureNames)
         {
-            String name = it.next();
             removeCreature(name);
         }
     }
@@ -854,9 +827,9 @@ public class PredictSplitNode implements Comparable<PredictSplitNode>
     static List<String> subtractLists(List<String> big, List<String> little)
     {
         ArrayList<String> li = new ArrayList<String>(big);
-        for (Iterator<String> it = little.iterator(); it.hasNext();)
+        for (String str: little)
         {
-            li.remove(it.next());
+            li.remove(str);
         }
         return li;
     }
@@ -865,9 +838,8 @@ public class PredictSplitNode implements Comparable<PredictSplitNode>
     static int count(List<String> li, String name)
     {
         int num = 0;
-        for (Iterator<String> it = li.iterator(); it.hasNext();)
+        for (String s: li)
         {
-            String s = it.next();
             if (s.equals(name))
             {
                 num++;
@@ -883,9 +855,8 @@ public class PredictSplitNode implements Comparable<PredictSplitNode>
     static int minCount(List<List<String>> lili, String name)
     {
         int min = Integer.MAX_VALUE;
-        for (Iterator<List<String>> it = lili.iterator(); it.hasNext();)
+        for (List<String> li: lili)
         {
-            List<String> li = it.next();
             min = Math.min(min, count(li, name));
         }
         if (min == Integer.MAX_VALUE)
