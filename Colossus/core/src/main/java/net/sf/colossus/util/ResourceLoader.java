@@ -760,7 +760,7 @@ public final class ResourceLoader
             return null;
         }
         LOGGER.log(Level.WARNING, "No document for basename " + filename
-            + " found " + "(neither .html, .txt nor without extention)!");
+            + " found " + "(neither .html, .txt nor without extension)!");
         return null;
     }
 
