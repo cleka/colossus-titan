@@ -49,6 +49,12 @@ then
   MyName=$USERNAME
 fi
 
+if [ "X$TEMP" = "X" ]
+then
+  echo "\$TEMP not set, guessing it to be /tmp"
+  TEMP="/tmp"
+fi
+
 
 while [ $# -gt 0 -a "$done" = "no" ]
 do
@@ -170,7 +176,7 @@ fi
 variantnr=0
 if [ "X$variants" = "X" ]
 then
-  variants="Abyssal6 Abyssal9 Badlands Beelzebub Default ExtTitan Outlands \
+  variants="Abyssal3 Abyssal6 Abyssal9 Badlands Beelzebub Default ExtTitan Outlands \
             Pantheon TG-Wild TitanPlus Undead Unified"
 fi
 
@@ -211,6 +217,10 @@ do
     if [ $ec -ne 0 ]
     then
       echo -e "Exit code is non-zero ($ec) - \c"
+      mkbackup=y
+    elif grep "SEVERE" $TEMP/Colossus[012].log
+    then
+      echo -e "Found SEVERE error in logs - \c"
       mkbackup=y
     elif [ -e backup.flag ]
     then
