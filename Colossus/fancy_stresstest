@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # Run 6-AI games in a loop forever, looking for hangs.
 # XXX The log will eventually fill the disk. 
