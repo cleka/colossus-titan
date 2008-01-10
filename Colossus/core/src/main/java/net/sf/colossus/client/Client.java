@@ -4677,7 +4677,7 @@ public final class Client implements IClient, IOracle, IOptions
         {
             LegionInfo info = it.next();
             String markerId = info.getMarkerId();
-            if (!player.equals(info.getPlayer()))
+            if (!player.equals(info.getPlayer().getPlayer()))
             {
                 markerIds.add(markerId);
             }
