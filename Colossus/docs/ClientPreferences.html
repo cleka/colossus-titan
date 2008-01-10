@@ -12,12 +12,13 @@
 This document describes the various available settings in the Preferences 
 Window (displayable by "MasterBoard menu" =&gt; "Window" =&gt; "Preferences...")
 <p>
-This window has four tabbed panes:
+This window has five tabbed panes:
 <ul>
 <li><a HREF="#BattleTab">Battle tab</a>
 <li><a HREF="#AutoplayTab">Autoplay tab</a>
 <li><a HREF="#GraphicsTab">Graphics/View tab</a>
 <li><a HREF="#WindowsTab">Windows tab</a>
+<li><a HREF="#ColorTab">Color tab</a>
 </ul>
 <p>
 <hr>
@@ -110,36 +111,17 @@ SimpleAI would do it.
 </ul>
 
 <h3><a NAME="#Auto_pick_color">Autoplay - Auto pick color</a></h3>
-During begin of the game, you are asked to select a color. If you don't
-care which color you get, mark this option. The system will then pick
-any color for you randomly.
-<p>
-<b>Tip for "hacker-type" users:</b>
-There is the possibility to put a line in the Options file, what your 
-favorite (=preferred) colors are; then this option will try to give you 
-one of those preferred colors (if possible - if you are the last of 
-several human players to choose and the previous players picked all of 
-those colors, you still get a random color). Human players have 
-precedence before AI players.
-<p>
-Unfortunately there is (so far) no menu functionality to put this
-preferred color to the Options file. The file in question is
-normally called <br>
-<PRE>  Colossus-&lt;your player name&gt;.cfg</PRE> 
-and it is located in the .colossus directory mentioned above.
-You would need to manually add a line *exactly* like this:
-<PRE>
-  Favorite\ colors=Green,Black,Orange
-</PRE>
-to that file, to get (if possible) one of those colors.
-Note the backslash before the space, and the proper spelling (case-sensitive!) of the color names, and no spaces around the comma!
-<p>
-Such a change must be done while Colossus is not running - otherwise, when Colossus ends it will write back the options/settings you possibly modified during the game (and thus wiping out the manual editing of the file).
-<p>
-Perhaps one day someone makes a GUI functionality for this...
+During begin of the game, you are asked to select a color. With this
+option set, the system will pick the first one which is still available
+from your list of preferred colors (when you have set them in
+<a HREF="#ColorTab">Color tab</a>); without any preferred colors
+set (or all already taken by human players before you), 
+the system will simply pick one for you randomly.
 
 <h3><a NAME="#Auto_pick_markers">Autoplay - Auto pick markers</a></h3>
-If you don't care which marker will be taken for splitting a legion, mark this option - it will just pick one by random.
+If you don't care which marker will be taken for splitting a legion
+(or as initial marker at game start), then mark this option 
+- the system will just pick one for you randomly.
 
 <h3><a NAME="#Auto_pick_entry_sides">Autoplay - Auto pick entry sides</a></h3>
 
@@ -531,13 +513,19 @@ following choices are offered:
 <li>Windows</li>
 </ul>
 
+<hr>
+
+<h2><a NAME="#ColorTab">Color tab</a></h2>
+
+You can define an order of favorite colors here. See 
+<a HREF="#Auto_pick_color">Auto pick color</a> for details.
 <p>
 <hr>
 <p>
 <i>
 Created January 2008.
 <br>
-Last updated tuesday, January 8, 2008 by Clemens Katzer
+Last updated January 10, 2008 by CleKa
 </i>
 </body>
 </html>
