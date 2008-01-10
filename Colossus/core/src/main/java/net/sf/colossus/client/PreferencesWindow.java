@@ -1,6 +1,8 @@
 package net.sf.colossus.client;
 
+
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Container;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -9,9 +11,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
+import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
@@ -30,19 +36,23 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import net.sf.colossus.server.Constants;
+import net.sf.colossus.util.HTMLColor;
 import net.sf.colossus.util.KFrame;
 import net.sf.colossus.util.Options;
+import net.sf.colossus.util.Split;
 
-public class PreferencesWindow extends KFrame
-    implements ItemListener, ActionListener
+
+public class PreferencesWindow extends KFrame implements ItemListener,
+    ActionListener
 {
     /**
      * Gridbag constraints for a vertical filling (use with empty JPanel).
      */
     private static final GridBagConstraints FILL_CONSTRAINTS = new GridBagConstraints();
-    static 
+    static
     {
-        FILL_CONSTRAINTS.gridx = 1;   // first in new line
+        FILL_CONSTRAINTS.gridx = 1; // first in new line
         FILL_CONSTRAINTS.weighty = 1; // expand vertically (others should have weighty set to 0)
     }
 
@@ -50,9 +60,9 @@ public class PreferencesWindow extends KFrame
      * Gridbag constraints for a vertical spacer (use with empty JPanel).
      */
     private static final GridBagConstraints SPACER_CONSTRAINTS = new GridBagConstraints();
-    static 
+    static
     {
-        SPACER_CONSTRAINTS.gridx = 1;  // first in new line
+        SPACER_CONSTRAINTS.gridx = 1; // first in new line
         SPACER_CONSTRAINTS.ipady = 10; // expand vsize by this many pixels
     }
 
@@ -60,47 +70,50 @@ public class PreferencesWindow extends KFrame
      * Gridbag constraints for the controls itself.
      */
     private static final GridBagConstraints CONTROL_CONSTRAINTS = new GridBagConstraints();
-    static 
+    static
     {
         CONTROL_CONSTRAINTS.gridx = 1; // first in new line
         CONTROL_CONSTRAINTS.weightx = 1; // expand cell horizontally to use width of pane
         CONTROL_CONSTRAINTS.anchor = GridBagConstraints.NORTHWEST; // align top left
-        CONTROL_CONSTRAINTS.insets = new Insets(0,5,0,5); // add a bit extra space around it
+        CONTROL_CONSTRAINTS.insets = new Insets(0, 5, 0, 5); // add a bit extra space around it
     }
-    
+
     /**
      * Gridbag constraints for nested panels.
      */
     private static final GridBagConstraints SUBPANEL_CONSTRAINTS = new GridBagConstraints();
-    static 
+    static
     {
         SUBPANEL_CONSTRAINTS.gridx = 1; // first in new line
         SUBPANEL_CONSTRAINTS.weightx = 1; // expand cell horizontally to use width of pane
         SUBPANEL_CONSTRAINTS.fill = GridBagConstraints.BOTH; // panel should use all of cell
     }
-    
+
     private IOptions options;
     private Client client;
-    private Map<String, JCheckBox> prefCheckboxes = new HashMap<String, JCheckBox>();
+    private final Map<String, JCheckBox> prefCheckboxes = new HashMap<String, JCheckBox>();
     private JButton closeButton;
-    private Box lfBox;    // Look & Feel
-    private Box rcModes;  // Recruit Chit modes
-    
+    private Box lfBox; // Look & Feel
+    private Box rcModes; // Recruit Chit modes
+    private JPanel favColorPane;
+    private List<String> favoriteColors;
+    private ArrayList<String> colorsLeft;
+
     public PreferencesWindow(IOptions options, Client client)
     {
         super("Preferences");
-        
+
         this.options = options;
         this.client = client;
-        
+
         getContentPane().add(new JLabel("Dummy"));
-        
+
         setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
-        
+
         setupGUI();
-        
+
         pack();
-                       
+
         useSaveWindow(options, "Preferences", null);
     }
 
@@ -108,7 +121,7 @@ public class PreferencesWindow extends KFrame
     {
         addCheckBox(pane, name, true, false);
     }
-    
+
     private void addCheckBox(Container pane, String name, boolean enabled,
         boolean defVal)
     {
@@ -133,6 +146,13 @@ public class PreferencesWindow extends KFrame
         cont.add(rb, CONTROL_CONSTRAINTS);
         boolean selected = (text.equals(current));
         rb.setSelected(selected);
+    }
+
+    private void addButton(Container cont, String name, ActionListener al)
+    {
+        JButton button = new JButton(name);
+        button.addActionListener(al);
+        cont.add(button);
     }
 
     private void setupGUI()
@@ -187,12 +207,16 @@ public class PreferencesWindow extends KFrame
         addCheckBox(apPane, Options.autoReinforce);
         addCheckBox(apPane, Options.autoPlay);
         apPane.add(new JPanel(), FILL_CONSTRAINTS);
-        
+
+        // Color tab
+        JPanel colorPane = getColorPane();
+        tabbedPane.addTab("Color", colorPane);
+
         // Graphics/View tab
         JPanel viewPane = new JPanel(new GridBagLayout());
         tabbedPane.addTab("Graphics/View", viewPane);
 
-        //   - graphics features panel in Garhpics tab
+        //   - graphics features panel in Graphics tab
         JPanel graphicsPane = new JPanel(new GridBagLayout());
         graphicsPane.setBorder(new TitledBorder("Graphics features"));
         graphicsPane.setAlignmentX(LEFT_ALIGNMENT);
@@ -201,7 +225,7 @@ public class PreferencesWindow extends KFrame
         addCheckBox(graphicsPane, Options.useSVG);
         addCheckBox(graphicsPane, Options.noBaseColor);
         viewPane.add(graphicsPane, SUBPANEL_CONSTRAINTS);
-       
+
         //   - "Show recruit preview chits ..." panel in Graphics tab
         ButtonGroup group = new ButtonGroup();
         rcModes = new Box(BoxLayout.Y_AXIS);
@@ -209,13 +233,18 @@ public class PreferencesWindow extends KFrame
         rcModes.setBorder(new TitledBorder(Options.showRecruitChitsSubmenu));
         viewPane.add(rcModes, SUBPANEL_CONSTRAINTS);
 
-        String current = options.getStringOption(Options.showRecruitChitsSubmenu);
+        String current = options
+            .getStringOption(Options.showRecruitChitsSubmenu);
         // NOTE! : event handling is based on that the RB is partof this rcModes Box!
-        addRadioButton(rcModes, group, Options.showRecruitChitsNone, "", current);
-        addRadioButton(rcModes, group, Options.showRecruitChitsStrongest, "", current);
-        addRadioButton(rcModes, group, Options.showRecruitChitsRecruitHint, "", current);
-        addRadioButton(rcModes, group, Options.showRecruitChitsAll, "", current);
- 
+        addRadioButton(rcModes, group, Options.showRecruitChitsNone, "",
+            current);
+        addRadioButton(rcModes, group, Options.showRecruitChitsStrongest, "",
+            current);
+        addRadioButton(rcModes, group, Options.showRecruitChitsRecruitHint,
+            "", current);
+        addRadioButton(rcModes, group, Options.showRecruitChitsAll, "",
+            current);
+
         //   -- misc. Panel in Graphics tab: 
         //        so far only dubious as blanks
         Box miscPane = new Box(BoxLayout.Y_AXIS);
@@ -225,11 +254,10 @@ public class PreferencesWindow extends KFrame
         //  The "dubious as blanks" option makes only sense with the 
         //    "view what SplitPrediction tells us" mode => otherwise inactive.
         boolean avail = (client.getViewMode() == Options.viewableEverNum);
-        addCheckBox(miscPane, Options.dubiousAsBlanks, avail, false); 
+        addCheckBox(miscPane, Options.dubiousAsBlanks, avail, false);
         // , KeyEvent.VK_D);
         viewPane.add(new JPanel(), FILL_CONSTRAINTS);
 
-        
         // Window tab
         JPanel windowPane = new JPanel(new GridBagLayout());
         tabbedPane.addTab("Windows", windowPane);
@@ -244,13 +272,13 @@ public class PreferencesWindow extends KFrame
         lfBox.setBorder(new TitledBorder("Look & Feel"));
         lfBox.add(new JLabel("Choose your preferred \"Look & Feel\":"));
         String currentLF = UIManager.getLookAndFeel().getName();
-        UIManager.LookAndFeelInfo[] lfInfo =
-            UIManager.getInstalledLookAndFeels();
+        UIManager.LookAndFeelInfo[] lfInfo = UIManager
+            .getInstalledLookAndFeels();
         for (int i = 0; i < lfInfo.length; i++)
         {
             // NOTE! : event handling is based on that the RB is partof this lfBox Box!
-            addRadioButton(lfBox, lfGroup, lfInfo[i].getName(),
-                lfInfo[i].getClassName(), currentLF);          
+            addRadioButton(lfBox, lfGroup, lfInfo[i].getName(), lfInfo[i]
+                .getClassName(), currentLF);
         }
 
         int oldValue = Scale.get();
@@ -262,16 +290,69 @@ public class PreferencesWindow extends KFrame
         windowPane.add(scalePane, SUBPANEL_CONSTRAINTS);
 
         windowPane.add(new JPanel(), FILL_CONSTRAINTS);
-        
+
         closeButton = new JButton("Close");
         closeButton.addActionListener(this);
         getContentPane().add(closeButton, BorderLayout.SOUTH);
     }
-    
+
+    private JPanel getColorPane()
+    {
+
+        JPanel colorPane = new JPanel(new BorderLayout());
+
+        favColorPane = new JPanel();
+        favColorPane
+            .setLayout(new BoxLayout(favColorPane, BoxLayout.PAGE_AXIS));
+        favColorPane.setBorder(BorderFactory
+            .createTitledBorder("Favorite Colors"));
+        String favorites = client.getStringOption(Options.favoriteColors);
+        favoriteColors = null;
+        colorsLeft = new ArrayList<String>();
+        for (int i = 0; i < Constants.colorNames.length; i++)
+        {
+            colorsLeft.add(Constants.colorNames[i]);
+        }
+        if (favorites != null)
+        {
+            favoriteColors = Split.split(',', favorites);
+        }
+        else
+        {
+            favoriteColors = new ArrayList<String>();
+        }
+        ActionListener selectColorAL = new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                selectColor();
+            }
+        };
+        ActionListener clearColorAL = new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                clearColor();
+            }
+        };
+        JPanel colorButtonPane = new JPanel();
+        addButton(colorButtonPane, "Select", selectColorAL);
+        addButton(colorButtonPane, "Clear All", clearColorAL);
+        colorPane.add(colorButtonPane, BorderLayout.NORTH);
+        colorPane.add(favColorPane, BorderLayout.CENTER);
+        for (int i = 0; i < favoriteColors.size(); i++)
+        {
+            String color = favoriteColors.get(i);
+            addColor(color);
+            colorsLeft.remove(color);
+        }
+        return colorPane;
+    }
+
     @Override
     public void dispose()
     {
-//        cleanPrefCBListeners();
+        //        cleanPrefCBListeners();
         super.dispose();
         options = null;
         client = null;
@@ -286,7 +367,7 @@ public class PreferencesWindow extends KFrame
     {
         Object source = e.getSource();
         JComponent sourceJC = (JComponent)source;
-        
+
         if (source instanceof JCheckBox)
         {
             String text = ((JCheckBox)source).getText();
@@ -308,45 +389,110 @@ public class PreferencesWindow extends KFrame
                     options.setOption(Options.showRecruitChitsSubmenu, text);
                 }
             }
-            else if ( sourceJC.getParent() == lfBox )
+            else if (sourceJC.getParent() == lfBox)
             {
                 client.setLookAndFeel(text);
             }
         }
     }
-    
-    class ScaleValue extends JPanel
-        implements ChangeListener, ActionListener
+
+    public void saveFavColor()
+    {
+        if (favoriteColors.size() > 0)
+        {
+            StringBuilder favorites = new StringBuilder();
+            for (Iterator<String> it = favoriteColors.iterator(); it.hasNext();)
+            {
+                if (favorites.length() > 0)
+                {
+                    favorites.append(',');
+                }
+                favorites.append(it.next());
+            }
+            client.setOption(Options.favoriteColors, favorites.toString());
+        }
+    }
+
+    private void clearColor()
+    {
+        favoriteColors = new ArrayList<String>();
+        favColorPane.removeAll();
+        colorsLeft = new ArrayList<String>();
+        for (int i = 0; i < Constants.colorNames.length; i++)
+        {
+            colorsLeft.add(Constants.colorNames[i]);
+        }
+        this.repaint();
+        saveFavColor();
+    }
+
+    private void unselectColor(JButton button)
+    {
+        String color = button.getText();
+        favColorPane.remove(button);
+        colorsLeft.add(color);
+        this.repaint();
+        saveFavColor();
+    }
+
+    private void addColor(String color)
+    {
+        Color realColor = HTMLColor.stringToColor(color + "Colossus");
+        JButton button = new JButton(color);
+        button.setBackground(realColor);
+        int sum = realColor.getRed() + realColor.getGreen()
+            + realColor.getBlue();
+        button.setForeground(sum > 200 ? Color.black : Color.white);
+        ActionListener al = new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                unselectColor((JButton)e.getSource());
+            }
+        };
+        button.addActionListener(al);
+        favColorPane.add(button);
+    }
+
+    private void selectColor()
+    {
+        String c = PickColor.pickColor(this, "You", colorsLeft, options);
+        addColor(c);
+        colorsLeft.remove(c);
+        saveFavColor();
+        this.repaint();
+    }
+
+    class ScaleValue extends JPanel implements ChangeListener, ActionListener
     {
         SpinnerNumberModel model;
         JSpinner spinner;
         int newValue;
         int oldValue;
-        
+
         ScaleValue(int oldValue, int min, int max, int step)
         {
             super();
             this.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
-            
+
             this.oldValue = oldValue;
             this.newValue = oldValue;
 
             Box scalePane = new Box(BoxLayout.X_AXIS);
             add(scalePane);
-            
+
             add(new JLabel("Window scale: "));
             this.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
             model = new SpinnerNumberModel(oldValue, min, max, step);
             spinner = new JSpinner(model);
             add(spinner);
             spinner.addChangeListener(this);
-             
+
             JButton applyButton = new JButton("Apply");
             applyButton.addActionListener(this);
             add(applyButton);
         }
-        
-        
+
         public void stateChanged(ChangeEvent e)
         {
             newValue = ((Integer)spinner.getValue()).intValue();
