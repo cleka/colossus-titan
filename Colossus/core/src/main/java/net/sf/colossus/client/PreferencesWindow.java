@@ -432,6 +432,7 @@ public class PreferencesWindow extends KFrame implements ItemListener,
         favColorPane.remove(button);
         colorsLeft.add(color);
         this.repaint();
+        favoriteColors.remove(color);
         saveFavColor();
     }
 
@@ -458,6 +459,7 @@ public class PreferencesWindow extends KFrame implements ItemListener,
     {
         String c = PickColor.pickColor(this, "You", colorsLeft, options);
         addColor(c);
+        favoriteColors.add(c);
         colorsLeft.remove(c);
         saveFavColor();
         this.repaint();
