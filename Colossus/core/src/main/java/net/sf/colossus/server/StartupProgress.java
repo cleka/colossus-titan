@@ -11,6 +11,7 @@ import java.awt.event.KeyEvent;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.SwingConstants;
+import javax.swing.Timer;
 import javax.swing.WindowConstants;
 
 import net.sf.colossus.util.KFrame;
@@ -23,12 +24,22 @@ import net.sf.colossus.util.KFrame;
  */
 public final class StartupProgress implements ActionListener
 {
+    /**
+     * The time the window takes to show itself.
+     * 
+     * This is a number of milliseconds to wait before showing the window in this
+     * class is shown. This means that in local games where everyone is there straight
+     * away the window will never be visible. 
+     */
+    private static final int SHOWUP_DELAY = 1000;
+
     private KFrame logFrame;
-    private TextArea text;
-    private Container pane;
+    private final TextArea text;
+    private final Container pane;
     private Server server;
     private JButton b;
-    private JCheckBox autoCloseCheckBox;
+    private final JCheckBox autoCloseCheckBox;
+    private final Timer showUpTimer;
 
     public StartupProgress(Server server)
     {
@@ -37,7 +48,7 @@ public final class StartupProgress implements ActionListener
         net.sf.colossus.webcommon.InstanceTracker.register(this, "only one");
 
         //Create and set up the window.
-        KFrame logFrame = new KFrame("Server startup progress log");
+        final KFrame logFrame = new KFrame("Server startup progress log");
         this.logFrame = logFrame;
 
         logFrame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
@@ -64,9 +75,16 @@ public final class StartupProgress implements ActionListener
         autoCloseCheckBox.setSelected(true);
         pane.add(autoCloseCheckBox, BorderLayout.NORTH);
 
-        //Display the window.
-        logFrame.pack();
-        logFrame.setVisible(true);
+        //Display the window with delay -- if the game starts quickly we don't want to see it
+        showUpTimer = new Timer(SHOWUP_DELAY, new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                logFrame.pack();
+                logFrame.setVisible(true);
+            }
+        });
+        showUpTimer.start();
     }
 
     public void append(String s)
@@ -76,6 +94,11 @@ public final class StartupProgress implements ActionListener
 
     public void setCompleted()
     {
+        if (showUpTimer.isRunning())
+        {
+            // don't show anymore if not necessarily
+            showUpTimer.stop();
+        }
         if (this.autoCloseCheckBox.isSelected())
         {
             this.dispose();
@@ -98,6 +121,11 @@ public final class StartupProgress implements ActionListener
 
     public void dispose()
     {
+        if (showUpTimer.isRunning())
+        {
+            // don't try to show anymore
+            showUpTimer.stop();
+        }
         if (this.logFrame != null)
         {
             this.logFrame.dispose();
