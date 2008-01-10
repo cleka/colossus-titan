@@ -5392,8 +5392,16 @@ public final class Client implements IClient, IOracle, IOptions
         {
             ClassLoader cl = Client.class.getClassLoader();
             InputStream is = cl.getResourceAsStream("version");
-            is.read(bytes);
-            version = new String(bytes, 0, bytes.length);
+            if (is != null)
+            {
+                is.read(bytes);
+                version = new String(bytes, 0, bytes.length);
+            }
+            else
+            {
+                LOGGER.log(Level.WARNING, "Version file not found");
+                version = "UNKNOWN";
+            }
         }
         catch (Exception ex)
         {
