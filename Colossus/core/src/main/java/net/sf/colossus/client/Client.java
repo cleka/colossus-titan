@@ -4693,7 +4693,7 @@ public final class Client implements IClient, IOracle, IOptions
         while (it.hasNext())
         {
             String markerId = it.next();
-            if (!player.equals(getPlayerByMarkerId(markerId)))
+            if (!player.equals(getPlayerStateByMarkerId(markerId)))
             {
                 markerIds.add(markerId);
             }

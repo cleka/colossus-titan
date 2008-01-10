@@ -48,7 +48,7 @@ public final class LegionInfo extends Legion
         this.markerId = markerId;
         this.client = client;
         myNode = null;
-        isMyLegion = getPlayer().equals(client.getPlayer());
+        isMyLegion = getPlayer().getPlayer().equals(client.getPlayer());
     }
 
     private PredictSplitNode getNode(String markerId)

@@ -58,4 +58,13 @@ public class PlayerState
     {
         return Collections.unmodifiableList(this.legions);
     }
+
+    @Override
+    public boolean equals(Object obj)
+    {
+        // TODO only temporary to make sure we don't compare apples and eggs
+        assert obj.getClass() == this.getClass() : getClass().getName()
+            + " compared with something else";
+        return super.equals(obj);
+    }
 }
