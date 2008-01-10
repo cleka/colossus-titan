@@ -159,4 +159,80 @@ public class HazardTerrain
 
     public static final HazardTerrain STONE = new HazardTerrain("Stone",
         false, false, true, false, false, false, true);
+
+    public static void main(String[] args)
+    {
+        for (HazardTerrain terrain : getAllHazardTerrains())
+        {
+            StringBuilder builder = new StringBuilder();
+            builder.append(terrain.getName());
+            builder.append(":\n");
+            builder.append("+++++++++++++++++++++++++++\n");
+            builder.append("blocks flying creatures");
+            if (terrain.blocksFlying())
+            {
+                builder.append(": yes\n");
+            }
+            else
+            {
+                builder.append(": no\n");
+            }
+            builder.append("blocks non-flyers");
+            if (terrain.isFlyersOnly())
+            {
+                builder.append(": yes\n");
+            }
+            else
+            {
+                builder.append(": no\n");
+            }
+            builder.append("gives bonus to natives");
+            if (terrain.isNativeBonusTerrain())
+            {
+                builder.append(": yes\n");
+            }
+            else
+            {
+                builder.append(": no\n");
+            }
+            builder.append("is native flyers only");
+            if (terrain.isNativeFlyersOnly())
+            {
+                builder.append(": yes\n");
+            }
+            else
+            {
+                builder.append(": no\n");
+            }
+            builder.append("is natives only");
+            if (terrain.isNativeOnly())
+            {
+                builder.append(": yes\n");
+            }
+            else
+            {
+                builder.append(": no\n");
+            }
+            builder.append("gives penalty to non-natives");
+            if (terrain.isNonNativePenaltyTerrain())
+            {
+                builder.append(": yes\n");
+            }
+            else
+            {
+                builder.append(": no\n");
+            }
+            builder.append("slows non-natives");
+            if (terrain.slowsNonNative())
+            {
+                builder.append(": yes\n");
+            }
+            else
+            {
+                builder.append(": no\n");
+            }
+            System.out.print(builder.toString());
+            System.out.println("+++++++++++++++++++++++++++");
+        }
+    }
 }
