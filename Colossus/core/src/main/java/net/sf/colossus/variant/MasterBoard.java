@@ -164,60 +164,33 @@ public class MasterBoard
     private void setupOneExit(MasterHex[][] h, int i, int j, int k)
     {
         MasterHex dh = hexByLabel(h, h[i][j].getBaseExitLabel(k));
-        if (dh == null)
-        {
-            LOGGER.log(Level.SEVERE, "null pointer ; i=" + i + ", j=" + j
-                + ", k=" + k);
-            System.exit(1);
-        }
-        // Static analysis of Eclipse doesn't grok System.exit()
-        assert dh != null;
+        assert dh != null : "null pointer ; i=" + i + ", j=" + j + ", k=" + k;
         if (dh.getXCoord() == i)
         {
             if (dh.getYCoord() == (j - 1))
             {
                 h[i][j].setExitType(0, h[i][j].getBaseExitType(k));
             }
-            else if (dh.getYCoord() == (j + 1))
-            {
-                h[i][j].setExitType(3, h[i][j].getBaseExitType(k));
-            }
             else
             {
-                LOGGER.log(Level.WARNING, "bad exit ; i=" + i + ", j=" + j
-                    + ", k=" + k);
+                assert dh.getYCoord() == (j + 1) : "bad exit ; i=" + i
+                    + ", j=" + j + ", k=" + k;
+                h[i][j].setExitType(3, h[i][j].getBaseExitType(k));
             }
         }
         else if (dh.getXCoord() == (i + 1))
         {
-            if (dh.getYCoord() == j)
-            {
-                h[i][j].setExitType(2 - ((i + j + boardParity) & 1), h[i][j]
-                    .getBaseExitType(k));
-            }
-            else
-            {
-                LOGGER.log(Level.WARNING, "bad exit ; i=" + i + ", j=" + j
-                    + ", k=" + k);
-            }
-        }
-        else if (dh.getXCoord() == (i - 1))
-        {
-            if (dh.getYCoord() == j)
-            {
-                h[i][j].setExitType(4 + ((i + j + boardParity) & 1), h[i][j]
-                    .getBaseExitType(k));
-            }
-            else
-            {
-                LOGGER.log(Level.WARNING, "bad exit ; i=" + i + ", j=" + j
-                    + ", k=" + k);
-            }
+            assert dh.getYCoord() == j : "bad exit ; i=" + i + ", j=" + j
+                + ", k=" + k;
+            h[i][j].setExitType(2 - ((i + j + boardParity) & 1), h[i][j]
+                .getBaseExitType(k));
         }
         else
         {
-            LOGGER.log(Level.WARNING, "bad exit ; i=" + i + ", j=" + j
-                + ", k=" + k);
+            assert dh.getXCoord() == (i - 1) && dh.getYCoord() == j : "bad exit ; i="
+                + i + ", j=" + j + ", k=" + k;
+            h[i][j].setExitType(4 + ((i + j + boardParity) & 1), h[i][j]
+                .getBaseExitType(k));
         }
     }
 
@@ -441,7 +414,7 @@ public class MasterBoard
      *   converted to int. this must be the case anyway since the
      *   param 'label' is an int here.
      */
-    MasterHex hexByLabel(MasterHex[][] h, int label)
+    private MasterHex hexByLabel(MasterHex[][] h, int label)
     {
         // if the 'h' was the same last time we can use the cache
         if (_hexByLabel_last_h != h)

@@ -2075,12 +2075,8 @@ public final class Server implements IServer
     public void assignFirstMarker(String markerId)
     {
         Player player = game.getPlayer(getPlayerName());
-        if (!player.getMarkersAvailable().contains(markerId))
-        {
-            LOGGER.log(Level.SEVERE, getPlayerName()
-                + " illegally called assignFirstMarker()");
-            return;
-        }
+        assert player.getMarkersAvailable().contains(markerId) : getPlayerName()
+            + " illegally called assignFirstMarker()";
         player.setFirstMarker(markerId);
         game.nextPickColor();
     }
