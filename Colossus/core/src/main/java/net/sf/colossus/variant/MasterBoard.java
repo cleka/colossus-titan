@@ -22,6 +22,8 @@ import net.sf.colossus.xmlparser.StrategicMapLoader;
 
 /**
  * The master board as part of a variant.
+ * 
+ * Instances of this class are immutable.
  */
 public class MasterBoard
 {
@@ -62,13 +64,12 @@ public class MasterBoard
      */
     private final Set<String> towerSet;
 
-    /** Reference to the 'h' the cache was built for.
-     *  We have to rebuild the cache for a new 'h'
+    /** 
+     * The cache used inside 'hexByLabel'.
+     * 
+     * TODO do we really need this? It doesn't seem to be used much.
      */
-    private MasterHex[][] _hexByLabel_last_h;
-
-    /** the cache used inside 'hexByLabel'. */
-    private Vector<MasterHex> _hexByLabel_cache = new Vector<MasterHex>();
+    private final Vector<MasterHex> hexByLabelCache = new Vector<MasterHex>();
 
     /**
      * TODO move loading code out of here, make constructor taking all the values and put
@@ -163,7 +164,7 @@ public class MasterBoard
 
     private void setupOneExit(MasterHex[][] h, int i, int j, int k)
     {
-        MasterHex dh = hexByLabel(h, h[i][j].getBaseExitLabel(k));
+        MasterHex dh = hexByLabel(h[i][j].getBaseExitLabel(k));
         assert dh != null : "null pointer ; i=" + i + ", j=" + j + ", k=" + k;
         if (dh.getXCoord() == i)
         {
@@ -410,52 +411,46 @@ public class MasterBoard
     /**
      * towi changes: here is now a cache implemented so that the nested
      *   loop is not executed at every call. the cache is implemented with
-     *   an array. it will work as long as the hex-labels-strings can be
+     *   a vector. it will work as long as the hex-labels-strings can be
      *   converted to int. this must be the case anyway since the
      *   param 'label' is an int here.
      */
-    private MasterHex hexByLabel(MasterHex[][] h, int label)
+    private MasterHex hexByLabel(int label)
     {
-        // if the 'h' was the same last time we can use the cache
-        if (_hexByLabel_last_h != h)
+        if (hexByLabelCache.isEmpty())
         {
-            // alas, we have to rebuild the cache
-            LOGGER.log(Level.FINEST,
-                "new 'MasterHex[][] h' in MasterBoard.hexByLabel()");
-            _hexByLabel_last_h = h;
-            // write all 'h' elements by their int-value into an Array.
-            // we can do that here, because the 'label' arg is an int. if it
-            // were a string we could not rely on that all h-entries are ints.
-            // (Vector: lots of unused space, i am afraid. about 80kB...)
-            // TODO replace with ArrayList
-            _hexByLabel_cache = new Vector<MasterHex>(1000);
-            for (int i = 0; i < h.length; i++)
-            {
-                for (int j = 0; j < h[i].length; j++)
-                {
-                    if (show[i][j])
-                    {
-                        final int iLabel = Integer
-                            .parseInt(h[i][j].getLabel());
-                        if (_hexByLabel_cache.size() <= iLabel)
-                        {
-                            _hexByLabel_cache.setSize(iLabel + 1);
-                        }
-                        _hexByLabel_cache.set(iLabel, h[i][j]);
-                    }
-                }
-            }
+            initHexByLabelCache();
         }
         // the cache is built and looks like this:
         //   _hexByLabel_cache[0...] =
         //      [ h00,h01,h02, ..., null, null, ..., h30,h31,... ]
-        final MasterHex found = _hexByLabel_cache.get(label);
+        final MasterHex found = hexByLabelCache.get(label);
         if (found == null)
         {
             LOGGER.log(Level.WARNING, "Couldn't find Masterhex labeled "
                 + label);
         }
         return found;
+    }
+
+    private void initHexByLabelCache()
+    {
+        for (int i = 0; i < plainHexArray.length; i++)
+        {
+            for (int j = 0; j < plainHexArray[i].length; j++)
+            {
+                if (show[i][j])
+                {
+                    final int iLabel = Integer.parseInt(plainHexArray[i][j]
+                        .getLabel());
+                    if (hexByLabelCache.size() <= iLabel)
+                    {
+                        hexByLabelCache.setSize(iLabel + 1);
+                    }
+                    hexByLabelCache.set(iLabel, plainHexArray[i][j]);
+                }
+            }
+        }
     }
 
     /** Do a brute-force search through the hex array, looking for
