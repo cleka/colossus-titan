@@ -21,21 +21,20 @@ public class MasterHex extends Hex
 {
     private final MasterHex[] neighbors = new MasterHex[6];
 
-    /** Terrain types are:
-     *  Brush, Desert, Hills, Jungle, mountains, Marsh, Plains,
-     *  Swamp, Tower, tundra, Woods */
-
-    // Hex labels are:
-    // Middle ring: 1-42
-    // Outer ring: 101-142
-    // Towers: 100, 200, 300, 400, 500, 600
-    // Inner ring: 1000, 2000, 3000, 4000, 5000, 6000
-    // n, ne, se, s, sw, nw
     private int labelSide;
     private final int[] exitType = new int[6];
-    private final int[] baseExitType = new int[3];
-    private final int[] baseExitLabel = new int[3];
     private final int[] entranceType = new int[6];
+
+    /**
+     * TODO these base exit types and labels are somehow used only during setup of the MasterBoard,
+     * no real need to keep them around.
+     * 
+     * It seems to be related to the fact that the master board hexes are really triangles and
+     * stored as such in the XML files. Maybe they should not be hexes in the code either.
+     */
+    private final int[] baseExitType = new int[3];
+    private final String[] baseExitLabel = new String[3];
+
     private String terrain; // TODO should be typesafe enum
 
     // The hex vertexes are numbered like this:
@@ -91,8 +90,7 @@ public class MasterHex extends Hex
         int bonusHazardCount = 0;
         int bonusHazardSideCount = 0;
 
-        for (HazardTerrain hTerrain : HazardTerrain
-            .getAllHazardTerrains())
+        for (HazardTerrain hTerrain : HazardTerrain.getAllHazardTerrains())
         {
             int count = HexMap.getHazardCountInTerrain(hTerrain, terrain);
             if (hTerrain.isNativeBonusTerrain()
@@ -184,12 +182,12 @@ public class MasterHex extends Hex
         this.baseExitType[i] = exitType;
     }
 
-    public int getBaseExitLabel(int i)
+    public String getBaseExitLabel(int i)
     {
         return baseExitLabel[i];
     }
 
-    public void setBaseExitLabel(int i, int label)
+    public void setBaseExitLabel(int i, String label)
     {
         this.baseExitLabel[i] = label;
     }

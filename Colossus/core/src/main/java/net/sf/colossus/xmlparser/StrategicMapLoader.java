@@ -85,7 +85,7 @@ public class StrategicMapLoader
             String sExitType = exit.getAttributeValue("type");
             int iExitType = Constants.hexsideMap.get(sExitType).intValue();
             hex.setBaseExitType(i, iExitType);
-            int exitLabel = exit.getAttribute("label").getIntValue();
+            String exitLabel = exit.getAttributeValue("label");
             hex.setBaseExitLabel(i, exitLabel);
             i++;
         }

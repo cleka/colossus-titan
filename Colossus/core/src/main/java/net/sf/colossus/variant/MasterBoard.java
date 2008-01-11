@@ -4,10 +4,11 @@ package net.sf.colossus.variant;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
-import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -65,11 +66,9 @@ public class MasterBoard
     private final Set<String> towerSet;
 
     /** 
-     * The cache used inside 'hexByLabel'.
-     * 
-     * TODO do we really need this? It doesn't seem to be used much.
+     * A cache for faster lookup of hexes using their labels.
      */
-    private final Vector<MasterHex> hexByLabelCache = new Vector<MasterHex>();
+    private final Map<String, MasterHex> hexByLabelCache = new HashMap<String, MasterHex>();
 
     /**
      * TODO move loading code out of here, make constructor taking all the values and put
@@ -89,15 +88,16 @@ public class MasterBoard
         this.vertSize = sml.getVertSize();
         this.show = sml.getShow();
         this.plainHexArray = sml.getHexes();
+
+        initHexByLabelCache();
         this.boardParity = computeBoardParity();
         this.towerSet = new HashSet<String>();
+        setupTowerSet();
 
         setupExits(plainHexArray);
         setupEntrances(plainHexArray);
         setupHexLabelSides(plainHexArray);
         setupNeighbors(plainHexArray);
-
-        setupTowerSet();
     }
 
     public int getBoardParity()
@@ -164,7 +164,7 @@ public class MasterBoard
 
     private void setupOneExit(MasterHex[][] h, int i, int j, int k)
     {
-        MasterHex dh = hexByLabel(h[i][j].getBaseExitLabel(k));
+        MasterHex dh = getHexByLabel(h[i][j].getBaseExitLabel(k));
         assert dh != null : "null pointer ; i=" + i + ", j=" + j + ", k=" + k;
         if (dh.getXCoord() == i)
         {
@@ -408,68 +408,31 @@ public class MasterBoard
         }
     }
 
-    /**
-     * towi changes: here is now a cache implemented so that the nested
-     *   loop is not executed at every call. the cache is implemented with
-     *   a vector. it will work as long as the hex-labels-strings can be
-     *   converted to int. this must be the case anyway since the
-     *   param 'label' is an int here.
-     */
-    private MasterHex hexByLabel(int label)
-    {
-        if (hexByLabelCache.isEmpty())
-        {
-            initHexByLabelCache();
-        }
-        // the cache is built and looks like this:
-        //   _hexByLabel_cache[0...] =
-        //      [ h00,h01,h02, ..., null, null, ..., h30,h31,... ]
-        final MasterHex found = hexByLabelCache.get(label);
-        if (found == null)
-        {
-            LOGGER.log(Level.WARNING, "Couldn't find Masterhex labeled "
-                + label);
-        }
-        return found;
-    }
-
     private void initHexByLabelCache()
     {
-        for (int i = 0; i < plainHexArray.length; i++)
+        for (MasterHex[] row : plainHexArray)
         {
-            for (int j = 0; j < plainHexArray[i].length; j++)
+            for (MasterHex masterHex : row)
             {
-                if (show[i][j])
+                if (masterHex != null)
                 {
-                    final int iLabel = Integer.parseInt(plainHexArray[i][j]
-                        .getLabel());
-                    if (hexByLabelCache.size() <= iLabel)
-                    {
-                        hexByLabelCache.setSize(iLabel + 1);
-                    }
-                    hexByLabelCache.set(iLabel, plainHexArray[i][j]);
+                    hexByLabelCache.put(masterHex.getLabel(), masterHex);
                 }
             }
         }
     }
 
-    /** Do a brute-force search through the hex array, looking for
-     *  a match.  Return the hex, or null if none is found. */
+    /**
+     * Retrieve a hex by its label.
+     * 
+     * @param label The label to find the hex for. Valid label, not null.
+     * @return The label found.
+     */
     public MasterHex getHexByLabel(final String label)
     {
-        return ArrayHelper.findFirstMatch(this.plainHexArray,
-            new NullCheckPredicate<MasterHex>(false)
-            {
-                @Override
-                public boolean matchesNonNullValue(MasterHex hex)
-                {
-                    if (hex.getLabel().equals(label))
-                    {
-                        return true;
-                    }
-                    return false;
-                }
-            });
+        MasterHex hex = hexByLabelCache.get(label);
+        assert hex != null : "No hex with label '" + label + "'";
+        return hex;
     }
 
     public Set<String> getTowerSet()
@@ -494,21 +457,11 @@ public class MasterBoard
             });
     }
 
-    /** Return a set of all hex labels. */
+    /** 
+     * Return a set of all hex labels.
+     */
     public Set<String> getAllHexLabels()
     {
-        final Set<String> set = new HashSet<String>();
-        ArrayHelper.findFirstMatch(this.plainHexArray,
-            new NullCheckPredicate<MasterHex>(false)
-            {
-                @Override
-                public boolean matchesNonNullValue(MasterHex hex)
-                {
-                    set.add(hex.getLabel());
-                    return false;
-                }
-            });
-        return set;
+        return hexByLabelCache.keySet();
     }
-
 }
