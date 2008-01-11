@@ -221,6 +221,8 @@ public final class VariantSupport
         }
         catch (Exception e)
         {
+            // TODO this seems like a classic case of fail-slow, rethrowing the exception
+            // might be better
             LOGGER.log(Level.SEVERE, "Variant loading failed : " + e, e);
             varDirectory = Constants.defaultDirName;
             variantName = Constants.defaultVARFile;
