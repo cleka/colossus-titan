@@ -14,6 +14,7 @@ import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.Creature;
 import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.variant.CreatureType;
+import net.sf.colossus.variant.MasterHex;
 
 
 /**
@@ -104,7 +105,8 @@ public final class LegionInfo extends Legion
 
     public MasterHex getCurrentHex()
     {
-        return MasterBoard.getHexByLabel(getHexLabel());
+        return client.getGame().getVariant().getMasterBoard().getHexByLabel(
+            getHexLabel());
     }
 
     public String getPlayerName()

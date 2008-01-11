@@ -210,6 +210,14 @@ public final class VariantSupport
             directories.add(tempVarDirectory);
             varREADME = ResourceLoader.getDocument("README", directories);
 
+            loadTerrainsAndRecruits(serverSide);
+            // TODO add things as the variant package gets fleshed out
+            List<CreatureType> creatureTypes = loadCreatures();
+            List<BattleLand> battleLands = new ArrayList<BattleLand>();
+            MasterBoard masterBoard = new MasterBoard();
+            CURRENT_VARIANT = new Variant(creatureTypes, battleLands,
+                masterBoard);
+
             // varREADME seems to be used as flag for a successfully loaded
             // variant, but breaking the whole variant loading just because
             // there is no readme file seems a bit overkill, thus we set
@@ -237,16 +245,8 @@ public final class VariantSupport
         if (varREADME != null)
         {
             loadedVariant = true;
-            loadTerrainsAndRecruits(serverSide);
             loadHints();
             markerNames = loadMarkerNamesProperties();
-
-            // TODO add things as the variant package gets fleshed out
-            List<CreatureType> creatureTypes = loadCreatures();
-            List<BattleLand> battleLands = new ArrayList<BattleLand>();
-            MasterBoard masterBoard = null;
-            CURRENT_VARIANT = new Variant(creatureTypes, battleLands,
-                masterBoard);
         }
         else
         {
@@ -407,11 +407,11 @@ public final class VariantSupport
         }
         catch (Exception e)
         {
+            // TODO another exception anti-pattern: calling System.exit which means
+            // noone can escape the disappearing VM, even if they would know how
             LOGGER.log(Level.SEVERE, "Recruit-per-terrain loading failed.", e);
             System.exit(1);
         }
-        // initialize the static bits of the MasterBoard
-        net.sf.colossus.client.MasterBoard.staticMasterboardInit();
     }
 
     private static Properties loadMarkerNamesProperties()

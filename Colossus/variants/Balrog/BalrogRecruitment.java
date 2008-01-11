@@ -100,8 +100,8 @@ public class BalrogRecruitment extends CustomRecruitBase
     @Override
     protected void changeOfTurn(int newActivePlayer)
     {
-        Set<String> towerSet = net.sf.colossus.client.MasterBoard
-            .getTowerSet();
+        Set<String> towerSet = VariantSupport.getCurrentVariant()
+            .getMasterBoard().getTowerSet();
 
         // update all Balrogs, as a lost fight may have given points
         // to a different Player

@@ -7,8 +7,8 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.sf.colossus.client.MasterHex;
 import net.sf.colossus.server.Constants;
+import net.sf.colossus.variant.MasterHex;
 
 import org.jdom.Document;
 import org.jdom.Element;

@@ -24,6 +24,7 @@ import javax.swing.JPanel;
 import javax.swing.WindowConstants;
 
 import net.sf.colossus.server.Constants;
+import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.util.KDialog;
 import net.sf.colossus.util.Options;
 
@@ -479,9 +480,15 @@ final class EngagementResults extends KDialog
 
         public String getSummary()
         {
-            return "On turn " + this.gameTurn + ", " + this.attackerId
-                + " attacked " + this.defenderId + " in "
-                + MasterBoard.getHexByLabel(this.hexLabel).getDescription();
+            return "On turn "
+                + this.gameTurn
+                + ", "
+                + this.attackerId
+                + " attacked "
+                + this.defenderId
+                + " in "
+                + VariantSupport.getCurrentVariant().getMasterBoard()
+                    .getHexByLabel(this.hexLabel).getDescription();
         }
 
         private void setWinnerAndLoserId()

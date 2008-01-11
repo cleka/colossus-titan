@@ -24,14 +24,13 @@ import javax.swing.JOptionPane;
 
 import net.sf.colossus.client.BattleMap;
 import net.sf.colossus.client.HexMap;
-import net.sf.colossus.client.MasterBoard;
-import net.sf.colossus.client.MasterHex;
 import net.sf.colossus.client.Proposal;
 import net.sf.colossus.util.Options;
 import net.sf.colossus.util.ResourceLoader;
 import net.sf.colossus.util.Split;
 import net.sf.colossus.util.ViableEntityManager;
 import net.sf.colossus.variant.CreatureType;
+import net.sf.colossus.variant.MasterHex;
 import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
 import org.jdom.Attribute;
@@ -541,7 +540,7 @@ public final class Game extends net.sf.colossus.game.Game
     {
         int numPlayers = getNumPlayers();
         String[] playerTower = new String[numPlayers];
-        Set<String> towerSet = MasterBoard.getTowerSet();
+        Set<String> towerSet = getVariant().getMasterBoard().getTowerSet();
         List<String> towerList = new ArrayList<String>();
 
         Iterator<String> it = towerSet.iterator();
@@ -1789,7 +1788,7 @@ public final class Game extends net.sf.colossus.game.Game
         Legion legion = getLegionByMarkerId(markerId);
         List<Creature> recruits;
 
-        MasterHex hex = MasterBoard.getHexByLabel(hexLabel);
+        MasterHex hex = getVariant().getMasterBoard().getHexByLabel(hexLabel);
         String terrain = hex.getTerrain();
 
         recruits = new ArrayList<Creature>();
@@ -1845,7 +1844,7 @@ public final class Game extends net.sf.colossus.game.Game
 
         Legion legion = getLegionByMarkerId(markerId);
         String hexLabel = legion.getCurrentHexLabel();
-        MasterHex hex = MasterBoard.getHexByLabel(hexLabel);
+        MasterHex hex = getVariant().getMasterBoard().getHexByLabel(hexLabel);
         String terrain = hex.getTerrain();
         recruiters = TerrainRecruitLoader.getPossibleRecruiters(terrain,
             hexLabel);
@@ -2258,13 +2257,14 @@ public final class Game extends net.sf.colossus.game.Game
             if (towerToTowerTeleportAllowed())
             {
                 // Mark every unoccupied tower.
-                Set<String> towerSet = MasterBoard.getTowerSet();
+                Set<String> towerSet = getVariant().getMasterBoard()
+                    .getTowerSet();
                 Iterator<String> it = towerSet.iterator();
                 while (it.hasNext())
                 {
                     String hexLabel = it.next();
 
-                    if (MasterBoard.getHexByLabel(hexLabel) != null)
+                    if (getVariant().getMasterBoard().getHexByLabel(hexLabel) != null)
                     {
                         if ((!isOccupied(hexLabel) || (ignoreFriends && getNumEnemyLegions(
                             hexLabel, player) == 0))
@@ -2278,7 +2278,8 @@ public final class Game extends net.sf.colossus.game.Game
             else
             {
                 // Remove nearby towers from set.
-                Set<String> towerSet = MasterBoard.getTowerSet();
+                Set<String> towerSet = getVariant().getMasterBoard()
+                    .getTowerSet();
                 Iterator<String> it = towerSet.iterator();
                 while (it.hasNext())
                 {
@@ -2324,7 +2325,8 @@ public final class Game extends net.sf.colossus.game.Game
         Player player = legion.getPlayerState();
         int movementRoll = player.getMovementRoll();
         MasterHex currentHex = legion.getCurrentHex();
-        MasterHex targetHex = MasterBoard.getHexByLabel(targetHexLabel);
+        MasterHex targetHex = getVariant().getMasterBoard().getHexByLabel(
+            targetHexLabel);
 
         if (teleport)
         {
@@ -2763,7 +2765,7 @@ public final class Game extends net.sf.colossus.game.Game
                 + legalSides.toString();
         }
 
-        MasterHex hex = MasterBoard.getHexByLabel(hexLabel);
+        MasterHex hex = getVariant().getMasterBoard().getHexByLabel(hexLabel);
         // If this is a tower hex, the only entry side is the bottom.
         if (HexMap.terrainHasStartlist(hex.getTerrain())
             && !entrySide.equals(Constants.bottom))

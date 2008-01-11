@@ -25,8 +25,6 @@ import net.sf.colossus.client.Client;
 import net.sf.colossus.client.CritterMove;
 import net.sf.colossus.client.HexMap;
 import net.sf.colossus.client.LegionInfo;
-import net.sf.colossus.client.MasterBoard;
-import net.sf.colossus.client.MasterHex;
 import net.sf.colossus.client.PlayerInfo;
 import net.sf.colossus.client.Strike;
 import net.sf.colossus.game.PlayerState;
@@ -41,6 +39,8 @@ import net.sf.colossus.util.PermutationIterator;
 import net.sf.colossus.util.Probs;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.HazardTerrain;
+import net.sf.colossus.variant.MasterHex;
+import net.sf.colossus.variant.Variant;
 import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
 
@@ -135,7 +135,7 @@ public class SimpleAI implements AI
 
     public String pickColor(List<String> colors, List<String> favoriteColors)
     {
-        for (String preferredColor: favoriteColors)
+        for (String preferredColor : favoriteColors)
         {
             if (colors.contains(preferredColor))
             {
@@ -143,7 +143,7 @@ public class SimpleAI implements AI
             }
         }
         // Can't have one of our favorites, so take what's there.
-        for (String color: colors)
+        for (String color : colors)
         {
             return color;
         }
@@ -165,7 +165,7 @@ public class SimpleAI implements AI
         ArrayList<String> allMarkerIds = new ArrayList<String>();
 
         // split between own / other
-        for (String markerId: markerIds)
+        for (String markerId : markerIds)
         {
             if (preferredShortColor != null
                 && markerId.startsWith(preferredShortColor))
@@ -197,7 +197,7 @@ public class SimpleAI implements AI
         List<String> myMarkerIds = new ArrayList<String>();
         List<String> otherMarkerIds = new ArrayList<String>();
         // split between own / other
-        for (String markerId: markerIds)
+        for (String markerId : markerIds)
         {
             if (preferredShortColor != null
                 && markerId.startsWith(preferredShortColor))
@@ -233,7 +233,7 @@ public class SimpleAI implements AI
         int minimumSizeToRecruit = (int)(scoobySnackFactor * client
             .getAverageLegionPointValue());
         List<String> markerIds = client.getLegionsByPlayer(client.getPlayer());
-        for (String markerId: markerIds)
+        for (String markerId : markerIds)
         {
             LegionInfo legion = client.getLegionInfo(markerId);
 
@@ -291,7 +291,8 @@ public class SimpleAI implements AI
     Creature chooseRecruit(LegionInfo legion, String hexLabel,
         boolean considerReservations)
     {
-        MasterHex hex = MasterBoard.getHexByLabel(hexLabel);
+        MasterHex hex = getVariantPlayed().getMasterBoard().getHexByLabel(
+            hexLabel);
         List<CreatureType> recruits = client.findEligibleRecruits(legion
             .getMarkerId(), hexLabel, considerReservations);
         if (recruits.size() == 0)
@@ -314,7 +315,7 @@ public class SimpleAI implements AI
 
         splitsDone = 0;
         splitsAcked = 0;
-        for (String markerId: playerInfo.getLegionIds())
+        for (String markerId : playerInfo.getLegionIds())
         {
             if (remainingMarkers.isEmpty())
             {
@@ -366,9 +367,10 @@ public class SimpleAI implements AI
                 Set<String> moves = client.getMovement().listAllMoves(legion,
                     legion.getCurrentHex(), roll);
                 int safeMoves = 0;
-                for (String hexLabel: moves)
+                for (String hexLabel : moves)
                 {
-                    MasterHex hex = MasterBoard.getHexByLabel(hexLabel);
+                    MasterHex hex = getVariantPlayed().getMasterBoard()
+                        .getHexByLabel(hexLabel);
                     if (client.getNumEnemyLegions(hexLabel, player) == 0)
                     {
                         safeMoves++;
@@ -450,7 +452,7 @@ public class SimpleAI implements AI
 
         StringBuilder results = new StringBuilder();
         List<Creature> creatures = chooseCreaturesToSplitOut(legion);
-        for (Creature creature: creatures)
+        for (Creature creature : creatures)
         {
             results.append(creature.getName());
             results.append(",");
@@ -507,7 +509,7 @@ public class SimpleAI implements AI
             {
                 List<String> ral = TerrainRecruitLoader
                     .getRecruitableAcquirableList(terrain, nextScore);
-                for (String creatureName: ral)
+                for (String creatureName : ral)
                 {
                     Creature tempRecruit = (Creature)client.getGame()
                         .getVariant().getCreatureByName(creatureName);
@@ -562,7 +564,7 @@ public class SimpleAI implements AI
         Creature weakest1 = null;
         Creature weakest2 = null;
 
-        for (String name: legion.getContents())
+        for (String name : legion.getContents())
         {
             Creature critter = (Creature)client.getGame().getVariant()
                 .getCreatureByName(name);
@@ -645,8 +647,8 @@ public class SimpleAI implements AI
         }
 
         Creature[] startCre = TerrainRecruitLoader
-            .getStartingCreatures(MasterBoard.getHexByLabel(label)
-                .getTerrain());
+            .getStartingCreatures(getVariantPlayed().getMasterBoard()
+                .getHexByLabel(label).getTerrain());
         // in CMU style splitting, we split centaurs in even towers,
         // ogres in odd towers.
         final boolean oddTower = "100".equals(label) || "300".equals(label)
@@ -691,8 +693,8 @@ public class SimpleAI implements AI
         Creature nonsplitCreature, String label)
     {
         Creature[] startCre = TerrainRecruitLoader
-            .getStartingCreatures(MasterBoard.getHexByLabel(label)
-                .getTerrain());
+            .getStartingCreatures(getVariantPlayed().getMasterBoard()
+                .getHexByLabel(label).getTerrain());
         List<Creature> splitoffs = new LinkedList<Creature>();
 
         if (favorTitan)
@@ -751,8 +753,8 @@ public class SimpleAI implements AI
         Creature nonsplitCreature, String label)
     {
         Creature[] startCre = TerrainRecruitLoader
-            .getStartingCreatures(MasterBoard.getHexByLabel(label)
-                .getTerrain());
+            .getStartingCreatures(getVariantPlayed().getMasterBoard()
+                .getHexByLabel(label).getTerrain());
         List<Creature> splitoffs = new LinkedList<Creature>();
 
         if (favorTitan)
@@ -818,7 +820,7 @@ public class SimpleAI implements AI
 
         List<Creature> byCreature = new ArrayList<Creature>();
 
-        for (String name: byName)
+        for (String name : byName)
         {
             Creature cre = (Creature)client.getGame().getVariant()
                 .getCreatureByName(name);
@@ -940,7 +942,7 @@ public class SimpleAI implements AI
             }
         });
 
-        for (String markerId: markerIds)
+        for (String markerId : markerIds)
         {
             LegionInfo legion = client.getLegionInfo(markerId);
 
@@ -963,7 +965,7 @@ public class SimpleAI implements AI
             Set<String> set = client.getMovement().listAllMoves(legion,
                 legion.getCurrentHex(), client.getMovementRoll());
 
-            for (String hexLabel: set)
+            for (String hexLabel : set)
             {
                 // XXX
                 // Do not consider moves onto hexes where we already have a 
@@ -973,7 +975,8 @@ public class SimpleAI implements AI
                 {
                     continue;
                 }
-                final MasterHex hex = MasterBoard.getHexByLabel(hexLabel);
+                final MasterHex hex = getVariantPlayed().getMasterBoard()
+                    .getHexByLabel(hexLabel);
                 final int value = evaluateMove(legion, hex, true,
                     enemyAttackMap);
 
@@ -1005,7 +1008,7 @@ public class SimpleAI implements AI
         Map<LegionInfo, List<MoveInfo>> moveMap)
     {
         List<String> markerIds = ((PlayerInfo)player).getLegionIds();
-        for (String markerId: markerIds)
+        for (String markerId : markerIds)
         {
             LegionInfo legion = client.getLegionInfo(markerId);
             String hexLabel = legion.getHexLabel();
@@ -1027,7 +1030,7 @@ public class SimpleAI implements AI
                 // difference from sitting still multiplied by
                 // the value of the legion.
                 List<MoveInfo> allmoves = new ArrayList<MoveInfo>();
-                for (String friendId: friendlyLegions)
+                for (String friendId : friendlyLegions)
                 {
                     LegionInfo friendlyLegion = client.getLegionInfo(friendId);
                     List<MoveInfo> moves = moveMap.get(friendlyLegion);
@@ -1048,7 +1051,7 @@ public class SimpleAI implements AI
 
                 // now, one at a time, try applying moves until we
                 // have handled our split problem.
-                for (MoveInfo move: allmoves)
+                for (MoveInfo move : allmoves)
                 {
                     if (move.hex == null)
                     {
@@ -1085,7 +1088,7 @@ public class SimpleAI implements AI
 
         List<MoveInfo> allmoves = new ArrayList<MoveInfo>();
         List<String> markerIds = player.getLegionIds();
-        for (String friendlyMarkerId: markerIds)
+        for (String friendlyMarkerId : markerIds)
         {
             LegionInfo friendlyLegion = client.getLegionInfo(friendlyMarkerId);
             List<MoveInfo> moves = moveMap.get(friendlyLegion);
@@ -1105,10 +1108,10 @@ public class SimpleAI implements AI
         });
 
         // now, one at a time, try applying moves until we have moved a legion
-        for (MoveInfo move: allmoves)
+        for (MoveInfo move : allmoves)
         {
-            if (player.numLegionsMoved() != 0 || 
-                player.numMobileLegions() == 0)
+            if (player.numLegionsMoved() != 0
+                || player.numMobileLegions() == 0)
             {
                 break;
             }
@@ -1160,7 +1163,7 @@ public class SimpleAI implements AI
         }
 
         // for each enemy player
-        for (String enemyPlayerName: client.getPlayerNames())
+        for (String enemyPlayerName : client.getPlayerNames())
         {
             PlayerInfo enemyPlayer = client.getPlayerInfo(enemyPlayerName);
             if (enemyPlayer == player)
@@ -1169,8 +1172,8 @@ public class SimpleAI implements AI
             }
 
             // for each legion that player controls
-            for (String markerId:  client.getLegionsByPlayer(
-                Player.getPlayerByName(enemyPlayerName)))
+            for (String markerId : client.getLegionsByPlayer(Player
+                .getPlayerByName(enemyPlayerName)))
             {
                 LegionInfo legion = client.getLegionInfo(markerId);
 
@@ -1195,10 +1198,9 @@ public class SimpleAI implements AI
                             legion.getCurrentHex(), roll);
                     }
 
-                    for (String hexlabel: set)
+                    for (String hexlabel : set)
                     {
-                        for (int effectiveRoll = roll; effectiveRoll <= 6; 
-                                effectiveRoll++)
+                        for (int effectiveRoll = roll; effectiveRoll <= 6; effectiveRoll++)
                         {
                             // legion can attack to hexlabel on a effectiveRoll
                             List<LegionInfo> list = enemyMap[effectiveRoll]
@@ -1282,7 +1284,7 @@ public class SimpleAI implements AI
                     boolean haveOtherSummonables = false;
                     PlayerInfo player = legion.getPlayerInfo();
                     List<String> markerIds = player.getLegionIds();
-                    for (String markerId: markerIds)
+                    for (String markerId : markerIds)
                     {
                         LegionInfo l = client.getLegionInfo(markerId);
 
@@ -1432,7 +1434,7 @@ public class SimpleAI implements AI
                     Creature weakest1 = null;
                     Creature weakest2 = null;
 
-                    for (String name: legion.getContents())
+                    for (String name : legion.getContents())
                     {
                         // XXX Titan
                         Creature critter = (Creature)client.getGame()
@@ -1537,9 +1539,10 @@ public class SimpleAI implements AI
                 roll);
             int bestRecruitVal = 0;
 
-            for (String nextLabel: moves)
+            for (String nextLabel : moves)
             {
-                MasterHex nextHex = MasterBoard.getHexByLabel(nextLabel);
+                MasterHex nextHex = getVariantPlayed().getMasterBoard()
+                    .getHexByLabel(nextLabel);
                 // if we have to fight in that hex and we can't
                 // WIN_WITH_MINIMAL_LOSSES, then assume we can't
                 // recruit there.  IDEA: instead of doing any of this
@@ -1614,7 +1617,7 @@ public class SimpleAI implements AI
                     continue;
                 }
 
-                for (LegionInfo enemy: enemies)
+                for (LegionInfo enemy : enemies)
                 {
                     final int result = estimateBattleResults(enemy, false,
                         legion, hex, recruit);
@@ -1704,7 +1707,7 @@ public class SimpleAI implements AI
         {
             // remove PV of the split
             List<Creature> creaturesToRemove = chooseCreaturesToSplitOut(attacker);
-            for (Creature creature: creaturesToRemove)
+            for (Creature creature : creaturesToRemove)
             {
                 attackerPointValue -= getCombatValue(creature, terrain);
             }
@@ -1791,14 +1794,14 @@ public class SimpleAI implements AI
             List<String> all = client.getFriendlyLegions(client
                 .getPlayerName());
 
-            for (String markerId: all)
+            for (String markerId : all)
             {
                 if (!(legion.getMarkerId().equals(markerId)))
                 {
                     LegionInfo other = client.getLegionInfo(markerId);
                     boolean hasAll = true;
 
-                    for (String name: allNames)
+                    for (String name : allNames)
                     {
                         if (other.numCreature(name) <= 0)
                         {
@@ -1850,7 +1853,7 @@ public class SimpleAI implements AI
                     .getHexLabel());
                 if (enemyList != null)
                 {
-                    for (LegionInfo enemy: enemyList)
+                    for (LegionInfo enemy : enemyList)
                     {
                         if (enemy.getHeight() > worst)
                         {
@@ -1909,12 +1912,13 @@ public class SimpleAI implements AI
         return total;
     }
 
-    private static boolean setContainsHexWithTerrain(Set<String> set,
+    private boolean setContainsHexWithTerrain(Set<String> set,
         String terrainType)
     {
-        for (String hexLabel: set)
+        for (String hexLabel : set)
         {
-            String terrain = MasterBoard.getHexByLabel(hexLabel).getTerrain();
+            String terrain = getVariantPlayed().getMasterBoard()
+                .getHexByLabel(hexLabel).getTerrain();
             if (terrain.equals(terrainType))
             {
                 return true;
@@ -1963,7 +1967,7 @@ public class SimpleAI implements AI
         String bestChoice = null;
         int bestScore = Integer.MIN_VALUE;
 
-        for (String hexLabel: hexLabels)
+        for (String hexLabel : hexLabels)
         {
             int score = evaluateEngagement(hexLabel);
             if (score > bestScore)
@@ -1991,7 +1995,8 @@ public class SimpleAI implements AI
             .getFirstFriendlyLegion(hexLabel, player));
         LegionInfo defender = client.getLegionInfo(client.getFirstEnemyLegion(
             hexLabel, player));
-        MasterHex hex = MasterBoard.getHexByLabel(hexLabel);
+        MasterHex hex = getVariantPlayed().getMasterBoard().getHexByLabel(
+            hexLabel);
         int value = 0;
 
         final int result = estimateBattleResults(attacker, defender, hex);
@@ -2195,7 +2200,7 @@ public class SimpleAI implements AI
             return null;
         }
         Creature best = null;
-        for (String creatureName: creatures)
+        for (String creatureName : creatures)
         {
             Creature creature = (Creature)client.getGame().getVariant()
                 .getCreatureByName(creatureName);
@@ -2220,7 +2225,7 @@ public class SimpleAI implements AI
         LegionInfo bestLegion = null;
         String bestAngel = null;
 
-        for (String hexLabel: hexLabels)
+        for (String hexLabel : hexLabels)
         {
             List<String> legions = client.getLegionsByHex(hexLabel);
             if (legions.size() != 1)
@@ -2264,7 +2269,7 @@ public class SimpleAI implements AI
     private Map<BattleChit, Double> generateDamageMap()
     {
         Map<BattleChit, Double> map = new HashMap<BattleChit, Double>();
-        for (BattleChit critter: client.getActiveBattleChits())
+        for (BattleChit critter : client.getActiveBattleChits())
         {
             // Offboard critters can't strike.
             if (critter.getCurrentHexLabel().startsWith("X"))
@@ -2272,7 +2277,7 @@ public class SimpleAI implements AI
                 continue;
             }
             Set<String> set = client.findStrikes(critter.getTag());
-            for (String hexLabel: set)
+            for (String hexLabel : set)
             {
                 BattleChit target = client.getBattleChit(hexLabel);
                 int dice = client.getStrike().getDice(critter, target);
@@ -2301,7 +2306,7 @@ public class SimpleAI implements AI
         // of hits it would take if all possible creatures attacked it.
         Map<BattleChit, Double> map = generateDamageMap();
 
-        for (BattleChit target: map.keySet())
+        for (BattleChit target : map.keySet())
         {
             double h = map.get(target).doubleValue();
 
@@ -2334,7 +2339,7 @@ public class SimpleAI implements AI
     // TODO Have this actually find the best one, not the first one.
     private BattleChit findBestAttacker(BattleChit target)
     {
-        for (BattleChit critter: client.getActiveBattleChits())
+        for (BattleChit critter : client.getActiveBattleChits())
         {
             if (client.getStrike().canStrike(critter, target))
             {
@@ -2352,7 +2357,7 @@ public class SimpleAI implements AI
         String terrain = client.getBattleTerrain();
         BattleChit bestTarget = null;
 
-        for (String desc: carryTargets)
+        for (String desc : carryTargets)
         {
             String targetHexLabel = desc.substring(desc.length() - 2);
             BattleChit target = client.getBattleChit(targetHexLabel);
@@ -2513,7 +2518,7 @@ public class SimpleAI implements AI
     int getCombatValue(LegionInfo legion, String terrain)
     {
         int val = 0;
-        for (String name: legion.getContents())
+        for (String name : legion.getContents())
         {
             if (name.startsWith(Constants.titan))
             {
@@ -2768,7 +2773,7 @@ public class SimpleAI implements AI
         {
             return;
         }
-        for (CritterMove cm: bestMoveOrder)
+        for (CritterMove cm : bestMoveOrder)
         {
             BattleChit critter = cm.getCritter();
             String startingHexLabel = cm.getStartingHexLabel();
@@ -2898,7 +2903,7 @@ public class SimpleAI implements AI
     {
         boolean allOK = true;
         int val = 0;
-        for (CritterMove cm: order)
+        for (CritterMove cm : order)
         {
             BattleChit critter = cm.getCritter();
             String hexLabel = cm.getEndingHexLabel();
@@ -2918,7 +2923,7 @@ public class SimpleAI implements AI
         }
 
         // Move them all back where they started.
-        for (CritterMove cm: order)
+        for (CritterMove cm : order)
         {
             BattleChit critter = cm.getCritter();
             String hexLabel = cm.getStartingHexLabel();
@@ -2971,7 +2976,7 @@ public class SimpleAI implements AI
         // allCritterMoves is an ArrayList (for clone()) of moveLists.
         final ArrayList<List<CritterMove>> allCritterMoves = new ArrayList<List<CritterMove>>();
 
-        for (BattleChit critter: client.getActiveBattleChits())
+        for (BattleChit critter : client.getActiveBattleChits())
         {
             List<CritterMove> moveList = findBattleMovesOneCritter(critter);
 
@@ -3013,7 +3018,7 @@ public class SimpleAI implements AI
 
         List<CritterMove> moveList = new ArrayList<CritterMove>();
 
-        for (String hexLabel: moves)
+        for (String hexLabel : moves)
         {
             CritterMove cm = new CritterMove(critter, currentHexLabel,
                 hexLabel);
@@ -3041,7 +3046,7 @@ public class SimpleAI implements AI
         StringBuilder buf = new StringBuilder("Considered " + moveList.size()
             + " moves for " + critter.getTag() + " "
             + critter.getCreatureName() + " in " + currentHexLabel + ":");
-        for (CritterMove cm: moveList)
+        for (CritterMove cm : moveList)
         {
             buf.append(" " + cm.getEndingHexLabel());
         }
@@ -3079,7 +3084,7 @@ public class SimpleAI implements AI
         Timer findBestLegionMoveTimer = setupTimer();
 
         int count = 0;
-        for (LegionMove lm: legionMoves)
+        for (LegionMove lm : legionMoves)
         {
             int score = evaluateLegionBattleMove(lm);
             if (score > bestScore)
@@ -3236,7 +3241,7 @@ public class SimpleAI implements AI
         while (it.hasNext())
         {
             List<CritterMove> moveList = it.next();
-            for (CritterMove cm: moveList)
+            for (CritterMove cm : moveList)
             {
                 if (takenHexLabels.contains(cm.getEndingHexLabel()))
                 {
@@ -3291,10 +3296,10 @@ public class SimpleAI implements AI
     {
         Map<String, Integer> map = new HashMap<String, Integer>();
 
-        for (BattleChit critter: client.getActiveBattleChits())
+        for (BattleChit critter : client.getActiveBattleChits())
         {
             Set<String> targets = client.findStrikes(critter.getTag());
-            for (String hexLabel: targets)
+            for (String hexLabel : targets)
             {
                 Integer old = map.get(hexLabel);
                 if (old == null)
@@ -3421,7 +3426,7 @@ public class SimpleAI implements AI
                 // prefer strikes not through bramble.  Warlocks should
                 // try to rangestrike titans.
                 boolean penalty = true;
-                for (String hexLabel: targetHexLabels)
+                for (String hexLabel : targetHexLabels)
                 {
                     BattleChit target = client.getBattleChit(hexLabel);
                     if (target.isTitan())
@@ -3470,7 +3475,7 @@ public class SimpleAI implements AI
                 int numKillableTargets = 0;
                 int hitsExpected = 0;
 
-                for (String hexLabel: targetHexLabels)
+                for (String hexLabel : targetHexLabels)
                 {
                     BattleChit target = client.getBattleChit(hexLabel);
 
@@ -3690,7 +3695,7 @@ public class SimpleAI implements AI
     private int evaluateLegionBattleMove(LegionMove lm)
     {
         // First we need to move all critters into position.
-        for (CritterMove cm: lm.getCritterMoves())
+        for (CritterMove cm : lm.getCritterMoves())
         {
             cm.getCritter().moveToHex(cm.getEndingHexLabel());
         }
@@ -3699,13 +3704,13 @@ public class SimpleAI implements AI
 
         // Then find the sum of all critter evals.
         int sum = 0;
-        for (CritterMove cm: lm.getCritterMoves())
+        for (CritterMove cm : lm.getCritterMoves())
         {
             sum += evaluateCritterMove(cm.getCritter(), strikeMap);
         }
 
         // Then move them all back.
-        for (CritterMove cm: lm.getCritterMoves())
+        for (CritterMove cm : lm.getCritterMoves())
         {
             cm.getCritter().moveToHex(cm.getStartingHexLabel());
         }
@@ -3748,7 +3753,7 @@ public class SimpleAI implements AI
         public String toString()
         {
             StringBuilder sb = new StringBuilder();
-            for (CritterMove cm: critterMoves)
+            for (CritterMove cm : critterMoves)
             {
                 sb.append(cm.toString());
                 sb.append(", ");
@@ -3792,5 +3797,10 @@ public class SimpleAI implements AI
             remainingMarkers.clear();
         }
         this.client = null;
+    }
+
+    protected Variant getVariantPlayed()
+    {
+        return this.client.getGame().getVariant();
     }
 }

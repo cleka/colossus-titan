@@ -18,6 +18,7 @@ import javax.swing.WindowConstants;
 
 import net.sf.colossus.util.KDialog;
 import net.sf.colossus.util.Options;
+import net.sf.colossus.variant.MasterHex;
 
 
 public class AutoInspector extends KDialog

@@ -12,6 +12,7 @@ import net.sf.colossus.game.PlayerState;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.util.Options;
 import net.sf.colossus.util.Split;
+import net.sf.colossus.variant.MasterHex;
 
 
 /**
@@ -340,12 +341,14 @@ public final class Movement
             if (towerToTowerTeleportAllowed())
             {
                 // Mark every unoccupied tower.
-                Set<String> towerSet = MasterBoard.getTowerSet();
+                Set<String> towerSet = client.getGame().getVariant()
+                    .getMasterBoard().getTowerSet();
                 Iterator<String> it = towerSet.iterator();
                 while (it.hasNext())
                 {
                     String hexLabel = it.next();
-                    if (MasterBoard.getHexByLabel(hexLabel) != null)
+                    if (client.getGame().getVariant().getMasterBoard()
+                        .getHexByLabel(hexLabel) != null)
                     {
                         if (!client.isOccupied(hexLabel)
                             && (!(hexLabel.equals(hex.getLabel()))))
@@ -358,7 +361,8 @@ public final class Movement
             else
             {
                 // Remove nearby towers from set.
-                Set<String> towerSet = MasterBoard.getTowerSet();
+                Set<String> towerSet = client.getGame().getVariant()
+                    .getMasterBoard().getTowerSet();
                 Iterator<String> it = towerSet.iterator();
                 while (it.hasNext())
                 {
@@ -403,8 +407,10 @@ public final class Movement
         Set<String> entrySides = new HashSet<String>();
         LegionInfo legion = client.getLegionInfo(markerId);
         int movementRoll = client.getMovementRoll();
-        MasterHex currentHex = MasterBoard.getHexByLabel(legion.getHexLabel());
-        MasterHex targetHex = MasterBoard.getHexByLabel(targetHexLabel);
+        MasterHex currentHex = client.getGame().getVariant().getMasterBoard()
+            .getHexByLabel(legion.getHexLabel());
+        MasterHex targetHex = client.getGame().getVariant().getMasterBoard()
+            .getHexByLabel(targetHexLabel);
 
         if (teleport)
         {

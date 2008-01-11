@@ -49,6 +49,7 @@ import net.sf.colossus.util.ResourceLoader;
 import net.sf.colossus.util.Split;
 import net.sf.colossus.util.ViableEntityManager;
 import net.sf.colossus.variant.CreatureType;
+import net.sf.colossus.variant.MasterHex;
 import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
 
@@ -2174,7 +2175,8 @@ public final class Client implements IClient, IOracle, IOptions
         List<CreatureType> recruits)
     {
         LegionInfo legion = getLegionInfo(markerId);
-        MasterHex hex = MasterBoard.getHexByLabel(hexLabel);
+        MasterHex hex = getGame().getVariant().getMasterBoard().getHexByLabel(
+            hexLabel);
         // NOTE! Below the simpleAI is an object, not class! 
         Creature recruit = (Creature)simpleAI.getVariantRecruitHint(legion,
             hex, recruits);
@@ -3047,8 +3049,8 @@ public final class Client implements IClient, IOracle, IOptions
 
         String hexLabel = getHexForLegion(markerId);
         List<CreatureType> recruits = findEligibleRecruits(markerId, hexLabel);
-        String hexDescription = MasterBoard.getHexByLabel(hexLabel)
-            .getDescription();
+        String hexDescription = getGame().getVariant().getMasterBoard()
+            .getHexByLabel(hexLabel).getDescription();
 
         String recruitName = PickRecruit.pickRecruit(board.getFrame(),
             recruits, hexDescription, markerId, this);
@@ -3090,8 +3092,8 @@ public final class Client implements IClient, IOracle, IOptions
 
             List<CreatureType> recruits = findEligibleRecruits(markerId,
                 hexLabel);
-            String hexDescription = MasterBoard.getHexByLabel(hexLabel)
-                .getDescription();
+            String hexDescription = getGame().getVariant().getMasterBoard()
+                .getHexByLabel(hexLabel).getDescription();
 
             String recruitName = PickRecruit.pickRecruit(board.getFrame(),
                 recruits, hexDescription, markerId, this);
@@ -3796,7 +3798,8 @@ public final class Client implements IClient, IOracle, IOptions
 
     public String getBattleTerrain()
     {
-        MasterHex mHex = MasterBoard.getHexByLabel(battleSite);
+        MasterHex mHex = getGame().getVariant().getMasterBoard()
+            .getHexByLabel(battleSite);
         return mHex.getTerrain();
     }
 
@@ -4330,7 +4333,8 @@ public final class Client implements IClient, IOracle, IOptions
             return recruits;
         }
 
-        MasterHex hex = MasterBoard.getHexByLabel(hexLabel);
+        MasterHex hex = getGame().getVariant().getMasterBoard().getHexByLabel(
+            hexLabel);
         if (hex == null)
         {
             LOGGER.log(Level.WARNING,
@@ -4397,7 +4401,8 @@ public final class Client implements IClient, IOracle, IOptions
 
         LegionInfo info = getLegionInfo(markerId);
         String hexLabel = info.getHexLabel();
-        MasterHex hex = MasterBoard.getHexByLabel(hexLabel);
+        MasterHex hex = getGame().getVariant().getMasterBoard().getHexByLabel(
+            hexLabel);
         String terrain = hex.getTerrain();
 
         recruiters = new HashSet<CreatureType>(TerrainRecruitLoader
@@ -4481,7 +4486,8 @@ public final class Client implements IClient, IOracle, IOptions
     Set<String> listTeleportMoves(String markerId)
     {
         LegionInfo info = getLegionInfo(markerId);
-        MasterHex hex = MasterBoard.getHexByLabel(info.getHexLabel());
+        MasterHex hex = getGame().getVariant().getMasterBoard().getHexByLabel(
+            info.getHexLabel());
         return movement.listTeleportMoves(info, hex, movementRoll);
     }
 
@@ -4489,7 +4495,8 @@ public final class Client implements IClient, IOracle, IOptions
     Set<String> listNormalMoves(String markerId)
     {
         LegionInfo info = getLegionInfo(markerId);
-        MasterHex hex = MasterBoard.getHexByLabel(info.getHexLabel());
+        MasterHex hex = getGame().getVariant().getMasterBoard().getHexByLabel(
+            info.getHexLabel());
         return movement.listNormalMoves(info, hex, movementRoll);
     }
 
@@ -4622,7 +4629,8 @@ public final class Client implements IClient, IOracle, IOptions
     public Set<String> findEngagements()
     {
         Set<String> set = new HashSet<String>();
-        Iterator<String> it = MasterBoard.getAllHexLabels().iterator();
+        Iterator<String> it = getGame().getVariant().getMasterBoard()
+            .getAllHexLabels().iterator();
         while (it.hasNext())
         {
             String hexLabel = it.next();

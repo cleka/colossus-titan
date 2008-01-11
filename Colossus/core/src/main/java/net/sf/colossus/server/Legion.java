@@ -9,10 +9,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.colossus.client.BattleMap;
-import net.sf.colossus.client.MasterBoard;
-import net.sf.colossus.client.MasterHex;
 import net.sf.colossus.game.PlayerState;
 import net.sf.colossus.variant.CreatureType;
+import net.sf.colossus.variant.MasterHex;
 import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
 
@@ -100,9 +99,9 @@ public final class Legion extends net.sf.colossus.game.Legion implements
     static Legion getStartingLegion(String markerId, String hexLabel,
         String playerName, Game game)
     {
-        Creature[] startCre = TerrainRecruitLoader
-            .getStartingCreatures(MasterBoard.getHexByLabel(hexLabel)
-                .getTerrain());
+        Creature[] startCre = TerrainRecruitLoader.getStartingCreatures(game
+            .getVariant().getMasterBoard().getHexByLabel(hexLabel)
+            .getTerrain());
         Legion legion = new Legion(markerId, null, hexLabel, hexLabel,
             (Creature)VariantSupport.getCurrentVariant().getCreatureByName(
                 Constants.titan),
@@ -601,7 +600,8 @@ public final class Legion extends net.sf.colossus.game.Legion implements
 
     MasterHex getCurrentHex()
     {
-        return MasterBoard.getHexByLabel(currentHexLabel);
+        return game.getVariant().getMasterBoard().getHexByLabel(
+            currentHexLabel);
     }
 
     String getStartingHexLabel()
@@ -611,7 +611,8 @@ public final class Legion extends net.sf.colossus.game.Legion implements
 
     MasterHex getStartingHex()
     {
-        return MasterBoard.getHexByLabel(startingHexLabel);
+        return game.getVariant().getMasterBoard().getHexByLabel(
+            startingHexLabel);
     }
 
     void setEntrySide(int entrySide)

@@ -13,10 +13,9 @@ import java.util.logging.Logger;
 import net.sf.colossus.client.BattleHex;
 import net.sf.colossus.client.BattleMap;
 import net.sf.colossus.client.HexMap;
-import net.sf.colossus.client.MasterBoard;
-import net.sf.colossus.client.MasterHex;
 import net.sf.colossus.util.Options;
 import net.sf.colossus.variant.HazardTerrain;
+import net.sf.colossus.variant.MasterHex;
 
 
 /**
@@ -91,11 +90,17 @@ public final class Battle extends net.sf.colossus.game.Battle
         // Make sure defender can recruit, even if savegame is off.
         defender.setRecruitName(null);
 
-        LOGGER.log(Level.INFO, attacker.getLongMarkerName() + " ("
-            + attacker.getPlayerName() + ") attacks "
-            + defender.getLongMarkerName() + " (" + defender.getPlayerName()
-            + ")" + " in "
-            + MasterBoard.getHexByLabel(masterHexLabel).getDescription());
+        LOGGER.log(Level.INFO, attacker.getLongMarkerName()
+            + " ("
+            + attacker.getPlayerName()
+            + ") attacks "
+            + defender.getLongMarkerName()
+            + " ("
+            + defender.getPlayerName()
+            + ")"
+            + " in "
+            + game.getVariant().getMasterBoard().getHexByLabel(masterHexLabel)
+                .getDescription());
 
         placeLegion(attacker);
         placeLegion(defender);
@@ -274,7 +279,8 @@ public final class Battle extends net.sf.colossus.game.Battle
 
     private MasterHex getMasterHex()
     {
-        return MasterBoard.getHexByLabel(masterHexLabel);
+        return game.getVariant().getMasterBoard()
+            .getHexByLabel(masterHexLabel);
     }
 
     String getTerrain()

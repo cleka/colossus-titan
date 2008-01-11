@@ -25,11 +25,8 @@ import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -58,13 +55,14 @@ import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 
 import net.sf.colossus.server.Constants;
-import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.server.XMLSnapshotFilter;
+import net.sf.colossus.util.ArrayHelper;
 import net.sf.colossus.util.HTMLColor;
 import net.sf.colossus.util.KFrame;
+import net.sf.colossus.util.NullCheckPredicate;
 import net.sf.colossus.util.Options;
 import net.sf.colossus.util.ResourceLoader;
-import net.sf.colossus.xmlparser.StrategicMapLoader;
+import net.sf.colossus.variant.MasterHex;
 import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
 
@@ -81,19 +79,9 @@ public final class MasterBoard extends JPanel
         .getName());
 
     private Image offScreenBuffer;
-    private static int horizSize = 0;
-    private static int vertSize = 0;
     private boolean overlayChanged = false;
 
-    /** "parity" of the board, so that Hexes are displayed the proper way */
-    private static int boardParity = 0;
-
     private GUIMasterHex[][] guiHexArray = null;
-    private static MasterHex[][] plainHexArray = null;
-
-    /** The hexes in the horizSize*vertSize array that actually exist are
-     *  represented by true. */
-    private static boolean[][] show = null;
 
     private Client client;
 
@@ -173,9 +161,6 @@ public final class MasterBoard extends JPanel
     private AbstractAction aboutAction;
     private AbstractAction viewReadmeAction;
     private AbstractAction viewHelpDocAction;
-
-    /* a Set of label (String) of all Tower hex */
-    private static Set<String> towerSet = null;
 
     private boolean playerLabelDone;
 
@@ -288,88 +273,6 @@ public final class MasterBoard extends JPanel
                 super.keyReleased(e);
             }
         }
-    }
-
-    private static interface MasterHexVisitor
-    {
-
-        /** Returns true iff the Hex matches **/
-        boolean visitHex(MasterHex hex);
-    }
-
-    private static interface GUIMasterHexVisitor
-    {
-
-        /** Returns true iff the Hex matches **/
-        boolean visitHex(GUIMasterHex hex);
-    }
-
-    private static MasterHex visitMasterHexes(MasterHexVisitor visitor)
-    {
-        for (MasterHex[] hexes : plainHexArray)
-        {
-            for (MasterHex hex : hexes)
-            {
-                if (hex == null)
-                {
-                    continue;
-                }
-                boolean hexFound = visitor.visitHex(hex);
-                if (hexFound)
-                {
-                    return hex;
-                }
-            }
-        }
-        return null;
-    }
-
-    private GUIMasterHex visitGUIMasterHexes(GUIMasterHexVisitor visitor)
-    {
-        for (GUIMasterHex[] hexes : guiHexArray)
-        {
-            for (GUIMasterHex hex : hexes)
-            {
-                if (hex == null)
-                {
-                    continue;
-                }
-                boolean hexFound = visitor.visitHex(hex);
-                if (hexFound)
-                {
-                    return hex;
-                }
-            }
-        }
-        return null;
-    }
-
-    /** Must ensure that variant is loaded before referencing this class,
-     *  since readMapData() needs it. */
-    public synchronized static void staticMasterboardInit()
-    {
-        // variant can change these
-        horizSize = 0;
-        vertSize = 0;
-        boardParity = 0;
-        plainHexArray = null;
-        show = null;
-        towerSet = null;
-
-        try
-        {
-            readMapData();
-        }
-        catch (Exception e)
-        {
-            LOGGER
-                .log(Level.SEVERE, "Reading map data for non-GUI failed.", e);
-            e.printStackTrace();
-            System.exit(1);
-        }
-
-        LOGGER.log(Level.FINEST, "Setting up static TowerSet in MasterBoard");
-        setupTowerSet();
     }
 
     MasterBoard(final Client client)
@@ -1027,7 +930,8 @@ public final class MasterBoard extends JPanel
 
     private void setupGUIHexes()
     {
-        guiHexArray = new GUIMasterHex[horizSize][vertSize];
+        guiHexArray = new GUIMasterHex[getMasterBoard().getHorizSize()][getMasterBoard()
+            .getVertSize()];
 
         int scale = Scale.get();
         int cx = 3 * scale;
@@ -1037,22 +941,29 @@ public final class MasterBoard extends JPanel
         {
             for (int j = 0; j < guiHexArray[0].length; j++)
             {
-                if (show[i][j])
+                if (getMasterBoard().getShow()[i][j])
                 {
-                    GUIMasterHex hex = new GUIMasterHex(plainHexArray[i][j]);
-                    hex
-                        .init(
-                            cx + 4 * i * scale,
-                            (int)Math
-                                .round(cy
-                                    + (3 * j + ((i + boardParity) & 1)
-                                        * (1 + 2 * (j / 2)) + ((i + 1 + boardParity) & 1)
-                                        * 2 * ((j + 1) / 2)) * GUIHex.SQRT3
-                                    * scale), scale, isHexInverted(i, j), this);
+                    GUIMasterHex hex = new GUIMasterHex(getMasterBoard()
+                        .getPlainHexArray()[i][j]);
+                    hex.init(cx + 4 * i * scale, (int)Math.round(cy
+                        + (3 * j
+                            + ((i + getMasterBoard().getBoardParity()) & 1)
+                            * (1 + 2 * (j / 2)) + ((i + 1 + getMasterBoard()
+                            .getBoardParity()) & 1)
+                            * 2 * ((j + 1) / 2)) * GUIHex.SQRT3 * scale),
+                        scale, getMasterBoard().isHexInverted(i, j), this);
                     guiHexArray[i][j] = hex;
                 }
             }
         }
+    }
+
+    /**
+     * TODO this should probably be stored as member, possibly instead of the client class.
+     */
+    private net.sf.colossus.variant.MasterBoard getMasterBoard()
+    {
+        return client.getGame().getVariant().getMasterBoard();
     }
 
     private void cleanGUIHexes()
@@ -1061,400 +972,11 @@ public final class MasterBoard extends JPanel
         {
             for (int j = 0; j < guiHexArray[0].length; j++)
             {
-                if (show[i][j])
+                if (getMasterBoard().getShow()[i][j])
                 {
                     GUIMasterHex hex = guiHexArray[i][j];
                     hex.cleanup();
                     guiHexArray[i][j] = null;
-                }
-            }
-        }
-    }
-
-    private static boolean isHexInverted(int i, int j)
-    {
-        return (((i + j) & 1) == boardParity);
-    }
-
-    /** Reference to the 'h' the cache was built for.
-     *  We have to rebuild the cache for a new 'h'
-     */
-    private static MasterHex[][] _hexByLabel_last_h = null;
-
-    /** the cache used inside 'hexByLabel'. */
-    private static java.util.Vector<MasterHex> _hexByLabel_cache = null;
-
-    /**
-     * towi changes: here is now a cache implemented so that the nested
-     *   loop is not executed at every call. the cache is implemented with
-     *   an array. it will work as long as the hex-labels-strings can be
-     *   converted to int. this must be the case anyway since the
-     *   param 'label' is an int here.
-     */
-    static MasterHex hexByLabel(MasterHex[][] h, int label)
-    {
-        // if the 'h' was the same last time we can use the cache
-        if (_hexByLabel_last_h != h)
-        {
-            // alas, we have to rebuild the cache
-            LOGGER.log(Level.FINEST,
-                "new 'MasterHex[][] h' in MasterBoard.hexByLabel()");
-            _hexByLabel_last_h = h;
-            // write all 'h' elements by their int-value into an Array.
-            // we can do that here, because the 'label' arg is an int. if it
-            // were a string we could not rely on that all h-entries are ints.
-            // (Vector: lots of unused space, i am afraid. about 80kB...)
-            _hexByLabel_cache = new java.util.Vector<MasterHex>(1000);
-            for (int i = 0; i < h.length; i++)
-            {
-                for (int j = 0; j < h[i].length; j++)
-                {
-                    if (show[i][j])
-                    {
-                        final int iLabel = Integer
-                            .parseInt(h[i][j].getLabel());
-                        if (_hexByLabel_cache.size() <= iLabel)
-                        {
-                            _hexByLabel_cache.setSize(iLabel + 1);
-                        }
-                        _hexByLabel_cache.set(iLabel, h[i][j]);
-                    }
-                }
-            }
-        }
-        // the cache is built and looks like this:
-        //   _hexByLabel_cache[0...] =
-        //      [ h00,h01,h02, ..., null, null, ..., h30,h31,... ]
-        final MasterHex found = _hexByLabel_cache.get(label);
-        if (found == null)
-        {
-            LOGGER.log(Level.WARNING, "Couldn't find Masterhex labeled "
-                + label);
-        }
-        return found;
-    }
-
-    private static synchronized void readMapData() throws Exception
-    {
-        List<String> directories = VariantSupport.getVarDirectoriesList();
-        InputStream mapIS = ResourceLoader.getInputStream(VariantSupport
-            .getMapName(), directories);
-        if (mapIS == null)
-        {
-            throw new FileNotFoundException(VariantSupport.getMapName());
-        }
-        StrategicMapLoader sml = new StrategicMapLoader(mapIS);
-        horizSize = sml.getHorizSize();
-        vertSize = sml.getVertSize();
-        show = sml.getShow();
-        plainHexArray = sml.getHexes();
-
-        computeBoardParity();
-        setupExits(plainHexArray);
-        setupEntrances(plainHexArray);
-        setupHexLabelSides(plainHexArray);
-        setupNeighbors(plainHexArray);
-    }
-
-    private static void computeBoardParity()
-    {
-        boardParity = 0;
-        for (int x = 0; x < horizSize; x++)
-        {
-            for (int y = 0; y < vertSize - 1; y++)
-            {
-                if (show[x][y] && show[x][y + 1])
-                {
-                    boardParity = 1 - ((x + y) & 1);
-                    return;
-                }
-            }
-        }
-    }
-
-    private static void setupExits(MasterHex[][] h)
-    {
-        for (int i = 0; i < h.length; i++)
-        {
-            for (int j = 0; j < h[i].length; j++)
-            {
-                if (show[i][j])
-                {
-                    for (int k = 0; k < 3; k++)
-                    {
-                        if (h[i][j].getBaseExitType(k) != Constants.NONE)
-                        {
-                            setupOneExit(h, i, j, k);
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    private static void setupOneExit(MasterHex[][] h, int i, int j, int k)
-    {
-        MasterHex dh = hexByLabel(h, h[i][j].getBaseExitLabel(k));
-        if (dh == null)
-        {
-            LOGGER.log(Level.SEVERE, "null pointer ; i=" + i + ", j=" + j
-                + ", k=" + k);
-            System.exit(1);
-        }
-        // Static analysis of Eclipse doesn't grok System.exit()
-        assert dh != null;
-        if (dh.getXCoord() == i)
-        {
-            if (dh.getYCoord() == (j - 1))
-            {
-                h[i][j].setExitType(0, h[i][j].getBaseExitType(k));
-            }
-            else if (dh.getYCoord() == (j + 1))
-            {
-                h[i][j].setExitType(3, h[i][j].getBaseExitType(k));
-            }
-            else
-            {
-                LOGGER.log(Level.WARNING, "bad exit ; i=" + i + ", j=" + j
-                    + ", k=" + k);
-            }
-        }
-        else if (dh.getXCoord() == (i + 1))
-        {
-            if (dh.getYCoord() == j)
-            {
-                h[i][j].setExitType(2 - ((i + j + boardParity) & 1), h[i][j]
-                    .getBaseExitType(k));
-            }
-            else
-            {
-                LOGGER.log(Level.WARNING, "bad exit ; i=" + i + ", j=" + j
-                    + ", k=" + k);
-            }
-        }
-        else if (dh.getXCoord() == (i - 1))
-        {
-            if (dh.getYCoord() == j)
-            {
-                h[i][j].setExitType(4 + ((i + j + boardParity) & 1), h[i][j]
-                    .getBaseExitType(k));
-            }
-            else
-            {
-                LOGGER.log(Level.WARNING, "bad exit ; i=" + i + ", j=" + j
-                    + ", k=" + k);
-            }
-        }
-        else
-        {
-            LOGGER.log(Level.WARNING, "bad exit ; i=" + i + ", j=" + j
-                + ", k=" + k);
-        }
-    }
-
-    private static void setupEntrances(MasterHex[][] h)
-    {
-        for (int i = 0; i < h.length; i++)
-        {
-            for (int j = 0; j < h[0].length; j++)
-            {
-                if (show[i][j])
-                {
-                    for (int k = 0; k < 6; k++)
-                    {
-                        int gateType = h[i][j].getExitType(k);
-                        if (gateType != Constants.NONE)
-                        {
-                            switch (k)
-                            {
-                                case 0:
-                                    h[i][j - 1].setEntranceType(3, gateType);
-                                    break;
-
-                                case 1:
-                                    h[i + 1][j].setEntranceType(4, gateType);
-                                    break;
-
-                                case 2:
-                                    h[i + 1][j].setEntranceType(5, gateType);
-                                    break;
-
-                                case 3:
-                                    h[i][j + 1].setEntranceType(0, gateType);
-                                    break;
-
-                                case 4:
-                                    h[i - 1][j].setEntranceType(1, gateType);
-                                    break;
-
-                                case 5:
-                                    h[i - 1][j].setEntranceType(2, gateType);
-                                    break;
-
-                                default:
-                                    LOGGER.log(Level.SEVERE, "Bogus hexside");
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    /** If the shortest hexside closest to the center of the board
-     *  is a short hexside, set the label side to it.
-     *  Else set the label side to the opposite hexside. */
-    private static void setupHexLabelSides(MasterHex[][] h)
-    {
-        // First find the center of the board.
-        int width = h.length;
-        int height = h[0].length;
-
-        // Subtract 1 to account for 1-based length of 0-based array.
-        double midX = (width - 1) / 2.0;
-        double midY = (height - 1) / 2.0;
-
-        for (int i = 0; i < h.length; i++)
-        {
-            for (int j = 0; j < h[0].length; j++)
-            {
-                if (show[i][j])
-                {
-                    double deltaX = i - midX;
-                    // Adjust for aspect ratio of h array, which has roughly
-                    // twice as many horizontal as vertical elements even
-                    // though the board is roughly square.
-                    double deltaY = (j - midY) * width / height;
-
-                    double ratio;
-
-                    // Watch for division by zero.
-                    if (deltaY == 0)
-                    {
-                        ratio = deltaX * 99999999;
-                    }
-                    else
-                    {
-                        ratio = deltaX / deltaY;
-                    }
-
-                    // Derive the exact number if needed.
-                    if (Math.abs(ratio) < 0.6)
-                    {
-                        // Vertically dominated, so top or bottom hexside.
-                        // top, unless inverted
-                        if (isHexInverted(i, j))
-                        {
-                            h[i][j].setLabelSide(3);
-                        }
-                        else
-                        {
-                            h[i][j].setLabelSide(0);
-                        }
-                    }
-                    else
-                    {
-                        // One of the left or right side hexsides.
-                        if (deltaX >= 0)
-                        {
-                            if (deltaY >= 0)
-                            {
-                                // 2 unless inverted
-                                if (isHexInverted(i, j))
-                                {
-                                    h[i][j].setLabelSide(5);
-                                }
-                                else
-                                {
-                                    h[i][j].setLabelSide(2);
-                                }
-                            }
-                            else
-                            {
-                                // 4 unless inverted
-                                if (isHexInverted(i, j))
-                                {
-                                    h[i][j].setLabelSide(1);
-                                }
-                                else
-                                {
-                                    h[i][j].setLabelSide(4);
-                                }
-                            }
-                        }
-                        else
-                        {
-                            if (deltaY >= 0)
-                            {
-                                // 4 unless inverted
-                                if (isHexInverted(i, j))
-                                {
-                                    h[i][j].setLabelSide(1);
-                                }
-                                else
-                                {
-                                    h[i][j].setLabelSide(4);
-                                }
-                            }
-                            else
-                            {
-                                // 2 unless inverted
-                                if (isHexInverted(i, j))
-                                {
-                                    h[i][j].setLabelSide(5);
-                                }
-                                else
-                                {
-                                    h[i][j].setLabelSide(2);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    private static void setupNeighbors(MasterHex[][] h)
-    {
-        for (int i = 0; i < h.length; i++)
-        {
-            for (int j = 0; j < h[0].length; j++)
-            {
-                if (show[i][j])
-                {
-                    MasterHex hex = h[i][j];
-
-                    if (hex.getExitType(0) != Constants.NONE
-                        || hex.getEntranceType(0) != Constants.NONE)
-                    {
-                        hex.setNeighbor(0, h[i][j - 1]);
-                    }
-                    if (hex.getExitType(1) != Constants.NONE
-                        || hex.getEntranceType(1) != Constants.NONE)
-                    {
-                        hex.setNeighbor(1, h[i + 1][j]);
-                    }
-                    if (hex.getExitType(2) != Constants.NONE
-                        || hex.getEntranceType(2) != Constants.NONE)
-                    {
-                        hex.setNeighbor(2, h[i + 1][j]);
-                    }
-                    if (hex.getExitType(3) != Constants.NONE
-                        || hex.getEntranceType(3) != Constants.NONE)
-                    {
-                        hex.setNeighbor(3, h[i][j + 1]);
-                    }
-                    if (hex.getExitType(4) != Constants.NONE
-                        || hex.getEntranceType(4) != Constants.NONE)
-                    {
-                        hex.setNeighbor(4, h[i - 1][j]);
-                    }
-                    if (hex.getExitType(5) != Constants.NONE
-                        || hex.getEntranceType(5) != Constants.NONE)
-                    {
-                        hex.setNeighbor(5, h[i - 1][j]);
-                    }
                 }
             }
         }
@@ -1690,6 +1212,21 @@ public final class MasterBoard extends JPanel
         return masterFrame;
     }
 
+    /** This is incredibly inefficient. */
+    void alignAllLegions()
+    {
+        ArrayHelper.findFirstMatch(getMasterBoard().getPlainHexArray(),
+            new NullCheckPredicate<MasterHex>(false)
+            {
+                @Override
+                public boolean matchesNonNullValue(MasterHex hex)
+                {
+                    alignLegions(hex.getLabel());
+                    return false;
+                }
+            });
+    }
+
     void alignLegions(String hexLabel)
     {
         GUIMasterHex hex = getGUIHexByLabel(hexLabel);
@@ -1782,19 +1319,6 @@ public final class MasterBoard extends JPanel
         }
     }
 
-    /** This is incredibly inefficient. */
-    void alignAllLegions()
-    {
-        visitMasterHexes(new MasterHexVisitor()
-        {
-            public boolean visitHex(MasterHex hex)
-            {
-                alignLegions(hex.getLabel());
-                return false;
-            }
-        });
-    }
-
     void highlightTallLegions()
     {
         unselectAllHexes();
@@ -1870,45 +1394,32 @@ public final class MasterBoard extends JPanel
 
     /** Do a brute-force search through the hex array, looking for
      *  a match.  Return the hex, or null if none is found. */
-    public static MasterHex getHexByLabel(final String label)
-    {
-        return visitMasterHexes(new MasterHexVisitor()
-        {
-            public boolean visitHex(MasterHex hex)
-            {
-                if (hex.getLabel().equals(label))
-                {
-                    return true;
-                }
-                return false;
-            }
-        });
-    }
-
-    /** Do a brute-force search through the hex array, looking for
-     *  a match.  Return the hex, or null if none is found. */
     GUIMasterHex getGUIHexByLabel(final String label)
     {
-        return visitGUIMasterHexes(new GUIMasterHexVisitor()
-        {
-            public boolean visitHex(GUIMasterHex hex)
+        return ArrayHelper.findFirstMatch(guiHexArray,
+            new NullCheckPredicate<GUIMasterHex>(false)
             {
-                return hex.getMasterHexModel().getLabel().equals(label);
-            }
-        });
+                @Override
+                public boolean matchesNonNullValue(GUIMasterHex hex)
+                {
+                    return hex.getMasterHexModel().getLabel().equals(label);
+                }
+            });
     }
 
     /** Return the MasterHex that contains the given point, or
      *  null if none does. */
     private GUIMasterHex getHexContainingPoint(final Point point)
     {
-        return visitGUIMasterHexes(new GUIMasterHexVisitor()
-        {
-            public boolean visitHex(GUIMasterHex hex)
+        return ArrayHelper.findFirstMatch(guiHexArray,
+            new NullCheckPredicate<GUIMasterHex>(false)
             {
-                return hex.contains(point);
-            }
-        });
+                @Override
+                public boolean matchesNonNullValue(GUIMasterHex hex)
+                {
+                    return hex.contains(point);
+                }
+            });
     }
 
     /** Return the topmost Marker that contains the given point, or
@@ -1928,106 +1439,127 @@ public final class MasterBoard extends JPanel
         return null;
     }
 
+    // TODO the next couple of methods iterate through all elements of an array
+    // by just returning false as predicate value. It should be a different method
+    // without return value IMO -- it didn't look as bad when it was called visitor,
+    // but a true Visitor shouldn't have the return value. Now the error is the other
+    // way around, but at least generified :-)
     void unselectAllHexes()
     {
-        visitGUIMasterHexes(new GUIMasterHexVisitor()
-        {
-            public boolean visitHex(GUIMasterHex hex)
+        ArrayHelper.findFirstMatch(guiHexArray,
+            new NullCheckPredicate<GUIMasterHex>(false)
             {
-                if (hex.isSelected())
+                @Override
+                public boolean matchesNonNullValue(GUIMasterHex hex)
+
                 {
-                    hex.unselect();
-                    hex.repaint();
+                    if (hex.isSelected())
+                    {
+                        hex.unselect();
+                        hex.repaint();
+                    }
+                    return false; // keep going
                 }
-                return false; // keep going
-            }
-        });
+            });
     }
 
     void unselectHexByLabel(final String label)
     {
-        visitGUIMasterHexes(new GUIMasterHexVisitor()
-        {
-            public boolean visitHex(GUIMasterHex hex)
+        ArrayHelper.findFirstMatch(guiHexArray,
+            new NullCheckPredicate<GUIMasterHex>(false)
             {
-                if (hex.isSelected()
-                    && label.equals(hex.getMasterHexModel().getLabel()))
+                @Override
+                public boolean matchesNonNullValue(GUIMasterHex hex)
+
                 {
-                    hex.unselect();
-                    hex.repaint();
-                    return true;
+                    if (hex.isSelected()
+                        && label.equals(hex.getMasterHexModel().getLabel()))
+                    {
+                        hex.unselect();
+                        hex.repaint();
+                        return true;
+                    }
+                    return false; // keep going
                 }
-                return false; // keep going
-            }
-        });
+            });
     }
 
     void unselectHexesByLabels(final Set<String> labels)
     {
-        visitGUIMasterHexes(new GUIMasterHexVisitor()
-        {
-            public boolean visitHex(GUIMasterHex hex)
+        ArrayHelper.findFirstMatch(guiHexArray,
+            new NullCheckPredicate<GUIMasterHex>(false)
             {
-                if (hex.isSelected()
-                    && labels.contains(hex.getMasterHexModel().getLabel()))
+                @Override
+                public boolean matchesNonNullValue(GUIMasterHex hex)
+
                 {
-                    hex.unselect();
-                    hex.repaint();
+                    if (hex.isSelected()
+                        && labels.contains(hex.getMasterHexModel().getLabel()))
+                    {
+                        hex.unselect();
+                        hex.repaint();
+                    }
+                    return false; // keep going
                 }
-                return false; // keep going
-            }
-        });
+            });
     }
 
     void selectHexByLabel(final String label)
     {
-        visitGUIMasterHexes(new GUIMasterHexVisitor()
-        {
-            public boolean visitHex(GUIMasterHex hex)
+        ArrayHelper.findFirstMatch(guiHexArray,
+            new NullCheckPredicate<GUIMasterHex>(false)
             {
-                if (!hex.isSelected()
-                    && label.equals(hex.getMasterHexModel().getLabel()))
+                @Override
+                public boolean matchesNonNullValue(GUIMasterHex hex)
                 {
-                    hex.select();
-                    hex.repaint();
+                    if (!hex.isSelected()
+                        && label.equals(hex.getMasterHexModel().getLabel()))
+                    {
+                        hex.select();
+                        hex.repaint();
+                    }
+                    return false; // keep going
                 }
-                return false; // keep going
-            }
-        });
+            });
     }
 
     void selectHexesByLabels(final Set<String> labels)
     {
-        visitGUIMasterHexes(new GUIMasterHexVisitor()
-        {
-            public boolean visitHex(GUIMasterHex hex)
+        ArrayHelper.findFirstMatch(guiHexArray,
+            new NullCheckPredicate<GUIMasterHex>(false)
             {
-                if (!hex.isSelected()
-                    && labels.contains(hex.getMasterHexModel().getLabel()))
+                @Override
+                public boolean matchesNonNullValue(GUIMasterHex hex)
                 {
-                    hex.select();
-                    hex.repaint();
+                    if (!hex.isSelected()
+                        && labels.contains(hex.getMasterHexModel().getLabel()))
+                    {
+                        hex.select();
+                        hex.repaint();
+                    }
+                    return false; // keep going
                 }
-                return false; // keep going
-            }
-        });
+            });
     }
 
     void selectHexesByLabels(final Set<String> labels, final Color color)
     {
-        visitGUIMasterHexes(new GUIMasterHexVisitor()
-        {
-            public boolean visitHex(GUIMasterHex hex)
+        ArrayHelper.findFirstMatch(guiHexArray,
+            new NullCheckPredicate<GUIMasterHex>(false)
             {
-                if (labels.contains(hex.getMasterHexModel().getLabel()))
+                @Override
+                public boolean matchesNonNullValue(GUIMasterHex hex)
+
                 {
-                    hex.select();
-                    hex.setSelectColor(color);
-                    hex.repaint();
+                    if (labels.contains(hex.getMasterHexModel().getLabel()))
+                    {
+                        hex.select();
+                        hex.setSelectColor(color);
+                        hex.repaint();
+                    }
+                    return false; // keep going
                 }
-                return false; // keep going
-            }
-        });
+            });
     }
 
     void actOnMisclick()
@@ -2317,26 +1849,32 @@ public final class MasterBoard extends JPanel
 
     private void paintHexes(final Graphics g)
     {
-        visitGUIMasterHexes(new GUIMasterHexVisitor()
-        {
-            public boolean visitHex(GUIMasterHex hex)
+        ArrayHelper.findFirstMatch(guiHexArray,
+            new NullCheckPredicate<GUIMasterHex>(false)
             {
-                hex.paint(g);
-                return false; // keep going
-            }
-        });
+                @Override
+                public boolean matchesNonNullValue(GUIMasterHex hex)
+
+                {
+                    hex.paint(g);
+                    return false; // keep going
+                }
+            });
     }
 
     private void paintHighlights(final Graphics2D g)
     {
-        visitGUIMasterHexes(new GUIMasterHexVisitor()
-        {
-            public boolean visitHex(GUIMasterHex hex)
+        ArrayHelper.findFirstMatch(guiHexArray,
+            new NullCheckPredicate<GUIMasterHex>(false)
             {
-                hex.paintHighlightIfNeeded(g);
-                return false; // keep going
-            }
-        });
+                @Override
+                public boolean matchesNonNullValue(GUIMasterHex hex)
+
+                {
+                    hex.paintHighlightIfNeeded(g);
+                    return false; // keep going
+                }
+            });
     }
 
     /** Paint markers in z-order. */
@@ -2403,8 +1941,8 @@ public final class MasterBoard extends JPanel
     public Dimension getMinimumSize()
     {
         int scale = Scale.get();
-        return new Dimension(((horizSize + 1) * 4) * scale, (vertSize * 7)
-            * scale);
+        return new Dimension(((getMasterBoard().getHorizSize() + 1) * 4)
+            * scale, (getMasterBoard().getVertSize() * 7) * scale);
     }
 
     @Override
@@ -2467,45 +2005,9 @@ public final class MasterBoard extends JPanel
         this.client = null;
     }
 
-    public static Set<String> getTowerSet()
-    {
-        return Collections.unmodifiableSet(towerSet);
-    }
-
-    private static void setupTowerSet()
-    {
-        towerSet = new HashSet<String>();
-        visitMasterHexes(new MasterHexVisitor()
-        {
-            public boolean visitHex(MasterHex hex)
-            {
-                if (HexMap.terrainIsTower(hex.getTerrain()))
-                {
-                    towerSet.add(hex.getLabel());
-                }
-                return false;
-            }
-        });
-    }
-
     JScrollPane getScrollPane()
     {
         return scrollPane;
-    }
-
-    /** Return a set of all hex labels. */
-    static Set<String> getAllHexLabels()
-    {
-        final Set<String> set = new HashSet<String>();
-        visitMasterHexes(new MasterHexVisitor()
-        {
-            public boolean visitHex(MasterHex hex)
-            {
-                set.add(hex.getLabel());
-                return false;
-            }
-        });
-        return set;
     }
 
     void pack()

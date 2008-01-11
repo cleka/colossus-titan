@@ -19,14 +19,13 @@ import java.util.logging.Logger;
 
 import net.sf.colossus.client.Client;
 import net.sf.colossus.client.LegionInfo;
-import net.sf.colossus.client.MasterBoard;
-import net.sf.colossus.client.MasterHex;
 import net.sf.colossus.client.PlayerInfo;
 import net.sf.colossus.game.PlayerState;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.Creature;
 import net.sf.colossus.util.MultiSet;
 import net.sf.colossus.variant.CreatureType;
+import net.sf.colossus.variant.MasterHex;
 import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
 
@@ -37,7 +36,7 @@ import net.sf.colossus.xmlparser.TerrainRecruitLoader;
  * @author Romain Dolbeau
  * @author Corwin Joy, extensively rewritten on 02-Oct-2003
  */
-public class RationalAI extends SimpleAI implements AI
+public class RationalAI extends SimpleAI
 {
     private static final Logger logger = Logger.getLogger(RationalAI.class
         .getName());
@@ -172,7 +171,8 @@ public class RationalAI extends SimpleAI implements AI
             while (moveIt.hasNext())
             {
                 String hexLabel = moveIt.next();
-                MasterHex hex = MasterBoard.getHexByLabel(hexLabel);
+                MasterHex hex = getVariantPlayed().getMasterBoard()
+                    .getHexByLabel(hexLabel);
                 double risk_payoff1 = evaluateMove(legion, hex, RECRUIT_TRUE,
                     1, true);
 
@@ -805,8 +805,8 @@ public class RationalAI extends SimpleAI implements AI
 
             // compute the value of sitting still
             List<LegionBoardMove> legionMoves = new ArrayList<LegionBoardMove>();
-            MasterHex hex = MasterBoard.getHexByLabel(legion.getCurrentHex()
-                .getLabel());
+            MasterHex hex = getVariantPlayed().getMasterBoard().getHexByLabel(
+                legion.getCurrentHex().getLabel());
             double value = evaluateMove(legion, hex, RECRUIT_FALSE, 2, true);
             LegionBoardMove lmove = new LegionBoardMove(markerId, legion
                 .getCurrentHex().getLabel(),
@@ -840,7 +840,8 @@ public class RationalAI extends SimpleAI implements AI
             while (moveIterator.hasNext())
             {
                 final String hexLabel = moveIterator.next();
-                hex = MasterBoard.getHexByLabel(hexLabel);
+                hex = getVariantPlayed().getMasterBoard().getHexByLabel(
+                    hexLabel);
                 value = evaluateMove(legion, hex, RECRUIT_TRUE, 2, true);
 
                 logger.log(Level.FINEST, "value hex " + hexLabel + " value: "
@@ -1054,8 +1055,8 @@ public class RationalAI extends SimpleAI implements AI
                             .getFriendlyLegions(targetHex, player);
                         if (targetOwnLegions.size() == 0)
                         {
-                            MasterHex hex = MasterBoard
-                                .getHexByLabel(targetHex);
+                            MasterHex hex = getVariantPlayed()
+                                .getMasterBoard().getHexByLabel(targetHex);
                             int value = evaluateMove(minLegion, hex,
                                 RECRUIT_TRUE, 2, true);
                             if (value > bestValue || bestValue == -1)
@@ -1201,7 +1202,8 @@ public class RationalAI extends SimpleAI implements AI
         while (moveIterator.hasNext())
         {
             String targetHex = moveIterator.next();
-            MasterHex hex = MasterBoard.getHexByLabel(targetHex);
+            MasterHex hex = getVariantPlayed().getMasterBoard().getHexByLabel(
+                targetHex);
 
             List<String> targetOwnLegions = client.getFriendlyLegions(
                 targetHex, player);
@@ -1903,7 +1905,8 @@ public class RationalAI extends SimpleAI implements AI
                 while (nextMoveIt.hasNext())
                 {
                     String nextLabel = nextMoveIt.next();
-                    MasterHex nextHex = MasterBoard.getHexByLabel(nextLabel);
+                    MasterHex nextHex = getVariantPlayed().getMasterBoard()
+                        .getHexByLabel(nextLabel);
 
                     double nextMoveVal = evaluateMove(legion, nextHex,
                         RECRUIT_AT_7, depth - 1, no_attack);

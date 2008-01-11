@@ -45,8 +45,9 @@ final class Concede extends KDialog implements ActionListener, WindowListener
             + " with Legion "
             + Legion.getLongMarkerName(allyMarkerId)
             + " in "
-            + MasterBoard.getHexByLabel(client.getHexForLegion(allyMarkerId))
-                .getDescription() + "?", false);
+            + client.getGame().getVariant().getMasterBoard().getHexByLabel(
+                client.getHexForLegion(allyMarkerId)).getDescription() + "?",
+            false);
 
         Container contentPane = getContentPane();
         contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));

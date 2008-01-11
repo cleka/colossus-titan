@@ -31,6 +31,7 @@ import javax.swing.JPanel;
 import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.util.ResourceLoader;
 import net.sf.colossus.variant.HazardTerrain;
+import net.sf.colossus.variant.MasterHex;
 import net.sf.colossus.xmlparser.BattlelandLoader;
 import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
@@ -142,7 +143,8 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
 
     MasterHex getMasterHex()
     {
-        return MasterBoard.getHexByLabel(masterHexLabel);
+        return VariantSupport.getCurrentVariant().getMasterBoard()
+            .getHexByLabel(masterHexLabel);
     }
 
     void setupHexes()

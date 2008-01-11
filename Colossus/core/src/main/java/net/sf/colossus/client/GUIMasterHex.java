@@ -24,6 +24,7 @@ import java.util.logging.Logger;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.util.ResourceLoader;
+import net.sf.colossus.variant.MasterHex;
 
 
 /**

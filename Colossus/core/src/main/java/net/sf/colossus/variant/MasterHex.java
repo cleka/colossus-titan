@@ -1,10 +1,12 @@
-package net.sf.colossus.client;
+package net.sf.colossus.variant;
 
 
 import java.awt.Color;
 
+import net.sf.colossus.client.BattleHex;
+import net.sf.colossus.client.Hex;
+import net.sf.colossus.client.HexMap;
 import net.sf.colossus.server.Creature;
-import net.sf.colossus.variant.HazardTerrain;
 import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
 
