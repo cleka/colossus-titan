@@ -1,5 +1,0 @@
-#!/bin/sh
-# Run 6-AI games in a loop forever, looking for hangs.
-while true; 
-    do ./run -i 6 -qO -g -d 1 $1 $2 $3 $4 $5 $6 $7 $8 $9 >> log 2>> log;
-done
