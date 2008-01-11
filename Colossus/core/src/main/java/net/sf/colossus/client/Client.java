@@ -8,6 +8,7 @@ import java.awt.Window;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Enumeration;
@@ -1091,14 +1092,9 @@ public final class Client implements IClient, IOracle, IOptions
         return player;
     }
 
-    public List<String> getPlayerNames()
+    public List<PlayerInfo> getPlayers()
     {
-        List<String> names = new ArrayList<String>();
-        for (PlayerInfo info : playerInfo)
-        {
-            names.add(info.getPlayer().getName());
-        }
-        return names;
+        return Collections.unmodifiableList(Arrays.asList(playerInfo));
     }
 
     // TODO: temporarily, do both hash and loop lookup and compare.
@@ -1126,6 +1122,7 @@ public final class Client implements IClient, IOracle, IOptions
                 return i;
             }
         }
+        assert false : "No player with player name '" + pName + "' found";
         return -1;
     }
 
@@ -1659,6 +1656,8 @@ public final class Client implements IClient, IOracle, IOptions
     public LegionInfo getLegionInfo(String markerId)
     {
         LegionInfo info = legionInfo.get(markerId);
+        assert info != null : "No legion with markerId '" + markerId
+            + "' exists";
         return info;
     }
 
@@ -1829,7 +1828,8 @@ public final class Client implements IClient, IOracle, IOptions
         }
 
         // "Normal" split prediction stuff:
-        String pName = getPlayerByMarkerId(markerId).getPlayer().getName();
+        String pName = getPlayerStateByMarkerId(markerId).getPlayer()
+            .getName();
         if (predictSplits == null || getPredictSplits(pName) == null)
         {
             initPredictSplits(pName, markerId, names);
@@ -2031,11 +2031,13 @@ public final class Client implements IClient, IOracle, IOptions
         String colorName;
         if (inverted)
         {
-            colorName = getColorByMarkerId(defenderMarkerId);
+            PlayerInfo player = (PlayerInfo)getPlayerStateByMarkerId(defenderMarkerId);
+            colorName = player.getColor();
         }
         else
         {
-            colorName = getColorByMarkerId(attackerMarkerId);
+            PlayerInfo player = (PlayerInfo)getPlayerStateByMarkerId(attackerMarkerId);
+            colorName = player.getColor();
         }
         BattleChit chit = new BattleChit(5 * Scale.get(), imageName, inverted,
             tag, hexLabel, colorName, this);
@@ -3941,11 +3943,11 @@ public final class Client implements IClient, IOracle, IOptions
 
         if (chit.isInverted())
         {
-            return getPlayerByMarkerId(defenderMarkerId).getPlayer();
+            return getPlayerStateByMarkerId(defenderMarkerId).getPlayer();
         }
         else
         {
-            return getPlayerByMarkerId(attackerMarkerId).getPlayer();
+            return getPlayerStateByMarkerId(attackerMarkerId).getPlayer();
         }
     }
 
@@ -4748,7 +4750,7 @@ public final class Client implements IClient, IOracle, IOptions
         while (it.hasNext())
         {
             String markerId = it.next();
-            if (player.equals(getPlayerByMarkerId(markerId)))
+            if (player.equals(getPlayerStateByMarkerId(markerId)))
             {
                 markerIds.add(markerId);
             }
@@ -5053,14 +5055,6 @@ public final class Client implements IClient, IOracle, IOptions
         server.doneWithRecruits();
     }
 
-    public PlayerState getPlayerByMarkerId(String markerId)
-    {
-        assert markerId != null : "Parameter must not be null";
-
-        String shortColor = markerId.substring(0, 2);
-        return getActivePlayerStateUsingColor(shortColor);
-    }
-
     public PlayerState getPlayerStateByMarkerId(String markerId)
     {
         assert markerId != null : "Parameter must not be null";
@@ -5102,29 +5096,21 @@ public final class Client implements IClient, IOracle, IOptions
         return null;
     }
 
-    String getColorByMarkerId(String markerId)
-    {
-        PlayerInfo player = (PlayerInfo)getPlayerByMarkerId(markerId);
-        return player.getColor();
-    }
-
     boolean isMyLegion(String markerId)
     {
-        return (player.getName().equals(getPlayerByMarkerId(markerId)
-            .getPlayer().getName()));
+        return player.equals(getPlayerStateByMarkerId(markerId).getPlayer());
     }
 
     boolean isMyTurn()
     {
-        return player.getName().equals(getActivePlayerName());
+        return player.equals(getActivePlayer());
     }
 
     boolean isMyBattlePhase()
     {
         // check also for phase, because delayed callbacks could come
         // after our phase is over but activePlayerName not updated yet
-        return playerAlive
-            && player.getName().equals(getBattleActivePlayerName())
+        return playerAlive && player.equals(getBattleActivePlayer())
             && this.phase == Constants.Phase.FIGHT;
     }
 
@@ -5135,7 +5121,7 @@ public final class Client implements IClient, IOracle, IOptions
 
     int getMulligansLeft()
     {
-        PlayerInfo info = getPlayerInfo(player.getName());
+        PlayerInfo info = getPlayerInfo(player);
         return info.getMulligansLeft();
     }
 

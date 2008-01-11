@@ -17,7 +17,6 @@ import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.sf.colossus.Player;
 import net.sf.colossus.client.BattleChit;
 import net.sf.colossus.client.BattleHex;
 import net.sf.colossus.client.BattleMap;
@@ -1163,17 +1162,16 @@ public class SimpleAI implements AI
         }
 
         // for each enemy player
-        for (String enemyPlayerName : client.getPlayerNames())
+        for (PlayerInfo enemyPlayer : client.getPlayers())
         {
-            PlayerInfo enemyPlayer = client.getPlayerInfo(enemyPlayerName);
             if (enemyPlayer == player)
             {
                 continue;
             }
 
             // for each legion that player controls
-            for (String markerId : client.getLegionsByPlayer(Player
-                .getPlayerByName(enemyPlayerName)))
+            for (String markerId : client.getLegionsByPlayer(enemyPlayer
+                .getPlayer()))
             {
                 LegionInfo legion = client.getLegionInfo(markerId);
 
