@@ -7,10 +7,9 @@ import java.util.List;
 
 /** Perl-style split function.
  * 
- * TODO check if this is obsolete since JDK 1.4 introduced String.split(..)
- *  and document why not if not. 
+ *  Still useful, because String.split works with arrays and 
+ *  regexes, not Lists and plain Strings.
  * 
- *  @version $Id$
  *  @author David Ripton
  */
 
