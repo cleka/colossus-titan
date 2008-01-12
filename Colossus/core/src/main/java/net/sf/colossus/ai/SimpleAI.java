@@ -36,6 +36,7 @@ import net.sf.colossus.util.DevRandom;
 import net.sf.colossus.util.Options;
 import net.sf.colossus.util.PermutationIterator;
 import net.sf.colossus.util.Probs;
+import net.sf.colossus.util.Join;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.HazardTerrain;
 import net.sf.colossus.variant.MasterHex;
@@ -449,14 +450,13 @@ public class SimpleAI implements AI
         String newMarkerId = remainingMarkers.get(0);
         remainingMarkers.remove(0);
 
-        StringBuilder results = new StringBuilder();
         List<Creature> creatures = chooseCreaturesToSplitOut(legion);
+        List<String> creatureNames = new ArrayList<String>();
         for (Creature creature : creatures)
         {
-            results.append(creature.getName());
-            results.append(",");
+            creatureNames.add(creature.getName());
         }
-        results.deleteCharAt(results.length() - 1);
+        String results = Join.join(creatureNames, ",");
         // increment BEFORE calling client 
         // (instead of: return true and caller increments). 
         // Otherwise we might have a race situation, if callback is quicker
@@ -3733,7 +3733,8 @@ public class SimpleAI implements AI
      *  in the legion. */
     class LegionMove
     {
-        private final List<CritterMove> critterMoves = new ArrayList<CritterMove>();
+        private final List<CritterMove> critterMoves = 
+          new ArrayList<CritterMove>();
 
         void add(CritterMove cm)
         {
@@ -3748,15 +3749,12 @@ public class SimpleAI implements AI
         @Override
         public String toString()
         {
-            StringBuilder sb = new StringBuilder();
+            List<String> cmStrings = new ArrayList<String>();
             for (CritterMove cm : critterMoves)
             {
-                sb.append(cm.toString());
-                sb.append(", ");
+                cmStrings.add(cm.toString());
             }
-            sb.deleteCharAt(sb.length() - 1);
-            sb.deleteCharAt(sb.length() - 1);
-            return sb.toString();
+            return Join.join(cmStrings, ", ");
         }
 
         @Override
