@@ -199,7 +199,7 @@ public final class Options implements IOptions
             + Constants.optionsExtension;
     }
 
-    public void loadOptions()
+    synchronized public void loadOptions()
     {
         // Don't load from temporary player names.
         if (owner.startsWith(Constants.byColor)
@@ -225,7 +225,7 @@ public final class Options implements IOptions
         }
     }
 
-    public void saveOptions()
+    synchronized public void saveOptions()
     {
         // Don't save from temporary player names.
         if (owner.startsWith(Constants.byColor)
@@ -261,7 +261,7 @@ public final class Options implements IOptions
         }
     }
 
-    public void setOption(String optname, String value)
+    synchronized public void setOption(String optname, String value)
     {
         String oldValue = getStringOption(optname);
         if (oldValue != value)
@@ -271,7 +271,7 @@ public final class Options implements IOptions
         }
     }
 
-    public void setOption(String optname, boolean value)
+    synchronized public void setOption(String optname, boolean value)
     {
         boolean oldValue = getOption(optname);
         if (oldValue != value)
@@ -281,7 +281,7 @@ public final class Options implements IOptions
         }
     }
 
-    public void setOption(String optname, int value)
+    synchronized public void setOption(String optname, int value)
     {
         int oldValue = getIntOption(optname);
         if (oldValue != value)
@@ -291,19 +291,20 @@ public final class Options implements IOptions
         }
     }
 
-    public String getStringOption(String optname)
+    synchronized public String getStringOption(String optname)
     {
         String value = props.getProperty(optname);
         return value;
     }
 
-    public String getStringOption(String optname, String defaultValue)
+    synchronized public String getStringOption(String optname,
+        String defaultValue)
     {
         String value = props.getProperty(optname, defaultValue);
         return value;
     }
 
-    public boolean getOption(String optname)
+    synchronized public boolean getOption(String optname)
     {
         // return true for all Auto-* options if autoplay is on
         if (optname.startsWith("Auto") && !optname.equals(Options.autoPlay))
@@ -318,7 +319,7 @@ public final class Options implements IOptions
         return (value != null && value.equals("true"));
     }
 
-    public boolean getOption(String optname, boolean defaultValue)
+    synchronized public boolean getOption(String optname, boolean defaultValue)
     {
         String value = getStringOption(optname, (defaultValue ? "true"
             : "false"));
@@ -326,7 +327,7 @@ public final class Options implements IOptions
     }
 
     /** Return -1 if the option's value has not been set. */
-    public int getIntOption(String optname)
+    synchronized public int getIntOption(String optname)
     {
         String buf = getStringOption(optname);
         int value = -1;
@@ -341,20 +342,20 @@ public final class Options implements IOptions
         return value;
     }
 
-    public void removeOption(String optname)
+    synchronized public void removeOption(String optname)
     {
         props.remove(optname);
     }
 
     // we know we didn't mistreat Properties by adding non-Strings
     @SuppressWarnings("unchecked")
-    public Enumeration<String> propertyNames()
+    synchronized public Enumeration<String> propertyNames()
     {
         return (Enumeration<String>)props.propertyNames();
     }
 
     /** Remove all playerName and playerType entries. */
-    public void clearPlayerInfo()
+    synchronized public void clearPlayerInfo()
     {
         Enumeration<String> en = propertyNames();
         while (en.hasMoreElements())
@@ -368,12 +369,12 @@ public final class Options implements IOptions
     }
 
     /** Wipe everything. */
-    public void clear()
+    synchronized public void clear()
     {
         props.clear();
     }
 
-    public boolean isEmpty()
+    synchronized public boolean isEmpty()
     {
         return props.isEmpty();
     }
@@ -385,7 +386,8 @@ public final class Options implements IOptions
     }
 
     // client compares then only numeric modes (easier and faster in runtime)
-    public int getNumberForViewMode(String viewMode)
+    // TODO this one and the next one could be better solved with enums
+    synchronized public int getNumberForViewMode(String viewMode)
     {
         int val = Options.viewableAllNum;
         if (viewMode == null)
@@ -432,7 +434,7 @@ public final class Options implements IOptions
      */
     // client compares then only numeric modes (easier and faster in runtime)
     // ((can use switch case statement))
-    public int getNumberForRecruitChitSelection(String s)
+    synchronized public int getNumberForRecruitChitSelection(String s)
     {
         if (s == null || s.equals(""))
         {
@@ -463,10 +465,10 @@ public final class Options implements IOptions
 
     public static boolean isStresstest()
     {
-        return (System.getProperty(propNameStresstestRounds) != null);
+        return System.getProperty(propNameStresstestRounds) != null;
     }
 
-    public static int getHowManyStresstestRoundsProperty()
+    synchronized public static int getHowManyStresstestRoundsProperty()
     {
         String propHowMany = System.getProperty(propNameStresstestRounds);
         int howMany = 1;
@@ -489,7 +491,7 @@ public final class Options implements IOptions
         return howMany;
     }
 
-    public void addListener(String optname, Listener listener)
+    synchronized public void addListener(String optname, Listener listener)
     {
         List<Listener> optionListeners = getListenersForOption(optname);
         optionListeners.add(listener);
@@ -506,7 +508,7 @@ public final class Options implements IOptions
         return optionListeners;
     }
 
-    public void removeListener(Listener listener)
+    synchronized public void removeListener(Listener listener)
     {
         for (List<Listener> optionListeners : listeners.values())
         {
