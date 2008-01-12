@@ -22,6 +22,9 @@ import net.sf.colossus.util.Predicate;
  * in the {@link Game} class.
  * 
  * Instances of this class are immutable.
+ * 
+ * TODO add access to the markers by having a class for them
+ * TODO same thing for the colors/markersets
  */
 public class Variant
 {
