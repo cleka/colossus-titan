@@ -2,9 +2,11 @@ package net.sf.colossus.client;
 
 
 import java.awt.Cursor;
+import java.awt.Graphics2D;
 import java.awt.GraphicsDevice;
 import java.awt.Point;
 import java.awt.Window;
+import java.awt.geom.AffineTransform;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -19,7 +21,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.Map.Entry;
 import java.util.logging.Level;
@@ -30,6 +31,7 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
+import javax.swing.undo.UndoManager;
 
 import net.sf.colossus.Player;
 import net.sf.colossus.ai.AI;
@@ -64,6 +66,14 @@ import net.sf.colossus.xmlparser.TerrainRecruitLoader;
  *  back and forth between BattleMap (which is really a GUI class) and
  *  this class.
  *  
+ *  TODO there are quite a few spots where the existance of GUI elements
+ *  is checked, e.g. "board == null" or "getPreferredParent() == null".
+ *  Having a GUI class whose GUI may not be initialized seems utterly
+ *  wrong -- it probably relates to the todo above about splitting the
+ *  game logic out. AIs without visible GUI should not use GUI classes.
+ *  And if someone wants to watch AIs play it might be a better idea to
+ *  create a notion of a passive observer of a game.
+ *  
  *  @version $Id$
  *  @author David Ripton
  *  @author Romain Dolbeau
@@ -85,6 +95,8 @@ public final class Client implements IClient, IOracle, IOptions
 
     public boolean failed = false;
 
+    // TODO the naming of these classes is confusing, they should be clearly named
+    // as dialogs
     private MasterBoard board;
     private StatusScreen statusScreen;
     private CreatureCollectionView caretakerDisplay;
@@ -101,8 +113,15 @@ public final class Client implements IClient, IOracle, IOptions
 
     private final List<BattleChit> battleChits = new ArrayList<BattleChit>();
 
-    /** Stack of legion marker ids, to allow multiple levels of undo for
-     *  splits, moves, and recruits. */
+    /** 
+     * Stack of legion marker ids, to allow multiple levels of undo for
+     * splits, moves, and recruits.
+     * 
+     * TODO it would probably be good to have a full Command pattern here, similar
+     * to Swing's {@link UndoManager} stuff. In the GUI client we could/should
+     * probably just use that. A list of objects (which are mostly the string
+     * identifiers of something) isn't that safe.
+     */
     private final LinkedList<Object> undoStack = new LinkedList<Object>();
 
     // Information on the current moving legion.
@@ -139,6 +158,10 @@ public final class Client implements IClient, IOracle, IOptions
     private int numSplitsThisTurn;
 
     // show best potential recruit chit needs exactly "SimpleAI".
+    // TODO this seems to be mixing the AI that actually plays with the AI that is just
+    // used to help the human player. The client should probably know about (a) the player
+    // playing the local game (which can be a human or an AI) and (b) someone to ask for
+    // the hints on screen (which currently would be a SimpleAI)
     private SimpleAI simpleAI;
     private AI ai;
 
@@ -162,14 +185,21 @@ public final class Client implements IClient, IOracle, IOptions
 
     /** One per player. */
     private PlayerInfo[] playerInfo;
-    private Hashtable<String, PlayerInfo> playerInfoByName = new Hashtable<String, PlayerInfo>(
-        12);
+    // TODO in the long run we shouldn't really need a Hashtable here, hopefully not even the
+    // Map anymore. (Note: the core difference between HashMap and Hashtable is that the
+    // latter is synchronized)
+    private Map<String, PlayerInfo> playerInfoByName = new Hashtable<String, PlayerInfo>();
 
     /** One per player. */
     private PredictSplits[] predictSplits;
 
-    /** One LegionInfo per legion, keyed by markerId.  Never null. */
-    private SortedMap<String, LegionInfo> legionInfo = new TreeMap<String, LegionInfo>();
+    /**
+     * One LegionInfo per legion, keyed by markerId.  Never null.
+     * 
+     * TODO does this need to be a TreeMap? Will we need it at all once the model refactoring
+     * is done?
+     */
+    private Map<String, LegionInfo> legionInfo = new TreeMap<String, LegionInfo>();
 
     private int numPlayers;
 
@@ -184,12 +214,17 @@ public final class Client implements IClient, IOracle, IOptions
     private Negotiate negotiate;
     private ReplyToProposal replyToProposal;
 
-    // Constants for closedBy:
-    public static final int notYet = 0;
-    public static final int byServer = 1;
-    public static final int byClient = 2;
-    public static final int byWebClient = 3;
-    public int closedBy = notYet;
+    /**
+     * Constants modeling the party who closed this client.
+     * 
+     * TODO the CLOSED_BY_WEBCLIENT seems unused
+     */
+    private enum ClosedByConstant
+    {
+        NOT_CLOSED, CLOSED_BY_SERVER, CLOSED_BY_CLIENT, CLOSED_BY_WEBCLIENT
+    }
+
+    public ClosedByConstant closedBy = ClosedByConstant.NOT_CLOSED;
 
     // XXX temporary until things are synched
     private boolean tookMulligan;
@@ -200,8 +235,6 @@ public final class Client implements IClient, IOracle, IOptions
     private List<CritterMove> bestMoveOrder = null;
     private List<CritterMove> failedBattleMoves = null;
 
-    // XXX Make private and wrap consistently.
-    boolean showAllRecruitChits = false;
     private final Hashtable<String, Integer> recruitReservations = new Hashtable<String, Integer>();
 
     private LogWindow logWindow;
@@ -417,10 +450,10 @@ public final class Client implements IClient, IOracle, IOptions
         server.fight(land);
     }
 
-    private List<String> _tellEngagementResults_attackerStartingContents = null;
-    private List<String> _tellEngagementResults_defenderStartingContents = null;
-    private List<Boolean> _tellEngagementResults_attackerLegionCertainities = null;
-    private List<Boolean> _tellEngagementResults_defenderLegionCertainities = null;
+    private List<String> tellEngagementResultsAttackerStartingContents = null;
+    private List<String> tellEngagementResultsDefenderStartingContents = null;
+    private List<Boolean> tellEngagementResultsAttackerLegionCertainities = null;
+    private List<Boolean> tellEngagementResultsDefenderLegionCertainities = null;
 
     public void tellEngagement(String hexLabel, String attackerId,
         String defenderId)
@@ -434,25 +467,24 @@ public final class Client implements IClient, IOracle, IOptions
         }
 
         // remember for end of battle.
-        _tellEngagementResults_attackerStartingContents = getLegionImageNames(attackerId);
-        _tellEngagementResults_defenderStartingContents = getLegionImageNames(defenderId);
+        tellEngagementResultsAttackerStartingContents = getLegionImageNames(attackerId);
+        tellEngagementResultsDefenderStartingContents = getLegionImageNames(defenderId);
         // TODO: I have the feeling that getLegionCertainties()
         //   does not work here.
         //   I always seem to get either ALL true or ALL false.
-        _tellEngagementResults_attackerLegionCertainities = getLegionCreatureCertainties(attackerId);
-        _tellEngagementResults_defenderLegionCertainities = getLegionCreatureCertainties(defenderId);
+        tellEngagementResultsAttackerLegionCertainities = getLegionCreatureCertainties(attackerId);
+        tellEngagementResultsDefenderLegionCertainities = getLegionCreatureCertainties(defenderId);
 
         highlightBattleSite();
     }
 
     private JFrame getPreferredParent()
     {
-        JFrame parent = secondaryParent;
-        if ((parent == null) && (board != null))
+        if ((secondaryParent == null) && (board != null))
         {
-            parent = board.getFrame();
+            return board.getFrame();
         }
-        return parent;
+        return secondaryParent;
     }
 
     private void initShowEngagementResults()
@@ -540,10 +572,10 @@ public final class Client implements IClient, IOracle, IOptions
         if (engagementResults != null)
         {
             engagementResults.addData(winnerId, method, points, turns,
-                _tellEngagementResults_attackerStartingContents,
-                _tellEngagementResults_defenderStartingContents,
-                _tellEngagementResults_attackerLegionCertainities,
-                _tellEngagementResults_defenderLegionCertainities, isMyTurn());
+                tellEngagementResultsAttackerStartingContents,
+                tellEngagementResultsDefenderStartingContents,
+                tellEngagementResultsAttackerLegionCertainities,
+                tellEngagementResultsDefenderLegionCertainities, isMyTurn());
         }
     }
 
@@ -655,6 +687,11 @@ public final class Client implements IClient, IOracle, IOptions
         }
     }
 
+    /**
+     * TODO since we are doing Swing nowadays it would probably be much better to replace
+     * all this rescaling code with just using {@link AffineTransform} on the right 
+     * {@link Graphics2D} instances.
+     */
     void rescaleAllWindows()
     {
         clearRecruitChits();
@@ -837,10 +874,6 @@ public final class Client implements IClient, IOracle, IOptions
             {
                 board.repaintAfterOverlayChanged();
             }
-        }
-        else if (optname.equals(Options.showAllRecruitChits))
-        {
-            showAllRecruitChits = bval;
         }
         else if (optname.equals(Options.showRecruitChitsSubmenu))
         {
@@ -1066,6 +1099,8 @@ public final class Client implements IClient, IOracle, IOptions
         setupPlayerLabel();
     }
 
+    // TODO fix this mess with lots of different methods for retrieving Player[Info]s
+    // TODO get rid of anything that uses player names as identifiers -- these can change
     PlayerInfo getPlayerInfo(int playerNum)
     {
         return playerInfo[playerNum];
@@ -1251,7 +1286,7 @@ public final class Client implements IClient, IOracle, IOptions
 
     public void setClosedByServer()
     {
-        closedBy = byServer;
+        closedBy = ClosedByConstant.CLOSED_BY_SERVER;
     }
 
     // called by WebClient
@@ -1311,7 +1346,7 @@ public final class Client implements IClient, IOracle, IOptions
         {
             return;
         }
-        closedBy = byClient;
+        closedBy = ClosedByConstant.CLOSED_BY_CLIENT;
 
         if (sct != null && !sct.isAlreadyDown())
         {
@@ -1405,7 +1440,7 @@ public final class Client implements IClient, IOracle, IOptions
         {
             close = true;
         }
-        else if (closedBy == byServer)
+        else if (closedBy == ClosedByConstant.CLOSED_BY_SERVER)
         {
             if (remote)
             {
@@ -1754,15 +1789,11 @@ public final class Client implements IClient, IOracle, IOptions
         }
         else
         {
-            // LOGGER.log(Level.SEVERE,
-            //    "getLegionCreatureCertainties getLegionInfo for " + 
-            //    markerId + " returned null!");
-
             // TODO: is this the right thing?
-            List<Boolean> l = new ArrayList<Boolean>(42 / 4); // just longer then max
-            for (int idx = 0; idx < (42 / 4); idx++)
+            List<Boolean> l = new ArrayList<Boolean>(10); // just longer then max
+            for (int idx = 0; idx < 10; idx++)
             {
-                l.add(new Boolean(true)); // all true
+                l.add(Boolean.valueOf(true)); // all true
             }
             return l;
         }
@@ -1799,7 +1830,7 @@ public final class Client implements IClient, IOracle, IOptions
         info.removeCreature(name);
         if (height <= 1)
         {
-            // dont remove this, sever will give explicit order to remove it
+            // do not remove this, sever will give explicit order to remove it
             // removeLegion(markerId);
         }
         if (height <= 1 && getTurnNumber() == -1)
@@ -1894,18 +1925,20 @@ public final class Client implements IClient, IOracle, IOptions
         final List<String> names, boolean isAttacker, String reason)
     {
         revealCreatures(markerId, names, reason);
-        // in engagment we need to update the remembered list, too.
+        // in engagement we need to update the remembered list, too.
         if (isAttacker)
         {
-            _tellEngagementResults_attackerStartingContents = getLegionImageNames(markerId);
+            tellEngagementResultsAttackerStartingContents = getLegionImageNames(markerId);
             // towi: should return a list of trues, right?
-            _tellEngagementResults_attackerLegionCertainities = getLegionCreatureCertainties(markerId);
+            // TODO if comment above is right: add assertion
+            tellEngagementResultsAttackerLegionCertainities = getLegionCreatureCertainties(markerId);
         }
         else
         {
-            _tellEngagementResults_defenderStartingContents = getLegionImageNames(markerId);
+            tellEngagementResultsDefenderStartingContents = getLegionImageNames(markerId);
             // towi: should return a list of trues, right?
-            _tellEngagementResults_defenderLegionCertainities = getLegionCreatureCertainties(markerId);
+            // TODO if comment above is right: add assertion
+            tellEngagementResultsDefenderLegionCertainities = getLegionCreatureCertainties(markerId);
         }
 
         if (eventViewer != null)
