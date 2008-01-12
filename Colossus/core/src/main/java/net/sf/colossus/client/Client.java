@@ -136,8 +136,13 @@ public final class Client implements IClient, IOracle, IOptions
     // Per-client and per-player options.
     private final Options options;
 
-    /** Player who owns this client. */
-    private final Player player;
+    /** 
+     * Player who owns this client.
+     * 
+     * TODO should be final but can't be until the constructor gets all the data
+     * needed
+     */
+    private PlayerInfo owningPlayer;
     private boolean playerAlive = true;
 
     /**
@@ -167,12 +172,22 @@ public final class Client implements IClient, IOracle, IOptions
 
     private final CaretakerInfo caretakerInfo;
 
+    /**
+     * This is used as a placeholder for activePlayer and battleActivePlayer since they
+     * are sometimes accessed when they are not available.
+     * 
+     * TODO this is a hack. Those members should just not be accessed at times where they
+     * are not available. It seems to happen during startup (the not yet set case) and in
+     * some GUI parts after battles, when battleActivePlayer has been reset already.
+     */
+    private final PlayerInfo noone;
+
     private int turnNumber = -1;
-    private String activePlayerName = "";
+    private PlayerInfo activePlayer;
     private Constants.Phase phase;
 
     private int battleTurnNumber = -1;
-    private String battleActivePlayerName = null;
+    private PlayerInfo battleActivePlayer;
     private Constants.BattlePhase battlePhase;
     private String attackerMarkerId = "none";
     private String defenderMarkerId = "none";
@@ -184,11 +199,7 @@ public final class Client implements IClient, IOracle, IOptions
     private boolean gameOver;
 
     /** One per player. */
-    private PlayerInfo[] playerInfo;
-    // TODO in the long run we shouldn't really need a Hashtable here, hopefully not even the
-    // Map anymore. (Note: the core difference between HashMap and Hashtable is that the
-    // latter is synchronized)
-    private Map<String, PlayerInfo> playerInfoByName = new Hashtable<String, PlayerInfo>();
+    private PlayerInfo[] playerInfos;
 
     /** One per player. */
     private PredictSplits[] predictSplits;
@@ -259,7 +270,16 @@ public final class Client implements IClient, IOracle, IOptions
         // TODO the caretaker should be attached to the Game class
         this.caretakerInfo = new CaretakerInfo(game);
 
-        this.player = player;
+        // TODO this is currently not set properly straight away, it is fixed in
+        // updatePlayerInfo(..) when the PlayerInfos are initialized. Should really
+        // happen here, but doesn't yet since we don't have all players (not even as
+        // names) yet
+        this.owningPlayer = new PlayerInfo(this, player, 0);
+
+        this.noone = new PlayerInfo(this, Player.getPlayerByName(""), 0);
+        this.activePlayer = noone;
+        this.battleActivePlayer = noone;
+
         this.remote = remote;
         this.startedByWebClient = byWebClient;
         this.threadMgr = new ChildThreadManager("Client " + player.getName());
@@ -513,8 +533,8 @@ public final class Client implements IClient, IOracle, IOptions
         {
             if (autoInspector == null)
             {
-                autoInspector = new AutoInspector(parent, this, player
-                    .getName(), viewMode, getOption(Options.dubiousAsBlanks));
+                autoInspector = new AutoInspector(parent, this, owningPlayer,
+                    viewMode, getOption(Options.dubiousAsBlanks));
             }
         }
         else
@@ -1029,7 +1049,7 @@ public final class Client implements IClient, IOracle, IOptions
     public int getNumLivingPlayers()
     {
         int total = 0;
-        for (PlayerInfo info : playerInfo)
+        for (PlayerInfo info : playerInfos)
         {
             if (!info.isDead())
             {
@@ -1042,20 +1062,26 @@ public final class Client implements IClient, IOracle, IOptions
     public void updatePlayerInfo(List<String> infoStrings)
     {
         numPlayers = infoStrings.size();
-        if (playerInfo == null)
+        if (playerInfos == null)
         {
-            playerInfo = new PlayerInfo[numPlayers];
+            // first time we get the player infos, store them locally and set our
+            // own, too -- which has been a fake until now
+            playerInfos = new PlayerInfo[numPlayers];
             for (int i = 0; i < numPlayers; i++)
             {
                 List<String> data = Split.split(":", infoStrings.get(i));
                 Player player = Player.getPlayerByName(data.get(1));
-                PlayerInfo info = new PlayerInfo(this, player);
-                playerInfo[i] = info;
+                PlayerInfo info = new PlayerInfo(this, player, i);
+                playerInfos[i] = info;
+                if (player.equals(this.owningPlayer.getPlayer()))
+                {
+                    this.owningPlayer = info;
+                }
             }
         }
         for (int i = 0; i < numPlayers; i++)
         {
-            playerInfo[i].update(infoStrings.get(i));
+            playerInfos[i].update(infoStrings.get(i));
         }
         updateStatusScreen();
     }
@@ -1100,65 +1126,32 @@ public final class Client implements IClient, IOracle, IOptions
     }
 
     // TODO fix this mess with lots of different methods for retrieving Player[Info]s
-    // TODO get rid of anything that uses player names as identifiers -- these can change
     PlayerInfo getPlayerInfo(int playerNum)
     {
-        return playerInfo[playerNum];
-    }
-
-    public PlayerInfo getPlayerInfo(String name)
-    {
-        int num = getPlayerNum(name);
-        return (num == -1 ? null : playerInfo[num]);
+        return playerInfos[playerNum];
     }
 
     public PlayerInfo getPlayerInfo(Player player)
     {
-        return getPlayerInfo(player.getName());
+        for (PlayerInfo info : playerInfos)
+        {
+            if (info.getPlayer().equals(player))
+            {
+                return info;
+            }
+        }
+        throw new IllegalArgumentException("No player info found for player '"
+            + player.getName() + "'");
     }
 
-    public PlayerInfo getPlayerInfo()
+    public PlayerInfo getOwningPlayer()
     {
-        return getPlayerInfo(player);
-    }
-
-    public Player getPlayer()
-    {
-        return player;
+        return owningPlayer;
     }
 
     public List<PlayerInfo> getPlayers()
     {
-        return Collections.unmodifiableList(Arrays.asList(playerInfo));
-    }
-
-    // TODO: temporarily, do both hash and loop lookup and compare.
-    // if it turns out that this works reliably, we can change it 
-    // so that it loops only if it does not find it ( = first call?)
-    int getPlayerNum(String pName)
-    {
-        assert pName != null : "Player name must not be null";
-
-        PlayerInfo tryHash = playerInfoByName.get(pName);
-        for (int i = 0; i < playerInfo.length; i++)
-        {
-            if (pName.equals(playerInfo[i].getPlayer().getName()))
-            {
-                if (tryHash == null)
-                {
-                    playerInfoByName.put(pName, playerInfo[i]);
-                }
-                // should never happen... just for to be sure.
-                else if (tryHash != playerInfo[i])
-                {
-                    LOGGER.log(Level.SEVERE,
-                        "Wooooah! Found by hash differs from loop?");
-                }
-                return i;
-            }
-        }
-        assert false : "No player with player name '" + pName + "' found";
-        return -1;
+        return Collections.unmodifiableList(Arrays.asList(playerInfos));
     }
 
     /** Return the average point value of all legions in the game. */
@@ -1413,8 +1406,8 @@ public final class Client implements IClient, IOracle, IOptions
             catch (Exception e)
             {
                 LOGGER.log(Level.SEVERE, "During close in client "
-                    + player.getName() + ": got Exception!!!" + e.toString(),
-                    e);
+                    + owningPlayer.getPlayer().getName()
+                    + ": got Exception!!!" + e.toString(), e);
             }
             ViableEntityManager.unregister(this);
         }
@@ -1546,8 +1539,7 @@ public final class Client implements IClient, IOracle, IOptions
         this.strike = null;
         this.secondaryParent = null;
         this.legionInfo = null;
-        this.playerInfoByName = null;
-        this.playerInfo = null;
+        this.playerInfos = null;
 
         net.sf.colossus.server.CustomRecruitBase.reset();
     }
@@ -1720,7 +1712,7 @@ public final class Client implements IClient, IOracle, IOptions
         // TODO Do for all players
         if (isMyLegion(id))
         {
-            getPlayerInfo().addMarkerAvailable(id);
+            getOwningPlayer().addMarkerAvailable(id);
         }
 
         LegionInfo info = getLegionInfo(id);
@@ -2302,7 +2294,8 @@ public final class Client implements IClient, IOracle, IOptions
 
     public void initBoard()
     {
-        LOGGER.log(Level.FINEST, player.getName() + " Client.initBoard()");
+        LOGGER.log(Level.FINEST, owningPlayer.getPlayer().getName()
+            + " Client.initBoard()");
         if (isRemote())
         {
             VariantSupport.loadVariant(options
@@ -2347,7 +2340,8 @@ public final class Client implements IClient, IOracle, IOptions
         }
 
         if (!getOption(Options.autoPlay)
-            || (forceViewBoard && (player.getName().endsWith("1")
+            || (forceViewBoard && (owningPlayer.getPlayer().getName()
+                .endsWith("1")
                 || getStringOption(Options.playerType).endsWith("Human") || getStringOption(
                 Options.playerType).endsWith("Network"))))
         {
@@ -2379,14 +2373,9 @@ public final class Client implements IClient, IOracle, IOptions
         }
     }
 
-    public String getPlayerName()
-    {
-        return player.getName();
-    }
-
     public void setPlayerName(String playerName)
     {
-        this.player.setName(playerName);
+        this.owningPlayer.getPlayer().setName(playerName);
         // all those just for debugging purposes:
         net.sf.colossus.webcommon.InstanceTracker.setId(this, "Client "
             + playerName);
@@ -2568,7 +2557,7 @@ public final class Client implements IClient, IOracle, IOptions
         // should log them.
         if (getOption(Options.autoPlay))
         {
-            boolean isAI = getPlayerInfo().isAI();
+            boolean isAI = getOwningPlayer().isAI();
             if ((message.equals("Draw") || message.endsWith(" wins")) && !isAI
                 && !getOption(Options.autoQuit))
             {
@@ -2588,11 +2577,13 @@ public final class Client implements IClient, IOracle, IOptions
     }
 
     // TODO Move legion markers to slayer on client side.
+    // TODO parameters should be PlayerState
     public void tellPlayerElim(String deadPlayerName, String slayerName)
     {
-        LOGGER.log(Level.FINEST, this.player.getName() + " tellPlayerElim("
-            + deadPlayerName + ", " + slayerName + ")");
-        PlayerInfo info = getPlayerInfo(deadPlayerName);
+        LOGGER.log(Level.FINEST, this.owningPlayer.getPlayer().getName()
+            + " tellPlayerElim(" + deadPlayerName + ", " + slayerName + ")");
+        Player deadPlayer = Player.getPlayerByName(deadPlayerName);
+        PlayerInfo info = getPlayerInfo(deadPlayer);
 
         if (info != null)
         {
@@ -2603,12 +2594,12 @@ public final class Client implements IClient, IOracle, IOptions
             // already during game start...
             if (predictSplits != null)
             {
-                predictSplits[getPlayerNum(deadPlayerName)] = null;
+                predictSplits[info.getNumber()] = null;
             }
 
         }
 
-        if (this.player.getName().equals(deadPlayerName))
+        if (this.owningPlayer.getPlayer().equals(deadPlayer))
         {
             playerAlive = false;
         }
@@ -2842,15 +2833,15 @@ public final class Client implements IClient, IOracle, IOptions
 
     public void nak(String reason, String errmsg)
     {
-        LOGGER.log(Level.WARNING, player.getName() + " got nak for " + reason
-            + " " + errmsg);
+        LOGGER.log(Level.WARNING, owningPlayer.getPlayer().getName()
+            + " got nak for " + reason + " " + errmsg);
         recoverFromNak(reason, errmsg);
     }
 
     private void recoverFromNak(String reason, String errmsg)
     {
-        LOGGER.log(Level.FINEST, player.getName() + " recoverFromNak "
-            + reason + " " + errmsg);
+        LOGGER.log(Level.FINEST, owningPlayer.getPlayer().getName()
+            + " recoverFromNak " + reason + " " + errmsg);
         if (reason == null)
         {
             LOGGER.log(Level.SEVERE, "recoverFromNak with null reason!");
@@ -2909,8 +2900,8 @@ public final class Client implements IClient, IOracle, IOptions
         }
         else
         {
-            LOGGER.log(Level.WARNING, player.getName() + " unexpected nak "
-                + reason + " " + errmsg);
+            LOGGER.log(Level.WARNING, owningPlayer.getPlayer().getName()
+                + " unexpected nak " + reason + " " + errmsg);
         }
     }
 
@@ -2995,7 +2986,8 @@ public final class Client implements IClient, IOracle, IOptions
 
     public void cleanupBattle()
     {
-        LOGGER.log(Level.FINEST, player.getName() + " Client.cleanupBattle()");
+        LOGGER.log(Level.FINEST, owningPlayer.getPlayer().getName()
+            + " Client.cleanupBattle()");
         if (battleBoard != null)
         {
             battleBoard.dispose();
@@ -3004,7 +2996,7 @@ public final class Client implements IClient, IOracle, IOptions
         battleChits.clear();
         battlePhase = null;
         battleTurnNumber = -1;
-        battleActivePlayerName = null;
+        battleActivePlayer = noone;
     }
 
     public int[] getReinforcementTurns()
@@ -3022,7 +3014,7 @@ public final class Client implements IClient, IOracle, IOptions
     {
         if (board != null)
         {
-            if (getPlayerName().equals(getActivePlayerName()))
+            if (owningPlayer.equals(getActivePlayer()))
             {
                 focusBoard();
             }
@@ -3240,12 +3232,13 @@ public final class Client implements IClient, IOracle, IOptions
      *  active player and turn are usually set. */
     public void setupTurnState(String activePlayerName, int turnNumber)
     {
-        this.activePlayerName = activePlayerName;
+        Player activePlayer = Player.getPlayerByName(activePlayerName);
+        this.activePlayer = getPlayerInfo(activePlayer);
         this.turnNumber = turnNumber;
         if (eventViewer != null)
         {
-            eventViewer.turnOrPlayerChange(this, turnNumber,
-                getPlayerNum(activePlayerName));
+            eventViewer.turnOrPlayerChange(this, turnNumber, this.activePlayer
+                .getNumber());
         }
     }
 
@@ -3287,13 +3280,14 @@ public final class Client implements IClient, IOracle, IOptions
         clearUndoStack();
         cleanupNegotiationDialogs();
 
-        this.activePlayerName = activePlayerName;
+        Player activePlayer = Player.getPlayerByName(activePlayerName);
+        this.activePlayer = getPlayerInfo(activePlayer);
         this.turnNumber = turnNumber;
 
         if (eventViewer != null)
         {
-            eventViewer.turnOrPlayerChange(this, turnNumber,
-                getPlayerNum(activePlayerName));
+            eventViewer.turnOrPlayerChange(this, turnNumber, this.activePlayer
+                .getNumber());
         }
 
         this.phase = Constants.Phase.SPLIT;
@@ -3316,7 +3310,7 @@ public final class Client implements IClient, IOracle, IOptions
                 focusBoard();
                 defaultCursor();
                 if (!getOption(Options.autoSplit)
-                    && (getPlayerInfo().getMarkersAvailable().size() < 1 || findTallLegionHexes(
+                    && (getOwningPlayer().getMarkersAvailable().size() < 1 || findTallLegionHexes(
                         4).isEmpty()))
                 {
                     doneWithSplits();
@@ -3641,27 +3635,23 @@ public final class Client implements IClient, IOracle, IOptions
         return net.sf.colossus.server.Player.getShortColor(player.getColor());
     }
 
-    // public for IOracle
-    public String getBattleActivePlayerName()
+    // TODO this would probably work better as state in PlayerState
+    public PlayerInfo getBattleActivePlayer()
     {
-        return battleActivePlayerName;
+        return battleActivePlayer;
     }
 
-    public Player getBattleActivePlayer()
-    {
-        // TODO this should be the other way around -- the Player should be stored
-        return Player.getPlayerByName(battleActivePlayerName);
-    }
-
+    // TODO set PlayerInfo directly
     void setBattleActivePlayerName(String name)
     {
-        battleActivePlayerName = name;
+
+        this.battleActivePlayer = getPlayerInfo(Player.getPlayerByName(name));
     }
 
     String getBattleActiveMarkerId()
     {
         LegionInfo info = getLegionInfo(defenderMarkerId);
-        if (battleActivePlayerName.equals(info.getPlayerName()))
+        if (battleActivePlayer.equals(info.getPlayer()))
         {
             return defenderMarkerId;
         }
@@ -3674,7 +3664,7 @@ public final class Client implements IClient, IOracle, IOptions
     String getBattleInactiveMarkerId()
     {
         LegionInfo info = getLegionInfo(defenderMarkerId);
-        if (battleActivePlayerName.equals(info.getPlayerName()))
+        if (battleActivePlayer.equals(info.getPlayer()))
         {
             return attackerMarkerId;
         }
@@ -3747,7 +3737,8 @@ public final class Client implements IClient, IOracle, IOptions
 
     private void handleFailedBattleMove()
     {
-        LOGGER.log(Level.FINEST, player.getName() + "handleFailedBattleMove");
+        LOGGER.log(Level.FINEST, owningPlayer.getPlayer().getName()
+            + "handleFailedBattleMove");
         if (bestMoveOrder != null)
         {
             Iterator<CritterMove> it = bestMoveOrder.iterator();
@@ -3874,8 +3865,7 @@ public final class Client implements IClient, IOracle, IOptions
 
     boolean isActive(BattleChit chit)
     {
-        return battleActivePlayerName.equals(getPlayerByTag(chit.getTag())
-            .getName());
+        return battleActivePlayer.equals(getPlayerByTag(chit.getTag()));
     }
 
     /** Return a set of hexLabels. */
@@ -3969,46 +3959,30 @@ public final class Client implements IClient, IOracle, IOptions
         }
     }
 
-    Player getPlayerByTag(int tag)
+    PlayerState getPlayerByTag(int tag)
     {
         BattleChit chit = getBattleChit(tag);
         assert chit != null : "Illegal value for tag parameter";
 
         if (chit.isInverted())
         {
-            return getPlayerStateByMarkerId(defenderMarkerId).getPlayer();
+            return getPlayerStateByMarkerId(defenderMarkerId);
         }
         else
         {
-            return getPlayerStateByMarkerId(attackerMarkerId).getPlayer();
+            return getPlayerStateByMarkerId(attackerMarkerId);
         }
     }
 
     boolean isMyCritter(int tag)
     {
-        return (player.equals(getPlayerByTag(tag)));
+        return (owningPlayer.equals(getPlayerByTag(tag)));
     }
 
-    // public for IOracle
-    public String getActivePlayerName()
+    // TODO active or not would probably work better as state in PlayerState
+    public PlayerState getActivePlayer()
     {
-        return activePlayerName;
-    }
-
-    public Player getActivePlayer()
-    {
-        // TODO the Player instance should be stored instead
-        return Player.getPlayerByName(activePlayerName);
-    }
-
-    public PlayerState getActivePlayerState()
-    {
-        return getPlayerInfo(getActivePlayer());
-    }
-
-    public int getActivePlayerNum()
-    {
-        return getPlayerNum(activePlayerName);
+        return activePlayer;
     }
 
     Constants.Phase getPhase()
@@ -4177,7 +4151,7 @@ public final class Client implements IClient, IOracle, IOptions
         if (!hexLabel.equals(li.getHexLabel()))
         {
             int friendlyLegions = getNumFriendlyLegions(hexLabel,
-                getActivePlayerState());
+                getActivePlayer());
             if (friendlyLegions > 0)
             {
                 return false;
@@ -4296,7 +4270,7 @@ public final class Client implements IClient, IOracle, IOptions
         }
         else
         {
-            LOGGER.log(Level.WARNING, player.getName()
+            LOGGER.log(Level.WARNING, owningPlayer.getPlayer().getName()
                 + " reserveRecruit creature " + recruitName
                 + " not fround from hash, should have been created"
                 + " during getReservedCount!");
@@ -4474,8 +4448,7 @@ public final class Client implements IClient, IOracle, IOptions
         while (it.hasNext())
         {
             LegionInfo info = it.next();
-            if (activePlayerName.equals(info.getPlayerName())
-                && info.canRecruit())
+            if (activePlayer.equals(info.getPlayer()) && info.canRecruit())
             {
                 set.add(info.getHexLabel());
             }
@@ -4490,8 +4463,8 @@ public final class Client implements IClient, IOracle, IOptions
     {
         Set<String> set = new HashSet<String>();
         LegionInfo summonerInfo = getLegionInfo(summonerId);
-        Player player = summonerInfo.getPlayer().getPlayer();
-        Iterator<String> it = getLegionsByPlayer(player).iterator();
+        PlayerInfo player = summonerInfo.getPlayer();
+        Iterator<String> it = player.getLegionIds().iterator();
         while (it.hasNext())
         {
             String markerId = it.next();
@@ -4595,23 +4568,21 @@ public final class Client implements IClient, IOracle, IOptions
      * 
      * TODO this should be replaced with a call to query all legions of the
      * PlayerState instance.
+     * 
+     * TODO the return value should be the LegionInfo objects, not their markerIDs
      */
-    public List<String> getLegionsByPlayer(Player player)
+    public List<String> getLegionsByPlayerState(PlayerState player)
     {
         List<String> markerIds = new ArrayList<String>();
-        Iterator<Map.Entry<String, LegionInfo>> it = legionInfo.entrySet()
-            .iterator();
-        while (it.hasNext())
+        for (LegionInfo info : legionInfo.values())
         {
-            Entry<String, LegionInfo> entry = it.next();
-            LegionInfo info = entry.getValue();
-            if (player.equals(info.getPlayer().getPlayer()))
+            if (player.equals(info.getPlayer()))
             {
                 markerIds.add(info.getMarkerId());
             }
         }
         LOGGER.log(Level.FINER, "Found " + markerIds.size()
-            + " legions for player " + player.getName());
+            + " legions for player " + player.getPlayer().getName());
         return markerIds;
     }
 
@@ -4623,8 +4594,7 @@ public final class Client implements IClient, IOracle, IOptions
         while (it.hasNext())
         {
             LegionInfo info = it.next();
-            if (!info.hasMoved()
-                && getActivePlayerName().equals(info.getPlayerName()))
+            if (!info.hasMoved() && activePlayer.equals(info.getPlayer()))
             {
                 set.add(info.getHexLabel());
             }
@@ -4652,7 +4622,7 @@ public final class Client implements IClient, IOracle, IOptions
             Entry<String, LegionInfo> entry = it.next();
             LegionInfo info = entry.getValue();
             if (info.getHeight() >= minHeight
-                && activePlayerName.equals(info.getPlayerName()))
+                && activePlayer.equals(info.getPlayer()))
             {
                 set.add(info.getHexLabel());
             }
@@ -4674,13 +4644,13 @@ public final class Client implements IClient, IOracle, IOptions
             {
                 String marker0 = markerIds.get(0);
                 LegionInfo info0 = getLegionInfo(marker0);
-                String pName0 = info0.getPlayerName();
+                PlayerState player0 = info0.getPlayer();
 
                 String marker1 = markerIds.get(1);
                 LegionInfo info1 = getLegionInfo(marker1);
-                String pName1 = info1.getPlayerName();
+                PlayerState player1 = info1.getPlayer();
 
-                if (!pName0.equals(pName1))
+                if (!player0.equals(player1))
                 {
                     set.add(hexLabel);
                 }
@@ -4701,17 +4671,18 @@ public final class Client implements IClient, IOracle, IOptions
         {
             String marker0 = markerIds.get(0);
             LegionInfo info0 = getLegionInfo(marker0);
-            String pName0 = info0.getPlayerName();
+            PlayerState player0 = info0.getPlayer();
 
             String marker1 = markerIds.get(1);
             LegionInfo info1 = getLegionInfo(marker1);
-            String pName1 = info1.getPlayerName();
+            PlayerState player1 = info1.getPlayer();
 
-            return !pName0.equals(pName1);
+            return !player0.equals(player1);
         }
         return false;
     }
 
+    // TODO this and similar methods should be on PlayerState class
     List<String> getEnemyLegions(Player player)
     {
         List<String> markerIds = new ArrayList<String>();
@@ -4759,7 +4730,7 @@ public final class Client implements IClient, IOracle, IOptions
         return getEnemyLegions(hexLabel, player).size();
     }
 
-    public List<String> getFriendlyLegions(String pName)
+    public List<String> getFriendlyLegions(PlayerState player)
     {
         List<String> markerIds = new ArrayList<String>();
         Iterator<LegionInfo> it = legionInfo.values().iterator();
@@ -4767,7 +4738,7 @@ public final class Client implements IClient, IOracle, IOptions
         {
             LegionInfo info = it.next();
             String markerId = info.getMarkerId();
-            if (pName.equals(info.getPlayerName()))
+            if (player.equals(info.getPlayer()))
             {
                 markerIds.add(markerId);
             }
@@ -4913,7 +4884,7 @@ public final class Client implements IClient, IOracle, IOptions
     public void undoSplit(String splitoffId)
     {
         server.undoSplit(splitoffId);
-        getPlayerInfo().addMarkerAvailable(splitoffId);
+        getOwningPlayer().addMarkerAvailable(splitoffId);
         numSplitsThisTurn--;
         if (turnNumber == 1 && numSplitsThisTurn == 0)
         {
@@ -5093,16 +5064,16 @@ public final class Client implements IClient, IOracle, IOptions
         assert markerId != null : "Parameter must not be null";
 
         String shortColor = markerId.substring(0, 2);
-        return getActivePlayerStateUsingColor(shortColor);
+        return getPlayerStateUsingColor(shortColor);
     }
 
-    private PlayerState getActivePlayerStateUsingColor(String shortColor)
+    private PlayerState getPlayerStateUsingColor(String shortColor)
     {
-        assert this.playerInfo != null : "Client not yet initialized";
+        assert this.playerInfos != null : "Client not yet initialized";
         assert shortColor != null : "Parameter must not be null";
 
         // Stage 1: See if the player who started with this color is alive.
-        for (PlayerInfo info : playerInfo)
+        for (PlayerInfo info : playerInfos)
         {
             if (shortColor.equals(info.getShortColor()) && !info.isDead())
             {
@@ -5111,7 +5082,7 @@ public final class Client implements IClient, IOracle, IOptions
         }
 
         // Stage 2: He's dead.  Find who killed him and see if he's alive.
-        for (PlayerInfo info : playerInfo)
+        for (PlayerInfo info : playerInfos)
         {
             if (info.getPlayersElim().indexOf(shortColor) != -1)
             {
@@ -5122,7 +5093,7 @@ public final class Client implements IClient, IOracle, IOptions
                 }
                 else
                 {
-                    return getActivePlayerStateUsingColor(info.getShortColor());
+                    return getPlayerStateUsingColor(info.getShortColor());
                 }
             }
         }
@@ -5131,19 +5102,19 @@ public final class Client implements IClient, IOracle, IOptions
 
     boolean isMyLegion(String markerId)
     {
-        return player.equals(getPlayerStateByMarkerId(markerId).getPlayer());
+        return owningPlayer.equals(getPlayerStateByMarkerId(markerId));
     }
 
     boolean isMyTurn()
     {
-        return player.equals(getActivePlayer());
+        return owningPlayer.equals(getActivePlayer());
     }
 
     boolean isMyBattlePhase()
     {
         // check also for phase, because delayed callbacks could come
         // after our phase is over but activePlayerName not updated yet
-        return playerAlive && player.equals(getBattleActivePlayer())
+        return playerAlive && owningPlayer.equals(getBattleActivePlayer())
             && this.phase == Constants.Phase.FIGHT;
     }
 
@@ -5152,10 +5123,10 @@ public final class Client implements IClient, IOracle, IOptions
         return movementRoll;
     }
 
+    // TODO inline
     int getMulligansLeft()
     {
-        PlayerInfo info = getPlayerInfo(player);
-        return info.getMulligansLeft();
+        return owningPlayer.getMulligansLeft();
     }
 
     void doSplit(String parentId)
@@ -5176,7 +5147,7 @@ public final class Client implements IClient, IOracle, IOptions
             kickSplit();
             return;
         }
-        Set<String> markersAvailable = getPlayerInfo().getMarkersAvailable();
+        Set<String> markersAvailable = getOwningPlayer().getMarkersAvailable();
         // Need a legion marker to split.
         if (markersAvailable.size() < 1)
         {
@@ -5208,8 +5179,8 @@ public final class Client implements IClient, IOracle, IOptions
         }
         else
         {
-            new PickMarker(board.getFrame(), player.getName(),
-                markersAvailable, this);
+            new PickMarker(board.getFrame(), owningPlayer, markersAvailable,
+                this);
         }
     }
 
@@ -5271,7 +5242,7 @@ public final class Client implements IClient, IOracle, IOptions
         {
             clearRecruitChits();
             pushUndoStack(childId);
-            getPlayerInfo().removeMarkerAvailable(childId);
+            getOwningPlayer().removeMarkerAvailable(childId);
         }
 
         numSplitsThisTurn++;
@@ -5321,8 +5292,8 @@ public final class Client implements IClient, IOracle, IOptions
         {
             do
             {
-                color = PickColor.pickColor(board.getFrame(),
-                    player.getName(), colorsLeft, this);
+                color = PickColor.pickColor(board.getFrame(), owningPlayer
+                    .getPlayer().getName(), colorsLeft, this);
             }
             while (color == null);
         }
@@ -5334,7 +5305,7 @@ public final class Client implements IClient, IOracle, IOptions
 
     public void askPickFirstMarker()
     {
-        Set<String> markersAvailable = getPlayerInfo().getMarkersAvailable();
+        Set<String> markersAvailable = getOwningPlayer().getMarkersAvailable();
         if (getOption(Options.autoPickMarker))
         {
             String markerId = ai.pickMarker(markersAvailable, getShortColor());
@@ -5342,8 +5313,8 @@ public final class Client implements IClient, IOracle, IOptions
         }
         else
         {
-            new PickMarker(board.getFrame(), player.getName(),
-                markersAvailable, this);
+            new PickMarker(board.getFrame(), owningPlayer, markersAvailable,
+                this);
         }
     }
 
@@ -5464,8 +5435,9 @@ public final class Client implements IClient, IOracle, IOptions
             if (!(ai.getClass().getName().equals(type)))
             {
                 LOGGER.log(Level.FINEST, "need to change type");
-                LOGGER.log(Level.INFO, "Changing client " + player.getName()
-                    + " from " + ai.getClass().getName() + " to " + type);
+                LOGGER.log(Level.INFO, "Changing client "
+                    + owningPlayer.getPlayer().getName() + " from "
+                    + ai.getClass().getName() + " to " + type);
                 try
                 {
                     // TODO these seem to be classes of either AI or Client, there
@@ -5481,7 +5453,7 @@ public final class Client implements IClient, IOracle, IOptions
                 catch (Exception ex)
                 {
                     LOGGER.log(Level.SEVERE, "Failed to change client "
-                        + player.getName() + " from "
+                        + owningPlayer.getPlayer().getName() + " from "
                         + ai.getClass().getName() + " to " + type, ex);
                 }
             }
@@ -5555,7 +5527,8 @@ public final class Client implements IClient, IOracle, IOptions
         {
             predictSplits = new PredictSplits[numPlayers];
         }
-        int playerNum = getPlayerNum(pName);
+        Player player = Player.getPlayerByName(pName);
+        int playerNum = getPlayerInfo(player).getNumber();
         predictSplits[playerNum] = new PredictSplits(rootMarkerId,
             creatureNames);
     }
@@ -5564,10 +5537,14 @@ public final class Client implements IClient, IOracle, IOptions
     {
         try
         {
-            return predictSplits[getPlayerNum(pName)];
+            Player player = Player.getPlayerByName(pName);
+            int playerNum = getPlayerInfo(player).getNumber();
+            return predictSplits[playerNum];
         }
         catch (NullPointerException ex)
         {
+            // TODO why do we ignore an NPE here? Shouldn't we at least have a log message and/or
+            // an "assert false" here?
             return null;
         }
     }

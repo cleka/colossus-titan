@@ -54,6 +54,7 @@ import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 
+import net.sf.colossus.game.PlayerState;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.XMLSnapshotFilter;
 import net.sf.colossus.util.ArrayHelper;
@@ -182,7 +183,7 @@ public final class MasterBoard extends JPanel
             super();
             this.clientRef = new WeakReference<Client>(client);
             net.sf.colossus.webcommon.InstanceTracker.register(this, client
-                .getPlayerName());
+                .getOwningPlayer().getPlayer().getName());
         }
 
         @Override
@@ -240,7 +241,7 @@ public final class MasterBoard extends JPanel
                     .getOption(Options.dubiousAsBlanks);
                 final JPanel panel = new LegionInfoPanel(legion, scale,
                     PANEL_MARGIN, PANEL_PADDING, true, client.getViewMode(),
-                    client.getPlayerName(), dubiousAsBlanks, true);
+                    client.getActivePlayer(), dubiousAsBlanks, true);
                 add(panel);
                 legionFlyouts[i] = panel;
 
@@ -279,9 +280,9 @@ public final class MasterBoard extends JPanel
     {
         this.client = client;
         net.sf.colossus.webcommon.InstanceTracker.register(this, client
-            .getPlayerName());
+            .getOwningPlayer().getPlayer().getName());
 
-        String pname = client.getPlayerName();
+        String pname = client.getOwningPlayer().getPlayer().getName();
         if (pname == null)
         {
             pname = "unknown";
@@ -903,7 +904,7 @@ public final class MasterBoard extends JPanel
         {
             return;
         }
-        String playerName = client.getPlayerName();
+        String playerName = client.getOwningPlayer().getPlayer().getName();
         cachedPlayerName = playerName;
         if (bottomBar == null)
         {
@@ -987,14 +988,14 @@ public final class MasterBoard extends JPanel
         unselectAllHexes();
         reqFocus();
 
-        String activePlayerName = client.getActivePlayerName();
+        PlayerState activePlayer = client.getActivePlayer();
 
-        masterFrame.setTitle(activePlayerName + " Turn "
+        masterFrame.setTitle(activePlayer.getPlayer().getName() + " Turn "
             + client.getTurnNumber() + " : Split stacks");
 
         phaseMenu.removeAll();
 
-        if (client.getPlayerName().equals(activePlayerName))
+        if (client.getOwningPlayer().equals(activePlayer))
         {
             bottomBar.setPhase("Split stacks");
             enableDoneAction();
@@ -1032,7 +1033,8 @@ public final class MasterBoard extends JPanel
         }
         else
         {
-            bottomBar.setPhase("(" + activePlayerName + " splits)");
+            bottomBar.setPhase("(" + activePlayer.getPlayer().getName()
+                + " splits)");
         }
     }
 
@@ -1041,14 +1043,15 @@ public final class MasterBoard extends JPanel
         unselectAllHexes();
         reqFocus();
 
-        String activePlayerName = client.getActivePlayerName();
+        PlayerState activePlayer = client.getActivePlayer();
+        String activePlayerName = activePlayer.getPlayer().getName();
         masterFrame.setTitle(activePlayerName + " Turn "
             + client.getTurnNumber() + " : Movement Roll: "
             + client.getMovementRoll());
 
         phaseMenu.removeAll();
 
-        if (client.getPlayerName().equals(activePlayerName))
+        if (client.getOwningPlayer().equals(activePlayer))
         {
             bottomBar.setPhase("Movement");
 
@@ -1107,14 +1110,15 @@ public final class MasterBoard extends JPanel
         unselectAllHexes();
         reqFocus();
 
-        String activePlayerName = client.getActivePlayerName();
+        PlayerState activePlayer = client.getActivePlayer();
+        String activePlayerName = activePlayer.getPlayer().getName();
 
         masterFrame.setTitle(activePlayerName + " Turn "
             + client.getTurnNumber() + " : Resolve Engagements ");
 
         phaseMenu.removeAll();
 
-        if (client.getPlayerName().equals(activePlayerName))
+        if (client.getOwningPlayer().equals(activePlayer))
         {
             bottomBar.setPhase("Resolve Engagements");
 
@@ -1152,14 +1156,15 @@ public final class MasterBoard extends JPanel
         unselectAllHexes();
         reqFocus();
 
-        String activePlayerName = client.getActivePlayerName();
+        PlayerState activePlayer = client.getActivePlayer();
+        String activePlayerName = activePlayer.getPlayer().getName();
 
         masterFrame.setTitle(activePlayerName + " Turn "
             + client.getTurnNumber() + " : Muster Recruits ");
 
         phaseMenu.removeAll();
 
-        if (client.getPlayerName().equals(activePlayerName))
+        if (client.getOwningPlayer().equals(activePlayer))
         {
             bottomBar.setPhase("Muster Recruits");
             enableDoneAction();
@@ -1629,12 +1634,12 @@ public final class MasterBoard extends JPanel
                 if (isPopupButton(e))
                 {
                     LegionInfo legion = client.getLegionInfo(markerId);
-                    String playerName = client.getPlayerName();
                     int viewMode = client.getViewMode();
                     boolean dubiousAsBlanks = client
                         .getOption(Options.dubiousAsBlanks);
                     new ShowLegion(masterFrame, legion, point, scrollPane,
-                        4 * Scale.get(), playerName, viewMode, dubiousAsBlanks);
+                        4 * Scale.get(), client.getActivePlayer(),
+                        viewMode, dubiousAsBlanks);
                     return;
                 }
                 else if (client.isMyLegion(markerId))
@@ -1667,8 +1672,8 @@ public final class MasterBoard extends JPanel
 
                 // Otherwise, the action to take depends on the phase.
                 // Only the current player can manipulate game state.
-                if (client.getPlayerName()
-                    .equals(client.getActivePlayerName()))
+                if (client.getOwningPlayer().equals(
+                    client.getActivePlayer()))
                 {
                     actOnHex(hex.getMasterHexModel().getLabel());
                     hex.repaint();
@@ -1677,7 +1682,7 @@ public final class MasterBoard extends JPanel
             }
 
             // No hits on chits or map, so re-highlight.
-            if (client.getPlayerName().equals(client.getActivePlayerName()))
+            if (client.getOwningPlayer().equals(client.getActivePlayer()))
             {
                 actOnMisclick();
             }

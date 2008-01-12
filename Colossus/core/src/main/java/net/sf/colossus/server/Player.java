@@ -56,7 +56,8 @@ public final class Player extends PlayerState implements Comparable<Player>
 
     Player(String name, Game game)
     {
-        super(game, net.sf.colossus.Player.getPlayerByName(name));
+        // TODO why are the players on the client side numbered but not here?
+        super(game, net.sf.colossus.Player.getPlayerByName(name), 0);
         type = Constants.human;
 
         net.sf.colossus.webcommon.InstanceTracker.register(this, name);

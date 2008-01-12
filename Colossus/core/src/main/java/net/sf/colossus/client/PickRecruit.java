@@ -46,8 +46,8 @@ final class PickRecruit extends KDialog implements MouseListener,
     private PickRecruit(JFrame parentFrame, List<CreatureType> recruits,
         String hexDescription, String markerId, Client client)
     {
-        super(parentFrame, client.getPlayerName() + ": Pick Recruit in "
-            + hexDescription, true);
+        super(parentFrame, client.getOwningPlayer().getPlayer().getName()
+            + ": Pick Recruit in " + hexDescription, true);
 
         this.recruits = recruits;
 

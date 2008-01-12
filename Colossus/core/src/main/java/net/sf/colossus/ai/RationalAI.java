@@ -62,12 +62,12 @@ public class RationalAI extends SimpleAI
     public boolean split()
     {
         // Refresh these once per turn.
-        enemyAttackMap = buildEnemyAttackMap(client.getPlayerInfo());
+        enemyAttackMap = buildEnemyAttackMap(client.getOwningPlayer());
         evaluateMoveMap.clear();
 
         legionsToSplit.clear();
 
-        PlayerInfo player = client.getPlayerInfo();
+        PlayerInfo player = client.getOwningPlayer();
         Iterator<String> it = player.getLegionIds().iterator();
         while (it.hasNext())
         {
@@ -83,7 +83,7 @@ public class RationalAI extends SimpleAI
         logger.log(Level.FINEST, "RationalAI.fireSplits " + legionsToSplit);
 
         //safe to cache the player out of the loop, ref to mutable object
-        PlayerInfo player = client.getPlayerInfo();
+        PlayerInfo player = client.getOwningPlayer();
 
         while (!legionsToSplit.isEmpty())
         {
@@ -411,7 +411,7 @@ public class RationalAI extends SimpleAI
             }
 
             // should work with all variants
-            int currentScore = legion.getPlayerInfo().getScore();
+            int currentScore = legion.getPlayer().getScore();
             int arv = TerrainRecruitLoader.getAcquirableRecruitmentsValue();
             int nextScore = ((currentScore / arv) + 1) * arv;
 
@@ -714,13 +714,13 @@ public class RationalAI extends SimpleAI
     public boolean masterMove()
     {
         logger.log(Level.FINEST, "This is RationalAI.");
-        PlayerInfo playerInfo = client.getPlayerInfo();
+        PlayerInfo playerInfo = client.getOwningPlayer();
 
         if (enemyAttackMap == null)
         {
             // special code to allow game to reload prperly if saved
             // during AI move
-            enemyAttackMap = buildEnemyAttackMap(client.getPlayerInfo());
+            enemyAttackMap = buildEnemyAttackMap(client.getOwningPlayer());
         }
 
         // consider mulligans
@@ -1618,7 +1618,7 @@ public class RationalAI extends SimpleAI
 
     int evaluateCombat(LegionInfo attacker, LegionInfo defender, MasterHex hex)
     {
-        if (attacker.getPlayerName().equals(defender.getPlayerName()))
+        if (attacker.getPlayer().equals(defender.getPlayer()))
         {
             return 0;
         }
@@ -1725,7 +1725,7 @@ public class RationalAI extends SimpleAI
 
         // apply penalty to attacks if we have few legions
         // Don't reward titan attacks with few stacks
-        int attackerLegions = attacker.getPlayerInfo().getNumLegions();
+        int attackerLegions = attacker.getPlayer().getNumLegions();
         if (attackerLegions < 5 && !I_HATE_HUMANS)
         {
             return value - (result.getAttackerDead() / attackerPointValue)
@@ -1935,7 +1935,7 @@ public class RationalAI extends SimpleAI
 
     boolean isHumanLegion(LegionInfo legion)
     {
-        return !legion.getPlayerInfo().isAI();
+        return !legion.getPlayer().isAI();
     }
 
     static class BattleResults
@@ -2332,7 +2332,7 @@ public class RationalAI extends SimpleAI
             deniedMuster = bestRecruit.getPointValue();
         }
 
-        int currentScore = enemy.getPlayerInfo().getScore();
+        int currentScore = enemy.getPlayer().getScore();
         int pointValue = legion.getPointValue();
         boolean canAcquireAngel = ((currentScore + pointValue)
             / TerrainRecruitLoader.getAcquirableRecruitmentsValue() > (currentScore / TerrainRecruitLoader
@@ -2432,7 +2432,7 @@ public class RationalAI extends SimpleAI
         if (br.getDefenderDead() < enemy.getPointValue() * 2 / 7
             && height >= 6)
         {
-            int currentScore = enemy.getPlayerInfo().getScore();
+            int currentScore = enemy.getPlayer().getScore();
             int pointValue = legion.getPointValue();
             boolean canAcquireAngel = ((currentScore + pointValue)
                 / TerrainRecruitLoader.getAcquirableRecruitmentsValue() > (currentScore / TerrainRecruitLoader
@@ -2466,7 +2466,7 @@ public class RationalAI extends SimpleAI
             if (name.startsWith(Constants.titan))
             {
                 PowerSkill ps;
-                int titanPower = legion.getPlayerInfo().getTitanPower();
+                int titanPower = legion.getPlayer().getTitanPower();
 
                 // Assume that Titans
                 // take only a minimal part in the combat.

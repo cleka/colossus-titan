@@ -11,6 +11,7 @@ import javax.swing.Box;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import net.sf.colossus.game.PlayerState;
 import net.sf.colossus.util.HTMLColor;
 import net.sf.colossus.util.Options;
 
@@ -27,8 +28,9 @@ public final class LegionInfoPanel extends JPanel
     private String valueText = "";
 
     public LegionInfoPanel(LegionInfo legion, int scale, int margin,
-        int padding, boolean usePlayerColor, int viewMode, String playerName,
-        boolean dubiousAsBlanks, boolean showLegionValue)
+        int padding, boolean usePlayerColor, int viewMode,
+        PlayerState activePlayer, boolean dubiousAsBlanks,
+        boolean showLegionValue)
     {
         boolean contentCertain = false;
         boolean hideAll = false;
@@ -41,8 +43,8 @@ public final class LegionInfoPanel extends JPanel
         }
         else if (viewMode == Options.viewableOwnNum)
         {
-            String legionOwner = legion.getPlayerName();
-            if (playerName.equals(legionOwner))
+            PlayerState legionOwner = legion.getPlayer();
+            if (activePlayer.equals(legionOwner))
             {
                 contentCertain = true;
                 viewAll(legion, usePlayerColor, scale, margin, padding,
@@ -125,7 +127,7 @@ public final class LegionInfoPanel extends JPanel
 
         if (usePlayerColor)
         {
-            Color playerColor = HTMLColor.stringToColor(legion.getPlayerInfo()
+            Color playerColor = HTMLColor.stringToColor(legion.getPlayer()
                 .getColor()
                 + "Colossus");
             setBackground(playerColor);

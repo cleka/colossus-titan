@@ -129,7 +129,7 @@ public class SimpleAI implements AI
         this.client = client;
         // initialize the creature info needed by the AI
         net.sf.colossus.webcommon.InstanceTracker.register(this, client
-            .getPlayerName());
+            .getOwningPlayer().getPlayer().getName());
     }
 
     public String pickColor(List<String> colors, List<String> favoriteColors)
@@ -231,7 +231,7 @@ public class SimpleAI implements AI
         double scoobySnackFactor = 0.15;
         int minimumSizeToRecruit = (int)(scoobySnackFactor * client
             .getAverageLegionPointValue());
-        List<String> markerIds = client.getLegionsByPlayer(client.getPlayer());
+        List<String> markerIds = client.getOwningPlayer().getLegionIds();
         for (String markerId : markerIds)
         {
             LegionInfo legion = client.getLegionInfo(markerId);
@@ -308,7 +308,7 @@ public class SimpleAI implements AI
 
     public boolean split()
     {
-        PlayerInfo playerInfo = client.getPlayerInfo();
+        PlayerInfo playerInfo = client.getOwningPlayer();
         remainingMarkers = prepareMarkers(playerInfo.getMarkersAvailable(),
             playerInfo.getShortColor());
 
@@ -499,7 +499,7 @@ public class SimpleAI implements AI
             }
 
             // should work with all variants
-            int currentScore = legion.getPlayerInfo().getScore();
+            int currentScore = legion.getPlayer().getScore();
             int arv = TerrainRecruitLoader.getAcquirableRecruitmentsValue();
             int nextScore = ((currentScore / arv) + 1) * arv;
 
@@ -859,7 +859,7 @@ public class SimpleAI implements AI
     {
         boolean moved = false;
 
-        PlayerInfo playerInfo = client.getPlayerInfo();
+        PlayerInfo playerInfo = client.getOwningPlayer();
 
         // consider mulligans
         if (handleMulligans(playerInfo))
@@ -1170,8 +1170,7 @@ public class SimpleAI implements AI
             }
 
             // for each legion that player controls
-            for (String markerId : client.getLegionsByPlayer(enemyPlayer
-                .getPlayer()))
+            for (String markerId : client.getLegionsByPlayerState(enemyPlayer))
             {
                 LegionInfo legion = client.getLegionInfo(markerId);
 
@@ -1184,7 +1183,7 @@ public class SimpleAI implements AI
                     // Only allow Titan teleport
                     // Remember, tower teleports cannot attack
                     if (legion.hasTitan()
-                        && legion.getPlayerInfo().canTitanTeleport()
+                        && legion.getPlayer().canTitanTeleport()
                         && client.getMovement().titanTeleportAllowed())
                     {
                         set = client.getMovement().listAllMoves(legion,
@@ -1280,7 +1279,7 @@ public class SimpleAI implements AI
                         + " and WIN_WITH_HEAVY_LOSSES");
                     // don't do this with our titan unless we can win the game
                     boolean haveOtherSummonables = false;
-                    PlayerInfo player = legion.getPlayerInfo();
+                    PlayerInfo player = legion.getPlayer();
                     List<String> markerIds = player.getLegionIds();
                     for (String markerId : markerIds)
                     {
@@ -1790,7 +1789,7 @@ public class SimpleAI implements AI
         public boolean otherFriendlyStackHasCreature(List<String> allNames)
         {
             List<String> all = client.getFriendlyLegions(client
-                .getPlayerName());
+                .getOwningPlayer());
 
             for (String markerId : all)
             {
@@ -1842,7 +1841,7 @@ public class SimpleAI implements AI
         {
             if (enemyAttackMap == null)
             {
-                enemyAttackMap = buildEnemyAttackMap(client.getPlayerInfo());
+                enemyAttackMap = buildEnemyAttackMap(client.getOwningPlayer());
             }
             int worst = 0;
             for (int i = 1; i < 6; i++)
@@ -1988,7 +1987,7 @@ public class SimpleAI implements AI
         //    that could recruit later this turn) and push them
         //    over 100-point boundaries.
 
-        PlayerState player = client.getActivePlayerState();
+        PlayerState player = client.getActivePlayer();
         LegionInfo attacker = client.getLegionInfo(client
             .getFirstFriendlyLegion(hexLabel, player));
         LegionInfo defender = client.getLegionInfo(client.getFirstEnemyLegion(
@@ -2138,7 +2137,7 @@ public class SimpleAI implements AI
             terrain)
             && height >= 6)
         {
-            int currentScore = enemy.getPlayerInfo().getScore();
+            int currentScore = enemy.getPlayer().getScore();
             int pointValue = legion.getPointValue();
             boolean canAcquireAngel = ((currentScore + pointValue)
                 / TerrainRecruitLoader.getAcquirableRecruitmentsValue() > (currentScore / TerrainRecruitLoader
@@ -2520,8 +2519,7 @@ public class SimpleAI implements AI
         {
             if (name.startsWith(Constants.titan))
             {
-                val += getTitanCombatValue(legion.getPlayerInfo()
-                    .getTitanPower());
+                val += getTitanCombatValue(legion.getPlayer().getTitanPower());
             }
             else
             {
@@ -3722,7 +3720,7 @@ public class SimpleAI implements AI
         {
             return creature.getHintedRecruitmentValue(section);
         }
-        PlayerInfo player = legion.getPlayerInfo();
+        PlayerInfo player = legion.getPlayer();
         int power = player.getTitanPower();
         int skill = creature.getSkill();
         return power

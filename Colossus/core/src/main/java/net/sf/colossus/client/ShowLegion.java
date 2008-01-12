@@ -11,6 +11,7 @@ import java.awt.event.WindowListener;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 
+import net.sf.colossus.game.PlayerState;
 import net.sf.colossus.util.KDialog;
 
 
@@ -24,7 +25,7 @@ final class ShowLegion extends KDialog implements MouseListener,
     WindowListener
 {
     ShowLegion(JFrame parentFrame, LegionInfo legion, Point point,
-        JScrollPane pane, int scale, String playerName, int viewMode,
+        JScrollPane pane, int scale, PlayerState activePlayer, int viewMode,
         boolean dubiousAsBlanks)
     {
         super(parentFrame, legion.getMarkerId(), false);
@@ -39,12 +40,12 @@ final class ShowLegion extends KDialog implements MouseListener,
         addWindowListener(this);
 
         LegionInfoPanel liPanel = new LegionInfoPanel(legion, scale, 5, 2,
-            false, viewMode, playerName, dubiousAsBlanks, false);
+            false, viewMode, activePlayer, dubiousAsBlanks, false);
         getContentPane().add(liPanel);
 
         String valueText = liPanel.getValueText();
         String ownerText = legion.isMyLegion() ? "" : " ["
-            + legion.getPlayerName() + "]";
+            + legion.getPlayer().getPlayer().getName() + "]";
 
         setTitle(legion.getMarkerId() + valueText + ownerText);
         liPanel = null;

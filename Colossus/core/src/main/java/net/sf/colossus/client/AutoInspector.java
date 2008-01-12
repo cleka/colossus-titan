@@ -16,6 +16,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.WindowConstants;
 
+import net.sf.colossus.game.PlayerState;
 import net.sf.colossus.util.KDialog;
 import net.sf.colossus.util.Options;
 import net.sf.colossus.variant.MasterHex;
@@ -29,19 +30,19 @@ public class AutoInspector extends KDialog
 
     private final JScrollPane scrollPane;
 
-    private final String playerName;
+    private final PlayerState owner;
 
     private final int viewMode;
 
     private boolean dubiousAsBlanks;
 
-    public AutoInspector(JFrame frame, IOptions options, String playerName,
+    public AutoInspector(JFrame frame, IOptions options, PlayerState owner,
         int viewMode, boolean dubiousAsBlanks)
     {
         super(frame, "Inspector", false);
 
         this.options = options;
-        this.playerName = playerName;
+        this.owner = owner;
         this.viewMode = viewMode;
         this.dubiousAsBlanks = dubiousAsBlanks;
 
@@ -91,11 +92,11 @@ public class AutoInspector extends KDialog
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
         LegionInfoPanel liPanel = new LegionInfoPanel(legion, 4 * Scale.get(),
-            5, 2, false, viewMode, playerName, dubiousAsBlanks, false);
+            5, 2, false, viewMode, owner, dubiousAsBlanks, false);
         panel.add(liPanel);
         String valueText = liPanel.getValueText();
         String ownerText = legion.isMyLegion() ? "" : " ["
-            + legion.getPlayerName() + "]";
+            + legion.getPlayer().getPlayer().getName() + "]";
         setTitle("Inspector: Legion " + legion.getMarkerId() + valueText
             + ownerText);
         liPanel = null;

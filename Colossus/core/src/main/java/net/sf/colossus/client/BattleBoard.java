@@ -129,7 +129,8 @@ public final class BattleBoard extends KFrame
             public void mousePressed(MouseEvent e)
             {
                 // Only the active player can click on stuff.
-                if (!client.getPlayer().equals(client.getBattleActivePlayer()))
+                if (!client.getOwningPlayer().equals(
+                    client.getBattleActivePlayer()))
                 {
                     return;
                 }
@@ -180,13 +181,14 @@ public final class BattleBoard extends KFrame
         battleDice = new BattleDice();
         getContentPane().add(battleDice, BorderLayout.SOUTH);
 
-        setTitle(client.getPlayerName() + ": "
+        setTitle(client.getOwningPlayer().getPlayer().getName() + ": "
             + Legion.getMarkerName(attackerMarkerId) + " (" + attackerMarkerId
             + ") attacks " + Legion.getMarkerName(defenderMarkerId) + " ("
             + defenderMarkerId + ") in " + masterHexLabel);
 
-        String instanceId = client.getPlayerName() + ": " + attackerMarkerId
-            + "/" + defenderMarkerId + " (" + count + ")";
+        String instanceId = client.getOwningPlayer().getPlayer().getName()
+            + ": " + attackerMarkerId + "/" + defenderMarkerId + " (" + count
+            + ")";
         count++;
         net.sf.colossus.webcommon.InstanceTracker.setId(this, instanceId);
 
@@ -205,8 +207,8 @@ public final class BattleBoard extends KFrame
         {
             public void actionPerformed(ActionEvent e)
             {
-                if (!client.getPlayerName().equals(
-                    client.getBattleActivePlayerName()))
+                if (!client.getOwningPlayer().equals(
+                    client.getBattleActivePlayer()))
                 {
                     return;
                 }
@@ -223,8 +225,8 @@ public final class BattleBoard extends KFrame
         {
             public void actionPerformed(ActionEvent e)
             {
-                if (!client.getPlayerName().equals(
-                    client.getBattleActivePlayerName()))
+                if (!client.getOwningPlayer().equals(
+                    client.getBattleActivePlayer()))
                 {
                     return;
                 }
@@ -241,8 +243,8 @@ public final class BattleBoard extends KFrame
         {
             public void actionPerformed(ActionEvent e)
             {
-                if (!client.getPlayerName().equals(
-                    client.getBattleActivePlayerName()))
+                if (!client.getOwningPlayer().equals(
+                    client.getBattleActivePlayer()))
                 {
                     return;
                 }
@@ -283,7 +285,8 @@ public final class BattleBoard extends KFrame
 
                 if (answer == JOptionPane.YES_OPTION)
                 {
-                    String playerName = client.getPlayerName();
+                    String playerName = client.getOwningPlayer().getPlayer()
+                        .getName();
                     LOGGER
                         .log(Level.INFO, playerName + " concedes the battle");
                     client.concede();
@@ -344,7 +347,7 @@ public final class BattleBoard extends KFrame
         mi.setMnemonic(KeyEvent.VK_C);
         mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, 0));
 
-        if (client.getPlayerName().equals(client.getBattleActivePlayerName()))
+        if (client.getOwningPlayer().equals(client.getBattleActivePlayer()))
         {
             highlightMobileCritters();
             reqFocus();
@@ -367,7 +370,7 @@ public final class BattleBoard extends KFrame
         mi.setMnemonic(KeyEvent.VK_C);
         mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, 0));
 
-        if (client.getPlayerName().equals(client.getBattleActivePlayerName()))
+        if (client.getOwningPlayer().equals(client.getBattleActivePlayer()))
         {
             highlightCrittersWithTargets();
             reqFocus();
@@ -376,7 +379,7 @@ public final class BattleBoard extends KFrame
 
     public void setPhase(Constants.BattlePhase newBattlePhase)
     {
-        if (client.getPlayerName().equals(client.getBattleActivePlayerName()))
+        if (client.getOwningPlayer().equals(client.getBattleActivePlayer()))
         {
             enableDoneButton();
             infoPanel.setOwnPhase(newBattlePhase.toString());
@@ -798,7 +801,7 @@ public final class BattleBoard extends KFrame
 
         private void setForeignPhase(String s)
         {
-            String name = client.getBattleActivePlayerName();
+            String name = client.getBattleActivePlayer().getPlayer().getName();
             phaseLabel.setText("(" + name + ") " + s);
             doneButton.setEnabled(false);
         }

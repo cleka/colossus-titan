@@ -157,7 +157,8 @@ public class RevealEvent
             if (rc != null && rc.getPlainName() != null
                 && rc.getPlainName().equals(Constants.titan))
             {
-                Player player = (realPlayer != null ? realPlayer : client.getPlayerStateByMarkerId(markerId).getPlayer());
+                Player player = (realPlayer != null ? realPlayer : client
+                    .getPlayerStateByMarkerId(markerId).getPlayer());
 
                 if (player == null)
                 {
@@ -166,7 +167,7 @@ public class RevealEvent
                 }
                 else
                 {
-                    PlayerInfo info = client.getPlayerInfo(player.getName());
+                    PlayerInfo info = client.getPlayerInfo(player);
                     String tbName = getTitanBasename(info);
                     rc.setTitanBaseName(tbName);
                 }

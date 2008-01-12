@@ -22,6 +22,7 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.lang.reflect.Constructor;
 import java.net.Socket;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -371,11 +372,11 @@ public final class ResourceLoader
         ImageIcon icon = null;
         try
         {
-            java.net.URL url;
-            url = cl.getResource(path + pathSeparator + fixFilename(filename));
-            // URL will not be null even if the file doesn't exist,
+            URL url = cl.getResource(path + pathSeparator
+                + fixFilename(filename));
+            // URL will can be null even if the file exist,
             // so we need to check if connection can be opened
-            if (url.openStream() != null)
+            if (url != null && url.openStream() != null)
             {
                 icon = new ImageIcon(url);
             }

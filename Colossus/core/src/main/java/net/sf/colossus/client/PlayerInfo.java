@@ -42,14 +42,27 @@ public final class PlayerInfo extends PlayerState
     private final SortedSet<String> markersAvailable = new TreeSet<String>(
         new MarkerComparator(getShortColor()));
 
-    /** Two-stage initialization. */
-    PlayerInfo(Client client, net.sf.colossus.Player player)
+    /** 
+     * Two-stage initialization at the moment, only some data here, the rest comes
+     * through {@link #update(String)}.
+     * 
+     * TODO: the object should be properly initialized in the constructor
+     */
+    PlayerInfo(Client client, net.sf.colossus.Player player, int number)
     {
-        super(client.getGame(), player);
+        super(client.getGame(), player, number);
         this.client = client;
         net.sf.colossus.server.CustomRecruitBase.addPlayerInfo(this);
-        net.sf.colossus.webcommon.InstanceTracker.register(this, client
-            .getPlayerName());
+        String playerName;
+        if (client.getOwningPlayer() != null)
+        {
+            playerName = client.getOwningPlayer().getPlayer().getName();
+        }
+        else
+        {
+            playerName = "UNKNOWN";
+        }
+        net.sf.colossus.webcommon.InstanceTracker.register(this, playerName);
     }
 
     /** Takes a colon-separated string of form
@@ -283,7 +296,7 @@ public final class PlayerInfo extends PlayerState
     /** Return a List of markerIds. */
     public List<String> getLegionIds()
     {
-        return client.getLegionsByPlayer(getPlayer());
+        return client.getLegionsByPlayerState(this);
     }
 
     void removeAllLegions()

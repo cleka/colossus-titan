@@ -60,7 +60,8 @@ final class SplitLegion extends KDialog implements MouseListener,
 
     private SplitLegion(Client client, String parentId, String selectedMarkerId)
     {
-        super(client.getBoard().getFrame(), client.getPlayerName()
+        super(client.getBoard().getFrame(), client.getOwningPlayer().getPlayer()
+            .getName()
             + ": Split Legion " + parentId, true);
 
         Container contentPane = getContentPane();

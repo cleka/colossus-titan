@@ -54,12 +54,12 @@ final class SocketClientThread extends Thread implements IServer
 
     SocketClientThread(Client client, String host, int port)
     {
-        super("Client " + client.getPlayerName());
+        super("Client " + client.getOwningPlayer().getPlayer().getName());
 
         this.client = client;
         this.threadMgr = client.getThreadMgr();
         net.sf.colossus.webcommon.InstanceTracker.register(this, "SCT "
-            + client.getPlayerName());
+            + client.getOwningPlayer().getPlayer().getName());
 
         String task = "";
 
@@ -885,7 +885,8 @@ final class SocketClientThread extends Thread implements IServer
     // Setup method
     private void signOn()
     {
-        sendToServer(Constants.signOn + sep + client.getPlayerName() + sep
+        sendToServer(Constants.signOn + sep
+            + client.getOwningPlayer().getPlayer().getName() + sep
             + client.isRemote());
     }
 

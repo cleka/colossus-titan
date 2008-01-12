@@ -32,7 +32,7 @@ public class Game
         this.playerstates = new PlayerState[players.length];
         for (int i = 0; i < players.length; i++)
         {
-            playerstates[i] = new PlayerState(this, players[i]);
+            playerstates[i] = new PlayerState(this, players[i], i);
         }
     }
 

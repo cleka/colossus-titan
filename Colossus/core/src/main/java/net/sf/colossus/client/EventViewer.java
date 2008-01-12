@@ -641,7 +641,7 @@ final class EventViewer extends KDialog implements WindowListener,
     // Helper methods to ask something from client:
     private int getActivePlayerNum()
     {
-        return client.getActivePlayerNum();
+        return client.getActivePlayer().getNumber();
     }
 
     private LegionInfo getLegionInfo(String marker)
@@ -739,7 +739,8 @@ final class EventViewer extends KDialog implements WindowListener,
             getLegionInfo(attackerId).getHeight(),
             new ArrayList<RevealedCreature>(), null, 0);
         attackerEventLegion.setEventInfo(Constants.reasonBattleStarts);
-        attackerEventLegion.setRealPlayer(client.getPlayerStateByMarkerId(attackerId).getPlayer());
+        attackerEventLegion.setRealPlayer(client.getPlayerStateByMarkerId(
+            attackerId).getPlayer());
 
         defenderEventLegion = new RevealEvent(client, turnNumber,
             getActivePlayerNum(), RevealEvent.eventBattle, defenderId,
@@ -747,7 +748,8 @@ final class EventViewer extends KDialog implements WindowListener,
             new ArrayList<RevealedCreature>(), null, 0);
 
         defenderEventLegion.setEventInfo(Constants.reasonBattleStarts);
-        defenderEventLegion.setRealPlayer(client.getPlayerStateByMarkerId(defenderId).getPlayer());
+        defenderEventLegion.setRealPlayer(client.getPlayerStateByMarkerId(
+            defenderId).getPlayer());
     }
 
     public void tellEngagementResults(String winnerId, String method, int turns)
@@ -1022,13 +1024,18 @@ final class EventViewer extends KDialog implements WindowListener,
             {
                 // This should now never happen any more:
                 LOGGER.log(Level.SEVERE, "no attacker nor defender "
-                    + " legion event for acquiring!!" + " turn"
-                    + client.getTurnNumber() + " player "
-                    + client.getActivePlayerName() + " phase "
-                    + client.getPhase() + " markerid " + markerId
+                    + " legion event for acquiring!!"
+                    + " turn"
+                    + client.getTurnNumber()
+                    + " player "
+                    + client.getActivePlayer().getPlayer().getName()
+                    + " phase "
+                    + client.getPhase()
+                    + " markerid "
+                    + markerId
                     + " marker owner"
-                    + getLegionInfo(markerId).getPlayerName()
-                    + "last engagement were" + " attacker "
+                    + getLegionInfo(markerId).getPlayer().getPlayer()
+                        .getName() + "last engagement were" + " attacker "
                     + lastAttackerEventLegion.getMarkerId() + " defender "
                     + lastDefenderEventLegion.getMarkerId());
                 System.exit(1);

@@ -238,7 +238,8 @@ final class StatusScreen extends KDialog implements WindowListener
 
     void updateStatusScreen()
     {
-        activePlayerLabel.setText(oracle.getActivePlayerName());
+        activePlayerLabel.setText(oracle.getActivePlayer().getPlayer()
+            .getName());
         int turnNumber = oracle.getTurnNumber();
         String turn = "";
         if (turnNumber >= 1)
@@ -247,7 +248,8 @@ final class StatusScreen extends KDialog implements WindowListener
         }
         turnLabel.setText(turn);
         phaseLabel.setText(oracle.getPhaseName());
-        battleActivePlayerLabel.setText(oracle.getBattleActivePlayerName());
+        battleActivePlayerLabel.setText(oracle.getBattleActivePlayer()
+            .getPlayer().getName());
         int battleTurnNumber = oracle.getBattleTurnNumber();
         String battleTurn = "";
         if (battleTurnNumber >= 1)
@@ -269,7 +271,7 @@ final class StatusScreen extends KDialog implements WindowListener
             }
             else
             {
-                if (oracle.getActivePlayer().equals(info.getPlayer()))
+                if (oracle.getActivePlayer().equals(info))
                 {
                     color = Color.YELLOW;
                 }

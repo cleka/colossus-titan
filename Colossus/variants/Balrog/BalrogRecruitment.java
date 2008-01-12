@@ -12,6 +12,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.colossus.client.PlayerInfo;
+import net.sf.colossus.game.PlayerState;
 import net.sf.colossus.server.Creature;
 import net.sf.colossus.server.CustomRecruitBase;
 import net.sf.colossus.server.VariantSupport;
@@ -28,8 +29,12 @@ public class BalrogRecruitment extends CustomRecruitBase
     private static final Logger LOGGER = Logger
         .getLogger(BalrogRecruitment.class.getName());
 
-    private final Map<String, Integer> nameToOldScore = Collections
-        .synchronizedMap(new HashMap<String, Integer>());
+    /**
+     * Maps a player to their previous points count.
+     */
+    private final Map<PlayerState, Integer> playerToOldScore = Collections
+        .synchronizedMap(new HashMap<PlayerState, Integer>());
+
     private final static int balrogValue = 300;
     private final static String balrogPrefix = "Balrog";
 
@@ -130,9 +135,9 @@ public class BalrogRecruitment extends CustomRecruitBase
         int alreadyNumber;
         int nowNumber;
 
-        synchronized (nameToOldScore)
+        synchronized (playerToOldScore)
         {
-            Integer score = nameToOldScore.remove(pi.getPlayer().getName());
+            Integer score = playerToOldScore.remove(pi);
 
             if (score == null)
             {
@@ -144,8 +149,7 @@ public class BalrogRecruitment extends CustomRecruitBase
             }
             newscore = pi.getScore();
 
-            nameToOldScore
-                .put(pi.getPlayer().getName(), new Integer(newscore));
+            playerToOldScore.put(pi, new Integer(newscore));
 
             alreadyNumber = (oldscore / balrogValue);
             nowNumber = (newscore / balrogValue);
@@ -202,6 +206,6 @@ public class BalrogRecruitment extends CustomRecruitBase
     protected void resetInstance()
     {
         LOGGER.log(Level.FINEST, "CUSTOM: resetting " + getClass().getName());
-        nameToOldScore.clear();
+        playerToOldScore.clear();
     }
 }

@@ -317,7 +317,7 @@ public final class Movement
     Set<String> listTeleportMoves(LegionInfo legion, MasterHex hex,
         int movementRoll, boolean inAdvance)
     {
-        PlayerInfo player = legion.getPlayerInfo();
+        PlayerInfo player = legion.getPlayer();
 
         Set<String> set = new HashSet<String>();
         if (hex == null

@@ -32,12 +32,23 @@ public class PlayerState
      */
     private final List<Legion> legions = new ArrayList<Legion>();
 
-    public PlayerState(Game game, Player player)
+    /**
+     * The number of the player in the game.
+     * 
+     * TODO clarify if this is just an arbitrary number (in which case we might want
+     * to get rid of it) or the actual turn sequence
+     */
+    private final int number;
+
+    public PlayerState(Game game, Player player, int number)
     {
         assert player != null : "Player required for joining a game";
         assert game != null : "No game without Game";
+        assert number >= 0 : "Player number must not be negative";
+        // TODO check for max on number once game has the players stored in it
         this.player = player;
         this.game = game;
+        this.number = number;
     }
 
     /**
@@ -62,9 +73,14 @@ public class PlayerState
     @Override
     public boolean equals(Object obj)
     {
-        // TODO only temporary to make sure we don't compare apples and eggs
+        // make sure we don't compare apples and eggs
         assert obj.getClass() == this.getClass() : getClass().getName()
             + " compared with something else";
         return super.equals(obj);
+    }
+
+    public int getNumber()
+    {
+        return number;
     }
 }

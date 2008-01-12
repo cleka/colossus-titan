@@ -49,12 +49,13 @@ public final class LegionInfo extends Legion
         this.markerId = markerId;
         this.client = client;
         myNode = null;
-        isMyLegion = getPlayer().getPlayer().equals(client.getPlayer());
+        isMyLegion = getPlayer().equals(client.getOwningPlayer());
     }
 
     private PredictSplitNode getNode(String markerId)
     {
-        PredictSplits ps = client.getPredictSplits(getPlayerName());
+        PredictSplits ps = client.getPredictSplits(getPlayer().getPlayer()
+            .getName());
         PredictSplitNode node = ps.getLeaf(markerId);
         return node;
     }
@@ -107,11 +108,6 @@ public final class LegionInfo extends Legion
     {
         return client.getGame().getVariant().getMasterBoard().getHexByLabel(
             getHexLabel());
-    }
-
-    public String getPlayerName()
-    {
-        return getPlayer().getPlayer().getName();
     }
 
     public String getMarkerId()
@@ -204,9 +200,10 @@ public final class LegionInfo extends Legion
         return booleans;
     }
 
-    public PlayerInfo getPlayerInfo()
+    @Override
+    public PlayerInfo getPlayer()
     {
-        return (PlayerInfo)getPlayer();
+        return (PlayerInfo)super.getPlayer();
     }
 
     /** Return the full basename for a titan in legion markerId,
@@ -216,7 +213,7 @@ public final class LegionInfo extends Legion
     {
         try
         {
-            PlayerInfo info = (PlayerInfo)getPlayer();
+            PlayerInfo info = getPlayer();
             String color = info.getColor();
             int power = info.getTitanPower();
             return "Titan-" + power + "-" + color;
@@ -332,7 +329,7 @@ public final class LegionInfo extends Legion
             String name = it.next();
             if (name.startsWith(Constants.titan))
             {
-                PlayerInfo info = (PlayerInfo)getPlayer();
+                PlayerInfo info = getPlayer();
                 // Titan skill is changed by variants.
                 sum += info.getTitanPower()
                     * ((Creature)getPlayer().getGame().getVariant()
@@ -360,7 +357,7 @@ public final class LegionInfo extends Legion
             String name = it.next();
             if (name.startsWith(Constants.titan))
             {
-                PlayerInfo info = (PlayerInfo)getPlayer();
+                PlayerInfo info = getPlayer();
                 // Titan skill is changed by variants.
                 sum += info.getTitanPower()
                     * ((Creature)getPlayer().getGame().getVariant()
@@ -479,7 +476,7 @@ public final class LegionInfo extends Legion
         return hasMoved()
             && getHeight() < 7
             && !hasRecruited()
-            && !getPlayerInfo().isDead()
+            && !getPlayer().isDead()
             && !client.findEligibleRecruits(getMarkerId(), getHexLabel())
                 .isEmpty();
     }

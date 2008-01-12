@@ -50,7 +50,7 @@ public final class Legion extends net.sf.colossus.game.Legion implements
     {
         // TODO we just fake a playerstate here
         super(new PlayerState(game, net.sf.colossus.Player
-            .getPlayerByName(playerName)));
+            .getPlayerByName(playerName), 0));
         this.markerId = markerId;
         this.parentId = parentId;
         // Sanity check

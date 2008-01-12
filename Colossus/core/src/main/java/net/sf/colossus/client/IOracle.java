@@ -3,12 +3,15 @@ package net.sf.colossus.client;
 
 import java.util.List;
 
-import net.sf.colossus.Player;
+import net.sf.colossus.game.PlayerState;
 
 
 /** Knows a lot of things, but cannot actually take any actions.
  *  Everything returned by this interface must be immutable, or a copy.
  *  An attempt to reduce the God-class nature of Client.
+ *  
+ *  TODO get rid of all the Strings in this interface
+ *  
  *  @version $Id$
  *  @author David Ripton
  */
@@ -30,13 +33,11 @@ public interface IOracle
 
     int getNumPlayers();
 
-    String getActivePlayerName();
-
-    Player getActivePlayer();
+    PlayerState getActivePlayer();
 
     String getPhaseName();
 
-    String getBattleActivePlayerName();
+    PlayerState getBattleActivePlayer();
 
     String getBattlePhaseName();
 }
