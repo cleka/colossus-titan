@@ -27,7 +27,7 @@
 	<property name="core.resource.dir" value="core/src/main/resource" />
 	<property name="libs.dir" value="libs" />
 	<property name="variants.dir" value="variants" />
-	<property name="build.dir" value="build" />
+	<property name="build.dir" value="build/ant" />
 	<property name="build.classes.dir" value="${build.dir}/classes" />
 	<property name="testresults.dir" value="${build.dir}/testresults" />
 	<property name="datatools.src.dir" value="datatools/src/main/java" />
