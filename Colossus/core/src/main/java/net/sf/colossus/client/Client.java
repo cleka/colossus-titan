@@ -1691,8 +1691,6 @@ public final class Client implements IClient, IOracle
     public LegionInfo getLegionInfo(String markerId)
     {
         LegionInfo info = legionInfo.get(markerId);
-        assert info != null : "No legion with markerId '" + markerId
-            + "' exists";
         return info;
     }
 
