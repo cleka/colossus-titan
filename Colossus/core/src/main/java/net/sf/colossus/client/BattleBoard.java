@@ -108,7 +108,7 @@ public final class BattleBoard extends KFrame
         setupActions();
         setupTopMenu();
 
-        saveWindow = new SaveWindow(client, "BattleMap");
+        saveWindow = new SaveWindow(client.getOptions(), "BattleMap");
 
         if (location == null)
         {
@@ -251,7 +251,7 @@ public final class BattleBoard extends KFrame
                 Constants.BattlePhase phase = client.getBattlePhase();
                 if (phase == Constants.BattlePhase.MOVE)
                 {
-                    if (!client.getOption(Options.autoPlay)
+                    if (!client.getOptions().getOption(Options.autoPlay)
                         && client.anyOffboardCreatures()
                         && !confirmLeavingCreaturesOffboard())
                     {
@@ -670,7 +670,7 @@ public final class BattleBoard extends KFrame
 
     public void reqFocus()
     {
-        if (client.getOption(Options.stealFocus))
+        if (client.getOptions().getOption(Options.stealFocus))
         {
             requestFocus();
             toFront();

@@ -87,7 +87,7 @@ final class PickRecruiter extends KDialog implements MouseListener,
         }
 
         pack();
-        saveWindow = new SaveWindow(client, "PickRecruiter");
+        saveWindow = new SaveWindow(client.getOptions(), "PickRecruiter");
         Point location = saveWindow.loadLocation();
         if (location == null)
         {

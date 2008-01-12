@@ -5,7 +5,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -173,6 +177,8 @@ public final class Options implements IOptions
     private final String owner; // playerName, or Constants.optionsServerName
     private final String dataPath; // WebServer sets to create a server.cfg file
 
+    private final Map<String, List<Listener>> listeners = new HashMap<String, List<Listener>>();
+
     // in the directory in which the game is run
 
     public Options(String owner)
@@ -209,6 +215,7 @@ public final class Options implements IOptions
         {
             FileInputStream in = new FileInputStream(optionsFile);
             props.load(in);
+            triggerAllOptions();
         }
         catch (IOException e)
         {
@@ -256,17 +263,32 @@ public final class Options implements IOptions
 
     public void setOption(String optname, String value)
     {
-        props.setProperty(optname, value);
+        String oldValue = getStringOption(optname);
+        if (oldValue != value)
+        {
+            props.setProperty(optname, value);
+            triggerStringOption(optname, oldValue, value);
+        }
     }
 
     public void setOption(String optname, boolean value)
     {
-        setOption(optname, String.valueOf(value));
+        boolean oldValue = getOption(optname);
+        if (oldValue != value)
+        {
+            setOption(optname, String.valueOf(value));
+            triggerBooleanOption(optname, oldValue, value);
+        }
     }
 
     public void setOption(String optname, int value)
     {
-        setOption(optname, String.valueOf(value));
+        int oldValue = getIntOption(optname);
+        if (oldValue != value)
+        {
+            setOption(optname, String.valueOf(value));
+            triggerIntOption(optname, oldValue, value);
+        }
     }
 
     public String getStringOption(String optname)
@@ -283,6 +305,15 @@ public final class Options implements IOptions
 
     public boolean getOption(String optname)
     {
+        // return true for all Auto-* options if autoplay is on
+        if (optname.startsWith("Auto") && !optname.equals(Options.autoPlay))
+        {
+            if (getOption(Options.autoPlay))
+            {
+                return true;
+            }
+        }
+
         String value = getStringOption(optname);
         return (value != null && value.equals("true"));
     }
@@ -456,5 +487,102 @@ public final class Options implements IOptions
             }
         }
         return howMany;
+    }
+
+    public void addListener(String optname, Listener listener)
+    {
+        List<Listener> optionListeners = getListenersForOption(optname);
+        optionListeners.add(listener);
+    }
+
+    private List<Listener> getListenersForOption(String optname)
+    {
+        List<Listener> optionListeners = listeners.get(optname);
+        if (optionListeners == null)
+        {
+            optionListeners = new ArrayList<Listener>();
+            listeners.put(optname, optionListeners);
+        }
+        return optionListeners;
+    }
+
+    public void removeListener(Listener listener)
+    {
+        for (List<Listener> optionListeners : listeners.values())
+        {
+            optionListeners.remove(listener);
+        }
+    }
+
+    private void triggerBooleanOption(String optname, boolean oldValue,
+        boolean newValue)
+    {
+        List<Listener> optionListeners = getListenersForOption(optname);
+        for (Listener listener : optionListeners)
+        {
+            listener.booleanOptionChanged(optname, oldValue, newValue);
+        }
+    }
+
+    private void triggerIntOption(String optname, int oldValue, int newValue)
+    {
+        List<Listener> optionListeners = getListenersForOption(optname);
+        for (Listener listener : optionListeners)
+        {
+            listener.intOptionChanged(optname, oldValue, newValue);
+        }
+    }
+
+    private void triggerStringOption(String optname, String oldValue,
+        String newValue)
+    {
+        List<Listener> optionListeners = getListenersForOption(optname);
+        for (Listener listener : optionListeners)
+        {
+            listener.stringOptionChanged(optname, oldValue, newValue);
+        }
+    }
+
+    private void triggerAllOptions()
+    {
+        for (Map.Entry<Object, Object> option : props.entrySet())
+        {
+            String optname = (String)option.getKey();
+            String stringVal = (String)option.getValue();
+            // try triggering things as integer or boolean first
+            // (which implies a string trigger)
+            // make sure the oldVal is guaranteed to be different
+            try
+            {
+                int intVal = Integer.parseInt(stringVal);
+                // don't just negate the value, it might be Integer.MIN_VALUE
+                // used by someone as a marker
+                if (intVal == 0)
+                {
+                    triggerIntOption(optname, 1, 0);
+                }
+                else
+                {
+                    triggerIntOption(optname, 0, intVal);
+                }
+            }
+            catch (NumberFormatException e)
+            {
+                // so it is not a number, let's try boolean
+                if (stringVal.equalsIgnoreCase("true"))
+                {
+                    triggerBooleanOption(optname, false, true);
+                }
+                else if (stringVal.equalsIgnoreCase("false"))
+                {
+                    triggerBooleanOption(optname, true, false);
+                }
+                else
+                {
+                    // neither int nor boolean
+                    triggerStringOption(optname, null, stringVal);
+                }
+            }
+        }
     }
 }

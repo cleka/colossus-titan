@@ -49,8 +49,8 @@ final class BattleMovement
                     if (bogey == null)
                     {
                         entryCost = neighbor.getEntryCost(creature,
-                            reverseDir, client
-                                .getOption(Options.cumulativeSlow));
+                            reverseDir, client.getOptions().getOption(
+                                Options.cumulativeSlow));
                     }
                     else
                     {
@@ -59,7 +59,7 @@ final class BattleMovement
 
                     if ((entryCost != BattleHex.IMPASSIBLE_COST)
                         && ((entryCost <= movesLeft) || (first && client
-                            .getOption(Options.oneHexAllowed))))
+                            .getOptions().getOption(Options.oneHexAllowed))))
                     {
                         // Mark that hex as a legal move.
                         set.add(neighbor.getLabel());

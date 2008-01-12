@@ -104,7 +104,8 @@ class CreatureCollectionView extends KDialog
 
         setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
 
-        saveWindow = new SaveWindow(client, "CreatureCollectionView");
+        saveWindow = new SaveWindow(client.getOptions(),
+            "CreatureCollectionView");
         saveWindow.restoreOrCenter(this);
 
         update();
@@ -327,8 +328,8 @@ class CreatureCollectionView extends KDialog
     @Override
     public void windowClosing(WindowEvent e)
     {
-        CreatureCollectionView.this.client.setOption(Options.showCaretaker,
-            false);
+        CreatureCollectionView.this.client.getOptions().setOption(
+            Options.showCaretaker, false);
     }
 
     @Override

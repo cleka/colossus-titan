@@ -66,7 +66,7 @@ final class PickMarker extends KDialog implements MouseListener,
         }
 
         pack();
-        saveWindow = new SaveWindow(client, "PickMarker");
+        saveWindow = new SaveWindow(client.getOptions(), "PickMarker");
         Point location = saveWindow.loadLocation();
         if (location == null)
         {

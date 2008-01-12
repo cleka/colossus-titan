@@ -425,7 +425,7 @@ final class EngagementResults extends KDialog
     /**
      * Stores information about an engagement.
      * 
-     * @todo: it might be useful to have this as a proper toplevel class
+     * TODO this should probably be a class in the game package
      */
     private class Engagement
     {

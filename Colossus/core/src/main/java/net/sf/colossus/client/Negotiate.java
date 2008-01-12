@@ -72,7 +72,7 @@ final class Negotiate extends KDialog implements MouseListener, ActionListener
 
         pack();
 
-        saveWindow = new SaveWindow(client, "Negotiate");
+        saveWindow = new SaveWindow(client.getOptions(), "Negotiate");
 
         location = saveWindow.loadLocation();
         if (location == null)

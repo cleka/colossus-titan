@@ -73,7 +73,7 @@ final class AcquireAngel extends KDialog implements MouseListener,
         cancelButton.addActionListener(this);
 
         pack();
-        saveWindow = new SaveWindow(client, "AcquireAngel");
+        saveWindow = new SaveWindow(client.getOptions(), "AcquireAngel");
         Point location = saveWindow.loadLocation();
         if (location == null)
         {

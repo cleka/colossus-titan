@@ -25,14 +25,14 @@ import net.sf.colossus.client.SaveWindow;
  */
 public final class LogWindow extends JTextArea
 {
-    private JFrame logFrame;
-    private JScrollPane scrollPane;
+    private final JFrame logFrame;
+    private final JScrollPane scrollPane;
     private Client client;
     private Point location;
     private Dimension size;
-    private SaveWindow saveWindow;
+    private final SaveWindow saveWindow;
     private final Logger logger;
-    private SwingDocumentLogHandler handler;
+    private final SwingDocumentLogHandler handler;
 
     public LogWindow(Client client, Logger logger)
     {
@@ -47,7 +47,8 @@ public final class LogWindow extends JTextArea
             @Override
             public void windowClosing(WindowEvent e)
             {
-                LogWindow.this.client.setOption(Options.showLogWindow, false);
+                LogWindow.this.client.getOptions().setOption(
+                    Options.showLogWindow, false);
             }
         });
 
@@ -55,7 +56,7 @@ public final class LogWindow extends JTextArea
         logFrame.getContentPane().add(scrollPane);
         logFrame.pack();
 
-        saveWindow = new SaveWindow(client, "LogWindow");
+        saveWindow = new SaveWindow(client.getOptions(), "LogWindow");
 
         size = saveWindow.loadSize();
         if (size == null)

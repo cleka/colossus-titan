@@ -122,7 +122,7 @@ final class ReplyToProposal extends KDialog implements ActionListener
 
         pack();
 
-        saveWindow = new SaveWindow(client, "ReplyToProposal");
+        saveWindow = new SaveWindow(client.getOptions(), "ReplyToProposal");
 
         location = saveWindow.loadLocation();
         if (location == null)

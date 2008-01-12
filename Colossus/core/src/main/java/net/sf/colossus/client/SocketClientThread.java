@@ -462,7 +462,7 @@ final class SocketClientThread extends Thread implements IServer
         {
             String optname = args.remove(0);
             String value = args.remove(0);
-            client.setOption(optname, value);
+            client.getOptions().setOption(optname, value);
         }
         else if (method.equals(Constants.updatePlayerInfo))
         {

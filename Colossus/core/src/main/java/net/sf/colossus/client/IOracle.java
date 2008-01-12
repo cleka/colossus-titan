@@ -10,7 +10,8 @@ import net.sf.colossus.game.PlayerState;
  *  Everything returned by this interface must be immutable, or a copy.
  *  An attempt to reduce the God-class nature of Client.
  *  
- *  TODO get rid of all the Strings in this interface
+ *  TODO this should be replaced with classes from the game package, mostly
+ *       Game itself
  *  
  *  @version $Id$
  *  @author David Ripton

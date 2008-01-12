@@ -237,8 +237,8 @@ public final class MasterBoard extends JPanel
                 LegionInfo legion = client.getLegionInfo(marker.getId());
                 int scale = 2 * Scale.get();
 
-                boolean dubiousAsBlanks = client
-                    .getOption(Options.dubiousAsBlanks);
+                boolean dubiousAsBlanks = client.getOptions().getOption(
+                    Options.dubiousAsBlanks);
                 final JPanel panel = new LegionInfoPanel(legion, scale,
                     PANEL_MARGIN, PANEL_PADDING, true, client.getViewMode(),
                     client.getActivePlayer(), dubiousAsBlanks, true);
@@ -312,7 +312,7 @@ public final class MasterBoard extends JPanel
 
         setupPlayerLabel();
 
-        saveWindow = new SaveWindow(client, "MasterBoardScreen");
+        saveWindow = new SaveWindow(client.getOptions(), "MasterBoardScreen");
         Point loadLocation = saveWindow.loadLocation();
 
         if (loadLocation == null)
@@ -476,8 +476,8 @@ public final class MasterBoard extends JPanel
         {
             public void actionPerformed(ActionEvent e)
             {
-                new ShowAllRecruits(masterFrame, client, TerrainRecruitLoader
-                    .getTerrains());
+                new ShowAllRecruits(masterFrame, client.getOptions(),
+                    TerrainRecruitLoader.getTerrains());
             }
         };
 
@@ -736,7 +736,7 @@ public final class MasterBoard extends JPanel
                 {
                     showReadme.dispose();
                 }
-                showReadme = new ShowReadme(client);
+                showReadme = new ShowReadme(client.getOptions());
             }
         };
         viewHelpDocAction = new AbstractAction(viewHelpDoc)
@@ -775,7 +775,7 @@ public final class MasterBoard extends JPanel
     {
         JCheckBoxMenuItem cbmi = new JCheckBoxMenuItem(name);
         cbmi.setMnemonic(mnemonic);
-        cbmi.setSelected(client.getOption(name));
+        cbmi.setSelected(client.getOptions().getOption(name));
 
         cbmi.addItemListener(itemHandler);
         menu.add(cbmi);
@@ -1634,8 +1634,8 @@ public final class MasterBoard extends JPanel
                 {
                     LegionInfo legion = client.getLegionInfo(markerId);
                     int viewMode = client.getViewMode();
-                    boolean dubiousAsBlanks = client
-                        .getOption(Options.dubiousAsBlanks);
+                    boolean dubiousAsBlanks = client.getOptions().getOption(
+                        Options.dubiousAsBlanks);
                     new ShowLegion(masterFrame, legion, point, scrollPane,
                         4 * Scale.get(), client.getActivePlayer(), viewMode,
                         dubiousAsBlanks);
@@ -1784,7 +1784,7 @@ public final class MasterBoard extends JPanel
             JMenuItem source = (JMenuItem)e.getSource();
             String text = source.getText();
             boolean selected = (e.getStateChange() == ItemEvent.SELECTED);
-            client.setOption(text, selected);
+            client.getOptions().setOption(text, selected);
         }
     }
 
@@ -2032,7 +2032,7 @@ public final class MasterBoard extends JPanel
 
     void reqFocus()
     {
-        if (client.getOption(Options.stealFocus))
+        if (client.getOptions().getOption(Options.stealFocus))
         {
             requestFocus();
             getFrame().toFront();

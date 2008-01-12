@@ -48,7 +48,7 @@ final class PickStrikePenalty extends KDialog implements ActionListener
         });
 
         pack();
-        saveWindow = new SaveWindow(client, "PickStrikePenalty");
+        saveWindow = new SaveWindow(client.getOptions(), "PickStrikePenalty");
         Point location = saveWindow.loadLocation();
         if (location == null)
         {

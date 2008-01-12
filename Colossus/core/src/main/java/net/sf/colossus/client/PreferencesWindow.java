@@ -306,7 +306,7 @@ public class PreferencesWindow extends KFrame implements ItemListener,
             .setLayout(new BoxLayout(favColorPane, BoxLayout.PAGE_AXIS));
         favColorPane.setBorder(BorderFactory
             .createTitledBorder("Favorite Colors"));
-        String favorites = client.getStringOption(Options.favoriteColors);
+        String favorites = options.getStringOption(Options.favoriteColors);
         favoriteColors = null;
         colorsLeft = new ArrayList<String>();
         for (String colorName : Constants.colorNames)
@@ -409,7 +409,8 @@ public class PreferencesWindow extends KFrame implements ItemListener,
                 }
                 favorites.append(string);
             }
-            client.setOption(Options.favoriteColors, favorites.toString());
+            client.getOptions().setOption(Options.favoriteColors,
+                favorites.toString());
         }
     }
 
@@ -506,7 +507,7 @@ public class PreferencesWindow extends KFrame implements ItemListener,
             {
                 if (newValue != oldValue)
                 {
-                    client.setOption(Options.scale, newValue);
+                    options.setOption(Options.scale, newValue);
                     Scale.set(newValue);
                     net.sf.colossus.util.ResourceLoader.purgeImageCache();
                     client.rescaleAllWindows();

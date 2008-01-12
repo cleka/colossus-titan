@@ -78,7 +78,7 @@ final class Concede extends KDialog implements ActionListener, WindowListener
 
         pack();
 
-        saveWindow = new SaveWindow(client, "Concede");
+        saveWindow = new SaveWindow(client.getOptions(), "Concede");
 
         if (location == null)
         {

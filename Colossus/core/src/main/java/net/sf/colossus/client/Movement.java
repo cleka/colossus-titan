@@ -253,12 +253,12 @@ public final class Movement
 
     private boolean towerTeleportAllowed()
     {
-        if (client.getOption(Options.noTowerTeleport))
+        if (client.getOptions().getOption(Options.noTowerTeleport))
         {
             return false;
         }
         if (client.getTurnNumber() == 1
-            && client.getOption(Options.noFirstTurnTeleport))
+            && client.getOptions().getOption(Options.noFirstTurnTeleport))
         {
             return false;
         }
@@ -272,7 +272,7 @@ public final class Movement
             return false;
         }
         if (client.getTurnNumber() == 1
-            && client.getOption(Options.noFirstTurnT2TTeleport))
+            && client.getOptions().getOption(Options.noFirstTurnT2TTeleport))
         {
             return false;
         }
@@ -285,7 +285,7 @@ public final class Movement
         {
             return false;
         }
-        if (client.getOption(Options.towerToTowerTeleportOnly))
+        if (client.getOptions().getOption(Options.towerToTowerTeleportOnly))
         {
             return false;
         }
@@ -294,12 +294,12 @@ public final class Movement
 
     public boolean titanTeleportAllowed()
     {
-        if (client.getOption(Options.noTitanTeleport))
+        if (client.getOptions().getOption(Options.noTitanTeleport))
         {
             return false;
         }
         if (client.getTurnNumber() == 1
-            && client.getOption(Options.noFirstTurnTeleport))
+            && client.getOptions().getOption(Options.noFirstTurnTeleport))
         {
             return false;
         }

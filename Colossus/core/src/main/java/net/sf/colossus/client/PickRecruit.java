@@ -105,7 +105,7 @@ final class PickRecruit extends KDialog implements MouseListener,
         recruitPane.add(cancelButton);
 
         pack();
-        saveWindow = new SaveWindow(client, "PickRecruit");
+        saveWindow = new SaveWindow(client.getOptions(), "PickRecruit");
         Point location = saveWindow.loadLocation();
         if (location == null)
         {

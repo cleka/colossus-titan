@@ -106,7 +106,7 @@ final class SummonAngel extends KDialog implements MouseListener,
 
         pack();
 
-        saveWindow = new SaveWindow(client, "SummonAngel");
+        saveWindow = new SaveWindow(client.getOptions(), "SummonAngel");
         Point location = saveWindow.loadLocation();
         if (location == null)
         {

@@ -236,8 +236,8 @@ class Chit extends JPanel
         Image image = bufferedImage;
 
         if (inverted
-            && (client == null || !client
-                .getOption(Options.doNotInvertDefender)))
+            && (client == null || !client.getOptions().getOption(
+                Options.doNotInvertDefender)))
         {
             if (bufferedInvertedImage == null)
             {

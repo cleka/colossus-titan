@@ -143,7 +143,7 @@ final class SplitLegion extends KDialog implements MouseListener,
         buttonBox.add(button2);
 
         pack();
-        saveWindow = new SaveWindow(client, "SplitLegion");
+        saveWindow = new SaveWindow(client.getOptions(), "SplitLegion");
         Point location = saveWindow.loadLocation();
         if (location == null)
         {

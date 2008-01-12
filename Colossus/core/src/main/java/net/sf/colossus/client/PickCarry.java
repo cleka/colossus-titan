@@ -53,7 +53,7 @@ final class PickCarry extends KDialog implements ActionListener
         });
 
         pack();
-        saveWindow = new SaveWindow(client, "PickCarry");
+        saveWindow = new SaveWindow(client.getOptions(), "PickCarry");
         Point location = saveWindow.loadLocation();
         if (location == null)
         {

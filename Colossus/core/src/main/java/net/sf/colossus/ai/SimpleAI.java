@@ -2745,7 +2745,7 @@ public class SimpleAI implements AI
 
         // Defer setting time limit until here where it's needed, to
         // avoid initialization timing issues.
-        timeLimit = client.getIntOption(Options.aiTimeLimit);
+        timeLimit = client.getOptions().getIntOption(Options.aiTimeLimit);
 
         // Consider one critter at a time, in order of importance.
         // Examine all possible moves for that critter not already

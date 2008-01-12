@@ -78,7 +78,7 @@ import net.sf.colossus.xmlparser.TerrainRecruitLoader;
  *  @author Romain Dolbeau
  */
 
-public final class Client implements IClient, IOracle, IOptions
+public final class Client implements IClient, IOracle
 {
     private static final Logger LOGGER = Logger.getLogger(Client.class
         .getName());
@@ -261,8 +261,6 @@ public final class Client implements IClient, IOracle, IOptions
     public Client(String host, int port, Game game, String playerName,
         boolean remote, boolean byWebClient)
     {
-        super();
-
         assert playerName != null;
 
         this.game = game;
@@ -295,6 +293,7 @@ public final class Client implements IClient, IOracle, IOptions
             + playerName);
 
         options = new Options(playerName);
+        setupOptionListeners();
         // Need to load options early so they don't overwrite server options.
         loadOptions();
 
@@ -515,7 +514,7 @@ public final class Client implements IClient, IOracle, IOptions
             return;
         }
 
-        engagementResults = new EngagementResults(parent, this, this);
+        engagementResults = new EngagementResults(parent, this, options);
         engagementResults.maybeShow();
     }
 
@@ -532,8 +531,9 @@ public final class Client implements IClient, IOracle, IOptions
         {
             if (autoInspector == null)
             {
-                autoInspector = new AutoInspector(parent, this, owningPlayer,
-                    viewMode, getOption(Options.dubiousAsBlanks));
+                autoInspector = new AutoInspector(parent, options,
+                    owningPlayer, viewMode, options
+                        .getOption(Options.dubiousAsBlanks));
             }
         }
         else
@@ -606,7 +606,7 @@ public final class Client implements IClient, IOracle, IOptions
         if (eventViewer == null)
         {
             JFrame parent = getPreferredParent();
-            eventViewer = new EventViewer(parent, this, this);
+            eventViewer = new EventViewer(parent, options, this);
         }
     }
 
@@ -614,7 +614,7 @@ public final class Client implements IClient, IOracle, IOptions
     {
         if (preferencesWindow == null)
         {
-            preferencesWindow = new PreferencesWindow(this, this);
+            preferencesWindow = new PreferencesWindow(options, this);
         }
     }
 
@@ -754,7 +754,8 @@ public final class Client implements IClient, IOracle, IOptions
 
     private void kickMoves()
     {
-        if (isMyTurn() && getOption(Options.autoMasterMove) && !isGameOver())
+        if (isMyTurn() && options.getOption(Options.autoMasterMove)
+            && !isGameOver())
         {
             doAutoMoves();
         }
@@ -790,65 +791,12 @@ public final class Client implements IClient, IOracle, IOptions
         return movementDie;
     }
 
-    // public for IOptions
-    public boolean getOption(String optname, boolean defaultValue)
-    {
-        return options.getOption(optname, defaultValue);
-    }
-
-    // public for IOptions
-    public boolean getOption(String optname)
-    {
-        // If autoplay is set, then return true for all other auto* options.
-        if (optname.startsWith("Auto") && !optname.equals(Options.autoPlay))
-        {
-            if (options.getOption(Options.autoPlay))
-            {
-                return true;
-            }
-        }
-        return options.getOption(optname);
-    }
-
-    // Public for IOptions
-    public String getStringOption(String optname)
-    {
-        return options.getStringOption(optname);
-    }
-
-    /** Return -1 if the option's value has not been set.
-     public for LogWindow */
-    public int getIntOption(String optname)
-    {
-        return options.getIntOption(optname);
-    }
-
     /** public so that server can set autoPlay for AIs. */
     public void setOption(String optname, String value)
     {
-        boolean optionChanged = false;
-        if (!value.equals(getStringOption(optname)))
-        {
-            optionChanged = true;
-        }
         options.setOption(optname, value);
-        if (optionChanged)
-        {
-            optionTrigger(optname, value);
-            syncOptions();
-        }
-    }
-
-    /** public for LogWindow */
-    public void setOption(String optname, boolean value)
-    {
-        setOption(optname, String.valueOf(value));
-    }
-
-    /** public for LogWindow */
-    public void setOption(String optname, int value)
-    {
-        setOption(optname, String.valueOf(value));
+        syncCheckboxes();
+        options.saveOptions();
     }
 
     public int getViewMode()
@@ -856,174 +804,233 @@ public final class Client implements IClient, IOracle, IOptions
         return this.viewMode;
     }
 
-    /** Fully sync the board state by running all option triggers. */
-    private void runAllOptionTriggers()
+    /**
+     * Trigger side effects after changing an option value.
+     * 
+     *  TODO now that there are listeners, many of the other classes could listen to the
+     *  options relevant to them instead of dispatching it all through the Client class.
+     */
+    private void setupOptionListeners()
     {
-        Enumeration<String> en = options.propertyNames();
-        while (en.hasMoreElements())
+        options.addListener(Options.antialias, new IOptions.Listener()
         {
-            String name = en.nextElement();
-            String value = getStringOption(name);
-            optionTrigger(name, value);
-        }
-        syncOptions();
-    }
-
-    private void optionTrigger(String optname)
-    {
-        String value = getStringOption(optname);
-        optionTrigger(optname, value);
-    }
-
-    /** Trigger side effects after changing an option value. */
-    private void optionTrigger(String optname, String value)
-    {
-        LOGGER.log(Level.INFO, "optionTrigger " + optname + " : " + value);
-        boolean bval = Boolean.valueOf(value).booleanValue();
-
-        if (optname.equals(Options.antialias))
-        {
-            GUIHex.setAntialias(bval);
-            repaintAllWindows();
-        }
-        else if (optname.equals(Options.useOverlay))
-        {
-            GUIHex.setOverlay(bval);
-            if (board != null)
+            @Override
+            public void booleanOptionChanged(String optname, boolean oldValue,
+                boolean newValue)
             {
-                board.repaintAfterOverlayChanged();
+                GUIHex.setAntialias(newValue);
+                repaintAllWindows();
             }
-        }
-        else if (optname.equals(Options.showRecruitChitsSubmenu))
+        });
+        options.addListener(Options.useOverlay, new IOptions.Listener()
         {
-            recruitChitMode = options.getNumberForRecruitChitSelection(value);
-        }
-        else if (optname.equals(Options.noBaseColor))
-        {
-            Creature.setNoBaseColor(bval);
-            net.sf.colossus.util.ResourceLoader.purgeImageCache();
-            repaintAllWindows();
-        }
-        else if (optname.equals(Options.useColoredBorders))
-        {
-            BattleChit.setUseColoredBorders(bval);
-            repaintAllWindows();
-        }
-        else if (optname.equals(Options.logDebug))
-        {
-            if (bval)
+            @Override
+            public void booleanOptionChanged(String optname, boolean oldValue,
+                boolean newValue)
             {
-                Logger.getLogger("net.sf.colossus").setLevel(Level.ALL);
-            }
-            else
-            {
-                Logger.getLogger("net.sf.colossus").setLevel(Level.OFF);
-            }
-        }
-        else if (optname.equals(Options.showCaretaker))
-        {
-            showOrHideCaretaker(bval);
-        }
-        else if (optname.equals(Options.showLogWindow))
-        {
-            if (board != null && bval)
-            {
-                if (logWindow == null)
+                GUIHex.setOverlay(newValue);
+                if (board != null)
                 {
-                    // the logger with the empty name is parent to all loggers
-                    // and thus catches all messages
-                    logWindow = new LogWindow(this, Logger.getLogger(""));
+                    board.repaintAfterOverlayChanged();
                 }
             }
-            else
+        });
+        options.addListener(Options.showRecruitChitsSubmenu,
+            new IOptions.Listener()
             {
-                disposeLogWindow();
-            }
-        }
-        else if (optname.equals(Options.showStatusScreen))
+                @Override
+                public void stringOptionChanged(String optname,
+                    String oldValue, String newValue)
+                {
+                    recruitChitMode = options
+                        .getNumberForRecruitChitSelection(newValue);
+                }
+            });
+        options.addListener(Options.noBaseColor, new IOptions.Listener()
         {
-            updateStatusScreen();
-        }
-        else if (optname.equals(Options.showAutoInspector))
-        {
-            showOrHideAutoInspector(bval);
-        }
-        else if (optname.equals(Options.showEventViewer))
-        {
-            // if null: no board (not yet, or not at all) => no eventviewer
-            if (eventViewer != null)
+            @Override
+            public void booleanOptionChanged(String optname, boolean oldValue,
+                boolean newValue)
             {
-                // Eventviewer takes care of showing/hiding itself
-                eventViewer.setVisibleMaybe();
+                Creature.setNoBaseColor(newValue);
+                net.sf.colossus.util.ResourceLoader.purgeImageCache();
+                repaintAllWindows();
             }
-        }
-        else if (optname.equals(Options.viewMode))
+        });
+        options.addListener(Options.useColoredBorders, new IOptions.Listener()
         {
-            String viewModeName = options.getStringOption(Options.viewMode);
-            viewMode = options.getNumberForViewMode(viewModeName);
-        }
-        else if (optname.equals(Options.dubiousAsBlanks))
-        {
-            if (autoInspector != null)
+            @Override
+            public void booleanOptionChanged(String optname, boolean oldValue,
+                boolean newValue)
             {
-                autoInspector.setDubiousAsBlanks(bval);
+                BattleChit.setUseColoredBorders(newValue);
+                repaintAllWindows();
             }
-        }
-        else if (optname.equals(Options.showEngagementResults))
+        });
+        options.addListener(Options.logDebug, new IOptions.Listener()
         {
-            // null if there is no board, e.g. AI
-            if (engagementResults != null)
+            @Override
+            public void booleanOptionChanged(String optname, boolean oldValue,
+                boolean newValue)
             {
-                // maybeShow decides by itself based on the current value
-                // of the option whether to hide or show. 
-                engagementResults.maybeShow();
+                if (newValue)
+                {
+                    Logger.getLogger("net.sf.colossus").setLevel(Level.ALL);
+                }
+                else
+                {
+                    Logger.getLogger("net.sf.colossus").setLevel(Level.OFF);
+                }
             }
-        }
-        else if (optname.equals(Options.favoriteLookFeel))
+        });
+        options.addListener(Options.showCaretaker, new IOptions.Listener()
         {
-            setLookAndFeel(value);
-        }
-        else if (optname.equals(Options.scale))
-        {
-            int scale = Integer.parseInt(value);
-            if (scale > 0)
+            @Override
+            public void booleanOptionChanged(String optname, boolean oldValue,
+                boolean newValue)
             {
-                Scale.set(scale);
-                rescaleAllWindows();
+                showOrHideCaretaker(newValue);
+                syncCheckboxes();
             }
-        }
-        else if (optname.equals(Options.playerType))
+        });
+        options.addListener(Options.showLogWindow, new IOptions.Listener()
         {
-            setType(value);
-        }
-        else if (optname.equals(Options.useSVG))
+            @Override
+            public void booleanOptionChanged(String optname, boolean oldValue,
+                boolean newValue)
+            {
+                showOrHideLogWindow(newValue);
+                syncCheckboxes();
+            }
+        });
+        options.addListener(Options.showStatusScreen, new IOptions.Listener()
         {
-            ResourceLoader.setUseSVG(bval);
-        }
-    }
-
-    /** Save player options to a file. */
-    void saveOptions()
-    {
-        options.saveOptions();
+            @Override
+            public void booleanOptionChanged(String optname, boolean oldValue,
+                boolean newValue)
+            {
+                updateStatusScreen();
+            }
+        });
+        options.addListener(Options.showAutoInspector, new IOptions.Listener()
+        {
+            @Override
+            public void booleanOptionChanged(String optname, boolean oldValue,
+                boolean newValue)
+            {
+                showOrHideAutoInspector(newValue);
+                syncCheckboxes();
+            }
+        });
+        options.addListener(Options.showEventViewer, new IOptions.Listener()
+        {
+            @Override
+            public void booleanOptionChanged(String optname, boolean oldValue,
+                boolean newValue)
+            {
+                // if null: no board (not yet, or not at all) => no eventviewer
+                if (eventViewer != null)
+                {
+                    // Eventviewer takes care of showing/hiding itself
+                    eventViewer.setVisibleMaybe();
+                }
+                syncCheckboxes();
+            }
+        });
+        options.addListener(Options.viewMode, new IOptions.Listener()
+        {
+            @Override
+            public void stringOptionChanged(String optname, String oldValue,
+                String newValue)
+            {
+                viewMode = options.getNumberForViewMode(newValue);
+            }
+        });
+        options.addListener(Options.dubiousAsBlanks, new IOptions.Listener()
+        {
+            @Override
+            public void booleanOptionChanged(String optname, boolean oldValue,
+                boolean newValue)
+            {
+                if (autoInspector != null)
+                {
+                    autoInspector.setDubiousAsBlanks(newValue);
+                }
+            }
+        });
+        options.addListener(Options.showEngagementResults,
+            new IOptions.Listener()
+            {
+                @Override
+                public void booleanOptionChanged(String optname,
+                    boolean oldValue, boolean newValue)
+                {
+                    // null if there is no board, e.g. AI
+                    if (engagementResults != null)
+                    {
+                        // maybeShow decides by itself based on the current value
+                        // of the option whether to hide or show. 
+                        engagementResults.maybeShow();
+                    }
+                }
+            });
+        options.addListener(Options.favoriteLookFeel, new IOptions.Listener()
+        {
+            @Override
+            public void stringOptionChanged(String optname, String oldValue,
+                String newValue)
+            {
+                setLookAndFeel(newValue);
+            }
+        });
+        options.addListener(Options.scale, new IOptions.Listener()
+        {
+            // TODO check if we could use the intOptionChanged callback here
+            @Override
+            public void stringOptionChanged(String optname, String oldValue,
+                String newValue)
+            {
+                int scale = Integer.parseInt(oldValue);
+                if (scale > 0)
+                {
+                    Scale.set(scale);
+                    rescaleAllWindows();
+                }
+            }
+        });
+        options.addListener(Options.playerType, new IOptions.Listener()
+        {
+            @Override
+            public void stringOptionChanged(String optname, String oldValue,
+                String newValue)
+            {
+                setType(newValue);
+            }
+        });
+        options.addListener(Options.useSVG, new IOptions.Listener()
+        {
+            @Override
+            public void booleanOptionChanged(String optname, boolean oldValue,
+                boolean newValue)
+            {
+                ResourceLoader.setUseSVG(newValue);
+            }
+        });
     }
 
     /** Load player options from a file. */
     private void loadOptions()
     {
         options.loadOptions();
-        syncOptions();
-        runAllOptionTriggers();
-    }
-
-    /** Synchronize menu checkboxes and cfg file after an option change. */
-    private void syncOptions()
-    {
         syncCheckboxes();
-        saveOptions();
     }
 
-    /** Ensure that Player menu checkboxes reflect the correct state. */
+    /** 
+     * Ensure that Player menu checkboxes reflect the correct state.
+     * 
+     * TODO let the checkboxes have their own listeners instead. Or even
+     * better: use a binding framework.
+     */
     private void syncCheckboxes()
     {
         if (board == null)
@@ -1034,7 +1041,7 @@ public final class Client implements IClient, IOracle, IOptions
         while (en.hasMoreElements())
         {
             String name = en.nextElement();
-            boolean value = getOption(name);
+            boolean value = options.getOption(name);
             board.twiddleOption(name, value);
         }
     }
@@ -1092,7 +1099,7 @@ public final class Client implements IClient, IOracle, IOptions
             // Called too early.
             return;
         }
-        if (getOption(Options.showStatusScreen))
+        if (options.getOption(Options.showStatusScreen))
         {
             if (statusScreen != null)
             {
@@ -1103,7 +1110,7 @@ public final class Client implements IClient, IOracle, IOptions
                 if (board != null)
                 {
                     statusScreen = new StatusScreen(getPreferredParent(),
-                        this, this, this);
+                        this, options, this);
                 }
             }
         }
@@ -1419,7 +1426,7 @@ public final class Client implements IClient, IOracle, IOptions
         // I don't use "getPlayerInfo().isAI() here, because if done
         // so very early, getPlayerInfo delivers null. 
         boolean isAI = true;
-        String pType = getStringOption(Options.playerType);
+        String pType = options.getStringOption(Options.playerType);
         if (pType != null
             && (pType.endsWith("Human") || pType.endsWith("Network")))
         {
@@ -1624,10 +1631,10 @@ public final class Client implements IClient, IOracle, IOptions
     /** Return true if any strikes were taken. */
     boolean makeForcedStrikes()
     {
-        if (isMyBattlePhase() && getOption(Options.autoForcedStrike))
+        if (isMyBattlePhase() && options.getOption(Options.autoForcedStrike))
         {
-            return strike
-                .makeForcedStrikes(getOption(Options.autoRangeSingle));
+            return strike.makeForcedStrikes(options
+                .getOption(Options.autoRangeSingle));
         }
         return false;
     }
@@ -1637,7 +1644,7 @@ public final class Client implements IClient, IOracle, IOptions
     {
         if (isMyBattlePhase())
         {
-            if (getOption(Options.autoPlay))
+            if (options.getOption(Options.autoPlay))
             {
                 aiPause();
                 boolean struck = makeForcedStrikes();
@@ -1678,7 +1685,9 @@ public final class Client implements IClient, IOracle, IOptions
         return info;
     }
 
-    /** Get this legion's info.  Create it first if necessary. */
+    /**
+     * Get this legion's info.
+     */
     public LegionInfo getLegionInfo(String markerId)
     {
         LegionInfo info = legionInfo.get(markerId);
@@ -2337,10 +2346,11 @@ public final class Client implements IClient, IOracle, IOptions
             options.setOption(Options.showStatusScreen, new String("true"));
         }
 
-        if (!getOption(Options.autoPlay)
+        if (!options.getOption(Options.autoPlay)
             || (forceViewBoard && (owningPlayer.getName().endsWith("1")
-                || getStringOption(Options.playerType).endsWith("Human") || getStringOption(
-                Options.playerType).endsWith("Network"))))
+                || options.getStringOption(Options.playerType).endsWith(
+                    "Human") || options.getStringOption(Options.playerType)
+                .endsWith("Network"))))
         {
             disposeEventViewer();
             disposePreferencesWindow();
@@ -2354,9 +2364,10 @@ public final class Client implements IClient, IOracle, IOptions
             initEventViewer();
             initShowEngagementResults();
             initPreferencesWindow();
-            optionTrigger(Options.showAutoInspector);
-            optionTrigger(Options.showLogWindow);
-            optionTrigger(Options.showCaretaker);
+            showOrHideAutoInspector(options
+                .getOption(Options.showAutoInspector));
+            showOrHideLogWindow(options.getOption(Options.showLogWindow));
+            showOrHideCaretaker(options.getOption(Options.showCaretaker));
 
             focusBoard();
         }
@@ -2395,7 +2406,7 @@ public final class Client implements IClient, IOracle, IOptions
 
     public void createSummonAngel(String markerId)
     {
-        if (getOption(Options.autoSummonAngels))
+        if (options.getOption(Options.autoSummonAngels))
         {
             String typeColonDonor = ai.summonAngel(markerId);
             List<String> parts = Split.split(':', typeColonDonor);
@@ -2428,7 +2439,7 @@ public final class Client implements IClient, IOracle, IOptions
 
     public void askAcquireAngel(String markerId, List<String> recruits)
     {
-        if (getOption(Options.autoAcquireAngels))
+        if (options.getOption(Options.autoAcquireAngels))
         {
             acquireAngelCallback(markerId, ai.acquireAngel(markerId, recruits));
         }
@@ -2448,7 +2459,7 @@ public final class Client implements IClient, IOracle, IOptions
      *  Return true if the player chooses to teleport. */
     private boolean chooseWhetherToTeleport(String hexLabel)
     {
-        if (getOption(Options.autoMasterMove))
+        if (options.getOption(Options.autoMasterMove))
         {
             return false;
         }
@@ -2472,7 +2483,7 @@ public final class Client implements IClient, IOracle, IOptions
      *  or higher strike number) in order to be allowed to carry. */
     public void askChooseStrikePenalty(List<String> choices)
     {
-        if (getOption(Options.autoPlay))
+        if (options.getOption(Options.autoPlay))
         {
             String choice = ai.pickStrikePenalty(choices);
             assignStrikePenalty(choice);
@@ -2552,11 +2563,11 @@ public final class Client implements IClient, IOracle, IOptions
     {
         // Don't bother showing messages to AI players.  Perhaps we
         // should log them.
-        if (getOption(Options.autoPlay))
+        if (options.getOption(Options.autoPlay))
         {
             boolean isAI = getOwningPlayer().isAI();
             if ((message.equals("Draw") || message.endsWith(" wins")) && !isAI
-                && !getOption(Options.autoQuit))
+                && !options.getOption(Options.autoQuit))
             {
                 // show it for humans, even in autoplay,
                 //  but not when autoQuit set (=> remote stresstest)
@@ -2654,7 +2665,7 @@ public final class Client implements IClient, IOracle, IOptions
 
     public void askConcede(String allyMarkerId, String enemyMarkerId)
     {
-        if (getOption(Options.autoConcede))
+        if (options.getOption(Options.autoConcede))
         {
             answerConcede(allyMarkerId, ai.concede(
                 getLegionInfo(allyMarkerId), getLegionInfo(enemyMarkerId)));
@@ -2668,7 +2679,7 @@ public final class Client implements IClient, IOracle, IOptions
 
     public void askFlee(String allyMarkerId, String enemyMarkerId)
     {
-        if (getOption(Options.autoFlee))
+        if (options.getOption(Options.autoFlee))
         {
             answerFlee(allyMarkerId, ai.flee(getLegionInfo(allyMarkerId),
                 getLegionInfo(enemyMarkerId)));
@@ -2708,7 +2719,7 @@ public final class Client implements IClient, IOracle, IOptions
         this.attackerMarkerId = attackerId;
         this.defenderMarkerId = defenderId;
 
-        if (getOption(Options.autoNegotiate))
+        if (options.getOption(Options.autoNegotiate))
         {
             // XXX AI players just fight for now.
             Proposal proposal = new Proposal(attackerId, defenderId, true,
@@ -2914,7 +2925,7 @@ public final class Client implements IClient, IOracle, IOptions
             leaveCarryMode();
         }
         else if (carryTargetDescriptions.size() == 1
-            && getOption(Options.autoCarrySingle))
+            && options.getOption(Options.autoCarrySingle))
         {
             Iterator<String> it = carryTargetDescriptions.iterator();
             String desc = it.next();
@@ -2923,7 +2934,7 @@ public final class Client implements IClient, IOracle, IOptions
         }
         else
         {
-            if (getOption(Options.autoPlay))
+            if (options.getOption(Options.autoPlay))
             {
                 aiPause();
                 ai.handleCarries(carryDamage, carryTargetDescriptions);
@@ -3023,7 +3034,7 @@ public final class Client implements IClient, IOracle, IOptions
         highlightEngagements();
         if (isMyTurn())
         {
-            if (getOption(Options.autoPickEngagements))
+            if (options.getOption(Options.autoPickEngagements))
             {
                 aiPause();
                 String hexLabel = ai.pickEngagement();
@@ -3105,7 +3116,7 @@ public final class Client implements IClient, IOracle, IOptions
      *  wanted, to get past the reinforcing phase. */
     public void doReinforce(String markerId)
     {
-        if (getOption(Options.autoReinforce))
+        if (options.getOption(Options.autoReinforce))
         {
             ai.reinforce(getLegionInfo(markerId));
         }
@@ -3208,7 +3219,7 @@ public final class Client implements IClient, IOracle, IOptions
             // A warm body recruits in a tower.
             recruiterName = "none";
         }
-        else if (getOption(Options.autoPickRecruiter)
+        else if (options.getOption(Options.autoPickRecruiter)
             || numEligibleRecruiters == 1)
         {
             // If there's only one possible recruiter, or if
@@ -3303,7 +3314,7 @@ public final class Client implements IClient, IOracle, IOptions
                 }
                 focusBoard();
                 defaultCursor();
-                if (!getOption(Options.autoSplit)
+                if (!options.getOption(Options.autoSplit)
                     && (getOwningPlayer().getMarkersAvailable().size() < 1 || findTallLegionHexes(
                         4).isEmpty()))
                 {
@@ -3321,7 +3332,8 @@ public final class Client implements IClient, IOracle, IOptions
 
     private void kickSplit()
     {
-        if (isMyTurn() && getOption(Options.autoSplit) && !isGameOver())
+        if (isMyTurn() && options.getOption(Options.autoSplit)
+            && !isGameOver())
         {
             boolean done = ai.split();
             if (done)
@@ -3359,7 +3371,7 @@ public final class Client implements IClient, IOracle, IOptions
         if (isMyTurn())
         {
             defaultCursor();
-            if (getOption(Options.autoPickEngagements))
+            if (options.getOption(Options.autoPickEngagements))
             {
                 aiPause();
                 ai.pickEngagement();
@@ -3388,7 +3400,7 @@ public final class Client implements IClient, IOracle, IOptions
             {
                 focusBoard();
                 defaultCursor();
-                if (!getOption(Options.autoRecruit)
+                if (!options.getOption(Options.autoRecruit)
                     && getPossibleRecruitHexes().isEmpty())
                 {
                     doneWithRecruits();
@@ -3401,8 +3413,8 @@ public final class Client implements IClient, IOracle, IOptions
         // before, this makes autorecruit stop working also for human
         // when they won against all others and continue playing
         // (just for growing bigger creatures ;-)
-        if (getOption(Options.autoRecruit) && playerAlive && isMyTurn()
-            && this.phase == Constants.Phase.MUSTER)
+        if (options.getOption(Options.autoRecruit) && playerAlive
+            && isMyTurn() && this.phase == Constants.Phase.MUSTER)
         {
             ai.muster();
             // Do not automatically say we are done.
@@ -3493,7 +3505,7 @@ public final class Client implements IClient, IOracle, IOptions
             }
         }
         updateStatusScreen();
-        if (isMyBattlePhase() && getOption(Options.autoPlay))
+        if (isMyBattlePhase() && options.getOption(Options.autoPlay))
         {
             bestMoveOrder = ai.battleMove();
             failedBattleMoves = new ArrayList<CritterMove>();
@@ -3754,7 +3766,7 @@ public final class Client implements IClient, IOracle, IOptions
         if (isMyCritter(tag) && !undo)
         {
             pushUndoStack(endingHexLabel);
-            if (getOption(Options.autoPlay))
+            if (options.getOption(Options.autoPlay))
             {
                 markBattleMoveSuccessful(tag, endingHexLabel);
             }
@@ -3933,7 +3945,8 @@ public final class Client implements IClient, IOracle, IOptions
             }
             int baseDice = 0;
             int strikeDice = strike.getDice(chit, target, baseDice);
-            if (baseDice == dice || getOption(Options.showDiceAjustmentsRange))
+            if (baseDice == dice
+                || options.getOption(Options.showDiceAjustmentsRange))
             {
                 target.setStrikeDice(strikeDice - dice);
             }
@@ -4017,7 +4030,7 @@ public final class Client implements IClient, IOracle, IOptions
                 return lordName;
 
             default:
-                if (getOption(Options.autoPickLord))
+                if (options.getOption(Options.autoPickLord))
                 {
                     lordName = lords.get(0);
                     if (lordName.startsWith(Constants.titan))
@@ -4028,7 +4041,7 @@ public final class Client implements IClient, IOracle, IOptions
                 }
                 else
                 {
-                    return PickLord.pickLord(this, board.getFrame(), lords);
+                    return PickLord.pickLord(options, board.getFrame(), lords);
                 }
         }
     }
@@ -4118,7 +4131,7 @@ public final class Client implements IClient, IOracle, IOptions
             teleport);
 
         String entrySide = null;
-        if (getOption(Options.autoPickEntrySide))
+        if (options.getOption(Options.autoPickEntrySide))
         {
             entrySide = ai.pickEntrySide(hexLabel, moverId, entrySides);
         }
@@ -4923,7 +4936,7 @@ public final class Client implements IClient, IOracle, IOptions
             board.highlightTallLegions();
         }
         if (isMyTurn() && this.phase == Constants.Phase.SPLIT
-            && getOption(Options.autoSplit) && !isGameOver())
+            && options.getOption(Options.autoSplit) && !isGameOver())
         {
             boolean done = ai.splitCallback(null, null);
             if (done)
@@ -5164,7 +5177,7 @@ public final class Client implements IClient, IOracle, IOptions
 
         this.parentId = parentId;
 
-        if (getOption(Options.autoPickMarker))
+        if (options.getOption(Options.autoPickMarker))
         {
             String childId = ai.pickMarker(markersAvailable, getShortColor());
             pickMarkerCallback(childId);
@@ -5252,7 +5265,7 @@ public final class Client implements IClient, IOracle, IOptions
         // check also for phase, because delayed callbacks could come
         // after our phase is over but activePlayerName not updated yet.
         if (isMyTurn() && this.phase == Constants.Phase.SPLIT
-            && getOption(Options.autoSplit) && !isGameOver())
+            && options.getOption(Options.autoSplit) && !isGameOver())
         {
             boolean done = ai.splitCallback(parentId, childId);
             if (done)
@@ -5265,10 +5278,10 @@ public final class Client implements IClient, IOracle, IOptions
     public void askPickColor(List<String> colorsLeft)
     {
         String color = null;
-        if (getOption(Options.autoPickColor))
+        if (options.getOption(Options.autoPickColor))
         {
             // Convert favorite colors from a comma-separated string to a list.
-            String favorites = getStringOption(Options.favoriteColors);
+            String favorites = options.getStringOption(Options.favoriteColors);
             List<String> favoriteColors = null;
             if (favorites != null)
             {
@@ -5285,7 +5298,7 @@ public final class Client implements IClient, IOracle, IOptions
             do
             {
                 color = PickColor.pickColor(board.getFrame(), owningPlayer
-                    .getName(), colorsLeft, this);
+                    .getName(), colorsLeft, options);
             }
             while (color == null);
         }
@@ -5298,7 +5311,7 @@ public final class Client implements IClient, IOracle, IOptions
     public void askPickFirstMarker()
     {
         Set<String> markersAvailable = getOwningPlayer().getMarkersAvailable();
-        if (getOption(Options.autoPickMarker))
+        if (options.getOption(Options.autoPickMarker))
         {
             String markerId = ai.pickMarker(markersAvailable, getShortColor());
             pickMarkerCallback(markerId);
@@ -5334,7 +5347,7 @@ public final class Client implements IClient, IOracle, IOptions
             }
             updateEverything();
             LOGGER.log(Level.FINEST, "Switched to Look & Feel: " + lfName);
-            setOption(Options.favoriteLookFeel, lfName);
+            options.setOption(Options.favoriteLookFeel, lfName);
         }
         catch (Exception e)
         {
@@ -5472,8 +5485,9 @@ public final class Client implements IClient, IOracle, IOptions
 
     private void setupDelay()
     {
-        delay = getIntOption(Options.aiDelay);
-        if (!getOption(Options.autoPlay) || delay < Constants.MIN_AI_DELAY)
+        delay = options.getIntOption(Options.aiDelay);
+        if (!options.getOption(Options.autoPlay)
+            || delay < Constants.MIN_AI_DELAY)
         {
             delay = Constants.MIN_AI_DELAY;
         }
@@ -5491,7 +5505,7 @@ public final class Client implements IClient, IOracle, IOptions
             disposeStatusScreen();
             updateStatusScreen();
             disposeCaretakerDisplay();
-            boolean bval = getOption(Options.showCaretaker);
+            boolean bval = options.getOption(Options.showCaretaker);
             showOrHideCaretaker(bval);
         }
     }
@@ -5563,5 +5577,27 @@ public final class Client implements IClient, IOracle, IOptions
     public Game getGame()
     {
         return game;
+    }
+
+    public Options getOptions()
+    {
+        return options;
+    }
+
+    private void showOrHideLogWindow(boolean show)
+    {
+        if (board != null && show)
+        {
+            if (logWindow == null)
+            {
+                // the logger with the empty name is parent to all loggers
+                // and thus catches all messages
+                logWindow = new LogWindow(Client.this, Logger.getLogger(""));
+            }
+        }
+        else
+        {
+            disposeLogWindow();
+        }
     }
 }
