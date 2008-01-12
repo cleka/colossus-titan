@@ -181,14 +181,13 @@ public final class BattleBoard extends KFrame
         battleDice = new BattleDice();
         getContentPane().add(battleDice, BorderLayout.SOUTH);
 
-        setTitle(client.getOwningPlayer().getPlayer().getName() + ": "
+        setTitle(client.getOwningPlayer().getName() + ": "
             + Legion.getMarkerName(attackerMarkerId) + " (" + attackerMarkerId
             + ") attacks " + Legion.getMarkerName(defenderMarkerId) + " ("
             + defenderMarkerId + ") in " + masterHexLabel);
 
-        String instanceId = client.getOwningPlayer().getPlayer().getName()
-            + ": " + attackerMarkerId + "/" + defenderMarkerId + " (" + count
-            + ")";
+        String instanceId = client.getOwningPlayer().getName() + ": "
+            + attackerMarkerId + "/" + defenderMarkerId + " (" + count + ")";
         count++;
         net.sf.colossus.webcommon.InstanceTracker.setId(this, instanceId);
 
@@ -285,8 +284,7 @@ public final class BattleBoard extends KFrame
 
                 if (answer == JOptionPane.YES_OPTION)
                 {
-                    String playerName = client.getOwningPlayer().getPlayer()
-                        .getName();
+                    String playerName = client.getOwningPlayer().getName();
                     LOGGER
                         .log(Level.INFO, playerName + " concedes the battle");
                     client.concede();
@@ -801,7 +799,7 @@ public final class BattleBoard extends KFrame
 
         private void setForeignPhase(String s)
         {
-            String name = client.getBattleActivePlayer().getPlayer().getName();
+            String name = client.getBattleActivePlayer().getName();
             phaseLabel.setText("(" + name + ") " + s);
             doneButton.setEnabled(false);
         }

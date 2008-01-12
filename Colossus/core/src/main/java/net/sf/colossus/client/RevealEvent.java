@@ -15,7 +15,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.TitledBorder;
 
-import net.sf.colossus.Player;
+import net.sf.colossus.game.PlayerState;
 import net.sf.colossus.server.Constants;
 
 
@@ -56,7 +56,7 @@ public class RevealEvent
     private String info;
     // set for losing battle events, because if Titan killed the
     // marker does already belong to slayer when we ask. 
-    private Player realPlayer;
+    private PlayerInfo realPlayer;
 
     public final static int eventSplit = 0;
     public final static int eventRecruit = 1;
@@ -157,8 +157,8 @@ public class RevealEvent
             if (rc != null && rc.getPlainName() != null
                 && rc.getPlainName().equals(Constants.titan))
             {
-                Player player = (realPlayer != null ? realPlayer : client
-                    .getPlayerStateByMarkerId(markerId).getPlayer());
+                PlayerInfo player = (realPlayer != null ? realPlayer : client
+                    .getPlayerStateByMarkerId(markerId));
 
                 if (player == null)
                 {
@@ -167,8 +167,7 @@ public class RevealEvent
                 }
                 else
                 {
-                    PlayerInfo info = client.getPlayerInfo(player);
-                    String tbName = getTitanBasename(info);
+                    String tbName = getTitanBasename(player);
                     rc.setTitanBaseName(tbName);
                 }
             }
@@ -192,7 +191,7 @@ public class RevealEvent
         this.info = info;
     }
 
-    public void setRealPlayer(Player realPlayer)
+    public void setRealPlayer(PlayerInfo realPlayer)
     {
         assert realPlayer != null;
         this.realPlayer = realPlayer;
@@ -355,9 +354,9 @@ public class RevealEvent
         return turnNumber;
     }
 
-    public Player getPlayer()
+    public PlayerState getPlayer()
     {
-        return client.getPlayerInfo(playerNr).getPlayer();
+        return client.getPlayerInfo(playerNr);
     }
 
     public int getPlayerNr()

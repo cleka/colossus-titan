@@ -5,27 +5,25 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import net.sf.colossus.Player;
-
 
 /**
- * The state of a player in a game.
+ * A player in a game.
  * 
- * This class holds all information describing the state of a player in a game, such
+ * This class holds all information describing a player in a game, such
  * as the current legions and the score. Instances of this class are always bound to
  * an instance of {@link Game}.
  */
 public class PlayerState
 {
     /**
-     * The player whose state is modeled.
-     */
-    private final Player player;
-
-    /**
      * The game this information belongs to.
      */
     private final Game game;
+
+    /**
+     * A name for this player for UI purposes and as identifier.
+     */
+    private String name;
 
     /**
      * The current legions owned by this player.
@@ -40,24 +38,15 @@ public class PlayerState
      */
     private final int number;
 
-    public PlayerState(Game game, Player player, int number)
+    public PlayerState(Game game, String playerName, int number)
     {
-        assert player != null : "Player required for joining a game";
         assert game != null : "No game without Game";
+        assert playerName != null : "Player needs a name";
         assert number >= 0 : "Player number must not be negative";
         // TODO check for max on number once game has the players stored in it
-        this.player = player;
         this.game = game;
+        this.name = playerName;
         this.number = number;
-    }
-
-    /**
-     * TODO there are quite a few places (mostly in the Client) where PlayerInfo/PlayerState
-     * should be used instead of player -- calling this getter will be an indication of that.
-     */
-    public Player getPlayer()
-    {
-        return player;
     }
 
     public Game getGame()
@@ -82,5 +71,15 @@ public class PlayerState
     public int getNumber()
     {
         return number;
+    }
+
+    public String getName()
+    {
+        return name;
+    }
+
+    public void setName(String name)
+    {
+        this.name = name;
     }
 }

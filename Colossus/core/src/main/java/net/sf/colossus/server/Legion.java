@@ -49,8 +49,7 @@ public final class Legion extends net.sf.colossus.game.Legion implements
         String playerName, Game game)
     {
         // TODO we just fake a playerstate here
-        super(new PlayerState(game, net.sf.colossus.Player
-            .getPlayerByName(playerName), 0));
+        super(new PlayerState(game, playerName, 0));
         this.markerId = markerId;
         this.parentId = parentId;
         // Sanity check
@@ -419,7 +418,7 @@ public final class Legion extends net.sf.colossus.game.Legion implements
 
     public String getPlayerName()
     {
-        return getPlayer().getPlayer().getName();
+        return getPlayer().getName();
     }
 
     Player getPlayerState()

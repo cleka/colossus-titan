@@ -129,7 +129,7 @@ public class SimpleAI implements AI
         this.client = client;
         // initialize the creature info needed by the AI
         net.sf.colossus.webcommon.InstanceTracker.register(this, client
-            .getOwningPlayer().getPlayer().getName());
+            .getOwningPlayer().getName());
     }
 
     public String pickColor(List<String> colors, List<String> favoriteColors)

@@ -96,7 +96,7 @@ public class AutoInspector extends KDialog
         panel.add(liPanel);
         String valueText = liPanel.getValueText();
         String ownerText = legion.isMyLegion() ? "" : " ["
-            + legion.getPlayer().getPlayer().getName() + "]";
+            + legion.getPlayer().getName() + "]";
         setTitle("Inspector: Legion " + legion.getMarkerId() + valueText
             + ownerText);
         liPanel = null;

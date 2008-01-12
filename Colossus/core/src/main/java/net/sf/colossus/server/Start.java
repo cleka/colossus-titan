@@ -8,7 +8,6 @@ import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.sf.colossus.Player;
 import net.sf.colossus.client.Client;
 import net.sf.colossus.client.StartClient;
 import net.sf.colossus.client.WebClient;
@@ -229,10 +228,10 @@ public final class Start
             // a hack to pass something into the Client constructor
             // TODO needs to be constructed properly
             net.sf.colossus.game.Game dummyGame = new net.sf.colossus.game.Game(
-                null, new net.sf.colossus.Player[0]);
+                null, new String[0]);
 
-            Client c = new Client(hostname, port, dummyGame, Player
-                .getPlayerByName(playerName), remote, byWeb);
+            Client c = new Client(hostname, port, dummyGame, playerName,
+                remote, byWeb);
             failed = c.getFailed();
             c = null;
         }

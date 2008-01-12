@@ -36,8 +36,7 @@ final class PickMarker extends KDialog implements MouseListener,
     PickMarker(JFrame parentFrame, PlayerState owner, Set<String> markerIds,
         Client client)
     {
-        super(parentFrame, owner.getPlayer().getName()
-            + ": Pick Legion Marker", true);
+        super(parentFrame, owner.getName() + ": Pick Legion Marker", true);
 
         this.client = client;
 

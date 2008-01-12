@@ -39,8 +39,7 @@ final class ReplyToProposal extends KDialog implements ActionListener
 
     ReplyToProposal(Client client, Proposal proposal)
     {
-        super(client.getBoard().getFrame(), client.getOwningPlayer().getPlayer()
-            .getName()
+        super(client.getBoard().getFrame(), client.getOwningPlayer().getName()
             + ": Reply to Proposal", false);
 
         this.client = client;

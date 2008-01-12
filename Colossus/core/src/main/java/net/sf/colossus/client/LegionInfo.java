@@ -54,8 +54,7 @@ public final class LegionInfo extends Legion
 
     private PredictSplitNode getNode(String markerId)
     {
-        PredictSplits ps = client.getPredictSplits(getPlayer().getPlayer()
-            .getName());
+        PredictSplits ps = client.getPredictSplits(getPlayer().getName());
         PredictSplitNode node = ps.getLeaf(markerId);
         return node;
     }

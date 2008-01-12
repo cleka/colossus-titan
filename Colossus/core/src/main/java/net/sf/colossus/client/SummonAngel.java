@@ -50,10 +50,8 @@ final class SummonAngel extends KDialog implements MouseListener,
 
     private SummonAngel(Client client, String markerId)
     {
-        super(client.getBoard().getFrame(), client.getOwningPlayer().getPlayer()
-            .getName()
-            + baseSummonString
-            + Legion.getLongMarkerName(markerId)
+        super(client.getBoard().getFrame(), client.getOwningPlayer().getName()
+            + baseSummonString + Legion.getLongMarkerName(markerId)
             + noSourceSummonString, false);
 
         this.client = client;
@@ -184,16 +182,15 @@ final class SummonAngel extends KDialog implements MouseListener,
         String donorId = client.getDonorId();
         if (donorId == null)
         {
-            setTitle(client.getOwningPlayer().getPlayer().getName()
-                + baseSummonString + Legion.getLongMarkerName(markerId)
-                + noSourceSummonString);
+            setTitle(client.getOwningPlayer().getName() + baseSummonString
+                + Legion.getLongMarkerName(markerId) + noSourceSummonString);
             return;
         }
         else
         {
-            setTitle(client.getOwningPlayer().getPlayer().getName()
-                + baseSummonString + Legion.getLongMarkerName(markerId)
-                + sourceSummonString + Legion.getLongMarkerName(donorId));
+            setTitle(client.getOwningPlayer().getName() + baseSummonString
+                + Legion.getLongMarkerName(markerId) + sourceSummonString
+                + Legion.getLongMarkerName(donorId));
         }
         Iterator<Chit> it = sumChitList.iterator();
         while (it.hasNext())

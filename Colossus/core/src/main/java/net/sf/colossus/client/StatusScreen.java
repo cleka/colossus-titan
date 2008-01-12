@@ -238,8 +238,7 @@ final class StatusScreen extends KDialog implements WindowListener
 
     void updateStatusScreen()
     {
-        activePlayerLabel.setText(oracle.getActivePlayer().getPlayer()
-            .getName());
+        activePlayerLabel.setText(oracle.getActivePlayer().getName());
         int turnNumber = oracle.getTurnNumber();
         String turn = "";
         if (turnNumber >= 1)
@@ -249,7 +248,7 @@ final class StatusScreen extends KDialog implements WindowListener
         turnLabel.setText(turn);
         phaseLabel.setText(oracle.getPhaseName());
         battleActivePlayerLabel.setText(oracle.getBattleActivePlayer()
-            .getPlayer().getName());
+            .getName());
         int battleTurnNumber = oracle.getBattleTurnNumber();
         String battleTurn = "";
         if (battleTurnNumber >= 1)
@@ -294,14 +293,14 @@ final class StatusScreen extends KDialog implements WindowListener
                 setPlayerLabelColors(nameLabel[i], bgcolor, fgcolor);
             }
 
-            nameLabel[i].setText(info.getPlayer().getName());
+            nameLabel[i].setText(info.getName());
             if (info.canTitanTeleport())
             {
-                nameLabel[i].setText(info.getPlayer().getName() + "*");
+                nameLabel[i].setText(info.getName() + "*");
             }
             else
             {
-                nameLabel[i].setText(info.getPlayer().getName());
+                nameLabel[i].setText(info.getName());
             }
             towerLabel[i].setText("" + info.getTower());
             elimLabel[i].setText(info.getPlayersElim());

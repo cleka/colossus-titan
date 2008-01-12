@@ -57,7 +57,7 @@ public final class Player extends PlayerState implements Comparable<Player>
     Player(String name, Game game)
     {
         // TODO why are the players on the client side numbered but not here?
-        super(game, net.sf.colossus.Player.getPlayerByName(name), 0);
+        super(game, name, 0);
         type = Constants.human;
 
         net.sf.colossus.webcommon.InstanceTracker.register(this, name);
@@ -105,8 +105,8 @@ public final class Player extends PlayerState implements Comparable<Player>
     void setType(final String aType)
     {
         String type = new String(aType);
-        LOGGER.log(Level.FINEST, "Called Player.setType() for "
-            + getPlayer().getName() + " " + type);
+        LOGGER.log(Level.FINEST, "Called Player.setType() for " + getName()
+            + " " + type);
         if (type.endsWith(Constants.anyAI))
         {
             int whichAI = Dice.rollDie(Constants.numAITypes) - 1;
@@ -492,8 +492,8 @@ public final class Player extends PlayerState implements Comparable<Player>
         else
         {
             movementRoll = Dice.rollDie();
-            LOGGER.log(Level.INFO, getPlayer().getName() + " rolls a "
-                + movementRoll + " for movement");
+            LOGGER.log(Level.INFO, getName() + " rolls a " + movementRoll
+                + " for movement");
         }
         getGame().getServer().allTellMovementRoll(movementRoll);
     }
@@ -503,8 +503,7 @@ public final class Player extends PlayerState implements Comparable<Player>
         if (mulligansLeft > 0)
         {
             undoAllMoves();
-            LOGGER
-                .log(Level.INFO, getPlayer().getName() + " takes a mulligan");
+            LOGGER.log(Level.INFO, getName() + " takes a mulligan");
             if (!getGame().getOption(Options.unlimitedMulligans))
             {
                 mulligansLeft--;
@@ -706,8 +705,7 @@ public final class Player extends PlayerState implements Comparable<Player>
                 getGame().getServer().allUpdatePlayerInfo();
             }
 
-            LOGGER.log(Level.INFO, getPlayer().getName() + " earns " + points
-                + " points");
+            LOGGER.log(Level.INFO, getName() + " earns " + points + " points");
         }
     }
 
@@ -775,9 +773,8 @@ public final class Player extends PlayerState implements Comparable<Player>
 
         getGame().getServer().allUpdatePlayerInfo();
 
-        LOGGER.log(Level.INFO, getPlayer().getName() + " dies");
-        getGame().getServer().allTellPlayerElim(getPlayer().getName(),
-            slayerName, true);
+        LOGGER.log(Level.INFO, getName() + " dies");
+        getGame().getServer().allTellPlayerElim(getName(), slayerName, true);
 
         // See if the game is over.
         if (checkForVictory)
@@ -802,7 +799,7 @@ public final class Player extends PlayerState implements Comparable<Player>
     {
         List<String> li = new ArrayList<String>();
         li.add(Boolean.toString(!treatDeadAsAlive && isDead()));
-        li.add(getPlayer().getName());
+        li.add(getName());
         li.add(getTower());
         li.add(getColor());
         li.add(getType());

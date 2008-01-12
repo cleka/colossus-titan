@@ -183,7 +183,7 @@ public final class MasterBoard extends JPanel
             super();
             this.clientRef = new WeakReference<Client>(client);
             net.sf.colossus.webcommon.InstanceTracker.register(this, client
-                .getOwningPlayer().getPlayer().getName());
+                .getOwningPlayer().getName());
         }
 
         @Override
@@ -280,9 +280,9 @@ public final class MasterBoard extends JPanel
     {
         this.client = client;
         net.sf.colossus.webcommon.InstanceTracker.register(this, client
-            .getOwningPlayer().getPlayer().getName());
+            .getOwningPlayer().getName());
 
-        String pname = client.getOwningPlayer().getPlayer().getName();
+        String pname = client.getOwningPlayer().getName();
         if (pname == null)
         {
             pname = "unknown";
@@ -904,7 +904,7 @@ public final class MasterBoard extends JPanel
         {
             return;
         }
-        String playerName = client.getOwningPlayer().getPlayer().getName();
+        String playerName = client.getOwningPlayer().getName();
         cachedPlayerName = playerName;
         if (bottomBar == null)
         {
@@ -990,7 +990,7 @@ public final class MasterBoard extends JPanel
 
         PlayerState activePlayer = client.getActivePlayer();
 
-        masterFrame.setTitle(activePlayer.getPlayer().getName() + " Turn "
+        masterFrame.setTitle(activePlayer.getName() + " Turn "
             + client.getTurnNumber() + " : Split stacks");
 
         phaseMenu.removeAll();
@@ -1033,8 +1033,7 @@ public final class MasterBoard extends JPanel
         }
         else
         {
-            bottomBar.setPhase("(" + activePlayer.getPlayer().getName()
-                + " splits)");
+            bottomBar.setPhase("(" + activePlayer.getName() + " splits)");
         }
     }
 
@@ -1044,7 +1043,7 @@ public final class MasterBoard extends JPanel
         reqFocus();
 
         PlayerState activePlayer = client.getActivePlayer();
-        String activePlayerName = activePlayer.getPlayer().getName();
+        String activePlayerName = activePlayer.getName();
         masterFrame.setTitle(activePlayerName + " Turn "
             + client.getTurnNumber() + " : Movement Roll: "
             + client.getMovementRoll());
@@ -1111,7 +1110,7 @@ public final class MasterBoard extends JPanel
         reqFocus();
 
         PlayerState activePlayer = client.getActivePlayer();
-        String activePlayerName = activePlayer.getPlayer().getName();
+        String activePlayerName = activePlayer.getName();
 
         masterFrame.setTitle(activePlayerName + " Turn "
             + client.getTurnNumber() + " : Resolve Engagements ");
@@ -1157,7 +1156,7 @@ public final class MasterBoard extends JPanel
         reqFocus();
 
         PlayerState activePlayer = client.getActivePlayer();
-        String activePlayerName = activePlayer.getPlayer().getName();
+        String activePlayerName = activePlayer.getName();
 
         masterFrame.setTitle(activePlayerName + " Turn "
             + client.getTurnNumber() + " : Muster Recruits ");
@@ -1638,8 +1637,8 @@ public final class MasterBoard extends JPanel
                     boolean dubiousAsBlanks = client
                         .getOption(Options.dubiousAsBlanks);
                     new ShowLegion(masterFrame, legion, point, scrollPane,
-                        4 * Scale.get(), client.getActivePlayer(),
-                        viewMode, dubiousAsBlanks);
+                        4 * Scale.get(), client.getActivePlayer(), viewMode,
+                        dubiousAsBlanks);
                     return;
                 }
                 else if (client.isMyLegion(markerId))
@@ -1672,8 +1671,7 @@ public final class MasterBoard extends JPanel
 
                 // Otherwise, the action to take depends on the phase.
                 // Only the current player can manipulate game state.
-                if (client.getOwningPlayer().equals(
-                    client.getActivePlayer()))
+                if (client.getOwningPlayer().equals(client.getActivePlayer()))
                 {
                     actOnHex(hex.getMasterHexModel().getLabel());
                     hex.repaint();

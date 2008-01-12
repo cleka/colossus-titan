@@ -53,7 +53,6 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
 
-import net.sf.colossus.Player;
 import net.sf.colossus.game.Game;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.Start;
@@ -112,7 +111,7 @@ public class WebClient extends KFrame implements WindowListener,
 
     private int state = NotLoggedIn;
     private String enrolledGameId = null;
-    
+
     private int usersLoggedIn = 0;
     private int usersEnrolled = 0;
     private int usersPlaying = 0;
@@ -132,7 +131,7 @@ public class WebClient extends KFrame implements WindowListener,
     private final Point defaultLocation = new Point(600, 100);
 
     private JLabel statusLabel;
-    private JLabel userinfoLabel;    // Server/Login pane:
+    private JLabel userinfoLabel; // Server/Login pane:
 
     private JTextField webserverHostField;
     private JTextField webserverPortField;
@@ -413,15 +412,15 @@ public class WebClient extends KFrame implements WindowListener,
     private void setupGUI()
     {
         getContentPane().setLayout(new BorderLayout());
-        
+
         Box headPane = new Box(BoxLayout.Y_AXIS);
         getContentPane().add(headPane, BorderLayout.NORTH);
-        
+
         statusLabel = new JLabel("login status");
         userinfoLabel = new JLabel("user info status");
         headPane.add(statusLabel);
         headPane.add(userinfoLabel);
-        
+
         Box mainPane = new Box(BoxLayout.Y_AXIS);
         getContentPane().add(mainPane, BorderLayout.CENTER);
 
@@ -1104,10 +1103,10 @@ public class WebClient extends KFrame implements WindowListener,
         {
             text = usersLoggedIn + " logged in.";
             // just to get rid of the "never read locally" warning...:
-            String dummy = (usersEnrolled + usersPlaying + usersDead +
-                usersLogoffAgo) + usersText;
-            LOGGER.log(Level.FINEST, "Loggedin: " + usersLoggedIn +
-                ", others dummy: " + dummy); 
+            String dummy = (usersEnrolled + usersPlaying + usersDead + usersLogoffAgo)
+                + usersText;
+            LOGGER.log(Level.FINEST, "Loggedin: " + usersLoggedIn
+                + ", others dummy: " + dummy);
             // // Server doesn't tell actual values for the other stuff yet.
             // text = usersLoggedIn + " logged in, of that " +
             //     usersEnrolled + " enrolled, " +
@@ -1198,7 +1197,7 @@ public class WebClient extends KFrame implements WindowListener,
             statusLabel.setText("Status: logged in as " + username);
             userinfoLabel.setText("Userinfo: " + getUserinfoText());
             this.setTitle(windowTitle + " " + username + " (logged in)");
-            
+
         }
         else if (state == Enrolled)
         {
@@ -1233,8 +1232,7 @@ public class WebClient extends KFrame implements WindowListener,
             userinfoLabel.setText("Userinfo: " + getUserinfoText());
             statusLabel.setText("Status: As " + username
                 + " - enrolled to game " + enrolledGameId);
-            this.setTitle(windowTitle + " " + username
-                + " (enrolled)");
+            this.setTitle(windowTitle + " " + username + " (enrolled)");
         }
         else if (state == Playing)
         {
@@ -1589,10 +1587,9 @@ public class WebClient extends KFrame implements WindowListener,
 
             // a hack to pass something into the Client constructor
             // TODO needs to be constructed properly
-            Game dummyGame = new Game(null, new net.sf.colossus.Player[0]);
+            Game dummyGame = new Game(null, new String[0]);
 
-            gc = new Client(hostname, p, dummyGame, Player
-                .getPlayerByName(username), true, true);
+            gc = new Client(hostname, p, dummyGame, username, true, true);
             boolean failed = gc.getFailed();
             if (failed)
             {

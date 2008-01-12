@@ -342,13 +342,12 @@ public final class Server implements IServer
 
     public void setBoardVisibility(Player p, boolean val)
     {
-        getClient(p.getPlayer().getName()).setBoardActive(val);
+        getClient(p.getName()).setBoardActive(val);
     }
 
     public boolean isClientGone(Player p)
     {
-        SocketServerThread sst = (SocketServerThread)getClient(p.getPlayer()
-            .getName());
+        SocketServerThread sst = (SocketServerThread)getClient(p.getName());
         if (sst == null || sst.isGone())
         {
             return true;
@@ -424,7 +423,7 @@ public final class Server implements IServer
             if (!player.isDead()
                 && !player.getType().endsWith(Constants.network))
             {
-                createLocalClient(player.getPlayer().getName());
+                createLocalClient(player.getName());
             }
         }
     }
@@ -437,10 +436,9 @@ public final class Server implements IServer
         // a hack to pass something into the Client constructor
         // TODO needs to be constructed properly
         net.sf.colossus.game.Game dummyGame = new net.sf.colossus.game.Game(
-            null, new net.sf.colossus.Player[0]);
+            null, new String[0]);
 
-        new Client("127.0.0.1", port, dummyGame, net.sf.colossus.Player
-            .getPlayerByName(playerName), false, false);
+        new Client("127.0.0.1", port, dummyGame, playerName, false, false);
     }
 
     synchronized void addClient(final IClient client, final String playerName,
@@ -521,7 +519,7 @@ public final class Server implements IServer
 
         clientMap.put(name, client);
         Player player = game.getPlayer(slot);
-        player.getPlayer().setName(name);
+        player.setName(name);
         // In case we had to change a duplicate name.
         setPlayerName(name, name);
     }
@@ -682,7 +680,7 @@ public final class Server implements IServer
             Player player = it.next();
             if (!player.isDead())
             {
-                IClient client = getClient(player.getPlayer().getName());
+                IClient client = getClient(player.getName());
                 if (client != null)
                 {
                     client.initBoard();
@@ -769,7 +767,7 @@ public final class Server implements IServer
         while (it.hasNext())
         {
             Player player = it.next();
-            IClient client = getClient(player.getPlayer().getName());
+            IClient client = getClient(player.getName());
             if (client != null)
             {
                 client.setupSplit(game.getActivePlayerName(), game
@@ -1514,7 +1512,7 @@ public final class Server implements IServer
             LOGGER.log(Level.SEVERE, getPlayerName()
                 + " illegally (wrong player) called "
                 + "doneWithSplits() - active player is "
-                + game.getActivePlayer().getPlayer().getName());
+                + game.getActivePlayer().getName());
             getClient(getPlayerName()).nak(Constants.doneWithSplits,
                 "Wrong player");
         }
@@ -1625,7 +1623,7 @@ public final class Server implements IServer
 
         Player player = getPlayer();
 
-        String name = player.getPlayer().getName();
+        String name = player.getName();
         LOGGER.log(Level.FINE, "Player " + name + " withdraws from the game.");
 
         if (player.isDead())
@@ -2088,7 +2086,7 @@ public final class Server implements IServer
         while (it.hasNext())
         {
             Player player = it.next();
-            String name = player.getPlayer().getName();
+            String name = player.getName();
             String color = player.getColor();
             IClient client = getClient(name);
             if (client != null)

@@ -39,7 +39,7 @@ final class AcquireAngel extends KDialog implements MouseListener,
     AcquireAngel(JFrame parentFrame, Client client, String markerId,
         List<String> recruits)
     {
-        super(parentFrame, client.getOwningPlayer().getPlayer().getName()
+        super(parentFrame, client.getOwningPlayer().getName()
             + ": Acquire Angel in legion " + markerId, false);
 
         this.client = client;

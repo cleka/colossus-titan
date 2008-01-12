@@ -48,20 +48,11 @@ public final class PlayerInfo extends PlayerState
      * 
      * TODO: the object should be properly initialized in the constructor
      */
-    PlayerInfo(Client client, net.sf.colossus.Player player, int number)
+    PlayerInfo(Client client, String playerName, int number)
     {
-        super(client.getGame(), player, number);
+        super(client.getGame(), playerName, number);
         this.client = client;
         net.sf.colossus.server.CustomRecruitBase.addPlayerInfo(this);
-        String playerName;
-        if (client.getOwningPlayer() != null)
-        {
-            playerName = client.getOwningPlayer().getPlayer().getName();
-        }
-        else
-        {
-            playerName = "UNKNOWN";
-        }
         net.sf.colossus.webcommon.InstanceTracker.register(this, playerName);
     }
 
@@ -76,7 +67,7 @@ public final class PlayerInfo extends PlayerState
         buf = data.remove(0);
         setDead(Boolean.valueOf(buf).booleanValue());
 
-        getPlayer().setName(data.remove(0));
+        setName(data.remove(0));
 
         setTower(data.remove(0));
 

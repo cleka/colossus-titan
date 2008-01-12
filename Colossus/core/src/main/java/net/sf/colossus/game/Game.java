@@ -1,7 +1,6 @@
 package net.sf.colossus.game;
 
 
-import net.sf.colossus.Player;
 import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.variant.Variant;
 
@@ -23,16 +22,18 @@ public class Game
 
     /**
      * The state of the different players in the game. 
+     * 
+     * TODO use List instead
      */
     private final PlayerState[] playerstates;
 
-    public Game(Variant variant, Player[] players)
+    public Game(Variant variant, String[] playerNames)
     {
         this.variant = variant;
-        this.playerstates = new PlayerState[players.length];
-        for (int i = 0; i < players.length; i++)
+        this.playerstates = new PlayerState[playerNames.length];
+        for (int i = 0; i < playerNames.length; i++)
         {
-            playerstates[i] = new PlayerState(this, players[i], i);
+            playerstates[i] = new PlayerState(this, playerNames[i], i);
         }
     }
 

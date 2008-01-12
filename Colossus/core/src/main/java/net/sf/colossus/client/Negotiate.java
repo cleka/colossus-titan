@@ -42,8 +42,7 @@ final class Negotiate extends KDialog implements MouseListener, ActionListener
 
     Negotiate(Client client, String attackerId, String defenderId)
     {
-        super(client.getBoard().getFrame(), client.getOwningPlayer().getPlayer()
-            .getName()
+        super(client.getBoard().getFrame(), client.getOwningPlayer().getName()
             + ": " + attackerId + " Negotiates with " + defenderId, false);
 
         this.client = client;

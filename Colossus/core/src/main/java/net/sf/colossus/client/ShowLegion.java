@@ -45,7 +45,7 @@ final class ShowLegion extends KDialog implements MouseListener,
 
         String valueText = liPanel.getValueText();
         String ownerText = legion.isMyLegion() ? "" : " ["
-            + legion.getPlayer().getPlayer().getName() + "]";
+            + legion.getPlayer().getName() + "]";
 
         setTitle(legion.getMarkerId() + valueText + ownerText);
         liPanel = null;
