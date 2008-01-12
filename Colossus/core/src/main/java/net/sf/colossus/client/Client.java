@@ -66,7 +66,7 @@ import net.sf.colossus.xmlparser.TerrainRecruitLoader;
  *  back and forth between BattleMap (which is really a GUI class) and
  *  this class.
  *  
- *  TODO there are quite a few spots where the existance of GUI elements
+ *  TODO there are quite a few spots where the existence of GUI elements
  *  is checked, e.g. "board == null" or "getPreferredParent() == null".
  *  Having a GUI class whose GUI may not be initialized seems utterly
  *  wrong -- it probably relates to the todo above about splitting the
