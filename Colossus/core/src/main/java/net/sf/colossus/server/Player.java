@@ -2,7 +2,6 @@ package net.sf.colossus.server;
 
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -723,8 +722,7 @@ public final class Player extends PlayerState implements Comparable<Player>
 
         Player slayer = getGame().getPlayer(slayerName);
 
-        Iterator<Legion> itLeg = legions.iterator();
-        while (itLeg.hasNext())
+        for (Iterator<Legion> itLeg = legions.iterator(); itLeg.hasNext();)
         {
             Legion legion = itLeg.next();
             String hexLabel = legion.getCurrentHexLabel();
@@ -753,11 +751,8 @@ public final class Player extends PlayerState implements Comparable<Player>
         }
 
         // Truncate every player's score to an integer value.
-        Collection<Player> players = getGame().getPlayers();
-        Iterator<Player> itPl = players.iterator();
-        while (itPl.hasNext())
+        for (Player player : getGame().getPlayers())
         {
-            Player player = itPl.next();
             player.truncScore();
         }
 
@@ -820,10 +815,8 @@ public final class Player extends PlayerState implements Comparable<Player>
     synchronized int getTotalPointValue()
     {
         int total = 0;
-        Iterator<Legion> it = legions.iterator();
-        while (it.hasNext())
+        for (Legion legion : legions)
         {
-            Legion legion = it.next();
             total += legion.getPointValue();
         }
         return total;
