@@ -83,6 +83,9 @@ public class Variant
      * The lookup is case-insensitive at the moment (TODO: check if that makes
      * sense at all).
      * 
+     * TODO in the long run noone should really need this since the names shouldn't
+     * be passed around by themselves
+     * 
      * @param name valid name of a creature type (must exist)
      * @return creature with the given name, null if not a creature
      */

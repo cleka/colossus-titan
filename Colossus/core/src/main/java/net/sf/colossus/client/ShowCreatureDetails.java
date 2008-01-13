@@ -24,6 +24,7 @@ import javax.swing.ScrollPaneConstants;
 
 import net.sf.colossus.server.Creature;
 import net.sf.colossus.server.Critter;
+import net.sf.colossus.server.Legion;
 import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.util.HTMLColor;
 import net.sf.colossus.util.KDialog;
@@ -396,6 +397,10 @@ public final class ShowCreatureDetails extends KDialog implements
     /** helper class to simulate a battle of the creature in question against
      * an other creature. especially distance and hazard must be simulated.
      * very fragile class, i suppose. but it might be worth it.
+     * 
+     * TODO this gets harder and harder to maintain the more typesafe the model gets.
+     * Figure out what it is really good for and solve the actual problem.
+     * 
      * @author Towi
      */
     final class SimulatedCritter extends Critter
@@ -408,7 +413,8 @@ public final class ShowCreatureDetails extends KDialog implements
          * @param hazard that stands in this hazard */
         SimulatedCritter(final Creature creature, final HazardTerrain hazard)
         {
-            super(creature, "markerId", null);
+            super(creature, new Legion("dummy", "dummy", "dummy", "dummy",
+                null, null), null);
             setNewHazardHex(hazard);
         }
 

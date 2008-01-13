@@ -101,13 +101,13 @@ final class PenaltyOption implements Comparable<PenaltyOption>
         {
             return 1;
         }
-        else if (striker.compareTo(other.striker) != 0)
+        else if (Critter.IMPORTANCE_ORDER.compare(striker, other.striker) != 0)
         {
-            return striker.compareTo(other.striker);
+            return Critter.IMPORTANCE_ORDER.compare(striker, other.striker);
         }
         else
         {
-            return target.compareTo(other.target);
+            return Critter.IMPORTANCE_ORDER.compare(target, other.target);
         }
     }
 

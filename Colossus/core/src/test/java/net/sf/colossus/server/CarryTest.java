@@ -31,6 +31,9 @@ public class CarryTest extends TestCase
     Creature gargoyle;
     Creature warlock;
 
+    Player red;
+    Player blue;
+
     public CarryTest(String name)
     {
         super(name);
@@ -42,8 +45,8 @@ public class CarryTest extends TestCase
         game = new Game();
         VariantSupport.loadVariant("Default", true);
 
-        game.addPlayer("Red", "SimpleAI");
-        game.addPlayer("Blue", "SimpleAI");
+        red = game.addPlayer("Red", "SimpleAI");
+        blue = game.addPlayer("Blue", "SimpleAI");
 
         cyclops = (Creature)game.getVariant().getCreatureByName("Cyclops");
         troll = (Creature)game.getVariant().getCreatureByName("Troll");
@@ -63,10 +66,10 @@ public class CarryTest extends TestCase
     {
         String hexLabel = "35"; // Desert
 
-        attacker = new Legion("Rd03", "Rd01", hexLabel, null, centaur,
-            centaur, lion, colossus, null, null, null, null, "Red", game);
-        defender = new Legion("Bu03", "Bu01", hexLabel, null, hydra, null,
-            null, null, null, null, null, null, "Blue", game);
+        attacker = new Legion("Rd03", "Rd01", hexLabel, null, red, game,
+            centaur, centaur, lion, colossus);
+        defender = new Legion("Bu03", "Bu01", hexLabel, null, blue, game,
+            hydra);
 
         game.getPlayer("Red").addLegion(attacker);
         game.getPlayer("Blue").addLegion(defender);
@@ -127,10 +130,10 @@ public class CarryTest extends TestCase
     {
         String hexLabel = "1"; // Plains
 
-        attacker = new Legion("Rd03", "Rd01", hexLabel, null, warlock,
-            warlock, colossus, null, null, null, null, null, "Red", game);
-        defender = new Legion("Bu03", "Bu01", hexLabel, null, gargoyle, ogre,
-            ogre, null, null, null, null, null, "Blue", game);
+        attacker = new Legion("Rd03", "Rd01", hexLabel, null, red, game,
+            warlock, warlock, colossus);
+        defender = new Legion("Bu03", "Bu01", hexLabel, null, blue, game,
+            gargoyle, ogre, ogre);
 
         game.getPlayer("Red").addLegion(attacker);
         game.getPlayer("Blue").addLegion(defender);

@@ -30,9 +30,6 @@ public final class LegionInfo extends Legion
 
     private final Client client;
 
-    /** immutable */
-    private final String markerId;
-
     private String hexLabel;
     private Marker marker;
     private String lastRecruit;
@@ -45,8 +42,7 @@ public final class LegionInfo extends Legion
 
     LegionInfo(String markerId, Client client)
     {
-        super(client.getPlayerStateByMarkerId(markerId));
-        this.markerId = markerId;
+        super(client.getPlayerStateByMarkerId(markerId), markerId);
         this.client = client;
         myNode = null;
         isMyLegion = getPlayer().equals(client.getOwningPlayer());
@@ -107,11 +103,6 @@ public final class LegionInfo extends Legion
     {
         return client.getGame().getVariant().getMasterBoard().getHexByLabel(
             getHexLabel());
-    }
-
-    public String getMarkerId()
-    {
-        return markerId;
     }
 
     /** Return an immutable copy of the legion's contents, in sorted order. */

@@ -9,6 +9,7 @@ import java.util.logging.Logger;
 
 import net.sf.colossus.client.CaretakerInfo;
 import net.sf.colossus.client.PlayerInfo;
+import net.sf.colossus.game.Legion;
 
 
 /**

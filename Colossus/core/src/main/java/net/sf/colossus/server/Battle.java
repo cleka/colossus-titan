@@ -13,6 +13,7 @@ import java.util.logging.Logger;
 import net.sf.colossus.client.BattleHex;
 import net.sf.colossus.client.BattleMap;
 import net.sf.colossus.client.HexMap;
+import net.sf.colossus.game.PlayerState;
 import net.sf.colossus.util.Options;
 import net.sf.colossus.variant.HazardTerrain;
 import net.sf.colossus.variant.MasterHex;
@@ -139,8 +140,8 @@ public final class Battle extends net.sf.colossus.game.Battle
 
     private void placeCritter(Critter critter)
     {
-        BattleHex entrance = BattleMap.getEntrance(terrain, critter
-            .getLegion().getEntrySide());
+        BattleHex entrance = BattleMap.getEntrance(terrain, ((Legion)critter
+            .getLegion()).getEntrySide());
         String entranceLabel = entrance.getLabel();
         critter.addBattleInfo(entranceLabel, entranceLabel, this);
         server.allPlaceNewChit(critter);
@@ -821,7 +822,7 @@ public final class Battle extends net.sf.colossus.game.Battle
 
     private void cleanupOneDeadCritter(Critter critter)
     {
-        Legion legion = critter.getLegion();
+        Legion legion = (Legion)critter.getLegion();
         Legion donor = null;
 
         // After turn 1, offboard creatures are returned to the
@@ -1026,7 +1027,7 @@ public final class Battle extends net.sf.colossus.game.Battle
             return set;
         }
 
-        Player player = critter.getPlayer();
+        PlayerState player = critter.getPlayer();
         BattleHex currentHex = critter.getCurrentHex();
 
         boolean adjacentEnemy = false;

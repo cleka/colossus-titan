@@ -37,6 +37,10 @@ public class LOSTest extends TestCase
     Creature dragon;
     Creature minotaur;
     Creature guardian;
+    Player black;
+    Player green;
+    Player red;
+    Player blue;
 
     public LOSTest(String name)
     {
@@ -49,10 +53,10 @@ public class LOSTest extends TestCase
         game = new Game();
         VariantSupport.loadVariant("Default", true);
 
-        game.addPlayer("Black", "SimpleAI");
-        game.addPlayer("Green", "SimpleAI");
-        game.addPlayer("Red", "SimpleAI");
-        game.addPlayer("Blue", "SimpleAI");
+        black = game.addPlayer("Black", "SimpleAI");
+        green = game.addPlayer("Green", "SimpleAI");
+        red = game.addPlayer("Red", "SimpleAI");
+        blue = game.addPlayer("Blue", "SimpleAI");
 
         cyclops = (Creature)game.getVariant().getCreatureByName("Cyclops");
         troll = (Creature)game.getVariant().getCreatureByName("Troll");
@@ -78,10 +82,10 @@ public class LOSTest extends TestCase
         LOGGER.log(Level.FINEST, "testLOS1()");
         String hexLabel = "3"; // Brush
 
-        defender = new Legion("Rd03", "Rd01", hexLabel, null, centaur,
-            gargoyle, null, null, null, null, null, null, "Red", game);
-        attacker = new Legion("Bl03", "Bl01", hexLabel, null, hydra, null,
-            null, null, null, null, null, null, "Black", game);
+        defender = new Legion("Rd03", "Rd01", hexLabel, null, red, game,
+            centaur, gargoyle);
+        attacker = new Legion("Bl03", "Bl01", hexLabel, null, black, game,
+            hydra);
 
         game.getPlayer("Red").addLegion(defender);
         game.getPlayer("Blue").addLegion(attacker);
@@ -113,11 +117,10 @@ public class LOSTest extends TestCase
         LOGGER.log(Level.FINEST, "testLOS2()");
         String hexLabel = "40"; // Jungle
 
-        defender = new Legion("Gr03", "Gr01", hexLabel, null, centaur,
-            centaur, lion, lion, ranger, ranger, ranger, null, "Green", game);
-        attacker = new Legion("Bk03", "Bk01", hexLabel, null, gargoyle,
-            cyclops, cyclops, cyclops, gorgon, gorgon, ranger, null, "Black",
-            game);
+        defender = new Legion("Gr03", "Gr01", hexLabel, null, green, game,
+            centaur, centaur, lion, lion, ranger, ranger, ranger);
+        attacker = new Legion("Bk03", "Bk01", hexLabel, null, black, game,
+            gargoyle, cyclops, cyclops, cyclops, gorgon, gorgon, ranger);
 
         game.getPlayer("Green").addLegion(defender);
         game.getPlayer("Black").addLegion(attacker);
@@ -256,10 +259,10 @@ public class LOSTest extends TestCase
         LOGGER.log(Level.FINEST, "testLOS3()");
         String hexLabel = "100"; // Tower
 
-        defender = new Legion("Gr03", "Gr01", hexLabel, null, centaur, lion,
-            ranger, ranger, null, null, null, null, "Green", game);
-        attacker = new Legion("Bk03", "Bk01", hexLabel, null, cyclops, gorgon,
-            gorgon, gorgon, gorgon, ranger, ranger, null, "Black", game);
+        defender = new Legion("Gr03", "Gr01", hexLabel, null, green, game,
+            centaur, lion, ranger, ranger);
+        attacker = new Legion("Bk03", "Bk01", hexLabel, null, black, game,
+            cyclops, gorgon, gorgon, gorgon, gorgon, ranger, ranger);
 
         game.getPlayer("Green").addLegion(defender);
         game.getPlayer("Black").addLegion(attacker);
@@ -386,10 +389,10 @@ public class LOSTest extends TestCase
         LOGGER.log(Level.FINEST, "testLOS4()");
         String hexLabel = "4"; // Hills
 
-        defender = new Legion("Gr03", "Gr01", hexLabel, null, centaur,
-            centaur, lion, lion, ranger, ranger, null, null, "Green", game);
-        attacker = new Legion("Bk03", "Bk01", hexLabel, null, gorgon, gorgon,
-            ranger, ranger, null, null, null, null, "Black", game);
+        defender = new Legion("Gr03", "Gr01", hexLabel, null, green, game,
+            centaur, centaur, lion, lion, ranger, ranger);
+        attacker = new Legion("Bk03", "Bk01", hexLabel, null, black, game,
+            gorgon, gorgon, ranger, ranger);
 
         game.getPlayer("Green").addLegion(defender);
         game.getPlayer("Black").addLegion(attacker);
@@ -501,10 +504,10 @@ public class LOSTest extends TestCase
         VariantSupport.loadVariant("TG-ConceptIII", true);
         String hexLabel = "1"; // Plains - Delta
 
-        defender = new Legion("Gr03", "Gr01", hexLabel, null, troll, troll,
-            troll, troll, wyvern, null, null, null, "Green", game);
-        attacker = new Legion("Bk03", "Bk01", hexLabel, null, ranger, ranger,
-            ranger, null, null, null, null, null, "Black", game);
+        defender = new Legion("Gr03", "Gr01", hexLabel, null, green, game,
+            troll, troll, troll, troll, wyvern);
+        attacker = new Legion("Bk03", "Bk01", hexLabel, null, black, game,
+            ranger, ranger, ranger);
 
         game.getPlayer("Green").addLegion(defender);
         game.getPlayer("Black").addLegion(attacker);
@@ -590,10 +593,10 @@ public class LOSTest extends TestCase
         VariantSupport.loadVariant("Badlands-JDG", true);
         String hexLabel = "5000"; // MountainsAlt
 
-        defender = new Legion("Gr03", "Gr01", hexLabel, null, dragon, dragon,
-            minotaur, minotaur, minotaur, null, null, null, "Green", game);
-        attacker = new Legion("Bk03", "Bk01", hexLabel, null, ranger, ranger,
-            ranger, null, null, null, null, null, "Black", game);
+        defender = new Legion("Gr03", "Gr01", hexLabel, null, green, game,
+            dragon, dragon, minotaur, minotaur, minotaur);
+        attacker = new Legion("Bk03", "Bk01", hexLabel, null, black, game,
+            ranger, ranger, ranger);
 
         game.getPlayer("Green").addLegion(defender);
         game.getPlayer("Black").addLegion(attacker);
@@ -678,10 +681,10 @@ public class LOSTest extends TestCase
         LOGGER.log(Level.FINEST, "testLOS7()");
         String hexLabel = "40"; // Jungle
 
-        defender = new Legion("Gr03", "Gr01", hexLabel, null, hydra, null,
-            null, null, null, null, null, null, "Green", game);
-        attacker = new Legion("Bk03", "Bk01", hexLabel, null, hydra, guardian,
-            null, null, null, null, null, null, "Black", game);
+        defender = new Legion("Gr03", "Gr01", hexLabel, null, green, game,
+            hydra);
+        attacker = new Legion("Bk03", "Bk01", hexLabel, null, black, game,
+            hydra, guardian);
 
         game.getPlayer("Green").addLegion(defender);
         game.getPlayer("Black").addLegion(attacker);

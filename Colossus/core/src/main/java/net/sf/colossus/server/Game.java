@@ -643,12 +643,13 @@ public final class Game extends net.sf.colossus.game.Game
         return server;
     }
 
-    void addPlayer(String name, String type)
+    Player addPlayer(String name, String type)
     {
         Player player = new Player(name, this);
 
         player.setType(type);
         players.add(player);
+        return player;
     }
 
     int getNumPlayers()
@@ -1638,11 +1639,19 @@ public final class Game extends net.sf.colossus.game.Game
         int battleTally = leg.getAttribute("battleTally").getIntValue();
 
         // Critters
-        Critter[] critters = new Critter[8];
+        // find legion for them, if it doesn't exist create one
+        net.sf.colossus.server.Legion legion = player
+            .getLegionByMarkerId(markerId);
+        if (legion == null)
+        {
+            legion = new net.sf.colossus.server.Legion(markerId, parentId,
+                currentHexLabel, startingHexLabel, player, this);
+            player.addLegion(legion);
+        }
+
         List<Element> creatureElements = leg.getChildren("Creature");
         Iterator<Element> it = creatureElements.iterator();
         int k = 0;
-
         while (it.hasNext())
         {
             Element cre = it.next();
@@ -1671,33 +1680,8 @@ public final class Game extends net.sf.colossus.game.Game
                 critter.setStruck(struck);
             }
 
-            critters[k] = critter;
+            legion.setCritter(k, critter);
             k++;
-        }
-
-        // If this legion already exists, modify it in place.
-        Legion legion = player.getLegionByMarkerId(markerId);
-
-        if (legion != null)
-        {
-            for (k = 0; k < legion.getHeight(); k++)
-            {
-                legion.setCritter(k, critters[k]);
-            }
-        }
-        else
-        {
-            legion = new Legion(markerId, parentId, currentHexLabel,
-                startingHexLabel, critters[0] == null ? null : critters[0]
-                    .getCreature(), critters[1] == null ? null : critters[1]
-                    .getCreature(), critters[2] == null ? null : critters[2]
-                    .getCreature(), critters[3] == null ? null : critters[3]
-                    .getCreature(), critters[4] == null ? null : critters[4]
-                    .getCreature(), critters[5] == null ? null : critters[5]
-                    .getCreature(), critters[6] == null ? null : critters[6]
-                    .getCreature(), critters[7] == null ? null : critters[7]
-                    .getCreature(), player.getName(), this);
-            player.addLegion(legion);
         }
 
         legion.setMoved(moved);
@@ -1978,8 +1962,8 @@ public final class Game extends net.sf.colossus.game.Game
 
         // Lookup coords for chit starting from player[i].getTower()
         String hexLabel = player.getTower();
-        Legion legion = Legion.getStartingLegion(markerId, hexLabel, player
-            .getName(), this);
+        Legion legion = Legion.getStartingLegion(markerId, hexLabel, player,
+            this);
         player.addLegion(legion);
     }
 

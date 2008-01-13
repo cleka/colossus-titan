@@ -1,7 +1,6 @@
 package net.sf.colossus.server;
 
 
-import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -41,10 +40,6 @@ public class Creature extends CreatureType
     private int maxCount; // Not final because we adjust for titans.
     private final String baseColor;
     private static boolean noBaseColor = false;
-
-    public static final Creature unknown = new Creature("Unknown", 1, 1,
-        false, false, new HashSet<HazardTerrain>(), false, false, false,
-        false, false, false, false, 1, "Unknown", null);
 
     public Creature(String name, int power, int skill, boolean rangestrikes,
         boolean flies, Set<HazardTerrain> nativeTerrrains,
@@ -122,11 +117,15 @@ public class Creature extends CreatureType
         return isTitan();
     }
 
-    public String getImageName()
+    // Overridden for Balrog
+    protected String getImageName()
     {
         return getName();
     }
 
+    // TODO it would be much nicer for clients of this class if this class would just
+    // store the image itself, created beforehand and passed into the constructor. That
+    // would also serve as a cache which is then bound to the lifetime of the right object
     public String[] getImageNames()
     {
         String[] tempNames;

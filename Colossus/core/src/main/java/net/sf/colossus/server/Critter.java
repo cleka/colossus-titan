@@ -3,6 +3,7 @@ package net.sf.colossus.server;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -13,24 +14,77 @@ import java.util.logging.Logger;
 
 import net.sf.colossus.client.BattleHex;
 import net.sf.colossus.client.HexMap;
+import net.sf.colossus.game.Legion;
+import net.sf.colossus.game.PlayerState;
 import net.sf.colossus.util.Options;
 import net.sf.colossus.variant.HazardTerrain;
 
 
 /**
  * Class Critter represents an individual Titan Character.
+ * 
+ * TODO this duplicates functionality from the {@link Creature} class,
+ * mostly due to the fact that the latter doesn't handle the Titans
+ * properly
+ * 
  * @version $Id$
  * @author David Ripton
  * @author Romain Dolbeau
  */
 
-public class Critter extends net.sf.colossus.game.Creature implements
-    Comparable<Critter>
+public class Critter extends net.sf.colossus.game.Creature
 {
+    /**
+     * Implements an order on Critters by some definition of importance.
+     * 
+     * The order is:
+     * - titans first
+     * - then sorted by points value
+     * - then sorted by rangestriker or not
+     * - then sorted by flyer or not
+     * - then by name
+     */
+    public static final Comparator<Critter> IMPORTANCE_ORDER = new Comparator<Critter>()
+    {
+        public int compare(Critter critter1, Critter critter2)
+        {
+            if (critter1.isTitan())
+            {
+                return -1;
+            }
+            if (critter2.isTitan())
+            {
+                return 1;
+            }
+            int diff = critter2.getPointValue() - critter1.getPointValue();
+            if (diff != 0)
+            {
+                return diff;
+            }
+            if (critter1.isRangestriker() && !critter2.isRangestriker())
+            {
+                return -1;
+            }
+            if (!critter1.isRangestriker() && critter2.isRangestriker())
+            {
+                return 1;
+            }
+            if (critter1.isFlier() && !critter2.isFlier())
+            {
+                return -1;
+            }
+            if (!critter1.isFlier() && critter2.isFlier())
+            {
+                return 1;
+            }
+            return critter1.getName().compareTo(critter2.getName());
+        }
+    };
+
     private static final Logger LOGGER = Logger.getLogger(Critter.class
         .getName());
 
-    private String markerId;
+    private Legion legion;
     private Battle battle;
     private boolean struck;
     private String currentHexLabel;
@@ -48,10 +102,10 @@ public class Critter extends net.sf.colossus.game.Creature implements
     private final SortedSet<PenaltyOption> penaltyOptions = new TreeSet<PenaltyOption>();
     private boolean carryPossible;
 
-    public Critter(Creature creature, String markerId, Game game)
+    public Critter(Creature creature, Legion legion, Game game)
     {
         super(creature);
-        this.markerId = markerId;
+        this.legion = legion;
         this.game = game;
         tag = ++tagCounter;
     }
@@ -75,22 +129,22 @@ public class Critter extends net.sf.colossus.game.Creature implements
 
     String getMarkerId()
     {
-        return markerId;
+        return legion.getMarkerId();
     }
 
-    void setMarkerId(String markerId)
+    void setLegion(Legion legion)
     {
-        this.markerId = markerId;
+        this.legion = legion;
     }
 
     Legion getLegion()
     {
-        return game.getLegionByMarkerId(markerId);
+        return legion;
     }
 
-    Player getPlayer()
+    PlayerState getPlayer()
     {
-        return game.getPlayerByMarkerId(markerId);
+        return legion.getPlayer();
     }
 
     int getTag()
@@ -112,7 +166,7 @@ public class Critter extends net.sf.colossus.game.Creature implements
     {
         if (isTitan())
         {
-            Player player = getPlayer();
+            Player player = (Player)getPlayer();
             if (player != null)
             {
                 return player.getTitanPower();
@@ -790,41 +844,6 @@ public class Critter extends net.sf.colossus.game.Creature implements
         }
     }
 
-    /** Inconsistent with equals() */
-    public int compareTo(Critter critter)
-    {
-        if (isTitan())
-        {
-            return -1;
-        }
-        if (critter.isTitan())
-        {
-            return 1;
-        }
-        int diff = critter.getPointValue() - getPointValue();
-        if (diff != 0)
-        {
-            return diff;
-        }
-        if (isRangestriker() && !critter.isRangestriker())
-        {
-            return -1;
-        }
-        if (!isRangestriker() && critter.isRangestriker())
-        {
-            return 1;
-        }
-        if (isFlier() && !critter.isFlier())
-        {
-            return -1;
-        }
-        if (!isFlier() && critter.isFlier())
-        {
-            return 1;
-        }
-        return getName().compareTo(critter.getName());
-    }
-
     // big ugly overloading, in case our Creature isn't really a Creature,
     // but a subclass of Creature.
     // getPower() is not there, as it it already overloaded above
@@ -868,11 +887,6 @@ public class Critter extends net.sf.colossus.game.Creature implements
     public String getPluralName()
     {
         return getCreature().getPluralName();
-    }
-
-    public String getImageName()
-    {
-        return getCreature().getImageName();
     }
 
     public String[] getImageNames()
