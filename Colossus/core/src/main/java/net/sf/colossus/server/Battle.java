@@ -53,7 +53,11 @@ public final class Battle extends net.sf.colossus.game.Battle
     private boolean conceded;
     private boolean driftDamageApplied = false;
 
-    /** Set of hexLabels for valid carry targets */
+    /**
+     * Set of hexLabels for valid carry targets 
+     *
+     * TODO storing the hexes themselves would be better
+     */
     private final Set<String> carryTargets = new HashSet<String>();
     private final PhaseAdvancer phaseAdvancer = new BattlePhaseAdvancer();
     private int pointsScored = 0;
@@ -117,24 +121,23 @@ public final class Battle extends net.sf.colossus.game.Battle
     {
         BattleHex entrance = BattleMap.getEntrance(terrain, legion
             .getEntrySide());
-        String entranceLabel = entrance.getLabel();
         Iterator<Critter> it = legion.getCritters().iterator();
         while (it.hasNext())
         {
             Critter critter = it.next();
 
-            String currentHexLabel = critter.getCurrentHexLabel();
-            if (currentHexLabel == null)
+            BattleHex currentHex = critter.getCurrentHex();
+            if (currentHex == null)
             {
-                currentHexLabel = entranceLabel;
+                currentHex = entrance;
             }
-            String startingHexLabel = critter.getStartingHexLabel();
-            if (startingHexLabel == null)
+            BattleHex startingHex = critter.getStartingHex();
+            if (startingHex == null)
             {
-                startingHexLabel = entranceLabel;
+                startingHex = entrance;
             }
 
-            critter.addBattleInfo(currentHexLabel, startingHexLabel, this);
+            critter.addBattleInfo(currentHex, startingHex, this);
         }
     }
 
@@ -142,8 +145,7 @@ public final class Battle extends net.sf.colossus.game.Battle
     {
         BattleHex entrance = BattleMap.getEntrance(terrain, ((Legion)critter
             .getLegion()).getEntrySide());
-        String entranceLabel = entrance.getLabel();
-        critter.addBattleInfo(entranceLabel, entranceLabel, this);
+        critter.addBattleInfo(entrance, entrance, this);
         server.allPlaceNewChit(critter);
     }
 
@@ -1116,7 +1118,7 @@ public final class Battle extends net.sf.colossus.game.Battle
 
     void applyCarries(Critter target)
     {
-        if (!carryTargets.contains(target.getCurrentHexLabel()))
+        if (!carryTargets.contains(target.getCurrentHex().getLabel()))
         {
             LOGGER.log(Level.WARNING, "Tried illegal carry to "
                 + target.getDescription());
@@ -1125,7 +1127,7 @@ public final class Battle extends net.sf.colossus.game.Battle
         int dealt = carryDamage;
         carryDamage = target.wound(carryDamage);
         dealt -= carryDamage;
-        carryTargets.remove(target.getCurrentHexLabel());
+        carryTargets.remove(target.getCurrentHex().getLabel());
 
         LOGGER.log(Level.INFO, dealt
             + (dealt == 1 ? " hit carries to " : " hits carry to ")
@@ -1732,25 +1734,26 @@ public final class Battle extends net.sf.colossus.game.Battle
     boolean doMove(int tag, String hexLabel)
     {
         Critter critter = getActiveLegion().getCritterByTag(tag);
+        BattleHex hex = BattleMap.getHexByLabel(terrain, hexLabel);
         if (critter == null)
         {
             return false;
         }
 
         // Allow null moves.
-        if (hexLabel.equals(critter.getCurrentHexLabel()))
+        if (hex.equals(critter.getCurrentHex()))
         {
             LOGGER
                 .log(Level.INFO, critter.getDescription() + " does not move");
             // Call moveToHex() anyway to sync client.
-            critter.moveToHex(hexLabel, true);
+            critter.moveToHex(hex, true);
             return true;
         }
         else if (showMoves(critter, false).contains(hexLabel))
         {
             LOGGER.log(Level.INFO, critter.getName() + " moves from "
-                + critter.getCurrentHexLabel() + " to " + hexLabel);
-            critter.moveToHex(hexLabel, true);
+                + critter.getCurrentHex().getLabel() + " to " + hexLabel);
+            critter.moveToHex(hex, true);
             return true;
         }
         else
@@ -1758,7 +1761,7 @@ public final class Battle extends net.sf.colossus.game.Battle
             Legion legion = getActiveLegion();
             String markerId = legion.getMarkerId();
             LOGGER.log(Level.WARNING, critter.getName() + " in "
-                + critter.getCurrentHexLabel()
+                + critter.getCurrentHex().getLabel()
                 + " tried to illegally move to " + hexLabel + " in " + terrain
                 + " (" + attackerId + " attacking " + defenderId
                 + ", active: " + markerId + ")");
@@ -1796,7 +1799,7 @@ public final class Battle extends net.sf.colossus.game.Battle
         while (it.hasNext())
         {
             Critter critter = it.next();
-            if (hexLabel.equals(critter.getCurrentHexLabel()))
+            if (hexLabel.equals(critter.getCurrentHex().getLabel()))
             {
                 return true;
             }
@@ -1820,7 +1823,7 @@ public final class Battle extends net.sf.colossus.game.Battle
         while (it.hasNext())
         {
             Critter critter = it.next();
-            if (hexLabel.equals(critter.getCurrentHexLabel()))
+            if (hexLabel.equals(critter.getCurrentHex().getLabel()))
             {
                 return critter;
             }

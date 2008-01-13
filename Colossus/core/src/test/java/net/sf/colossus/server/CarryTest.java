@@ -3,9 +3,10 @@ package net.sf.colossus.server;
 
 import java.util.Iterator;
 
-import net.sf.colossus.game.PlayerState;
-
 import junit.framework.TestCase;
+import net.sf.colossus.client.BattleHex;
+import net.sf.colossus.client.HexMap;
+import net.sf.colossus.game.PlayerState;
 
 
 /** 
@@ -89,12 +90,12 @@ public class CarryTest extends TestCase
 
         Critter hydra1 = defender.getCritter(0);
 
-        centaur1.setCurrentHexLabel("C5");
-        centaur2.setCurrentHexLabel("D6");
-        lion1.setCurrentHexLabel("E4");
-        colossus1.setCurrentHexLabel("C4");
+        placeCreature(centaur1, "C5");
+        placeCreature(centaur2, "D6");
+        placeCreature(lion1, "E4");
+        placeCreature(colossus1, "C4");
 
-        hydra1.setCurrentHexLabel("D5");
+        placeCreature(hydra1, "D5");
 
         assertTrue(hydra1.canStrike(centaur1));
         assertTrue(hydra1.canStrike(centaur2));
@@ -128,6 +129,13 @@ public class CarryTest extends TestCase
         assertTrue(hydra1.getPenaltyOptions().size() == 0);
     }
 
+    private void placeCreature(Critter creature, String battleHexLabel)
+    {
+        String terrain = battle.getTerrain();
+        BattleHex battleHex = HexMap.getHexByLabel(terrain, battleHexLabel);
+        creature.setCurrentHex(battleHex);
+    }
+
     public void testCarries2()
     {
         String hexLabel = "1"; // Plains
@@ -158,13 +166,13 @@ public class CarryTest extends TestCase
         ogre1.setHits(5);
         ogre2.setHits(5);
 
-        warlock1.setCurrentHexLabel("A3");
-        warlock2.setCurrentHexLabel("B4");
-        colossus1.setCurrentHexLabel("E3");
+        placeCreature(warlock1, "A3");
+        placeCreature(warlock2, "B4");
+        placeCreature(colossus1, "E3");
 
-        gargoyle1.setCurrentHexLabel("D3");
-        ogre1.setCurrentHexLabel("E2");
-        ogre2.setCurrentHexLabel("F2");
+        placeCreature(gargoyle1, "D3");
+        placeCreature(ogre1, "E2");
+        placeCreature(ogre2, "F2");
 
         assertTrue(colossus1.canStrike(gargoyle1));
         assertTrue(colossus1.canStrike(ogre1));

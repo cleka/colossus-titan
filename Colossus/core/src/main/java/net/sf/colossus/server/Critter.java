@@ -13,7 +13,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.colossus.client.BattleHex;
-import net.sf.colossus.client.HexMap;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.PlayerState;
 import net.sf.colossus.util.Options;
@@ -87,8 +86,8 @@ public class Critter extends net.sf.colossus.game.Creature
     private Legion legion;
     private Battle battle;
     private boolean struck;
-    private String currentHexLabel;
-    private String startingHexLabel;
+    private BattleHex currentHex;
+    private BattleHex startingHex;
 
     /** Damage taken */
     private int hits = 0;
@@ -110,11 +109,11 @@ public class Critter extends net.sf.colossus.game.Creature
         tag = ++tagCounter;
     }
 
-    void addBattleInfo(String currentHexLabel, String startingHexLabel,
+    void addBattleInfo(BattleHex currentHex, BattleHex startingHex,
         Battle battle)
     {
-        this.currentHexLabel = currentHexLabel;
-        this.startingHexLabel = startingHexLabel;
+        this.currentHex = currentHex;
+        this.startingHex = startingHex;
         this.battle = battle;
     }
 
@@ -230,12 +229,12 @@ public class Critter extends net.sf.colossus.game.Creature
 
     boolean hasMoved()
     {
-        return (!currentHexLabel.equals(startingHexLabel));
+        return (!currentHex.equals(startingHex));
     }
 
     void commitMove()
     {
-        startingHexLabel = currentHexLabel;
+        startingHex = currentHex;
     }
 
     boolean hasStruck()
@@ -250,32 +249,22 @@ public class Critter extends net.sf.colossus.game.Creature
 
     protected BattleHex getCurrentHex()
     {
-        return HexMap.getHexByLabel(battle.getTerrain(), currentHexLabel);
+        return currentHex;
     }
 
     BattleHex getStartingHex()
     {
-        return HexMap.getHexByLabel(battle.getTerrain(), startingHexLabel);
+        return startingHex;
     }
 
-    String getCurrentHexLabel()
+    void setCurrentHex(BattleHex hex)
     {
-        return currentHexLabel;
+        this.currentHex = hex;
     }
 
-    void setCurrentHexLabel(String label)
+    void setStartingHex(BattleHex hex)
     {
-        this.currentHexLabel = label;
-    }
-
-    String getStartingHexLabel()
-    {
-        return startingHexLabel;
-    }
-
-    void setStartingHexLabel(String label)
-    {
-        this.startingHexLabel = label;
+        this.startingHex = hex;
     }
 
     /** Return the number of enemy creatures in contact with this critter.
@@ -347,29 +336,29 @@ public class Critter extends net.sf.colossus.game.Creature
 
     /** Most code should use Battle.doMove() instead, since it checks
      *  for legality and logs the move. */
-    void moveToHex(String hexLabel, boolean tellClients)
+    void moveToHex(BattleHex hexLabel, boolean tellClients)
     {
-        currentHexLabel = hexLabel;
+        currentHex = hexLabel;
         if (tellClients)
         {
             battle.getGame().getServer().allTellBattleMove(tag,
-                startingHexLabel, currentHexLabel, false);
+                startingHex.getLabel(), currentHex.getLabel(), false);
         }
     }
 
     void undoMove()
     {
-        String formerHexLabel = currentHexLabel;
-        currentHexLabel = startingHexLabel;
+        BattleHex formerHexLabel = currentHex;
+        currentHex = startingHex;
         LOGGER.log(Level.INFO, getName() + " undoes move and returns to "
-            + startingHexLabel);
-        battle.getGame().getServer().allTellBattleMove(tag, formerHexLabel,
-            currentHexLabel, true);
+            + startingHex);
+        battle.getGame().getServer().allTellBattleMove(tag,
+            formerHexLabel.getLabel(), currentHex.getLabel(), true);
     }
 
     boolean canStrike(Critter target)
     {
-        String hexLabel = target.getCurrentHexLabel();
+        String hexLabel = target.getCurrentHex().getLabel();
         return battle.findStrikes(this, true).contains(hexLabel);
     }
 
@@ -795,9 +784,9 @@ public class Critter extends net.sf.colossus.game.Creature
             }
         }
 
-        LOGGER.log(Level.INFO, getName() + " in " + currentHexLabel
-            + " strikes " + target.getDescription() + " with strike number "
-            + strikeNumber + " : " + rollString + ": " + damage
+        LOGGER.log(Level.INFO, getName() + " in " + currentHex + " strikes "
+            + target.getDescription() + " with strike number " + strikeNumber
+            + " : " + rollString + ": " + damage
             + (damage == 1 ? " hit" : " hits"));
 
         int carryDamage = target.wound(damage);

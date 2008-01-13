@@ -22,6 +22,7 @@ import java.util.logging.Logger;
 
 import javax.swing.JOptionPane;
 
+import net.sf.colossus.client.BattleHex;
 import net.sf.colossus.client.BattleMap;
 import net.sf.colossus.client.HexMap;
 import net.sf.colossus.client.Proposal;
@@ -1333,8 +1334,10 @@ public final class Game extends net.sf.colossus.game.Game
             if (inBattle)
             {
                 cre.setAttribute("hits", "" + critter.getHits());
-                cre.setAttribute("currentHex", critter.getCurrentHexLabel());
-                cre.setAttribute("startingHex", critter.getStartingHexLabel());
+                cre.setAttribute("currentHex", critter.getCurrentHex()
+                    .getLabel());
+                cre.setAttribute("startingHex", critter.getStartingHex()
+                    .getLabel());
                 cre.setAttribute("struck", "" + critter.hasStruck());
             }
             leg.addContent(cre);
@@ -1667,14 +1670,19 @@ public final class Game extends net.sf.colossus.game.Game
 
                 critter.setHits(hits);
 
+                String terrain = getVariant().getMasterBoard().getHexByLabel(
+                    currentHexLabel).getTerrainName();
                 String currentBattleHexLabel = cre.getAttribute("currentHex")
                     .getValue();
+                BattleHex currentBattleHex = HexMap.getHexByLabel(terrain,
+                    currentBattleHexLabel);
+                critter.setCurrentHex(currentBattleHex);
 
-                critter.setCurrentHexLabel(currentBattleHexLabel);
                 String startingBattleHexLabel = cre
                     .getAttribute("startingHex").getValue();
-
-                critter.setStartingHexLabel(startingBattleHexLabel);
+                BattleHex startingBattleHex = HexMap.getHexByLabel(terrain,
+                    startingBattleHexLabel);
+                critter.setStartingHex(startingBattleHex);
 
                 boolean struck = cre.getAttribute("struck").getBooleanValue();
 

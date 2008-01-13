@@ -4,9 +4,10 @@ package net.sf.colossus.server;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.sf.colossus.game.PlayerState;
-
 import junit.framework.TestCase;
+import net.sf.colossus.client.BattleHex;
+import net.sf.colossus.client.HexMap;
+import net.sf.colossus.game.PlayerState;
 
 
 /** 
@@ -103,15 +104,22 @@ public class LOSTest extends TestCase
 
         Critter hydra1 = attacker.getCritter(0);
 
-        centaur1.setCurrentHexLabel("B3");
-        gargoyle1.setCurrentHexLabel("B4");
+        placeCreature(centaur1, "B3");
+        placeCreature(gargoyle1, "B4");
 
-        hydra1.setCurrentHexLabel("D4");
+        placeCreature(hydra1, "D4");
 
         assertTrue(!battle.isLOSBlocked(hydra1.getCurrentHex(), centaur1
             .getCurrentHex()));
         assertTrue(!battle.isLOSBlocked(hydra1.getCurrentHex(), gargoyle1
             .getCurrentHex()));
+    }
+
+    private void placeCreature(Critter creature, String battleHexLabel)
+    {
+        String terrain = battle.getTerrain();
+        BattleHex battleHex = HexMap.getHexByLabel(terrain, battleHexLabel);
+        creature.setCurrentHex(battleHex);
     }
 
     public void testLOS2()
@@ -149,21 +157,21 @@ public class LOSTest extends TestCase
         Critter gorgon2 = attacker.getCritter(5);
         Critter ranger4 = attacker.getCritter(6);
 
-        centaur1.setCurrentHexLabel("D1");
-        centaur2.setCurrentHexLabel("E1");
-        lion1.setCurrentHexLabel("F1");
-        lion2.setCurrentHexLabel("C1");
-        ranger1.setCurrentHexLabel("D2");
-        ranger2.setCurrentHexLabel("E2");
-        ranger3.setCurrentHexLabel("F2");
+        placeCreature(centaur1, "D1");
+        placeCreature(centaur2, "E1");
+        placeCreature(lion1, "F1");
+        placeCreature(lion2, "C1");
+        placeCreature(ranger1, "D2");
+        placeCreature(ranger2, "E2");
+        placeCreature(ranger3, "F2");
 
-        gargoyle1.setCurrentHexLabel("A1");
-        cyclops1.setCurrentHexLabel("A2");
-        cyclops2.setCurrentHexLabel("C4");
-        cyclops3.setCurrentHexLabel("E5");
-        gorgon1.setCurrentHexLabel("C3");
-        gorgon2.setCurrentHexLabel("D4");
-        ranger4.setCurrentHexLabel("E4");
+        placeCreature(gargoyle1, "A1");
+        placeCreature(cyclops1, "A2");
+        placeCreature(cyclops2, "C4");
+        placeCreature(cyclops3, "E5");
+        placeCreature(gorgon1, "C3");
+        placeCreature(gorgon2, "D4");
+        placeCreature(ranger4, "E4");
 
         assertTrue(!battle.isLOSBlocked(ranger1.getCurrentHex(), gargoyle1
             .getCurrentHex()));
@@ -288,18 +296,18 @@ public class LOSTest extends TestCase
         Critter ranger3 = attacker.getCritter(5);
         Critter ranger4 = attacker.getCritter(6);
 
-        centaur1.setCurrentHexLabel("D3");
-        lion1.setCurrentHexLabel("E3");
-        ranger1.setCurrentHexLabel("C3");
-        ranger2.setCurrentHexLabel("D4");
+        placeCreature(centaur1, "D3");
+        placeCreature(lion1, "E3");
+        placeCreature(ranger1, "C3");
+        placeCreature(ranger2, "D4");
 
-        cyclops1.setCurrentHexLabel("D2");
-        gorgon1.setCurrentHexLabel("A3");
-        gorgon2.setCurrentHexLabel("A2");
-        gorgon3.setCurrentHexLabel("A1");
-        gorgon4.setCurrentHexLabel("C1");
-        ranger3.setCurrentHexLabel("F1");
-        ranger4.setCurrentHexLabel("B4");
+        placeCreature(cyclops1, "D2");
+        placeCreature(gorgon1, "A3");
+        placeCreature(gorgon2, "A2");
+        placeCreature(gorgon3, "A1");
+        placeCreature(gorgon4, "C1");
+        placeCreature(ranger3, "F1");
+        placeCreature(ranger4, "B4");
 
         assertTrue(!battle.isLOSBlocked(ranger1.getCurrentHex(), cyclops1
             .getCurrentHex()));
@@ -417,17 +425,17 @@ public class LOSTest extends TestCase
         Critter ranger3 = attacker.getCritter(2);
         Critter ranger4 = attacker.getCritter(3);
 
-        centaur1.setCurrentHexLabel("D4");
-        centaur2.setCurrentHexLabel("B1");
-        lion1.setCurrentHexLabel("C5");
-        lion2.setCurrentHexLabel("B2");
-        ranger1.setCurrentHexLabel("D6");
-        ranger2.setCurrentHexLabel("E3");
+        placeCreature(centaur1, "D4");
+        placeCreature(centaur2, "B1");
+        placeCreature(lion1, "C5");
+        placeCreature(lion2, "B2");
+        placeCreature(ranger1, "D6");
+        placeCreature(ranger2, "E3");
 
-        gorgon1.setCurrentHexLabel("D2");
-        gorgon2.setCurrentHexLabel("D3");
-        ranger3.setCurrentHexLabel("B3");
-        ranger4.setCurrentHexLabel("F1");
+        placeCreature(gorgon1, "D2");
+        placeCreature(gorgon2, "D3");
+        placeCreature(ranger3, "B3");
+        placeCreature(ranger4, "F1");
 
         assertTrue(!battle.isLOSBlocked(ranger1.getCurrentHex(), gorgon1
             .getCurrentHex()));
@@ -530,15 +538,15 @@ public class LOSTest extends TestCase
         Critter ranger2 = attacker.getCritter(1);
         Critter ranger3 = attacker.getCritter(2);
 
-        troll1.setCurrentHexLabel("D6");
-        troll2.setCurrentHexLabel("B3");
-        troll3.setCurrentHexLabel("C3");
-        troll4.setCurrentHexLabel("E4");
-        wyvern1.setCurrentHexLabel("E3");
+        placeCreature(troll1, "D6");
+        placeCreature(troll2, "B3");
+        placeCreature(troll3, "C3");
+        placeCreature(troll4, "E4");
+        placeCreature(wyvern1, "E3");
 
-        ranger1.setCurrentHexLabel("E1");
-        ranger2.setCurrentHexLabel("E2");
-        ranger3.setCurrentHexLabel("F2");
+        placeCreature(ranger1, "E1");
+        placeCreature(ranger2, "E2");
+        placeCreature(ranger3, "F2");
 
         assertTrue(battle.isLOSBlocked(ranger1.getCurrentHex(), troll1
             .getCurrentHex()));
@@ -619,15 +627,15 @@ public class LOSTest extends TestCase
         Critter ranger2 = attacker.getCritter(1);
         Critter ranger3 = attacker.getCritter(2);
 
-        dragon1.setCurrentHexLabel("D3");
-        dragon2.setCurrentHexLabel("C3");
-        minotaur1.setCurrentHexLabel("E4");
-        minotaur2.setCurrentHexLabel("B2");
-        minotaur3.setCurrentHexLabel("A1");
+        placeCreature(dragon1, "D3");
+        placeCreature(dragon2, "C3");
+        placeCreature(minotaur1, "E4");
+        placeCreature(minotaur2, "B2");
+        placeCreature(minotaur3, "A1");
 
-        ranger1.setCurrentHexLabel("E2");
-        ranger2.setCurrentHexLabel("C2");
-        ranger3.setCurrentHexLabel("E5");
+        placeCreature(ranger1, "E2");
+        placeCreature(ranger2, "C2");
+        placeCreature(ranger3, "E5");
 
         assertTrue(!battle.isLOSBlocked(ranger1.getCurrentHex(), dragon1
             .getCurrentHex()));
@@ -701,9 +709,9 @@ public class LOSTest extends TestCase
         Critter hydra2 = attacker.getCritter(0);
         Critter guardian1 = attacker.getCritter(1);
 
-        hydra1.setCurrentHexLabel("D5");
-        hydra2.setCurrentHexLabel("E3");
-        guardian1.setCurrentHexLabel("E4");
+        placeCreature(hydra1, "D5");
+        placeCreature(hydra2, "E3");
+        placeCreature(guardian1, "E4");
 
         assertTrue(!battle.isLOSBlocked(hydra1.getCurrentHex(), hydra2
             .getCurrentHex()));

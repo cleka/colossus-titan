@@ -867,7 +867,7 @@ public final class Server implements IServer
             IClient client = it.next();
             client.placeNewChit(critter.getName(), critter.getMarkerId()
                 .equals(game.getBattle().getDefenderId()), critter.getTag(),
-                critter.getCurrentHexLabel());
+                critter.getCurrentHex().getLabel());
         }
     }
 
