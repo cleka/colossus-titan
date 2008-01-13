@@ -982,7 +982,6 @@ public final class Server implements IServer
                 + " illegally called doRecruit()"
                 + ": null legion for markerId " + markerId);
             client.nak(Constants.doRecruit, "Null legion");
-            // return;
         }
 
         else if (!getPlayerName().equals(legion.getPlayerName()))
@@ -990,11 +989,17 @@ public final class Server implements IServer
             LOGGER.log(Level.SEVERE, getPlayerName()
                 + " illegally called doRecruit()");
             client.nak(Constants.doRecruit, "Wrong player");
-            // return;
         }
 
-        else if ((legion.hasMoved() || game.getPhase() == Constants.Phase.FIGHT)
-            && legion.canRecruit())
+        else if (!legion.canRecruit())
+        {
+            LOGGER.log(Level.SEVERE, "Illegal legion " + markerId
+                + " for recruit: " + recruitName + " recruiterName "
+                + recruiterName);
+            client.nak(Constants.doRecruit, "Illegal recruit");
+        }
+
+        else if (legion.hasMoved() || game.getPhase() == Constants.Phase.FIGHT)
         {
             legion.sortCritters();
             Creature recruit = null;
@@ -1018,11 +1023,11 @@ public final class Server implements IServer
         }
         else
         {
-            LOGGER.log(Level.SEVERE, "Illegal recruit with legion " + markerId
-                + " recruit: " + recruitName + " recruiterName "
-                + recruiterName);
+            LOGGER.log(Level.SEVERE,
+                "Illegal recruit (not moved, not in battle) with legion "
+                    + markerId + " recruit: " + recruitName
+                    + " recruiterName " + recruiterName);
             client.nak(Constants.doRecruit, "Illegal recruit");
-            // return;
         }
 
         // Need to always call this to keep game from hanging.
