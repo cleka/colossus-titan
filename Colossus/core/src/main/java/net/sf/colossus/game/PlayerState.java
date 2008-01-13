@@ -38,6 +38,13 @@ public class PlayerState
      */
     private final int number;
 
+    /**
+     * Set to true if the player is dead.
+     * 
+     * TODO check if that isn't equivalent to not having legions anymore
+     */
+    private boolean dead;
+
     public PlayerState(Game game, String playerName, int number)
     {
         assert game != null : "No game without Game";
@@ -47,6 +54,7 @@ public class PlayerState
         this.game = game;
         this.name = playerName;
         this.number = number;
+        this.dead = false;
     }
 
     public Game getGame()
@@ -81,5 +89,15 @@ public class PlayerState
     public void setName(String name)
     {
         this.name = name;
+    }
+
+    public boolean isDead()
+    {
+        return dead;
+    }
+
+    public void setDead(boolean dead)
+    {
+        this.dead = dead;
     }
 }

@@ -25,6 +25,7 @@ import javax.swing.JOptionPane;
 import net.sf.colossus.client.BattleMap;
 import net.sf.colossus.client.HexMap;
 import net.sf.colossus.client.Proposal;
+import net.sf.colossus.game.PlayerState;
 import net.sf.colossus.util.Options;
 import net.sf.colossus.util.ResourceLoader;
 import net.sf.colossus.util.Split;
@@ -102,7 +103,7 @@ public final class Game extends net.sf.colossus.game.Game
 
     private boolean hotSeatMode = false;
     // currently visible board-player (for hotSeatMode)
-    Player cvbPlayer = null;
+    PlayerState cvbPlayer = null;
 
     /** Package-private only for JUnit test setup. */
     Game()
@@ -279,7 +280,7 @@ public final class Game extends net.sf.colossus.game.Game
     {
         for (int i = 0; i < getNumPlayers(); i++)
         {
-            Player player = players.get(i);
+            PlayerState player = players.get(i);
 
             if (player.getName().equals(name))
             {
@@ -643,7 +644,7 @@ public final class Game extends net.sf.colossus.game.Game
         return server;
     }
 
-    Player addPlayer(String name, String type)
+    PlayerState addPlayer(String name, String type)
     {
         Player player = new Player(name, this);
 
@@ -664,7 +665,7 @@ public final class Game extends net.sf.colossus.game.Game
 
         while (it.hasNext())
         {
-            Player player = it.next();
+            PlayerState player = it.next();
 
             if (!player.isDead())
             {
@@ -752,7 +753,7 @@ public final class Game extends net.sf.colossus.game.Game
 
         while (it.hasNext())
         {
-            Player player = it.next();
+            PlayerState player = it.next();
 
             if (!player.isDead())
             {
@@ -801,15 +802,15 @@ public final class Game extends net.sf.colossus.game.Game
         return remaining;
     }
 
-    Player getWinner()
+    PlayerState getWinner()
     {
         int remaining = 0;
-        Player winner = null;
+        PlayerState winner = null;
         Iterator<Player> it = players.iterator();
 
         while (it.hasNext())
         {
-            Player player = it.next();
+            PlayerState player = it.next();
 
             if (!player.isDead())
             {
@@ -1995,7 +1996,7 @@ public final class Game extends net.sf.colossus.game.Game
     {
         Set<String> set = new HashSet<String>();
         String hexLabel = hex.getLabel();
-        Player player = legion.getPlayerState();
+        Player player = legion.getPlayer();
 
         // If there are enemy legions in this hex, mark it
         // as a legal move and stop recursing.  If there is
@@ -2217,7 +2218,7 @@ public final class Game extends net.sf.colossus.game.Game
     Set<String> listTeleportMoves(Legion legion, MasterHex hex,
         int movementRoll, boolean ignoreFriends)
     {
-        Player player = legion.getPlayerState();
+        Player player = legion.getPlayer();
         Set<String> set = new HashSet<String>();
         if (movementRoll != 6 || legion.hasMoved() || player.hasTeleported())
         {
@@ -2303,7 +2304,7 @@ public final class Game extends net.sf.colossus.game.Game
     {
         Set<String> entrySides = new HashSet<String>();
         Legion legion = getLegionByMarkerId(markerId);
-        Player player = legion.getPlayerState();
+        Player player = legion.getPlayer();
         int movementRoll = player.getMovementRoll();
         MasterHex currentHex = legion.getCurrentHex();
         MasterHex targetHex = getVariant().getMasterBoard().getHexByLabel(
@@ -2378,7 +2379,7 @@ public final class Game extends net.sf.colossus.game.Game
             List<String> markerIds = getLegionMarkerIds(hexLabel);
             Iterator<String> it = markerIds.iterator();
             String markerId = it.next();
-            Player player = getPlayerByMarkerId(markerId);
+            PlayerState player = getPlayerByMarkerId(markerId);
 
             while (it.hasNext())
             {
@@ -2499,7 +2500,7 @@ public final class Game extends net.sf.colossus.game.Game
             // Remove battle info from winning legion and its creatures.
             winner.clearBattleInfo();
 
-            if (winner.getPlayerState() == getActivePlayer())
+            if (winner.getPlayer() == getActivePlayer())
             {
                 // Attacker won, so possibly summon angel.
                 if (winner.canSummonAngel())
@@ -2530,7 +2531,7 @@ public final class Game extends net.sf.colossus.game.Game
     {
         Legion legion = getLegionByMarkerId(markerId);
         Set<String> set = new HashSet<String>();
-        List<Legion> legions = legion.getPlayerState().getLegions();
+        List<Legion> legions = legion.getPlayer().getLegions();
         Iterator<Legion> it = legions.iterator();
         while (it.hasNext())
         {
@@ -2563,7 +2564,7 @@ public final class Game extends net.sf.colossus.game.Game
     boolean doSplit(String parentId, String childId, String results)
     {
         Legion legion = getLegionByMarkerId(parentId);
-        Player player = legion.getPlayerState();
+        Player player = legion.getPlayer();
 
         // Need a legion marker to split.
         if (!player.isMarkerAvailable(childId))
@@ -2704,7 +2705,7 @@ public final class Game extends net.sf.colossus.game.Game
             return "Legion null";
         }
 
-        Player player = legion.getPlayerState();
+        Player player = legion.getPlayer();
         // Verify that the move is legal.
         if (teleport)
         {
@@ -2845,8 +2846,7 @@ public final class Game extends net.sf.colossus.game.Game
     {
         Legion defender = getLegionByMarkerId(markerId);
         String hexLabel = defender.getCurrentHexLabel();
-        Legion attacker = getFirstEnemyLegion(hexLabel, defender
-            .getPlayerState());
+        Legion attacker = getFirstEnemyLegion(hexLabel, defender.getPlayer());
 
         handleConcession(defender, attacker, true);
     }
@@ -2862,7 +2862,7 @@ public final class Game extends net.sf.colossus.game.Game
             Legion attacker = getLegionByMarkerId(markerId);
             String hexLabel = attacker.getCurrentHexLabel();
             Legion defender = getFirstEnemyLegion(hexLabel, attacker
-                .getPlayerState());
+                .getPlayer());
 
             handleConcession(attacker, defender, false);
         }
@@ -2997,11 +2997,11 @@ public final class Game extends net.sf.colossus.game.Game
         // Add points, and angels if necessary.
         winner.addPoints(points);
         // Remove any fractional points.
-        winner.getPlayerState().truncScore();
+        winner.getPlayer().truncScore();
 
         // Need to grab the player reference before the legion is
         // removed.
-        Player losingPlayer = loser.getPlayerState();
+        Player losingPlayer = loser.getPlayer();
 
         String reason = fled ? Constants.reasonFled
             : Constants.reasonConcession;
@@ -3056,20 +3056,20 @@ public final class Game extends net.sf.colossus.game.Game
             if (attacker.hasTitan() && defender.hasTitan())
             {
                 // Make defender die first, to simplify turn advancing.
-                defender.getPlayerState().die(null, false);
-                attacker.getPlayerState().die(null, true);
+                defender.getPlayer().die(null, false);
+                attacker.getPlayer().die(null, true);
             }
 
             // If either was the titan stack, its owner dies and gives
             // half points to the victor.
             else if (attacker.hasTitan())
             {
-                attacker.getPlayerState().die(defender.getPlayerName(), true);
+                attacker.getPlayer().die(defender.getPlayerName(), true);
             }
 
             else if (defender.hasTitan())
             {
-                defender.getPlayerState().die(attacker.getPlayerName(), true);
+                defender.getPlayer().die(attacker.getPlayerName(), true);
             }
         }
         else
@@ -3117,7 +3117,7 @@ public final class Game extends net.sf.colossus.game.Game
 
             points = loser.getPointValue();
 
-            Player losingPlayer = loser.getPlayerState();
+            Player losingPlayer = loser.getPlayer();
 
             // Remove the losing legion.
             loser.remove();
@@ -3148,7 +3148,7 @@ public final class Game extends net.sf.colossus.game.Game
             else
             {
                 if (attacker.getHeight() < 7
-                    && !attacker.getPlayerState().hasSummoned())
+                    && !attacker.getPlayer().hasSummoned())
                 {
                     // If the attacker won the battle by agreement,
                     // he may summon an angel.
@@ -3249,7 +3249,7 @@ public final class Game extends net.sf.colossus.game.Game
     }
 
     /** Return a list of all legions not belonging to player. */
-    synchronized List<Legion> getAllEnemyLegions(Player player)
+    synchronized List<Legion> getAllEnemyLegions(PlayerState player)
     {
         List<Legion> list = new ArrayList<Legion>();
         for (Player nextPlayer : players)
@@ -3265,7 +3265,7 @@ public final class Game extends net.sf.colossus.game.Game
     }
 
     /** Return a list of ids for all legions not belonging to player. */
-    List<String> getAllEnemyLegionIds(Player player)
+    List<String> getAllEnemyLegionIds(PlayerState player)
     {
         List<String> list = new ArrayList<String>();
         for (Player nextPlayer : players)
@@ -3436,7 +3436,7 @@ public final class Game extends net.sf.colossus.game.Game
         return newLegions;
     }
 
-    int getNumEnemyLegions(String hexLabel, Player player)
+    int getNumEnemyLegions(String hexLabel, PlayerState player)
     {
         int count = 0;
         Iterator<Legion> it = getAllEnemyLegions(player).iterator();
@@ -3452,7 +3452,7 @@ public final class Game extends net.sf.colossus.game.Game
         return count;
     }
 
-    Legion getFirstEnemyLegion(String hexLabel, Player player)
+    Legion getFirstEnemyLegion(String hexLabel, PlayerState player)
     {
         Iterator<Legion> it = getAllEnemyLegions(player).iterator();
         while (it.hasNext())

@@ -4,6 +4,8 @@ package net.sf.colossus.server;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.sf.colossus.game.PlayerState;
+
 import junit.framework.TestCase;
 
 
@@ -37,10 +39,10 @@ public class LOSTest extends TestCase
     Creature dragon;
     Creature minotaur;
     Creature guardian;
-    Player black;
-    Player green;
-    Player red;
-    Player blue;
+    PlayerState black;
+    PlayerState green;
+    PlayerState red;
+    PlayerState blue;
 
     public LOSTest(String name)
     {

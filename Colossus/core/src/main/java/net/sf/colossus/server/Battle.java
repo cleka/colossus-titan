@@ -198,7 +198,7 @@ public final class Battle extends net.sf.colossus.game.Battle
         return game;
     }
 
-    private Player getActivePlayer()
+    private PlayerState getActivePlayer()
     {
         return game.getPlayerByMarkerId(legions[activeLegionNum]);
     }
@@ -420,7 +420,7 @@ public final class Battle extends net.sf.colossus.game.Battle
             {
                 // This is the attacker's titan stack, so the defender gets 
                 // his markers plus half points for his unengaged legions.
-                Player player = attacker.getPlayerState();
+                Player player = attacker.getPlayer();
                 attacker.remove();
                 player.die(getDefender().getPlayerName(), true);
             }
@@ -773,13 +773,13 @@ public final class Battle extends net.sf.colossus.game.Battle
         removeDeadCreaturesFromLegion(defender);
         removeDeadCreaturesFromLegion(attacker);
 
-        if (attacker.getPlayerState() == null
-            || attacker.getPlayerState().isTitanEliminated())
+        if (attacker.getPlayer() == null
+            || attacker.getPlayer().isTitanEliminated())
         {
             attackerElim = true;
         }
-        if (defender.getPlayerState() == null
-            || defender.getPlayerState().isTitanEliminated())
+        if (defender.getPlayer() == null
+            || defender.getPlayer().isTitanEliminated())
         {
             defenderElim = true;
         }
@@ -833,7 +833,7 @@ public final class Battle extends net.sf.colossus.game.Battle
             if (legion == getAttacker())
             {
                 // Summoned angel.
-                Player player = legion.getPlayerState();
+                Player player = legion.getPlayer();
                 donor = player.getDonor();
                 if (donor != null)
                 {
@@ -884,7 +884,7 @@ public final class Battle extends net.sf.colossus.game.Battle
 
         if (critter.isTitan())
         {
-            legion.getPlayerState().eliminateTitan();
+            legion.getPlayer().eliminateTitan();
         }
     }
 
@@ -892,8 +892,8 @@ public final class Battle extends net.sf.colossus.game.Battle
     {
         Legion attacker = getAttacker();
         Legion defender = getDefender();
-        Player attackerPlayer = attacker.getPlayerState();
-        Player defenderPlayer = defender.getPlayerState();
+        Player attackerPlayer = attacker.getPlayer();
+        Player defenderPlayer = defender.getPlayer();
 
         boolean attackerTitanDead = attackerPlayer.isTitanEliminated();
         boolean defenderTitanDead = defenderPlayer.isTitanEliminated();
@@ -903,8 +903,8 @@ public final class Battle extends net.sf.colossus.game.Battle
         {
             // Nobody gets any points.
             // Make defender die first, to simplify turn advancing.
-            defender.getPlayerState().die(null, false);
-            attacker.getPlayerState().die(null, true);
+            defender.getPlayer().die(null, false);
+            attacker.getPlayer().die(null, true);
             cleanup();
         }
 
@@ -921,7 +921,7 @@ public final class Battle extends net.sf.colossus.game.Battle
                 pointsScored = defender.getBattleTally();
                 defender.addBattleTallyToPoints();
             }
-            attacker.getPlayerState().die(slayerName, true);
+            attacker.getPlayer().die(slayerName, true);
             cleanup();
         }
         else if (defenderTitanDead)
@@ -936,7 +936,7 @@ public final class Battle extends net.sf.colossus.game.Battle
                 pointsScored = attacker.getBattleTally();
                 attacker.addBattleTallyToPoints();
             }
-            defender.getPlayerState().die(slayerName, true);
+            defender.getPlayer().die(slayerName, true);
             cleanup();
         }
 

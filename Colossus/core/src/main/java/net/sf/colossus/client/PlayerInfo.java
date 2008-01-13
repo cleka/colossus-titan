@@ -27,7 +27,6 @@ public final class PlayerInfo extends PlayerState
 {
     private Client client;
 
-    private boolean dead;
     private String tower;
     private String color;
     private String type;
@@ -93,16 +92,6 @@ public final class PlayerInfo extends PlayerState
         setMulligansLeft(Integer.parseInt(buf));
 
         setMarkersAvailable(data);
-    }
-
-    void setDead(boolean dead)
-    {
-        this.dead = dead;
-    }
-
-    boolean isDead()
-    {
-        return dead;
     }
 
     public boolean isAI()

@@ -9,6 +9,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.colossus.client.BattleMap;
+import net.sf.colossus.game.PlayerState;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.MasterHex;
 import net.sf.colossus.xmlparser.TerrainRecruitLoader;
@@ -47,7 +48,7 @@ public final class Legion extends net.sf.colossus.game.Legion implements
      * not enforce this.
      */
     public Legion(String markerId, String parentId, String currentHexLabel,
-        String startingHexLabel, Player player, Game game,
+        String startingHexLabel, PlayerState player, Game game,
         Creature... creatureTypes)
     {
         // TODO we just fake a playerstate here
@@ -70,7 +71,7 @@ public final class Legion extends net.sf.colossus.game.Legion implements
     }
 
     static Legion getStartingLegion(String markerId, String hexLabel,
-        Player player, Game game)
+        PlayerState player, Game game)
     {
         Creature[] startCre = TerrainRecruitLoader.getStartingCreatures(game
             .getVariant().getMasterBoard().getHexByLabel(hexLabel)
@@ -108,7 +109,7 @@ public final class Legion extends net.sf.colossus.game.Legion implements
         {
             return;
         }
-        Player player = getPlayerState();
+        Player player = getPlayer();
         int score = player.getScore(); // 375
         player.addPoints(points); // 375 + 150 = 525
         int value = TerrainRecruitLoader.getAcquirableRecruitmentsValue();
@@ -238,7 +239,7 @@ public final class Legion extends net.sf.colossus.game.Legion implements
 
     Legion getParent()
     {
-        return getPlayerState().getLegionByMarkerId(parentId);
+        return getPlayer().getLegionByMarkerId(parentId);
     }
 
     @Override
@@ -365,9 +366,10 @@ public final class Legion extends net.sf.colossus.game.Legion implements
         return getPlayer().getName();
     }
 
-    Player getPlayerState()
+    @Override
+    public Player getPlayer()
     {
-        return game.getPlayerByMarkerId(markerId);
+        return (Player)super.getPlayer();
     }
 
     public boolean hasMoved()
@@ -384,9 +386,9 @@ public final class Legion extends net.sf.colossus.game.Legion implements
     void remove(boolean returnCrittersToStacks, boolean updateHistory)
     {
         prepareToRemove(returnCrittersToStacks, updateHistory);
-        if (getPlayerState() != null)
+        if (getPlayer() != null)
         {
-            getPlayerState().removeLegion(this);
+            getPlayer().removeLegion(this);
         }
     }
 
@@ -420,16 +422,16 @@ public final class Legion extends net.sf.colossus.game.Legion implements
         {
             game.getServer().allRemoveLegion(markerId);
         }
-        if (getPlayerState() != null)
+        if (getPlayer() != null)
         {
-            getPlayerState().addLegionMarker(getMarkerId());
+            getPlayer().addLegionMarker(getMarkerId());
         }
     }
 
     void moveToHex(MasterHex hex, String entrySide, boolean teleported,
         String teleportingLord)
     {
-        Player player = getPlayerState();
+        Player player = getPlayer();
         String hexLabel = hex.getLabel();
 
         currentHexLabel = hexLabel;
@@ -457,7 +459,7 @@ public final class Legion extends net.sf.colossus.game.Legion implements
     boolean hasConventionalMove()
     {
         return !game.listNormalMoves(this, getCurrentHex(),
-            getPlayerState().getMovementRoll(), false).isEmpty();
+            getPlayer().getMovementRoll(), false).isEmpty();
     }
 
     void undoMove()
@@ -468,7 +470,7 @@ public final class Legion extends net.sf.colossus.game.Legion implements
             if (hasTeleported())
             {
                 setTeleported(false);
-                getPlayerState().setTeleported(false);
+                getPlayer().setTeleported(false);
             }
 
             currentHexLabel = startingHexLabel;
@@ -507,7 +509,7 @@ public final class Legion extends net.sf.colossus.game.Legion implements
     boolean canRecruit()
     {
         return (recruitName == null && getHeight() <= 6
-            && !getPlayerState().isDead() && !(game.findEligibleRecruits(
+            && !getPlayer().isDead() && !(game.findEligibleRecruits(
             getMarkerId(), getCurrentHexLabel()).isEmpty()));
     }
 
@@ -528,7 +530,7 @@ public final class Legion extends net.sf.colossus.game.Legion implements
     /** Return true if this legion can summon. */
     boolean canSummonAngel()
     {
-        Player player = getPlayerState();
+        Player player = getPlayer();
         if (getHeight() >= 7 || player.hasSummoned())
         {
             return false;
@@ -805,7 +807,7 @@ public final class Legion extends net.sf.colossus.game.Legion implements
      */
     Legion split(List<Creature> creatures, String newMarkerId)
     {
-        Player player = getPlayerState();
+        Player player = getPlayer();
         if (newMarkerId == null)
         {
             return null;
@@ -813,7 +815,7 @@ public final class Legion extends net.sf.colossus.game.Legion implements
 
         player.selectMarkerId(newMarkerId);
         Legion newLegion = new Legion(newMarkerId, markerId, currentHexLabel,
-            currentHexLabel, getPlayerState(), game);
+            currentHexLabel, getPlayer(), game);
 
         Iterator<Creature> it = creatures.iterator();
         while (it.hasNext())
@@ -853,7 +855,7 @@ public final class Legion extends net.sf.colossus.game.Legion implements
         List<String> lords = new ArrayList<String>();
 
         // Titan teleport
-        if (game.getNumEnemyLegions(hexLabel, getPlayerState()) >= 1)
+        if (game.getNumEnemyLegions(hexLabel, getPlayer()) >= 1)
         {
             if (hasTitan())
             {

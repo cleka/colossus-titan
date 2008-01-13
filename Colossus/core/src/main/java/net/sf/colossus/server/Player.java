@@ -45,7 +45,6 @@ public final class Player extends PlayerState implements Comparable<Player>
      * maintained. Things should move up.
      */
     private final List<Legion> legions = new ArrayList<Legion>();
-    private boolean dead;
     private boolean titanEliminated;
     private String donorId;
     private final SortedSet<String> markersAvailable = Collections
@@ -118,16 +117,6 @@ public final class Player extends PlayerState implements Comparable<Player>
         this.type = type;
     }
 
-    boolean isDead()
-    {
-        return dead;
-    }
-
-    void setDead(boolean dead)
-    {
-        this.dead = dead;
-    }
-
     String getColor()
     {
         return color;
@@ -161,7 +150,7 @@ public final class Player extends PlayerState implements Comparable<Player>
     /** Set markersAvailable based on other available information. */
     void computeMarkersAvailable()
     {
-        if (dead)
+        if (isDead())
         {
             markersAvailable.clear();
         }
@@ -733,7 +722,7 @@ public final class Player extends PlayerState implements Comparable<Player>
 
             if (enemyLegion != null)
             {
-                scorer = enemyLegion.getPlayerState();
+                scorer = enemyLegion.getPlayer();
             }
             else
             {

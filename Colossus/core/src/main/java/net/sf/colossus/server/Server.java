@@ -19,6 +19,7 @@ import java.util.logging.Logger;
 import net.sf.colossus.client.Client;
 import net.sf.colossus.client.IClient;
 import net.sf.colossus.client.Proposal;
+import net.sf.colossus.game.PlayerState;
 import net.sf.colossus.util.ChildThreadManager;
 import net.sf.colossus.util.Options;
 import net.sf.colossus.xmlparser.TerrainRecruitLoader;
@@ -340,12 +341,12 @@ public final class Server implements IServer
         }
     }
 
-    public void setBoardVisibility(Player p, boolean val)
+    public void setBoardVisibility(PlayerState p, boolean val)
     {
         getClient(p.getName()).setBoardActive(val);
     }
 
-    public boolean isClientGone(Player p)
+    public boolean isClientGone(PlayerState p)
     {
         SocketServerThread sst = (SocketServerThread)getClient(p.getName());
         if (sst == null || sst.isGone())
@@ -518,7 +519,7 @@ public final class Server implements IServer
         }
 
         clientMap.put(name, client);
-        Player player = game.getPlayer(slot);
+        PlayerState player = game.getPlayer(slot);
         player.setName(name);
         // In case we had to change a duplicate name.
         setPlayerName(name, name);
@@ -677,7 +678,7 @@ public final class Server implements IServer
         Iterator<Player> it = game.getPlayers().iterator();
         while (it.hasNext())
         {
-            Player player = it.next();
+            PlayerState player = it.next();
             if (!player.isDead())
             {
                 IClient client = getClient(player.getName());
@@ -766,7 +767,7 @@ public final class Server implements IServer
         Iterator<Player> it = game.getPlayers().iterator();
         while (it.hasNext())
         {
-            Player player = it.next();
+            PlayerState player = it.next();
             IClient client = getClient(player.getName());
             if (client != null)
             {
@@ -1675,7 +1676,7 @@ public final class Server implements IServer
         }
         Player player = game.getActivePlayer();
         Legion donor = game.getLegionByMarkerId(markerId);
-        if (donor != null && donor.getPlayerState() == player)
+        if (donor != null && donor.getPlayer() == player)
         {
             player.setDonor(donor);
         }

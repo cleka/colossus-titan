@@ -3,6 +3,8 @@ package net.sf.colossus.server;
 
 import java.util.Iterator;
 
+import net.sf.colossus.game.PlayerState;
+
 import junit.framework.TestCase;
 
 
@@ -31,8 +33,8 @@ public class CarryTest extends TestCase
     Creature gargoyle;
     Creature warlock;
 
-    Player red;
-    Player blue;
+    PlayerState red;
+    PlayerState blue;
 
     public CarryTest(String name)
     {
