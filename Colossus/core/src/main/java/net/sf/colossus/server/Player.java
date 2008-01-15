@@ -715,6 +715,9 @@ public final class Player extends PlayerState implements Comparable<Player>
      */
     synchronized void die(Player slayer, boolean checkForVictory)
     {
+        LOGGER
+            .info("Player '" + getName() + "' is dying, killed by " + slayer == null ? "nobody"
+                : slayer.getName());
         // Engaged legions give half points to the player they're
         // engaged with.  All others give half points to slayer,
         // if non-null.
@@ -765,10 +768,9 @@ public final class Player extends PlayerState implements Comparable<Player>
 
         getGame().getServer().allUpdatePlayerInfo();
 
-        LOGGER.log(Level.INFO, getName() + " dies");
+        LOGGER.info(getName() + " is dead, telling everyone about it");
 
-        String slayerName = slayer != null ? slayer.getName() : null;
-        getGame().getServer().allTellPlayerElim(getName(), slayerName, true);
+        getGame().getServer().allTellPlayerElim(this, slayer, true);
 
         // See if the game is over.
         if (checkForVictory)

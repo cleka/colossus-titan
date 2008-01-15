@@ -668,8 +668,9 @@ final class SocketServerThread extends Thread implements IClient
 
     public void tellPlayerElim(PlayerState player, PlayerState slayer)
     {
+        // slayer can be null
         sendToClient(Constants.tellPlayerElim + sep + player.getName() + sep
-            + slayer.getName());
+            + slayer != null ? slayer.getName() : null);
     }
 
     public void askConcede(String allyMarkerId, String enemyMarkerId)
