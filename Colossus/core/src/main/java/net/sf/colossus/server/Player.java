@@ -31,6 +31,9 @@ public final class Player extends PlayerState implements Comparable<Player>
 
     private String color; // Black, Blue, Brown, Gold, Green, Red
     private String startingTower; // hex label
+    // TODO the half-points are really used only in the die(..) method,
+    // they could be summed up there and then added all in one go. Save
+    // us from storing a double and truncating things later
     private double score; // track half-points, then round
     private boolean summoned;
     private boolean teleported;
@@ -708,6 +711,9 @@ public final class Player extends PlayerState implements Comparable<Player>
      * 
      * This method calculates the points other players get, adds them to their score and
      * then cleans up this player and marks him dead.
+     * 
+     * TODO is it really the Player's role to assign points? I'd rather see that responsibility
+     * with the Game object
      * 
      * @param slayer The player who killed us. May be null if we just gave up.
      * @param checkForVictory If set the game will be asked to check for a victory after
