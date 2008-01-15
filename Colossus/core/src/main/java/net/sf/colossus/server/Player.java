@@ -49,7 +49,11 @@ public final class Player extends PlayerState implements Comparable<Player>
      */
     private final List<Legion> legions = new ArrayList<Legion>();
     private boolean titanEliminated;
-    private String donorId;
+
+    /**
+     * The legion which gave a summonable creature.
+     */
+    private Legion donor;
     private final SortedSet<String> markersAvailable = Collections
         .synchronizedSortedSet(new TreeSet<String>());
     private String type; // "Human" or ".*AI"
@@ -275,24 +279,14 @@ public final class Player extends PlayerState implements Comparable<Player>
         this.summoned = summoned;
     }
 
-    String getDonorId()
-    {
-        return donorId;
-    }
-
     Legion getDonor()
     {
-        return getLegionByMarkerId(donorId);
-    }
-
-    void setDonorId(String markerId)
-    {
-        donorId = markerId;
+        return donor;
     }
 
     void setDonor(Legion donor)
     {
-        setDonorId(donor.getMarkerId());
+        this.donor = donor;
     }
 
     /** Remove all of this player's zero-height legions. */
@@ -304,9 +298,9 @@ public final class Player extends PlayerState implements Comparable<Player>
             Legion legion = it.next();
             if (legion.getHeight() == 0)
             {
-                if (donorId != null && donorId.equals(legion.getMarkerId()))
+                if (legion.equals(donor))
                 {
-                    donorId = null;
+                    donor = null;
                 }
                 legion.prepareToRemove(true, true);
                 it.remove();
@@ -464,7 +458,7 @@ public final class Player extends PlayerState implements Comparable<Player>
     void resetTurnState()
     {
         summoned = false;
-        donorId = null;
+        donor = null;
 
         setTeleported(false);
         movementRoll = 0;
