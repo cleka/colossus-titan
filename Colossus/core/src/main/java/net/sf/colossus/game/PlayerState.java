@@ -102,4 +102,13 @@ public class PlayerState
     {
         this.dead = dead;
     }
+
+    /**
+     * Overridden for debug/logging purposes.
+     */
+    @Override
+    public String toString()
+    {
+        return getName();
+    }
 }
