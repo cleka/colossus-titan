@@ -993,12 +993,18 @@ public class Critter extends net.sf.colossus.game.Creature
         return getCreature().isSummonable();
     }
 
+    // TODO noone seems to be calling this, so we might as well remove it
+    // Check first, though -- maybe by adding an assert false here and then
+    // run some stresstests and a game or two
     @Override
     public String toString()
     {
         return getCreature().toString();
     }
 
+    // TODO only hashCode() but not equals() is overridden. This implementation
+    // makes all Creatures(Critters) of the same CreatureType(Creature) equal,
+    // which seems highly suspicious
     @Override
     public int hashCode()
     {
