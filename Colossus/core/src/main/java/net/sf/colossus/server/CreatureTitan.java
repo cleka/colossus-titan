@@ -55,34 +55,11 @@ public class CreatureTitan extends Creature
     }
 
     @Override
-    public String[] getImageNames()
-    {
-        LOGGER.log(Level.WARNING, "Calling getImageNames() for Titan");
-        return super.getImageNames();
-    }
-
-    @Override
     public int getPointValue()
     {
         // Log.warn("Calling getPointValue() on Titan Creature"); 
         // XXX This is wrong, but 24 is better than -4.
         int val = 6 * getSkill();
-        return val;
-    }
-
-    @Override
-    public int getHintedRecruitmentValue()
-    {
-        int val = super.getHintedRecruitmentValue();
-        LOGGER.log(Level.FINEST, "getHintedRecruitmentValue() is " + val);
-        return val;
-    }
-
-    @Override
-    public int getHintedRecruitmentValue(String[] section)
-    {
-        int val = super.getHintedRecruitmentValue(section);
-        LOGGER.log(Level.FINEST, "getHintedRecruitmentValue() is " + val);
         return val;
     }
 }
