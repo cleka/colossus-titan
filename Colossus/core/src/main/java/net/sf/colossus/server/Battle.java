@@ -143,8 +143,8 @@ public final class Battle extends net.sf.colossus.game.Battle
 
     private void placeCritter(Critter critter)
     {
-        BattleHex entrance = BattleMap.getEntrance(terrain, ((Legion)critter
-            .getLegion()).getEntrySide());
+        BattleHex entrance = BattleMap.getEntrance(terrain, critter
+            .getLegion().getEntrySide());
         critter.addBattleInfo(entrance, entrance, this);
         server.allPlaceNewChit(critter);
     }
@@ -824,7 +824,7 @@ public final class Battle extends net.sf.colossus.game.Battle
 
     private void cleanupOneDeadCritter(Critter critter)
     {
-        Legion legion = (Legion)critter.getLegion();
+        Legion legion = critter.getLegion();
         Legion donor = null;
 
         // After turn 1, offboard creatures are returned to the

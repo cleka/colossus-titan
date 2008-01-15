@@ -13,8 +13,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.colossus.client.BattleHex;
-import net.sf.colossus.game.Legion;
-import net.sf.colossus.game.PlayerState;
 import net.sf.colossus.util.Options;
 import net.sf.colossus.variant.HazardTerrain;
 
@@ -25,6 +23,11 @@ import net.sf.colossus.variant.HazardTerrain;
  * TODO this duplicates functionality from the {@link Creature} class,
  * mostly due to the fact that the latter doesn't handle the Titans
  * properly
+ * 
+ * TODO a lot of the code in here is about the battle rules, often
+ * implemented in combination with the Battle class. It would be much
+ * easier if this class was just a dumb critter and the rules of battles
+ * are all in the Battle class.
  * 
  * @version $Id$
  * @author David Ripton
@@ -42,6 +45,8 @@ public class Critter extends net.sf.colossus.game.Creature
      * - then sorted by rangestriker or not
      * - then sorted by flyer or not
      * - then by name
+     * 
+     * TODO this is actually applicable on the CreatureType level
      */
     public static final Comparator<Critter> IMPORTANCE_ORDER = new Comparator<Critter>()
     {
@@ -141,7 +146,7 @@ public class Critter extends net.sf.colossus.game.Creature
         return legion;
     }
 
-    PlayerState getPlayer()
+    Player getPlayer()
     {
         return legion.getPlayer();
     }
@@ -165,7 +170,7 @@ public class Critter extends net.sf.colossus.game.Creature
     {
         if (isTitan())
         {
-            Player player = (Player)getPlayer();
+            Player player = getPlayer();
             if (player != null)
             {
                 return player.getTitanPower();
