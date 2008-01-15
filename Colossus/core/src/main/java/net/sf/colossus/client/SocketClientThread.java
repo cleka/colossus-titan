@@ -591,7 +591,8 @@ final class SocketClientThread extends Thread implements IServer
         {
             String playerName = args.remove(0);
             String slayerName = args.remove(0);
-            client.tellPlayerElim(playerName, slayerName);
+            client.tellPlayerElim(client.getPlayerInfo(playerName), client
+                .getPlayerInfo(slayerName));
         }
         else if (method.equals(Constants.askConcede))
         {
@@ -651,9 +652,9 @@ final class SocketClientThread extends Thread implements IServer
                 .fromInt(Integer.parseInt(args.remove(0)));
             String attackerMarkerId = args.remove(0);
             String defenderMarkerId = args.remove(0);
-            client.initBattle(masterHexLabel, battleTurnNumber,
-                battleActivePlayerName, battlePhase, attackerMarkerId,
-                defenderMarkerId);
+            client.initBattle(masterHexLabel, battleTurnNumber, client
+                .getPlayerInfo(battleActivePlayerName), battlePhase,
+                attackerMarkerId, defenderMarkerId);
         }
         else if (method.equals(Constants.cleanupBattle))
         {
@@ -687,13 +688,15 @@ final class SocketClientThread extends Thread implements IServer
         {
             String activePlayerName = args.remove(0);
             int turnNumber = Integer.parseInt(args.remove(0));
-            client.setupTurnState(activePlayerName, turnNumber);
+            client.setupTurnState(client.getPlayerInfo(activePlayerName),
+                turnNumber);
         }
         else if (method.equals(Constants.setupSplit))
         {
             String activePlayerName = args.remove(0);
             int turnNumber = Integer.parseInt(args.remove(0));
-            client.setupSplit(activePlayerName, turnNumber);
+            client.setupSplit(client.getPlayerInfo(activePlayerName),
+                turnNumber);
         }
         else if (method.equals(Constants.setupMove))
         {
@@ -711,27 +714,30 @@ final class SocketClientThread extends Thread implements IServer
         {
             String battleActivePlayerName = args.remove(0);
             int battleTurnNumber = Integer.parseInt(args.remove(0));
-            client.setupBattleSummon(battleActivePlayerName, battleTurnNumber);
+            client.setupBattleSummon(client
+                .getPlayerInfo(battleActivePlayerName), battleTurnNumber);
         }
         else if (method.equals(Constants.setupBattleRecruit))
         {
             String battleActivePlayerName = args.remove(0);
             int battleTurnNumber = Integer.parseInt(args.remove(0));
-            client
-                .setupBattleRecruit(battleActivePlayerName, battleTurnNumber);
+            client.setupBattleRecruit(client
+                .getPlayerInfo(battleActivePlayerName), battleTurnNumber);
         }
         else if (method.equals(Constants.setupBattleMove))
         {
             String battleActivePlayerName = args.remove(0);
             int battleTurnNumber = Integer.parseInt(args.remove(0));
-            client.setupBattleMove(battleActivePlayerName, battleTurnNumber);
+            client.setupBattleMove(client
+                .getPlayerInfo(battleActivePlayerName), battleTurnNumber);
         }
         else if (method.equals(Constants.setupBattleFight))
         {
             Constants.BattlePhase battlePhase = Constants.BattlePhase
                 .fromInt(Integer.parseInt(args.remove(0)));
             String battleActivePlayerName = args.remove(0);
-            client.setupBattleFight(battlePhase, battleActivePlayerName);
+            client.setupBattleFight(battlePhase, client
+                .getPlayerInfo(battleActivePlayerName));
         }
         else if (method.equals(Constants.tellLegionLocation))
         {

@@ -96,6 +96,8 @@ public class PlayerState
         return dead;
     }
 
+    // TODO it would probably be safer not to have this method and instead set the
+    // state only in the constructor or during die()
     public void setDead(boolean dead)
     {
         this.dead = dead;

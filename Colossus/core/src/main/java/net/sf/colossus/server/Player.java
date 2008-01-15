@@ -703,13 +703,21 @@ public final class Player extends PlayerState implements Comparable<Player>
         score = Math.floor(score);
     }
 
-    synchronized void die(String slayerName, boolean checkForVictory)
+    /**
+     * Turns the player dead.
+     * 
+     * This method calculates the points other players get, adds them to their score and
+     * then cleans up this player and marks him dead.
+     * 
+     * @param slayer The player who killed us. May be null if we just gave up.
+     * @param checkForVictory If set the game will be asked to check for a victory after
+     *      we are finished.
+     */
+    synchronized void die(Player slayer, boolean checkForVictory)
     {
         // Engaged legions give half points to the player they're
         // engaged with.  All others give half points to slayer,
         // if non-null.
-
-        Player slayer = getGame().getPlayer(slayerName);
 
         for (Iterator<Legion> itLeg = legions.iterator(); itLeg.hasNext();)
         {
@@ -758,6 +766,8 @@ public final class Player extends PlayerState implements Comparable<Player>
         getGame().getServer().allUpdatePlayerInfo();
 
         LOGGER.log(Level.INFO, getName() + " dies");
+
+        String slayerName = slayer != null ? slayer.getName() : null;
         getGame().getServer().allTellPlayerElim(getName(), slayerName, true);
 
         // See if the game is over.

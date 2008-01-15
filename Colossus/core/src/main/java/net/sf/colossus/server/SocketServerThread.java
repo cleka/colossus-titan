@@ -15,6 +15,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.colossus.client.IClient;
+import net.sf.colossus.game.PlayerState;
 import net.sf.colossus.util.Glob;
 import net.sf.colossus.util.Split;
 import net.sf.colossus.webcommon.InstanceTracker;
@@ -665,10 +666,10 @@ final class SocketServerThread extends Thread implements IClient
         sendToClient(Constants.tellGameOver + sep + message);
     }
 
-    public void tellPlayerElim(String playerName, String slayerName)
+    public void tellPlayerElim(PlayerState player, PlayerState slayer)
     {
-        sendToClient(Constants.tellPlayerElim + sep + playerName + sep
-            + slayerName);
+        sendToClient(Constants.tellPlayerElim + sep + player.getName() + sep
+            + slayer.getName());
     }
 
     public void askConcede(String allyMarkerId, String enemyMarkerId)
@@ -706,11 +707,11 @@ final class SocketServerThread extends Thread implements IClient
     }
 
     public void initBattle(String masterHexLabel, int battleTurnNumber,
-        String battleActivePlayerName, Constants.BattlePhase battlePhase,
+        PlayerState battleActivePlayer, Constants.BattlePhase battlePhase,
         String attackerMarkerId, String defenderMarkerId)
     {
         sendToClient(Constants.initBattle + sep + masterHexLabel + sep
-            + battleTurnNumber + sep + battleActivePlayerName + sep
+            + battleTurnNumber + sep + battleActivePlayer.getName() + sep
             + battlePhase.toInt() + sep + attackerMarkerId + sep
             + defenderMarkerId);
     }
@@ -743,15 +744,15 @@ final class SocketServerThread extends Thread implements IClient
             + recruitName);
     }
 
-    public void setupTurnState(String activePlayerName, int turnNumber)
+    public void setupTurnState(PlayerState activePlayer, int turnNumber)
     {
-        sendToClient(Constants.setupTurnState + sep + activePlayerName + sep
-            + turnNumber);
+        sendToClient(Constants.setupTurnState + sep + activePlayer.getName()
+            + sep + turnNumber);
     }
 
-    public void setupSplit(String activePlayerName, int turnNumber)
+    public void setupSplit(PlayerState activePlayer, int turnNumber)
     {
-        sendToClient(Constants.setupSplit + sep + activePlayerName + sep
+        sendToClient(Constants.setupSplit + sep + activePlayer.getName() + sep
             + turnNumber);
     }
 
@@ -770,32 +771,32 @@ final class SocketServerThread extends Thread implements IClient
         sendToClient(Constants.setupMuster);
     }
 
-    public void setupBattleSummon(String battleActivePlayerName,
+    public void setupBattleSummon(PlayerState battleActivePlayer,
         int battleTurnNumber)
     {
         sendToClient(Constants.setupBattleSummon + sep
-            + battleActivePlayerName + sep + battleTurnNumber);
+            + battleActivePlayer.getName() + sep + battleTurnNumber);
     }
 
-    public void setupBattleRecruit(String battleActivePlayerName,
+    public void setupBattleRecruit(PlayerState battleActivePlayer,
         int battleTurnNumber)
     {
         sendToClient(Constants.setupBattleRecruit + sep
-            + battleActivePlayerName + sep + battleTurnNumber);
+            + battleActivePlayer.getName() + sep + battleTurnNumber);
     }
 
-    public void setupBattleMove(String battleActivePlayerName,
+    public void setupBattleMove(PlayerState battleActivePlayer,
         int battleTurnNumber)
     {
-        sendToClient(Constants.setupBattleMove + sep + battleActivePlayerName
-            + sep + battleTurnNumber);
+        sendToClient(Constants.setupBattleMove + sep
+            + battleActivePlayer.getName() + sep + battleTurnNumber);
     }
 
     public void setupBattleFight(Constants.BattlePhase battlePhase,
-        String battleActivePlayerName)
+        PlayerState battleActivePlayer)
     {
         sendToClient(Constants.setupBattleFight + sep + battlePhase.toInt()
-            + sep + battleActivePlayerName);
+            + sep + battleActivePlayer.getName());
     }
 
     public void tellLegionLocation(String markerId, String hexLabel)

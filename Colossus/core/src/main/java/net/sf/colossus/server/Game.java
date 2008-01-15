@@ -87,7 +87,7 @@ public final class Game extends net.sf.colossus.game.Game
     private final Set<Proposal> attackerProposals = new HashSet<Proposal>();
     private final Set<Proposal> defenderProposals = new HashSet<Proposal>();
 
-    private final LinkedList<String> colorPickOrder = new LinkedList<String>();
+    private final LinkedList<PlayerState> colorPickOrder = new LinkedList<PlayerState>();
     private List<String> colorsLeft;
     private final PhaseAdvancer phaseAdvancer = new GamePhaseAdvancer();
     private Options options = null;
@@ -305,24 +305,24 @@ public final class Game extends net.sf.colossus.game.Game
      *  If loading a game, this is the network player with a matching
      *  player name.  If a new game, it's the first network player whose
      *  name is still set to <By client> */
-    int findNetworkSlot(final String playerName)
+    int findNetworkSlot(final PlayerState player)
     {
         for (int i = 0; i < getNumPlayers(); i++)
         {
-            Player player = players.get(i);
+            Player curPlayer = players.get(i);
 
-            if (player.getType().endsWith(Constants.network))
+            if (curPlayer.getType().endsWith(Constants.network))
             {
                 if (isLoadingGame())
                 {
-                    if (playerName.equals(player.getName()))
+                    if (player.equals(curPlayer))
                     {
                         return i;
                     }
                 }
                 else
                 {
-                    if (player.getName().startsWith(Constants.byClient))
+                    if (curPlayer.getName().startsWith(Constants.byClient))
                     {
                         return i;
                     }
@@ -340,10 +340,8 @@ public final class Game extends net.sf.colossus.game.Game
         {
             Player player = it.next();
 
-            server.oneSetOption(player.getName(), Options.autoPlay, player
-                .isAI());
-            server.oneSetOption(player.getName(), Options.playerType, player
-                .getType());
+            server.oneSetOption(player, Options.autoPlay, player.isAI());
+            server.oneSetOption(player, Options.playerType, player.getType());
         }
     }
 
@@ -396,7 +394,7 @@ public final class Game extends net.sf.colossus.game.Game
 
             if (player.isHuman())
             {
-                colorPickOrder.add(player.getName());
+                colorPickOrder.add(player);
             }
         }
         for (int i = getNumPlayers() - 1; i >= 0; i--)
@@ -405,7 +403,7 @@ public final class Game extends net.sf.colossus.game.Game
 
             if (player.isAI())
             {
-                colorPickOrder.add(player.getName());
+                colorPickOrder.add(player);
             }
         }
 
@@ -416,7 +414,7 @@ public final class Game extends net.sf.colossus.game.Game
     {
         if (colorPickOrder.size() >= 1)
         {
-            String playerName = colorPickOrder.getFirst();
+            PlayerState playerName = colorPickOrder.getFirst();
 
             server.askPickColor(playerName, colorsLeft);
         }
@@ -469,14 +467,12 @@ public final class Game extends net.sf.colossus.game.Game
         return newName;
     }
 
-    void assignColor(String playerName, String color)
+    void assignColor(PlayerState player, String color)
     {
-        Player player = getPlayer(playerName);
-
-        colorPickOrder.remove(playerName);
+        colorPickOrder.remove(player);
         colorsLeft.remove(color);
-        player.setColor(color);
-        String type = player.getType();
+        ((Player)player).setColor(color);
+        String type = ((Player)player).getType();
         String gotName = player.getName();
         if (gotName.startsWith(Constants.byType))
         {
@@ -485,9 +481,8 @@ public final class Game extends net.sf.colossus.game.Game
             {
                 LOGGER.log(Level.INFO, "Setting for \"" + gotName
                     + "\" new name: " + newName);
-                server.setPlayerName(gotName, newName);
+                server.setPlayerName(player, newName);
                 player.setName(newName);
-                playerName = newName;
             }
             else
             {
@@ -499,17 +494,16 @@ public final class Game extends net.sf.colossus.game.Game
 
         if (gotName.startsWith(Constants.byColor))
         {
-            server.setPlayerName(player.getName(), color);
+            server.setPlayerName(player, color);
             player.setName(color);
-            playerName = color;
         }
-        LOGGER.log(Level.INFO, player.getName() + " chooses color " + color);
-        player.initMarkersAvailable();
+        LOGGER.log(Level.INFO, player + " chooses color " + color);
+        ((Player)player).initMarkersAvailable();
         server.allUpdatePlayerInfo();
-        server.askPickFirstMarker(playerName);
+        server.askPickFirstMarker(player);
     }
 
-    String getNextColorPicker()
+    PlayerState getNextColorPicker()
     {
         return colorPickOrder.getFirst();
     }
@@ -889,22 +883,22 @@ public final class Game extends net.sf.colossus.game.Game
     /** Advance to the next phase, only if the passed oldPhase and playerName
      *  are current. */
     synchronized void advancePhase(final Constants.Phase oldPhase,
-        final String playerName)
+        final PlayerState player)
     {
         if (oldPhase != phase || pendingAdvancePhase
-            || !playerName.equals(getActivePlayerName()))
+            || !player.equals(getActivePlayer()))
         {
             LOGGER
                 .log(
                     Level.SEVERE,
                     "Player "
-                        + playerName
+                        + player.getName()
                         + " called advancePhase illegally (reason: "
                         + (oldPhase != phase ? "oldPhase (" + oldPhase
                             + ") != phase (" + phase + ")"
                             : (pendingAdvancePhase ? "pendingAdvancePhase is true "
-                                : (!playerName.equals(getActivePlayerName()) ? "wrong player ["
-                                    + playerName
+                                : (!player.equals(getActivePlayer()) ? "wrong player ["
+                                    + player.getName()
                                     + " vs. "
                                     + getActivePlayerName() + "]"
                                     : "UNKNOWN"))) + ")");
@@ -1108,7 +1102,7 @@ public final class Game extends net.sf.colossus.game.Game
         // still being around to advance the turn.
         if (player.isDead())
         {
-            advancePhase(Constants.Phase.MUSTER, player.getName());
+            advancePhase(Constants.Phase.MUSTER, player);
         }
         else
         {
@@ -1270,7 +1264,7 @@ public final class Game extends net.sf.colossus.game.Game
                 bat.setAttribute("masterHexLabel", battle.getMasterHexLabel());
                 bat.setAttribute("turnNumber", "" + battle.getTurnNumber());
                 bat.setAttribute("activePlayer", ""
-                    + battle.getActivePlayerName());
+                    + battle.getActivePlayer().getName());
                 bat
                     .setAttribute("phase", ""
                         + battle.getBattlePhase().toInt());
@@ -2693,10 +2687,8 @@ public final class Game extends net.sf.colossus.game.Game
         }
         else
         {
-            server.oneRevealLegion(legion, player.getName(),
-                Constants.reasonSplit);
-            server.oneRevealLegion(newLegion, player.getName(),
-                Constants.reasonSplit);
+            server.oneRevealLegion(legion, player, Constants.reasonSplit);
+            server.oneRevealLegion(newLegion, player, Constants.reasonSplit);
         }
         return true;
     }
@@ -2805,9 +2797,9 @@ public final class Game extends net.sf.colossus.game.Game
             attacker.sortCritters();
             defender.sortCritters();
 
-            server.oneRevealLegion(attacker, defender.getPlayerName(),
+            server.oneRevealLegion(attacker, defender.getPlayer(),
                 Constants.reasonEngaged);
-            server.oneRevealLegion(defender, attacker.getPlayerName(),
+            server.oneRevealLegion(defender, attacker.getPlayer(),
                 Constants.reasonEngaged);
 
             if (defender.canFlee())
@@ -2863,7 +2855,7 @@ public final class Game extends net.sf.colossus.game.Game
     {
         if (battleInProgress)
         {
-            battle.concede(getLegionByMarkerId(markerId).getPlayerName());
+            battle.concede(getLegionByMarkerId(markerId).getPlayer());
         }
         else
         {
@@ -2936,16 +2928,16 @@ public final class Game extends net.sf.colossus.game.Game
         else
         {
             ourProposals.add(proposal);
-            String other = null;
+            PlayerState other = null;
             if (playerName.equals(getActivePlayerName()))
             {
                 Legion defender = getLegionByMarkerId(proposal.getDefenderId());
 
-                other = defender.getPlayerName();
+                other = defender.getPlayer();
             }
             else
             {
-                other = getActivePlayerName();
+                other = getActivePlayer();
             }
 
             // Tell the other player about the proposal.
@@ -3026,7 +3018,7 @@ public final class Game extends net.sf.colossus.game.Game
             // loser.remove outside/before the if (or would need to store
             // the hasTitan information as extra boolean)
             loser.remove();
-            losingPlayer.die(winner.getPlayerName(), true);
+            losingPlayer.die(winner.getPlayer(), true);
         }
         else
         {
@@ -3072,12 +3064,12 @@ public final class Game extends net.sf.colossus.game.Game
             // half points to the victor.
             else if (attacker.hasTitan())
             {
-                attacker.getPlayer().die(defender.getPlayerName(), true);
+                attacker.getPlayer().die(defender.getPlayer(), true);
             }
 
             else if (defender.hasTitan())
             {
-                defender.getPlayer().die(attacker.getPlayerName(), true);
+                defender.getPlayer().die(attacker.getPlayer(), true);
             }
         }
         else
@@ -3118,9 +3110,9 @@ public final class Game extends net.sf.colossus.game.Game
             }
             LOGGER.log(Level.INFO, log.toString());
 
-            server.oneRevealLegion(winner, attacker.getPlayerName(),
+            server.oneRevealLegion(winner, attacker.getPlayer(),
                 Constants.reasonNegotiated);
-            server.oneRevealLegion(winner, defender.getPlayerName(),
+            server.oneRevealLegion(winner, defender.getPlayer(),
                 Constants.reasonNegotiated);
 
             points = loser.getPointValue();
@@ -3141,7 +3133,7 @@ public final class Game extends net.sf.colossus.game.Game
             // points to the victor.
             if (loser.hasTitan())
             {
-                losingPlayer.die(winner.getPlayerName(), true);
+                losingPlayer.die(winner.getPlayer(), true);
             }
 
             if (winner == defender)
@@ -3170,11 +3162,11 @@ public final class Game extends net.sf.colossus.game.Game
         checkEngagementDone();
     }
 
-    synchronized void askAcquireAngel(String playerName, String markerId,
+    synchronized void askAcquireAngel(Player player, String markerId,
         List<String> recruits)
     {
         acquiring = true;
-        server.askAcquireAngel(playerName, markerId, recruits);
+        server.askAcquireAngel(player, markerId, recruits);
     }
 
     synchronized void doneAcquiringAngels()
@@ -3537,9 +3529,9 @@ public final class Game extends net.sf.colossus.game.Game
             turnNumber);
     }
 
-    void playerElimEvent(String playerName, String slayerName)
+    void playerElimEvent(PlayerState player, PlayerState slayer)
     {
-        history.playerElimEvent(playerName, slayerName, turnNumber);
+        history.playerElimEvent(player, slayer, turnNumber);
     }
 
     public NotifyWebServer getNotifyWebServer()
@@ -3587,11 +3579,12 @@ public final class Game extends net.sf.colossus.game.Game
             }
         }
 
-        public void gotClient(String name, String type)
+        public void gotClient(PlayerState player, String type)
         {
             if (active)
             {
-                out.println("Client (type " + type + ") connected: " + name);
+                out.println("Client (type " + type + ") connected: "
+                    + player.getName());
                 out.flush();
             }
         }

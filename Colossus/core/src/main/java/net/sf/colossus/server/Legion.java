@@ -133,7 +133,7 @@ public final class Legion extends net.sf.colossus.game.Legion implements
             if ((recruits != null) && (!recruits.isEmpty()))
             {
                 angelsToAcquire++; // 1       2
-                game.askAcquireAngel(getPlayerName(), getMarkerId(), recruits);
+                game.askAcquireAngel(getPlayer(), getMarkerId(), recruits);
             }
         }
     }
@@ -361,11 +361,6 @@ public final class Legion extends net.sf.colossus.game.Legion implements
         return getCritters().size();
     }
 
-    public String getPlayerName()
-    {
-        return getPlayer().getName();
-    }
-
     @Override
     public Player getPlayer()
     {
@@ -446,14 +441,17 @@ public final class Legion extends net.sf.colossus.game.Legion implements
             player.setTeleported(true);
         }
 
-        LOGGER.log(Level.INFO, "Legion "
-            + getLongMarkerName()
-            + " in "
-            + getStartingHexLabel()
-            + (teleported ? (game.getNumEnemyLegions(hexLabel, game
-                .getPlayer(getPlayerName())) > 0 ? " titan teleports "
-                : " tower teleports (" + teleportingLord + ") ") : " moves ")
-            + "to " + hex.getDescription() + " entering on " + entrySide);
+        LOGGER
+            .log(Level.INFO,
+                "Legion "
+                    + getLongMarkerName()
+                    + " in "
+                    + getStartingHexLabel()
+                    + (teleported ? (game.getNumEnemyLegions(hexLabel,
+                        getPlayer()) > 0 ? " titan teleports "
+                        : " tower teleports (" + teleportingLord + ") ")
+                        : " moves ") + "to " + hex.getDescription()
+                    + " entering on " + entrySide);
     }
 
     boolean hasConventionalMove()

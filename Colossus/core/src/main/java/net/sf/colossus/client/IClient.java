@@ -4,6 +4,7 @@ package net.sf.colossus.client;
 import java.util.List;
 import java.util.Set;
 
+import net.sf.colossus.game.PlayerState;
 import net.sf.colossus.server.Constants;
 
 
@@ -55,7 +56,7 @@ public interface IClient
 
     public void initBoard();
 
-    public void setPlayerName(String playerName);
+    public void setPlayerName(String newPlayerName);
 
     public void createSummonAngel(String markerId);
 
@@ -65,7 +66,7 @@ public interface IClient
 
     public void tellGameOver(String message);
 
-    public void tellPlayerElim(String playerName, String slayerName);
+    public void tellPlayerElim(PlayerState player, PlayerState slayer);
 
     public void askConcede(String allyMarkerId, String enemyMarkerId);
 
@@ -81,7 +82,7 @@ public interface IClient
         Set<String> carryTargetDescriptions);
 
     public void initBattle(String masterHexLabel, int battleTurnNumber,
-        String battleActivePlayerName, Constants.BattlePhase battlePhase,
+        PlayerState battleActivePlayer, Constants.BattlePhase battlePhase,
         String attackerMarkerId, String defenderMarkerId);
 
     public void cleanupBattle();
@@ -95,9 +96,9 @@ public interface IClient
 
     public void undidRecruit(String markerId, String recruitName);
 
-    public void setupTurnState(String activePlayerName, int turnNumber);
+    public void setupTurnState(PlayerState activePlayer, int turnNumber);
 
-    public void setupSplit(String activePlayerName, int turnNumber);
+    public void setupSplit(PlayerState activePlayer, int turnNumber);
 
     public void setupMove();
 
@@ -105,17 +106,17 @@ public interface IClient
 
     public void setupMuster();
 
-    public void setupBattleSummon(String battleActivePlayerName,
+    public void setupBattleSummon(PlayerState battleActivePlayer,
         int battleTurnNumber);
 
-    public void setupBattleRecruit(String battleActivePlayerName,
+    public void setupBattleRecruit(PlayerState battleActivePlayer,
         int battleTurnNumber);
 
-    public void setupBattleMove(String battleActivePlayerName,
+    public void setupBattleMove(PlayerState battleActivePlayer,
         int battleTurnNumber);
 
     public void setupBattleFight(Constants.BattlePhase battlePhase,
-        String battleActivePlayerName);
+        PlayerState battleActivePlayer);
 
     public void tellLegionLocation(String markerId, String hexLabel);
 

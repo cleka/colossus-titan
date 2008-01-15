@@ -97,11 +97,11 @@ public final class Battle extends net.sf.colossus.game.Battle
 
         LOGGER.log(Level.INFO, attacker.getLongMarkerName()
             + " ("
-            + attacker.getPlayerName()
+            + attacker.getPlayer().getName()
             + ") attacks "
             + defender.getLongMarkerName()
             + " ("
-            + defender.getPlayerName()
+            + defender.getPlayer().getName()
             + ")"
             + " in "
             + game.getVariant().getMasterBoard().getHexByLabel(masterHexLabel)
@@ -200,18 +200,9 @@ public final class Battle extends net.sf.colossus.game.Battle
         return game;
     }
 
-    private PlayerState getActivePlayer()
+    PlayerState getActivePlayer()
     {
         return game.getPlayerByMarkerId(legions[activeLegionNum]);
-    }
-
-    String getActivePlayerName()
-    {
-        if (getActivePlayer() == null)
-        {
-            return null;
-        }
-        return getActivePlayer().getName();
     }
 
     String getAttackerId()
@@ -260,15 +251,15 @@ public final class Battle extends net.sf.colossus.game.Battle
         }
     }
 
-    private Legion getLegionByPlayerName(String playerName)
+    private Legion getLegionByPlayer(Player player)
     {
         Legion attacker = getAttacker();
-        if (attacker != null && attacker.getPlayerName().equals(playerName))
+        if (attacker != null && attacker.getPlayer().equals(player))
         {
             return attacker;
         }
         Legion defender = getDefender();
-        if (defender != null && defender.getPlayerName().equals(playerName))
+        if (defender != null && defender.getPlayer().equals(player))
         {
             return defender;
         }
@@ -389,7 +380,7 @@ public final class Battle extends net.sf.colossus.game.Battle
             if (activeLegionNum == Constants.ATTACKER)
             {
                 phase = Constants.BattlePhase.SUMMON;
-                LOGGER.log(Level.INFO, getActivePlayerName()
+                LOGGER.log(Level.INFO, getActivePlayer()
                     + "'s battle turn, number " + turnNumber);
                 again = setupSummon();
             }
@@ -406,7 +397,7 @@ public final class Battle extends net.sf.colossus.game.Battle
                     again = setupRecruit();
                     if (getActivePlayer() != null)
                     {
-                        LOGGER.log(Level.INFO, getActivePlayerName()
+                        LOGGER.log(Level.INFO, getActivePlayer()
                             + "'s battle turn, number " + turnNumber);
                     }
                 }
@@ -424,7 +415,7 @@ public final class Battle extends net.sf.colossus.game.Battle
                 // his markers plus half points for his unengaged legions.
                 Player player = attacker.getPlayer();
                 attacker.remove();
-                player.die(getDefender().getPlayerName(), true);
+                player.die(getDefender().getPlayer(), true);
             }
             else
             {
@@ -662,9 +653,9 @@ public final class Battle extends net.sf.colossus.game.Battle
     }
 
     /** Mark all of the conceding player's critters as dead. */
-    void concede(String playerName)
+    void concede(Player player)
     {
-        Legion legion = getLegionByPlayerName(playerName);
+        Legion legion = getLegionByPlayer(player);
         String markerId = legion.getMarkerId();
         LOGGER.log(Level.INFO, markerId + " concedes the battle");
         conceded = true;
@@ -676,7 +667,7 @@ public final class Battle extends net.sf.colossus.game.Battle
             critter.setDead(true);
         }
 
-        if (legion.getPlayerName().equals(getActivePlayerName()))
+        if (legion.getPlayer().equals(getActivePlayer()))
         {
             advancePhase();
         }
@@ -913,7 +904,6 @@ public final class Battle extends net.sf.colossus.game.Battle
         // Check for single Titan elimination.
         else if (attackerTitanDead)
         {
-            String slayerName = defender.getPlayerName();
             if (defenderElim)
             {
                 defender.remove();
@@ -923,12 +913,11 @@ public final class Battle extends net.sf.colossus.game.Battle
                 pointsScored = defender.getBattleTally();
                 defender.addBattleTallyToPoints();
             }
-            attacker.getPlayer().die(slayerName, true);
+            attacker.getPlayer().die(defender.getPlayer(), true);
             cleanup();
         }
         else if (defenderTitanDead)
         {
-            String slayerName = attacker.getPlayerName();
             if (attackerElim)
             {
                 attacker.remove();
@@ -938,7 +927,7 @@ public final class Battle extends net.sf.colossus.game.Battle
                 pointsScored = attacker.getBattleTally();
                 attacker.addBattleTallyToPoints();
             }
-            defender.getPlayer().die(slayerName, true);
+            defender.getPlayer().die(attacker.getPlayer(), true);
             cleanup();
         }
 

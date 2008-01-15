@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.sf.colossus.game.PlayerState;
+
 import org.jdom.Element;
 
 
@@ -120,13 +122,13 @@ public class History
         root.addContent(event);
     }
 
-    void playerElimEvent(String playerName, String slayerName, int turn)
+    void playerElimEvent(PlayerState player, PlayerState slayer, int turn)
     {
         Element event = new Element("PlayerElim");
-        event.setAttribute("name", playerName);
-        if (slayerName != null)
+        event.setAttribute("name", player.getName());
+        if (slayer != null)
         {
-            event.setAttribute("slayer", slayerName);
+            event.setAttribute("slayer", slayer.getName());
         }
         event.setAttribute("turn", "" + turn);
         root.addContent(event);

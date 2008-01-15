@@ -182,11 +182,11 @@ public final class Client implements IClient, IOracle
     private final PlayerInfo noone;
 
     private int turnNumber = -1;
-    private PlayerInfo activePlayer;
+    private PlayerState activePlayer;
     private Constants.Phase phase;
 
     private int battleTurnNumber = -1;
-    private PlayerInfo battleActivePlayer;
+    private PlayerState battleActivePlayer;
     private Constants.BattlePhase battlePhase;
     private String attackerMarkerId = "none";
     private String defenderMarkerId = "none";
@@ -2584,27 +2584,24 @@ public final class Client implements IClient, IOracle
 
     // TODO Move legion markers to slayer on client side.
     // TODO parameters should be PlayerState
-    public void tellPlayerElim(String deadPlayerName, String slayerName)
+    public void tellPlayerElim(PlayerState deadPlayer, PlayerState slayer)
     {
+        assert deadPlayer != null;
         LOGGER.log(Level.FINEST, this.owningPlayer.getName()
-            + " tellPlayerElim(" + deadPlayerName + ", " + slayerName + ")");
-        PlayerInfo info = getPlayerInfo(deadPlayerName);
+            + " tellPlayerElim(" + deadPlayer + ", " + slayer + ")");
 
-        if (info != null)
+        // TODO Merge these
+        // TODO should this be rather calling Player.die()?
+        deadPlayer.setDead(true);
+        ((PlayerInfo)deadPlayer).removeAllLegions();
+        // otherwise called too early, e.g. someone quitted
+        // already during game start...
+        if (predictSplits != null)
         {
-            // TODO Merge these
-            info.setDead(true);
-            info.removeAllLegions();
-            // otherwise called too early, e.g. someone quitted
-            // already during game start...
-            if (predictSplits != null)
-            {
-                predictSplits[info.getNumber()] = null;
-            }
-
+            predictSplits[deadPlayer.getNumber()] = null;
         }
 
-        if (this.owningPlayer.getName().equals(deadPlayerName))
+        if (this.owningPlayer.equals(deadPlayer))
         {
             playerAlive = false;
         }
@@ -2960,13 +2957,13 @@ public final class Client implements IClient, IOracle
     }
 
     public void initBattle(String masterHexLabel, int battleTurnNumber,
-        String battleActivePlayerName, Constants.BattlePhase battlePhase,
+        PlayerState battleActivePlayer, Constants.BattlePhase battlePhase,
         String attackerMarkerId, String defenderMarkerId)
     {
         cleanupNegotiationDialogs();
 
         this.battleTurnNumber = battleTurnNumber;
-        setBattleActivePlayerName(battleActivePlayerName);
+        setBattleActivePlayer(battleActivePlayer);
         this.battlePhase = battlePhase;
         this.attackerMarkerId = attackerMarkerId;
         this.defenderMarkerId = defenderMarkerId;
@@ -3235,9 +3232,9 @@ public final class Client implements IClient, IOracle
 
     /** Needed if we load a game outside the split phase, where
      *  active player and turn are usually set. */
-    public void setupTurnState(String activePlayerName, int turnNumber)
+    public void setupTurnState(PlayerState activePlayer, int turnNumber)
     {
-        this.activePlayer = getPlayerInfo(activePlayerName);
+        this.activePlayer = activePlayer;
         this.turnNumber = turnNumber;
         if (eventViewer != null)
         {
@@ -3279,12 +3276,12 @@ public final class Client implements IClient, IOracle
         board.setBoardActive(val);
     }
 
-    public void setupSplit(String activePlayerName, int turnNumber)
+    public void setupSplit(PlayerState activePlayer, int turnNumber)
     {
         clearUndoStack();
         cleanupNegotiationDialogs();
 
-        this.activePlayer = getPlayerInfo(activePlayerName);
+        this.activePlayer = activePlayer;
         this.turnNumber = turnNumber;
 
         if (eventViewer != null)
@@ -3424,11 +3421,11 @@ public final class Client implements IClient, IOracle
         }
     }
 
-    public void setupBattleSummon(String battleActivePlayerName,
+    public void setupBattleSummon(PlayerState battleActivePlayer,
         int battleTurnNumber)
     {
         this.battlePhase = Constants.BattlePhase.SUMMON;
-        setBattleActivePlayerName(battleActivePlayerName);
+        setBattleActivePlayer(battleActivePlayer);
         this.battleTurnNumber = battleTurnNumber;
 
         if (battleBoard != null)
@@ -3449,11 +3446,11 @@ public final class Client implements IClient, IOracle
         updateStatusScreen();
     }
 
-    public void setupBattleRecruit(String battleActivePlayerName,
+    public void setupBattleRecruit(PlayerState battleActivePlayer,
         int battleTurnNumber)
     {
         this.battlePhase = Constants.BattlePhase.RECRUIT;
-        setBattleActivePlayerName(battleActivePlayerName);
+        setBattleActivePlayer(battleActivePlayer);
         this.battleTurnNumber = battleTurnNumber;
 
         if (battleBoard != null)
@@ -3480,10 +3477,10 @@ public final class Client implements IClient, IOracle
         }
     }
 
-    public void setupBattleMove(String battleActivePlayerName,
+    public void setupBattleMove(PlayerState battleActivePlayer,
         int battleTurnNumber)
     {
-        setBattleActivePlayerName(battleActivePlayerName);
+        setBattleActivePlayer(battleActivePlayer);
         this.battleTurnNumber = battleTurnNumber;
 
         // Just in case the other player started the battle
@@ -3550,10 +3547,10 @@ public final class Client implements IClient, IOracle
 
     /** Used for both strike and strikeback. */
     public void setupBattleFight(Constants.BattlePhase battlePhase,
-        String battleActivePlayerName)
+        PlayerState battleActivePlayer)
     {
         this.battlePhase = battlePhase;
-        setBattleActivePlayerName(battleActivePlayerName);
+        setBattleActivePlayer(battleActivePlayer);
         if (battlePhase == Constants.BattlePhase.FIGHT)
         {
             markOffboardCreaturesDead();
@@ -3640,15 +3637,14 @@ public final class Client implements IClient, IOracle
     }
 
     // TODO this would probably work better as state in PlayerState
-    public PlayerInfo getBattleActivePlayer()
+    public PlayerState getBattleActivePlayer()
     {
         return battleActivePlayer;
     }
 
-    // TODO set PlayerInfo directly
-    void setBattleActivePlayerName(String name)
+    void setBattleActivePlayer(PlayerState player)
     {
-        this.battleActivePlayer = getPlayerInfo(name);
+        this.battleActivePlayer = player;
     }
 
     String getBattleActiveMarkerId()

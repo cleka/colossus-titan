@@ -64,7 +64,7 @@ public final class PlayerInfo extends PlayerState
         String buf;
 
         buf = data.remove(0);
-        setDead(Boolean.valueOf(buf).booleanValue());
+        setDead(Boolean.parseBoolean(buf));
 
         setName(data.remove(0));
 
