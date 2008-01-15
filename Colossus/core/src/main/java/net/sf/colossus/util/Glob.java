@@ -6,7 +6,6 @@ import java.util.Iterator;
 
 
 /** Stringify contents of various container classes.
- *  @version $Id$
  *  @author David Ripton
  */
 
@@ -16,7 +15,7 @@ public final class Glob
 
     public static String glob(String sep, String[] a)
     {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         for (int i = 0; i < a.length - 1; i++)
         {
             sb.append(a[i]);
@@ -33,7 +32,7 @@ public final class Glob
 
     public static String glob(String sep, int[] a)
     {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         for (int i = 0; i < a.length - 1; i++)
         {
             sb.append(a[i]);
@@ -50,7 +49,7 @@ public final class Glob
 
     public static String glob(String sep, Collection<?> col)
     {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         if (col != null)
         {
             Iterator<?> it = col.iterator();

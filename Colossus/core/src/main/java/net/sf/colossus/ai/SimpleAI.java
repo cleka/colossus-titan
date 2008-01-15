@@ -36,7 +36,7 @@ import net.sf.colossus.util.DevRandom;
 import net.sf.colossus.util.Options;
 import net.sf.colossus.util.PermutationIterator;
 import net.sf.colossus.util.Probs;
-import net.sf.colossus.util.Join;
+import net.sf.colossus.util.Glob;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.HazardTerrain;
 import net.sf.colossus.variant.MasterHex;
@@ -456,7 +456,7 @@ public class SimpleAI implements AI
         {
             creatureNames.add(creature.getName());
         }
-        String results = Join.join(creatureNames, ",");
+        String results = Glob.glob(",", creatureNames);
         // increment BEFORE calling client 
         // (instead of: return true and caller increments). 
         // Otherwise we might have a race situation, if callback is quicker
@@ -3754,7 +3754,7 @@ public class SimpleAI implements AI
             {
                 cmStrings.add(cm.toString());
             }
-            return Join.join(cmStrings, ", ");
+            return Glob.glob(", ", cmStrings);
         }
 
         @Override
