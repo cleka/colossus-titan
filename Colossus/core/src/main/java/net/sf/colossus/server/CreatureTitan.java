@@ -14,6 +14,12 @@ import net.sf.colossus.variant.HazardTerrain;
  * 
  * Game related info is in Critter.  Counts of
  * recruited/available/dead are in Caretaker.
+ * 
+ * TODO this class doesn't really fulfill the whole {@link Creature} interface
+ * since it can't handle getPower() at the moment (and thus some other things don't
+ * work). The solution could be to consider each Titan a type of creature of his
+ * own, distinguished by the Player owning them, which then could be stored as
+ * member in the class, delegating {@link #getPower()} to {@link Player#getTitanPower()}.
  *
  * @version $Id$
  * @author Romain Dolbeau
