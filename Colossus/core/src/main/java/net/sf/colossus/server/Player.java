@@ -709,7 +709,11 @@ public final class Player extends PlayerState implements Comparable<Player>
      * TODO is it really the Player's role to assign points? I'd rather see that responsibility
      * with the Game object
      * 
-     * @param slayer The player who killed us. May be null if we just gave up.
+     * TODO the slayer could be non-null if we introduce a null object (some object called
+     * e.g. "NOONE" that behaves like a Player as far as possible, giving a name and swallowing
+     * points)
+     * 
+     * @param slayer The player who killed us. May be null if we just gave up or it is a draw.
      * @param checkForVictory If set the game will be asked to check for a victory after
      *      we are finished.
      */
