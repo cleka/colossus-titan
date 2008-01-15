@@ -715,9 +715,8 @@ public final class Player extends PlayerState implements Comparable<Player>
      */
     synchronized void die(Player slayer, boolean checkForVictory)
     {
-        LOGGER
-            .info("Player '" + getName() + "' is dying, killed by " + slayer == null ? "nobody"
-                : slayer.getName());
+        LOGGER.info("Player '" + getName() + "' is dying, killed by "
+            + (slayer == null ? "nobody" : slayer.getName()));
         // Engaged legions give half points to the player they're
         // engaged with.  All others give half points to slayer,
         // if non-null.
