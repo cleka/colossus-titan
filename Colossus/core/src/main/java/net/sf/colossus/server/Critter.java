@@ -791,7 +791,7 @@ public class Critter extends net.sf.colossus.game.Creature
 
         LOGGER.log(Level.INFO, getName() + " in " + currentHex + " strikes "
             + target.getDescription() + " with strike number " + strikeNumber
-            + " : " + rollString + ": " + damage
+            + ", rolling: " + rollString + ": " + damage
             + (damage == 1 ? " hit" : " hits"));
 
         int carryDamage = target.wound(damage);
