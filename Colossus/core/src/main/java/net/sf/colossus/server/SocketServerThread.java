@@ -670,7 +670,7 @@ final class SocketServerThread extends Thread implements IClient
     {
         // slayer can be null
         sendToClient(Constants.tellPlayerElim + sep + player.getName() + sep
-            + slayer != null ? slayer.getName() : null);
+            + (slayer != null ? slayer.getName() : null));
     }
 
     public void askConcede(String allyMarkerId, String enemyMarkerId)
