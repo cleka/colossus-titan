@@ -16,8 +16,8 @@
 	<classpathentry kind="lib" path="libs/batik-transcoder.jar"/>
 	<classpathentry kind="lib" path="libs/batik-util.jar"/>
 	<classpathentry kind="lib" path="libs/batik-xml.jar"/>
-	<classpathentry kind="lib" path="libs/javamake-ant15.jar"/>
 	<classpathentry kind="lib" path="libs/javamake.jar"/>
+	<classpathentry kind="lib" path="libs/javamake-ant15.jar"/>
 	<classpathentry kind="lib" path="libs/jdom.jar"/>
 	<classpathentry kind="lib" path="libs/junit.jar"/>
 	<classpathentry kind="lib" path="libs/werken.opt.jar"/>
