@@ -591,8 +591,10 @@ final class SocketClientThread extends Thread implements IServer
         {
             String playerName = args.remove(0);
             String slayerName = args.remove(0);
-            client.tellPlayerElim(client.getPlayerInfo(playerName), client
-                .getPlayerInfo(slayerName));
+            client
+                .tellPlayerElim(client.getPlayerInfo(playerName),
+                    (slayerName != null ? client.getPlayerInfo(slayerName)
+                        : null));
         }
         else if (method.equals(Constants.askConcede))
         {
