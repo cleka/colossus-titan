@@ -4157,6 +4157,17 @@ public final class Client implements IClient, IOracle
                 return false;
             }
         }
+        else
+        {
+            // same hex as starting hex, but it might be occupied by
+            // multiple legions after split
+            int friendlyLegions = getNumFriendlyLegions(hexLabel,
+                getActivePlayer());
+            if (friendlyLegions > 1)
+            {
+                return false;
+            }
+        }
 
         server.doMove(moverId, hexLabel, entrySide, teleport, teleportingLord);
         return true;
