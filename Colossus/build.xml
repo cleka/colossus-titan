@@ -6,9 +6,6 @@
 <!-- To use this you need:
      Sun JDK 1.5+    http://java.sun.com  (currently recommend 1.5.0)
      Ant 1.5+        http://jakarta.apache.org/ant/
-     Javamake 1.3.3+ http://www.experimentalstuff.com/Technologies/JavaMake/
-        javamake.jar and javamake-ant15.jar need to be in your CLASSPATH.
-        (Jars are included in the libs subdirectory.)
      JUnit 3.8.1+      http://junit.org
         (Jars are included in the libs subdirectory.)
      To sign jarfiles, you need a file called usernameKeystore,
@@ -71,32 +68,29 @@
 		<echo file="${build.classes.dir}/version" message="${DSTAMP}&#10;" />
 	</target>
 
-<taskdef name="javamake" classname="com.sun.tools.javamake.ant.JavaMake" 
-         classpathref="project.class.path"
-/> 
 
-	<target name="compile" depends="init" description="Compiles Colossus without datatools and variants using javamake">
-		<javamake debug="yes" deprecation="yes" target="${target.level}" source="${source.level}" srcdir="${core.src.dir}" destdir="${build.classes.dir}">
+	<target name="compile" depends="init" description="Compiles Colossus without datatools and variants">
+		<javac debug="yes" deprecation="yes" target="${target.level}" source="${source.level}" srcdir="${core.src.dir}" destdir="${build.classes.dir}">
 			<classpath refid="project.class.path" />
-		</javamake>
+		</javac>
 	</target>
 
-	<target name="compileVariants" depends="init" description="Compiles the variant code using javamake">
-		<javamake debug="yes" deprecation="yes" target="${target.level}" source="${source.level}" srcdir="${variants.dir}" destdir="${build.classes.dir}">
+	<target name="compileVariants" depends="init" description="Compiles the variant code">
+		<javac debug="yes" deprecation="yes" target="${target.level}" source="${source.level}" srcdir="${variants.dir}" destdir="${build.classes.dir}">
 			<classpath refid="project.class.path" />
-		</javamake>
+		</javac>
 	</target>
 
-	<target name="compileDatatools" depends="init" description="Compiles the datatools using javamake">
-		<javamake debug="yes" deprecation="yes" target="${target.level}" source="${source.level}" srcdir="${datatools.src.dir}" destdir="${build.classes.dir}">
+	<target name="compileDatatools" depends="init" description="Compiles the datatools using javac">
+		<javac debug="yes" deprecation="yes" target="${target.level}" source="${source.level}" srcdir="${datatools.src.dir}" destdir="${build.classes.dir}">
 			<classpath refid="project.class.path" />
-		</javamake>
+		</javac>
 	</target>
 
 	<target name="compileTests" depends="compile" description="Compiles the JUnit tests">
-		<javamake debug="yes" deprecation="yes" target="${target.level}" source="${source.level}" srcdir="${tests.src.dir}" destdir="${build.classes.dir}">
+		<javac debug="yes" deprecation="yes" target="${target.level}" source="${source.level}" srcdir="${tests.src.dir}" destdir="${build.classes.dir}">
 			<classpath refid="project.class.path" />
-		</javamake>
+		</javac>
 	</target>
 
 	<target name="test" depends="compileTests,compileVariants" description="Run all unit tests using JUnit">
@@ -177,8 +171,7 @@
                          **/*.class,
                          **/Colossus.*.zip,
                          TEST-*Test.txt,
-                         javadoc/**,
-                         javamake.pdb" />
+                         javadoc/**" />
 		</delete>
 		<delete dir="${build.dir}" />
 	</target>
