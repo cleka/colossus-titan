@@ -85,6 +85,8 @@ public class History
             // angel was called out of legion which was then empty,
             // and in the final updateAllLegionContents there is then
             // this empty legion...
+            // TODO if this case can happen in a regular game no warning 
+            // should be logged
             LOGGER.log(Level.WARNING, "Called revealEvent(" + allPlayers
                 + ", "
                 + (playerNames != null ? playerNames.toString() : "-null-")
