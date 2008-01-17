@@ -23,11 +23,11 @@ import net.sf.colossus.xmlparser.TerrainRecruitLoader;
  * @author Romain Dolbeau
  */
 
-public final class LegionServerSide extends net.sf.colossus.game.Legion implements
-    Comparable<LegionServerSide>
+public final class LegionServerSide extends net.sf.colossus.game.Legion
+    implements Comparable<LegionServerSide>
 {
-    private static final Logger LOGGER = Logger.getLogger(LegionServerSide.class
-        .getName());
+    private static final Logger LOGGER = Logger
+        .getLogger(LegionServerSide.class.getName());
 
     private final String parentId;
     private String currentHexLabel;
@@ -47,9 +47,9 @@ public final class LegionServerSide extends net.sf.colossus.game.Legion implemen
      * normal Titan game it is between 0 and 8 creatures, but this class does
      * not enforce this.
      */
-    public LegionServerSide(String markerId, String parentId, String currentHexLabel,
-        String startingHexLabel, Player player, GameServerSide game,
-        CreatureTypeServerSide... creatureTypes)
+    public LegionServerSide(String markerId, String parentId,
+        String currentHexLabel, String startingHexLabel, Player player,
+        GameServerSide game, CreatureTypeServerSide... creatureTypes)
     {
         // TODO we just fake a playerstate here
         super(player, markerId);
@@ -70,18 +70,26 @@ public final class LegionServerSide extends net.sf.colossus.game.Legion implemen
         }
     }
 
-    static LegionServerSide getStartingLegion(String markerId, String hexLabel,
-        Player player, GameServerSide game)
+    static LegionServerSide getStartingLegion(String markerId,
+        String hexLabel, Player player, GameServerSide game)
     {
-        CreatureTypeServerSide[] startCre = TerrainRecruitLoader.getStartingCreatures(game
-            .getVariant().getMasterBoard().getHexByLabel(hexLabel)
-            .getTerrain());
-        LegionServerSide legion = new LegionServerSide(markerId, null, hexLabel, hexLabel, player,
-            game, (CreatureTypeServerSide)VariantSupport.getCurrentVariant()
-                .getCreatureByName(Constants.titan), (CreatureTypeServerSide)VariantSupport
-                .getCurrentVariant().getCreatureByName(
-                    TerrainRecruitLoader.getPrimaryAcquirable()), startCre[2],
-            startCre[2], startCre[0], startCre[0], startCre[1], startCre[1]);
+        CreatureTypeServerSide[] startCre = TerrainRecruitLoader
+            .getStartingCreatures(game.getVariant().getMasterBoard()
+                .getHexByLabel(hexLabel).getTerrain());
+        LegionServerSide legion = new LegionServerSide(
+            markerId,
+            null,
+            hexLabel,
+            hexLabel,
+            player,
+            game,
+            (CreatureTypeServerSide)VariantSupport.getCurrentVariant()
+                .getCreatureByName(Constants.titan),
+            (CreatureTypeServerSide)VariantSupport
+                .getCurrentVariant()
+                .getCreatureByName(TerrainRecruitLoader.getPrimaryAcquirable()),
+            startCre[2], startCre[2], startCre[0], startCre[0], startCre[1],
+            startCre[1]);
 
         Iterator<CreatureServerSide> it = legion.getCritters().iterator();
         while (it.hasNext())
@@ -157,8 +165,8 @@ public final class LegionServerSide extends net.sf.colossus.game.Legion implemen
             }
             else
             {
-                CreatureTypeServerSide angel = (CreatureTypeServerSide)game.getVariant()
-                    .getCreatureByName(angelType);
+                CreatureTypeServerSide angel = (CreatureTypeServerSide)game
+                    .getVariant().getCreatureByName(angelType);
                 if (angel != null)
                 {
                     addCreature(angel, true);
@@ -515,8 +523,8 @@ public final class LegionServerSide extends net.sf.colossus.game.Legion implemen
     {
         if (recruitName != null)
         {
-            CreatureTypeServerSide creature = (CreatureTypeServerSide)game.getVariant().getCreatureByName(
-                recruitName);
+            CreatureTypeServerSide creature = (CreatureTypeServerSide)game
+                .getVariant().getCreatureByName(recruitName);
             game.getCaretaker().putOneBack(creature);
             removeCreature(creature, false, true);
             recruitName = null;
@@ -645,8 +653,8 @@ public final class LegionServerSide extends net.sf.colossus.game.Legion implemen
 
     /** Remove the first creature matching the passed creature's type
      from the legion.  Return the removed creature. */
-    CreatureTypeServerSide removeCreature(CreatureTypeServerSide creature, boolean returnImmortalToStack,
-        boolean disbandIfEmpty)
+    CreatureTypeServerSide removeCreature(CreatureTypeServerSide creature,
+        boolean returnImmortalToStack, boolean disbandIfEmpty)
     {
         // indexOf wants the same object, not just the same type.
         // So use getCritter() to get the correct object.
@@ -666,8 +674,8 @@ public final class LegionServerSide extends net.sf.colossus.game.Legion implemen
      *  legion.  Do not actually remove it, to prevent comodification
      *  errors.  Do not disband the legion if empty, since the critter
      *  has not actually been removed. */
-    void prepareToRemoveCritter(CreatureServerSide critter, boolean returnToStacks,
-        boolean updateHistory)
+    void prepareToRemoveCritter(CreatureServerSide critter,
+        boolean returnToStacks, boolean updateHistory)
     {
         if (critter == null || !getCritters().contains(critter))
         {
@@ -698,9 +706,9 @@ public final class LegionServerSide extends net.sf.colossus.game.Legion implemen
         return getCritters().get(i);
     }
 
-    void setCritter(int i, CreatureServerSide critter)
+    void addCritter(CreatureServerSide critter)
     {
-        getCritters().set(i, critter);
+        getCritters().add(critter);
         critter.setLegion(this);
     }
 
@@ -803,7 +811,8 @@ public final class LegionServerSide extends net.sf.colossus.game.Legion implemen
      * (Or the first available marker, if markerId is null.)
      * Return the new legion, or null if there's an error.
      */
-    LegionServerSide split(List<CreatureTypeServerSide> creatures, String newMarkerId)
+    LegionServerSide split(List<CreatureTypeServerSide> creatures,
+        String newMarkerId)
     {
         PlayerServerSide player = getPlayer();
         if (newMarkerId == null)
@@ -812,8 +821,8 @@ public final class LegionServerSide extends net.sf.colossus.game.Legion implemen
         }
 
         player.selectMarkerId(newMarkerId);
-        LegionServerSide newLegion = new LegionServerSide(newMarkerId, markerId, currentHexLabel,
-            currentHexLabel, getPlayer(), game);
+        LegionServerSide newLegion = new LegionServerSide(newMarkerId,
+            markerId, currentHexLabel, currentHexLabel, getPlayer(), game);
 
         Iterator<CreatureTypeServerSide> it = creatures.iterator();
         while (it.hasNext())
