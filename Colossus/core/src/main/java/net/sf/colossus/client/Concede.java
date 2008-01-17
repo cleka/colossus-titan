@@ -20,7 +20,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import net.sf.colossus.server.Legion;
+import net.sf.colossus.server.LegionServerSide;
 import net.sf.colossus.util.KDialog;
 
 
@@ -43,7 +43,7 @@ final class Concede extends KDialog implements ActionListener, WindowListener
     {
         super(parentFrame, (flee ? "Flee" : "Concede")
             + " with Legion "
-            + Legion.getLongMarkerName(allyMarkerId)
+            + LegionServerSide.getLongMarkerName(allyMarkerId)
             + " in "
             + client.getGame().getVariant().getMasterBoard().getHexByLabel(
                 client.getHexForLegion(allyMarkerId)).getDescription() + "?",

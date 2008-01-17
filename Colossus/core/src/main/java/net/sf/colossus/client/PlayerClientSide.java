@@ -9,9 +9,9 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import net.sf.colossus.game.PlayerState;
+import net.sf.colossus.game.Player;
 import net.sf.colossus.server.Constants;
-import net.sf.colossus.server.Player;
+import net.sf.colossus.server.PlayerServerSide;
 import net.sf.colossus.util.Split;
 import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
@@ -23,7 +23,7 @@ import net.sf.colossus.xmlparser.TerrainRecruitLoader;
  * @author David Ripton
  */
 
-public final class PlayerInfo extends PlayerState
+public final class PlayerClientSide extends Player
 {
     private Client client;
 
@@ -47,7 +47,7 @@ public final class PlayerInfo extends PlayerState
      * 
      * TODO: the object should be properly initialized in the constructor
      */
-    PlayerInfo(Client client, String playerName, int number)
+    PlayerClientSide(Client client, String playerName, int number)
     {
         super(client.getGame(), playerName, number);
         this.client = client;
@@ -131,7 +131,7 @@ public final class PlayerInfo extends PlayerState
 
     public String getShortColor()
     {
-        return Player.getShortColor(getColor());
+        return PlayerServerSide.getShortColor(getColor());
     }
 
     void setPlayersElim(String playersElim)
@@ -241,7 +241,7 @@ public final class PlayerInfo extends PlayerState
         while (it.hasNext())
         {
             String markerId = it.next();
-            LegionInfo info = client.getLegionInfo(markerId);
+            LegionClientSide info = client.getLegionInfo(markerId);
             if (info.hasTeleported())
             {
                 return true;
@@ -259,7 +259,7 @@ public final class PlayerInfo extends PlayerState
         while (it.hasNext())
         {
             String markerId = it.next();
-            LegionInfo legion = client.getLegionInfo(markerId);
+            LegionClientSide legion = client.getLegionInfo(markerId);
             if (legion.hasMoved())
             {
                 count++;

@@ -13,7 +13,7 @@ import java.util.List;
  * as the current legions and the score. Instances of this class are always bound to
  * an instance of {@link Game}.
  */
-public class PlayerState
+public class Player
 {
     /**
      * The game this information belongs to.
@@ -45,7 +45,7 @@ public class PlayerState
      */
     private boolean dead;
 
-    public PlayerState(Game game, String playerName, int number)
+    public Player(Game game, String playerName, int number)
     {
         assert game != null : "No game without Game";
         assert playerName != null : "Player needs a name";

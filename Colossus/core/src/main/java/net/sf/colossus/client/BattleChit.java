@@ -13,7 +13,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.colossus.server.Constants;
-import net.sf.colossus.server.Creature;
+import net.sf.colossus.server.CreatureTypeServerSide;
 import net.sf.colossus.util.HTMLColor;
 
 
@@ -206,9 +206,9 @@ public final class BattleChit extends Chit
     }
 
     // XXX Titans
-    public Creature getCreature()
+    public CreatureTypeServerSide getCreature()
     {
-        Creature creature = (Creature)client.getGame().getVariant()
+        CreatureTypeServerSide creature = (CreatureTypeServerSide)client.getGame().getVariant()
             .getCreatureByName(getCreatureName());
         return creature;
     }

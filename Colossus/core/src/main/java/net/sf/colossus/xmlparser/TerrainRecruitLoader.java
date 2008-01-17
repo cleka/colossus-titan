@@ -13,7 +13,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.colossus.client.CaretakerInfo;
-import net.sf.colossus.server.Creature;
+import net.sf.colossus.server.CreatureTypeServerSide;
 import net.sf.colossus.server.CustomRecruitBase;
 import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.util.HTMLColor;
@@ -30,7 +30,7 @@ import org.jdom.input.SAXBuilder;
  * TerrainRecruitLoader load the terrains and recruits descriptions.
  * @author Romain Dolbeau
  * @version $Id$
- * @see net.sf.colossus.server.Creature
+ * @see net.sf.colossus.server.CreatureTypeServerSide
  */
 public class TerrainRecruitLoader
 {
@@ -165,12 +165,12 @@ public class TerrainRecruitLoader
                     // special recruitment, need to add edge 
                     // between the special aned every possible recruit
                     CustomRecruitBase cri = getCustomRecruitBase(v2);
-                    java.util.List<Creature> allRecruits = cri
+                    java.util.List<CreatureTypeServerSide> allRecruits = cri
                         .getAllPossibleSpecialRecruits(t);
-                    Iterator<Creature> it3 = allRecruits.iterator();
+                    Iterator<CreatureTypeServerSide> it3 = allRecruits.iterator();
                     while (it3.hasNext())
                     {
-                        Creature cre = it3.next();
+                        CreatureTypeServerSide cre = it3.next();
                         // use 99 so no-one will rely on this
                         graph.addEdge(v2, cre.getName(), RecruitGraph.BIGNUM,
                             t);
@@ -425,15 +425,15 @@ public class TerrainRecruitLoader
      * turn and in a particular kind of Tower.
      * @param terrain The kind of Tower considered.
      * @return an array of Creature representing the starting creatures.
-     * @see net.sf.colossus.server.Creature
+     * @see net.sf.colossus.server.CreatureTypeServerSide
      */
-    public static Creature[] getStartingCreatures(String terrain)
+    public static CreatureTypeServerSide[] getStartingCreatures(String terrain)
     {
-        Creature[] bc = new Creature[3];
+        CreatureTypeServerSide[] bc = new CreatureTypeServerSide[3];
         List<CreatureType> to = getPossibleRecruits(terrain, null);
-        bc[0] = (Creature)to.get(0);
-        bc[1] = (Creature)to.get(1);
-        bc[2] = (Creature)to.get(2);
+        bc[0] = (CreatureTypeServerSide)to.get(0);
+        bc[1] = (CreatureTypeServerSide)to.get(1);
+        bc[2] = (CreatureTypeServerSide)to.get(2);
         return (bc);
     }
 
@@ -472,7 +472,7 @@ public class TerrainRecruitLoader
      * Give a modifiable list of the possible recruits in a terrain.
      * @param terrain String representing a terrain.
      * @return List of Creatures that can be recruited in the terrain.
-     * @see net.sf.colossus.server.Creature
+     * @see net.sf.colossus.server.CreatureTypeServerSide
      */
     public static List<CreatureType> getPossibleRecruits(String terrain,
         String hexLabel)
@@ -515,7 +515,7 @@ public class TerrainRecruitLoader
      * 
      * @param terrain String representing a terrain.
      * @return List of Creatures that can recruit in the terrain.
-     * @see net.sf.colossus.server.Creature
+     * @see net.sf.colossus.server.CreatureTypeServerSide
      */
     public static List<CreatureType> getPossibleRecruiters(String terrain,
         String hexLabel)
@@ -554,7 +554,7 @@ public class TerrainRecruitLoader
                     Iterator<CreatureType> itCr = potential.iterator();
                     while (itCr.hasNext())
                     {
-                        Creature creature = (Creature)itCr.next();
+                        CreatureTypeServerSide creature = (CreatureTypeServerSide)itCr.next();
                         if (creature.isLord())
                         {
                             re.add(creature);
@@ -566,7 +566,7 @@ public class TerrainRecruitLoader
                     CustomRecruitBase cri = getCustomRecruitBase(tr.getName());
                     if (cri != null)
                     {
-                        List<Creature> temp = cri
+                        List<CreatureTypeServerSide> temp = cri
                             .getPossibleSpecialRecruiters(terrain, hexLabel);
                         re.addAll(temp);
                     }
@@ -584,7 +584,7 @@ public class TerrainRecruitLoader
      * @param terrain String representing a terrain, in which the
      * recruiting occurs.
      * @return Number of recruiter needed.
-     * @see net.sf.colossus.server.Creature
+     * @see net.sf.colossus.server.CreatureTypeServerSide
      */
     public static int numberOfRecruiterNeeded(CreatureType recruiter,
         CreatureType recruit, String terrain, String hexLabel)
@@ -773,7 +773,7 @@ public class TerrainRecruitLoader
      * @param c The Creature inquired.
      * @return If the creature is Acquirable.
      */
-    public boolean isAcquirable(Creature c)
+    public boolean isAcquirable(CreatureTypeServerSide c)
     {
         return isAcquirable(c.getName());
     }

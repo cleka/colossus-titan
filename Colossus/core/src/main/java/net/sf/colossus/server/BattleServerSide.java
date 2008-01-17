@@ -13,7 +13,7 @@ import java.util.logging.Logger;
 import net.sf.colossus.client.BattleHex;
 import net.sf.colossus.client.BattleMap;
 import net.sf.colossus.client.HexMap;
-import net.sf.colossus.game.PlayerState;
+import net.sf.colossus.game.Player;
 import net.sf.colossus.util.Options;
 import net.sf.colossus.variant.HazardTerrain;
 import net.sf.colossus.variant.MasterHex;
@@ -29,12 +29,12 @@ import net.sf.colossus.variant.MasterHex;
  * @author Romain Dolbeau
  */
 
-public final class Battle extends net.sf.colossus.game.Battle
+public final class BattleServerSide extends net.sf.colossus.game.Battle
 {
-    private static final Logger LOGGER = Logger.getLogger(Battle.class
+    private static final Logger LOGGER = Logger.getLogger(BattleServerSide.class
         .getName());
 
-    private Game game;
+    private GameServerSide game;
     private Server server;
     private final String attackerId;
     private final String defenderId;
@@ -62,7 +62,7 @@ public final class Battle extends net.sf.colossus.game.Battle
     private final PhaseAdvancer phaseAdvancer = new BattlePhaseAdvancer();
     private int pointsScored = 0;
 
-    Battle(Game game, String attackerId, String defenderId,
+    BattleServerSide(GameServerSide game, String attackerId, String defenderId,
         int activeLegionNum, String masterHexLabel, int turnNumber,
         Constants.BattlePhase phase)
     {
@@ -82,7 +82,7 @@ public final class Battle extends net.sf.colossus.game.Battle
         terrain = getMasterHex().getTerrain();
 
         // Set defender's entry side opposite attacker's.
-        Legion attacker = getAttacker();
+        LegionServerSide attacker = getAttacker();
         int side = attacker.getEntrySide();
         if (side != 1 && side != 3 && side != 5)
         {
@@ -90,7 +90,7 @@ public final class Battle extends net.sf.colossus.game.Battle
             // If invalid, default to bottom, which is always valid.
             attacker.setEntrySide(3);
         }
-        Legion defender = getDefender();
+        LegionServerSide defender = getDefender();
         defender.setEntrySide((side + 3) % 6);
         // Make sure defender can recruit, even if savegame is off.
         defender.setRecruitName(null);
@@ -117,14 +117,14 @@ public final class Battle extends net.sf.colossus.game.Battle
         this.game = null;
     }
 
-    private void placeLegion(Legion legion)
+    private void placeLegion(LegionServerSide legion)
     {
         BattleHex entrance = BattleMap.getEntrance(terrain, legion
             .getEntrySide());
-        Iterator<Critter> it = legion.getCritters().iterator();
+        Iterator<CreatureServerSide> it = legion.getCritters().iterator();
         while (it.hasNext())
         {
-            Critter critter = it.next();
+            CreatureServerSide critter = it.next();
 
             BattleHex currentHex = critter.getCurrentHex();
             if (currentHex == null)
@@ -141,7 +141,7 @@ public final class Battle extends net.sf.colossus.game.Battle
         }
     }
 
-    private void placeCritter(Critter critter)
+    private void placeCritter(CreatureServerSide critter)
     {
         BattleHex entrance = BattleMap.getEntrance(terrain, critter
             .getLegion().getEntrySide());
@@ -149,12 +149,12 @@ public final class Battle extends net.sf.colossus.game.Battle
         server.allPlaceNewChit(critter);
     }
 
-    private synchronized void initBattleChits(Legion legion)
+    private synchronized void initBattleChits(LegionServerSide legion)
     {
-        Iterator<Critter> it = legion.getCritters().iterator();
+        Iterator<CreatureServerSide> it = legion.getCritters().iterator();
         while (it.hasNext())
         {
-            Critter critter = it.next();
+            CreatureServerSide critter = it.next();
             server.allPlaceNewChit(critter);
         }
     }
@@ -195,12 +195,12 @@ public final class Battle extends net.sf.colossus.game.Battle
         }
     }
 
-    Game getGame()
+    GameServerSide getGame()
     {
         return game;
     }
 
-    PlayerState getActivePlayer()
+    Player getActivePlayer()
     {
         return game.getPlayerByMarkerId(legions[activeLegionNum]);
     }
@@ -210,9 +210,9 @@ public final class Battle extends net.sf.colossus.game.Battle
         return attackerId;
     }
 
-    Legion getAttacker()
+    LegionServerSide getAttacker()
     {
-        return (Legion)getAttackingLegion();
+        return (LegionServerSide)getAttackingLegion();
     }
 
     String getDefenderId()
@@ -220,22 +220,22 @@ public final class Battle extends net.sf.colossus.game.Battle
         return defenderId;
     }
 
-    Legion getDefender()
+    LegionServerSide getDefender()
     {
-        return (Legion)getDefendingLegion();
+        return (LegionServerSide)getDefendingLegion();
     }
 
-    Legion getActiveLegion()
+    LegionServerSide getActiveLegion()
     {
         return getLegion(activeLegionNum);
     }
 
-    private Legion getInactiveLegion()
+    private LegionServerSide getInactiveLegion()
     {
         return getLegion((activeLegionNum + 1) & 1);
     }
 
-    private Legion getLegion(int legionNum)
+    private LegionServerSide getLegion(int legionNum)
     {
         if (legionNum == Constants.DEFENDER)
         {
@@ -251,14 +251,14 @@ public final class Battle extends net.sf.colossus.game.Battle
         }
     }
 
-    private Legion getLegionByPlayer(Player player)
+    private LegionServerSide getLegionByPlayer(PlayerServerSide player)
     {
-        Legion attacker = getAttacker();
+        LegionServerSide attacker = getAttacker();
         if (attacker != null && attacker.getPlayer().equals(player))
         {
             return attacker;
         }
-        Legion defender = getDefender();
+        LegionServerSide defender = getDefender();
         if (defender != null && defender.getPlayer().equals(player))
         {
             return defender;
@@ -407,13 +407,13 @@ public final class Battle extends net.sf.colossus.game.Battle
         private void timeLoss()
         {
             LOGGER.log(Level.INFO, "Time loss");
-            Legion attacker = getAttacker();
+            LegionServerSide attacker = getAttacker();
             // Time loss.  Attacker is eliminated but defender gets no points.
             if (attacker.hasTitan())
             {
                 // This is the attacker's titan stack, so the defender gets 
                 // his markers plus half points for his unengaged legions.
-                Player player = attacker.getPlayer();
+                PlayerServerSide player = attacker.getPlayer();
                 attacker.remove();
                 player.die(getDefender().getPlayer(), true);
             }
@@ -479,8 +479,8 @@ public final class Battle extends net.sf.colossus.game.Battle
     {
         if (placeNewChit)
         {
-            Legion attacker = getAttacker();
-            Critter critter = attacker.getCritter(attacker.getHeight() - 1);
+            LegionServerSide attacker = getAttacker();
+            CreatureServerSide critter = attacker.getCritter(attacker.getHeight() - 1);
             placeCritter(critter);
         }
         if (phase == Constants.BattlePhase.SUMMON)
@@ -491,7 +491,7 @@ public final class Battle extends net.sf.colossus.game.Battle
 
     private boolean recruitReinforcement()
     {
-        Legion defender = getDefender();
+        LegionServerSide defender = getDefender();
         if (turnNumber == 4 && defender.canRecruit())
         {
             LOGGER.log(Level.FINEST, "Calling Game.reinforce()"
@@ -506,10 +506,10 @@ public final class Battle extends net.sf.colossus.game.Battle
     void doneReinforcing()
     {
         LOGGER.log(Level.FINEST, "Called Battle.doneReinforcing()");
-        Legion defender = getDefender();
+        LegionServerSide defender = getDefender();
         if (defender.hasRecruited())
         {
-            Critter newCritter = defender.getCritter(defender.getHeight() - 1);
+            CreatureServerSide newCritter = defender.getCritter(defender.getHeight() - 1);
             placeCritter(newCritter);
         }
         game.doneReinforcing();
@@ -530,7 +530,7 @@ public final class Battle extends net.sf.colossus.game.Battle
      *  all legal destinations.  Do not double back.  If ignoreMobileAllies
      *  is true, pretend that allied creatures that can move out of the
      *  way are not there. */
-    private Set<String> findMoves(BattleHex hex, Critter critter,
+    private Set<String> findMoves(BattleHex hex, CreatureServerSide critter,
         boolean flies, int movesLeft, int cameFrom,
         boolean ignoreMobileAllies, boolean first)
     {
@@ -546,7 +546,7 @@ public final class Battle extends net.sf.colossus.game.Battle
                     int reverseDir = (i + 3) % 6;
                     int entryCost;
 
-                    Critter bogey = getCritter(neighbor);
+                    CreatureServerSide bogey = getCritter(neighbor);
                     if (bogey == null
                         || (ignoreMobileAllies
                             && bogey.getMarkerId().equals(
@@ -618,7 +618,7 @@ public final class Battle extends net.sf.colossus.game.Battle
 
     /** Find all legal moves for this critter. The returned list
      *  contains hex IDs, not hexes. */
-    private Set<String> showMoves(Critter critter, boolean ignoreMobileAllies)
+    private Set<String> showMoves(CreatureServerSide critter, boolean ignoreMobileAllies)
     {
         Set<String> set = new HashSet<String>();
         if (!critter.hasMoved() && !critter.isInContact(false))
@@ -640,7 +640,7 @@ public final class Battle extends net.sf.colossus.game.Battle
 
     void undoMove(String hexLabel)
     {
-        Critter critter = getCritter(hexLabel);
+        CreatureServerSide critter = getCritter(hexLabel);
         if (critter != null)
         {
             critter.undoMove();
@@ -653,17 +653,17 @@ public final class Battle extends net.sf.colossus.game.Battle
     }
 
     /** Mark all of the conceding player's critters as dead. */
-    void concede(Player player)
+    void concede(PlayerServerSide player)
     {
-        Legion legion = getLegionByPlayer(player);
+        LegionServerSide legion = getLegionByPlayer(player);
         String markerId = legion.getMarkerId();
         LOGGER.log(Level.INFO, markerId + " concedes the battle");
         conceded = true;
 
-        Iterator<Critter> it = legion.getCritters().iterator();
+        Iterator<CreatureServerSide> it = legion.getCritters().iterator();
         while (it.hasNext())
         {
-            Critter critter = it.next();
+            CreatureServerSide critter = it.next();
             critter.setDead(true);
         }
 
@@ -677,11 +677,11 @@ public final class Battle extends net.sf.colossus.game.Battle
      *  summoned or recruited, unsummon or unrecruit them instead. */
     private void removeOffboardCreatures()
     {
-        Legion legion = getActiveLegion();
-        Iterator<Critter> it = legion.getCritters().iterator();
+        LegionServerSide legion = getActiveLegion();
+        Iterator<CreatureServerSide> it = legion.getCritters().iterator();
         while (it.hasNext())
         {
-            Critter critter = it.next();
+            CreatureServerSide critter = it.next();
             if (critter.getCurrentHex().isEntrance())
             {
                 critter.setDead(true);
@@ -692,10 +692,10 @@ public final class Battle extends net.sf.colossus.game.Battle
 
     private void commitMoves()
     {
-        Iterator<Critter> it = getActiveLegion().getCritters().iterator();
+        Iterator<CreatureServerSide> it = getActiveLegion().getCritters().iterator();
         while (it.hasNext())
         {
-            Critter critter = it.next();
+            CreatureServerSide critter = it.next();
             critter.commitMove();
         }
     }
@@ -713,11 +713,11 @@ public final class Battle extends net.sf.colossus.game.Battle
         //    during the strike phase.
         if (phase == Constants.BattlePhase.FIGHT && !driftDamageApplied)
         {
-            Iterator<Critter> it = getAllCritters().iterator();
+            Iterator<CreatureServerSide> it = getAllCritters().iterator();
             driftDamageApplied = true;
             while (it.hasNext())
             {
-                Critter critter = it.next();
+                CreatureServerSide critter = it.next();
                 int dam = critter.getCurrentHex().damageToCreature(
                     critter.getCreature());
                 if (dam > 0)
@@ -760,8 +760,8 @@ public final class Battle extends net.sf.colossus.game.Battle
         attackerElim = true;
         defenderElim = true;
 
-        Legion attacker = getAttacker();
-        Legion defender = getDefender();
+        LegionServerSide attacker = getAttacker();
+        LegionServerSide defender = getDefender();
 
         removeDeadCreaturesFromLegion(defender);
         removeDeadCreaturesFromLegion(attacker);
@@ -779,19 +779,19 @@ public final class Battle extends net.sf.colossus.game.Battle
         server.allRemoveDeadBattleChits();
     }
 
-    private void removeDeadCreaturesFromLegion(Legion legion)
+    private void removeDeadCreaturesFromLegion(LegionServerSide legion)
     {
         if (legion == null)
         {
             return;
         }
-        List<Critter> critters = legion.getCritters();
+        List<CreatureServerSide> critters = legion.getCritters();
         if (critters != null)
         {
-            Iterator<Critter> it = critters.iterator();
+            Iterator<CreatureServerSide> it = critters.iterator();
             while (it.hasNext())
             {
-                Critter critter = it.next();
+                CreatureServerSide critter = it.next();
                 if (critter.isDead())
                 {
                     cleanupOneDeadCritter(critter);
@@ -813,10 +813,10 @@ public final class Battle extends net.sf.colossus.game.Battle
         }
     }
 
-    private void cleanupOneDeadCritter(Critter critter)
+    private void cleanupOneDeadCritter(CreatureServerSide critter)
     {
-        Legion legion = critter.getLegion();
-        Legion donor = null;
+        LegionServerSide legion = critter.getLegion();
+        LegionServerSide donor = null;
 
         // After turn 1, offboard creatures are returned to the
         // stacks or the legion they were summoned from, with
@@ -826,7 +826,7 @@ public final class Battle extends net.sf.colossus.game.Battle
             if (legion == getAttacker())
             {
                 // Summoned angel.
-                Player player = legion.getPlayer();
+                PlayerServerSide player = legion.getPlayer();
                 donor = player.getDonor();
                 if (donor != null)
                 {
@@ -883,10 +883,10 @@ public final class Battle extends net.sf.colossus.game.Battle
 
     private void checkForElimination()
     {
-        Legion attacker = getAttacker();
-        Legion defender = getDefender();
-        Player attackerPlayer = attacker.getPlayer();
-        Player defenderPlayer = defender.getPlayer();
+        LegionServerSide attacker = getAttacker();
+        LegionServerSide defender = getDefender();
+        PlayerServerSide attackerPlayer = attacker.getPlayer();
+        PlayerServerSide defenderPlayer = defender.getPlayer();
 
         boolean attackerTitanDead = attackerPlayer.isTitanEliminated();
         boolean defenderTitanDead = defenderPlayer.isTitanEliminated();
@@ -958,13 +958,13 @@ public final class Battle extends net.sf.colossus.game.Battle
 
     private void commitStrikes()
     {
-        Legion legion = getActiveLegion();
+        LegionServerSide legion = getActiveLegion();
         if (legion != null)
         {
-            Iterator<Critter> it = legion.getCritters().iterator();
+            Iterator<CreatureServerSide> it = legion.getCritters().iterator();
             while (it.hasNext())
             {
-                Critter critter = it.next();
+                CreatureServerSide critter = it.next();
                 critter.setStruck(false);
             }
         }
@@ -972,13 +972,13 @@ public final class Battle extends net.sf.colossus.game.Battle
 
     private boolean isForcedStrikeRemaining()
     {
-        Legion legion = getActiveLegion();
+        LegionServerSide legion = getActiveLegion();
         if (legion != null)
         {
-            Iterator<Critter> it = legion.getCritters().iterator();
+            Iterator<CreatureServerSide> it = legion.getCritters().iterator();
             while (it.hasNext())
             {
-                Critter critter = it.next();
+                CreatureServerSide critter = it.next();
                 if (!critter.hasStruck() && critter.isInContact(false))
                 {
                     return true;
@@ -1008,7 +1008,7 @@ public final class Battle extends net.sf.colossus.game.Battle
     /** Return a set of hex labels for hexes containing targets that the
      *  critter may strike.  Only include rangestrikes if rangestrike
      *  is true. */
-    Set<String> findStrikes(Critter critter, boolean rangestrike)
+    Set<String> findStrikes(CreatureServerSide critter, boolean rangestrike)
     {
         Set<String> set = new HashSet<String>();
 
@@ -1018,7 +1018,7 @@ public final class Battle extends net.sf.colossus.game.Battle
             return set;
         }
 
-        PlayerState player = critter.getPlayer();
+        Player player = critter.getPlayer();
         BattleHex currentHex = critter.getCurrentHex();
 
         boolean adjacentEnemy = false;
@@ -1032,7 +1032,7 @@ public final class Battle extends net.sf.colossus.game.Battle
                 BattleHex targetHex = currentHex.getNeighbor(i);
                 if (targetHex != null && isOccupied(targetHex))
                 {
-                    Critter target = getCritter(targetHex);
+                    CreatureServerSide target = getCritter(targetHex);
                     if (target.getPlayer() != player)
                     {
                         adjacentEnemy = true;
@@ -1052,11 +1052,11 @@ public final class Battle extends net.sf.colossus.game.Battle
             && getBattlePhase() != Constants.BattlePhase.STRIKEBACK
             && critter.getLegion() == getActiveLegion())
         {
-            Iterator<Critter> it = getInactiveLegion().getCritters()
+            Iterator<CreatureServerSide> it = getInactiveLegion().getCritters()
                 .iterator();
             while (it.hasNext())
             {
-                Critter target = it.next();
+                CreatureServerSide target = it.next();
                 if (!target.isDead())
                 {
                     BattleHex targetHex = target.getCurrentHex();
@@ -1083,7 +1083,7 @@ public final class Battle extends net.sf.colossus.game.Battle
         while (it.hasNext())
         {
             String hexLabel = it.next();
-            Critter critter = getCritter(hexLabel);
+            CreatureServerSide critter = getCritter(hexLabel);
             set.add(critter.getDescription());
         }
         return set;
@@ -1105,7 +1105,7 @@ public final class Battle extends net.sf.colossus.game.Battle
         carryTargets.add(hexLabel);
     }
 
-    void applyCarries(Critter target)
+    void applyCarries(CreatureServerSide target)
     {
         if (!carryTargets.contains(target.getCurrentHex().getLabel()))
         {
@@ -1452,7 +1452,7 @@ public final class Battle extends net.sf.colossus.game.Battle
     }
 
     /** Return true if the rangestrike is possible. */
-    private boolean isRangestrikePossible(Critter critter, Critter target)
+    private boolean isRangestrikePossible(CreatureServerSide critter, CreatureServerSide target)
     {
         BattleHex currentHex = critter.getCurrentHex();
         BattleHex targetHex = target.getCurrentHex();
@@ -1722,7 +1722,7 @@ public final class Battle extends net.sf.colossus.game.Battle
     /** If legal, move critter to hex and return true. Else return false. */
     boolean doMove(int tag, String hexLabel)
     {
-        Critter critter = getActiveLegion().getCritterByTag(tag);
+        CreatureServerSide critter = getActiveLegion().getCritterByTag(tag);
         BattleHex hex = BattleMap.getHexByLabel(terrain, hexLabel);
         if (critter == null)
         {
@@ -1747,7 +1747,7 @@ public final class Battle extends net.sf.colossus.game.Battle
         }
         else
         {
-            Legion legion = getActiveLegion();
+            LegionServerSide legion = getActiveLegion();
             String markerId = legion.getMarkerId();
             LOGGER.log(Level.WARNING, critter.getName() + " in "
                 + critter.getCurrentHex().getLabel()
@@ -1766,15 +1766,15 @@ public final class Battle extends net.sf.colossus.game.Battle
     }
 
     /** Return a list of all critters in the battle. */
-    private List<Critter> getAllCritters()
+    private List<CreatureServerSide> getAllCritters()
     {
-        List<Critter> critters = new ArrayList<Critter>();
-        Legion defender = getDefender();
+        List<CreatureServerSide> critters = new ArrayList<CreatureServerSide>();
+        LegionServerSide defender = getDefender();
         if (defender != null)
         {
             critters.addAll(defender.getCritters());
         }
-        Legion attacker = getAttacker();
+        LegionServerSide attacker = getAttacker();
         if (attacker != null)
         {
             critters.addAll(attacker.getCritters());
@@ -1784,10 +1784,10 @@ public final class Battle extends net.sf.colossus.game.Battle
 
     private boolean isOccupied(String hexLabel)
     {
-        Iterator<Critter> it = getAllCritters().iterator();
+        Iterator<CreatureServerSide> it = getAllCritters().iterator();
         while (it.hasNext())
         {
-            Critter critter = it.next();
+            CreatureServerSide critter = it.next();
             if (hexLabel.equals(critter.getCurrentHex().getLabel()))
             {
                 return true;
@@ -1801,17 +1801,17 @@ public final class Battle extends net.sf.colossus.game.Battle
         return isOccupied(hex.getLabel());
     }
 
-    Critter getCritter(BattleHex hex)
+    CreatureServerSide getCritter(BattleHex hex)
     {
         return getCritter(hex.getLabel());
     }
 
-    Critter getCritter(String hexLabel)
+    CreatureServerSide getCritter(String hexLabel)
     {
-        Iterator<Critter> it = getAllCritters().iterator();
+        Iterator<CreatureServerSide> it = getAllCritters().iterator();
         while (it.hasNext())
         {
-            Critter critter = it.next();
+            CreatureServerSide critter = it.next();
             if (hexLabel.equals(critter.getCurrentHex().getLabel()))
             {
                 return critter;

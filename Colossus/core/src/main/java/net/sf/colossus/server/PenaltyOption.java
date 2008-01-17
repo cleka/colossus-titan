@@ -20,13 +20,13 @@ final class PenaltyOption implements Comparable<PenaltyOption>
     private static final Logger LOGGER = Logger.getLogger(PenaltyOption.class
         .getName());
 
-    private final Critter striker;
-    private final Critter target;
+    private final CreatureServerSide striker;
+    private final CreatureServerSide target;
     private final Set<String> carryTargets = new HashSet<String>(); // of hexLabels
     private final int dice;
     private final int strikeNumber;
 
-    PenaltyOption(Critter striker, Critter target, int dice, int strikeNumber)
+    PenaltyOption(CreatureServerSide striker, CreatureServerSide target, int dice, int strikeNumber)
     {
         this.striker = striker;
         this.target = target;
@@ -39,12 +39,12 @@ final class PenaltyOption implements Comparable<PenaltyOption>
         }
     }
 
-    Critter getStriker()
+    CreatureServerSide getStriker()
     {
         return striker;
     }
 
-    Critter getTarget()
+    CreatureServerSide getTarget()
     {
         return target;
     }
@@ -101,13 +101,13 @@ final class PenaltyOption implements Comparable<PenaltyOption>
         {
             return 1;
         }
-        else if (Critter.IMPORTANCE_ORDER.compare(striker, other.striker) != 0)
+        else if (CreatureServerSide.IMPORTANCE_ORDER.compare(striker, other.striker) != 0)
         {
-            return Critter.IMPORTANCE_ORDER.compare(striker, other.striker);
+            return CreatureServerSide.IMPORTANCE_ORDER.compare(striker, other.striker);
         }
         else
         {
-            return Critter.IMPORTANCE_ORDER.compare(target, other.target);
+            return CreatureServerSide.IMPORTANCE_ORDER.compare(target, other.target);
         }
     }
 
@@ -155,7 +155,7 @@ final class PenaltyOption implements Comparable<PenaltyOption>
                 }
                 first = false;
                 String hexLabel = it.next();
-                Critter critter = striker.getBattle().getCritter(hexLabel);
+                CreatureServerSide critter = striker.getBattle().getCritter(hexLabel);
                 sb.append(critter.getDescription());
             }
         }

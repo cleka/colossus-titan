@@ -260,7 +260,7 @@ final class StatusScreen extends KDialog implements WindowListener
 
         for (int i = 0; i < numPlayers; i++)
         {
-            PlayerInfo info = client.getPlayerInfo(i);
+            PlayerClientSide info = client.getPlayerInfo(i);
             Color color, bgcolor, fgcolor;
 
             if (info.isDead())

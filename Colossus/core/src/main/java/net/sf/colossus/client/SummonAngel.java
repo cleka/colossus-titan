@@ -20,7 +20,7 @@ import java.util.logging.Logger;
 
 import javax.swing.JButton;
 
-import net.sf.colossus.server.Legion;
+import net.sf.colossus.server.LegionServerSide;
 import net.sf.colossus.util.KDialog;
 import net.sf.colossus.variant.CreatureType;
 
@@ -51,7 +51,7 @@ final class SummonAngel extends KDialog implements MouseListener,
     private SummonAngel(Client client, String markerId)
     {
         super(client.getBoard().getFrame(), client.getOwningPlayer().getName()
-            + baseSummonString + Legion.getLongMarkerName(markerId)
+            + baseSummonString + LegionServerSide.getLongMarkerName(markerId)
             + noSourceSummonString, false);
 
         this.client = client;
@@ -183,14 +183,14 @@ final class SummonAngel extends KDialog implements MouseListener,
         if (donorId == null)
         {
             setTitle(client.getOwningPlayer().getName() + baseSummonString
-                + Legion.getLongMarkerName(markerId) + noSourceSummonString);
+                + LegionServerSide.getLongMarkerName(markerId) + noSourceSummonString);
             return;
         }
         else
         {
             setTitle(client.getOwningPlayer().getName() + baseSummonString
-                + Legion.getLongMarkerName(markerId) + sourceSummonString
-                + Legion.getLongMarkerName(donorId));
+                + LegionServerSide.getLongMarkerName(markerId) + sourceSummonString
+                + LegionServerSide.getLongMarkerName(donorId));
         }
         Iterator<Chit> it = sumChitList.iterator();
         while (it.hasNext())

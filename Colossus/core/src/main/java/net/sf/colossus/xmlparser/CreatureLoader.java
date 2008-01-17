@@ -11,7 +11,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.sf.colossus.server.Creature;
+import net.sf.colossus.server.CreatureTypeServerSide;
 import net.sf.colossus.server.CreatureTitan;
 import net.sf.colossus.variant.HazardTerrain;
 
@@ -25,20 +25,20 @@ import org.jdom.input.SAXBuilder;
  * CreatureLoader loads the creature descriptions.
  * @author Romain Dolbeau
  * @version $Id$
- * @see net.sf.colossus.server.Creature
+ * @see net.sf.colossus.server.CreatureTypeServerSide
  */
 public class CreatureLoader
 {
     private static final Logger LOGGER = Logger.getLogger(CreatureLoader.class
         .getName());
 
-    private final ArrayList<Creature> creatures;
+    private final ArrayList<CreatureTypeServerSide> creatures;
 
     // we need to cast since JDOM is not generified
     @SuppressWarnings("unchecked")
     public CreatureLoader(InputStream creIS)
     {
-        this.creatures = new ArrayList<Creature>();
+        this.creatures = new ArrayList<CreatureTypeServerSide>();
         SAXBuilder builder = new SAXBuilder();
         try
         {
@@ -116,7 +116,7 @@ public class CreatureLoader
         String plural_name = el.getAttributeValue("plural_name");
         String base_color = el.getAttributeValue("base_color");
 
-        Creature creature = null;
+        CreatureTypeServerSide creature = null;
         if (name.equals("Titan"))
         {
             creature = new CreatureTitan(name, power, skill, rangestrikes,
@@ -125,14 +125,14 @@ public class CreatureLoader
         }
         else
         {
-            creature = new Creature(name, power, skill, rangestrikes, flies,
+            creature = new CreatureTypeServerSide(name, power, skill, rangestrikes, flies,
                 nativeTerrains, slope, river, water, magic_missile,
                 summonable, lord, demilord, count, plural_name, base_color);
         }
         this.creatures.add(creature);
     }
 
-    public List<Creature> getCreatures()
+    public List<CreatureTypeServerSide> getCreatures()
     {
         return Collections.unmodifiableList(this.creatures);
     }

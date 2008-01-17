@@ -15,7 +15,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.colossus.client.IClient;
-import net.sf.colossus.game.PlayerState;
+import net.sf.colossus.game.Player;
 import net.sf.colossus.util.Glob;
 import net.sf.colossus.util.Split;
 import net.sf.colossus.webcommon.InstanceTracker;
@@ -666,7 +666,7 @@ final class SocketServerThread extends Thread implements IClient
         sendToClient(Constants.tellGameOver + sep + message);
     }
 
-    public void tellPlayerElim(PlayerState player, PlayerState slayer)
+    public void tellPlayerElim(Player player, Player slayer)
     {
         // slayer can be null
         sendToClient(Constants.tellPlayerElim + sep + player.getName() + sep
@@ -708,7 +708,7 @@ final class SocketServerThread extends Thread implements IClient
     }
 
     public void initBattle(String masterHexLabel, int battleTurnNumber,
-        PlayerState battleActivePlayer, Constants.BattlePhase battlePhase,
+        Player battleActivePlayer, Constants.BattlePhase battlePhase,
         String attackerMarkerId, String defenderMarkerId)
     {
         sendToClient(Constants.initBattle + sep + masterHexLabel + sep
@@ -745,13 +745,13 @@ final class SocketServerThread extends Thread implements IClient
             + recruitName);
     }
 
-    public void setupTurnState(PlayerState activePlayer, int turnNumber)
+    public void setupTurnState(Player activePlayer, int turnNumber)
     {
         sendToClient(Constants.setupTurnState + sep + activePlayer.getName()
             + sep + turnNumber);
     }
 
-    public void setupSplit(PlayerState activePlayer, int turnNumber)
+    public void setupSplit(Player activePlayer, int turnNumber)
     {
         sendToClient(Constants.setupSplit + sep + activePlayer.getName() + sep
             + turnNumber);
@@ -772,21 +772,21 @@ final class SocketServerThread extends Thread implements IClient
         sendToClient(Constants.setupMuster);
     }
 
-    public void setupBattleSummon(PlayerState battleActivePlayer,
+    public void setupBattleSummon(Player battleActivePlayer,
         int battleTurnNumber)
     {
         sendToClient(Constants.setupBattleSummon + sep
             + battleActivePlayer.getName() + sep + battleTurnNumber);
     }
 
-    public void setupBattleRecruit(PlayerState battleActivePlayer,
+    public void setupBattleRecruit(Player battleActivePlayer,
         int battleTurnNumber)
     {
         sendToClient(Constants.setupBattleRecruit + sep
             + battleActivePlayer.getName() + sep + battleTurnNumber);
     }
 
-    public void setupBattleMove(PlayerState battleActivePlayer,
+    public void setupBattleMove(Player battleActivePlayer,
         int battleTurnNumber)
     {
         sendToClient(Constants.setupBattleMove + sep
@@ -794,7 +794,7 @@ final class SocketServerThread extends Thread implements IClient
     }
 
     public void setupBattleFight(Constants.BattlePhase battlePhase,
-        PlayerState battleActivePlayer)
+        Player battleActivePlayer)
     {
         sendToClient(Constants.setupBattleFight + sep + battlePhase.toInt()
             + sep + battleActivePlayer.getName());

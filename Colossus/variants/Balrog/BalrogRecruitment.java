@@ -11,9 +11,9 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.sf.colossus.client.PlayerInfo;
-import net.sf.colossus.game.PlayerState;
-import net.sf.colossus.server.Creature;
+import net.sf.colossus.client.PlayerClientSide;
+import net.sf.colossus.game.Player;
+import net.sf.colossus.server.CreatureTypeServerSide;
 import net.sf.colossus.server.CustomRecruitBase;
 import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.variant.CreatureType;
@@ -32,28 +32,28 @@ public class BalrogRecruitment extends CustomRecruitBase
     /**
      * Maps a player to their previous points count.
      */
-    private final Map<PlayerState, Integer> playerToOldScore = Collections
-        .synchronizedMap(new HashMap<PlayerState, Integer>());
+    private final Map<Player, Integer> playerToOldScore = Collections
+        .synchronizedMap(new HashMap<Player, Integer>());
 
     private final static int balrogValue = 300;
     private final static String balrogPrefix = "Balrog";
 
     @Override
-    public List<Creature> getAllPossibleSpecialRecruiters(String terrain)
+    public List<CreatureTypeServerSide> getAllPossibleSpecialRecruiters(String terrain)
     {
         // Balrog recruited in Tower, where everything recruit anyway.
-        return new ArrayList<Creature>();
+        return new ArrayList<CreatureTypeServerSide>();
     }
 
     @Override
-    public List<Creature> getAllPossibleSpecialRecruits(String terrain)
+    public List<CreatureTypeServerSide> getAllPossibleSpecialRecruits(String terrain)
     {
-        List<Creature> temp = new ArrayList<Creature>();
+        List<CreatureTypeServerSide> temp = new ArrayList<CreatureTypeServerSide>();
         Iterator<CreatureType> it = VariantSupport.getCurrentVariant()
             .getCreatureTypes().iterator();
         while (it.hasNext())
         {
-            Creature cre = (Creature)it.next();
+            CreatureTypeServerSide cre = (CreatureTypeServerSide)it.next();
             if (cre.getName().startsWith(balrogPrefix))
             {
                 temp.add(cre);
@@ -63,18 +63,18 @@ public class BalrogRecruitment extends CustomRecruitBase
     }
 
     @Override
-    public List<Creature> getPossibleSpecialRecruiters(String terrain,
+    public List<CreatureTypeServerSide> getPossibleSpecialRecruiters(String terrain,
         String hexLabel)
     {
         // Balrog recruited in Tower, where everything recruit anyway.
-        return new ArrayList<Creature>();
+        return new ArrayList<CreatureTypeServerSide>();
     }
 
     @Override
-    public List<Creature> getPossibleSpecialRecruits(String terrain,
+    public List<CreatureTypeServerSide> getPossibleSpecialRecruits(String terrain,
         String hexLabel)
     {
-        List<Creature> temp = new ArrayList<Creature>();
+        List<CreatureTypeServerSide> temp = new ArrayList<CreatureTypeServerSide>();
 
         if (hexLabel == null)
         {
@@ -89,7 +89,7 @@ public class BalrogRecruitment extends CustomRecruitBase
 
         if (getCount(name) > 0)
         {
-            temp.add((Creature)VariantSupport.getCurrentVariant()
+            temp.add((CreatureTypeServerSide)VariantSupport.getCurrentVariant()
                 .getCreatureByName(name));
         }
         return temp;
@@ -121,7 +121,7 @@ public class BalrogRecruitment extends CustomRecruitBase
     {
         String name = balrogPrefix + hexLabel;
 
-        PlayerInfo pi = findPlayerWithStartingTower(hexLabel);
+        PlayerClientSide pi = findPlayerWithStartingTower(hexLabel);
 
         if (pi == null)
         {
@@ -162,7 +162,7 @@ public class BalrogRecruitment extends CustomRecruitBase
             return;
         }
 
-        Creature cre = (Creature)VariantSupport.getCurrentVariant()
+        CreatureTypeServerSide cre = (CreatureTypeServerSide)VariantSupport.getCurrentVariant()
             .getCreatureByName(name);
         ((CreatureBalrog)cre).setNewMaxCount(nowNumber);
 
@@ -186,12 +186,12 @@ public class BalrogRecruitment extends CustomRecruitBase
         }
     }
 
-    private PlayerInfo findPlayerWithStartingTower(String hexLabel)
+    private PlayerClientSide findPlayerWithStartingTower(String hexLabel)
     {
-        Iterator<PlayerInfo> it = allPlayerInfo.iterator();
+        Iterator<PlayerClientSide> it = allPlayerInfo.iterator();
         while (it.hasNext())
         {
-            PlayerInfo pi = it.next();
+            PlayerClientSide pi = it.next();
             String towerLabel = pi.getTower();
 
             if (towerLabel.equals(hexLabel))

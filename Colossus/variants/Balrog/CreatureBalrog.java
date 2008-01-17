@@ -13,7 +13,7 @@ import net.sf.colossus.variant.HazardTerrain;
  * @version $Id$
  * @author Romain Dolbeau
  */
-public class CreatureBalrog extends net.sf.colossus.server.Creature
+public class CreatureBalrog extends net.sf.colossus.server.CreatureTypeServerSide
 {
     private int localMaxCount;
 

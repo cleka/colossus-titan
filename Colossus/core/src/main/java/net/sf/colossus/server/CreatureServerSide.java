@@ -20,7 +20,7 @@ import net.sf.colossus.variant.HazardTerrain;
 /**
  * Class Critter represents an individual Titan Character.
  * 
- * TODO this duplicates functionality from the {@link Creature} class,
+ * TODO this duplicates functionality from the {@link CreatureTypeServerSide} class,
  * mostly due to the fact that the latter doesn't handle the Titans
  * properly
  * 
@@ -34,7 +34,7 @@ import net.sf.colossus.variant.HazardTerrain;
  * @author Romain Dolbeau
  */
 
-public class Critter extends net.sf.colossus.game.Creature
+public class CreatureServerSide extends net.sf.colossus.game.Creature
 {
     /**
      * Implements an order on Critters by some definition of importance.
@@ -48,9 +48,10 @@ public class Critter extends net.sf.colossus.game.Creature
      * 
      * TODO this is actually applicable on the CreatureType level
      */
-    public static final Comparator<Critter> IMPORTANCE_ORDER = new Comparator<Critter>()
+    public static final Comparator<CreatureServerSide> IMPORTANCE_ORDER = new Comparator<CreatureServerSide>()
     {
-        public int compare(Critter critter1, Critter critter2)
+        public int compare(CreatureServerSide critter1,
+            CreatureServerSide critter2)
         {
             if (critter1.isTitan())
             {
@@ -85,18 +86,18 @@ public class Critter extends net.sf.colossus.game.Creature
         }
     };
 
-    private static final Logger LOGGER = Logger.getLogger(Critter.class
-        .getName());
+    private static final Logger LOGGER = Logger
+        .getLogger(CreatureServerSide.class.getName());
 
-    private Legion legion;
-    private Battle battle;
+    private LegionServerSide legion;
+    private BattleServerSide battle;
     private boolean struck;
     private BattleHex currentHex;
     private BattleHex startingHex;
 
     /** Damage taken */
     private int hits = 0;
-    private final Game game;
+    private final GameServerSide game;
 
     /** Unique identifier for each critter. */
     private final int tag;
@@ -106,7 +107,8 @@ public class Critter extends net.sf.colossus.game.Creature
     private final SortedSet<PenaltyOption> penaltyOptions = new TreeSet<PenaltyOption>();
     private boolean carryPossible;
 
-    public Critter(Creature creature, Legion legion, Game game)
+    public CreatureServerSide(CreatureTypeServerSide creature, LegionServerSide legion,
+        GameServerSide game)
     {
         super(creature);
         this.legion = legion;
@@ -115,7 +117,7 @@ public class Critter extends net.sf.colossus.game.Creature
     }
 
     void addBattleInfo(BattleHex currentHex, BattleHex startingHex,
-        Battle battle)
+        BattleServerSide battle)
     {
         this.currentHex = currentHex;
         this.startingHex = startingHex;
@@ -126,9 +128,9 @@ public class Critter extends net.sf.colossus.game.Creature
      * TODO MODEL -- getType() should be used once everything needed is moved
      *      up into the CreatureType class
      */
-    Creature getCreature()
+    CreatureTypeServerSide getCreature()
     {
-        return (Creature)getType();
+        return (CreatureTypeServerSide)getType();
     }
 
     String getMarkerId()
@@ -136,17 +138,17 @@ public class Critter extends net.sf.colossus.game.Creature
         return legion.getMarkerId();
     }
 
-    void setLegion(Legion legion)
+    void setLegion(LegionServerSide legion)
     {
         this.legion = legion;
     }
 
-    Legion getLegion()
+    LegionServerSide getLegion()
     {
         return legion;
     }
 
-    Player getPlayer()
+    PlayerServerSide getPlayer()
     {
         return legion.getPlayer();
     }
@@ -156,7 +158,7 @@ public class Critter extends net.sf.colossus.game.Creature
         return tag;
     }
 
-    Battle getBattle()
+    BattleServerSide getBattle()
     {
         return battle;
     }
@@ -170,7 +172,7 @@ public class Critter extends net.sf.colossus.game.Creature
     {
         if (isTitan())
         {
-            Player player = getPlayer();
+            PlayerServerSide player = getPlayer();
             if (player != null)
             {
                 return player.getTitanPower();
@@ -293,7 +295,7 @@ public class Critter extends net.sf.colossus.game.Creature
                 BattleHex neighbor = hex.getNeighbor(i);
                 if (neighbor != null)
                 {
-                    Critter other = battle.getCritter(neighbor);
+                    CreatureServerSide other = battle.getCritter(neighbor);
                     if (other != null && other.getPlayer() != getPlayer()
                         && (countDead || !other.isDead()))
                     {
@@ -326,7 +328,7 @@ public class Critter extends net.sf.colossus.game.Creature
                 BattleHex neighbor = hex.getNeighbor(i);
                 if (neighbor != null)
                 {
-                    Critter other = battle.getCritter(neighbor);
+                    CreatureServerSide other = battle.getCritter(neighbor);
                     if (other != null && other.getPlayer() != getPlayer()
                         && (countDead || !other.isDead()))
                     {
@@ -361,7 +363,7 @@ public class Critter extends net.sf.colossus.game.Creature
             formerHexLabel.getLabel(), currentHex.getLabel(), true);
     }
 
-    boolean canStrike(Critter target)
+    boolean canStrike(CreatureServerSide target)
     {
         String hexLabel = target.getCurrentHex().getLabel();
         return battle.findStrikes(this, true).contains(hexLabel);
@@ -369,7 +371,7 @@ public class Critter extends net.sf.colossus.game.Creature
 
     /** Return the number of dice that will be rolled when striking this
      *  target, including modifications for terrain. */
-    protected int getDice(Critter target)
+    protected int getDice(CreatureServerSide target)
     {
         BattleHex hex = getCurrentHex();
         BattleHex targetHex = target.getCurrentHex();
@@ -400,7 +402,8 @@ public class Critter extends net.sf.colossus.game.Creature
             }
 
             // Adjacent hex, so only one possible direction.
-            int direction = Battle.getDirection(hex, targetHex, false);
+            int direction = BattleServerSide.getDirection(hex, targetHex,
+                false);
             char hexside = hex.getHexside(direction);
 
             // Native striking down a dune hexside: +2
@@ -424,7 +427,7 @@ public class Critter extends net.sf.colossus.game.Creature
         return dice;
     }
 
-    private int getAttackerSkill(Critter target)
+    private int getAttackerSkill(CreatureServerSide target)
     {
         BattleHex hex = getCurrentHex();
         BattleHex targetHex = target.getCurrentHex();
@@ -446,7 +449,8 @@ public class Critter extends net.sf.colossus.game.Creature
             if (hex.getElevation() > targetHex.getElevation())
             {
                 // Adjacent hex, so only one possible direction.
-                int direction = Battle.getDirection(hex, targetHex, false);
+                int direction = BattleServerSide.getDirection(hex, targetHex,
+                    false);
                 char hexside = hex.getHexside(direction);
                 // Striking down across wall: +1
                 if (hexside == 'w')
@@ -457,7 +461,8 @@ public class Critter extends net.sf.colossus.game.Creature
             else if (hex.getElevation() < targetHex.getElevation())
             {
                 // Adjacent hex, so only one possible direction.
-                int direction = Battle.getDirection(targetHex, hex, false);
+                int direction = BattleServerSide.getDirection(targetHex, hex,
+                    false);
                 char hexside = targetHex.getHexside(direction);
                 // Non-native striking up slope: -1
                 // Striking up across wall: -1
@@ -470,7 +475,7 @@ public class Critter extends net.sf.colossus.game.Creature
         else if (!useMagicMissile())
         {
             // Range penalty
-            if (Battle.getRange(hex, targetHex, false) == 4)
+            if (BattleServerSide.getRange(hex, targetHex, false) == 4)
             {
                 attackerSkill--;
             }
@@ -510,7 +515,7 @@ public class Critter extends net.sf.colossus.game.Creature
         return battle.countBrambleHexes(getCurrentHex(), targetHex);
     }
 
-    protected int getStrikeNumber(Critter target)
+    protected int getStrikeNumber(CreatureServerSide target)
     {
         boolean rangestrike = !isInContact(true);
 
@@ -561,7 +566,7 @@ public class Critter extends net.sf.colossus.game.Creature
     /** Calculate number of dice and strike number needed to hit target,
      *  and whether any carries and strike penalties are possible.  The
      *  actual striking is now deferred to strike2(). */
-    synchronized void strike(Critter target)
+    synchronized void strike(CreatureServerSide target)
     {
         battle.leaveCarryMode();
         carryPossible = true;
@@ -603,7 +608,7 @@ public class Critter extends net.sf.colossus.game.Creature
         PenaltyOption po = matchingPenaltyOption(prompt);
         if (po != null)
         {
-            Critter target = po.getTarget();
+            CreatureServerSide target = po.getTarget();
             int dice = po.getDice();
             int strikeNumber = po.getStrikeNumber();
             carryPossible = (po.numCarryTargets() >= 1);
@@ -640,7 +645,7 @@ public class Critter extends net.sf.colossus.game.Creature
     // rather than use side effects.
 
     /** Side effects on penaltyOptions, Battle.carryTargets */
-    void findCarries(Critter target)
+    void findCarries(CreatureServerSide target)
     {
         battle.clearCarryTargets();
         penaltyOptions.clear();
@@ -695,8 +700,8 @@ public class Critter extends net.sf.colossus.game.Creature
         // Strikes not up across dune hexsides cannot carry up across 
         // dune hexsides.
         if (hex.getOppositeHexside(dir) == 'd'
-            && targetHex
-                .getHexside(Battle.getDirection(targetHex, hex, false)) != 'd')
+            && targetHex.getHexside(BattleServerSide.getDirection(targetHex,
+                hex, false)) != 'd')
         {
             return false;
         }
@@ -706,12 +711,12 @@ public class Critter extends net.sf.colossus.game.Creature
     /** For a strike on target, find any carries (including those
      *  only allowed via strike penalty) to the creature in neighbor
      *  Side effects on penaltyOptions, Battle.carryTargets */
-    private void findCarry(Critter target, BattleHex neighbor)
+    private void findCarry(CreatureServerSide target, BattleHex neighbor)
     {
         final int dice = getDice(target);
         final int strikeNumber = getStrikeNumber(target);
 
-        Critter victim = battle.getCritter(neighbor);
+        CreatureServerSide victim = battle.getCritter(neighbor);
         if (victim == null || victim.getPlayer() == getPlayer()
             || victim.isDead())
         {
@@ -767,7 +772,7 @@ public class Critter extends net.sf.colossus.game.Creature
 
     /** Called after strike penalties are chosen.
      *  Roll the dice and apply damage.  Highlight legal carry targets. */
-    private void strike2(Critter target, int dice, int strikeNumber)
+    private void strike2(CreatureServerSide target, int dice, int strikeNumber)
     {
         // Roll the dice.
         int damage = 0;

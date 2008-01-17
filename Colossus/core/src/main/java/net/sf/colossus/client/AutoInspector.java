@@ -16,7 +16,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.WindowConstants;
 
-import net.sf.colossus.game.PlayerState;
+import net.sf.colossus.game.Player;
 import net.sf.colossus.util.KDialog;
 import net.sf.colossus.util.Options;
 import net.sf.colossus.variant.MasterHex;
@@ -30,13 +30,13 @@ public class AutoInspector extends KDialog
 
     private final JScrollPane scrollPane;
 
-    private final PlayerState owner;
+    private final Player owner;
 
     private final int viewMode;
 
     private boolean dubiousAsBlanks;
 
-    public AutoInspector(JFrame frame, IOptions options, PlayerState owner,
+    public AutoInspector(JFrame frame, IOptions options, Player owner,
         int viewMode, boolean dubiousAsBlanks)
     {
         super(frame, "Inspector", false);
@@ -86,7 +86,7 @@ public class AutoInspector extends KDialog
         return new Dimension(550, 110);
     }
 
-    public void showLegion(LegionInfo legion)
+    public void showLegion(LegionClientSide legion)
     {
         scrollPane.getViewport().removeAll();
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT));

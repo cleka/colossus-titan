@@ -11,7 +11,7 @@ import java.awt.event.WindowListener;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 
-import net.sf.colossus.game.PlayerState;
+import net.sf.colossus.game.Player;
 import net.sf.colossus.util.KDialog;
 
 
@@ -24,8 +24,8 @@ import net.sf.colossus.util.KDialog;
 final class ShowLegion extends KDialog implements MouseListener,
     WindowListener
 {
-    ShowLegion(JFrame parentFrame, LegionInfo legion, Point point,
-        JScrollPane pane, int scale, PlayerState activePlayer, int viewMode,
+    ShowLegion(JFrame parentFrame, LegionClientSide legion, Point point,
+        JScrollPane pane, int scale, Player activePlayer, int viewMode,
         boolean dubiousAsBlanks)
     {
         super(parentFrame, legion.getMarkerId(), false);

@@ -11,7 +11,7 @@ import java.util.logging.Logger;
 
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.server.Constants;
-import net.sf.colossus.server.Creature;
+import net.sf.colossus.server.CreatureTypeServerSide;
 import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.MasterHex;
@@ -23,9 +23,9 @@ import net.sf.colossus.variant.MasterHex;
  * @author David Ripton
  */
 
-public final class LegionInfo extends Legion
+public final class LegionClientSide extends Legion
 {
-    private static final Logger LOGGER = Logger.getLogger(LegionInfo.class
+    private static final Logger LOGGER = Logger.getLogger(LegionClientSide.class
         .getName());
 
     private final Client client;
@@ -40,7 +40,7 @@ public final class LegionInfo extends Legion
     private PredictSplitNode myNode;
     private final boolean isMyLegion;
 
-    LegionInfo(String markerId, Client client)
+    LegionClientSide(String markerId, Client client)
     {
         super(client.getPlayerStateByMarkerId(markerId), markerId);
         this.client = client;
@@ -146,7 +146,7 @@ public final class LegionInfo extends Legion
         Iterator<String> it = getContents().iterator();
         while (it.hasNext())
         {
-            Creature c = (Creature)getPlayer().getGame().getVariant()
+            CreatureTypeServerSide c = (CreatureTypeServerSide)getPlayer().getGame().getVariant()
                 .getCreatureByName(it.next());
             if (c.isSummonable())
             {
@@ -191,9 +191,9 @@ public final class LegionInfo extends Legion
     }
 
     @Override
-    public PlayerInfo getPlayer()
+    public PlayerClientSide getPlayer()
     {
-        return (PlayerInfo)super.getPlayer();
+        return (PlayerClientSide)super.getPlayer();
     }
 
     /** Return the full basename for a titan in legion markerId,
@@ -203,7 +203,7 @@ public final class LegionInfo extends Legion
     {
         try
         {
-            PlayerInfo info = getPlayer();
+            PlayerClientSide info = getPlayer();
             String color = info.getColor();
             int power = info.getTitanPower();
             return "Titan-" + power + "-" + color;
@@ -266,7 +266,7 @@ public final class LegionInfo extends Legion
             }
             else
             {
-                Creature creature = (Creature)getPlayer().getGame()
+                CreatureTypeServerSide creature = (CreatureTypeServerSide)getPlayer().getGame()
                     .getVariant().getCreatureByName(name);
                 if (creature != null && creature.isLord())
                 {
@@ -279,13 +279,13 @@ public final class LegionInfo extends Legion
 
     public String bestSummonable()
     {
-        Creature best = null;
+        CreatureTypeServerSide best = null;
 
         Iterator<String> it = getContents().iterator();
         while (it.hasNext())
         {
             String name = it.next();
-            Creature creature = (Creature)getPlayer().getGame().getVariant()
+            CreatureTypeServerSide creature = (CreatureTypeServerSide)getPlayer().getGame().getVariant()
                 .getCreatureByName(name);
             if (creature.isSummonable())
             {
@@ -319,15 +319,15 @@ public final class LegionInfo extends Legion
             String name = it.next();
             if (name.startsWith(Constants.titan))
             {
-                PlayerInfo info = getPlayer();
+                PlayerClientSide info = getPlayer();
                 // Titan skill is changed by variants.
                 sum += info.getTitanPower()
-                    * ((Creature)getPlayer().getGame().getVariant()
+                    * ((CreatureTypeServerSide)getPlayer().getGame().getVariant()
                         .getCreatureByName("Titan")).getSkill();
             }
             else
             {
-                sum += ((Creature)getPlayer().getGame().getVariant()
+                sum += ((CreatureTypeServerSide)getPlayer().getGame().getVariant()
                     .getCreatureByName(name)).getPointValue();
             }
         }
@@ -347,15 +347,15 @@ public final class LegionInfo extends Legion
             String name = it.next();
             if (name.startsWith(Constants.titan))
             {
-                PlayerInfo info = getPlayer();
+                PlayerClientSide info = getPlayer();
                 // Titan skill is changed by variants.
                 sum += info.getTitanPower()
-                    * ((Creature)getPlayer().getGame().getVariant()
+                    * ((CreatureTypeServerSide)getPlayer().getGame().getVariant()
                         .getCreatureByName("Titan")).getSkill();
             }
             else
             {
-                sum += ((Creature)getPlayer().getGame().getVariant()
+                sum += ((CreatureTypeServerSide)getPlayer().getGame().getVariant()
                     .getCreatureByName(name)).getPointValue();
             }
         }
@@ -372,9 +372,9 @@ public final class LegionInfo extends Legion
      with equals().  Really only useful for comparing own legions. */
     public int compareTo(Object object)
     {
-        if (object instanceof LegionInfo)
+        if (object instanceof LegionClientSide)
         {
-            LegionInfo other = (LegionInfo)object;
+            LegionClientSide other = (LegionClientSide)object;
             if (hasTitan())
             {
                 return Integer.MIN_VALUE;
@@ -503,9 +503,9 @@ public final class LegionInfo extends Legion
             {
                 return 1;
             }
-            Creature c1 = (Creature)VariantSupport.getCurrentVariant()
+            CreatureTypeServerSide c1 = (CreatureTypeServerSide)VariantSupport.getCurrentVariant()
                 .getCreatureByName(s1);
-            Creature c2 = (Creature)VariantSupport.getCurrentVariant()
+            CreatureTypeServerSide c2 = (CreatureTypeServerSide)VariantSupport.getCurrentVariant()
                 .getCreatureByName(s2);
             return c2.getKillValue() - c1.getKillValue();
         }

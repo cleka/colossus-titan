@@ -20,7 +20,7 @@ import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 
-import net.sf.colossus.server.Creature;
+import net.sf.colossus.server.CreatureTypeServerSide;
 import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.util.Options;
 import net.sf.colossus.util.ResourceLoader;
@@ -105,7 +105,7 @@ class Chit extends JPanel
         }
         else if (VariantSupport.getCurrentVariant().isCreature(id))
         {
-            Creature cre = (Creature)VariantSupport.getCurrentVariant()
+            CreatureTypeServerSide cre = (CreatureTypeServerSide)VariantSupport.getCurrentVariant()
                 .getCreatureByName(id);
             String[] names = cre.getImageNames();
             if (dubious)
@@ -139,7 +139,7 @@ class Chit extends JPanel
                 filenames[0] = "Plain" + color;
                 filenames[1] = "TitanMask";
                 filenames[2] = "Power-" + power + color;
-                int skill = ((Creature)VariantSupport.getCurrentVariant()
+                int skill = ((CreatureTypeServerSide)VariantSupport.getCurrentVariant()
                     .getCreatureByName("Titan")).getSkill();
                 filenames[3] = "Skill-" + skill + "" + color;
 

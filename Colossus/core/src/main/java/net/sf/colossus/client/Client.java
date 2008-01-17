@@ -36,10 +36,11 @@ import javax.swing.undo.UndoManager;
 import net.sf.colossus.ai.AI;
 import net.sf.colossus.ai.SimpleAI;
 import net.sf.colossus.game.Game;
-import net.sf.colossus.game.PlayerState;
+import net.sf.colossus.game.Player;
 import net.sf.colossus.server.Constants;
-import net.sf.colossus.server.Creature;
+import net.sf.colossus.server.CreatureTypeServerSide;
 import net.sf.colossus.server.Dice;
+import net.sf.colossus.server.GameServerSide;
 import net.sf.colossus.server.IServer;
 import net.sf.colossus.server.Start;
 import net.sf.colossus.server.VariantSupport;
@@ -72,6 +73,12 @@ import net.sf.colossus.xmlparser.TerrainRecruitLoader;
  *  game logic out. AIs without visible GUI should not use GUI classes.
  *  And if someone wants to watch AIs play it might be a better idea to
  *  create a notion of a passive observer of a game.
+ *  
+ *  TODO this class also has the functionality of a GameClientSide class,
+ *  which should be separated and ideally moved up into the {@link Game}
+ *  class. One approach would be moving code from {@link GameServerSide}
+ *  up into {@link Game} and then reuse it here in the matching methods,
+ *  then inlining it into the calling code.
  *  
  *  @version $Id$
  *  @author David Ripton
@@ -141,7 +148,7 @@ public final class Client implements IClient, IOracle
      * TODO should be final but can't be until the constructor gets all the data
      * needed
      */
-    private PlayerInfo owningPlayer;
+    private PlayerClientSide owningPlayer;
     private boolean playerAlive = true;
 
     /**
@@ -179,14 +186,14 @@ public final class Client implements IClient, IOracle
      * are not available. It seems to happen during startup (the not yet set case) and in
      * some GUI parts after battles, when battleActivePlayer has been reset already.
      */
-    private final PlayerInfo noone;
+    private final PlayerClientSide noone;
 
     private int turnNumber = -1;
-    private PlayerState activePlayer;
+    private Player activePlayer;
     private Constants.Phase phase;
 
     private int battleTurnNumber = -1;
-    private PlayerState battleActivePlayer;
+    private Player battleActivePlayer;
     private Constants.BattlePhase battlePhase;
     private String attackerMarkerId = "none";
     private String defenderMarkerId = "none";
@@ -198,7 +205,7 @@ public final class Client implements IClient, IOracle
     private boolean gameOver;
 
     /** One per player. */
-    private PlayerInfo[] playerInfos;
+    private PlayerClientSide[] playerInfos;
 
     /** One per player. */
     private PredictSplits[] predictSplits;
@@ -209,7 +216,7 @@ public final class Client implements IClient, IOracle
      * TODO does this need to be a TreeMap? Will we need it at all once the model refactoring
      * is done?
      */
-    private Map<String, LegionInfo> legionInfo = new TreeMap<String, LegionInfo>();
+    private Map<String, LegionClientSide> legionInfo = new TreeMap<String, LegionClientSide>();
 
     private int numPlayers;
 
@@ -271,9 +278,9 @@ public final class Client implements IClient, IOracle
         // updatePlayerInfo(..) when the PlayerInfos are initialized. Should really
         // happen here, but doesn't yet since we don't have all players (not even as
         // names) yet
-        this.owningPlayer = new PlayerInfo(this, playerName, 0);
+        this.owningPlayer = new PlayerClientSide(this, playerName, 0);
 
-        this.noone = new PlayerInfo(this, "", 0);
+        this.noone = new PlayerClientSide(this, "", 0);
         this.activePlayer = noone;
         this.battleActivePlayer = noone;
 
@@ -634,7 +641,7 @@ public final class Client implements IClient, IOracle
         if (autoInspector != null)
         {
             String markerId = marker.getId();
-            LegionInfo legion = getLegionInfo(markerId);
+            LegionClientSide legion = getLegionInfo(markerId);
             autoInspector.showLegion(legion);
         }
     }
@@ -852,7 +859,7 @@ public final class Client implements IClient, IOracle
             public void booleanOptionChanged(String optname, boolean oldValue,
                 boolean newValue)
             {
-                Creature.setNoBaseColor(newValue);
+                CreatureTypeServerSide.setNoBaseColor(newValue);
                 net.sf.colossus.util.ResourceLoader.purgeImageCache();
                 repaintAllWindows();
             }
@@ -1055,7 +1062,7 @@ public final class Client implements IClient, IOracle
     public int getNumLivingPlayers()
     {
         int total = 0;
-        for (PlayerInfo info : playerInfos)
+        for (PlayerClientSide info : playerInfos)
         {
             if (!info.isDead())
             {
@@ -1072,12 +1079,13 @@ public final class Client implements IClient, IOracle
         {
             // first time we get the player infos, store them locally and set our
             // own, too -- which has been a fake until now
-            playerInfos = new PlayerInfo[numPlayers];
+            playerInfos = new PlayerClientSide[numPlayers];
             for (int i = 0; i < numPlayers; i++)
             {
                 List<String> data = Split.split(":", infoStrings.get(i));
                 String playerName = data.get(1);
-                PlayerInfo info = new PlayerInfo(this, playerName, i);
+                PlayerClientSide info = new PlayerClientSide(this, playerName,
+                    i);
                 playerInfos[i] = info;
                 if (playerName.equals(this.owningPlayer.getName()))
                 {
@@ -1132,14 +1140,14 @@ public final class Client implements IClient, IOracle
     }
 
     // TODO fix this mess with lots of different methods for retrieving Player[Info]s
-    PlayerInfo getPlayerInfo(int playerNum)
+    PlayerClientSide getPlayerInfo(int playerNum)
     {
         return playerInfos[playerNum];
     }
 
-    public PlayerInfo getPlayerInfo(String playerName)
+    public PlayerClientSide getPlayerInfo(String playerName)
     {
-        for (PlayerInfo info : playerInfos)
+        for (PlayerClientSide info : playerInfos)
         {
             if (info.getName().equals(playerName))
             {
@@ -1150,12 +1158,12 @@ public final class Client implements IClient, IOracle
             + playerName + "'");
     }
 
-    public PlayerInfo getOwningPlayer()
+    public PlayerClientSide getOwningPlayer()
     {
         return owningPlayer;
     }
 
-    public List<PlayerInfo> getPlayers()
+    public List<PlayerClientSide> getPlayers()
     {
         return Collections.unmodifiableList(Arrays.asList(playerInfos));
     }
@@ -1166,10 +1174,10 @@ public final class Client implements IClient, IOracle
         int totalValue = 0;
         int totalLegions = 0;
 
-        Iterator<LegionInfo> it = legionInfo.values().iterator();
+        Iterator<LegionClientSide> it = legionInfo.values().iterator();
         while (it.hasNext())
         {
-            LegionInfo info = it.next();
+            LegionClientSide info = it.next();
             totalLegions++;
             totalValue = info.getPointValue();
         }
@@ -1678,9 +1686,9 @@ public final class Client implements IClient, IOracle
         return Collections.unmodifiableList(markers);
     }
 
-    LegionInfo createLegionInfo(String markerId)
+    LegionClientSide createLegionInfo(String markerId)
     {
-        LegionInfo info = new LegionInfo(markerId, this);
+        LegionClientSide info = new LegionClientSide(markerId, this);
         legionInfo.put(markerId, info);
         return info;
     }
@@ -1688,9 +1696,9 @@ public final class Client implements IClient, IOracle
     /**
      * Get this legion's info.
      */
-    public LegionInfo getLegionInfo(String markerId)
+    public LegionClientSide getLegionInfo(String markerId)
     {
-        LegionInfo info = legionInfo.get(markerId);
+        LegionClientSide info = legionInfo.get(markerId);
         return info;
     }
 
@@ -1721,7 +1729,7 @@ public final class Client implements IClient, IOracle
             getOwningPlayer().addMarkerAvailable(id);
         }
 
-        LegionInfo info = getLegionInfo(id);
+        LegionClientSide info = getLegionInfo(id);
         String hexLabel = info.getHexLabel();
 
         // XXX Not perfect -- Need to track recruitChits by legion.
@@ -1736,7 +1744,7 @@ public final class Client implements IClient, IOracle
 
     int getLegionHeight(String markerId)
     {
-        LegionInfo legionInfo = getLegionInfo(markerId);
+        LegionClientSide legionInfo = getLegionInfo(markerId);
         if (legionInfo == null)
         {
             return 0; //no legion, no height
@@ -1748,7 +1756,7 @@ public final class Client implements IClient, IOracle
     public void setLegionStatus(String markerId, boolean moved,
         boolean teleported, int entrySide, String lastRecruit)
     {
-        LegionInfo info = getLegionInfo(markerId);
+        LegionClientSide info = getLegionInfo(markerId);
         info.setMoved(moved);
         info.setTeleported(teleported);
         info.setEntrySide(entrySide);
@@ -1768,7 +1776,7 @@ public final class Client implements IClient, IOracle
     // public for IOracle
     public List<String> getLegionImageNames(String markerId)
     {
-        LegionInfo info = getLegionInfo(markerId);
+        LegionClientSide info = getLegionInfo(markerId);
         if (info != null)
         {
             return info.getImageNames();
@@ -1780,7 +1788,7 @@ public final class Client implements IClient, IOracle
     // public for IOracle
     public List<Boolean> getLegionCreatureCertainties(String markerId)
     {
-        LegionInfo info = getLegionInfo(markerId);
+        LegionClientSide info = getLegionInfo(markerId);
         if (info != null)
         {
             return info.getCertainties();
@@ -1816,7 +1824,7 @@ public final class Client implements IClient, IOracle
 
     public void removeCreature(String markerId, String name, String reason)
     {
-        LegionInfo info = getLegionInfo(markerId);
+        LegionClientSide info = getLegionInfo(markerId);
 
         if (eventViewer != null)
         {
@@ -1866,7 +1874,7 @@ public final class Client implements IClient, IOracle
 
         try
         {
-            LegionInfo info = getLegionInfo(markerId);
+            LegionClientSide info = getLegionInfo(markerId);
             if (info == null)
             {
                 if (reason.equals(Constants.reasonGameOver))
@@ -2004,7 +2012,7 @@ public final class Client implements IClient, IOracle
                 String name = chit.getId();
                 if (chit.isInverted())
                 {
-                    LegionInfo info = getLegionInfo(defenderMarkerId);
+                    LegionClientSide info = getLegionInfo(defenderMarkerId);
                     info.removeCreature(name);
                     if (eventViewer != null)
                     {
@@ -2014,7 +2022,7 @@ public final class Client implements IClient, IOracle
                 }
                 else
                 {
-                    LegionInfo info = getLegionInfo(attackerMarkerId);
+                    LegionClientSide info = getLegionInfo(attackerMarkerId);
                     info.removeCreature(name);
                     if (eventViewer != null)
                     {
@@ -2061,12 +2069,12 @@ public final class Client implements IClient, IOracle
         String colorName;
         if (inverted)
         {
-            PlayerInfo player = getPlayerStateByMarkerId(defenderMarkerId);
+            PlayerClientSide player = getPlayerStateByMarkerId(defenderMarkerId);
             colorName = player.getColor();
         }
         else
         {
-            PlayerInfo player = getPlayerStateByMarkerId(attackerMarkerId);
+            PlayerClientSide player = getPlayerStateByMarkerId(attackerMarkerId);
             colorName = player.getColor();
         }
         BattleChit chit = new BattleChit(5 * Scale.get(), imageName, inverted,
@@ -2127,9 +2135,9 @@ public final class Client implements IClient, IOracle
             {
                 imageName = (String)o;
             }
-            else if (o instanceof Creature)
+            else if (o instanceof CreatureTypeServerSide)
             {
-                imageName = ((Creature)o).getName();
+                imageName = ((CreatureTypeServerSide)o).getName();
             }
             else
             {
@@ -2184,7 +2192,7 @@ public final class Client implements IClient, IOracle
 
                     case Options.showRecruitChitsNumRecruitHint:
                         oneElemList.clear();
-                        Creature hint = chooseBestPotentialRecruit(markerId,
+                        CreatureTypeServerSide hint = chooseBestPotentialRecruit(markerId,
                             hexLabel, recruits);
                         oneElemList.add(hint);
                         recruits = oneElemList;
@@ -2203,14 +2211,14 @@ public final class Client implements IClient, IOracle
         }
     }
 
-    Creature chooseBestPotentialRecruit(String markerId, String hexLabel,
+    CreatureTypeServerSide chooseBestPotentialRecruit(String markerId, String hexLabel,
         List<CreatureType> recruits)
     {
-        LegionInfo legion = getLegionInfo(markerId);
+        LegionClientSide legion = getLegionInfo(markerId);
         MasterHex hex = getGame().getVariant().getMasterBoard().getHexByLabel(
             hexLabel);
         // NOTE! Below the simpleAI is an object, not class! 
-        Creature recruit = (Creature)simpleAI.getVariantRecruitHint(legion,
+        CreatureTypeServerSide recruit = (CreatureTypeServerSide)simpleAI.getVariantRecruitHint(legion,
             hex, recruits);
         return recruit;
     }
@@ -2431,7 +2439,7 @@ public final class Client implements IClient, IOracle
         {
             return false;
         }
-        LegionInfo info = getLegionInfo(donorId);
+        LegionClientSide info = getLegionInfo(donorId);
         return info.getContents().contains(name);
     }
 
@@ -2584,7 +2592,7 @@ public final class Client implements IClient, IOracle
 
     // TODO Move legion markers to slayer on client side.
     // TODO parameters should be PlayerState
-    public void tellPlayerElim(PlayerState deadPlayer, PlayerState slayer)
+    public void tellPlayerElim(Player deadPlayer, Player slayer)
     {
         assert deadPlayer != null;
         LOGGER.log(Level.FINEST, this.owningPlayer.getName()
@@ -2593,7 +2601,7 @@ public final class Client implements IClient, IOracle
         // TODO Merge these
         // TODO should this be rather calling Player.die()?
         deadPlayer.setDead(true);
-        ((PlayerInfo)deadPlayer).removeAllLegions();
+        ((PlayerClientSide)deadPlayer).removeAllLegions();
         // otherwise called too early, e.g. someone quitted
         // already during game start...
         if (predictSplits != null)
@@ -2957,7 +2965,7 @@ public final class Client implements IClient, IOracle
     }
 
     public void initBattle(String masterHexLabel, int battleTurnNumber,
-        PlayerState battleActivePlayer, Constants.BattlePhase battlePhase,
+        Player battleActivePlayer, Constants.BattlePhase battlePhase,
         String attackerMarkerId, String defenderMarkerId)
     {
         cleanupNegotiationDialogs();
@@ -3063,7 +3071,7 @@ public final class Client implements IClient, IOracle
     /** Used for human players only.  */
     void doRecruit(String markerId)
     {
-        LegionInfo info = getLegionInfo(markerId);
+        LegionClientSide info = getLegionInfo(markerId);
         if (isMyTurn() && isMyLegion(markerId) && info.hasRecruited())
         {
             undoRecruit(markerId);
@@ -3162,7 +3170,7 @@ public final class Client implements IClient, IOracle
         }
         addCreature(markerId, recruitName, Constants.reasonRecruited);
 
-        LegionInfo info = getLegionInfo(markerId);
+        LegionClientSide info = getLegionInfo(markerId);
         info.setRecruited(true);
         info.setLastRecruit(recruitName);
 
@@ -3232,7 +3240,7 @@ public final class Client implements IClient, IOracle
 
     /** Needed if we load a game outside the split phase, where
      *  active player and turn are usually set. */
-    public void setupTurnState(PlayerState activePlayer, int turnNumber)
+    public void setupTurnState(Player activePlayer, int turnNumber)
     {
         this.activePlayer = activePlayer;
         this.turnNumber = turnNumber;
@@ -3245,10 +3253,10 @@ public final class Client implements IClient, IOracle
 
     private void resetAllMoves()
     {
-        Iterator<LegionInfo> it = legionInfo.values().iterator();
+        Iterator<LegionClientSide> it = legionInfo.values().iterator();
         while (it.hasNext())
         {
-            LegionInfo info = it.next();
+            LegionClientSide info = it.next();
             info.setMoved(false);
             info.setTeleported(false);
             info.setRecruited(false);
@@ -3276,7 +3284,7 @@ public final class Client implements IClient, IOracle
         board.setBoardActive(val);
     }
 
-    public void setupSplit(PlayerState activePlayer, int turnNumber)
+    public void setupSplit(Player activePlayer, int turnNumber)
     {
         clearUndoStack();
         cleanupNegotiationDialogs();
@@ -3421,7 +3429,7 @@ public final class Client implements IClient, IOracle
         }
     }
 
-    public void setupBattleSummon(PlayerState battleActivePlayer,
+    public void setupBattleSummon(Player battleActivePlayer,
         int battleTurnNumber)
     {
         this.battlePhase = Constants.BattlePhase.SUMMON;
@@ -3446,7 +3454,7 @@ public final class Client implements IClient, IOracle
         updateStatusScreen();
     }
 
-    public void setupBattleRecruit(PlayerState battleActivePlayer,
+    public void setupBattleRecruit(Player battleActivePlayer,
         int battleTurnNumber)
     {
         this.battlePhase = Constants.BattlePhase.RECRUIT;
@@ -3477,8 +3485,7 @@ public final class Client implements IClient, IOracle
         }
     }
 
-    public void setupBattleMove(PlayerState battleActivePlayer,
-        int battleTurnNumber)
+    public void setupBattleMove(Player battleActivePlayer, int battleTurnNumber)
     {
         setBattleActivePlayer(battleActivePlayer);
         this.battleTurnNumber = battleTurnNumber;
@@ -3547,7 +3554,7 @@ public final class Client implements IClient, IOracle
 
     /** Used for both strike and strikeback. */
     public void setupBattleFight(Constants.BattlePhase battlePhase,
-        PlayerState battleActivePlayer)
+        Player battleActivePlayer)
     {
         this.battlePhase = battlePhase;
         setBattleActivePlayer(battleActivePlayer);
@@ -3579,7 +3586,7 @@ public final class Client implements IClient, IOracle
     /** Create marker if necessary, and place it in hexLabel. */
     public void tellLegionLocation(String markerId, String hexLabel)
     {
-        LegionInfo info = getLegionInfo(markerId);
+        LegionClientSide info = getLegionInfo(markerId);
         info.setHexLabel(hexLabel);
 
         if (board != null)
@@ -3596,12 +3603,12 @@ public final class Client implements IClient, IOracle
     {
         markers.clear();
 
-        Iterator<Entry<String, LegionInfo>> it = legionInfo.entrySet()
+        Iterator<Entry<String, LegionClientSide>> it = legionInfo.entrySet()
             .iterator();
         while (it.hasNext())
         {
-            Entry<String, LegionInfo> entry = it.next();
-            LegionInfo info = entry.getValue();
+            Entry<String, LegionClientSide> entry = it.next();
+            LegionClientSide info = entry.getValue();
             String markerId = info.getMarkerId();
             String hexLabel = info.getHexLabel();
             Marker marker = new Marker(3 * Scale.get(), markerId, this);
@@ -3626,30 +3633,32 @@ public final class Client implements IClient, IOracle
 
     String getShortColor()
     {
-        return net.sf.colossus.server.Player.getShortColor(getColor());
+        return net.sf.colossus.server.PlayerServerSide
+            .getShortColor(getColor());
     }
 
     // public for RevealEvent
     public String getShortColor(int playerNum)
     {
-        PlayerInfo player = getPlayerInfo(playerNum);
-        return net.sf.colossus.server.Player.getShortColor(player.getColor());
+        PlayerClientSide player = getPlayerInfo(playerNum);
+        return net.sf.colossus.server.PlayerServerSide.getShortColor(player
+            .getColor());
     }
 
     // TODO this would probably work better as state in PlayerState
-    public PlayerState getBattleActivePlayer()
+    public Player getBattleActivePlayer()
     {
         return battleActivePlayer;
     }
 
-    void setBattleActivePlayer(PlayerState player)
+    void setBattleActivePlayer(Player player)
     {
         this.battleActivePlayer = player;
     }
 
     String getBattleActiveMarkerId()
     {
-        LegionInfo info = getLegionInfo(defenderMarkerId);
+        LegionClientSide info = getLegionInfo(defenderMarkerId);
         if (battleActivePlayer.equals(info.getPlayer()))
         {
             return defenderMarkerId;
@@ -3662,7 +3671,7 @@ public final class Client implements IClient, IOracle
 
     String getBattleInactiveMarkerId()
     {
-        LegionInfo info = getLegionInfo(defenderMarkerId);
+        LegionClientSide info = getLegionInfo(defenderMarkerId);
         if (battleActivePlayer.equals(info.getPlayer()))
         {
             return attackerMarkerId;
@@ -3926,7 +3935,7 @@ public final class Client implements IClient, IOracle
             String targetHex = it.next();
             BattleChit target = getBattleChit(targetHex);
             target.setStrikeNumber(strike.getStrikeNumber(chit, target));
-            Creature striker = (Creature)game.getVariant().getCreatureByName(
+            CreatureTypeServerSide striker = (CreatureTypeServerSide)game.getVariant().getCreatureByName(
                 chit.getCreatureName());
             int dice;
             if (striker.isTitan())
@@ -3959,7 +3968,7 @@ public final class Client implements IClient, IOracle
         }
     }
 
-    PlayerState getPlayerByTag(int tag)
+    Player getPlayerByTag(int tag)
     {
         BattleChit chit = getBattleChit(tag);
         assert chit != null : "Illegal value for tag parameter";
@@ -3980,7 +3989,7 @@ public final class Client implements IClient, IOracle
     }
 
     // TODO active or not would probably work better as state in PlayerState
-    public PlayerState getActivePlayer()
+    public Player getActivePlayer()
     {
         return activePlayer;
     }
@@ -4048,7 +4057,7 @@ public final class Client implements IClient, IOracle
         // an imageList.
         List<String> lords = new ArrayList<String>();
 
-        LegionInfo info = getLegionInfo(moverId);
+        LegionClientSide info = getLegionInfo(moverId);
 
         // Titan teleport
         List<String> legions = getLegionsByHex(hexLabel);
@@ -4068,7 +4077,7 @@ public final class Client implements IClient, IOracle
             while (it.hasNext())
             {
                 String name = it.next();
-                Creature creature = (Creature)game.getVariant()
+                CreatureTypeServerSide creature = (CreatureTypeServerSide)game.getVariant()
                     .getCreatureByName(name);
                 if (creature != null && creature.isLord()
                     && !lords.contains(name))
@@ -4147,7 +4156,7 @@ public final class Client implements IClient, IOracle
         }
 
         // if this hex is already occupied, return false
-        LegionInfo li = getLegionInfo(moverId);
+        LegionClientSide li = getLegionInfo(moverId);
         int friendlyLegions = getNumFriendlyLegions(hexLabel,
             getActivePlayer());
         if (hexLabel.equals(li.getHexLabel()))
@@ -4187,7 +4196,7 @@ public final class Client implements IClient, IOracle
         {
             pushUndoStack(markerId);
         }
-        LegionInfo info = getLegionInfo(markerId);
+        LegionClientSide info = getLegionInfo(markerId);
         info.setHexLabel(currentHexLabel);
         info.setMoved(true);
         info.setEntrySide(BattleMap.entrySideNum(entrySide));
@@ -4345,7 +4354,7 @@ public final class Client implements IClient, IOracle
     {
         List<CreatureType> recruits = new ArrayList<CreatureType>();
 
-        LegionInfo info = getLegionInfo(markerId);
+        LegionClientSide info = getLegionInfo(markerId);
         if (info == null)
         {
             return recruits;
@@ -4410,14 +4419,14 @@ public final class Client implements IClient, IOracle
         String recruitName)
     {
         Set<CreatureType> recruiters;
-        Creature recruit = (Creature)game.getVariant().getCreatureByName(
+        CreatureTypeServerSide recruit = (CreatureTypeServerSide)game.getVariant().getCreatureByName(
             recruitName);
         if (recruit == null)
         {
             return new ArrayList<String>();
         }
 
-        LegionInfo info = getLegionInfo(markerId);
+        LegionClientSide info = getLegionInfo(markerId);
         String hexLabel = info.getHexLabel();
         MasterHex hex = getGame().getVariant().getMasterBoard().getHexByLabel(
             hexLabel);
@@ -4453,10 +4462,10 @@ public final class Client implements IClient, IOracle
     {
         Set<String> set = new HashSet<String>();
 
-        Iterator<LegionInfo> it = legionInfo.values().iterator();
+        Iterator<LegionClientSide> it = legionInfo.values().iterator();
         while (it.hasNext())
         {
-            LegionInfo info = it.next();
+            LegionClientSide info = it.next();
             if (activePlayer.equals(info.getPlayer()) && info.canRecruit())
             {
                 set.add(info.getHexLabel());
@@ -4471,15 +4480,15 @@ public final class Client implements IClient, IOracle
     public Set<String> findSummonableAngelHexes(String summonerId)
     {
         Set<String> set = new HashSet<String>();
-        LegionInfo summonerInfo = getLegionInfo(summonerId);
-        PlayerInfo player = summonerInfo.getPlayer();
+        LegionClientSide summonerInfo = getLegionInfo(summonerId);
+        PlayerClientSide player = summonerInfo.getPlayer();
         Iterator<String> it = player.getLegionIds().iterator();
         while (it.hasNext())
         {
             String markerId = it.next();
             if (!markerId.equals(summonerId))
             {
-                LegionInfo info = getLegionInfo(markerId);
+                LegionClientSide info = getLegionInfo(markerId);
                 if (info.hasSummonable() && !(info.isEngaged()))
                 {
                     set.add(info.getHexLabel());
@@ -4502,7 +4511,7 @@ public final class Client implements IClient, IOracle
     /** Return a set of hexLabels. */
     Set<String> listTeleportMoves(String markerId)
     {
-        LegionInfo info = getLegionInfo(markerId);
+        LegionClientSide info = getLegionInfo(markerId);
         MasterHex hex = getGame().getVariant().getMasterBoard().getHexByLabel(
             info.getHexLabel());
         return movement.listTeleportMoves(info, hex, movementRoll);
@@ -4511,7 +4520,7 @@ public final class Client implements IClient, IOracle
     /** Return a set of hexLabels. */
     Set<String> listNormalMoves(String markerId)
     {
-        LegionInfo info = getLegionInfo(markerId);
+        LegionClientSide info = getLegionInfo(markerId);
         MasterHex hex = getGame().getVariant().getMasterBoard().getHexByLabel(
             info.getHexLabel());
         return movement.listNormalMoves(info, hex, movementRoll);
@@ -4557,12 +4566,12 @@ public final class Client implements IClient, IOracle
     public List<String> getLegionsByHex(String hexLabel)
     {
         List<String> markerIds = new ArrayList<String>();
-        Iterator<Entry<String, LegionInfo>> it = legionInfo.entrySet()
+        Iterator<Entry<String, LegionClientSide>> it = legionInfo.entrySet()
             .iterator();
         while (it.hasNext())
         {
-            Entry<String, LegionInfo> entry = it.next();
-            LegionInfo info = entry.getValue();
+            Entry<String, LegionClientSide> entry = it.next();
+            LegionClientSide info = entry.getValue();
             if (info != null && info.getHexLabel() != null && hexLabel != null
                 && hexLabel.equals(info.getHexLabel()))
             {
@@ -4580,10 +4589,10 @@ public final class Client implements IClient, IOracle
      * 
      * TODO the return value should be the LegionInfo objects, not their markerIDs
      */
-    public List<String> getLegionsByPlayerState(PlayerState player)
+    public List<String> getLegionsByPlayerState(Player player)
     {
         List<String> markerIds = new ArrayList<String>();
-        for (LegionInfo info : legionInfo.values())
+        for (LegionClientSide info : legionInfo.values())
         {
             if (player.equals(info.getPlayer()))
             {
@@ -4599,10 +4608,10 @@ public final class Client implements IClient, IOracle
     {
         Set<String> set = new HashSet<String>();
 
-        Iterator<LegionInfo> it = legionInfo.values().iterator();
+        Iterator<LegionClientSide> it = legionInfo.values().iterator();
         while (it.hasNext())
         {
-            LegionInfo info = it.next();
+            LegionClientSide info = it.next();
             if (!info.hasMoved() && activePlayer.equals(info.getPlayer()))
             {
                 set.add(info.getHexLabel());
@@ -4624,12 +4633,12 @@ public final class Client implements IClient, IOracle
     {
         Set<String> set = new HashSet<String>();
 
-        Iterator<Entry<String, LegionInfo>> it = legionInfo.entrySet()
+        Iterator<Entry<String, LegionClientSide>> it = legionInfo.entrySet()
             .iterator();
         while (it.hasNext())
         {
-            Entry<String, LegionInfo> entry = it.next();
-            LegionInfo info = entry.getValue();
+            Entry<String, LegionClientSide> entry = it.next();
+            LegionClientSide info = entry.getValue();
             if (info.getHeight() >= minHeight
                 && activePlayer.equals(info.getPlayer()))
             {
@@ -4652,12 +4661,12 @@ public final class Client implements IClient, IOracle
             if (markerIds.size() == 2)
             {
                 String marker0 = markerIds.get(0);
-                LegionInfo info0 = getLegionInfo(marker0);
-                PlayerState player0 = info0.getPlayer();
+                LegionClientSide info0 = getLegionInfo(marker0);
+                Player player0 = info0.getPlayer();
 
                 String marker1 = markerIds.get(1);
-                LegionInfo info1 = getLegionInfo(marker1);
-                PlayerState player1 = info1.getPlayer();
+                LegionClientSide info1 = getLegionInfo(marker1);
+                Player player1 = info1.getPlayer();
 
                 if (!player0.equals(player1))
                 {
@@ -4679,25 +4688,25 @@ public final class Client implements IClient, IOracle
         if (markerIds.size() == 2)
         {
             String marker0 = markerIds.get(0);
-            LegionInfo info0 = getLegionInfo(marker0);
-            PlayerState player0 = info0.getPlayer();
+            LegionClientSide info0 = getLegionInfo(marker0);
+            Player player0 = info0.getPlayer();
 
             String marker1 = markerIds.get(1);
-            LegionInfo info1 = getLegionInfo(marker1);
-            PlayerState player1 = info1.getPlayer();
+            LegionClientSide info1 = getLegionInfo(marker1);
+            Player player1 = info1.getPlayer();
 
             return !player0.equals(player1);
         }
         return false;
     }
 
-    List<String> getEnemyLegions(PlayerState player)
+    List<String> getEnemyLegions(Player player)
     {
         List<String> markerIds = new ArrayList<String>();
-        Iterator<LegionInfo> it = legionInfo.values().iterator();
+        Iterator<LegionClientSide> it = legionInfo.values().iterator();
         while (it.hasNext())
         {
-            LegionInfo info = it.next();
+            LegionClientSide info = it.next();
             String markerId = info.getMarkerId();
             if (!player.equals(info.getPlayer()))
             {
@@ -4707,7 +4716,7 @@ public final class Client implements IClient, IOracle
         return markerIds;
     }
 
-    List<String> getEnemyLegions(String hexLabel, PlayerState player)
+    List<String> getEnemyLegions(String hexLabel, Player player)
     {
         List<String> markerIds = new ArrayList<String>();
         List<String> legions = getLegionsByHex(hexLabel);
@@ -4723,7 +4732,7 @@ public final class Client implements IClient, IOracle
         return markerIds;
     }
 
-    public String getFirstEnemyLegion(String hexLabel, PlayerState player)
+    public String getFirstEnemyLegion(String hexLabel, Player player)
     {
         List<String> markerIds = getEnemyLegions(hexLabel, player);
         if (markerIds.isEmpty())
@@ -4733,18 +4742,18 @@ public final class Client implements IClient, IOracle
         return markerIds.get(0);
     }
 
-    public int getNumEnemyLegions(String hexLabel, PlayerState player)
+    public int getNumEnemyLegions(String hexLabel, Player player)
     {
         return getEnemyLegions(hexLabel, player).size();
     }
 
-    public List<String> getFriendlyLegions(PlayerState player)
+    public List<String> getFriendlyLegions(Player player)
     {
         List<String> markerIds = new ArrayList<String>();
-        Iterator<LegionInfo> it = legionInfo.values().iterator();
+        Iterator<LegionClientSide> it = legionInfo.values().iterator();
         while (it.hasNext())
         {
-            LegionInfo info = it.next();
+            LegionClientSide info = it.next();
             String markerId = info.getMarkerId();
             if (player.equals(info.getPlayer()))
             {
@@ -4754,7 +4763,7 @@ public final class Client implements IClient, IOracle
         return markerIds;
     }
 
-    public List<String> getFriendlyLegions(String hexLabel, PlayerState player)
+    public List<String> getFriendlyLegions(String hexLabel, Player player)
     {
         List<String> markerIds = new ArrayList<String>();
         List<String> legions = getLegionsByHex(hexLabel);
@@ -4770,7 +4779,7 @@ public final class Client implements IClient, IOracle
         return markerIds;
     }
 
-    public String getFirstFriendlyLegion(String hexLabel, PlayerState player)
+    public String getFirstFriendlyLegion(String hexLabel, Player player)
     {
         List<String> markerIds = getFriendlyLegions(hexLabel, player);
         if (markerIds.isEmpty())
@@ -4780,7 +4789,7 @@ public final class Client implements IClient, IOracle
         return markerIds.get(0);
     }
 
-    public int getNumFriendlyLegions(String hexLabel, PlayerState player)
+    public int getNumFriendlyLegions(String hexLabel, Player player)
     {
         return getFriendlyLegions(hexLabel, player).size();
     }
@@ -4917,7 +4926,7 @@ public final class Client implements IClient, IOracle
 
     public void undidSplit(String splitoffId, String survivorId, int turn)
     {
-        LegionInfo info = getLegionInfo(survivorId);
+        LegionClientSide info = getLegionInfo(survivorId);
         info.merge(splitoffId);
         removeLegion(splitoffId);
         // do the eventViewer stuff before the board, so we are sure to get
@@ -5067,7 +5076,7 @@ public final class Client implements IClient, IOracle
         server.doneWithRecruits();
     }
 
-    public PlayerInfo getPlayerStateByMarkerId(String markerId)
+    public PlayerClientSide getPlayerStateByMarkerId(String markerId)
     {
         assert markerId != null : "Parameter must not be null";
 
@@ -5075,13 +5084,13 @@ public final class Client implements IClient, IOracle
         return getPlayerStateUsingColor(shortColor);
     }
 
-    private PlayerInfo getPlayerStateUsingColor(String shortColor)
+    private PlayerClientSide getPlayerStateUsingColor(String shortColor)
     {
         assert this.playerInfos != null : "Client not yet initialized";
         assert shortColor != null : "Parameter must not be null";
 
         // Stage 1: See if the player who started with this color is alive.
-        for (PlayerInfo info : playerInfos)
+        for (PlayerClientSide info : playerInfos)
         {
             if (shortColor.equals(info.getShortColor()) && !info.isDead())
             {
@@ -5090,7 +5099,7 @@ public final class Client implements IClient, IOracle
         }
 
         // Stage 2: He's dead.  Find who killed him and see if he's alive.
-        for (PlayerInfo info : playerInfos)
+        for (PlayerClientSide info : playerInfos)
         {
             if (info.getPlayersElim().indexOf(shortColor) != -1)
             {
@@ -5227,8 +5236,8 @@ public final class Client implements IClient, IOracle
         LOGGER.log(Level.FINEST, "Client.didSplit " + hexLabel + " "
             + parentId + " " + childId + " " + childHeight + " " + turn);
 
-        LegionInfo parentInfo = getLegionInfo(parentId);
-        LegionInfo childInfo = createLegionInfo(childId);
+        LegionClientSide parentInfo = getLegionInfo(parentId);
+        LegionClientSide childInfo = createLegionInfo(childId);
         parentInfo.split(childHeight, childId, turn);
 
         childInfo.setHexLabel(hexLabel);

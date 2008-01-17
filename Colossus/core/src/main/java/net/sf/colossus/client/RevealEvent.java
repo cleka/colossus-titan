@@ -15,7 +15,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.TitledBorder;
 
-import net.sf.colossus.game.PlayerState;
+import net.sf.colossus.game.Player;
 import net.sf.colossus.server.Constants;
 
 
@@ -56,7 +56,7 @@ public class RevealEvent
     private String info;
     // set for losing battle events, because if Titan killed the
     // marker does already belong to slayer when we ask. 
-    private PlayerInfo realPlayer;
+    private PlayerClientSide realPlayer;
 
     public final static int eventSplit = 0;
     public final static int eventRecruit = 1;
@@ -133,7 +133,7 @@ public class RevealEvent
         this.oldRoll = oldRoll;
         this.newRoll = newRoll;
 
-        PlayerInfo info = client.getPlayerInfo(playerNr);
+        PlayerClientSide info = client.getPlayerInfo(playerNr);
         this.mulliganTitanBaseName = getTitanBasename(info);
     }
 
@@ -157,7 +157,7 @@ public class RevealEvent
             if (rc != null && rc.getPlainName() != null
                 && rc.getPlainName().equals(Constants.titan))
             {
-                PlayerInfo player = (realPlayer != null ? realPlayer : client
+                PlayerClientSide player = (realPlayer != null ? realPlayer : client
                     .getPlayerStateByMarkerId(markerId));
 
                 if (player == null)
@@ -191,7 +191,7 @@ public class RevealEvent
         this.info = info;
     }
 
-    public void setRealPlayer(PlayerInfo realPlayer)
+    public void setRealPlayer(PlayerClientSide realPlayer)
     {
         assert realPlayer != null;
         this.realPlayer = realPlayer;
@@ -354,7 +354,7 @@ public class RevealEvent
         return turnNumber;
     }
 
-    public PlayerState getPlayer()
+    public Player getPlayer()
     {
         return client.getPlayerInfo(playerNr);
     }
@@ -480,7 +480,7 @@ public class RevealEvent
     /** Return the full basename for a titan in legion markerId,
      *  first finding that legion's player, player color, and titan size.
      *  Default to Constants.titan if the info is not there. */
-    String getTitanBasename(PlayerInfo info)
+    String getTitanBasename(PlayerClientSide info)
     {
         try
         {
@@ -522,7 +522,7 @@ public class RevealEvent
                 LOGGER.log(Level.SEVERE, "While trying to get chit: ", e);
                 // if solid marker does not exist for this color,
                 // use as fallback the Titan chit.
-                PlayerInfo info = client.getPlayerInfo(playerNr);
+                PlayerClientSide info = client.getPlayerInfo(playerNr);
                 solidMarker = new Chit(scale, getTitanBasename(info));
             }
         }

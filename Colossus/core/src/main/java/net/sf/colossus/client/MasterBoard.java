@@ -54,7 +54,7 @@ import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 
-import net.sf.colossus.game.PlayerState;
+import net.sf.colossus.game.Player;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.XMLSnapshotFilter;
 import net.sf.colossus.util.ArrayHelper;
@@ -209,7 +209,7 @@ public final class MasterBoard extends JPanel
                     List<Marker> myMarkers = new ArrayList<Marker>();
                     for (Marker marker : client.getMarkers())
                     {
-                        LegionInfo legionInfo = client.getLegionInfo(marker
+                        LegionClientSide legionInfo = client.getLegionInfo(marker
                             .getId());
                         if (legionInfo.isMyLegion())
                         {
@@ -234,7 +234,7 @@ public final class MasterBoard extends JPanel
             for (int i = 0; i < markerArray.length; i++)
             {
                 Marker marker = markerArray[i];
-                LegionInfo legion = client.getLegionInfo(marker.getId());
+                LegionClientSide legion = client.getLegionInfo(marker.getId());
                 int scale = 2 * Scale.get();
 
                 boolean dubiousAsBlanks = client.getOptions().getOption(
@@ -988,7 +988,7 @@ public final class MasterBoard extends JPanel
         unselectAllHexes();
         reqFocus();
 
-        PlayerState activePlayer = client.getActivePlayer();
+        Player activePlayer = client.getActivePlayer();
 
         masterFrame.setTitle(activePlayer.getName() + " Turn "
             + client.getTurnNumber() + " : Split stacks");
@@ -1042,7 +1042,7 @@ public final class MasterBoard extends JPanel
         unselectAllHexes();
         reqFocus();
 
-        PlayerState activePlayer = client.getActivePlayer();
+        Player activePlayer = client.getActivePlayer();
         String activePlayerName = activePlayer.getName();
         masterFrame.setTitle(activePlayerName + " Turn "
             + client.getTurnNumber() + " : Movement Roll: "
@@ -1109,7 +1109,7 @@ public final class MasterBoard extends JPanel
         unselectAllHexes();
         reqFocus();
 
-        PlayerState activePlayer = client.getActivePlayer();
+        Player activePlayer = client.getActivePlayer();
         String activePlayerName = activePlayer.getName();
 
         masterFrame.setTitle(activePlayerName + " Turn "
@@ -1155,7 +1155,7 @@ public final class MasterBoard extends JPanel
         unselectAllHexes();
         reqFocus();
 
-        PlayerState activePlayer = client.getActivePlayer();
+        Player activePlayer = client.getActivePlayer();
         String activePlayerName = activePlayer.getName();
 
         masterFrame.setTitle(activePlayerName + " Turn "
@@ -1632,7 +1632,7 @@ public final class MasterBoard extends JPanel
                 // Right-click means to show the contents of the legion.
                 if (isPopupButton(e))
                 {
-                    LegionInfo legion = client.getLegionInfo(markerId);
+                    LegionClientSide legion = client.getLegionInfo(markerId);
                     int viewMode = client.getViewMode();
                     boolean dubiousAsBlanks = client.getOptions().getOption(
                         Options.dubiousAsBlanks);

@@ -489,7 +489,7 @@ public final class VariantSupport
     }
 
     public synchronized static String getRecruitHint(String terrain,
-        net.sf.colossus.client.LegionInfo legion, List<CreatureType> recruits,
+        net.sf.colossus.client.LegionClientSide legion, List<CreatureType> recruits,
         net.sf.colossus.server.HintOracleInterface oracle)
     {
         String[] section = new String[1];
@@ -498,7 +498,7 @@ public final class VariantSupport
     }
 
     public synchronized static String getRecruitHint(String terrain,
-        net.sf.colossus.client.LegionInfo legion, List<CreatureType> recruits,
+        net.sf.colossus.client.LegionClientSide legion, List<CreatureType> recruits,
         net.sf.colossus.server.HintOracleInterface oracle, String[] section)
     {
         if (aihl != null)

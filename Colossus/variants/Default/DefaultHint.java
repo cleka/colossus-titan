@@ -6,7 +6,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
-import net.sf.colossus.client.LegionInfo;
+import net.sf.colossus.client.LegionClientSide;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.HintOracleInterface;
 import net.sf.colossus.util.DevRandom;
@@ -30,7 +30,7 @@ public class DefaultHint implements net.sf.colossus.server.HintInterface
         return recruits;
     }
 
-    public String getRecruitHint(String terrain, LegionInfo legion,
+    public String getRecruitHint(String terrain, LegionClientSide legion,
         List<CreatureType> recruits, HintOracleInterface oracle,
         String[] section)
     {

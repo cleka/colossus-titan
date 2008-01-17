@@ -10,7 +10,7 @@ public class Legion
     /**
      * The player/game combination owning this Legion.
      */
-    private final PlayerState playerState;
+    private final Player playerState;
 
     /**
      * The creatures in this legion.
@@ -20,13 +20,13 @@ public class Legion
     protected final String markerId;
 
     // TODO legions should be created through factory from the player instances
-    public Legion(final PlayerState playerState, String markerId)
+    public Legion(final Player playerState, String markerId)
     {
         this.playerState = playerState;
         this.markerId = markerId;
     }
 
-    public PlayerState getPlayer()
+    public Player getPlayer()
     {
         return playerState;
     }

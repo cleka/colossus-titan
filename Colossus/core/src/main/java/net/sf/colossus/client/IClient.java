@@ -4,7 +4,7 @@ package net.sf.colossus.client;
 import java.util.List;
 import java.util.Set;
 
-import net.sf.colossus.game.PlayerState;
+import net.sf.colossus.game.Player;
 import net.sf.colossus.server.Constants;
 
 
@@ -66,7 +66,7 @@ public interface IClient
 
     public void tellGameOver(String message);
 
-    public void tellPlayerElim(PlayerState player, PlayerState slayer);
+    public void tellPlayerElim(Player player, Player slayer);
 
     public void askConcede(String allyMarkerId, String enemyMarkerId);
 
@@ -82,7 +82,7 @@ public interface IClient
         Set<String> carryTargetDescriptions);
 
     public void initBattle(String masterHexLabel, int battleTurnNumber,
-        PlayerState battleActivePlayer, Constants.BattlePhase battlePhase,
+        Player battleActivePlayer, Constants.BattlePhase battlePhase,
         String attackerMarkerId, String defenderMarkerId);
 
     public void cleanupBattle();
@@ -96,9 +96,9 @@ public interface IClient
 
     public void undidRecruit(String markerId, String recruitName);
 
-    public void setupTurnState(PlayerState activePlayer, int turnNumber);
+    public void setupTurnState(Player activePlayer, int turnNumber);
 
-    public void setupSplit(PlayerState activePlayer, int turnNumber);
+    public void setupSplit(Player activePlayer, int turnNumber);
 
     public void setupMove();
 
@@ -106,17 +106,17 @@ public interface IClient
 
     public void setupMuster();
 
-    public void setupBattleSummon(PlayerState battleActivePlayer,
+    public void setupBattleSummon(Player battleActivePlayer,
         int battleTurnNumber);
 
-    public void setupBattleRecruit(PlayerState battleActivePlayer,
+    public void setupBattleRecruit(Player battleActivePlayer,
         int battleTurnNumber);
 
-    public void setupBattleMove(PlayerState battleActivePlayer,
+    public void setupBattleMove(Player battleActivePlayer,
         int battleTurnNumber);
 
     public void setupBattleFight(Constants.BattlePhase battlePhase,
-        PlayerState battleActivePlayer);
+        Player battleActivePlayer);
 
     public void tellLegionLocation(String markerId, String hexLabel);
 

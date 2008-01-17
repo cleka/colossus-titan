@@ -22,9 +22,9 @@ import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 
-import net.sf.colossus.server.Creature;
-import net.sf.colossus.server.Critter;
-import net.sf.colossus.server.Legion;
+import net.sf.colossus.server.CreatureTypeServerSide;
+import net.sf.colossus.server.CreatureServerSide;
+import net.sf.colossus.server.LegionServerSide;
 import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.util.HTMLColor;
 import net.sf.colossus.util.KDialog;
@@ -76,7 +76,7 @@ public final class ShowCreatureDetails extends KDialog implements
      * @param pane if 'point' is not null it is relative to this.
      */
     public ShowCreatureDetails(final JFrame parentFrame,
-        final Creature creature, final Point point, final JScrollPane pane)
+        final CreatureTypeServerSide creature, final Point point, final JScrollPane pane)
     {
         super(parentFrame, "Creature Info: " + creature.getName(), false);
 
@@ -102,7 +102,7 @@ public final class ShowCreatureDetails extends KDialog implements
      * @param creature the creature that details you want to show
      */
     public void showCreatureDetails(final Container cnt,
-        final Creature creature)
+        final CreatureTypeServerSide creature)
     {
         // claear all the elements
         cnt.removeAll();
@@ -335,7 +335,7 @@ public final class ShowCreatureDetails extends KDialog implements
         "cliff", "slope", "tower", "river" };
 
     /** html header and start of page. */
-    private static void _head(StringBuffer s, final Creature cr)
+    private static void _head(StringBuffer s, final CreatureTypeServerSide cr)
     {
         s.append("<html><head></head><body bgcolor="
             + HTMLColor.colorToCode(Color.LIGHT_GRAY) + ">");
@@ -401,9 +401,13 @@ public final class ShowCreatureDetails extends KDialog implements
      * TODO this gets harder and harder to maintain the more typesafe the model gets.
      * Figure out what it is really good for and solve the actual problem.
      * 
+     * TODO this is the only reference to {@link CreatureServerSide} left in the client
+     * code and it probably doesn't need the specific model. If this should stay, it
+     * should probably changed to use {@link net.sf.colossus.game.Creature} instead.
+     * 
      * @author Towi
      */
-    final class SimulatedCritter extends Critter
+    final class SimulatedCritter extends CreatureServerSide
     {
 
         /** catch calls to "underlying" battle hex and proxy it to this. */
@@ -411,15 +415,15 @@ public final class ShowCreatureDetails extends KDialog implements
 
         /** @param creature to create a critter for
          * @param hazard that stands in this hazard */
-        SimulatedCritter(final Creature creature, final HazardTerrain hazard)
+        SimulatedCritter(final CreatureTypeServerSide creature, final HazardTerrain hazard)
         {
-            super(creature, new Legion("dummy", "dummy", "dummy", "dummy",
-                null, null), null);
+            super(creature, new LegionServerSide("dummy", "dummy", "dummy",
+                "dummy", null, null), null);
             setNewHazardHex(hazard);
         }
 
         /** in hazard Plains. */
-        SimulatedCritter(final Creature creature)
+        SimulatedCritter(final CreatureTypeServerSide creature)
         {
             this(creature, HazardTerrain.PLAINS);
         }
@@ -431,13 +435,13 @@ public final class ShowCreatureDetails extends KDialog implements
         }
 
         /** power of this creature hitting target. */
-        public int getSimulatedPower(final Critter target)
+        public int getSimulatedPower(final CreatureServerSide target)
         {
             return getDice(target);
         }
 
         /** skill of this creature hitting target. */
-        public int getSimulatedSkill(final Critter target)
+        public int getSimulatedSkill(final CreatureServerSide target)
         {
             return getStrikeNumber(target);
         }

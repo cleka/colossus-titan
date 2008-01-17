@@ -6,7 +6,7 @@ import java.awt.Color;
 import net.sf.colossus.client.BattleHex;
 import net.sf.colossus.client.Hex;
 import net.sf.colossus.client.HexMap;
-import net.sf.colossus.server.Creature;
+import net.sf.colossus.server.CreatureTypeServerSide;
 import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
 
@@ -85,7 +85,7 @@ public class MasterHex extends Hex
         return (TerrainRecruitLoader.getTerrainColor(terrain));
     }
 
-    public static boolean isNativeCombatBonus(Creature creature, String terrain)
+    public static boolean isNativeCombatBonus(CreatureTypeServerSide creature, String terrain)
     {
         int bonusHazardCount = 0;
         int bonusHazardSideCount = 0;

@@ -4,7 +4,7 @@ package Abyssal3;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.colossus.client.LegionInfo;
+import net.sf.colossus.client.LegionClientSide;
 import net.sf.colossus.server.HintOracleInterface;
 import net.sf.colossus.util.DevRandom;
 import net.sf.colossus.variant.CreatureType;
@@ -15,7 +15,7 @@ public class Abyssal3Hint implements net.sf.colossus.server.HintInterface
 {
     private final DevRandom rnd = new DevRandom();
 
-    public String getRecruitHint(String terrain, LegionInfo legion,
+    public String getRecruitHint(String terrain, LegionClientSide legion,
         List<CreatureType> recruits, HintOracleInterface oracle,
         String[] section)
     {

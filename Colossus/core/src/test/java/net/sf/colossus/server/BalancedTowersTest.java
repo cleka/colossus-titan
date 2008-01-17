@@ -30,7 +30,7 @@ public class BalancedTowersTest extends TestCase
             towerList.add("" + 100 * (i + 1));
         }
 
-        List<String> results = Game.getBalancedTowers(numPlayers, towerList);
+        List<String> results = GameServerSide.getBalancedTowers(numPlayers, towerList);
 
         assertTrue(results.size() == 4);
         assertTrue((results.contains("100") && results.contains("200")

@@ -5,7 +5,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import net.sf.colossus.server.Creature;
+import net.sf.colossus.server.CreatureTypeServerSide;
 import net.sf.colossus.util.Options;
 
 
@@ -29,7 +29,7 @@ final class BattleMovement
 
     /** Recursively find moves from this hex.  Return an array of hex IDs for
      *  all legal destinations.  Do not double back.  */
-    private Set<String> findMoves(BattleHex hex, Creature creature,
+    private Set<String> findMoves(BattleHex hex, CreatureTypeServerSide creature,
         boolean flies, int movesLeft, int cameFrom, boolean first)
     {
         Set<String> set = new HashSet<String>();
@@ -137,7 +137,7 @@ final class BattleMovement
             }
             else
             {
-                Creature creature = (Creature)client.getGame().getVariant()
+                CreatureTypeServerSide creature = (CreatureTypeServerSide)client.getGame().getVariant()
                     .getCreatureByName(chit.getCreatureName());
                 BattleHex hex = client.getBattleHex(chit);
                 set = findMoves(hex, creature, creature.isFlier(), creature

@@ -12,8 +12,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.colossus.client.CaretakerInfo;
-import net.sf.colossus.client.LegionInfo;
-import net.sf.colossus.server.Creature;
+import net.sf.colossus.client.LegionClientSide;
+import net.sf.colossus.game.Legion;
+import net.sf.colossus.server.CreatureTypeServerSide;
 import net.sf.colossus.server.CustomRecruitBase;
 import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.xmlparser.TerrainRecruitLoader;
@@ -22,6 +23,12 @@ import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 /**
  * Implementation of a graph dedicated to the Recruit "Tree" (it's a directed
  * graph, not a tree, as we can have cycle in theory).
+ * 
+ * TODO this has a dependency of {@link LegionClientSide}, which means it
+ * should probably not be in the util package. The dependency should be
+ * pulled up to {@link Legion}, which would move the class into the game
+ * package.
+ * 
  * @version $Id$
  * @author Romain Dolbeau
  */
@@ -293,7 +300,7 @@ public class RecruitGraph
      * @return The list of all reachable Vertex from parameter s.
      */
     private List<RecruitVertex> traverse(RecruitVertex s,
-        Set<RecruitVertex> visited, LegionInfo legion)
+        Set<RecruitVertex> visited, LegionClientSide legion)
     {
         List<RecruitVertex> all = new ArrayList<RecruitVertex>();
 
@@ -371,7 +378,7 @@ public class RecruitGraph
      * @param cre Name of the base creature
      * @return A List of all the reachable RecruitVertex.
      */
-    private List<RecruitVertex> traverse(String cre, LegionInfo legion)
+    private List<RecruitVertex> traverse(String cre, LegionClientSide legion)
     {
         return traverse(getVertex(cre), new HashSet<RecruitVertex>(), legion);
     }
@@ -397,7 +404,7 @@ public class RecruitGraph
     {
         List<RecruitEdge> allEdge = getIncomingEdges(recruit);
         RecruitVertex source = getVertex(recruiter);
-        Creature recruiterCre = (Creature)VariantSupport.getCurrentVariant()
+        CreatureTypeServerSide recruiterCre = (CreatureTypeServerSide)VariantSupport.getCurrentVariant()
             .getCreatureByName(recruiter);
         // if the recruiter is a special such as Anything, avoid
         // crashing with NullPointerException
@@ -588,7 +595,8 @@ public class RecruitGraph
      * @param legion The recruiting legion or null.
      * @return Name of the best possible recruit.
      */
-    public String getBestPossibleRecruitEver(String cre, LegionInfo legion)
+    public String getBestPossibleRecruitEver(String cre,
+        LegionClientSide legion)
     {
         String best = cre;
         int maxVP = -1;
@@ -597,7 +605,7 @@ public class RecruitGraph
         while (it.hasNext())
         {
             RecruitVertex v2 = it.next();
-            Creature creature = (Creature)VariantSupport.getCurrentVariant()
+            CreatureTypeServerSide creature = (CreatureTypeServerSide)VariantSupport.getCurrentVariant()
                 .getCreatureByName(v2.getCreatureName());
             int vp = (creature == null ? -1 : creature.getPointValue());
             if (vp > maxVP)

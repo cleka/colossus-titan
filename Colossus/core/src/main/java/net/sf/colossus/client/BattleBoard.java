@@ -35,7 +35,7 @@ import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
 
 import net.sf.colossus.server.Constants;
-import net.sf.colossus.server.Legion;
+import net.sf.colossus.server.LegionServerSide;
 import net.sf.colossus.util.KFrame;
 import net.sf.colossus.util.Options;
 import net.sf.colossus.util.ResourceLoader;
@@ -182,8 +182,8 @@ public final class BattleBoard extends KFrame
         getContentPane().add(battleDice, BorderLayout.SOUTH);
 
         setTitle(client.getOwningPlayer().getName() + ": "
-            + Legion.getMarkerName(attackerMarkerId) + " (" + attackerMarkerId
-            + ") attacks " + Legion.getMarkerName(defenderMarkerId) + " ("
+            + LegionServerSide.getMarkerName(attackerMarkerId) + " (" + attackerMarkerId
+            + ") attacks " + LegionServerSide.getMarkerName(defenderMarkerId) + " ("
             + defenderMarkerId + ") in " + masterHexLabel);
 
         String instanceId = client.getOwningPlayer().getName() + ": "

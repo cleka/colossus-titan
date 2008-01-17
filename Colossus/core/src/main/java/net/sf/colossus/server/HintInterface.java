@@ -3,7 +3,7 @@ package net.sf.colossus.server;
 
 import java.util.List;
 
-import net.sf.colossus.client.LegionInfo;
+import net.sf.colossus.client.LegionClientSide;
 import net.sf.colossus.variant.CreatureType;
 
 
@@ -27,7 +27,7 @@ public interface HintInterface
      *     (usually one or more of "AllAI:", "DefensiveAI:", "OffensiveAI:")
      * @return The name of the suggested recruit
      */
-    public String getRecruitHint(String terrain, LegionInfo legion,
+    public String getRecruitHint(String terrain, LegionClientSide legion,
         List<CreatureType> recruits, HintOracleInterface oracle,
         String[] section);
 

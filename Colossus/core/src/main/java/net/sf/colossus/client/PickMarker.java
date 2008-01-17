@@ -16,7 +16,7 @@ import java.util.Set;
 
 import javax.swing.JFrame;
 
-import net.sf.colossus.game.PlayerState;
+import net.sf.colossus.game.Player;
 import net.sf.colossus.util.KDialog;
 
 
@@ -33,7 +33,7 @@ final class PickMarker extends KDialog implements MouseListener,
     private Client client;
     private final SaveWindow saveWindow;
 
-    PickMarker(JFrame parentFrame, PlayerState owner, Set<String> markerIds,
+    PickMarker(JFrame parentFrame, Player owner, Set<String> markerIds,
         Client client)
     {
         super(parentFrame, owner.getName() + ": Pick Legion Marker", true);

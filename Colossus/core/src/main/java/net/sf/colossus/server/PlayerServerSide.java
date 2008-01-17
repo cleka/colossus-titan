@@ -11,7 +11,7 @@ import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.sf.colossus.game.PlayerState;
+import net.sf.colossus.game.Player;
 import net.sf.colossus.util.Glob;
 import net.sf.colossus.util.Options;
 import net.sf.colossus.xmlparser.TerrainRecruitLoader;
@@ -24,9 +24,9 @@ import net.sf.colossus.xmlparser.TerrainRecruitLoader;
  * @author David Ripton
  */
 
-public final class Player extends PlayerState implements Comparable<Player>
+public final class PlayerServerSide extends Player implements Comparable<PlayerServerSide>
 {
-    private static final Logger LOGGER = Logger.getLogger(Player.class
+    private static final Logger LOGGER = Logger.getLogger(PlayerServerSide.class
         .getName());
 
     private String color; // Black, Blue, Brown, Gold, Green, Red
@@ -47,19 +47,19 @@ public final class Player extends PlayerState implements Comparable<Player>
      * TODO The base class currently has a list of legions, but that is not yet
      * maintained. Things should move up.
      */
-    private final List<Legion> legions = new ArrayList<Legion>();
+    private final List<LegionServerSide> legions = new ArrayList<LegionServerSide>();
     private boolean titanEliminated;
 
     /**
      * The legion which gave a summonable creature.
      */
-    private Legion donor;
+    private LegionServerSide donor;
     private final SortedSet<String> markersAvailable = Collections
         .synchronizedSortedSet(new TreeSet<String>());
     private String type; // "Human" or ".*AI"
     private String firstMarker;
 
-    Player(String name, Game game)
+    PlayerServerSide(String name, GameServerSide game)
     {
         // TODO why are the players on the client side numbered but not here?
         super(game, name, 0);
@@ -72,9 +72,9 @@ public final class Player extends PlayerState implements Comparable<Player>
      * Overridden to return specific flavor of Game until the upper class is sufficient. 
      */
     @Override
-    public Game getGame()
+    public GameServerSide getGame()
     {
-        return (Game)super.getGame();
+        return (GameServerSide)super.getGame();
     }
 
     boolean isHuman()
@@ -171,7 +171,7 @@ public final class Player extends PlayerState implements Comparable<Player>
                 {
                     String shortColor = allVictims.substring(i, i + 2);
                     initMarkersAvailable(shortColor);
-                    Player victim = getGame()
+                    PlayerServerSide victim = getGame()
                         .getPlayerByShortColor(shortColor);
                     allVictims.append(victim.getPlayersElim());
                 }
@@ -224,7 +224,7 @@ public final class Player extends PlayerState implements Comparable<Player>
 
     /** Players are sorted in order of decreasing starting tower.
      This is inconsistent with equals(). */
-    public int compareTo(Player other)
+    public int compareTo(PlayerServerSide other)
     {
         return (other.getTower().compareTo(this.getTower()));
     }
@@ -249,7 +249,7 @@ public final class Player extends PlayerState implements Comparable<Player>
         this.playersEliminated = playersEliminated;
     }
 
-    void addPlayerElim(Player player)
+    void addPlayerElim(PlayerServerSide player)
     {
         playersEliminated = playersEliminated + player.getShortColor();
     }
@@ -279,12 +279,12 @@ public final class Player extends PlayerState implements Comparable<Player>
         this.summoned = summoned;
     }
 
-    Legion getDonor()
+    LegionServerSide getDonor()
     {
         return donor;
     }
 
-    void setDonor(Legion donor)
+    void setDonor(LegionServerSide donor)
     {
         this.donor = donor;
     }
@@ -292,10 +292,10 @@ public final class Player extends PlayerState implements Comparable<Player>
     /** Remove all of this player's zero-height legions. */
     synchronized void removeEmptyLegions()
     {
-        Iterator<Legion> it = legions.iterator();
+        Iterator<LegionServerSide> it = legions.iterator();
         while (it.hasNext())
         {
-            Legion legion = it.next();
+            LegionServerSide legion = it.next();
             if (legion.getHeight() == 0)
             {
                 if (legion.equals(donor))
@@ -319,17 +319,17 @@ public final class Player extends PlayerState implements Comparable<Player>
         return legions.size();
     }
 
-    synchronized Legion getLegion(int i)
+    synchronized LegionServerSide getLegion(int i)
     {
         return legions.get(i);
     }
 
-    synchronized Legion getLegionByMarkerId(String markerId)
+    synchronized LegionServerSide getLegionByMarkerId(String markerId)
     {
-        Iterator<Legion> it = legions.iterator();
+        Iterator<LegionServerSide> it = legions.iterator();
         while (it.hasNext())
         {
-            Legion legion = it.next();
+            LegionServerSide legion = it.next();
             if (legion.getMarkerId().equals(markerId))
             {
                 return legion;
@@ -338,12 +338,12 @@ public final class Player extends PlayerState implements Comparable<Player>
         return null;
     }
 
-    synchronized Legion getTitanLegion()
+    synchronized LegionServerSide getTitanLegion()
     {
-        Iterator<Legion> it = legions.iterator();
+        Iterator<LegionServerSide> it = legions.iterator();
         while (it.hasNext())
         {
-            Legion legion = it.next();
+            LegionServerSide legion = it.next();
             if (legion.hasTitan())
             {
                 return legion;
@@ -353,7 +353,7 @@ public final class Player extends PlayerState implements Comparable<Player>
     }
 
     @Override
-    synchronized public List<Legion> getLegions()
+    synchronized public List<LegionServerSide> getLegions()
     {
         return legions;
     }
@@ -361,16 +361,16 @@ public final class Player extends PlayerState implements Comparable<Player>
     synchronized List<String> getLegionIds()
     {
         List<String> ids = new ArrayList<String>();
-        Iterator<Legion> it = legions.iterator();
+        Iterator<LegionServerSide> it = legions.iterator();
         while (it.hasNext())
         {
-            Legion legion = it.next();
+            LegionServerSide legion = it.next();
             ids.add(legion.getMarkerId());
         }
         return ids;
     }
 
-    synchronized void removeLegion(Legion legion)
+    synchronized void removeLegion(LegionServerSide legion)
     {
         legions.remove(legion);
     }
@@ -378,10 +378,10 @@ public final class Player extends PlayerState implements Comparable<Player>
     synchronized int getMaxLegionHeight()
     {
         int max = 0;
-        Iterator<Legion> it = legions.iterator();
+        Iterator<LegionServerSide> it = legions.iterator();
         while (it.hasNext())
         {
-            Legion legion = it.next();
+            LegionServerSide legion = it.next();
             int height = legion.getHeight();
             if (height > max)
             {
@@ -396,10 +396,10 @@ public final class Player extends PlayerState implements Comparable<Player>
     {
         int count = 0;
 
-        Iterator<Legion> it = legions.iterator();
+        Iterator<LegionServerSide> it = legions.iterator();
         while (it.hasNext())
         {
-            Legion legion = it.next();
+            LegionServerSide legion = it.next();
             if (legion.hasMoved())
             {
                 count++;
@@ -413,10 +413,10 @@ public final class Player extends PlayerState implements Comparable<Player>
     synchronized int countMobileLegions()
     {
         int count = 0;
-        Iterator<Legion> it = legions.iterator();
+        Iterator<LegionServerSide> it = legions.iterator();
         while (it.hasNext())
         {
-            Legion legion = it.next();
+            LegionServerSide legion = it.next();
             if (legion.hasConventionalMove())
             {
                 count++;
@@ -427,10 +427,10 @@ public final class Player extends PlayerState implements Comparable<Player>
 
     synchronized void commitMoves()
     {
-        Iterator<Legion> it = legions.iterator();
+        Iterator<LegionServerSide> it = legions.iterator();
         while (it.hasNext())
         {
-            Legion legion = it.next();
+            LegionServerSide legion = it.next();
             legion.commitMove();
         }
     }
@@ -499,7 +499,7 @@ public final class Player extends PlayerState implements Comparable<Player>
 
     void undoMove(String markerId)
     {
-        Legion legion = getLegionByMarkerId(markerId);
+        LegionServerSide legion = getLegionByMarkerId(markerId);
         if (legion != null)
         {
             legion.undoMove();
@@ -508,10 +508,10 @@ public final class Player extends PlayerState implements Comparable<Player>
 
     synchronized void undoAllMoves()
     {
-        Iterator<Legion> it = legions.iterator();
+        Iterator<LegionServerSide> it = legions.iterator();
         while (it.hasNext())
         {
-            Legion legion = it.next();
+            LegionServerSide legion = it.next();
             legion.undoMove();
         }
     }
@@ -520,10 +520,10 @@ public final class Player extends PlayerState implements Comparable<Player>
      *  a hex and they have a legal non-teleport move. */
     synchronized boolean splitLegionHasForcedMove()
     {
-        Iterator<Legion> it = legions.iterator();
+        Iterator<LegionServerSide> it = legions.iterator();
         while (it.hasNext())
         {
-            Legion legion = it.next();
+            LegionServerSide legion = it.next();
             String hexLabel = legion.getCurrentHexLabel();
             if (getGame().getNumFriendlyLegions(hexLabel, this) > 1
                 && legion.hasConventionalMove())
@@ -539,10 +539,10 @@ public final class Player extends PlayerState implements Comparable<Player>
     /** Return true if any legion can recruit. */
     synchronized boolean canRecruit()
     {
-        Iterator<Legion> it = legions.iterator();
+        Iterator<LegionServerSide> it = legions.iterator();
         while (it.hasNext())
         {
-            Legion legion = it.next();
+            LegionServerSide legion = it.next();
             if (legion.hasMoved() && legion.canRecruit())
             {
                 return true;
@@ -553,7 +553,7 @@ public final class Player extends PlayerState implements Comparable<Player>
 
     void undoRecruit(String markerId)
     {
-        Legion legion = getLegionByMarkerId(markerId);
+        LegionServerSide legion = getLegionByMarkerId(markerId);
         if (legion == null)
         {
             LOGGER.log(Level.SEVERE,
@@ -581,21 +581,21 @@ public final class Player extends PlayerState implements Comparable<Player>
 
     void undoSplit(String splitoffId)
     {
-        Legion splitoff = getLegionByMarkerId(splitoffId);
-        Legion parent = splitoff.getParent();
+        LegionServerSide splitoff = getLegionByMarkerId(splitoffId);
+        LegionServerSide parent = splitoff.getParent();
         splitoff.recombine(parent, true);
         getGame().getServer().allUpdatePlayerInfo();
     }
 
     synchronized void recombineIllegalSplits()
     {
-        Iterator<Legion> it = legions.iterator();
+        Iterator<LegionServerSide> it = legions.iterator();
         while (it.hasNext())
         {
-            Legion legion = it.next();
+            LegionServerSide legion = it.next();
             // Don't use the legion's real parent, as there could have been
             // a 3-way split and the parent could be gone.
-            Legion parent = getGame().getFirstFriendlyLegion(
+            LegionServerSide parent = getGame().getFirstFriendlyLegion(
                 legion.getCurrentHexLabel(), this);
             if (legion != parent)
             {
@@ -609,16 +609,16 @@ public final class Player extends PlayerState implements Comparable<Player>
     synchronized int getNumCreatures()
     {
         int count = 0;
-        Iterator<Legion> it = legions.iterator();
+        Iterator<LegionServerSide> it = legions.iterator();
         while (it.hasNext())
         {
-            Legion legion = it.next();
+            LegionServerSide legion = it.next();
             count += legion.getHeight();
         }
         return count;
     }
 
-    synchronized void addLegion(Legion legion)
+    synchronized void addLegion(LegionServerSide legion)
     {
         legions.add(legion);
     }
@@ -669,7 +669,7 @@ public final class Player extends PlayerState implements Comparable<Player>
         markersAvailable.add(markerId);
     }
 
-    private void takeLegionMarkers(Player victim)
+    private void takeLegionMarkers(PlayerServerSide victim)
     {
         synchronized (victim.markersAvailable)
         {
@@ -717,7 +717,7 @@ public final class Player extends PlayerState implements Comparable<Player>
      * @param checkForVictory If set the game will be asked to check for a victory after
      *      we are finished.
      */
-    synchronized void die(Player slayer, boolean checkForVictory)
+    synchronized void die(PlayerServerSide slayer, boolean checkForVictory)
     {
         LOGGER.info("Player '" + getName() + "' is dying, killed by "
             + (slayer == null ? "nobody" : slayer.getName()));
@@ -725,14 +725,14 @@ public final class Player extends PlayerState implements Comparable<Player>
         // engaged with.  All others give half points to slayer,
         // if non-null.
 
-        for (Iterator<Legion> itLeg = legions.iterator(); itLeg.hasNext();)
+        for (Iterator<LegionServerSide> itLeg = legions.iterator(); itLeg.hasNext();)
         {
-            Legion legion = itLeg.next();
+            LegionServerSide legion = itLeg.next();
             String hexLabel = legion.getCurrentHexLabel();
-            Legion enemyLegion = getGame().getFirstEnemyLegion(hexLabel, this);
+            LegionServerSide enemyLegion = getGame().getFirstEnemyLegion(hexLabel, this);
             double halfPoints = legion.getPointValue() / 2.0;
 
-            Player scorer;
+            PlayerServerSide scorer;
 
             if (enemyLegion != null)
             {
@@ -754,7 +754,7 @@ public final class Player extends PlayerState implements Comparable<Player>
         }
 
         // Truncate every player's score to an integer value.
-        for (Player player : getGame().getPlayers())
+        for (PlayerServerSide player : getGame().getPlayers())
         {
             player.truncScore();
         }
@@ -819,7 +819,7 @@ public final class Player extends PlayerState implements Comparable<Player>
     synchronized int getTotalPointValue()
     {
         int total = 0;
-        for (Legion legion : legions)
+        for (LegionServerSide legion : legions)
         {
             total += legion.getPointValue();
         }

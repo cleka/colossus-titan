@@ -644,7 +644,7 @@ final class EventViewer extends KDialog implements WindowListener,
         return client.getActivePlayer().getNumber();
     }
 
-    private LegionInfo getLegionInfo(String marker)
+    private LegionClientSide getLegionInfo(String marker)
     {
         return client.getLegionInfo(marker);
     }
@@ -930,7 +930,7 @@ final class EventViewer extends KDialog implements WindowListener,
             if (ownEvent != null)
             {
                 String ownMarkerId = ownEvent.getMarkerId();
-                LegionInfo info = getLegionInfo(ownMarkerId);
+                LegionClientSide info = getLegionInfo(ownMarkerId);
                 List<String> ownNames = info.getContents();
                 ArrayList<RevealedCreature> rcNames = new ArrayList<RevealedCreature>();
                 Iterator<String> it = ownNames.iterator();

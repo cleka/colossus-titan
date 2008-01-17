@@ -30,7 +30,7 @@ import javax.swing.JScrollPane;
 import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
 
-import net.sf.colossus.server.Creature;
+import net.sf.colossus.server.CreatureTypeServerSide;
 import net.sf.colossus.util.KDialog;
 import net.sf.colossus.util.Options;
 import net.sf.colossus.variant.CreatureType;
@@ -143,7 +143,7 @@ class CreatureCollectionView extends KDialog
             topCountMap.put(name, topLabel);
 
             // clicking the creature icon invokes the details view
-            final Creature creature = (Creature)client.getGame().getVariant()
+            final CreatureTypeServerSide creature = (CreatureTypeServerSide)client.getGame().getVariant()
                 .getCreatureByName(name);
             assert creature != null : "Expected creature name '" + name
                 + "' to be valid";
@@ -225,7 +225,7 @@ class CreatureCollectionView extends KDialog
                     return;
                 }
 
-                boolean immortal = ((Creature)client.getGame().getVariant()
+                boolean immortal = ((CreatureTypeServerSide)client.getGame().getVariant()
                     .getCreatureByName(name)).isImmortal();
                 String color;
                 if (count == 0)

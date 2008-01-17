@@ -22,9 +22,9 @@ import net.sf.colossus.variant.HazardTerrain;
  * @author Romain Dolbeau
  */
 
-public class Creature extends CreatureType
+public class CreatureTypeServerSide extends CreatureType
 {
-    private static final Logger LOGGER = Logger.getLogger(Creature.class
+    private static final Logger LOGGER = Logger.getLogger(CreatureTypeServerSide.class
         .getName());
 
     private final int power;
@@ -41,7 +41,7 @@ public class Creature extends CreatureType
     private final String baseColor;
     private static boolean noBaseColor = false;
 
-    public Creature(String name, int power, int skill, boolean rangestrikes,
+    public CreatureTypeServerSide(String name, int power, int skill, boolean rangestrikes,
         boolean flies, Set<HazardTerrain> nativeTerrrains,
         boolean nativeSlope, boolean nativeRiver, boolean waterDwelling,
         boolean magicMissile, boolean summonable, boolean lord,
@@ -252,7 +252,7 @@ public class Creature extends CreatureType
         {
             return false;
         }
-        Creature other = (Creature)object;
+        CreatureTypeServerSide other = (CreatureTypeServerSide)object;
         return getName().equals(other.getName());
     }
 

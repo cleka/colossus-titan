@@ -5,7 +5,7 @@ import java.awt.Color;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.sf.colossus.server.Creature;
+import net.sf.colossus.server.CreatureTypeServerSide;
 import net.sf.colossus.util.HTMLColor;
 import net.sf.colossus.variant.HazardTerrain;
 
@@ -396,7 +396,7 @@ public class BattleHex extends Hex
      * @param cameFrom The HexSide through which the Creature try to enter.
      * @return Cost to enter the BattleHex.
      */
-    public int getEntryCost(Creature creature, int cameFrom, boolean cumul)
+    public int getEntryCost(CreatureTypeServerSide creature, int cameFrom, boolean cumul)
     {
         int cost = NORMAL_COST;
 
@@ -463,7 +463,7 @@ public class BattleHex extends Hex
      * @param creature The Creature that want to fly over this BattleHex
      * @return If the Creature can fly over here or not.
      */
-    public boolean canBeFlownOverBy(Creature creature)
+    public boolean canBeFlownOverBy(CreatureTypeServerSide creature)
     {
         if (!creature.isFlier())
         { // non-flyer can't fly, obviously...
@@ -485,7 +485,7 @@ public class BattleHex extends Hex
      * @param creature The Creature that may suffer damage.
      * @return How much damage the Creature should take from being there.
      */
-    public int damageToCreature(Creature creature)
+    public int damageToCreature(CreatureTypeServerSide creature)
     {
         if (terrain.equals(HazardTerrain.DRIFT)
             && (!creature.isNativeIn(terrain)))

@@ -3,7 +3,7 @@ package net.sf.colossus.client;
 
 import java.util.List;
 
-import net.sf.colossus.game.PlayerState;
+import net.sf.colossus.game.Player;
 
 
 /** Knows a lot of things, but cannot actually take any actions.
@@ -34,11 +34,11 @@ public interface IOracle
 
     int getNumPlayers();
 
-    PlayerState getActivePlayer();
+    Player getActivePlayer();
 
     String getPhaseName();
 
-    PlayerState getBattleActivePlayer();
+    Player getBattleActivePlayer();
 
     String getBattlePhaseName();
 }

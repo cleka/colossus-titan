@@ -33,7 +33,7 @@ public final class Start
 
     // game static, so that (a local) Client can ask from Start for 
     // current game, to end it (before perhaps starting a new one).
-    private static Game game = null;
+    private static GameServerSide game = null;
 
     // static, there's always only one valid "what to do next" object:
     private static Start startObject = null;
@@ -685,7 +685,7 @@ public final class Start
                     .getStringOption(Options.webFlagFileName);
                 startOptions.removeOption(Options.webFlagFileName);
 
-                game = new Game();
+                game = new GameServerSide();
                 game.setPort(port);
                 game.setOptions(serverOptions);
                 if (webGameFlagFileName != null
@@ -707,7 +707,7 @@ public final class Start
 
                 if (filename != null && filename.length() > 0)
                 {
-                    game = new Game();
+                    game = new GameServerSide();
                     game.setPort(port);
                     game.setOptions(serverOptions);
                     serverOptions.clearPlayerInfo();

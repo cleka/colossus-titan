@@ -35,9 +35,9 @@ public final class Caretaker
      *  creature is not found, assume that we have a 0 count */
     private final HashMap<String, Integer> deadMap = new HashMap<String, Integer>();
 
-    private final Game game;
+    private final GameServerSide game;
 
-    Caretaker(Game game)
+    Caretaker(GameServerSide game)
     {
         this.game = game;
     }
@@ -47,7 +47,7 @@ public final class Caretaker
         Integer count = map.get(creatureName);
         if (count == null)
         {
-            return ((Creature)game.getVariant()
+            return ((CreatureTypeServerSide)game.getVariant()
                 .getCreatureByName(creatureName)).getMaxCount();
         }
         return count.intValue();
@@ -85,12 +85,12 @@ public final class Caretaker
         updateDisplays(creatureName);
     }
 
-    void setCount(Creature creature, int count)
+    void setCount(CreatureTypeServerSide creature, int count)
     {
         setCount(creature.getName(), count);
     }
 
-    void setDeadCount(Creature creature, int count)
+    void setDeadCount(CreatureTypeServerSide creature, int count)
     {
         setDeadCount(creature.getName(), count);
     }
@@ -102,7 +102,7 @@ public final class Caretaker
         fullySyncDisplays();
     }
 
-    void takeOne(Creature creature)
+    void takeOne(CreatureTypeServerSide creature)
     {
         Integer count = map.remove(creature.getName());
         if (count == null)
@@ -136,7 +136,7 @@ public final class Caretaker
         updateDisplays(creature.getName());
     }
 
-    void putOneBack(Creature creature)
+    void putOneBack(CreatureTypeServerSide creature)
     {
         Integer count = map.get(creature.getName());
         // count can be null if we're testing a battle.
@@ -148,7 +148,7 @@ public final class Caretaker
         updateDisplays(creature.getName());
     }
 
-    void putDeadOne(Creature creature)
+    void putDeadOne(CreatureTypeServerSide creature)
     {
         String name = creature.getName();
         Integer deadCount = deadMap.get(name);
@@ -209,7 +209,7 @@ public final class Caretaker
             .iterator();
         while (it.hasNext())
         {
-            Creature creature = (Creature)it.next();
+            CreatureTypeServerSide creature = (CreatureTypeServerSide)it.next();
             if (creature.isImmortal())
             {
                 String name = creature.getName();

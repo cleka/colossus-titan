@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import net.sf.colossus.game.Game;
-import net.sf.colossus.server.Creature;
+import net.sf.colossus.server.CreatureTypeServerSide;
 import net.sf.colossus.variant.CreatureType;
 
 
@@ -50,7 +50,7 @@ public final class CaretakerInfo
         Integer count = creatureCounts.get(creatureName);
         if (count == null)
         {
-            Creature cre = (Creature)game.getVariant().getCreatureByName(
+            CreatureTypeServerSide cre = (CreatureTypeServerSide)game.getVariant().getCreatureByName(
                 creatureName);
             if (cre != null)
             {
@@ -107,7 +107,7 @@ public final class CaretakerInfo
     {
         if (creature != null)
         {
-            return ((Creature)creature).getMaxCount();
+            return ((CreatureTypeServerSide)creature).getMaxCount();
         }
         else
         {
