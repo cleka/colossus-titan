@@ -4148,22 +4148,20 @@ public final class Client implements IClient, IOracle
 
         // if this hex is already occupied, return false
         LegionInfo li = getLegionInfo(moverId);
-        if (!hexLabel.equals(li.getHexLabel()))
+        int friendlyLegions = getNumFriendlyLegions(hexLabel,
+            getActivePlayer());
+        if (hexLabel.equals(li.getHexLabel()))
         {
-            int friendlyLegions = getNumFriendlyLegions(hexLabel,
-                getActivePlayer());
-            if (friendlyLegions > 0)
+            // same hex as starting hex, but it might be occupied by
+            // multiple legions after split
+            if (friendlyLegions > 1)
             {
                 return false;
             }
         }
         else
         {
-            // same hex as starting hex, but it might be occupied by
-            // multiple legions after split
-            int friendlyLegions = getNumFriendlyLegions(hexLabel,
-                getActivePlayer());
-            if (friendlyLegions > 1)
+            if (friendlyLegions > 0)
             {
                 return false;
             }
