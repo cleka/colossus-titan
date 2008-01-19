@@ -463,10 +463,6 @@ public final class Start
             int limit = Integer.parseInt(buf);
             options.setOption(Options.aiTimeLimit, limit);
         }
-        if (cl.optIsSet('x'))
-        {
-            options.setOption(Options.logDebug, false);
-        }
 
         if (cl.optIsSet('u'))
         {
@@ -563,7 +559,6 @@ public final class Start
             opts.addOption('A', "autoplay", false, "Autoplay");
             opts.addOption('R', "resetOptions", false, "Reset options");
             opts.addOption('m', "myname", true, "My player name");
-            opts.addOption('x', "quiet", false, "turn off debug log");
             opts.addOption('O', "noobserver", false, "Go on without observer");
 
             cl = opts.parse(args);

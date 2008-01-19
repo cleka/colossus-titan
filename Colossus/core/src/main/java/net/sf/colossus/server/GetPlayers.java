@@ -173,7 +173,6 @@ public final class GetPlayers extends KFrame implements WindowListener,
         optionPane.add(checkboxPane);
 
         addCheckbox(Options.autosave, checkboxPane);
-        addCheckbox(Options.logDebug, checkboxPane);
         addCheckbox(Options.balancedTowers, checkboxPane);
         addCheckbox(Options.autoStop, checkboxPane);
         addCheckbox(Options.autoQuit, checkboxPane);

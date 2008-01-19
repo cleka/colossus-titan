@@ -34,8 +34,8 @@ import net.sf.colossus.util.Options;
 
 public class GameInfo extends Thread
 {
-    private static final Logger LOGGER =
-        Logger.getLogger(GameInfo.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(GameInfo.class
+        .getName());
 
     // the possible states of a game:
     public final static int Proposed = 1;
@@ -60,8 +60,7 @@ public class GameInfo extends Thread
     private boolean balancedTowers;
 
     // this 2 statically set like this:
-    private boolean autoSave = true;
-    private boolean logDebug = true;
+    private final boolean autoSave = true;
 
     private int min;
     private int target;
@@ -105,8 +104,8 @@ public class GameInfo extends Thread
 
         this.server = null;
         LOGGER.log(Level.FINEST,
-            "A new potential game was created!! - variant " + variant +
-            " viewmode " + viewmode);
+            "A new potential game was created!! - variant " + variant
+                + " viewmode " + viewmode);
     }
 
     public void setState(int state)
@@ -425,7 +424,8 @@ public class GameInfo extends Thread
         this.gameId = gameId;
     }
 
-    public static GameInfo fromString(String[] tokens, HashMap<String, GameInfo> games)
+    public static GameInfo fromString(String[] tokens,
+        HashMap<String, GameInfo> games)
     {
         GameInfo gi;
 
@@ -517,8 +517,9 @@ public class GameInfo extends Thread
 
         Runtime rt = Runtime.getRuntime();
 
-        String loggingFileArg = propFileOk ?
-            "-Djava.util.logging.config.file=" + logPropFile : "";
+        String loggingFileArg = propFileOk ? "-Djava.util.logging.config.file="
+            + logPropFile
+            : "";
 
         String command = javaCommand + " " + loggingFileArg + " -Duser.home="
             + gameDir + " -jar " + colossusJar + " -p " + portNr + " -n "
@@ -541,8 +542,8 @@ public class GameInfo extends Thread
         }
         catch (Exception e)
         {
-            LOGGER.log(Level.SEVERE,
-                "Executing\n  " + command + "\ndid throw exception", e);
+            LOGGER.log(Level.SEVERE, "Executing\n  " + command
+                + "\ndid throw exception", e);
         }
     }
 
@@ -590,8 +591,8 @@ public class GameInfo extends Thread
         }
         catch (Exception e)
         {
-            LOGGER.log(Level.SEVERE,
-                "Exception durimg waitForGameShutdown", e);
+            LOGGER
+                .log(Level.SEVERE, "Exception durimg waitForGameShutdown", e);
         }
 
         try
@@ -600,8 +601,8 @@ public class GameInfo extends Thread
 
             if (exitCode != 0)
             {
-                LOGGER.log(Level.FINEST,
-                    "After waitFor... - exit code is " + exitCode);
+                LOGGER.log(Level.FINEST, "After waitFor... - exit code is "
+                    + exitCode);
             }
         }
         catch (InterruptedException e)
@@ -612,16 +613,15 @@ public class GameInfo extends Thread
 
         if (flagFile.exists())
         {
-            LOGGER.log(Level.WARNING,
-                "Game " + gameId + " ended but flagfile " +
-                flagFile.toString() + " does still exist...? Deleting it...");
+            LOGGER.log(Level.WARNING, "Game " + gameId
+                + " ended but flagfile " + flagFile.toString()
+                + " does still exist...? Deleting it...");
             flagFile.delete();
         }
         else
         {
-            LOGGER.log(Level.FINEST,
-                "Game " + gameId + " ended and flagfile " +
-                flagFile.toString() + " is gone. Fine!");
+            LOGGER.log(Level.FINEST, "Game " + gameId + " ended and flagfile "
+                + flagFile.toString() + " is gone. Fine!");
         }
         server.unregisterGame(this, portNr);
     }
@@ -682,7 +682,6 @@ public class GameInfo extends Thread
         gameOptions.setOption(Options.variant, this.variant);
         gameOptions.setOption(Options.viewMode, this.viewmode);
         gameOptions.setOption(Options.autosave, this.autoSave);
-        gameOptions.setOption(Options.logDebug, this.logDebug);
         gameOptions.setOption(Options.eventExpiring, this.eventExpiring);
         gameOptions.setOption(Options.unlimitedMulligans,
             this.unlimitedMulligans);
@@ -751,8 +750,8 @@ public class GameInfo extends Thread
         }
         catch (IOException e1)
         {
-            LOGGER.log(Level.SEVERE,
-                "during wait for line: IOException: ", e1);
+            LOGGER
+                .log(Level.SEVERE, "during wait for line: IOException: ", e1);
         }
         return line;
     }
@@ -771,14 +770,13 @@ public class GameInfo extends Thread
         }
         catch (FileNotFoundException ef)
         {
-            LOGGER.log(Level.SEVERE, 
+            LOGGER.log(Level.SEVERE,
                 "while waiting until game started successfully: ", ef);
         }
 
         if (in == null)
         {
-            LOGGER.log(Level.SEVERE,
-                "could not open flagfile for reading!!");
+            LOGGER.log(Level.SEVERE, "could not open flagfile for reading!!");
             return false;
         }
 
@@ -815,8 +813,8 @@ public class GameInfo extends Thread
         else
         {
             LOGGER.log(Level.WARNING,
-                "RESULT: game started, but not all clients did connect\n" +
-                "Got only " + connected + " players");
+                "RESULT: game started, but not all clients did connect\n"
+                    + "Got only " + connected + " players");
         }
 
         try
@@ -928,7 +926,7 @@ public class GameInfo extends Thread
             {
                 this.reader.close();
             }
-            catch(IOException e)
+            catch (IOException e)
             {
                 LOGGER.log(Level.WARNING, "Nulldumper reader.close got " + e);
             }

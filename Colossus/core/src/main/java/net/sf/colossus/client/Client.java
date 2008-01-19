@@ -874,22 +874,6 @@ public final class Client implements IClient, IOracle
                 repaintAllWindows();
             }
         });
-        options.addListener(Options.logDebug, new IOptions.Listener()
-        {
-            @Override
-            public void booleanOptionChanged(String optname, boolean oldValue,
-                boolean newValue)
-            {
-                if (newValue)
-                {
-                    Logger.getLogger("net.sf.colossus").setLevel(Level.ALL);
-                }
-                else
-                {
-                    Logger.getLogger("net.sf.colossus").setLevel(Level.OFF);
-                }
-            }
-        });
         options.addListener(Options.showCaretaker, new IOptions.Listener()
         {
             @Override
@@ -2192,8 +2176,8 @@ public final class Client implements IClient, IOracle
 
                     case Options.showRecruitChitsNumRecruitHint:
                         oneElemList.clear();
-                        CreatureTypeServerSide hint = chooseBestPotentialRecruit(markerId,
-                            hexLabel, recruits);
+                        CreatureTypeServerSide hint = chooseBestPotentialRecruit(
+                            markerId, hexLabel, recruits);
                         oneElemList.add(hint);
                         recruits = oneElemList;
                         break;
@@ -2211,15 +2195,15 @@ public final class Client implements IClient, IOracle
         }
     }
 
-    CreatureTypeServerSide chooseBestPotentialRecruit(String markerId, String hexLabel,
-        List<CreatureType> recruits)
+    CreatureTypeServerSide chooseBestPotentialRecruit(String markerId,
+        String hexLabel, List<CreatureType> recruits)
     {
         LegionClientSide legion = getLegionInfo(markerId);
         MasterHex hex = getGame().getVariant().getMasterBoard().getHexByLabel(
             hexLabel);
         // NOTE! Below the simpleAI is an object, not class! 
-        CreatureTypeServerSide recruit = (CreatureTypeServerSide)simpleAI.getVariantRecruitHint(legion,
-            hex, recruits);
+        CreatureTypeServerSide recruit = (CreatureTypeServerSide)simpleAI
+            .getVariantRecruitHint(legion, hex, recruits);
         return recruit;
     }
 
@@ -3935,8 +3919,8 @@ public final class Client implements IClient, IOracle
             String targetHex = it.next();
             BattleChit target = getBattleChit(targetHex);
             target.setStrikeNumber(strike.getStrikeNumber(chit, target));
-            CreatureTypeServerSide striker = (CreatureTypeServerSide)game.getVariant().getCreatureByName(
-                chit.getCreatureName());
+            CreatureTypeServerSide striker = (CreatureTypeServerSide)game
+                .getVariant().getCreatureByName(chit.getCreatureName());
             int dice;
             if (striker.isTitan())
             {
@@ -4077,8 +4061,8 @@ public final class Client implements IClient, IOracle
             while (it.hasNext())
             {
                 String name = it.next();
-                CreatureTypeServerSide creature = (CreatureTypeServerSide)game.getVariant()
-                    .getCreatureByName(name);
+                CreatureTypeServerSide creature = (CreatureTypeServerSide)game
+                    .getVariant().getCreatureByName(name);
                 if (creature != null && creature.isLord()
                     && !lords.contains(name))
                 {
@@ -4419,8 +4403,8 @@ public final class Client implements IClient, IOracle
         String recruitName)
     {
         Set<CreatureType> recruiters;
-        CreatureTypeServerSide recruit = (CreatureTypeServerSide)game.getVariant().getCreatureByName(
-            recruitName);
+        CreatureTypeServerSide recruit = (CreatureTypeServerSide)game
+            .getVariant().getCreatureByName(recruitName);
         if (recruit == null)
         {
             return new ArrayList<String>();
