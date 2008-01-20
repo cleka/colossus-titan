@@ -76,9 +76,16 @@ then
   TEMP="/tmp"
 fi
 
+# offer a choice where we mess around
+if [ "X$TEST_WORKDIR" = "X" ]
+then
+  TEST_WORKDIR="./tmp/stresstest"
+  echo "\$TEST_WORKDIR not set, using $TEST_WORKDIR"
+fi
+
 # Copied log and autosave files will be put under here
 # (in separate dirs names "logs.exitonerror.<gamenr>) :
-mkdir -p ./tmp
+mkdir -p $TEST_WORKDIR
 
 
 while [ $# -gt 0 -a "$done" = "no" ]
@@ -161,7 +168,7 @@ rm -f stop.flag log
 # to append (re-create??) file with same name, that fails.
 # Try this already here, so that it does not bother us inside the loop 
 # all the time...
-if ! echo -e "Starting stresstest$CR" > log
+if ! echo -e "Starting stresstest$CR" > $TEST_WORKDIR/log
 then
   echo -e "\nAppending to log failed. Perhaps some other terminal still has the file open?"
   echo -e "Exiting.\n"
@@ -171,9 +178,9 @@ fi
 # ----------------------------------------------------------------------
 # continue the game nr, so that copy-logs-to-dir does not use same
 # numbers. If one cleans up dirs, can also remove the file i.
-if [ -f i ]
+if [ -f $TEST_WORKDIR/i ]
 then
-  i=`cat i`
+  i=`cat $TEST_WORKDIR/i`
 else
   i=0
 fi
@@ -233,19 +240,19 @@ do
     timestamp=`date +'%d.%m.%Y %T'`
 
     i=`expr $i + 1`
-    echo -e $i > i
+    echo -e $i > $TEST_WORKDIR/i
     echo -e "\n$timestamp: Starting game #$i as variant $variant"
-    echo -e "$CR\n$timestamp: Starting game #$i as variant $variant$CR" >> log
+    echo -e "$CR\n$timestamp: Starting game #$i as variant $variant$CR" >> $TEST_WORKDIR/log
     
     CMD="java -ea -Djava.util.logging.config.file=logging.properties $FORCEBOARD $INTERNALROUNDS -Xmx128M -jar Colossus.jar $humans -i$AIs $remoteclients -qgS -d 1 --variant $variant $1 $2 $3 $4 $5 $6 $7 $8 $9"
     echo $CMD
-    echo -e "$CMD$CR" >> log 2>&1
-    nice -$niceness $CMD >> log 2>&1;
+    echo -e "$CMD$CR" >> $TEST_WORKDIR/log 2>&1
+    nice -$niceness $CMD >> $TEST_WORKDIR/log 2>&1;
 
     ec=$?
 
     # copy the part which was now added to a separate file:
-    showNew log part.$i.log
+    showNew $TEST_WORKDIR/log $TEST_WORKDIR/part.$i.log
 
     mkbackup=n
     if [ $ec -ne 0 ]
@@ -265,10 +272,10 @@ do
     then
       echo "making backup of logs and autosave files..."
       rm -f backup.flag
-      dir=$currdir/tmp/logs.exitonerror.$i
+      dir=$TEST_WORKDIR/logs.exitonerror.$i
       mkdir -p $dir
-      cp -p log $dir
-      cp -p part.$i.log $dir
+      cp -p $TEST_WORKDIR/log $dir
+      cp -p $TEST_WORKDIR/part.$i.log $dir
       cd "$HOME/.Colossus/saves"
       files=`ls -rt -1 snap*.xml 2>/dev/null | tail -20`
       if [ "X$files" != "X" ]
@@ -281,7 +288,7 @@ do
       cp -p Colossus[012].log $dir
       cd $currdir
     fi
-    rm -f part.$i.log
+    rm -f $TEST_WORKDIR/part.$i.log
     if [ "X$iMax" != "X" ]
     then
       if [ $i -ge $iMax ]
