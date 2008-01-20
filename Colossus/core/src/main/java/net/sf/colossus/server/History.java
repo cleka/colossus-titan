@@ -189,14 +189,16 @@ public class History
                 creatureNames.add(creatureName);
             }
             String reason = "<unknown>";
+            GameServerSide game = server.getGame();
             if (all)
             {
-                server.allRevealCreatures(markerId, creatureNames, reason);
+                server.allRevealCreatures(game.getLegionByMarkerId(markerId),
+                    creatureNames, reason);
             }
             else
             {
-                server.oneRevealCreatures(playerName, markerId, creatureNames,
-                    reason);
+                server.oneRevealCreatures(playerName, game
+                    .getLegionByMarkerId(markerId), creatureNames, reason);
             }
         }
         else if (el.getName().equals("Split"))

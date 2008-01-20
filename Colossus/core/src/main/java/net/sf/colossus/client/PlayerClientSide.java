@@ -241,7 +241,7 @@ public final class PlayerClientSide extends Player
         while (it.hasNext())
         {
             String markerId = it.next();
-            LegionClientSide info = client.getLegionInfo(markerId);
+            LegionClientSide info = client.getLegion(markerId);
             if (info.hasTeleported())
             {
                 return true;
@@ -259,7 +259,7 @@ public final class PlayerClientSide extends Player
         while (it.hasNext())
         {
             String markerId = it.next();
-            LegionClientSide legion = client.getLegionInfo(markerId);
+            LegionClientSide legion = client.getLegion(markerId);
             if (legion.hasMoved())
             {
                 count++;

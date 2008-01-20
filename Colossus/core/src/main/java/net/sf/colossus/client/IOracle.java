@@ -3,6 +3,7 @@ package net.sf.colossus.client;
 
 import java.util.List;
 
+import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
 
 
@@ -20,17 +21,17 @@ public interface IOracle
 {
     String getBattleSite();
 
-    String getAttackerMarkerId();
+    Legion getAttacker();
 
-    String getDefenderMarkerId();
+    Legion getDefender();
 
     int getBattleTurnNumber();
 
     int getTurnNumber();
 
-    List<String> getLegionImageNames(String markerId);
+    List<String> getLegionImageNames(Legion legion);
 
-    List<Boolean> getLegionCreatureCertainties(String markerId);
+    List<Boolean> getLegionCreatureCertainties(Legion legion);
 
     int getNumPlayers();
 

@@ -15,6 +15,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.colossus.client.IClient;
+import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.util.Glob;
 import net.sf.colossus.util.Split;
@@ -337,7 +338,7 @@ final class SocketServerThread extends Thread implements IClient
         else if (method.equals(Constants.concede))
         {
             String markerId = args.remove(0);
-            server.concede(markerId);
+            server.concede(server.getGame().getLegionByMarkerId(markerId));
         }
         else if (method.equals(Constants.doNotConcede))
         {
@@ -347,12 +348,12 @@ final class SocketServerThread extends Thread implements IClient
         else if (method.equals(Constants.flee))
         {
             String markerId = args.remove(0);
-            server.flee(markerId);
+            server.flee(server.getGame().getLegionByMarkerId(markerId));
         }
         else if (method.equals(Constants.doNotFlee))
         {
             String markerId = args.remove(0);
-            server.doNotFlee(markerId);
+            server.doNotFlee(server.getGame().getLegionByMarkerId(markerId));
         }
         else if (method.equals(Constants.makeProposal))
         {
@@ -524,18 +525,19 @@ final class SocketServerThread extends Thread implements IClient
 
     // IClient methods to sent requests to client over socket.
 
-    public void tellEngagement(String hexLabel, String attackerId,
-        String defenderId)
+    public void tellEngagement(String hexLabel, Legion attacker,
+        Legion defender)
     {
         sendToClient(Constants.tellEngagement + sep + hexLabel + sep
-            + attackerId + sep + defenderId);
+            + attacker.getMarkerId() + sep + defender.getMarkerId());
     }
 
-    public void tellEngagementResults(String winnerId, String method,
+    public void tellEngagementResults(Legion winner, String method,
         int points, int turns)
     {
-        sendToClient(Constants.tellEngagementResults + sep + winnerId + sep
-            + method + sep + points + sep + turns);
+        sendToClient(Constants.tellEngagementResults + sep
+            + (winner != null ? winner.getMarkerId() : null) + sep + method
+            + sep + points + sep + turns);
     }
 
     public void tellMovementRoll(int roll)
@@ -597,11 +599,11 @@ final class SocketServerThread extends Thread implements IClient
             + sep + reason);
     }
 
-    public void revealCreatures(String markerId, final List<String> names,
+    public void revealCreatures(Legion legion, final List<String> names,
         String reason)
     {
-        sendToClient(Constants.revealCreatures + sep + markerId + sep
-            + Glob.glob(names) + sep + reason);
+        sendToClient(Constants.revealCreatures + sep + legion.getMarkerId()
+            + sep + Glob.glob(names) + sep + reason);
     }
 
     /** print the 'revealEngagagedCreature'-message,
@@ -612,11 +614,12 @@ final class SocketServerThread extends Thread implements IClient
      * @param reason why this was revealed
      * @author Towi, copied from revealCreatures
      */
-    public void revealEngagedCreatures(final String markerId,
+    public void revealEngagedCreatures(final Legion legion,
         final List<String> names, final boolean isAttacker, String reason)
     {
-        sendToClient(Constants.revealEngagedCreatures + sep + markerId + sep
-            + isAttacker + sep + Glob.glob(names) + sep + reason);
+        sendToClient(Constants.revealEngagedCreatures + sep
+            + legion.getMarkerId() + sep + isAttacker + sep + Glob.glob(names)
+            + sep + reason);
     }
 
     public void removeDeadBattleChits()
@@ -673,22 +676,22 @@ final class SocketServerThread extends Thread implements IClient
             + (slayer != null ? slayer.getName() : null));
     }
 
-    public void askConcede(String allyMarkerId, String enemyMarkerId)
+    public void askConcede(Legion ally, Legion enemy)
     {
-        sendToClient(Constants.askConcede + sep + allyMarkerId + sep
-            + enemyMarkerId);
+        sendToClient(Constants.askConcede + sep + ally.getMarkerId() + sep
+            + enemy.getMarkerId());
     }
 
-    public void askFlee(String allyMarkerId, String enemyMarkerId)
+    public void askFlee(Legion ally, Legion enemy)
     {
-        sendToClient(Constants.askFlee + sep + allyMarkerId + sep
-            + enemyMarkerId);
+        sendToClient(Constants.askFlee + sep + ally.getMarkerId() + sep
+            + enemy.getMarkerId());
     }
 
-    public void askNegotiate(String attackerId, String defenderId)
+    public void askNegotiate(Legion attacker, Legion defender)
     {
-        sendToClient(Constants.askNegotiate + sep + attackerId + sep
-            + defenderId);
+        sendToClient(Constants.askNegotiate + sep + attacker.getMarkerId()
+            + sep + defender.getMarkerId());
     }
 
     public void tellProposal(String proposalString)
@@ -709,12 +712,12 @@ final class SocketServerThread extends Thread implements IClient
 
     public void initBattle(String masterHexLabel, int battleTurnNumber,
         Player battleActivePlayer, Constants.BattlePhase battlePhase,
-        String attackerMarkerId, String defenderMarkerId)
+        Legion attacker, Legion defender)
     {
         sendToClient(Constants.initBattle + sep + masterHexLabel + sep
             + battleTurnNumber + sep + battleActivePlayer.getName() + sep
-            + battlePhase.toInt() + sep + attackerMarkerId + sep
-            + defenderMarkerId);
+            + battlePhase.toInt() + sep + attacker.getMarkerId() + sep
+            + defender.getMarkerId());
     }
 
     public void cleanupBattle()
@@ -786,8 +789,7 @@ final class SocketServerThread extends Thread implements IClient
             + battleActivePlayer.getName() + sep + battleTurnNumber);
     }
 
-    public void setupBattleMove(Player battleActivePlayer,
-        int battleTurnNumber)
+    public void setupBattleMove(Player battleActivePlayer, int battleTurnNumber)
     {
         sendToClient(Constants.setupBattleMove + sep
             + battleActivePlayer.getName() + sep + battleTurnNumber);

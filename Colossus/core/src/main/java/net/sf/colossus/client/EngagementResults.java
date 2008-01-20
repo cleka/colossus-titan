@@ -23,6 +23,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.WindowConstants;
 
+import net.sf.colossus.game.Legion;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.util.KDialog;
@@ -123,14 +124,14 @@ final class EngagementResults extends KDialog
      *   to this engagement, the same will happen with the next
      */
     void addData(
-        String winnerId, // null on mutual elim, flee, concede, negotiate
+        Legion winner, // null on mutual elim, flee, concede, negotiate
         String method, int points, int turns,
         List<String> attackerStartingContents,
         List<String> defenderStartingContents,
         List<Boolean> attackerStartingCertainities,
         List<Boolean> defenderStartingCertainities, boolean attackersTurn)
     {
-        Engagement result = new Engagement(winnerId, method, points, turns,
+        Engagement result = new Engagement(winner, method, points, turns,
             attackerStartingContents, defenderStartingContents,
             attackerStartingCertainities, defenderStartingCertainities, oracle);
         this.engagementLog.add(result);
@@ -351,8 +352,8 @@ final class EngagementResults extends KDialog
                 + engagementLog.size());
             this.summaryLabel.setText(result.getSummary());
             this.resultLabel.setText(result.getResultText());
-            this.attackerIdLabel.setText(result.attackerId);
-            this.defenderIdLabel.setText(result.defenderId);
+            this.attackerIdLabel.setText(result.attacker.getMarkerId());
+            this.defenderIdLabel.setText(result.defender.getMarkerId());
 
             this.firstButton.setEnabled(current != 0);
             this.prevButton.setEnabled(current != 0);
@@ -360,22 +361,22 @@ final class EngagementResults extends KDialog
             this.lastButton.setEnabled(current != engagementLog.size() - 1);
 
             this.panelCenter.removeAll();
-            this.panelCenter.add(createLegionComponent(result.attackerId,
-                result.attackerStartingContents,
+            this.panelCenter.add(createLegionComponent(result.attacker
+                .getMarkerId(), result.attackerStartingContents,
                 result.attackerStartingCertainities, false));
-            this.panelCenter.add(createLegionComponent(result.defenderId,
-                result.defenderStartingContents,
+            this.panelCenter.add(createLegionComponent(result.defender
+                .getMarkerId(), result.defenderStartingContents,
                 result.defenderStartingCertainities, true));
-            if (result.attackerId.equals(result.winnerId))
+            if (result.attacker.equals(result.winner))
             {
-                this.panelCenter.add(createLegionComponent(result.attackerId,
-                    result.attackerEndingContents,
+                this.panelCenter.add(createLegionComponent(result.attacker
+                    .getMarkerId(), result.attackerEndingContents,
                     result.attackerEndingCertainties, false));
             }
-            else if (result.defenderId.equals(result.winnerId))
+            else if (result.defender.equals(result.winner))
             {
-                this.panelCenter.add(createLegionComponent(result.defenderId,
-                    result.defenderEndingContents,
+                this.panelCenter.add(createLegionComponent(result.defender
+                    .getMarkerId(), result.defenderEndingContents,
                     result.defenderEndingCertainties, true));
             }
             else
@@ -429,10 +430,10 @@ final class EngagementResults extends KDialog
      */
     private class Engagement
     {
-        String winnerId; // null on mutual elim, flee, concede, negotiate
-        String loserId;
-        String attackerId;
-        String defenderId;
+        Legion winner; // null on mutual elim, flee, concede, negotiate
+        Legion loser;
+        Legion attacker;
+        Legion defender;
         String method;
         int points;
         int turns;
@@ -447,13 +448,13 @@ final class EngagementResults extends KDialog
         List<Boolean> attackerEndingCertainties;
         List<Boolean> defenderEndingCertainties;
 
-        public Engagement(String winnerId, String method, int points,
-            int turns, List<String> attackerStartingContents,
+        public Engagement(Legion winner, String method, int points, int turns,
+            List<String> attackerStartingContents,
             List<String> defenderStartingContents,
             List<Boolean> attackerStartingCertainities,
             List<Boolean> defenderStartingCertainities, IOracle oracle)
         {
-            this.winnerId = winnerId;
+            this.winner = winner;
             this.method = method;
             this.points = points;
             this.turns = turns;
@@ -462,18 +463,18 @@ final class EngagementResults extends KDialog
             this.attackerStartingCertainities = attackerStartingCertainities;
             this.defenderStartingCertainities = defenderStartingCertainities;
             this.hexLabel = oracle.getBattleSite();
-            this.attackerId = oracle.getAttackerMarkerId();
-            this.defenderId = oracle.getDefenderMarkerId();
+            this.attacker = oracle.getAttacker();
+            this.defender = oracle.getDefender();
             this.gameTurn = oracle.getTurnNumber();
 
             this.attackerEndingContents = oracle
-                .getLegionImageNames(this.attackerId);
+                .getLegionImageNames(this.attacker);
             this.defenderEndingContents = oracle
-                .getLegionImageNames(this.defenderId);
+                .getLegionImageNames(this.defender);
             this.attackerEndingCertainties = oracle
-                .getLegionCreatureCertainties(this.attackerId);
+                .getLegionCreatureCertainties(this.attacker);
             this.defenderEndingCertainties = oracle
-                .getLegionCreatureCertainties(this.defenderId);
+                .getLegionCreatureCertainties(this.defender);
 
             this.setWinnerAndLoserId();
         }
@@ -483,9 +484,9 @@ final class EngagementResults extends KDialog
             return "On turn "
                 + this.gameTurn
                 + ", "
-                + this.attackerId
+                + this.attacker
                 + " attacked "
-                + this.defenderId
+                + this.defender
                 + " in "
                 + VariantSupport.getCurrentVariant().getMasterBoard()
                     .getHexByLabel(this.hexLabel).getDescription();
@@ -493,20 +494,20 @@ final class EngagementResults extends KDialog
 
         private void setWinnerAndLoserId()
         {
-            this.loserId = null;
-            if (this.winnerId != null)
+            this.loser = null;
+            if (this.winner != null)
             {
-                if (this.winnerId.equals(this.attackerId))
+                if (this.winner.equals(this.attacker))
                 {
-                    this.loserId = this.defenderId;
+                    this.loser = this.defender;
                 }
-                else if (this.winnerId.equals(this.defenderId))
+                else if (this.winner.equals(this.defender))
                 {
-                    this.loserId = this.attackerId;
+                    this.loser = this.attacker;
                 }
                 else
                 {
-                    this.winnerId = null; // @todo is this case possible at all? What does it mean?
+                    this.winner = null; // @todo is this case possible at all? What does it mean?
                 }
             }
         }
@@ -516,19 +517,19 @@ final class EngagementResults extends KDialog
             String result = "bogus method";
             if (method.equals(Constants.erMethodFlee))
             {
-                result = winnerId + " won when " + loserId
-                    + " fled and earned " + this.points + " points";
+                result = winner + " won when " + loser + " fled and earned "
+                    + this.points + " points";
             }
             else if (method.equals(Constants.erMethodConcede))
             {
-                result = winnerId + " won when " + loserId
+                result = winner + " won when " + loser
                     + " conceded and earned " + this.points + " points";
             }
             else if (method.equals(Constants.erMethodConcede))
             {
-                if (winnerId != null)
+                if (winner != null)
                 {
-                    result = winnerId
+                    result = winner
                         + " won a negotiated settlement and earned "
                         + this.points + " points";
                 }
@@ -539,16 +540,16 @@ final class EngagementResults extends KDialog
             }
             else if (method.equals(Constants.erMethodFight))
             {
-                if (winnerId != null)
+                if (winner != null)
                 {
                     if (turns > 7)
                     {
-                        result = winnerId + " won the battle by time loss"
+                        result = winner + " won the battle by time loss"
                             + " and earned " + this.points + " points";
                     }
                     else
                     {
-                        result = winnerId + " won the battle in " + this.turns
+                        result = winner + " won the battle in " + this.turns
                             + " turns and earned " + this.points + " points";
                     }
                 }

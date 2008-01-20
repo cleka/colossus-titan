@@ -209,7 +209,7 @@ public final class MasterBoard extends JPanel
                     List<Marker> myMarkers = new ArrayList<Marker>();
                     for (Marker marker : client.getMarkers())
                     {
-                        LegionClientSide legionInfo = client.getLegionInfo(marker
+                        LegionClientSide legionInfo = client.getLegion(marker
                             .getId());
                         if (legionInfo.isMyLegion())
                         {
@@ -234,7 +234,7 @@ public final class MasterBoard extends JPanel
             for (int i = 0; i < markerArray.length; i++)
             {
                 Marker marker = markerArray[i];
-                LegionClientSide legion = client.getLegionInfo(marker.getId());
+                LegionClientSide legion = client.getLegion(marker.getId());
                 int scale = 2 * Scale.get();
 
                 boolean dubiousAsBlanks = client.getOptions().getOption(
@@ -1632,7 +1632,7 @@ public final class MasterBoard extends JPanel
                 // Right-click means to show the contents of the legion.
                 if (isPopupButton(e))
                 {
-                    LegionClientSide legion = client.getLegionInfo(markerId);
+                    LegionClientSide legion = client.getLegion(markerId);
                     int viewMode = client.getViewMode();
                     boolean dubiousAsBlanks = client.getOptions().getOption(
                         Options.dubiousAsBlanks);

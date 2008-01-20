@@ -22,6 +22,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import net.sf.colossus.game.Legion;
 import net.sf.colossus.util.KDialog;
 import net.sf.colossus.variant.CreatureType;
 
@@ -44,7 +45,7 @@ final class PickRecruit extends KDialog implements MouseListener,
     private final SaveWindow saveWindow;
 
     private PickRecruit(JFrame parentFrame, List<CreatureType> recruits,
-        String hexDescription, String markerId, Client client)
+        String hexDescription, Legion legion, Client client)
     {
         super(parentFrame, client.getOwningPlayer().getName()
             + ": Pick Recruit in " + hexDescription, true);
@@ -61,10 +62,10 @@ final class PickRecruit extends KDialog implements MouseListener,
         JPanel legionPane = new JPanel();
         contentPane.add(legionPane);
 
-        legionMarker = new Marker(scale, markerId);
+        legionMarker = new Marker(scale, legion.getMarkerId());
         legionPane.add(legionMarker);
 
-        List<String> imageNames = client.getLegionImageNames(markerId);
+        List<String> imageNames = client.getLegionImageNames(legion);
         Iterator<String> itName = imageNames.iterator();
         while (itName.hasNext())
         {
@@ -121,13 +122,13 @@ final class PickRecruit extends KDialog implements MouseListener,
 
     /** Return the creature recruited, or null if none. */
     static String pickRecruit(JFrame parentFrame, List<CreatureType> recruits,
-        String hexDescription, String markerId, Client client)
+        String hexDescription, Legion legion, Client client)
     {
         recruit = null;
         if (!active)
         {
             active = true;
-            new PickRecruit(parentFrame, recruits, hexDescription, markerId,
+            new PickRecruit(parentFrame, recruits, hexDescription, legion,
                 client);
             active = false;
         }

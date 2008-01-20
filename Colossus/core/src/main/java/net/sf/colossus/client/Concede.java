@@ -20,6 +20,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import net.sf.colossus.game.Legion;
 import net.sf.colossus.server.LegionServerSide;
 import net.sf.colossus.util.KDialog;
 
@@ -35,19 +36,18 @@ final class Concede extends KDialog implements ActionListener, WindowListener
     private final boolean flee;
     private Point location;
     private final Client client;
-    private final String allyMarkerId;
+    private final Legion ally;
     private final SaveWindow saveWindow;
 
-    private Concede(Client client, JFrame parentFrame, String allyMarkerId,
-        String enemyMarkerId, boolean flee)
+    private Concede(Client client, JFrame parentFrame, Legion ally,
+        Legion enemy, boolean flee)
     {
         super(parentFrame, (flee ? "Flee" : "Concede")
             + " with Legion "
-            + LegionServerSide.getLongMarkerName(allyMarkerId)
+            + LegionServerSide.getLongMarkerName(ally.getMarkerId())
             + " in "
             + client.getGame().getVariant().getMasterBoard().getHexByLabel(
-                client.getHexForLegion(allyMarkerId)).getDescription() + "?",
-            false);
+                client.getHexForLegion(ally)).getDescription() + "?", false);
 
         Container contentPane = getContentPane();
         contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
@@ -56,12 +56,12 @@ final class Concede extends KDialog implements ActionListener, WindowListener
 
         this.flee = flee;
         this.client = client;
-        this.allyMarkerId = allyMarkerId;
+        this.ally = ally;
 
         setBackground(Color.lightGray);
 
-        showLegion(allyMarkerId);
-        showLegion(enemyMarkerId);
+        showLegion(ally);
+        showLegion(enemy);
 
         JPanel buttonPane = new JPanel();
         contentPane.add(buttonPane);
@@ -97,7 +97,7 @@ final class Concede extends KDialog implements ActionListener, WindowListener
         repaint();
     }
 
-    private void showLegion(String markerId)
+    private void showLegion(Legion legion)
     {
         Box pane = new Box(BoxLayout.X_AXIS);
         pane.setAlignmentX(0);
@@ -105,11 +105,11 @@ final class Concede extends KDialog implements ActionListener, WindowListener
 
         int scale = 4 * Scale.get();
 
-        Marker marker = new Marker(scale, markerId, client);
+        Marker marker = new Marker(scale, legion.getMarkerId(), client);
         pane.add(marker);
         pane.add(Box.createRigidArea(new Dimension(scale / 4, 0)));
 
-        int points = client.getLegionInfo(markerId).getPointValue();
+        int points = ((LegionClientSide)legion).getPointValue();
         Box pointsPanel = new Box(BoxLayout.Y_AXIS);
         pointsPanel.setSize(marker.getSize());
         pointsPanel.add(new JLabel("" + points));
@@ -117,7 +117,7 @@ final class Concede extends KDialog implements ActionListener, WindowListener
         pane.add(pointsPanel);
         pane.add(Box.createRigidArea(new Dimension(scale / 4, 0)));
 
-        List<String> imageNames = client.getLegionImageNames(markerId);
+        List<String> imageNames = client.getLegionImageNames(legion);
         Iterator<String> it = imageNames.iterator();
         while (it.hasNext())
         {
@@ -127,16 +127,16 @@ final class Concede extends KDialog implements ActionListener, WindowListener
         }
     }
 
-    static void concede(Client client, JFrame parentFrame,
-        String allyMarkerId, String enemyMarkerId)
+    static void concede(Client client, JFrame parentFrame, Legion ally,
+        Legion enemy)
     {
-        new Concede(client, parentFrame, allyMarkerId, enemyMarkerId, false);
+        new Concede(client, parentFrame, ally, enemy, false);
     }
 
-    static void flee(Client client, JFrame parentFrame, String allyMarkerId,
-        String enemyMarkerId)
+    static void flee(Client client, JFrame parentFrame, Legion ally,
+        Legion enemy)
     {
-        new Concede(client, parentFrame, allyMarkerId, enemyMarkerId, true);
+        new Concede(client, parentFrame, ally, enemy, true);
     }
 
     private void cleanup(boolean answer)
@@ -146,11 +146,11 @@ final class Concede extends KDialog implements ActionListener, WindowListener
         dispose();
         if (flee)
         {
-            client.answerFlee(allyMarkerId, answer);
+            client.answerFlee(ally, answer);
         }
         else
         {
-            client.answerConcede(allyMarkerId, answer);
+            client.answerConcede(ally, answer);
         }
     }
 

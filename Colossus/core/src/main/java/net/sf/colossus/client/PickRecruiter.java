@@ -16,6 +16,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import net.sf.colossus.game.Legion;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.util.KDialog;
 
@@ -37,7 +38,7 @@ final class PickRecruiter extends KDialog implements MouseListener,
 
     /** recruiters is a list of creature name strings */
     private PickRecruiter(JFrame parentFrame, List<String> recruiters,
-        String hexDescription, String markerId, Client client)
+        String hexDescription, Legion legion, Client client)
     {
         super(parentFrame, client.getOwningPlayer().getName()
             + ": Pick Recruiter in " + hexDescription, true);
@@ -55,10 +56,10 @@ final class PickRecruiter extends KDialog implements MouseListener,
         JPanel legionPane = new JPanel();
         contentPane.add(legionPane);
 
-        legionMarker = new Marker(scale, markerId);
+        legionMarker = new Marker(scale, legion.getMarkerId());
         legionPane.add(legionMarker);
 
-        List<String> imageNames = client.getLegionImageNames(markerId);
+        List<String> imageNames = client.getLegionImageNames(legion);
         Iterator<String> it = imageNames.iterator();
         while (it.hasNext())
         {
@@ -77,7 +78,7 @@ final class PickRecruiter extends KDialog implements MouseListener,
             String recruiterName = it.next();
             if (recruiterName.equals(Constants.titan))
             {
-                recruiterName = client.getTitanBasename(markerId);
+                recruiterName = client.getTitanBasename(legion);
             }
             Chit chit = new Chit(scale, recruiterName);
             recruiterChits.add(chit);
@@ -102,9 +103,9 @@ final class PickRecruiter extends KDialog implements MouseListener,
     }
 
     static String pickRecruiter(JFrame parentFrame, List<String> recruiters,
-        String hexDescription, String markerId, Client client)
+        String hexDescription, Legion legion, Client client)
     {
-        new PickRecruiter(parentFrame, recruiters, hexDescription, markerId,
+        new PickRecruiter(parentFrame, recruiters, hexDescription, legion,
             client);
         return recruiterName;
     }

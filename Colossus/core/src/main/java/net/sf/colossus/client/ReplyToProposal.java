@@ -61,8 +61,8 @@ final class ReplyToProposal extends KDialog implements ActionListener
         attackerMarker = new Marker(scale, attackerId, client);
         attackerPane.add(attackerMarker);
 
-        List<String> attackerImageNames = client
-            .getLegionImageNames(attackerId);
+        List<String> attackerImageNames = client.getLegionImageNames(client
+            .getLegion(attackerId));
         Iterator<String> it = attackerImageNames.iterator();
         while (it.hasNext())
         {
@@ -78,8 +78,8 @@ final class ReplyToProposal extends KDialog implements ActionListener
         defenderMarker = new Marker(scale, defenderId, client);
         defenderPane.add(defenderMarker);
 
-        List<String> defenderImageNames = client
-            .getLegionImageNames(defenderId);
+        List<String> defenderImageNames = client.getLegionImageNames(client
+            .getLegion(defenderId));
         it = defenderImageNames.iterator();
         while (it.hasNext())
         {

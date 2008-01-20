@@ -4,6 +4,7 @@ package net.sf.colossus.client;
 import java.util.List;
 import java.util.Set;
 
+import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.server.Constants;
 
@@ -15,10 +16,10 @@ import net.sf.colossus.server.Constants;
  */
 public interface IClient
 {
-    public void tellEngagement(String hexLabel, String attackerId,
-        String defenderId);
+    public void tellEngagement(String hexLabel, Legion attacker,
+        Legion defender);
 
-    public void tellEngagementResults(String winnerId, String method,
+    public void tellEngagementResults(Legion winner, String method,
         int points, int turns);
 
     public void tellMovementRoll(int roll);
@@ -43,10 +44,10 @@ public interface IClient
 
     public void removeCreature(String markerId, String name, String reason);
 
-    public void revealCreatures(String markerId, final List<String> names,
+    public void revealCreatures(Legion legion, final List<String> names,
         String reason);
 
-    public void revealEngagedCreatures(String markerId,
+    public void revealEngagedCreatures(Legion legion,
         final List<String> names, boolean isAttacker, String reason);
 
     public void removeDeadBattleChits();
@@ -68,11 +69,11 @@ public interface IClient
 
     public void tellPlayerElim(Player player, Player slayer);
 
-    public void askConcede(String allyMarkerId, String enemyMarkerId);
+    public void askConcede(Legion ally, Legion enemy);
 
-    public void askFlee(String allyMarkerId, String enemyMarkerId);
+    public void askFlee(Legion ally, Legion enemy);
 
-    public void askNegotiate(String attackerId, String defenderId);
+    public void askNegotiate(Legion attacker, Legion defender);
 
     public void tellProposal(String proposalString);
 
@@ -83,7 +84,7 @@ public interface IClient
 
     public void initBattle(String masterHexLabel, int battleTurnNumber,
         Player battleActivePlayer, Constants.BattlePhase battlePhase,
-        String attackerMarkerId, String defenderMarkerId);
+        Legion attacker, Legion defender);
 
     public void cleanupBattle();
 
@@ -112,8 +113,7 @@ public interface IClient
     public void setupBattleRecruit(Player battleActivePlayer,
         int battleTurnNumber);
 
-    public void setupBattleMove(Player battleActivePlayer,
-        int battleTurnNumber);
+    public void setupBattleMove(Player battleActivePlayer, int battleTurnNumber);
 
     public void setupBattleFight(Constants.BattlePhase battlePhase,
         Player battleActivePlayer);

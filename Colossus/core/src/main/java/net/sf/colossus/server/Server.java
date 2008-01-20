@@ -19,6 +19,7 @@ import java.util.logging.Logger;
 import net.sf.colossus.client.Client;
 import net.sf.colossus.client.IClient;
 import net.sf.colossus.client.Proposal;
+import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.util.ChildThreadManager;
 import net.sf.colossus.util.Options;
@@ -457,8 +458,8 @@ public final class Server implements IServer
         addClient(client, game.getPlayer(playerName), remote);
     }
 
-    synchronized void addClient(final IClient client,
-        final Player player, final boolean remote)
+    synchronized void addClient(final IClient client, final Player player,
+        final boolean remote)
     {
         LOGGER.log(Level.FINEST, "Called Server.addClient() for "
             + player.getName());
@@ -886,8 +887,8 @@ public final class Server implements IServer
         while (it.hasNext())
         {
             IClient client = it.next();
-            client.placeNewChit(critter.getName(), critter.getMarkerId()
-                .equals(game.getBattle().getDefenderId()), critter.getTag(),
+            client.placeNewChit(critter.getName(), critter.getLegion().equals(
+                game.getBattle().getDefendingLegion()), critter.getTag(),
                 critter.getCurrentHex().getLabel());
         }
     }
@@ -902,14 +903,14 @@ public final class Server implements IServer
         }
     }
 
-    void allTellEngagementResults(String winnerId, String method, int points,
+    void allTellEngagementResults(Legion winner, String method, int points,
         int turns)
     {
         Iterator<IClient> it = clients.iterator();
         while (it.hasNext())
         {
             IClient client = it.next();
-            client.tellEngagementResults(winnerId, method, points, turns);
+            client.tellEngagementResults(winner, method, points, turns);
         }
     }
 
@@ -920,8 +921,8 @@ public final class Server implements IServer
     }
 
     /** Find out if the player wants to acquire an angel or archangel. */
-    synchronized void askAcquireAngel(PlayerServerSide player, String markerId,
-        List<String> recruits)
+    synchronized void askAcquireAngel(PlayerServerSide player,
+        String markerId, List<String> recruits)
     {
         LegionServerSide legion = game.getLegionByMarkerId(markerId);
         if (legion.getHeight() < 7)
@@ -974,7 +975,8 @@ public final class Server implements IServer
         CreatureTypeServerSide creature = null;
         if (angel != null)
         {
-            creature = (CreatureTypeServerSide)game.getVariant().getCreatureByName(angel);
+            creature = (CreatureTypeServerSide)game.getVariant()
+                .getCreatureByName(angel);
         }
         game.doSummon(legion, donor, creature);
     }
@@ -1027,10 +1029,10 @@ public final class Server implements IServer
             CreatureTypeServerSide recruiter = null;
             if (recruitName != null)
             {
-                recruit = (CreatureTypeServerSide)game.getVariant().getCreatureByName(
-                    recruitName);
-                recruiter = (CreatureTypeServerSide)game.getVariant().getCreatureByName(
-                    recruiterName);
+                recruit = (CreatureTypeServerSide)game.getVariant()
+                    .getCreatureByName(recruitName);
+                recruiter = (CreatureTypeServerSide)game.getVariant()
+                    .getCreatureByName(recruiterName);
                 if (recruit != null)
                 {
                     game.doRecruit(legion, recruit, recruiter);
@@ -1065,7 +1067,8 @@ public final class Server implements IServer
         }
     }
 
-    void didRecruit(LegionServerSide legion, CreatureTypeServerSide recruit, CreatureTypeServerSide recruiter)
+    void didRecruit(LegionServerSide legion, CreatureTypeServerSide recruit,
+        CreatureTypeServerSide recruiter)
     {
         allUpdatePlayerInfo();
 
@@ -1123,35 +1126,34 @@ public final class Server implements IServer
         game.engage(hexLabel);
     }
 
-    void allTellEngagement(String hexLabel, LegionServerSide attacker, LegionServerSide defender)
+    void allTellEngagement(String hexLabel, LegionServerSide attacker,
+        LegionServerSide defender)
     {
         LOGGER.log(Level.FINEST, "allTellEngagement() " + hexLabel);
         Iterator<IClient> it = clients.iterator();
         while (it.hasNext())
         {
             IClient client = it.next();
-            client.tellEngagement(hexLabel, attacker.getMarkerId(), defender
-                .getMarkerId());
+            client.tellEngagement(hexLabel, attacker, defender);
         }
     }
 
     /** Ask ally's player whether he wants to concede with ally. */
-    void askConcede(LegionServerSide ally, LegionServerSide enemy)
+    void askConcede(Legion ally, Legion enemy)
     {
         IClient client = getClient(ally.getPlayer());
-        client.askConcede(ally.getMarkerId(), enemy.getMarkerId());
+        client.askConcede(ally, enemy);
     }
 
-    public void concede(String markerId)
+    public void concede(Legion legion)
     {
-        LegionServerSide legion = game.getLegionByMarkerId(markerId);
         if (!getPlayer().equals(legion.getPlayer()))
         {
             LOGGER.log(Level.SEVERE, getPlayerName()
                 + " illegally called concede()");
             return;
         }
-        game.concede(markerId);
+        game.concede(legion.getMarkerId());
     }
 
     public void doNotConcede(String markerId)
@@ -1167,43 +1169,41 @@ public final class Server implements IServer
     }
 
     /** Ask ally's player whether he wants to flee with ally. */
-    void askFlee(LegionServerSide ally, LegionServerSide enemy)
+    void askFlee(Legion ally, Legion enemy)
     {
         IClient client = getClient(ally.getPlayer());
-        client.askFlee(ally.getMarkerId(), enemy.getMarkerId());
+        client.askFlee(ally, enemy);
     }
 
-    public void flee(String markerId)
+    public void flee(Legion legion)
     {
-        LegionServerSide legion = game.getLegionByMarkerId(markerId);
         if (!getPlayer().equals(legion.getPlayer()))
         {
             LOGGER.log(Level.SEVERE, getPlayerName()
                 + " illegally called flee()");
             return;
         }
-        game.flee(markerId);
+        game.flee(legion.getMarkerId());
     }
 
-    public void doNotFlee(String markerId)
+    public void doNotFlee(Legion legion)
     {
-        LegionServerSide legion = game.getLegionByMarkerId(markerId);
         if (!getPlayer().equals(legion.getPlayer()))
         {
             LOGGER.log(Level.SEVERE, getPlayerName()
                 + " illegally called doNotFlee()");
             return;
         }
-        game.doNotFlee(markerId);
+        game.doNotFlee(legion.getMarkerId());
     }
 
-    void twoNegotiate(LegionServerSide attacker, LegionServerSide defender)
+    void twoNegotiate(Legion attacker, Legion defender)
     {
         IClient client1 = getClient(defender.getPlayer());
-        client1.askNegotiate(attacker.getMarkerId(), defender.getMarkerId());
+        client1.askNegotiate(attacker, defender);
 
         IClient client2 = getClient(attacker.getPlayer());
-        client2.askNegotiate(attacker.getMarkerId(), defender.getMarkerId());
+        client2.askNegotiate(attacker, defender);
     }
 
     /** playerName makes a proposal. */
@@ -1336,9 +1336,9 @@ public final class Server implements IServer
         game.getBattle().undoMove(hexLabel);
     }
 
-    synchronized void allTellStrikeResults(CreatureServerSide striker, CreatureServerSide target,
-        int strikeNumber, List<String> rolls, int damage, int carryDamageLeft,
-        Set<String> carryTargetDescriptions)
+    synchronized void allTellStrikeResults(CreatureServerSide striker,
+        CreatureServerSide target, int strikeNumber, List<String> rolls,
+        int damage, int carryDamageLeft, Set<String> carryTargetDescriptions)
     {
         // Save strike info so that it can be reused for carries.
         this.striker = striker;
@@ -1388,7 +1388,8 @@ public final class Server implements IServer
         }
     }
 
-    synchronized void allTellHexDamageResults(CreatureServerSide target, int damage)
+    synchronized void allTellHexDamageResults(CreatureServerSide target,
+        int damage)
     {
         this.target = target;
 
@@ -1448,7 +1449,7 @@ public final class Server implements IServer
             IClient client = it.next();
             client.initBattle(masterHexLabel, battle.getTurnNumber(), battle
                 .getActivePlayer(), battle.getBattlePhase(), battle
-                .getAttackerId(), battle.getDefenderId());
+                .getAttackingLegion(), battle.getDefendingLegion());
         }
     }
 
@@ -1902,8 +1903,7 @@ public final class Server implements IServer
         while (it.hasNext())
         {
             IClient client = it.next();
-            client.revealCreatures(legion.getMarkerId(), legion
-                .getImageNames(), reason);
+            client.revealCreatures(legion, legion.getImageNames(), reason);
         }
         game.revealEvent(true, null, legion.getMarkerId(), legion
             .getImageNames());
@@ -1916,29 +1916,29 @@ public final class Server implements IServer
      * @param isAttacker true if the 'legion' is the atackker in the
      *   battle, false for the defender.
      */
-    void allRevealEngagedLegion(final LegionServerSide legion, final boolean isAttacker,
-        String reason)
+    void allRevealEngagedLegion(final LegionServerSide legion,
+        final boolean isAttacker, String reason)
     {
         Iterator<IClient> it = clients.iterator();
         while (it.hasNext())
         {
             IClient client = it.next();
-            client.revealEngagedCreatures(legion.getMarkerId(), legion
-                .getImageNames(), isAttacker, reason);
+            client.revealEngagedCreatures(legion, legion.getImageNames(),
+                isAttacker, reason);
         }
         game.revealEvent(true, null, legion.getMarkerId(), legion
             .getImageNames());
     }
 
     /** Call from History during load game only */
-    void allRevealLegion(String markerId, List<String> creatureNames,
+    void allRevealLegion(Legion legion, List<String> creatureNames,
         String reason)
     {
         Iterator<IClient> it = clients.iterator();
         while (it.hasNext())
         {
             IClient client = it.next();
-            client.revealCreatures(markerId, creatureNames, reason);
+            client.revealCreatures(legion, creatureNames, reason);
         }
     }
 
@@ -1947,8 +1947,7 @@ public final class Server implements IServer
         IClient client = getClient(player);
         if (client != null)
         {
-            client.revealCreatures(legion.getMarkerId(), legion
-                .getImageNames(), reason);
+            client.revealCreatures(legion, legion.getImageNames(), reason);
         }
         List<String> li = new ArrayList<String>();
         li.add(player.getName());
@@ -1957,13 +1956,13 @@ public final class Server implements IServer
     }
 
     /** Call from History during load game only */
-    void oneRevealLegion(Player player, String markerId,
+    void oneRevealLegion(Player player, Legion legion,
         List<String> creatureNames, String reason)
     {
         IClient client = getClient(player);
         if (client != null)
         {
-            client.revealCreatures(markerId, creatureNames, reason);
+            client.revealCreatures(legion, creatureNames, reason);
         }
     }
 
@@ -1975,7 +1974,8 @@ public final class Server implements IServer
             IClient client = it.next();
             if (client != null)
             {
-                Iterator<LegionServerSide> it2 = game.getAllLegions().iterator();
+                Iterator<LegionServerSide> it2 = game.getAllLegions()
+                    .iterator();
                 while (it2.hasNext())
                 {
                     LegionServerSide legion = it2.next();
@@ -1997,39 +1997,38 @@ public final class Server implements IServer
         }
     }
 
-    void allRevealCreatures(LegionServerSide legion, List<String> creatureNames,
-        String reason)
+    void allRevealCreatures(LegionServerSide legion,
+        List<String> creatureNames, String reason)
     {
         Iterator<IClient> it = clients.iterator();
         while (it.hasNext())
         {
             IClient client = it.next();
-            client
-                .revealCreatures(legion.getMarkerId(), creatureNames, reason);
+            client.revealCreatures(legion, creatureNames, reason);
         }
         game.revealEvent(true, null, legion.getMarkerId(), creatureNames);
     }
 
     /** Call from History during load game only */
-    void oneRevealCreatures(String playerName, String markerId,
+    void oneRevealCreatures(String playerName, Legion legion,
         List<String> creatureNames, String reason)
     {
         IClient client = getClient(game.getPlayer(playerName));
         if (client != null)
         {
-            client.revealCreatures(markerId, creatureNames, reason);
+            client.revealCreatures(legion, creatureNames, reason);
         }
     }
 
     /** Call from History during load game only */
-    void allRevealCreatures(String markerId, List<String> creatureNames,
+    void allRevealCreatures(Legion legion, List<String> creatureNames,
         String reason)
     {
         Iterator<IClient> it = clients.iterator();
         while (it.hasNext())
         {
             IClient client = it.next();
-            client.revealCreatures(markerId, creatureNames, reason);
+            client.revealCreatures(legion, creatureNames, reason);
         }
     }
 
@@ -2060,8 +2059,7 @@ public final class Server implements IServer
         client.setPlayerName(newName);
     }
 
-    synchronized void askPickColor(Player player,
-        final List<String> colorsLeft)
+    synchronized void askPickColor(Player player, final List<String> colorsLeft)
     {
         IClient client = getClient(player);
         if (client != null)
@@ -2206,5 +2204,10 @@ public final class Server implements IServer
             "User pressed 'QUIT' in startupProgress window "
                 + "- doing System.exit(1)");
         System.exit(1);
+    }
+
+    public GameServerSide getGame()
+    {
+        return game;
     }
 }

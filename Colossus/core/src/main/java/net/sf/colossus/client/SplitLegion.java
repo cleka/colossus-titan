@@ -20,6 +20,7 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 
+import net.sf.colossus.game.Legion;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.util.KDialog;
 import net.sf.colossus.xmlparser.TerrainRecruitLoader;
@@ -58,10 +59,10 @@ final class SplitLegion extends KDialog implements MouseListener,
 
     private final SaveWindow saveWindow;
 
-    private SplitLegion(Client client, String parentId, String selectedMarkerId)
+    private SplitLegion(Client client, Legion parent, String selectedMarkerId)
     {
         super(client.getBoard().getFrame(), client.getOwningPlayer().getName()
-            + ": Split Legion " + parentId, true);
+            + ": Split Legion " + parent, true);
 
         Container contentPane = getContentPane();
         contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
@@ -102,12 +103,12 @@ final class SplitLegion extends KDialog implements MouseListener,
         buttonBox = new Box(BoxLayout.X_AXIS);
         contentPane.add(buttonBox);
 
-        oldMarker = new Marker(scale, parentId);
+        oldMarker = new Marker(scale, parent.getMarkerId());
         oldBox.add(oldMarker);
         oldBox.add(Box.createRigidArea(new Dimension(scale / 4, 0)));
         oldBox.add(Box.createHorizontalGlue());
 
-        List<String> imageNames = client.getLegionImageNames(parentId);
+        List<String> imageNames = client.getLegionImageNames(parent);
         totalChits = imageNames.size();
 
         Iterator<String> it = imageNames.iterator();
@@ -157,13 +158,13 @@ final class SplitLegion extends KDialog implements MouseListener,
     }
 
     /** Return childMarkerId,splitCreature1,splitCreature2,etc. */
-    static String splitLegion(Client client, String parentId,
+    static String splitLegion(Client client, Legion parent,
         String selectedMarkerId)
     {
         if (!active)
         {
             active = true;
-            new SplitLegion(client, parentId, selectedMarkerId);
+            new SplitLegion(client, parent, selectedMarkerId);
             active = false;
             return results;
         }

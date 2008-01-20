@@ -96,7 +96,7 @@ public final class Movement
             {
                 List<String> markerIds = client.getLegionsByHex(hexLabel);
                 String markerId = markerIds.get(0);
-                LegionClientSide hex_legion = client.getLegionInfo(markerId);
+                LegionClientSide hex_legion = client.getLegion(markerId);
                 if (hex_legion.hasMoved())
                 {
                     return set;
@@ -382,7 +382,7 @@ public final class Movement
             while (it.hasNext())
             {
                 String markerId = it.next();
-                LegionClientSide other = client.getLegionInfo(markerId);
+                LegionClientSide other = client.getLegion(markerId);
                 {
                     String hexLabel = other.getHexLabel();
                     if (hexLabel != null && !client.isEngagement(hexLabel))
@@ -404,7 +404,7 @@ public final class Movement
         boolean teleport)
     {
         Set<String> entrySides = new HashSet<String>();
-        LegionClientSide legion = client.getLegionInfo(markerId);
+        LegionClientSide legion = client.getLegion(markerId);
         int movementRoll = client.getMovementRoll();
         MasterHex currentHex = client.getGame().getVariant().getMasterBoard()
             .getHexByLabel(legion.getHexLabel());

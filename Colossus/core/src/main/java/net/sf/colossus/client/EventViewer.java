@@ -37,6 +37,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 import javax.swing.border.TitledBorder;
 
+import net.sf.colossus.game.Legion;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.util.KDialog;
 import net.sf.colossus.util.Options;
@@ -142,8 +143,8 @@ final class EventViewer extends KDialog implements WindowListener,
 
     private int mulliganOldRoll = -2;
 
-    private String attackerId;
-    private String defenderId;
+    private Legion attacker;
+    private Legion defender;
 
     private RevealEvent attackerEventLegion = null;
     private RevealEvent defenderEventLegion = null;
@@ -646,7 +647,7 @@ final class EventViewer extends KDialog implements WindowListener,
 
     private LegionClientSide getLegionInfo(String marker)
     {
-        return client.getLegionInfo(marker);
+        return client.getLegion(marker);
     }
 
     // shortcuts:
@@ -728,31 +729,30 @@ final class EventViewer extends KDialog implements WindowListener,
         }
     }
 
-    public void tellEngagement(String attackerId, String defenderId,
-        int turnNumber)
+    public void tellEngagement(Legion attacker, Legion defender, int turnNumber)
     {
-        this.attackerId = attackerId;
-        this.defenderId = defenderId;
+        this.attacker = attacker;
+        this.defender = defender;
 
         attackerEventLegion = new RevealEvent(client, turnNumber,
-            getActivePlayerNum(), RevealEvent.eventBattle, attackerId,
-            getLegionInfo(attackerId).getHeight(),
+            getActivePlayerNum(), RevealEvent.eventBattle, attacker
+                .getMarkerId(), ((LegionClientSide)attacker).getHeight(),
             new ArrayList<RevealedCreature>(), null, 0);
         attackerEventLegion.setEventInfo(Constants.reasonBattleStarts);
-        attackerEventLegion.setRealPlayer(client
-            .getPlayerStateByMarkerId(attackerId));
+        attackerEventLegion.setRealPlayer((PlayerClientSide)attacker
+            .getPlayer());
 
         defenderEventLegion = new RevealEvent(client, turnNumber,
-            getActivePlayerNum(), RevealEvent.eventBattle, defenderId,
-            getLegionInfo(defenderId).getHeight(),
+            getActivePlayerNum(), RevealEvent.eventBattle, defender
+                .getMarkerId(), ((LegionClientSide)defender).getHeight(),
             new ArrayList<RevealedCreature>(), null, 0);
 
         defenderEventLegion.setEventInfo(Constants.reasonBattleStarts);
-        defenderEventLegion.setRealPlayer(client
-            .getPlayerStateByMarkerId(defenderId));
+        defenderEventLegion.setRealPlayer((PlayerClientSide)defender
+            .getPlayer());
     }
 
-    public void tellEngagementResults(String winnerId, String method, int turns)
+    public void tellEngagementResults(Legion winner, String method, int turns)
     {
         // if those are not set, we are new version client with old
         // version server, who does not provide the reason argument
@@ -765,28 +765,24 @@ final class EventViewer extends KDialog implements WindowListener,
             return;
         }
 
-        if (winnerId == null)
+        if (winner == null)
         {
-            LOGGER.log(Level.FINEST, "winnerId is null value");
-        }
-        else if (winnerId.equals("null"))
-        {
-            LOGGER.log(Level.FINEST, "winnerId is string 'null'");
+            LOGGER.log(Level.FINEST, "winner is null value");
         }
         else
         {
-            LOGGER.log(Level.FINEST, "winnerId is '" + winnerId + "'");
+            LOGGER.log(Level.FINEST, "winner is '" + winner + "'");
         }
 
-        if (winnerId == null || winnerId.equals("null"))
+        if (winner == null)
         {
             // null value = normal mutual
             // string with content "null": one legion contained titan, 
             // titan killed, some others survived, 
             // titan-killing-legion eliminated.
             // The above is for normal game. What if load from history??
-            LOGGER.log(Level.FINEST, "tellEngagementResultHandling, winner "
-                + (winnerId == null ? null : "string 'null'"));
+            LOGGER.log(Level.FINEST,
+                "tellEngagementResultHandling, winner null");
 
             // mutual elimination
             // attackerEventLegion.setAllDead();
@@ -802,8 +798,8 @@ final class EventViewer extends KDialog implements WindowListener,
         else
         {
             LOGGER.log(Level.INFO, "tellEngagementResultHandling, winner = "
-                + winnerId);
-            if (winnerId.equals(this.attackerId))
+                + winner);
+            if (winner.equals(this.attacker))
             { // attacker won:
                 winnerLegion = attackerEventLegion;
                 loserLegion = defenderEventLegion;
@@ -825,14 +821,14 @@ final class EventViewer extends KDialog implements WindowListener,
             loserLegion.setEventInfo(method);
             addEvent(loserLegion);
 
-            int winnerHeight = getLegionInfo(winnerId).getHeight();
+            int winnerHeight = winnerLegion.getHeight();
             int winnerEventHeight = winnerLegion.getHeight();
             if (winnerEventHeight != winnerHeight)
             {
                 if (winnerEventHeight != 0)
                 {
                     // @TODO: is that a problem?
-                    LOGGER.log(Level.FINEST, "Winner legion " + winnerId
+                    LOGGER.log(Level.FINEST, "Winner legion " + winner
                         + " event height mismatch: Eventheight="
                         + winnerLegion.getHeight() + ", actual height="
                         + winnerHeight);
@@ -886,7 +882,7 @@ final class EventViewer extends KDialog implements WindowListener,
         addEvent(e);
     }
 
-    public void revealCreatures(String markerId, final List<String> names,
+    public void revealCreatures(Legion legion, final List<String> names,
         String reason)
     {
         // EventViewer stuff:
@@ -903,12 +899,12 @@ final class EventViewer extends KDialog implements WindowListener,
             RevealEvent ownEvent = null;
             RevealEvent otherEvent = null;
 
-            if (markerId.equals(attackerId))
+            if (legion.equals(attacker))
             {
                 otherEvent = attackerEventLegion;
                 ownEvent = defenderEventLegion;
             }
-            else if (markerId.equals(defenderId))
+            else if (legion.equals(defender))
             {
                 otherEvent = defenderEventLegion;
                 ownEvent = attackerEventLegion;
@@ -1052,23 +1048,23 @@ final class EventViewer extends KDialog implements WindowListener,
 
     public void removeCreature(String markerId, String name)
     {
-        if (attackerId != null && attackerEventLegion != null
-            && attackerId.equals(markerId))
+        if (attacker != null && attackerEventLegion != null
+            && attacker.getMarkerId().equals(markerId))
         {
             LOGGER.log(Level.FINEST, "During battle, remove creature " + name
                 + " from attacker legion " + markerId);
 
             attackerEventLegion.setCreatureDied(name,
-                getLegionInfo(attackerId).getHeight());
+                ((LegionClientSide)attacker).getHeight());
         }
 
-        else if (defenderId != null && defenderEventLegion != null
-            && defenderId.equals(markerId))
+        else if (defender != null && defenderEventLegion != null
+            && defender.getMarkerId().equals(markerId))
         {
             LOGGER.log(Level.FINEST, "During battle, remove creature " + name
                 + " from defender legion " + markerId);
             defenderEventLegion.setCreatureDied(name,
-                getLegionInfo(defenderId).getHeight());
+                ((LegionClientSide)defender).getHeight());
         }
     }
 

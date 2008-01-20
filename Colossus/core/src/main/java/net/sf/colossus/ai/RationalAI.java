@@ -236,7 +236,7 @@ public class RationalAI extends SimpleAI
     {
         logger.log(Level.FINEST, "splitOneLegion()");
 
-        LegionClientSide legion = client.getLegionInfo(markerId);
+        LegionClientSide legion = client.getLegion(markerId);
 
         // Allow aggressive splits - especially early in the game it is better
         // to split more often -- this should get toned down later in the
@@ -315,7 +315,7 @@ public class RationalAI extends SimpleAI
             return true; //nothing to do. splitCallback() depends on this exit
         }
 
-        LegionClientSide legion = client.getLegionInfo(markerId);
+        LegionClientSide legion = client.getLegion(markerId);
         logger.log(Level.FINEST, "Split complete");
 
         if (client.getTurnNumber() == 1)
@@ -324,7 +324,7 @@ public class RationalAI extends SimpleAI
             return true;
         }
 
-        LegionClientSide child_legion = client.getLegionInfo(newMarkerId);
+        LegionClientSide child_legion = client.getLegion(newMarkerId);
 
         // Compute split value
         logger
@@ -794,7 +794,7 @@ public class RationalAI extends SimpleAI
         while (it.hasNext())
         {
             String markerId = it.next();
-            LegionClientSide legion = client.getLegionInfo(markerId);
+            LegionClientSide legion = client.getLegion(markerId);
             if (legion.hasMoved())
             {
                 moved = true;
@@ -978,7 +978,7 @@ public class RationalAI extends SimpleAI
         while (it.hasNext())
         {
             String markerId = it.next();
-            LegionClientSide legion = client.getLegionInfo(markerId);
+            LegionClientSide legion = client.getLegion(markerId);
             String hexLabel = legion.getHexLabel();
             List<String> friendlyLegions = client.getFriendlyLegions(hexLabel,
                 player);
@@ -998,7 +998,7 @@ public class RationalAI extends SimpleAI
             // pick just any legion for asking the getMovement
             Object[] legions = friendlyLegions.toArray();
             String anyLegionId = (String)legions[0];
-            LegionClientSide anyLegion = client.getLegionInfo(anyLegionId);
+            LegionClientSide anyLegion = client.getLegion(anyLegionId);
 
             if (!client.getMovement().listNormalMoves(anyLegion,
                 anyLegion.getCurrentHex(), roll).isEmpty())
@@ -1018,7 +1018,7 @@ public class RationalAI extends SimpleAI
                 Iterator<String> it2 = friendlyLegions.iterator();
                 while (it2.hasNext())
                 {
-                    LegionClientSide l = client.getLegionInfo(it2.next());
+                    LegionClientSide l = client.getLegion(it2.next());
                     int size = l.getHeight();
                     if (size < minSize)
                     {
@@ -1118,7 +1118,7 @@ public class RationalAI extends SimpleAI
         while (it.hasNext())
         {
             String markerId = it.next();
-            LegionClientSide legion = client.getLegionInfo(markerId);
+            LegionClientSide legion = client.getLegion(markerId);
 
             Set<String> set = client.getMovement().listNormalMoves(legion,
                 legion.getCurrentHex(), roll);
@@ -1162,7 +1162,7 @@ public class RationalAI extends SimpleAI
         while (it.hasNext())
         {
             String markerId = it.next();
-            LegionClientSide legion = client.getLegionInfo(markerId);
+            LegionClientSide legion = client.getLegion(markerId);
             int value = legion.getPointValue();
 
             if (legion.hasTitan())
@@ -1192,7 +1192,7 @@ public class RationalAI extends SimpleAI
 
         // Now decide where we move this unlucky one to:
 
-        LegionClientSide minLegion = client.getLegionInfo(minValueMarker);
+        LegionClientSide minLegion = client.getLegion(minValueMarker);
         Set<String> minValueMoves = client.getMovement().listNormalMoves(
             minLegion, minLegion.getCurrentHex(), roll);
 
@@ -1385,7 +1385,7 @@ public class RationalAI extends SimpleAI
                 }
                 // now we know we have a split legion not moving since
                 // that is the only way to have a noMove conflict
-                LegionClientSide legion = client.getLegionInfo(lm.markerId);
+                LegionClientSide legion = client.getLegion(lm.markerId);
                 Set<String> moves = client.getMovement().listNormalMoves(
                     legion, legion.getCurrentHex(), client.getMovementRoll());
                 for (String dest : moves)
@@ -1753,7 +1753,7 @@ public class RationalAI extends SimpleAI
 
         if (enemyMarkerId != null)
         {
-            LegionClientSide defender = client.getLegionInfo(enemyMarkerId);
+            LegionClientSide defender = client.getLegion(enemyMarkerId);
             if (!attacker.getPlayer().equals(defender.getPlayer()))
             {
                 value = evaluateCombat(attacker, defender, hex);

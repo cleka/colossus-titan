@@ -26,6 +26,7 @@ import net.sf.colossus.client.BattleHex;
 import net.sf.colossus.client.BattleMap;
 import net.sf.colossus.client.HexMap;
 import net.sf.colossus.client.Proposal;
+import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.util.Options;
 import net.sf.colossus.util.ResourceLoader;
@@ -75,7 +76,7 @@ public final class GameServerSide extends net.sf.colossus.game.Game
     private boolean acquiring;
     private int pointsScored;
     private int turnCombatFinished;
-    private String winnerId;
+    private Legion winner;
     private String engagementResult;
     private boolean pendingAdvancePhase;
     private boolean loadingGame;
@@ -2531,8 +2532,7 @@ public final class GameServerSide extends net.sf.colossus.game.Game
         }
         battleInProgress = false;
 
-        setEngagementResult(Constants.erMethodFight, winner == null ? null
-            : winner.getMarkerId(), points, turnDone);
+        setEngagementResult(Constants.erMethodFight, winner, points, turnDone);
         checkEngagementDone();
     }
 
@@ -3045,7 +3045,7 @@ public final class GameServerSide extends net.sf.colossus.game.Game
         // the battle.
         String method = fled ? Constants.erMethodFlee
             : Constants.erMethodConcede;
-        setEngagementResult(method, winner.getMarkerId(), points, 0);
+        setEngagementResult(method, winner, points, 0);
         checkEngagementDone();
     }
 
@@ -3173,8 +3173,7 @@ public final class GameServerSide extends net.sf.colossus.game.Game
             }
         }
 
-        setEngagementResult(Constants.erMethodNegotiate, winner == null ? null
-            : winner.getMarkerId(), points, 0);
+        setEngagementResult(Constants.erMethodNegotiate, winner, points, 0);
         checkEngagementDone();
     }
 
@@ -3191,11 +3190,11 @@ public final class GameServerSide extends net.sf.colossus.game.Game
         checkEngagementDone();
     }
 
-    private void setEngagementResult(String aResult, String aWinner,
+    private void setEngagementResult(String aResult, Legion winner,
         int aPoints, int aTurn)
     {
         engagementResult = aResult;
-        winnerId = aWinner;
+        this.winner = winner;
         pointsScored = aPoints;
         turnCombatFinished = aTurn;
     }
@@ -3211,7 +3210,7 @@ public final class GameServerSide extends net.sf.colossus.game.Game
 
         server.allUpdatePlayerInfo();
 
-        server.allTellEngagementResults(winnerId, engagementResult,
+        server.allTellEngagementResults(winner, engagementResult,
             pointsScored, turnCombatFinished);
 
         engagementResult = null;

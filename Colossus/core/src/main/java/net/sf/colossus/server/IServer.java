@@ -1,6 +1,9 @@
 package net.sf.colossus.server;
 
 
+import net.sf.colossus.game.Legion;
+
+
 /**
  *  IServer is an interface for the client-accessible parts of Server.
  *  @version $Id$
@@ -23,13 +26,13 @@ public interface IServer
 
     public void engage(String hexLabel);
 
-    public void concede(String markerId);
+    public void concede(Legion legion);
 
     public void doNotConcede(String markerId);
 
-    public void flee(String markerId);
+    public void flee(Legion legion);
 
-    public void doNotFlee(String markerId);
+    public void doNotFlee(Legion legion);
 
     public void makeProposal(String proposalString);
 

@@ -29,8 +29,9 @@ final class BattleMovement
 
     /** Recursively find moves from this hex.  Return an array of hex IDs for
      *  all legal destinations.  Do not double back.  */
-    private Set<String> findMoves(BattleHex hex, CreatureTypeServerSide creature,
-        boolean flies, int movesLeft, int cameFrom, boolean first)
+    private Set<String> findMoves(BattleHex hex,
+        CreatureTypeServerSide creature, boolean flies, int movesLeft,
+        int cameFrom, boolean first)
     {
         Set<String> set = new HashSet<String>();
         for (int i = 0; i < 6; i++)
@@ -130,15 +131,15 @@ final class BattleMovement
         {
             if (HexMap.terrainHasStartlist(client.getBattleTerrain())
                 && (client.getBattleTurnNumber() == 1)
-                && client.getBattleActiveMarkerId().equals(
-                    client.getDefenderMarkerId()))
+                && client.getBattleActiveLegion().equals(client.getDefender()))
             {
                 set = findUnoccupiedStartlistHexes();
             }
             else
             {
-                CreatureTypeServerSide creature = (CreatureTypeServerSide)client.getGame().getVariant()
-                    .getCreatureByName(chit.getCreatureName());
+                CreatureTypeServerSide creature = (CreatureTypeServerSide)client
+                    .getGame().getVariant().getCreatureByName(
+                        chit.getCreatureName());
                 BattleHex hex = client.getBattleHex(chit);
                 set = findMoves(hex, creature, creature.isFlier(), creature
                     .getSkill(), -1, true);

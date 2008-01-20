@@ -9,15 +9,22 @@ import net.sf.colossus.variant.BattleLand;
  */
 public class Battle
 {
+    private final Game game;
     private final Legion attacker;
     private final Legion defender;
     private final BattleLand land;
 
-    public Battle(Legion attacker, Legion defender, BattleLand land)
+    public Battle(Game game, Legion attacker, Legion defender, BattleLand land)
     {
+        this.game = game;
         this.attacker = attacker;
         this.defender = defender;
         this.land = land;
+    }
+
+    public Game getGame()
+    {
+        return game;
     }
 
     public Legion getAttackingLegion()

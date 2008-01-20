@@ -19,6 +19,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
+import net.sf.colossus.game.Legion;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.util.KDialog;
 
@@ -31,8 +32,8 @@ import net.sf.colossus.util.KDialog;
 
 final class Negotiate extends KDialog implements MouseListener, ActionListener
 {
-    private final String attackerId;
-    private final String defenderId;
+    private final Legion attacker;
+    private final Legion defender;
     private final List<Chit> attackerChits = new ArrayList<Chit>();
     private final List<Chit> defenderChits = new ArrayList<Chit>();
     private final Client client;
@@ -40,14 +41,14 @@ final class Negotiate extends KDialog implements MouseListener, ActionListener
     private Point location;
     private final SaveWindow saveWindow;
 
-    Negotiate(Client client, String attackerId, String defenderId)
+    Negotiate(Client client, Legion attacker, Legion defender)
     {
         super(client.getBoard().getFrame(), client.getOwningPlayer().getName()
-            + ": " + attackerId + " Negotiates with " + defenderId, false);
+            + ": " + attacker + " Negotiates with " + defender, false);
 
         this.client = client;
-        this.attackerId = attackerId;
-        this.defenderId = defenderId;
+        this.attacker = attacker;
+        this.defender = defender;
 
         Container contentPane = getContentPane();
         contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
@@ -55,8 +56,8 @@ final class Negotiate extends KDialog implements MouseListener, ActionListener
         setBackground(Color.lightGray);
         addMouseListener(this);
 
-        showLegion(attackerId, attackerChits);
-        showLegion(defenderId, defenderChits);
+        showLegion(attacker, attackerChits);
+        showLegion(defender, defenderChits);
 
         JButton button1 = new JButton("Offer");
         button1.setMnemonic(KeyEvent.VK_O);
@@ -88,7 +89,7 @@ final class Negotiate extends KDialog implements MouseListener, ActionListener
         repaint();
     }
 
-    private void showLegion(String markerId, List<Chit> chits)
+    private void showLegion(Legion legion, List<Chit> chits)
     {
         Box pane = new Box(BoxLayout.X_AXIS);
         pane.setAlignmentX(0);
@@ -96,11 +97,11 @@ final class Negotiate extends KDialog implements MouseListener, ActionListener
 
         int scale = 4 * Scale.get();
 
-        Marker marker = new Marker(scale, markerId);
+        Marker marker = new Marker(scale, legion.getMarkerId());
         pane.add(marker);
         pane.add(Box.createRigidArea(new Dimension(scale / 4, 0)));
 
-        List<String> imageNames = client.getLegionImageNames(markerId);
+        List<String> imageNames = client.getLegionImageNames(legion);
         Iterator<String> it = imageNames.iterator();
         while (it.hasNext())
         {
@@ -172,22 +173,22 @@ final class Negotiate extends KDialog implements MouseListener, ActionListener
             if (!attackersLeft && !defendersLeft)
             {
                 // Mutual destruction.
-                proposal = new Proposal(attackerId, defenderId, false, true,
-                    null, null);
+                proposal = new Proposal(attacker.getMarkerId(), defender
+                    .getMarkerId(), false, true, null, null);
             }
             else
             {
-                String winnerMarkerId;
-                java.util.List<Chit> winnerChits;
+                Legion winnerLegion;
+                List<Chit> winnerChits;
 
                 if (!defendersLeft)
                 {
-                    winnerMarkerId = attackerId;
+                    winnerLegion = attacker;
                     winnerChits = attackerChits;
                 }
                 else
                 {
-                    winnerMarkerId = defenderId;
+                    winnerLegion = defender;
                     winnerChits = defenderChits;
                 }
 
@@ -207,7 +208,7 @@ final class Negotiate extends KDialog implements MouseListener, ActionListener
                 }
 
                 // Remove all dead creatures from the winning legion.
-                java.util.List<String> winnerLosses = new ArrayList<String>();
+                List<String> winnerLosses = new ArrayList<String>();
                 it = winnerChits.iterator();
                 while (it.hasNext())
                 {
@@ -222,8 +223,9 @@ final class Negotiate extends KDialog implements MouseListener, ActionListener
                         winnerLosses.add(name);
                     }
                 }
-                proposal = new Proposal(attackerId, defenderId, false, false,
-                    winnerMarkerId, winnerLosses);
+                proposal = new Proposal(attacker.getMarkerId(), defender
+                    .getMarkerId(), false, false, winnerLegion.getMarkerId(),
+                    winnerLosses);
             }
 
             // Exit this dialog.
@@ -232,8 +234,8 @@ final class Negotiate extends KDialog implements MouseListener, ActionListener
 
         else if (e.getActionCommand().equals("Fight"))
         {
-            proposal = new Proposal(attackerId, defenderId, true, false, null,
-                null);
+            proposal = new Proposal(attacker.getMarkerId(), defender
+                .getMarkerId(), true, false, null, null);
 
             // Exit this dialog.
             cleanup();
