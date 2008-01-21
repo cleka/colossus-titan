@@ -1,5 +1,8 @@
-# Example WebServer.cf file, for windows;
-# For usage rename to WebServer.cf and adjust pathnames
+# Templae WebServer.cf file, for windows;
+# For usage:
+# - copy this file to WebServer.cf and adjust pathnames
+# - copy example.users.dat e.g. to users.dat and change name in
+#   UsersFile line below
 #
 # @version $Id$
 # @author Clemens Katzer
@@ -11,7 +14,7 @@ MaxUsers=500
 PortRangeFrom=26767
 AvailablePorts=20
 UsersFile=users.dat
-JavaCommand=C:\\apps\\j2sdk_1.4.2_12\\bin\\java.exe
+JavaCommand=C:\\apps\\j2sdk_1.5.0_07\\bin\\java.exe
 ColossusJar=C:\\workspace\\colossus\\Colossus.jar
 LogPropTemplate=C:\\workspace\\colossus\\logging.properties
 WorkFilesBaseDir=C:\\temp\\colossus

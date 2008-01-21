@@ -1,5 +1,8 @@
-# Example WebServer.cf file, for unix;
-# For usage rename to WebServer.cf and adjust pathnames
+# Template WebServer.cf file, for unix;
+# For usage:
+# - copy this file to WebServer.cf and adjust pathnames
+# - copy example.users.dat e.g. to users.dat and change name in
+#   UsersFile line below
 #
 # @version $Id$
 # @author Clemens Katzer
