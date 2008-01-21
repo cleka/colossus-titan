@@ -37,18 +37,20 @@ and open it with your favorite editor.
 <P>
 Typically you will have to edit the lines with the following keys:
 <PRE>
-JavaCommand=C:\\apps\\j2sdk_1.4.2_12\\bin\\java.exe
+UsersFile=example.users.dat
+JavaCommand=C:\\apps\\j2sdk_1.5.0_07\\bin\\java.exe
 ColossusJar=C:\\workspace\\ColossusSVNJavaRaw\\Colossus.jar
 LogPropTemplate=C:\\workspace\\ColossusSVNJavaRaw\\logging.properties
 WorkFilesBaseDir=C:\\temp\\SomeColossus
 </PRE>
+Copy example.users.dat to a new name (e.g. users.dat) and change the
+setting here to that name (otherwise subversion will always flag this
+file as modified and you might accidentally submit the changed file to 
+the repository).
+<P>
 Make JavaCommand point to your Java binary. (The WebServer starts a new 
 java binary with a System.exec call - depending on the environment setup
 it may or may not be sufficient that java binary is in the PATH.)
-<P>I mostly tested it against Java 1.4.2. Peter once tested it against 1.6, 
-he reported one problem (Thread now defined a getState(), which name I
-had used, too; now fixed); if there is anything else not working in 
-1.5 or 1.6 let me know!
 <P>
 Edit ColossusJar and LogPropTemplate to point to your Colossus Directory
 in which you built the new jars.
