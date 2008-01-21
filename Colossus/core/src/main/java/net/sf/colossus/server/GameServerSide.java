@@ -303,11 +303,11 @@ public final class GameServerSide extends net.sf.colossus.game.Game
         return getUniqueName(name + Dice.rollDie());
     }
 
-    /** Return the index of the correct player for a new remote client.
+    /** Find a Player for a new remote client.
      *  If loading a game, this is the network player with a matching
      *  player name.  If a new game, it's the first network player whose
      *  name is still set to <By client> */
-    int findNetworkSlot(final Player player)
+    Player findNetworkPlayer(final String playerName)
     {
         for (int i = 0; i < getNumPlayers(); i++)
         {
@@ -317,21 +317,21 @@ public final class GameServerSide extends net.sf.colossus.game.Game
             {
                 if (isLoadingGame())
                 {
-                    if (player.equals(curPlayer))
+                    if (curPlayer.getName().equals(playerName))
                     {
-                        return i;
+                        return curPlayer;
                     }
                 }
                 else
                 {
                     if (curPlayer.getName().startsWith(Constants.byClient))
                     {
-                        return i;
+                        return curPlayer;
                     }
                 }
             }
         }
-        return -1;
+        return null;
     }
 
     private void syncAutoPlay()
@@ -3597,12 +3597,13 @@ public final class GameServerSide extends net.sf.colossus.game.Game
             }
         }
 
-        public void gotClient(Player player, String type)
+        public void gotClient(Player player, boolean remote)
         {
             if (active)
             {
-                out.println("Client (type " + type + ") connected: "
-                    + player.getName());
+                out.println("Client (type " +
+                    (remote ? "remote" : "local") + ") connected: " +
+                    player.getName());
                 out.flush();
             }
         }

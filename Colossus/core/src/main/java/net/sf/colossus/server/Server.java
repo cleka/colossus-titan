@@ -450,34 +450,46 @@ public final class Server implements IServer
         new Client("127.0.0.1", port, dummyGame, playerName, false, false);
     }
 
-    // TODO temporary method since SocketServerThread doesn't know the player nor the
-    // game, thus can't pass a Player instance directly
+    // TODO temporary method since SocketServerThread doesn't know the player
+    // nor the game, thus can't pass a Player instance directly [Peter]
+    // XXX Still TODO? Replaced the two methods by one, because 
+    // SocketServerThread cannot know the Player, and for finding it the 
+    // if (remote) decision needs to be done 
+    // -- so folded both methods into one again to avoid the NPE [Clemens]
     synchronized void addClient(final IClient client, final String playerName,
         final boolean remote)
     {
-        addClient(client, game.getPlayer(playerName), remote);
-    }
+        LOGGER.log(Level.FINEST, "Calling Server.addClient() for "
+            + playerName);
 
-    synchronized void addClient(final IClient client, final Player player,
-        final boolean remote)
-    {
-        LOGGER.log(Level.FINEST, "Called Server.addClient() for "
-            + player.getName());
+        Player player = null;
+        if (remote)
+        {
+            player = game.findNetworkPlayer(playerName);
+        }
+        else
+        {
+            player = game.getPlayer(playerName);
+        }
+
+        if (player == null)
+        {
+            LOGGER.log(Level.WARNING, "Could not add client, " +
+                "because no Player was found for playerName " + playerName);
+            return;
+        }
+
         clients.add(client);
 
         if (remote)
         {
             addRemoteClient(client, player);
-            logToStartLog("Remote player " + player.getName() + " signed on.");
-            game.getNotifyWebServer().gotClient(player, "remote");
         }
-        else
-        {
-            addLocalClient(client, player);
-            logToStartLog("Local player " + player.getName() + " signed on.");
-            game.getNotifyWebServer().gotClient(player, "local");
-        }
-
+        
+        clientMap.put(player, client);
+        logToStartLog((remote ? "Remote" : "Local") + " player " +
+            player.getName() + " signed on.");
+        game.getNotifyWebServer().gotClient(player, remote);
         waitingForClients--;
         LOGGER.log(Level.INFO, "Decremented waitingForClients to "
             + waitingForClients);
@@ -508,19 +520,8 @@ public final class Server implements IServer
         }
     }
 
-    private void addLocalClient(final IClient client, final Player player)
-    {
-        clientMap.put(player, client);
-    }
-
     private void addRemoteClient(final IClient client, final Player player)
     {
-        int slot = game.findNetworkSlot(player);
-        if (slot == -1)
-        {
-            return;
-        }
-
         RemoteLogHandler remoteLogHandler = new RemoteLogHandler();
         remoteLogHandler.setServer(this);
         LOGGER.addHandler(remoteLogHandler);
@@ -534,8 +535,6 @@ public final class Server implements IServer
             // In case we had to change a duplicate name.
             setPlayerName(player, player.getName());
         }
-
-        clientMap.put(player, client);
     }
 
     void disposeAllClients()
