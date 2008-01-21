@@ -58,21 +58,6 @@
      (the current directory); you&#39;ll add stuff to it later as you add Java
     tools. A few tools directly use JAVA_HOME. It also lets you easily switch
     JDKs by changing one environment variable.</p>
-    <h4>Other compilers</h4>
-    <p>
-    <a
-    href="http://oss.software.ibm.com/developerworks/opensource/jikes/">Jikes</a>
-     is a very fast Open Source Java compiler originally written by IBM. I
-    don&#39;t recommend using it anymore, because it produces slightly
-    different class files than javac. If you need the speed, the combination of
-    
-    <a href="http://jakarta.apache.org/ant/">Ant</a>
-     and 
-    <a
-    href="http://www.experimentalstuff.com/Technologies/JavaMake/">Javamake</a>
-     helps a lot by compiling all files in one Java process, and only
-    recompiling the files that need to be recompiled.  The JavaMake jars are
-    included in the Colossus libs/ subdirectory; include it in your CLASSPATH.</p>
     <h4>Build tools</h4>
     <a href="http://jakarta.apache.org/ant/">Ant</a>
      is a newer cross-platform build tool used by many Java projects. It&#39;s
@@ -86,11 +71,6 @@
      in your 
     <b>PATH</b>
      .</p>
-    <p>
-    <a
-    href="http://www.experimentalstuff.com/Technologies/JavaMake/">Javamake</a>
-     is a Java dependency checker from Sun Labs. It allows us to recompile only
-    the classes that need to be recompiled.</p>
     <h4>Source code control</h4>
     <p>We use 
     <a href="http://cvshome.org">CVS</a>
