@@ -16,7 +16,7 @@
     <p>All of these tools are free downloads, and we need to avoid making the
     game depend on tools that aren&#39;t.</p>
     <p>Where practical (a combination of friendly licensing and reasonably small
-    size), we now put the tools in CVS, in the libs/ subdirectory.  If you
+    size), we now put the tools in SVN, in the libs/ subdirectory.  If you
     add $COLOSSUS_HOME/libs to your CLASSPATH, you can use these tools without
     further configuration.
     <h4>Java development kit</h4>
@@ -73,32 +73,20 @@
      .</p>
     <h4>Source code control</h4>
     <p>We use 
-    <a href="http://cvshome.org">CVS</a>
+    <a href="http://subversion.tigris.org">Subversion</a>
      , with the repository hosted on 
     <a href="http://sf.net">SourceForge</a>
      .</p>
     <p>SourceForge requires using 
     <a href="http://www.openssh.com">ssh</a>
-     instead of the insecure pserver as a transport mechanism, which
-    complicates cvs setup a bit. There are a lot of CVS + ssh setup directions
-    on 
+     as a transport mechanism, which complicates setup a bit. There are a lot 
+     of svn + ssh setup directions on 
     <a href="http://sourceforge.net/docman/?group_id=1">SF</a>
      . If you can&#39;t get it to work, ask for help.</p>
     <p>If you&#39;re using Windows try 
     <a href="http://www.chiark.greenend.org.uk/~sgtatham/putty/">PuTTY</a>
-     for a good free SSH/Telnet client. . If you&#39;re using Unix (bash
-    syntax, I assume you can convert to csh or whatever):</p>
-    <pre>
-    export CVSROOT=username@cvs1.sourceforge.net:/cvsroot/colossus 
-    export CVS_RSH=ssh
-    </pre>
-    <p>
-    If you&#39;re using Windows:</p>
-    <pre>
-    set CVSROOT=username@cvs1.sourceforge.net:/cvsroot/colossus 
-    set CVS_RSH=c:/putty/plink.exe 
-    set PLINK_PROTOCOL=ssh
-    </pre>
+     for a good free SSH/Telnet client.  If you're using anything else, use
+     <a href="http://www.openssh.com">OpenSSH</a>, which should already be installed.
     <h4>Java Web Start</h4>
     <p>If your JDK didn&#39;t include 
     <a href="http://java.sun.com/products/javawebstart/">Java Web Start</a>
@@ -143,7 +131,7 @@
     conventions. If your editor can&#39;t do these, then you&#39;ll need to run
     
     <b>ant fix</b>
-     on your code before checking it into CVS, to avoid creating whole-file
+     on your code before checking it into SVN, to avoid creating whole-file
     false diffs or files that look awful if someone has different tab stop
     settings than yours. (Yes, cross-platform development adds a few wrinkles.)
     Two popular, powerful, free, portable editors are 
@@ -179,18 +167,6 @@
     but it was way too slow to be usable for Colossus, presumably because it
     records every instruction rather than a sample.
     </p>
-    <h4>Code reformatters</h4>
-    <p>If you just can&#39;t work with 
-    <a href="CodingStandards.html">our format</a>
-     then you need a tool to convert files to and from your personal pet format
-    to the one this project uses. 
-    <a href="http://www.tiobe.com/jacobe.htm">Jacobe</a>
-     is free (but not open source) and works pretty well. It&#39;s available
-    for Windows and Linux. See CVSROOT/colossus-jacobe.cfg
-    </p>
-    <p>Another one that looks promising is
-    <a href="http://jalopy.sf.net">Jalopy</a>
-    <p>Unfortunately, neither breaks long lines perfectly.</p>
     <h4>Image editors</h4>
     <p>Currently all images used in Colossus are GIFs or PNGs. (Though
     we&#39;re starting to experiment with SVG.) JPEGs are great for photos but
@@ -214,7 +190,7 @@
     <p>First you need all the source files. Snag the latest zip file from 
     <a
     href="http://colossus.sf.net/download">http://colossus.sf.net/download/</a>
-     or (to get the newest possible code) pull from CVS.</p>
+     or (to get the newest possible code) pull from SVN.</p>
     <p>If you just type 
     <b>ant</b>
      from the project base directory, then you get the default target, which
