@@ -480,13 +480,13 @@ public final class Server implements IServer
         }
 
         clients.add(client);
+        clientMap.put(player, client);
 
         if (remote)
         {
             addRemoteClient(client, player);
         }
         
-        clientMap.put(player, client);
         logToStartLog((remote ? "Remote" : "Local") + " player " +
             player.getName() + " signed on.");
         game.getNotifyWebServer().gotClient(player, remote);
