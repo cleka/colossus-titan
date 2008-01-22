@@ -39,7 +39,36 @@
 #   -N or --count           = stop latest after N counts
 #   -R or --remote          = nr. of remote clients
 #   -A or --aggressive      = grab more resources from the OS
+#
 
+
+# Before the first writing, call rememberSize to remember the number of lines
+# in the file (given to function as argument).
+# After writing, call showNew to tail the added lines from that file
+# (arg1) to a separate file (arg2).
+#
+function rememberSize ()
+{
+  FILE=$1
+  if [ -e $FILE ]
+  then
+      size=`wc -l $1 | cut -d " " -f 1`
+  else
+      # Let's assume it's created afterwards from scratch
+      size=0
+  fi
+}
+
+function showNew()
+{
+  FILE=$1
+  PARTFILE=$2
+  startline=`expr $size + 1`
+  tail -n +$startline $FILE > $PARTFILE
+  partsize=`wc -l $PARTFILE | cut -d " " -f 1`
+
+  size=`expr $size + $partsize`
+}
 
 if [ ! -e Colossus.jar ]
 then
@@ -48,9 +77,6 @@ then
   echo ""
   exit 1
 fi
-
-# this defines the two functions to get just the added part from the log:
-. logFollowing.sh
 
 
 FORCEBOARD=""
@@ -259,9 +285,9 @@ do
     then
       echo -e "Exit code is non-zero ($ec) - \c"
       mkbackup=y
-    elif grep -e "SEVERE" -e WARNING -e Exception part.$i.log
+    elif grep -e "SEVERE" -e WARNING -e Exception $TEST_WORKDIR/part.$i.log
     then
-      echo -e "Found SEVERE, WARNING or Exception in part.$i.log - \c"
+      echo -e "Found SEVERE, WARNING or Exception in $TEST_WORKDIR/part.$i.log - \c"
       mkbackup=y
     elif [ -e backup.flag ]
     then
