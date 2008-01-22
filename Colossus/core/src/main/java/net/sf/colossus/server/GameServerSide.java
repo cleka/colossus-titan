@@ -1856,16 +1856,15 @@ public final class GameServerSide extends net.sf.colossus.game.Game
      * Return true if this legion can recruit this recruit
      * without disclosing a recruiter.
      */
-    private boolean anonymousRecruitLegal(LegionServerSide legion,
-        CreatureTypeServerSide recruit)
+    private boolean anonymousRecruitLegal(Legion legion, CreatureType recruit)
     {
-        return TerrainRecruitLoader.anonymousRecruitLegal(recruit, legion
-            .getCurrentHex().getTerrain(), legion.getCurrentHex().getLabel());
+        return TerrainRecruitLoader.anonymousRecruitLegal(recruit,
+            ((LegionServerSide)legion).getCurrentHex().getTerrain(),
+            ((LegionServerSide)legion).getCurrentHex().getLabel());
     }
 
     /** Add recruit to legion. */
-    void doRecruit(LegionServerSide legion, CreatureTypeServerSide recruit,
-        CreatureTypeServerSide recruiter)
+    void doRecruit(Legion legion, CreatureType recruit, CreatureType recruiter)
     {
         if (recruit == null)
         {
@@ -1898,9 +1897,10 @@ public final class GameServerSide extends net.sf.colossus.game.Game
 
         lastRecruitTurnNumber = turnNumber;
 
-        if (legion.addCreature(recruit, true))
+        if (((LegionServerSide)legion).addCreature(
+            (CreatureTypeServerSide)recruit, true))
         {
-            MasterHex hex = legion.getCurrentHex();
+            MasterHex hex = ((LegionServerSide)legion).getCurrentHex();
             int numRecruiters = 0;
 
             if (recruiter != null)
@@ -1911,7 +1911,7 @@ public final class GameServerSide extends net.sf.colossus.game.Game
             }
 
             LOGGER.log(Level.INFO, "Legion "
-                + legion.getLongMarkerName()
+                + legion
                 + " in "
                 + hex.getDescription()
                 + " recruits "
@@ -1923,7 +1923,7 @@ public final class GameServerSide extends net.sf.colossus.game.Game
                         : recruiter.getName())));
 
             // Recruits are one to a customer.
-            legion.setRecruitName(recruit.getName());
+            ((LegionServerSide)legion).setRecruitName(recruit.getName());
             reinforcing = false;
         }
     }
@@ -2000,12 +2000,11 @@ public final class GameServerSide extends net.sf.colossus.game.Game
      *  the direction you just came from.  Return a set of
      *  hexLabel:entrySide tuples. */
     private synchronized Set<String> findNormalMoves(MasterHex hex,
-        LegionServerSide legion, int roll, int block, int cameFrom,
-        boolean ignoreFriends)
+        Legion legion, int roll, int block, int cameFrom, boolean ignoreFriends)
     {
         Set<String> set = new HashSet<String>();
         String hexLabel = hex.getLabel();
-        PlayerServerSide player = legion.getPlayer();
+        Player player = legion.getPlayer();
 
         // If there are enemy legions in this hex, mark it
         // as a legal move and stop recursing.  If there is
@@ -2031,15 +2030,13 @@ public final class GameServerSide extends net.sf.colossus.game.Game
             // XXX fix
             // This hex is the final destination.  Mark it as legal if
             // it is unoccupied by friendly legions.
-            List<LegionServerSide> legions = player.getLegions();
-            Iterator<LegionServerSide> it = legions.iterator();
-            while (it.hasNext())
+            List<? extends Legion> legions = player.getLegions();
+            for (Legion otherLegion : legions)
             {
-                // Account for spin cycles.
-                LegionServerSide otherLegion = it.next();
-
-                if (!ignoreFriends && otherLegion != legion
-                    && hexLabel.equals(otherLegion.getCurrentHexLabel()))
+                if (!ignoreFriends
+                    && otherLegion != legion
+                    && hexLabel.equals(((LegionServerSide)otherLegion)
+                        .getCurrentHexLabel()))
                 {
                     return set;
                 }
@@ -2089,7 +2086,7 @@ public final class GameServerSide extends net.sf.colossus.game.Game
     /** Recursively find all unoccupied hexes within roll hexes, for
      *  tower teleport. */
     private Set<String> findNearbyUnoccupiedHexes(MasterHex hex,
-        LegionServerSide legion, int roll, int cameFrom, boolean ignoreFriends)
+        Legion legion, int roll, int cameFrom, boolean ignoreFriends)
     {
         // This hex is the final destination.  Mark it as legal if
         // it is unoccupied.
@@ -2145,10 +2142,10 @@ public final class GameServerSide extends net.sf.colossus.game.Game
     /** Return set of hexLabels describing where this legion can move
      *  without teleporting.  Include moves currently blocked by friendly
      *  legions if ignoreFriends is true. */
-    Set<String> listNormalMoves(LegionServerSide legion, MasterHex hex,
+    Set<String> listNormalMoves(Legion legion, MasterHex hex,
         int movementRoll, boolean ignoreFriends)
     {
-        if (legion.hasMoved())
+        if (((LegionServerSide)legion).hasMoved())
         {
             return new HashSet<String>();
         }
@@ -2224,18 +2221,20 @@ public final class GameServerSide extends net.sf.colossus.game.Game
     /** Return set of hexLabels describing where this legion can teleport.
      *  Include moves currently blocked by friendly legions if
      *  ignoreFriends is true. */
-    Set<String> listTeleportMoves(LegionServerSide legion, MasterHex hex,
+    Set<String> listTeleportMoves(Legion legion, MasterHex hex,
         int movementRoll, boolean ignoreFriends)
     {
-        PlayerServerSide player = legion.getPlayer();
+        Player player = legion.getPlayer();
         Set<String> set = new HashSet<String>();
-        if (movementRoll != 6 || legion.hasMoved() || player.hasTeleported())
+        if (movementRoll != 6 || ((LegionServerSide)legion).hasMoved()
+            || ((PlayerServerSide)player).hasTeleported())
         {
             return set;
         }
 
         // Tower teleport
-        if (HexMap.terrainIsTower(hex.getTerrain()) && legion.numLords() > 0
+        if (HexMap.terrainIsTower(hex.getTerrain())
+            && ((LegionServerSide)legion).numLords() > 0
             && towerTeleportAllowed())
         {
             // Mark every unoccupied hex within 6 hexes.
@@ -2282,8 +2281,8 @@ public final class GameServerSide extends net.sf.colossus.game.Game
         }
 
         // Titan teleport
-        if (player.canTitanTeleport() && legion.hasTitan()
-            && titanTeleportAllowed())
+        if (((PlayerServerSide)player).canTitanTeleport()
+            && ((LegionServerSide)legion).hasTitan() && titanTeleportAllowed())
         {
             // Mark every hex containing an enemy stack that does not
             // already contain a friendly stack.
@@ -2309,14 +2308,13 @@ public final class GameServerSide extends net.sf.colossus.game.Game
     /** Return a Set of Strings "Left" "Right" or "Bottom" describing
      *  possible entry sides.  If the hex is unoccupied, just return
      *  one entry side since it doesn't matter. */
-    Set<String> listPossibleEntrySides(String markerId, String targetHexLabel,
+    Set<String> listPossibleEntrySides(Legion legion, String targetHexLabel,
         boolean teleport)
     {
         Set<String> entrySides = new HashSet<String>();
-        LegionServerSide legion = getLegionByMarkerId(markerId);
-        PlayerServerSide player = legion.getPlayer();
-        int movementRoll = player.getMovementRoll();
-        MasterHex currentHex = legion.getCurrentHex();
+        Player player = legion.getPlayer();
+        int movementRoll = ((PlayerServerSide)player).getMovementRoll();
+        MasterHex currentHex = ((LegionServerSide)legion).getCurrentHex();
         MasterHex targetHex = getVariant().getMasterBoard().getHexByLabel(
             targetHexLabel);
 
@@ -2448,31 +2446,30 @@ public final class GameServerSide extends net.sf.colossus.game.Game
     }
 
     // Called by both human and AI.
-    void doSummon(LegionServerSide legion, LegionServerSide donor,
-        CreatureTypeServerSide angel)
+    void doSummon(Legion legion, Legion donor, CreatureTypeServerSide angel)
     {
         PlayerServerSide player = getActivePlayer();
 
-        if (angel != null && donor != null && legion.canSummonAngel())
+        if (angel != null && donor != null
+            && ((LegionServerSide)legion).canSummonAngel())
         {
             // Only one angel can be summoned per turn.
             player.setSummoned(true);
 
             // Move the angel or archangel.
-            donor.removeCreature(angel, false, false);
-            legion.addCreature(angel, false);
+            ((LegionServerSide)donor).removeCreature(angel, false, false);
+            ((LegionServerSide)legion).addCreature(angel, false);
 
-            server.allTellRemoveCreature(donor.getMarkerId(), angel.getName(),
-                true, Constants.reasonSummon);
-            server.allTellAddCreature(legion.getMarkerId(), angel.getName(),
-                true, Constants.reasonSummon);
+            server.allTellRemoveCreature(donor, angel.getName(), true,
+                Constants.reasonSummon);
+            server.allTellAddCreature(legion, angel.getName(), true,
+                Constants.reasonSummon);
 
-            server.allTellDidSummon(legion.getMarkerId(), donor.getMarkerId(),
-                angel.getName());
+            server.allTellDidSummon(legion, donor, angel.getName());
 
             LOGGER.log(Level.INFO, "One " + angel.getName()
-                + " is summoned from legion " + donor.getLongMarkerName()
-                + " into legion " + legion.getLongMarkerName());
+                + " is summoned from legion " + donor + " into legion "
+                + legion);
         }
 
         // Need to call this regardless to advance past the summon phase.
@@ -2571,10 +2568,9 @@ public final class GameServerSide extends net.sf.colossus.game.Game
 
     /** Return true and call Server.didSplit() if the split succeeded.
      *  Return false if it failed. */
-    boolean doSplit(String parentId, String childId, String results)
+    boolean doSplit(Legion parent, String childId, String results)
     {
-        LegionServerSide legion = getLegionByMarkerId(parentId);
-        PlayerServerSide player = legion.getPlayer();
+        PlayerServerSide player = (PlayerServerSide)parent.getPlayer();
 
         // Need a legion marker to split.
         if (!player.isMarkerAvailable(childId))
@@ -2585,16 +2581,16 @@ public final class GameServerSide extends net.sf.colossus.game.Game
         }
 
         // Pre-split legion must have 4+ creatures.
-        if (legion.getHeight() < 4)
+        if (((LegionServerSide)parent).getHeight() < 4)
         {
-            LOGGER.log(Level.SEVERE, "Legion " + parentId
+            LOGGER.log(Level.SEVERE, "Legion " + parent
                 + " is too short to split.");
             return false;
         }
 
         if (results == null)
         {
-            LOGGER.log(Level.FINEST, "Empty split list (" + parentId + ", "
+            LOGGER.log(Level.FINEST, "Empty split list (" + parent + ", "
                 + childId + ")");
             return false;
         }
@@ -2610,9 +2606,10 @@ public final class GameServerSide extends net.sf.colossus.game.Game
         }
 
         // Each legion must have 2+ creatures after the split.
-        if (creatures.size() < 2 || legion.getHeight() - creatures.size() < 2)
+        if (creatures.size() < 2
+            || ((LegionServerSide)parent).getHeight() - creatures.size() < 2)
         {
-            LOGGER.log(Level.FINEST, "Too small/big split list (" + parentId
+            LOGGER.log(Level.FINEST, "Too small/big split list (" + parent
                 + ", " + childId + ")");
             return false;
         }
@@ -2621,7 +2618,8 @@ public final class GameServerSide extends net.sf.colossus.game.Game
         // WARNING: Legion.getCritters() return Critters,
         // not Creature - different things now.
         // so we must clone "by hand" the List.
-        List<CreatureServerSide> tempCritters = legion.getCritters();
+        List<CreatureServerSide> tempCritters = ((LegionServerSide)parent)
+            .getCritters();
         List<CreatureTypeServerSide> tempCreatures = new ArrayList<CreatureTypeServerSide>();
 
         Iterator<CreatureServerSide> itCrit = tempCritters.iterator();
@@ -2636,7 +2634,7 @@ public final class GameServerSide extends net.sf.colossus.game.Game
             if (!tempCreatures.remove(creature))
             {
                 LOGGER.log(Level.FINEST,
-                    "Unavailable creature in split list (" + parentId + ", "
+                    "Unavailable creature in split list (" + parent + ", "
                         + childId + ") : " + creature.getName());
                 return false;
             }
@@ -2673,14 +2671,15 @@ public final class GameServerSide extends net.sf.colossus.game.Game
             }
         }
 
-        LegionServerSide newLegion = legion.split(creatures, childId);
+        LegionServerSide newLegion = ((LegionServerSide)parent).split(
+            creatures, childId);
         if (newLegion == null)
         {
             return false;
         }
 
-        String hexLabel = legion.getCurrentHexLabel();
-        server.didSplit(hexLabel, parentId, childId, newLegion.getHeight());
+        String hexLabel = ((LegionServerSide)parent).getCurrentHexLabel();
+        server.didSplit(hexLabel, parent, newLegion, newLegion.getHeight());
 
         // viewableAll depends on the splitPrediction to tell then true contents,
         // and viewableOwn it does not harm; it only helps the AIs :)
@@ -2691,12 +2690,14 @@ public final class GameServerSide extends net.sf.colossus.game.Game
         if (viewModeOptNum == Options.viewableAllNum
             || viewModeOptNum == Options.viewableOwnNum)
         {
-            server.allRevealLegion(legion, Constants.reasonSplit);
+            server.allRevealLegion((LegionServerSide)parent,
+                Constants.reasonSplit);
             server.allRevealLegion(newLegion, Constants.reasonSplit);
         }
         else
         {
-            server.oneRevealLegion(legion, player, Constants.reasonSplit);
+            server.oneRevealLegion((LegionServerSide)parent, player,
+                Constants.reasonSplit);
             server.oneRevealLegion(newLegion, player, Constants.reasonSplit);
         }
         return true;
@@ -2705,27 +2706,27 @@ public final class GameServerSide extends net.sf.colossus.game.Game
     /** Move the legion to the hex if legal.  Return a string telling
      *  the reason why it is illegal, or null if ok and move was done.
      */
-    String doMove(String markerId, String hexLabel, String entrySide,
+    String doMove(Legion legion, String hexLabel, String entrySide,
         boolean teleport, String teleportingLord)
     {
-        LegionServerSide legion = getLegionByMarkerId(markerId);
-        if (legion == null)
-        {
-            return "Legion null";
-        }
+        assert legion != null : "Legion must not be null";
 
-        PlayerServerSide player = legion.getPlayer();
+        Player player = legion.getPlayer();
         // Verify that the move is legal.
         if (teleport)
         {
-            if (!listTeleportMoves(legion, legion.getCurrentHex(),
-                player.getMovementRoll(), false).contains(hexLabel))
+            if (!listTeleportMoves(legion,
+                ((LegionServerSide)legion).getCurrentHex(),
+                ((PlayerServerSide)player).getMovementRoll(), false).contains(
+                hexLabel))
             {
                 String marker = legion.getMarkerId() + " "
-                    + legion.getMarkerName();
-                String from = legion.getCurrentHex().getLabel();
-                Set<String> set = listTeleportMoves(legion, legion
-                    .getCurrentHex(), player.getMovementRoll(), false);
+                    + ((LegionServerSide)legion).getMarkerName();
+                String from = ((LegionServerSide)legion).getCurrentHex()
+                    .getLabel();
+                Set<String> set = listTeleportMoves(legion,
+                    ((LegionServerSide)legion).getCurrentHex(),
+                    ((PlayerServerSide)player).getMovementRoll(), false);
                 return "List for teleport moves " + set.toString() + " of "
                     + marker + " from " + from + " does not contain '"
                     + hexLabel + "'";
@@ -2733,14 +2734,18 @@ public final class GameServerSide extends net.sf.colossus.game.Game
         }
         else
         {
-            if (!listNormalMoves(legion, legion.getCurrentHex(),
-                player.getMovementRoll(), false).contains(hexLabel))
+            if (!listNormalMoves(legion,
+                ((LegionServerSide)legion).getCurrentHex(),
+                ((PlayerServerSide)player).getMovementRoll(), false).contains(
+                hexLabel))
             {
                 String marker = legion.getMarkerId() + " "
-                    + legion.getMarkerName();
-                String from = legion.getCurrentHex().getLabel();
-                Set<String> set = listNormalMoves(legion, legion
-                    .getCurrentHex(), player.getMovementRoll(), false);
+                    + ((LegionServerSide)legion).getMarkerName();
+                String from = ((LegionServerSide)legion).getCurrentHex()
+                    .getLabel();
+                Set<String> set = listNormalMoves(legion,
+                    ((LegionServerSide)legion).getCurrentHex(),
+                    ((PlayerServerSide)player).getMovementRoll(), false);
                 return "List for normal moves " + set.toString() + " + of "
                     + marker + " from " + from + " does not contain '"
                     + hexLabel + "'";
@@ -2748,7 +2753,7 @@ public final class GameServerSide extends net.sf.colossus.game.Game
         }
 
         // Verify that the entry side is legal.
-        Set<String> legalSides = listPossibleEntrySides(markerId, hexLabel,
+        Set<String> legalSides = listPossibleEntrySides(legion, hexLabel,
             teleport);
         if (!legalSides.contains(entrySide))
         {
@@ -2770,15 +2775,18 @@ public final class GameServerSide extends net.sf.colossus.game.Game
         {
             // Verify teleporting lord.
             if (teleportingLord == null
-                || !legion.listTeleportingLords(hexLabel).contains(
-                    teleportingLord))
+                || !((LegionServerSide)legion).listTeleportingLords(hexLabel)
+                    .contains(teleportingLord))
             {
+                // boil out if assertions are enabled -- gives a stacktrace
+                assert false : "Illegal teleport";
                 if (teleportingLord == null)
                 {
                     return "teleportingLord null";
                 }
                 return "list of telep. lords "
-                    + legion.listTeleportingLords(hexLabel).toString()
+                    + ((LegionServerSide)legion)
+                        .listTeleportingLords(hexLabel).toString()
                     + " does not contain '" + teleportingLord + "'";
             }
             List<String> creatureNames = new ArrayList<String>();
@@ -2786,7 +2794,8 @@ public final class GameServerSide extends net.sf.colossus.game.Game
             server.allRevealCreatures(legion, creatureNames,
                 Constants.reasonTeleport);
         }
-        legion.moveToHex(hex, entrySide, teleport, teleportingLord);
+        ((LegionServerSide)legion).moveToHex(hex, entrySide, teleport,
+            teleportingLord);
         return null;
     }
 
@@ -2852,14 +2861,13 @@ public final class GameServerSide extends net.sf.colossus.game.Game
         server.twoNegotiate(attacker, defender);
     }
 
-    void flee(String markerId)
+    void flee(Legion legion)
     {
-        LegionServerSide defender = getLegionByMarkerId(markerId);
-        String hexLabel = defender.getCurrentHexLabel();
-        LegionServerSide attacker = getFirstEnemyLegion(hexLabel, defender
+        String hexLabel = ((LegionServerSide)legion).getCurrentHexLabel();
+        LegionServerSide attacker = getFirstEnemyLegion(hexLabel, legion
             .getPlayer());
 
-        handleConcession(defender, attacker, true);
+        handleConcession(legion, attacker, true);
     }
 
     void concede(String markerId)
@@ -2879,19 +2887,17 @@ public final class GameServerSide extends net.sf.colossus.game.Game
         }
     }
 
-    void doNotFlee(String markerId)
+    void doNotFlee(Legion legion)
     {
-        LegionServerSide defender = getLegionByMarkerId(markerId);
-        String hexLabel = defender.getCurrentHexLabel();
+        String hexLabel = ((LegionServerSide)legion).getCurrentHexLabel();
 
         engage2(hexLabel);
     }
 
     /** Used only for pre-battle attacker concession. */
-    void doNotConcede(String markerId)
+    void doNotConcede(Legion legion)
     {
-        LegionServerSide attacker = getLegionByMarkerId(markerId);
-        String hexLabel = attacker.getCurrentHexLabel();
+        String hexLabel = ((LegionServerSide)legion).getCurrentHexLabel();
 
         engage3(hexLabel);
     }
@@ -2990,32 +2996,32 @@ public final class GameServerSide extends net.sf.colossus.game.Game
         }
     }
 
-    private synchronized void handleConcession(LegionServerSide loser,
-        LegionServerSide winner, boolean fled)
+    private synchronized void handleConcession(Legion loser, Legion winner,
+        boolean fled)
     {
         // Figure how many points the victor receives.
-        int points = loser.getPointValue();
+        int points = ((LegionServerSide)loser).getPointValue();
 
         if (fled)
         {
             points /= 2;
-            LOGGER.log(Level.INFO, "Legion " + loser.getLongMarkerName()
-                + " flees from legion " + winner.getLongMarkerName());
+            LOGGER.log(Level.INFO, "Legion " + loser + " flees from legion "
+                + winner);
         }
         else
         {
-            LOGGER.log(Level.INFO, "Legion " + loser.getLongMarkerName()
-                + " concedes to legion " + winner.getLongMarkerName());
+            LOGGER.log(Level.INFO, "Legion " + loser + " concedes to legion "
+                + winner);
         }
 
         // Add points, and angels if necessary.
-        winner.addPoints(points);
+        ((LegionServerSide)winner).addPoints(points);
         // Remove any fractional points.
-        winner.getPlayer().truncScore();
+        ((PlayerServerSide)winner.getPlayer()).truncScore();
 
         // Need to grab the player reference before the legion is
         // removed.
-        PlayerServerSide losingPlayer = loser.getPlayer();
+        Player losingPlayer = loser.getPlayer();
 
         String reason = fled ? Constants.reasonFled
             : Constants.reasonConcession;
@@ -3026,18 +3032,18 @@ public final class GameServerSide extends net.sf.colossus.game.Game
 
         // If this was the titan stack, its owner dies and gives half
         // points to the victor.
-        if (loser.hasTitan())
+        if (((LegionServerSide)loser).hasTitan())
         {
             // first remove dead legion, then the rest. Cannot do the
             // loser.remove outside/before the if (or would need to store
             // the hasTitan information as extra boolean)
-            loser.remove();
-            losingPlayer.die(winner.getPlayer(), true);
+            ((LegionServerSide)loser).remove();
+            ((PlayerServerSide)losingPlayer).die(winner.getPlayer(), true);
         }
         else
         {
             // simply remove the dead legion.
-            loser.remove();
+            ((LegionServerSide)loser).remove();
         }
 
         // No recruiting or angel summoning is allowed after the
@@ -3121,8 +3127,8 @@ public final class GameServerSide extends net.sf.colossus.game.Game
                 CreatureTypeServerSide creature = (CreatureTypeServerSide)getVariant()
                     .getCreatureByName(creatureName);
                 winner.removeCreature(creature, true, true);
-                server.allTellRemoveCreature(winner.getMarkerId(),
-                    creatureName, true, Constants.reasonNegotiated);
+                server.allTellRemoveCreature(winner, creatureName, true,
+                    Constants.reasonNegotiated);
             }
             LOGGER.log(Level.INFO, log.toString());
 
@@ -3177,11 +3183,11 @@ public final class GameServerSide extends net.sf.colossus.game.Game
         checkEngagementDone();
     }
 
-    synchronized void askAcquireAngel(PlayerServerSide player,
-        String markerId, List<String> recruits)
+    synchronized void askAcquireAngel(PlayerServerSide player, Legion legion,
+        List<String> recruits)
     {
         acquiring = true;
-        server.askAcquireAngel(player, markerId, recruits);
+        server.askAcquireAngel(player, legion, recruits);
     }
 
     synchronized void doneAcquiringAngels()
@@ -3401,17 +3407,14 @@ public final class GameServerSide extends net.sf.colossus.game.Game
         return markerIds;
     }
 
-    synchronized int getNumFriendlyLegions(String hexLabel,
-        PlayerServerSide player)
+    synchronized int getNumFriendlyLegions(String hexLabel, Player player)
     {
         int count = 0;
-        List<LegionServerSide> legions = player.getLegions();
-        Iterator<LegionServerSide> it = legions.iterator();
-        while (it.hasNext())
+        List<? extends Legion> legions = player.getLegions();
+        for (Legion legion : legions)
         {
-            LegionServerSide legion = it.next();
-
-            if (hexLabel.equals(legion.getCurrentHexLabel()))
+            if (hexLabel.equals(((LegionServerSide)legion)
+                .getCurrentHexLabel()))
             {
                 count++;
             }
@@ -3519,20 +3522,20 @@ public final class GameServerSide extends net.sf.colossus.game.Game
     }
 
     // History wrappers.  Time to start obeying the Law of Demeter.
-    void addCreatureEvent(String markerId, String creatureName)
+    void addCreatureEvent(Legion legion, String creatureName)
     {
         lastRecruitTurnNumber = turnNumber;
-        history.addCreatureEvent(markerId, creatureName, turnNumber);
+        history.addCreatureEvent(legion, creatureName, turnNumber);
     }
 
-    void removeCreatureEvent(String markerId, String creatureName)
+    void removeCreatureEvent(Legion legion, String creatureName)
     {
-        history.removeCreatureEvent(markerId, creatureName, turnNumber);
+        history.removeCreatureEvent(legion, creatureName, turnNumber);
     }
 
-    void splitEvent(String parentId, String childId, List<String> splitoffs)
+    void splitEvent(Legion parent, Legion child, List<String> splitoffs)
     {
-        history.splitEvent(parentId, childId, splitoffs, turnNumber);
+        history.splitEvent(parent, child, splitoffs, turnNumber);
     }
 
     void mergeEvent(String splitoffId, String survivorId)
@@ -3541,9 +3544,9 @@ public final class GameServerSide extends net.sf.colossus.game.Game
     }
 
     void revealEvent(boolean allPlayers, List<String> playerNames,
-        String markerId, List<String> creatureNames)
+        Legion legion, List<String> creatureNames)
     {
-        history.revealEvent(allPlayers, playerNames, markerId, creatureNames,
+        history.revealEvent(allPlayers, playerNames, legion, creatureNames,
             turnNumber);
     }
 
@@ -3601,9 +3604,8 @@ public final class GameServerSide extends net.sf.colossus.game.Game
         {
             if (active)
             {
-                out.println("Client (type " +
-                    (remote ? "remote" : "local") + ") connected: " +
-                    player.getName());
+                out.println("Client (type " + (remote ? "remote" : "local")
+                    + ") connected: " + player.getName());
                 out.flush();
             }
         }

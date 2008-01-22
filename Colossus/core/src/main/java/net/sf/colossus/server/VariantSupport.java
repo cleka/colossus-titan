@@ -18,6 +18,7 @@ import javax.swing.text.Document;
 import javax.swing.text.StyledDocument;
 
 import net.sf.colossus.client.HexMap;
+import net.sf.colossus.client.LegionClientSide;
 import net.sf.colossus.util.ResourceLoader;
 import net.sf.colossus.variant.BattleLand;
 import net.sf.colossus.variant.CreatureType;
@@ -489,8 +490,8 @@ public final class VariantSupport
     }
 
     public synchronized static String getRecruitHint(String terrain,
-        net.sf.colossus.client.LegionClientSide legion, List<CreatureType> recruits,
-        net.sf.colossus.server.HintOracleInterface oracle)
+        LegionClientSide legion, List<CreatureType> recruits,
+        HintOracleInterface oracle)
     {
         String[] section = new String[1];
         section[0] = Constants.sectionAllAI;
@@ -498,20 +499,11 @@ public final class VariantSupport
     }
 
     public synchronized static String getRecruitHint(String terrain,
-        net.sf.colossus.client.LegionClientSide legion, List<CreatureType> recruits,
-        net.sf.colossus.server.HintOracleInterface oracle, String[] section)
+        LegionClientSide legion, List<CreatureType> recruits,
+        HintOracleInterface oracle, String[] section)
     {
-        if (aihl != null)
-        {
-            return aihl.getRecruitHint(terrain, legion, recruits, oracle,
-                section);
-        }
-        else
-        {
-            LOGGER.log(Level.SEVERE,
-                "No AIHintLoader available ! Should never happen.");
-        }
-        return null;
+        assert aihl != null : "No AIHintLoader available";
+        return aihl.getRecruitHint(terrain, legion, recruits, oracle, section);
     }
 
     public synchronized static List<String> getInitialSplitHint(String label)

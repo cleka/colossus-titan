@@ -17,18 +17,19 @@ public interface IServer
 
     public void doneWithStrikes();
 
-    public void acquireAngel(String markerId, String angelType);
+    public void acquireAngel(Legion legion, String angelType);
 
-    public void doSummon(String markerId, String donorId, String angel);
+    public void doSummon(Legion receivingLegion, Legion donorLegion,
+        String angel);
 
-    public void doRecruit(String markerId, String recruitName,
+    public void doRecruit(Legion legion, String recruitName,
         String recruiterName);
 
     public void engage(String hexLabel);
 
     public void concede(Legion legion);
 
-    public void doNotConcede(String markerId);
+    public void doNotConcede(Legion legion);
 
     public void flee(Legion legion);
 
@@ -52,9 +53,9 @@ public interface IServer
 
     public void undoSplit(String splitoffId);
 
-    public void undoMove(String markerId);
+    public void undoMove(Legion legion);
 
-    public void undoRecruit(String markerId);
+    public void undoRecruit(Legion legion);
 
     public void doneWithSplits();
 
@@ -70,11 +71,11 @@ public interface IServer
 
     public void stopGame();
 
-    public void setDonor(String markerId);
+    public void setDonor(Legion legion);
 
-    public void doSplit(String parentId, String childId, String results);
+    public void doSplit(Legion parent, String childMarker, String results);
 
-    public void doMove(String markerId, String hexLabel, String entrySide,
+    public void doMove(Legion legion, String hexLabel, String entrySide,
         boolean teleport, String teleportingLord);
 
     public void assignColor(String color);

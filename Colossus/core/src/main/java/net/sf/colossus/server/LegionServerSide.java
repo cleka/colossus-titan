@@ -141,7 +141,7 @@ public final class LegionServerSide extends net.sf.colossus.game.Legion
             if ((recruits != null) && (!recruits.isEmpty()))
             {
                 angelsToAcquire++; // 1       2
-                game.askAcquireAngel(getPlayer(), getMarkerId(), recruits);
+                game.askAcquireAngel(getPlayer(), this, recruits);
             }
         }
     }
@@ -172,8 +172,8 @@ public final class LegionServerSide extends net.sf.colossus.game.Legion
                     addCreature(angel, true);
                     LOGGER.log(Level.INFO, "Legion " + getLongMarkerName()
                         + " acquires one " + angelType);
-                    game.getServer().allTellAddCreature(getMarkerId(),
-                        angelType, true, Constants.reasonAcquire);
+                    game.getServer().allTellAddCreature(this, angelType, true,
+                        Constants.reasonAcquire);
                 }
             }
         }
@@ -423,7 +423,7 @@ public final class LegionServerSide extends net.sf.colossus.game.Legion
         // Let the clients clean up the legion marker, etc.
         if (updateHistory)
         {
-            game.getServer().allRemoveLegion(markerId);
+            game.getServer().allRemoveLegion(this);
         }
         if (getPlayer() != null)
         {
@@ -691,7 +691,7 @@ public final class LegionServerSide extends net.sf.colossus.game.Legion
         }
         if (updateHistory)
         {
-            game.removeCreatureEvent(getMarkerId(), critter.getName());
+            game.removeCreatureEvent(this, critter.getName());
         }
     }
 
@@ -802,8 +802,7 @@ public final class LegionServerSide extends net.sf.colossus.game.Legion
         sortCritters();
 
         // Let the clients know that the legions have recombined.
-        game.getServer().undidSplit(getMarkerId(), legion.getMarkerId(), true,
-            game.getTurnNumber());
+        game.getServer().undidSplit(this, legion, true, game.getTurnNumber());
     }
 
     /**

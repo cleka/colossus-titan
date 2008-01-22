@@ -25,15 +25,15 @@ public class Game
      * 
      * TODO use List instead
      */
-    private final Player[] playerstates;
+    private final Player[] players;
 
     public Game(Variant variant, String[] playerNames)
     {
         this.variant = variant;
-        this.playerstates = new Player[playerNames.length];
+        this.players = new Player[playerNames.length];
         for (int i = 0; i < playerNames.length; i++)
         {
-            playerstates[i] = new Player(this, playerNames[i], i);
+            players[i] = new Player(this, playerNames[i], i);
         }
     }
 

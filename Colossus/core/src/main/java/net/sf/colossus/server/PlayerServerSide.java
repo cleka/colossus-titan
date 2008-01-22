@@ -11,6 +11,7 @@ import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.util.Glob;
 import net.sf.colossus.util.Options;
@@ -24,10 +25,11 @@ import net.sf.colossus.xmlparser.TerrainRecruitLoader;
  * @author David Ripton
  */
 
-public final class PlayerServerSide extends Player implements Comparable<PlayerServerSide>
+public final class PlayerServerSide extends Player implements
+    Comparable<PlayerServerSide>
 {
-    private static final Logger LOGGER = Logger.getLogger(PlayerServerSide.class
-        .getName());
+    private static final Logger LOGGER = Logger
+        .getLogger(PlayerServerSide.class.getName());
 
     private String color; // Black, Blue, Brown, Gold, Green, Red
     private String startingTower; // hex label
@@ -171,8 +173,8 @@ public final class PlayerServerSide extends Player implements Comparable<PlayerS
                 {
                     String shortColor = allVictims.substring(i, i + 2);
                     initMarkersAvailable(shortColor);
-                    PlayerServerSide victim = getGame()
-                        .getPlayerByShortColor(shortColor);
+                    PlayerServerSide victim = getGame().getPlayerByShortColor(
+                        shortColor);
                     allVictims.append(victim.getPlayersElim());
                 }
                 Iterator<String> it = getLegionIds().iterator();
@@ -497,12 +499,11 @@ public final class PlayerServerSide extends Player implements Comparable<PlayerS
         }
     }
 
-    void undoMove(String markerId)
+    void undoMove(Legion legion)
     {
-        LegionServerSide legion = getLegionByMarkerId(markerId);
         if (legion != null)
         {
-            legion.undoMove();
+            ((LegionServerSide)legion).undoMove();
         }
     }
 
@@ -551,28 +552,22 @@ public final class PlayerServerSide extends Player implements Comparable<PlayerS
         return false;
     }
 
-    void undoRecruit(String markerId)
+    void undoRecruit(Legion legion)
     {
-        LegionServerSide legion = getLegionByMarkerId(markerId);
-        if (legion == null)
-        {
-            LOGGER.log(Level.SEVERE,
-                "Player.undoRecruit: legion for markerId " + markerId
-                    + " is null");
-            return;
-        }
+        assert legion != null : "Player.undoRecruit: legion for markerId "
+            + legion + " is null";
 
         // This is now permanently fixed in Player.java, so this should
         // never happen again. Still, leaving this in place, just to be sure...
-        String recruitName = legion.getRecruitName();
+        String recruitName = ((LegionServerSide)legion).getRecruitName();
         if (recruitName == null)
         {
             LOGGER.log(Level.SEVERE,
                 "Player.undoRecruit: Nothing to unrecruit for marker "
-                    + markerId);
+                    + legion);
             return;
         }
-        legion.undoRecruit();
+        ((LegionServerSide)legion).undoRecruit();
 
         // Update number of creatures in status window.
         getGame().getServer().allUpdatePlayerInfo();
@@ -717,7 +712,7 @@ public final class PlayerServerSide extends Player implements Comparable<PlayerS
      * @param checkForVictory If set the game will be asked to check for a victory after
      *      we are finished.
      */
-    synchronized void die(PlayerServerSide slayer, boolean checkForVictory)
+    synchronized void die(Player slayer, boolean checkForVictory)
     {
         LOGGER.info("Player '" + getName() + "' is dying, killed by "
             + (slayer == null ? "nobody" : slayer.getName()));
@@ -725,14 +720,16 @@ public final class PlayerServerSide extends Player implements Comparable<PlayerS
         // engaged with.  All others give half points to slayer,
         // if non-null.
 
-        for (Iterator<LegionServerSide> itLeg = legions.iterator(); itLeg.hasNext();)
+        for (Iterator<LegionServerSide> itLeg = legions.iterator(); itLeg
+            .hasNext();)
         {
             LegionServerSide legion = itLeg.next();
             String hexLabel = legion.getCurrentHexLabel();
-            LegionServerSide enemyLegion = getGame().getFirstEnemyLegion(hexLabel, this);
+            LegionServerSide enemyLegion = getGame().getFirstEnemyLegion(
+                hexLabel, this);
             double halfPoints = legion.getPointValue() / 2.0;
 
-            PlayerServerSide scorer;
+            Player scorer;
 
             if (enemyLegion != null)
             {
@@ -744,7 +741,7 @@ public final class PlayerServerSide extends Player implements Comparable<PlayerS
             }
             if (scorer != null)
             {
-                scorer.addPoints(halfPoints);
+                ((PlayerServerSide)scorer).addPoints(halfPoints);
             }
 
             // Call the iterator's remove() method rather than
@@ -765,8 +762,8 @@ public final class PlayerServerSide extends Player implements Comparable<PlayerS
         // Record the slayer and give him this player's legion markers.
         if (slayer != null)
         {
-            slayer.addPlayerElim(this);
-            slayer.takeLegionMarkers(this);
+            ((PlayerServerSide)slayer).addPlayerElim(this);
+            ((PlayerServerSide)slayer).takeLegionMarkers(this);
         }
 
         getGame().getServer().allUpdatePlayerInfo();

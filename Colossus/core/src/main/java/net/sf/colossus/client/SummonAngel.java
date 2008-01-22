@@ -20,6 +20,7 @@ import java.util.logging.Logger;
 
 import javax.swing.JButton;
 
+import net.sf.colossus.game.Legion;
 import net.sf.colossus.server.LegionServerSide;
 import net.sf.colossus.util.KDialog;
 import net.sf.colossus.variant.CreatureType;
@@ -38,7 +39,7 @@ final class SummonAngel extends KDialog implements MouseListener,
     private static final Logger LOGGER = Logger.getLogger(SummonAngel.class
         .getName());
 
-    private final String markerId;
+    private final Legion legion;
     private final List<Chit> sumChitList = new ArrayList<Chit>();
     private final JButton cancelButton;
     private static boolean active;
@@ -48,19 +49,18 @@ final class SummonAngel extends KDialog implements MouseListener,
     private static final String noSourceSummonString = " No selected Legion";
     private final SaveWindow saveWindow;
 
-    private SummonAngel(Client client, String markerId)
+    private SummonAngel(Client client, Legion legion)
     {
         super(client.getBoard().getFrame(), client.getOwningPlayer().getName()
-            + baseSummonString + LegionServerSide.getLongMarkerName(markerId)
-            + noSourceSummonString, false);
+            + baseSummonString + legion + noSourceSummonString, false);
 
         this.client = client;
-        this.markerId = markerId;
+        this.legion = legion;
 
         // Count and highlight legions with summonable angels, and put
         // board into a state where those legions can be selected.
         // TODO this should really not happen in a constructor
-        if (client.getBoard().highlightSummonableAngels(markerId) < 1)
+        if (client.getBoard().highlightSummonableAngels(legion) < 1)
         {
             cleanup(null, null);
             // trying to keep things final despite awkward exit point
@@ -121,27 +121,27 @@ final class SummonAngel extends KDialog implements MouseListener,
         repaint();
     }
 
-    static SummonAngel summonAngel(Client client, String markerId)
+    static SummonAngel summonAngel(Client client, Legion legion)
     {
-        LOGGER.log(Level.FINEST, "called summonAngel for " + markerId);
+        LOGGER.log(Level.FINER, "called summonAngel for " + legion);
         if (!active)
         {
             active = true;
             LOGGER.log(Level.FINEST, "returning new SummonAngel dialog for "
-                + markerId);
-            return new SummonAngel(client, markerId);
+                + legion);
+            return new SummonAngel(client, legion);
         }
         return null;
     }
 
-    String getMarkerId()
+    Legion getLegion()
     {
-        return markerId;
+        return legion;
     }
 
-    private void cleanup(String donorId, String angel)
+    private void cleanup(Legion donor, String angel)
     {
-        client.doSummon(markerId, donorId, angel);
+        client.doSummon(legion, donor, angel);
         saveWindow.saveLocation(getLocation());
         dispose();
         active = false;
@@ -150,8 +150,8 @@ final class SummonAngel extends KDialog implements MouseListener,
     @Override
     public void mousePressed(MouseEvent e)
     {
-        String donorId = client.getDonorId();
-        if (donorId == null)
+        Legion donor = client.getDonor();
+        if (donor == null)
         {
             return;
         }
@@ -164,7 +164,7 @@ final class SummonAngel extends KDialog implements MouseListener,
             Chit c = it.next();
             if ((source == c) && !(c.isDead()))
             {
-                cleanup(donorId, c.getId());
+                cleanup(donor, c.getId());
                 done = true;
             }
         }
@@ -179,18 +179,20 @@ final class SummonAngel extends KDialog implements MouseListener,
     /** Upstate state of angel and archangel chits to reflect donor */
     void updateChits()
     {
-        String donorId = client.getDonorId();
-        if (donorId == null)
+        Legion donor = client.getDonor();
+        if (donor == null)
         {
             setTitle(client.getOwningPlayer().getName() + baseSummonString
-                + LegionServerSide.getLongMarkerName(markerId) + noSourceSummonString);
+                + LegionServerSide.getLongMarkerName(legion.getMarkerId())
+                + noSourceSummonString);
             return;
         }
         else
         {
             setTitle(client.getOwningPlayer().getName() + baseSummonString
-                + LegionServerSide.getLongMarkerName(markerId) + sourceSummonString
-                + LegionServerSide.getLongMarkerName(donorId));
+                + LegionServerSide.getLongMarkerName(legion.getMarkerId())
+                + sourceSummonString
+                + LegionServerSide.getLongMarkerName(donor.getMarkerId()));
         }
         Iterator<Chit> it = sumChitList.iterator();
         while (it.hasNext())

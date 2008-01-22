@@ -54,6 +54,7 @@ import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 
+import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.XMLSnapshotFilter;
@@ -1238,17 +1239,17 @@ public final class MasterBoard extends JPanel
         {
             return;
         }
-        List<String> markerIds = client.getLegionsByHex(hexLabel);
+        List<Legion> legions = client.getLegionsByHex(hexLabel);
 
-        int numLegions = markerIds.size();
+        int numLegions = legions.size();
         if (numLegions == 0)
         {
             hex.repaint();
             return;
         }
 
-        String markerId = markerIds.get(0);
-        Marker marker = client.getMarker(markerId);
+        Legion legion = legions.get(0);
+        Marker marker = ((LegionClientSide)legion).getMarker();
         if (marker == null)
         {
             hex.repaint();
@@ -1278,8 +1279,8 @@ public final class MasterBoard extends JPanel
             point = new Point(startingPoint);
             point.x -= chitScale4;
             point.y -= chitScale4;
-            markerId = markerIds.get(1);
-            marker = client.getMarker(markerId);
+            legion = legions.get(1);
+            marker = ((LegionClientSide)legion).getMarker();
             if (marker != null)
             {
                 // Second marker can be null when loading during
@@ -1298,15 +1299,15 @@ public final class MasterBoard extends JPanel
             point = new Point(startingPoint);
             point.x -= chitScale4;
             point.y -= chitScale4;
-            markerId = markerIds.get(1);
-            marker = client.getMarker(markerId);
+            legion = legions.get(1);
+            marker = ((LegionClientSide)legion).getMarker();
             marker.setLocation(point);
 
             point = new Point(startingPoint);
             point.x -= chitScale4;
             point.y -= chitScale;
-            markerId = markerIds.get(2);
-            marker = client.getMarker(markerId);
+            legion = legions.get(2);
+            marker = ((LegionClientSide)legion).getMarker();
             marker.setLocation(point);
         }
 
@@ -1337,21 +1338,21 @@ public final class MasterBoard extends JPanel
     }
 
     /** Select hexes where this legion can move. */
-    private void highlightMoves(String markerId)
+    private void highlightMoves(Legion legion)
     {
         unselectAllHexes();
 
-        Set<String> teleport = client.listTeleportMoves(markerId);
+        Set<String> teleport = client.listTeleportMoves(legion);
         selectHexesByLabels(teleport, HTMLColor.purple);
 
-        Set<String> normal = client.listNormalMoves(markerId);
+        Set<String> normal = client.listNormalMoves(legion);
         selectHexesByLabels(normal, Color.white);
 
         Set<String> combo = new HashSet<String>();
         combo.addAll(teleport);
         combo.addAll(normal);
 
-        client.addPossibleRecruitChits(markerId, combo);
+        client.addPossibleRecruitChits(legion, combo);
     }
 
     void highlightEngagements()
@@ -1362,9 +1363,9 @@ public final class MasterBoard extends JPanel
     }
 
     /** Return number of legions with summonable angels. */
-    int highlightSummonableAngels(String markerId)
+    int highlightSummonableAngels(Legion legion)
     {
-        Set<String> set = client.findSummonableAngelHexes(markerId);
+        Set<String> set = client.findSummonableAngelHexes(legion);
         unselectAllHexes();
         selectHexesByLabels(set);
         return set.size();
@@ -1576,7 +1577,7 @@ public final class MasterBoard extends JPanel
         else if (phase == Constants.Phase.MOVE)
         {
             client.clearRecruitChits();
-            client.setMoverId(null);
+            client.setMover(null);
             highlightUnmovedLegions();
         }
         else if (phase == Constants.Phase.FIGHT)
@@ -1584,7 +1585,7 @@ public final class MasterBoard extends JPanel
             SummonAngel summonAngel = client.getSummonAngel();
             if (summonAngel != null)
             {
-                highlightSummonableAngels(summonAngel.getMarkerId());
+                highlightSummonableAngels(summonAngel.getLegion());
                 summonAngel.repaint();
             }
             else
@@ -1629,10 +1630,10 @@ public final class MasterBoard extends JPanel
                 // What to do depends on which mouse button was used
                 // and the current phase of the turn.
 
+                LegionClientSide legion = client.getLegion(markerId);
                 // Right-click means to show the contents of the legion.
                 if (isPopupButton(e))
                 {
-                    LegionClientSide legion = client.getLegion(markerId);
                     int viewMode = client.getViewMode();
                     boolean dubiousAsBlanks = client.getOptions().getOption(
                         Options.dubiousAsBlanks);
@@ -1641,12 +1642,11 @@ public final class MasterBoard extends JPanel
                         dubiousAsBlanks);
                     return;
                 }
-                else if (client.isMyLegion(markerId))
+                else if (legion.isMyLegion())
                 {
                     if (hex != null)
                     {
-                        actOnLegion(markerId, hex.getMasterHexModel()
-                            .getLabel());
+                        actOnLegion(legion, hex.getMasterHexModel().getLabel());
                     }
                     else
                     {
@@ -1709,7 +1709,7 @@ public final class MasterBoard extends JPanel
         }
     }
 
-    private void actOnLegion(String markerId, String hexLabel)
+    private void actOnLegion(Legion legion, String hexLabel)
     {
         if (!client.isMyTurn())
         {
@@ -1719,20 +1719,20 @@ public final class MasterBoard extends JPanel
         Constants.Phase phase = client.getPhase();
         if (phase == Constants.Phase.SPLIT)
         {
-            client.doSplit(markerId);
+            client.doSplit(legion);
         }
         else if (phase == Constants.Phase.MOVE)
         {
             // Allow spin cycle by clicking on chit again.
-            if (markerId.equals(client.getMoverId()))
+            if (legion.equals(client.getMover()))
             {
                 actOnHex(hexLabel);
             }
             else
             {
-                client.setMoverId(markerId);
+                client.setMover(legion);
                 getGUIHexByLabel(hexLabel).repaint();
-                highlightMoves(markerId);
+                highlightMoves(legion);
             }
         }
         else if (phase == Constants.Phase.FIGHT)
@@ -1741,7 +1741,7 @@ public final class MasterBoard extends JPanel
         }
         else if (phase == Constants.Phase.MUSTER)
         {
-            client.doRecruit(markerId);
+            client.doRecruit(legion);
         }
     }
 

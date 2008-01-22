@@ -285,7 +285,7 @@ public final class PlayerClientSide extends Player
         while (it.hasNext())
         {
             String id = it.next();
-            client.removeLegion(id);
+            client.removeLegion(client.getLegion(id));
         }
     }
 

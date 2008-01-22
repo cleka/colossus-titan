@@ -1,8 +1,10 @@
 package net.sf.colossus.util;
 
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 
 /**
@@ -28,5 +30,30 @@ public class CollectionHelper
                 target.add(t);
             }
         }
+    }
+
+    /**
+     * Retrieves all elements from a collection that match a predicate.
+     * 
+     * The result will be all elements of the source collection for which the predicate is true,
+     * retrieved in normal iteration order.
+     * 
+     * @param <T> The type of elements we are interested in.
+     * @param source A collection containing elements we are interested in. Not null. Can be empty.
+     * @param filter The predicate determining if an element is to be retrieved. Not null.
+     * @return A list containing all matching elements in iteration order. Never null. Can be empty.
+     */
+    public static <T> List<T> selectAsList(Collection<? extends T> source,
+        Predicate<T> filter)
+    {
+        List<T> result = new ArrayList<T>();
+        for (T t : source)
+        {
+            if (filter.matches(t))
+            {
+                result.add(t);
+            }
+        }
+        return result;
     }
 }

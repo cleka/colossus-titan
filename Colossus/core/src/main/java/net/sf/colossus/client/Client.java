@@ -46,9 +46,11 @@ import net.sf.colossus.server.IServer;
 import net.sf.colossus.server.Start;
 import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.util.ChildThreadManager;
+import net.sf.colossus.util.CollectionHelper;
 import net.sf.colossus.util.KFrame;
 import net.sf.colossus.util.LogWindow;
 import net.sf.colossus.util.Options;
+import net.sf.colossus.util.Predicate;
 import net.sf.colossus.util.ResourceLoader;
 import net.sf.colossus.util.Split;
 import net.sf.colossus.util.ViableEntityManager;
@@ -131,7 +133,7 @@ public final class Client implements IClient, IOracle
     private final LinkedList<Object> undoStack = new LinkedList<Object>();
 
     // Information on the current moving legion.
-    private String moverId;
+    private Legion mover;
 
     /** The end of the list is on top in the z-order. */
     private final List<Marker> markers = new ArrayList<Marker>();
@@ -165,7 +167,7 @@ public final class Client implements IClient, IOracle
     /** the parent frame for secondary windows */
     private JFrame secondaryParent = null;
 
-    private String parentId;
+    private Legion parent;
     private int numSplitsThisTurn;
 
     // show best potential recruit chit needs exactly "SimpleAI".
@@ -199,7 +201,7 @@ public final class Client implements IClient, IOracle
     private Legion defender;
 
     /** Summon angel donor legion, for this client's player only. */
-    private String donorId;
+    private Legion donor;
 
     /** If the game is over, then quitting does not require confirmation. */
     private boolean gameOver;
@@ -463,9 +465,9 @@ public final class Client implements IClient, IOracle
         }
     }
 
-    private void doNotConcede(String markerId)
+    private void doNotConcede(Legion legion)
     {
-        server.doNotConcede(markerId);
+        server.doNotConcede(legion);
     }
 
     /** Cease negotiations and fight a battle in land. */
@@ -657,7 +659,7 @@ public final class Client implements IClient, IOracle
     }
 
     /** Legion summoner summons unit from legion donor. */
-    void doSummon(String summoner, String donor, String unit)
+    void doSummon(Legion summoner, Legion donor, String unit)
     {
         server.doSummon(summoner, donor, unit);
 
@@ -671,13 +673,14 @@ public final class Client implements IClient, IOracle
         }
     }
 
-    public void didSummon(String summonerId, String donorId, String summon)
+    public void didSummon(Legion summoner, Legion donor, String summon)
     {
         if (eventViewer != null)
         {
-            eventViewer.newCreatureRevealEvent(RevealEvent.eventSummon,
-                donorId, getLegion(donorId).getHeight(), summon,
-                summonerId, getLegion(summonerId).getHeight());
+            eventViewer.newCreatureRevealEvent(RevealEvent.eventSummon, donor
+                .getMarkerId(), ((LegionClientSide)donor).getHeight(), summon,
+                summoner.getMarkerId(), ((LegionClientSide)summoner)
+                    .getHeight());
         }
     }
 
@@ -1641,8 +1644,7 @@ public final class Client implements IClient, IOracle
                 boolean struck = makeForcedStrikes();
                 if (!struck)
                 {
-                    struck = ai
-                        .strike((LegionClientSide)getBattleActiveLegion());
+                    struck = ai.strike(getBattleActiveLegion());
                 }
                 if (!struck)
                 {
@@ -1707,24 +1709,23 @@ public final class Client implements IClient, IOracle
     }
 
     /** Remove this eliminated legion, and clean up related stuff. */
-    public void removeLegion(String id)
+    public void removeLegion(Legion legion)
     {
-        Marker marker = getMarker(id);
+        Marker marker = ((LegionClientSide)legion).getMarker();
         markers.remove(marker);
 
         // TODO Do for all players
-        if (isMyLegion(id))
+        if (isMyLegion(legion))
         {
-            getOwningPlayer().addMarkerAvailable(id);
+            getOwningPlayer().addMarkerAvailable(legion.getMarkerId());
         }
 
-        LegionClientSide info = getLegion(id);
-        String hexLabel = info.getHexLabel();
+        String hexLabel = ((LegionClientSide)legion).getHexLabel();
 
         // XXX Not perfect -- Need to track recruitChits by legion.
         removeRecruitChit(hexLabel);
 
-        legionInfo.remove(id);
+        legionInfo.remove(legion.getMarkerId());
         if (board != null)
         {
             board.alignLegions(hexLabel);
@@ -1742,14 +1743,13 @@ public final class Client implements IClient, IOracle
     }
 
     /** Needed when loading a game outside split phase. */
-    public void setLegionStatus(String markerId, boolean moved,
+    public void setLegionStatus(Legion legion, boolean moved,
         boolean teleported, int entrySide, String lastRecruit)
     {
-        LegionClientSide info = getLegion(markerId);
-        info.setMoved(moved);
-        info.setTeleported(teleported);
-        info.setEntrySide(entrySide);
-        info.setLastRecruit(lastRecruit);
+        ((LegionClientSide)legion).setMoved(moved);
+        ((LegionClientSide)legion).setTeleported(teleported);
+        ((LegionClientSide)legion).setEntrySide(entrySide);
+        ((LegionClientSide)legion).setLastRecruit(lastRecruit);
     }
 
     /** Return the full basename for a titan in legion markerId,
@@ -1795,10 +1795,9 @@ public final class Client implements IClient, IOracle
     }
 
     /** Add a new creature to this legion. */
-    public void addCreature(String markerId, String name, String reason)
+    public void addCreature(Legion legion, String name, String reason)
     {
-        LegionClientSide legion = getLegion(markerId);
-        legion.addCreature(name);
+        ((LegionClientSide)legion).addCreature(name);
         if (board != null)
         {
             String hexLabel = getHexForLegion(legion);
@@ -1808,22 +1807,20 @@ public final class Client implements IClient, IOracle
 
         if (eventViewer != null)
         {
-            eventViewer.addCreature(markerId, name, reason);
+            eventViewer.addCreature(legion.getMarkerId(), name, reason);
         }
     }
 
-    public void removeCreature(String markerId, String name, String reason)
+    public void removeCreature(Legion legion, String name, String reason)
     {
-        LegionClientSide info = getLegion(markerId);
-
         if (eventViewer != null)
         {
-            eventViewer.removeCreature(markerId, name);
+            eventViewer.removeCreature(legion.getMarkerId(), name);
         }
 
-        String hexLabel = info.getHexLabel();
-        int height = info.getHeight();
-        info.removeCreature(name);
+        String hexLabel = ((LegionClientSide)legion).getHexLabel();
+        int height = ((LegionClientSide)legion).getHeight();
+        ((LegionClientSide)legion).removeCreature(name);
         if (height <= 1)
         {
             // do not remove this, sever will give explicit order to remove it
@@ -1832,7 +1829,7 @@ public final class Client implements IClient, IOracle
         if (height <= 1 && getTurnNumber() == -1)
         {
             // hack to remove legions correctly during load
-            removeLegion(markerId);
+            removeLegion(legion);
         }
         if (board != null)
         {
@@ -2106,7 +2103,7 @@ public final class Client implements IClient, IOracle
     }
 
     // all hexes
-    public void addPossibleRecruitChits(String markerId, Set<String> set)
+    public void addPossibleRecruitChits(Legion legion, Set<String> set)
     {
         clearPossibleRecruitChits();
 
@@ -2122,7 +2119,7 @@ public final class Client implements IClient, IOracle
         while (it.hasNext())
         {
             String hexLabel = it.next();
-            List<CreatureType> recruits = findEligibleRecruits(markerId,
+            List<CreatureType> recruits = findEligibleRecruits(legion,
                 hexLabel);
 
             if (recruits != null && recruits.size() > 0)
@@ -2134,8 +2131,8 @@ public final class Client implements IClient, IOracle
 
                     case Options.showRecruitChitsNumRecruitHint:
                         oneElemList.clear();
-                        CreatureTypeServerSide hint = chooseBestPotentialRecruit(
-                            markerId, hexLabel, recruits);
+                        CreatureType hint = chooseBestPotentialRecruit(legion,
+                            hexLabel, recruits);
                         oneElemList.add(hint);
                         recruits = oneElemList;
                         break;
@@ -2153,10 +2150,9 @@ public final class Client implements IClient, IOracle
         }
     }
 
-    CreatureTypeServerSide chooseBestPotentialRecruit(String markerId,
+    CreatureTypeServerSide chooseBestPotentialRecruit(Legion legion,
         String hexLabel, List<CreatureType> recruits)
     {
-        LegionClientSide legion = getLegion(markerId);
         MasterHex hex = getGame().getVariant().getMasterBoard().getHexByLabel(
             hexLabel);
         // NOTE! Below the simpleAI is an object, not class! 
@@ -2230,14 +2226,14 @@ public final class Client implements IClient, IOracle
         return undoStack.isEmpty();
     }
 
-    String getMoverId()
+    Legion getMover()
     {
-        return moverId;
+        return mover;
     }
 
-    void setMoverId(String moverId)
+    void setMover(Legion legion)
     {
-        this.moverId = moverId;
+        this.mover = legion;
     }
 
     MasterBoard getBoard()
@@ -2352,55 +2348,54 @@ public final class Client implements IClient, IOracle
         return summonAngel;
     }
 
-    public void createSummonAngel(String markerId)
+    public void createSummonAngel(Legion legion)
     {
         if (options.getOption(Options.autoSummonAngels))
         {
-            String typeColonDonor = ai.summonAngel(markerId);
+            String typeColonDonor = ai.summonAngel(legion);
             List<String> parts = Split.split(':', typeColonDonor);
             String unit = parts.get(0);
             String donor = parts.get(1);
-            doSummon(markerId, donor, unit);
+            doSummon(legion, getLegion(donor), unit);
         }
         else
         {
             board.deiconify();
             focusBoard();
-            summonAngel = SummonAngel.summonAngel(this, markerId);
+            summonAngel = SummonAngel.summonAngel(this, legion);
         }
     }
 
-    String getDonorId()
+    Legion getDonor()
     {
-        return donorId;
+        return donor;
     }
 
     boolean donorHas(String name)
     {
-        if (donorId == null)
+        if (donor == null)
         {
             return false;
         }
-        LegionClientSide info = getLegion(donorId);
-        return info.getContents().contains(name);
+        return ((LegionClientSide)donor).getContents().contains(name);
     }
 
-    public void askAcquireAngel(String markerId, List<String> recruits)
+    public void askAcquireAngel(Legion legion, List<String> recruits)
     {
         if (options.getOption(Options.autoAcquireAngels))
         {
-            acquireAngelCallback(markerId, ai.acquireAngel(markerId, recruits));
+            acquireAngelCallback(legion, ai.acquireAngel(legion, recruits));
         }
         else
         {
             board.deiconify();
-            new AcquireAngel(board.getFrame(), this, markerId, recruits);
+            new AcquireAngel(board.getFrame(), this, legion, recruits);
         }
     }
 
-    void acquireAngelCallback(String markerId, String angelType)
+    void acquireAngelCallback(Legion legion, String angelType)
     {
-        server.acquireAngel(markerId, angelType);
+        server.acquireAngel(legion, angelType);
     }
 
     /** Present a dialog allowing the player to enter via land or teleport.
@@ -2587,20 +2582,19 @@ public final class Client implements IClient, IOracle
         }
         if (summonAngel != null)
         {
-            List<String> legions = getLegionsByHex(hexLabel);
+            List<Legion> legions = getLegionsByHex(hexLabel);
             if (legions.size() != 1)
             {
                 LOGGER
                     .log(Level.SEVERE, "Not exactly one legion in donor hex");
                 return;
             }
-            String markerId = legions.get(0);
-            donorId = markerId;
+            donor = legions.get(0);
 
-            server.setDonor(markerId);
+            server.setDonor(donor);
             summonAngel.updateChits();
             summonAngel.repaint();
-            getLegion(markerId).getMarker().repaint();
+            ((LegionClientSide)donor).getMarker().repaint();
         }
         else
         {
@@ -2612,8 +2606,7 @@ public final class Client implements IClient, IOracle
     {
         if (options.getOption(Options.autoConcede))
         {
-            answerConcede(ally, ai.concede((LegionClientSide)ally,
-                (LegionClientSide)enemy));
+            answerConcede(ally, ai.concede(ally, enemy));
         }
         else
         {
@@ -2625,8 +2618,7 @@ public final class Client implements IClient, IOracle
     {
         if (options.getOption(Options.autoFlee))
         {
-            answerFlee(ally, ai.flee((LegionClientSide)ally,
-                (LegionClientSide)enemy));
+            answerFlee(ally, ai.flee(ally, enemy));
         }
         else
         {
@@ -2654,7 +2646,7 @@ public final class Client implements IClient, IOracle
         }
         else
         {
-            doNotConcede(legion.getMarkerId());
+            doNotConcede(legion);
         }
     }
 
@@ -3010,57 +3002,56 @@ public final class Client implements IClient, IOracle
     }
 
     /** Used for human players only.  */
-    void doRecruit(String markerId)
+    void doRecruit(Legion legion)
     {
-        LegionClientSide info = getLegion(markerId);
-        if (isMyTurn() && isMyLegion(markerId) && info.hasRecruited())
+        if (isMyTurn() && isMyLegion(legion)
+            && ((LegionClientSide)legion).hasRecruited())
         {
-            undoRecruit(markerId);
+            undoRecruit(legion);
             return;
         }
 
-        if (info == null || !info.canRecruit() || !isMyTurn()
-            || !isMyLegion(markerId))
+        if (legion == null || !((LegionClientSide)legion).canRecruit()
+            || !isMyTurn() || !isMyLegion(legion))
         {
             return;
         }
 
-        String hexLabel = getHexForLegion(info);
-        List<CreatureType> recruits = findEligibleRecruits(markerId, hexLabel);
+        String hexLabel = getHexForLegion(legion);
+        List<CreatureType> recruits = findEligibleRecruits(legion, hexLabel);
         String hexDescription = getGame().getVariant().getMasterBoard()
             .getHexByLabel(hexLabel).getDescription();
 
         String recruitName = PickRecruit.pickRecruit(board.getFrame(),
-            recruits, hexDescription, info, this);
+            recruits, hexDescription, legion, this);
 
         if (recruitName == null)
         {
             return;
         }
 
-        String recruiterName = findRecruiterName(markerId, recruitName,
+        String recruiterName = findRecruiterName(legion, recruitName,
             hexDescription);
         if (recruiterName == null)
         {
             return;
         }
 
-        doRecruit(markerId, recruitName, recruiterName);
+        doRecruit(legion, recruitName, recruiterName);
     }
 
-    public void doRecruit(String markerId, String recruitName,
+    public void doRecruit(Legion legion, String recruitName,
         String recruiterName)
     {
         // Call server even if some arguments are null, to get past
         // reinforcement.
-        server.doRecruit(markerId, recruitName, recruiterName);
+        server.doRecruit(legion, recruitName, recruiterName);
     }
 
     /** Always needs to call server.doRecruit(), even if no recruit is
      *  wanted, to get past the reinforcing phase. */
-    public void doReinforce(String markerId)
+    public void doReinforce(Legion legion)
     {
-        LegionClientSide legion = getLegion(markerId);
         if (options.getOption(Options.autoReinforce))
         {
             ai.reinforce(legion);
@@ -3069,7 +3060,7 @@ public final class Client implements IClient, IOracle
         {
             String hexLabel = getHexForLegion(legion);
 
-            List<CreatureType> recruits = findEligibleRecruits(markerId,
+            List<CreatureType> recruits = findEligibleRecruits(legion,
                 hexLabel);
             String hexDescription = getGame().getVariant().getMasterBoard()
                 .getHexByLabel(hexLabel).getDescription();
@@ -3080,26 +3071,25 @@ public final class Client implements IClient, IOracle
             String recruiterName = null;
             if (recruitName != null)
             {
-                recruiterName = findRecruiterName(markerId, recruitName,
+                recruiterName = findRecruiterName(legion, recruitName,
                     hexDescription);
             }
-            doRecruit(markerId, recruitName, recruiterName);
+            doRecruit(legion, recruitName, recruiterName);
         }
     }
 
-    public void didRecruit(String markerId, String recruitName,
+    public void didRecruit(Legion legion, String recruitName,
         String recruiterName, int numRecruiters)
     {
-        LegionClientSide info = getLegion(markerId);
-        String hexLabel = getHexForLegion(info);
+        String hexLabel = getHexForLegion(legion);
         if (hexLabel == null)
         {
             LOGGER.log(Level.SEVERE, "Client.didRecruit() null hexLabel for "
-                + markerId);
+                + legion);
         }
-        if (isMyLegion(info))
+        if (isMyLegion(legion))
         {
-            pushUndoStack(markerId);
+            pushUndoStack(legion.getMarkerId());
         }
 
         List<String> recruiters = new ArrayList<String>();
@@ -3109,16 +3099,17 @@ public final class Client implements IClient, IOracle
             {
                 recruiters.add(recruiterName);
             }
-            revealCreatures(info, recruiters, Constants.reasonRecruiter);
+            revealCreatures(legion, recruiters, Constants.reasonRecruiter);
         }
-        addCreature(markerId, recruitName, Constants.reasonRecruited);
+        addCreature(legion, recruitName, Constants.reasonRecruited);
 
-        info.setRecruited(true);
-        info.setLastRecruit(recruitName);
+        ((LegionClientSide)legion).setRecruited(true);
+        ((LegionClientSide)legion).setLastRecruit(recruitName);
 
         if (eventViewer != null)
         {
-            eventViewer.recruitEvent(markerId, info.getHeight(), recruitName,
+            eventViewer.recruitEvent(legion.getMarkerId(),
+                ((LegionClientSide)legion).getHeight(), recruitName,
                 recruiters);
         }
 
@@ -3131,16 +3122,15 @@ public final class Client implements IClient, IOracle
         }
     }
 
-    public void undidRecruit(String markerId, String recruitName)
+    public void undidRecruit(Legion legion, String recruitName)
     {
-        LegionClientSide legion = getLegion(markerId);
         String hexLabel = getHexForLegion(legion);
-        removeCreature(markerId, recruitName, Constants.reasonUndidRecruit);
-        legion.setRecruited(false);
+        removeCreature(legion, recruitName, Constants.reasonUndidRecruit);
+        ((LegionClientSide)legion).setRecruited(false);
         if (eventViewer != null)
         {
-            eventViewer.undoEvent(RevealEvent.eventRecruit, markerId, null,
-                turnNumber);
+            eventViewer.undoEvent(RevealEvent.eventRecruit, legion
+                .getMarkerId(), null, turnNumber);
         }
         if (board != null)
         {
@@ -3152,12 +3142,12 @@ public final class Client implements IClient, IOracle
     }
 
     /** null means cancel.  "none" means no recruiter (tower creature). */
-    private String findRecruiterName(String markerId, String recruitName,
+    private String findRecruiterName(Legion legion, String recruitName,
         String hexDescription)
     {
         String recruiterName = null;
 
-        List<String> recruiters = findEligibleRecruiters(markerId, recruitName);
+        List<String> recruiters = findEligibleRecruiters(legion, recruitName);
 
         int numEligibleRecruiters = recruiters.size();
         if (numEligibleRecruiters == 0)
@@ -3176,7 +3166,7 @@ public final class Client implements IClient, IOracle
         else
         {
             recruiterName = PickRecruiter.pickRecruiter(board.getFrame(),
-                recruiters, hexDescription, getLegion(markerId), this);
+                recruiters, hexDescription, legion, this);
         }
         return recruiterName;
     }
@@ -3956,9 +3946,9 @@ public final class Client implements IClient, IOracle
         return turnNumber;
     }
 
-    private String figureTeleportingLord(String moverId, String hexLabel)
+    private String figureTeleportingLord(Legion legion, String hexLabel)
     {
-        List<String> lords = listTeleportingLords(moverId, hexLabel);
+        List<String> lords = listTeleportingLords(legion, hexLabel);
         String lordName = null;
         switch (lords.size())
         {
@@ -3992,29 +3982,29 @@ public final class Client implements IClient, IOracle
 
     /** List the lords eligible to teleport this legion to hexLabel,
      *  as strings. */
-    private List<String> listTeleportingLords(String moverId, String hexLabel)
+    private List<String> listTeleportingLords(Legion legion, String hexLabel)
     {
         // Needs to be a List not a Set so that it can be passed as
         // an imageList.
         List<String> lords = new ArrayList<String>();
 
-        LegionClientSide info = getLegion(moverId);
-
         // Titan teleport
-        List<String> legions = getLegionsByHex(hexLabel);
+        List<Legion> legions = getLegionsByHex(hexLabel);
         if (!legions.isEmpty())
         {
-            String markerId = legions.get(0);
-            if (markerId != null && !isMyLegion(markerId) && info.hasTitan())
+            Legion legion0 = legions.get(0);
+            if (legion0 != null && !isMyLegion(legion0)
+                && ((LegionClientSide)legion).hasTitan())
             {
-                lords.add(info.getTitanBasename());
+                lords.add(((LegionClientSide)legion).getTitanBasename());
             }
         }
 
         // Tower teleport
         else
         {
-            Iterator<String> it = info.getContents().iterator();
+            Iterator<String> it = ((LegionClientSide)legion).getContents()
+                .iterator();
             while (it.hasNext())
             {
                 String name = it.next();
@@ -4025,7 +4015,8 @@ public final class Client implements IClient, IOracle
                 {
                     if (creature.isTitan())
                     {
-                        lords.add(info.getTitanBasename());
+                        lords.add(((LegionClientSide)legion)
+                            .getTitanBasename());
                     }
                     else
                     {
@@ -4039,21 +4030,21 @@ public final class Client implements IClient, IOracle
 
     boolean doMove(String hexLabel)
     {
-        return doMove(moverId, hexLabel);
+        return doMove(mover, hexLabel);
     }
 
     /** Return true if the move looks legal. */
-    public boolean doMove(String moverId, String hexLabel)
+    public boolean doMove(Legion mover, String hexLabel)
     {
-        if (moverId == null)
+        if (mover == null)
         {
             return false;
         }
 
         boolean teleport = false;
 
-        Set<String> teleports = listTeleportMoves(moverId);
-        Set<String> normals = listNormalMoves(moverId);
+        Set<String> teleports = listTeleportMoves(mover);
+        Set<String> normals = listNormalMoves(mover);
         if (teleports.contains(hexLabel) && normals.contains(hexLabel))
         {
             teleport = chooseWhetherToTeleport(hexLabel);
@@ -4071,13 +4062,13 @@ public final class Client implements IClient, IOracle
             return false;
         }
 
-        Set<String> entrySides = listPossibleEntrySides(moverId, hexLabel,
+        Set<String> entrySides = listPossibleEntrySides(mover, hexLabel,
             teleport);
 
         String entrySide = null;
         if (options.getOption(Options.autoPickEntrySide))
         {
-            entrySide = ai.pickEntrySide(hexLabel, moverId, entrySides);
+            entrySide = ai.pickEntrySide(hexLabel, mover, entrySides);
         }
         else
         {
@@ -4093,14 +4084,13 @@ public final class Client implements IClient, IOracle
         String teleportingLord = null;
         if (teleport)
         {
-            teleportingLord = figureTeleportingLord(moverId, hexLabel);
+            teleportingLord = figureTeleportingLord(mover, hexLabel);
         }
 
         // if this hex is already occupied, return false
-        LegionClientSide li = getLegion(moverId);
-        int friendlyLegions = getNumFriendlyLegions(hexLabel,
-            getActivePlayer());
-        if (hexLabel.equals(li.getHexLabel()))
+        int friendlyLegions = getFriendlyLegions(hexLabel, getActivePlayer())
+            .size();
+        if (hexLabel.equals(((LegionClientSide)mover).getHexLabel()))
         {
             // same hex as starting hex, but it might be occupied by
             // multiple legions after split
@@ -4117,7 +4107,7 @@ public final class Client implements IClient, IOracle
             }
         }
 
-        server.doMove(moverId, hexLabel, entrySide, teleport, teleportingLord);
+        server.doMove(mover, hexLabel, entrySide, teleport, teleportingLord);
         return true;
     }
 
@@ -4128,29 +4118,30 @@ public final class Client implements IClient, IOracle
             .equals(Constants.right)));
     }
 
-    public void didMove(String markerId, String startingHexLabel,
+    public void didMove(Legion info, String startingHexLabel,
         String currentHexLabel, String entrySide, boolean teleport,
         String teleportingLord, boolean splitLegionHasForcedMove)
     {
         removeRecruitChit(startingHexLabel);
-        if (isMyLegion(markerId))
+        if (isMyLegion(info))
         {
-            pushUndoStack(markerId);
+            pushUndoStack(info.getMarkerId());
         }
-        LegionClientSide info = getLegion(markerId);
-        info.setHexLabel(currentHexLabel);
-        info.setMoved(true);
-        info.setEntrySide(BattleMap.entrySideNum(entrySide));
+        ((LegionClientSide)info).setHexLabel(currentHexLabel);
+        ((LegionClientSide)info).setMoved(true);
+        ((LegionClientSide)info).setEntrySide(BattleMap
+            .entrySideNum(entrySide));
 
         // old version server does not send the teleportingLord,
         // socketCLientThread sets then it to null.
         if (teleport && teleportingLord != null)
         {
-            getLegion(markerId).setTeleported(true);
+            ((LegionClientSide)info).setTeleported(true);
             if (eventViewer != null)
             {
                 eventViewer.newCreatureRevealEvent(RevealEvent.eventTeleport,
-                    markerId, info.getHeight(), teleportingLord, null, 0);
+                    info.getMarkerId(), ((LegionClientSide)info).getHeight(),
+                    teleportingLord, null, 0);
             }
         }
         if (board != null)
@@ -4159,7 +4150,7 @@ public final class Client implements IClient, IOracle
             board.alignLegions(currentHexLabel);
             board.highlightUnmovedLegions();
             board.repaint();
-            if (isMyLegion(markerId) && !splitLegionHasForcedMove)
+            if (isMyLegion(info) && !splitLegionHasForcedMove)
             {
                 board.enableDoneAction();
             }
@@ -4167,15 +4158,15 @@ public final class Client implements IClient, IOracle
         kickMoves();
     }
 
-    public void undidMove(String markerId, String formerHexLabel,
+    public void undidMove(Legion legion, String formerHexLabel,
         String currentHexLabel, boolean splitLegionHasForcedMove)
     {
         removeRecruitChit(formerHexLabel);
         removeRecruitChit(currentHexLabel);
-        getLegion(markerId).setHexLabel(currentHexLabel);
-        getLegion(markerId).setMoved(false);
-        boolean didTeleport = getLegion(markerId).hasTeleported();
-        getLegion(markerId).setTeleported(false);
+        ((LegionClientSide)legion).setHexLabel(currentHexLabel);
+        ((LegionClientSide)legion).setMoved(false);
+        boolean didTeleport = ((LegionClientSide)legion).hasTeleported();
+        ((LegionClientSide)legion).setTeleported(false);
         if (board != null)
         {
             board.alignLegions(formerHexLabel);
@@ -4192,8 +4183,8 @@ public final class Client implements IClient, IOracle
 
             if (didTeleport && eventViewer != null)
             {
-                eventViewer.undoEvent(RevealEvent.eventTeleport, markerId,
-                    null, turnNumber);
+                eventViewer.undoEvent(RevealEvent.eventTeleport, legion
+                    .getMarkerId(), null, turnNumber);
             }
         }
     }
@@ -4282,21 +4273,26 @@ public final class Client implements IClient, IOracle
         return remain;
     }
 
-    /** Return a list of Creatures (ignore reservations). */
-    public List<CreatureType> findEligibleRecruits(String markerId,
+    /** Return a list of Creatures (ignore reservations). 
+     * 
+     * TODO the extra hexLabel parameter is probably not needed anymore
+     */
+    public List<CreatureType> findEligibleRecruits(Legion legion,
         String hexLabel)
     {
-        return findEligibleRecruits(markerId, hexLabel, false);
+        return findEligibleRecruits(legion, hexLabel, false);
     }
 
-    /** Return a list of Creatures. Consider reservations if wanted */
-    public List<CreatureType> findEligibleRecruits(String markerId,
+    /** Return a list of Creatures. Consider reservations if wanted
+     * 
+     * TODO the extra hexLabel parameter is probably not needed anymore
+     */
+    public List<CreatureType> findEligibleRecruits(Legion legion,
         String hexLabel, boolean considerReservations)
     {
         List<CreatureType> recruits = new ArrayList<CreatureType>();
 
-        LegionClientSide info = getLegion(markerId);
-        if (info == null)
+        if (legion == null)
         {
             return recruits;
         }
@@ -4326,7 +4322,8 @@ public final class Client implements IClient, IOracle
             {
                 CreatureType lesser = liter.next();
                 if ((TerrainRecruitLoader.numberOfRecruiterNeeded(lesser,
-                    creature, terrain, hexLabel) <= info.numCreature(lesser))
+                    creature, terrain, hexLabel) <= ((LegionClientSide)legion)
+                    .numCreature(lesser))
                     && (recruits.indexOf(creature) == -1))
                 {
                     recruits.add(creature);
@@ -4356,8 +4353,7 @@ public final class Client implements IClient, IOracle
     }
 
     /** Return a list of creature name strings. */
-    public List<String> findEligibleRecruiters(String markerId,
-        String recruitName)
+    public List<String> findEligibleRecruiters(Legion info, String recruitName)
     {
         Set<CreatureType> recruiters;
         CreatureTypeServerSide recruit = (CreatureTypeServerSide)game
@@ -4367,8 +4363,7 @@ public final class Client implements IClient, IOracle
             return new ArrayList<String>();
         }
 
-        LegionClientSide info = getLegion(markerId);
-        String hexLabel = info.getHexLabel();
+        String hexLabel = ((LegionClientSide)info).getHexLabel();
         MasterHex hex = getGame().getVariant().getMasterBoard().getHexByLabel(
             hexLabel);
         String terrain = hex.getTerrain();
@@ -4381,7 +4376,9 @@ public final class Client implements IClient, IOracle
             CreatureType possibleRecruiter = it.next();
             int needed = TerrainRecruitLoader.numberOfRecruiterNeeded(
                 possibleRecruiter, recruit, terrain, hexLabel);
-            if (needed < 1 || needed > info.numCreature(possibleRecruiter))
+            if (needed < 1
+                || needed > ((LegionClientSide)info)
+                    .numCreature(possibleRecruiter))
             {
                 // Zap this possible recruiter.
                 it.remove();
@@ -4418,16 +4415,16 @@ public final class Client implements IClient, IOracle
     /** Return a set of hexLabels for all other unengaged legions of
      *  markerId's player that have summonables.
      * public for client-side AI -- do not call from server side. */
-    public Set<String> findSummonableAngelHexes(String summonerId)
+    public Set<String> findSummonableAngelHexes(Legion summoner)
     {
         Set<String> set = new HashSet<String>();
-        LegionClientSide summonerInfo = getLegion(summonerId);
-        PlayerClientSide player = summonerInfo.getPlayer();
-        Iterator<String> it = player.getLegionIds().iterator();
+        Player player = summoner.getPlayer();
+        Iterator<String> it = ((PlayerClientSide)player).getLegionIds()
+            .iterator();
         while (it.hasNext())
         {
             String markerId = it.next();
-            if (!markerId.equals(summonerId))
+            if (!markerId.equals(summoner.getMarkerId()))
             {
                 LegionClientSide info = getLegion(markerId);
                 if (info.hasSummonable() && !(info.isEngaged()))
@@ -4450,27 +4447,26 @@ public final class Client implements IClient, IOracle
     }
 
     /** Return a set of hexLabels. */
-    Set<String> listTeleportMoves(String markerId)
+    Set<String> listTeleportMoves(Legion legion)
     {
-        LegionClientSide info = getLegion(markerId);
         MasterHex hex = getGame().getVariant().getMasterBoard().getHexByLabel(
-            info.getHexLabel());
-        return movement.listTeleportMoves(info, hex, movementRoll);
+            ((LegionClientSide)legion).getHexLabel());
+        return movement.listTeleportMoves(legion, hex, movementRoll);
     }
 
     /** Return a set of hexLabels. */
-    Set<String> listNormalMoves(String markerId)
+    Set<String> listNormalMoves(Legion info)
     {
-        LegionClientSide info = getLegion(markerId);
         MasterHex hex = getGame().getVariant().getMasterBoard().getHexByLabel(
-            info.getHexLabel());
+            ((LegionClientSide)info).getHexLabel());
         return movement.listNormalMoves(info, hex, movementRoll);
     }
 
-    Set<String> listPossibleEntrySides(String moverId, String hexLabel,
+    Set<String> listPossibleEntrySides(Legion mover, String hexLabel,
         boolean teleport)
     {
-        return movement.listPossibleEntrySides(moverId, hexLabel, teleport);
+        return movement.listPossibleEntrySides(mover.getMarkerId(), hexLabel,
+            teleport);
     }
 
     int getCreatureCount(String creatureName)
@@ -4503,23 +4499,18 @@ public final class Client implements IClient, IOracle
         return caretakerInfo.getMaxCount(creature);
     }
 
-    /** Returns a list of markerIds. */
-    public List<String> getLegionsByHex(String hexLabel)
+    public List<Legion> getLegionsByHex(String hexLabel)
     {
-        List<String> markerIds = new ArrayList<String>();
-        Iterator<Entry<String, LegionClientSide>> it = legionInfo.entrySet()
-            .iterator();
-        while (it.hasNext())
+        List<Legion> legions = new ArrayList<Legion>();
+        for (LegionClientSide info : legionInfo.values())
         {
-            Entry<String, LegionClientSide> entry = it.next();
-            LegionClientSide info = entry.getValue();
             if (info != null && info.getHexLabel() != null && hexLabel != null
                 && hexLabel.equals(info.getHexLabel()))
             {
-                markerIds.add(info.getMarkerId());
+                legions.add(info);
             }
         }
-        return markerIds;
+        return legions;
     }
 
     /** 
@@ -4598,16 +4589,14 @@ public final class Client implements IClient, IOracle
         while (it.hasNext())
         {
             String hexLabel = it.next();
-            List<String> markerIds = getLegionsByHex(hexLabel);
-            if (markerIds.size() == 2)
+            List<Legion> legions = getLegionsByHex(hexLabel);
+            if (legions.size() == 2)
             {
-                String marker0 = markerIds.get(0);
-                LegionClientSide info0 = getLegion(marker0);
-                Player player0 = info0.getPlayer();
+                Legion legion0 = legions.get(0);
+                Player player0 = legion0.getPlayer();
 
-                String marker1 = markerIds.get(1);
-                LegionClientSide info1 = getLegion(marker1);
-                Player player1 = info1.getPlayer();
+                Legion legion1 = legions.get(1);
+                Player player1 = legion1.getPlayer();
 
                 if (!player0.equals(player1))
                 {
@@ -4625,15 +4614,13 @@ public final class Client implements IClient, IOracle
 
     boolean isEngagement(String hexLabel)
     {
-        List<String> markerIds = getLegionsByHex(hexLabel);
-        if (markerIds.size() == 2)
+        List<Legion> legions = getLegionsByHex(hexLabel);
+        if (legions.size() == 2)
         {
-            String marker0 = markerIds.get(0);
-            LegionClientSide info0 = getLegion(marker0);
+            Legion info0 = legions.get(0);
             Player player0 = info0.getPlayer();
 
-            String marker1 = markerIds.get(1);
-            LegionClientSide info1 = getLegion(marker1);
+            Legion info1 = legions.get(1);
             Player player1 = info1.getPlayer();
 
             return !player0.equals(player1);
@@ -4657,82 +4644,62 @@ public final class Client implements IClient, IOracle
         return markerIds;
     }
 
-    List<String> getEnemyLegions(String hexLabel, Player player)
+    public List<Legion> getEnemyLegions(final String hexLabel,
+        final Player player)
     {
-        List<String> markerIds = new ArrayList<String>();
-        List<String> legions = getLegionsByHex(hexLabel);
-        Iterator<String> it = legions.iterator();
-        while (it.hasNext())
-        {
-            String markerId = it.next();
-            if (!player.equals(getPlayerStateByMarkerId(markerId)))
+        return CollectionHelper.selectAsList(getLegionsByHex(hexLabel),
+            new Predicate<Legion>()
             {
-                markerIds.add(markerId);
-            }
-        }
-        return markerIds;
+                public boolean matches(Legion legion)
+                {
+                    return !player.equals(legion.getPlayer());
+                }
+            });
     }
 
-    public String getFirstEnemyLegion(String hexLabel, Player player)
+    public Legion getFirstEnemyLegion(String hexLabel, Player player)
     {
-        List<String> markerIds = getEnemyLegions(hexLabel, player);
-        if (markerIds.isEmpty())
+        List<Legion> legions = getEnemyLegions(hexLabel, player);
+        if (legions.isEmpty())
         {
             return null;
         }
-        return markerIds.get(0);
+        return legions.get(0);
     }
 
-    public int getNumEnemyLegions(String hexLabel, Player player)
+    public List<Legion> getFriendlyLegions(final Player player)
     {
-        return getEnemyLegions(hexLabel, player).size();
-    }
-
-    public List<String> getFriendlyLegions(Player player)
-    {
-        List<String> markerIds = new ArrayList<String>();
-        Iterator<LegionClientSide> it = legionInfo.values().iterator();
-        while (it.hasNext())
-        {
-            LegionClientSide info = it.next();
-            String markerId = info.getMarkerId();
-            if (player.equals(info.getPlayer()))
+        return CollectionHelper.selectAsList(legionInfo.values(),
+            new Predicate<Legion>()
             {
-                markerIds.add(markerId);
-            }
-        }
-        return markerIds;
+                public boolean matches(Legion legion)
+                {
+                    return player.equals(legion.getPlayer());
+                }
+            });
     }
 
-    public List<String> getFriendlyLegions(String hexLabel, Player player)
+    public List<Legion> getFriendlyLegions(final String hexLabel,
+        final Player player)
     {
-        List<String> markerIds = new ArrayList<String>();
-        List<String> legions = getLegionsByHex(hexLabel);
-        Iterator<String> it = legions.iterator();
-        while (it.hasNext())
-        {
-            String markerId = it.next();
-            if (player.equals(getPlayerStateByMarkerId(markerId)))
+        return CollectionHelper.selectAsList(getLegionsByHex(hexLabel),
+            new Predicate<Legion>()
             {
-                markerIds.add(markerId);
-            }
-        }
-        return markerIds;
+                public boolean matches(Legion legion)
+                {
+                    return player.equals(legion.getPlayer());
+                }
+            });
     }
 
-    public String getFirstFriendlyLegion(String hexLabel, Player player)
+    public Legion getFirstFriendlyLegion(String hexLabel, Player player)
     {
-        List<String> markerIds = getFriendlyLegions(hexLabel, player);
-        if (markerIds.isEmpty())
+        List<Legion> legions = getFriendlyLegions(hexLabel, player);
+        if (legions.isEmpty())
         {
             return null;
         }
-        return markerIds.get(0);
-    }
-
-    public int getNumFriendlyLegions(String hexLabel, Player player)
-    {
-        return getFriendlyLegions(hexLabel, player).size();
+        return legions.get(0);
     }
 
     // Used by File=>Close and Window closing 
@@ -4860,22 +4827,21 @@ public final class Client implements IClient, IOracle
         if (!isUndoStackEmpty())
         {
             String markerId = (String)popUndoStack();
-            server.undoMove(markerId);
+            server.undoMove(getLegion(markerId));
             clearRecruitChits();
         }
     }
 
-    public void undidSplit(String splitoffId, String survivorId, int turn)
+    public void undidSplit(Legion splitoff, Legion survivor, int turn)
     {
-        LegionClientSide info = getLegion(survivorId);
-        info.merge(splitoffId);
-        removeLegion(splitoffId);
+        ((LegionClientSide)survivor).merge(splitoff);
+        removeLegion(splitoff);
         // do the eventViewer stuff before the board, so we are sure to get
         // a repaint.
         if (eventViewer != null)
         {
-            eventViewer.undoEvent(RevealEvent.eventSplit, survivorId,
-                splitoffId, turn);
+            eventViewer.undoEvent(RevealEvent.eventSplit, survivor
+                .getMarkerId(), splitoff.getMarkerId(), turn);
         }
         else
         {
@@ -4885,7 +4851,7 @@ public final class Client implements IClient, IOracle
 
         if (board != null)
         {
-            board.alignLegions(info.getHexLabel());
+            board.alignLegions(((LegionClientSide)survivor).getHexLabel());
             board.highlightTallLegions();
         }
         if (isMyTurn() && this.phase == Constants.Phase.SPLIT
@@ -4904,17 +4870,17 @@ public final class Client implements IClient, IOracle
         if (!isUndoStackEmpty())
         {
             String markerId = (String)popUndoStack();
-            server.undoRecruit(markerId);
+            server.undoRecruit(getLegion(markerId));
         }
     }
 
-    void undoRecruit(String markerId)
+    void undoRecruit(Legion legion)
     {
-        if (undoStack.contains(markerId))
+        if (undoStack.contains(legion.getMarkerId()))
         {
-            undoStack.remove(markerId);
+            undoStack.remove(legion.getMarkerId());
         }
-        server.undoRecruit(markerId);
+        server.undoRecruit(legion);
     }
 
     void undoAllSplits()
@@ -5092,10 +5058,10 @@ public final class Client implements IClient, IOracle
         return owningPlayer.getMulligansLeft();
     }
 
-    void doSplit(String parentId)
+    void doSplit(Legion legion)
     {
-        LOGGER.log(Level.FINEST, "Client.doSplit " + parentId);
-        this.parentId = null;
+        LOGGER.log(Level.FINER, "Client.doSplit " + legion);
+        this.parent = null;
 
         if (!isMyTurn())
         {
@@ -5104,7 +5070,7 @@ public final class Client implements IClient, IOracle
             return;
         }
         // Can't split other players' legions.
-        if (!isMyLegion(parentId))
+        if (!isMyLegion(legion))
         {
             LOGGER.log(Level.SEVERE, "Not my legion!");
             kickSplit();
@@ -5119,7 +5085,7 @@ public final class Client implements IClient, IOracle
             return;
         }
         // Legion must be tall enough to split.
-        if (getLegionHeight(parentId) < 4)
+        if (((LegionClientSide)legion).getHeight() < 4)
         {
             showMessageDialog("Legion is too short to split");
             kickSplit();
@@ -5133,7 +5099,7 @@ public final class Client implements IClient, IOracle
             return;
         }
 
-        this.parentId = parentId;
+        this.parent = legion;
 
         if (options.getOption(Options.autoPickMarker))
         {
@@ -5148,65 +5114,68 @@ public final class Client implements IClient, IOracle
     }
 
     /** Called after a marker is picked, either first marker or split. */
-    void pickMarkerCallback(String childId)
+    void pickMarkerCallback(String childMarker)
     {
-        if (childId == null)
+        if (childMarker == null)
         {
             return;
         }
-        if (parentId == null)
+        if (parent == null)
         {
             // Picking first marker.
-            server.assignFirstMarker(childId);
+            server.assignFirstMarker(childMarker);
             return;
         }
-        String results = SplitLegion.splitLegion(this,
-            getLegion(parentId), childId);
+        String results = SplitLegion.splitLegion(this, parent, childMarker);
         if (results != null)
         {
-            doSplit(parentId, childId, results);
+            doSplit(parent, childMarker, results);
         }
     }
 
     /** Called by AI, and by pickMarkerCallback() */
-    public void doSplit(String parentId, String childId, String results)
+    public void doSplit(Legion parent, String childMarker, String results)
     {
-        LOGGER.log(Level.FINEST, "Client.doSplit " + parentId + " " + childId
+        LOGGER.log(Level.FINER, "Client.doSplit " + parent + " " + childMarker
             + " " + results);
-        server.doSplit(parentId, childId, results);
+        server.doSplit(parent, childMarker, results);
     }
 
-    /** Callback from server after any successful split. */
-    public void didSplit(String hexLabel, String parentId, String childId,
+    /** 
+     * Callback from server after any successful split.
+     * 
+     * TODO childHeight is probably redundant now that we pass the legion object
+     */
+    public void didSplit(String hexLabel, Legion parent, Legion child,
         int childHeight, List<String> splitoffs, int turn)
     {
-        LOGGER.log(Level.FINEST, "Client.didSplit " + hexLabel + " "
-            + parentId + " " + childId + " " + childHeight + " " + turn);
+        LOGGER.log(Level.FINEST, "Client.didSplit " + hexLabel + " " + parent
+            + " " + child + " " + childHeight + " " + turn);
 
-        LegionClientSide parentInfo = getLegion(parentId);
-        LegionClientSide childInfo = createLegionInfo(childId);
-        parentInfo.split(childHeight, childId, turn);
+        ((LegionClientSide)parent).split(childHeight, child, turn);
 
-        childInfo.setHexLabel(hexLabel);
+        ((LegionClientSide)child).setHexLabel(hexLabel);
 
         if (eventViewer != null)
         {
-            eventViewer.newSplitEvent(parentId, parentInfo.getHeight(), null,
-                childId, childInfo.getHeight());
+            eventViewer.newSplitEvent(parent.getMarkerId(),
+                ((LegionClientSide)parent).getHeight(), null, child
+                    .getMarkerId(), ((LegionClientSide)child).getHeight());
         }
 
         if (board != null)
         {
-            Marker marker = new Marker(3 * Scale.get(), childId, this);
-            setMarker(childId, marker);
+            Marker marker = new Marker(3 * Scale.get(), child.getMarkerId(),
+                this);
+            setMarker(child.getMarkerId(), marker);
             board.alignLegions(hexLabel);
         }
 
-        if (isMyLegion(childId))
+        if (isMyLegion(child))
         {
             clearRecruitChits();
-            pushUndoStack(childId);
-            getOwningPlayer().removeMarkerAvailable(childId);
+            pushUndoStack(child.getMarkerId());
+            getOwningPlayer().removeMarkerAvailable(child.getMarkerId());
         }
 
         numSplitsThisTurn++;
@@ -5226,7 +5195,8 @@ public final class Client implements IClient, IOracle
         if (isMyTurn() && this.phase == Constants.Phase.SPLIT
             && options.getOption(Options.autoSplit) && !isGameOver())
         {
-            boolean done = ai.splitCallback(parentId, childId);
+            boolean done = ai.splitCallback(parent.getMarkerId(), child
+                .getMarkerId());
             if (done)
             {
                 doneWithSplits();

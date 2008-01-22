@@ -18,6 +18,7 @@ import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 
+import net.sf.colossus.game.Legion;
 import net.sf.colossus.util.KDialog;
 
 
@@ -33,17 +34,17 @@ final class AcquireAngel extends KDialog implements MouseListener,
     private final List<Chit> chits = new ArrayList<Chit>();
     private final List<String> recruits;
     private final Client client;
-    private final String markerId;
+    private final Legion legion;
     private final SaveWindow saveWindow;
 
-    AcquireAngel(JFrame parentFrame, Client client, String markerId,
+    AcquireAngel(JFrame parentFrame, Client client, Legion legion,
         List<String> recruits)
     {
         super(parentFrame, client.getOwningPlayer().getName()
-            + ": Acquire Angel in legion " + markerId, false);
+            + ": Acquire Angel in legion " + legion, false);
 
         this.client = client;
-        this.markerId = markerId;
+        this.legion = legion;
         this.recruits = recruits;
 
         addMouseListener(this);
@@ -89,7 +90,7 @@ final class AcquireAngel extends KDialog implements MouseListener,
 
     void cleanup(String angelType)
     {
-        client.acquireAngelCallback(markerId, angelType);
+        client.acquireAngelCallback(legion, angelType);
         saveWindow.saveLocation(getLocation());
         dispose();
     }

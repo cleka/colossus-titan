@@ -35,14 +35,14 @@ public interface IClient
 
     public void dispose();
 
-    public void removeLegion(String id);
+    public void removeLegion(Legion legion);
 
-    public void setLegionStatus(String markerId, boolean moved,
+    public void setLegionStatus(Legion legion, boolean moved,
         boolean teleported, int entrySide, String lastRecruit);
 
-    public void addCreature(String markerId, String name, String reason);
+    public void addCreature(Legion legion, String name, String reason);
 
-    public void removeCreature(String markerId, String name, String reason);
+    public void removeCreature(Legion legion, String name, String reason);
 
     public void revealCreatures(Legion legion, final List<String> names,
         String reason);
@@ -59,9 +59,9 @@ public interface IClient
 
     public void setPlayerName(String newPlayerName);
 
-    public void createSummonAngel(String markerId);
+    public void createSummonAngel(Legion legion);
 
-    public void askAcquireAngel(String markerId, List<String> recruits);
+    public void askAcquireAngel(Legion legion, List<String> recruits);
 
     public void askChooseStrikePenalty(List<String> choices);
 
@@ -90,12 +90,12 @@ public interface IClient
 
     public void nextEngagement();
 
-    public void doReinforce(String markerId);
+    public void doReinforce(Legion legion);
 
-    public void didRecruit(String markerId, String recruitName,
+    public void didRecruit(Legion legion, String recruitName,
         String recruiterName, int numRecruiters);
 
-    public void undidRecruit(String markerId, String recruitName);
+    public void undidRecruit(Legion legion, String recruitName);
 
     public void setupTurnState(Player activePlayer, int turnNumber);
 
@@ -123,18 +123,19 @@ public interface IClient
     public void tellBattleMove(int tag, String startingHexLabel,
         String endingHexLabel, boolean undo);
 
-    public void didMove(String markerId, String startingHexLabel,
+    public void didMove(Legion legion, String startingHexLabel,
         String currentHexLabel, String entrySide, boolean teleport,
         String teleportingLord, boolean splitLegionHasForcedMove);
 
-    public void undidMove(String markerId, String formerHexLabel,
+    public void undidMove(Legion legion, String formerHexLabel,
         String currentHexLabel, boolean splitLegionHasForcedMove);
 
-    public void didSummon(String summonerId, String donorId, String summon);
+    public void didSummon(Legion receivingLegion, Legion donorLegion,
+        String summon);
 
-    public void undidSplit(String splitoffId, String survivorId, int turn);
+    public void undidSplit(Legion splitoff, Legion survivor, int turn);
 
-    public void didSplit(String hexLabel, String parentId, String childId,
+    public void didSplit(String hexLabel, Legion parent, Legion child,
         int childHeight, List<String> splitoffs, int turn);
 
     public void askPickColor(List<String> colorsLeft);

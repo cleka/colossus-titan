@@ -822,13 +822,12 @@ public final class BattleServerSide extends net.sf.colossus.game.Battle
                 if (donor != null)
                 {
                     donor.addCreature(critter.getCreature(), false);
-                    server.allTellAddCreature(donor.getMarkerId(), critter
-                        .getName(), true, Constants.reasonUndoSummon);
+                    server.allTellAddCreature(donor, critter.getName(), true,
+                        Constants.reasonUndoSummon);
                     // This summon doesn't count; the player can
                     // summon again later this turn.
-                    LOGGER.log(Level.INFO, "undosummon critter "
-                        + critter.getName() + " back to marker "
-                        + donor.getMarkerId() + "");
+                    LOGGER.log(Level.INFO, "undosummon critter " + critter
+                        + " back to marker " + donor + "");
                     player.setSummoned(false);
                 }
                 else

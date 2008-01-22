@@ -25,8 +25,8 @@ import net.sf.colossus.variant.MasterHex;
 
 public final class LegionClientSide extends Legion
 {
-    private static final Logger LOGGER = Logger.getLogger(LegionClientSide.class
-        .getName());
+    private static final Logger LOGGER = Logger
+        .getLogger(LegionClientSide.class.getName());
 
     private final Client client;
 
@@ -146,8 +146,8 @@ public final class LegionClientSide extends Legion
         Iterator<String> it = getContents().iterator();
         while (it.hasNext())
         {
-            CreatureTypeServerSide c = (CreatureTypeServerSide)getPlayer().getGame().getVariant()
-                .getCreatureByName(it.next());
+            CreatureTypeServerSide c = (CreatureTypeServerSide)getPlayer()
+                .getGame().getVariant().getCreatureByName(it.next());
             if (c.isSummonable())
             {
                 count++;
@@ -231,17 +231,17 @@ public final class LegionClientSide extends Legion
         getNode().revealCreatures(names);
     }
 
-    void split(int childHeight, String childId, int turn)
+    void split(int childHeight, Legion child, int turn)
     {
-        getNode().split(childHeight, childId, turn);
+        getNode().split(childHeight, child, turn);
         myNode = myNode.getChild1();
     }
 
-    void merge(String splitoffId)
+    void merge(Legion splitoff)
     {
-        LOGGER.log(Level.FINEST, "LegionInfo.merge() for " + markerId + " "
-            + splitoffId);
-        getNode().merge(getNode(splitoffId));
+        LOGGER.log(Level.FINER, "LegionInfo.merge() for " + splitoff + " "
+            + splitoff);
+        getNode().merge(getNode(splitoff.getMarkerId()));
         // since this is potentially a merge of a 3-way split, be safe and 
         // find the node again
         myNode = getNode(this.markerId);
@@ -266,8 +266,8 @@ public final class LegionClientSide extends Legion
             }
             else
             {
-                CreatureTypeServerSide creature = (CreatureTypeServerSide)getPlayer().getGame()
-                    .getVariant().getCreatureByName(name);
+                CreatureTypeServerSide creature = (CreatureTypeServerSide)getPlayer()
+                    .getGame().getVariant().getCreatureByName(name);
                 if (creature != null && creature.isLord())
                 {
                     count++;
@@ -285,8 +285,8 @@ public final class LegionClientSide extends Legion
         while (it.hasNext())
         {
             String name = it.next();
-            CreatureTypeServerSide creature = (CreatureTypeServerSide)getPlayer().getGame().getVariant()
-                .getCreatureByName(name);
+            CreatureTypeServerSide creature = (CreatureTypeServerSide)getPlayer()
+                .getGame().getVariant().getCreatureByName(name);
             if (creature.isSummonable())
             {
                 if (best == null
@@ -322,13 +322,13 @@ public final class LegionClientSide extends Legion
                 PlayerClientSide info = getPlayer();
                 // Titan skill is changed by variants.
                 sum += info.getTitanPower()
-                    * ((CreatureTypeServerSide)getPlayer().getGame().getVariant()
-                        .getCreatureByName("Titan")).getSkill();
+                    * ((CreatureTypeServerSide)getPlayer().getGame()
+                        .getVariant().getCreatureByName("Titan")).getSkill();
             }
             else
             {
-                sum += ((CreatureTypeServerSide)getPlayer().getGame().getVariant()
-                    .getCreatureByName(name)).getPointValue();
+                sum += ((CreatureTypeServerSide)getPlayer().getGame()
+                    .getVariant().getCreatureByName(name)).getPointValue();
             }
         }
         return sum;
@@ -350,13 +350,13 @@ public final class LegionClientSide extends Legion
                 PlayerClientSide info = getPlayer();
                 // Titan skill is changed by variants.
                 sum += info.getTitanPower()
-                    * ((CreatureTypeServerSide)getPlayer().getGame().getVariant()
-                        .getCreatureByName("Titan")).getSkill();
+                    * ((CreatureTypeServerSide)getPlayer().getGame()
+                        .getVariant().getCreatureByName("Titan")).getSkill();
             }
             else
             {
-                sum += ((CreatureTypeServerSide)getPlayer().getGame().getVariant()
-                    .getCreatureByName(name)).getPointValue();
+                sum += ((CreatureTypeServerSide)getPlayer().getGame()
+                    .getVariant().getCreatureByName(name)).getPointValue();
             }
         }
         return sum;
@@ -463,12 +463,9 @@ public final class LegionClientSide extends Legion
     /** Return true if the legion has moved and can recruit. */
     public boolean canRecruit()
     {
-        return hasMoved()
-            && getHeight() < 7
-            && !hasRecruited()
+        return hasMoved() && getHeight() < 7 && !hasRecruited()
             && !getPlayer().isDead()
-            && !client.findEligibleRecruits(getMarkerId(), getHexLabel())
-                .isEmpty();
+            && !client.findEligibleRecruits(this, getHexLabel()).isEmpty();
     }
 
     @Override
@@ -503,10 +500,10 @@ public final class LegionClientSide extends Legion
             {
                 return 1;
             }
-            CreatureTypeServerSide c1 = (CreatureTypeServerSide)VariantSupport.getCurrentVariant()
-                .getCreatureByName(s1);
-            CreatureTypeServerSide c2 = (CreatureTypeServerSide)VariantSupport.getCurrentVariant()
-                .getCreatureByName(s2);
+            CreatureTypeServerSide c1 = (CreatureTypeServerSide)VariantSupport
+                .getCurrentVariant().getCreatureByName(s1);
+            CreatureTypeServerSide c2 = (CreatureTypeServerSide)VariantSupport
+                .getCurrentVariant().getCreatureByName(s2);
             return c2.getKillValue() - c1.getKillValue();
         }
     }

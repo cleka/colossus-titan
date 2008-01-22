@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Set;
 
 import net.sf.colossus.client.CritterMove;
-import net.sf.colossus.client.LegionClientSide;
+import net.sf.colossus.game.Legion;
 
 
 /**
@@ -31,16 +31,16 @@ public interface AI
     void muster();
 
     /** pick one reinforcement for legion */
-    void reinforce(LegionClientSide legion);
+    void reinforce(Legion legion);
 
     /** choose whether legion should flee from enemy */
-    boolean flee(LegionClientSide legion, LegionClientSide enemy);
+    boolean flee(Legion legion, Legion enemy);
 
     /** choose whether legion should concede to enemy */
-    boolean concede(LegionClientSide legion, LegionClientSide enemy);
+    boolean concede(Legion legion, Legion enemy);
 
     /** make battle strikes for legion */
-    boolean strike(LegionClientSide legion);
+    boolean strike(Legion legion);
 
     /** return a list of battle moves for the active legion */
     List<CritterMove> battleMove();
@@ -49,17 +49,16 @@ public interface AI
     void retryFailedBattleMoves(List<CritterMove> bestMoveOrder);
 
     /** pick an entry side */
-    String pickEntrySide(String hexLabel, String markerId,
-        Set<String> entrySides);
+    String pickEntrySide(String hexLabel, Legion legion, Set<String> entrySides);
 
     /** pick an engagement to resolve */
     String pickEngagement();
 
     /** choose whether to acquire an angel or archangel */
-    String acquireAngel(String markerId, List<String> recruits);
+    String acquireAngel(Legion legion, List<String> recruits);
 
     /** choose whether to summon an angel or archangel */
-    String summonAngel(String summonerId);
+    String summonAngel(Legion summoner);
 
     /** pick a color of legion markers */
     String pickColor(List<String> colors, List<String> favoriteColors);

@@ -8,6 +8,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import net.sf.colossus.game.Legion;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.CreatureTypeServerSide;
 import net.sf.colossus.server.VariantSupport;
@@ -619,7 +620,7 @@ public class PredictSplitNode implements Comparable<PredictSplitNode>
      * @param otherMarkerId
      * @param turn
      */
-    void split(int childSize, String otherMarkerId, int turn)
+    void split(int childSize, Legion otherLegion, int turn)
     {
         assert creatures.size() <= 8 : "> 8 creatures in legion";
         assert !hasSplit() : "use reSplit to recalculate old splits";
@@ -633,7 +634,8 @@ public class PredictSplitNode implements Comparable<PredictSplitNode>
         computeSplit(childSize, knownKeep, knownSplit, keepList, splitList);
 
         child1 = new PredictSplitNode(markerId, turn, keepList, this);
-        child2 = new PredictSplitNode(otherMarkerId, turn, splitList, this);
+        child2 = new PredictSplitNode(otherLegion.getMarkerId(), turn,
+            splitList, this);
         childSize2 = child2.getHeight();
     }
 

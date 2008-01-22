@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
 
 import org.jdom.Element;
@@ -29,30 +30,30 @@ public class History
         return (Element)root.clone();
     }
 
-    void addCreatureEvent(String markerId, String creatureName, int turn)
+    void addCreatureEvent(Legion legion, String creatureName, int turn)
     {
         Element event = new Element("AddCreature");
-        event.setAttribute("markerId", markerId);
+        event.setAttribute("markerId", legion.getMarkerId());
         event.setAttribute("creatureName", creatureName);
         event.setAttribute("turn", "" + turn);
         root.addContent(event);
     }
 
-    void removeCreatureEvent(String markerId, String creatureName, int turn)
+    void removeCreatureEvent(Legion legion, String creatureName, int turn)
     {
         Element event = new Element("RemoveCreature");
-        event.setAttribute("markerId", markerId);
+        event.setAttribute("markerId", legion.getMarkerId());
         event.setAttribute("creatureName", creatureName);
         event.setAttribute("turn", "" + turn);
         root.addContent(event);
     }
 
-    void splitEvent(String parentId, String childId, List<String> splitoffs,
+    void splitEvent(Legion parent, Legion child, List<String> splitoffs,
         int turn)
     {
         Element event = new Element("Split");
-        event.setAttribute("parentId", parentId);
-        event.setAttribute("childId", childId);
+        event.setAttribute("parentId", parent.getMarkerId());
+        event.setAttribute("childId", child.getMarkerId());
         event.setAttribute("turn", "" + turn);
         Element creatures = new Element("splitoffs");
         event.addContent(creatures);
@@ -77,7 +78,7 @@ public class History
     }
 
     void revealEvent(boolean allPlayers, List<String> playerNames,
-        String markerId, List<String> creatureNames, int turn)
+        Legion legion, List<String> creatureNames, int turn)
     {
         if (creatureNames.isEmpty())
         {
@@ -90,12 +91,12 @@ public class History
             LOGGER.log(Level.WARNING, "Called revealEvent(" + allPlayers
                 + ", "
                 + (playerNames != null ? playerNames.toString() : "-null-")
-                + ", " + markerId + ", " + creatureNames.toString() + ", "
+                + ", " + legion + ", " + creatureNames.toString() + ", "
                 + turn + ") with empty creatureNames");
             return;
         }
         Element event = new Element("Reveal");
-        event.setAttribute("markerId", markerId);
+        event.setAttribute("markerId", legion.getMarkerId());
         event.setAttribute("allPlayers", "" + allPlayers);
         event.setAttribute("turn", "" + turn);
         if (!allPlayers)
@@ -216,7 +217,9 @@ public class History
                 String creatureName = creature.getTextNormalize();
                 creatureNames.add(creatureName);
             }
-            server.didSplit(parentId, childId, creatureNames, turn);
+            server.didSplit(server.getGame().getLegionByMarkerId(parentId),
+                server.getGame().getLegionByMarkerId(childId), creatureNames,
+                turn);
         }
         else if (el.getName().equals("Merge"))
         {
@@ -224,22 +227,25 @@ public class History
             String survivorId = el.getAttributeValue("survivorId");
             String turnString = el.getAttributeValue("turn");
             int turn = Integer.parseInt(turnString);
-            server.undidSplit(splitoffId, survivorId, false, turn);
+            server.undidSplit(
+                server.getGame().getLegionByMarkerId(splitoffId), server
+                    .getGame().getLegionByMarkerId(survivorId), false, turn);
         }
         else if (el.getName().equals("AddCreature"))
         {
             String markerId = el.getAttributeValue("markerId");
             String creatureName = el.getAttributeValue("creatureName");
             String reason = "<unknown>";
-            server.allTellAddCreature(markerId, creatureName, false, reason);
+            server.allTellAddCreature(server.getGame().getLegionByMarkerId(
+                markerId), creatureName, false, reason);
         }
         else if (el.getName().equals("RemoveCreature"))
         {
             String markerId = el.getAttributeValue("markerId");
             String creatureName = el.getAttributeValue("creatureName");
             String reason = "<unknown>";
-            server
-                .allTellRemoveCreature(markerId, creatureName, false, reason);
+            server.allTellRemoveCreature(server.getGame().getLegionByMarkerId(
+                markerId), creatureName, false, reason);
         }
         else if (el.getName().equals("PlayerElim"))
         {

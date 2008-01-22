@@ -94,6 +94,9 @@ public class RevealEvent
         eventPlayerChangeText, eventMulliganText, eventMoveRollText,
         eventBattleText };
 
+    /**
+     * TODO replace marker/height combos with Legion objects
+     */
     public RevealEvent(Client client, int turnNumber, int playerNr,
         int eventType, String markerId, int height,
         List<RevealedCreature> knownCreatures, String markerId2, int height2)
@@ -157,8 +160,8 @@ public class RevealEvent
             if (rc != null && rc.getPlainName() != null
                 && rc.getPlainName().equals(Constants.titan))
             {
-                PlayerClientSide player = (realPlayer != null ? realPlayer : client
-                    .getPlayerStateByMarkerId(markerId));
+                PlayerClientSide player = (realPlayer != null ? realPlayer
+                    : client.getPlayerStateByMarkerId(markerId));
 
                 if (player == null)
                 {
