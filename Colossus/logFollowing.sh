@@ -3,7 +3,7 @@
 # How to use:
 # -----------
 # This file is not meant to be executed directly.
-# You need to source this file via ". logFollowing.SH" to get the 
+# You need to source this file via ". logFollowing.sh" to get the 
 # functions defined in your script.
 #
 # What it does:

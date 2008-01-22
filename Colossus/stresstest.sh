@@ -3,11 +3,11 @@
 # Run 6-AI games in a loop forever, looking for hangs.
 # XXX The log will eventually fill the disk. 
 #
-# @version: $Id$
+# @version: $Id:stresstest.sh 3088 2008-01-20 01:18:45Z peterbecker $
 # @author: Clemens Katzer
 #
 # 11.04.2007 (Clemens Katzer): 
-# New file "fancy_stresstest" based on original stresstest 
+# New file "stresstest.sh" based on original stresstest 
 # script, but much more functionality:
 # - counter which game nr. ongoing
 # - stops if stop.flag found
@@ -27,7 +27,7 @@
 #
 # Usage:
 #
-# ./fancy_stresstest [-C] [-W] [-V <variants>] [ -N <count>] [ -R <count> ] [-A] [ -- <Colossus-Options> ]
+# ./stresstest.sh [-C] [-W] [-V <variants>] [ -N <count>] [ -R <count> ] [-A] [ -- <Colossus-Options> ]
 #
 # That means, all options not meant to the script but rather that they
 # shall be given to the Colossus commandline,  must come after an "--".
@@ -50,7 +50,7 @@ then
 fi
 
 # this defines the two functions to get just the added part from the log:
-. logFollowing.SH
+. logFollowing.sh
 
 
 FORCEBOARD=""
