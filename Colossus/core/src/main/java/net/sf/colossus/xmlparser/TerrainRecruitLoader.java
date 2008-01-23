@@ -165,12 +165,10 @@ public class TerrainRecruitLoader
                     // special recruitment, need to add edge 
                     // between the special aned every possible recruit
                     CustomRecruitBase cri = getCustomRecruitBase(v2);
-                    java.util.List<CreatureTypeServerSide> allRecruits = cri
+                    List<CreatureType> allRecruits = cri
                         .getAllPossibleSpecialRecruits(t);
-                    Iterator<CreatureTypeServerSide> it3 = allRecruits.iterator();
-                    while (it3.hasNext())
+                    for (CreatureType cre : allRecruits)
                     {
-                        CreatureTypeServerSide cre = it3.next();
                         // use 99 so no-one will rely on this
                         graph.addEdge(v2, cre.getName(), RecruitGraph.BIGNUM,
                             t);
@@ -554,7 +552,8 @@ public class TerrainRecruitLoader
                     Iterator<CreatureType> itCr = potential.iterator();
                     while (itCr.hasNext())
                     {
-                        CreatureTypeServerSide creature = (CreatureTypeServerSide)itCr.next();
+                        CreatureTypeServerSide creature = (CreatureTypeServerSide)itCr
+                            .next();
                         if (creature.isLord())
                         {
                             re.add(creature);
@@ -566,7 +565,7 @@ public class TerrainRecruitLoader
                     CustomRecruitBase cri = getCustomRecruitBase(tr.getName());
                     if (cri != null)
                     {
-                        List<CreatureTypeServerSide> temp = cri
+                        List<CreatureType> temp = cri
                             .getPossibleSpecialRecruiters(terrain, hexLabel);
                         re.addAll(temp);
                     }

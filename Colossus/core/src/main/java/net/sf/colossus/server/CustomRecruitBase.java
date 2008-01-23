@@ -8,8 +8,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.colossus.client.CaretakerInfo;
-import net.sf.colossus.client.PlayerClientSide;
 import net.sf.colossus.game.Legion;
+import net.sf.colossus.game.Player;
+import net.sf.colossus.variant.CreatureType;
 
 
 /**
@@ -23,7 +24,7 @@ abstract public class CustomRecruitBase
     private static final Logger LOGGER = Logger
         .getLogger(CustomRecruitBase.class.getName());
 
-    protected static List<PlayerClientSide> allPlayerInfo = new ArrayList<PlayerClientSide>();
+    protected static List<Player> allPlayers = new ArrayList<Player>();
     private static List<CaretakerInfo> allCaretakerInfo = new ArrayList<CaretakerInfo>();
     private static Caretaker serverCaretaker = null;
     private static GameServerSide serverGame = null;
@@ -38,7 +39,7 @@ abstract public class CustomRecruitBase
     /* full reset (change variant) */
     synchronized public static final void reset()
     {
-        allPlayerInfo.clear();
+        allPlayers.clear();
         allCaretakerInfo.clear();
         allCustomRecruitBase.clear();
         serverGame = null;
@@ -49,7 +50,7 @@ abstract public class CustomRecruitBase
     synchronized public static final void resetAllInstances()
     {
 
-        allPlayerInfo.clear();
+        allPlayers.clear();
         allCaretakerInfo.clear();
         serverGame = null;
         serverCaretaker = null;
@@ -73,9 +74,9 @@ abstract public class CustomRecruitBase
         }
     }
 
-    synchronized public static final void addPlayerInfo(PlayerClientSide pi)
+    synchronized public static final void addPlayerInfo(Player pi)
     {
-        allPlayerInfo.add(pi);
+        allPlayers.add(pi);
     }
 
     synchronized public static final void addCaretakerInfo(CaretakerInfo ci)
@@ -230,21 +231,22 @@ abstract public class CustomRecruitBase
     /* subclasses must reimplement the following */
 
     /** List all Creature that can recruit in this terrain in a special way */
-    abstract public List<CreatureTypeServerSide> getAllPossibleSpecialRecruiters(
+    abstract public List<CreatureType> getAllPossibleSpecialRecruiters(
         String terrain);
 
     /** List all Creature that can be recruited in this terrain 
      * in a special way */
-    abstract public List<CreatureTypeServerSide> getAllPossibleSpecialRecruits(String terrain);
+    abstract public List<CreatureType> getAllPossibleSpecialRecruits(
+        String terrain);
 
     /** List Creature that can recruit in this terrain in a special way now */
-    abstract public List<CreatureTypeServerSide> getPossibleSpecialRecruiters(
+    abstract public List<CreatureType> getPossibleSpecialRecruiters(
         String terrain, String hexLabel);
 
     /** List Creature that can be recruited in this terrain 
      * in a special way now */
-    abstract public List<CreatureTypeServerSide> getPossibleSpecialRecruits(String terrain,
-        String hexLabel);
+    abstract public List<CreatureType> getPossibleSpecialRecruits(
+        String terrain, String hexLabel);
 
     /** number of recruiter needed to get a recruit 
      * in a special way in this terrain now */
