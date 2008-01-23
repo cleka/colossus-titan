@@ -105,7 +105,7 @@ fi
 # offer a choice where we mess around
 if [ "X$TEST_WORKDIR" = "X" ]
 then
-  TEST_WORKDIR="./tmp/stresstest"
+  TEST_WORKDIR=`pwd`"/tmp/stresstest"
   echo "\$TEST_WORKDIR not set, using $TEST_WORKDIR"
 fi
 
