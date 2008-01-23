@@ -4516,39 +4516,35 @@ public final class Client implements IClient, IOracle
     }
 
     /** 
-     * Returns a list of markerIds.
+     * Returns a list of all legions of a player.
      * 
-     * TODO this should be replaced with a call to query all legions of the
-     * PlayerState instance.
-     * 
-     * TODO the return value should be the LegionInfo objects, not their markerIDs
+     * TODO this should be integrated on the player side, clients should already call
+     *      {@link Player#getLegions()}.
      */
-    public List<String> getLegionsByPlayerState(Player player)
+    public List<Legion> getLegionsByPlayer(Player player)
     {
-        List<String> markerIds = new ArrayList<String>();
-        for (LegionClientSide info : legionInfo.values())
+        List<Legion> result = new ArrayList<Legion>();
+        for (Legion legion : legionInfo.values())
         {
-            if (player.equals(info.getPlayer()))
+            if (player.equals(legion.getPlayer()))
             {
-                markerIds.add(info.getMarkerId());
+                result.add(legion);
             }
         }
-        LOGGER.log(Level.FINER, "Found " + markerIds.size()
+        LOGGER.log(Level.FINER, "Found " + result.size()
             + " legions for player " + player.getName());
-        return markerIds;
+        return result;
     }
 
     Set<String> findUnmovedLegionHexes()
     {
         Set<String> set = new HashSet<String>();
-
-        Iterator<LegionClientSide> it = legionInfo.values().iterator();
-        while (it.hasNext())
+        for (Legion info : legionInfo.values())
         {
-            LegionClientSide info = it.next();
-            if (!info.hasMoved() && activePlayer.equals(info.getPlayer()))
+            if (!((LegionClientSide)info).hasMoved()
+                && activePlayer.equals(info.getPlayer()))
             {
-                set.add(info.getHexLabel());
+                set.add(((LegionClientSide)info).getHexLabel());
             }
         }
         return set;

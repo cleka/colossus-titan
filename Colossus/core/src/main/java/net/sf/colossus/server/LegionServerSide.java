@@ -833,7 +833,7 @@ public final class LegionServerSide extends net.sf.colossus.game.Legion
             ((LegionServerSide)newLegion).addCreature(creature, false);
         }
 
-        player.addLegion((LegionServerSide)newLegion);
+        player.addLegion(newLegion);
 
         game.getServer().allUpdatePlayerInfo();
         LOGGER.log(Level.INFO, ((LegionServerSide)newLegion).getHeight()

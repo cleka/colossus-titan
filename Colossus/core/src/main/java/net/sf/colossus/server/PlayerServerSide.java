@@ -41,13 +41,6 @@ public final class PlayerServerSide extends Player implements
     private int mulligansLeft = 1;
     private int movementRoll; // 0 if movement has not been rolled.
 
-    /**
-     * The server-specific copy of the legions.
-     * 
-     * TODO The base class currently has a list of legions, but that is not yet
-     * maintained. Things should move up.
-     */
-    private final List<LegionServerSide> legions = new ArrayList<LegionServerSide>();
     private boolean titanEliminated;
 
     /**
@@ -252,20 +245,22 @@ public final class PlayerServerSide extends Player implements
             / TerrainRecruitLoader.getTitanImprovementValue();
     }
 
+    /**
+     * TODO remove once noone needs the specific version anymore
+     */
+    @SuppressWarnings("unchecked")
     @Override
     synchronized public List<LegionServerSide> getLegions()
     {
-        return legions;
+        return (List<LegionServerSide>)super.getLegions();
     }
 
     synchronized int getMaxLegionHeight()
     {
         int max = 0;
-        Iterator<LegionServerSide> it = legions.iterator();
-        while (it.hasNext())
+        for (Legion legion : getLegions())
         {
-            LegionServerSide legion = it.next();
-            int height = legion.getHeight();
+            int height = ((LegionServerSide)legion).getHeight();
             if (height > max)
             {
                 max = height;
@@ -279,11 +274,9 @@ public final class PlayerServerSide extends Player implements
     {
         int count = 0;
 
-        Iterator<LegionServerSide> it = legions.iterator();
-        while (it.hasNext())
+        for (Legion legion : getLegions())
         {
-            LegionServerSide legion = it.next();
-            if (legion.hasMoved())
+            if (((LegionServerSide)legion).hasMoved())
             {
                 count++;
             }
@@ -296,11 +289,9 @@ public final class PlayerServerSide extends Player implements
     synchronized int countMobileLegions()
     {
         int count = 0;
-        Iterator<LegionServerSide> it = legions.iterator();
-        while (it.hasNext())
+        for (Legion legion : getLegions())
         {
-            LegionServerSide legion = it.next();
-            if (legion.hasConventionalMove())
+            if (((LegionServerSide)legion).hasConventionalMove())
             {
                 count++;
             }
@@ -310,11 +301,9 @@ public final class PlayerServerSide extends Player implements
 
     synchronized void commitMoves()
     {
-        Iterator<LegionServerSide> it = legions.iterator();
-        while (it.hasNext())
+        for (Legion legion : getLegions())
         {
-            LegionServerSide legion = it.next();
-            legion.commitMove();
+            ((LegionServerSide)legion).commitMove();
         }
     }
 
@@ -390,11 +379,9 @@ public final class PlayerServerSide extends Player implements
 
     synchronized void undoAllMoves()
     {
-        Iterator<LegionServerSide> it = legions.iterator();
-        while (it.hasNext())
+        for (Legion legion : getLegions())
         {
-            LegionServerSide legion = it.next();
-            legion.undoMove();
+            ((LegionServerSide)legion).undoMove();
         }
     }
 
@@ -402,13 +389,11 @@ public final class PlayerServerSide extends Player implements
      *  a hex and they have a legal non-teleport move. */
     synchronized boolean splitLegionHasForcedMove()
     {
-        Iterator<LegionServerSide> it = legions.iterator();
-        while (it.hasNext())
+        for (Legion legion : getLegions())
         {
-            LegionServerSide legion = it.next();
-            String hexLabel = legion.getCurrentHexLabel();
+            String hexLabel = ((LegionServerSide)legion).getCurrentHexLabel();
             if (getGame().getNumFriendlyLegions(hexLabel, this) > 1
-                && legion.hasConventionalMove())
+                && ((LegionServerSide)legion).hasConventionalMove())
             {
                 LOGGER.log(Level.FINEST,
                     "Found unseparated split legions at hex " + hexLabel);
@@ -421,11 +406,10 @@ public final class PlayerServerSide extends Player implements
     /** Return true if any legion can recruit. */
     synchronized boolean canRecruit()
     {
-        Iterator<LegionServerSide> it = legions.iterator();
-        while (it.hasNext())
+        for (Legion legion : getLegions())
         {
-            LegionServerSide legion = it.next();
-            if (legion.hasMoved() && legion.canRecruit())
+            if (((LegionServerSide)legion).hasMoved()
+                && ((LegionServerSide)legion).canRecruit())
             {
                 return true;
             }
@@ -465,17 +449,17 @@ public final class PlayerServerSide extends Player implements
 
     synchronized void recombineIllegalSplits()
     {
-        Iterator<LegionServerSide> it = legions.iterator();
+        Iterator<LegionServerSide> it = getLegions().iterator();
         while (it.hasNext())
         {
-            LegionServerSide legion = it.next();
+            Legion legion = it.next();
             // Don't use the legion's real parent, as there could have been
             // a 3-way split and the parent could be gone.
-            LegionServerSide parent = getGame().getFirstFriendlyLegion(
-                legion.getCurrentHexLabel(), this);
+            Legion parent = getGame().getFirstFriendlyLegion(
+                ((LegionServerSide)legion).getCurrentHexLabel(), this);
             if (legion != parent)
             {
-                legion.recombine(parent, false);
+                ((LegionServerSide)legion).recombine(parent, false);
                 it.remove();
             }
         }
@@ -485,18 +469,11 @@ public final class PlayerServerSide extends Player implements
     synchronized int getNumCreatures()
     {
         int count = 0;
-        Iterator<LegionServerSide> it = legions.iterator();
-        while (it.hasNext())
+        for (Legion legion : getLegions())
         {
-            LegionServerSide legion = it.next();
-            count += legion.getHeight();
+            count += ((LegionServerSide)legion).getHeight();
         }
         return count;
-    }
-
-    synchronized void addLegion(LegionServerSide legion)
-    {
-        legions.add(legion);
     }
 
     int getNumMarkersAvailable()
@@ -601,7 +578,7 @@ public final class PlayerServerSide extends Player implements
         // engaged with.  All others give half points to slayer,
         // if non-null.
 
-        for (Iterator<LegionServerSide> itLeg = legions.iterator(); itLeg
+        for (Iterator<LegionServerSide> itLeg = getLegions().iterator(); itLeg
             .hasNext();)
         {
             LegionServerSide legion = itLeg.next();
@@ -643,7 +620,7 @@ public final class PlayerServerSide extends Player implements
         // Record the slayer and give him this player's legion markers.
         if (slayer != null)
         {
-            ((PlayerServerSide)slayer).addPlayerElim(this);
+            slayer.addPlayerElim(this);
             ((PlayerServerSide)slayer).takeLegionMarkers(this);
         }
 
@@ -697,9 +674,9 @@ public final class PlayerServerSide extends Player implements
     synchronized int getTotalPointValue()
     {
         int total = 0;
-        for (LegionServerSide legion : legions)
+        for (Legion legion : getLegions())
         {
-            total += legion.getPointValue();
+            total += ((LegionServerSide)legion).getPointValue();
         }
         return total;
     }

@@ -1185,10 +1185,8 @@ public class SimpleAI implements AI
             }
 
             // for each legion that player controls
-            for (String markerId : client.getLegionsByPlayerState(enemyPlayer))
+            for (Legion legion : enemyPlayer.getLegions())
             {
-                LegionClientSide legion = client.getLegion(markerId);
-
                 // for each movement roll he might make
                 for (int roll = 1; roll <= 6; roll++)
                 {
@@ -1198,16 +1196,17 @@ public class SimpleAI implements AI
                     // Only allow Titan teleport
                     // Remember, tower teleports cannot attack
                     if (legion.hasTitan()
-                        && legion.getPlayer().canTitanTeleport()
+                        && ((PlayerClientSide)legion.getPlayer())
+                            .canTitanTeleport()
                         && client.getMovement().titanTeleportAllowed())
                     {
                         set = client.getMovement().listAllMoves(legion,
-                            legion.getCurrentHex(), roll);
+                            ((LegionClientSide)legion).getCurrentHex(), roll);
                     }
                     else
                     {
                         set = client.getMovement().listNormalMoves(legion,
-                            legion.getCurrentHex(), roll);
+                            ((LegionClientSide)legion).getCurrentHex(), roll);
                     }
 
                     for (String hexlabel : set)

@@ -2,10 +2,10 @@ package net.sf.colossus.game;
 
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import net.sf.colossus.server.Constants;
+import net.sf.colossus.server.PlayerServerSide;
 
 
 /**
@@ -29,6 +29,8 @@ public class Player
 
     /**
      * The current legions owned by this player.
+     * 
+     * TODO not yet used on the client side
      */
     private final List<Legion> legions = new ArrayList<Legion>();
 
@@ -105,9 +107,14 @@ public class Player
         return game;
     }
 
+    /**
+     * TODO should be List<Legion>, but currently subclasses still use more specific types
+     * TODO should be unmodifiable, but at least {@link PlayerServerSide#die(Player, boolean)} still
+     *      removes items
+     */
     public List<? extends Legion> getLegions()
     {
-        return Collections.unmodifiableList(this.legions);
+        return this.legions;
     }
 
     @Override
@@ -233,9 +240,14 @@ public class Player
         return null;
     }
 
+    public void addLegion(Legion legion)
+    {
+        legions.add(legion);
+    }
+
     public void removeLegion(Legion legion)
     {
-        getLegions().remove(legion);
+        legions.remove(legion);
     }
 
     /**

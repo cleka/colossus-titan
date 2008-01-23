@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.server.CustomRecruitBase;
 import net.sf.colossus.util.Split;
@@ -219,11 +220,10 @@ public final class PlayerClientSide extends Player
         return getNumLegions() - numLegionsMoved();
     }
 
-    /** Return a List of markerIds. */
     @Override
-    public List<String> getLegionIds()
+    public List<Legion> getLegions()
     {
-        return client.getLegionsByPlayerState(this);
+        return client.getLegionsByPlayer(this);
     }
 
     void removeAllLegions()
