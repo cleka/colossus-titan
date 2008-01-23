@@ -24,8 +24,8 @@ import net.sf.colossus.variant.HazardTerrain;
 
 public class CreatureTypeServerSide extends CreatureType
 {
-    private static final Logger LOGGER = Logger.getLogger(CreatureTypeServerSide.class
-        .getName());
+    private static final Logger LOGGER = Logger
+        .getLogger(CreatureTypeServerSide.class.getName());
 
     private final int power;
     private final int skill;
@@ -41,11 +41,12 @@ public class CreatureTypeServerSide extends CreatureType
     private final String baseColor;
     private static boolean noBaseColor = false;
 
-    public CreatureTypeServerSide(String name, int power, int skill, boolean rangestrikes,
-        boolean flies, Set<HazardTerrain> nativeTerrrains,
-        boolean nativeSlope, boolean nativeRiver, boolean waterDwelling,
-        boolean magicMissile, boolean summonable, boolean lord,
-        boolean demilord, int maxCount, String pluralName, String baseColor)
+    public CreatureTypeServerSide(String name, int power, int skill,
+        boolean rangestrikes, boolean flies,
+        Set<HazardTerrain> nativeTerrrains, boolean nativeSlope,
+        boolean nativeRiver, boolean waterDwelling, boolean magicMissile,
+        boolean summonable, boolean lord, boolean demilord, int maxCount,
+        String pluralName, String baseColor)
     {
         super(name, pluralName, nativeTerrrains, summonable);
         this.power = power;
@@ -98,11 +99,6 @@ public class CreatureTypeServerSide extends CreatureType
     public boolean isImmortal()
     { // might not the same for derived class
         return isLordOrDemiLord();
-    }
-
-    public boolean isTitan()
-    { // Titan use class CreatureTitan
-        return false;
     }
 
     /** true if any if the values can change during the game returned by:

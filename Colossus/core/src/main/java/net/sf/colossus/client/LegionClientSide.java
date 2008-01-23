@@ -247,6 +247,7 @@ public final class LegionClientSide extends Legion
         myNode = getNode(this.markerId);
     }
 
+    @Override
     public boolean hasTitan()
     {
         return getContents().contains(Constants.titan);

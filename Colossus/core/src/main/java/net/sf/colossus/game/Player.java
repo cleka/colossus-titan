@@ -209,6 +209,48 @@ public class Player
         playersEliminated = playersEliminated + player.getShortColor();
     }
 
+    public Legion getLegionByMarkerId(String markerId)
+    {
+        for (Legion legion : getLegions())
+        {
+            if (legion.getMarkerId().equals(markerId))
+            {
+                return legion;
+            }
+        }
+        return null;
+    }
+
+    public Legion getTitanLegion()
+    {
+        for (Legion legion : getLegions())
+        {
+            if (legion.hasTitan())
+            {
+                return legion;
+            }
+        }
+        return null;
+    }
+
+    public void removeLegion(Legion legion)
+    {
+        getLegions().remove(legion);
+    }
+
+    /**
+     * TODO this should really not be necessary, clients should use {@link #getLegions()}.
+     */
+    synchronized public List<String> getLegionIds()
+    {
+        List<String> ids = new ArrayList<String>();
+        for (Legion legion : getLegions())
+        {
+            ids.add(legion.getMarkerId());
+        }
+        return ids;
+    }
+
     /**
      * Overridden for debug/logging purposes.
      */

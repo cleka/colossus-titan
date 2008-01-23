@@ -230,7 +230,7 @@ public final class PlayerServerSide extends Player implements
     /** Remove all of this player's zero-height legions. */
     synchronized void removeEmptyLegions()
     {
-        Iterator<LegionServerSide> it = legions.iterator();
+        Iterator<LegionServerSide> it = getLegions().iterator();
         while (it.hasNext())
         {
             LegionServerSide legion = it.next();
@@ -252,65 +252,10 @@ public final class PlayerServerSide extends Player implements
             / TerrainRecruitLoader.getTitanImprovementValue();
     }
 
-    synchronized int getNumLegions()
-    {
-        return legions.size();
-    }
-
-    synchronized LegionServerSide getLegion(int i)
-    {
-        return legions.get(i);
-    }
-
-    synchronized LegionServerSide getLegionByMarkerId(String markerId)
-    {
-        Iterator<LegionServerSide> it = legions.iterator();
-        while (it.hasNext())
-        {
-            LegionServerSide legion = it.next();
-            if (legion.getMarkerId().equals(markerId))
-            {
-                return legion;
-            }
-        }
-        return null;
-    }
-
-    synchronized LegionServerSide getTitanLegion()
-    {
-        Iterator<LegionServerSide> it = legions.iterator();
-        while (it.hasNext())
-        {
-            LegionServerSide legion = it.next();
-            if (legion.hasTitan())
-            {
-                return legion;
-            }
-        }
-        return null;
-    }
-
     @Override
     synchronized public List<LegionServerSide> getLegions()
     {
         return legions;
-    }
-
-    synchronized List<String> getLegionIds()
-    {
-        List<String> ids = new ArrayList<String>();
-        Iterator<LegionServerSide> it = legions.iterator();
-        while (it.hasNext())
-        {
-            LegionServerSide legion = it.next();
-            ids.add(legion.getMarkerId());
-        }
-        return ids;
-    }
-
-    synchronized void removeLegion(LegionServerSide legion)
-    {
-        legions.remove(legion);
     }
 
     synchronized int getMaxLegionHeight()
@@ -512,9 +457,9 @@ public final class PlayerServerSide extends Player implements
 
     void undoSplit(String splitoffId)
     {
-        LegionServerSide splitoff = getLegionByMarkerId(splitoffId);
-        LegionServerSide parent = splitoff.getParent();
-        splitoff.recombine(parent, true);
+        Legion splitoff = getLegionByMarkerId(splitoffId);
+        Legion parent = ((LegionServerSide)splitoff).getParent();
+        ((LegionServerSide)splitoff).recombine(parent, true);
         getGame().getServer().allUpdatePlayerInfo();
     }
 
@@ -736,7 +681,7 @@ public final class PlayerServerSide extends Player implements
         li.add(getColor());
         li.add(getType());
         li.add(getPlayersElim());
-        li.add(Integer.toString(getNumLegions()));
+        li.add(Integer.toString(getLegions().size()));
         li.add(Integer.toString(getNumCreatures()));
         li.add(Integer.toString(getTitanPower()));
         li.add(Integer.toString(getScore()));

@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.sf.colossus.game.Game;
 import net.sf.colossus.variant.CreatureType;
 
 
@@ -35,9 +36,9 @@ public final class Caretaker
      *  creature is not found, assume that we have a 0 count */
     private final HashMap<String, Integer> deadMap = new HashMap<String, Integer>();
 
-    private final GameServerSide game;
+    private final Game game;
 
-    Caretaker(GameServerSide game)
+    Caretaker(Game game)
     {
         this.game = game;
     }
@@ -85,12 +86,12 @@ public final class Caretaker
         updateDisplays(creatureName);
     }
 
-    void setCount(CreatureTypeServerSide creature, int count)
+    void setCount(CreatureType creature, int count)
     {
         setCount(creature.getName(), count);
     }
 
-    void setDeadCount(CreatureTypeServerSide creature, int count)
+    void setDeadCount(CreatureType creature, int count)
     {
         setDeadCount(creature.getName(), count);
     }
@@ -102,19 +103,20 @@ public final class Caretaker
         fullySyncDisplays();
     }
 
-    void takeOne(CreatureTypeServerSide creature)
+    void takeOne(CreatureType creature)
     {
         Integer count = map.remove(creature.getName());
         if (count == null)
         {
             LOGGER.log(Level.INFO, "First " + creature.getName()
                 + " recruited");
-            map.put(creature.getName(),
-                new Integer(creature.getMaxCount() - 1));
+            map.put(creature.getName(), new Integer(
+                ((CreatureTypeServerSide)creature).getMaxCount() - 1));
         }
         else
         {
-            if (count.intValue() == creature.getMaxCount())
+            if (count.intValue() == ((CreatureTypeServerSide)creature)
+                .getMaxCount())
             {
                 // Not quite right for immortals.
                 LOGGER.log(Level.INFO, "First " + creature.getName()
@@ -136,19 +138,20 @@ public final class Caretaker
         updateDisplays(creature.getName());
     }
 
-    void putOneBack(CreatureTypeServerSide creature)
+    void putOneBack(CreatureType creature)
     {
         Integer count = map.get(creature.getName());
         // count can be null if we're testing a battle.
         if (count == null)
         {
-            count = new Integer(creature.getMaxCount() - 1);
+            count = new Integer(((CreatureTypeServerSide)creature)
+                .getMaxCount() - 1);
         }
         map.put(creature.getName(), new Integer(count.intValue() + 1));
         updateDisplays(creature.getName());
     }
 
-    void putDeadOne(CreatureTypeServerSide creature)
+    void putDeadOne(CreatureType creature)
     {
         String name = creature.getName();
         Integer deadCount = deadMap.get(name);
@@ -171,7 +174,7 @@ public final class Caretaker
     /** Update creatureName's count on all clients. */
     private void updateDisplays(String creatureName)
     {
-        Server server = game.getServer();
+        Server server = ((GameServerSide)game).getServer();
         if (server != null)
         {
             if (creatureName != null)
@@ -209,7 +212,8 @@ public final class Caretaker
             .iterator();
         while (it.hasNext())
         {
-            CreatureTypeServerSide creature = (CreatureTypeServerSide)it.next();
+            CreatureTypeServerSide creature = (CreatureTypeServerSide)it
+                .next();
             if (creature.isImmortal())
             {
                 String name = creature.getName();

@@ -32,7 +32,7 @@ public class Legion
     }
 
     /**
-     * TODO should be an unmodifable List<Creature>, but can't at the moment since both
+     * TODO should be an unmodifiable List<Creature>, but can't at the moment since both
      * derived classes and users might still expect to change it using the subtype they
      * know of
      */
@@ -44,5 +44,17 @@ public class Legion
     public String getMarkerId()
     {
         return markerId;
+    }
+
+    public boolean hasTitan()
+    {
+        for (Creature critter : getCreatures())
+        {
+            if (critter.getType().isTitan())
+            {
+                return true;
+            }
+        }
+        return false;
     }
 }

@@ -13,6 +13,8 @@ import java.util.logging.Logger;
 import net.sf.colossus.client.BattleHex;
 import net.sf.colossus.client.BattleMap;
 import net.sf.colossus.client.HexMap;
+import net.sf.colossus.game.Creature;
+import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.util.Options;
 import net.sf.colossus.variant.HazardTerrain;
@@ -114,7 +116,7 @@ public final class BattleServerSide extends net.sf.colossus.game.Battle
     {
         BattleHex entrance = BattleMap.getEntrance(terrain, legion
             .getEntrySide());
-        Iterator<CreatureServerSide> it = legion.getCritters().iterator();
+        Iterator<CreatureServerSide> it = legion.getCreatures().iterator();
         while (it.hasNext())
         {
             CreatureServerSide critter = it.next();
@@ -136,15 +138,15 @@ public final class BattleServerSide extends net.sf.colossus.game.Battle
 
     private void placeCritter(CreatureServerSide critter)
     {
-        BattleHex entrance = BattleMap.getEntrance(terrain, critter
-            .getLegion().getEntrySide());
+        BattleHex entrance = BattleMap.getEntrance(terrain,
+            ((LegionServerSide)critter.getLegion()).getEntrySide());
         critter.addBattleInfo(entrance, entrance, this);
         server.allPlaceNewChit(critter);
     }
 
     private synchronized void initBattleChits(LegionServerSide legion)
     {
-        Iterator<CreatureServerSide> it = legion.getCritters().iterator();
+        Iterator<CreatureServerSide> it = legion.getCreatures().iterator();
         while (it.hasNext())
         {
             CreatureServerSide critter = it.next();
@@ -238,14 +240,14 @@ public final class BattleServerSide extends net.sf.colossus.game.Battle
         }
     }
 
-    private LegionServerSide getLegionByPlayer(PlayerServerSide player)
+    private Legion getLegionByPlayer(Player player)
     {
-        LegionServerSide attacker = getAttacker();
+        Legion attacker = getAttacker();
         if (attacker != null && attacker.getPlayer().equals(player))
         {
             return attacker;
         }
-        LegionServerSide defender = getDefender();
+        Legion defender = getDefender();
         if (defender != null && defender.getPlayer().equals(player))
         {
             return defender;
@@ -643,18 +645,16 @@ public final class BattleServerSide extends net.sf.colossus.game.Battle
     }
 
     /** Mark all of the conceding player's critters as dead. */
-    void concede(PlayerServerSide player)
+    void concede(Player player)
     {
-        LegionServerSide legion = getLegionByPlayer(player);
+        Legion legion = getLegionByPlayer(player);
         String markerId = legion.getMarkerId();
         LOGGER.log(Level.INFO, markerId + " concedes the battle");
         conceded = true;
 
-        Iterator<CreatureServerSide> it = legion.getCritters().iterator();
-        while (it.hasNext())
+        for (Creature creature : legion.getCreatures())
         {
-            CreatureServerSide critter = it.next();
-            critter.setDead(true);
+            ((CreatureServerSide)creature).setDead(true);
         }
 
         if (legion.getPlayer().equals(getActivePlayer()))
@@ -668,7 +668,7 @@ public final class BattleServerSide extends net.sf.colossus.game.Battle
     private void removeOffboardCreatures()
     {
         LegionServerSide legion = getActiveLegion();
-        Iterator<CreatureServerSide> it = legion.getCritters().iterator();
+        Iterator<CreatureServerSide> it = legion.getCreatures().iterator();
         while (it.hasNext())
         {
             CreatureServerSide critter = it.next();
@@ -682,7 +682,7 @@ public final class BattleServerSide extends net.sf.colossus.game.Battle
 
     private void commitMoves()
     {
-        Iterator<CreatureServerSide> it = getActiveLegion().getCritters()
+        Iterator<CreatureServerSide> it = getActiveLegion().getCreatures()
             .iterator();
         while (it.hasNext())
         {
@@ -776,7 +776,7 @@ public final class BattleServerSide extends net.sf.colossus.game.Battle
         {
             return;
         }
-        List<CreatureServerSide> critters = legion.getCritters();
+        List<CreatureServerSide> critters = legion.getCreatures();
         if (critters != null)
         {
             Iterator<CreatureServerSide> it = critters.iterator();
@@ -806,7 +806,7 @@ public final class BattleServerSide extends net.sf.colossus.game.Battle
 
     private void cleanupOneDeadCritter(CreatureServerSide critter)
     {
-        LegionServerSide legion = critter.getLegion();
+        Legion legion = critter.getLegion();
         LegionServerSide donor = null;
 
         // After turn 1, offboard creatures are returned to the
@@ -817,8 +817,8 @@ public final class BattleServerSide extends net.sf.colossus.game.Battle
             if (legion == getAttacker())
             {
                 // Summoned angel.
-                PlayerServerSide player = legion.getPlayer();
-                donor = player.getDonor();
+                Player player = legion.getPlayer();
+                donor = ((PlayerServerSide)player).getDonor();
                 if (donor != null)
                 {
                     donor.addCreature(critter.getCreature(), false);
@@ -828,7 +828,7 @@ public final class BattleServerSide extends net.sf.colossus.game.Battle
                     // summon again later this turn.
                     LOGGER.log(Level.INFO, "undosummon critter " + critter
                         + " back to marker " + donor + "");
-                    player.setSummoned(false);
+                    ((PlayerServerSide)player).setSummoned(false);
                 }
                 else
                 {
@@ -840,7 +840,7 @@ public final class BattleServerSide extends net.sf.colossus.game.Battle
             {
                 // Reinforcement.
                 // This recruit doesn't count.
-                legion.setRecruitName(null);
+                ((LegionServerSide)legion).setRecruitName(null);
             }
         }
         else if (legion == getAttacker())
@@ -863,11 +863,12 @@ public final class BattleServerSide extends net.sf.colossus.game.Battle
 
         // If an angel or archangel was returned to its donor instead of 
         // the stack, then don't put it back on the stack.
-        legion.prepareToRemoveCritter(critter, donor == null, true);
+        ((LegionServerSide)legion).prepareToRemoveCritter(critter,
+            donor == null, true);
 
         if (critter.isTitan())
         {
-            legion.getPlayer().eliminateTitan();
+            ((PlayerServerSide)legion.getPlayer()).eliminateTitan();
         }
     }
 
@@ -951,7 +952,7 @@ public final class BattleServerSide extends net.sf.colossus.game.Battle
         LegionServerSide legion = getActiveLegion();
         if (legion != null)
         {
-            Iterator<CreatureServerSide> it = legion.getCritters().iterator();
+            Iterator<CreatureServerSide> it = legion.getCreatures().iterator();
             while (it.hasNext())
             {
                 CreatureServerSide critter = it.next();
@@ -965,7 +966,7 @@ public final class BattleServerSide extends net.sf.colossus.game.Battle
         LegionServerSide legion = getActiveLegion();
         if (legion != null)
         {
-            Iterator<CreatureServerSide> it = legion.getCritters().iterator();
+            Iterator<CreatureServerSide> it = legion.getCreatures().iterator();
             while (it.hasNext())
             {
                 CreatureServerSide critter = it.next();
@@ -1042,8 +1043,7 @@ public final class BattleServerSide extends net.sf.colossus.game.Battle
             && getBattlePhase() != Constants.BattlePhase.STRIKEBACK
             && critter.getLegion() == getActiveLegion())
         {
-            Iterator<CreatureServerSide> it = getInactiveLegion()
-                .getCritters().iterator();
+            Iterator<CreatureServerSide> it = getInactiveLegion().getCreatures().iterator();
             while (it.hasNext())
             {
                 CreatureServerSide target = it.next();
@@ -1763,12 +1763,12 @@ public final class BattleServerSide extends net.sf.colossus.game.Battle
         LegionServerSide defender = getDefender();
         if (defender != null)
         {
-            critters.addAll(defender.getCritters());
+            critters.addAll(defender.getCreatures());
         }
         LegionServerSide attacker = getAttacker();
         if (attacker != null)
         {
-            critters.addAll(attacker.getCritters());
+            critters.addAll(attacker.getCreatures());
         }
         return critters;
     }

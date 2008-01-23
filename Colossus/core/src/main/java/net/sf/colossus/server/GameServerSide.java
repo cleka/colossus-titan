@@ -26,6 +26,7 @@ import net.sf.colossus.client.BattleHex;
 import net.sf.colossus.client.BattleMap;
 import net.sf.colossus.client.HexMap;
 import net.sf.colossus.client.Proposal;
+import net.sf.colossus.game.Creature;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.util.Options;
@@ -520,7 +521,7 @@ public final class GameServerSide extends net.sf.colossus.game.Game
         {
             PlayerServerSide player = it.next();
             placeInitialLegion(player, player.getFirstMarker());
-            server.allRevealLegion(player.getLegion(0),
+            server.allRevealLegion(player.getLegions().get(0),
                 Constants.reasonInitial);
             server.allUpdatePlayerInfo();
         }
@@ -1318,7 +1319,7 @@ public final class GameServerSide extends net.sf.colossus.game.Game
         leg.setAttribute("recruitName", notnull(legion.getRecruitName()));
         leg.setAttribute("battleTally", "" + legion.getBattleTally());
 
-        Collection<CreatureServerSide> critters = legion.getCritters();
+        Collection<CreatureServerSide> critters = legion.getCreatures();
         Iterator<CreatureServerSide> it = critters.iterator();
 
         while (it.hasNext())
@@ -1640,14 +1641,14 @@ public final class GameServerSide extends net.sf.colossus.game.Game
 
         // Critters
         // find legion for them, if it doesn't exist create one
-        net.sf.colossus.server.LegionServerSide legion = player
+        LegionServerSide legion = (LegionServerSide)player
             .getLegionByMarkerId(markerId);
         if (legion == null)
         {
             // TODO can there ever be a legion before? If not: collect all data
             // first (including critters) and then create the legion in one go
-            legion = new net.sf.colossus.server.LegionServerSide(markerId,
-                parentId, currentHexLabel, startingHexLabel, player, this);
+            legion = new LegionServerSide(markerId, parentId, currentHexLabel,
+                startingHexLabel, player, this);
             player.addLegion(legion);
         }
 
@@ -1655,9 +1656,8 @@ public final class GameServerSide extends net.sf.colossus.game.Game
         for (Element cre : creatureElements)
         {
             String name = cre.getAttribute("name").getValue();
-            CreatureServerSide critter = new CreatureServerSide(
-                (CreatureTypeServerSide)getVariant().getCreatureByName(name),
-                null, this);
+            CreatureServerSide critter = new CreatureServerSide(getVariant()
+                .getCreatureByName(name), null, this);
 
             // Battle stuff
             if (cre.getAttribute("hits") != null)
@@ -1768,36 +1768,27 @@ public final class GameServerSide extends net.sf.colossus.game.Game
     }
 
     /** Return a list of eligible recruits, as Creatures. */
-    List<CreatureTypeServerSide> findEligibleRecruits(String markerId,
-        String hexLabel)
+    List<CreatureType> findEligibleRecruits(String markerId, String hexLabel)
     {
-        LegionServerSide legion = getLegionByMarkerId(markerId);
-        List<CreatureTypeServerSide> recruits;
+        Legion legion = getLegionByMarkerId(markerId);
+        List<CreatureType> recruits;
 
         MasterHex hex = getVariant().getMasterBoard().getHexByLabel(hexLabel);
         String terrain = hex.getTerrain();
 
-        recruits = new ArrayList<CreatureTypeServerSide>();
+        recruits = new ArrayList<CreatureType>();
         List<CreatureType> tempRecruits = TerrainRecruitLoader
             .getPossibleRecruits(terrain, hexLabel);
         List<CreatureType> recruiters = TerrainRecruitLoader
             .getPossibleRecruiters(terrain, hexLabel);
 
-        Iterator<CreatureType> lit = tempRecruits.iterator();
-
-        while (lit.hasNext())
+        for (CreatureType creature : tempRecruits)
         {
-            CreatureTypeServerSide creature = (CreatureTypeServerSide)lit
-                .next();
-            Iterator<CreatureType> itRec = recruiters.iterator();
-
-            while (itRec.hasNext())
+            for (CreatureType lesser : recruiters)
             {
-                CreatureTypeServerSide lesser = (CreatureTypeServerSide)itRec
-                    .next();
-
                 if ((TerrainRecruitLoader.numberOfRecruiterNeeded(lesser,
-                    creature, terrain, hexLabel) <= legion.numCreature(lesser))
+                    creature, terrain, hexLabel) <= ((LegionServerSide)legion)
+                    .numCreature(lesser))
                     && (recruits.indexOf(creature) == -1))
                 {
                     recruits.add(creature);
@@ -1806,10 +1797,10 @@ public final class GameServerSide extends net.sf.colossus.game.Game
         }
 
         // Make sure that the potential recruits are available.
-        Iterator<CreatureTypeServerSide> it = recruits.iterator();
+        Iterator<CreatureType> it = recruits.iterator();
         while (it.hasNext())
         {
-            CreatureTypeServerSide recruit = it.next();
+            CreatureType recruit = it.next();
             if (caretaker.getCount(recruit) < 1)
             {
                 it.remove();
@@ -1830,8 +1821,8 @@ public final class GameServerSide extends net.sf.colossus.game.Game
             return new ArrayList<CreatureType>();
         }
 
-        LegionServerSide legion = getLegionByMarkerId(markerId);
-        String hexLabel = legion.getCurrentHexLabel();
+        Legion legion = getLegionByMarkerId(markerId);
+        String hexLabel = ((LegionServerSide)legion).getCurrentHexLabel();
         MasterHex hex = getVariant().getMasterBoard().getHexByLabel(hexLabel);
         String terrain = hex.getTerrain();
         recruiters = TerrainRecruitLoader.getPossibleRecruiters(terrain,
@@ -1843,7 +1834,9 @@ public final class GameServerSide extends net.sf.colossus.game.Game
             int needed = TerrainRecruitLoader.numberOfRecruiterNeeded(
                 possibleRecruiter, recruit, terrain, hexLabel);
 
-            if (needed < 1 || needed > legion.numCreature(possibleRecruiter))
+            if (needed < 1
+                || needed > ((LegionServerSide)legion)
+                    .numCreature(possibleRecruiter))
             {
                 // Zap this possible recruiter.
                 it.remove();
@@ -1897,8 +1890,7 @@ public final class GameServerSide extends net.sf.colossus.game.Game
 
         lastRecruitTurnNumber = turnNumber;
 
-        if (((LegionServerSide)legion).addCreature(
-            (CreatureTypeServerSide)recruit, true))
+        if (((LegionServerSide)legion).addCreature(recruit, true))
         {
             MasterHex hex = ((LegionServerSide)legion).getCurrentHex();
             int numRecruiters = 0;
@@ -2407,13 +2399,9 @@ public final class GameServerSide extends net.sf.colossus.game.Game
         Set<String> set = new HashSet<String>();
         PlayerServerSide player = getActivePlayer();
 
-        List<LegionServerSide> legions = player.getLegions();
-        Iterator<LegionServerSide> it = legions.iterator();
-
-        while (it.hasNext())
+        for (Legion legion : player.getLegions())
         {
-            LegionServerSide legion = it.next();
-            String hexLabel = legion.getCurrentHexLabel();
+            String hexLabel = ((LegionServerSide)legion).getCurrentHexLabel();
 
             if (getNumEnemyLegions(hexLabel, player) > 0)
             {
@@ -2423,7 +2411,7 @@ public final class GameServerSide extends net.sf.colossus.game.Game
         return set;
     }
 
-    void createSummonAngel(LegionServerSide attacker)
+    void createSummonAngel(Legion attacker)
     {
         if (!isOver())
         {
@@ -2433,7 +2421,7 @@ public final class GameServerSide extends net.sf.colossus.game.Game
     }
 
     /** Called locally and from Battle. */
-    void reinforce(LegionServerSide legion)
+    void reinforce(Legion legion)
     {
         reinforcing = true;
         server.reinforce(legion);
@@ -2536,16 +2524,14 @@ public final class GameServerSide extends net.sf.colossus.game.Game
     /** Return a set of hexLabels. */
     synchronized Set<String> findSummonableAngels(String markerId)
     {
-        LegionServerSide legion = getLegionByMarkerId(markerId);
+        Legion legion = getLegionByMarkerId(markerId);
         Set<String> set = new HashSet<String>();
-        List<LegionServerSide> legions = legion.getPlayer().getLegions();
-        Iterator<LegionServerSide> it = legions.iterator();
-        while (it.hasNext())
+        for (Legion candidate : legion.getPlayer().getLegions())
         {
-            LegionServerSide candidate = it.next();
             if (candidate != legion)
             {
-                String hexLabel = candidate.getCurrentHexLabel();
+                String hexLabel = ((LegionServerSide)candidate)
+                    .getCurrentHexLabel();
                 boolean hasSummonable = false;
                 List<CreatureType> summonableList = getVariant()
                     .getSummonableCreatureTypes();
@@ -2555,7 +2541,7 @@ public final class GameServerSide extends net.sf.colossus.game.Game
                     CreatureType c = sumIt.next();
 
                     hasSummonable = hasSummonable
-                        || (candidate.numCreature(c) > 0);
+                        || (((LegionServerSide)candidate).numCreature(c) > 0);
                 }
                 if (hasSummonable && !isEngagement(hexLabel))
                 {
@@ -2595,13 +2581,12 @@ public final class GameServerSide extends net.sf.colossus.game.Game
             return false;
         }
         List<String> strings = Split.split(',', results);
-        List<CreatureTypeServerSide> creatures = new ArrayList<CreatureTypeServerSide>();
+        List<CreatureType> creatures = new ArrayList<CreatureType>();
         Iterator<String> it = strings.iterator();
         while (it.hasNext())
         {
             String name = it.next();
-            CreatureTypeServerSide creature = (CreatureTypeServerSide)getVariant()
-                .getCreatureByName(name);
+            CreatureType creature = getVariant().getCreatureByName(name);
             creatures.add(creature);
         }
 
@@ -2614,28 +2599,20 @@ public final class GameServerSide extends net.sf.colossus.game.Game
             return false;
         }
 
-        // All creatures in results must be in the legion.
-        // WARNING: Legion.getCritters() return Critters,
-        // not Creature - different things now.
-        // so we must clone "by hand" the List.
-        List<CreatureServerSide> tempCritters = ((LegionServerSide)parent)
-            .getCritters();
-        List<CreatureTypeServerSide> tempCreatures = new ArrayList<CreatureTypeServerSide>();
+        List<CreatureType> tempCreatureTypes = new ArrayList<CreatureType>();
 
-        Iterator<CreatureServerSide> itCrit = tempCritters.iterator();
-        while (itCrit.hasNext())
+        for (Creature creature : parent.getCreatures())
         {
-            tempCreatures.add((itCrit.next()).getCreature());
+            tempCreatureTypes.add(creature.getType());
         }
-        Iterator<CreatureTypeServerSide> itCre = creatures.iterator();
-        while (itCre.hasNext())
+
+        for (CreatureType creatureType : creatures)
         {
-            CreatureTypeServerSide creature = itCre.next();
-            if (!tempCreatures.remove(creature))
+            if (!tempCreatureTypes.remove(creatureType))
             {
                 LOGGER.log(Level.FINEST,
                     "Unavailable creature in split list (" + parent + ", "
-                        + childId + ") : " + creature.getName());
+                        + childId + ") : " + creatureType.getName());
                 return false;
             }
         }
@@ -2643,7 +2620,7 @@ public final class GameServerSide extends net.sf.colossus.game.Game
         if (getTurnNumber() == 1)
         {
             // Only allow a single split on turn 1.
-            if (player.getNumLegions() > 1)
+            if (player.getLegions().size() > 1)
             {
                 LOGGER.log(Level.SEVERE, "Cannot split twice on Turn 1.");
                 return false;
@@ -2656,11 +2633,9 @@ public final class GameServerSide extends net.sf.colossus.game.Game
             // Each stack must contain exactly 1 lord.
             int numLords = 0;
 
-            itCre = creatures.iterator();
-            while (itCre.hasNext())
+            for (CreatureType creature : creatures)
             {
-                CreatureTypeServerSide creature = itCre.next();
-                if (creature.isLord())
+                if (((CreatureTypeServerSide)creature).isLord())
                 {
                     numLords++;
                 }
@@ -2671,15 +2646,16 @@ public final class GameServerSide extends net.sf.colossus.game.Game
             }
         }
 
-        LegionServerSide newLegion = ((LegionServerSide)parent).split(
-            creatures, childId);
+        Legion newLegion = ((LegionServerSide)parent)
+            .split(creatures, childId);
         if (newLegion == null)
         {
             return false;
         }
 
         String hexLabel = ((LegionServerSide)parent).getCurrentHexLabel();
-        server.didSplit(hexLabel, parent, newLegion, newLegion.getHeight());
+        server.didSplit(hexLabel, parent, newLegion,
+            ((LegionServerSide)newLegion).getHeight());
 
         // viewableAll depends on the splitPrediction to tell then true contents,
         // and viewableOwn it does not harm; it only helps the AIs :)
@@ -2690,14 +2666,12 @@ public final class GameServerSide extends net.sf.colossus.game.Game
         if (viewModeOptNum == Options.viewableAllNum
             || viewModeOptNum == Options.viewableOwnNum)
         {
-            server.allRevealLegion((LegionServerSide)parent,
-                Constants.reasonSplit);
+            server.allRevealLegion(parent, Constants.reasonSplit);
             server.allRevealLegion(newLegion, Constants.reasonSplit);
         }
         else
         {
-            server.oneRevealLegion((LegionServerSide)parent, player,
-                Constants.reasonSplit);
+            server.oneRevealLegion(parent, player, Constants.reasonSplit);
             server.oneRevealLegion(newLegion, player, Constants.reasonSplit);
         }
         return true;
@@ -2878,9 +2852,10 @@ public final class GameServerSide extends net.sf.colossus.game.Game
         }
         else
         {
-            LegionServerSide attacker = getLegionByMarkerId(markerId);
-            String hexLabel = attacker.getCurrentHexLabel();
-            LegionServerSide defender = getFirstEnemyLegion(hexLabel, attacker
+            Legion attacker = getLegionByMarkerId(markerId);
+            String hexLabel = ((LegionServerSide)attacker)
+                .getCurrentHexLabel();
+            Legion defender = getFirstEnemyLegion(hexLabel, attacker
                 .getPlayer());
 
             handleConcession(attacker, defender, false);
@@ -2929,9 +2904,9 @@ public final class GameServerSide extends net.sf.colossus.game.Game
         // If this player wants to fight, cancel negotiations.
         if (proposal.isFight())
         {
-            LegionServerSide attacker = getLegionByMarkerId(proposal
-                .getAttackerId());
-            String hexLabel = attacker.getCurrentHexLabel();
+            Legion attacker = getLegionByMarkerId(proposal.getAttackerId());
+            String hexLabel = ((LegionServerSide)attacker)
+                .getCurrentHexLabel();
             fight(hexLabel);
         }
 
@@ -2949,8 +2924,7 @@ public final class GameServerSide extends net.sf.colossus.game.Game
             Player other = null;
             if (playerName.equals(getActivePlayerName()))
             {
-                LegionServerSide defender = getLegionByMarkerId(proposal
-                    .getDefenderId());
+                Legion defender = getLegionByMarkerId(proposal.getDefenderId());
 
                 other = defender.getPlayer();
             }
@@ -3057,48 +3031,47 @@ public final class GameServerSide extends net.sf.colossus.game.Game
 
     private synchronized void handleNegotiation(Proposal results)
     {
-        LegionServerSide attacker = getLegionByMarkerId(results
-            .getAttackerId());
-        LegionServerSide defender = getLegionByMarkerId(results
-            .getDefenderId());
-        LegionServerSide winner = null;
+        Legion attacker = getLegionByMarkerId(results.getAttackerId());
+        Legion defender = getLegionByMarkerId(results.getDefenderId());
+        Legion winner = null;
         int points = 0;
 
         if (results.isMutual())
         {
             // Remove both legions and give no points.
-            attacker.remove();
-            defender.remove();
+            ((LegionServerSide)attacker).remove();
+            ((LegionServerSide)defender).remove();
 
-            LOGGER.log(Level.INFO, attacker.getLongMarkerName() + " and "
-                + defender.getLongMarkerName()
+            LOGGER.log(Level.INFO, attacker + " and " + defender
                 + " agree to mutual elimination");
 
             // If both Titans died, eliminate both players.
             if (attacker.hasTitan() && defender.hasTitan())
             {
                 // Make defender die first, to simplify turn advancing.
-                defender.getPlayer().die(null, false);
-                attacker.getPlayer().die(null, true);
+                ((PlayerServerSide)defender.getPlayer()).die(null, false);
+                ((PlayerServerSide)attacker.getPlayer()).die(null, true);
             }
 
             // If either was the titan stack, its owner dies and gives
             // half points to the victor.
             else if (attacker.hasTitan())
             {
-                attacker.getPlayer().die(defender.getPlayer(), true);
+                ((PlayerServerSide)attacker.getPlayer()).die(defender
+                    .getPlayer(), true);
             }
 
             else if (defender.hasTitan())
             {
-                defender.getPlayer().die(attacker.getPlayer(), true);
+                ((PlayerServerSide)defender.getPlayer()).die(attacker
+                    .getPlayer(), true);
             }
         }
         else
         {
             // One legion was eliminated during negotiations.
             winner = getLegionByMarkerId(results.getWinnerId());
-            LegionServerSide loser;
+            Legion loser;
             if (winner == defender)
             {
                 loser = attacker;
@@ -3110,7 +3083,7 @@ public final class GameServerSide extends net.sf.colossus.game.Game
 
             StringBuffer log = new StringBuffer("Winning legion ");
 
-            log.append(winner.getLongMarkerName());
+            log.append(((LegionServerSide)winner).getLongMarkerName());
             log.append(" loses creatures ");
 
             // Remove all dead creatures from the winning legion.
@@ -3124,9 +3097,10 @@ public final class GameServerSide extends net.sf.colossus.game.Game
                 {
                     log.append(", ");
                 }
-                CreatureTypeServerSide creature = (CreatureTypeServerSide)getVariant()
-                    .getCreatureByName(creatureName);
-                winner.removeCreature(creature, true, true);
+                CreatureType creature = getVariant().getCreatureByName(
+                    creatureName);
+                ((LegionServerSide)winner)
+                    .removeCreature(creature, true, true);
                 server.allTellRemoveCreature(winner, creatureName, true,
                     Constants.reasonNegotiated);
             }
@@ -3137,30 +3111,29 @@ public final class GameServerSide extends net.sf.colossus.game.Game
             server.oneRevealLegion(winner, defender.getPlayer(),
                 Constants.reasonNegotiated);
 
-            points = loser.getPointValue();
+            points = ((LegionServerSide)loser).getPointValue();
 
-            PlayerServerSide losingPlayer = loser.getPlayer();
+            Player losingPlayer = loser.getPlayer();
 
             // Remove the losing legion.
-            loser.remove();
+            ((LegionServerSide)loser).remove();
 
             // Add points, and angels if necessary.
-            winner.addPoints(points);
+            ((LegionServerSide)winner).addPoints(points);
 
-            LOGGER.log(Level.INFO, "Legion " + loser.getLongMarkerName()
-                + " is eliminated by legion " + winner.getLongMarkerName()
-                + " via negotiation");
+            LOGGER.log(Level.INFO, "Legion " + loser
+                + " is eliminated by legion " + winner + " via negotiation");
 
             // If this was the titan stack, its owner dies and gives half
             // points to the victor.
             if (loser.hasTitan())
             {
-                losingPlayer.die(winner.getPlayer(), true);
+                ((PlayerServerSide)losingPlayer).die(winner.getPlayer(), true);
             }
 
             if (winner == defender)
             {
-                if (defender.canRecruit())
+                if (((LegionServerSide)defender).canRecruit())
                 {
                     // If the defender won the battle by agreement,
                     // he may recruit.
@@ -3169,8 +3142,8 @@ public final class GameServerSide extends net.sf.colossus.game.Game
             }
             else
             {
-                if (attacker.getHeight() < 7
-                    && !attacker.getPlayer().hasSummoned())
+                if (((LegionServerSide)attacker).getHeight() < 7
+                    && !((PlayerServerSide)attacker.getPlayer()).hasSummoned())
                 {
                     // If the attacker won the battle by agreement,
                     // he may summon an angel.
@@ -3273,12 +3246,11 @@ public final class GameServerSide extends net.sf.colossus.game.Game
     synchronized List<LegionServerSide> getAllEnemyLegions(Player player)
     {
         List<LegionServerSide> list = new ArrayList<LegionServerSide>();
-        for (PlayerServerSide nextPlayer : players)
+        for (PlayerServerSide otherPlayer : players)
         {
-            if (nextPlayer != player)
+            if (otherPlayer != player)
             {
-                List<LegionServerSide> legions = nextPlayer.getLegions();
-
+                List<LegionServerSide> legions = otherPlayer.getLegions();
                 list.addAll(legions);
             }
         }
@@ -3299,13 +3271,11 @@ public final class GameServerSide extends net.sf.colossus.game.Game
         return list;
     }
 
-    LegionServerSide getLegionByMarkerId(String markerId)
+    Legion getLegionByMarkerId(String markerId)
     {
-        Iterator<PlayerServerSide> it = players.iterator();
-        while (it.hasNext())
+        for (Player player : players)
         {
-            PlayerServerSide player = it.next();
-            LegionServerSide legion = player.getLegionByMarkerId(markerId);
+            Legion legion = player.getLegionByMarkerId(markerId);
             if (legion != null)
             {
                 return legion;
@@ -3314,13 +3284,11 @@ public final class GameServerSide extends net.sf.colossus.game.Game
         return null;
     }
 
-    PlayerServerSide getPlayerByMarkerId(String markerId)
+    Player getPlayerByMarkerId(String markerId)
     {
-        Iterator<PlayerServerSide> it = players.iterator();
-        while (it.hasNext())
+        for (Player player : players)
         {
-            PlayerServerSide player = it.next();
-            LegionServerSide legion = player.getLegionByMarkerId(markerId);
+            Legion legion = player.getLegionByMarkerId(markerId);
 
             if (legion != null)
             {
@@ -3460,12 +3428,10 @@ public final class GameServerSide extends net.sf.colossus.game.Game
     int getNumEnemyLegions(String hexLabel, Player player)
     {
         int count = 0;
-        Iterator<LegionServerSide> it = getAllEnemyLegions(player).iterator();
-        while (it.hasNext())
+        for (Legion legion : getAllEnemyLegions(player))
         {
-            LegionServerSide legion = it.next();
-
-            if (hexLabel.equals(legion.getCurrentHexLabel()))
+            if (hexLabel.equals(((LegionServerSide)legion)
+                .getCurrentHexLabel()))
             {
                 count++;
             }

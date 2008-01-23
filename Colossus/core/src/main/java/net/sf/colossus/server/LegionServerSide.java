@@ -9,6 +9,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.colossus.client.BattleMap;
+import net.sf.colossus.game.Creature;
+import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.MasterHex;
@@ -66,7 +68,7 @@ public final class LegionServerSide extends net.sf.colossus.game.Legion
         for (CreatureTypeServerSide creature : creatureTypes)
         {
             assert creature != null : "Null creature not allowed";
-            getCritters().add(new CreatureServerSide(creature, this, game));
+            getCreatures().add(new CreatureServerSide(creature, this, game));
         }
     }
 
@@ -91,7 +93,7 @@ public final class LegionServerSide extends net.sf.colossus.game.Legion
             startCre[2], startCre[2], startCre[0], startCre[0], startCre[1],
             startCre[1]);
 
-        Iterator<CreatureServerSide> it = legion.getCritters().iterator();
+        Iterator<CreatureServerSide> it = legion.getCreatures().iterator();
         while (it.hasNext())
         {
             CreatureServerSide critter = it.next();
@@ -103,13 +105,16 @@ public final class LegionServerSide extends net.sf.colossus.game.Legion
     public int getPointValue()
     {
         int pointValue = 0;
-        for (CreatureServerSide critter : getCritters())
+        for (CreatureServerSide critter : getCreatures())
         {
             pointValue += critter.getPointValue();
         }
         return pointValue;
     }
 
+    /**
+     * TODO handling the points shouldn't be really a task for the Legion.
+     */
     // Example: Start with 375, earn 150
     void addPoints(int points)
     {
@@ -198,7 +203,7 @@ public final class LegionServerSide extends net.sf.colossus.game.Legion
     {
         clearBattleTally();
 
-        for (CreatureServerSide critter : getCritters())
+        for (CreatureServerSide critter : getCreatures())
         {
             critter.heal();
             critter.addBattleInfo(null, null, null);
@@ -245,7 +250,7 @@ public final class LegionServerSide extends net.sf.colossus.game.Legion
         return parentId;
     }
 
-    LegionServerSide getParent()
+    Legion getParent()
     {
         return getPlayer().getLegionByMarkerId(parentId);
     }
@@ -261,7 +266,7 @@ public final class LegionServerSide extends net.sf.colossus.game.Legion
     {
         sortCritters();
         List<String> imageNames = new ArrayList<String>();
-        Iterator<CreatureServerSide> it = getCritters().iterator();
+        Iterator<CreatureServerSide> it = getCreatures().iterator();
         while (it.hasNext())
         {
             CreatureServerSide critter = it.next();
@@ -291,7 +296,7 @@ public final class LegionServerSide extends net.sf.colossus.game.Legion
 
     boolean canFlee()
     {
-        for (CreatureServerSide critter : getCritters())
+        for (CreatureServerSide critter : getCreatures())
         {
             if (critter.isLord())
             {
@@ -304,7 +309,7 @@ public final class LegionServerSide extends net.sf.colossus.game.Legion
     int numCreature(CreatureType creatureType)
     {
         int count = 0;
-        for (CreatureServerSide critter : getCritters())
+        for (CreatureServerSide critter : getCreatures())
         {
             if (critter.getType().equals(creatureType))
             {
@@ -317,7 +322,7 @@ public final class LegionServerSide extends net.sf.colossus.game.Legion
     public int numLords()
     {
         int count = 0;
-        for (CreatureServerSide critter : getCritters())
+        for (CreatureServerSide critter : getCreatures())
         {
             if (critter.isLord())
             {
@@ -330,7 +335,7 @@ public final class LegionServerSide extends net.sf.colossus.game.Legion
     public int numRangestrikers()
     {
         int count = 0;
-        for (CreatureServerSide critter : getCritters())
+        for (CreatureServerSide critter : getCreatures())
         {
             if (critter.isRangestriker())
             {
@@ -340,21 +345,9 @@ public final class LegionServerSide extends net.sf.colossus.game.Legion
         return count;
     }
 
-    public boolean hasTitan()
-    {
-        for (CreatureServerSide critter : getCritters())
-        {
-            if (critter.isTitan())
-            {
-                return true;
-            }
-        }
-        return false;
-    }
-
     public boolean hasSummonable()
     {
-        for (CreatureServerSide critter : getCritters())
+        for (CreatureServerSide critter : getCreatures())
         {
             if (critter.isSummonable())
             {
@@ -366,7 +359,7 @@ public final class LegionServerSide extends net.sf.colossus.game.Legion
 
     public int getHeight()
     {
-        return getCritters().size();
+        return getCreatures().size();
     }
 
     @Override
@@ -403,12 +396,12 @@ public final class LegionServerSide extends net.sf.colossus.game.Legion
     /** Do the cleanup required before this legion can be removed. */
     void prepareToRemove(boolean returnCrittersToStacks, boolean updateHistory)
     {
-        LOGGER.log(Level.INFO, "Legion " + markerId + getCritters().toString()
-            + " is eliminated");
+        LOGGER.log(Level.INFO, "Legion " + markerId
+            + getCreatures().toString() + " is eliminated");
         if (getHeight() > 0)
         {
             // Return immortals to the stacks, others to the Graveyard
-            Iterator<CreatureServerSide> it = getCritters().iterator();
+            Iterator<CreatureServerSide> it = getCreatures().iterator();
             while (it.hasNext())
             {
                 CreatureServerSide critter = it.next();
@@ -594,7 +587,7 @@ public final class LegionServerSide extends net.sf.colossus.game.Legion
     /** Add a creature to this legion.  If takeFromStack is true,
      then do this only if such a creature remains in the stacks,
      and decrement the number of this creature type remaining. */
-    boolean addCreature(CreatureTypeServerSide creature, boolean takeFromStack)
+    boolean addCreature(CreatureType creature, boolean takeFromStack)
     {
         if (getHeight() > 7 || (getHeight() == 7 && game.getTurnNumber() > 1))
         {
@@ -617,17 +610,17 @@ public final class LegionServerSide extends net.sf.colossus.game.Legion
             }
         }
 
-        getCritters().add(new CreatureServerSide(creature, this, game));
+        getCreatures().add(new CreatureServerSide(creature, this, game));
         return true;
     }
 
     /** Remove the creature in position i in the legion.  Return the
      removed creature. Put immortal creatures back on the stack
      and others to the Graveyard if returnImmortalToStack is true. */
-    CreatureTypeServerSide removeCreature(int i, boolean returnToStack,
+    CreatureType removeCreature(int i, boolean returnToStack,
         boolean disbandIfEmpty)
     {
-        CreatureServerSide critter = getCritters().remove(i);
+        CreatureServerSide critter = getCreatures().remove(i);
 
         // If the creature is an immortal, put it back in the stacks.
         if (returnToStack)
@@ -653,31 +646,31 @@ public final class LegionServerSide extends net.sf.colossus.game.Legion
 
     /** Remove the first creature matching the passed creature's type
      from the legion.  Return the removed creature. */
-    CreatureTypeServerSide removeCreature(CreatureTypeServerSide creature,
+    CreatureType removeCreature(CreatureType creature,
         boolean returnImmortalToStack, boolean disbandIfEmpty)
     {
         // indexOf wants the same object, not just the same type.
         // So use getCritter() to get the correct object.
-        CreatureServerSide critter = getCritter(creature);
+        Creature critter = getCritter(creature);
         if (critter == null)
         {
             return null;
         }
         else
         {
-            int i = getCritters().indexOf(critter);
+            int i = getCreatures().indexOf(critter);
             return removeCreature(i, returnImmortalToStack, disbandIfEmpty);
         }
     }
 
     /** Do the cleanup associated with removing the critter from this
-     *  legion.  Do not actually remove it, to prevent comodification
+     *  legion.  Do not actually remove it, to prevent co-modification
      *  errors.  Do not disband the legion if empty, since the critter
      *  has not actually been removed. */
     void prepareToRemoveCritter(CreatureServerSide critter,
         boolean returnToStacks, boolean updateHistory)
     {
-        if (critter == null || !getCritters().contains(critter))
+        if (critter == null || !getCreatures().contains(critter))
         {
             LOGGER.log(Level.SEVERE,
                 "Called prepareToRemoveCritter with bad critter");
@@ -696,26 +689,30 @@ public final class LegionServerSide extends net.sf.colossus.game.Legion
     }
 
     @SuppressWarnings("unchecked")
-    List<CreatureServerSide> getCritters()
+    @Override
+    public List<CreatureServerSide> getCreatures()
     {
         return (List<CreatureServerSide>)super.getCreatures();
     }
 
+    /**
+     * TODO avoid index-based access
+     */
     CreatureServerSide getCritter(int i)
     {
-        return getCritters().get(i);
+        return getCreatures().get(i);
     }
 
     void addCritter(CreatureServerSide critter)
     {
-        getCritters().add(critter);
+        getCreatures().add(critter);
         critter.setLegion(this);
     }
 
     /** Return the first critter with a matching tag. */
     CreatureServerSide getCritterByTag(int tag)
     {
-        for (CreatureServerSide critter : getCritters())
+        for (CreatureServerSide critter : getCreatures())
         {
             if (tag == critter.getTag())
             {
@@ -729,7 +726,7 @@ public final class LegionServerSide extends net.sf.colossus.game.Legion
      *  Return true if it was moved. */
     boolean moveToTop(CreatureServerSide critter)
     {
-        int i = getCritters().indexOf(critter);
+        int i = getCreatures().indexOf(critter);
         if (i <= 0)
         {
             // Not found, or already first in the list.
@@ -737,21 +734,21 @@ public final class LegionServerSide extends net.sf.colossus.game.Legion
         }
         else
         {
-            getCritters().remove(i);
-            getCritters().add(0, critter);
+            getCreatures().remove(i);
+            getCreatures().add(0, critter);
             return true;
         }
     }
 
     /** Gets the first critter in this legion with the same creature
      type as the passed creature. */
-    CreatureServerSide getCritter(CreatureTypeServerSide creatureType)
+    Creature getCritter(CreatureType creatureType)
     {
-        for (CreatureServerSide critter : getCritters())
+        for (Creature creature : getCreatures())
         {
-            if (critter.getType().equals(creatureType))
+            if (creature.getType().equals(creatureType))
             {
-                return critter;
+                return creature;
             }
         }
         return null;
@@ -764,7 +761,7 @@ public final class LegionServerSide extends net.sf.colossus.game.Legion
      */
     void sortCritters()
     {
-        Collections.sort(getCritters(), CreatureServerSide.IMPORTANCE_ORDER);
+        Collections.sort(getCreatures(), CreatureServerSide.IMPORTANCE_ORDER);
     }
 
     /** Recombine this legion into another legion. Only remove this
@@ -773,7 +770,7 @@ public final class LegionServerSide extends net.sf.colossus.game.Legion
      concurrent access problems. Someone needs to call
      MasterBoard.alignLegions() on the remaining legion's hexLabel
      after the recombined legion is actually removed. */
-    void recombine(LegionServerSide legion, boolean remove)
+    void recombine(Legion legion, boolean remove)
     {
         // Sanity check
         if (legion == this)
@@ -782,9 +779,9 @@ public final class LegionServerSide extends net.sf.colossus.game.Legion
                 "Tried to recombine a legion with itself!");
             return;
         }
-        for (CreatureServerSide critter : getCritters())
+        for (Creature critter : getCreatures())
         {
-            legion.addCreature(critter.getCreature(), false);
+            ((LegionServerSide)legion).addCreature(critter.getType(), false);
         }
 
         if (remove)
@@ -796,8 +793,8 @@ public final class LegionServerSide extends net.sf.colossus.game.Legion
             prepareToRemove(false, false);
         }
 
-        LOGGER.log(Level.INFO, "Legion " + getLongMarkerName()
-            + " recombined into legion " + legion.getLongMarkerName());
+        LOGGER.log(Level.INFO, "Legion " + this + " recombined into legion "
+            + legion);
 
         sortCritters();
 
@@ -810,8 +807,7 @@ public final class LegionServerSide extends net.sf.colossus.game.Legion
      * (Or the first available marker, if markerId is null.)
      * Return the new legion, or null if there's an error.
      */
-    LegionServerSide split(List<CreatureTypeServerSide> creatures,
-        String newMarkerId)
+    Legion split(List<CreatureType> creatures, String newMarkerId)
     {
         PlayerServerSide player = getPlayer();
         if (newMarkerId == null)
@@ -820,32 +816,32 @@ public final class LegionServerSide extends net.sf.colossus.game.Legion
         }
 
         player.selectMarkerId(newMarkerId);
-        LegionServerSide newLegion = new LegionServerSide(newMarkerId,
-            markerId, currentHexLabel, currentHexLabel, getPlayer(), game);
+        Legion newLegion = new LegionServerSide(newMarkerId, markerId,
+            currentHexLabel, currentHexLabel, getPlayer(), game);
 
-        Iterator<CreatureTypeServerSide> it = creatures.iterator();
+        Iterator<CreatureType> it = creatures.iterator();
         while (it.hasNext())
         {
-            CreatureTypeServerSide creature = it.next();
+            CreatureType creature = it.next();
             creature = removeCreature(creature, false, false);
             if (creature == null)
             {
                 // Abort the split.
-                newLegion.recombine(this, true);
+                ((LegionServerSide)newLegion).recombine(this, true);
                 return null;
             }
-            newLegion.addCreature(creature, false);
+            ((LegionServerSide)newLegion).addCreature(creature, false);
         }
 
-        player.addLegion(newLegion);
+        player.addLegion((LegionServerSide)newLegion);
 
         game.getServer().allUpdatePlayerInfo();
-        LOGGER.log(Level.INFO, newLegion.getHeight()
-            + " creatures are split off from legion " + getLongMarkerName()
-            + " into new legion " + newLegion.getLongMarkerName());
+        LOGGER.log(Level.INFO, ((LegionServerSide)newLegion).getHeight()
+            + " creatures are split off from legion " + this
+            + " into new legion " + newLegion);
 
         sortCritters();
-        newLegion.sortCritters();
+        ((LegionServerSide)newLegion).sortCritters();
 
         // game.getServer().allTellLegionLocation(newMarkerId);
 
@@ -872,7 +868,7 @@ public final class LegionServerSide extends net.sf.colossus.game.Legion
         // Tower teleport
         else
         {
-            for (CreatureServerSide critter : getCritters())
+            for (CreatureServerSide critter : getCreatures())
             {
                 if (critter.isLord())
                 {

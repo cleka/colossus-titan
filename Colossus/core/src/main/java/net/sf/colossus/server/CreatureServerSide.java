@@ -13,7 +13,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.colossus.client.BattleHex;
+import net.sf.colossus.game.Creature;
+import net.sf.colossus.game.Game;
+import net.sf.colossus.game.Legion;
+import net.sf.colossus.game.Player;
 import net.sf.colossus.util.Options;
+import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.HazardTerrain;
 
 
@@ -34,7 +39,7 @@ import net.sf.colossus.variant.HazardTerrain;
  * @author Romain Dolbeau
  */
 
-public class CreatureServerSide extends net.sf.colossus.game.Creature
+public class CreatureServerSide extends Creature
 {
     /**
      * Implements an order on Critters by some definition of importance.
@@ -89,7 +94,7 @@ public class CreatureServerSide extends net.sf.colossus.game.Creature
     private static final Logger LOGGER = Logger
         .getLogger(CreatureServerSide.class.getName());
 
-    private LegionServerSide legion;
+    private Legion legion;
     private BattleServerSide battle;
     private boolean struck;
     private BattleHex currentHex;
@@ -97,7 +102,7 @@ public class CreatureServerSide extends net.sf.colossus.game.Creature
 
     /** Damage taken */
     private int hits = 0;
-    private final GameServerSide game;
+    private final Game game;
 
     /** Unique identifier for each critter. */
     private final int tag;
@@ -107,8 +112,7 @@ public class CreatureServerSide extends net.sf.colossus.game.Creature
     private final SortedSet<PenaltyOption> penaltyOptions = new TreeSet<PenaltyOption>();
     private boolean carryPossible;
 
-    public CreatureServerSide(CreatureTypeServerSide creature, LegionServerSide legion,
-        GameServerSide game)
+    public CreatureServerSide(CreatureType creature, Legion legion, Game game)
     {
         super(creature);
         this.legion = legion;
@@ -143,12 +147,12 @@ public class CreatureServerSide extends net.sf.colossus.game.Creature
         this.legion = legion;
     }
 
-    LegionServerSide getLegion()
+    Legion getLegion()
     {
         return legion;
     }
 
-    PlayerServerSide getPlayer()
+    Player getPlayer()
     {
         return legion.getPlayer();
     }
@@ -172,10 +176,10 @@ public class CreatureServerSide extends net.sf.colossus.game.Creature
     {
         if (isTitan())
         {
-            PlayerServerSide player = getPlayer();
+            Player player = getPlayer();
             if (player != null)
             {
-                return player.getTitanPower();
+                return ((PlayerServerSide)player).getTitanPower();
             }
             else
             {
@@ -599,7 +603,8 @@ public class CreatureServerSide extends net.sf.colossus.game.Creature
 
     private void chooseStrikePenalty()
     {
-        game.getServer().askChooseStrikePenalty(penaltyOptions);
+        ((GameServerSide)game).getServer().askChooseStrikePenalty(
+            penaltyOptions);
     }
 
     /** Side effects. */
@@ -777,7 +782,8 @@ public class CreatureServerSide extends net.sf.colossus.game.Creature
         // Roll the dice.
         int damage = 0;
         // Check if we roll or if we don't
-        boolean randomized = !(game.getOption(Options.nonRandomBattleDice));
+        boolean randomized = !(((GameServerSide)game)
+            .getOption(Options.nonRandomBattleDice));
 
         List<String> rolls = new ArrayList<String>();
         StringBuffer rollString = new StringBuffer(36);
@@ -819,8 +825,8 @@ public class CreatureServerSide extends net.sf.colossus.game.Creature
 
         if (game != null)
         {
-            game.getServer().allTellStrikeResults(this, target, strikeNumber,
-                rolls, damage, carryDamage,
+            ((GameServerSide)game).getServer().allTellStrikeResults(this,
+                target, strikeNumber, rolls, damage, carryDamage,
                 battle.getCarryTargetDescriptions());
         }
     }
@@ -880,7 +886,7 @@ public class CreatureServerSide extends net.sf.colossus.game.Creature
 
     public boolean isTitan()
     {
-        return getCreature().isTitan();
+        return getType().isTitan();
     }
 
     public String getPluralName()

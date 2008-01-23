@@ -88,4 +88,17 @@ public class CreatureType
     {
         return isSummonable;
     }
+
+    /**
+     * Returns true if this is a Titan.
+     * 
+     * The default implementation is a constant false, to be overridden in classes
+     * representing Titans.
+     * 
+     * @return true iff this creature type is a Titan.
+     */
+    public boolean isTitan()
+    {
+        return false;
+    }
 }

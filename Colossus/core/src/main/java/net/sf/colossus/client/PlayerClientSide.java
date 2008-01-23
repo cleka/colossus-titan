@@ -220,6 +220,7 @@ public final class PlayerClientSide extends Player
     }
 
     /** Return a List of markerIds. */
+    @Override
     public List<String> getLegionIds()
     {
         return client.getLegionsByPlayerState(this);
