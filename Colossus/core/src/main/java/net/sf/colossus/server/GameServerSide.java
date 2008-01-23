@@ -1311,7 +1311,7 @@ public final class GameServerSide extends net.sf.colossus.game.Game
         Element leg = new Element("Legion");
 
         leg.setAttribute("name", legion.getMarkerId());
-        leg.setAttribute("currentHex", legion.getCurrentHexLabel());
+        leg.setAttribute("currentHex", legion.getHexLabel());
         leg.setAttribute("startingHex", legion.getStartingHexLabel());
         leg.setAttribute("moved", "" + legion.hasMoved());
         leg.setAttribute("entrySide", "" + legion.getEntrySide());
@@ -1822,7 +1822,7 @@ public final class GameServerSide extends net.sf.colossus.game.Game
         }
 
         Legion legion = getLegionByMarkerId(markerId);
-        String hexLabel = ((LegionServerSide)legion).getCurrentHexLabel();
+        String hexLabel = ((LegionServerSide)legion).getHexLabel();
         MasterHex hex = getVariant().getMasterBoard().getHexByLabel(hexLabel);
         String terrain = hex.getTerrain();
         recruiters = TerrainRecruitLoader.getPossibleRecruiters(terrain,
@@ -1851,9 +1851,8 @@ public final class GameServerSide extends net.sf.colossus.game.Game
      */
     private boolean anonymousRecruitLegal(Legion legion, CreatureType recruit)
     {
-        return TerrainRecruitLoader.anonymousRecruitLegal(recruit,
-            ((LegionServerSide)legion).getCurrentHex().getTerrain(),
-            ((LegionServerSide)legion).getCurrentHex().getLabel());
+        return TerrainRecruitLoader.anonymousRecruitLegal(recruit, legion
+            .getCurrentHex().getTerrain(), legion.getCurrentHex().getLabel());
     }
 
     /** Add recruit to legion. */
@@ -1892,7 +1891,7 @@ public final class GameServerSide extends net.sf.colossus.game.Game
 
         if (((LegionServerSide)legion).addCreature(recruit, true))
         {
-            MasterHex hex = ((LegionServerSide)legion).getCurrentHex();
+            MasterHex hex = legion.getCurrentHex();
             int numRecruiters = 0;
 
             if (recruiter != null)
@@ -2028,7 +2027,7 @@ public final class GameServerSide extends net.sf.colossus.game.Game
                 if (!ignoreFriends
                     && otherLegion != legion
                     && hexLabel.equals(((LegionServerSide)otherLegion)
-                        .getCurrentHexLabel()))
+                        .getHexLabel()))
                 {
                     return set;
                 }
@@ -2284,7 +2283,7 @@ public final class GameServerSide extends net.sf.colossus.game.Game
             {
                 LegionServerSide other = it.next();
                 {
-                    String hexLabel = other.getCurrentHexLabel();
+                    String hexLabel = other.getHexLabel();
                     if (!isEngagement(hexLabel) || ignoreFriends)
                     {
                         set.add(hexLabel);
@@ -2306,7 +2305,7 @@ public final class GameServerSide extends net.sf.colossus.game.Game
         Set<String> entrySides = new HashSet<String>();
         Player player = legion.getPlayer();
         int movementRoll = ((PlayerServerSide)player).getMovementRoll();
-        MasterHex currentHex = ((LegionServerSide)legion).getCurrentHex();
+        MasterHex currentHex = legion.getCurrentHex();
         MasterHex targetHex = getVariant().getMasterBoard().getHexByLabel(
             targetHexLabel);
 
@@ -2401,7 +2400,7 @@ public final class GameServerSide extends net.sf.colossus.game.Game
 
         for (Legion legion : player.getLegions())
         {
-            String hexLabel = ((LegionServerSide)legion).getCurrentHexLabel();
+            String hexLabel = ((LegionServerSide)legion).getHexLabel();
 
             if (getNumEnemyLegions(hexLabel, player) > 0)
             {
@@ -2530,8 +2529,7 @@ public final class GameServerSide extends net.sf.colossus.game.Game
         {
             if (candidate != legion)
             {
-                String hexLabel = ((LegionServerSide)candidate)
-                    .getCurrentHexLabel();
+                String hexLabel = ((LegionServerSide)candidate).getHexLabel();
                 boolean hasSummonable = false;
                 List<CreatureType> summonableList = getVariant()
                     .getSummonableCreatureTypes();
@@ -2653,7 +2651,7 @@ public final class GameServerSide extends net.sf.colossus.game.Game
             return false;
         }
 
-        String hexLabel = ((LegionServerSide)parent).getCurrentHexLabel();
+        String hexLabel = ((LegionServerSide)parent).getHexLabel();
         server.didSplit(hexLabel, parent, newLegion,
             ((LegionServerSide)newLegion).getHeight());
 
@@ -2689,37 +2687,32 @@ public final class GameServerSide extends net.sf.colossus.game.Game
         // Verify that the move is legal.
         if (teleport)
         {
-            if (!listTeleportMoves(legion,
-                ((LegionServerSide)legion).getCurrentHex(),
+            if (!listTeleportMoves(legion, legion.getCurrentHex(),
                 ((PlayerServerSide)player).getMovementRoll(), false).contains(
                 hexLabel))
             {
                 String marker = legion.getMarkerId() + " "
                     + ((LegionServerSide)legion).getMarkerName();
-                String from = ((LegionServerSide)legion).getCurrentHex()
-                    .getLabel();
-                Set<String> set = listTeleportMoves(legion,
-                    ((LegionServerSide)legion).getCurrentHex(),
-                    ((PlayerServerSide)player).getMovementRoll(), false);
-                return "List for teleport moves " + set.toString() + " of "
-                    + marker + " from " + from + " does not contain '"
-                    + hexLabel + "'";
+                String from = legion.getCurrentHex().getLabel();
+                Set<String> set = listTeleportMoves(legion, legion
+                    .getCurrentHex(), ((PlayerServerSide)player)
+                    .getMovementRoll(), false);
+                return "List for teleport moves " + set + " of " + marker
+                    + " from " + from + " does not contain '" + hexLabel + "'";
             }
         }
         else
         {
-            if (!listNormalMoves(legion,
-                ((LegionServerSide)legion).getCurrentHex(),
+            if (!listNormalMoves(legion, legion.getCurrentHex(),
                 ((PlayerServerSide)player).getMovementRoll(), false).contains(
                 hexLabel))
             {
                 String marker = legion.getMarkerId() + " "
                     + ((LegionServerSide)legion).getMarkerName();
-                String from = ((LegionServerSide)legion).getCurrentHex()
-                    .getLabel();
-                Set<String> set = listNormalMoves(legion,
-                    ((LegionServerSide)legion).getCurrentHex(),
-                    ((PlayerServerSide)player).getMovementRoll(), false);
+                String from = legion.getCurrentHex().getLabel();
+                Set<String> set = listNormalMoves(legion, legion
+                    .getCurrentHex(), ((PlayerServerSide)player)
+                    .getMovementRoll(), false);
                 return "List for normal moves " + set.toString() + " + of "
                     + marker + " from " + from + " does not contain '"
                     + hexLabel + "'";
@@ -2837,7 +2830,7 @@ public final class GameServerSide extends net.sf.colossus.game.Game
 
     void flee(Legion legion)
     {
-        String hexLabel = ((LegionServerSide)legion).getCurrentHexLabel();
+        String hexLabel = ((LegionServerSide)legion).getHexLabel();
         LegionServerSide attacker = getFirstEnemyLegion(hexLabel, legion
             .getPlayer());
 
@@ -2853,8 +2846,7 @@ public final class GameServerSide extends net.sf.colossus.game.Game
         else
         {
             Legion attacker = getLegionByMarkerId(markerId);
-            String hexLabel = ((LegionServerSide)attacker)
-                .getCurrentHexLabel();
+            String hexLabel = ((LegionServerSide)attacker).getHexLabel();
             Legion defender = getFirstEnemyLegion(hexLabel, attacker
                 .getPlayer());
 
@@ -2864,7 +2856,7 @@ public final class GameServerSide extends net.sf.colossus.game.Game
 
     void doNotFlee(Legion legion)
     {
-        String hexLabel = ((LegionServerSide)legion).getCurrentHexLabel();
+        String hexLabel = ((LegionServerSide)legion).getHexLabel();
 
         engage2(hexLabel);
     }
@@ -2872,7 +2864,7 @@ public final class GameServerSide extends net.sf.colossus.game.Game
     /** Used only for pre-battle attacker concession. */
     void doNotConcede(Legion legion)
     {
-        String hexLabel = ((LegionServerSide)legion).getCurrentHexLabel();
+        String hexLabel = ((LegionServerSide)legion).getHexLabel();
 
         engage3(hexLabel);
     }
@@ -2905,8 +2897,7 @@ public final class GameServerSide extends net.sf.colossus.game.Game
         if (proposal.isFight())
         {
             Legion attacker = getLegionByMarkerId(proposal.getAttackerId());
-            String hexLabel = ((LegionServerSide)attacker)
-                .getCurrentHexLabel();
+            String hexLabel = ((LegionServerSide)attacker).getHexLabel();
             fight(hexLabel);
         }
 
@@ -3322,7 +3313,7 @@ public final class GameServerSide extends net.sf.colossus.game.Game
         {
             LegionServerSide legion = it.next();
 
-            if (hexLabel.equals(legion.getCurrentHexLabel()))
+            if (hexLabel.equals(legion.getHexLabel()))
             {
                 count++;
             }
@@ -3337,7 +3328,7 @@ public final class GameServerSide extends net.sf.colossus.game.Game
         {
             LegionServerSide legion = it.next();
 
-            if (hexLabel.equals(legion.getCurrentHexLabel()))
+            if (hexLabel.equals(legion.getHexLabel()))
             {
                 return true;
             }
@@ -3351,7 +3342,7 @@ public final class GameServerSide extends net.sf.colossus.game.Game
         while (it.hasNext())
         {
             LegionServerSide legion = it.next();
-            if (hexLabel.equals(legion.getCurrentHexLabel()))
+            if (hexLabel.equals(legion.getHexLabel()))
             {
                 return legion;
             }
@@ -3367,7 +3358,7 @@ public final class GameServerSide extends net.sf.colossus.game.Game
         {
             LegionServerSide legion = it.next();
 
-            if (hexLabel.equals(legion.getCurrentHexLabel()))
+            if (hexLabel.equals(legion.getHexLabel()))
             {
                 markerIds.add(legion.getMarkerId());
             }
@@ -3381,8 +3372,7 @@ public final class GameServerSide extends net.sf.colossus.game.Game
         List<? extends Legion> legions = player.getLegions();
         for (Legion legion : legions)
         {
-            if (hexLabel.equals(((LegionServerSide)legion)
-                .getCurrentHexLabel()))
+            if (hexLabel.equals(((LegionServerSide)legion).getHexLabel()))
             {
                 count++;
             }
@@ -3399,7 +3389,7 @@ public final class GameServerSide extends net.sf.colossus.game.Game
         {
             LegionServerSide legion = it.next();
 
-            if (hexLabel.equals(legion.getCurrentHexLabel()))
+            if (hexLabel.equals(legion.getHexLabel()))
             {
                 return legion;
             }
@@ -3417,7 +3407,7 @@ public final class GameServerSide extends net.sf.colossus.game.Game
         {
             LegionServerSide legion = it.next();
 
-            if (hexLabel.equals(legion.getCurrentHexLabel()))
+            if (hexLabel.equals(legion.getHexLabel()))
             {
                 newLegions.add(legion);
             }
@@ -3430,8 +3420,7 @@ public final class GameServerSide extends net.sf.colossus.game.Game
         int count = 0;
         for (Legion legion : getAllEnemyLegions(player))
         {
-            if (hexLabel.equals(((LegionServerSide)legion)
-                .getCurrentHexLabel()))
+            if (hexLabel.equals(((LegionServerSide)legion).getHexLabel()))
             {
                 count++;
             }
@@ -3446,7 +3435,7 @@ public final class GameServerSide extends net.sf.colossus.game.Game
         {
             LegionServerSide legion = it.next();
 
-            if (hexLabel.equals(legion.getCurrentHexLabel()))
+            if (hexLabel.equals(legion.getHexLabel()))
             {
                 return legion;
             }

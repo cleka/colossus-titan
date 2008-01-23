@@ -32,7 +32,10 @@ public final class LegionServerSide extends net.sf.colossus.game.Legion
         .getLogger(LegionServerSide.class.getName());
 
     private final String parentId;
-    private String currentHexLabel;
+
+    /**
+     * The label of the starting hex of the last move.
+     */
     private String startingHexLabel;
     private boolean moved;
     private int entrySide = -1;
@@ -53,7 +56,6 @@ public final class LegionServerSide extends net.sf.colossus.game.Legion
         String currentHexLabel, String startingHexLabel, Player player,
         GameServerSide game, CreatureTypeServerSide... creatureTypes)
     {
-        // TODO we just fake a playerstate here
         super(player, markerId);
         this.parentId = parentId;
         // Sanity check
@@ -61,7 +63,7 @@ public final class LegionServerSide extends net.sf.colossus.game.Legion
         {
             parentId = null;
         }
-        this.currentHexLabel = currentHexLabel;
+        setHexLabel(currentHexLabel);
         this.startingHexLabel = startingHexLabel;
         this.game = game;
 
@@ -170,8 +172,8 @@ public final class LegionServerSide extends net.sf.colossus.game.Legion
             }
             else
             {
-                CreatureTypeServerSide angel = (CreatureTypeServerSide)game
-                    .getVariant().getCreatureByName(angelType);
+                CreatureType angel = game.getVariant().getCreatureByName(
+                    angelType);
                 if (angel != null)
                 {
                     addCreature(angel, true);
@@ -430,7 +432,7 @@ public final class LegionServerSide extends net.sf.colossus.game.Legion
         PlayerServerSide player = getPlayer();
         String hexLabel = hex.getLabel();
 
-        currentHexLabel = hexLabel;
+        setHexLabel(hexLabel);
         moved = true;
 
         setEntrySide(entrySide);
@@ -472,18 +474,17 @@ public final class LegionServerSide extends net.sf.colossus.game.Legion
                 getPlayer().setTeleported(false);
             }
 
-            currentHexLabel = startingHexLabel;
+            setHexLabel(startingHexLabel);
 
             moved = false;
-            LOGGER.log(Level.INFO, "Legion " + getLongMarkerName()
-                + " undoes its move");
+            LOGGER.log(Level.INFO, "Legion " + this + " undoes its move");
         }
     }
 
     /** Called at end of player turn. */
     void commitMove()
     {
-        startingHexLabel = currentHexLabel;
+        startingHexLabel = getHexLabel();
         moved = false;
         recruitName = null;
     }
@@ -509,7 +510,7 @@ public final class LegionServerSide extends net.sf.colossus.game.Legion
     {
         return (recruitName == null && getHeight() <= 6
             && !getPlayer().isDead() && !(game.findEligibleRecruits(
-            getMarkerId(), getCurrentHexLabel()).isEmpty()));
+            getMarkerId(), getHexLabel()).isEmpty()));
     }
 
     void undoRecruit()
@@ -537,26 +538,9 @@ public final class LegionServerSide extends net.sf.colossus.game.Legion
         return !game.findSummonableAngels(markerId).isEmpty();
     }
 
-    String getCurrentHexLabel()
-    {
-        return currentHexLabel;
-    }
-
-    MasterHex getCurrentHex()
-    {
-        return game.getVariant().getMasterBoard().getHexByLabel(
-            currentHexLabel);
-    }
-
     String getStartingHexLabel()
     {
         return startingHexLabel;
-    }
-
-    MasterHex getStartingHex()
-    {
-        return game.getVariant().getMasterBoard().getHexByLabel(
-            startingHexLabel);
     }
 
     void setEntrySide(int entrySide)
@@ -817,7 +801,7 @@ public final class LegionServerSide extends net.sf.colossus.game.Legion
 
         player.selectMarkerId(newMarkerId);
         Legion newLegion = new LegionServerSide(newMarkerId, markerId,
-            currentHexLabel, currentHexLabel, getPlayer(), game);
+            getHexLabel(), getHexLabel(), getPlayer(), game);
 
         Iterator<CreatureType> it = creatures.iterator();
         while (it.hasNext())

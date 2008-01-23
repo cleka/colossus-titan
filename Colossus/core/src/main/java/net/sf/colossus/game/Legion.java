@@ -4,13 +4,20 @@ package net.sf.colossus.game;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.sf.colossus.variant.MasterHex;
+
 
 public class Legion
 {
     /**
      * The player/game combination owning this Legion.
      */
-    private final Player playerState;
+    private final Player player;
+
+    /**
+     * The current position of the legion on the masterboard.
+     */
+    private MasterHex currentHex;
 
     /**
      * The creatures in this legion.
@@ -22,13 +29,59 @@ public class Legion
     // TODO legions should be created through factory from the player instances
     public Legion(final Player playerState, String markerId)
     {
-        this.playerState = playerState;
+        this.player = playerState;
         this.markerId = markerId;
     }
 
     public Player getPlayer()
     {
-        return playerState;
+        return player;
+    }
+
+    /**
+     * Places the legion using a hex label.
+     * 
+     * TODO replace all occurrences with {@link #moveTo(MasterHex)}
+     * 
+     * @param hexLabel the label of the new hex to move to
+     */
+    public void setHexLabel(String hexLabel)
+    {
+        this.currentHex = player.getGame().getVariant().getMasterBoard()
+            .getHexByLabel(hexLabel);
+    }
+
+    /**
+     * Places the legion into the new position.
+     * 
+     * @param newPosition the hex that will be the new position
+     * @see #getCurrentHex()
+     */
+    public void moveTo(MasterHex newPosition)
+    {
+        this.currentHex = newPosition;
+    }
+
+    /**
+     * Returns the current position of the legion as hex label.
+     * 
+     * @return the label of the hex the legion is currently on.
+     * 
+     * TODO remove in favor of {@link #getCurrentHex()}
+     */
+    public String getHexLabel()
+    {
+        return currentHex != null ? currentHex.getLabel() : null;
+    }
+
+    /**
+     * Returns the current position of the legion.
+     * 
+     * @return the hex the legion currently is on.
+     */
+    public MasterHex getCurrentHex()
+    {
+        return currentHex;
     }
 
     /**

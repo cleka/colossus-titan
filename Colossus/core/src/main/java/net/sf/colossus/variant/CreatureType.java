@@ -101,4 +101,10 @@ public class CreatureType
     {
         return false;
     }
+
+    @Override
+    public String toString()
+    {
+        return getName();
+    }
 }

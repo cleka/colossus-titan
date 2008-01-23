@@ -1201,12 +1201,12 @@ public class SimpleAI implements AI
                         && client.getMovement().titanTeleportAllowed())
                     {
                         set = client.getMovement().listAllMoves(legion,
-                            ((LegionClientSide)legion).getCurrentHex(), roll);
+                            legion.getCurrentHex(), roll);
                     }
                     else
                     {
                         set = client.getMovement().listNormalMoves(legion,
-                            ((LegionClientSide)legion).getCurrentHex(), roll);
+                            legion.getCurrentHex(), roll);
                     }
 
                     for (String hexlabel : set)
@@ -2079,28 +2079,20 @@ public class SimpleAI implements AI
             return false;
         } // Titan never flee !
 
-        int result = estimateBattleResults(enemy, legion,
-            ((LegionClientSide)legion).getCurrentHex());
+        int result = estimateBattleResults(enemy, legion, legion
+            .getCurrentHex());
         switch (result)
         {
             case WIN_WITH_HEAVY_LOSSES:
             case DRAW:
             case LOSE_BUT_INFLICT_HEAVY_LOSSES:
             case LOSE:
-                LOGGER.log(Level.FINEST, "Legion "
-                    + legion.getMarkerId()
-                    + " doesn't flee "
-                    + " before "
-                    + enemy.getMarkerId()
-                    + " with result "
-                    + result
-                    + " ("
-                    + ((LegionClientSide)legion).getPointValue()
-                    + " vs. "
-                    + ((LegionClientSide)enemy).getPointValue()
-                    + " in "
-                    + ((LegionClientSide)legion).getCurrentHex()
-                        .getTerrainName() + ")");
+                LOGGER.log(Level.FINEST, "Legion " + legion.getMarkerId()
+                    + " doesn't flee " + " before " + enemy.getMarkerId()
+                    + " with result " + result + " ("
+                    + ((LegionClientSide)legion).getPointValue() + " vs. "
+                    + ((LegionClientSide)enemy).getPointValue() + " in "
+                    + legion.getCurrentHex().getTerrainName() + ")");
                 return false;
 
             case WIN_WITH_MINIMAL_LOSSES:
@@ -2126,8 +2118,7 @@ public class SimpleAI implements AI
                 if (((LegionClientSide)enemy).getHeight() == 7)
                 {
                     List<CreatureType> recruits = client.findEligibleRecruits(
-                        enemy, ((LegionClientSide)legion).getCurrentHex()
-                            .getLabel());
+                        enemy, legion.getCurrentHex().getLabel());
                     if (recruits.size() > 0)
                     {
                         CreatureTypeServerSide best = (CreatureTypeServerSide)recruits
@@ -2136,10 +2127,9 @@ public class SimpleAI implements AI
                         if (best.getPointValue() > (lValue / ((LegionClientSide)enemy)
                             .getHeight()))
                         {
-                            LOGGER.log(Level.FINEST, "Legion "
-                                + legion.getMarkerId() + " flee "
-                                + " to prevent " + enemy.getMarkerId()
-                                + " to be able to recruit " + best.getName());
+                            LOGGER.log(Level.FINEST, "Legion " + legion
+                                + " flee " + " to prevent " + enemy
+                                + " to be able to recruit " + best);
                             return true;
                         }
                     }
@@ -2171,8 +2161,7 @@ public class SimpleAI implements AI
 
         // Wimpy legions should concede if it costs the enemy an
         // angel or good recruit.
-        String terrain = ((LegionClientSide)legion).getCurrentHex()
-            .getTerrain();
+        String terrain = legion.getCurrentHex().getTerrain();
         int height = ((LegionClientSide)enemy).getHeight();
         if (getCombatValue(legion, terrain) < 0.5 * getCombatValue(enemy,
             terrain)
@@ -2686,11 +2675,11 @@ public class SimpleAI implements AI
     // return power and skill of a given creature given the terrain
     // terrain here is either a board hex label OR
     // a Hex terrain label
-    private PowerSkill calc_bonus(CreatureTypeServerSide creature,
-        String terrain, boolean defender)
+    private PowerSkill calc_bonus(CreatureType creature, String terrain,
+        boolean defender)
     {
-        int power = creature.getPower();
-        int skill = creature.getSkill();
+        int power = ((CreatureTypeServerSide)creature).getPower();
+        int skill = ((CreatureTypeServerSide)creature).getSkill();
 
         TerrainBonuses bonuses = TERRAIN_BONUSES.get(terrain);
         if (bonuses == null)

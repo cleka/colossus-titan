@@ -14,7 +14,6 @@ import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.CreatureTypeServerSide;
 import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.variant.CreatureType;
-import net.sf.colossus.variant.MasterHex;
 
 
 /**
@@ -30,7 +29,6 @@ public final class LegionClientSide extends Legion
 
     private final Client client;
 
-    private String hexLabel;
     private Marker marker;
     private String lastRecruit;
     private boolean moved;
@@ -87,22 +85,6 @@ public final class LegionClientSide extends Legion
             return 0;
         }
         return node.getHeight();
-    }
-
-    public void setHexLabel(String hexLabel)
-    {
-        this.hexLabel = hexLabel;
-    }
-
-    public String getHexLabel()
-    {
-        return hexLabel;
-    }
-
-    public MasterHex getCurrentHex()
-    {
-        return client.getGame().getVariant().getMasterBoard().getHexByLabel(
-            getHexLabel());
     }
 
     /** Return an immutable copy of the legion's contents, in sorted order. */

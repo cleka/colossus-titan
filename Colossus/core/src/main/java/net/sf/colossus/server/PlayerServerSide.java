@@ -391,7 +391,7 @@ public final class PlayerServerSide extends Player implements
     {
         for (Legion legion : getLegions())
         {
-            String hexLabel = ((LegionServerSide)legion).getCurrentHexLabel();
+            String hexLabel = ((LegionServerSide)legion).getHexLabel();
             if (getGame().getNumFriendlyLegions(hexLabel, this) > 1
                 && ((LegionServerSide)legion).hasConventionalMove())
             {
@@ -456,7 +456,7 @@ public final class PlayerServerSide extends Player implements
             // Don't use the legion's real parent, as there could have been
             // a 3-way split and the parent could be gone.
             Legion parent = getGame().getFirstFriendlyLegion(
-                ((LegionServerSide)legion).getCurrentHexLabel(), this);
+                ((LegionServerSide)legion).getHexLabel(), this);
             if (legion != parent)
             {
                 ((LegionServerSide)legion).recombine(parent, false);
@@ -582,7 +582,7 @@ public final class PlayerServerSide extends Player implements
             .hasNext();)
         {
             LegionServerSide legion = itLeg.next();
-            String hexLabel = legion.getCurrentHexLabel();
+            String hexLabel = legion.getHexLabel();
             LegionServerSide enemyLegion = getGame().getFirstEnemyLegion(
                 hexLabel, this);
             double halfPoints = legion.getPointValue() / 2.0;

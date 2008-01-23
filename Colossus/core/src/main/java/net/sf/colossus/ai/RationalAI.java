@@ -819,17 +819,15 @@ public class RationalAI extends SimpleAI
 
             // compute the value of sitting still
             List<LegionBoardMove> legionMoves = new ArrayList<LegionBoardMove>();
-            MasterHex hex = getVariantPlayed().getMasterBoard().getHexByLabel(
-                legion.getCurrentHex().getLabel());
+            MasterHex hex = legion.getCurrentHex();
             double value = evaluateMove(legion, hex, RECRUIT_FALSE, 2, true);
-            LegionBoardMove lmove = new LegionBoardMove(markerId, legion
-                .getCurrentHex().getLabel(),
-                legion.getCurrentHex().getLabel(), value, true);
+            LegionBoardMove lmove = new LegionBoardMove(markerId, hex
+                .getLabel(), hex.getLabel(), value, true);
 
             if (!teleportsOnly)
             {
                 legionMoves.add(lmove);
-                occupiedHexes.add(legion.getCurrentHex().getLabel());
+                occupiedHexes.add(hex.getLabel());
 
                 logger.log(Level.FINEST, "value of sitting still at hex "
                     + hex.getLabel() + " : " + value);
@@ -840,14 +838,14 @@ public class RationalAI extends SimpleAI
             if (!teleportsOnly)
             {
                 // exclude teleport moves
-                set = client.getMovement().listNormalMoves(legion,
-                    legion.getCurrentHex(), client.getMovementRoll());
+                set = client.getMovement().listNormalMoves(legion, hex,
+                    client.getMovementRoll());
             }
             else
             {
                 // only teleport moves
-                set = client.getMovement().listTeleportMoves(legion,
-                    legion.getCurrentHex(), client.getMovementRoll());
+                set = client.getMovement().listTeleportMoves(legion, hex,
+                    client.getMovementRoll());
             }
 
             Iterator<String> moveIterator = set.iterator();
@@ -1014,7 +1012,7 @@ public class RationalAI extends SimpleAI
             Legion anyLegion = friendlyLegions.get(0);
 
             if (!client.getMovement().listNormalMoves(anyLegion,
-                ((LegionClientSide)anyLegion).getCurrentHex(), roll).isEmpty())
+                anyLegion.getCurrentHex(), roll).isEmpty())
             {
                 // Easiest solution: just move the smallest of them,
                 // usually that is the one with less valuable stuff split off
@@ -1040,8 +1038,7 @@ public class RationalAI extends SimpleAI
 
                 String minMarkerId = minLegion.getMarkerId();
                 Set<String> set = client.getMovement().listNormalMoves(
-                    minLegion, ((LegionClientSide)minLegion).getCurrentHex(),
-                    roll);
+                    minLegion, minLegion.getCurrentHex(), roll);
 
                 if (set.size() == 0)
                 {
@@ -2304,8 +2301,8 @@ public class RationalAI extends SimpleAI
 
         boolean save_hate = I_HATE_HUMANS;
         I_HATE_HUMANS = false; //need true value of battle results here
-        BattleResults br = estimateBattleResults(enemy, legion,
-            ((LegionClientSide)legion).getCurrentHex());
+        BattleResults br = estimateBattleResults(enemy, legion, legion
+            .getCurrentHex());
         I_HATE_HUMANS = save_hate;
         int result = (int)br.getExpectedValue();
 
@@ -2338,7 +2335,7 @@ public class RationalAI extends SimpleAI
         // find attacker's most likely recruit
         double deniedMuster = 0;
         List<CreatureType> recruits = client.findEligibleRecruits(enemy,
-            ((LegionClientSide)legion).getCurrentHex().getLabel());
+            legion.getCurrentHex().getLabel());
 
         if (!recruits.isEmpty())
         {
@@ -2429,8 +2426,8 @@ public class RationalAI extends SimpleAI
 
         boolean save_hate = I_HATE_HUMANS;
         I_HATE_HUMANS = false; //need true value of battle results here
-        BattleResults br = estimateBattleResults(legion, enemy,
-            ((LegionClientSide)legion).getCurrentHex());
+        BattleResults br = estimateBattleResults(legion, enemy, legion
+            .getCurrentHex());
         I_HATE_HUMANS = save_hate;
 
         logger.log(Level.FINEST, "concede: attacking legion = " + legion + ":"
@@ -2457,7 +2454,7 @@ public class RationalAI extends SimpleAI
             // Can't use Legion.getRecruit() because it checks for
             // 7-high legions.
             boolean canRecruit = !client.findEligibleRecruits(enemy,
-                ((LegionClientSide)enemy).getHexLabel()).isEmpty();
+                enemy.getHexLabel()).isEmpty();
 
             if (height == 7 && (canAcquireAngel || canRecruit))
             {

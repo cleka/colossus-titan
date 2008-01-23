@@ -706,7 +706,7 @@ public final class Server implements IServer
     void allTellLegionLocation(String markerId)
     {
         Legion legion = game.getLegionByMarkerId(markerId);
-        String hexLabel = ((LegionServerSide)legion).getCurrentHexLabel();
+        String hexLabel = ((LegionServerSide)legion).getHexLabel();
 
         for (IClient client : clients)
         {
@@ -1023,9 +1023,9 @@ public final class Server implements IServer
         allUpdatePlayerInfo();
 
         int numRecruiters = (recruiter == null ? 0 : TerrainRecruitLoader
-            .numberOfRecruiterNeeded(recruiter, recruit,
-                ((LegionServerSide)legion).getCurrentHex().getTerrain(),
-                ((LegionServerSide)legion).getCurrentHex().getLabel()));
+            .numberOfRecruiterNeeded(recruiter, recruit, legion
+                .getCurrentHex().getTerrain(), legion.getCurrentHex()
+                .getLabel()));
         String recruiterName = null;
         if (recruiter != null)
         {
@@ -1455,11 +1455,9 @@ public final class Server implements IServer
         {
             return;
         }
-        String formerHexLabel = ((LegionServerSide)legion)
-            .getCurrentHexLabel();
+        String formerHexLabel = ((LegionServerSide)legion).getHexLabel();
         game.getActivePlayer().undoMove(legion);
-        String currentHexLabel = ((LegionServerSide)legion)
-            .getCurrentHexLabel();
+        String currentHexLabel = ((LegionServerSide)legion).getHexLabel();
 
         PlayerServerSide player = game.getPlayer(game.getActivePlayerName());
         // needed in undidMove to decide whether to dis/enable button
@@ -1613,12 +1611,10 @@ public final class Server implements IServer
         Player slayer = null;
         Legion legion = player.getTitanLegion();
         if (legion != null
-            && game.isEngagement(((LegionServerSide)legion)
-                .getCurrentHexLabel()))
+            && game.isEngagement(((LegionServerSide)legion).getHexLabel()))
         {
             slayer = game.getFirstEnemyLegion(
-                ((LegionServerSide)legion).getCurrentHexLabel(), player)
-                .getPlayer();
+                ((LegionServerSide)legion).getHexLabel(), player).getPlayer();
         }
         player.die(slayer, true);
 
@@ -1765,8 +1761,7 @@ public final class Server implements IServer
             return;
         }
 
-        String startingHexLabel = ((LegionServerSide)legion)
-            .getCurrentHexLabel();
+        String startingHexLabel = ((LegionServerSide)legion).getHexLabel();
         String reasonFail = game.doMove(legion, hexLabel, entrySide, teleport,
             teleportingLord);
         if (reasonFail == null)
