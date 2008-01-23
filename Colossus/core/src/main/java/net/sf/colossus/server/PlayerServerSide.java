@@ -15,6 +15,7 @@ import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.util.Glob;
 import net.sf.colossus.util.Options;
+import net.sf.colossus.webcommon.InstanceTracker;
 import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
 
@@ -31,15 +32,12 @@ public final class PlayerServerSide extends Player implements
     private static final Logger LOGGER = Logger
         .getLogger(PlayerServerSide.class.getName());
 
-    private String color; // Black, Blue, Brown, Gold, Green, Red
-    private String startingTower; // hex label
     // TODO the half-points are really used only in the die(..) method,
     // they could be summed up there and then added all in one go. Save
     // us from storing a double and truncating things later
     private double score; // track half-points, then round
     private boolean summoned;
     private boolean teleported;
-    private String playersEliminated = ""; // RdBkGr
     private int mulligansLeft = 1;
     private int movementRoll; // 0 if movement has not been rolled.
 
@@ -58,16 +56,15 @@ public final class PlayerServerSide extends Player implements
     private LegionServerSide donor;
     private final SortedSet<String> markersAvailable = Collections
         .synchronizedSortedSet(new TreeSet<String>());
-    private String type; // "Human" or ".*AI"
     private String firstMarker;
 
     PlayerServerSide(String name, GameServerSide game)
     {
         // TODO why are the players on the client side numbered but not here?
         super(game, name, 0);
-        type = Constants.human;
+        super.setType(Constants.human);
 
-        net.sf.colossus.webcommon.InstanceTracker.register(this, name);
+        InstanceTracker.register(this, name);
     }
 
     /**
@@ -81,35 +78,26 @@ public final class PlayerServerSide extends Player implements
 
     boolean isHuman()
     {
-        return type.endsWith(Constants.human) || isNetwork();
+        return isLocalHuman() || isNetwork();
     }
 
     boolean isLocalHuman()
     {
-        return type.endsWith(Constants.human);
+        return getType().endsWith(Constants.human);
     }
 
     boolean isNetwork()
     {
-        return type.endsWith(Constants.network);
-    }
-
-    boolean isAI()
-    {
-        return type.endsWith(Constants.ai);
+        return getType().endsWith(Constants.network);
     }
 
     boolean isNone()
     {
-        return type.endsWith(Constants.none);
+        return getType().endsWith(Constants.none);
     }
 
-    String getType()
-    {
-        return type;
-    }
-
-    void setType(final String aType)
+    @Override
+    public void setType(final String aType)
     {
         String type = new String(aType);
         LOGGER.log(Level.FINEST, "Called Player.setType() for " + getName()
@@ -123,17 +111,7 @@ public final class PlayerServerSide extends Player implements
         {
             type = Constants.aiPackage + type;
         }
-        this.type = type;
-    }
-
-    String getColor()
-    {
-        return color;
-    }
-
-    void setColor(String color)
-    {
-        this.color = color;
+        super.setType(type);
     }
 
     void initMarkersAvailable()
@@ -168,7 +146,7 @@ public final class PlayerServerSide extends Player implements
             synchronized (markersAvailable)
             {
                 initMarkersAvailable();
-                StringBuffer allVictims = new StringBuffer(playersEliminated);
+                StringBuffer allVictims = new StringBuffer(getPlayersElim());
                 for (int i = 0; i < allVictims.length(); i += 2)
                 {
                     String shortColor = allVictims.substring(i, i + 2);
@@ -197,38 +175,11 @@ public final class PlayerServerSide extends Player implements
         return firstMarker;
     }
 
-    String getShortColor()
-    {
-        return getShortColor(getColor());
-    }
-
-    public static String getShortColor(String color)
-    {
-        if (color == null)
-        {
-            return null;
-        }
-        else
-        {
-            return Constants.getShortColorName(color);
-        }
-    }
-
-    void setTower(String startingTower)
-    {
-        this.startingTower = startingTower;
-    }
-
-    String getTower()
-    {
-        return startingTower;
-    }
-
     /** Players are sorted in order of decreasing starting tower.
      This is inconsistent with equals(). */
     public int compareTo(PlayerServerSide other)
     {
-        return (other.getTower().compareTo(this.getTower()));
+        return (other.getStartingTower().compareTo(this.getStartingTower()));
     }
 
     int getScore()
@@ -239,21 +190,6 @@ public final class PlayerServerSide extends Player implements
     void setScore(int score)
     {
         this.score = score;
-    }
-
-    String getPlayersElim()
-    {
-        return playersEliminated;
-    }
-
-    void setPlayersElim(String playersEliminated)
-    {
-        this.playersEliminated = playersEliminated;
-    }
-
-    void addPlayerElim(PlayerServerSide player)
-    {
-        playersEliminated = playersEliminated + player.getShortColor();
     }
 
     boolean canTitanTeleport()
@@ -796,7 +732,7 @@ public final class PlayerServerSide extends Player implements
         List<String> li = new ArrayList<String>();
         li.add(Boolean.toString(!treatDeadAsAlive && isDead()));
         li.add(getName());
-        li.add(getTower());
+        li.add(getStartingTower());
         li.add(getColor());
         li.add(getType());
         li.add(getPlayersElim());

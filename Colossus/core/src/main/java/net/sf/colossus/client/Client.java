@@ -158,7 +158,11 @@ public final class Client implements IClient, IOracle
      */
     private final Game game;
 
-    /** Starting marker color of player who owns this client. */
+    /** 
+     * Starting marker color of player who owns this client.
+     * 
+     * TODO most likely redundant with owningPlayer.getColor() 
+     */
     private String color;
 
     /** Last movement roll for any player. */
@@ -3566,16 +3570,14 @@ public final class Client implements IClient, IOracle
 
     String getShortColor()
     {
-        return net.sf.colossus.server.PlayerServerSide
-            .getShortColor(getColor());
+        return Constants.getShortColorName(color);
     }
 
     // public for RevealEvent
     public String getShortColor(int playerNum)
     {
         PlayerClientSide player = getPlayerInfo(playerNum);
-        return net.sf.colossus.server.PlayerServerSide.getShortColor(player
-            .getColor());
+        return player.getShortColor();
     }
 
     // TODO this would probably work better as state in PlayerState

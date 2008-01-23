@@ -564,7 +564,7 @@ public final class GameServerSide extends net.sf.colossus.game.Game
             PlayerServerSide player = getPlayer(i);
             LOGGER.log(Level.INFO, player.getName() + " gets tower "
                 + playerTower[i]);
-            player.setTower(playerTower[i]);
+            player.setStartingTower(playerTower[i]);
         }
     }
 
@@ -1226,7 +1226,7 @@ public final class GameServerSide extends net.sf.colossus.game.Game
                 el.setAttribute("name", player.getName());
                 el.setAttribute("type", player.getType());
                 el.setAttribute("color", player.getColor());
-                el.setAttribute("startingTower", player.getTower());
+                el.setAttribute("startingTower", player.getStartingTower());
                 el.setAttribute("score", "" + player.getScore());
                 el.setAttribute("dead", "" + player.isDead());
                 el.setAttribute("mulligansLeft", ""
@@ -1496,7 +1496,7 @@ public final class GameServerSide extends net.sf.colossus.game.Game
                 player.setColor(color);
 
                 String tower = pla.getAttribute("startingTower").getValue();
-                player.setTower(tower);
+                player.setStartingTower(tower);
 
                 int score = pla.getAttribute("score").getIntValue();
                 player.setScore(score);
@@ -1970,7 +1970,7 @@ public final class GameServerSide extends net.sf.colossus.game.Game
         LOGGER.log(Level.INFO, name + " selects initial marker");
 
         // Lookup coords for chit starting from player[i].getTower()
-        String hexLabel = player.getTower();
+        String hexLabel = player.getStartingTower();
         LegionServerSide legion = LegionServerSide.getStartingLegion(markerId,
             hexLabel, player, this);
         player.addLegion(legion);

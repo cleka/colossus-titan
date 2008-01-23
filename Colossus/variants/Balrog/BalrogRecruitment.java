@@ -192,7 +192,7 @@ public class BalrogRecruitment extends CustomRecruitBase
         while (it.hasNext())
         {
             PlayerClientSide pi = it.next();
-            String towerLabel = pi.getTower();
+            String towerLabel = pi.getStartingTower();
 
             if (towerLabel.equals(hexLabel))
             {

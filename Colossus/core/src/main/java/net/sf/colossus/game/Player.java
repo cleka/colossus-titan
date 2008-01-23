@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import net.sf.colossus.server.Constants;
+
 
 /**
  * A player in a game.
@@ -44,6 +46,47 @@ public class Player
      * TODO check if that isn't equivalent to not having legions anymore
      */
     private boolean dead;
+
+    /**
+     * The starting tower of the player.
+     * 
+     * TODO use typesafe representation of masterboard hexes
+     * TODO rename getter and setter
+     * TODO this should be kind-of final: once a tower has been assigned, it shouldn't
+     *      change anymore -- but assigning the towers has probably to happen a while
+     *      after all players are created. We could at least at an assertion into the
+     *      setter that it is allowed to change the value only if it was not set before.
+     */
+    private String startingTower;
+
+    /**
+     * The label of the color we use.
+     * 
+     * TODO this should really be an object representing a markerset
+     * TODO similar to {@link #startingTower} this should be set only once but probably
+     *      can't be set in the constructor.
+     */
+    private String color;
+
+    /**
+     * The type of player: local human, AI or network.
+     * 
+     * TODO make typesafe version
+     * TODO shouldn't this be final? It should be possible to set that in the constructor.
+     *      Unless we have to allow changes e.g. for humans dropping out of the game (in
+     *      which case the todo should be read as "add some documentation regarding that ;-) ).
+     */
+    private String type;
+
+    /**
+     * A string representing all players eliminated by this player.
+     * 
+     * The format is just a sequence of the short, two-character versions
+     * of the colors, e.g. "BkRd".
+     * 
+     * TODO this should really be a List<Player>
+     */
+    private String playersEliminated = "";
 
     public Player(Game game, String playerName, int number)
     {
@@ -101,6 +144,69 @@ public class Player
     public void setDead(boolean dead)
     {
         this.dead = dead;
+    }
+
+    public void setType(String type)
+    {
+        this.type = type;
+    }
+
+    public String getType()
+    {
+        return type;
+    }
+
+    public boolean isAI()
+    {
+        return type.endsWith(Constants.ai);
+    }
+
+    public void setStartingTower(String startingTower)
+    {
+        this.startingTower = startingTower;
+    }
+
+    public String getStartingTower()
+    {
+        return startingTower;
+    }
+
+    public void setColor(String color)
+    {
+        this.color = color;
+    }
+
+    public String getColor()
+    {
+        return color;
+    }
+
+    public String getShortColor()
+    {
+        String color = getColor();
+        if (color == null)
+        {
+            return null;
+        }
+        else
+        {
+            return Constants.getShortColorName(color);
+        }
+    }
+
+    public String getPlayersElim()
+    {
+        return playersEliminated;
+    }
+
+    public void setPlayersElim(String playersEliminated)
+    {
+        this.playersEliminated = playersEliminated;
+    }
+
+    public void addPlayerElim(Player player)
+    {
+        playersEliminated = playersEliminated + player.getShortColor();
     }
 
     /**

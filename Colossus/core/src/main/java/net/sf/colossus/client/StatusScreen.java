@@ -302,7 +302,7 @@ final class StatusScreen extends KDialog implements WindowListener
             {
                 nameLabel[i].setText(info.getName());
             }
-            towerLabel[i].setText("" + info.getTower());
+            towerLabel[i].setText("" + info.getStartingTower());
             elimLabel[i].setText(info.getPlayersElim());
             legionsLabel[i].setText("" + info.getNumLegions());
             markersLabel[i].setText("" + info.getNumMarkers());

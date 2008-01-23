@@ -10,9 +10,9 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import net.sf.colossus.game.Player;
-import net.sf.colossus.server.Constants;
-import net.sf.colossus.server.PlayerServerSide;
+import net.sf.colossus.server.CustomRecruitBase;
 import net.sf.colossus.util.Split;
+import net.sf.colossus.webcommon.InstanceTracker;
 import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
 
@@ -27,10 +27,6 @@ public final class PlayerClientSide extends Player
 {
     private Client client;
 
-    private String tower;
-    private String color;
-    private String type;
-    private String playersElim;
     private int numLegions;
     private int numCreatures;
     private int titanPower;
@@ -51,8 +47,8 @@ public final class PlayerClientSide extends Player
     {
         super(client.getGame(), playerName, number);
         this.client = client;
-        net.sf.colossus.server.CustomRecruitBase.addPlayerInfo(this);
-        net.sf.colossus.webcommon.InstanceTracker.register(this, playerName);
+        CustomRecruitBase.addPlayerInfo(this);
+        InstanceTracker.register(this, playerName);
     }
 
     /** Takes a colon-separated string of form
@@ -68,7 +64,7 @@ public final class PlayerClientSide extends Player
 
         setName(data.remove(0));
 
-        setTower(data.remove(0));
+        setStartingTower(data.remove(0));
 
         setColor(data.remove(0));
 
@@ -92,56 +88,6 @@ public final class PlayerClientSide extends Player
         setMulligansLeft(Integer.parseInt(buf));
 
         setMarkersAvailable(data);
-    }
-
-    public boolean isAI()
-    {
-        return type.endsWith(Constants.ai);
-    }
-
-    void setTower(String tower)
-    {
-        this.tower = tower;
-    }
-
-    public String getTower()
-    {
-        return tower;
-    }
-
-    void setColor(String color)
-    {
-        this.color = color;
-    }
-
-    String getColor()
-    {
-        return color;
-    }
-
-    void setType(String type)
-    {
-        this.type = type;
-    }
-
-    String getType()
-    {
-        return type;
-    }
-
-    public String getShortColor()
-    {
-        return PlayerServerSide.getShortColor(getColor());
-    }
-
-    void setPlayersElim(String playersElim)
-    {
-        this.playersElim = playersElim;
-    }
-
-    String getPlayersElim()
-    {
-        return playersElim;
     }
 
     void setNumLegions(int numLegions)
