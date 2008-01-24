@@ -120,6 +120,7 @@ public final class LegionServerSide extends net.sf.colossus.game.Legion
     // Example: Start with 375, earn 150
     void addPoints(int points)
     {
+        // TODO can that ever happen? Seems more like a case for an assertion
         if (game == null)
         {
             return;
@@ -208,7 +209,7 @@ public final class LegionServerSide extends net.sf.colossus.game.Legion
         for (CreatureServerSide critter : getCreatures())
         {
             critter.heal();
-            critter.addBattleInfo(null, null, null);
+            critter.setBattleInfo(null, null, null);
         }
     }
 

@@ -132,7 +132,7 @@ public final class BattleServerSide extends net.sf.colossus.game.Battle
                 startingHex = entrance;
             }
 
-            critter.addBattleInfo(currentHex, startingHex, this);
+            critter.setBattleInfo(currentHex, startingHex, this);
         }
     }
 
@@ -140,7 +140,7 @@ public final class BattleServerSide extends net.sf.colossus.game.Battle
     {
         BattleHex entrance = BattleMap.getEntrance(terrain,
             ((LegionServerSide)critter.getLegion()).getEntrySide());
-        critter.addBattleInfo(entrance, entrance, this);
+        critter.setBattleInfo(entrance, entrance, this);
         server.allPlaceNewChit(critter);
     }
 

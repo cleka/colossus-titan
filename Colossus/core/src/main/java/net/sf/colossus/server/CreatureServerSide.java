@@ -120,7 +120,7 @@ public class CreatureServerSide extends Creature
         tag = ++tagCounter;
     }
 
-    void addBattleInfo(BattleHex currentHex, BattleHex startingHex,
+    void setBattleInfo(BattleHex currentHex, BattleHex startingHex,
         BattleServerSide battle)
     {
         this.currentHex = currentHex;
