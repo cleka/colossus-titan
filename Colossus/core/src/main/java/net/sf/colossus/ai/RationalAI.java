@@ -986,12 +986,8 @@ public class RationalAI extends SimpleAI
          * c) Once we did move one, we move, return true, get called again,
          *    then the list of labels is re-considered again.
          */
-        Iterator<String> it = ((PlayerClientSide)player).getLegionIds()
-            .iterator();
-        while (it.hasNext())
+        for (LegionClientSide legion : ((PlayerClientSide)player).getLegions())
         {
-            String markerId = it.next();
-            LegionClientSide legion = client.getLegion(markerId);
             String hexLabel = legion.getHexLabel();
             List<Legion> friendlyLegions = client.getFriendlyLegions(hexLabel,
                 player);
@@ -1122,14 +1118,10 @@ public class RationalAI extends SimpleAI
 
         // first we have to find out those that can move at all:
 
-        ArrayList<String> movableLegions = new ArrayList<String>();
+        ArrayList<LegionClientSide> movableLegions = new ArrayList<LegionClientSide>();
 
-        Iterator<String> it = ((PlayerClientSide)player).getLegionIds()
-            .iterator();
-        while (it.hasNext())
+        for (LegionClientSide legion : ((PlayerClientSide)player).getLegions())
         {
-            String markerId = it.next();
-            LegionClientSide legion = client.getLegion(markerId);
 
             Set<String> set = client.getMovement().listNormalMoves(legion,
                 legion.getCurrentHex(), roll);
@@ -1152,7 +1144,7 @@ public class RationalAI extends SimpleAI
                 }
                 if (couldMove)
                 {
-                    movableLegions.add(markerId);
+                    movableLegions.add(legion);
                 }
             }
         }
@@ -1166,46 +1158,43 @@ public class RationalAI extends SimpleAI
         // OK, now decide which of them to move - the smallest one.
 
         int minValue = 0;
-        String minValueMarker = null;
-        String titanMarker = null;
+        Legion minValueLegion = null;
+        Legion titanLegion = null;
 
-        it = movableLegions.iterator();
-        while (it.hasNext())
+        for (LegionClientSide legion : movableLegions)
         {
-            String markerId = it.next();
-            LegionClientSide legion = client.getLegion(markerId);
             int value = legion.getPointValue();
 
             if (legion.hasTitan())
             {
-                titanMarker = markerId;
+                titanLegion = legion;
             }
 
-            else if (value < minValue || minValueMarker == null)
+            else if (value < minValue || minValueLegion == null)
             {
                 Set<String> set = client.getMovement().listNormalMoves(legion,
                     legion.getCurrentHex(), roll);
                 if (set.size() > 0)
                 {
                     minValue = value;
-                    minValueMarker = markerId;
+                    minValueLegion = legion;
                 }
             }
         }
 
         // Arrrgggh. Have to move Titan legion :-(
-        if (minValueMarker == null && titanMarker != null)
+        if (minValueLegion == null && titanLegion != null)
         {
-            logger.log(Level.FINEST, "Rational AI, forced single move: "
+            logger.log(Level.FINER, "Rational AI, forced single move: "
                 + " have to move Titan legion :-(");
-            minValueMarker = titanMarker;
+            minValueLegion = titanLegion;
         }
 
-        // Now decide where we move this unlucky one to:
+        assert minValueLegion != null : "There should be at least one legion we can move";
 
-        LegionClientSide minLegion = client.getLegion(minValueMarker);
+        // Now decide where we move this unlucky one to:
         Set<String> minValueMoves = client.getMovement().listNormalMoves(
-            minLegion, minLegion.getCurrentHex(), roll);
+            minValueLegion, minValueLegion.getCurrentHex(), roll);
 
         Iterator<String> moveIterator = minValueMoves.iterator();
         int bestValue = -1;
@@ -1220,7 +1209,8 @@ public class RationalAI extends SimpleAI
                 targetHex, player);
             if (targetOwnLegions.size() == 0)
             {
-                int value = evaluateMove(minLegion, hex, RECRUIT_TRUE, 2, true);
+                int value = evaluateMove(minValueLegion, hex, RECRUIT_TRUE, 2,
+                    true);
                 if (value > bestValue || bestValue == -1)
                 {
                     bestValue = value;
@@ -1232,13 +1222,12 @@ public class RationalAI extends SimpleAI
         if (bestHex == null)
         {
             logger.log(Level.SEVERE, "Forced single moves remain, "
-                + "moveIterator left bestHex for minValueMarker"
-                + minValueMarker + " null ?");
+                + "moveIterator left bestHex for minValueLegion"
+                + minValueLegion + " null ?");
             return false;
         }
 
-        boolean wentOk = client.doMove(client.getLegion(minValueMarker),
-            bestHex);
+        boolean wentOk = client.doMove(minValueLegion, bestHex);
         if (wentOk)
         {
             return true;
@@ -1247,7 +1236,7 @@ public class RationalAI extends SimpleAI
         {
             // This should never happen. Most likely we get then a NAK...
             logger.log(Level.SEVERE, "Forced single moves remain, "
-                + "but client rejects moving marker " + minValueMarker
+                + "but client rejects moving legion " + minValueLegion
                 + " to " + bestHex);
             return false;
         }
