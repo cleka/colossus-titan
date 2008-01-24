@@ -56,6 +56,7 @@ import net.sf.colossus.util.Split;
 import net.sf.colossus.util.ViableEntityManager;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.MasterHex;
+import net.sf.colossus.webcommon.InstanceTracker;
 import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
 
@@ -79,9 +80,11 @@ import net.sf.colossus.xmlparser.TerrainRecruitLoader;
  *  
  *  TODO this class also has the functionality of a GameClientSide class,
  *  which should be separated and ideally moved up into the {@link Game}
- *  class. One approach would be moving code from {@link GameServerSide}
+ *  class. The whole {@link IOracle} interface is part of that. 
+ *  One approach would be moving code from {@link GameServerSide}
  *  up into {@link Game} and then reuse it here in the matching methods,
- *  then inlining it into the calling code.
+ *  then inlining it into the calling code. Another one would be creating
+ *  the GameClientSide for now and relocating code there.
  *  
  *  @version $Id$
  *  @author David Ripton
@@ -211,10 +214,7 @@ public final class Client implements IClient, IOracle
     private boolean gameOver;
 
     /** One per player. */
-    private PlayerClientSide[] playerInfos;
-
-    /** One per player. */
-    private PredictSplits[] predictSplits;
+    private PlayerClientSide[] players;
 
     /**
      * One LegionInfo per legion, keyed by markerId.  Never null.
@@ -302,8 +302,7 @@ public final class Client implements IClient, IOracle
         this.strike = new Strike(this);
 
         ViableEntityManager.register(this, "Client " + playerName);
-        net.sf.colossus.webcommon.InstanceTracker.register(this, "Client "
-            + playerName);
+        InstanceTracker.register(this, "Client " + playerName);
 
         options = new Options(playerName);
         setupOptionListeners();
@@ -1052,7 +1051,7 @@ public final class Client implements IClient, IOracle
     public int getNumLivingPlayers()
     {
         int total = 0;
-        for (PlayerClientSide info : playerInfos)
+        for (PlayerClientSide info : players)
         {
             if (!info.isDead())
             {
@@ -1065,18 +1064,18 @@ public final class Client implements IClient, IOracle
     public void updatePlayerInfo(List<String> infoStrings)
     {
         numPlayers = infoStrings.size();
-        if (playerInfos == null)
+        if (players == null)
         {
             // first time we get the player infos, store them locally and set our
             // own, too -- which has been a fake until now
-            playerInfos = new PlayerClientSide[numPlayers];
+            players = new PlayerClientSide[numPlayers];
             for (int i = 0; i < numPlayers; i++)
             {
                 List<String> data = Split.split(":", infoStrings.get(i));
                 String playerName = data.get(1);
                 PlayerClientSide info = new PlayerClientSide(this, playerName,
                     i);
-                playerInfos[i] = info;
+                players[i] = info;
                 if (playerName.equals(this.owningPlayer.getName()))
                 {
                     this.owningPlayer = info;
@@ -1085,7 +1084,7 @@ public final class Client implements IClient, IOracle
         }
         for (int i = 0; i < numPlayers; i++)
         {
-            playerInfos[i].update(infoStrings.get(i));
+            players[i].update(infoStrings.get(i));
         }
         updateStatusScreen();
     }
@@ -1132,12 +1131,12 @@ public final class Client implements IClient, IOracle
     // TODO fix this mess with lots of different methods for retrieving Player[Info]s
     PlayerClientSide getPlayerInfo(int playerNum)
     {
-        return playerInfos[playerNum];
+        return players[playerNum];
     }
 
     public PlayerClientSide getPlayerInfo(String playerName)
     {
-        for (PlayerClientSide info : playerInfos)
+        for (PlayerClientSide info : players)
         {
             if (info.getName().equals(playerName))
             {
@@ -1155,7 +1154,7 @@ public final class Client implements IClient, IOracle
 
     public List<PlayerClientSide> getPlayers()
     {
-        return Collections.unmodifiableList(Arrays.asList(playerInfos));
+        return Collections.unmodifiableList(Arrays.asList(players));
     }
 
     /** Return the average point value of all legions in the game. */
@@ -1543,7 +1542,7 @@ public final class Client implements IClient, IOracle
         this.strike = null;
         this.secondaryParent = null;
         this.legionInfo = null;
-        this.playerInfos = null;
+        this.players = null;
 
         net.sf.colossus.server.CustomRecruitBase.reset();
     }
@@ -1855,15 +1854,7 @@ public final class Client implements IClient, IOracle
             eventViewer.revealCreatures(legion, names, reason);
         }
 
-        // "Normal" split prediction stuff:
-        String pName = legion.getPlayer().getName();
-        if (predictSplits == null || getPredictSplits(pName) == null)
-        {
-            initPredictSplits(pName, legion.getMarkerId(), names);
-        }
-
-        LegionClientSide info = (LegionClientSide)legion;
-        info.revealCreatures(names);
+        ((LegionClientSide)legion).revealCreatures(names);
     }
 
     /* pass revealed info to EventViewer and SplitPrediction, and
@@ -2545,10 +2536,6 @@ public final class Client implements IClient, IOracle
         ((PlayerClientSide)deadPlayer).removeAllLegions();
         // otherwise called too early, e.g. someone quitted
         // already during game start...
-        if (predictSplits != null)
-        {
-            predictSplits[deadPlayer.getNumber()] = null;
-        }
 
         if (this.owningPlayer.equals(deadPlayer))
         {
@@ -4626,20 +4613,16 @@ public final class Client implements IClient, IOracle
         return false;
     }
 
-    List<String> getEnemyLegions(Player player)
+    public List<Legion> getEnemyLegions(final Player player)
     {
-        List<String> markerIds = new ArrayList<String>();
-        Iterator<LegionClientSide> it = legionInfo.values().iterator();
-        while (it.hasNext())
-        {
-            LegionClientSide info = it.next();
-            String markerId = info.getMarkerId();
-            if (!player.equals(info.getPlayer()))
+        return CollectionHelper.selectAsList(legionInfo.values(),
+            new Predicate<Legion>()
             {
-                markerIds.add(markerId);
-            }
-        }
-        return markerIds;
+                public boolean matches(Legion legion)
+                {
+                    return !player.equals(legion.getPlayer());
+                }
+            });
     }
 
     public List<Legion> getEnemyLegions(final String hexLabel,
@@ -4991,11 +4974,11 @@ public final class Client implements IClient, IOracle
 
     private PlayerClientSide getPlayerStateUsingColor(String shortColor)
     {
-        assert this.playerInfos != null : "Client not yet initialized";
+        assert this.players != null : "Client not yet initialized";
         assert shortColor != null : "Parameter must not be null";
 
         // Stage 1: See if the player who started with this color is alive.
-        for (PlayerClientSide info : playerInfos)
+        for (PlayerClientSide info : players)
         {
             if (shortColor.equals(info.getShortColor()) && !info.isDead())
             {
@@ -5004,7 +4987,7 @@ public final class Client implements IClient, IOracle
         }
 
         // Stage 2: He's dead.  Find who killed him and see if he's alive.
-        for (PlayerClientSide info : playerInfos)
+        for (PlayerClientSide info : players)
         {
             if (info.getPlayersElim().indexOf(shortColor) != -1)
             {
@@ -5450,33 +5433,6 @@ public final class Client implements IClient, IOracle
         if (board != null)
         {
             board.reqFocus();
-        }
-    }
-
-    private void initPredictSplits(String pName, String rootMarkerId,
-        List<String> creatureNames)
-    {
-        if (predictSplits == null)
-        {
-            predictSplits = new PredictSplits[numPlayers];
-        }
-        int playerNum = getPlayerInfo(pName).getNumber();
-        predictSplits[playerNum] = new PredictSplits(rootMarkerId,
-            creatureNames);
-    }
-
-    PredictSplits getPredictSplits(String pName)
-    {
-        try
-        {
-            int playerNum = getPlayerInfo(pName).getNumber();
-            return predictSplits[playerNum];
-        }
-        catch (NullPointerException ex)
-        {
-            // TODO why do we ignore an NPE here? Shouldn't we at least have a log message and/or
-            // an "assert false" here?
-            return null;
         }
     }
 

@@ -34,6 +34,8 @@ public final class PlayerClientSide extends Player
     private int score;
     private int mulligansLeft;
 
+    private PredictSplits predictSplits;
+
     /** Sorted set of available legion markers for this player. */
     private final SortedSet<String> markersAvailable = new TreeSet<String>(
         new MarkerComparator(getShortColor()));
@@ -239,5 +241,16 @@ public final class PlayerClientSide extends Player
     public void setClientNull()
     {
         this.client = null;
+    }
+
+    public PredictSplits getPredictSplits()
+    {
+        return predictSplits;
+    }
+
+    public void initPredictSplits(Legion rootLegion, List<String> creatureNames)
+    {
+        this.predictSplits = new PredictSplits(rootLegion.getMarkerId(),
+            creatureNames);
     }
 }

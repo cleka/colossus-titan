@@ -380,17 +380,12 @@ public final class Movement
         {
             // Mark every hex containing an enemy stack that does not
             // already contain a friendly stack.
-            Iterator<String> it = client.getEnemyLegions(player).iterator();
-            while (it.hasNext())
+            for (Legion other : client.getEnemyLegions(player))
             {
-                String markerId = it.next();
-                LegionClientSide other = client.getLegion(markerId);
+                String hexLabel = other.getHexLabel();
+                if (hexLabel != null && !client.isEngagement(hexLabel))
                 {
-                    String hexLabel = other.getHexLabel();
-                    if (hexLabel != null && !client.isEngagement(hexLabel))
-                    {
-                        set.add(hexLabel);
-                    }
+                    set.add(hexLabel);
                 }
             }
         }

@@ -48,7 +48,7 @@ public final class LegionClientSide extends Legion
 
     private PredictSplitNode getNode(String markerId)
     {
-        PredictSplits ps = client.getPredictSplits(getPlayer().getName());
+        PredictSplits ps = getPlayer().getPredictSplits();
         PredictSplitNode node = ps.getLeaf(markerId);
         return node;
     }
@@ -210,6 +210,11 @@ public final class LegionClientSide extends Legion
     /** Reveal creatures in this legion, some of which already may be known. */
     void revealCreatures(final List<String> names)
     {
+        // TODO find better way of initializing the PredictSplits object in Player
+        if (getPlayer().getPredictSplits() == null)
+        {
+            getPlayer().initPredictSplits(this, names);
+        }
         getNode().revealCreatures(names);
     }
 
