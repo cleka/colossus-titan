@@ -3,7 +3,6 @@ package net.sf.colossus.client;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
@@ -186,11 +185,8 @@ public final class PlayerClientSide extends Player
 
     boolean hasTeleported()
     {
-        Iterator<String> it = getLegionIds().iterator();
-        while (it.hasNext())
+        for (LegionClientSide info : getLegions())
         {
-            String markerId = it.next();
-            LegionClientSide info = client.getLegion(markerId);
             if (info.hasTeleported())
             {
                 return true;
@@ -204,11 +200,8 @@ public final class PlayerClientSide extends Player
     {
         int count = 0;
 
-        Iterator<String> it = getLegionIds().iterator();
-        while (it.hasNext())
+        for (LegionClientSide legion : getLegions())
         {
-            String markerId = it.next();
-            LegionClientSide legion = client.getLegion(markerId);
             if (legion.hasMoved())
             {
                 count++;
@@ -223,18 +216,16 @@ public final class PlayerClientSide extends Player
     }
 
     @Override
-    public List<Legion> getLegions()
+    public List<LegionClientSide> getLegions()
     {
         return client.getLegionsByPlayer(this);
     }
 
     void removeAllLegions()
     {
-        Iterator<String> it = getLegionIds().iterator();
-        while (it.hasNext())
+        for (Legion legion : getLegions())
         {
-            String id = it.next();
-            client.removeLegion(client.getLegion(id));
+            client.removeLegion(legion);
         }
     }
 

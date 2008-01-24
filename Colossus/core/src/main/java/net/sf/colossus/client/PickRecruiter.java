@@ -78,7 +78,7 @@ final class PickRecruiter extends KDialog implements MouseListener,
             String recruiterName = it.next();
             if (recruiterName.equals(Constants.titan))
             {
-                recruiterName = client.getTitanBasename(legion);
+                recruiterName = ((LegionClientSide)legion).getTitanBasename();
             }
             Chit chit = new Chit(scale, recruiterName);
             recruiterChits.add(chit);
