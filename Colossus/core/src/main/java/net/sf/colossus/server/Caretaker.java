@@ -14,6 +14,10 @@ import net.sf.colossus.variant.CreatureType;
  *
  * Class Caretaker represents the caretaker's stacks.
  * It also contains the (preliminary) Graveyard.
+ * 
+ * TODO apart from the {@link #updateDisplays(String)} method this seems to be
+ *      ready to go into the game package. The latter would need to be enhanced
+ *      with some type of callback/observer approach.
  *
  * @version $Id$
  * @author Bruce Sherrod
