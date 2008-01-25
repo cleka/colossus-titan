@@ -694,23 +694,20 @@ public final class Server implements IServer
 
     synchronized void allTellAllLegionLocations()
     {
-        List<String> markerIds = game.getAllLegionIds();
-        Iterator<String> it = markerIds.iterator();
-        while (it.hasNext())
+        List<Legion> legions = game.getAllLegions();
+        for (Legion legion : legions)
         {
-            String markerId = it.next();
-            allTellLegionLocation(markerId);
+            allTellLegionLocation(legion);
         }
     }
 
-    void allTellLegionLocation(String markerId)
+    void allTellLegionLocation(Legion legion)
     {
-        Legion legion = game.getLegionByMarkerId(markerId);
-        String hexLabel = ((LegionServerSide)legion).getHexLabel();
+        String hexLabel = legion.getHexLabel();
 
         for (IClient client : clients)
         {
-            client.tellLegionLocation(markerId, hexLabel);
+            client.tellLegionLocation(legion.getMarkerId(), hexLabel);
         }
     }
 
@@ -1914,13 +1911,12 @@ public final class Server implements IServer
             IClient client = it.next();
             if (client != null)
             {
-                Iterator<LegionServerSide> it2 = game.getAllLegions()
-                    .iterator();
-                while (it2.hasNext())
+                for (Legion legion : game.getAllLegions())
                 {
-                    LegionServerSide legion = it2.next();
-                    client.setLegionStatus(legion, legion.hasMoved(), legion
-                        .hasTeleported(), legion.getEntrySide(), legion
+                    client.setLegionStatus(legion, ((LegionServerSide)legion)
+                        .hasMoved(), ((LegionServerSide)legion)
+                        .hasTeleported(), ((LegionServerSide)legion)
+                        .getEntrySide(), ((LegionServerSide)legion)
                         .getRecruitName());
                 }
             }
@@ -1929,10 +1925,8 @@ public final class Server implements IServer
 
     void allFullyUpdateAllLegionContents(String reason)
     {
-        Iterator<LegionServerSide> it = game.getAllLegions().iterator();
-        while (it.hasNext())
+        for (Legion legion : game.getAllLegions())
         {
-            LegionServerSide legion = it.next();
             allRevealLegion(legion, reason);
         }
     }

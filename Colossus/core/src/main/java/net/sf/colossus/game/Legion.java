@@ -110,4 +110,14 @@ public class Legion
         }
         return false;
     }
+
+    /**
+     * Returns the number of creatures in this legion.
+     * 
+     * @return the number of creatures in the legion
+     */
+    public int getHeight()
+    {
+        return creatures.size();
+    }
 }

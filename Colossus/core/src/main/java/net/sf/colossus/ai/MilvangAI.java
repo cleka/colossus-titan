@@ -15,6 +15,8 @@ import java.util.logging.Logger;
 
 import net.sf.colossus.client.Client;
 import net.sf.colossus.client.LegionClientSide;
+import net.sf.colossus.game.Creature;
+import net.sf.colossus.game.Legion;
 import net.sf.colossus.server.CreatureTypeServerSide;
 import net.sf.colossus.util.Combos;
 import net.sf.colossus.variant.CreatureType;
@@ -39,7 +41,8 @@ public class MilvangAI extends RationalAI
         // TODO Auto-generated constructor stub
     }
 
-    double findRecruitPotential(Map<CreatureTypeServerSide, Integer> critters, String terrain)
+    double findRecruitPotential(Map<CreatureType, Integer> critters,
+        String terrain)
     {
         int recruitNow = 0;
         int recruitLater = 0;
@@ -54,11 +57,13 @@ public class MilvangAI extends RationalAI
         Iterator<CreatureType> lit = tempRecruits.iterator();
         while (lit.hasNext())
         {
-            CreatureTypeServerSide creature = (CreatureTypeServerSide)lit.next();
+            CreatureTypeServerSide creature = (CreatureTypeServerSide)lit
+                .next();
             Iterator<CreatureType> liter = recruiters.iterator();
             while (liter.hasNext())
             {
-                CreatureTypeServerSide lesser = (CreatureTypeServerSide)liter.next();
+                CreatureTypeServerSide lesser = (CreatureTypeServerSide)liter
+                    .next();
                 int numNeeded = TerrainRecruitLoader.numberOfRecruiterNeeded(
                     lesser, creature, terrain, "");
                 int hintValue = creature.getHintedRecruitmentValue();
@@ -77,8 +82,7 @@ public class MilvangAI extends RationalAI
     }
 
     @Override
-    MusteredCreatures chooseCreaturesToSplitOut(LegionClientSide legion,
-        boolean at_risk)
+    MusteredCreatures chooseCreaturesToSplitOut(Legion legion, boolean at_risk)
     {
 
         //
@@ -86,7 +90,8 @@ public class MilvangAI extends RationalAI
         //
         if (legion.getHeight() == 8)
         {
-            List<CreatureTypeServerSide> creatures = doInitialGameSplit(legion.getHexLabel());
+            List<CreatureType> creatures = doInitialGameSplit(legion
+                .getHexLabel());
 
             return new MusteredCreatures(true, creatures);
         }
@@ -94,42 +99,42 @@ public class MilvangAI extends RationalAI
         LOGGER.log(Level.FINEST,
             "sortCreaturesByValueName() in chooseCreaturesToSplitOut");
 
-        boolean hasTitan = legion.contains("Titan");
+        boolean hasTitan = ((LegionClientSide)legion).contains("Titan");
         String[] terrains = TerrainRecruitLoader.getTerrains();
 
-        List<CreatureTypeServerSide> critters = new ArrayList<CreatureTypeServerSide>();
-        for (String string : legion.getContents())
+        List<CreatureType> critters = new ArrayList<CreatureType>();
+        for (Creature creature : legion.getCreatures())
         {
-            critters.add((CreatureTypeServerSide)client.getGame().getVariant()
-                .getCreatureByName(string));
+            critters.add(creature.getType());
         }
 
         double bestValue = 0;
         // make sure the list is never null even if we don't find anything
-        List<CreatureTypeServerSide> bestKeep = new ArrayList<CreatureTypeServerSide>();
+        List<CreatureType> bestKeep = new ArrayList<CreatureType>();
 
-        Combos<CreatureTypeServerSide> combos = new Combos<CreatureTypeServerSide>(critters, critters
-            .size() - 2);
-        for (Iterator<List<CreatureTypeServerSide>> it = combos.iterator(); it.hasNext();)
+        Combos<CreatureType> combos = new Combos<CreatureType>(critters,
+            critters.size() - 2);
+        for (Iterator<List<CreatureType>> it = combos.iterator(); it.hasNext();)
         {
-            List<CreatureTypeServerSide> keepers = it.next();
+            List<CreatureType> keepers = it.next();
             double critterValue = 0;
             boolean keepTitan = false;
-            Map<CreatureTypeServerSide, Integer> critterMap = new HashMap<CreatureTypeServerSide, Integer>();
-            for (CreatureTypeServerSide critter : keepers)
+            Map<CreatureType, Integer> critterMap = new HashMap<CreatureType, Integer>();
+            for (CreatureType creatureType : keepers)
             {
-                keepTitan |= critter.getName().equals("Titan");
-                int tmp = critter.getHintedRecruitmentValue();
+                keepTitan |= creatureType.getName().equals("Titan");
+                int tmp = ((CreatureTypeServerSide)creatureType)
+                    .getHintedRecruitmentValue();
                 critterValue += tmp * tmp;
-                Integer numCritters = critterMap.get(critter);
+                Integer numCritters = critterMap.get(creatureType);
                 if (numCritters == null)
                 {
-                    critterMap.put(critter, new Integer(1));
+                    critterMap.put(creatureType, new Integer(1));
                 }
                 else
                 {
-                    critterMap.put(critter, new Integer(
-                        numCritters.intValue() + 1));
+                    critterMap.put(creatureType, new Integer(numCritters
+                        .intValue() + 1));
                 }
             }
 
@@ -167,7 +172,7 @@ public class MilvangAI extends RationalAI
         }
 
         // remove the keep from critters to obtain the split
-        for (CreatureTypeServerSide creature : bestKeep)
+        for (CreatureType creature : bestKeep)
         {
             critters.remove(creature);
         }

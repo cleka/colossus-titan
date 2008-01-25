@@ -251,19 +251,6 @@ public class Player
     }
 
     /**
-     * TODO this should really not be necessary, clients should use {@link #getLegions()}.
-     */
-    synchronized public List<String> getLegionIds()
-    {
-        List<String> ids = new ArrayList<String>();
-        for (Legion legion : getLegions())
-        {
-            ids.add(legion.getMarkerId());
-        }
-        return ids;
-    }
-
-    /**
      * Overridden for debug/logging purposes.
      */
     @Override

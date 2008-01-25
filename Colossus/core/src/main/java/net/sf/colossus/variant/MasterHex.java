@@ -85,7 +85,8 @@ public class MasterHex extends Hex
         return (TerrainRecruitLoader.getTerrainColor(terrain));
     }
 
-    public static boolean isNativeCombatBonus(CreatureTypeServerSide creature, String terrain)
+    public static boolean isNativeCombatBonus(CreatureType creature,
+        String terrain)
     {
         int bonusHazardCount = 0;
         int bonusHazardSideCount = 0;
@@ -114,14 +115,16 @@ public class MasterHex extends Hex
             int count = net.sf.colossus.client.HexMap
                 .getHazardSideCountInTerrain(hazardSide[i], terrain);
             if (BattleHex.isNativeBonusHexside(hazardSide[i])
-                && creature.isNativeHexside(hazardSide[i]))
+                && ((CreatureTypeServerSide)creature)
+                    .isNativeHexside(hazardSide[i]))
             {
                 bonusHazardSideCount += count;
             }
             else
             {
                 if (BattleHex.isNonNativePenaltyHexside(hazardSide[i])
-                    && !creature.isNativeHexside(hazardSide[i]))
+                    && !((CreatureTypeServerSide)creature)
+                        .isNativeHexside(hazardSide[i]))
                 {
                     bonusHazardSideCount -= count;
                 }

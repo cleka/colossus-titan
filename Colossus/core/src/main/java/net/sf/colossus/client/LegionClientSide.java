@@ -18,11 +18,16 @@ import net.sf.colossus.variant.CreatureType;
 
 /**
  * LegionInfo holds client-side public info about a legion.
+ * 
+ * TODO Comparable is implemented only for AI purposes, it might be better to have
+ *      a Comparator there.
+ * 
  * @version $Id$ 
  * @author David Ripton
  */
 
-public final class LegionClientSide extends Legion
+public final class LegionClientSide extends Legion implements
+    Comparable<LegionClientSide>
 {
     private static final Logger LOGGER = Logger
         .getLogger(LegionClientSide.class.getName());
@@ -77,6 +82,7 @@ public final class LegionClientSide extends Legion
         return isMyLegion;
     }
 
+    @Override
     public int getHeight()
     {
         PredictSplitNode node = getNode();
@@ -87,7 +93,11 @@ public final class LegionClientSide extends Legion
         return node.getHeight();
     }
 
-    /** Return an immutable copy of the legion's contents, in sorted order. */
+    /** 
+     * Return an immutable copy of the legion's contents, in sorted order.
+     * 
+     * TODO get rid of this string-based version in favor of the typesafe ones
+     */
     public List<String> getContents()
     {
         try
@@ -358,27 +368,19 @@ public final class LegionClientSide extends Legion
     /** Legions are sorted in descending order of known total point value,
      with the titan legion always coming first.  This is inconsistent
      with equals().  Really only useful for comparing own legions. */
-    public int compareTo(Object object)
+    public int compareTo(LegionClientSide other)
     {
-        if (object instanceof LegionClientSide)
+        if (hasTitan())
         {
-            LegionClientSide other = (LegionClientSide)object;
-            if (hasTitan())
-            {
-                return Integer.MIN_VALUE;
-            }
-            else if (other.hasTitan())
-            {
-                return Integer.MAX_VALUE;
-            }
-            else
-            {
-                return (other.getPointValue() - this.getPointValue());
-            }
+            return Integer.MIN_VALUE;
+        }
+        else if (other.hasTitan())
+        {
+            return Integer.MAX_VALUE;
         }
         else
         {
-            throw new ClassCastException();
+            return (other.getPointValue() - this.getPointValue());
         }
     }
 

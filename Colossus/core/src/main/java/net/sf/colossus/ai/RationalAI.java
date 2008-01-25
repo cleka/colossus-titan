@@ -43,7 +43,7 @@ public class RationalAI extends SimpleAI
         .getName());
 
     boolean I_HATE_HUMANS = false;
-    private final LinkedList<String> legionsToSplit = new LinkedList<String>();
+    private final LinkedList<Legion> legionsToSplit = new LinkedList<Legion>();
     private Map<String, List<Legion>>[] enemyAttackMap;
     private final Map<String, Integer> evaluateMoveMap = new HashMap<String, Integer>();
     private List<LegionBoardMove> bestMoveList;
@@ -69,11 +69,9 @@ public class RationalAI extends SimpleAI
         legionsToSplit.clear();
 
         PlayerClientSide player = client.getOwningPlayer();
-        Iterator<String> it = player.getLegionIds().iterator();
-        while (it.hasNext())
+        for (Legion legion : player.getLegions())
         {
-            String markerId = it.next();
-            legionsToSplit.add(markerId);
+            legionsToSplit.add(legion);
         }
         return fireSplits();
     }
@@ -94,8 +92,8 @@ public class RationalAI extends SimpleAI
                 return true; //early exit, out of markers
             }
 
-            String markerId = legionsToSplit.removeFirst();
-            if (!splitOneLegion(player, markerId))
+            Legion legion = legionsToSplit.removeFirst();
+            if (!splitOneLegion(player, legion))
             {
                 return false; //early exit, we've decided we won't finish
             }
@@ -233,11 +231,9 @@ public class RationalAI extends SimpleAI
     }
 
     /** Return true if done, false if waiting for callback. */
-    boolean splitOneLegion(PlayerClientSide player, String markerId)
+    boolean splitOneLegion(PlayerClientSide player, Legion legion)
     {
         logger.log(Level.FINEST, "splitOneLegion()");
-
-        LegionClientSide legion = client.getLegion(markerId);
 
         // Allow aggressive splits - especially early in the game it is better
         // to split more often -- this should get toned down later in the
@@ -267,17 +263,17 @@ public class RationalAI extends SimpleAI
         boolean hasMustered = false;
 
         MusteredCreatures mc = chooseCreaturesToSplitOut(legion, at_risk);
-        List<CreatureTypeServerSide> creatures = mc.creatures;
+        List<CreatureType> creatures = mc.creatures;
 
         hasMustered = mc.mustered;
-        Iterator<CreatureTypeServerSide> it = creatures.iterator();
+        Iterator<CreatureType> it = creatures.iterator();
         int child_value = 0;
 
         while (it.hasNext())
         {
-            CreatureTypeServerSide creature = it.next();
+            CreatureType creature = it.next();
 
-            child_value += creature.getPointValue();
+            child_value += ((CreatureTypeServerSide)creature).getPointValue();
             results.append(creature.getName());
             if (it.hasNext())
             {
@@ -494,11 +490,11 @@ public class RationalAI extends SimpleAI
     public class CompCreaturesByValueName implements
         Comparator<CreatureTypeServerSide>
     {
-        private final LegionClientSide legion;
+        private final Legion legion;
 
-        public CompCreaturesByValueName(LegionClientSide l)
+        public CompCreaturesByValueName(Legion legion)
         {
-            legion = l;
+            this.legion = legion;
         }
 
         public final int compare(CreatureTypeServerSide creature1,
@@ -525,7 +521,7 @@ public class RationalAI extends SimpleAI
     // Sort creatures first by value then by name.
     // Exclude titan.
     List<CreatureTypeServerSide> sortCreaturesByValueName(
-        List<String> Creatures, LegionClientSide legion)
+        List<String> Creatures, Legion legion)
     {
         List<CreatureTypeServerSide> sortedCreatures = new ArrayList<CreatureTypeServerSide>();
         Iterator<String> critterIt = Creatures.iterator();
@@ -562,9 +558,9 @@ public class RationalAI extends SimpleAI
     class MusteredCreatures
     {
         public boolean mustered;
-        public List<CreatureTypeServerSide> creatures;
+        public List<CreatureType> creatures;
 
-        MusteredCreatures(boolean m, List<CreatureTypeServerSide> c)
+        MusteredCreatures(boolean m, List<CreatureType> c)
         {
             mustered = m;
             creatures = c;
@@ -574,8 +570,7 @@ public class RationalAI extends SimpleAI
     /** Decide how to split this legion, and return a list of
      *  Creatures to remove + status flag indicating if these
      creatures have mustered or not*/
-    MusteredCreatures chooseCreaturesToSplitOut(LegionClientSide legion,
-        boolean at_risk)
+    MusteredCreatures chooseCreaturesToSplitOut(Legion legion, boolean at_risk)
     {
         //
         // split a 5 to 8 high legion
@@ -592,7 +587,7 @@ public class RationalAI extends SimpleAI
         //
         if (legion.getHeight() == 8)
         {
-            List<CreatureTypeServerSide> creatures = doInitialGameSplit(legion
+            List<CreatureType> creatures = doInitialGameSplit(legion
                 .getHexLabel());
 
             return new MusteredCreatures(true, creatures);
@@ -602,7 +597,7 @@ public class RationalAI extends SimpleAI
             "sortCreaturesByValueName() in chooseCreaturesToSplitOut");
 
         List<CreatureTypeServerSide> sortedCreatures = sortCreaturesByValueName(
-            legion.getContents(), legion);
+            ((LegionClientSide)legion).getContents(), legion);
 
         logger.log(Level.FINEST, "Sorted stack - minus titan: "
             + sortedCreatures);
@@ -625,7 +620,7 @@ public class RationalAI extends SimpleAI
             hasMustered = true;
         }
 
-        List<CreatureTypeServerSide> creaturesToRemove = new ArrayList<CreatureTypeServerSide>();
+        List<CreatureType> creaturesToRemove = new ArrayList<CreatureType>();
 
         // Try to pull out pair that has already mustered.
         logger.log(Level.FINEST,
@@ -656,7 +651,7 @@ public class RationalAI extends SimpleAI
         // but it seems to give a better result
         if (sortIt.hasNext() && !at_risk)
         {
-            CreatureTypeServerSide first_remove = creaturesToRemove.get(0);
+            CreatureType first_remove = creaturesToRemove.get(0);
             CreatureTypeServerSide critter = sortIt.next();
             String s_first = first_remove.getName();
             String s_critter = critter.getName();
@@ -698,6 +693,7 @@ public class RationalAI extends SimpleAI
     // little helper class to store possible moves by legion
     private class LegionBoardMove
     {
+        // TODO make this typesafe, i.e.: Legion, MasterHex, MasterHex
         final String markerId;
         final String fromHex;
         final String toHex;
@@ -799,30 +795,27 @@ public class RationalAI extends SimpleAI
         return true;
     }
 
-    private boolean findMoveList(List<String> markerIds,
+    private boolean findMoveList(List<LegionClientSide> legions,
         List<List<LegionBoardMove>> all_legionMoves, MultiSet occupiedHexes,
         boolean teleportsOnly)
     {
         boolean moved = false;
-        Iterator<String> it = markerIds.iterator();
-        while (it.hasNext())
+        for (LegionClientSide legion : legions)
         {
-            String markerId = it.next();
-            LegionClientSide legion = client.getLegion(markerId);
             if (legion.hasMoved())
             {
                 moved = true;
                 continue;
             }
 
-            logger.log(Level.FINEST, "consider marker " + markerId);
+            logger.log(Level.FINEST, "consider marker " + legion);
 
             // compute the value of sitting still
             List<LegionBoardMove> legionMoves = new ArrayList<LegionBoardMove>();
             MasterHex hex = legion.getCurrentHex();
             double value = evaluateMove(legion, hex, RECRUIT_FALSE, 2, true);
-            LegionBoardMove lmove = new LegionBoardMove(markerId, hex
-                .getLabel(), hex.getLabel(), value, true);
+            LegionBoardMove lmove = new LegionBoardMove(legion.getMarkerId(),
+                hex.getLabel(), hex.getLabel(), value, true);
 
             if (!teleportsOnly)
             {
@@ -859,8 +852,8 @@ public class RationalAI extends SimpleAI
                 logger.log(Level.FINEST, "value hex " + hexLabel + " value: "
                     + r3(value));
 
-                lmove = new LegionBoardMove(markerId, legion.getCurrentHex()
-                    .getLabel(), hexLabel, value, false);
+                lmove = new LegionBoardMove(legion.getMarkerId(), legion
+                    .getCurrentHex().getLabel(), hexLabel, value, false);
                 legionMoves.add(lmove);
             }
 
@@ -884,12 +877,12 @@ public class RationalAI extends SimpleAI
         logger.log(Level.FINEST, "handleVoluntaryMoves()");
 
         boolean moved = false;
-        List<String> markerIds = player.getLegionIds();
+        List<LegionClientSide> legions = player.getLegions();
         List<List<LegionBoardMove>> all_legionMoves = new ArrayList<List<LegionBoardMove>>();
 
         MultiSet occupiedHexes = new MultiSet();
 
-        moved = findMoveList(markerIds, all_legionMoves, occupiedHexes, false);
+        moved = findMoveList(legions, all_legionMoves, occupiedHexes, false);
 
         logger.log(Level.FINEST, "done computing move values for legions");
 
@@ -911,7 +904,7 @@ public class RationalAI extends SimpleAI
         {
             List<List<LegionBoardMove>> teleport_legionMoves = new ArrayList<List<LegionBoardMove>>();
             MultiSet dummy = new MultiSet();
-            findMoveList(markerIds, teleport_legionMoves, dummy, true);
+            findMoveList(legions, teleport_legionMoves, dummy, true);
 
             Iterator<List<LegionBoardMove>> legit = teleport_legionMoves
                 .iterator();

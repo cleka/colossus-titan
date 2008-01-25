@@ -2488,7 +2488,7 @@ public final class GameServerSide extends net.sf.colossus.game.Game
         // Handle any after-battle angel summoning or recruiting.
         if (getNumLegions(hexLabel) == 1)
         {
-            winner = getFirstLegion(hexLabel);
+            winner = (LegionServerSide)getFirstLegion(hexLabel);
 
             // Make all creatures in the victorious legion visible.
             server.allRevealLegion(winner, Constants.reasonWinner);
@@ -3210,25 +3210,13 @@ public final class GameServerSide extends net.sf.colossus.game.Game
     }
 
     /** Return a list of all players' legions. */
-    synchronized List<LegionServerSide> getAllLegions()
+    synchronized List<Legion> getAllLegions()
     {
-        List<LegionServerSide> list = new ArrayList<LegionServerSide>();
-        for (PlayerServerSide player : players)
+        List<Legion> list = new ArrayList<Legion>();
+        for (Player player : players)
         {
-            List<LegionServerSide> legions = player.getLegions();
-
+            List<? extends Legion> legions = player.getLegions();
             list.addAll(legions);
-        }
-        return list;
-    }
-
-    /** Return a list of all players' legions' marker ids. */
-    List<String> getAllLegionIds()
-    {
-        List<String> list = new ArrayList<String>();
-        for (PlayerServerSide player : players)
-        {
-            list.addAll(player.getLegionIds());
         }
         return list;
     }
@@ -3243,20 +3231,6 @@ public final class GameServerSide extends net.sf.colossus.game.Game
             {
                 List<LegionServerSide> legions = otherPlayer.getLegions();
                 list.addAll(legions);
-            }
-        }
-        return list;
-    }
-
-    /** Return a list of ids for all legions not belonging to player. */
-    List<String> getAllEnemyLegionIds(Player player)
-    {
-        List<String> list = new ArrayList<String>();
-        for (PlayerServerSide nextPlayer : players)
-        {
-            if (nextPlayer != player)
-            {
-                list.addAll(nextPlayer.getLegionIds());
             }
         }
         return list;
@@ -3294,13 +3268,10 @@ public final class GameServerSide extends net.sf.colossus.game.Game
     int getAverageLegionPointValue()
     {
         int total = 0;
-        List<LegionServerSide> legions = getAllLegions();
-        Iterator<LegionServerSide> it = legions.iterator();
-        while (it.hasNext())
+        List<Legion> legions = getAllLegions();
+        for (Legion legion : legions)
         {
-            LegionServerSide legion = it.next();
-
-            total += legion.getPointValue();
+            total += ((LegionServerSide)legion).getPointValue();
         }
         return total / legions.size();
     }
@@ -3308,11 +3279,8 @@ public final class GameServerSide extends net.sf.colossus.game.Game
     int getNumLegions(String hexLabel)
     {
         int count = 0;
-        Iterator<LegionServerSide> it = getAllLegions().iterator();
-        while (it.hasNext())
+        for (Legion legion : getAllLegions())
         {
-            LegionServerSide legion = it.next();
-
             if (hexLabel.equals(legion.getHexLabel()))
             {
                 count++;
@@ -3323,11 +3291,8 @@ public final class GameServerSide extends net.sf.colossus.game.Game
 
     boolean isOccupied(String hexLabel)
     {
-        Iterator<LegionServerSide> it = getAllLegions().iterator();
-        while (it.hasNext())
+        for (Legion legion : getAllLegions())
         {
-            LegionServerSide legion = it.next();
-
             if (hexLabel.equals(legion.getHexLabel()))
             {
                 return true;
@@ -3336,12 +3301,10 @@ public final class GameServerSide extends net.sf.colossus.game.Game
         return false;
     }
 
-    LegionServerSide getFirstLegion(String hexLabel)
+    Legion getFirstLegion(String hexLabel)
     {
-        Iterator<LegionServerSide> it = getAllLegions().iterator();
-        while (it.hasNext())
+        for (Legion legion : getAllLegions())
         {
-            LegionServerSide legion = it.next();
             if (hexLabel.equals(legion.getHexLabel()))
             {
                 return legion;
@@ -3353,11 +3316,8 @@ public final class GameServerSide extends net.sf.colossus.game.Game
     List<String> getLegionMarkerIds(String hexLabel)
     {
         List<String> markerIds = new ArrayList<String>();
-        Iterator<LegionServerSide> it = getAllLegions().iterator();
-        while (it.hasNext())
+        for (Legion legion : getAllLegions())
         {
-            LegionServerSide legion = it.next();
-
             if (hexLabel.equals(legion.getHexLabel()))
             {
                 markerIds.add(legion.getMarkerId());

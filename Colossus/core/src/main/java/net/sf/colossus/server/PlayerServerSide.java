@@ -148,11 +148,9 @@ public final class PlayerServerSide extends Player implements
                         shortColor);
                     allVictims.append(victim.getPlayersElim());
                 }
-                Iterator<String> it = getLegionIds().iterator();
-                while (it.hasNext())
+                for (Legion legion : getLegions())
                 {
-                    String markerId = it.next();
-                    markersAvailable.remove(markerId);
+                    markersAvailable.remove(legion.getMarkerId());
                 }
             }
         }

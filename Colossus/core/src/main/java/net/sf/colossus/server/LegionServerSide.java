@@ -360,11 +360,6 @@ public final class LegionServerSide extends net.sf.colossus.game.Legion
         return false;
     }
 
-    public int getHeight()
-    {
-        return getCreatures().size();
-    }
-
     @Override
     public PlayerServerSide getPlayer()
     {
