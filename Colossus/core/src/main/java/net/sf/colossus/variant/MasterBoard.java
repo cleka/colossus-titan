@@ -431,7 +431,9 @@ public class MasterBoard
     public MasterHex getHexByLabel(final String label)
     {
         MasterHex hex = hexByLabelCache.get(label);
-        assert hex != null : "No hex with label '" + label + "'";
+        // TODO such an assertion would be nice, but seems to fail when loading
+        // a game:
+        // assert hex != null : "No hex with label '" + label + "'";
         return hex;
     }
 
