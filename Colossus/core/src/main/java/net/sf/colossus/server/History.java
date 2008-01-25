@@ -25,6 +25,12 @@ public class History
 
     private Element root = new Element("History");
 
+    /**
+     * Set to true during the processing of {@link #fireEventsFromXML(Server)}
+     * to avoid triggering events we just restored again.
+     */
+    private boolean loading = false;
+
     Element getCopy()
     {
         return (Element)root.clone();
@@ -32,6 +38,10 @@ public class History
 
     void addCreatureEvent(Legion legion, String creatureName, int turn)
     {
+        if (loading)
+        {
+            return;
+        }
         Element event = new Element("AddCreature");
         event.setAttribute("markerId", legion.getMarkerId());
         event.setAttribute("creatureName", creatureName);
@@ -41,6 +51,10 @@ public class History
 
     void removeCreatureEvent(Legion legion, String creatureName, int turn)
     {
+        if (loading)
+        {
+            return;
+        }
         Element event = new Element("RemoveCreature");
         event.setAttribute("markerId", legion.getMarkerId());
         event.setAttribute("creatureName", creatureName);
@@ -51,6 +65,10 @@ public class History
     void splitEvent(Legion parent, Legion child, List<String> splitoffs,
         int turn)
     {
+        if (loading)
+        {
+            return;
+        }
         Element event = new Element("Split");
         event.setAttribute("parentId", parent.getMarkerId());
         event.setAttribute("childId", child.getMarkerId());
@@ -70,6 +88,10 @@ public class History
 
     void mergeEvent(String splitoffId, String survivorId, int turn)
     {
+        if (loading)
+        {
+            return;
+        }
         Element event = new Element("Merge");
         event.setAttribute("splitoffId", splitoffId);
         event.setAttribute("survivorId", survivorId);
@@ -80,6 +102,10 @@ public class History
     void revealEvent(boolean allPlayers, List<String> playerNames,
         Legion legion, List<String> creatureNames, int turn)
     {
+        if (loading)
+        {
+            return;
+        }
         if (creatureNames.isEmpty())
         {
             // this happens e.g. when in final battle (titan vs. titan)
@@ -127,6 +153,10 @@ public class History
 
     void playerElimEvent(Player player, Player slayer, int turn)
     {
+        if (loading)
+        {
+            return;
+        }
         Element event = new Element("PlayerElim");
         event.setAttribute("name", player.getName());
         if (slayer != null)
@@ -146,6 +176,7 @@ public class History
     @SuppressWarnings("unchecked")
     void fireEventsFromXML(Server server)
     {
+        this.loading = true;
         if (root == null)
         {
             return;
@@ -157,6 +188,7 @@ public class History
             Element el = it.next();
             fireEventFromElement(server, el);
         }
+        this.loading = false;
     }
 
     // unchecked conversions from JDOM
@@ -198,7 +230,7 @@ public class History
             }
             else
             {
-                server.oneRevealCreatures(playerName, game
+                server.oneRevealLegion(game.getPlayer(playerName), game
                     .getLegionByMarkerId(markerId), creatureNames, reason);
             }
         }

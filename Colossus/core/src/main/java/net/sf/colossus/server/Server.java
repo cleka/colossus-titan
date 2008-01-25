@@ -1928,30 +1928,6 @@ public final class Server implements IServer
         }
     }
 
-    void allRevealCreatures(LegionServerSide legion,
-        List<String> creatureNames, String reason)
-    {
-        Iterator<IClient> it = clients.iterator();
-        while (it.hasNext())
-        {
-            IClient client = it.next();
-            client.revealCreatures(legion, creatureNames, reason);
-        }
-        game.revealEvent(true, null, legion, creatureNames);
-    }
-
-    /** Call from History during load game only */
-    void oneRevealCreatures(String playerName, Legion legion,
-        List<String> creatureNames, String reason)
-    {
-        IClient client = getClient(game.getPlayer(playerName));
-        if (client != null)
-        {
-            client.revealCreatures(legion, creatureNames, reason);
-        }
-    }
-
-    /** Call from History during load game only */
     void allRevealCreatures(Legion legion, List<String> creatureNames,
         String reason)
     {
@@ -1961,6 +1937,7 @@ public final class Server implements IServer
             IClient client = it.next();
             client.revealCreatures(legion, creatureNames, reason);
         }
+        game.revealEvent(true, null, legion, creatureNames);
     }
 
     // XXX Disallow these in network games?
