@@ -1,12 +1,12 @@
-package net.sf.colossus.server;
+package net.sf.colossus.variant;
 
 
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.sf.colossus.variant.CreatureType;
-import net.sf.colossus.variant.HazardTerrain;
+import net.sf.colossus.server.Constants;
+import net.sf.colossus.server.PlayerServerSide;
 
 
 /**
@@ -22,8 +22,6 @@ import net.sf.colossus.variant.HazardTerrain;
  * own, distinguished by the Player owning them, which then could be stored as
  * member in the class, delegating {@link #getPower()} to {@link PlayerServerSide#getTitanPower()}.
  * 
- * TODO this should probably be in the variant package
- *
  * @version $Id$
  * @author Romain Dolbeau
  */
