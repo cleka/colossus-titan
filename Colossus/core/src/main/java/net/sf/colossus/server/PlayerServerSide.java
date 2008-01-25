@@ -12,7 +12,6 @@ import net.sf.colossus.game.Player;
 import net.sf.colossus.util.Glob;
 import net.sf.colossus.util.Options;
 import net.sf.colossus.webcommon.InstanceTracker;
-import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
 
 /**
@@ -31,10 +30,10 @@ public final class PlayerServerSide extends Player implements
     // TODO the half-points are really used only in the die(..) method,
     // they could be summed up there and then added all in one go. That
     // would save us from storing a double and truncating things later
+    // and the getScore/setScore overrides could go.
     private double score; // track half-points, then round
     private boolean summoned;
     private boolean teleported;
-    private int mulligansLeft = 1;
     private int movementRoll; // 0 if movement has not been rolled.
 
     private boolean titanEliminated;
@@ -158,22 +157,7 @@ public final class PlayerServerSide extends Player implements
      This is inconsistent with equals(). */
     public int compareTo(PlayerServerSide other)
     {
-        return (other.getStartingTower().compareTo(this.getStartingTower()));
-    }
-
-    int getScore()
-    {
-        return (int)score;
-    }
-
-    void setScore(int score)
-    {
-        this.score = score;
-    }
-
-    boolean canTitanTeleport()
-    {
-        return (score >= TerrainRecruitLoader.getTitanTeleportValue());
+        return other.getStartingTower().compareTo(this.getStartingTower());
     }
 
     boolean hasTeleported()
@@ -225,12 +209,6 @@ public final class PlayerServerSide extends Player implements
         }
     }
 
-    int getTitanPower()
-    {
-        return 6 + getScore()
-            / TerrainRecruitLoader.getTitanImprovementValue();
-    }
-
     /**
      * TODO remove once noone needs the specific version anymore
      */
@@ -241,20 +219,6 @@ public final class PlayerServerSide extends Player implements
         return (List<LegionServerSide>)super.getLegions();
     }
 
-    synchronized int getMaxLegionHeight()
-    {
-        int max = 0;
-        for (Legion legion : getLegions())
-        {
-            int height = ((LegionServerSide)legion).getHeight();
-            if (height > max)
-            {
-                max = height;
-            }
-        }
-        return max;
-    }
-
     /** Return the number of this player's legions that have moved. */
     synchronized int legionsMoved()
     {
@@ -262,7 +226,7 @@ public final class PlayerServerSide extends Player implements
 
         for (Legion legion : getLegions())
         {
-            if (((LegionServerSide)legion).hasMoved())
+            if (legion.hasMoved())
             {
                 count++;
             }
@@ -303,16 +267,6 @@ public final class PlayerServerSide extends Player implements
         this.movementRoll = movementRoll;
     }
 
-    int getMulligansLeft()
-    {
-        return mulligansLeft;
-    }
-
-    void setMulligansLeft(int number)
-    {
-        mulligansLeft = number;
-    }
-
     void resetTurnState()
     {
         summoned = false;
@@ -330,12 +284,12 @@ public final class PlayerServerSide extends Player implements
         // Only roll if it hasn't already been done.
         if (movementRoll != 0)
         {
-            LOGGER.log(Level.WARNING, "Called rollMovement() more than once");
+            LOGGER.warning("Called rollMovement() more than once");
         }
         else
         {
             movementRoll = Dice.rollDie();
-            LOGGER.log(Level.INFO, getName() + " rolls a " + movementRoll
+            LOGGER.info(getName() + " rolls a " + movementRoll
                 + " for movement");
         }
         getGame().getServer().allTellMovementRoll(movementRoll);
@@ -343,13 +297,15 @@ public final class PlayerServerSide extends Player implements
 
     void takeMulligan()
     {
-        if (mulligansLeft > 0)
+        int mulligans = getMulligansLeft();
+        if (mulligans > 0)
         {
             undoAllMoves();
-            LOGGER.log(Level.INFO, getName() + " takes a mulligan");
+            LOGGER.info(getName() + " takes a mulligan");
             if (!getGame().getOption(Options.unlimitedMulligans))
             {
-                mulligansLeft--;
+                mulligans--;
+                setMulligansLeft(mulligans);
             }
             movementRoll = 0;
         }
@@ -377,12 +333,12 @@ public final class PlayerServerSide extends Player implements
     {
         for (Legion legion : getLegions())
         {
-            String hexLabel = ((LegionServerSide)legion).getHexLabel();
+            String hexLabel = legion.getHexLabel();
             if (getGame().getNumFriendlyLegions(hexLabel, this) > 1
                 && ((LegionServerSide)legion).hasConventionalMove())
             {
-                LOGGER.log(Level.FINEST,
-                    "Found unseparated split legions at hex " + hexLabel);
+                LOGGER.finest("Found unseparated split legions at hex "
+                    + hexLabel);
                 return true;
             }
         }
@@ -394,8 +350,7 @@ public final class PlayerServerSide extends Player implements
     {
         for (Legion legion : getLegions())
         {
-            if (((LegionServerSide)legion).hasMoved()
-                && ((LegionServerSide)legion).canRecruit())
+            if (legion.hasMoved() && ((LegionServerSide)legion).canRecruit())
             {
                 return true;
             }
@@ -442,7 +397,7 @@ public final class PlayerServerSide extends Player implements
             // Don't use the legion's real parent, as there could have been
             // a 3-way split and the parent could be gone.
             Legion parent = getGame().getFirstFriendlyLegion(
-                ((LegionServerSide)legion).getHexLabel(), this);
+                legion.getHexLabel(), this);
             if (legion != parent)
             {
                 ((LegionServerSide)legion).recombine(parent, false);
@@ -450,6 +405,18 @@ public final class PlayerServerSide extends Player implements
             }
         }
         getGame().getServer().allUpdatePlayerInfo();
+    }
+
+    @Override
+    public void setScore(int score)
+    {
+        this.score = score;
+    }
+
+    @Override
+    public int getScore()
+    {
+        return (int)score;
     }
 
     /** Add points to this player's score.  Update the status window
@@ -464,7 +431,7 @@ public final class PlayerServerSide extends Player implements
                 getGame().getServer().allUpdatePlayerInfo();
             }
 
-            LOGGER.log(Level.INFO, getName() + " earns " + points + " points");
+            LOGGER.info(getName() + " earns " + points + " points");
         }
     }
 
@@ -590,16 +557,5 @@ public final class PlayerServerSide extends Player implements
         li.add(Integer.toString(getMulligansLeft()));
         li.addAll(getMarkersAvailable());
         return Glob.glob(":", li);
-    }
-
-    /** Return the total value of all of this player's creatures. */
-    synchronized int getTotalPointValue()
-    {
-        int total = 0;
-        for (Legion legion : getLegions())
-        {
-            total += ((LegionServerSide)legion).getPointValue();
-        }
-        return total;
     }
 }

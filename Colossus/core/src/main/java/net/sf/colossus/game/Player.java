@@ -11,6 +11,7 @@ import java.util.TreeSet;
 import net.sf.colossus.client.MarkerComparator;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.PlayerServerSide;
+import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
 
 /**
@@ -96,6 +97,10 @@ public class Player
      * TODO this should really be a List<Player>
      */
     private String playersEliminated = "";
+
+    private int mulligansLeft;
+
+    private int score;
 
     /**
      * Sorted set of available legion markers for this player. 
@@ -337,4 +342,49 @@ public class Player
     {
         return getName();
     }
+
+    public void setMulligansLeft(int mulligansLeft)
+    {
+        this.mulligansLeft = mulligansLeft;
+    }
+
+    public int getMulligansLeft()
+    {
+        return mulligansLeft;
+    }
+
+    public void setScore(int score)
+    {
+        this.score = score;
+    }
+
+    public int getScore()
+    {
+        return score;
+    }
+
+    public int getTitanPower()
+    {
+        return 6 + getScore()
+            / TerrainRecruitLoader.getTitanImprovementValue();
+    }
+
+    public boolean canTitanTeleport()
+    {
+        return getScore() >= TerrainRecruitLoader.getTitanTeleportValue();
+    }
+
+    /** 
+     * Return the total value of all of this player's creatures. 
+     */
+    public int getTotalPointValue()
+    {
+        int total = 0;
+        for (Legion legion : getLegions())
+        {
+            total += legion.getPointValue();
+        }
+        return total;
+    }
+
 }

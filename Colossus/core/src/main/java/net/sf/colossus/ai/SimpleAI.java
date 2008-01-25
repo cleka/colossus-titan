@@ -1171,8 +1171,7 @@ public class SimpleAI implements AI
                     // Only allow Titan teleport
                     // Remember, tower teleports cannot attack
                     if (legion.hasTitan()
-                        && ((PlayerClientSide)legion.getPlayer())
-                            .canTitanTeleport()
+                        && legion.getPlayer().canTitanTeleport()
                         && client.getMovement().titanTeleportAllowed())
                     {
                         set = client.getMovement().listAllMoves(legion,

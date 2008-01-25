@@ -8,7 +8,6 @@ import net.sf.colossus.game.Player;
 import net.sf.colossus.server.CustomRecruitBase;
 import net.sf.colossus.util.Split;
 import net.sf.colossus.webcommon.InstanceTracker;
-import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
 
 /**
@@ -25,8 +24,6 @@ public final class PlayerClientSide extends Player
     private int numLegions;
     private int numCreatures;
     private int titanPower;
-    private int score;
-    private int mulligansLeft;
 
     private PredictSplits predictSplits;
 
@@ -108,39 +105,16 @@ public final class PlayerClientSide extends Player
         return numCreatures;
     }
 
-    void setTitanPower(int titanPower)
+    private void setTitanPower(int titanPower)
     {
         this.titanPower = titanPower;
     }
 
+    // TODO can't we just use the calculated version from the base class?
+    @Override
     public int getTitanPower()
     {
         return titanPower;
-    }
-
-    void setScore(int score)
-    {
-        this.score = score;
-    }
-
-    public int getScore()
-    {
-        return score;
-    }
-
-    public boolean canTitanTeleport()
-    {
-        return (score >= TerrainRecruitLoader.getTitanTeleportValue());
-    }
-
-    void setMulligansLeft(int mulligansLeft)
-    {
-        this.mulligansLeft = mulligansLeft;
-    }
-
-    public int getMulligansLeft()
-    {
-        return mulligansLeft;
     }
 
     boolean hasTeleported()
