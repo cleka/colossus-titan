@@ -861,39 +861,39 @@ public class SimpleAI implements AI
     {
         boolean moved = false;
 
-        PlayerClientSide playerInfo = client.getOwningPlayer();
+        Player player = client.getOwningPlayer();
 
         // consider mulligans
-        if (handleMulligans(playerInfo))
+        if (handleMulligans(player))
         {
             return true;
         }
 
         /** cache all places enemies can move to, for use in risk analysis. */
-        Map<String, List<Legion>>[] enemyAttackMap = buildEnemyAttackMap(playerInfo);
+        Map<String, List<Legion>>[] enemyAttackMap = buildEnemyAttackMap(player);
 
         // A mapping from Legion to List of MoveInfo objects,
         // listing all moves that we've evaluated.  We use this if
         // we're forced to move.
         Map<Legion, List<MoveInfo>> moveMap = new HashMap<Legion, List<MoveInfo>>();
 
-        moved = handleVoluntaryMoves(playerInfo, moveMap, enemyAttackMap);
+        moved = handleVoluntaryMoves(player, moveMap, enemyAttackMap);
         if (moved)
         {
             return true;
         }
 
         // make sure we move splits (when forced)
-        moved = handleForcedSplitMoves(playerInfo, moveMap);
+        moved = handleForcedSplitMoves(player, moveMap);
         if (moved)
         {
             return true;
         }
 
         // make sure we move at least one legion
-        if (playerInfo.numLegionsMoved() == 0)
+        if (!player.hasMoved())
         {
-            moved = handleForcedSingleMove(playerInfo, moveMap);
+            moved = handleForcedSingleMove(player, moveMap);
             // Earlier here was a comment: 
             // "always need to retry" and hardcoded returned true.
             // In [ 1748718 ] Game halt in Abyssal9 this lead to a deadlock;
@@ -909,7 +909,7 @@ public class SimpleAI implements AI
     }
 
     /** Return true if AI took a mulligan. */
-    boolean handleMulligans(PlayerClientSide player)
+    boolean handleMulligans(Player player)
     {
         // TODO: This is really stupid.  Do something smart here.
         if (client.getTurnNumber() == 1
@@ -930,6 +930,8 @@ public class SimpleAI implements AI
         Map<String, List<Legion>>[] enemyAttackMap)
     {
         boolean moved = false;
+        // TODO this is still List<LegionClientSide> to get the Comparable
+        // -> use a Comparator instead since we are the only ones needing this
         List<LegionClientSide> legions = ((PlayerClientSide)player)
             .getLegions();
 
@@ -1100,7 +1102,10 @@ public class SimpleAI implements AI
         // now, one at a time, try applying moves until we have moved a legion
         for (MoveInfo move : allmoves)
         {
-            if (((PlayerClientSide)player).numLegionsMoved() != 0
+            // TODO this check against numMobileLegions() seems rather superflous
+            //      and is the only call to that method in the whole codebase, so
+            //      we should try to get rid of it
+            if (player.hasMoved()
                 || ((PlayerClientSide)player).numMobileLegions() == 0)
             {
                 break;

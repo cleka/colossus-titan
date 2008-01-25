@@ -716,7 +716,7 @@ public class RationalAI extends SimpleAI
     public boolean masterMove()
     {
         logger.log(Level.FINEST, "This is RationalAI.");
-        PlayerClientSide playerInfo = client.getOwningPlayer();
+        Player player = client.getOwningPlayer();
 
         if (enemyAttackMap == null)
         {
@@ -726,7 +726,7 @@ public class RationalAI extends SimpleAI
         }
 
         // consider mulligans
-        if (handleMulligans(playerInfo))
+        if (handleMulligans(player))
         {
             return true;
         }
@@ -735,7 +735,7 @@ public class RationalAI extends SimpleAI
         if (bestMoveList == null)
         {
             bestMoveList = new ArrayList<LegionBoardMove>();
-            telePort = handleVoluntaryMoves(playerInfo);
+            telePort = handleVoluntaryMoves(player);
             bestMoveListIter = bestMoveList.iterator();
         }
 
@@ -746,15 +746,15 @@ public class RationalAI extends SimpleAI
             // ForcedSplit and ForcedSingle implementations here are perhaps 
             // quite poor solutions, but better than getting NAKs...
 
-            boolean moved = handleForcedSplitMoves(playerInfo);
+            boolean moved = handleForcedSplitMoves(player);
             if (moved)
             {
                 return true;
             }
 
-            if (playerInfo.numLegionsMoved() == 0)
+            if (!player.hasMoved())
             {
-                moved = handleForcedSingleMove(playerInfo);
+                moved = handleForcedSingleMove(player);
 
                 // Earlier here was a comment: 
                 // "always need to retry" and hardcoded returned true.
@@ -788,7 +788,7 @@ public class RationalAI extends SimpleAI
         return true;
     }
 
-    private boolean findMoveList(List<LegionClientSide> legions,
+    private boolean findMoveList(List<? extends Legion> legions,
         List<List<LegionBoardMove>> all_legionMoves, MultiSet occupiedHexes,
         boolean teleportsOnly)
     {
@@ -865,12 +865,12 @@ public class RationalAI extends SimpleAI
     }
 
     /** Return true if we moved something and need to be called again. */
-    private boolean handleVoluntaryMoves(PlayerClientSide player)
+    private boolean handleVoluntaryMoves(Player player)
     {
         logger.log(Level.FINEST, "handleVoluntaryMoves()");
 
         boolean moved = false;
-        List<LegionClientSide> legions = player.getLegions();
+        List<? extends Legion> legions = player.getLegions();
         List<List<LegionBoardMove>> all_legionMoves = new ArrayList<List<LegionBoardMove>>();
 
         MultiSet occupiedHexes = new MultiSet();

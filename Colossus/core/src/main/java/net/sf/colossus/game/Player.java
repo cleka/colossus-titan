@@ -387,4 +387,20 @@ public class Player
         return total;
     }
 
+    /**
+     * Check if the player has already moved.
+     * 
+     * @return true iff at least one legion of the player has been moved
+     */
+    public boolean hasMoved()
+    {
+        for (Legion legion : getLegions())
+        {
+            if (legion.hasMoved())
+            {
+                return true;
+            }
+        }
+        return false;
+    }
 }

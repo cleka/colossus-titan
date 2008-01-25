@@ -19,7 +19,7 @@ import net.sf.colossus.webcommon.InstanceTracker;
 
 public final class PlayerClientSide extends Player
 {
-    private Client client;
+    private final Client client;
 
     private int numLegions;
     private int numCreatures;
@@ -129,24 +129,18 @@ public final class PlayerClientSide extends Player
         return false;
     }
 
-    /** Return the number of this player's legions that have moved. */
-    public int numLegionsMoved()
+    public int numMobileLegions()
     {
         int count = 0;
 
         for (Legion legion : getLegions())
         {
-            if (legion.hasMoved())
+            if (!legion.hasMoved())
             {
                 count++;
             }
         }
         return count;
-    }
-
-    public int numMobileLegions()
-    {
-        return getNumLegions() - numLegionsMoved();
     }
 
     @Override
@@ -161,11 +155,6 @@ public final class PlayerClientSide extends Player
         {
             client.removeLegion(legion);
         }
-    }
-
-    public void setClientNull()
-    {
-        this.client = null;
     }
 
     public PredictSplits getPredictSplits()
