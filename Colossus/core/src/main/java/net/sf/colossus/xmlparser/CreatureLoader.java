@@ -11,7 +11,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.sf.colossus.variant.CreatureTitan;
+import net.sf.colossus.variant.CreatureTypeTitan;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.HazardTerrain;
 
@@ -119,7 +119,7 @@ public class CreatureLoader
         CreatureType creature = null;
         if (name.equals("Titan"))
         {
-            creature = new CreatureTitan(name, power, skill, rangestrikes,
+            creature = new CreatureTypeTitan(name, power, skill, rangestrikes,
                 flies, nativeTerrains, slope, river, water, magic_missile,
                 summonable, lord, demilord, count, plural_name, base_color);
         }
