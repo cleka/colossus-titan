@@ -15,9 +15,7 @@ import java.util.logging.Logger;
 
 import net.sf.colossus.client.Client;
 import net.sf.colossus.client.LegionClientSide;
-import net.sf.colossus.game.Creature;
 import net.sf.colossus.game.Legion;
-import net.sf.colossus.server.CreatureTypeServerSide;
 import net.sf.colossus.util.Combos;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.xmlparser.TerrainRecruitLoader;
@@ -57,13 +55,11 @@ public class MilvangAI extends RationalAI
         Iterator<CreatureType> lit = tempRecruits.iterator();
         while (lit.hasNext())
         {
-            CreatureTypeServerSide creature = (CreatureTypeServerSide)lit
-                .next();
+            CreatureType creature = lit.next();
             Iterator<CreatureType> liter = recruiters.iterator();
             while (liter.hasNext())
             {
-                CreatureTypeServerSide lesser = (CreatureTypeServerSide)liter
-                    .next();
+                CreatureType lesser = liter.next();
                 int numNeeded = TerrainRecruitLoader.numberOfRecruiterNeeded(
                     lesser, creature, terrain, "");
                 int hintValue = creature.getHintedRecruitmentValue();
@@ -103,9 +99,10 @@ public class MilvangAI extends RationalAI
         String[] terrains = TerrainRecruitLoader.getTerrains();
 
         List<CreatureType> critters = new ArrayList<CreatureType>();
-        for (Creature creature : legion.getCreatures())
+        for (String name : ((LegionClientSide)legion).getContents())
         {
-            critters.add(creature.getType());
+            critters
+                .add(client.getGame().getVariant().getCreatureByName(name));
         }
 
         double bestValue = 0;
@@ -123,8 +120,7 @@ public class MilvangAI extends RationalAI
             for (CreatureType creatureType : keepers)
             {
                 keepTitan |= creatureType.getName().equals("Titan");
-                int tmp = ((CreatureTypeServerSide)creatureType)
-                    .getHintedRecruitmentValue();
+                int tmp = creatureType.getHintedRecruitmentValue();
                 critterValue += tmp * tmp;
                 Integer numCritters = critterMap.get(creatureType);
                 if (numCritters == null)

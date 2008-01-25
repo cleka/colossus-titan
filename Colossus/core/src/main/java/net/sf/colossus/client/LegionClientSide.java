@@ -11,7 +11,6 @@ import java.util.logging.Logger;
 
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.server.Constants;
-import net.sf.colossus.server.CreatureTypeServerSide;
 import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.variant.CreatureType;
 
@@ -138,8 +137,8 @@ public final class LegionClientSide extends Legion implements
         Iterator<String> it = getContents().iterator();
         while (it.hasNext())
         {
-            CreatureTypeServerSide c = (CreatureTypeServerSide)getPlayer()
-                .getGame().getVariant().getCreatureByName(it.next());
+            CreatureType c = getPlayer().getGame().getVariant()
+                .getCreatureByName(it.next());
             if (c.isSummonable())
             {
                 count++;
@@ -264,8 +263,8 @@ public final class LegionClientSide extends Legion implements
             }
             else
             {
-                CreatureTypeServerSide creature = (CreatureTypeServerSide)getPlayer()
-                    .getGame().getVariant().getCreatureByName(name);
+                CreatureType creature = getPlayer().getGame().getVariant()
+                    .getCreatureByName(name);
                 if (creature != null && creature.isLord())
                 {
                     count++;
@@ -277,14 +276,14 @@ public final class LegionClientSide extends Legion implements
 
     public String bestSummonable()
     {
-        CreatureTypeServerSide best = null;
+        CreatureType best = null;
 
         Iterator<String> it = getContents().iterator();
         while (it.hasNext())
         {
             String name = it.next();
-            CreatureTypeServerSide creature = (CreatureTypeServerSide)getPlayer()
-                .getGame().getVariant().getCreatureByName(name);
+            CreatureType creature = getPlayer().getGame().getVariant()
+                .getCreatureByName(name);
             if (creature.isSummonable())
             {
                 if (best == null
@@ -320,13 +319,13 @@ public final class LegionClientSide extends Legion implements
                 PlayerClientSide info = getPlayer();
                 // Titan skill is changed by variants.
                 sum += info.getTitanPower()
-                    * ((CreatureTypeServerSide)getPlayer().getGame()
-                        .getVariant().getCreatureByName("Titan")).getSkill();
+                    * (getPlayer().getGame().getVariant()
+                        .getCreatureByName("Titan")).getSkill();
             }
             else
             {
-                sum += ((CreatureTypeServerSide)getPlayer().getGame()
-                    .getVariant().getCreatureByName(name)).getPointValue();
+                sum += (getPlayer().getGame().getVariant()
+                    .getCreatureByName(name)).getPointValue();
             }
         }
         return sum;
@@ -348,13 +347,13 @@ public final class LegionClientSide extends Legion implements
                 PlayerClientSide info = getPlayer();
                 // Titan skill is changed by variants.
                 sum += info.getTitanPower()
-                    * ((CreatureTypeServerSide)getPlayer().getGame()
-                        .getVariant().getCreatureByName("Titan")).getSkill();
+                    * (getPlayer().getGame().getVariant()
+                        .getCreatureByName("Titan")).getSkill();
             }
             else
             {
-                sum += ((CreatureTypeServerSide)getPlayer().getGame()
-                    .getVariant().getCreatureByName(name)).getPointValue();
+                sum += (getPlayer().getGame().getVariant()
+                    .getCreatureByName(name)).getPointValue();
             }
         }
         return sum;
@@ -490,10 +489,10 @@ public final class LegionClientSide extends Legion implements
             {
                 return 1;
             }
-            CreatureTypeServerSide c1 = (CreatureTypeServerSide)VariantSupport
-                .getCurrentVariant().getCreatureByName(s1);
-            CreatureTypeServerSide c2 = (CreatureTypeServerSide)VariantSupport
-                .getCurrentVariant().getCreatureByName(s2);
+            CreatureType c1 = VariantSupport.getCurrentVariant()
+                .getCreatureByName(s1);
+            CreatureType c2 = VariantSupport.getCurrentVariant()
+                .getCreatureByName(s2);
             return c2.getKillValue() - c1.getKillValue();
         }
     }

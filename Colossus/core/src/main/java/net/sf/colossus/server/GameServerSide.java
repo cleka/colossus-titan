@@ -213,8 +213,7 @@ public final class GameServerSide extends net.sf.colossus.game.Game
         // No longer need the player name and type options.
         options.clearPlayerInfo();
 
-        ((CreatureTypeServerSide)getVariant().getCreatureByName("Titan"))
-            .setMaxCount(getNumPlayers());
+        getVariant().getCreatureByName("Titan").setMaxCount(getNumPlayers());
     }
 
     /** Start a new game. */
@@ -1465,8 +1464,8 @@ public final class GameServerSide extends net.sf.colossus.game.Game
                 String creatureName = el.getAttribute("name").getValue();
                 int remaining = el.getAttribute("remaining").getIntValue();
                 int dead = el.getAttribute("dead").getIntValue();
-                CreatureTypeServerSide creature = (CreatureTypeServerSide)getVariant()
-                    .getCreatureByName(creatureName);
+                CreatureType creature = getVariant().getCreatureByName(
+                    creatureName);
 
                 caretaker.setCount(creature, remaining);
                 caretaker.setDeadCount(creature, dead);
@@ -1814,8 +1813,7 @@ public final class GameServerSide extends net.sf.colossus.game.Game
         String recruitName)
     {
         List<CreatureType> recruiters;
-        CreatureTypeServerSide recruit = (CreatureTypeServerSide)getVariant()
-            .getCreatureByName(recruitName);
+        CreatureType recruit = getVariant().getCreatureByName(recruitName);
         if (recruit == null)
         {
             return new ArrayList<CreatureType>();
@@ -2433,7 +2431,7 @@ public final class GameServerSide extends net.sf.colossus.game.Game
     }
 
     // Called by both human and AI.
-    void doSummon(Legion legion, Legion donor, CreatureTypeServerSide angel)
+    void doSummon(Legion legion, Legion donor, CreatureType angel)
     {
         PlayerServerSide player = getActivePlayer();
 
@@ -2633,7 +2631,7 @@ public final class GameServerSide extends net.sf.colossus.game.Game
 
             for (CreatureType creature : creatures)
             {
-                if (((CreatureTypeServerSide)creature).isLord())
+                if ((creature).isLord())
                 {
                     numLords++;
                 }

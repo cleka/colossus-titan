@@ -922,11 +922,10 @@ public final class Server implements IServer
                 + " illegally called doSummon()");
             return;
         }
-        CreatureTypeServerSide creature = null;
+        CreatureType creature = null;
         if (angel != null)
         {
-            creature = (CreatureTypeServerSide)game.getVariant()
-                .getCreatureByName(angel);
+            creature = game.getVariant().getCreatureByName(angel);
         }
         game.doSummon(legion, donor, creature);
     }
@@ -973,14 +972,12 @@ public final class Server implements IServer
             || game.getPhase() == Constants.Phase.FIGHT)
         {
             ((LegionServerSide)legion).sortCritters();
-            CreatureTypeServerSide recruit = null;
-            CreatureTypeServerSide recruiter = null;
+            CreatureType recruit = null;
+            CreatureType recruiter = null;
             if (recruitName != null)
             {
-                recruit = (CreatureTypeServerSide)game.getVariant()
-                    .getCreatureByName(recruitName);
-                recruiter = (CreatureTypeServerSide)game.getVariant()
-                    .getCreatureByName(recruiterName);
+                recruit = game.getVariant().getCreatureByName(recruitName);
+                recruiter = game.getVariant().getCreatureByName(recruiterName);
                 if (recruit != null)
                 {
                     game.doRecruit(legion, recruit, recruiter);

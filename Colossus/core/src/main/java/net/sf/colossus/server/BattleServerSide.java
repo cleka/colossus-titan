@@ -544,8 +544,7 @@ public final class BattleServerSide extends net.sf.colossus.game.Battle
                                 critter.getMarkerId()) && !bogey
                             .isInContact(false)))
                     {
-                        entryCost = neighbor.getEntryCost(critter
-                            .getCreature(), reverseDir, getGame().getOption(
+                        entryCost = neighbor.getEntryCost(critter.getType(), reverseDir, getGame().getOption(
                             Options.cumulativeSlow));
                     }
                     else
@@ -574,7 +573,7 @@ public final class BattleServerSide extends net.sf.colossus.game.Battle
                     // Fliers can fly over any hex for 1 movement point,
                     // but some Hex cannot be flown over by some creatures.
                     if (flies && movesLeft > 1
-                        && neighbor.canBeFlownOverBy(critter.getCreature()))
+                        && neighbor.canBeFlownOverBy(critter.getType()))
                     {
                         set.addAll(findMoves(neighbor, critter, flies,
                             movesLeft - 1, reverseDir, ignoreMobileAllies,
@@ -710,7 +709,7 @@ public final class BattleServerSide extends net.sf.colossus.game.Battle
             {
                 CreatureServerSide critter = it.next();
                 int dam = critter.getCurrentHex().damageToCreature(
-                    critter.getCreature());
+                    critter.getType());
                 if (dam > 0)
                 {
                     critter.wound(dam);
@@ -821,7 +820,7 @@ public final class BattleServerSide extends net.sf.colossus.game.Battle
                 donor = ((PlayerServerSide)player).getDonor();
                 if (donor != null)
                 {
-                    donor.addCreature(critter.getCreature(), false);
+                    donor.addCreature(critter.getType(), false);
                     server.allTellAddCreature(donor, critter.getName(), true,
                         Constants.reasonUndoSummon);
                     // This summon doesn't count; the player can

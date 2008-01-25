@@ -1,7 +1,9 @@
 package Balrog;
 
+
 import java.util.Set;
 
+import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.HazardTerrain;
 
 
@@ -13,7 +15,7 @@ import net.sf.colossus.variant.HazardTerrain;
  * @version $Id$
  * @author Romain Dolbeau
  */
-public class CreatureBalrog extends net.sf.colossus.server.CreatureTypeServerSide
+public class CreatureBalrog extends CreatureType
 {
     private int localMaxCount;
 

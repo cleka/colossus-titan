@@ -10,9 +10,9 @@ import java.util.Set;
 
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.server.Constants;
-import net.sf.colossus.server.CreatureTypeServerSide;
 import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.util.Combos;
+import net.sf.colossus.variant.CreatureType;
 
 
 /**
@@ -528,8 +528,8 @@ public class PredictSplitNode implements Comparable<PredictSplitNode>
             int totalKillValue = 0;
             for (String name : li)
             {
-                CreatureTypeServerSide creature = (CreatureTypeServerSide)VariantSupport
-                    .getCurrentVariant().getCreatureByName(name);
+                CreatureType creature = VariantSupport.getCurrentVariant()
+                    .getCreatureByName(name);
                 totalKillValue += creature.getKillValue();
             }
             if ((bestKillValue < 0)

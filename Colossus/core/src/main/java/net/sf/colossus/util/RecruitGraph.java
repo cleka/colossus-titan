@@ -14,9 +14,9 @@ import java.util.logging.Logger;
 import net.sf.colossus.client.CaretakerInfo;
 import net.sf.colossus.client.LegionClientSide;
 import net.sf.colossus.game.Legion;
-import net.sf.colossus.server.CreatureTypeServerSide;
 import net.sf.colossus.server.CustomRecruitBase;
 import net.sf.colossus.server.VariantSupport;
+import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
 
@@ -404,7 +404,7 @@ public class RecruitGraph
     {
         List<RecruitEdge> allEdge = getIncomingEdges(recruit);
         RecruitVertex source = getVertex(recruiter);
-        CreatureTypeServerSide recruiterCre = (CreatureTypeServerSide)VariantSupport.getCurrentVariant()
+        CreatureType recruiterCre = VariantSupport.getCurrentVariant()
             .getCreatureByName(recruiter);
         // if the recruiter is a special such as Anything, avoid
         // crashing with NullPointerException
@@ -605,7 +605,7 @@ public class RecruitGraph
         while (it.hasNext())
         {
             RecruitVertex v2 = it.next();
-            CreatureTypeServerSide creature = (CreatureTypeServerSide)VariantSupport.getCurrentVariant()
+            CreatureType creature = VariantSupport.getCurrentVariant()
                 .getCreatureByName(v2.getCreatureName());
             int vp = (creature == null ? -1 : creature.getPointValue());
             if (vp > maxVP)

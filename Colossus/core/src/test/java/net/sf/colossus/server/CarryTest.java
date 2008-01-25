@@ -7,6 +7,7 @@ import junit.framework.TestCase;
 import net.sf.colossus.client.BattleHex;
 import net.sf.colossus.client.HexMap;
 import net.sf.colossus.game.Player;
+import net.sf.colossus.variant.CreatureType;
 
 
 /** 
@@ -21,18 +22,18 @@ public class CarryTest extends TestCase
     BattleServerSide battle;
     LegionServerSide attacker;
     LegionServerSide defender;
-    CreatureTypeServerSide cyclops;
-    CreatureTypeServerSide troll;
-    CreatureTypeServerSide ogre;
-    CreatureTypeServerSide ranger;
-    CreatureTypeServerSide gorgon;
-    CreatureTypeServerSide lion;
-    CreatureTypeServerSide griffon;
-    CreatureTypeServerSide hydra;
-    CreatureTypeServerSide centaur;
-    CreatureTypeServerSide colossus;
-    CreatureTypeServerSide gargoyle;
-    CreatureTypeServerSide warlock;
+    CreatureType cyclops;
+    CreatureType troll;
+    CreatureType ogre;
+    CreatureType ranger;
+    CreatureType gorgon;
+    CreatureType lion;
+    CreatureType griffon;
+    CreatureType hydra;
+    CreatureType centaur;
+    CreatureType colossus;
+    CreatureType gargoyle;
+    CreatureType warlock;
 
     Player red;
     Player blue;
@@ -51,28 +52,28 @@ public class CarryTest extends TestCase
         red = game.addPlayer("Red", "SimpleAI");
         blue = game.addPlayer("Blue", "SimpleAI");
 
-        cyclops = (CreatureTypeServerSide)game.getVariant().getCreatureByName("Cyclops");
-        troll = (CreatureTypeServerSide)game.getVariant().getCreatureByName("Troll");
-        ogre = (CreatureTypeServerSide)game.getVariant().getCreatureByName("Ogre");
-        ranger = (CreatureTypeServerSide)game.getVariant().getCreatureByName("Ranger");
-        gorgon = (CreatureTypeServerSide)game.getVariant().getCreatureByName("Gorgon");
-        lion = (CreatureTypeServerSide)game.getVariant().getCreatureByName("Lion");
-        griffon = (CreatureTypeServerSide)game.getVariant().getCreatureByName("Griffon");
-        hydra = (CreatureTypeServerSide)game.getVariant().getCreatureByName("Hydra");
-        centaur = (CreatureTypeServerSide)game.getVariant().getCreatureByName("Centaur");
-        colossus = (CreatureTypeServerSide)game.getVariant().getCreatureByName("Colossus");
-        gargoyle = (CreatureTypeServerSide)game.getVariant().getCreatureByName("Gargoyle");
-        warlock = (CreatureTypeServerSide)game.getVariant().getCreatureByName("Warlock");
+        cyclops = game.getVariant().getCreatureByName("Cyclops");
+        troll = game.getVariant().getCreatureByName("Troll");
+        ogre = game.getVariant().getCreatureByName("Ogre");
+        ranger = game.getVariant().getCreatureByName("Ranger");
+        gorgon = game.getVariant().getCreatureByName("Gorgon");
+        lion = game.getVariant().getCreatureByName("Lion");
+        griffon = game.getVariant().getCreatureByName("Griffon");
+        hydra = game.getVariant().getCreatureByName("Hydra");
+        centaur = game.getVariant().getCreatureByName("Centaur");
+        colossus = game.getVariant().getCreatureByName("Colossus");
+        gargoyle = game.getVariant().getCreatureByName("Gargoyle");
+        warlock = game.getVariant().getCreatureByName("Warlock");
     }
 
     public void testCarries()
     {
         String hexLabel = "35"; // Desert
 
-        attacker = new LegionServerSide("Rd03", "Rd01", hexLabel, null, red, game,
-            centaur, centaur, lion, colossus);
-        defender = new LegionServerSide("Bu03", "Bu01", hexLabel, null, blue, game,
-            hydra);
+        attacker = new LegionServerSide("Rd03", "Rd01", hexLabel, null, red,
+            game, centaur, centaur, lion, colossus);
+        defender = new LegionServerSide("Bu03", "Bu01", hexLabel, null, blue,
+            game, hydra);
 
         game.getPlayer("Red").addLegion(attacker);
         game.getPlayer("Blue").addLegion(defender);
@@ -129,7 +130,8 @@ public class CarryTest extends TestCase
         assertTrue(hydra1.getPenaltyOptions().size() == 0);
     }
 
-    private void placeCreature(CreatureServerSide creature, String battleHexLabel)
+    private void placeCreature(CreatureServerSide creature,
+        String battleHexLabel)
     {
         String terrain = battle.getTerrain();
         BattleHex battleHex = HexMap.getHexByLabel(terrain, battleHexLabel);
@@ -140,10 +142,10 @@ public class CarryTest extends TestCase
     {
         String hexLabel = "1"; // Plains
 
-        attacker = new LegionServerSide("Rd03", "Rd01", hexLabel, null, red, game,
-            warlock, warlock, colossus);
-        defender = new LegionServerSide("Bu03", "Bu01", hexLabel, null, blue, game,
-            gargoyle, ogre, ogre);
+        attacker = new LegionServerSide("Rd03", "Rd01", hexLabel, null, red,
+            game, warlock, warlock, colossus);
+        defender = new LegionServerSide("Bu03", "Bu01", hexLabel, null, blue,
+            game, gargoyle, ogre, ogre);
 
         game.getPlayer("Red").addLegion(attacker);
         game.getPlayer("Blue").addLegion(defender);

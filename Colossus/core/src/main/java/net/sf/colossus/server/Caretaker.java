@@ -48,8 +48,8 @@ public final class Caretaker
         Integer count = map.get(creatureName);
         if (count == null)
         {
-            return ((CreatureTypeServerSide)game.getVariant()
-                .getCreatureByName(creatureName)).getMaxCount();
+            return game.getVariant().getCreatureByName(creatureName)
+                .getMaxCount();
         }
         return count.intValue();
     }
@@ -111,12 +111,11 @@ public final class Caretaker
             LOGGER.log(Level.INFO, "First " + creature.getName()
                 + " recruited");
             map.put(creature.getName(), new Integer(
-                ((CreatureTypeServerSide)creature).getMaxCount() - 1));
+                (creature).getMaxCount() - 1));
         }
         else
         {
-            if (count.intValue() == ((CreatureTypeServerSide)creature)
-                .getMaxCount())
+            if (count.intValue() == (creature).getMaxCount())
             {
                 // Not quite right for immortals.
                 LOGGER.log(Level.INFO, "First " + creature.getName()
@@ -144,8 +143,7 @@ public final class Caretaker
         // count can be null if we're testing a battle.
         if (count == null)
         {
-            count = new Integer(((CreatureTypeServerSide)creature)
-                .getMaxCount() - 1);
+            count = new Integer((creature).getMaxCount() - 1);
         }
         map.put(creature.getName(), new Integer(count.intValue() + 1));
         updateDisplays(creature.getName());
@@ -212,8 +210,7 @@ public final class Caretaker
             .iterator();
         while (it.hasNext())
         {
-            CreatureTypeServerSide creature = (CreatureTypeServerSide)it
-                .next();
+            CreatureType creature = it.next();
             if (creature.isImmortal())
             {
                 String name = creature.getName();

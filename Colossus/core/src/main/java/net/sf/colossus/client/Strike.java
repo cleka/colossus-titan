@@ -9,7 +9,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.colossus.server.Constants;
-import net.sf.colossus.server.CreatureTypeServerSide;
+import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.HazardTerrain;
 
 
@@ -149,7 +149,7 @@ public final class Strike
             }
         }
 
-        CreatureTypeServerSide creature = (CreatureTypeServerSide)client.getGame().getVariant()
+        CreatureType creature = client.getGame().getVariant()
             .getCreatureByName(chit.getCreatureName());
 
         // Then do rangestrikes if applicable.  Rangestrikes are not allowed
@@ -531,9 +531,9 @@ public final class Strike
     /** Return true if the rangestrike is possible. */
     private boolean isRangestrikePossible(BattleChit chit, BattleChit target)
     {
-        CreatureTypeServerSide creature = (CreatureTypeServerSide)client.getGame().getVariant()
+        CreatureType creature = client.getGame().getVariant()
             .getCreatureByName(chit.getCreatureName());
-        CreatureTypeServerSide targetCreature = (CreatureTypeServerSide)client.getGame().getVariant()
+        CreatureType targetCreature = client.getGame().getVariant()
             .getCreatureByName(target.getCreatureName());
 
         BattleHex currentHex = client.getBattleHex(chit);
@@ -822,7 +822,7 @@ public final class Strike
     {
         BattleHex hex = client.getBattleHex(chit);
         BattleHex targetHex = client.getBattleHex(target);
-        CreatureTypeServerSide striker = (CreatureTypeServerSide)client.getGame().getVariant()
+        CreatureType striker = client.getGame().getVariant()
             .getCreatureByName(chit.getCreatureName());
 
         int dice;

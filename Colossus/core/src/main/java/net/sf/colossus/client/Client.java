@@ -38,7 +38,6 @@ import net.sf.colossus.game.Game;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.server.Constants;
-import net.sf.colossus.server.CreatureTypeServerSide;
 import net.sf.colossus.server.Dice;
 import net.sf.colossus.server.GameServerSide;
 import net.sf.colossus.server.IServer;
@@ -868,7 +867,7 @@ public final class Client implements IClient, IOracle
             public void booleanOptionChanged(String optname, boolean oldValue,
                 boolean newValue)
             {
-                CreatureTypeServerSide.setNoBaseColor(newValue);
+                CreatureType.setNoBaseColor(newValue);
                 net.sf.colossus.util.ResourceLoader.purgeImageCache();
                 repaintAllWindows();
             }
@@ -2114,14 +2113,14 @@ public final class Client implements IClient, IOracle
         }
     }
 
-    CreatureTypeServerSide chooseBestPotentialRecruit(Legion legion,
-        String hexLabel, List<CreatureType> recruits)
+    CreatureType chooseBestPotentialRecruit(Legion legion, String hexLabel,
+        List<CreatureType> recruits)
     {
         MasterHex hex = getGame().getVariant().getMasterBoard().getHexByLabel(
             hexLabel);
         // NOTE! Below the simpleAI is an object, not class! 
-        CreatureTypeServerSide recruit = (CreatureTypeServerSide)simpleAI
-            .getVariantRecruitHint(legion, hex, recruits);
+        CreatureType recruit = simpleAI.getVariantRecruitHint(legion, hex,
+            recruits);
         return recruit;
     }
 
@@ -3809,8 +3808,8 @@ public final class Client implements IClient, IOracle
         {
             BattleChit target = getBattleChit(targetHexLabel);
             target.setStrikeNumber(strike.getStrikeNumber(chit, target));
-            CreatureTypeServerSide striker = (CreatureTypeServerSide)game
-                .getVariant().getCreatureByName(chit.getCreatureName());
+            CreatureType striker = game.getVariant().getCreatureByName(
+                chit.getCreatureName());
             int dice;
             if (striker.isTitan())
             {
@@ -3946,8 +3945,8 @@ public final class Client implements IClient, IOracle
         {
             for (String name : ((LegionClientSide)legion).getContents())
             {
-                CreatureTypeServerSide creature = (CreatureTypeServerSide)game
-                    .getVariant().getCreatureByName(name);
+                CreatureType creature = game.getVariant().getCreatureByName(
+                    name);
                 if (creature != null && creature.isLord()
                     && !lords.contains(name))
                 {
@@ -4294,8 +4293,8 @@ public final class Client implements IClient, IOracle
     public List<String> findEligibleRecruiters(Legion info, String recruitName)
     {
         Set<CreatureType> recruiters;
-        CreatureTypeServerSide recruit = (CreatureTypeServerSide)game
-            .getVariant().getCreatureByName(recruitName);
+        CreatureType recruit = game.getVariant()
+            .getCreatureByName(recruitName);
         if (recruit == null)
         {
             return new ArrayList<String>();

@@ -5,6 +5,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.HazardTerrain;
 
 
@@ -15,17 +16,19 @@ import net.sf.colossus.variant.HazardTerrain;
  * Game related info is in Critter.  Counts of
  * recruited/available/dead are in Caretaker.
  * 
- * TODO this class doesn't really fulfill the whole {@link CreatureTypeServerSide} interface
+ * TODO this class doesn't really fulfill the whole {@link CreatureType} interface
  * since it can't handle getPower() at the moment (and thus some other things don't
  * work). The solution could be to consider each Titan a type of creature of his
  * own, distinguished by the Player owning them, which then could be stored as
  * member in the class, delegating {@link #getPower()} to {@link PlayerServerSide#getTitanPower()}.
+ * 
+ * TODO this should probably be in the variant package
  *
  * @version $Id$
  * @author Romain Dolbeau
  */
 
-public class CreatureTitan extends CreatureTypeServerSide
+public class CreatureTitan extends CreatureType
 {
     private static final Logger LOGGER = Logger.getLogger(CreatureTitan.class
         .getName());

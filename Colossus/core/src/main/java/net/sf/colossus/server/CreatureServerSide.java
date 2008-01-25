@@ -25,7 +25,7 @@ import net.sf.colossus.variant.HazardTerrain;
 /**
  * Class Critter represents an individual Titan Character.
  * 
- * TODO this duplicates functionality from the {@link CreatureTypeServerSide} class,
+ * TODO this duplicates functionality from the {@link CreatureType} class,
  * mostly due to the fact that the latter doesn't handle the Titans
  * properly
  * 
@@ -128,15 +128,6 @@ public class CreatureServerSide extends Creature
         this.battle = battle;
     }
 
-    /**
-     * TODO MODEL -- getType() should be used once everything needed is moved
-     *      up into the CreatureType class
-     */
-    CreatureTypeServerSide getCreature()
-    {
-        return (CreatureTypeServerSide)getType();
-    }
-
     String getMarkerId()
     {
         return legion.getMarkerId();
@@ -187,7 +178,7 @@ public class CreatureServerSide extends Creature
                 return 6;
             }
         }
-        return getCreature().getPower();
+        return getType().getPower();
     }
 
     int getHits()
@@ -856,32 +847,32 @@ public class CreatureServerSide extends Creature
 
     public String getName()
     {
-        return getCreature().getName();
+        return getType().getName();
     }
 
     public int getMaxCount()
     {
-        return getCreature().getMaxCount();
+        return getType().getMaxCount();
     }
 
     public boolean isLord()
     {
-        return getCreature().isLord();
+        return getType().isLord();
     }
 
     public boolean isDemiLord()
     {
-        return getCreature().isDemiLord();
+        return getType().isDemiLord();
     }
 
     public boolean isLordOrDemiLord()
     {
-        return getCreature().isLordOrDemiLord();
+        return getType().isLordOrDemiLord();
     }
 
     public boolean isImmortal()
     {
-        return getCreature().isImmortal();
+        return getType().isImmortal();
     }
 
     public boolean isTitan()
@@ -891,17 +882,17 @@ public class CreatureServerSide extends Creature
 
     public String getPluralName()
     {
-        return getCreature().getPluralName();
+        return getType().getPluralName();
     }
 
     public String[] getImageNames()
     {
-        return getCreature().getImageNames();
+        return getType().getImageNames();
     }
 
     public int getSkill()
     {
-        return getCreature().getSkill();
+        return getType().getSkill();
     }
 
     public int getPointValue()
@@ -916,7 +907,7 @@ public class CreatureServerSide extends Creature
         // Must use our local, Titan-aware getPointValue()
         // return getCreature().getHintedRecruitmentValue();
         return getPointValue()
-            + VariantSupport.getHintedRecruitmentValueOffset(getCreature()
+            + VariantSupport.getHintedRecruitmentValueOffset(getType()
                 .getName());
     }
 
@@ -925,88 +916,88 @@ public class CreatureServerSide extends Creature
         // Must use our local, Titan-aware getPointValue()
         // return getCreature().getHintedRecruitmentValue(section);
         return getPointValue()
-            + VariantSupport.getHintedRecruitmentValueOffset(getCreature()
+            + VariantSupport.getHintedRecruitmentValueOffset(getType()
                 .getName(), section);
     }
 
     public boolean isRangestriker()
     {
-        return getCreature().isRangestriker();
+        return getType().isRangestriker();
     }
 
     public boolean isFlier()
     {
-        return getCreature().isFlier();
+        return getType().isFlier();
     }
 
     public boolean isNativeTerrain(HazardTerrain t)
     {
-        return getCreature().isNativeIn(t);
+        return getType().isNativeIn(t);
     }
 
     public boolean isNativeHexside(char h)
     {
-        return getCreature().isNativeHexside(h);
+        return getType().isNativeHexside(h);
     }
 
     public boolean isNativeBramble()
     {
-        return getCreature().isNativeIn(HazardTerrain.BRAMBLES);
+        return getType().isNativeIn(HazardTerrain.BRAMBLES);
     }
 
     public boolean isNativeDrift()
     {
-        return getCreature().isNativeIn(HazardTerrain.DRIFT);
+        return getType().isNativeIn(HazardTerrain.DRIFT);
     }
 
     public boolean isNativeBog()
     {
-        return getCreature().isNativeIn(HazardTerrain.BOG);
+        return getType().isNativeIn(HazardTerrain.BOG);
     }
 
     public boolean isNativeSandDune()
     {
-        return getCreature().isNativeIn(HazardTerrain.SAND);
+        return getType().isNativeIn(HazardTerrain.SAND);
     }
 
     public boolean isNativeSlope()
     {
-        return getCreature().isNativeSlope();
+        return getType().isNativeSlope();
     }
 
     public boolean isNativeVolcano()
     {
-        return getCreature().isNativeIn(HazardTerrain.VOLCANO);
+        return getType().isNativeIn(HazardTerrain.VOLCANO);
     }
 
     public boolean isNativeRiver()
     {
-        return getCreature().isNativeRiver();
+        return getType().isNativeRiver();
     }
 
     public boolean isNativeStone()
     {
-        return getCreature().isNativeIn(HazardTerrain.STONE);
+        return getType().isNativeIn(HazardTerrain.STONE);
     }
 
     public boolean isNativeTree()
     {
-        return getCreature().isNativeIn(HazardTerrain.TREE);
+        return getType().isNativeIn(HazardTerrain.TREE);
     }
 
     public boolean isWaterDwelling()
     {
-        return getCreature().isWaterDwelling();
+        return getType().isWaterDwelling();
     }
 
     public boolean useMagicMissile()
     {
-        return getCreature().useMagicMissile();
+        return getType().useMagicMissile();
     }
 
     public boolean isSummonable()
     {
-        return getCreature().isSummonable();
+        return getType().isSummonable();
     }
 
     // TODO noone seems to be calling this, so we might as well remove it
@@ -1015,7 +1006,7 @@ public class CreatureServerSide extends Creature
     @Override
     public String toString()
     {
-        return getCreature().toString();
+        return getType().toString();
     }
 
     // TODO only hashCode() but not equals() is overridden. This implementation
@@ -1024,6 +1015,6 @@ public class CreatureServerSide extends Creature
     @Override
     public int hashCode()
     {
-        return getCreature().hashCode();
+        return getType().hashCode();
     }
 }

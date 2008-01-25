@@ -4,6 +4,9 @@ package net.sf.colossus.variant;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.logging.Logger;
+
+import net.sf.colossus.server.VariantSupport;
 
 
 /**
@@ -14,6 +17,9 @@ import java.util.Set;
  */
 public class CreatureType
 {
+    private static final Logger LOGGER = Logger.getLogger(CreatureType.class
+        .getName());
+
     /**
      * A comparator sorting creature types by name.
      */
@@ -25,16 +31,51 @@ public class CreatureType
         }
     };
 
+    private static boolean noBaseColor = false;
+
+    public static void setNoBaseColor(boolean b)
+    {
+        noBaseColor = b;
+    }
+
     private final String name;
 
     private final String pluralName;
+
+    private final int power;
+
+    private final int skill;
+
+    private final boolean rangestrikes;
+
+    private final boolean flies;
+
+    private final boolean nativeSlope;
+
+    private final boolean nativeRiver;
+
+    private final boolean waterDwelling;
+
+    private final boolean magicMissile;
+
+    private final boolean lord;
+
+    private final boolean demilord;
+
+    private int maxCount;
+
+    private final String baseColor;
 
     private final Set<HazardTerrain> nativeTerrains = new HashSet<HazardTerrain>();
 
     private final boolean isSummonable;
 
-    public CreatureType(String name, String pluralName,
-        Set<HazardTerrain> nativeTerrains, boolean isSummonable)
+    public CreatureType(String name, int power, int skill,
+        boolean rangestrikes, boolean flies,
+        Set<HazardTerrain> nativeTerrains, boolean nativeSlope,
+        boolean nativeRiver, boolean waterDwelling, boolean magicMissile,
+        boolean summonable, boolean lord, boolean demilord, int maxCount,
+        String pluralName, String baseColor)
     {
         this.name = name;
         this.pluralName = pluralName;
@@ -42,7 +83,26 @@ public class CreatureType
         // defensive, but shallow copy of terrains
         this.nativeTerrains.addAll(nativeTerrains);
 
-        this.isSummonable = isSummonable;
+        this.isSummonable = summonable;
+        this.power = power;
+        this.skill = skill;
+        this.rangestrikes = rangestrikes;
+        this.flies = flies;
+        this.nativeSlope = nativeSlope;
+        this.nativeRiver = nativeRiver;
+        this.waterDwelling = waterDwelling;
+        this.magicMissile = magicMissile;
+        this.lord = lord;
+        this.demilord = demilord;
+        this.maxCount = maxCount;
+        this.baseColor = baseColor;
+
+        /* warn about likely inappropriate combinations */
+        if (waterDwelling && isNativeIn(HazardTerrain.SAND))
+        {
+            LOGGER.warning("Creature " + name
+                + " is both a Water Dweller and native to Sand and Dune.");
+        }
     }
 
     /**
@@ -106,5 +166,232 @@ public class CreatureType
     public String toString()
     {
         return getName();
+    }
+
+    /** Compare by name. */
+    @Override
+    public final boolean equals(Object object)
+    {
+        if (object.getClass() != this.getClass())
+        {
+            return false;
+        }
+        CreatureType other = (CreatureType)object;
+        return getName().equals(other.getName());
+    }
+
+    public int getMaxCount()
+    {
+        return maxCount;
+    }
+
+    /** Only called on Titans after numPlayers is known. */
+    public void setMaxCount(int maxCount)
+    {
+        this.maxCount = maxCount;
+    }
+
+    public boolean isLord()
+    {
+        return lord;
+    }
+
+    public boolean isDemiLord()
+    {
+        return demilord;
+    }
+
+    public boolean isLordOrDemiLord()
+    {
+        return (isLord() || isDemiLord());
+    }
+
+    public boolean isImmortal()
+    { // might not the same for derived class
+        return isLordOrDemiLord();
+    }
+
+    /** true if any if the values can change during the game returned by:
+     * - getPower, getSkill, (and therefore getPointValue)
+     * - isRangestriker, isFlier, useMagicMissile
+     * - isNativeTerraion(t), for all t
+     * - isNativeHexSide(h) for all h
+     * In Standard game only the titans change their attributes
+     */
+    public boolean canChangeValue()
+    {
+        return isTitan();
+    }
+
+    protected String getImageName()
+    {
+        return getName();
+    }
+
+    public String[] getImageNames()
+    {
+        String[] tempNames;
+        if (baseColor != null)
+        {
+            int specialIncrement = ((isFlier() || isRangestriker()) ? 1 : 0);
+            tempNames = new String[4 + specialIncrement];
+            String colorSuffix = "-" + (noBaseColor ? "black" : baseColor);
+            tempNames[0] = getImageName();
+            tempNames[1] = "Power-" + getPower() + colorSuffix;
+
+            tempNames[2] = "Skill-" + getSkill() + colorSuffix;
+            tempNames[3] = getName() + "-Name" + colorSuffix;
+            if (specialIncrement > 0)
+            {
+                tempNames[4] = (isFlier() ? "Flying" : "")
+                    + (isRangestriker() ? "Rangestrike" : "") + colorSuffix;
+            }
+        }
+        else
+        {
+            tempNames = new String[1];
+            tempNames[0] = getImageName();
+        }
+        return tempNames;
+    }
+
+    public int getPower()
+    {
+        return power;
+    }
+
+    public int getSkill()
+    {
+        return skill;
+    }
+
+    public int getPointValue()
+    { // this function is replicated in Critter
+        return getPower() * getSkill();
+    }
+
+    public int getHintedRecruitmentValue()
+    { // this function is replicated in Critter
+        return getPointValue()
+            + VariantSupport.getHintedRecruitmentValueOffset(getName());
+    }
+
+    public int getHintedRecruitmentValue(String[] section)
+    { // this function is replicated in Critter
+        return getPointValue()
+            + VariantSupport.getHintedRecruitmentValueOffset(getName(),
+                section);
+    }
+
+    public boolean isRangestriker()
+    {
+        return rangestrikes;
+    }
+
+    public boolean isFlier()
+    {
+        return flies;
+    }
+
+    public boolean isNativeHexside(char h)
+    {
+        switch (h)
+        {
+            default:
+                return false;
+
+            case ' ': /* undefined */
+                return false;
+
+            case 'd':
+                return isNativeIn(HazardTerrain.SAND);
+
+            case 'c': /* undefined */
+                return false;
+
+            case 's':
+                return isNativeSlope();
+
+            case 'w': /* undefined, beneficial for everyone */
+                return true;
+
+            case 'r':
+                return isNativeRiver();
+        }
+    }
+
+    public boolean isNativeSlope()
+    {
+        return nativeSlope;
+    }
+
+    public boolean isNativeRiver()
+    {
+        return nativeRiver;
+    }
+
+    public boolean isWaterDwelling()
+    {
+        return waterDwelling;
+    }
+
+    public boolean useMagicMissile()
+    {
+        return magicMissile;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return getName().hashCode();
+    }
+
+    public String getBaseColor()
+    {
+        if (baseColor != null)
+        {
+            return baseColor;
+        }
+        else
+        {
+            return "";
+        }
+    }
+
+    /** 
+     * Get the non-terrainified part of the kill-value.
+     * 
+     * TODO this is not model, but AI related (but also used in client for
+     * sorting creatures -- the client uses the AI for recruit hints, too) 
+     */
+    public int getKillValue()
+    {
+        int val = 10 * getPointValue();
+        final int skill = getSkill();
+        if (skill >= 4)
+        {
+            val += 2;
+        }
+        else if (skill <= 2)
+        {
+            val += 1;
+        }
+        if (isFlier())
+        {
+            val += 4;
+        }
+        if (isRangestriker())
+        {
+            val += 5;
+        }
+        if (useMagicMissile())
+        {
+            val += 4;
+        }
+        if (isTitan())
+        {
+            val += 1000;
+        }
+        return val;
     }
 }

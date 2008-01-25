@@ -13,7 +13,6 @@ import java.util.logging.Logger;
 
 import net.sf.colossus.client.PlayerClientSide;
 import net.sf.colossus.game.Player;
-import net.sf.colossus.server.CreatureTypeServerSide;
 import net.sf.colossus.server.CustomRecruitBase;
 import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.variant.CreatureType;
@@ -53,7 +52,7 @@ public class BalrogRecruitment extends CustomRecruitBase
             .getCreatureTypes().iterator();
         while (it.hasNext())
         {
-            CreatureTypeServerSide cre = (CreatureTypeServerSide)it.next();
+            CreatureType cre = it.next();
             if (cre.getName().startsWith(balrogPrefix))
             {
                 temp.add(cre);
@@ -162,8 +161,8 @@ public class BalrogRecruitment extends CustomRecruitBase
             return;
         }
 
-        CreatureTypeServerSide cre = (CreatureTypeServerSide)VariantSupport
-            .getCurrentVariant().getCreatureByName(name);
+        CreatureType cre = VariantSupport.getCurrentVariant()
+            .getCreatureByName(name);
         ((CreatureBalrog)cre).setNewMaxCount(nowNumber);
 
         int difference = nowNumber - alreadyNumber;

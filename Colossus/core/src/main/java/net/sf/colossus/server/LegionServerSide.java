@@ -54,7 +54,7 @@ public final class LegionServerSide extends net.sf.colossus.game.Legion
      */
     public LegionServerSide(String markerId, String parentId,
         String currentHexLabel, String startingHexLabel, Player player,
-        GameServerSide game, CreatureTypeServerSide... creatureTypes)
+        GameServerSide game, CreatureType... creatureTypes)
     {
         super(player, markerId);
         this.parentId = parentId;
@@ -67,7 +67,7 @@ public final class LegionServerSide extends net.sf.colossus.game.Legion
         this.startingHexLabel = startingHexLabel;
         this.game = game;
 
-        for (CreatureTypeServerSide creature : creatureTypes)
+        for (CreatureType creature : creatureTypes)
         {
             assert creature != null : "Null creature not allowed";
             getCreatures().add(new CreatureServerSide(creature, this, game));
@@ -77,29 +77,21 @@ public final class LegionServerSide extends net.sf.colossus.game.Legion
     static LegionServerSide getStartingLegion(String markerId,
         String hexLabel, Player player, GameServerSide game)
     {
-        CreatureTypeServerSide[] startCre = TerrainRecruitLoader
+        CreatureType[] startCre = TerrainRecruitLoader
             .getStartingCreatures(game.getVariant().getMasterBoard()
                 .getHexByLabel(hexLabel).getTerrain());
-        LegionServerSide legion = new LegionServerSide(
-            markerId,
-            null,
-            hexLabel,
-            hexLabel,
-            player,
-            game,
-            (CreatureTypeServerSide)VariantSupport.getCurrentVariant()
-                .getCreatureByName(Constants.titan),
-            (CreatureTypeServerSide)VariantSupport
-                .getCurrentVariant()
-                .getCreatureByName(TerrainRecruitLoader.getPrimaryAcquirable()),
-            startCre[2], startCre[2], startCre[0], startCre[0], startCre[1],
-            startCre[1]);
+        LegionServerSide legion = new LegionServerSide(markerId, null,
+            hexLabel, hexLabel, player, game, VariantSupport
+                .getCurrentVariant().getCreatureByName(Constants.titan),
+            VariantSupport.getCurrentVariant().getCreatureByName(
+                TerrainRecruitLoader.getPrimaryAcquirable()), startCre[2],
+            startCre[2], startCre[0], startCre[0], startCre[1], startCre[1]);
 
         Iterator<CreatureServerSide> it = legion.getCreatures().iterator();
         while (it.hasNext())
         {
             CreatureServerSide critter = it.next();
-            game.getCaretaker().takeOne(critter.getCreature());
+            game.getCaretaker().takeOne(critter.getType());
         }
         return legion;
     }
@@ -513,8 +505,8 @@ public final class LegionServerSide extends net.sf.colossus.game.Legion
     {
         if (recruitName != null)
         {
-            CreatureTypeServerSide creature = (CreatureTypeServerSide)game
-                .getVariant().getCreatureByName(recruitName);
+            CreatureType creature = game.getVariant().getCreatureByName(
+                recruitName);
             game.getCaretaker().putOneBack(creature);
             removeCreature(creature, false, true);
             recruitName = null;
@@ -607,11 +599,11 @@ public final class LegionServerSide extends net.sf.colossus.game.Legion
         {
             if (critter.isImmortal())
             {
-                game.getCaretaker().putOneBack(critter.getCreature());
+                game.getCaretaker().putOneBack(critter.getType());
             }
             else
             {
-                game.getCaretaker().putDeadOne(critter.getCreature());
+                game.getCaretaker().putDeadOne(critter.getType());
             }
         }
 
@@ -621,7 +613,7 @@ public final class LegionServerSide extends net.sf.colossus.game.Legion
             remove(false, true);
         }
         // return a Creature, not a Critter
-        return critter.getCreature();
+        return critter.getType();
     }
 
     /** Remove the first creature matching the passed creature's type
@@ -660,7 +652,7 @@ public final class LegionServerSide extends net.sf.colossus.game.Legion
         // pulled back out later.
         if (returnToStacks)
         {
-            game.getCaretaker().putDeadOne(critter.getCreature());
+            game.getCaretaker().putDeadOne(critter.getType());
         }
         if (updateHistory)
         {

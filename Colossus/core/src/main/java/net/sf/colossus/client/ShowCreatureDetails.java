@@ -22,7 +22,6 @@ import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 
-import net.sf.colossus.server.CreatureTypeServerSide;
 import net.sf.colossus.server.CreatureServerSide;
 import net.sf.colossus.server.LegionServerSide;
 import net.sf.colossus.server.VariantSupport;
@@ -76,7 +75,7 @@ public final class ShowCreatureDetails extends KDialog implements
      * @param pane if 'point' is not null it is relative to this.
      */
     public ShowCreatureDetails(final JFrame parentFrame,
-        final CreatureTypeServerSide creature, final Point point, final JScrollPane pane)
+        final CreatureType creature, final Point point, final JScrollPane pane)
     {
         super(parentFrame, "Creature Info: " + creature.getName(), false);
 
@@ -102,7 +101,7 @@ public final class ShowCreatureDetails extends KDialog implements
      * @param creature the creature that details you want to show
      */
     public void showCreatureDetails(final Container cnt,
-        final CreatureTypeServerSide creature)
+        final CreatureType creature)
     {
         // claear all the elements
         cnt.removeAll();
@@ -335,7 +334,7 @@ public final class ShowCreatureDetails extends KDialog implements
         "cliff", "slope", "tower", "river" };
 
     /** html header and start of page. */
-    private static void _head(StringBuffer s, final CreatureTypeServerSide cr)
+    private static void _head(StringBuffer s, final CreatureType cr)
     {
         s.append("<html><head></head><body bgcolor="
             + HTMLColor.colorToCode(Color.LIGHT_GRAY) + ">");
@@ -415,7 +414,8 @@ public final class ShowCreatureDetails extends KDialog implements
 
         /** @param creature to create a critter for
          * @param hazard that stands in this hazard */
-        SimulatedCritter(final CreatureTypeServerSide creature, final HazardTerrain hazard)
+        SimulatedCritter(final CreatureType creature,
+            final HazardTerrain hazard)
         {
             super(creature, new LegionServerSide("dummy", "dummy", "dummy",
                 "dummy", null, null), null);
@@ -423,7 +423,7 @@ public final class ShowCreatureDetails extends KDialog implements
         }
 
         /** in hazard Plains. */
-        SimulatedCritter(final CreatureTypeServerSide creature)
+        SimulatedCritter(final CreatureType creature)
         {
             this(creature, HazardTerrain.PLAINS);
         }

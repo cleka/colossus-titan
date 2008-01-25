@@ -6,7 +6,6 @@ import java.awt.Color;
 import net.sf.colossus.client.BattleHex;
 import net.sf.colossus.client.Hex;
 import net.sf.colossus.client.HexMap;
-import net.sf.colossus.server.CreatureTypeServerSide;
 import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
 
@@ -115,16 +114,14 @@ public class MasterHex extends Hex
             int count = net.sf.colossus.client.HexMap
                 .getHazardSideCountInTerrain(hazardSide[i], terrain);
             if (BattleHex.isNativeBonusHexside(hazardSide[i])
-                && ((CreatureTypeServerSide)creature)
-                    .isNativeHexside(hazardSide[i]))
+                && (creature).isNativeHexside(hazardSide[i]))
             {
                 bonusHazardSideCount += count;
             }
             else
             {
                 if (BattleHex.isNonNativePenaltyHexside(hazardSide[i])
-                    && !((CreatureTypeServerSide)creature)
-                        .isNativeHexside(hazardSide[i]))
+                    && !(creature).isNativeHexside(hazardSide[i]))
                 {
                     bonusHazardSideCount -= count;
                 }

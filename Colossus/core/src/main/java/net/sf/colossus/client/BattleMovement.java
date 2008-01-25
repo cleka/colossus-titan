@@ -5,8 +5,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import net.sf.colossus.server.CreatureTypeServerSide;
 import net.sf.colossus.util.Options;
+import net.sf.colossus.variant.CreatureType;
 
 
 /**
@@ -29,9 +29,8 @@ final class BattleMovement
 
     /** Recursively find moves from this hex.  Return an array of hex IDs for
      *  all legal destinations.  Do not double back.  */
-    private Set<String> findMoves(BattleHex hex,
-        CreatureTypeServerSide creature, boolean flies, int movesLeft,
-        int cameFrom, boolean first)
+    private Set<String> findMoves(BattleHex hex, CreatureType creature,
+        boolean flies, int movesLeft, int cameFrom, boolean first)
     {
         Set<String> set = new HashSet<String>();
         for (int i = 0; i < 6; i++)
@@ -137,9 +136,8 @@ final class BattleMovement
             }
             else
             {
-                CreatureTypeServerSide creature = (CreatureTypeServerSide)client
-                    .getGame().getVariant().getCreatureByName(
-                        chit.getCreatureName());
+                CreatureType creature = client.getGame().getVariant()
+                    .getCreatureByName(chit.getCreatureName());
                 BattleHex hex = client.getBattleHex(chit);
                 set = findMoves(hex, creature, creature.isFlier(), creature
                     .getSkill(), -1, true);
