@@ -305,7 +305,7 @@ final class StatusScreen extends KDialog implements WindowListener
             towerLabel[i].setText("" + info.getStartingTower());
             elimLabel[i].setText(info.getPlayersElim());
             legionsLabel[i].setText("" + info.getNumLegions());
-            markersLabel[i].setText("" + info.getNumMarkers());
+            markersLabel[i].setText("" + info.getNumMarkersAvailable());
             creaturesLabel[i].setText("" + info.getNumCreatures());
             titanLabel[i].setText("" + info.getTitanPower());
             scoreLabel[i].setText("" + info.getScore());

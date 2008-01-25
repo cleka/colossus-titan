@@ -1,12 +1,7 @@
 package net.sf.colossus.client;
 
 
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
 
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
@@ -17,7 +12,7 @@ import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
 
 /**
- * PlayerInfo holds client-side public info about a player.
+ * This class holds client-side version of a player.
  * 
  * @version $Id$ 
  * @author David Ripton
@@ -34,10 +29,6 @@ public final class PlayerClientSide extends Player
     private int mulligansLeft;
 
     private PredictSplits predictSplits;
-
-    /** Sorted set of available legion markers for this player. */
-    private final SortedSet<String> markersAvailable = new TreeSet<String>(
-        new MarkerComparator(getShortColor()));
 
     /** 
      * Two-stage initialization at the moment, only some data here, the rest comes
@@ -89,7 +80,11 @@ public final class PlayerClientSide extends Player
         buf = data.remove(0);
         setMulligansLeft(Integer.parseInt(buf));
 
-        setMarkersAvailable(data);
+        clearMarkersAvailable();
+        for (String markerId : data)
+        {
+            addMarkerAvailable(markerId);
+        }
     }
 
     void setNumLegions(int numLegions)
@@ -102,48 +97,13 @@ public final class PlayerClientSide extends Player
         return numLegions;
     }
 
-    void setMarkersAvailable(Collection<String> markersAvailable)
-    {
-        this.markersAvailable.clear();
-        if (!markersAvailable.isEmpty())
-        {
-            this.markersAvailable.addAll(markersAvailable);
-        }
-    }
-
-    void addMarkerAvailable(String markerId)
-    {
-        markersAvailable.add(markerId);
-    }
-
-    void removeMarkerAvailable(String markerId)
-    {
-        markersAvailable.remove(markerId);
-    }
-
-    public Set<String> getMarkersAvailable()
-    {
-        return Collections.unmodifiableSortedSet(markersAvailable);
-    }
-
-    public int getNumMarkers()
-    {
-        if (markersAvailable == null)
-        {
-            return 0;
-        }
-        else
-        {
-            return markersAvailable.size();
-        }
-    }
-
     void setNumCreatures(int numCreatures)
     {
         this.numCreatures = numCreatures;
     }
 
-    int getNumCreatures()
+    @Override
+    public int getNumCreatures()
     {
         return numCreatures;
     }

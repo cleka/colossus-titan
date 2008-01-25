@@ -85,7 +85,7 @@ public class RationalAI extends SimpleAI
 
         while (!legionsToSplit.isEmpty())
         {
-            if (player.getNumMarkers() == 0)
+            if (player.getNumMarkersAvailable() == 0)
             {
                 logger.log(Level.FINEST, "No more splits. No markers left.");
                 return true; //early exit, out of markers

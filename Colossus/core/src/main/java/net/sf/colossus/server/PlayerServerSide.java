@@ -2,12 +2,8 @@ package net.sf.colossus.server;
 
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -33,8 +29,8 @@ public final class PlayerServerSide extends Player implements
         .getLogger(PlayerServerSide.class.getName());
 
     // TODO the half-points are really used only in the die(..) method,
-    // they could be summed up there and then added all in one go. Save
-    // us from storing a double and truncating things later
+    // they could be summed up there and then added all in one go. That
+    // would save us from storing a double and truncating things later
     private double score; // track half-points, then round
     private boolean summoned;
     private boolean teleported;
@@ -47,8 +43,6 @@ public final class PlayerServerSide extends Player implements
      * The legion which gave a summonable creature.
      */
     private LegionServerSide donor;
-    private final SortedSet<String> markersAvailable = Collections
-        .synchronizedSortedSet(new TreeSet<String>());
     private String firstMarker;
 
     PlayerServerSide(String name, GameServerSide game)
@@ -114,16 +108,13 @@ public final class PlayerServerSide extends Player implements
 
     void initMarkersAvailable(String shortColor)
     {
-        synchronized (markersAvailable)
+        for (int i = 1; i <= 9; i++)
         {
-            for (int i = 1; i <= 9; i++)
-            {
-                addLegionMarker(shortColor + '0' + Integer.toString(i));
-            }
-            for (int i = 10; i <= 12; i++)
-            {
-                addLegionMarker(shortColor + Integer.toString(i));
-            }
+            addMarkerAvailable(shortColor + '0' + Integer.toString(i));
+        }
+        for (int i = 10; i <= 12; i++)
+        {
+            addMarkerAvailable(shortColor + Integer.toString(i));
         }
     }
 
@@ -132,26 +123,23 @@ public final class PlayerServerSide extends Player implements
     {
         if (isDead())
         {
-            markersAvailable.clear();
+            clearMarkersAvailable();
         }
         else
         {
-            synchronized (markersAvailable)
+            initMarkersAvailable();
+            StringBuffer allVictims = new StringBuffer(getPlayersElim());
+            for (int i = 0; i < allVictims.length(); i += 2)
             {
-                initMarkersAvailable();
-                StringBuffer allVictims = new StringBuffer(getPlayersElim());
-                for (int i = 0; i < allVictims.length(); i += 2)
-                {
-                    String shortColor = allVictims.substring(i, i + 2);
-                    initMarkersAvailable(shortColor);
-                    PlayerServerSide victim = getGame().getPlayerByShortColor(
-                        shortColor);
-                    allVictims.append(victim.getPlayersElim());
-                }
-                for (Legion legion : getLegions())
-                {
-                    markersAvailable.remove(legion.getMarkerId());
-                }
+                String shortColor = allVictims.substring(i, i + 2);
+                initMarkersAvailable(shortColor);
+                PlayerServerSide victim = getGame().getPlayerByShortColor(
+                    shortColor);
+                allVictims.append(victim.getPlayersElim());
+            }
+            for (Legion legion : getLegions())
+            {
+                removeMarkerAvailable(legion.getMarkerId());
             }
         }
     }
@@ -464,71 +452,6 @@ public final class PlayerServerSide extends Player implements
         getGame().getServer().allUpdatePlayerInfo();
     }
 
-    synchronized int getNumCreatures()
-    {
-        int count = 0;
-        for (Legion legion : getLegions())
-        {
-            count += ((LegionServerSide)legion).getHeight();
-        }
-        return count;
-    }
-
-    int getNumMarkersAvailable()
-    {
-        return markersAvailable.size();
-    }
-
-    Set<String> getMarkersAvailable()
-    {
-        return Collections.unmodifiableSortedSet(markersAvailable);
-    }
-
-    String getFirstAvailableMarker()
-    {
-        synchronized (markersAvailable)
-        {
-            if (markersAvailable.isEmpty())
-            {
-                return null;
-            }
-            return markersAvailable.first();
-        }
-    }
-
-    boolean isMarkerAvailable(String markerId)
-    {
-        return markersAvailable.contains(markerId);
-    }
-
-    /** Removes the selected marker from the list of those available.
-     *  Returns the markerId if it was present, or null if it was not. */
-    String selectMarkerId(String markerId)
-    {
-        if (markersAvailable.remove(markerId))
-        {
-            return markerId;
-        }
-        else
-        {
-            return null;
-        }
-    }
-
-    void addLegionMarker(String markerId)
-    {
-        markersAvailable.add(markerId);
-    }
-
-    private void takeLegionMarkers(PlayerServerSide victim)
-    {
-        synchronized (victim.markersAvailable)
-        {
-            markersAvailable.addAll(victim.getMarkersAvailable());
-            victim.markersAvailable.clear();
-        }
-    }
-
     /** Add points to this player's score.  Update the status window
      *  to reflect the addition. */
     void addPoints(double points)
@@ -619,7 +542,11 @@ public final class PlayerServerSide extends Player implements
         if (slayer != null)
         {
             slayer.addPlayerElim(this);
-            ((PlayerServerSide)slayer).takeLegionMarkers(this);
+            for (String markerId : getMarkersAvailable())
+            {
+                slayer.addMarkerAvailable(markerId);
+            }
+            clearMarkersAvailable();
         }
 
         getGame().getServer().allUpdatePlayerInfo();
@@ -661,10 +588,7 @@ public final class PlayerServerSide extends Player implements
         li.add(Integer.toString(getTitanPower()));
         li.add(Integer.toString(getScore()));
         li.add(Integer.toString(getMulligansLeft()));
-        synchronized (markersAvailable)
-        {
-            li.addAll(getMarkersAvailable());
-        }
+        li.addAll(getMarkersAvailable());
         return Glob.glob(":", li);
     }
 

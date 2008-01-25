@@ -2,8 +2,13 @@ package net.sf.colossus.game;
 
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
+import net.sf.colossus.client.MarkerComparator;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.PlayerServerSide;
 
@@ -14,6 +19,8 @@ import net.sf.colossus.server.PlayerServerSide;
  * This class holds all information describing a player in a game, such
  * as the current legions and the score. Instances of this class are always bound to
  * an instance of {@link Game}.
+ * 
+ * TODO there is an excessive amount of methods around the markersAvailable list.
  */
 public class Player
 {
@@ -89,6 +96,12 @@ public class Player
      * TODO this should really be a List<Player>
      */
     private String playersEliminated = "";
+
+    /**
+     * Sorted set of available legion markers for this player. 
+     */
+    private final SortedSet<String> markersAvailable = new TreeSet<String>(
+        new MarkerComparator(getShortColor()));
 
     public Player(Game game, String playerName, int number)
     {
@@ -248,6 +261,72 @@ public class Player
     public void removeLegion(Legion legion)
     {
         legions.remove(legion);
+    }
+
+    public void addMarkerAvailable(String markerId)
+    {
+        markersAvailable.add(markerId);
+    }
+
+    public void removeMarkerAvailable(String markerId)
+    {
+        markersAvailable.remove(markerId);
+    }
+
+    public void clearMarkersAvailable()
+    {
+        markersAvailable.clear();
+    }
+
+    public Set<String> getMarkersAvailable()
+    {
+        return Collections.unmodifiableSortedSet(markersAvailable);
+    }
+
+    public int getNumMarkersAvailable()
+    {
+        return markersAvailable.size();
+    }
+
+    public String getFirstAvailableMarker()
+    {
+        synchronized (markersAvailable)
+        {
+            if (markersAvailable.isEmpty())
+            {
+                return null;
+            }
+            return markersAvailable.first();
+        }
+    }
+
+    public boolean isMarkerAvailable(String markerId)
+    {
+        return markersAvailable.contains(markerId);
+    }
+
+    /** Removes the selected marker from the list of those available.
+     *  Returns the markerId if it was present, or null if it was not. */
+    public String selectMarkerId(String markerId)
+    {
+        if (markersAvailable.remove(markerId))
+        {
+            return markerId;
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+    public int getNumCreatures()
+    {
+        int count = 0;
+        for (Legion legion : getLegions())
+        {
+            count += legion.getHeight();
+        }
+        return count;
     }
 
     /**

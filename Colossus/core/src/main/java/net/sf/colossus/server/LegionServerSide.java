@@ -31,6 +31,9 @@ public final class LegionServerSide extends net.sf.colossus.game.Legion
     private static final Logger LOGGER = Logger
         .getLogger(LegionServerSide.class.getName());
 
+    /**
+     * TODO this should be a Legion.
+     */
     private final String parentId;
 
     /**
@@ -331,7 +334,7 @@ public final class LegionServerSide extends net.sf.colossus.game.Legion
         }
         if (getPlayer() != null)
         {
-            getPlayer().addLegionMarker(getMarkerId());
+            getPlayer().addMarkerAvailable(getMarkerId());
         }
     }
 
