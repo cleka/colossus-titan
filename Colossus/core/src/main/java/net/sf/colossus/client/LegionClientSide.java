@@ -9,8 +9,10 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.sf.colossus.game.Creature;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.server.Constants;
+import net.sf.colossus.server.LegionServerSide;
 import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.variant.CreatureType;
 
@@ -20,6 +22,17 @@ import net.sf.colossus.variant.CreatureType;
  * 
  * TODO Comparable is implemented only for AI purposes, it might be better to have
  *      a Comparator there.
+ *      
+ * TODO candidates to pull up:
+ * -canRecruit()
+ *    requires Game.findEligibleRecruits() on both sides, might be better as method in Game
+ * -getMarker()
+ * -setMarker(Marker)
+ *    requires abstraction of the client.Marker class first, should replace markerId member
+ * -hasRecruited()
+ * -setLastRecruit(String)
+ * -setRecruited(boolean)
+ *    requires a bit of alignment with {@link LegionServerSide#setRecruitName(String)} etc.
  * 
  * @version $Id$ 
  * @author David Ripton
@@ -34,8 +47,6 @@ public final class LegionClientSide extends Legion implements
     private final Client client;
 
     private Marker marker;
-    private String lastRecruit;
-    private int entrySide;
     private boolean recruited;
     private PredictSplitNode myNode;
     private final boolean isMyLegion;
@@ -90,6 +101,27 @@ public final class LegionClientSide extends Legion implements
         return node.getHeight();
     }
 
+    /**
+     * We don't use the creature list in this class yet, so we override this
+     * to use the one from the {@link PredictSplitNode}.
+     * 
+     * TODO fix this, particularly the use of creature names in here. Note that
+     *      the current version also has the issue that every time this method
+     *      is called a new list with new creatures is created, which will break
+     *      identity checks.
+     */
+    @Override
+    public List<? extends Creature> getCreatures()
+    {
+        List<Creature> result = new ArrayList<Creature>();
+        for (String name : getContents())
+        {
+            result.add(new Creature(getPlayer().getGame().getVariant()
+                .getCreatureByName(name)));
+        }
+        return result;
+    }
+
     /** 
      * Return an immutable copy of the legion's contents, in sorted order.
      * 
@@ -108,12 +140,19 @@ public final class LegionClientSide extends Legion implements
         }
     }
 
+    /**
+     * A less typesafe version of {@link #contains(CreatureType)}.
+     * 
+     * TODO deprecate and remove
+     */
     public boolean contains(String creatureName)
     {
         return getContents().contains(creatureName);
     }
 
-    // TODO: great benefit from speeding this up
+    /**
+     * TODO get rid of string-based version
+     */
     public int numCreature(String creatureName)
     {
         int count = 0;
@@ -129,23 +168,7 @@ public final class LegionClientSide extends Legion implements
         return count;
     }
 
-    public int numSummonableCreature()
-    {
-        int count = 0;
-        Iterator<String> it = getContents().iterator();
-        while (it.hasNext())
-        {
-            CreatureType c = getPlayer().getGame().getVariant()
-                .getCreatureByName(it.next());
-            if (c.isSummonable())
-            {
-                count++;
-            }
-        }
-        return count;
-    }
-
-    // TODO: ... or speed this up
+    @Override
     public int numCreature(CreatureType creature)
     {
         return numCreature(creature.getName());
@@ -153,7 +176,8 @@ public final class LegionClientSide extends Legion implements
 
     /** Return a list of Strings.  Use the proper string for titans and
      *  unknown creatures. */
-    List<String> getImageNames()
+    @Override
+    public List<String> getImageNames()
     {
         List<String> names = new ArrayList<String>();
         names.addAll(getContents());
@@ -185,9 +209,12 @@ public final class LegionClientSide extends Legion implements
         return (PlayerClientSide)super.getPlayer();
     }
 
-    /** Return the full basename for a titan in legion markerId,
-     *  first finding that legion's player, player color, and titan size.
-     *  Default to Constants.titan if the info is not there. */
+    /** 
+     * Return the full basename for a titan in legion markerId,
+     * first finding that legion's player, player color, and titan size.
+     *  
+     * TODO this is really not legion-specific, but player-specific 
+     */
     String getTitanBasename()
     {
         try
@@ -247,31 +274,6 @@ public final class LegionClientSide extends Legion implements
         return getContents().contains(Constants.titan);
     }
 
-    public int numLords()
-    {
-        int count = 0;
-
-        Iterator<String> it = getContents().iterator();
-        while (it.hasNext())
-        {
-            String name = it.next();
-            if (name.startsWith(Constants.titan))
-            {
-                count++;
-            }
-            else
-            {
-                CreatureType creature = getPlayer().getGame().getVariant()
-                    .getCreatureByName(name);
-                if (creature != null && creature.isLord())
-                {
-                    count++;
-                }
-            }
-        }
-        return count;
-    }
-
     public String bestSummonable()
     {
         CreatureType best = null;
@@ -299,12 +301,8 @@ public final class LegionClientSide extends Legion implements
         return best.getName();
     }
 
-    public boolean hasSummonable()
-    {
-        return (bestSummonable() != null);
-    }
-
     /** Return the point value of suspected contents of this legion. */
+    @Override
     public int getPointValue()
     {
         int sum = 0;
@@ -314,16 +312,15 @@ public final class LegionClientSide extends Legion implements
             String name = it.next();
             if (name.startsWith(Constants.titan))
             {
-                PlayerClientSide info = getPlayer();
                 // Titan skill is changed by variants.
-                sum += info.getTitanPower()
-                    * (getPlayer().getGame().getVariant()
-                        .getCreatureByName("Titan")).getSkill();
+                sum += getPlayer().getTitanPower()
+                    * getPlayer().getGame().getVariant().getCreatureByName(
+                        "Titan").getSkill();
             }
             else
             {
-                sum += (getPlayer().getGame().getVariant()
-                    .getCreatureByName(name)).getPointValue();
+                sum += getPlayer().getGame().getVariant().getCreatureByName(
+                    name).getPointValue();
             }
         }
         return sum;
@@ -392,29 +389,12 @@ public final class LegionClientSide extends Legion implements
     {
         if (lastRecruit == null || lastRecruit.equals("null"))
         {
-            this.lastRecruit = null;
             setRecruited(false);
         }
         else
         {
-            this.lastRecruit = lastRecruit;
             setRecruited(true);
         }
-    }
-
-    String getLastRecruit()
-    {
-        return lastRecruit;
-    }
-
-    void setEntrySide(int entrySide)
-    {
-        this.entrySide = entrySide;
-    }
-
-    public int getEntrySide()
-    {
-        return entrySide;
     }
 
     void setRecruited(boolean recruited)
@@ -422,7 +402,8 @@ public final class LegionClientSide extends Legion implements
         this.recruited = recruited;
     }
 
-    boolean hasRecruited()
+    @Override
+    public boolean hasRecruited()
     {
         return recruited;
     }

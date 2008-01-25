@@ -1277,7 +1277,7 @@ public class SimpleAI implements AI
                             continue;
                         }
 
-                        if (((LegionClientSide)l).numSummonableCreature() == 0)
+                        if (!l.hasSummonable())
                         {
                             continue;
                         }
@@ -1304,8 +1304,7 @@ public class SimpleAI implements AI
                     }
                     // don't do this if we'll lose our only summonable group
                     // and won't score enough points to make up for it
-                    else if (((LegionClientSide)legion)
-                        .numSummonableCreature() > 0
+                    else if (legion.hasSummonable()
                         && !haveOtherSummonables
                         && enemyPointValue < TerrainRecruitLoader
                             .getAcquirableRecruitmentsValue() * .88)
@@ -1501,8 +1500,7 @@ public class SimpleAI implements AI
                     // stacks to be sure that someone will summon from us, 
                     // just give a small bonus for the possible recruit, if 
                     // we're not fighting and have a summonable.
-                    if (enemyLegion == null
-                        && ((LegionClientSide)legion).numSummonableCreature() >= 1)
+                    if (enemyLegion == null && legion.hasSummonable())
                     {
                         // This is total fudge.  Removing an angel may hurt 
                         // this legion, or may help it if the recruit is even

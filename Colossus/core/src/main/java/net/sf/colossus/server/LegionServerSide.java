@@ -37,7 +37,6 @@ public final class LegionServerSide extends net.sf.colossus.game.Legion
      * The label of the starting hex of the last move.
      */
     private String startingHexLabel;
-    private int entrySide = -1;
     private String recruitName;
     private int battleTally;
     private final GameServerSide game;
@@ -94,6 +93,7 @@ public final class LegionServerSide extends net.sf.colossus.game.Legion
         return legion;
     }
 
+    @Override
     public int getPointValue()
     {
         int pointValue = 0;
@@ -255,7 +255,8 @@ public final class LegionServerSide extends net.sf.colossus.game.Legion
     }
 
     /** Return a list of imageNames for all critters in this legion. */
-    List<String> getImageNames()
+    @Override
+    public List<String> getImageNames()
     {
         sortCritters();
         List<String> imageNames = new ArrayList<String>();
@@ -280,74 +281,6 @@ public final class LegionServerSide extends net.sf.colossus.game.Legion
             imageNames.add(critter.getName());
         }
         return imageNames;
-    }
-
-    String getImageName()
-    {
-        return markerId;
-    }
-
-    boolean canFlee()
-    {
-        for (CreatureServerSide critter : getCreatures())
-        {
-            if (critter.isLord())
-            {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    int numCreature(CreatureType creatureType)
-    {
-        int count = 0;
-        for (CreatureServerSide critter : getCreatures())
-        {
-            if (critter.getType().equals(creatureType))
-            {
-                count++;
-            }
-        }
-        return count;
-    }
-
-    public int numLords()
-    {
-        int count = 0;
-        for (CreatureServerSide critter : getCreatures())
-        {
-            if (critter.isLord())
-            {
-                count++;
-            }
-        }
-        return count;
-    }
-
-    public int numRangestrikers()
-    {
-        int count = 0;
-        for (CreatureServerSide critter : getCreatures())
-        {
-            if (critter.isRangestriker())
-            {
-                count++;
-            }
-        }
-        return count;
-    }
-
-    public boolean hasSummonable()
-    {
-        for (CreatureServerSide critter : getCreatures())
-        {
-            if (critter.isSummonable())
-            {
-                return true;
-            }
-        }
-        return false;
     }
 
     @Override
@@ -411,7 +344,7 @@ public final class LegionServerSide extends net.sf.colossus.game.Legion
         setHexLabel(hexLabel);
         setMoved(true);
 
-        setEntrySide(entrySide);
+        setEntrySide(BattleMap.entrySideNum(entrySide));
 
         // If we teleported, no more teleports are allowed this turn.
         if (teleported)
@@ -465,7 +398,8 @@ public final class LegionServerSide extends net.sf.colossus.game.Legion
         recruitName = null;
     }
 
-    boolean hasRecruited()
+    @Override
+    public boolean hasRecruited()
     {
         return (recruitName != null);
     }
@@ -517,21 +451,6 @@ public final class LegionServerSide extends net.sf.colossus.game.Legion
     String getStartingHexLabel()
     {
         return startingHexLabel;
-    }
-
-    void setEntrySide(int entrySide)
-    {
-        this.entrySide = entrySide;
-    }
-
-    void setEntrySide(String entrySide)
-    {
-        this.entrySide = BattleMap.entrySideNum(entrySide);
-    }
-
-    int getEntrySide()
-    {
-        return entrySide;
     }
 
     /** Add a creature to this legion.  If takeFromStack is true,

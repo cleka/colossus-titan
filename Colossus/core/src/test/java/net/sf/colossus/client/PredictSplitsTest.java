@@ -61,6 +61,32 @@ public class PredictSplitsTest extends TestCase
     private static final Player player = new Player(new Game(null,
         new String[] {}), "Tester", 1);
 
+    private static class TestLegion extends Legion
+    {
+        public TestLegion(Player playerState, String markerId)
+        {
+            super(playerState, markerId);
+        }
+
+        @Override
+        public List<String> getImageNames()
+        {
+            return null;
+        }
+
+        @Override
+        public int getPointValue()
+        {
+            return 0;
+        }
+
+        @Override
+        public boolean hasRecruited()
+        {
+            return false;
+        }
+    }
+
     List<String> cnl;
     AllPredictSplits aps;
     PredictSplits ps;
@@ -98,9 +124,9 @@ public class PredictSplitsTest extends TestCase
         PredictSplitNode root = ps.getLeaf("Rd01");
         assertTrue(root != null);
         assertTrue(ps.getLeaves(root) != null);
-        ps.getLeaf("Rd01").split(4, new Legion(player, "Rd02"), turn);
+        ps.getLeaf("Rd01").split(4, new TestLegion(player, "Rd02"), turn);
         ps.getLeaf("Rd01").merge(ps.getLeaf("Rd02"));
-        ps.getLeaf("Rd01").split(4, new Legion(player, "Rd02"), turn);
+        ps.getLeaf("Rd01").split(4, new TestLegion(player, "Rd02"), turn);
         cnl.clear();
         cnl.add("Ogre");
         cnl.add("Ogre");
@@ -142,8 +168,8 @@ public class PredictSplitsTest extends TestCase
 
         turn = 4;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        ps.getLeaf("Rd01").split(2, new Legion(player, "Rd03"), turn);
-        ps.getLeaf("Rd02").split(2, new Legion(player, "Rd04"), turn);
+        ps.getLeaf("Rd01").split(2, new TestLegion(player, "Rd03"), turn);
+        ps.getLeaf("Rd02").split(2, new TestLegion(player, "Rd04"), turn);
         cnl.clear();
         cnl.add("Gargoyle");
         cnl.add("Gargoyle");
@@ -185,7 +211,7 @@ public class PredictSplitsTest extends TestCase
 
         turn = 6;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        ps.getLeaf("Rd02").split(2, new Legion(player, "Rd05"), turn);
+        ps.getLeaf("Rd02").split(2, new TestLegion(player, "Rd05"), turn);
         cnl.clear();
         cnl.add("Titan");
         cnl.add("Warlock");
@@ -249,7 +275,7 @@ public class PredictSplitsTest extends TestCase
 
         turn = 8;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        ps.getLeaf("Rd01").split(2, new Legion(player, "Rd02"), turn);
+        ps.getLeaf("Rd01").split(2, new TestLegion(player, "Rd02"), turn);
         cnl.clear();
         cnl.add("Cyclops");
         ps.getLeaf("Rd01").revealCreatures(cnl);
@@ -295,7 +321,7 @@ public class PredictSplitsTest extends TestCase
 
         turn = 10;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        ps.getLeaf("Rd01").split(2, new Legion(player, "Rd06"), turn);
+        ps.getLeaf("Rd01").split(2, new TestLegion(player, "Rd06"), turn);
         assertFalse(ps.getLeaf("Rd01").allCertain());
         assertFalse(ps.getLeaf("Rd02").allCertain());
         assertTrue(ps.getLeaf("Rd03").allCertain());
@@ -422,7 +448,7 @@ public class PredictSplitsTest extends TestCase
         PredictSplitNode root = ps.getLeaf("Rd11");
         assertTrue(root != null);
         assertTrue(ps.getLeaves(root) != null);
-        ps.getLeaf("Rd11").split(4, new Legion(player, "Rd10"), turn);
+        ps.getLeaf("Rd11").split(4, new TestLegion(player, "Rd10"), turn);
         cnl.clear();
         cnl.add("Ogre");
         cnl.add("Ogre");
@@ -489,7 +515,7 @@ public class PredictSplitsTest extends TestCase
 
         turn = 5;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        ps.getLeaf("Rd10").split(2, new Legion(player, "Rd01"), turn);
+        ps.getLeaf("Rd10").split(2, new TestLegion(player, "Rd01"), turn);
         cnl.clear();
         cnl.add("Troll");
         ps.getLeaf("Rd10").revealCreatures(cnl);
@@ -534,7 +560,7 @@ public class PredictSplitsTest extends TestCase
 
         turn = 7;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        ps.getLeaf("Rd10").split(2, new Legion(player, "Rd06"), turn);
+        ps.getLeaf("Rd10").split(2, new TestLegion(player, "Rd06"), turn);
         cnl.clear();
         cnl.add("Centaur");
         cnl.add("Centaur");
@@ -549,7 +575,7 @@ public class PredictSplitsTest extends TestCase
 
         turn = 8;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        ps.getLeaf("Rd11").split(2, new Legion(player, "Rd07"), turn);
+        ps.getLeaf("Rd11").split(2, new TestLegion(player, "Rd07"), turn);
         cnl.clear();
         cnl.add("Troll");
         cnl.add("Troll");
@@ -600,7 +626,7 @@ public class PredictSplitsTest extends TestCase
 
         turn = 10;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        ps.getLeaf("Rd11").split(2, new Legion(player, "Rd08"), turn);
+        ps.getLeaf("Rd11").split(2, new TestLegion(player, "Rd08"), turn);
         cnl.clear();
         cnl.add("Angel");
         cnl.add("Angel");
@@ -675,7 +701,7 @@ public class PredictSplitsTest extends TestCase
 
         turn = 12;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        ps.getLeaf("Rd10").split(2, new Legion(player, "Rd05"), turn);
+        ps.getLeaf("Rd10").split(2, new TestLegion(player, "Rd05"), turn);
         cnl.clear();
         cnl.add("Troll");
         ps.getLeaf("Rd05").revealCreatures(cnl);
@@ -705,7 +731,7 @@ public class PredictSplitsTest extends TestCase
 
         turn = 13;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        ps.getLeaf("Rd11").split(2, new Legion(player, "Rd04"), turn);
+        ps.getLeaf("Rd11").split(2, new TestLegion(player, "Rd04"), turn);
         cnl.clear();
         cnl.add("Troll");
         cnl.add("Troll");
@@ -773,8 +799,8 @@ public class PredictSplitsTest extends TestCase
 
         turn = 15;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        ps.getLeaf("Rd07").split(2, new Legion(player, "Rd02"), turn);
-        ps.getLeaf("Rd11").split(2, new Legion(player, "Rd01"), turn);
+        ps.getLeaf("Rd07").split(2, new TestLegion(player, "Rd02"), turn);
+        ps.getLeaf("Rd11").split(2, new TestLegion(player, "Rd01"), turn);
         cnl.clear();
         cnl.add("Troll");
         ps.getLeaf("Rd05").revealCreatures(cnl);
@@ -848,8 +874,8 @@ public class PredictSplitsTest extends TestCase
 
         turn = 17;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        ps.getLeaf("Rd06").split(2, new Legion(player, "Rd08"), turn);
-        ps.getLeaf("Rd11").split(2, new Legion(player, "Rd03"), turn);
+        ps.getLeaf("Rd06").split(2, new TestLegion(player, "Rd08"), turn);
+        ps.getLeaf("Rd11").split(2, new TestLegion(player, "Rd03"), turn);
         cnl.clear();
         cnl.add("Troll");
         cnl.add("Troll");
@@ -877,7 +903,7 @@ public class PredictSplitsTest extends TestCase
 
         turn = 18;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        ps.getLeaf("Rd10").split(2, new Legion(player, "Rd12"), turn);
+        ps.getLeaf("Rd10").split(2, new TestLegion(player, "Rd12"), turn);
         cnl.clear();
         cnl.add("Ranger");
         ps.getLeaf("Rd01").revealCreatures(cnl);
@@ -905,7 +931,7 @@ public class PredictSplitsTest extends TestCase
 
         turn = 19;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        ps.getLeaf("Rd11").split(2, new Legion(player, "Rd08"), turn);
+        ps.getLeaf("Rd11").split(2, new TestLegion(player, "Rd08"), turn);
         cnl.clear();
         cnl.add("Cyclops");
         cnl.add("Ranger");
@@ -1018,7 +1044,7 @@ public class PredictSplitsTest extends TestCase
         PredictSplitNode root = ps.getLeaf("Gr07");
         assertTrue(root != null);
         assertTrue(ps.getLeaves(root) != null);
-        ps.getLeaf("Gr07").split(4, new Legion(player, "Gr11"), turn);
+        ps.getLeaf("Gr07").split(4, new TestLegion(player, "Gr11"), turn);
         cnl.clear();
         cnl.add("Gargoyle");
         cnl.add("Gargoyle");
@@ -1082,7 +1108,7 @@ public class PredictSplitsTest extends TestCase
 
         turn = 1;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        ps.getLeaf("Gd04").split(4, new Legion(player, "Gd12"), turn);
+        ps.getLeaf("Gd04").split(4, new TestLegion(player, "Gd12"), turn);
         cnl.clear();
         cnl.add("Titan");
         ps.getLeaf("Gd12").revealCreatures(cnl);
@@ -1127,7 +1153,7 @@ public class PredictSplitsTest extends TestCase
 
         turn = 4;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        ps.getLeaf("Gd04").split(2, new Legion(player, "Gd07"), turn);
+        ps.getLeaf("Gd04").split(2, new TestLegion(player, "Gd07"), turn);
         cnl.clear();
         cnl.add("Troll");
         ps.getLeaf("Gd04").revealCreatures(cnl);
@@ -1154,8 +1180,8 @@ public class PredictSplitsTest extends TestCase
 
         turn = 6;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        ps.getLeaf("Gd04").split(2, new Legion(player, "Gd08"), turn);
-        ps.getLeaf("Gd12").split(2, new Legion(player, "Gd03"), turn);
+        ps.getLeaf("Gd04").split(2, new TestLegion(player, "Gd08"), turn);
+        ps.getLeaf("Gd12").split(2, new TestLegion(player, "Gd03"), turn);
         cnl.clear();
         cnl.add("Ogre");
         ps.getLeaf("Gd08").revealCreatures(cnl);
@@ -1183,7 +1209,7 @@ public class PredictSplitsTest extends TestCase
 
         turn = 7;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        ps.getLeaf("Gd12").split(2, new Legion(player, "Gd09"), turn);
+        ps.getLeaf("Gd12").split(2, new TestLegion(player, "Gd09"), turn);
         cnl.clear();
         cnl.add("Gargoyle");
         cnl.add("Gargoyle");
@@ -1283,7 +1309,7 @@ public class PredictSplitsTest extends TestCase
 
         turn = 12;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        ps.getLeaf("Gd07").split(2, new Legion(player, "Gd06"), turn);
+        ps.getLeaf("Gd07").split(2, new TestLegion(player, "Gd06"), turn);
         cnl.clear();
         cnl.add("Centaur");
         cnl.add("Centaur");
@@ -1299,7 +1325,7 @@ public class PredictSplitsTest extends TestCase
 
         turn = 13;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        ps.getLeaf("Gd12").split(2, new Legion(player, "Gd10"), turn);
+        ps.getLeaf("Gd12").split(2, new TestLegion(player, "Gd10"), turn);
         cnl.clear();
         cnl.add("Cyclops");
         ps.getLeaf("Gd03").revealCreatures(cnl);
@@ -1325,7 +1351,7 @@ public class PredictSplitsTest extends TestCase
 
         turn = 14;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        ps.getLeaf("Gd04").split(2, new Legion(player, "Gd02"), turn);
+        ps.getLeaf("Gd04").split(2, new TestLegion(player, "Gd02"), turn);
         cnl.clear();
         cnl.add("Lion");
         cnl.add("Lion");
@@ -1357,7 +1383,7 @@ public class PredictSplitsTest extends TestCase
 
         turn = 15;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        ps.getLeaf("Gd12").split(2, new Legion(player, "Gd11"), turn);
+        ps.getLeaf("Gd12").split(2, new TestLegion(player, "Gd11"), turn);
         ps.printLeaves();
         assertTrue(ps.getLeaf("Gd02").numUncertainCreatures() == 2);
         assertTrue(ps.getLeaf("Gd03").numUncertainCreatures() == 0);
@@ -1403,7 +1429,7 @@ public class PredictSplitsTest extends TestCase
 
         turn = 17;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        ps.getLeaf("Gd07").split(2, new Legion(player, "Gd08"), turn);
+        ps.getLeaf("Gd07").split(2, new TestLegion(player, "Gd08"), turn);
         cnl.clear();
         cnl.add("Ranger");
         ps.getLeaf("Gd02").revealCreatures(cnl);
@@ -1539,7 +1565,7 @@ public class PredictSplitsTest extends TestCase
 
         turn = 22;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        ps.getLeaf("Gd09").split(2, new Legion(player, "Gd07"), turn);
+        ps.getLeaf("Gd09").split(2, new TestLegion(player, "Gd07"), turn);
         cnl.clear();
         cnl.add("Cyclops");
         cnl.add("Cyclops");
@@ -1579,7 +1605,7 @@ public class PredictSplitsTest extends TestCase
 
         turn = 23;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        ps.getLeaf("Gd03").split(2, new Legion(player, "Gd05"), turn);
+        ps.getLeaf("Gd03").split(2, new TestLegion(player, "Gd05"), turn);
         cnl.clear();
         cnl.add("Ranger");
         ps.getLeaf("Gd02").revealCreatures(cnl);
@@ -1618,8 +1644,8 @@ public class PredictSplitsTest extends TestCase
 
         turn = 24;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        ps.getLeaf("Gd02").split(2, new Legion(player, "Gd04"), turn);
-        ps.getLeaf("Gd10").split(2, new Legion(player, "Gd06"), turn);
+        ps.getLeaf("Gd02").split(2, new TestLegion(player, "Gd04"), turn);
+        ps.getLeaf("Gd10").split(2, new TestLegion(player, "Gd06"), turn);
         cnl.clear();
         cnl.add("Ranger");
         ps.getLeaf("Gd02").revealCreatures(cnl);
@@ -1670,7 +1696,7 @@ public class PredictSplitsTest extends TestCase
         cnl.add("Ogre");
         cnl.add("Ogre");
         aps.getLeaf("Gr11").revealCreatures(cnl);
-        aps.getLeaf("Gr11").split(4, new Legion(player, "Gr02"), turn);
+        aps.getLeaf("Gr11").split(4, new TestLegion(player, "Gr02"), turn);
         cnl.clear();
         cnl.add("Titan");
         aps.getLeaf("Gr02").revealCreatures(cnl);
@@ -1717,8 +1743,8 @@ public class PredictSplitsTest extends TestCase
         assertEquals(ps.getLeaf("Gr11").numUncertainCreatures(), 1);
 
         turn = 4;
-        aps.getLeaf("Gr02").split(2, new Legion(player, "Gr10"), turn);
-        aps.getLeaf("Gr11").split(3, new Legion(player, "Gr03"), turn);
+        aps.getLeaf("Gr02").split(2, new TestLegion(player, "Gr10"), turn);
+        aps.getLeaf("Gr11").split(3, new TestLegion(player, "Gr03"), turn);
         aps.getLeaf("Gr11").merge(ps.getLeaf("Gr03"));
         aps.printLeaves();
         assertEquals(ps.getLeaf("Gr02").numUncertainCreatures(), 5);
@@ -1726,7 +1752,7 @@ public class PredictSplitsTest extends TestCase
         assertEquals(ps.getLeaf("Gr11").numUncertainCreatures(), 1);
 
         turn = 5;
-        aps.getLeaf("Gr11").split(3, new Legion(player, "Gr12"), turn);
+        aps.getLeaf("Gr11").split(3, new TestLegion(player, "Gr12"), turn);
         cnl.clear();
         cnl.add("Warlock");
         aps.getLeaf("Gr02").revealCreatures(cnl);
@@ -1793,7 +1819,7 @@ public class PredictSplitsTest extends TestCase
 
         turn = 1;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        aps.getLeaf("Gr08").split(4, new Legion(player, "Gr04"), turn);
+        aps.getLeaf("Gr08").split(4, new TestLegion(player, "Gr04"), turn);
         cnl.clear();
         cnl.add("Titan");
         aps.getLeaf("Gr04").revealCreatures(cnl);
@@ -1832,7 +1858,7 @@ public class PredictSplitsTest extends TestCase
 
         turn = 4;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        aps.getLeaf("Gr04").split(2, new Legion(player, "Gr06"), turn);
+        aps.getLeaf("Gr04").split(2, new TestLegion(player, "Gr06"), turn);
         cnl.clear();
         cnl.add("Ogre");
         aps.getLeaf("Gr04").revealCreatures(cnl);
@@ -1866,8 +1892,8 @@ public class PredictSplitsTest extends TestCase
 
         turn = 6;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        aps.getLeaf("Gr04").split(2, new Legion(player, "Gr07"), turn);
-        aps.getLeaf("Gr08").split(2, new Legion(player, "Gr11"), turn);
+        aps.getLeaf("Gr04").split(2, new TestLegion(player, "Gr07"), turn);
+        aps.getLeaf("Gr08").split(2, new TestLegion(player, "Gr11"), turn);
         cnl.clear();
         cnl.add("Titan");
         aps.getLeaf("Gr04").revealCreatures(cnl);
@@ -1909,7 +1935,7 @@ public class PredictSplitsTest extends TestCase
 
         turn = 8;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        aps.getLeaf("Gr04").split(2, new Legion(player, "Gr12"), turn);
+        aps.getLeaf("Gr04").split(2, new TestLegion(player, "Gr12"), turn);
         cnl.clear();
         cnl.add("Ogre");
         cnl.add("Ogre");
@@ -1950,7 +1976,7 @@ public class PredictSplitsTest extends TestCase
 
         turn = 11;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        aps.getLeaf("Gr08").split(2, new Legion(player, "Gr01"), turn);
+        aps.getLeaf("Gr08").split(2, new TestLegion(player, "Gr01"), turn);
         cnl.clear();
         cnl.add("Titan");
         aps.getLeaf("Gr04").revealCreatures(cnl);
@@ -1985,7 +2011,7 @@ public class PredictSplitsTest extends TestCase
 
         turn = 13;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        aps.getLeaf("Gr08").split(2, new Legion(player, "Gr02"), turn);
+        aps.getLeaf("Gr08").split(2, new TestLegion(player, "Gr02"), turn);
         cnl.clear();
         cnl.add("Ogre");
         cnl.add("Ogre");
@@ -1999,7 +2025,7 @@ public class PredictSplitsTest extends TestCase
 
         turn = 14;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        aps.getLeaf("Gr04").split(2, new Legion(player, "Gr06"), turn);
+        aps.getLeaf("Gr04").split(2, new TestLegion(player, "Gr06"), turn);
         cnl.clear();
         cnl.add("Cyclops");
         aps.getLeaf("Gr04").revealCreatures(cnl);
@@ -2067,7 +2093,7 @@ public class PredictSplitsTest extends TestCase
         aps.getLeaf("Gr02").removeCreature("Lion");
         aps.getLeaf("Gr02").removeCreature("Centaur");
         aps.printLeaves();
-        aps.getLeaf("Gr08").split(2, new Legion(player, "Gr12"), turn);
+        aps.getLeaf("Gr08").split(2, new TestLegion(player, "Gr12"), turn);
         cnl.clear();
         cnl.add("Cyclops");
         cnl.add("Cyclops");
@@ -2083,8 +2109,8 @@ public class PredictSplitsTest extends TestCase
         LOGGER.log(Level.FINEST, "Turn " + turn);
         aps.getLeaf("Gr12").removeCreature("Lion");
         aps.getLeaf("Gr12").removeCreature("Lion");
-        aps.getLeaf("Gr04").split(2, new Legion(player, "Gr12"), turn);
-        aps.getLeaf("Gr07").split(2, new Legion(player, "Gr09"), turn);
+        aps.getLeaf("Gr04").split(2, new TestLegion(player, "Gr12"), turn);
+        aps.getLeaf("Gr07").split(2, new TestLegion(player, "Gr09"), turn);
         cnl.clear();
         cnl.add("Cyclops");
         cnl.add("Cyclops");
@@ -2099,7 +2125,7 @@ public class PredictSplitsTest extends TestCase
 
         turn = 19;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        aps.getLeaf("Gr08").split(2, new Legion(player, "Gr06"), turn);
+        aps.getLeaf("Gr08").split(2, new TestLegion(player, "Gr06"), turn);
         aps.getLeaf("Gr09").removeCreature("Ogre");
         aps.getLeaf("Gr09").removeCreature("Ogre");
         cnl.clear();
@@ -2170,7 +2196,7 @@ public class PredictSplitsTest extends TestCase
         aps.printLeaves();
         turn = 1;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        aps.getLeaf("Gd08").split(4, new Legion(player, "Gd03"), turn);
+        aps.getLeaf("Gd08").split(4, new TestLegion(player, "Gd03"), turn);
         cnl.clear();
         cnl.add("Gargoyle");
         cnl.add("Gargoyle");
@@ -2182,7 +2208,7 @@ public class PredictSplitsTest extends TestCase
         aps.getLeaf("Gd08").addCreature("Ogre");
         assertEquals(aps.getLeaf("Gd03").numUncertainCreatures(), 2);
         assertEquals(aps.getLeaf("Gd08").numUncertainCreatures(), 2);
-        aps.getLeaf("Bu02").split(4, new Legion(player, "Bu05"), turn);
+        aps.getLeaf("Bu02").split(4, new TestLegion(player, "Bu05"), turn);
         cnl.clear();
         cnl.add("Centaur");
         aps.getLeaf("Bu02").revealCreatures(cnl);
@@ -2194,7 +2220,7 @@ public class PredictSplitsTest extends TestCase
         aps.getLeaf("Bu05").addCreature("Cyclops");
         assertEquals(aps.getLeaf("Bu02").numUncertainCreatures(), 2);
         assertEquals(aps.getLeaf("Bu05").numUncertainCreatures(), 2);
-        aps.getLeaf("Gr12").split(4, new Legion(player, "Gr08"), turn);
+        aps.getLeaf("Gr12").split(4, new TestLegion(player, "Gr08"), turn);
         cnl.clear();
         cnl.add("Titan");
         aps.getLeaf("Gr08").revealCreatures(cnl);
@@ -2209,7 +2235,7 @@ public class PredictSplitsTest extends TestCase
         aps.getLeaf("Gr12").addCreature("Centaur");
         assertEquals(aps.getLeaf("Gr08").numUncertainCreatures(), 1);
         assertEquals(aps.getLeaf("Gr12").numUncertainCreatures(), 1);
-        aps.getLeaf("Br06").split(4, new Legion(player, "Br01"), turn);
+        aps.getLeaf("Br06").split(4, new TestLegion(player, "Br01"), turn);
         cnl.clear();
         cnl.add("Titan");
         aps.getLeaf("Br01").revealCreatures(cnl);
@@ -2224,7 +2250,7 @@ public class PredictSplitsTest extends TestCase
         aps.getLeaf("Br06").addCreature("Centaur");
         assertEquals(aps.getLeaf("Br01").numUncertainCreatures(), 1);
         assertEquals(aps.getLeaf("Br06").numUncertainCreatures(), 1);
-        aps.getLeaf("Bk06").split(4, new Legion(player, "Bk10"), turn);
+        aps.getLeaf("Bk06").split(4, new TestLegion(player, "Bk10"), turn);
         cnl.clear();
         cnl.add("Ogre");
         aps.getLeaf("Bk06").revealCreatures(cnl);
@@ -2236,7 +2262,7 @@ public class PredictSplitsTest extends TestCase
         aps.getLeaf("Bk10").addCreature("Cyclops");
         assertEquals(aps.getLeaf("Bk06").numUncertainCreatures(), 2);
         assertEquals(aps.getLeaf("Bk10").numUncertainCreatures(), 2);
-        aps.getLeaf("Rd06").split(4, new Legion(player, "Rd02"), turn);
+        aps.getLeaf("Rd06").split(4, new TestLegion(player, "Rd02"), turn);
         cnl.clear();
         cnl.add("Ogre");
         aps.getLeaf("Rd02").revealCreatures(cnl);
@@ -2325,7 +2351,7 @@ public class PredictSplitsTest extends TestCase
         assertEquals(aps.getLeaf("Gr08").numUncertainCreatures(), 1);
         assertEquals(aps.getLeaf("Gr12").numUncertainCreatures(), 1);
         aps.printLeaves();
-        aps.getLeaf("Br06").split(3, new Legion(player, "Br12"), turn);
+        aps.getLeaf("Br06").split(3, new TestLegion(player, "Br12"), turn);
         cnl.clear();
         cnl.add("Cyclops");
         aps.getLeaf("Br01").revealCreatures(cnl);
@@ -2357,7 +2383,7 @@ public class PredictSplitsTest extends TestCase
         aps.printLeaves();
         turn = 4;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        aps.getLeaf("Gd03").split(2, new Legion(player, "Gd12"), turn);
+        aps.getLeaf("Gd03").split(2, new TestLegion(player, "Gd12"), turn);
         cnl.clear();
         cnl.add("Centaur");
         aps.getLeaf("Gd03").revealCreatures(cnl);
@@ -2370,15 +2396,15 @@ public class PredictSplitsTest extends TestCase
         assertEquals(aps.getLeaf("Gd03").numUncertainCreatures(), 1);
         assertEquals(aps.getLeaf("Gd08").numUncertainCreatures(), 1);
         assertEquals(aps.getLeaf("Gd12").numUncertainCreatures(), 0);
-        aps.getLeaf("Bu02").split(2, new Legion(player, "Bu08"), turn);
+        aps.getLeaf("Bu02").split(2, new TestLegion(player, "Bu08"), turn);
         aps.getLeaf("Bu02").merge(aps.getLeaf("Bu08"));
         cnl.clear();
         cnl.add("Cyclops");
         aps.getLeaf("Bu05").revealCreatures(cnl);
         aps.getLeaf("Bu05").addCreature("Cyclops");
-        aps.getLeaf("Gr08").split(2, new Legion(player, "Gr06"), turn);
+        aps.getLeaf("Gr08").split(2, new TestLegion(player, "Gr06"), turn);
         aps.getLeaf("Gr08").merge(aps.getLeaf("Gr06"));
-        aps.getLeaf("Gr12").split(2, new Legion(player, "Gr09"), turn);
+        aps.getLeaf("Gr12").split(2, new TestLegion(player, "Gr09"), turn);
         cnl.clear();
         cnl.add("Gargoyle");
         cnl.add("Gargoyle");
@@ -2394,8 +2420,8 @@ public class PredictSplitsTest extends TestCase
         cnl.add("Centaur");
         aps.getLeaf("Br12").revealCreatures(cnl);
         aps.getLeaf("Br12").addCreature("Warbear");
-        aps.getLeaf("Bk06").split(2, new Legion(player, "Bk04"), turn);
-        aps.getLeaf("Bk10").split(2, new Legion(player, "Bk11"), turn);
+        aps.getLeaf("Bk06").split(2, new TestLegion(player, "Bk04"), turn);
+        aps.getLeaf("Bk10").split(2, new TestLegion(player, "Bk11"), turn);
         cnl.clear();
         cnl.add("Centaur");
         aps.getLeaf("Bk06").revealCreatures(cnl);
@@ -2419,8 +2445,8 @@ public class PredictSplitsTest extends TestCase
         assertEquals(aps.getLeaf("Gd03").numUncertainCreatures(), 1);
         assertEquals(aps.getLeaf("Gd08").numUncertainCreatures(), 1);
         assertEquals(aps.getLeaf("Gd12").numUncertainCreatures(), 0);
-        aps.getLeaf("Bu02").split(2, new Legion(player, "Bu01"), turn);
-        aps.getLeaf("Bu05").split(2, new Legion(player, "Bu09"), turn);
+        aps.getLeaf("Bu02").split(2, new TestLegion(player, "Bu01"), turn);
+        aps.getLeaf("Bu05").split(2, new TestLegion(player, "Bu09"), turn);
         cnl.clear();
         cnl.add("Gargoyle");
         cnl.add("Gargoyle");
@@ -2448,7 +2474,7 @@ public class PredictSplitsTest extends TestCase
         cnl.add("Cyclops");
         aps.getLeaf("Bu05").revealCreatures(cnl);
         aps.getLeaf("Bu05").addCreature("Gorgon");
-        aps.getLeaf("Gr08").split(2, new Legion(player, "Gr01"), turn);
+        aps.getLeaf("Gr08").split(2, new TestLegion(player, "Gr01"), turn);
         cnl.clear();
         cnl.add("Gargoyle");
         aps.getLeaf("Gr01").revealCreatures(cnl);
@@ -2457,7 +2483,7 @@ public class PredictSplitsTest extends TestCase
         cnl.add("Cyclops");
         aps.getLeaf("Gr09").revealCreatures(cnl);
         aps.getLeaf("Gr09").addCreature("Cyclops");
-        aps.getLeaf("Br01").split(2, new Legion(player, "Br11"), turn);
+        aps.getLeaf("Br01").split(2, new TestLegion(player, "Br11"), turn);
         aps.getLeaf("Br01").merge(aps.getLeaf("Br11"));
         cnl.clear();
         cnl.add("Titan");
@@ -2466,7 +2492,7 @@ public class PredictSplitsTest extends TestCase
         aps.printLeaves();
         turn = 6;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        aps.getLeaf("Gd03").split(2, new Legion(player, "Gd06"), turn);
+        aps.getLeaf("Gd03").split(2, new TestLegion(player, "Gd06"), turn);
         cnl.clear();
         cnl.add("Cyclops");
         cnl.add("Cyclops");
@@ -2507,7 +2533,7 @@ public class PredictSplitsTest extends TestCase
         cnl.add("Centaur");
         aps.getLeaf("Gr12").revealCreatures(cnl);
         aps.getLeaf("Gr12").addCreature("Lion");
-        aps.getLeaf("Br01").split(2, new Legion(player, "Br09"), turn);
+        aps.getLeaf("Br01").split(2, new TestLegion(player, "Br09"), turn);
         aps.getLeaf("Br01").merge(aps.getLeaf("Br09"));
         cnl.clear();
         cnl.add("Lion");
@@ -2552,7 +2578,7 @@ public class PredictSplitsTest extends TestCase
         assertEquals(aps.getLeaf("Gd06").numUncertainCreatures(), 0);
         assertEquals(aps.getLeaf("Gd08").numUncertainCreatures(), 1);
         assertEquals(aps.getLeaf("Gd12").numUncertainCreatures(), 0);
-        aps.getLeaf("Bu05").split(2, new Legion(player, "Bu12"), turn);
+        aps.getLeaf("Bu05").split(2, new TestLegion(player, "Bu12"), turn);
         cnl.clear();
         cnl.add("Titan");
         aps.getLeaf("Bu05").revealCreatures(cnl);
@@ -2564,14 +2590,14 @@ public class PredictSplitsTest extends TestCase
         cnl.add("Warlock");
         aps.getLeaf("Bu05").revealCreatures(cnl);
         aps.getLeaf("Bu05").addCreature("Warlock");
-        aps.getLeaf("Gr12").split(3, new Legion(player, "Gr02"), turn);
+        aps.getLeaf("Gr12").split(3, new TestLegion(player, "Gr02"), turn);
         aps.getLeaf("Gr12").merge(aps.getLeaf("Gr02"));
         cnl.clear();
         cnl.add("Gargoyle");
         cnl.add("Gargoyle");
         aps.getLeaf("Gr01").revealCreatures(cnl);
         aps.getLeaf("Gr01").addCreature("Cyclops");
-        aps.getLeaf("Br01").split(2, new Legion(player, "Br08"), turn);
+        aps.getLeaf("Br01").split(2, new TestLegion(player, "Br08"), turn);
         aps.getLeaf("Br01").merge(aps.getLeaf("Br08"));
         cnl.clear();
         cnl.add("Ogre");
@@ -2581,7 +2607,7 @@ public class PredictSplitsTest extends TestCase
         cnl.add("Unicorn");
         aps.getLeaf("Br12").revealCreatures(cnl);
         aps.getLeaf("Br12").addCreature("Unicorn");
-        aps.getLeaf("Bk06").split(2, new Legion(player, "Bk12"), turn);
+        aps.getLeaf("Bk06").split(2, new TestLegion(player, "Bk12"), turn);
         cnl.clear();
         cnl.add("Centaur");
         cnl.add("Centaur");
@@ -2595,8 +2621,8 @@ public class PredictSplitsTest extends TestCase
 
         turn = 8;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        aps.getLeaf("Gd03").split(2, new Legion(player, "Gd04"), turn);
-        aps.getLeaf("Gd08").split(2, new Legion(player, "Gd05"), turn);
+        aps.getLeaf("Gd03").split(2, new TestLegion(player, "Gd04"), turn);
+        aps.getLeaf("Gd08").split(2, new TestLegion(player, "Gd05"), turn);
         cnl.clear();
         cnl.add("Cyclops");
         cnl.add("Cyclops");
@@ -2612,17 +2638,17 @@ public class PredictSplitsTest extends TestCase
         assertEquals(aps.getLeaf("Gd06").numUncertainCreatures(), 0);
         assertEquals(aps.getLeaf("Gd08").numUncertainCreatures(), 3);
         assertEquals(aps.getLeaf("Gd12").numUncertainCreatures(), 0);
-        aps.getLeaf("Bu02").split(2, new Legion(player, "Bu07"), turn);
+        aps.getLeaf("Bu02").split(2, new TestLegion(player, "Bu07"), turn);
         cnl.clear();
         cnl.add("Centaur");
         aps.getLeaf("Bu07").revealCreatures(cnl);
         aps.getLeaf("Bu07").addCreature("Centaur");
-        aps.getLeaf("Gr12").split(3, new Legion(player, "Gr03"), turn);
+        aps.getLeaf("Gr12").split(3, new TestLegion(player, "Gr03"), turn);
         cnl.clear();
         cnl.add("Cyclops");
         aps.getLeaf("Gr01").revealCreatures(cnl);
         aps.getLeaf("Gr01").addCreature("Cyclops");
-        aps.getLeaf("Br01").split(2, new Legion(player, "Br09"), turn);
+        aps.getLeaf("Br01").split(2, new TestLegion(player, "Br09"), turn);
         cnl.clear();
         cnl.add("Lion");
         aps.getLeaf("Bk06").revealCreatures(cnl);
@@ -2699,7 +2725,7 @@ public class PredictSplitsTest extends TestCase
         cnl.add("Cyclops");
         aps.getLeaf("Bu12").revealCreatures(cnl);
         aps.getLeaf("Bu12").addCreature("Cyclops");
-        aps.getLeaf("Gr01").split(2, new Legion(player, "Gr04"), turn);
+        aps.getLeaf("Gr01").split(2, new TestLegion(player, "Gr04"), turn);
         aps.getLeaf("Bu01").removeCreature("Lion");
         aps.getLeaf("Bu01").removeCreature("Centaur");
         aps.getLeaf("Bu01").removeCreature("Centaur");
@@ -2725,7 +2751,7 @@ public class PredictSplitsTest extends TestCase
         cnl.add("Cyclops");
         aps.getLeaf("Br01").revealCreatures(cnl);
         aps.getLeaf("Br01").addCreature("Cyclops");
-        aps.getLeaf("Bk10").split(2, new Legion(player, "Bk11"), turn);
+        aps.getLeaf("Bk10").split(2, new TestLegion(player, "Bk11"), turn);
         cnl.clear();
         cnl.add("Angel");
         cnl.add("Troll");
@@ -2791,7 +2817,7 @@ public class PredictSplitsTest extends TestCase
         assertEquals(aps.getLeaf("Gd04").numUncertainCreatures(), 2);
         assertEquals(aps.getLeaf("Gd06").numUncertainCreatures(), 0);
         assertEquals(aps.getLeaf("Gd12").numUncertainCreatures(), 0);
-        aps.getLeaf("Bu05").split(2, new Legion(player, "Bu10"), turn);
+        aps.getLeaf("Bu05").split(2, new TestLegion(player, "Bu10"), turn);
         aps.getLeaf("Rd02").removeCreature("Gargoyle");
         aps.getLeaf("Rd02").removeCreature("Gargoyle");
         aps.getLeaf("Rd02").removeCreature("Ogre");
@@ -2837,7 +2863,7 @@ public class PredictSplitsTest extends TestCase
         cnl.add("Centaur");
         aps.getLeaf("Bk12").revealCreatures(cnl);
         aps.getLeaf("Bk12").addCreature("Warbear");
-        aps.getLeaf("Rd06").split(2, new Legion(player, "Rd09"), turn);
+        aps.getLeaf("Rd06").split(2, new TestLegion(player, "Rd09"), turn);
         cnl.clear();
         cnl.add("Centaur");
         aps.getLeaf("Rd09").revealCreatures(cnl);
@@ -2846,9 +2872,9 @@ public class PredictSplitsTest extends TestCase
 
         turn = 11;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        aps.getLeaf("Gd03").split(2, new Legion(player, "Gd07"), turn);
+        aps.getLeaf("Gd03").split(2, new TestLegion(player, "Gd07"), turn);
         aps.getLeaf("Gd03").merge(aps.getLeaf("Gd07"));
-        aps.getLeaf("Bu02").split(2, new Legion(player, "Bu04"), turn);
+        aps.getLeaf("Bu02").split(2, new TestLegion(player, "Bu04"), turn);
         assertEquals(aps.getLeaf("Gd03").numUncertainCreatures(), 3);
         assertEquals(aps.getLeaf("Gd04").numUncertainCreatures(), 2);
         assertEquals(aps.getLeaf("Gd06").numUncertainCreatures(), 0);
@@ -2872,16 +2898,16 @@ public class PredictSplitsTest extends TestCase
         cnl.add("Cyclops");
         aps.getLeaf("Bu12").revealCreatures(cnl);
         aps.getLeaf("Bu12").addCreature("Guardian");
-        aps.getLeaf("Gr08").split(2, new Legion(player, "Gr02"), turn);
+        aps.getLeaf("Gr08").split(2, new TestLegion(player, "Gr02"), turn);
         aps.getLeaf("Gr08").merge(aps.getLeaf("Gr02"));
         cnl.clear();
         cnl.add("Ogre");
         cnl.add("Ogre");
         aps.getLeaf("Gr01").revealCreatures(cnl);
         aps.getLeaf("Gr01").addCreature("Troll");
-        aps.getLeaf("Br01").split(2, new Legion(player, "Br03"), turn);
+        aps.getLeaf("Br01").split(2, new TestLegion(player, "Br03"), turn);
         aps.getLeaf("Br01").merge(aps.getLeaf("Br03"));
-        aps.getLeaf("Br12").split(2, new Legion(player, "Br07"), turn);
+        aps.getLeaf("Br12").split(2, new TestLegion(player, "Br07"), turn);
         aps.getLeaf("Br12").merge(aps.getLeaf("Br07"));
         aps.getLeaf("Gd04").removeCreature("Lion");
         aps.getLeaf("Gd04").removeCreature("Lion");
@@ -2899,7 +2925,7 @@ public class PredictSplitsTest extends TestCase
         aps.printLeaves();
         turn = 12;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        aps.getLeaf("Gd03").split(2, new Legion(player, "Gd08"), turn);
+        aps.getLeaf("Gd03").split(2, new TestLegion(player, "Gd08"), turn);
         aps.getLeaf("Gd03").merge(aps.getLeaf("Gd08"));
         assertEquals(aps.getLeaf("Gd03").numUncertainCreatures(), 0);
         assertEquals(aps.getLeaf("Gd06").numUncertainCreatures(), 0);
@@ -2917,15 +2943,15 @@ public class PredictSplitsTest extends TestCase
         cnl.add("Cyclops");
         aps.getLeaf("Bu12").revealCreatures(cnl);
         aps.getLeaf("Bu12").addCreature("Gorgon");
-        aps.getLeaf("Gr08").split(2, new Legion(player, "Gr10"), turn);
+        aps.getLeaf("Gr08").split(2, new TestLegion(player, "Gr10"), turn);
         aps.getLeaf("Gr08").merge(aps.getLeaf("Gr10"));
         cnl.clear();
         cnl.add("Cyclops");
         aps.getLeaf("Gr01").revealCreatures(cnl);
         aps.getLeaf("Gr01").addCreature("Cyclops");
-        aps.getLeaf("Br01").split(2, new Legion(player, "Br02"), turn);
+        aps.getLeaf("Br01").split(2, new TestLegion(player, "Br02"), turn);
         aps.getLeaf("Br01").merge(aps.getLeaf("Br02"));
-        aps.getLeaf("Br12").split(2, new Legion(player, "Br06"), turn);
+        aps.getLeaf("Br12").split(2, new TestLegion(player, "Br06"), turn);
         aps.getLeaf("Br12").merge(aps.getLeaf("Br06"));
         aps.getLeaf("Gd12").removeCreature("Cyclops");
         aps.getLeaf("Gd12").removeCreature("Cyclops");
@@ -2980,11 +3006,11 @@ public class PredictSplitsTest extends TestCase
 
         turn = 13;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        aps.getLeaf("Gd03").split(2, new Legion(player, "Gd09"), turn);
+        aps.getLeaf("Gd03").split(2, new TestLegion(player, "Gd09"), turn);
         aps.getLeaf("Gd03").merge(aps.getLeaf("Gd09"));
         assertEquals(aps.getLeaf("Gd03").numUncertainCreatures(), 0);
         assertEquals(aps.getLeaf("Gd06").numUncertainCreatures(), 0);
-        aps.getLeaf("Bu05").split(2, new Legion(player, "Bu02"), turn);
+        aps.getLeaf("Bu05").split(2, new TestLegion(player, "Bu02"), turn);
         cnl.clear();
         cnl.add("Centaur");
         aps.getLeaf("Bu02").revealCreatures(cnl);
@@ -2995,16 +3021,16 @@ public class PredictSplitsTest extends TestCase
         cnl.add("Cyclops");
         aps.getLeaf("Bu12").revealCreatures(cnl);
         aps.getLeaf("Bu12").addCreature("Behemoth");
-        aps.getLeaf("Gr01").split(2, new Legion(player, "Gr07"), turn);
+        aps.getLeaf("Gr01").split(2, new TestLegion(player, "Gr07"), turn);
         aps.getLeaf("Gr01").merge(aps.getLeaf("Gr07"));
-        aps.getLeaf("Gr08").split(2, new Legion(player, "Gr05"), turn);
+        aps.getLeaf("Gr08").split(2, new TestLegion(player, "Gr05"), turn);
         aps.getLeaf("Gr08").merge(aps.getLeaf("Gr05"));
         aps.getLeaf("Rd09").removeCreature("Gargoyle");
         aps.getLeaf("Rd09").removeCreature("Centaur");
         aps.getLeaf("Rd09").removeCreature("Centaur");
-        aps.getLeaf("Br01").split(2, new Legion(player, "Br07"), turn);
+        aps.getLeaf("Br01").split(2, new TestLegion(player, "Br07"), turn);
         aps.getLeaf("Br01").merge(aps.getLeaf("Br07"));
-        aps.getLeaf("Br12").split(2, new Legion(player, "Br04"), turn);
+        aps.getLeaf("Br12").split(2, new TestLegion(player, "Br04"), turn);
         aps.getLeaf("Br12").merge(aps.getLeaf("Br04"));
         cnl.clear();
         cnl.add("Centaur");
@@ -3015,7 +3041,7 @@ public class PredictSplitsTest extends TestCase
 
         turn = 14;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        aps.getLeaf("Gd03").split(2, new Legion(player, "Gd04"), turn);
+        aps.getLeaf("Gd03").split(2, new TestLegion(player, "Gd04"), turn);
         cnl.clear();
         cnl.add("Titan");
         aps.getLeaf("Gd03").revealCreatures(cnl);
@@ -3038,11 +3064,11 @@ public class PredictSplitsTest extends TestCase
         cnl.add("Cyclops");
         aps.getLeaf("Bu12").revealCreatures(cnl);
         aps.getLeaf("Bu12").addCreature("Gorgon");
-        aps.getLeaf("Gr01").split(2, new Legion(player, "Gr05"), turn);
-        aps.getLeaf("Gr08").split(2, new Legion(player, "Gr06"), turn);
+        aps.getLeaf("Gr01").split(2, new TestLegion(player, "Gr05"), turn);
+        aps.getLeaf("Gr08").split(2, new TestLegion(player, "Gr06"), turn);
         aps.getLeaf("Gr08").merge(aps.getLeaf("Gr06"));
-        aps.getLeaf("Br01").split(2, new Legion(player, "Br05"), turn);
-        aps.getLeaf("Br12").split(2, new Legion(player, "Br04"), turn);
+        aps.getLeaf("Br01").split(2, new TestLegion(player, "Br05"), turn);
+        aps.getLeaf("Br12").split(2, new TestLegion(player, "Br04"), turn);
         cnl.clear();
         cnl.add("Cyclops");
         cnl.add("Cyclops");
@@ -3069,8 +3095,8 @@ public class PredictSplitsTest extends TestCase
         assertEquals(aps.getLeaf("Gd03").numUncertainCreatures(), 2);
         assertEquals(aps.getLeaf("Gd04").numUncertainCreatures(), 2);
         assertEquals(aps.getLeaf("Gd06").numUncertainCreatures(), 0);
-        aps.getLeaf("Bu07").split(2, new Legion(player, "Bu09"), turn);
-        aps.getLeaf("Bu12").split(2, new Legion(player, "Bu06"), turn);
+        aps.getLeaf("Bu07").split(2, new TestLegion(player, "Bu09"), turn);
+        aps.getLeaf("Bu12").split(2, new TestLegion(player, "Bu06"), turn);
         aps.getLeaf("Bu12").merge(aps.getLeaf("Bu06"));
         aps.getLeaf("Bu02").addCreature("Gargoyle");
         cnl.clear();
@@ -3084,7 +3110,7 @@ public class PredictSplitsTest extends TestCase
         aps.getLeaf("Bu09").revealCreatures(cnl);
         aps.getLeaf("Bu09").addCreature("Lion");
         aps.getLeaf("Bu10").addCreature("Gargoyle");
-        aps.getLeaf("Gr08").split(2, new Legion(player, "Gr06"), turn);
+        aps.getLeaf("Gr08").split(2, new TestLegion(player, "Gr06"), turn);
         aps.getLeaf("Gr08").merge(aps.getLeaf("Gr06"));
         cnl.clear();
         cnl.add("Lion");
@@ -3114,7 +3140,7 @@ public class PredictSplitsTest extends TestCase
 
         turn = 16;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        aps.getLeaf("Gd03").split(2, new Legion(player, "Gd12"), turn);
+        aps.getLeaf("Gd03").split(2, new TestLegion(player, "Gd12"), turn);
         cnl.clear();
         cnl.add("Lion");
         cnl.add("Lion");
@@ -3124,13 +3150,13 @@ public class PredictSplitsTest extends TestCase
         assertEquals(aps.getLeaf("Gd04").numUncertainCreatures(), 2);
         assertEquals(aps.getLeaf("Gd06").numUncertainCreatures(), 0);
         assertEquals(aps.getLeaf("Gd12").numUncertainCreatures(), 2);
-        aps.getLeaf("Bu12").split(2, new Legion(player, "Bu01"), turn);
+        aps.getLeaf("Bu12").split(2, new TestLegion(player, "Bu01"), turn);
         aps.getLeaf("Bu12").merge(aps.getLeaf("Bu01"));
         cnl.clear();
         cnl.add("Gorgon");
         aps.getLeaf("Bu05").revealCreatures(cnl);
         aps.getLeaf("Bu05").addCreature("Gorgon");
-        aps.getLeaf("Gr08").split(2, new Legion(player, "Gr11"), turn);
+        aps.getLeaf("Gr08").split(2, new TestLegion(player, "Gr11"), turn);
         aps.getLeaf("Gr08").merge(aps.getLeaf("Gr11"));
         cnl.clear();
         cnl.add("Ogre");
@@ -3142,7 +3168,7 @@ public class PredictSplitsTest extends TestCase
         cnl.add("Cyclops");
         aps.getLeaf("Gr09").revealCreatures(cnl);
         aps.getLeaf("Gr09").addCreature("Gorgon");
-        aps.getLeaf("Br01").split(2, new Legion(player, "Br03"), turn);
+        aps.getLeaf("Br01").split(2, new TestLegion(player, "Br03"), turn);
         aps.getLeaf("Br01").merge(aps.getLeaf("Br03"));
         cnl.clear();
         cnl.add("Lion");
@@ -3158,7 +3184,7 @@ public class PredictSplitsTest extends TestCase
         cnl.add("Cyclops");
         aps.getLeaf("Bk10").revealCreatures(cnl);
         aps.getLeaf("Bk10").addCreature("Gorgon");
-        aps.getLeaf("Rd06").split(2, new Legion(player, "Rd11"), turn);
+        aps.getLeaf("Rd06").split(2, new TestLegion(player, "Rd11"), turn);
         aps.printLeaves();
 
         turn = 17;
@@ -3175,14 +3201,14 @@ public class PredictSplitsTest extends TestCase
         assertEquals(aps.getLeaf("Gd04").numUncertainCreatures(), 1);
         assertEquals(aps.getLeaf("Gd06").numUncertainCreatures(), 0);
         assertEquals(aps.getLeaf("Gd12").numUncertainCreatures(), 1);
-        aps.getLeaf("Bu05").split(2, new Legion(player, "Bu08"), turn);
-        aps.getLeaf("Bu12").split(2, new Legion(player, "Bu01"), turn);
+        aps.getLeaf("Bu05").split(2, new TestLegion(player, "Bu08"), turn);
+        aps.getLeaf("Bu12").split(2, new TestLegion(player, "Bu01"), turn);
         aps.getLeaf("Bu12").merge(aps.getLeaf("Bu01"));
         cnl.clear();
         cnl.add("Lion");
         aps.getLeaf("Bu09").revealCreatures(cnl);
         aps.getLeaf("Bu09").addCreature("Lion");
-        aps.getLeaf("Gr08").split(2, new Legion(player, "Gr06"), turn);
+        aps.getLeaf("Gr08").split(2, new TestLegion(player, "Gr06"), turn);
         aps.getLeaf("Gr08").merge(aps.getLeaf("Gr06"));
         cnl.clear();
         cnl.add("Gorgon");
@@ -3224,7 +3250,7 @@ public class PredictSplitsTest extends TestCase
         cnl.add("Cyclops");
         aps.getLeaf("Gr09").revealCreatures(cnl);
         aps.getLeaf("Gr09").addCreature("Angel");
-        aps.getLeaf("Br01").split(2, new Legion(player, "Br05"), turn);
+        aps.getLeaf("Br01").split(2, new TestLegion(player, "Br05"), turn);
         aps.getLeaf("Br01").merge(aps.getLeaf("Br05"));
         cnl.clear();
         cnl.add("Centaur");
@@ -3287,7 +3313,7 @@ public class PredictSplitsTest extends TestCase
 
         turn = 18;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        aps.getLeaf("Gd06").split(2, new Legion(player, "Gd10"), turn);
+        aps.getLeaf("Gd06").split(2, new TestLegion(player, "Gd10"), turn);
         aps.getLeaf("Gd06").merge(aps.getLeaf("Gd10"));
         cnl.clear();
         cnl.add("Cyclops");
@@ -3298,13 +3324,13 @@ public class PredictSplitsTest extends TestCase
         assertEquals(aps.getLeaf("Gd04").numUncertainCreatures(), 0);
         assertEquals(aps.getLeaf("Gd06").numUncertainCreatures(), 0);
         assertEquals(aps.getLeaf("Gd12").numUncertainCreatures(), 1);
-        aps.getLeaf("Bu12").split(2, new Legion(player, "Bu04"), turn);
+        aps.getLeaf("Bu12").split(2, new TestLegion(player, "Bu04"), turn);
         cnl.clear();
         cnl.add("Cyclops");
         cnl.add("Cyclops");
         aps.getLeaf("Bu04").revealCreatures(cnl);
         aps.getLeaf("Bu04").addCreature("Gorgon");
-        aps.getLeaf("Gr08").split(2, new Legion(player, "Gr06"), turn);
+        aps.getLeaf("Gr08").split(2, new TestLegion(player, "Gr06"), turn);
         aps.getLeaf("Gr08").merge(aps.getLeaf("Gr06"));
         cnl.clear();
         cnl.add("Troll");
@@ -3316,7 +3342,7 @@ public class PredictSplitsTest extends TestCase
         aps.getLeaf("Gr04").addCreature("Gargoyle");
         aps.getLeaf("Gr05").addCreature("Gargoyle");
         aps.getLeaf("Gr09").addCreature("Gargoyle");
-        aps.getLeaf("Br01").split(2, new Legion(player, "Br06"), turn);
+        aps.getLeaf("Br01").split(2, new TestLegion(player, "Br06"), turn);
         cnl.clear();
         cnl.add("Cyclops");
         cnl.add("Cyclops");
@@ -3418,7 +3444,7 @@ public class PredictSplitsTest extends TestCase
 
         turn = 19;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        aps.getLeaf("Gd06").split(2, new Legion(player, "Gd10"), turn);
+        aps.getLeaf("Gd06").split(2, new TestLegion(player, "Gd10"), turn);
         aps.getLeaf("Gd06").merge(aps.getLeaf("Gd10"));
         cnl.clear();
         cnl.add("Lion");
@@ -3436,7 +3462,7 @@ public class PredictSplitsTest extends TestCase
         cnl.add("Guardian");
         aps.getLeaf("Bu12").revealCreatures(cnl);
         aps.getLeaf("Bu12").addCreature("Guardian");
-        aps.getLeaf("Gr08").split(2, new Legion(player, "Gr07"), turn);
+        aps.getLeaf("Gr08").split(2, new TestLegion(player, "Gr07"), turn);
         aps.getLeaf("Gr08").merge(aps.getLeaf("Gr07"));
         cnl.clear();
         cnl.add("Cyclops");
@@ -3452,7 +3478,7 @@ public class PredictSplitsTest extends TestCase
         aps.printLeaves();
         turn = 20;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        aps.getLeaf("Gd06").split(2, new Legion(player, "Gd08"), turn);
+        aps.getLeaf("Gd06").split(2, new TestLegion(player, "Gd08"), turn);
         cnl.clear();
         cnl.add("Behemoth");
         cnl.add("Behemoth");
@@ -3474,9 +3500,9 @@ public class PredictSplitsTest extends TestCase
         cnl.add("Cyclops");
         aps.getLeaf("Bu10").revealCreatures(cnl);
         aps.getLeaf("Bu10").addCreature("Gorgon");
-        aps.getLeaf("Gr01").split(2, new Legion(player, "Gr03"), turn);
+        aps.getLeaf("Gr01").split(2, new TestLegion(player, "Gr03"), turn);
         aps.getLeaf("Gr01").merge(aps.getLeaf("Gr03"));
-        aps.getLeaf("Gr08").split(2, new Legion(player, "Gr02"), turn);
+        aps.getLeaf("Gr08").split(2, new TestLegion(player, "Gr02"), turn);
         aps.getLeaf("Bu08").removeCreature("Gorgon");
         aps.getLeaf("Bu08").removeCreature("Gorgon");
         cnl.clear();
@@ -3516,7 +3542,7 @@ public class PredictSplitsTest extends TestCase
         aps.printLeaves();
         turn = 21;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        aps.getLeaf("Gd03").split(2, new Legion(player, "Gd07"), turn);
+        aps.getLeaf("Gd03").split(2, new TestLegion(player, "Gd07"), turn);
         aps.getLeaf("Gd03").merge(aps.getLeaf("Gd07"));
         cnl.clear();
         cnl.add("Cyclops");
@@ -3528,7 +3554,7 @@ public class PredictSplitsTest extends TestCase
         cnl.add("Cyclops");
         aps.getLeaf("Bu10").revealCreatures(cnl);
         aps.getLeaf("Bu10").addCreature("Gorgon");
-        aps.getLeaf("Gr01").split(2, new Legion(player, "Gr05"), turn);
+        aps.getLeaf("Gr01").split(2, new TestLegion(player, "Gr05"), turn);
         cnl.clear();
         cnl.add("Gorgon");
         cnl.add("Cyclops");
@@ -3559,12 +3585,12 @@ public class PredictSplitsTest extends TestCase
         cnl.add("Warlock");
         aps.getLeaf("Bu05").revealCreatures(cnl);
         aps.getLeaf("Bu05").addCreature("Angel");
-        aps.getLeaf("Br01").split(2, new Legion(player, "Br10"), turn);
+        aps.getLeaf("Br01").split(2, new TestLegion(player, "Br10"), turn);
         aps.getLeaf("Br01").merge(aps.getLeaf("Br10"));
         aps.printLeaves();
         turn = 22;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        aps.getLeaf("Gd03").split(2, new Legion(player, "Gd09"), turn);
+        aps.getLeaf("Gd03").split(2, new TestLegion(player, "Gd09"), turn);
         aps.getLeaf("Gd03").merge(aps.getLeaf("Gd09"));
         cnl.clear();
         cnl.add("Lion");
@@ -3579,7 +3605,7 @@ public class PredictSplitsTest extends TestCase
         aps.getLeaf("Bu09").removeCreature("Lion");
         aps.getLeaf("Bu09").removeCreature("Lion");
         aps.getLeaf("Bu09").removeCreature("Centaur");
-        aps.getLeaf("Br01").split(2, new Legion(player, "Br07"), turn);
+        aps.getLeaf("Br01").split(2, new TestLegion(player, "Br07"), turn);
         aps.getLeaf("Br01").merge(aps.getLeaf("Br07"));
         cnl.clear();
         cnl.add("Lion");
@@ -3591,7 +3617,7 @@ public class PredictSplitsTest extends TestCase
         cnl.add("Troll");
         aps.getLeaf("Bk06").revealCreatures(cnl);
         aps.getLeaf("Bk06").addCreature("Warbear");
-        aps.getLeaf("Rd06").split(2, new Legion(player, "Rd07"), turn);
+        aps.getLeaf("Rd06").split(2, new TestLegion(player, "Rd07"), turn);
         cnl.clear();
         cnl.add("Gorgon");
         aps.getLeaf("Rd06").revealCreatures(cnl);
@@ -3599,9 +3625,9 @@ public class PredictSplitsTest extends TestCase
         aps.printLeaves();
         turn = 23;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        aps.getLeaf("Gd03").split(2, new Legion(player, "Gd05"), turn);
+        aps.getLeaf("Gd03").split(2, new TestLegion(player, "Gd05"), turn);
         aps.getLeaf("Gd03").merge(aps.getLeaf("Gd05"));
-        aps.getLeaf("Gd06").split(2, new Legion(player, "Gd04"), turn);
+        aps.getLeaf("Gd06").split(2, new TestLegion(player, "Gd04"), turn);
         cnl.clear();
         cnl.add("Titan");
         cnl.add("Serpent");
@@ -3645,9 +3671,9 @@ public class PredictSplitsTest extends TestCase
         cnl.add("Gorgon");
         aps.getLeaf("Gd12").revealCreatures(cnl);
         aps.getLeaf("Gd12").addCreature("Gorgon");
-        aps.getLeaf("Br01").split(2, new Legion(player, "Br09"), turn);
+        aps.getLeaf("Br01").split(2, new TestLegion(player, "Br09"), turn);
         aps.getLeaf("Br01").merge(aps.getLeaf("Br09"));
-        aps.getLeaf("Bk04").split(2, new Legion(player, "Bk01"), turn);
+        aps.getLeaf("Bk04").split(2, new TestLegion(player, "Bk01"), turn);
         cnl.clear();
         cnl.add("Angel");
         cnl.add("Warbear");
@@ -3686,7 +3712,7 @@ public class PredictSplitsTest extends TestCase
         aps.printLeaves();
         turn = 24;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        aps.getLeaf("Br01").split(2, new Legion(player, "Br07"), turn);
+        aps.getLeaf("Br01").split(2, new TestLegion(player, "Br07"), turn);
         cnl.clear();
         cnl.add("Troll");
         aps.getLeaf("Bk06").revealCreatures(cnl);
@@ -3709,7 +3735,7 @@ public class PredictSplitsTest extends TestCase
         aps.printLeaves();
         turn = 25;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        aps.getLeaf("Bu12").split(2, new Legion(player, "Bu07"), turn);
+        aps.getLeaf("Bu12").split(2, new TestLegion(player, "Bu07"), turn);
         cnl.clear();
         cnl.add("Titan");
         cnl.add("Troll");
@@ -3797,7 +3823,7 @@ public class PredictSplitsTest extends TestCase
         aps.printLeaves();
         turn = 26;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        aps.getLeaf("Gd06").split(2, new Legion(player, "Gd11"), turn);
+        aps.getLeaf("Gd06").split(2, new TestLegion(player, "Gd11"), turn);
         cnl.clear();
         cnl.add("Minotaur");
         aps.getLeaf("Gd06").revealCreatures(cnl);
@@ -3866,7 +3892,7 @@ public class PredictSplitsTest extends TestCase
         aps.printLeaves();
         turn = 28;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        aps.getLeaf("Br12").split(2, new Legion(player, "Br04"), turn);
+        aps.getLeaf("Br12").split(2, new TestLegion(player, "Br04"), turn);
         cnl.clear();
         cnl.add("Warbear");
         aps.getLeaf("Bk06").revealCreatures(cnl);
@@ -3879,7 +3905,7 @@ public class PredictSplitsTest extends TestCase
         aps.printLeaves();
         turn = 30;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        aps.getLeaf("Gd06").split(2, new Legion(player, "Gd10"), turn);
+        aps.getLeaf("Gd06").split(2, new TestLegion(player, "Gd10"), turn);
         cnl.clear();
         cnl.add("Ranger");
         cnl.add("Ranger");
@@ -3913,7 +3939,7 @@ public class PredictSplitsTest extends TestCase
         aps.printLeaves();
         turn = 31;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        aps.getLeaf("Bk06").split(2, new Legion(player, "Bk02"), turn);
+        aps.getLeaf("Bk06").split(2, new TestLegion(player, "Bk02"), turn);
         aps.getLeaf("Gd04").removeCreature("Lion");
         aps.getLeaf("Gd04").removeCreature("Centaur");
         cnl.clear();
@@ -3923,8 +3949,8 @@ public class PredictSplitsTest extends TestCase
         aps.printLeaves();
         turn = 32;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        aps.getLeaf("Gd06").split(2, new Legion(player, "Gd01"), turn);
-        aps.getLeaf("Gd11").split(2, new Legion(player, "Gd05"), turn);
+        aps.getLeaf("Gd06").split(2, new TestLegion(player, "Gd01"), turn);
+        aps.getLeaf("Gd11").split(2, new TestLegion(player, "Gd05"), turn);
         cnl.clear();
         cnl.add("Ranger");
         aps.getLeaf("Gd11").revealCreatures(cnl);
@@ -3974,8 +4000,8 @@ public class PredictSplitsTest extends TestCase
         aps.printLeaves();
         turn = 34;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        aps.getLeaf("Gd03").split(2, new Legion(player, "Gd07"), turn);
-        aps.getLeaf("Gd11").split(2, new Legion(player, "Gd02"), turn);
+        aps.getLeaf("Gd03").split(2, new TestLegion(player, "Gd07"), turn);
+        aps.getLeaf("Gd11").split(2, new TestLegion(player, "Gd02"), turn);
         cnl.clear();
         cnl.add("Ranger");
         aps.getLeaf("Gd02").revealCreatures(cnl);
@@ -3993,12 +4019,12 @@ public class PredictSplitsTest extends TestCase
         cnl.add("Ranger");
         aps.getLeaf("Gd11").revealCreatures(cnl);
         aps.getLeaf("Gd11").addCreature("Ranger");
-        aps.getLeaf("Br12").split(2, new Legion(player, "Br04"), turn);
+        aps.getLeaf("Br12").split(2, new TestLegion(player, "Br04"), turn);
         cnl.clear();
         cnl.add("Serpent");
         aps.getLeaf("Br01").revealCreatures(cnl);
         aps.getLeaf("Br01").addCreature("Serpent");
-        aps.getLeaf("Bk06").split(2, new Legion(player, "Bk05"), turn);
+        aps.getLeaf("Bk06").split(2, new TestLegion(player, "Bk05"), turn);
         aps.getLeaf("Gd02").removeCreature("Ranger");
         aps.getLeaf("Gd02").removeCreature("Ranger");
         aps.getLeaf("Gd02").removeCreature("Ranger");
@@ -4018,7 +4044,7 @@ public class PredictSplitsTest extends TestCase
         aps.printLeaves();
         turn = 35;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        aps.getLeaf("Br01").split(2, new Legion(player, "Br07"), turn);
+        aps.getLeaf("Br01").split(2, new TestLegion(player, "Br07"), turn);
         aps.getLeaf("Gd10").removeCreature("Hydra");
         aps.getLeaf("Gd10").removeCreature("Griffon");
         aps.getLeaf("Gd10").removeCreature("Griffon");
@@ -4051,7 +4077,7 @@ public class PredictSplitsTest extends TestCase
         aps.printLeaves();
         turn = 36;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        aps.getLeaf("Gd11").split(2, new Legion(player, "Gd08"), turn);
+        aps.getLeaf("Gd11").split(2, new TestLegion(player, "Gd08"), turn);
         aps.getLeaf("Gd11").merge(aps.getLeaf("Gd08"));
         cnl.clear();
         cnl.add("Lion");
@@ -4069,7 +4095,7 @@ public class PredictSplitsTest extends TestCase
         aps.printLeaves();
         turn = 37;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        aps.getLeaf("Gd11").split(2, new Legion(player, "Gd08"), turn);
+        aps.getLeaf("Gd11").split(2, new TestLegion(player, "Gd08"), turn);
         cnl.clear();
         cnl.add("Ranger");
         aps.getLeaf("Gd05").revealCreatures(cnl);
@@ -4101,7 +4127,7 @@ public class PredictSplitsTest extends TestCase
         aps.printLeaves();
         turn = 38;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        aps.getLeaf("Br12").split(2, new Legion(player, "Br09"), turn);
+        aps.getLeaf("Br12").split(2, new TestLegion(player, "Br09"), turn);
         aps.getLeaf("Br12").merge(aps.getLeaf("Br09"));
         cnl.clear();
         cnl.add("Ranger");
@@ -4110,7 +4136,7 @@ public class PredictSplitsTest extends TestCase
         aps.printLeaves();
         turn = 39;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        aps.getLeaf("Br12").split(2, new Legion(player, "Br06"), turn);
+        aps.getLeaf("Br12").split(2, new TestLegion(player, "Br06"), turn);
         aps.getLeaf("Br12").merge(aps.getLeaf("Br06"));
         cnl.clear();
         cnl.add("Serpent");
@@ -4155,9 +4181,9 @@ public class PredictSplitsTest extends TestCase
         aps.printLeaves();
         turn = 40;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        aps.getLeaf("Br12").split(2, new Legion(player, "Br05"), turn);
+        aps.getLeaf("Br12").split(2, new TestLegion(player, "Br05"), turn);
         aps.getLeaf("Br12").merge(aps.getLeaf("Br05"));
-        aps.getLeaf("Bk05").split(2, new Legion(player, "Bk03"), turn);
+        aps.getLeaf("Bk05").split(2, new TestLegion(player, "Bk03"), turn);
         aps.getLeaf("Br04").removeCreature("Guardian");
         aps.getLeaf("Br04").removeCreature("Unicorn");
         aps.getLeaf("Br04").removeCreature("Unicorn");
@@ -4172,7 +4198,7 @@ public class PredictSplitsTest extends TestCase
         aps.printLeaves();
         turn = 41;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        aps.getLeaf("Gd05").split(2, new Legion(player, "Gd09"), turn);
+        aps.getLeaf("Gd05").split(2, new TestLegion(player, "Gd09"), turn);
         cnl.clear();
         cnl.add("Serpent");
         aps.getLeaf("Gd03").revealCreatures(cnl);
@@ -4189,7 +4215,7 @@ public class PredictSplitsTest extends TestCase
         cnl.add("Ranger");
         aps.getLeaf("Gd11").revealCreatures(cnl);
         aps.getLeaf("Gd11").addCreature("Troll");
-        aps.getLeaf("Br12").split(2, new Legion(player, "Br03"), turn);
+        aps.getLeaf("Br12").split(2, new TestLegion(player, "Br03"), turn);
         aps.getLeaf("Br12").merge(aps.getLeaf("Br03"));
         cnl.clear();
         cnl.add("Troll");
@@ -4199,15 +4225,15 @@ public class PredictSplitsTest extends TestCase
         aps.printLeaves();
         turn = 42;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        aps.getLeaf("Gd06").split(2, new Legion(player, "Gd02"), turn);
+        aps.getLeaf("Gd06").split(2, new TestLegion(player, "Gd02"), turn);
         aps.getLeaf("Gd06").merge(aps.getLeaf("Gd02"));
         cnl.clear();
         cnl.add("Troll");
         aps.getLeaf("Gd11").revealCreatures(cnl);
         aps.getLeaf("Gd11").addCreature("Troll");
-        aps.getLeaf("Br12").split(2, new Legion(player, "Br08"), turn);
+        aps.getLeaf("Br12").split(2, new TestLegion(player, "Br08"), turn);
         aps.getLeaf("Br12").merge(aps.getLeaf("Br08"));
-        aps.getLeaf("Bk05").split(2, new Legion(player, "Bk12"), turn);
+        aps.getLeaf("Bk05").split(2, new TestLegion(player, "Bk12"), turn);
         cnl.clear();
         cnl.add("Troll");
         aps.getLeaf("Bk02").revealCreatures(cnl);
@@ -4225,32 +4251,32 @@ public class PredictSplitsTest extends TestCase
         aps.printLeaves();
         turn = 43;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        aps.getLeaf("Gd06").split(2, new Legion(player, "Gd07"), turn);
-        aps.getLeaf("Gd11").split(2, new Legion(player, "Gd10"), turn);
+        aps.getLeaf("Gd06").split(2, new TestLegion(player, "Gd07"), turn);
+        aps.getLeaf("Gd11").split(2, new TestLegion(player, "Gd10"), turn);
         aps.getLeaf("Gd11").merge(aps.getLeaf("Gd10"));
-        aps.getLeaf("Br12").split(2, new Legion(player, "Br07"), turn);
+        aps.getLeaf("Br12").split(2, new TestLegion(player, "Br07"), turn);
         aps.getLeaf("Br12").merge(aps.getLeaf("Br07"));
-        aps.getLeaf("Bk06").split(2, new Legion(player, "Bk08"), turn);
+        aps.getLeaf("Bk06").split(2, new TestLegion(player, "Bk08"), turn);
         aps.printLeaves();
         turn = 44;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        aps.getLeaf("Gd11").split(2, new Legion(player, "Gd04"), turn);
+        aps.getLeaf("Gd11").split(2, new TestLegion(player, "Gd04"), turn);
         aps.getLeaf("Gd11").merge(aps.getLeaf("Gd04"));
-        aps.getLeaf("Br12").split(2, new Legion(player, "Br11"), turn);
+        aps.getLeaf("Br12").split(2, new TestLegion(player, "Br11"), turn);
         aps.getLeaf("Br12").merge(aps.getLeaf("Br11"));
         aps.getLeaf("Bk01").removeCreature("Centaur");
         aps.getLeaf("Bk01").removeCreature("Centaur");
         aps.printLeaves();
         turn = 45;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        aps.getLeaf("Gd11").split(2, new Legion(player, "Gd02"), turn);
+        aps.getLeaf("Gd11").split(2, new TestLegion(player, "Gd02"), turn);
         aps.getLeaf("Gd11").merge(aps.getLeaf("Gd02"));
         cnl.clear();
         cnl.add("Minotaur");
         cnl.add("Minotaur");
         aps.getLeaf("Gd01").revealCreatures(cnl);
         aps.getLeaf("Gd01").addCreature("Unicorn");
-        aps.getLeaf("Br12").split(2, new Legion(player, "Br11"), turn);
+        aps.getLeaf("Br12").split(2, new TestLegion(player, "Br11"), turn);
         cnl.clear();
         cnl.add("Unicorn");
         aps.getLeaf("Br11").revealCreatures(cnl);
@@ -4266,7 +4292,7 @@ public class PredictSplitsTest extends TestCase
         aps.printLeaves();
         turn = 46;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        aps.getLeaf("Gd11").split(2, new Legion(player, "Gd02"), turn);
+        aps.getLeaf("Gd11").split(2, new TestLegion(player, "Gd02"), turn);
         cnl.clear();
         cnl.add("Titan");
         aps.getLeaf("Br01").revealCreatures(cnl);
@@ -4282,7 +4308,7 @@ public class PredictSplitsTest extends TestCase
         aps.printLeaves();
         turn = 47;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        aps.getLeaf("Br01").split(2, new Legion(player, "Br06"), turn);
+        aps.getLeaf("Br01").split(2, new TestLegion(player, "Br06"), turn);
         cnl.clear();
         cnl.add("Serpent");
         aps.getLeaf("Br01").revealCreatures(cnl);
@@ -4312,9 +4338,9 @@ public class PredictSplitsTest extends TestCase
         aps.printLeaves();
         turn = 49;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        aps.getLeaf("Gd03").split(2, new Legion(player, "Gd07"), turn);
+        aps.getLeaf("Gd03").split(2, new TestLegion(player, "Gd07"), turn);
         aps.getLeaf("Gd03").merge(aps.getLeaf("Gd07"));
-        aps.getLeaf("Gd06").split(2, new Legion(player, "Gd07"), turn);
+        aps.getLeaf("Gd06").split(2, new TestLegion(player, "Gd07"), turn);
         aps.getLeaf("Gd06").merge(aps.getLeaf("Gd07"));
         cnl.clear();
         cnl.add("Unicorn");
@@ -4337,15 +4363,15 @@ public class PredictSplitsTest extends TestCase
         aps.printLeaves();
         turn = 50;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        aps.getLeaf("Gd03").split(2, new Legion(player, "Gd10"), turn);
+        aps.getLeaf("Gd03").split(2, new TestLegion(player, "Gd10"), turn);
         aps.getLeaf("Gd03").merge(aps.getLeaf("Gd10"));
-        aps.getLeaf("Gd06").split(2, new Legion(player, "Gd11"), turn);
+        aps.getLeaf("Gd06").split(2, new TestLegion(player, "Gd11"), turn);
         aps.getLeaf("Gd06").merge(aps.getLeaf("Gd11"));
         cnl.clear();
         cnl.add("Minotaur");
         aps.getLeaf("Gd01").revealCreatures(cnl);
         aps.getLeaf("Gd01").addCreature("Minotaur");
-        aps.getLeaf("Br12").split(2, new Legion(player, "Br07"), turn);
+        aps.getLeaf("Br12").split(2, new TestLegion(player, "Br07"), turn);
         cnl.clear();
         cnl.add("Guardian");
         aps.getLeaf("Bk03").revealCreatures(cnl);
@@ -4353,14 +4379,14 @@ public class PredictSplitsTest extends TestCase
         aps.printLeaves();
         turn = 51;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        aps.getLeaf("Gd03").split(2, new Legion(player, "Gd07"), turn);
+        aps.getLeaf("Gd03").split(2, new TestLegion(player, "Gd07"), turn);
         aps.getLeaf("Gd03").merge(aps.getLeaf("Gd07"));
-        aps.getLeaf("Gd06").split(2, new Legion(player, "Gd11"), turn);
+        aps.getLeaf("Gd06").split(2, new TestLegion(player, "Gd11"), turn);
         cnl.clear();
         cnl.add("Serpent");
         aps.getLeaf("Br01").revealCreatures(cnl);
         aps.getLeaf("Br01").addCreature("Behemoth");
-        aps.getLeaf("Bk05").split(2, new Legion(player, "Bk07"), turn);
+        aps.getLeaf("Bk05").split(2, new TestLegion(player, "Bk07"), turn);
         aps.getLeaf("Gd09").removeCreature("Minotaur");
         aps.getLeaf("Gd09").removeCreature("Lion");
         aps.getLeaf("Gd09").removeCreature("Lion");
@@ -4369,13 +4395,13 @@ public class PredictSplitsTest extends TestCase
         aps.printLeaves();
         turn = 52;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        aps.getLeaf("Gd03").split(2, new Legion(player, "Gd04"), turn);
+        aps.getLeaf("Gd03").split(2, new TestLegion(player, "Gd04"), turn);
         aps.getLeaf("Gd03").merge(aps.getLeaf("Gd04"));
         cnl.clear();
         cnl.add("Hydra");
         aps.getLeaf("Gd06").revealCreatures(cnl);
         aps.getLeaf("Gd06").addCreature("Griffon");
-        aps.getLeaf("Br01").split(2, new Legion(player, "Br03"), turn);
+        aps.getLeaf("Br01").split(2, new TestLegion(player, "Br03"), turn);
         cnl.clear();
         cnl.add("Unicorn");
         aps.getLeaf("Br11").revealCreatures(cnl);
@@ -4396,7 +4422,7 @@ public class PredictSplitsTest extends TestCase
         aps.printLeaves();
         turn = 53;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        aps.getLeaf("Gd03").split(2, new Legion(player, "Gd09"), turn);
+        aps.getLeaf("Gd03").split(2, new TestLegion(player, "Gd09"), turn);
         cnl.clear();
         cnl.add("Ranger");
         cnl.add("Ranger");
@@ -4449,7 +4475,7 @@ public class PredictSplitsTest extends TestCase
         aps.printLeaves();
         turn = 54;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        aps.getLeaf("Gd05").split(2, new Legion(player, "Gd07"), turn);
+        aps.getLeaf("Gd05").split(2, new TestLegion(player, "Gd07"), turn);
         cnl.clear();
         cnl.add("Behemoth");
         aps.getLeaf("Br03").revealCreatures(cnl);
@@ -4469,7 +4495,7 @@ public class PredictSplitsTest extends TestCase
         aps.printLeaves();
         turn = 58;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        aps.getLeaf("Gd06").split(2, new Legion(player, "Gd11"), turn);
+        aps.getLeaf("Gd06").split(2, new TestLegion(player, "Gd11"), turn);
         cnl.clear();
         cnl.add("Warlock");
         aps.getLeaf("Br06").revealCreatures(cnl);
@@ -4493,7 +4519,7 @@ public class PredictSplitsTest extends TestCase
         aps.printLeaves();
         turn = 60;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        aps.getLeaf("Br12").split(2, new Legion(player, "Br02"), turn);
+        aps.getLeaf("Br12").split(2, new TestLegion(player, "Br02"), turn);
         cnl.clear();
         cnl.add("Titan");
         aps.getLeaf("Bk10").revealCreatures(cnl);
@@ -4531,7 +4557,7 @@ public class PredictSplitsTest extends TestCase
         aps.printLeaves();
         turn = 61;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        aps.getLeaf("Bk10").split(2, new Legion(player, "Bk09"), turn);
+        aps.getLeaf("Bk10").split(2, new TestLegion(player, "Bk09"), turn);
         aps.getLeaf("Gd07").removeCreature("Ranger");
         aps.getLeaf("Gd07").removeCreature("Ranger");
         cnl.clear();
@@ -4541,7 +4567,7 @@ public class PredictSplitsTest extends TestCase
         aps.printLeaves();
         turn = 62;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        aps.getLeaf("Br01").split(2, new Legion(player, "Br05"), turn);
+        aps.getLeaf("Br01").split(2, new TestLegion(player, "Br05"), turn);
         cnl.clear();
         cnl.add("Titan");
         aps.getLeaf("Bk10").revealCreatures(cnl);
@@ -4632,8 +4658,8 @@ public class PredictSplitsTest extends TestCase
         aps.printLeaves();
         turn = 63;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        aps.getLeaf("Bk02").split(2, new Legion(player, "Bk11"), turn);
-        aps.getLeaf("Bk06").split(2, new Legion(player, "Bk04"), turn);
+        aps.getLeaf("Bk02").split(2, new TestLegion(player, "Bk11"), turn);
+        aps.getLeaf("Bk06").split(2, new TestLegion(player, "Bk04"), turn);
         cnl.clear();
         cnl.add("Wyvern");
         aps.getLeaf("Bk02").revealCreatures(cnl);
@@ -4657,7 +4683,7 @@ public class PredictSplitsTest extends TestCase
         aps.printLeaves();
         turn = 64;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        aps.getLeaf("Gd06").split(2, new Legion(player, "Gd07"), turn);
+        aps.getLeaf("Gd06").split(2, new TestLegion(player, "Gd07"), turn);
         aps.getLeaf("Gd06").merge(aps.getLeaf("Gd07"));
         cnl.clear();
         cnl.add("Titan");
@@ -4668,7 +4694,7 @@ public class PredictSplitsTest extends TestCase
         aps.printLeaves();
         turn = 65;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        aps.getLeaf("Gd06").split(2, new Legion(player, "Gd08"), turn);
+        aps.getLeaf("Gd06").split(2, new TestLegion(player, "Gd08"), turn);
         aps.getLeaf("Gd06").merge(aps.getLeaf("Gd08"));
         cnl.clear();
         cnl.add("Titan");
@@ -4712,7 +4738,7 @@ public class PredictSplitsTest extends TestCase
         aps.printLeaves();
         turn = 66;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        aps.getLeaf("Gd06").split(2, new Legion(player, "Gd05"), turn);
+        aps.getLeaf("Gd06").split(2, new TestLegion(player, "Gd05"), turn);
         cnl.clear();
         cnl.add("Warlock");
         aps.getLeaf("Gd03").revealCreatures(cnl);
@@ -4732,7 +4758,7 @@ public class PredictSplitsTest extends TestCase
         aps.printLeaves();
         turn = 67;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        aps.getLeaf("Gd03").split(2, new Legion(player, "Gd02"), turn);
+        aps.getLeaf("Gd03").split(2, new TestLegion(player, "Gd02"), turn);
         cnl.clear();
         cnl.add("Titan");
         aps.getLeaf("Gd03").revealCreatures(cnl);
@@ -4740,7 +4766,7 @@ public class PredictSplitsTest extends TestCase
         cnl.add("Titan");
         aps.getLeaf("Gd03").revealCreatures(cnl);
         aps.getLeaf("Gd03").addCreature("Warlock");
-        aps.getLeaf("Bk02").split(2, new Legion(player, "Bk01"), turn);
+        aps.getLeaf("Bk02").split(2, new TestLegion(player, "Bk01"), turn);
         aps.getLeaf("Gd05").removeCreature("Wyvern");
         aps.getLeaf("Gd05").removeCreature("Griffon");
         aps.getLeaf("Br05").removeCreature("Behemoth");
@@ -4765,12 +4791,12 @@ public class PredictSplitsTest extends TestCase
         aps.printLeaves();
         turn = 68;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        aps.getLeaf("Bk06").split(2, new Legion(player, "Gr01"), turn);
+        aps.getLeaf("Bk06").split(2, new TestLegion(player, "Gr01"), turn);
         aps.getLeaf("Bk06").merge(aps.getLeaf("Gr01"));
         aps.printLeaves();
         turn = 69;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        aps.getLeaf("Gd03").split(2, new Legion(player, "Gd12"), turn);
+        aps.getLeaf("Gd03").split(2, new TestLegion(player, "Gd12"), turn);
         cnl.clear();
         cnl.add("Titan");
         aps.getLeaf("Gd03").revealCreatures(cnl);
@@ -4784,7 +4810,7 @@ public class PredictSplitsTest extends TestCase
         cnl.add("Wyvern");
         aps.getLeaf("Gd06").revealCreatures(cnl);
         aps.getLeaf("Gd06").addCreature("Wyvern");
-        aps.getLeaf("Bk06").split(2, new Legion(player, "Bu09"), turn);
+        aps.getLeaf("Bk06").split(2, new TestLegion(player, "Bu09"), turn);
         cnl.clear();
         cnl.add("Troll");
         cnl.add("Troll");
@@ -4793,7 +4819,7 @@ public class PredictSplitsTest extends TestCase
         aps.printLeaves();
         turn = 70;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        aps.getLeaf("Gd06").split(2, new Legion(player, "Gd01"), turn);
+        aps.getLeaf("Gd06").split(2, new TestLegion(player, "Gd01"), turn);
         cnl.clear();
         cnl.add("Titan");
         aps.getLeaf("Gd03").revealCreatures(cnl);
@@ -4851,7 +4877,7 @@ public class PredictSplitsTest extends TestCase
         aps.printLeaves();
         turn = 71;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        aps.getLeaf("Gd03").split(2, new Legion(player, "Gd04"), turn);
+        aps.getLeaf("Gd03").split(2, new TestLegion(player, "Gd04"), turn);
         cnl.clear();
         cnl.add("Serpent");
         aps.getLeaf("Gd03").revealCreatures(cnl);
@@ -4880,7 +4906,7 @@ public class PredictSplitsTest extends TestCase
         aps.printLeaves();
         turn = 74;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        aps.getLeaf("Gd06").split(2, new Legion(player, "Gd11"), turn);
+        aps.getLeaf("Gd06").split(2, new TestLegion(player, "Gd11"), turn);
         cnl.clear();
         cnl.add("Titan");
         aps.getLeaf("Br01").revealCreatures(cnl);
@@ -4901,7 +4927,7 @@ public class PredictSplitsTest extends TestCase
         aps.printLeaves();
         turn = 75;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        aps.getLeaf("Br01").split(2, new Legion(player, "Br05"), turn);
+        aps.getLeaf("Br01").split(2, new TestLegion(player, "Br05"), turn);
         cnl.clear();
         cnl.add("Griffon");
         aps.getLeaf("Bu09").revealCreatures(cnl);
@@ -4928,7 +4954,7 @@ public class PredictSplitsTest extends TestCase
         aps.printLeaves();
         turn = 77;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        aps.getLeaf("Gd06").split(2, new Legion(player, "Gd08"), turn);
+        aps.getLeaf("Gd06").split(2, new TestLegion(player, "Gd08"), turn);
         cnl.clear();
         cnl.add("Serpent");
         cnl.add("Serpent");
@@ -4938,7 +4964,7 @@ public class PredictSplitsTest extends TestCase
         aps.printLeaves();
         turn = 78;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        aps.getLeaf("Gd03").split(2, new Legion(player, "Gd01"), turn);
+        aps.getLeaf("Gd03").split(2, new TestLegion(player, "Gd01"), turn);
         cnl.clear();
         cnl.add("Titan");
         cnl.add("Archangel");
@@ -4979,7 +5005,7 @@ public class PredictSplitsTest extends TestCase
         aps.printLeaves();
         turn = 79;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        aps.getLeaf("Bk10").split(2, new Legion(player, "Bk03"), turn);
+        aps.getLeaf("Bk10").split(2, new TestLegion(player, "Bk03"), turn);
         aps.getLeaf("Gd01").removeCreature("Guardian");
         aps.getLeaf("Gd01").removeCreature("Behemoth");
         cnl.clear();
@@ -4993,7 +5019,7 @@ public class PredictSplitsTest extends TestCase
         aps.printLeaves();
         turn = 80;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        aps.getLeaf("Bk02").split(2, new Legion(player, "Gr11"), turn);
+        aps.getLeaf("Bk02").split(2, new TestLegion(player, "Gr11"), turn);
         cnl.clear();
         cnl.add("Guardian");
         aps.getLeaf("Bk02").revealCreatures(cnl);
@@ -5019,7 +5045,7 @@ public class PredictSplitsTest extends TestCase
         aps.printLeaves();
         turn = 84;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        aps.getLeaf("Bk05").split(2, new Legion(player, "Gr06"), turn);
+        aps.getLeaf("Bk05").split(2, new TestLegion(player, "Gr06"), turn);
         aps.getLeaf("Gd08").removeCreature("Griffon");
         aps.getLeaf("Gd08").removeCreature("Griffon");
         aps.getLeaf("Gd08").removeCreature("Griffon");
@@ -5031,7 +5057,7 @@ public class PredictSplitsTest extends TestCase
         aps.printLeaves();
         turn = 87;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        aps.getLeaf("Bu09").split(2, new Legion(player, "Br07"), turn);
+        aps.getLeaf("Bu09").split(2, new TestLegion(player, "Br07"), turn);
         cnl.clear();
         cnl.add("Guardian");
         aps.getLeaf("Bk04").revealCreatures(cnl);
@@ -5056,7 +5082,7 @@ public class PredictSplitsTest extends TestCase
         aps.printLeaves();
         turn = 89;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        aps.getLeaf("Bk08").split(2, new Legion(player, "Gr09"), turn);
+        aps.getLeaf("Bk08").split(2, new TestLegion(player, "Gr09"), turn);
         cnl.clear();
         cnl.add("Serpent");
         aps.getLeaf("Gd03").revealCreatures(cnl);
@@ -5068,7 +5094,7 @@ public class PredictSplitsTest extends TestCase
         aps.printLeaves();
         turn = 91;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        aps.getLeaf("Gd03").split(2, new Legion(player, "Gd07"), turn);
+        aps.getLeaf("Gd03").split(2, new TestLegion(player, "Gd07"), turn);
         aps.getLeaf("Gd03").merge(aps.getLeaf("Gd07"));
         aps.getLeaf("Bk07").removeCreature("Warbear");
         aps.getLeaf("Bk07").removeCreature("Warbear");
@@ -5082,12 +5108,12 @@ public class PredictSplitsTest extends TestCase
         aps.printLeaves();
         turn = 92;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        aps.getLeaf("Gd03").split(2, new Legion(player, "Gd07"), turn);
+        aps.getLeaf("Gd03").split(2, new TestLegion(player, "Gd07"), turn);
         aps.getLeaf("Gd03").merge(aps.getLeaf("Gd07"));
         aps.printLeaves();
         turn = 93;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        aps.getLeaf("Gd03").split(2, new Legion(player, "Gd10"), turn);
+        aps.getLeaf("Gd03").split(2, new TestLegion(player, "Gd10"), turn);
         cnl.clear();
         cnl.add("Serpent");
         aps.getLeaf("Gd03").revealCreatures(cnl);
@@ -5130,7 +5156,7 @@ public class PredictSplitsTest extends TestCase
         aps.printLeaves();
         turn = 97;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        aps.getLeaf("Gd06").split(2, new Legion(player, "Gd09"), turn);
+        aps.getLeaf("Gd06").split(2, new TestLegion(player, "Gd09"), turn);
         aps.getLeaf("Gd06").merge(aps.getLeaf("Gd09"));
         aps.getLeaf("Bk01").removeCreature("Wyvern");
         aps.getLeaf("Bk01").removeCreature("Wyvern");
@@ -5138,7 +5164,7 @@ public class PredictSplitsTest extends TestCase
         aps.printLeaves();
         turn = 98;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        aps.getLeaf("Gd06").split(2, new Legion(player, "Gd02"), turn);
+        aps.getLeaf("Gd06").split(2, new TestLegion(player, "Gd02"), turn);
         cnl.clear();
         cnl.add("Griffon");
         aps.getLeaf("Gd02").revealCreatures(cnl);
@@ -5146,7 +5172,7 @@ public class PredictSplitsTest extends TestCase
         aps.printLeaves();
         turn = 99;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        aps.getLeaf("Bk06").split(2, new Legion(player, "Bk07"), turn);
+        aps.getLeaf("Bk06").split(2, new TestLegion(player, "Bk07"), turn);
         cnl.clear();
         cnl.add("Hydra");
         cnl.add("Hydra");
@@ -5186,7 +5212,7 @@ public class PredictSplitsTest extends TestCase
         aps.printLeaves();
         turn = 105;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        aps.getLeaf("Bk05").split(2, new Legion(player, "Bk03"), turn);
+        aps.getLeaf("Bk05").split(2, new TestLegion(player, "Bk03"), turn);
         cnl.clear();
         cnl.add("Colossus");
         aps.getLeaf("Bk05").revealCreatures(cnl);
@@ -5211,7 +5237,7 @@ public class PredictSplitsTest extends TestCase
         aps.printLeaves();
         turn = 107;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        aps.getLeaf("Gd03").split(2, new Legion(player, "Gd12"), turn);
+        aps.getLeaf("Gd03").split(2, new TestLegion(player, "Gd12"), turn);
         cnl.clear();
         cnl.add("Titan");
         aps.getLeaf("Bk10").revealCreatures(cnl);
@@ -5228,7 +5254,7 @@ public class PredictSplitsTest extends TestCase
 
         turn = 1;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        ps.getLeaf("Bk06").split(4, new Legion(player, "Bk09"), turn);
+        ps.getLeaf("Bk06").split(4, new TestLegion(player, "Bk09"), turn);
         cnl.clear();
         cnl.add("Gargoyle");
         cnl.add("Gargoyle");
@@ -5266,7 +5292,7 @@ public class PredictSplitsTest extends TestCase
 
         turn = 4;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        ps.getLeaf("Bk09").split(2, new Legion(player, "Bk10"), turn);
+        ps.getLeaf("Bk09").split(2, new TestLegion(player, "Bk10"), turn);
         cnl.clear();
         cnl.add("Titan");
         ps.getLeaf("Bk06").revealCreatures(cnl);
@@ -5306,7 +5332,7 @@ public class PredictSplitsTest extends TestCase
 
         turn = 1;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        ps.getLeaf("Bk06").split(4, new Legion(player, "Bk09"), turn);
+        ps.getLeaf("Bk06").split(4, new TestLegion(player, "Bk09"), turn);
         cnl.clear();
         cnl.add("Ogre");
         cnl.add("Ogre");
@@ -5350,8 +5376,8 @@ public class PredictSplitsTest extends TestCase
 
         turn = 5;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        ps.getLeaf("Bk06").split(2, new Legion(player, "Bk08"), turn);
-        ps.getLeaf("Bk09").split(2, new Legion(player, "Bk11"), turn);
+        ps.getLeaf("Bk06").split(2, new TestLegion(player, "Bk08"), turn);
+        ps.getLeaf("Bk09").split(2, new TestLegion(player, "Bk11"), turn);
         cnl.clear();
         cnl.add("Angel");
         ps.getLeaf("Bk09").revealCreatures(cnl);
@@ -5413,7 +5439,7 @@ public class PredictSplitsTest extends TestCase
 
         turn = 8;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        ps.getLeaf("Bk09").split(2, new Legion(player, "Bk12"), turn);
+        ps.getLeaf("Bk09").split(2, new TestLegion(player, "Bk12"), turn);
         ps.getLeaf("Bk12").removeCreature("Gargoyle");
         ps.getLeaf("Bk12").removeCreature("Centaur");
         assertTrue(ps.getLeaf("Bk06").allCertain());
@@ -5553,7 +5579,7 @@ public class PredictSplitsTest extends TestCase
         cnl.add("Ogre");
         cnl.add("Ogre");
         aps.getLeaf("Rd12").revealCreatures(cnl);
-        aps.getLeaf("Gr07").split(4, new Legion(player, "Gr12"), turn);
+        aps.getLeaf("Gr07").split(4, new TestLegion(player, "Gr12"), turn);
         cnl.clear();
         cnl.add("Ogre");
         cnl.add("Ogre");
@@ -5564,7 +5590,7 @@ public class PredictSplitsTest extends TestCase
         cnl.add("Gargoyle");
         aps.getLeaf("Gr12").revealCreatures(cnl);
         aps.getLeaf("Gr12").addCreature("Cyclops");
-        aps.getLeaf("Bu08").split(4, new Legion(player, "Bu12"), turn);
+        aps.getLeaf("Bu08").split(4, new TestLegion(player, "Bu12"), turn);
         cnl.clear();
         cnl.add("Centaur");
         aps.getLeaf("Bu08").revealCreatures(cnl);
@@ -5574,7 +5600,7 @@ public class PredictSplitsTest extends TestCase
         cnl.add("Gargoyle");
         aps.getLeaf("Bu12").revealCreatures(cnl);
         aps.getLeaf("Bu12").addCreature("Cyclops");
-        aps.getLeaf("Gd01").split(4, new Legion(player, "Gd12"), turn);
+        aps.getLeaf("Gd01").split(4, new TestLegion(player, "Gd12"), turn);
         cnl.clear();
         cnl.add("Ogre");
         cnl.add("Ogre");
@@ -5584,7 +5610,7 @@ public class PredictSplitsTest extends TestCase
         cnl.add("Centaur");
         aps.getLeaf("Gd12").revealCreatures(cnl);
         aps.getLeaf("Gd12").addCreature("Centaur");
-        aps.getLeaf("Bk10").split(4, new Legion(player, "Bk03"), turn);
+        aps.getLeaf("Bk10").split(4, new TestLegion(player, "Bk03"), turn);
         cnl.clear();
         cnl.add("Titan");
         aps.getLeaf("Bk03").revealCreatures(cnl);
@@ -5597,7 +5623,7 @@ public class PredictSplitsTest extends TestCase
         cnl.add("Centaur");
         aps.getLeaf("Bk10").revealCreatures(cnl);
         aps.getLeaf("Bk10").addCreature("Centaur");
-        aps.getLeaf("Br12").split(4, new Legion(player, "Br07"), turn);
+        aps.getLeaf("Br12").split(4, new TestLegion(player, "Br07"), turn);
         cnl.clear();
         cnl.add("Titan");
         aps.getLeaf("Br07").revealCreatures(cnl);
@@ -5609,7 +5635,7 @@ public class PredictSplitsTest extends TestCase
         cnl.add("Ogre");
         aps.getLeaf("Br12").revealCreatures(cnl);
         aps.getLeaf("Br12").addCreature("Ogre");
-        aps.getLeaf("Rd12").split(4, new Legion(player, "Rd03"), turn);
+        aps.getLeaf("Rd12").split(4, new TestLegion(player, "Rd03"), turn);
         cnl.clear();
         cnl.add("Gargoyle");
         aps.getLeaf("Rd12").revealCreatures(cnl);
@@ -5735,7 +5761,7 @@ public class PredictSplitsTest extends TestCase
         cnl.add("Centaur");
         aps.getLeaf("Bu08").revealCreatures(cnl);
         aps.getLeaf("Bu08").addCreature("Lion");
-        aps.getLeaf("Gd01").split(2, new Legion(player, "Gd07"), turn);
+        aps.getLeaf("Gd01").split(2, new TestLegion(player, "Gd07"), turn);
         cnl.clear();
         cnl.add("Troll");
         aps.getLeaf("Gd01").revealCreatures(cnl);
@@ -5778,8 +5804,8 @@ public class PredictSplitsTest extends TestCase
 
         turn = 5;
         LOGGER.log(Level.FINEST, "Turn " + turn);
-        aps.getLeaf("Gr07").split(2, new Legion(player, "Gr05"), turn);
-        aps.getLeaf("Gr12").split(2, new Legion(player, "Gr10"), turn);
+        aps.getLeaf("Gr07").split(2, new TestLegion(player, "Gr05"), turn);
+        aps.getLeaf("Gr12").split(2, new TestLegion(player, "Gr10"), turn);
         cnl.clear();
         cnl.add("Ogre");
         aps.getLeaf("Gr05").revealCreatures(cnl);
@@ -5789,7 +5815,7 @@ public class PredictSplitsTest extends TestCase
         cnl.add("Troll");
         aps.getLeaf("Gr07").revealCreatures(cnl);
         aps.getLeaf("Gr07").addCreature("Ranger");
-        aps.getLeaf("Bu08").split(2, new Legion(player, "Bu02"), turn);
+        aps.getLeaf("Bu08").split(2, new TestLegion(player, "Bu02"), turn);
         cnl.clear();
         cnl.add("Ogre");
         cnl.add("Ogre");
@@ -5800,21 +5826,21 @@ public class PredictSplitsTest extends TestCase
         cnl.add("Centaur");
         aps.getLeaf("Bu12").revealCreatures(cnl);
         aps.getLeaf("Bu12").addCreature("Centaur");
-        aps.getLeaf("Gd12").split(2, new Legion(player, "Gd11"), turn);
+        aps.getLeaf("Gd12").split(2, new TestLegion(player, "Gd11"), turn);
         aps.getLeaf("Gd12").merge(aps.getLeaf("Gd11"));
         cnl.clear();
         cnl.add("Centaur");
         cnl.add("Centaur");
         aps.getLeaf("Gd07").revealCreatures(cnl);
         aps.getLeaf("Gd07").addCreature("Lion");
-        aps.getLeaf("Bk03").split(2, new Legion(player, "Bk04"), turn);
-        aps.getLeaf("Bk10").split(2, new Legion(player, "Bk07"), turn);
+        aps.getLeaf("Bk03").split(2, new TestLegion(player, "Bk04"), turn);
+        aps.getLeaf("Bk10").split(2, new TestLegion(player, "Bk07"), turn);
         aps.getLeaf("Bk10").merge(aps.getLeaf("Bk07"));
         cnl.clear();
         cnl.add("Ogre");
         aps.getLeaf("Bk03").revealCreatures(cnl);
         aps.getLeaf("Bk03").addCreature("Ogre");
-        aps.getLeaf("Br12").split(2, new Legion(player, "Br10"), turn);
+        aps.getLeaf("Br12").split(2, new TestLegion(player, "Br10"), turn);
         aps.getLeaf("Gr10").removeCreature("Gargoyle");
         aps.getLeaf("Gr10").removeCreature("Gargoyle");
         cnl.clear();
@@ -5825,8 +5851,8 @@ public class PredictSplitsTest extends TestCase
         cnl.add("Troll");
         aps.getLeaf("Br12").revealCreatures(cnl);
         aps.getLeaf("Br12").addCreature("Troll");
-        aps.getLeaf("Rd03").split(2, new Legion(player, "Rd04"), turn);
-        aps.getLeaf("Rd12").split(2, new Legion(player, "Rd10"), turn);
+        aps.getLeaf("Rd03").split(2, new TestLegion(player, "Rd04"), turn);
+        aps.getLeaf("Rd12").split(2, new TestLegion(player, "Rd10"), turn);
         cnl.clear();
         cnl.add("Gargoyle");
         cnl.add("Gargoyle");
@@ -5885,7 +5911,7 @@ public class PredictSplitsTest extends TestCase
         cnl.add("Centaur");
         aps.getLeaf("Gr12").revealCreatures(cnl);
         aps.getLeaf("Gr12").addCreature("Lion");
-        aps.getLeaf("Bu12").split(2, new Legion(player, "Bu11"), turn);
+        aps.getLeaf("Bu12").split(2, new TestLegion(player, "Bu11"), turn);
         cnl.clear();
         cnl.add("Titan");
         cnl.add("Cyclops");
@@ -5915,7 +5941,7 @@ public class PredictSplitsTest extends TestCase
         cnl.add("Centaur");
         aps.getLeaf("Bu12").revealCreatures(cnl);
         aps.getLeaf("Bu12").addCreature("Centaur");
-        aps.getLeaf("Gd12").split(2, new Legion(player, "Gd11"), turn);
+        aps.getLeaf("Gd12").split(2, new TestLegion(player, "Gd11"), turn);
         aps.getLeaf("Gd12").merge(aps.getLeaf("Gd11"));
         cnl.clear();
         cnl.add("Angel");
@@ -5950,7 +5976,7 @@ public class PredictSplitsTest extends TestCase
         cnl.add("Troll");
         cnl.add("Troll");
         aps.getLeaf("Rd03").revealCreatures(cnl);
-        aps.getLeaf("Bk10").split(2, new Legion(player, "Bk01"), turn);
+        aps.getLeaf("Bk10").split(2, new TestLegion(player, "Bk01"), turn);
         cnl.clear();
         cnl.add("Ogre");
         cnl.add("Ogre");

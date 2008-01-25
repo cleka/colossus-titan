@@ -4,10 +4,11 @@ package net.sf.colossus.game;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.MasterHex;
 
 
-public class Legion
+public abstract class Legion
 {
     /**
      * The player/game combination owning this Legion.
@@ -29,6 +30,11 @@ public class Legion
     private boolean moved;
 
     private boolean teleported;
+
+    /**
+     * The side this legion entered a battle in.
+     */
+    private int entrySide;
 
     // TODO legions should be created through factory from the player instances
     public Legion(final Player playerState, String markerId)
@@ -122,7 +128,7 @@ public class Legion
      */
     public int getHeight()
     {
-        return creatures.size();
+        return getCreatures().size();
     }
 
     public void setMoved(boolean moved)
@@ -143,5 +149,103 @@ public class Legion
     public boolean hasTeleported()
     {
         return teleported;
+    }
+
+    public boolean contains(CreatureType type)
+    {
+        return getCreatures().contains(type);
+    }
+
+    public void setEntrySide(int entrySide)
+    {
+        this.entrySide = entrySide;
+    }
+
+    public int getEntrySide()
+    {
+        return entrySide;
+    }
+
+    /**
+     * TODO unify between the two derived classes or even better: replace with code
+     *      for getting the image 
+     */
+    public abstract List<String> getImageNames();
+
+    /**
+     * TODO unify between the two derived classes if possible -- the handling of Titans
+     *      is quite different, although it should have the same result
+     */
+    public abstract int getPointValue();
+
+    /**
+     * TODO unify between the two derived classes if possible
+     */
+    public abstract boolean hasRecruited();
+
+    public boolean hasSummonable()
+    {
+        for (Creature creature : getCreatures())
+        {
+            if (creature.getType().isSummonable())
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean canFlee()
+    {
+        for (Creature critter : getCreatures())
+        {
+            if (critter.getType().isLord())
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * TODO unify between the two derived classes
+     */
+    public int numCreature(CreatureType creatureType)
+    {
+        int count = 0;
+        for (Creature critter : getCreatures())
+        {
+            if (critter.getType().equals(creatureType))
+            {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    public int numLords()
+    {
+        int count = 0;
+        for (Creature critter : getCreatures())
+        {
+            if (critter.getType().isLord())
+            {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    public int numRangestrikers()
+    {
+        int count = 0;
+        for (Creature critter : getCreatures())
+        {
+            if (critter.getType().isRangestriker())
+            {
+                count++;
+            }
+        }
+        return count;
     }
 }
