@@ -33,7 +33,8 @@ import net.sf.colossus.xmlparser.VariantLoader;
  * Class VariantSupport hold the members and functions 
  * required to support Variants in Colossus
  * 
- * TODO this should probably move into the variant package sooner or later
+ * TODO this should probably move into the variant package sooner or later, possibly
+ *      into the {@link Variant} class itself
  * 
  * @version $Id$
  * @author Romain Dolbeau
