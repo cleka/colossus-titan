@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.sf.colossus.client.PlayerClientSide;
+import net.sf.colossus.game.Game;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.util.Glob;
@@ -33,7 +35,17 @@ public final class PlayerServerSide extends Player implements
     // and the getScore/setScore overrides could go.
     private double score; // track half-points, then round
     private boolean summoned;
+
+    /**
+     * TODO {@link PlayerClientSide} just checks if any legion has teleported.
+     *      Pick one version and move up into {@link Player}.
+     */
     private boolean teleported;
+
+    /**
+     * TODO this might be better as a state in {@link Game} since there is
+     *      always only one per game, not per player
+     */
     private int movementRoll; // 0 if movement has not been rolled.
 
     private boolean titanEliminated;
