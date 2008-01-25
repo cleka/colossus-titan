@@ -96,7 +96,7 @@ public final class Movement
             if (client.getFriendlyLegions(hexLabel, player).size() > 0)
             {
                 List<Legion> legions = client.getLegionsByHex(hexLabel);
-                if (((LegionClientSide)legions.get(0)).hasMoved())
+                if (legions.get(0).hasMoved())
                 {
                     return set;
                 }
@@ -229,8 +229,7 @@ public final class Movement
     public Set<String> listNormalMoves(Legion legion, MasterHex hex,
         int movementRoll, boolean inAdvance, String fromHexLabel)
     {
-        if (hex == null
-            || (((LegionClientSide)legion).hasMoved() && (!inAdvance)))
+        if (hex == null || ((legion).hasMoved() && (!inAdvance)))
         {
             return new HashSet<String>();
         }
@@ -321,8 +320,7 @@ public final class Movement
 
         Set<String> set = new HashSet<String>();
         if (hex == null
-            || ((!inAdvance) && (movementRoll != 6
-                || ((LegionClientSide)legion).hasMoved() || ((PlayerClientSide)player)
+            || ((!inAdvance) && (movementRoll != 6 || (legion).hasMoved() || ((PlayerClientSide)player)
                 .hasTeleported())))
         {
             return set;
@@ -376,7 +374,7 @@ public final class Movement
 
         // Titan teleport
         if (((PlayerClientSide)player).canTitanTeleport()
-            && ((LegionClientSide)legion).hasTitan() && titanTeleportAllowed())
+            && (legion).hasTitan() && titanTeleportAllowed())
         {
             // Mark every hex containing an enemy stack that does not
             // already contain a friendly stack.
@@ -401,7 +399,7 @@ public final class Movement
         boolean teleport)
     {
         Set<String> entrySides = new HashSet<String>();
-        LegionClientSide legion = client.getLegion(markerId);
+        Legion legion = client.getLegion(markerId);
         int movementRoll = client.getMovementRoll();
         MasterHex currentHex = client.getGame().getVariant().getMasterBoard()
             .getHexByLabel(legion.getHexLabel());

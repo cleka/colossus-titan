@@ -26,6 +26,10 @@ public class Legion
 
     protected final String markerId;
 
+    private boolean moved;
+
+    private boolean teleported;
+
     // TODO legions should be created through factory from the player instances
     public Legion(final Player playerState, String markerId)
     {
@@ -85,9 +89,9 @@ public class Legion
     }
 
     /**
-     * TODO should be an unmodifiable List<Creature>, but can't at the moment since both
-     * derived classes and users might still expect to change it using the subtype they
-     * know of
+     * TODO should be an unmodifiable List, but can't at the moment since both
+     * derived classes and users might still expect to change it 
+     * TODO should be List<Creature>, but subtypes are still covariant
      */
     public List<? extends Creature> getCreatures()
     {
@@ -119,5 +123,25 @@ public class Legion
     public int getHeight()
     {
         return creatures.size();
+    }
+
+    public void setMoved(boolean moved)
+    {
+        this.moved = moved;
+    }
+
+    public boolean hasMoved()
+    {
+        return moved;
+    }
+
+    public void setTeleported(boolean teleported)
+    {
+        this.teleported = teleported;
+    }
+
+    public boolean hasTeleported()
+    {
+        return teleported;
     }
 }

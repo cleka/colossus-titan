@@ -37,9 +37,7 @@ public final class LegionServerSide extends net.sf.colossus.game.Legion
      * The label of the starting hex of the last move.
      */
     private String startingHexLabel;
-    private boolean moved;
     private int entrySide = -1;
-    private boolean teleported;
     private String recruitName;
     private int battleTally;
     private final GameServerSide game;
@@ -358,16 +356,6 @@ public final class LegionServerSide extends net.sf.colossus.game.Legion
         return (PlayerServerSide)super.getPlayer();
     }
 
-    public boolean hasMoved()
-    {
-        return moved;
-    }
-
-    void setMoved(boolean moved)
-    {
-        this.moved = moved;
-    }
-
     /** Eliminate this legion. */
     void remove(boolean returnCrittersToStacks, boolean updateHistory)
     {
@@ -421,7 +409,7 @@ public final class LegionServerSide extends net.sf.colossus.game.Legion
         String hexLabel = hex.getLabel();
 
         setHexLabel(hexLabel);
-        moved = true;
+        setMoved(true);
 
         setEntrySide(entrySide);
 
@@ -453,7 +441,7 @@ public final class LegionServerSide extends net.sf.colossus.game.Legion
 
     void undoMove()
     {
-        if (moved)
+        if (hasMoved())
         {
             // If this legion teleported, allow teleporting again.
             if (hasTeleported())
@@ -464,7 +452,7 @@ public final class LegionServerSide extends net.sf.colossus.game.Legion
 
             setHexLabel(startingHexLabel);
 
-            moved = false;
+            setMoved(false);
             LOGGER.log(Level.INFO, "Legion " + this + " undoes its move");
         }
     }
@@ -473,7 +461,7 @@ public final class LegionServerSide extends net.sf.colossus.game.Legion
     void commitMove()
     {
         startingHexLabel = getHexLabel();
-        moved = false;
+        setMoved(false);
         recruitName = null;
     }
 
@@ -544,16 +532,6 @@ public final class LegionServerSide extends net.sf.colossus.game.Legion
     int getEntrySide()
     {
         return entrySide;
-    }
-
-    boolean hasTeleported()
-    {
-        return teleported;
-    }
-
-    void setTeleported(boolean teleported)
-    {
-        this.teleported = teleported;
     }
 
     /** Add a creature to this legion.  If takeFromStack is true,

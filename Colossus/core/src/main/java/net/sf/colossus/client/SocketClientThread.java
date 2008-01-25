@@ -877,7 +877,7 @@ final class SocketClientThread extends Thread implements IServer
             String resMethod = args.remove(0);
             int points = Integer.parseInt(args.remove(0));
             int turns = Integer.parseInt(args.remove(0));
-            LegionClientSide legion;
+            Legion legion;
             if (winnerId.equals("null"))
             {
                 legion = null;

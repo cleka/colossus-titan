@@ -16,7 +16,7 @@ import net.sf.colossus.variant.CreatureType;
 
 
 /**
- * LegionInfo holds client-side public info about a legion.
+ * Client-side version of a legion.
  * 
  * TODO Comparable is implemented only for AI purposes, it might be better to have
  *      a Comparator there.
@@ -35,8 +35,6 @@ public final class LegionClientSide extends Legion implements
 
     private Marker marker;
     private String lastRecruit;
-    private boolean moved;
-    private boolean teleported;
     private int entrySide;
     private boolean recruited;
     private PredictSplitNode myNode;
@@ -407,26 +405,6 @@ public final class LegionClientSide extends Legion implements
     String getLastRecruit()
     {
         return lastRecruit;
-    }
-
-    public void setMoved(boolean moved)
-    {
-        this.moved = moved;
-    }
-
-    public boolean hasMoved()
-    {
-        return moved;
-    }
-
-    void setTeleported(boolean teleported)
-    {
-        this.teleported = teleported;
-    }
-
-    boolean hasTeleported()
-    {
-        return teleported;
     }
 
     void setEntrySide(int entrySide)

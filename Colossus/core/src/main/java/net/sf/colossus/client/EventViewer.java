@@ -736,7 +736,7 @@ final class EventViewer extends KDialog implements WindowListener,
 
         attackerEventLegion = new RevealEvent(client, turnNumber,
             getActivePlayerNum(), RevealEvent.eventBattle, attacker
-                .getMarkerId(), ((LegionClientSide)attacker).getHeight(),
+                .getMarkerId(), attacker.getHeight(),
             new ArrayList<RevealedCreature>(), null, 0);
         attackerEventLegion.setEventInfo(Constants.reasonBattleStarts);
         attackerEventLegion.setRealPlayer((PlayerClientSide)attacker
@@ -744,7 +744,7 @@ final class EventViewer extends KDialog implements WindowListener,
 
         defenderEventLegion = new RevealEvent(client, turnNumber,
             getActivePlayerNum(), RevealEvent.eventBattle, defender
-                .getMarkerId(), ((LegionClientSide)defender).getHeight(),
+                .getMarkerId(), defender.getHeight(),
             new ArrayList<RevealedCreature>(), null, 0);
 
         defenderEventLegion.setEventInfo(Constants.reasonBattleStarts);
@@ -1054,8 +1054,7 @@ final class EventViewer extends KDialog implements WindowListener,
             LOGGER.log(Level.FINEST, "During battle, remove creature " + name
                 + " from attacker legion " + markerId);
 
-            attackerEventLegion.setCreatureDied(name,
-                ((LegionClientSide)attacker).getHeight());
+            attackerEventLegion.setCreatureDied(name, (attacker).getHeight());
         }
 
         else if (defender != null && defenderEventLegion != null
@@ -1063,8 +1062,7 @@ final class EventViewer extends KDialog implements WindowListener,
         {
             LOGGER.log(Level.FINEST, "During battle, remove creature " + name
                 + " from defender legion " + markerId);
-            defenderEventLegion.setCreatureDied(name,
-                ((LegionClientSide)defender).getHeight());
+            defenderEventLegion.setCreatureDied(name, (defender).getHeight());
         }
     }
 

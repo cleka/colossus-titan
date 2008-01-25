@@ -185,7 +185,7 @@ public final class PlayerClientSide extends Player
 
     boolean hasTeleported()
     {
-        for (LegionClientSide info : getLegions())
+        for (Legion info : getLegions())
         {
             if (info.hasTeleported())
             {
@@ -200,7 +200,7 @@ public final class PlayerClientSide extends Player
     {
         int count = 0;
 
-        for (LegionClientSide legion : getLegions())
+        for (Legion legion : getLegions())
         {
             if (legion.hasMoved())
             {

@@ -684,9 +684,8 @@ public final class Client implements IClient, IOracle
         if (eventViewer != null)
         {
             eventViewer.newCreatureRevealEvent(RevealEvent.eventSummon, donor
-                .getMarkerId(), ((LegionClientSide)donor).getHeight(), summon,
-                summoner.getMarkerId(), ((LegionClientSide)summoner)
-                    .getHeight());
+                .getMarkerId(), (donor).getHeight(), summon, summoner
+                .getMarkerId(), (summoner).getHeight());
         }
     }
 
@@ -1166,10 +1165,10 @@ public final class Client implements IClient, IOracle
         int totalValue = 0;
         int totalLegions = 0;
 
-        for (LegionClientSide legion : legionInfo.values())
+        for (Legion legion : legionInfo.values())
         {
             totalLegions++;
-            totalValue = legion.getPointValue();
+            totalValue = ((LegionClientSide)legion).getPointValue();
         }
         return (int)(Math.round((double)totalValue / totalLegions));
     }
@@ -1716,7 +1715,7 @@ public final class Client implements IClient, IOracle
             getOwningPlayer().addMarkerAvailable(legion.getMarkerId());
         }
 
-        String hexLabel = ((LegionClientSide)legion).getHexLabel();
+        String hexLabel = (legion).getHexLabel();
 
         // XXX Not perfect -- Need to track recruitChits by legion.
         removeRecruitChit(hexLabel);
@@ -1730,7 +1729,7 @@ public final class Client implements IClient, IOracle
 
     int getLegionHeight(String markerId)
     {
-        LegionClientSide legionInfo = getLegion(markerId);
+        Legion legionInfo = getLegion(markerId);
         if (legionInfo == null)
         {
             return 0; //no legion, no height
@@ -1742,8 +1741,8 @@ public final class Client implements IClient, IOracle
     public void setLegionStatus(Legion legion, boolean moved,
         boolean teleported, int entrySide, String lastRecruit)
     {
-        ((LegionClientSide)legion).setMoved(moved);
-        ((LegionClientSide)legion).setTeleported(teleported);
+        legion.setMoved(moved);
+        legion.setTeleported(teleported);
         ((LegionClientSide)legion).setEntrySide(entrySide);
         ((LegionClientSide)legion).setLastRecruit(lastRecruit);
     }
@@ -1814,8 +1813,8 @@ public final class Client implements IClient, IOracle
             eventViewer.removeCreature(legion.getMarkerId(), name);
         }
 
-        String hexLabel = ((LegionClientSide)legion).getHexLabel();
-        int height = ((LegionClientSide)legion).getHeight();
+        String hexLabel = (legion).getHexLabel();
+        int height = (legion).getHeight();
         ((LegionClientSide)legion).removeCreature(name);
         if (height <= 1)
         {
@@ -3067,9 +3066,8 @@ public final class Client implements IClient, IOracle
 
         if (eventViewer != null)
         {
-            eventViewer.recruitEvent(legion.getMarkerId(),
-                ((LegionClientSide)legion).getHeight(), recruitName,
-                recruiters);
+            eventViewer.recruitEvent(legion.getMarkerId(), (legion)
+                .getHeight(), recruitName, recruiters);
         }
 
         if (board != null)
@@ -3933,8 +3931,7 @@ public final class Client implements IClient, IOracle
         if (!legions.isEmpty())
         {
             Legion legion0 = legions.get(0);
-            if (legion0 != null && !isMyLegion(legion0)
-                && ((LegionClientSide)legion).hasTitan())
+            if (legion0 != null && !isMyLegion(legion0) && (legion).hasTitan())
             {
                 lords.add(((LegionClientSide)legion).getTitanBasename());
             }
@@ -4027,7 +4024,7 @@ public final class Client implements IClient, IOracle
         // if this hex is already occupied, return false
         int friendlyLegions = getFriendlyLegions(hexLabel, getActivePlayer())
             .size();
-        if (hexLabel.equals(((LegionClientSide)mover).getHexLabel()))
+        if (hexLabel.equals((mover).getHexLabel()))
         {
             // same hex as starting hex, but it might be occupied by
             // multiple legions after split
@@ -4064,8 +4061,8 @@ public final class Client implements IClient, IOracle
         {
             pushUndoStack(info.getMarkerId());
         }
-        ((LegionClientSide)info).setHexLabel(currentHexLabel);
-        ((LegionClientSide)info).setMoved(true);
+        (info).setHexLabel(currentHexLabel);
+        (info).setMoved(true);
         ((LegionClientSide)info).setEntrySide(BattleMap
             .entrySideNum(entrySide));
 
@@ -4073,12 +4070,12 @@ public final class Client implements IClient, IOracle
         // socketCLientThread sets then it to null.
         if (teleport && teleportingLord != null)
         {
-            ((LegionClientSide)info).setTeleported(true);
+            (info).setTeleported(true);
             if (eventViewer != null)
             {
                 eventViewer.newCreatureRevealEvent(RevealEvent.eventTeleport,
-                    info.getMarkerId(), ((LegionClientSide)info).getHeight(),
-                    teleportingLord, null, 0);
+                    info.getMarkerId(), (info).getHeight(), teleportingLord,
+                    null, 0);
             }
         }
         if (board != null)
@@ -4100,10 +4097,10 @@ public final class Client implements IClient, IOracle
     {
         removeRecruitChit(formerHexLabel);
         removeRecruitChit(currentHexLabel);
-        ((LegionClientSide)legion).setHexLabel(currentHexLabel);
-        ((LegionClientSide)legion).setMoved(false);
-        boolean didTeleport = ((LegionClientSide)legion).hasTeleported();
-        ((LegionClientSide)legion).setTeleported(false);
+        (legion).setHexLabel(currentHexLabel);
+        (legion).setMoved(false);
+        boolean didTeleport = (legion).hasTeleported();
+        (legion).setTeleported(false);
         if (board != null)
         {
             board.alignLegions(formerHexLabel);
@@ -4300,7 +4297,7 @@ public final class Client implements IClient, IOracle
             return new ArrayList<String>();
         }
 
-        String hexLabel = ((LegionClientSide)info).getHexLabel();
+        String hexLabel = (info).getHexLabel();
         MasterHex hex = getGame().getVariant().getMasterBoard().getHexByLabel(
             hexLabel);
         String terrain = hex.getTerrain();
@@ -4382,7 +4379,7 @@ public final class Client implements IClient, IOracle
     Set<String> listTeleportMoves(Legion legion)
     {
         MasterHex hex = getGame().getVariant().getMasterBoard().getHexByLabel(
-            ((LegionClientSide)legion).getHexLabel());
+            (legion).getHexLabel());
         return movement.listTeleportMoves(legion, hex, movementRoll);
     }
 
@@ -4390,7 +4387,7 @@ public final class Client implements IClient, IOracle
     Set<String> listNormalMoves(Legion info)
     {
         MasterHex hex = getGame().getVariant().getMasterBoard().getHexByLabel(
-            ((LegionClientSide)info).getHexLabel());
+            (info).getHexLabel());
         return movement.listNormalMoves(info, hex, movementRoll);
     }
 
@@ -4434,7 +4431,7 @@ public final class Client implements IClient, IOracle
     public List<Legion> getLegionsByHex(String hexLabel)
     {
         List<Legion> legions = new ArrayList<Legion>();
-        for (LegionClientSide info : legionInfo.values())
+        for (Legion info : legionInfo.values())
         {
             if (info != null && info.getHexLabel() != null && hexLabel != null
                 && hexLabel.equals(info.getHexLabel()))
@@ -4469,7 +4466,7 @@ public final class Client implements IClient, IOracle
     Set<String> findUnmovedLegionHexes()
     {
         Set<String> set = new HashSet<String>();
-        for (LegionClientSide info : legionInfo.values())
+        for (Legion info : legionInfo.values())
         {
             if (!info.hasMoved() && activePlayer.equals(info.getPlayer()))
             {
@@ -4492,7 +4489,7 @@ public final class Client implements IClient, IOracle
     {
         Set<String> set = new HashSet<String>();
 
-        for (LegionClientSide legion : legionInfo.values())
+        for (Legion legion : legionInfo.values())
         {
             if (legion.getHeight() >= minHeight
                 && activePlayer.equals(legion.getPlayer()))
@@ -4768,7 +4765,7 @@ public final class Client implements IClient, IOracle
 
         if (board != null)
         {
-            board.alignLegions(((LegionClientSide)survivor).getHexLabel());
+            board.alignLegions(survivor.getHexLabel());
             board.highlightTallLegions();
         }
         if (isMyTurn() && this.phase == Constants.Phase.SPLIT
@@ -5002,7 +4999,7 @@ public final class Client implements IClient, IOracle
             return;
         }
         // Legion must be tall enough to split.
-        if (((LegionClientSide)legion).getHeight() < 4)
+        if (legion.getHeight() < 4)
         {
             showMessageDialog("Legion is too short to split");
             kickSplit();
@@ -5071,13 +5068,12 @@ public final class Client implements IClient, IOracle
 
         ((LegionClientSide)parent).split(childHeight, child, turn);
 
-        ((LegionClientSide)child).setHexLabel(hexLabel);
+        (child).setHexLabel(hexLabel);
 
         if (eventViewer != null)
         {
-            eventViewer.newSplitEvent(parent.getMarkerId(),
-                ((LegionClientSide)parent).getHeight(), null, child
-                    .getMarkerId(), ((LegionClientSide)child).getHeight());
+            eventViewer.newSplitEvent(parent.getMarkerId(), (parent)
+                .getHeight(), null, child.getMarkerId(), (child).getHeight());
         }
 
         if (board != null)
@@ -5171,7 +5167,7 @@ public final class Client implements IClient, IOracle
 
     String getHexForLegion(Legion legion)
     {
-        return ((LegionClientSide)legion).getHexLabel();
+        return (legion).getHexLabel();
     }
 
     void setLookAndFeel(String lfName)
