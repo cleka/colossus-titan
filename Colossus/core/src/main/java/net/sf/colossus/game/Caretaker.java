@@ -3,7 +3,6 @@ package net.sf.colossus.game;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -192,22 +191,19 @@ public class Caretaker
      */
     public void resurrectImmortals()
     {
-        Iterator<CreatureType> it = getGame().getVariant().getCreatureTypes()
-            .iterator();
-        while (it.hasNext())
+        for (CreatureType type : getGame().getVariant().getCreatureTypes())
         {
-            CreatureType creature = it.next();
-            if (creature.isImmortal())
+            if (type.isImmortal())
             {
-                int dead = getDeadCount(creature);
+                int dead = getDeadCount(type);
                 if (dead > 0)
                 {
-                    int live = getCount(creature);
+                    int live = getCount(type);
                     // Don't use setCount() / setDeadCount(), because we 
                     // want to update displays only at the end. 
-                    creatureAvailableCounts.put(creature, Integer.valueOf(live
+                    creatureAvailableCounts.put(type, Integer.valueOf(live
                         + dead));
-                    creatureDeadCounts.put(creature, Integer.valueOf(0));
+                    creatureDeadCounts.put(type, Integer.valueOf(0));
                 }
             }
         }
