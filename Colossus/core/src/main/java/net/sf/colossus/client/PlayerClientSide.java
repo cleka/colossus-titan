@@ -3,6 +3,7 @@ package net.sf.colossus.client;
 
 import java.util.List;
 
+import net.sf.colossus.game.Game;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.server.CustomRecruitBase;
@@ -19,8 +20,6 @@ import net.sf.colossus.webcommon.InstanceTracker;
 
 public final class PlayerClientSide extends Player
 {
-    private final Client client;
-
     private PredictSplits predictSplits;
 
     /** 
@@ -29,16 +28,17 @@ public final class PlayerClientSide extends Player
      * 
      * TODO: the object should be properly initialized in the constructor
      */
-    PlayerClientSide(Client client, String playerName, int number)
+    PlayerClientSide(Game game, String playerName, int number)
     {
-        super(client.getGame(), playerName, number);
-        this.client = client;
+        super(game, playerName, number);
         CustomRecruitBase.addPlayerInfo(this);
         InstanceTracker.register(this, playerName);
     }
 
     /** Takes a colon-separated string of form
      *  dead:name:tower:color:elim:legions:markers:creatures:value:titan:score
+     *  
+     *  TODO this is part of the network protocol and should be somewhere in there
      */
     void update(String infoString)
     {
@@ -50,7 +50,7 @@ public final class PlayerClientSide extends Player
 
         setName(data.remove(0));
 
-        setStartingTower(client.getGame().getVariant().getMasterBoard()
+        setStartingTower(getGame().getVariant().getMasterBoard()
             .getHexByLabel(data.remove(0)));
 
         setColor(data.remove(0));
@@ -78,20 +78,6 @@ public final class PlayerClientSide extends Player
         {
             addMarkerAvailable(markerId);
         }
-    }
-
-    public int numMobileLegions()
-    {
-        int count = 0;
-
-        for (Legion legion : getLegions())
-        {
-            if (!legion.hasMoved())
-            {
-                count++;
-            }
-        }
-        return count;
     }
 
     public PredictSplits getPredictSplits()

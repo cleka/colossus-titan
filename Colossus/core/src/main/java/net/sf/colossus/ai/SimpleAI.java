@@ -14,7 +14,6 @@ import java.util.Random;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.colossus.client.BattleChit;
@@ -41,6 +40,7 @@ import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.HazardTerrain;
 import net.sf.colossus.variant.MasterHex;
 import net.sf.colossus.variant.Variant;
+import net.sf.colossus.webcommon.InstanceTracker;
 import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
 
@@ -129,8 +129,7 @@ public class SimpleAI implements AI
     {
         this.client = client;
         // initialize the creature info needed by the AI
-        net.sf.colossus.webcommon.InstanceTracker.register(this, client
-            .getOwningPlayer().getName());
+        InstanceTracker.register(this, client.getOwningPlayer().getName());
     }
 
     public String pickColor(List<String> colors, List<String> favoriteColors)
@@ -213,13 +212,13 @@ public class SimpleAI implements AI
         if (!(myMarkerIds.isEmpty()))
         {
             Collections.shuffle(myMarkerIds, random);
-            return (myMarkerIds.get(0));
+            return myMarkerIds.get(0);
         }
 
         if (!(otherMarkerIds.isEmpty()))
         {
             Collections.shuffle(otherMarkerIds, random);
-            return (otherMarkerIds.get(0));
+            return otherMarkerIds.get(0);
         }
         return null;
     }
@@ -322,16 +321,16 @@ public class SimpleAI implements AI
 
         // if we did splits, don't signal to client that it's done;
         // because it would do doneWithSplits immediately;
-        // instead the last didSplit Callback will do doneWithSplits
+        // instead the last didSplit callback will do doneWithSplits
         // (This is done to avoid the advancePhase illegally messages)
-        return (splitsDone <= 0);
+        return splitsDone <= 0;
     }
 
     /** Unused in this AI; just return true to indicate done. */
     public boolean splitCallback(Legion parent, Legion child)
     {
         splitsAcked++;
-        return (splitsAcked >= splitsDone);
+        return splitsAcked >= splitsDone;
     }
 
     private void splitOneLegion(Player player, Legion legion)
@@ -380,8 +379,8 @@ public class SimpleAI implements AI
 
                         if (result == WIN_WITH_MINIMAL_LOSSES)
                         {
-                            LOGGER.log(Level.FINEST,
-                                "We can safely split AND attack with "
+                            LOGGER
+                                .finest("We can safely split AND attack with "
                                     + legion);
                             safeMoves++;
 
@@ -401,7 +400,7 @@ public class SimpleAI implements AI
                             && result != WIN_WITH_MINIMAL_LOSSES && roll <= 4)
                         {
                             // don't split so that we can attack!
-                            LOGGER.log(Level.FINEST, "Not splitting " + legion
+                            LOGGER.finest("Not splitting " + legion
                                 + " because we want the muscle to attack");
 
                             forcedToAttack = 999;
@@ -424,7 +423,7 @@ public class SimpleAI implements AI
             if (!goodRecruit)
             {
                 // No point in splitting, since we can't improve.
-                LOGGER.log(Level.FINEST, "Not splitting " + legion
+                LOGGER.finest("Not splitting " + legion
                     + " because it can't improve from here");
                 return;
             }
@@ -432,7 +431,7 @@ public class SimpleAI implements AI
 
         if (remainingMarkers.isEmpty())
         {
-            LOGGER.log(Level.FINEST, "Not splitting " + legion
+            LOGGER.finest("Not splitting " + legion
                 + " because no markers available");
             return;
         }
@@ -820,8 +819,8 @@ public class SimpleAI implements AI
                 .getCreatureByName(name);
             if (cre == null)
             {
-                LOGGER.log(Level.SEVERE, "HINT: Unknown creature in hint ("
-                    + name + "), aborting.");
+                LOGGER.severe("HINT: Unknown creature in hint (" + name
+                    + "), aborting.");
                 return null;
             }
             byCreature.add(cre);
@@ -911,7 +910,7 @@ public class SimpleAI implements AI
             && !client.tookMulligan())
         {
             client.mulligan();
-            // XXX Need to wait for new movement roll.
+            // TODO Need to wait for new movement roll.
             return true;
         }
         return false;
@@ -955,7 +954,7 @@ public class SimpleAI implements AI
 
             for (MasterHex hex : set)
             {
-                // XXX
+                // TODO
                 // Do not consider moves onto hexes where we already have a 
                 // legion. This is sub-optimal since the legion in this hex 
                 // may be able to move and "get out of the way"
@@ -1006,7 +1005,7 @@ public class SimpleAI implements AI
                 // Pick the legion in this hex whose best move has the
                 // least difference with its sitStillValue, scaled by
                 // the point value of the legion, and force it to move.
-                LOGGER.log(Level.FINEST, "Ack! forced to move a split group");
+                LOGGER.finest("Ack! forced to move a split group");
 
                 // first, concatenate all the moves for all the
                 // legions that are here, and sort them by their
@@ -1041,8 +1040,8 @@ public class SimpleAI implements AI
                     {
                         continue; // skip the sitStill moves
                     }
-                    LOGGER.log(Level.FINEST, "forced to move split legion "
-                        + move.legion + " to " + move.hex + " taking penalty "
+                    LOGGER.finest("forced to move split legion " + move.legion
+                        + " to " + move.hex + " taking penalty "
                         + move.difference
                         + " in order to handle illegal legion " + legion);
 
@@ -1060,7 +1059,7 @@ public class SimpleAI implements AI
     private boolean handleForcedSingleMove(Player player,
         Map<Legion, List<MoveInfo>> moveMap)
     {
-        LOGGER.log(Level.FINEST, "Ack! forced to move someone");
+        LOGGER.finest("Ack! forced to move someone");
 
         // Pick the legion whose best move has the least
         // difference with its sitStillValue, scaled by the
@@ -1093,22 +1092,13 @@ public class SimpleAI implements AI
         // now, one at a time, try applying moves until we have moved a legion
         for (MoveInfo move : allmoves)
         {
-            // TODO this check against numMobileLegions() seems rather superflous
-            //      and is the only call to that method in the whole codebase, so
-            //      we should try to get rid of it
-            if (player.hasMoved()
-                || ((PlayerClientSide)player).numMobileLegions() == 0)
-            {
-                break;
-            }
-
             if (move.hex == null)
             {
                 continue; // skip the sitStill moves
             }
 
-            LOGGER.log(Level.FINEST, "forced to move " + move.legion + " to "
-                + move.hex + " taking penalty " + move.difference
+            LOGGER.finest("forced to move " + move.legion + " to " + move.hex
+                + " taking penalty " + move.difference
                 + " in order to handle illegal legion " + move.legion);
 
             boolean moved = doMove(move.legion, move.hex);
@@ -1118,10 +1108,9 @@ public class SimpleAI implements AI
             }
         }
 
-        LOGGER.log(Level.WARNING,
-            "handleForcedSingleMove() didn't move anyone - "
-                + "probably no legion can move?? "
-                + "(('see [ 1748718 ] Game halt in Abyssal9'))");
+        LOGGER.warning("handleForcedSingleMove() didn't move anyone - "
+            + "probably no legion can move?? "
+            + "(('see [ 1748718 ] Game halt in Abyssal9'))");
         // Let's hope the server sees it the same way, otherwise
         // we'll loop forever...
         return false;
@@ -1129,11 +1118,7 @@ public class SimpleAI implements AI
 
     private boolean doMove(Legion legion, MasterHex hex)
     {
-        // OLD COMMENT: Don't *know* move succeeded without asking server.
-        //  ... nonsense. Client just sends message to server
-        //      and returns true...
-        boolean moved = client.doMove(legion, hex);
-        return moved;
+        return client.doMove(legion, hex);
     }
 
     // arrays and generics don't work well together -- TODO replace the
@@ -1236,8 +1221,8 @@ public class SimpleAI implements AI
             switch (result)
             {
                 case WIN_WITH_MINIMAL_LOSSES:
-                    LOGGER.log(Level.FINEST, "legion " + legion
-                        + " can attack " + enemyLegion + " in " + hex
+                    LOGGER.finest("legion " + legion + " can attack "
+                        + enemyLegion + " in " + hex
                         + " and WIN_WITH_MINIMAL_LOSSES");
 
                     // we score a fraction of a basic acquirable
@@ -1258,8 +1243,8 @@ public class SimpleAI implements AI
                     break;
 
                 case WIN_WITH_HEAVY_LOSSES:
-                    LOGGER.log(Level.FINEST, "legion " + legion
-                        + " can attack " + enemyLegion + " in " + hex
+                    LOGGER.finest("legion " + legion + " can attack "
+                        + enemyLegion + " in " + hex
                         + " and WIN_WITH_HEAVY_LOSSES");
                     // don't do this with our titan unless we can win the game
                     boolean haveOtherSummonables = false;
@@ -1326,9 +1311,8 @@ public class SimpleAI implements AI
                     break;
 
                 case DRAW:
-                    LOGGER.log(Level.FINEST, "legion " + legion
-                        + " can attack " + enemyLegion + " in " + hex
-                        + " and DRAW");
+                    LOGGER.finest("legion " + legion + " can attack "
+                        + enemyLegion + " in " + hex + " and DRAW");
 
                     // If this is an unimportant group for us, but
                     // is enemy titan, do it.  This might be an
@@ -1356,8 +1340,8 @@ public class SimpleAI implements AI
                     break;
 
                 case LOSE_BUT_INFLICT_HEAVY_LOSSES:
-                    LOGGER.log(Level.FINEST, "legion " + legion
-                        + " can attack " + enemyLegion + " in " + hex
+                    LOGGER.finest("legion " + legion + " can attack "
+                        + enemyLegion + " in " + hex
                         + " and LOSE_BUT_INFLICT_HEAVY_LOSSES");
 
                     // TODO: how important is it that we damage his group?
@@ -1365,15 +1349,14 @@ public class SimpleAI implements AI
                     break;
 
                 case LOSE:
-                    LOGGER.log(Level.FINEST, "legion " + legion
-                        + " can attack " + enemyLegion + " in " + hex
-                        + " and LOSE");
+                    LOGGER.finest("legion " + legion + " can attack "
+                        + enemyLegion + " in " + hex + " and LOSE");
 
                     value += LOSE_LEGION;
                     break;
 
                 default:
-                    LOGGER.log(Level.SEVERE, "Bogus battle result case");
+                    LOGGER.severe("Bogus battle result case");
             }
         }
 
@@ -1409,7 +1392,7 @@ public class SimpleAI implements AI
                     // and 6-high stacks refused to recruit colossi,
                     // because the value of the recruit was toned down
                     // too much. So the effect has been reduced.
-                    LOGGER.log(Level.FINEST, "--- 6-HIGH SPECIAL CASE");
+                    LOGGER.finest("--- 6-HIGH SPECIAL CASE");
 
                     CreatureType weakest1 = null;
                     CreatureType weakest2 = null;
@@ -1510,13 +1493,13 @@ public class SimpleAI implements AI
                 }
                 else
                 {
-                    LOGGER.log(Level.SEVERE, "Bogus legion height "
+                    LOGGER.severe("Bogus legion height "
                         + (legion).getHeight());
                 }
 
-                LOGGER.log(Level.FINEST, "--- if " + legion + " moves to "
-                    + hex + " then recruit " + recruit.toString()
-                    + " (adding " + (value - oldval) + ")");
+                LOGGER.finest("--- if " + legion + " moves to " + hex
+                    + " then recruit " + recruit.toString() + " (adding "
+                    + (value - oldval) + ")");
             }
         }
 
@@ -1579,13 +1562,13 @@ public class SimpleAI implements AI
         {
             if (moved)
             {
-                LOGGER.log(Level.FINEST, "considering risk of moving "
-                    + legion + " to " + hex);
+                LOGGER.finest("considering risk of moving " + legion + " to "
+                    + hex);
             }
             else
             {
-                LOGGER.log(Level.FINEST, "considering risk of leaving "
-                    + legion + " in " + hex);
+                LOGGER.finest("considering risk of leaving " + legion + " in "
+                    + hex);
             }
 
             Map<MasterHex, List<Legion>>[] enemiesThatCanAttackOnA = enemyAttackMap;
@@ -1649,8 +1632,8 @@ public class SimpleAI implements AI
         // (i.e. if another legion has warbears under the top that
         // recruit on 1,3,5, and we have a behemoth with choice of 3/5
         // to jungle or 4/6 to jungle, prefer the 4/6 location).
-        LOGGER.log(Level.FINEST, "EVAL " + legion
-            + (moved ? " move to " : " stay in ") + hex + " = " + value);
+        LOGGER.finest("EVAL " + legion + (moved ? " move to " : " stay in ")
+            + hex + " = " + value);
 
         return value;
     }
@@ -1869,9 +1852,11 @@ public class SimpleAI implements AI
             .getCreatureByName(recruitName);
         if (!(recruits.contains(recruit)))
         {
-            LOGGER.log(Level.WARNING,
-                "HINT: Invalid Hint for this variant ! (can't recruit "
-                    + recruitName + "; recruits=" + recruits.toString()
+            LOGGER
+                .warning("HINT: Invalid Hint for this variant ! (can't recruit "
+                    + recruitName
+                    + "; recruits="
+                    + recruits.toString()
                     + ") in " + hex.getTerrain());
             return (recruits.get(recruits.size() - 1));
         }
@@ -2039,7 +2024,7 @@ public class SimpleAI implements AI
             case DRAW:
             case LOSE_BUT_INFLICT_HEAVY_LOSSES:
             case LOSE:
-                LOGGER.log(Level.FINEST, "Legion " + legion.getMarkerId()
+                LOGGER.finest("Legion " + legion.getMarkerId()
                     + " doesn't flee " + " before " + enemy.getMarkerId()
                     + " with result " + result + " ("
                     + ((LegionClientSide)legion).getPointValue() + " vs. "
@@ -2053,16 +2038,15 @@ public class SimpleAI implements AI
                 // also, 7-height stack never flee and wimpy stack always flee
                 if ((legion).getHeight() < 6)
                 {
-                    LOGGER.log(Level.FINEST, "Legion " + legion.getMarkerId()
-                        + " flee " + " as they are just "
-                        + (legion).getHeight() + " wimps !");
+                    LOGGER.finest("Legion " + legion.getMarkerId() + " flee "
+                        + " as they are just " + (legion).getHeight()
+                        + " wimps !");
                     return true;
                 }
                 if ((((LegionClientSide)enemy).getPointValue() * 0.5) > ((LegionClientSide)legion)
                     .getPointValue())
                 {
-                    LOGGER.log(Level.FINEST, "Legion " + legion.getMarkerId()
-                        + " flee "
+                    LOGGER.finest("Legion " + legion.getMarkerId() + " flee "
                         + " as they are less than half as strong as "
                         + enemy.getMarkerId());
                     return true;
@@ -2078,8 +2062,8 @@ public class SimpleAI implements AI
                         if (best.getPointValue() > (lValue / (enemy)
                             .getHeight()))
                         {
-                            LOGGER.log(Level.FINEST, "Legion " + legion
-                                + " flee " + " to prevent " + enemy
+                            LOGGER.finest("Legion " + legion + " flee "
+                                + " to prevent " + enemy
                                 + " to be able to recruit " + best);
                             return true;
                         }
@@ -2087,13 +2071,13 @@ public class SimpleAI implements AI
                 }
                 if ((enemy).hasTitan())
                 {
-                    LOGGER.log(Level.FINEST, "Legion " + legion.getMarkerId()
+                    LOGGER.finest("Legion " + legion.getMarkerId()
                         + " doesn't flee " + " to fight the Titan in "
                         + enemy.getMarkerId());
                 }
                 if ((legion).getHeight() == 7)
                 {
-                    LOGGER.log(Level.FINEST, "Legion " + legion.getMarkerId()
+                    LOGGER.finest("Legion " + legion.getMarkerId()
                         + " doesn't flee " + " they are the magnificent 7 !");
                 }
                 return !((enemy).hasTitan() || ((legion).getHeight() == 7));
@@ -2161,7 +2145,7 @@ public class SimpleAI implements AI
             CreatureType bestRecruit = recruits.get(recruits.size() - 1);
             if (getKillValue(bestRecruit) > getKillValue(bestAngel))
             {
-                LOGGER.log(Level.FINEST, "AI declines acquiring to recruit "
+                LOGGER.finest("AI declines acquiring to recruit "
                     + bestRecruit.getName());
                 return null;
             }
@@ -2208,16 +2192,14 @@ public class SimpleAI implements AI
             List<Legion> legions = client.getLegionsByHex(hex);
             if (legions.size() != 1)
             {
-                LOGGER.log(Level.SEVERE,
-                    "SimpleAI.summonAngel(): Engagement in " + hex);
+                LOGGER.severe("SimpleAI.summonAngel(): Engagement in " + hex);
                 continue;
             }
             Legion legion = legions.get(0);
             String myAngel = ((LegionClientSide)legion).bestSummonable();
             if (myAngel == null)
             {
-                LOGGER.log(Level.SEVERE,
-                    "SimpleAI.summonAngel(): No angel in " + legion);
+                LOGGER.severe("SimpleAI.summonAngel(): No angel in " + legion);
                 continue;
             }
 
@@ -2359,13 +2341,13 @@ public class SimpleAI implements AI
         }
         if (bestTarget == null)
         {
-            LOGGER.log(Level.WARNING, "No carry target but " + carryDamage
+            LOGGER.warning("No carry target but " + carryDamage
                 + " points of available carry damage");
             client.leaveCarryMode();
         }
         else
         {
-            LOGGER.log(Level.FINEST, "Best carry target is "
+            LOGGER.finest("Best carry target is "
                 + bestTarget.getDescription());
             client.applyCarries(bestTarget.getCurrentHexLabel());
         }
@@ -2382,7 +2364,7 @@ public class SimpleAI implements AI
      *  no strike targets. */
     public boolean strike(Legion legion)
     {
-        LOGGER.log(Level.FINEST, "Called ai.strike() for " + legion);
+        LOGGER.finest("Called ai.strike() for " + legion);
         // PRE: Caller handles forced strikes before calling this.
 
         // Pick the most important target that can likely be killed this
@@ -2393,11 +2375,10 @@ public class SimpleAI implements AI
         BattleChit bestTarget = findBestTarget();
         if (bestTarget == null)
         {
-            LOGGER.log(Level.FINEST, "Best target is null, aborting");
+            LOGGER.finest("Best target is null, aborting");
             return false;
         }
-        LOGGER.log(Level.FINEST, "Best target is "
-            + bestTarget.getDescription());
+        LOGGER.finest("Best target is " + bestTarget.getDescription());
 
         // Having found the target, pick an attacker.  The
         // first priority is finding one that does not need
@@ -2412,8 +2393,7 @@ public class SimpleAI implements AI
             return false;
         }
 
-        LOGGER.log(Level.FINEST, "Best attacker is "
-            + bestAttacker.getDescription());
+        LOGGER.finest("Best attacker is " + bestAttacker.getDescription());
 
         // Having found the target and attacker, strike.
         // Take a carry penalty if there is still a 95%
@@ -2451,10 +2431,9 @@ public class SimpleAI implements AI
         if (creature.isTitan())
         {
             // Don't know the power, so just estimate.
-            LOGGER.log(Level.WARNING,
-                "Called SimpleAI.getCombatValue() for Titan");
-            return 6 * (client.getGame().getVariant()
-                .getCreatureByName("Titan")).getSkill();
+            LOGGER.warning("Called SimpleAI.getCombatValue() for Titan");
+            return 6 * client.getGame().getVariant()
+                .getCreatureByName("Titan").getSkill();
         }
 
         int val = (creature).getPointValue();
@@ -2480,7 +2459,7 @@ public class SimpleAI implements AI
     int getTitanCombatValue(int power)
     {
         int val = power
-            * (client.getGame().getVariant().getCreatureByName("Titan"))
+            * client.getGame().getVariant().getCreatureByName("Titan")
                 .getSkill();
         if (power < 9)
         {
@@ -2526,8 +2505,7 @@ public class SimpleAI implements AI
         int val;
         if (creature == null)
         {
-            LOGGER
-                .log(Level.WARNING, "Called getKillValue with null creature");
+            LOGGER.warning("Called getKillValue with null creature");
             return 0;
         }
         // get non-terrain modified part of kill value
@@ -2719,7 +2697,7 @@ public class SimpleAI implements AI
     /** Return a list of critter moves, in best move order. */
     public List<CritterMove> battleMove()
     {
-        LOGGER.log(Level.FINEST, "Called battleMove()");
+        LOGGER.finest("Called battleMove()");
 
         // Defer setting time limit until here where it's needed, to
         // avoid initialization timing issues.
@@ -2752,15 +2730,14 @@ public class SimpleAI implements AI
             BattleChit critter = cm.getCritter();
             String startingHexLabel = cm.getStartingHexLabel();
 
-            LOGGER.log(Level.FINEST, critter.getDescription()
-                + " failed to move");
+            LOGGER.finest(critter.getDescription() + " failed to move");
             List<CritterMove> moveList = findBattleMovesOneCritter(critter);
             if (!moveList.isEmpty())
             {
                 CritterMove cm2 = moveList.get(0);
-                LOGGER.log(Level.FINEST, "Moving " + critter.getDescription()
-                    + " to " + cm2.getEndingHexLabel()
-                    + " (startingHexLabel was " + startingHexLabel + ")");
+                LOGGER.finest("Moving " + critter.getDescription() + " to "
+                    + cm2.getEndingHexLabel() + " (startingHexLabel was "
+                    + startingHexLabel + ")");
                 client.tryBattleMove(cm2);
             }
         }
@@ -2848,8 +2825,8 @@ public class SimpleAI implements AI
                 }
                 else
                 {
-                    LOGGER.log(Level.WARNING,
-                        "Time is up figuring move order, but we ignore "
+                    LOGGER
+                        .warning("Time is up figuring move order, but we ignore "
                             + "it (no valid moveOrder found yet... "
                             + " - buggy break)");
                     timeIsUp = false;
@@ -2863,7 +2840,7 @@ public class SimpleAI implements AI
             testMoveOrder(bestOrder, newOrder);
             bestOrder = new ArrayList<CritterMove>(newOrder);
         }
-        LOGGER.log(Level.FINEST, "Got score " + bestScore + " in " + count
+        LOGGER.finest("Got score " + bestScore + " in " + count
             + " permutations");
         return bestOrder;
     }
@@ -2933,7 +2910,7 @@ public class SimpleAI implements AI
 
     List<LegionMove> findBattleMoves()
     {
-        LOGGER.log(Level.FINEST, "Called findBattleMoves()");
+        LOGGER.finest("Called findBattleMoves()");
 
         // Consider one critter at a time in isolation.
         // Find the best N moves for each critter.
@@ -3024,7 +3001,7 @@ public class SimpleAI implements AI
         {
             buf.append(" " + cm.getEndingHexLabel());
         }
-        LOGGER.log(Level.FINEST, buf.toString());
+        LOGGER.finest(buf.toString());
 
         return moveList;
     }
@@ -3073,22 +3050,20 @@ public class SimpleAI implements AI
             {
                 if (count >= MIN_ITERATIONS)
                 {
-                    LOGGER.log(Level.FINEST,
-                        "findBestLegionMove() time up after " + count
-                            + " iterations");
+                    LOGGER.finest("findBestLegionMove() time up after "
+                        + count + " iterations");
                     break;
                 }
                 else
                 {
-                    LOGGER.log(Level.FINEST,
-                        "findBestLegionMove() time up after " + count
-                            + " iterations, but we keep searching until "
-                            + MIN_ITERATIONS);
+                    LOGGER.finest("findBestLegionMove() time up after "
+                        + count + " iterations, but we keep searching until "
+                        + MIN_ITERATIONS);
                 }
             }
         }
         findBestLegionMoveTimer.cancel();
-        LOGGER.log(Level.FINEST, "Best legion move: "
+        LOGGER.finest("Best legion move: "
             + ((best == null) ? "none " : best.toString()) + " (" + bestScore
             + ")");
         return best;
@@ -3114,8 +3089,7 @@ public class SimpleAI implements AI
 
         nestForLoop(indexes, indexes.length - 1, critterMoves, legionMoves);
 
-        LOGGER
-            .log(Level.FINEST, "Got " + legionMoves.size() + " legion moves");
+        LOGGER.finest("Got " + legionMoves.size() + " legion moves");
         return legionMoves;
     }
 

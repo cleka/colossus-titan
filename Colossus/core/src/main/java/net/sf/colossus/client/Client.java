@@ -279,9 +279,9 @@ public final class Client implements IClient, IOracle
         // updatePlayerInfo(..) when the PlayerInfos are initialized. Should really
         // happen here, but doesn't yet since we don't have all players (not even as
         // names) yet
-        this.owningPlayer = new PlayerClientSide(this, playerName, 0);
+        this.owningPlayer = new PlayerClientSide(getGame(), playerName, 0);
 
-        this.noone = new PlayerClientSide(this, "", 0);
+        this.noone = new PlayerClientSide(getGame(), "", 0);
         this.activePlayer = noone;
         this.battleActivePlayer = noone;
 
@@ -1066,8 +1066,8 @@ public final class Client implements IClient, IOracle
             {
                 List<String> data = Split.split(":", infoStrings.get(i));
                 String playerName = data.get(1);
-                PlayerClientSide info = new PlayerClientSide(this, playerName,
-                    i);
+                PlayerClientSide info = new PlayerClientSide(getGame(),
+                    playerName, i);
                 players[i] = info;
                 if (playerName.equals(this.owningPlayer.getName()))
                 {
