@@ -3451,7 +3451,7 @@ public final class Client implements IClient, IOracle
     /** Create marker if necessary, and place it in hexLabel. */
     public void tellLegionLocation(Legion legion, MasterHex hex)
     {
-        legion.moveTo(hex);
+        legion.setCurrentHex(hex);
 
         if (board != null)
         {
@@ -4036,7 +4036,7 @@ public final class Client implements IClient, IOracle
         {
             pushUndoStack(legion.getMarkerId());
         }
-        legion.moveTo(currentHex);
+        legion.setCurrentHex(currentHex);
         legion.setMoved(true);
         ((LegionClientSide)legion).setEntrySide(BattleMap
             .entrySideNum(entrySide));
@@ -4072,7 +4072,7 @@ public final class Client implements IClient, IOracle
     {
         removeRecruitChit(formerHex);
         removeRecruitChit(currentHex);
-        legion.moveTo(currentHex);
+        legion.setCurrentHex(currentHex);
         legion.setMoved(false);
         boolean didTeleport = legion.hasTeleported();
         legion.setTeleported(false);
@@ -5034,7 +5034,7 @@ public final class Client implements IClient, IOracle
 
         ((LegionClientSide)parent).split(childHeight, child, turn);
 
-        child.moveTo(hex);
+        child.setCurrentHex(hex);
 
         if (eventViewer != null)
         {

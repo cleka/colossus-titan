@@ -51,7 +51,7 @@ public abstract class Legion
     /**
      * Places the legion using a hex label.
      * 
-     * TODO replace all occurrences with {@link #moveTo(MasterHex)}
+     * TODO replace all occurrences with {@link #setCurrentHex(MasterHex)}
      * 
      * @param hexLabel the label of the new hex to move to
      */
@@ -66,10 +66,8 @@ public abstract class Legion
      * 
      * @param newPosition the hex that will be the new position
      * @see #getCurrentHex()
-     * 
-     * TODO rename as normal setter for consistency
      */
-    public void moveTo(MasterHex newPosition)
+    public void setCurrentHex(MasterHex newPosition)
     {
         this.currentHex = newPosition;
     }
@@ -91,7 +89,7 @@ public abstract class Legion
      * 
      * @return the hex the legion currently is on.
      * 
-     * @see #moveTo(MasterHex)
+     * @see #setCurrentHex(MasterHex)
      */
     public MasterHex getCurrentHex()
     {

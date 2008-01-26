@@ -63,7 +63,7 @@ public final class LegionServerSide extends Legion implements
         {
             parentId = null;
         }
-        moveTo(currentHex);
+        setCurrentHex(currentHex);
         this.startingHex = startingHex;
         this.game = game;
 
@@ -342,7 +342,7 @@ public final class LegionServerSide extends Legion implements
     {
         PlayerServerSide player = getPlayer();
 
-        moveTo(hex);
+        setCurrentHex(hex);
         setMoved(true);
 
         setEntrySide(BattleMap.entrySideNum(entrySide));
@@ -384,7 +384,7 @@ public final class LegionServerSide extends Legion implements
                 getPlayer().setTeleported(false);
             }
 
-            moveTo(startingHex);
+            setCurrentHex(startingHex);
 
             setMoved(false);
             LOGGER.log(Level.INFO, "Legion " + this + " undoes its move");
