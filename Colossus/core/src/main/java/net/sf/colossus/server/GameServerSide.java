@@ -534,11 +534,9 @@ public final class GameServerSide extends net.sf.colossus.game.Game
 
     private void fullySyncCaretakerDisplays()
     {
-        Iterator<CreatureType> it = getVariant().getCreatureTypes().iterator();
-        while (it.hasNext())
+        for (CreatureType type : getVariant().getCreatureTypes())
         {
-            CreatureType creature = it.next();
-            caretaker.updateDisplays(creature.getName());
+            caretaker.updateDisplays(type);
         }
     }
 

@@ -78,23 +78,20 @@ final class PickRecruit extends KDialog implements MouseListener,
         JPanel recruitPane = new JPanel();
         contentPane.add(recruitPane);
 
-        Iterator<CreatureType> it = recruits.iterator();
         int i = 0;
-        while (it.hasNext())
+        for (CreatureType recruit : recruits)
         {
             Box vertPane = new Box(BoxLayout.Y_AXIS);
             vertPane.setAlignmentY(0);
             recruitPane.add(vertPane);
 
-            CreatureType recruit = it.next();
-            String recruitName = recruit.getName();
-            Chit chit = new Chit(scale, recruitName);
+            Chit chit = new Chit(scale, recruit.getName());
             recruitChits.add(chit);
 
             vertPane.add(chit);
             chit.addMouseListener(this);
 
-            int count = client.getCreatureCount(recruitName);
+            int count = client.getCreatureCount(recruit);
             JLabel countLabel = new JLabel(Integer.toString(count));
             countLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
             vertPane.add(countLabel);

@@ -7,6 +7,7 @@ import java.util.Set;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.server.Constants;
+import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.MasterHex;
 
 
@@ -30,8 +31,7 @@ public interface IClient
 
     public void setColor(String color);
 
-    public void updateCreatureCount(String creatureName, int count,
-        int deadCount);
+    public void updateCreatureCount(CreatureType type, int count, int deadCount);
 
     public void dispose();
 

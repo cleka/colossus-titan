@@ -602,11 +602,11 @@ public final class Server implements IServer
         allUpdatePlayerInfo(false);
     }
 
-    void allUpdateCreatureCount(String creatureName, int count, int deadCount)
+    void allUpdateCreatureCount(CreatureType type, int count, int deadCount)
     {
         for (IClient client : clients)
         {
-            client.updateCreatureCount(creatureName, count, deadCount);
+            client.updateCreatureCount(type, count, deadCount);
         }
     }
 

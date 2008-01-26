@@ -253,7 +253,7 @@ public final class Client implements IClient, IOracle
     private List<CritterMove> bestMoveOrder = null;
     private List<CritterMove> failedBattleMoves = null;
 
-    private final Hashtable<String, Integer> recruitReservations = new Hashtable<String, Integer>();
+    private final Hashtable<CreatureType, Integer> recruitReservations = new Hashtable<CreatureType, Integer>();
 
     private LogWindow logWindow;
     private int viewMode;
@@ -1169,10 +1169,10 @@ public final class Client implements IClient, IOracle
         this.color = color;
     }
 
-    public void updateCreatureCount(String creatureName, int count,
-        int deadCount)
+    public void updateCreatureCount(CreatureType type, int count, int deadCount)
     {
-        caretakerInfo.updateCount(creatureName, count, deadCount);
+        caretakerInfo.setCount(type, count);
+        caretakerInfo.setDeadCount(type, deadCount);
         updateCreatureCountDisplay();
     }
 
@@ -2966,6 +2966,7 @@ public final class Client implements IClient, IOracle
         doRecruit(legion, recruitName, recruiterName);
     }
 
+    // TODO use CreatureType instead of String
     public void doRecruit(Legion legion, String recruitName,
         String recruiterName)
     {
@@ -4103,24 +4104,24 @@ public final class Client implements IClient, IOracle
      * Returns whether creature can still be recruited (=is available according
      * to caretakers stack plus reservations)
      */
-    public boolean reserveRecruit(String recruitName)
+    public boolean reserveRecruit(CreatureType recruitType)
     {
         boolean ok = false;
         int remain;
 
-        Integer count = recruitReservations.get(recruitName);
+        Integer count = recruitReservations.get(recruitType);
         if (count != null)
         {
             remain = count.intValue();
-            recruitReservations.remove(recruitName);
+            recruitReservations.remove(recruitType);
         }
         else
         {
             LOGGER.log(Level.WARNING, owningPlayer.getName()
-                + " reserveRecruit creature " + recruitName
+                + " reserveRecruit creature " + recruitType
                 + " not fround from hash, should have been created"
                 + " during getReservedCount!");
-            remain = getCreatureCount(recruitName);
+            remain = getCreatureCount(recruitType);
         }
 
         if (remain > 0)
@@ -4129,7 +4130,7 @@ public final class Client implements IClient, IOracle
             ok = true;
         }
 
-        recruitReservations.put(recruitName, new Integer(remain));
+        recruitReservations.put(recruitType, new Integer(remain));
         return ok;
     }
 
@@ -4141,30 +4142,30 @@ public final class Client implements IClient, IOracle
      * Returns how many creatures can still be recruited (=according
      * to caretakers stack plus reservations)
      */
-    public int getReservedRemain(String recruitName)
+    public int getReservedRemain(CreatureType recruitType)
     {
         int remain;
 
-        Integer count = recruitReservations.get(recruitName);
+        Integer count = recruitReservations.get(recruitType);
         if (count == null)
         {
-            remain = getCreatureCount(recruitName);
+            remain = getCreatureCount(recruitType);
         }
         else
         {
             remain = count.intValue();
-            recruitReservations.remove(recruitName);
+            recruitReservations.remove(recruitType);
         }
 
         // in case someone called getReservedRemain with bypassing the 
         // reset or reserve methods, to be sure doublecheck against the 
         // real remaining value.
-        int realCount = getCreatureCount(recruitName);
+        int realCount = getCreatureCount(recruitType);
         if (realCount < remain)
         {
             remain = realCount;
         }
-        recruitReservations.put(recruitName, new Integer(remain));
+        recruitReservations.put(recruitType, new Integer(remain));
 
         return remain;
     }
@@ -4228,8 +4229,7 @@ public final class Client implements IClient, IOracle
 
             if (remaining > 0 && considerReservations)
             {
-                String recruitName = recruit.toString();
-                remaining = getReservedRemain(recruitName);
+                remaining = getReservedRemain(recruit);
             }
             if (remaining < 1)
             {
@@ -4352,29 +4352,14 @@ public final class Client implements IClient, IOracle
         return movement.listPossibleEntrySides(mover, hex, teleport);
     }
 
-    int getCreatureCount(String creatureName)
-    {
-        return caretakerInfo.getCount(creatureName);
-    }
-
     int getCreatureCount(CreatureType creature)
     {
         return caretakerInfo.getCount(creature);
     }
 
-    int getCreatureDeadCount(String creatureName)
-    {
-        return caretakerInfo.getDeadCount(creatureName);
-    }
-
     int getCreatureDeadCount(CreatureType creature)
     {
         return caretakerInfo.getDeadCount(creature);
-    }
-
-    int getCreatureMaxCount(String creatureName)
-    {
-        return caretakerInfo.getMaxCount(creatureName);
     }
 
     public List<Legion> getLegionsByHex(MasterHex hex)

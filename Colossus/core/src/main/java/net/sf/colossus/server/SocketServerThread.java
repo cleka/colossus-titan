@@ -19,6 +19,7 @@ import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.util.Glob;
 import net.sf.colossus.util.Split;
+import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.MasterHex;
 import net.sf.colossus.webcommon.InstanceTracker;
 
@@ -575,11 +576,10 @@ final class SocketServerThread extends Thread implements IClient
         sendToClient(Constants.setColor + sep + color);
     }
 
-    public void updateCreatureCount(String creatureName, int count,
-        int deadCount)
+    public void updateCreatureCount(CreatureType type, int count, int deadCount)
     {
-        sendToClient(Constants.updateCreatureCount + sep + creatureName + sep
-            + count + sep + deadCount);
+        sendToClient(Constants.updateCreatureCount + sep + type.getName()
+            + sep + count + sep + deadCount);
     }
 
     public void dispose()

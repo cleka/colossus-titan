@@ -32,14 +32,14 @@ public final class CaretakerServerSide extends Caretaker
             public void creatureTypeAvailabilityUpdated(CreatureType type,
                 int availableCount)
             {
-                updateDisplays(type.getName());
+                updateDisplays(type);
             }
 
             @Override
             public void creatureTypeDeadCountUpdated(CreatureType type,
                 int deadCount)
             {
-                updateDisplays(type.getName());
+                updateDisplays(type);
             }
         });
     }
@@ -78,16 +78,13 @@ public final class CaretakerServerSide extends Caretaker
      * TODO move out of this class into external listener
      * TODO use CreatureType as parameter
      */
-    void updateDisplays(String creatureName)
+    void updateDisplays(CreatureType type)
     {
         Server server = ((GameServerSide)getGame()).getServer();
         if (server != null)
         {
-            if (creatureName != null)
-            {
-                server.allUpdateCreatureCount(creatureName,
-                    getCount(creatureName), getDeadCount(creatureName));
-            }
+            server.allUpdateCreatureCount(type, getCount(type),
+                getDeadCount(type));
         }
     }
 }

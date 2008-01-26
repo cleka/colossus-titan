@@ -23,6 +23,7 @@ import net.sf.colossus.server.IServer;
 import net.sf.colossus.util.ChildThreadManager;
 import net.sf.colossus.util.Glob;
 import net.sf.colossus.util.Split;
+import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.MasterHex;
 
 
@@ -484,7 +485,8 @@ final class SocketClientThread extends Thread implements IServer
             String creatureName = args.remove(0);
             int count = Integer.parseInt(args.remove(0));
             int deadCount = Integer.parseInt(args.remove(0));
-            client.updateCreatureCount(creatureName, count, deadCount);
+            client.updateCreatureCount(resolveCreatureType(creatureName),
+                count, deadCount);
         }
         else if (method.equals(Constants.dispose))
         {
@@ -898,6 +900,11 @@ final class SocketClientThread extends Thread implements IServer
             LOGGER.log(Level.SEVERE, "Bogus packet (Client, method: " + method
                 + ", args: " + args + ")");
         }
+    }
+
+    private CreatureType resolveCreatureType(String creatureName)
+    {
+        return client.getGame().getVariant().getCreatureByName(creatureName);
     }
 
     private Legion resolveLegion(String markerId)

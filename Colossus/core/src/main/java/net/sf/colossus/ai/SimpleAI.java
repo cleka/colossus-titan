@@ -252,9 +252,8 @@ public class SimpleAI implements AI
                         // Just take the first one.
                         recruiterName = recruiters.get(0);
                     }
-                    String recruitName = recruit.getName();
-                    client.doRecruit(legion, recruitName, recruiterName);
-                    client.reserveRecruit(recruitName);
+                    client.doRecruit(legion, recruit.getName(), recruiterName);
+                    client.reserveRecruit(recruit);
                 }
             }
         }
@@ -1771,7 +1770,9 @@ public class SimpleAI implements AI
 
         public int creatureAvailable(String name)
         {
-            int count = client.getReservedRemain(name);
+            CreatureType type = client.getGame().getVariant()
+                .getCreatureByName(name);
+            int count = client.getReservedRemain(type);
             return count;
         }
 
@@ -1807,14 +1808,13 @@ public class SimpleAI implements AI
 
         public boolean canRecruit(String name)
         {
-            boolean contains = recruits.contains(client.getGame().getVariant()
+            return recruits.contains(client.getGame().getVariant()
                 .getCreatureByName(name));
-            return contains;
         }
 
         public int stackHeight()
         {
-            return (legion).getHeight();
+            return legion.getHeight();
         }
 
         public String hexLabel()

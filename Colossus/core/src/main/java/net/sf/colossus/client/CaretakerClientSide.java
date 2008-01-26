@@ -42,10 +42,4 @@ public final class CaretakerClientSide extends Caretaker
             creatureName);
         return getDeadCount(type);
     }
-
-    public int getMaxCount(String creatureName)
-    {
-        return getGame().getVariant().getCreatureByName(creatureName)
-            .getMaxCount();
-    }
 }
