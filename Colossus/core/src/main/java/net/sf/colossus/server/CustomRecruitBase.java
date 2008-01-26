@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.sf.colossus.client.CaretakerInfo;
+import net.sf.colossus.client.CaretakerClientSide;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.variant.CreatureType;
@@ -26,8 +26,8 @@ abstract public class CustomRecruitBase
         .getLogger(CustomRecruitBase.class.getName());
 
     protected static List<Player> allPlayers = new ArrayList<Player>();
-    private static List<CaretakerInfo> allCaretakerInfo = new ArrayList<CaretakerInfo>();
-    private static Caretaker serverCaretaker = null;
+    private static List<CaretakerClientSide> allCaretakerInfo = new ArrayList<CaretakerClientSide>();
+    private static CaretakerServerSide serverCaretaker = null;
     private static GameServerSide serverGame = null;
     private static List<CustomRecruitBase> allCustomRecruitBase = new ArrayList<CustomRecruitBase>();
 
@@ -80,12 +80,12 @@ abstract public class CustomRecruitBase
         allPlayers.add(pi);
     }
 
-    synchronized public static final void addCaretakerInfo(CaretakerInfo ci)
+    synchronized public static final void addCaretakerInfo(CaretakerClientSide ci)
     {
         allCaretakerInfo.add(ci);
     }
 
-    synchronized public static final void setCaretaker(Caretaker c)
+    synchronized public static final void setCaretaker(CaretakerServerSide c)
     {
         serverCaretaker = c;
     }
@@ -98,10 +98,10 @@ abstract public class CustomRecruitBase
     synchronized protected final void setCount(String name, int newCount)
     {
         // first update all known CaretakerInfo (if we're client(s))
-        Iterator<CaretakerInfo> it = allCaretakerInfo.iterator();
+        Iterator<CaretakerClientSide> it = allCaretakerInfo.iterator();
         while (it.hasNext())
         {
-            CaretakerInfo ci = it.next();
+            CaretakerClientSide ci = it.next();
             ci.updateCount(name, newCount, ci.getDeadCount(name));
         }
         // update the Caretaker if we're server
@@ -123,10 +123,10 @@ abstract public class CustomRecruitBase
     {
         int count = -1;
         int oldcount = -1;
-        Iterator<CaretakerInfo> it = allCaretakerInfo.iterator();
+        Iterator<CaretakerClientSide> it = allCaretakerInfo.iterator();
         while (it.hasNext() && (count == -1))
         {
-            CaretakerInfo ci = it.next();
+            CaretakerClientSide ci = it.next();
             oldcount = count;
             count = ci.getCount(name);
             if ((oldcount != -1) && (count != oldcount))
@@ -155,10 +155,10 @@ abstract public class CustomRecruitBase
         int newDeadCount)
     {
         // first update all known CaretakerInfo (if we're client(s))
-        Iterator<CaretakerInfo> it = allCaretakerInfo.iterator();
+        Iterator<CaretakerClientSide> it = allCaretakerInfo.iterator();
         while (it.hasNext())
         {
-            CaretakerInfo ci = it.next();
+            CaretakerClientSide ci = it.next();
             ci.updateCount(name, ci.getCount(name), newDeadCount);
         }
         // second, update the Caretaker if we're server
@@ -174,10 +174,10 @@ abstract public class CustomRecruitBase
     {
         int count = -1;
         int oldcount = -1;
-        Iterator<CaretakerInfo> it = allCaretakerInfo.iterator();
+        Iterator<CaretakerClientSide> it = allCaretakerInfo.iterator();
         while (it.hasNext() && (count == -1))
         {
-            CaretakerInfo ci = it.next();
+            CaretakerClientSide ci = it.next();
             oldcount = count;
             count = ci.getDeadCount(name);
             if ((oldcount != -1) && (count != oldcount))

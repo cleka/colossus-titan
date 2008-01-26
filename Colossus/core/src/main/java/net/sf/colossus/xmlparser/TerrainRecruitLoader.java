@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.sf.colossus.client.CaretakerInfo;
+import net.sf.colossus.client.CaretakerClientSide;
 import net.sf.colossus.server.CustomRecruitBase;
 import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.util.HTMLColor;
@@ -98,7 +98,7 @@ public class TerrainRecruitLoader
      * set the CaretakerInfo used by the graph
      * (needed to know what creatures are still available)
      */
-    public static void setCaretakerInfo(CaretakerInfo caretakerInfo)
+    public static void setCaretakerInfo(CaretakerClientSide caretakerInfo)
     {
         LOGGER.log(Level.FINEST, "GRAPH: Setting the CaretakerInfo");
         graph.setCaretakerInfo(caretakerInfo);

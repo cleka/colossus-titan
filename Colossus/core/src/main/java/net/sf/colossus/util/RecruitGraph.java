@@ -11,7 +11,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.sf.colossus.client.CaretakerInfo;
+import net.sf.colossus.client.CaretakerClientSide;
 import net.sf.colossus.client.LegionClientSide;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.server.CustomRecruitBase;
@@ -39,7 +39,7 @@ public class RecruitGraph
     private static final Logger LOGGER = Logger.getLogger(RecruitGraph.class
         .getName());
 
-    private CaretakerInfo caretakerInfo;
+    private CaretakerClientSide caretakerInfo;
     private final List<RecruitVertex> allVertex = new ArrayList<RecruitVertex>();
     private final List<RecruitEdge> allEdge = new ArrayList<RecruitEdge>();
     private final Map<String, RecruitVertex> creatureToVertex = new HashMap<String, RecruitVertex>();
@@ -243,7 +243,7 @@ public class RecruitGraph
         }
     }
 
-    public RecruitGraph(CaretakerInfo caretakerInfo)
+    public RecruitGraph(CaretakerClientSide caretakerInfo)
     {
         this.caretakerInfo = caretakerInfo;
     }
@@ -346,7 +346,7 @@ public class RecruitGraph
         return all;
     }
 
-    CaretakerInfo getCaretakerInfo()
+    CaretakerClientSide getCaretakerInfo()
     {
         return caretakerInfo;
     }
@@ -456,7 +456,7 @@ public class RecruitGraph
      * Set the CaretakerInfo to use for availability of creatures.
      * @param The caretakerInfo to use subsequently.
      */
-    public void setCaretakerInfo(CaretakerInfo caretakerInfo)
+    public void setCaretakerInfo(CaretakerClientSide caretakerInfo)
     {
         this.caretakerInfo = caretakerInfo;
     }

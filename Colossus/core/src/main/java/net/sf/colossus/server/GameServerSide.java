@@ -83,7 +83,7 @@ public final class GameServerSide extends net.sf.colossus.game.Game
     private boolean loadingGame;
     private boolean gameOver;
     private BattleServerSide battle;
-    private final Caretaker caretaker = new Caretaker(this);
+    private final CaretakerServerSide caretaker = new CaretakerServerSide(this);
     private Constants.Phase phase;
     private Server server;
     // Negotiation
@@ -226,7 +226,6 @@ public final class GameServerSide extends net.sf.colossus.game.Game
         turnNumber = 1;
         lastRecruitTurnNumber = -1;
         phase = Constants.Phase.SPLIT;
-        caretaker.resetAllCounts();
         players.clear();
 
         VariantSupport.loadVariant(options.getStringOption(Options.variant),
@@ -239,6 +238,8 @@ public final class GameServerSide extends net.sf.colossus.game.Game
         CustomRecruitBase.setGame(this);
 
         addPlayersFromOptions();
+        // reset the caretaker after we have the players to get the right Titan counts
+        caretaker.resetAllCounts();
 
         hotSeatMode = options.getOption(Options.hotSeatMode);
 
@@ -528,7 +529,17 @@ public final class GameServerSide extends net.sf.colossus.game.Game
         server.allTellAllLegionLocations();
         autoSave();
         setupPhase();
-        caretaker.fullySyncDisplays();
+        fullySyncCaretakerDisplays();
+    }
+
+    private void fullySyncCaretakerDisplays()
+    {
+        Iterator<CreatureType> it = getVariant().getCreatureTypes().iterator();
+        while (it.hasNext())
+        {
+            CreatureType creature = it.next();
+            caretaker.updateDisplays(creature.getName());
+        }
     }
 
     /** Randomize towers by rolling dice and rerolling ties. */
@@ -626,7 +637,7 @@ public final class GameServerSide extends net.sf.colossus.game.Game
         return returnList;
     }
 
-    Caretaker getCaretaker()
+    CaretakerServerSide getCaretaker()
     {
         return caretaker;
     }
@@ -1719,7 +1730,7 @@ public final class GameServerSide extends net.sf.colossus.game.Game
 
         server.allSetupTurnState();
         setupPhase();
-        caretaker.fullySyncDisplays();
+        fullySyncCaretakerDisplays();
     }
 
     /** Extract and return the numeric part of a filename. */

@@ -188,7 +188,7 @@ public final class Client implements IClient, IOracle
     private SimpleAI simpleAI;
     private AI ai;
 
-    private final CaretakerInfo caretakerInfo;
+    private final CaretakerClientSide caretakerInfo;
 
     /**
      * This is used as a placeholder for activePlayer and battleActivePlayer since they
@@ -273,7 +273,7 @@ public final class Client implements IClient, IOracle
 
         this.game = game;
         // TODO the caretaker should be attached to the Game class
-        this.caretakerInfo = new CaretakerInfo(game);
+        this.caretakerInfo = new CaretakerClientSide(game);
 
         // TODO this is currently not set properly straight away, it is fixed in
         // updatePlayerInfo(..) when the PlayerInfos are initialized. Should really
@@ -4375,11 +4375,6 @@ public final class Client implements IClient, IOracle
     int getCreatureMaxCount(String creatureName)
     {
         return caretakerInfo.getMaxCount(creatureName);
-    }
-
-    int getCreatureMaxCount(CreatureType creature)
-    {
-        return caretakerInfo.getMaxCount(creature);
     }
 
     public List<Legion> getLegionsByHex(MasterHex hex)
