@@ -419,4 +419,9 @@ public class Player
         }
         return false;
     }
+
+    public int getNumLegions()
+    {
+        return getLegions().size();
+    }
 }

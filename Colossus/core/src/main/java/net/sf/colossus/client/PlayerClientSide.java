@@ -21,10 +21,6 @@ public final class PlayerClientSide extends Player
 {
     private final Client client;
 
-    private int numLegions;
-    private int numCreatures;
-    private int titanPower;
-
     private PredictSplits predictSplits;
 
     /** 
@@ -63,17 +59,16 @@ public final class PlayerClientSide extends Player
 
         setPlayersElim(data.remove(0));
 
-        buf = data.remove(0);
-        setNumLegions(Integer.parseInt(buf));
+        buf = data.remove(0); // numLegions -- we can calculate that later
+
+        buf = data.remove(0); // numCreatures -- we can calculate that later
 
         buf = data.remove(0);
-        setNumCreatures(Integer.parseInt(buf));
-
-        buf = data.remove(0);
-        setTitanPower(Integer.parseInt(buf));
+        int titanPower = Integer.parseInt(buf);
 
         buf = data.remove(0);
         setScore(Integer.parseInt(buf));
+        assert titanPower == getTitanPower() : "Titan strength inconsistent between client and server";
 
         buf = data.remove(0);
         setMulligansLeft(Integer.parseInt(buf));
@@ -83,39 +78,6 @@ public final class PlayerClientSide extends Player
         {
             addMarkerAvailable(markerId);
         }
-    }
-
-    void setNumLegions(int numLegions)
-    {
-        this.numLegions = numLegions;
-    }
-
-    public int getNumLegions()
-    {
-        return numLegions;
-    }
-
-    void setNumCreatures(int numCreatures)
-    {
-        this.numCreatures = numCreatures;
-    }
-
-    @Override
-    public int getNumCreatures()
-    {
-        return numCreatures;
-    }
-
-    private void setTitanPower(int titanPower)
-    {
-        this.titanPower = titanPower;
-    }
-
-    // TODO can't we just use the calculated version from the base class?
-    @Override
-    public int getTitanPower()
-    {
-        return titanPower;
     }
 
     public int numMobileLegions()
