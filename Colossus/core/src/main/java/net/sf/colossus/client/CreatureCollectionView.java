@@ -14,7 +14,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowEvent;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -49,14 +48,21 @@ class CreatureCollectionView extends KDialog
     private Client client;
     private static final int fixedChitSize = 60;
 
-    /** hash by creature name to the label that displays the bottom counts */
-    Map<String, JLabel> countMap = new HashMap<String, JLabel>();
+    /**
+     * Maps each creature type to the bottom label with all counts.
+     */
+    Map<CreatureType, JLabel> countMap = new HashMap<CreatureType, JLabel>();
 
-    /** hash by creature name to the label that displays the top count */
-    Map<String, JLabel> topCountMap = new HashMap<String, JLabel>();
+    /**
+     * Maps each creature type to the top label with the total count.
+     */
+    Map<CreatureType, JLabel> topCountMap = new HashMap<CreatureType, JLabel>();
 
-    /** hash by creature name to the Chit (so we can cross away the dead) */
-    Map<String, Chit> chitMap = new HashMap<String, Chit>();
+    /**
+     * Maps each creature type to the chit (for crossing out).
+     */
+    Map<CreatureType, Chit> chitMap = new HashMap<CreatureType, Chit>();
+
     private SaveWindow saveWindow;
     private JScrollPane scrollPane;
     private JFrame parentFrame;
@@ -118,34 +124,29 @@ class CreatureCollectionView extends KDialog
         private final JLabel topLabel;
         private Chit chit;
 
-        CreatureCount(String name)
+        CreatureCount(final CreatureType type)
         {
             super(new BorderLayout());
 
             setBorder(BorderFactory.createLineBorder(Color.black));
-            if (!(name.equals("Titan")))
+            if (!(type.isTitan()))
             {
-                chit = new Chit(fixedChitSize, name);
+                chit = new Chit(fixedChitSize, type.getName());
             }
             else
             {
                 chit = new Chit(fixedChitSize, "Titan-0-Black");
             }
-            chitMap.put(name, chit);
+            chitMap.put(type, chit);
             label = new JLabel(baseString, SwingConstants.CENTER);
             topLabel = new JLabel(htmlizeOnly(htmlColorizeOnly(Integer
-                .toString(client.getCreatureMaxCount(name)), "blue")),
-                SwingConstants.CENTER);
+                .toString(type.getMaxCount()), "blue")), SwingConstants.CENTER);
             label.setFont(countFont);
             topLabel.setFont(countFont);
-            countMap.put(name, label);
-            topCountMap.put(name, topLabel);
+            countMap.put(type, label);
+            topCountMap.put(type, topLabel);
 
             // clicking the creature icon invokes the details view
-            final CreatureType creature = client.getGame().getVariant()
-                .getCreatureByName(name);
-            assert creature != null : "Expected creature name '" + name
-                + "' to be valid";
             this.addMouseListener(new MouseAdapter()
             {
                 @Override
@@ -154,7 +155,7 @@ class CreatureCollectionView extends KDialog
                     if (e.getButton() == MouseEvent.BUTTON1)
                     {
                         new ShowCreatureDetails(
-                            CreatureCollectionView.this.parentFrame, creature,
+                            CreatureCollectionView.this.parentFrame, type,
                             null, CreatureCollectionView.this.scrollPane);
                     }
                 }
@@ -188,11 +189,9 @@ class CreatureCollectionView extends KDialog
         JPanel creaturePanel = new JPanel();
         creaturePanel.setLayout(new CCVFlowLayout(scrollPane, creaturePanel,
             FlowLayout.LEFT, 2, 2));
-        Iterator<CreatureType> it = creatures.iterator();
-        while (it.hasNext())
+        for (CreatureType type : creatures)
         {
-            CreatureType creature = it.next();
-            creaturePanel.add(new CreatureCount(creature.getName()));
+            creaturePanel.add(new CreatureCount(type));
         }
 
         return creaturePanel;
@@ -202,16 +201,13 @@ class CreatureCollectionView extends KDialog
     {
         try
         {
-            Iterator<Entry<String, JLabel>> it = countMap.entrySet()
-                .iterator();
-            while (it.hasNext())
+            for (Entry<CreatureType, JLabel> entry : countMap.entrySet())
             {
-                Entry<String, JLabel> entry = it.next();
-                String name = entry.getKey();
+                CreatureType type = entry.getKey();
                 JLabel label = entry.getValue();
-                int count = client.getCreatureCount(name);
-                int maxcount = client.getCreatureMaxCount(name);
-                int deadCount = client.getCreatureDeadCount(name);
+                int count = client.getCreatureCount(type);
+                int maxcount = type.getMaxCount();
+                int deadCount = client.getCreatureDeadCount(type);
                 int inGameCount = maxcount - (deadCount + count);
 
                 // safety check
@@ -220,25 +216,24 @@ class CreatureCollectionView extends KDialog
                     LOGGER.log(Level.SEVERE, "Something went wrong:"
                         + " discrepancy between total (" + maxcount
                         + "), remaining (" + count + ") and dead ("
-                        + deadCount + ") count for creature " + name);
+                        + deadCount + ") count for creature " + type);
                     return;
                 }
 
-                boolean immortal = (client.getGame().getVariant()
-                    .getCreatureByName(name)).isImmortal();
+                boolean immortal = type.isImmortal();
                 String color;
                 if (count == 0)
                 {
                     color = "yellow";
                     if (!immortal)
                     {
-                        Chit chit = chitMap.get(name);
+                        Chit chit = chitMap.get(type);
                         chit.setDead(true);
                     }
                 }
                 else
                 {
-                    Chit chit = chitMap.get(name);
+                    Chit chit = chitMap.get(type);
                     chit.setDead(false);
                     if (count == maxcount)
                     {
@@ -260,7 +255,7 @@ class CreatureCollectionView extends KDialog
                 String htmlSlash = htmlColorizeOnly("/", "black");
                 label.setText(htmlizeOnly(htmlCount + htmlSlash
                     + htmlInGameCount + htmlSlash + htmlDeadCount));
-                JLabel topLabel = topCountMap.get(name);
+                JLabel topLabel = topCountMap.get(type);
                 topLabel.setText(htmlizeOnly(htmlColorizeOnly(Integer
                     .toString(maxcount), "blue")));
             }
