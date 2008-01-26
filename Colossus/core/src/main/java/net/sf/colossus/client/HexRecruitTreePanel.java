@@ -22,12 +22,13 @@ import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.util.RecruitGraph;
 import net.sf.colossus.variant.CreatureType;
+import net.sf.colossus.variant.MasterHex;
 import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
 
 public class HexRecruitTreePanel extends Box
 {
-    public HexRecruitTreePanel(int direction, String terrain, String hexLabel,
+    public HexRecruitTreePanel(int direction, String terrain, MasterHex hex,
         MouseListener listener)
     {
         super(direction);
@@ -40,7 +41,7 @@ public class HexRecruitTreePanel extends Box
         add(terrainLabel);
 
         List<CreatureType> creatures = TerrainRecruitLoader
-            .getPossibleRecruits(terrain, hexLabel);
+            .getPossibleRecruits(terrain, hex);
         Iterator<CreatureType> it = creatures.iterator();
         boolean firstTime = true;
         int scale = 4 * Scale.get();
@@ -59,7 +60,7 @@ public class HexRecruitTreePanel extends Box
             else
             {
                 numToRecruit = TerrainRecruitLoader.numberOfRecruiterNeeded(
-                    prevCreature, creature, terrain, hexLabel);
+                    prevCreature, creature, terrain, hex);
             }
 
             JLabel numToRecruitLabel = new JLabel("");

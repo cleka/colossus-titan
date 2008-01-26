@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import junit.framework.TestCase;
+import net.sf.colossus.variant.MasterHex;
 
 
 /** 
@@ -14,6 +15,19 @@ import junit.framework.TestCase;
  */
 public class BalancedTowersTest extends TestCase
 {
+    private static final MasterHex T100 = VariantSupport.getCurrentVariant()
+        .getMasterBoard().getHexByLabel("100");
+    private static final MasterHex T200 = VariantSupport.getCurrentVariant()
+        .getMasterBoard().getHexByLabel("200");
+    private static final MasterHex T300 = VariantSupport.getCurrentVariant()
+        .getMasterBoard().getHexByLabel("300");
+    private static final MasterHex T400 = VariantSupport.getCurrentVariant()
+        .getMasterBoard().getHexByLabel("400");
+    private static final MasterHex T500 = VariantSupport.getCurrentVariant()
+        .getMasterBoard().getHexByLabel("500");
+    private static final MasterHex T600 = VariantSupport.getCurrentVariant()
+        .getMasterBoard().getHexByLabel("600");
+
     public BalancedTowersTest(String name)
     {
         super(name);
@@ -24,20 +38,22 @@ public class BalancedTowersTest extends TestCase
         int numPlayers = 4;
         int numTowers = 6;
 
-        List<String> towerList = new ArrayList<String>();
+        List<MasterHex> towerList = new ArrayList<MasterHex>();
         for (int i = 0; i < numTowers; i++)
         {
-            towerList.add("" + 100 * (i + 1));
+            towerList.add(VariantSupport.getCurrentVariant().getMasterBoard()
+                .getHexByLabel(String.valueOf(100 * (i + 1))));
         }
 
-        List<String> results = GameServerSide.getBalancedTowers(numPlayers, towerList);
+        List<MasterHex> results = GameServerSide.getBalancedTowers(numPlayers,
+            towerList);
 
         assertTrue(results.size() == 4);
-        assertTrue((results.contains("100") && results.contains("200")
-            && results.contains("400") && results.contains("500"))
-            || (results.contains("100") && results.contains("300")
-                && results.contains("400") && results.contains("600"))
-            || (results.contains("200") && results.contains("300")
-                && results.contains("500") && results.contains("600")));
+        assertTrue((results.contains(T100) && results.contains(T200)
+            && results.contains(T400) && results.contains(T500))
+            || (results.contains(T100) && results.contains(T300)
+                && results.contains(T400) && results.contains(T600))
+            || (results.contains(T200) && results.contains(T300)
+                && results.contains(T500) && results.contains(T600)));
     }
 }

@@ -17,6 +17,7 @@ import net.sf.colossus.game.Legion;
 import net.sf.colossus.server.CustomRecruitBase;
 import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.variant.CreatureType;
+import net.sf.colossus.variant.MasterHex;
 import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
 
@@ -400,7 +401,7 @@ public class RecruitGraph
     }
 
     public int numberOfRecruiterNeeded(String recruiter, String recruit,
-        String terrain, String hexLabel)
+        String terrain, MasterHex hex)
     {
         List<RecruitEdge> allEdge = getIncomingEdges(recruit);
         RecruitVertex source = getVertex(recruiter);
@@ -440,7 +441,7 @@ public class RecruitGraph
                     CustomRecruitBase cri = TerrainRecruitLoader
                         .getCustomRecruitBase(tempSrc.getCreatureName());
                     int v = cri.numberOfRecruiterNeeded(recruiter, recruit,
-                        terrain, hexLabel);
+                        terrain, hex);
                     if (v < minValue)
                     {
                         minValue = v;

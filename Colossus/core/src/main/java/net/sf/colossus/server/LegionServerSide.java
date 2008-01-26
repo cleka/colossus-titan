@@ -25,8 +25,8 @@ import net.sf.colossus.xmlparser.TerrainRecruitLoader;
  * @author Romain Dolbeau
  */
 
-public final class LegionServerSide extends net.sf.colossus.game.Legion
-    implements Comparable<LegionServerSide>
+public final class LegionServerSide extends Legion implements
+    Comparable<LegionServerSide>
 {
     private static final Logger LOGGER = Logger
         .getLogger(LegionServerSide.class.getName());
@@ -39,7 +39,7 @@ public final class LegionServerSide extends net.sf.colossus.game.Legion
     /**
      * The label of the starting hex of the last move.
      */
-    private String startingHexLabel;
+    private MasterHex startingHex;
     private String recruitName;
     private int battleTally;
     private final GameServerSide game;
@@ -53,7 +53,7 @@ public final class LegionServerSide extends net.sf.colossus.game.Legion
      * not enforce this.
      */
     public LegionServerSide(String markerId, String parentId,
-        String currentHexLabel, String startingHexLabel, Player player,
+        MasterHex currentHex, MasterHex startingHex, Player player,
         GameServerSide game, CreatureType... creatureTypes)
     {
         super(player, markerId);
@@ -63,8 +63,8 @@ public final class LegionServerSide extends net.sf.colossus.game.Legion
         {
             parentId = null;
         }
-        setHexLabel(currentHexLabel);
-        this.startingHexLabel = startingHexLabel;
+        moveTo(currentHex);
+        this.startingHex = startingHex;
         this.game = game;
 
         for (CreatureType creature : creatureTypes)
@@ -74,17 +74,16 @@ public final class LegionServerSide extends net.sf.colossus.game.Legion
         }
     }
 
-    static LegionServerSide getStartingLegion(String markerId,
-        String hexLabel, Player player, GameServerSide game)
+    static LegionServerSide getStartingLegion(String markerId, MasterHex hex,
+        Player player, GameServerSide game)
     {
         CreatureType[] startCre = TerrainRecruitLoader
-            .getStartingCreatures(game.getVariant().getMasterBoard()
-                .getHexByLabel(hexLabel).getTerrain());
-        LegionServerSide legion = new LegionServerSide(markerId, null,
-            hexLabel, hexLabel, player, game, VariantSupport
-                .getCurrentVariant().getCreatureByName(Constants.titan),
-            VariantSupport.getCurrentVariant().getCreatureByName(
-                TerrainRecruitLoader.getPrimaryAcquirable()), startCre[2],
+            .getStartingCreatures(hex.getTerrain());
+        LegionServerSide legion = new LegionServerSide(markerId, null, hex,
+            hex, player, game, VariantSupport.getCurrentVariant()
+                .getCreatureByName(Constants.titan), VariantSupport
+                .getCurrentVariant().getCreatureByName(
+                    TerrainRecruitLoader.getPrimaryAcquirable()), startCre[2],
             startCre[2], startCre[0], startCre[0], startCre[1], startCre[1]);
 
         Iterator<CreatureServerSide> it = legion.getCreatures().iterator();
@@ -342,9 +341,8 @@ public final class LegionServerSide extends net.sf.colossus.game.Legion
         String teleportingLord)
     {
         PlayerServerSide player = getPlayer();
-        String hexLabel = hex.getLabel();
 
-        setHexLabel(hexLabel);
+        moveTo(hex);
         setMoved(true);
 
         setEntrySide(BattleMap.entrySideNum(entrySide));
@@ -357,13 +355,13 @@ public final class LegionServerSide extends net.sf.colossus.game.Legion
         }
 
         LOGGER
-            .log(Level.INFO,
+            .log(
+                Level.INFO,
                 "Legion "
                     + getLongMarkerName()
                     + " in "
-                    + getStartingHexLabel()
-                    + (teleported ? (game.getNumEnemyLegions(hexLabel,
-                        getPlayer()) > 0 ? " titan teleports "
+                    + getStartingHex()
+                    + (teleported ? (game.getNumEnemyLegions(hex, getPlayer()) > 0 ? " titan teleports "
                         : " tower teleports (" + teleportingLord + ") ")
                         : " moves ") + "to " + hex.getDescription()
                     + " entering on " + entrySide);
@@ -386,7 +384,7 @@ public final class LegionServerSide extends net.sf.colossus.game.Legion
                 getPlayer().setTeleported(false);
             }
 
-            setHexLabel(startingHexLabel);
+            moveTo(startingHex);
 
             setMoved(false);
             LOGGER.log(Level.INFO, "Legion " + this + " undoes its move");
@@ -396,7 +394,7 @@ public final class LegionServerSide extends net.sf.colossus.game.Legion
     /** Called at end of player turn. */
     void commitMove()
     {
-        startingHexLabel = getHexLabel();
+        startingHex = getCurrentHex();
         setMoved(false);
         recruitName = null;
     }
@@ -422,8 +420,8 @@ public final class LegionServerSide extends net.sf.colossus.game.Legion
     boolean canRecruit()
     {
         return (recruitName == null && getHeight() <= 6
-            && !getPlayer().isDead() && !(game.findEligibleRecruits(
-            getMarkerId(), getHexLabel()).isEmpty()));
+            && !getPlayer().isDead() && !(game.findEligibleRecruits(this,
+            getCurrentHex()).isEmpty()));
     }
 
     void undoRecruit()
@@ -451,9 +449,9 @@ public final class LegionServerSide extends net.sf.colossus.game.Legion
         return !game.findSummonableAngels(markerId).isEmpty();
     }
 
-    String getStartingHexLabel()
+    MasterHex getStartingHex()
     {
-        return startingHexLabel;
+        return startingHex;
     }
 
     /** Add a creature to this legion.  If takeFromStack is true,
@@ -689,7 +687,7 @@ public final class LegionServerSide extends net.sf.colossus.game.Legion
 
         player.selectMarkerId(newMarkerId);
         Legion newLegion = new LegionServerSide(newMarkerId, markerId,
-            getHexLabel(), getHexLabel(), getPlayer(), game);
+            getCurrentHex(), getCurrentHex(), getPlayer(), game);
 
         Iterator<CreatureType> it = creatures.iterator();
         while (it.hasNext())
@@ -722,14 +720,14 @@ public final class LegionServerSide extends net.sf.colossus.game.Legion
 
     /** List the lords eligible to teleport this legion to hexLabel,
      *  as strings. */
-    List<String> listTeleportingLords(String hexLabel)
+    List<String> listTeleportingLords(MasterHex hex)
     {
         // Needs to be a List not a Set so that it can be passed as
         // an imageList.
         List<String> lords = new ArrayList<String>();
 
         // Titan teleport
-        if (game.getNumEnemyLegions(hexLabel, getPlayer()) >= 1)
+        if (game.getNumEnemyLegions(hex, getPlayer()) >= 1)
         {
             if (hasTitan())
             {

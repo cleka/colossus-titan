@@ -16,6 +16,7 @@ import net.sf.colossus.game.Player;
 import net.sf.colossus.server.CustomRecruitBase;
 import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.variant.CreatureType;
+import net.sf.colossus.variant.MasterHex;
 
 
 /**
@@ -63,7 +64,7 @@ public class BalrogRecruitment extends CustomRecruitBase
 
     @Override
     public List<CreatureType> getPossibleSpecialRecruiters(String terrain,
-        String hexLabel)
+        MasterHex hex)
     {
         // Balrog recruited in Tower, where everything recruit anyway.
         return new ArrayList<CreatureType>();
@@ -71,20 +72,20 @@ public class BalrogRecruitment extends CustomRecruitBase
 
     @Override
     public List<CreatureType> getPossibleSpecialRecruits(String terrain,
-        String hexLabel)
+        MasterHex hex)
     {
         List<CreatureType> temp = new ArrayList<CreatureType>();
 
-        if (hexLabel == null)
+        if (hex == null)
         {
             return temp;
         }
 
         // need to update, as we might have earned points in the Engagement
         // phase and recruit in the Recruit phase
-        updateBalrogCount(hexLabel);
+        updateBalrogCount(hex);
 
-        String name = balrogPrefix + hexLabel;
+        String name = balrogPrefix + hex.getLabel();
 
         if (getCount(name) > 0)
         {
@@ -96,7 +97,7 @@ public class BalrogRecruitment extends CustomRecruitBase
 
     @Override
     public int numberOfRecruiterNeeded(String recruiter, String recruit,
-        String terrain, String hexLabel)
+        String terrain, MasterHex hex)
     {
         return 0;
     }
@@ -104,28 +105,27 @@ public class BalrogRecruitment extends CustomRecruitBase
     @Override
     protected void changeOfTurn(int newActivePlayer)
     {
-        Set<String> towerSet = VariantSupport.getCurrentVariant()
+        Set<MasterHex> towerSet = VariantSupport.getCurrentVariant()
             .getMasterBoard().getTowerSet();
 
         // update all Balrogs, as a lost fight may have given points
         // to a different Player
-        Iterator<String> it = towerSet.iterator();
-        while (it.hasNext())
+        for (MasterHex tower : towerSet)
         {
-            updateBalrogCount(it.next());
+            updateBalrogCount(tower);
         }
     }
 
-    private synchronized void updateBalrogCount(String hexLabel)
+    private synchronized void updateBalrogCount(MasterHex tower)
     {
-        String name = balrogPrefix + hexLabel;
+        String name = balrogPrefix + tower;
 
-        Player pi = findPlayerWithStartingTower(hexLabel);
+        Player pi = findPlayerWithStartingTower(tower);
 
         if (pi == null)
         {
-            LOGGER.log(Level.FINEST, "CUSTOM: no player info for hex "
-                + hexLabel);
+            LOGGER
+                .log(Level.FINEST, "CUSTOM: no player info for hex " + tower);
             return;
         }
 
@@ -185,17 +185,13 @@ public class BalrogRecruitment extends CustomRecruitBase
         }
     }
 
-    private Player findPlayerWithStartingTower(String hexLabel)
+    private Player findPlayerWithStartingTower(MasterHex tower)
     {
-        Iterator<Player> it = allPlayers.iterator();
-        while (it.hasNext())
+        for (Player player : allPlayers)
         {
-            Player pi = it.next();
-            String towerLabel = pi.getStartingTower();
-
-            if (towerLabel.equals(hexLabel))
+            if (player.getStartingTower().equals(tower))
             {
-                return pi;
+                return player;
             }
         }
         return null;

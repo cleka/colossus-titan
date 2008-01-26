@@ -95,7 +95,7 @@ final class BattleMovement
      */
     private Set<String> findUnoccupiedStartlistHexes()
     {
-        String terrain = client.getBattleTerrain();
+        String terrain = client.getBattleSite().getTerrain();
         Set<String> set = new HashSet<String>();
         Iterator<String> it = HexMap.getTowerStartList(terrain).iterator();
         while (it.hasNext())
@@ -128,7 +128,8 @@ final class BattleMovement
         Set<String> set = new HashSet<String>();
         if (!chit.hasMoved() && !client.isInContact(chit, false))
         {
-            if (HexMap.terrainHasStartlist(client.getBattleTerrain())
+            if (HexMap
+                .terrainHasStartlist(client.getBattleSite().getTerrain())
                 && (client.getBattleTurnNumber() == 1)
                 && client.getBattleActiveLegion().equals(client.getDefender()))
             {

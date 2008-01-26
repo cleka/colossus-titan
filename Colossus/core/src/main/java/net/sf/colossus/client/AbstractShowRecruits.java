@@ -11,6 +11,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JFrame;
 
 import net.sf.colossus.util.KDialog;
+import net.sf.colossus.variant.MasterHex;
 
 
 /**
@@ -35,12 +36,10 @@ public abstract class AbstractShowRecruits extends KDialog implements
         addMouseListener(this);
     }
 
-    void doOneTerrain(String terrain, String hexLabel)
+    void doOneTerrain(String terrain, MasterHex hex)
     {
-        getContentPane()
-            .add(
-                new HexRecruitTreePanel(BoxLayout.Y_AXIS, terrain, hexLabel,
-                    this));
+        getContentPane().add(
+            new HexRecruitTreePanel(BoxLayout.Y_AXIS, terrain, hex, this));
     }
 
     @Override

@@ -80,6 +80,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
     int cx = 6 * scale;
     int cy = 2 * scale;
 
+    // TODO make parameter typesafe (MasterHex)
     HexMap(String masterHexLabel)
     {
         this.masterHexLabel = masterHexLabel;

@@ -42,12 +42,9 @@ final class Concede extends KDialog implements ActionListener, WindowListener
     private Concede(Client client, JFrame parentFrame, Legion ally,
         Legion enemy, boolean flee)
     {
-        super(parentFrame, (flee ? "Flee" : "Concede")
-            + " with Legion "
-            + LegionServerSide.getLongMarkerName(ally.getMarkerId())
-            + " in "
-            + client.getGame().getVariant().getMasterBoard().getHexByLabel(
-                client.getHexForLegion(ally)).getDescription() + "?", false);
+        super(parentFrame, (flee ? "Flee" : "Concede") + " with Legion "
+            + LegionServerSide.getLongMarkerName(ally.getMarkerId()) + " in "
+            + ally.getCurrentHex().getDescription() + "?", false);
 
         Container contentPane = getContentPane();
         contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));

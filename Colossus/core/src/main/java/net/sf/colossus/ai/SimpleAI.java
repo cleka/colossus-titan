@@ -240,7 +240,7 @@ public class SimpleAI implements AI
                     .getPointValue() >= minimumSizeToRecruit))
             {
                 CreatureType recruit = chooseRecruit(legion, legion
-                    .getHexLabel(), true);
+                    .getCurrentHex(), true);
                 if (recruit != null)
                 {
                     List<String> recruiters = client.findEligibleRecruiters(
@@ -263,7 +263,7 @@ public class SimpleAI implements AI
 
     public void reinforce(Legion legion)
     {
-        CreatureType recruit = chooseRecruit(legion, (legion).getHexLabel());
+        CreatureType recruit = chooseRecruit(legion, legion.getCurrentHex());
         String recruitName = null;
         String recruiterName = null;
         if (recruit != null)
@@ -281,18 +281,16 @@ public class SimpleAI implements AI
     }
 
     // support old interface without reserve feature
-    CreatureType chooseRecruit(Legion legion, String hexLabel)
+    CreatureType chooseRecruit(Legion legion, MasterHex hex)
     {
-        return chooseRecruit(legion, hexLabel, false);
+        return chooseRecruit(legion, hex, false);
     }
 
-    CreatureType chooseRecruit(Legion legion, String hexLabel,
+    CreatureType chooseRecruit(Legion legion, MasterHex hex,
         boolean considerReservations)
     {
-        MasterHex hex = getVariantPlayed().getMasterBoard().getHexByLabel(
-            hexLabel);
-        List<CreatureType> recruits = client.findEligibleRecruits(legion,
-            hexLabel, considerReservations);
+        List<CreatureType> recruits = client.findEligibleRecruits(legion, hex,
+            considerReservations);
         if (recruits.size() == 0)
         {
             return null;
@@ -360,18 +358,16 @@ public class SimpleAI implements AI
             boolean goodRecruit = false;
             for (int roll = 1; roll <= 6; roll++)
             {
-                Set<String> moves = client.getMovement().listAllMoves(legion,
-                    legion.getCurrentHex(), roll);
+                Set<MasterHex> moves = client.getMovement().listAllMoves(
+                    legion, legion.getCurrentHex(), roll);
                 int safeMoves = 0;
-                for (String hexLabel : moves)
+                for (MasterHex hex : moves)
                 {
-                    MasterHex hex = getVariantPlayed().getMasterBoard()
-                        .getHexByLabel(hexLabel);
-                    if (client.getEnemyLegions(hexLabel, player).size() == 0)
+                    if (client.getEnemyLegions(hex, player).size() == 0)
                     {
                         safeMoves++;
                         if (!goodRecruit
-                            && couldRecruitUp(legion, hexLabel, null, hex
+                            && couldRecruitUp(legion, hex, null, hex
                                 .getTerrain()))
                         {
                             goodRecruit = true;
@@ -379,8 +375,7 @@ public class SimpleAI implements AI
                     }
                     else
                     {
-                        Legion enemy = client.getFirstEnemyLegion(hexLabel,
-                            player);
+                        Legion enemy = client.getFirstEnemyLegion(hex, player);
                         int result = estimateBattleResults(legion, true,
                             enemy, hex);
 
@@ -393,7 +388,7 @@ public class SimpleAI implements AI
 
                             // Also consider acquiring angel.
                             if (!goodRecruit
-                                && couldRecruitUp(legion, hexLabel, enemy, hex
+                                && couldRecruitUp(legion, hex, enemy, hex
                                     .getTerrain()))
                             {
                                 goodRecruit = true;
@@ -463,8 +458,8 @@ public class SimpleAI implements AI
 
     /** Return true if the legion could recruit or acquire something
      *  better than its worst creature in hexLabel. */
-    private boolean couldRecruitUp(Legion legion, String hexLabel,
-        Legion enemy, String terrain)
+    private boolean couldRecruitUp(Legion legion, MasterHex hex, Legion enemy,
+        String terrain)
     {
         CreatureType weakest = client.getGame().getVariant()
             .getCreatureByName(
@@ -472,8 +467,7 @@ public class SimpleAI implements AI
                     (legion).getHeight() - 1));
 
         // Consider recruiting.
-        List<CreatureType> recruits = client.findEligibleRecruits(legion,
-            hexLabel);
+        List<CreatureType> recruits = client.findEligibleRecruits(legion, hex);
         if (!recruits.isEmpty())
         {
             CreatureType bestRecruit = recruits.get(recruits.size() - 1);
@@ -870,7 +864,7 @@ public class SimpleAI implements AI
         }
 
         /** cache all places enemies can move to, for use in risk analysis. */
-        Map<String, List<Legion>>[] enemyAttackMap = buildEnemyAttackMap(player);
+        Map<MasterHex, List<Legion>>[] enemyAttackMap = buildEnemyAttackMap(player);
 
         // A mapping from Legion to List of MoveInfo objects,
         // listing all moves that we've evaluated.  We use this if
@@ -927,7 +921,7 @@ public class SimpleAI implements AI
     /** Return true if we moved something. */
     private boolean handleVoluntaryMoves(Player player,
         Map<Legion, List<MoveInfo>> moveMap,
-        Map<String, List<Legion>>[] enemyAttackMap)
+        Map<MasterHex, List<Legion>>[] enemyAttackMap)
     {
         boolean moved = false;
         // TODO this is still List<LegionClientSide> to get the Comparable
@@ -956,21 +950,19 @@ public class SimpleAI implements AI
             // find the best move (1-ply search)
             MasterHex bestHex = null;
             int bestValue = Integer.MIN_VALUE;
-            Set<String> set = client.getMovement().listAllMoves(legion,
+            Set<MasterHex> set = client.getMovement().listAllMoves(legion,
                 legion.getCurrentHex(), client.getMovementRoll());
 
-            for (String hexLabel : set)
+            for (MasterHex hex : set)
             {
                 // XXX
                 // Do not consider moves onto hexes where we already have a 
                 // legion. This is sub-optimal since the legion in this hex 
                 // may be able to move and "get out of the way"
-                if (client.getFriendlyLegions(hexLabel, player).size() > 0)
+                if (client.getFriendlyLegions(hex, player).size() > 0)
                 {
                     continue;
                 }
-                final MasterHex hex = getVariantPlayed().getMasterBoard()
-                    .getHexByLabel(hexLabel);
                 final int value = evaluateMove(legion, hex, true,
                     enemyAttackMap);
 
@@ -987,7 +979,7 @@ public class SimpleAI implements AI
             // if we found a move that's better than sitting still, move
             if (bestValue > sitStillMove.value && bestHex != null)
             {
-                moved = doMove(legion, bestHex.getLabel());
+                moved = doMove(legion, bestHex);
                 if (moved)
                 {
                     return true;
@@ -1003,9 +995,8 @@ public class SimpleAI implements AI
     {
         for (Legion legion : player.getLegions())
         {
-            String hexLabel = legion.getHexLabel();
-            List<Legion> friendlyLegions = client.getFriendlyLegions(hexLabel,
-                player);
+            List<Legion> friendlyLegions = client.getFriendlyLegions(legion
+                .getCurrentHex(), player);
 
             if (friendlyLegions.size() > 1
                 && !client.getMovement().listNormalMoves(legion,
@@ -1055,7 +1046,7 @@ public class SimpleAI implements AI
                         + move.difference
                         + " in order to handle illegal legion " + legion);
 
-                    boolean moved = doMove(move.legion, move.hex.getLabel());
+                    boolean moved = doMove(move.legion, move.hex);
                     if (moved)
                     {
                         return true;
@@ -1120,7 +1111,7 @@ public class SimpleAI implements AI
                 + move.hex + " taking penalty " + move.difference
                 + " in order to handle illegal legion " + move.legion);
 
-            boolean moved = doMove(move.legion, move.hex.getLabel());
+            boolean moved = doMove(move.legion, move.hex);
             if (moved)
             {
                 return true;
@@ -1136,24 +1127,24 @@ public class SimpleAI implements AI
         return false;
     }
 
-    private boolean doMove(Legion legion, String hexLabel)
+    private boolean doMove(Legion legion, MasterHex hex)
     {
         // OLD COMMENT: Don't *know* move succeeded without asking server.
         //  ... nonsense. Client just sends message to server
         //      and returns true...
-        boolean moved = client.doMove(legion, hexLabel);
+        boolean moved = client.doMove(legion, hex);
         return moved;
     }
 
     // arrays and generics don't work well together -- TODO replace the
     // array with a list or model some intermediate classes
     @SuppressWarnings("unchecked")
-    Map<String, List<Legion>>[] buildEnemyAttackMap(Player player)
+    Map<MasterHex, List<Legion>>[] buildEnemyAttackMap(Player player)
     {
-        Map<String, List<Legion>>[] enemyMap = (Map<String, List<Legion>>[])new HashMap<?, ?>[7];
+        Map<MasterHex, List<Legion>>[] enemyMap = (Map<MasterHex, List<Legion>>[])new HashMap<?, ?>[7];
         for (int i = 1; i <= 6; i++)
         {
-            enemyMap[i] = new HashMap<String, List<Legion>>();
+            enemyMap[i] = new HashMap<MasterHex, List<Legion>>();
         }
 
         // for each enemy player
@@ -1171,7 +1162,7 @@ public class SimpleAI implements AI
                 for (int roll = 1; roll <= 6; roll++)
                 {
                     // count the moves he can get to
-                    Set<String> set;
+                    Set<MasterHex> set;
 
                     // Only allow Titan teleport
                     // Remember, tower teleports cannot attack
@@ -1188,13 +1179,13 @@ public class SimpleAI implements AI
                             legion.getCurrentHex(), roll);
                     }
 
-                    for (String hexlabel : set)
+                    for (MasterHex hex : set)
                     {
                         for (int effectiveRoll = roll; effectiveRoll <= 6; effectiveRoll++)
                         {
                             // legion can attack to hexlabel on a effectiveRoll
                             List<Legion> list = enemyMap[effectiveRoll]
-                                .get(hexlabel);
+                                .get(hex);
 
                             if (list == null)
                             {
@@ -1207,7 +1198,7 @@ public class SimpleAI implements AI
                             }
 
                             list.add(legion);
-                            enemyMap[effectiveRoll].put(hexlabel, list);
+                            enemyMap[effectiveRoll].put(hex, list);
                         }
                     }
                 }
@@ -1226,7 +1217,7 @@ public class SimpleAI implements AI
     // pass the legion instead of just the marker
     //
     int evaluateMove(Legion legion, MasterHex hex, boolean moved,
-        Map<String, List<Legion>>[] enemyAttackMap)
+        Map<MasterHex, List<Legion>>[] enemyAttackMap)
     {
         // Avoid using MIN_VALUE and MAX_VALUE because of possible overflow.
         final int WIN_GAME = Integer.MAX_VALUE / 2;
@@ -1234,13 +1225,12 @@ public class SimpleAI implements AI
 
         int value = 0;
         // consider making an attack
-        final Legion enemyLegion = client.getFirstEnemyLegion(hex.getLabel(),
-            legion.getPlayer());
+        final Legion enemyLegion = client.getFirstEnemyLegion(hex, legion
+            .getPlayer());
 
         if (enemyLegion != null)
         {
-            final int enemyPointValue = ((LegionClientSide)enemyLegion)
-                .getPointValue();
+            final int enemyPointValue = enemyLegion.getPointValue();
             final int result = estimateBattleResults(legion, enemyLegion, hex);
 
             switch (result)
@@ -1257,13 +1247,13 @@ public class SimpleAI implements AI
                         / TerrainRecruitLoader
                             .getAcquirableRecruitmentsValue();
                     // plus a fraction of a titan strength
-                    // XXX Should be by variant
+                    // TODO Should be by variant
                     value += (6 * enemyPointValue)
                         / TerrainRecruitLoader.getTitanImprovementValue();
                     // plus some more for killing a group (this is arbitrary)
                     value += (10 * enemyPointValue) / 100;
 
-                    // TODO: if enemy titan, we also score half points
+                    // TODO if enemy titan, we also score half points
                     // (this may make the AI unfairly gun for your titan)
                     break;
 
@@ -1392,18 +1382,18 @@ public class SimpleAI implements AI
 
         if (moved)
         {
-            recruit = chooseRecruit(legion, hex.getLabel());
+            recruit = chooseRecruit(legion, hex);
 
             if (recruit != null)
             {
                 int oldval = value;
 
-                if ((legion).getHeight() <= 5)
+                if (legion.getHeight() <= 5)
                 {
                     value += getHintedRecruitmentValue(recruit, legion,
                         hintSectionUsed);
                 }
-                else if ((legion).getHeight() == 6)
+                else if (legion.getHeight() == 6)
                 {
                     // if we're 6-high, then the value of a recruit is
                     // equal to the improvement in the value of the
@@ -1536,14 +1526,12 @@ public class SimpleAI implements AI
         for (int roll = 1; roll <= 6; roll++)
         {
             // XXX Should ignore friends.
-            Set<String> moves = client.getMovement().listAllMoves(legion, hex,
-                roll);
+            Set<MasterHex> moves = client.getMovement().listAllMoves(legion,
+                hex, roll);
             int bestRecruitVal = 0;
 
-            for (String nextLabel : moves)
+            for (MasterHex nextHex : moves)
             {
-                MasterHex nextHex = getVariantPlayed().getMasterBoard()
-                    .getHexByLabel(nextLabel);
                 // if we have to fight in that hex and we can't
                 // WIN_WITH_MINIMAL_LOSSES, then assume we can't
                 // recruit there.  IDEA: instead of doing any of this
@@ -1552,8 +1540,8 @@ public class SimpleAI implements AI
                 // maximize over choices and average over die rolls.
                 // this would be essentially minimax but ignoring the
                 // others players ability to move.
-                Legion enemy = client.getFirstEnemyLegion(nextHex.getLabel(),
-                    legion.getPlayer());
+                Legion enemy = client.getFirstEnemyLegion(nextHex, legion
+                    .getPlayer());
 
                 if (enemy != null
                     && estimateBattleResults(legion, enemy, nextHex) != WIN_WITH_MINIMAL_LOSSES)
@@ -1562,7 +1550,7 @@ public class SimpleAI implements AI
                 }
 
                 List<CreatureType> nextRecruits = client.findEligibleRecruits(
-                    legion, nextLabel);
+                    legion, nextHex);
 
                 if (nextRecruits.size() == 0)
                 {
@@ -1600,7 +1588,7 @@ public class SimpleAI implements AI
                     + legion + " in " + hex);
             }
 
-            Map<String, List<Legion>>[] enemiesThatCanAttackOnA = enemyAttackMap;
+            Map<MasterHex, List<Legion>>[] enemiesThatCanAttackOnA = enemyAttackMap;
             int roll;
 
             for (roll = 1; roll <= 6; roll++)
@@ -1763,7 +1751,7 @@ public class SimpleAI implements AI
         Legion legion;
         MasterHex hex;
         List<CreatureType> recruits;
-        Map<String, List<Legion>>[] enemyAttackMap = null;
+        Map<MasterHex, List<Legion>>[] enemyAttackMap = null;
 
         SimpleAIOracle(Legion legion, MasterHex hex,
             List<CreatureType> recruits2)
@@ -1898,8 +1886,8 @@ public class SimpleAI implements AI
         int total = 0;
         for (int roll = 1; roll <= 6; roll++)
         {
-            Set<String> set = client.getMovement().listAllMoves(legion, hex,
-                roll, true);
+            Set<MasterHex> set = client.getMovement().listAllMoves(legion,
+                hex, roll, true);
             if (setContainsHexWithTerrain(set, terrainType))
             {
                 total++;
@@ -1908,14 +1896,12 @@ public class SimpleAI implements AI
         return total;
     }
 
-    private boolean setContainsHexWithTerrain(Set<String> set,
+    private boolean setContainsHexWithTerrain(Set<MasterHex> set,
         String terrainType)
     {
-        for (String hexLabel : set)
+        for (MasterHex hex : set)
         {
-            String terrain = getVariantPlayed().getMasterBoard()
-                .getHexByLabel(hexLabel).getTerrain();
-            if (terrain.equals(terrainType))
+            if (hex.getTerrain().equals(terrainType))
             {
                 return true;
             }
@@ -1926,7 +1912,7 @@ public class SimpleAI implements AI
     // This is a really dumb placeholder.  TODO Make it smarter.
     // In particular, the AI should pick a side that will let it enter
     // as many creatures as possible.
-    public String pickEntrySide(String hexLabel, Legion legion,
+    public String pickEntrySide(MasterHex hex, Legion legion,
         Set<String> entrySides)
     {
         // Default to bottom to simplify towers.
@@ -1945,37 +1931,37 @@ public class SimpleAI implements AI
         return null;
     }
 
-    public String pickEngagement()
+    public MasterHex pickEngagement()
     {
-        Set<String> hexLabels = client.findEngagements();
+        Set<MasterHex> hexes = client.findEngagements();
 
         // Bail out early if we have no real choice.
-        int numChoices = hexLabels.size();
+        int numChoices = hexes.size();
         if (numChoices == 0)
         {
             return null;
         }
         if (numChoices == 1)
         {
-            return hexLabels.iterator().next();
+            return hexes.iterator().next();
         }
 
-        String bestChoice = null;
+        MasterHex bestChoice = null;
         int bestScore = Integer.MIN_VALUE;
 
-        for (String hexLabel : hexLabels)
+        for (MasterHex hex : hexes)
         {
-            int score = evaluateEngagement(hexLabel);
+            int score = evaluateEngagement(hex);
             if (score > bestScore)
             {
                 bestScore = score;
-                bestChoice = hexLabel;
+                bestChoice = hex;
             }
         }
         return bestChoice;
     }
 
-    private int evaluateEngagement(String hexLabel)
+    private int evaluateEngagement(MasterHex hex)
     {
         // Fight losing battles last, so that we don't give away
         //    points while they may be used against us this turn.
@@ -1987,10 +1973,8 @@ public class SimpleAI implements AI
         //    over 100-point boundaries.
 
         Player player = client.getActivePlayer();
-        Legion attacker = client.getFirstFriendlyLegion(hexLabel, player);
-        Legion defender = client.getFirstEnemyLegion(hexLabel, player);
-        MasterHex hex = getVariantPlayed().getMasterBoard().getHexByLabel(
-            hexLabel);
+        Legion attacker = client.getFirstFriendlyLegion(hex, player);
+        Legion defender = client.getFirstEnemyLegion(hex, player);
         int value = 0;
 
         final int result = estimateBattleResults(attacker, defender, hex);
@@ -2088,7 +2072,7 @@ public class SimpleAI implements AI
                 if ((enemy).getHeight() == 7)
                 {
                     List<CreatureType> recruits = client.findEligibleRecruits(
-                        enemy, legion.getCurrentHex().getLabel());
+                        enemy, legion.getCurrentHex());
                     if (recruits.size() > 0)
                     {
                         CreatureType best = recruits.get(recruits.size() - 1);
@@ -2144,7 +2128,7 @@ public class SimpleAI implements AI
             // Can't use Legion.getRecruit() because it checks for
             // 7-high legions.
             boolean canRecruit = !client.findEligibleRecruits(enemy,
-                (enemy).getHexLabel()).isEmpty();
+                enemy.getCurrentHex()).isEmpty();
             if (height == 7 && (canAcquireAngel || canRecruit))
             {
                 return true;
@@ -2175,7 +2159,7 @@ public class SimpleAI implements AI
             && ((LegionClientSide)legion).canRecruit())
         {
             List<CreatureType> recruits = client.findEligibleRecruits(legion,
-                (legion).getHexLabel());
+                legion.getCurrentHex());
             CreatureType bestRecruit = recruits.get(recruits.size() - 1);
             if (getKillValue(bestRecruit) > getKillValue(bestAngel))
             {
@@ -2216,18 +2200,18 @@ public class SimpleAI implements AI
         //
         // TODO Sometimes leave room for recruiting.
 
-        Set<String> hexLabels = client.findSummonableAngelHexes(summoner);
+        Set<MasterHex> hexes = client.findSummonableAngelHexes(summoner);
 
         LegionClientSide bestLegion = null;
         String bestAngel = null;
 
-        for (String hexLabel : hexLabels)
+        for (MasterHex hex : hexes)
         {
-            List<Legion> legions = client.getLegionsByHex(hexLabel);
+            List<Legion> legions = client.getLegionsByHex(hex);
             if (legions.size() != 1)
             {
                 LOGGER.log(Level.SEVERE,
-                    "SimpleAI.summonAngel(): Engagement in " + hexLabel);
+                    "SimpleAI.summonAngel(): Engagement in " + hex);
                 continue;
             }
             Legion legion = legions.get(0);
@@ -2293,7 +2277,7 @@ public class SimpleAI implements AI
     private BattleChit findBestTarget()
     {
         BattleChit bestTarget = null;
-        String terrain = client.getBattleTerrain();
+        String terrain = client.getBattleSite().getTerrain();
 
         // Create a map containing each target and the likely number
         // of hits it would take if all possible creatures attacked it.
@@ -2347,7 +2331,7 @@ public class SimpleAI implements AI
      *  hexLabel description strings. */
     public void handleCarries(int carryDamage, Set<String> carryTargets)
     {
-        String terrain = client.getBattleTerrain();
+        String terrain = client.getBattleSite().getTerrain();
         BattleChit bestTarget = null;
 
         for (String desc : carryTargets)
@@ -3311,7 +3295,7 @@ public class SimpleAI implements AI
     private int evaluateCritterMove(BattleChit critter,
         Map<String, Integer> strikeMap)
     {
-        final String terrain = client.getBattleTerrain();
+        final String terrain = client.getBattleSite().getTerrain();
         final LegionClientSide legion = (LegionClientSide)client
             .getMyEngagedLegion();
         final int skill = critter.getSkill();

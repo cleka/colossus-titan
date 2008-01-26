@@ -112,7 +112,7 @@ public class AutoInspector extends KDialog
         MasterHex hexModel = hex.getMasterHexModel();
         scrollPane.getViewport().add(
             new HexRecruitTreePanel(BoxLayout.X_AXIS, hexModel.getTerrain(),
-                hexModel.getLabel(), new MouseAdapter()
+                hexModel, new MouseAdapter()
                 {
                     // nothing to do
                 }));

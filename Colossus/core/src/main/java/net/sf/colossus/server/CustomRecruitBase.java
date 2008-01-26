@@ -11,6 +11,7 @@ import net.sf.colossus.client.CaretakerInfo;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.variant.CreatureType;
+import net.sf.colossus.variant.MasterHex;
 
 
 /**
@@ -201,20 +202,20 @@ abstract public class CustomRecruitBase
         return count;
     }
 
-    synchronized protected final Legion getRecruitingLegion(String hexLabel)
+    synchronized protected final Legion getRecruitingLegion(MasterHex hex)
     {
         if (serverGame == null)
         {
             return null;
         }
-        int num = serverGame.getNumLegions(hexLabel);
+        int num = serverGame.getNumLegions(hex);
         if (num == 0)
         {
             return null;
         }
         if (num == 1)
         { // only one Legion, it is the recruiting Legion
-            Legion l = serverGame.getFirstLegion(hexLabel);
+            Legion l = serverGame.getFirstLegion(hex);
             return l;
         }
         if (num == 2)
@@ -223,8 +224,8 @@ abstract public class CustomRecruitBase
         }
         // num > 2 this should not happen during recruiting, 
         //   as only a three-way split can do that.
-        LOGGER.log(Level.WARNING, "CUSTOM: 3 legions in recruiting hex "
-            + hexLabel + " ?!?");
+        LOGGER.log(Level.WARNING, "CUSTOM: 3 legions in recruiting hex " + hex
+            + " ?!?");
         return null;
     }
 
@@ -239,19 +240,28 @@ abstract public class CustomRecruitBase
     abstract public List<CreatureType> getAllPossibleSpecialRecruits(
         String terrain);
 
-    /** List Creature that can recruit in this terrain in a special way now */
+    /** List Creature that can recruit in this terrain in a special way now 
+     *
+     * TODO the terrain parameter might be superfluous
+     */
     abstract public List<CreatureType> getPossibleSpecialRecruiters(
-        String terrain, String hexLabel);
+        String terrain, MasterHex hex);
 
     /** List Creature that can be recruited in this terrain 
-     * in a special way now */
+     * in a special way now
+     *
+     * TODO the terrain parameter might be superfluous
+     */
     abstract public List<CreatureType> getPossibleSpecialRecruits(
-        String terrain, String hexLabel);
+        String terrain, MasterHex hex);
 
     /** number of recruiter needed to get a recruit 
-     * in a special way in this terrain now */
+     * in a special way in this terrain now
+     *
+     * TODO the terrain parameter might be superfluous
+     */
     abstract public int numberOfRecruiterNeeded(String recruiter,
-        String recruit, String terrain, String hexLabel);
+        String recruit, String terrain, MasterHex hex);
 
     /** bookkeeping function, called once after every player turn.
      private as it should only be called from everyoneAdvanceTurn() */

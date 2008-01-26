@@ -7,6 +7,7 @@ import java.util.Set;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.server.Constants;
+import net.sf.colossus.variant.MasterHex;
 
 
 /**
@@ -16,8 +17,7 @@ import net.sf.colossus.server.Constants;
  */
 public interface IClient
 {
-    public void tellEngagement(String hexLabel, Legion attacker,
-        Legion defender);
+    public void tellEngagement(MasterHex hex, Legion attacker, Legion defender);
 
     public void tellEngagementResults(Legion winner, String method,
         int points, int turns);
@@ -82,7 +82,7 @@ public interface IClient
         boolean wasCarry, int carryDamageLeft,
         Set<String> carryTargetDescriptions);
 
-    public void initBattle(String masterHexLabel, int battleTurnNumber,
+    public void initBattle(MasterHex masterHex, int battleTurnNumber,
         Player battleActivePlayer, Constants.BattlePhase battlePhase,
         Legion attacker, Legion defender);
 
@@ -118,24 +118,25 @@ public interface IClient
     public void setupBattleFight(Constants.BattlePhase battlePhase,
         Player battleActivePlayer);
 
-    public void tellLegionLocation(String markerId, String hexLabel);
+    // TODO the extra hex parameter is probably not needed anymore
+    public void tellLegionLocation(Legion legion, MasterHex hex);
 
     public void tellBattleMove(int tag, String startingHexLabel,
         String endingHexLabel, boolean undo);
 
-    public void didMove(Legion legion, String startingHexLabel,
-        String currentHexLabel, String entrySide, boolean teleport,
-        String teleportingLord, boolean splitLegionHasForcedMove);
+    public void didMove(Legion legion, MasterHex startingHex, MasterHex hex,
+        String entrySide, boolean teleport, String teleportingLord,
+        boolean splitLegionHasForcedMove);
 
-    public void undidMove(Legion legion, String formerHexLabel,
-        String currentHexLabel, boolean splitLegionHasForcedMove);
+    public void undidMove(Legion legion, MasterHex formerHex,
+        MasterHex currentHex, boolean splitLegionHasForcedMove);
 
     public void didSummon(Legion receivingLegion, Legion donorLegion,
         String summon);
 
     public void undidSplit(Legion splitoff, Legion survivor, int turn);
 
-    public void didSplit(String hexLabel, Legion parent, Legion child,
+    public void didSplit(MasterHex hex, Legion parent, Legion child,
         int childHeight, List<String> splitoffs, int turn);
 
     public void askPickColor(List<String> colorsLeft);

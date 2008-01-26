@@ -66,6 +66,8 @@ public abstract class Legion
      * 
      * @param newPosition the hex that will be the new position
      * @see #getCurrentHex()
+     * 
+     * TODO rename as normal setter for consistency
      */
     public void moveTo(MasterHex newPosition)
     {
@@ -88,6 +90,8 @@ public abstract class Legion
      * Returns the current position of the legion.
      * 
      * @return the hex the legion currently is on.
+     * 
+     * @see #moveTo(MasterHex)
      */
     public MasterHex getCurrentHex()
     {

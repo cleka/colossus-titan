@@ -6,6 +6,7 @@ import java.util.Set;
 
 import net.sf.colossus.client.CritterMove;
 import net.sf.colossus.game.Legion;
+import net.sf.colossus.variant.MasterHex;
 
 
 /**
@@ -49,10 +50,10 @@ public interface AI
     void retryFailedBattleMoves(List<CritterMove> bestMoveOrder);
 
     /** pick an entry side */
-    String pickEntrySide(String hexLabel, Legion legion, Set<String> entrySides);
+    String pickEntrySide(MasterHex hex, Legion legion, Set<String> entrySides);
 
     /** pick an engagement to resolve */
-    String pickEngagement();
+    MasterHex pickEngagement();
 
     /** choose whether to acquire an angel or archangel */
     String acquireAngel(Legion legion, List<String> recruits);

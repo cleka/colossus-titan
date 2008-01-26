@@ -3,6 +3,7 @@ package net.sf.colossus.variant;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -59,11 +60,9 @@ public class MasterBoard
     private final boolean[][] show;
 
     /**
-     * A Set of label (String) of all Tower hexes.
-     * 
-     * TODO should probably be objects instead.
+     * A Set of all Tower hexes.
      */
-    private final Set<String> towerSet;
+    private final Set<MasterHex> towerSet;
 
     /** 
      * A cache for faster lookup of hexes using their labels.
@@ -91,7 +90,7 @@ public class MasterBoard
 
         initHexByLabelCache();
         this.boardParity = computeBoardParity();
-        this.towerSet = new HashSet<String>();
+        this.towerSet = new HashSet<MasterHex>();
         setupTowerSet();
 
         setupExits(plainHexArray);
@@ -437,7 +436,7 @@ public class MasterBoard
         return hex;
     }
 
-    public Set<String> getTowerSet()
+    public Set<MasterHex> getTowerSet()
     {
         return Collections.unmodifiableSet(towerSet);
     }
@@ -452,7 +451,7 @@ public class MasterBoard
                 {
                     if (HexMap.terrainIsTower(hex.getTerrain()))
                     {
-                        towerSet.add(hex.getLabel());
+                        towerSet.add(hex);
                     }
                     return false;
                 }
@@ -465,5 +464,13 @@ public class MasterBoard
     public Set<String> getAllHexLabels()
     {
         return hexByLabelCache.keySet();
+    }
+
+    /** 
+     * Return a set of all hex labels.
+     */
+    public Collection<MasterHex> getAllHexes()
+    {
+        return hexByLabelCache.values();
     }
 }

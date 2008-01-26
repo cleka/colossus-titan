@@ -5,6 +5,7 @@ import java.util.List;
 
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
+import net.sf.colossus.variant.MasterHex;
 
 
 /** Knows a lot of things, but cannot actually take any actions.
@@ -19,7 +20,7 @@ import net.sf.colossus.game.Player;
  */
 public interface IOracle
 {
-    String getBattleSite();
+    MasterHex getBattleSite();
 
     Legion getAttacker();
 
@@ -37,9 +38,15 @@ public interface IOracle
 
     Player getActivePlayer();
 
+    /**
+     * TODO make typesafe
+     */
     String getPhaseName();
 
     Player getBattleActivePlayer();
 
+    /**
+     * TODO make typesafe
+     */
     String getBattlePhaseName();
 }

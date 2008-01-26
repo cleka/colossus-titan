@@ -13,6 +13,7 @@ import java.util.logging.Logger;
 import net.sf.colossus.client.BattleHex;
 import net.sf.colossus.client.BattleMap;
 import net.sf.colossus.client.HexMap;
+import net.sf.colossus.game.Battle;
 import net.sf.colossus.game.Creature;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
@@ -31,16 +32,14 @@ import net.sf.colossus.variant.MasterHex;
  * @author Romain Dolbeau
  */
 
-public final class BattleServerSide extends net.sf.colossus.game.Battle
+public final class BattleServerSide extends Battle
 {
     private static final Logger LOGGER = Logger
         .getLogger(BattleServerSide.class.getName());
 
     private Server server;
-    private final String[] legions = new String[2];
     private int activeLegionNum;
-    private final String masterHexLabel;
-    private final String terrain;
+    private final MasterHex masterHex;
     private int turnNumber;
     private Constants.BattlePhase phase;
     private int summonState = Constants.NO_KILLS;
@@ -61,24 +60,18 @@ public final class BattleServerSide extends net.sf.colossus.game.Battle
     private final PhaseAdvancer phaseAdvancer = new BattlePhaseAdvancer();
     private int pointsScored = 0;
 
-    BattleServerSide(GameServerSide game, String attackerId,
-        String defenderId, int activeLegionNum, String masterHexLabel,
-        int turnNumber, Constants.BattlePhase phase)
+    BattleServerSide(GameServerSide game, Legion attacker, Legion defender,
+        int activeLegionNum, MasterHex masterHex, int turnNumber,
+        Constants.BattlePhase phase)
     {
-        super(game, game.getLegionByMarkerId(attackerId), game
-            .getLegionByMarkerId(defenderId), null);
+        super(game, attacker, defender, null);
         server = game.getServer();
-        this.masterHexLabel = masterHexLabel;
-        legions[0] = defenderId;
-        legions[1] = attackerId;
+        this.masterHex = masterHex;
         this.activeLegionNum = activeLegionNum;
         this.turnNumber = turnNumber;
         this.phase = phase;
 
-        terrain = getMasterHex().getTerrain();
-
         // Set defender's entry side opposite attacker's.
-        LegionServerSide attacker = getAttacker();
         int side = attacker.getEntrySide();
         if (side != 1 && side != 3 && side != 5)
         {
@@ -86,22 +79,13 @@ public final class BattleServerSide extends net.sf.colossus.game.Battle
             // If invalid, default to bottom, which is always valid.
             attacker.setEntrySide(3);
         }
-        LegionServerSide defender = getDefender();
         defender.setEntrySide((side + 3) % 6);
         // Make sure defender can recruit, even if savegame is off.
-        defender.setRecruitName(null);
+        ((LegionServerSide)defender).setRecruitName(null);
 
-        LOGGER.log(Level.INFO, attacker.getLongMarkerName()
-            + " ("
-            + attacker.getPlayer().getName()
-            + ") attacks "
-            + defender.getLongMarkerName()
-            + " ("
-            + defender.getPlayer().getName()
-            + ")"
-            + " in "
-            + game.getVariant().getMasterBoard().getHexByLabel(masterHexLabel)
-                .getDescription());
+        LOGGER.info(attacker + " (" + attacker.getPlayer() + ") attacks "
+            + defender + " (" + defender.getPlayer() + ")" + " in "
+            + masterHex);
 
         placeLegion(attacker);
         placeLegion(defender);
@@ -112,14 +96,13 @@ public final class BattleServerSide extends net.sf.colossus.game.Battle
         this.server = null;
     }
 
-    private void placeLegion(LegionServerSide legion)
+    private void placeLegion(Legion legion)
     {
-        BattleHex entrance = BattleMap.getEntrance(terrain, legion
-            .getEntrySide());
-        Iterator<CreatureServerSide> it = legion.getCreatures().iterator();
-        while (it.hasNext())
+        BattleHex entrance = BattleMap.getEntrance(masterHex.getTerrain(),
+            legion.getEntrySide());
+        for (CreatureServerSide critter : ((LegionServerSide)legion)
+            .getCreatures())
         {
-            CreatureServerSide critter = it.next();
 
             BattleHex currentHex = critter.getCurrentHex();
             if (currentHex == null)
@@ -138,19 +121,17 @@ public final class BattleServerSide extends net.sf.colossus.game.Battle
 
     private void placeCritter(CreatureServerSide critter)
     {
-        BattleHex entrance = BattleMap.getEntrance(terrain,
-            ((LegionServerSide)critter.getLegion()).getEntrySide());
+        BattleHex entrance = BattleMap.getEntrance(masterHex.getTerrain(),
+            critter.getLegion().getEntrySide());
         critter.setBattleInfo(entrance, entrance, this);
         server.allPlaceNewChit(critter);
     }
 
     private synchronized void initBattleChits(LegionServerSide legion)
     {
-        Iterator<CreatureServerSide> it = legion.getCreatures().iterator();
-        while (it.hasNext())
+        for (CreatureServerSide creature : legion.getCreatures())
         {
-            CreatureServerSide critter = it.next();
-            server.allPlaceNewChit(critter);
+            server.allPlaceNewChit(creature);
         }
     }
 
@@ -158,7 +139,7 @@ public final class BattleServerSide extends net.sf.colossus.game.Battle
      *  is non-null earlier. */
     void init()
     {
-        server.allInitBattle(masterHexLabel);
+        server.allInitBattle(masterHex);
         initBattleChits(getAttacker());
         initBattleChits(getDefender());
 
@@ -201,7 +182,7 @@ public final class BattleServerSide extends net.sf.colossus.game.Battle
 
     Player getActivePlayer()
     {
-        return getGame().getPlayerByMarkerId(legions[activeLegionNum]);
+        return getLegion(activeLegionNum).getPlayer();
     }
 
     LegionServerSide getAttacker()
@@ -236,7 +217,7 @@ public final class BattleServerSide extends net.sf.colossus.game.Battle
         }
         else
         {
-            return null;
+            throw new IllegalArgumentException("Parameter out of range");
         }
     }
 
@@ -255,20 +236,9 @@ public final class BattleServerSide extends net.sf.colossus.game.Battle
         return null;
     }
 
-    String getMasterHexLabel()
+    public MasterHex getMasterHex()
     {
-        return masterHexLabel;
-    }
-
-    private MasterHex getMasterHex()
-    {
-        return getGame().getVariant().getMasterBoard().getHexByLabel(
-            masterHexLabel);
-    }
-
-    String getTerrain()
-    {
-        return terrain;
+        return masterHex;
     }
 
     Constants.BattlePhase getBattlePhase()
@@ -544,8 +514,9 @@ public final class BattleServerSide extends net.sf.colossus.game.Battle
                                 critter.getMarkerId()) && !bogey
                             .isInContact(false)))
                     {
-                        entryCost = neighbor.getEntryCost(critter.getType(), reverseDir, getGame().getOption(
-                            Options.cumulativeSlow));
+                        entryCost = neighbor.getEntryCost(critter.getType(),
+                            reverseDir, getGame().getOption(
+                                Options.cumulativeSlow));
                     }
                     else
                     {
@@ -614,10 +585,11 @@ public final class BattleServerSide extends net.sf.colossus.game.Battle
         Set<String> set = new HashSet<String>();
         if (!critter.hasMoved() && !critter.isInContact(false))
         {
-            if (HexMap.terrainHasStartlist(terrain) && (turnNumber == 1)
-                && activeLegionNum == Constants.DEFENDER)
+            if (HexMap.terrainHasStartlist(masterHex.getTerrain())
+                && (turnNumber == 1) && activeLegionNum == Constants.DEFENDER)
             {
-                set = findUnoccupiedStartlistHexes(ignoreMobileAllies, terrain);
+                set = findUnoccupiedStartlistHexes(ignoreMobileAllies,
+                    masterHex.getTerrain());
             }
             else
             {
@@ -1042,7 +1014,8 @@ public final class BattleServerSide extends net.sf.colossus.game.Battle
             && getBattlePhase() != Constants.BattlePhase.STRIKEBACK
             && critter.getLegion() == getActiveLegion())
         {
-            Iterator<CreatureServerSide> it = getInactiveLegion().getCreatures().iterator();
+            Iterator<CreatureServerSide> it = getInactiveLegion()
+                .getCreatures().iterator();
             while (it.hasNext())
             {
                 CreatureServerSide target = it.next();
@@ -1713,7 +1686,8 @@ public final class BattleServerSide extends net.sf.colossus.game.Battle
     boolean doMove(int tag, String hexLabel)
     {
         CreatureServerSide critter = getActiveLegion().getCritterByTag(tag);
-        BattleHex hex = BattleMap.getHexByLabel(terrain, hexLabel);
+        BattleHex hex = BattleMap.getHexByLabel(masterHex.getTerrain(),
+            hexLabel);
         if (critter == null)
         {
             return false;
@@ -1741,9 +1715,10 @@ public final class BattleServerSide extends net.sf.colossus.game.Battle
             String markerId = legion.getMarkerId();
             LOGGER.log(Level.WARNING, critter.getName() + " in "
                 + critter.getCurrentHex().getLabel()
-                + " tried to illegally move to " + hexLabel + " in " + terrain
-                + " (" + getAttacker().getMarkerId() + " attacking "
-                + getDefender().getMarkerId() + ", active: " + markerId + ")");
+                + " tried to illegally move to " + hexLabel + " in "
+                + masterHex.getTerrain() + " (" + getAttacker().getMarkerId()
+                + " attacking " + getDefender().getMarkerId() + ", active: "
+                + markerId + ")");
             return false;
         }
     }
@@ -1751,7 +1726,7 @@ public final class BattleServerSide extends net.sf.colossus.game.Battle
     private void cleanup()
     {
         battleOver = true;
-        getGame().finishBattle(masterHexLabel, attackerEntered, pointsScored,
+        getGame().finishBattle(masterHex, attackerEntered, pointsScored,
             turnNumber);
     }
 

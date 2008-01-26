@@ -499,7 +499,7 @@ public final class MasterBoard extends JPanel
                 {
                     MasterHex hexModel = hex.getMasterHexModel();
                     new ShowRecruits(masterFrame, hexModel.getTerrain(),
-                        lastPoint, hexModel.getLabel(), scrollPane);
+                        lastPoint, hexModel, scrollPane);
                 }
             }
         };
@@ -1226,20 +1226,20 @@ public final class MasterBoard extends JPanel
                 @Override
                 public boolean matchesNonNullValue(MasterHex hex)
                 {
-                    alignLegions(hex.getLabel());
+                    alignLegions(hex);
                     return false;
                 }
             });
     }
 
-    void alignLegions(String hexLabel)
+    void alignLegions(MasterHex masterHex)
     {
-        GUIMasterHex hex = getGUIHexByLabel(hexLabel);
+        GUIMasterHex hex = getGUIHexByMasterHex(masterHex);
         if (hex == null)
         {
             return;
         }
-        List<Legion> legions = client.getLegionsByHex(hexLabel);
+        List<Legion> legions = client.getLegionsByHex(masterHex);
 
         int numLegions = legions.size();
         if (numLegions == 0)
@@ -1314,13 +1314,11 @@ public final class MasterBoard extends JPanel
         hex.repaint();
     }
 
-    void alignLegions(Set<String> hexLabels)
+    void alignLegions(Set<MasterHex> hexes)
     {
-        Iterator<String> it = hexLabels.iterator();
-        while (it.hasNext())
+        for (MasterHex masterHex : hexes)
         {
-            String hexLabel = it.next();
-            alignLegions(hexLabel);
+            alignLegions(masterHex);
         }
     }
 
@@ -1342,13 +1340,13 @@ public final class MasterBoard extends JPanel
     {
         unselectAllHexes();
 
-        Set<String> teleport = client.listTeleportMoves(legion);
+        Set<MasterHex> teleport = client.listTeleportMoves(legion);
         selectHexesByLabels(teleport, HTMLColor.purple);
 
-        Set<String> normal = client.listNormalMoves(legion);
+        Set<MasterHex> normal = client.listNormalMoves(legion);
         selectHexesByLabels(normal, Color.white);
 
-        Set<String> combo = new HashSet<String>();
+        Set<MasterHex> combo = new HashSet<MasterHex>();
         combo.addAll(teleport);
         combo.addAll(normal);
 
@@ -1357,7 +1355,7 @@ public final class MasterBoard extends JPanel
 
     void highlightEngagements()
     {
-        Set<String> set = client.findEngagements();
+        Set<MasterHex> set = client.findEngagements();
         unselectAllHexes();
         selectHexesByLabels(set);
     }
@@ -1365,7 +1363,7 @@ public final class MasterBoard extends JPanel
     /** Return number of legions with summonable angels. */
     int highlightSummonableAngels(Legion legion)
     {
-        Set<String> set = client.findSummonableAngelHexes(legion);
+        Set<MasterHex> set = client.findSummonableAngelHexes(legion);
         unselectAllHexes();
         selectHexesByLabels(set);
         return set.size();
@@ -1399,7 +1397,7 @@ public final class MasterBoard extends JPanel
 
     /** Do a brute-force search through the hex array, looking for
      *  a match.  Return the hex, or null if none is found. */
-    GUIMasterHex getGUIHexByLabel(final String label)
+    GUIMasterHex getGUIHexByMasterHex(final MasterHex masterHex)
     {
         return ArrayHelper.findFirstMatch(guiHexArray,
             new NullCheckPredicate<GUIMasterHex>(false)
@@ -1407,7 +1405,7 @@ public final class MasterBoard extends JPanel
                 @Override
                 public boolean matchesNonNullValue(GUIMasterHex hex)
                 {
-                    return hex.getMasterHexModel().getLabel().equals(label);
+                    return hex.getMasterHexModel().equals(masterHex);
                 }
             });
     }
@@ -1509,6 +1507,7 @@ public final class MasterBoard extends JPanel
             });
     }
 
+    // TODO make typesafe
     void selectHexByLabel(final String label)
     {
         ArrayHelper.findFirstMatch(guiHexArray,
@@ -1528,7 +1527,8 @@ public final class MasterBoard extends JPanel
             });
     }
 
-    void selectHexesByLabels(final Set<String> labels)
+    // TODO rename since we don't use labels anymore
+    void selectHexesByLabels(final Set<MasterHex> hexes)
     {
         ArrayHelper.findFirstMatch(guiHexArray,
             new NullCheckPredicate<GUIMasterHex>(false)
@@ -1537,7 +1537,7 @@ public final class MasterBoard extends JPanel
                 public boolean matchesNonNullValue(GUIMasterHex hex)
                 {
                     if (!hex.isSelected()
-                        && labels.contains(hex.getMasterHexModel().getLabel()))
+                        && hexes.contains(hex.getMasterHexModel()))
                     {
                         hex.select();
                         hex.repaint();
@@ -1547,7 +1547,8 @@ public final class MasterBoard extends JPanel
             });
     }
 
-    void selectHexesByLabels(final Set<String> labels, final Color color)
+    // TODO rename since we don't use labels anymore
+    void selectHexesByLabels(final Set<MasterHex> hexes, final Color color)
     {
         ArrayHelper.findFirstMatch(guiHexArray,
             new NullCheckPredicate<GUIMasterHex>(false)
@@ -1556,7 +1557,7 @@ public final class MasterBoard extends JPanel
                 public boolean matchesNonNullValue(GUIMasterHex hex)
 
                 {
-                    if (labels.contains(hex.getMasterHexModel().getLabel()))
+                    if (hexes.contains(hex.getMasterHexModel()))
                     {
                         hex.select();
                         hex.setSelectColor(color);
@@ -1625,12 +1626,9 @@ public final class MasterBoard extends JPanel
                 String markerId = marker.getId();
 
                 // Move the clicked-on marker to the top of the z-order.
-                client.setMarker(markerId, marker);
-
-                // What to do depends on which mouse button was used
-                // and the current phase of the turn.
-
                 LegionClientSide legion = client.getLegion(markerId);
+                client.setMarker(legion, marker);
+
                 // Right-click means to show the contents of the legion.
                 if (isPopupButton(e))
                 {
@@ -1646,7 +1644,7 @@ public final class MasterBoard extends JPanel
                 {
                     if (hex != null)
                     {
-                        actOnLegion(legion, hex.getMasterHexModel().getLabel());
+                        actOnLegion(legion, hex.getMasterHexModel());
                     }
                     else
                     {
@@ -1673,7 +1671,7 @@ public final class MasterBoard extends JPanel
                 // Only the current player can manipulate game state.
                 if (client.getOwningPlayer().equals(client.getActivePlayer()))
                 {
-                    actOnHex(hex.getMasterHexModel().getLabel());
+                    actOnHex(hex.getMasterHexModel());
                     hex.repaint();
                     return;
                 }
@@ -1709,7 +1707,7 @@ public final class MasterBoard extends JPanel
         }
     }
 
-    private void actOnLegion(Legion legion, String hexLabel)
+    private void actOnLegion(Legion legion, MasterHex hex)
     {
         if (!client.isMyTurn())
         {
@@ -1726,18 +1724,18 @@ public final class MasterBoard extends JPanel
             // Allow spin cycle by clicking on chit again.
             if (legion.equals(client.getMover()))
             {
-                actOnHex(hexLabel);
+                actOnHex(hex);
             }
             else
             {
                 client.setMover(legion);
-                getGUIHexByLabel(hexLabel).repaint();
+                getGUIHexByMasterHex(hex).repaint();
                 highlightMoves(legion);
             }
         }
         else if (phase == Constants.Phase.FIGHT)
         {
-            client.doFight(hexLabel);
+            client.doFight(hex);
         }
         else if (phase == Constants.Phase.MUSTER)
         {
@@ -1745,7 +1743,7 @@ public final class MasterBoard extends JPanel
         }
     }
 
-    private void actOnHex(String hexLabel)
+    private void actOnHex(MasterHex hex)
     {
         Constants.Phase phase = client.getPhase();
         if (phase == Constants.Phase.SPLIT)
@@ -1758,7 +1756,7 @@ public final class MasterBoard extends JPanel
             // has not yet moved, and this hex is a legal
             // destination, move the legion here.
             client.clearRecruitChits();
-            client.doMove(hexLabel);
+            client.doMove(hex);
             actOnMisclick(); // Yes, even if the move was good.
         }
         else if (phase == Constants.Phase.FIGHT)
@@ -1766,7 +1764,7 @@ public final class MasterBoard extends JPanel
             // If we're fighting and there is an engagement here,
             // resolve it.  If an angel is being summoned, mark
             // the donor legion instead.
-            client.engage(hexLabel);
+            client.engage(hex);
         }
     }
 

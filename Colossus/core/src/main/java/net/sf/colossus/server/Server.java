@@ -24,6 +24,7 @@ import net.sf.colossus.game.Player;
 import net.sf.colossus.util.ChildThreadManager;
 import net.sf.colossus.util.Options;
 import net.sf.colossus.variant.CreatureType;
+import net.sf.colossus.variant.MasterHex;
 import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
 
@@ -703,11 +704,9 @@ public final class Server implements IServer
 
     void allTellLegionLocation(Legion legion)
     {
-        String hexLabel = legion.getHexLabel();
-
         for (IClient client : clients)
         {
-            client.tellLegionLocation(legion.getMarkerId(), hexLabel);
+            client.tellLegionLocation(legion, legion.getCurrentHex());
         }
     }
 
@@ -1018,8 +1017,7 @@ public final class Server implements IServer
 
         int numRecruiters = (recruiter == null ? 0 : TerrainRecruitLoader
             .numberOfRecruiterNeeded(recruiter, recruit, legion
-                .getCurrentHex().getTerrain(), legion.getCurrentHex()
-                .getLabel()));
+                .getCurrentHex().getTerrain(), legion.getCurrentHex()));
         String recruiterName = null;
         if (recruiter != null)
         {
@@ -1059,7 +1057,7 @@ public final class Server implements IServer
         game.removeCreatureEvent(legion, recruitName);
     }
 
-    public synchronized void engage(String hexLabel)
+    public synchronized void engage(MasterHex hex)
     {
         if (!isActivePlayer())
         {
@@ -1067,18 +1065,17 @@ public final class Server implements IServer
                 + " illegally called engage()");
             return;
         }
-        game.engage(hexLabel);
+        game.engage(hex);
     }
 
-    void allTellEngagement(String hexLabel, LegionServerSide attacker,
-        LegionServerSide defender)
+    void allTellEngagement(MasterHex hex, Legion attacker, Legion defender)
     {
-        LOGGER.log(Level.FINEST, "allTellEngagement() " + hexLabel);
+        LOGGER.log(Level.FINEST, "allTellEngagement() " + hex);
         Iterator<IClient> it = clients.iterator();
         while (it.hasNext())
         {
             IClient client = it.next();
-            client.tellEngagement(hexLabel, attacker, defender);
+            client.tellEngagement(hex, attacker, defender);
         }
     }
 
@@ -1152,7 +1149,7 @@ public final class Server implements IServer
     /** playerName makes a proposal. */
     public void makeProposal(String proposalString)
     {
-        // XXX Validate calling player
+        // TODO Validate calling player
         game.makeProposal(getPlayerName(), proposalString);
     }
 
@@ -1163,10 +1160,10 @@ public final class Server implements IServer
         client.tellProposal(proposal.toString());
     }
 
-    public void fight(String hexLabel)
+    public void fight(MasterHex hex)
     {
-        // XXX Validate calling player
-        game.fight(hexLabel);
+        // TODO Validate calling player
+        game.fight(hex);
     }
 
     public void doBattleMove(int tag, String hexLabel)
@@ -1383,14 +1380,14 @@ public final class Server implements IServer
         }
     }
 
-    synchronized void allInitBattle(String masterHexLabel)
+    synchronized void allInitBattle(MasterHex masterHex)
     {
         BattleServerSide battle = game.getBattle();
         Iterator<IClient> it = clients.iterator();
         while (it.hasNext())
         {
             IClient client = it.next();
-            client.initBattle(masterHexLabel, battle.getTurnNumber(), battle
+            client.initBattle(masterHex, battle.getTurnNumber(), battle
                 .getActivePlayer(), battle.getBattlePhase(), battle
                 .getAttackingLegion(), battle.getDefendingLegion());
         }
@@ -1449,9 +1446,9 @@ public final class Server implements IServer
         {
             return;
         }
-        String formerHexLabel = ((LegionServerSide)legion).getHexLabel();
+        MasterHex formerHex = legion.getCurrentHex();
         game.getActivePlayer().undoMove(legion);
-        String currentHexLabel = ((LegionServerSide)legion).getHexLabel();
+        MasterHex currentHex = legion.getCurrentHex();
 
         PlayerServerSide player = game.getPlayer(game.getActivePlayerName());
         // needed in undidMove to decide whether to dis/enable button
@@ -1461,7 +1458,7 @@ public final class Server implements IServer
         while (it.hasNext())
         {
             IClient client = it.next();
-            client.undidMove(legion, formerHexLabel, currentHexLabel,
+            client.undidMove(legion, formerHex, currentHex,
                 splitLegionHasForcedMove);
         }
     }
@@ -1604,11 +1601,10 @@ public final class Server implements IServer
         // If player quits while engaged, set slayer.
         Player slayer = null;
         Legion legion = player.getTitanLegion();
-        if (legion != null
-            && game.isEngagement(((LegionServerSide)legion).getHexLabel()))
+        if (legion != null && game.isEngagement(legion.getCurrentHex()))
         {
-            slayer = game.getFirstEnemyLegion(
-                ((LegionServerSide)legion).getHexLabel(), player).getPlayer();
+            slayer = game.getFirstEnemyLegion(legion.getCurrentHex(), player)
+                .getPlayer();
         }
         player.die(slayer, true);
 
@@ -1688,16 +1684,16 @@ public final class Server implements IServer
     }
 
     /** Callback from game after this legion was split off. */
-    void didSplit(String hexLabel, Legion parent, Legion child, int height)
+    void didSplit(MasterHex hex, Legion parent, Legion child, int height)
     {
-        LOGGER.log(Level.FINER, "Server.didSplit " + hexLabel + " " + parent
-            + " " + child + " " + height);
+        LOGGER.log(Level.FINER, "Server.didSplit " + hex + " " + parent + " "
+            + child + " " + height);
         allUpdatePlayerInfo();
 
         IClient activeClient = getClient(game.getActivePlayer());
 
         List<String> splitoffs = ((LegionServerSide)child).getImageNames();
-        activeClient.didSplit(hexLabel, parent, child, height, splitoffs, game
+        activeClient.didSplit(hex, parent, child, height, splitoffs, game
             .getTurnNumber());
 
         game.splitEvent(parent, child, splitoffs);
@@ -1713,8 +1709,8 @@ public final class Server implements IServer
             IClient client = it.next();
             if (client != activeClient)
             {
-                client.didSplit(hexLabel, parent, child, height, splitoffs,
-                    game.getTurnNumber());
+                client.didSplit(hex, parent, child, height, splitoffs, game
+                    .getTurnNumber());
             }
         }
     }
@@ -1743,7 +1739,7 @@ public final class Server implements IServer
         }
     }
 
-    public void doMove(Legion legion, String hexLabel, String entrySide,
+    public void doMove(Legion legion, MasterHex hex, String entrySide,
         boolean teleport, String teleportingLord)
     {
         IClient client = getClient(getPlayer());
@@ -1755,13 +1751,13 @@ public final class Server implements IServer
             return;
         }
 
-        String startingHexLabel = ((LegionServerSide)legion).getHexLabel();
-        String reasonFail = game.doMove(legion, hexLabel, entrySide, teleport,
+        MasterHex startingHex = legion.getCurrentHex();
+        String reasonFail = game.doMove(legion, hex, entrySide, teleport,
             teleportingLord);
         if (reasonFail == null)
         {
-            allTellDidMove(legion, startingHexLabel, hexLabel, entrySide,
-                teleport, teleportingLord);
+            allTellDidMove(legion, startingHex, hex, entrySide, teleport,
+                teleportingLord);
         }
         else
         {
@@ -1770,9 +1766,8 @@ public final class Server implements IServer
         }
     }
 
-    void allTellDidMove(Legion legion, String startingHexLabel,
-        String endingHexLabel, String entrySide, boolean teleport,
-        String teleportingLord)
+    void allTellDidMove(Legion legion, MasterHex startingHex, MasterHex hex,
+        String entrySide, boolean teleport, String teleportingLord)
     {
         PlayerServerSide player = game.getPlayer(game.getActivePlayerName());
         // needed in didMove to decide whether to dis/enable button
@@ -1782,9 +1777,8 @@ public final class Server implements IServer
         while (it.hasNext())
         {
             IClient client = it.next();
-            client
-                .didMove(legion, startingHexLabel, endingHexLabel, entrySide,
-                    teleport, teleportingLord, splitLegionHasForcedMove);
+            client.didMove(legion, startingHex, hex, entrySide, teleport,
+                teleportingLord, splitLegionHasForcedMove);
         }
     }
 

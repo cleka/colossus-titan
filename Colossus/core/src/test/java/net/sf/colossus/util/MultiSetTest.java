@@ -18,7 +18,7 @@ public class MultiSetTest extends TestCase
 
     public void testMultiSet()
     {
-        MultiSet ms = new MultiSet();
+        MultiSet<String> ms = new MultiSet<String>();
         assertEquals(ms.size(), 0);
         assertTrue(ms.isEmpty());
         assertEquals(ms.remove("a"), false);

@@ -8,6 +8,7 @@ import net.sf.colossus.client.BattleHex;
 import net.sf.colossus.client.HexMap;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.variant.CreatureType;
+import net.sf.colossus.variant.MasterHex;
 
 
 /** 
@@ -68,21 +69,20 @@ public class CarryTest extends TestCase
 
     public void testCarries()
     {
-        String hexLabel = "35"; // Desert
+        MasterHex hex = game.getVariant().getMasterBoard().getHexByLabel("35"); // Desert
 
-        attacker = new LegionServerSide("Rd03", "Rd01", hexLabel, null, red,
-            game, centaur, centaur, lion, colossus);
-        defender = new LegionServerSide("Bu03", "Bu01", hexLabel, null, blue,
-            game, hydra);
+        attacker = new LegionServerSide("Rd03", "Rd01", hex, null, red, game,
+            centaur, centaur, lion, colossus);
+        defender = new LegionServerSide("Bu03", "Bu01", hex, null, blue, game,
+            hydra);
 
         game.getPlayer("Red").addLegion(attacker);
         game.getPlayer("Blue").addLegion(defender);
 
         attacker.setEntrySide(5);
 
-        battle = new BattleServerSide(game, attacker.getMarkerId(), defender
-            .getMarkerId(), Constants.DEFENDER, hexLabel, 2,
-            Constants.BattlePhase.FIGHT);
+        battle = new BattleServerSide(game, attacker, defender,
+            Constants.DEFENDER, hex, 2, Constants.BattlePhase.FIGHT);
 
         CreatureServerSide centaur1 = attacker.getCritter(0);
         CreatureServerSide centaur2 = attacker.getCritter(1);
@@ -133,28 +133,27 @@ public class CarryTest extends TestCase
     private void placeCreature(CreatureServerSide creature,
         String battleHexLabel)
     {
-        String terrain = battle.getTerrain();
+        String terrain = battle.getMasterHex().getTerrain();
         BattleHex battleHex = HexMap.getHexByLabel(terrain, battleHexLabel);
         creature.setCurrentHex(battleHex);
     }
 
     public void testCarries2()
     {
-        String hexLabel = "1"; // Plains
+        MasterHex hex = game.getVariant().getMasterBoard().getHexByLabel("1"); // Plains
 
-        attacker = new LegionServerSide("Rd03", "Rd01", hexLabel, null, red,
-            game, warlock, warlock, colossus);
-        defender = new LegionServerSide("Bu03", "Bu01", hexLabel, null, blue,
-            game, gargoyle, ogre, ogre);
+        attacker = new LegionServerSide("Rd03", "Rd01", hex, null, red, game,
+            warlock, warlock, colossus);
+        defender = new LegionServerSide("Bu03", "Bu01", hex, null, blue, game,
+            gargoyle, ogre, ogre);
 
         game.getPlayer("Red").addLegion(attacker);
         game.getPlayer("Blue").addLegion(defender);
 
         attacker.setEntrySide(5);
 
-        battle = new BattleServerSide(game, attacker.getMarkerId(), defender
-            .getMarkerId(), Constants.ATTACKER, hexLabel, 3,
-            Constants.BattlePhase.FIGHT);
+        battle = new BattleServerSide(game, attacker, defender,
+            Constants.ATTACKER, hex, 3, Constants.BattlePhase.FIGHT);
 
         CreatureServerSide warlock1 = attacker.getCritter(0);
         CreatureServerSide warlock2 = attacker.getCritter(1);

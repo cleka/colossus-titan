@@ -45,10 +45,11 @@ public class MilvangAI extends RationalAI
         int recruitNow = 0;
         int recruitLater = 0;
 
+        // TODO why do we pass null here?
         List<CreatureType> tempRecruits = TerrainRecruitLoader
-            .getPossibleRecruits(terrain, "");
+            .getPossibleRecruits(terrain, null);
         List<CreatureType> recruiters = TerrainRecruitLoader
-            .getPossibleRecruiters(terrain, "");
+            .getPossibleRecruiters(terrain, null);
 
         recruiters.retainAll(critters.keySet());
 
@@ -60,8 +61,9 @@ public class MilvangAI extends RationalAI
             while (liter.hasNext())
             {
                 CreatureType lesser = liter.next();
+                // TODO another null for the TerranRecruitLoader -> why?
                 int numNeeded = TerrainRecruitLoader.numberOfRecruiterNeeded(
-                    lesser, creature, terrain, "");
+                    lesser, creature, terrain, null);
                 int hintValue = creature.getHintedRecruitmentValue();
                 if (hintValue > recruitNow
                     && numNeeded <= critters.get(lesser).intValue())

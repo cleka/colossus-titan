@@ -18,6 +18,7 @@ import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.util.HTMLColor;
 import net.sf.colossus.util.RecruitGraph;
 import net.sf.colossus.variant.CreatureType;
+import net.sf.colossus.variant.MasterHex;
 
 import org.jdom.Document;
 import org.jdom.Element;
@@ -27,6 +28,9 @@ import org.jdom.input.SAXBuilder;
 
 /**
  * TerrainRecruitLoader load the terrains and recruits descriptions.
+ * 
+ * TODO check if any of the methods still needs the "String terrain" parameter
+ * 
  * @author Romain Dolbeau
  * @version $Id$
  * @see net.sf.colossus.server.CreatureType
@@ -472,10 +476,10 @@ public class TerrainRecruitLoader
      * @see net.sf.colossus.server.CreatureType
      */
     public static List<CreatureType> getPossibleRecruits(String terrain,
-        String hexLabel)
+        MasterHex hex)
     {
         List<RecruitNumber> al = strToRecruits.get(terrain);
-        List<CreatureType> re = new ArrayList<CreatureType>();
+        List<CreatureType> result = new ArrayList<CreatureType>();
         Iterator<RecruitNumber> it = al.iterator();
         while (it.hasNext())
         {
@@ -487,8 +491,8 @@ public class TerrainRecruitLoader
                 && !(tr.getName().equals(Keyword_Lord))
                 && !(tr.getName().startsWith(Keyword_Special)))
             {
-                re.add(VariantSupport.getCurrentVariant().getCreatureByName(
-                    tr.getName()));
+                result.add(VariantSupport.getCurrentVariant()
+                    .getCreatureByName(tr.getName()));
             }
             if (tr.getName().startsWith(Keyword_Special))
             {
@@ -496,12 +500,12 @@ public class TerrainRecruitLoader
                 if (cri != null)
                 {
                     List<? extends CreatureType> temp = cri
-                        .getPossibleSpecialRecruits(terrain, hexLabel);
-                    re.addAll(temp);
+                        .getPossibleSpecialRecruits(terrain, hex);
+                    result.addAll(temp);
                 }
             }
         }
-        return (re);
+        return result;
     }
 
     /**
@@ -515,7 +519,7 @@ public class TerrainRecruitLoader
      * @see net.sf.colossus.server.CreatureType
      */
     public static List<CreatureType> getPossibleRecruiters(String terrain,
-        String hexLabel)
+        MasterHex hex)
     {
         List<RecruitNumber> al = strToRecruits.get(terrain);
         List<CreatureType> re = new ArrayList<CreatureType>();
@@ -564,7 +568,7 @@ public class TerrainRecruitLoader
                     if (cri != null)
                     {
                         List<CreatureType> temp = cri
-                            .getPossibleSpecialRecruiters(terrain, hexLabel);
+                            .getPossibleSpecialRecruiters(terrain, hex);
                         re.addAll(temp);
                     }
                 }
@@ -584,22 +588,22 @@ public class TerrainRecruitLoader
      * @see net.sf.colossus.server.CreatureType
      */
     public static int numberOfRecruiterNeeded(CreatureType recruiter,
-        CreatureType recruit, String terrain, String hexLabel)
+        CreatureType recruit, String terrain, MasterHex hex)
     {
         int g_value = graph.numberOfRecruiterNeeded(recruiter.getName(),
-            recruit.getName(), terrain, hexLabel);
+            recruit.getName(), terrain, hex);
         return g_value;
     }
 
     public static boolean anonymousRecruitLegal(CreatureType recruit,
-        String terrain, String hexLabel)
+        String terrain, MasterHex hex)
     {
         int g_value = graph.numberOfRecruiterNeeded(Keyword_Anything, recruit
-            .getName(), terrain, hexLabel);
+            .getName(), terrain, hex);
         if (g_value != 0)
         { // we really should ensure the caller *has* AnyNonLord...
             g_value = graph.numberOfRecruiterNeeded(Keyword_AnyNonLord,
-                recruit.getName(), terrain, hexLabel);
+                recruit.getName(), terrain, hex);
         }
         return (g_value == 0);
     }

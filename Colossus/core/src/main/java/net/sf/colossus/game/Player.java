@@ -11,6 +11,7 @@ import java.util.TreeSet;
 import net.sf.colossus.client.MarkerComparator;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.PlayerServerSide;
+import net.sf.colossus.variant.MasterHex;
 import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
 
@@ -60,14 +61,12 @@ public class Player
     /**
      * The starting tower of the player.
      * 
-     * TODO use typesafe representation of masterboard hexes
-     * TODO rename getter and setter
      * TODO this should be kind-of final: once a tower has been assigned, it shouldn't
      *      change anymore -- but assigning the towers has probably to happen a while
      *      after all players are created. We could at least at an assertion into the
      *      setter that it is allowed to change the value only if it was not set before.
      */
-    private String startingTower;
+    private MasterHex startingTower;
 
     /**
      * The label of the color we use.
@@ -186,12 +185,12 @@ public class Player
         return type.endsWith(Constants.ai);
     }
 
-    public void setStartingTower(String startingTower)
+    public void setStartingTower(MasterHex startingTower)
     {
         this.startingTower = startingTower;
     }
 
-    public String getStartingTower()
+    public MasterHex getStartingTower()
     {
         return startingTower;
     }
@@ -385,6 +384,18 @@ public class Player
             total += legion.getPointValue();
         }
         return total;
+    }
+
+    public boolean hasTeleported()
+    {
+        for (Legion info : getLegions())
+        {
+            if (info.hasTeleported())
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

@@ -2,6 +2,7 @@ package net.sf.colossus.server;
 
 
 import net.sf.colossus.game.Legion;
+import net.sf.colossus.variant.MasterHex;
 
 
 /**
@@ -25,7 +26,7 @@ public interface IServer
     public void doRecruit(Legion legion, String recruitName,
         String recruiterName);
 
-    public void engage(String hexLabel);
+    public void engage(MasterHex hex);
 
     public void concede(Legion legion);
 
@@ -37,7 +38,7 @@ public interface IServer
 
     public void makeProposal(String proposalString);
 
-    public void fight(String hexLabel);
+    public void fight(MasterHex hex);
 
     public void doBattleMove(int tag, String hexLabel);
 
@@ -75,7 +76,7 @@ public interface IServer
 
     public void doSplit(Legion parent, String childMarker, String results);
 
-    public void doMove(Legion legion, String hexLabel, String entrySide,
+    public void doMove(Legion legion, MasterHex hex, String entrySide,
         boolean teleport, String teleportingLord);
 
     public void assignColor(String color);

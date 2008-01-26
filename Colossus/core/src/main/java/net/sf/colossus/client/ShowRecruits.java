@@ -6,6 +6,8 @@ import java.awt.Point;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 
+import net.sf.colossus.variant.MasterHex;
+
 
 /**
  * Displays recruit trees for a single Hex type.
@@ -18,11 +20,11 @@ final class ShowRecruits extends AbstractShowRecruits
 {
 
     ShowRecruits(JFrame parentFrame, String terrain, Point point,
-        String terrainHexLabel, JScrollPane pane)
+        MasterHex hex, JScrollPane pane)
     {
         super(parentFrame);
 
-        doOneTerrain(terrain, terrainHexLabel);
+        doOneTerrain(terrain, hex);
 
         pack();
 

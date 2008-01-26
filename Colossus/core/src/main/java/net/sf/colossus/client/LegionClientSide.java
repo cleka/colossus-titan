@@ -378,10 +378,10 @@ public final class LegionClientSide extends Legion implements
         }
     }
 
-    // XXX Not exact -- does not verify that other legion is enemy.
+    // TODO Not exact -- does not verify that other legion is enemy.
     boolean isEngaged()
     {
-        int numInHex = client.getLegionsByHex(getHexLabel()).size();
+        int numInHex = client.getLegionsByHex(getCurrentHex()).size();
         return (numInHex == 2);
     }
 
@@ -413,7 +413,7 @@ public final class LegionClientSide extends Legion implements
     {
         return hasMoved() && getHeight() < 7 && !hasRecruited()
             && !getPlayer().isDead()
-            && !client.findEligibleRecruits(this, getHexLabel()).isEmpty();
+            && !client.findEligibleRecruits(this, getCurrentHex()).isEmpty();
     }
 
     @Override

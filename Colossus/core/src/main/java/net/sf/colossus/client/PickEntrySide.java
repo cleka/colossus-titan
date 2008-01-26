@@ -19,6 +19,7 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 
 import net.sf.colossus.server.Constants;
+import net.sf.colossus.variant.MasterHex;
 
 
 /**
@@ -38,10 +39,10 @@ final class PickEntrySide extends HexMap implements ActionListener,
     private final JDialog dialog;
     private static String entrySide = "";
 
-    private PickEntrySide(JFrame parentFrame, String masterHexLabel,
+    private PickEntrySide(JFrame parentFrame, MasterHex masterHex,
         Set<String> sides)
     {
-        super(masterHexLabel);
+        super(masterHex.getLabel());
         dialog = new JDialog(parentFrame, "Pick entry side", true);
         laidOut = false;
         Container contentPane = dialog.getContentPane();
@@ -82,12 +83,12 @@ final class PickEntrySide extends HexMap implements ActionListener,
         dialog.setVisible(true);
     }
 
-    static String pickEntrySide(JFrame parentFrame, String masterHexLabel,
+    static String pickEntrySide(JFrame parentFrame, MasterHex masterHex,
         Set<String> sides)
     {
         if (sides.size() >= 2)
         {
-            new PickEntrySide(parentFrame, masterHexLabel, sides);
+            new PickEntrySide(parentFrame, masterHex, sides);
         }
         else
         {

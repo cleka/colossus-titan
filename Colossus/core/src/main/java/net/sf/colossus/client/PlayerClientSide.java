@@ -54,7 +54,8 @@ public final class PlayerClientSide extends Player
 
         setName(data.remove(0));
 
-        setStartingTower(data.remove(0));
+        setStartingTower(client.getGame().getVariant().getMasterBoard()
+            .getHexByLabel(data.remove(0)));
 
         setColor(data.remove(0));
 
@@ -115,18 +116,6 @@ public final class PlayerClientSide extends Player
     public int getTitanPower()
     {
         return titanPower;
-    }
-
-    boolean hasTeleported()
-    {
-        for (Legion info : getLegions())
-        {
-            if (info.hasTeleported())
-            {
-                return true;
-            }
-        }
-        return false;
     }
 
     public int numMobileLegions()

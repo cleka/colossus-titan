@@ -14,16 +14,16 @@ import java.util.TreeSet;
  * 
  * @version $Id$
  */
-public class MultiSet
+public class MultiSet<T>
 {
-    private Map<Object, Integer> map;
+    private final Map<T, Integer> map;
 
     public MultiSet()
     {
-        map = new HashMap<Object, Integer>();
+        map = new HashMap<T, Integer>();
     }
 
-    public void add(Object key)
+    public void add(T key)
     {
         if (!contains(key))
         {
@@ -41,7 +41,7 @@ public class MultiSet
     /** Remove one of key from the set, if present.  Return true iff it
      *  was present.
      */
-    public boolean remove(Object key)
+    public boolean remove(T key)
     {
         if (!contains(key))
         {
@@ -66,12 +66,12 @@ public class MultiSet
         return map.size();
     }
 
-    public boolean contains(Object key)
+    public boolean contains(T key)
     {
         return map.containsKey(key);
     }
 
-    public int count(Object key)
+    public int count(T key)
     {
         if (!contains(key))
         {
@@ -81,7 +81,7 @@ public class MultiSet
         return val.intValue();
     }
 
-    public Collection<Object> keySet()
+    public Collection<T> keySet()
     {
         return map.keySet();
     }

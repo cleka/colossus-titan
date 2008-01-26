@@ -169,10 +169,12 @@ public final class PlayerServerSide extends Player implements
      This is inconsistent with equals(). */
     public int compareTo(PlayerServerSide other)
     {
-        return other.getStartingTower().compareTo(this.getStartingTower());
+        return other.getStartingTower().getLabel().compareTo(
+            this.getStartingTower().getLabel());
     }
 
-    boolean hasTeleported()
+    @Override
+    public boolean hasTeleported()
     {
         return teleported;
     }
@@ -345,12 +347,11 @@ public final class PlayerServerSide extends Player implements
     {
         for (Legion legion : getLegions())
         {
-            String hexLabel = legion.getHexLabel();
-            if (getGame().getNumFriendlyLegions(hexLabel, this) > 1
+            if (getGame().getNumFriendlyLegions(legion.getCurrentHex(), this) > 1
                 && ((LegionServerSide)legion).hasConventionalMove())
             {
                 LOGGER.finest("Found unseparated split legions at hex "
-                    + hexLabel);
+                    + legion.getCurrentHex());
                 return true;
             }
         }
@@ -409,7 +410,7 @@ public final class PlayerServerSide extends Player implements
             // Don't use the legion's real parent, as there could have been
             // a 3-way split and the parent could be gone.
             Legion parent = getGame().getFirstFriendlyLegion(
-                legion.getHexLabel(), this);
+                legion.getCurrentHex(), this);
             if (legion != parent)
             {
                 ((LegionServerSide)legion).recombine(parent, false);
@@ -482,9 +483,8 @@ public final class PlayerServerSide extends Player implements
             .hasNext();)
         {
             LegionServerSide legion = itLeg.next();
-            String hexLabel = legion.getHexLabel();
-            LegionServerSide enemyLegion = getGame().getFirstEnemyLegion(
-                hexLabel, this);
+            Legion enemyLegion = getGame().getFirstEnemyLegion(
+                legion.getCurrentHex(), this);
             double halfPoints = legion.getPointValue() / 2.0;
 
             Player scorer;
@@ -558,7 +558,7 @@ public final class PlayerServerSide extends Player implements
         List<String> li = new ArrayList<String>();
         li.add(Boolean.toString(!treatDeadAsAlive && isDead()));
         li.add(getName());
-        li.add(getStartingTower());
+        li.add(getStartingTower().getLabel());
         li.add(getColor());
         li.add(getType());
         li.add(getPlayersElim());
