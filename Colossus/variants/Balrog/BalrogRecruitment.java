@@ -8,7 +8,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.colossus.client.PlayerClientSide;
@@ -86,18 +85,19 @@ public class BalrogRecruitment extends CustomRecruitBase
         updateBalrogCount(hex);
 
         String name = balrogPrefix + hex.getLabel();
+        CreatureType balrogType = VariantSupport.getCurrentVariant()
+            .getCreatureByName(name);
 
-        if (getCount(name) > 0)
+        if (getCount(balrogType) > 0)
         {
-            temp.add(VariantSupport.getCurrentVariant()
-                .getCreatureByName(name));
+            temp.add(balrogType);
         }
         return temp;
     }
 
     @Override
-    public int numberOfRecruiterNeeded(String recruiter, String recruit,
-        String terrain, MasterHex hex)
+    public int numberOfRecruiterNeeded(CreatureType recruiter,
+        CreatureType recruit, String terrain, MasterHex hex)
     {
         return 0;
     }
@@ -124,8 +124,7 @@ public class BalrogRecruitment extends CustomRecruitBase
 
         if (pi == null)
         {
-            LOGGER
-                .log(Level.FINEST, "CUSTOM: no player info for hex " + tower);
+            LOGGER.finest("CUSTOM: no player info for hex " + tower);
             return;
         }
 
@@ -156,7 +155,7 @@ public class BalrogRecruitment extends CustomRecruitBase
 
         if (!VariantSupport.getCurrentVariant().isCreature(name))
         {
-            LOGGER.log(Level.SEVERE, "CUSTOM: Balrog by the name of " + name
+            LOGGER.severe("CUSTOM: Balrog by the name of " + name
                 + " doesn't exist !");
             return;
         }
@@ -166,22 +165,21 @@ public class BalrogRecruitment extends CustomRecruitBase
         ((CreatureBalrog)cre).setNewMaxCount(nowNumber);
 
         int difference = nowNumber - alreadyNumber;
-        int newcount = getCount(name) + difference;
+        int newcount = getCount(cre) + difference;
 
-        setCount(name, newcount);
+        setCount(cre, newcount);
 
         if (difference > 0)
         {
-            LOGGER.log(Level.FINEST, "CUSTOM: Pushing the total number of "
-                + name + " from " + alreadyNumber + " to " + nowNumber
+            LOGGER.finest("CUSTOM: Pushing the total number of " + name
+                + " from " + alreadyNumber + " to " + nowNumber
                 + " (new available count is: " + newcount + ")");
         }
         else if (difference < 0)
         {
-            LOGGER.log(Level.FINEST,
-                "CUSTOM: WARNING: DIMINISHING the total number of " + name
-                    + " from " + alreadyNumber + " to " + nowNumber
-                    + " (new available count is: " + newcount + ")");
+            LOGGER.finest("CUSTOM: WARNING: DIMINISHING the total number of "
+                + name + " from " + alreadyNumber + " to " + nowNumber
+                + " (new available count is: " + newcount + ")");
         }
     }
 
@@ -200,7 +198,7 @@ public class BalrogRecruitment extends CustomRecruitBase
     @Override
     protected void resetInstance()
     {
-        LOGGER.log(Level.FINEST, "CUSTOM: resetting " + getClass().getName());
+        LOGGER.finest("CUSTOM: resetting " + getClass().getName());
         playerToOldScore.clear();
     }
 }

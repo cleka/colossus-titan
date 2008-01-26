@@ -31,7 +31,7 @@ public final class PlayerClientSide extends Player
     PlayerClientSide(Game game, String playerName, int number)
     {
         super(game, playerName, number);
-        CustomRecruitBase.addPlayerInfo(this);
+        CustomRecruitBase.addPlayerClientSide(this);
         InstanceTracker.register(this, playerName);
     }
 

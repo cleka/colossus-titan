@@ -11,8 +11,8 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.sf.colossus.client.CaretakerClientSide;
 import net.sf.colossus.client.LegionClientSide;
+import net.sf.colossus.game.Caretaker;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.server.CustomRecruitBase;
 import net.sf.colossus.server.VariantSupport;
@@ -30,6 +30,8 @@ import net.sf.colossus.xmlparser.TerrainRecruitLoader;
  * pulled up to {@link Legion}, which would move the class into the game
  * package.
  * 
+ * TODO this is still string-based, see comment in {@link TerrainRecruitLoader}
+ * 
  * @version $Id$
  * @author Romain Dolbeau
  */
@@ -39,7 +41,7 @@ public class RecruitGraph
     private static final Logger LOGGER = Logger.getLogger(RecruitGraph.class
         .getName());
 
-    private CaretakerClientSide caretakerInfo;
+    private Caretaker caretaker;
     private final List<RecruitVertex> allVertex = new ArrayList<RecruitVertex>();
     private final List<RecruitEdge> allEdge = new ArrayList<RecruitEdge>();
     private final Map<String, RecruitVertex> creatureToVertex = new HashMap<String, RecruitVertex>();
@@ -103,9 +105,11 @@ public class RecruitGraph
 
         int getRemaining()
         {
-            if (graph.getCaretakerInfo() != null)
+            if (graph.getCaretaker() != null)
             {
-                return graph.getCaretakerInfo().getCount(cre);
+                CreatureType type = VariantSupport.getCurrentVariant()
+                    .getCreatureByName(cre);
+                return graph.getCaretaker().getCount(type);
             }
             else
             {
@@ -243,14 +247,14 @@ public class RecruitGraph
         }
     }
 
-    public RecruitGraph(CaretakerClientSide caretakerInfo)
+    public RecruitGraph(Caretaker caretaker)
     {
-        this.caretakerInfo = caretakerInfo;
+        this.caretaker = caretaker;
     }
 
     public RecruitGraph()
     {
-        this.caretakerInfo = null;
+        this.caretaker = null;
     }
 
     private RecruitVertex addVertex(String cre)
@@ -346,9 +350,9 @@ public class RecruitGraph
         return all;
     }
 
-    CaretakerClientSide getCaretakerInfo()
+    Caretaker getCaretaker()
     {
-        return caretakerInfo;
+        return caretaker;
     }
 
     /**
@@ -407,6 +411,8 @@ public class RecruitGraph
         RecruitVertex source = getVertex(recruiter);
         CreatureType recruiterCre = VariantSupport.getCurrentVariant()
             .getCreatureByName(recruiter);
+        CreatureType recruitCre = VariantSupport.getCurrentVariant()
+            .getCreatureByName(recruit);
         // if the recruiter is a special such as Anything, avoid
         // crashing with NullPointerException
         boolean isLord = (recruiterCre == null ? false : recruiterCre.isLord());
@@ -440,8 +446,8 @@ public class RecruitGraph
                 {
                     CustomRecruitBase cri = TerrainRecruitLoader
                         .getCustomRecruitBase(tempSrc.getCreatureName());
-                    int v = cri.numberOfRecruiterNeeded(recruiter, recruit,
-                        terrain, hex);
+                    int v = cri.numberOfRecruiterNeeded(recruiterCre,
+                        recruitCre, terrain, hex);
                     if (v < minValue)
                     {
                         minValue = v;
@@ -453,12 +459,12 @@ public class RecruitGraph
     }
 
     /**
-     * Set the CaretakerInfo to use for availability of creatures.
-     * @param The caretakerInfo to use subsequently.
+     * Set the Caretaker to use for availability of creatures.
+     * @param The caretaker to use subsequently.
      */
-    public void setCaretakerInfo(CaretakerClientSide caretakerInfo)
+    public void setCaretaker(Caretaker caretaker)
     {
-        this.caretakerInfo = caretakerInfo;
+        this.caretaker = caretaker;
     }
 
     /**
@@ -466,7 +472,7 @@ public class RecruitGraph
      */
     public void clear()
     {
-        caretakerInfo = null;
+        caretaker = null;
         allVertex.clear();
         allEdge.clear();
         creatureToVertex.clear();

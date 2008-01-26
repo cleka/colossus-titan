@@ -27,6 +27,11 @@ public class Game
      */
     private final Player[] players;
 
+    /**
+     * The caretaker takes care of managing the available and dead creatures.
+     */
+    private final Caretaker caretaker;
+
     public Game(Variant variant, String[] playerNames)
     {
         this.variant = variant;
@@ -35,6 +40,7 @@ public class Game
         {
             players[i] = new Player(this, playerNames[i], i);
         }
+        this.caretaker = new Caretaker(this);
     }
 
     public Variant getVariant()
@@ -49,5 +55,10 @@ public class Game
             // properly
             return VariantSupport.getCurrentVariant();
         }
+    }
+
+    public Caretaker getCaretaker()
+    {
+        return caretaker;
     }
 }

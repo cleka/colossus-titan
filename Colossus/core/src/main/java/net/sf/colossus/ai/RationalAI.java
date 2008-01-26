@@ -451,18 +451,19 @@ public class RationalAI extends SimpleAI
         outer: for (int index1 = 0; index1 < 4
             && index1 < sortedCreatures.size(); index1++)
         {
-            String critter1 = sortedCreatures.get(index1).getName();
+            CreatureType critter1 = sortedCreatures.get(index1);
 
             for (int index2 = index1 + 1; index2 < sortedCreatures.size(); index2++)
             {
-                String critter2 = sortedCreatures.get(index2).getName();
+                CreatureType critter2 = sortedCreatures.get(index2);
 
-                if (critter1 == critter2)
+                if (critter1.equals(critter2))
                 { // mustering yourself does not count
                     continue;
                 }
                 if (TerrainRecruitLoader.getRecruitGraph()
-                    .isRecruitDistanceLessThan(critter1, critter2, 2))
+                    .isRecruitDistanceLessThan(critter1.getName(),
+                        critter2.getName(), 2))
                 {// this creature has mustered
                     creaturesThatHaveMustered.add(sortedCreatures.get(index1));
                     sortedCreatures.remove(index1);

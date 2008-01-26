@@ -21,6 +21,11 @@ public class Caretaker
 {
     /**
      * Callback interface for listening to changes to the numbers.
+     * 
+     * TODO this is not final since we use the access to the outer class in {@link #fullUpdate()}
+     *      Maybe it would be better to just use an interface and forget about this little
+     *      convenience base implementation -- the obj.new Class() syntax is not exactly
+     *      common and thus probably rather confusing
      */
     public abstract class ChangeListener
     {

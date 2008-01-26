@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.sf.colossus.client.CaretakerClientSide;
+import net.sf.colossus.game.Caretaker;
 import net.sf.colossus.server.CustomRecruitBase;
 import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.util.HTMLColor;
@@ -30,6 +30,10 @@ import org.jdom.input.SAXBuilder;
  * TerrainRecruitLoader load the terrains and recruits descriptions.
  * 
  * TODO check if any of the methods still needs the "String terrain" parameter
+ * 
+ * TODO we still use plenty of strings in here since the creatures are mixed with the
+ *      special recruit requirements such as Anything/Lord/AnyNonLord or the custom
+ *      recruits marked by the "Special:" keyword
  * 
  * @author Romain Dolbeau
  * @version $Id$
@@ -95,13 +99,13 @@ public class TerrainRecruitLoader
     private static RecruitGraph graph = new RecruitGraph();
 
     /**
-     * set the CaretakerInfo used by the graph
+     * set the Caretaker used by the graph
      * (needed to know what creatures are still available)
      */
-    public static void setCaretakerInfo(CaretakerClientSide caretakerInfo)
+    public static void setCaretaker(Caretaker caretaker)
     {
         LOGGER.log(Level.FINEST, "GRAPH: Setting the CaretakerInfo");
-        graph.setCaretakerInfo(caretakerInfo);
+        graph.setCaretaker(caretaker);
     }
 
     /**

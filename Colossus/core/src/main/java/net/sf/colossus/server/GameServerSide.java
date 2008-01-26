@@ -27,6 +27,7 @@ import net.sf.colossus.client.BattleMap;
 import net.sf.colossus.client.HexMap;
 import net.sf.colossus.client.Proposal;
 import net.sf.colossus.game.Creature;
+import net.sf.colossus.game.Game;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.util.Options;
@@ -35,6 +36,7 @@ import net.sf.colossus.util.Split;
 import net.sf.colossus.util.ViableEntityManager;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.MasterHex;
+import net.sf.colossus.webcommon.InstanceTracker;
 import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
 import org.jdom.Attribute;
@@ -60,7 +62,7 @@ import org.jdom.output.XMLOutputter;
  * @author Romain Dolbeau
  */
 
-public final class GameServerSide extends net.sf.colossus.game.Game
+public final class GameServerSide extends Game
 {
     private static final Logger LOGGER = Logger.getLogger(GameServerSide.class
         .getName());
@@ -83,7 +85,6 @@ public final class GameServerSide extends net.sf.colossus.game.Game
     private boolean loadingGame;
     private boolean gameOver;
     private BattleServerSide battle;
-    private final CaretakerServerSide caretaker = new CaretakerServerSide(this);
     private Constants.Phase phase;
     private Server server;
     // Negotiation
@@ -115,14 +116,43 @@ public final class GameServerSide extends net.sf.colossus.game.Game
         super(null, new String[0]);
         // later perhaps from cmdline, GUI, or WebServer set it?
         gameId = "#" + (gameCounter++);
+        getCaretaker().addListener(getCaretaker().new ChangeListener()
+        {
+            @Override
+            public void creatureTypeAvailabilityUpdated(CreatureType type,
+                int availableCount)
+            {
+                updateDisplays(type);
+            }
+
+            @Override
+            public void creatureTypeDeadCountUpdated(CreatureType type,
+                int deadCount)
+            {
+                updateDisplays(type);
+            }
+
+        });
+    }
+
+    /** 
+     * Update creatureName's count on all clients.
+     */
+    private void updateDisplays(CreatureType type)
+    {
+        Server server = getServer();
+        if (server != null)
+        {
+            server.allUpdateCreatureCount(type, getCaretaker().getCount(type),
+                getCaretaker().getDeadCount(type));
+        }
     }
 
     // TODO: Get via Options instead?
     public void setPort(int portNr)
     {
         this.port = portNr;
-        net.sf.colossus.webcommon.InstanceTracker.register(this,
-            "Game at port " + port);
+        InstanceTracker.register(this, "Game at port " + port);
     }
 
     public void setOptions(Options options)
@@ -234,12 +264,11 @@ public final class GameServerSide extends net.sf.colossus.game.Game
         LOGGER.log(Level.INFO, "Starting new game");
 
         CustomRecruitBase.resetAllInstances();
-        CustomRecruitBase.setCaretaker(caretaker);
         CustomRecruitBase.setGame(this);
 
         addPlayersFromOptions();
         // reset the caretaker after we have the players to get the right Titan counts
-        caretaker.resetAllCounts();
+        getCaretaker().resetAllCounts();
 
         hotSeatMode = options.getOption(Options.hotSeatMode);
 
@@ -536,7 +565,7 @@ public final class GameServerSide extends net.sf.colossus.game.Game
     {
         for (CreatureType type : getVariant().getCreatureTypes())
         {
-            caretaker.updateDisplays(type);
+            updateDisplays(type);
         }
     }
 
@@ -633,11 +662,6 @@ public final class GameServerSide extends net.sf.colossus.game.Game
             numDone++;
         }
         return returnList;
-    }
-
-    CaretakerServerSide getCaretaker()
-    {
-        return caretaker;
     }
 
     Server getServer()
@@ -1213,10 +1237,10 @@ public final class GameServerSide extends net.sf.colossus.game.Game
 
                 el = new Element("Creature");
                 el.setAttribute("name", creature.getName());
-                el
-                    .setAttribute("remaining", ""
-                        + caretaker.getCount(creature));
-                el.setAttribute("dead", "" + caretaker.getDeadCount(creature));
+                el.setAttribute("remaining", ""
+                    + getCaretaker().getCount(creature));
+                el.setAttribute("dead", ""
+                    + getCaretaker().getDeadCount(creature));
                 car.addContent(el);
             }
 
@@ -1473,8 +1497,8 @@ public final class GameServerSide extends net.sf.colossus.game.Game
                 CreatureType creature = getVariant().getCreatureByName(
                     creatureName);
 
-                caretaker.setCount(creature, remaining);
-                caretaker.setDeadCount(creature, dead);
+                getCaretaker().setCount(creature, remaining);
+                getCaretaker().setDeadCount(creature, dead);
             }
 
             players.clear();
@@ -1815,7 +1839,7 @@ public final class GameServerSide extends net.sf.colossus.game.Game
         while (it.hasNext())
         {
             CreatureType recruit = it.next();
-            if (caretaker.getCount(recruit) < 1)
+            if (getCaretaker().getCount(recruit) < 1)
             {
                 it.remove();
             }
@@ -1944,7 +1968,7 @@ public final class GameServerSide extends net.sf.colossus.game.Game
         {
             String name = it.next();
 
-            if (caretaker.getCount(getVariant().getCreatureByName(name)) >= 1
+            if (getCaretaker().getCount(getVariant().getCreatureByName(name)) >= 1
                 && !recruits.contains(name))
             {
                 recruits.add(name);

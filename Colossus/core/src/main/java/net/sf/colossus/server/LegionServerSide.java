@@ -9,6 +9,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.colossus.client.BattleMap;
+import net.sf.colossus.game.Caretaker;
 import net.sf.colossus.game.Creature;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
@@ -466,7 +467,7 @@ public final class LegionServerSide extends Legion implements
         }
         if (takeFromStack)
         {
-            CaretakerServerSide caretaker = game.getCaretaker();
+            Caretaker caretaker = game.getCaretaker();
             if (caretaker.getCount(creature) > 0)
             {
                 caretaker.takeOne(creature);

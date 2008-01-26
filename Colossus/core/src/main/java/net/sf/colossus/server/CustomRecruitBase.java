@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.sf.colossus.client.CaretakerClientSide;
+import net.sf.colossus.game.Caretaker;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.variant.CreatureType;
@@ -26,8 +26,9 @@ abstract public class CustomRecruitBase
         .getLogger(CustomRecruitBase.class.getName());
 
     protected static List<Player> allPlayers = new ArrayList<Player>();
-    private static List<CaretakerClientSide> allCaretakerInfo = new ArrayList<CaretakerClientSide>();
-    private static CaretakerServerSide serverCaretaker = null;
+    // TODO consider storing the Game instances instead, which would give access to both Caretaker and Player
+    // instances
+    private static List<Caretaker> allCaretakerInfo = new ArrayList<Caretaker>();
     private static GameServerSide serverGame = null;
     private static List<CustomRecruitBase> allCustomRecruitBase = new ArrayList<CustomRecruitBase>();
 
@@ -44,7 +45,6 @@ abstract public class CustomRecruitBase
         allCaretakerInfo.clear();
         allCustomRecruitBase.clear();
         serverGame = null;
-        serverCaretaker = null;
     }
 
     /* partial reset (change game) */
@@ -54,7 +54,6 @@ abstract public class CustomRecruitBase
         allPlayers.clear();
         allCaretakerInfo.clear();
         serverGame = null;
-        serverCaretaker = null;
 
         Iterator<CustomRecruitBase> it = allCustomRecruitBase.iterator();
         while (it.hasNext())
@@ -75,19 +74,14 @@ abstract public class CustomRecruitBase
         }
     }
 
-    synchronized public static final void addPlayerInfo(Player pi)
+    synchronized public static final void addPlayerClientSide(Player pi)
     {
         allPlayers.add(pi);
     }
 
-    synchronized public static final void addCaretakerInfo(CaretakerClientSide ci)
+    synchronized public static final void addCaretakerClientSide(Caretaker ci)
     {
         allCaretakerInfo.add(ci);
-    }
-
-    synchronized public static final void setCaretaker(CaretakerServerSide c)
-    {
-        serverCaretaker = c;
     }
 
     synchronized public static final void setGame(GameServerSide g)
@@ -95,40 +89,33 @@ abstract public class CustomRecruitBase
         serverGame = g;
     }
 
-    synchronized protected final void setCount(String name, int newCount)
+    synchronized protected final void setCount(CreatureType type, int newCount)
     {
         // first update all known CaretakerInfo (if we're client(s))
-        Iterator<CaretakerClientSide> it = allCaretakerInfo.iterator();
+        Iterator<Caretaker> it = allCaretakerInfo.iterator();
         while (it.hasNext())
         {
-            CaretakerClientSide ci = it.next();
-            ci.updateCount(name, newCount, ci.getDeadCount(name));
+            Caretaker ci = it.next();
+            ci.setCount(type, newCount);
         }
         // update the Caretaker if we're server
-        if (serverCaretaker != null)
+        if (serverGame != null)
         {
             // first update the server's count
-            serverCaretaker.setCount(name, newCount);
-            // second force pushing the value to the client
-            // the work might be duplicated, but this make
-            // sure everything is coherent, and above make
-            // sure the child class get the proper value
-            // when calling getCount() even in a different JVM
-            // not needed - this is done by setCount() already
-            //serverCaretaker.updateDisplays(name);
+            serverGame.getCaretaker().setCount(type, newCount);
         }
     }
 
-    synchronized protected final int getCount(String name)
+    synchronized protected final int getCount(CreatureType type)
     {
         int count = -1;
         int oldcount = -1;
-        Iterator<CaretakerClientSide> it = allCaretakerInfo.iterator();
+        Iterator<Caretaker> it = allCaretakerInfo.iterator();
         while (it.hasNext() && (count == -1))
         {
-            CaretakerClientSide ci = it.next();
+            Caretaker ci = it.next();
             oldcount = count;
-            count = ci.getCount(name);
+            count = ci.getCount(type);
             if ((oldcount != -1) && (count != oldcount))
             {
                 LOGGER.log(Level.SEVERE,
@@ -137,10 +124,10 @@ abstract public class CustomRecruitBase
             }
         }
         // second, update the Caretaker if we're server
-        if ((serverCaretaker != null) && (count == -1))
+        if ((serverGame != null) && (count == -1))
         {
             oldcount = count;
-            count = serverCaretaker.getCount(name);
+            count = serverGame.getCaretaker().getCount(type);
             if ((oldcount != -1) && (count != oldcount))
             {
                 LOGGER.log(Level.SEVERE,
@@ -151,35 +138,34 @@ abstract public class CustomRecruitBase
         return count;
     }
 
-    synchronized protected final void setDeadCount(String name,
+    synchronized protected final void setDeadCount(CreatureType type,
         int newDeadCount)
     {
         // first update all known CaretakerInfo (if we're client(s))
-        Iterator<CaretakerClientSide> it = allCaretakerInfo.iterator();
+        Iterator<Caretaker> it = allCaretakerInfo.iterator();
         while (it.hasNext())
         {
-            CaretakerClientSide ci = it.next();
-            ci.updateCount(name, ci.getCount(name), newDeadCount);
+            Caretaker ci = it.next();
+            ci.setDeadCount(type, newDeadCount);
         }
         // second, update the Caretaker if we're server
-        if (serverCaretaker != null)
+        if (serverGame != null)
         {
             // same comments as setCount() above
-            serverCaretaker.setDeadCount(name, newDeadCount);
-            //serverCaretaker.updateDisplays(name);
+            serverGame.getCaretaker().setDeadCount(type, newDeadCount);
         }
     }
 
-    synchronized protected final int getDeadCount(String name)
+    synchronized protected final int getDeadCount(CreatureType type)
     {
         int count = -1;
         int oldcount = -1;
-        Iterator<CaretakerClientSide> it = allCaretakerInfo.iterator();
+        Iterator<Caretaker> it = allCaretakerInfo.iterator();
         while (it.hasNext() && (count == -1))
         {
-            CaretakerClientSide ci = it.next();
+            Caretaker ci = it.next();
             oldcount = count;
-            count = ci.getDeadCount(name);
+            count = ci.getDeadCount(type);
             if ((oldcount != -1) && (count != oldcount))
             {
                 LOGGER.log(Level.SEVERE,
@@ -188,10 +174,10 @@ abstract public class CustomRecruitBase
             }
         }
         // second, update the Caretaker if we're server
-        if ((serverCaretaker != null) && (count == -1))
+        if ((serverGame != null) && (count == -1))
         {
             oldcount = count;
-            count = serverCaretaker.getDeadCount(name);
+            count = serverGame.getCaretaker().getDeadCount(type);
             if ((oldcount != -1) && (count != oldcount))
             {
                 LOGGER.log(Level.SEVERE,
@@ -260,8 +246,8 @@ abstract public class CustomRecruitBase
      *
      * TODO the terrain parameter might be superfluous
      */
-    abstract public int numberOfRecruiterNeeded(String recruiter,
-        String recruit, String terrain, MasterHex hex);
+    abstract public int numberOfRecruiterNeeded(CreatureType recruiter,
+        CreatureType recruit, String terrain, MasterHex hex);
 
     /** bookkeeping function, called once after every player turn.
      private as it should only be called from everyoneAdvanceTurn() */

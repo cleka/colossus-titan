@@ -38,6 +38,7 @@ import net.sf.colossus.game.Game;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.server.Constants;
+import net.sf.colossus.server.CustomRecruitBase;
 import net.sf.colossus.server.Dice;
 import net.sf.colossus.server.GameServerSide;
 import net.sf.colossus.server.IServer;
@@ -188,8 +189,6 @@ public final class Client implements IClient, IOracle
     private SimpleAI simpleAI;
     private AI ai;
 
-    private final CaretakerClientSide caretakerInfo;
-
     /**
      * This is used as a placeholder for activePlayer and battleActivePlayer since they
      * are sometimes accessed when they are not available.
@@ -272,8 +271,6 @@ public final class Client implements IClient, IOracle
         assert playerName != null;
 
         this.game = game;
-        // TODO the caretaker should be attached to the Game class
-        this.caretakerInfo = new CaretakerClientSide(game);
 
         // TODO this is currently not set properly straight away, it is fixed in
         // updatePlayerInfo(..) when the PlayerInfos are initialized. Should really
@@ -332,19 +329,17 @@ public final class Client implements IClient, IOracle
             this.server = sct;
             if (remote)
             {
-                net.sf.colossus.util.ResourceLoader.setDataServer(host,
-                    port + 1);
+                ResourceLoader.setDataServer(host, port + 1);
             }
             else
             {
-                net.sf.colossus.util.ResourceLoader.setDataServer(null, 0);
+                ResourceLoader.setDataServer(null, 0);
             }
 
             sct.start();
 
-            TerrainRecruitLoader.setCaretakerInfo(caretakerInfo);
-            net.sf.colossus.server.CustomRecruitBase
-                .addCaretakerInfo(caretakerInfo);
+            TerrainRecruitLoader.setCaretaker(getGame().getCaretaker());
+            CustomRecruitBase.addCaretakerClientSide(getGame().getCaretaker());
             failed = false;
         }
     }
@@ -1171,8 +1166,8 @@ public final class Client implements IClient, IOracle
 
     public void updateCreatureCount(CreatureType type, int count, int deadCount)
     {
-        caretakerInfo.setCount(type, count);
-        caretakerInfo.setDeadCount(type, deadCount);
+        getGame().getCaretaker().setCount(type, count);
+        getGame().getCaretaker().setDeadCount(type, deadCount);
         updateCreatureCountDisplay();
     }
 
@@ -4121,7 +4116,7 @@ public final class Client implements IClient, IOracle
                 + " reserveRecruit creature " + recruitType
                 + " not fround from hash, should have been created"
                 + " during getReservedCount!");
-            remain = getCreatureCount(recruitType);
+            remain = getGame().getCaretaker().getCount(recruitType);
         }
 
         if (remain > 0)
@@ -4149,7 +4144,7 @@ public final class Client implements IClient, IOracle
         Integer count = recruitReservations.get(recruitType);
         if (count == null)
         {
-            remain = getCreatureCount(recruitType);
+            remain = getGame().getCaretaker().getCount(recruitType);
         }
         else
         {
@@ -4160,7 +4155,7 @@ public final class Client implements IClient, IOracle
         // in case someone called getReservedRemain with bypassing the 
         // reset or reserve methods, to be sure doublecheck against the 
         // real remaining value.
-        int realCount = getCreatureCount(recruitType);
+        int realCount = getGame().getCaretaker().getCount(recruitType);
         if (realCount < remain)
         {
             remain = realCount;
@@ -4225,7 +4220,7 @@ public final class Client implements IClient, IOracle
         while (it.hasNext())
         {
             CreatureType recruit = it.next();
-            int remaining = getCreatureCount(recruit);
+            int remaining = getGame().getCaretaker().getCount(recruit);
 
             if (remaining > 0 && considerReservations)
             {
@@ -4350,16 +4345,6 @@ public final class Client implements IClient, IOracle
         boolean teleport)
     {
         return movement.listPossibleEntrySides(mover, hex, teleport);
-    }
-
-    int getCreatureCount(CreatureType creature)
-    {
-        return caretakerInfo.getCount(creature);
-    }
-
-    int getCreatureDeadCount(CreatureType creature)
-    {
-        return caretakerInfo.getDeadCount(creature);
     }
 
     public List<Legion> getLegionsByHex(MasterHex hex)
