@@ -132,20 +132,6 @@ public final class PlayerClientSide extends Player
         return count;
     }
 
-    @Override
-    public List<LegionClientSide> getLegions()
-    {
-        return client.getLegionsByPlayer(this);
-    }
-
-    void removeAllLegions()
-    {
-        for (Legion legion : getLegions())
-        {
-            client.removeLegion(legion);
-        }
-    }
-
     public PredictSplits getPredictSplits()
     {
         return predictSplits;

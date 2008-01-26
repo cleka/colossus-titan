@@ -210,9 +210,8 @@ public final class MasterBoard extends JPanel
                     List<Marker> myMarkers = new ArrayList<Marker>();
                     for (Marker marker : client.getMarkers())
                     {
-                        LegionClientSide legionInfo = client.getLegion(marker
-                            .getId());
-                        if (legionInfo.isMyLegion())
+                        Legion legion = client.getLegion(marker.getId());
+                        if (((LegionClientSide)legion).isMyLegion())
                         {
                             myMarkers.add(marker);
                         }
@@ -235,14 +234,15 @@ public final class MasterBoard extends JPanel
             for (int i = 0; i < markerArray.length; i++)
             {
                 Marker marker = markerArray[i];
-                LegionClientSide legion = client.getLegion(marker.getId());
+                Legion legion = client.getLegion(marker.getId());
                 int scale = 2 * Scale.get();
 
                 boolean dubiousAsBlanks = client.getOptions().getOption(
                     Options.dubiousAsBlanks);
-                final JPanel panel = new LegionInfoPanel(legion, scale,
-                    PANEL_MARGIN, PANEL_PADDING, true, client.getViewMode(),
-                    client.getActivePlayer(), dubiousAsBlanks, true);
+                final JPanel panel = new LegionInfoPanel(
+                    (LegionClientSide)legion, scale, PANEL_MARGIN,
+                    PANEL_PADDING, true, client.getViewMode(), client
+                        .getActivePlayer(), dubiousAsBlanks, true);
                 add(panel);
                 legionFlyouts[i] = panel;
 
@@ -1626,7 +1626,7 @@ public final class MasterBoard extends JPanel
                 String markerId = marker.getId();
 
                 // Move the clicked-on marker to the top of the z-order.
-                LegionClientSide legion = client.getLegion(markerId);
+                Legion legion = client.getLegion(markerId);
                 client.setMarker(legion, marker);
 
                 // Right-click means to show the contents of the legion.
@@ -1635,12 +1635,12 @@ public final class MasterBoard extends JPanel
                     int viewMode = client.getViewMode();
                     boolean dubiousAsBlanks = client.getOptions().getOption(
                         Options.dubiousAsBlanks);
-                    new ShowLegion(masterFrame, legion, point, scrollPane,
-                        4 * Scale.get(), client.getActivePlayer(), viewMode,
-                        dubiousAsBlanks);
+                    new ShowLegion(masterFrame, (LegionClientSide)legion,
+                        point, scrollPane, 4 * Scale.get(), client
+                            .getActivePlayer(), viewMode, dubiousAsBlanks);
                     return;
                 }
-                else if (legion.isMyLegion())
+                else if (((LegionClientSide)legion).isMyLegion())
                 {
                     if (hex != null)
                     {

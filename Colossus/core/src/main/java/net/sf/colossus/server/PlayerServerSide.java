@@ -393,9 +393,8 @@ public final class PlayerServerSide extends Player implements
         getGame().getServer().undidRecruit(legion, recruitName);
     }
 
-    void undoSplit(String splitoffId)
+    void undoSplit(Legion splitoff)
     {
-        Legion splitoff = getLegionByMarkerId(splitoffId);
         Legion parent = ((LegionServerSide)splitoff).getParent();
         ((LegionServerSide)splitoff).recombine(parent, true);
         getGame().getServer().allUpdatePlayerInfo();

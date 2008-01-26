@@ -101,17 +101,17 @@ public class RationalAI extends SimpleAI
         return true; //successfully looked at all splits
     }
 
-    // XXX Undoing a split could release the marker needed to do another
+    // TODO Undoing a split could release the marker needed to do another
     // split, so we need to synchronize access.
     /** If parentId and childId are null, this is a callback to
      * an undo split */
     @Override
-    public boolean splitCallback(String parentId, String childId)
+    public boolean splitCallback(Legion parent, Legion child)
     {
-        logger.log(Level.FINEST, "RationalAI.splitCallback " + parentId + " "
-            + childId);
+        logger.log(Level.FINEST, "RationalAI.splitCallback " + parent + " "
+            + child);
 
-        return splitOneLegionCallback(parentId, childId) && fireSplits();
+        return splitOneLegionCallback(parent, child) && fireSplits();
     }
 
     // Compute the expected value of a split legion
@@ -299,14 +299,13 @@ public class RationalAI extends SimpleAI
     }
 
     /** Return true if done, false if waiting for undo split */
-    private boolean splitOneLegionCallback(String markerId, String newMarkerId)
+    private boolean splitOneLegionCallback(Legion parent, Legion child)
     {
-        if (markerId == null && newMarkerId == null)
+        if (parent == null && child == null)
         {
             return true; //nothing to do. splitCallback() depends on this exit
         }
 
-        Legion legion = client.getLegion(markerId);
         logger.log(Level.FINEST, "Split complete");
 
         if (client.getTurnNumber() == 1)
@@ -315,12 +314,10 @@ public class RationalAI extends SimpleAI
             return true;
         }
 
-        Legion child_legion = client.getLegion(newMarkerId);
-
         // Compute split value
         logger
             .log(Level.FINEST, "splitOneLegion(): Expected value with split");
-        double split_value = expectedValueSplitLegion(legion, child_legion);
+        double split_value = expectedValueSplitLegion(parent, child);
         // expected value of split
 
         // find expected value of no split
@@ -329,7 +326,7 @@ public class RationalAI extends SimpleAI
         double no_split_value = 0.0;
         if (client.getTurnNumber() > 1)
         {
-            no_split_value = expectedValueSplitLegion(legion, null);
+            no_split_value = expectedValueSplitLegion(parent, null);
         }
 
         // For Titan group, try to only split when at 7
@@ -357,7 +354,7 @@ public class RationalAI extends SimpleAI
         if (split_value * 1.02 < no_split_value || split_value < -20)
         {
             // Undo the split
-            client.undoSplit(newMarkerId);
+            client.undoSplit(child);
             logger.log(Level.FINEST,
                 "undo split - better to keep stack together");
             return false;
@@ -1002,14 +999,13 @@ public class RationalAI extends SimpleAI
                     }
                 }
 
-                String minMarkerId = minLegion.getMarkerId();
                 Set<MasterHex> set = client.getMovement().listNormalMoves(
                     minLegion, minLegion.getCurrentHex(), roll);
 
                 if (set.size() == 0)
                 {
                     // This should never happen. Most likely we get then a NAK...
-                    logger.log(Level.SEVERE, "Split legion " + minMarkerId
+                    logger.log(Level.SEVERE, "Split legion " + minLegion
                         + " in hexlabel " + hex
                         + " was supposed to have forced moves left, "
                         + " but normal moves list is empty?");
@@ -1040,15 +1036,12 @@ public class RationalAI extends SimpleAI
                     if (bestHex == null)
                     {
                         // well, no legal move for this one. So, leave it as it is.
-                        logger
-                            .log(Level.FINEST, "Forced split moves remain "
-                                + "(no legal move for legion " + minMarkerId
-                                + ")");
+                        logger.log(Level.FINEST, "Forced split moves remain "
+                            + "(no legal move for legion " + minLegion + ")");
                     }
                     else
                     {
-                        boolean wentOk = client.doMove(client
-                            .getLegion(minMarkerId), bestHex);
+                        boolean wentOk = client.doMove(minLegion, bestHex);
                         if (wentOk)
                         {
                             // ok, lets get called again to check if there are more.
@@ -1060,7 +1053,7 @@ public class RationalAI extends SimpleAI
                             logger.log(Level.SEVERE,
                                 "Forced split moves remain, "
                                     + "but client rejects moving marker "
-                                    + minMarkerId + " from " + hex + " to "
+                                    + minLegion + " from " + hex + " to "
                                     + bestHex);
                         }
                     }

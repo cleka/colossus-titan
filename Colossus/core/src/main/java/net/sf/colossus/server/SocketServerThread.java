@@ -402,7 +402,7 @@ final class SocketServerThread extends Thread implements IClient
         else if (method.equals(Constants.undoSplit))
         {
             String splitoffId = args.remove(0);
-            server.undoSplit(splitoffId);
+            server.undoSplit(resolveLegion(splitoffId));
         }
         else if (method.equals(Constants.undoMove))
         {

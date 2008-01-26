@@ -645,7 +645,7 @@ final class EventViewer extends KDialog implements WindowListener,
         return client.getActivePlayer().getNumber();
     }
 
-    private LegionClientSide getLegionInfo(String marker)
+    private Legion getLegion(String marker)
     {
         return client.getLegion(marker);
     }
@@ -926,8 +926,9 @@ final class EventViewer extends KDialog implements WindowListener,
             if (ownEvent != null)
             {
                 String ownMarkerId = ownEvent.getMarkerId();
-                LegionClientSide info = getLegionInfo(ownMarkerId);
-                List<String> ownNames = info.getContents();
+                Legion ownLegion = getLegion(ownMarkerId);
+                List<String> ownNames = ((LegionClientSide)ownLegion)
+                    .getContents();
                 ArrayList<RevealedCreature> rcNames = new ArrayList<RevealedCreature>();
                 Iterator<String> it = ownNames.iterator();
                 while (it.hasNext())
@@ -1007,7 +1008,7 @@ final class EventViewer extends KDialog implements WindowListener,
         // create also the separate acquire event:
         if (reason.equals(Constants.reasonAcquire))
         {
-            int newHeight = getLegionInfo(markerId).getHeight();
+            int newHeight = getLegion(markerId).getHeight();
             RevealedCreature rc = new RevealedCreature(name);
             rc.setWasAcquired(true);
             ArrayList<RevealedCreature> rcList = new ArrayList<RevealedCreature>(
@@ -1025,7 +1026,7 @@ final class EventViewer extends KDialog implements WindowListener,
                     + client.getActivePlayer().getName() + " phase "
                     + client.getPhase() + " markerid " + markerId
                     + " marker owner"
-                    + getLegionInfo(markerId).getPlayer().getName()
+                    + getLegion(markerId).getPlayer().getName()
                     + "last engagement were" + " attacker "
                     + lastAttackerEventLegion.getMarkerId() + " defender "
                     + lastDefenderEventLegion.getMarkerId());

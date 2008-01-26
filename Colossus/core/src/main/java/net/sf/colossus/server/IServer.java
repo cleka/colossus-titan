@@ -52,7 +52,7 @@ public interface IServer
 
     public void mulligan();
 
-    public void undoSplit(String splitoffId);
+    public void undoSplit(Legion splitoff);
 
     public void undoMove(Legion legion);
 

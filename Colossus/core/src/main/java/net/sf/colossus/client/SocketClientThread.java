@@ -900,7 +900,7 @@ final class SocketClientThread extends Thread implements IServer
         }
     }
 
-    private LegionClientSide resolveLegion(String markerId)
+    private Legion resolveLegion(String markerId)
     {
         return client.getLegion(markerId);
     }
@@ -1037,9 +1037,9 @@ final class SocketClientThread extends Thread implements IServer
         sendToServer(Constants.mulligan);
     }
 
-    public void undoSplit(String splitoffId)
+    public void undoSplit(Legion splitoff)
     {
-        sendToServer(Constants.undoSplit + sep + splitoffId);
+        sendToServer(Constants.undoSplit + sep + splitoff.getMarkerId());
     }
 
     public void undoMove(Legion legion)

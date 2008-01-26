@@ -1416,13 +1416,13 @@ public final class Server implements IServer
             + " takes a mulligan and rolls " + roll);
     }
 
-    public void undoSplit(String splitoffId)
+    public void undoSplit(Legion splitoff)
     {
         if (!isActivePlayer())
         {
             return;
         }
-        game.getActivePlayer().undoSplit(splitoffId);
+        game.getActivePlayer().undoSplit(splitoff);
     }
 
     void undidSplit(Legion splitoff, Legion survivor, boolean updateHistory,

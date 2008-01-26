@@ -267,6 +267,11 @@ public class Player
         legions.remove(legion);
     }
 
+    public void removeAllLegions()
+    {
+        legions.clear();
+    }
+
     public void addMarkerAvailable(String markerId)
     {
         markersAvailable.add(markerId);

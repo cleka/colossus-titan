@@ -56,4 +56,25 @@ public class CollectionHelper
         }
         return result;
     }
+
+    /**
+     * Retrieves the first element from a collection that matches a predicate.
+     * 
+     * @param <T> The type of elements we are interested in.
+     * @param source A collection containing elements we are interested in. Not null. Can be empty.
+     * @param filter The predicate determining if an element is to be retrieved. Not null.
+     * @return The first matching element or null if no element matches.
+     */
+    public static <T> T selectFirst(Collection<? extends T> source,
+        Predicate<T> filter)
+    {
+        for (T t : source)
+        {
+            if (filter.matches(t))
+            {
+                return t;
+            }
+        }
+        return null;
+    }
 }

@@ -19,9 +19,7 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -218,14 +216,6 @@ public final class Client implements IClient, IOracle
 
     /** One per player. */
     private PlayerClientSide[] players;
-
-    /**
-     * One LegionInfo per legion, keyed by markerId.  Never null.
-     * 
-     * TODO does this need to be a TreeMap? Will we need it at all once the model refactoring
-     * is done?
-     */
-    private Map<String, LegionClientSide> legionInfo = new TreeMap<String, LegionClientSide>();
 
     private int numPlayers;
 
@@ -647,8 +637,8 @@ public final class Client implements IClient, IOracle
         if (autoInspector != null)
         {
             String markerId = marker.getId();
-            LegionClientSide legion = getLegion(markerId);
-            autoInspector.showLegion(legion);
+            Legion legion = getLegion(markerId);
+            autoInspector.showLegion((LegionClientSide)legion);
         }
     }
 
@@ -1164,10 +1154,10 @@ public final class Client implements IClient, IOracle
         int totalValue = 0;
         int totalLegions = 0;
 
-        for (Legion legion : legionInfo.values())
+        for (Player player : players)
         {
-            totalLegions++;
-            totalValue = ((LegionClientSide)legion).getPointValue();
+            totalLegions += player.getLegions().size();
+            totalValue += player.getTotalPointValue();
         }
         return (int)(Math.round((double)totalValue / totalLegions));
     }
@@ -1540,7 +1530,6 @@ public final class Client implements IClient, IOracle
         this.battleMovement = null;
         this.strike = null;
         this.secondaryParent = null;
-        this.legionInfo = null;
         this.players = null;
 
         net.sf.colossus.server.CustomRecruitBase.reset();
@@ -1665,32 +1654,22 @@ public final class Client implements IClient, IOracle
         return Collections.unmodifiableList(markers);
     }
 
-    LegionClientSide createLegionInfo(String markerId)
-    {
-        LegionClientSide info = new LegionClientSide(markerId, this);
-        legionInfo.put(markerId, info);
-        return info;
-    }
-
     /**
      * Get this legion's info or create if necessary.
      * 
      * TODO try to get rid of the implicit creation.
+     * TODO move legion creation into a factory on {@link Player}
      */
-    public LegionClientSide getLegion(String markerId)
+    public Legion getLegion(String markerId)
     {
-        LegionClientSide info = legionInfo.get(markerId);
-        if (info == null)
+        Player player = getPlayerStateByMarkerId(markerId);
+        Legion legion = player.getLegionByMarkerId(markerId);
+        if (legion == null)
         {
-            info = createLegionInfo(markerId);
+            legion = new LegionClientSide(markerId, this);
+            player.addLegion(legion);
         }
-        return info;
-    }
-
-    /** Get the marker with this id. */
-    Marker getMarker(String id)
-    {
-        return getLegion(id).getMarker();
+        return legion;
     }
 
     /** Add the marker to the end of the list and to the LegionInfo.
@@ -1717,7 +1696,7 @@ public final class Client implements IClient, IOracle
         // XXX Not perfect -- Need to track recruitChits by legion.
         removeRecruitChit(legion.getCurrentHex());
 
-        legionInfo.remove(legion.getMarkerId());
+        legion.getPlayer().removeLegion(legion);
         if (board != null)
         {
             board.alignLegions(legion.getCurrentHex());
@@ -3123,11 +3102,14 @@ public final class Client implements IClient, IOracle
 
     private void resetAllMoves()
     {
-        for (LegionClientSide legion : legionInfo.values())
+        for (Player player : players)
         {
-            legion.setMoved(false);
-            legion.setTeleported(false);
-            legion.setRecruited(false);
+            for (Legion legion : player.getLegions())
+            {
+                legion.setMoved(false);
+                legion.setTeleported(false);
+                ((LegionClientSide)legion).setRecruited(false);
+            }
         }
     }
 
@@ -3469,13 +3451,16 @@ public final class Client implements IClient, IOracle
     {
         markers.clear();
 
-        for (LegionClientSide legion : legionInfo.values())
+        for (Player player : players)
         {
-            String markerId = legion.getMarkerId();
-            Marker marker = new Marker(3 * Scale.get(), markerId, this);
-            legion.setMarker(marker);
-            markers.add(marker);
-            board.alignLegions(legion.getCurrentHex());
+            for (Legion legion : player.getLegions())
+            {
+                String markerId = legion.getMarkerId();
+                Marker marker = new Marker(3 * Scale.get(), markerId, this);
+                ((LegionClientSide)legion).setMarker(marker);
+                markers.add(marker);
+                board.alignLegions(legion.getCurrentHex());
+            }
         }
     }
 
@@ -4302,16 +4287,16 @@ public final class Client implements IClient, IOracle
     /** Return a set of hexLabels. */
     Set<MasterHex> getPossibleRecruitHexes()
     {
-        Set<MasterHex> set = new HashSet<MasterHex>();
+        Set<MasterHex> result = new HashSet<MasterHex>();
 
-        for (LegionClientSide legion : legionInfo.values())
+        for (Legion legion : activePlayer.getLegions())
         {
-            if (activePlayer.equals(legion.getPlayer()) && legion.canRecruit())
+            if (((LegionClientSide)legion).canRecruit())
             {
-                set.add(legion.getCurrentHex());
+                result.add(legion.getCurrentHex());
             }
         }
-        return set;
+        return result;
     }
 
     /** Return a set of hexes for all other unengaged legions of
@@ -4319,7 +4304,7 @@ public final class Client implements IClient, IOracle
      */
     public Set<MasterHex> findSummonableAngelHexes(Legion summoner)
     {
-        Set<MasterHex> set = new HashSet<MasterHex>();
+        Set<MasterHex> result = new HashSet<MasterHex>();
         Player player = summoner.getPlayer();
         for (Legion legion : player.getLegions())
         {
@@ -4328,11 +4313,11 @@ public final class Client implements IClient, IOracle
                 if (legion.hasSummonable()
                     && !(((LegionClientSide)legion).isEngaged()))
                 {
-                    set.add(legion.getCurrentHex());
+                    result.add(legion.getCurrentHex());
                 }
             }
         }
-        return set;
+        return result;
     }
 
     public Movement getMovement()
@@ -4397,44 +4382,27 @@ public final class Client implements IClient, IOracle
 
     public List<Legion> getLegionsByHex(MasterHex hex)
     {
+        assert hex != null : "No hex given to find legions on.";
         List<Legion> legions = new ArrayList<Legion>();
-        for (Legion info : legionInfo.values())
+        for (Player player : players)
         {
-            if (info != null && hex.equals(info.getCurrentHex()))
+            for (Legion legion : player.getLegions())
             {
-                legions.add(info);
+                if (hex.equals(legion.getCurrentHex()))
+                {
+                    legions.add(legion);
+                }
             }
         }
         return legions;
     }
 
-    /** 
-     * Returns a list of all legions of a player.
-     * 
-     * TODO this should be integrated on the player side, clients should already call
-     *      {@link Player#getLegions()}.
-     */
-    public List<LegionClientSide> getLegionsByPlayer(Player player)
-    {
-        List<LegionClientSide> result = new ArrayList<LegionClientSide>();
-        for (LegionClientSide legion : legionInfo.values())
-        {
-            if (player.equals(legion.getPlayer()))
-            {
-                result.add(legion);
-            }
-        }
-        LOGGER.log(Level.FINER, "Found " + result.size()
-            + " legions for player " + player.getName());
-        return result;
-    }
-
     Set<MasterHex> findUnmovedLegionHexes()
     {
         Set<MasterHex> result = new HashSet<MasterHex>();
-        for (Legion legion : legionInfo.values())
+        for (Legion legion : activePlayer.getLegions())
         {
-            if (!legion.hasMoved() && activePlayer.equals(legion.getPlayer()))
+            if (!legion.hasMoved())
             {
                 result.add(legion.getCurrentHex());
             }
@@ -4455,10 +4423,9 @@ public final class Client implements IClient, IOracle
     {
         Set<MasterHex> result = new HashSet<MasterHex>();
 
-        for (Legion legion : legionInfo.values())
+        for (Legion legion : activePlayer.getLegions())
         {
-            if (legion.getHeight() >= minHeight
-                && activePlayer.equals(legion.getPlayer()))
+            if (legion.getHeight() >= minHeight)
             {
                 result.add(legion.getCurrentHex());
             }
@@ -4466,7 +4433,13 @@ public final class Client implements IClient, IOracle
         return result;
     }
 
-    /** Return a set of all hexes with engagements. */
+    /**
+     * Return a set of all hexes with engagements.
+     * 
+     * TODO it would probably be cheaper to just establish a Map<MasterHex,Legion>
+     *      checking for the second hit -- that way the iteration would be only
+     *      once on the set of all legions
+     */
     public Set<MasterHex> findEngagements()
     {
         Set<MasterHex> result = new HashSet<MasterHex>();
@@ -4514,72 +4487,78 @@ public final class Client implements IClient, IOracle
 
     public List<Legion> getEnemyLegions(final Player player)
     {
-        return CollectionHelper.selectAsList(legionInfo.values(),
-            new Predicate<Legion>()
+        List<Legion> result = new ArrayList<Legion>();
+        for (Player otherPlayer : players)
+        {
+            if (!otherPlayer.equals(player))
             {
-                public boolean matches(Legion legion)
-                {
-                    return !player.equals(legion.getPlayer());
-                }
-            });
+                result.addAll(otherPlayer.getLegions());
+            }
+        }
+        return result;
     }
 
     public List<Legion> getEnemyLegions(final MasterHex hex,
         final Player player)
     {
-        return CollectionHelper.selectAsList(getLegionsByHex(hex),
-            new Predicate<Legion>()
+        List<Legion> result = new ArrayList<Legion>();
+        for (Player otherPlayer : players)
+        {
+            if (!otherPlayer.equals(player))
             {
-                public boolean matches(Legion legion)
+                for (Legion legion : otherPlayer.getLegions())
                 {
-                    return !player.equals(legion.getPlayer());
+                    if (legion.getCurrentHex().equals(hex))
+                    {
+                        result.add(legion);
+                    }
                 }
-            });
+            }
+        }
+        return result;
     }
 
     public Legion getFirstEnemyLegion(MasterHex hex, Player player)
     {
-        List<Legion> legions = getEnemyLegions(hex, player);
-        if (legions.isEmpty())
+        for (Player otherPlayer : players)
         {
-            return null;
-        }
-        return legions.get(0);
-    }
-
-    public List<Legion> getFriendlyLegions(final Player player)
-    {
-        return CollectionHelper.selectAsList(legionInfo.values(),
-            new Predicate<Legion>()
+            if (!otherPlayer.equals(player))
             {
-                public boolean matches(Legion legion)
+                for (Legion legion : otherPlayer.getLegions())
                 {
-                    return player.equals(legion.getPlayer());
+                    if (legion.getCurrentHex().equals(hex))
+                    {
+                        return legion;
+                    }
                 }
-            });
+            }
+        }
+        return null;
     }
 
     public List<Legion> getFriendlyLegions(final MasterHex hex,
         final Player player)
     {
-        return CollectionHelper.selectAsList(getLegionsByHex(hex),
+        return CollectionHelper.selectAsList(player.getLegions(),
             new Predicate<Legion>()
             {
                 public boolean matches(Legion legion)
                 {
-                    return player.equals(legion.getPlayer());
+                    return legion.getCurrentHex().equals(hex);
                 }
             });
     }
 
-    public Legion getFirstFriendlyLegion(MasterHex hex, Player player)
+    public Legion getFirstFriendlyLegion(final MasterHex hex, Player player)
     {
-        List<Legion> legions = getFriendlyLegions(hex, player);
-        if (legions.isEmpty())
-        {
-            return null;
-        }
-        return legions.get(0);
+        return CollectionHelper.selectFirst(player.getLegions(),
+            new Predicate<Legion>()
+            {
+                public boolean matches(Legion legion)
+                {
+                    return legion.getCurrentHex().equals(hex);
+                }
+            });
     }
 
     // Used by File=>Close and Window closing 
@@ -4679,17 +4658,17 @@ public final class Client implements IClient, IOracle
         if (!isUndoStackEmpty())
         {
             String splitoffId = (String)popUndoStack();
-            undoSplit(splitoffId);
+            undoSplit(getLegion(splitoffId));
         }
     }
 
     // because of synchronization issues we need to
     // be able to pass an undo split request to the server even if it is not
     // yet in the client UndoStack
-    public void undoSplit(String splitoffId)
+    public void undoSplit(Legion splitoff)
     {
-        server.undoSplit(splitoffId);
-        getOwningPlayer().addMarkerAvailable(splitoffId);
+        server.undoSplit(splitoff);
+        getOwningPlayer().addMarkerAvailable(splitoff.getMarkerId());
         numSplitsThisTurn--;
         if (turnNumber == 1 && numSplitsThisTurn == 0)
         {
@@ -5074,8 +5053,7 @@ public final class Client implements IClient, IOracle
         if (isMyTurn() && this.phase == Constants.Phase.SPLIT
             && options.getOption(Options.autoSplit) && !isGameOver())
         {
-            boolean done = ai.splitCallback(parent.getMarkerId(), child
-                .getMarkerId());
+            boolean done = ai.splitCallback(parent, child);
             if (done)
             {
                 doneWithSplits();

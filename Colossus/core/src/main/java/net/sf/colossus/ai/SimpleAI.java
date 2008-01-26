@@ -329,7 +329,7 @@ public class SimpleAI implements AI
     }
 
     /** Unused in this AI; just return true to indicate done. */
-    public boolean splitCallback(String parentId, String childId)
+    public boolean splitCallback(Legion parent, Legion child)
     {
         splitsAcked++;
         return (splitsAcked >= splitsDone);
@@ -919,6 +919,7 @@ public class SimpleAI implements AI
     }
 
     /** Return true if we moved something. */
+    @SuppressWarnings("unchecked")
     private boolean handleVoluntaryMoves(Player player,
         Map<Legion, List<MoveInfo>> moveMap,
         Map<MasterHex, List<Legion>>[] enemyAttackMap)
@@ -926,7 +927,7 @@ public class SimpleAI implements AI
         boolean moved = false;
         // TODO this is still List<LegionClientSide> to get the Comparable
         // -> use a Comparator instead since we are the only ones needing this
-        List<LegionClientSide> legions = ((PlayerClientSide)player)
+        List<LegionClientSide> legions = (List<LegionClientSide>)player
             .getLegions();
 
         // Sort markerIds in descending order of legion importance.
@@ -1776,10 +1777,7 @@ public class SimpleAI implements AI
 
         public boolean otherFriendlyStackHasCreature(List<String> allNames)
         {
-            List<Legion> all = client.getFriendlyLegions(client
-                .getOwningPlayer());
-
-            for (Legion other : all)
+            for (Legion other : client.getOwningPlayer().getLegions())
             {
                 if (!(legion.equals(other)))
                 {

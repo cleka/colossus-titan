@@ -26,7 +26,7 @@ public interface AI
     boolean split();
 
     /** continue making splits.  Return true if done. */
-    boolean splitCallback(String parentId, String childId);
+    boolean splitCallback(Legion parent, Legion child);
 
     /** make recruits for current player */
     void muster();

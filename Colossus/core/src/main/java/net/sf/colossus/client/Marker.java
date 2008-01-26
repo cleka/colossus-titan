@@ -14,6 +14,10 @@ import java.util.logging.Logger;
 
 /**
  * Class Marker implements the GUI for a legion marker.
+ * 
+ * TODO this really represents a whole legion (since it shows the height), so
+ *      it probably should store a Legion object instead of the marker ID
+ * 
  * @version $Id$
  * @author David Ripton
  */
