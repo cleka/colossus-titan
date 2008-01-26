@@ -14,11 +14,13 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -4436,28 +4438,31 @@ public final class Client implements IClient, IOracle
     /**
      * Return a set of all hexes with engagements.
      * 
-     * TODO it would probably be cheaper to just establish a Map<MasterHex,Legion>
-     *      checking for the second hit -- that way the iteration would be only
-     *      once on the set of all legions
+     * TODO if we can be sure that the activePlayer is set properly, we could
+     *      just create a set of all hexes he is on and then check if someone
+     *      else occupies any of the same
      */
     public Set<MasterHex> findEngagements()
     {
         Set<MasterHex> result = new HashSet<MasterHex>();
-        for (MasterHex hex : getGame().getVariant().getMasterBoard()
-            .getAllHexes())
+        Map<MasterHex, Player> playersOnHex = new HashMap<MasterHex, Player>();
+        for (Player player : players)
         {
-            List<Legion> legions = getLegionsByHex(hex);
-            if (legions.size() == 2)
+            for (Legion legion : player.getLegions())
             {
-                Legion legion0 = legions.get(0);
-                Player player0 = legion0.getPlayer();
-
-                Legion legion1 = legions.get(1);
-                Player player1 = legion1.getPlayer();
-
-                if (!player0.equals(player1))
+                MasterHex hex = legion.getCurrentHex();
+                if (playersOnHex.get(hex) == null)
                 {
-                    result.add(hex);
+                    // no player on that hex found yet, set this one
+                    playersOnHex.put(hex, player);
+                }
+                else
+                {
+                    if (!playersOnHex.get(hex).equals(player))
+                    {
+                        // someone else already on the hex -> engagement
+                        result.add(hex);
+                    }
                 }
             }
         }
