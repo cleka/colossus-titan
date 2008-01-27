@@ -1437,7 +1437,7 @@ public final class Server implements IServer
         game.getActivePlayer().undoMove(legion);
         MasterHex currentHex = legion.getCurrentHex();
 
-        PlayerServerSide player = game.getPlayer(game.getActivePlayerName());
+        PlayerServerSide player = game.getActivePlayer();
         // needed in undidMove to decide whether to dis/enable button
         boolean splitLegionHasForcedMove = player.splitLegionHasForcedMove();
 
@@ -1752,7 +1752,7 @@ public final class Server implements IServer
     void allTellDidMove(Legion legion, MasterHex startingHex, MasterHex hex,
         String entrySide, boolean teleport, String teleportingLord)
     {
-        PlayerServerSide player = game.getPlayer(game.getActivePlayerName());
+        PlayerServerSide player = game.getActivePlayer();
         // needed in didMove to decide whether to dis/enable button
         boolean splitLegionHasForcedMove = player.splitLegionHasForcedMove();
 
