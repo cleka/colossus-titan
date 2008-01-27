@@ -4146,10 +4146,11 @@ public final class Client implements IClient, IOracle
      * This way we are independent of when the changes which are triggered by 
      * didRecruit influence the caretaker Stack. 
      * Returns how many creatures can still be recruited (=according
-     * to caretakers stack plus reservations)
+     * to caretaker's stack plus reservations)
      */
     public int getReservedRemain(CreatureType recruitType)
     {
+        assert recruitType != null : "Can not reserve recruit for null";
         int remain;
 
         Integer count = recruitReservations.get(recruitType);
@@ -4164,7 +4165,7 @@ public final class Client implements IClient, IOracle
         }
 
         // in case someone called getReservedRemain with bypassing the 
-        // reset or reserve methods, to be sure doublecheck against the 
+        // reset or reserve methods, to be sure double check against the 
         // real remaining value.
         int realCount = getGame().getCaretaker().getCount(recruitType);
         if (realCount < remain)

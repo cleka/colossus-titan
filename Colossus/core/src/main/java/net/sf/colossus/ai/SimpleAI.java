@@ -1753,6 +1753,9 @@ public class SimpleAI implements AI
 
         public int creatureAvailable(String name)
         {
+            // TODO name doesn't seem to always refer to an actual creature
+            //      type, which means the next line can return null, then
+            //      causing an NPE in getReservedRemain(..)
             CreatureType type = client.getGame().getVariant()
                 .getCreatureByName(name);
             int count = client.getReservedRemain(type);

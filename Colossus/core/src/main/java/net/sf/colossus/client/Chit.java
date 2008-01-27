@@ -75,6 +75,9 @@ class Chit extends JPanel
         this(scale, id, inverted, dubious, false);
     }
 
+    // TODO this is a bit confusing: the id parameter can be either the name of a 
+    //      creature type or a markerId (maybe more?). Good thing markerIds have no
+    //      overlap with creature names
     Chit(int scale, String id, boolean inverted, boolean dubious,
         boolean dubiousAsBlank)
     {

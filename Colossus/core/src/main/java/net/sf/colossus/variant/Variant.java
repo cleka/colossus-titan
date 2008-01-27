@@ -86,8 +86,8 @@ public class Variant
      * TODO in the long run noone should really need this since the names shouldn't
      * be passed around by themselves
      * 
-     * @param name valid name of a creature type (must exist)
-     * @return creature with the given name, null if not a creature
+     * @param name Name of a creature type. Not null.
+     * @return CreatureType with the given name, null no such creature type.
      */
     public CreatureType getCreatureByName(final String name)
     {
@@ -121,7 +121,7 @@ public class Variant
      */
     public boolean isCreature(final String name)
     {
-        return getCreatureByName(name) != null;
+        return creatureTypeByNameCache.containsKey(name.toLowerCase());
     }
 
     public List<CreatureType> getSummonableCreatureTypes()
