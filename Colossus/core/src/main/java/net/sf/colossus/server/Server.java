@@ -128,10 +128,8 @@ public final class Server implements IServer
     {
         numClients = 0;
         maxClients = game.getNumLivingPlayers();
-        LOGGER
-            .log(Level.FINEST, "initSocketServer maxClients = " + maxClients);
-        LOGGER.log(Level.FINEST, "About to create server socket on port "
-            + port);
+        LOGGER.finest("initSocketServer maxClients = " + maxClients);
+        LOGGER.finest("About to create server socket on port " + port);
         try
         {
             if (serverSocket != null)
@@ -180,18 +178,18 @@ public final class Server implements IServer
         }
         else
         {
-            LOGGER.log(Level.FINEST,
-                "No alive remote client, not launching the file server.");
+            LOGGER
+                .finest("No alive remote client, not launching the file server.");
         }
     }
 
     public void waitUntilGameFinishes()
     {
-        LOGGER.log(Level.FINEST, "Server.waitUntilGameFinishes: "
+        LOGGER.finest("Server.waitUntilGameFinishes: "
             + "waitUntilAllChildThreadsGone is next");
         threadMgr.waitUntilAllChildThreadsGone();
         threadMgr.cleanup();
-        LOGGER.log(Level.FINEST, "Server.waitUntilGameFinishes: "
+        LOGGER.finest("Server.waitUntilGameFinishes: "
             + "waitUntilAllChildThreadsGone completed.");
     }
 
@@ -270,14 +268,14 @@ public final class Server implements IServer
     // last SocketClientThread going down calls this
     public synchronized void stopFileServer()
     {
-        LOGGER.log(Level.FINEST, "About to stop file server socket on port "
-            + (port + 1));
+        LOGGER
+            .finest("About to stop file server socket on port " + (port + 1));
 
         if (fileServerThread != null)
         {
             try
             {
-                LOGGER.log(Level.FINEST, "Stopping the FileServerThread ");
+                LOGGER.finest("Stopping the FileServerThread ");
                 ((FileServerThread)fileServerThread).stopGoingOn();
             }
             catch (Exception e)
@@ -318,7 +316,7 @@ public final class Server implements IServer
             // and need to empty it and close all loggers.
             if (activeSocketList.isEmpty())
             {
-                LOGGER.log(Level.FINEST, "Server.unregisterSocket() thread "
+                LOGGER.finest("Server.unregisterSocket() thread "
                     + Thread.currentThread().getName()
                     + ": activeSocketList empty - stopping server...");
                 stopServerRunning();
@@ -336,7 +334,7 @@ public final class Server implements IServer
             // then close everything, too 
             else if (!anyNonAiSocketsLeft())
             {
-                LOGGER.log(Level.FINEST, "Server.unregisterSocket() thread "
+                LOGGER.finest("Server.unregisterSocket() thread "
                     + Thread.currentThread().getName()
                     + ": All connections to human or network players gone "
                     + " (no point to keep AIs running if noone sees it) "
@@ -442,8 +440,7 @@ public final class Server implements IServer
 
     private void createLocalClient(String playerName)
     {
-        LOGGER.log(Level.FINEST, "Called Server.createLocalClient() for "
-            + playerName);
+        LOGGER.finest("Called Server.createLocalClient() for " + playerName);
 
         // a hack to pass something into the Client constructor
         // TODO needs to be constructed properly
@@ -461,8 +458,7 @@ public final class Server implements IServer
     synchronized void addClient(final IClient client, final String playerName,
         final boolean remote)
     {
-        LOGGER.log(Level.FINEST, "Calling Server.addClient() for "
-            + playerName);
+        LOGGER.finest("Calling Server.addClient() for " + playerName);
 
         Player player = null;
         if (remote)
@@ -493,8 +489,7 @@ public final class Server implements IServer
             + player.getName() + " signed on.");
         game.getNotifyWebServer().gotClient(player, remote);
         waitingForClients--;
-        LOGGER.log(Level.INFO, "Decremented waitingForClients to "
-            + waitingForClients);
+        LOGGER.info("Decremented waitingForClients to " + waitingForClients);
 
         if (waitingForClients > 0)
         {
@@ -623,7 +618,7 @@ public final class Server implements IServer
     {
         if (!isBattleActivePlayer())
         {
-            LOGGER.log(Level.SEVERE, getPlayerName()
+            LOGGER.severe(getPlayerName()
                 + " illegally called leaveCarryMode()");
             return;
         }
@@ -635,7 +630,7 @@ public final class Server implements IServer
     {
         if (!isBattleActivePlayer())
         {
-            LOGGER.log(Level.SEVERE, getPlayerName()
+            LOGGER.severe(getPlayerName()
                 + " illegally called doneWithBattleMoves()");
             getClient(getPlayer()).nak(Constants.doneWithBattleMoves,
                 "Illegal attempt to end phase");
@@ -650,7 +645,7 @@ public final class Server implements IServer
         BattleServerSide battle = game.getBattle();
         if (!isBattleActivePlayer())
         {
-            LOGGER.log(Level.SEVERE, getPlayerName()
+            LOGGER.severe(getPlayerName()
                 + " illegally called doneWithStrikes()");
             getClient(getPlayer()).nak(Constants.doneWithStrikes,
                 "Wrong player");
@@ -894,7 +889,7 @@ public final class Server implements IServer
         {
             if (!getPlayer().equals(legion.getPlayer()))
             {
-                LOGGER.log(Level.SEVERE, getPlayerName()
+                LOGGER.severe(getPlayerName()
                     + " illegally called acquireAngel()");
                 return;
             }
@@ -918,8 +913,7 @@ public final class Server implements IServer
     {
         if (!isActivePlayer())
         {
-            LOGGER.log(Level.SEVERE, getPlayerName()
-                + " illegally called doSummon()");
+            LOGGER.severe(getPlayerName() + " illegally called doSummon()");
             return;
         }
         CreatureType creature = null;
@@ -948,23 +942,21 @@ public final class Server implements IServer
 
         if (legion == null)
         {
-            LOGGER.log(Level.SEVERE, getPlayerName()
+            LOGGER.severe(getPlayerName()
                 + " illegally called doRecruit(): no legion");
             client.nak(Constants.doRecruit, "Null legion");
         }
 
         else if (!getPlayer().equals(legion.getPlayer()))
         {
-            LOGGER.log(Level.SEVERE, getPlayerName()
-                + " illegally called doRecruit()");
+            LOGGER.severe(getPlayerName() + " illegally called doRecruit()");
             client.nak(Constants.doRecruit, "Wrong player");
         }
 
         else if (!((LegionServerSide)legion).canRecruit())
         {
-            LOGGER.log(Level.SEVERE, "Illegal legion " + legion
-                + " for recruit: " + recruitName + " recruiterName "
-                + recruiterName);
+            LOGGER.severe("Illegal legion " + legion + " for recruit: "
+                + recruitName + " recruiterName " + recruiterName);
             client.nak(Constants.doRecruit, "Illegal recruit");
         }
 
@@ -991,9 +983,12 @@ public final class Server implements IServer
         }
         else
         {
-            LOGGER.log(Level.SEVERE,
-                "Illegal recruit (not moved, not in battle) with legion "
-                    + legion + " recruit: " + recruitName + " recruiterName "
+            LOGGER
+                .severe("Illegal recruit (not moved, not in battle) with legion "
+                    + legion
+                    + " recruit: "
+                    + recruitName
+                    + " recruiterName "
                     + recruiterName);
             client.nak(Constants.doRecruit, "Illegal recruit");
         }
@@ -1062,8 +1057,7 @@ public final class Server implements IServer
     {
         if (!isActivePlayer())
         {
-            LOGGER.log(Level.SEVERE, getPlayerName()
-                + " illegally called engage()");
+            LOGGER.severe(getPlayerName() + " illegally called engage()");
             return;
         }
         game.engage(hex);
@@ -1071,7 +1065,7 @@ public final class Server implements IServer
 
     void allTellEngagement(MasterHex hex, Legion attacker, Legion defender)
     {
-        LOGGER.log(Level.FINEST, "allTellEngagement() " + hex);
+        LOGGER.finest("allTellEngagement() " + hex);
         Iterator<IClient> it = clients.iterator();
         while (it.hasNext())
         {
@@ -1091,8 +1085,7 @@ public final class Server implements IServer
     {
         if (!getPlayer().equals(legion.getPlayer()))
         {
-            LOGGER.log(Level.SEVERE, getPlayerName()
-                + " illegally called concede()");
+            LOGGER.severe(getPlayerName() + " illegally called concede()");
             return;
         }
         game.concede(legion.getMarkerId());
@@ -1102,8 +1095,8 @@ public final class Server implements IServer
     {
         if (!getPlayer().equals(legion.getPlayer()))
         {
-            LOGGER.log(Level.SEVERE, getPlayerName()
-                + " illegally called doNotConcede()");
+            LOGGER
+                .severe(getPlayerName() + " illegally called doNotConcede()");
             return;
         }
         game.doNotConcede(legion);
@@ -1120,8 +1113,7 @@ public final class Server implements IServer
     {
         if (!getPlayer().equals(legion.getPlayer()))
         {
-            LOGGER.log(Level.SEVERE, getPlayerName()
-                + " illegally called flee()");
+            LOGGER.severe(getPlayerName() + " illegally called flee()");
             return;
         }
         game.flee(legion);
@@ -1131,8 +1123,7 @@ public final class Server implements IServer
     {
         if (!getPlayer().equals(legion.getPlayer()))
         {
-            LOGGER.log(Level.SEVERE, getPlayerName()
-                + " illegally called doNotFlee()");
+            LOGGER.severe(getPlayerName() + " illegally called doNotFlee()");
             return;
         }
         game.doNotFlee(legion);
@@ -1172,15 +1163,15 @@ public final class Server implements IServer
         IClient client = getClient(getPlayer());
         if (!isBattleActivePlayer())
         {
-            LOGGER.log(Level.SEVERE, getPlayerName()
-                + " illegally called doBattleMove()");
+            LOGGER
+                .severe(getPlayerName() + " illegally called doBattleMove()");
             client.nak(Constants.doBattleMove, "Wrong player");
             return;
         }
         boolean moved = game.getBattle().doMove(tag, hexLabel);
         if (!moved)
         {
-            LOGGER.log(Level.SEVERE, "Battle move failed");
+            LOGGER.severe("Battle move failed");
             client.nak(Constants.doBattleMove, "Illegal move");
         }
     }
@@ -1201,52 +1192,50 @@ public final class Server implements IServer
         IClient client = getClient(getPlayer());
         if (!isBattleActivePlayer())
         {
-            LOGGER.log(Level.SEVERE, getPlayerName()
-                + " illegally called strike()");
+            LOGGER.severe(getPlayerName() + " illegally called strike()");
             client.nak(Constants.strike, "Wrong player");
             return;
         }
         BattleServerSide battle = game.getBattle();
         if (battle == null)
         {
-            LOGGER.log(Level.SEVERE, "null battle in Server.strike()");
+            LOGGER.severe("null battle in Server.strike()");
             client.nak(Constants.strike, "No battle");
             return;
         }
         LegionServerSide legion = battle.getActiveLegion();
         if (legion == null)
         {
-            LOGGER.log(Level.SEVERE, "null active legion in Server.strike()");
+            LOGGER.severe("null active legion in Server.strike()");
             client.nak(Constants.strike, "No active legion");
             return;
         }
         CreatureServerSide critter = legion.getCritterByTag(tag);
         if (critter == null)
         {
-            LOGGER.log(Level.SEVERE, "No critter with tag " + tag
-                + " in Server.strike()");
+            LOGGER
+                .severe("No critter with tag " + tag + " in Server.strike()");
             client.nak(Constants.strike, "No critter with that tag");
             return;
         }
         CreatureServerSide target = battle.getCritter(hexLabel);
         if (target == null)
         {
-            LOGGER.log(Level.SEVERE, "No target in hex " + hexLabel
+            LOGGER.severe("No target in hex " + hexLabel
                 + " in Server.strike()");
             client.nak(Constants.strike, "No target in that hex");
             return;
         }
         if (target.getPlayer() == critter.getPlayer())
         {
-            LOGGER.log(Level.SEVERE, critter.getDescription()
+            LOGGER.severe(critter.getDescription()
                 + " tried to strike allied " + target.getDescription());
             client.nak(Constants.strike, "Target is friendly");
             return;
         }
         if (critter.hasStruck())
         {
-            LOGGER.log(Level.SEVERE, critter.getDescription()
-                + " tried to strike twice");
+            LOGGER.severe(critter.getDescription() + " tried to strike twice");
             client.nak(Constants.strike, "Critter already struck");
             return;
         }
@@ -1257,8 +1246,8 @@ public final class Server implements IServer
     {
         if (!isBattleActivePlayer())
         {
-            LOGGER.log(Level.SEVERE, getPlayerName()
-                + " illegally called applyCarries()");
+            LOGGER
+                .severe(getPlayerName() + " illegally called applyCarries()");
             return;
         }
         BattleServerSide battle = game.getBattle();
@@ -1270,7 +1259,7 @@ public final class Server implements IServer
     {
         if (!isBattleActivePlayer())
         {
-            LOGGER.log(Level.SEVERE, getPlayerName()
+            LOGGER.severe(getPlayerName()
                 + " illegally called undoBattleMove()");
             return;
         }
@@ -1303,19 +1292,18 @@ public final class Server implements IServer
     {
         if (striker == null || target == null || rolls == null)
         {
-            LOGGER.log(Level.SEVERE,
-                "Called allTellCarryResults() without setup.");
+            LOGGER.severe("Called allTellCarryResults() without setup.");
             if (striker == null)
             {
-                LOGGER.log(Level.SEVERE, "null striker");
+                LOGGER.severe("null striker");
             }
             if (target == null)
             {
-                LOGGER.log(Level.SEVERE, "null target");
+                LOGGER.severe("null target");
             }
             if (rolls == null)
             {
-                LOGGER.log(Level.SEVERE, "null rolls");
+                LOGGER.severe("null rolls");
             }
             return;
         }
@@ -1363,14 +1351,14 @@ public final class Server implements IServer
     {
         if (!isBattleActivePlayer())
         {
-            LOGGER.log(Level.SEVERE, getPlayerName()
+            LOGGER.severe(getPlayerName()
                 + " illegally called assignStrikePenalty()");
             getClient(getPlayer()).nak(Constants.assignStrikePenalty,
                 "Wrong player");
         }
         else if (striker.hasStruck())
         {
-            LOGGER.log(Level.SEVERE, getPlayerName()
+            LOGGER.severe(getPlayerName()
                 + " assignStrikePenalty -- already struck");
             getClient(getPlayer()).nak(Constants.assignStrikePenalty,
                 "Critter already struck");
@@ -1408,13 +1396,11 @@ public final class Server implements IServer
     {
         if (!isActivePlayer())
         {
-            LOGGER.log(Level.SEVERE, getPlayerName()
-                + " illegally called mulligan()");
+            LOGGER.severe(getPlayerName() + " illegally called mulligan()");
             return;
         }
         int roll = game.mulligan();
-        LOGGER.log(Level.INFO, getPlayerName()
-            + " takes a mulligan and rolls " + roll);
+        LOGGER.info(getPlayerName() + " takes a mulligan and rolls " + roll);
     }
 
     public void undoSplit(Legion splitoff)
@@ -1477,7 +1463,7 @@ public final class Server implements IServer
     {
         if (!isActivePlayer())
         {
-            LOGGER.log(Level.SEVERE, getPlayerName()
+            LOGGER.severe(getPlayerName()
                 + " illegally (wrong player) called "
                 + "doneWithSplits() - active player is "
                 + game.getActivePlayer().getName());
@@ -1501,7 +1487,7 @@ public final class Server implements IServer
         PlayerServerSide player = game.getActivePlayer();
         if (!isActivePlayer())
         {
-            LOGGER.log(Level.SEVERE, getPlayerName()
+            LOGGER.severe(getPlayerName()
                 + " illegally called doneWithMoves()");
             getClient(getPlayer())
                 .nak(Constants.doneWithMoves, "Wrong player");
@@ -1510,7 +1496,7 @@ public final class Server implements IServer
         // the player must move at least one legion.
         else if (player.legionsMoved() == 0 && player.countMobileLegions() > 0)
         {
-            LOGGER.log(Level.FINEST, "At least one legion must move.");
+            LOGGER.finest("At least one legion must move.");
             getClient(getPlayer()).nak(Constants.doneWithMoves,
                 "Must move at least one legion");
         }
@@ -1518,7 +1504,7 @@ public final class Server implements IServer
         // non-teleport move, force one of them to take it.
         else if (player.splitLegionHasForcedMove())
         {
-            LOGGER.log(Level.FINEST, "Split legions must be separated.");
+            LOGGER.finest("Split legions must be separated.");
             getClient(getPlayer()).nak(Constants.doneWithMoves,
                 "Must separate split legions");
         }
@@ -1535,7 +1521,7 @@ public final class Server implements IServer
     {
         if (!isActivePlayer())
         {
-            LOGGER.log(Level.SEVERE, getPlayerName()
+            LOGGER.severe(getPlayerName()
                 + " illegally called doneWithEngagements()");
             getClient(getPlayer()).nak(Constants.doneWithEngagements,
                 "Wrong player");
@@ -1556,7 +1542,7 @@ public final class Server implements IServer
     {
         if (!isActivePlayer())
         {
-            LOGGER.log(Level.SEVERE, getPlayerName()
+            LOGGER.severe(getPlayerName()
                 + " illegally called doneWithRecruits()");
             getClient(getPlayer()).nak(Constants.doneWithRecruits,
                 "Wrong player");
@@ -1637,8 +1623,7 @@ public final class Server implements IServer
     {
         if (!isActivePlayer())
         {
-            LOGGER.log(Level.SEVERE, getPlayerName()
-                + " illegally called setDonor()");
+            LOGGER.severe(getPlayerName() + " illegally called setDonor()");
             return;
         }
         PlayerServerSide player = game.getActivePlayer();
@@ -1648,8 +1633,7 @@ public final class Server implements IServer
         }
         else
         {
-            LOGGER.log(Level.SEVERE, "Bad arg to Server.getDonor() for "
-                + donor);
+            LOGGER.severe("Bad arg to Server.getDonor() for " + donor);
         }
     }
 
@@ -1672,14 +1656,13 @@ public final class Server implements IServer
         IClient client = getClient(getPlayer());
         if (!isActivePlayer())
         {
-            LOGGER.log(Level.SEVERE, getPlayerName()
-                + " illegally called doSplit()");
+            LOGGER.severe(getPlayerName() + " illegally called doSplit()");
             client.nak(Constants.doSplit, "Wrong player");
             return;
         }
         if (!game.doSplit(parent, childId, results))
         {
-            LOGGER.log(Level.SEVERE, "split failed for " + parent);
+            LOGGER.severe("split failed for " + parent);
             client.nak(Constants.doSplit, "Illegal split");
         }
     }
@@ -1746,8 +1729,7 @@ public final class Server implements IServer
         IClient client = getClient(getPlayer());
         if (!isActivePlayer())
         {
-            LOGGER.log(Level.SEVERE, getPlayerName()
-                + " illegally called doMove()");
+            LOGGER.severe(getPlayerName() + " illegally called doMove()");
             client.nak(Constants.doMove, "Wrong player");
             return;
         }
@@ -1762,7 +1744,7 @@ public final class Server implements IServer
         }
         else
         {
-            LOGGER.log(Level.SEVERE, "Move failed");
+            LOGGER.severe("Move failed");
             client.nak(Constants.doMove, "Illegal move: " + reasonFail);
         }
     }
@@ -1956,8 +1938,8 @@ public final class Server implements IServer
     /** Used to change a player name after color is assigned. */
     void setPlayerName(Player player, String newName)
     {
-        LOGGER.log(Level.FINEST, "Server.setPlayerName() from "
-            + player.getName() + " to " + newName);
+        LOGGER.finest("Server.setPlayerName() from " + player.getName()
+            + " to " + newName);
         IClient client = getClient(player);
         client.setPlayerName(newName);
     }
@@ -1975,8 +1957,7 @@ public final class Server implements IServer
     {
         if (!getPlayer().equals(game.getNextColorPicker()))
         {
-            LOGGER.log(Level.SEVERE, getPlayerName()
-                + " illegally called assignColor()");
+            LOGGER.severe(getPlayerName() + " illegally called assignColor()");
             return;
         }
         if (getPlayer() == null || getPlayer().getColor() == null)
@@ -2103,9 +2084,8 @@ public final class Server implements IServer
      */
     public void startupProgressQuit()
     {
-        LOGGER.log(Level.SEVERE,
-            "User pressed 'QUIT' in startupProgress window "
-                + "- doing System.exit(1)");
+        LOGGER.severe("User pressed 'QUIT' in startupProgress window "
+            + "- doing System.exit(1)");
         System.exit(1);
     }
 
