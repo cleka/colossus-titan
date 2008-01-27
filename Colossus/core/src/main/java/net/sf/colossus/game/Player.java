@@ -117,6 +117,7 @@ public class Player
         this.name = playerName;
         this.number = number;
         this.dead = false;
+        this.mulligansLeft = 1;
     }
 
     public Game getGame()
