@@ -11,6 +11,7 @@ import java.util.logging.Logger;
 import net.sf.colossus.client.Client;
 import net.sf.colossus.client.StartClient;
 import net.sf.colossus.client.WebClient;
+import net.sf.colossus.game.Game;
 import net.sf.colossus.util.DebugMethods;
 import net.sf.colossus.util.Options;
 import net.sf.colossus.util.ViableEntityManager;
@@ -222,16 +223,12 @@ public final class Start
         boolean failed = false;
         try
         {
-            boolean remote = true;
-            boolean byWeb = false;
-
             // a hack to pass something into the Client constructor
             // TODO needs to be constructed properly
-            net.sf.colossus.game.Game dummyGame = new net.sf.colossus.game.Game(
-                null, new String[0]);
+            Game dummyGame = new Game(null, new String[0]);
 
-            Client c = new Client(hostname, port, dummyGame, playerName,
-                remote, byWeb);
+            Client c = new Client(hostname, port, dummyGame, playerName, true,
+                false);
             failed = c.getFailed();
             c = null;
         }

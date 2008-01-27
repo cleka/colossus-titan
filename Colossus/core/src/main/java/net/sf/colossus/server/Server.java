@@ -472,7 +472,7 @@ public final class Server implements IServer
 
         if (player == null)
         {
-            LOGGER.log(Level.WARNING, "Could not add client, "
+            LOGGER.warning("Could not add client, "
                 + "because no Player was found for playerName " + playerName);
             return;
         }

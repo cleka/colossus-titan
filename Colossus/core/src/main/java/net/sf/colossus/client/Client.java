@@ -265,41 +265,23 @@ public final class Client implements IClient, IOracle
 
     private boolean disposeInProgress = false;
 
+    /**
+     * TODO since Client is currently still the equivalent of GameClientSide it should
+     *      create the Game instance instead of getting it passed in. The problem is
+     *      getting all the player names to begin with.
+     *      
+     * TODO try to make the Client class agnostic of the network or not question by
+     *      having the SCT outside and behaving like a normal server -- that way it
+     *      would be easier to run the local clients without the detour across the
+     *      network and the serialization/deserialization of all objects
+     */
     public Client(String host, int port, Game game, String playerName,
         boolean remote, boolean byWebClient)
     {
-        assert playerName != null;
-
-        this.game = game;
-
-        // TODO this is currently not set properly straight away, it is fixed in
-        // updatePlayerInfo(..) when the PlayerInfos are initialized. Should really
-        // happen here, but doesn't yet since we don't have all players (not even as
-        // names) yet
-        this.owningPlayer = new PlayerClientSide(getGame(), playerName, 0);
-
-        this.noone = new PlayerClientSide(getGame(), "", 0);
-        this.activePlayer = noone;
-        this.battleActivePlayer = noone;
+        this(game, playerName);
 
         this.remote = remote;
         this.startedByWebClient = byWebClient;
-        this.threadMgr = new ChildThreadManager("Client " + playerName);
-
-        this.simpleAI = new SimpleAI(this);
-        this.ai = this.simpleAI;
-
-        this.movement = new Movement(this);
-        this.battleMovement = new BattleMovement(this);
-        this.strike = new Strike(this);
-
-        ViableEntityManager.register(this, "Client " + playerName);
-        InstanceTracker.register(this, "Client " + playerName);
-
-        options = new Options(playerName);
-        setupOptionListeners();
-        // Need to load options early so they don't overwrite server options.
-        loadOptions();
 
         sct = new SocketClientThread(this, host, port);
 
@@ -342,6 +324,40 @@ public final class Client implements IClient, IOracle
             CustomRecruitBase.addCaretakerClientSide(getGame().getCaretaker());
             failed = false;
         }
+    }
+
+    private Client(Game game, String playerName)
+    {
+        assert playerName != null;
+
+        this.game = game;
+
+        // TODO this is currently not set properly straight away, it is fixed in
+        // updatePlayerInfo(..) when the PlayerInfos are initialized. Should really
+        // happen here, but doesn't yet since we don't have all players (not even as
+        // names) yet
+        this.owningPlayer = new PlayerClientSide(getGame(), playerName, 0);
+
+        this.noone = new PlayerClientSide(getGame(), "", 0);
+        this.activePlayer = noone;
+        this.battleActivePlayer = noone;
+
+        this.threadMgr = new ChildThreadManager("Client " + playerName);
+
+        this.simpleAI = new SimpleAI(this);
+        this.ai = this.simpleAI;
+
+        this.movement = new Movement(this);
+        this.battleMovement = new BattleMovement(this);
+        this.strike = new Strike(this);
+
+        ViableEntityManager.register(this, "Client " + playerName);
+        InstanceTracker.register(this, "Client " + playerName);
+
+        options = new Options(playerName);
+        setupOptionListeners();
+        // Need to load options early so they don't overwrite server options.
+        loadOptions();
     }
 
     public ChildThreadManager getThreadMgr()
@@ -1453,11 +1469,6 @@ public final class Client implements IClient, IOracle
     {
         disposeInProgress = true;
 
-        if (sct == null)
-        {
-            return;
-        }
-
         sct = null;
         server = null;
 
@@ -2145,8 +2156,7 @@ public final class Client implements IClient, IOracle
 
     private Object popUndoStack()
     {
-        Object object = undoStack.removeFirst();
-        return object;
+        return undoStack.removeFirst();
     }
 
     private void pushUndoStack(Object object)
@@ -2262,18 +2272,19 @@ public final class Client implements IClient, IOracle
     {
         this.owningPlayer.setName(playerName);
         // all those just for debugging purposes:
-        net.sf.colossus.webcommon.InstanceTracker.setId(this, "Client "
-            + playerName);
+        InstanceTracker.setId(this, "Client " + playerName);
         // set name right for the autoplay-AI
-        net.sf.colossus.webcommon.InstanceTracker.setId(this.simpleAI,
-            "Autoplay-SimpleAI " + playerName);
+        InstanceTracker
+            .setId(this.simpleAI, "Autoplay-SimpleAI " + playerName);
         if (ai != simpleAI)
         {
             // set name right for the AI if this is an AI player
-            net.sf.colossus.webcommon.InstanceTracker.setId(ai, "AI: "
-                + playerName);
+            InstanceTracker.setId(ai, "AI: " + playerName);
         }
-        sct.fixName(playerName);
+        if (sct != null)
+        {
+            sct.fixName(playerName);
+        }
     }
 
     SummonAngel getSummonAngel()

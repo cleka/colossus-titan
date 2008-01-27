@@ -201,7 +201,8 @@ public final class GameServerSide extends Game
         }
         catch (Exception e)
         {
-            LOGGER.log(Level.SEVERE, "Game.initServer(): got Exception " + e);
+            LOGGER.log(Level.SEVERE, "Server initialization got Exception "
+                + e.getMessage(), e);
         }
     }
 
