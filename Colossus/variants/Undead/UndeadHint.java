@@ -32,10 +32,10 @@ public class UndeadHint implements net.sf.colossus.server.HintInterface
         }
         else if (terrain.equals("Plains"))
         {
-            if (recruitNames.contains("Naga") && !legion.contains("Griffon")
+            if (recruitNames.contains("Naga") && !legion.contains("Griffin")
                 && legion.numCreature("Naga") == 2
                 && oracle.canReach("Desert")
-                && oracle.creatureAvailable("Griffon") >= 2)
+                && oracle.creatureAvailable("Griffin") >= 2)
             {
                 return "Naga";
             }

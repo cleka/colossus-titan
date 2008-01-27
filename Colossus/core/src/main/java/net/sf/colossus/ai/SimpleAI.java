@@ -1756,6 +1756,9 @@ public class SimpleAI implements AI
             // TODO name doesn't seem to always refer to an actual creature
             //      type, which means the next line can return null, then
             //      causing an NPE in getReservedRemain(..)
+            // Still TODO ?
+            //      Fixed "Griffon vs. Griffin" in Undead, which was the
+            //      reason in all cases I got that exception (Clemens).
             CreatureType type = client.getGame().getVariant()
                 .getCreatureByName(name);
             int count = client.getReservedRemain(type);
