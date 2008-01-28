@@ -1133,7 +1133,7 @@ public final class Client implements IClient, IOracle
     }
 
     // TODO fix this mess with lots of different methods for retrieving Player[Info]s
-    PlayerClientSide getPlayerInfo(int playerNum)
+    PlayerClientSide getPlayer(int playerNum)
     {
         return players[playerNum];
     }
@@ -3494,7 +3494,7 @@ public final class Client implements IClient, IOracle
     // public for RevealEvent
     public String getShortColor(int playerNum)
     {
-        PlayerClientSide player = getPlayerInfo(playerNum);
+        PlayerClientSide player = getPlayer(playerNum);
         return player.getShortColor();
     }
 

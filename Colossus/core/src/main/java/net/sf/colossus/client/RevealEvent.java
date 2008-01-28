@@ -136,7 +136,7 @@ public class RevealEvent
         this.oldRoll = oldRoll;
         this.newRoll = newRoll;
 
-        PlayerClientSide info = client.getPlayerInfo(playerNr);
+        PlayerClientSide info = client.getPlayer(playerNr);
         this.mulliganTitanBaseName = getTitanBasename(info);
     }
 
@@ -359,7 +359,7 @@ public class RevealEvent
 
     public Player getPlayer()
     {
-        return client.getPlayerInfo(playerNr);
+        return client.getPlayer(playerNr);
     }
 
     public int getPlayerNr()
@@ -525,7 +525,7 @@ public class RevealEvent
                 LOGGER.log(Level.SEVERE, "While trying to get chit: ", e);
                 // if solid marker does not exist for this color,
                 // use as fallback the Titan chit.
-                PlayerClientSide info = client.getPlayerInfo(playerNr);
+                PlayerClientSide info = client.getPlayer(playerNr);
                 solidMarker = new Chit(scale, getTitanBasename(info));
             }
         }

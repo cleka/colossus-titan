@@ -15,6 +15,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import net.sf.colossus.game.Player;
 import net.sf.colossus.util.KDialog;
 import net.sf.colossus.util.Options;
 
@@ -260,17 +261,17 @@ final class StatusScreen extends KDialog implements WindowListener
 
         for (int i = 0; i < numPlayers; i++)
         {
-            PlayerClientSide info = client.getPlayerInfo(i);
+            Player player = client.getPlayer(i);
             Color color, bgcolor, fgcolor;
 
-            if (info.isDead())
+            if (player.isDead())
             {
                 color = Color.RED;
                 setPlayerLabelBackground(i, color);
             }
             else
             {
-                if (oracle.getActivePlayer().equals(info))
+                if (oracle.getActivePlayer().equals(player))
                 {
                     color = Color.YELLOW;
                 }
@@ -279,10 +280,10 @@ final class StatusScreen extends KDialog implements WindowListener
                     color = Color.LIGHT_GRAY;
                 }
 
-                if (!info.getColor().equals("null"))
+                if (!player.getColor().equals("null"))
                 {
-                    bgcolor = PickColor.getBackgroundColor(info.getColor());
-                    fgcolor = PickColor.getForegroundColor(info.getColor());
+                    bgcolor = PickColor.getBackgroundColor(player.getColor());
+                    fgcolor = PickColor.getForegroundColor(player.getColor());
                 }
                 else
                 {
@@ -293,22 +294,22 @@ final class StatusScreen extends KDialog implements WindowListener
                 setPlayerLabelColors(nameLabel[i], bgcolor, fgcolor);
             }
 
-            nameLabel[i].setText(info.getName());
-            if (info.canTitanTeleport())
+            nameLabel[i].setText(player.getName());
+            if (player.canTitanTeleport())
             {
-                nameLabel[i].setText(info.getName() + "*");
+                nameLabel[i].setText(player.getName() + "*");
             }
             else
             {
-                nameLabel[i].setText(info.getName());
+                nameLabel[i].setText(player.getName());
             }
-            towerLabel[i].setText("" + info.getStartingTower().getLabel());
-            elimLabel[i].setText(info.getPlayersElim());
-            legionsLabel[i].setText("" + info.getNumLegions());
-            markersLabel[i].setText("" + info.getNumMarkersAvailable());
-            creaturesLabel[i].setText("" + info.getNumCreatures());
-            titanLabel[i].setText("" + info.getTitanPower());
-            scoreLabel[i].setText("" + info.getScore());
+            towerLabel[i].setText("" + player.getStartingTower().getLabel());
+            elimLabel[i].setText(player.getPlayersElim());
+            legionsLabel[i].setText("" + player.getNumLegions());
+            markersLabel[i].setText("" + player.getNumMarkersAvailable());
+            creaturesLabel[i].setText("" + player.getNumCreatures());
+            titanLabel[i].setText("" + player.getTitanPower());
+            scoreLabel[i].setText("" + player.getScore());
         }
 
         repaint();
