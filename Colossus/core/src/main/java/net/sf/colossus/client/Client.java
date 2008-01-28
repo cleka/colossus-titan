@@ -1182,7 +1182,7 @@ public final class Client implements IClient, IOracle
 
     public void updateCreatureCount(CreatureType type, int count, int deadCount)
     {
-        getGame().getCaretaker().setCount(type, count);
+        getGame().getCaretaker().setAvailableCount(type, count);
         getGame().getCaretaker().setDeadCount(type, deadCount);
         updateCreatureCountDisplay();
     }
@@ -4127,7 +4127,7 @@ public final class Client implements IClient, IOracle
                 + " reserveRecruit creature " + recruitType
                 + " not fround from hash, should have been created"
                 + " during getReservedCount!");
-            remain = getGame().getCaretaker().getCount(recruitType);
+            remain = getGame().getCaretaker().getAvailableCount(recruitType);
         }
 
         if (remain > 0)
@@ -4156,7 +4156,7 @@ public final class Client implements IClient, IOracle
         Integer count = recruitReservations.get(recruitType);
         if (count == null)
         {
-            remain = getGame().getCaretaker().getCount(recruitType);
+            remain = getGame().getCaretaker().getAvailableCount(recruitType);
         }
         else
         {
@@ -4167,7 +4167,7 @@ public final class Client implements IClient, IOracle
         // in case someone called getReservedRemain with bypassing the 
         // reset or reserve methods, to be sure double check against the 
         // real remaining value.
-        int realCount = getGame().getCaretaker().getCount(recruitType);
+        int realCount = getGame().getCaretaker().getAvailableCount(recruitType);
         if (realCount < remain)
         {
             remain = realCount;
@@ -4232,7 +4232,7 @@ public final class Client implements IClient, IOracle
         while (it.hasNext())
         {
             CreatureType recruit = it.next();
-            int remaining = getGame().getCaretaker().getCount(recruit);
+            int remaining = getGame().getCaretaker().getAvailableCount(recruit);
 
             if (remaining > 0 && considerReservations)
             {

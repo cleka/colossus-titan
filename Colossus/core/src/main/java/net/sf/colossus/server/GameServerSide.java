@@ -147,7 +147,7 @@ public final class GameServerSide extends Game
         Server server = getServer();
         if (server != null)
         {
-            server.allUpdateCreatureCount(type, getCaretaker().getCount(type),
+            server.allUpdateCreatureCount(type, getCaretaker().getAvailableCount(type),
                 getCaretaker().getDeadCount(type));
         }
     }
@@ -1247,7 +1247,7 @@ public final class GameServerSide extends Game
                 el = new Element("Creature");
                 el.setAttribute("name", creature.getName());
                 el.setAttribute("remaining", ""
-                    + getCaretaker().getCount(creature));
+                    + getCaretaker().getAvailableCount(creature));
                 el.setAttribute("dead", ""
                     + getCaretaker().getDeadCount(creature));
                 car.addContent(el);
@@ -1509,7 +1509,7 @@ public final class GameServerSide extends Game
                 CreatureType creature = getVariant().getCreatureByName(
                     creatureName);
 
-                getCaretaker().setCount(creature, remaining);
+                getCaretaker().setAvailableCount(creature, remaining);
                 getCaretaker().setDeadCount(creature, dead);
             }
 
@@ -1851,7 +1851,7 @@ public final class GameServerSide extends Game
         while (it.hasNext())
         {
             CreatureType recruit = it.next();
-            if (getCaretaker().getCount(recruit) < 1)
+            if (getCaretaker().getAvailableCount(recruit) < 1)
             {
                 it.remove();
             }
@@ -1980,7 +1980,7 @@ public final class GameServerSide extends Game
         {
             String name = it.next();
 
-            if (getCaretaker().getCount(getVariant().getCreatureByName(name)) >= 1
+            if (getCaretaker().getAvailableCount(getVariant().getCreatureByName(name)) >= 1
                 && !recruits.contains(name))
             {
                 recruits.add(name);

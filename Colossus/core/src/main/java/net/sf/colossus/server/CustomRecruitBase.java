@@ -96,13 +96,13 @@ abstract public class CustomRecruitBase
         while (it.hasNext())
         {
             Caretaker ci = it.next();
-            ci.setCount(type, newCount);
+            ci.setAvailableCount(type, newCount);
         }
         // update the Caretaker if we're server
         if (serverGame != null)
         {
             // first update the server's count
-            serverGame.getCaretaker().setCount(type, newCount);
+            serverGame.getCaretaker().setAvailableCount(type, newCount);
         }
     }
 
@@ -115,7 +115,7 @@ abstract public class CustomRecruitBase
         {
             Caretaker ci = it.next();
             oldcount = count;
-            count = ci.getCount(type);
+            count = ci.getAvailableCount(type);
             if ((oldcount != -1) && (count != oldcount))
             {
                 LOGGER.log(Level.SEVERE,
@@ -127,7 +127,7 @@ abstract public class CustomRecruitBase
         if ((serverGame != null) && (count == -1))
         {
             oldcount = count;
-            count = serverGame.getCaretaker().getCount(type);
+            count = serverGame.getCaretaker().getAvailableCount(type);
             if ((oldcount != -1) && (count != oldcount))
             {
                 LOGGER.log(Level.SEVERE,

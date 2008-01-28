@@ -97,7 +97,7 @@ public class Caretaker
         triggerFullUpdate();
     }
 
-    public void setCount(CreatureType type, int availableCount)
+    public void setAvailableCount(CreatureType type, int availableCount)
     {
         assert type != null : "Can not update counts unless creature type given";
         creatureAvailableCounts.put(type, Integer.valueOf(availableCount));
@@ -111,7 +111,7 @@ public class Caretaker
         triggerOneDeadCount(type, deadCount);
     }
 
-    public int getCount(CreatureType type)
+    public int getAvailableCount(CreatureType type)
     {
         return creatureAvailableCounts.get(type).intValue();
     }
@@ -163,15 +163,15 @@ public class Caretaker
     public void takeOne(CreatureType type)
     {
         assert type != null : "Can not take null creature type";
-        int count = getCount(type);
+        int count = getAvailableCount(type);
         assert count > 0 : "Trying to take creature that doesn't exist anymore";
-        setCount(type, count - 1);
+        setAvailableCount(type, count - 1);
     }
 
     public void putOneBack(CreatureType type)
     {
         assert type != null : "Can not put null creature type back";
-        setCount(type, getCount(type) + 1);
+        setAvailableCount(type, getAvailableCount(type) + 1);
     }
 
     public void putDeadOne(CreatureType type)
@@ -192,7 +192,7 @@ public class Caretaker
                 int dead = getDeadCount(type);
                 if (dead > 0)
                 {
-                    int live = getCount(type);
+                    int live = getAvailableCount(type);
                     // Don't use setCount() / setDeadCount(), because we 
                     // want to update displays only at the end. 
                     creatureAvailableCounts.put(type, Integer.valueOf(live

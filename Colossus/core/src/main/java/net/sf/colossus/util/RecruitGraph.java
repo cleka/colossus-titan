@@ -109,7 +109,7 @@ public class RecruitGraph
             {
                 CreatureType type = VariantSupport.getCurrentVariant()
                     .getCreatureByName(cre);
-                return graph.getCaretaker().getCount(type);
+                return graph.getCaretaker().getAvailableCount(type);
             }
             else
             {

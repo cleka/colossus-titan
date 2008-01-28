@@ -468,7 +468,7 @@ public final class LegionServerSide extends Legion implements
         if (takeFromStack)
         {
             Caretaker caretaker = game.getCaretaker();
-            if (caretaker.getCount(creature) > 0)
+            if (caretaker.getAvailableCount(creature) > 0)
             {
                 caretaker.takeOne(creature);
             }

@@ -205,7 +205,7 @@ class CreatureCollectionView extends KDialog
             {
                 CreatureType type = entry.getKey();
                 JLabel label = entry.getValue();
-                int count = client.getGame().getCaretaker().getCount(type);
+                int count = client.getGame().getCaretaker().getAvailableCount(type);
                 int maxcount = type.getMaxCount();
                 int deadCount = client.getGame().getCaretaker().getDeadCount(
                     type);
