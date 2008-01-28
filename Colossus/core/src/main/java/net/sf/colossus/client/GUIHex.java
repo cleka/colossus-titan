@@ -6,6 +6,8 @@ import java.awt.Rectangle;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
 
+import javax.swing.JComponent;
+
 
 /**
  *  Abstract parent class for various hexes
@@ -14,7 +16,7 @@ import java.awt.geom.Point2D;
  * 
  */
 
-public abstract class GUIHex
+public abstract class GUIHex extends JComponent
 {
     public static final double SQRT3 = Math.sqrt(3.0);
 
@@ -51,11 +53,13 @@ public abstract class GUIHex
         this.model = model;
     }
 
+    @Override
     public Rectangle getBounds()
     {
         return rectBound;
     }
 
+    @Override
     public boolean contains(Point point)
     {
         return (hexagon.contains(point));

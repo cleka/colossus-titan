@@ -49,7 +49,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
         .getName());
 
     private final String masterHexLabel;
-    private final String terrain;
+    final String terrain;
 
     // GUI hexes need to be recreated for each object, since scale varies.
     private final GUIBattleHex[][] h = new GUIBattleHex[6][6];

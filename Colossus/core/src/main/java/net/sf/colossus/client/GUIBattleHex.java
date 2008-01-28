@@ -4,6 +4,7 @@ package net.sf.colossus.client;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -39,7 +40,6 @@ public class GUIBattleHex extends GUIHex
     private static final Logger LOGGER = Logger.getLogger(GUIBattleHex.class
         .getName());
 
-    private GeneralPath innerHexagon;
     private Component map;
     private static final Color highlightColor = Color.red;
 
@@ -52,28 +52,57 @@ public class GUIBattleHex extends GUIHex
      */
     private final GUIBattleHex[] neighbors = new GUIBattleHex[6];
 
+    private int scale;
+    private int cx; /* x location of upper left Vertex */
+    private int cy; /* Y location of upper left Vertex */
+
     // Hex terrain types are:
     // p, r, s, t, o, v, d, w
     // plain, bramble, sand, tree, bog, volcano, drift, tower
     // also
     // l
     // lake
-
     // Hexside terrain types are:
     // d, c, s, w, space
     // dune, cliff, slope, wall, no obstacle
     // The hexside is marked only in the higher hex.
-
     // Hex labels are:
     // A1-A3, B1-B4, C1-C5, D1-D6, E1-E5, F1-F4.
     // Letters increase left to right; numbers increase bottom to top.
-
     public GUIBattleHex(int cx, int cy, int scale, Component map, int xCoord,
         int yCoord)
     {
         super(new BattleHex(xCoord, yCoord));
+        this.cx = cx;
+        this.cy = cy;
         this.map = map;
+        this.scale = scale;
 
+        makeHexagon();
+
+    }
+
+    /* constructs a dummy with Battle map Coords */
+    public GUIBattleHex(int xCoord, int yCoord)
+    {
+        super(new BattleHex(xCoord, yCoord));
+    }
+
+    public void setVertexZeroLocation(int cx, int cy)
+    {
+        this.cx = cx;
+        this.cy = cy;
+        makeHexagon();
+    }
+
+    public void setWidth(int width)
+    {
+        scale = width / 4;
+        makeHexagon();
+    }
+
+    private void makeHexagon()
+    {
         len = scale / 3.0;
 
         xVertex[0] = cx;
@@ -91,7 +120,12 @@ public class GUIBattleHex extends GUIHex
 
         hexagon = makePolygon(6, xVertex, yVertex, true);
         rectBound = hexagon.getBounds();
+        setPreferredSize(new Dimension(rectBound.width, rectBound.height));
+    }
 
+    private GeneralPath getInnerHexagon()
+    {
+        GeneralPath innerHexagon = null;
         Point2D.Double center = findCenter2D();
 
         final double innerScale = 0.8;
@@ -107,15 +141,13 @@ public class GUIBattleHex extends GUIHex
         at = AffineTransform.getTranslateInstance(center.getX()
             - innerCenter.getX(), center.getY() - innerCenter.getY());
         innerHexagon.transform(at);
+        return innerHexagon;
     }
 
-    public GUIBattleHex(int xCoord, int yCoord)
-    {
-        super(new BattleHex(xCoord, yCoord));
-    }
-
+    @Override
     public void paint(Graphics g)
     {
+        super.paint(g);
         Graphics2D g2 = (Graphics2D)g;
         if (getAntialias())
         {
@@ -141,6 +173,7 @@ public class GUIBattleHex extends GUIHex
             }
             g2.fill(hexagon);
 
+            GeneralPath innerHexagon = getInnerHexagon();
             g2.setColor(terrainColor);
             g2.fill(innerHexagon);
 
@@ -208,8 +241,14 @@ public class GUIBattleHex extends GUIHex
         return (BattleHex)getHexModel();
     }
 
+    @Override
     public void repaint()
     {
+        if (map == null)
+        {
+            super.repaint();
+            return;
+        }
         // If an entrance needs repainting, paint the whole map.
         if (getBattleHexModel().isEntrance())
         {
@@ -368,7 +407,7 @@ public class GUIBattleHex extends GUIHex
 
     public boolean innerContains(Point point)
     {
-        return (innerHexagon.contains(point));
+        return (getInnerHexagon().contains(point));
     }
 
     private static String imagePostfix = "_Hazard";
@@ -399,7 +438,8 @@ public class GUIBattleHex extends GUIHex
         // second, draw the opposite Hex HexSide
         for (int i = 0; i < 6; i++)
         {
-            char op = getBattleHexModel().getOppositeHexside(i);
+            BattleHex model = getBattleHexModel();
+            char op = model.getOppositeHexside(i);
             if (op != ' ')
             {
                 GUIBattleHex neighbor = getNeighbor(i);

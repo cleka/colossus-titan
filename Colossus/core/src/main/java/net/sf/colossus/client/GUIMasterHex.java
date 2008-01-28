@@ -139,6 +139,7 @@ public final class GUIMasterHex extends GUIHex
         highlightBorder.append(hexagon, false);
     }
 
+    @Override
     public void paint(Graphics g)
     {
         if (hexagon == null)
@@ -292,6 +293,7 @@ public final class GUIMasterHex extends GUIHex
             + halfFontHeight + rectBound.height * (isInverted() ? 1 : 2) / 3);
     }
 
+    @Override
     public void repaint()
     {
         MasterBoard board = weakBoardRef.get();

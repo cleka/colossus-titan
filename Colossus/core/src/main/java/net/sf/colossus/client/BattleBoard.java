@@ -59,6 +59,7 @@ public final class BattleBoard extends KFrame
     private Point location;
     private JMenuBar menuBar;
     private JMenu phaseMenu;
+    private JMenu helpMenu;
     private final InfoPanel infoPanel;
     private final Client client;
     private final Cursor defaultCursor;
@@ -70,11 +71,13 @@ public final class BattleBoard extends KFrame
     private static final String undoAll = "Undo All";
     private static final String doneWithPhase = "Done";
     private static final String concedeBattle = "Concede Battle";
+    private static final String showTerrainHazard = "Show Terrain";
 
     private AbstractAction undoLastAction;
     private AbstractAction undoAllAction;
     private AbstractAction doneWithPhaseAction;
     private AbstractAction concedeBattleAction;
+    private AbstractAction showTerrainHazardAction;
 
     private final SaveWindow saveWindow;
 
@@ -107,6 +110,7 @@ public final class BattleBoard extends KFrame
 
         setupActions();
         setupTopMenu();
+        setupHelpMenu();
 
         saveWindow = new SaveWindow(client.getOptions(), "BattleMap");
 
@@ -202,6 +206,14 @@ public final class BattleBoard extends KFrame
 
     private void setupActions()
     {
+        showTerrainHazardAction = new AbstractAction(showTerrainHazard)
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                new BattleTerrainHazardWindow(BattleBoard.this, client,
+                    battleMap);
+            }
+        };
         undoLastAction = new AbstractAction(undoLast)
         {
             public void actionPerformed(ActionEvent e)
@@ -301,7 +313,21 @@ public final class BattleBoard extends KFrame
         // Phase menu items change by phase and will be set up later.
         phaseMenu = new JMenu("Phase");
         phaseMenu.setMnemonic(KeyEvent.VK_P);
+        helpMenu = new JMenu("Help");
+        helpMenu.setMnemonic(KeyEvent.VK_H);
         menuBar.add(phaseMenu);
+        menuBar.add(helpMenu);
+    }
+
+    public void setupHelpMenu()
+    {
+        JMenuItem mi;
+
+        mi = helpMenu.add(showTerrainHazardAction);
+        mi.setMnemonic(KeyEvent.VK_T);
+        mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_T, 0));
+
+        reqFocus();
     }
 
     public void setupSummonMenu()
