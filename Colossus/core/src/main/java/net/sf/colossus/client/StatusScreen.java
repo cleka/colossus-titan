@@ -262,36 +262,30 @@ final class StatusScreen extends KDialog implements WindowListener
         for (int i = 0; i < numPlayers; i++)
         {
             Player player = client.getPlayer(i);
-            Color color, bgcolor, fgcolor;
 
-            if (player.isDead())
+            if (oracle.getActivePlayer().equals(player))
             {
-                color = Color.RED;
-                setPlayerLabelBackground(i, color);
+                setPlayerLabelBackground(i, Color.YELLOW);
+            }
+            else if (player.isDead())
+            {
+                setPlayerLabelBackground(i, Color.RED);
             }
             else
             {
-                if (oracle.getActivePlayer().equals(player))
-                {
-                    color = Color.YELLOW;
-                }
-                else
-                {
-                    color = Color.LIGHT_GRAY;
-                }
+                setPlayerLabelBackground(i, Color.LIGHT_GRAY);
+            }
 
-                if (!player.getColor().equals("null"))
-                {
-                    bgcolor = PickColor.getBackgroundColor(player.getColor());
-                    fgcolor = PickColor.getForegroundColor(player.getColor());
-                }
-                else
-                {
-                    bgcolor = Color.LIGHT_GRAY;
-                    fgcolor = Color.BLACK;
-                }
-                setPlayerLabelBackground(i, color);
-                setPlayerLabelColors(nameLabel[i], bgcolor, fgcolor);
+            if (!player.getColor().equals("null"))
+            {
+                setPlayerLabelColors(nameLabel[i], PickColor
+                    .getBackgroundColor(player.getColor()), PickColor
+                    .getForegroundColor(player.getColor()));
+            }
+            else
+            {
+                setPlayerLabelColors(nameLabel[i], Color.LIGHT_GRAY,
+                    Color.BLACK);
             }
 
             nameLabel[i].setText(player.getName());
