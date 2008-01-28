@@ -1349,7 +1349,7 @@ public final class GameServerSide extends Game
         Element leg = new Element("Legion");
 
         leg.setAttribute("name", legion.getMarkerId());
-        leg.setAttribute("currentHex", legion.getHexLabel());
+        leg.setAttribute("currentHex", legion.getCurrentHex().getLabel());
         leg.setAttribute("startingHex", legion.getStartingHex().getLabel());
         leg.setAttribute("moved", "" + legion.hasMoved());
         leg.setAttribute("entrySide", "" + legion.getEntrySide());

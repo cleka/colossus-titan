@@ -23,6 +23,7 @@ import net.sf.colossus.util.ResourceLoader;
 import net.sf.colossus.variant.BattleLand;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.MasterBoard;
+import net.sf.colossus.variant.MasterHex;
 import net.sf.colossus.variant.Variant;
 import net.sf.colossus.xmlparser.CreatureLoader;
 import net.sf.colossus.xmlparser.TerrainRecruitLoader;
@@ -510,19 +511,19 @@ public final class VariantSupport
         return aihl.getRecruitHint(terrain, legion, recruits, oracle, section);
     }
 
-    public synchronized static List<String> getInitialSplitHint(String label)
+    public synchronized static List<String> getInitialSplitHint(MasterHex hex)
     {
         String[] section = new String[1];
         section[0] = Constants.sectionAllAI;
-        return getInitialSplitHint(label, section);
+        return getInitialSplitHint(hex, section);
     }
 
-    public synchronized static List<String> getInitialSplitHint(String label,
+    public synchronized static List<String> getInitialSplitHint(MasterHex hex,
         String[] section)
     {
         if (aihl != null)
         {
-            return aihl.getInitialSplitHint(label, section);
+            return aihl.getInitialSplitHint(hex.getLabel(), section);
         }
         return null;
     }

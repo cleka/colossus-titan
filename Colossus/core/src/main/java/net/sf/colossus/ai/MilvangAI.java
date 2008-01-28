@@ -89,7 +89,7 @@ public class MilvangAI extends RationalAI
         if (legion.getHeight() == 8)
         {
             List<CreatureType> creatures = doInitialGameSplit(legion
-                .getHexLabel());
+                .getCurrentHex());
 
             return new MusteredCreatures(true, creatures);
         }

@@ -550,7 +550,7 @@ public class SimpleAI implements AI
         //
         if (legion.getHeight() == 8)
         {
-            return doInitialGameSplit(legion.getHexLabel());
+            return doInitialGameSplit(legion.getCurrentHex());
         }
 
         CreatureType weakest1 = null;
@@ -629,9 +629,9 @@ public class SimpleAI implements AI
 
     /** Return a list of exactly four creatures (including one lord) to
      *  split out. */
-    List<CreatureType> doInitialGameSplit(String label)
+    List<CreatureType> doInitialGameSplit(MasterHex hex)
     {
-        List<CreatureType> hintSuggestedSplit = getInitialSplitHint(label);
+        List<CreatureType> hintSuggestedSplit = getInitialSplitHint(hex);
 
         /* Log.debug("HINT: suggest splitting " + hintSuggestedSplit +
          " in " + label); */
@@ -642,12 +642,11 @@ public class SimpleAI implements AI
         }
 
         CreatureType[] startCre = TerrainRecruitLoader
-            .getStartingCreatures(getVariantPlayed().getMasterBoard()
-                .getHexByLabel(label).getTerrain());
+            .getStartingCreatures(hex.getTerrain());
         // in CMU style splitting, we split centaurs in even towers,
         // ogres in odd towers.
-        final boolean oddTower = "100".equals(label) || "300".equals(label)
-            || "500".equals(label);
+        final boolean oddTower = "100".equals(hex.getLabel())
+            || "300".equals(hex.getLabel()) || "500".equals(hex.getLabel());
         final CreatureType splitCreature = oddTower ? startCre[2]
             : startCre[0];
         final CreatureType nonsplitCreature = oddTower ? startCre[0]
@@ -655,9 +654,9 @@ public class SimpleAI implements AI
 
         // XXX Hardcoded to default board.
         // don't split gargoyles in tower 3 or 6 (because of the extra jungles)
-        if ("300".equals(label) || "600".equals(label))
+        if ("300".equals(hex.getLabel()) || "600".equals(hex.getLabel()))
         {
-            return CMUsplit(false, splitCreature, nonsplitCreature, label);
+            return CMUsplit(false, splitCreature, nonsplitCreature, hex);
         }
         //
         // new idea due to David Ripton: split gargoyles in tower 2 or
@@ -666,9 +665,9 @@ public class SimpleAI implements AI
         // a cyclops and leaving the other group in the tower, but it's
         // interesting so we'll try it.
         //
-        else if ("200".equals(label) || "500".equals(label))
+        else if ("200".equals(hex.getLabel()) || "500".equals(hex.getLabel()))
         {
-            return MITsplit(true, splitCreature, nonsplitCreature, label);
+            return MITsplit(true, splitCreature, nonsplitCreature, hex);
         }
         //
         // otherwise, mix it up for fun
@@ -676,22 +675,22 @@ public class SimpleAI implements AI
         {
             if (Dice.rollDie() <= 3)
             {
-                return MITsplit(true, splitCreature, nonsplitCreature, label);
+                return MITsplit(true, splitCreature, nonsplitCreature, hex);
             }
             else
             {
-                return CMUsplit(true, splitCreature, nonsplitCreature, label);
+                return CMUsplit(true, splitCreature, nonsplitCreature, hex);
             }
         }
     }
 
     /** Keep the gargoyles together. */
     List<CreatureType> CMUsplit(boolean favorTitan,
-        CreatureType splitCreature, CreatureType nonsplitCreature, String label)
+        CreatureType splitCreature, CreatureType nonsplitCreature,
+        MasterHex hex)
     {
         CreatureType[] startCre = TerrainRecruitLoader
-            .getStartingCreatures(getVariantPlayed().getMasterBoard()
-                .getHexByLabel(label).getTerrain());
+            .getStartingCreatures(hex.getTerrain());
         List<CreatureType> splitoffs = new LinkedList<CreatureType>();
 
         if (favorTitan)
@@ -745,11 +744,11 @@ public class SimpleAI implements AI
 
     /** Split the gargoyles. */
     List<CreatureType> MITsplit(boolean favorTitan,
-        CreatureType splitCreature, CreatureType nonsplitCreature, String label)
+        CreatureType splitCreature, CreatureType nonsplitCreature,
+        MasterHex hex)
     {
         CreatureType[] startCre = TerrainRecruitLoader
-            .getStartingCreatures(getVariantPlayed().getMasterBoard()
-                .getHexByLabel(label).getTerrain());
+            .getStartingCreatures(hex.getTerrain());
         List<CreatureType> splitoffs = new LinkedList<CreatureType>();
 
         if (favorTitan)
@@ -801,9 +800,9 @@ public class SimpleAI implements AI
         return splitoffs;
     }
 
-    List<CreatureType> getInitialSplitHint(String label)
+    List<CreatureType> getInitialSplitHint(MasterHex hex)
     {
-        List<String> byName = VariantSupport.getInitialSplitHint(label,
+        List<String> byName = VariantSupport.getInitialSplitHint(hex,
             hintSectionUsed);
 
         if (byName == null)
@@ -1820,8 +1819,8 @@ public class SimpleAI implements AI
             int worst = 0;
             for (int i = 1; i < 6; i++)
             {
-                List<Legion> enemyList = enemyAttackMap[i].get((legion)
-                    .getHexLabel());
+                List<Legion> enemyList = enemyAttackMap[i].get(legion
+                    .getCurrentHex());
                 if (enemyList != null)
                 {
                     for (Legion enemy : enemyList)

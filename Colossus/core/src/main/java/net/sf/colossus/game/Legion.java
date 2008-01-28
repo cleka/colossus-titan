@@ -12,6 +12,8 @@ public abstract class Legion
 {
     /**
      * The player/game combination owning this Legion.
+     * 
+     * Never null.
      */
     private final Player player;
 
@@ -29,10 +31,21 @@ public abstract class Legion
      */
     private final List<Creature> creatures = new ArrayList<Creature>();
 
+    /**
+     * The ID of the marker of this legion.
+     * 
+     * Used as identifier for serialization purposes. Never null.
+     */
     protected final String markerId;
 
+    /**
+     * Flag if the legion has moved in the current masterboard round.
+     */
     private boolean moved;
 
+    /**
+     * Flag if the legion has teleported in the current masterboard round.
+     */
     private boolean teleported;
 
     /**
@@ -41,28 +54,22 @@ public abstract class Legion
     private int entrySide;
 
     // TODO legions should be created through factory from the player instances
-    public Legion(final Player playerState, String markerId)
+    public Legion(final Player player, String markerId)
     {
-        this.player = playerState;
+        assert player != null : "Legion has to have a player";
+        assert markerId != null : "Legion has to have a markerId";
+        this.player = player;
         this.markerId = markerId;
     }
 
+    /**
+     * Retrieves the player this legion belongs to.
+     * 
+     * @return The matching player. Never null.
+     */
     public Player getPlayer()
     {
         return player;
-    }
-
-    /**
-     * Places the legion using a hex label.
-     * 
-     * TODO replace all occurrences with {@link #setCurrentHex(MasterHex)}
-     * 
-     * @param hexLabel the label of the new hex to move to
-     */
-    public void setHexLabel(String hexLabel)
-    {
-        this.currentHex = player.getGame().getVariant().getMasterBoard()
-            .getHexByLabel(hexLabel);
     }
 
     /**
@@ -74,18 +81,6 @@ public abstract class Legion
     public void setCurrentHex(MasterHex newPosition)
     {
         this.currentHex = newPosition;
-    }
-
-    /**
-     * Returns the current position of the legion as hex label.
-     * 
-     * @return the label of the hex the legion is currently on.
-     * 
-     * TODO remove in favor of {@link #getCurrentHex()}
-     */
-    public String getHexLabel()
-    {
-        return currentHex != null ? currentHex.getLabel() : null;
     }
 
     /**

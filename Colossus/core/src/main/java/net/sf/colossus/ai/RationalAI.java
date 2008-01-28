@@ -575,7 +575,7 @@ public class RationalAI extends SimpleAI
         if (legion.getHeight() == 8)
         {
             List<CreatureType> creatures = doInitialGameSplit(legion
-                .getHexLabel());
+                .getCurrentHex());
 
             return new MusteredCreatures(true, creatures);
         }
