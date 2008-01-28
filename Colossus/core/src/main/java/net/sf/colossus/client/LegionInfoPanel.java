@@ -19,18 +19,14 @@ import net.sf.colossus.util.Options;
 /** 
  * Creates a JPanel displaying one legion, 
  * used by AutoInspector and ShowLegion (right-click on legion)
- * 
- * @version $Id$
  */
-
 public final class LegionInfoPanel extends JPanel
 {
     private String valueText = "";
 
     public LegionInfoPanel(LegionClientSide legion, int scale, int margin,
         int padding, boolean usePlayerColor, int viewMode,
-        Player activePlayer, boolean dubiousAsBlanks,
-        boolean showLegionValue)
+        Player activePlayer, boolean dubiousAsBlanks, boolean showLegionValue)
     {
         boolean contentCertain = false;
         boolean hideAll = false;
@@ -119,9 +115,9 @@ public final class LegionInfoPanel extends JPanel
         add(new JLabel(text));
     }
 
-    private void viewAll(LegionClientSide legion, boolean usePlayerColor, int scale,
-        int margin, int padding, boolean dubiousAsBlanks, boolean hideAll,
-        boolean showLegionValue)
+    private void viewAll(LegionClientSide legion, boolean usePlayerColor,
+        int scale, int margin, int padding, boolean dubiousAsBlanks,
+        boolean hideAll, boolean showLegionValue)
     {
         setLayout(null);
 

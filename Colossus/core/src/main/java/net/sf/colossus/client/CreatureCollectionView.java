@@ -46,7 +46,7 @@ class CreatureCollectionView extends KDialog
         .getLogger(CreatureCollectionView.class.getName());
 
     private Client client;
-    private static final int fixedChitSize = 60;
+    private static final int CHIT_SIZE = 60;
 
     /**
      * Maps each creature type to the bottom label with all counts.
@@ -63,7 +63,6 @@ class CreatureCollectionView extends KDialog
      */
     Map<CreatureType, Chit> chitMap = new HashMap<CreatureType, Chit>();
 
-    private SaveWindow saveWindow;
     private JScrollPane scrollPane;
     private JFrame parentFrame;
     private final static Font countFont = new Font("Monospaced", Font.PLAIN,
@@ -109,9 +108,7 @@ class CreatureCollectionView extends KDialog
 
         setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
 
-        saveWindow = new SaveWindow(client.getOptions(),
-            "CreatureCollectionView");
-        saveWindow.restoreOrCenter(this);
+        useSaveWindow(client.getOptions(), "CreatureCollectionView", null);
 
         update();
         setVisible(true);
@@ -131,11 +128,11 @@ class CreatureCollectionView extends KDialog
             setBorder(BorderFactory.createLineBorder(Color.black));
             if (!(type.isTitan()))
             {
-                chit = new Chit(fixedChitSize, type.getName());
+                chit = new Chit(CHIT_SIZE, type.getName());
             }
             else
             {
-                chit = new Chit(fixedChitSize, "Titan-0-Black");
+                chit = new Chit(CHIT_SIZE, "Titan-0-Black");
             }
             chitMap.put(type, chit);
             label = new JLabel(baseString, SwingConstants.CENTER);
@@ -205,7 +202,8 @@ class CreatureCollectionView extends KDialog
             {
                 CreatureType type = entry.getKey();
                 JLabel label = entry.getValue();
-                int count = client.getGame().getCaretaker().getAvailableCount(type);
+                int count = client.getGame().getCaretaker().getAvailableCount(
+                    type);
                 int maxcount = type.getMaxCount();
                 int deadCount = client.getGame().getCaretaker().getDeadCount(
                     type);
@@ -297,9 +295,6 @@ class CreatureCollectionView extends KDialog
             return;
         }
 
-        saveWindow.save(this);
-        saveWindow = null;
-
         setVisible(false);
 
         // We MUST remove this. Otherwise the object does not get 
@@ -334,16 +329,16 @@ class CreatureCollectionView extends KDialog
             .getCreatureTypes();
         // default : 5 creatures wide 
 
-        int minSingleX = fixedChitSize + 8;
+        int minSingleX = CHIT_SIZE + 8;
         if (minSingleX < (int)baseLabel.getPreferredSize().getWidth() + 8)
         {
             minSingleX = (int)baseLabel.getPreferredSize().getWidth() + 8;
         }
 
         int minX = minSingleX * 5;
-        int minY = ((fixedChitSize + 8 + (2 * (int)baseLabel
-            .getPreferredSize().getHeight())) * ((creatures.size() + 4) / 5))
-            + fixedChitSize;
+        int minY = ((CHIT_SIZE + 8 + (2 * (int)baseLabel.getPreferredSize()
+            .getHeight())) * ((creatures.size() + 4) / 5))
+            + CHIT_SIZE;
 
         return new Dimension(minX, minY);
     }

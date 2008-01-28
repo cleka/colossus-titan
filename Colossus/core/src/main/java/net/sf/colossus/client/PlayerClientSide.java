@@ -35,6 +35,13 @@ public final class PlayerClientSide extends Player
         InstanceTracker.register(this, playerName);
     }
 
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<LegionClientSide> getLegions()
+    {
+        return (List<LegionClientSide>)super.getLegions();
+    }
+
     /** Takes a colon-separated string of form
      *  dead:name:tower:color:elim:legions:markers:creatures:value:titan:score
      *  

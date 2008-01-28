@@ -15,6 +15,10 @@ import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.JViewport;
 
+import net.sf.colossus.client.IOptions;
+import net.sf.colossus.client.SaveWindow;
+import net.sf.colossus.webcommon.InstanceTracker;
+
 
 /** KDialog adds some generally useful functions to JDialog.
  * 
@@ -25,13 +29,13 @@ import javax.swing.JViewport;
 
 public class KDialog extends JDialog implements MouseListener, WindowListener
 {
+    private SaveWindow kSaveWindow;
 
     /** Only support one of JDialog's many constructor forms. */
     public KDialog(Frame owner, String title, boolean modal)
     {
         super(owner, title, modal);
-        net.sf.colossus.webcommon.InstanceTracker.register(this,
-            "KDialog-for-?");
+        InstanceTracker.register(this, "KDialog-for-?");
     }
 
     /** Place dialog relative to parentFrame's origin, offset by 
@@ -91,6 +95,58 @@ public class KDialog extends JDialog implements MouseListener, WindowListener
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
         setLocation(new Point(d.width - getSize().width, d.height
             - getSize().height - 30));
+    }
+
+    /**
+     * If, and only if, the extending class calls this useSaveWindow,
+     * then the KDialog will handle the SaveWindow work:
+     * creating it when useSaveWindow is called, and saving back
+     * always when setVisible(false) is called (and useSaveWindow was
+     * called before, of course).
+     * 
+     * TODO maybe we should enforce this by calling it through the 
+     *      constructor
+     * 
+     * @param options IOptions reference to the client for saving window 
+     *        size+pos in the Options data
+     * @param windowName name/title of the window, 
+     *        window size+pos are stored for that name 
+     * @param defaultLocation to be used if no location was earlier stored: 
+     *        place there; give null to center on screen.
+     */
+    public void useSaveWindow(IOptions options, String windowName,
+        Point defaultLocation)
+    {
+        kSaveWindow = new SaveWindow(options, windowName);
+        if (defaultLocation == null)
+        {
+            kSaveWindow.restoreOrCenter(this);
+        }
+        else
+        {
+            kSaveWindow.restore(this, defaultLocation);
+        }
+    }
+
+    @Override
+    public void setVisible(boolean val)
+    {
+        if (!val && kSaveWindow != null)
+        {
+            kSaveWindow.save(this);
+        }
+        super.setVisible(val);
+    }
+
+    @Override
+    public void dispose()
+    {
+        if (kSaveWindow != null)
+        {
+            kSaveWindow.save(this);
+        }
+        super.dispose();
+        kSaveWindow = null;
     }
 
     // Add the do-nothing mouse and window listener methods here, rather 

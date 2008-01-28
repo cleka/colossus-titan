@@ -13,6 +13,7 @@ import javax.swing.JFrame;
 
 import net.sf.colossus.client.IOptions;
 import net.sf.colossus.client.SaveWindow;
+import net.sf.colossus.webcommon.InstanceTracker;
 
 
 /** KFrame adds some generally useful functions to JFrame.
@@ -24,7 +25,6 @@ import net.sf.colossus.client.SaveWindow;
 
 public class KFrame extends JFrame implements MouseListener, WindowListener
 {
-
     private SaveWindow kSaveWindow;
 
     /** Only support the simple constructor forms of JFrame. */
@@ -32,13 +32,13 @@ public class KFrame extends JFrame implements MouseListener, WindowListener
     public KFrame()
     {
         super();
-        net.sf.colossus.webcommon.InstanceTracker.register(this, "<no title>");
+        InstanceTracker.register(this, "<no title>");
     }
 
     public KFrame(String title)
     {
         super(title);
-        net.sf.colossus.webcommon.InstanceTracker.register(this, title);
+        InstanceTracker.register(this, title);
     }
 
     /**
@@ -47,6 +47,10 @@ public class KFrame extends JFrame implements MouseListener, WindowListener
      * creating it when useSaveWindow is called, and saving back
      * always when setVisible(false) is called (and useSaveWindow was
      * called before, of course).
+     * 
+     * TODO maybe we should enforce this by calling it through the 
+     *      constructor
+     * 
      * @param options IOptions reference to the client for saving window 
      *        size+pos in the Options data
      * @param windowName name/title of the window, 
@@ -81,6 +85,10 @@ public class KFrame extends JFrame implements MouseListener, WindowListener
     @Override
     public void dispose()
     {
+        if (kSaveWindow != null)
+        {
+            kSaveWindow.save(this);
+        }
         super.dispose();
         kSaveWindow = null;
     }

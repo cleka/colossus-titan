@@ -6,6 +6,8 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.Point;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 
@@ -30,6 +32,9 @@ final class StatusScreen extends KDialog implements WindowListener
 {
     private final int numPlayers;
 
+    // TODO it would probably be nicer to just have a JPanel for each player, then mapped
+    //      via a Map<Player,PlayerPanel> -- this way things would be grouped better and
+    //      the need for the index-based access to players would be gone
     private final JLabel[] nameLabel;
     private final JLabel[] towerLabel;
     private final JLabel[] elimLabel;
@@ -54,7 +59,8 @@ final class StatusScreen extends KDialog implements WindowListener
     private Dimension size;
     private final SaveWindow saveWindow;
 
-    StatusScreen(JFrame frame, IOracle oracle, IOptions options, Client client)
+    StatusScreen(JFrame frame, IOracle oracle, IOptions options,
+        final Client client)
     {
         super(frame, "Game Status", false);
 
@@ -120,6 +126,17 @@ final class StatusScreen extends KDialog implements WindowListener
             nameLabel[i] = new JLabel();
             nameLabel[i].setOpaque(true);
             gridPane.add(nameLabel[i]);
+
+            final PlayerClientSide player = client.getPlayer(i);
+            nameLabel[i].addMouseListener(new MouseAdapter()
+            {
+                @Override
+                public void mouseClicked(MouseEvent e)
+                {
+                    new PlayerDetailsDialog(client.getBoard().getFrame(),
+                        player, client);
+                }
+            });
         }
 
         gridPane.add(new JLabel("Tower"));
