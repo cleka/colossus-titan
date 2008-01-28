@@ -17,6 +17,10 @@ public abstract class Legion
 
     /**
      * The current position of the legion on the masterboard.
+     * 
+     * TODO it would be good to establish an invariant "not null" on this one,
+     *      which currently doesn't seem to be feasible yet -- even the setter
+     *      still gets called with null on game starts
      */
     private MasterHex currentHex;
 

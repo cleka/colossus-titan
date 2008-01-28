@@ -147,8 +147,8 @@ public final class GameServerSide extends Game
         Server server = getServer();
         if (server != null)
         {
-            server.allUpdateCreatureCount(type, getCaretaker().getAvailableCount(type),
-                getCaretaker().getDeadCount(type));
+            server.allUpdateCreatureCount(type, getCaretaker()
+                .getAvailableCount(type), getCaretaker().getDeadCount(type));
         }
     }
 
@@ -1980,7 +1980,8 @@ public final class GameServerSide extends Game
         {
             String name = it.next();
 
-            if (getCaretaker().getAvailableCount(getVariant().getCreatureByName(name)) >= 1
+            if (getCaretaker().getAvailableCount(
+                getVariant().getCreatureByName(name)) >= 1
                 && !recruits.contains(name))
             {
                 recruits.add(name);
@@ -3256,6 +3257,8 @@ public final class GameServerSide extends Game
                 return legion;
             }
         }
+        LOGGER.warning("Can't find legion for markerId '" + markerId + "'");
+        assert false : "Request for unknown legion '" + markerId + "'";
         return null;
     }
 
