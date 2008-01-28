@@ -865,7 +865,12 @@ final class SocketServerThread extends Thread implements IClient
     public void didSplit(MasterHex hex, Legion parent, Legion child,
         int childHeight, List<String> splitoffs, int turn)
     {
-        sendToClient(Constants.didSplit + sep + hex.getLabel() + sep
+        // hex can be null when loading a game
+        // TODO make sure we always have a hex
+        assert parent != null : " Split needs parent";
+        assert child != null : " Split needs child";
+        sendToClient(Constants.didSplit + sep
+            + (hex == null ? "null" : hex.getLabel()) + sep
             + parent.getMarkerId() + sep + child.getMarkerId() + sep
             + childHeight + sep + Glob.glob(splitoffs) + sep + turn);
     }

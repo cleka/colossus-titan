@@ -195,6 +195,7 @@ public class History
     @SuppressWarnings("unchecked")
     void fireEventFromElement(Server server, Element el)
     {
+        GameServerSide game = server.getGame();
         if (el.getName().equals("Reveal"))
         {
             String allPlayers = el.getAttributeValue("allPlayers");
@@ -222,7 +223,6 @@ public class History
                 creatureNames.add(creatureName);
             }
             String reason = "<unknown>";
-            GameServerSide game = server.getGame();
             if (all)
             {
                 server.allRevealCreatures(game.getLegionByMarkerId(markerId),
@@ -249,9 +249,8 @@ public class History
                 String creatureName = creature.getTextNormalize();
                 creatureNames.add(creatureName);
             }
-            server.didSplit(server.getGame().getLegionByMarkerId(parentId),
-                server.getGame().getLegionByMarkerId(childId), creatureNames,
-                turn);
+            server.didSplit(game.getLegionByMarkerId(parentId), game
+                .getLegionByMarkerId(childId), creatureNames, turn);
         }
         else if (el.getName().equals("Merge"))
         {
@@ -259,25 +258,24 @@ public class History
             String survivorId = el.getAttributeValue("survivorId");
             String turnString = el.getAttributeValue("turn");
             int turn = Integer.parseInt(turnString);
-            server.undidSplit(
-                server.getGame().getLegionByMarkerId(splitoffId), server
-                    .getGame().getLegionByMarkerId(survivorId), false, turn);
+            server.undidSplit(game.getLegionByMarkerId(splitoffId), game
+                .getLegionByMarkerId(survivorId), false, turn);
         }
         else if (el.getName().equals("AddCreature"))
         {
             String markerId = el.getAttributeValue("markerId");
             String creatureName = el.getAttributeValue("creatureName");
             String reason = "<unknown>";
-            server.allTellAddCreature(server.getGame().getLegionByMarkerId(
-                markerId), creatureName, false, reason);
+            server.allTellAddCreature(game.getLegionByMarkerId(markerId),
+                creatureName, false, reason);
         }
         else if (el.getName().equals("RemoveCreature"))
         {
             String markerId = el.getAttributeValue("markerId");
             String creatureName = el.getAttributeValue("creatureName");
             String reason = "<unknown>";
-            server.allTellRemoveCreature(server.getGame().getLegionByMarkerId(
-                markerId), creatureName, false, reason);
+            server.allTellRemoveCreature(game.getLegionByMarkerId(markerId),
+                creatureName, false, reason);
         }
         else if (el.getName().equals("PlayerElim"))
         {
