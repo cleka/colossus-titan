@@ -15,22 +15,10 @@ import net.sf.colossus.variant.MasterHex;
  */
 public class BalancedTowersTest extends TestCase
 {
-    private static final MasterHex T100 = VariantSupport.getCurrentVariant()
-        .getMasterBoard().getHexByLabel("100");
-    private static final MasterHex T200 = VariantSupport.getCurrentVariant()
-        .getMasterBoard().getHexByLabel("200");
-    private static final MasterHex T300 = VariantSupport.getCurrentVariant()
-        .getMasterBoard().getHexByLabel("300");
-    private static final MasterHex T400 = VariantSupport.getCurrentVariant()
-        .getMasterBoard().getHexByLabel("400");
-    private static final MasterHex T500 = VariantSupport.getCurrentVariant()
-        .getMasterBoard().getHexByLabel("500");
-    private static final MasterHex T600 = VariantSupport.getCurrentVariant()
-        .getMasterBoard().getHexByLabel("600");
-
     public BalancedTowersTest(String name)
     {
         super(name);
+        VariantSupport.loadVariant("Default", true);
     }
 
     public void testGetBalancedTowers()
@@ -47,6 +35,13 @@ public class BalancedTowersTest extends TestCase
 
         List<MasterHex> results = GameServerSide.getBalancedTowers(numPlayers,
             towerList);
+
+        MasterHex T100 = towerList.get(0);
+        MasterHex T200 = towerList.get(1);
+        MasterHex T300 = towerList.get(2);
+        MasterHex T400 = towerList.get(3);
+        MasterHex T500 = towerList.get(4);
+        MasterHex T600 = towerList.get(5);
 
         assertTrue(results.size() == 4);
         assertTrue((results.contains(T100) && results.contains(T200)
