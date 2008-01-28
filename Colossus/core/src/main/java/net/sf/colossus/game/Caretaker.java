@@ -21,54 +21,38 @@ public class Caretaker
 {
     /**
      * Callback interface for listening to changes to the numbers.
-     * 
-     * TODO this is not final since we use the access to the outer class in {@link #fullUpdate()}
-     *      Maybe it would be better to just use an interface and forget about this little
-     *      convenience base implementation -- the obj.new Class() syntax is not exactly
-     *      common and thus probably rather confusing
      */
-    public abstract class ChangeListener
+    public static interface ChangeListener
     {
         /**
          * Called whenever a change to the availability of a single creature type occurs.
          * 
-         * This is not called by the {@link Caretaker} on a full update, but the default 
-         * implementation of {@link #fullUpdate()} in this class does it. By overriding
-         * the latter you can avoid getting a call to this method for each creature type.
+         * This is not called by the {@link Caretaker} on a full update but only on smaller 
+         * changes.
          * 
          * @param type The creature type for which the count is changed.
          * @param availableCount The new number of available creatures of this type.
          */
         public void creatureTypeAvailabilityUpdated(CreatureType type,
-            int availableCount)
-        {
-            // base implementation does nothing
-        }
+            int availableCount);
 
         /**
          * Called whenever a change to the number of dead creatures of a single type occurs.
          * 
-         * This is not called by the {@link Caretaker} on a full update, but the default 
-         * implementation of {@link #fullUpdate()} in this class does it. By overriding
-         * the latter you can avoid getting a call to this method for each creature type.
+         * This is not called by the {@link Caretaker} on a full update but only on smaller 
+         * changes.
          * 
          * @param type The creature type for which the count is changed.
          * @param deadCount The new number of dead creatures of this type.
          */
         public void creatureTypeDeadCountUpdated(CreatureType type,
-            int deadCount)
-        {
-            // base implementation does nothing
-        }
+            int deadCount);
 
-        public void fullUpdate()
-        {
-            for (CreatureType type : game.getVariant().getCreatureTypes())
-            {
-                creatureTypeAvailabilityUpdated(type, getCount(type));
-                creatureTypeDeadCountUpdated(type, getDeadCount(type));
-            }
-        }
+        /**
+         * Called after large changes when listeners should perform an update of all
+         * inferred information and/or displays.
+         */
+        public void fullUpdate();
     }
 
     /** 

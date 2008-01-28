@@ -26,6 +26,7 @@ import net.sf.colossus.client.BattleHex;
 import net.sf.colossus.client.BattleMap;
 import net.sf.colossus.client.HexMap;
 import net.sf.colossus.client.Proposal;
+import net.sf.colossus.game.Caretaker;
 import net.sf.colossus.game.Creature;
 import net.sf.colossus.game.Game;
 import net.sf.colossus.game.Legion;
@@ -116,35 +117,49 @@ public final class GameServerSide extends Game
         super(null, new String[0]);
         // later perhaps from cmdline, GUI, or WebServer set it?
         gameId = "#" + (gameCounter++);
-        getCaretaker().addListener(getCaretaker().new ChangeListener()
+        getCaretaker().addListener(new Caretaker.ChangeListener()
         {
-            @Override
             public void creatureTypeAvailabilityUpdated(CreatureType type,
                 int availableCount)
             {
-                updateDisplays(type);
+                updateCaretakerDisplays(type);
             }
 
-            @Override
             public void creatureTypeDeadCountUpdated(CreatureType type,
                 int deadCount)
             {
-                updateDisplays(type);
+                updateCaretakerDisplays(type);
+            }
+
+            public void fullUpdate()
+            {
+                updateCaretakerDisplays();
             }
 
         });
     }
 
     /** 
-     * Update creatureName's count on all clients.
+     * Update the dead and available counts for a creature type on all clients.
      */
-    private void updateDisplays(CreatureType type)
+    private void updateCaretakerDisplays(CreatureType type)
     {
         Server server = getServer();
         if (server != null)
         {
             server.allUpdateCreatureCount(type, getCaretaker().getCount(type),
                 getCaretaker().getDeadCount(type));
+        }
+    }
+
+    /** 
+     * Update the dead and available counts for a creature type on all clients.
+     */
+    private void updateCaretakerDisplays()
+    {
+        for (CreatureType type : getVariant().getCreatureTypes())
+        {
+            updateCaretakerDisplays(type);
         }
     }
 
@@ -566,7 +581,7 @@ public final class GameServerSide extends Game
     {
         for (CreatureType type : getVariant().getCreatureTypes())
         {
-            updateDisplays(type);
+            updateCaretakerDisplays(type);
         }
     }
 
