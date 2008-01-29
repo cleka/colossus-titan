@@ -194,6 +194,9 @@ public final class PlayerDetailsDialog extends KDialog implements
         {
             PredictSplitNode node = entry.getKey();
             GridBagConstraints constraints = entry.getValue();
+            // Currently we just place a simple label with the name, colored in a way
+            // that the length on the timeline gets clear.
+            // TODO: replace with some graphical representation of the node
             JLabel label = new JLabel(node.getFullName());
             label.setOpaque(true);
             label.setBackground(getIntermediateColor(SystemColor.control,
@@ -218,6 +221,12 @@ public final class PlayerDetailsDialog extends KDialog implements
     private GridBagConstraints calculateSplitNodeLayout(PredictSplitNode node,
         int y, Map<PredictSplitNode, GridBagConstraints> layouts)
     {
+        // Layout concept: each parent spans the height of the two children, the
+        // child that keeps the marker stays at the same level, the splitoff gets
+        // placed just below the other.
+        // Horizontally the legions are placed according to a timeline concept: from
+        // the turn they were created to the turn they were split again.
+        // TODO: what about killed legions?
         GridBagConstraints constraints = new GridBagConstraints();
         constraints.gridx = node.getTurnCreated();
         constraints.gridy = y;
