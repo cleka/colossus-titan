@@ -14,7 +14,6 @@ import java.util.logging.Logger;
 
 import net.sf.colossus.client.BattleHex;
 import net.sf.colossus.game.Creature;
-import net.sf.colossus.game.Game;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.util.Options;
@@ -102,7 +101,13 @@ public class CreatureServerSide extends Creature
 
     /** Damage taken */
     private int hits = 0;
-    private final Game game;
+
+    /**
+     * The game this creature belongs to.
+     * 
+     * Never null.
+     */
+    private final GameServerSide game;
 
     /** Unique identifier for each critter. */
     private final int tag;
@@ -112,9 +117,11 @@ public class CreatureServerSide extends Creature
     private final SortedSet<PenaltyOption> penaltyOptions = new TreeSet<PenaltyOption>();
     private boolean carryPossible;
 
-    public CreatureServerSide(CreatureType creature, Legion legion, Game game)
+    public CreatureServerSide(CreatureType creature, Legion legion,
+        GameServerSide game)
     {
         super(creature);
+        assert game != null : "No server-side creature without a game";
         this.legion = legion;
         this.game = game;
         tag = ++tagCounter;
@@ -594,8 +601,7 @@ public class CreatureServerSide extends Creature
 
     private void chooseStrikePenalty()
     {
-        ((GameServerSide)game).getServer().askChooseStrikePenalty(
-            penaltyOptions);
+        (game).getServer().askChooseStrikePenalty(penaltyOptions);
     }
 
     /** Side effects. */
@@ -773,8 +779,7 @@ public class CreatureServerSide extends Creature
         // Roll the dice.
         int damage = 0;
         // Check if we roll or if we don't
-        boolean randomized = !(((GameServerSide)game)
-            .getOption(Options.nonRandomBattleDice));
+        boolean randomized = !game.getOption(Options.nonRandomBattleDice);
 
         List<String> rolls = new ArrayList<String>();
         StringBuffer rollString = new StringBuffer(36);
@@ -814,12 +819,8 @@ public class CreatureServerSide extends Creature
         // Record that this attacker has struck.
         setStruck(true);
 
-        if (game != null)
-        {
-            ((GameServerSide)game).getServer().allTellStrikeResults(this,
-                target, strikeNumber, rolls, damage, carryDamage,
-                battle.getCarryTargetDescriptions());
-        }
+        game.getServer().allTellStrikeResults(this, target, strikeNumber,
+            rolls, damage, carryDamage, battle.getCarryTargetDescriptions());
     }
 
     Set<PenaltyOption> getPenaltyOptions()
