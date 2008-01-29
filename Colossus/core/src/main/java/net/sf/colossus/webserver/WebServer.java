@@ -34,8 +34,8 @@ import net.sf.colossus.webcommon.User;
 
 public class WebServer implements IWebServer, IRunWebServer
 {
-    private static final Logger LOGGER =
-        Logger.getLogger(WebServer.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(WebServer.class
+        .getName());
 
     private WebServerOptions options = null;
     private PortBookKeeper portBookKeeper = null;
@@ -49,23 +49,23 @@ public class WebServer implements IWebServer, IRunWebServer
      * be combined with a command line option to suppress the GUI even if it would
      * be possible to show one.
      */
-    private boolean runGUI = !GraphicsEnvironment.isHeadless();
+    private final boolean runGUI = !GraphicsEnvironment.isHeadless();
 
     private boolean shutdownRequested = false;
     private boolean shutdownInitiatedByGUI = false;
 
-    private int maxClients;
+    private final int maxClients;
 
     private ArrayList<GameInfo> potentialGames = null;
     private ArrayList<GameInfo> runningGames = null;
     private ArrayList<GameInfo> endingGames = null;
 
     // Server socket port where we listen for WebClient connections
-    private int port;
+    private final int port;
 
     private ServerSocket serverSocket;
 
-    private List<ChatMessage> lastNChatMessages = new ArrayList<ChatMessage>();
+    private final List<ChatMessage> lastNChatMessages = new ArrayList<ChatMessage>();
 
     public static void main(String[] args)
     {
@@ -116,8 +116,8 @@ public class WebServer implements IWebServer, IRunWebServer
 
         User.readUsersFromFile(usersFile, maxUsers);
 
-        LOGGER.log(Level.ALL, "Server started: port " + port +
-            ", maxClients " + maxClients);
+        LOGGER.log(Level.ALL, "Server started: port " + port + ", maxClients "
+            + maxClients);
 
         long now = new Date().getTime();
         ChatMessage startMsg = new ChatMessage(IWebServer.generalChatName,
@@ -151,11 +151,11 @@ public class WebServer implements IWebServer, IRunWebServer
 
     void runSocketServer()
     {
-        int socketQueueLen =
-            options.getIntOptionNoUndef(WebServerConstants.optSocketQueueLen);
+        int socketQueueLen = options
+            .getIntOptionNoUndef(WebServerConstants.optSocketQueueLen);
 
-        LOGGER.log(Level.FINEST,
-            "About to create server socket on port " + port);
+        LOGGER.log(Level.FINEST, "About to create server socket on port "
+            + port);
         try
         {
             if (serverSocket != null)
@@ -181,8 +181,8 @@ public class WebServer implements IWebServer, IRunWebServer
             boolean rejected = waitForUser();
             if (rejected)
             {
-                LOGGER.log(Level.FINEST, "accepted one client but " + 
-                    "rejected it - maxClients limit reached.");
+                LOGGER.log(Level.FINEST, "accepted one client but "
+                    + "rejected it - maxClients limit reached.");
             }
             else
             {
@@ -339,8 +339,8 @@ public class WebServer implements IWebServer, IRunWebServer
             }
             catch (Exception e)
             {
-                LOGGER.log(Level.WARNING, "Different exception than usual " +
-                    "while tried to interrupt 'other': ", e);
+                LOGGER.log(Level.WARNING, "Different exception than usual "
+                    + "while tried to interrupt 'other': ", e);
             }
 
             LOGGER.log(Level.FINEST, "WebServer.closeAllWscst's: before join");
@@ -414,9 +414,8 @@ public class WebServer implements IWebServer, IRunWebServer
             GameInfo gi = it.next();
             if (gi.isEnrolled(newUser))
             {
-                LOGGER.log(Level.FINEST,
-                    "Telling user " + newUser.getName() + 
-                    " that he is still enrolled in game " + gi.getGameId());
+                LOGGER.log(Level.FINEST, "Telling user " + newUser.getName()
+                    + " that he is still enrolled in game " + gi.getGameId());
                 // userMap finds already new user for that name
                 client.didEnroll(gi.getGameId(), newUser.getName());
             }
@@ -448,8 +447,8 @@ public class WebServer implements IWebServer, IRunWebServer
 
     public void gameFailed(GameInfo gi, String reason)
     {
-        LOGGER.log(Level.WARNING,
-            "GAME starting/running failed!!! Reason: " + reason);
+        LOGGER.log(Level.WARNING, "GAME starting/running failed!!! Reason: "
+            + reason);
     }
 
     public void tellEnrolledGameStartsSoon(GameInfo gi)
@@ -564,8 +563,8 @@ public class WebServer implements IWebServer, IRunWebServer
             LOGGER.log(Level.FINEST, "Found gi, got port " + port);
             if (!success)
             {
-                LOGGER.log(Level.SEVERE,
-                    "\nstarting/running game " + gameId + " failed!!\n");
+                LOGGER.log(Level.SEVERE, "\nstarting/running game " + gameId
+                    + " failed!!\n");
             }
         }
     }
@@ -582,14 +581,14 @@ public class WebServer implements IWebServer, IRunWebServer
         if (User.getLoggedInCount() > 0)
         {
             int loggedin = User.getLoggedInCount();
-            
+
             // the other five are still dummies.
             int enrolled = User.getEnrolledCount();
-            int playing  = User.getPlayingCount();
-            int dead     = User.getDeadCount();
+            int playing = User.getPlayingCount();
+            int dead = User.getDeadCount();
             long ago = 0;
             String text = "";
-            
+
             Iterator<User> it = User.getLoggedInUsersIterator();
             while (it.hasNext())
             {
@@ -617,8 +616,8 @@ public class WebServer implements IWebServer, IRunWebServer
         }
         else
         {
-            LOGGER.log(Level.WARNING,
-                "Chat for chatId " + chatId + " not implemented.");
+            LOGGER.log(Level.WARNING, "Chat for chatId " + chatId
+                + " not implemented.");
         }
     }
 
@@ -632,8 +631,8 @@ public class WebServer implements IWebServer, IRunWebServer
         }
         else
         {
-            LOGGER.log(Level.WARNING, "tellLastChatMessagesToOne: " +
-                "illegal chat id " + chatId + " - doing nothing");
+            LOGGER.log(Level.WARNING, "tellLastChatMessagesToOne: "
+                + "illegal chat id " + chatId + " - doing nothing");
             return;
         }
         IWebClient client = cst;
@@ -704,14 +703,10 @@ public class WebServer implements IWebServer, IRunWebServer
         }
 
         LOGGER.log(Level.FINEST, "startOneGame, id " + gi.getGameId());
-        String workFilesBaseDir =
-            getStringOption(WebServerConstants.optWorkFilesBaseDir);
-        String template =
-            getStringOption(WebServerConstants.optLogPropTemplate);
-        String javaCommand =
-            getStringOption(WebServerConstants.optJavaCommand);
-        String colossusJar =
-            getStringOption(WebServerConstants.optColossusJar);
+        String workFilesBaseDir = getStringOption(WebServerConstants.optWorkFilesBaseDir);
+        String template = getStringOption(WebServerConstants.optLogPropTemplate);
+        String javaCommand = getStringOption(WebServerConstants.optJavaCommand);
+        String colossusJar = getStringOption(WebServerConstants.optColossusJar);
 
         boolean ok = gi.makeRunningGame(this, workFilesBaseDir, template,
             javaCommand, colossusJar, port);
@@ -808,10 +803,10 @@ public class WebServer implements IWebServer, IRunWebServer
         }
     }
 
-    class WebServerOptions
+    private static class WebServerOptions
     {
-        private Properties props = new Properties();
-        private String filename;
+        private final Properties props = new Properties();
+        private final String filename;
 
         public WebServerOptions(String filename)
         {
@@ -827,8 +822,8 @@ public class WebServer implements IWebServer, IRunWebServer
             }
             catch (IOException e)
             {
-                LOGGER.log(Level.SEVERE, 
-                    "Couldn't read options from " + filename, e);
+                LOGGER.log(Level.SEVERE, "Couldn't read options from "
+                    + filename, e);
                 return;
             }
         }
@@ -881,8 +876,8 @@ public class WebServer implements IWebServer, IRunWebServer
             int val = getIntOption(optname);
             if (val == -1)
             {
-                LOGGER.log(Level.SEVERE, "Invalid or not set value for " +
-                    optname + " from WebServer config file " + filename);
+                LOGGER.log(Level.SEVERE, "Invalid or not set value for "
+                    + optname + " from WebServer config file " + filename);
                 System.exit(1);
             }
             return val;
@@ -927,8 +922,8 @@ public class WebServer implements IWebServer, IRunWebServer
                     {
                         GameInfo game = it.next();
                         String name = game.getName();
-                        LOGGER.log(Level.FINE,
-                            "REAPER: wait for '" + name + "' to end...");
+                        LOGGER.log(Level.FINE, "REAPER: wait for '" + name
+                            + "' to end...");
                         try
                         {
                             game.join();
@@ -959,7 +954,7 @@ public class WebServer implements IWebServer, IRunWebServer
         }
     }
 
-    private class ChatMessage
+    private static class ChatMessage
     {
         String chatId;
         long when;

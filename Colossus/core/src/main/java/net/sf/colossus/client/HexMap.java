@@ -213,7 +213,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
                 {
                     startlistMap.put(terrain, tempTowerStartList);
                 }
-                towerStatusMap.put(terrain, new Boolean(bl.isTower()));
+                towerStatusMap.put(terrain, Boolean.valueOf(bl.isTower()));
                 subtitleMap.put(terrain, bl.getSubtitle());
             }
             else
@@ -321,7 +321,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
                 }
                 if (count > 0)
                 {
-                    t2n.put(hTerrain, new Integer(count));
+                    t2n.put(hTerrain, Integer.valueOf(count));
                 }
             }
             hazardNumberMap.put(terrain, t2n);
@@ -348,7 +348,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
                 }
                 if (count > 0)
                 {
-                    s2n.put(new Character(side), new Integer(count));
+                    s2n.put(Character.valueOf(side), Integer.valueOf(count));
                 }
             }
             hazardSideNumberMap.put(terrain, s2n);
@@ -575,7 +575,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
     public static BattleHex getHexByLabel(String terrain, String label)
     {
         int x = 0;
-        int y = Integer.parseInt(new String(label.substring(1)));
+        int y = Integer.parseInt(label.substring(1));
         switch (label.charAt(0))
         {
             case 'A':
@@ -861,7 +861,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
 
         assert s2n != null : "Accessing terrain that does not exist in Variant";
 
-        Integer number = s2n.get(new Character(hazard));
+        Integer number = s2n.get(Character.valueOf(hazard));
         if (number == null)
         {
             return 0;

@@ -1938,8 +1938,7 @@ public class WebClient extends KFrame implements WindowListener,
         else if (source == autoGSNothingRB || source == autoGSHideRB
             || source == autoGSCloseRB)
         {
-            String autoGSAction = new String(command);
-            options.setOption(optAutoGameStartAction, autoGSAction);
+            options.setOption(optAutoGameStartAction, command);
         }
 
         else if (source == variantBox)
@@ -2093,7 +2092,7 @@ public class WebClient extends KFrame implements WindowListener,
 
             if (row >= rows)
             {
-                return new String("-");
+                return "-";
             }
 
             GameInfo gi = data.get(row);
@@ -2129,11 +2128,11 @@ public class WebClient extends KFrame implements WindowListener,
                     break;
 
                 case 6:
-                    o = new Boolean(gi.getUnlimitedMulligans());
+                    o = Boolean.valueOf(gi.getUnlimitedMulligans());
                     break;
 
                 case 7:
-                    o = new Boolean(gi.getBalancedTowers());
+                    o = Boolean.valueOf(gi.getBalancedTowers());
                     break;
 
                 case 8:
@@ -2278,7 +2277,7 @@ public class WebClient extends KFrame implements WindowListener,
             int nextIndex = data.size();
             data.add(gi);
             String gameId = gi.getGameId();
-            rowIndex.put(gameId, new Integer(nextIndex));
+            rowIndex.put(gameId, Integer.valueOf(nextIndex));
 
             fireTableRowsUpdated(nextIndex, nextIndex);
             return nextIndex;
@@ -2322,7 +2321,7 @@ public class WebClient extends KFrame implements WindowListener,
             {
                 GameInfo gi = data.get(i);
                 String gameId = gi.getGameId();
-                rowIndex.put(gameId, new Integer(i));
+                rowIndex.put(gameId, Integer.valueOf(i));
                 i++;
             }
         }
@@ -2331,7 +2330,7 @@ public class WebClient extends KFrame implements WindowListener,
         {
             GameInfo gi = (GameInfo)value;
             String gameId = gi.getGameId();
-            rowIndex.put(gameId, new Integer(row));
+            rowIndex.put(gameId, Integer.valueOf(row));
 
             data.set(row, gi);
 
@@ -2356,11 +2355,11 @@ public class WebClient extends KFrame implements WindowListener,
             Integer index = rowIndex.get(gameId);
             if (index == null)
             {
-                index = new Integer(data.size());
+                index = Integer.valueOf(data.size());
                 int row = index.intValue();
                 GameInfo gi = new GameInfo(gameId);
                 data.add(gi);
-                rowIndex.put(gameId, new Integer(row));
+                rowIndex.put(gameId, Integer.valueOf(row));
                 fireTableRowsInserted(row, row);
             }
             return index;

@@ -229,11 +229,11 @@ public final class Constants
     public static final Map<String, Integer> hexsideMap = new HashMap<String, Integer>();
     static
     {
-        hexsideMap.put("NONE", new Integer(NONE));
-        hexsideMap.put("BLOCK", new Integer(BLOCK));
-        hexsideMap.put("ARCH", new Integer(ARCH));
-        hexsideMap.put("ARROW", new Integer(ARROW));
-        hexsideMap.put("ARROWS", new Integer(ARROWS));
+        hexsideMap.put("NONE", Integer.valueOf(NONE));
+        hexsideMap.put("BLOCK", Integer.valueOf(BLOCK));
+        hexsideMap.put("ARCH", Integer.valueOf(ARCH));
+        hexsideMap.put("ARROW", Integer.valueOf(ARROW));
+        hexsideMap.put("ARROWS", Integer.valueOf(ARROWS));
     }
 
     // MasterBoard size
@@ -357,11 +357,11 @@ public final class Constants
     public static final int defaultPort = 26567;
 
     // Web clients:
-    public static String defaultWebServer = "localhost";
-    public static int defaultWebPort = 26766;
-    public static String defaultWebLogin = System.getProperty("user.name",
-        "webuser");
-    public static String defaultWebPassword = "webpassword";
+    public static final String defaultWebServer = "localhost";
+    public static final int defaultWebPort = 26766;
+    public static final String defaultWebLogin = System.getProperty(
+        "user.name", "webuser");
+    public static final String defaultWebPassword = "webpassword";
 
     public static final int numSavedServerNames = 10;
 

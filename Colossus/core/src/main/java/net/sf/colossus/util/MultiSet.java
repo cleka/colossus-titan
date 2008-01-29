@@ -27,7 +27,7 @@ public class MultiSet<T>
     {
         if (!contains(key))
         {
-            map.put(key, new Integer(1));
+            map.put(key, Integer.valueOf(1));
         }
         else
         {
@@ -52,7 +52,7 @@ public class MultiSet<T>
         int cur = prev - 1;
         if (cur >= 1)
         {
-            map.put(key, new Integer(cur));
+            map.put(key, Integer.valueOf(cur));
         }
         else
         {

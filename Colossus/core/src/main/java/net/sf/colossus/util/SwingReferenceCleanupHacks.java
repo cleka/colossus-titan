@@ -23,7 +23,7 @@ public class SwingReferenceCleanupHacks
         {
             javax.swing.MenuSelectionManager aMenuSelectionManager = javax.swing.MenuSelectionManager
                 .defaultManager();
-            Object anObject = SafelyGetReflectedField(
+            Object anObject = safelyGetReflectedField(
                 "javax.swing.MenuSelectionManager", "listenerList",
                 aMenuSelectionManager);
             if (null != anObject)
@@ -98,7 +98,7 @@ public class SwingReferenceCleanupHacks
             "javax.swing.plaf.basic.BasicPopupMenuUI", "menuKeyboardHelper",
             null);
 
-        Object anObject = SafelyGetReflectedField(
+        Object anObject = safelyGetReflectedField(
             "com.sun.java.swing.plaf.windows.WindowsPopupMenuUI",
             "mnemonicListener", null);
         if (null != anObject)
@@ -139,7 +139,7 @@ public class SwingReferenceCleanupHacks
         }
     }
 
-    private static Object SafelyGetReflectedField(String aClassName,
+    private static Object safelyGetReflectedField(String aClassName,
         String aFieldName, Object anObject)
     {
         try
@@ -155,7 +155,7 @@ public class SwingReferenceCleanupHacks
         }
     }
 
-    public static void CleanupJMenuBarGlobals()
+    public static void cleanupJMenuBarGlobals()
     {
         SafelySetReflectedFieldToNull(
             "com.sun.java.swing.plaf.windows.WindowsRootPaneUI$AltProcessor",

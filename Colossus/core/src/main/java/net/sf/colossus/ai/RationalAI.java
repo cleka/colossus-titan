@@ -1766,7 +1766,7 @@ public class RationalAI extends SimpleAI
         {
             score = evaluateMoveInner(legion, hex, canRecruitHere, depth,
                 addHexRisk);
-            val = new Integer(score);
+            val = Integer.valueOf(score);
             evaluateMoveMap.put(key, val);
         }
         return score;

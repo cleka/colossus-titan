@@ -356,7 +356,7 @@ final class EventViewer extends KDialog implements WindowListener,
             // 1, 2, 3, 4, 5, 
             if (i <= 5 || i == maxVal)
             {
-                alChoices.add(new Integer(i).toString());
+                alChoices.add(String.valueOf(i));
             }
 
             /* right now: no big values due to performance issues...
@@ -365,7 +365,7 @@ final class EventViewer extends KDialog implements WindowListener,
              */
             else if (i == 10)
             {
-                alChoices.add(new Integer(i).toString());
+                alChoices.add(String.valueOf(i));
             }
         }
         if (this.expireTurns == -1)

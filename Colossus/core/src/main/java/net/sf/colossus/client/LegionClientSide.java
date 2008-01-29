@@ -198,7 +198,7 @@ public final class LegionClientSide extends Legion implements
         while (it.hasNext())
         {
             CreatureInfo ci = it.next();
-            booleans.add(new Boolean(ci.isCertain()));
+            booleans.add(Boolean.valueOf(ci.isCertain()));
         }
         return booleans;
     }
@@ -359,9 +359,15 @@ public final class LegionClientSide extends Legion implements
         return getNode().numUncertainCreatures();
     }
 
-    /** Legions are sorted in descending order of known total point value,
-     with the titan legion always coming first.  This is inconsistent
-     with equals().  Really only useful for comparing own legions. */
+    /** 
+     * Legions are sorted in descending order of known total point value,
+     * with the titan legion always coming first.  
+     * 
+     * TODO This is inconsistent with equals() and thus not a proper implementation
+     *      of Comparable.  
+     *      
+     * Really only useful for comparing own legions. 
+     */
     public int compareTo(LegionClientSide other)
     {
         if (hasTitan())

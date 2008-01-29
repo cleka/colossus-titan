@@ -16,11 +16,13 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.lang.reflect.Constructor;
+import java.net.MalformedURLException;
 import java.net.Socket;
 import java.net.URL;
 import java.util.ArrayList;
@@ -110,7 +112,11 @@ public final class ResourceLoader
                 return defineClass(className, classDataBytes, 0,
                     classDataBytes.length);
             }
-            catch (Exception e)
+            catch (FileNotFoundException e)
+            {
+                return super.findClass(className);
+            }
+            catch (IOException e)
             {
                 return super.findClass(className);
             }
@@ -334,8 +340,8 @@ public final class ResourceLoader
         Image image = null;
         try
         {
-            java.net.URL url;
-            url = new java.net.URL("file:" + path + pathSeparator
+            URL url;
+            url = new URL("file:" + path + pathSeparator
                 + fixFilename(filename));
             // URL will not be null even if the file doesn't exist,
             // so we need to check if connection can be opened
@@ -344,7 +350,11 @@ public final class ResourceLoader
                 image = Toolkit.getDefaultToolkit().getImage(url);
             }
         }
-        catch (Exception e)
+        catch (MalformedURLException e)
+        {
+            // nothing to do
+        }
+        catch (IOException e)
         {
             // nothing to do
         }

@@ -513,16 +513,14 @@ final class SocketClientThread extends Thread implements IServer
         {
             String markerId = args.remove(0);
             String name = args.remove(0);
-            String reason = args.isEmpty() ? new String("<Unknown>")
-                : (String)args.remove(0);
+            String reason = args.isEmpty() ? "<Unknown>" : args.remove(0);
             client.addCreature(resolveLegion(markerId), name, reason);
         }
         else if (method.equals(Constants.removeCreature))
         {
             String markerId = args.remove(0);
             String name = args.remove(0);
-            String reason = args.isEmpty() ? new String("<Unknown>")
-                : (String)args.remove(0);
+            String reason = args.isEmpty() ? "<Unknown>" : args.remove(0);
             client.removeCreature(resolveLegion(markerId), name, reason);
         }
         else if (method.equals(Constants.revealCreatures))
@@ -538,8 +536,7 @@ final class SocketClientThread extends Thread implements IServer
             {
                 names.remove(0);
             }
-            String reason = args.isEmpty() ? new String("<Unknown>")
-                : (String)args.remove(0);
+            String reason = args.isEmpty() ? "<Unknown>" : args.remove(0);
             client.revealCreatures(resolveLegion(markerId), names, reason);
         }
         else if (method.equals(Constants.revealEngagedCreatures))
@@ -548,8 +545,7 @@ final class SocketClientThread extends Thread implements IServer
             boolean isAttacker = Boolean.valueOf(args.remove(0))
                 .booleanValue();
             List<String> names = Split.split(Glob.sep, args.remove(0));
-            String reason = args.isEmpty() ? new String("<Unknown>")
-                : (String)args.remove(0);
+            String reason = args.isEmpty() ? "<Unknown>" : args.remove(0);
             client.revealEngagedCreatures(resolveLegion(markerId), names,
                 isAttacker, reason);
         }

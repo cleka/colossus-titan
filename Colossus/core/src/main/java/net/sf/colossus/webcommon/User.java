@@ -30,8 +30,8 @@ import java.util.logging.Logger;
 
 public class User
 {
-    private static final Logger LOGGER =
-        Logger.getLogger(User.class.getName());
+    private static final Logger LOGGER = Logger
+        .getLogger(User.class.getName());
 
     private static HashMap<String, User> userMap = new HashMap<String, User>();
     private static HashMap<String, User> loggedInUserMap = new HashMap<String, User>();
@@ -43,7 +43,7 @@ public class User
 
     private static int maxUsers;
 
-    private String name;
+    private final String name;
     private String password;
     private String email;
     private boolean isAdmin;
@@ -263,11 +263,11 @@ public class User
     {
         String sep = net.sf.colossus.server.Constants.protocolTermSeparator;
 
-        String[] tokens = line.split(new String(sep));
+        String[] tokens = line.split(sep);
         if (tokens.length != 5)
         {
-            LOGGER.log(Level.WARNING,
-                "invalid line '" + line + "' in user file!");
+            LOGGER.log(Level.WARNING, "invalid line '" + line
+                + "' in user file!");
             return;
         }
         String name = tokens[0].trim();
@@ -310,7 +310,7 @@ public class User
                 {
                     // ignore comment line
                 }
-                else if (line.matches(new String("\\s*")))
+                else if (line.matches("\\s*"))
                 {
                     // ignore empty line
                 }
@@ -322,14 +322,13 @@ public class User
         }
         catch (FileNotFoundException e)
         {
-            LOGGER.log(Level.SEVERE,
-                "Users file " + filename + " not found!", e);
+            LOGGER.log(Level.SEVERE, "Users file " + filename + " not found!",
+                e);
             System.exit(1);
         }
         catch (IOException e)
         {
-            LOGGER.log(Level.SEVERE,
-                "IOException while reading users file "
+            LOGGER.log(Level.SEVERE, "IOException while reading users file "
                 + filename + "!", e);
             System.exit(1);
         }
@@ -374,8 +373,8 @@ public class User
         }
         catch (FileNotFoundException e)
         {
-            LOGGER.log(Level.SEVERE, "Writing users file " + filename +
-                "failed: FileNotFoundException: ", e);
+            LOGGER.log(Level.SEVERE, "Writing users file " + filename
+                + "failed: FileNotFoundException: ", e);
             System.exit(1);
         }
     }

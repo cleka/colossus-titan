@@ -332,12 +332,6 @@ public final class GetPlayers extends KFrame implements WindowListener,
         setVisible(true);
     }
 
-    private Object makeObj(final String item)
-    {
-        String strObject = new String(item);
-        return strObject;
-    }
-
     private void setRunningOnLabel(int port)
     {
         InetAddress ia = null;
@@ -490,7 +484,7 @@ public final class GetPlayers extends KFrame implements WindowListener,
         }
         if (found == -1)
         {
-            box.addItem(makeObj(port));
+            box.addItem(port);
         }
     }
 

@@ -1,6 +1,7 @@
 package net.sf.colossus.client;
 
 
+import java.io.Serializable;
 import java.util.Comparator;
 
 import net.sf.colossus.server.VariantSupport;
@@ -9,7 +10,8 @@ import net.sf.colossus.variant.CreatureType;
 
 /** Sort creatures in decreasing order of importance, then by creature
  *  name, then by certainty. */
-final class CreatureInfoComparator implements Comparator<CreatureInfo>
+final class CreatureInfoComparator implements Comparator<CreatureInfo>,
+    Serializable
 {
     public int compare(CreatureInfo info1, CreatureInfo info2)
     {

@@ -100,7 +100,7 @@ class PermGen
             return;
         }
         int size = Integer.parseInt(args[0]);
-        int[] perm = new int[size];
+        int[] perm;
         int count = 0;
         PermGen pg = new PermGen(size);
         do

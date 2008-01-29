@@ -811,15 +811,6 @@ public final class Strike
      *  target, including modifications for terrain. */
     public int getDice(BattleChit chit, BattleChit target)
     {
-        int baseDice = 0;
-        return getDice(chit, target, baseDice);
-    }
-
-    /** Return the number of dice that will be rolled when striking this
-     *  target, including modifications for terrain. 
-     *  also return the number of dice before terrain adjustments. */
-    int getDice(BattleChit chit, BattleChit target, int baseDice)
-    {
         BattleHex hex = client.getBattleHex(chit);
         BattleHex targetHex = client.getBattleHex(target);
         CreatureType striker = client.getGame().getVariant()
@@ -834,8 +825,6 @@ public final class Strike
         {
             dice = striker.getPower();
         }
-
-        baseDice = (baseDice != dice ? dice : baseDice);
 
         boolean rangestrike = !client.isInContact(chit, true);
         HazardTerrain terrain = hex.getTerrain();

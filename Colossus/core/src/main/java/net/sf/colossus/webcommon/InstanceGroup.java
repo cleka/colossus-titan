@@ -19,15 +19,15 @@ import java.util.logging.Logger;
 
 public class InstanceGroup
 {
-    private static final Logger LOGGER =
-        Logger.getLogger(InstanceGroup.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(InstanceGroup.class
+        .getName());
 
-    private WeakHashMap<Object, typeInstance> instances;
-    private String shortType;
+    private final WeakHashMap<Object, TypeInstance> instances;
+    private final String shortType;
 
     public InstanceGroup(String type)
     {
-        instances = new WeakHashMap<Object, typeInstance>();
+        instances = new WeakHashMap<Object, TypeInstance>();
         this.shortType = shortType(type);
     }
 
@@ -46,14 +46,14 @@ public class InstanceGroup
 
     public synchronized void addInstance(Object o, String id)
     {
-        typeInstance i = new typeInstance(o, id);
+        TypeInstance i = new TypeInstance(o, id);
         instances.put(o, i);
     }
 
     public synchronized String getPrintStatistics()
     {
         StringBuffer gstat = new StringBuffer("");
-        
+
         int count = instances.size();
         if (count == 0)
         {
@@ -75,7 +75,7 @@ public class InstanceGroup
             }
             else
             {
-                typeInstance i = instances.get(key);
+                TypeInstance i = instances.get(key);
                 gstat.append(sep + i.getId());
                 sep = ", ";
             }
@@ -91,10 +91,10 @@ public class InstanceGroup
         return amount;
     }
 
-    public synchronized typeInstance getInstance(Object o)
+    public synchronized TypeInstance getInstance(Object o)
     {
         Iterator<Object> it = instances.keySet().iterator();
-        typeInstance foundInstance = null;
+        TypeInstance foundInstance = null;
 
         while (foundInstance == null && it.hasNext())
         {
@@ -105,7 +105,7 @@ public class InstanceGroup
             }
             else
             {
-                typeInstance i = instances.get(key);
+                TypeInstance i = instances.get(key);
                 if (i.getObj() == o)
                 {
                     foundInstance = i;
@@ -116,12 +116,12 @@ public class InstanceGroup
         return foundInstance;
     }
 
-    public class typeInstance
+    public class TypeInstance
     {
-        private WeakReference<Object> objRef;
+        private final WeakReference<Object> objRef;
         private String id;
 
-        private typeInstance(Object o, String id)
+        private TypeInstance(Object o, String id)
         {
             this.objRef = new WeakReference<Object>(o);
             this.id = id;

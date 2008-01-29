@@ -241,7 +241,6 @@ public final class BattleChit extends Chit
             int hitsFontWidth = fontMetrics.stringWidth(hitString);
 
             // Setup spaces to show Hits and Strike Target.
-            Rectangle hitRect = new Rectangle();
             if (strikeNumber > 0)
             {
                 Rectangle strikeRect = strikeDie.getBounds();
@@ -264,7 +263,7 @@ public final class BattleChit extends Chit
             }
             if (hits > 0)
             {
-                hitRect = new Rectangle(rect.x + 2, rect.y + 2
+                Rectangle hitRect = new Rectangle(rect.x + 2, rect.y + 2
                     + (inverted ? fifthChitSize + 2 : 0), hitsFontWidth,
                     fontHeight);
 

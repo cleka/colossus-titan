@@ -755,9 +755,14 @@ public final class LegionServerSide extends Legion implements
         return lords;
     }
 
-    /** Legions are sorted in descending order of total point value,
-     with the titan legion always coming first.  This is inconsistent
-     with equals(). */
+    /** 
+     * Legions are sorted in descending order of total point value,
+     * with the titan legion always coming first.
+     * 
+     * TODO This is inconsistent with equals() which means the Comparable
+     *      contract is not fulfilled. Probably better of in a Comparator
+     *      in any case.
+     */
     public int compareTo(LegionServerSide other)
     {
         if (hasTitan())

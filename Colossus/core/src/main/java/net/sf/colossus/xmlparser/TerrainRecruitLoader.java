@@ -295,7 +295,8 @@ public class TerrainRecruitLoader
         TerrainRecruitLoader.strToDisplayName.put(name, displayName);
         TerrainRecruitLoader.strToColor.put(name, HTMLColor
             .stringToColor(color));
-        TerrainRecruitLoader.strToBelow.put(name, new Boolean(regularRecruit));
+        TerrainRecruitLoader.strToBelow.put(name, Boolean
+            .valueOf(regularRecruit));
         // XXX Random not yet supported:            
         TerrainRecruitLoader.strToRnd.put(name, null);
 

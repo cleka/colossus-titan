@@ -304,7 +304,7 @@ public class DiceTest extends TestCase
             if (roll != lastroll)
             {
                 lastroll = roll;
-                li.add(new Integer(lastroll));
+                li.add(Integer.valueOf(lastroll));
             }
         }
         int[] results = new int[li.size()];

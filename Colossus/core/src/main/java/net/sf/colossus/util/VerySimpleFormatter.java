@@ -46,7 +46,7 @@ public class VerySimpleFormatter extends Formatter
             }
             catch (Exception ex)
             {
-                // really should work
+                // really should work and we don't want to write anything anywhere else
             }
         }
         return sb.toString();

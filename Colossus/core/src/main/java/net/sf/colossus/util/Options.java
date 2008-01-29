@@ -75,9 +75,8 @@ public final class Options implements IOptions
     public static final String viewableEver = "Ever revealed (or concludable) since start";
     public static final String viewableAll = "True content for all legions";
 
-    public static final String[] viewModeArray = { viewableOwn,
-    //        viewableLast,  // not implemented yet.
-        viewableEver, viewableAll };
+    public static final String[] viewModeArray = { viewableOwn, viewableEver,
+        viewableAll };
 
     public static final int viewableOwnNum = 1;
     public static final int viewableLastNum = 2;
@@ -211,17 +210,32 @@ public final class Options implements IOptions
 
         String optionsFile = getOptionsFilename();
         LOGGER.log(Level.INFO, "Loading options from " + optionsFile);
+        FileInputStream in = null;
         try
         {
-            FileInputStream in = new FileInputStream(optionsFile);
+            in = new FileInputStream(optionsFile);
             props.load(in);
             triggerAllOptions();
         }
         catch (IOException e)
         {
-            LOGGER
-                .log(Level.INFO, "Couldn't read options from " + optionsFile);
+            LOGGER.warning("Couldn't read options from " + optionsFile);
             return;
+        }
+        finally
+        {
+            if (in != null)
+            {
+                try
+                {
+                    in.close();
+                }
+                catch (IOException e)
+                {
+                    LOGGER.log(Level.WARNING,
+                        "Could not close options file properly", e);
+                }
+            }
         }
     }
 
@@ -264,7 +278,7 @@ public final class Options implements IOptions
     synchronized public void setOption(String optname, String value)
     {
         String oldValue = getStringOption(optname);
-        if (oldValue != value)
+        if (!value.equals(oldValue))
         {
             props.setProperty(optname, value);
             triggerStringOption(optname, oldValue, value);

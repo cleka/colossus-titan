@@ -122,7 +122,7 @@ public class InstanceTracker
         if (instanceGroups.containsKey(type))
         {
             InstanceGroup group = instanceGroups.get(type);
-            InstanceGroup.typeInstance i = group.getInstance(o);
+            InstanceGroup.TypeInstance i = group.getInstance(o);
             if (i != null)
             {
                 i.setId(id);

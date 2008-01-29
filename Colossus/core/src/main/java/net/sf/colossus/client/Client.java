@@ -2229,8 +2229,8 @@ public final class Client implements IClient, IOracle
         if (propViewBoard != null && propViewBoard.equalsIgnoreCase("yes"))
         {
             forceViewBoard = true;
-            options.setOption(Options.showEventViewer, new String("true"));
-            options.setOption(Options.showStatusScreen, new String("true"));
+            options.setOption(Options.showEventViewer, "true");
+            options.setOption(Options.showStatusScreen, "true");
         }
 
         if (!options.getOption(Options.autoPlay)
@@ -3773,24 +3773,31 @@ public final class Client implements IClient, IOracle
         {
             BattleChit target = getBattleChit(targetHexLabel);
             target.setStrikeNumber(strike.getStrikeNumber(chit, target));
-            CreatureType striker = game.getVariant().getCreatureByName(
-                chit.getCreatureName());
-            int dice;
-            if (striker.isTitan())
-            {
-                dice = chit.getTitanPower();
-            }
-            else
-            {
-                dice = striker.getPower();
-            }
-            int baseDice = 0;
-            int strikeDice = strike.getDice(chit, target, baseDice);
-            if (baseDice == dice
-                || options.getOption(Options.showDiceAjustmentsRange))
-            {
-                target.setStrikeDice(strikeDice - dice);
-            }
+            // TODO this whole block of code was written under the assumption
+            //      that the Strike.getDice(BattleChit,BattleChit,int) method
+            //      (now deleted) would return a new baseDice value through the
+            //      third parameter. Java's parameters are CallByValue and do
+            //      not allow OUT parameters, thus the whole code does nothing
+            //      at all.
+            //
+            // CreatureType striker = game.getVariant().getCreatureByName(
+            //     chit.getCreatureName());
+            // int dice;
+            // if (striker.isTitan())
+            // {
+            //     dice = chit.getTitanPower();
+            // }
+            // else
+            // {
+            //     dice = striker.getPower();
+            // }
+            // int baseDice = 0;
+            // int strikeDice = strike.getDice(chit, target, baseDice);
+            // if (baseDice == dice
+            //     || options.getOption(Options.showDiceAjustmentsRange))
+            // {
+            //     target.setStrikeDice(strikeDice - dice);
+            // }
         }
     }
 
@@ -4136,7 +4143,7 @@ public final class Client implements IClient, IOracle
             ok = true;
         }
 
-        recruitReservations.put(recruitType, new Integer(remain));
+        recruitReservations.put(recruitType, Integer.valueOf(remain));
         return ok;
     }
 
@@ -4167,12 +4174,13 @@ public final class Client implements IClient, IOracle
         // in case someone called getReservedRemain with bypassing the 
         // reset or reserve methods, to be sure double check against the 
         // real remaining value.
-        int realCount = getGame().getCaretaker().getAvailableCount(recruitType);
+        int realCount = getGame().getCaretaker()
+            .getAvailableCount(recruitType);
         if (realCount < remain)
         {
             remain = realCount;
         }
-        recruitReservations.put(recruitType, new Integer(remain));
+        recruitReservations.put(recruitType, Integer.valueOf(remain));
 
         return remain;
     }
@@ -4232,7 +4240,8 @@ public final class Client implements IClient, IOracle
         while (it.hasNext())
         {
             CreatureType recruit = it.next();
-            int remaining = getGame().getCaretaker().getAvailableCount(recruit);
+            int remaining = getGame().getCaretaker()
+                .getAvailableCount(recruit);
 
             if (remaining > 0 && considerReservations)
             {
@@ -5185,7 +5194,7 @@ public final class Client implements IClient, IOracle
     private void setType(final String aType)
     {
         LOGGER.log(Level.FINEST, "Called setType for " + aType);
-        String type = new String(aType);
+        String type = aType;
         if (type.endsWith(Constants.anyAI))
         {
             int whichAI = Dice.rollDie(Constants.numAITypes) - 1;

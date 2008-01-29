@@ -69,7 +69,7 @@ public class DebugMethods
                 if (line.equals("h"))
                 {
                     SwingReferenceCleanupHacks.CleanupJPopupMenuGlobals(true);
-                    SwingReferenceCleanupHacks.CleanupJMenuBarGlobals();
+                    SwingReferenceCleanupHacks.cleanupJMenuBarGlobals();
                 }
 
                 if (line.equals("f"))

@@ -43,7 +43,7 @@ public final class ShowReadme extends KFrame
             variantName = Constants.variantArray[0];
         }
 
-        String title = new String("README for variant " + variantName);
+        String title = "README for variant " + variantName;
         setTitle(title);
 
         // KFrame does the registration:

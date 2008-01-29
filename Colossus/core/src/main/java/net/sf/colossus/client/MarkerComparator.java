@@ -1,6 +1,7 @@
 package net.sf.colossus.client;
 
 
+import java.io.Serializable;
 import java.util.Comparator;
 
 
@@ -9,7 +10,7 @@ import java.util.Comparator;
  *  @version $Id$
  *  @author David Ripton
  */
-public class MarkerComparator implements Comparator<String>
+public class MarkerComparator implements Comparator<String>, Serializable
 {
     private String shortColor;
 

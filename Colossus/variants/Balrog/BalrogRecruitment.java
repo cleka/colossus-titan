@@ -147,7 +147,7 @@ public class BalrogRecruitment extends CustomRecruitBase
             }
             newscore = ((PlayerClientSide)pi).getScore();
 
-            playerToOldScore.put(pi, new Integer(newscore));
+            playerToOldScore.put(pi, Integer.valueOf(newscore));
 
             alreadyNumber = (oldscore / balrogValue);
             nowNumber = (newscore / balrogValue);

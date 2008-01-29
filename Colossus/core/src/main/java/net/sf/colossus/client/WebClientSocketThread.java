@@ -33,13 +33,13 @@ import net.sf.colossus.webcommon.IWebServer;
 
 public class WebClientSocketThread extends Thread implements IWebServer
 {
-    private static final Logger LOGGER =
-        Logger.getLogger(WebClientSocketThread.class.getName());
+    private static final Logger LOGGER = Logger
+        .getLogger(WebClientSocketThread.class.getName());
 
     private WebClient webClient = null;
 
     private String hostname = null;
-    private int port;
+    private final int port;
 
     private String username = null;
     private String password = null;
@@ -292,7 +292,8 @@ public class WebClientSocketThread extends Thread implements IWebServer
                 }
                 else if (command.equals(IWebClient.gameInfo))
                 {
-                    HashMap<String, GameInfo> gameHash = webClient.getGameHash();
+                    HashMap<String, GameInfo> gameHash = webClient
+                        .getGameHash();
                     GameInfo gi = GameInfo.fromString(tokens, gameHash);
 
                     webClient.gameInfo(gi);
@@ -301,12 +302,12 @@ public class WebClientSocketThread extends Thread implements IWebServer
                 {
                     int loggedin = Integer.parseInt(tokens[1]);
                     int enrolled = Integer.parseInt(tokens[2]);
-                    int playing  = Integer.parseInt(tokens[3]);
-                    int dead     = Integer.parseInt(tokens[4]);
-                    long ago     = Long.parseLong(tokens[5]);
-                    String text  = tokens[6];
-                    webClient.userInfo(loggedin, enrolled, playing, dead,
-                        ago, text);
+                    int playing = Integer.parseInt(tokens[3]);
+                    int dead = Integer.parseInt(tokens[4]);
+                    long ago = Long.parseLong(tokens[5]);
+                    String text = tokens[6];
+                    webClient.userInfo(loggedin, enrolled, playing, dead, ago,
+                        text);
                 }
 
                 else if (command.equals(IWebClient.didEnroll))
@@ -386,14 +387,13 @@ public class WebClientSocketThread extends Thread implements IWebServer
         }
         catch (IOException ex)
         {
-            LOGGER.log(Level.SEVERE,
-            "WebClientSocketThread IOException!");
+            LOGGER.log(Level.SEVERE, "WebClientSocketThread IOException!");
             webClient.connectionReset(false);
         }
         catch (Exception e)
         {
-                LOGGER.log(Level.WARNING,
-                    "WebClientSocketThread whatever Exception!", e);
+            LOGGER.log(Level.WARNING,
+                "WebClientSocketThread whatever Exception!", e);
             Thread.dumpStack();
             webClient.connectionReset(false);
         }
@@ -411,7 +411,8 @@ public class WebClientSocketThread extends Thread implements IWebServer
             }
             catch (IOException ex)
             {
-                LOGGER.log(Level.WARNING, "WebClientSocketThread close() IOException!", ex);
+                LOGGER.log(Level.WARNING,
+                    "WebClientSocketThread close() IOException!", ex);
             }
         }
         socket = null;
@@ -476,8 +477,7 @@ public class WebClientSocketThread extends Thread implements IWebServer
             }
             catch (InterruptedException e)
             {
-                LOGGER.log(Level.WARNING,
-                    " got exception " + e.toString());
+                LOGGER.log(Level.WARNING, " got exception " + e.toString());
             }
             return result;
         }
@@ -514,9 +514,8 @@ public class WebClientSocketThread extends Thread implements IWebServer
             }
             else
             {
-                LOGGER.log(Level.WARNING,
-                    "Waiting for (N)ACK for command " + cmd +" but " +
-                    "got " + command);
+                LOGGER.log(Level.WARNING, "Waiting for (N)ACK for command "
+                    + cmd + " but " + "got " + command);
             }
         }
     }
@@ -581,11 +580,11 @@ public class WebClientSocketThread extends Thread implements IWebServer
         if (false)
         {
             LOGGER.log(Level.INFO, s);
-         
+
         }
     }
 
-    public class WebClientSocketThreadException extends Throwable
+    public class WebClientSocketThreadException extends Exception
     {
         boolean failedBecauseAlreadyLoggedIn = false;
 

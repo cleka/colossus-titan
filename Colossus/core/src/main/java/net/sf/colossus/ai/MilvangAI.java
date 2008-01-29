@@ -127,11 +127,11 @@ public class MilvangAI extends RationalAI
                 Integer numCritters = critterMap.get(creatureType);
                 if (numCritters == null)
                 {
-                    critterMap.put(creatureType, new Integer(1));
+                    critterMap.put(creatureType, Integer.valueOf(1));
                 }
                 else
                 {
-                    critterMap.put(creatureType, new Integer(numCritters
+                    critterMap.put(creatureType, Integer.valueOf(numCritters
                         .intValue() + 1));
                 }
             }

@@ -30,7 +30,7 @@ public final class PredictSplits
     PredictSplits(String rootId, List<String> creatureNames)
     {
         CreatureInfoList infoList = new CreatureInfoList();
-        for (String name: creatureNames)
+        for (String name : creatureNames)
         {
             CreatureInfo ci = new CreatureInfo(name, true, true);
             infoList.add(ci);
@@ -73,18 +73,18 @@ public final class PredictSplits
                             .getTurnCreated() : "Leaf nodes have to have different markerId or turn";
                         if (leaf1.getTurnCreated() < leaf2.getTurnCreated())
                         {
-                            prunes.add(new Integer(i));
+                            prunes.add(Integer.valueOf(i));
                         }
                         else
                         {
-                            prunes.add(new Integer(j));
+                            prunes.add(Integer.valueOf(j));
                         }
                     }
                 }
             }
         }
         // Remove in reverse order to keep indexes consistent.
-        for (Integer in: prunes)
+        for (Integer in : prunes)
         {
             leaves.remove(in.intValue());
         }
@@ -124,7 +124,7 @@ public final class PredictSplits
         LOGGER.log(Level.FINEST, "");
         List<PredictSplitNode> leaves = getLeaves(root);
         Collections.sort(leaves);
-        for (PredictSplitNode leaf: leaves)
+        for (PredictSplitNode leaf : leaves)
         {
             LOGGER.log(Level.FINEST, leaf.toString());
         }
@@ -137,7 +137,7 @@ public final class PredictSplits
         LOGGER.log(Level.FINEST, "");
         List<PredictSplitNode> nodes = getNodes(root);
         Collections.sort(nodes, nodeTurnComparator);
-        for (PredictSplitNode node: nodes)
+        for (PredictSplitNode node : nodes)
         {
             LOGGER.log(Level.FINEST, node.toString());
         }
@@ -148,7 +148,7 @@ public final class PredictSplits
     PredictSplitNode getLeaf(String markerId)
     {
         List<PredictSplitNode> leaves = getLeaves(root);
-        for (PredictSplitNode leaf: leaves)
+        for (PredictSplitNode leaf : leaves)
         {
             if (markerId.equals(leaf.getMarkerId()))
             {

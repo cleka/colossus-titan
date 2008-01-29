@@ -118,9 +118,10 @@ public class RecruitGraph
         }
 
         @Override
+        // TODO override hashCode() or leave both
         public boolean equals(Object obj)
         {
-            if (!(obj instanceof RecruitVertex))
+            if (this.getClass() != obj.getClass())
             {
                 return false;
             }
@@ -181,10 +182,11 @@ public class RecruitGraph
             return terrain;
         }
 
+        // TODO override hashCode(), too -- or leave both
         @Override
         public boolean equals(Object obj)
         {
-            if (!(obj instanceof RecruitEdge))
+            if (this.getClass() != obj.getClass())
             {
                 return false;
             }

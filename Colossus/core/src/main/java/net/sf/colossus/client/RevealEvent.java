@@ -530,6 +530,8 @@ public class RevealEvent
             }
         }
 
+        // TODO this assignment overrides whatever was assigned before without
+        //      ever having used it
         // NOTE: this assumes that this event is for the player in whose 
         //       turn this happens:
         solidMarker = new Chit(scale, mulliganTitanBaseName);

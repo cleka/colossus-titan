@@ -135,15 +135,6 @@ public class Player
         return this.legions;
     }
 
-    @Override
-    public boolean equals(Object obj)
-    {
-        // make sure we don't compare apples and eggs
-        assert obj.getClass() == this.getClass() : getClass().getName()
-            + " compared with something else";
-        return super.equals(obj);
-    }
-
     public int getNumber()
     {
         return number;

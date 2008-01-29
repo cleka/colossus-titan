@@ -820,6 +820,8 @@ public class PredictSplitNode implements Comparable<PredictSplitNode>
         }
     }
 
+    // TODO Comparable not implemented properly since equals() not
+    //      overridden
     public int compareTo(PredictSplitNode other)
     {
         return toString().compareTo(other.toString());

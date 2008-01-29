@@ -85,7 +85,7 @@ public class GameInfo extends Thread
         String expire, boolean unlimitedMulligans, boolean balancedTowers,
         int min, int target, int max)
     {
-        this.gameId = new Integer(nextFreeGameId).toString();
+        this.gameId = String.valueOf(nextFreeGameId);
         nextFreeGameId++;
 
         this.initiator = initiator;
@@ -229,7 +229,7 @@ public class GameInfo extends Thread
 
     public Integer getMin()
     {
-        return new Integer(min);
+        return Integer.valueOf(min);
     }
 
     public void setMin(Integer val)
@@ -239,7 +239,7 @@ public class GameInfo extends Thread
 
     public Integer getTarget()
     {
-        return new Integer(target);
+        return Integer.valueOf(target);
     }
 
     public void setTarget(Integer val)
@@ -249,7 +249,7 @@ public class GameInfo extends Thread
 
     public Integer getMax()
     {
-        return new Integer(max);
+        return Integer.valueOf(max);
     }
 
     public void setMax(Integer val)
@@ -259,7 +259,7 @@ public class GameInfo extends Thread
 
     public Integer getEnrolledCount()
     {
-        return new Integer(enrolledPlayers);
+        return Integer.valueOf(enrolledPlayers);
     }
 
     public void setEnrolledCount(Integer val)
@@ -651,7 +651,7 @@ public class GameInfo extends Thread
                     // replace the \ of a Windows directory to /'es,
                     // because as it looks the java logger only accepts those,
                     // and uses backslashes just as quote character...
-                    line = new String(patternLine + "Colossus%g.log");
+                    line = patternLine + "Colossus%g.log";
                 }
                 out.println(line);
             }

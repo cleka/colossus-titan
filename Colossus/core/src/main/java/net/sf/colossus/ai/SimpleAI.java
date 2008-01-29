@@ -451,7 +451,7 @@ public class SimpleAI implements AI
         // Otherwise we might have a race situation, if callback is quicker
         // than caller incrementing the splitsDone value...
         this.splitsDone++;
-        client.doSplit(legion, newMarkerId, results.toString());
+        client.doSplit(legion, newMarkerId, results);
     }
 
     /** Return true if the legion could recruit or acquire something
@@ -3255,11 +3255,11 @@ public class SimpleAI implements AI
                 Integer old = map.get(hexLabel);
                 if (old == null)
                 {
-                    map.put(hexLabel, new Integer(1));
+                    map.put(hexLabel, Integer.valueOf(1));
                 }
                 else
                 {
-                    map.put(hexLabel, new Integer(old.intValue() + 1));
+                    map.put(hexLabel, Integer.valueOf(old.intValue() + 1));
                 }
             }
         }

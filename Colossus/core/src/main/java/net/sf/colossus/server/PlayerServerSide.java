@@ -97,7 +97,7 @@ public final class PlayerServerSide extends Player implements
     @Override
     public void setType(final String aType)
     {
-        String type = new String(aType);
+        String type = aType;
         LOGGER.log(Level.FINEST, "Called Player.setType() for " + getName()
             + " " + type);
         if (type.endsWith(Constants.anyAI))

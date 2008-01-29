@@ -652,7 +652,7 @@ public final class GameServerSide extends Game
 
         while (numDone < numPlayers)
         {
-            sequence.add(new Integer((int)Math.floor(counter + epsilon)));
+            sequence.add(Integer.valueOf((int)Math.floor(counter + epsilon)));
             numDone++;
             counter += towersPerPlayer;
         }
@@ -1190,7 +1190,7 @@ public final class GameServerSide extends Game
         }
         else
         {
-            fn = new String(filename);
+            fn = filename;
             LOGGER.info("Saving game to " + filename);
         }
 
