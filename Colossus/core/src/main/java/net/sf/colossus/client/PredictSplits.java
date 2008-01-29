@@ -157,6 +157,11 @@ public final class PredictSplits
         }
         return null;
     }
+
+    public PredictSplitNode getRoot()
+    {
+        return root;
+    }
 }
 
 

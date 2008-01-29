@@ -4,14 +4,17 @@
 package net.sf.colossus.client;
 
 
+import java.awt.Color;
 import java.awt.Container;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.SystemColor;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.WindowListener;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -19,6 +22,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 
 import net.sf.colossus.game.Creature;
@@ -167,7 +171,76 @@ public final class PlayerDetailsDialog extends KDialog implements
                 LABEL_CONSTRAINT);
             result.add(new JPanel(), HORIZONTAL_FILL_CONSTRAINT);
         }
+
+        result.add(new JLabel("Split history:"), SECTION_TITLE_CONSTRAINT);
+        JScrollPane splitNodesPanel = new JScrollPane(createSplitNodesPanel());
+        result.add(splitNodesPanel, SECTION_TITLE_CONSTRAINT);
+
         return result;
+    }
+
+    private JPanel createSplitNodesPanel()
+    {
+        JPanel result = new JPanel(new GridBagLayout());
+        PredictSplits ps = player.getPredictSplits();
+        PredictSplitNode root = ps.getRoot();
+        Map<PredictSplitNode, GridBagConstraints> layouts = new HashMap<PredictSplitNode, GridBagConstraints>();
+        GridBagConstraints rootConstraints = calculateSplitNodeLayout(root, 0,
+            layouts);
+        int totalHeight = rootConstraints.gridheight;
+
+        for (Map.Entry<PredictSplitNode, GridBagConstraints> entry : layouts
+            .entrySet())
+        {
+            PredictSplitNode node = entry.getKey();
+            GridBagConstraints constraints = entry.getValue();
+            JLabel label = new JLabel(node.getFullName());
+            label.setOpaque(true);
+            label.setBackground(getIntermediateColor(SystemColor.control,
+                Color.WHITE, constraints.gridy / (totalHeight - 1D)));
+            result.add(label, constraints);
+        }
+        return result;
+    }
+
+    private Color getIntermediateColor(Color from, Color to, double pos)
+    {
+        assert (pos >= 0) && (pos <= 1) : "Position out of range [0,1]";
+        int red = (int)(from.getRed() * (1 - pos) + to.getRed() * pos);
+        int green = (int)(from.getGreen() * (1 - pos) + to.getGreen() * pos);
+        int blue = (int)(from.getBlue() * (1 - pos) + to.getBlue() * pos);
+        int alpha = (int)(from.getAlpha() * (1 - pos) + to.getAlpha() * pos);
+        return new Color(red, green, blue, alpha);
+    }
+
+    // TODO it might be possible to just place the nodes directly instead of using
+    //      the map to store the constraints first
+    private GridBagConstraints calculateSplitNodeLayout(PredictSplitNode node,
+        int y, Map<PredictSplitNode, GridBagConstraints> layouts)
+    {
+        GridBagConstraints constraints = new GridBagConstraints();
+        constraints.gridx = node.getTurnCreated();
+        constraints.gridy = y;
+        constraints.fill = GridBagConstraints.BOTH;
+        if (node.getChild1() != null)
+        {
+            GridBagConstraints child1Layout = calculateSplitNodeLayout(node
+                .getChild1(), y, layouts);
+            GridBagConstraints child2Layout = calculateSplitNodeLayout(node
+                .getChild2(), y + child1Layout.gridheight, layouts);
+            constraints.gridheight = child1Layout.gridheight
+                + child2Layout.gridheight;
+            constraints.gridwidth = node.getChild1().getTurnCreated()
+                - node.getTurnCreated();
+        }
+        else
+        {
+            constraints.gridheight = 1;
+            constraints.gridwidth = client.getTurnNumber()
+                - node.getTurnCreated();
+        }
+        layouts.put(node, constraints);
+        return constraints;
     }
 
     private JPanel createCreaturesTable()
