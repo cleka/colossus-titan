@@ -1528,7 +1528,7 @@ public class RationalAI extends SimpleAI
 
         for (roll = 1; roll <= 6; roll++)
         {
-            List<Legion> enemies = enemyAttackMap[roll].get(hex.getLabel());
+            List<Legion> enemies = enemyAttackMap[roll].get(hex);
 
             if (enemies == null)
             {

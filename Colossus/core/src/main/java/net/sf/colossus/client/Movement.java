@@ -377,7 +377,6 @@ public final class Movement
             }
         }
         result.remove(null);
-        result.remove("null");
         return result;
     }
 

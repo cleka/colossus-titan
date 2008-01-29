@@ -1265,7 +1265,7 @@ public class SimpleAI implements AI
                         break;
                     }
 
-                    if ((legion).hasTitan())
+                    if (legion.hasTitan())
                     {
                         // unless we can win the game with this attack
                         if ((enemyLegion).hasTitan()
@@ -1316,8 +1316,7 @@ public class SimpleAI implements AI
                     // If this is an unimportant group for us, but
                     // is enemy titan, do it.  This might be an
                     // unfair use of information for the AI
-                    if (((LegionClientSide)legion).numLords() == 0
-                        && (enemyLegion).hasTitan())
+                    if (legion.numLords() == 0 && enemyLegion.hasTitan())
                     {
                         // Arbitrary value for killing a player but
                         // scoring no points: it's worth a little
@@ -1575,8 +1574,7 @@ public class SimpleAI implements AI
 
             for (roll = 1; roll <= 6; roll++)
             {
-                List<Legion> enemies = enemiesThatCanAttackOnA[roll].get(hex
-                    .getLabel());
+                List<Legion> enemies = enemiesThatCanAttackOnA[roll].get(hex);
 
                 if (enemies == null)
                 {

@@ -2322,7 +2322,6 @@ public final class GameServerSide extends Game
             }
         }
         result.remove(null);
-        result.remove("null");
         return result;
     }
 
