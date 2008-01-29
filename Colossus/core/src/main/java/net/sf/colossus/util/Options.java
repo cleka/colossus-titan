@@ -209,7 +209,7 @@ public final class Options implements IOptions
         }
 
         String optionsFile = getOptionsFilename();
-        LOGGER.log(Level.INFO, "Loading options from " + optionsFile);
+        LOGGER.info("Loading options from " + optionsFile);
         FileInputStream in = null;
         try
         {
@@ -219,7 +219,9 @@ public final class Options implements IOptions
         }
         catch (IOException e)
         {
-            LOGGER.warning("Couldn't read options from " + optionsFile);
+            // this can happen for the netclient-config and others, so
+            // don't warn
+            LOGGER.info("Couldn't read options from " + optionsFile);
             return;
         }
         finally
