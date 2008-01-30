@@ -517,6 +517,14 @@ final class SocketServerThread extends Thread implements IClient
 
     private Legion resolveLegion(String markerId)
     {
+        // TODO: currently doSummon still allows a null legion (and thus legion marker
+        //       on the network) to indicate that a summon was skipped. To disallow
+        //       having the null values in here we would need to introduce a new
+        //       network message such as "doneSummoning".
+        if (markerId.equals("null"))
+        {
+            return null;
+        }
         return server.getGame().getLegionByMarkerId(markerId);
     }
 
