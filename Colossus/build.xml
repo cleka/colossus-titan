@@ -94,7 +94,8 @@
 	</target>
 
 	<target name="test" depends="compileTests,compileVariants" description="Run all unit tests using JUnit">
-		<junit printsummary="yes" fork="no" haltonfailure="no">
+		<junit printsummary="yes" fork="no" haltonfailure="no" failureproperty="junit.testFailed" 
+			   errorproperty="junit.testError">
 			<classpath refid="project.class.path" />
 			<formatter type="plain" />
 			<batchtest todir="${testresults.dir}">
@@ -103,6 +104,10 @@
 		</junit>
 	</target>
 
+	<target name="failOnBrokenTest" description="Fails the build if a previously run 'test' target has any failures or errors">
+		<fail if="junit.testFailed" message="Failing build since a unit test failed"/>
+		<fail if="junit.testError" message="Failing build since a unit test returned an error"/>
+	</target>
 
 	<target name="javadoc" depends="compile" description="Make javadoc files">
 		<mkdir dir="javadoc" />
