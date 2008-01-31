@@ -526,13 +526,14 @@ public class CreatureServerSide extends Creature
 
         int strikeNumber = 4 - attackerSkill + defenderSkill;
 
+        HazardTerrain terrain = target.getCurrentHex().getTerrain();
+
         // Strike number can be modified directly by terrain.
         // Native defending in bramble, from strike by a non-native: +1
         // Native defending in bramble, from rangestrike by a non-native
         //     non-magicMissile: +1
-        if (target.getCurrentHex().getTerrain().equals(HazardTerrain.BRAMBLES)
-            && target.isNativeBramble() && !isNativeBramble()
-            && !(rangestrike && useMagicMissile()))
+        if (terrain.equals(HazardTerrain.BRAMBLES) && target.isNativeBramble()
+            && !isNativeBramble() && !(rangestrike && useMagicMissile()))
         {
             strikeNumber++;
         }
@@ -540,9 +541,8 @@ public class CreatureServerSide extends Creature
         // Native defending in stone, from strike by a non-native: +1
         // Native defending in stone, from rangestrike by a non-native
         //     non-magicMissile: +1
-        if (target.getCurrentHex().getTerrain().equals(HazardTerrain.STONE)
-            && target.isNativeStone() && !isNativeStone()
-            && !(rangestrike && useMagicMissile()))
+        if (terrain.equals(HazardTerrain.STONE) && target.isNativeStone()
+            && !isNativeStone() && !(rangestrike && useMagicMissile()))
         {
             strikeNumber++;
         }
@@ -550,8 +550,8 @@ public class CreatureServerSide extends Creature
         // Native defending in tree, from strike by a non-native: +1
         // Native defending in tree, from rangestrike by a non-native
         //     non-magicMissile: no effect
-        if (target.getCurrentHex().getTerrain().equals(HazardTerrain.TREE)
-            && target.isNativeTree() && !isNativeTree() && !(rangestrike))
+        if (terrain.equals(HazardTerrain.TREE) && target.isNativeTree()
+            && !isNativeTree() && !(rangestrike))
         {
             strikeNumber++;
         }
