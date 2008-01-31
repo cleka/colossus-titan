@@ -2606,8 +2606,8 @@ public class SimpleAI implements AI
     private PowerSkill calc_bonus(CreatureType creature, String terrain,
         boolean defender)
     {
-        int power = (creature).getPower();
-        int skill = (creature).getSkill();
+        int power = creature.getPower();
+        int skill = creature.getSkill();
 
         TerrainBonuses bonuses = TERRAIN_BONUSES.get(terrain);
         if (bonuses == null)
