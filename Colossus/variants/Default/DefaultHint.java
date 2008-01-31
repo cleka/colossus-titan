@@ -8,12 +8,14 @@ import java.util.List;
 
 import net.sf.colossus.client.LegionClientSide;
 import net.sf.colossus.server.Constants;
+import net.sf.colossus.server.HintInterface;
 import net.sf.colossus.server.HintOracleInterface;
 import net.sf.colossus.util.DevRandom;
 import net.sf.colossus.variant.CreatureType;
+import net.sf.colossus.variant.MasterBoardTerrain;
 
 
-public class DefaultHint implements net.sf.colossus.server.HintInterface
+public class DefaultHint implements HintInterface
 {
     private final DevRandom rnd = new DevRandom();
 
@@ -30,14 +32,15 @@ public class DefaultHint implements net.sf.colossus.server.HintInterface
         return recruits;
     }
 
-    public String getRecruitHint(String terrain, LegionClientSide legion,
-        List<CreatureType> recruits, HintOracleInterface oracle,
-        String[] section)
+    public String getRecruitHint(MasterBoardTerrain terrain,
+        LegionClientSide legion, List<CreatureType> recruits,
+        HintOracleInterface oracle, String[] section)
     {
+        String terrainId = terrain.getId();
         List<String> recruitNames = creaturesToStrings(recruits);
         List<String> sect = Arrays.asList(section);
 
-        if (terrain.equals("Brush") || terrain.equals("Jungle"))
+        if (terrainId.equals("Brush") || terrainId.equals("Jungle"))
         {
             int numCyclops = legion.numCreature("Cyclops");
             if (numCyclops > 0 && numCyclops < 3
@@ -48,7 +51,7 @@ public class DefaultHint implements net.sf.colossus.server.HintInterface
                 return "Cyclops";
             }
         }
-        else if (terrain.equals("Plains"))
+        else if (terrainId.equals("Plains"))
         {
             if (recruitNames.contains("Lion") && !legion.contains("Griffon")
                 && legion.numCreature("Lion") == 2
@@ -83,7 +86,7 @@ public class DefaultHint implements net.sf.colossus.server.HintInterface
                 }
             }
         }
-        else if (terrain.equals("Marsh"))
+        else if (terrainId.equals("Marsh"))
         {
             if (recruitNames.contains("Troll") && !legion.contains("Wyvern")
                 && legion.numCreature("Troll") == 2
@@ -118,7 +121,7 @@ public class DefaultHint implements net.sf.colossus.server.HintInterface
                 }
             }
         }
-        else if (terrain.equals("Tower"))
+        else if (terrainId.equals("Tower"))
         {
             if (recruitNames.contains("Warlock"))
             {

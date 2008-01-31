@@ -42,7 +42,7 @@ public final class Movement
         int entrySide = -1;
         if (cameFrom != -1)
         {
-            if (hex.getTerrain().hasTowerStartList())
+            if (hex.getTerrain().hasStartList())
             {
                 entrySide = 3;
             }
@@ -330,7 +330,7 @@ public final class Movement
         }
 
         // Tower teleport
-        if (hex.getTerrain().hasTowerStartList() && legion.numLords() > 0
+        if (hex.getTerrain().hasStartList() && legion.numLords() > 0
             && towerTeleportAllowed())
         {
             // Mark every unoccupied hex within 6 hexes.
@@ -397,7 +397,7 @@ public final class Movement
                 // Startlisted terrain only have bottom entry side.
                 // Don't bother finding more than one entry side if unoccupied.
                 if (!client.isOccupied(targetHex)
-                    || targetHex.getTerrain().hasTowerStartList())
+                    || targetHex.getTerrain().hasStartList())
 
                 {
                     entrySides.add(Constants.bottom);

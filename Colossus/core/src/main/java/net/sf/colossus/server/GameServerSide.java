@@ -1825,7 +1825,7 @@ public final class GameServerSide extends Game
     {
         List<CreatureType> recruits;
 
-        String terrain = hex.getTerrain().getId();
+        MasterBoardTerrain terrain = hex.getTerrain();
 
         recruits = new ArrayList<CreatureType>();
         List<CreatureType> tempRecruits = TerrainRecruitLoader
@@ -1872,14 +1872,13 @@ public final class GameServerSide extends Game
 
         MasterHex hex = legion.getCurrentHex();
         MasterBoardTerrain terrain = hex.getTerrain();
-        recruiters = TerrainRecruitLoader.getPossibleRecruiters(terrain
-            .getId(), hex);
+        recruiters = TerrainRecruitLoader.getPossibleRecruiters(terrain, hex);
         Iterator<CreatureType> it = recruiters.iterator();
         while (it.hasNext())
         {
             CreatureType possibleRecruiter = it.next();
             int needed = TerrainRecruitLoader.numberOfRecruiterNeeded(
-                possibleRecruiter, recruit, terrain.getId(), hex);
+                possibleRecruiter, recruit, terrain, hex);
 
             if (needed < 1
                 || needed > ((LegionServerSide)legion)
@@ -1899,7 +1898,7 @@ public final class GameServerSide extends Game
     private boolean anonymousRecruitLegal(Legion legion, CreatureType recruit)
     {
         return TerrainRecruitLoader.anonymousRecruitLegal(recruit, legion
-            .getCurrentHex().getTerrain().getId(), legion.getCurrentHex());
+            .getCurrentHex().getTerrain(), legion.getCurrentHex());
     }
 
     /** Add recruit to legion. */
@@ -1945,7 +1944,7 @@ public final class GameServerSide extends Game
             {
                 // Mark the recruiter(s) as visible.
                 numRecruiters = TerrainRecruitLoader.numberOfRecruiterNeeded(
-                    recruiter, recruit, hex.getTerrain().getId(), hex);
+                    recruiter, recruit, hex.getTerrain(), hex);
             }
 
             LOGGER.info("Legion "
@@ -1974,7 +1973,7 @@ public final class GameServerSide extends Game
             return null;
         }
         List<String> recruits = new ArrayList<String>();
-        String terrain = legion.getCurrentHex().getTerrain().getId();
+        MasterBoardTerrain terrain = legion.getCurrentHex().getTerrain();
         List<String> allRecruits = TerrainRecruitLoader
             .getRecruitableAcquirableList(terrain, score);
         Iterator<String> it = allRecruits.iterator();
@@ -2021,7 +2020,7 @@ public final class GameServerSide extends Game
         int entrySide = -1;
         if (cameFrom != -1)
         {
-            if (hex.getTerrain().hasTowerStartList())
+            if (hex.getTerrain().hasStartList())
             {
                 entrySide = 3;
             }
@@ -2270,7 +2269,7 @@ public final class GameServerSide extends Game
         }
 
         // Tower teleport
-        if (hex.getTerrain().hasTowerStartList() && legion.numLords() > 0
+        if (hex.getTerrain().hasStartList() && legion.numLords() > 0
             && towerTeleportAllowed())
         {
             // Mark every unoccupied hex within 6 hexes.
@@ -2345,7 +2344,7 @@ public final class GameServerSide extends Game
                 // Startlisted terrain only have bottom entry side.
                 // Don't bother finding more than one entry side if unoccupied.
                 if (!isOccupied(targetHex)
-                    || targetHex.getTerrain().hasTowerStartList())
+                    || targetHex.getTerrain().hasStartList())
                 {
                     entrySides.add(Constants.bottom);
                     return entrySides;
@@ -2752,7 +2751,7 @@ public final class GameServerSide extends Game
         }
 
         // If this is a tower hex, the only entry side is the bottom.
-        if (hex.getTerrain().hasTowerStartList()
+        if (hex.getTerrain().hasStartList()
             && !entrySide.equals(Constants.bottom))
         {
             LOGGER.log(Level.WARNING, "Tried to enter invalid side of tower");

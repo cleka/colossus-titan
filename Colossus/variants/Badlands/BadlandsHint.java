@@ -7,24 +7,27 @@ import java.util.List;
 
 import net.sf.colossus.client.LegionClientSide;
 import net.sf.colossus.server.Constants;
+import net.sf.colossus.server.HintInterface;
 import net.sf.colossus.server.HintOracleInterface;
 import net.sf.colossus.util.DevRandom;
 import net.sf.colossus.variant.CreatureType;
+import net.sf.colossus.variant.MasterBoardTerrain;
 import Default.DefaultHint;
 
 
-public class BadlandsHint implements net.sf.colossus.server.HintInterface
+public class BadlandsHint implements HintInterface
 {
     private final DevRandom rnd = new DevRandom();
 
-    public String getRecruitHint(String terrain, LegionClientSide legion,
-        List<CreatureType> recruits, HintOracleInterface oracle,
-        String[] section)
+    public String getRecruitHint(MasterBoardTerrain terrain,
+        LegionClientSide legion, List<CreatureType> recruits,
+        HintOracleInterface oracle, String[] section)
     {
+        String terrainId = terrain.getId();
         List<String> recruitNames = DefaultHint.creaturesToStrings(recruits);
         List<String> sect = Arrays.asList(section);
 
-        if (terrain.equals("Brush") || terrain.equals("BrushAlt"))
+        if (terrainId.equals("Brush") || terrainId.equals("BrushAlt"))
         {
             if (recruitNames.contains("Cyclops")
                 && !legion.contains("Behemoth")
@@ -34,8 +37,8 @@ public class BadlandsHint implements net.sf.colossus.server.HintInterface
                 return "Cyclops";
             }
         }
-        else if (terrain.equals("Plains") || terrain.equals("Fort")
-            || terrain.equals("Town") || terrain.equals("Waterhole"))
+        else if (terrainId.equals("Plains") || terrainId.equals("Fort")
+            || terrainId.equals("Town") || terrainId.equals("Waterhole"))
         {
             if (recruitNames.contains("Lion") && !legion.contains("Griffon")
                 && legion.numCreature("Lion") == 2
@@ -74,7 +77,7 @@ public class BadlandsHint implements net.sf.colossus.server.HintInterface
                 }
             }
         }
-        else if (terrain.equals("Marsh") || terrain.equals("MarshAlt"))
+        else if (terrainId.equals("Marsh") || terrainId.equals("MarshAlt"))
         {
             if (recruitNames.contains("Troll") && !legion.contains("Wyvern")
                 && legion.numCreature("Troll") == 2
@@ -113,7 +116,7 @@ public class BadlandsHint implements net.sf.colossus.server.HintInterface
                 }
             }
         }
-        else if (terrain.equals("Tower") || terrain.equals("TowerAlt"))
+        else if (terrainId.equals("Tower") || terrainId.equals("TowerAlt"))
         // TowerAlt is in Badlands-JDG
         {
             if (recruitNames.contains("Warlock"))

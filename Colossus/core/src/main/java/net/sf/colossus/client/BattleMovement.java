@@ -4,6 +4,7 @@ package net.sf.colossus.client;
 import java.util.HashSet;
 import java.util.Set;
 
+import net.sf.colossus.server.BattleServerSide;
 import net.sf.colossus.util.Options;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.MasterBoardTerrain;
@@ -92,12 +93,14 @@ final class BattleMovement
      *  Startlisted Terrain,
      *  so we know that there are no enemies on board, and all allies
      *  are mobile.
+     *  
+     * TODO same as {@link BattleServerSide#findUnoccupiedStartlistHexes()}
      */
     private Set<String> findUnoccupiedStartlistHexes()
     {
         MasterBoardTerrain terrain = client.getBattleSite().getTerrain();
         Set<String> set = new HashSet<String>();
-        for (String hexLabel : terrain.getTowerStartList())
+        for (String hexLabel : terrain.getStartList())
         {
             BattleHex hex = HexMap.getHexByLabel(terrain, hexLabel);
             if (!isOccupied(hexLabel))
@@ -126,7 +129,7 @@ final class BattleMovement
         Set<String> set = new HashSet<String>();
         if (!chit.hasMoved() && !client.isInContact(chit, false))
         {
-            if (client.getBattleSite().getTerrain().hasTowerStartList()
+            if (client.getBattleSite().getTerrain().hasStartList()
                 && (client.getBattleTurnNumber() == 1)
                 && client.getBattleActiveLegion().equals(client.getDefender()))
             {

@@ -75,11 +75,12 @@ public final class LegionServerSide extends Legion implements
         }
     }
 
+    // TODO this method should be somewhere else, e.g. on Game
     static LegionServerSide getStartingLegion(String markerId, MasterHex hex,
         Player player, GameServerSide game)
     {
         CreatureType[] startCre = TerrainRecruitLoader
-            .getStartingCreatures(hex.getTerrain().getId());
+            .getStartingCreatures(hex.getTerrain());
         LegionServerSide legion = new LegionServerSide(markerId, null, hex,
             hex, player, game, VariantSupport.getCurrentVariant()
                 .getCreatureByName(Constants.titan), VariantSupport

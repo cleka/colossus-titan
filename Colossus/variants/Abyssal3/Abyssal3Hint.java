@@ -8,6 +8,7 @@ import net.sf.colossus.client.LegionClientSide;
 import net.sf.colossus.server.HintOracleInterface;
 import net.sf.colossus.util.DevRandom;
 import net.sf.colossus.variant.CreatureType;
+import net.sf.colossus.variant.MasterBoardTerrain;
 import Default.DefaultHint;
 
 
@@ -15,13 +16,14 @@ public class Abyssal3Hint implements net.sf.colossus.server.HintInterface
 {
     private final DevRandom rnd = new DevRandom();
 
-    public String getRecruitHint(String terrain, LegionClientSide legion,
-        List<CreatureType> recruits, HintOracleInterface oracle,
-        String[] section)
+    public String getRecruitHint(MasterBoardTerrain terrain,
+        LegionClientSide legion, List<CreatureType> recruits,
+        HintOracleInterface oracle, String[] section)
     {
+        String terrainId = terrain.getId();
         List<String> recruitNames = DefaultHint.creaturesToStrings(recruits);
 
-        if (terrain.equals("Brush"))
+        if (terrainId.equals("Brush"))
         {
             if (recruitNames.contains("Cyclops")
                 && !legion.contains("Behemoth") && legion.getHeight() != 6
@@ -31,7 +33,7 @@ public class Abyssal3Hint implements net.sf.colossus.server.HintInterface
                 return "Cyclops";
             }
         }
-        else if (terrain.equals("Plains"))
+        else if (terrainId.equals("Plains"))
         {
             if (recruitNames.contains("Lion") && !legion.contains("Griffon")
                 && legion.getHeight() != 6 && legion.numCreature("Lion") == 2
@@ -40,7 +42,7 @@ public class Abyssal3Hint implements net.sf.colossus.server.HintInterface
                 return "Lion";
             }
         }
-        else if (terrain.equals("Marsh"))
+        else if (terrainId.equals("Marsh"))
         {
             if (recruitNames.contains("Troll") && !legion.contains("Wyvern")
                 && legion.getHeight() != 6 && legion.numCreature("Troll") == 2
@@ -58,7 +60,7 @@ public class Abyssal3Hint implements net.sf.colossus.server.HintInterface
                 return "Ranger";
             }
         }
-        else if (terrain.equals("Woods"))
+        else if (terrainId.equals("Woods"))
         {
             if (recruitNames.contains("Unicorn")
                 && !legion.contains("EarthElemental")
@@ -70,7 +72,7 @@ public class Abyssal3Hint implements net.sf.colossus.server.HintInterface
                 return "Unicorn";
             }
         }
-        else if (terrain.equals("Desert"))
+        else if (terrainId.equals("Desert"))
         {
             if (recruitNames.contains("Hydra")
                 && !legion.contains("WaterElemental")
@@ -81,7 +83,7 @@ public class Abyssal3Hint implements net.sf.colossus.server.HintInterface
                 return "Hydra";
             }
         }
-        else if (terrain.equals("Tundra"))
+        else if (terrainId.equals("Tundra"))
         {
             if (recruitNames.contains("Colossus")
                 && !legion.contains("FireElemental")
@@ -93,7 +95,7 @@ public class Abyssal3Hint implements net.sf.colossus.server.HintInterface
                 return "Colossus";
             }
         }
-        else if (terrain.equals("Tower"))
+        else if (terrainId.equals("Tower"))
         {
             if (recruitNames.contains("Knight"))
             {

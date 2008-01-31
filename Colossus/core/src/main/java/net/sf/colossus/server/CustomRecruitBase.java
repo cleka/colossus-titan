@@ -11,6 +11,7 @@ import net.sf.colossus.game.Caretaker;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.variant.CreatureType;
+import net.sf.colossus.variant.MasterBoardTerrain;
 import net.sf.colossus.variant.MasterHex;
 
 
@@ -215,23 +216,25 @@ abstract public class CustomRecruitBase
         return null;
     }
 
-    /* subclasses must reimplement the following */
-
-    /** List all Creature that can recruit in this terrain in a special way */
+    /** 
+     * List all Creature that can recruit in this terrain in a special way
+     */
     abstract public List<CreatureType> getAllPossibleSpecialRecruiters(
-        String terrain);
+        MasterBoardTerrain terrain);
 
-    /** List all Creature that can be recruited in this terrain 
-     * in a special way */
+    /** 
+     * List all Creature that can be recruited in this terrain 
+     * in a special way
+     */
     abstract public List<CreatureType> getAllPossibleSpecialRecruits(
-        String terrain);
+        MasterBoardTerrain terrain);
 
     /** List Creature that can recruit in this terrain in a special way now 
      *
      * TODO the terrain parameter might be superfluous
      */
     abstract public List<CreatureType> getPossibleSpecialRecruiters(
-        String terrain, MasterHex hex);
+        MasterBoardTerrain terrain, MasterHex hex);
 
     /** List Creature that can be recruited in this terrain 
      * in a special way now
@@ -239,7 +242,7 @@ abstract public class CustomRecruitBase
      * TODO the terrain parameter might be superfluous
      */
     abstract public List<CreatureType> getPossibleSpecialRecruits(
-        String terrain, MasterHex hex);
+        MasterBoardTerrain terrain, MasterHex hex);
 
     /** number of recruiter needed to get a recruit 
      * in a special way in this terrain now
@@ -247,7 +250,7 @@ abstract public class CustomRecruitBase
      * TODO the terrain parameter might be superfluous
      */
     abstract public int numberOfRecruiterNeeded(CreatureType recruiter,
-        CreatureType recruit, String terrain, MasterHex hex);
+        CreatureType recruit, MasterBoardTerrain terrain, MasterHex hex);
 
     /** bookkeeping function, called once after every player turn.
      private as it should only be called from everyoneAdvanceTurn() */

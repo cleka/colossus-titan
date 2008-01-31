@@ -160,7 +160,7 @@ public final class ShowCreatureDetails extends KDialog implements
             {
                 final CreatureType recruiter = recruiters.get(ri);
                 int num = TerrainRecruitLoader.numberOfRecruiterNeeded(
-                    recruiter, creature, terrain.getId(), null);
+                    recruiter, creature, terrain, null);
                 if (num == 1)
                 {
                     buf.append("by 1 " + recruiter.getName() + ", ");
@@ -197,7 +197,7 @@ public final class ShowCreatureDetails extends KDialog implements
             {
                 final CreatureType recruit = recruits.get(ri);
                 int num = TerrainRecruitLoader.numberOfRecruiterNeeded(
-                    creature, recruit, terrain.getId(), null);
+                    creature, recruit, terrain, null);
                 if ((num > 0) && (num < RecruitGraph.BIGNUM))
                 {
                     buf.append(num + " recruit a " + recruit.getName() + ", ");

@@ -52,27 +52,27 @@ public class TerrainRecruitLoader
     public static final String Keyword_Special = "Special:";
 
     /**
-     * Map a String (representing a terrain) to a list of recruits.
+     * Map a terrain to a list of recruits.
      *   
      * TODO integrate into {@link MasterBoardTerrain}
      */
-    private static Map<String, List<RecruitNumber>> strToRecruits = new HashMap<String, List<RecruitNumber>>();
+    private static Map<MasterBoardTerrain, List<RecruitNumber>> strToRecruits = new HashMap<MasterBoardTerrain, List<RecruitNumber>>();
 
     /**
-     * Map a String (representing a terrain) to a boolean,
+     * Map a terrain to a boolean,
      * telling if a Creature can recruit in the usual way or not.
      *   
      * TODO integrate into {@link MasterBoardTerrain}
      */
-    private static Map<String, Boolean> strToBelow = new HashMap<String, Boolean>();
+    private static Map<MasterBoardTerrain, Boolean> strToBelow = new HashMap<MasterBoardTerrain, Boolean>();
 
     /**
-     * Map a String (representing a terrain) to an 
+     * Map a terrain to an 
      *   optional BattlelandsRandomizer filename.
      *   
      * TODO integrate into {@link MasterBoardTerrain}
      */
-    private static Map<String, String> strToRnd = new HashMap<String, String>();
+    private static Map<MasterBoardTerrain, String> strToRnd = new HashMap<MasterBoardTerrain, String>();
 
     /**
      * A map from the terrain names to the terrains.
@@ -109,7 +109,8 @@ public class TerrainRecruitLoader
      * Add an entire terrain recruiting list to the Recruiting Graph.
      * @param rl The list of RecruitNumber to add to the graph.
      */
-    private static void addToGraph(ArrayList<RecruitNumber> rl, String t)
+    private static void addToGraph(ArrayList<RecruitNumber> rl,
+        MasterBoardTerrain t)
     {
         Iterator<RecruitNumber> it = rl.iterator();
         String v1 = null;
@@ -288,15 +289,15 @@ public class TerrainRecruitLoader
 
         MasterBoardTerrain terrain = new MasterBoardTerrain(name, displayName,
             HTMLColor.stringToColor(color));
-        TerrainRecruitLoader.strToRecruits.put(name, rl);
-        TerrainRecruitLoader.strToBelow.put(name, Boolean
+        TerrainRecruitLoader.strToRecruits.put(terrain, rl);
+        TerrainRecruitLoader.strToBelow.put(terrain, Boolean
             .valueOf(regularRecruit));
         // XXX Random not yet supported:            
-        TerrainRecruitLoader.strToRnd.put(name, null);
+        TerrainRecruitLoader.strToRnd.put(terrain, null);
 
         terrains.put(name, terrain);
 
-        addToGraph(rl, name);
+        addToGraph(rl, terrain);
     }
 
     private void handleAcquirable(Element el) throws JDOMException,
@@ -304,7 +305,9 @@ public class TerrainRecruitLoader
     {
         String name = el.getAttribute("name").getValue();
         int points = el.getAttribute("points").getIntValue();
-        String terrain = el.getAttributeValue("terrain");
+        String terrainId = el.getAttributeValue("terrain");
+        MasterBoardTerrain terrain = TerrainRecruitLoader
+            .getTerrainById(terrainId);
         AcquirableData ad = new AcquirableData(name, points);
         if (terrain != null)
         {
@@ -419,7 +422,8 @@ public class TerrainRecruitLoader
      * @return an array of Creature representing the starting creatures.
      * @see net.sf.colossus.server.CreatureType
      */
-    public static CreatureType[] getStartingCreatures(String terrain)
+    public static CreatureType[] getStartingCreatures(
+        MasterBoardTerrain terrain)
     {
         CreatureType[] bc = new CreatureType[3];
         List<CreatureType> to = getPossibleRecruits(terrain, null);
@@ -448,8 +452,8 @@ public class TerrainRecruitLoader
      * @return List of Creatures that can be recruited in the terrain.
      * @see net.sf.colossus.server.CreatureType
      */
-    public static List<CreatureType> getPossibleRecruits(String terrain,
-        MasterHex hex)
+    public static List<CreatureType> getPossibleRecruits(
+        MasterBoardTerrain terrain, MasterHex hex)
     {
         List<RecruitNumber> al = strToRecruits.get(terrain);
         List<CreatureType> result = new ArrayList<CreatureType>();
@@ -491,8 +495,8 @@ public class TerrainRecruitLoader
      * @return List of Creatures that can recruit in the terrain.
      * @see net.sf.colossus.server.CreatureType
      */
-    public static List<CreatureType> getPossibleRecruiters(String terrain,
-        MasterHex hex)
+    public static List<CreatureType> getPossibleRecruiters(
+        MasterBoardTerrain terrain, MasterHex hex)
     {
         List<RecruitNumber> al = strToRecruits.get(terrain);
         List<CreatureType> re = new ArrayList<CreatureType>();
@@ -553,6 +557,9 @@ public class TerrainRecruitLoader
     /**
      * Give the number of a given recruiters needed to recruit a given
      * Creature.
+     * 
+     * TODO do we need the terrain parameter
+     * 
      * @param recruiter The Creature that wish to recruit.
      * @param recruit The Creature that is to be recruited.
      * @param terrain String representing a terrain, in which the
@@ -561,7 +568,7 @@ public class TerrainRecruitLoader
      * @see net.sf.colossus.server.CreatureType
      */
     public static int numberOfRecruiterNeeded(CreatureType recruiter,
-        CreatureType recruit, String terrain, MasterHex hex)
+        CreatureType recruit, MasterBoardTerrain terrain, MasterHex hex)
     {
         int g_value = graph.numberOfRecruiterNeeded(recruiter.getName(),
             recruit.getName(), terrain, hex);
@@ -569,7 +576,7 @@ public class TerrainRecruitLoader
     }
 
     public static boolean anonymousRecruitLegal(CreatureType recruit,
-        String terrain, MasterHex hex)
+        MasterBoardTerrain terrain, MasterHex hex)
     {
         int g_value = graph.numberOfRecruiterNeeded(Keyword_Anything, recruit
             .getName(), terrain, hex);
@@ -591,13 +598,13 @@ public class TerrainRecruitLoader
     {
         private final String name;
         private final int value;
-        private final List<String> where;
+        private final List<MasterBoardTerrain> where;
 
         AcquirableData(String n, int v)
         {
             name = n;
             value = v;
-            where = new ArrayList<String>();
+            where = new ArrayList<MasterBoardTerrain>();
         }
 
         String getName()
@@ -610,7 +617,7 @@ public class TerrainRecruitLoader
             return value;
         }
 
-        void addTerrain(String t)
+        void addTerrain(MasterBoardTerrain t)
         {
             where.add(t);
         }
@@ -621,7 +628,7 @@ public class TerrainRecruitLoader
          * @return True if the Acquirable can be acquired here,
          * false otherwise.
          */
-        boolean isAvailable(String t)
+        boolean isAvailable(MasterBoardTerrain t)
         {
             if (where.isEmpty() || ((where.indexOf(t)) != -1))
             {
@@ -703,7 +710,8 @@ public class TerrainRecruitLoader
      * terrain, for this amount of points.
      * @see #getAcquirableRecruitmentsValue()
      */
-    public static List<String> getRecruitableAcquirableList(String t, int value)
+    public static List<String> getRecruitableAcquirableList(
+        MasterBoardTerrain t, int value)
     {
         List<String> al = new ArrayList<String>();
         if ((value % getAcquirableRecruitmentsValue()) != 0)

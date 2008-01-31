@@ -42,7 +42,7 @@ public class HexRecruitTreePanel extends Box
         add(terrainLabel);
 
         List<CreatureType> creatures = TerrainRecruitLoader
-            .getPossibleRecruits(terrain.getId(), hex);
+            .getPossibleRecruits(terrain, hex);
         Iterator<CreatureType> it = creatures.iterator();
         boolean firstTime = true;
         int scale = 4 * Scale.get();
@@ -61,7 +61,7 @@ public class HexRecruitTreePanel extends Box
             else
             {
                 numToRecruit = TerrainRecruitLoader.numberOfRecruiterNeeded(
-                    prevCreature, creature, terrain.getId(), hex);
+                    prevCreature, creature, terrain, hex);
             }
 
             JLabel numToRecruitLabel = new JLabel("");

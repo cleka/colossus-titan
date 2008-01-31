@@ -5,23 +5,26 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.colossus.client.LegionClientSide;
+import net.sf.colossus.server.HintInterface;
 import net.sf.colossus.server.HintOracleInterface;
 import net.sf.colossus.util.DevRandom;
 import net.sf.colossus.variant.CreatureType;
+import net.sf.colossus.variant.MasterBoardTerrain;
 import Default.DefaultHint;
 
 
-public class Beelzebub12Hint implements net.sf.colossus.server.HintInterface
+public class Beelzebub12Hint implements HintInterface
 {
     private final DevRandom rnd = new DevRandom();
 
-    public String getRecruitHint(String terrain, LegionClientSide legion,
-        List<CreatureType> recruits, HintOracleInterface oracle,
-        String[] section)
+    public String getRecruitHint(MasterBoardTerrain terrain,
+        LegionClientSide legion, List<CreatureType> recruits,
+        HintOracleInterface oracle, String[] section)
     {
+        String terrainId = terrain.getId();
         List<String> recruitNames = DefaultHint.creaturesToStrings(recruits);
 
-        if (terrain.equals("Plains"))
+        if (terrainId.equals("Plains"))
         {
             if (recruitNames.contains("Centaur")
                 && !legion.contains("Warbear") && !legion.contains("Ent")
@@ -44,7 +47,7 @@ public class Beelzebub12Hint implements net.sf.colossus.server.HintInterface
             }
 
         }
-        else if (terrain.equals("Marsh"))
+        else if (terrainId.equals("Marsh"))
         {
             if (recruitNames.contains("Goblin")
                 && !legion.contains("Minotaur") && !legion.contains("Djinn")
@@ -58,7 +61,7 @@ public class Beelzebub12Hint implements net.sf.colossus.server.HintInterface
                 return "Goblin";
             }
         }
-        else if (terrain.equals("Ruins"))
+        else if (terrainId.equals("Ruins"))
         {
             if (recruitNames.contains("Skeleton")
                 && !legion.contains("Zombie") && !legion.contains("Ghost")
@@ -82,7 +85,7 @@ public class Beelzebub12Hint implements net.sf.colossus.server.HintInterface
                 return "Shade";
             }
         }
-        else if (terrain.equals("Tombs"))
+        else if (terrainId.equals("Tombs"))
         {
             if (recruitNames.contains("Ghost") && !legion.contains("Wraith")
                 && !legion.contains("Beelzebub") && !legion.contains("Death")
@@ -94,7 +97,7 @@ public class Beelzebub12Hint implements net.sf.colossus.server.HintInterface
                 return "Ghost";
             }
         }
-        else if (terrain.equals("Desert"))
+        else if (terrainId.equals("Desert"))
         {
             if (recruitNames.contains("Djinn")
                 && !legion.contains("Manticore")
@@ -105,7 +108,7 @@ public class Beelzebub12Hint implements net.sf.colossus.server.HintInterface
                 return "Djinn";
             }
         }
-        else if (terrain.equals("Swamp"))
+        else if (terrainId.equals("Swamp"))
         {
             if (recruitNames.contains("Ent") && !legion.contains("Unicorn")
                 && legion.numCreature("Ent") == 2 && legion.getHeight() != 6
@@ -115,7 +118,7 @@ public class Beelzebub12Hint implements net.sf.colossus.server.HintInterface
                 return "Ent";
             }
         }
-        else if (terrain.equals("Tower"))
+        else if (terrainId.equals("Tower"))
         {
             if (recruitNames.contains("Skeleton")
                 && legion.contains("Skeleton")

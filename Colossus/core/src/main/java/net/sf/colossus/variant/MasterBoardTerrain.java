@@ -26,7 +26,7 @@ public class MasterBoardTerrain
     private final String displayName;
     private final Color color;
     // TODO this should be a List<BattleHex> (and BattleHex should be part of the variant package)
-    private List<String> towerStartList;
+    private List<String> startList;
     private boolean isTower;
     private Map<HazardTerrain, Integer> hazardNumberMap;
     // TODO this should be a Map<HazardHexside, Integer>
@@ -39,7 +39,6 @@ public class MasterBoardTerrain
         this.color = color;
     }
 
-    // TODO this is still used in many places where the object reference should be used
     public String getId()
     {
         return id;
@@ -105,14 +104,18 @@ public class MasterBoardTerrain
         return false;
     }
 
-    public void setTowerStartList(List<String> towerStartList)
+    public void setStartList(List<String> startList)
     {
-        this.towerStartList = towerStartList;
+        this.startList = startList;
     }
 
-    public List<String> getTowerStartList()
+    public List<String> getStartList()
     {
-        return Collections.unmodifiableList(towerStartList);
+        if (startList == null)
+        {
+            return null;
+        }
+        return Collections.unmodifiableList(startList);
     }
 
     public void setTower(boolean isTower)
@@ -125,9 +128,9 @@ public class MasterBoardTerrain
         return isTower;
     }
 
-    public boolean hasTowerStartList()
+    public boolean hasStartList()
     {
-        return towerStartList != null;
+        return startList != null;
     }
 
     public void setHazardNumberMap(

@@ -15,6 +15,7 @@ import net.sf.colossus.game.Player;
 import net.sf.colossus.server.CustomRecruitBase;
 import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.variant.CreatureType;
+import net.sf.colossus.variant.MasterBoardTerrain;
 import net.sf.colossus.variant.MasterHex;
 
 
@@ -38,14 +39,16 @@ public class BalrogRecruitment extends CustomRecruitBase
     private final static String balrogPrefix = "Balrog";
 
     @Override
-    public List<CreatureType> getAllPossibleSpecialRecruiters(String terrain)
+    public List<CreatureType> getAllPossibleSpecialRecruiters(
+        MasterBoardTerrain terrain)
     {
         // Balrog recruited in Tower, where everything recruit anyway.
         return new ArrayList<CreatureType>();
     }
 
     @Override
-    public List<CreatureType> getAllPossibleSpecialRecruits(String terrain)
+    public List<CreatureType> getAllPossibleSpecialRecruits(
+        MasterBoardTerrain terrain)
     {
         List<CreatureType> temp = new ArrayList<CreatureType>();
         Iterator<CreatureType> it = VariantSupport.getCurrentVariant()
@@ -62,16 +65,16 @@ public class BalrogRecruitment extends CustomRecruitBase
     }
 
     @Override
-    public List<CreatureType> getPossibleSpecialRecruiters(String terrain,
-        MasterHex hex)
+    public List<CreatureType> getPossibleSpecialRecruiters(
+        MasterBoardTerrain terrain, MasterHex hex)
     {
         // Balrog recruited in Tower, where everything recruit anyway.
         return new ArrayList<CreatureType>();
     }
 
     @Override
-    public List<CreatureType> getPossibleSpecialRecruits(String terrain,
-        MasterHex hex)
+    public List<CreatureType> getPossibleSpecialRecruits(
+        MasterBoardTerrain terrain, MasterHex hex)
     {
         List<CreatureType> temp = new ArrayList<CreatureType>();
 
@@ -97,7 +100,7 @@ public class BalrogRecruitment extends CustomRecruitBase
 
     @Override
     public int numberOfRecruiterNeeded(CreatureType recruiter,
-        CreatureType recruit, String terrain, MasterHex hex)
+        CreatureType recruit, MasterBoardTerrain terrain, MasterHex hex)
     {
         return 0;
     }

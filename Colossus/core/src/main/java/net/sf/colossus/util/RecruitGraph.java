@@ -17,6 +17,7 @@ import net.sf.colossus.game.Legion;
 import net.sf.colossus.server.CustomRecruitBase;
 import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.variant.CreatureType;
+import net.sf.colossus.variant.MasterBoardTerrain;
 import net.sf.colossus.variant.MasterHex;
 import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
@@ -151,10 +152,10 @@ public class RecruitGraph
         private final RecruitVertex src;
         private final RecruitVertex dst;
         private final int number;
-        private final String terrain;
+        private final MasterBoardTerrain terrain;
 
         RecruitEdge(RecruitVertex src, RecruitVertex dst, int number,
-            String terrain)
+            MasterBoardTerrain terrain)
         {
             this.src = src;
             this.dst = dst;
@@ -177,7 +178,7 @@ public class RecruitGraph
             return number;
         }
 
-        String getTerrain()
+        MasterBoardTerrain getTerrain()
         {
             return terrain;
         }
@@ -213,12 +214,12 @@ public class RecruitGraph
      */
     public static final class RecruitOption
     {
-        private final String terrain;
+        private final MasterBoardTerrain terrain;
         private final String startCreature;
         private final String targetCreature;
         private final int numberRequired;
 
-        public RecruitOption(String terrain, String startCreature,
+        public RecruitOption(MasterBoardTerrain terrain, String startCreature,
             String targetCreature, int numberRequired)
         {
             super();
@@ -228,7 +229,7 @@ public class RecruitGraph
             this.numberRequired = numberRequired;
         }
 
-        public String getTerrain()
+        public MasterBoardTerrain getTerrain()
         {
             return terrain;
         }
@@ -286,7 +287,7 @@ public class RecruitGraph
     }
 
     private RecruitEdge addEdge(RecruitVertex src, RecruitVertex dst,
-        int number, String terrain)
+        int number, MasterBoardTerrain terrain)
     {
         RecruitEdge e = new RecruitEdge(src, dst, number, terrain);
         allEdge.add(e);
@@ -401,13 +402,14 @@ public class RecruitGraph
      * @param terrain Terrain where the recruiting occurs
      * @return The new RecruitEdge.
      */
-    public void addEdge(String src, String dst, int number, String terrain)
+    public void addEdge(String src, String dst, int number,
+        MasterBoardTerrain terrain)
     {
         addEdge(addVertex(src), addVertex(dst), number, terrain);
     }
 
     public int numberOfRecruiterNeeded(String recruiter, String recruit,
-        String terrain, MasterHex hex)
+        MasterBoardTerrain terrain, MasterHex hex)
     {
         List<RecruitEdge> allEdge = getIncomingEdges(recruit);
         RecruitVertex source = getVertex(recruiter);
@@ -511,13 +513,13 @@ public class RecruitGraph
      * number of creature of the given name can recruit.
      * @param cre Name of the recruiting creature.
      * @param number Number of creature
-     * @return A List of String representing all Terrains where recruitment
+     * @return A List of all Terrains where recruitment
      *     is possible.
      */
-    public List<String> getAllTerrainsWhereThisNumberOfCreatureRecruit(
+    public List<MasterBoardTerrain> getAllTerrainsWhereThisNumberOfCreatureRecruit(
         String cre, int number)
     {
-        List<String> at = new ArrayList<String>();
+        List<MasterBoardTerrain> at = new ArrayList<MasterBoardTerrain>();
 
         List<RecruitEdge> outgoing = getOutgoingEdges(cre);
         Iterator<RecruitEdge> it = outgoing.iterator();

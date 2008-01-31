@@ -561,12 +561,15 @@ public final class BattleServerSide extends Battle
      *  Startlisted Terrain,
      *  so we know that there are no enemies on board, and all allies
      *  are mobile.
+     *  
+     * TODO same as {@link BattleMovement#findUnoccupiedStartlistHexes()}.
      */
     private Set<String> findUnoccupiedStartlistHexes(
         boolean ignoreMobileAllies, MasterBoardTerrain terrain)
     {
+        assert terrain != null;
         Set<String> set = new HashSet<String>();
-        for (String hexLabel : terrain.getTowerStartList())
+        for (String hexLabel : terrain.getStartList())
         {
             BattleHex hex = HexMap.getHexByLabel(terrain, hexLabel);
             if (ignoreMobileAllies || !isOccupied(hex))
@@ -585,7 +588,7 @@ public final class BattleServerSide extends Battle
         Set<String> set = new HashSet<String>();
         if (!critter.hasMoved() && !critter.isInContact(false))
         {
-            if ((masterHex.getTerrain() != null) && (turnNumber == 1)
+            if (masterHex.getTerrain().hasStartList() && (turnNumber == 1)
                 && activeLegionNum == Constants.DEFENDER)
             {
                 set = findUnoccupiedStartlistHexes(ignoreMobileAllies,

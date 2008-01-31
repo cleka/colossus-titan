@@ -370,7 +370,7 @@ public class RationalAI extends SimpleAI
     /** Find value of recruiting, including possibly attacking an enemy
      set enemy = null to indicate no enemy */
     double recruitValue(Legion legion, MasterHex hex, Legion enemy,
-        String terrain)
+        MasterBoardTerrain terrain)
     {
         int value = 0;
 
@@ -1737,14 +1737,12 @@ public class RationalAI extends SimpleAI
         {
             if (!(attacker).hasTitan())
             {
-                value += recruitValue(attacker, hex, null, hex.getTerrain()
-                    .getId());
+                value += recruitValue(attacker, hex, null, hex.getTerrain());
             }
             else
             {
                 // prefer recruiting with Titan legion
-                value += recruitValue(attacker, hex, null, hex.getTerrain()
-                    .getId()) * 1.1;
+                value += recruitValue(attacker, hex, null, hex.getTerrain()) * 1.1;
             }
         }
 

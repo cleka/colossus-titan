@@ -366,7 +366,7 @@ public class SimpleAI implements AI
                         safeMoves++;
                         if (!goodRecruit
                             && couldRecruitUp(legion, hex, null, hex
-                                .getTerrain().getId()))
+                                .getTerrain()))
                         {
                             goodRecruit = true;
                         }
@@ -387,7 +387,7 @@ public class SimpleAI implements AI
                             // Also consider acquiring angel.
                             if (!goodRecruit
                                 && couldRecruitUp(legion, hex, enemy, hex
-                                    .getTerrain().getId()))
+                                    .getTerrain()))
                             {
                                 goodRecruit = true;
                             }
@@ -457,7 +457,7 @@ public class SimpleAI implements AI
     /** Return true if the legion could recruit or acquire something
      *  better than its worst creature in hexLabel. */
     private boolean couldRecruitUp(Legion legion, MasterHex hex, Legion enemy,
-        String terrain)
+        MasterBoardTerrain terrain)
     {
         CreatureType weakest = client.getGame().getVariant()
             .getCreatureByName(
@@ -642,7 +642,7 @@ public class SimpleAI implements AI
         }
 
         CreatureType[] startCre = TerrainRecruitLoader
-            .getStartingCreatures(hex.getTerrain().getId());
+            .getStartingCreatures(hex.getTerrain());
         // in CMU style splitting, we split centaurs in even towers,
         // ogres in odd towers.
         final boolean oddTower = "100".equals(hex.getLabel())
@@ -690,7 +690,7 @@ public class SimpleAI implements AI
         MasterHex hex)
     {
         CreatureType[] startCre = TerrainRecruitLoader
-            .getStartingCreatures(hex.getTerrain().getId());
+            .getStartingCreatures(hex.getTerrain());
         List<CreatureType> splitoffs = new LinkedList<CreatureType>();
 
         if (favorTitan)
@@ -748,7 +748,7 @@ public class SimpleAI implements AI
         MasterHex hex)
     {
         CreatureType[] startCre = TerrainRecruitLoader
-            .getStartingCreatures(hex.getTerrain().getId());
+            .getStartingCreatures(hex.getTerrain());
         List<CreatureType> splitoffs = new LinkedList<CreatureType>();
 
         if (favorTitan)
@@ -1837,9 +1837,9 @@ public class SimpleAI implements AI
     public CreatureType getVariantRecruitHint(Legion legion, MasterHex hex,
         List<CreatureType> recruits)
     {
-        String recruitName = VariantSupport.getRecruitHint(hex.getTerrain()
-            .getId(), (LegionClientSide)legion, recruits, new SimpleAIOracle(
-            legion, hex, recruits), hintSectionUsed);
+        String recruitName = VariantSupport.getRecruitHint(hex.getTerrain(),
+            (LegionClientSide)legion, recruits, new SimpleAIOracle(legion,
+                hex, recruits), hintSectionUsed);
 
         if (recruitName == null)
         {
@@ -2604,6 +2604,8 @@ public class SimpleAI implements AI
     // return power and skill of a given creature given the terrain
     // terrain here is either a board hex label OR
     // a Hex terrain label
+    // TODO this either or is dangerous and forces us to use the label
+    //      instead of the objects
     private PowerSkill calc_bonus(CreatureType creature, String terrain,
         boolean defender)
     {
@@ -2643,7 +2645,8 @@ public class SimpleAI implements AI
     protected PowerSkill getNativeValue(CreatureType creature,
         MasterBoardTerrain terrain, boolean defender)
     {
-
+        // TODO checking the tower via string is unsafe -- maybe terrain.isTower()
+        //      is meant anyway
         if (!(terrain.hasNativeCombatBonus(creature) || (terrain.getId()
             .equals("Tower") && defender == true)))
         {

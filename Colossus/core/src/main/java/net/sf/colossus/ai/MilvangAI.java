@@ -41,7 +41,7 @@ public class MilvangAI extends RationalAI
     }
 
     double findRecruitPotential(Map<CreatureType, Integer> critters,
-        String terrain)
+        MasterBoardTerrain terrain)
     {
         int recruitNow = 0;
         int recruitLater = 0;
@@ -147,7 +147,8 @@ public class MilvangAI extends RationalAI
                 .getTerrains())
             {
                 double currRecruitValue = findRecruitPotential(critterMap,
-                    terrain.getId());
+                    terrain);
+                // TODO shouldn't that rather be terrain.isTower()?
                 if (currRecruitValue > bestRecruitValue
                     && !terrain.getId().equals("Tower"))
                 {

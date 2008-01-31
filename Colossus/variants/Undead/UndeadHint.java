@@ -5,23 +5,26 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.colossus.client.LegionClientSide;
+import net.sf.colossus.server.HintInterface;
 import net.sf.colossus.server.HintOracleInterface;
 import net.sf.colossus.util.DevRandom;
 import net.sf.colossus.variant.CreatureType;
+import net.sf.colossus.variant.MasterBoardTerrain;
 import Default.DefaultHint;
 
 
-public class UndeadHint implements net.sf.colossus.server.HintInterface
+public class UndeadHint implements HintInterface
 {
     private final DevRandom rnd = new DevRandom();
 
-    public String getRecruitHint(String terrain, LegionClientSide legion,
-        List<CreatureType> recruits, HintOracleInterface oracle,
-        String[] section)
+    public String getRecruitHint(MasterBoardTerrain terrain,
+        LegionClientSide legion, List<CreatureType> recruits,
+        HintOracleInterface oracle, String[] section)
     {
+        String terrainId = terrain.getId();
         List<String> recruitNames = DefaultHint.creaturesToStrings(recruits);
 
-        if (terrain.equals("Brush"))
+        if (terrainId.equals("Brush"))
         {
             if (recruitNames.contains("Zombie") && !legion.contains("Wraith")
                 && legion.numCreature("Zombie") == 2
@@ -30,7 +33,7 @@ public class UndeadHint implements net.sf.colossus.server.HintInterface
                 return "Zombie";
             }
         }
-        else if (terrain.equals("Plains"))
+        else if (terrainId.equals("Plains"))
         {
             if (recruitNames.contains("Naga") && !legion.contains("Griffin")
                 && legion.numCreature("Naga") == 2
@@ -40,7 +43,7 @@ public class UndeadHint implements net.sf.colossus.server.HintInterface
                 return "Naga";
             }
         }
-        else if (terrain.equals("Marsh"))
+        else if (terrainId.equals("Marsh"))
         {
             if (recruitNames.contains("Orc") && !legion.contains("Wyvern")
                 && legion.numCreature("Orc") == 2 && oracle.canReach("Swamp")
@@ -49,7 +52,7 @@ public class UndeadHint implements net.sf.colossus.server.HintInterface
                 return "Orc";
             }
         }
-        else if (terrain.equals("Tower"))
+        else if (terrainId.equals("Tower"))
         {
             if (recruitNames.contains("Beholder"))
             {

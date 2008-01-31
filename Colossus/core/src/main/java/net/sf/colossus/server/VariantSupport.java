@@ -20,9 +20,9 @@ import javax.swing.text.StyledDocument;
 import net.sf.colossus.client.HexMap;
 import net.sf.colossus.client.LegionClientSide;
 import net.sf.colossus.util.ResourceLoader;
-import net.sf.colossus.variant.MasterBoardTerrain;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.MasterBoard;
+import net.sf.colossus.variant.MasterBoardTerrain;
 import net.sf.colossus.variant.MasterHex;
 import net.sf.colossus.variant.Variant;
 import net.sf.colossus.xmlparser.CreatureLoader;
@@ -494,18 +494,19 @@ public final class VariantSupport
         }
     }
 
-    public synchronized static String getRecruitHint(String terrain,
-        LegionClientSide legion, List<CreatureType> recruits,
-        HintOracleInterface oracle)
+    public synchronized static String getRecruitHint(
+        MasterBoardTerrain terrain, LegionClientSide legion,
+        List<CreatureType> recruits, HintOracleInterface oracle)
     {
         String[] section = new String[1];
         section[0] = Constants.sectionAllAI;
         return getRecruitHint(terrain, legion, recruits, oracle, section);
     }
 
-    public synchronized static String getRecruitHint(String terrain,
-        LegionClientSide legion, List<CreatureType> recruits,
-        HintOracleInterface oracle, String[] section)
+    public synchronized static String getRecruitHint(
+        MasterBoardTerrain terrain, LegionClientSide legion,
+        List<CreatureType> recruits, HintOracleInterface oracle,
+        String[] section)
     {
         assert aihl != null : "No AIHintLoader available";
         return aihl.getRecruitHint(terrain, legion, recruits, oracle, section);

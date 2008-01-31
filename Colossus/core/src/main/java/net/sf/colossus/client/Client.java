@@ -54,6 +54,7 @@ import net.sf.colossus.util.ResourceLoader;
 import net.sf.colossus.util.Split;
 import net.sf.colossus.util.ViableEntityManager;
 import net.sf.colossus.variant.CreatureType;
+import net.sf.colossus.variant.MasterBoardTerrain;
 import net.sf.colossus.variant.MasterHex;
 import net.sf.colossus.webcommon.InstanceTracker;
 import net.sf.colossus.xmlparser.TerrainRecruitLoader;
@@ -4210,7 +4211,7 @@ public final class Client implements IClient, IOracle
             return recruits;
         }
 
-        String terrain = hex.getTerrain().getId();
+        MasterBoardTerrain terrain = hex.getTerrain();
 
         List<CreatureType> tempRecruits = TerrainRecruitLoader
             .getPossibleRecruits(terrain, hex);
@@ -4273,7 +4274,7 @@ public final class Client implements IClient, IOracle
         }
 
         MasterHex hex = legion.getCurrentHex();
-        String terrain = hex.getTerrain().getId();
+        MasterBoardTerrain terrain = hex.getTerrain();
 
         recruiters = new HashSet<CreatureType>(TerrainRecruitLoader
             .getPossibleRecruiters(terrain, hex));

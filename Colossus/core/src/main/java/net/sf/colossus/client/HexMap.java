@@ -195,10 +195,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
 
                 BattlelandLoader bl = new BattlelandLoader(batIS, hexModel);
                 List<String> tempTowerStartList = bl.getStartList();
-                if (tempTowerStartList != null)
-                {
-                    masterBoardTerrain.setTowerStartList(tempTowerStartList);
-                }
+                masterBoardTerrain.setStartList(tempTowerStartList);
                 masterBoardTerrain.setTower(bl.isTower());
             }
             else
@@ -304,10 +301,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
                         }
                     }
                 }
-                if (count > 0)
-                {
-                    t2n.put(hTerrain, Integer.valueOf(count));
-                }
+                t2n.put(hTerrain, Integer.valueOf(count));
             }
             masterBoardTerrain.setHazardNumberMap(t2n);
             char[] hazardSides = BattleHex.getHexsides();
@@ -331,10 +325,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
                         }
                     }
                 }
-                if (count > 0)
-                {
-                    s2n.put(Character.valueOf(side), Integer.valueOf(count));
-                }
+                s2n.put(Character.valueOf(side), Integer.valueOf(count));
             }
             masterBoardTerrain.setHazardSideNumberMap(s2n);
             // map model into GUI
