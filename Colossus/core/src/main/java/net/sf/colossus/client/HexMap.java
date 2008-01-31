@@ -60,7 +60,6 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
     // The game state hexes can be set up once for each terrain type.
     private static Map<MasterBoardTerrain, GUIBattleHex[][]> terrainH = new HashMap<MasterBoardTerrain, GUIBattleHex[][]>();
     private static Map<MasterBoardTerrain, GUIBattleHex[]> entranceHexes = new HashMap<MasterBoardTerrain, GUIBattleHex[]>();
-    private static Map<MasterBoardTerrain, Map<HazardTerrain, Integer>> hazardNumberMap = new HashMap<MasterBoardTerrain, Map<HazardTerrain, Integer>>();
     private static Map<MasterBoardTerrain, Map<Character, Integer>> hazardSideNumberMap = new HashMap<MasterBoardTerrain, Map<Character, Integer>>();
 
     /** ne, e, se, sw, w, nw */
@@ -93,7 +92,6 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
     {
         terrainH.clear();
         entranceHexes.clear();
-        hazardNumberMap.clear();
         hazardSideNumberMap.clear();
 
         for (MasterBoardTerrain terrain : TerrainRecruitLoader.getTerrains())
@@ -313,7 +311,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
                     t2n.put(hTerrain, Integer.valueOf(count));
                 }
             }
-            hazardNumberMap.put(masterBoardTerrain, t2n);
+            masterBoardTerrain.setHazardNumberMap(t2n);
             char[] hazardSides = BattleHex.getHexsides();
             HashMap<Character, Integer> s2n = new HashMap<Character, Integer>();
             for (char side : hazardSides)
@@ -789,22 +787,6 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
     public Dimension getPreferredSize()
     {
         return new Dimension(60 * Scale.get(), 55 * Scale.get());
-    }
-
-    public static int getHazardCountInTerrain(HazardTerrain hazard,
-        MasterBoardTerrain masterBoardTerrain)
-    {
-        Map<HazardTerrain, Integer> t2n = hazardNumberMap
-            .get(masterBoardTerrain);
-
-        assert t2n != null : "Accessing terrain that does not exist in Variant";
-
-        Integer number = t2n.get(hazard);
-        if (number == null)
-        {
-            return 0;
-        }
-        return number.intValue();
     }
 
     public static int getHazardSideCountInTerrain(char hazard,

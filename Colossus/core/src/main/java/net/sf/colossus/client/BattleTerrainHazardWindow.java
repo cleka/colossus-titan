@@ -99,8 +99,8 @@ public class BattleTerrainHazardWindow extends KDialog
         {
             HazardTerrain hazard = iterator.next();
             if (hazardsDisplayed.containsKey(hazard.getName())
-                || HexMap.getHazardCountInTerrain(hazard, map.getMasterHex()
-                    .getTerrain()) == 0)
+                || map.getMasterHex()
+                .getTerrain().getHazardCount(hazard) == 0)
             {
                 // Ignore
             }

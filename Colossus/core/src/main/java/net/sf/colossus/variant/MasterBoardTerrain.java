@@ -3,6 +3,7 @@ package net.sf.colossus.variant;
 
 import java.awt.Color;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 import net.sf.colossus.client.BattleHex;
@@ -15,6 +16,9 @@ import net.sf.colossus.client.HexMap;
  * This class describes a terrain on the master board, including its name, color and the 
  * layout of a generic battle land. It can occur multiple times on a master board layout
  * attached to the {@link MasterHex} class.
+ * 
+ * Battle land information could probably split out into another class, which could then
+ * be immutable.
  */
 public class MasterBoardTerrain
 {
@@ -24,6 +28,7 @@ public class MasterBoardTerrain
     // TODO this should be a List<BattleHex> (and BattleHex should be part of the variant package)
     private List<String> towerStartList;
     private boolean isTower;
+    private HashMap<HazardTerrain, Integer> hazardNumberMap;
 
     public MasterBoardTerrain(String id, String displayName, Color color)
     {
@@ -56,7 +61,7 @@ public class MasterBoardTerrain
 
         for (HazardTerrain hTerrain : HazardTerrain.getAllHazardTerrains())
         {
-            int count = HexMap.getHazardCountInTerrain(hTerrain, this);
+            int count = this.getHazardCount(hTerrain);
             if (hTerrain.isNativeBonusTerrain()
                 && creature.isNativeIn(hTerrain))
             {
@@ -122,5 +127,16 @@ public class MasterBoardTerrain
     public boolean hasTowerStartList()
     {
         return towerStartList != null;
+    }
+
+    public void setHazardNumberMap(
+        HashMap<HazardTerrain, Integer> hazardNumberMap)
+    {
+        this.hazardNumberMap = hazardNumberMap;
+    }
+
+    public int getHazardCount(HazardTerrain terrain)
+    {
+        return hazardNumberMap.get(terrain).intValue();
     }
 }
