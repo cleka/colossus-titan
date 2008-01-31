@@ -60,7 +60,6 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
     // The game state hexes can be set up once for each terrain type.
     private static Map<MasterBoardTerrain, GUIBattleHex[][]> terrainH = new HashMap<MasterBoardTerrain, GUIBattleHex[][]>();
     private static Map<MasterBoardTerrain, GUIBattleHex[]> entranceHexes = new HashMap<MasterBoardTerrain, GUIBattleHex[]>();
-    private static Map<MasterBoardTerrain, Map<Character, Integer>> hazardSideNumberMap = new HashMap<MasterBoardTerrain, Map<Character, Integer>>();
 
     /** ne, e, se, sw, w, nw */
     private final GUIBattleHex[] entrances = new GUIBattleHex[6];
@@ -92,7 +91,6 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
     {
         terrainH.clear();
         entranceHexes.clear();
-        hazardSideNumberMap.clear();
 
         for (MasterBoardTerrain terrain : TerrainRecruitLoader.getTerrains())
         {
@@ -338,7 +336,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
                     s2n.put(Character.valueOf(side), Integer.valueOf(count));
                 }
             }
-            hazardSideNumberMap.put(masterBoardTerrain, s2n);
+            masterBoardTerrain.setHazardSideNumberMap(s2n);
             // map model into GUI
             for (int i = 0; i < hexModel.length; i++)
             {
@@ -787,20 +785,5 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
     public Dimension getPreferredSize()
     {
         return new Dimension(60 * Scale.get(), 55 * Scale.get());
-    }
-
-    public static int getHazardSideCountInTerrain(char hazard,
-        MasterBoardTerrain terrain)
-    {
-        Map<Character, Integer> s2n = hazardSideNumberMap.get(terrain);
-
-        assert s2n != null : "Accessing terrain that does not exist in Variant";
-
-        Integer number = s2n.get(Character.valueOf(hazard));
-        if (number == null)
-        {
-            return 0;
-        }
-        return number.intValue();
     }
 }

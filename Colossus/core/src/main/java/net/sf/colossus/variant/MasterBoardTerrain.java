@@ -5,9 +5,9 @@ import java.awt.Color;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import net.sf.colossus.client.BattleHex;
-import net.sf.colossus.client.HexMap;
 
 
 /**
@@ -28,7 +28,9 @@ public class MasterBoardTerrain
     // TODO this should be a List<BattleHex> (and BattleHex should be part of the variant package)
     private List<String> towerStartList;
     private boolean isTower;
-    private HashMap<HazardTerrain, Integer> hazardNumberMap;
+    private Map<HazardTerrain, Integer> hazardNumberMap;
+    // TODO this should be a Map<HazardHexside, Integer>
+    private Map<Character, Integer> hazardSideNumberMap;
 
     public MasterBoardTerrain(String id, String displayName, Color color)
     {
@@ -80,8 +82,7 @@ public class MasterBoardTerrain
 
         for (int i = 0; i < hazardSide.length; i++)
         {
-            int count = HexMap
-                .getHazardSideCountInTerrain(hazardSide[i], this);
+            int count = this.getHazardSideCount(hazardSide[i]);
             if (BattleHex.isNativeBonusHexside(hazardSide[i])
                 && (creature).isNativeHexside(hazardSide[i]))
             {
@@ -138,5 +139,17 @@ public class MasterBoardTerrain
     public int getHazardCount(HazardTerrain terrain)
     {
         return hazardNumberMap.get(terrain).intValue();
+    }
+
+    public void setHazardSideNumberMap(
+        HashMap<Character, Integer> hazardSideNumberMap)
+    {
+        this.hazardSideNumberMap = hazardSideNumberMap;
+    }
+
+    public int getHazardSideCount(char hazardSide)
+    {
+        return hazardSideNumberMap.get(Character.valueOf(hazardSide))
+            .intValue();
     }
 }
