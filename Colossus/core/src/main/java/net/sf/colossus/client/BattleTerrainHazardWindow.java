@@ -110,7 +110,7 @@ public class BattleTerrainHazardWindow extends KDialog
                 chart.add(addHazard(hazard));
             }
         }
-        // TODO - Add Hex sides.
+        // TODO ED - Add Hex sides.
     }
 
     private JPanel addHazard(HazardTerrain terrain)
@@ -225,7 +225,7 @@ public class BattleTerrainHazardWindow extends KDialog
         defenderPanel.setBorder(BorderFactory
             .createTitledBorder("Defence Bonus"));
         defenderPanel.setMinimumSize(new Dimension(scale, scale));
-        // TODO add Strike data when moved from strike to Hazard Terrain.
+        // TODO ED - add Strike data when moved from strike to Hazard Terrain.
         return defenderPanel;
     }
 
@@ -235,7 +235,7 @@ public class BattleTerrainHazardWindow extends KDialog
         strikePanel
             .setBorder(BorderFactory.createTitledBorder("Strike Bonus"));
         strikePanel.setMinimumSize(new Dimension(scale, scale));
-        // TODO add Strike data when moved from strike to Hazard Terrain.
+        // TODO ED - add Strike data when moved from strike to Hazard Terrain.
         return strikePanel;
     }
 

@@ -10,7 +10,7 @@ import java.util.Map;
  * This is a typesafe enumeration of all hazard terrains, i.e. the
  * terrains used in the battle maps.
  */
-public class HazardTerrain
+public class HazardTerrain implements HazardConstants
 {
     /**
      * The name used for serialization.
@@ -18,57 +18,63 @@ public class HazardTerrain
     private final String name;
 
     /**
-     * Determines if native characters get a bonus in this terrain.
+     * Properties - 
      */
-    private final boolean isNativeBonusTerrain;
+    public final String effectOnGroundMovement; // Also flyers at end of move
+    public final String effectOnFlyerMovement;
 
-    /**
-     * Determines if non-native characters get a penalty in this terrain.
-     */
-    private final boolean isNonNativePenaltyTerrain;
+    public final String effectforDefendingInTerrain;
+    public final String scopeForDefenceEffect;
+    public final int defenceEffectAdjustment;
 
-    /**
-     * Determines if only native characters can enter the terrain.
-     */
-    private final boolean isNativeOnly;
+    public final String effectforAttackingFromTerrain;
+    public final String scopeForAttackEffect;
+    public final int AttackEffectAdjustment;
 
-    /**
-     * Determines if only flyers can enter the terrain.
-     */
-    private final boolean isFlyersOnly;
+    public final String effectForBeingRangeSruckInTerrain;
+    public final String scopeForRangeStruckEffect;
+    public final int RangeStruckEffectAdjustment;
 
-    /**
-     * Determines if only native flyers can enter the terrain.
-     */
-    private final boolean isNativeFlyersOnly;
+    public final String effectforRangeStrikeFromTerrain;
+    public final String scopeForRangeStrikeEffect;
+    public final int RangeStrikeEffectAdjustment;
 
-    /**
-     * Determines if a non-native gets slowed in the terrain.
-     */
-    private final boolean slowsNonNative;
-
-    /**
-     * Determines if flyers are not allowed to pass either.
-     */
-    private final boolean blocksFlying;
+    public final String RangeStrikeSpecial;
 
     /**
      * A map from the serialization string of a terrain to the instances.
      */
     private final static Map<String, HazardTerrain> TERRAIN_MAP = new HashMap<String, HazardTerrain>();
 
-    public HazardTerrain(String name, boolean nativeBonus,
-        boolean nonNativePenalty, boolean nativeOnly, boolean flyerOnly,
-        boolean nativeFlyerOnly, boolean slowsNonNative, boolean blocksFlying)
+    public HazardTerrain(String name, String effectOnGroundMovement,
+        String effectOnFlyerMovement, String effectforDefendingInTerrain,
+        String scopeForDefenceEffect, int defenceEffectAdjustment,
+        String effectforAttackingFromTerrain, String scopeForAttackEffect,
+        int attackEffectAdjustment, String effectForBeingRangeSruckInTerrain,
+        String scopeForRangeStruckEffect, int RangeStruckEffectAdjustment,
+        String effectforRangeStrikeFromTerrain,
+        String scopeForRangeStrikeEffect, int RangeStrikeEffectAdjustment,
+        String RangeStrikeSpecial)
     {
         this.name = name;
-        this.isNativeBonusTerrain = nativeBonus;
-        this.isNonNativePenaltyTerrain = nonNativePenalty;
-        this.isNativeOnly = nativeOnly;
-        this.isFlyersOnly = flyerOnly;
-        this.isNativeFlyersOnly = nativeFlyerOnly;
-        this.slowsNonNative = slowsNonNative;
-        this.blocksFlying = blocksFlying;
+        this.effectOnGroundMovement = effectOnGroundMovement;
+        this.effectOnFlyerMovement = effectOnFlyerMovement;
+
+        this.effectforDefendingInTerrain = effectforDefendingInTerrain;
+        this.scopeForDefenceEffect = scopeForDefenceEffect;
+        this.defenceEffectAdjustment = defenceEffectAdjustment;
+
+        this.effectforAttackingFromTerrain = effectforAttackingFromTerrain;
+        this.scopeForAttackEffect = scopeForAttackEffect;
+        this.AttackEffectAdjustment = attackEffectAdjustment;
+        this.effectForBeingRangeSruckInTerrain = effectForBeingRangeSruckInTerrain;
+        this.scopeForRangeStruckEffect = scopeForRangeStruckEffect;
+        this.RangeStruckEffectAdjustment = RangeStruckEffectAdjustment;
+        this.effectforRangeStrikeFromTerrain = effectforRangeStrikeFromTerrain;
+        this.scopeForRangeStrikeEffect = scopeForRangeStrikeEffect;
+        this.RangeStrikeEffectAdjustment = RangeStrikeEffectAdjustment;
+        this.RangeStrikeSpecial = RangeStrikeSpecial;
+
         TERRAIN_MAP.put(name, this);
     }
 
@@ -79,37 +85,27 @@ public class HazardTerrain
 
     public boolean isNativeBonusTerrain()
     {
-        return isNativeBonusTerrain;
+        return (scopeForAttackEffect.equals(SCOPENATIVE) || scopeForDefenceEffect
+            .equals(SCOPENATIVE))
+            && (effectforAttackingFromTerrain.equals(SKILLBONUS)
+                || effectforAttackingFromTerrain.equals(POWERBONUS)
+                || effectforDefendingInTerrain.equals(SKILLBONUS) || effectforDefendingInTerrain
+                .equals(POWERBONUS));
     }
 
     public boolean isNonNativePenaltyTerrain()
     {
-        return isNonNativePenaltyTerrain;
+        return (scopeForAttackEffect.equals(SCOPEFOREIGNER) || scopeForDefenceEffect
+            .equals(SCOPEFOREIGNER))
+            && (effectforAttackingFromTerrain.equals(SKILLPENALTY)
+                || effectforAttackingFromTerrain.equals(POWERPENALTY)
+                || effectforDefendingInTerrain.equals(SKILLPENALTY) || effectforDefendingInTerrain
+                .equals(POWERPENALTY));
     }
 
     public boolean isNativeOnly()
     {
-        return isNativeOnly;
-    }
-
-    public boolean isNativeFlyersOnly()
-    {
-        return isNativeFlyersOnly;
-    }
-
-    public boolean isFlyersOnly()
-    {
-        return isFlyersOnly;
-    }
-
-    public boolean slowsNonNative()
-    {
-        return slowsNonNative;
-    }
-
-    public boolean blocksFlying()
-    {
-        return blocksFlying;
+        return effectOnGroundMovement.equals(BLOCKFOREIGNER);
     }
 
     public static HazardTerrain getTerrainByName(String name)
@@ -131,108 +127,76 @@ public class HazardTerrain
     }
 
     public static final HazardTerrain PLAINS = new HazardTerrain("Plains",
-        false, false, false, false, false, false, false);
+        FREEMOVE, FREEMOVE, NOEFFECT, SCOPENULL, 0, NOEFFECT, SCOPENULL, 0,
+        NOEFFECT, SCOPENULL, 0, NOEFFECT, SCOPENULL, 0, RANGESTRIKEFREE);
+
+    public static final HazardTerrain TREE = new HazardTerrain("Tree",
+        BLOCKFOREIGNER, FREEMOVE, NOEFFECT, SCOPENULL, 0, NOEFFECT, SCOPENULL,
+        0, NOEFFECT, SCOPENULL, 0, NOEFFECT, SCOPENULL, 0, RANGESTRIKEFREE);
 
     public static final HazardTerrain BRAMBLES = new HazardTerrain("Brambles",
-        true, true, false, false, false, false, false);
-
-    public static final HazardTerrain SAND = new HazardTerrain("Sand", false,
-        false, false, false, false, false, false);
-
-    public static final HazardTerrain TREE = new HazardTerrain("Tree", false,
-        false, true, false, false, false, false);
-
-    public static final HazardTerrain BOG = new HazardTerrain("Bog", false,
-        false, true, false, false, false, false);
-
-    public static final HazardTerrain VOLCANO = new HazardTerrain("Volcano",
-        true, false, true, false, true, false, false);
+        SLOWFOREIGNER, SLOWFOREIGNER, SKILLBONUS, SCOPENATIVE, 1,
+        SKILLPENALTY, SCOPEFOREIGNER, -1, SKILLBONUS, SCOPENATIVE, 1,
+        SKILLPENALTY, SCOPEFOREIGNER, -1, RANGESTRIKESKILLPENALTY);
 
     public static final HazardTerrain DRIFT = new HazardTerrain("Drift",
-        false, true, false, false, false, false, false);
+        SLOWFOREIGNER, SLOWFOREIGNER, HEALTHDRAIN, SCOPEFOREIGNER, -1,
+        HEALTHDRAIN, SCOPEFOREIGNER, -1, HEALTHDRAIN, SCOPEFOREIGNER, -1,
+        HEALTHDRAIN, SCOPEFOREIGNER, -1, RANGESTRIKEFREE);
+
+    public static final HazardTerrain VOLCANO = new HazardTerrain("Volcano",
+        BLOCKFOREIGNER, BLOCKFOREIGNER, NOEFFECT, SCOPENULL, 0, POWERBONUS,
+        SCOPENATIVE, 2, SKILLBONUS, SCOPENATIVE, 1, POWERBONUS, SCOPENATIVE,
+        0, RANGESTRIKEFREE);
+
+    public static final HazardTerrain BOG = new HazardTerrain("Bog",
+        BLOCKFOREIGNER, FREEMOVE, NOEFFECT, SCOPENULL, 0, NOEFFECT, SCOPENULL,
+        0, NOEFFECT, SCOPENULL, 0, NOEFFECT, SCOPENULL, 0, RANGESTRIKEFREE);
+
+    public static final HazardTerrain SAND = new HazardTerrain("Sand",
+        SLOWFOREIGNER, FREEMOVE, NOEFFECT, SCOPENULL, 0, NOEFFECT, SCOPENULL,
+        0, NOEFFECT, SCOPENULL, 0, NOEFFECT, SCOPENULL, 0, RANGESTRIKEFREE);
 
     public static final HazardTerrain TOWER = new HazardTerrain("Tower",
-        false, false, false, false, false, false, false);
+        FREEMOVE, FREEMOVE, NOEFFECT, SCOPENULL, 0, NOEFFECT, SCOPENULL, 0,
+        NOEFFECT, SCOPENULL, 0, NOEFFECT, SCOPENULL, 0, RANGESTRIKEFREE);
 
-    public static final HazardTerrain LAKE = new HazardTerrain("Lake", false,
-        false, true, false, false, false, false);
+    public static final HazardTerrain LAKE = new HazardTerrain("Lake",
+        BLOCKFOREIGNER, FREEMOVE, NOEFFECT, SCOPENULL, 0, NOEFFECT, SCOPENULL,
+        0, NOEFFECT, SCOPENULL, 0, NOEFFECT, SCOPENULL, 0, RANGESTRIKEFREE);
 
     public static final HazardTerrain STONE = new HazardTerrain("Stone",
-        false, false, true, false, false, false, true);
+        BLOCKFOREIGNER, BLOCKALL, NOEFFECT, SCOPENULL, 0, NOEFFECT, SCOPENULL,
+        0, NOEFFECT, SCOPENULL, 0, NOEFFECT, SCOPENULL, 0, RANGESTRIKEFREE);
 
-    public static void main(String[] args)
+    @Override
+    public String toString()
     {
-        for (HazardTerrain terrain : getAllHazardTerrains())
-        {
-            StringBuilder builder = new StringBuilder();
-            builder.append(terrain.getName());
-            builder.append(":\n");
-            builder.append("+++++++++++++++++++++++++++\n");
-            builder.append("blocks flying creatures");
-            if (terrain.blocksFlying())
-            {
-                builder.append(": yes\n");
-            }
-            else
-            {
-                builder.append(": no\n");
-            }
-            builder.append("blocks non-flyers");
-            if (terrain.isFlyersOnly())
-            {
-                builder.append(": yes\n");
-            }
-            else
-            {
-                builder.append(": no\n");
-            }
-            builder.append("gives bonus to natives");
-            if (terrain.isNativeBonusTerrain())
-            {
-                builder.append(": yes\n");
-            }
-            else
-            {
-                builder.append(": no\n");
-            }
-            builder.append("is native flyers only");
-            if (terrain.isNativeFlyersOnly())
-            {
-                builder.append(": yes\n");
-            }
-            else
-            {
-                builder.append(": no\n");
-            }
-            builder.append("is natives only");
-            if (terrain.isNativeOnly())
-            {
-                builder.append(": yes\n");
-            }
-            else
-            {
-                builder.append(": no\n");
-            }
-            builder.append("gives penalty to non-natives");
-            if (terrain.isNonNativePenaltyTerrain())
-            {
-                builder.append(": yes\n");
-            }
-            else
-            {
-                builder.append(": no\n");
-            }
-            builder.append("slows non-natives");
-            if (terrain.slowsNonNative())
-            {
-                builder.append(": yes\n");
-            }
-            else
-            {
-                builder.append(": no\n");
-            }
-            System.out.print(builder.toString());
-            System.out.println("+++++++++++++++++++++++++++");
-        }
+        StringBuilder builder = new StringBuilder();
+        builder.append("+++++++++++++++++++++++++++\n");
+        builder.append(getName());
+        builder.append(":\n");
+        return builder.toString();
+    }
+
+    public boolean blocksFlying()
+    {
+        return effectOnFlyerMovement.equals(BLOCKALL);
+    }
+
+    public boolean isFlyersOnly()
+    {
+        return effectOnGroundMovement.equals(BLOCKALL);
+    }
+
+    public boolean isNativeFlyersOnly()
+    {
+        return effectOnFlyerMovement.equals(BLOCKFOREIGNER);
+    }
+
+    public boolean slowsNonNative()
+    {
+        return effectOnFlyerMovement.equals(SLOWFOREIGNER)
+            || effectOnGroundMovement.equals(SLOWFOREIGNER);
     }
 }

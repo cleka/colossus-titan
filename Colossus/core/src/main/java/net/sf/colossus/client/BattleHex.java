@@ -454,15 +454,10 @@ public class BattleHex extends Hex
         { // non-flyer can't fly, obviously...
             return false;
         }
-        if (terrain.blocksFlying())
-        {
-            return false;
-        }
-        if (terrain.isNativeFlyersOnly())
-        {
-            return creature.isNativeIn(terrain);
-        }
-        return (true);
+        return !terrain.effectOnFlyerMovement.equals(HazardTerrain.BLOCKALL)
+            || (terrain.effectOnFlyerMovement
+                .equals(HazardTerrain.BLOCKFOREIGNER) && creature
+                .isNativeIn(terrain));
     }
 
     /**
