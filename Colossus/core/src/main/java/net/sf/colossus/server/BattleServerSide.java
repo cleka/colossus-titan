@@ -566,10 +566,9 @@ public final class BattleServerSide extends Battle
         boolean ignoreMobileAllies, MasterBoardTerrain terrain)
     {
         Set<String> set = new HashSet<String>();
-        Iterator<String> it = HexMap.getTowerStartList(terrain).iterator();
-        while (it.hasNext())
+        for (String hexLabel : terrain.getTowerStartList())
         {
-            BattleHex hex = HexMap.getHexByLabel(terrain, it.next());
+            BattleHex hex = HexMap.getHexByLabel(terrain, hexLabel);
             if (ignoreMobileAllies || !isOccupied(hex))
             {
                 set.add(hex.getLabel());
@@ -586,8 +585,8 @@ public final class BattleServerSide extends Battle
         Set<String> set = new HashSet<String>();
         if (!critter.hasMoved() && !critter.isInContact(false))
         {
-            if (HexMap.terrainHasStartlist(masterHex.getTerrain())
-                && (turnNumber == 1) && activeLegionNum == Constants.DEFENDER)
+            if ((masterHex.getTerrain() != null) && (turnNumber == 1)
+                && activeLegionNum == Constants.DEFENDER)
             {
                 set = findUnoccupiedStartlistHexes(ignoreMobileAllies,
                     masterHex.getTerrain());

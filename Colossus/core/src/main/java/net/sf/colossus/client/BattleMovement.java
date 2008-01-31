@@ -2,7 +2,6 @@ package net.sf.colossus.client;
 
 
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
 import net.sf.colossus.util.Options;
@@ -98,10 +97,8 @@ final class BattleMovement
     {
         MasterBoardTerrain terrain = client.getBattleSite().getTerrain();
         Set<String> set = new HashSet<String>();
-        Iterator<String> it = HexMap.getTowerStartList(terrain).iterator();
-        while (it.hasNext())
+        for (String hexLabel : terrain.getTowerStartList())
         {
-            String hexLabel = it.next();
             BattleHex hex = HexMap.getHexByLabel(terrain, hexLabel);
             if (!isOccupied(hexLabel))
             {
@@ -129,8 +126,7 @@ final class BattleMovement
         Set<String> set = new HashSet<String>();
         if (!chit.hasMoved() && !client.isInContact(chit, false))
         {
-            if (HexMap
-                .terrainHasStartlist(client.getBattleSite().getTerrain())
+            if (client.getBattleSite().getTerrain().hasTowerStartList()
                 && (client.getBattleTurnNumber() == 1)
                 && client.getBattleActiveLegion().equals(client.getDefender()))
             {

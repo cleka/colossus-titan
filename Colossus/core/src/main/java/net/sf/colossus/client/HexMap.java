@@ -39,11 +39,13 @@ import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
 /**
  * Class HexMap displays a basic battle map.
+ * 
+ * TODO it also contains model information, particularly in the static members
+ * 
  * @version $Id$
  * @author David Ripton
  * @author Romain Dolbeau
  */
-
 public class HexMap extends JPanel implements MouseListener, WindowListener
 {
     private static final Logger LOGGER = Logger.getLogger(HexMap.class
@@ -58,8 +60,6 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
     // The game state hexes can be set up once for each terrain type.
     private static Map<MasterBoardTerrain, GUIBattleHex[][]> terrainH = new HashMap<MasterBoardTerrain, GUIBattleHex[][]>();
     private static Map<MasterBoardTerrain, GUIBattleHex[]> entranceHexes = new HashMap<MasterBoardTerrain, GUIBattleHex[]>();
-    private static Map<MasterBoardTerrain, List<String>> startlistMap = new HashMap<MasterBoardTerrain, List<String>>();
-    private static Map<MasterBoardTerrain, Boolean> towerStatusMap = new HashMap<MasterBoardTerrain, Boolean>();
     private static Map<MasterBoardTerrain, Map<HazardTerrain, Integer>> hazardNumberMap = new HashMap<MasterBoardTerrain, Map<HazardTerrain, Integer>>();
     private static Map<MasterBoardTerrain, Map<Character, Integer>> hazardSideNumberMap = new HashMap<MasterBoardTerrain, Map<Character, Integer>>();
 
@@ -93,8 +93,6 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
     {
         terrainH.clear();
         entranceHexes.clear();
-        startlistMap.clear();
-        towerStatusMap.clear();
         hazardNumberMap.clear();
         hazardSideNumberMap.clear();
 
@@ -203,10 +201,9 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
                 List<String> tempTowerStartList = bl.getStartList();
                 if (tempTowerStartList != null)
                 {
-                    startlistMap.put(masterBoardTerrain, tempTowerStartList);
+                    masterBoardTerrain.setTowerStartList(tempTowerStartList);
                 }
-                towerStatusMap.put(masterBoardTerrain, Boolean.valueOf(bl
-                    .isTower()));
+                masterBoardTerrain.setTower(bl.isTower());
             }
             else
             {// random Battlelands
@@ -645,11 +642,6 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
         return set;
     }
 
-    public static List<String> getTowerStartList(MasterBoardTerrain terrain)
-    {
-        return startlistMap.get(terrain);
-    }
-
     public void mousePressed(MouseEvent e)
     {
         // necessary to implement interface
@@ -797,38 +789,6 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
     public Dimension getPreferredSize()
     {
         return new Dimension(60 * Scale.get(), 55 * Scale.get());
-    }
-
-    public boolean terrainIsTower()
-    {
-        return terrainIsTower(getMasterHex().getTerrain());
-    }
-
-    // TODO this seems to be an intrinsic feature of the terrain and should be in
-    //      the MasterBoardTerrain class
-    public static boolean terrainIsTower(MasterBoardTerrain t)
-    {
-        try
-        {
-            return towerStatusMap.get(t).booleanValue();
-        }
-        catch (NullPointerException ex)
-        // XXX Called too early, before towerStatusMap is setup?
-        {
-            LOGGER.log(Level.SEVERE, "Null pointer exception caught", ex);
-            return false;
-        }
-    }
-
-    public boolean terrainHasStartlist()
-    {
-        return terrainHasStartlist(getMasterHex().getTerrain());
-    }
-
-    public static boolean terrainHasStartlist(MasterBoardTerrain t)
-    {
-        List<String> temp = startlistMap.get(t);
-        return (!(temp == null));
     }
 
     public static int getHazardCountInTerrain(HazardTerrain hazard,

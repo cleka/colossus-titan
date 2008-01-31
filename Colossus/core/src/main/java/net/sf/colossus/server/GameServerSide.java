@@ -2021,7 +2021,7 @@ public final class GameServerSide extends Game
         int entrySide = -1;
         if (cameFrom != -1)
         {
-            if (HexMap.terrainHasStartlist(hex.getTerrain()))
+            if (hex.getTerrain().hasTowerStartList())
             {
                 entrySide = 3;
             }
@@ -2270,8 +2270,7 @@ public final class GameServerSide extends Game
         }
 
         // Tower teleport
-        if (HexMap.terrainIsTower(hex.getTerrain())
-            && ((LegionServerSide)legion).numLords() > 0
+        if (hex.getTerrain().hasTowerStartList() && legion.numLords() > 0
             && towerTeleportAllowed())
         {
             // Mark every unoccupied hex within 6 hexes.
@@ -2346,7 +2345,7 @@ public final class GameServerSide extends Game
                 // Startlisted terrain only have bottom entry side.
                 // Don't bother finding more than one entry side if unoccupied.
                 if (!isOccupied(targetHex)
-                    || HexMap.terrainHasStartlist(targetHex.getTerrain()))
+                    || targetHex.getTerrain().hasTowerStartList())
                 {
                     entrySides.add(Constants.bottom);
                     return entrySides;
@@ -2753,7 +2752,7 @@ public final class GameServerSide extends Game
         }
 
         // If this is a tower hex, the only entry side is the bottom.
-        if (HexMap.terrainHasStartlist(hex.getTerrain())
+        if (hex.getTerrain().hasTowerStartList()
             && !entrySide.equals(Constants.bottom))
         {
             LOGGER.log(Level.WARNING, "Tried to enter invalid side of tower");

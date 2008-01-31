@@ -13,7 +13,6 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.sf.colossus.client.HexMap;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.util.ArrayHelper;
@@ -449,7 +448,7 @@ public class MasterBoard
                 @Override
                 public boolean matchesNonNullValue(MasterHex hex)
                 {
-                    if (HexMap.terrainIsTower(hex.getTerrain()))
+                    if (hex.getTerrain().isTower())
                     {
                         towerSet.add(hex);
                     }

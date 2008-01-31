@@ -21,7 +21,6 @@ import net.sf.colossus.client.BattleHex;
 import net.sf.colossus.client.BattleMap;
 import net.sf.colossus.client.Client;
 import net.sf.colossus.client.CritterMove;
-import net.sf.colossus.client.HexMap;
 import net.sf.colossus.client.LegionClientSide;
 import net.sf.colossus.client.PlayerClientSide;
 import net.sf.colossus.client.Strike;
@@ -1690,7 +1689,7 @@ public class SimpleAI implements AI
         double defenderPointValue = getCombatValue(defender, terrain);
         // TODO: add in enemy's most likely turn 4 recruit
 
-        if (HexMap.terrainIsTower(hex.getTerrain()))
+        if (hex.getTerrain().isTower())
         {
             // defender in the tower!  ouch!
             defenderPointValue *= 1.2;
@@ -3549,8 +3548,7 @@ public class SimpleAI implements AI
         // don't just sit back and wait for a time loss.
         if (critter.isTitan())
         {
-            if (HexMap.terrainIsTower(terrain)
-                && legion.equals(client.getDefender()))
+            if (terrain.isTower() && legion.equals(client.getDefender()))
             {
                 // Stick to the center of the tower.
                 value += bec.TITAN_TOWER_HEIGHT_BONUS * hex.getElevation();
@@ -3578,7 +3576,7 @@ public class SimpleAI implements AI
         // Encourage defending critters to hang back.
         else if (legion.equals(client.getDefender()))
         {
-            if (HexMap.terrainIsTower(terrain))
+            if (terrain.isTower())
             {
                 // Stick to the center of the tower.
                 value += bec.DEFENDER_TOWER_HEIGHT_BONUS * hex.getElevation();

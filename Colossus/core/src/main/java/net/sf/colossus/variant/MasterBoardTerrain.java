@@ -2,6 +2,8 @@ package net.sf.colossus.variant;
 
 
 import java.awt.Color;
+import java.util.Collections;
+import java.util.List;
 
 import net.sf.colossus.client.BattleHex;
 import net.sf.colossus.client.HexMap;
@@ -19,6 +21,9 @@ public class MasterBoardTerrain
     private final String id;
     private final String displayName;
     private final Color color;
+    // TODO this should be a List<BattleHex> (and BattleHex should be part of the variant package)
+    private List<String> towerStartList;
+    private boolean isTower;
 
     public MasterBoardTerrain(String id, String displayName, Color color)
     {
@@ -92,5 +97,30 @@ public class MasterBoardTerrain
             return true;
         }
         return false;
+    }
+
+    public void setTowerStartList(List<String> towerStartList)
+    {
+        this.towerStartList = towerStartList;
+    }
+
+    public List<String> getTowerStartList()
+    {
+        return Collections.unmodifiableList(towerStartList);
+    }
+
+    public void setTower(boolean isTower)
+    {
+        this.isTower = isTower;
+    }
+
+    public boolean isTower()
+    {
+        return isTower;
+    }
+
+    public boolean hasTowerStartList()
+    {
+        return towerStartList != null;
     }
 }
