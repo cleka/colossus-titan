@@ -30,6 +30,7 @@ public interface HazardConstants
     public static final String POWERBONUS = "Power increase";
     public static final String POWERPENALTY = "Power decrease";
     public static final String HEALTHDRAIN = "Lose health every strike phase";
+    public static final String BLOCKED = "Strikes are blocked";
     public static final String NOEFFECT = "No Terrain Effect";
 
     public static final String RANGESTRIKEFREE = "No effect on RangeStrike";
