@@ -30,6 +30,7 @@ import net.sf.colossus.util.KDialog;
 import net.sf.colossus.util.RecruitGraph;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.HazardTerrain;
+import net.sf.colossus.variant.MasterBoardTerrain;
 import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
 
@@ -149,9 +150,8 @@ public final class ShowCreatureDetails extends KDialog implements
         // recruit
         //
         _section(s, "Recruit");
-        final String[] terrains = TerrainRecruitLoader.getTerrains();
         //   in
-        for (String terrainName : terrains)
+        for (MasterBoardTerrain terrain : TerrainRecruitLoader.getTerrains())
         {
             buf = new StringBuffer();
             List<CreatureType> recruiters = VariantSupport.getCurrentVariant()
@@ -160,7 +160,7 @@ public final class ShowCreatureDetails extends KDialog implements
             {
                 final CreatureType recruiter = recruiters.get(ri);
                 int num = TerrainRecruitLoader.numberOfRecruiterNeeded(
-                    recruiter, creature, terrainName, null);
+                    recruiter, creature, terrain.getId(), null);
                 if (num == 1)
                 {
                     buf.append("by 1 " + recruiter.getName() + ", ");
@@ -173,8 +173,7 @@ public final class ShowCreatureDetails extends KDialog implements
             }
             if (buf.length() > 0)
             {
-                Color color = TerrainRecruitLoader
-                    .getTerrainColor(terrainName).brighter();
+                Color color = terrain.getColor().brighter();
                 s
                     .append(MessageFormat
                         .format(
@@ -182,14 +181,14 @@ public final class ShowCreatureDetails extends KDialog implements
                                 + "<td colspan={2} nowrap><font color=blue>{3}</font></td>"
                                 + "</tr>", new Object[] {
                                 HTMLColor.colorToCode(color),
-                                terrainName,
+                                terrain.getId(),
                                 ""
                                     + (HazardTerrain.getAllHazardTerrains()
                                         .size() + 1), buf.toString(), }));
             }
         }
         //   out
-        for (String terrainName : terrains)
+        for (MasterBoardTerrain terrain : TerrainRecruitLoader.getTerrains())
         {
             buf = new StringBuffer();
             List<CreatureType> recruits = VariantSupport.getCurrentVariant()
@@ -198,7 +197,7 @@ public final class ShowCreatureDetails extends KDialog implements
             {
                 final CreatureType recruit = recruits.get(ri);
                 int num = TerrainRecruitLoader.numberOfRecruiterNeeded(
-                    creature, recruit, terrainName, null);
+                    creature, recruit, terrain.getId(), null);
                 if ((num > 0) && (num < RecruitGraph.BIGNUM))
                 {
                     buf.append(num + " recruit a " + recruit.getName() + ", ");
@@ -206,8 +205,7 @@ public final class ShowCreatureDetails extends KDialog implements
             }
             if (buf.length() > 0)
             {
-                Color color = TerrainRecruitLoader
-                    .getTerrainColor(terrainName).brighter();
+                Color color = terrain.getColor().brighter();
                 s
                     .append(MessageFormat
                         .format(
@@ -215,7 +213,7 @@ public final class ShowCreatureDetails extends KDialog implements
                                 + "<td colspan={2} nowrap><font color=green>{3}</font></td>"
                                 + "</tr>", new Object[] {
                                 HTMLColor.colorToCode(color),
-                                terrainName,
+                                terrain.getId(),
                                 ""
                                     + (HazardTerrain.getAllHazardTerrains()
                                         .size() + 1), buf.toString(), }));

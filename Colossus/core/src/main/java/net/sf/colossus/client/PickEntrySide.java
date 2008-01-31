@@ -42,7 +42,7 @@ final class PickEntrySide extends HexMap implements ActionListener,
     private PickEntrySide(JFrame parentFrame, MasterHex masterHex,
         Set<String> sides)
     {
-        super(masterHex.getLabel());
+        super(masterHex);
         dialog = new JDialog(parentFrame, "Pick entry side", true);
         laidOut = false;
         Container contentPane = dialog.getContentPane();

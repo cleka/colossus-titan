@@ -18,6 +18,7 @@ import net.sf.colossus.client.LegionClientSide;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.util.Combos;
 import net.sf.colossus.variant.CreatureType;
+import net.sf.colossus.variant.MasterBoardTerrain;
 import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
 
@@ -98,7 +99,6 @@ public class MilvangAI extends RationalAI
             "sortCreaturesByValueName() in chooseCreaturesToSplitOut");
 
         boolean hasTitan = ((LegionClientSide)legion).contains("Titan");
-        String[] terrains = TerrainRecruitLoader.getTerrains();
 
         List<CreatureType> critters = new ArrayList<CreatureType>();
         for (String name : ((LegionClientSide)legion).getContents())
@@ -143,12 +143,13 @@ public class MilvangAI extends RationalAI
 
             double totalRecruitValue = 0;
             double bestRecruitValue = 0;
-            for (int i = 0; i < terrains.length; i++)
+            for (MasterBoardTerrain terrain : TerrainRecruitLoader
+                .getTerrains())
             {
                 double currRecruitValue = findRecruitPotential(critterMap,
-                    terrains[i]);
+                    terrain.getId());
                 if (currRecruitValue > bestRecruitValue
-                    && !terrains[i].equals("Tower"))
+                    && !terrain.getId().equals("Tower"))
                 {
                     totalRecruitValue += SECONDARY_RECRUIT_FACTOR
                         * bestRecruitValue;

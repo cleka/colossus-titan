@@ -1,10 +1,11 @@
 package net.sf.colossus.xmlparser;
 
 
-import java.awt.Color;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -18,6 +19,7 @@ import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.util.HTMLColor;
 import net.sf.colossus.util.RecruitGraph;
 import net.sf.colossus.variant.CreatureType;
+import net.sf.colossus.variant.MasterBoardTerrain;
 import net.sf.colossus.variant.MasterHex;
 
 import org.jdom.Document;
@@ -51,42 +53,37 @@ public class TerrainRecruitLoader
 
     /**
      * Map a String (representing a terrain) to a list of recruits.
+     *   
+     * TODO integrate into {@link MasterBoardTerrain}
      */
     private static Map<String, List<RecruitNumber>> strToRecruits = new HashMap<String, List<RecruitNumber>>();
 
     /**
-     * Map a String (representing a terrain) to a terrain display name.
-     */
-
-    private static Map<String, String> strToDisplayName = new HashMap<String, String>();
-
-    /**
-     * Map a String (representing a terrain) to a terrain color.
-     */
-    private static Map<String, Color> strToColor = new HashMap<String, Color>();
-
-    /**
      * Map a String (representing a terrain) to a boolean,
      * telling if a Creature can recruit in the usual way or not.
+     *   
+     * TODO integrate into {@link MasterBoardTerrain}
      */
     private static Map<String, Boolean> strToBelow = new HashMap<String, Boolean>();
 
     /**
      * Map a String (representing a terrain) to an 
      *   optional BattlelandsRandomizer filename.
+     *   
+     * TODO integrate into {@link MasterBoardTerrain}
      */
     private static Map<String, String> strToRnd = new HashMap<String, String>();
 
     /**
-     * All the Strings that are valid terrains.
+     * A map from the terrain names to the terrains.
      */
-    private static String[] terrains = null;
+    private static Map<String, MasterBoardTerrain> terrains = new HashMap<String, MasterBoardTerrain>();
 
     /**
      * The list of Acquirable Creature, as acquirableData.
-     * @see net.sf.colossus.xmlparser.TerrainRecruitLoader.acquirableData
+     * @see net.sf.colossus.xmlparser.TerrainRecruitLoader.AcquirableData
      */
-    private static List<acquirableData> acquirableList = null;
+    private static List<AcquirableData> acquirableList = null;
 
     /** support for the custom recruiting functions ; map the class name to an
      instance of the class. */
@@ -202,17 +199,15 @@ public class TerrainRecruitLoader
                     + "during a game...");
             acquirableList = null;
         }
-        if (terrains != null)
+        if (!terrains.isEmpty())
         {
             LOGGER.log(Level.FINEST,
                 "TerrainRecruitLoader: Destroying previous "
                     + "``terrains'' ; this should never happen during "
                     + "a game...");
-            terrains = null;
+            terrains.clear();
         }
         strToRecruits.clear();
-        strToDisplayName.clear();
-        strToColor.clear();
         strToBelow.clear();
         strToRnd.clear();
         nameToInstance.clear();
@@ -291,30 +286,15 @@ public class TerrainRecruitLoader
             rl.add(rn);
         }
 
+        MasterBoardTerrain terrain = new MasterBoardTerrain(name, displayName,
+            HTMLColor.stringToColor(color));
         TerrainRecruitLoader.strToRecruits.put(name, rl);
-        TerrainRecruitLoader.strToDisplayName.put(name, displayName);
-        TerrainRecruitLoader.strToColor.put(name, HTMLColor
-            .stringToColor(color));
         TerrainRecruitLoader.strToBelow.put(name, Boolean
             .valueOf(regularRecruit));
         // XXX Random not yet supported:            
         TerrainRecruitLoader.strToRnd.put(name, null);
 
-        if (TerrainRecruitLoader.terrains == null)
-        {
-            TerrainRecruitLoader.terrains = new String[1];
-            TerrainRecruitLoader.terrains[0] = name;
-        }
-        else
-        {
-            String[] t2 = new String[TerrainRecruitLoader.terrains.length + 1];
-            for (int i = 0; i < TerrainRecruitLoader.terrains.length; i++)
-            {
-                t2[i] = TerrainRecruitLoader.terrains[i];
-            }
-            t2[TerrainRecruitLoader.terrains.length] = name;
-            TerrainRecruitLoader.terrains = t2;
-        }
+        terrains.put(name, terrain);
 
         addToGraph(rl, name);
     }
@@ -325,7 +305,7 @@ public class TerrainRecruitLoader
         String name = el.getAttribute("name").getValue();
         int points = el.getAttribute("points").getIntValue();
         String terrain = el.getAttributeValue("terrain");
-        acquirableData ad = new acquirableData(name, points);
+        AcquirableData ad = new AcquirableData(name, points);
         if (terrain != null)
         {
             ad.addTerrain(terrain);
@@ -346,12 +326,18 @@ public class TerrainRecruitLoader
     }
 
     /**
-     * Return an array of all the String representing a valid terrain.
-     * @return An array of String, each representing a valid terrain.
+     * Return a collection of all possible terrains.
+     * 
+     * @return A collection containing all instances of {@link MasterBoardTerrain}.
      */
-    public static String[] getTerrains()
+    public static Collection<MasterBoardTerrain> getTerrains()
     {
-        return terrains.clone();
+        return Collections.unmodifiableCollection(terrains.values());
+    }
+
+    public static MasterBoardTerrain getTerrainById(String id)
+    {
+        return terrains.get(id);
     }
 
     /**
@@ -444,34 +430,16 @@ public class TerrainRecruitLoader
     }
 
     /**
-     * Give the display name of the terrain.
-     * @param tc String representing a terrain.
-     * @return The display name of the terrain as a String.
-     */
-    public static String getTerrainDisplayName(String tc)
-    {
-        return strToDisplayName.get(tc);
-    }
-
-    /**
-     * Give the color of the terrain.
-     * @param tc String representing a terrain.
-     * @return The color of the terrain as Color.
-     */
-    public static Color getTerrainColor(String tc)
-    {
-        return strToColor.get(tc);
-    }
-
-    /**
      * Give the name of the random filename to use to generate this terrain,
      * or null if it's a static Battlelands.
-     * @param tc String representing a terrain.
+     * 
+     * @param masterBoardTerrain A mastre board terrain.
      * @return The name of the random source file as a String
      */
-    public static String getTerrainRandomName(String tc)
+    public static String getTerrainRandomName(
+        MasterBoardTerrain masterBoardTerrain)
     {
-        return strToRnd.get(tc);
+        return strToRnd.get(masterBoardTerrain);
     }
 
     /**
@@ -619,13 +587,13 @@ public class TerrainRecruitLoader
      * @author Romain Dolbeau
      * @version $Id$
      */
-    private class acquirableData
+    private class AcquirableData
     {
         private final String name;
         private final int value;
         private final List<String> where;
 
-        acquirableData(String n, int v)
+        AcquirableData(String n, int v)
         {
             name = n;
             value = v;
@@ -673,11 +641,11 @@ public class TerrainRecruitLoader
         }
     }
 
-    private void addAcquirable(acquirableData ad) throws ParseException
+    private void addAcquirable(AcquirableData ad) throws ParseException
     {
         if (acquirableList == null)
         {
-            acquirableList = new ArrayList<acquirableData>();
+            acquirableList = new ArrayList<AcquirableData>();
         }
         acquirableList.add(ad);
         if ((ad.getValue() % getAcquirableRecruitmentsValue()) != 0)
@@ -694,10 +662,10 @@ public class TerrainRecruitLoader
     public static List<String> getAcquirableList()
     {
         List<String> al = new ArrayList<String>();
-        Iterator<acquirableData> it = acquirableList.iterator();
+        Iterator<AcquirableData> it = acquirableList.iterator();
         while (it.hasNext())
         {
-            acquirableData ad = it.next();
+            AcquirableData ad = it.next();
             al.add(ad.getName());
         }
         return al;
@@ -710,7 +678,7 @@ public class TerrainRecruitLoader
      */
     public static int getAcquirableRecruitmentsValue()
     {
-        acquirableData ad = acquirableList.get(0);
+        AcquirableData ad = acquirableList.get(0);
         return ad.getValue();
     }
 
@@ -721,7 +689,7 @@ public class TerrainRecruitLoader
      */
     public static String getPrimaryAcquirable()
     {
-        acquirableData ad = acquirableList.get(0);
+        AcquirableData ad = acquirableList.get(0);
         return ad.getName();
     }
 
@@ -742,10 +710,10 @@ public class TerrainRecruitLoader
         {
             return al;
         }
-        Iterator<acquirableData> it = acquirableList.iterator();
+        Iterator<AcquirableData> it = acquirableList.iterator();
         while (it.hasNext())
         {
-            acquirableData ad = it.next();
+            AcquirableData ad = it.next();
             if (ad.isAvailable(t) && ((value % ad.getValue()) == 0))
             {
                 al.add(ad.getName());
@@ -762,10 +730,10 @@ public class TerrainRecruitLoader
      */
     public boolean isAcquirable(String name)
     {
-        Iterator<acquirableData> it = acquirableList.iterator();
+        Iterator<AcquirableData> it = acquirableList.iterator();
         while (it.hasNext())
         {
-            acquirableData ad = it.next();
+            AcquirableData ad = it.next();
             if (name.equals(ad.getName()))
             {
                 return true;

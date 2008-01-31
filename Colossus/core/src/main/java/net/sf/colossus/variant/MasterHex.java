@@ -3,10 +3,7 @@ package net.sf.colossus.variant;
 
 import java.awt.Color;
 
-import net.sf.colossus.client.BattleHex;
 import net.sf.colossus.client.Hex;
-import net.sf.colossus.client.HexMap;
-import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
 
 /**
@@ -34,7 +31,7 @@ public class MasterHex extends Hex
     private final int[] baseExitType = new int[3];
     private final String[] baseExitLabel = new String[3];
 
-    private String terrain; // TODO should be typesafe enum
+    private final MasterBoardTerrain terrain;
 
     // The hex vertexes are numbered like this:
     //
@@ -53,86 +50,32 @@ public class MasterHex extends Hex
     //          \              /                \        /
     //           4------------3                  4------3
 
-    public MasterHex()
+    public MasterHex(String label, MasterBoardTerrain terrain, int xCoord,
+        int yCoord)
     {
-        super();
+        super(label, xCoord, yCoord);
+        this.terrain = terrain;
     }
 
-    public String getTerrain()
+    public MasterBoardTerrain getTerrain()
     {
         return this.terrain;
-    }
-
-    public void setTerrain(String terrain)
-    {
-        this.terrain = terrain;
     }
 
     @Override
     public String getTerrainName()
     {
-        return this.terrain;
+        return this.terrain.getId();
     }
 
     public String getTerrainDisplayName()
     {
-        return (TerrainRecruitLoader.getTerrainDisplayName(terrain));
+        return terrain.getDisplayName();
     }
 
     public Color getTerrainColor()
     {
-        return (TerrainRecruitLoader.getTerrainColor(terrain));
-    }
-
-    public static boolean isNativeCombatBonus(CreatureType creature,
-        String terrain)
-    {
-        int bonusHazardCount = 0;
-        int bonusHazardSideCount = 0;
-
-        for (HazardTerrain hTerrain : HazardTerrain.getAllHazardTerrains())
-        {
-            int count = HexMap.getHazardCountInTerrain(hTerrain, terrain);
-            if (hTerrain.isNativeBonusTerrain()
-                && creature.isNativeIn(hTerrain))
-            {
-                bonusHazardCount += count;
-            }
-            else
-            {
-                if (hTerrain.isNonNativePenaltyTerrain()
-                    && !creature.isNativeIn(hTerrain))
-                {
-                    bonusHazardCount -= count;
-                }
-            }
-        }
-        final char[] hazardSide = BattleHex.getHexsides();
-
-        for (int i = 0; i < hazardSide.length; i++)
-        {
-            int count = net.sf.colossus.client.HexMap
-                .getHazardSideCountInTerrain(hazardSide[i], terrain);
-            if (BattleHex.isNativeBonusHexside(hazardSide[i])
-                && (creature).isNativeHexside(hazardSide[i]))
-            {
-                bonusHazardSideCount += count;
-            }
-            else
-            {
-                if (BattleHex.isNonNativePenaltyHexside(hazardSide[i])
-                    && !(creature).isNativeHexside(hazardSide[i]))
-                {
-                    bonusHazardSideCount -= count;
-                }
-            }
-        }
-        if (((bonusHazardCount + bonusHazardSideCount) > 0)
-            && ((bonusHazardCount >= 3) || (bonusHazardSideCount >= 5)))
-        {
-            return true;
-        }
-        return false;
+        return terrain.getColor();
     }
 
     public MasterHex getNeighbor(int i)
@@ -145,11 +88,6 @@ public class MasterHex extends Hex
     {
         assert (i >= 0) && (i <= 5) : "Neighbor index out of range";
         neighbors[i] = hex;
-    }
-
-    public void setLabel(int label)
-    {
-        setLabel(Integer.toString(label));
     }
 
     public int getLabelSide()

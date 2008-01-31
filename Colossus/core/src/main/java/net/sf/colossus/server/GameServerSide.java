@@ -36,6 +36,7 @@ import net.sf.colossus.util.ResourceLoader;
 import net.sf.colossus.util.Split;
 import net.sf.colossus.util.ViableEntityManager;
 import net.sf.colossus.variant.CreatureType;
+import net.sf.colossus.variant.MasterBoardTerrain;
 import net.sf.colossus.variant.MasterHex;
 import net.sf.colossus.webcommon.InstanceTracker;
 import net.sf.colossus.xmlparser.TerrainRecruitLoader;
@@ -1714,8 +1715,8 @@ public final class GameServerSide extends Game
 
                 critter.setHits(hits);
 
-                String terrain = getVariant().getMasterBoard().getHexByLabel(
-                    currentHexLabel).getTerrainName();
+                MasterBoardTerrain terrain = getVariant().getMasterBoard()
+                    .getHexByLabel(currentHexLabel).getTerrain();
                 String currentBattleHexLabel = cre.getAttribute("currentHex")
                     .getValue();
                 BattleHex currentBattleHex = HexMap.getHexByLabel(terrain,
@@ -1824,7 +1825,7 @@ public final class GameServerSide extends Game
     {
         List<CreatureType> recruits;
 
-        String terrain = hex.getTerrain();
+        String terrain = hex.getTerrain().getId();
 
         recruits = new ArrayList<CreatureType>();
         List<CreatureType> tempRecruits = TerrainRecruitLoader
@@ -1870,14 +1871,15 @@ public final class GameServerSide extends Game
         }
 
         MasterHex hex = legion.getCurrentHex();
-        String terrain = hex.getTerrain();
-        recruiters = TerrainRecruitLoader.getPossibleRecruiters(terrain, hex);
+        MasterBoardTerrain terrain = hex.getTerrain();
+        recruiters = TerrainRecruitLoader.getPossibleRecruiters(terrain
+            .getId(), hex);
         Iterator<CreatureType> it = recruiters.iterator();
         while (it.hasNext())
         {
             CreatureType possibleRecruiter = it.next();
             int needed = TerrainRecruitLoader.numberOfRecruiterNeeded(
-                possibleRecruiter, recruit, terrain, hex);
+                possibleRecruiter, recruit, terrain.getId(), hex);
 
             if (needed < 1
                 || needed > ((LegionServerSide)legion)
@@ -1897,7 +1899,7 @@ public final class GameServerSide extends Game
     private boolean anonymousRecruitLegal(Legion legion, CreatureType recruit)
     {
         return TerrainRecruitLoader.anonymousRecruitLegal(recruit, legion
-            .getCurrentHex().getTerrain(), legion.getCurrentHex());
+            .getCurrentHex().getTerrain().getId(), legion.getCurrentHex());
     }
 
     /** Add recruit to legion. */
@@ -1943,7 +1945,7 @@ public final class GameServerSide extends Game
             {
                 // Mark the recruiter(s) as visible.
                 numRecruiters = TerrainRecruitLoader.numberOfRecruiterNeeded(
-                    recruiter, recruit, hex.getTerrain(), hex);
+                    recruiter, recruit, hex.getTerrain().getId(), hex);
             }
 
             LOGGER.info("Legion "
@@ -1972,7 +1974,7 @@ public final class GameServerSide extends Game
             return null;
         }
         List<String> recruits = new ArrayList<String>();
-        String terrain = legion.getCurrentHex().getTerrain();
+        String terrain = legion.getCurrentHex().getTerrain().getId();
         List<String> allRecruits = TerrainRecruitLoader
             .getRecruitableAcquirableList(terrain, score);
         Iterator<String> it = allRecruits.iterator();

@@ -2,8 +2,11 @@ package net.sf.colossus.client;
 
 
 import java.awt.Point;
+import java.util.Collection;
 
 import javax.swing.JFrame;
+
+import net.sf.colossus.variant.MasterBoardTerrain;
 
 
 /**
@@ -20,7 +23,8 @@ final class ShowAllRecruits extends AbstractShowRecruits
     // Avoid showing multiple allTerrains displays.
     private static boolean allTerrainsDisplayActive = false;
 
-    ShowAllRecruits(JFrame parentFrame, IOptions options, String[] terrains)
+    ShowAllRecruits(JFrame parentFrame, IOptions options,
+        Collection<MasterBoardTerrain> terrains)
     {
         super(parentFrame);
 
@@ -33,9 +37,9 @@ final class ShowAllRecruits extends AbstractShowRecruits
         }
         allTerrainsDisplayActive = true;
 
-        for (String terrainName : terrains)
+        for (MasterBoardTerrain terrain : terrains)
         {
-            doOneTerrain(terrainName, null);
+            doOneTerrain(terrain, null);
         }
 
         pack();

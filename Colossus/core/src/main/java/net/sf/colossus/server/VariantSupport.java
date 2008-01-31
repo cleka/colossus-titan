@@ -20,7 +20,7 @@ import javax.swing.text.StyledDocument;
 import net.sf.colossus.client.HexMap;
 import net.sf.colossus.client.LegionClientSide;
 import net.sf.colossus.util.ResourceLoader;
-import net.sf.colossus.variant.BattleLand;
+import net.sf.colossus.variant.MasterBoardTerrain;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.MasterBoard;
 import net.sf.colossus.variant.MasterHex;
@@ -219,7 +219,7 @@ public final class VariantSupport
             loadTerrainsAndRecruits(serverSide);
             // TODO add things as the variant package gets fleshed out
             List<CreatureType> creatureTypes = loadCreatures();
-            List<BattleLand> battleLands = new ArrayList<BattleLand>();
+            List<MasterBoardTerrain> battleLands = new ArrayList<MasterBoardTerrain>();
             MasterBoard masterBoard = new MasterBoard();
             CURRENT_VARIANT = new Variant(creatureTypes, battleLands,
                 masterBoard);

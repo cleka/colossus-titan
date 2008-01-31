@@ -498,8 +498,8 @@ public final class MasterBoard extends JPanel
                 if (hex != null)
                 {
                     MasterHex hexModel = hex.getMasterHexModel();
-                    new ShowRecruits(masterFrame, hexModel.getTerrain(),
-                        lastPoint, hexModel, scrollPane);
+                    new ShowRecruits(masterFrame, lastPoint, hexModel,
+                        scrollPane);
                 }
             }
         };
@@ -511,8 +511,8 @@ public final class MasterBoard extends JPanel
                 GUIMasterHex hex = getHexContainingPoint(lastPoint);
                 if (hex != null)
                 {
-                    new ShowBattleMap(masterFrame, hex.getMasterHexModel()
-                        .getLabel(), hex);
+                    new ShowBattleMap(masterFrame, hex.getMasterHexModel(),
+                        hex);
                     // Work around a Windows JDK 1.3 bug.
                     hex.repaint();
                 }

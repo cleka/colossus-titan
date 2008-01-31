@@ -9,6 +9,7 @@ import net.sf.colossus.client.BattleHex;
 import net.sf.colossus.client.HexMap;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.variant.CreatureType;
+import net.sf.colossus.variant.MasterBoardTerrain;
 import net.sf.colossus.variant.MasterHex;
 
 
@@ -119,7 +120,7 @@ public class LOSTest extends TestCase
     private void placeCreature(CreatureServerSide creature,
         String battleHexLabel)
     {
-        String terrain = battle.getMasterHex().getTerrain();
+        MasterBoardTerrain terrain = battle.getMasterHex().getTerrain();
         BattleHex battleHex = HexMap.getHexByLabel(terrain, battleHexLabel);
         creature.setCurrentHex(battleHex);
     }

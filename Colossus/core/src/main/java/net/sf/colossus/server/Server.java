@@ -1013,7 +1013,7 @@ public final class Server implements IServer
 
         int numRecruiters = (recruiter == null ? 0 : TerrainRecruitLoader
             .numberOfRecruiterNeeded(recruiter, recruit, legion
-                .getCurrentHex().getTerrain(), legion.getCurrentHex()));
+                .getCurrentHex().getTerrain().getId(), legion.getCurrentHex()));
         String recruiterName = null;
         if (recruiter != null)
         {

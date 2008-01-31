@@ -39,6 +39,8 @@ import net.sf.colossus.server.LegionServerSide;
 import net.sf.colossus.util.KFrame;
 import net.sf.colossus.util.Options;
 import net.sf.colossus.util.ResourceLoader;
+import net.sf.colossus.variant.MasterBoardTerrain;
+import net.sf.colossus.variant.MasterHex;
 
 
 /**
@@ -84,7 +86,8 @@ public final class BattleBoard extends KFrame
     private final BattleMap battleMap;
     private final BattleDice battleDice;
 
-    public BattleBoard(final Client client, String masterHexLabel,
+    // TODO pass Legions instead of the markerIds
+    public BattleBoard(final Client client, MasterHex masterHex,
         String attackerMarkerId, String defenderMarkerId)
     {
         super(); // title will be set later
@@ -124,7 +127,7 @@ public final class BattleBoard extends KFrame
         }
         setLocation(location);
 
-        battleMap = new BattleMap(client, masterHexLabel, attackerMarkerId,
+        battleMap = new BattleMap(client, masterHex, attackerMarkerId,
             defenderMarkerId);
         contentPane.add(new JScrollPane(battleMap), BorderLayout.CENTER);
         battleMap.addMouseListener(new MouseAdapter()
@@ -186,9 +189,10 @@ public final class BattleBoard extends KFrame
         getContentPane().add(battleDice, BorderLayout.SOUTH);
 
         setTitle(client.getOwningPlayer().getName() + ": "
-            + LegionServerSide.getMarkerName(attackerMarkerId) + " (" + attackerMarkerId
-            + ") attacks " + LegionServerSide.getMarkerName(defenderMarkerId) + " ("
-            + defenderMarkerId + ") in " + masterHexLabel);
+            + LegionServerSide.getMarkerName(attackerMarkerId) + " ("
+            + attackerMarkerId + ") attacks "
+            + LegionServerSide.getMarkerName(defenderMarkerId) + " ("
+            + defenderMarkerId + ") in " + masterHex.getLabel());
 
         String instanceId = client.getOwningPlayer().getName() + ": "
             + attackerMarkerId + "/" + defenderMarkerId + " (" + count + ")";
@@ -447,7 +451,8 @@ public final class BattleBoard extends KFrame
         }
     }
 
-    public static BattleHex getEntrance(String terrain, int entrySide)
+    public static BattleHex getEntrance(MasterBoardTerrain terrain,
+        int entrySide)
     {
         return HexMap.getHexByLabel(terrain, "X" + entrySide);
     }

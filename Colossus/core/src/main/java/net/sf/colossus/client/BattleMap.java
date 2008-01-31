@@ -15,6 +15,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.colossus.server.Constants;
+import net.sf.colossus.variant.MasterBoardTerrain;
+import net.sf.colossus.variant.MasterHex;
+import net.sf.colossus.webcommon.InstanceTracker;
 
 
 /**
@@ -36,10 +39,11 @@ public final class BattleMap extends HexMap implements MouseListener,
     private final Marker attackerMarker;
     private final Marker defenderMarker;
 
-    public BattleMap(Client client, String masterHexLabel,
+    // TODO pass Legions instead of markerIds
+    public BattleMap(Client client, MasterHex masterHex,
         String attackerMarkerId, String defenderMarkerId)
     {
-        super(masterHexLabel);
+        super(masterHex);
 
         this.client = client;
 
@@ -55,8 +59,7 @@ public final class BattleMap extends HexMap implements MouseListener,
         String instanceId = client.getOwningPlayer().getName() + ": "
             + attackerMarkerId + "/" + defenderMarkerId + " (" + count + ")";
         count++;
-        net.sf.colossus.webcommon.InstanceTracker.setId(this, instanceId);
-
+        InstanceTracker.setId(this, instanceId);
     }
 
     public void setBattleMarkerLocation(boolean isDefender, String hexLabel)
@@ -82,7 +85,8 @@ public final class BattleMap extends HexMap implements MouseListener,
         }
     }
 
-    public static BattleHex getEntrance(String terrain, int entrySide)
+    public static BattleHex getEntrance(MasterBoardTerrain terrain,
+        int entrySide)
     {
         return HexMap.getHexByLabel(terrain, "X" + entrySide);
     }

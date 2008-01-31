@@ -1,7 +1,7 @@
 package net.sf.colossus.game;
 
 
-import net.sf.colossus.variant.BattleLand;
+import net.sf.colossus.variant.MasterBoardTerrain;
 
 
 /**
@@ -12,9 +12,9 @@ public class Battle
     private final Game game;
     private final Legion attacker;
     private final Legion defender;
-    private final BattleLand land;
+    private final MasterBoardTerrain land;
 
-    public Battle(Game game, Legion attacker, Legion defender, BattleLand land)
+    public Battle(Game game, Legion attacker, Legion defender, MasterBoardTerrain land)
     {
         this.game = game;
         this.attacker = attacker;
@@ -37,7 +37,7 @@ public class Battle
         return defender;
     }
 
-    public BattleLand getLand()
+    public MasterBoardTerrain getLand()
     {
         return land;
     }

@@ -7,6 +7,7 @@ import java.util.Set;
 
 import net.sf.colossus.util.Options;
 import net.sf.colossus.variant.CreatureType;
+import net.sf.colossus.variant.MasterBoardTerrain;
 
 
 /**
@@ -95,7 +96,7 @@ final class BattleMovement
      */
     private Set<String> findUnoccupiedStartlistHexes()
     {
-        String terrain = client.getBattleSite().getTerrain();
+        MasterBoardTerrain terrain = client.getBattleSite().getTerrain();
         Set<String> set = new HashSet<String>();
         Iterator<String> it = HexMap.getTowerStartList(terrain).iterator();
         while (it.hasNext())

@@ -79,7 +79,7 @@ public final class LegionServerSide extends Legion implements
         Player player, GameServerSide game)
     {
         CreatureType[] startCre = TerrainRecruitLoader
-            .getStartingCreatures(hex.getTerrain());
+            .getStartingCreatures(hex.getTerrain().getId());
         LegionServerSide legion = new LegionServerSide(markerId, null, hex,
             hex, player, game, VariantSupport.getCurrentVariant()
                 .getCreatureByName(Constants.titan), VariantSupport

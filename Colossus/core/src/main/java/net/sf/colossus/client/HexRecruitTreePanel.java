@@ -22,26 +22,27 @@ import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.util.RecruitGraph;
 import net.sf.colossus.variant.CreatureType;
+import net.sf.colossus.variant.MasterBoardTerrain;
 import net.sf.colossus.variant.MasterHex;
 import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
 
 public class HexRecruitTreePanel extends Box
 {
-    public HexRecruitTreePanel(int direction, String terrain, MasterHex hex,
-        MouseListener listener)
+    public HexRecruitTreePanel(int direction, MasterBoardTerrain terrain,
+        MasterHex hex, MouseListener listener)
     {
         super(direction);
         setAlignmentY(0);
         setBorder(BorderFactory.createLineBorder(Color.black));
-        setBackground(TerrainRecruitLoader.getTerrainColor(terrain));
+        setBackground(terrain.getColor());
 
-        JLabel terrainLabel = new JLabel(terrain);
+        JLabel terrainLabel = new JLabel(terrain.getDisplayName());
         terrainLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         add(terrainLabel);
 
         List<CreatureType> creatures = TerrainRecruitLoader
-            .getPossibleRecruits(terrain, hex);
+            .getPossibleRecruits(terrain.getId(), hex);
         Iterator<CreatureType> it = creatures.iterator();
         boolean firstTime = true;
         int scale = 4 * Scale.get();
@@ -60,7 +61,7 @@ public class HexRecruitTreePanel extends Box
             else
             {
                 numToRecruit = TerrainRecruitLoader.numberOfRecruiterNeeded(
-                    prevCreature, creature, terrain, hex);
+                    prevCreature, creature, terrain.getId(), hex);
             }
 
             JLabel numToRecruitLabel = new JLabel("");

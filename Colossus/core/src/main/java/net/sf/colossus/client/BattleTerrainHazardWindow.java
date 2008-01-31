@@ -49,7 +49,8 @@ public class BattleTerrainHazardWindow extends KDialog
     public BattleTerrainHazardWindow(JFrame frame, Client client, BattleMap map)
 
     {
-        super(frame, "Battle Terrain Hazards for " + map.terrain, false);
+        super(frame, "Battle Terrain Hazards for "
+            + map.getMasterHex().getTerrain().getDisplayName(), false);
 
         this.options = client.getOptions();
         this.map = map;
@@ -98,7 +99,8 @@ public class BattleTerrainHazardWindow extends KDialog
         {
             HazardTerrain hazard = iterator.next();
             if (hazardsDisplayed.containsKey(hazard.getName())
-                || HexMap.getHazardCountInTerrain(hazard, map.terrain) == 0)
+                || HexMap.getHazardCountInTerrain(hazard, map.getMasterHex()
+                    .getTerrain()) == 0)
             {
                 // Ignore
             }
@@ -121,8 +123,8 @@ public class BattleTerrainHazardWindow extends KDialog
         hazardPanel.add(makeHexPanel(terrain, scale));
         hazardPanel.add(makeMovementPanel(terrain, scale));
         hazardPanel.add(makeNativesPanel(terrain, scale));
-        hazardPanel.add(makeStrikePanel(terrain, scale));
-        hazardPanel.add(makeDefenderPanel(terrain, scale));
+        hazardPanel.add(makeStrikePanel(scale));
+        hazardPanel.add(makeDefenderPanel(scale));
         return hazardPanel;
     }
 
@@ -217,7 +219,7 @@ public class BattleTerrainHazardWindow extends KDialog
         return movementPanel;
     }
 
-    private JPanel makeDefenderPanel(HazardTerrain terrain, int scale)
+    private JPanel makeDefenderPanel(int scale)
     {
         JPanel defenderPanel = new JPanel();
         defenderPanel.setBorder(BorderFactory
@@ -227,7 +229,7 @@ public class BattleTerrainHazardWindow extends KDialog
         return defenderPanel;
     }
 
-    private JPanel makeStrikePanel(HazardTerrain terrain, int scale)
+    private JPanel makeStrikePanel(int scale)
     {
         JPanel strikePanel = new JPanel();
         strikePanel

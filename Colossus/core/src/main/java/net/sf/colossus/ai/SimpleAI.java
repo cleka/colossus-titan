@@ -38,6 +38,7 @@ import net.sf.colossus.util.PermutationIterator;
 import net.sf.colossus.util.Probs;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.HazardTerrain;
+import net.sf.colossus.variant.MasterBoardTerrain;
 import net.sf.colossus.variant.MasterHex;
 import net.sf.colossus.variant.Variant;
 import net.sf.colossus.webcommon.InstanceTracker;
@@ -366,7 +367,7 @@ public class SimpleAI implements AI
                         safeMoves++;
                         if (!goodRecruit
                             && couldRecruitUp(legion, hex, null, hex
-                                .getTerrain()))
+                                .getTerrain().getId()))
                         {
                             goodRecruit = true;
                         }
@@ -387,7 +388,7 @@ public class SimpleAI implements AI
                             // Also consider acquiring angel.
                             if (!goodRecruit
                                 && couldRecruitUp(legion, hex, enemy, hex
-                                    .getTerrain()))
+                                    .getTerrain().getId()))
                             {
                                 goodRecruit = true;
                             }
@@ -642,7 +643,7 @@ public class SimpleAI implements AI
         }
 
         CreatureType[] startCre = TerrainRecruitLoader
-            .getStartingCreatures(hex.getTerrain());
+            .getStartingCreatures(hex.getTerrain().getId());
         // in CMU style splitting, we split centaurs in even towers,
         // ogres in odd towers.
         final boolean oddTower = "100".equals(hex.getLabel())
@@ -690,7 +691,7 @@ public class SimpleAI implements AI
         MasterHex hex)
     {
         CreatureType[] startCre = TerrainRecruitLoader
-            .getStartingCreatures(hex.getTerrain());
+            .getStartingCreatures(hex.getTerrain().getId());
         List<CreatureType> splitoffs = new LinkedList<CreatureType>();
 
         if (favorTitan)
@@ -748,7 +749,7 @@ public class SimpleAI implements AI
         MasterHex hex)
     {
         CreatureType[] startCre = TerrainRecruitLoader
-            .getStartingCreatures(hex.getTerrain());
+            .getStartingCreatures(hex.getTerrain().getId());
         List<CreatureType> splitoffs = new LinkedList<CreatureType>();
 
         if (favorTitan)
@@ -1665,7 +1666,7 @@ public class SimpleAI implements AI
         boolean attackerSplitsBeforeBattle, Legion defender, MasterHex hex,
         CreatureType recruit)
     {
-        String terrain = hex.getTerrain();
+        MasterBoardTerrain terrain = hex.getTerrain();
         double attackerPointValue = getCombatValue(attacker, terrain);
 
         if (attackerSplitsBeforeBattle)
@@ -1837,9 +1838,9 @@ public class SimpleAI implements AI
     public CreatureType getVariantRecruitHint(Legion legion, MasterHex hex,
         List<CreatureType> recruits)
     {
-        String recruitName = VariantSupport.getRecruitHint(hex.getTerrain(),
-            (LegionClientSide)legion, recruits, new SimpleAIOracle(legion,
-                hex, recruits), hintSectionUsed);
+        String recruitName = VariantSupport.getRecruitHint(hex.getTerrain()
+            .getId(), (LegionClientSide)legion, recruits, new SimpleAIOracle(
+            legion, hex, recruits), hintSectionUsed);
 
         if (recruitName == null)
         {
@@ -2098,7 +2099,7 @@ public class SimpleAI implements AI
 
         // Wimpy legions should concede if it costs the enemy an
         // angel or good recruit.
-        String terrain = legion.getCurrentHex().getTerrain();
+        MasterBoardTerrain terrain = legion.getCurrentHex().getTerrain();
         int height = (enemy).getHeight();
         if (getCombatValue(legion, terrain) < 0.5 * getCombatValue(enemy,
             terrain)
@@ -2260,7 +2261,7 @@ public class SimpleAI implements AI
     private BattleChit findBestTarget()
     {
         BattleChit bestTarget = null;
-        String terrain = client.getBattleSite().getTerrain();
+        MasterBoardTerrain terrain = client.getBattleSite().getTerrain();
 
         // Create a map containing each target and the likely number
         // of hits it would take if all possible creatures attacked it.
@@ -2314,7 +2315,7 @@ public class SimpleAI implements AI
      *  hexLabel description strings. */
     public void handleCarries(int carryDamage, Set<String> carryTargets)
     {
-        String terrain = client.getBattleSite().getTerrain();
+        MasterBoardTerrain terrain = client.getBattleSite().getTerrain();
         BattleChit bestTarget = null;
 
         for (String desc : carryTargets)
@@ -2405,7 +2406,7 @@ public class SimpleAI implements AI
         return true;
     }
 
-    static int getCombatValue(BattleChit chit, String terrain)
+    static int getCombatValue(BattleChit chit, MasterBoardTerrain terrain)
     {
         int val = chit.getPointValue();
         CreatureType creature = chit.getCreature();
@@ -2420,7 +2421,7 @@ public class SimpleAI implements AI
             val++;
         }
 
-        if (MasterHex.isNativeCombatBonus(creature, terrain))
+        if (terrain.hasNativeCombatBonus(creature))
         {
             val++;
         }
@@ -2429,7 +2430,7 @@ public class SimpleAI implements AI
     }
 
     /** XXX Inaccurate for titans. */
-    int getCombatValue(CreatureType creature, String terrain)
+    int getCombatValue(CreatureType creature, MasterBoardTerrain terrain)
     {
         if (creature.isTitan())
         {
@@ -2451,7 +2452,7 @@ public class SimpleAI implements AI
             val++;
         }
 
-        if (MasterHex.isNativeCombatBonus(creature, terrain))
+        if (terrain.hasNativeCombatBonus(creature))
         {
             val++;
         }
@@ -2471,7 +2472,7 @@ public class SimpleAI implements AI
         return val;
     }
 
-    int getCombatValue(Legion legion, String terrain)
+    int getCombatValue(Legion legion, MasterBoardTerrain terrain)
     {
         int val = 0;
         for (String name : ((LegionClientSide)legion).getContents())
@@ -2498,12 +2499,14 @@ public class SimpleAI implements AI
     }
 
     // XXX titan power
-    static int getKillValue(final BattleChit chit, final String terrain)
+    static int getKillValue(final BattleChit chit,
+        final MasterBoardTerrain terrain)
     {
         return getKillValue(chit.getCreature(), terrain);
     }
 
-    private static int getKillValue(final CreatureType creature, String terrain)
+    private static int getKillValue(final CreatureType creature,
+        MasterBoardTerrain terrain)
     {
         int val;
         if (creature == null)
@@ -2514,8 +2517,7 @@ public class SimpleAI implements AI
         // get non-terrain modified part of kill value
         val = creature.getKillValue();
         // modify with terrain
-        if (terrain != null
-            && MasterHex.isNativeCombatBonus(creature, terrain))
+        if (terrain != null && terrain.hasNativeCombatBonus(creature))
         {
             val += 3;
         }
@@ -2639,18 +2641,18 @@ public class SimpleAI implements AI
 
     // return power and skill of a given creature given the terrain
     // board hex label 
-    protected PowerSkill getNativeValue(CreatureType creature, String terrain,
-        boolean defender)
+    protected PowerSkill getNativeValue(CreatureType creature,
+        MasterBoardTerrain terrain, boolean defender)
     {
 
-        if (!(MasterHex.isNativeCombatBonus(creature, terrain) || (terrain
+        if (!(terrain.hasNativeCombatBonus(creature) || (terrain.getId()
             .equals("Tower") && defender == true)))
         {
             return new PowerSkill(creature.getName(), creature.getPower(),
                 creature.getSkill());
         }
 
-        return calc_bonus(creature, terrain, defender);
+        return calc_bonus(creature, terrain.getId(), defender);
 
     }
 
@@ -3270,7 +3272,7 @@ public class SimpleAI implements AI
     private int evaluateCritterMove(BattleChit critter,
         Map<String, Integer> strikeMap)
     {
-        final String terrain = client.getBattleSite().getTerrain();
+        final MasterBoardTerrain terrain = client.getBattleSite().getTerrain();
         final LegionClientSide legion = (LegionClientSide)client
             .getMyEngagedLegion();
         final int skill = critter.getSkill();

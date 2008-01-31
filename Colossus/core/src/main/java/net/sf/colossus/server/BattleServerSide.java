@@ -19,6 +19,7 @@ import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.util.Options;
 import net.sf.colossus.variant.HazardTerrain;
+import net.sf.colossus.variant.MasterBoardTerrain;
 import net.sf.colossus.variant.MasterHex;
 
 
@@ -562,7 +563,7 @@ public final class BattleServerSide extends Battle
      *  are mobile.
      */
     private Set<String> findUnoccupiedStartlistHexes(
-        boolean ignoreMobileAllies, String terrain)
+        boolean ignoreMobileAllies, MasterBoardTerrain terrain)
     {
         Set<String> set = new HashSet<String>();
         Iterator<String> it = HexMap.getTowerStartList(terrain).iterator();

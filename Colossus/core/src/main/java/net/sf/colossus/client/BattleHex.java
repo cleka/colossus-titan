@@ -50,9 +50,6 @@ public class BattleHex extends Hex
      */
     private final BattleHex[] neighbors = new BattleHex[6];
 
-    private final int xCoord;
-    private final int yCoord;
-
     // Hex labels are:
     // A1-A3, B1-B4, C1-C5, D1-D6, E1-E5, F1-F4.
     // Letters increase left to right; numbers increase bottom to top.
@@ -70,8 +67,7 @@ public class BattleHex extends Hex
 
     public BattleHex(int xCoord, int yCoord)
     {
-        this.xCoord = xCoord;
-        this.yCoord = yCoord;
+        super(xCoord, yCoord);
 
         for (int i = 0; i < 6; i++)
         {
@@ -79,7 +75,7 @@ public class BattleHex extends Hex
         }
 
         terrain = HazardTerrain.PLAINS;
-        assignLabel();
+        setLabel(createLabel());
     }
 
     public HazardTerrain getTerrain()
@@ -247,19 +243,20 @@ public class BattleHex extends Hex
         return result;
     }
 
-    private void assignLabel()
+    private String createLabel()
     {
         String label;
-        if (xCoord < 0)
+        if (getXCoord() < 0)
         {
-            label = "X" + yCoord;
+            label = "X" + getYCoord();
         }
         else
         {
-            final int yLabel = 6 - yCoord - Math.abs(((xCoord - 3) / 2));
-            label = "" + _intXCoordToXLabel(xCoord) + yLabel;
+            final int yLabel = 6 - getYCoord()
+                - Math.abs(((getXCoord() - 3) / 2));
+            label = "" + _intXCoordToXLabel(getXCoord()) + yLabel;
         }
-        setLabel(label);
+        return label;
     }
 
     /** a char for an int: 0:'A'=0, 1:'B', ... int(w):'W', else:'?', <0:undef.
@@ -351,21 +348,9 @@ public class BattleHex extends Hex
         neighbors[i] = hex;
     }
 
-    @Override
-    public int getXCoord()
-    {
-        return xCoord;
-    }
-
-    @Override
-    public int getYCoord()
-    {
-        return yCoord;
-    }
-
     public boolean isEntrance()
     {
-        return (xCoord == -1);
+        return (getXCoord() == -1);
     }
 
     public boolean hasWall()

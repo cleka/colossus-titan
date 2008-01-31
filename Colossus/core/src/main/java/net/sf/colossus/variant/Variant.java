@@ -30,7 +30,7 @@ public class Variant
 {
     private final List<CreatureType> creatureTypes;
     private final List<CreatureType> summonableCreatureTypes;
-    private final List<BattleLand> battleLands;
+    private final List<MasterBoardTerrain> battleLands;
     private final MasterBoard masterBoard;
 
     /** 
@@ -41,7 +41,7 @@ public class Variant
     private final Map<String, CreatureType> creatureTypeByNameCache = new HashMap<String, CreatureType>();
 
     public Variant(List<CreatureType> creatureTypes,
-        List<BattleLand> battleLands, MasterBoard masterBoard)
+        List<MasterBoardTerrain> battleLands, MasterBoard masterBoard)
     {
         // defensive copies to ensure immutability
         this.creatureTypes = new ArrayList<CreatureType>(creatureTypes);
@@ -58,7 +58,7 @@ public class Variant
                 }
             });
 
-        this.battleLands = new ArrayList<BattleLand>(battleLands);
+        this.battleLands = new ArrayList<MasterBoardTerrain>(battleLands);
         this.masterBoard = masterBoard;
     }
 
@@ -67,7 +67,7 @@ public class Variant
         return Collections.unmodifiableList(this.creatureTypes);
     }
 
-    public List<BattleLand> getBattleLands()
+    public List<MasterBoardTerrain> getBattleLands()
     {
         return Collections.unmodifiableList(this.battleLands);
     }

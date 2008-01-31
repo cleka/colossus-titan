@@ -24,9 +24,23 @@ public abstract class Hex
     //              4---------3
 
     // Game state variables
-    private String label = ""; // Avoid null pointer in stringWidth()
-    private int xCoord = -1;
-    private int yCoord = -1;
+    // TODO make label final -- currently BattleHex still calculates it
+    private String label = "";
+    private final int xCoord;
+    private final int yCoord;
+
+    public Hex(String label, int xCoord, int yCoord)
+    {
+        this.label = label;
+        this.xCoord = xCoord;
+        this.yCoord = yCoord;
+    }
+
+    public Hex(int xCoord, int yCoord)
+    {
+        this.xCoord = xCoord;
+        this.yCoord = yCoord;
+    }
 
     public String getLabel()
     {
@@ -56,18 +70,8 @@ public abstract class Hex
         return xCoord;
     }
 
-    public void setXCoord(int xCoord)
-    {
-        this.xCoord = xCoord;
-    }
-
     public int getYCoord()
     {
         return yCoord;
-    }
-
-    public void setYCoord(int yCoord)
-    {
-        this.yCoord = yCoord;
     }
 }

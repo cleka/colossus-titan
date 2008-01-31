@@ -19,12 +19,12 @@ import net.sf.colossus.variant.MasterHex;
 final class ShowRecruits extends AbstractShowRecruits
 {
 
-    ShowRecruits(JFrame parentFrame, String terrain, Point point,
-        MasterHex hex, JScrollPane pane)
+    ShowRecruits(JFrame parentFrame, Point point, MasterHex hex,
+        JScrollPane pane)
     {
         super(parentFrame);
 
-        doOneTerrain(terrain, hex);
+        doOneTerrain(hex.getTerrain(), hex);
 
         pack();
 

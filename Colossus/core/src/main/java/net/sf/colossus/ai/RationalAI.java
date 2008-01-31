@@ -25,6 +25,7 @@ import net.sf.colossus.game.Player;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.util.MultiSet;
 import net.sf.colossus.variant.CreatureType;
+import net.sf.colossus.variant.MasterBoardTerrain;
 import net.sf.colossus.variant.MasterHex;
 import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
@@ -1736,12 +1737,14 @@ public class RationalAI extends SimpleAI
         {
             if (!(attacker).hasTitan())
             {
-                value += recruitValue(attacker, hex, null, hex.getTerrain());
+                value += recruitValue(attacker, hex, null, hex.getTerrain()
+                    .getId());
             }
             else
             {
                 // prefer recruiting with Titan legion
-                value += recruitValue(attacker, hex, null, hex.getTerrain()) * 1.1;
+                value += recruitValue(attacker, hex, null, hex.getTerrain()
+                    .getId()) * 1.1;
             }
         }
 
@@ -1966,7 +1969,7 @@ public class RationalAI extends SimpleAI
             // assume no risk that AIs will attack each other
             return new BattleResults(0, 0, 0);
         }
-        String terrain = hex.getTerrain();
+        MasterBoardTerrain terrain = hex.getTerrain();
 
         // Get list of PowerSkill creatures
         List<PowerSkill> attackerCreatures = getCombatList(attacker, terrain,
@@ -2400,8 +2403,8 @@ public class RationalAI extends SimpleAI
         return false;
     }
 
-    public List<PowerSkill> getCombatList(Legion legion, String terrain,
-        boolean defender)
+    public List<PowerSkill> getCombatList(Legion legion,
+        MasterBoardTerrain terrain, boolean defender)
     {
         List<PowerSkill> powerskills = new ArrayList<PowerSkill>();
         Iterator<String> it = ((LegionClientSide)legion).getContents()

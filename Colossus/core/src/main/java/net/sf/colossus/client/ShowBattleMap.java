@@ -18,7 +18,6 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 
 import net.sf.colossus.server.Constants;
-import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.util.KFrame;
 import net.sf.colossus.variant.MasterHex;
 
@@ -43,18 +42,14 @@ final class ShowBattleMap extends HexMap implements WindowListener,
 
     private int oldScale = -1;
 
-    ShowBattleMap(KFrame parentFrame, String masterHexLabel,
-        GUIMasterHex guiHex)
+    ShowBattleMap(KFrame parentFrame, MasterHex masterHex, GUIMasterHex guiHex)
     {
-        super(masterHexLabel);
-        MasterHex hex = VariantSupport.getCurrentVariant().getMasterBoard()
-            .getHexByLabel(masterHexLabel);
-
+        super(masterHex);
         Map<String, String> neighbors = findOutNeighbors(guiHex);
         String neighborsText = neighbors.get("text");
 
         dialog = new JDialog(parentFrame, "Battle Map for "
-            + hex.getTerrainName() + " " + masterHexLabel + " "
+            + masterHex.getTerrainName() + " " + masterHex + " "
             + neighborsText, true);
         laidOut = false;
 

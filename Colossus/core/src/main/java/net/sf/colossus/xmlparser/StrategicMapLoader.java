@@ -8,6 +8,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.colossus.server.Constants;
+import net.sf.colossus.variant.MasterBoardTerrain;
 import net.sf.colossus.variant.MasterHex;
 
 import org.jdom.Document;
@@ -66,17 +67,15 @@ public class StrategicMapLoader
     private void handleHex(Element el) throws JDOMException
     {
         String label = el.getAttributeValue("label");
-        String terrain = el.getAttributeValue("terrain");
+        String terrainId = el.getAttributeValue("terrain");
         int xpos = el.getAttribute("xpos").getIntValue();
         int ypos = el.getAttribute("ypos").getIntValue();
 
         this.show[xpos][ypos] = true;
 
-        MasterHex hex = new MasterHex();
-        hex.setLabel(label);
-        hex.setTerrain(terrain);
-        hex.setXCoord(xpos);
-        hex.setYCoord(ypos);
+        MasterBoardTerrain terrain = TerrainRecruitLoader
+            .getTerrainById(terrainId);
+        MasterHex hex = new MasterHex(label, terrain, xpos, ypos);
 
         List<Element> exits = el.getChildren("exit");
         int i = 0;

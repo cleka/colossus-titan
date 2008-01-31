@@ -2857,8 +2857,8 @@ public final class Client implements IClient, IOracle
         if (board != null)
         {
             // TODO should be done on the EDT
-            battleBoard = new BattleBoard(this, hex.getLabel(), attacker
-                .getMarkerId(), defender.getMarkerId());
+            battleBoard = new BattleBoard(this, hex, attacker.getMarkerId(),
+                defender.getMarkerId());
             battleBoard.setPhase(battlePhase);
             battleBoard.setTurn(battleTurnNumber);
             battleBoard.setBattleMarkerLocation(false, "X" + attackerSide);
@@ -4210,7 +4210,7 @@ public final class Client implements IClient, IOracle
             return recruits;
         }
 
-        String terrain = hex.getTerrain();
+        String terrain = hex.getTerrain().getId();
 
         List<CreatureType> tempRecruits = TerrainRecruitLoader
             .getPossibleRecruits(terrain, hex);
@@ -4273,7 +4273,7 @@ public final class Client implements IClient, IOracle
         }
 
         MasterHex hex = legion.getCurrentHex();
-        String terrain = hex.getTerrain();
+        String terrain = hex.getTerrain().getId();
 
         recruiters = new HashSet<CreatureType>(TerrainRecruitLoader
             .getPossibleRecruiters(terrain, hex));
