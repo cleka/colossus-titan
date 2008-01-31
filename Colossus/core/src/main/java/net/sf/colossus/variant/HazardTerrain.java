@@ -20,41 +20,41 @@ public class HazardTerrain implements HazardConstants
     /**
      * Properties - 
      */
-    public final String effectOnGroundMovement; // Also flyers at end of move
-    public final String effectOnFlyerMovement;
+    public final EffectOnMovement effectOnGroundMovement; // Also flyers at end of move
+    public final EffectOnMovement effectOnFlyerMovement;
 
-    public final String effectforDefendingInTerrain;
-    public final String scopeForDefenceEffect;
+    public final EffectOnStrike effectforDefendingInTerrain;
+    public final ScopeOfEffectOnStrike scopeForDefenceEffect;
     public final int defenceEffectAdjustment;
 
-    public final String effectforAttackingFromTerrain;
-    public final String scopeForAttackEffect;
-    public final int AttackEffectAdjustment;
+    public final EffectOnStrike effectforAttackingFromTerrain;
+    public final ScopeOfEffectOnStrike scopeForAttackEffect;
+    public final int attackEffectAdjustment;
 
-    public final String effectForBeingRangeSruckInTerrain;
-    public final String scopeForRangeStruckEffect;
-    public final int RangeStruckEffectAdjustment;
+    public final EffectOnStrike effectForBeingRangeSruckInTerrain;
+    public final ScopeOfEffectOnStrike scopeForRangeStruckEffect;
+    public final int rangeStruckEffectAdjustment;
 
-    public final String effectforRangeStrikeFromTerrain;
-    public final String scopeForRangeStrikeEffect;
-    public final int RangeStrikeEffectAdjustment;
+    public final EffectOnStrike effectforRangeStrikeFromTerrain;
+    public final ScopeOfEffectOnStrike scopeForRangeStrikeEffect;
+    public final int rangeStrikeEffectAdjustment;
 
-    public final String RangeStrikeSpecial;
+    public final RangeStrikeSpecialEffect rangeStrikeSpecial;
 
     /**
      * A map from the serialization string of a terrain to the instances.
      */
     private final static Map<String, HazardTerrain> TERRAIN_MAP = new HashMap<String, HazardTerrain>();
 
-    public HazardTerrain(String name, String effectOnGroundMovement,
-        String effectOnFlyerMovement, String effectforDefendingInTerrain,
-        String scopeForDefenceEffect, int defenceEffectAdjustment,
-        String effectforAttackingFromTerrain, String scopeForAttackEffect,
-        int attackEffectAdjustment, String effectForBeingRangeSruckInTerrain,
-        String scopeForRangeStruckEffect, int RangeStruckEffectAdjustment,
-        String effectforRangeStrikeFromTerrain,
-        String scopeForRangeStrikeEffect, int RangeStrikeEffectAdjustment,
-        String RangeStrikeSpecial)
+    public HazardTerrain(String name, EffectOnMovement effectOnGroundMovement,
+        EffectOnMovement effectOnFlyerMovement, EffectOnStrike effectforDefendingInTerrain,
+        ScopeOfEffectOnStrike scopeForDefenceEffect, int defenceEffectAdjustment,
+        EffectOnStrike effectforAttackingFromTerrain, ScopeOfEffectOnStrike scopeForAttackEffect,
+        int attackEffectAdjustment, EffectOnStrike effectForBeingRangeSruckInTerrain,
+        ScopeOfEffectOnStrike scopeForRangeStruckEffect, int RangeStruckEffectAdjustment,
+        EffectOnStrike effectforRangeStrikeFromTerrain,
+        ScopeOfEffectOnStrike scopeForRangeStrikeEffect, int RangeStrikeEffectAdjustment,
+        RangeStrikeSpecialEffect RangeStrikeSpecial)
     {
         this.name = name;
         this.effectOnGroundMovement = effectOnGroundMovement;
@@ -66,14 +66,14 @@ public class HazardTerrain implements HazardConstants
 
         this.effectforAttackingFromTerrain = effectforAttackingFromTerrain;
         this.scopeForAttackEffect = scopeForAttackEffect;
-        this.AttackEffectAdjustment = attackEffectAdjustment;
+        this.attackEffectAdjustment = attackEffectAdjustment;
         this.effectForBeingRangeSruckInTerrain = effectForBeingRangeSruckInTerrain;
         this.scopeForRangeStruckEffect = scopeForRangeStruckEffect;
-        this.RangeStruckEffectAdjustment = RangeStruckEffectAdjustment;
+        this.rangeStruckEffectAdjustment = RangeStruckEffectAdjustment;
         this.effectforRangeStrikeFromTerrain = effectforRangeStrikeFromTerrain;
         this.scopeForRangeStrikeEffect = scopeForRangeStrikeEffect;
-        this.RangeStrikeEffectAdjustment = RangeStrikeEffectAdjustment;
-        this.RangeStrikeSpecial = RangeStrikeSpecial;
+        this.rangeStrikeEffectAdjustment = RangeStrikeEffectAdjustment;
+        this.rangeStrikeSpecial = RangeStrikeSpecial;
 
         TERRAIN_MAP.put(name, this);
     }
@@ -85,27 +85,27 @@ public class HazardTerrain implements HazardConstants
 
     public boolean isNativeBonusTerrain()
     {
-        return (scopeForAttackEffect.equals(SCOPENATIVE) || scopeForDefenceEffect
-            .equals(SCOPENATIVE))
-            && (effectforAttackingFromTerrain.equals(SKILLBONUS)
-                || effectforAttackingFromTerrain.equals(POWERBONUS)
-                || effectforDefendingInTerrain.equals(SKILLBONUS) || effectforDefendingInTerrain
-                .equals(POWERBONUS));
+        return (scopeForAttackEffect.equals(ScopeOfEffectOnStrike.NATIVES) || scopeForDefenceEffect
+            .equals(ScopeOfEffectOnStrike.NATIVES))
+            && (effectforAttackingFromTerrain.equals(EffectOnStrike.SKILLBONUS)
+                || effectforAttackingFromTerrain.equals(EffectOnStrike.POWERBONUS)
+                || effectforDefendingInTerrain.equals(EffectOnStrike.SKILLBONUS) || effectforDefendingInTerrain
+                .equals(EffectOnStrike.POWERBONUS));
     }
 
     public boolean isNonNativePenaltyTerrain()
     {
-        return (scopeForAttackEffect.equals(SCOPEFOREIGNER) || scopeForDefenceEffect
-            .equals(SCOPEFOREIGNER))
-            && (effectforAttackingFromTerrain.equals(SKILLPENALTY)
-                || effectforAttackingFromTerrain.equals(POWERPENALTY)
-                || effectforDefendingInTerrain.equals(SKILLPENALTY) || effectforDefendingInTerrain
-                .equals(POWERPENALTY));
+        return (scopeForAttackEffect.equals(ScopeOfEffectOnStrike.FOREIGNERS) || scopeForDefenceEffect
+            .equals(ScopeOfEffectOnStrike.FOREIGNERS))
+            && (effectforAttackingFromTerrain.equals(EffectOnStrike.SKILLPENALTY)
+                || effectforAttackingFromTerrain.equals(EffectOnStrike.POWERPENALTY)
+                || effectforDefendingInTerrain.equals(EffectOnStrike.SKILLPENALTY) || effectforDefendingInTerrain
+                .equals(EffectOnStrike.POWERPENALTY));
     }
 
     public boolean isNativeOnly()
     {
-        return effectOnGroundMovement.equals(BLOCKFOREIGNER);
+        return effectOnGroundMovement.equals(EffectOnMovement.BLOCKFOREIGNER);
     }
 
     public static HazardTerrain getTerrainByName(String name)
@@ -127,47 +127,64 @@ public class HazardTerrain implements HazardConstants
     }
 
     public static final HazardTerrain PLAINS = new HazardTerrain("Plains",
-        FREEMOVE, FREEMOVE, NOEFFECT, SCOPENULL, 0, NOEFFECT, SCOPENULL, 0,
-        NOEFFECT, SCOPENULL, 0, NOEFFECT, SCOPENULL, 0, RANGESTRIKEFREE);
+        EffectOnMovement.FREEMOVE, EffectOnMovement.FREEMOVE, EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.NOBODY,
+        0, EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.NOBODY, 0, EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.NOBODY, 0,
+        EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.NOBODY, 0,
+        RangeStrikeSpecialEffect.RANGESTRIKEFREE);
 
     public static final HazardTerrain TREE = new HazardTerrain("Tree",
-        BLOCKFOREIGNER, FREEMOVE, NOEFFECT, SCOPENULL, 0, NOEFFECT, SCOPENULL,
-        0, NOEFFECT, SCOPENULL, 0, NOEFFECT, SCOPENULL, 0, RANGESTRIKEFREE);
+        EffectOnMovement.BLOCKFOREIGNER, EffectOnMovement.FREEMOVE, EffectOnStrike.NOEFFECT,
+        ScopeOfEffectOnStrike.NOBODY, 0, EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.NOBODY, 0, EffectOnStrike.NOEFFECT,
+        ScopeOfEffectOnStrike.NOBODY, 0, EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.NOBODY, 0,
+        RangeStrikeSpecialEffect.RANGESTRIKEFREE);
 
     public static final HazardTerrain BRAMBLES = new HazardTerrain("Brambles",
-        SLOWFOREIGNER, SLOWFOREIGNER, SKILLBONUS, SCOPENATIVE, 1,
-        SKILLPENALTY, SCOPEFOREIGNER, -1, SKILLBONUS, SCOPENATIVE, 1,
-        SKILLPENALTY, SCOPEFOREIGNER, -1, RANGESTRIKESKILLPENALTY);
+        EffectOnMovement.SLOWFOREIGNER, EffectOnMovement.SLOWFOREIGNER, EffectOnStrike.SKILLBONUS,
+        ScopeOfEffectOnStrike.NATIVES, 1, EffectOnStrike.SKILLPENALTY, ScopeOfEffectOnStrike.FOREIGNERS, -1,
+        EffectOnStrike.SKILLBONUS, ScopeOfEffectOnStrike.NATIVES, 1, EffectOnStrike.SKILLPENALTY,
+        ScopeOfEffectOnStrike.FOREIGNERS, -1, RangeStrikeSpecialEffect.RANGESTRIKESKILLPENALTY);
 
     public static final HazardTerrain DRIFT = new HazardTerrain("Drift",
-        SLOWFOREIGNER, SLOWFOREIGNER, HEALTHDRAIN, SCOPEFOREIGNER, -1,
-        HEALTHDRAIN, SCOPEFOREIGNER, -1, HEALTHDRAIN, SCOPEFOREIGNER, -1,
-        HEALTHDRAIN, SCOPEFOREIGNER, -1, RANGESTRIKEFREE);
+        EffectOnMovement.SLOWFOREIGNER, EffectOnMovement.SLOWFOREIGNER, EffectOnStrike.HEALTHDRAIN,
+        ScopeOfEffectOnStrike.FOREIGNERS, -1, EffectOnStrike.HEALTHDRAIN, ScopeOfEffectOnStrike.FOREIGNERS, -1,
+        EffectOnStrike.HEALTHDRAIN, ScopeOfEffectOnStrike.FOREIGNERS, -1, EffectOnStrike.HEALTHDRAIN,
+        ScopeOfEffectOnStrike.FOREIGNERS, -1, RangeStrikeSpecialEffect.RANGESTRIKEFREE);
 
     public static final HazardTerrain VOLCANO = new HazardTerrain("Volcano",
-        BLOCKFOREIGNER, BLOCKFOREIGNER, NOEFFECT, SCOPENULL, 0, POWERBONUS,
-        SCOPENATIVE, 2, SKILLBONUS, SCOPENATIVE, 1, POWERBONUS, SCOPENATIVE,
-        0, RANGESTRIKEFREE);
+        EffectOnMovement.BLOCKFOREIGNER, EffectOnMovement.BLOCKFOREIGNER, EffectOnStrike.NOEFFECT,
+        ScopeOfEffectOnStrike.NOBODY, 0, EffectOnStrike.POWERBONUS, ScopeOfEffectOnStrike.NATIVES, 2,
+        EffectOnStrike.SKILLBONUS, ScopeOfEffectOnStrike.NATIVES, 1, EffectOnStrike.POWERBONUS, ScopeOfEffectOnStrike.NATIVES,
+        0, RangeStrikeSpecialEffect.RANGESTRIKEFREE);
 
     public static final HazardTerrain BOG = new HazardTerrain("Bog",
-        BLOCKFOREIGNER, FREEMOVE, NOEFFECT, SCOPENULL, 0, NOEFFECT, SCOPENULL,
-        0, NOEFFECT, SCOPENULL, 0, NOEFFECT, SCOPENULL, 0, RANGESTRIKEFREE);
+        EffectOnMovement.BLOCKFOREIGNER, EffectOnMovement.FREEMOVE, EffectOnStrike.NOEFFECT,
+        ScopeOfEffectOnStrike.NOBODY, 0, EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.NOBODY, 0, EffectOnStrike.NOEFFECT,
+        ScopeOfEffectOnStrike.NOBODY, 0, EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.NOBODY, 0,
+        RangeStrikeSpecialEffect.RANGESTRIKEFREE);
 
     public static final HazardTerrain SAND = new HazardTerrain("Sand",
-        SLOWFOREIGNER, FREEMOVE, NOEFFECT, SCOPENULL, 0, NOEFFECT, SCOPENULL,
-        0, NOEFFECT, SCOPENULL, 0, NOEFFECT, SCOPENULL, 0, RANGESTRIKEFREE);
+        EffectOnMovement.SLOWFOREIGNER, EffectOnMovement.FREEMOVE, EffectOnStrike.NOEFFECT,
+        ScopeOfEffectOnStrike.NOBODY, 0, EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.NOBODY, 0, EffectOnStrike.NOEFFECT,
+        ScopeOfEffectOnStrike.NOBODY, 0, EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.NOBODY, 0,
+        RangeStrikeSpecialEffect.RANGESTRIKEFREE);
 
     public static final HazardTerrain TOWER = new HazardTerrain("Tower",
-        FREEMOVE, FREEMOVE, NOEFFECT, SCOPENULL, 0, NOEFFECT, SCOPENULL, 0,
-        NOEFFECT, SCOPENULL, 0, NOEFFECT, SCOPENULL, 0, RANGESTRIKEFREE);
+        EffectOnMovement.FREEMOVE, EffectOnMovement.FREEMOVE, EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.NOBODY,
+        0, EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.NOBODY, 0, EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.NOBODY, 0,
+        EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.NOBODY, 0,
+        RangeStrikeSpecialEffect.RANGESTRIKEFREE);
 
     public static final HazardTerrain LAKE = new HazardTerrain("Lake",
-        BLOCKFOREIGNER, FREEMOVE, NOEFFECT, SCOPENULL, 0, NOEFFECT, SCOPENULL,
-        0, NOEFFECT, SCOPENULL, 0, NOEFFECT, SCOPENULL, 0, RANGESTRIKEFREE);
+        EffectOnMovement.BLOCKFOREIGNER, EffectOnMovement.FREEMOVE, EffectOnStrike.NOEFFECT,
+        ScopeOfEffectOnStrike.NOBODY, 0, EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.NOBODY, 0, EffectOnStrike.NOEFFECT,
+        ScopeOfEffectOnStrike.NOBODY, 0, EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.NOBODY, 0,
+        RangeStrikeSpecialEffect.RANGESTRIKEFREE);
 
     public static final HazardTerrain STONE = new HazardTerrain("Stone",
-        BLOCKFOREIGNER, BLOCKALL, NOEFFECT, SCOPENULL, 0, NOEFFECT, SCOPENULL,
-        0, NOEFFECT, SCOPENULL, 0, NOEFFECT, SCOPENULL, 0, RANGESTRIKEFREE);
+        EffectOnMovement.BLOCKFOREIGNER, EffectOnMovement.BLOCKALL, EffectOnStrike.NOEFFECT,
+        ScopeOfEffectOnStrike.NOBODY, 0, EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.NOBODY, 0, EffectOnStrike.NOEFFECT,
+        ScopeOfEffectOnStrike.NOBODY, 0, EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.NOBODY, 0,
+        RangeStrikeSpecialEffect.RANGESTRIKEFREE);
 
     @Override
     public String toString()
@@ -181,22 +198,22 @@ public class HazardTerrain implements HazardConstants
 
     public boolean blocksFlying()
     {
-        return effectOnFlyerMovement.equals(BLOCKALL);
+        return effectOnFlyerMovement.equals(EffectOnMovement.BLOCKALL);
     }
 
     public boolean isFlyersOnly()
     {
-        return effectOnGroundMovement.equals(BLOCKALL);
+        return effectOnGroundMovement.equals(EffectOnMovement.BLOCKALL);
     }
 
     public boolean isNativeFlyersOnly()
     {
-        return effectOnFlyerMovement.equals(BLOCKFOREIGNER);
+        return effectOnFlyerMovement.equals(EffectOnMovement.BLOCKFOREIGNER);
     }
 
     public boolean slowsNonNative()
     {
-        return effectOnFlyerMovement.equals(SLOWFOREIGNER)
-            || effectOnGroundMovement.equals(SLOWFOREIGNER);
+        return effectOnFlyerMovement.equals(EffectOnMovement.SLOWFOREIGNER)
+            || effectOnGroundMovement.equals(EffectOnMovement.SLOWFOREIGNER);
     }
 }
