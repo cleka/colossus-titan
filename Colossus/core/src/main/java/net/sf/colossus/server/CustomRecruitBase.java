@@ -18,6 +18,7 @@ import net.sf.colossus.variant.MasterHex;
 /**
  * Base class to implement custom recruiting functions 
  *   (i.e. anything that is not a-number-of-creature to another creature)
+ *   
  * @version $Id$
  * @author Romain Dolbeau
  */
@@ -217,45 +218,53 @@ abstract public class CustomRecruitBase
     }
 
     /** 
-     * List all Creature that can recruit in this terrain in a special way
+     * List all creatures that can recruit in this terrain in a special way.
      */
     abstract public List<CreatureType> getAllPossibleSpecialRecruiters(
         MasterBoardTerrain terrain);
 
     /** 
-     * List all Creature that can be recruited in this terrain 
-     * in a special way
+     * List all creatures that can be recruited in this terrain 
+     * in a special way.
      */
     abstract public List<CreatureType> getAllPossibleSpecialRecruits(
         MasterBoardTerrain terrain);
 
-    /** List Creature that can recruit in this terrain in a special way now 
+    /** 
+     * List creatures that can recruit in this terrain in a special way now. 
      *
-     * TODO the terrain parameter might be superfluous
+     * TODO the hex parameter might be superfluous
      */
     abstract public List<CreatureType> getPossibleSpecialRecruiters(
         MasterBoardTerrain terrain, MasterHex hex);
 
-    /** List Creature that can be recruited in this terrain 
-     * in a special way now
+    /** 
+     * List creatures that can be recruited in this terrain 
+     * in a special way now.
      *
-     * TODO the terrain parameter might be superfluous
+     * TODO the hex parameter might be superfluous
      */
     abstract public List<CreatureType> getPossibleSpecialRecruits(
         MasterBoardTerrain terrain, MasterHex hex);
 
-    /** number of recruiter needed to get a recruit 
-     * in a special way in this terrain now
+    /**
+     * Number of recruiters needed to get a recruit 
+     * in a special way in this terrain now.
      *
-     * TODO the terrain parameter might be superfluous
+     * TODO the hex parameter might be superfluous
      */
     abstract public int numberOfRecruiterNeeded(CreatureType recruiter,
         CreatureType recruit, MasterBoardTerrain terrain, MasterHex hex);
 
-    /** bookkeeping function, called once after every player turn.
-     private as it should only be called from everyoneAdvanceTurn() */
+    /** 
+     * Bookkeeping function, called once after every player turn.
+     * 
+     * Protected as it should only be called from everyoneAdvanceTurn().
+     */
     abstract protected void changeOfTurn(int newActivePlayer);
 
-    /** reset, called at the beginning of a game */
+    /**
+     * Reset, called at the beginning of a game.
+     */
     abstract protected void resetInstance();
 }
