@@ -3,7 +3,6 @@ package net.sf.colossus.variant;
 
 import java.awt.Color;
 
-import net.sf.colossus.client.Hex;
 
 
 /**

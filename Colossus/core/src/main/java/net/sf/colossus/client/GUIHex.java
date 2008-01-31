@@ -8,6 +8,8 @@ import java.awt.geom.Point2D;
 
 import javax.swing.JComponent;
 
+import net.sf.colossus.variant.Hex;
+
 
 /**
  *  Abstract parent class for various hexes

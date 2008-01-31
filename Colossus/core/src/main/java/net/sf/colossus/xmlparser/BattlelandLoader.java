@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.sf.colossus.client.BattleHex;
+import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.HazardTerrain;
 
 import org.jdom.Document;

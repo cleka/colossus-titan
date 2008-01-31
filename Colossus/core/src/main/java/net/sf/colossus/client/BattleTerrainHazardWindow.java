@@ -23,6 +23,7 @@ import javax.swing.WindowConstants;
 
 import net.sf.colossus.util.KDialog;
 import net.sf.colossus.util.Options;
+import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.HazardTerrain;
 import net.sf.colossus.variant.Variant;

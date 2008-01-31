@@ -4,9 +4,9 @@ package net.sf.colossus.server;
 import java.util.Iterator;
 
 import junit.framework.TestCase;
-import net.sf.colossus.client.BattleHex;
 import net.sf.colossus.client.HexMap;
 import net.sf.colossus.game.Player;
+import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.MasterBoardTerrain;
 import net.sf.colossus.variant.MasterHex;

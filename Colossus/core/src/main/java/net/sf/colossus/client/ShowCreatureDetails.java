@@ -28,6 +28,7 @@ import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.util.HTMLColor;
 import net.sf.colossus.util.KDialog;
 import net.sf.colossus.util.RecruitGraph;
+import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.HazardTerrain;
 import net.sf.colossus.variant.MasterBoardTerrain;

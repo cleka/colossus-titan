@@ -6,6 +6,7 @@ import java.util.Set;
 
 import net.sf.colossus.server.BattleServerSide;
 import net.sf.colossus.util.Options;
+import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.MasterBoardTerrain;
 

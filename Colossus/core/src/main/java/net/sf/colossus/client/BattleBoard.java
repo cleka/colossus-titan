@@ -39,6 +39,7 @@ import net.sf.colossus.server.LegionServerSide;
 import net.sf.colossus.util.KFrame;
 import net.sf.colossus.util.Options;
 import net.sf.colossus.util.ResourceLoader;
+import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.MasterBoardTerrain;
 import net.sf.colossus.variant.MasterHex;
 

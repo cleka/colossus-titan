@@ -15,6 +15,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.colossus.server.Constants;
+import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.MasterBoardTerrain;
 import net.sf.colossus.variant.MasterHex;
 import net.sf.colossus.webcommon.InstanceTracker;

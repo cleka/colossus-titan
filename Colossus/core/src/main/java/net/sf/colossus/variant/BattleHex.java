@@ -1,4 +1,4 @@
-package net.sf.colossus.client;
+package net.sf.colossus.variant;
 
 
 import java.awt.Color;
@@ -6,8 +6,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.colossus.util.HTMLColor;
-import net.sf.colossus.variant.CreatureType;
-import net.sf.colossus.variant.HazardTerrain;
 
 
 /**

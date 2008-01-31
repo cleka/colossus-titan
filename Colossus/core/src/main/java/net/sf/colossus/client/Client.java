@@ -53,6 +53,7 @@ import net.sf.colossus.util.Predicate;
 import net.sf.colossus.util.ResourceLoader;
 import net.sf.colossus.util.Split;
 import net.sf.colossus.util.ViableEntityManager;
+import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.MasterBoardTerrain;
 import net.sf.colossus.variant.MasterHex;

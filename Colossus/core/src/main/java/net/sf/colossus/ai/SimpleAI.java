@@ -17,7 +17,6 @@ import java.util.TimerTask;
 import java.util.logging.Logger;
 
 import net.sf.colossus.client.BattleChit;
-import net.sf.colossus.client.BattleHex;
 import net.sf.colossus.client.BattleMap;
 import net.sf.colossus.client.Client;
 import net.sf.colossus.client.CritterMove;
@@ -35,6 +34,7 @@ import net.sf.colossus.util.Glob;
 import net.sf.colossus.util.Options;
 import net.sf.colossus.util.PermutationIterator;
 import net.sf.colossus.util.Probs;
+import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.HazardTerrain;
 import net.sf.colossus.variant.MasterBoardTerrain;

@@ -22,7 +22,6 @@ import java.util.logging.Logger;
 
 import javax.swing.JOptionPane;
 
-import net.sf.colossus.client.BattleHex;
 import net.sf.colossus.client.BattleMap;
 import net.sf.colossus.client.HexMap;
 import net.sf.colossus.client.Proposal;
@@ -35,6 +34,7 @@ import net.sf.colossus.util.Options;
 import net.sf.colossus.util.ResourceLoader;
 import net.sf.colossus.util.Split;
 import net.sf.colossus.util.ViableEntityManager;
+import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.MasterBoardTerrain;
 import net.sf.colossus.variant.MasterHex;
