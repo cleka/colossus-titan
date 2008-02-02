@@ -2,9 +2,12 @@ package net.sf.colossus.server;
 
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.net.ServerSocket;
-import java.net.Socket;
-import java.net.SocketException;
+import java.nio.channels.SelectionKey;
+import java.nio.channels.Selector;
+import java.nio.channels.ServerSocketChannel;
+import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -13,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -37,7 +41,7 @@ import net.sf.colossus.xmlparser.TerrainRecruitLoader;
  *  @version $Id$
  *  @author David Ripton
  */
-public final class Server implements IServer
+public final class Server extends Thread implements IServer
 {
     private static final Logger LOGGER = Logger.getLogger(Server.class
         .getName());
@@ -55,6 +59,8 @@ public final class Server implements IServer
 
     /** Map of players to their clients. */
     private final Map<Player, IClient> clientMap = new HashMap<Player, IClient>();
+    private final Map<SocketChannel, SocketServerThread> clientChannelMap
+        = new HashMap<SocketChannel, SocketServerThread>();
 
     /** Number of remote clients we're waiting for. */
     private int waitingForClients;
@@ -70,9 +76,12 @@ public final class Server implements IServer
 
     // Network stuff
     private ServerSocket serverSocket;
+    private Selector selector = null;
+
     // list of Socket that are currently active
-    private final List<Socket> activeSocketList = Collections
-        .synchronizedList(new ArrayList<Socket>());
+    private final List<SocketChannel> activeSocketChannelList = Collections
+    .synchronizedList(new ArrayList<SocketChannel>());
+
     private int numClients;
     private int maxClients;
 
@@ -119,60 +128,27 @@ public final class Server implements IServer
         InstanceTracker.register(this, "only one");
     }
 
+    @Override
+    public void run()
+    {
+        while (serverRunning && !shuttingDown)
+        {
+            waitOnSelector();
+        }
+    }
+    
     public ChildThreadManager getThreadMgr()
     {
         return threadMgr;
     }
-
-    void initSocketServer()
-    {
-        numClients = 0;
-        maxClients = game.getNumLivingPlayers();
-        LOGGER.finest("initSocketServer maxClients = " + maxClients);
-        LOGGER.finest("About to create server socket on port " + port);
-        try
-        {
-            if (serverSocket != null)
-            {
-                serverSocket.close();
-                serverSocket = null;
-            }
-            serverSocket = new ServerSocket(port, Constants.MAX_MAX_PLAYERS);
-            serverSocket.setReuseAddress(true);
-        }
-        catch (IOException ex)
-        {
-            LOGGER.log(Level.SEVERE,
-                "Could not create socket. Configure networking in OS, "
-                    + "or check that no previous Colossus instance got stuck "
-                    + "and is blocking the socket.", ex);
-            System.exit(1);
-        }
-        createLocalClients();
-    }
-
-    /** Returns true if all clients came in, false if startup was aborted
-     *  before that. */
-    boolean waitForClients()
-    {
-        logToStartLog("\nStarting up, waiting for " + waitingForClients
-            + " clients at port " + port + "\n");
-        serverRunning = true;
-        while (numClients < maxClients && serverRunning && !shuttingDown)
-        {
-            waitForConnection();
-        }
-
-        return (numClients >= maxClients);
-    }
-
+    
     void initFileServer()
     {
         stopFileServer();
 
         if (game.getNumRemoteRemaining() > 0)
         {
-            fileServerThread = new FileServerThread(activeSocketList,
+            fileServerThread = new FileServerThread(activeSocketChannelList,
                 port + 1, threadMgr);
             fileServerThread.start();
         }
@@ -182,7 +158,124 @@ public final class Server implements IServer
                 .finest("No alive remote client, not launching the file server.");
         }
     }
+        
+    void initSocketServer()
+    {
+        numClients = 0;
+        maxClients = game.getNumLivingPlayers();
+        LOGGER
+            .log(Level.FINEST, "initSocketServer maxClients = " + maxClients);
+        LOGGER.log(Level.FINEST, "About to create server socket on port "
+            + port);
 
+        try
+        {
+/*            
+            if (serverSocket != null)
+            {
+                serverSocket.close();
+                serverSocket = null;
+            }
+*/            
+            selector = Selector.open();
+            
+            ServerSocketChannel ssc = ServerSocketChannel.open();
+            ssc.configureBlocking(false);
+            
+            serverSocket = ssc.socket();
+            serverSocket.setReuseAddress(true);
+            InetSocketAddress address = new InetSocketAddress(port);
+            serverSocket.bind(address);
+            // SelectionKey key = ssc.register(selector, SelectionKey.OP_ACCEPT);
+            ssc.register(selector, SelectionKey.OP_ACCEPT);
+        }
+        catch(IOException ex)
+        {
+            LOGGER.log(Level.SEVERE,
+                "Could not create socket. Configure networking in OS, "
+                    + "or check that no previous Colossus instance got stuck "
+                    + "and is blocking the socket.", ex);
+            System.exit(1);
+        }
+        createLocalClients();
+    }
+    
+    boolean waitForClients()
+    {
+        logToStartLog("\nStarting up, waiting for " + waitingForClients
+            + " clients at port " + port + "\n");
+        serverRunning = true;
+        while (numClients < maxClients && serverRunning && !shuttingDown)
+        {
+            waitOnSelector();
+        }
+        
+        return (numClients >= maxClients);
+    }
+
+        
+    public void waitOnSelector()
+    {
+        try
+        {
+            int num = selector.select();
+            LOGGER.log(Level.FINEST, "select returned, " + num +
+                " channels are ready to be processed.");
+
+            Set<SelectionKey> selectedKeys = selector.selectedKeys();
+            Iterator<SelectionKey> it = selectedKeys.iterator();
+
+            while (it.hasNext())
+            {
+                SelectionKey key = it.next();
+                
+                if ((key.readyOps() & SelectionKey.OP_ACCEPT)
+                    == SelectionKey.OP_ACCEPT)
+                {
+                    // Accept the new connection
+                    ServerSocketChannel ssc = (ServerSocketChannel)key.channel();
+                    SocketChannel sc = ssc.accept();
+                    sc.configureBlocking(false);
+                    LOGGER.log(Level.FINE, "Accepted: ssc = " + ssc);
+
+                    sc.register(selector,  SelectionKey.OP_READ);
+                    ArrayBlockingQueue<String> q = new ArrayBlockingQueue<String>(1);
+                    SocketServerThread sst = new SocketServerThread(this, sc, q);
+                    numClients++;
+                    activeSocketChannelList.add(sc);
+                    clientChannelMap.put(sc, sst);
+                    
+                    sst.start();
+                    it.remove();
+                }
+                else if ((key.readyOps() & SelectionKey.OP_READ)
+                    == SelectionKey.OP_READ)
+                {
+                    // Read the data
+                    SocketChannel sc = (SocketChannel)key.channel();
+
+                    SocketServerThread sst = clientChannelMap.get(sc);
+                    if (sst == null)
+                    {
+                        LOGGER.severe("No sst for socket channel " + sc);
+                    }
+                    else
+                    {
+                        sst.processInput();
+                    }
+                   
+                    it.remove();
+                }
+            }
+            
+            selectedKeys.clear();
+        }
+        catch(IOException ex)
+        {
+            LOGGER.log(Level.SEVERE, ex.toString(), ex);
+        }
+    }
+    
     public void waitUntilGameFinishes()
     {
         LOGGER.finest("Server.waitUntilGameFinishes: "
@@ -191,52 +284,6 @@ public final class Server implements IServer
         threadMgr.cleanup();
         LOGGER.finest("Server.waitUntilGameFinishes: "
             + "waitUntilAllChildThreadsGone completed.");
-    }
-
-    private void waitForConnection()
-    {
-        Socket clientSocket = null;
-        try
-        {
-            clientSocket = serverSocket.accept();
-            LOGGER.log(Level.FINE, "Got client connection from "
-                + clientSocket.getInetAddress().toString());
-            logToStartLog("Got client connection from IP: "
-                + clientSocket.getInetAddress().toString());
-
-            synchronized (activeSocketList)
-            {
-                activeSocketList.add(clientSocket);
-            }
-            numClients++;
-        }
-        catch (SocketException ex)
-        {
-            if (shuttingDown)
-            {
-                LOGGER.log(Level.FINE,
-                    "Server.waitForConnection SocketException - but "
-                        + "that's ok, it seems shutdown is in progress.");
-            }
-            return;
-
-        }
-        catch (IOException ex)
-        {
-            if (shuttingDown)
-            {
-                LOGGER.log(Level.FINE,
-                    "Server.waitForConnection SocketException - but "
-                        + "that's ok, it seems shutdown is in progress.");
-            }
-            else
-            {
-                LOGGER.log(Level.SEVERE, ex.toString(), ex);
-            }
-            return;
-        }
-
-        new SocketServerThread(this, clientSocket).start();
     }
 
     /*
@@ -291,20 +338,20 @@ public final class Server implements IServer
         }
     }
 
-    public void unregisterSocket(Socket socket)
+    public void unregisterSocketChannel(SocketChannel socketChannel)
     {
-        if (activeSocketList == null)
+        if (activeSocketChannelList == null)
         {
             return;
         }
-        synchronized (activeSocketList)
+        synchronized (activeSocketChannelList)
         {
-            int index = activeSocketList.indexOf(socket);
+            int index = activeSocketChannelList.indexOf(socketChannel);
             if (index == -1)
             {
                 return;
             }
-            activeSocketList.remove(index);
+            activeSocketChannelList.remove(index);
 
             if (!serverRunning)
             {
@@ -314,11 +361,11 @@ public final class Server implements IServer
             // no client whatsoever left => end the game and close server stuff
             // Even if socket list is empty, client list may not be empty yet,
             // and need to empty it and close all loggers.
-            if (activeSocketList.isEmpty())
+            if (activeSocketChannelList.isEmpty())
             {
-                LOGGER.finest("Server.unregisterSocket() thread "
+                LOGGER.finest("Server.unregisterSocketChannel() thread "
                     + Thread.currentThread().getName()
-                    + ": activeSocketList empty - stopping server...");
+                    + ": activeSocketChannelList empty - stopping server...");
                 stopServerRunning();
             }
 
@@ -342,8 +389,9 @@ public final class Server implements IServer
                 stopServerRunning();
             }
         }
-    }
 
+    }
+    
     public void setBoardVisibility(Player player, boolean val)
     {
         getClient(player).setBoardActive(val);
@@ -426,7 +474,7 @@ public final class Server implements IServer
             && getPlayer().equals(game.getBattle().getActivePlayer());
     }
 
-    private void createLocalClients()
+    public void createLocalClients()
     {
         for (Player player : game.getPlayers())
         {
@@ -497,10 +545,15 @@ public final class Server implements IServer
             logToStartLog(" ==> Waiting for " + waitingForClients
                 + " more client" + pluralS + " to sign on.\n");
         }
+        else
+        {
+            logToStartLog("\nGot all clients, game can start now.\n");
+        }
 
+        
         if (waitingForClients <= 0)
         {
-            logToStartLog("\nGot all clients, starting the game.\n");
+            logToStartLog("\nStarting the game now.\n");
             if (game.isLoadingGame())
             {
                 game.loadGame2();
@@ -1955,6 +2008,12 @@ public final class Server implements IServer
 
     public synchronized void assignColor(String color)
     {
+        Player p = getPlayer();
+        if (p == null)
+        {
+            System.out.println("player is null!");
+            System.exit(1);
+        }
         if (!getPlayer().equals(game.getNextColorPicker()))
         {
             LOGGER.severe(getPlayerName() + " illegally called assignColor()");

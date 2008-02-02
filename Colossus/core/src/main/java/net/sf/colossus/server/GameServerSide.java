@@ -214,6 +214,7 @@ public final class GameServerSide extends Game
             {
                 ViableEntityManager.register(this, "Server/Game " + gameId);
             }
+            server.start();
         }
         catch (Exception e)
         {
@@ -297,6 +298,7 @@ public final class GameServerSide extends Game
         // Main thread has now nothing to do any more, can wait
         // until game finishes.
 
+        
         if (server.isServerRunning())
         {
             cleanupWhenGameOver();

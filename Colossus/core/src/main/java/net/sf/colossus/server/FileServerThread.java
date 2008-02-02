@@ -9,6 +9,7 @@ import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.channels.SocketChannel;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
@@ -31,7 +32,7 @@ final class FileServerThread extends Thread
         .getLogger(FileServerThread.class.getName());
 
     private ServerSocket fileServer;
-    private final List<Socket> activeSocketList;
+    private final List<SocketChannel> activeSocketChannelList;
     private ChildThreadManager threadMgr;
 
     private static final String sep = Constants.protocolTermSeparator;
@@ -39,12 +40,12 @@ final class FileServerThread extends Thread
     private final int port;
     private boolean keepGoingOn = true;
 
-    FileServerThread(java.util.List<Socket> activeSocketList, int port,
+    FileServerThread(java.util.List<SocketChannel> activeSocketChannelList, int port,
         ChildThreadManager mgr)
     {
         super();
         setDaemon(true);
-        this.activeSocketList = activeSocketList;
+        this.activeSocketChannelList = activeSocketChannelList;
         this.port = port;
         this.threadMgr = mgr;
         try
@@ -107,12 +108,13 @@ final class FileServerThread extends Thread
 
                     boolean knownIP = false;
 
-                    synchronized (activeSocketList)
+                    synchronized (activeSocketChannelList)
                     {
-                        Iterator<Socket> it = activeSocketList.iterator();
+                        Iterator<SocketChannel> it = activeSocketChannelList.iterator();
                         while (it.hasNext() && !knownIP)
                         {
-                            InetAddress cIP = it.next().getInetAddress();
+                            SocketChannel sc = it.next();
+                            InetAddress cIP = sc.socket().getInetAddress();
                             knownIP = requester.equals(cIP);
                         }
                     }
