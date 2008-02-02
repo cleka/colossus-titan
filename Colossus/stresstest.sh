@@ -109,6 +109,15 @@ then
   echo "\$TEST_WORKDIR not set, using $TEST_WORKDIR"
 fi
 
+# offer an option to replace the default logging configuration
+# by passing LOGCONFIG into the script
+if [ "X$LOGCONFIG" = "X" ]
+then
+  LOGCONFIG="logging.properties"
+  echo "\$LOGCONFIG not set, using $LOGCONFIG"
+fi
+
+
 # Copied log and autosave files will be put under here
 # (in separate dirs names "logs.exitonerror.<gamenr>) :
 mkdir -p $TEST_WORKDIR
@@ -270,7 +279,7 @@ do
     echo -e "\n$timestamp: Starting game #$i as variant $variant"
     echo -e "$CR\n$timestamp: Starting game #$i as variant $variant$CR" >> $TEST_WORKDIR/log
     
-    CMD="java -ea -Djava.util.logging.config.file=logging.properties $FORCEBOARD $INTERNALROUNDS -Xmx128M -jar Colossus.jar $humans -i$AIs $remoteclients -qgS -d 1 --variant $variant $1 $2 $3 $4 $5 $6 $7 $8 $9"
+    CMD="java -ea -Djava.util.logging.config.file=$LOGCONFIG $FORCEBOARD $INTERNALROUNDS -Xmx128M -jar Colossus.jar $humans -i$AIs $remoteclients -qgS -d 1 --variant $variant $1 $2 $3 $4 $5 $6 $7 $8 $9"
     echo $CMD
     echo -e "$CMD$CR" >> $TEST_WORKDIR/log 2>&1
     nice -$niceness $CMD >> $TEST_WORKDIR/log 2>&1;
