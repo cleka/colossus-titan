@@ -52,18 +52,22 @@ public final class LegionServerSide extends Legion implements
      * Not that this class does not constraint the number of creatures. In a 
      * normal Titan game it is between 0 and 8 creatures, but this class does
      * not enforce this.
+     * 
+     * TODO the game parameter should be redundant since it should be the same
+     *      as player.getGame()
      */
     public LegionServerSide(String markerId, String parentId,
         MasterHex currentHex, MasterHex startingHex, Player player,
         GameServerSide game, CreatureType... creatureTypes)
     {
         super(player, markerId);
+        assert parentId != markerId : "Parent can not have the same markerId as we have";
+        assert currentHex != null : "Legion needs to be placed on some hex";
+        assert startingHex != null : "Legion needs to start on some hex";
+        assert game != null : "Legion needs to be part of some game";
+        assert game == player.getGame() : "Legion needs to be part of the same game as its player";
+
         this.parentId = parentId;
-        // Sanity check
-        if (parentId != null && parentId.equals(markerId))
-        {
-            parentId = null;
-        }
         setCurrentHex(currentHex);
         this.startingHex = startingHex;
         this.game = game;

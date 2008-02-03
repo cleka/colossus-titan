@@ -93,6 +93,10 @@ public abstract class Legion
      */
     public MasterHex getCurrentHex()
     {
+        // TODO Legion.getCurrentHex() can be null on the client side since there is no explicit event
+        // creating a new legion in the network protocol, which can cause some legions to have null
+        // hexes when others get the hex through the tellLegionLocation event
+        //assert currentHex != null : "getCurrentHex() called on Legion before position was set";
         return currentHex;
     }
 

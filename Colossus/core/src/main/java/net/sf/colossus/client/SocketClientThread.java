@@ -904,12 +904,19 @@ final class SocketClientThread extends Thread implements IServer
 
     private CreatureType resolveCreatureType(String creatureName)
     {
-        return client.getGame().getVariant().getCreatureByName(creatureName);
+        CreatureType creatureByName = client.getGame().getVariant()
+            .getCreatureByName(creatureName);
+        assert creatureByName != null : "Client got unknown creature name '"
+            + creatureName + "' from server";
+        return creatureByName;
     }
 
     private Legion resolveLegion(String markerId)
     {
-        return client.getLegion(markerId);
+        Legion legion = client.getLegion(markerId);
+        assert legion != null : "Client got unknown markerId '" + markerId
+            + "' from server";
+        return legion;
     }
 
     private void sendToServer(String message)
@@ -1143,7 +1150,10 @@ final class SocketClientThread extends Thread implements IServer
 
     private MasterHex resolveHex(String label)
     {
-        return client.getGame().getVariant().getMasterBoard().getHexByLabel(
-            label);
+        MasterHex hexByLabel = client.getGame().getVariant().getMasterBoard()
+            .getHexByLabel(label);
+        assert hexByLabel != null : "Client got unknown hex label '" + label
+            + "' from server";
+        return hexByLabel;
     }
 }
