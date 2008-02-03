@@ -551,6 +551,7 @@ final class SocketClientThread extends Thread implements IServer
                 // this can happen on game startup since there is no explicit
                 // event creating the first legions
                 // TODO try to make this less implicit
+                assert client.getTurnNumber() == -1 : "Implicit legion creation should happen only before the first round";
                 legion = new LegionClientSide(markerId, client, player
                     .getStartingTower());
                 player.addLegion(legion);
