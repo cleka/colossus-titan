@@ -170,13 +170,6 @@ public final class Server extends Thread implements IServer
 
         try
         {
-/*            
-            if (serverSocket != null)
-            {
-                serverSocket.close();
-                serverSocket = null;
-            }
-*/            
             selector = Selector.open();
             
             ServerSocketChannel ssc = ServerSocketChannel.open();
@@ -619,6 +612,7 @@ public final class Server extends Thread implements IServer
             try
             {
                 serverSocket.close();
+                selector.close();
             }
             catch (IOException ex)
             {
