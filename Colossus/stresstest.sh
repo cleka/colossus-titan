@@ -311,7 +311,7 @@ do
       mkdir -p $dir
       cp -p $TEST_WORKDIR/log $dir
       cp -p $TEST_WORKDIR/part.$i.log $dir
-      cd "$HOME/.Colossus/saves"
+      cd "$HOME/.colossus/saves"
       files=`ls -rt -1 snap*.xml 2>/dev/null | tail -20`
       if [ "X$files" != "X" ]
       then 
