@@ -270,7 +270,7 @@ final class SocketClientThread extends Thread implements IServer
                 {
                     try
                     {
-                        LOGGER.finer("Client '"
+                        LOGGER.finest("Client '"
                             + client.getOwningPlayer().getName()
                             + "' got message from server: " + fromServer);
                         parseLine(fromServer);
@@ -459,6 +459,8 @@ final class SocketClientThread extends Thread implements IServer
 
     private void callMethod(String method, List<String> args)
     {
+        LOGGER.finer("Client '" + client.getOwningPlayer().getName()
+            + "' processing message: " + method);
         if (method.equals(Constants.tellMovementRoll))
         {
             int roll = Integer.parseInt(args.remove(0));
@@ -896,6 +898,8 @@ final class SocketClientThread extends Thread implements IServer
             LOGGER.log(Level.SEVERE, "Bogus packet (Client, method: " + method
                 + ", args: " + args + ")");
         }
+        LOGGER.finer("Client '" + client.getOwningPlayer().getName()
+            + "' finished method processing");
     }
 
     private CreatureType resolveCreatureType(String creatureName)
