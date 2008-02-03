@@ -75,11 +75,12 @@ public abstract class Legion
     /**
      * Places the legion into the new position.
      * 
-     * @param newPosition the hex that will be the new position
+     * @param newPosition the hex that will be the new position. Not null.
      * @see #getCurrentHex()
      */
     public void setCurrentHex(MasterHex newPosition)
     {
+        assert newPosition != null : "Need position to move legion to";
         this.currentHex = newPosition;
     }
 
