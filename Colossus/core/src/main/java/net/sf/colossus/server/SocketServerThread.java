@@ -53,9 +53,9 @@ final class SocketServerThread extends Thread implements IClient
 
     private final Object isWaitingLock = new Object();
     private boolean isWaiting = false;
-
+    private String incompleteInput = "";
     
-    // Charset and encoder for default according to the property, 
+    // Charset and encoder: by default according to the property, 
     // fallback US-ASCII
     String defaultCharSet = System.getProperty("file.encoding");
     String charsetName = defaultCharSet != null ? defaultCharSet :"US-ASCII"; 
@@ -108,6 +108,11 @@ final class SocketServerThread extends Thread implements IClient
                 LOGGER.log(Level.FINEST,
                     "End of SocketServerThread while loop");
             }
+            // @TODO: all this "interrupting", "client terminated?" etc.
+            // is now not necessary any more. ServerThread who waits on all
+            // of the sockets via selector can clean up all of them properly
+            // with less hassle...
+            // On the long run, we'll get rid of the server side threads anyway.
             catch (InterruptedException ex)
             {
                 if (selfInterrupted)
@@ -122,47 +127,17 @@ final class SocketServerThread extends Thread implements IClient
                 else
                 {
                     // ooops. Exception, perhaps client closed his side?
-                    LOGGER.log(Level.FINE, "SocketException in " + getName()
-                        + " while "
-                        + "read loop (client terminated unexpectedly?)");
-                }
-
-//                LOGGER.log(Level.SEVERE,
-//                    "InterruptedException while read loop; ", ex);
-//                Thread.currentThread().interrupt();
-            }
-
-/*
-             catch (InterruptedIOException ex)
-            {
-                LOGGER.log(Level.SEVERE,
-                    "InterruptedIOException while read loop; ", ex);
-                Thread.currentThread().interrupt();
-            }
-            catch (SocketException ex)
-            {
-                if (selfInterrupted)
-                {
-                    // all right. Server (some other SST) interrupted us 
-                    // in order to make us stop waiting on the socket...
-                }
-                else if (done)
-                {
-                    // all right. Client told it will disconnect.
-                }
-                else
-                {
-                    // ooops. Exception, perhaps client closed his side?
-                    LOGGER.log(Level.FINE, "SocketException in " + getName()
+                    LOGGER.log(Level.FINE, "InterruptedException in " + getName()
                         + " while "
                         + "read loop (client terminated unexpectedly?)");
                 }
             }
-            catch (IOException ex)
+
+            catch (Exception e)
             {
-                LOGGER.log(Level.SEVERE, "IOException while read loop; ", ex);
+                LOGGER.log(Level.SEVERE, "Whatever exception while read loop: ", e);
             }
-*/
+
             isGone = true;
 
             try
@@ -221,11 +196,6 @@ final class SocketServerThread extends Thread implements IClient
         this.socketChannel = null;
     }
 
-    public ArrayBlockingQueue<String> getInputQueue()
-    {
-        return this.inputQueue;
-    }
-    
     private void setWaiting(boolean val)
     {
         synchronized (isWaitingLock)
@@ -234,11 +204,8 @@ final class SocketServerThread extends Thread implements IClient
         }
     }
 
-    private String incompleteInput = "";
-    
     public void processInput()
     {
-        CharBuffer charBuff = null;
         byteBuffer.clear();
         try
         {
@@ -255,7 +222,7 @@ final class SocketServerThread extends Thread implements IClient
             byteBuffer.flip();
             if (read > 0)
             {
-                charBuff = decoder.decode(byteBuffer);
+                CharBuffer charBuff = decoder.decode(byteBuffer);
         
                 LOGGER.log(Level.FINEST,
                     "Read " + read + " bytes from " + socketChannel);
@@ -272,16 +239,12 @@ final class SocketServerThread extends Thread implements IClient
                 for (int i=0 ; i<len ; i++)
                 {
                     String line = lines[i];
-                    // System.out.println("processing i=" + i + ": '" + line + "'");
                     if ( i<len-1 )
                     {
                         synchronized(line)
                         {
-                            // System.out.println("putting    i=" + i + ": '" + line + "'");
                             inputQueue.put(line);
-                            // System.out.println("did put the line, now wait()");
                             line.wait();
-                            // System.out.println("server.selector, after wait()");
                         }
                         processed++;
                     }
@@ -292,12 +255,12 @@ final class SocketServerThread extends Thread implements IClient
                     }
                     else
                     {
-                        LOGGER.log(Level.FINER,
+                        LOGGER.log(Level.FINE,
                             "last item incomplete, storing it: '" + line + "'");
                         incompleteInput = line;
                     }
                 }
-                LOGGER.log(Level.FINE, "Processed " + processed + " commands.");
+                LOGGER.log(Level.FINEST, "Processed " + processed + " commands.");
                 byteBuffer.clear();
             }
             else
@@ -325,19 +288,18 @@ final class SocketServerThread extends Thread implements IClient
                 socketChannel, ioe);
         }
     }
-    
+
     private void sendViaChannel(String msg)
     {
-        CharBuffer cb = CharBuffer.allocate(msg.length()+20);
+        CharBuffer cb = CharBuffer.allocate(msg.length()+2);
         cb.put(msg);
         cb.put("\n");
         cb.flip();
-        
+
         try
         {
             ByteBuffer bb = encoder.encode(cb);
             socketChannel.write(bb);
-            
         }
         catch(CharacterCodingException e)
         {
@@ -349,9 +311,8 @@ final class SocketServerThread extends Thread implements IClient
             LOGGER.log(Level.SEVERE, "IOException while writing String '" +
                 msg + "' for channel " + socketChannel);
         }
-
     }
-    
+
     public synchronized void tellToTerminate()
     {
         toldToTerminate = true;
