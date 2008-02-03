@@ -11,6 +11,7 @@ import net.sf.colossus.game.Game;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
 import net.sf.colossus.server.VariantSupport;
+import net.sf.colossus.variant.MasterHex;
 
 
 /** Test helper */
@@ -65,7 +66,7 @@ public class PredictSplitsTest extends TestCase
     {
         public TestLegion(Player playerState, String markerId)
         {
-            super(playerState, markerId);
+            super(playerState, markerId, new MasterHex("dummy", null, 0, 0));
         }
 
         @Override

@@ -237,6 +237,18 @@ public class Player
         return null;
     }
 
+    public boolean hasLegion(String markerId)
+    {
+        for (Legion legion : getLegions())
+        {
+            if (legion.getMarkerId().equals(markerId))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public Legion getTitanLegion()
     {
         for (Legion legion : getLegions())

@@ -1667,19 +1667,20 @@ public final class Client implements IClient, IOracle
     /**
      * Get this legion's info or create if necessary.
      * 
-     * TODO try to get rid of the implicit creation.
      * TODO move legion creation into a factory on {@link Player}
      */
     public Legion getLegion(String markerId)
     {
         Player player = getPlayerStateByMarkerId(markerId);
         Legion legion = player.getLegionByMarkerId(markerId);
-        if (legion == null)
-        {
-            legion = new LegionClientSide(markerId, this);
-            player.addLegion(legion);
-        }
+        assert legion != null;
         return legion;
+    }
+
+    public boolean legionExists(String markerId)
+    {
+        Player player = getPlayerStateByMarkerId(markerId);
+        return player.hasLegion(markerId);
     }
 
     /** Add the marker to the end of the list and to the LegionInfo.

@@ -33,7 +33,7 @@ public final class LegionServerSide extends Legion implements
         .getLogger(LegionServerSide.class.getName());
 
     /**
-     * TODO this should be a Legion.
+     * TODO this should be a {@link Legion}
      */
     private final String parentId;
 
@@ -41,6 +41,10 @@ public final class LegionServerSide extends Legion implements
      * The label of the starting hex of the last move.
      */
     private MasterHex startingHex;
+
+    /**
+     * TODO this should be a {@link Creature} or {@link CreatureType}
+     */
     private String recruitName;
     private int battleTally;
     private final GameServerSide game;
@@ -60,15 +64,13 @@ public final class LegionServerSide extends Legion implements
         MasterHex currentHex, MasterHex startingHex, Player player,
         GameServerSide game, CreatureType... creatureTypes)
     {
-        super(player, markerId);
+        super(player, markerId, currentHex);
         assert parentId != markerId : "Parent can not have the same markerId as we have";
-        assert currentHex != null : "Legion needs to be placed on some hex";
         assert startingHex != null : "Legion needs to start on some hex";
         assert game != null : "Legion needs to be part of some game";
         assert game == player.getGame() : "Legion needs to be part of the same game as its player";
 
         this.parentId = parentId;
-        setCurrentHex(currentHex);
         this.startingHex = startingHex;
         this.game = game;
 

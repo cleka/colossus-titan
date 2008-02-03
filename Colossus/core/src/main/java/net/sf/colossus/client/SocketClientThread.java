@@ -18,6 +18,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.colossus.game.Legion;
+import net.sf.colossus.game.Player;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.IServer;
 import net.sf.colossus.util.ChildThreadManager;
@@ -539,7 +540,22 @@ final class SocketClientThread extends Thread implements IServer
                 names.remove(0);
             }
             String reason = args.isEmpty() ? "<Unknown>" : args.remove(0);
-            client.revealCreatures(resolveLegion(markerId), names, reason);
+            Player player = client.getPlayerStateByMarkerId(markerId);
+            Legion legion;
+            if (player.hasLegion(markerId))
+            {
+                legion = player.getLegionByMarkerId(markerId);
+            }
+            else
+            {
+                // this can happen on game startup since there is no explicit
+                // event creating the first legions
+                // TODO try to make this less implicit
+                legion = new LegionClientSide(markerId, client, player
+                    .getStartingTower());
+                player.addLegion(legion);
+            }
+            client.revealCreatures(legion, names, reason);
         }
         else if (method.equals(Constants.revealEngagedCreatures))
         {
@@ -840,8 +856,13 @@ final class SocketClientThread extends Thread implements IServer
                 splitoffs.addAll(soList);
             }
             int turn = Integer.parseInt(args.remove(0));
-            client.didSplit(resolveHex(hexLabel), resolveLegion(parentId),
-                resolveLegion(childId), childHeight, splitoffs, turn);
+            // create client-side copy of new legion
+            MasterHex hex = resolveHex(hexLabel);
+            Legion parentLegion = resolveLegion(parentId);
+            Legion newLegion = new LegionClientSide(childId, client, hex);
+            parentLegion.getPlayer().addLegion(newLegion);
+            client.didSplit(hex, parentLegion, newLegion, childHeight,
+                splitoffs, turn);
         }
         else if (method.equals(Constants.askPickColor))
         {

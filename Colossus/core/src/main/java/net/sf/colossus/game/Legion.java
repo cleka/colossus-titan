@@ -20,9 +20,7 @@ public abstract class Legion
     /**
      * The current position of the legion on the masterboard.
      * 
-     * TODO it would be good to establish an invariant "not null" on this one,
-     *      which currently doesn't seem to be feasible yet -- even the setter
-     *      still gets called with null on game starts
+     * Never null.
      */
     private MasterHex currentHex;
 
@@ -54,12 +52,14 @@ public abstract class Legion
     private int entrySide;
 
     // TODO legions should be created through factory from the player instances
-    public Legion(final Player player, String markerId)
+    public Legion(final Player player, String markerId, MasterHex hex)
     {
         assert player != null : "Legion has to have a player";
         assert markerId != null : "Legion has to have a markerId";
+        assert hex != null : "Legion nees to be placed somewhere";
         this.player = player;
         this.markerId = markerId;
+        this.currentHex = hex;
     }
 
     /**
@@ -93,10 +93,7 @@ public abstract class Legion
      */
     public MasterHex getCurrentHex()
     {
-        // TODO Legion.getCurrentHex() can be null on the client side since there is no explicit event
-        // creating a new legion in the network protocol, which can cause some legions to have null
-        // hexes when others get the hex through the tellLegionLocation event
-        //assert currentHex != null : "getCurrentHex() called on Legion before position was set";
+        assert currentHex != null : "getCurrentHex() called on Legion before position was set";
         return currentHex;
     }
 
