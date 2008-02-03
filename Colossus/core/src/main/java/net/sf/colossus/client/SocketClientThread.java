@@ -26,6 +26,7 @@ import net.sf.colossus.util.Glob;
 import net.sf.colossus.util.Split;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.MasterHex;
+import net.sf.colossus.webcommon.InstanceTracker;
 
 
 /**
@@ -62,7 +63,7 @@ final class SocketClientThread extends Thread implements IServer
 
         this.client = client;
         this.threadMgr = client.getThreadMgr();
-        net.sf.colossus.webcommon.InstanceTracker.register(this, "SCT "
+        InstanceTracker.register(this, "SCT "
             + client.getOwningPlayer().getName());
 
         String task = "";
