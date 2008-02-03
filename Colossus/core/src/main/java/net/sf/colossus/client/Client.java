@@ -5204,7 +5204,15 @@ public final class Client implements IClient, IOracle
         }
         if (!type.startsWith(Constants.aiPackage))
         {
-            type = Constants.aiPackage + type;
+            if (type.startsWith(Constants.oldAiPackage))
+            {
+                type = type.replace(Constants.oldAiPackage,
+                    Constants.aiPackage);
+            }
+            else
+            {
+                type = Constants.aiPackage + type;
+            }
         }
         LOGGER.log(Level.FINEST, "final type: " + type);
         if (type.endsWith("AI"))

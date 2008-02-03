@@ -19,6 +19,8 @@ public final class Constants
 {
     /**
      * A typesafe enumeration for the different phases of the main game.
+     * 
+     * TODO replace with normal enum now that we use Java 5
      */
     public static class Phase
     {
@@ -91,6 +93,8 @@ public final class Constants
 
     /**
      * A typesafe enumeration of the phases of a battle.
+     * 
+     * TODO replace with normal enum now that we use Java 5
      */
     public static class BattlePhase
     {
@@ -342,6 +346,7 @@ public final class Constants
     public static final int numAITypes = aiArray.length;
     public static final String all = "All";
     public static final String aiPackage = "net.sf.colossus.ai.";
+    public static final String oldAiPackage = "net.sf.colossus.client.";
 
     // Player names
     public static final String byColor = "<By color>";

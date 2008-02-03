@@ -94,6 +94,7 @@ public final class PlayerServerSide extends Player implements
         return getType().endsWith(Constants.none);
     }
 
+    // TODO strong redundancy with Client.setType(String)
     @Override
     public void setType(final String aType)
     {
@@ -107,7 +108,15 @@ public final class PlayerServerSide extends Player implements
         }
         if (!type.startsWith(Constants.aiPackage))
         {
-            type = Constants.aiPackage + type;
+            if (type.startsWith(Constants.oldAiPackage))
+            {
+                type = type.replace(Constants.oldAiPackage,
+                    Constants.aiPackage);
+            }
+            else
+            {
+                type = Constants.aiPackage + type;
+            }
         }
         super.setType(type);
     }
