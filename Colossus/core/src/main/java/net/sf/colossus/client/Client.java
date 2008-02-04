@@ -142,7 +142,7 @@ public final class Client implements IClient, IOracle
     private final LinkedList<Object> undoStack = new LinkedList<Object>();
 
     // Information on the current moving legion.
-    private Legion mover;
+    private LegionClientSide mover;
 
     /** The end of the list is on top in the z-order. */
     private final List<Marker> markers = new ArrayList<Marker>();
@@ -202,7 +202,7 @@ public final class Client implements IClient, IOracle
     private final PlayerClientSide noone;
 
     private int turnNumber = -1;
-    private Player activePlayer;
+    private PlayerClientSide activePlayer;
     private Constants.Phase phase;
 
     private int battleTurnNumber = -1;
@@ -212,7 +212,7 @@ public final class Client implements IClient, IOracle
     private Legion defender;
 
     /** Summon angel donor legion, for this client's player only. */
-    private Legion donor;
+    private LegionClientSide donor;
 
     /** If the game is over, then quitting does not require confirmation. */
     private boolean gameOver;
@@ -1669,10 +1669,10 @@ public final class Client implements IClient, IOracle
      * 
      * TODO move legion creation into a factory on {@link Player}
      */
-    public Legion getLegion(String markerId)
+    public LegionClientSide getLegion(String markerId)
     {
-        Player player = getPlayerByMarkerId(markerId);
-        Legion legion = player.getLegionByMarkerId(markerId);
+        PlayerClientSide player = getPlayerByMarkerId(markerId);
+        LegionClientSide legion = player.getLegionByMarkerId(markerId);
         assert legion != null : "No legion with markerId '" + markerId + "'";
         return legion;
     }
@@ -2055,7 +2055,8 @@ public final class Client implements IClient, IOracle
     }
 
     // all hexes
-    public void addPossibleRecruitChits(Legion legion, Set<MasterHex> hexes)
+    public void addPossibleRecruitChits(LegionClientSide legion,
+        Set<MasterHex> hexes)
     {
         clearPossibleRecruitChits();
 
@@ -2099,8 +2100,8 @@ public final class Client implements IClient, IOracle
         }
     }
 
-    CreatureType chooseBestPotentialRecruit(Legion legion, MasterHex hex,
-        List<CreatureType> recruits)
+    CreatureType chooseBestPotentialRecruit(LegionClientSide legion,
+        MasterHex hex, List<CreatureType> recruits)
     {
         CreatureType recruit = simpleAI.getVariantRecruitHint(legion, hex,
             recruits);
@@ -2177,7 +2178,7 @@ public final class Client implements IClient, IOracle
         return mover;
     }
 
-    void setMover(Legion legion)
+    void setMover(LegionClientSide legion)
     {
         this.mover = legion;
     }
@@ -2191,8 +2192,7 @@ public final class Client implements IClient, IOracle
 
     public void initBoard()
     {
-        LOGGER.log(Level.FINEST, owningPlayer.getName()
-            + " Client.initBoard()");
+        LOGGER.finest(owningPlayer.getName() + " Client.initBoard()");
         if (isRemote())
         {
             VariantSupport.loadVariant(options
@@ -2324,7 +2324,7 @@ public final class Client implements IClient, IOracle
         {
             return false;
         }
-        return ((LegionClientSide)donor).getContents().contains(name);
+        return donor.getContents().contains(name);
     }
 
     public void askAcquireAngel(Legion legion, List<String> recruits)
@@ -2525,11 +2525,10 @@ public final class Client implements IClient, IOracle
         }
         if (summonAngel != null)
         {
-            List<Legion> legions = getLegionsByHex(hex);
+            List<LegionClientSide> legions = getLegionsByHex(hex);
             if (legions.size() != 1)
             {
-                LOGGER
-                    .log(Level.SEVERE, "Not exactly one legion in donor hex");
+                LOGGER.severe("Not exactly one legion in donor hex");
                 return;
             }
             donor = legions.get(0);
@@ -2537,7 +2536,7 @@ public final class Client implements IClient, IOracle
             server.setDonor(donor);
             summonAngel.updateChits();
             summonAngel.repaint();
-            ((LegionClientSide)donor).getMarker().repaint();
+            donor.getMarker().repaint();
         }
         else
         {
@@ -3103,7 +3102,7 @@ public final class Client implements IClient, IOracle
      *  active player and turn are usually set. */
     public void setupTurnState(Player activePlayer, int turnNumber)
     {
-        this.activePlayer = activePlayer;
+        this.activePlayer = (PlayerClientSide)activePlayer;
         this.turnNumber = turnNumber;
         if (eventViewer != null)
         {
@@ -3114,13 +3113,13 @@ public final class Client implements IClient, IOracle
 
     private void resetAllMoves()
     {
-        for (Player player : players)
+        for (PlayerClientSide player : players)
         {
-            for (Legion legion : player.getLegions())
+            for (LegionClientSide legion : player.getLegions())
             {
                 legion.setMoved(false);
                 legion.setTeleported(false);
-                ((LegionClientSide)legion).setRecruited(false);
+                legion.setRecruited(false);
             }
         }
     }
@@ -3151,7 +3150,7 @@ public final class Client implements IClient, IOracle
         clearUndoStack();
         cleanupNegotiationDialogs();
 
-        this.activePlayer = activePlayer;
+        this.activePlayer = (PlayerClientSide)activePlayer;
         this.turnNumber = turnNumber;
 
         if (eventViewer != null)
@@ -3835,7 +3834,7 @@ public final class Client implements IClient, IOracle
     }
 
     // TODO active or not would probably work better as state in PlayerState
-    public Player getActivePlayer()
+    public PlayerClientSide getActivePlayer()
     {
         return activePlayer;
     }
@@ -3861,7 +3860,7 @@ public final class Client implements IClient, IOracle
         return turnNumber;
     }
 
-    private String figureTeleportingLord(Legion legion, MasterHex hex)
+    private String figureTeleportingLord(LegionClientSide legion, MasterHex hex)
     {
         List<String> lords = listTeleportingLords(legion, hex);
         String lordName = null;
@@ -3900,27 +3899,28 @@ public final class Client implements IClient, IOracle
      *
      *  TODO return value should be List<Creature> or List<CreatureType>
      */
-    private List<String> listTeleportingLords(Legion legion, MasterHex hex)
+    private List<String> listTeleportingLords(LegionClientSide legion,
+        MasterHex hex)
     {
         // Needs to be a List not a Set so that it can be passed as
         // an imageList.
         List<String> lords = new ArrayList<String>();
 
         // Titan teleport
-        List<Legion> legions = getLegionsByHex(hex);
+        List<LegionClientSide> legions = getLegionsByHex(hex);
         if (!legions.isEmpty())
         {
             Legion legion0 = legions.get(0);
-            if (legion0 != null && !isMyLegion(legion0) && (legion).hasTitan())
+            if (legion0 != null && !isMyLegion(legion0) && legion.hasTitan())
             {
-                lords.add(((LegionClientSide)legion).getTitanBasename());
+                lords.add(legion.getTitanBasename());
             }
         }
 
         // Tower teleport
         else
         {
-            for (String name : ((LegionClientSide)legion).getContents())
+            for (String name : legion.getContents())
             {
                 CreatureType creature = game.getVariant().getCreatureByName(
                     name);
@@ -3929,8 +3929,7 @@ public final class Client implements IClient, IOracle
                 {
                     if (creature.isTitan())
                     {
-                        lords.add(((LegionClientSide)legion)
-                            .getTitanBasename());
+                        lords.add(legion.getTitanBasename());
                     }
                     else
                     {
@@ -3948,7 +3947,7 @@ public final class Client implements IClient, IOracle
     }
 
     /** Return true if the move looks legal. */
-    public boolean doMove(Legion mover, MasterHex hex)
+    public boolean doMove(LegionClientSide mover, MasterHex hex)
     {
         if (mover == null)
         {
@@ -4359,25 +4358,25 @@ public final class Client implements IClient, IOracle
     }
 
     /** Return a set of hexLabels. */
-    Set<MasterHex> listNormalMoves(Legion legion)
+    Set<MasterHex> listNormalMoves(LegionClientSide legion)
     {
         return movement.listNormalMoves(legion, legion.getCurrentHex(),
             movementRoll);
     }
 
-    Set<String> listPossibleEntrySides(Legion mover, MasterHex hex,
+    Set<String> listPossibleEntrySides(LegionClientSide mover, MasterHex hex,
         boolean teleport)
     {
         return movement.listPossibleEntrySides(mover, hex, teleport);
     }
 
-    public List<Legion> getLegionsByHex(MasterHex hex)
+    public List<LegionClientSide> getLegionsByHex(MasterHex hex)
     {
         assert hex != null : "No hex given to find legions on.";
-        List<Legion> legions = new ArrayList<Legion>();
-        for (Player player : players)
+        List<LegionClientSide> legions = new ArrayList<LegionClientSide>();
+        for (PlayerClientSide player : players)
         {
-            for (Legion legion : player.getLegions())
+            for (LegionClientSide legion : player.getLegions())
             {
                 if (hex.equals(legion.getCurrentHex()))
                 {
@@ -4465,7 +4464,7 @@ public final class Client implements IClient, IOracle
 
     boolean isEngagement(MasterHex hex)
     {
-        List<Legion> legions = getLegionsByHex(hex);
+        List<LegionClientSide> legions = getLegionsByHex(hex);
         if (legions.size() == 2)
         {
             Legion info0 = legions.get(0);
@@ -4530,13 +4529,13 @@ public final class Client implements IClient, IOracle
         return null;
     }
 
-    public List<Legion> getFriendlyLegions(final MasterHex hex,
-        final Player player)
+    public List<LegionClientSide> getFriendlyLegions(final MasterHex hex,
+        final PlayerClientSide player)
     {
         return CollectionHelper.selectAsList(player.getLegions(),
-            new Predicate<Legion>()
+            new Predicate<LegionClientSide>()
             {
-                public boolean matches(Legion legion)
+                public boolean matches(LegionClientSide legion)
                 {
                     return legion.getCurrentHex().equals(hex);
                 }

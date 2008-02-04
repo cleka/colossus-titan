@@ -21,7 +21,6 @@ import net.sf.colossus.client.Client;
 import net.sf.colossus.client.LegionClientSide;
 import net.sf.colossus.client.PlayerClientSide;
 import net.sf.colossus.game.Legion;
-import net.sf.colossus.game.Player;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.util.MultiSet;
 import net.sf.colossus.variant.CreatureType;
@@ -112,13 +111,16 @@ public class RationalAI extends SimpleAI
         logger.log(Level.FINEST, "RationalAI.splitCallback " + parent + " "
             + child);
 
-        return splitOneLegionCallback(parent, child) && fireSplits();
+        return splitOneLegionCallback((LegionClientSide)parent,
+            (LegionClientSide)child)
+            && fireSplits();
     }
 
     // Compute the expected value of a split legion
     // If we want to compute just a single legion, pass null for
     // the child_legion
-    private double expectedValueSplitLegion(Legion legion, Legion child_legion)
+    private double expectedValueSplitLegion(LegionClientSide legion,
+        LegionClientSide child_legion)
     {
         double split_value = 0.0;
 
@@ -300,7 +302,8 @@ public class RationalAI extends SimpleAI
     }
 
     /** Return true if done, false if waiting for undo split */
-    private boolean splitOneLegionCallback(Legion parent, Legion child)
+    private boolean splitOneLegionCallback(LegionClientSide parent,
+        LegionClientSide child)
     {
         if (parent == null && child == null)
         {
@@ -680,14 +683,14 @@ public class RationalAI extends SimpleAI
     // little helper class to store possible moves by legion
     private class LegionBoardMove
     {
-        final Legion legion;
+        final LegionClientSide legion;
         final MasterHex fromHex;
         final MasterHex toHex;
         final double val;
         final boolean noMove;
 
-        LegionBoardMove(Legion legion, MasterHex fromHex, MasterHex toHex,
-            double val, boolean noMove)
+        LegionBoardMove(LegionClientSide legion, MasterHex fromHex,
+            MasterHex toHex, double val, boolean noMove)
         {
             this.legion = legion;
             this.fromHex = fromHex;
@@ -709,7 +712,7 @@ public class RationalAI extends SimpleAI
     public boolean masterMove()
     {
         logger.log(Level.FINEST, "This is RationalAI.");
-        Player player = client.getOwningPlayer();
+        PlayerClientSide player = client.getOwningPlayer();
 
         if (enemyAttackMap == null)
         {
@@ -780,12 +783,12 @@ public class RationalAI extends SimpleAI
         return true;
     }
 
-    private boolean findMoveList(List<? extends Legion> legions,
+    private boolean findMoveList(List<LegionClientSide> legions,
         List<List<LegionBoardMove>> all_legionMoves,
         MultiSet<MasterHex> occupiedHexes, boolean teleportsOnly)
     {
         boolean moved = false;
-        for (Legion legion : legions)
+        for (LegionClientSide legion : legions)
         {
             if (legion.hasMoved())
             {
@@ -793,7 +796,7 @@ public class RationalAI extends SimpleAI
                 continue;
             }
 
-            logger.log(Level.FINEST, "consider marker " + legion);
+            logger.finest("consider marker " + legion);
 
             // compute the value of sitting still
             List<LegionBoardMove> legionMoves = new ArrayList<LegionBoardMove>();
@@ -853,12 +856,12 @@ public class RationalAI extends SimpleAI
     }
 
     /** Return true if we moved something and need to be called again. */
-    private boolean handleVoluntaryMoves(Player player)
+    private boolean handleVoluntaryMoves(PlayerClientSide player)
     {
         logger.log(Level.FINEST, "handleVoluntaryMoves()");
 
         boolean moved = false;
-        List<? extends Legion> legions = player.getLegions();
+        List<LegionClientSide> legions = player.getLegions();
         List<List<LegionBoardMove>> all_legionMoves = new ArrayList<List<LegionBoardMove>>();
 
         MultiSet<MasterHex> occupiedHexes = new MultiSet<MasterHex>();
@@ -944,7 +947,7 @@ public class RationalAI extends SimpleAI
      * one and spare weak ones...  
      */
 
-    private boolean handleForcedSplitMoves(Player player)
+    private boolean handleForcedSplitMoves(PlayerClientSide player)
     {
         int roll = client.getMovementRoll();
         ArrayList<MasterHex> unsplitHexes = new ArrayList<MasterHex>();
@@ -960,8 +963,8 @@ public class RationalAI extends SimpleAI
          */
         for (Legion legion : player.getLegions())
         {
-            List<Legion> friendlyLegions = client.getFriendlyLegions(legion
-                .getCurrentHex(), player);
+            List<LegionClientSide> friendlyLegions = client
+                .getFriendlyLegions(legion.getCurrentHex(), player);
 
             if (friendlyLegions.size() > 1)
             {
@@ -970,11 +973,11 @@ public class RationalAI extends SimpleAI
         }
         for (MasterHex hex : unsplitHexes)
         {
-            List<Legion> friendlyLegions = client.getFriendlyLegions(hex,
-                player);
+            List<LegionClientSide> friendlyLegions = client
+                .getFriendlyLegions(hex, player);
 
             // pick just any legion for asking the getMovement
-            Legion anyLegion = friendlyLegions.get(0);
+            LegionClientSide anyLegion = friendlyLegions.get(0);
 
             if (!client.getMovement().listNormalMoves(anyLegion,
                 anyLegion.getCurrentHex(), roll).isEmpty())
@@ -988,12 +991,12 @@ public class RationalAI extends SimpleAI
                 // But this happens very rarely, this whole forcedSplitMoves
                 // in games with 6 AIs perhaps one out of 100 games...
 
-                Legion minLegion = anyLegion;
-                int minSize = (minLegion).getHeight();
+                LegionClientSide minLegion = anyLegion;
+                int minSize = minLegion.getHeight();
 
-                for (Legion l : friendlyLegions)
+                for (LegionClientSide l : friendlyLegions)
                 {
-                    int size = (l).getHeight();
+                    int size = l.getHeight();
                     if (size < minSize)
                     {
                         minSize = size;
@@ -1021,7 +1024,7 @@ public class RationalAI extends SimpleAI
                     for (MasterHex targetHex : set)
                     {
                         // The set of moves includes still hexes occupied by our own legions. 
-                        List<Legion> targetOwnLegions = client
+                        List<LegionClientSide> targetOwnLegions = client
                             .getFriendlyLegions(targetHex, player);
                         if (targetOwnLegions.size() == 0)
                         {
@@ -1072,15 +1075,15 @@ public class RationalAI extends SimpleAI
      * (except Titan legion) to the place which is best for it.
      * Moves Titan legion only if no other choice.
      */
-    private boolean handleForcedSingleMove(Player player)
+    private boolean handleForcedSingleMove(PlayerClientSide player)
     {
         int roll = client.getMovementRoll();
 
         // first we have to find out those that can move at all:
 
-        ArrayList<Legion> movableLegions = new ArrayList<Legion>();
+        ArrayList<LegionClientSide> movableLegions = new ArrayList<LegionClientSide>();
 
-        for (Legion legion : player.getLegions())
+        for (LegionClientSide legion : player.getLegions())
         {
             Set<MasterHex> set = client.getMovement().listNormalMoves(legion,
                 legion.getCurrentHex(), roll);
@@ -1091,8 +1094,8 @@ public class RationalAI extends SimpleAI
                 for (MasterHex targetHex : set)
                 {
                     // The set of moves includes still hexes occupied by our own legions. 
-                    List<Legion> targetOwnLegions = client.getFriendlyLegions(
-                        targetHex, player);
+                    List<LegionClientSide> targetOwnLegions = client
+                        .getFriendlyLegions(targetHex, player);
                     if (targetOwnLegions.size() == 0)
                     {
                         couldMove = true;
@@ -1114,12 +1117,12 @@ public class RationalAI extends SimpleAI
         // OK, now decide which of them to move - the smallest one.
 
         int minValue = 0;
-        Legion minValueLegion = null;
-        Legion titanLegion = null;
+        LegionClientSide minValueLegion = null;
+        LegionClientSide titanLegion = null;
 
-        for (Legion legion : movableLegions)
+        for (LegionClientSide legion : movableLegions)
         {
-            int value = ((LegionClientSide)legion).getPointValue();
+            int value = legion.getPointValue();
 
             if (legion.hasTitan())
             {
@@ -1156,8 +1159,8 @@ public class RationalAI extends SimpleAI
         MasterHex bestHex = null;
         for (MasterHex targetHex : minValueMoves)
         {
-            List<Legion> targetOwnLegions = client.getFriendlyLegions(
-                targetHex, player);
+            List<LegionClientSide> targetOwnLegions = client
+                .getFriendlyLegions(targetHex, player);
             if (targetOwnLegions.size() == 0)
             {
                 int value = evaluateMove(minValueLegion, targetHex,
@@ -1750,8 +1753,8 @@ public class RationalAI extends SimpleAI
     }
 
     /** Memoizing wrapper for evaluateMoveInner */
-    private int evaluateMove(Legion legion, MasterHex hex, int canRecruitHere,
-        int depth, boolean addHexRisk)
+    private int evaluateMove(LegionClientSide legion, MasterHex hex,
+        int canRecruitHere, int depth, boolean addHexRisk)
     {
         String sep = "~";
         String key = "" + legion + sep + hex + sep + canRecruitHere + sep
@@ -1776,7 +1779,7 @@ public class RationalAI extends SimpleAI
     // cheap, inaccurate evaluation function.  Returns an expected value for
     // moving this legion to this hex.  The value defines a distance
     // metric over the set of all possible moves.
-    private int evaluateMoveInner(Legion legion, MasterHex hex,
+    private int evaluateMoveInner(LegionClientSide legion, MasterHex hex,
         int canRecruitHere, int depth, boolean normalHexRisk)
     {
 

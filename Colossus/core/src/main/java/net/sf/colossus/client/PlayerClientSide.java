@@ -97,4 +97,10 @@ public final class PlayerClientSide extends Player
         this.predictSplits = new PredictSplits(rootLegion.getMarkerId(),
             creatureNames);
     }
+
+    @Override
+    public LegionClientSide getLegionByMarkerId(String markerId)
+    {
+        return (LegionClientSide)super.getLegionByMarkerId(markerId);
+    }
 }

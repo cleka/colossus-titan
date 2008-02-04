@@ -1239,7 +1239,7 @@ public final class MasterBoard extends JPanel
         {
             return;
         }
-        List<Legion> legions = client.getLegionsByHex(masterHex);
+        List<LegionClientSide> legions = client.getLegionsByHex(masterHex);
 
         int numLegions = legions.size();
         if (numLegions == 0)
@@ -1248,8 +1248,8 @@ public final class MasterBoard extends JPanel
             return;
         }
 
-        Legion legion = legions.get(0);
-        Marker marker = ((LegionClientSide)legion).getMarker();
+        LegionClientSide legion = legions.get(0);
+        Marker marker = legion.getMarker();
         if (marker == null)
         {
             hex.repaint();
@@ -1280,7 +1280,7 @@ public final class MasterBoard extends JPanel
             point.x -= chitScale4;
             point.y -= chitScale4;
             legion = legions.get(1);
-            marker = ((LegionClientSide)legion).getMarker();
+            marker = (legion).getMarker();
             if (marker != null)
             {
                 // Second marker can be null when loading during
@@ -1300,14 +1300,14 @@ public final class MasterBoard extends JPanel
             point.x -= chitScale4;
             point.y -= chitScale4;
             legion = legions.get(1);
-            marker = ((LegionClientSide)legion).getMarker();
+            marker = (legion).getMarker();
             marker.setLocation(point);
 
             point = new Point(startingPoint);
             point.x -= chitScale4;
             point.y -= chitScale;
             legion = legions.get(2);
-            marker = ((LegionClientSide)legion).getMarker();
+            marker = (legion).getMarker();
             marker.setLocation(point);
         }
 
@@ -1336,7 +1336,7 @@ public final class MasterBoard extends JPanel
     }
 
     /** Select hexes where this legion can move. */
-    private void highlightMoves(Legion legion)
+    private void highlightMoves(LegionClientSide legion)
     {
         unselectAllHexes();
 
@@ -1626,7 +1626,7 @@ public final class MasterBoard extends JPanel
                 String markerId = marker.getId();
 
                 // Move the clicked-on marker to the top of the z-order.
-                Legion legion = client.getLegion(markerId);
+                LegionClientSide legion = client.getLegion(markerId);
                 client.setMarker(legion, marker);
 
                 // Right-click means to show the contents of the legion.
@@ -1635,12 +1635,12 @@ public final class MasterBoard extends JPanel
                     int viewMode = client.getViewMode();
                     boolean dubiousAsBlanks = client.getOptions().getOption(
                         Options.dubiousAsBlanks);
-                    new ShowLegion(masterFrame, (LegionClientSide)legion,
-                        point, scrollPane, 4 * Scale.get(), client
-                            .getActivePlayer(), viewMode, dubiousAsBlanks);
+                    new ShowLegion(masterFrame, legion, point, scrollPane,
+                        4 * Scale.get(), client.getActivePlayer(), viewMode,
+                        dubiousAsBlanks);
                     return;
                 }
-                else if (((LegionClientSide)legion).isMyLegion())
+                else if (legion.isMyLegion())
                 {
                     if (hex != null)
                     {
@@ -1707,7 +1707,7 @@ public final class MasterBoard extends JPanel
         }
     }
 
-    private void actOnLegion(Legion legion, MasterHex hex)
+    private void actOnLegion(LegionClientSide legion, MasterHex hex)
     {
         if (!client.isMyTurn())
         {
