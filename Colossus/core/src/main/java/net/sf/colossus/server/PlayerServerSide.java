@@ -262,9 +262,9 @@ public final class PlayerServerSide extends Player implements
     synchronized int countMobileLegions()
     {
         int count = 0;
-        for (Legion legion : getLegions())
+        for (LegionServerSide legion : getLegions())
         {
-            if (((LegionServerSide)legion).hasConventionalMove())
+            if ((legion).hasConventionalMove())
             {
                 count++;
             }
@@ -274,9 +274,9 @@ public final class PlayerServerSide extends Player implements
 
     synchronized void commitMoves()
     {
-        for (Legion legion : getLegions())
+        for (LegionServerSide legion : getLegions())
         {
-            ((LegionServerSide)legion).commitMove();
+            (legion).commitMove();
         }
     }
 
@@ -344,9 +344,9 @@ public final class PlayerServerSide extends Player implements
 
     synchronized void undoAllMoves()
     {
-        for (Legion legion : getLegions())
+        for (LegionServerSide legion : getLegions())
         {
-            ((LegionServerSide)legion).undoMove();
+            legion.undoMove();
         }
     }
 
@@ -354,10 +354,10 @@ public final class PlayerServerSide extends Player implements
      *  a hex and they have a legal non-teleport move. */
     synchronized boolean splitLegionHasForcedMove()
     {
-        for (Legion legion : getLegions())
+        for (LegionServerSide legion : getLegions())
         {
             if (getGame().getNumFriendlyLegions(legion.getCurrentHex(), this) > 1
-                && ((LegionServerSide)legion).hasConventionalMove())
+                && (legion).hasConventionalMove())
             {
                 LOGGER.finest("Found unseparated split legions at hex "
                     + legion.getCurrentHex());
@@ -370,9 +370,9 @@ public final class PlayerServerSide extends Player implements
     /** Return true if any legion can recruit. */
     synchronized boolean canRecruit()
     {
-        for (Legion legion : getLegions())
+        for (LegionServerSide legion : getLegions())
         {
-            if (legion.hasMoved() && ((LegionServerSide)legion).canRecruit())
+            if (legion.hasMoved() && legion.canRecruit())
             {
                 return true;
             }
