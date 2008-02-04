@@ -298,7 +298,6 @@ public final class GameServerSide extends Game
         // Main thread has now nothing to do any more, can wait
         // until game finishes.
 
-        
         if (server.isServerRunning())
         {
             cleanupWhenGameOver();
@@ -3248,11 +3247,12 @@ public final class GameServerSide extends Game
         return list;
     }
 
-    Legion getLegionByMarkerId(String markerId)
+    LegionServerSide getLegionByMarkerId(String markerId)
     {
-        for (Player player : players)
+        for (PlayerServerSide player : players)
         {
-            Legion legion = player.getLegionByMarkerId(markerId);
+            LegionServerSide legion = (LegionServerSide)player
+                .getLegionByMarkerId(markerId);
             if (legion != null)
             {
                 return legion;
@@ -3263,15 +3263,44 @@ public final class GameServerSide extends Game
         return null;
     }
 
-    Player getPlayerByMarkerId(String markerId)
+    // TODO copy and paste from Client class
+    public Player getPlayerByMarkerId(String markerId)
     {
+        assert markerId != null : "Parameter must not be null";
+
+        String shortColor = markerId.substring(0, 2);
+        return getPlayerUsingColor(shortColor);
+    }
+
+    // TODO copy and paste from Client class
+    private Player getPlayerUsingColor(String shortColor)
+    {
+        assert players != null : "Game not yet initialized";
+        assert shortColor != null : "Parameter must not be null";
+
+        // Stage 1: See if the player who started with this color is alive.
         for (Player player : players)
         {
-            Legion legion = player.getLegionByMarkerId(markerId);
-
-            if (legion != null)
+            if (shortColor.equals(player.getShortColor()) && !player.isDead())
             {
                 return player;
+            }
+        }
+
+        // Stage 2: He's dead.  Find who killed him and see if he's alive.
+        for (Player player : players)
+        {
+            if (player.getPlayersElim().indexOf(shortColor) != -1)
+            {
+                // We have the killer.
+                if (!player.isDead())
+                {
+                    return player;
+                }
+                else
+                {
+                    return getPlayerUsingColor(player.getShortColor());
+                }
             }
         }
         return null;

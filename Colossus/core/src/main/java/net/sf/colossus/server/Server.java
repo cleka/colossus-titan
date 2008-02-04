@@ -59,8 +59,7 @@ public final class Server extends Thread implements IServer
 
     /** Map of players to their clients. */
     private final Map<Player, IClient> clientMap = new HashMap<Player, IClient>();
-    private final Map<SocketChannel, SocketServerThread> clientChannelMap
-        = new HashMap<SocketChannel, SocketServerThread>();
+    private final Map<SocketChannel, SocketServerThread> clientChannelMap = new HashMap<SocketChannel, SocketServerThread>();
 
     /** Number of remote clients we're waiting for. */
     private int waitingForClients;
@@ -80,7 +79,7 @@ public final class Server extends Thread implements IServer
 
     // list of Socket that are currently active
     private final List<SocketChannel> activeSocketChannelList = Collections
-    .synchronizedList(new ArrayList<SocketChannel>());
+        .synchronizedList(new ArrayList<SocketChannel>());
 
     private int numClients;
     private int maxClients;
@@ -136,12 +135,12 @@ public final class Server extends Thread implements IServer
             waitOnSelector();
         }
     }
-    
+
     public ChildThreadManager getThreadMgr()
     {
         return threadMgr;
     }
-    
+
     void initFileServer()
     {
         stopFileServer();
@@ -158,7 +157,7 @@ public final class Server extends Thread implements IServer
                 .finest("No alive remote client, not launching the file server.");
         }
     }
-        
+
     void initSocketServer()
     {
         numClients = 0;
@@ -171,10 +170,10 @@ public final class Server extends Thread implements IServer
         try
         {
             selector = Selector.open();
-            
+
             ServerSocketChannel ssc = ServerSocketChannel.open();
             ssc.configureBlocking(false);
-            
+
             serverSocket = ssc.socket();
             serverSocket.setReuseAddress(true);
             InetSocketAddress address = new InetSocketAddress(port);
@@ -182,7 +181,7 @@ public final class Server extends Thread implements IServer
             // SelectionKey key = ssc.register(selector, SelectionKey.OP_ACCEPT);
             ssc.register(selector, SelectionKey.OP_ACCEPT);
         }
-        catch(IOException ex)
+        catch (IOException ex)
         {
             LOGGER.log(Level.SEVERE,
                 "Could not create socket. Configure networking in OS, "
@@ -192,7 +191,7 @@ public final class Server extends Thread implements IServer
         }
         createLocalClients();
     }
-    
+
     boolean waitForClients()
     {
         logToStartLog("\nStarting up, waiting for " + waitingForClients
@@ -202,18 +201,17 @@ public final class Server extends Thread implements IServer
         {
             waitOnSelector();
         }
-        
+
         return (numClients >= maxClients);
     }
 
-        
     public void waitOnSelector()
     {
         try
         {
             int num = selector.select();
-            LOGGER.log(Level.FINEST, "select returned, " + num +
-                " channels are ready to be processed.");
+            LOGGER.log(Level.FINEST, "select returned, " + num
+                + " channels are ready to be processed.");
 
             Set<SelectionKey> selectedKeys = selector.selectedKeys();
             Iterator<SelectionKey> it = selectedKeys.iterator();
@@ -221,28 +219,29 @@ public final class Server extends Thread implements IServer
             while (it.hasNext())
             {
                 SelectionKey key = it.next();
-                
-                if ((key.readyOps() & SelectionKey.OP_ACCEPT)
-                    == SelectionKey.OP_ACCEPT)
+
+                if ((key.readyOps() & SelectionKey.OP_ACCEPT) == SelectionKey.OP_ACCEPT)
                 {
                     // Accept the new connection
-                    ServerSocketChannel ssc = (ServerSocketChannel)key.channel();
+                    ServerSocketChannel ssc = (ServerSocketChannel)key
+                        .channel();
                     SocketChannel sc = ssc.accept();
                     sc.configureBlocking(false);
                     LOGGER.log(Level.FINE, "Accepted: ssc = " + ssc);
 
-                    sc.register(selector,  SelectionKey.OP_READ);
-                    ArrayBlockingQueue<String> q = new ArrayBlockingQueue<String>(1);
-                    SocketServerThread sst = new SocketServerThread(this, sc, q);
+                    sc.register(selector, SelectionKey.OP_READ);
+                    ArrayBlockingQueue<String> q = new ArrayBlockingQueue<String>(
+                        1);
+                    SocketServerThread sst = new SocketServerThread(this, sc,
+                        q);
                     numClients++;
                     activeSocketChannelList.add(sc);
                     clientChannelMap.put(sc, sst);
-                    
+
                     sst.start();
                     it.remove();
                 }
-                else if ((key.readyOps() & SelectionKey.OP_READ)
-                    == SelectionKey.OP_READ)
+                else if ((key.readyOps() & SelectionKey.OP_READ) == SelectionKey.OP_READ)
                 {
                     // Read the data
                     SocketChannel sc = (SocketChannel)key.channel();
@@ -256,19 +255,19 @@ public final class Server extends Thread implements IServer
                     {
                         sst.processInput();
                     }
-                   
+
                     it.remove();
                 }
             }
-            
+
             selectedKeys.clear();
         }
-        catch(IOException ex)
+        catch (IOException ex)
         {
             LOGGER.log(Level.SEVERE, ex.toString(), ex);
         }
     }
-    
+
     public void waitUntilGameFinishes()
     {
         LOGGER.finest("Server.waitUntilGameFinishes: "
@@ -384,7 +383,7 @@ public final class Server extends Thread implements IServer
         }
 
     }
-    
+
     public void setBoardVisibility(Player player, boolean val)
     {
         getClient(player).setBoardActive(val);
@@ -543,7 +542,6 @@ public final class Server extends Thread implements IServer
             logToStartLog("\nGot all clients, game can start now.\n");
         }
 
-        
         if (waitingForClients <= 0)
         {
             logToStartLog("\nStarting the game now.\n");
@@ -1751,7 +1749,8 @@ public final class Server extends Thread implements IServer
     {
         IClient activeClient = getClient(game.getActivePlayer());
         int childSize = splitoffs.size();
-        activeClient.didSplit(null, parent, child, childSize, splitoffs, turn);
+        activeClient.didSplit(parent.getCurrentHex(), parent, child,
+            childSize, splitoffs, turn);
 
         if (!game.getOption(Options.allStacksVisible))
         {
@@ -1764,8 +1763,8 @@ public final class Server extends Thread implements IServer
             IClient client = it.next();
             if (client != activeClient)
             {
-                client.didSplit(null, parent, child, childSize, splitoffs,
-                    turn);
+                client.didSplit(parent.getCurrentHex(), parent, child,
+                    childSize, splitoffs, turn);
             }
         }
     }
@@ -1934,11 +1933,9 @@ public final class Server extends Thread implements IServer
             {
                 for (Legion legion : game.getAllLegions())
                 {
-                    client.setLegionStatus(legion, ((LegionServerSide)legion)
-                        .hasMoved(), ((LegionServerSide)legion)
-                        .hasTeleported(), ((LegionServerSide)legion)
-                        .getEntrySide(), ((LegionServerSide)legion)
-                        .getRecruitName());
+                    client.setLegionStatus(legion, legion.hasMoved(), legion
+                        .hasTeleported(), legion.getEntrySide(),
+                        ((LegionServerSide)legion).getRecruitName());
                 }
             }
         }

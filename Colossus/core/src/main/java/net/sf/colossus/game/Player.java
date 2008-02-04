@@ -38,8 +38,6 @@ public class Player
 
     /**
      * The current legions owned by this player.
-     * 
-     * TODO not yet used on the client side
      */
     private final List<Legion> legions = new ArrayList<Legion>();
 

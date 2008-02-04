@@ -541,7 +541,7 @@ final class SocketClientThread extends Thread implements IServer
                 names.remove(0);
             }
             String reason = args.isEmpty() ? "<Unknown>" : args.remove(0);
-            Player player = client.getPlayerStateByMarkerId(markerId);
+            Player player = client.getPlayerByMarkerId(markerId);
             Legion legion;
             if (player.hasLegion(markerId))
             {

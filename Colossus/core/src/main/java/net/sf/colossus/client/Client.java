@@ -1671,15 +1671,15 @@ public final class Client implements IClient, IOracle
      */
     public Legion getLegion(String markerId)
     {
-        Player player = getPlayerStateByMarkerId(markerId);
+        Player player = getPlayerByMarkerId(markerId);
         Legion legion = player.getLegionByMarkerId(markerId);
-        assert legion != null;
+        assert legion != null : "No legion with markerId '" + markerId + "'";
         return legion;
     }
 
     public boolean legionExists(String markerId)
     {
-        Player player = getPlayerStateByMarkerId(markerId);
+        Player player = getPlayerByMarkerId(markerId);
         return player.hasLegion(markerId);
     }
 
@@ -4836,15 +4836,15 @@ public final class Client implements IClient, IOracle
         server.doneWithRecruits();
     }
 
-    public PlayerClientSide getPlayerStateByMarkerId(String markerId)
+    public PlayerClientSide getPlayerByMarkerId(String markerId)
     {
         assert markerId != null : "Parameter must not be null";
 
         String shortColor = markerId.substring(0, 2);
-        return getPlayerStateUsingColor(shortColor);
+        return getPlayerUsingColor(shortColor);
     }
 
-    private PlayerClientSide getPlayerStateUsingColor(String shortColor)
+    private PlayerClientSide getPlayerUsingColor(String shortColor)
     {
         assert this.players != null : "Client not yet initialized";
         assert shortColor != null : "Parameter must not be null";
@@ -4870,7 +4870,7 @@ public final class Client implements IClient, IOracle
                 }
                 else
                 {
-                    return getPlayerStateUsingColor(info.getShortColor());
+                    return getPlayerUsingColor(info.getShortColor());
                 }
             }
         }
@@ -4879,7 +4879,7 @@ public final class Client implements IClient, IOracle
 
     public boolean isMyLegion(String markerId)
     {
-        return owningPlayer.equals(getPlayerStateByMarkerId(markerId));
+        return owningPlayer.equals(getPlayerByMarkerId(markerId));
     }
 
     private boolean isMyLegion(Legion legion)

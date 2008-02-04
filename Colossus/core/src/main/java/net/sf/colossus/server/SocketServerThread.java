@@ -38,7 +38,7 @@ final class SocketServerThread extends Thread implements IClient
 
     private Server server;
     private SocketChannel socketChannel;
-    private ArrayBlockingQueue<String> inputQueue;
+    private final ArrayBlockingQueue<String> inputQueue;
     private String playerName;
 
     private boolean done = false;
@@ -54,18 +54,17 @@ final class SocketServerThread extends Thread implements IClient
     private final Object isWaitingLock = new Object();
     private boolean isWaiting = false;
     private String incompleteInput = "";
-    
+
     // Charset and encoder: by default according to the property, 
     // fallback US-ASCII
     String defaultCharSet = System.getProperty("file.encoding");
-    String charsetName = defaultCharSet != null ? defaultCharSet :"US-ASCII"; 
-    private Charset charset = Charset.forName(charsetName);
-    private CharsetEncoder encoder = charset.newEncoder();
-    private CharsetDecoder decoder = charset.newDecoder();
-    
-    private ByteBuffer byteBuffer = ByteBuffer.allocate( 1024 );
+    String charsetName = defaultCharSet != null ? defaultCharSet : "US-ASCII";
+    private final Charset charset = Charset.forName(charsetName);
+    private final CharsetEncoder encoder = charset.newEncoder();
+    private final CharsetDecoder decoder = charset.newDecoder();
 
-    
+    private final ByteBuffer byteBuffer = ByteBuffer.allocate(1024);
+
     SocketServerThread(Server server, SocketChannel channel,
         ArrayBlockingQueue<String> inputQueue)
     {
@@ -92,13 +91,14 @@ final class SocketServerThread extends Thread implements IClient
             {
                 String fromClient;
                 setWaiting(true);
-                while (!done && (fromClient = inputQueue.take()) != null && !done)
+                while (!done && (fromClient = inputQueue.take()) != null
+                    && !done)
                 {
-                    synchronized(fromClient)
+                    synchronized (fromClient)
                     {
                         setWaiting(false);
-                        LOGGER.finer("Message from client " + playerName + ": "
-                            + fromClient);
+                        LOGGER.finer("Message from client " + playerName
+                            + ": " + fromClient);
                         parseLine(fromClient);
                         setWaiting(true);
                         fromClient.notify();
@@ -127,15 +127,16 @@ final class SocketServerThread extends Thread implements IClient
                 else
                 {
                     // ooops. Exception, perhaps client closed his side?
-                    LOGGER.log(Level.FINE, "InterruptedException in " + getName()
-                        + " while "
+                    LOGGER.log(Level.FINE, "InterruptedException in "
+                        + getName() + " while "
                         + "read loop (client terminated unexpectedly?)");
                 }
             }
 
             catch (Exception e)
             {
-                LOGGER.log(Level.SEVERE, "Whatever exception while read loop: ", e);
+                LOGGER.log(Level.SEVERE,
+                    "Whatever exception while read loop: ", e);
             }
 
             isGone = true;
@@ -213,7 +214,7 @@ final class SocketServerThread extends Thread implements IClient
             while (true)
             {
                 int r = socketChannel.read(byteBuffer);
-                if (r<=0)
+                if (r <= 0)
                 {
                     break;
                 }
@@ -223,44 +224,47 @@ final class SocketServerThread extends Thread implements IClient
             if (read > 0)
             {
                 CharBuffer charBuff = decoder.decode(byteBuffer);
-        
-                LOGGER.log(Level.FINEST,
-                    "Read " + read + " bytes from " + socketChannel);
+
+                LOGGER.log(Level.FINEST, "Read " + read + " bytes from "
+                    + socketChannel);
                 String msg = incompleteInput + charBuff.toString();
                 incompleteInput = "";
-                
-                LOGGER.log(Level.FINEST,
-                    "Decoded string is >>>>>" + msg + "<<<<<");
+
+                LOGGER.log(Level.FINEST, "Decoded string is >>>>>" + msg
+                    + "<<<<<");
 
                 int processed = 0;
-                
+
                 String lines[] = msg.split("\r\n|\n|\r", -1);
                 int len = lines.length;
-                for (int i=0 ; i<len ; i++)
+                for (int i = 0; i < len; i++)
                 {
                     String line = lines[i];
-                    if ( i<len-1 )
+                    if (i < len - 1)
                     {
-                        synchronized(line)
+                        synchronized (line)
                         {
                             inputQueue.put(line);
                             line.wait();
                         }
                         processed++;
                     }
-                    else if (i == len-1 && line.equals(""))
+                    else if (i == len - 1 && line.equals(""))
                     {
                         // Received characters ended with newline, producing one
                         // empty string at the end. Perfect.
                     }
                     else
                     {
-                        LOGGER.log(Level.FINE,
-                            "last item incomplete, storing it: '" + line + "'");
+                        LOGGER
+                            .log(Level.FINE,
+                                "last item incomplete, storing it: '" + line
+                                    + "'");
                         incompleteInput = line;
                     }
                 }
-                LOGGER.log(Level.FINEST, "Processed " + processed + " commands.");
+                LOGGER.log(Level.FINEST, "Processed " + processed
+                    + " commands.");
                 byteBuffer.clear();
             }
             else
@@ -268,30 +272,28 @@ final class SocketServerThread extends Thread implements IClient
                 LOGGER.log(Level.FINE, "\nread is 0!");
             }
         }
-        catch(InterruptedException e)
+        catch (InterruptedException e)
         {
-            LOGGER.log(Level.SEVERE,
-                "Interrupted exception while putting to " +
-                "queue of sc " + socketChannel, e);
+            LOGGER.log(Level.SEVERE, "Interrupted exception while putting to "
+                + "queue of sc " + socketChannel, e);
         }
-        catch(CharacterCodingException cce)
+        catch (CharacterCodingException cce)
         {
             LOGGER.log(Level.SEVERE,
-                "CharacterCodingException while reading from channel" +
-                socketChannel, cce);
-            
+                "CharacterCodingException while reading from channel"
+                    + socketChannel, cce);
+
         }
-        catch(IOException ioe)
+        catch (IOException ioe)
         {
-            LOGGER.log(Level.SEVERE,
-                "IOException while reading from channel" +
-                socketChannel, ioe);
+            LOGGER.log(Level.SEVERE, "IOException while reading from channel"
+                + socketChannel, ioe);
         }
     }
 
     private void sendViaChannel(String msg)
     {
-        CharBuffer cb = CharBuffer.allocate(msg.length()+2);
+        CharBuffer cb = CharBuffer.allocate(msg.length() + 2);
         cb.put(msg);
         cb.put("\n");
         cb.flip();
@@ -301,15 +303,16 @@ final class SocketServerThread extends Thread implements IClient
             ByteBuffer bb = encoder.encode(cb);
             socketChannel.write(bb);
         }
-        catch(CharacterCodingException e)
+        catch (CharacterCodingException e)
         {
-            LOGGER.log(Level.SEVERE, "EncondingException while encoding String '" +
-                msg + "' for channel " + socketChannel);
+            LOGGER.log(Level.SEVERE,
+                "EncondingException while encoding String '" + msg
+                    + "' for channel " + socketChannel);
         }
-        catch(IOException ioe)
+        catch (IOException ioe)
         {
-            LOGGER.log(Level.SEVERE, "IOException while writing String '" +
-                msg + "' for channel " + socketChannel);
+            LOGGER.log(Level.SEVERE, "IOException while writing String '"
+                + msg + "' for channel " + socketChannel);
         }
     }
 
@@ -989,8 +992,8 @@ final class SocketServerThread extends Thread implements IClient
         // TODO make sure we always have a hex
         assert parent != null : " Split needs parent";
         assert child != null : " Split needs child";
-        sendToClient(Constants.didSplit + sep
-            + (hex == null ? "null" : hex.getLabel()) + sep
+        assert hex != null : "Split needs location";
+        sendToClient(Constants.didSplit + sep + hex.getLabel() + sep
             + parent.getMarkerId() + sep + child.getMarkerId() + sep
             + childHeight + sep + Glob.glob(splitoffs) + sep + turn);
     }

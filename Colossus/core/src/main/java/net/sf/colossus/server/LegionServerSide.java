@@ -467,11 +467,8 @@ public final class LegionServerSide extends Legion implements
      and decrement the number of this creature type remaining. */
     boolean addCreature(CreatureType creature, boolean takeFromStack)
     {
-        if (getHeight() > 7 || (getHeight() == 7 && game.getTurnNumber() > 1))
-        {
-            LOGGER.log(Level.SEVERE, "Tried to add to 7-high legion!");
-            return false;
-        }
+        assert getHeight() < 7
+            || (getHeight() == 7 && game.getTurnNumber() == 1) : "Tried to add to 7-high legion!";
         if (takeFromStack)
         {
             Caretaker caretaker = game.getCaretaker();
@@ -685,17 +682,14 @@ public final class LegionServerSide extends Legion implements
      * (Or the first available marker, if markerId is null.)
      * Return the new legion, or null if there's an error.
      */
-    Legion split(List<CreatureType> creatures, String newMarkerId)
+    LegionServerSide split(List<CreatureType> creatures, String newMarkerId)
     {
+        assert newMarkerId != null : "We need a marker to split";
         PlayerServerSide player = getPlayer();
-        if (newMarkerId == null)
-        {
-            return null;
-        }
 
         player.selectMarkerId(newMarkerId);
-        Legion newLegion = new LegionServerSide(newMarkerId, markerId,
-            getCurrentHex(), getCurrentHex(), getPlayer(), game);
+        LegionServerSide newLegion = new LegionServerSide(newMarkerId,
+            markerId, getCurrentHex(), getCurrentHex(), getPlayer(), game);
 
         Iterator<CreatureType> it = creatures.iterator();
         while (it.hasNext())
@@ -705,21 +699,23 @@ public final class LegionServerSide extends Legion implements
             if (creature == null)
             {
                 // Abort the split.
-                ((LegionServerSide)newLegion).recombine(this, true);
+                LOGGER
+                    .warning("Split aborted since removeCreature(..) returned null");
+                newLegion.recombine(this, true);
                 return null;
             }
-            ((LegionServerSide)newLegion).addCreature(creature, false);
+            newLegion.addCreature(creature, false);
         }
 
         player.addLegion(newLegion);
 
         game.getServer().allUpdatePlayerInfo();
-        LOGGER.log(Level.INFO, ((LegionServerSide)newLegion).getHeight()
+        LOGGER.log(Level.INFO, newLegion.getHeight()
             + " creatures are split off from legion " + this
             + " into new legion " + newLegion);
 
         sortCritters();
-        ((LegionServerSide)newLegion).sortCritters();
+        newLegion.sortCritters();
 
         // game.getServer().allTellLegionLocation(newMarkerId);
 

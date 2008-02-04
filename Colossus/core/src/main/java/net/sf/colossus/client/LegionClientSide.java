@@ -55,7 +55,7 @@ public final class LegionClientSide extends Legion implements
     // TODO the Client parameter should be a Game(ClientSide), which doesn't exist yet
     LegionClientSide(String markerId, Client client, MasterHex hex)
     {
-        super(client.getPlayerStateByMarkerId(markerId), markerId, hex);
+        super(client.getPlayerByMarkerId(markerId), markerId, hex);
         this.client = client;
         myNode = null;
         isMyLegion = getPlayer().equals(client.getOwningPlayer());
