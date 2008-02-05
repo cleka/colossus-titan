@@ -16,7 +16,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.WindowConstants;
 
-import net.sf.colossus.game.Player;
 import net.sf.colossus.util.KDialog;
 import net.sf.colossus.util.Options;
 import net.sf.colossus.variant.MasterHex;
@@ -30,19 +29,16 @@ public class AutoInspector extends KDialog
 
     private final JScrollPane scrollPane;
 
-    private final Player boardOwner;
-
     private final int viewMode;
 
     private boolean dubiousAsBlanks;
 
-    public AutoInspector(JFrame frame, IOptions options, Player boardOwner,
-        int viewMode, boolean dubiousAsBlanks)
+    public AutoInspector(JFrame frame, IOptions options, int viewMode,
+        boolean dubiousAsBlanks)
     {
         super(frame, "Inspector", false);
 
         this.options = options;
-        this.boardOwner = boardOwner;
         this.viewMode = viewMode;
         this.dubiousAsBlanks = dubiousAsBlanks;
 
@@ -92,7 +88,7 @@ public class AutoInspector extends KDialog
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
         LegionInfoPanel liPanel = new LegionInfoPanel(legion, 4 * Scale.get(),
-            5, 2, false, viewMode, boardOwner, dubiousAsBlanks, false);
+            5, 2, false, viewMode, dubiousAsBlanks, false);
         panel.add(liPanel);
         String valueText = liPanel.getValueText();
         String ownerText = legion.isMyLegion() ? "" : " ["

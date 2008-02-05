@@ -234,15 +234,14 @@ public final class MasterBoard extends JPanel
             for (int i = 0; i < markerArray.length; i++)
             {
                 Marker marker = markerArray[i];
-                Legion legion = client.getLegion(marker.getId());
+                LegionClientSide legion = client.getLegion(marker.getId());
                 int scale = 2 * Scale.get();
 
                 boolean dubiousAsBlanks = client.getOptions().getOption(
                     Options.dubiousAsBlanks);
-                final JPanel panel = new LegionInfoPanel(
-                    (LegionClientSide)legion, scale, PANEL_MARGIN,
-                    PANEL_PADDING, true, client.getViewMode(), client
-                        .getActivePlayer(), dubiousAsBlanks, true);
+                final JPanel panel = new LegionInfoPanel(legion, scale,
+                    PANEL_MARGIN, PANEL_PADDING, true, client.getViewMode(),
+                    dubiousAsBlanks, true);
                 add(panel);
                 legionFlyouts[i] = panel;
 
@@ -1636,8 +1635,7 @@ public final class MasterBoard extends JPanel
                     boolean dubiousAsBlanks = client.getOptions().getOption(
                         Options.dubiousAsBlanks);
                     new ShowLegion(masterFrame, legion, point, scrollPane,
-                        4 * Scale.get(), client.getOwningPlayer(), viewMode,
-                        dubiousAsBlanks);
+                        4 * Scale.get(), viewMode, dubiousAsBlanks);
                     return;
                 }
                 else if (legion.isMyLegion())

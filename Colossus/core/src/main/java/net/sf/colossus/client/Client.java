@@ -550,7 +550,7 @@ public final class Client implements IClient, IOracle
             if (autoInspector == null)
             {
                 autoInspector = new AutoInspector(parent, options,
-                    owningPlayer, viewMode, options
+                    viewMode, options
                         .getOption(Options.dubiousAsBlanks));
             }
         }

@@ -11,7 +11,6 @@ import javax.swing.Box;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import net.sf.colossus.game.Player;
 import net.sf.colossus.util.HTMLColor;
 import net.sf.colossus.util.Options;
 
@@ -26,7 +25,7 @@ public final class LegionInfoPanel extends JPanel
 
     public LegionInfoPanel(LegionClientSide legion, int scale, int margin,
         int padding, boolean usePlayerColor, int viewMode,
-        Player boardOwner, boolean dubiousAsBlanks, boolean showLegionValue)
+        boolean dubiousAsBlanks, boolean showLegionValue)
     {
         boolean contentCertain = false;
         boolean hideAll = false;
@@ -39,8 +38,7 @@ public final class LegionInfoPanel extends JPanel
         }
         else if (viewMode == Options.viewableOwnNum)
         {
-            Player legionOwner = legion.getPlayer();
-            if (boardOwner.equals(legionOwner))
+            if (legion.isMyLegion())
             {
                 contentCertain = true;
                 viewAll(legion, usePlayerColor, scale, margin, padding,
