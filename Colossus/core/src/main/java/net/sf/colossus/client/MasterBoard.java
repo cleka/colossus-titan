@@ -1636,7 +1636,7 @@ public final class MasterBoard extends JPanel
                     boolean dubiousAsBlanks = client.getOptions().getOption(
                         Options.dubiousAsBlanks);
                     new ShowLegion(masterFrame, legion, point, scrollPane,
-                        4 * Scale.get(), client.getActivePlayer(), viewMode,
+                        4 * Scale.get(), client.getOwningPlayer(), viewMode,
                         dubiousAsBlanks);
                     return;
                 }
