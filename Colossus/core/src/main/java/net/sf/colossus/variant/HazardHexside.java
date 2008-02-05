@@ -40,6 +40,7 @@ public class HazardHexside implements HazardConstants
     public final int RangeStrikeEffectAdjustment;
 
     public final RangeStrikeSpecialEffect RangeStrikeSpecial;
+    public final TerrainSpecial terrainSpecial;
 
     /**
      * A map from the serialization string of a terrain to the instances.
@@ -47,14 +48,21 @@ public class HazardHexside implements HazardConstants
     private final static Map<String, HazardHexside> HEXSIDE_MAP = new HashMap<String, HazardHexside>();
 
     public HazardHexside(String name, EffectOnMovement effectOnGroundMovement,
-        EffectOnMovement effectOnFlyerMovement, EffectOnStrike effectforDefendingInTerrain,
-        ScopeOfEffectOnStrike scopeForDefenceEffect, int defenceEffectAdjustment,
-        EffectOnStrike effectforAttackingFromTerrain, ScopeOfEffectOnStrike scopeForAttackEffect,
-        int attackEffectAdjustment, EffectOnStrike effectForBeingRangeSruckInTerrain,
-        ScopeOfEffectOnStrike scopeForRangeStruckEffect, int RangeStruckEffectAdjustment,
+        EffectOnMovement effectOnFlyerMovement,
+        EffectOnStrike effectforDefendingInTerrain,
+        ScopeOfEffectOnStrike scopeForDefenceEffect,
+        int defenceEffectAdjustment,
+        EffectOnStrike effectforAttackingFromTerrain,
+        ScopeOfEffectOnStrike scopeForAttackEffect,
+        int attackEffectAdjustment,
+        EffectOnStrike effectForBeingRangeSruckInTerrain,
+        ScopeOfEffectOnStrike scopeForRangeStruckEffect,
+        int RangeStruckEffectAdjustment,
         EffectOnStrike effectforRangeStrikeFromTerrain,
-        ScopeOfEffectOnStrike scopeForRangeStrikeEffect, int RangeStrikeEffectAdjustment,
-        RangeStrikeSpecialEffect RangeStrikeSpecial)
+        ScopeOfEffectOnStrike scopeForRangeStrikeEffect,
+        int RangeStrikeEffectAdjustment,
+        RangeStrikeSpecialEffect RangeStrikeSpecial,
+        TerrainSpecial terrainSpecial)
     {
         this.name = name;
         this.effectOnGroundMovement = effectOnGroundMovement;
@@ -74,6 +82,7 @@ public class HazardHexside implements HazardConstants
         this.scopeForRangeStrikeEffect = scopeForRangeStrikeEffect;
         this.RangeStrikeEffectAdjustment = RangeStrikeEffectAdjustment;
         this.RangeStrikeSpecial = RangeStrikeSpecial;
+        this.terrainSpecial = terrainSpecial;
 
         HEXSIDE_MAP.put(name, this);
     }
@@ -102,41 +111,53 @@ public class HazardHexside implements HazardConstants
     }
 
     public static final HazardHexside NOTHING = new HazardHexside("Nothing",
-        EffectOnMovement.FREEMOVE, EffectOnMovement.FREEMOVE, EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.NOBODY,
-        0, EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.NOBODY, 0, EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.NOBODY, 0,
+        EffectOnMovement.FREEMOVE, EffectOnMovement.FREEMOVE,
         EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.NOBODY, 0,
-        RangeStrikeSpecialEffect.RANGESTRIKEFREE);
+        EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.NOBODY, 0,
+        EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.NOBODY, 0,
+        EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.NOBODY, 0,
+        RangeStrikeSpecialEffect.RANGESTRIKEFREE, TerrainSpecial.NOSPECIAL);
 
     public static final HazardHexside DUNE = new HazardHexside("Dune",
-        EffectOnMovement.FREEMOVE, EffectOnMovement.FREEMOVE, EffectOnStrike.POWERPENALTY,
-        ScopeOfEffectOnStrike.FOREIGNERS, 1, EffectOnStrike.POWERBONUS, ScopeOfEffectOnStrike.NATIVES, 2,
-        EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.NOBODY, 0, EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.NOBODY, 0,
-        RangeStrikeSpecialEffect.RANGESTRIKEOCCUPIED);
+        EffectOnMovement.FREEMOVE, EffectOnMovement.FREEMOVE,
+        EffectOnStrike.POWERPENALTY, ScopeOfEffectOnStrike.FOREIGNERS, 1,
+        EffectOnStrike.POWERBONUS, ScopeOfEffectOnStrike.NATIVES, 2,
+        EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.NOBODY, 0,
+        EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.NOBODY, 0,
+        RangeStrikeSpecialEffect.RANGESTRIKEOCCUPIED, TerrainSpecial.NOSPECIAL);
 
     public static final HazardHexside CLIFF = new HazardHexside("Cliff",
-        EffectOnMovement.BLOCKALL, EffectOnMovement.FREEMOVE, EffectOnStrike.BLOCKED, ScopeOfEffectOnStrike.ALL, 0,
-        EffectOnStrike.BLOCKED, ScopeOfEffectOnStrike.ALL, 0, EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.NOBODY, 0,
+        EffectOnMovement.BLOCKALL, EffectOnMovement.FREEMOVE,
+        EffectOnStrike.BLOCKED, ScopeOfEffectOnStrike.ALL, 0,
+        EffectOnStrike.BLOCKED, ScopeOfEffectOnStrike.ALL, 0,
         EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.NOBODY, 0,
-        RangeStrikeSpecialEffect.RANGESTRIKEOCCUPIED);
+        EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.NOBODY, 0,
+        RangeStrikeSpecialEffect.RANGESTRIKEOCCUPIED, TerrainSpecial.NOSPECIAL);
 
     public static final HazardHexside SLOPE = new HazardHexside("Slope",
-        EffectOnMovement.SLOWFOREIGNER, EffectOnMovement.FREEMOVE, EffectOnStrike.SKILLPENALTY,
-        ScopeOfEffectOnStrike.FOREIGNERS, -1, EffectOnStrike.POWERBONUS, ScopeOfEffectOnStrike.NATIVES, 1,
-        EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.NOBODY, 0, EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.NOBODY, 0,
-        RangeStrikeSpecialEffect.RANGESTRIKEOCCUPIED);
+        EffectOnMovement.SLOWFOREIGNER, EffectOnMovement.FREEMOVE,
+        EffectOnStrike.SKILLPENALTY, ScopeOfEffectOnStrike.FOREIGNERS, -1,
+        EffectOnStrike.POWERBONUS, ScopeOfEffectOnStrike.NATIVES, 1,
+        EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.NOBODY, 0,
+        EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.NOBODY, 0,
+        RangeStrikeSpecialEffect.RANGESTRIKEOCCUPIED, TerrainSpecial.NOSPECIAL);
 
     public static final HazardHexside TOWER = new HazardHexside("Tower",
-        EffectOnMovement.SLOWALL, EffectOnMovement.FREEMOVE, EffectOnStrike.SKILLBONUS, ScopeOfEffectOnStrike.ALL, 1,
-        EffectOnStrike.SKILLPENALTY, ScopeOfEffectOnStrike.ALL, 1, EffectOnStrike.SKILLPENALTY, ScopeOfEffectOnStrike.ALL, 1,
+        EffectOnMovement.SLOWALL, EffectOnMovement.FREEMOVE,
+        EffectOnStrike.SKILLBONUS, ScopeOfEffectOnStrike.ALL, 1,
+        EffectOnStrike.SKILLPENALTY, ScopeOfEffectOnStrike.ALL, 1,
+        EffectOnStrike.SKILLPENALTY, ScopeOfEffectOnStrike.ALL, 1,
         EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.NOBODY, 0,
-        RangeStrikeSpecialEffect.RANGESTRIKEWALL);
+        RangeStrikeSpecialEffect.RANGESTRIKEWALL, TerrainSpecial.NOSPECIAL);
 
     // TODO Verify
     public static final HazardHexside RIVER = new HazardHexside("River",
-        EffectOnMovement.BLOCKFOREIGNER, EffectOnMovement.FREEMOVE, EffectOnStrike.NOEFFECT,
-        ScopeOfEffectOnStrike.NOBODY, 0, EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.NOBODY, 0, EffectOnStrike.NOEFFECT,
-        ScopeOfEffectOnStrike.NOBODY, 0, EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.NOBODY, 0,
-        RangeStrikeSpecialEffect.RANGESTRIKEFREE);
+        EffectOnMovement.BLOCKFOREIGNER, EffectOnMovement.FREEMOVE,
+        EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.NOBODY, 0,
+        EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.NOBODY, 0,
+        EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.NOBODY, 0,
+        EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.NOBODY, 0,
+        RangeStrikeSpecialEffect.RANGESTRIKEFREE, TerrainSpecial.NOSPECIAL);
 
     @Override
     public String toString()

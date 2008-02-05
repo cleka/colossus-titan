@@ -27,7 +27,12 @@ public interface HazardConstants
      */
     public enum EffectOnStrike
     {
-        SKILLBONUS, SKILLPENALTY, POWERBONUS, POWERPENALTY, HEALTHDRAIN, BLOCKED, NOEFFECT
+        SKILLBONUS, SKILLPENALTY, POWERBONUS, POWERPENALTY, BLOCKED, NOEFFECT
+    }
+
+    public enum TerrainSpecial
+    {
+        NOSPECIAL, HEALTHDRAIN
     }
 
     /**
