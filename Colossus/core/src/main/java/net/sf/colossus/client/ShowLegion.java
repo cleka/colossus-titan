@@ -25,7 +25,7 @@ final class ShowLegion extends KDialog implements MouseListener,
     WindowListener
 {
     ShowLegion(JFrame parentFrame, LegionClientSide legion, Point point,
-        JScrollPane pane, int scale, Player activePlayer, int viewMode,
+        JScrollPane pane, int scale, Player boardOwner, int viewMode,
         boolean dubiousAsBlanks)
     {
         super(parentFrame, legion.getMarkerId(), false);
@@ -40,7 +40,7 @@ final class ShowLegion extends KDialog implements MouseListener,
         addWindowListener(this);
 
         LegionInfoPanel liPanel = new LegionInfoPanel(legion, scale, 5, 2,
-            false, viewMode, activePlayer, dubiousAsBlanks, false);
+            false, viewMode, boardOwner, dubiousAsBlanks, false);
         getContentPane().add(liPanel);
 
         String valueText = liPanel.getValueText();

@@ -26,7 +26,7 @@ public final class LegionInfoPanel extends JPanel
 
     public LegionInfoPanel(LegionClientSide legion, int scale, int margin,
         int padding, boolean usePlayerColor, int viewMode,
-        Player activePlayer, boolean dubiousAsBlanks, boolean showLegionValue)
+        Player boardOwner, boolean dubiousAsBlanks, boolean showLegionValue)
     {
         boolean contentCertain = false;
         boolean hideAll = false;
@@ -40,7 +40,7 @@ public final class LegionInfoPanel extends JPanel
         else if (viewMode == Options.viewableOwnNum)
         {
             Player legionOwner = legion.getPlayer();
-            if (activePlayer.equals(legionOwner))
+            if (boardOwner.equals(legionOwner))
             {
                 contentCertain = true;
                 viewAll(legion, usePlayerColor, scale, margin, padding,

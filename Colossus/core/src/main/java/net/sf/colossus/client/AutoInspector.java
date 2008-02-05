@@ -30,19 +30,19 @@ public class AutoInspector extends KDialog
 
     private final JScrollPane scrollPane;
 
-    private final Player owner;
+    private final Player boardOwner;
 
     private final int viewMode;
 
     private boolean dubiousAsBlanks;
 
-    public AutoInspector(JFrame frame, IOptions options, Player owner,
+    public AutoInspector(JFrame frame, IOptions options, Player boardOwner,
         int viewMode, boolean dubiousAsBlanks)
     {
         super(frame, "Inspector", false);
 
         this.options = options;
-        this.owner = owner;
+        this.boardOwner = boardOwner;
         this.viewMode = viewMode;
         this.dubiousAsBlanks = dubiousAsBlanks;
 
@@ -92,7 +92,7 @@ public class AutoInspector extends KDialog
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
         LegionInfoPanel liPanel = new LegionInfoPanel(legion, 4 * Scale.get(),
-            5, 2, false, viewMode, owner, dubiousAsBlanks, false);
+            5, 2, false, viewMode, boardOwner, dubiousAsBlanks, false);
         panel.add(liPanel);
         String valueText = liPanel.getValueText();
         String ownerText = legion.isMyLegion() ? "" : " ["
