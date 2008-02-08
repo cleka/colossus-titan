@@ -91,7 +91,10 @@ public class HazardTerrain extends Hazards
         Collection<HazardTerrain> terrain = new LinkedList<HazardTerrain>();
         for (Hazards hazard : hazards)
         {
-            terrain.add((HazardTerrain)hazard);
+            if (hazard instanceof HazardTerrain)
+            {
+                terrain.add((HazardTerrain)hazard);
+            }
         }
         return terrain;
     }
