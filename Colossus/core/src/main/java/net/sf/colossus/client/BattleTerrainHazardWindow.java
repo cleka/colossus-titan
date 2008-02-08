@@ -124,7 +124,7 @@ public class BattleTerrainHazardWindow extends KDialog
         hazardPanel.add(makeMovementPanel(hazard, scale));
         hazardPanel.add(makeNativesPanel(hazard, scale));
         hazardPanel.add(makeStrikePanel(hazard, scale));
-        hazardPanel.add(makeDefenderPanel(scale));
+        hazardPanel.add(makeDefenderPanel(hazard, scale));
         return hazardPanel;
     }
 
@@ -279,13 +279,19 @@ public class BattleTerrainHazardWindow extends KDialog
         return movementPanel;
     }
 
-    private JPanel makeDefenderPanel(int scale)
+    private JPanel makeDefenderPanel(Hazards hazard, int scale)
     {
         JPanel defenderPanel = new JPanel();
         defenderPanel.setBorder(BorderFactory
             .createTitledBorder("Defence Bonus"));
         defenderPanel.setMinimumSize(new Dimension(scale, scale));
-        // TODO ED - add Strike data when moved from strike to Hazard Terrain.
+        defenderPanel.add(makeStrikeEffect("Defending",
+            hazard.effectforAttackingFromTerrain, hazard.scopeForAttackEffect,
+            hazard.AttackEffectAdjustment));
+        defenderPanel.add(makeStrikeEffect("Being Rangestruck",
+            hazard.effectforRangeStrikeFromTerrain,
+            hazard.scopeForRangeStrikeEffect,
+            hazard.RangeStrikeEffectAdjustment));
         return defenderPanel;
     }
 
