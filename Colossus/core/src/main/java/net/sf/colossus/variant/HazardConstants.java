@@ -15,11 +15,16 @@ public interface HazardConstants
     }
 
     /**
-     * Scope Constants
+     * Scope Constants - 
+     * All - is everyone
+     * Natives means Natives vs anyone
+     * Patriots means Natives vs Foreigners
+     * Foreigners are Non-Natives vs anyone
+     * Imperials means Foreigners vs Natives
      */
     public enum ScopeOfEffectOnStrike
     {
-        ALL, NATIVES, FOREIGNERS, NOBODY
+        NATIVES, PATRIOTS, FOREIGNERS, IMPERIALS, ALL
     }
 
     /**
@@ -30,7 +35,7 @@ public interface HazardConstants
         SKILLBONUS, SKILLPENALTY, POWERBONUS, POWERPENALTY, BLOCKED, NOEFFECT
     }
 
-    public enum TerrainSpecial
+    public enum SpecialEffect
     {
         NOSPECIAL, HEALTHDRAIN
     }
@@ -46,14 +51,6 @@ public interface HazardConstants
     {
         RANGESTRIKEFREE, RANGESTRIKEBLOCKED, RANGESTRIKEOCCUPIED, RANGESTRIKEWALL, RANGESTRIKESKILLPENALTY
     }
-
-    public String getName();
-
-    public boolean isNativeBonusTerrain();
-
-    public boolean isNonNativePenaltyTerrain();
-
-    public boolean isNativeOnly();
 
     public String toString();
 }

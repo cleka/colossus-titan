@@ -2,52 +2,17 @@ package net.sf.colossus.variant;
 
 
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.LinkedList;
 
 
 /** 
  * This is a typesafe enumeration of all hazard Hexsides, i.e. the
  * Hexsides used in the battle maps.
  */
-public class HazardHexside implements HazardConstants
+public class HazardHexside extends Hazards
 {
-    /**
-     * The name used for serialization.
-     */
-    private final String name;
-
-    /**
-     * Properties - 
-     */
-    public final EffectOnMovement effectOnGroundMovement; // Also flyers at end of move
-    public final EffectOnMovement effectOnFlyerMovement;
-
-    public final EffectOnStrike effectforDefendingInTerrain;
-    public final ScopeOfEffectOnStrike scopeForDefenceEffect;
-    public final int defenceEffectAdjustment;
-
-    public final EffectOnStrike effectforAttackingFromTerrain;
-    public final ScopeOfEffectOnStrike scopeForAttackEffect;
-    public final int AttackEffectAdjustment;
-
-    public final EffectOnStrike effectForBeingRangeSruckInTerrain;
-    public final ScopeOfEffectOnStrike scopeForRangeStruckEffect;
-    public final int RangeStruckEffectAdjustment;
-
-    public final EffectOnStrike effectforRangeStrikeFromTerrain;
-    public final ScopeOfEffectOnStrike scopeForRangeStrikeEffect;
-    public final int RangeStrikeEffectAdjustment;
-
-    public final RangeStrikeSpecialEffect RangeStrikeSpecial;
-    public final TerrainSpecial terrainSpecial;
-
-    /**
-     * A map from the serialization string of a terrain to the instances.
-     */
-    private final static Map<String, HazardHexside> HEXSIDE_MAP = new HashMap<String, HazardHexside>();
-
-    public HazardHexside(String name, EffectOnMovement effectOnGroundMovement,
+    public HazardHexside(String name, char code,
+        EffectOnMovement effectOnGroundMovement,
         EffectOnMovement effectOnFlyerMovement,
         EffectOnStrike effectforDefendingInTerrain,
         ScopeOfEffectOnStrike scopeForDefenceEffect,
@@ -62,39 +27,21 @@ public class HazardHexside implements HazardConstants
         ScopeOfEffectOnStrike scopeForRangeStrikeEffect,
         int RangeStrikeEffectAdjustment,
         RangeStrikeSpecialEffect RangeStrikeSpecial,
-        TerrainSpecial terrainSpecial)
+        SpecialEffect terrainSpecial)
     {
-        this.name = name;
-        this.effectOnGroundMovement = effectOnGroundMovement;
-        this.effectOnFlyerMovement = effectOnFlyerMovement;
-
-        this.effectforDefendingInTerrain = effectforDefendingInTerrain;
-        this.scopeForDefenceEffect = scopeForDefenceEffect;
-        this.defenceEffectAdjustment = defenceEffectAdjustment;
-
-        this.effectforAttackingFromTerrain = effectforAttackingFromTerrain;
-        this.scopeForAttackEffect = scopeForAttackEffect;
-        this.AttackEffectAdjustment = attackEffectAdjustment;
-        this.effectForBeingRangeSruckInTerrain = effectForBeingRangeSruckInTerrain;
-        this.scopeForRangeStruckEffect = scopeForRangeStruckEffect;
-        this.RangeStruckEffectAdjustment = RangeStruckEffectAdjustment;
-        this.effectforRangeStrikeFromTerrain = effectforRangeStrikeFromTerrain;
-        this.scopeForRangeStrikeEffect = scopeForRangeStrikeEffect;
-        this.RangeStrikeEffectAdjustment = RangeStrikeEffectAdjustment;
-        this.RangeStrikeSpecial = RangeStrikeSpecial;
-        this.terrainSpecial = terrainSpecial;
-
-        HEXSIDE_MAP.put(name, this);
-    }
-
-    public String getName()
-    {
-        return name;
+        super(name, code, effectOnGroundMovement, effectOnFlyerMovement,
+            effectforDefendingInTerrain, scopeForDefenceEffect,
+            defenceEffectAdjustment, effectforAttackingFromTerrain,
+            scopeForAttackEffect, attackEffectAdjustment,
+            effectForBeingRangeSruckInTerrain, scopeForRangeStruckEffect,
+            RangeStruckEffectAdjustment, effectforRangeStrikeFromTerrain,
+            scopeForRangeStrikeEffect, RangeStrikeEffectAdjustment,
+            RangeStrikeSpecial, terrainSpecial);
     }
 
     public static HazardHexside getTerrainByName(String name)
     {
-        return HEXSIDE_MAP.get(name);
+        return (HazardHexside)getByName(name);
     }
 
     /**
@@ -107,57 +54,66 @@ public class HazardHexside implements HazardConstants
      */
     public static final Collection<HazardHexside> getAllHazardHexsides()
     {
-        return HEXSIDE_MAP.values();
+        Collection<Hazards> hazards = getAllHazards();
+        Collection<HazardHexside> hexsides = new LinkedList<HazardHexside>();
+        for (Hazards hazard : hazards)
+        {
+            if (hazard instanceof HazardHexside)
+            {
+                hexsides.add((HazardHexside)hazard);
+            }
+        }
+        return hexsides;
     }
 
     public static final HazardHexside NOTHING = new HazardHexside("Nothing",
-        EffectOnMovement.FREEMOVE, EffectOnMovement.FREEMOVE,
-        EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.NOBODY, 0,
-        EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.NOBODY, 0,
-        EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.NOBODY, 0,
-        EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.NOBODY, 0,
-        RangeStrikeSpecialEffect.RANGESTRIKEFREE, TerrainSpecial.NOSPECIAL);
+        ' ', EffectOnMovement.FREEMOVE, EffectOnMovement.FREEMOVE,
+        EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0,
+        EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0,
+        EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0,
+        EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0,
+        RangeStrikeSpecialEffect.RANGESTRIKEFREE, SpecialEffect.NOSPECIAL);
 
-    public static final HazardHexside DUNE = new HazardHexside("Dune",
+    public static final HazardHexside DUNE = new HazardHexside("Dune", 'd',
         EffectOnMovement.FREEMOVE, EffectOnMovement.FREEMOVE,
         EffectOnStrike.POWERPENALTY, ScopeOfEffectOnStrike.FOREIGNERS, 1,
         EffectOnStrike.POWERBONUS, ScopeOfEffectOnStrike.NATIVES, 2,
-        EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.NOBODY, 0,
-        EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.NOBODY, 0,
-        RangeStrikeSpecialEffect.RANGESTRIKEOCCUPIED, TerrainSpecial.NOSPECIAL);
+        EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0,
+        EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0,
+        RangeStrikeSpecialEffect.RANGESTRIKEOCCUPIED, SpecialEffect.NOSPECIAL);
 
-    public static final HazardHexside CLIFF = new HazardHexside("Cliff",
+    public static final HazardHexside CLIFF = new HazardHexside("Cliff", 'c',
         EffectOnMovement.BLOCKALL, EffectOnMovement.FREEMOVE,
         EffectOnStrike.BLOCKED, ScopeOfEffectOnStrike.ALL, 0,
         EffectOnStrike.BLOCKED, ScopeOfEffectOnStrike.ALL, 0,
-        EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.NOBODY, 0,
-        EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.NOBODY, 0,
-        RangeStrikeSpecialEffect.RANGESTRIKEOCCUPIED, TerrainSpecial.NOSPECIAL);
+        EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0,
+        EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0,
+        RangeStrikeSpecialEffect.RANGESTRIKEOCCUPIED, SpecialEffect.NOSPECIAL);
 
-    public static final HazardHexside SLOPE = new HazardHexside("Slope",
+    public static final HazardHexside SLOPE = new HazardHexside("Slope", 's',
         EffectOnMovement.SLOWFOREIGNER, EffectOnMovement.FREEMOVE,
         EffectOnStrike.SKILLPENALTY, ScopeOfEffectOnStrike.FOREIGNERS, -1,
         EffectOnStrike.POWERBONUS, ScopeOfEffectOnStrike.NATIVES, 1,
-        EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.NOBODY, 0,
-        EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.NOBODY, 0,
-        RangeStrikeSpecialEffect.RANGESTRIKEOCCUPIED, TerrainSpecial.NOSPECIAL);
+        EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0,
+        EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0,
+        RangeStrikeSpecialEffect.RANGESTRIKEOCCUPIED, SpecialEffect.NOSPECIAL);
 
-    public static final HazardHexside TOWER = new HazardHexside("Tower",
+    public static final HazardHexside TOWER = new HazardHexside("Tower", 'w',
         EffectOnMovement.SLOWALL, EffectOnMovement.FREEMOVE,
         EffectOnStrike.SKILLBONUS, ScopeOfEffectOnStrike.ALL, 1,
         EffectOnStrike.SKILLPENALTY, ScopeOfEffectOnStrike.ALL, 1,
         EffectOnStrike.SKILLPENALTY, ScopeOfEffectOnStrike.ALL, 1,
-        EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.NOBODY, 0,
-        RangeStrikeSpecialEffect.RANGESTRIKEWALL, TerrainSpecial.NOSPECIAL);
+        EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0,
+        RangeStrikeSpecialEffect.RANGESTRIKEWALL, SpecialEffect.NOSPECIAL);
 
     // TODO Verify
-    public static final HazardHexside RIVER = new HazardHexside("River",
+    public static final HazardHexside RIVER = new HazardHexside("River", 'r',
         EffectOnMovement.BLOCKFOREIGNER, EffectOnMovement.FREEMOVE,
-        EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.NOBODY, 0,
-        EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.NOBODY, 0,
-        EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.NOBODY, 0,
-        EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.NOBODY, 0,
-        RangeStrikeSpecialEffect.RANGESTRIKEFREE, TerrainSpecial.NOSPECIAL);
+        EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0,
+        EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0,
+        EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0,
+        EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0,
+        RangeStrikeSpecialEffect.RANGESTRIKEFREE, SpecialEffect.NOSPECIAL);
 
     @Override
     public String toString()
@@ -167,44 +123,5 @@ public class HazardHexside implements HazardConstants
         builder.append(getName());
         builder.append(":\n");
         return builder.toString();
-    }
-
-    public boolean blocksFlying()
-    {
-        return effectOnFlyerMovement.equals(EffectOnMovement.BLOCKALL);
-    }
-
-    public boolean isFlyersOnly()
-    {
-        return effectOnGroundMovement.equals(EffectOnMovement.BLOCKALL);
-    }
-
-    public boolean isNativeFlyersOnly()
-    {
-        return effectOnFlyerMovement.equals(EffectOnMovement.BLOCKFOREIGNER);
-    }
-
-    public boolean slowsNonNative()
-    {
-        return effectOnFlyerMovement.equals(EffectOnMovement.SLOWFOREIGNER)
-            || effectOnGroundMovement.equals(EffectOnMovement.SLOWFOREIGNER);
-    }
-
-    public boolean isNativeBonusTerrain()
-    {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    public boolean isNativeOnly()
-    {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    public boolean isNonNativePenaltyTerrain()
-    {
-        // TODO Auto-generated method stub
-        return false;
     }
 }

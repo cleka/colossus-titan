@@ -1,31 +1,29 @@
 package net.sf.colossus.client;
 
 
-import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridLayout;
-import java.awt.Point;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import javax.swing.BorderFactory;
-import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.WindowConstants;
+import javax.swing.SwingUtilities;
 
 import net.sf.colossus.util.KDialog;
-import net.sf.colossus.util.Options;
 import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.CreatureType;
+import net.sf.colossus.variant.HazardConstants;
+import net.sf.colossus.variant.HazardHexside;
 import net.sf.colossus.variant.HazardTerrain;
+import net.sf.colossus.variant.Hazards;
 import net.sf.colossus.variant.Variant;
 
 
@@ -38,14 +36,12 @@ import net.sf.colossus.variant.Variant;
  */
 public class BattleTerrainHazardWindow extends KDialog
 {
-    private IOptions options;
     private BattleMap map;
     private final JPanel chart;
-    private final JButton closeButton;
-    private final SaveWindow saveWindow;
     private final Variant variant;
     private final List<CreatureType> creatures;
     private Map<String, HazardTerrain> hazardsDisplayed;
+    private Map<String, HazardHexside> hexsidesDisplayed;
 
     public BattleTerrainHazardWindow(JFrame frame, Client client, BattleMap map)
 
@@ -53,55 +49,45 @@ public class BattleTerrainHazardWindow extends KDialog
         super(frame, "Battle Terrain Hazards for "
             + map.getMasterHex().getTerrain().getDisplayName(), false);
 
-        this.options = client.getOptions();
         this.map = map;
         variant = client.getGame().getVariant();
         creatures = variant.getCreatureTypes();
         chart = new JPanel();
         chart.setLayout(new GridLayout(0, 1));
+        useSaveWindow(client.getOptions(), "PlayerDetails", null);
 
-        getContentPane().setLayout(new BorderLayout());
-        getContentPane().add(chart, BorderLayout.CENTER);
-        closeButton = new JButton("Close");
-        closeButton.addActionListener(new ActionListener()
-        {
-            public void actionPerformed(ActionEvent e)
-            {
-                BattleTerrainHazardWindow.this.setVisible(false);
-            }
-        });
-        getContentPane().add(closeButton, BorderLayout.SOUTH);
-
-        setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
-        addWindowListener(new WindowAdapter()
+        getContentPane().add(chart);
+        addMouseListener(new MouseAdapter()
         {
             @Override
-            public void windowClosing(WindowEvent e)
+            public void mouseClicked(MouseEvent e)
             {
-                BattleTerrainHazardWindow.this.options.setOption(
-                    Options.BattleTerrainHazardWindow, false);
+                dispose();
             }
         });
-        saveWindow = new SaveWindow(options, "BattleTerrainHazardWindow");
-        Point location = getUpperRightCorner(550);
-        saveWindow.restore(this, location);
+
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
         setupChart();
 
-        pack();
-        setVisible(true);
+        SwingUtilities.invokeLater(new Runnable()
+        {
+            public void run()
+            {
+                pack();
+                setVisible(true);
+            }
+        });
     }
 
     private void setupChart()
     {
         hazardsDisplayed = new HashMap<String, HazardTerrain>();
-        for (Iterator<HazardTerrain> iterator = HazardTerrain
-            .getAllHazardTerrains().iterator(); iterator.hasNext();)
+        hexsidesDisplayed = new HashMap<String, HazardHexside>();
+        for (HazardTerrain hazard : HazardTerrain.getAllHazardTerrains())
         {
-            HazardTerrain hazard = iterator.next();
             if (hazardsDisplayed.containsKey(hazard.getName())
-                || map.getMasterHex()
-                .getTerrain().getHazardCount(hazard) == 0)
+                || map.getMasterHex().getTerrain().getHazardCount(hazard) == 0)
             {
                 // Ignore
             }
@@ -111,112 +97,185 @@ public class BattleTerrainHazardWindow extends KDialog
                 chart.add(addHazard(hazard));
             }
         }
-        // TODO ED - Add Hex sides.
+        for (HazardHexside hazard : HazardHexside.getAllHazardHexsides())
+        {
+            if (hexsidesDisplayed.containsKey(hazard.getName())
+                || map.getMasterHex().getTerrain().getHazardSideCount(
+                    hazard.getCode()) == 0)
+            {
+                // Ignore
+            }
+            else
+            {
+                hexsidesDisplayed.put(hazard.getName(), hazard);
+                chart.add(addHazard(hazard));
+            }
+        }
     }
 
-    private JPanel addHazard(HazardTerrain terrain)
+    private JPanel addHazard(Hazards hazard)
     {
         JPanel hazardPanel = new JPanel(); // Row in Chart
         hazardPanel.setBorder(BorderFactory.createEtchedBorder());
         int scale = Scale.get();
-        hazardPanel.add(new JLabel(terrain.getName()));
+        hazardPanel.add(new JLabel(hazard.getName()));
 
-        hazardPanel.add(makeHexPanel(terrain, scale));
-        hazardPanel.add(makeMovementPanel(terrain, scale));
-        hazardPanel.add(makeNativesPanel(terrain, scale));
-        hazardPanel.add(makeStrikePanel(scale));
+        hazardPanel.add(makeHexPanel(hazard, scale));
+        hazardPanel.add(makeMovementPanel(hazard, scale));
+        hazardPanel.add(makeNativesPanel(hazard, scale));
+        hazardPanel.add(makeStrikePanel(hazard, scale));
         hazardPanel.add(makeDefenderPanel(scale));
         return hazardPanel;
     }
 
     // Create GUI representation of Terrain 
-    private JPanel makeHexPanel(HazardTerrain terrain, int scale)
+    private JPanel makeHexPanel(Hazards hazard, int scale)
     {
         JPanel hexPanel = new JPanel();
-        hexPanel.setPreferredSize(new Dimension(scale * 7, scale * 7));
+        hexPanel.setPreferredSize(new Dimension(scale * 8, scale * 8));
         hexPanel.setBorder(BorderFactory.createTitledBorder("Hex"));
         GUIBattleHex hex = new GUIBattleHex(hexPanel.getX() + scale, hexPanel
-            .getY(), scale, hexPanel, 0, 1);
+            .getY(), scale * 2, hexPanel, 0, 1);
         BattleHex model = new BattleHex(1, 1);
-        model.setTerrain(terrain);
+        if (hazard instanceof HazardTerrain)
+        {
+            model.setTerrain((HazardTerrain)hazard);
+        }
+        else
+        {
+            model.setTerrain(HazardTerrain.PLAINS);
+            model.setHexside(0, hazard.getCode());
+            model.setHexside(1, hazard.getCode());
+            model.setHexside(2, hazard.getCode());
+            model.setHexside(3, hazard.getCode());
+            model.setHexside(4, hazard.getCode());
+            model.setHexside(5, hazard.getCode());
+        }
         hex.setHexModel(model);
         hexPanel.add(hex);
         return hexPanel;
     }
 
     // Show Native critters;
-    private JPanel makeNativesPanel(HazardTerrain terrain, int scale)
+    private JPanel makeNativesPanel(Hazards hazard, int scale)
     {
-        JPanel nativePanel = new JPanel();
+        JPanel nativePanel = new JPanel(new GridLayout(0, 6));
         nativePanel.setBorder(BorderFactory.createTitledBorder("Natives"));
         nativePanel.setMinimumSize(new Dimension(scale, scale));
         Iterator<CreatureType> it = creatures.iterator();
         while (it.hasNext())
         {
             CreatureType creature = it.next();
-            if (creature.isNativeIn(terrain))
+            if (hazard instanceof HazardTerrain)
             {
-                Chit chit = new Chit(60, creature.getName());
-                nativePanel.add(chit);
+                if (creature.isNativeIn((HazardTerrain)hazard))
+                {
+                    Chit chit = new Chit(60, creature.getName());
+                    nativePanel.add(chit);
+                }
+            }
+            else
+            {
+                if ((hazard.equals(HazardHexside.DUNE) && creature
+                    .isNativeIn(HazardTerrain.SAND))
+                    || (hazard.equals(HazardHexside.SLOPE) && creature
+                        .isNativeSlope())
+                    || (hazard.equals(HazardHexside.RIVER) && creature
+                        .isNativeRiver()))
+                {
+                    Chit chit = new Chit(scale, creature.getName());
+                    nativePanel.add(chit);
+                }
             }
         }
         return nativePanel;
     }
 
     // Effect on Movement
-    private JPanel makeMovementPanel(HazardTerrain terrain, int scale)
+    private JPanel makeMovementPanel(Hazards hazard, int scale)
     {
         JPanel movementPanel = new JPanel();
         movementPanel.setMinimumSize(new Dimension(scale, scale));
         movementPanel.setBorder(BorderFactory
             .createTitledBorder("Effect on Movement"));
         Chit flySymbol = null;
-        if (terrain.blocksFlying())
+        if (hazard.effectOnFlyerMovement
+            .equals(HazardConstants.EffectOnMovement.BLOCKALL))
         {
             flySymbol = new Chit(30, "FlyingBlocked");
             flySymbol.setToolTipText("FlyingBlocked");
         }
-        else if (terrain.isNativeFlyersOnly())
+        else if (hazard.effectOnFlyerMovement
+            .equals(HazardConstants.EffectOnMovement.BLOCKFOREIGNER))
         {
             flySymbol = new Chit(30, "FlyingNative");
             flySymbol.setToolTipText("Native Flyers Only");
         }
-        else if (terrain.isFlyersOnly())
+        else if (hazard.effectOnFlyerMovement
+            .equals(HazardConstants.EffectOnMovement.SLOWALL))
         {
-            flySymbol = new Chit(30, "Flying");
-            flySymbol.setToolTipText("Only Flying Creatures");
+            flySymbol = new Chit(30, "FlyingSlow");
+            flySymbol.setToolTipText("Slows Flying Creatures");
         }
-        if (flySymbol != null)
+        else if (hazard.effectOnFlyerMovement
+            .equals(HazardConstants.EffectOnMovement.SLOWFOREIGNER))
         {
-            movementPanel.add(flySymbol);
+            flySymbol = new Chit(30, "FlyingNativeSlow");
+            flySymbol.setToolTipText("Slows Non-Native Flying Creatures");
         }
-        Chit moveSymbol = null;
-        if (terrain.isNativeOnly())
+        else
         {
-            moveSymbol = new Chit(30, "NativeOnly");
-            moveSymbol.setToolTipText("Only Natives may Occupy");
+            flySymbol = new Chit(30, "FlyingAll");
+            flySymbol.setToolTipText("No effect on Flying Creatures");
         }
-        else if (terrain.slowsNonNative())
+        movementPanel.add(flySymbol);
+        Chit groundSymbol = null;
+        if (hazard.effectOnGroundMovement
+            .equals(HazardConstants.EffectOnMovement.BLOCKALL))
         {
-            moveSymbol = new Chit(30, "NativeSlow");
-            moveSymbol.setToolTipText("NonNatives Slowed");
+            groundSymbol = new Chit(30, "GroundBlocked");
+            groundSymbol.setToolTipText("Blocks Ground Movement");
         }
-        if (moveSymbol != null)
+        else if (hazard.effectOnGroundMovement
+            .equals(HazardConstants.EffectOnMovement.BLOCKFOREIGNER))
         {
-            movementPanel.add(moveSymbol);
+            groundSymbol = new Chit(30, "GroundNativeOnly");
+            groundSymbol.setToolTipText("Only Natives may Occupy");
         }
-        if (terrain.isNativeBonusTerrain())
+        else if (hazard.effectOnGroundMovement
+            .equals(HazardConstants.EffectOnMovement.SLOWFOREIGNER))
         {
-            Chit bonusSymbol = new Chit(30, "NativeBonus");
-            movementPanel.add(bonusSymbol);
-            bonusSymbol.setToolTipText("Natives get Bonuses");
+            groundSymbol = new Chit(30, "GroundNativeSlow");
+            groundSymbol.setToolTipText("NonNatives Slowed");
         }
-        if (terrain.isNonNativePenaltyTerrain())
+        else if (hazard.effectOnGroundMovement
+            .equals(HazardConstants.EffectOnMovement.SLOWALL))
         {
-            Chit penaltySumbol = new Chit(30, "NativePenalty");
-            penaltySumbol.setToolTipText("NonNatives get Penalty");
-            movementPanel.add(penaltySumbol);
+            groundSymbol = new Chit(30, "GroundSlow");
+            groundSymbol.setToolTipText("Slows Ground Movement");
         }
+        else
+        {
+            groundSymbol = new Chit(30, "GroundAll");
+            groundSymbol.setToolTipText("No Effect On Ground Movement");
+        }
+        movementPanel.add(groundSymbol);
+        //        if (hazard instanceof HazardTerrain)
+        //        {
+        //            HazardTerrain terrain = (HazardTerrain)hazard;
+        //            if (terrain.isNativeBonusTerrain())
+        //            {
+        //                Chit bonusSymbol = new Chit(30, "NativeSlow");
+        //                movementPanel.add(bonusSymbol);
+        //                bonusSymbol.setToolTipText("Natives get Bonuses");
+        //            }
+        //            if (terrain.isNonNativePenaltyTerrain())
+        //            {
+        //                Chit penaltySumbol = new Chit(30, "NativePenalty");
+        //                penaltySumbol.setToolTipText("NonNatives get Penalty");
+        //                movementPanel.add(penaltySumbol);
+        //            }
+        //        }
         return movementPanel;
     }
 
@@ -230,14 +289,132 @@ public class BattleTerrainHazardWindow extends KDialog
         return defenderPanel;
     }
 
-    private JPanel makeStrikePanel(int scale)
+    private JPanel makeStrikePanel(Hazards hazard, int scale)
     {
         JPanel strikePanel = new JPanel();
         strikePanel
             .setBorder(BorderFactory.createTitledBorder("Strike Bonus"));
         strikePanel.setMinimumSize(new Dimension(scale, scale));
-        // TODO ED - add Strike data when moved from strike to Hazard Terrain.
+        strikePanel.add(makeStrikeEffect("Attacking",
+            hazard.effectforAttackingFromTerrain, hazard.scopeForAttackEffect,
+            hazard.AttackEffectAdjustment));
+        strikePanel.add(makeStrikeEffect("Rangestriking",
+            hazard.effectforRangeStrikeFromTerrain,
+            hazard.scopeForRangeStrikeEffect,
+            hazard.RangeStrikeEffectAdjustment));
         return strikePanel;
+    }
+
+    private Chit makeStrikeEffect(String strike,
+        HazardConstants.EffectOnStrike strikeEffect,
+        HazardConstants.ScopeOfEffectOnStrike scope, int effectAdjustment)
+    {
+        Chit strikeSymbol;
+        if (strikeEffect.equals(HazardConstants.EffectOnStrike.BLOCKED))
+        {
+            strikeSymbol = new Chit(30, "StrikeBlocked");
+            strikeSymbol.setToolTipText(strike
+                + " Across Hazard is not Possible");
+        }
+        else if (strikeEffect
+            .equals(HazardConstants.EffectOnStrike.SKILLBONUS)
+            || strikeEffect
+                .equals(HazardConstants.EffectOnStrike.SKILLPENALTY))
+        {
+            strikeSymbol = new StrikeDie(30, 4 + effectAdjustment, "RedBlue");
+            StringBuilder tip = new StringBuilder();
+            if (scope.equals(HazardConstants.ScopeOfEffectOnStrike.FOREIGNERS)
+                || scope
+                    .equals(HazardConstants.ScopeOfEffectOnStrike.IMPERIALS))
+            {
+                tip.append("Non-Natives ");
+            }
+            else if (scope
+                .equals(HazardConstants.ScopeOfEffectOnStrike.NATIVES)
+                || scope
+                    .equals(HazardConstants.ScopeOfEffectOnStrike.PATRIOTS))
+            {
+                tip.append("Natives ");
+            }
+            else
+            {
+                tip.append("Everyone ");
+            }
+            tip.append("have skill ");
+            if (strikeEffect
+                .equals(HazardConstants.EffectOnStrike.SKILLPENALTY))
+            {
+                tip.append("decreased by ");
+            }
+            else
+            {
+                tip.append("increased by ");
+            }
+            tip.append(effectAdjustment);
+            tip.append(" when " + strike);
+            if (scope.equals(HazardConstants.ScopeOfEffectOnStrike.IMPERIALS))
+            {
+                tip.append("Natives");
+            }
+            else if (scope
+                .equals(HazardConstants.ScopeOfEffectOnStrike.PATRIOTS))
+            {
+                tip.append("Non-Natives");
+            }
+            strikeSymbol.setToolTipText(tip.toString());
+        }
+        else if (strikeEffect
+            .equals(HazardConstants.EffectOnStrike.POWERBONUS)
+            || strikeEffect
+                .equals(HazardConstants.EffectOnStrike.POWERPENALTY))
+        {
+            strikeSymbol = new StrikeDie(30, 1, "RedBlue");
+            StringBuilder tip = new StringBuilder();
+            if (scope.equals(HazardConstants.ScopeOfEffectOnStrike.FOREIGNERS)
+                || scope
+                    .equals(HazardConstants.ScopeOfEffectOnStrike.IMPERIALS))
+            {
+                tip.append("Non-Natives ");
+            }
+            else if (scope
+                .equals(HazardConstants.ScopeOfEffectOnStrike.NATIVES)
+                || scope
+                    .equals(HazardConstants.ScopeOfEffectOnStrike.PATRIOTS))
+            {
+                tip.append("Natives ");
+            }
+            else
+            {
+                tip.append("Everyone ");
+            }
+            if (strikeEffect
+                .equals(HazardConstants.EffectOnStrike.POWERPENALTY))
+            {
+                tip.append("loses ");
+            }
+            else
+            {
+                tip.append("gains ");
+            }
+            tip.append(effectAdjustment);
+            tip.append(" dice when " + strike);
+            if (scope.equals(HazardConstants.ScopeOfEffectOnStrike.IMPERIALS))
+            {
+                tip.append("Natives");
+            }
+            else if (scope
+                .equals(HazardConstants.ScopeOfEffectOnStrike.PATRIOTS))
+            {
+                tip.append("Non-Natives");
+            }
+            strikeSymbol.setToolTipText(tip.toString());
+        }
+        else
+        {
+            strikeSymbol = new StrikeDie(30, 4, "RedBlue");
+            strikeSymbol.setToolTipText("Normal Strike");
+        }
+        return strikeSymbol;
     }
 
     @Override
@@ -245,7 +422,6 @@ public class BattleTerrainHazardWindow extends KDialog
     {
         // cleanPrefCBListeners();
         super.dispose();
-        options = null;
         map = null;
     }
 
