@@ -54,7 +54,7 @@ public class BattleTerrainHazardWindow extends KDialog
         creatures = variant.getCreatureTypes();
         chart = new JPanel();
         chart.setLayout(new GridLayout(0, 1));
-        useSaveWindow(client.getOptions(), "PlayerDetails", null);
+        useSaveWindow(client.getOptions(), "BattleTerrainHazard", null);
 
         getContentPane().add(chart);
         addMouseListener(new MouseAdapter()
