@@ -496,7 +496,7 @@ public final class MasterBoard extends JPanel
                 GUIMasterHex hex = getHexContainingPoint(lastPoint);
                 if (hex != null)
                 {
-                    MasterHex hexModel = hex.getMasterHexModel();
+                    MasterHex hexModel = hex.getHexModel();
                     new ShowRecruits(masterFrame, lastPoint, hexModel,
                         scrollPane);
                 }
@@ -510,10 +510,8 @@ public final class MasterBoard extends JPanel
                 GUIMasterHex hex = getHexContainingPoint(lastPoint);
                 if (hex != null)
                 {
-                    new ShowBattleMap(masterFrame, hex.getMasterHexModel(),
+                    new ShowBattleMap(masterFrame, hex.getHexModel(),
                         hex);
-                    // Work around a Windows JDK 1.3 bug.
-                    hex.repaint();
                 }
             }
         };
@@ -1404,7 +1402,7 @@ public final class MasterBoard extends JPanel
                 @Override
                 public boolean matchesNonNullValue(GUIMasterHex hex)
                 {
-                    return hex.getMasterHexModel().equals(masterHex);
+                    return hex.getHexModel().equals(masterHex);
                 }
             });
     }
@@ -1475,7 +1473,7 @@ public final class MasterBoard extends JPanel
 
                 {
                     if (hex.isSelected()
-                        && label.equals(hex.getMasterHexModel().getLabel()))
+                        && label.equals(hex.getHexModel().getLabel()))
                     {
                         hex.unselect();
                         hex.repaint();
@@ -1496,7 +1494,7 @@ public final class MasterBoard extends JPanel
 
                 {
                     if (hex.isSelected()
-                        && labels.contains(hex.getMasterHexModel().getLabel()))
+                        && labels.contains(hex.getHexModel().getLabel()))
                     {
                         hex.unselect();
                         hex.repaint();
@@ -1516,7 +1514,7 @@ public final class MasterBoard extends JPanel
                 public boolean matchesNonNullValue(GUIMasterHex hex)
                 {
                     if (!hex.isSelected()
-                        && label.equals(hex.getMasterHexModel().getLabel()))
+                        && label.equals(hex.getHexModel().getLabel()))
                     {
                         hex.select();
                         hex.repaint();
@@ -1536,7 +1534,7 @@ public final class MasterBoard extends JPanel
                 public boolean matchesNonNullValue(GUIMasterHex hex)
                 {
                     if (!hex.isSelected()
-                        && hexes.contains(hex.getMasterHexModel()))
+                        && hexes.contains(hex.getHexModel()))
                     {
                         hex.select();
                         hex.repaint();
@@ -1556,7 +1554,7 @@ public final class MasterBoard extends JPanel
                 public boolean matchesNonNullValue(GUIMasterHex hex)
 
                 {
-                    if (hexes.contains(hex.getMasterHexModel()))
+                    if (hexes.contains(hex.getHexModel()))
                     {
                         hex.select();
                         hex.setSelectColor(color);
@@ -1642,7 +1640,7 @@ public final class MasterBoard extends JPanel
                 {
                     if (hex != null)
                     {
-                        actOnLegion(legion, hex.getMasterHexModel());
+                        actOnLegion(legion, hex.getHexModel());
                     }
                     else
                     {
@@ -1659,7 +1657,7 @@ public final class MasterBoard extends JPanel
                 if (isPopupButton(e))
                 {
                     lastPoint = point;
-                    popupMenu.setLabel(hex.getMasterHexModel()
+                    popupMenu.setLabel(hex.getHexModel()
                         .getDescription());
                     popupMenu.show(e.getComponent(), point.x, point.y);
                     return;
@@ -1669,7 +1667,7 @@ public final class MasterBoard extends JPanel
                 // Only the current player can manipulate game state.
                 if (client.getOwningPlayer().equals(client.getActivePlayer()))
                 {
-                    actOnHex(hex.getMasterHexModel());
+                    actOnHex(hex.getHexModel());
                     hex.repaint();
                     return;
                 }

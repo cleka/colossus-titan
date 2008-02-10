@@ -12,17 +12,15 @@ import net.sf.colossus.variant.Hex;
 
 
 /**
- *  Abstract parent class for various hexes
+ *  Abstract parent class for various GUI hexes
  *  
  *  @version $Id$
- * 
  */
-
-public abstract class GUIHex extends JComponent
+public abstract class GUIHex<H extends Hex> extends JComponent
 {
     public static final double SQRT3 = Math.sqrt(3.0);
 
-    private Hex model;
+    private H model;
 
     // GUI variables
     double[] xVertex = new double[6];
@@ -40,17 +38,17 @@ public abstract class GUIHex extends JComponent
     // Selection is in-between GUI and game state.
     private boolean selected;
 
-    public GUIHex(Hex model)
+    public GUIHex(H model)
     {
         this.model = model;
     }
 
-    public Hex getHexModel()
+    public H getHexModel()
     {
         return this.model;
     }
 
-    public void setHexModel(Hex model)
+    public void setHexModel(H model)
     {
         this.model = model;
     }

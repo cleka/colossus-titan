@@ -36,7 +36,7 @@ import net.sf.colossus.variant.BattleHex;
  * @author Romain Dolbeau
  */
 
-public class GUIBattleHex extends GUIHex
+public class GUIBattleHex extends GUIHex<BattleHex>
 {
     private static final Logger LOGGER = Logger.getLogger(GUIBattleHex.class
         .getName());
@@ -45,9 +45,9 @@ public class GUIBattleHex extends GUIHex
     private static final Color highlightColor = Color.red;
 
     /**
-     * Stores the neighbouring views.
+     * Stores the neighboring views.
      *
-     * This parallels the neighors field in BattleHex, just on the view side. 
+     * This parallels the neighbors field in BattleHex, just on the view side. 
      * 
      * @todo check if we can avoid this
      */
@@ -161,7 +161,7 @@ public class GUIBattleHex extends GUIHex
                 RenderingHints.VALUE_ANTIALIAS_OFF);
         }
 
-        Color terrainColor = getBattleHexModel().getTerrainColor();
+        Color terrainColor = getHexModel().getTerrainColor();
         if (isSelected())
         {
             if (terrainColor.equals(highlightColor))
@@ -199,7 +199,7 @@ public class GUIBattleHex extends GUIHex
             // Draw hexside features.
             for (int i = 0; i < 6; i++)
             {
-                char hexside = getBattleHexModel().getHexside(i);
+                char hexside = getHexModel().getHexside(i);
                 int n;
                 if (hexside != ' ')
                 {
@@ -209,7 +209,7 @@ public class GUIBattleHex extends GUIHex
                 }
 
                 // Draw them again from the other side.
-                hexside = getBattleHexModel().getOppositeHexside(i);
+                hexside = getHexModel().getOppositeHexside(i);
                 if (hexside != ' ')
                 {
                     n = (i + 1) % 6;
@@ -222,7 +222,7 @@ public class GUIBattleHex extends GUIHex
         // Do not anti-alias text.
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
             RenderingHints.VALUE_ANTIALIAS_OFF);
-        String name = getBattleHexModel().getTerrainName().toUpperCase();
+        String name = getHexModel().getTerrainName().toUpperCase();
 
         FontMetrics fontMetrics = g2.getFontMetrics();
 
@@ -231,15 +231,10 @@ public class GUIBattleHex extends GUIHex
             rectBound.y + ((fontMetrics.getHeight() + rectBound.height) / 2));
 
         // Show hex label in upper left corner.
-        g2.drawString(getBattleHexModel().getLabel(), rectBound.x
-            + (rectBound.width - fontMetrics.stringWidth(getBattleHexModel()
+        g2.drawString(getHexModel().getLabel(), rectBound.x
+            + (rectBound.width - fontMetrics.stringWidth(getHexModel()
                 .getLabel())) / 3, rectBound.y
             + ((fontMetrics.getHeight() + rectBound.height) / 4));
-    }
-
-    public BattleHex getBattleHexModel()
-    {
-        return (BattleHex)getHexModel();
     }
 
     @Override
@@ -251,7 +246,7 @@ public class GUIBattleHex extends GUIHex
             return;
         }
         // If an entrance needs repainting, paint the whole map.
-        if (getBattleHexModel().isEntrance())
+        if (getHexModel().isEntrance())
         {
             map.repaint();
         }
@@ -424,8 +419,8 @@ public class GUIBattleHex extends GUIHex
 
     public boolean paintOverlay(Graphics2D g)
     {
-        Image overlay = loadOneOverlay(getBattleHexModel().getTerrain()
-            .getName(), rectBound.width, rectBound.height);
+        Image overlay = loadOneOverlay(getHexModel().getTerrain().getName(),
+            rectBound.width, rectBound.height);
         if (overlay != null)
         { // first, draw the Hex itself
             g.drawImage(overlay, rectBound.x, rectBound.y, rectBound.width,
@@ -439,7 +434,7 @@ public class GUIBattleHex extends GUIHex
         // second, draw the opposite Hex HexSide
         for (int i = 0; i < 6; i++)
         {
-            BattleHex model = getBattleHexModel();
+            BattleHex model = getHexModel();
             char op = model.getOppositeHexside(i);
             if (op != ' ')
             {
@@ -468,9 +463,8 @@ public class GUIBattleHex extends GUIHex
                 dx2 = (int)xi;
                 dy2 = (int)yi;
 
-                Image sideOverlay = loadOneOverlay(neighbor
-                    .getBattleHexModel().getHexsideName((i + 3) % 6), dx2
-                    - dx1, dy2 - dy1);
+                Image sideOverlay = loadOneOverlay(neighbor.getHexModel()
+                    .getHexsideName((i + 3) % 6), dx2 - dx1, dy2 - dy1);
 
                 if (sideOverlay != null)
                 {
@@ -497,6 +491,6 @@ public class GUIBattleHex extends GUIHex
     {
         assert (i >= 0) && (i <= 5) : "Neighbor index out of range";
         neighbors[i] = hex;
-        getBattleHexModel().setNeighbor(i, hex.getBattleHexModel());
+        getHexModel().setNeighbor(i, hex.getHexModel());
     }
 }

@@ -591,14 +591,14 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
 
                 /* entrances */
                 GUIBattleHex[] gameEntrances = entranceHexes.get(terrain);
-                return gameEntrances[y].getBattleHexModel();
+                return gameEntrances[y].getHexModel();
 
             default:
                 LOGGER.log(Level.SEVERE, "Label " + label + " is invalid");
         }
         y = 6 - y - Math.abs((x - 3) / 2);
         GUIBattleHex[][] correctHexes = terrainH.get(terrain);
-        return correctHexes[x][y].getBattleHexModel();
+        return correctHexes[x][y].getHexModel();
     }
 
     /** Return the GUIBattleHex that contains the given point, or
@@ -625,7 +625,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
         while (it.hasNext())
         {
             GUIBattleHex hex = it.next();
-            set.add(hex.getBattleHexModel().getLabel());
+            set.add(hex.getHexModel().getLabel());
         }
         return set;
     }
@@ -712,7 +712,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
             while (it.hasNext())
             {
                 GUIBattleHex hex = it.next();
-                if (!hex.getBattleHexModel().isEntrance()
+                if (!hex.getHexModel().isEntrance()
                     && rectClip.intersects(hex.getBounds()))
                 {
                     hex.paint(g);

@@ -34,7 +34,7 @@ import net.sf.colossus.variant.MasterHex;
  * @author Romain Dolbeau
  */
 
-public final class GUIMasterHex extends GUIHex
+public final class GUIMasterHex extends GUIHex<MasterHex>
 {
     private static final Logger LOGGER = Logger.getLogger(GUIMasterHex.class
         .getName());
@@ -71,11 +71,6 @@ public final class GUIMasterHex extends GUIHex
     GUIMasterHex(MasterHex model)
     {
         super(model);
-    }
-
-    public MasterHex getMasterHexModel()
-    {
-        return (MasterHex)this.getHexModel();
     }
 
     void init(int cx, int cy, int scale, boolean inverted, MasterBoard board)
@@ -166,7 +161,7 @@ public final class GUIMasterHex extends GUIHex
                 RenderingHints.VALUE_ANTIALIAS_OFF);
         }
 
-        MasterHex model = getMasterHexModel();
+        MasterHex model = this.getHexModel();
         g2.setColor(model.getTerrainColor());
         g2.fill(hexagon);
         g2.setColor(Color.black);
@@ -230,7 +225,7 @@ public final class GUIMasterHex extends GUIHex
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
             RenderingHints.VALUE_ANTIALIAS_OFF);
 
-        MasterHex model = getMasterHexModel();
+        MasterHex model = this.getHexModel();
         String label = model.getLabel();
         switch (model.getLabelSide())
         {
@@ -286,7 +281,7 @@ public final class GUIMasterHex extends GUIHex
         fontMetrics = g2.getFontMetrics();
         halfFontHeight = (fontMetrics.getMaxAscent() + fontMetrics
             .getLeading()) / 2;
-        String name = getMasterHexModel().getTerrainDisplayName()
+        String name = this.getHexModel().getTerrainDisplayName()
             .toUpperCase();
         g2.drawString(name, rectBound.x
             + ((rectBound.width - stringWidth(name, g2)) / 2), rectBound.y
@@ -477,7 +472,7 @@ public final class GUIMasterHex extends GUIHex
     private Image getOverlayImage()
     {
         Image overlay = null;
-        overlay = ResourceLoader.getImage(getMasterHexModel()
+        overlay = ResourceLoader.getImage(this.getHexModel()
             .getTerrainDisplayName()
             + (!inverted ? invertedPostfix : ""), VariantSupport
             .getImagesDirectoriesList(), rectBound.width, rectBound.height);

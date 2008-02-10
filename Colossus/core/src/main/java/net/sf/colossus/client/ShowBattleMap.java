@@ -101,7 +101,7 @@ final class ShowBattleMap extends HexMap implements WindowListener,
         String neighborsText = "";
 
         boolean inverted = guiHex.isInverted();
-        MasterHex model = guiHex.getMasterHexModel();
+        MasterHex model = guiHex.getHexModel();
 
         String right = NoLandText;
         String left = NoLandText;

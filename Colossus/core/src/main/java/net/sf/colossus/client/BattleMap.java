@@ -23,10 +23,13 @@ import net.sf.colossus.webcommon.InstanceTracker;
 
 /**
  * Class BattleMap implements the GUI for a Titan battlemap.
+ * 
+ * TODO there is still model code in here, thus we still have dependencies
+ *      from the AI and server packages into this class.
+ * 
  * @version $Id$
  * @author David Ripton
  */
-
 public final class BattleMap extends HexMap implements MouseListener,
     WindowListener
 {
