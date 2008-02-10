@@ -3,7 +3,6 @@ package net.sf.colossus.client;
 
 import java.awt.Dimension;
 import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.HashMap;
@@ -24,6 +23,7 @@ import net.sf.colossus.variant.HazardConstants;
 import net.sf.colossus.variant.HazardHexside;
 import net.sf.colossus.variant.HazardTerrain;
 import net.sf.colossus.variant.Hazards;
+import net.sf.colossus.variant.MasterHex;
 import net.sf.colossus.variant.Variant;
 
 
@@ -36,20 +36,22 @@ import net.sf.colossus.variant.Variant;
  */
 public class BattleTerrainHazardWindow extends KDialog
 {
-    private BattleMap map;
+    private final MasterHex hex;
     private final JPanel chart;
     private final Variant variant;
     private final List<CreatureType> creatures;
     private Map<String, HazardTerrain> hazardsDisplayed;
     private Map<String, HazardHexside> hexsidesDisplayed;
 
-    public BattleTerrainHazardWindow(JFrame frame, Client client, BattleMap map)
+    public BattleTerrainHazardWindow(JFrame frame, Client client, MasterHex hex)
 
     {
         super(frame, "Battle Terrain Hazards for "
-            + map.getMasterHex().getTerrain().getDisplayName(), false);
+            + hex.getTerrain().getDisplayName(), false);
 
-        this.map = map;
+        assert SwingUtilities.isEventDispatchThread() : "Constructor should be called only on the EDT";
+
+        this.hex = hex;
         variant = client.getGame().getVariant();
         creatures = variant.getCreatureTypes();
         chart = new JPanel();
@@ -70,14 +72,8 @@ public class BattleTerrainHazardWindow extends KDialog
 
         setupChart();
 
-        SwingUtilities.invokeLater(new Runnable()
-        {
-            public void run()
-            {
-                pack();
-                setVisible(true);
-            }
-        });
+        pack();
+        setVisible(true);
     }
 
     private void setupChart()
@@ -87,7 +83,7 @@ public class BattleTerrainHazardWindow extends KDialog
         for (HazardTerrain hazard : HazardTerrain.getAllHazardTerrains())
         {
             if (hazardsDisplayed.containsKey(hazard.getName())
-                || map.getMasterHex().getTerrain().getHazardCount(hazard) == 0)
+                || hex.getTerrain().getHazardCount(hazard) == 0)
             {
                 // Ignore
             }
@@ -100,8 +96,7 @@ public class BattleTerrainHazardWindow extends KDialog
         for (HazardHexside hazard : HazardHexside.getAllHazardHexsides())
         {
             if (hexsidesDisplayed.containsKey(hazard.getName())
-                || map.getMasterHex().getTerrain().getHazardSideCount(
-                    hazard.getCode()) == 0)
+                || hex.getTerrain().getHazardSideCount(hazard.getCode()) == 0)
             {
                 // Ignore
             }
@@ -422,19 +417,4 @@ public class BattleTerrainHazardWindow extends KDialog
         }
         return strikeSymbol;
     }
-
-    @Override
-    public void dispose()
-    {
-        // cleanPrefCBListeners();
-        super.dispose();
-        map = null;
-    }
-
-    public void actionPerformed(@SuppressWarnings("unused")
-    ActionEvent e)
-    {
-        setVisible(false);
-    }
-
 }

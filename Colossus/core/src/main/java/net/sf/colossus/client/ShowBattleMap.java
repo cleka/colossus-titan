@@ -1,39 +1,42 @@
 package net.sf.colossus.client;
 
 
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Rectangle;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
 
 import net.sf.colossus.server.Constants;
-import net.sf.colossus.util.KFrame;
+import net.sf.colossus.util.KDialog;
 import net.sf.colossus.variant.MasterHex;
 
 
 /**
  * Class ShowBattleMap displays a battle map.
+ * 
+ * TODO this is inside out: the dialog this class is displayed in is owned 
+ *      and managed by this class
+ *      
+ * TODO the only reason this class needs GUIMasterHex and not just MasterHex
+ *      is that the MasterHex class doesn't offer isInverted(), which it
+ *      probably could (and maybe should)
+ *      
  * @version $Id$
  * @author David Ripton
  */
-
-final class ShowBattleMap extends HexMap implements WindowListener,
-    MouseListener
+final class ShowBattleMap extends HexMap
 {
     private static final String NoLandText = "--";
-
-    private final JDialog dialog;
 
     private static JButton leftButton;
     private static JButton bottomButton;
@@ -42,18 +45,22 @@ final class ShowBattleMap extends HexMap implements WindowListener,
 
     private int oldScale = -1;
 
-    ShowBattleMap(KFrame parentFrame, MasterHex masterHex, GUIMasterHex guiHex)
+    ShowBattleMap(final JFrame parentFrame, final Client client,
+        final GUIMasterHex hex)
     {
-        super(masterHex);
-        Map<String, String> neighbors = findOutNeighbors(guiHex);
+        super(hex.getHexModel());
+
+        assert SwingUtilities.isEventDispatchThread() : "Constructor should be called only on the EDT";
+
+        Map<String, String> neighbors = findOutNeighbors(hex);
         String neighborsText = neighbors.get("text");
 
-        dialog = new JDialog(parentFrame, "Battle Map for "
-            + masterHex.getTerrainName() + " " + masterHex + " "
-            + neighborsText, true);
+        final KDialog dialog = new KDialog(parentFrame, "Battle Map for "
+            + hex.getHexModel().getTerrainName() + " " + hex.getHexModel()
+            + " " + neighborsText, false);
         laidOut = false;
 
-        Container contentPane = dialog.getContentPane();
+        final Container contentPane = dialog.getContentPane();
         // contentPane.setLayout(new BorderLayout());
         contentPane.setLayout(null);
 
@@ -84,11 +91,28 @@ final class ShowBattleMap extends HexMap implements WindowListener,
             contentPane.add(rightButton);
         }
 
-        addMouseListener(this);
-        dialog.addWindowListener(this);
+        dialog.useSaveWindow(client.getOptions(), "ShowBattleMap", null);
+
+        addMouseListener(new MouseAdapter()
+        {
+            @Override
+            public void mouseClicked(MouseEvent e)
+            {
+                if (e.getButton() == MouseEvent.BUTTON1)
+                {
+                    dialog.dispose();
+                }
+                else
+                {
+                    new BattleTerrainHazardWindow(parentFrame, client, hex
+                        .getHexModel());
+                }
+            }
+        });
+        dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 
         setSize(getPreferredSize());
-        contentPane.add(this, BorderLayout.CENTER);
+        contentPane.add(ShowBattleMap.this);
         dialog.pack();
 
         dialog.setSize(getPreferredSize());
@@ -151,6 +175,8 @@ final class ShowBattleMap extends HexMap implements WindowListener,
     {
         super.paintComponent(g);
 
+        assert SwingUtilities.isEventDispatchThread() : "Painting code should be called only on the EDT";
+
         // Abort if called too early.
         Rectangle rectClip = g.getClipBounds();
         if (rectClip == null)
@@ -201,29 +227,5 @@ final class ShowBattleMap extends HexMap implements WindowListener,
         {
             leftButton.repaint();
         }
-    }
-
-    @Override
-    public void mouseClicked(MouseEvent e)
-    {
-        dialog.dispose();
-    }
-
-    @Override
-    public void mousePressed(MouseEvent e)
-    {
-        dialog.dispose();
-    }
-
-    @Override
-    public void mouseReleased(MouseEvent e)
-    {
-        dialog.dispose();
-    }
-
-    @Override
-    public void windowClosing(WindowEvent e)
-    {
-        dialog.dispose();
     }
 }

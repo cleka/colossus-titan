@@ -510,8 +510,7 @@ public final class MasterBoard extends JPanel
                 GUIMasterHex hex = getHexContainingPoint(lastPoint);
                 if (hex != null)
                 {
-                    new ShowBattleMap(masterFrame, hex.getHexModel(),
-                        hex);
+                    new ShowBattleMap(masterFrame, client, hex);
                 }
             }
         };
@@ -1533,8 +1532,7 @@ public final class MasterBoard extends JPanel
                 @Override
                 public boolean matchesNonNullValue(GUIMasterHex hex)
                 {
-                    if (!hex.isSelected()
-                        && hexes.contains(hex.getHexModel()))
+                    if (!hex.isSelected() && hexes.contains(hex.getHexModel()))
                     {
                         hex.select();
                         hex.repaint();
@@ -1657,8 +1655,7 @@ public final class MasterBoard extends JPanel
                 if (isPopupButton(e))
                 {
                     lastPoint = point;
-                    popupMenu.setLabel(hex.getHexModel()
-                        .getDescription());
+                    popupMenu.setLabel(hex.getHexModel().getDescription());
                     popupMenu.show(e.getComponent(), point.x, point.y);
                     return;
                 }

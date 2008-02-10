@@ -216,7 +216,7 @@ public final class BattleBoard extends KFrame
             public void actionPerformed(ActionEvent e)
             {
                 new BattleTerrainHazardWindow(BattleBoard.this, client,
-                    battleMap);
+                    battleMap.getMasterHex());
             }
         };
         undoLastAction = new AbstractAction(undoLast)
