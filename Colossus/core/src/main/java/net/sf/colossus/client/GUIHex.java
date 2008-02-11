@@ -62,7 +62,7 @@ public abstract class GUIHex<H extends Hex> extends JComponent
     @Override
     public boolean contains(Point point)
     {
-        return (hexagon.contains(point));
+        return hexagon.contains(point);
     }
 
     public void select()

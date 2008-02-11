@@ -403,7 +403,7 @@ public class GUIBattleHex extends GUIHex<BattleHex>
 
     public boolean innerContains(Point point)
     {
-        return (getInnerHexagon().contains(point));
+        return getInnerHexagon().contains(point);
     }
 
     private static String imagePostfix = "_Hazard";
