@@ -1,8 +1,11 @@
 package net.sf.colossus.client;
 
 
-import java.awt.Dimension;
+import java.awt.Container;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.GridLayout;
+import java.awt.Insets;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.HashMap;
@@ -10,7 +13,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import javax.swing.BorderFactory;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -36,8 +38,32 @@ import net.sf.colossus.variant.Variant;
  */
 public class BattleTerrainHazardWindow extends KDialog
 {
+    private static final int HEX_SIZE = 15;
+    private static final int EFFECT_SIZE = 20;
+    private static final int CREATURE_SIZE = 30;
+    private static final int DIE_SIZE = 15;
+
+    private static GridBagConstraints GBC_DEFAULT = new GridBagConstraints();
+    static
+    {
+        GBC_DEFAULT.anchor = GridBagConstraints.NORTH;
+        GBC_DEFAULT.insets = new Insets(2, 2, 5, 2);
+        GBC_DEFAULT.weightx = 0.01;
+    }
+    private static GridBagConstraints GBC_NORTHWEST = (GridBagConstraints)GBC_DEFAULT
+        .clone();
+    static
+    {
+        GBC_NORTHWEST.anchor = GridBagConstraints.NORTHWEST;
+    }
+    private static GridBagConstraints GBC_NORTHEAST = (GridBagConstraints)GBC_DEFAULT
+        .clone();
+    static
+    {
+        GBC_NORTHEAST.anchor = GridBagConstraints.NORTHEAST;
+    }
+
     private final MasterHex hex;
-    private final JPanel chart;
     private final Variant variant;
     private final List<CreatureType> creatures;
     private Map<String, HazardTerrain> hazardsDisplayed;
@@ -54,11 +80,9 @@ public class BattleTerrainHazardWindow extends KDialog
         this.hex = hex;
         variant = client.getGame().getVariant();
         creatures = variant.getCreatureTypes();
-        chart = new JPanel();
-        chart.setLayout(new GridLayout(0, 1));
+        getContentPane().setLayout(new GridBagLayout());
         useSaveWindow(client.getOptions(), "BattleTerrainHazard", null);
 
-        getContentPane().add(chart);
         addMouseListener(new MouseAdapter()
         {
             @Override
@@ -70,13 +94,38 @@ public class BattleTerrainHazardWindow extends KDialog
 
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
-        setupChart();
+        setupHeader(getContentPane());
+        setupChart(getContentPane());
 
         pack();
         setVisible(true);
     }
 
-    private void setupChart()
+    private void setupHeader(Container container)
+    {
+        // to save extra indirections with subpanels some labels will be across two columns
+        GridBagConstraints dblConstraints = (GridBagConstraints)GBC_DEFAULT
+            .clone();
+        dblConstraints.gridwidth = 2;
+
+        // add headers
+        container.add(new JPanel(), GBC_DEFAULT);
+        container.add(new JLabel("Hex"), GBC_DEFAULT);
+        container.add(new JLabel("Move"), dblConstraints);
+        container.add(new JLabel("Natives"), GBC_DEFAULT);
+        container.add(new JLabel("Strike"), dblConstraints);
+        container.add(new JLabel("Defence"), dblConstraints);
+
+        // add an empty cell to finalize the row and eat extra space
+        GridBagConstraints constraints = (GridBagConstraints)GBC_DEFAULT
+            .clone();
+        constraints.gridwidth = GridBagConstraints.REMAINDER;
+        constraints.weightx = 1;
+        container.add(new JPanel(), constraints);
+
+    }
+
+    private void setupChart(Container container)
     {
         hazardsDisplayed = new HashMap<String, HazardTerrain>();
         hexsidesDisplayed = new HashMap<String, HazardHexside>();
@@ -90,7 +139,7 @@ public class BattleTerrainHazardWindow extends KDialog
             else
             {
                 hazardsDisplayed.put(hazard.getName(), hazard);
-                chart.add(addHazard(hazard));
+                addHazard(container, hazard);
             }
         }
         for (HazardHexside hazard : HazardHexside.getAllHazardHexsides())
@@ -103,35 +152,47 @@ public class BattleTerrainHazardWindow extends KDialog
             else
             {
                 hexsidesDisplayed.put(hazard.getName(), hazard);
-                chart.add(addHazard(hazard));
+                addHazard(container, hazard);
             }
         }
+
+        // add an empty row that can grow with spare vSpace
+        GridBagConstraints vFillConstraints = new GridBagConstraints();
+        vFillConstraints.gridx = 0;
+        vFillConstraints.gridwidth = GridBagConstraints.REMAINDER;
+        vFillConstraints.weighty = 1;
+        container.add(new JPanel(), vFillConstraints);
     }
 
-    private JPanel addHazard(Hazards hazard)
+    private void addHazard(Container container, Hazards hazard)
     {
-        JPanel hazardPanel = new JPanel(); // Row in Chart
-        hazardPanel.setBorder(BorderFactory.createEtchedBorder());
-        int scale = Scale.get();
-        hazardPanel.add(new JLabel(hazard.getName()));
+        // hex label is always first in row, aligned vCenter but left
+        GridBagConstraints hexLabelConstraints = (GridBagConstraints)GBC_DEFAULT
+            .clone();
+        hexLabelConstraints.gridx = 0;
+        hexLabelConstraints.anchor = GridBagConstraints.NORTHWEST;
+        container.add(new JLabel(hazard.getName()), hexLabelConstraints);
 
-        hazardPanel.add(makeHexPanel(hazard, scale));
-        hazardPanel.add(makeMovementPanel(hazard, scale));
-        hazardPanel.add(makeNativesPanel(hazard, scale));
-        hazardPanel.add(makeStrikePanel(hazard, scale));
-        hazardPanel.add(makeDefenderPanel(hazard, scale));
-        return hazardPanel;
+        addHexImage(container, hazard);
+        addMovementInfo(container, hazard);
+        addNativesPanel(container, hazard);
+        addStrikeInfo(container, hazard);
+        addDefenderInfo(container, hazard);
+
+        // add an empty cell to finalize the row and eat extra space
+        GridBagConstraints constraints = new GridBagConstraints();
+        constraints.gridwidth = GridBagConstraints.REMAINDER;
+        constraints.weightx = 1;
+        container.add(new JPanel(), constraints);
+
     }
 
     // Create GUI representation of Terrain 
-    private JPanel makeHexPanel(Hazards hazard, int scale)
+    private void addHexImage(Container container, Hazards hazard)
     {
-        JPanel hexPanel = new JPanel();
-        hexPanel.setPreferredSize(new Dimension(scale * 8, scale * 8));
-        hexPanel.setBorder(BorderFactory.createTitledBorder("Hex"));
-        GUIBattleHex hex = new GUIBattleHex(hexPanel.getX() + scale, hexPanel
-            .getY(), scale * 2, hexPanel, 0, 1);
-        BattleHex model = new BattleHex(1, 1);
+        GUIBattleHex hex = new GUIBattleHex(HEX_SIZE, 0, HEX_SIZE, container,
+            0, 0);
+        BattleHex model = hex.getHexModel();
         if (hazard instanceof HazardTerrain)
         {
             model.setTerrain((HazardTerrain)hazard);
@@ -139,24 +200,48 @@ public class BattleTerrainHazardWindow extends KDialog
         else
         {
             model.setTerrain(HazardTerrain.PLAINS);
-            model.setHexside(0, hazard.getCode());
-            model.setHexside(1, hazard.getCode());
-            model.setHexside(2, hazard.getCode());
-            model.setHexside(3, hazard.getCode());
-            model.setHexside(4, hazard.getCode());
-            model.setHexside(5, hazard.getCode());
+            // to see the hexsides (or at least most of them) we have to configure 
+            // them on the neighbors
+            // TODO top is broken, three are still missing
+            // TODO for a full drawn one we would have to draw two hexes at least
+            //      it might be easier (and better looking) to just draw the hexside
+            GUIBattleHex neighborTop = new GUIBattleHex(HEX_SIZE, -4
+                * HEX_SIZE, HEX_SIZE, container, 0, 0);
+            configureHexModel((HazardHexside)hazard, neighborTop.getHexModel());
+            hex.setNeighbor(0, neighborTop);
+            GUIBattleHex neighborTopRight = new GUIBattleHex(4 * HEX_SIZE, -2
+                * HEX_SIZE, HEX_SIZE, container, 0, 0);
+            configureHexModel((HazardHexside)hazard, neighborTopRight
+                .getHexModel());
+            hex.setNeighbor(1, neighborTopRight);
+            GUIBattleHex neighborBottomRight = new GUIBattleHex(4 * HEX_SIZE,
+                2 * HEX_SIZE, HEX_SIZE, container, 0, 0);
+            configureHexModel((HazardHexside)hazard, neighborBottomRight
+                .getHexModel());
+            hex.setNeighbor(2, neighborBottomRight);
         }
         hex.setHexModel(model);
-        hexPanel.add(hex);
-        return hexPanel;
+
+        // we give this one some extra space around it
+        GridBagConstraints constraints = (GridBagConstraints)GBC_DEFAULT
+            .clone();
+        constraints.insets = new Insets(5, 5, 5, 5);
+        container.add(hex, constraints);
+    }
+
+    private void configureHexModel(HazardHexside hazard, BattleHex model)
+    {
+        model.setTerrain(HazardTerrain.PLAINS);
+        for (int i = 0; i <= 5; i++)
+        {
+            model.setHexside(i, hazard.getCode());
+        }
     }
 
     // Show Native critters;
-    private JPanel makeNativesPanel(Hazards hazard, int scale)
+    private void addNativesPanel(Container container, Hazards hazard)
     {
         JPanel nativePanel = new JPanel(new GridLayout(0, 6));
-        nativePanel.setBorder(BorderFactory.createTitledBorder("Natives"));
-        nativePanel.setMinimumSize(new Dimension(scale, scale));
         Iterator<CreatureType> it = creatures.iterator();
         while (it.hasNext())
         {
@@ -165,7 +250,8 @@ public class BattleTerrainHazardWindow extends KDialog
             {
                 if (creature.isNativeIn((HazardTerrain)hazard))
                 {
-                    Chit chit = new Chit(60, creature.getName());
+                    Chit chit = new Chit(CREATURE_SIZE, creature.getName());
+                    chit.setToolTipText(creature.getName());
                     nativePanel.add(chit);
                 }
             }
@@ -178,83 +264,81 @@ public class BattleTerrainHazardWindow extends KDialog
                     || (hazard.equals(HazardHexside.RIVER) && creature
                         .isNativeRiver()))
                 {
-                    Chit chit = new Chit(scale, creature.getName());
+                    Chit chit = new Chit(CREATURE_SIZE, creature.getName());
+                    chit.setToolTipText(creature.getName());
                     nativePanel.add(chit);
                 }
             }
         }
-        return nativePanel;
+        container.add(nativePanel, GBC_DEFAULT);
     }
 
     // Effect on Movement
-    private JPanel makeMovementPanel(Hazards hazard, int scale)
+    private void addMovementInfo(Container container, Hazards hazard)
     {
-        JPanel movementPanel = new JPanel();
-        movementPanel.setMinimumSize(new Dimension(scale, scale));
-        movementPanel.setBorder(BorderFactory
-            .createTitledBorder("Effect on Movement"));
         Chit flySymbol = null;
         if (hazard.effectOnFlyerMovement
             .equals(HazardConstants.EffectOnMovement.BLOCKALL))
         {
-            flySymbol = new Chit(30, "FlyingBlocked");
+            flySymbol = new Chit(EFFECT_SIZE, "FlyingBlocked");
             flySymbol.setToolTipText("FlyingBlocked");
         }
         else if (hazard.effectOnFlyerMovement
             .equals(HazardConstants.EffectOnMovement.BLOCKFOREIGNER))
         {
-            flySymbol = new Chit(30, "FlyingNative");
+            flySymbol = new Chit(EFFECT_SIZE, "FlyingNative");
             flySymbol.setToolTipText("Native Flyers Only");
         }
         else if (hazard.effectOnFlyerMovement
             .equals(HazardConstants.EffectOnMovement.SLOWALL))
         {
-            flySymbol = new Chit(30, "FlyingSlow");
+            flySymbol = new Chit(EFFECT_SIZE, "FlyingSlow");
             flySymbol.setToolTipText("Slows Flying Creatures");
         }
         else if (hazard.effectOnFlyerMovement
             .equals(HazardConstants.EffectOnMovement.SLOWFOREIGNER))
         {
-            flySymbol = new Chit(30, "FlyingNativeSlow");
+            flySymbol = new Chit(EFFECT_SIZE, "FlyingNativeSlow");
             flySymbol.setToolTipText("Slows Non-Native Flying Creatures");
         }
         else
         {
-            flySymbol = new Chit(30, "FlyingAll");
+            flySymbol = new Chit(EFFECT_SIZE, "FlyingAll");
             flySymbol.setToolTipText("No effect on Flying Creatures");
         }
-        movementPanel.add(flySymbol);
+        container.add(flySymbol, GBC_NORTHEAST);
+
         Chit groundSymbol = null;
         if (hazard.effectOnGroundMovement
             .equals(HazardConstants.EffectOnMovement.BLOCKALL))
         {
-            groundSymbol = new Chit(30, "GroundBlocked");
+            groundSymbol = new Chit(EFFECT_SIZE, "GroundBlocked");
             groundSymbol.setToolTipText("Blocks Ground Movement");
         }
         else if (hazard.effectOnGroundMovement
             .equals(HazardConstants.EffectOnMovement.BLOCKFOREIGNER))
         {
-            groundSymbol = new Chit(30, "GroundNativeOnly");
+            groundSymbol = new Chit(EFFECT_SIZE, "GroundNativeOnly");
             groundSymbol.setToolTipText("Only Natives may Occupy");
         }
         else if (hazard.effectOnGroundMovement
             .equals(HazardConstants.EffectOnMovement.SLOWFOREIGNER))
         {
-            groundSymbol = new Chit(30, "GroundNativeSlow");
+            groundSymbol = new Chit(EFFECT_SIZE, "GroundNativeSlow");
             groundSymbol.setToolTipText("NonNatives Slowed");
         }
         else if (hazard.effectOnGroundMovement
             .equals(HazardConstants.EffectOnMovement.SLOWALL))
         {
-            groundSymbol = new Chit(30, "GroundSlow");
+            groundSymbol = new Chit(EFFECT_SIZE, "GroundSlow");
             groundSymbol.setToolTipText("Slows Ground Movement");
         }
         else
         {
-            groundSymbol = new Chit(30, "GroundAll");
+            groundSymbol = new Chit(EFFECT_SIZE, "GroundAll");
             groundSymbol.setToolTipText("No Effect On Ground Movement");
         }
-        movementPanel.add(groundSymbol);
+        container.add(groundSymbol, GBC_NORTHWEST);
         //        if (hazard instanceof HazardTerrain)
         //        {
         //            HazardTerrain terrain = (HazardTerrain)hazard;
@@ -271,39 +355,28 @@ public class BattleTerrainHazardWindow extends KDialog
         //                movementPanel.add(penaltySumbol);
         //            }
         //        }
-        return movementPanel;
     }
 
-    private JPanel makeDefenderPanel(Hazards hazard, int scale)
+    private void addDefenderInfo(Container container, Hazards hazard)
     {
-        JPanel defenderPanel = new JPanel();
-        defenderPanel.setBorder(BorderFactory
-            .createTitledBorder("Defence Bonus"));
-        defenderPanel.setMinimumSize(new Dimension(scale, scale));
-        defenderPanel.add(makeStrikeEffect("Defending",
+        container.add(makeStrikeEffect("Defending",
             hazard.effectforAttackingFromTerrain, hazard.scopeForAttackEffect,
-            hazard.AttackEffectAdjustment));
-        defenderPanel.add(makeStrikeEffect("Being Rangestruck",
+            hazard.AttackEffectAdjustment), GBC_NORTHEAST);
+        container.add(makeStrikeEffect("Being Rangestruck",
             hazard.effectforRangeStrikeFromTerrain,
             hazard.scopeForRangeStrikeEffect,
-            hazard.RangeStrikeEffectAdjustment));
-        return defenderPanel;
+            hazard.RangeStrikeEffectAdjustment), GBC_NORTHWEST);
     }
 
-    private JPanel makeStrikePanel(Hazards hazard, int scale)
+    private void addStrikeInfo(Container container, Hazards hazard)
     {
-        JPanel strikePanel = new JPanel();
-        strikePanel
-            .setBorder(BorderFactory.createTitledBorder("Strike Bonus"));
-        strikePanel.setMinimumSize(new Dimension(scale, scale));
-        strikePanel.add(makeStrikeEffect("Attacking",
+        container.add(makeStrikeEffect("Attacking",
             hazard.effectforAttackingFromTerrain, hazard.scopeForAttackEffect,
-            hazard.AttackEffectAdjustment));
-        strikePanel.add(makeStrikeEffect("Rangestriking",
+            hazard.AttackEffectAdjustment), GBC_NORTHEAST);
+        container.add(makeStrikeEffect("Rangestriking",
             hazard.effectforRangeStrikeFromTerrain,
             hazard.scopeForRangeStrikeEffect,
-            hazard.RangeStrikeEffectAdjustment));
-        return strikePanel;
+            hazard.RangeStrikeEffectAdjustment), GBC_NORTHWEST);
     }
 
     private Chit makeStrikeEffect(String strike,
@@ -313,7 +386,7 @@ public class BattleTerrainHazardWindow extends KDialog
         Chit strikeSymbol;
         if (strikeEffect.equals(HazardConstants.EffectOnStrike.BLOCKED))
         {
-            strikeSymbol = new Chit(30, "StrikeBlocked");
+            strikeSymbol = new Chit(DIE_SIZE, "StrikeBlocked");
             strikeSymbol.setToolTipText(strike
                 + " Across Hazard is not Possible");
         }
@@ -322,7 +395,8 @@ public class BattleTerrainHazardWindow extends KDialog
             || strikeEffect
                 .equals(HazardConstants.EffectOnStrike.SKILLPENALTY))
         {
-            strikeSymbol = new StrikeDie(30, 4 + effectAdjustment, "RedBlue");
+            strikeSymbol = new StrikeDie(DIE_SIZE, 4 + effectAdjustment,
+                "RedBlue");
             StringBuilder tip = new StringBuilder();
             if (scope.equals(HazardConstants.ScopeOfEffectOnStrike.FOREIGNERS)
                 || scope
@@ -369,7 +443,7 @@ public class BattleTerrainHazardWindow extends KDialog
             || strikeEffect
                 .equals(HazardConstants.EffectOnStrike.POWERPENALTY))
         {
-            strikeSymbol = new StrikeDie(30, 1, "RedBlue");
+            strikeSymbol = new StrikeDie(DIE_SIZE, 1, "RedBlue");
             StringBuilder tip = new StringBuilder();
             if (scope.equals(HazardConstants.ScopeOfEffectOnStrike.FOREIGNERS)
                 || scope
@@ -412,7 +486,7 @@ public class BattleTerrainHazardWindow extends KDialog
         }
         else
         {
-            strikeSymbol = new StrikeDie(30, 4, "RedBlue");
+            strikeSymbol = new StrikeDie(DIE_SIZE, 4, "RedBlue");
             strikeSymbol.setToolTipText("Normal Strike");
         }
         return strikeSymbol;
