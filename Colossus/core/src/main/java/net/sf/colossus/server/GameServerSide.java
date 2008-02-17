@@ -577,8 +577,8 @@ public final class GameServerSide extends Game
 
         server.allTellAllLegionLocations();
         autoSave();
-        setupPhase();
         fullySyncCaretakerDisplays();
+        setupPhase();
     }
 
     private void fullySyncCaretakerDisplays()
@@ -1767,8 +1767,8 @@ public final class GameServerSide extends Game
         server.allTellAllLegionLocations();
 
         server.allSetupTurnState();
-        setupPhase();
         fullySyncCaretakerDisplays();
+        setupPhase();
     }
 
     /** Extract and return the numeric part of a filename. */

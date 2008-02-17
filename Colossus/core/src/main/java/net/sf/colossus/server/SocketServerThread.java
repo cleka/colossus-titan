@@ -4,6 +4,7 @@ package net.sf.colossus.server;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
+import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
@@ -11,7 +12,6 @@ import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CharsetEncoder;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.ArrayBlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -31,29 +31,25 @@ import net.sf.colossus.webcommon.InstanceTracker;
  *  @author David Ripton
  */
 
-final class SocketServerThread extends Thread implements IClient
+final class SocketServerThread implements IClient
 {
     private static final Logger LOGGER = Logger
         .getLogger(SocketServerThread.class.getName());
 
     private Server server;
     private SocketChannel socketChannel;
-    private final ArrayBlockingQueue<String> inputQueue;
+    private SelectionKey selectionKey;
     private String playerName;
 
-    private boolean done = false;
     private boolean isGone = false;
-    private boolean toldToTerminate = false;
     private boolean withdrawnAlready = false;
-    private boolean selfInterrupted = false;
 
     private static final String sep = Constants.protocolTermSeparator;
 
     private static int counter = 0;
 
-    private final Object isWaitingLock = new Object();
-    private boolean isWaiting = false;
     private String incompleteInput = "";
+    private String incompleteText = "";
 
     // Charset and encoder: by default according to the property, 
     // fallback US-ASCII
@@ -63,231 +59,101 @@ final class SocketServerThread extends Thread implements IClient
     private final CharsetEncoder encoder = charset.newEncoder();
     private final CharsetDecoder decoder = charset.newDecoder();
 
-    private final ByteBuffer byteBuffer = ByteBuffer.allocate(1024);
 
-    SocketServerThread(Server server, SocketChannel channel,
-        ArrayBlockingQueue<String> inputQueue)
+    SocketServerThread(Server server, SocketChannel channel, SelectionKey selKey)
     {
-        super("SocketServerThread");
         this.server = server;
         this.socketChannel = channel;
-        this.inputQueue = inputQueue;
+        this.selectionKey = selKey;
+     
         String tempId = "<no name yet #" + (counter++) + ">";
         InstanceTracker.register(this, tempId);
-        // We must register already in constructor. Otherwise, clients
-        // might have connected, but none yet registered to threadmgr.
-        // So Server continues with "waitUntilAllGone", there are no
-        // threads [yet, but thinks "not any more"],
-        // and does cleanup, set game to null, etc...
-        server.getThreadMgr().registerToThreadManager(this);
     }
 
-    @Override
-    public void run()
+    public SelectionKey getKey()
+    {
+        return selectionKey;
+    }
+    
+    public SocketChannel getSocketChannel()
+    {
+        return socketChannel;
+    }
+    
+    // if "isGone" is true, connection to this client is gone
+    // Server uses this to decide whether any nonAI player is 
+    // (even if perhaps dead) still connected (= watching).
+    public boolean isGone()
+    {
+        return this.isGone;
+    }
+
+    public void setIsGone(boolean val)
+    {
+        this.isGone = val;
+    }
+    
+    // Called by Server's select reader
+    public void processInput(ByteBuffer byteBuffer)
     {
         try
         {
-            try
+            CharBuffer charBuff = decoder.decode(byteBuffer);
+
+            String msg = incompleteInput + charBuff.toString();
+            incompleteInput = "";
+            incompleteText = "";
+            
+            LOGGER.log(Level.FINEST, "Decoded string is >>>>>" + msg
+                + "<<<<<");
+
+            int processed = 0;
+
+            String lines[] = msg.split("\r\n|\n|\r", -1);
+            int len = lines.length;
+            for (int i = 0; i < len; i++)
             {
-                String fromClient;
-                setWaiting(true);
-                while (!done && (fromClient = inputQueue.take()) != null
-                    && !done)
+                String line = lines[i];
+                if (i < len - 1)
                 {
-                    synchronized (fromClient)
+                    LOGGER.finest("before processing cmd '" + line + "'");
+                    List<String> li = Split.split(sep, line);
+                    String method = li.remove(0);
+                    if (playerName == null && !method.equals(Constants.signOn))
                     {
-                        setWaiting(false);
-                        LOGGER.finer("Message from client " + playerName
-                            + ": " + fromClient);
-                        parseLine(fromClient);
-                        setWaiting(true);
-                        fromClient.notify();
-                    }
-                }
-                setWaiting(false);
-                LOGGER.log(Level.FINEST,
-                    "End of SocketServerThread while loop");
-            }
-            // @TODO: all this "interrupting", "client terminated?" etc.
-            // is now not necessary any more. ServerThread who waits on all
-            // of the sockets via selector can clean up all of them properly
-            // with less hassle...
-            // On the long run, we'll get rid of the server side threads anyway.
-            catch (InterruptedException ex)
-            {
-                if (selfInterrupted)
-                {
-                    // all right. Server (some other SST) interrupted us 
-                    // in order to make us stop waiting on the socket...
-                }
-                else if (done)
-                {
-                    // all right. Client told it will disconnect.
-                }
-                else
-                {
-                    // ooops. Exception, perhaps client closed his side?
-                    LOGGER.log(Level.FINE, "InterruptedException in "
-                        + getName() + " while "
-                        + "read loop (client terminated unexpectedly?)");
-                }
-            }
-
-            catch (Exception e)
-            {
-                LOGGER.log(Level.SEVERE,
-                    "Whatever exception while read loop: ", e);
-            }
-
-            isGone = true;
-
-            try
-            {
-                server.unregisterSocketChannel(socketChannel);
-            }
-            catch (Exception e)
-            {
-                LOGGER.log(Level.SEVERE, "Exception while unregisterSocket; ",
-                    e);
-            }
-
-            if (selfInterrupted)
-            {
-                // no need to withdraw any more
-            }
-            else if (toldToTerminate)
-            {
-                // told to terminate - ok
-            }
-            else if (!withdrawnAlready)
-            {
-                withdrawnAlready = true;
-                server.withdrawFromGame();
-            }
-
-            // Still tell client to shutdown... if necessary.
-            dispose();
-
-            try
-            {
-                if (socketChannel != null)
-                {
-                    socketChannel.close();
-                }
-            }
-            catch (IOException ex)
-            {
-                LOGGER.log(Level.SEVERE, "IOException while socket.close; ",
-                    ex);
-            }
-
-            socketChannel = null;
-        }
-        catch (Exception e)
-        {
-            LOGGER.log(Level.SEVERE, "Exception in major try/catch; ", e);
-        }
-        // just to be sure...
-        setWaiting(false);
-        isGone = true;
-
-        server.getThreadMgr().unregisterFromThreadManager(this);
-
-        this.server = null;
-        this.socketChannel = null;
-    }
-
-    private void setWaiting(boolean val)
-    {
-        synchronized (isWaitingLock)
-        {
-            isWaiting = val;
-        }
-    }
-
-    public void processInput()
-    {
-        byteBuffer.clear();
-        try
-        {
-            int read = 0;
-            while (true)
-            {
-                int r = socketChannel.read(byteBuffer);
-                if (r <= 0)
-                {
-                    break;
-                }
-                read += r;
-            }
-            byteBuffer.flip();
-            if (read > 0)
-            {
-                CharBuffer charBuff = decoder.decode(byteBuffer);
-
-                LOGGER.log(Level.FINEST, "Read " + read + " bytes from "
-                    + socketChannel);
-                String msg = incompleteInput + charBuff.toString();
-                incompleteInput = "";
-
-                LOGGER.log(Level.FINEST, "Decoded string is >>>>>" + msg
-                    + "<<<<<");
-
-                int processed = 0;
-
-                String lines[] = msg.split("\r\n|\n|\r", -1);
-                int len = lines.length;
-                for (int i = 0; i < len; i++)
-                {
-                    String line = lines[i];
-                    if (i < len - 1)
-                    {
-                        synchronized (line)
-                        {
-                            inputQueue.put(line);
-                            line.wait();
-                        }
-                        processed++;
-                    }
-                    else if (i == len - 1 && line.equals(""))
-                    {
-                        // Received characters ended with newline, producing one
-                        // empty string at the end. Perfect.
+                        LOGGER.log(Level.SEVERE, "First packet must be signOn");
                     }
                     else
                     {
-                        LOGGER
-                            .log(Level.FINE,
-                                "last item incomplete, storing it: '" + line
-                                    + "'");
-                        incompleteInput = line;
+                        callMethod(method, li);
                     }
+                    LOGGER.finest("after  processing line '" + line + "'");
+                    processed++;
                 }
-                LOGGER.log(Level.FINEST, "Processed " + processed
-                    + " commands.");
-                byteBuffer.clear();
+                else if (i == len - 1 && line.equals(""))
+                {
+                    // Received characters ended with newline, producing one
+                    // empty string at the end. Perfect.
+                }
+                else
+                {
+                    LOGGER.log(Level.FINEST,
+                        "last item incomplete, storing it: '" + line + "'");
+                    incompleteInput = line;
+                    incompleteText = " (not handled: incomplete input '" +
+                        incompleteInput + "')";
+                }
             }
-            else
-            {
-                LOGGER.log(Level.FINE, "\nread is 0!");
-            }
-        }
-        catch (InterruptedException e)
-        {
-            LOGGER.log(Level.SEVERE, "Interrupted exception while putting to "
-                + "queue of sc " + socketChannel, e);
+            
+            LOGGER.log(Level.FINEST,
+                "Processed " + processed + " commands" + incompleteText + ".");
         }
         catch (CharacterCodingException cce)
         {
             LOGGER.log(Level.SEVERE,
-                "CharacterCodingException while reading from channel"
-                    + socketChannel, cce);
+                "CharacterCodingException while reading from channel" +
+                socketChannel, cce);
 
-        }
-        catch (IOException ioe)
-        {
-            LOGGER.log(Level.SEVERE, "IOException while reading from channel"
-                + socketChannel, ioe);
         }
     }
 
@@ -305,93 +171,17 @@ final class SocketServerThread extends Thread implements IClient
         }
         catch (CharacterCodingException e)
         {
-            LOGGER.log(Level.SEVERE,
-                "EncondingException while encoding String '" + msg
-                    + "' for channel " + socketChannel);
+            LOGGER.log(Level.WARNING,
+                "EncondingException '" + e.getMessage() + "'" +
+                " was thrown while encoding String '" + msg + "'" +
+                " for writing it to" + " channel for player " + playerName);
         }
         catch (IOException ioe)
         {
-            LOGGER.log(Level.SEVERE, "IOException while writing String '"
-                + msg + "' for channel " + socketChannel);
-        }
-    }
-
-    public synchronized void tellToTerminate()
-    {
-        toldToTerminate = true;
-        done = true;
-        try
-        {
-            sendViaChannel(Constants.dispose);
-        }
-        catch (Exception e)
-        {
-            LOGGER.log(Level.SEVERE, e.getMessage(), e);
-        }
-
-        if (Thread.currentThread() == this)
-        {
-            // no need to interrupt ourselves; we'll get to the top of loop
-            // after parseLine completed anyway.
-        }
-        else
-        {
-            synchronized (isWaitingLock)
-            {
-                // If socketReader is currently waiting on the socket, 
-                // we need to interrupt it. 
-                if (isWaiting)
-                {
-                    selfInterrupted = true;
-                    this.interrupt();
-                }
-                // Otherwise, it will return to back of loop
-                // anyway once it has done the parseLine execution.
-                else
-                {
-                    // no need to interrupt - nothing to do.
-                }
-            }
-        }
-    }
-
-    @Override
-    public void interrupt()
-    {
-        super.interrupt();
-
-        try
-        {
-            if (socketChannel != null)
-            {
-                socketChannel.close();
-            }
-        }
-        catch (IOException e)
-        {
-            // quietly close  
-        }
-    }
-
-    // if true, connection to this client is gone
-    // Server uses this to decide whether any nonAI player is 
-    // (even if perhaps dead) still connected (= watching).
-    public boolean isGone()
-    {
-        return this.isGone;
-    }
-
-    private synchronized void parseLine(String s)
-    {
-        List<String> li = Split.split(sep, s);
-        String method = li.remove(0);
-        if (playerName == null && !method.equals(Constants.signOn))
-        {
-            LOGGER.log(Level.SEVERE, "First packet must be signOn");
-        }
-        else
-        {
-            callMethod(method, li);
+            LOGGER.log(Level.WARNING,
+                "IOException '" + ioe.getMessage() + "'" +
+                " was thrown while writing String '" + msg + "'" +
+                " to channel for player " + playerName);
         }
     }
 
@@ -404,7 +194,12 @@ final class SocketServerThread extends Thread implements IClient
             boolean success = server.addClient(this, playerName, remote);
             if (success)
             {
+                // this setPlayerName is only send for the reason that the client
+                // expects a response quickly
                 setPlayerName(playerName);
+                // @TODO: move to outside Select loop 
+                //   => notify main thread to so this?
+                server.startGameIfAllPlayers();
             }
             else
             {
@@ -416,6 +211,7 @@ final class SocketServerThread extends Thread implements IClient
         {
             String newName = args.remove(0);
             // Prevent an infinite loop oscillating between two names.
+            // @TODO: is this still needed?
             if (!newName.equals(playerName)
                 && !newName.startsWith(Constants.byColor))
             {
@@ -555,12 +351,16 @@ final class SocketServerThread extends Thread implements IClient
         }
         else if (method.equals(Constants.withdrawFromGame))
         {
-            withdrawnAlready = true;
-            server.withdrawFromGame();
+            if (!withdrawnAlready)
+            {
+                withdrawnAlready = true;
+                server.withdrawFromGame();
+            }
         }
         else if (method.equals(Constants.disconnect))
         {
-            if (withdrawnAlready)
+            isGone = true;
+            if (!withdrawnAlready)
             {
                 LOGGER.log(Level.FINE,
                     "Client disconnected without explicit withdraw - "
@@ -568,14 +368,11 @@ final class SocketServerThread extends Thread implements IClient
                 server.withdrawFromGame();
                 withdrawnAlready = true;
             }
-            done = true;
             server.disconnect();
         }
         else if (method.equals(Constants.stopGame))
         {
-            // client will dispose itself soon, 
-            // do not attempt to further read from there.
-            done = true;
+            server.disconnect();
             server.stopGame();
         }
         else if (method.equals(Constants.setDonor))
@@ -653,7 +450,7 @@ final class SocketServerThread extends Thread implements IClient
     // Wrapper for all the send-over-socket methods:
     public void sendToClient(String message)
     {
-        if (done || isGone || socketChannel == null)
+        if (isGone || socketChannel == null)
         {
             // do not send any more
             /*
@@ -664,13 +461,26 @@ final class SocketServerThread extends Thread implements IClient
         }
         else
         {
-            LOGGER.finer("Sending message to client '" + playerName + "': "
-                + message);
+//            LOGGER.finer("Sending message to client '" + playerName + "': "
+//                + message);
             sendViaChannel(message);
         }
     }
 
     // IClient methods to sent requests to client over socket.
+
+    public void dispose()
+    {
+        // Don't do it again
+        if (isGone)
+        {
+            return;
+        }
+        
+        isGone = true;
+        sendViaChannel(Constants.dispose);
+        server.disposeSST(this);
+    }
 
     public void tellEngagement(MasterHex hex, Legion attacker, Legion defender)
     {
@@ -710,14 +520,6 @@ final class SocketServerThread extends Thread implements IClient
     {
         sendToClient(Constants.updateCreatureCount + sep + type.getName()
             + sep + count + sep + deadCount);
-    }
-
-    public void dispose()
-    {
-        if (!done)
-        {
-            tellToTerminate();
-        }
     }
 
     public void removeLegion(Legion legion)
@@ -788,11 +590,14 @@ final class SocketServerThread extends Thread implements IClient
     public void setPlayerName(String playerName)
     {
         this.playerName = playerName;
-        setName(playerName);
-
         sendToClient(Constants.setPlayerName + sep + playerName);
     }
 
+    public String getPlayerName()
+    {
+        return this.playerName;
+    }
+    
     public void createSummonAngel(Legion legion)
     {
         sendToClient(Constants.createSummonAngel + sep + legion.getMarkerId());

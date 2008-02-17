@@ -9,13 +9,10 @@ import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.nio.channels.SocketChannel;
-import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.sf.colossus.util.ChildThreadManager;
 import net.sf.colossus.util.ResourceLoader;
 import net.sf.colossus.util.Split;
 
@@ -32,22 +29,19 @@ final class FileServerThread extends Thread
         .getLogger(FileServerThread.class.getName());
 
     private ServerSocket fileServer;
-    private final List<SocketChannel> activeSocketChannelList;
-    private ChildThreadManager threadMgr;
 
     private static final String sep = Constants.protocolTermSeparator;
 
+    private final Server server;
     private final int port;
     private boolean keepGoingOn = true;
 
-    FileServerThread(java.util.List<SocketChannel> activeSocketChannelList, int port,
-        ChildThreadManager mgr)
+    FileServerThread(Server server, int port)
     {
         super();
         setDaemon(true);
-        this.activeSocketChannelList = activeSocketChannelList;
+        this.server = server;
         this.port = port;
-        this.threadMgr = mgr;
         try
         {
             fileServer = new ServerSocket(port, Constants.MAX_MAX_PLAYERS);
@@ -90,7 +84,6 @@ final class FileServerThread extends Thread
     @Override
     public void run()
     {
-        threadMgr.registerToThreadManager(this);
         net.sf.colossus.webcommon.InstanceTracker.register(this, "only 1");
         try
         {
@@ -105,20 +98,7 @@ final class FileServerThread extends Thread
                     }
 
                     InetAddress requester = fileClient.getInetAddress();
-
-                    boolean knownIP = false;
-
-                    synchronized (activeSocketChannelList)
-                    {
-                        Iterator<SocketChannel> it = activeSocketChannelList.iterator();
-                        while (it.hasNext() && !knownIP)
-                        {
-                            SocketChannel sc = it.next();
-                            InetAddress cIP = sc.socket().getInetAddress();
-                            knownIP = requester.equals(cIP);
-                        }
-                    }
-
+                    boolean knownIP = server.isKnownClient(requester);
                     if (knownIP)
                     {
                         InputStream is = fileClient.getInputStream();
@@ -209,7 +189,5 @@ final class FileServerThread extends Thread
                 + " outer try/catch block");
         }
 
-        threadMgr.unregisterFromThreadManager(this);
-        threadMgr = null;
     }
 }
