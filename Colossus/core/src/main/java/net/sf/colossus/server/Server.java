@@ -495,8 +495,8 @@ public final class Server extends Thread implements IServer
     // SocketServerThread cannot know the Player, and for finding it the 
     // if (remote) decision needs to be done 
     // -- so folded both methods into one again to avoid the NPE [Clemens]
-    synchronized void addClient(final IClient client, final String playerName,
-        final boolean remote)
+    synchronized boolean addClient(final IClient client,
+        final String playerName, final boolean remote)
     {
         LOGGER.finest("Calling Server.addClient() for " + playerName);
 
@@ -514,9 +514,17 @@ public final class Server extends Thread implements IServer
         {
             LOGGER.warning("Could not add client, "
                 + "because no Player was found for playerName " + playerName);
-            return;
+            return false;
         }
 
+        if (clientMap.containsKey(player))
+        {
+            LOGGER.warning("Could not add client, "
+                + "because Player for playerName " + playerName +
+                " had already signed on.");
+            return false;
+            
+        }
         clients.add(client);
         clientMap.put(player, client);
 
@@ -559,6 +567,7 @@ public final class Server extends Thread implements IServer
                 startLog.setCompleted();
             }
         }
+        return true;
     }
 
     private void addRemoteClient(final IClient client, final Player player)
@@ -572,9 +581,18 @@ public final class Server extends Thread implements IServer
 
         if (!game.isLoadingGame())
         {
-            player.setName(game.getUniqueName(player.getName()));
-            // In case we had to change a duplicate name.
-            setPlayerName(player, player.getName());
+            // Returns original name if no other player has this name
+            String uName = game.getUniqueName(player.getName(), player);
+            if (!uName.equals(player.getName()))
+            {
+                // set in player
+                player.setName(uName);
+            }
+            // set playerName + threadname in SST, and send to client:
+            // It's necessary to send to client only for that reason, that
+            // it otherwise might time out if it does not get quick response
+            // (5 seconds) from server to it's initial signOn request
+            setPlayerName(player, uName);
         }
     }
 
@@ -2000,11 +2018,9 @@ public final class Server extends Thread implements IServer
     public synchronized void assignColor(String color)
     {
         Player p = getPlayer();
-        if (p == null)
-        {
-            System.out.println("player is null!");
-            System.exit(1);
-        }
+        assert p != null : "getPlayer returned null player (in thread " +
+            Thread.currentThread().getName() + ")";
+
         if (!getPlayer().equals(game.getNextColorPicker()))
         {
             LOGGER.severe(getPlayerName() + " illegally called assignColor()");

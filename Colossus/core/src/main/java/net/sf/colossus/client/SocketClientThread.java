@@ -964,12 +964,10 @@ final class SocketClientThread extends Thread implements IServer
             + client.getOwningPlayer().getName() + sep + client.isRemote());
     }
 
-    /** Set the thread name to playerName, and tell the server so we
-     *  can set this playerName in the right SocketServerThread. */
+    /** Set the thread name to playerName */
     void fixName(String playerName)
     {
         setName("Client " + playerName);
-        sendToServer(Constants.fixName + sep + playerName);
     }
 
     // IServer methods, called from client and sent over the

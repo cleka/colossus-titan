@@ -424,6 +424,10 @@ public final class GetPlayers extends KFrame implements WindowListener,
         {
             name = Constants.byType;
         }
+        else if (name.startsWith(Constants.byClient))
+        {
+            name = Constants.byClient;
+        }
         Vector<String> nameChoices = new Vector<String>();
         nameChoices.add(name);
         if (!nameChoices.contains(Constants.byColor))
@@ -526,7 +530,7 @@ public final class GetPlayers extends KFrame implements WindowListener,
                 if (names.contains(name))
                 {
                     JOptionPane.showMessageDialog(this,
-                        "Duplicate player names!");
+                        "Duplicate player name '" + name + "'!");
                     options.clearPlayerInfo();
                     return false;
                 }
@@ -680,6 +684,41 @@ public final class GetPlayers extends KFrame implements WindowListener,
         }
     }
 
+    private String makeUniqueName(String baseName, int i)
+    {
+        String tryName = baseName; 
+        boolean duplicate = true;
+        while (duplicate)
+        {
+            duplicate = false;
+            for (int j = 0; j < Constants.MAX_MAX_PLAYERS; j++)
+            {
+                if (j!=i)
+                {
+                    String otherBoxName = (String) playerNames[j].getSelectedItem();
+                    if (tryName.equals(otherBoxName))
+                    {
+                        duplicate = true;
+                    }
+                }
+            }
+            if (duplicate)
+            {
+                // on first attempt, take row number
+                if (tryName.equals(Constants.username))
+                {
+                    tryName = tryName + i;
+                }
+                // if that does not help, random until unique
+                else
+                {
+                    tryName = tryName + Dice.rollDie();
+                }
+            }
+        }
+        return tryName;
+    }
+    
     public synchronized void actionPerformed(ActionEvent e)
     {
         if (e.getActionCommand().equals(Constants.quitGame))
@@ -811,7 +850,9 @@ public final class GetPlayers extends KFrame implements WindowListener,
                         }
                         else if (value.endsWith(Constants.human))
                         {
-                            playerNames[i].setSelectedItem(Constants.username);
+                            String uniqueHuman = 
+                                makeUniqueName(Constants.username, i);
+                            playerNames[i].setSelectedItem(uniqueHuman);
                         }
                         // If player type was changed away from none, also
                         // change player name to something else.

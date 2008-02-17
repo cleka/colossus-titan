@@ -327,13 +327,14 @@ public final class GameServerSide extends Game
         assignColors();
     }
 
-    private boolean nameIsTaken(String name)
+    private boolean nameIsTaken(String name, Player checkedPlayer)
     {
         for (int i = 0; i < getNumPlayers(); i++)
         {
             Player player = players.get(i);
 
-            if (player.getName().equals(name))
+            if (player.getName().equals(name) && 
+                ! player.equals(checkedPlayer))
             {
                 return true;
             }
@@ -342,13 +343,13 @@ public final class GameServerSide extends Game
     }
 
     /** If the name is taken, add random digits to the end. */
-    String getUniqueName(final String name)
+    String getUniqueName(final String name, Player player)
     {
-        if (!nameIsTaken(name))
+        if (!nameIsTaken(name, player))
         {
             return name;
         }
-        return getUniqueName(name + Dice.rollDie());
+        return getUniqueName(name + Dice.rollDie(), player);
     }
 
     /** Find a Player for a new remote client.
@@ -374,6 +375,7 @@ public final class GameServerSide extends Game
                 {
                     if (curPlayer.getName().startsWith(Constants.byClient))
                     {
+                        curPlayer.setName(playerName);
                         return curPlayer;
                     }
                 }

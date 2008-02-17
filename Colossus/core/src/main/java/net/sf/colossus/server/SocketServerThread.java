@@ -401,8 +401,15 @@ final class SocketServerThread extends Thread implements IClient
         {
             String playerName = args.remove(0);
             boolean remote = Boolean.valueOf(args.remove(0)).booleanValue();
-            setPlayerName(playerName);
-            server.addClient(this, playerName, remote);
+            boolean success = server.addClient(this, playerName, remote);
+            if (success)
+            {
+                setPlayerName(playerName);
+            }
+            else
+            {
+                sendToClient(Constants.signOn + sep + "rejected");
+            }
             InstanceTracker.setId(this, playerName);
         }
         else if (method.equals(Constants.fixName))
