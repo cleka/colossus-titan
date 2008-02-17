@@ -51,20 +51,21 @@ public class InstanceTracker
     // put into the HashSet with the block below:
     static
     {
-        interestedIn.add("net.sf.colossus.server.Player");
         interestedIn.add("net.sf.colossus.client.Client");
         interestedIn.add("net.sf.colossus.client.SocketClientThread");
         interestedIn.add("net.sf.colossus.client.MasterBoard");
         interestedIn.add("net.sf.colossus.ai.SimpleAI");
 
         interestedIn.add("net.sf.colossus.util.KFrame");
+        interestedIn.add("net.sf.colossus.util.KDialog");
         interestedIn.add("net.sf.colossus.client.BattleMap");
         interestedIn.add("net.sf.colossus.client.ShowReadme");
         interestedIn.add("net.sf.colossus.client.ShowHelpDoc");
 
+        interestedIn.add("net.sf.colossus.server.PlayerServerSide");
         interestedIn.add("net.sf.colossus.server.Start");
         interestedIn.add("net.sf.colossus.server.GetPlayers");
-        interestedIn.add("net.sf.colossus.server.Game");
+        interestedIn.add("net.sf.colossus.server.GameServerSide");
         interestedIn.add("net.sf.colossus.server.Server");
         interestedIn.add("net.sf.colossus.server.SocketServerThread");
 
