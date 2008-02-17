@@ -794,11 +794,18 @@ public final class Start
 
         } // end WHILE not QuitAll
 
+        // Probably this could be totally deleted, but...
         // DebugMethods.doCleanupStuff(true);
 
-        // DebugMethods.waitLoopUntilAllIsCleanedUp();
-
-        // DebugMethods.waitReturnLoop(false);
+        final boolean doWaitReturnLoop = false;
+        if (doWaitReturnLoop)
+        {
+            // if this is used, make sure you have debug level for 
+            // Root logger and InstanceTracker at least to INFO, 
+            // otherwise you won't see any statistics...
+            final boolean forceLoopAnyway = false;
+            DebugMethods.waitReturnLoop(forceLoopAnyway);
+        }
 
         final boolean printObjectStatistics = false;
         if (printObjectStatistics)
@@ -808,7 +815,7 @@ public final class Start
 
         // If want to have a way to prevent it from straight exit,
         // e.g. look at it with Profiler when everything is supposed to
-        // be gone already.
+        // be gone already (Clemens)
         final boolean waitReturnBeforeExiting = false;
         if (waitReturnBeforeExiting)
         {
