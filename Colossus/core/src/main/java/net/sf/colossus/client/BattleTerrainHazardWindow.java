@@ -416,7 +416,7 @@ public class BattleTerrainHazardWindow extends KDialog
             || "Rangestriking".equals(strike))
         {
             overlay = new String[1];
-            overlay[0] = "";
+            overlay[0] = "RangestrikeBase";
         }
         else
         {
