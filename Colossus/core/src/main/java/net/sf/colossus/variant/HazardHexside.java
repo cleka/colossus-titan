@@ -2,7 +2,8 @@ package net.sf.colossus.variant;
 
 
 import java.util.Collection;
-import java.util.LinkedList;
+import java.util.HashMap;
+import java.util.Map;
 
 
 /** 
@@ -11,6 +12,11 @@ import java.util.LinkedList;
  */
 public class HazardHexside extends Hazards
 {
+    /**
+    * A map from the serialization string of a Hexside to the instances.
+    */
+    private final static Map<String, HazardHexside> HEXSIDE_MAP = new HashMap<String, HazardHexside>();
+
     public HazardHexside(String name, char code,
         EffectOnMovement effectOnGroundMovement,
         EffectOnMovement effectOnFlyerMovement,
@@ -37,33 +43,25 @@ public class HazardHexside extends Hazards
             RangeStruckEffectAdjustment, effectforRangeStrikeFromTerrain,
             scopeForRangeStrikeEffect, RangeStrikeEffectAdjustment,
             RangeStrikeSpecial, terrainSpecial);
+        HEXSIDE_MAP.put(name, this);
     }
 
-    public static HazardHexside getTerrainByName(String name)
+    public static HazardHexside getHexsideByName(String name)
     {
-        return (HazardHexside)getByName(name);
+        return HEXSIDE_MAP.get(name);
     }
 
     /**
-     * Returns all available hazard terrains.
+     * Returns all available hazard hexsides.
      * 
-     * This is not variant-specific, any terrain known to the program is listed even
+     * This is not variant-specific, any hexside known to the program is listed even
      * if it is not available in the current variant.
      * 
      * TODO this should really be a question to ask a variant instance
      */
     public static final Collection<HazardHexside> getAllHazardHexsides()
     {
-        Collection<Hazards> hazards = getAllHazards();
-        Collection<HazardHexside> hexsides = new LinkedList<HazardHexside>();
-        for (Hazards hazard : hazards)
-        {
-            if (hazard instanceof HazardHexside)
-            {
-                hexsides.add((HazardHexside)hazard);
-            }
-        }
-        return hexsides;
+        return HEXSIDE_MAP.values();
     }
 
     public static final HazardHexside NOTHING = new HazardHexside("Nothing",

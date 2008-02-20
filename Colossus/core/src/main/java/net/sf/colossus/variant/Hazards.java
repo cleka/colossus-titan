@@ -1,11 +1,6 @@
 package net.sf.colossus.variant;
 
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-
-
 /** 
  * Superclass for BattleMap hazards: Terrain & Hexsides, 
  */
@@ -41,11 +36,6 @@ public abstract class Hazards implements HazardConstants
 
     public final RangeStrikeSpecialEffect RangeStrikeSpecial;
     public final SpecialEffect terrainSpecial;
-
-    /**
-     * A map from the serialization string of a terrain to the instances.
-     */
-    private final static Map<String, Hazards> MAP = new HashMap<String, Hazards>();
 
     public Hazards(String name, char code,
         EffectOnMovement effectOnGroundMovement,
@@ -86,7 +76,6 @@ public abstract class Hazards implements HazardConstants
         this.RangeStrikeSpecial = RangeStrikeSpecial;
         this.terrainSpecial = terrainSpecial;
 
-        MAP.put(name, this);
     }
 
     public String getName()
@@ -97,24 +86,6 @@ public abstract class Hazards implements HazardConstants
     public char getCode()
     {
         return code;
-    }
-
-    static Hazards getByName(String name)
-    {
-        return MAP.get(name);
-    }
-
-    /**
-     * Returns all available hazard terrains.
-     * 
-     * This is not variant-specific, any terrain known to the program is listed even
-     * if it is not available in the current variant.
-     * 
-     * TODO this should really be a question to ask a variant instance
-     */
-    static final Collection<Hazards> getAllHazards()
-    {
-        return MAP.values();
     }
 
     @Override

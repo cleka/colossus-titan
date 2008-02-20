@@ -2,7 +2,8 @@ package net.sf.colossus.variant;
 
 
 import java.util.Collection;
-import java.util.LinkedList;
+import java.util.HashMap;
+import java.util.Map;
 
 
 /** 
@@ -11,6 +12,11 @@ import java.util.LinkedList;
  */
 public class HazardTerrain extends Hazards
 {
+    /**
+     * A map from the serialization string of a terrain to the instances.
+     */
+    private final static Map<String, HazardTerrain> TERRAIN_MAP = new HashMap<String, HazardTerrain>();
+
     public HazardTerrain(String name, char code,
         EffectOnMovement effectOnGroundMovement,
         EffectOnMovement effectOnFlyerMovement,
@@ -37,6 +43,7 @@ public class HazardTerrain extends Hazards
             RangeStruckEffectAdjustment, effectforRangeStrikeFromTerrain,
             scopeForRangeStrikeEffect, RangeStrikeEffectAdjustment,
             RangeStrikeSpecial, terrainSpecial);
+        TERRAIN_MAP.put(name, this);
     }
 
     public boolean isNativeBonusTerrain()
@@ -74,7 +81,7 @@ public class HazardTerrain extends Hazards
 
     public static HazardTerrain getTerrainByName(String name)
     {
-        return (HazardTerrain)getByName(name);
+        return TERRAIN_MAP.get(name);
     }
 
     /**
@@ -87,16 +94,7 @@ public class HazardTerrain extends Hazards
      */
     public static final Collection<HazardTerrain> getAllHazardTerrains()
     {
-        Collection<Hazards> hazards = getAllHazards();
-        Collection<HazardTerrain> terrain = new LinkedList<HazardTerrain>();
-        for (Hazards hazard : hazards)
-        {
-            if (hazard instanceof HazardTerrain)
-            {
-                terrain.add((HazardTerrain)hazard);
-            }
-        }
-        return terrain;
+        return TERRAIN_MAP.values();
     }
 
     public static final HazardTerrain PLAINS = new HazardTerrain("Plains",
