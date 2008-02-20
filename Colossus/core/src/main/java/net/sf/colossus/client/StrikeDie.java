@@ -15,7 +15,12 @@ final class StrikeDie extends Chit
 
     StrikeDie(int scale, int roll, String type)
     {
-        super(scale, getDieImageName(type, roll));
+        this(scale, roll, type, null);
+    }
+
+    StrikeDie(int scale, int roll, String type, String[] overlays)
+    {
+        super(scale, getDieImageName(type, roll), overlays);
         lastRoll = roll;
         setOpaque(false);
     }

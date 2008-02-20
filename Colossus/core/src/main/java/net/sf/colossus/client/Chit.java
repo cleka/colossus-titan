@@ -65,6 +65,11 @@ class Chit extends JPanel
         this(scale, id, false, false);
     }
 
+    Chit(int scale, String id, String[] overlays)
+    {
+        this(scale, id, false, false, false, overlays);
+    }
+
     Chit(int scale, String id, boolean inverted)
     {
         this(scale, id, inverted, false, false);
@@ -75,11 +80,17 @@ class Chit extends JPanel
         this(scale, id, inverted, dubious, false);
     }
 
+    Chit(int scale, String id, boolean inverted, boolean dubious,
+        boolean dubiousAsBlank)
+    {
+        this(scale, id, inverted, dubious, dubiousAsBlank, null);
+    }
+
     // TODO this is a bit confusing: the id parameter can be either the name of a 
     //      creature type or a markerId (maybe more?). Good thing markerIds have no
     //      overlap with creature names
     Chit(int scale, String id, boolean inverted, boolean dubious,
-        boolean dubiousAsBlank)
+        boolean dubiousAsBlank, String[] overlays)
     {
         // LayoutManager null - we want to place things ourselves
         super((LayoutManager)null);
@@ -156,7 +167,20 @@ class Chit extends JPanel
             }
             else
             {
-                bufferedImage = getImage(id, scale);
+                if (overlays == null)
+                {
+                    bufferedImage = getImage(id, scale);
+                }
+                else
+                {
+                    String[] filenames = new String[overlays.length + 1];
+                    filenames[0] = id;
+                    for (int i = 0; i < overlays.length; i++)
+                    {
+                        filenames[i + 1] = overlays[i];
+                    }
+                    bufferedImage = getImage(filenames, scale);
+                }
             }
         }
     }

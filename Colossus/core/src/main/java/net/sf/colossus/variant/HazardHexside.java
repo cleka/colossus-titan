@@ -92,7 +92,7 @@ public class HazardHexside extends Hazards
 
     public static final HazardHexside SLOPE = new HazardHexside("Slope", 's',
         EffectOnMovement.SLOWFOREIGNER, EffectOnMovement.FREEMOVE,
-        EffectOnStrike.SKILLPENALTY, ScopeOfEffectOnStrike.FOREIGNERS, -1,
+        EffectOnStrike.SKILLPENALTY, ScopeOfEffectOnStrike.FOREIGNERS, 1,
         EffectOnStrike.POWERBONUS, ScopeOfEffectOnStrike.NATIVES, 1,
         EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0,
         EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0,

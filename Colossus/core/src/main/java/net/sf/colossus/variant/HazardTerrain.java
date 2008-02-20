@@ -111,16 +111,16 @@ public class HazardTerrain extends Hazards
         EffectOnMovement.BLOCKFOREIGNER, EffectOnMovement.FREEMOVE,
         EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0,
         EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0,
+        EffectOnStrike.BLOCKED, ScopeOfEffectOnStrike.IMPERIALS, 0,
         EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0,
-        EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0,
-        RangeStrikeSpecialEffect.RANGESTRIKEFREE, SpecialEffect.NOSPECIAL);
+        RangeStrikeSpecialEffect.RANGESTRIKEBLOCKED, SpecialEffect.NOSPECIAL);
 
     public static final HazardTerrain BRAMBLES = new HazardTerrain("Brambles",
         'b', EffectOnMovement.SLOWFOREIGNER, EffectOnMovement.SLOWFOREIGNER,
         EffectOnStrike.SKILLBONUS, ScopeOfEffectOnStrike.PATRIOTS, 1,
-        EffectOnStrike.SKILLPENALTY, ScopeOfEffectOnStrike.IMPERIALS, -1,
+        EffectOnStrike.SKILLPENALTY, ScopeOfEffectOnStrike.IMPERIALS, 1,
         EffectOnStrike.SKILLBONUS, ScopeOfEffectOnStrike.PATRIOTS, 1,
-        EffectOnStrike.SKILLPENALTY, ScopeOfEffectOnStrike.IMPERIALS, -1,
+        EffectOnStrike.SKILLPENALTY, ScopeOfEffectOnStrike.IMPERIALS, 1,
         RangeStrikeSpecialEffect.RANGESTRIKESKILLPENALTY,
         SpecialEffect.NOSPECIAL);
 

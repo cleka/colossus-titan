@@ -41,7 +41,7 @@ public class BattleTerrainHazardWindow extends KDialog
     private static final int HEX_SIZE = 15;
     private static final int EFFECT_SIZE = 20;
     private static final int CREATURE_SIZE = 30;
-    private static final int DIE_SIZE = 15;
+    private static final int STRIKE_SIZE = 15;
 
     private static GridBagConstraints GBC_DEFAULT = new GridBagConstraints();
     static
@@ -115,6 +115,7 @@ public class BattleTerrainHazardWindow extends KDialog
         container.add(new JLabel("Natives"), GBC_DEFAULT);
         container.add(new JLabel("Strike"), dblConstraints);
         container.add(new JLabel("Defence"), dblConstraints);
+        container.add(new JLabel("Special"), dblConstraints);
 
         // add an empty cell to finalize the row and eat extra space
         GridBagConstraints constraints = (GridBagConstraints)GBC_DEFAULT
@@ -144,7 +145,8 @@ public class BattleTerrainHazardWindow extends KDialog
         }
         for (HazardHexside hazard : HazardHexside.getAllHazardHexsides())
         {
-            if (hexsidesDisplayed.containsKey(hazard.getName())
+            if ("nothing".equalsIgnoreCase(hazard.getName())
+                || hexsidesDisplayed.containsKey(hazard.getName())
                 || hex.getTerrain().getHazardSideCount(hazard.getCode()) == 0)
             {
                 // Ignore
@@ -178,6 +180,7 @@ public class BattleTerrainHazardWindow extends KDialog
         addNativesPanel(container, hazard);
         addStrikeInfo(container, hazard);
         addDefenderInfo(container, hazard);
+        addSpecialInfo(container, hazard);
 
         // add an empty cell to finalize the row and eat extra space
         GridBagConstraints constraints = new GridBagConstraints();
@@ -286,7 +289,7 @@ public class BattleTerrainHazardWindow extends KDialog
         else if (hazard.effectOnFlyerMovement
             .equals(HazardConstants.EffectOnMovement.BLOCKFOREIGNER))
         {
-            flySymbol = new Chit(EFFECT_SIZE, "FlyingNative");
+            flySymbol = new Chit(EFFECT_SIZE, "FlyingNativeOnly");
             flySymbol.setToolTipText("Native Flyers Only");
         }
         else if (hazard.effectOnFlyerMovement
@@ -330,7 +333,7 @@ public class BattleTerrainHazardWindow extends KDialog
         else if (hazard.effectOnGroundMovement
             .equals(HazardConstants.EffectOnMovement.SLOWALL))
         {
-            groundSymbol = new Chit(EFFECT_SIZE, "GroundSlow");
+            groundSymbol = new Chit(EFFECT_SIZE, "GroundAllSlow");
             groundSymbol.setToolTipText("Slows Ground Movement");
         }
         else
@@ -339,22 +342,47 @@ public class BattleTerrainHazardWindow extends KDialog
             groundSymbol.setToolTipText("No Effect On Ground Movement");
         }
         container.add(groundSymbol, GBC_NORTHWEST);
-        //        if (hazard instanceof HazardTerrain)
-        //        {
-        //            HazardTerrain terrain = (HazardTerrain)hazard;
-        //            if (terrain.isNativeBonusTerrain())
-        //            {
-        //                Chit bonusSymbol = new Chit(30, "NativeSlow");
-        //                movementPanel.add(bonusSymbol);
-        //                bonusSymbol.setToolTipText("Natives get Bonuses");
-        //            }
-        //            if (terrain.isNonNativePenaltyTerrain())
-        //            {
-        //                Chit penaltySumbol = new Chit(30, "NativePenalty");
-        //                penaltySumbol.setToolTipText("NonNatives get Penalty");
-        //                movementPanel.add(penaltySumbol);
-        //            }
-        //        }
+    }
+
+    private void addSpecialInfo(Container container, Hazards hazard)
+    {
+        Chit rangeStrikeSymbol;
+        if (hazard.RangeStrikeSpecial
+            .equals(HazardConstants.RangeStrikeSpecialEffect.RANGESTRIKEBLOCKED))
+        {
+            rangeStrikeSymbol = new Chit(EFFECT_SIZE, "RangeStrikeBlocked");
+            rangeStrikeSymbol
+                .setToolTipText("Blocks normal Rangestrikes-Magic is not blocked");
+        }
+        else if (hazard.RangeStrikeSpecial
+            .equals(HazardConstants.RangeStrikeSpecialEffect.RANGESTRIKEWALL))
+        {
+            rangeStrikeSymbol = new Chit(EFFECT_SIZE, "RangeStrikeWall");
+            rangeStrikeSymbol
+                .setToolTipText("Blocks Rangestrikes unless Hazard is"
+                    + "occupied by either the Rangestriker or the target.");
+        }
+        else if (hazard.RangeStrikeSpecial
+            .equals(HazardConstants.RangeStrikeSpecialEffect.RANGESTRIKESKILLPENALTY))
+        {
+            rangeStrikeSymbol = new Chit(EFFECT_SIZE, "RangeStrikeSkill");
+            rangeStrikeSymbol
+                .setToolTipText("Non Natives to this Hazard sill lose 1 Skill"
+                    + "for each hazard of this type being crossed.");
+        }
+        else
+        {
+            rangeStrikeSymbol = new Chit(EFFECT_SIZE, "RangeStrikeFree");
+            rangeStrikeSymbol.setToolTipText("No effect on Rangestrikes.");
+        }
+        container.add(rangeStrikeSymbol);
+
+        if (hazard.terrainSpecial
+            .equals(HazardConstants.SpecialEffect.HEALTHDRAIN))
+        {
+            Chit special = new Chit(EFFECT_SIZE, "HealthDrain");
+            special.setToolTipText("Non natives lose 1 health per turn");
+        }
     }
 
     private void addDefenderInfo(Container container, Hazards hazard)
@@ -383,10 +411,22 @@ public class BattleTerrainHazardWindow extends KDialog
         HazardConstants.EffectOnStrike strikeEffect,
         HazardConstants.ScopeOfEffectOnStrike scope, int effectAdjustment)
     {
+        String[] overlay;
+        if ("Being Rangestruck".equals(strike)
+            || "Rangestriking".equals(strike))
+        {
+            overlay = new String[1];
+            overlay[0] = "";
+        }
+        else
+        {
+            overlay = null;
+        }
+
         Chit strikeSymbol;
         if (strikeEffect.equals(HazardConstants.EffectOnStrike.BLOCKED))
         {
-            strikeSymbol = new Chit(DIE_SIZE, "StrikeBlocked");
+            strikeSymbol = new Chit(STRIKE_SIZE, "StrikeBlocked", overlay);
             strikeSymbol.setToolTipText(strike
                 + " Across Hazard is not Possible");
         }
@@ -395,8 +435,17 @@ public class BattleTerrainHazardWindow extends KDialog
             || strikeEffect
                 .equals(HazardConstants.EffectOnStrike.SKILLPENALTY))
         {
-            strikeSymbol = new StrikeDie(DIE_SIZE, 4 + effectAdjustment,
-                "RedBlue");
+            if (strikeEffect
+                .equals(HazardConstants.EffectOnStrike.SKILLPENALTY))
+            {
+                strikeSymbol = new StrikeDie(STRIKE_SIZE, effectAdjustment,
+                    "Miss", overlay);
+            }
+            else
+            {
+                strikeSymbol = new StrikeDie(STRIKE_SIZE, effectAdjustment,
+                    "Hit", overlay);
+            }
             StringBuilder tip = new StringBuilder();
             if (scope.equals(HazardConstants.ScopeOfEffectOnStrike.FOREIGNERS)
                 || scope
@@ -443,7 +492,7 @@ public class BattleTerrainHazardWindow extends KDialog
             || strikeEffect
                 .equals(HazardConstants.EffectOnStrike.POWERPENALTY))
         {
-            strikeSymbol = new StrikeDie(DIE_SIZE, 1, "RedBlue");
+            strikeSymbol = new StrikeDie(STRIKE_SIZE, 1, "RedBlue", overlay);
             StringBuilder tip = new StringBuilder();
             if (scope.equals(HazardConstants.ScopeOfEffectOnStrike.FOREIGNERS)
                 || scope
@@ -486,7 +535,7 @@ public class BattleTerrainHazardWindow extends KDialog
         }
         else
         {
-            strikeSymbol = new StrikeDie(DIE_SIZE, 4, "RedBlue");
+            strikeSymbol = new StrikeDie(STRIKE_SIZE, 0, "RedBlue", overlay);
             strikeSymbol.setToolTipText("Normal Strike");
         }
         return strikeSymbol;
