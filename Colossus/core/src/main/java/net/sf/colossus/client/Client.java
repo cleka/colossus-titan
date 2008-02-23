@@ -2356,6 +2356,13 @@ public final class Client implements IClient, IOracle
         return donor.getContents().contains(name);
     }
 
+    /**
+     * recruits is the list of acquirables that can be chosen from
+     * for a certain point value reached. E.g. for getting 180 points,
+     * going from 380 + 180 = 560,
+     * game would first call this for 400: recruits = [Angel]
+     * and then call it once more for 500: recruits = [Angel, Archangel]
+     */
     public void askAcquireAngel(Legion legion, List<String> recruits)
     {
         if (options.getOption(Options.autoAcquireAngels))
