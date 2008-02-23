@@ -177,11 +177,24 @@ public final class LegionServerSide extends Legion implements
                     angelType);
                 if (angel != null)
                 {
-                    addCreature(angel, true);
                     LOGGER.log(Level.INFO, "Legion " + getLongMarkerName()
-                        + " acquires one " + angelType);
-                    game.getServer().allTellAddCreature(this, angelType, true,
-                        Constants.reasonAcquire);
+                        + " is going to call addCreature() to add "
+                        + "one acquired " + angelType);
+
+                    if (addCreature(angel, true))
+                    {
+                        LOGGER.log(Level.INFO, "Legion " + getLongMarkerName()
+                            + " acquired one " + angelType);
+                        game.getServer().allTellAddCreature(this, angelType,
+                            true, Constants.reasonAcquire);
+                    }
+                    else
+                    {
+                        LOGGER.log(Level.WARNING, "Legion "
+                            + getLongMarkerName()
+                            + " attempting to acquire one " + angelType
+                            + " failed!!");
+                    }
                 }
             }
         }
