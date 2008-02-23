@@ -1686,7 +1686,17 @@ public final class Client implements IClient, IOracle
     {
         PlayerClientSide player = getPlayerByMarkerId(markerId);
         LegionClientSide legion = player.getLegionByMarkerId(markerId);
-        assert legion != null : "No legion with markerId '" + markerId + "'";
+        // Added this logging only for the purpose that one gets a clue
+        // when during the game this happened - the assertion appears only
+        // on stderr. Now it's also in the log, so one sees what was logged
+        // just before and after it.
+        if (legion == null)
+        {
+            LOGGER.log(Level.SEVERE, "No legion with markerId '" + markerId
+                + "' (for player " + player + ")");
+        }
+        assert legion != null : "No legion with markerId '" + markerId + "'"
+            + " (for player " + player + ")";
         return legion;
     }
 
