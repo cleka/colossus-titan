@@ -2271,24 +2271,7 @@ public final class Client implements IClient, IOracle
                     "Human") || options.getStringOption(Options.playerType)
                 .endsWith("Network"))))
         {
-            disposeEventViewer();
-            disposePreferencesWindow();
-            disposeEngagementResults();
-            disposeInspector();
-            disposeCaretakerDisplay();
-            disposeLogWindow();
-            disposeMasterBoard();
-
-            board = new MasterBoard(this);
-            initEventViewer();
-            initShowEngagementResults();
-            initPreferencesWindow();
-            showOrHideAutoInspector(options
-                .getOption(Options.showAutoInspector));
-            showOrHideLogWindow(options.getOption(Options.showLogWindow));
-            showOrHideCaretaker(options.getOption(Options.showCaretaker));
-
-            focusBoard();
+            ensureEdtSetupClientGUI();
         }
 
         if (startedByWebClient)
@@ -2298,6 +2281,59 @@ public final class Client implements IClient, IOracle
                 webClient.notifyComingUp();
             }
         }
+    }
+
+    public void ensureEdtSetupClientGUI()
+    {
+        if (SwingUtilities.isEventDispatchThread())
+        {
+            setupClientGUI();
+        }
+        else
+        {
+            try
+            {
+                SwingUtilities.invokeAndWait(new Runnable()
+                {
+                    public void run()
+                    {
+                        setupClientGUI();
+                    }
+                });
+            }
+            catch (InvocationTargetException e)
+            {
+                LOGGER.log(Level.SEVERE,
+                    "Failed to run setupClientGUI with invokeAndWait(): ", e);
+            }
+            catch (InterruptedException e2)
+            {
+                LOGGER.log(Level.SEVERE,
+                    "Failed to run setupClientGUI with invokeAndWait(): ", e2);
+            }
+
+        }
+    }
+
+    public void setupClientGUI()
+    {
+        disposeEventViewer();
+        disposePreferencesWindow();
+        disposeEngagementResults();
+        disposeInspector();
+        disposeCaretakerDisplay();
+        disposeLogWindow();
+        disposeMasterBoard();
+
+        board = new MasterBoard(this);
+        initEventViewer();
+        initShowEngagementResults();
+        initPreferencesWindow();
+        showOrHideAutoInspector(options.getOption(Options.showAutoInspector));
+        showOrHideLogWindow(options.getOption(Options.showLogWindow));
+        showOrHideCaretaker(options.getOption(Options.showCaretaker));
+
+        focusBoard();
     }
 
     public void setPlayerName(String playerName)
