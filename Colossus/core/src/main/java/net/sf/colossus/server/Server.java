@@ -1218,8 +1218,10 @@ public final class Server extends Thread implements IServer
 
         else if (!((LegionServerSide)legion).canRecruit())
         {
-            LOGGER.severe("Illegal legion " + legion + " for recruit: "
-                + recruitName + " recruiterName " + recruiterName);
+            int size = ((LegionServerSide)legion).getHeight();
+            LOGGER.severe("Illegal legion " + legion + " (height=" + size
+                + ") for recruit: " + recruitName + " recruiterName "
+                + recruiterName);
             client.nak(Constants.doRecruit, "Illegal recruit");
         }
 
