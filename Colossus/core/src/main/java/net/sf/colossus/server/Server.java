@@ -27,7 +27,6 @@ import net.sf.colossus.client.Proposal;
 import net.sf.colossus.game.Game;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
-// import net.sf.colossus.util.ChildThreadManager;
 import net.sf.colossus.util.Options;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.MasterHex;
@@ -60,13 +59,11 @@ public final class Server extends Thread implements IServer
 
     /** Map of players to their clients. */
     private final Map<Player, IClient> clientMap = new HashMap<Player, IClient>();
-    private final Map<SocketChannel, SocketServerThread> clientChannelMap =
-        new HashMap<SocketChannel, SocketServerThread>();
+    private final Map<SocketChannel, SocketServerThread> clientChannelMap = new HashMap<SocketChannel, SocketServerThread>();
     // list of Socket that are currently active
     // TODO: perhaps we could eliminate activeSocketChannelList,
     //       they are all also in clientChannelMap
-    private final List<SocketChannel> activeSocketChannelList 
-        = new ArrayList<SocketChannel>();
+    private final List<SocketChannel> activeSocketChannelList = new ArrayList<SocketChannel>();
 
     /** Number of remote clients we're waiting for. */
     private int waitingForClients;
@@ -91,7 +88,6 @@ public final class Server extends Thread implements IServer
      * previously allocated FileServerThread */
     private static Thread fileServerThread = null;
 
-
     private boolean serverRunning = false;
     private boolean obsolete = false;
     private boolean shuttingDown = false;
@@ -109,9 +105,9 @@ public final class Server extends Thread implements IServer
 
     SocketServerThread processingSST = null;
     String processingPlayerName = null;
-    
+
     private final List<SocketServerThread> channelChanges = new ArrayList<SocketServerThread>();
-    
+
     Server(GameServerSide game, int port)
     {
         this.game = game;
@@ -178,7 +174,7 @@ public final class Server extends Thread implements IServer
         }
         return knownIP;
     }
-    
+
     void initSocketServer()
     {
         numClients = 0;
@@ -231,7 +227,7 @@ public final class Server extends Thread implements IServer
         try
         {
             LOGGER.log(Level.FINEST, "before select()");
-            
+
             int num = selector.select();
             LOGGER.log(Level.FINEST, "select returned, " + num
                 + " channels are ready to be processed.");
@@ -246,13 +242,16 @@ public final class Server extends Thread implements IServer
                 if ((key.readyOps() & SelectionKey.OP_ACCEPT) == SelectionKey.OP_ACCEPT)
                 {
                     // Accept the new connection
-                    SocketChannel sc = ((ServerSocketChannel)key.channel()).accept();
+                    SocketChannel sc = ((ServerSocketChannel)key.channel())
+                        .accept();
                     sc.configureBlocking(false);
                     LOGGER.log(Level.FINE, "Accepted: sc = " + sc);
-                    SelectionKey selKey = sc.register(selector, SelectionKey.OP_READ);
-                    SocketServerThread sst = new SocketServerThread(this, sc, selKey);
+                    SelectionKey selKey = sc.register(selector,
+                        SelectionKey.OP_READ);
+                    SocketServerThread sst = new SocketServerThread(this, sc,
+                        selKey);
                     numClients++;
-                    synchronized(activeSocketChannelList)
+                    synchronized (activeSocketChannelList)
                     {
                         activeSocketChannelList.add(sc);
                     }
@@ -290,18 +289,19 @@ public final class Server extends Thread implements IServer
                 }
                 else
                 {
-                    LOGGER.warning("Unexpected type of ready Operation: " + key.readyOps());
+                    LOGGER.warning("Unexpected type of ready Operation: "
+                        + key.readyOps());
                 }
             }
             // just to be sure.
             selectedKeys.clear();
-            
+
             if (shuttingDown)
             {
                 return;
             }
-            
-            synchronized(channelChanges)
+
+            synchronized (channelChanges)
             {
                 Iterator<SocketServerThread> sit = channelChanges.iterator();
                 while (sit.hasNext())
@@ -311,7 +311,8 @@ public final class Server extends Thread implements IServer
                     SelectionKey key = nextSST.getKey();
                     if (key == null)
                     {
-                        LOGGER.warning("key for to-be-closed-channel is null!");
+                        LOGGER
+                            .warning("key for to-be-closed-channel is null!");
                     }
                     else if (sc.isOpen())
                     {
@@ -324,9 +325,9 @@ public final class Server extends Thread implements IServer
                     }
                 }
                 channelChanges.clear();
-            }              
+            }
         }
-        
+
         catch (ClosedChannelException cce)
         {
             LOGGER.log(Level.SEVERE, "socketChannel.register() failed: ", cce);
@@ -341,7 +342,7 @@ public final class Server extends Thread implements IServer
     // I took as model this page:
     //   http://www.javafaq.nu/java-article1102.html
     // Throws IOException when closing the channel fails.
-        
+
     private int readFromChannel(SelectionKey key, SocketChannel sc)
         throws IOException
     {
@@ -360,9 +361,9 @@ public final class Server extends Thread implements IServer
             }
             catch (IOException e)
             {
-                LOGGER.log(Level.WARNING, "IOException " + e.getMessage() +
-                    " while reading from channel for player " +
-                    processingPlayerName);
+                LOGGER.log(Level.WARNING, "IOException " + e.getMessage()
+                    + " while reading from channel for player "
+                    + processingPlayerName);
 
                 // The remote forcibly/unexpectedly closed the connection, 
                 // cancel the selection key and close the channel.
@@ -375,8 +376,7 @@ public final class Server extends Thread implements IServer
 
         if (read > 0)
         {
-            LOGGER.log(Level.FINEST, "Read " + read + " bytes from "
-                + sc);
+            LOGGER.log(Level.FINEST, "Read " + read + " bytes from " + sc);
             return read;
         }
 
@@ -393,19 +393,19 @@ public final class Server extends Thread implements IServer
             return 0;
         }
     }
-    
+
     /**
      *  Put the SST into the queue to be removed from selector on next
      *  possible opportunity
      */
     public void disposeSST(SocketServerThread sst)
     {
-        if(currentThread().equals(this))
+        if (currentThread().equals(this))
         {
             // OK, activity which is originated by client, so we will
             // come to the "after select loop" point when this was 
             // completely processed
-            synchronized(channelChanges)
+            synchronized (channelChanges)
             {
                 channelChanges.add(sst);
             }
@@ -414,34 +414,34 @@ public final class Server extends Thread implements IServer
         {
             // some other thread wants to tell the ServerThread to 
             // dispose one client - not implemented yet
-            LOGGER.log(Level.SEVERE, "disposeSC() run by other thread not implemented yet!");
+            LOGGER.log(Level.SEVERE,
+                "disposeSC() run by other thread not implemented yet!");
         }
     }
-    
-    
-    private Object waitUntilOverMutex = new Object();
-    
+
+    private final Object waitUntilOverMutex = new Object();
+
     public void notifyThatGameFinished()
     {
-        synchronized(waitUntilOverMutex)
+        synchronized (waitUntilOverMutex)
         {
             waitUntilOverMutex.notify();
         }
     }
-    
+
     public void waitUntilGameFinishes()
     {
         LOGGER.finest("Before synchronized(waitUntilOverMutex)");
-        synchronized(waitUntilOverMutex)
+        synchronized (waitUntilOverMutex)
         {
             try
             {
                 waitUntilOverMutex.wait();
             }
-            catch(InterruptedException e)
+            catch (InterruptedException e)
             {
-                LOGGER.log(Level.SEVERE, "interrupted while waiting to be " +
-                    "notified that game is over: " , e);
+                LOGGER.log(Level.SEVERE, "interrupted while waiting to be "
+                    + "notified that game is over: ", e);
             }
         }
 
@@ -478,8 +478,8 @@ public final class Server extends Thread implements IServer
     // last SocketClientThread going down calls this
     public synchronized void stopFileServer()
     {
-        LOGGER.finest(
-            "About to stop file server socket on port " + (port + 1));
+        LOGGER
+            .finest("About to stop file server socket on port " + (port + 1));
 
         if (fileServerThread != null)
         {
@@ -508,7 +508,7 @@ public final class Server extends Thread implements IServer
         key.cancel();
         unregisterSocketChannel(sc);
     }
-    
+
     public void unregisterSocketChannel(SocketChannel socketChannel)
     {
         if (activeSocketChannelList == null)
@@ -516,7 +516,7 @@ public final class Server extends Thread implements IServer
             LOGGER.finest("activeSocketChannelList null");
             return;
         }
-        
+
         LOGGER.finest("activeSocketChannelList before synch ");
         synchronized (activeSocketChannelList)
         {
@@ -540,27 +540,26 @@ public final class Server extends Thread implements IServer
             // and need to empty it and close all loggers.
             if (activeSocketChannelList.isEmpty())
             {
-                LOGGER.finest("Server.unregisterSocketChannel(), " +
-                    " processing player " + getPlayerName() +
-                    ": activeSocketChannelList empty - stopping server...");
+                LOGGER.finest("Server.unregisterSocketChannel(), "
+                    + " processing player " + getPlayerName()
+                    + ": activeSocketChannelList empty - stopping server...");
                 stopServerRunning();
             }
 
             else if (game.getOption(Options.goOnWithoutObserver))
             {
-                LOGGER.finest(
-                    "\n==========\nOne socket went away, " +
-                    "but we go on because goOnWithoutObserver is set...\n");
+                LOGGER.finest("\n==========\nOne socket went away, "
+                    + "but we go on because goOnWithoutObserver is set...\n");
             }
             // or, if only AI player clients left as "observers", 
             // then close everything, too 
             else if (!anyNonAiSocketsLeft())
             {
-                LOGGER.finest("Server.unregisterSocket(), " +
-                    " processing player " + getPlayerName() +
-                    ": All connections to human or network players gone " +
-                    " (no point to keep AIs running if noone sees it) " +
-                    "- stopping server...");
+                LOGGER.finest("Server.unregisterSocket(), "
+                    + " processing player " + getPlayerName()
+                    + ": All connections to human or network players gone "
+                    + " (no point to keep AIs running if noone sees it) "
+                    + "- stopping server...");
                 stopServerRunning();
             }
             else
@@ -641,9 +640,9 @@ public final class Server extends Thread implements IServer
     private PlayerServerSide getPlayer()
     {
         PlayerServerSide p = game.getPlayer(getPlayerName());
-        assert p != null :
-            "game.getPlayer returned null player for name " + getPlayerName();
-            
+        assert p != null : "game.getPlayer returned null player for name "
+            + getPlayerName();
+
         return p;
     }
 
@@ -717,10 +716,10 @@ public final class Server extends Thread implements IServer
         if (clientMap.containsKey(player))
         {
             LOGGER.warning("Could not add client, "
-                + "because Player for playerName " + playerName +
-                " had already signed on.");
+                + "because Player for playerName " + playerName
+                + " had already signed on.");
             return false;
-            
+
         }
 
         clients.add(client);
@@ -771,7 +770,7 @@ public final class Server extends Thread implements IServer
             }
         }
     }
-    
+
     private void addRemoteClient(final IClient client, final Player player)
     {
         RemoteLogHandler remoteLogHandler = new RemoteLogHandler();
@@ -2221,8 +2220,8 @@ public final class Server extends Thread implements IServer
     public synchronized void assignColor(String color)
     {
         Player p = getPlayer();
-        assert p != null : "getPlayer returned null player (in thread " +
-            Thread.currentThread().getName() + ")";
+        assert p != null : "getPlayer returned null player (in thread "
+            + Thread.currentThread().getName() + ")";
 
         if (!getPlayer().equals(game.getNextColorPicker()))
         {
