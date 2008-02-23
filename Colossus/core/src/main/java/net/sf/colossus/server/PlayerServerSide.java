@@ -442,7 +442,7 @@ public final class PlayerServerSide extends Player implements
 
     /** Add points to this player's score.  Update the status window
      *  to reflect the addition. */
-    void addPoints(double points)
+    void addPoints(double points, boolean halfPoints)
     {
         if (points > 0)
         {
@@ -452,7 +452,9 @@ public final class PlayerServerSide extends Player implements
                 getGame().getServer().allUpdatePlayerInfo();
             }
 
-            LOGGER.info(getName() + " earns " + points + " points");
+            LOGGER.info(getName() + " earns " + points + " "
+                + (halfPoints ? "half-points" : "points") + " ("
+                + (score - points) + " + " + points + " => " + score + ")");
         }
     }
 
@@ -507,7 +509,7 @@ public final class PlayerServerSide extends Player implements
             }
             if (scorer != null)
             {
-                ((PlayerServerSide)scorer).addPoints(halfPoints);
+                ((PlayerServerSide)scorer).addPoints(halfPoints, true);
             }
 
             // Call the iterator's remove() method rather than

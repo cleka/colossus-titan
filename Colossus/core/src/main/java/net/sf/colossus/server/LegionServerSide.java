@@ -127,7 +127,7 @@ public final class LegionServerSide extends Legion implements
         }
         PlayerServerSide player = getPlayer();
         int score = player.getScore(); // 375
-        player.addPoints(points); // 375 + 150 = 525
+        player.addPoints(points, false); // 375 + 150 = 525
         int value = TerrainRecruitLoader.getAcquirableRecruitmentsValue();
         // 100
         int tmpScore = score; // 375
@@ -475,6 +475,9 @@ public final class LegionServerSide extends Legion implements
             if (caretaker.getAvailableCount(creature) > 0)
             {
                 caretaker.takeOne(creature);
+                int count = caretaker.getAvailableCount(creature);
+                LOGGER.log(Level.INFO, "Added " + creature.toString()
+                    + " - now there are " + count + " left.");
             }
             else
             {
