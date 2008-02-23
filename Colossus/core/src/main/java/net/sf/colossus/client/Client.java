@@ -561,9 +561,8 @@ public final class Client implements IClient, IOracle
         {
             if (autoInspector == null)
             {
-                autoInspector = new AutoInspector(parent, options,
-                    viewMode, options
-                        .getOption(Options.dubiousAsBlanks));
+                autoInspector = new AutoInspector(parent, options, viewMode,
+                    options.getOption(Options.dubiousAsBlanks));
             }
         }
         else
@@ -3547,8 +3546,7 @@ public final class Client implements IClient, IOracle
                 for (Legion legion : player.getLegions())
                 {
                     String markerId = legion.getMarkerId();
-                    Marker marker = new Marker(3 * Scale.get(),
-                        markerId, this);
+                    Marker marker = new Marker(3 * Scale.get(), markerId, this);
                     ((LegionClientSide)legion).setMarker(marker);
                     markersOnBoard.add(marker);
                     board.alignLegions(legion.getCurrentHex());
