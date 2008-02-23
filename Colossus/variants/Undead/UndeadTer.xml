@@ -87,7 +87,7 @@
     <acquirable name="AirElemental" points="100" terrain="Woods" />
     <acquirable name="EarthElemental" points="100" terrain="Hills" />
     <acquirable name="Archdevil" points="100" terrain="Jungle" />
-    <acquirable name="Efreet" points="100" terrain="Moutains" />
+    <acquirable name="Efreet" points="100" terrain="Mountains" />
     <acquirable name="Genie" points="100" terrain="Tundra" />
     <acquirable name="Necromancer" points="100" terrain="Tower" />
     <acquirable name="TheReaper" points="300" terrain="Tower" />
