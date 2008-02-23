@@ -2931,6 +2931,12 @@ public final class Client implements IClient, IOracle
         if (board != null)
         {
             // TODO should be done on the EDT
+            // ... but once I tried that with invokeAndWait,
+            // during stresstest games gets stuck basically in the first
+            // battle (or the first one where the player who owns the board
+            // is involved?)
+            // Needs investigation why the whole bunch below cannot be 
+            // inside a invokeAndWait().
             battleBoard = new BattleBoard(this, hex, attacker.getMarkerId(),
                 defender.getMarkerId());
             battleBoard.setPhase(battlePhase);
