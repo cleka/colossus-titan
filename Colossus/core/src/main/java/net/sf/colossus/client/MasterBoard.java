@@ -199,7 +199,11 @@ public final class MasterBoard extends JPanel
             {
                 if (legionFlyouts == null)
                 {
-                    createLegionFlyouts(client.getMarkers());
+                    List<Marker> markers = client.getMarkers();
+                    synchronized (markers)
+                    {
+                        createLegionFlyouts(markers);
+                    }
                 }
             }
             else if (e.getKeyCode() == POPUP_KEY_MY_LEGIONS)
@@ -208,15 +212,19 @@ public final class MasterBoard extends JPanel
                 {
                     // copy only local players markers
                     List<Marker> myMarkers = new ArrayList<Marker>();
-                    for (Marker marker : client.getMarkers())
+                    List<Marker> markers = client.getMarkers();
+                    synchronized (markers)
                     {
-                        Legion legion = client.getLegion(marker.getId());
-                        if (((LegionClientSide)legion).isMyLegion())
+                        for (Marker marker : markers)
                         {
-                            myMarkers.add(marker);
+                            Legion legion = client.getLegion(marker.getId());
+                            if (((LegionClientSide)legion).isMyLegion())
+                            {
+                                myMarkers.add(marker);
+                            }
                         }
+                        createLegionFlyouts(myMarkers);
                     }
-                    createLegionFlyouts(myMarkers);
                 }
             }
             else
@@ -1426,13 +1434,16 @@ public final class MasterBoard extends JPanel
     private Marker getMarkerAtPoint(Point point)
     {
         List<Marker> markers = client.getMarkers();
-        ListIterator<Marker> lit = markers.listIterator(markers.size());
-        while (lit.hasPrevious())
+        synchronized (markers)
         {
-            Marker marker = lit.previous();
-            if (marker != null && marker.contains(point))
+            ListIterator<Marker> lit = markers.listIterator(markers.size());
+            while (lit.hasPrevious())
             {
-                return marker;
+                Marker marker = lit.previous();
+                if (marker != null && marker.contains(point))
+                {
+                    return marker;
+                }
             }
         }
         return null;
@@ -1874,14 +1885,18 @@ public final class MasterBoard extends JPanel
     /** Paint markers in z-order. */
     private void paintMarkers(Graphics g)
     {
-        Iterator<Marker> it = client.getMarkers().iterator();
-        while (it.hasNext())
+        List<Marker> markers = client.getMarkers();
+        synchronized (markers)
         {
-            Marker marker = it.next();
-            if (marker != null
-                && g.getClipBounds().intersects(marker.getBounds()))
+            Iterator<Marker> it = markers.iterator();
+            while (it.hasNext())
             {
-                marker.paintComponent(g);
+                Marker marker = it.next();
+                if (marker != null
+                    && g.getClipBounds().intersects(marker.getBounds()))
+                {
+                    marker.paintComponent(g);
+                }
             }
         }
     }
