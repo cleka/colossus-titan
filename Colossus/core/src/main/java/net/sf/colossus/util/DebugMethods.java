@@ -1,5 +1,6 @@
 package net.sf.colossus.util;
 
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -43,19 +44,18 @@ public class DebugMethods
         System.runFinalization();
     }
 
-    
     /**
      * prints out "PRESS RETURN TO CONTINUE",
      * and after return is pressed, 
      * prints then "OK, continuing" and returns.
-     */ 
+     */
     public static void waitReturn()
     {
         System.out.println("\nPRESS RETURN TO CONTINUE!");
         try
         {
-            BufferedReader in =
-                new BufferedReader(new InputStreamReader(System.in));
+            BufferedReader in = new BufferedReader(new InputStreamReader(
+                System.in));
             in.readLine();
         }
         catch (IOException e)
@@ -74,7 +74,7 @@ public class DebugMethods
      * If from beginning on all are gone, does not even go into the loop.
      * 
      * @param force Go into loop even if allGone already returns true at begin
-     */ 
+     */
     public static void waitReturnLoop(boolean force)
     {
         System.gc();
@@ -89,8 +89,8 @@ public class DebugMethods
             }
         }
 
-        System.out.println(
-            "Enter s, g, f, h or x. x exits the loop.\n----------\n");
+        System.out
+            .println("Enter s, g, f, h or x. x exits the loop.\n----------\n");
         int cnt = 2;
         String line = "";
         boolean done = false;
@@ -163,7 +163,7 @@ public class DebugMethods
             System.gc();
             System.runFinalization();
         }
-        System.out.println(
-            "ok, list empty or x entered... finishing shutdown...");
+        System.out
+            .println("ok, list empty or x entered... finishing shutdown...");
     }
 }

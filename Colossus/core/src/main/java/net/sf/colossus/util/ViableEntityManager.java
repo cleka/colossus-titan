@@ -30,20 +30,20 @@ import java.util.logging.Logger;
 
 public class ViableEntityManager
 {
-    private static final Logger LOGGER =
-        Logger.getLogger(ViableEntityManager.class.getName());
+    private static final Logger LOGGER = Logger
+        .getLogger(ViableEntityManager.class.getName());
 
     private static boolean debug = false;
 
     private static WeakHashMap<Object, String> viableEntities = new WeakHashMap<Object, String>();
     private static int waiting = 0;
     private static Object mutex = new Object();
-    
+
     public static synchronized void register(Object viableEntity, String name)
     {
         viableEntities.put(viableEntity, name);
-        LOGGER.log(Level.FINEST, "ViableEntityManager: now " +
-            viableEntities.size() + " entities registered.");
+        LOGGER.log(Level.FINEST, "ViableEntityManager: now "
+            + viableEntities.size() + " entities registered.");
     }
 
     public static synchronized void unregister(Object viableEntity)
@@ -53,7 +53,7 @@ public class ViableEntityManager
             viableEntities.remove(viableEntity);
             if (viableEntities.isEmpty())
             {
-                LOGGER.log(Level.FINEST, 
+                LOGGER.log(Level.FINEST,
                     "\n\nSystemExitManager: last viable entity is gone!!");
 
                 // notify that all gone:
@@ -68,8 +68,8 @@ public class ViableEntityManager
         {
             int count = viableEntities.size();
             String list = viableEntities.values().toString();
-            LOGGER.log(Level.FINEST, "ViableEntityManager: now " + count +
-                " entities registered: " + list);
+            LOGGER.log(Level.FINEST, "ViableEntityManager: now " + count
+                + " entities registered: " + list);
         }
     }
 
@@ -77,7 +77,7 @@ public class ViableEntityManager
     {
         return waiting;
     }
-    
+
     public static void waitUntilAllGone()
     {
         synchronized (viableEntities)
@@ -85,8 +85,8 @@ public class ViableEntityManager
             if (viableEntities.isEmpty())
             {
                 LOGGER.log(Level.FINEST,
-                    "waitUntilAllGone: viableEntities already empty! " + 
-                    "- returning.");
+                    "waitUntilAllGone: viableEntities already empty! "
+                        + "- returning.");
                 return;
             }
         }
@@ -101,8 +101,8 @@ public class ViableEntityManager
             }
             catch (InterruptedException e)
             {
-                LOGGER.log(Level.WARNING,
-                    "waitUntilAllGone(): interrupted!", e);
+                LOGGER.log(Level.WARNING, "waitUntilAllGone(): interrupted!",
+                    e);
             }
         }
     }

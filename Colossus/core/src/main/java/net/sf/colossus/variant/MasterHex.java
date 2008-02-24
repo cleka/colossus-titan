@@ -4,7 +4,6 @@ package net.sf.colossus.variant;
 import java.awt.Color;
 
 
-
 /**
  * Class MasterHex describes one Masterboard hex, without GUI info.
  * @version $Id$

@@ -14,7 +14,8 @@ public class Battle
     private final Legion defender;
     private final MasterBoardTerrain land;
 
-    public Battle(Game game, Legion attacker, Legion defender, MasterBoardTerrain land)
+    public Battle(Game game, Legion attacker, Legion defender,
+        MasterBoardTerrain land)
     {
         this.game = game;
         this.attacker = attacker;

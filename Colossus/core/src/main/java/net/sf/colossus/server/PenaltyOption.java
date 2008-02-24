@@ -26,7 +26,8 @@ final class PenaltyOption implements Comparable<PenaltyOption>
     private final int dice;
     private final int strikeNumber;
 
-    PenaltyOption(CreatureServerSide striker, CreatureServerSide target, int dice, int strikeNumber)
+    PenaltyOption(CreatureServerSide striker, CreatureServerSide target,
+        int dice, int strikeNumber)
     {
         this.striker = striker;
         this.target = target;
@@ -101,13 +102,16 @@ final class PenaltyOption implements Comparable<PenaltyOption>
         {
             return 1;
         }
-        else if (CreatureServerSide.IMPORTANCE_ORDER.compare(striker, other.striker) != 0)
+        else if (CreatureServerSide.IMPORTANCE_ORDER.compare(striker,
+            other.striker) != 0)
         {
-            return CreatureServerSide.IMPORTANCE_ORDER.compare(striker, other.striker);
+            return CreatureServerSide.IMPORTANCE_ORDER.compare(striker,
+                other.striker);
         }
         else
         {
-            return CreatureServerSide.IMPORTANCE_ORDER.compare(target, other.target);
+            return CreatureServerSide.IMPORTANCE_ORDER.compare(target,
+                other.target);
         }
     }
 
@@ -155,7 +159,8 @@ final class PenaltyOption implements Comparable<PenaltyOption>
                 }
                 first = false;
                 String hexLabel = it.next();
-                CreatureServerSide critter = striker.getBattle().getCritter(hexLabel);
+                CreatureServerSide critter = striker.getBattle().getCritter(
+                    hexLabel);
                 sb.append(critter.getDescription());
             }
         }

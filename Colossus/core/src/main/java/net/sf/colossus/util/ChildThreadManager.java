@@ -27,8 +27,8 @@ import java.util.logging.Logger;
 
 public class ChildThreadManager
 {
-    private static final Logger LOGGER =
-        Logger.getLogger(ChildThreadManager.class.getName());
+    private static final Logger LOGGER = Logger
+        .getLogger(ChildThreadManager.class.getName());
 
     private ArrayList<Thread> childThreads;
     private ArrayList<Thread> unregisteringChilds;
@@ -147,8 +147,8 @@ public class ChildThreadManager
         printdebug("unregisterFromTM " + child);
         unregisteringChilds.add(child);
 
-        printdebug("Unregistrering list now: " + 
-            unregisteringChilds.toString());
+        printdebug("Unregistrering list now: "
+            + unregisteringChilds.toString());
         printdebug("Still alive    list now: " + childThreads.toString());
         printdebug("Callin notify...");
         this.notify();

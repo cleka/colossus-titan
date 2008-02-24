@@ -16,8 +16,8 @@ import java.util.logging.Logger;
 
 public class PortBookKeeper
 {
-    private static final Logger LOGGER =
-        Logger.getLogger(PortBookKeeper.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(PortBookKeeper.class
+        .getName());
 
     private int portRangeFrom;
     private int availablePorts;
@@ -55,9 +55,9 @@ public class PortBookKeeper
                     }
                     else
                     {
-                        LOGGER.log(Level.SEVERE,
-                            "port " + tryPort + " is supposed to be free " +
-                            "but test shows it is in use?");
+                        LOGGER.log(Level.SEVERE, "port " + tryPort
+                            + " is supposed to be free "
+                            + "but test shows it is in use?");
                     }
                 }
             }
@@ -79,8 +79,8 @@ public class PortBookKeeper
         }
         catch (IOException e)
         {
-            LOGGER.log(Level.WARNING, "testThatPortReallyFree IOException " +
-                "while attempting to open", e);
+            LOGGER.log(Level.WARNING, "testThatPortReallyFree IOException "
+                + "while attempting to open", e);
         }
 
         try
@@ -92,8 +92,8 @@ public class PortBookKeeper
         }
         catch (IOException e)
         {
-            LOGGER.log(Level.WARNING, "testThatPortReallyFree IOException " +
-                "while attempting to close", e);
+            LOGGER.log(Level.WARNING, "testThatPortReallyFree IOException "
+                + "while attempting to close", e);
         }
         return ok;
     }
@@ -103,9 +103,8 @@ public class PortBookKeeper
         int index = port - portRangeFrom;
         if (index < 0 || index > availablePorts)
         {
-            LOGGER.log(Level.WARNING,
-                "attempt to release invalid port " +
-                port + " (index = " + index + ")!");
+            LOGGER.log(Level.WARNING, "attempt to release invalid port "
+                + port + " (index = " + index + ")!");
         }
         else
         {

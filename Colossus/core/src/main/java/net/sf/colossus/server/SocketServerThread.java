@@ -59,13 +59,13 @@ final class SocketServerThread implements IClient
     private final CharsetEncoder encoder = charset.newEncoder();
     private final CharsetDecoder decoder = charset.newDecoder();
 
-
-    SocketServerThread(Server server, SocketChannel channel, SelectionKey selKey)
+    SocketServerThread(Server server, SocketChannel channel,
+        SelectionKey selKey)
     {
         this.server = server;
         this.socketChannel = channel;
         this.selectionKey = selKey;
-     
+
         String tempId = "<no name yet #" + (counter++) + ">";
         InstanceTracker.register(this, tempId);
     }
@@ -74,12 +74,12 @@ final class SocketServerThread implements IClient
     {
         return selectionKey;
     }
-    
+
     public SocketChannel getSocketChannel()
     {
         return socketChannel;
     }
-    
+
     // if "isGone" is true, connection to this client is gone
     // Server uses this to decide whether any nonAI player is 
     // (even if perhaps dead) still connected (= watching).
@@ -92,7 +92,7 @@ final class SocketServerThread implements IClient
     {
         this.isGone = val;
     }
-    
+
     // Called by Server's select reader
     public void processInput(ByteBuffer byteBuffer)
     {
@@ -103,9 +103,9 @@ final class SocketServerThread implements IClient
             String msg = incompleteInput + charBuff.toString();
             incompleteInput = "";
             incompleteText = "";
-            
-            LOGGER.log(Level.FINEST, "Decoded string is >>>>>" + msg
-                + "<<<<<");
+
+            LOGGER
+                .log(Level.FINEST, "Decoded string is >>>>>" + msg + "<<<<<");
 
             int processed = 0;
 
@@ -121,7 +121,8 @@ final class SocketServerThread implements IClient
                     String method = li.remove(0);
                     if (playerName == null && !method.equals(Constants.signOn))
                     {
-                        LOGGER.log(Level.SEVERE, "First packet must be signOn");
+                        LOGGER
+                            .log(Level.SEVERE, "First packet must be signOn");
                     }
                     else
                     {
@@ -140,19 +141,19 @@ final class SocketServerThread implements IClient
                     LOGGER.log(Level.FINEST,
                         "last item incomplete, storing it: '" + line + "'");
                     incompleteInput = line;
-                    incompleteText = " (not handled: incomplete input '" +
-                        incompleteInput + "')";
+                    incompleteText = " (not handled: incomplete input '"
+                        + incompleteInput + "')";
                 }
             }
-            
-            LOGGER.log(Level.FINEST,
-                "Processed " + processed + " commands" + incompleteText + ".");
+
+            LOGGER.log(Level.FINEST, "Processed " + processed + " commands"
+                + incompleteText + ".");
         }
         catch (CharacterCodingException cce)
         {
             LOGGER.log(Level.SEVERE,
-                "CharacterCodingException while reading from channel" +
-                socketChannel, cce);
+                "CharacterCodingException while reading from channel"
+                    + socketChannel, cce);
 
         }
     }
@@ -171,17 +172,15 @@ final class SocketServerThread implements IClient
         }
         catch (CharacterCodingException e)
         {
-            LOGGER.log(Level.WARNING,
-                "EncondingException '" + e.getMessage() + "'" +
-                " was thrown while encoding String '" + msg + "'" +
-                " for writing it to" + " channel for player " + playerName);
+            LOGGER.log(Level.WARNING, "EncondingException '" + e.getMessage()
+                + "'" + " was thrown while encoding String '" + msg + "'"
+                + " for writing it to" + " channel for player " + playerName);
         }
         catch (IOException ioe)
         {
-            LOGGER.log(Level.WARNING,
-                "IOException '" + ioe.getMessage() + "'" +
-                " was thrown while writing String '" + msg + "'" +
-                " to channel for player " + playerName);
+            LOGGER.log(Level.WARNING, "IOException '" + ioe.getMessage() + "'"
+                + " was thrown while writing String '" + msg + "'"
+                + " to channel for player " + playerName);
         }
     }
 
@@ -461,8 +460,8 @@ final class SocketServerThread implements IClient
         }
         else
         {
-//            LOGGER.finer("Sending message to client '" + playerName + "': "
-//                + message);
+            //            LOGGER.finer("Sending message to client '" + playerName + "': "
+            //                + message);
             sendViaChannel(message);
         }
     }
@@ -476,7 +475,7 @@ final class SocketServerThread implements IClient
         {
             return;
         }
-        
+
         isGone = true;
         sendViaChannel(Constants.dispose);
         server.disposeSST(this);
@@ -597,7 +596,7 @@ final class SocketServerThread implements IClient
     {
         return this.playerName;
     }
-    
+
     public void createSummonAngel(Legion legion)
     {
         sendToClient(Constants.createSummonAngel + sep + legion.getMarkerId());

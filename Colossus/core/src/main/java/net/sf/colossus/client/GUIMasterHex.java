@@ -281,8 +281,7 @@ public final class GUIMasterHex extends GUIHex<MasterHex>
         fontMetrics = g2.getFontMetrics();
         halfFontHeight = (fontMetrics.getMaxAscent() + fontMetrics
             .getLeading()) / 2;
-        String name = this.getHexModel().getTerrainDisplayName()
-            .toUpperCase();
+        String name = this.getHexModel().getTerrainDisplayName().toUpperCase();
         g2.drawString(name, rectBound.x
             + ((rectBound.width - stringWidth(name, g2)) / 2), rectBound.y
             + halfFontHeight + rectBound.height * (isInverted() ? 1 : 2) / 3);

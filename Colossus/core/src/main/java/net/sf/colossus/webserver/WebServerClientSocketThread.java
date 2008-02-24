@@ -31,8 +31,8 @@ import net.sf.colossus.webcommon.User;
 
 public class WebServerClientSocketThread extends Thread implements IWebClient
 {
-    private static final Logger LOGGER =
-        Logger.getLogger(WebServerClientSocketThread.class.getName());
+    private static final Logger LOGGER = Logger
+        .getLogger(WebServerClientSocketThread.class.getName());
 
     private WebServer server;
     private Socket socket;
@@ -116,8 +116,8 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
     {
         String fromClient = "dummy";
 
-        LOGGER.log(Level.FINEST,
-            "A new WSCST started running: " + this.toString());
+        LOGGER.log(Level.FINEST, "A new WSCST started running: "
+            + this.toString());
         try
         {
             is = socket.getInputStream();
@@ -192,8 +192,8 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
         }
         catch (IOException ex)
         {
-            LOGGER.log(Level.WARNING,
-                "IOException while closing connection", ex);
+            LOGGER.log(Level.WARNING, "IOException while closing connection",
+                ex);
         }
 
         // if did not log in (wrong password, or duplicate name and without force,
@@ -409,8 +409,8 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
         }
         else
         {
-            LOGGER.log(Level.INFO,
-                "Unexpected command '" + command + "' from client");
+            LOGGER.log(Level.INFO, "Unexpected command '" + command
+                + "' from client");
             ok = false;
         }
 
@@ -489,8 +489,8 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
             catch (Exception e)
             {
                 LOGGER.log(Level.WARNING,
-                    "Different exception than usual while tried to " + 
-                    "interrupt 'other': ", e);
+                    "Different exception than usual while tried to "
+                        + "interrupt 'other': ", e);
             }
 
             // LOGGER.log(Level.FINEST, "In CST before join");
@@ -535,8 +535,8 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
     public void userInfo(int loggedin, int enrolled, int playing, int dead,
         long ago, String text)
     {
-        sendToClient(userInfo + sep + loggedin + sep + enrolled + sep +
-            playing + sep + dead + sep + ago + sep + text);
+        sendToClient(userInfo + sep + loggedin + sep + enrolled + sep
+            + playing + sep + dead + sep + ago + sep + text);
     }
 
     public void gameInfo(GameInfo gi)
@@ -562,9 +562,8 @@ public class WebServerClientSocketThread extends Thread implements IWebClient
     public void chatDeliver(String chatId, long when, String sender,
         String message, boolean resent)
     {
-        LOGGER.log(Level.FINEST,
-            "chatDeliver() to client " + user.getName() + ": "+ chatId +
-            ", " + sender + ": " + message);
+        LOGGER.log(Level.FINEST, "chatDeliver() to client " + user.getName()
+            + ": " + chatId + ", " + sender + ": " + message);
         sendToClient(chatDeliver + sep + chatId + sep + when + sep + sender
             + sep + message + sep + resent);
     }

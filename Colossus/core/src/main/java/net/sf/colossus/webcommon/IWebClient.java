@@ -32,7 +32,7 @@ public interface IWebClient
 
     public void userInfo(int loggedin, int enrolled, int playing, int dead,
         long ago, String text);
-    
+
     public void gameInfo(GameInfo gi);
 
     public void gameStartsNow(String gameId, int port);

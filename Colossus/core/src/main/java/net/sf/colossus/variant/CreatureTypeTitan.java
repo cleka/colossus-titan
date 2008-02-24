@@ -28,8 +28,8 @@ import net.sf.colossus.server.PlayerServerSide;
 
 public class CreatureTypeTitan extends CreatureType
 {
-    private static final Logger LOGGER = Logger.getLogger(CreatureTypeTitan.class
-        .getName());
+    private static final Logger LOGGER = Logger
+        .getLogger(CreatureTypeTitan.class.getName());
 
     public CreatureTypeTitan(String name, int power, int skill,
         boolean rangestrikes, boolean flies,

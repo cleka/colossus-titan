@@ -686,16 +686,17 @@ public final class GetPlayers extends KFrame implements WindowListener,
 
     private String makeUniqueName(String baseName, int i)
     {
-        String tryName = baseName; 
+        String tryName = baseName;
         boolean duplicate = true;
         while (duplicate)
         {
             duplicate = false;
             for (int j = 0; j < Constants.MAX_MAX_PLAYERS; j++)
             {
-                if (j!=i)
+                if (j != i)
                 {
-                    String otherBoxName = (String) playerNames[j].getSelectedItem();
+                    String otherBoxName = (String)playerNames[j]
+                        .getSelectedItem();
                     if (tryName.equals(otherBoxName))
                     {
                         duplicate = true;
@@ -718,7 +719,7 @@ public final class GetPlayers extends KFrame implements WindowListener,
         }
         return tryName;
     }
-    
+
     public synchronized void actionPerformed(ActionEvent e)
     {
         if (e.getActionCommand().equals(Constants.quitGame))
@@ -850,8 +851,8 @@ public final class GetPlayers extends KFrame implements WindowListener,
                         }
                         else if (value.endsWith(Constants.human))
                         {
-                            String uniqueHuman = 
-                                makeUniqueName(Constants.username, i);
+                            String uniqueHuman = makeUniqueName(
+                                Constants.username, i);
                             playerNames[i].setSelectedItem(uniqueHuman);
                         }
                         // If player type was changed away from none, also

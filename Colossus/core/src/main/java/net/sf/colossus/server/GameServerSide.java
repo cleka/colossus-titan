@@ -333,8 +333,7 @@ public final class GameServerSide extends Game
         {
             Player player = players.get(i);
 
-            if (player.getName().equals(name) && 
-                ! player.equals(checkedPlayer))
+            if (player.getName().equals(name) && !player.equals(checkedPlayer))
             {
                 return true;
             }
