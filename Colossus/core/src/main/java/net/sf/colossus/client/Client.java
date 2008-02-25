@@ -68,7 +68,7 @@ import net.sf.colossus.xmlparser.TerrainRecruitLoader;
  *  
  *  TODO the logic for the battles could probably be separated from the
  *  rest of this code. At the moment the battle logic seems to bounce
- *  back and forth between BattleMap (which is really a GUI class) and
+ *  back and forth between BattleBoard (which is really a GUI class) and
  *  this class.
  *  
  *  TODO there are quite a few spots where the existence of GUI elements
@@ -131,8 +131,10 @@ public final class Client implements IClient, IOracle
     private final List<BattleChit> battleChits = new ArrayList<BattleChit>();
 
     /** 
-     * Stack of legion marker ids, to allow multiple levels of undo for
+     * Stack of legion marker ID's, to allow multiple levels of undo for
      * splits, moves, and recruits.
+     * (for battle actions, the Strings are not actually marker ID's, 
+     *  it's battle hex ID's there instead).
      * 
      * TODO it would probably be good to have a full Command pattern here, similar
      * to Swing's {@link UndoManager} stuff. In the GUI client we could/should
@@ -1208,7 +1210,7 @@ public final class Client implements IClient, IOracle
         }
     }
 
-    private void disposeBattleMap()
+    private void disposeBattleBoard()
     {
         if (battleBoard != null)
         {
@@ -1298,7 +1300,7 @@ public final class Client implements IClient, IOracle
         }
     }
 
-    // Used by MasterBoard and by BattleMap
+    // Used by MasterBoard and by BattleBoard
     public void askNewCloseQuitCancel(JFrame frame, boolean fromBattleBoard)
     {
         String[] options = new String[4];
@@ -1529,7 +1531,7 @@ public final class Client implements IClient, IOracle
         disposeEventViewer();
         disposePreferencesWindow();
         disposeEngagementResults();
-        disposeBattleMap();
+        disposeBattleBoard();
         disposeMasterBoard();
 
         movement.dispose();
@@ -1543,7 +1545,7 @@ public final class Client implements IClient, IOracle
         net.sf.colossus.server.CustomRecruitBase.reset();
     }
 
-    /** Called from BattleMap to leave carry mode. */
+    /** Called from BattleBoard to leave carry mode. */
     public void leaveCarryMode()
     {
         server.leaveCarryMode();
@@ -2908,21 +2910,56 @@ public final class Client implements IClient, IOracle
 
         if (board != null)
         {
-            // TODO should be done on the EDT
-            // ... but once I tried that with invokeAndWait,
-            // during stresstest games gets stuck basically in the first
-            // battle (or the first one where the player who owns the board
-            // is involved?)
-            // Needs investigation why the whole bunch below cannot be 
-            // inside a invokeAndWait().
-            battleBoard = new BattleBoard(this, hex, attacker.getMarkerId(),
-                defender.getMarkerId());
-            battleBoard.setPhase(battlePhase);
-            battleBoard.setTurn(battleTurnNumber);
-            battleBoard.setBattleMarkerLocation(false, "X" + attackerSide);
-            battleBoard.setBattleMarkerLocation(true, "X" + defenderSide);
-            focusMap();
+            ensureEdtNewBattleBoard();
         }
+    }
+
+    public void ensureEdtNewBattleBoard()
+    {
+        if (SwingUtilities.isEventDispatchThread())
+        {
+            doNewBattleBoard();
+        }
+        else
+        {
+            // @TODO: use invokeLater() instead of invokeAndWait() ?
+            //
+            // Right now I don't dare to use invokeLater() - this way here
+            // it preserves the execution order as it was without EDT,
+            // but GUI stuff is one in EDT so we are safe from exceptions.
+            Exception e = null;
+            try
+            {
+                SwingUtilities.invokeAndWait(new Runnable()
+                {
+                    public void run()
+                    {
+                        doNewBattleBoard();
+                    }
+
+                });
+            }
+            catch (InvocationTargetException e1)
+            {
+                e = e1;
+            }
+            catch (InterruptedException e2)
+            {
+                e = e2;
+            }
+
+            if (e != null)
+            {
+                String message = "Failed to run doNewBattleBoard with "
+                    + "invokeAndWait(): ";
+                LOGGER.log(Level.SEVERE, message, e);
+            }
+        }
+    }
+
+    public void doNewBattleBoard()
+    {
+        battleBoard = new BattleBoard(this, battleSite, attacker, defender);
     }
 
     public void cleanupBattle()
@@ -3604,7 +3641,7 @@ public final class Client implements IClient, IOracle
         return "";
     }
 
-    // public for IOracle
+    // public for IOracle and BattleBoard
     public int getBattleTurnNumber()
     {
         return battleTurnNumber;

@@ -34,6 +34,7 @@ import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
 
+import net.sf.colossus.game.Legion;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.LegionServerSide;
 import net.sf.colossus.util.KFrame;
@@ -89,11 +90,14 @@ public final class BattleBoard extends KFrame
 
     // TODO pass Legions instead of the markerIds
     public BattleBoard(final Client client, MasterHex masterHex,
-        String attackerMarkerId, String defenderMarkerId)
+        Legion attacker, Legion defender)
     {
         super(); // title will be set later
 
         this.client = client;
+
+        String attackerMarkerId = attacker.getMarkerId();
+        String defenderMarkerId = defender.getMarkerId();
 
         setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 
@@ -202,9 +206,18 @@ public final class BattleBoard extends KFrame
 
         pack();
         setVisible(true);
+
+        // @TODO: perhaps those could be done earlier, but in previous code
+        // (still in Client) they were done after BattleBoard instantiation,
+        // so I keep them like that, for now.
+        setPhase(client.getBattlePhase());
+        setTurn(client.getBattleTurnNumber());
+        setBattleMarkerLocation(false, "X" + attacker.getEntrySide());
+        setBattleMarkerLocation(true, "X" + defender.getEntrySide());
+        reqFocus();
     }
 
-    public void setBattleMarkerLocation(boolean isDefender, String hexLabel)
+    private void setBattleMarkerLocation(boolean isDefender, String hexLabel)
     {
         battleMap.setBattleMarkerLocation(isDefender, hexLabel);
     }
