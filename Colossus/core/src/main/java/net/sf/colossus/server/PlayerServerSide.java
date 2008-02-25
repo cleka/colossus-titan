@@ -465,6 +465,27 @@ public final class PlayerServerSide extends Player implements
     }
 
     /**
+     * Award points and handle all acquiring related issues.
+     * 
+     * Note that this is not used for adding points for cleaning up legions
+     * of a dead player!
+     * 
+     * @param points the points to award
+     * @param legion the legion which is entitled to acquire due to that
+     * @param halfPoints this are already halfPoints (from fleeing)
+     */
+    void awardPoints(int points, LegionServerSide legion, boolean halfPoints)
+    {
+        int score = getScore(); // 375
+        addPoints(points, halfPoints); // 375 + 150 = 525
+
+        // calculate and set them as pending
+        legion.makeAcquirableDecisions(score, points);
+        // make the server send the ask... to the client
+        legion.askAcquirablesDecisions();
+    }
+
+    /**
      * Turns the player dead.
      * 
      * This method calculates the points other players get, adds them to their score and

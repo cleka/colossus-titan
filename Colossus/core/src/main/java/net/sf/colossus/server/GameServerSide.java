@@ -2992,7 +2992,9 @@ public final class GameServerSide extends Game
         }
 
         // Add points, and angels if necessary.
-        ((LegionServerSide)winner).addPoints(points);
+        ((PlayerServerSide)winner.getPlayer()).awardPoints(points,
+            (LegionServerSide)winner, fled);
+        // @TODO: probably the truncating is not needed at all here?
         // Remove any fractional points.
         ((PlayerServerSide)winner.getPlayer()).truncScore();
 
@@ -3122,7 +3124,8 @@ public final class GameServerSide extends Game
             ((LegionServerSide)loser).remove();
 
             // Add points, and angels if necessary.
-            ((LegionServerSide)winner).addPoints(points);
+            ((PlayerServerSide)winner.getPlayer()).awardPoints(points,
+                (LegionServerSide)winner, false);
 
             LOGGER.info("Legion " + loser + " is eliminated by legion "
                 + winner + " via negotiation");

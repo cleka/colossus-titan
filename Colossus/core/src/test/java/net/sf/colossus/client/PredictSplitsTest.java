@@ -86,6 +86,15 @@ public class PredictSplitsTest extends TestCase
         {
             return false;
         }
+
+        @Override
+        public List<String> findEligibleAngels(int tmpScore)
+        {
+            assert false : "Not implemented in PredictSplitsTest.";
+
+            List<String> angels = new ArrayList<String>();
+            return angels;
+        }
     }
 
     List<String> cnl;

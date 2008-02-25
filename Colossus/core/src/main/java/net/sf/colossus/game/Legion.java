@@ -6,6 +6,7 @@ import java.util.List;
 
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.MasterHex;
+import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
 
 public abstract class Legion
@@ -50,6 +51,9 @@ public abstract class Legion
      * The side this legion entered a battle in.
      */
     private int entrySide;
+
+    protected List<AcquirableDecision> decisions = null;
+    protected int angelsToAcquire;
 
     // TODO legions should be created through factory from the player instances
     public Legion(final Player player, String markerId, MasterHex hex)
@@ -250,5 +254,113 @@ public abstract class Legion
             }
         }
         return count;
+    }
+
+    /**
+     * Calculate the acquirableDecisions and store them in the legion.
+     * @param score
+     * @param points
+     */
+    public void makeAcquirableDecisions(int score, int points)
+    {
+        this.decisions = calculateAcquirableDecisions(score, points);
+    }
+
+    /**
+     * From the given score, awarding given points, calculate the choices for
+     * each threshold that will be crossed. E.g. 375+150 => 525 will cross 
+     * 400 and 500, so one has to make two decisions:  
+     *  400: take angel (or not);
+     *  500: take angel, archangel (or nothing).
+     * This only calculates them, does not set them in the legion yet; so a client
+     * or AI could use this for theoretical calculations "how much / which angels 
+     * would I get if..." without modifying the legions state itself.
+     * The limits for "which one can get" due to legion height, creatures left count
+     * and terrain are considered (implicitly, because findEligibleAngels(tmpScore)
+     * checks them).
+     *  
+     * @param score Current score of player
+     * @param points Points to be added which entitle to acquiring
+     * @return List of decisions
+     */
+    List<AcquirableDecision> calculateAcquirableDecisions(int score, int points)
+    {
+        ArrayList<AcquirableDecision> AcquirablesDecisions = new ArrayList<AcquirableDecision>();
+
+        // Example: Start with (score) 375, earn (points) 150 => 525
+
+        int value = TerrainRecruitLoader.getAcquirableRecruitmentsValue();
+        // 100
+        int tmpScore = score; // 375
+        int tmpPoints = points; // 150
+
+        // round Score down, and tmpPoints by the same amount.
+        // this allow to keep all points
+        int round = (tmpScore % value); //  75
+        tmpScore -= round; // 300
+        tmpPoints += round; // 225
+
+        List<String> recruits;
+
+        // @TODO: the constraint by height would make only sense, if askAquire's
+        // would be fired sequentially - 2nd not before decision response for 1st
+        // from client did arrive. Right now they are fired all at same time
+        // (and have to), because client (e.g. human player) should get all of the 
+        // choices at once, to take e.g. the 500 archangel and skip the 400 angel.
+        // AI does not handle that well yet, and humans get several modal dialogs.
+        // Should be improved generally...
+        while ((getHeight() < 7) && (tmpPoints >= value))
+        {
+            tmpScore += value; // 400   500
+            tmpPoints -= value; // 125    25
+
+            recruits = findEligibleAngels(tmpScore);
+
+            if ((recruits != null) && (!recruits.isEmpty()))
+            {
+                AcquirableDecision decision = new AcquirableDecision(this,
+                    tmpScore, recruits);
+                // {legion, 400, [Angel]}   {legion, 500, [Angel, Archangel]}
+
+                AcquirablesDecisions.add(decision); //  [d1]       [d1, d2]
+                angelsToAcquire++; // 1       2
+            }
+        }
+
+        return AcquirablesDecisions; // 2 decisions
+    }
+
+    /**
+     * Finding out which creatures can be acquired we can currently
+     * do only on server side. Delegate this to LegionServerSide or
+     * LegionClientSide (there it's not implemented yet...)
+     * 
+     * @param tmpScore
+     * @return list of creatures that can be get at that threshold
+     */
+    public abstract List<String> findEligibleAngels(int tmpScore);
+
+    /**
+     * Data for one pending decision. For example, for crossing the 500 
+     * there will be a decision, whether the player takes for this legion
+     * an angel or an archangel.
+     */
+    public class AcquirableDecision
+    {
+        Legion legion;
+        int points;
+        List<String> acquirableNames;
+
+        public AcquirableDecision(Legion legion, int points, List<String> names)
+        {
+            this.legion = legion;
+            this.points = points;
+            this.acquirableNames = names;
+        }
+
+        public List<String> getNames()
+        {
+            return acquirableNames;
+        }
     }
 }

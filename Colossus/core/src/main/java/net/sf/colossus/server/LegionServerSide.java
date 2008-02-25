@@ -48,7 +48,6 @@ public final class LegionServerSide extends Legion implements
     private String recruitName;
     private int battleTally;
     private final GameServerSide game;
-    private int angelsToAcquire;
 
     /**
      * Creates a new Legion instance.
@@ -114,43 +113,22 @@ public final class LegionServerSide extends Legion implements
         return pointValue;
     }
 
-    /**
-     * TODO handling the points shouldn't be really a task for the Legion.
-     */
-    // Example: Start with 375, earn 150
-    void addPoints(int points)
+    @Override
+    public List<String> findEligibleAngels(int tmpScore)
     {
-        // TODO can that ever happen? Seems more like a case for an assertion
-        if (game == null)
-        {
-            return;
-        }
+        return game.findEligibleAngels(this, tmpScore);
+    }
+
+    /**
+     * For each acquirable decision, ask the client to choose one
+     * of the possible acquirables.
+     */
+    public void askAcquirablesDecisions()
+    {
         PlayerServerSide player = getPlayer();
-        int score = player.getScore(); // 375
-        player.addPoints(points, false); // 375 + 150 = 525
-        int value = TerrainRecruitLoader.getAcquirableRecruitmentsValue();
-        // 100
-        int tmpScore = score; // 375
-        int tmpPoints = points; // 150
-
-        // round Score down, and tmpPoints by the same amount.
-        // this allow to keep all points
-        int round = (tmpScore % value); //  75
-        tmpScore -= round; // 300
-        tmpPoints += round; // 225
-
-        List<String> recruits;
-
-        while ((getHeight() < 7) && (tmpPoints >= value))
+        for (AcquirableDecision decision : decisions)
         {
-            tmpScore += value; // 400   500
-            tmpPoints -= value; // 125    25
-            recruits = game.findEligibleAngels(this, tmpScore);
-            if ((recruits != null) && (!recruits.isEmpty()))
-            {
-                angelsToAcquire++; // 1       2
-                game.askAcquireAngel(getPlayer(), this, recruits);
-            }
+            game.askAcquireAngel(player, this, decision.getNames());
         }
     }
 
@@ -201,6 +179,7 @@ public final class LegionServerSide extends Legion implements
         angelsToAcquire--;
         if (angelsToAcquire <= 0)
         {
+            this.decisions = null;
             game.doneAcquiringAngels();
         }
     }
@@ -233,7 +212,8 @@ public final class LegionServerSide extends Legion implements
 
     void addBattleTallyToPoints()
     {
-        addPoints(battleTally);
+        PlayerServerSide player = getPlayer();
+        player.awardPoints(battleTally, this, false);
         clearBattleTally();
     }
 

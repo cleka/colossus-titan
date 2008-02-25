@@ -425,6 +425,15 @@ public final class LegionClientSide extends Legion implements
     }
 
     @Override
+    public List<String> findEligibleAngels(int tmpScore)
+    {
+        assert false : "Not implemented in client side yet.";
+
+        List<String> angels = new ArrayList<String>();
+        return angels;
+    }
+
+    @Override
     public String toString()
     {
         return markerId;
