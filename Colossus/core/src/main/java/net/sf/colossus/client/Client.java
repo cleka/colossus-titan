@@ -144,21 +144,8 @@ public final class Client implements IClient, IOracle
     // Information on the current moving legion.
     private LegionClientSide mover;
 
-    /** List of markers which are currently on the board.
-     *  The end of the list is on top in the z-order.
-     *  
-     *  Now synchronized access to prevent NPEs when EDT wants to
-     *  paint a marker and asks for the legion for it, and
-     *  legion has just been removed.
-     *  I don't use a sycnhronizedList, because then I get into 
-     *  trouble in the recreateMarkers method.
-     *  @TODO: Perhaps the whole list should be legions instead
-     *         of markers, and/or, perhaps the list should be
-     *         maintained by MasterBoard, not Client.
-     *         Non-GUI clients effectively do not even need this list
-     */
-    private final List<Marker> markersOnBoard = new ArrayList<Marker>();
-
+    // @TODO: Those should be moved to MasterBoard, too - attached to
+    // the respective legion/marker.
     private final List<Chit> recruitedChits = new ArrayList<Chit>();
     private final List<Chit> possibleRecruitChits = new ArrayList<Chit>();
 
@@ -1670,12 +1657,6 @@ public final class Client implements IClient, IOracle
         }
     }
 
-    List<Marker> getMarkers()
-    {
-        // Note: whoever uses this, should access it in synchronized way!
-        return markersOnBoard;
-    }
-
     /**
      * Get this legion's info or create if necessary.
      * 
@@ -1709,10 +1690,9 @@ public final class Client implements IClient, IOracle
      If it's already in the list, remove the earlier entry. */
     void setMarker(Legion legion, Marker marker)
     {
-        synchronized (markersOnBoard)
+        if (board != null)
         {
-            markersOnBoard.remove(marker);
-            markersOnBoard.add(marker);
+            board.markerToTop(marker);
         }
         ((LegionClientSide)legion).setMarker(marker);
     }
@@ -1720,10 +1700,9 @@ public final class Client implements IClient, IOracle
     /** Remove this eliminated legion, and clean up related stuff. */
     public void removeLegion(Legion legion)
     {
-        Marker marker = ((LegionClientSide)legion).getMarker();
-        synchronized (markersOnBoard)
+        if (board != null)
         {
-            markersOnBoard.remove(marker);
+            board.removeMarkerForLegion(legion);
         }
 
         // TODO Do for all players
@@ -3532,26 +3511,6 @@ public final class Client implements IClient, IOracle
             // TODO next line seems redundant since setMarker(..) does set the marker on the legion
             ((LegionClientSide)legion).setMarker(marker);
             board.alignLegions(hex);
-        }
-    }
-
-    /** Create new markers in response to a rescale. */
-    void recreateMarkers()
-    {
-        synchronized (markersOnBoard)
-        {
-            markersOnBoard.clear();
-            for (Player player : players)
-            {
-                for (Legion legion : player.getLegions())
-                {
-                    String markerId = legion.getMarkerId();
-                    Marker marker = new Marker(3 * Scale.get(), markerId, this);
-                    ((LegionClientSide)legion).setMarker(marker);
-                    markersOnBoard.add(marker);
-                    board.alignLegions(legion.getCurrentHex());
-                }
-            }
         }
     }
 
