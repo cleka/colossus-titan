@@ -22,24 +22,26 @@ import net.sf.colossus.webcommon.InstanceTracker;
 
 /** KDialog adds some generally useful functions to JDialog.
  * 
- * TODO SaveWindow handling should be on this level
- * 
  *  @version $Id$
- *  @author David Ripton */
-
+ *  @author David Ripton
+ */
 public class KDialog extends JDialog implements MouseListener, WindowListener
 {
     private SaveWindow kSaveWindow;
 
-    /** Only support one of JDialog's many constructor forms. */
+    /** 
+     * Only support one of JDialog's many constructor forms.
+     */
     public KDialog(Frame owner, String title, boolean modal)
     {
         super(owner, title, modal);
         InstanceTracker.register(this, "KDialog-for-?");
     }
 
-    /** Place dialog relative to parentFrame's origin, offset by 
-     *  point, and fully on-screen. */
+    /** 
+     * Place dialog relative to parentFrame's origin, offset by 
+     * point, and fully on-screen.
+     */
     public void placeRelative(JFrame parentFrame, Point point, JScrollPane pane)
     {
 
@@ -57,8 +59,11 @@ public class KDialog extends JDialog implements MouseListener, WindowListener
         setLocation(origin);
     }
 
-    /** Center this dialog on the screen.  Must be called after the dialog
-     *  size has been set. */
+    /**
+     * Center this dialog on the screen.
+     * 
+     * Must be called after the dialog size has been set.
+     */
     public void centerOnScreen()
     {
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
@@ -66,8 +71,12 @@ public class KDialog extends JDialog implements MouseListener, WindowListener
             - getSize().height / 2));
     }
 
-    /** Center this dialog on the screen, with an additional offset.
-     * Must be called after the dialog size has been set. */
+    /**
+     * 
+     * Center this dialog on the screen, with an additional offset.
+     * 
+     * Must be called after the dialog size has been set.
+     */
     public void centerOnScreen(int xoffset, int yoffset)
     {
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();

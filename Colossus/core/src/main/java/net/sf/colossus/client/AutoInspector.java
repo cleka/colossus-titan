@@ -14,6 +14,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
 import net.sf.colossus.util.KDialog;
@@ -37,7 +38,7 @@ public class AutoInspector extends KDialog
         boolean dubiousAsBlanks)
     {
         super(frame, "Inspector", false);
-
+        assert SwingUtilities.isEventDispatchThread() : "GUI code should only run on the EDT";
         this.options = options;
         this.viewMode = viewMode;
         this.dubiousAsBlanks = dubiousAsBlanks;
@@ -84,6 +85,8 @@ public class AutoInspector extends KDialog
 
     public void showLegion(LegionClientSide legion)
     {
+        assert SwingUtilities.isEventDispatchThread() : "GUI code should only run on the EDT";
+        
         scrollPane.getViewport().removeAll();
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
@@ -103,6 +106,7 @@ public class AutoInspector extends KDialog
 
     public void showHexRecruitTree(GUIMasterHex hex)
     {
+        assert SwingUtilities.isEventDispatchThread() : "GUI code should only run on the EDT";
         setTitle("Inspector");
         scrollPane.getViewport().removeAll();
         MasterHex hexModel = hex.getHexModel();
@@ -119,5 +123,6 @@ public class AutoInspector extends KDialog
     public void setDubiousAsBlanks(boolean newVal)
     {
         this.dubiousAsBlanks = newVal;
+        repaint();
     }
 }
