@@ -304,13 +304,27 @@ public class TerrainRecruitLoader
         ParseException
     {
         String name = el.getAttribute("name").getValue();
-        int points = el.getAttribute("points").getIntValue();
-        String terrainId = el.getAttributeValue("terrain");
-        MasterBoardTerrain terrain = TerrainRecruitLoader
-            .getTerrainById(terrainId);
-        AcquirableData ad = new AcquirableData(name, points);
-        if (terrain != null)
+        if (name == null)
         {
+            throw new ParseException("Acquirable is missing name attribute");
+        }
+        int points = el.getAttribute("points").getIntValue();
+        if (points == 0)
+        {
+            throw new ParseException("Acquirable '" + name
+                + "' has invalid points");
+        }
+        AcquirableData ad = new AcquirableData(name, points);
+        String terrainId = el.getAttributeValue("terrain");
+        if (terrainId != null)
+        {
+            MasterBoardTerrain terrain = TerrainRecruitLoader
+                .getTerrainById(terrainId);
+            if (terrain == null)
+            {
+                throw new ParseException("Illegal terrainId '" + terrainId
+                    + "' in variant for aquirable '" + name + "'");
+            }
             ad.addTerrain(terrain);
         }
         addAcquirable(ad);
