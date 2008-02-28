@@ -111,6 +111,7 @@ public final class Client implements IClient, IOracle
     private boolean startedByWebClient = false;
 
     public boolean failed = false;
+    private boolean replayOngoing = false;
 
     // TODO the naming of these classes is confusing, they should be clearly named
     // as dialogs
@@ -1723,7 +1724,10 @@ public final class Client implements IClient, IOracle
         legion.getPlayer().removeLegion(legion);
         if (board != null)
         {
-            board.alignLegions(legion.getCurrentHex());
+            if (!replayOngoing)
+            {
+                board.alignLegions(legion.getCurrentHex());
+            }
         }
     }
 
@@ -2202,6 +2206,18 @@ public final class Client implements IClient, IOracle
     }
 
     private static String propNameForceViewBoard = "net.sf.colossus.forceViewBoard";
+
+    public void tellReplay(boolean val)
+    {
+        replayOngoing = val;
+        if (!replayOngoing)
+        {
+            if (board != null)
+            {
+                board.recreateMarkers();
+            }
+        }
+    }
 
     public void initBoard()
     {
@@ -3551,7 +3567,10 @@ public final class Client implements IClient, IOracle
             setMarker(legion, marker);
             // TODO next line seems redundant since setMarker(..) does set the marker on the legion
             ((LegionClientSide)legion).setMarker(marker);
-            board.alignLegions(hex);
+            if (!replayOngoing)
+            {
+                board.alignLegions(hex);
+            }
         }
     }
 
@@ -4770,7 +4789,7 @@ public final class Client implements IClient, IOracle
         removeLegion(splitoff);
         // do the eventViewer stuff before the board, so we are sure to get
         // a repaint.
-        if (eventViewer != null)
+        if (eventViewer != null && !replayOngoing)
         {
             eventViewer.undoEvent(RevealEvent.eventSplit, survivor
                 .getMarkerId(), splitoff.getMarkerId(), turn);
@@ -4783,8 +4802,11 @@ public final class Client implements IClient, IOracle
 
         if (board != null)
         {
-            board.alignLegions(survivor.getCurrentHex());
-            board.highlightTallLegions();
+            if (!replayOngoing)
+            {
+                board.alignLegions(survivor.getCurrentHex());
+                board.highlightTallLegions();
+            }
         }
         if (isMyTurn() && this.phase == Constants.Phase.SPLIT
             && options.getOption(Options.autoSplit) && !isGameOver())
@@ -5088,7 +5110,7 @@ public final class Client implements IClient, IOracle
 
         child.setCurrentHex(hex);
 
-        if (eventViewer != null)
+        if (eventViewer != null && !replayOngoing)
         {
             eventViewer.newSplitEvent(turn, parent.getMarkerId(), (parent)
                 .getHeight(), null, child.getMarkerId(), (child).getHeight());
@@ -5099,7 +5121,10 @@ public final class Client implements IClient, IOracle
             Marker marker = new Marker(3 * Scale.get(), child.getMarkerId(),
                 this);
             setMarker(child, marker);
-            board.alignLegions(hex);
+            if (!replayOngoing)
+            {
+                board.alignLegions(hex);
+            }
         }
 
         if (isMyLegion(child))
@@ -5117,8 +5142,11 @@ public final class Client implements IClient, IOracle
 
         if (board != null)
         {
-            board.alignLegions(hex);
-            board.highlightTallLegions();
+            if (!replayOngoing)
+            {
+                board.alignLegions(hex);
+                board.highlightTallLegions();
+            }
         }
 
         // check also for phase, because delayed callbacks could come

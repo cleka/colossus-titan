@@ -952,6 +952,14 @@ public final class Server extends Thread implements IServer
         }
     }
 
+    synchronized void allTellReplay(boolean val)
+    {
+        for (IClient client : clients)
+        {
+            client.tellReplay(val);
+        }
+    }
+
     synchronized void allTellAllLegionLocations()
     {
         List<Legion> legions = game.getAllLegions();

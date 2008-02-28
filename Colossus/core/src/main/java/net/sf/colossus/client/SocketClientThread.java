@@ -581,6 +581,11 @@ final class SocketClientThread extends Thread implements IServer
             String hexLabel = args.remove(0);
             client.placeNewChit(imageName, inverted, tag, hexLabel);
         }
+        else if (method.equals(Constants.replayOngoing))
+        {
+            boolean val = Boolean.valueOf(args.remove(0)).booleanValue();
+            client.tellReplay(val);
+        }
         else if (method.equals(Constants.initBoard))
         {
             client.initBoard();

@@ -36,9 +36,9 @@ final class SocketServerThread implements IClient
     private static final Logger LOGGER = Logger
         .getLogger(SocketServerThread.class.getName());
 
-    private Server server;
-    private SocketChannel socketChannel;
-    private SelectionKey selectionKey;
+    private final Server server;
+    private final SocketChannel socketChannel;
+    private final SelectionKey selectionKey;
     private String playerName;
 
     private boolean isGone = false;
@@ -579,6 +579,11 @@ final class SocketServerThread implements IClient
     {
         sendToClient(Constants.placeNewChit + sep + imageName + sep + inverted
             + sep + tag + sep + hexLabel);
+    }
+
+    public void tellReplay(boolean val)
+    {
+        sendToClient(Constants.replayOngoing + sep + val);
     }
 
     public void initBoard()

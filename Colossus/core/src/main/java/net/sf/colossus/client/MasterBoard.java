@@ -321,7 +321,6 @@ public final class MasterBoard extends JPanel
         masterFrame.addKeyListener(this.iph);
 
         setupGUIHexes();
-
         setupActions();
         setupPopupMenu();
         setupTopMenu();
@@ -1467,6 +1466,7 @@ public final class MasterBoard extends JPanel
     /** Create new markers in response to a rescale. */
     void recreateMarkers()
     {
+        Set<MasterHex> hexesNeedAligning = new HashSet<MasterHex>();
         synchronized (markersOnBoard)
         {
             markersOnBoard.clear();
@@ -1479,10 +1479,11 @@ public final class MasterBoard extends JPanel
                         client);
                     ((LegionClientSide)legion).setMarker(marker);
                     markersOnBoard.add(marker);
-                    alignLegions(legion.getCurrentHex());
+                    hexesNeedAligning.add(legion.getCurrentHex());
                 }
             }
         }
+        alignLegions(hexesNeedAligning);
     }
 
     /** Return the topmost Marker that contains the given point, or

@@ -1758,12 +1758,14 @@ public final class GameServerSide extends Game
         syncOptions();
 
         server.allUpdatePlayerInfo(true);
+
+        server.allTellReplay(true);
+        server.allInitBoard();
         history.fireEventsFromXML(server);
         server.allFullyUpdateLegionStatus();
         server.allUpdatePlayerInfo(false);
-
-        server.allInitBoard();
         server.allTellAllLegionLocations();
+        server.allTellReplay(false);
 
         server.allSetupTurnState();
         fullySyncCaretakerDisplays();

@@ -57,6 +57,8 @@ public interface IClient
 
     public void initBoard();
 
+    public void tellReplay(boolean val);
+
     public void setPlayerName(String newPlayerName);
 
     public void createSummonAngel(Legion legion);

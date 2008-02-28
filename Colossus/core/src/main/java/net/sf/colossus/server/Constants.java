@@ -484,6 +484,7 @@ public final class Constants
     public static final String revealEngagedCreatures = "revealEngagedCreatures";
     public static final String removeDeadBattleChits = "removeDeadBattleChits";
     public static final String placeNewChit = "placeNewChit";
+    public static final String replayOngoing = "replayOngoing";
     public static final String initBoard = "initBoard";
     public static final String setPlayerName = "setPlayerName";
     public static final String createSummonAngel = "createSummonAngel";
