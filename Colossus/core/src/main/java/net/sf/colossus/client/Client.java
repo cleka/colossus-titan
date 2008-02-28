@@ -1534,6 +1534,10 @@ public final class Client implements IClient, IOracle
         disposeBattleBoard();
         disposeMasterBoard();
 
+        // Options must be saved after all satellites are disposed,
+        // because they store their location and state (enabled or not, e.g.)
+        // in disposal.
+        options.saveOptions();
         movement.dispose();
 
         this.movement = null;
