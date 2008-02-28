@@ -375,7 +375,8 @@ public final class BattleServerSide extends Battle
                 // his markers plus half points for his unengaged legions.
                 PlayerServerSide player = attacker.getPlayer();
                 attacker.remove();
-                player.die(getDefender().getPlayer(), true);
+                player.die(getDefender().getPlayer());
+                getGame().checkForVictory();
             }
             else
             {
@@ -861,8 +862,9 @@ public final class BattleServerSide extends Battle
         {
             // Nobody gets any points.
             // Make defender die first, to simplify turn advancing.
-            defender.getPlayer().die(null, false);
-            attacker.getPlayer().die(null, true);
+            defender.getPlayer().die(null);
+            attacker.getPlayer().die(null);
+            getGame().checkForVictory();
             cleanup();
         }
 
@@ -878,7 +880,8 @@ public final class BattleServerSide extends Battle
                 pointsScored = defender.getBattleTally();
                 defender.addBattleTallyToPoints();
             }
-            attacker.getPlayer().die(defender.getPlayer(), true);
+            attacker.getPlayer().die(defender.getPlayer());
+            getGame().checkForVictory();
             cleanup();
         }
         else if (defenderTitanDead)
@@ -892,7 +895,8 @@ public final class BattleServerSide extends Battle
                 pointsScored = attacker.getBattleTally();
                 attacker.addBattleTallyToPoints();
             }
-            defender.getPlayer().die(attacker.getPlayer(), true);
+            defender.getPlayer().die(attacker.getPlayer());
+            getGame().checkForVictory();
             cleanup();
         }
 

@@ -1866,7 +1866,8 @@ public final class Server extends Thread implements IServer
             slayer = game.getFirstEnemyLegion(legion.getCurrentHex(), player)
                 .getPlayer();
         }
-        player.die(slayer, true);
+        player.die(slayer);
+        game.checkForVictory();
 
         // if it returns, it returns true and that means game shall go on.
         if (game.checkAutoQuitOrGoOn())

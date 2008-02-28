@@ -125,7 +125,7 @@ public class Player
 
     /**
      * TODO should be List<Legion>, but currently subclasses still use more specific types
-     * TODO should be unmodifiable, but at least {@link PlayerServerSide#die(Player, boolean)} still
+     * TODO should be unmodifiable, but at least {@link PlayerServerSide#die(Player)} still
      *      removes items
      */
     public List<? extends Legion> getLegions()

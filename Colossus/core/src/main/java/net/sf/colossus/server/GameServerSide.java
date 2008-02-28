@@ -3019,7 +3019,8 @@ public final class GameServerSide extends Game
             // loser.remove outside/before the if (or would need to store
             // the hasTitan information as extra boolean)
             ((LegionServerSide)loser).remove();
-            ((PlayerServerSide)losingPlayer).die(winner.getPlayer(), true);
+            ((PlayerServerSide)losingPlayer).die(winner.getPlayer());
+            checkForVictory();
         }
         else
         {
@@ -3056,8 +3057,9 @@ public final class GameServerSide extends Game
             if (attacker.hasTitan() && defender.hasTitan())
             {
                 // Make defender die first, to simplify turn advancing.
-                ((PlayerServerSide)defender.getPlayer()).die(null, false);
-                ((PlayerServerSide)attacker.getPlayer()).die(null, true);
+                ((PlayerServerSide)defender.getPlayer()).die(null);
+                ((PlayerServerSide)attacker.getPlayer()).die(null);
+                checkForVictory();
             }
 
             // If either was the titan stack, its owner dies and gives
@@ -3065,13 +3067,15 @@ public final class GameServerSide extends Game
             else if (attacker.hasTitan())
             {
                 ((PlayerServerSide)attacker.getPlayer()).die(defender
-                    .getPlayer(), true);
+                    .getPlayer());
+                checkForVictory();
             }
 
             else if (defender.hasTitan())
             {
                 ((PlayerServerSide)defender.getPlayer()).die(attacker
-                    .getPlayer(), true);
+                    .getPlayer());
+                checkForVictory();
             }
         }
         else
@@ -3136,7 +3140,8 @@ public final class GameServerSide extends Game
             // points to the victor.
             if (loser.hasTitan())
             {
-                ((PlayerServerSide)losingPlayer).die(winner.getPlayer(), true);
+                ((PlayerServerSide)losingPlayer).die(winner.getPlayer());
+                checkForVictory();
             }
 
             if (winner == defender)

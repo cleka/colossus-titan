@@ -499,10 +499,8 @@ public final class PlayerServerSide extends Player implements
      * points)
      * 
      * @param slayer The player who killed us. May be null if we just gave up or it is a draw.
-     * @param checkForVictory If set the game will be asked to check for a victory after
-     *      we are finished.
      */
-    synchronized void die(Player slayer, boolean checkForVictory)
+    synchronized void die(Player slayer)
     {
         LOGGER.info("Player '" + getName() + "' is dying, killed by "
             + (slayer == null ? "nobody" : slayer.getName()));
@@ -564,12 +562,6 @@ public final class PlayerServerSide extends Player implements
         LOGGER.info(getName() + " is dead, telling everyone about it");
 
         getGame().getServer().allTellPlayerElim(this, slayer, true);
-
-        // See if the game is over.
-        if (checkForVictory)
-        {
-            getGame().checkForVictory();
-        }
     }
 
     void eliminateTitan()
