@@ -878,6 +878,7 @@ public final class BattleServerSide extends Battle
             else
             {
                 pointsScored = defender.getBattleTally();
+                // award points and handle acquiring
                 defender.addBattleTallyToPoints();
             }
             attacker.getPlayer().die(defender.getPlayer());
@@ -893,6 +894,7 @@ public final class BattleServerSide extends Battle
             else
             {
                 pointsScored = attacker.getBattleTally();
+                // award points and handle acquiring
                 attacker.addBattleTallyToPoints();
             }
             defender.getPlayer().die(attacker.getPlayer());
@@ -912,6 +914,7 @@ public final class BattleServerSide extends Battle
         else if (attackerElim)
         {
             pointsScored = defender.getBattleTally();
+            // award points and handle acquiring            
             defender.addBattleTallyToPoints();
             attacker.remove();
             cleanup();
@@ -919,6 +922,7 @@ public final class BattleServerSide extends Battle
         else if (defenderElim)
         {
             pointsScored = attacker.getBattleTally();
+            // award points and handle acquiring
             attacker.addBattleTallyToPoints();
             defender.remove();
             cleanup();

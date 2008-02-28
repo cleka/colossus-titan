@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.colossus.variant.CreatureType;
+import net.sf.colossus.variant.MasterBoardTerrain;
 import net.sf.colossus.variant.MasterHex;
 import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
@@ -261,7 +262,7 @@ public abstract class Legion
      * @param score
      * @param points
      */
-    public void makeAcquirableDecisions(int score, int points)
+    public void setupAcquirableDecisions(int score, int points)
     {
         this.decisions = calculateAcquirableDecisions(score, points);
     }
@@ -309,7 +310,7 @@ public abstract class Legion
         // choices at once, to take e.g. the 500 archangel and skip the 400 angel.
         // AI does not handle that well yet, and humans get several modal dialogs.
         // Should be improved generally...
-        while ((getHeight() < 7) && (tmpPoints >= value))
+        while (tmpPoints >= value)
         {
             tmpScore += value; // 400   500
             tmpPoints -= value; // 125    25
@@ -331,14 +332,17 @@ public abstract class Legion
     }
 
     /**
-     * Finding out which creatures can be acquired we can currently
-     * do only on server side. Delegate this to LegionServerSide or
-     * LegionClientSide (there it's not implemented yet...)
+     * Calculate which angels this legion can get in its current land 
+     * when crossing the given points threshold
      * 
-     * @param tmpScore
+     * @param points Score threshold (100, ..., 400, 500) for which to get angel 
      * @return list of creatures that can be get at that threshold
      */
-    public abstract List<String> findEligibleAngels(int tmpScore);
+    public List<String> findEligibleAngels(int points)
+    {
+        MasterBoardTerrain terrain = getCurrentHex().getTerrain();
+        return player.getGame().findAvailableEligibleAngels(terrain, points);
+    }
 
     /**
      * Data for one pending decision. For example, for crossing the 500 

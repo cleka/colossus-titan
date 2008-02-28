@@ -1,8 +1,14 @@
 package net.sf.colossus.game;
 
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 import net.sf.colossus.server.VariantSupport;
+import net.sf.colossus.variant.MasterBoardTerrain;
 import net.sf.colossus.variant.Variant;
+import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
 
 /**
@@ -55,6 +61,35 @@ public class Game
             // properly
             return VariantSupport.getCurrentVariant();
         }
+    }
+
+    /** 
+     * Return a list of names of angel types that can be acquired based
+     * on the hex in which legion is, when reaching given score threshold,
+     * and if they are still available from caretaker
+     * @param terrain The terrain in which this legion wants to acquire
+     * @param score A acquring threshold, e.g. in Default 100, ..., 400, 500
+     * @return list of acquirable names
+     */
+    List<String> findAvailableEligibleAngels(MasterBoardTerrain terrain,
+        int score)
+    {
+        List<String> recruits = new ArrayList<String>();
+        List<String> allRecruits = TerrainRecruitLoader
+            .getRecruitableAcquirableList(terrain, score);
+        Iterator<String> it = allRecruits.iterator();
+        while (it.hasNext())
+        {
+            String name = it.next();
+
+            if (getCaretaker().getAvailableCount(
+                getVariant().getCreatureByName(name)) >= 1
+                && !recruits.contains(name))
+            {
+                recruits.add(name);
+            }
+        }
+        return recruits;
     }
 
     public Caretaker getCaretaker()

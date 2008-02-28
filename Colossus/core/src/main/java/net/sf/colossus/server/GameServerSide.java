@@ -1969,30 +1969,25 @@ public final class GameServerSide extends Game
         }
     }
 
-    /** Return a list of names of angel types that can be acquired. */
-    List<String> findEligibleAngels(LegionServerSide legion, int score)
+    /**
+     * If the legion can acquire (height < 7), find out which acquirable it
+     * might get for the pointsToAdd, and fire off the askAcquirable messages.
+     * @param legion  Legion which earned the points and thus is entitled to 
+     *                get the acqirable
+     * @param scoreBeforeAdd Score from which to start
+     * @param pointsToAdd How many points were earned
+     */
+    public void acquireMaybe(LegionServerSide legion, int scoreBeforeAdd,
+        int pointsToAdd)
     {
-        if (legion.getHeight() >= 7)
+        if (legion.getHeight() < 7)
         {
-            return null;
+            // calculate and set them as pending
+            legion.setupAcquirableDecisions(scoreBeforeAdd, pointsToAdd);
+            // make the server send the ask... to the client
+            legion.askAcquirablesDecisions();
         }
-        List<String> recruits = new ArrayList<String>();
-        MasterBoardTerrain terrain = legion.getCurrentHex().getTerrain();
-        List<String> allRecruits = TerrainRecruitLoader
-            .getRecruitableAcquirableList(terrain, score);
-        Iterator<String> it = allRecruits.iterator();
-        while (it.hasNext())
-        {
-            String name = it.next();
 
-            if (getCaretaker().getAvailableCount(
-                getVariant().getCreatureByName(name)) >= 1
-                && !recruits.contains(name))
-            {
-                recruits.add(name);
-            }
-        }
-        return recruits;
     }
 
     void dispose()

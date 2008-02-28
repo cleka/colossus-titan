@@ -113,12 +113,6 @@ public final class LegionServerSide extends Legion implements
         return pointValue;
     }
 
-    @Override
-    public List<String> findEligibleAngels(int tmpScore)
-    {
-        return game.findEligibleAngels(this, tmpScore);
-    }
-
     /**
      * For each acquirable decision, ask the client to choose one
      * of the possible acquirables.

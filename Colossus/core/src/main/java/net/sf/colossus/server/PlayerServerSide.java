@@ -476,13 +476,10 @@ public final class PlayerServerSide extends Player implements
      */
     void awardPoints(int points, LegionServerSide legion, boolean halfPoints)
     {
-        int score = getScore(); // 375
+        int scoreBeforeAdd = getScore(); // 375
         addPoints(points, halfPoints); // 375 + 150 = 525
 
-        // calculate and set them as pending
-        legion.makeAcquirableDecisions(score, points);
-        // make the server send the ask... to the client
-        legion.askAcquirablesDecisions();
+        getGame().acquireMaybe(legion, scoreBeforeAdd, points);
     }
 
     /**
