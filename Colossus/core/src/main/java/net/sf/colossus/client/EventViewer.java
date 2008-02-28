@@ -873,12 +873,12 @@ final class EventViewer extends KDialog implements WindowListener,
         newEvent(eventType, markerId1, height1, rcList, markerId2, height2);
     }
 
-    public void newSplitEvent(String markerId1, int height1,
+    public void newSplitEvent(int turnNr, String markerId1, int height1,
         ArrayList<RevealedCreature> rcList, String markerId2, int height2)
     {
-        RevealEvent e = new RevealEvent(client, client.getTurnNumber(),
-            getActivePlayerNum(), RevealEvent.eventSplit, markerId1, height1,
-            rcList, markerId2, height2);
+        RevealEvent e = new RevealEvent(client, turnNr, getActivePlayerNum(),
+            RevealEvent.eventSplit, markerId1, height1, rcList, markerId2,
+            height2);
         addEvent(e);
     }
 
@@ -1133,6 +1133,9 @@ final class EventViewer extends KDialog implements WindowListener,
             // search also in the previous round.
             // TODO: investigate, why does server gives us different turn numbers
             //       in those events?
+            // TODO: Now newSplitEvent does not do client.getTurn() any more, 
+            //       which might have been the reason for the misfit; 
+            //       does this here still happen?
             if (found == 0)
             {
                 synchronized (syncdEventList)

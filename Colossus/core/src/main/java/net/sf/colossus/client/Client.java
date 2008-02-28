@@ -5090,7 +5090,7 @@ public final class Client implements IClient, IOracle
 
         if (eventViewer != null)
         {
-            eventViewer.newSplitEvent(parent.getMarkerId(), (parent)
+            eventViewer.newSplitEvent(turn, parent.getMarkerId(), (parent)
                 .getHeight(), null, child.getMarkerId(), (child).getHeight());
         }
 
