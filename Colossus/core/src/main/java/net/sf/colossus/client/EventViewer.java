@@ -1136,6 +1136,7 @@ final class EventViewer extends KDialog implements WindowListener,
             // TODO: Now newSplitEvent does not do client.getTurn() any more, 
             //       which might have been the reason for the misfit; 
             //       does this here still happen?
+            assert found != 0 : "Mismatch for turnNr of SplitEvent still happens.";
             if (found == 0)
             {
                 synchronized (syncdEventList)
