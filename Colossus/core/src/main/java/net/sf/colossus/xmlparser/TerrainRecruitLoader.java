@@ -308,6 +308,14 @@ public class TerrainRecruitLoader
         {
             throw new ParseException("Acquirable is missing name attribute");
         }
+        // TODO the name attribute should be validated to be an actual creature
+        // name. Currently this is not yet possible since we don't necessarily
+        // have the creatures yet. It could be fixed with a quick hack, reordering
+        // the loading process and passing the List<CreatureType> around, but the
+        // proper solution would be passing the results of this class as objects
+        // around instead of using static code, then validate consistency on
+        // construction of the Variant instance, which would get all the necessary
+        // information to do that
         int points = el.getAttribute("points").getIntValue();
         if (points == 0)
         {
