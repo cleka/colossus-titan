@@ -53,7 +53,7 @@ public abstract class Legion
      */
     private int entrySide;
 
-    protected List<AcquirableDecision> decisions = null;
+    public List<AcquirableDecision> decisions = null;
     protected int angelsToAcquire;
 
     // TODO legions should be created through factory from the player instances
@@ -365,6 +365,11 @@ public abstract class Legion
         public List<String> getNames()
         {
             return acquirableNames;
+        }
+
+        public int getPoints()
+        {
+            return points;
         }
     }
 }
