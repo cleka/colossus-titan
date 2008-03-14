@@ -60,20 +60,6 @@ class Chit extends JPanel
     static BasicStroke oneWide = new BasicStroke(1);
     static BasicStroke threeWide = new BasicStroke(3);
 
-    /* Cloning Constructor. */
-    Chit(Chit twin)
-    {
-        bufferedImage = twin.bufferedImage;
-        bufferedInvertedImage = twin.bufferedInvertedImage;
-        rect = twin.rect;
-        client = twin.client;
-        dead = twin.dead;
-        border = twin.border;
-        borderColor = twin.borderColor;
-        inverted = twin.inverted;
-        id = twin.id;
-    }
-
     Chit(int scale, String id)
     {
         this(scale, id, false, false);
@@ -391,25 +377,5 @@ class Chit extends JPanel
     public boolean isInverted()
     {
         return inverted;
-    }
-
-    public Image getBufferedImage()
-    {
-        return bufferedImage;
-    }
-
-    public Image getBufferedInvertedImage()
-    {
-        return bufferedInvertedImage;
-    }
-
-    public void setBufferedInvertedImage(Image bufferedInvertedImage)
-    {
-        this.bufferedInvertedImage = bufferedInvertedImage;
-    }
-
-    public void setBufferedImage(Image bufferedImage)
-    {
-        this.bufferedImage = bufferedImage;
     }
 }

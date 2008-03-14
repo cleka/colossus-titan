@@ -34,7 +34,6 @@ import javax.swing.undo.UndoManager;
 
 import net.sf.colossus.ai.AI;
 import net.sf.colossus.ai.SimpleAI;
-import net.sf.colossus.game.Creature;
 import net.sf.colossus.game.Game;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
@@ -2989,7 +2988,6 @@ public final class Client implements IClient, IOracle
             + " Client.cleanupBattle()");
         if (battleBoard != null)
         {
-            //makeAftermath();
             battleBoard.dispose();
             battleBoard = null;
         }
@@ -2997,29 +2995,6 @@ public final class Client implements IClient, IOracle
         battlePhase = null;
         battleTurnNumber = -1;
         battleActivePlayer = noone;
-    }
-
-    //  Following line for testing...
-    private void makeAftermath()
-    {
-        LegionClientSide activeLegion = (LegionClientSide)getBattleActiveLegion();
-        List<CritterSource> summonables = new ArrayList<CritterSource>();
-        for (LegionClientSide legion : owningPlayer.getLegions())
-        {
-            if (legion != null && !legion.isEngaged())
-            {
-                for (Creature creature : legion.getCreatures())
-                {
-                    if (creature.getType().isSummonable())
-                        summonables.add(new CritterSource(creature.getType(),
-                            legion));
-                }
-            }
-        }
-        new BattleAftermathWindow(battleBoard, this, activeLegion,
-            summonables, findEligibleRecruits(activeLegion, activeLegion
-                .getCurrentHex()));
-
     }
 
     public int[] getReinforcementTurns()
