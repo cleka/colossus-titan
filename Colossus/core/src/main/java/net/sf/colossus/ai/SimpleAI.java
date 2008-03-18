@@ -3733,15 +3733,6 @@ public class SimpleAI implements AI
         }
     }
 
-    public void dispose()
-    {
-        if (remainingMarkers != null)
-        {
-            remainingMarkers.clear();
-        }
-        this.client = null;
-    }
-
     protected Variant getVariantPlayed()
     {
         return this.client.getGame().getVariant();

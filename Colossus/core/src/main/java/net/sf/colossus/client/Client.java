@@ -185,12 +185,8 @@ public final class Client implements IClient, IOracle
     private Legion parent;
     private int numSplitsThisTurn;
 
-    // show best potential recruit chit needs exactly "SimpleAI".
-    // TODO this seems to be mixing the AI that actually plays with the AI that is just
-    // used to help the human player. The client should probably know about (a) the player
-    // playing the local game (which can be a human or an AI) and (b) someone to ask for
-    // the hints on screen (which currently would be a SimpleAI)
-    private SimpleAI simpleAI;
+    // This ai is either the actual ai player for an AI player, but is also
+    // used by human clients for the autoXXX actions.
     private AI ai;
 
     /**
@@ -348,8 +344,7 @@ public final class Client implements IClient, IOracle
 
         this.threadMgr = new ChildThreadManager("Client " + playerName);
 
-        this.simpleAI = new SimpleAI(this);
-        this.ai = this.simpleAI;
+        this.ai = new SimpleAI(this);
 
         this.movement = new Movement(this);
         this.battleMovement = new BattleMovement(this);
@@ -1478,14 +1473,6 @@ public final class Client implements IClient, IOracle
         threadMgr.cleanup();
         threadMgr = null;
 
-        if (ai != simpleAI)
-        {
-            ((SimpleAI)ai).dispose();
-        }
-        simpleAI.dispose();
-        simpleAI = null;
-        ai = null;
-
         if (SwingUtilities.isEventDispatchThread())
         {
             cleanupGUI();
@@ -2120,8 +2107,7 @@ public final class Client implements IClient, IOracle
     CreatureType chooseBestPotentialRecruit(LegionClientSide legion,
         MasterHex hex, List<CreatureType> recruits)
     {
-        CreatureType recruit = simpleAI.getVariantRecruitHint(legion, hex,
-            recruits);
+        CreatureType recruit = ai.getVariantRecruitHint(legion, hex, recruits);
         return recruit;
     }
 
@@ -2339,16 +2325,10 @@ public final class Client implements IClient, IOracle
     public void setPlayerName(String playerName)
     {
         this.owningPlayer.setName(playerName);
-        // all those just for debugging purposes:
+
         InstanceTracker.setId(this, "Client " + playerName);
-        // set name right for the autoplay-AI
-        InstanceTracker
-            .setId(this.simpleAI, "Autoplay-SimpleAI " + playerName);
-        if (ai != simpleAI)
-        {
-            // set name right for the AI if this is an AI player
-            InstanceTracker.setId(ai, "AI: " + playerName);
-        }
+        InstanceTracker.setId(ai, "AI: " + playerName);
+
         if (sct != null)
         {
             sct.fixName(playerName);
