@@ -91,6 +91,7 @@ public final class Server extends Thread implements IServer
     private boolean serverRunning = false;
     private boolean obsolete = false;
     private boolean shuttingDown = false;
+    private boolean forceShutDown = false;
 
     // Earlier I have locked on an Boolean object itself, 
     // which I modify... and when this is done too often,
@@ -139,6 +140,7 @@ public final class Server extends Thread implements IServer
         {
             waitOnSelector();
         }
+        notifyThatGameFinished();
         LOGGER.finest("Server.run() ends.");
     }
 
@@ -231,6 +233,13 @@ public final class Server extends Thread implements IServer
             int num = selector.select();
             LOGGER.log(Level.FINEST, "select returned, " + num
                 + " channels are ready to be processed.");
+
+            if (forceShutDown)
+            {
+                LOGGER.log(Level.FINEST,
+                    "waitOnSelector: force shutdown now true! num=" + num);
+                stopServerRunning();
+            }
 
             Set<SelectionKey> selectedKeys = selector.selectedKeys();
             Iterator<SelectionKey> readyKeys = selectedKeys.iterator();
@@ -337,6 +346,20 @@ public final class Server extends Thread implements IServer
             LOGGER.log(Level.SEVERE,
                 "IOException while waiting or processing ready channels", ex);
         }
+        catch (Exception e)
+        {
+            LOGGER.log(Level.SEVERE, "Exception while waiting on selector", e);
+
+        }
+    }
+
+    /** Shutdown initiated by outside, i.e. NOT by the Server thread itself.
+     *  Right now, this is used by StartupProgressDialog's abort button.
+     */
+    public void externShutdown()
+    {
+        forceShutDown = true;
+        selector.wakeup();
     }
 
     // I took as model this page:
@@ -413,9 +436,12 @@ public final class Server extends Thread implements IServer
         else
         {
             // some other thread wants to tell the ServerThread to 
-            // dispose one client - not implemented yet
-            LOGGER.log(Level.SEVERE,
-                "disposeSC() run by other thread not implemented yet!");
+            // dispose one client - for example EDT when user pressed
+            // "Abort" button in StartupProgress dialog.
+            synchronized (channelChanges)
+            {
+                channelChanges.add(sst);
+            }
         }
     }
 
@@ -467,7 +493,6 @@ public final class Server extends Thread implements IServer
         {
             disposeAllClients();
         }
-        notifyThatGameFinished();
     }
 
     public boolean isServerRunning()
@@ -810,6 +835,11 @@ public final class Server extends Thread implements IServer
 
         for (IClient client : clients)
         {
+            // This sends the dispose message, and queues SST for being
+            // removed from selector. Actual removal happens after all
+            // selector-keys are processed.
+            // @TODO: does that make even sense? shuttingDown is set true,
+            // so the selector loop does not even reach the removal part...
             client.dispose();
         }
         clients.clear();

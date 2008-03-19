@@ -214,6 +214,9 @@ public final class GameServerSide extends Game
             {
                 ViableEntityManager.register(this, "Server/Game " + gameId);
             }
+            // Note server.start() is done even if not all clients came in.
+            // This is needed to that run() after the loop notifies that
+            // the game is over.
             server.start();
         }
         catch (Exception e)
