@@ -312,10 +312,11 @@ public final class Server extends Thread implements IServer
 
             synchronized (channelChanges)
             {
-                Iterator<SocketServerThread> sit = channelChanges.iterator();
-                while (sit.hasNext())
+                // Can't use iterator, because e.g. removal of last human/observer
+                // will add more items to the channelChanges list.
+                while (!channelChanges.isEmpty())
                 {
-                    SocketServerThread nextSST = sit.next();
+                    SocketServerThread nextSST = channelChanges.remove(0);
                     SocketChannel sc = nextSST.getSocketChannel();
                     SelectionKey key = nextSST.getKey();
                     if (key == null)
@@ -565,9 +566,8 @@ public final class Server extends Thread implements IServer
             // and need to empty it and close all loggers.
             if (activeSocketChannelList.isEmpty())
             {
-                LOGGER.finest("Server.unregisterSocketChannel(), "
-                    + " processing player " + getPlayerName()
-                    + ": activeSocketChannelList empty - stopping server...");
+                LOGGER.finest("Server.unregisterSocketChannel(): "
+                    + "activeSocketChannelList empty - stopping server...");
                 stopServerRunning();
             }
 
@@ -580,16 +580,16 @@ public final class Server extends Thread implements IServer
             // then close everything, too 
             else if (!anyNonAiSocketsLeft())
             {
-                LOGGER.finest("Server.unregisterSocket(), "
-                    + " processing player " + getPlayerName()
-                    + ": All connections to human or network players gone "
-                    + " (no point to keep AIs running if noone sees it) "
+                LOGGER.finest("Server.unregisterSocket(): "
+                    + "All connections to human or network players gone "
+                    + "(no point to keep AIs running if noone sees it) "
                     + "- stopping server...");
                 stopServerRunning();
             }
             else
             {
-                LOGGER.finest("Server.unregisterSocket() : ELSE ");
+                LOGGER.finest("Server.unregisterSocket(): ELSE case "
+                    + "(i.e. someone is left, so it makes sense to go on)");
             }
         }
         LOGGER.finest("activeSocketChannelList after synch ");
