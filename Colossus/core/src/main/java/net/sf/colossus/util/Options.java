@@ -54,6 +54,8 @@ public final class Options implements IOptions
 
     // Server administrative options
     public static final String autosave = "Autosave";
+    public static final String autosaveMaxKeep = "Max autosave files";
+    public static final String autosaveVerboseNames = "Verbose autosave names";
     public static final String autoStop = "AIs stop when humans dead";
     public static final String autoQuit = "Auto quit when game over";
     public static final String goOnWithoutObserver = "Go on without observer";
