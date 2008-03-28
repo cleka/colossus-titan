@@ -96,6 +96,7 @@ public class PreferencesWindow extends KFrame implements ItemListener,
     private Box lfBox; // Look & Feel
     private Box rcModes; // Recruit Chit modes
     private JPanel favColorPane;
+    private int activePaneIndex;
     private List<String> favoriteColors;
     private ArrayList<String> colorsLeft;
 
@@ -294,6 +295,52 @@ public class PreferencesWindow extends KFrame implements ItemListener,
         closeButton = new JButton("Close");
         closeButton.addActionListener(this);
         getContentPane().add(closeButton, BorderLayout.SOUTH);
+
+        restoreWhichTabActive(tabbedPane);
+
+    }
+
+    private void restoreWhichTabActive(JTabbedPane tabbedPane)
+    {
+        String activeTab = options
+            .getStringOption(Options.activePreferencesTab);
+        int index = -1;
+        if (activeTab != null)
+        {
+            index = tabbedPane.indexOfTab(activeTab);
+        }
+        if (index != -1)
+        {
+            tabbedPane.setSelectedIndex(index);
+        }
+        this.activePaneIndex = tabbedPane.getSelectedIndex();
+
+        tabbedPane.addChangeListener(new ChangeListener()
+        {
+            public void stateChanged(ChangeEvent e)
+            {
+                try
+                {
+                    JTabbedPane theTabbedPane = (JTabbedPane)e.getSource();
+                    int newIndex = theTabbedPane.getSelectedIndex();
+                    if (newIndex != activePaneIndex)
+                    {
+                        activePaneIndex = newIndex;
+                        String tabName = theTabbedPane.getTitleAt(newIndex);
+                        if (tabName != null)
+                        {
+                            options.setOption(Options.activePreferencesTab,
+                                tabName);
+                        }
+                    }
+                }
+                catch (NullPointerException nullEx)
+                {
+                    //
+                }
+            }
+        });
+
     }
 
     private JPanel getColorPane()

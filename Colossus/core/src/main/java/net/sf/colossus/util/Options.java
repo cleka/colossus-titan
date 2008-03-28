@@ -173,6 +173,7 @@ public final class Options implements IOptions
     public static final String favoriteColors = "Favorite colors";
     public static final String favoriteLookFeel = "Favorite Look And Feel";
     public static final String serverName = "Server name";
+    public static final String activePreferencesTab = "Active preferences tab";
 
     private final Properties props = new Properties();
     private final String owner; // playerName, or Constants.optionsServerName
