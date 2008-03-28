@@ -26,15 +26,24 @@ import net.sf.colossus.webcommon.InstanceTracker;
 
 
 /**
- *  Thread to handle one client connection.
+ *  Holds all data specific to one client connection.
+ *  (Earlier this was the class SocketClientThread, but since changing
+ *   to NIO it's not an own thread any more.)
+ *   
+ *  The code in here is (should be) executed exclusively by the server
+ *  thread as reaction to something happening on the selector
+ *  - first the client connection being accepted, and then later always
+ *  when data from client was received (usually from THIS client, but
+ *  there might be other cases).
+ *    
  *  @version $Id$
  *  @author David Ripton
  */
 
-final class SocketServerThread implements IClient
+final class ClientHandler implements IClient
 {
-    private static final Logger LOGGER = Logger
-        .getLogger(SocketServerThread.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(ClientHandler.class
+        .getName());
 
     private final Server server;
     private final SocketChannel socketChannel;
@@ -59,8 +68,7 @@ final class SocketServerThread implements IClient
     private final CharsetEncoder encoder = charset.newEncoder();
     private final CharsetDecoder decoder = charset.newDecoder();
 
-    SocketServerThread(Server server, SocketChannel channel,
-        SelectionKey selKey)
+    ClientHandler(Server server, SocketChannel channel, SelectionKey selKey)
     {
         this.server = server;
         this.socketChannel = channel;
@@ -478,7 +486,7 @@ final class SocketServerThread implements IClient
 
         isGone = true;
         sendViaChannel(Constants.dispose);
-        server.disposeSST(this);
+        server.disposeClientHandler(this);
     }
 
     public void tellEngagement(MasterHex hex, Legion attacker, Legion defender)

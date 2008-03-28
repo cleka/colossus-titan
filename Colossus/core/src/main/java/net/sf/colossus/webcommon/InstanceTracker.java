@@ -67,7 +67,7 @@ public class InstanceTracker
         interestedIn.add("net.sf.colossus.server.GetPlayers");
         interestedIn.add("net.sf.colossus.server.GameServerSide");
         interestedIn.add("net.sf.colossus.server.Server");
-        interestedIn.add("net.sf.colossus.server.SocketServerThread");
+        interestedIn.add("net.sf.colossus.server.ClientHandler");
 
         interestedIn.add("net.sf.colossus.util.KDialog");
         interestedIn.add("net.sf.colossus.client.StatusScreen");

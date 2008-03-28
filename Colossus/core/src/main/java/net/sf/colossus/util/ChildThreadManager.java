@@ -9,7 +9,7 @@ import java.util.logging.Logger;
 
 /** Keeps track of children threads (usually the socket threads), 
  *  for example at server side the one FileServerThread and one
- *  SocketServerThread per client.
+ *  ClientHandler per client.
  *  A child thread can register her, and when it finishes,
  *  i.e. when the run() method is ending, unregister again.
  *  The parent, usually the main() thread of the application,
@@ -17,7 +17,7 @@ import java.util.logging.Logger;
  *  game), calls then waitUntilAllChildThreadsGone(); that one 
  *  returns when all children threads have unregistered.    
  *  (for this to work it is necessary, that each child thread, e.g.
- *  SocketServerThread, is properly exiting it's "wait on the socket
+ *  ClientHandler, is properly exiting it's "wait on the socket
  *  input stream" loop).
  *  
  *  

@@ -200,7 +200,7 @@ public final class GameServerSide extends Game
         {
             // Clemens 12/2007:
             // initFileServer can now done before creating local clients,
-            // starting the SSTs and accepting the clients.
+            // starting the ClientHandlers and accepting the clients.
             // It decides whether to start a FST or not based on whether there
             // are *Network type* players in the Player list (instead of
             // whether there is something in the socket list, which was bogus,
@@ -314,7 +314,7 @@ public final class GameServerSide extends Game
         }
     }
 
-    /* Called from the last SocketServerThread connecting 
+    /* Called from the last ClientHandler connecting 
      *  ( = when expected nr. of clients has connected).
      */
     void newGame2()
@@ -1787,7 +1787,7 @@ public final class GameServerSide extends Game
         legion.addToBattleTally(battleTally);
     }
 
-    /* Called from the last SocketServerThread connecting 
+    /* Called from the last ClientHandler connecting 
      *  ( = when expected nr. of clients has connected).
      */
     void loadGame2()

@@ -59,7 +59,7 @@ public final class Server extends Thread implements IServer
 
     /** Map of players to their clients. */
     private final Map<Player, IClient> clientMap = new HashMap<Player, IClient>();
-    private final Map<SocketChannel, SocketServerThread> clientChannelMap = new HashMap<SocketChannel, SocketServerThread>();
+    private final Map<SocketChannel, ClientHandler> clientChannelMap = new HashMap<SocketChannel, ClientHandler>();
     // list of Socket that are currently active
     // TODO: perhaps we could eliminate activeSocketChannelList,
     //       they are all also in clientChannelMap
@@ -102,12 +102,16 @@ public final class Server extends Thread implements IServer
 
     private final ByteBuffer byteBuffer = ByteBuffer.allocate(1024);
 
-    // The SST of which the input is currently processed
+    // The ClientHandler of which the input is currently processed,
+    // and the player name belonging to that client:
 
-    SocketServerThread processingSST = null;
+    ClientHandler processingCH = null;
     String processingPlayerName = null;
 
-    private final List<SocketServerThread> channelChanges = new ArrayList<SocketServerThread>();
+    // Channels are queued into here, to be removed from selector on
+    // next possible opportunity ( = when all waiting-to-be-processed keys
+    // have been processed).
+    private final List<ClientHandler> channelChanges = new ArrayList<ClientHandler>();
 
     Server(GameServerSide game, int port)
     {
@@ -257,42 +261,42 @@ public final class Server extends Thread implements IServer
                     LOGGER.log(Level.FINE, "Accepted: sc = " + sc);
                     SelectionKey selKey = sc.register(selector,
                         SelectionKey.OP_READ);
-                    SocketServerThread sst = new SocketServerThread(this, sc,
-                        selKey);
+                    ClientHandler ch = new ClientHandler(this, sc, selKey);
                     numClients++;
                     synchronized (activeSocketChannelList)
                     {
                         activeSocketChannelList.add(sc);
                     }
-                    clientChannelMap.put(sc, sst);
+                    clientChannelMap.put(sc, ch);
                 }
                 else if ((key.readyOps() & SelectionKey.OP_READ) == SelectionKey.OP_READ)
                 {
                     // Read the data
                     SocketChannel sc = (SocketChannel)key.channel();
-                    SocketServerThread sst = clientChannelMap.get(sc);
-                    if (sst == null)
+                    ClientHandler ch = clientChannelMap.get(sc);
+                    if (ch == null)
                     {
-                        LOGGER.severe("No sst for socket channel " + sc);
+                        LOGGER.severe("No ClientHandler for socket channel "
+                            + sc);
                     }
                     else
                     {
-                        processingSST = sst;
-                        processingPlayerName = sst.getPlayerName();
+                        processingCH = ch;
+                        processingPlayerName = ch.getPlayerName();
 
                         int read = readFromChannel(key, sc);
                         if (read > 0)
                         {
                             byteBuffer.flip();
-                            LOGGER.finest("* before sst.processInput()");
-                            sst.processInput(byteBuffer);
-                            LOGGER.finest("* after  sst.processInput()");
+                            LOGGER.finest("* before ch.processInput()");
+                            ch.processInput(byteBuffer);
+                            LOGGER.finest("* after  ch.processInput()");
                         }
                         else
                         {
                             LOGGER.finest("readFromChannel: 0 bytes read.");
                         }
-                        processingSST = null;
+                        processingCH = null;
                         processingPlayerName = null;
                     }
                 }
@@ -316,9 +320,9 @@ public final class Server extends Thread implements IServer
                 // will add more items to the channelChanges list.
                 while (!channelChanges.isEmpty())
                 {
-                    SocketServerThread nextSST = channelChanges.remove(0);
-                    SocketChannel sc = nextSST.getSocketChannel();
-                    SelectionKey key = nextSST.getKey();
+                    ClientHandler nextCH = channelChanges.remove(0);
+                    SocketChannel sc = nextCH.getSocketChannel();
+                    SelectionKey key = nextCH.getKey();
                     if (key == null)
                     {
                         LOGGER
@@ -326,7 +330,7 @@ public final class Server extends Thread implements IServer
                     }
                     else if (sc.isOpen())
                     {
-                        // sending dispose and setIsGone is done by SST
+                        // sending dispose and setIsGone is done by ClientHandler
                         disconnectChannel(sc, key);
                     }
                     else
@@ -391,7 +395,7 @@ public final class Server extends Thread implements IServer
 
                 // The remote forcibly/unexpectedly closed the connection, 
                 // cancel the selection key and close the channel.
-                processingSST.setIsGone(true);
+                processingCH.setIsGone(true);
                 withdrawFromGame();
                 disconnectChannel(sc, key);
                 return 0;
@@ -412,17 +416,17 @@ public final class Server extends Thread implements IServer
             // Remote entity shut the socket down cleanly. Do the
             // same from our end and cancel the channel.
             withdrawFromGame();
-            processingSST.setIsGone(true);
+            processingCH.setIsGone(true);
             disconnectChannel(sc, key);
             return 0;
         }
     }
 
     /**
-     *  Put the SST into the queue to be removed from selector on next
-     *  possible opportunity
+     *  Put the ClientHandler into the queue to be removed
+     *  from selector on next possible opportunity
      */
-    public void disposeSST(SocketServerThread sst)
+    public void disposeClientHandler(ClientHandler ch)
     {
         if (currentThread().equals(this))
         {
@@ -431,7 +435,7 @@ public final class Server extends Thread implements IServer
             // completely processed
             synchronized (channelChanges)
             {
-                channelChanges.add(sst);
+                channelChanges.add(ch);
             }
         }
         else
@@ -441,7 +445,7 @@ public final class Server extends Thread implements IServer
             // "Abort" button in StartupProgress dialog.
             synchronized (channelChanges)
             {
-                channelChanges.add(sst);
+                channelChanges.add(ch);
             }
         }
     }
@@ -602,8 +606,8 @@ public final class Server extends Thread implements IServer
 
     public boolean isClientGone(Player player)
     {
-        SocketServerThread sst = (SocketServerThread)getClient(player);
-        if (sst == null || sst.isGone())
+        ClientHandler ch = (ClientHandler)getClient(player);
+        if (ch == null || ch.isGone())
         {
             return true;
         }
@@ -710,10 +714,10 @@ public final class Server extends Thread implements IServer
         new Client("127.0.0.1", port, dummyGame, playerName, false, false);
     }
 
-    // TODO temporary method since SocketServerThread doesn't know the player
+    // TODO temporary method since ClientHandler doesn't know the player
     // nor the game, thus can't pass a Player instance directly [Peter]
     // XXX Still TODO? Replaced the two methods by one, because 
-    // SocketServerThread cannot know the Player, and for finding it the 
+    // ClientHandler cannot know the Player, and for finding it the 
     // if (remote) decision needs to be done 
     // -- so folded both methods into one again to avoid the NPE [Clemens]
     synchronized boolean addClient(final IClient client,
@@ -814,7 +818,8 @@ public final class Server extends Thread implements IServer
                 // set in player
                 player.setName(uName);
             }
-            // set playerName + threadname in SST, and send to client:
+            // set playerName + thread name in ClientHandler, and send 
+            // playerName to client:
             // It's necessary to send to client only for that reason, that
             // it otherwise might time out if it does not get quick response
             // (5 seconds) from server to it's initial signOn request
@@ -835,9 +840,9 @@ public final class Server extends Thread implements IServer
 
         for (IClient client : clients)
         {
-            // This sends the dispose message, and queues SST for being
-            // removed from selector. Actual removal happens after all
-            // selector-keys are processed.
+            // This sends the dispose message, and queues ClientHandler's 
+            // channel for being removed from selector. 
+            // Actual removal happens after all selector-keys are processed.
             // @TODO: does that make even sense? shuttingDown is set true,
             // so the selector loop does not even reach the removal part...
             client.dispose();
@@ -1913,8 +1918,8 @@ public final class Server extends Thread implements IServer
     // do not attempt to further read from there.
     public void disconnect()
     {
-        processingSST.setIsGone(true);
-        disposeSST(processingSST);
+        processingCH.setIsGone(true);
+        disposeClientHandler(processingCH);
     }
 
     public void stopGame()
