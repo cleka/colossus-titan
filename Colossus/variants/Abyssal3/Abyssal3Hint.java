@@ -132,21 +132,21 @@ public class Abyssal3Hint implements net.sf.colossus.server.HintInterface
     public List<String> getInitialSplitHint(String label, String[] section)
     {
         List<String> li = new ArrayList<String>();
-        if (label.equals("100"))
+        if (label.equals("500"))
         {
             li.add("Titan");
             li.add("Cyclops");
             li.add("Troll");
             li.add("Troll");
         }
-        else if (label.equals("300"))
+        else if (label.equals("100"))
         {
-            if (rnd.nextFloat() < 0.5)
+            if (rnd.nextFloat() < 0.3)
             {
                 li.add("Titan");
                 li.add("Cyclops");
-                li.add("Troll");
-                li.add("Troll");
+                li.add("Lion");
+                li.add("Lion");
             }
             else
             {
@@ -156,22 +156,12 @@ public class Abyssal3Hint implements net.sf.colossus.server.HintInterface
                 li.add("Lion");
             }
         }
-        else if (label.equals("500"))
+        else if (label.equals("300"))
         {
-            if (rnd.nextFloat() < 0.5)
-            {
-                li.add("Titan");
-                li.add("Cyclops");
-                li.add("Cyclops");
-                li.add("Lion");
-            }
-            else
-            {
-                li.add("Titan");
-                li.add("Cyclops");
-                li.add("Lion");
-                li.add("Lion");
-            }
+            li.add("Titan");
+            li.add("Cyclops");
+            li.add("Troll");
+            li.add("Troll");
         }
         else
         {
