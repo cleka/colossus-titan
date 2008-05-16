@@ -988,7 +988,7 @@ public final class Client implements IClient, IOracle
             public void stringOptionChanged(String optname, String oldValue,
                 String newValue)
             {
-                int scale = Integer.parseInt(oldValue);
+                int scale = Integer.parseInt(newValue);
                 if (scale > 0)
                 {
                     Scale.set(scale);

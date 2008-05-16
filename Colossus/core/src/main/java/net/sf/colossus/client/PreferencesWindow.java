@@ -554,10 +554,8 @@ public class PreferencesWindow extends KFrame implements ItemListener,
             {
                 if (newValue != oldValue)
                 {
-                    options.setOption(Options.scale, newValue);
-                    Scale.set(newValue);
                     net.sf.colossus.util.ResourceLoader.purgeImageCache();
-                    client.rescaleAllWindows();
+                    options.setOption(Options.scale, newValue);
                 }
                 oldValue = newValue;
             }
