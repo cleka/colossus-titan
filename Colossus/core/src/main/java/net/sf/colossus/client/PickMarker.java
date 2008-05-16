@@ -30,15 +30,15 @@ final class PickMarker extends KDialog implements MouseListener,
     WindowListener
 {
     private final List<Marker> markers = new ArrayList<Marker>();
-    private Client client;
     private final SaveWindow saveWindow;
+    private static String markerId;
 
     PickMarker(JFrame parentFrame, Player owner, Set<String> markerIds,
-        Client client)
+        IOptions options)
     {
         super(parentFrame, owner.getName() + ": Pick Legion Marker", true);
 
-        this.client = client;
+        markerId = null;
 
         if (markerIds.isEmpty())
         {
@@ -66,7 +66,7 @@ final class PickMarker extends KDialog implements MouseListener,
         }
 
         pack();
-        saveWindow = new SaveWindow(client.getOptions(), "PickMarker");
+        saveWindow = new SaveWindow(options, "PickMarker");
         Point location = saveWindow.loadLocation();
         if (location == null)
         {
@@ -79,16 +79,22 @@ final class PickMarker extends KDialog implements MouseListener,
         setVisible(true);
     }
 
+    static String pickMarker(JFrame parentFrame, Player owner,
+        Set<String> markerIds, IOptions options)
+    {
+        new PickMarker(parentFrame, owner, markerIds, options);
+        return markerId;
+    }
+
     /** Pass the chosen marker id, or null if none are available or
      *  the player aborts the selection. */
-    private void cleanup(String markerId)
+    private void cleanup(String pickedMarkerId)
     {
         saveWindow.saveLocation(getLocation());
         removeMouseListener(this);
         removeWindowListener(this);
         dispose();
-        client.pickMarkerCallback(markerId);
-        client = null;
+        markerId = pickedMarkerId;
     }
 
     @Override

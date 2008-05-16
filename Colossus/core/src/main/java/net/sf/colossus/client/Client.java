@@ -5034,17 +5034,18 @@ public final class Client implements IClient, IOracle
         }
 
         this.parent = legion;
+        String childId = null;
 
         if (options.getOption(Options.autoPickMarker))
         {
-            String childId = ai.pickMarker(markersAvailable, getShortColor());
-            pickMarkerCallback(childId);
+            childId = ai.pickMarker(markersAvailable, getShortColor());
         }
         else
         {
-            new PickMarker(board.getFrame(), owningPlayer, markersAvailable,
-                this);
+            childId = PickMarker.pickMarker(board.getFrame(), owningPlayer,
+                markersAvailable, options);
         }
+        pickMarkerCallback(childId);
     }
 
     /** Called after a marker is picked, either first marker or split. */
@@ -5177,17 +5178,23 @@ public final class Client implements IClient, IOracle
 
     public void askPickFirstMarker()
     {
+        String markerId = null;
+
         Set<String> markersAvailable = getOwningPlayer().getMarkersAvailable();
         if (options.getOption(Options.autoPickMarker))
         {
-            String markerId = ai.pickMarker(markersAvailable, getShortColor());
-            pickMarkerCallback(markerId);
+            markerId = ai.pickMarker(markersAvailable, getShortColor());
         }
         else
         {
-            new PickMarker(board.getFrame(), owningPlayer, markersAvailable,
-                this);
+            do
+            {
+                markerId = PickMarker.pickMarker(board.getFrame(),
+                    owningPlayer, markersAvailable, options);
+            }
+            while (markerId == null);
         }
+        pickMarkerCallback(markerId);
     }
 
     void setLookAndFeel(String lfName)
