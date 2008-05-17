@@ -93,8 +93,8 @@ final class PickMarker extends KDialog implements MouseListener,
         saveWindow.saveLocation(getLocation());
         removeMouseListener(this);
         removeWindowListener(this);
-        dispose();
         markerId = pickedMarkerId;
+        dispose();
     }
 
     @Override
