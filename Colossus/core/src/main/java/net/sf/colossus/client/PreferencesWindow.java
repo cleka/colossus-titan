@@ -506,11 +506,14 @@ public class PreferencesWindow extends KFrame implements ItemListener,
     private void selectColor()
     {
         String c = PickColor.pickColor(this, "You", colorsLeft, options);
-        addColor(c);
-        favoriteColors.add(c);
-        colorsLeft.remove(c);
-        saveFavColor();
-        this.repaint();
+        if (c != null)
+        {
+            addColor(c);
+            favoriteColors.add(c);
+            colorsLeft.remove(c);
+            saveFavColor();
+            this.repaint();
+        }
     }
 
     class ScaleValue extends JPanel implements ChangeListener, ActionListener
