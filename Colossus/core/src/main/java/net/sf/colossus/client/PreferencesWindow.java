@@ -459,6 +459,10 @@ public class PreferencesWindow extends KFrame implements ItemListener,
             client.getOptions().setOption(Options.favoriteColors,
                 favorites.toString());
         }
+        else
+        {
+            client.getOptions().removeOption(Options.favoriteColors);
+        }
     }
 
     private void clearColor()
