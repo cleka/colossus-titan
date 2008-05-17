@@ -4,7 +4,7 @@ package net.sf.colossus.client;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
+import java.awt.GridLayout;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -62,7 +62,7 @@ final class PickColor extends KDialog implements WindowListener,
         pack();
 
         Container contentPane = getContentPane();
-        contentPane.setLayout(new FlowLayout());
+        contentPane.setLayout(new GridLayout(3, 4));
 
         for (int i = 0; i < Constants.MAX_MAX_PLAYERS; i++)
         {
@@ -70,7 +70,7 @@ final class PickColor extends KDialog implements WindowListener,
             {
                 JButton button = new JButton();
                 int scale = Scale.get();
-                button.setPreferredSize(new Dimension(7 * scale, 4 * scale));
+                button.setPreferredSize(new Dimension(7 * scale, 3 * scale));
                 button.setText(Constants.colorNames[i]);
                 button.setMnemonic(Constants.colorMnemonics[i]);
                 button.setBackground(background[i]);
