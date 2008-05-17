@@ -6,7 +6,6 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Point;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowListener;
@@ -65,26 +64,13 @@ final class PickColor extends KDialog implements WindowListener,
         Container contentPane = getContentPane();
         contentPane.setLayout(new FlowLayout());
 
-        Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
-        int width = screen.width;
-
-        width -= 10; // left and right window border... just a guess
-        width -= 20; // some spare ;-) ... arbitrary chosen
-
-        int cnt = Constants.colorNames.length;
-        cnt = (cnt > 1 ? cnt : 1);
-
-        int buttonWidth = (int)Math.floor(width / (double)cnt);
-        buttonWidth -= 5; // space between buttons ... and again just a guess
-        int buttonHeight = (int)Math.floor(4.0 * (buttonWidth / 7.0));
-
         for (int i = 0; i < Constants.MAX_MAX_PLAYERS; i++)
         {
             if (colorsLeft.contains(Constants.colorNames[i]))
             {
                 JButton button = new JButton();
-                button.setPreferredSize(new Dimension(buttonWidth,
-                    buttonHeight));
+                int scale = Scale.get();
+                button.setPreferredSize(new Dimension(7 * scale, 4 * scale));
                 button.setText(Constants.colorNames[i]);
                 button.setMnemonic(Constants.colorMnemonics[i]);
                 button.setBackground(background[i]);
