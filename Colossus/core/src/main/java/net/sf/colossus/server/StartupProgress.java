@@ -82,6 +82,7 @@ public final class StartupProgress implements ActionListener
             {
                 logFrame.pack();
                 logFrame.setVisible(true);
+                showUpTimer.stop();
             }
         });
         showUpTimer.start();
