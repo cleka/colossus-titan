@@ -50,7 +50,7 @@ final class PickMarker extends KDialog implements MouseListener,
         Container contentPane = getContentPane();
 
         int numAvailable = markerIds.size();
-        contentPane.setLayout(new GridLayout(0, Math.min(numAvailable, 12)));
+        contentPane.setLayout(new GridLayout(0, Math.min(numAvailable, 6)));
 
         pack();
         setBackground(Color.lightGray);
