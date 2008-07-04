@@ -54,9 +54,8 @@ final class SummonAngel extends KDialog implements MouseListener,
     private final JButton cancelButton;
     private static boolean active;
     private final Client client;
-    private static final String baseSummonString = ": Summon Angel into Legion ";
-    private static final String sourceSummonString = " Selected Legion is ";
-    private static final String noSourceSummonString = " No selected Legion";
+    private static final String baseSummonString = 
+        ": Summon Angel into Legion ";
     private final SaveWindow saveWindow;
     private static String typeColonDonor = null;
     private Map<Chit, Legion> chitToDonor = new HashMap<Chit, Legion>();
@@ -64,7 +63,7 @@ final class SummonAngel extends KDialog implements MouseListener,
     private SummonAngel(Client client, Legion legion)
     {
         super(client.getBoard().getFrame(), client.getOwningPlayer().getName()
-            + baseSummonString + legion + noSourceSummonString, true);
+            + baseSummonString + legion, true);
 
         this.client = client;
         this.legion = legion;
@@ -171,7 +170,10 @@ final class SummonAngel extends KDialog implements MouseListener,
 
     private void cleanup(Legion donor, String angel)
     {
-        typeColonDonor = angel + ":" + donor.toString();
+        if (donor != null || angel != null)
+        {
+            typeColonDonor = angel + ":" + donor.toString();
+        }
         saveWindow.saveLocation(getLocation());
         dispose();
     }
