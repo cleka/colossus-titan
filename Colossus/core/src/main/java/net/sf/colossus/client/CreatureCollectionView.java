@@ -356,7 +356,7 @@ class CCVFlowLayout extends FlowLayout implements ComponentListener
     private final JScrollPane parentScrollPane;
     private final JComponent parentComponent;
 
-    public CCVFlowLayout(JScrollPane sp, JComponent me, int al, int sx, int sy)
+    CCVFlowLayout(JScrollPane sp, JComponent me, int al, int sx, int sy)
     {
         super(al, sx, sy);
         parentScrollPane = sp;
