@@ -22,6 +22,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -118,7 +120,6 @@ public final class Client implements IClient, IOracle
     private MasterBoard board;
     private StatusScreen statusScreen;
     private CreatureCollectionView caretakerDisplay;
-    private SummonAngel summonAngel;
     private MovementDie movementDie;
     private EngagementResults engagementResults;
     private AutoInspector autoInspector;
@@ -208,9 +209,6 @@ public final class Client implements IClient, IOracle
     private Constants.BattlePhase battlePhase;
     private Legion attacker;
     private Legion defender;
-
-    /** Summon angel donor legion, for this client's player only. */
-    private LegionClientSide donor;
 
     /** If the game is over, then quitting does not require confirmation. */
     private boolean gameOver;
@@ -668,12 +666,8 @@ public final class Client implements IClient, IOracle
     void doSummon(Legion summoner, Legion donor, String unit)
     {
         server.doSummon(summoner, donor, unit);
-
         if (board != null)
         {
-            board.repaint();
-            summonAngel = null;
-
             highlightEngagements();
             board.repaint();
         }
@@ -2335,41 +2329,21 @@ public final class Client implements IClient, IOracle
         }
     }
 
-    SummonAngel getSummonAngel()
-    {
-        return summonAngel;
-    }
-
     public void createSummonAngel(Legion legion)
     {
+        String typeColonDonor;
         if (options.getOption(Options.autoSummonAngels))
         {
-            String typeColonDonor = ai.summonAngel(legion);
-            List<String> parts = Split.split(':', typeColonDonor);
-            String unit = parts.get(0);
-            String donor = parts.get(1);
-            doSummon(legion, getLegion(donor), unit);
+            typeColonDonor = ai.summonAngel(legion);
         }
         else
         {
-            board.deiconify();
-            focusBoard();
-            summonAngel = SummonAngel.summonAngel(this, legion);
+            typeColonDonor = SummonAngel.summonAngel(this, legion);
         }
-    }
-
-    Legion getDonor()
-    {
-        return donor;
-    }
-
-    boolean donorHas(String name)
-    {
-        if (donor == null)
-        {
-            return false;
-        }
-        return donor.getContents().contains(name);
+        List<String> parts = Split.split(':', typeColonDonor);
+        String unit = parts.get(0);
+        String donor = parts.get(1);
+        doSummon(legion, getLegion(donor), unit);
     }
 
     /**
@@ -2575,25 +2549,7 @@ public final class Client implements IClient, IOracle
         {
             return;
         }
-        if (summonAngel != null)
-        {
-            List<LegionClientSide> legions = getLegionsByHex(hex);
-            if (legions.size() != 1)
-            {
-                LOGGER.severe("Not exactly one legion in donor hex");
-                return;
-            }
-            donor = legions.get(0);
-
-            server.setDonor(donor);
-            summonAngel.updateChits();
-            summonAngel.repaint();
-            donor.getMarker().repaint();
-        }
-        else
-        {
-            engage(hex);
-        }
+        engage(hex);
     }
 
     public void askConcede(Legion ally, Legion enemy)
@@ -4398,12 +4354,12 @@ public final class Client implements IClient, IOracle
         return result;
     }
 
-    /** Return a set of hexes for all other unengaged legions of
-     *  the legion's player that have summonables.
+    /** Return a set of all other unengaged legions of the legion's player
+     *  that have summonables.
      */
-    public Set<MasterHex> findSummonableAngelHexes(Legion summoner)
+    public SortedSet<Legion> findLegionsWithSummonableAngels(Legion summoner)
     {
-        Set<MasterHex> result = new HashSet<MasterHex>();
+        SortedSet<Legion> result = new TreeSet<Legion>();
         Player player = summoner.getPlayer();
         for (Legion legion : player.getLegions())
         {
@@ -4412,7 +4368,7 @@ public final class Client implements IClient, IOracle
                 if (legion.hasSummonable()
                     && !(((LegionClientSide)legion).isEngaged()))
                 {
-                    result.add(legion.getCurrentHex());
+                    result.add(legion);
                 }
             }
         }

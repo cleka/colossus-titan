@@ -1374,15 +1374,6 @@ public final class MasterBoard extends JPanel
         selectHexesByLabels(set);
     }
 
-    /** Return number of legions with summonable angels. */
-    int highlightSummonableAngels(Legion legion)
-    {
-        Set<MasterHex> set = client.findSummonableAngelHexes(legion);
-        unselectAllHexes();
-        selectHexesByLabels(set);
-        return set.size();
-    }
-
     private void setupIcon()
     {
         List<String> directories = new ArrayList<String>();
@@ -1646,16 +1637,7 @@ public final class MasterBoard extends JPanel
         }
         else if (phase == Constants.Phase.FIGHT)
         {
-            SummonAngel summonAngel = client.getSummonAngel();
-            if (summonAngel != null)
-            {
-                highlightSummonableAngels(summonAngel.getLegion());
-                summonAngel.repaint();
-            }
-            else
-            {
-                highlightEngagements();
-            }
+            highlightEngagements();
         }
         else if (phase == Constants.Phase.MUSTER)
         {
