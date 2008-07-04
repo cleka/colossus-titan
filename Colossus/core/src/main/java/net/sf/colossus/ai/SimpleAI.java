@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Logger;
@@ -2178,38 +2179,29 @@ public class SimpleAI implements AI
         //
         // TODO Sometimes leave room for recruiting.
 
-        Set<MasterHex> hexes = client.findSummonableAngelHexes(summoner);
+        SortedSet<Legion> legions = 
+            client.findLegionsWithSummonableAngels(summoner);
 
         LegionClientSide bestLegion = null;
         String bestAngel = null;
 
-        for (MasterHex hex : hexes)
+        for (Legion legion : legions)
         {
-            List<LegionClientSide> legions = client.getLegionsByHex(hex);
-            if (legions.size() != 1)
-            {
-                LOGGER.severe("SimpleAI.summonAngel(): Engagement in " + hex);
-                continue;
-            }
-            LegionClientSide legion = legions.get(0);
-            String myAngel = legion.bestSummonable();
-            if (myAngel == null)
-            {
-                LOGGER.severe("SimpleAI.summonAngel(): No angel in " + legion);
-                continue;
-            }
+            LegionClientSide lcs = new LegionClientSide(legion.getMarkerId(),
+                client, legion.getCurrentHex());
 
+            String myAngel = lcs.bestSummonable();
             if (bestAngel == null
                 || bestLegion == null
                 || (client.getGame().getVariant().getCreatureByName(myAngel))
                     .getPointValue() > (client.getGame().getVariant()
                     .getCreatureByName(bestAngel)).getPointValue()
-                || legion.compareTo(bestLegion) > 0
+                || lcs.compareTo(bestLegion) > 0
                 && ((client.getGame().getVariant().getCreatureByName(myAngel))
                     .getPointValue() == (client.getGame().getVariant()
                     .getCreatureByName(bestAngel)).getPointValue()))
             {
-                bestLegion = legion;
+                bestLegion = lcs;
                 bestAngel = myAngel;
             }
         }
