@@ -170,7 +170,7 @@ final class SummonAngel extends KDialog implements MouseListener,
 
     private void cleanup(Legion donor, String angel)
     {
-        if (donor != null || angel != null)
+        if (donor != null && angel != null)
         {
             typeColonDonor = angel + ":" + donor.toString();
         }

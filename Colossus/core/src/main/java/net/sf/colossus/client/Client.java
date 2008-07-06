@@ -2340,10 +2340,13 @@ public final class Client implements IClient, IOracle
         {
             typeColonDonor = SummonAngel.summonAngel(this, legion);
         }
-        List<String> parts = Split.split(':', typeColonDonor);
-        String unit = parts.get(0);
-        String donor = parts.get(1);
-        doSummon(legion, getLegion(donor), unit);
+        if (typeColonDonor != null)
+        {
+            List<String> parts = Split.split(':', typeColonDonor);
+            String unit = parts.get(0);
+            String donor = parts.get(1);
+            doSummon(legion, getLegion(donor), unit);
+        }
     }
 
     /**
