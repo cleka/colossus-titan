@@ -68,8 +68,6 @@ final class SummonAngel extends KDialog implements MouseListener,
         this.client = client;
         this.legion = legion;
 
-        // Count and highlight legions with summonable angels, and put
-        // board into a state where those legions can be selected.
         // TODO this should really not happen in a constructor
         SortedSet<Legion> possibleDonors = 
             client.findLegionsWithSummonableAngels(legion);
@@ -107,21 +105,17 @@ final class SummonAngel extends KDialog implements MouseListener,
             box.add(marker);
             box.add(Box.createRigidArea(new Dimension(scale / 4, 0)));
             box.add(Box.createHorizontalGlue());
-            Set<CreatureType> seen = new HashSet<CreatureType>();
             for (Creature creature : donor.getCreatures())
             {
+                Chit chit = new Chit(scale, creature.getType().getName());
+                box.add(chit);
                 if (creature.getType().isSummonable())
                 {
-                    if (!seen.contains(creature.getType()))
-                    {
-                        seen.add(creature.getType());
-                        Chit chit = 
-                            new Chit(scale, creature.getType().getName());
-                        box.add(chit);
-                        chit.addMouseListener(this);
-                        sumChitList.add(chit);
-                        chitToDonor.put(chit, donor);
-                    }
+                    chit.setBorder(true);
+                    chit.setBorderColor(Color.red);
+                    chit.addMouseListener(this);
+                    sumChitList.add(chit);
+                    chitToDonor.put(chit, donor);
                 }
             }
         }
@@ -160,6 +154,7 @@ final class SummonAngel extends KDialog implements MouseListener,
             new SummonAngel(client, legion);
             active = false;
         }
+        LOGGER.log(Level.FINEST, "summonAngel returning " + typeColonDonor);
         return typeColonDonor;
     }
 
@@ -170,6 +165,7 @@ final class SummonAngel extends KDialog implements MouseListener,
 
     private void cleanup(Legion donor, String angel)
     {
+        LOGGER.log(Level.FINEST, "SummonAngel.cleanup " + donor + " " + angel);
         if (donor != null && angel != null)
         {
             typeColonDonor = angel + ":" + donor.toString();

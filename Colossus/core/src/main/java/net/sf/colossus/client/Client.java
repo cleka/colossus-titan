@@ -1793,6 +1793,10 @@ public final class Client implements IClient, IOracle
 
     public void removeCreature(Legion legion, String name, String reason)
     {
+        if (legion == null || name == null)
+        {
+            return;
+        }
         if (eventViewer != null)
         {
             eventViewer.removeCreature(legion.getMarkerId(), name);
@@ -2346,6 +2350,11 @@ public final class Client implements IClient, IOracle
             String unit = parts.get(0);
             String donor = parts.get(1);
             doSummon(legion, getLegion(donor), unit);
+        }
+        else
+        {
+            // necessary to keep the game moving
+            doSummon(null, null, null);
         }
     }
 
