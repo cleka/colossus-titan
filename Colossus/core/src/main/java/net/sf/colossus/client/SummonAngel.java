@@ -145,6 +145,7 @@ final class SummonAngel extends KDialog implements MouseListener,
     /** Return a string like Angel:Bk12 or Archangel:Rd02, or null. */
     static String summonAngel(Client client, Legion legion)
     {
+        typeColonDonor = null;
         LOGGER.log(Level.FINER, "called summonAngel for " + legion);
         if (!active)
         {
