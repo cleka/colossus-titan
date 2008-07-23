@@ -1001,7 +1001,8 @@ final class SocketClientThread extends Thread implements IServer
 
     public void doSummon(Legion legion, Legion donor, String angel)
     {
-        sendToServer(Constants.doSummon + sep + legion.getMarkerId() + sep
+        sendToServer(Constants.doSummon + sep 
+            + (legion != null ? legion.getMarkerId() : null) + sep
             + (donor != null ? donor.getMarkerId() : null) + sep + angel);
     }
 
