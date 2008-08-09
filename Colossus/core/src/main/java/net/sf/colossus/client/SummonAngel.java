@@ -3,9 +3,8 @@ package net.sf.colossus.client;
 
 import java.awt.Color;
 import java.awt.Container;
-import java.awt.FlowLayout;
-import java.awt.Point;
 import java.awt.Dimension;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -14,26 +13,20 @@ import java.awt.event.MouseListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.HashSet;
-import java.util.TreeSet;
-import java.util.Map;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.SortedSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.swing.JButton;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.JButton;
 
-import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Creature;
-import net.sf.colossus.server.LegionServerSide;
+import net.sf.colossus.game.Legion;
 import net.sf.colossus.util.KDialog;
-import net.sf.colossus.variant.CreatureType;
 
 
 /**
@@ -53,7 +46,6 @@ final class SummonAngel extends KDialog implements MouseListener,
     private final List<Chit> sumChitList = new ArrayList<Chit>();
     private final JButton cancelButton;
     private static boolean active;
-    private final Client client;
     private static final String baseSummonString = 
         ": Summon Angel into Legion ";
     private final SaveWindow saveWindow;
@@ -65,7 +57,6 @@ final class SummonAngel extends KDialog implements MouseListener,
         super(client.getBoard().getFrame(), client.getOwningPlayer().getName()
             + baseSummonString + legion, true);
 
-        this.client = client;
         this.legion = legion;
 
         // TODO this should really not happen in a constructor
@@ -92,9 +83,6 @@ final class SummonAngel extends KDialog implements MouseListener,
 
         int scale = 4 * Scale.get();
 
-        List<CreatureType> summonableList = client.getGame().getVariant()
-            .getSummonableCreatureTypes();
-        Iterator<CreatureType> it = summonableList.iterator();
         sumChitList.clear();
 
         for (Legion donor : possibleDonors)
