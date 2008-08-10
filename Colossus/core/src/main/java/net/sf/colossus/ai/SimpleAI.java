@@ -919,7 +919,6 @@ public class SimpleAI implements AI
     }
 
     /** Return true if we moved something. */
-    @SuppressWarnings("unchecked")
     private boolean handleVoluntaryMoves(PlayerClientSide player,
         Map<Legion, List<MoveInfo>> moveMap,
         Map<MasterHex, List<Legion>>[] enemyAttackMap)
@@ -2179,8 +2178,8 @@ public class SimpleAI implements AI
         //
         // TODO Sometimes leave room for recruiting.
 
-        SortedSet<Legion> legions = 
-            client.findLegionsWithSummonableAngels(summoner);
+        SortedSet<Legion> legions = client
+            .findLegionsWithSummonableAngels(summoner);
 
         LegionClientSide bestLegion = null;
         String bestAngel = null;
