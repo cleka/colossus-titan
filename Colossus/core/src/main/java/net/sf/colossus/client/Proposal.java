@@ -137,7 +137,6 @@ public final class Proposal
         sb.append(sep);
         sb.append(winnerId);
         sb.append(sep);
-        sb.append(sep);
         if (winnerLosses != null)
         {
             Iterator<String> it = winnerLosses.iterator();
