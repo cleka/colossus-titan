@@ -13,43 +13,77 @@
 This describes the recent changes in some more detail than just the
 one-line-info on the main pages "News" section.
 
-<h3>January xx, 2008, build r30xx</h3>
+<h3>August xx, 2008, build r3298 or later</h3>
 <p>
-<b><font color="red">Colossus requires now at least Java 1.5.</font></b>
-<p>  
+A lot of things were changed this time. Some of them you as end-user might notice, some not...
+<p>
+<b><font color="red">Colossus requires now at least Java 1.5!</font></b>
+<p>
+<i>This time the changes in "oldest first" order
+   (earlier they were mostly most recent first, or unordered...)</i>
+<p>
 <ul>
-<li>A new (unfinished) feature in the menu of the battle window: the new help
-    menu contains an entry to show a summary of the terrains on the battle land.</li>
-<li>A new (unfinished) dialog showing information about a player: a click on a
-    player's name in the status screen shows a summary of a player including the
-    legions and creatures currently owned.</li> 
-<li>Bugfix: the AI hints for the Undead variant were fixed so the AIs should go
-    for a third Naga in Plains if a Griffin could be mustered on the next move.</li>
-<li>The indicators for needed roll for a hot and added/lost dice due to
-    rangestrike or terrain, all three of them are now optional.<br>
-    Added pointer to the Battle Map Features document.
-<li>New variant "Abyssal3" added.    
-<li>Added "configure your favorite colors" functionality in Preferences.
-<li>WebClient shows now the number of users logged in to the server.
-<li>Player name in the status screen stays in player's color. This allows
-    telling who e.g. the green player was when green is dead.</li>
-<li>Includes now the <a href="WebClient.html">WebClient</a> (and 
-    <a href="WebServer.html">WebServer</a>) functionality.
-<li>The items in the MasterBoard menu which are more like "Preferences" 
-    (as opposed to: "actions") are now moved into an own window 
-    (Window => Preferences).<br>
-    Documentation for Client is now accordingly split into two files.
-<li>In Game setup a checkbox for "HotSeatMode". If mode is active,
-    it restores on player change the <b>MasterBoard</b> of the active player and
-    minimizes the others. <b>Does not cover the battle maps yet.</b> Also the satellites
-    (game status, eventviewer, ...) come and go with their respective MasterBoard.
-    <br>
-    So, something left to do here...</li>
+<li>Quite some internal cleanup, architectural changes (NIO, less threads, 
+    started to share code between server and client instead of duplicate it, 
+    rearranged java packages, game shutdown/cleanup more properly, memory freed, ...)
 <li>Changes which eliminate or at least provide more logging info related to 
     [ colossus-Bugs-1813362 ] "Battle hangs game, perhaps due to Java 1.5 ?" 
-    {perhaps caused by GTK window Look & Feel?}.
-<li>Quite some internal cleanup.
+    {perhaps caused by GTK window Look & Feel?}.    
+<li>In Game setup a checkbox for "HotSeatMode". If mode is active,
+    it restores on player change the <b>MasterBoard</b> of the active player and
+    minimizes the others. <b>Does not cover the battle maps yet.</b>
+    Also the satellites (game status, eventviewer, ...) come and go with 
+    their respective MasterBoard.<br>
+    So, something left to do here...</li>
+<li>The items in the MasterBoard menu which are more like "Preferences" 
+    (as opposed to: "actions") are now all moved into an own window 
+    (Window => Preferences).<br>
+    Documentation for Client is now accordingly split into two files 
+    (actions in the menu, and meaning of the various Preferences items)
+<li>Includes now the <a href="WebClient.html">WebClient</a> (and 
+    <a href="WebServer.html">WebServer</a>) functionality.<br>
+    <B>We have the code working, but no server running :-( </b><br>
+    <u>If you are willing to help organizing something into that direction, 
+       don't hesitate to contact us!</u>
+<li>Player name in the status screen stays in player's color. This allows
+    telling who e.g. the green player was when green is dead.</li>
+<li>Restricted logging to the Colossus classes.</li>
+<li>Added "configure your favorite colors" functionality in Preferences.
+<li>It's now possible to close the MasterBoard of a dead player (when several
+    human players play on same computer). Earlier this would have quite the whole
+    application. Also the dialogs related to Close and Quit are changed quite much.
+<li>Closing the network client (or when it fails) you are back to the main
+    GetPlayers dialog (instead of just whole application gone, as earlier). </li>
+    Web client dialog behaves the same.</li>
+<li>Last Recently Used lists for server host and port work better now.</li>
+<li>Network client has now a timeout and shows an error message when it fails, and
+    dialog stays up, so one can try again.</li>
+<li>Server port visible and modifyable in GetPlayers dialog.</li>
+<li>New variant "Abyssal3" added.    
+<li>Various improvements to stresstest script.</li>
+<li>A new (unfinished?) feature in the menu of the battle window: the new help
+    menu contains an entry to show a summary of the terrains on the battle land.</li>
+<li>A new dialog showing information about a player: a click on a
+    player's name in the status screen shows a summary of a player including the
+    legions and creatures currently owned.</li> 
+<li>Improved log messages for earned points and half-points, and for acquiring, 
+    and failures in acquiring.</li>
+<li>Fixed: [ 1964752 ] Changing scale value sometimes causes exception.</li>
+<li>Bugfix: the AI hints for the Undead variant were fixed so the AIs should go
+    for a third Naga in Plains if a Griffin could be mustered on the next move.
+    Also some other (minor) special creatures/lands typos in variant data fixed.</li>
+<li>PickMarker and PickColor dialog layout changed to avoid wrap situations.</li>
+<li>Angel Summoning changed: instead of the 2-step-procedure (select legion 
+    on masterboard and then creature from legion in dialog) the dialog shows
+    now all possible donors with the summonables red bordered. And the dialog
+    contains some text instructing how to used it.</li>
+<li>Negotiations (offer and accept) do work now.</li>
 </ul>
+
+<hr>
+yeah, a long time no changes visible to the public (=no public build).
+But as you see above, a lot of things happened...
+<hr>
 
 <h3>December 28, 2007, build r2890</h3>
 
@@ -75,7 +109,7 @@ Changes so far (just most recent first, i.e. NOT sorted by importance... ;-)
     <a href="BattleFeatures.html">Description for the features of the BattleMap window</a>.
     You can also find this page from the documentation index ("The full docs are here.")
     on Colossus main page.
-     
+    
 </ul>
 <li>Changes in EventViewer which should eliminate some (harmless?) exception
     in AWT Event Queue.
