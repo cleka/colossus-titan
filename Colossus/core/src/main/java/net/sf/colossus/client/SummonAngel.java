@@ -23,6 +23,7 @@ import java.util.logging.Logger;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JLabel;
 
 import net.sf.colossus.game.Creature;
 import net.sf.colossus.game.Legion;
@@ -83,16 +84,24 @@ final class SummonAngel extends KDialog implements MouseListener,
 
         int scale = 4 * Scale.get();
 
+        contentPane.add(Box.createRigidArea(new Dimension(0, scale / 4)));
+        Box txtBox = new Box(BoxLayout.X_AXIS);
+        txtBox.add(Box.createRigidArea(new Dimension(8, scale / 8)));
+        txtBox.add(new JLabel("The following legions contain summonable " 
+            + "creatures (they have a red border):   "));
+        txtBox.add(Box.createHorizontalGlue());
+        contentPane.add(txtBox);
+        contentPane.add(Box.createRigidArea(new Dimension(0, scale / 4)));
+        
         sumChitList.clear();
 
         for (Legion donor : possibleDonors)
         {
             Box box = new Box(BoxLayout.X_AXIS);
-            contentPane.add(box);
             Marker marker = new Marker(scale, donor.getMarkerId());
+            box.add(Box.createRigidArea(new Dimension(scale / 8, 0)));
             box.add(marker);
             box.add(Box.createRigidArea(new Dimension(scale / 4, 0)));
-            box.add(Box.createHorizontalGlue());
             for (Creature creature : donor.getCreatures())
             {
                 Chit chit = new Chit(scale, creature.getType().getName());
@@ -106,12 +115,30 @@ final class SummonAngel extends KDialog implements MouseListener,
                     chitToDonor.put(chit, donor);
                 }
             }
+            box.add(Box.createHorizontalGlue());
+            contentPane.add(box);
+            contentPane.add(Box.createRigidArea(new Dimension(0, scale / 8)));
         }
+        
+        txtBox = new Box(BoxLayout.X_AXIS);
+        txtBox.add(Box.createRigidArea(new Dimension(scale / 8, 0)));
+        txtBox.add(Box.createHorizontalGlue());
+        txtBox.add(new JLabel("Click a summonable to summon it to your "
+            + "legion, or Cancel for not summoning anything.   "));
+        txtBox.add(Box.createHorizontalGlue());
+        contentPane.add(txtBox);
+        contentPane.add(Box.createRigidArea(new Dimension(0, scale / 4)));
 
         cancelButton = new JButton("Cancel");
         cancelButton.setMnemonic(KeyEvent.VK_C);
-        contentPane.add(cancelButton);
         cancelButton.addActionListener(this);
+
+        Box btnBox = new Box(BoxLayout.X_AXIS);
+        btnBox.add(Box.createHorizontalGlue());
+        btnBox.add(cancelButton);
+        btnBox.add(Box.createHorizontalGlue());
+        contentPane.add(btnBox);
+        contentPane.add(Box.createRigidArea(new Dimension(0, scale / 4)));
 
         pack();
 
