@@ -138,9 +138,25 @@ final class SummonAngel extends KDialog implements MouseListener,
         if (!active)
         {
             active = true;
-            LOGGER.log(Level.FINEST, "returning new SummonAngel dialog for "
+            LOGGER.log(Level.FINEST, "creating new SummonAngel dialog for "
                 + legion);
-            new SummonAngel(client, legion);
+
+            SummonAngel saDialog = new SummonAngel(client, legion);
+            
+            synchronized (saDialog)
+            {
+                try
+                {
+                    saDialog.wait();
+                }
+                catch (InterruptedException e)
+                {
+                    LOGGER.log(Level.WARNING, "While static SummonAngel() was "
+                        + "waiting for SummonAngel dialog to complete, "
+                        + "received InterruptedException?");
+                }
+            }
+            saDialog = null;
             active = false;
         }
         LOGGER.log(Level.FINEST, "summonAngel returning " + typeColonDonor);
@@ -161,6 +177,10 @@ final class SummonAngel extends KDialog implements MouseListener,
         }
         saveWindow.saveLocation(getLocation());
         dispose();
+        synchronized(this)
+        {
+            this.notify();
+        }
     }
 
     @Override
