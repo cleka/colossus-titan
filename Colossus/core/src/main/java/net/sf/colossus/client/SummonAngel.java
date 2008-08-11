@@ -55,7 +55,7 @@ final class SummonAngel extends KDialog implements MouseListener,
     private SummonAngel(Client client, Legion legion)
     {
         super(client.getBoard().getFrame(), client.getOwningPlayer().getName()
-            + baseSummonString + legion, true);
+            + baseSummonString + legion, false);
 
         this.legion = legion;
 
