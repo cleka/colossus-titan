@@ -104,7 +104,12 @@ final class SummonAngel extends KDialog implements MouseListener,
             box.add(Box.createRigidArea(new Dimension(scale / 4, 0)));
             for (Creature creature : donor.getCreatures())
             {
-                Chit chit = new Chit(scale, creature.getType().getName());
+                String name = creature.getType().getName();
+                if (creature.getType().isTitan())
+                {
+                    name = ((LegionClientSide)legion).getTitanBasename();
+                }
+                Chit chit = new Chit(scale, name);
                 box.add(chit);
                 if (creature.getType().isSummonable())
                 {
