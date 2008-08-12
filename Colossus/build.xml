@@ -8,11 +8,18 @@
      Ant 1.5+        http://jakarta.apache.org/ant/
      JUnit 3.8.1+      http://junit.org
         (Jars are included in the libs subdirectory.)
-     To sign jarfiles, you need a file called usernameKeystore,
-        (substituting your username for "username")
+     To sign jarfiles, you need to have a file called usernameKeystore
+        in the main Colossus directory (there where build.xml is;
+          substituting your username for "username"),
         with an alias matching your username, and you need to put
         the password for this key in environment var JARPASSWORD.
         (Ant won't do keyboard password input.)
+     To install a build on the website (normal public build, or one of
+     the experimental builds, you need a proper rsync/ssh keys setup.
+     Most noticable, you need the ssh public key setup done according SF's
+     instructions, and if your local username at your working computer is
+     different than the username you have on sourceforge, you need to set
+     it (using the variables "Host" and "User") in your .ssh/config file.
 -->
 
 <project name="Colossus" default="jar" basedir=".">
@@ -56,8 +63,6 @@
 		<property name="LIBS_DIR" value="${HTML_DIR}/libs" />
 		<property name="ZIPFILE" value="Colossus.${DSTAMP}.zip" />
 		<property name="SERVER" value="shell1.sf.net" />
-<!--		<property name="SFUSER" value=""${env.SFUSER}" /> -->
-		<property name="SFUSER" value="cleka" />
 
 		<mkdir dir="${build.classes.dir}" />
 		<mkdir dir="${testresults.dir}" />
@@ -301,6 +306,7 @@
 
 	<!-- TODO Eliminate double maintenance -->
 	<!-- This requires rsync and a good ssh-agent setup. -->
+	<!-- Official public build -->
 	<target name="remote-inst" depends="clean,init,sign,dist" description="copy files into htdocs tree on SF">
 		<exec executable="rsync">
 			<arg line="-a Colossus.jar ${SERVER}:${HTML_DIR}" />
@@ -319,20 +325,58 @@
 		</exec>
 	</target>
 
-	<target name="remote-trunk-inst" depends="clean,init,sign" description="copy files into htdocs tree on SF">
+        <!-- The following two remote-trunk-... targets are for updating the "trunk-head*" copies in separate directories;
+             the first one is accessible via the ExperimentalBuilds wiki page. The other one from a special page (not in index).
+             It's somewhat working in standard case, but only always by same person, and/or,
+             before some other user does such a build, he needs unsigned versions of the 2 libs/.jar files.
+             One more problem is, that updated files on SF host get the "users" group, despite the usage of "-g" (-a) attribute for rsync
+             - and I have no clue why this happens.
+             So, if someone else would want to do such an trunk-head* build, he probably have to delete the files by logging
+             in to the server itself (then he can delete them, since directories have right group).
+             After I have done such a build I try to do the command:
+               find . -print | xargs chgrp colossus
+             e.g. being in trunk-head/ or trunk-head-work/ directory so that all files have group colossus.
+          -->
+
+	<!--  trunk-head -->
+	<target name="remote-trunk-head-inst" depends="clean,init,signall" 
+                description="copy files into trunk-head-directory under htdocs tree on SF">
 		<exec executable="rsync">
-			<arg line="-rltgoD --chmod=ug+rw Colossus.jar ${SFUSER}@${SERVER}:${HTML_DIR}/head/Colossus.jar" />
+			<arg line="-a --chmod=ug=rw,o=r Colossus-trunk-head.jnlp ${SERVER}:${HTML_DIR}/trunk-head/Colossus-trunk-head.jnlp" />
 		</exec>
 		<exec executable="rsync">
-			<arg line="--rltgoD --chmod=ug+rw libs/werken.opt.jar ${SFUSER}@${SERVER}:${HTML_DIR}/head/libs/werken.opt.jar" />
+			<arg line="-a --chmod=ug=rw,o=r Colossus.jar ${SERVER}:${HTML_DIR}/trunk-head/Colossus-trunk-head.jar" />
 		</exec>
 		<exec executable="rsync">
-			<arg line="--rltgoD --chmod=ug+rw  libs/jdom.jar ${SFUSER}@${SERVER}:${HTML_DIR}/head/libs/jdom.jar" />
+			<arg line="-a --chmod=ug=rw,o=r libs/werken.opt.jar ${SERVER}:${HTML_DIR}/trunk-head/libs/werken.opt.jar" />
 		</exec>
 		<exec executable="rsync">
-			<arg line="-rltgoD --chmod=ug+rw  Colossus-head.jnlp ${SFUSER}@${SERVER}:${HTML_DIR}" />
+			<arg line="-a --chmod=ug=rw,o=r libs/jdom.jar ${SERVER}:${HTML_DIR}/trunk-head/libs/jdom.jar" />
+		</exec>
+		<exec executable="rsync">
+			<arg line="-a --chmod=ug=rw,o=r  docs/* ${SERVER}:${HTML_DIR}/trunk-head/docs/" />
+		</exec>
+	</target>
+
+	<!--  trunk-head-work (testing copy to play around with the rsync stuff ==> see ExperimentalBuildsWork wiki page) -->
+	<target name="remote-trunk-head-work-inst" depends="clean,init,signall" 
+                description="copy files into trunk-head-work-directory under htdocs tree on SF">
+
+		<exec executable="rsync">
+			<arg line="-a --chmod=ug=rw,o=r Colossus-trunk-head-work.jnlp ${SERVER}:${HTML_DIR}/trunk-head-work/Colossus-trunk-head-work.jnlp" />
+		</exec>
+		<exec executable="rsync">
+			<arg line="-a --chmod=ug=rw,o=r Colossus.jar ${SERVER}:${HTML_DIR}/trunk-head-work/Colossus-trunk-head-work.jar" />
+		</exec>
+		<exec executable="rsync">
+			<arg line="-a --chmod=ug=rw,o=r libs/werken.opt.jar ${SERVER}:${HTML_DIR}/trunk-head-work/libs/werken.opt.jar" />
+		</exec>
+		<exec executable="rsync">
+			<arg line="-a --chmod=ug=rw,o=r libs/jdom.jar ${SERVER}:${HTML_DIR}/trunk-head-work/libs/jdom.jar" />
+		</exec>
+		<exec executable="rsync">
+			<arg line="-a --chmod=ug=rw,o=r  docs/* ${SERVER}:${HTML_DIR}/trunk-head-work/docs/" />
 		</exec>
 	</target>
 
 </project>
-

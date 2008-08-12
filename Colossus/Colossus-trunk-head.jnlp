@@ -3,19 +3,19 @@
      <!-- JNLP File for Colossus -->
      <jnlp
        codebase="http://colossus.sf.net/"
-       href="Colossus-trunk.jnlp">
+       href="trunk-head/Colossus-trunk-head.jnlp">
        <application-desc main-class="net.sf.colossus.server.Start"/>
        <information>
-         <title>Colossus</title>
+         <title>Colossus (trunk-head build)</title>
          <vendor>Colossus dev team</vendor>
          <icon href="Colossus.gif"/>
          <offline-allowed/>
          <homepage href="index.html"/>
        </information>
        <resources>
-         <jar href="Colossus-trunk.jar"/>
-         <jar href="libs/werken.opt.jar"/>
-         <jar href="libs/jdom.jar"/>
+         <jar href="trunk-head/Colossus-trunk-head.jar"/>
+         <jar href="trunk-head/libs/werken.opt.jar"/>
+         <jar href="trunk-head/libs/jdom.jar"/>
          <j2se version="1.5+" max-heap-size="128M"/>
        </resources>
        <security>
