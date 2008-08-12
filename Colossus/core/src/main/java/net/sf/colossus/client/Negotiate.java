@@ -40,6 +40,9 @@ final class Negotiate extends KDialog implements MouseListener, ActionListener
     private Proposal proposal;
     private Point location;
     private final SaveWindow saveWindow;
+    private Marker attackerMarker;
+    private Marker defenderMarker;
+
 
     Negotiate(Client client, Legion attacker, Legion defender)
     {
@@ -56,8 +59,8 @@ final class Negotiate extends KDialog implements MouseListener, ActionListener
         setBackground(Color.lightGray);
         addMouseListener(this);
 
-        showLegion(attacker, attackerChits);
-        showLegion(defender, defenderChits);
+        attackerMarker = showLegion(attacker, attackerChits);
+        defenderMarker = showLegion(defender, defenderChits);
 
         JButton button1 = new JButton("Offer");
         button1.setMnemonic(KeyEvent.VK_O);
@@ -89,7 +92,7 @@ final class Negotiate extends KDialog implements MouseListener, ActionListener
         repaint();
     }
 
-    private void showLegion(Legion legion, List<Chit> chits)
+    private Marker showLegion(Legion legion, List<Chit> chits)
     {
         Box pane = new Box(BoxLayout.X_AXIS);
         pane.setAlignmentX(0);
@@ -98,6 +101,7 @@ final class Negotiate extends KDialog implements MouseListener, ActionListener
         int scale = 4 * Scale.get();
 
         Marker marker = new Marker(scale, legion.getMarkerId());
+        marker.addMouseListener(this);
         pane.add(marker);
         pane.add(Box.createRigidArea(new Dimension(scale / 4, 0)));
 
@@ -111,6 +115,7 @@ final class Negotiate extends KDialog implements MouseListener, ActionListener
             chits.add(chit);
             pane.add(chit);
         }
+        return marker;
     }
 
     void cleanup()
@@ -121,11 +126,39 @@ final class Negotiate extends KDialog implements MouseListener, ActionListener
         client.negotiateCallback(proposal, true);
     }
 
+    /*
+     * If not all are dead yet, mark all as dead;
+     * but if all are dead, unmark all 
+     */  
+    private void toggleAllDead(List <Chit> chits)
+    {
+        boolean allDead = true;
+        for (Chit c : chits)
+        {
+            if (!c.isDead())
+            {
+                allDead = false;
+            }
+        }
+        for (Chit c : chits)
+        {
+            c.setDead(!allDead);
+        }
+    }
+    
     @Override
     public void mousePressed(MouseEvent e)
     {
         Object source = e.getSource();
-        if (attackerChits.contains(source) || defenderChits.contains(source))
+        if (source == attackerMarker)
+        {
+            toggleAllDead(attackerChits);
+        }
+        else if (source == defenderMarker)
+        {
+            toggleAllDead(defenderChits);
+        }
+        else if (attackerChits.contains(source) || defenderChits.contains(source))
         {
             Chit chit = (Chit)source;
             chit.toggleDead();
