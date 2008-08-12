@@ -53,7 +53,7 @@ is usually the best to leave the setting to <b>&lt;By color&gt;</b>.
 <h3>Section "General"</h3>
 Most of those are hopefully self-explaining:
 <ul>
-<li><A NAME="#Autosave">Autosave</A>
+<li>Autosave
 <li>Log debug messages
 <li>Balanced starting towers
 <li>AIs stop when humans dead
@@ -61,6 +61,26 @@ Most of those are hopefully self-explaining:
 <li>Hot seat mode
 </ul>
 
+<B><A NAME="#Autosave">Autosave:</A></B>
+<p>
+As the name suggests, state of the game is saved regularly (begin of
+each players turn) to files in "saves" directory under the Colossus
+home directory.  Earlier the filenames were simply
+snap&lt;number&gt;.xml, where the number is some representation of
+current date/time (seconds since begin of epoch, or something like
+that).
+<p>
+Since recently (August 2008) now the filename contains also
+information about the current turn number, active player and phase at
+the time of saving. If you don't like those long names, or your system
+cannot handle them, you can disable the "verbose autosave names" (=
+revert to old behavior) by putting the following line into the
+Colossus-server.cfg file:
+
+<pre>
+  Verbose\ autosave\ names=false
+</pre>
+<P>
 <B><A NAME="#HotSeatMode">Hot seat mode:</A></B>
 <P>
 This is intended to reduce the problems with the many open windows
