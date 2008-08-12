@@ -1166,7 +1166,7 @@ public final class GameServerSide extends Game
     {
         Date date = new Date();
         boolean withInfo = options.getOption(Options.autosaveVerboseNames,
-            false);
+            true);
 
         String infoPart = "";
         if (withInfo)
