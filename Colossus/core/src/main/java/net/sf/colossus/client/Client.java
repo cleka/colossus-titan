@@ -799,7 +799,13 @@ public final class Client implements IClient, IOracle
         return movementDie;
     }
 
-    /** public so that server can set autoPlay for AIs. */
+    /** public so that server can set autoPlay for AIs.
+     *  
+     * TODO This it totally confusing: this method is declared
+     * to fulfill the IClient interface, but it is never actually
+     * used, since the SocketClientThread directly deals with
+     * the actual Options object itself...
+     */
     public void setOption(String optname, String value)
     {
         options.setOption(optname, value);
