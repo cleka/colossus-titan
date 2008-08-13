@@ -72,8 +72,6 @@ public interface IServer
 
     public void stopGame();
 
-    public void setDonor(Legion legion);
-
     public void doSplit(Legion parent, String childMarker, String results);
 
     public void doMove(Legion legion, MasterHex hex, String entrySide,

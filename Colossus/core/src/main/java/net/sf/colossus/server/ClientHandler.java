@@ -382,11 +382,6 @@ final class ClientHandler implements IClient
             server.disconnect();
             server.stopGame();
         }
-        else if (method.equals(Constants.setDonor))
-        {
-            String markerId = args.remove(0);
-            server.setDonor(resolveLegion(markerId));
-        }
         else if (method.equals(Constants.doSplit))
         {
             String parentId = args.remove(0);

@@ -1131,11 +1131,6 @@ final class SocketClientThread extends Thread implements IServer
         sendToServer(Constants.stopGame);
     }
 
-    public void setDonor(Legion donor)
-    {
-        sendToServer(Constants.setDonor + sep + donor.getMarkerId());
-    }
-
     public void doSplit(Legion parent, String childMarker, String results)
     {
         sendToServer(Constants.doSplit + sep + parent.getMarkerId() + sep

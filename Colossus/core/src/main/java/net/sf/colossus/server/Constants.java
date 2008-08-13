@@ -440,7 +440,6 @@ public final class Constants
     public static final String withdrawFromGame = "withdrawFromGame";
     public static final String disconnect = "disconnect";
     public static final String stopGame = "stopGame";
-    public static final String setDonor = "setDonor";
     public static final String doSplit = "doSplit";
     public static final String doMove = "doMove";
     public static final String assignColor = "assignColor";
