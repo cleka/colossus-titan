@@ -399,10 +399,23 @@ public class PreferencesWindow extends KFrame implements ItemListener,
     @Override
     public void dispose()
     {
-        //        cleanPrefCBListeners();
         super.dispose();
         options = null;
         client = null;
+    }
+
+    @Override
+    public void setVisible(boolean val)
+    {
+        // We use hideOnClose, so it never actually gets disposed while
+        // client stays alive. Thus, to plug in the the saveOptions when
+        // user closes the PreferencesWindow, we have to couple it to the
+        // hide/unhide:
+        if (!val)
+        {
+            client.getOptions().saveOptions();
+        }
+        super.setVisible(val);
     }
 
     public void actionPerformed(ActionEvent e)
