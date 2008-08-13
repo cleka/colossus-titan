@@ -2506,6 +2506,7 @@ public final class GameServerSide extends Game
         {
             // Only one angel can be summoned per turn.
             player.setSummoned(true);
+            player.setDonor(((LegionServerSide)donor));
 
             // Move the angel or archangel.
             ((LegionServerSide)donor).removeCreature(angel, false, false);
