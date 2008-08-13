@@ -931,10 +931,20 @@ public final class Server extends Thread implements IServer
             LOGGER.severe(getPlayerName()
                 + " illegally called doneWithBattleMoves()");
             getClient(getPlayer()).nak(Constants.doneWithBattleMoves,
-                "Illegal attempt to end phase");
+                "Illegal attempt to end phase (wrong player)");
             return;
         }
+        
         BattleServerSide battle = game.getBattle();
+        if (!battle.getBattlePhase().isMovePhase())
+        {
+            LOGGER.severe(getPlayerName()
+                + " illegally called doneWithBattleMoves()");
+            getClient(getPlayer()).nak(Constants.doneWithBattleMoves,
+                "Illegal attempt to end phase (wrong phase " 
+                + battle.getBattlePhase().toString() + ")");
+            return;
+        }
         battle.doneWithMoves();
     }
 

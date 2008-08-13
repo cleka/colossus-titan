@@ -161,6 +161,21 @@ public final class Constants
         }
 
         /**
+         * Determine if the phase is part of the fighting.
+         * Right now we consider also SUMMON or RECRUT as move phase
+         * (currently they are own phases; I would like those actions
+         *  to happen as part of the move phase instead, then this here
+         *  can be changed).
+         *  
+         * @return true iff the phase is a move phase;
+         * 
+         */
+        public boolean isMovePhase()
+        {
+            return value == 0 || value == 1 || value == 2;
+        }
+
+        /**
          * Returns a non-localized UI string for the phase.
          */
         @Override
