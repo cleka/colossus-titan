@@ -195,7 +195,7 @@ fi
 # copying files.
 
 currdir=`pwd`
-rm -f stop.flag log
+rm -f stop.flag $TEST_WORKDIR/log
 
 # ----------------------------------------------------------------------
 # Under cygwin, if some other terminal still reads the file (e.g. tail -f),
@@ -253,7 +253,7 @@ fi
 export variants
 export variantscount=`echo $variants | wc -w`
 
-rememberSize log
+rememberSize $TEST_WORKDIR/log
 
 while true
 do 
@@ -329,7 +329,7 @@ do
       if [ $i -ge $iMax ]
       then
         echo -e    "\nReady: i=$i, $maxcount rounds run - exiting..."
-        echo -e "$CR\nReady: i=$i, $maxcount rounds run - exiting...$CR" >> log
+        echo -e "$CR\nReady: i=$i, $maxcount rounds run - exiting...$CR" >> $TEST_WORKDIR/log
 
         # if relevant, tell the clients to stop, too:
         if [ "X$remoteclients" != "X" ]
@@ -342,7 +342,7 @@ do
     if [ -e stop.flag ]
     then
       echo -e    "\nFlagfile stop.flag found - exiting..."
-      echo -e "$CR\nFlagfile stop.flag found - exiting...$CR" >> log
+      echo -e "$CR\nFlagfile stop.flag found - exiting...$CR" >> $TEST_WORKDIR/log
       exit
     fi
 done
