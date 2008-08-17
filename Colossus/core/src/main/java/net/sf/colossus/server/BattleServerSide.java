@@ -804,7 +804,6 @@ public final class BattleServerSide extends Battle
                     LOGGER.log(Level.INFO, "undosummon critter " + critter
                         + " back to marker " + donor + "");
                     ((PlayerServerSide)player).setSummoned(false);
-                    ((PlayerServerSide)player).setDonor(null);
                 }
                 else
                 {

@@ -193,10 +193,6 @@ public final class PlayerServerSide extends Player implements
         this.teleported = teleported;
     }
 
-    // TODO the boolean summoned could be eliminated - instead
-    // just be checed for donor != null.
-    // But right now that causes trouble because only the summoned
-    // stated is preserved over save & load.
     boolean hasSummoned()
     {
         return summoned;
