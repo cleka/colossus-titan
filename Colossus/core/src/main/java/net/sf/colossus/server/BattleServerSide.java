@@ -84,6 +84,9 @@ public final class BattleServerSide extends Battle
         // Make sure defender can recruit, even if savegame is off.
         ((LegionServerSide)defender).setRecruitName(null);
 
+        // Make sure donor is null, if it remained set from an earlier battle
+        ((LegionServerSide)attacker).getPlayer().setDonor(null);
+        
         LOGGER.info(attacker + " (" + attacker.getPlayer() + ") attacks "
             + defender + " (" + defender.getPlayer() + ")" + " in "
             + masterHex);
