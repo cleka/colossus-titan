@@ -1940,24 +1940,6 @@ public final class Server extends Thread implements IServer
         }
     }
 
-    public void setDonor(Legion donor)
-    {
-        if (!isActivePlayer())
-        {
-            LOGGER.severe(getPlayerName() + " illegally called setDonor()");
-            return;
-        }
-        PlayerServerSide player = game.getActivePlayer();
-        if (donor != null && donor.getPlayer() == player)
-        {
-            player.setDonor((LegionServerSide)donor);
-        }
-        else
-        {
-            LOGGER.severe("Bad arg to Server.setDonor() for " + donor);
-        }
-    }
-
     private List<String> getPlayerInfo(boolean treatDeadAsAlive)
     {
         List<String> info = new ArrayList<String>(game.getNumPlayers());
