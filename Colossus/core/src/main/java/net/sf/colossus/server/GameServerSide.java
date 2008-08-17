@@ -1602,6 +1602,11 @@ public final class GameServerSide extends Game
                 player.setTeleported(pla.getAttribute("teleported")
                     .getBooleanValue());
 
+                // TODO what about the donor value? Just summoned is
+                // good enough, so that at least one cannot summon
+                // twice in same engagements-phase,
+                // but not good enough to save a game in mid-battle
+                // in particular in battle turn 4.
                 player.setSummoned(pla.getAttribute("summoned")
                     .getBooleanValue());
 
