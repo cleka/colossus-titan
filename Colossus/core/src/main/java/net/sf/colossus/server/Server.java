@@ -1954,7 +1954,7 @@ public final class Server extends Thread implements IServer
         }
         else
         {
-            LOGGER.severe("Bad arg to Server.getDonor() for " + donor);
+            LOGGER.severe("Bad arg to Server.setDonor() for " + donor);
         }
     }
 
