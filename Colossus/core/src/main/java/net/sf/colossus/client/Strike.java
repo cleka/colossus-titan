@@ -968,9 +968,19 @@ public final class Strike
 
         int strikeNumber = 4 - attackerSkill + defenderSkill;
 
-        // Strike number can be modified directly by terrain.
-        // Native defending in bramble, from strike by a non-native: +1
-        // Native defending in bramble, from rangestrike by a non-native
+        // == Strike number can be modified directly by terrain.
+        
+        // Non-Native striking out of bramble: +1
+        if (client.getBattleHex(striker).getTerrain().equals(
+            HazardTerrain.BRAMBLES)
+            && !striker.getCreature().isNativeIn(HazardTerrain.BRAMBLES)
+            )
+        {
+            strikeNumber++;
+        }
+
+        // Target native defending in bramble, from strike by a non-native: +1
+        // Target Native defending in bramble, from rangestrike by a non-native
         //     non-magicMissile: +1
         if (client.getBattleHex(target).getTerrain().equals(
             HazardTerrain.BRAMBLES)
