@@ -1048,7 +1048,8 @@ public final class MasterBoard extends JPanel
         }
         else
         {
-            bottomBar.setPhase("(" + activePlayer.getName() + " splits)");
+            bottomBar.setPhase("");
+            disableDoneAction(activePlayer.getName() + " splits");
         }
     }
 
@@ -1112,7 +1113,8 @@ public final class MasterBoard extends JPanel
         }
         else
         {
-            bottomBar.setPhase("(" + activePlayerName + " moves)");
+            bottomBar.setPhase("");
+            disableDoneAction(activePlayerName + " moves");
         }
 
         // Force showing the updated movement die.
@@ -1216,7 +1218,8 @@ public final class MasterBoard extends JPanel
         }
         else
         {
-            bottomBar.setPhase("(" + activePlayerName + " musters)");
+            bottomBar.setPhase("");
+            disableDoneAction(activePlayerName + " musters");
         }
     }
 

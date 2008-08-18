@@ -4115,9 +4115,16 @@ public final class Client implements IClient, IOracle
             board.alignLegions(currentHex);
             board.highlightUnmovedLegions();
             board.repaint();
-            if (isMyLegion(legion) && !splitLegionHasForcedMove)
+            if (isMyLegion(legion))
             {
-                board.enableDoneAction();
+                if (splitLegionHasForcedMove)
+                {
+                    board.disableDoneAction("Split legion needs to move");
+                }
+                else
+                {
+                    board.enableDoneAction();
+                }
             }
         }
         kickMoves();
@@ -4137,13 +4144,16 @@ public final class Client implements IClient, IOracle
             board.alignLegions(formerHex);
             board.alignLegions(currentHex);
             board.highlightUnmovedLegions();
-            if (isUndoStackEmpty())
+            if (isMyTurn())
             {
-                board.disableDoneAction("At least one legion must move");
-            }
-            if (splitLegionHasForcedMove)
-            {
-                board.disableDoneAction("Split legion needs to move");
+                if (isUndoStackEmpty())
+                {
+                    board.disableDoneAction("At least one legion must move");
+                }
+                if (splitLegionHasForcedMove)
+                {
+                    board.disableDoneAction("Split legion needs to move");
+                }
             }
 
             if (didTeleport && eventViewer != null)
@@ -4719,7 +4729,7 @@ public final class Client implements IClient, IOracle
         if (turnNumber == 1 && numSplitsThisTurn == 0)
         {
             // must split in first turn - Done not allowed now
-            if (board != null)
+            if (board != null && isMyTurn())
             {
                 board.disableDoneAction("Split required in first round");
             }
@@ -5090,7 +5100,7 @@ public final class Client implements IClient, IOracle
         }
 
         numSplitsThisTurn++;
-        if (turnNumber == 1 && board != null)
+        if (turnNumber == 1 && board != null && isMyTurn())
         {
             board.enableDoneAction();
         }
