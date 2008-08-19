@@ -452,11 +452,14 @@ public class BattleHex extends Hex
         { // non-flyer can't fly, obviously...
             return false;
         }
-        return !terrain.effectOnFlyerMovement
-            .equals(HazardTerrain.EffectOnMovement.BLOCKALL)
-            || (terrain.effectOnFlyerMovement
-                .equals(HazardTerrain.EffectOnMovement.BLOCKFOREIGNER) && creature
-                .isNativeIn(terrain));
+       
+        boolean denyBecauseForeigner = (terrain.isNativeFlyersOnly() 
+            && !creature.isNativeIn(terrain));
+
+        // (...||...): It's forbidden if it blocks flying generally,
+        //             or denies flying to foreigners (and cre is foreigner)
+        // !():   It's allowed if it's not forbidden
+        return !(terrain.blocksFlying() || denyBecauseForeigner);
     }
 
     /**
