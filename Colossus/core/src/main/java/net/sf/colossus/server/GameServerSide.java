@@ -3089,6 +3089,9 @@ public final class GameServerSide extends Game
 
         if (results.isMutual())
         {
+            boolean attackerHasTitan = attacker.hasTitan();
+            boolean defenderHasTitan = defender.hasTitan();
+            
             // Remove both legions and give no points.
             ((LegionServerSide)attacker).remove();
             ((LegionServerSide)defender).remove();
@@ -3097,7 +3100,7 @@ public final class GameServerSide extends Game
                 + " agree to mutual elimination");
 
             // If both Titans died, eliminate both players.
-            if (attacker.hasTitan() && defender.hasTitan())
+            if (attackerHasTitan && defenderHasTitan)
             {
                 // Make defender die first, to simplify turn advancing.
                 ((PlayerServerSide)defender.getPlayer()).die(null);
@@ -3107,14 +3110,14 @@ public final class GameServerSide extends Game
 
             // If either was the titan stack, its owner dies and gives
             // half points to the victor.
-            else if (attacker.hasTitan())
+            else if (attackerHasTitan)
             {
                 ((PlayerServerSide)attacker.getPlayer()).die(defender
                     .getPlayer());
                 checkForVictory();
             }
 
-            else if (defender.hasTitan())
+            else if (defenderHasTitan)
             {
                 ((PlayerServerSide)defender.getPlayer()).die(attacker
                     .getPlayer());
@@ -3168,6 +3171,9 @@ public final class GameServerSide extends Game
             points = loser.getPointValue();
 
             Player losingPlayer = loser.getPlayer();
+            
+            // Need to check and remember this before removing the legion
+            boolean loserHasTitan = loser.hasTitan();
 
             // Remove the losing legion.
             ((LegionServerSide)loser).remove();
@@ -3181,13 +3187,19 @@ public final class GameServerSide extends Game
 
             // If this was the titan stack, its owner dies and gives half
             // points to the victor.
-            if (loser.hasTitan())
+            if (loserHasTitan)
             {
                 ((PlayerServerSide)losingPlayer).die(winner.getPlayer());
                 checkForVictory();
             }
 
-            if (winner == defender)
+            if (gameOver)
+            {
+                LOGGER.info("Negotiation (non-mutual) causes Game Over - "
+                    + "skipping summon/reinforce procedures.");
+    
+            }
+            else if (winner == defender)
             {
                 if (((LegionServerSide)defender).canRecruit())
                 {
