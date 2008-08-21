@@ -395,6 +395,10 @@ public final class Constants
     public static final String runClient = "Run network client";
     public static final String runWebClient = "Run web client";
 
+    // Used as prompt, and as the string for "strike penalty" send to server 
+    // for cancelling the strike. 
+    public static final String cancelStrike = "Cancel";
+
     /** Available internal variants  Try to keep this list mostly
      *  alphabetized for easier searching, with Default at the top. */
     public static final String[] variantArray = { "Default", "Abyssal3",

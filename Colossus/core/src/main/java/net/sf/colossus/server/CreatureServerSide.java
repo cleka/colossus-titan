@@ -607,6 +607,14 @@ public class CreatureServerSide extends Creature
     /** Side effects. */
     void assignStrikePenalty(String prompt)
     {
+        if (prompt.equals(Constants.cancelStrike))
+        {
+            LOGGER.log(Level.INFO, "Strike cancelled on pickCarryDialog");
+            penaltyOptions.clear();
+            battle.clearCarryTargets();
+            return;
+        }
+        
         PenaltyOption po = matchingPenaltyOption(prompt);
         if (po != null)
         {
