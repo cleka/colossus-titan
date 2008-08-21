@@ -126,6 +126,9 @@ public final class Client implements IClient, IOracle
     private EventViewer eventViewer;
     private PreferencesWindow preferencesWindow;
 
+    private PickCarry pickCarryDialog = null;
+
+
     /** hexLabel of MasterHex for current or last engagement. */
     private MasterHex battleSite;
     private BattleBoard battleBoard;
@@ -1196,7 +1199,7 @@ public final class Client implements IClient, IOracle
             caretakerDisplay.update();
         }
     }
-
+    
     private void disposeMasterBoard()
     {
         if (board != null)
@@ -1212,6 +1215,19 @@ public final class Client implements IClient, IOracle
         {
             battleBoard.dispose();
             battleBoard = null;
+        }
+    }
+
+    private void disposePickCarryDialog()
+    {
+        if (pickCarryDialog != null)
+        {   
+            if (battleBoard != null)
+            {
+                battleBoard.unselectAllHexes();
+            }
+            pickCarryDialog.dispose();
+            pickCarryDialog = null;
         }
     }
 
@@ -1540,6 +1556,7 @@ public final class Client implements IClient, IOracle
     /** Called from BattleBoard to leave carry mode. */
     public void leaveCarryMode()
     {
+        disposePickCarryDialog();
         server.leaveCarryMode();
         doAutoStrikes();
     }
@@ -2706,6 +2723,8 @@ public final class Client implements IClient, IOracle
             chit.setStruck(true);
         }
 
+        disposePickCarryDialog();
+                
         BattleChit targetChit = getBattleChit(targetTag);
         if (battleBoard != null)
         {
@@ -2846,10 +2865,21 @@ public final class Client implements IClient, IOracle
             }
             else
             {
-                new PickCarry(battleBoard, this, carryDamage,
+                Set<String> carryTargetHexes = new TreeSet<String>();
+                for (String desc : carryTargetDescriptions)
+                {
+                    carryTargetHexes.add(desc.substring(desc.length() - 2));
+                }
+                battleBoard.highlightPossibleCarries(carryTargetHexes);
+                pickCarryDialog = new PickCarry(battleBoard, this, carryDamage,
                     carryTargetDescriptions);
             }
         }
+    }
+
+    public PickCarry getPickCarryDialog()
+    {
+        return pickCarryDialog;
     }
 
     void cleanupNegotiationDialogs()

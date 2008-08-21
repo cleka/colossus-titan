@@ -151,31 +151,8 @@ public final class BattleBoard extends KFrame
 
                 BattleChit chit = getBattleChitAtPoint(point);
                 GUIBattleHex hex = battleMap.getHexContainingPoint(point);
-                String hexLabel = "";
-                client.resetStrikeNumbers();
-                if (hex != null)
-                {
-                    hexLabel = hex.getHexModel().getLabel();
-                }
-
-                if (chit != null
-                    && client.getPlayerByTag(chit.getTag()).equals(
-                        client.getBattleActivePlayer()))
-                {
-                    actOnCritter(chit.getTag());
-                }
-
-                // No hits on friendly chits, so check map.
-                else if (hex != null && hex.isSelected())
-                {
-                    actOnHex(hexLabel);
-                }
-
-                // No hits on selected hexes, so clean up.
-                else
-                {
-                    actOnMisclick();
-                }
+                
+                handleMousePressed(chit, hex);
             }
         });
 
@@ -215,6 +192,59 @@ public final class BattleBoard extends KFrame
         setBattleMarkerLocation(false, "X" + attacker.getEntrySide());
         setBattleMarkerLocation(true, "X" + defender.getEntrySide());
         reqFocus();
+    }
+
+    private void handleMousePressed(BattleChit chit, GUIBattleHex hex)
+    {
+        String hexLabel = "";
+        client.resetStrikeNumbers();
+        if (hex != null)
+        {
+            hexLabel = hex.getHexModel().getLabel();
+        }
+
+        String choiceDesc;
+        PickCarry pickCarryDialog = client.getPickCarryDialog();
+        boolean ownChit = ( chit != null
+            && client.getPlayerByTag(chit.getTag()).equals(
+                client.getBattleActivePlayer())); 
+        
+        if (pickCarryDialog != null)
+        {
+            if (chit != null && !ownChit)
+            {
+                choiceDesc = pickCarryDialog.findCarryChoiceForHex(hexLabel);
+                // clicked on possible carry target
+                if (choiceDesc != null)
+                {
+                    pickCarryDialog.handleCarryToDescription(choiceDesc);
+                }
+                else
+                {
+                    // enemy but not carryable to there
+                }
+            }
+            else
+            {
+                // not a chit, or at least not own chit
+            }
+        }
+        else if (chit != null && ownChit)
+        {
+            actOnCritter(chit.getTag());
+        }
+
+        // No hits on friendly chits, so check map.
+        else if (hex != null && hex.isSelected())
+        {
+            actOnHex(hexLabel);
+        }
+
+        // No hits on selected hexes, so clean up.
+        else
+        {
+            actOnMisclick();
+        }
     }
 
     private void setBattleMarkerLocation(boolean isDefender, String hexLabel)
@@ -568,6 +598,17 @@ public final class BattleBoard extends KFrame
         client.resetStrikeNumbers();
         battleMap.selectHexesByLabels(set);
         client.setStrikeNumbers(tag, set);
+        // XXX Needed?
+        repaint();
+    }
+
+    /** Highlight all hexes to which carries could be applied */
+    public void highlightPossibleCarries(Set<String> set)
+    {
+        unselectAllHexes();
+        client.resetStrikeNumbers();
+        battleMap.selectHexesByLabels(set);
+        // client.setStrikeNumbers(tag, set);
         // XXX Needed?
         repaint();
     }

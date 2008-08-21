@@ -6,6 +6,7 @@ import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -22,6 +23,7 @@ import net.sf.colossus.util.KDialog;
 final class PickCarry extends KDialog implements ActionListener
 {
     private final Client client;
+    private final Set<String> choices;
     private static final String cancel = "Decline carry";
     private final SaveWindow saveWindow;
 
@@ -30,9 +32,10 @@ final class PickCarry extends KDialog implements ActionListener
         Set<String> choices)
     {
         super(parentFrame, "Apply " + carryDamage
-            + (carryDamage == 1 ? "carry to:" : " carries to:"), false);
+            + (carryDamage == 1 ? " carry to:" : " carries to:"), false);
 
         this.client = client;
+        this.choices = choices;
 
         getContentPane().setLayout(new GridLayout(choices.size() + 1, 1));
 
@@ -73,19 +76,72 @@ final class PickCarry extends KDialog implements ActionListener
         getContentPane().add(button);
     }
 
-    public void actionPerformed(ActionEvent e)
+    /**
+     * @param hex String The short string denoting a hex on the 
+     *                   battle map, eg. A1 or D5
+     *
+     * Client calls this when user clicked on a hex (or chit) 
+     * instead of the dialog.
+     * Check whether the clicked hex is a potential carry 
+     * and if yes, return choice the description string
+     */
+    public String findCarryChoiceForHex(String hex)
     {
-        if (e.getActionCommand().equals(cancel))
+        for (String desc : choices)
+        {
+            String choiceHex = desc.substring(desc.length() - 2);
+            if (choiceHex.equals(hex))
+            {
+                return desc;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Called by click on one one of the buttons
+     * (from actionPerformed) or, from battleMap via Client,
+     * if a chit was clicked which is a potential carry target.
+     * @param desc String denoting a carry target choice
+     * 
+     */
+    public void handleCarryToDescription(String desc)
+    {
+        if (desc.equals(cancel))
         {
             client.leaveCarryMode();
         }
         else
         {
-            String desc = e.getActionCommand();
             String targetHex = desc.substring(desc.length() - 2);
             client.applyCarries(targetHex);
         }
         saveWindow.saveLocation(getLocation());
         dispose();
     }
+    
+    public void actionPerformed(ActionEvent e)
+    {
+        String desc = e.getActionCommand();
+        handleCarryToDescription(desc);
+    }
+
+    /* TODO This does not get called, neither if defined with event
+     *      or without??
+     *      The strange thing is, in PickStrikePenalty it is done
+     *      *exactly the same way* and there it works...
+     */
+    // public void windowClosing()
+    @Override
+    public void windowClosing(WindowEvent e)
+    {
+        System.out.println("PickCarry windowClosing 1");
+        client.leaveCarryMode();
+    }
+    public void windowClosing()
+    {
+        System.out.println("PickCarry windowClosing 2");
+        client.leaveCarryMode();
+    }
+
 }
