@@ -1163,7 +1163,8 @@ public final class MasterBoard extends JPanel
         }
         else
         {
-            bottomBar.setPhase("(" + activePlayerName + " fights)");
+            bottomBar.setPhase("");
+            disableDoneAction(activePlayerName + " fights");
         }
     }
 
