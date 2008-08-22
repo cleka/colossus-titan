@@ -4,6 +4,8 @@ package net.sf.colossus.client;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -15,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -60,6 +63,10 @@ final class PickRecruit extends KDialog implements MouseListener,
         int scale = 4 * Scale.get();
 
         JPanel legionPane = new JPanel();
+        String legionId = legion.getMarkerId();
+        String text = "Current content of legion " + legionId + ":";
+        legionPane.setBorder(BorderFactory.createTitledBorder(text));
+
         contentPane.add(legionPane);
 
         legionMarker = new Marker(scale, legion.getMarkerId());
@@ -75,6 +82,12 @@ final class PickRecruit extends KDialog implements MouseListener,
             legionPane.add(chit);
         }
 
+        contentPane.add(Box.createRigidArea(new Dimension(0, scale / 4)));
+        JLabel label = new JLabel(
+            "  Pick one of the following to recruit it, or cancel");
+        label.setAlignmentX(FlowLayout.LEADING);
+        contentPane.add(label);
+        
         JPanel recruitPane = new JPanel();
         contentPane.add(recruitPane);
 

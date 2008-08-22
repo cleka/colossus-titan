@@ -3,6 +3,8 @@ package net.sf.colossus.client;
 
 import java.awt.Color;
 import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -12,8 +14,11 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.swing.BorderFactory;
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import net.sf.colossus.game.Legion;
@@ -53,8 +58,18 @@ final class PickRecruiter extends KDialog implements MouseListener,
         setBackground(Color.lightGray);
         int scale = 4 * Scale.get();
 
+        JLabel label = new JLabel(
+            "  There is more than one way you can recruit this.");
+        label.setAlignmentX(FlowLayout.LEADING );
+        
+        contentPane.add(Box.createRigidArea(new Dimension(0, scale / 4)));
+        contentPane.add(label);
+        contentPane.add(Box.createRigidArea(new Dimension(0, scale / 4)));
+        
         JPanel legionPane = new JPanel();
-        contentPane.add(legionPane);
+        String legionId = legion.getMarkerId();
+        String text = "Current content of legion " + legionId + ":";
+        legionPane.setBorder(BorderFactory.createTitledBorder(text));
 
         legionMarker = new Marker(scale, legion.getMarkerId());
         legionPane.add(legionMarker);
@@ -68,6 +83,14 @@ final class PickRecruiter extends KDialog implements MouseListener,
             legionPane.add(chit);
         }
 
+        contentPane.add(legionPane);
+        contentPane.add(Box.createRigidArea(new Dimension(0, scale / 4)));
+
+        JLabel label2 = new JLabel(
+            "  Pick the creature type you want to reveal:  ");
+        label2.setAlignmentX(FlowLayout.LEADING );
+        contentPane.add(label2);
+        
         JPanel recruiterPane = new JPanel();
         contentPane.add(recruiterPane);
 
