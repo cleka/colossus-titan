@@ -3193,8 +3193,14 @@ public final class Client implements IClient, IOracle
         }
         else
         {
+            // Even if PickRecruiter dialog is modal, this only prevents mouse
+            // and keyboard into; but with pressing "D" one could still end the
+            // recruiting phase which leaves game in inconsisten state...
+            // So, forcibly really disable the Done action for that time.
+            board.disableDoneAction("Finish 'Pick Recruiter' first");
             recruiterName = PickRecruiter.pickRecruiter(board.getFrame(),
                 recruiters, hexDescription, legion, this);
+            board.enableDoneAction();
         }
         return recruiterName;
     }
