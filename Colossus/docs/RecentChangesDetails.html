@@ -13,7 +13,7 @@
 This describes the recent changes in some more detail than just the
 one-line-info on the main pages "News" section.
 
-<h3>August 20, 2008, build r3324 or later</h3>
+<h3>August 22, 2008, built from r3332</h3>
 <p>
 A lot of things were changed this time. Some of them you as end-user might notice, some not...
 <p>
@@ -25,10 +25,10 @@ A lot of things were changed this time. Some of them you as end-user might notic
 <ul>
 <li>Quite some internal cleanup, architectural changes (NIO, less threads, 
     started to share code between server and client instead of duplicate it, 
-    rearranged java packages, game shutdown/cleanup more properly, memory freed, ...)
+    rearranged java packages, game shutdown/cleanup more properly, memory freed, ...)</li>
 <li>Changes which eliminate or at least provide more logging info related to 
     [ colossus-Bugs-1813362 ] "Battle hangs game, perhaps due to Java 1.5 ?" 
-    {perhaps caused by GTK window Look & Feel?}.    
+    {perhaps caused by GTK window Look &amp; Feel?}.</li>
 <li>In Game setup a checkbox for "HotSeatMode". If mode is active,
     it restores on player change the <b>MasterBoard</b> of the active player and
     minimizes the others. <b>Does not cover the battle maps yet.</b>
@@ -37,14 +37,14 @@ A lot of things were changed this time. Some of them you as end-user might notic
     So, something left to do here...</li>
 <li>The items in the MasterBoard menu which are more like "Preferences" 
     (as opposed to: "actions") are now all moved into an own window 
-    (Window => Preferences).<br>
+    (Window=&gt;Preferences).<br>
     Documentation for Client is now accordingly split into two files 
-    (actions in the menu, and meaning of the various Preferences items)
+    (actions in the menu, and meaning of the various Preferences items)</li>
 <li>Includes now the <a href="WebClient.html">WebClient</a> (and 
     <a href="WebServer.html">WebServer</a>) functionality.<br>
-    <B>We have the code working, but no server running :-( </b><br>
+    <b>We have the code working, but no server running :-( </b><br>
     <u>If you are willing to help organizing something into that direction, 
-       don't hesitate to contact us!</u>
+       don't hesitate to contact us!</u></li>
 <li>Player name in the status screen stays in player's color. This allows
     telling who e.g. the green player was when green is dead.</li>
 <li>Restricted logging to the Colossus classes.</li>
@@ -53,13 +53,13 @@ A lot of things were changed this time. Some of them you as end-user might notic
     human players play on same computer). Earlier this would have quite the whole
     application. Also the dialogs related to Close and Quit are changed quite much.
 <li>Closing the network client (or when it fails) you are back to the main
-    GetPlayers dialog (instead of just whole application gone, as earlier). </li>
+    GetPlayers dialog (instead of just whole application gone, as earlier).
     Web client dialog behaves the same.</li>
 <li>Last Recently Used lists for server host and port work better now.</li>
 <li>Network client has now a timeout and shows an error message when it fails, and
     dialog stays up, so one can try again.</li>
 <li>Server port visible and modifyable in GetPlayers dialog.</li>
-<li>New variant "Abyssal3" added.    
+<li>New variant "Abyssal3" added.</li> 
 <li>Various improvements to stresstest script.</li>
 <li>A new (unfinished?) feature in the menu of the battle window: the new help
     menu contains an entry to show a summary of the terrains on the battle land.</li>
@@ -78,8 +78,8 @@ A lot of things were changed this time. Some of them you as end-user might notic
     now all possible donors with the summonables red bordered. And the dialog
     contains some text instructing how to used it.</li>
 <li>Negotiations (offer and accept) do work now.</li>
-<li>Autosave filenames (and those created by just "File-Save" without specifying 
-    own filename, are now long style; i.e. at the end they contain info about
+<li>Autosave filenames (and those created by just "File=&gt;Save" without specifying 
+    own filename), are now long style; i.e. at the end they contain info about
     turn number, active player and phase.</li>
 <li>In new SummonAngel dialog, Titan in possible donor legion is now shown in 
     player color with right power value (instead of the black default icon)</li>
@@ -88,25 +88,33 @@ A lot of things were changed this time. Some of them you as end-user might notic
 <li>Save preferences back to clients cf file also then when preferences dialog is
     "close"d (not only when client/masterboard is closed). </li>
 <li>Fixed: [ 2044243 ] "After summon and left offboard, can't after battle summon"</li>
-<li>Fixed: [ 700478 ] mandatory strike skipped<BR>
+<li>Fixed: [ 700478 ] "mandatory strike skipped":
     DoneWithBattleMoves now checks that it's indeed move phase.</li>
-<li>More change needed for 
-    Fixed: [ 2044243 ] "After summon and left offboard, can't after battle summon";
-    now it should be ok.</li>
-<li>"Done" action (Button & Menu) should now be correctly en/disabled during normal play, 
+<li>Fixed: [ 1859016 ] "Done key and box disabled ?randomly?": 
+    "Done" action (Button &amp; Menu) should now be correctly en/disabled during normal play, 
     also for the non-active players; 
-    but the situation after loading a game is not handled yet</li>    
+    (but the situation after loading a game is not handled yet [1702874]).</li>    
 <li>Fixed: [ 2028230 ] Terrain penalties not applied in combat (ogre out of brambles)</li>    
 <li>Fixed: [ 2058959 ] Angel can fly over volcano</li>
 <li>Fixed: [ 2046854 ] If Titan is killed in negotiation, game does not end</li>
-<li>Pick Strike Penalty dialog: added "cancel", and cancel or closing window 
+<li>Partly done FR [ 491247 ] "Closing a question box":
+    In PickStrikePenalty dialog, added "cancel", and cancel or closing window 
     do now cancel the strike, rather than striking with default.</li>
+<li>Fixed: [ 1895129 ] "carryover gui issue"; this means also partly done 
+    FR [ 558825 ] "Clickable spillover":
+    For picking carry targets, now clicking a valid target does the carry there,
+    clicking anywhere else does not harm (dialog and carry mode keep alive).</li>
+<li>Fixed: [ 1608709 ] Problem mustering when choice (make it impossible to bypass 
+    the Pick Recruiter dialog via Done key shortcut)</li>
+<li>Made the PickRecruit and PickRecruiter dialogs somewhat more informative.</li>
 </ul>
 
-<hr>
+<hr></hr>
+
 yeah, a long time no changes visible to the public (=no public build).
 But as you see above, a lot of things happened...
-<hr>
+
+<hr></hr>
 
 <h3>December 28, 2007, build r2890</h3>
 
