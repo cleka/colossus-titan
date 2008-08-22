@@ -2447,7 +2447,10 @@ public final class Client implements IClient, IOracle
 
     void assignStrikePenalty(String prompt)
     {
-        battleBoard.highlightCrittersWithTargets();
+        if (battleBoard != null)
+        {
+            battleBoard.highlightCrittersWithTargets();
+        }
         server.assignStrikePenalty(prompt);
     }
 
