@@ -808,6 +808,13 @@ public final class Strike
         }
     }
 
+    // TODO : duplicate with Server Side??
+    // This calculcates the penalties etc for client side, and we had a bug
+    // [2028230] claiming strike penalties were not applied.
+    // For the hit result it was applied right, but the preview (here,
+    // client side) was missing something. ==> should use same code as
+    // on server side.
+    
     /** Return the number of dice that will be rolled when striking this
      *  target, including modifications for terrain. */
     public int getDice(BattleChit chit, BattleChit target)
