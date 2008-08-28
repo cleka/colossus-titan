@@ -736,9 +736,26 @@ public final class MasterBoard extends JPanel
         {
             public void actionPerformed(ActionEvent e)
             {
+                String dirSep = File.separator;
+                String colossusHome = new String(
+                    System.getProperty("user.home") + dirSep + ".colossus");
+                String logDirectory = System.getProperty("java.io.tmpdir");
+                // Resolve "DOCUME~1" stuff to real names on windows:
+                File logDir = new File(logDirectory);
+                String logPath = logDirectory;
+                try
+                {
+                    logPath = logDir.getCanonicalPath();
+                }
+                catch(Exception exc)
+                {
+                    // ignore it...
+                }
                 JOptionPane.showMessageDialog(masterFrame, "Colossus build: "
                     + Client.getVersion() + "\n" + "user.home:      "
                     + System.getProperty("user.home") + "\n"
+                    + "Colossus home:  " + colossusHome + "\n"
+                    + "Logdirectory:   " + logPath + "\n"
                     + "java.version:   " + System.getProperty("java.version"));
             }
         };
