@@ -2332,6 +2332,15 @@ public final class Client implements IClient, IOracle
         disposeLogWindow();
         disposeMasterBoard();
 
+        int scale = options.getIntOption(Options.scale);
+        if (scale == -1)
+        {
+            scale = 15;
+            options.setOption(Options.scale, scale);
+            options.saveOptions();
+        }
+        Scale.set(scale);
+
         board = new MasterBoard(this);
         initEventViewer();
         initShowEngagementResults();
