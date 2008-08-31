@@ -310,6 +310,18 @@ public class PredictSplitNode implements Comparable<PredictSplitNode>
             {
                 this.creatures.add(new CreatureInfo(name, true, true));
             }
+            
+            // TODO : added null guard, because during loading a game it went
+            // up and up many times (7+) until it hit null.
+            // Probably caused by incorrent legion contents...
+            // So null guard here to find the reason for that...
+            // Probably should never happen any more after loading of saved
+            // games was fixed in 08/2008... (Clemens)
+            
+            assert this.parent != null : 
+                "Parent in PredictSplitNode is null, but should go up; " 
+                + "certain info gained is " + certainInfoGained; 
+                
             this.parent.revealCreatures(null);
             // Note the parent is responsible for updating the CreatureInfo
             // for this node when calculating the predicted split.
