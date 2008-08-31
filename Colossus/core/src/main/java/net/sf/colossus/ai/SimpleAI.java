@@ -1486,7 +1486,8 @@ public class SimpleAI implements AI
                 else
                 {
                     LOGGER.severe("Bogus legion height "
-                        + (legion).getHeight());
+                        + (legion).getHeight() + " in legion " 
+                        + legion.getMarkerId() + "; content: " + legion.getCreatures().toString());
                 }
 
                 LOGGER.finest("--- if " + legion + " moves to " + hex
