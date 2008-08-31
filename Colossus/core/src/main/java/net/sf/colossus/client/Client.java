@@ -592,6 +592,8 @@ public final class Client implements IClient, IOracle
     public void tellEngagementResults(Legion winner, String method,
         int points, int turns)
     {
+        LOGGER.finest("Client for player " + getOwningPlayer()
+            + " receives eng. res., points=" + points + ", winner=" + winner);
         JFrame frame = getMapOrBoardFrame();
         if (frame == null)
         {

@@ -2564,11 +2564,18 @@ public final class GameServerSide extends Game
             // Remove battle info from winning legion and its creatures.
             winner.clearBattleInfo();
 
-            if (winner.getPlayer() == getActivePlayer())
+            if (gameOver)
+            {
+                LOGGER.finest("in finishBattle: gameOver - skipping "
+                    + "possible summon/reinforce in Game.finishBattle()");
+            }
+            else if (winner.getPlayer() == getActivePlayer())
             {
                 // Attacker won, so possibly summon angel.
                 if (winner.canSummonAngel())
                 {
+                    LOGGER.finest("Calling Game.createSummonAngel() from "
+                        + "Game.finishBattle()");
                     createSummonAngel(winner);
                 }
             }
@@ -2577,8 +2584,8 @@ public final class GameServerSide extends Game
                 // Defender won, so possibly recruit reinforcement.
                 if (attackerEntered && winner.canRecruit())
                 {
-                    LOGGER
-                        .finest("Calling Game.reinforce() from Game.finishBattle()");
+                    LOGGER.finest("Calling Game.reinforce() from "
+                        + "Game.finishBattle()");
                     reinforce(winner);
                 }
             }
@@ -3261,9 +3268,13 @@ public final class GameServerSide extends Game
             pointsScored, turnCombatFinished);
 
         engagementResult = null;
+
         if (checkAutoQuitOrGoOn())
         {
-            server.nextEngagement();
+            if (!gameOver)
+            {
+                server.nextEngagement();
+            }
         }
     }
 
