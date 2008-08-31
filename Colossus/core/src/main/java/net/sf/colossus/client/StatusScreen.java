@@ -280,13 +280,13 @@ final class StatusScreen extends KDialog implements WindowListener
         {
             Player player = client.getPlayer(i);
 
-            if (oracle.getActivePlayer().equals(player))
-            {
-                setPlayerLabelBackground(i, Color.YELLOW);
-            }
-            else if (player.isDead())
+            if (player.isDead())
             {
                 setPlayerLabelBackground(i, Color.RED);
+            }
+            else if (oracle.getActivePlayer().equals(player))
+            {
+                setPlayerLabelBackground(i, Color.YELLOW);
             }
             else
             {
