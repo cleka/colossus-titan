@@ -2197,4 +2197,10 @@ public final class MasterBoard extends JPanel
             disableDoneAction("connection to server lost");
         }
     }
+
+    public void setGameOverState(String message)
+    {
+        bottomBar.setPhase(message);
+        disableDoneAction("Game Over");
+    }
 }

@@ -2571,6 +2571,8 @@ public final class Client implements IClient, IOracle
 
     public void tellGameOver(String message)
     {
+        LOGGER.info("Client " + getOwningPlayer()
+            + " received from server game over message: " + message);
         gameOver = true;
         if (webClient != null)
         {
@@ -2579,9 +2581,8 @@ public final class Client implements IClient, IOracle
 
         if (board != null)
         {
-            // @@ TODO CleKa: take those in use?
-            // defaultCursor();
-            // board.setGameOverState();
+            defaultCursor();
+            board.setGameOverState(message);
             showMessageDialog(message);
         }
     }
