@@ -10,6 +10,7 @@ import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CharsetEncoder;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
@@ -59,6 +60,9 @@ final class ClientHandler implements IClient
 
     private String incompleteInput = "";
     private String incompleteText = "";
+    
+    private int processedCtr = 0;
+    private boolean clientCantFollow = false;
 
     // Charset and encoder: by default according to the property, 
     // fallback US-ASCII
@@ -68,6 +72,10 @@ final class ClientHandler implements IClient
     private final CharsetEncoder encoder = charset.newEncoder();
     private final CharsetDecoder decoder = charset.newDecoder();
 
+    private final int MAX_SERVER_AHEAD = 1200;
+    private final int MIN_CLIENT_CATCHUP = 900;
+    private final int CTR_SYNC_EVERY_N = 500;
+    
     ClientHandler(Server server, SocketChannel channel, SelectionKey selKey)
     {
         this.server = server;
@@ -166,7 +174,46 @@ final class ClientHandler implements IClient
         }
     }
 
+    private int msgCounter = 1;
+    private LinkedList<String> sendToClientQueue = new LinkedList<String>();
+    
     private void sendViaChannel(String msg)
+    {
+        // TODO queue is not synchronized - can something happen?
+        // in later phase of game not - then all action is initiated
+        // via the Selector thread; but in beginning, especially
+        // during loading, can something happen then?
+        sendToClientQueue.add(msg);
+        sendSomethingIfPossible();
+    }
+
+    public void sendSomethingIfPossible()
+    {
+        while(!sendToClientQueue.isEmpty() && !clientCantFollow)
+        {
+            String sendMsg = sendToClientQueue.removeFirst();
+         
+            sendViaChannelRaw(sendMsg);
+            msgCounter++;
+            if (msgCounter % CTR_SYNC_EVERY_N == 0)
+            {
+                sendViaChannelRaw(Constants.msgCtrToClient + sep + msgCounter);
+                msgCounter++;
+            }
+        
+            int serverAhead = msgCounter - processedCtr;
+            if (serverAhead > MAX_SERVER_AHEAD && !clientCantFollow)
+            {
+                LOGGER.info("While trying to send to client " + playerName
+                    + ": server is " + serverAhead + " messages ahead ("
+                    + msgCounter + " vs. " + processedCtr
+                    + ") - setting CLIENT-CANT-FOLLOW TRUE");
+                clientCantFollow = true;
+                Thread.yield();
+            }
+        }
+    }
+    private void sendViaChannelRaw(String msg)
     {
         CharBuffer cb = CharBuffer.allocate(msg.length() + 2);
         cb.put(msg);
@@ -190,6 +237,7 @@ final class ClientHandler implements IClient
                 + " was thrown while writing String '" + msg + "'"
                 + " to channel for player " + playerName);
         }
+        Thread.yield();
     }
 
     private void callMethod(String method, List<String> args)
@@ -423,6 +471,31 @@ final class ClientHandler implements IClient
             String filename = args.remove(0);
             server.saveGame(filename);
         }
+        else if (method.equals(Constants.processedCtr))
+        {
+            processedCtr = Integer.parseInt(args.remove(0));
+            int serverAhead = msgCounter - processedCtr;
+            if (serverAhead < MIN_CLIENT_CATCHUP && clientCantFollow)
+            {
+                LOGGER.info("Received processedCounter from client " + playerName
+                    + ": server is " + serverAhead + " messages ahead ("
+                    + msgCounter + " vs. " + processedCtr
+                    + ") - setting client-cant-follow false");
+
+                clientCantFollow = false;
+                
+                while(!clientCantFollow && !sendToClientQueue.isEmpty())
+                {
+                    // System.out.println("During processing read, client can follow loop...");
+                    sendSomethingIfPossible();
+                }
+                // System.out.println("\n\n*****\nAfter !clientCantFollow loop!\n");
+            }
+        }
+        else if (method.equals(Constants.catchupConfirmation))
+        {
+            server.clientConfirmedCatchup();
+        }
         else
         {
             LOGGER.log(Level.SEVERE, "Bogus packet (Server, method: " + method
@@ -463,9 +536,25 @@ final class ClientHandler implements IClient
         }
         else
         {
-            //            LOGGER.finer("Sending message to client '" + playerName + "': "
-            //                + message);
             sendViaChannel(message);
+            if (server.getGame().isLoadingGame())
+            {
+                // Give clients some opportunity to process it
+                // (especially during replay during loading game)
+                Thread.yield();
+            }
+        }
+    }
+
+    void sleepFor(long ms)
+    {
+        try
+        {
+            Thread.sleep(ms);
+        }
+        catch (InterruptedException ex)
+        {
+            //
         }
     }
 
@@ -584,9 +673,9 @@ final class ClientHandler implements IClient
             + sep + tag + sep + hexLabel);
     }
 
-    public void tellReplay(boolean val)
+    public void tellReplay(boolean val, int maxTurn)
     {
-        sendToClient(Constants.replayOngoing + sep + val);
+        sendToClient(Constants.replayOngoing + sep + val + sep + maxTurn);
     }
 
     public void initBoard()
@@ -841,4 +930,11 @@ final class ClientHandler implements IClient
     {
         sendToClient(Constants.boardActive + sep + val);
     }
+
+    public void confirmWhenCatchedUp()
+    {
+        sendToClient(Constants.askConfirmCatchUp);
+    }
+
 }
+

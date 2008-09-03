@@ -2,10 +2,8 @@ package net.sf.colossus.server;
 
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -35,18 +33,34 @@ public class History
     private boolean loading = false;
 
     /**
-     * Stores the surviving legions.
+     * Stores the surviving legions (this variable is not needed any more)
      * 
-     * While the history should contain all information to reproduce the game state,
-     * the last set of legions is currently still loaded upfront since they contain
-     * the battle-specific information. This collides with replaying the game from
-     * history, so we need to know which legions we have to reconstruct and which
-     * ones we don't touch.
+     * While the history should contain all information to reproduce the game
+     * state, the last set of legions is currently still loaded upfront since
+     * they contain the battle-specific information. This collides with 
+     * replaying the game from history...
+     * Now, since 08/2008, they are not stored as "survivorlegions" any more.
+     * Instead, they are backed up internally (done inside PlayerServerSide),
+     * all the history is replayed. This creates proper split prediction data
+     * in all clients. After that, backup data is compared with result of 
+     * replay.
+     * E.g. Legion count, their content, players eliminated must be in sync.
+     * Then the replayed ones are discarded and the backedup ones restored
+     * - which have the right legion state (moved, donor, summoned, ...) 
      * 
-     * TODO align the history replay more with the original gameplay so we don't
-     *      need this anymore
+     * TODO align the history replay more with the original gameplay so we 
+     *      don't need this anymore;
+     *      08/2008:==> this is now to some part done. Still replay
+     *      events could be closer to original events (split, summon,
+     *      acquire, teleport, ...) , not just the "result" of that
+     *      event (reveal,add,remove effects).
+     *       
+     * TODO instead: model the actual events instead of just result,
+     * or at least add relevant info to history elements, so that all
+     * replayed events carry all needed data so that they could also be 
+     * processed by event viewer (currently EV does not process anything
+     * during replay).
      */
-    private Set<Legion> survivorLegions;
 
     Element getCopy()
     {
@@ -196,13 +210,6 @@ public class History
         this.loading = true;
         assert root != null : "History should always have a JDOM root element as backing store";
 
-        // the game should have a number of legions preset now (all surviving ones)
-        // make sure we don't touch them when replaying the history
-        this.survivorLegions = new HashSet<Legion>();
-        for (Legion legion : server.getGame().getAllLegions())
-        {
-            this.survivorLegions.add(legion);
-        }
         List<Element> kids = root.getChildren();
         Iterator<Element> it = kids.iterator();
         while (it.hasNext())
@@ -210,7 +217,6 @@ public class History
             Element el = it.next();
             fireEventFromElement(server, el);
         }
-        this.survivorLegions = null; // free memory -- TODO could be passed around instead of member
         this.loading = false;
     }
 
@@ -252,10 +258,11 @@ public class History
             }
             Player player = game.getPlayerByMarkerId(markerId);
             Legion legion;
-            if (turn == 1 && !player.hasLegion(markerId))
+
+            if (turn == 1 && player.getLegionByMarkerId(markerId) == null)
             {
-                // there is no create event for the startup legions, so we might need 
-                // to create them for the reveal event
+                // there is no create event for the startup legions,
+                // so we might need to create them for the reveal event
                 legion = new LegionServerSide(markerId, null, player
                     .getStartingTower(), player.getStartingTower(), player,
                     game, creatures
@@ -300,25 +307,29 @@ public class History
             // legion can't remove creatures (not there?) -- create child directly
             // instead
             PlayerServerSide player = parentLegion.getPlayer();
-            Legion childLegion;
+            LegionServerSide childLegion;
             if (player.hasLegion(childId))
             {
                 childLegion = game.getLegionByMarkerId(childId);
+                List<String> content = childLegion.getImageNames();
+                LOGGER.severe("During replay of history: child legion "
+                    + childId + " should not " + "exist yet (turn=" + turn
+                    + ")!!\n"
+                    + "Exists already with: " + content.toString() + " but "
+                    + "should now be created with creatures: " + creatures);
+              
+                childLegion.remove();
             }
-            else
+                
+            childLegion = new LegionServerSide(childId, null, parentLegion
+                .getCurrentHex(), parentLegion.getCurrentHex(), player,
+                game, creatures.toArray(new CreatureType[creatures.size()]));
+
+            player.addLegion(childLegion);
+            
+            for (CreatureType creature : creatures)
             {
-                childLegion = new LegionServerSide(childId, null, parentLegion
-                    .getCurrentHex(), parentLegion.getCurrentHex(), player,
-                    game, creatures
-                        .toArray(new CreatureType[creatures.size()]));
-                player.addLegion(childLegion);
-            }
-            if (!this.survivorLegions.contains(parentLegion))
-            {
-                for (CreatureType creature : creatures)
-                {
-                    parentLegion.removeCreature(creature, false, false);
-                }
+                parentLegion.removeCreature(creature, false, false);
             }
 
             server.didSplit(parentLegion, childLegion, creatureNames, turn);
@@ -329,11 +340,18 @@ public class History
             String survivorId = el.getAttributeValue("survivorId");
             String turnString = el.getAttributeValue("turn");
             int turn = Integer.parseInt(turnString);
+            
             LegionServerSide splitoff = game.getLegionByMarkerId(splitoffId);
-            server.undidSplit(splitoff, game.getLegionByMarkerId(survivorId),
-                false, turn);
-            splitoff.remove(false, false);
+            LegionServerSide survivor = game.getLegionByMarkerId(survivorId);
 
+            server.undidSplit(splitoff, survivor, false, turn);
+            // Add them back to parent:
+            while (splitoff.getHeight() > 0)
+            {
+                CreatureType type = splitoff.removeCreature(0, false, false);
+                survivor.addCreature(type, false);
+            }
+            splitoff.remove(false, false);
         }
         else if (el.getName().equals("AddCreature"))
         {
@@ -344,11 +362,8 @@ public class History
                 + "' to legion with markerId '" + markerId + "', reason '"
                 + reason + "'");
             LegionServerSide legion = game.getLegionByMarkerId(markerId);
-            if (!this.survivorLegions.contains(legion))
-            {
-                legion.addCreature(game.getVariant().getCreatureByName(
-                    creatureName), false);
-            }
+            legion.addCreature(game.getVariant().getCreatureByName(
+                creatureName), false);
             server.allTellAddCreature(legion, creatureName, false, reason);
             LOGGER.finest("Legion '" + markerId + "' now contains "
                 + legion.getCreatures());
@@ -362,12 +377,26 @@ public class History
                 + "' from legion with markerId '" + markerId + "', reason '"
                 + reason + "'");
             LegionServerSide legion = game.getLegionByMarkerId(markerId);
-            if (!this.survivorLegions.contains(legion))
+            if (legion == null)
             {
-                // don't use disbandIfEmpty parameter since that'll fire another history event
-                legion.removeCreature(game.getVariant().getCreatureByName(
-                    creatureName), false, false);
+                LOGGER.warning("removeCreature " + creatureName + 
+                    " from legion " + markerId + ", legion is null");
+                return;
             }
+            else
+            {
+                List<CreatureServerSide> cres = legion.getCreatures();
+                List<String> crenames = new ArrayList<String>();
+                for (CreatureServerSide c : cres)
+                {
+                    crenames.add(c.getName());
+                }
+            }
+            
+            // don't use disbandIfEmpty parameter since that'll fire another history event
+            legion.removeCreature(game.getVariant().getCreatureByName(
+                creatureName), false, false);
+
             server.allTellRemoveCreature(legion, creatureName, false, reason);
             LOGGER.finest("Legion '" + markerId + "' now contains "
                 + legion.getCreatures());
@@ -381,7 +410,16 @@ public class History
         {
             String playerName = el.getAttributeValue("name");
             String slayerName = el.getAttributeValue("slayer");
-            server.allTellPlayerElim(playerName, slayerName, false);
+            PlayerServerSide player = game.getPlayer(playerName);
+            PlayerServerSide slayer = game.getPlayer(slayerName);
+            // Record the slayer and give him this player's legion markers.
+            if (slayer != null)
+            {
+                player.handleSlaying(slayer);
+            }
+            player.setDead(true);
+            server.allUpdatePlayerInfo();
+            server.allTellPlayerElim(player, slayer, false);
         }
     }
 }

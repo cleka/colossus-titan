@@ -57,7 +57,9 @@ public interface IClient
 
     public void initBoard();
 
-    public void tellReplay(boolean val);
+    public void tellReplay(boolean val, int maxTurn);
+    
+    public void confirmWhenCatchedUp();
 
     public void setPlayerName(String newPlayerName);
 

@@ -53,6 +53,7 @@ final class SocketClientThread extends Thread implements IServer
 
     private String reasonFail = null;
     private String initialLine = null;
+    private int expectedCounter = 0;
 
     private final Object isWaitingLock = new Object();
     private boolean isWaiting = false;
@@ -454,6 +455,20 @@ final class SocketClientThread extends Thread implements IServer
         List<String> li = Split.split(sep, s);
         if (!goingDown)
         {
+            // Server side starts with 1 and embeds actual nr into the
+            // message and increments its counter then.
+            // Client side is initialized to 0 and increments beforehand:
+            // If we increment after the parse, it will go wrong as soon
+            // as processing of any message causes an exception
+            //  (incr. would be skipped...)
+            ++expectedCounter;
+            if (expectedCounter % 20 == 0)
+            {
+                LOGGER.finest("Client " + client.getOwningPlayer().getName()
+                    + ": expectedCounter = " + expectedCounter + " - sending ACK.");
+                sendToServer(Constants.processedCtr + sep + expectedCounter);
+            }
+
             String method = li.remove(0);
             callMethod(method, li);
         }
@@ -584,7 +599,10 @@ final class SocketClientThread extends Thread implements IServer
         else if (method.equals(Constants.replayOngoing))
         {
             boolean val = Boolean.valueOf(args.remove(0)).booleanValue();
-            client.tellReplay(val);
+            // older servers may not send this...
+            String turnArgMaybe = args.isEmpty() ? "0" : args.remove(0);
+            int maxTurn = Integer.parseInt(turnArgMaybe);
+            client.tellReplay(val, maxTurn);
         }
         else if (method.equals(Constants.initBoard))
         {
@@ -921,6 +939,23 @@ final class SocketClientThread extends Thread implements IServer
             }
             client.tellEngagementResults(legion, resMethod, points, turns);
         }
+        
+        // Right now server isn't even sending this, I think... take into use?
+        else if (method.equals(Constants.msgCtrToClient))
+        {
+            int gotCounter = Integer.parseInt(args.remove(0));
+            LOGGER.info("client " + client.getOwningPlayer() + " got Counter " + gotCounter);
+            if (gotCounter != expectedCounter)
+            {
+                LOGGER.warning("Expected message counter " +
+                    expectedCounter + " but got " + gotCounter + "!!! => Resyncing.");
+                expectedCounter = gotCounter;
+            }
+        }
+        else if (method.equals(Constants.askConfirmCatchUp))
+        {
+            client.confirmWhenCatchedUp();
+        }
         else
         {
             LOGGER.log(Level.SEVERE, "Bogus packet (Client, method: " + method
@@ -942,8 +977,28 @@ final class SocketClientThread extends Thread implements IServer
     private Legion resolveLegion(String markerId)
     {
         Legion legion = client.getLegion(markerId);
-        assert legion != null : "Client got unknown markerId '" + markerId
-            + "' from server";
+
+        // it's not just "unknown" - it might also be at any point during
+        // the replay of a loaded game that there is no legion for that
+        // marker *at that particular moment*.
+        // Whereas delayed painting in EDT may cause similar error, they
+        // should be carefully distincted.
+
+        if (legion == null)
+        {
+            // If such a thing happens, there is something seriously wrong,
+            // so I don't see a use in continuing the game.
+            // This I call it severe, and log it always, 
+            // not just an assertion. 
+            LOGGER.severe("SCT ResolveLegion for " + markerId + " in client "
+                + client.getOwningPlayer().getName() + " gave null!");
+        }
+
+        // Peter made this assertion, I guess...
+        assert legion != null : "SocketClientThread.resolveLegion("
+            + markerId + " in client of player "
+            + client.getOwningPlayer().getName() + " returned null!";
+
         return legion;
     }
 
@@ -1170,6 +1225,11 @@ final class SocketClientThread extends Thread implements IServer
         sendToServer(Constants.saveGame + sep + filename);
     }
 
+    public void clientConfirmedCatchup()
+    {
+        sendToServer(Constants.catchupConfirmation);
+    }
+    
     private MasterHex resolveHex(String label)
     {
         MasterHex hexByLabel = client.getGame().getVariant().getMasterBoard()

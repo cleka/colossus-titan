@@ -86,6 +86,7 @@ public final class GameServerSide extends Game
     private boolean pendingAdvancePhase;
     private boolean loadingGame;
     private boolean gameOver;
+    private String gameOverMessage = null;
     private BattleServerSide battle;
     private Constants.Phase phase;
     private Server server;
@@ -273,8 +274,10 @@ public final class GameServerSide extends Game
     void newGame()
     {
         clearFlags();
-        // additionally, because clearFlags must NOT do that:
+        // TODO are they really still needed to set? Nowadays we do not
+        // always re-use same game, so they could be initialized in top...
         gameOver = false;
+        gameOverMessage = null;
 
         turnNumber = 1;
         lastRecruitTurnNumber = -1;
@@ -880,17 +883,16 @@ public final class GameServerSide extends Game
         switch (remaining)
         {
             case 0:
-                LOGGER.info("Game over -- Draw at " + new Date().getTime());
-                server.allTellGameOver("Draw");
-                setGameOver(true);
+                LOGGER.info("Reached game over state -- Draw at "
+                    + new Date().getTime());
+                setGameOver(true, "Draw");
                 break;
 
             case 1:
                 String winnerName = getWinner().getName();
-                LOGGER.info("Game over -- " + winnerName + " wins at "
-                    + new Date().getTime());
-                server.allTellGameOver(winnerName + " wins");
-                setGameOver(true);
+                LOGGER.info("Reached game over state -- " + winnerName
+                    + " wins at " + new Date().getTime());
+                setGameOver(true, winnerName + " wins");
                 break;
 
             default:
@@ -903,13 +905,17 @@ public final class GameServerSide extends Game
         return gameOver;
     }
 
-    public synchronized void setGameOver(boolean gameOver)
+    public synchronized void setGameOver(boolean gameOver, String message)
     {
         this.gameOver = gameOver;
-        if (gameOver)
-        {
-            server.allFullyUpdateAllLegionContents(Constants.reasonGameOver);
-        }
+        this.gameOverMessage = message;
+    }
+
+    public void announceGameOver()
+    {
+        server.allFullyUpdateAllLegionContents(Constants.reasonGameOver);
+        LOGGER.info("Announcing: Game over -- " + gameOverMessage);
+        server.allTellGameOver(gameOverMessage);
     }
 
     boolean isLoadingGame()
@@ -956,13 +962,13 @@ public final class GameServerSide extends Game
             && !gameOver)
         {
             LOGGER.info("Not advancing because no humans remain");
-            // TODO buggy?
-            server.allTellGameOver("All humans eliminated");
-            setGameOver(true);
-            checkAutoQuitOrGoOn();
-            return;
+            setGameOver(true, "All humans eliminated");
         }
-        phaseAdvancer.advancePhase();
+
+        if (gameShouldContinue())
+        {
+            phaseAdvancer.advancePhase();
+        }
     }
 
     /** Wrap the complexity of phase advancing. */
@@ -1590,7 +1596,9 @@ public final class GameServerSide extends Game
                 int score = pla.getAttribute("score").getIntValue();
                 player.setScore(score);
 
-                player.setDead(pla.getAttribute("dead").getBooleanValue());
+                // Don't set dead - will be slaughtered during replay...
+                // TODO compare / sync instead?
+                // player.setDead(pla.getAttribute("dead").getBooleanValue());
 
                 int mulligansLeft = pla.getAttribute("mulligansLeft")
                     .getIntValue();
@@ -1624,13 +1632,8 @@ public final class GameServerSide extends Game
                     Element leg = it2.next();
                     readLegion(leg, player);
                 }
-            }
-            // Need all players' playersElim set up before we can do this.
-            Iterator<PlayerServerSide> itPl = players.iterator();
-            while (itPl.hasNext())
-            {
-                PlayerServerSide player = itPl.next();
-                player.computeMarkersAvailable();
+                
+                player.backupLoadedData();
             }
 
             // Battle stuff
@@ -1795,7 +1798,7 @@ public final class GameServerSide extends Game
     /* Called from the last ClientHandler connecting 
      *  ( = when expected nr. of clients has connected).
      */
-    void loadGame2()
+    boolean loadGame2()
     {
         server.allSetColor();
 
@@ -1806,17 +1809,44 @@ public final class GameServerSide extends Game
 
         server.allUpdatePlayerInfo(true);
 
-        server.allTellReplay(true);
+        server.allTellReplay(true, turnNumber);
         server.allInitBoard();
         history.fireEventsFromXML(server);
+        boolean ok = resyncBackupData();
+        LOGGER.info("Loading and resync result: " + ok);
+        
+        if (!ok)
+        {
+            LOGGER.severe("Loading and resync failed - Aborting!!");
+            return false;
+        }
+        
+        for (PlayerServerSide p : getPlayers())
+        {
+            p.computeMarkersAvailable();
+        }
+
         server.allFullyUpdateLegionStatus();
         server.allUpdatePlayerInfo(false);
         server.allTellAllLegionLocations();
-        server.allTellReplay(false);
+        server.allTellReplay(false, 0);
 
         server.allSetupTurnState();
         fullySyncCaretakerDisplays();
+        
         setupPhase();
+        server.allRequestConfirmCatchup();
+        return ok;
+    }
+
+    boolean resyncBackupData()
+    {
+        boolean allOk = true;
+        for (PlayerServerSide player : getPlayers())
+        {
+            allOk = allOk && player.resyncBackupData();
+        }
+        return allOk;
     }
 
     /** Extract and return the numeric part of a filename. */
@@ -2564,18 +2594,11 @@ public final class GameServerSide extends Game
             // Remove battle info from winning legion and its creatures.
             winner.clearBattleInfo();
 
-            if (gameOver)
-            {
-                LOGGER.finest("in finishBattle: gameOver - skipping "
-                    + "possible summon/reinforce in Game.finishBattle()");
-            }
-            else if (winner.getPlayer() == getActivePlayer())
+            if (winner.getPlayer() == getActivePlayer())
             {
                 // Attacker won, so possibly summon angel.
                 if (winner.canSummonAngel())
                 {
-                    LOGGER.finest("Calling Game.createSummonAngel() from "
-                        + "Game.finishBattle()");
                     createSummonAngel(winner);
                 }
             }
@@ -2584,8 +2607,8 @@ public final class GameServerSide extends Game
                 // Defender won, so possibly recruit reinforcement.
                 if (attackerEntered && winner.canRecruit())
                 {
-                    LOGGER.finest("Calling Game.reinforce() from "
-                        + "Game.finishBattle()");
+                    LOGGER
+                        .finest("Calling Game.reinforce() from Game.finishBattle()");
                     reinforce(winner);
                 }
             }
@@ -3268,31 +3291,37 @@ public final class GameServerSide extends Game
             pointsScored, turnCombatFinished);
 
         engagementResult = null;
-
-        if (checkAutoQuitOrGoOn())
+        
+        if (gameShouldContinue())
         {
-            if (!gameOver)
-            {
-                server.nextEngagement();
-            }
+            server.nextEngagement();
         }
     }
 
     /*
      * returns true if game should go on.
      */
-    public boolean checkAutoQuitOrGoOn()
+    public boolean gameShouldContinue()
     {
-        if (gameOver && getOption(Options.autoQuit))
+        if (gameOver)
         {
-            Start.setCurrentWhatToDoNext(Start.QuitAll);
-            dispose();
-            // if dispose does System.exit(), we would never come here, 
-            // but when we get rid of all System.exit()'s ...
+            if (getOption(Options.autoQuit))
+            {
+                Start.setCurrentWhatToDoNext(Start.QuitAll);
+                dispose();
+                // if dispose does System.exit(), we would never come here, 
+                // but when we get rid of all System.exit()'s ...
+            }
+            else
+            {
+                announceGameOver();
+            }
+            LOGGER.info("Game is now over - returning false");
             return false;
         }
         else
         {
+            LOGGER.finest("Game is NOT over yet - returning true");
             return true;
         }
     }

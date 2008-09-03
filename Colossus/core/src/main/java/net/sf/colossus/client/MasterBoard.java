@@ -121,6 +121,7 @@ public final class MasterBoard extends JPanel
 
     /** our own little bar implementation */
     private BottomBar bottomBar;
+    private boolean gameOverStateReached = false;
 
     public static final String saveGameAs = "Save game as";
 
@@ -444,10 +445,18 @@ public final class MasterBoard extends JPanel
         {
             public void actionPerformed(ActionEvent e)
             {
-                // first set disabled...
-                doneWithPhaseAction.setEnabled(false);
-                // because response from server might set it to enabled again
-                client.doneWithPhase();
+                if (gameOverStateReached)
+                {
+                    client.askNewCloseQuitCancel(masterFrame, false);
+                }
+                else
+                {
+                    // first set disabled...
+                    doneWithPhaseAction.setEnabled(false);
+                    // ... because response from server might set it
+                    // to enabled again
+                    client.doneWithPhase();
+                }
             }
         };
         // will be enabled if it is player's turn
@@ -1675,8 +1684,8 @@ public final class MasterBoard extends JPanel
     {
         int modifiers = e.getModifiers();
         return (((modifiers & InputEvent.BUTTON2_MASK) != 0)
-            || ((modifiers & InputEvent.BUTTON3_MASK) != 0) || e.isAltDown() || e
-            .isControlDown());
+            || ((modifiers & InputEvent.BUTTON3_MASK) != 0) || e.isAltDown() 
+            || e.isControlDown());
     }
 
     class MasterBoardMouseHandler extends MouseAdapter
@@ -2184,6 +2193,12 @@ public final class MasterBoard extends JPanel
         bottomBar.setReasonForDisabledDone(reason);
     }
 
+    private void makeDoneCloseWindow()
+    {
+        gameOverStateReached = true;
+        enableDoneAction();
+        
+    }
     public void setServerClosedMessage(boolean gameOver)
     {
         if (gameOver)
@@ -2196,11 +2211,22 @@ public final class MasterBoard extends JPanel
             bottomBar.setPhase("Unable to continue game");
             disableDoneAction("connection to server lost");
         }
+        makeDoneCloseWindow();
+    }
+
+    public void setReplayMode(int currTurn, int maxTurn)
+    {
+        bottomBar.setPhase("Replay ongoing, " + currTurn + " of " + maxTurn
+            + " turns processed");
+        disableDoneAction("please wait...");
     }
 
     public void setGameOverState(String message)
     {
+        masterFrame.setTitle(client.getActivePlayer() + " Turn "
+            + client.getTurnNumber() + " : Game Over -- " + message);
         bottomBar.setPhase(message);
         disableDoneAction("Game Over");
+        makeDoneCloseWindow();
     }
 }

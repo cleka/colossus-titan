@@ -467,6 +467,8 @@ public final class Constants
     //public static final String newGame = "newGame";
     //public static final String loadGame = "loadGame";
     //public static final String saveGame = "saveGame";
+    public static final String processedCtr = "processedCtr";
+    public static final String catchupConfirmation = "catchupConfirmation";
 
     public static final String reasonSplit = "Split";
     public static final String reasonSummon = "Summon";
@@ -541,6 +543,8 @@ public final class Constants
     public static final String log = "log";
     public static final String nak = "nak";
     public static final String boardActive = "boardActive";
+    public static final String msgCtrToClient = "msgCtrToClient";
+    public static final String askConfirmCatchUp = "askConfirmCatchUp";
 
     // engagement resolved, methods:
     public static final String erMethodFlee = "flee";

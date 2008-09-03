@@ -56,6 +56,10 @@ public final class PlayerServerSide extends Player implements
     private LegionServerSide donor;
     private String firstMarker;
 
+    /* Needed during loading a game: */
+    private String playersEliminatedBackup = "";
+    private final List<Legion> legionsBackup = new ArrayList<Legion>();
+    
     PlayerServerSide(String name, GameServerSide game)
     {
         // TODO why are the players on the client side numbered but not here?
@@ -544,6 +548,18 @@ public final class PlayerServerSide extends Player implements
         setDead(true);
 
         // Record the slayer and give him this player's legion markers.
+        handleSlaying(slayer);
+
+        getGame().getServer().allUpdatePlayerInfo();
+
+        LOGGER.info(getName() + " is dead, telling everyone about it");
+
+        getGame().getServer().allTellPlayerElim(this, slayer, true);
+    }
+
+    // Record the slayer and give him this player's legion markers.
+    public void handleSlaying(Player slayer)
+    {
         if (slayer != null)
         {
             slayer.addPlayerElim(this);
@@ -553,12 +569,6 @@ public final class PlayerServerSide extends Player implements
             }
             clearMarkersAvailable();
         }
-
-        getGame().getServer().allUpdatePlayerInfo();
-
-        LOGGER.info(getName() + " is dead, telling everyone about it");
-
-        getGame().getServer().allTellPlayerElim(this, slayer, true);
     }
 
     void eliminateTitan()
@@ -589,5 +599,75 @@ public final class PlayerServerSide extends Player implements
         li.add(Integer.toString(getMulligansLeft()));
         li.addAll(getMarkersAvailable());
         return Glob.glob(":", li);
+    }
+ 
+    /* After legions are loaded, put them aside (legions and who owns them
+     * might be totally mismatching esp. after player elimination.
+     * Reconstruct creation, deceasing, surviving legions, player elimination
+     * and slayer-setting and markerTransfer from history;
+     * After that, synchronize state info like location, hasMoved etc 
+     * from the backup.
+     */
+    
+    public void backupLoadedData()
+    {
+        playersEliminatedBackup = getPlayersElim();
+        setPlayersElim("");
+                
+        for (LegionServerSide l : getLegions())
+        {
+            legionsBackup.add(l);
+        }
+        removeAllLegions();
+    }
+    
+    public boolean resyncBackupData()
+    {
+        if ( !(playersEliminatedBackup != null
+                && getPlayersElim() != null
+                && getPlayersElim().equals(playersEliminatedBackup)))
+        {
+            LOGGER.severe("PlayersEliminated strings NOT in sync: replayed "
+                + " is '"+ getPlayersElim() + "' but loaded is '" 
+                + playersEliminatedBackup + "'!" );
+            return false;
+        }
+        
+        if (getLegions().size() != legionsBackup.size() )
+        {
+            LOGGER.severe("Loaded player data, legion lists different size!" +
+                " replay: " + getLegions().size() +
+                ", loaded: " + legionsBackup.size());
+            return false;
+        }
+        
+        boolean ok = true;
+        for (Legion bl : legionsBackup)
+        {
+            Legion l = getLegionByMarkerId(bl.getMarkerId());
+                        
+            String list1 = ((LegionServerSide)  l).getImageNames().toString();
+            String list2 = ((LegionServerSide) bl).getImageNames().toString();
+                                
+            if (!list1.equals(list2))
+            {
+                LOGGER.severe("Loaded legion data differs from replay result: "
+                    + "Replay-Legion content for " + l.getMarkerId() + " is " 
+                    + list1 + ", Loaded-Legion content is " + list2);
+                ok = false;
+            }
+        }
+        
+        if (ok)
+        {
+            // discard the replay results and get the backup data back into
+            // place which has the right legion state:
+            removeAllLegions();
+            for (Legion l : legionsBackup)
+            {
+                addLegion(l);
+            }
+        }        
+        return ok;
     }
 }

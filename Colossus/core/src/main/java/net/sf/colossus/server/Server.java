@@ -13,6 +13,7 @@ import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -142,6 +143,11 @@ public final class Server extends Thread implements IServer
     {
         while (serverRunning && !shuttingDown)
         {
+            waitOnSelector();
+        }
+        while(!haveAllCatchedUp())
+        {
+            LOGGER.warning("Not all have catched up - still looping");
             waitOnSelector();
         }
         notifyThatGameFinished();
@@ -488,7 +494,8 @@ public final class Server extends Thread implements IServer
         serverRunning = false;
         if (!game.isOver())
         {
-            game.setGameOver(true);
+            LOGGER.info("stopServerRunning called when game was not over yet.");
+            game.setGameOver(true, "Game stopped by system");
         }
 
         stopFileServer();
@@ -783,15 +790,28 @@ public final class Server extends Thread implements IServer
     {
         if (waitingForClients <= 0)
         {
-            logToStartLog("\nStarting the game now.\n");
             if (game.isLoadingGame())
             {
-                game.loadGame2();
+                logToStartLog("Loading game, sending replay data to clients...");
+                boolean ok = game.loadGame2();
+                if (ok)
+                {
+                    logToStartLog("Waiting for clients to catch up with replay data...\n");
+                }
+                else
+                {
+                    logToStartLog("Loading/Replay failed!!\n");
+                    logToStartLog("\n-- Press Abort button "
+                        + "to return to Start Game dialog --\n");
+                    return;
+                }
             }
             else
             {
                 game.newGame2();
             }
+
+            logToStartLog("\nStarting the game now.\n");
             game.getNotifyWebServer().allClientsConnected();
             if (startLog != null)
             {
@@ -997,11 +1017,36 @@ public final class Server extends Thread implements IServer
         }
     }
 
-    synchronized void allTellReplay(boolean val)
+    synchronized void allTellReplay(boolean val, int maxTurn)
     {
         for (IClient client : clients)
         {
-            client.tellReplay(val);
+            client.tellReplay(val, maxTurn);
+        }
+    }
+
+    
+    synchronized void allRequestConfirmCatchup()
+    {
+        // First put them all to the list, send messages after that
+        synchronized(waitingToCatchup)
+        {
+            waitingToCatchup.clear();
+            for (IClient client : clients)
+            {
+                waitingToCatchup.add(client);
+            }
+        
+        /* better to do the sending not inside the notify. It *might*
+         * happen that the sendTo goes an extra way around the wait on 
+         * selector if the queue is just full and if that reply would
+         * want to e.g. remove already from waitingToCatchup list
+         * (which is blocked by the sync. up here) we have a deadlock...
+         */
+            for (IClient client : clients)
+            {
+                client.confirmWhenCatchedUp();
+            }
         }
     }
 
@@ -1028,15 +1073,6 @@ public final class Server extends Thread implements IServer
         {
             client.removeLegion(legion);
         }
-    }
-
-    // TODO The History class still needs the string version of this method, try
-    // to get rid of that
-    void allTellPlayerElim(String eliminatedPlayerName, String slayerName,
-        boolean updateHistory)
-    {
-        allTellPlayerElim(game.getPlayer(eliminatedPlayerName), game
-            .getPlayer(slayerName), updateHistory);
     }
 
     void allTellPlayerElim(Player eliminatedPlayer, Player slayer,
@@ -1914,8 +1950,10 @@ public final class Server extends Thread implements IServer
         player.die(slayer);
         game.checkForVictory();
 
-        // if it returns, it returns true and that means game shall go on.
-        if (game.checkAutoQuitOrGoOn())
+        // checks if game over state is reached, and if yes, announces so;
+        // and returns false.
+        // Otherwise it returns true and that means game shall go on.
+        if (game.gameShouldContinue())
         {
             if (player == game.getActivePlayer())
             {
@@ -2235,6 +2273,36 @@ public final class Server extends Thread implements IServer
     public void saveGame(String filename)
     {
         game.saveGame(filename);
+    }
+
+    private HashSet<IClient> waitingToCatchup = new HashSet<IClient>();
+    
+    public void clientConfirmedCatchup()
+    {
+        ClientHandler ch = processingCH;
+        String playerName = ch.getPlayerName();
+
+        synchronized(waitingToCatchup)
+        {
+            if (waitingToCatchup.contains(ch))
+            {
+                waitingToCatchup.remove(ch);
+            }
+            else
+            {
+                LOGGER.warning("Client for " + playerName
+                    + " not found from waitingForCatchup list!");
+            }
+        
+            int remaining = waitingToCatchup.size();
+            LOGGER.info("Client " + playerName + " confirmed catch-up. "
+                + "Remaining: " + remaining);
+        }
+    }
+
+    private boolean haveAllCatchedUp()
+    {
+        return waitingToCatchup.isEmpty();
     }
 
     /** Used to change a player name after color is assigned. */

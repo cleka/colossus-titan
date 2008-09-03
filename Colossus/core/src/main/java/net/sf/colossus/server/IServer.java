@@ -87,4 +87,7 @@ public interface IServer
     public void loadGame(String filename);
 
     public void saveGame(String filename);
+    
+    public void clientConfirmedCatchup(); 
+    
 }

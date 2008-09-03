@@ -319,6 +319,18 @@ public final class LegionServerSide extends Legion implements
             }
         }
 
+        // TODO during replay / and/or if returnCrToSt is not set,
+        // this is probably unnecessary and creates enormous amount
+        // of extra messages during reload of a long game.
+        // But its safer, there might be a small risk that caretaker
+        // gets empty even if its not really empty???
+        // To be safe, we just do it...
+        /*
+        if (returnCrittersToStacks)
+        {
+            game.getCaretaker().resurrectImmortals();
+        }
+        */
         game.getCaretaker().resurrectImmortals();
 
         // Let the clients clean up the legion marker, etc.

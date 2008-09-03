@@ -114,6 +114,8 @@ public final class Client implements IClient, IOracle
 
     public boolean failed = false;
     private boolean replayOngoing = false;
+    private int replayLastTurn = -1;
+    private int replayMaxTurn = 0;
 
     // TODO the naming of these classes is confusing, they should be clearly named
     // as dialogs
@@ -592,8 +594,6 @@ public final class Client implements IClient, IOracle
     public void tellEngagementResults(Legion winner, String method,
         int points, int turns)
     {
-        LOGGER.finest("Client for player " + getOwningPlayer()
-            + " receives eng. res., points=" + points + ", winner=" + winner);
         JFrame frame = getMapOrBoardFrame();
         if (frame == null)
         {
@@ -768,7 +768,7 @@ public final class Client implements IClient, IOracle
     private void kickMoves()
     {
         if (isMyTurn() && options.getOption(Options.autoMasterMove)
-            && !isGameOver())
+            && !isGameOver() && !replayOngoing)
         {
             doAutoMoves();
         }
@@ -1686,10 +1686,12 @@ public final class Client implements IClient, IOracle
         if (legion == null)
         {
             LOGGER.log(Level.SEVERE, "No legion with markerId '" + markerId
-                + "' (for player " + player + ")");
+                + "'" + " (for player " + player + "), turn = " + turnNumber
+                + " in client " + getOwningPlayer());
         }
         assert legion != null : "No legion with markerId '" + markerId + "'"
-            + " (for player " + player + ")";
+            + " (for player " + player + "), turn = " + turnNumber
+            + " in client " + getOwningPlayer();
         return legion;
     }
 
@@ -2216,16 +2218,41 @@ public final class Client implements IClient, IOracle
 
     private static String propNameForceViewBoard = "net.sf.colossus.forceViewBoard";
 
-    public void tellReplay(boolean val)
+    public void tellReplay(boolean val, int maxTurn)
     {
         replayOngoing = val;
-        if (!replayOngoing)
+        if (replayOngoing)
+        {
+            replayMaxTurn = maxTurn;
+            if (board != null)
+            {
+                board.setReplayMode(0, replayMaxTurn);
+            }
+        }
+        else
         {
             if (board != null)
             {
                 board.recreateMarkers();
             }
         }
+    }
+
+    public void replayTurnChange(int nowTurn)
+    {
+        if (board != null)
+        {
+            board.setReplayMode(nowTurn, replayMaxTurn);
+            if (nowTurn != replayLastTurn)
+            {
+                replayLastTurn = nowTurn;
+            }
+        }
+    }
+
+    public void confirmWhenCatchedUp()
+    {
+        sct.clientConfirmedCatchup();
     }
 
     public void initBoard()
@@ -2583,6 +2610,10 @@ public final class Client implements IClient, IOracle
 
         if (board != null)
         {
+            if (statusScreen != null)
+            {
+                statusScreen.repaint();
+            }
             defaultCursor();
             board.setGameOverState(message);
             showMessageDialog(message);
@@ -4818,13 +4849,17 @@ public final class Client implements IClient, IOracle
 
         if (board != null)
         {
-            if (!replayOngoing)
+            if (replayOngoing)
+            {
+                replayTurnChange(turn);
+            }
+            else
             {
                 board.alignLegions(survivor.getCurrentHex());
                 board.highlightTallLegions();
             }
         }
-        if (isMyTurn() && this.phase == Constants.Phase.SPLIT
+        if (isMyTurn() && this.phase == Constants.Phase.SPLIT && !replayOngoing
             && options.getOption(Options.autoSplit) && !isGameOver())
         {
             boolean done = ai.splitCallback(null, null);
@@ -5138,7 +5173,12 @@ public final class Client implements IClient, IOracle
             Marker marker = new Marker(3 * Scale.get(), child.getMarkerId(),
                 this);
             setMarker(child, marker);
-            if (!replayOngoing)
+            
+            if (replayOngoing)
+            {
+                replayTurnChange(turn);
+            }
+            else
             {
                 board.alignLegions(hex);
             }
@@ -5168,7 +5208,7 @@ public final class Client implements IClient, IOracle
 
         // check also for phase, because delayed callbacks could come
         // after our phase is over but activePlayerName not updated yet.
-        if (isMyTurn() && this.phase == Constants.Phase.SPLIT
+        if (isMyTurn() && this.phase == Constants.Phase.SPLIT && !replayOngoing
             && options.getOption(Options.autoSplit) && !isGameOver())
         {
             boolean done = ai.splitCallback(parent, child);
