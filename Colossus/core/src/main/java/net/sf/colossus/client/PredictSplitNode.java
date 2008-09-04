@@ -321,8 +321,15 @@ public class PredictSplitNode implements Comparable<PredictSplitNode>
             assert this.parent != null : 
                 "Parent in PredictSplitNode is null, but should go up; " 
                 + "certain info gained is " + certainInfoGained; 
-                
-            this.parent.revealCreatures(null);
+
+            // it should never be null, but... in faulty game loading it
+            // did happen. NullGuard just to avoid exceptions.
+            // No LOGGER here, too lazy to add it just for this one here...
+            if (this.parent != null)
+            {
+                this.parent.revealCreatures(null);
+            }
+
             // Note the parent is responsible for updating the CreatureInfo
             // for this node when calculating the predicted split.
         }
