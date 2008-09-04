@@ -23,6 +23,7 @@ import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
@@ -414,6 +415,13 @@ public class PreferencesWindow extends KFrame implements ItemListener,
         if (!val)
         {
             client.getOptions().saveOptions();
+        }
+        else
+        {
+            if ((this.getExtendedState() & JFrame.ICONIFIED) != 0)
+            {
+                this.setExtendedState(JFrame.NORMAL);
+            }
         }
         super.setVisible(val);
     }
