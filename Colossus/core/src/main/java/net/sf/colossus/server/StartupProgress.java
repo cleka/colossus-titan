@@ -10,6 +10,7 @@ import java.awt.event.KeyEvent;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JFrame;
 import javax.swing.SwingConstants;
 import javax.swing.Timer;
 import javax.swing.WindowConstants;
@@ -91,6 +92,11 @@ public final class StartupProgress implements ActionListener
     public void append(String s)
     {
         this.text.append(s + "\n");
+    }
+
+    public JFrame getFrame()
+    {
+        return logFrame;
     }
 
     public void setCompleted()

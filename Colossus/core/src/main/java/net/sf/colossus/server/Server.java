@@ -22,6 +22,8 @@ import java.util.SortedSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.swing.JOptionPane;
+
 import net.sf.colossus.client.Client;
 import net.sf.colossus.client.IClient;
 import net.sf.colossus.client.Proposal;
@@ -803,6 +805,7 @@ public final class Server extends Thread implements IServer
                     logToStartLog("Loading/Replay failed!!\n");
                     logToStartLog("\n-- Press Abort button "
                         + "to return to Start Game dialog --\n");
+                    loadFailed();
                     return;
                 }
             }
@@ -891,6 +894,16 @@ public final class Server extends Thread implements IServer
                 LOGGER.log(Level.SEVERE, "Could not close server socket", ex);
             }
         }
+    }
+
+    public void loadFailed()
+    {
+        JOptionPane.showMessageDialog(startLog.getFrame(),
+            "Loading, replay of history and comparison between saved "
+            + "state and replay result failed!!\n\n"
+            + "Click Abort on the Startup Progress Dialog to return to "
+            + "Game setup dialog to start a different or new one.",
+            "Loading game failed!", JOptionPane.ERROR_MESSAGE);
     }
 
     public void cleanup()
