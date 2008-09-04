@@ -2715,6 +2715,10 @@ public final class Client implements IClient, IOracle
 
         if (respawn)
         {
+            if (negotiate != null)
+            {
+                negotiate.dispose();
+            }
             negotiate = new Negotiate(this, attacker, defender);
         }
     }
@@ -2728,7 +2732,12 @@ public final class Client implements IClient, IOracle
     public void tellProposal(String proposalString)
     {
         Proposal proposal = Proposal.makeFromString(proposalString);
-        new ReplyToProposal(this, proposal);
+        if (replyToProposal != null)
+        {
+            replyToProposal.dispose();
+        }
+        replyToProposal = new ReplyToProposal(this, proposal);
+        
     }
 
     public BattleHex getBattleHex(BattleChit chit)
