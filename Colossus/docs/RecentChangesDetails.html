@@ -26,10 +26,23 @@ one-line-info on the main pages "News" section.
     (perhaps we undo this skipping of summon/reinforce soon again...).</li>
 <li>Fixed (hopefully): [ 2074220 ] Exception while loading game with dead players.
     This includes a lot of small changes related to loading/replaying a saved game.
+<li>Fixed: [ 2044310 ] LoadGame: wrong legions existing/content/location (same as 
+    2074220).</li>
 <li>"Server to Client" flow control => server sends only a certain amount of messages
     and waits then until client has catched up.</li>
 <li>During loading of a game the Masterboard Bottombar (where normally the phase is 
     displayed) shows a "replay ongoing - turn x of n (please wait)" text.</li>
+</ul>
+after 3.9.:
+<ul>
+<li>Fixed: [ 2090866 ] AI spinners wrong intialized</li>
+<li>Fixed: [ 2091811 ] Preferences window should restore if requested from menu</li>
+<li>Fixed: [ 585329 ] Net game lockup from negotiation window;
+    (made sure that Negotiation and ReplyToProposal dialogs are closed when same
+    type of dialog is opened; and close them when battle starts).</li>
+<li>Feature Request [ 2083312 ] game type - pantheon 12: created a new variant 
+    "BeelzeGods12" - it's basically Beelzebub12 with the Gods and some rules from 
+    Pantheon.</li>
 </ul>
 
 <h3>August 22, 2008, built from r3332</h3>
