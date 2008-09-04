@@ -1,0 +1,168 @@
+<?xml version="1.0"?>
+<terrains>
+    <terrain name="Ruins" color="dimGray" regular_recruit="True" >
+        <recruit name="Skeleton" number="1" />
+        <recruit name="Shade" number="2" />
+        <recruit name="Vampire" number="2" />
+        <recruit name="Lich" number="3" />
+        <recruit name="Death" number="3" />
+    </terrain>
+    <terrain name="Tombs" color="darkSlateGray" regular_recruit="True" >
+        <recruit name="Skeleton" number="1" />
+        <recruit name="Zombie" number="3" />
+        <recruit name="Ghost" number="2" />
+        <recruit name="Mummy" number="2" />
+        <recruit name="Death" number="2" />
+    </terrain>
+    <terrain name="Circle" color="darkGreen" regular_recruit="True" >
+        <recruit name="Shade" number="1" />
+        <recruit name="Ghost" number="3" />
+        <recruit name="Wraith" number="3" />
+        <recruit name="Beelzebub" number="2" />
+    </terrain>
+    <terrain name="Marsh" color="sienna" regular_recruit="True" >
+        <recruit name="Goblin" number="1" />
+        <recruit name="Naga" number="2" />
+        <recruit name="Ranger" number="2" />
+        <recruit name="Basilisk" number="3" />
+    </terrain>
+    <terrain name="Plains" color="yellow" regular_recruit="True" >
+        <recruit name="Centaur" number="1" />
+        <recruit name="Lion" number="2" />
+        <recruit name="Ranger" number="2" />
+        <recruit name="Knight" number="2" />
+    </terrain>
+    <terrain name="Hills" color="saddleBrown" regular_recruit="True" >
+        <recruit name="Goblin" number="1" />
+        <recruit name="Minotaur" number="3" />
+        <recruit name="Djinn" number="2" />
+        <recruit name="Manticore" number="3" />
+    </terrain>
+    <terrain name="Woods" color="olive" regular_recruit="True" >
+        <recruit name="Centaur" number="1" />
+        <recruit name="Warbear" number="3" />
+        <recruit name="Ent" number="2" />
+        <recruit name="Unicorn" number="3" />
+    </terrain>
+    <terrain name="Desert" color="orange" regular_recruit="True" >
+        <recruit name="Lion" number="1" />
+        <recruit name="Wyvern" number="2" />
+        <recruit name="Djinn" number="2" />
+        <recruit name="Phoenix" number="2" />
+    </terrain>
+    <terrain name="Swamp" color="blue" regular_recruit="True" >
+        <recruit name="Naga" number="1" />
+        <recruit name="Wyvern" number="2" />
+        <recruit name="Ent" number="2" />
+        <recruit name="Hydra" number="2" />
+    </terrain>
+    <terrain name="Mountains" color="red" regular_recruit="True" >
+        <recruit name="Lion" number="1" />
+        <recruit name="Minotaur" number="2" />
+        <recruit name="Dragon" number="2" />
+        <recruit name="Colossus" number="2" />
+    </terrain>
+    <terrain name="Tundra" color="skyBlue" regular_recruit="True" >
+        <recruit name="Naga" number="1" />
+        <recruit name="Warbear" number="2" />
+        <recruit name="Giant" number="2" />
+        <recruit name="Mammoth" number="2" />
+    </terrain>
+<!--  Tower is a special case -->
+    <terrain name="Tower" color="grey" regular_recruit="False" >
+        <recruit name="Anything" number="0" />
+        <recruit name="Centaur" number="0" />
+        <recruit name="Anything" number="0" />
+        <recruit name="Skeleton" number="0" />
+        <recruit name="Anything" number="0" />
+        <recruit name="Goblin" number="0" />
+        <recruit name="AnyNonLord" number="0" />
+        <recruit name="Golem" number="3" />
+    </terrain>
+    <!-- In BB regular_recruit is True, in Pantheon Mantio r_r is False 
+         - which one should we take? I try it with false ;-)            -->
+    <terrain name="Hellmouth" color="purple" regular_recruit="False" >
+        <!-- Beelzebub stuff -->
+        <recruit name="Anything" number="0" />
+        <recruit name="Imp" number="0" />
+        <recruit name="Devil" number="2" />
+        <recruit name="Fiend" number="3" />
+        <recruit name="Beelzebub" number="2" />
+        <!-- Pantheon stuff -->
+        <recruit name="Ranger" number="-1" />
+        <recruit name="Aphrodite" number="3" />
+        <recruit name="Ranger" number="-1" />
+        <recruit name="Apolo" number="4" />
+        <recruit name="Gorgon" number="-1" />
+        <recruit name="Hermes" number="3" />
+        <recruit name="Gorgon" number="-1" />
+        <recruit name="Dionysous" number="4" />
+        <recruit name="Serpent" number="-1" />
+        <recruit name="Artemis" number="2" />
+        <recruit name="Unicorn" number="-1" />
+        <recruit name="Ares" number="3" />
+        <recruit name="Unicorn" number="-1" />
+        <recruit name="Dimitra" number="2" />
+        <recruit name="Hydra" number="-1" />
+        <recruit name="Poseidon" number="3" />
+        <recruit name="Hydra" number="-1" />
+        <recruit name="Hepfaestus" number="2" />
+        <recruit name="Colossus" number="-1" />
+        <recruit name="Zeus" number="3" />
+        <recruit name="Colossus" number="-1" />
+        <recruit name="Hera" number="2" />
+        <recruit name="Guardian" number="-1" />
+        <recruit name="Athena" number="4" />
+        <recruit name="Warlock" number="-1" />
+        <recruit name="Athena" number="4" />
+        <recruit name="Lord" number="-1" />
+        <recruit name="Hades" number="4" />
+    </terrain>
+    <acquirable name="Angel" points="100" terrain="Plains" />
+    <acquirable name="Angel" points="100" terrain="Desert" />
+    <acquirable name="Angel" points="100" terrain="Woods" />
+    <acquirable name="Angel" points="100" terrain="Marsh" />
+    <acquirable name="Angel" points="100" terrain="Swamp" />
+    <acquirable name="Angel" points="100" terrain="Hills" />
+    <acquirable name="Angel" points="100" terrain="Mountains" />
+    <acquirable name="Angel" points="100" terrain="Tower" />
+    <acquirable name="Angel" points="100" terrain="Tundra" />
+    <acquirable name="Archangel" points="500" terrain="Plains" />
+    <acquirable name="Archangel" points="500" terrain="Desert" />
+    <acquirable name="Archangel" points="500" terrain="Woods" />
+    <acquirable name="Archangel" points="500" terrain="Marsh" />
+    <acquirable name="Archangel" points="500" terrain="Swamp" />
+    <acquirable name="Archangel" points="500" terrain="Hills" />
+    <acquirable name="Archangel" points="500" terrain="Mountains" />
+    <acquirable name="Archangel" points="500" terrain="Tower" />
+    <acquirable name="Archangel" points="500" terrain="Tundra" />
+    <acquirable name="AirElemental" points="100" terrain="Plains" />
+    <acquirable name="AirElemental" points="100" terrain="Tundra" />
+    <acquirable name="EarthElemental" points="100" terrain="Woods" />
+    <acquirable name="EarthElemental" points="100" terrain="Hills" />
+    <acquirable name="FireElemental" points="100" terrain="Mountains" />
+    <acquirable name="FireElemental" points="100" terrain="Desert" />
+    <acquirable name="WaterElemental" points="100" terrain="Marsh" />
+    <acquirable name="WaterElemental" points="100" terrain="Swamp" />
+    <acquirable name="Spectre" points="100" terrain="Ruins" />
+    <acquirable name="Spectre" points="100" terrain="Tombs" />
+    <acquirable name="Spectre" points="100" terrain="Circle" />
+    <acquirable name="Phantom" points="500" terrain="Circle" />
+    <acquirable name="Phantom" points="500" terrain="Tombs" />
+    <acquirable name="Devil" points="100" terrain="Ruins" />
+    <acquirable name="Devil" points="100" terrain="Tombs" />
+    <acquirable name="Devil" points="100" terrain="Hellmouth" />
+    <acquirable name="Archdevil" points="500" terrain="Hellmouth" />
+    <acquirable name="Archdevil" points="500" terrain="Ruins" />
+    <acquirable name="Mage" points="100" terrain="Circle" />
+    <acquirable name="Mage" points="100" terrain="Hellmouth" />
+    <acquirable name="Mage" points="100" terrain="Tower" />
+    <acquirable name="Archmage" points="500" terrain="Circle"
+    />
+    <acquirable name="Archmage" points="500" terrain="Hellmouth"
+    />
+    <acquirable name="Archmage" points="500" terrain="Tower"
+    />
+    <titan_teleport points="1000" />
+    <titan_improve points="100" />
+</terrains>

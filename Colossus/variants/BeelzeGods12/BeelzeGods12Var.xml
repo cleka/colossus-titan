@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<variant name="BeelzeGods12">
+<!--  BeelzeGods12 - a variant by Matt Roe and Clemens Katzer, based on Beelzebub and Panthon -->
+    <creatures filename="BeelzeGods12Cre.xml" />
+    <strategic_map filename="BeelzeGods12Map.xml" />
+    <terrain_recruits filename="BeelzeGods12Ter.xml" />
+    <hint classname="BeelzeGods12.BeelzeGods12Hint" />
+    <depends>
+        <depend variant="Beelzebub" />
+        <depend variant="Beelzebub12" />
+        <depend variant="Pantheon" />
+    </depends>
+    <max_players num="12" />
+</variant>

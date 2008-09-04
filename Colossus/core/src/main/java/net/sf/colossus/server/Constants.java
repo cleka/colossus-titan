@@ -403,8 +403,8 @@ public final class Constants
      *  alphabetized for easier searching, with Default at the top. */
     public static final String[] variantArray = { "Default", "Abyssal3",
         "Abyssal6", "Abyssal9", "Badlands", "Badlands-JDG", "Beelzebub",
-        "Beelzebub12", "ExtTitan", "Infinite", "Outlands", "Pantheon",
-        "SmallTitan", "TG-ConceptI", "TG-ConceptII", "TG-ConceptIII",
+        "Beelzebub12", "BeelzeGods12", "ExtTitan", "Infinite", "Outlands",
+        "Pantheon", "SmallTitan", "TG-ConceptI", "TG-ConceptII", "TG-ConceptIII",
         "TG-SetII", "TG-SetIII", "TG-Wild", "TitanPlus", "Undead", "Unified" };
     // XXX Currently broken variants
     //    "Balrog",
