@@ -750,6 +750,7 @@ public final class GetPlayers extends KFrame implements WindowListener,
             if (newDelay != oldDelay)
             {
                 options.setOption(Options.aiDelay, newDelay);
+                oldDelay = newDelay;
             }
             setDelayLabel(newDelay);
         }
@@ -761,6 +762,7 @@ public final class GetPlayers extends KFrame implements WindowListener,
             if (newLimit != oldLimit)
             {
                 options.setOption(Options.aiTimeLimit, newLimit);
+                oldLimit = newLimit;
             }
             setTimeLimitLabel(newLimit);
         }
