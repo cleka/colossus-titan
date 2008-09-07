@@ -3019,6 +3019,12 @@ public final class Client implements IClient, IOracle
 
     public void doNewBattleBoard()
     {
+        if (battleBoard != null)
+        {
+            LOGGER.warning("Old BattleBoard still in place? Disposing it.");
+            battleBoard.dispose();
+            battleBoard = null;
+        }
         battleBoard = new BattleBoard(this, battleSite, attacker, defender);
     }
 
