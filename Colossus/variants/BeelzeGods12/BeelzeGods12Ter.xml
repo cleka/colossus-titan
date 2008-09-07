@@ -93,22 +93,24 @@
         <recruit name="Aphrodite" number="3" />
         <recruit name="Ranger" number="-1" />
         <recruit name="Apolo" number="4" />
-        <recruit name="Gorgon" number="-1" />
+        <recruit name="Wraith" number="-1" />
         <recruit name="Hermes" number="3" />
-        <recruit name="Gorgon" number="-1" />
+        <recruit name="Wraith" number="-1" />
         <recruit name="Dionysous" number="4" />
-        <recruit name="Serpent" number="-1" />
-        <recruit name="Artemis" number="2" />
-        <recruit name="Unicorn" number="-1" />
-        <recruit name="Ares" number="3" />
-        <recruit name="Unicorn" number="-1" />
+        <recruit name="Phoenix" number="-1" />
         <recruit name="Dimitra" number="2" />
+        <recruit name="Phoenix" number="-1" />
+        <recruit name="Estia" number="3" />
+        <recruit name="Hydra" number="-1" />
+        <recruit name="Ares" number="2" />
         <recruit name="Hydra" number="-1" />
         <recruit name="Poseidon" number="3" />
-        <recruit name="Hydra" number="-1" />
+
+        <recruit name="Unicorn" number="-1" />
         <recruit name="Hepfaestus" number="2" />
-        <recruit name="Colossus" number="-1" />
-        <recruit name="Zeus" number="3" />
+        <recruit name="Unicorn" number="-1" />
+        <recruit name="Artemis" number="3" />
+
         <recruit name="Colossus" number="-1" />
         <recruit name="Hera" number="2" />
         <recruit name="Guardian" number="-1" />
@@ -117,6 +119,8 @@
         <recruit name="Athena" number="4" />
         <recruit name="Lord" number="-1" />
         <recruit name="Hades" number="4" />
+        <recruit name="Colossus" number="-1" />
+        <recruit name="Zeus" number="3" />
     </terrain>
     <acquirable name="Angel" points="100" terrain="Plains" />
     <acquirable name="Angel" points="100" terrain="Desert" />
