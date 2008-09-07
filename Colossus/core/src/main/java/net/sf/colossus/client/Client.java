@@ -3332,6 +3332,14 @@ public final class Client implements IClient, IOracle
 
         if (board != null)
         {
+            if (isMyTurn())
+            {
+                // for debug purposes. We had a bug where legions remain
+                // on the board even if player is dead. So, let's check
+                // for this once per turn and clean up.
+                validateLegions();
+            }
+            
             disposeMovementDie();
             board.setupSplitMenu();
             board.fullRepaint(); // Ensure that movement die goes away
@@ -3359,6 +3367,32 @@ public final class Client implements IClient, IOracle
         kickSplit();
     }
 
+    private void validateLegions()
+    {
+        boolean foundProblem = false;
+        
+        for (Player p : players)
+        {
+            if (p.isDead())
+            {
+                for (Legion l : p.getLegions())
+                {
+                    LOGGER.warning("Dead player " + p.getName() + " has "
+                        + "still legion " + l.getMarkerId()
+                        + ". Removing it.");
+                    p.removeLegion(l);
+                    foundProblem = true;
+                }
+            }
+        }
+        if (foundProblem)
+        {
+            LOGGER.info("Found legion(s) for dead player "
+                + "- recreating markers");
+            board.recreateMarkers();
+        }
+    }
+    
     private void kickSplit()
     {
         if (isMyTurn() && options.getOption(Options.autoSplit)
