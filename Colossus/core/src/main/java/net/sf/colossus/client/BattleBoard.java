@@ -317,10 +317,14 @@ public final class BattleBoard extends KFrame
                     {
                         return;
                     }
+                    unselectAllHexes();
+                    battleMap.unselectEntranceHexes();
                     client.doneWithBattleMoves();
                 }
                 else if (phase.isFightPhase())
                 {
+                    unselectAllHexes();
+                    battleMap.unselectEntranceHexes();
                     client.doneWithStrikes();
                 }
                 else
