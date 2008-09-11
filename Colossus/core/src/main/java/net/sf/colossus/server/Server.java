@@ -214,11 +214,32 @@ public final class Server extends Thread implements IServer
         }
         catch (IOException ex)
         {
-            LOGGER.log(Level.SEVERE,
-                "Could not create socket. Configure networking in OS, "
-                    + "or check that no previous Colossus instance got stuck "
-                    + "and is blocking the socket.", ex);
+            String message =  "Could not create server side socket.\n"
+                + "Configure networking in OS, or check that no previous "
+                + "Colossus instance got stuck and is blocking the socket.\n"
+                + "Got IOException: " + ex;
+                
+            LOGGER.log(Level.SEVERE, message);
+            JOptionPane.showMessageDialog(startLog.getFrame(), message,
+                "Starting game (server side) failed!", 
+                JOptionPane.ERROR_MESSAGE);
+
             System.exit(1);
+        }
+        catch (Exception anyex)
+        {
+            String message =  "Could not create server side socket.\n"
+                + "Configure networking in OS, or check that no previous "
+                + "Colossus instance got stuck and is blocking the socket.\n"
+                + "Got Exception: " + anyex;
+                
+            LOGGER.log(Level.SEVERE, message);
+            JOptionPane.showMessageDialog(startLog.getFrame(), message,
+                "Starting game (server side) failed!", 
+                JOptionPane.ERROR_MESSAGE);
+
+            System.exit(1);
+            
         }
         createLocalClients();
     }
