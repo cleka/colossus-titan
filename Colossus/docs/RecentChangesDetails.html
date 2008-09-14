@@ -13,7 +13,30 @@
 This describes the recent changes in some more detail than just the
 one-line-info on the main pages "News" section.
 
-<h3>September 03, 2008, built from r3343+</h3>
+<h3>September 14, 2008, Public testing build from r3359</h3>
+<p>
+<ul>
+<li>Fixed: [ 2090866 ] AI spinners wrong intialized</li>
+<li>Fixed: [ 2091811 ] Preferences window should restore if requested from menu</li>
+<li>Fixed: [ 585329 ] Net game lockup from negotiation window;
+    (made sure that Negotiation and ReplyToProposal dialogs are closed when same
+    type of dialog is opened; and close them when battle starts).</li>
+<li>Feature Request [ 2083312 ] game type - pantheon 12: created a new variant 
+    "BeelzeGods12" - it's basically Beelzebub12 with the Gods and some rules from 
+    Pantheon.</li>
+<li>When creating new BattleMap, dispose previous one, 
+    in case it is still open for some reason...</li>
+<li>Fixed: [ 2060169 ] Skipping rangestrike, rangestriker(s) stay highlighted</li>
+<li>During serverSocket creation, catch any exception, not just IOException.
+    Also first display an error message dialog, before doing System.exit().</li>
+<li>Fixed the problem that games with remote players could not be loaded</li>
+<li>Reduced "window size" for server-client flow control; client displays 
+    error message dialog if message counter mismatch encountered; when 
+    starting new or loaded game, wait until all clients have catched up with 
+    load/preparations, before doing setupPhase to start the actual game.</li>
+</ul>
+
+<h3>September 03, 2008, Public testing build from r3343+</h3>
 <p>
 <ul>
 <li>Fixed: [ 2078529 ] "Preferences" => scales value is now read from cf file on startup.</li>
@@ -32,17 +55,6 @@ one-line-info on the main pages "News" section.
     and waits then until client has catched up.</li>
 <li>During loading of a game the Masterboard Bottombar (where normally the phase is 
     displayed) shows a "replay ongoing - turn x of n (please wait)" text.</li>
-</ul>
-after 3.9.:
-<ul>
-<li>Fixed: [ 2090866 ] AI spinners wrong intialized</li>
-<li>Fixed: [ 2091811 ] Preferences window should restore if requested from menu</li>
-<li>Fixed: [ 585329 ] Net game lockup from negotiation window;
-    (made sure that Negotiation and ReplyToProposal dialogs are closed when same
-    type of dialog is opened; and close them when battle starts).</li>
-<li>Feature Request [ 2083312 ] game type - pantheon 12: created a new variant 
-    "BeelzeGods12" - it's basically Beelzebub12 with the Gods and some rules from 
-    Pantheon.</li>
 </ul>
 
 <h3>August 22, 2008, built from r3332</h3>
