@@ -585,7 +585,7 @@ public final class GameServerSide extends Game
         server.allTellAllLegionLocations();
         autoSave();
         fullySyncCaretakerDisplays();
-        setupPhase();
+        server.allRequestConfirmCatchup();
     }
 
     private void fullySyncCaretakerDisplays()
@@ -921,6 +921,13 @@ public final class GameServerSide extends Game
     boolean isLoadingGame()
     {
         return loadingGame;
+    }
+
+    public void kickstartGame()
+    {
+        LOGGER.info("All clients have catched up with loading/replay or "
+            + "pickColor, now kicking off the Game!");
+        setupPhase();
     }
 
     Constants.Phase getPhase()
@@ -1838,7 +1845,6 @@ public final class GameServerSide extends Game
         server.allSetupTurnState();
         fullySyncCaretakerDisplays();
         
-        setupPhase();
         server.allRequestConfirmCatchup();
         return ok;
     }

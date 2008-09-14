@@ -58,6 +58,8 @@ final class SocketClientThread extends Thread implements IServer
     private final Object isWaitingLock = new Object();
     private boolean isWaiting = false;
 
+    private int CLIENT_CTR_ACK_EVERY = 20;
+        
     SocketClientThread(Client client, String host, int port)
     {
         super("Client " + client.getOwningPlayer().getName());
@@ -462,7 +464,7 @@ final class SocketClientThread extends Thread implements IServer
             // as processing of any message causes an exception
             //  (incr. would be skipped...)
             ++expectedCounter;
-            if (expectedCounter % 20 == 0)
+            if (expectedCounter % CLIENT_CTR_ACK_EVERY == 0)
             {
                 LOGGER.finest("Client " + client.getOwningPlayer().getName()
                     + ": expectedCounter = " + expectedCounter + " - sending ACK.");
@@ -944,11 +946,21 @@ final class SocketClientThread extends Thread implements IServer
         else if (method.equals(Constants.msgCtrToClient))
         {
             int gotCounter = Integer.parseInt(args.remove(0));
-            LOGGER.info("client " + client.getOwningPlayer() + " got Counter " + gotCounter);
+            LOGGER.finest("client " + client.getOwningPlayer()
+                + " got Counter " + gotCounter);
             if (gotCounter != expectedCounter)
             {
-                LOGGER.warning("Expected message counter " +
-                    expectedCounter + " but got " + gotCounter + "!!! => Resyncing.");
+                LOGGER.warning("In Client " + client.getOwningPlayer()
+                    + ": Expected message counter is " + expectedCounter
+                    + " but got " + gotCounter + "!!! => Syncing counters "
+                    + " now, but messages are lost.");
+                String msg = "Expected message counter "
+                    + expectedCounter + " but got " + gotCounter + "!!!\n\n"
+                    + "This means messages from server to client "
+                    + client.getOwningPlayer() + " got lost in"
+                    + " between, client might be in inconsistent state now.";
+                client.showErrorMessage(msg, "Server-Client messages lost!"); 
+                    
                 expectedCounter = gotCounter;
             }
         }

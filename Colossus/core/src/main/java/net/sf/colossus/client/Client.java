@@ -2508,13 +2508,22 @@ public final class Client implements IClient, IOracle
 
     public void showErrorMessage(String reason, String title)
     {
+        boolean isDummyFrame = false;
+        JFrame f = getMapOrBoardFrame();
         // I do not use null or a simple frame, because then the System.exit(0)
         // does not exit by itself (due to some bug in Swing/AWT).
-        KFrame f = new KFrame("Dummyframe for Client error message dialog");
+        if (f == null)
+        {
+            f = new KFrame("Dummyframe for Client error message dialog");
+            isDummyFrame = true;
+        }
         JOptionPane.showMessageDialog(f, reason, title,
             JOptionPane.ERROR_MESSAGE);
-        f.dispose();
-        f = null;
+        if (isDummyFrame)
+        {
+            f.dispose();
+            f = null;
+        }
     }
 
     String getMessage()

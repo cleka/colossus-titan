@@ -2331,6 +2331,10 @@ public final class Server extends Thread implements IServer
             int remaining = waitingToCatchup.size();
             LOGGER.info("Client " + playerName + " confirmed catch-up. "
                 + "Remaining: " + remaining);
+            if (remaining <= 0 )
+            {
+                game.kickstartGame();
+            }
         }
     }
 

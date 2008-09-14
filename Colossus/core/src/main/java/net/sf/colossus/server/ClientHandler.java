@@ -72,9 +72,10 @@ final class ClientHandler implements IClient
     private final CharsetEncoder encoder = charset.newEncoder();
     private final CharsetDecoder decoder = charset.newDecoder();
 
-    private final int MAX_SERVER_AHEAD = 1200;
-    private final int MIN_CLIENT_CATCHUP = 900;
-    private final int CTR_SYNC_EVERY_N = 500;
+    // Note that the client send ack every CLIENT_CTR_ACK_EVERY messages 
+    private final int MAX_SERVER_AHEAD = 500;
+    private final int MIN_CLIENT_CATCHUP = 100;
+    private final int CTR_SYNC_EVERY_N = 100;
     
     ClientHandler(Server server, SocketChannel channel, SelectionKey selKey)
     {
@@ -484,6 +485,9 @@ final class ClientHandler implements IClient
 
                 clientCantFollow = false;
                 
+                sendViaChannelRaw(Constants.msgCtrToClient + sep + msgCounter);
+                msgCounter++;
+
                 while(!clientCantFollow && !sendToClientQueue.isEmpty())
                 {
                     // System.out.println("During processing read, client can follow loop...");
@@ -543,18 +547,6 @@ final class ClientHandler implements IClient
                 // (especially during replay during loading game)
                 Thread.yield();
             }
-        }
-    }
-
-    void sleepFor(long ms)
-    {
-        try
-        {
-            Thread.sleep(ms);
-        }
-        catch (InterruptedException ex)
-        {
-            //
         }
     }
 
@@ -713,6 +705,9 @@ final class ClientHandler implements IClient
 
     public void tellGameOver(String message)
     {
+        sendViaChannelRaw(Constants.msgCtrToClient + sep + msgCounter);
+        msgCounter++;
+
         sendToClient(Constants.tellGameOver + sep + message);
     }
 
