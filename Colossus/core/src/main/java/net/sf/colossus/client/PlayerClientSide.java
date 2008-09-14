@@ -57,8 +57,21 @@ public final class PlayerClientSide extends Player
 
         setName(data.remove(0));
 
-        setStartingTower(getGame().getVariant().getMasterBoard()
-            .getHexByLabel(data.remove(0)));
+        // TODO This is a workaround - fix better, init variant at proper
+        // time somehow proper way?
+        try
+        {
+            String towerHex = data.remove(0);
+            setStartingTower(getGame().getVariant().getMasterBoard()
+                .getHexByLabel(towerHex));
+        }
+        catch(NullPointerException e)
+        {
+            // When loading a game in remote client, in beginning variant is
+            // not loaded yes, so that may cause NPE which we ignore here.
+            // After syncOptions variant name is known,  
+            // and in initBoard it is loaded, so all future updates go fine.
+        }
 
         setColor(data.remove(0));
 

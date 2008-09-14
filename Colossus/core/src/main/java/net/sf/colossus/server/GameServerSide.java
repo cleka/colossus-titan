@@ -1811,6 +1811,10 @@ public final class GameServerSide extends Game
 
         server.allTellReplay(true, turnNumber);
         server.allInitBoard();
+        // Once again, to properly init the tower hexes in the players 
+        // in remote players (see PlayerClientSide.update()).
+        server.allUpdatePlayerInfo(true);
+
         history.fireEventsFromXML(server);
         boolean ok = resyncBackupData();
         LOGGER.info("Loading and resync result: " + ok);
