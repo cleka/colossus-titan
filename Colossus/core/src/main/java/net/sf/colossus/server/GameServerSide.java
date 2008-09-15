@@ -1540,6 +1540,7 @@ public final class GameServerSide extends Game
             // we're server, but the file generation process has been done
             // by loading the savefile.
             VariantSupport.loadVariant(fil.getValue(), dir.getValue(), false);
+            options.setOption(Options.variant, VariantSupport.getVarName());
 
             el = root.getChild("TurnNumber");
             turnNumber = Integer.parseInt(el.getTextTrim());
@@ -1815,12 +1816,8 @@ public final class GameServerSide extends Game
         syncOptions();
 
         server.allUpdatePlayerInfo(true);
-
         server.allTellReplay(true, turnNumber);
         server.allInitBoard();
-        // Once again, to properly init the tower hexes in the players 
-        // in remote players (see PlayerClientSide.update()).
-        server.allUpdatePlayerInfo(true);
 
         history.fireEventsFromXML(server);
         boolean ok = resyncBackupData();

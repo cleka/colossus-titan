@@ -1805,7 +1805,7 @@ public final class Client implements IClient, IOracle
     public void addCreature(Legion legion, String name, String reason)
     {
         ((LegionClientSide)legion).addCreature(name);
-        if (board != null)
+        if (board != null && !replayOngoing)
         {
             GUIMasterHex hex = board.getGUIHexByMasterHex(legion
                 .getCurrentHex());
