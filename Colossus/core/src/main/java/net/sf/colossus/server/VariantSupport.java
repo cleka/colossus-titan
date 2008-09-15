@@ -47,7 +47,8 @@ public final class VariantSupport
         .getName());
 
     private static String varDirectory = "";
-    private static String variantName = "";
+    private static String varFilename = "";
+    private static String variantName = "";    
     private static String mapName = "";
     private static String recruitName = "";
     private static String hintName = "";
@@ -76,22 +77,22 @@ public final class VariantSupport
      */
     public static void freshenVariant(java.io.File varFile)
     {
-        String tempVarName = varFile.getName();
+        String tempVarFilename  = varFile.getName();
         String tempVarDirectory = varFile.getParentFile().getAbsolutePath();
-        freshenVariant(tempVarName, tempVarDirectory);
+        freshenVariant(tempVarFilename, tempVarDirectory);
     }
 
     /**
      * Clean-up the ResourceLoader caches to make room for a variant.
-     * @param tempVarName The name of the file holding the
+     * @param tempVarFiel The name of the file holding the
      *     soon-to-be-loaded Variant definition.
      * @param tempVarDirectory The path to the directory holding the
      *     soon-to-be-loaded Variant.
      */
-    public static void freshenVariant(String tempVarName,
+    public static void freshenVariant(String tempVarFilename,
         String tempVarDirectory)
     {
-        if (!(loadedVariant && variantName.equals(tempVarName) && varDirectory
+        if (!(loadedVariant && varFilename.equals(tempVarFilename) && varDirectory
             .equals(tempVarDirectory)))
         {
             ResourceLoader.purgeImageCache();
@@ -119,23 +120,23 @@ public final class VariantSupport
      */
     public static Document loadVariant(java.io.File varFile, boolean serverSide)
     {
-        String tempVarName = varFile.getName();
+        String tempVarFilename  = varFile.getName();
         String tempVarDirectory = varFile.getParentFile().getAbsolutePath();
-        return loadVariant(tempVarName, tempVarDirectory, serverSide);
+        return loadVariant(tempVarFilename, tempVarDirectory, serverSide);
     }
 
     /**
      * Load a Colossus Variant from the specified filename
      *   in the specified path.
-     * @param tempVarName The name of the file holding the Variant definition.
+     * @param tempVarFilename The name of the file holding the Variant definition.
      * @param tempVarDirectory The path to the directory holding the Variant.
      * @param serverSide We're loading on a server.
      * @return A Document describing the variant.
      */
-    public static Document loadVariant(String tempVarName,
+    public static Document loadVariant(String tempVarFilename,
         String tempVarDirectory, boolean serverSide)
     {
-        if (loadedVariant && variantName.equals(tempVarName)
+        if (loadedVariant && varFilename.equals(tempVarFilename)
             && varDirectory.equals(tempVarDirectory))
         {
             return varREADME;
@@ -149,7 +150,7 @@ public final class VariantSupport
 
         loadedVariant = false;
 
-        LOGGER.log(Level.FINEST, "Loading variant " + tempVarName
+        LOGGER.log(Level.FINEST, "Loading variant file " + tempVarFilename
             + ", data files in " + tempVarDirectory);
         try
         {
@@ -158,11 +159,11 @@ public final class VariantSupport
             List<String> directories = new ArrayList<String>();
             directories.add(tempVarDirectory);
             directories.add(Constants.defaultDirName);
-            InputStream varIS = ResourceLoader.getInputStream(tempVarName,
+            InputStream varIS = ResourceLoader.getInputStream(tempVarFilename,
                 directories);
             if (varIS == null)
             {
-                throw new FileNotFoundException(tempVarName);
+                throw new FileNotFoundException(tempVarFilename);
             }
             else
             {
@@ -183,7 +184,24 @@ public final class VariantSupport
                     maxPlayers = Constants.MAX_MAX_PLAYERS;
                 }
                 varDirectory = tempVarDirectory;
-                variantName = tempVarName;
+                varFilename = tempVarFilename;
+                if (varFilename.endsWith(Constants.varEnd))
+                {
+                    // We need the Variantname for loading a game with
+                    // remote players.
+                    variantName = varFilename.substring(0, 
+                        varFilename.length() - Constants.varEnd.length()); 
+                }
+                else
+                {
+                    // Seems the filename is not <variantname>VAR.xml
+                    // - then we cannot conclude the name.
+                    // TODO every loading of a variant should get the variant
+                    // name as argument and also set the variantName variable
+                    // from that, and saving a game it should store a 3rd
+                    // property to hold the variant name (not just file and dir).
+                    throw(new Exception("IllegalVariantFilenameException"));
+                }
 
                 mapName = vl.getMap();
                 if (mapName == null)
@@ -239,7 +257,8 @@ public final class VariantSupport
             // might be better
             LOGGER.log(Level.SEVERE, "Variant loading failed : " + e, e);
             varDirectory = Constants.defaultDirName;
-            variantName = Constants.defaultVARFile;
+            varFilename = Constants.defaultVARFile;
+            variantName = Constants.defaultVarName;
             mapName = Constants.defaultMAPFile;
             recruitName = Constants.defaultTERFile;
             hintName = Constants.defaultHINTFile;
@@ -256,7 +275,7 @@ public final class VariantSupport
         }
         else
         {
-            if (tempVarName.equals(Constants.defaultVARFile))
+            if (tempVarFilename.equals(Constants.defaultVARFile))
             {
                 LOGGER.log(Level.SEVERE,
                     "Default Variant Loading Failed, aborting !");
@@ -327,6 +346,11 @@ public final class VariantSupport
     public static String getVarDirectory()
     {
         return varDirectory;
+    }
+
+    public static String getVarFile()
+    {
+        return varFilename;
     }
 
     public static String getVarName()

@@ -301,6 +301,7 @@ public final class Constants
      */
     //public static final String defaultDirName = "variants/Default";
     public static final String defaultDirName = "Default";
+    public static final String defaultVarName = "Default";
 
     /** Images subdirectory name */
     public static final String imagesDirName = "images";
