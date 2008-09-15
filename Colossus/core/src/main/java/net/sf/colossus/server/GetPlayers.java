@@ -769,7 +769,7 @@ public final class GetPlayers extends KFrame implements WindowListener,
         else if (e.getActionCommand().startsWith(loadVariant))
         {
             doLoadVariant();
-            String varName = VariantSupport.getVarName();
+            String varName = VariantSupport.getVariantName();
             if (!(Constants.getVariantList().contains(varName)))
             {
                 String buttonName = varName.substring(0, varName
@@ -790,7 +790,7 @@ public final class GetPlayers extends KFrame implements WindowListener,
             {
                 int maxPlayers = VariantSupport.getMaxPlayers();
                 String value = (String)variantBox.getSelectedItem();
-                if (VariantSupport.getVarName().equals(
+                if (VariantSupport.getVariantName().equals(
                     value + Constants.varEnd))
                 {
                     // re-selecting the same ; do nothing

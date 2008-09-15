@@ -109,7 +109,7 @@ public final class VariantSupport
     public static Document loadVariant(String variantName, boolean serverSide)
     {
         return loadVariant(variantName + Constants.varEnd, Constants.varPath
-            + variantName, serverSide);
+            + variantName, variantName, serverSide);
     }
 
     /**
@@ -118,11 +118,13 @@ public final class VariantSupport
      * @param serverSide We're loading on a server.
      * @return A Document describing the variant.
      */
-    public static Document loadVariant(java.io.File varFile, boolean serverSide)
+    public static Document loadVariant(java.io.File varFile,
+        boolean serverSide)
     {
         String tempVarFilename  = varFile.getName();
         String tempVarDirectory = varFile.getParentFile().getAbsolutePath();
-        return loadVariant(tempVarFilename, tempVarDirectory, serverSide);
+        return loadVariant(tempVarFilename, tempVarDirectory, null,
+            serverSide);
     }
 
     /**
@@ -130,11 +132,16 @@ public final class VariantSupport
      *   in the specified path.
      * @param tempVarFilename The name of the file holding the Variant definition.
      * @param tempVarDirectory The path to the directory holding the Variant.
+     * @param tempVariantName The actual plain name of the variant
      * @param serverSide We're loading on a server.
      * @return A Document describing the variant.
+     * 
+     * TODO right now variant name might sometimes be null, then we try a hack
+     * to retrieve the variant name from the variant file name.
      */
     public static Document loadVariant(String tempVarFilename,
-        String tempVarDirectory, boolean serverSide)
+        String tempVarDirectory, String tempVariantName,
+        boolean serverSide)
     {
         if (loadedVariant && varFilename.equals(tempVarFilename)
             && varDirectory.equals(tempVarDirectory))
@@ -185,22 +192,32 @@ public final class VariantSupport
                 }
                 varDirectory = tempVarDirectory;
                 varFilename = tempVarFilename;
-                if (varFilename.endsWith(Constants.varEnd))
+                if (tempVariantName != null)
                 {
-                    // We need the Variantname for loading a game with
-                    // remote players.
-                    variantName = varFilename.substring(0, 
-                        varFilename.length() - Constants.varEnd.length()); 
+                    variantName = tempVariantName;
                 }
                 else
                 {
-                    // Seems the filename is not <variantname>VAR.xml
-                    // - then we cannot conclude the name.
-                    // TODO every loading of a variant should get the variant
-                    // name as argument and also set the variantName variable
-                    // from that, and saving a game it should store a 3rd
-                    // property to hold the variant name (not just file and dir).
-                    throw(new Exception("IllegalVariantFilenameException"));
+                    if (varFilename.endsWith(Constants.varEnd))
+                    {
+                        // We need the Variantname for loading a game with
+                        // remote players.
+                        variantName = varFilename.substring(0,
+                            varFilename.length() - Constants.varEnd.length());
+                    }
+                    else
+                    {
+                        /* Seems the filename is not <variantname>VAR.xml
+                         *  - then we cannot conclude the name.
+                         * TODO every loading of a variant should get the
+                         * variant name as argument and also set the 
+                         * variantName variable from that, and saving a game
+                         * it should store a 3rd property to hold the variant
+                         * name (not just file and dir).
+                         */
+                        throw(new Exception(
+                            "IllegalVariantFilenameException"));
+                    }
                 }
 
                 mapName = vl.getMap();
@@ -285,7 +302,8 @@ public final class VariantSupport
             {
                 LOGGER.log(Level.FINEST, "Trying to load Default instead...");
                 varREADME = loadVariant(Constants.defaultVARFile,
-                    Constants.defaultDirName, serverSide);
+                    Constants.defaultDirName, Constants.defaultVarName, 
+                    serverSide);
             }
         }
 
@@ -348,12 +366,12 @@ public final class VariantSupport
         return varDirectory;
     }
 
-    public static String getVarFile()
+    public static String getVarFilename()
     {
         return varFilename;
     }
 
-    public static String getVarName()
+    public static String getVariantName()
     {
         return variantName;
     }
