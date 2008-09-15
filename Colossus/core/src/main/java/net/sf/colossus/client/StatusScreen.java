@@ -348,8 +348,15 @@ final class StatusScreen extends KDialog implements WindowListener
     @Override
     public Dimension getMinimumSize()
     {
-        int scale = Scale.get();
-        return new Dimension(25 * scale, 20 * scale);
+        Dimension d = getSize();
+        if (d.width < 150 || d.height < 50)
+        {
+            return new Dimension(400, 300);
+        }
+        else
+        {
+            return d;
+        }
     }
 
     @Override
