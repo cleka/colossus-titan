@@ -13,20 +13,26 @@
 This describes the recent changes in some more detail than just the
 one-line-info on the main pages "News" section.
 
-<h3>September 16, 2008, Public testing build from r3369</h3>
+<h3>September 16/17, 2008: Official Public Build from r3374</h3>
 <p>
+<i>(Content is mostly same as the "Public Testing Build" from Sep 16, r3369)</i>
 <ul>
-<li>StatusScreen window now does not use scale any more (see [ 2078529 ] Preferences)</li>
-<li>Fixed: [ 2073991 ] Game hangs on AI Split</li>
-<li>Fixed (partially): [ 2074220 ] Exception while loading game with dead players:  
-    Now it can be loaded without exceptions, but it wants initially as many clients as
-    originally players were involved; especially troublesome if there were remote clients
-    that are dead now...</li>
-</ul>
-
-<h3>September 14, 2008, Public testing build from r3359</h3>
-<p>
-<ul>
+<li>Fixed: [ 2078529 ] "Preferences" => scales value is now read from cf file on startup.</li>
+<li>Help=>About now tell also the actual .colossus dir and also the 
+    log directory where Colossus[012].log files will be created.</li>
+<li>When game is over, MasterBoard tells so also in Title and in "phase" label,
+    and DONE button invokes then the Quit/Close/New/Cancel dialog (same as closing
+    the window with the "x" in upper corner always does).</li>
+<li>When gameOver state reached, skip summon/reinforce + kick next engagement
+    (perhaps we undo this skipping of summon/reinforce soon again...).</li>
+<li>Fixed (hopefully): [ 2074220 ] Exception while loading game with dead players.
+    This includes a lot of small changes related to loading/replaying a saved game.
+<li>Fixed: [ 2044310 ] LoadGame: wrong legions existing/content/location (same as 
+    2074220).</li>
+<li>"Server to Client" flow control => server sends only a certain amount of messages
+    and waits then until client has catched up.</li>
+<li>During loading of a game the Masterboard Bottombar (where normally the phase is 
+    displayed) shows a "replay ongoing - turn x of n (please wait)" text.</li>
 <li>Fixed: [ 2090866 ] AI spinners wrong intialized</li>
 <li>Fixed: [ 2091811 ] Preferences window should restore if requested from menu</li>
 <li>Fixed: [ 585329 ] Net game lockup from negotiation window;
@@ -45,27 +51,12 @@ one-line-info on the main pages "News" section.
     error message dialog if message counter mismatch encountered; when 
     starting new or loaded game, wait until all clients have catched up with 
     load/preparations, before doing setupPhase to start the actual game.</li>
-</ul>
-
-<h3>September 03, 2008, Public testing build from r3343+</h3>
-<p>
-<ul>
-<li>Fixed: [ 2078529 ] "Preferences" => scales value is now read from cf file on startup.</li>
-<li>Help=>About now tell also the actual .colossus dir and also the 
-    log directory where Colossus[012].log files will be created.</li>
-<li>When game is over, MasterBoard tells so also in Title and in "phase" label,
-    and DONE button invokes then the Quit/Close/New/Cancel dialog (same as closing
-    the window with the "x" in upper corner always does).</li>
-<li>When gameOver state reached, skip summon/reinforce + kick next engagement
-    (perhaps we undo this skipping of summon/reinforce soon again...).</li>
-<li>Fixed (hopefully): [ 2074220 ] Exception while loading game with dead players.
-    This includes a lot of small changes related to loading/replaying a saved game.
-<li>Fixed: [ 2044310 ] LoadGame: wrong legions existing/content/location (same as 
-    2074220).</li>
-<li>"Server to Client" flow control => server sends only a certain amount of messages
-    and waits then until client has catched up.</li>
-<li>During loading of a game the Masterboard Bottombar (where normally the phase is 
-    displayed) shows a "replay ongoing - turn x of n (please wait)" text.</li>
+<li>StatusScreen window now does not use scale any more (see [ 2078529 ] Preferences)</li>
+<li>Fixed: [ 2073991 ] Game hangs on AI Split</li>
+<li>Fixed (partially): [ 2074220 ] Exception while loading game with dead players:  
+    Now it can be loaded without exceptions, but it wants initially as many clients as
+    originally players were involved; especially troublesome if there were remote clients
+    that are dead now...</li>
 </ul>
 
 <h3>August 22, 2008, built from r3332</h3>
