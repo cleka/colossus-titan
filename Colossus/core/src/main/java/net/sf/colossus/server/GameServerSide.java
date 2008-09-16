@@ -1513,7 +1513,13 @@ public final class GameServerSide extends Game
             Element el = root.getChild("Variant");
             Attribute dir = el.getAttribute("dir");
             Attribute fil = el.getAttribute("file");
-            String nam = el.getAttribute("name").getValue();
+
+            Attribute namAttr = el.getAttribute("name");
+            String varName = null;
+            if (namAttr != null)
+            {
+                varName = namAttr.getValue();
+            }
 
             VariantSupport.freshenVariant(fil.getValue(), dir.getValue());
 
@@ -1541,16 +1547,16 @@ public final class GameServerSide extends Game
 
             // we're server, but the file generation process has been done
             // by loading the savefile.
-            VariantSupport.loadVariant(fil.getValue(), dir.getValue(), nam, false);
-            // old save games (before r3360, 09/2008) do not save the variant name
-            // - retrieve it back from VariantSupport.
+            VariantSupport.loadVariant(fil.getValue(), dir.getValue(),
+                varName, false);
+            // old save games (before r3360, 09/2008) do not save the
+            // variant name - retrieve it back from VariantSupport.
             // TODO remove this one day?
-            if (nam == null)
+            if (varName == null)
             {
-                nam = VariantSupport.getVariantName();
+                varName = VariantSupport.getVariantName();
             }
-            options.setOption(Options.variant, nam);
-
+            options.setOption(Options.variant, varName);
 
             el = root.getChild("TurnNumber");
             turnNumber = Integer.parseInt(el.getTextTrim());
