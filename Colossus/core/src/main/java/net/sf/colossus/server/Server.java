@@ -2031,14 +2031,17 @@ public final class Server extends Thread implements IServer
         IClient client = getClient(getPlayer());
         if (!isActivePlayer())
         {
-            LOGGER.severe(getPlayerName() + " illegally called doSplit()");
-            client.nak(Constants.doSplit, "Wrong player");
+            LOGGER.warning(getPlayerName() + " illegally called doSplit() "
+                + "- activePlayer is " + game.getActivePlayer());
+            client.nak(Constants.doSplit, "Cannot split: Wrong player "
+                + "(active player is " + game.getActivePlayer());
             return;
         }
         if (!game.doSplit(parent, childId, results))
         {
-            LOGGER.severe("split failed for " + parent);
-            client.nak(Constants.doSplit, "Illegal split");
+            LOGGER.warning(getPlayerName() + " tried split for "
+                + parent + ", failed!");
+            client.nak(Constants.doSplit, "Illegal split / Split failed!");
         }
     }
 
