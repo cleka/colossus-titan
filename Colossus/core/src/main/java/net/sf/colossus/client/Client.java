@@ -2844,7 +2844,22 @@ public final class Client implements IClient, IOracle
         else if (reason.equals(Constants.doSplit))
         {
             showMessageDialog(errmsg);
-            kickSplit();
+
+            // if AI just got NAK for split, there's no point for
+            // kickSplit again. Instead, let's just be DoneWithSplits.
+            if (isMyTurn() && options.getOption(Options.autoSplit)
+                && !isGameOver())
+            {
+                // XXX This may cause advancePhance illegally messages,
+                // if e.g. SimpleAI fires two splits, both gets rejected,
+                // and it responds with dineWithSplits two times.
+                // But this whole situation should normally never happen, did
+                // happen now only because of server/client data regarding
+                // available markers was out of sync and then as reaction
+                // to nak for didSplit do kickSplit() did just end in an
+                // endless loop. Now perhaps 2 error messages, but no hang.
+                doneWithSplits();
+            }
         }
         else if (reason.equals(Constants.doneWithSplits))
         {
