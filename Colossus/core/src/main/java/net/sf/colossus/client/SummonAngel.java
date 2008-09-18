@@ -129,7 +129,7 @@ final class SummonAngel extends KDialog implements MouseListener,
         txtBox.add(Box.createRigidArea(new Dimension(scale / 8, 0)));
         txtBox.add(Box.createHorizontalGlue());
         txtBox.add(new JLabel("Click a summonable to summon it to your "
-            + "legion, or Cancel for not summoning anything.   "));
+            + "legion, or Cancel to not summon anything."));
         txtBox.add(Box.createHorizontalGlue());
         contentPane.add(txtBox);
         contentPane.add(Box.createRigidArea(new Dimension(0, scale / 4)));
