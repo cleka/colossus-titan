@@ -13,9 +13,9 @@
 This describes the recent changes in some more detail than just the
 one-line-info on the main pages "News" section.
 
-<h3>September 16/17, 2008: Official Public Build from r3374</h3>
+<h3>September 18+, 2008: Upcoming Public Build from r3379+ ??</h3>
 <p>
-<i>(Content is mostly same as the "Public Testing Build" from Sep 16, r3369)</i>
+<i>(All below is mostly same as the "Public Testing Build" from Sep 16, r3369)</i>
 <ul>
 <li>Fixed: [ 2078529 ] "Preferences" => scales value is now read from cf file on startup.</li>
 <li>Help=>About now tell also the actual .colossus dir and also the 
@@ -57,6 +57,15 @@ one-line-info on the main pages "News" section.
     Now it can be loaded without exceptions, but it wants initially as many clients as
     originally players were involved; especially troublesome if there were remote clients
     that are dead now...</li>
+</ul>
+<i>Changes since last "Public Testing Build" from Sep 16, r3369:</i>
+<ul>
+<li>Slightly rephrased text in summon dialog and corrected catched to 
+    caught in some method names ;-)</li>
+<li> After a timeout (curr. 35 secs, somewhat more than AI timeout), server sends
+the current message counter to each client. 
+So, this should help to prove or reject my assumptions what is causing the hang.
+Next step: server could buffer non-ACKed messages and on NACK re-send them?</li>
 </ul>
 
 <h3>August 22, 2008, built from r3332</h3>
