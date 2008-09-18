@@ -932,7 +932,7 @@ public class WebServer implements IWebServer, IRunWebServer
                         catch (InterruptedException e)
                         {
                             LOGGER.log(Level.WARNING,
-                                "Ups??? Catched exception ", e);
+                                "Ups??? Caught exception ", e);
                         }
                         it.remove();
                     }

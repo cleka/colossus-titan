@@ -926,7 +926,7 @@ final class ClientHandler implements IClient
         sendToClient(Constants.boardActive + sep + val);
     }
 
-    public void confirmWhenCatchedUp()
+    public void confirmWhenCaughtUp()
     {
         sendToClient(Constants.askConfirmCatchUp);
     }

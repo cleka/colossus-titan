@@ -2250,7 +2250,7 @@ public final class Client implements IClient, IOracle
         }
     }
 
-    public void confirmWhenCatchedUp()
+    public void confirmWhenCaughtUp()
     {
         sct.clientConfirmedCatchup();
     }

@@ -147,9 +147,9 @@ public final class Server extends Thread implements IServer
         {
             waitOnSelector();
         }
-        while(!haveAllCatchedUp())
+        while(!haveAllCaughtUp())
         {
-            LOGGER.warning("Not all have catched up - still looping");
+            LOGGER.warning("Not all have caught up - still looping");
             waitOnSelector();
         }
         notifyThatGameFinished();
@@ -1079,7 +1079,7 @@ public final class Server extends Thread implements IServer
          */
             for (IClient client : clients)
             {
-                client.confirmWhenCatchedUp();
+                client.confirmWhenCaughtUp();
             }
         }
     }
@@ -2341,7 +2341,7 @@ public final class Server extends Thread implements IServer
         }
     }
 
-    private boolean haveAllCatchedUp()
+    private boolean haveAllCaughtUp()
     {
         return waitingToCatchup.isEmpty();
     }

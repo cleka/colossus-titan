@@ -925,7 +925,7 @@ public final class GameServerSide extends Game
 
     public void kickstartGame()
     {
-        LOGGER.info("All clients have catched up with loading/replay or "
+        LOGGER.info("All clients have caught up with loading/replay or "
             + "pickColor, now kicking off the Game!");
         setupPhase();
     }

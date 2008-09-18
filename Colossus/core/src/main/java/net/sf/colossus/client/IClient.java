@@ -59,7 +59,7 @@ public interface IClient
 
     public void tellReplay(boolean val, int maxTurn);
     
-    public void confirmWhenCatchedUp();
+    public void confirmWhenCaughtUp();
 
     public void setPlayerName(String newPlayerName);
 

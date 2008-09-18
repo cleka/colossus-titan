@@ -966,7 +966,7 @@ final class SocketClientThread extends Thread implements IServer
         }
         else if (method.equals(Constants.askConfirmCatchUp))
         {
-            client.confirmWhenCatchedUp();
+            client.confirmWhenCaughtUp();
         }
         else
         {
