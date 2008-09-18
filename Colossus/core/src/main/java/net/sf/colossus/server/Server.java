@@ -263,10 +263,22 @@ public final class Server extends Thread implements IServer
         {
             LOGGER.log(Level.FINEST, "before select()");
 
-            int num = selector.select();
+            // TODO choose timeout more cleverly, e.g. based on
+            // AI timeout?
+            int num = selector.select(35000);
             LOGGER.log(Level.FINEST, "select returned, " + num
                 + " channels are ready to be processed.");
 
+            // Timeout:
+            if (num == 0)
+            {
+                // TODO This shutUp stuff is just for development purposes,
+                // should be removed once we get the troubles solved.
+                allSetShutUp(false);
+                LOGGER.info("Server side select timeout, sending message "
+                    + "counter to all clients.");
+                allSendMessageCounter();
+            }
             if (forceShutDown)
             {
                 LOGGER.log(Level.FINEST,
@@ -1059,7 +1071,24 @@ public final class Server extends Thread implements IServer
         }
     }
 
-    
+    // TODO This shutUp stuff is just for development purposes,
+    // should be removed once we get the troubles solved.
+    synchronized void allSetShutUp(boolean val)
+    {
+        for (IClient client : clients)
+        {
+            ((ClientHandler) client).setShutUp(val);
+        }
+    }
+
+    synchronized void allSendMessageCounter()
+    {
+        for (IClient client : clients)
+        {
+            ((ClientHandler) client).sendMessageCounter();
+        }
+    }
+
     synchronized void allRequestConfirmCatchup()
     {
         // First put them all to the list, send messages after that

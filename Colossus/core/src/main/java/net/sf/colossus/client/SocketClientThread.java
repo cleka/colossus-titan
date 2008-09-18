@@ -942,15 +942,15 @@ final class SocketClientThread extends Thread implements IServer
             client.tellEngagementResults(legion, resMethod, points, turns);
         }
         
-        // Right now server isn't even sending this, I think... take into use?
         else if (method.equals(Constants.msgCtrToClient))
         {
             int gotCounter = Integer.parseInt(args.remove(0));
             LOGGER.finest("client " + client.getOwningPlayer()
                 + " got Counter " + gotCounter);
+
             if (gotCounter != expectedCounter)
             {
-                LOGGER.warning("In Client " + client.getOwningPlayer()
+                LOGGER.severe("In Client " + client.getOwningPlayer()
                     + ": Expected message counter is " + expectedCounter
                     + " but got " + gotCounter + "!!! => Syncing counters "
                     + " now, but messages are lost.");
@@ -960,8 +960,20 @@ final class SocketClientThread extends Thread implements IServer
                     + client.getOwningPlayer() + " got lost in"
                     + " between, client might be in inconsistent state now.";
                 client.showErrorMessage(msg, "Server-Client messages lost!"); 
-                    
+                
+                // TODO proper recovery? Server should re-send lost?
                 expectedCounter = gotCounter;
+            }
+            else
+            {
+                // Server may send this when it has long time not heard from us
+                // nor any other client. Give an ACK that it can send some more,
+                // if it has in the queue.
+
+                LOGGER.info("Client " + client.getOwningPlayer().getName()
+                    + ": gotCounter == expectedCounter = " + expectedCounter
+                    + " - sending ACK.");
+                sendToServer(Constants.processedCtr + sep + expectedCounter);
             }
         }
         else if (method.equals(Constants.askConfirmCatchUp))

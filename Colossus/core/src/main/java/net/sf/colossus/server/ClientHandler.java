@@ -196,12 +196,12 @@ final class ClientHandler implements IClient
          
             sendViaChannelRaw(sendMsg);
             msgCounter++;
+
             if (msgCounter % CTR_SYNC_EVERY_N == 0)
             {
-                sendViaChannelRaw(Constants.msgCtrToClient + sep + msgCounter);
-                msgCounter++;
+                sendMessageCounter();
             }
-        
+            
             int serverAhead = msgCounter - processedCtr;
             if (serverAhead > MAX_SERVER_AHEAD && !clientCantFollow)
             {
@@ -214,8 +214,22 @@ final class ClientHandler implements IClient
             }
         }
     }
+
+    public void sendMessageCounter()
+    {
+        sendViaChannelRaw(Constants.msgCtrToClient + sep + msgCounter);
+        msgCounter++;
+    }
+
     private void sendViaChannelRaw(String msg)
     {
+        // TODO This shutUp stuff is just for development purposes,
+        // should be removed once we get the troubles solved.
+        if (shutUp)
+        {
+            System.out.println("SERVER SHUTUP DROPS >> " + msg);
+            return;
+        }
         CharBuffer cb = CharBuffer.allocate(msg.length() + 2);
         cb.put(msg);
         cb.put("\n");
@@ -565,6 +579,17 @@ final class ClientHandler implements IClient
         server.disposeClientHandler(this);
     }
 
+    
+    // TODO This shutUp stuff is just for development purposes,
+    // should be removed once we get the troubles solved.
+
+    private boolean shutUp = false;
+    
+    public void setShutUp(boolean val)
+    {
+        shutUp = val;
+    }    
+
     public void tellEngagement(MasterHex hex, Legion attacker, Legion defender)
     {
         sendToClient(Constants.tellEngagement + sep + hex.getLabel() + sep
@@ -764,6 +789,12 @@ final class ClientHandler implements IClient
 
     public void cleanupBattle()
     {
+        // TODO This shutUp stuff is just for development purposes,
+        // should be removed once we get the troubles solved.
+        
+        // DURING DEBUG/development I set this to true
+        //// shutUp = true;
+
         sendToClient(Constants.cleanupBattle);
     }
 
