@@ -328,57 +328,90 @@
 		</exec>
 	</target>
 
-        <!-- The following two remote-trunk-... targets are for updating the "trunk-head*" copies in separate directories;
-             the first one is accessible via the ExperimentalBuilds wiki page. The other one from a special page (not in index).
-             It's somewhat working in standard case, but only always by same person, and/or,
-             before some other user does such a build, he needs unsigned versions of the 2 libs/.jar files.
-             One more problem is, that updated files on SF host get the "users" group, despite the usage of "-g" (-a) attribute for rsync
-             - and I have no clue why this happens.
-             So, if someone else would want to do such an trunk-head* build, he probably have to delete the files by logging
-             in to the server itself (then he can delete them, since directories have right group).
-             After I have done such a build I try to do the command:
-               find . -print | xargs chgrp colossus
-             e.g. being in trunk-head/ or trunk-head-work/ directory so that all files have group colossus.
-          -->
+    <!-- If we can agree to put the public build files also to a subdir, and use the following
+         three targets for that, then those three targets could even be unified to use
+         one target that does all the rsync and 3 special ones that just set the variables.
+         Perhaps we could even just rsync whole ./htdocs/BUILD/ directory...
+         Clemens, 22.9.2008
+      -->
 
-	<!--  trunk-head -->
-	<target name="remote-trunk-head-inst" depends="clean,init,signall" 
-                description="copy files into trunk-head-directory under htdocs tree on SF">
+
+<!-- next one: NOT TESTED YET !!! -->
+
+	<!--  public-build ("Official" public build) -->
+	<target name="remote-inst-public-build" depends="clean,init,signall" 
+        description="copy files into public-build -directory under htdocs tree on SF">
+
 		<exec executable="rsync">
-			<arg line="-a --chmod=ug=rw,o=r Colossus-trunk-head.jnlp ${SERVER}:${HTML_DIR}/trunk-head/Colossus-trunk-head.jnlp" />
+			<arg line="-a --chmod=ug=rw,o=r htdocs/public-build/Colossus.jnlp ${SERVER}:${HTML_DIR}/public-build/Colossus.jnlp" />
 		</exec>
 		<exec executable="rsync">
-			<arg line="-a --chmod=ug=rw,o=r Colossus.jar ${SERVER}:${HTML_DIR}/trunk-head/Colossus-trunk-head.jar" />
+			<arg line="-a --chmod=ug=rw,o=r Colossus.jar ${SERVER}:${HTML_DIR}/public-build/Colossus.jar" />
 		</exec>
 		<exec executable="rsync">
-			<arg line="-a --chmod=ug=rw,o=r libs/werken.opt.jar ${SERVER}:${HTML_DIR}/trunk-head/libs/werken.opt.jar" />
+			<arg line="-a --chmod=ug=rw,o=r libs/werken.opt.jar ${SERVER}:${HTML_DIR}/public-build/libs/werken.opt.jar" />
 		</exec>
 		<exec executable="rsync">
-			<arg line="-a --chmod=ug=rw,o=r libs/jdom.jar ${SERVER}:${HTML_DIR}/trunk-head/libs/jdom.jar" />
+			<arg line="-a --chmod=ug=rw,o=r libs/jdom.jar ${SERVER}:${HTML_DIR}/public-build/libs/jdom.jar" />
 		</exec>
 		<exec executable="rsync">
-			<arg line="-a --chmod=ug=rw,o=r  docs/* ${SERVER}:${HTML_DIR}/trunk-head/docs/" />
+			<arg line="-a --chmod=ug=rw,o=r  docs/* ${SERVER}:${HTML_DIR}/public-build/docs/" />
+		</exec>
+		
+		<!--- TODO how to do this for the two other builds, or do at all? 
+		           Or use the download feature on SF site instead? -->
+<!--		           
+		<exec executable="rsync">
+			<arg line="-a ${ZIPFILE} ${SERVER}:${DOWNLOAD_DIR}" />
+		</exec>
+-->		
+		
+	</target>
+
+
+	<!--  public-testing (Public testing build, usually from trunk-head.) -->
+	<target name="remote-inst-public-testing" depends="clean,init,signall" 
+        description="copy files into public-testing -directory under htdocs tree on SF">
+
+		<exec executable="rsync">
+			<arg line="-a --chmod=ug=rw,o=r htdocs/public-testing/Colossus-public-testing.jnlp ${SERVER}:${HTML_DIR}/public-testing/Colossus-public-testing.jnlp" />
+		</exec>
+		<exec executable="rsync">
+			<arg line="-a --chmod=ug=rw,o=r Colossus.jar ${SERVER}:${HTML_DIR}/public-testing/Colossus.jar" />
+		</exec>
+		<exec executable="rsync">
+			<arg line="-a --chmod=ug=rw,o=r libs/werken.opt.jar ${SERVER}:${HTML_DIR}/public-testing/libs/werken.opt.jar" />
+		</exec>
+		<exec executable="rsync">
+			<arg line="-a --chmod=ug=rw,o=r libs/jdom.jar ${SERVER}:${HTML_DIR}/public-testing/libs/jdom.jar" />
+		</exec>
+		<exec executable="rsync">
+			<arg line="-a --chmod=ug=rw,o=r  docs/* ${SERVER}:${HTML_DIR}/public-testing/docs/" />
 		</exec>
 	</target>
 
-	<!--  trunk-head-work (testing copy to play around with the rsync stuff ==> see ExperimentalBuildsWork wiki page) -->
-	<target name="remote-trunk-head-work-inst" depends="clean,init,signall" 
-                description="copy files into trunk-head-work-directory under htdocs tree on SF">
+
+	<!--  special-build (testing copy to play around e.g. with the rsync stuff 
+	      or make a special build for someone to troubleshoot a
+	      "happens-only-for-user-but-not-developer-" type of bug.
+      -->
+	<target name="remote-inst-special-build" depends="clean,init,signall" 
+                description="copy files into special-build -directory under htdocs tree on SF">
 
 		<exec executable="rsync">
-			<arg line="-a --chmod=ug=rw,o=r Colossus-trunk-head-work.jnlp ${SERVER}:${HTML_DIR}/trunk-head-work/Colossus-trunk-head-work.jnlp" />
+			<arg line="-a --chmod=ug=rw,o=r htdocs/special-build/Colossus-special-build.jnlp ${SERVER}:${HTML_DIR}/special-build/Colossus-special-build.jnlp" />
 		</exec>
 		<exec executable="rsync">
-			<arg line="-a --chmod=ug=rw,o=r Colossus.jar ${SERVER}:${HTML_DIR}/trunk-head-work/Colossus-trunk-head-work.jar" />
+			<arg line="-a --chmod=ug=rw,o=r Colossus.jar ${SERVER}:${HTML_DIR}/special-build/Colossus.jar" />
 		</exec>
 		<exec executable="rsync">
-			<arg line="-a --chmod=ug=rw,o=r libs/werken.opt.jar ${SERVER}:${HTML_DIR}/trunk-head-work/libs/werken.opt.jar" />
+			<arg line="-a --chmod=ug=rw,o=r libs/werken.opt.jar ${SERVER}:${HTML_DIR}/special-build/libs/werken.opt.jar" />
 		</exec>
 		<exec executable="rsync">
-			<arg line="-a --chmod=ug=rw,o=r libs/jdom.jar ${SERVER}:${HTML_DIR}/trunk-head-work/libs/jdom.jar" />
+			<arg line="-a --chmod=ug=rw,o=r libs/jdom.jar ${SERVER}:${HTML_DIR}/special-build/libs/jdom.jar" />
 		</exec>
 		<exec executable="rsync">
-			<arg line="-a --chmod=ug=rw,o=r  docs/* ${SERVER}:${HTML_DIR}/trunk-head-work/docs/" />
+			<arg line="-a --chmod=ug=rw,o=r  docs/* ${SERVER}:${HTML_DIR}/special-build/docs/" />
 		</exec>
 	</target>
 

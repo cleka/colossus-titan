@@ -3,19 +3,19 @@
      <!-- JNLP File for Colossus -->
      <jnlp
        codebase="http://colossus.sf.net/"
-       href="Colossus.jnlp">
+       href="public-testing/Colossus-public-testing.jnlp">
        <application-desc main-class="net.sf.colossus.server.Start"/>
        <information>
-         <title>Colossus</title>
+         <title>Colossus (Public Testing Build)</title>
          <vendor>Colossus dev team</vendor>
          <icon href="Colossus.gif"/>
          <offline-allowed/>
          <homepage href="index.html"/>
        </information>
        <resources>
-         <jar href="Colossus.jar"/>
-         <jar href="libs/werken.opt.jar"/>
-         <jar href="libs/jdom.jar"/>
+         <jar href="public-testing/Colossus.jar"/>
+         <jar href="public-testing/libs/werken.opt.jar"/>
+         <jar href="public-testing/libs/jdom.jar"/>
          <j2se version="1.5+" max-heap-size="128M"/>
        </resources>
        <security>
