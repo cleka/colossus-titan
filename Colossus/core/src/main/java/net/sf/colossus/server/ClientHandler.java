@@ -28,7 +28,7 @@ import net.sf.colossus.webcommon.InstanceTracker;
 
 /**
  *  Holds all data specific to one client connection.
- *  (Earlier this was the class SocketClientThread, but since changing
+ *  (Earlier this was the class ServerSocketThread, but since changing
  *   to NIO it's not an own thread any more.)
  *   
  *  The code in here is (should be) executed exclusively by the server
