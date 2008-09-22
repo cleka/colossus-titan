@@ -17,9 +17,12 @@
      To install a build on the website (normal public build, or one of
      the experimental builds, you need a proper rsync/ssh keys setup.
      Most noticable, you need the ssh public key setup done according SF's
-     instructions, and if your local username at your working computer is
-     different than the username you have on sourceforge, you need to set
-     it (using the variables "Host" and "User") in your .ssh/config file.
+     instructions, and put the right setup in your .ssh/config file.
+     E.g. my (cleka's) file looks like this:
+     ~~~clip~~~
+     Host web.sourceforge.net
+       User cleka,colossus
+     ~~~clap~~~
 -->
 
 <project name="Colossus" default="jar" basedir=".">
@@ -62,7 +65,7 @@
 		<property name="DOCS_DIR" value="${HTML_DIR}/docs" />
 		<property name="LIBS_DIR" value="${HTML_DIR}/libs" />
 		<property name="ZIPFILE" value="Colossus.${DSTAMP}.zip" />
-		<property name="SERVER" value="shell1.sf.net" />
+		<property name="SERVER" value="web.sourceforge.net" />
 
 		<mkdir dir="${build.classes.dir}" />
 		<mkdir dir="${testresults.dir}" />
