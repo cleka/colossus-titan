@@ -77,6 +77,11 @@ final class SocketClientThread extends Thread implements IServer
             LOGGER.log(Level.FINEST, "Next: " + task);
             socket = new Socket(host, port);
 
+            int receiveBufferSize = socket.getReceiveBufferSize();
+            LOGGER.info("Client socket receive buffer size for Client "
+                + client.getOwningPlayer().getName() + " is "
+                + receiveBufferSize);
+
             task = "preparing PrintWriter";
             LOGGER.log(Level.FINEST, "Next: " + task);
             out = new PrintWriter(socket.getOutputStream(), true);
@@ -464,6 +469,12 @@ final class SocketClientThread extends Thread implements IServer
             // as processing of any message causes an exception
             //  (incr. would be skipped...)
             ++expectedCounter;
+            
+            // The purpose of this ACK is that the server knows we have
+            // caught up to #xxx and possibly can send more if there is still
+            // something pending.
+            // Additionally ACKs will be sent when we receive the server's 
+            // counter in a Constants.msgCtrToClient message.
             if (expectedCounter % CLIENT_CTR_ACK_EVERY == 0)
             {
                 LOGGER.finest("Client " + client.getOwningPlayer().getName()

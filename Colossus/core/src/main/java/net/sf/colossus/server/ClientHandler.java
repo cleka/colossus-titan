@@ -72,9 +72,15 @@ final class ClientHandler implements IClient
     private final CharsetEncoder encoder = charset.newEncoder();
     private final CharsetDecoder decoder = charset.newDecoder();
 
-    // Note that the client send ack every CLIENT_CTR_ACK_EVERY messages 
+    // That much ahead? Let's stop for a while...
     private final int MAX_SERVER_AHEAD = 50;
+    
+    // had caught up so that only that many in the air?
+    // OK, continue sending if something in the queue
     private final int MIN_CLIENT_CATCHUP = 15;
+    
+    // Note that the client (SocketClientThread) sends ack every 
+    // CLIENT_CTR_ACK_EVERY messages (currently 20) 
     private final int CTR_SYNC_EVERY_N = 24;
     
     ClientHandler(Server server, SocketChannel channel, SelectionKey selKey)
