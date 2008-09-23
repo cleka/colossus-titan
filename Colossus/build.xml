@@ -400,4 +400,12 @@
       <arg line="-a --chmod=ug=rw,o=r docs/* ${SERVER}:${HTML_DIR}/special-build/docs/" />
     </exec>
   </target>
+
+  <target name="remote-inst-web"
+  depends="clean,init,signall"
+  description="copy web page files into top htdocs dir on SF">
+    <exec executable="rsync">
+      <arg line="-a htdocs ${SERVER}:${HTML_DIR}" />
+    </exec>
+  </target>
 </project>
