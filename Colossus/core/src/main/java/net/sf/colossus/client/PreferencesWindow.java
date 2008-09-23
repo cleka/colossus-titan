@@ -224,7 +224,6 @@ public class PreferencesWindow extends KFrame implements ItemListener,
         graphicsPane.setAlignmentX(LEFT_ALIGNMENT);
         addCheckBox(graphicsPane, Options.antialias);
         addCheckBox(graphicsPane, Options.useOverlay);
-        addCheckBox(graphicsPane, Options.useSVG);
         addCheckBox(graphicsPane, Options.noBaseColor);
         viewPane.add(graphicsPane, SUBPANEL_CONSTRAINTS);
 

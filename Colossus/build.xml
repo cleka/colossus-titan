@@ -244,42 +244,6 @@
     <signjar jar="libs/werken.opt.jar" alias="${user.name}"
     keystore="${user.name}Keystore"
     storepass="${env.JARPASSWORD}" />
-    <signjar jar="libs/batik-awt-util.jar" alias="${user.name}"
-    keystore="${user.name}Keystore"
-    storepass="${env.JARPASSWORD}" />
-    <signjar jar="libs/batik-bridge.jar" alias="${user.name}"
-    keystore="${user.name}Keystore"
-    storepass="${env.JARPASSWORD}" />
-    <signjar jar="libs/batik-css.jar" alias="${user.name}"
-    keystore="${user.name}Keystore"
-    storepass="${env.JARPASSWORD}" />
-    <signjar jar="libs/batik-dom.jar" alias="${user.name}"
-    keystore="${user.name}Keystore"
-    storepass="${env.JARPASSWORD}" />
-    <signjar jar="libs/batik-ext.jar" alias="${user.name}"
-    keystore="${user.name}Keystore"
-    storepass="${env.JARPASSWORD}" />
-    <signjar jar="libs/batik-gvt.jar" alias="${user.name}"
-    keystore="${user.name}Keystore"
-    storepass="${env.JARPASSWORD}" />
-    <signjar jar="libs/batik-parser.jar" alias="${user.name}"
-    keystore="${user.name}Keystore"
-    storepass="${env.JARPASSWORD}" />
-    <signjar jar="libs/batik-script.jar" alias="${user.name}"
-    keystore="${user.name}Keystore"
-    storepass="${env.JARPASSWORD}" />
-    <signjar jar="libs/batik-svg-dom.jar" alias="${user.name}"
-    keystore="${user.name}Keystore"
-    storepass="${env.JARPASSWORD}" />
-    <signjar jar="libs/batik-transcoder.jar" alias="${user.name}"
-    keystore="${user.name}Keystore"
-    storepass="${env.JARPASSWORD}" />
-    <signjar jar="libs/batik-util.jar" alias="${user.name}"
-    keystore="${user.name}Keystore"
-    storepass="${env.JARPASSWORD}" />
-    <signjar jar="libs/batik-xml.jar" alias="${user.name}"
-    keystore="${user.name}Keystore"
-    storepass="${env.JARPASSWORD}" />
   </target>
   <!-- Tasks from here down are only needed for installation on the web site. -->
   <target name="dist" depends="clean,init,sign"

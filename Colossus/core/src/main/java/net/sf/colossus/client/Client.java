@@ -1010,15 +1010,6 @@ public final class Client implements IClient, IOracle
                 setType(newValue);
             }
         });
-        options.addListener(Options.useSVG, new IOptions.Listener()
-        {
-            @Override
-            public void booleanOptionChanged(String optname, boolean oldValue,
-                boolean newValue)
-            {
-                ResourceLoader.setUseSVG(newValue);
-            }
-        });
     }
 
     /** Load player options from a file. */

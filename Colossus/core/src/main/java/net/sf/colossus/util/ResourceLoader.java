@@ -44,11 +44,6 @@ import javax.swing.text.html.HTMLEditorKit;
 
 import net.sf.colossus.server.Constants;
 
-import org.apache.batik.transcoder.TranscoderException;
-import org.apache.batik.transcoder.TranscoderInput;
-import org.apache.batik.transcoder.TranscoderOutput;
-import org.apache.batik.transcoder.image.ImageTranscoder;
-import org.apache.batik.util.XMLResourceDescriptor;
 import org.jdom.Element;
 
 
@@ -138,7 +133,6 @@ public final class ResourceLoader
     // A hardcoded '/' works in Unix, Windows, MacOS X, and jar files.
     private static final String pathSeparator = "/";
     private static final String[] imageExtension = { ".png", ".gif" };
-    private static final String[] svgExtension = { ".svg" };
     private static final ClassLoader baseCL = ResourceLoader.class
         .getClassLoader();
     private static final ColossusClassLoader cl = new ColossusClassLoader(
@@ -149,27 +143,6 @@ public final class ResourceLoader
         .synchronizedMap(new HashMap<String, byte[]>());
 
     private final static String sep = Constants.protocolTermSeparator;
-
-    // check if we can use Batik (SVG files) or not
-    private static boolean hasBatik = false;
-    static
-    {
-        try
-        {
-            baseCL
-                .loadClass("org.apache.batik.transcoder.image.ImageTranscoder");
-            hasBatik = true;
-            // Use Crimson, not Xerces
-            XMLResourceDescriptor
-                .setXMLParserClassName("org.apache.crimson.parser.XMLReaderImpl");
-        }
-        catch (Exception e)
-        {
-            LOGGER.log(Level.FINEST, "Couldn't load class \""
-                + "org.apache.batik.transcoder.image.ImageTranscoder\", "
-                + "assuming batik (and SVG files) not available.");
-        }
-    }
 
     private static String server = null;
     private static int serverPort = 0;
@@ -234,11 +207,6 @@ public final class ResourceLoader
         while (it.hasNext() && (image == null))
         {
             String path = it.next();
-            for (int i = 0; ((i < svgExtension.length) && (image == null)); i++)
-            {
-                image = tryLoadSVGImageFromFile(filename + svgExtension[i],
-                    path, width, height);
-            }
             for (int i = 0; ((i < imageExtension.length) && (image == null)); i++)
             {
                 image = tryLoadImageFromFile(filename + imageExtension[i],
@@ -291,15 +259,6 @@ public final class ResourceLoader
         {
             String path = it.next();
 
-            for (int i = 0; ((i < svgExtension.length) && (icon == null)); i++)
-            {
-                Image temp = tryLoadSVGImageFromFile(filename
-                    + svgExtension[i], path, width, height);
-                if (temp != null)
-                {
-                    icon = new ImageIcon(temp);
-                }
-            }
             for (int i = 0; ((i < imageExtension.length) && (icon == null)); i++)
             {
                 Image temp = tryLoadImageFromFile(
@@ -1427,86 +1386,5 @@ public final class ResourceLoader
             allElement.add(el);
         }
         return allElement;
-    }
-
-    /* cheat, using Batik transcoder API. we only want the Image */
-    private static class BufferedImageTranscoder extends ImageTranscoder
-    {
-        private BufferedImage image;
-
-        @Override
-        public BufferedImage createImage(int width, int height)
-        {
-            return new BufferedImage(width, height,
-                BufferedImage.TYPE_INT_ARGB);
-        }
-
-        @Override
-        public void writeImage(BufferedImage image, TranscoderOutput output)
-            throws TranscoderException
-        {
-            this.image = image;
-        }
-
-        public BufferedImage getImage()
-        {
-            return image;
-        }
-    }
-
-    static boolean useSVG = false;
-
-    public static void setUseSVG(boolean useSVG)
-    {
-        ResourceLoader.useSVG = useSVG;
-    }
-
-    /**
-     * Try loading the SVG file with the given filename in the given path
-     * as an Image.
-     * @param filename Name of the file to load.
-     * @param path Path to search for the file
-     * @return Resulting Image, or null if it fails.
-     */
-    private static Image tryLoadSVGImageFromFile(String filename, String path,
-        int width, int height)
-    {
-        if (!hasBatik || !useSVG)
-        {
-            return null;
-        }
-
-        Image image = null;
-        try
-        {
-            java.net.URL url;
-            url = new java.net.URL("file:" + path + pathSeparator
-                + fixFilename(filename));
-            // URL will not be null even if the file doesn't exist,
-            // so we need to check if connection can be opened
-            InputStream stream = url.openStream();
-            if (stream != null)
-            {
-                BufferedImageTranscoder t = new BufferedImageTranscoder();
-                t.addTranscodingHint(ImageTranscoder.KEY_WIDTH, new Float(
-                    width));
-                t.addTranscodingHint(ImageTranscoder.KEY_HEIGHT, new Float(
-                    height));
-                TranscoderInput input = new TranscoderInput(stream);
-                t.transcode(input, null);
-                image = t.getImage();
-            }
-        }
-        catch (FileNotFoundException e)
-        {
-            // nothing to do
-        }
-        catch (Exception e)
-        {
-            LOGGER.log(Level.FINE, "SVG transcoding for " + filename + " in "
-                + path + " failed.", e);
-            // nothing to do
-        }
-        return image;
     }
 }

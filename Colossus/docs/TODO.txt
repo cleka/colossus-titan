@@ -217,10 +217,6 @@ JDK 1.4 changes:
    NetworkInterface / localhost
 
 
-SVG chits.  Maybe SVG board and map, after we have SVG chits.  (No point
-   before then -- just drags in Batik without giving infinite rescaling.)
-Remove SVG code until we have the chits.
-
 Place SummonAngel so that it doesn't overlap any of the player's markers
    with summonable angels.
 

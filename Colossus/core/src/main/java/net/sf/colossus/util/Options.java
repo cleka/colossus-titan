@@ -106,7 +106,6 @@ public final class Options implements IOptions
     public static final String unlimitedMulligans = "Unlimited Mulligans";
 
     // Display options (client only)
-    public static final String useSVG = "Use SVG chits";
     public static final String stealFocus = "Steal focus";
     public static final String BattleTerrainHazardWindow = "Show Terrain and Hazards";
     public static final String showCaretaker = "Show Caretaker's stacks";
