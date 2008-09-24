@@ -128,7 +128,7 @@
   </target>
   <target name="jar" depends="init,compile,compileVariants,version"
   description="Make jar file">
-    <pathconvert property="manifest.classpath" pathsep="">
+    <pathconvert property="manifest.classpath" pathsep=" ">
       <path refid="project.class.path" />
       <chainedmapper>
         <flattenmapper />
