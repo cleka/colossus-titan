@@ -66,7 +66,7 @@
   <target name="version" depends="init"
   description="Create a timestamp file">
     <echo file="${build.classes.dir}/version"
-    message="${DSTAMP}" />
+    message="${DSTAMP}&#10;" />
   </target>
   <target name="compile" depends="init"
   description="Compiles Colossus without datatools and variants">
