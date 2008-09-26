@@ -331,7 +331,7 @@ public final class Movement
         }
 
         // Tower teleport
-        if (hex.getTerrain().hasStartList() && legion.numLords() > 0
+        if (hex.getTerrain().isTower() && legion.numLords() > 0
             && towerTeleportAllowed())
         {
             // Mark every unoccupied hex within 6 hexes.

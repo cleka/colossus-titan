@@ -2368,7 +2368,7 @@ public final class GameServerSide extends Game
         }
 
         // Tower teleport
-        if (hex.getTerrain().hasStartList() && legion.numLords() > 0
+        if (hex.getTerrain().isTower() && legion.numLords() > 0
             && towerTeleportAllowed())
         {
             // Mark every unoccupied hex within 6 hexes.
