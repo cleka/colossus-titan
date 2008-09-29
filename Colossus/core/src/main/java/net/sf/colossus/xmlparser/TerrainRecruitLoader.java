@@ -758,7 +758,7 @@ public class TerrainRecruitLoader
      * @param name The name of the Creature inquired.
      * @return If the creature is Acquirable.
      */
-    public boolean isAcquirable(String name)
+    public static boolean isAcquirable(String name)
     {
         Iterator<AcquirableData> it = acquirableList.iterator();
         while (it.hasNext())
@@ -777,7 +777,7 @@ public class TerrainRecruitLoader
      * @param c The Creature inquired.
      * @return If the creature is Acquirable.
      */
-    public boolean isAcquirable(CreatureType c)
+    public static boolean isAcquirable(CreatureType c)
     {
         return isAcquirable(c.getName());
     }
