@@ -546,6 +546,7 @@ public final class Constants
     public static final String boardActive = "boardActive";
     public static final String msgCtrToClient = "msgCtrToClient";
     public static final String askConfirmCatchUp = "askConfirmCatchUp";
+    public static final String msgCounterMismatch  = "msgCounterMismatch";
 
     // engagement resolved, methods:
     public static final String erMethodFlee = "flee";

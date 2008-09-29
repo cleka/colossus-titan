@@ -80,8 +80,9 @@ final class ClientHandler implements IClient
     private final int MIN_CLIENT_CATCHUP = 15;
     
     // Note that the client (SocketClientThread) sends ack every 
-    // CLIENT_CTR_ACK_EVERY messages (currently 20) 
-    private final int CTR_SYNC_EVERY_N = 24;
+    // CLIENT_CTR_ACK_EVERY messages (currently 20)
+    // The two values above and the client value must fit together
+    // that it does not cause a deadlock.
     
     ClientHandler(Server server, SocketChannel channel, SelectionKey selKey)
     {
@@ -182,7 +183,7 @@ final class ClientHandler implements IClient
     }
 
     private int msgCounter = 1;
-    private LinkedList<String> sendToClientQueue = new LinkedList<String>();
+    private LinkedList<ServerMessage> sendToClientQueue = new LinkedList<ServerMessage>();
     
     private void sendViaChannel(String msg)
     {
@@ -190,24 +191,84 @@ final class ClientHandler implements IClient
         // in later phase of game not - then all action is initiated
         // via the Selector thread; but in beginning, especially
         // during loading, can something happen then?
-        sendToClientQueue.add(msg);
+        
+        // still dummy
+        int typeId = 0;
+        sendToClientQueue.add(new ServerMessage(0, typeId, msg));
         sendSomethingIfPossible();
+    }
+
+    public class ServerMessage
+    {
+        public int id;
+        public int typeId;
+        public String content;
+        
+        public ServerMessage(int msgId, int msgTypeId, String msgContent)
+        {
+            this.id = msgId;
+            this.typeId = msgTypeId;
+            this.content = msgContent;
+        }
+    }
+    
+    private LinkedList<ServerMessage>resendQueue = new LinkedList<ServerMessage>();
+    
+    /**
+     * Client has confirmed to have received msg with id receivedCounter.
+     * Purge front of resendQueue until reaching a non-confirmed one. 
+     * @param receivedCounter
+     */
+    private void purgeAcked(int receivedCounter)
+    {
+        if (resendQueue.isEmpty())
+        {
+            return;
+        }
+
+        boolean done = false;
+        while(!resendQueue.isEmpty() && !done)
+        {
+            ServerMessage msg = resendQueue.peek();
+            
+            if (msg.id <= receivedCounter)
+            {
+                resendQueue.removeFirst();
+            }
+            else
+            {
+                done = true;
+            }
+        }
+    }
+    
+    /**
+     * Some messages have gone lost, client expected a message with id
+     * expectedCounter. 
+     * Get rid of all those that were successfully received, and put the
+     * messages that were missing again to the sendToClientQueue queue.
+     * 
+     * @param expectedCounter
+     */
+    private void reEnqueueMessages(int expectedCounter)
+    {
+        while(!resendQueue.isEmpty())
+        {
+            ServerMessage msg = resendQueue.removeLast();
+            sendToClientQueue.addFirst(msg);
+        }
+        msgCounter = expectedCounter;
     }
 
     public void sendSomethingIfPossible()
     {
         while(!sendToClientQueue.isEmpty() && !clientCantFollow)
         {
-            String sendMsg = sendToClientQueue.removeFirst();
-         
-            sendViaChannelRaw(sendMsg);
+            ServerMessage msg = sendToClientQueue.removeFirst();
+            
+            sendViaChannelRaw(msgCounter, msg.typeId, msg.content);
             msgCounter++;
 
-            if (msgCounter % CTR_SYNC_EVERY_N == 0)
-            {
-                sendMessageCounter();
-            }
-            
             int serverAhead = msgCounter - processedCtr;
             if (serverAhead > MAX_SERVER_AHEAD && !clientCantFollow)
             {
@@ -224,22 +285,17 @@ final class ClientHandler implements IClient
 
     public void sendMessageCounter()
     {
-        sendViaChannelRaw(Constants.msgCtrToClient + sep + msgCounter);
+        sendViaChannelRaw(msgCounter, 0, Constants.msgCtrToClient + sep + msgCounter);
         msgCounter++;
     }
 
-    private void sendViaChannelRaw(String msg)
+    private void sendViaChannelRaw(int msgCtr, int msgTypeId, String msg)
     {
-        // TODO This shutUp stuff is just for development purposes,
-        // should be removed once we get the troubles solved.
-        if (shutUp)
-        {
-            System.out.println("SERVER SHUTUP DROPS >> " + msg);
-            return;
-        }
-        CharBuffer cb = CharBuffer.allocate(msg.length() + 2);
-        cb.put(msg);
-        cb.put("\n");
+        resendQueue.addLast(new ServerMessage(msgCtr, msgTypeId, msg));
+
+        String dataToSend = msgCtr + sep + msgTypeId + sep + msg + "\n";
+        CharBuffer cb = CharBuffer.allocate(dataToSend.length() + 2);
+        cb.put(dataToSend);
         cb.flip();
 
         try
@@ -493,9 +549,20 @@ final class ClientHandler implements IClient
             String filename = args.remove(0);
             server.saveGame(filename);
         }
+        else if (method.equals(Constants.msgCounterMismatch))
+        {
+            int expectedCtr = Integer.parseInt(args.remove(0));
+            purgeAcked(expectedCtr);
+            reEnqueueMessages(expectedCtr);
+            // send something so that client sends something back
+            // ==> then we get back into the sendSomethingIfPossible loop.
+            sendMessageCounter();
+        }
         else if (method.equals(Constants.processedCtr))
         {
             processedCtr = Integer.parseInt(args.remove(0));
+            purgeAcked(processedCtr);
+
             int serverAhead = msgCounter - processedCtr;
             if (serverAhead < MIN_CLIENT_CATCHUP && clientCantFollow)
             {
@@ -505,15 +572,8 @@ final class ClientHandler implements IClient
                     + ") - setting client-cant-follow false");
 
                 clientCantFollow = false;
-                sendMessageCounter();
-
-                while(!clientCantFollow && !sendToClientQueue.isEmpty())
-                {
-                    // System.out.println("During processing read, client can follow loop...");
-                    sendSomethingIfPossible();
-                }
-                // System.out.println("\n\n*****\nAfter !clientCantFollow loop!\n");
             }
+            sendSomethingIfPossible();
         }
         else if (method.equals(Constants.catchupConfirmation))
         {
@@ -583,17 +643,6 @@ final class ClientHandler implements IClient
         sendViaChannel(Constants.dispose);
         server.disposeClientHandler(this);
     }
-
-    
-    // TODO This shutUp stuff is just for development purposes,
-    // should be removed once we get the troubles solved.
-
-    private boolean shutUp = false;
-    
-    public void setShutUp(boolean val)
-    {
-        shutUp = val;
-    }    
 
     public void tellEngagement(MasterHex hex, Legion attacker, Legion defender)
     {
@@ -735,7 +784,6 @@ final class ClientHandler implements IClient
 
     public void tellGameOver(String message)
     {
-        sendMessageCounter();
         sendToClient(Constants.tellGameOver + sep + message);
     }
 
@@ -792,12 +840,6 @@ final class ClientHandler implements IClient
 
     public void cleanupBattle()
     {
-        // TODO This shutUp stuff is just for development purposes,
-        // should be removed once we get the troubles solved.
-        
-        // DURING DEBUG/development I set this to true
-        //// shutUp = true;
-
         sendToClient(Constants.cleanupBattle);
     }
 
@@ -962,6 +1004,8 @@ final class ClientHandler implements IClient
 
     public void confirmWhenCaughtUp()
     {
+        LOGGER.info("Sending request to confirm catchup to client "
+            + playerName);
         sendToClient(Constants.askConfirmCatchUp);
     }
 

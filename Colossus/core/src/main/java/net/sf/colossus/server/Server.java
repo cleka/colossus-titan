@@ -95,6 +95,11 @@ public final class Server extends Thread implements IServer
     private boolean obsolete = false;
     private boolean shuttingDown = false;
     private boolean forceShutDown = false;
+    private boolean initiateDisposal = false;
+    private String caughtUpAction = "";
+
+    private final int timeoutDuringGame = 10000;
+    private final int timeoutDuringShutdown = 1000;
 
     // Earlier I have locked on an Boolean object itself, 
     // which I modify... and when this is done too often,
@@ -143,17 +148,23 @@ public final class Server extends Thread implements IServer
     @Override
     public void run()
     {
-        while (serverRunning && !shuttingDown)
+        int timeout = timeoutDuringGame;
+        int disposeRound = 0;
+        while (serverRunning && !shuttingDown && disposeRound < 60)
         {
-            waitOnSelector();
+            waitOnSelector(timeout);
+            if (initiateDisposal && disposeRound == 0)
+            {
+                LOGGER.info("Game disposal initiated. Waiting for clients "
+                    + "to catch up...");
+                timeout = timeoutDuringShutdown;
+                disposeRound++;
+                allRequestConfirmCatchup("DisposeGame");
+            }
         }
-        while(!haveAllCaughtUp())
-        {
-            LOGGER.warning("Not all have caught up - still looping");
-            waitOnSelector();
-        }
+
         notifyThatGameFinished();
-        LOGGER.finest("Server.run() ends.");
+        LOGGER.info("Server.run() ends.");
     }
 
     void initFileServer()
@@ -251,34 +262,30 @@ public final class Server extends Thread implements IServer
         serverRunning = true;
         while (numClients < maxClients && serverRunning && !shuttingDown)
         {
-            waitOnSelector();
+            waitOnSelector(timeoutDuringGame);
         }
 
         return (numClients >= maxClients);
     }
 
-    public void waitOnSelector()
+    public void waitOnSelector(int timeout)
     {
         try
         {
             LOGGER.log(Level.FINEST, "before select()");
 
-            // TODO choose timeout more cleverly, e.g. based on
-            // AI timeout?
-            int num = selector.select(35000);
+            int num = selector.select(timeout);
             LOGGER.log(Level.FINEST, "select returned, " + num
                 + " channels are ready to be processed.");
 
             // Timeout:
             if (num == 0)
             {
-                // TODO This shutUp stuff is just for development purposes,
-                // should be removed once we get the troubles solved.
-                allSetShutUp(false);
                 LOGGER.info("Server side select timeout, sending message "
                     + "counter to all clients.");
                 allSendMessageCounter();
             }
+
             if (forceShutDown)
             {
                 LOGGER.log(Level.FINEST,
@@ -894,6 +901,7 @@ public final class Server extends Thread implements IServer
             disposeAllClientsDone = true;
         }
 
+        LOGGER.info("Disposing all clients...");
         for (IClient client : clients)
         {
             // This sends the dispose message, and queues ClientHandler's 
@@ -1071,16 +1079,6 @@ public final class Server extends Thread implements IServer
         }
     }
 
-    // TODO This shutUp stuff is just for development purposes,
-    // should be removed once we get the troubles solved.
-    synchronized void allSetShutUp(boolean val)
-    {
-        for (IClient client : clients)
-        {
-            ((ClientHandler) client).setShutUp(val);
-        }
-    }
-
     synchronized void allSendMessageCounter()
     {
         for (IClient client : clients)
@@ -1089,11 +1087,12 @@ public final class Server extends Thread implements IServer
         }
     }
 
-    synchronized void allRequestConfirmCatchup()
+    synchronized void allRequestConfirmCatchup(String action)
     {
         // First put them all to the list, send messages after that
         synchronized(waitingToCatchup)
         {
+            caughtUpAction = action;
             waitingToCatchup.clear();
             for (IClient client : clients)
             {
@@ -2041,6 +2040,11 @@ public final class Server extends Thread implements IServer
         }
     }
 
+    void triggerDispose()
+    {
+        initiateDisposal = true;
+    }
+
     private List<String> getPlayerInfo(boolean treatDeadAsAlive)
     {
         List<String> info = new ArrayList<String>(game.getNumPlayers());
@@ -2365,14 +2369,22 @@ public final class Server extends Thread implements IServer
                 + "Remaining: " + remaining);
             if (remaining <= 0 )
             {
-                game.kickstartGame();
+                if (caughtUpAction.equals("KickstartGame"))
+                {
+                    LOGGER.info("All caught up - doing game.kickstartGame()");
+                    game.kickstartGame();
+                }
+                else if (caughtUpAction.equals("DisposeGame"))
+                {
+                    LOGGER.info("All caught up - doing game.dispose()");
+                    game.dispose();
+                }
+                else
+                {
+                    LOGGER.severe("All clients caught up, but no action set??");
+                }
             }
         }
-    }
-
-    private boolean haveAllCaughtUp()
-    {
-        return waitingToCatchup.isEmpty();
     }
 
     /** Used to change a player name after color is assigned. */

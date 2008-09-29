@@ -13,7 +13,7 @@
 This describes the recent changes in some more detail than just the
 one-line-info on the main pages "News" section.
 
-<h3>September 18+, 2008: Upcoming Public Build from r3379+ ??</h3>
+<h3>September 29+, 2008: Upcoming Public Build from r3395+ ??</h3>
 <p>
 <i>(All below is mostly same as the "Public Testing Build" from Sep 16, r3369)</i>
 <ul>
@@ -63,13 +63,23 @@ one-line-info on the main pages "News" section.
 <ul>
 <li>Slightly rephrased text in summon dialog and corrected catched to 
     caught in some method names ;-)</li>
-<li> After a timeout (curr. 35 secs, somewhat more than AI timeout), server sends
-the current message counter to each client. 
-So, this should help to prove or reject my assumptions what is causing the hang.
-Next step: server could buffer non-ACKed messages and on NACK re-send them?</li>
+<li>Tower teleport now only allowed from lands which really have the isTower
+    attribute, not as before if they have a startlist (e.g. Abyssal, Mantio).
+<li>Further improved the server-client communication. Several of the mysterious 
+    battle and game-end related bugs shouldn't happen any more, e.g.:
+<ul>
+  <li>Fixed: [ 2072769 ] Game hangs when AI titan killed by AI </li>
+  <li>Fixed (most likely):[ 2090150 ] Stack Counter left after a battle</li>
+  <li>Fixed: [ 2095361 ] Game hangs when AI Titan killed</li>
+  <li>Fixed: [ 2097773 ] Battlemat fails to close</li>
+  <li>Fixed: [ 2113621 ] Major battlemap bugs that end gameplay</li>
+  
+</ul>  
 </ul>
 
-<h3>August 22, 2008, built from r3332</h3>
+<hr></hr>
+
+<h3>August 22, 2008, Public Build made from r3332</h3>
 <p>
 A lot of things were changed this time. Some of them you as end-user might notice, some not...
 <p>

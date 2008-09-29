@@ -459,9 +459,15 @@ final class SocketClientThread extends Thread implements IServer
 
     private synchronized void parseLine(String s)
     {
-        List<String> li = Split.split(sep, s);
         if (!goingDown)
         {
+            List<String> li = Split.split(sep, s);
+            int gotCounter = Integer.parseInt(li.remove(0));
+            int methodId = Integer.parseInt(li.remove(0));
+
+            LOGGER.finest("client " + client.getOwningPlayer()
+                + " got Counter " + gotCounter);
+
             // Server side starts with 1 and embeds actual nr into the
             // message and increments its counter then.
             // Client side is initialized to 0 and increments beforehand:
@@ -470,27 +476,55 @@ final class SocketClientThread extends Thread implements IServer
             //  (incr. would be skipped...)
             ++expectedCounter;
             
+            boolean skip = false;
+            if (gotCounter > expectedCounter)
+            {
+                LOGGER.warning("In Client " + client.getOwningPlayer()
+                    + ": Expected message counter is " + expectedCounter
+                    + " but got " + gotCounter + "!!!");
+                
+                // consider last message as not received and inform server
+                expectedCounter--;
+                skip = true;
+                sendToServer(Constants.msgCounterMismatch + sep
+                    + expectedCounter);
+            }
+            else if (gotCounter < expectedCounter)
+            {
+                LOGGER.warning("In Client " + client.getOwningPlayer()
+                    + ": Expected message counter is " + expectedCounter
+                    + " but got " + gotCounter + " (too small)!!!");
+                expectedCounter--;
+                skip = true;
+            }
+            else if (expectedCounter % CLIENT_CTR_ACK_EVERY == 0)
+            {
+                LOGGER.finest("Client " + client.getOwningPlayer().getName()
+                    + ": expectedCounter = " + expectedCounter
+                    + " - sending ACK.");
             // The purpose of this ACK is that the server knows we have
             // caught up to #xxx and possibly can send more if there is still
             // something pending.
             // Additionally ACKs will be sent when we receive the server's 
             // counter in a Constants.msgCtrToClient message.
             if (expectedCounter % CLIENT_CTR_ACK_EVERY == 0)
-            {
-                LOGGER.finest("Client " + client.getOwningPlayer().getName()
-                    + ": expectedCounter = " + expectedCounter + " - sending ACK.");
                 sendToServer(Constants.processedCtr + sep + expectedCounter);
             }
 
-            String method = li.remove(0);
-            callMethod(method, li);
+            if (!skip)
+            {
+                String method = li.remove(0);
+                callMethod(method, methodId, li);
+            }
         }
     }
 
-    private void callMethod(String method, List<String> args)
+    private void callMethod(String method, int methodId, List<String> args)
     {
         LOGGER.finer("Client '" + client.getOwningPlayer().getName()
-            + "' processing message: " + method);
+            + "' processing message: " + method
+            + " (methodId=" + methodId + ")");
+        
         if (method.equals(Constants.tellMovementRoll))
         {
             int roll = Integer.parseInt(args.remove(0));
@@ -580,7 +614,9 @@ final class SocketClientThread extends Thread implements IServer
                 // this can happen on game startup since there is no explicit
                 // event creating the first legions
                 // TODO try to make this less implicit
-                assert client.getTurnNumber() == -1 : "Implicit legion creation should happen only before the first round";
+                assert client.getTurnNumber() == -1 :
+                    "Implicit legion creation should happen only "
+                    + "before the first round";
                 legion = new LegionClientSide(markerId, client, player
                     .getStartingTower());
                 player.addLegion(legion);
@@ -955,37 +991,18 @@ final class SocketClientThread extends Thread implements IServer
         
         else if (method.equals(Constants.msgCtrToClient))
         {
-            int gotCounter = Integer.parseInt(args.remove(0));
-            LOGGER.finest("client " + client.getOwningPlayer()
-                + " got Counter " + gotCounter);
+            // Server may send this when it has long time not heard from us
+            // nor any other client. Give an ACK that it can update it's
+            // knowledge how far it is ahead, and can send some more,
+            // if it has in the queue.
+            // NOTE: Here we need only to handle the "ok"-case, i.e. the
+            // counters match. If they do not match, the reading loop already
+            // handles that and sends the mismatch message to server.
 
-            if (gotCounter != expectedCounter)
-            {
-                LOGGER.severe("In Client " + client.getOwningPlayer()
-                    + ": Expected message counter is " + expectedCounter
-                    + " but got " + gotCounter + "!!! => Syncing counters "
-                    + " now, but messages are lost.");
-                String msg = "Expected message counter "
-                    + expectedCounter + " but got " + gotCounter + "!!!\n\n"
-                    + "This means messages from server to client "
-                    + client.getOwningPlayer() + " got lost in"
-                    + " between, client might be in inconsistent state now.";
-                client.showErrorMessage(msg, "Server-Client messages lost!"); 
-                
-                // TODO proper recovery? Server should re-send lost?
-                expectedCounter = gotCounter;
-            }
-            else
-            {
-                // Server may send this when it has long time not heard from us
-                // nor any other client. Give an ACK that it can send some more,
-                // if it has in the queue.
-
-                LOGGER.info("Client " + client.getOwningPlayer().getName()
-                    + ": gotCounter == expectedCounter = " + expectedCounter
-                    + " - sending ACK.");
-                sendToServer(Constants.processedCtr + sep + expectedCounter);
-            }
+            LOGGER.info("Client " + client.getOwningPlayer().getName()
+                + ": gotCounter == expectedCounter = " + expectedCounter
+                + " - sending ACK.");
+            sendToServer(Constants.processedCtr + sep + expectedCounter);
         }
         else if (method.equals(Constants.askConfirmCatchUp))
         {

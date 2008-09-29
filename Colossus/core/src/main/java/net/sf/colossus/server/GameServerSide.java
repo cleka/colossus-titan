@@ -585,7 +585,7 @@ public final class GameServerSide extends Game
         server.allTellAllLegionLocations();
         autoSave();
         fullySyncCaretakerDisplays();
-        server.allRequestConfirmCatchup();
+        server.allRequestConfirmCatchup("KickstartGame");
     }
 
     private void fullySyncCaretakerDisplays()
@@ -1858,7 +1858,7 @@ public final class GameServerSide extends Game
         server.allSetupTurnState();
         fullySyncCaretakerDisplays();
         
-        server.allRequestConfirmCatchup();
+        server.allRequestConfirmCatchup("KickstartGame");
         return ok;
     }
 
@@ -3331,12 +3331,12 @@ public final class GameServerSide extends Game
             if (getOption(Options.autoQuit))
             {
                 Start.setCurrentWhatToDoNext(Start.QuitAll);
-                dispose();
-                // if dispose does System.exit(), we would never come here, 
-                // but when we get rid of all System.exit()'s ...
+                LOGGER.info("Reached Game Over, AutoQuit - trigger Game Dispose");
+                server.triggerDispose();
             }
             else
             {
+                LOGGER.info("Reached Game Over - just announce");
                 announceGameOver();
             }
             LOGGER.info("Game is now over - returning false");
