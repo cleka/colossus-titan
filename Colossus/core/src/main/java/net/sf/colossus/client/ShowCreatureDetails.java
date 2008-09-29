@@ -122,27 +122,36 @@ public final class ShowCreatureDetails extends KDialog implements
             + creature.getPluralName() + ")</i>");
         _trSpan(s, "Power..Skill", creature.getPower() + ".."
             + creature.getSkill());
+        _trSpan(s, "Total count", ""+creature.getMaxCount());
         _trSpan(s, "Rangestrike", (creature.isRangestriker() ? "yes" : "no")
             + (creature.useMagicMissile() ? " <b>(magic missiles)</b>" : ""));
         _trSpan(s, "Flier", creature.isFlier() ? "yes" : "no");
+        _trSpan(s, "Summonable", creature.isSummonable() ? "yes" : "no");
+        // TODO Instead show full list of "where and for each multiple of X 
+        _trSpan(s, "Acquirable", TerrainRecruitLoader.isAcquirable(creature)
+            ? "yes" : "no");
         _trSpan(s, _low("Lord"), creature.isLordOrDemiLord() ? (creature
             .isLord() ? "<u><b>Lord</b></u>" : "<b>Demi-Lord</b>")
             : _low("no"));
         StringBuffer buf = new StringBuffer();
+        String sp = "&nbsp;";
+        String separator = "";
         for (HazardTerrain terrain : HazardTerrain.getAllHazardTerrains())
         {
             if (creature.isNativeIn(terrain))
             {
+                buf.append(separator);
+                separator = ", ";
                 buf.append(terrain.getName());
-                buf.append(", ");
             }
         }
         for (int idx = 0; idx < HEXSIDES.length; idx++)
         {
             if (creature.isNativeHexside(HEXSIDES[idx]))
             {
+                buf.append(separator);
+                separator = ", ";
                 buf.append(HEXSIDE_NAMES[idx]);
-                buf.append(", ");
             }
         }
         _trSpan(s, "Native Hazards", buf.toString());
@@ -157,35 +166,45 @@ public final class ShowCreatureDetails extends KDialog implements
             buf = new StringBuffer();
             List<CreatureType> recruiters = VariantSupport.getCurrentVariant()
                 .getCreatureTypes();
+            separator = "";
             for (int ri = 0; ri < recruiters.size(); ri++)
             {
                 final CreatureType recruiter = recruiters.get(ri);
                 int num = TerrainRecruitLoader.numberOfRecruiterNeeded(
                     recruiter, creature, terrain, null);
-                if (num == 1)
+                if (num == 1 && creature.getMaxCount() == 1
+                    && recruiter.getName().equals(creature.getName()))
                 {
-                    buf.append("by 1 " + recruiter.getName() + ", ");
+                    // skip self-recruiting if there is only one of them
+                    // TODO skip already during load
                 }
-                else if ((num > 0) && (num < RecruitGraph.BIGNUM))
+                else if (num == 1)
                 {
-                    buf.append("by " + num + " " + recruiter.getPluralName()
-                        + ", ");
+                    buf.append(separator + "by" + sp + "1" + sp
+                        + recruiter.getName());
+                    separator = ", ";
+                }
+                // TODO skip the > getMaxCount() already during Variant load
+                else if ((num > 0) && (num < recruiter.getMaxCount())
+                    &&!recruiter.getName().equals("Titan"))
+                {
+                    buf.append(separator + "by" + sp + num + sp
+                        + recruiter.getPluralName());
+                    separator = ", ";
                 }
             }
             if (buf.length() > 0)
             {
                 Color color = terrain.getColor().brighter();
-                s
-                    .append(MessageFormat
-                        .format(
-                            "<tr><td bgcolor={0}>in {1}</td>"
-                                + "<td colspan={2} nowrap><font color=blue>{3}</font></td>"
-                                + "</tr>", new Object[] {
-                                HTMLColor.colorToCode(color),
-                                terrain.getId(),
-                                ""
-                                    + (HazardTerrain.getAllHazardTerrains()
-                                        .size() + 1), buf.toString(), }));
+                s.append(MessageFormat.format(
+                    "<tr><td bgcolor={0}>in {1}</td>"
+                    + "<td colspan={2}><font color=blue>{3}</font></td>"
+                    + "</tr>", new Object[] {
+                        HTMLColor.colorToCode(color),
+                        terrain.getId(),
+                        ""
+                        + (HazardTerrain.getAllHazardTerrains()
+                            .size() + 1), buf.toString(), }));
             }
         }
         //   out
@@ -194,30 +213,38 @@ public final class ShowCreatureDetails extends KDialog implements
             buf = new StringBuffer();
             List<CreatureType> recruits = VariantSupport.getCurrentVariant()
                 .getCreatureTypes();
+            separator = "";
             for (int ri = 0; ri < recruits.size(); ri++)
             {
                 final CreatureType recruit = recruits.get(ri);
                 int num = TerrainRecruitLoader.numberOfRecruiterNeeded(
                     creature, recruit, terrain, null);
-                if ((num > 0) && (num < RecruitGraph.BIGNUM))
+                if (num == 1 && creature.getMaxCount() == 1
+                    && recruit.getName().equals(creature.getName()))
                 {
-                    buf.append(num + " recruit a " + recruit.getName() + ", ");
+                    // skip self-recruiting if there is only one of them
+                    // TODO skip already during load
+                }
+                // TODO skip the > getMaxCount() already during Variant load
+                else if ((num > 0) && (num < creature.getMaxCount()))
+                {
+                    buf.append(separator);
+                    separator = ", ";
+                    buf.append(num + sp + "recruit" + sp + "a" + sp + recruit.getName());
                 }
             }
             if (buf.length() > 0)
             {
                 Color color = terrain.getColor().brighter();
-                s
-                    .append(MessageFormat
-                        .format(
-                            "<tr><td bgcolor={0}>in {1}</td>"
-                                + "<td colspan={2} nowrap><font color=green>{3}</font></td>"
-                                + "</tr>", new Object[] {
-                                HTMLColor.colorToCode(color),
-                                terrain.getId(),
-                                ""
-                                    + (HazardTerrain.getAllHazardTerrains()
-                                        .size() + 1), buf.toString(), }));
+                s.append(MessageFormat.format(
+                    "<tr><td bgcolor={0}>in {1}</td>"
+                    + "<td colspan={2}><font color=green>{3}</font></td>"
+                    + "</tr>", new Object[] {
+                        HTMLColor.colorToCode(color),
+                        terrain.getId(),
+                        ""
+                        + (HazardTerrain.getAllHazardTerrains()
+                            .size() + 1), buf.toString(), }));
             }
         }
 
@@ -330,7 +357,7 @@ public final class ShowCreatureDetails extends KDialog implements
 
     /** define hex side names for table column headers. */
     private static final String[] HEXSIDE_NAMES = { "nothing", "dune",
-        "cliff", "slope", "tower", "river" };
+        "cliff", "slope", "wall", "river" };
 
     /** html header and start of page. */
     private static void _head(StringBuffer s, final CreatureType cr)
