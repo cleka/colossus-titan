@@ -314,6 +314,15 @@ final class ClientHandler implements IClient
             LOGGER.log(Level.WARNING, "IOException '" + ioe.getMessage() + "'"
                 + " was thrown while writing String '" + msg + "'"
                 + " to channel for player " + playerName);
+
+            // TODO Would like to do withdraw and disconnect here, but they
+            // can't be used because they wd/disconn. the processingPlayer, 
+            // i.e. the player for which data was just read from socket.
+            //  
+            isGone = true;
+            // TODO take care that also withdraw is done for player "this"
+            //withdrawIfNeeded();
+            server.disposeClientHandler(this);
         }
         Thread.yield();
     }
@@ -493,14 +502,7 @@ final class ClientHandler implements IClient
         else if (method.equals(Constants.disconnect))
         {
             isGone = true;
-            if (!withdrawnAlready)
-            {
-                LOGGER.log(Level.FINE,
-                    "Client disconnected without explicit withdraw - "
-                        + "doing automatic withdraw for player " + playerName);
-                server.withdrawFromGame();
-                withdrawnAlready = true;
-            }
+            withdrawIfNeeded();
             server.disconnect();
         }
         else if (method.equals(Constants.stopGame))
@@ -586,6 +588,18 @@ final class ClientHandler implements IClient
         }
     }
 
+    private void withdrawIfNeeded()
+    {
+        if (!withdrawnAlready)
+        {
+            LOGGER.log(Level.FINE,
+                "Client disconnected without explicit withdraw - "
+                    + "doing automatic withdraw for player " + playerName);
+            server.withdrawFromGame();
+            withdrawnAlready = true;
+        }
+    }
+    
     private MasterHex resolveMasterHex(String hexLabel)
     {
         return server.getGame().getVariant().getMasterBoard().getHexByLabel(
