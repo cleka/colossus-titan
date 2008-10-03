@@ -10,7 +10,6 @@ import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CharsetEncoder;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
@@ -61,9 +60,6 @@ final class ClientHandler implements IClient
     private String incompleteInput = "";
     private String incompleteText = "";
     
-    private int processedCtr = 0;
-    private boolean clientCantFollow = false;
-
     // Charset and encoder: by default according to the property, 
     // fallback US-ASCII
     String defaultCharSet = System.getProperty("file.encoding");
@@ -72,13 +68,6 @@ final class ClientHandler implements IClient
     private final CharsetEncoder encoder = charset.newEncoder();
     private final CharsetDecoder decoder = charset.newDecoder();
 
-    // That much ahead? Let's stop for a while...
-    private final int MAX_SERVER_AHEAD = 50;
-    
-    // had caught up so that only that many in the air?
-    // OK, continue sending if something in the queue
-    private final int MIN_CLIENT_CATCHUP = 15;
-    
     // Note that the client (SocketClientThread) sends ack every 
     // CLIENT_CTR_ACK_EVERY messages (currently 20)
     // The two values above and the client value must fit together
@@ -182,126 +171,63 @@ final class ClientHandler implements IClient
         }
     }
 
-    private int msgCounter = 1;
-    private LinkedList<ServerMessage> sendToClientQueue = new LinkedList<ServerMessage>();
-    
+    public void sleepFor(long millis)
+    {
+        try
+        {
+            Thread.sleep(millis);
+        }
+        catch (InterruptedException e)
+        {
+            LOGGER.log(Level.FINEST,
+                "sleepFor: InterruptException caught... ignoring it...");
+        }
+    }
+
     private void sendViaChannel(String msg)
     {
-        // TODO queue is not synchronized - can something happen?
-        // in later phase of game not - then all action is initiated
-        // via the Selector thread; but in beginning, especially
-        // during loading, can something happen then?
-        
-        // still dummy
-        int typeId = 0;
-        sendToClientQueue.add(new ServerMessage(0, typeId, msg));
-        sendSomethingIfPossible();
-    }
-
-    public class ServerMessage
-    {
-        public int id;
-        public int typeId;
-        public String content;
-        
-        public ServerMessage(int msgId, int msgTypeId, String msgContent)
+        int attempt = 0;
+        boolean ok = false;
+        while (!ok)
         {
-            this.id = msgId;
-            this.typeId = msgTypeId;
-            this.content = msgContent;
-        }
-    }
-    
-    private LinkedList<ServerMessage>resendQueue = new LinkedList<ServerMessage>();
-    
-    /**
-     * Client has confirmed to have received msg with id receivedCounter.
-     * Purge front of resendQueue until reaching a non-confirmed one. 
-     * @param receivedCounter
-     */
-    private void purgeAcked(int receivedCounter)
-    {
-        if (resendQueue.isEmpty())
-        {
-            return;
-        }
-
-        boolean done = false;
-        while(!resendQueue.isEmpty() && !done)
-        {
-            ServerMessage msg = resendQueue.peek();
-            
-            if (msg.id <= receivedCounter)
+            attempt++;
+            ok = sendViaChannelRaw(msg);
+            if (ok)
             {
-                resendQueue.removeFirst();
+                if (attempt != 1)
+                {
+                    System.out.println("Now succeeded, attempt = " + attempt);
+                }
             }
             else
             {
-                done = true;
-            }
-        }
-    }
-    
-    /**
-     * Some messages have gone lost, client expected a message with id
-     * expectedCounter. 
-     * Get rid of all those that were successfully received, and put the
-     * messages that were missing again to the sendToClientQueue queue.
-     * 
-     * @param expectedCounter
-     */
-    private void reEnqueueMessages(int expectedCounter)
-    {
-        while(!resendQueue.isEmpty())
-        {
-            ServerMessage msg = resendQueue.removeLast();
-            sendToClientQueue.addFirst(msg);
-        }
-        msgCounter = expectedCounter;
-    }
-
-    public void sendSomethingIfPossible()
-    {
-        while(!sendToClientQueue.isEmpty() && !clientCantFollow)
-        {
-            ServerMessage msg = sendToClientQueue.removeFirst();
-            
-            sendViaChannelRaw(msgCounter, msg.typeId, msg.content);
-            msgCounter++;
-
-            int serverAhead = msgCounter - processedCtr;
-            if (serverAhead > MAX_SERVER_AHEAD && !clientCantFollow)
-            {
-                LOGGER.info("While trying to send to client " + playerName
-                    + ": server is " + serverAhead + " messages ahead ("
-                    + msgCounter + " vs. " + processedCtr
-                    + ") - setting CLIENT-CANT-FOLLOW TRUE");
-                clientCantFollow = true;
-                sendMessageCounter();
-                Thread.yield();
+                int delay = 1;
+                System.out.println("Sleeping " + delay + " second(s) ...");
+                sleepFor(delay*1000);
+                System.out.println("Slept.");
             }
         }
     }
 
-    public void sendMessageCounter()
+    private boolean sendViaChannelRaw(String msg)
     {
-        sendViaChannelRaw(msgCounter, 0, Constants.msgCtrToClient + sep + msgCounter);
-        msgCounter++;
-    }
-
-    private void sendViaChannelRaw(int msgCtr, int msgTypeId, String msg)
-    {
-        resendQueue.addLast(new ServerMessage(msgCtr, msgTypeId, msg));
-
-        String dataToSend = msgCtr + sep + msgTypeId + sep + msg + "\n";
-        CharBuffer cb = CharBuffer.allocate(dataToSend.length() + 2);
+        String dataToSend = msg + "\n";
+        CharBuffer cb = CharBuffer.allocate(dataToSend.length());
         cb.put(dataToSend);
         cb.flip();
 
         try
         {
             ByteBuffer bb = encoder.encode(cb);
-            socketChannel.write(bb);
+            int should = bb.limit();
+            int written = socketChannel.write(bb);
+            if (written < should)
+            {
+                LOGGER.warning("Only written " + written
+                    + " bytes, but should have been " + should
+                    + " (sleeping a while and retrying then)");
+                return false;
+            }
         }
         catch (CharacterCodingException e)
         {
@@ -325,6 +251,7 @@ final class ClientHandler implements IClient
             server.disposeClientHandler(this);
         }
         Thread.yield();
+        return true;
     }
 
     private void callMethod(String method, List<String> args)
@@ -550,32 +477,6 @@ final class ClientHandler implements IClient
         {
             String filename = args.remove(0);
             server.saveGame(filename);
-        }
-        else if (method.equals(Constants.msgCounterMismatch))
-        {
-            int expectedCtr = Integer.parseInt(args.remove(0));
-            purgeAcked(expectedCtr);
-            reEnqueueMessages(expectedCtr);
-            // send something so that client sends something back
-            // ==> then we get back into the sendSomethingIfPossible loop.
-            sendMessageCounter();
-        }
-        else if (method.equals(Constants.processedCtr))
-        {
-            processedCtr = Integer.parseInt(args.remove(0));
-            purgeAcked(processedCtr);
-
-            int serverAhead = msgCounter - processedCtr;
-            if (serverAhead < MIN_CLIENT_CATCHUP && clientCantFollow)
-            {
-                LOGGER.info("Received processedCounter from client " + playerName
-                    + ": server is " + serverAhead + " messages ahead ("
-                    + msgCounter + " vs. " + processedCtr
-                    + ") - setting client-cant-follow false");
-
-                clientCantFollow = false;
-            }
-            sendSomethingIfPossible();
         }
         else if (method.equals(Constants.catchupConfirmation))
         {
@@ -1022,6 +923,4 @@ final class ClientHandler implements IClient
             + playerName);
         sendToClient(Constants.askConfirmCatchUp);
     }
-
 }
-

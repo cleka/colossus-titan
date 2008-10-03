@@ -273,7 +273,6 @@ public final class Server extends Thread implements IServer
         try
         {
             LOGGER.log(Level.FINEST, "before select()");
-
             int num = selector.select(timeout);
             LOGGER.log(Level.FINEST, "select returned, " + num
                 + " channels are ready to be processed.");
@@ -281,9 +280,7 @@ public final class Server extends Thread implements IServer
             // Timeout:
             if (num == 0)
             {
-                LOGGER.info("Server side select timeout, sending message "
-                    + "counter to all clients.");
-                allSendMessageCounter();
+                LOGGER.info("Server side select timeout...");
             }
 
             if (forceShutDown)
@@ -1076,14 +1073,6 @@ public final class Server extends Thread implements IServer
         for (IClient client : clients)
         {
             client.tellReplay(val, maxTurn);
-        }
-    }
-
-    synchronized void allSendMessageCounter()
-    {
-        for (IClient client : clients)
-        {
-            ((ClientHandler) client).sendMessageCounter();
         }
     }
 
