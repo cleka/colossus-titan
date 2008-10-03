@@ -2,6 +2,7 @@ package net.sf.colossus.server;
 
 
 import java.awt.event.KeyEvent;
+import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -197,7 +198,7 @@ public final class Constants
 
     /** Base path for all external game data files. */
     public static final String gameDataPath = System.getProperty("user.home")
-        + "/.colossus/";
+        + File.separator + ".colossus" + File.separator;
 
     // Constants related to the options config files
     public static final String optionsPath = gameDataPath;
@@ -214,7 +215,8 @@ public final class Constants
     // Constants for savegames
 
     /** Must include trailing slash. */
-    public static final String saveDirname = gameDataPath + "/saves/";
+    public static final String saveDirname = gameDataPath
+        + File.separator + "saves" + File.separator;
     public static final String xmlExtension = ".xml";
     public static final String xmlSnapshotStart = "snap";
     public static final String xmlSnapshotVersion = "12";
