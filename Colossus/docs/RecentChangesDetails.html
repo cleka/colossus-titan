@@ -13,7 +13,7 @@
 This describes the recent changes in some more detail than just the
 one-line-info on the main pages "News" section.
 
-<h3>September 29+, 2008: Upcoming Public Build from r3395+ ??</h3>
+<h3>October 05, 2008: Upcoming Public Build from r3410+ ??</h3>
 <p>
 <i>(All below is mostly same as the "Public Testing Build" from Sep 16, r3369)</i>
 <ul>
@@ -29,8 +29,6 @@ one-line-info on the main pages "News" section.
     This includes a lot of small changes related to loading/replaying a saved game.
 <li>Fixed: [ 2044310 ] LoadGame: wrong legions existing/content/location (same as 
     2074220).</li>
-<li>"Server to Client" flow control => server sends only a certain amount of messages
-    and waits then until client has caught up.</li>
 <li>During loading of a game the Masterboard Bottombar (where normally the phase is 
     displayed) shows a "replay ongoing - turn x of n (please wait)" text.</li>
 <li>Fixed: [ 2090866 ] AI spinners wrong intialized</li>
@@ -47,9 +45,7 @@ one-line-info on the main pages "News" section.
 <li>During serverSocket creation, catch any exception, not just IOException.
     Also first display an error message dialog, before doing System.exit().</li>
 <li>Fixed the problem that games with remote players could not be loaded</li>
-<li>Reduced "window size" for server-client flow control; client displays 
-    error message dialog if message counter mismatch encountered; when 
-    starting new or loaded game, wait until all clients have caught up with 
+<li>When starting new or loaded game, wait until all clients have caught up with 
     load/preparations, before doing setupPhase to start the actual game.</li>
 <li>StatusScreen window now does not use scale any more (see [ 2078529 ] Preferences)</li>
 <li>Fixed: [ 2073991 ] Game hangs on AI Split</li>
@@ -65,16 +61,17 @@ one-line-info on the main pages "News" section.
     caught in some method names ;-)</li>
 <li>Tower teleport now only allowed from lands which really have the isTower
     attribute, not as before if they have a startlist (e.g. Abyssal, Mantio).
-<li>Further improved the server-client communication. Several of the mysterious 
-    battle and game-end related bugs shouldn't happen any more, e.g.:
-<ul>
-  <li>Fixed: [ 2072769 ] Game hangs when AI titan killed by AI </li>
-  <li>Fixed (most likely):[ 2090150 ] Stack Counter left after a battle</li>
-  <li>Fixed: [ 2095361 ] Game hangs when AI Titan killed</li>
-  <li>Fixed: [ 2097773 ] Battlemat fails to close</li>
-  <li>Fixed: [ 2113621 ] Major battlemap bugs that end gameplay</li>
-  
-</ul>  
+<li>Fixed the server-client communication, now the right way. (?)
+    Several of the mysterious battle and game-end related bugs shouldn't 
+    happen any more, e.g.:
+  <ul>
+    <li>Fixed: [ 2072769 ] Game hangs when AI titan killed by AI </li>
+    <li>Fixed (most likely):[ 2090150 ] Stack Counter left after a battle</li>
+    <li>Fixed: [ 2095361 ] Game hangs when AI Titan killed</li>
+    <li>Fixed: [ 2097773 ] Battlemat fails to close</li>
+    <li>Fixed: [ 2113621 ] Major battlemap bugs that end gameplay</li>
+  </ul>
+  <li>Some corrections and improvements to CreatureDetails dialog</li>
 </ul>
 
 <hr></hr>
