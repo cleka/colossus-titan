@@ -98,7 +98,7 @@ public final class Server extends Thread implements IServer
     private boolean initiateDisposal = false;
     private String caughtUpAction = "";
 
-    private final int timeoutDuringGame = 10000;
+    private final int timeoutDuringGame = 0;
     private final int timeoutDuringShutdown = 1000;
 
     // Earlier I have locked on an Boolean object itself, 
