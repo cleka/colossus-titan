@@ -154,8 +154,7 @@ public final class Server extends Thread implements IServer
         {
             waitOnSelector(timeout);
             // The following is handling the case that game did initiate
-            // the dispose by itself, due to AutoQuit when game over
-            // or "no clients with boards left" situation.
+            // the dispose by itself  due to AutoQuit when game over
             if (initiateDisposal)
             {
                 if (disposeRound == 0)
