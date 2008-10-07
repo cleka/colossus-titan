@@ -374,29 +374,28 @@ final class SocketClientThread extends Thread implements IServer
 
     private void cleanupSocket()
     {
-        if (socket != null)
+        try
         {
-            try
+            if (socket != null && !socket.isClosed())
             {
                 socket.close();
                 socket = null;
-
-            }
-            catch (IOException e)
+            }                
+            else
             {
-                LOGGER.log(Level.WARNING, "SocketClientThread " + getName()
-                    + ", during socket.close(), got IOException ", e);
-            }
-            catch (Exception e)
-            {
-                LOGGER.log(Level.WARNING, "SocketClientThread " + getName()
-                    + ", during socket.close(), got Whatever Exception ", e);
+                LOGGER.log(Level.FINEST, "SCT Closing socket not needed in "
+                    + getName());
             }
         }
-        else
+        catch (IOException e)
         {
-            LOGGER.log(Level.FINEST, "SCT Closing socket not needed in "
-                + getName());
+            LOGGER.log(Level.WARNING, "SocketClientThread " + getName()
+                + ", during socket.close(), got IOException ", e);
+        }
+        catch (Exception e)
+        {
+            LOGGER.log(Level.WARNING, "SocketClientThread " + getName()
+                + ", during socket.close(), got Whatever Exception ", e);
         }
     }
 
@@ -994,7 +993,9 @@ final class SocketClientThread extends Thread implements IServer
         }
         else
         {
-            LOGGER.log(Level.SEVERE, "Attempt to send message '" + message
+            LOGGER.log(Level.SEVERE, "SCT of player "
+                + client.getOwningPlayer().getName()
+                + ": Attempt to send message '" + message
                 + "' but the socket is closed??");
         }
     }
