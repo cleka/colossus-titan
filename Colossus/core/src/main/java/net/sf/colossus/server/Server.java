@@ -83,6 +83,8 @@ public final class Server extends Thread implements IServer
     // Network stuff
     private ServerSocket serverSocket;
     private Selector selector = null;
+    private SelectionKey acceptKey = null;
+    private boolean stopAcceptingFlag = false;
 
     private int numClients;
     private int maxClients;
@@ -150,7 +152,7 @@ public final class Server extends Thread implements IServer
     {
         int timeout = timeoutDuringGame;
         int disposeRound = 0;
-        while (serverRunning && !shuttingDown && disposeRound < 60)
+        while (!shuttingDown && disposeRound < 60)
         {
             waitOnSelector(timeout);
             // The following is handling the case that game did initiate
@@ -172,6 +174,18 @@ public final class Server extends Thread implements IServer
                 }
                 disposeRound++;
             }
+        }
+        
+        if (serverRunning && disposeRound >= 60)
+        {
+            LOGGER.warning("The game.dispose() not triggered by caughtUp"
+                + " - doing it now.");
+            game.dispose();
+        }
+        
+        if (shuttingDown)
+        {
+            closeSocketAndSelector();
         }
 
         notifyThatGameFinished();
@@ -231,8 +245,7 @@ public final class Server extends Thread implements IServer
             serverSocket.setReuseAddress(true);
             InetSocketAddress address = new InetSocketAddress(port);
             serverSocket.bind(address);
-            // SelectionKey key = ssc.register(selector, SelectionKey.OP_ACCEPT);
-            ssc.register(selector, SelectionKey.OP_ACCEPT);
+            acceptKey = ssc.register(selector, SelectionKey.OP_ACCEPT);
         }
         catch (IOException ex)
         {
@@ -283,6 +296,13 @@ public final class Server extends Thread implements IServer
     {
         try
         {
+            if (stopAcceptingFlag)
+            {   
+                LOGGER.info("cancelDummy was set...");
+                stopAccepting();
+                stopAcceptingFlag = false;
+            }
+
             LOGGER.log(Level.FINEST, "before select()");
             int num = selector.select(timeout);
             LOGGER.log(Level.FINEST, "select returned, " + num
@@ -298,6 +318,7 @@ public final class Server extends Thread implements IServer
             {
                 LOGGER.log(Level.FINEST,
                     "waitOnSelector: force shutdown now true! num=" + num);
+                stopAccepting();
                 stopServerRunning();
             }
 
@@ -344,6 +365,10 @@ public final class Server extends Thread implements IServer
                         if (read > 0)
                         {
                             byteBuffer.flip();
+                            // NOTE that the following might cause trouble
+                            // if logging is set to FINEST for server,
+                            // and the disconnect does not properly set the
+                            // isGone flag...
                             LOGGER.finest("* before ch.processInput()");
                             ch.processInput(byteBuffer);
                             LOGGER.finest("* after  ch.processInput()");
@@ -364,11 +389,6 @@ public final class Server extends Thread implements IServer
             }
             // just to be sure.
             selectedKeys.clear();
-
-            if (shuttingDown)
-            {
-                return;
-            }
 
             synchronized (channelChanges)
             {
@@ -391,7 +411,10 @@ public final class Server extends Thread implements IServer
                     }
                     else
                     {
-                        LOGGER.warning("to-be-closed-channel is not open!");
+                        // TODO this should not happen, but it does regularly
+                        // - find out why and fix. Until then, just info
+                        // of warning
+                        LOGGER.info("to-be-closed-channel is not open!");
                     }
                 }
                 channelChanges.clear();
@@ -423,6 +446,59 @@ public final class Server extends Thread implements IServer
         selector.wakeup();
     }
 
+    private void stopAccepting() throws IOException
+    {
+        LOGGER.info("Canceling connection accepting key.");
+        acceptKey.cancel();
+        acceptKey = null;
+    
+        LOGGER.info("Closing server socket");
+        serverSocket.close();
+        serverSocket = null;
+    }
+
+    /**
+     * Close serverSocket and selector, if needed
+     */
+    private void closeSocketAndSelector()
+    {
+        LOGGER.info("After selector loop, shuttingDown flag is set. "
+            + "Closing socket and selector, if necessary");
+        if (serverSocket != null && !serverSocket.isClosed())
+        {
+            try
+            {
+                serverSocket.close();
+                LOGGER.fine("ServerSocket now closed.");
+            }
+            catch (IOException ex)
+            {
+                LOGGER.log(Level.SEVERE, "Could not close server socket", ex);
+            }
+        }
+        else
+        {
+            LOGGER.fine("After loop: ok, serverSocket was already closed");
+        }
+
+        if (selector != null && selector.isOpen())
+        {
+            try
+            {
+                selector.close();
+                LOGGER.fine("Server selector closed.");
+            }
+            catch (IOException ex)
+            {
+                LOGGER.log(Level.SEVERE, "Could not close server socket", ex);
+            }
+        }
+        else
+        {
+            LOGGER.fine("After loop: ok, server Selector was already closed");
+        }
+    }
+    
     // I took as model this page:
     //   http://www.javafaq.nu/java-article1102.html
     // Throws IOException when closing the channel fails.
@@ -439,43 +515,43 @@ public final class Server extends Thread implements IServer
                 int r = sc.read(byteBuffer);
                 if (r <= 0)
                 {
+                    if (r == -1)
+                    {
+                        processingCH.setIsGone(true);
+                        LOGGER.info("EOF on channel for client "
+                            + processingPlayerName + " setting isGone true");
+                        // Remote entity did shut the socket down.
+                        // Do the same from our end and cancel the channel.
+
+                        LOGGER.log(Level.FINE,
+                            "Remote side cleanly closed the connection (r == -1)");
+                        withdrawFromGame();
+                        disconnectChannel(sc, key);
+
+                    }
                     break;
                 }
                 read += r;
             }
             catch (IOException e)
             {
-                LOGGER.log(Level.WARNING, "IOException " + e.getMessage()
-                    + " while reading from channel for player "
-                    + processingPlayerName);
-
+                // set isGone first, to prevent from sending log info to 
+                // client channel - channel is gone anyway...
+                processingCH.setIsGone(true);
+                LOGGER.log(Level.WARNING, "IOException '" + e.getMessage()
+                    + "' while reading from channel for player "
+                    + processingPlayerName, e);
+                
                 // The remote forcibly/unexpectedly closed the connection, 
                 // cancel the selection key and close the channel.
-                processingCH.setIsGone(true);
                 withdrawFromGame();
                 disconnectChannel(sc, key);
                 return 0;
             }
         }
 
-        if (read > 0)
-        {
-            LOGGER.log(Level.FINEST, "Read " + read + " bytes from " + sc);
-            return read;
-        }
-
-        // Got -1 on first read: EOF
-        else
-        {
-            LOGGER.log(Level.FINE,
-                "Remote side cleanly closed the connection (read is 0)");
-            // Remote entity shut the socket down cleanly. Do the
-            // same from our end and cancel the channel.
-            withdrawFromGame();
-            processingCH.setIsGone(true);
-            disconnectChannel(sc, key);
-            return 0;
-        }
+        LOGGER.log(Level.FINEST, "Read " + read + " bytes from " + sc);
+        return read;
     }
 
     /**
@@ -541,7 +617,6 @@ public final class Server extends Thread implements IServer
      */
     public void stopServerRunning()
     {
-        serverRunning = false;
         if (!game.isOver())
         {
             LOGGER.info("stopServerRunning called when game was not over yet.");
@@ -555,6 +630,9 @@ public final class Server extends Thread implements IServer
         {
             disposeAllClients();
         }
+        
+        serverRunning = false;
+        shuttingDown = true;
     }
 
     public boolean isServerRunning()
@@ -572,12 +650,12 @@ public final class Server extends Thread implements IServer
         {
             try
             {
-                LOGGER.finest("Stopping the FileServerThread ");
+                LOGGER.info("Stopping the FileServerThread ");
                 ((FileServerThread)fileServerThread).stopGoingOn();
             }
             catch (Exception e)
             {
-                LOGGER.log(Level.FINE,
+                LOGGER.log(Level.WARNING,
                     "Couldn't stop FileServerThread, got Exception: " + e);
             }
             fileServerThread = null;
@@ -840,6 +918,7 @@ public final class Server extends Thread implements IServer
     {
         if (waitingForClients <= 0)
         {
+            stopAcceptingFlag = true;
             if (game.isLoadingGame())
             {
                 logToStartLog("Loading game, sending replay data to clients...");
@@ -909,7 +988,7 @@ public final class Server extends Thread implements IServer
             disposeAllClientsDone = true;
         }
 
-        LOGGER.info("Disposing all clients...");
+        LOGGER.info("BEGIN disposing all clients...");
         for (IClient client : clients)
         {
             // This sends the dispose message, and queues ClientHandler's 
@@ -923,26 +1002,14 @@ public final class Server extends Thread implements IServer
         clientMap.clear();
         remoteClients.clear();
 
+        LOGGER.fine("Removing all loggers...");
         for (RemoteLogHandler handler : remoteLogHandlers)
         {
             LOGGER.removeHandler(handler);
             handler.close();
         }
         remoteLogHandlers.clear();
-
-        if (serverSocket != null)
-        {
-            shuttingDown = true;
-            try
-            {
-                serverSocket.close();
-                selector.close();
-            }
-            catch (IOException ex)
-            {
-                LOGGER.log(Level.SEVERE, "Could not close server socket", ex);
-            }
-        }
+        LOGGER.info("COMPLETED disposing all clients...");
     }
 
     public void loadFailed()
