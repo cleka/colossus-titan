@@ -153,13 +153,25 @@ public final class Server extends Thread implements IServer
         while (serverRunning && !shuttingDown && disposeRound < 60)
         {
             waitOnSelector(timeout);
-            if (initiateDisposal && disposeRound == 0)
+            // The following is handling the case that game did initiate
+            // the dispose by itself, due to AutoQuit when game over
+            // or "no clients with boards left" situation.
+            if (initiateDisposal)
             {
-                LOGGER.info("Game disposal initiated. Waiting for clients "
-                    + "to catch up...");
-                timeout = timeoutDuringShutdown;
+                if (disposeRound == 0)
+                {
+                    LOGGER.info("Game disposal initiated. Waiting for clients"
+                        + " to catch up...");
+                    timeout = timeoutDuringShutdown;
+                    // Requesting all clients to confirm that they have caught
+                    // up with the processing of all the messages at game end. 
+                    // When all caught up, this will triger game.dispose(),
+                    //   which which do stopServerRunning,
+                    //     which will do stopFileServer, disposeAllClients,
+                    //     and set shuttingDown and serverRunning to false.
+                    allRequestConfirmCatchup("DisposeGame");
+                }
                 disposeRound++;
-                allRequestConfirmCatchup("DisposeGame");
             }
         }
 
