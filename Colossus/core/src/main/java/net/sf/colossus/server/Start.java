@@ -823,8 +823,9 @@ public final class Start
             DebugMethods.waitReturn();
         }
 
-        LOGGER.log(Level.FINER, "\nStart.main() should end now by itself.");
-
+        LOGGER.log(Level.FINE, "Start.main() at the end "
+            + "- JVM should exit now by itself.");
+            
         // JVM should do a clean exit now, no System.exit() needed.
         // To be sure, at all places where user selects "Quit", a demon 
         // thread is started that does the System.exit() after a certain
