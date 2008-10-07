@@ -4826,6 +4826,7 @@ public final class Client implements IClient, IOracle
         quitAlreadyTried = true;
 
         Start.setCurrentWhatToDoNext(Start.QuitAll);
+        Start.triggerTimedQuit();
         notifyServer();
     }
 

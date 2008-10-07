@@ -214,6 +214,7 @@ public class StartClient extends KFrame implements WindowListener,
         if (e.getActionCommand().equals(Constants.quitGame))
         {
             startObject.setWhatToDoNext(Start.QuitAll);
+            Start.triggerTimedQuit();
             dispose();
         }
         else if (e.getActionCommand().equals("Go"))

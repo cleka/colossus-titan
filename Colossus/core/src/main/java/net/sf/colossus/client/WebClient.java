@@ -1048,6 +1048,7 @@ public class WebClient extends KFrame implements WindowListener,
         {
             Start startObj = Start.getCurrentStartObject();
             startObj.setWhatToDoNext(Start.QuitAll);
+            Start.triggerTimedQuit();
         }
     }
 

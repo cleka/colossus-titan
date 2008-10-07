@@ -683,7 +683,7 @@ public final class Start
                 if (webGameFlagFileName != null
                     && !webGameFlagFileName.equals(""))
                 {
-                    startObject.setWhatToDoNext(QuitAll);
+                    startObject.setWhatToDoNext(Start.QuitAll);
                     game.setFlagFilename(webGameFlagFileName);
                 }
                 game.newGame();
@@ -826,8 +826,70 @@ public final class Start
         LOGGER.log(Level.FINER, "\nStart.main() should end now by itself.");
 
         // JVM should do a clean exit now, no System.exit() needed.
-        // @TODO: does it work on all platforms, all Java versions?
-        //        If not, build here a demon timer that does the
-        //        System.exit() after a few seconds...?        
+        // To be sure, at all places where user selects "Quit", a demon 
+        // thread is started that does the System.exit() after a certain
+        // delay (currently 10 secs - see class TimedJvmQuit).
+    }
+
+    /**
+     * Trigger a timed Quit, which will (by using a demon thread) terminate
+     * the JVM after a timeout (currently 10 seconds)  
+     * - unless the JVM has quit already anyway because cleanup has
+     * succeeded as planned.
+     */
+    public static void triggerTimedQuit()
+    {
+        new TimedJvmQuit().start();
+    }
+
+    /**
+     * A demon thread which is started by triggerTimedQuit.
+     * It will then (currently) sleep 10 seconds, and if it is then
+     * still alive, do a System.exit(1) to terminate the JVM.
+     * If, however, the game shutdown proceeded successdully as planned,
+     * Start.main() will already have reached it's end and there should
+     * not be any other non-demon threads alive, so the JVM *should*
+     * terminate by itself cleanly.
+     * So, if this TimedJvmQuit strikes, it means the "clean shutdown"
+     * has somehow failed. 
+     */
+    public static class TimedJvmQuit extends Thread
+    {
+        private static final Logger LOGGER = Logger.getLogger(Start.class
+            .getName());
+        
+        private final String name = "TimedJvmQuit thread";
+        private long timeOutInSecs = 10;
+        
+        public TimedJvmQuit()
+        {
+            super();
+            this.setDaemon(true);
+            this.setName(this.name);
+        }
+
+        @Override
+        public void run()
+        {
+            LOGGER.info(this.name + ": started... (sleeping "
+                + timeOutInSecs + " seconds)");
+            sleepFor(this.timeOutInSecs * 1000);
+            LOGGER.warning(this.name + ": JVM still alive? "
+                + "Ok, it's time to do System.exit()...");
+            System.exit(1);
+        }
+
+        public static void sleepFor(long millis)
+        {
+            try
+            {
+                Thread.sleep(millis);
+            }
+            catch (InterruptedException e)
+            {
+                LOGGER.log(Level.FINEST,
+                    "InterruptException caught... ignoring it...");
+            }
+        }
     }
 }

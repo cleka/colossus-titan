@@ -613,6 +613,7 @@ public final class GetPlayers extends KFrame implements WindowListener,
         }
         quitAlreadyTried = true;
         startObject.setWhatToDoNext(Start.QuitAll);
+        Start.triggerTimedQuit();
         dispose();
     }
 

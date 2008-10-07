@@ -3331,6 +3331,7 @@ public final class GameServerSide extends Game
             if (getOption(Options.autoQuit))
             {
                 Start.setCurrentWhatToDoNext(Start.QuitAll);
+                Start.triggerTimedQuit();
                 LOGGER.info("Reached Game Over, AutoQuit - trigger Game Dispose");
                 server.triggerDispose();
             }
