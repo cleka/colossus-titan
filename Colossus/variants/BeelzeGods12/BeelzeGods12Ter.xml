@@ -90,35 +90,37 @@
         <recruit name="Beelzebub" number="2" />
         <!-- Pantheon stuff -->
         <recruit name="Knight" number="-1" />
-        <recruit name="Aphrodite" number="3" />
+        <recruit name="Aphrodite" number="2" />
         <recruit name="Ranger" number="-1" />
-        <recruit name="Apolo" number="4" />
+        <recruit name="Apolo" number="3" />
         <recruit name="Wraith" number="-1" />
-        <recruit name="Hermes" number="3" />
+        <recruit name="Hermes" number="2" />
         <recruit name="Basilisk" number="-1" />
         <recruit name="Dionysous" number="3" />
         <recruit name="Phoenix" number="-1" />
-        <recruit name="Dimitra" number="3" />
+        <recruit name="Dimitra" number="2" />
         <recruit name="Fiend" number="-1" />
-        <recruit name="Estia" number="4" />
+        <recruit name="Estia" number="2" />
         <recruit name="Golem" number="-1" />
-        <recruit name="Ares" number="4" />
+        <recruit name="Ares" number="3" />
         <recruit name="Hydra" number="-1" />
-        <recruit name="Poseidon" number="3" />
+        <recruit name="Poseidon" number="2" />
         <recruit name="Unicorn" number="-1" />
-        <recruit name="Hepfaestus" number="3" />
+        <recruit name="Hepfaestus" number="2" />
         <recruit name="Manticore" number="-1" />
-        <recruit name="Artemis" number="3" />
+        <recruit name="Artemis" number="2" />
         <recruit name="Mummy" number="-1" />
-        <recruit name="Athena" number="4" />
+        <recruit name="Athena" number="3" />
         <recruit name="Lich" number="-1" />
-        <recruit name="Athena" number="4" />
+        <recruit name="Athena" number="3" />
         <recruit name="Mammoth" number="-1" />
-        <recruit name="Hera" number="3" />
+        <recruit name="Hades" number="2" />
         <recruit name="Colossus" number="-1" />
-        <recruit name="Zeus" number="3" />
+        <recruit name="Hera" number="2" />
         <recruit name="Lord" number="-1" />
-        <recruit name="Hades" number="4" />
+        <recruit name="Zeus" number="3" />
+        <recruit name="DemiLord" number="-1" />
+        <recruit name="Zeus" number="4" />
     </terrain>
     <acquirable name="Angel" points="100" terrain="Plains" />
     <acquirable name="Angel" points="100" terrain="Desert" />
