@@ -49,6 +49,7 @@ public class TerrainRecruitLoader
     public static final String Keyword_Anything = "Anything";
     public static final String Keyword_AnyNonLord = "AnyNonLord";
     public static final String Keyword_Lord = "Lord";
+    public static final String Keyword_DemiLord = "DemiLord";
     public static final String Keyword_Special = "Special:";
 
     /**
@@ -105,6 +106,15 @@ public class TerrainRecruitLoader
         graph.setCaretaker(caretaker);
     }
 
+    private static boolean isConcreteCreature(String name)
+    {
+        return ( !(name.equals(Keyword_Anything))
+            &&   !(name.equals(Keyword_AnyNonLord))
+            &&   !(name.equals(Keyword_Lord))
+            &&   !(name.equals(Keyword_DemiLord))
+            &&   !(name.startsWith(Keyword_Special)));
+    }
+
     /**
      * Add an entire terrain recruiting list to the Recruiting Graph.
      * @param rl The list of RecruitNumber to add to the graph.
@@ -121,11 +131,8 @@ public class TerrainRecruitLoader
             {
                 RecruitNumber tr = it.next();
                 String v2 = tr.getName();
-                if ((v2 != null) && !(v2.equals(Keyword_Anything))
-                    && !(v2.equals(Keyword_AnyNonLord))
-                    && !(v2.equals("Titan")) && !(v2.equals(Keyword_Lord))
-                    && !(v2.startsWith(Keyword_Special))
-                    && !(tr.getNumber() < 0))
+                if ((v2 != null) && !(v2.equals("Titan"))
+                    && isConcreteCreature(v2) && !(tr.getNumber() < 0))
                 { // we musn't add the Edges going to non-recruitable
                     if (v1 != null)
                     {
@@ -143,11 +150,7 @@ public class TerrainRecruitLoader
                             // one can always recruit itself at one/zero
                             // level, and also below if regularRecruit is on.
                             String v3 = tr2.getName();
-                            if (!(v3.equals(Keyword_Anything))
-                                && !(v3.equals(Keyword_AnyNonLord))
-                                && !(v3.equals("Titan"))
-                                && !(v3.equals(Keyword_Lord))
-                                && !(v3.startsWith(Keyword_Special)))
+                            if (isConcreteCreature(v3) && !v3.equals("Titan"))
                             {
                                 if ((tr2.getNumber() > 0))
                                 {
@@ -484,11 +487,8 @@ public class TerrainRecruitLoader
         {
             RecruitNumber tr = it.next();
             if ((tr.getNumber() >= 0)
-                && !(tr.getName().equals(Keyword_Anything))
-                && !(tr.getName().equals(Keyword_AnyNonLord))
-                && !(tr.getName().equals("Titan"))
-                && !(tr.getName().equals(Keyword_Lord))
-                && !(tr.getName().startsWith(Keyword_Special)))
+                && isConcreteCreature(tr.getName()) 
+                && !tr.getName().equals("Titan"))
             {
                 result.add(VariantSupport.getCurrentVariant()
                     .getCreatureByName(tr.getName()));
@@ -526,10 +526,7 @@ public class TerrainRecruitLoader
         while (it.hasNext())
         {
             RecruitNumber tr = it.next();
-            if (!(tr.getName().equals(Keyword_Anything))
-                && !(tr.getName().equals(Keyword_AnyNonLord))
-                && !(tr.getName().equals(Keyword_Lord))
-                && !(tr.getName().startsWith(Keyword_Special)))
+            if (isConcreteCreature(tr.getName()))
             {
                 re.add(VariantSupport.getCurrentVariant().getCreatureByName(
                     tr.getName()));
@@ -556,6 +553,20 @@ public class TerrainRecruitLoader
                     {
                         CreatureType creature = itCr.next();
                         if (creature.isLord())
+                        {
+                            re.add(creature);
+                        }
+                    }
+                }
+                if (tr.getName().equals(Keyword_DemiLord))
+                {
+                    List<CreatureType> potential = VariantSupport
+                        .getCurrentVariant().getCreatureTypes();
+                    Iterator<CreatureType> itCr = potential.iterator();
+                    while (itCr.hasNext())
+                    {
+                        CreatureType creature = itCr.next();
+                        if (creature.isDemiLord())
                         {
                             re.add(creature);
                         }

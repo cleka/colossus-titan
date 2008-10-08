@@ -438,7 +438,9 @@ public class RecruitGraph
                         .getCreatureName()
                         .equals(TerrainRecruitLoader.Keyword_AnyNonLord)))
                     || ((isLord) && (tempSrc.getCreatureName()
-                        .equals(TerrainRecruitLoader.Keyword_Lord))))
+                        .equals(TerrainRecruitLoader.Keyword_Lord)))
+                    || ((isDemiLord) && (tempSrc.getCreatureName()
+                        .equals(TerrainRecruitLoader.Keyword_DemiLord))))
                 {
                     if (minValue > theEdge.getNumber())
                     {
