@@ -13,9 +13,8 @@
 This describes the recent changes in some more detail than just the
 one-line-info on the main pages "News" section.
 
-<h3>October 05, 2008: Upcoming Public Build from r3410+ ??</h3>
+<h3>October 09+, 2008: Upcoming Public Build from r3420+</h3>
 <p>
-<i>(All below is mostly same as the "Public Testing Build" from Sep 16, r3369)</i>
 <ul>
 <li>Fixed: [ 2078529 ] "Preferences" => scales value is now read from cf file on startup.</li>
 <li>Help=>About now tell also the actual .colossus dir and also the 
@@ -54,14 +53,11 @@ one-line-info on the main pages "News" section.
     originally players were involved; especially troublesome if there were remote clients
     that are dead now...</li>
 <li>Removed SVG support and the Batik library</li>
-</ul>
-<i>Changes since last "Public Testing Build" from Sep 16, r3369:</i>
-<ul>
 <li>Slightly rephrased text in summon dialog and corrected catched to 
     caught in some method names ;-)</li>
 <li>Tower teleport now only allowed from lands which really have the isTower
     attribute, not as before if they have a startlist (e.g. Abyssal, Mantio).
-<li>Fixed the server-client communication, now the right way. (?)
+<li>Fixed the server-client communication, now (hopefully) the right way. 
     Several of the mysterious battle and game-end related bugs shouldn't 
     happen any more, e.g.:
   <ul>
@@ -70,8 +66,15 @@ one-line-info on the main pages "News" section.
     <li>Fixed: [ 2095361 ] Game hangs when AI Titan killed</li>
     <li>Fixed: [ 2097773 ] Battlemat fails to close</li>
     <li>Fixed: [ 2113621 ] Major battlemap bugs that end gameplay</li>
-  </ul>
-  <li>Some corrections and improvements to CreatureDetails dialog</li>
+  </ul></li>
+<li>Some corrections and improvements to CreatureDetails dialog</li>
+<li>When user selects Quit, trigger a timer which would do a 
+    System.exit() after 10 seconds - to make sure that the java/javaw
+    process will really terminate.</li>
+<li>Fixed: [ 2111020 ] After game completed, start new one: clients don't 
+    come in<br>
+    (when all expected clients did connect, stop listening to 
+    socket and accepting connections)</br></li>
 </ul>
 
 <hr></hr>
