@@ -283,6 +283,9 @@
     <exec executable="rsync">
       <arg line="-a docs ${SERVER}:${HTML_DIR}" />
     </exec>
+    <exec executable="rsync">
+      <arg line="-a htdocs/ ${SERVER}:${HTML_DIR}" />
+    </exec>
   </target>
   <!-- If we can agree to put the public build files also to a subdir, and use the following
          three targets for that, then those three targets could even be unified to use
