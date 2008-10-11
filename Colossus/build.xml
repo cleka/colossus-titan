@@ -272,7 +272,7 @@
       <arg line="-a Colossus.jar ${SERVER}:${HTML_DIR}" />
     </exec>
     <exec executable="rsync">
-      <arg line="-a Colossus.jnlp ${SERVER}:${HTML_DIR}" />
+      <arg line="-a htdocs/public-build/Colossus.jnlp ${SERVER}:${HTML_DIR}" />
     </exec>
     <exec executable="rsync">
       <arg line="-a libs ${SERVER}:${HTML_DIR}" />
