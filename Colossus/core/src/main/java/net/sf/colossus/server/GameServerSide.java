@@ -695,7 +695,7 @@ public final class GameServerSide extends Game
         return server;
     }
 
-    Player addPlayer(String name, String type)
+    PlayerServerSide addPlayer(String name, String type)
     {
         PlayerServerSide player = new PlayerServerSide(name, this);
 
@@ -716,9 +716,9 @@ public final class GameServerSide extends Game
 
         while (it.hasNext())
         {
-            Player player = it.next();
+            PlayerServerSide player = it.next();
 
-            if (!player.isDead())
+            if (!player.isDead() && !player.getDeadBeforeSave())
             {
                 count++;
             }
@@ -1603,11 +1603,9 @@ public final class GameServerSide extends Game
                 Element pla = it.next();
 
                 String name = pla.getAttribute("name").getValue();
-                PlayerServerSide player = new PlayerServerSide(name, this);
-                players.add(player);
-
                 String type = pla.getAttribute("type").getValue();
-                player.setType(type);
+
+                PlayerServerSide player = addPlayer(name, type); 
 
                 String color = pla.getAttribute("color").getValue();
                 player.setColor(color);
@@ -1620,9 +1618,10 @@ public final class GameServerSide extends Game
                 int score = pla.getAttribute("score").getIntValue();
                 player.setScore(score);
 
-                // Don't set dead - will be slaughtered during replay...
-                // TODO compare / sync instead?
-                // player.setDead(pla.getAttribute("dead").getBooleanValue());
+                // Don't use the normal "dead" attribute - will be set
+                // during replay...
+                boolean dead = pla.getAttribute("dead").getBooleanValue();
+                player.setDeadBeforeSave(dead);
 
                 int mulligansLeft = pla.getAttribute("mulligansLeft")
                     .getIntValue();

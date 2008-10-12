@@ -830,7 +830,7 @@ public final class Server extends Thread implements IServer
     {
         for (PlayerServerSide player : game.getPlayers())
         {
-            if (!player.isDead()
+            if (!player.getDeadBeforeSave()
                 && !player.getType().endsWith(Constants.network))
             {
                 
