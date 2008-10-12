@@ -228,7 +228,7 @@ public final class Start
             Game dummyGame = new Game(null, new String[0]);
 
             Client c = new Client(hostname, port, dummyGame, playerName, true,
-                false);
+                false, false);
             failed = c.getFailed();
             c = null;
         }

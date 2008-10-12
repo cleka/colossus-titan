@@ -1589,8 +1589,9 @@ public class WebClient extends KFrame implements WindowListener,
             // a hack to pass something into the Client constructor
             // TODO needs to be constructed properly
             Game dummyGame = new Game(null, new String[0]);
-
-            gc = new Client(hostname, p, dummyGame, username, true, true);
+            boolean noOptionsFile = false;
+            gc = new Client(hostname, p, dummyGame, username, true, true,
+                noOptionsFile);
             boolean failed = gc.getFailed();
             if (failed)
             {

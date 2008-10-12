@@ -677,7 +677,7 @@ public class GameInfo extends Thread
 
         String gameDirPath = gameDir.getPath();
         Options gameOptions = new Options("server", gameDirPath
-            + "/.colossus/");
+            + "/.colossus/", false);
 
         gameOptions.setOption(Options.variant, this.variant);
         gameOptions.setOption(Options.viewMode, this.viewmode);

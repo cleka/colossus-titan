@@ -279,9 +279,9 @@ public final class Client implements IClient, IOracle
      *      network and the serialization/deserialization of all objects
      */
     public Client(String host, int port, Game game, String playerName,
-        boolean remote, boolean byWebClient)
+        boolean remote, boolean byWebClient, boolean noOptionsFile)
     {
-        this(game, playerName);
+        this(game, playerName, noOptionsFile);
 
         this.remote = remote;
         this.startedByWebClient = byWebClient;
@@ -329,7 +329,7 @@ public final class Client implements IClient, IOracle
         }
     }
 
-    private Client(Game game, String playerName)
+    private Client(Game game, String playerName, boolean noOptionsFile)
     {
         assert playerName != null;
 
@@ -356,7 +356,7 @@ public final class Client implements IClient, IOracle
         ViableEntityManager.register(this, "Client " + playerName);
         InstanceTracker.register(this, "Client " + playerName);
 
-        options = new Options(playerName);
+        options = new Options(playerName, noOptionsFile);
         setupOptionListeners();
         // Need to load options early so they don't overwrite server options.
         loadOptions();

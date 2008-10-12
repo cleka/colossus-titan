@@ -177,23 +177,29 @@ public final class Options implements IOptions
     private final Properties props = new Properties();
     private final String owner; // playerName, or Constants.optionsServerName
     private final String dataPath; // WebServer sets to create a server.cfg file
+    private final boolean noFile;
 
     private final Map<String, List<Listener>> listeners = new HashMap<String, List<Listener>>();
 
     // in the directory in which the game is run
 
-    public Options(String owner)
-    {
-        this.owner = owner;
-        this.dataPath = Constants.gameDataPath;
-    }
-
-    public Options(String owner, String customPath)
+    public Options(String owner, String customPath, boolean noFile)
     {
         this.owner = owner;
         this.dataPath = customPath;
+        this.noFile = noFile;
     }
 
+    public Options(String owner)
+    {
+        this(owner, Constants.gameDataPath, false);
+    }
+
+    public Options(String owner, boolean noFile)
+    {
+        this(owner, Constants.gameDataPath, noFile);
+    }
+    
     public String getOptionsFilename()
     {
         return dataPath + Constants.optionsBase + owner
@@ -202,10 +208,8 @@ public final class Options implements IOptions
 
     synchronized public void loadOptions()
     {
-        // Don't load from temporary player names.
-        if (owner.startsWith(Constants.byColor)
-            || owner.startsWith(Constants.byType)
-            || owner.startsWith(Constants.byClient))
+        // Don't load if noFile is set - typically AI players
+        if (this.noFile)
         {
             return;
         }
@@ -245,10 +249,8 @@ public final class Options implements IOptions
 
     synchronized public void saveOptions()
     {
-        // Don't save from temporary player names.
-        if (owner.startsWith(Constants.byColor)
-            || owner.startsWith(Constants.byType)
-            || owner.startsWith(Constants.byClient))
+        // Don't save if noFile is set - typically AI players
+        if (this.noFile)
         {
             return;
         }

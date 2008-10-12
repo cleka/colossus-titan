@@ -828,25 +828,29 @@ public final class Server extends Thread implements IServer
 
     public void createLocalClients()
     {
-        for (Player player : game.getPlayers())
+        for (PlayerServerSide player : game.getPlayers())
         {
             if (!player.isDead()
                 && !player.getType().endsWith(Constants.network))
             {
-                createLocalClient(player.getName());
+                
+                createLocalClient(player);
             }
         }
     }
 
-    private void createLocalClient(String playerName)
+    private void createLocalClient(PlayerServerSide player)
     {
+        String playerName = player.getName();
+        boolean dontUseOptionsFile = player.isAI();
         LOGGER.finest("Called Server.createLocalClient() for " + playerName);
 
         // a hack to pass something into the Client constructor
         // TODO needs to be constructed properly
         Game dummyGame = new Game(null, new String[0]);
 
-        new Client("127.0.0.1", port, dummyGame, playerName, false, false);
+        new Client("127.0.0.1", port, dummyGame, playerName,
+            false, false, dontUseOptionsFile);
     }
 
     // TODO temporary method since ClientHandler doesn't know the player
