@@ -177,7 +177,7 @@ public final class Options implements IOptions
     private final Properties props = new Properties();
     private final String owner; // playerName, or Constants.optionsServerName
     private final String dataPath; // WebServer sets to create a server.cfg file
-    private final boolean noFile;
+    private boolean noFile;
 
     private final Map<String, List<Listener>> listeners = new HashMap<String, List<Listener>>();
 
@@ -208,6 +208,15 @@ public final class Options implements IOptions
 
     synchronized public void loadOptions()
     {
+        // As long as we don't prevent e.g. Human players to
+        // choose "<byColor>" have to block it here - otherwise
+        // it gives File Exceptions due to the "<" character.
+        if (owner.startsWith(Constants.byColor)
+            || owner.startsWith(Constants.byType))
+        {
+            this.noFile = true;
+        }
+
         // Don't load if noFile is set - typically AI players
         if (this.noFile)
         {
