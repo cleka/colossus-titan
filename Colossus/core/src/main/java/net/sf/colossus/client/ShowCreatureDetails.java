@@ -27,6 +27,7 @@ import net.sf.colossus.server.LegionServerSide;
 import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.util.HTMLColor;
 import net.sf.colossus.util.KDialog;
+import net.sf.colossus.util.RecruitGraph;
 import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.HazardTerrain;
@@ -184,7 +185,8 @@ public final class ShowCreatureDetails extends KDialog implements
                     separator = ", ";
                 }
                 // TODO skip the > getMaxCount() already during Variant load
-                else if ((num > 0) && (num < recruiter.getMaxCount())
+                else if ((num > 0) && num < recruiter.getMaxCount()
+                    && num < RecruitGraph.BIGNUM
                     &&!recruiter.getName().equals("Titan"))
                 {
                     buf.append(separator + "by" + sp + num + sp
@@ -225,7 +227,8 @@ public final class ShowCreatureDetails extends KDialog implements
                     // TODO skip already during load
                 }
                 // TODO skip the > getMaxCount() already during Variant load
-                else if ((num > 0) && (num < creature.getMaxCount()))
+                else if (num > 0 && num < creature.getMaxCount()
+                    && num < RecruitGraph.BIGNUM)
                 {
                     buf.append(separator);
                     separator = ", ";
