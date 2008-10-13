@@ -2,6 +2,7 @@ package net.sf.colossus.client;
 
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
@@ -22,7 +23,6 @@ import net.sf.colossus.variant.MasterHex;
  */
 public abstract class AbstractShowRecruits extends KDialog
 {
-
     AbstractShowRecruits(JFrame parentFrame)
     {
         super(parentFrame, "Recruits", false);
@@ -48,7 +48,21 @@ public abstract class AbstractShowRecruits extends KDialog
     {
         assert SwingUtilities.isEventDispatchThread() : "GUI code should only run on the EDT";
         
+        JFrame frame = (JFrame) this.getParent();
         getContentPane().add(
-            new HexRecruitTreePanel(BoxLayout.Y_AXIS, terrain, hex, this));
+            new HexRecruitTreePanel(BoxLayout.Y_AXIS, terrain, hex, frame, true));
+    }
+
+    @Override
+    public void dispose()
+    {
+        for (Component c : getContentPane().getComponents())
+        {
+            if (c instanceof HexRecruitTreePanel)
+            {
+                ((HexRecruitTreePanel) c).closeCreatureWindows();
+            }
+        }
+        super.dispose();
     }
 }

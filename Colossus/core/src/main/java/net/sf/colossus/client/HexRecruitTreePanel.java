@@ -10,12 +10,17 @@ package net.sf.colossus.client;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 
 import net.sf.colossus.server.Constants;
@@ -29,10 +34,19 @@ import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
 public class HexRecruitTreePanel extends Box
 {
+    private HashMap<Chit, CreatureType> chitToCreatureMap
+        = new HashMap<Chit, CreatureType>();
+
+    private ArrayList<ShowCreatureDetails> creatureWindows
+        = new ArrayList<ShowCreatureDetails>();
+
+    private JFrame parentFrame;
+    
     public HexRecruitTreePanel(int direction, MasterBoardTerrain terrain,
-        MasterHex hex, MouseListener listener)
+        MasterHex hex, JFrame parent, boolean clickable)
     {
         super(direction);
+        this.parentFrame = parent;
         setAlignmentY(0);
         setBorder(BorderFactory.createLineBorder(Color.black));
         setBackground(terrain.getColor());
@@ -72,15 +86,55 @@ public class HexRecruitTreePanel extends Box
             }
 
             add(numToRecruitLabel);
-            numToRecruitLabel.addMouseListener(listener);
-
             Chit chit = new Chit(scale, creature.getName());
             add(chit);
-            chit.addMouseListener(listener);
+            chitToCreatureMap.put(chit, creature);
 
+            // ShowAllRecruits windows uses this, Inspector right now not
+            if (clickable)
+            {
+                MouseListener creListener = new MouseAdapter()
+                {
+                    @Override
+                    public void mouseClicked(MouseEvent e)
+                    {
+                        if (e.getButton() == MouseEvent.BUTTON1)
+                        {
+                            showCreatureInfo(e);
+                        }
+                    }
+                };
+            
+                chit.addMouseListener(creListener);
+            }
             chit.repaint();
 
             prevCreature = creature;
+        }
+    }
+
+    public void showCreatureInfo(MouseEvent e)
+    {
+        Object source = e.getSource();
+        if (source instanceof Chit)
+        {
+            CreatureType type = chitToCreatureMap.get(source);
+            ShowCreatureDetails creatureWindow = new 
+                ShowCreatureDetails(this.parentFrame, type, null, null);
+            creatureWindows.add(creatureWindow);
+        }
+        else
+        {
+            // showCreaturrInfo called for something which is not a chit?
+        }
+    }
+
+    // ShowAllRecruits windows uses this, Inspector right now not
+    public void closeCreatureWindows()
+    {
+        for (ShowCreatureDetails window : creatureWindows)
+        {
+            window.dispose();
         }
     }
 }

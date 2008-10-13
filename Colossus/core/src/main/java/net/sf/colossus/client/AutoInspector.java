@@ -6,7 +6,6 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Point;
-import java.awt.event.MouseAdapter;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
@@ -29,6 +28,8 @@ public class AutoInspector extends KDialog
     private final SaveWindow saveWindow;
 
     private final JScrollPane scrollPane;
+    
+    private final JFrame parentFrame;
 
     private final int viewMode;
 
@@ -39,6 +40,7 @@ public class AutoInspector extends KDialog
     {
         super(frame, "Inspector", false);
         assert SwingUtilities.isEventDispatchThread() : "GUI code should only run on the EDT";
+        this.parentFrame = frame;
         this.options = options;
         this.viewMode = viewMode;
         this.dubiousAsBlanks = dubiousAsBlanks;
@@ -112,10 +114,7 @@ public class AutoInspector extends KDialog
         MasterHex hexModel = hex.getHexModel();
         scrollPane.getViewport().add(
             new HexRecruitTreePanel(BoxLayout.X_AXIS, hexModel.getTerrain(),
-                hexModel, new MouseAdapter()
-                {
-                    // nothing to do
-                }));
+                hexModel, this.parentFrame, false));
         repaint();
     }
 
