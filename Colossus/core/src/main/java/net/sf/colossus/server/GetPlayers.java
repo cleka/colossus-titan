@@ -500,6 +500,7 @@ public final class GetPlayers extends KFrame implements WindowListener,
         int numPlayers = 0;
         List<String> names = new ArrayList<String>();
         List<String> types = new ArrayList<String>();
+        StringBuffer sb = new StringBuffer("");
 
         for (int i = 0; i < Constants.MAX_MAX_PLAYERS; i++)
         {
@@ -538,8 +539,25 @@ public final class GetPlayers extends KFrame implements WindowListener,
                 names.add(name);
                 types.add(type);
             }
+            if (type.equals(Constants.human) 
+                && (name.startsWith(Constants.byColor)
+                    || name.startsWith(Constants.byType)))
+            {
+                sb.append("Invalid name \"" + name
+                    + "\" for Player " + (i+1) + "\n");
+            }
+
         }
 
+        if (sb.length() > 0)
+        {
+            String message = sb.substring(0) + "\n" 
+                + "Reason: <by...> names are not allowed for human players!";
+            JOptionPane.showMessageDialog(this, message);
+            return false;
+            
+        }
+        
         // Exit if there aren't enough unique player names.
         if (numPlayers < 1 || names.size() != numPlayers)
         {
