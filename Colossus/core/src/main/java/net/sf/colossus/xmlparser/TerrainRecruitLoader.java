@@ -459,6 +459,40 @@ public class TerrainRecruitLoader
     }
 
     /**
+     * Tell whether given type is in the loaded variant a start creature,
+     * i.e. one of those one gets in the initial legion in the tower.
+     * 
+     * I plan to use this for e.g. HexRecruitTreePanel, to show there
+     * how one can get to have a certain creature: 
+     * start creature 
+     * -or- acquirable
+     * -or- recruitable by N of from prev. in tree,
+     * -or- recruitable by any/Lord/DemiLord/anyNonLord 
+     * -or- recruitable by N of something else (e.g. Titan=>Warlock)
+     * @param type
+     * @return true if this is a start creature in the loaded variant
+     */
+    public static boolean isStartCreature(CreatureType type)
+    {
+        boolean isSC = false;
+        for (MasterBoardTerrain terrain : getTerrains())
+        {
+            if (terrain.isTower())
+            {
+                CreatureType[] bc = getStartingCreatures(terrain);
+                if (   type.equals(bc[0])
+                    || type.equals(bc[1])
+                    || type.equals(bc[2]))
+                {
+                    isSC = true;
+                    return isSC;
+                }
+            }
+        }
+        return isSC;
+    }
+
+    /**
      * Give the name of the random filename to use to generate this terrain,
      * or null if it's a static Battlelands.
      * 
