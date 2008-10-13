@@ -99,6 +99,8 @@ class CreatureCollectionView extends KDialog
             javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         JPanel panel = makeCreaturePanel(scrollPane);
         scrollPane.setViewportView(panel);
+        JLabel infoText = new JLabel("Click on a creature for details!");
+        getContentPane().add(infoText, BorderLayout.NORTH);
         getContentPane().add(scrollPane, BorderLayout.CENTER);
         getContentPane().add(legendLabel, BorderLayout.SOUTH);
 
