@@ -434,6 +434,11 @@ public final class BattleBoard extends KFrame
     {
         phaseMenu.removeAll();
 
+        if (client.getMyEngagedLegion() == null)
+        {
+            // We are not involved - we can't do concede or done
+            return;
+        }
         JMenuItem mi;
 
         mi = phaseMenu.add(doneWithPhaseAction);
