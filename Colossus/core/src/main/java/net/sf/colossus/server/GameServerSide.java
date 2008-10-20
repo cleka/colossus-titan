@@ -2066,6 +2066,11 @@ public final class GameServerSide extends Game
             ((LegionServerSide)legion).setRecruitName(recruit.getName());
             reinforcing = false;
         }
+        else
+        {
+            LOGGER.finest("Did not add creature " + recruit.getName()
+                + " - none left in caretaker to take!");
+        }
     }
 
     /**
