@@ -26,6 +26,7 @@ public class RevealedCreature
     // possible reasons why this creature was revealed:
     private boolean didRecruit = false;
     private boolean wasRecruited = false;
+    private boolean wasReinforced = false;
     private boolean didTeleport = false;
     // private boolean didTowerTeleport = false;
     // private boolean didTitanTeleport = false;
@@ -85,6 +86,7 @@ public class RevealedCreature
             + ": "
             + (didRecruit ? "did recruit; " : "")
             + (wasRecruited ? "was recruited; " : "")
+            + (wasReinforced ? "was reinforced; " : "")
             + (didTeleport ? "teleported; " : "")
             +
             // (didTowerTeleport ? "tower teleported; " : "") +
@@ -133,6 +135,16 @@ public class RevealedCreature
     public boolean wasRecruited()
     {
         return wasRecruited;
+    }
+
+    public void setWasReinforced(boolean value)
+    {
+        this.wasReinforced = value;
+    }
+
+    public boolean wasReinforced()
+    {
+        return wasReinforced;
     }
 
     public void setDidTeleport(boolean value)
@@ -208,6 +220,10 @@ public class RevealedCreature
         if (reason.equals(Constants.reasonRecruited))
         {
             setWasRecruited(true);
+        }
+        else if (reason.equals(Constants.reasonReinforced))
+        {
+            setWasReinforced(true);
         }
         else if (reason.equals(Constants.reasonSummon))
         {

@@ -1817,7 +1817,18 @@ public final class Client implements IClient, IOracle
         }
         if (eventViewer != null)
         {
-            eventViewer.removeCreature(legion.getMarkerId(), name);
+            if (reason.equals(Constants.reasonUndidReinforce))
+            {
+                LOGGER.warning("removeCreature should not be called for undidReinforce!");
+            }
+            else if (reason.equals(Constants.reasonUndidRecruit))
+            {
+                LOGGER.warning("removeCreature should not be called for undidRecruit!");
+            }
+            else
+            {
+                eventViewer.removeCreature(legion.getMarkerId(), name);
+            }
         }
 
         int height = legion.getHeight();
@@ -3201,7 +3212,10 @@ public final class Client implements IClient, IOracle
             }
             revealCreatures(legion, recruiters, Constants.reasonRecruiter);
         }
-        addCreature(legion, recruitName, Constants.reasonRecruited);
+        String reason = (battleSite != null ? 
+            Constants.reasonReinforced : Constants.reasonRecruited);
+        
+        addCreature(legion, recruitName, reason);
 
         ((LegionClientSide)legion).setRecruited(true);
         ((LegionClientSide)legion).setLastRecruit(recruitName);
@@ -3209,7 +3223,7 @@ public final class Client implements IClient, IOracle
         if (eventViewer != null)
         {
             eventViewer.recruitEvent(legion.getMarkerId(), (legion)
-                .getHeight(), recruitName, recruiters);
+                .getHeight(), recruitName, recruiters, reason);
         }
 
         if (board != null)
@@ -3225,11 +3239,23 @@ public final class Client implements IClient, IOracle
 
     public void undidRecruit(Legion legion, String recruitName)
     {
-        removeCreature(legion, recruitName, Constants.reasonUndidRecruit);
+        int eventType;
+        if (battlePhase != null)
+        {
+            eventViewer.cancelReinforcement(recruitName, getTurnNumber());
+            eventType = RevealEvent.eventReinforce;
+        }
+        else
+        {
+            // normal undoRecruit
+            // eventViewer.removeCreature(legion.getMarkerId(), recruitName);
+            eventType = RevealEvent.eventRecruit;
+        }
+            
         ((LegionClientSide)legion).setRecruited(false);
         if (eventViewer != null)
         {
-            eventViewer.undoEvent(RevealEvent.eventRecruit, legion
+            eventViewer.undoEvent(eventType, legion
                 .getMarkerId(), null, turnNumber);
         }
         if (board != null)

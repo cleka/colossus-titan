@@ -39,6 +39,7 @@ public class RevealEvent
     private String markerId;
     private int height;
     private List<RevealedCreature> knownCreatures;
+    private RevealedCreature readyToDie = null;
 
     // child legion or summoner (for split or summon events)
     private String markerId2;
@@ -69,11 +70,12 @@ public class RevealEvent
     public final static int eventPlayerChange = 8;
     public final static int eventMulligan = 9;
     public final static int eventMoveRoll = 10;
+    public final static int eventReinforce = 12;
 
     // Battle is only a temporary state, before it becomes Won or Lost
     // ( = no filter / checkbox setting for that needed, so far at least...)
     public final static int eventBattle = 11;
-    public final static int NUMBEROFEVENTS = 12;
+    public final static int NUMBEROFEVENTS = 13;
 
     private final static String eventSplitText = "Split";
     private final static String eventRecruitText = "Recruit";
@@ -87,12 +89,13 @@ public class RevealEvent
     private final static String eventMulliganText = "Mulligan";
     private final static String eventMoveRollText = "Movement roll";
     private final static String eventBattleText = "Battle";
+    private final static String eventReinforceText = "Reinforce";
 
     private static String[] eventTypeToString = { eventSplitText,
         eventRecruitText, eventSummonText, eventTeleportText,
         eventAcquireText, eventWonText, eventLostText, eventTurnChangeText,
         eventPlayerChangeText, eventMulliganText, eventMoveRollText,
-        eventBattleText };
+        eventBattleText, eventReinforceText };   
 
     /**
      * TODO replace marker/height combos with Legion objects
@@ -270,6 +273,12 @@ public class RevealEvent
 
     public void setCreatureDied(String name, int newHeight)
     {
+        if (readyToDie != null && readyToDie.getName().equals(name))
+        {
+            readyToDie = null;
+            return;
+        }
+        
         Iterator<RevealedCreature> it = this.knownCreatures.iterator();
         boolean done = false;
         while (!done && it.hasNext())
@@ -300,7 +309,7 @@ public class RevealEvent
 
     // undo the summoning of the angel to this battle event legion
     // (when angel was left off board).
-    public boolean undoSummon(int turnNumber, String name)
+    public boolean removeSummonedCreature(int turnNumber, String name)
     {
         if (turnNumber != this.turnNumber)
         {
@@ -315,7 +324,41 @@ public class RevealEvent
             RevealedCreature rc = it.next();
             if (rc.matches(name) && rc.wasSummoned())
             {
+                rc.setDead(true);
+                // remember it so that RemoveDeadBattleChits does not 
+                // strikeout one of the original creatures
+                readyToDie = rc;
                 it.remove();
+                height--;
+                done = true;
+            }
+        }
+        return done;
+    }
+
+    // undo the summoning of the angel to this battle event legion
+    // (when angel was left off board).
+    public boolean removeReinforcedCreature(int turnNumber, String name)
+    {
+        if (turnNumber != this.turnNumber)
+        {
+            LOGGER.log(Level.WARNING, "removeReinforcement for " + this.toString()
+                + " -- wrong turn.");
+            return false;
+        }
+        Iterator<RevealedCreature> it = this.knownCreatures.iterator();
+        boolean done = false;
+        while (!done && it.hasNext())
+        {
+            RevealedCreature rc = it.next();
+            if (rc.matches(name) && rc.wasReinforced())
+            {
+                rc.setDead(true);
+                // remember it so that RemoveDeadBattleChits does not 
+                // strikeout one of the original creatures
+                readyToDie = rc;
+                it.remove();
+                height--;
                 done = true;
             }
         }
@@ -555,6 +598,10 @@ public class RevealEvent
         {
             info = "R:";
         }
+        else if (rc.wasReinforced())
+        {
+            info = "Ri:";
+        }
 
         if (info != null)
         {
@@ -712,13 +759,13 @@ public class RevealEvent
             p.add(Box.createRigidArea(new Dimension(5, 0)));
             addMarker(markerId2, height2);
         }
-        else if (eventType == eventRecruit)
+        else if (eventType == eventRecruit || eventType == eventReinforce)
         {
             Iterator<RevealedCreature> it = knownCreatures.iterator();
             while (it.hasNext())
             {
                 RevealedCreature rc = it.next();
-                if (rc.wasRecruited())
+                if (rc.wasRecruited() || rc.wasReinforced())
                 {
                     addLabel(" => ");
                 }

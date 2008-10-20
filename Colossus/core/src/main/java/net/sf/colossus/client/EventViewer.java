@@ -176,6 +176,9 @@ final class EventViewer extends KDialog implements WindowListener,
         showEventType = new boolean[RevealEvent.NUMBEROFEVENTS];
         showEventType[RevealEvent.eventRecruit] = getBoolOption(evfRecruit,
             true);
+        // Reinforce uses same checkbox as Recruit!
+        showEventType[RevealEvent.eventReinforce] = getBoolOption(evfRecruit,
+            true);
         showEventType[RevealEvent.eventSplit] = getBoolOption(evfSplit, true);
         showEventType[RevealEvent.eventTeleport] = getBoolOption(evfTeleport,
             true);
@@ -750,6 +753,8 @@ final class EventViewer extends KDialog implements WindowListener,
         defenderEventLegion.setEventInfo(Constants.reasonBattleStarts);
         defenderEventLegion.setRealPlayer((PlayerClientSide)defender
             .getPlayer());
+        addEvent(attackerEventLegion);
+        addEvent(defenderEventLegion);
     }
 
     public void tellEngagementResults(Legion winner, String method, int turns)
@@ -1005,9 +1010,9 @@ final class EventViewer extends KDialog implements WindowListener,
             // no battle events where to add creature
         }
 
-        // create also the separate acquire event:
         if (reason.equals(Constants.reasonAcquire))
         {
+            // create also the separate acquire event:
             int newHeight = getLegion(markerId).getHeight();
             RevealedCreature rc = new RevealedCreature(name);
             rc.setWasAcquired(true);
@@ -1036,15 +1041,24 @@ final class EventViewer extends KDialog implements WindowListener,
         else if (reason.equals(Constants.reasonUndoSummon))
         {
             // addCreature adds summoned creature back to donor:
-            undoEvent(RevealEvent.eventSummon, markerId, null, client
-                .getTurnNumber());
-            if (!attackerEventLegion.undoSummon(client.getTurnNumber(), name))
+            int turn = client.getTurnNumber();
+            undoEvent(RevealEvent.eventSummon, markerId, null, turn);
+            if (!attackerEventLegion.removeSummonedCreature(turn, name))
             {
                 // this should never happen...
                 LOGGER.log(Level.WARNING, "Un-Summon " + name
                     + " out of attacker event failed!");
             }
         }
+        else if (reason.equals(Constants.reasonReinforced))
+        {
+            // Recruit/Reinforce event is created by didRecruit()
+        }
+    }
+
+    public void cancelReinforcement(String name, int turn)
+    {
+        defenderEventLegion.removeReinforcedCreature(turn, name);
     }
 
     public void removeCreature(String markerId, String name)
@@ -1068,7 +1082,7 @@ final class EventViewer extends KDialog implements WindowListener,
     }
 
     public void recruitEvent(String markerId, int height, String recruitName,
-        List<String> recruiters)
+        List<String> recruiters, String reason)
     {
         ArrayList<RevealedCreature> rcList = new ArrayList<RevealedCreature>();
         RevealedCreature rc;
@@ -1082,11 +1096,21 @@ final class EventViewer extends KDialog implements WindowListener,
             rcList.add(rc);
         }
 
+        int recruitType;
         rc = new RevealedCreature(recruitName);
-        rc.setWasRecruited(true);
+        if (reason.equals(Constants.reasonReinforced))
+        {
+            recruitType = RevealEvent.eventReinforce;
+            rc.setWasReinforced(true);
+        }
+        else
+        {
+            recruitType = RevealEvent.eventRecruit;
+            rc.setWasRecruited(true);
+        }
+        
         rcList.add(rc);
-
-        newEvent(RevealEvent.eventRecruit, markerId, height, rcList, null, 0);
+        newEvent(recruitType, markerId, height, rcList, null, 0);
     }
 
     // next two are for removeDeadBattleChits:
@@ -1160,45 +1184,10 @@ final class EventViewer extends KDialog implements WindowListener,
                 }
             }
         }
-        else if (type == RevealEvent.eventRecruit)
-        {
-            synchronized (syncdEventList)
-            {
-                int last = syncdEventList.size();
-                ListIterator<RevealEvent> it = syncdEventList
-                    .listIterator(last);
-                while (it.hasPrevious() && found == 0)
-                {
-                    RevealEvent e = it.previous();
-                    if (e.getEventType() == type && e.getTurn() == turn
-                        && e.getMarkerId().equals(parentId) && !e.wasUndone())
-                    {
-                        found++;
-                        e.setUndone(true);
-                    }
-                }
-            }
-        }
-        else if (type == RevealEvent.eventSummon)
-        {
-            synchronized (syncdEventList)
-            {
-                int last = syncdEventList.size();
-                ListIterator<RevealEvent> it = syncdEventList
-                    .listIterator(last);
-                while (it.hasPrevious() && found == 0)
-                {
-                    RevealEvent e = it.previous();
-                    if (e.getEventType() == type && e.getTurn() == turn
-                        && e.getMarkerId().equals(parentId) && !e.wasUndone())
-                    {
-                        found++;
-                        e.setUndone(true);
-                    }
-                }
-            }
-        }
-        else if (type == RevealEvent.eventTeleport)
+        else if (type == RevealEvent.eventRecruit
+             ||  type == RevealEvent.eventReinforce
+             ||  type == RevealEvent.eventSummon
+             ||  type == RevealEvent.eventTeleport )
         {
             synchronized (syncdEventList)
             {

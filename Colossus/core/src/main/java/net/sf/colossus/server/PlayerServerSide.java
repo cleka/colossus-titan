@@ -386,6 +386,11 @@ public final class PlayerServerSide extends Player implements
         return false;
     }
 
+    /**
+     * Tell legion to do undo the recruiting and trigger needed messages
+     * to be sent to clients
+     * @param legion The legion which undoes the recruiting
+     */
     void undoRecruit(Legion legion)
     {
         assert legion != null : "Player.undoRecruit: legion for markerId "
@@ -405,6 +410,31 @@ public final class PlayerServerSide extends Player implements
 
         // Update number of creatures in status window.
         getGame().getServer().allUpdatePlayerInfo();
+        getGame().getServer().undidRecruit(legion, recruitName);
+    }
+
+    /**
+     * Tell legion to do undo the reinforcement and trigger needed messages
+     * to be sent to clients
+     * (quite similar to undorecuit, but not exactly the same)
+     * @param legion The legion which cancels the reinforcement
+     */
+    void undoReinforcement(Legion legion)
+    {
+        // This is now permanently fixed in Player.java, so this should
+        // never happen again. Still, leaving this in place, just to be sure...
+        String recruitName = ((LegionServerSide)legion).getRecruitName();
+        if (recruitName == null)
+        {
+            LOGGER.log(Level.SEVERE,
+                "Player.undoReinforcement: Nothing to unreinforce for marker "
+                    + legion);
+            return;
+        }
+        ((LegionServerSide)legion).undoReinforcement();
+
+        // We don't do the allUpdatePlayerInfo() here, because the remove
+        // is done later by iterator (so amounts are not even changed yet)
         getGame().getServer().undidRecruit(legion, recruitName);
     }
 

@@ -746,6 +746,8 @@ public final class BattleServerSide extends Battle
             defenderElim = true;
         }
         server.allRemoveDeadBattleChits();
+        // to update number of creatures in status window:
+        server.allUpdatePlayerInfo();
     }
 
     private void removeDeadCreaturesFromLegion(LegionServerSide legion)
@@ -787,6 +789,8 @@ public final class BattleServerSide extends Battle
         Legion legion = critter.getLegion();
         LegionServerSide donor = null;
 
+        PlayerServerSide player = (PlayerServerSide) legion.getPlayer();
+
         // After turn 1, offboard creatures are returned to the
         // stacks or the legion they were summoned from, with
         // no points awarded.
@@ -795,8 +799,7 @@ public final class BattleServerSide extends Battle
             if (legion == getAttacker())
             {
                 // Summoned angel.
-                Player player = legion.getPlayer();
-                donor = ((PlayerServerSide)player).getDonor();
+                donor = player.getDonor();
                 if (donor != null)
                 {
                     donor.addCreature(critter.getType(), false);
@@ -806,8 +809,8 @@ public final class BattleServerSide extends Battle
                     // summon again later this turn.
                     LOGGER.log(Level.INFO, "undosummon critter " + critter
                         + " back to marker " + donor + "");
-                    ((PlayerServerSide)player).setSummoned(false);
-                    ((PlayerServerSide)player).setDonor(null);
+                    player.setSummoned(false);
+                    player.setDonor(null);
                 }
                 else
                 {
@@ -817,9 +820,10 @@ public final class BattleServerSide extends Battle
             }
             else
             {
-                // Reinforcement.
-                // This recruit doesn't count.
-                ((LegionServerSide)legion).setRecruitName(null);
+                // This reinforcment doesn't count.
+                // Tell legion to do undo the reinforcement and trigger 
+                // sending of needed messages to clients: 
+                player.undoReinforcement(legion);
             }
         }
         else if (legion == getAttacker())

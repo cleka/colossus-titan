@@ -445,6 +445,25 @@ public final class LegionServerSide extends Legion implements
         }
     }
 
+    /*
+     * Can't use undoRecruit, because undoRecruit directly removes it, 
+     * and the iterator in removeAllDead removes as well
+     * Even if not so, undoRecruit removes the first it finds, not
+     * the one which was reinforced. 
+     */
+    void undoReinforcement()
+    {
+        if (recruitName != null)
+        {
+            CreatureType creature = game.getVariant().getCreatureByName(
+                recruitName);
+            game.getCaretaker().putOneBack(creature);
+            recruitName = null;
+            LOGGER.log(Level.INFO, "Legion " + getLongMarkerName()
+                + " undoes its reinforcement");
+        }
+    }
+
     /** Return true if this legion can summon. */
     boolean canSummonAngel()
     {

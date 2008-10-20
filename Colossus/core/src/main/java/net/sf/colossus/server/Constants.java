@@ -479,7 +479,9 @@ public final class Constants
     public static final String reasonAcquire = "Acquire";
     public static final String reasonRecruiter = "Recruiter";
     public static final String reasonRecruited = "Recruited";
+    public static final String reasonReinforced = "Reinforced";
     public static final String reasonUndidRecruit = "UndidRecruit";
+    public static final String reasonUndidReinforce = "UndidReinforce";
     public static final String reasonNegotiated = "Negotiated";
     public static final String reasonTeleport = "Teleport";
     public static final String reasonInitial = "Initial";
