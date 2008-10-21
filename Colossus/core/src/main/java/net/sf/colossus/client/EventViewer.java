@@ -753,8 +753,6 @@ final class EventViewer extends KDialog implements WindowListener,
         defenderEventLegion.setEventInfo(Constants.reasonBattleStarts);
         defenderEventLegion.setRealPlayer((PlayerClientSide)defender
             .getPlayer());
-        addEvent(attackerEventLegion);
-        addEvent(defenderEventLegion);
     }
 
     public void tellEngagementResults(Legion winner, String method, int turns)
