@@ -63,15 +63,17 @@ public class HazardTerrain extends Hazards
 
     public boolean isNonNativePenaltyTerrain()
     {
-        return (scopeForAttackEffect.equals(ScopeOfEffectOnStrike.FOREIGNERS) || scopeForDefenceEffect
-            .equals(ScopeOfEffectOnStrike.FOREIGNERS))
-            && (effectforAttackingFromTerrain
-                .equals(EffectOnStrike.SKILLPENALTY)
-                || effectforAttackingFromTerrain
-                    .equals(EffectOnStrike.POWERPENALTY)
-                || effectforDefendingInTerrain
-                    .equals(EffectOnStrike.SKILLPENALTY) || effectforDefendingInTerrain
-                .equals(EffectOnStrike.POWERPENALTY));
+        boolean effectsAttack = 
+            scopeForAttackEffect. equals(ScopeOfEffectOnStrike.FOREIGNERS)
+        && (   effectforAttackingFromTerrain.equals(EffectOnStrike.SKILLPENALTY)
+            || effectforAttackingFromTerrain.equals(EffectOnStrike.POWERPENALTY)
+           );
+        boolean effectsDefence = 
+            scopeForDefenceEffect.equals(ScopeOfEffectOnStrike.FOREIGNERS)
+        && (    effectforDefendingInTerrain.equals(EffectOnStrike.SKILLPENALTY)
+             || effectforDefendingInTerrain.equals(EffectOnStrike.POWERPENALTY)
+           );
+        return (effectsAttack || effectsDefence);
     }
 
     public boolean isNativeOnly()
@@ -116,9 +118,9 @@ public class HazardTerrain extends Hazards
     public static final HazardTerrain BRAMBLES = new HazardTerrain("Brambles",
         'b', EffectOnMovement.SLOWFOREIGNER, EffectOnMovement.SLOWFOREIGNER,
         EffectOnStrike.SKILLBONUS, ScopeOfEffectOnStrike.PATRIOTS, 1,
-        EffectOnStrike.SKILLPENALTY, ScopeOfEffectOnStrike.IMPERIALS, 1,
+        EffectOnStrike.SKILLPENALTY, ScopeOfEffectOnStrike.FOREIGNERS, 1,
         EffectOnStrike.SKILLBONUS, ScopeOfEffectOnStrike.PATRIOTS, 1,
-        EffectOnStrike.SKILLPENALTY, ScopeOfEffectOnStrike.IMPERIALS, 1,
+        EffectOnStrike.NOEFFECT, ScopeOfEffectOnStrike.ALL, 0,
         RangeStrikeSpecialEffect.RANGESTRIKESKILLPENALTY,
         SpecialEffect.NOSPECIAL);
 
