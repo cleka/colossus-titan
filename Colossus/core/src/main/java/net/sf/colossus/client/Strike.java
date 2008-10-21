@@ -898,7 +898,7 @@ public final class Strike
             // Non-native striking out of bramble: -1
             HazardTerrain terrain = hex.getTerrain();
             if (terrain.isNonNativePenaltyTerrain()
-                && !striker.getCreature().isNativeIn(terrain) && !rangestrike)
+                && !striker.getCreature().isNativeIn(terrain))
             {
                 attackerSkill--;
             }
@@ -981,6 +981,7 @@ public final class Strike
         if (client.getBattleHex(striker).getTerrain().equals(
             HazardTerrain.BRAMBLES)
             && !striker.getCreature().isNativeIn(HazardTerrain.BRAMBLES)
+            && !rangestrike
             )
         {
             strikeNumber++;
