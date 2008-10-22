@@ -325,6 +325,7 @@ public final class BattleBoard extends KFrame
                 {
                     unselectAllHexes();
                     battleMap.unselectEntranceHexes();
+                    client.resetStrikeNumbers();
                     client.doneWithStrikes();
                 }
                 else
