@@ -95,13 +95,15 @@ public final class PlayerDetailsDialog extends KDialog implements
 
         useSaveWindow(client.getOptions(), "PlayerDetails", null);
 
-        Container contentPane = getContentPane();
-        contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
-        contentPane.add(createSummaryTable());
-        contentPane.add(createLegionsTable());
-        contentPane.add(createCreaturesTable());
+        JPanel mainPane = new JPanel();
+        JScrollPane scrollPane = new JScrollPane(mainPane);
+        getContentPane().add(scrollPane);
+        mainPane.setLayout(new BoxLayout(mainPane, BoxLayout.Y_AXIS));
+        mainPane.add(createSummaryTable());
+        mainPane.add(createLegionsTable());
+        mainPane.add(createCreaturesTable());
 
-        addMouseListener(new MouseAdapter()
+        mainPane.addMouseListener(new MouseAdapter()
         {
             @Override
             public void mouseClicked(MouseEvent e)
