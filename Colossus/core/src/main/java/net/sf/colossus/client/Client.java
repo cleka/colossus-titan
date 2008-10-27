@@ -613,6 +613,9 @@ public final class Client implements IClient, IOracle
                 tellEngagementResultsAttackerLegionCertainities,
                 tellEngagementResultsDefenderLegionCertainities, isMyTurn());
         }
+        battleSite = null;
+        attacker = null;
+        defender = null;
     }
 
     /* Create the event viewer, so that it can collect data from beginning on.
