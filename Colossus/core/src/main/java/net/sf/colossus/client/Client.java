@@ -1823,7 +1823,9 @@ public final class Client implements IClient, IOracle
             }
             else if (reason.equals(Constants.reasonUndidRecruit))
             {
-                LOGGER.warning("removeCreature should not be called for undidRecruit!");
+                // normal undidRecruit does not use this, but during loading a game
+                // they appear as add- and removeCreature calls.
+                LOGGER.info("removeCreature called for undidRecruit - ignored");
             }
             else
             {
@@ -3242,14 +3244,14 @@ public final class Client implements IClient, IOracle
         int eventType;
         if (battlePhase != null)
         {
-            eventViewer.cancelReinforcement(recruitName, getTurnNumber());
             eventType = RevealEvent.eventReinforce;
+            eventViewer.cancelReinforcement(recruitName, getTurnNumber());
         }
         else
         {
             // normal undoRecruit
-            // eventViewer.removeCreature(legion.getMarkerId(), recruitName);
             eventType = RevealEvent.eventRecruit;
+            ((LegionClientSide)legion).removeCreature(recruitName);
         }
             
         ((LegionClientSide)legion).setRecruited(false);
