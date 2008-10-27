@@ -48,11 +48,17 @@ final class PickCarry extends KDialog implements ActionListener
             addButton(choice);
         }
 
-        // Don't allow exiting without making a choice, or the game will hang.
+        // client disposes us during leaveCarryMode()
+        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+
+        // Don't allow exiting without making a choice, or the game will hang
         addWindowListener(new WindowAdapter()
         {
-            // @todo: this could probably be done by using 
-            // setDefaultCloseOperation()
+            @Override
+            public void windowClosing(WindowEvent e)
+            {
+                PickCarry.this.client.leaveCarryMode();
+            }
         });
 
         pack();
@@ -125,23 +131,4 @@ final class PickCarry extends KDialog implements ActionListener
         String desc = e.getActionCommand();
         handleCarryToDescription(desc);
     }
-
-    /* TODO This does not get called, neither if defined with event
-     *      or without??
-     *      The strange thing is, in PickStrikePenalty it is done
-     *      *exactly the same way* and there it works...
-     */
-    // public void windowClosing()
-    @Override
-    public void windowClosing(WindowEvent e)
-    {
-        System.out.println("PickCarry windowClosing 1");
-        client.leaveCarryMode();
-    }
-    public void windowClosing()
-    {
-        System.out.println("PickCarry windowClosing 2");
-        client.leaveCarryMode();
-    }
-
 }
