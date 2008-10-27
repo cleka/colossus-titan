@@ -2991,6 +2991,8 @@ public final class Client implements IClient, IOracle
         this.battleTurnNumber = battleTurnNumber;
         setBattleActivePlayer(battleActivePlayer);
         this.battlePhase = battlePhase;
+        // TODO the following three are probably not needed, 
+        //      they are already set during tellEngagement()
         this.attacker = attacker;
         this.defender = defender;
         this.battleSite = hex;
