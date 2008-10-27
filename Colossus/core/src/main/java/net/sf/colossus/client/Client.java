@@ -3250,7 +3250,10 @@ public final class Client implements IClient, IOracle
         if (battlePhase != null)
         {
             eventType = RevealEvent.eventReinforce;
-            eventViewer.cancelReinforcement(recruitName, getTurnNumber());
+            if (eventViewer != null)
+            {
+                eventViewer.cancelReinforcement(recruitName, getTurnNumber());
+            }
         }
         else
         {
