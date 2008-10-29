@@ -25,22 +25,22 @@ public class CowardSimpleAI extends SimpleAI
 
     /* up the ratios a little */
 
-    static double RATIO_WIN_MINIMAL_LOSS()
+    double RATIO_WIN_MINIMAL_LOSS()
     {
         return 1.45;
     }
 
-    static double RATIO_WIN_HEAVY_LOSS()
+    double RATIO_WIN_HEAVY_LOSS()
     {
         return 1.25;
     }
     
-    static double RATIO_DRAW()
+    double RATIO_DRAW()
     {
         return 0.90;
     }
 
-    static double RATIO_LOSE_HEAVY_LOSS()
+    double RATIO_LOSE_HEAVY_LOSS()
     {
         return 0.75;
     }

@@ -1637,22 +1637,22 @@ public class SimpleAI implements AI
 
     /* can be overloaded by subclass -> not final */
 
-    static double RATIO_WIN_MINIMAL_LOSS()
+    double RATIO_WIN_MINIMAL_LOSS()
     {
         return 1.30;
     }
 
-    static double RATIO_WIN_HEAVY_LOSS()
+    double RATIO_WIN_HEAVY_LOSS()
     {
         return 1.15;
     }
 
-    static double RATIO_DRAW()
+    double RATIO_DRAW()
     {
         return 0.85;
     }
 
-    static double RATIO_LOSE_HEAVY_LOSS()
+    double RATIO_LOSE_HEAVY_LOSS()
     {
         return 0.70;
     }
