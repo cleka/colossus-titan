@@ -17,14 +17,31 @@ public class CowardSimpleAI extends SimpleAI
     {
         super(client);
 
-        /* up the ratios a little */
-        RATIO_WIN_MINIMAL_LOSS = 1.45; // 1.30;
-        RATIO_WIN_HEAVY_LOSS = 1.25; // 1.15;
-        RATIO_DRAW = 0.90; // 0.85;
-        RATIO_LOSE_HEAVY_LOSS = 0.75; // 0.70;
 
         /* this is a defensive AI, not an offensive one, so use
          the proper hints section */
         hintSectionUsed[0] = Constants.sectionDefensiveAI;
+    }
+
+    /* up the ratios a little */
+
+    static double RATIO_WIN_MINIMAL_LOSS()
+    {
+        return 1.45;
+    }
+
+    static double RATIO_WIN_HEAVY_LOSS()
+    {
+        return 1.25;
+    }
+    
+    static double RATIO_DRAW()
+    {
+        return 0.90;
+    }
+
+    static double RATIO_LOSE_HEAVY_LOSS()
+    {
+        return 0.75;
     }
 }
