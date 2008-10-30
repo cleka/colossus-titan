@@ -1190,7 +1190,7 @@ public final class Client implements IClient, IOracle
         {
             return;
         }
-        if (caretakerDisplay != null)
+        if (caretakerDisplay != null && !replayOngoing)
         {
             caretakerDisplay.update();
         }
@@ -1848,7 +1848,7 @@ public final class Client implements IClient, IOracle
             // hack to remove legions correctly during load
             removeLegion(legion);
         }
-        if (board != null)
+        if (board != null && !replayOngoing)
         {
             GUIMasterHex hex = board.getGUIHexByMasterHex(legion
                 .getCurrentHex());
