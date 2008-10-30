@@ -25,21 +25,25 @@ public class CowardSimpleAI extends SimpleAI
 
     /* up the ratios a little */
 
+    @Override
     double RATIO_WIN_MINIMAL_LOSS()
     {
         return 1.45;
     }
 
+    @Override
     double RATIO_WIN_HEAVY_LOSS()
     {
         return 1.25;
     }
-    
+
+    @Override
     double RATIO_DRAW()
     {
         return 0.90;
     }
 
+    @Override
     double RATIO_LOSE_HEAVY_LOSS()
     {
         return 0.75;
