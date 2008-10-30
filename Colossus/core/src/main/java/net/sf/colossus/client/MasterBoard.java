@@ -2214,11 +2214,15 @@ public final class MasterBoard extends JPanel
         makeDoneCloseWindow();
     }
 
-    public void setReplayMode(int currTurn, int maxTurn)
+    public void setReplayMode()
+    {
+        disableDoneAction("please wait...");
+    }
+
+    public void updateReplayText(int currTurn, int maxTurn)
     {
         bottomBar.setPhase("Replay ongoing, " + currTurn + " of " + maxTurn
             + " turns processed");
-        disableDoneAction("please wait...");
     }
 
     public void setGameOverState(String message)

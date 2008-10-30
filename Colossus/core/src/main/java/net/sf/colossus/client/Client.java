@@ -2233,7 +2233,8 @@ public final class Client implements IClient, IOracle
             replayMaxTurn = maxTurn;
             if (board != null)
             {
-                board.setReplayMode(0, replayMaxTurn);
+                board.setReplayMode();
+                board.updateReplayText(0, replayMaxTurn);
             }
         }
         else
@@ -2249,9 +2250,9 @@ public final class Client implements IClient, IOracle
     {
         if (board != null)
         {
-            board.setReplayMode(nowTurn, replayMaxTurn);
             if (nowTurn != replayLastTurn)
             {
+                board.updateReplayText(nowTurn, replayMaxTurn);
                 replayLastTurn = nowTurn;
             }
         }
