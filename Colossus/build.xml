@@ -266,7 +266,7 @@
 
   <!--  public-build ("Official" public build) -->
   <target name="remote-inst-public-build"
-  depends="clean,init,signall"
+  depends="clean,init,signall,dist"
   description="copy files into public-build -directory under htdocs tree on SF">
 
     <exec executable="rsync">
@@ -286,12 +286,11 @@
     </exec>
     <!--- TODO how to do this for the two other builds, or do at all? 
                    Or use the download feature on SF site instead? -->
-    <!--                       
-        <exec executable="rsync">
-                <arg line="-a ${ZIPFILE} ${SERVER}:${DOWNLOAD_DIR}" />
-        </exec>
--->
+    <exec executable="rsync">
+            <arg line="-a ${ZIPFILE} ${SERVER}:${DOWNLOAD_DIR}" />
+    </exec>
   </target>
+
   <!--  public-testing (Public testing build, usually from trunk-head.) -->
   <target name="remote-inst-public-testing"
   depends="clean,init,signall"
