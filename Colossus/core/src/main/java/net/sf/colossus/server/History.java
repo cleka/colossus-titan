@@ -274,7 +274,11 @@ public class History
                 legion = player.getLegionByMarkerId(markerId);
             }
             String reason = "<unknown>";
-            if (all)
+            if (((PlayerServerSide)player).getDeadBeforeSave())
+            {
+                // Skip for players that will be dead by end of replay
+            }
+            else if (all)
             {
                 server.allRevealCreatures(legion, creatureNames, reason);
             }
@@ -332,7 +336,11 @@ public class History
                 parentLegion.removeCreature(creature, false, false);
             }
 
-            server.didSplit(parentLegion, childLegion, creatureNames, turn);
+            // Skip for players that will be dead by end of replay
+            if (!player.getDeadBeforeSave())
+            {
+                server.didSplit(parentLegion, childLegion, creatureNames, turn);
+            }
         }
         else if (el.getName().equals("Merge"))
         {
@@ -344,7 +352,11 @@ public class History
             LegionServerSide splitoff = game.getLegionByMarkerId(splitoffId);
             LegionServerSide survivor = game.getLegionByMarkerId(survivorId);
 
-            server.undidSplit(splitoff, survivor, false, turn);
+            // Skip for players that will be dead by end of replay
+            if (!survivor.getPlayer().getDeadBeforeSave())
+            {
+                server.undidSplit(splitoff, survivor, false, turn);
+            }
             // Add them back to parent:
             while (splitoff.getHeight() > 0)
             {
@@ -364,7 +376,11 @@ public class History
             LegionServerSide legion = game.getLegionByMarkerId(markerId);
             legion.addCreature(game.getVariant().getCreatureByName(
                 creatureName), false);
-            server.allTellAddCreature(legion, creatureName, false, reason);
+            // Skip for players that will be dead by end of replay
+            if (!legion.getPlayer().getDeadBeforeSave())
+            {
+                server.allTellAddCreature(legion, creatureName, false, reason);
+            }
             LOGGER.finest("Legion '" + markerId + "' now contains "
                 + legion.getCreatures());
         }
@@ -397,7 +413,11 @@ public class History
             legion.removeCreature(game.getVariant().getCreatureByName(
                 creatureName), false, false);
 
-            server.allTellRemoveCreature(legion, creatureName, false, reason);
+            // Skip for players that will be dead by end of replay
+            if (!legion.getPlayer().getDeadBeforeSave())
+            {
+                server.allTellRemoveCreature(legion, creatureName, false, reason);
+            }
             LOGGER.finest("Legion '" + markerId + "' now contains "
                 + legion.getCreatures());
             if (legion.getHeight() == 0)
