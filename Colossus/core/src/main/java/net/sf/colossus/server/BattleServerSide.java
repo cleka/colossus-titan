@@ -492,8 +492,8 @@ public final class BattleServerSide extends Battle
         this.carryDamage = carryDamage;
     }
 
-    /** Recursively find moves from this hex.  Return an array of hex IDs for
-     *  all legal destinations.  Do not double back.  If ignoreMobileAllies
+    /** Recursively find moves from this hex.  Return a set of string hex IDs 
+     *  for all legal destinations.  Do not double back.  If ignoreMobileAllies
      *  is true, pretend that allied creatures that can move out of the
      *  way are not there. */
     private Set<String> findMoves(BattleHex hex, CreatureServerSide critter,

@@ -29,8 +29,8 @@ final class BattleMovement
         this.client = client;
     }
 
-    /** Recursively find moves from this hex.  Return an array of hex IDs for
-     *  all legal destinations.  Do not double back.  */
+    /** Recursively find moves from this hex.  Return a set of string hex IDs 
+     *  for all legal destinations.  Do not double back.  */
     private Set<String> findMoves(BattleHex hex, CreatureType creature,
         boolean flies, int movesLeft, int cameFrom, boolean first)
     {
