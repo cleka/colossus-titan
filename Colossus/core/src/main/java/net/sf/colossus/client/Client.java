@@ -4,7 +4,6 @@ package net.sf.colossus.client;
 import java.awt.Cursor;
 import java.awt.Graphics2D;
 import java.awt.GraphicsDevice;
-import java.awt.Point;
 import java.awt.Window;
 import java.awt.geom.AffineTransform;
 import java.io.InputStream;
@@ -152,11 +151,6 @@ public final class Client implements IClient, IOracle
 
     // Information on the current moving legion.
     private LegionClientSide mover;
-
-    // @TODO: Those should be moved to MasterBoard, too - attached to
-    // the respective legion/marker.
-    private final List<Chit> recruitedChits = new ArrayList<Chit>();
-    private final List<Chit> possibleRecruitChits = new ArrayList<Chit>();
 
     // Per-client and per-player options.
     private final Options options;
@@ -427,7 +421,6 @@ public final class Client implements IClient, IOracle
     {
         undoAllMoves(); // XXX Maybe move entirely to server
         clearUndoStack();
-        clearRecruitChits();
         tookMulligan = true;
 
         // TODO: should not be needed any more here?
@@ -729,14 +722,14 @@ public final class Client implements IClient, IOracle
      */
     void rescaleAllWindows()
     {
-        clearRecruitChits();
-
         if (statusScreen != null)
         {
             statusScreen.rescale();
         }
         if (board != null)
         {
+            board.clearRecruitedChits();
+            board.clearPossibleRecruitChits();
             board.rescale();
         }
         if (battleBoard != null)
@@ -1720,16 +1713,11 @@ public final class Client implements IClient, IOracle
             getOwningPlayer().addMarkerAvailable(legion.getMarkerId());
         }
 
-        // XXX Not perfect -- Need to track recruitChits by legion.
-        removeRecruitChit(legion.getCurrentHex());
-
         legion.getPlayer().removeLegion(legion);
-        if (board != null)
+        if (board != null && !replayOngoing)
         {
-            if (!replayOngoing)
-            {
-                board.alignLegions(legion.getCurrentHex());
-            }
+            ((LegionClientSide)legion).clearAllChits();
+            board.alignLegions(legion.getCurrentHex());
         }
     }
 
@@ -1750,7 +1738,7 @@ public final class Client implements IClient, IOracle
         legion.setMoved(moved);
         legion.setTeleported(teleported);
         ((LegionClientSide)legion).setEntrySide(entrySide);
-        ((LegionClientSide)legion).setLastRecruit(lastRecruit);
+        ((LegionClientSide)legion).setRecruitName(lastRecruit);
     }
 
     /** Return the full basename for a titan in legion,
@@ -2026,166 +2014,32 @@ public final class Client implements IClient, IOracle
         battleChits.add(chit);
     }
 
-    List<Chit> getRecruitedChits()
+
+    public int getRecruitChitMode()
     {
-        return Collections.unmodifiableList(recruitedChits);
+        return recruitChitMode;
     }
 
-    List<Chit> getPossibleRecruitChits()
-    {
-        return Collections.unmodifiableList(possibleRecruitChits);
-    }
-
-    void addRecruitedChit(String imageName, MasterHex masterHex)
-    {
-        int scale = 2 * Scale.get();
-        GUIMasterHex hex = board.getGUIHexByMasterHex(masterHex);
-        Chit chit = new Chit(scale, imageName);
-        Point startingPoint = hex.getOffCenter();
-        Point point = new Point(startingPoint);
-        point.x -= scale / 2;
-        point.y -= scale / 2;
-        chit.setLocation(point);
-        recruitedChits.add(chit);
-    }
-
-    // one chit, one hex
-    void addPossibleRecruitChit(String imageName, MasterHex masterHex)
-    {
-        int scale = 2 * Scale.get();
-        GUIMasterHex hex = board.getGUIHexByMasterHex(masterHex);
-        Chit chit = new Chit(scale, imageName);
-        Point startingPoint = hex.getOffCenter();
-        Point point = new Point(startingPoint);
-        point.x -= scale / 2;
-        point.y -= scale / 2;
-        chit.setLocation(point);
-        possibleRecruitChits.add(chit);
-    }
-
-    // all possible recuit chits, one hex
-    void addPossibleRecruitChits(List<CreatureType> imageNameList,
-        MasterHex masterHex)
-    {
-        int size = imageNameList.size();
-        int num = size;
-        for (CreatureType creatureType : imageNameList)
-        {
-            String imageName = creatureType.getName();
-            int scale = 2 * Scale.get();
-            GUIMasterHex hex = board.getGUIHexByMasterHex(masterHex);
-            Chit chit = new Chit(scale, imageName);
-            Point startingPoint = hex.getOffCenter();
-            Point point = new Point(startingPoint);
-            point.x -= scale / 2;
-            point.y -= scale / 2;
-            int offset = (num - ((size / 2) + 1));
-            point.x += ((offset * scale) + ((size % 2 == 0 ? (scale / 2) : 0)))
-                / size;
-            point.y += ((offset * scale) + ((size % 2 == 0 ? (scale / 2) : 0)))
-                / size;
-            num--;
-            chit.setLocation(point);
-            possibleRecruitChits.add(chit);
-        }
-    }
-
-    // all hexes
     public void addPossibleRecruitChits(LegionClientSide legion,
         Set<MasterHex> hexes)
     {
-        clearPossibleRecruitChits();
-
         if (recruitChitMode == Options.showRecruitChitsNumNone)
         {
             return;
         }
 
-        // set is a set of possible target hexes
-        List<CreatureType> oneElemList = new ArrayList<CreatureType>();
-
-        for (MasterHex hex : hexes)
+        if (board != null)
         {
-            List<CreatureType> recruits = findEligibleRecruits(legion, hex);
-
-            if (recruits != null && recruits.size() > 0)
-            {
-                switch (recruitChitMode)
-                {
-                    case Options.showRecruitChitsNumAll:
-                        break;
-
-                    case Options.showRecruitChitsNumRecruitHint:
-                        oneElemList.clear();
-                        CreatureType hint = chooseBestPotentialRecruit(legion,
-                            hex, recruits);
-                        oneElemList.add(hint);
-                        recruits = oneElemList;
-                        break;
-
-                    case Options.showRecruitChitsNumStrongest:
-                        oneElemList.clear();
-                        CreatureType strongest = recruits
-                            .get(recruits.size() - 1);
-                        oneElemList.add(strongest);
-                        recruits = oneElemList;
-                        break;
-                }
-                addPossibleRecruitChits(recruits, hex);
-            }
+            board.addPossibleRecruitChits(legion, hexes);
         }
     }
+
 
     CreatureType chooseBestPotentialRecruit(LegionClientSide legion,
         MasterHex hex, List<CreatureType> recruits)
     {
         CreatureType recruit = ai.getVariantRecruitHint(legion, hex, recruits);
         return recruit;
-    }
-
-    // TODO is this code for the MasterBoard class?
-    void removeRecruitChit(MasterHex masterHex)
-    {
-        Iterator<Chit> it = recruitedChits.iterator();
-        while (it.hasNext())
-        {
-            Chit chit = it.next();
-            // TODO the next line can cause an NPE when the user closes the client app
-            GUIMasterHex hex = board.getGUIHexByMasterHex(masterHex);
-            if (hex != null && hex.contains(chit.getCenter()))
-            {
-                it.remove();
-                return;
-            }
-        }
-        Iterator<Chit> it2 = possibleRecruitChits.iterator();
-        while (it2.hasNext())
-        {
-            Chit chit = it2.next();
-            // TODO the next line can cause an NPE when the user closes the client app
-            GUIMasterHex hex = board.getGUIHexByMasterHex(masterHex);
-            if (hex != null && hex.contains(chit.getCenter()))
-            {
-                it2.remove();
-                return;
-            }
-        }
-    }
-
-    void clearPossibleRecruitChits()
-    {
-        clearRecruitChits();
-    }
-
-    void clearRecruitChits()
-    {
-        recruitedChits.clear();
-        possibleRecruitChits.clear();
-        // TODO Only repaint needed hexes.
-        if (board != null)
-        {
-            board.repaint();
-        }
     }
 
     private void clearUndoStack()
@@ -3224,24 +3078,18 @@ public final class Client implements IClient, IOracle
             Constants.reasonReinforced : Constants.reasonRecruited);
         
         addCreature(legion, recruitName, reason);
-
-        ((LegionClientSide)legion).setRecruited(true);
-        ((LegionClientSide)legion).setLastRecruit(recruitName);
-
-        if (eventViewer != null)
-        {
-            eventViewer.recruitEvent(legion.getMarkerId(), (legion)
-                .getHeight(), recruitName, recruiters, reason);
-        }
+        ((LegionClientSide)legion).setRecruitName(recruitName);
 
         if (board != null)
         {
-            // TODO should be in MasterBoard?
-            GUIMasterHex hex = board.getGUIHexByMasterHex(legion
-                .getCurrentHex());
-            addRecruitedChit(recruitName, legion.getCurrentHex());
-            hex.repaint();
-            board.highlightPossibleRecruits();
+            board.addRecruitedChit((LegionClientSide)legion);
+            board.highlightPossibleRecruitLegionHexes();
+
+            if (eventViewer != null)
+            {
+                eventViewer.recruitEvent(legion.getMarkerId(), (legion)
+                    .getHeight(), recruitName, recruiters, reason);
+            }
         }
     }
 
@@ -3262,20 +3110,18 @@ public final class Client implements IClient, IOracle
             eventType = RevealEvent.eventRecruit;
             ((LegionClientSide)legion).removeCreature(recruitName);
         }
-            
-        ((LegionClientSide)legion).setRecruited(false);
-        if (eventViewer != null)
-        {
-            eventViewer.undoEvent(eventType, legion
-                .getMarkerId(), null, turnNumber);
-        }
+
+        ((LegionClientSide)legion).setRecruitName(null);
         if (board != null)
         {
-            GUIMasterHex hex = board.getGUIHexByMasterHex(legion
-                .getCurrentHex());
-            removeRecruitChit(legion.getCurrentHex());
-            hex.repaint();
-            board.highlightPossibleRecruits();
+            board.cleanRecruitedChit((LegionClientSide)legion);
+            board.highlightPossibleRecruitLegionHexes();
+            
+            if (eventViewer != null)
+            {
+                eventViewer.undoEvent(eventType, legion
+                    .getMarkerId(), null, turnNumber);
+            }
         }
     }
 
@@ -3336,7 +3182,7 @@ public final class Client implements IClient, IOracle
             {
                 legion.setMoved(false);
                 legion.setTeleported(false);
-                legion.setRecruited(false);
+                legion.setRecruitName(null);
             }
         }
     }
@@ -4271,7 +4117,6 @@ public final class Client implements IClient, IOracle
         MasterHex currentHex, String entrySide, boolean teleport,
         String teleportingLord, boolean splitLegionHasForcedMove)
     {
-        removeRecruitChit(startingHex);
         if (isMyLegion(legion))
         {
             pushUndoStack(legion.getMarkerId());
@@ -4293,8 +4138,10 @@ public final class Client implements IClient, IOracle
                     null, 0);
             }
         }
+                
         if (board != null)
         {
+            board.clearPossibleRecruitChits();
             board.alignLegions(startingHex);
             board.alignLegions(currentHex);
             board.highlightUnmovedLegions();
@@ -4317,17 +4164,18 @@ public final class Client implements IClient, IOracle
     public void undidMove(Legion legion, MasterHex formerHex,
         MasterHex currentHex, boolean splitLegionHasForcedMove)
     {
-        removeRecruitChit(formerHex);
-        removeRecruitChit(currentHex);
+        ((LegionClientSide)legion).setRecruitName(null);
         legion.setCurrentHex(currentHex);
         legion.setMoved(false);
         boolean didTeleport = legion.hasTeleported();
         legion.setTeleported(false);
         if (board != null)
         {
+            board.clearPossibleRecruitChits();
             board.alignLegions(formerHex);
             board.alignLegions(currentHex);
             board.highlightUnmovedLegions();
+            board.repaint();
             if (isMyTurn())
             {
                 if (isUndoStackEmpty())
@@ -4928,7 +4776,6 @@ public final class Client implements IClient, IOracle
         {
             String markerId = (String)popUndoStack();
             server.undoMove(getLegion(markerId));
-            clearRecruitChits();
         }
     }
 
@@ -5000,6 +4847,11 @@ public final class Client implements IClient, IOracle
 
     void undoAllMoves()
     {
+        if (board != null)
+        {
+            board.clearRecruitedChits();
+            board.clearPossibleRecruitChits();
+        }
         while (!isUndoStackEmpty())
         {
             undoLastMove();
@@ -5056,7 +4908,10 @@ public final class Client implements IClient, IOracle
             return;
         }
         server.doneWithSplits();
-        clearRecruitChits();
+        if (board != null)
+        {
+            board.clearRecruitedChits();
+        }
     }
 
     void doneWithMoves()
@@ -5066,7 +4921,11 @@ public final class Client implements IClient, IOracle
             return;
         }
         aiPause();
-        clearRecruitChits();
+        if (board != null)
+        {
+            board.clearRecruitedChits();
+            board.clearPossibleRecruitChits();
+        }
         server.doneWithMoves();
     }
 
@@ -5288,7 +5147,12 @@ public final class Client implements IClient, IOracle
 
         if (isMyLegion(child))
         {
-            clearRecruitChits();
+            if (board != null)
+            {
+                board.clearRecruitedChits();
+                board.clearPossibleRecruitChits();
+            }
+
             pushUndoStack(child.getMarkerId());
             getOwningPlayer().removeMarkerAvailable(child.getMarkerId());
         }

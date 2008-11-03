@@ -56,6 +56,11 @@ public abstract class Legion
     protected List<AcquirableDecision> decisions = null;
     protected int angelsToAcquire;
 
+    /**
+     * Name of the creature recruited in last recruit phase
+     */
+    private String recruitName;
+
     // TODO legions should be created through factory from the player instances
     public Legion(final Player player, String markerId, MasterHex hex)
     {
@@ -186,10 +191,28 @@ public abstract class Legion
      */
     public abstract int getPointValue();
 
-    /**
-     * TODO unify between the two derived classes if possible
-     */
-    public abstract boolean hasRecruited();
+    
+    public String getRecruitName()
+    {
+        return recruitName;
+    }
+
+    public void setRecruitName(String recruitName)
+    {
+        if (recruitName == null || recruitName.equals("null"))
+        {
+            this.recruitName = null;
+        }
+        else
+        {
+            this.recruitName = recruitName;
+        }
+    }
+
+    public boolean hasRecruited()
+    {
+        return (recruitName != null);
+    }
 
     public boolean hasSummonable()
     {

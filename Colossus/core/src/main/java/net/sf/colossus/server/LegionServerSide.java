@@ -45,7 +45,6 @@ public final class LegionServerSide extends Legion implements
     /**
      * TODO this should be a {@link Creature} or {@link CreatureType}
      */
-    private String recruitName;
     private int battleTally;
     private final GameServerSide game;
 
@@ -403,43 +402,27 @@ public final class LegionServerSide extends Legion implements
     {
         startingHex = getCurrentHex();
         setMoved(false);
-        recruitName = null;
-    }
-
-    @Override
-    public boolean hasRecruited()
-    {
-        return (recruitName != null);
-    }
-
-    String getRecruitName()
-    {
-        return recruitName;
-    }
-
-    void setRecruitName(String recruitName)
-    {
-        this.recruitName = recruitName;
+        setRecruitName(null);
     }
 
     /** hasMoved() is a separate check, so that this function can be used in
      *  battle as well as during the muster phase. */
     boolean canRecruit()
     {
-        return (recruitName == null && getHeight() <= 6
+        return (getRecruitName() == null && getHeight() <= 6
             && !getPlayer().isDead() && !(game.findEligibleRecruits(this,
             getCurrentHex()).isEmpty()));
     }
 
     void undoRecruit()
     {
-        if (recruitName != null)
+        if (hasRecruited())
         {
             CreatureType creature = game.getVariant().getCreatureByName(
-                recruitName);
+                getRecruitName());
             game.getCaretaker().putOneBack(creature);
             removeCreature(creature, false, true);
-            recruitName = null;
+            setRecruitName(null);
             LOGGER.log(Level.INFO, "Legion " + getLongMarkerName()
                 + " undoes its recruit");
         }
@@ -453,12 +436,12 @@ public final class LegionServerSide extends Legion implements
      */
     void undoReinforcement()
     {
-        if (recruitName != null)
+        if (getRecruitName() != null)
         {
             CreatureType creature = game.getVariant().getCreatureByName(
-                recruitName);
+                getRecruitName());
             game.getCaretaker().putOneBack(creature);
-            recruitName = null;
+            setRecruitName(null);
             LOGGER.log(Level.INFO, "Legion " + getLongMarkerName()
                 + " undoes its reinforcement");
         }

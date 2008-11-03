@@ -64,6 +64,7 @@ import net.sf.colossus.util.KFrame;
 import net.sf.colossus.util.NullCheckPredicate;
 import net.sf.colossus.util.Options;
 import net.sf.colossus.util.ResourceLoader;
+import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.MasterHex;
 import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
@@ -113,6 +114,9 @@ public final class MasterBoard extends JPanel
      *         of markers.
      */
     private final List<Marker> markersOnBoard = new ArrayList<Marker>();
+
+    private final List<LegionClientSide> recruitedChitsLegions = new ArrayList<LegionClientSide>();
+    private final HashMap<MasterHex, List<Chit>> possibleRecruitChits = new HashMap<MasterHex, List<Chit>>();
 
     /** The scrollbarspanel, needed to correct lastPoint. */
     private JScrollPane scrollPane;
@@ -371,7 +375,10 @@ public final class MasterBoard extends JPanel
         {
             public void actionPerformed(ActionEvent e)
             {
-                client.clearRecruitChits();
+                clearRecruitedChits();
+                clearPossibleRecruitChits();
+                // TODO Only repaint needed hexes.
+                repaint();
             }
         };
 
@@ -389,6 +396,8 @@ public final class MasterBoard extends JPanel
                 }
                 else if (phase == Constants.Phase.MOVE)
                 {
+                    clearRecruitedChits();
+                    clearPossibleRecruitChits();
                     client.undoLastMove();
                     highlightUnmovedLegions();
                 }
@@ -399,7 +408,7 @@ public final class MasterBoard extends JPanel
                 else if (phase == Constants.Phase.MUSTER)
                 {
                     client.undoLastRecruit();
-                    highlightPossibleRecruits();
+                    highlightPossibleRecruitLegionHexes();
                 }
                 else
                 {
@@ -432,7 +441,7 @@ public final class MasterBoard extends JPanel
                 else if (phase == Constants.Phase.MUSTER)
                 {
                     client.undoAllRecruits();
-                    highlightPossibleRecruits();
+                    highlightPossibleRecruitLegionHexes();
                 }
                 else
                 {
@@ -1241,7 +1250,7 @@ public final class MasterBoard extends JPanel
             mi = phaseMenu.add(withdrawFromGameAction);
             mi.setMnemonic(KeyEvent.VK_W);
 
-            highlightPossibleRecruits();
+            highlightPossibleRecruitLegionHexes();
         }
         else
         {
@@ -1250,7 +1259,10 @@ public final class MasterBoard extends JPanel
         }
     }
 
-    void highlightPossibleRecruits()
+    /**
+     * Highlight all hexes with legions that (still) can do recruiting
+     */
+    void highlightPossibleRecruitLegionHexes()
     {
         unselectAllHexes();
         selectHexesByLabels(client.getPossibleRecruitHexes());
@@ -1661,7 +1673,7 @@ public final class MasterBoard extends JPanel
         }
         else if (phase == Constants.Phase.MOVE)
         {
-            client.clearRecruitChits();
+            clearPossibleRecruitChits();
             client.setMover(null);
             highlightUnmovedLegions();
         }
@@ -1671,7 +1683,7 @@ public final class MasterBoard extends JPanel
         }
         else if (phase == Constants.Phase.MUSTER)
         {
-            highlightPossibleRecruits();
+            highlightPossibleRecruitLegionHexes();
         }
     }
 
@@ -1828,7 +1840,8 @@ public final class MasterBoard extends JPanel
             // If we're moving, and have selected a legion which
             // has not yet moved, and this hex is a legal
             // destination, move the legion here.
-            client.clearRecruitChits();
+            clearRecruitedChits();
+            clearPossibleRecruitChits();
             client.doMove(hex);
             actOnMisclick(); // Yes, even if the move was good.
         }
@@ -1910,8 +1923,8 @@ public final class MasterBoard extends JPanel
         {
             paintHighlights((Graphics2D)g);
             paintMarkers(g);
-            paintPossibleRecruitChits(g);
             paintRecruitedChits(g);
+            paintPossibleRecruitChits(g);
             paintMovementDie(g);
         }
         catch (ConcurrentModificationException ex)
@@ -1971,10 +1984,9 @@ public final class MasterBoard extends JPanel
 
     private void paintRecruitedChits(Graphics g)
     {
-        Iterator<Chit> it = client.getRecruitedChits().iterator();
-        while (it.hasNext())
+        for (LegionClientSide legion : recruitedChitsLegions)
         {
-            Chit chit = it.next();
+            Chit chit = legion.getRecruitChit();
             if (chit != null && g.getClipBounds().intersects(chit.getBounds()))
             {
                 chit.paintComponent(g);
@@ -1982,15 +1994,158 @@ public final class MasterBoard extends JPanel
         }
     }
 
-    private void paintPossibleRecruitChits(Graphics g)
+    void removeRecruitChit(MasterHex masterHex)
     {
-        Iterator<Chit> it = client.getPossibleRecruitChits().iterator();
+        Iterator<LegionClientSide> it = recruitedChitsLegions.iterator();
         while (it.hasNext())
         {
-            Chit chit = it.next();
-            if (chit != null && g.getClipBounds().intersects(chit.getBounds()))
+            LegionClientSide legion = it.next();
+            Chit chit = legion.getRecruitChit();
+            
+            // TODO the next line can cause an NPE when the user closes the client app
+            GUIMasterHex hex = getGUIHexByMasterHex(masterHex);
+            if (hex != null && hex.contains(chit.getCenter()))
             {
-                chit.paintComponent(g);
+                it.remove();
+                return;
+            }
+        }
+        
+        possibleRecruitChits.remove(masterHex);
+    }
+    
+    // all hexes
+    public void addPossibleRecruitChits(LegionClientSide legion,
+        Set<MasterHex> hexes)
+    {
+        clearPossibleRecruitChits();
+
+        // set is a set of possible target hexes
+        List<CreatureType> oneElemList = new ArrayList<CreatureType>();
+
+        for (MasterHex hex : hexes)
+        {
+            List<CreatureType> recruits = client.findEligibleRecruits(legion, hex);
+
+            if (recruits != null && recruits.size() > 0)
+            {
+                switch (client.getRecruitChitMode())
+                {
+                    case Options.showRecruitChitsNumAll:
+                        break;
+
+                    case Options.showRecruitChitsNumRecruitHint:
+                        oneElemList.clear();
+                        CreatureType hint = client.chooseBestPotentialRecruit(
+                            legion, hex, recruits);
+                        oneElemList.add(hint);
+                        recruits = oneElemList;
+                        break;
+
+                    case Options.showRecruitChitsNumStrongest:
+                        oneElemList.clear();
+                        CreatureType strongest = recruits
+                            .get(recruits.size() - 1);
+                        oneElemList.add(strongest);
+                        recruits = oneElemList;
+                        break;
+                }
+                addPossibleRecruitChits(recruits, hex);
+            }
+        }
+    }
+
+    void addRecruitedChit(LegionClientSide legion)
+    {
+        GUIMasterHex hex = getGUIHexByMasterHex(legion
+            .getCurrentHex());
+        legion.makeOrCleanRecruitChit();
+        recruitedChitsLegions.add(legion);
+        hex.repaint();
+    }
+
+    void cleanRecruitedChit(LegionClientSide legion)
+    {
+        GUIMasterHex hex = getGUIHexByMasterHex(legion
+            .getCurrentHex());
+        legion.makeOrCleanRecruitChit();
+        recruitedChitsLegions.remove(legion);
+        hex.repaint();
+    }
+    
+    // one single chit, one hex
+    void addPossibleRecruitChit(String imageName, MasterHex masterHex)
+    {
+        int scale = 2 * Scale.get();
+        GUIMasterHex hex = getGUIHexByMasterHex(masterHex);
+        Chit chit = new Chit(scale, imageName);
+        Point startingPoint = hex.getOffCenter();
+        Point point = new Point(startingPoint);
+        point.x -= scale / 2;
+        point.y -= scale / 2;
+        chit.setLocation(point);
+        List<Chit> list = new ArrayList<Chit>();
+        list.add(chit);
+        possibleRecruitChits.put(masterHex, list);
+    }
+
+    // all possible recuit chits, one hex
+    void addPossibleRecruitChits(List<CreatureType> imageNameList,
+        MasterHex masterHex)
+    {
+        List<Chit> list = new ArrayList<Chit>();
+        int size = imageNameList.size();
+        int num = size;
+        for (CreatureType creatureType : imageNameList)
+        {
+            String imageName = creatureType.getName();
+            int scale = 2 * Scale.get();
+            GUIMasterHex hex = getGUIHexByMasterHex(masterHex);
+            Chit chit = new Chit(scale, imageName);
+            Point startingPoint = hex.getOffCenter();
+            Point point = new Point(startingPoint);
+            point.x -= scale / 2;
+            point.y -= scale / 2;
+            int offset = (num - ((size / 2) + 1));
+            point.x += ((offset * scale) + ((size % 2 == 0 ? (scale / 2) : 0)))
+                / size;
+            point.y += ((offset * scale) + ((size % 2 == 0 ? (scale / 2) : 0)))
+                / size;
+            num--;
+            chit.setLocation(point);
+            list.add(chit);
+        }
+        possibleRecruitChits.put(masterHex, list);
+    }
+
+    public void clearRecruitedChits()
+    {
+        recruitedChitsLegions.clear();        
+    }
+
+    public void clearPossibleRecruitChits()
+    {
+        Set<MasterHex> hexes = possibleRecruitChits.keySet();
+        possibleRecruitChits.clear();
+        for (MasterHex hex : hexes)
+        {
+            GUIMasterHex guiHex = getGUIHexByMasterHex(hex);
+            guiHex.repaint();
+        }
+    }
+
+    private void paintPossibleRecruitChits(Graphics g)
+    {
+        // Each returned list is the list of chits for one hex
+        for (List<Chit> chits : possibleRecruitChits.values())
+        {
+            for (Chit chit : chits)
+            {
+                // TODO is this != null needed?
+                if (chit != null)
+                {
+                    chit.paintComponent(g);
+                }
             }
         }
     }

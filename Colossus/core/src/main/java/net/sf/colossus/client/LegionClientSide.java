@@ -1,6 +1,7 @@
 package net.sf.colossus.client;
 
 
+import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -12,7 +13,6 @@ import java.util.logging.Logger;
 import net.sf.colossus.game.Creature;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.server.Constants;
-import net.sf.colossus.server.LegionServerSide;
 import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.MasterHex;
@@ -30,10 +30,6 @@ import net.sf.colossus.variant.MasterHex;
  * -getMarker()
  * -setMarker(Marker)
  *    requires abstraction of the client.Marker class first, should replace markerId member
- * -hasRecruited()
- * -setLastRecruit(String)
- * -setRecruited(boolean)
- *    requires a bit of alignment with {@link LegionServerSide#setRecruitName(String)} etc.
  * 
  * @version $Id$ 
  * @author David Ripton
@@ -48,9 +44,11 @@ public final class LegionClientSide extends Legion implements
     private final Client client;
 
     private Marker marker;
-    private boolean recruited;
     private PredictSplitNode myNode;
     private final boolean isMyLegion;
+    
+    private Chit recruitChit = null;
+    
 
     // TODO the Client parameter should be a Game(ClientSide), which doesn't exist yet
     public LegionClientSide(String markerId, Client client, MasterHex hex)
@@ -393,27 +391,41 @@ public final class LegionClientSide extends Legion implements
         return (numInHex == 2);
     }
 
-    void setLastRecruit(String lastRecruit)
+    /**
+     * If recruitName is set, create the chit for it, otherwise also set
+     * the chit to null.
+     *
+     */
+    public void makeOrCleanRecruitChit()
     {
-        if (lastRecruit == null || lastRecruit.equals("null"))
+        if (getRecruitName() != null)
         {
-            setRecruited(false);
+            MasterHex masterHex = getCurrentHex();
+            int scale = 2 * Scale.get();
+            GUIMasterHex hex = client.getBoard().getGUIHexByMasterHex(masterHex);
+            Chit chit = new Chit(scale, getRecruitName());
+            Point startingPoint = hex.getOffCenter();
+            Point point = new Point(startingPoint);
+            point.x -= scale / 2;
+            point.y -= scale / 2;
+            chit.setLocation(point);
+            recruitChit = chit;
         }
         else
         {
-            setRecruited(true);
+            recruitChit = null;
         }
     }
-
-    void setRecruited(boolean recruited)
+   
+    public Chit getRecruitChit()
     {
-        this.recruited = recruited;
+        return recruitChit;
     }
 
-    @Override
-    public boolean hasRecruited()
+    public void clearAllChits()
     {
-        return recruited;
+        recruitChit = null;
+        makeOrCleanRecruitChit();
     }
 
     /** Return true if the legion has moved and can recruit. */
