@@ -2149,20 +2149,25 @@ public final class Server extends Thread implements IServer
         }
     }
 
-    /** Callback from game after this legion was split off. */
-    void didSplit(MasterHex hex, Legion parent, Legion child, int height)
+    /** Called from game after this legion was split off, or by history */
+    void allTellDidSplit(Legion parent, Legion child, int turn, boolean history)
     {
+        MasterHex hex = parent.getCurrentHex();
+        int childSize = child.getHeight();
+
         LOGGER.log(Level.FINER, "Server.didSplit " + hex + " " + parent + " "
-            + child + " " + height);
+            + child + " " + childSize);
         allUpdatePlayerInfo();
 
         IClient activeClient = getClient(game.getActivePlayer());
 
         List<String> splitoffs = ((LegionServerSide)child).getImageNames();
-        activeClient.didSplit(hex, parent, child, height, splitoffs, game
-            .getTurnNumber());
+        activeClient.didSplit(hex, parent, child, childSize, splitoffs, turn);
 
-        game.splitEvent(parent, child, splitoffs);
+        if (history)
+        {
+            game.splitEvent(parent, child, splitoffs);
+        }
 
         if (!game.getOption(Options.allStacksVisible))
         {
@@ -2175,33 +2180,7 @@ public final class Server extends Thread implements IServer
             IClient client = it.next();
             if (client != activeClient)
             {
-                client.didSplit(hex, parent, child, height, splitoffs, game
-                    .getTurnNumber());
-            }
-        }
-    }
-
-    /** Call from History during load game only */
-    void didSplit(Legion parent, Legion child, List<String> splitoffs, int turn)
-    {
-        IClient activeClient = getClient(game.getActivePlayer());
-        int childSize = splitoffs.size();
-        activeClient.didSplit(parent.getCurrentHex(), parent, child,
-            childSize, splitoffs, turn);
-
-        if (!game.getOption(Options.allStacksVisible))
-        {
-            splitoffs.clear();
-        }
-
-        Iterator<IClient> it = clients.iterator();
-        while (it.hasNext())
-        {
-            IClient client = it.next();
-            if (client != activeClient)
-            {
-                client.didSplit(parent.getCurrentHex(), parent, child,
-                    childSize, splitoffs, turn);
+                client.didSplit(hex, parent, child, childSize, splitoffs, turn);
             }
         }
     }

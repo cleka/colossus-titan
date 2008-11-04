@@ -2783,8 +2783,7 @@ public final class GameServerSide extends Game
             return false;
         }
 
-        server.didSplit(parent.getCurrentHex(), parent, newLegion, newLegion
-            .getHeight());
+        server.allTellDidSplit(parent, newLegion, getTurnNumber(), true);
 
         // viewableAll depends on the splitPrediction to tell then true contents,
         // and viewableOwn it does not harm; it only helps the AIs :)

@@ -339,7 +339,7 @@ public class History
             // Skip for players that will be dead by end of replay
             if (!player.getDeadBeforeSave())
             {
-                server.didSplit(parentLegion, childLegion, creatureNames, turn);
+                server.allTellDidSplit(parentLegion, childLegion, turn, false);
             }
         }
         else if (el.getName().equals("Merge"))
