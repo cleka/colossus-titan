@@ -414,7 +414,7 @@ final class EventViewer extends KDialog implements WindowListener,
                 if (maxTurnsOpt > maxVal)
                 {
                     maxTurnsOpt = maxVal;
-                    maxTurnsOptString = new Integer(maxTurnsOpt).toString();
+                    maxTurnsOptString = Integer.valueOf(maxTurnsOpt).toString();
                 }
             }
             catch (NumberFormatException e)
