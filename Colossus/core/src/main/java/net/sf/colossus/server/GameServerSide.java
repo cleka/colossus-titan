@@ -1729,6 +1729,13 @@ public final class GameServerSide extends Game
             // until game finishes.
             cleanupWhenGameOver();
         }
+        catch (RuntimeException rte)
+        {
+            LOGGER.log(Level.SEVERE, "RuntimeException!! "
+                + "While trying to load (corrupt?) savegame", rte);
+            dispose();
+            return;
+        }
         catch (Exception ex)
         {
             LOGGER.log(Level.SEVERE, "Tried to load corrupt savegame", ex);
