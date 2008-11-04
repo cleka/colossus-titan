@@ -38,7 +38,7 @@ final class PickRecruiter extends KDialog implements MouseListener,
     private final List<String> recruiters;
     private final List<Chit> recruiterChits = new ArrayList<Chit>();
     private final Marker legionMarker;
-    private static String recruiterName;
+    private String recruiterName;
     private final SaveWindow saveWindow;
 
     /** recruiters is a list of creature name strings */
@@ -125,12 +125,17 @@ final class PickRecruiter extends KDialog implements MouseListener,
         repaint();
     }
 
-    static String pickRecruiter(JFrame parentFrame, List<String> recruiters,
+    private String getRecruiterName()
+    {
+        return recruiterName;
+    }
+
+    static synchronized String pickRecruiter(JFrame parentFrame, List<String> recruiters,
         String hexDescription, Legion legion, Client client)
     {
-        new PickRecruiter(parentFrame, recruiters, hexDescription, legion,
-            client);
-        return recruiterName;
+        PickRecruiter pr = new PickRecruiter(parentFrame, recruiters,
+            hexDescription, legion, client);
+        return pr.getRecruiterName();
     }
 
     @Override

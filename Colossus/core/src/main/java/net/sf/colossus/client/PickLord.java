@@ -27,7 +27,7 @@ import net.sf.colossus.util.KDialog;
 final class PickLord extends KDialog implements MouseListener, WindowListener
 {
     private final List<Chit> chits = new ArrayList<Chit>();
-    private static String lordType;
+    private String lordType;
     private final List<String> imageNames;
     private final SaveWindow saveWindow;
 
@@ -72,11 +72,16 @@ final class PickLord extends KDialog implements MouseListener, WindowListener
         repaint();
     }
 
-    static String pickLord(IOptions options, JFrame parentFrame,
+    private String getLordType()
+    {
+        return lordType;
+    }
+
+    static synchronized String pickLord(IOptions options, JFrame parentFrame,
         List<String> imageNames)
     {
-        new PickLord(options, parentFrame, imageNames);
-        return lordType;
+        PickLord pl = new PickLord(options, parentFrame, imageNames);
+        return pl.getLordType();
     }
 
     @Override

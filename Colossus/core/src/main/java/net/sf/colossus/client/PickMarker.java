@@ -31,7 +31,7 @@ final class PickMarker extends KDialog implements MouseListener,
 {
     private final List<Marker> markers = new ArrayList<Marker>();
     private final SaveWindow saveWindow;
-    private static String markerId;
+    private String markerId;
 
     PickMarker(JFrame parentFrame, Player owner, Set<String> markerIds,
         IOptions options)
@@ -79,11 +79,16 @@ final class PickMarker extends KDialog implements MouseListener,
         setVisible(true);
     }
 
-    static String pickMarker(JFrame parentFrame, Player owner,
+    private String getMarkerId()
+    {
+        return markerId;
+    }
+
+    static synchronized String pickMarker(JFrame parentFrame, Player owner,
         Set<String> markerIds, IOptions options)
     {
-        new PickMarker(parentFrame, owner, markerIds, options);
-        return markerId;
+        PickMarker pm = new PickMarker(parentFrame, owner, markerIds, options);
+        return pm.getMarkerId();
     }
 
     /** Pass the chosen marker id, or null if none are available or
