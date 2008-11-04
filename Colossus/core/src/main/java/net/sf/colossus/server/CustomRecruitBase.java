@@ -27,7 +27,7 @@ abstract public class CustomRecruitBase
     private static final Logger LOGGER = Logger
         .getLogger(CustomRecruitBase.class.getName());
 
-    protected static List<Player> allPlayers = new ArrayList<Player>();
+    final protected static List<Player> allPlayers = new ArrayList<Player>();
     // TODO consider storing the Game instances instead, which would give access to both Caretaker and Player
     // instances
     private static List<Caretaker> allCaretakerInfo = new ArrayList<Caretaker>();
