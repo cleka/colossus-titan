@@ -208,7 +208,7 @@ public final class Server extends Thread implements IServer
         }
     }
 
-    // FST asks this 
+    // FileServerThread asks this 
     public boolean isKnownClient(InetAddress requester)
     {
         boolean knownIP = false;
@@ -641,6 +641,7 @@ public final class Server extends Thread implements IServer
     }
 
     // last SocketClientThread going down calls this
+    // Synchronized because *might* also be called from Abort button
     public synchronized void stopFileServer()
     {
         LOGGER
@@ -853,13 +854,7 @@ public final class Server extends Thread implements IServer
             false, false, dontUseOptionsFile);
     }
 
-    // TODO temporary method since ClientHandler doesn't know the player
-    // nor the game, thus can't pass a Player instance directly [Peter]
-    // XXX Still TODO? Replaced the two methods by one, because 
-    // ClientHandler cannot know the Player, and for finding it the 
-    // if (remote) decision needs to be done 
-    // -- so folded both methods into one again to avoid the NPE [Clemens]
-    synchronized boolean addClient(final IClient client,
+    boolean addClient(final IClient client,
         final String playerName, final boolean remote)
     {
         LOGGER.finest("Calling Server.addClient() for " + playerName);
@@ -1101,7 +1096,7 @@ public final class Server extends Thread implements IServer
         battle.doneWithMoves();
     }
 
-    public synchronized void doneWithStrikes()
+    public void doneWithStrikes()
     {
         BattleServerSide battle = game.getBattle();
         if (!isBattleActivePlayer())
@@ -1135,7 +1130,7 @@ public final class Server extends Thread implements IServer
         }
     }
 
-    synchronized void allInitBoard()
+    void allInitBoard()
     {
         for (Player player : game.getPlayers())
         {
@@ -1150,7 +1145,7 @@ public final class Server extends Thread implements IServer
         }
     }
 
-    synchronized void allTellReplay(boolean val, int maxTurn)
+    void allTellReplay(boolean val, int maxTurn)
     {
         for (IClient client : clients)
         {
@@ -1158,7 +1153,7 @@ public final class Server extends Thread implements IServer
         }
     }
 
-    synchronized void allRequestConfirmCatchup(String action)
+    void allRequestConfirmCatchup(String action)
     {
         // First put them all to the list, send messages after that
         synchronized(waitingToCatchup)
@@ -1183,7 +1178,7 @@ public final class Server extends Thread implements IServer
         }
     }
 
-    synchronized void allTellAllLegionLocations()
+    void allTellAllLegionLocations()
     {
         List<Legion> legions = game.getAllLegions();
         for (Legion legion : legions)
@@ -1231,7 +1226,7 @@ public final class Server extends Thread implements IServer
     }
 
     /** Needed if loading game outside the split phase. */
-    synchronized void allSetupTurnState()
+    void allSetupTurnState()
     {
         for (IClient client : clients)
         {
@@ -1321,7 +1316,7 @@ public final class Server extends Thread implements IServer
         }
     }
 
-    synchronized void allPlaceNewChit(CreatureServerSide critter)
+    void allPlaceNewChit(CreatureServerSide critter)
     {
         for (IClient client : clients)
         {
@@ -1355,7 +1350,7 @@ public final class Server extends Thread implements IServer
     }
 
     /** Find out if the player wants to acquire an angel or archangel. */
-    synchronized void askAcquireAngel(PlayerServerSide player, Legion legion,
+    void askAcquireAngel(PlayerServerSide player, Legion legion,
         List<String> recruits)
     {
         if (((LegionServerSide)legion).getHeight() < 7)
@@ -1368,7 +1363,7 @@ public final class Server extends Thread implements IServer
         }
     }
 
-    public synchronized void acquireAngel(Legion legion, String angelType)
+    public void acquireAngel(Legion legion, String angelType)
     {
         if (legion != null)
         {
@@ -1540,7 +1535,7 @@ public final class Server extends Thread implements IServer
         game.removeCreatureEvent(legion, recruitName);
     }
 
-    public synchronized void engage(MasterHex hex)
+    public void engage(MasterHex hex)
     {
         if (!isActivePlayer())
         {
@@ -1674,7 +1669,7 @@ public final class Server extends Thread implements IServer
         }
     }
 
-    public synchronized void strike(int tag, String hexLabel)
+    public void strike(int tag, String hexLabel)
     {
         IClient client = getClient(getPlayer());
         if (!isBattleActivePlayer())
@@ -1729,7 +1724,7 @@ public final class Server extends Thread implements IServer
         critter.strike(target);
     }
 
-    public synchronized void applyCarries(String hexLabel)
+    public void applyCarries(String hexLabel)
     {
         if (!isBattleActivePlayer())
         {
@@ -1753,7 +1748,7 @@ public final class Server extends Thread implements IServer
         game.getBattle().undoMove(hexLabel);
     }
 
-    synchronized void allTellStrikeResults(CreatureServerSide striker,
+    void allTellStrikeResults(CreatureServerSide striker,
         CreatureServerSide target, int strikeNumber, List<String> rolls,
         int damage, int carryDamageLeft, Set<String> carryTargetDescriptions)
     {
@@ -1773,7 +1768,7 @@ public final class Server extends Thread implements IServer
         }
     }
 
-    synchronized void allTellCarryResults(CreatureServerSide carryTarget,
+    void allTellCarryResults(CreatureServerSide carryTarget,
         int carryDamageDone, int carryDamageLeft,
         Set<String> carryTargetDescriptions)
     {
@@ -1804,7 +1799,7 @@ public final class Server extends Thread implements IServer
         }
     }
 
-    synchronized void allTellHexDamageResults(CreatureServerSide target,
+    void allTellHexDamageResults(CreatureServerSide target,
         int damage)
     {
         this.target = target;
@@ -1856,7 +1851,7 @@ public final class Server extends Thread implements IServer
         }
     }
 
-    synchronized void allInitBattle(MasterHex masterHex)
+    void allInitBattle(MasterHex masterHex)
     {
         BattleServerSide battle = game.getBattle();
         Iterator<IClient> it = clients.iterator();
@@ -2049,13 +2044,8 @@ public final class Server extends Thread implements IServer
         }
     }
 
-    // made synchronized by Clemens 1.10.2007:
-    // a bunch of calls inside this all go into methods in Game which
-    // are synchronized; if several threads do withdrawFromGame nearly
-    // same time,they will block each other.
-
     // XXX Notify all players.
-    public synchronized void withdrawFromGame()
+    public void withdrawFromGame()
     {
         if (obsolete || game == null || game.isOver())
         {
@@ -2446,7 +2436,7 @@ public final class Server extends Thread implements IServer
         client.setPlayerName(newName);
     }
 
-    synchronized void askPickColor(Player player, final List<String> colorsLeft)
+    void askPickColor(Player player, final List<String> colorsLeft)
     {
         IClient client = getClient(player);
         if (client != null)
@@ -2455,7 +2445,7 @@ public final class Server extends Thread implements IServer
         }
     }
 
-    public synchronized void assignColor(String color)
+    public void assignColor(String color)
     {
         Player p = getPlayer();
         assert p != null : "getPlayer returned null player (in thread "
@@ -2491,7 +2481,7 @@ public final class Server extends Thread implements IServer
     }
 
     /** Hack to set color on load game. */
-    synchronized void allSetColor()
+    void allSetColor()
     {
         Iterator<PlayerServerSide> it = game.getPlayers().iterator();
         while (it.hasNext())

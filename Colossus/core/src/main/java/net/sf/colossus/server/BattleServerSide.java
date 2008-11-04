@@ -131,7 +131,7 @@ public final class BattleServerSide extends Battle
         server.allPlaceNewChit(critter);
     }
 
-    private synchronized void initBattleChits(LegionServerSide legion)
+    private void initBattleChits(LegionServerSide legion)
     {
         for (CreatureServerSide creature : legion.getCreatures())
         {

@@ -566,9 +566,9 @@ public class CreatureServerSide extends Creature
     }
 
     /** Calculate number of dice and strike number needed to hit target,
-     *  and whether any carries and strike penalties are possible.  The
-     *  actual striking is now deferred to strike2(). */
-    synchronized void strike(CreatureServerSide target)
+     *  and whether any carries and strike penalties are possible.
+     *  The actual striking is now deferred to strike2(). */
+    void strike(CreatureServerSide target)
     {
         battle.leaveCarryMode();
         carryPossible = true;

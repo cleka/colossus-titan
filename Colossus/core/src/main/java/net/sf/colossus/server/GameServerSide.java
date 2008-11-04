@@ -247,7 +247,7 @@ public final class GameServerSide extends Game
         ViableEntityManager.unregister(this);
     }
 
-    private synchronized void clearFlags()
+    private void clearFlags()
     {
         engagementInProgress = false;
         battleInProgress = false;
@@ -870,7 +870,7 @@ public final class GameServerSide extends Game
         return winner;
     }
 
-    synchronized void checkForVictory()
+    void checkForVictory()
     {
         if (gameOver)
         {
@@ -901,12 +901,12 @@ public final class GameServerSide extends Game
         }
     }
 
-    synchronized boolean isOver()
+    boolean isOver()
     {
         return gameOver;
     }
 
-    public synchronized void setGameOver(boolean gameOver, String message)
+    public void setGameOver(boolean gameOver, String message)
     {
         this.gameOver = gameOver;
         this.gameOverMessage = message;
@@ -940,7 +940,7 @@ public final class GameServerSide extends Game
      * Advance to the next phase, only if the passed oldPhase and playerName
      * are current.
      */
-    synchronized void advancePhase(final Constants.Phase oldPhase,
+    void advancePhase(final Constants.Phase oldPhase,
         final Player player)
     {
         if (oldPhase != phase)
@@ -1149,7 +1149,7 @@ public final class GameServerSide extends Game
         server.allSetupMove();
     }
 
-    private synchronized void setupFight()
+    private void setupFight()
     {
         server.allSetupFight();
         server.nextEngagement();
@@ -1440,7 +1440,7 @@ public final class GameServerSide extends Game
         return leg;
     }
 
-    synchronized void autoSave()
+    void autoSave()
     {
         if (getOption(Options.autosave) && !isOver())
         {
@@ -2146,7 +2146,7 @@ public final class GameServerSide extends Game
      *
      *  TODO use proper data structure instead of String serializations
      */
-    private synchronized Set<String> findNormalMoves(MasterHex hex,
+    private Set<String> findNormalMoves(MasterHex hex,
         Legion legion, int roll, int block, int cameFrom, boolean ignoreFriends)
     {
         Set<String> set = new HashSet<String>();
@@ -2522,7 +2522,7 @@ public final class GameServerSide extends Game
     }
 
     /** Return set of hexLabels for engagements found. */
-    synchronized Set<MasterHex> findEngagements()
+    Set<MasterHex> findEngagements()
     {
         Set<MasterHex> result = new HashSet<MasterHex>();
         Player player = getActivePlayer();
@@ -2606,7 +2606,7 @@ public final class GameServerSide extends Game
         return battle;
     }
 
-    synchronized void finishBattle(MasterHex masterHex,
+    void finishBattle(MasterHex masterHex,
         boolean attackerEntered, int points, int turnDone)
     {
         battle.cleanRefs();
@@ -2654,7 +2654,7 @@ public final class GameServerSide extends Game
      * 
      * TODO rename -- it is not specific for angels
      */
-    synchronized Set<MasterHex> findSummonableAngels(String markerId)
+    Set<MasterHex> findSummonableAngels(String markerId)
     {
         Legion legion = getLegionByMarkerId(markerId);
         Set<MasterHex> result = new HashSet<MasterHex>();
@@ -2893,7 +2893,7 @@ public final class GameServerSide extends Game
         return null;
     }
 
-    synchronized void engage(MasterHex hex)
+    void engage(MasterHex hex)
     {
         // Do not allow clicking on engagements if one is
         // already being resolved.
@@ -3049,8 +3049,7 @@ public final class GameServerSide extends Game
         }
     }
 
-    /** Synchronized to keep both negotiators from racing to fight. */
-    synchronized void fight(MasterHex hex)
+    void fight(MasterHex hex)
     {
         if (!battleInProgress)
         {
@@ -3079,7 +3078,7 @@ public final class GameServerSide extends Game
         }
     }
 
-    private synchronized void handleConcession(Legion loser, Legion winner,
+    private void handleConcession(Legion loser, Legion winner,
         boolean fled)
     {
         // Figure how many points the victor receives.
@@ -3139,7 +3138,7 @@ public final class GameServerSide extends Game
         checkEngagementDone();
     }
 
-    private synchronized void handleNegotiation(Proposal results)
+    private void handleNegotiation(Proposal results)
     {
         Legion attacker = getLegionByMarkerId(results.getAttackerId());
         Legion defender = getLegionByMarkerId(results.getDefenderId());
@@ -3283,14 +3282,14 @@ public final class GameServerSide extends Game
         checkEngagementDone();
     }
 
-    synchronized void askAcquireAngel(PlayerServerSide player, Legion legion,
+    void askAcquireAngel(PlayerServerSide player, Legion legion,
         List<String> recruits)
     {
         acquiring = true;
         server.askAcquireAngel(player, legion, recruits);
     }
 
-    synchronized void doneAcquiringAngels()
+    void doneAcquiringAngels()
     {
         acquiring = false;
         checkEngagementDone();
@@ -3305,7 +3304,7 @@ public final class GameServerSide extends Game
         turnCombatFinished = aTurn;
     }
 
-    private synchronized void checkEngagementDone()
+    private void checkEngagementDone()
     {
         if (summoning || reinforcing || acquiring || engagementResult == null)
         {
@@ -3357,7 +3356,7 @@ public final class GameServerSide extends Game
     }
 
     /** Return a list of all players' legions. */
-    synchronized List<Legion> getAllLegions()
+    List<Legion> getAllLegions()
     {
         List<Legion> list = new ArrayList<Legion>();
         for (Player player : players)
@@ -3369,7 +3368,7 @@ public final class GameServerSide extends Game
     }
 
     /** Return a list of all legions not belonging to player. */
-    synchronized List<Legion> getAllEnemyLegions(Player player)
+    List<Legion> getAllEnemyLegions(Player player)
     {
         List<Legion> list = new ArrayList<Legion>();
         for (Player otherPlayer : players)
@@ -3505,7 +3504,7 @@ public final class GameServerSide extends Game
         return result;
     }
 
-    synchronized int getNumFriendlyLegions(MasterHex masterHex, Player player)
+    int getNumFriendlyLegions(MasterHex masterHex, Player player)
     {
         int count = 0;
         List<? extends Legion> legions = player.getLegions();
@@ -3519,7 +3518,7 @@ public final class GameServerSide extends Game
         return count;
     }
 
-    synchronized Legion getFirstFriendlyLegion(MasterHex masterHex,
+    Legion getFirstFriendlyLegion(MasterHex masterHex,
         Player player)
     {
         for (Legion legion : player.getLegions())
@@ -3532,7 +3531,7 @@ public final class GameServerSide extends Game
         return null;
     }
 
-    synchronized List<LegionServerSide> getFriendlyLegions(
+    List<LegionServerSide> getFriendlyLegions(
         MasterHex masterHex, PlayerServerSide player)
     {
         List<LegionServerSide> newLegions = new ArrayList<LegionServerSide>();

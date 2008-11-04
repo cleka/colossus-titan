@@ -220,7 +220,7 @@ public final class PlayerServerSide extends Player implements
     }
 
     /** Remove all of this player's zero-height legions. */
-    synchronized void removeEmptyLegions()
+    void removeEmptyLegions()
     {
         Iterator<LegionServerSide> it = getLegions().iterator();
         while (it.hasNext())
@@ -243,13 +243,13 @@ public final class PlayerServerSide extends Player implements
      */
     @SuppressWarnings("unchecked")
     @Override
-    synchronized public List<LegionServerSide> getLegions()
+    public List<LegionServerSide> getLegions()
     {
         return (List<LegionServerSide>)super.getLegions();
     }
 
     /** Return the number of this player's legions that have moved. */
-    synchronized int legionsMoved()
+    int legionsMoved()
     {
         int count = 0;
 
@@ -265,7 +265,7 @@ public final class PlayerServerSide extends Player implements
 
     /** Return the number of this player's legions that have legal
      non-teleport moves remaining. */
-    synchronized int countMobileLegions()
+    int countMobileLegions()
     {
         int count = 0;
         for (LegionServerSide legion : getLegions())
@@ -278,7 +278,7 @@ public final class PlayerServerSide extends Player implements
         return count;
     }
 
-    synchronized void commitMoves()
+    void commitMoves()
     {
         for (LegionServerSide legion : getLegions())
         {
@@ -348,7 +348,7 @@ public final class PlayerServerSide extends Player implements
         }
     }
 
-    synchronized void undoAllMoves()
+    void undoAllMoves()
     {
         for (LegionServerSide legion : getLegions())
         {
@@ -358,7 +358,7 @@ public final class PlayerServerSide extends Player implements
 
     /** Return true if two or more of this player's legions share
      *  a hex and they have a legal non-teleport move. */
-    synchronized boolean splitLegionHasForcedMove()
+    boolean splitLegionHasForcedMove()
     {
         for (LegionServerSide legion : getLegions())
         {
@@ -374,7 +374,7 @@ public final class PlayerServerSide extends Player implements
     }
 
     /** Return true if any legion can recruit. */
-    synchronized boolean canRecruit()
+    boolean canRecruit()
     {
         for (LegionServerSide legion : getLegions())
         {
@@ -445,7 +445,7 @@ public final class PlayerServerSide extends Player implements
         getGame().getServer().allUpdatePlayerInfo();
     }
 
-    synchronized void recombineIllegalSplits()
+    void recombineIllegalSplits()
     {
         Iterator<LegionServerSide> it = getLegions().iterator();
         while (it.hasNext())
@@ -533,7 +533,7 @@ public final class PlayerServerSide extends Player implements
      * 
      * @param slayer The player who killed us. May be null if we just gave up or it is a draw.
      */
-    synchronized void die(Player slayer)
+    void die(Player slayer)
     {
         LOGGER.info("Player '" + getName() + "' is dying, killed by "
             + (slayer == null ? "nobody" : slayer.getName()));
