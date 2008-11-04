@@ -1703,7 +1703,7 @@ public class SimpleAI implements AI
             // defender in the tower!  ouch!
             defenderPointValue *= 1.2;
         }
-        else if (hex.getTerrain().equals("Abyss")) // The Abyss, in variants
+        else if (hex.getTerrain().getDisplayName().equals("Abyss")) // The Abyss, in variants
         {
             // defender in the abyss!  Kill!
             defenderPointValue *= 0.8;
@@ -1751,9 +1751,9 @@ public class SimpleAI implements AI
 
         }
 
-        public boolean canReach(String terrain)
+        public boolean canReach(String terrainTypeName)
         {
-            int now = getNumberOfWaysToTerrain(legion, hex, terrain);
+            int now = getNumberOfWaysToTerrain(legion, hex, terrainTypeName);
             return (now > 0);
         }
 
@@ -1876,14 +1876,14 @@ public class SimpleAI implements AI
     }
 
     int getNumberOfWaysToTerrain(LegionClientSide legion, MasterHex hex,
-        String terrainType)
+        String terrainTypeName)
     {
         int total = 0;
         for (int roll = 1; roll <= 6; roll++)
         {
             Set<MasterHex> set = client.getMovement().listAllMoves(legion,
                 hex, roll, true);
-            if (setContainsHexWithTerrain(set, terrainType))
+            if (setContainsHexWithTerrain(set, terrainTypeName))
             {
                 total++;
             }
@@ -1892,11 +1892,11 @@ public class SimpleAI implements AI
     }
 
     private boolean setContainsHexWithTerrain(Set<MasterHex> set,
-        String terrainType)
+        String terrainTypeName)
     {
         for (MasterHex hex : set)
         {
-            if (hex.getTerrain().equals(terrainType))
+            if (hex.getTerrain().getDisplayName().equals(terrainTypeName))
             {
                 return true;
             }

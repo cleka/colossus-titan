@@ -593,7 +593,8 @@ public class RecruitGraph
         {
             RecruitEdge e = it.next();
 
-            if ((e.getNumber() == number) && (e.getTerrain().equals(t)))
+            if ((e.getNumber() == number)
+                && (e.getTerrain().getDisplayName().equals(t)))
             {
                 v2 = e.getDestination().getCreatureName();
             }
