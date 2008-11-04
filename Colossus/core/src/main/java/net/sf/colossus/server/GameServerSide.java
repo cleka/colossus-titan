@@ -85,6 +85,7 @@ public final class GameServerSide extends Game
     private String engagementResult;
     private boolean pendingAdvancePhase;
     private boolean loadingGame;
+    private boolean replayOngoing = false;
     private boolean gameOver;
     private String gameOverMessage = null;
     private BattleServerSide battle;
@@ -126,13 +127,13 @@ public final class GameServerSide extends Game
             public void creatureTypeAvailabilityUpdated(CreatureType type,
                 int availableCount)
             {
-                updateCaretakerDisplays(type);
+                updateCaretakerDisplaysFor(type);
             }
 
             public void creatureTypeDeadCountUpdated(CreatureType type,
                 int deadCount)
             {
-                updateCaretakerDisplays(type);
+                updateCaretakerDisplaysFor(type);
             }
 
             public void fullUpdate()
@@ -146,8 +147,12 @@ public final class GameServerSide extends Game
     /** 
      * Update the dead and available counts for a creature type on all clients.
      */
-    private void updateCaretakerDisplays(CreatureType type)
+    private void updateCaretakerDisplaysFor(CreatureType type)
     {
+        if (replayOngoing)
+        {
+            return;
+        }
         Server server = getServer();
         if (server != null)
         {
@@ -157,13 +162,17 @@ public final class GameServerSide extends Game
     }
 
     /** 
-     * Update the dead and available counts for a creature type on all clients.
+     * Update the dead and available counts for all creature types on all clients.
      */
     private void updateCaretakerDisplays()
     {
+        if (replayOngoing)
+        {
+            return;
+        }
         for (CreatureType type : getVariant().getCreatureTypes())
         {
-            updateCaretakerDisplays(type);
+            updateCaretakerDisplaysFor(type);
         }
     }
 
@@ -584,16 +593,8 @@ public final class GameServerSide extends Game
 
         server.allTellAllLegionLocations();
         autoSave();
-        fullySyncCaretakerDisplays();
+        updateCaretakerDisplays();
         server.allRequestConfirmCatchup("KickstartGame");
-    }
-
-    private void fullySyncCaretakerDisplays()
-    {
-        for (CreatureType type : getVariant().getCreatureTypes())
-        {
-            updateCaretakerDisplays(type);
-        }
     }
 
     /** Randomize towers by rolling dice and rerolling ties. */
@@ -1831,6 +1832,7 @@ public final class GameServerSide extends Game
         syncOptions();
 
         server.allUpdatePlayerInfo(true);
+        replayOngoing = true;
         server.allTellReplay(true, turnNumber);
         server.allInitBoard();
 
@@ -1853,9 +1855,10 @@ public final class GameServerSide extends Game
         server.allUpdatePlayerInfo(false);
         server.allTellAllLegionLocations();
         server.allTellReplay(false, 0);
+        replayOngoing = false;
 
         server.allSetupTurnState();
-        fullySyncCaretakerDisplays();
+        updateCaretakerDisplays();
         
         server.allRequestConfirmCatchup("KickstartGame");
         return ok;
