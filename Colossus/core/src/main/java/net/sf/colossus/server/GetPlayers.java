@@ -740,10 +740,7 @@ public final class GetPlayers extends KFrame implements WindowListener,
             }
         }
         
-        // perhaps .toString() would be ok, but there is arguing whether
-        // then you get simply ref to the value of original StringBuffer 
-        // object and heaven knows what then... so, just to be sure. 
-        return tryName.substring(0);
+        return tryName.toString();
     }
 
     public synchronized void actionPerformed(ActionEvent e)
