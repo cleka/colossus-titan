@@ -16,6 +16,7 @@ import net.sf.colossus.game.Battle;
 import net.sf.colossus.game.Creature;
 import net.sf.colossus.game.Legion;
 import net.sf.colossus.game.Player;
+import net.sf.colossus.util.CompareDoubles;
 import net.sf.colossus.util.Options;
 import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.HazardTerrain;
@@ -1117,18 +1118,6 @@ public final class BattleServerSide extends Battle
             getCarryTargets());
     }
 
-    /**
-     * Returns true if the two given doubles are basically equal (comparing
-     * difference to very small value to get rid of rounding issues) 
-     * @param d1 First double value
-     * @param d2 Second double value
-     * @return boolean whether they are basically equal value or not
-     */
-    private static boolean areEqual(double d1, double d2)
-    {
-        return (Math.abs(d1-d2) < 0.0000001);
-    }
-
     /** Return the range in hexes from hex1 to hex2.  Titan ranges are
      *  inclusive at both ends. */
     static int getRange(BattleHex hex1, BattleHex hex2, boolean allowEntrance)
@@ -1429,7 +1418,8 @@ public final class BattleServerSide extends Battle
         int strikeElevation = Math.min(hex1.getElevation(), hex2
             .getElevation());
 
-        if (areEqual(yDist, 0.0) || areEqual(Math.abs(yDist), 1.5 * Math.abs(xDist)))
+        if (CompareDoubles.almostEqual(yDist, 0.0) || CompareDoubles
+            .almostEqual(Math.abs(yDist), 1.5 * Math.abs(xDist)))
         {
             // Hexspine; try both sides.
             return (isLOSBlockedDir(hex1, hex1, hex2, true, strikeElevation,
@@ -1513,7 +1503,7 @@ public final class BattleServerSide extends Battle
             {
                 return 3;
             }
-            else if (areEqual(yDist, xDistAndAHalf))
+            else if (CompareDoubles.almostEqual(yDist, xDistAndAHalf))
             {
                 if (left)
                 {
@@ -1528,7 +1518,7 @@ public final class BattleServerSide extends Battle
             {
                 return 0;
             }
-            else if (areEqual(yDist, -xDistAndAHalf))
+            else if (CompareDoubles.almostEqual(yDist, -xDistAndAHalf))
             {
                 if (left)
                 {
@@ -1567,7 +1557,7 @@ public final class BattleServerSide extends Battle
             {
                 return 0;
             }
-            else if (areEqual(yDist, xDistAndAHalf))
+            else if (CompareDoubles.almostEqual(yDist, xDistAndAHalf))
             {
                 if (left)
                 {
@@ -1582,7 +1572,7 @@ public final class BattleServerSide extends Battle
             {
                 return 3;
             }
-            else if (areEqual(yDist, -xDistAndAHalf))
+            else if (CompareDoubles.almostEqual(yDist, -xDistAndAHalf))
             {
                 if (left)
                 {
@@ -1686,7 +1676,8 @@ public final class BattleServerSide extends Battle
         double xDist = x2 - x1;
         double yDist = y2 - y1;
 
-        if (areEqual(yDist, 0.0) || areEqual(Math.abs(yDist), 1.5 * Math.abs(xDist)))
+        if (CompareDoubles.almostEqual(yDist, 0.0) || CompareDoubles
+            .almostEqual(Math.abs(yDist), 1.5 * Math.abs(xDist)))
         {
             int strikeElevation = Math.min(hex1.getElevation(), hex2
                 .getElevation());

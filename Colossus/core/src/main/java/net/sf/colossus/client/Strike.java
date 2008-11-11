@@ -9,6 +9,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.colossus.server.Constants;
+import net.sf.colossus.util.CompareDoubles;
 import net.sf.colossus.variant.BattleHex;
 import net.sf.colossus.variant.CreatureType;
 import net.sf.colossus.variant.HazardTerrain;
@@ -180,18 +181,6 @@ public final class Strike
     private int countStrikes(BattleChit chit, boolean rangestrike)
     {
         return findStrikes(chit, rangestrike).size();
-    }
-
-    /**
-     * Returns true if the two given doubles are basically equal (comparing
-     * difference to very small value to get rid of rounding issues) 
-     * @param d1 First double value
-     * @param d2 Second double value
-     * @return boolean whether they are basically equal value or not
-     */
-    private static boolean areEqual(double d1, double d2)
-    {
-        return (Math.abs(d1-d2) < 0.0000001);
     }
 
     /** Return the range in hexes from hex1 to hex2.  Titan ranges are
@@ -526,7 +515,8 @@ public final class Strike
         int strikeElevation = Math.min(hex1.getElevation(), hex2
             .getElevation());
 
-        if (areEqual(yDist, 0.0) || areEqual(Math.abs(yDist), 1.5 * Math.abs(xDist)))
+        if (CompareDoubles.almostEqual(yDist, 0.0) || CompareDoubles
+            .almostEqual(Math.abs(yDist), 1.5 * Math.abs(xDist)))
         {
             // Hexspine; try both sides.
             return (isLOSBlockedDir(hex1, hex1, hex2, true, strikeElevation,
@@ -620,7 +610,7 @@ public final class Strike
             {
                 return 3;
             }
-            else if (areEqual(yDist, xDistAndAHalf))
+            else if (CompareDoubles.almostEqual(yDist, xDistAndAHalf))
             {
                 if (left)
                 {
@@ -635,7 +625,7 @@ public final class Strike
             {
                 return 0;
             }
-            else if (areEqual(yDist, -xDistAndAHalf))
+            else if (CompareDoubles.almostEqual(yDist, -xDistAndAHalf))
             {
                 if (left)
                 {
@@ -674,7 +664,7 @@ public final class Strike
             {
                 return 0;
             }
-            else if (areEqual(yDist, xDistAndAHalf))
+            else if (CompareDoubles.almostEqual(yDist, xDistAndAHalf))
             {
                 if (left)
                 {
@@ -689,7 +679,7 @@ public final class Strike
             {
                 return 3;
             }
-            else if (areEqual(yDist, -xDistAndAHalf))
+            else if (CompareDoubles.almostEqual(yDist, -xDistAndAHalf))
             {
                 if (left)
                 {
@@ -775,7 +765,8 @@ public final class Strike
         double y2 = hex2.getYCoord();
 
         // Offboard hexes are not allowed.
-        if (areEqual(x1,-1.0) || areEqual(x2,-1))
+        if (CompareDoubles.almostEqual(x1,-1.0)
+            || CompareDoubles.almostEqual(x2,-1))
         {
             return Constants.BIGNUM;
         }
@@ -793,7 +784,8 @@ public final class Strike
         double xDist = x2 - x1;
         double yDist = y2 - y1;
 
-        if (areEqual(yDist, 0.0) || areEqual(Math.abs(yDist), 1.5 * Math.abs(xDist)))
+        if (CompareDoubles.almostEqual(yDist, 0.0) || CompareDoubles
+            .almostEqual(Math.abs(yDist), 1.5 * Math.abs(xDist)))
         {
             int strikeElevation = Math.min(hex1.getElevation(), hex2
                 .getElevation());
